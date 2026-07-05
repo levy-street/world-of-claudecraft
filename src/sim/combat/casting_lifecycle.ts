@@ -699,6 +699,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     spendAbilityCost(p, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.runEffects(p, meta, target, res);
+    if (p.kind === 'player') ctx.applySetProcs(p, target, 'spellCast');
     return;
   }
 
@@ -751,4 +752,5 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   spendAbilityCost(p, res);
   armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
   ctx.runEffects(p, meta, target, res);
+  if (p.kind === 'player') ctx.applySetProcs(p, target, 'spellCast');
 }

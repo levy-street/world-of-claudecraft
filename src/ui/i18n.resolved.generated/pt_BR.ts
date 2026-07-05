@@ -7730,7 +7730,8 @@ export const pt_BR: EnTranslations = {
       "necromancers": {
         "name": "Vestes Mournweave",
         "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
-        "bonus3": "Aumenta o intelecto em 10 e o vigor em 10."
+        "bonus3": "Aumenta o intelecto em 10 e o vigor em 10.",
+        "bonus4": "Your spells have a chance to grant Clearcasting, making your next spell free."
       },
       "nighttalon": {
         "name": "Traje de Couro Direfang",

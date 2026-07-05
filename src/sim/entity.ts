@@ -37,6 +37,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     meleeHaste: 0,
     rangedHaste: 0,
     spellHaste: 0,
+    setProcs: [],
+    procReadyAt: undefined as unknown as Record<string, number>,
     critChance: 0.05,
     dodgeChance: 0.05,
     castPushbackReduction: 0,
@@ -337,6 +339,8 @@ export function recalcPlayerStats(
   e.meleeHaste = setEff.haste;
   e.rangedHaste = setEff.haste;
   e.spellHaste = setEff.haste;
+  e.setProcs = setEff.procs;
+  if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
   // Crit: ~1% per 20 agi at low level
   e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
   e.castPushbackReduction = setEff.castPushbackReduction;

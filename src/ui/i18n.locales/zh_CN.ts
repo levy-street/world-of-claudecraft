@@ -4744,6 +4744,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.necromancers.name': '哀织法衣',
   'entities.itemSets.necromancers.bonus2': '你不会被击退（击退抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 点，耐力提高 10 点。',
+  'entities.itemSets.necromancers.bonus4': '你的法术有几率触发“清晰施法”，使你的下一个法术免费施放。',
   'entities.itemSets.nighttalon.name': '恐牙皮甲',
   'entities.itemSets.nighttalon.bonus2': '攻击强度提高 40 点。',
   'entities.itemSets.nighttalon.bonus3':

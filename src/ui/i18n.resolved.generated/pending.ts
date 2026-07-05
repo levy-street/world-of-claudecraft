@@ -9,24 +9,52 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "es_ES": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "fr_FR": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "fr_CA": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "de_DE": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "pl_PL": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "id_ID": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "tr_TR": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "sv_SE": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "vi_VN": [
+    "entities.itemSets.necromancers.bonus4"
+  ],
+  "da_DK": [
+    "entities.itemSets.necromancers.bonus4"
+  ]
 };

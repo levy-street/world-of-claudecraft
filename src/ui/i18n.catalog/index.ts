@@ -43,7 +43,10 @@ export { questStrings } from './quests';
 // Re-export the catalog public surface (every name the old i18n.en.ts exported).
 export { shellStrings } from './shell';
 
-type ItemSetEntityText = Record<string, { name: string; bonus2?: string; bonus3?: string }>;
+type ItemSetEntityText = Record<
+  string,
+  { name: string; bonus2?: string; bonus3?: string; bonus4?: string }
+>;
 
 const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
   Object.values(ITEM_SETS)
@@ -53,9 +56,15 @@ const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
       // 3-piece tier, so emitting a bonus2 row would bake in an id-fallback string.
       const bonus2 = set.bonuses.find((bonus) => bonus.pieces === 2)?.text;
       const bonus3 = set.bonuses.find((bonus) => bonus.pieces === 3)?.text;
+      const bonus4 = set.bonuses.find((bonus) => bonus.pieces === 4)?.text;
       return [
         set.id,
-        { name: set.name, ...(bonus2 ? { bonus2 } : {}), ...(bonus3 ? { bonus3 } : {}) },
+        {
+          name: set.name,
+          ...(bonus2 ? { bonus2 } : {}),
+          ...(bonus3 ? { bonus3 } : {}),
+          ...(bonus4 ? { bonus4 } : {}),
+        },
       ];
     }),
 );

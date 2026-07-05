@@ -17,7 +17,7 @@
 // data-as-code: balance numbers live here, never inline in the engine.
 // `aggregateSetBonuses` is the pure resolver imported by `entity.ts`.
 
-import type { ItemSet, SetBonusEffect, SetBonusTier } from '../types';
+import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
 
 // Haste granted by a 3-piece bonus (fraction). The one knob for every haste
 // source: 0.15 makes swings 15% faster and casts/channels 15% shorter.
@@ -66,6 +66,21 @@ const CASTER_T1_BONUSES: SetBonusTier[] = [
     pieces: 3,
     effect: { int: 10, sta: 10 },
     text: 'Increases Intellect by 10 and Stamina by 10.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      proc: {
+        id: 'set_clearcasting',
+        name: 'Clearcasting',
+        trigger: 'spellCast',
+        chance: 0.1,
+        aura: 'next_cast_free',
+        duration: 12,
+        icd: 4,
+      },
+    },
+    text: 'Your spells have a chance to grant Clearcasting, making your next spell free.',
   },
 ];
 // Tier-2 3-piece tiers carry the tier-1 stats PLUS haste.
@@ -165,6 +180,7 @@ export interface AggregatedSetEffect {
   haste: number;
   castPushbackReduction: number;
   knockbackResistance: number;
+  procs: SetProc[];
 }
 
 function zeroEffect(): AggregatedSetEffect {
@@ -179,6 +195,7 @@ function zeroEffect(): AggregatedSetEffect {
     haste: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
+    procs: [],
   };
 }
 
@@ -208,6 +225,7 @@ export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetE
       if (e.knockbackResistance != null) {
         out.knockbackResistance = Math.max(out.knockbackResistance, e.knockbackResistance);
       }
+      if (e.proc) out.procs.push(e.proc);
     }
   }
   out.castPushbackReduction = Math.min(1, Math.max(0, out.castPushbackReduction));
