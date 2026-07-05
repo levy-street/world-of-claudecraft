@@ -3388,6 +3388,10 @@ export const nl_NL: EnTranslations = {
       "tooManyAttempts": "Te veel pogingen. Wacht een minuut en probeer het opnieuw.",
       "usernameShape": "Gebruikersnaam moet 3-24 tekens lang zijn en letters, cijfers of een liggend streepje bevatten.",
       "usernameNotAllowed": "Die gebruikersnaam is niet toegestaan.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Wachtwoord moet minstens 6 tekens lang zijn.",
       "usernameTaken": "Die gebruikersnaam is al in gebruik.",
       "invalidCredentials": "Ongeldige gebruikersnaam of wachtwoord.",
@@ -3449,6 +3453,16 @@ export const nl_NL: EnTranslations = {
     "statsOffline": "Offline",
     "statsRealmOffline": "{realm} (Offline)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}."
+  },
   "character": {
     "loading": "Laden...",
     "noneYet": "Nog geen personages. Maak er hieronder een aan.",
@@ -3461,6 +3475,9 @@ export const nl_NL: EnTranslations = {
     "delete": "Verwijderen",
     "rename": "Hernoemen",
     "newNamePlaceholder": "Nieuwe personagenaam",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "tabCharacters": "Personages",
     "tabCreate": "Aanmaken",
     "portraitAlt": "Portret van {name}",

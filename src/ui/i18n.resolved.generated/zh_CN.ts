@@ -3388,6 +3388,10 @@ export const zh_CN: EnTranslations = {
       "tooManyAttempts": "尝试次数过多。请等待一分钟后重试。",
       "usernameShape": "用户名必须为 3-24 个字符，并使用字母、数字或下划线。",
       "usernameNotAllowed": "该用户名不可使用。",
+      "linkWalletFirst": "请先连接并绑定 Solana 钱包。",
+      "nameReserved": "该名字已被预订。",
+      "quoteExpired": "支付报价已过期，请重新开始。",
+      "paymentUsed": "该笔支付已被使用。",
       "passwordMin": "密码至少需要 6 个字符。",
       "usernameTaken": "该用户名已被占用。",
       "invalidCredentials": "用户名或密码无效。",
@@ -3449,6 +3453,16 @@ export const zh_CN: EnTranslations = {
     "statsOffline": "离线",
     "statsRealmOffline": "{realm}（离线）"
   },
+  "woc": {
+    "linkWalletFirst": "连接并绑定 Solana 钱包后即可用 $WOC 支付。",
+    "quoting": "正在准备 $WOC 支付...",
+    "approveBurn": "请在钱包中批准销毁 {amount} $WOC...",
+    "confirming": "正在链上确认销毁...",
+    "finalizing": "等待 Solana 最终确认...",
+    "confirmFailed": "无法验证 $WOC 支付。",
+    "finalizeTimeout": "等待最终确认超时。如果 $WOC 已销毁，请重试：支付将在最终确认后结算。",
+    "renameSuccess": "已改名为 {name}。"
+  },
   "character": {
     "loading": "正在加载...",
     "noneYet": "还没有角色。请在下方创建一个。",
@@ -3461,6 +3475,9 @@ export const zh_CN: EnTranslations = {
     "delete": "删除",
     "rename": "改名",
     "newNamePlaceholder": "新角色名称",
+    "renamePaidButton": "支付 {amount} $WOC 并改名",
+    "renamePriceHint": "自愿改名将销毁 {amount} $WOC。",
+    "renameCancel": "取消",
     "tabCharacters": "角色",
     "tabCreate": "创建",
     "portraitAlt": "{name}的头像",

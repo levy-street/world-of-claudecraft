@@ -3388,6 +3388,10 @@ export const da_DK: EnTranslations = {
       "tooManyAttempts": "For mange forsøg. Vent et minut og prøv igen.",
       "usernameShape": "Brugernavnet skal være på 3-24 tegn og bruge bogstaver, cifre eller understregning.",
       "usernameNotAllowed": "Det brugernavn er ikke tilladt.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Adgangskoden skal være på mindst 6 tegn.",
       "usernameTaken": "Det brugernavn er allerede optaget.",
       "invalidCredentials": "Ugyldigt brugernavn eller adgangskode.",
@@ -3449,6 +3453,16 @@ export const da_DK: EnTranslations = {
     "statsOffline": "Offline",
     "statsRealmOffline": "{realm} (Offline)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}."
+  },
   "character": {
     "loading": "Indlæser...",
     "noneYet": "Ingen karakterer endnu. Opret en nedenfor.",
@@ -3461,6 +3475,9 @@ export const da_DK: EnTranslations = {
     "delete": "Slet",
     "rename": "Omdøb",
     "newNamePlaceholder": "Nyt karakternavn",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "tabCharacters": "Karakterer",
     "tabCreate": "Opret",
     "portraitAlt": "Portræt af {name}",

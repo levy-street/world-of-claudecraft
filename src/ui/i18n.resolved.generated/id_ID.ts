@@ -3388,6 +3388,10 @@ export const id_ID: EnTranslations = {
       "tooManyAttempts": "Terlalu banyak percobaan. Tunggu semenit lalu coba lagi.",
       "usernameShape": "Nama pengguna harus 3-24 karakter dan menggunakan huruf, angka, atau garis bawah.",
       "usernameNotAllowed": "Nama pengguna itu tidak diperbolehkan.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Kata sandi harus minimal 6 karakter.",
       "usernameTaken": "Nama pengguna itu sudah dipakai.",
       "invalidCredentials": "Nama pengguna atau kata sandi salah.",
@@ -3449,6 +3453,16 @@ export const id_ID: EnTranslations = {
     "statsOffline": "Offline",
     "statsRealmOffline": "{realm} (Offline)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}."
+  },
   "character": {
     "loading": "Memuat...",
     "noneYet": "Belum ada karakter. Buat satu di bawah.",
@@ -3461,6 +3475,9 @@ export const id_ID: EnTranslations = {
     "delete": "Hapus",
     "rename": "Ganti Nama",
     "newNamePlaceholder": "Nama karakter baru",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "tabCharacters": "Karakter",
     "tabCreate": "Buat",
     "portraitAlt": "Potret {name}",

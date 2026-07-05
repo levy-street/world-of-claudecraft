@@ -3388,6 +3388,10 @@ export const vi_VN: EnTranslations = {
       "tooManyAttempts": "Quá nhiều lần thử. Hãy đợi một phút rồi thử lại.",
       "usernameShape": "Tên đăng nhập phải có 3-24 ký tự và chỉ dùng chữ cái, chữ số hoặc dấu gạch dưới.",
       "usernameNotAllowed": "Tên đăng nhập đó không được phép.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Mật khẩu phải có ít nhất 6 ký tự.",
       "usernameTaken": "Tên đăng nhập đó đã được sử dụng.",
       "invalidCredentials": "Tên đăng nhập hoặc mật khẩu không đúng.",
@@ -3449,6 +3453,16 @@ export const vi_VN: EnTranslations = {
     "statsOffline": "Ngoại Tuyến",
     "statsRealmOffline": "{realm} (Ngoại Tuyến)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}."
+  },
   "character": {
     "loading": "Đang tải...",
     "noneYet": "Chưa có nhân vật nào. Tạo một nhân vật bên dưới.",
@@ -3461,6 +3475,9 @@ export const vi_VN: EnTranslations = {
     "delete": "Xóa",
     "rename": "Đổi Tên",
     "newNamePlaceholder": "Tên nhân vật mới",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "tabCharacters": "Nhân Vật",
     "tabCreate": "Tạo",
     "portraitAlt": "Chân dung của {name}",

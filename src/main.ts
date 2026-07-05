@@ -85,6 +85,7 @@ import {
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
 import type { WalletOption } from './net/wallet';
+import { payWocIdentityFlow, WocPayError } from './net/woc_identity';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
@@ -165,6 +166,7 @@ import {
 import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
+import { openPaidRenameEditor } from './ui/paid_rename';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
@@ -337,6 +339,12 @@ function userFacingApiError(err: unknown): string {
     return t('errors.api.characterNotFound');
   if (normalized === 'character is currently online') return t('errors.api.characterOnline');
   if (normalized === 'character rename is not permitted') return t('errors.api.renameNotPermitted');
+  // $WOC paid identity actions (server/identity*.ts REST errors).
+  if (normalized === 'link a solana wallet first') return t('errors.api.linkWalletFirst');
+  if (normalized === 'that name is reserved') return t('errors.api.nameReserved');
+  if (normalized === 'quote expired or already used, request a new one')
+    return t('errors.api.quoteExpired');
+  if (normalized === 'this payment was already used') return t('errors.api.paymentUsed');
   if (normalized === 'type the character name to confirm deletion')
     return t('errors.api.deleteConfirm');
   if (normalized === 'not authenticated' || normalized === 'authentication required')
@@ -3912,7 +3920,27 @@ function openDeleteCharacterDialog(character: CharacterSummary): void {
   input.focus();
 }
 
+// Cached human-readable $WOC price of a voluntary character rename, fetched
+// once for the character-select buttons. Display-only; the authoritative price
+// comes from the quote at pay time. A 404 (feature off server-side) or any
+// failure leaves it null, which hides the paid-rename entry point entirely.
+let renameCharacterPriceWoc: number | null = null;
+let identityPricesPromise: Promise<void> | null = null;
+function ensureIdentityPrices(): Promise<void> {
+  if (!identityPricesPromise) {
+    identityPricesPromise = api
+      .identityPrices()
+      .then((p) => {
+        renameCharacterPriceWoc =
+          typeof p.rename_character === 'number' ? p.rename_character : null;
+      })
+      .catch(() => {});
+  }
+  return identityPricesPromise;
+}
+
 async function refreshCharacters(): Promise<void> {
+  if (WALLET_ENABLED) await ensureIdentityPrices();
   if (api.realm) $('#charselect-realm').textContent = api.realm;
   updateSortButtonLabel();
   const listEl = $('#char-list');
@@ -3954,7 +3982,11 @@ async function refreshCharacters(): Promise<void> {
             ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn btn-danger delete-char-btn" ${c.online ? 'disabled' : ''}>${escapeHtml(t('character.delete'))}</button><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button></span>`
             : c.online
               ? `<span class="char-actions"><button class="btn btn-danger delete-char-btn" disabled title="${escapeHtml(t('character.inWorldHint'))}">${escapeHtml(t('character.delete'))}</button><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button></span>`
-              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
+              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button>${
+                  WALLET_ENABLED && renameCharacterPriceWoc !== null
+                    ? `<button class="btn paid-rename-btn" type="button">${escapeHtml(t('character.rename'))}</button>`
+                    : ''
+                }<button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -4000,6 +4032,16 @@ async function refreshCharacters(): Promise<void> {
           }
         });
       } else {
+        row.querySelector('.paid-rename-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openPaidRenameEditor(row, c, {
+            priceWoc: renameCharacterPriceWoc,
+            formatWoc,
+            pay: payCharacterRename,
+            onRenamed: () => refreshCharacters(),
+            errorText: paidRenameErrorText,
+          });
+        });
         row.querySelector('.enter-world-btn')?.addEventListener('click', (e) => {
           e.stopPropagation();
           void enterWorld(c, e.currentTarget as HTMLButtonElement);
@@ -6126,6 +6168,69 @@ async function startWalletVerifyFlow(forcePicker = false): Promise<void> {
     console.error('[wallet] open modal failed', err);
     flashWalletError(t('wallet.verifyFailed'));
   }
+}
+
+// Ensure this account has a connected AND linked Solana wallet to pay with
+// $WOC, connecting and signing-to-link as needed. Returns the linked pubkey,
+// or null when the player backed out at any step.
+async function ensureWalletLinked(): Promise<string | null> {
+  if (!WALLET_ENABLED || !api.token) return null;
+  const wallet = await loadWallet();
+  let state = wallet.currentWallet();
+  if (!state.isConnected || !state.address) {
+    try {
+      await wallet.openWalletModal();
+    } catch (err) {
+      if (wallet.isWalletSelectionCancelled(err)) return null;
+      throw err;
+    }
+    state = wallet.currentWallet();
+    if (!state.isConnected || !state.address) return null;
+  }
+  if (linkedWalletPubkey !== state.address) {
+    await completeWalletVerifyFlow(state.address);
+    if (linkedWalletPubkey !== state.address) return null;
+  }
+  return state.address;
+}
+
+// Full $WOC-paid character rename: ensure wallet, then quote -> burn ->
+// confirm via the injected-IO flow in src/net/woc_identity.ts, mapping its
+// progress stages onto localized status text.
+async function payCharacterRename(
+  characterId: number,
+  name: string,
+  onStatus: (message: string) => void,
+): Promise<{ name: string }> {
+  const linked = await ensureWalletLinked();
+  if (!linked) throw new Error(t('woc.linkWalletFirst'));
+  const wallet = await loadWallet();
+  const applied = await payWocIdentityFlow({
+    quote: () => api.identityQuote({ kind: 'rename_character', characterId, name }),
+    payContext: (quoteId) => api.identityPayContext(quoteId),
+    signAndSend: (tx) => wallet.signAndSendWocTransaction(tx),
+    confirm: (quoteId, signature) => api.identityConfirm(quoteId, signature),
+    onStage: (stage, quote) => {
+      if (stage === 'quoting') onStatus(t('woc.quoting'));
+      else if (stage === 'approve')
+        onStatus(t('woc.approveBurn', { amount: formatWoc(quote?.priceWoc ?? 0) }));
+      else if (stage === 'confirming') onStatus(t('woc.confirming'));
+      else onStatus(t('woc.finalizing'));
+    },
+    sleep: (ms) => new Promise((resolve) => window.setTimeout(resolve, ms)),
+  });
+  refreshWocBalanceOnDemand();
+  return { name: typeof applied?.name === 'string' ? applied.name : name };
+}
+
+// Localize a paid-rename failure: flow-level codes map to woc.* keys; server
+// error text goes through the shared API-error matcher like everywhere else.
+function paidRenameErrorText(err: unknown): string {
+  if (err instanceof WocPayError) {
+    if (err.code === 'finalize_timeout') return t('woc.finalizeTimeout');
+    return err.serverError ? userFacingApiError(err) : t('woc.confirmFailed');
+  }
+  return userFacingApiError(err);
 }
 
 async function onWalletButtonClick(): Promise<void> {
