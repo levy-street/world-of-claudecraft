@@ -1,40 +1,50 @@
-# FINDINGS: feat/woc-liquidity-guardian
+# Findings: feat/woc-liquidity-guardian
 
-## What is real and how verified
-- Cosmetic flair end to end: pure ladder (src/sim/guardian_tier.ts) + server RPC
-  reader (server/lp_guardian.ts) + wire (Entity.guardianTier, gt encode/decode) +
-  nameplate render (nameplate_painter.ts) + leaderboard decoration (lp_guardian_db).
-- Verified: 119 tests green across guardian_tier / lp_guardian / guardian_broadcast
-  (wire round-trip: gt encodes on snap.self, decodes to guardianTier, omitted -> 0,
-  rides alongside ht) / architecture (sim purity: guardianTier not read by src/sim) /
-  snapshots + bandwidth (wire lockstep) / lp_guardian_db.integration (real Postgres,
-  floor + wrong-pool + tier boundaries). tsc clean, biome clean.
-
-## No on-chain program of its own
-Branch 3 adds NO Solana program. It READS branch 1's woc_lp_vault Position accounts
-(via the same solanaRpc seam holder flair uses) and the lp_positions mirror. So there
-is no branch-3 devnet deploy or signatures: the on-chain surface is branch 1's,
-already devnet-proven there.
-
-## Fail-closed proof
-guardianFlairConfigured() = false unless WOC_LP_STAKING_ENABLED=1 AND the program id
-and LP mint are valid addresses. Off -> guardianInfoForPubkey returns {tier:0} with
-NO RPC issued -> guardianTier never set -> gt never on the wire -> painter no-ops.
-Server runs byte-identically to before when the LP layer is off.
+## Incident: external worktree reset mid-branch
+While building, this worktree's branch was reset by an external actor (reflog
+17:12: "reset: moving to feat/woc-lp-fee-share"), wiping in-flight tracked
+edits and rebasing the branch onto the fee-share branch. Recovery: mixed reset
+back to the branch-1 head (per the task: branch 3 stacks on branch 1),
+restored tracked files, removed fee-share leftovers, reapplied all edits. The
+external actor's versions of the game.ts/online.ts/types.ts changes (identical
+design, Promise.all refresh) and their catalog title values were kept.
 
 ## Cosmetic-only proof
-guardianTier is an Entity identity field set ONLY by the server; the sim never reads
-it (architecture.test.ts sim-purity scan passes). No gameplay system consults it.
+- Entity.guardianTier is presentation state: the sim never reads it
+  (tests/architecture.test.ts green; tests/parity/trace.ts excludes it like
+  holderTier); tests/sim.test.ts determinism suite green (92/92).
+- Rewards are titles, badges, aura, board prestige: no stat, drop, or economy
+  effect anywhere.
 
-## Known blocked / assumptions a reviewer must check
-- M16 i18n: the wordy guardian titles need 5 non-Latin fills at release (maintainer),
-  same deferred step as the inherited #799 wocSeason keys. The only red gate; not a
-  logic defect.
-- WOC_LP_GUARDIAN_MIN_STAKE_BASE (flair dust floor) is pool-specific and env-tuned;
-  default 1 base unit. A reviewer should set it to a sensible floor for the real LP
-  mint decimals so a dust position does not earn Wader.
-- The leaderboard enrichment assumes wallet_links.pubkey matches the vault Position
-  owner (the account's linked Solana wallet is the staker). True for the intended
-  flow; a reviewer should confirm no alt-wallet staking path breaks that assumption.
-- Seasoning is 7d and the ladder is veLP-lockstep by REMAINING lock; both are design
-  choices a reviewer may want to tune before enabling.
+## Anti farm-and-dump (vested cosmetic unlocks)
+- 7d seasoning: guardianTierIndex returns 0 until stakedAt is a week old; the
+  on-chain program RESETS stakedAt to 0 on full unstake (branch 1), so
+  exit-and-reenter restarts the clock.
+- Tier follows REMAINING lock (decays exactly like veLP reward weight;
+  lockstep pinned by tests/guardian_tier.test.ts against VE_LP_TIERS).
+
+## Gates and fail-closed posture
+- guardianFlairConfigured() requires WOC_LP_STAKING_ENABLED=1 + program + mint:
+  otherwise zero RPC, tier 0 everywhere, /api/woc/lp/guardian 404s.
+- Reader fails closed (RPC error -> tier 0, cached, retry after TTL 2min).
+- Leaderboard enrich reads only the DB mirror (no chain), only when configured.
+
+## Test inventory (all green)
+- guardian_tier.test.ts 7 (gates, boundaries, lockstep pin)
+- lp_guardian.test.ts 5 (config gate, PDA addressing, cache, fail-closed, floor)
+- guardian_broadcast.test.ts 4 (gt encode/omit/decode/coexists with ht)
+- lp_guardian_db.integration.test.ts 3 (real Postgres join, pool scope, floor)
+- Sweep: 231 tests green across guardian + holder + architecture + snapshots +
+  S3 i18n guard + leaderboard + player card + branch-1 LP suites; sim
+  determinism 92/92; tsc parity (0 new); biome warnings only.
+- i18n M16: five non-Latin fills shipped for the new wordy keys; the
+  completeness gate's remaining failures are PRE-EXISTING base-branch debt
+  (hudChrome.wocSeason.*, from #799), unchanged by this branch.
+
+## Deferred / limits
+- No dedicated CSS for .np-guardian / .lb-guardian (they reuse np-tier sizing;
+  an artist pass can restyle).
+- The guardian badge on nameplates uses direct style writes like the existing
+  setNameplateTier (render/ nameplates are outside the PainterHost regime).
+- No live-devnet test here: the Position account layout is devnet-proven by
+  branch 1; this branch's reader is exercised against stubbed RPC responses.
