@@ -165,9 +165,9 @@ export const shellStrings = {
       finalizing: 'Waiting for Solana finalization…',
       confirmFailed: 'The $WOC payment could not be verified.',
       finalizeTimeout:
-        'Timed out waiting for finalization. If $WOC was burned, reopen and retry — the payment settles once it finalizes.',
+        'Timed out waiting for finalization. If $WOC was burned, reopen and retry: the payment settles once it finalizes.',
       renameSuccess: 'Renamed to {name}.',
-      mintSuccess: "Minted {domain} — it's yours on-chain.",
+      mintSuccess: "Minted {domain}, it's yours on-chain.",
       guildRenameSuccess: 'Guild renamed to {name}.',
       reserveSuccess: 'Reserved the name {name}.',
     },
@@ -1213,9 +1213,9 @@ export const shellStrings = {
       finalizing: 'Waiting for Solana finalization…',
       confirmFailed: 'The $WOC payment could not be verified.',
       finalizeTimeout:
-        'Timed out waiting for finalization. If $WOC was burned, reopen and retry — the payment settles once it finalizes.',
+        'Timed out waiting for finalization. If $WOC was burned, reopen and retry: the payment settles once it finalizes.',
       renameSuccess: 'Renamed to {name}.',
-      mintSuccess: "Minted {domain} — it's yours on-chain.",
+      mintSuccess: "Minted {domain}, it's yours on-chain.",
       guildRenameSuccess: 'Guild renamed to {name}.',
       reserveSuccess: 'Reserved the name {name}.',
     },
