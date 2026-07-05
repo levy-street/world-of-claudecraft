@@ -12,12 +12,25 @@ const TICKS = 20; // sim ticks per second; par times are written in seconds × T
 // A closed ring-loop of `count` checkpoints around (cx,cz) at `radius`, with the
 // altitude rippling ±waveY around baseY so the line isn't flat. Rounded to 2dp so
 // the data is stable and readable (geometry is fixed — no Rng).
-function ringLoop(cx: number, cz: number, radius: number, count: number, baseY: number, waveY: number, ringR: number): Checkpoint[] {
+function ringLoop(
+  cx: number,
+  cz: number,
+  radius: number,
+  count: number,
+  baseY: number,
+  waveY: number,
+  ringR: number,
+): Checkpoint[] {
   const r2 = (n: number) => Math.round(n * 100) / 100;
   const out: Checkpoint[] = [];
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2;
-    out.push({ x: r2(cx + radius * Math.cos(a)), y: r2(baseY + waveY * Math.sin(a * 2)), z: r2(cz + radius * Math.sin(a)), radius: ringR });
+    out.push({
+      x: r2(cx + radius * Math.cos(a)),
+      y: r2(baseY + waveY * Math.sin(a * 2)),
+      z: r2(cz + radius * Math.sin(a)),
+      radius: ringR,
+    });
   }
   return out;
 }

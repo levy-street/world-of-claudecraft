@@ -14,6 +14,7 @@ import {
   highestThreatTarget,
   isTrivialTo,
   retargetMob,
+  tickForcedTarget,
   updateMobTarget,
 } from '../src/sim/mob/targeting';
 import type { SimContext } from '../src/sim/sim_context';
@@ -27,6 +28,8 @@ function ent(id: number, over: Partial<Entity> = {}): Entity {
     pos: { x: 0, y: 0, z: 0 },
     level: 1,
     templateId: 'forest_wolf',
+    ownerId: null,
+    scale: 1, // updateMobTarget reads scale for the size-scaled melee reach
     aiState: 'idle',
     inCombat: false,
     despawnTimer: undefined,
@@ -298,6 +301,30 @@ describe('mob/targeting: updateMobTarget forced-target/taunt', () => {
   });
 });
 
+describe('mob/targeting: tickForcedTarget (stunned-path timer slice)', () => {
+  it('decrements the window by DT and never touches aggro', () => {
+    const mob = ent(10, { aggroTargetId: 1, forcedTargetId: 2, forcedTargetTimer: 3 });
+    tickForcedTarget(mob);
+    expect(mob.forcedTargetTimer).toBeCloseTo(2.95, 5);
+    expect(mob.forcedTargetId).toBe(2); // still running
+    expect(mob.aggroTargetId).toBe(1); // unchanged (mob is stunned, cannot act)
+  });
+
+  it('clears the forced target once the window elapses', () => {
+    const mob = ent(10, { forcedTargetId: 2, forcedTargetTimer: 0.02 });
+    tickForcedTarget(mob);
+    expect(mob.forcedTargetTimer).toBeLessThanOrEqual(0);
+    expect(mob.forcedTargetId).toBe(null);
+  });
+
+  it('is a no-op when there is no forced target (timer already 0)', () => {
+    const mob = ent(10, { forcedTargetId: null, forcedTargetTimer: 0 });
+    tickForcedTarget(mob);
+    expect(mob.forcedTargetTimer).toBe(0);
+    expect(mob.forcedTargetId).toBe(null);
+  });
+});
+
 describe('mob/targeting: retargetMob', () => {
   it('grabs the highest-threat target and chases', () => {
     const a = ent(1);
@@ -329,6 +356,23 @@ describe('mob/targeting: retargetMob', () => {
     expect(mob.aggroTargetId).toBe(null);
     expect(mob.aiState).toBe('evade');
     expect(mob.threat.size).toBe(0); // the missing entry was pruned
+  });
+
+  it('clears an owned pet target without using evade', () => {
+    const ctx = fakeCtx(new Map(), { fallback: null, despawn: false });
+    const pet = ent(10, {
+      ownerId: 1,
+      aiState: 'attack',
+      aggroTargetId: 9,
+      inCombat: true,
+      despawnTimer: 3,
+      threat: new Map(),
+    });
+    retargetMob(ctx, pet);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.aiState).toBe('idle');
+    expect(pet.inCombat).toBe(false);
+    expect(pet.despawnTimer).toBeUndefined();
   });
 
   it('takes the Nythraxis fallback target when present and seeds its threat', () => {

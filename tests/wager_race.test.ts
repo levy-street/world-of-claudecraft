@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { COURSES } from '../src/sim/content/courses';
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
-import { COURSES } from '../src/sim/content/courses';
 
 // Phase 5 — the soft-currency PvP Wager Race. The governing invariant is
 // CONSENT + CONSERVATION: a player is charged only after their own accept, and
@@ -17,13 +17,21 @@ function makeWorld(n: number, opts: { charter?: boolean; copper?: number } = {})
   for (let i = 0; i < n; i++) {
     const pid = sim.addPlayer('warrior', `Racer${i}`);
     const e = sim.entities.get(pid)!;
-    e.pos.x = 40 + i * 0.5; e.pos.z = 40; e.pos.y = terrainHeight(e.pos.x, e.pos.z, sim.cfg.seed); e.prevPos = { ...e.pos };
-    e.mountTier = 11; e.mountId = 'sovereign'; // a flyer (set directly)
+    e.pos.x = 40 + i * 0.5;
+    e.pos.z = 40;
+    e.pos.y = terrainHeight(e.pos.x, e.pos.z, sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    e.mountTier = 11;
+    e.mountId = 'sovereign'; // a flyer (set directly)
     sim.players.get(pid)!.copper = opts.copper ?? 100_000;
     if (opts.charter) sim.addItem(CHARTER, 1, pid);
     pids.push(pid);
   }
-  for (const ent of sim.entities.values()) if (ent.kind === 'mob') { ent.hostile = false; ent.aiState = 'idle'; }
+  for (const ent of sim.entities.values())
+    if (ent.kind === 'mob') {
+      ent.hostile = false;
+      ent.aiState = 'idle';
+    }
   return { sim, pids };
 }
 
@@ -31,15 +39,24 @@ const copper = (sim: Sim, pid: number) => sim.players.get(pid)!.copper;
 const charters = (sim: Sim, pid: number) => sim.countItem(CHARTER, pid);
 // total wealth across the table — must be conserved by every wager outcome.
 function wealth(sim: Sim, pids: number[]): { copper: number; charters: number } {
-  let c = 0, ch = 0;
-  for (const pid of pids) { c += copper(sim, pid); ch += charters(sim, pid); }
+  let c = 0,
+    ch = 0;
+  for (const pid of pids) {
+    c += copper(sim, pid);
+    ch += charters(sim, pid);
+  }
   return { copper: c, charters: ch };
 }
 
 // Drive one racer through every gate of the course so they finish (in order).
 function finishCourse(sim: Sim, pid: number, courseId = 'skytrial_vale'): void {
   const e = sim.entities.get(pid)!;
-  for (const g of COURSES[courseId].checkpoints) { e.pos.x = g.x; e.pos.y = g.y; e.pos.z = g.z; sim.tick(); }
+  for (const g of COURSES[courseId].checkpoints) {
+    e.pos.x = g.x;
+    e.pos.y = g.y;
+    e.pos.z = g.z;
+    sim.tick();
+  }
 }
 
 describe('soft-currency Wager Race', () => {
@@ -81,7 +98,7 @@ describe('soft-currency Wager Race', () => {
     for (let i = 0; i < 61; i++) sim.tick(); // countdown → GO
 
     finishCourse(sim, other); // `other` wins (finishes first)
-    finishCourse(sim, host);  // host finishes second → race resolves
+    finishCourse(sim, host); // host finishes second → race resolves
 
     // winner gets both antes + both Charters; loser is down a full stake
     expect(copper(sim, other)).toBe(100_000 - ANTE + 2 * ANTE);
@@ -102,7 +119,8 @@ describe('soft-currency Wager Race', () => {
     sim.launchWagerRace(host);
     for (let i = 0; i < 61; i++) sim.tick(); // GO
     // both lose flight → both DNF
-    sim.dismissMount(host); sim.dismissMount(other);
+    sim.dismissMount(host);
+    sim.dismissMount(other);
     for (let i = 0; i < 5; i++) sim.tick(); // race detects DNF → done → refund
 
     expect(wealth(sim, pids)).toEqual(before); // fully refunded
@@ -116,7 +134,8 @@ describe('soft-currency Wager Race', () => {
     const [host, a, b] = pids;
     const before = wealth(sim, pids);
     sim.proposeWagerRace('skytrial_vale', ANTE, CHARTER, host);
-    sim.wagerJoin(a); sim.wagerJoin(b);
+    sim.wagerJoin(a);
+    sim.wagerJoin(b);
     expect(sim.wagerInfoFor(host)!.members.length).toBe(3);
 
     sim.wagerLeave(host); // host cancels

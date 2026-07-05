@@ -15,8 +15,8 @@ import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
 import {
   type AttachDef,
+  characterPreloadUrls,
   itemWeaponModelUrl,
-  manifestUrlsForGraphics,
   SKIN_EMISSIVE,
   SKINS,
   VISUALS,
@@ -290,7 +290,12 @@ function assetUrl(url: string): string {
   return visualAssetUrlForGraphics(url, GFX.standardMaterials);
 }
 
-const preloadUrls = manifestUrlsForGraphics(GFX.standardMaterials);
+// Preload the character/weapon GLBs. characterPreloadUrls() is tier-INDEPENDENT (see
+// manifest.ts): buildProps-style placement resolves asset URLs against the LIVE GFX
+// tier via assetUrl(), and resolvedGltf() throws "character asset not preloaded"
+// synchronously, so the preload set must be a superset of any tier's placement set or
+// world entry crashes (the character-side twin of the v0.16.0 props P0).
+const preloadUrls = characterPreloadUrls(GFX.standardMaterials);
 
 for (const url of preloadUrls) {
   registerPreload(

@@ -14,6 +14,810 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'auth.email': 'E-Mail',
+  'auth.emailError': 'Bitte gib eine gültige E-Mail-Adresse ein.',
+  'auth.emailPlaceholder': 'du@example.com',
+  'auth.recovery.body':
+    'Hinterlege eine E-Mail-Adresse, damit du dein Konto wiederherstellen kannst. Wir verwenden sie nur, um zu bestätigen, dass dir dieses Konto gehört, falls du je dein Passwort zurücksetzen musst.',
+  'auth.recovery.failed': 'Deine E-Mail konnte nicht gespeichert werden. Bitte versuche es erneut.',
+  'auth.recovery.invalid': 'Bitte gib eine gültige E-Mail-Adresse ein.',
+  'auth.recovery.logOut': 'Abmelden',
+  'auth.recovery.save': 'E-Mail speichern',
+  'auth.recovery.title': 'Wiederherstellungs-E-Mail hinzufügen',
+  'delveRiteUi.blurb':
+    'Die Schreine leuchten der Reihe nach auf. Wiederhole die Abfolge, indem du jeden Schrein nacheinander aktivierst. Eine falsche Berührung lässt den Versuch scheitern und spielt die Abfolge erneut ab, ein fehlerfreier Versuch bringt die reichste Beute, und gehen dir die Versuche aus, öffnet sich das Reliquiar mit seiner kargsten. Wähle, wie der Ritus dich prüft.',
+  'delveRiteUi.closeAria': 'Schließen',
+  'delveRiteUi.easy': 'Leicht',
+  'delveRiteUi.guideRepeat':
+    'Wenn die Schreine dunkel werden, geh zu jedem Schrein und drücke F (Interagieren) in derselben Reihenfolge.',
+  'delveRiteUi.guideStakes':
+    'Ein falscher Schrein bespritzt dich mit Schwarzwasser und kostet einen Versuch. Schließe die Abfolge ab, um das Reliquiar zu öffnen.',
+  'delveRiteUi.guideWatch':
+    'Nach deiner Wahl leuchten die vier Schreine nacheinander auf. Präge dir die Reihenfolge ein.',
+  'delveRiteUi.hard': 'Schwer',
+  'delveRiteUi.medium': 'Mittel',
+  'delveRiteUi.reward.easy': 'Bescheidene Beute',
+  'delveRiteUi.reward.hard': 'Erlesene Beute',
+  'delveRiteUi.reward.medium': 'Reiche Beute',
+  'delveRiteUi.showsOnce': 'Abfolge einmal gezeigt',
+  'delveRiteUi.showsTimes': 'Abfolge {count}-mal gezeigt',
+  'delveRiteUi.symbols': '{count} Symbole',
+  'delveRiteUi.title': 'Der Ritus des Ertrunkenen Reliquiars',
+  'delveRiteUi.tries': '{count} Versuche',
+  'delveUi.affix.belligerent_dead': 'Streitlustige Tote',
+  'delveUi.affix.high_water': 'Hochwasser',
+  'delveUi.affix.lively_choir': 'Lebhafter Chor',
+  'delveUi.board.companion.edda': 'Edda Reedhand',
+  'delveUi.board.partyTooLarge': 'Nur allein oder zu zweit (höchstens {max} Spieler)',
+  'delveUi.companion.edda.ally_revive': 'Hoch mit dir. Das Moor bekommt dich heute nicht.',
+  'delveUi.companion.edda.boss_pull':
+    'Diese Hymne kennt deinen Namen, {playerName}. Sing nicht zurück.',
+  'delveUi.companion.edda.combat_start':
+    'Achte auf das Schwarzwasser, {playerName}. Das Moor lauscht.',
+  'delveUi.companion.edda.completion':
+    'Das Moor mag seine Geheimnisse eine weitere Nacht verschlucken.',
+  'delveUi.companion.edda.low_hp': 'Ruhig. Meine Laterne ist noch nicht erloschen.',
+  'delveUi.companion.edda.rank.1': 'Laternenträgerin',
+  'delveUi.companion.edda.rank.2': 'Schilfwächterin',
+  'delveUi.companion.edda.rank.3': 'Fenbridge-Akolythin',
+  'delveUi.companion.edda.run_start':
+    'Bleib auf den Planken, {playerName}. Der Schlick holt sich die Hochmütigen.',
+  'delveUi.companion.edda.trap_spotted': 'Warte. Mit dem Schilf hier stimmt etwas nicht.',
+  'delveUi.companion.tessa.ally_revive':
+    'Steh auf. Das heutige Verzeichnis trägt deinen Namen nicht.',
+  'delveUi.companion.tessa.run_start':
+    'Ich habe meine Kerze und mein Verzeichnis, {playerName}. Geh voran.',
+  'delveUi.intro.litanyHeroic':
+    'Schwarzwasser umspült die Dammsteine. Eddas Flamme flackert grün. "Sie singen wieder dort unten, {playerName}. Antworte dem Chor nicht."',
+  'delveUi.intro.litanyNormal':
+    'Schilfverstopfte Stufen fallen unter Fenbridge hinab. Edda Reedhand hebt ihre Laterne. "Das Moor erinnert sich an jeden Namen, den sie ertränkt haben, {playerName}. Bleib im Licht."',
+  'delveUi.module.litany_apse': 'Die ertrunkene Apsis öffnet sich zu Schwester Nhalias Altarinsel.',
+  'delveUi.module.litany_baptistry':
+    'Ein Senkloch-Baptisterium gähnt unter geborstenen Heiligensteinen und Eikokons.',
+  'delveUi.module.litany_causeway': 'Ein gegabelter Damm teilt sich über hüfttiefem Moorwasser.',
+  'delveUi.module.litany_choir_loft':
+    'Aufgefächerte Choremporen hallen wider von Glocken an Seilen, die nie ganz verstummen.',
+  'delveUi.module.litany_ledger':
+    'Verzeichnisinseln erheben sich aus gefluteten Kanälen, Tinte blutet ins Moor.',
+  'delveUi.module.litany_ring':
+    'Ein Reliquiarring zieht sich um ein versiegeltes zentrales Becken aus schwarzem Wasser.',
+  'delveUi.module.litany_sluice':
+    'Moosverstopfte Schleusentore tropfen Schwarzwasser in die alte Chorgruft.',
+  'delveUi.moduleName.litany_apse': 'Die Ertrunkene Apsis',
+  'delveUi.moduleName.litany_baptistry': 'Das Senkloch-Baptisterium',
+  'delveUi.moduleName.litany_causeway': 'Der Gegabelte Damm',
+  'delveUi.moduleName.litany_choir_loft': 'Die Schilfgesang-Empore',
+  'delveUi.moduleName.litany_ledger': 'Das Inselverzeichnis',
+  'delveUi.moduleName.litany_ring': 'Das Ringreliquiar',
+  'delveUi.moduleName.litany_sluice': 'Die Sichelschleuse',
+  'delveUi.npc.halvenMarsh.greeting':
+    'Die Spur führte nach Norden ins Moor, {playerName}. Ein weiteres Reliquiar singt unter dem schwarzen Wasser, und die ertrunkenen Toten antworten den Glocken. Akolythin Edda kennt dieses Schilf besser als ich, bleib nah bei ihrer Laterne. Wähle deine Schwierigkeit, und ich halte das Seil, bis du zurückkehrst.',
+  'delveUi.object.bell_rope': 'Glockenseil',
+  'delveUi.object.corpse_candle': 'Leichenkerze',
+  'delveUi.object.grave_tablet': 'Grabtafel',
+  'delveUi.object.sluice_valve': 'Schleusenventil',
+  'delveUi.tracker.riteChoose':
+    'Nähere dich dem Ertrunkenen Reliquiar und drücke F, um den Ritus zu beginnen',
+  'delveUi.tracker.riteInput':
+    'Drücke F an jedem Schrein in der Reihenfolge, in der sie aufgeleuchtet sind ({current}/{total})',
+  'delveUi.tracker.riteOpen':
+    'Das Reliquiar ist offen: Drücke F daran, um deine Beute zu beanspruchen',
+  'delveUi.tracker.ritePlayback':
+    'Beobachte die Schreine: Präge dir die Reihenfolge ein, in der sie aufleuchten',
+  'editor.a11y.dialog': 'Editor-Dialog',
+  'editor.a11y.stage': 'Kartenansicht',
+  'editor.a11y.toasts': 'Editor-Benachrichtigungen',
+  'editor.appTitle': 'Karteneditor',
+  'editor.assets.category.biome': 'Biom',
+  'editor.assets.category.chars': 'Charaktere',
+  'editor.assets.category.creatures': 'Kreaturen',
+  'editor.assets.category.dungeon': 'Dungeon',
+  'editor.assets.category.foliage': 'Vegetation',
+  'editor.assets.category.props': 'Requisiten',
+  'editor.assets.category.quest': 'Quest',
+  'editor.assets.category.resources': 'Ressourcen',
+  'editor.assets.category.tools': 'Werkzeuge',
+  'editor.assets.category.weapons': 'Waffen',
+  'editor.assets.categoryTab': '{category} ({count})',
+  'editor.assets.deleteAsset': 'Hochgeladenes Asset löschen',
+  'editor.assets.deleteAssetConfirm':
+    'Das hochgeladene Asset "{name}" löschen? Karten, die es verwenden, verlieren das Modell.',
+  'editor.assets.empty': 'Keine passenden Assets.',
+  'editor.assets.label': 'Asset-Browser',
+  'editor.assets.pick': '{name} platzieren',
+  'editor.assets.search': 'Assets durchsuchen',
+  'editor.assets.searchPlaceholder': 'Assets durchsuchen...',
+  'editor.assets.title': 'Asset-Browser',
+  'editor.assets.uploadedEmpty':
+    'Noch keine hochgeladenen Assets. Nutze "Asset hochladen", um ein GLB-Modell hinzuzufügen (bis zu 8 MiB).',
+  'editor.assets.uploadedLoadFailed': 'Deine hochgeladenen Assets konnten nicht geladen werden.',
+  'editor.assets.uploadedSignIn':
+    'Melde dich im Spiel an, um eigene GLB-Modelle hochzuladen und zu platzieren.',
+  'editor.assets.uploadedTab': 'Hochgeladen',
+  'editor.biome.beach': 'Strand',
+  'editor.biome.cave': 'Höhle',
+  'editor.biome.clear': 'Gesamte Biom-Bemalung entfernen',
+  'editor.biome.clearConfirm': 'Jede bemalte Biomzelle von dieser Karte entfernen?',
+  'editor.biome.desert': 'Wüste',
+  'editor.biome.erase': 'Bemalung radieren',
+  'editor.biome.hint': 'Bemalte Zellen überschreiben das Zonenbiom bei Geländeform und -farbe.',
+  'editor.biome.marsh': 'Moor',
+  'editor.biome.paletteLabel': 'Zu malendes Biom',
+  'editor.biome.peaks': 'Gipfel',
+  'editor.biome.title': 'Biom',
+  'editor.biome.vale': 'Tal',
+  'editor.biome.volcano': 'Vulkan',
+  'editor.blockerTool.count': 'Sperrwände: {count} / {max}',
+  'editor.blockerTool.hint':
+    'Ziehe entlang des Bodens, um eine unsichtbare Wand zu zeichnen, durch die Spieler weder laufen noch springen können. Lass los, um sie zu platzieren; eine Wand, die kürzer als ein halber Meter ist, wird verworfen.',
+  'editor.blockerTool.title': 'Sperrwand',
+  'editor.brush.editCount': 'Geländebearbeitungen: {count} / {max}',
+  'editor.brush.size': 'Pinselgröße',
+  'editor.brush.sizeHint':
+    'Tasten: [ und ] ändern die Pinselgröße; Umschalt+[ und Umschalt+] ändern die Stärke.',
+  'editor.brush.strength': 'Stärke',
+  'editor.brush.title': 'Pinsel',
+  'editor.camp.count': 'Anzahl',
+  'editor.camp.delete': 'Lager löschen',
+  'editor.camp.hint':
+    'Klicke auf freien Boden, um ein Lager hinzuzufügen, oder klicke auf ein bestehendes Lager, um es zu bearbeiten.',
+  'editor.camp.mob': 'Mob',
+  'editor.camp.none': 'Kein Lager ausgewählt.',
+  'editor.camp.playtestNote': 'Mobs erscheinen nur im Spieltest, nie in der Editoransicht.',
+  'editor.camp.radius': 'Radius',
+  'editor.camp.selected': 'Lager: {mob}',
+  'editor.camp.title': 'Mob-Lager',
+  'editor.confirm.cancel': 'Abbrechen',
+  'editor.confirm.conflictBody':
+    'Diese Karte wurde auf dem Server geändert, seit du sie geöffnet hast (jetzt v{version}). Deine Version als neue Kopie speichern?',
+  'editor.confirm.conflictSaveCopy': 'Als Kopie speichern',
+  'editor.confirm.conflictTitle': 'Speicherkonflikt',
+  'editor.confirm.discard': 'Verwerfen',
+  'editor.confirm.discardBody': 'Du hast ungespeicherte Änderungen an "{name}". Verwerfen?',
+  'editor.confirm.discardTitle': 'Änderungen verwerfen?',
+  'editor.confirm.ok': 'OK',
+  'editor.docTitle': 'Karteneditor - World of ClaudeCraft',
+  'editor.eraseTool.blockerHint': 'Ein Klick nahe einer Sperrwand entfernt stattdessen diese Wand.',
+  'editor.eraseTool.hint':
+    'Klicke auf ein platziertes Asset, um es zu entfernen, oder auf geformten Boden, um den neuesten Stempel unter dem Cursor zu entfernen.',
+  'editor.eraseTool.title': 'Radieren',
+  'editor.flatten.hardEdge': 'Harte Kante',
+  'editor.flatten.hint':
+    'Einebnen bringt den Boden auf die Höhe unter dem Cursor beim Start des Ziehens.',
+  'editor.frame.all': 'Alles',
+  'editor.frame.title': 'Einpassen',
+  'editor.help.beginTutorial': 'Tutorial starten',
+  'editor.help.close': 'Schließen',
+  'editor.help.flow.draft':
+    'Solange du ungespeicherte Änderungen hast, wird alle 30 Sekunden automatisch ein Entwurf gespeichert; "Öffnen" stellt ihn wieder her.',
+  'editor.help.flow.playtest':
+    'Der Spieltest startet das echte Spiel auf dieser Karte, einschließlich deiner ungespeicherten Änderungen.',
+  'editor.help.flow.save':
+    'Speichern behält die Karte in diesem Browser, und auf dem Server, wenn du angemeldet bist.',
+  'editor.help.flowTitle': 'Speichern und Spieltest',
+  'editor.help.key.brush':
+    '[ und ] ändern die Pinselgröße; Umschalt+[ und Umschalt+] ändern seine Stärke.',
+  'editor.help.key.delete': 'Entf entfernt das ausgewählte Asset oder Lager.',
+  'editor.help.key.duplicate': 'Strg+D dupliziert das ausgewählte Asset.',
+  'editor.help.key.escape':
+    'Esc hebt zuerst die Auswahl auf und wechselt dann zurück zum Auswählen-Werkzeug.',
+  'editor.help.key.nudge':
+    'Die Pfeiltasten verschieben das ausgewählte Asset um 0,5 Meter; halte Umschalt für 2 Meter.',
+  'editor.help.key.save': 'Strg+S speichert die Karte.',
+  'editor.help.key.tools':
+    'Jedes Werkzeug hat ein Einzeltasten-Kürzel, das auf seiner Schaltfläche in der Werkzeugleiste angezeigt wird.',
+  'editor.help.key.undo':
+    'Strg+Z macht die letzte Änderung rückgängig; Strg+Y oder Strg+Umschalt+Z stellt sie wieder her.',
+  'editor.help.key.wheel':
+    'Umschalt+Scrollen dreht das ausgewählte Asset; Alt+Scrollen skaliert es.',
+  'editor.help.mouse.fly3d':
+    'Während du in 3D ziehst, fliegst du die Kamera mit WASD, und Q/E ändert die Höhe.',
+  'editor.help.mouse.move':
+    'Mit aktivem Auswählen ziehst du ein platziertes Asset über den Boden, um es zu verschieben.',
+  'editor.help.mouse.orbit3d':
+    '3D-Ansicht: Ziehen kreist um die Szene, Scrollen zoomt; Ziehen mit mittlerer Maustaste oder Umschalt+Ziehen verschiebt die Ansicht.',
+  'editor.help.mouse.pan2d': '2D-Ansicht: Ziehen verschiebt die Ansicht, Scrollen zoomt.',
+  'editor.help.mouseTitle': 'Maus und Navigation',
+  'editor.help.shortcutsTitle': 'Tastaturkürzel',
+  'editor.help.title': 'Editor-Hilfe',
+  'editor.help.tool.blocker': 'Ziehe unsichtbare Wände, die im Spieltest Bewegung blockieren.',
+  'editor.help.tool.camp':
+    'Füge Mob-Lager hinzu und bearbeite sie; ihre Mobs erscheinen im Spieltest.',
+  'editor.help.tool.erase': 'Entferne platzierte Assets oder Formstempel unter dem Cursor.',
+  'editor.help.tool.flatten': 'Ebne den Boden auf die Höhe ein, an der das Ziehen beginnt.',
+  'editor.help.tool.lower': 'Senke das Gelände unter dem Pinsel ab.',
+  'editor.help.tool.paint': 'Male Biom-Bodenbedeckung über den Zonenstandard.',
+  'editor.help.tool.place': 'Platziere Katalog-Assets oder hochgeladene Assets auf dem Boden.',
+  'editor.help.tool.raise': 'Hebe das Gelände unter dem Pinsel an.',
+  'editor.help.tool.region':
+    'Wähle Gelände und Assets mit einem Rahmen aus, um sie zu kopieren und einzufügen.',
+  'editor.help.tool.select':
+    'Wähle platzierte Assets, um sie zu verschieben, zu drehen und zu skalieren; klicke eine 2D-Markierung an, um sie zu bearbeiten.',
+  'editor.help.tool.smooth': 'Glätte Unebenheiten in Richtung der örtlichen Durchschnittshöhe.',
+  'editor.help.tool.spawn': 'Lege fest, wo der Spieltest den Spieler absetzt.',
+  'editor.help.tool.water': 'Lege den kartenweiten Wasserstand fest.',
+  'editor.help.toolsTitle': 'Werkzeuge',
+  'editor.hints.nav2d': 'Ziehen verschiebt die Ansicht, Scrollen zoomt.',
+  'editor.hints.nav3d':
+    'Ziehen kreist um die Szene, Scrollen zoomt. Während des Ziehens fliegst du mit WASD, und Q/E ändert die Höhe.',
+  'editor.inspector.label': 'Werkzeugoptionen',
+  'editor.layers.blocker': 'Sperrwände',
+  'editor.layers.camp': 'Lager',
+  'editor.layers.graveyard': 'Friedhöfe',
+  'editor.layers.hub': 'Knotenpunkte',
+  'editor.layers.lake': 'Seen',
+  'editor.layers.npc': 'NPCs',
+  'editor.layers.object': 'Objekte',
+  'editor.layers.poi': 'Interessante Orte',
+  'editor.layers.title': 'Ebenen',
+  'editor.marker.moved': '{count} Markierungen gegenüber dem eingebauten Layout verschoben.',
+  'editor.marker.reset': 'Position zurücksetzen',
+  'editor.marker.title': 'Markierung',
+  'editor.openDrawer.close': 'Schließen',
+  'editor.openDrawer.colName': 'Name',
+  'editor.openDrawer.colStatus': 'Status',
+  'editor.openDrawer.colUpdated': 'Aktualisiert',
+  'editor.openDrawer.delete': 'Löschen',
+  'editor.openDrawer.deleteLocalConfirm': 'Die lokale Karte "{name}" löschen?',
+  'editor.openDrawer.deleteServerConfirm':
+    'Die Serverkarte "{name}" löschen? Das kann nicht rückgängig gemacht werden.',
+  'editor.openDrawer.draft': 'Automatisch gespeicherter Entwurf',
+  'editor.openDrawer.emptyLocal':
+    'In diesem Browser sind noch keine Karten gespeichert. Speichere eine, und sie erscheint hier.',
+  'editor.openDrawer.emptyMine':
+    'Noch keine Karten auf dem Server. Speichere angemeldet, um eine zu erstellen.',
+  'editor.openDrawer.emptyPublic': 'Noch keine öffentlichen Karten.',
+  'editor.openDrawer.fork': 'Forken',
+  'editor.openDrawer.loadFailed': 'Karten konnten nicht vom Server geladen werden.',
+  'editor.openDrawer.loading': 'Karten werden geladen...',
+  'editor.openDrawer.next': 'Nächste Seite',
+  'editor.openDrawer.open': 'Öffnen',
+  'editor.openDrawer.page': 'Seite {page}',
+  'editor.openDrawer.prev': 'Vorherige Seite',
+  'editor.openDrawer.publish': 'Veröffentlichen',
+  'editor.openDrawer.signInHint':
+    'Melde dich im Spiel an, um Serverkarten zu durchstöbern, zu speichern und zu forken.',
+  'editor.openDrawer.statusPrivate': 'Privat',
+  'editor.openDrawer.statusPublic': 'Öffentlich',
+  'editor.openDrawer.tabLocal': 'Dieser Browser',
+  'editor.openDrawer.tabMine': 'Meine Serverkarten',
+  'editor.openDrawer.tabPublic': 'Öffentliche Karten',
+  'editor.openDrawer.title': 'Karte öffnen',
+  'editor.openDrawer.unpublish': 'Veröffentlichung aufheben',
+  'editor.place.chosen': 'Wird platziert: {name}',
+  'editor.place.collide': 'Blockiert Bewegung',
+  'editor.place.collideHint':
+    'Ein blockierendes Asset erhält eine Kollisionsfläche, durch die Spieler nicht hindurchlaufen können.',
+  'editor.place.none':
+    'Wähle unten im Browser ein Asset und klicke dann auf den Boden, um es zu platzieren.',
+  'editor.place.randomRotation': 'Zufällige Drehung',
+  'editor.place.scale': 'Skalierung',
+  'editor.place.title': 'Asset platzieren',
+  'editor.playtestPlayerName': 'Kartenbauer',
+  'editor.procgen.count': 'Anzahl',
+  'editor.procgen.hills': 'Sanfte Hügel erzeugen',
+  'editor.procgen.hillsAdded': '{count} Hügel hinzugefügt.',
+  'editor.procgen.noAssets': 'Keine Assets in dieser Kategorie.',
+  'editor.procgen.scatter': 'Kategorie-Assets verstreuen',
+  'editor.procgen.scattered': '{count} Assets aus {category} verstreut.',
+  'editor.procgen.title': 'Prozedural',
+  'editor.prompt.nameLabel': 'Name der neuen Karte',
+  'editor.prompt.saveAsTitle': 'Speichern unter',
+  'editor.region.copied': '{assets} Assets und {edits} Geländebearbeitungen kopiert.',
+  'editor.region.copy': 'Region kopieren',
+  'editor.region.hint':
+    'Ziehe einen Rahmen auf, um Platzierungen und Geländebearbeitungen auszuwählen. Kopiere, dann klicke zum Einfügen.',
+  'editor.region.hint3d':
+    'Regionsrahmen werden in der 2D-Ansicht gezeichnet; Kopieren und Einfügen funktionieren in beiden Ansichten.',
+  'editor.region.needBox': 'Ziehe zuerst einen Regionsrahmen auf.',
+  'editor.region.needClipboard': 'Kopiere zuerst eine Region.',
+  'editor.region.pasteBeside': 'Daneben einfügen',
+  'editor.region.pasted': '{count} Elemente eingefügt.',
+  'editor.region.title': 'Region',
+  'editor.selection.asset': 'Asset: {name}',
+  'editor.selection.collide': 'Blockiert Bewegung',
+  'editor.selection.delete': 'Löschen',
+  'editor.selection.deleteHint': 'Löschen entfernt die Auswahl; Strg+Z stellt sie wieder her.',
+  'editor.selection.duplicate': 'Duplizieren',
+  'editor.selection.footprints': 'Kollisionsflächen anzeigen',
+  'editor.selection.moveHint':
+    'Verschieben: Ziehe das Asset in der 3D-Ansicht über den Boden oder verschiebe es mit den Pfeiltasten (0,5 m, Umschalt für 2 m).',
+  'editor.selection.none':
+    'Nichts ausgewählt. Nutze Auswählen und klicke ein platziertes Asset an.',
+  'editor.selection.radius': 'Kollisionsradius',
+  'editor.selection.radiusAuto': 'Auto',
+  'editor.selection.radiusAutoTitle':
+    'Den Kollisionsradius zurücksetzen, sodass er der Asset-Skalierung folgt',
+  'editor.selection.radiusHint':
+    'Auto leitet den Kollisionsradius aus der Asset-Skalierung ab; ziehe den Regler, um ihn zu überschreiben.',
+  'editor.selection.rotation': 'Drehung',
+  'editor.selection.scale': 'Skalierung',
+  'editor.selection.title': 'Auswahl',
+  'editor.selection.wheelHint':
+    'Umschalt+Scrollen dreht das Asset, Alt+Scrollen skaliert es, Strg+D dupliziert es.',
+  'editor.selection.x': 'X',
+  'editor.selection.z': 'Z',
+  'editor.serverError.asset_blocked': 'Dieses Asset wurde von der Moderation gesperrt.',
+  'editor.serverError.asset_limit_reached':
+    'Du hast das Limit für hochgeladene Assets erreicht. Lösche eines, um weitere hochzuladen.',
+  'editor.serverError.asset_not_found': 'Dieses Asset existiert auf dem Server nicht mehr.',
+  'editor.serverError.asset_storage_limit_reached':
+    'Dein Asset-Speicherplatz ist aufgebraucht. Lösche zuerst ein Asset.',
+  'editor.serverError.asset_too_large': 'Dieses Modell überschreitet die Größengrenze für Uploads.',
+  'editor.serverError.invalid_glb': 'Diese Datei ist kein gültiges GLB-Modell.',
+  'editor.serverError.invalid_map_doc': 'Der Server hat das Kartendokument abgelehnt.',
+  'editor.serverError.invalid_map_name':
+    'Dieser Kartenname ist nicht erlaubt. Verwende Buchstaben, Zahlen, Leerzeichen, Apostrophe oder Bindestriche.',
+  'editor.serverError.invalid_version':
+    'Die Speicheranfrage war fehlerhaft. Lade die Seite neu und versuche es erneut.',
+  'editor.serverError.map_limit_reached':
+    'Du hast das Limit für Serverkarten erreicht. Lösche eine Karte, um weitere zu speichern.',
+  'editor.serverError.map_name_not_allowed': 'Dieser Kartenname ist nicht erlaubt.',
+  'editor.serverError.map_not_found': 'Diese Karte existiert auf dem Server nicht mehr.',
+  'editor.serverError.map_too_large':
+    'Das Kartendokument ist zu groß, um auf dem Server gespeichert zu werden.',
+  'editor.serverError.network':
+    'Der Server ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.',
+  'editor.serverError.rate_limited': 'Mach etwas langsamer und versuche es erneut.',
+  'editor.serverError.slug_unavailable':
+    'Der Server konnte für diesen Namen keinen Link erzeugen. Versuche einen anderen Namen.',
+  'editor.serverError.timeout': 'Der Server hat zu lange nicht geantwortet. Versuche es erneut.',
+  'editor.serverError.unauthorized': 'Deine Sitzung ist abgelaufen. Melde dich im Spiel erneut an.',
+  'editor.serverError.unknown': 'Bei der Kommunikation mit dem Server ist etwas schiefgelaufen.',
+  'editor.serverError.version_conflict':
+    'Die Karte wurde auf dem Server geändert, seit du sie geöffnet hast.',
+  'editor.spawn.clear': 'Startpunkt entfernen',
+  'editor.spawn.hint':
+    'Klicke auf den Boden, um festzulegen, wo der Spieltest den Spieler absetzt.',
+  'editor.spawn.position': 'Startpunkt: {x}, {z}',
+  'editor.spawn.title': 'Startpunkt',
+  'editor.spawn.unset': 'Die eingebaute Startposition wird verwendet.',
+  'editor.status.assetPlacedFirst': 'Wähle zuerst ein Asset im Browser aus.',
+  'editor.status.autosaveFailed':
+    'Automatisches Speichern fehlgeschlagen (der Browser-Speicher ist voll oder blockiert). Exportiere die Karte, um ein Backup zu behalten.',
+  'editor.status.autosaveOff':
+    'Automatisches Speichern ausgeschaltet: {reason} Speichere manuell und schalte es dann wieder ein.',
+  'editor.status.blockerCapReached':
+    'Sperrwand-Limit erreicht ({max}). Die neue Wand wurde nicht hinzugefügt.',
+  'editor.status.deleted': 'Karte gelöscht.',
+  'editor.status.draftRestored': 'Automatisch gespeicherter Entwurf wiederhergestellt.',
+  'editor.status.draftSaved': 'Entwurf automatisch gespeichert.',
+  'editor.status.exported': '"{name}" heruntergeladen.',
+  'editor.status.forked': 'Als "{name}" geforkt. Du bearbeitest jetzt deine eigene Kopie.',
+  'editor.status.importFailed': 'Import abgebrochen, oder die Datei ist keine gültige Karte.',
+  'editor.status.imported': '"{name}" importiert.',
+  'editor.status.loading3d': 'Welt wird geladen...',
+  'editor.status.newMap': 'Neue Karte aus der eingebauten Welt gestartet.',
+  'editor.status.opened': '"{name}" geöffnet.',
+  'editor.status.placementCapReached':
+    'Platzierungslimit erreicht ({max}). Überzählige Assets wurden nicht hinzugefügt.',
+  'editor.status.playtestFailed':
+    'Der Spieltest konnte nicht gestartet werden (Speicher blockiert).',
+  'editor.status.playtestLaunch': 'Spieltest wird gestartet...',
+  'editor.status.published': 'Karte veröffentlicht. Jeder kann sie jetzt finden und forken.',
+  'editor.status.saveFailedLocal': 'Lokales Speichern fehlgeschlagen (Speicher blockiert).',
+  'editor.status.savedLocal': '"{name}" in diesem Browser gespeichert.',
+  'editor.status.savedLocalOnly':
+    '"{name}" in diesem Browser gespeichert. Melde dich an, um online zu speichern.',
+  'editor.status.savedServer': '"{name}" auf dem Server gespeichert (v{version}).',
+  'editor.status.terrainCapReached':
+    'Limit für Geländebearbeitungen erreicht ({max}). Überzählige Formstempel wurden nicht hinzugefügt.',
+  'editor.status.unpublished': 'Veröffentlichung der Karte aufgehoben.',
+  'editor.tool.blocker': 'Sperrwand',
+  'editor.tool.camp': 'Lager',
+  'editor.tool.erase': 'Radieren',
+  'editor.tool.flatten': 'Einebnen',
+  'editor.tool.keyHint': '{name} ({key})',
+  'editor.tool.listLabel': 'Editor-Werkzeuge',
+  'editor.tool.lower': 'Absenken',
+  'editor.tool.paint': 'Biom malen',
+  'editor.tool.place': 'Asset platzieren',
+  'editor.tool.raise': 'Anheben',
+  'editor.tool.region': 'Region',
+  'editor.tool.select': 'Auswählen',
+  'editor.tool.smooth': 'Glätten',
+  'editor.tool.spawn': 'Startpunkt',
+  'editor.tool.water': 'Wasser',
+  'editor.topbar.autosave': 'Autospeichern',
+  'editor.topbar.autosaveTitle':
+    'Speichert die Karte automatisch, solange es ungespeicherte Änderungen gibt. Schaltet sich selbst ab, wenn ein Speichern fehlschlägt.',
+  'editor.topbar.clean': 'Alle Änderungen gespeichert',
+  'editor.topbar.dirty': 'Ungespeicherte Änderungen',
+  'editor.topbar.dirtyDot': 'Diese Karte hat ungespeicherte Änderungen',
+  'editor.topbar.export': 'Exportieren',
+  'editor.topbar.exportTitle': 'Diese Karte als JSON-Datei herunterladen',
+  'editor.topbar.fork': 'Forken',
+  'editor.topbar.forkDisabledTitle': 'Öffne zuerst eine Serverkarte, um sie zu forken',
+  'editor.topbar.forkTitle': 'Eine eigene serverseitige Kopie dieser Karte erstellen',
+  'editor.topbar.help': 'Hilfe',
+  'editor.topbar.helpTitle': 'Editor-Anleitung: Werkzeuge, Kürzel und das Tutorial',
+  'editor.topbar.import': 'Importieren',
+  'editor.topbar.importTitle': 'Eine Karte aus einer JSON-Datei importieren',
+  'editor.topbar.label': 'Editor-Aktionen',
+  'editor.topbar.mapNameLabel': 'Kartenname',
+  'editor.topbar.neverSaved': 'Noch nicht gespeichert',
+  'editor.topbar.new': 'Neu',
+  'editor.topbar.newTitle': 'Eine neue Karte aus der eingebauten Welt starten',
+  'editor.topbar.offline': 'Offline',
+  'editor.topbar.offlineTitle':
+    'Nicht angemeldet: Karten werden nur in diesem Browser gespeichert. Melde dich im Spiel an, um online zu speichern.',
+  'editor.topbar.open': 'Öffnen',
+  'editor.topbar.openTitle': 'Eine gespeicherte Karte öffnen (Browser oder Server)',
+  'editor.topbar.playtest': 'Spieltest',
+  'editor.topbar.playtestTitle':
+    'Das Spiel auf dieser Karte starten (offline, aktuelle Änderungen inklusive)',
+  'editor.topbar.redo': 'Wiederholen',
+  'editor.topbar.redoTitle': 'Die letzte rückgängig gemachte Änderung wiederherstellen (Strg+Y)',
+  'editor.topbar.save': 'Speichern',
+  'editor.topbar.saveAs': 'Speichern unter',
+  'editor.topbar.saveAsTitle': 'Eine Kopie unter neuem Namen speichern',
+  'editor.topbar.saveTitle':
+    'In diesem Browser speichern, und auf dem Server, wenn angemeldet (Strg+S)',
+  'editor.topbar.savedLocal': 'In diesem Browser gespeichert',
+  'editor.topbar.savedServer': 'Auf dem Server gespeichert (v{version})',
+  'editor.topbar.saving': 'Wird gespeichert...',
+  'editor.topbar.signIn': 'Anmelden',
+  'editor.topbar.signInTitle': 'Den Anmeldebildschirm des Spiels in einem neuen Tab öffnen',
+  'editor.topbar.undo': 'Rückgängig',
+  'editor.topbar.undoCount': 'Rückgängig: {count}',
+  'editor.topbar.undoCountTitle':
+    '{count} rückgängig machbare Schritte (Strg+Z: rückgängig, Strg+Y: wiederherstellen)',
+  'editor.topbar.undoTitle': 'Die letzte Änderung rückgängig machen (Strg+Z)',
+  'editor.topbar.uploadAsset': 'Asset hochladen',
+  'editor.topbar.uploadAssetDisabledTitle': 'Melde dich im Spiel an, um Assets hochzuladen',
+  'editor.topbar.uploadAssetTitle':
+    'Ein GLB-Modell (bis zu 8 MiB) hochladen, um es in deinen Karten zu platzieren',
+  'editor.topbar.view2d': '2D',
+  'editor.topbar.view2dTitle': 'Auf der symbolischen Übersichtskarte bearbeiten',
+  'editor.topbar.view3d': '3D',
+  'editor.topbar.view3dTitle': 'In der gerenderten Welt bearbeiten',
+  'editor.topbar.viewLabel': 'Ansichtsmodus',
+  'editor.tutorial.back': 'Zurück',
+  'editor.tutorial.counter': 'Schritt {current} von {total}',
+  'editor.tutorial.finish': 'Fertig',
+  'editor.tutorial.next': 'Weiter',
+  'editor.tutorial.skip': 'Tour überspringen',
+  'editor.tutorial.steps.help.body':
+    'Das ist schon der ganze Ablauf. Öffne jederzeit die Hilfe für die vollständige Werkzeugliste und alle Kürzel, oder um diese Tour erneut zu starten.',
+  'editor.tutorial.steps.help.title': 'Hier gibt es Hilfe',
+  'editor.tutorial.steps.inspector.body':
+    'Die Optionen des aktiven Werkzeugs erscheinen hier: Pinselgröße, die Biom-Palette, Asset-Skalierung, Lager-Einstellungen und die Eigenschaften deiner jeweiligen Auswahl.',
+  'editor.tutorial.steps.inspector.title': 'Werkzeugoptionen',
+  'editor.tutorial.steps.playtest.body':
+    'Starte jederzeit das echte Spiel auf deiner Karte, mit deinen aktuellen Änderungen. Schließe den Spieltest-Tab, um zurückzukehren und weiterzubearbeiten.',
+  'editor.tutorial.steps.playtest.title': 'Spieltest',
+  'editor.tutorial.steps.save.body':
+    'Speichern legt die Karte in diesem Browser ab, und auf dem Server, wenn du angemeldet bist. Exportieren lädt ein JSON-Backup herunter, und Öffnen bringt gespeicherte Karten und Entwürfe zurück.',
+  'editor.tutorial.steps.save.title': 'Sichere deine Arbeit',
+  'editor.tutorial.steps.stage.body':
+    'Das ist deine Karte, gerendert mit der echten Spiel-Engine. Ziehen kreist um die Szene, Scrollen zoomt, und mittlere Maustaste oder Umschalt+Ziehen verschiebt die Ansicht. Klicke mit einem Werkzeug auf den Boden, um zu bearbeiten.',
+  'editor.tutorial.steps.stage.title': 'Die Welt',
+  'editor.tutorial.steps.toolbar.body':
+    'Jedes Bearbeitungswerkzeug findest du hier: Formpinsel, Biom-Bemalung, Wasser, Asset-Platzierung, Lager und mehr. Jedes hat ein Einzeltasten-Kürzel, das in seiner Ecke angezeigt wird.',
+  'editor.tutorial.steps.toolbar.title': 'Die Werkzeugleiste',
+  'editor.tutorial.steps.viewToggle.body':
+    'Wechsle zwischen der gerenderten 3D-Welt und der symbolischen 2D-Übersichtskarte. Die 2D-Ansicht eignet sich am besten, um Zonenmarkierungen zu verschieben und große Bereiche zu überblicken.',
+  'editor.tutorial.steps.viewToggle.title': '3D und 2D',
+  'editor.tutorial.title': 'Editor-Tutorial',
+  'editor.untitledMap': 'Unbenannte Karte',
+  'editor.upload.deleted': 'Hochgeladenes Asset gelöscht.',
+  'editor.upload.notGlb': 'Wähle eine .glb-Datei.',
+  'editor.upload.tooLarge': 'Diese Datei überschreitet die Grenze von 8 MiB.',
+  'editor.upload.uploaded': 'Asset hochgeladen: {name}',
+  'editor.upload.uploadedExisting':
+    'Dieses Modell war bereits auf dem Server; es wird wiederverwendet.',
+  'editor.upload.uploading': 'Asset wird hochgeladen...',
+  'editor.water.hint':
+    'Legt die kartenweite Höhe der Wasseroberfläche fest, von {min} bis {max} Metern.',
+  'editor.water.level': 'Wasserstand',
+  'editor.water.reset': 'Auf den eingebauten Stand zurücksetzen',
+  'editor.water.title': 'Wasserstand',
+  'entities.delves.drowned_litany.enterText':
+    'Du steigst hinab in den ertrunkenen Schrein am Rand des Moores.',
+  'entities.delves.drowned_litany.leaveText':
+    'Du kletterst zurück zu Bruder Halven am Rand des Moores.',
+  'entities.delves.drowned_litany.name': 'Die Ertrunkene Litanei',
+  'entities.items.blackwater_vanguard_chest.name': 'Brustschutz der Schwarzwasser-Vorhut',
+  'entities.items.bulwark_rusted_pauldrons.name': 'Schulterstücke des rostigen Bollwerks',
+  'entities.items.cantors_drowned_sash.name': 'Ertrunkene Schärpe des Kantors',
+  'entities.items.corpse_candle_focus.name': 'Leichenkerzen-Fokus',
+  'entities.items.drowned_choir_fang.name': 'Fangzahn des Ertrunkenen Chors',
+  'entities.items.litany_cloth_chest.name': 'Chorertränktes Gewand',
+  'entities.items.litany_gloves_rog.name': 'Schilfgebundene Handwickel',
+  'entities.items.litany_helm.name': 'Ertrunkene Kapuze des Reliquanten',
+  'entities.items.litany_leather_chest.name': 'Schlicktiefer Ornat',
+  'entities.items.litany_legs.name': 'Schlickwandler-Beinschienen',
+  'entities.items.litany_plate_chest.name': 'Kürass des Sumpfwarts',
+  'entities.items.litany_shoulder.name': 'Treibmantel des Schwarzwassers',
+  'entities.items.mirejaw_fang_knife.name': 'Mirejaw-Fangzahnmesser',
+  'entities.items.nhalias_bell_maul.name': 'Nhalias Glockenschlägel',
+  'entities.items.nhalias_litany_rod.name': 'Nhalias Litaneistab',
+  'entities.items.reedstalker_jerkin.name': 'Schilfpirscher-Wams',
+  'entities.items.siltguard_helm.name': 'Schlickwacht-Helm',
+  'entities.items.siltstep_leggings.name': 'Schlickschritt-Beinlinge',
+  'entities.items.sister_nhalia_choir_plate.name':
+    'Schwester Nhalias chorgeschmiedeter Plattenpanzer',
+  'entities.items.sunken_reliquary_hood.name': 'Haube des Versunkenen Reliquiars',
+  'entities.items.widow_silk_hood.name': 'Haube aus Witwenseide',
+  'entities.mobs.choir_thrall.name': 'Moorknecht',
+  'entities.mobs.deepfen_spearjaw.name': 'Deepfen-Speerkiefer',
+  'entities.mobs.drowned_cantor.name': 'Ertrunkener Kantor',
+  'entities.mobs.edda_reedhand.name': 'Edda Reedhand',
+  'entities.mobs.grave_silt_bulwark.name': 'Grabschlick-Bollwerk',
+  'entities.mobs.mirefen_widowling.name': 'Mirefen-Witwenbrut',
+  'entities.mobs.reedbound_acolyte.name': 'Schilfgebundener Akolyth',
+  'entities.mobs.sister_nhalia_drowned_canticle.name': 'Schwester Nhalia, die Ertrunkene Hymne',
+  'entities.mobs.spider_egg_sac.name': 'Spinnen-Eikokon',
+  'entities.mobs.sump_troll_devourer.name': 'Sumpftroll-Verschlinger',
+  'entities.mobs.tolling_bell.name': 'Läutende Glocke',
+  'entities.npcs.brother_halven_marsh.greeting':
+    'Die Spur führte nach Norden. Ein weiteres Reliquiar, ein weiterer Ritus. Wähle deine Schwierigkeit, und ich halte das Seil, bis du zurückkehrst.',
+  'entities.npcs.brother_halven_marsh.name': 'Bruder Halven',
+  'entities.npcs.brother_halven_marsh.title': 'Reliquiarhüter',
+  'entities.npcs.spirit_healer.greeting':
+    'Ruhe nun, Geist. Ich kann dich in deinen Körper zurückbringen, doch die Rückkehr lässt dich geschwächt zurück.',
+  'entities.npcs.spirit_healer.name': 'Der Bleiche Hüter',
+  'entities.npcs.spirit_healer.title': 'Wächter der Toten',
+  'entities.quests.q_old_cragmaw.completion':
+    'Endlich erlegt. Das Bergvolk schwor, diese Katze würde die Mauer selbst überdauern. Die Pirscher bleiben nun in ihren hohen Schneefeldern, {playerName}, und meine Patrouillen gehen die Straße, ohne dafür zu bluten. Der ganze Grat ist dank deiner Arbeit stiller.',
+  'entities.quests.q_old_cragmaw.objectives.0.label': 'Alter Cragmaw getötet',
+  'entities.quests.q_old_cragmaw.text':
+    'Das Bergvolk hat den Spuren, die meine Späherin fand, einen Namen gegeben: der Alte Cragmaw, ein narbenfelliger Tyrann von einer Katze, der drei Generationen seines eigenen Rudels überlebt hat. Er ist der Grund, warum die Pirscher meine Straße überfluten, {playerName}. Sein Bau liegt auf dem Westgrat über der Straße nach Süden. Bring einen Freund mit und streck den alten Teufel nieder.',
+  'entities.quests.q_old_cragmaw.title': 'Der Alte Cragmaw',
+  'entities.quests.q_stalker_cloaks.completion':
+    'Zehn gute Bälge, so dick wie alle, die ich habe... nein, sieh dir diese an, {playerName}. Die Hälfte zerrissen, und nicht von Klinge oder Speer. Krallenspuren, breit wie meine Hand, mitten durch das Winterfell. Etwas auf diesem Grat fällt über die eigene Art her.',
+  'entities.quests.q_stalker_cloaks.objectives.0.label': 'Balg eines Gratpirschers',
+  'entities.quests.q_stalker_cloaks.text':
+    'Acht Bälge fütterten die Mäntel der Offiziere, und jetzt will jeder Soldat auf der Mauer dasselbe, {playerName}. Zu Recht: Der Winter nimmt zuerst Finger und niemals Entschuldigungen an. Zehn weitere Bälge von den Graten südlich des Tors, und die ganze Wache schläft warm.',
+  'entities.quests.q_stalker_cloaks.title': 'Mäntel für die Wache',
+  'entities.quests.q_stalkers_return.completion':
+    'Vierzehn weitere, und noch immer zählen meine Patrouillen am Morgen frische Spuren. Meine Späherin kam vom Hochgrat zurück, weiß wie die Schneegrenze: Abdrücke groß wie ein Schild, sagt sie, und alte Risse, die kein Pirscher zurücklassen würde. Was auch immer dort oben umgeht, ist keine gewöhnliche Katze.',
+  'entities.quests.q_stalkers_return.objectives.0.label': 'Gratpirscher getötet',
+  'entities.quests.q_stalkers_return.text':
+    'Zwölf tot, und der Grat wimmelt dichter als an dem Tag, an dem du begonnen hast, {playerName}. Bestien werfen sich nicht aus Hunger gegen eine Mauer. Etwas auf dem Hochgrat treibt sie herab, und bis ich weiß, was es ist, hört das Ausdünnen nicht auf. Vierzehn weitere.',
+  'entities.quests.q_stalkers_return.title': 'Die Pirscher kehren zurück',
+  'hudChrome.auraEffect.allStatsPctReduce': 'Verringert alle Attribute um {pct}%',
+  'hudChrome.bags.backpack': 'Rucksack',
+  'hudChrome.bags.bagSocketAria': '{name}: {slots}',
+  'hudChrome.bags.capacity': '{used}/{total}',
+  'hudChrome.bags.capacityAria': 'Belegte Taschenplätze: {used} von {total}',
+  'hudChrome.bags.socketEmpty': 'Leerer Taschenplatz',
+  'hudChrome.bags.unequipHint': 'Klicke, um diese Tasche abzulegen',
+  'hudChrome.calendar.addButton': 'Ereignis eintragen',
+  'hudChrome.calendar.allDay': 'Ganztägig',
+  'hudChrome.calendar.bookTitle': 'Ein Gildenereignis eintragen',
+  'hudChrome.calendar.bookedBy': 'Eingetragen von {name}',
+  'hudChrome.calendar.close': 'Kalender schließen',
+  'hudChrome.calendar.dayAria': '{date}: {count} Ereignisse',
+  'hudChrome.calendar.deleteAria': 'Das Ereignis {title} entfernen',
+  'hudChrome.calendar.events.arenaClash.note':
+    'Duellanten strömen zum Aschenkolosseum. Stell dich an und erklimm die Rangliste.',
+  'hudChrome.calendar.events.arenaClash.title': 'Arena-Schlagabtausch',
+  'hudChrome.calendar.events.delveDay.note':
+    'Bruder Halven markiert seine Karten: ein guter Tag, um das Eingestürzte Reliquiar zu wagen.',
+  'hudChrome.calendar.events.delveDay.title': 'Tiefgang-Tag',
+  'hudChrome.calendar.events.fiestaNight.note':
+    'Der 2v2-Fiesta-Ring zieht heute Nacht sein lautestes Publikum an.',
+  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-Nacht',
+  'hudChrome.calendar.events.fishingDerby.note':
+    'Angler säumen die Seen. Bring eine Rute mit und tausche Anglergeschichten aus.',
+  'hudChrome.calendar.events.fishingDerby.title': 'Angelderby',
+  'hudChrome.calendar.events.marketDay.note':
+    'Der Händler erwartet frische Ware. Ein guter Tag, um auf dem Weltmarkt zu stöbern.',
+  'hudChrome.calendar.events.marketDay.title': 'Markttag',
+  'hudChrome.calendar.events.moongateCommunion.note':
+    'Pilger versammeln sich unter dem Mond zur Monatsmitte am Mondtor des Tempels.',
+  'hudChrome.calendar.events.moongateCommunion.title': 'Mondtor-Kommunion',
+  'hudChrome.calendar.events.raidCall.note':
+    'Die Wächter blasen das Horn: Sammle eine Gruppe für die Grüfte und den Schlachtzug.',
+  'hudChrome.calendar.events.raidCall.title': 'Ruf zum Schlachtzug',
+  'hudChrome.calendar.guildOnlyNote': 'Tritt einer Gilde bei, um gemeinsam Ereignisse zu planen.',
+  'hudChrome.calendar.hourAllDay': 'Ganztägig',
+  'hudChrome.calendar.hourLabel': 'Stunde (UTC)',
+  'hudChrome.calendar.keybindLabel': 'Ereigniskalender',
+  'hudChrome.calendar.nextMonth': 'Nächster Monat',
+  'hudChrome.calendar.noEvents': 'Für diesen Tag ist nichts geplant.',
+  'hudChrome.calendar.notePlaceholder': 'Notiz (optional)',
+  'hudChrome.calendar.prevMonth': 'Vorheriger Monat',
+  'hudChrome.calendar.result.badInput': 'Gib dem Ereignis einen Titel und einen gültigen Tag.',
+  'hudChrome.calendar.result.calendarFull': 'Der Gildenkalender ist voll.',
+  'hudChrome.calendar.result.created': 'Das Ereignis steht im Gildenkalender.',
+  'hudChrome.calendar.result.eventGone': 'Dieses Ereignis steht nicht mehr im Kalender.',
+  'hudChrome.calendar.result.notInGuild': 'Du bist in keiner Gilde.',
+  'hudChrome.calendar.result.notOfficer':
+    'Nur Offiziere und der Gildenmeister dürfen Gildenereignisse verwalten.',
+  'hudChrome.calendar.result.removed': 'Das Ereignis wurde aus dem Kalender genommen.',
+  'hudChrome.calendar.title': 'Ereigniskalender',
+  'hudChrome.calendar.titlePlaceholder': 'Titel des Ereignisses',
+  'hudChrome.dailyRewards.disclaimer':
+    'Der WOC-Kurs kann sich schnell bewegen. Wir empfehlen, mehr als das Minimum von 20 USD zu halten, damit gewöhnliche Kursschwankungen dich nicht aussperren. Dies ist keine Finanzberatung.',
+  'hudChrome.dailyRewards.hideChestConfirmBody':
+    'Dies entfernt die Truhen-Verknüpfung aus deinem HUD. Belohnungen, Teilnahmeberechtigung und dieses Panel bleiben verfügbar; du kannst die Verknüpfung über die Optionen zurückholen.',
+  'hudChrome.dailyRewards.hideChestConfirmCancel': 'Abbrechen',
+  'hudChrome.dailyRewards.hideChestConfirmOk': 'Truhe ausblenden',
+  'hudChrome.dailyRewards.hideChestConfirmTitle': 'Truhe der täglichen Belohnungen ausblenden?',
+  'hudChrome.dailyRewards.pointsGained': '{points} Punkte für tägliche Belohnungen erhalten.',
+  'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier}-Multiplikator',
+  'hudChrome.dailyRewards.totalPlayer': '{count} Spieler heute',
+  'hudChrome.dailyRewards.totalPlayers': '{count} Spieler heute',
+  'hudChrome.death.resurrectAtCorpse': 'Am Leichnam wiederbeleben',
+  'hudChrome.death.resurrectAtHealer': 'Der Bleiche Hüter (Zoll des Hüters)',
+  'hudChrome.death.spiritHealerAlive':
+    'Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden.',
+  'hudChrome.discord.roleTag.admin': 'Admin',
+  'hudChrome.frameReset.label': 'Fensterpositionen zurücksetzen',
+  'hudChrome.mailbox.arrivedBanner': 'Der Rabe ist gelandet: Post von {name}.',
+  'hudChrome.mailbox.arrivedLog': 'Du hast neue Post von {name}.',
+  'hudChrome.mailbox.attachmentsBadge': 'Paket beigefügt',
+  'hudChrome.mailbox.back': 'Zurück',
+  'hudChrome.mailbox.bodyLabel': 'Nachricht',
+  'hudChrome.mailbox.cannotMail': 'Das kann nicht verschickt werden.',
+  'hudChrome.mailbox.clickAttach': 'Klicke, um es deinem Brief beizulegen.',
+  'hudChrome.mailbox.close': 'Briefkasten schließen',
+  'hudChrome.mailbox.coinLabel': 'Münzen beilegen',
+  'hudChrome.mailbox.delete': 'Brief löschen',
+  'hudChrome.mailbox.deleteAria': 'Den Brief {subject} löschen',
+  'hudChrome.mailbox.empty': 'Dein Briefkasten ist leer.',
+  'hudChrome.mailbox.indicatorAria': 'Ungelesene Post: {count}',
+  'hudChrome.mailbox.indicatorTip':
+    'Du hast {count} ungelesene Briefe. Besuche einen Briefkasten, um sie zu lesen.',
+  'hudChrome.mailbox.noSubject': '(kein Betreff)',
+  'hudChrome.mailbox.openAria': 'Den Brief {subject} von {name} lesen',
+  'hudChrome.mailbox.parcelsHint':
+    'Klicke einen Gegenstand in deinen Taschen an, um ihn beizulegen.',
+  'hudChrome.mailbox.parcelsLabel': 'Pakete',
+  'hudChrome.mailbox.postageNote': 'Porto: {amount}. Der Rabe ist etwa {seconds}s unterwegs.',
+  'hudChrome.mailbox.removeParcelAria': '{item} aus dem Brief entfernen',
+  'hudChrome.mailbox.result.cantAffordPostage': 'Du kannst dir das Porto nicht leisten.',
+  'hudChrome.mailbox.result.collected': 'Du entnimmst dem Brief {amount}.',
+  'hudChrome.mailbox.result.letterGone': 'Dieser Brief ist nicht mehr in deinem Kasten.',
+  'hudChrome.mailbox.result.needRecipient': 'Gib einen Empfänger für deinen Brief an.',
+  'hudChrome.mailbox.result.noMailQuestItems': 'Questgegenstände können nicht verschickt werden.',
+  'hudChrome.mailbox.result.noRecipient':
+    'Niemand mit diesem Namen unterhält hier einen Briefkasten.',
+  'hudChrome.mailbox.result.notEnoughItems': 'So viele davon hast du nicht zum Versenden.',
+  'hudChrome.mailbox.result.recipientBoxFull': 'Der Briefkasten des Empfängers ist voll.',
+  'hudChrome.mailbox.result.sent':
+    'Ein Rabe erhebt sich mit deinem Brief an {name} ({postage} Porto).',
+  'hudChrome.mailbox.result.takeParcelsFirst':
+    'Entnimm erst die Pakete, bevor du den Brief verwirfst.',
+  'hudChrome.mailbox.result.tooFar':
+    'Du musst an einem Briefkasten stehen, um deine Post zu erledigen.',
+  'hudChrome.mailbox.result.tooManyParcels': 'Ein Brief trägt höchstens {count} Pakete.',
+  'hudChrome.mailbox.sendButton': 'Brief senden',
+  'hudChrome.mailbox.subjectLabel': 'Betreff',
+  'hudChrome.mailbox.subtitle': 'Die Rabenpost',
+  'hudChrome.mailbox.tabInbox': 'Posteingang',
+  'hudChrome.mailbox.tabInboxWithCount': 'Posteingang ({count})',
+  'hudChrome.mailbox.tabSend': 'Senden',
+  'hudChrome.mailbox.take': 'Anhänge entnehmen',
+  'hudChrome.mailbox.title': 'Briefkasten',
+  'hudChrome.mailbox.toLabel': 'An',
+  'hudChrome.mailbox.toPlaceholder': 'Charaktername',
+  'hudChrome.mailbox.truncated': 'Zeigt die neuesten {shown} von {total} Briefen.',
+  'hudChrome.mailbox.unreadBadge': 'Ungelesen',
+  'hudChrome.mobTooltip.familyDemon': 'Dämon',
+  'hudChrome.mobTooltip.friendly': 'Freundlich',
+  'hudChrome.mobTooltip.hostile': 'Feindlich',
+  'hudChrome.mobTooltip.levelFamily': 'Stufe {level} {family}',
+  'hudChrome.options.aurasOnPlayerFrame': 'Stärkungszauber am Spielerfenster',
+  'hudChrome.options.playerFrameScale': 'Skalierung des Spielerfensters',
+  'hudChrome.options.showDailyRewardsChest': 'Truhe der täglichen Belohnungen anzeigen',
+  'hudChrome.options.showOwnNameplate': 'Eigene Namensplakette anzeigen',
+  'hudChrome.options.targetFrameScale': 'Skalierung des Zielfensters',
+  'hudChrome.options.walkByAutoloot': 'Plündern im Vorbeigehen',
+  'hudChrome.party.inviteUsage': 'Wen einladen? Verwendung: /invite <name>.',
+  'hudChrome.playerFrame.lock': 'Spielerfenster sperren',
+  'hudChrome.playerFrame.unlock': 'Spielerfenster verschieben',
+  'hudChrome.social.lastSeen': 'Zuletzt gesehen: {when}',
+  'hudChrome.social.lastSeenNever': 'nie',
+  'hudChrome.targetFrame.lock': 'Zielfenster sperren',
+  'hudChrome.targetFrame.unlock': 'Zielfenster verschieben',
+  'hudChrome.unitFrame.durationUnitDays': 'T',
+  'hudChrome.unitFrame.durationUnitHours': 'Std',
+  'hudChrome.unitFrame.durationUnitMinutes': 'Min',
+  'itemUi.kind.bag': 'Tasche',
+  'itemUi.tooltip.bagSlots': 'Tasche mit {slots} Plätzen',
+  'sim.delve.baptistryEggs':
+    'Das Baptisterium wird still. Eikokons der Spinnen haften feucht am Beckenrand.',
+  'sim.delve.baptistrySpidersSealed':
+    'Du solltest versuchen, die Eikokons der Spinnen zu zerstören.',
+  'sim.delve.baptistryWave': 'Etwas regt sich im schwarzen Wasser des Baptisteriums.',
+  'sim.delve.bellRopeShock':
+    'Das Glockenseil spannt sich mit einem Ruck. Ertrunkene Kantoren taumeln von der Erschütterung.',
+  'sim.delve.drownedLitanyReliquaryRise':
+    'Schwester Nhalia verstummt. Das Ertrunkene Reliquiar erhebt sich aus dem Schwarzwasser. Nähere dich ihm, um den Ritus zu beginnen.',
+  'sim.delve.eggSacBurst':
+    'Der Eikokon platzt. Spinnenbrut huscht über den Beckenrand des Baptisteriums davon.',
+  'sim.delve.moveCloserReliquary': 'Geh näher an das Reliquiar heran.',
+  'sim.delve.nhaliaBlackwaterMark': '{name} zeichnet {player} mit Schwarzwasser!',
+  'sim.delve.nhaliaCantorShield': 'Kantoren, haltet den Ton!',
+  'sim.delve.partyTooLarge':
+    '{name} ist für Tiefgänge allein oder zu zweit gedacht. Gruppen mit {max} oder mehr Mitgliedern dürfen nicht hinein.',
+  'sim.delve.puzzleSealed': 'Du musst das Siegel öffnen, indem du irgendwo im Raum Druck ausübst.',
+  'sim.delve.riteCorrect': 'Ein sanfter Glockenton antwortet auf deine Berührung.',
+  'sim.delve.riteReliquaryEmpty': 'Das Reliquiar ist leer.',
+  'sim.delve.riteReliquaryLocked': 'Schließe den Schrein-Ritus ab, um das Reliquiar zu öffnen.',
+  'sim.delve.riteReliquaryOpen': 'Das Ertrunkene Reliquiar öffnet sich.',
+  'sim.delve.riteSequencePlaying': 'Die Schreine wiederholen den Ritus. Warte.',
+  'sim.delve.riteSequenceReady': 'Die Schreine verdunkeln sich. Wiederhole die Abfolge.',
+  'sim.delve.riteWrong': 'Ein schriller Glockenschlag. Schwarzes Wasser spritzt dir vor die Füße.',
+  'sim.delve.ropesSealed': 'Du solltest versuchen, an den Glockenseilen zu ziehen.',
+  'wallet.extensionHelp':
+    'Damit hier eine Wallet erscheint, halte eine Browser-Wallet-Erweiterung wie Solflare Wallet aktiv.',
+  'worldContent.delveReliquaryInteract':
+    'Ertrunkenes Reliquiar: Drücke F, um den Ritus zu beginnen',
+  'worldContent.delveRiteShrineBellInteract': 'Glockenschrein: Drücke F, um die Glocke zu läuten',
+  'worldContent.delveRiteShrineCandleInteract': 'Kerzenschrein: Drücke F, um ihn zu berühren',
+  'worldContent.delveRiteShrineReedInteract': 'Schilfschrein: Drücke F, um ihn zu berühren',
+  'worldContent.delveRiteShrineSkullInteract': 'Schädelschrein: Drücke F, um ihn zu berühren',
+  'worldContent.mailboxName': 'Briefkasten',
+  'entities.npcs.auctioneer_voss.greeting':
+    'Der Weltmarkt ist auch hier geöffnet, {className}. Kauf bei jedem Abenteurer im Reich ein oder biete deine eigenen Waren feil.',
+  'entities.npcs.auctioneer_voss.name': 'Auktionator Voss',
+  'entities.npcs.auctioneer_voss.title': 'Hüter des Weltmarkts',
+  'hudChrome.devBadge.badgeTitle': 'Entwickler: {tier}',
+  'hudChrome.devBadge.contributor': 'Open-Source-Mitwirkender',
+  'hudChrome.devBadge.flavors.architect':
+    'Ein Architekt des Reiches: 30 zusammengeführte Pull Requests.',
+  'hudChrome.devBadge.flavors.artificer':
+    'Fünf Pull Requests, und die Welt beugt sich deinem Code.',
+  'hudChrome.devBadge.flavors.runesmith': 'Fünfzehn Pull Requests, geschmiedet ins laufende Spiel.',
+  'hudChrome.devBadge.flavors.tinkerer': 'Dein erster Pull Request ist im Reich gelandet.',
+  'hudChrome.devBadge.flavors.worldwright':
+    'Ein Erschaffer von Welten: 70 Pull Requests formen das Spiel.',
+  'hudChrome.devBadge.link.benefits':
+    'Verknüpfe dein GitHub, um ein Entwicklerabzeichen für die Pull Requests zu erhalten, die in das Open-Source-Repository zusammengeführt wurden.',
+  'hudChrome.devBadge.link.cta': 'GitHub verknüpfen',
+  'hudChrome.devBadge.link.error':
+    'GitHub konnte nicht verknüpft werden. Bitte versuche es erneut.',
+  'hudChrome.devBadge.link.relink': 'GitHub neu verknüpfen',
+  'hudChrome.devBadge.linkedAs': 'Verknüpft als {login}',
+  'hudChrome.devBadge.prsLanded': '{count} zusammengeführte Pull Requests',
+  'hudChrome.devBadge.tiers.architect': 'Architekt',
+  'hudChrome.devBadge.tiers.artificer': 'Artifex',
+  'hudChrome.devBadge.tiers.runesmith': 'Runenschmied',
+  'hudChrome.devBadge.tiers.tinkerer': 'Tüftler',
+  'hudChrome.devBadge.tiers.worldwright': 'Weltenbauer',
+  'hudChrome.devBadge.title': 'Entwickler',
+  'hudChrome.devBadge.unlink': 'GitHub trennen',
+  'hudChrome.itemShare.linkHint': 'Umschalt-Klick, um diesen Gegenstand im Chat zu verlinken.',
+  'hudChrome.itemTooltip.requiresLevel': 'Benötigt Stufe {level}',
+  'hudChrome.keybinds.discord': 'Discord',
+  'hudChrome.leaderboard.devEmpty': 'Noch keine platzierten Mitwirkenden.',
+  'hudChrome.leaderboard.devName': 'Mitwirkender',
+  'hudChrome.leaderboard.devTierCol': 'Abzeichen',
+  'hudChrome.leaderboard.mergedPrs': 'Zusammengeführte PRs',
+  'hudChrome.leaderboard.tabDevs': 'Entwickler',
+  'hudChrome.lootSettings.close': 'Beute-Einstellungen schließen',
+  'hudChrome.lootSettings.groupLoot': 'Gruppenbeute',
+  'hudChrome.lootSettings.leaderOption': 'Plündermeister: Anführer (Du)',
+  'hudChrome.lootSettings.masterOption': 'Plündermeister: {name}',
+  'hudChrome.lootSettings.menuItem': 'Beute-Einstellungen',
+  'hudChrome.lootSettings.method': 'Beuteverteilung',
+  'hudChrome.lootSettings.rollThreshold': 'Würfelschwelle',
+  'hudChrome.lootSettings.title': 'Beute-Einstellungen',
+  'hudChrome.lootSettings.valueMaster': 'Meisterbeute',
+  'hudChrome.masterLoot.looterChanged': 'Plündermeister ist jetzt {name}.',
+  'hudChrome.masterLoot.rollingFor': 'Es wird um {item} gewürfelt.',
+  'hudChrome.masterLoot.summaryGroup': 'Beute-Einstellungen: Gruppenbeute.',
+  'hudChrome.masterLoot.summaryMaster':
+    'Beute-Einstellungen: Meisterbeute, Plündermeister {name}, Schwelle {threshold}.',
+  'hudChrome.masterLoot.thresholdSet': 'Beuteschwelle auf {threshold} gesetzt.',
+  'hudChrome.options.showDevBadges': 'Entwicklerabzeichen anzeigen',
+  'hudChrome.options.groundReticle': 'Bodenziel-Fadenkreuz',
+  'hudChrome.options.startAttackOnAbility': 'Auto-Angriff bei Fähigkeitseinsatz',
+  'hudChrome.party.promoteLeader': 'Zum Anführer befördern',
+  'hudChrome.statInfo.desc.spellPower':
+    'Erhöht den Schaden deiner Zauber und die Stärke deiner Heilungen. Jeder Punkt Intelligenz gewährt etwas Zaubermacht, zusätzlich zu der aus Ausrüstung oder Stärkungszaubern.',
+  'hudChrome.statInfo.names.spellPower': 'Zaubermacht',
+  'hudChrome.statInfo.sources.attributes': 'Aus deinen Attributen: {value}',
+  'hudChrome.statInfo.sources.base': 'Basis: {value}',
+  'hudChrome.statInfo.sources.buff': '{name}: {value}',
+  'hudChrome.statInfo.sources.fromAttribute': 'Aus {stat}: {value}',
+  'hudChrome.statInfo.sources.gear': 'Angelegte Ausrüstung: {value}',
+  'hudChrome.statInfo.sources.header': 'Zusammengesetzt aus:',
+  'hudChrome.statInfo.sources.talents': 'Talente und Effekte: {value}',
   'hudChrome.loot.chestTitle': 'Truhe',
   'hudChrome.spellbook.addToBarAria': '{name} zur Aktionsleiste hinzufügen',
   'hudChrome.spellbook.removeFromBarAria': '{name} von der Aktionsleiste entfernen',
@@ -35,7 +839,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetLabel': 'Euer Ziel',
   'seo.officialLabel': 'Offizielle Website von World of ClaudeCraft',
   'seo.officialBody':
-    'worldofclaudecraft.com ist das offizielle kostenlose Browser-MMO für das Reich Claudemoon. Spiele online mit einem dauerhaften Charakter, erkunde solo offline, lies das Wiki und folge den verifizierten Community-Links auf dieser Website.',
+    'worldofclaudecraft.com ist das offizielle kostenlose Browser-MMO für die Welt Claudemoon. Spiele online mit einem dauerhaften Charakter, erkunde solo offline, lies das Wiki und folge den verifizierten Community-Links auf dieser Website.',
   'hudChrome.questShare.notShareable': 'Diese Quest kann nicht geteilt werden.',
   'hudChrome.questShare.notInSharerParty':
     'Ihr müsst in der Gruppe von {name} sein, um diese Quest anzunehmen.',
@@ -98,13 +902,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'realm.popTipLow':
     'Niedrige Bevölkerung: derzeit weniger als 15 Spieler online. Viel Platz; ideal für einen Neustart.',
   'realm.popTipMedium':
-    'Mittlere Bevölkerung: derzeit 15 bis 39 Spieler online. Ein gesunder, aktiver Realm.',
+    'Mittlere Bevölkerung: derzeit 15 bis 39 Spieler online. Eine gesunde, aktive Welt.',
   'realm.popTipHigh':
     'Hohe Bevölkerung: derzeit 40 bis 79 Spieler online. Belebt, mit vielen Spielern in der Nähe.',
   'realm.popTipFull':
     'Volle Bevölkerung: derzeit 80 oder mehr Spieler online. Sehr belebt; eventuell müsst Ihr in einer Login-Warteschlange warten.',
   'realm.popTipOffline':
-    'Offline: Dieser Realm ist derzeit nicht erreichbar und kann nicht betreten werden.',
+    'Offline: Diese Welt ist derzeit nicht erreichbar und kann nicht betreten werden.',
   'hud.tutorial.title': 'Neuer Abenteurer',
   'hud.tutorial.stepLabel': 'Schritt {current} von {total}',
   'hud.tutorial.skip': 'Tutorial überspringen',
@@ -247,7 +1051,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Hintergrund mit hohem Kontrast umschalten: deaktiviert den bewegten Trailer, damit der Text des Startbildschirms lesbar bleibt',
   'hudChrome.talents.defaultBuildName': 'Build {n}',
   'hudChrome.tips.joinChannels':
-    'Tipp: Gebt /join world oder /join lfg ein, um mit Spielern im ganzen Realm zu chatten.',
+    'Tipp: Gebt /join world oder /join lfg ein, um mit Spielern in der ganzen Welt zu chatten.',
   'meta.builtOn': 'Erstellt am {date}',
   'realmTypes.normal': 'Normal',
   'realmTypes.pvp': 'PvP',
@@ -270,7 +1074,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'game.leaderboard.subtitle': 'Lebenszeit-EP',
   'game.leaderboard.rank': 'Rang',
   'game.leaderboard.name': 'Name',
-  'game.leaderboard.realmCol': 'Realm',
+  'game.leaderboard.realmCol': 'Welt',
   'game.leaderboard.level': 'St.',
   'game.leaderboard.vlevel': 'V.St.',
   'game.leaderboard.lifetimeXp': 'Lebenszeit-EP',
@@ -279,7 +1083,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'game.leaderboard.loading': 'Rangliste wird geladen...',
   'game.leaderboard.unranked': 'Ohne Rang',
   'game.leaderboard.you': 'Ihr',
-  'game.leaderboard.globalSubtitle': 'Beste Champions aller Realms',
+  'game.leaderboard.globalSubtitle': 'Beste Champions aller Welten',
   'game.leaderboard.retry': 'Rangliste konnte nicht geladen werden. Versucht es erneut.',
   'game.milestone.unlocked': 'Meilenstein freigeschaltet',
   'game.milestone.veteran': 'Veteran',
@@ -388,10 +1192,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'nav.loginRegister': 'Einloggen/Registrieren',
   'nav.logout': 'Ausloggen',
   'nav.donate': 'Spenden',
-  'stats.title': 'Realmstatus',
+  'stats.title': 'Weltstatus',
   'stats.accountsCreated': 'Spieler',
   'stats.playersOnline': 'Spieler online',
-  'stats.realmName': 'Realmname',
+  'stats.realmName': 'Weltname',
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.githubLabel': 'Open-Source-Projekt',
@@ -399,19 +1203,21 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'footer.privacy': 'Datenschutzerklärung',
   'footer.discordLabel': 'Tritt dem Discord bei',
   'highscores.title': 'Bestenliste',
-  'highscores.desc': 'Verfolge die größten Champions des Realms und vergleiche deinen Fortschritt.',
+  'highscores.desc': 'Verfolge die größten Champions der Welt und vergleiche deinen Fortschritt.',
   'wiki.title': 'Spiel-Wiki und Guides',
   'wiki.desc': 'Entdecke die Geheimnisse des Realms, Klassenguides und Strategien.',
   'news.title': 'Neuigkeiten und Updates',
   'news.desc': 'Lies die neuesten Patchnotes, Events und Community-Updates.',
   'download.title': 'Desktop-Launcher herunterladen',
+  'download.macCta': 'Download fuer macOS',
+  'download.windowsPending': 'Windows-Build ausstehend.',
   'download.desc': 'Hol dir den eigenständigen Launcher für optimierte Leistung und Vollbildspiel.',
   'comingSoon.placeholder': 'Demnächst...',
-  'comingSoon.featureComingSoon': 'Diese Funktion ist demnächst auf dem Realm verfügbar.',
+  'comingSoon.featureComingSoon': 'Diese Funktion ist demnächst in der Welt verfügbar.',
   'mode.onlineTitle': 'Online spielen',
   'mode.onlineDesc':
-    'Logge dich im Realm ein. Deine Charaktere befinden sich auf dem Server und du teilst dir die Welt mit allen anderen Spielern online.',
-  'mode.onlineAria': 'Online spielen: Logge dich im persistenten, geteilten Realm ein',
+    'Melde dich in der Welt an. Deine Charaktere befinden sich auf dem Server und du teilst dir die Welt mit allen anderen, die online sind.',
+  'mode.onlineAria': 'Online spielen: Melde dich in der dauerhaften, geteilten Welt an',
   'mode.offlineTitle': 'Offline spielen',
   'mode.offlineDesc':
     'Sofortige Einzelspielerwelt in deinem Browser. Es wird nichts gespeichert: perfekt für einen schnellen Kampf oder zum Testen.',
@@ -419,7 +1225,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'mode.tipTitle': 'TIPP:',
   'mode.tipText':
     'Deaktiviere für das flüssigste Spielerlebnis Adblocker-Erweiterungen auf dieser Website. Community-Berichte zeigen, dass einige Blocker zu Verzögerungen führen können.',
-  'auth.enterRealm': 'Realm betreten',
+  'auth.enterRealm': 'Welt betreten',
   'auth.username': 'Benutzername',
   'auth.usernameError': 'Bitte gib deinen Benutzernamen ein.',
   'auth.usernamePlaceholder': 'Benutzername eingeben',
@@ -431,9 +1237,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'auth.logIn': 'Einloggen',
   'auth.createAccount': 'Account erstellen',
   'auth.back': 'Zurück',
-  'auth.realmList': 'Realmliste',
-  'auth.loadingRealms': 'Realms werden geladen...',
-  'auth.changeRealm': 'Realm wechseln',
+  'auth.realmList': 'Weltenliste',
+  'auth.loadingRealms': 'Welten werden geladen...',
+  'auth.changeRealm': 'Welt wechseln',
   'auth.characters': 'Charaktere:',
   'auth.createCharacter': 'Charakter erstellen',
   'auth.characterName': 'Charaktername',
@@ -568,7 +1374,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'playerCard.renderFailedStatus': 'Karten-Rendering fehlgeschlagen.',
   'playerCard.levelClass': 'Stufe {level} - {className}',
   'playerCard.topPercent': 'TOP {percent} %',
-  'playerCard.realmSubtitle': 'Realm {realm}',
+  'playerCard.realmSubtitle': 'Welt {realm}',
   'playerCard.defaultRealm': 'Welt von ClaudeCraft',
   'playerCard.brandWordmark': 'WORLD OF CLAUDECRAFT',
   'playerCard.recruited': '{count} rekrutiert',
@@ -578,7 +1384,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'playerCard.arenaStat': 'Arena',
   'playerCard.shareTierBit': ', $WOC-Inhaber mit Rang {tier}',
   'playerCard.shareText':
-    'Ich schmiede meine Legende in World of ClaudeCraft: Stufe {level} {className}{tierBit}. Tretet meinem Realm bei:',
+    'Ich schmiede meine Legende in World of ClaudeCraft: Stufe {level} {className}{tierBit}. Tritt meiner Welt bei:',
   'playerCard.nativeShareTitle': 'Welt von ClaudeCraft',
   'playerCard.fileNameFallback': 'spieler',
   'playerCard.actionShareX': 'Auf X teilen',
@@ -642,7 +1448,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'controls.chat': 'Chat öffnen',
   'seo.title': 'World of ClaudeCraft: Klassisches Web-MMO',
   'seo.description':
-    'Begib dich in World of ClaudeCraft auf ein episches Abenteuer, ein Micro-MMO im klassischen Stil direkt im Browser. Betritt einen gemeinsamen Realm, steigere Klassen und besiege Gegner.',
+    'Begib dich in World of ClaudeCraft auf ein episches Abenteuer, ein Micro-MMO im klassischen Stil direkt im Browser. Tritt einer dauerhaften, gemeinsamen Welt bei, steigere Klassen und besiege Gegner.',
   'seo.genre': 'MMORPG',
   'seo.playMode': 'Mehrspieler',
   'seo.applicationCategory': 'Spiel',
@@ -658,7 +1464,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'loading.world': 'Welt wird geladen...',
   'loading.worldProgress': 'Welt wird geladen... {done}/{total}',
   'loading.enteringWorld': 'Welt wird betreten...',
-  'loading.connectingRealm': 'Verbindung zum Realm...',
+  'loading.connectingRealm': 'Verbindung zur Welt...',
   'loading.assetsFailed': 'Ressourcen konnten nicht geladen werden: bitte neu laden. {error}',
   'loading.rendererFailed': 'Renderer konnte nicht gestartet werden: bitte neu laden. {error}',
   'loading.enterTimeout':
@@ -695,12 +1501,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'errors.api.alreadyInWorld': 'Der Charakter ist bereits in der Welt.',
   'errors.api.renameBeforeEntering':
     'Dieser Charakter muss vor dem Betreten der Welt umbenannt werden.',
-  'realm.noRealms': 'Keine Realms verfügbar.',
-  'realm.loading': 'Realms werden geladen...',
+  'realm.noRealms': 'Keine Welten verfügbar.',
+  'realm.loading': 'Welten werden geladen...',
   'realm.recommended': 'Empfohlen',
   'realm.checkingStatus': 'Status wird geprüft...',
   'realm.onlineNow': '{count} jetzt online',
-  'realm.down': 'Realm ist nicht erreichbar',
+  'realm.down': 'Welt ist nicht erreichbar',
   'realm.offline': 'Offline',
   'realm.full': 'Voll',
   'realm.high': 'Hoch',
@@ -708,7 +1514,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'realm.low': 'Niedrig',
   'realm.characterCountOne': '{count} Charakter',
   'realm.characterCountOther': '{count} Charaktere',
-  'realm.selectedRealm': 'Realm: {name}',
+  'realm.selectedRealm': 'Welt: {name}',
   'realm.statsOffline': 'Offline',
   'realm.statsRealmOffline': '{realm} (offline)',
   'character.loading': 'Lädt...',
@@ -762,19 +1568,19 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.warrior':
     'Krieger sind kampferprobte Nahkämpfer, die Wut aufbauen, wenn sie Schaden verursachen oder erleiden. Sie halten schwere Treffer aus oder zerschmettern Gegner.',
   'classDetails.lore.paladin':
-    'Paladine sind heilige Kreuzritter, die mit Segen unterstützen, mit Heiligem Licht heilen und Schwache in schwerer Rüstung schützen.',
+    'Paladine sind heilige Kreuzritter, die mit Segen unterstützen, Wunden mit Mending Light heilen und Schwache in schwerer Rüstung schützen.',
   'classDetails.lore.hunter':
-    'Jäger beherrschen die Wildnis, verfolgen Gegner aus der Ferne mit Bögen oder Schusswaffen und kontrollieren das Feld mit Fallen.',
+    'Jäger sind Fernkampfspezialisten, die an der Seite eines gezähmten Tieres kämpfen, Gegner mit gezielten und schnellen Schüssen überschütten, sie mit Stichen und erschütterndem Beschuss verlangsamen und je nach Augenblick zwischen ihren Aspekten wechseln.',
   'classDetails.lore.rogue':
     'Schurken sind verstohlene Assassinen, die Energie und Kombopunkte für Angriffe aus den Schatten ausgeben.',
   'classDetails.lore.priest':
-    'Priester rufen das Heilige Licht, um Verbündete zu heilen und zu schützen, während Schattenmagie Gegnern Leben entzieht.',
+    'Priester rufen Mending Light an, um Verbündete zu heilen und zu schützen, während Schattenmagie ihnen erlaubt, Gegnern das Leben zu entziehen.',
   'classDetails.lore.shaman':
     'Schamanen gebieten über die Elemente, erfüllen Waffen mit Macht, treffen Gegner mit Blitzen und stellen Verbündete wieder her.',
   'classDetails.lore.mage':
-    'Magier formen Feuer, Frost und Arkane Macht, um Gegner zu vernichten, Wasser zu beschwören und Bedrohungen einzufrieren.',
+    'Magier formen Feuer, Frost und arkane Kraft, um Gegner zu vernichten, Wasser zu beschwören und Bedrohungen einzufrieren.',
   'classDetails.lore.warlock':
-    'Hexenmeister beschwören Dämonen, wirken Flüche und Schaden über Zeit und entziehen Leben, um durchzuhalten.',
+    'Hexenmeister beschwören Dämonen, wirken Flüche und Schaden über Zeit und saugen Gegnern das Leben aus, um durchzuhalten.',
   'classDetails.lore.druid':
     'Druiden kanalisieren die Natur, heilen Wunden, fesseln Gegner und wechseln in Tierformen für Verteidigung oder Schaden.',
   'classDetails.aria':
@@ -804,10 +1610,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'mobilePreflight.otherStandaloneDetail': 'Halte dein Gerät im Vollbild-Querformat.',
   'mobilePreflight.otherInstallDetail':
     'Installiere diese Seite oder füge sie zum Startbildschirm hinzu, um das beste mobile Vollbild-Erlebnis zu erhalten.',
-  'serverUnavailable.title': 'World of ClaudeCraft - Realm nicht verfügbar',
+  'serverUnavailable.title': 'World of ClaudeCraft - Welt nicht verfügbar',
   'serverUnavailable.logoAlt': 'World of ClaudeCraft',
-  'serverUnavailable.eyebrow': 'Realmwartung',
-  'serverUnavailable.heading': 'Der Realm ist vorübergehend nicht verfügbar.',
+  'serverUnavailable.eyebrow': 'Weltwartung',
+  'serverUnavailable.heading': 'Die Welt ist vorübergehend nicht verfügbar.',
   'serverUnavailable.body':
     'Wir starten den Spieldienst neu und erwarten, dass Claudemoon bald zurückkehrt. Diese Seite prüft automatisch weiter.',
   'serverUnavailable.status': 'Bald zurück',
@@ -1079,9 +1885,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetMustDodge': 'Euer Ziel muss zuerst ausweichen.',
   'hud.errors.requiresCombo': 'Diese Fähigkeit benötigt Combopunkte.',
   'hud.errors.requiresForm': 'Ihr müsst in {form}form sein.',
-  'hud.errors.bear': 'Bären',
+  'hud.errors.bear': 'Bruin',
   'hud.errors.cat': 'Wolfs',
-  'hud.errors.travel': 'Reise',
+  'hud.errors.travel': 'Fleet',
   'hud.errors.cantInForm': 'Das könnt Ihr in {form}form nicht tun.',
   'hud.errors.shapeshifted': 'Das könnt Ihr in Gestaltwandlung nicht tun.',
   'hud.errors.stealthed': 'Ihr müsst verstohlen sein.',
@@ -1332,9 +2138,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': 'Bären',
   'abilityUi.forms.cat': 'Wolfs',
   'abilityUi.cast.fishing': 'Angeln',
+  'abilityUi.cast.thunzharrStormcall': 'Sturmruf',
   'abilityUi.cast.demonHeal': 'Dämonenheilung',
   'questUi.tracker.title': 'Quests',
   'questUi.tracker.complete': 'Abgeschlossen',
+
+  'questUi.tracker.showOnMap': '{name} auf der Karte anzeigen',
+
+  'questUi.tracker.hideFromMap': '{name} auf der Karte ausblenden',
   'questUi.log.title': 'Questlog',
   'questUi.log.close': 'Questlog schließen',
   'questUi.log.summary': 'Aktiv: {active} / Abgeschlossen: {completed}',
@@ -1588,450 +2399,465 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.greedAria': 'Gier für {item}',
   'itemUi.lootRoll.passAria': 'Bei {item} passen',
   'itemUi.lootRoll.everyonePassed': 'Alle passen bei {item}.',
-  'entities.abilities.heroic_strike.name': 'Heldenhafter Stoß',
+  'entities.abilities.heroic_strike.name': 'Reaver-Hieb',
   'entities.abilities.heroic_strike.description':
     'Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
-  'entities.abilities.battle_shout.name': 'Schlachtruf',
+  'entities.abilities.battle_shout.name': 'Eisernes Gebrüll',
   'entities.abilities.battle_shout.description': 'Erhöht eure Angriffskraft 2 Min. lang um 20.',
-  'entities.abilities.commanding_shout.name': 'Befehlsruf',
+  'entities.abilities.commanding_shout.name': 'Stärkender Ruf',
   'entities.abilities.commanding_shout.description': 'Erhöht eure Ausdauer 2 Min. lang um 6.',
-  'entities.abilities.demoralizing_shout.name': 'Demoralisierender Ruf',
+  'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.demoralizing_shout.description':
     'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um 30.',
-  'entities.abilities.charge.name': 'Sturmangriff',
+  'entities.abilities.charge.name': 'Vorpreschen',
   'entities.abilities.charge.description':
     'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m.',
-  'entities.abilities.rend.name': 'Verwunden',
+  'entities.abilities.rend.name': 'Tiefe Wunde',
   'entities.abilities.rend.description':
     'Verwundet das Ziel und lässt es über 9 Sek. für {damage} Schaden bluten.',
-  'entities.abilities.thunder_clap.name': 'Donnerknall',
+  'entities.abilities.thunder_clap.name': 'Bebender Schlag',
   'entities.abilities.thunder_clap.description':
     'Trifft nahe Gegner für {damage} Schaden und verlangsamt ihre Angriffe 10 Sek. lang um 10%.',
-  'entities.abilities.hamstring.name': 'Kniesehne',
+  'entities.abilities.hamstring.name': 'Lähmender Schnitt',
   'entities.abilities.hamstring.description':
     'Verkrüppelt den Gegner für 5 Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
-  'entities.abilities.bloodrage.name': 'Blutrausch',
+  'entities.abilities.bloodrage.name': 'Blutzoll',
   'entities.abilities.bloodrage.description': 'Erzeugt 10 Wut auf Kosten von Gesundheit.',
-  'entities.abilities.overpower.name': 'Überwältigen',
+  'entities.abilities.overpower.name': 'Redhand',
   'entities.abilities.overpower.description':
     'Sofortiger Angriff mit Waffenschaden +5. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
-  'entities.abilities.execute.name': 'Hinrichten',
+  'entities.abilities.execute.name': 'Frühes Grab',
   'entities.abilities.execute.description':
     'Versucht, einen verwundeten Gegner zu erledigen, und verursacht {damage} Schaden. Nur bei Gegnern unter 20% Gesundheit einsetzbar.',
-  'entities.abilities.slam.name': 'Zerschmettern',
+  'entities.abilities.slam.name': 'Roher Schwung',
   'entities.abilities.slam.description':
     'Zerschmettert den Gegner für Waffenschaden plus {damage}.',
-  'entities.abilities.cleave.name': 'Spalten',
+  'entities.abilities.cleave.name': 'Sichelschwung',
   'entities.abilities.cleave.description':
     'Ein weiter Hieb, der alle Gegner vor euch für {damage} Schaden trifft.',
-  'entities.abilities.defensive_stance.name': 'Verteidigungshaltung',
+  'entities.abilities.defensive_stance.name': 'Wehrhafte Haltung',
   'entities.abilities.defensive_stance.description':
     'Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Erneut wirken, um die Haltung zu verlassen.',
-  'entities.abilities.sunder_armor.name': 'Rüstung zerreißen',
+  'entities.abilities.sunder_armor.name': 'Rüstungsspalter',
   'entities.abilities.sunder_armor.description':
     'Zerreißt die Rüstung des Ziels und verringert sie pro Anwendung um {damage}. Bis zu 5-mal stapelbar. Erzeugt viel Bedrohung.',
-  'entities.abilities.taunt.name': 'Spott',
+  'entities.abilities.taunt.name': 'Anstacheln',
   'entities.abilities.taunt.description':
     'Verspottet das Ziel: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen.',
   'entities.abilities.fireball.name': 'Feuerball',
+  'entities.abilities.rain_of_fire.name': 'Feuerregen',
+  'entities.abilities.rain_of_fire.description':
+    'Lässt einen Feuerregen auf den Zielbereich niedergehen, der Gegner verbrennt und {damage} Feuerschaden verursacht.',
+  'entities.abilities.volley.name': 'Pfeilhagel',
+  'entities.abilities.volley.description':
+    'Lässt einen Pfeilhagel auf den Zielbereich niedergehen und verursacht {damage} Schaden an den Gegnern darin.',
+  'entities.abilities.hurricane.name': 'Wirbelsturm',
+  'entities.abilities.hurricane.description':
+    'Entfesselt einen Wirbelsturm über dem Zielbereich, der Gegner trifft und {damage} Naturschaden verursacht.',
+  'entities.abilities.earthquake.name': 'Erdbeben',
+  'entities.abilities.earthquake.description':
+    'Lässt den Zielbereich erbeben, trifft Gegner und verursacht {damage} Naturschaden.',
+  'entities.abilities.flamestrike.name': 'Flammenschlag',
+  'entities.abilities.flamestrike.description':
+    'Lässt am Zielort eine Feuerexplosion niedergehen, die allen Gegnern im Wirkungsbereich {damage} Feuerschaden zufügt.',
   'entities.abilities.fireball.description':
     'Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
-  'entities.abilities.frost_armor.name': 'Frostrüstung',
+  'entities.abilities.frost_armor.name': 'Raureifmantel',
   'entities.abilities.frost_armor.description':
     'Hüllt euch in Frost und erhöht die Rüstung 30 Min. lang um 30.',
-  'entities.abilities.arcane_intellect.name': 'Arkane Intelligenz',
+  'entities.abilities.arcane_intellect.name': 'Aether-Einsicht',
   'entities.abilities.arcane_intellect.description': 'Erhöht die Intelligenz 30 Min. lang um 2.',
-  'entities.abilities.frostbolt.name': 'Frostblitz',
+  'entities.abilities.frostbolt.name': 'Rimelance',
   'entities.abilities.frostbolt.description':
     'Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%.',
-  'entities.abilities.conjure_water.name': 'Wasser herbeizaubern',
+  'entities.abilities.conjure_water.name': 'Waterbind',
   'entities.abilities.conjure_water.description':
     'Beschwört 2 Flaschen Wasser, die beim Trinken Mana wiederherstellen. Höhere Ränge beschwören reineres Wasser.',
-  'entities.abilities.conjure_food.name': 'Nahrung herbeizaubern',
+  'entities.abilities.conjure_food.name': 'Breadbind',
   'entities.abilities.conjure_food.description':
     'Beschwört 2 Portionen Brot, die beim Essen Gesundheit wiederherstellen. Höhere Ränge beschwören nahrhaftere Speisen.',
-  'entities.abilities.fire_blast.name': 'Feuerschlag',
+  'entities.abilities.fire_blast.name': 'Cinderfall',
   'entities.abilities.fire_blast.description':
     'Trifft den Gegner für {damage} Feuerschaden. Sofort.',
-  'entities.abilities.arcane_missiles.name': 'Arkane Geschosse',
+  'entities.abilities.arcane_missiles.name': 'Aether-Pfeile',
   'entities.abilities.arcane_missiles.description':
-    'Schleudert Arkane Geschosse auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden.',
-  'entities.abilities.polymorph.name': 'Verwandlung',
+    'Schleudert Aether-Pfeile auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden.',
+  'entities.abilities.polymorph.name': 'Behexen',
   'entities.abilities.polymorph.description':
-    'Verwandelt den Gegner bis zu 15 Sek. lang in ein Schaf. Das Schaf wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
-  'entities.abilities.frost_nova.name': 'Frostnova',
+    'Verwandelt den Gegner bis zu 15 Sek. lang in eine Kröte. Die Kröte wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
+  'entities.abilities.frost_nova.name': 'Icebind',
   'entities.abilities.frost_nova.description':
     'Friert alle nahen Gegner bis zu 8 Sek. lang fest und verursacht {damage} Frostschaden.',
-  'entities.abilities.arcane_explosion.name': 'Arkane Explosion',
+  'entities.abilities.arcane_explosion.name': 'Aetherburst',
   'entities.abilities.arcane_explosion.description':
     'Ein Ausbruch arkaner Energie trifft alle nahen Gegner für {damage} Arkanschaden.',
-  'entities.abilities.scorch.name': 'Versengen',
+  'entities.abilities.scorch.name': 'Verbrühen',
   'entities.abilities.scorch.description':
     'Versengt den Gegner für {damage} Feuerschaden. Schnell zu wirken.',
-  'entities.abilities.pyroblast.name': 'Pyroschlag',
+  'entities.abilities.pyroblast.name': 'Pyrelance',
   'entities.abilities.pyroblast.description':
     'Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
-  'entities.abilities.ice_barrier.name': 'Eisbarriere',
+  'entities.abilities.ice_barrier.name': 'Frostschleier',
   'entities.abilities.ice_barrier.description':
     'Schützt euch mit Eis und absorbiert 60 Sek. lang 130 Schaden.',
-  'entities.abilities.sinister_strike.name': 'Finsterer Stoß',
+  'entities.abilities.sinister_strike.name': 'Boshafter Hieb',
   'entities.abilities.sinister_strike.description':
     'Sofortiger Hieb für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
-  'entities.abilities.eviscerate.name': 'Ausweiden',
+  'entities.abilities.eviscerate.name': 'Grabesschlaf',
   'entities.abilities.eviscerate.description':
     'Finishing-Move, der Schaden pro Combopunkt verursacht.',
-  'entities.abilities.backstab.name': 'Meucheln',
+  'entities.abilities.backstab.name': 'Feiger Stoß',
   'entities.abilities.backstab.description':
     'Meuchelt das Ziel für 150% Waffenschaden plus {damage}. Ihr müsst hinter dem Ziel stehen. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
-  'entities.abilities.gouge.name': 'Solarplexus',
+  'entities.abilities.gouge.name': 'Augenstich',
   'entities.abilities.gouge.description':
     'Trifft das Ziel und macht es 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. Gewährt 1 Combopunkt.',
-  'entities.abilities.evasion.name': 'Entrinnen',
+  'entities.abilities.evasion.name': 'Ghostfoot',
   'entities.abilities.evasion.description': 'Erhöht eure Ausweichchance 15 Sek. lang um 50%.',
-  'entities.abilities.slice_and_dice.name': 'Zerhäckseln',
+  'entities.abilities.slice_and_dice.name': 'Mörderisches Tempo',
   'entities.abilities.slice_and_dice.description':
     'Finishing-Move, der das Nahkampfangriffstempo um 30% erhöht. Hält pro Combopunkt länger an.',
-  'entities.abilities.sprint.name': 'Sprinten',
+  'entities.abilities.sprint.name': 'Flinke Fersen',
   'entities.abilities.sprint.description': 'Erhöht euer Bewegungstempo 15 Sek. lang um 70%.',
-  'entities.abilities.kidney_shot.name': 'Nierenhieb',
+  'entities.abilities.kidney_shot.name': 'Tiefschlag',
   'entities.abilities.kidney_shot.description':
     'Finishing-Move, der das Ziel betäubt. Hält pro Combopunkt 1 Sek. länger an.',
-  'entities.abilities.ambush.name': 'Hinterhalt',
+  'entities.abilities.ambush.name': 'Lauererstoß',
   'entities.abilities.ambush.description':
     'Überfällt das Ziel für 250% Waffenschaden plus {damage}. Ihr müsst verstohlen und hinter dem Ziel sein. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
-  'entities.abilities.stealth.name': 'Verstohlenheit',
+  'entities.abilities.stealth.name': 'Duskveil',
   'entities.abilities.stealth.description':
-    'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Verstohlenheit. Erneut wirken, um hervorzutreten.',
-  'entities.abilities.adrenaline_rush.name': 'Adrenalinrausch',
+    'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um hervorzutreten.',
+  'entities.abilities.adrenaline_rush.name': 'Beschleunigtes Blut',
   'entities.abilities.adrenaline_rush.description':
     'Euer Blut kocht und stellt sofort 60 Energie wieder her.',
-  'entities.abilities.garrote.name': 'Erwürgen',
+  'entities.abilities.garrote.name': 'Kehldraht',
   'entities.abilities.garrote.description':
     'Erwürgt den Gegner, verursacht sofort Schaden und lässt ihn 18 Sek. lang um {damage} bluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt.',
-  'entities.abilities.cheap_shot.name': 'Wilder Hieb',
+  'entities.abilities.cheap_shot.name': 'Magenhieb',
   'entities.abilities.cheap_shot.description':
     'Trifft das Ziel und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.',
   'entities.abilities.sap.name': 'Kopfnuss',
   'entities.abilities.sap.description':
     'Macht das Ziel 8 Sek. lang handlungsunfähig. Erfordert Verstohlenheit und außerhalb des Kampfes zu sein. Jeder Schaden bricht den Effekt.',
-  'entities.abilities.crippling_poison.name': 'Lähmendes Gift',
+  'entities.abilities.crippling_poison.name': 'Bleiernes Gift',
   'entities.abilities.crippling_poison.description':
-    'Trifft das Ziel mit einem lähmenden Gift, verursacht {damage} Naturschaden und verringert sein Bewegungstempo 12 Sek. lang um 50%.',
-  'entities.abilities.expose_armor.name': 'Rüstung entblößen',
+    'Trifft das Ziel mit einem bleiernen Gift, verursacht {damage} Naturschaden und verringert sein Bewegungstempo 12 Sek. lang um 50%.',
+  'entities.abilities.expose_armor.name': 'Rüstungsbruch',
   'entities.abilities.expose_armor.description':
     'Finishing-Move, der das Ziel entblößt und seine Rüstung verringert. Mehr eingesetzte Combopunkte führen zu einem tieferen Schnitt.',
-  'entities.abilities.rupture.name': 'Rupturieren',
+  'entities.abilities.rupture.name': 'Ausbluten',
   'entities.abilities.rupture.description':
     'Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt.',
-  'entities.abilities.vanish.name': 'Verschwinden',
+  'entities.abilities.vanish.name': 'Smokestep',
   'entities.abilities.vanish.description':
-    'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Verstohlenheit. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
-  'entities.abilities.instant_poison.name': 'Sofortgift',
+    'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
+  'entities.abilities.instant_poison.name': 'Natternbiss',
   'entities.abilities.instant_poison.description':
     'Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge 8 zusätzlichen Naturschaden verursacht.',
-  'entities.abilities.deadly_poison.name': 'Tödliches Gift',
+  'entities.abilities.deadly_poison.name': 'Eiterndes Gift',
   'entities.abilities.deadly_poison.description':
     'Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge 14 zusätzlichen Naturschaden verursacht.',
-  'entities.abilities.blind.name': 'Blenden',
+  'entities.abilities.blind.name': 'Dreckwurf',
   'entities.abilities.blind.description':
     'Blendet das Ziel, sodass es 8 Sek. lang desorientiert umherirrt. Jeder Schaden bricht den Effekt.',
-  'entities.abilities.seal_of_righteousness.name': 'Siegel der Rechtschaffenheit',
+  'entities.abilities.seal_of_righteousness.name': 'Oathbrand',
   'entities.abilities.seal_of_righteousness.description':
-    'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung 4 zusätzlichen Heiligschaden verursacht. Mit Richturteil entfesseln.',
-  'entities.abilities.holy_light.name': 'Heiliges Licht',
+    'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung 4 zusätzlichen Heiligschaden verursacht. Mit Verdict entfesseln.',
+  'entities.abilities.holy_light.name': 'Mending Light',
   'entities.abilities.holy_light.description': 'Heilt ein freundliches Ziel um {damage}.',
-  'entities.abilities.devotion_aura.name': 'Aura der Hingabe',
+  'entities.abilities.devotion_aura.name': 'Standhafte Aura',
   'entities.abilities.devotion_aura.description': 'Erhöht eure Rüstung 30 Min. lang um 40.',
-  'entities.abilities.judgement.name': 'Richturteil',
+  'entities.abilities.judgement.name': 'Verdict',
   'entities.abilities.judgement.description':
-    'Entfesselt euer aktives Siegel auf den Gegner, verbraucht es und verursacht seinen Richturteilschaden.',
-  'entities.abilities.blessing_of_might.name': 'Segen der Macht',
+    'Entfesselt euer aktives Siegel auf den Gegner, verbraucht es und verursacht seinen gespeicherten Heiligschaden.',
+  'entities.abilities.blessing_of_might.name': 'Eid des Eisens',
   'entities.abilities.blessing_of_might.description':
     'Belegt ein freundliches Ziel mit einem Segen und erhöht seine Angriffskraft 5 Min. lang um 15.',
-  'entities.abilities.divine_protection.name': 'Göttlicher Schutz',
+  'entities.abilities.divine_protection.name': 'Bannschild des Glaubens',
   'entities.abilities.divine_protection.description':
-    'Ein heiliger Schild absorbiert 10 Sek. lang 50 Schaden.',
-  'entities.abilities.hammer_of_justice.name': 'Hammer der Gerechtigkeit',
+    'Ein schützender Bannschild absorbiert 10 Sek. lang 50 Schaden.',
+  'entities.abilities.hammer_of_justice.name': 'Spaltender Richthammer',
   'entities.abilities.hammer_of_justice.description': 'Betäubt das Ziel 3 Sek. lang.',
-  'entities.abilities.lay_on_hands.name': 'Handauflegung',
+  'entities.abilities.lay_on_hands.name': 'Letzte Ölung',
   'entities.abilities.lay_on_hands.description':
     'Ein gewaltiger Heilungsstoß: Stellt 250 Gesundheit wieder her. 10 Min. Abklingzeit.',
-  'entities.abilities.flash_of_light.name': 'Lichtblitz',
+  'entities.abilities.flash_of_light.name': 'Lightmend',
   'entities.abilities.flash_of_light.description':
-    'Ein schneller, effizienter Lichtblitz, der ein freundliches Ziel um {damage} heilt.',
-  'entities.abilities.exorcism.name': 'Exorzismus',
+    'Ein schneller, effizienter Lichtstoß, der ein freundliches Ziel um {damage} heilt.',
+  'entities.abilities.exorcism.name': 'Ritus der Austreibung',
   'entities.abilities.exorcism.description':
     'Bannt das Böse mit Heiligem Zorn und verursacht {damage} Heiligschaden.',
-  'entities.abilities.consecration.name': 'Weihe',
+  'entities.abilities.consecration.name': 'Heiliger Boden',
   'entities.abilities.consecration.description':
     'Weiht den Boden unter euch und versengt nahe Gegner für {damage} Heiligschaden.',
-  'entities.abilities.righteous_fury.name': 'Zorn der Gerechtigkeit',
+  'entities.abilities.righteous_fury.name': 'Brennender Eid',
   'entities.abilities.righteous_fury.description':
     'Erhöht die durch euren Heiligschaden erzeugte Bedrohung 30 Min. lang um 60%. Der Grundpfeiler des Tank-Paladins.',
-  'entities.abilities.retribution_aura.name': 'Vergeltungsaura',
+  'entities.abilities.retribution_aura.name': 'Aura der Vergeltung',
   'entities.abilities.retribution_aura.description':
     'Umgibt Euch 30 Min. lang mit heiliger Energie und fügt jedem Gegner, der Euch im Nahkampf trifft, 5 Heiligschaden zu.',
-  'entities.abilities.tame_beast.name': 'Wildtier zähmen',
+  'entities.abilities.tame_beast.name': 'Wildbond',
   'entities.abilities.tame_beast.description':
     'Beginnt, ein Wildtier als Begleiter zu zähmen. Es muss eure Stufe oder niedriger haben und darf kein Elitegegner sein. Euer Begleiter folgt euch, greift eure Gegner an und hält eigene Bedrohung. Ihr könnt nur einen Begleiter zugleich haben.',
-  'entities.abilities.dismiss_pet.name': 'Begleiter freigeben',
+  'entities.abilities.dismiss_pet.name': 'Begleiter entlassen',
   'entities.abilities.dismiss_pet.description': 'Entlässt euren Begleiter zurück in die Wildnis.',
-  'entities.abilities.raptor_strike.name': 'Raptorstoß',
+  'entities.abilities.raptor_strike.name': 'Ausweidender Hieb',
   'entities.abilities.raptor_strike.description':
     'Starker Nahkampfangriff, der den Schaden um 5 erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
-  'entities.abilities.aspect_of_the_hawk.name': 'Aspekt des Falken',
+  'entities.abilities.aspect_of_the_hawk.name': 'Gestalt der Weihe',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Nehmt den Aspekt des Falken an und erhöht die Angriffskraft 30 Min. lang um 20.',
-  'entities.abilities.serpent_sting.name': 'Schlangenbiss',
+    'Nehmt die Gestalt der Weihe an und erhöht die Angriffskraft 30 Min. lang um 20.',
+  'entities.abilities.serpent_sting.name': 'Giftstachel',
   'entities.abilities.serpent_sting.description':
     'Sticht das Ziel und verursacht über 15 Sek. {damage} Naturschaden.',
-  'entities.abilities.arcane_shot.name': 'Arkaner Schuss',
+  'entities.abilities.arcane_shot.name': 'Finsterer Schuss',
   'entities.abilities.arcane_shot.description':
     'Sofortiger Schuss, der {damage} Arkanschaden verursacht.',
-  'entities.abilities.concussive_shot.name': 'Erschütternder Schuss',
+  'entities.abilities.concussive_shot.name': 'Rasselnder Schuss',
   'entities.abilities.concussive_shot.description':
     'Macht das Ziel benommen und verringert sein Bewegungstempo 4 Sek. lang um 50%.',
-  'entities.abilities.mongoose_bite.name': 'Mungobiss',
+  'entities.abilities.mongoose_bite.name': 'Counterfang',
   'entities.abilities.mongoose_bite.description':
     'Kontert, nachdem das Ziel ausgewichen ist, für Waffenschaden plus 12. Kann nicht ausgewichen werden.',
-  'entities.abilities.wing_clip.name': 'Zurechtstutzen',
+  'entities.abilities.wing_clip.name': 'Fesselnder Hieb',
   'entities.abilities.wing_clip.description':
     'Verursacht eine Wunde, die den Gegner 10 Sek. lang um 40% verlangsamt.',
-  'entities.abilities.aspect_of_the_monkey.name': 'Aspekt des Affen',
+  'entities.abilities.aspect_of_the_monkey.name': 'Gestalt des Marders',
   'entities.abilities.aspect_of_the_monkey.description':
-    'Nehmt den Aspekt des Affen an und erhöht eure Ausweichchance 30 Min. lang um 8%.',
-  'entities.abilities.aspect_of_the_cheetah.name': 'Aspekt des Geparden',
+    'Nehmt die Gestalt des Marders an und erhöht eure Ausweichchance 30 Min. lang um 8%.',
+  'entities.abilities.aspect_of_the_cheetah.name': 'Gestalt des Renners',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Nehmt den Aspekt des Geparden an und erhöht euer Bewegungstempo 30 Min. lang um 30%.',
-  'entities.abilities.aimed_shot.name': 'Gezielter Schuss',
+    'Nehmt die Gestalt eines Renners an und erhöht euer Bewegungstempo 30 Min. lang um 30%.',
+  'entities.abilities.aimed_shot.name': 'Langer Zug',
   'entities.abilities.aimed_shot.description':
-    'Ein sorgfältig gezielter Schuss, der {damage} Schaden verursacht.',
-  'entities.abilities.rapid_fire.name': 'Schnellfeuer',
+    'Ein sorgfältig gespannter Schuss, der {damage} Schaden verursacht.',
+  'entities.abilities.rapid_fire.name': 'Fieberhafter Zug',
   'entities.abilities.rapid_fire.description': 'Erhöht euer Angriffstempo 15 Sek. lang um 40%.',
   'entities.abilities.smite.name': 'Göttliche Pein',
   'entities.abilities.smite.description': 'Peinigt den Gegner für {damage} Heiligschaden.',
-  'entities.abilities.lesser_heal.name': 'Geringe Heilung',
+  'entities.abilities.lesser_heal.name': 'Geflüstertes Gebet',
   'entities.abilities.lesser_heal.description': 'Heilt ein freundliches Ziel um {damage}.',
-  'entities.abilities.power_word_fortitude.name': 'Machtwort: Seelenstärke',
+  'entities.abilities.power_word_fortitude.name': 'Litanei der Entschlossenheit',
   'entities.abilities.power_word_fortitude.description':
     'Erhöht die Ausdauer des Ziels 30 Min. lang um 3.',
-  'entities.abilities.shadow_word_pain.name': 'Schattenwort: Schmerz',
+  'entities.abilities.shadow_word_pain.name': 'Klagelied des Verfalls',
   'entities.abilities.shadow_word_pain.description':
     'Ein Wort der Dunkelheit verursacht über 18 Sek. {damage} Schattenschaden.',
-  'entities.abilities.power_word_shield.name': 'Machtwort: Schild',
+  'entities.abilities.power_word_shield.name': 'Psalm der Abschirmung',
   'entities.abilities.power_word_shield.description':
     'Schützt das Ziel und absorbiert 30 Sek. lang 48 Schaden.',
-  'entities.abilities.renew.name': 'Erneuerung',
+  'entities.abilities.renew.name': 'Anhaltende Gnade',
   'entities.abilities.renew.description': 'Heilt das Ziel über 15 Sek. um {damage}.',
-  'entities.abilities.mind_blast.name': 'Gedankenschlag',
+  'entities.abilities.mind_blast.name': 'Mindfracture',
   'entities.abilities.mind_blast.description':
     'Trifft den Geist des Ziels für {damage} Schattenschaden.',
-  'entities.abilities.heal.name': 'Heilung',
+  'entities.abilities.heal.name': 'Feierliches Gebet',
   'entities.abilities.heal.description':
     'Ein langsames, aber mächtiges Gebet, das ein freundliches Ziel um {damage} heilt.',
-  'entities.abilities.mind_flay.name': 'Gedankenschinden',
+  'entities.abilities.mind_flay.name': 'Litanei des Leids',
   'entities.abilities.mind_flay.description':
     'Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden.',
-  'entities.abilities.flash_heal.name': 'Blitzheilung',
+  'entities.abilities.flash_heal.name': 'Dringendes Gebet',
   'entities.abilities.flash_heal.description':
     'Ein schnelles Gebet, das ein freundliches Ziel um {damage} heilt.',
-  'entities.abilities.lightning_bolt.name': 'Blitzschlag',
+  'entities.abilities.lightning_bolt.name': 'Lichtbogenblitz',
   'entities.abilities.lightning_bolt.description':
     'Schleudert einen Blitz für {damage} Naturschaden.',
-  'entities.abilities.rockbiter_weapon.name': 'Felsbeißerwaffe',
+  'entities.abilities.rockbiter_weapon.name': 'Stonebound-Waffe',
   'entities.abilities.rockbiter_weapon.description':
     'Erfüllt eure Waffe mit der Wut des Steins: Jeder Schlag verursacht 5 zusätzlichen Schaden für 5 Min.',
-  'entities.abilities.healing_wave.name': 'Welle der Heilung',
+  'entities.abilities.healing_wave.name': 'Heilende Wasser',
   'entities.abilities.healing_wave.description': 'Heilt ein freundliches Ziel um {damage}.',
-  'entities.abilities.earth_shock.name': 'Erdschock',
+  'entities.abilities.earth_shock.name': 'Erdstoß',
   'entities.abilities.earth_shock.description':
     'Schockt das Ziel sofort mit erschütternder Kraft für {damage} Naturschaden.',
-  'entities.abilities.lightning_shield.name': 'Blitzschlagschild',
+  'entities.abilities.lightning_shield.name': 'Donnerschild',
   'entities.abilities.lightning_shield.description':
     'Umhüllt euch mit knisternden Blitzen: Nahkampfangreifer erleiden 13 Naturschaden.',
-  'entities.abilities.flame_shock.name': 'Flammenschock',
+  'entities.abilities.flame_shock.name': 'Cinder-Stoß',
   'entities.abilities.flame_shock.description':
     'Versengt das Ziel mit Feuer für 25 Schaden plus {damage} über 12 Sek.',
-  'entities.abilities.flametongue_weapon.name': 'Flammenzungenwaffe',
+  'entities.abilities.flametongue_weapon.name': 'Pyrebrand-Waffe',
   'entities.abilities.flametongue_weapon.description':
     'Erfüllt eure Waffe mit elementarem Feuer: Jeder Schlag verursacht 8 zusätzlichen Feuerschaden für 5 Min.',
-  'entities.abilities.frost_shock.name': 'Frostschock',
+  'entities.abilities.frost_shock.name': 'Rime-Stoß',
   'entities.abilities.frost_shock.description':
     'Schockt das Ziel sofort mit Frost für {damage} Frostschaden und verlangsamt seine Bewegung 8 Sek. lang um 50%.',
-  'entities.abilities.frostbrand_weapon.name': 'Frostbrandwaffe',
+  'entities.abilities.frostbrand_weapon.name': 'Rimebound-Waffe',
   'entities.abilities.frostbrand_weapon.description':
     'Verzaubert Eure Waffe mit beißendem Frost: Jeder Schlag verursacht 8 zusätzlichen Schaden für 5 Min.',
-  'entities.abilities.ghost_wolf.name': 'Geisterwolf',
+  'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.ghost_wolf.description':
-    'Verwandelt euch in einen Geisterwolf und erhöht euer Bewegungstempo 10 Min. lang um 40%.',
-  'entities.abilities.stormstrike.name': 'Sturmschlag',
+    'Verwandelt euch in einen Shadewolf und erhöht euer Bewegungstempo 10 Min. lang um 40%.',
+  'entities.abilities.stormstrike.name': 'Ahnenhieb',
   'entities.abilities.stormstrike.description':
     'Leitet den Sturm durch eure Waffe und trifft sofort für Waffenschaden plus {damage}.',
-  'entities.abilities.shadow_bolt.name': 'Schattenblitz',
+  'entities.abilities.shadow_bolt.name': 'Gloom-Blitz',
   'entities.abilities.shadow_bolt.description':
     'Sendet einen schattenhaften Blitz auf den Gegner und verursacht {damage} Schattenschaden.',
-  'entities.abilities.demon_skin.name': 'Dämonenhaut',
+  'entities.abilities.demon_skin.name': 'Fiendhide',
   'entities.abilities.demon_skin.description':
     'Dämonische Haut erhöht eure Rüstung 30 Min. lang um 30.',
-  'entities.abilities.immolate.name': 'Feuerbrand',
+  'entities.abilities.immolate.name': 'Brennender Pakt',
   'entities.abilities.immolate.description':
     'Verbrennt den Gegner für 11 Feuerschaden und zusätzlich {damage} über 15 Sek.',
-  'entities.abilities.corruption.name': 'Verderbnis',
+  'entities.abilities.corruption.name': 'Blackrot',
   'entities.abilities.corruption.description':
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
-  'entities.abilities.life_tap.name': 'Aderlass',
+  'entities.abilities.life_tap.name': 'Harter Handel',
   'entities.abilities.life_tap.description': 'Wandelt 30 Gesundheit in 30 Mana um.',
-  'entities.abilities.curse_of_agony.name': 'Fluch der Pein',
+  'entities.abilities.curse_of_agony.name': 'Fluch der Qual',
   'entities.abilities.curse_of_agony.description':
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
-  'entities.abilities.drain_life.name': 'Blutsauger',
+  'entities.abilities.drain_life.name': 'Verzehren',
   'entities.abilities.drain_life.description':
     'Entzieht dem Ziel Leben und überträgt euch 5 Sek. lang jede Sekunde {damage} Gesundheit.',
-  'entities.abilities.fear.name': 'Furcht',
+  'entities.abilities.fear.name': 'Heimsuchung',
   'entities.abilities.fear.description':
     'Versetzt den Gegner in Schrecken und lässt ihn bis zu 8 Sek. lang kauern. Jeder Schaden bricht den Effekt.',
-  'entities.abilities.searing_pain.name': 'Sengender Schmerz',
+  'entities.abilities.searing_pain.name': 'Versengen',
   'entities.abilities.searing_pain.description':
     'Versengt den Gegner mit qualvollem Feuer für {damage} Feuerschaden. Schnell zu wirken.',
-  'entities.abilities.shadowburn.name': 'Schattenbrand',
+  'entities.abilities.shadowburn.name': 'Dämmerfeuer',
   'entities.abilities.shadowburn.description':
-    'Trifft das Ziel sofort mit Schattenflamme für {damage} Schattenschaden.',
-  'entities.abilities.wrath.name': 'Zorn',
+    'Trifft das Ziel sofort mit sengendem Schatten für {damage} Schattenschaden.',
+  'entities.abilities.wrath.name': 'Wildbolt',
   'entities.abilities.wrath.description':
     'Schleudert einen Blitz Naturenergie für {damage} Naturschaden.',
-  'entities.abilities.healing_touch.name': 'Heilende Berührung',
+  'entities.abilities.healing_touch.name': 'Wildmend',
   'entities.abilities.healing_touch.description': 'Heilt ein freundliches Ziel um {damage}.',
-  'entities.abilities.mark_of_the_wild.name': 'Mal der Wildnis',
+  'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.mark_of_the_wild.description':
-    'Belegt ein freundliches Ziel mit dem Mal der Wildnis und erhöht seine Rüstung 30 Min. lang um 25.',
-  'entities.abilities.moonfire.name': 'Mondfeuer',
+    'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um 25.',
+  'entities.abilities.moonfire.name': 'Mondsturm',
   'entities.abilities.moonfire.description':
     'Verbrennt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
-  'entities.abilities.rejuvenation.name': 'Verjüngung',
+  'entities.abilities.rejuvenation.name': 'Wildbloom',
   'entities.abilities.rejuvenation.description': 'Heilt das Ziel über 12 Sek. um {damage}.',
-  'entities.abilities.thorns.name': 'Dornen',
+  'entities.abilities.thorns.name': 'Briarguard',
   'entities.abilities.thorns.description':
     'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden 3 Naturschaden.',
-  'entities.abilities.entangling_roots.name': 'Wucherwurzeln',
+  'entities.abilities.entangling_roots.name': 'Greifende Wurzeln',
   'entities.abilities.entangling_roots.description':
     'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.',
-  'entities.abilities.bear_form.name': 'Bärengestalt',
+  'entities.abilities.bear_form.name': 'Bruin Form',
   'entities.abilities.bear_form.description':
     'Verwandelt euch in einen Bären: Rüstung +65%, Angriffskraft +15, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
-  'entities.abilities.maul.name': 'Prankenhieb',
+  'entities.abilities.maul.name': 'Bonecrush',
   'entities.abilities.maul.description':
-    'Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bärengestalt.',
-  'entities.abilities.growl.name': 'Knurren',
+    'Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bruin Form.',
+  'entities.abilities.growl.name': 'Bedrohen',
   'entities.abilities.growl.description':
-    'Knurrt das Ziel an: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen. Nur in Bärengestalt.',
+    'Knurrt das Ziel an: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen. Nur in Bruin Form.',
   'entities.abilities.cat_form.name': 'Wolfsgestalt',
   'entities.abilities.cat_form.description':
     'Verwandelt euch in einen Wolf: Angriffskraft steigt mit eurer Stufe, eure Angriffe nutzen Energie und Combopunkte, und ihr erzeugt 29% weniger Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.claw.name': 'Klaue',
   'entities.abilities.claw.description':
     'Kratzt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
-  'entities.abilities.ferocious_bite.name': 'Wilder Biss',
+  'entities.abilities.ferocious_bite.name': 'Gorebite',
   'entities.abilities.ferocious_bite.description':
     'Finishing-Move, der Schaden pro Combopunkt verursacht. Nur in Wolfsgestalt.',
-  'entities.abilities.swipe.name': 'Prankenhieb',
+  'entities.abilities.swipe.name': 'Fegende Klauen',
   'entities.abilities.swipe.description':
-    'Fegt nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bärengestalt.',
-  'entities.abilities.regrowth.name': 'Nachwachsen',
+    'Fegt nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin Form.',
+  'entities.abilities.regrowth.name': 'Zweite Blüte',
   'entities.abilities.regrowth.description':
     'Heilt ein freundliches Ziel um {damage} und zusätzlich über 21 Sek.',
-  'entities.abilities.barkskin.name': 'Baumrinde',
+  'entities.abilities.barkskin.name': 'Eichenhaut',
   'entities.abilities.barkskin.description':
     'Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um 150.',
-  'entities.abilities.starfire.name': 'Sternenfeuer',
+  'entities.abilities.starfire.name': 'Skyfall',
   'entities.abilities.starfire.description':
     'Ruft einen Bolzen aus Sternenfeuer herab, der {damage} Arkanschaden verursacht.',
-  'entities.abilities.travel_form.name': 'Reisegestalt',
+  'entities.abilities.travel_form.name': 'Fleet Form',
   'entities.abilities.travel_form.description':
-    'Nehmt augenblicklich eine flinke Reisegestalt an, was das Lauftempo um 40% erhöht. In dieser Gestalt könnt ihr keine anderen Fähigkeiten einsetzen, aber ihr könnt im Kampf hinein- und herauswechseln. Ideal zur Flucht.',
-  'entities.abilities.enrage.name': 'Wutanfall',
-  'entities.abilities.enrage.description': 'Erzeugt sofort 20 Wut. Nur in Bärengestalt.',
-  'entities.abilities.bash.name': 'Knüppeln',
-  'entities.abilities.bash.description': 'Betäubt das Ziel 2 Sek. lang. Nur in Bärengestalt.',
-  'entities.abilities.faerie_fire.name': 'Feenfeuer',
+    'Nehmt augenblicklich eine flinke Fleet Form an, was das Lauftempo um 40% erhöht. In dieser Gestalt könnt ihr keine anderen Fähigkeiten einsetzen, aber ihr könnt im Kampf hinein- und herauswechseln. Ideal zur Flucht.',
+  'entities.abilities.enrage.name': 'Anfachen',
+  'entities.abilities.enrage.description': 'Erzeugt sofort 20 Wut. Nur in Bruin Form.',
+  'entities.abilities.bash.name': 'Erschüttern',
+  'entities.abilities.bash.description': 'Betäubt das Ziel 2 Sek. lang. Nur in Bruin Form.',
+  'entities.abilities.faerie_fire.name': 'Witchlight',
   'entities.abilities.faerie_fire.description':
     'Verringert die Rüstung des Ziels 40 Sek. lang um 35.',
-  'entities.abilities.hibernate.name': 'Winterschlaf',
+  'entities.abilities.hibernate.name': 'Schlummer',
   'entities.abilities.hibernate.description':
     'Versetzt das Ziel bis zu 8 Sek. in tiefen Schlaf. Jeglicher Schaden weckt es auf.',
   'entities.abilities.dash.name': 'Sprint',
   'entities.abilities.dash.description':
     'Sprintet vorwärts und erhöht das Lauftempo 15 Sek. lang um 50%. Nur in Wolfsgestalt.',
-  'entities.abilities.pounce.name': 'Anspringen',
+  'entities.abilities.pounce.name': 'Slinkstrike',
   'entities.abilities.pounce.description':
     'Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
-  'entities.abilities.insect_swarm.name': 'Insektenschwarm',
+  'entities.abilities.insect_swarm.name': 'Stechender Schwarm',
   'entities.abilities.insect_swarm.description':
     'Der Gegner wird von Insekten umschwärmt und erleidet {damage} Naturschaden über 12 Sek.',
-  'entities.abilities.tigers_fury.name': 'Zorn des Tigers',
+  'entities.abilities.tigers_fury.name': 'Wolfsblood',
   'entities.abilities.tigers_fury.description':
     'Erhöht die Angriffskraft 6 Sek. lang um 40. Nur in Wolfsgestalt.',
   'entities.abilities.rip.name': 'Zerfetzen',
   'entities.abilities.rip.description':
     'Finishing-Move, der über 12 Sek. Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
-  'entities.abilities.mortal_strike.name': 'Tödlicher Stoß',
+  'entities.abilities.mortal_strike.name': 'Verstümmelnder Hieb',
   'entities.abilities.mortal_strike.description':
     'Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)',
-  'entities.abilities.bloodthirst.name': 'Blutdurst',
+  'entities.abilities.bloodthirst.name': 'Aderlass',
   'entities.abilities.bloodthirst.description':
     'Greift sofort in blutiger Raserei an und verursacht {damage}. (Furor-Signatur)',
-  'entities.abilities.shield_slam.name': 'Schildschlag',
+  'entities.abilities.shield_slam.name': 'Shieldcrack',
   'entities.abilities.shield_slam.description':
     'Schlägt das Ziel mit eurem Schild für {damage} und erzeugt enorme Bedrohung. (Schutz-Signatur)',
-  'entities.abilities.whirlwind.name': 'Wirbelwind',
+  'entities.abilities.whirlwind.name': 'Klingenwirbel',
   'entities.abilities.whirlwind.description':
     'Dreht euch in einem tödlichen Bogen und trefft alle nahen Gegner für {damage}. (Furor-Talent)',
-  'entities.abilities.berserker_rage.name': 'Berserkerwut',
+  'entities.abilities.berserker_rage.name': 'Brodelnde Raserei',
   'entities.abilities.berserker_rage.description':
-    'Ihr verfallt in Berserkerwut und erzeugt 20 Wut. (Krieger-Talent)',
-  'entities.abilities.summon_imp.name': 'Wichtel beschwören',
+    'Ihr verfallt in brodelnde Raserei und erzeugt 20 Wut. (Krieger-Talent)',
+  'entities.abilities.summon_imp.name': 'Emberkin beschwören',
   'entities.abilities.summon_imp.description':
-    'Beschwört einen Wichtel unter dem Befehl des Hexenmeisters. Der Wichtel schleudert aus der Ferne Feuerblitze auf Eure Feinde. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
-  'entities.abilities.summon_voidwalker.name': 'Leerwandler beschwören',
+    'Beschwört einen Emberkin unter dem Befehl des Hexenmeisters. Der Emberkin schleudert aus der Ferne Ashbolts auf Eure Feinde. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+  'entities.abilities.summon_voidwalker.name': 'Gloomshade beschwören',
   'entities.abilities.summon_voidwalker.description':
-    'Beschwört einen Leerwandler unter dem Befehl des Hexenmeisters. Der Leerwandler ist ein zäher Dämon, der Eure Feinde verhöhnt und Schaden einsteckt. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
-  'entities.abilities.summon_succubus.name': 'Sukkubus beschwören',
+    'Beschwört einen Gloomshade unter dem Befehl des Hexenmeisters. Der Gloomshade ist ein zäher Dämon, der Eure Feinde verhöhnt und Schaden einsteckt. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+  'entities.abilities.summon_succubus.name': 'Duskborn beschwören',
   'entities.abilities.summon_succubus.description':
-    'Beschwört einen Sukkubus unter dem Befehl des Hexenmeisters. Der Sukkubus ist ein zerbrechlicher Dämon, der schnell zuschlägt und im Nahkampf hart austeilt. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
-  'entities.abilities.summon_felhunter.name': 'Teufelsjäger beschwören',
+    'Beschwört einen Duskborn unter dem Befehl des Hexenmeisters. Der Duskborn ist ein zerbrechlicher Dämon, der schnell zuschlägt und im Nahkampf hart austeilt. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+  'entities.abilities.summon_felhunter.name': 'Spellhound beschwören',
   'entities.abilities.summon_felhunter.description':
-    'Beschwört einen Teufelsjäger unter dem Befehl des Hexenmeisters. Der Teufelsjäger setzt Feinden aus der Ferne mit Schattenbiss zu und ist hervorragend darin, Zauberwirker zu jagen. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
-  'entities.abilities.summon_felguard.name': 'Teufelswache beschwören',
+    'Beschwört einen Spellhound unter dem Befehl des Hexenmeisters. Der Spellhound setzt Feinden aus der Ferne mit Gloombite zu und ist hervorragend darin, Zauberwirker zu jagen. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+  'entities.abilities.summon_felguard.name': 'Warfiend beschwören',
   'entities.abilities.summon_felguard.description':
-    'Beschwört eine Teufelswache unter dem Befehl des Hexenmeisters. Die Teufelswache ist ein widerstandsfähiger Nahkampfdämon, der sich in die Schlacht wirft und sich behauptet. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
-  'entities.abilities.summon_infernal.name': 'Inferno beschwören',
+    'Beschwört einen Warfiend unter dem Befehl des Hexenmeisters. Der Warfiend ist ein widerstandsfähiger Nahkampfdämon, der sich in die Schlacht wirft und sich behauptet. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+  'entities.abilities.summon_infernal.name': 'Pyre Colossus beschwören',
   'entities.abilities.summon_infernal.description':
-    'Bindet ein Inferno an Euren Willen – einen wuchtigen Koloss mit zermalmendem Nahkampf und den höchsten Lebens- und Rüstungswerten aller Dämonen. Eine lange Abklingzeit zügelt seine rohe Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
-  'entities.abilities.summon_doomguard.name': 'Schreckenswache beschwören',
+    'Bindet einen Pyre Colossus an Euren Willen, einen wuchtigen Koloss mit zermalmendem Nahkampf und den höchsten Lebens- und Rüstungswerten aller Dämonen. Eine lange Abklingzeit zügelt seine rohe Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+  'entities.abilities.summon_doomguard.name': 'Wraithborn beschwören',
   'entities.abilities.summon_doomguard.description':
-    'Bindet eine Schreckenswache an Euren Willen – einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
-  'entities.abilities.bear_charge.name': 'Bärensturm',
+    'Bindet einen Wraithborn an Euren Willen, einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+  'entities.abilities.bear_charge.name': 'Bruin-Ansturm',
   'entities.abilities.bear_charge.description':
-    'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. Reichweite 8-25 m. Nur in Bärengestalt.',
-  'entities.abilities.demoralizing_roar.name': 'Demoralisierendes Gebrüll',
+    'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. Reichweite 8-25 m. Nur in Bruin Form.',
+  'entities.abilities.demoralizing_roar.name': 'Feiges Gebrüll',
   'entities.abilities.demoralizing_roar.description':
-    'Demoralisiert nahe Gegner und senkt ihre Angriffskraft 20 Sek. lang um 20. Nur in Bärengestalt.',
-  'entities.abilities.prowl.name': 'Anschleichen',
+    'Demoralisiert nahe Gegner und senkt ihre Angriffskraft 20 Sek. lang um 20. Nur in Bruin Form.',
+  'entities.abilities.prowl.name': 'Anpirschen',
   'entities.abilities.prowl.description':
     'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar.',
-  'entities.abilities.rake.name': 'Krallenhieb',
+  'entities.abilities.rake.name': 'Schinden',
   'entities.abilities.rake.description':
     'Ein Schleicheröffner, der den Gegner für Waffenschaden plus {damage} aufreißt und über 9 Sek. Blutungsschaden verursacht. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.revive_pet.name': 'Begleiter wiederbeleben',
   'entities.abilities.revive_pet.description':
     'Belebt deinen toten Begleiter wieder und ruft ihn an deine Seite zurück.',
   'entities.items.worn_sword.name': 'Abgenutztes Kurzschwert',
-  'entities.items.gnarled_staff.name': 'Knorriger Stab',
+  'entities.items.gnarled_staff.name': 'Mooreichenstab',
   'entities.items.rusty_dagger.name': 'Rostiger Dolch',
   'entities.items.training_mace.name': 'Übungsstreitkolben',
   'entities.items.rusty_hatchet.name': 'Rostiges Beil',
-  'entities.items.recruit_tunic.name': 'Rekrutentunika',
-  'entities.items.apprentice_robe.name': 'Lehrlingsrobe',
-  'entities.items.footpad_jerkin.name': 'Wams des Wegelagerers',
+  'entities.items.recruit_tunic.name': 'Levyman-Tunika',
+  'entities.items.apprentice_robe.name': 'Fadenscheinige Robe',
+  'entities.items.footpad_jerkin.name': 'Beutelschneiderwams',
   'entities.items.redbrook_blade.name': 'Milizklinge von Redbrook',
   'entities.items.apprentice_staff.name': 'Lehrlingsstab des Tals',
   'entities.items.keen_dirk.name': 'Scharfer Dolch',
@@ -2065,12 +2891,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.milepost_boots.name': 'Meilenstein-Stiefel',
   'entities.items.quilted_trousers.name': 'Gesteppte Hose',
   'entities.items.greyjaw_pelt_cloak.name': 'Gamaschen aus Greyjaws Pelz',
-  'entities.items.baked_bread.name': 'Frisch gebackenes Brot',
-  'entities.items.spring_water.name': 'Erfrischendes Quellwasser',
-  'entities.items.roasted_boar.name': 'Gebratenes Eberfleisch',
-  'entities.items.conjured_water.name': 'Herbeigezaubertes Quellwasser',
-  'entities.items.conjured_water2.name': 'Herbeigezaubertes Mineralwasser',
-  'entities.items.conjured_water3.name': 'Herbeigezaubertes Sprudelwasser',
+  'entities.items.baked_bread.name': 'Bauernbrot',
+  'entities.items.spring_water.name': 'Kaltes Brunnenwasser',
+  'entities.items.roasted_boar.name': 'Eberkeule am Spieß',
+  'entities.items.conjured_water.name': 'Herbeigezaubertes Regenwasser',
+  'entities.items.conjured_water2.name': 'Herbeigezaubertes Brunnenwasser',
+  'entities.items.conjured_water3.name': 'Herbeigezaubertes Klarwasser',
   'entities.items.eastbrook_arming_sword.name': 'Eastbrook-Wehrschwert',
   'entities.items.bronzework_mace.name': 'Bronzewerkstreitkolben',
   'entities.items.vale_carving_knife.name': 'Talschnitzmesser',
@@ -2090,16 +2916,21 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravecaller_sigil.name': 'Gravecallers Siegel',
   'entities.items.blessed_wax.name': 'Gesegneter Talg',
   'entities.items.ghostly_essence.name': 'Geisterhafte Essenz',
-  'entities.items.webwood_silk.name': 'Seidendrüse von Webwood',
+  'entities.items.webwood_silk.name': 'Sableweb-Seidendrüse',
   'entities.items.supply_crate.name': 'Gestohlene Vorratskiste',
   'entities.items.greyjaw_fang.name': 'Zahn des alten Greyjaw',
   'entities.items.weathered_ledger_page.name': 'Verwitterte Buchseite',
   'entities.items.morthen_grimoire.name': 'Morthens Grimoire',
   'entities.items.wolf_fang.name': 'Gesprungener Wolfszahn',
+  'entities.items.linen_pouch.name': 'Leinenbeutel',
+  'entities.items.travelers_knapsack.name': 'Rucksack des Reisenden',
+  'entities.items.wolfhide_satchel.name': 'Wolfsledertasche',
+  'entities.items.gravewoven_bag.name': 'Grabgewebte Tasche',
+  'entities.items.mistcallers_duffel.name': 'Seesack des Fogbinders',
   'entities.items.bandit_bandana.name': 'Rotes Halstuch',
-  'entities.items.tough_jerky.name': 'Zähes Dörrfleisch',
-  'entities.items.mudfin_scale.name': 'Schleimige Murlocschuppe',
-  'entities.items.tallow_candle.name': 'Talgkerze',
+  'entities.items.tough_jerky.name': 'Gesalzenes Dörrfleisch',
+  'entities.items.mudfin_scale.name': 'Schleimige Mudfin-Schuppe',
+  'entities.items.tallow_candle.name': 'Fettiger Talgklumpen',
   'entities.items.spider_leg.name': 'Zuckendes Spinnenbein',
   'entities.items.bone_fragments.name': 'Knochenfragmente',
   'entities.items.linen_scrap.name': 'Leinenfetzen',
@@ -2138,7 +2969,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.eelskin_tunic.name': 'Aalhaut-Tunika',
   'entities.items.trollhide_leggings.name': 'Trollhautgamaschen',
   'entities.items.marshstrider_boots.name': 'Marschschreiterstiefel',
-  'entities.items.mistcallers_edge.name': 'Mistcallers Schneide',
+  'entities.items.mistcallers_edge.name': 'Fogbinders Schneide',
   'entities.items.vaels_mist_staff.name': 'Vaels Nebelstab',
   'entities.items.riptide_dirk.name': 'Springflutdolch',
   'entities.items.knight_commanders_greaves.name': 'Schienen des Ritterkommandanten',
@@ -2187,7 +3018,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.korgaths_chainwraps.name': 'Korgaths Kettenwickel',
   'entities.items.boneguard_breastplate.name': 'Knochenwachtbrustplatte',
   'entities.items.staff_of_velkhar.name': 'Stab von Velkhar',
-  'entities.items.shadowmeld_tunic.name': 'Schattenverschmelzungstunika',
+  'entities.items.shadowmeld_tunic.name': 'Nightveil-Tunika',
   'entities.items.gravewyrm_scale_hauberk.name': 'Gravewyrm-Schuppenhalsberge',
   'entities.items.wyrmcult_grand_robe.name': 'Große Robe des Wyrmkults',
   'entities.items.wyrmscale_jerkin.name': 'Wyrmschuppenwams',
@@ -2210,13 +3041,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.inert_storm_shard.name': 'Träger Sturmsplitter',
   'entities.items.frayed_prayer_beads.name': 'Ausgefranste Gebetsperlen',
   'entities.items.cracked_wyrm_scale.name': 'Gesprungene Wyrmschuppe',
-  'entities.items.bristleback_maul.name': 'Bristleback-Schlägel',
+  'entities.items.bristleback_maul.name': 'Gallowglass-Hammer',
   'entities.items.broodmother_silk_robe.name': 'Seidenrobe der Brutmutter',
   'entities.items.cryptbone_greaves.name': 'Gruftknochenbeinschienen',
-  'entities.items.cryptstalker_jerkin.name': 'Gruftpirscherwams',
-  'entities.items.deathlord_legguards.name': 'Beinschützer des Todeslords',
-  'entities.items.deathlord_sabatons.name': 'Sabatons des Todeslords',
-  'entities.items.deathlord_warplate.name': 'Kriegsplatte des Todeslords',
+  'entities.items.cryptstalker_jerkin.name': 'Gravestalker-Wams',
+  'entities.items.deathlord_legguards.name': 'Barrowlord-Beinschützer',
+  'entities.items.deathlord_sabatons.name': 'Barrowlord-Sabatons',
+  'entities.items.deathlord_warplate.name': 'Barrowlord-Kriegsplatte',
   'entities.items.drogmar_warboots.name': 'Drogmars Kriegsstiefel',
   'entities.items.drowned_prayer_leggings.name': 'Gamaschen des Ertrunkenen Gebets',
   'entities.items.drowned_prayer_sandals.name': 'Sandalen des Ertrunkenen Gebets',
@@ -2242,9 +3073,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.moggers_copper_cudgel.name': 'Moggers Kupferknüppel',
   'entities.items.moggers_shiv.name': 'Moggers Messer',
   'entities.items.moggers_stomper_boots.name': 'Moggers Stampfstiefel',
-  'entities.items.necromancers_legwraps.name': 'Beinwickel des Nekromanten',
-  'entities.items.necromancers_soulsteps.name': 'Seelenschritte des Nekromanten',
-  'entities.items.necromancers_starshroud.name': 'Sternenschleier des Nekromanten',
+  'entities.items.necromancers_legwraps.name': 'Mournweave-Beinwickel',
+  'entities.items.necromancers_soulsteps.name': 'Mournweave-Seelenschritte',
+  'entities.items.necromancers_starshroud.name': 'Mournweave-Sternenschleier',
   'entities.items.nhalias_dirgeblade.name': 'Nhalias Klageliedklinge',
   'entities.items.nhalias_funeral_wraps.name': 'Nhalias Leichenwickel',
   'entities.items.raw_mirror_trout.name': 'Rohe Spiegeltrutte',
@@ -2256,20 +3087,20 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.valeborn_spellblade.name': 'Talgeborene Zauberklinge',
   'entities.items.voss_sanctified_mace.name': "Voss' geheiligter Streitkolben",
   'entities.items.wyrmcult_soulsteps.name': 'Seelenschritte des Wyrmkults',
-  'entities.items.wyrmshadow_harness.name': 'Wyrmschattenharnisch',
-  'entities.items.wyrmshadow_legguards.name': 'Wyrmschattenbeinschützer',
-  'entities.items.wyrmshadow_treads.name': 'Wyrmschattentreter',
+  'entities.items.wyrmshadow_harness.name': 'Nightfang-Harnisch',
+  'entities.items.wyrmshadow_legguards.name': 'Nightfang-Beinschützer',
+  'entities.items.wyrmshadow_treads.name': 'Nightfang-Treter',
   'entities.items.boundstone_girdle.name': 'Gebundstein-Gurt',
   'entities.items.boundstone_helm.name': 'Gebundstein-Helm',
   'entities.items.cryptbone_helm.name': 'Gruftknochenhelm',
   'entities.items.cryptbone_pauldrons.name': 'Gruftknochenschulterstücke',
-  'entities.items.deathlords_dread_visage.name': 'Schreckensantlitz des Todeslords',
+  'entities.items.deathlords_dread_visage.name': 'Barrowlords Schreckensantlitz',
   'entities.items.gravewyrm_gauntlets.name': 'Gravewyrm-Stulpen',
   'entities.items.gravewyrm_mantle.name': 'Gravewyrm-Mantel',
   'entities.items.mistveil_cord.name': 'Nebelschleierkordel',
   'entities.items.mistveil_grips.name': 'Nebelschleiergriffe',
-  'entities.items.necromancers_soulspire_mantle.name': 'Seelenspitzenmantel des Nekromanten',
-  'entities.items.wyrmshadow_talongrips.name': 'Wyrmschatten-Krallengriffe',
+  'entities.items.necromancers_soulspire_mantle.name': 'Mournweave-Seelenspitzenmantel',
+  'entities.items.wyrmshadow_talongrips.name': 'Nightfang-Krallengriffe',
   'entities.items.briny_idol.name': 'Salzlaken-Götze',
   'entities.items.drowned_offering.name': 'Ertränkte Opfergabe',
   'entities.items.drownedmoon_kris.name': 'Kris des Ertränkten Mondes',
@@ -2281,9 +3112,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.moongate_rubbing.name': 'Schutzzeichen-Abrieb',
   'entities.items.moonpale_scale.name': 'Mondbleiche Schuppe',
   'entities.items.moonscale_saber.name': 'Mondschuppen-Säbel',
-  'entities.items.moonshroud_breastplate.name': 'Mondschleier-Brustpanzer',
-  'entities.items.moonshroud_robe.name': 'Mondschleier-Robe',
-  'entities.items.moonshroud_tunic.name': 'Mondschleier-Wams',
+  'entities.items.moonshroud_breastplate.name': 'Moonwrack-Brustpanzer',
+  'entities.items.moonshroud_robe.name': 'Moonwrack-Robe',
+  'entities.items.moonshroud_tunic.name': 'Moonwrack-Wams',
   'entities.items.pale_pearl.name': 'Bleiche Perle',
   'entities.items.palecoil_heartscale.name': 'Sethraels Herzschuppe',
   'entities.items.palecoil_rod.name': 'Bleichwinder-Rute',
@@ -2294,9 +3125,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.forest_wolf.name': 'Waldwolf',
   'entities.mobs.old_greyjaw.name': 'Alter Greyjaw',
   'entities.mobs.wild_boar.name': 'Wilder Eber',
-  'entities.mobs.webwood_spider.name': 'Webwood-Lauerer',
+  'entities.mobs.webwood_spider.name': 'Sableweb-Lauerer',
   'entities.mobs.mudfin_murloc.name': 'Schlammflossen-Schleicher',
-  'entities.mobs.tunnel_rat.name': 'Tunnelratten-Gräber',
+  'entities.mobs.tunnel_rat.name': 'Deeprock-Gräber',
   'entities.mobs.vale_bandit.name': 'Talbandit',
   'entities.mobs.restless_bones.name': 'Ruhelose Knochen',
   'entities.mobs.gorrak.name': 'Gorrak der Gnadenlose',
@@ -2329,9 +3160,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.tidebound_acolyte.name': 'Gezeitengebundener Akolyth',
   'entities.mobs.drowned_thrall.name': 'Ertrunkener Knecht',
   'entities.mobs.knight_commander_olen.name': 'Ritterkommandant Olen',
-  'entities.mobs.vael_the_mistcaller.name': 'Vael der Mistcaller',
+  'entities.mobs.vael_the_mistcaller.name': 'Vael der Fogbinder',
   'entities.mobs.sanctum_boneguard.name': 'Heiligtums-Knochenwache',
-  'entities.mobs.sanctum_drakonid.name': 'Heiligtumsdrakonid',
+  'entities.mobs.sanctum_drakonid.name': 'Sanktum-Schuppenwächter',
   'entities.mobs.raised_bonewalker.name': 'Erhobener Knochenläufer',
   'entities.mobs.korgath_the_bound.name': 'Korgath der Gebundene',
   'entities.mobs.grand_necromancer_velkhar.name': 'Großnekromant Velkhar',
@@ -2346,14 +3177,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nhalia_mourner.name': 'Nhalia-Trauernde',
   'entities.mobs.sister_nhalia.name': 'Schwester Nhalia',
   'entities.mobs.varkas_boneguard.name': "Varkas' Knochenwache",
-  'entities.mobs.imp.name': 'Wichtel',
-  'entities.mobs.voidwalker.name': 'Leerwandler',
-  'entities.mobs.succubus.name': 'Sukkubus',
+  'entities.mobs.emberkin.name': 'Emberkin',
+  'entities.mobs.gloomshade.name': 'Gloomshade',
+  'entities.mobs.duskborn.name': 'Duskborn',
   'entities.mobs.grix_the_tunnelking.name': 'Grix der Tunnelkönig',
-  'entities.mobs.felhunter.name': 'Teufelsjäger',
-  'entities.mobs.felguard.name': 'Teufelswache',
-  'entities.mobs.infernal.name': 'Inferno',
-  'entities.mobs.doomguard.name': 'Schreckenswache',
+  'entities.mobs.spellhound.name': 'Spellhound',
+  'entities.mobs.warfiend.name': 'Warfiend',
+  'entities.mobs.pyre_colossus.name': 'Pyre Colossus',
+  'entities.mobs.wraithborn.name': 'Wraithborn',
   'entities.mobs.choirmother_selthe.name': 'Chormutter Selthe',
   'entities.mobs.drowned_templeguard.name': 'Ertränkte Tempelwache',
   'entities.mobs.drowned_votary.name': 'Ertränkter Andächtiger',
@@ -2392,11 +3223,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fisherman_brandt.name': 'Fischer Brandt',
   'entities.npcs.fisherman_brandt.title': 'Alter Seebär',
   'entities.npcs.fisherman_brandt.greeting':
-    'Grlmurlgrl... verzeih, ich habe diesen Fischmenschen zu lange zugehört.',
+    'Blrb-glub... verzeih, ich habe diesen Fischmenschen zu lange zugehört.',
   'entities.npcs.foreman_odell.name': 'Vorarbeiter Odell',
   'entities.npcs.foreman_odell.title': 'Minenvorarbeiter',
   'entities.npcs.foreman_odell.greeting':
-    'Der ganze Stollen wimmelt von diesen Kerzenkopf-Schädlingen!',
+    'Der ganze Stollen wimmelt von diesem schlammverkrusteten Ungeziefer!',
   'entities.npcs.warden_fenwick.name': 'Wärter Fenwick',
   'entities.npcs.warden_fenwick.title': 'Wärter von Fenbridge',
   'entities.npcs.warden_fenwick.greeting':
@@ -2460,30 +3291,30 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_greyjaw.completion':
     'Der alte Teufel ist endlich tot. Der Stalljunge wird besser schlafen, und ich auch.',
   'entities.quests.q_greyjaw.objectives.0.label': 'Zahn des alten Greyjaw',
-  'entities.quests.q_boars.title': 'Bristleback-Häute',
+  'entities.quests.q_boars.title': 'Borstige Eberhäute',
   'entities.quests.q_boars.text':
     'Eberhäute ergeben beste Reisetaschen, und die Wiesen wimmeln von ihnen. Bring mir 5 borstige Häute.',
   'entities.quests.q_boars.completion':
     'Ah, feine borstige Häute. Dafür bekomme ich einen guten Preis.',
   'entities.quests.q_boars.objectives.0.label': 'Borstige Eberhaut',
-  'entities.quests.q_spiders.title': 'Bedrohung aus Webwood',
+  'entities.quests.q_spiders.title': 'Bedrohung aus Sableweb',
   'entities.quests.q_spiders.text':
-    'Die Webwood-Lauerer spinnen Seide für meine Umschläge, sind aber viel zu zahlreich. Töte 6 und schneide 4 Seidendrüsen heraus.',
+    'Die Lauerer in den östlichen Wäldern spinnen eine Seide, die ich für meine Umschläge brauche, und sie sind überdies viel zu zahlreich geworden. Töte 6 Sableweb-Lauerer und schneide 4 Seidendrüsen aus ihren Bäuchen.',
   'entities.quests.q_spiders.completion':
     'Igitt, sie zucken noch. Perfekt. Das hast du dir verdient.',
-  'entities.quests.q_spiders.objectives.0.label': 'Webwood-Lauerer getötet',
-  'entities.quests.q_spiders.objectives.1.label': 'Seidendrüse von Webwood',
+  'entities.quests.q_spiders.objectives.0.label': 'Sableweb-Lauerer getötet',
+  'entities.quests.q_spiders.objectives.1.label': 'Sableweb-Seidendrüse',
   'entities.quests.q_murlocs.title': 'Ärger am See',
   'entities.quests.q_murlocs.text':
-    'Zwanzig Jahre fischte ich am Spiegelsee, bis diese Fischmenschen aus den Untiefen krochen. Erschlage 8 Schlammflossen und pass auf Rudel auf.',
+    'Zwanzig Jahre habe ich am Spiegelsee gefischt und nie ein Netz verloren, bis diese gurgelnden Fischmenschen aus den Untiefen krochen. Treib die Mudfins zurück, erschlage 8 von ihnen. Und pass auf dich auf: Wo ein Mudfin ist, sind fünf.',
   'entities.quests.q_murlocs.completion': 'Ha! Das lehrt sie, in ihren Schlammlöchern zu bleiben.',
   'entities.quests.q_murlocs.objectives.0.label': 'Schlammflossen-Schleicher getötet',
   'entities.quests.q_mine.title': 'Ratten in der Mine',
   'entities.quests.q_mine.text':
-    'Wir fanden eine gute Kupferader, dann quollen Kobolde aus dem Hang. Erlege 10 Tunnelratten-Gräber, damit meine Leute zurückkehren.',
+    'Wir stießen auf eine gute Kupferader, und dann quoll dieses wühlende Ungeziefer aus dem Hang. Meine Leute setzen keinen Fuß in den Stollen, bis er geräumt ist. Erlege 10 Deeprock-Gräber.',
   'entities.quests.q_mine.completion':
     'Ha! Zurück an die Arbeit, Jungs! Du hast meinen Dank und mein Geld.',
-  'entities.quests.q_mine.objectives.0.label': 'Tunnelratten-Gräber getötet',
+  'entities.quests.q_mine.objectives.0.label': 'Deeprock-Gräber getötet',
   'entities.quests.q_bones.title': 'Die ruhelosen Toten',
   'entities.quests.q_bones.text':
     'Die alte Kapelle war einst ein Ruheort, bis etwas die Toten weckte. Lege 8 ruhelose Knochen wieder in die Erde, {playerName}.',
@@ -2516,7 +3347,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ruhelose Knochen zum Schweigen gebracht',
   'entities.quests.q_rite.title': 'Der Bindungsritus',
   'entities.quests.q_rite.text':
-    'Die Gruft muss geöffnet werden, doch nur ein Bindungsritus lässt Lebende passieren. Ich brauche 4 gesegnete Talgbrocken und 6 geisterhafte Essenzen.',
+    'Die Gruft unter der Kapelle muss entsiegelt werden, wenn wir den Gravecaller aufhalten wollen, doch nur ein Bindungsritus lässt die Lebenden passieren. Ich brauche 4 Klumpen gesegneten Talg, die Wühler der Mine horten Talg kistenweise, und 6 geisterhafte Essenzen von den ruhelosen Toten.',
   'entities.quests.q_rite.completion':
     'Es ist getan. Der Weg hinab steht offen... sammle deine stärksten Gefährten, {playerName}.',
   'entities.quests.q_rite.objectives.0.label': 'Gesegneter Talg',
@@ -2537,7 +3368,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravecallers_trail.text':
     'Morthen ist tot, doch seine Sekte verschwendet kein Jahrhundert des Schweigens an eine einzige Kapelle. Suche sein Grimoire in den Ruinen, {playerName}.',
   'entities.quests.q_gravecallers_trail.completion':
-    'Morthen schrieb an einen Mistcaller im nördlichen Moor. Die Sekte ist nicht tot, {playerName}; sie war nur geduldig.',
+    "Morthen schrieb an einen 'Fogbinder' im nördlichen Moor. Die Sekte ist nicht tot, {playerName}, sie war nur geduldig.",
   'entities.quests.q_gravecallers_trail.objectives.0.label': 'Morthens Grimoire',
   'entities.quests.q_bandits.title': 'Banditen des Tals',
   'entities.quests.q_bandits.text':
@@ -2553,7 +3384,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ringleader.objectives.0.label': 'Gorrak der Gnadenlose getötet',
   'entities.quests.q_fenbridge_muster.title': 'Musterung in Fenbridge',
   'entities.quests.q_fenbridge_muster.text':
-    'Morthens Schriften nennen einen Meister im Nordmoor. Zieh den Musterungsbefehl vom Tor in Fenbridge, {playerName}, und zeig ihn dem Wärter.',
+    "Morthens Schriften nannten einen Meister im nördlichen Sumpf, einen 'Fogbinder'. Nun hat Wärter Fenwick in Fenbridge das Musterungshorn geblasen, und ich glaube nicht an Zufälle, {playerName}. Nimm den Damm nach Norden, zieh den Musterungsbefehl vom Torpfosten und lege ihn dem Wärter vor.",
   'entities.quests.q_fenbridge_muster.completion':
     'Aldrics Siegel, ja? Dann taugst du. Das Moor verschlingt meine Patrouillen ganz.',
   'entities.quests.q_fenbridge_muster.objectives.0.label': 'Musterungsbefehl von Fenbridge',
@@ -2577,13 +3408,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fen_supplies.objectives.0.label': 'Waren der verlorenen Karawane',
   'entities.quests.q_deepfen.title': 'Deepfen regt sich',
   'entities.quests.q_deepfen.text':
-    'Die Deepfen-Murlocs wühlen Dinge vom Seegrund herauf. Töte 12 Schnapper, damit wir erfahren, was sie aufscheucht.',
+    'Die Deepfen-Mudfins blieben zwanzig Jahre in ihren Untiefen. Jetzt wimmeln sie am Ostufer wie Fliegen auf einem Kadaver, und meine Wärter sagen, sie schleppen Dinge vom Seegrund herauf. Was auch immer sie aufgescheucht hat, ich will, dass es aufhört. Töte 12 der Schnapper.',
   'entities.quests.q_deepfen.completion':
     'Das drängt sie eine Weile zurück in den Schlamm. Aber etwas ließ sie graben.',
   'entities.quests.q_deepfen.objectives.0.label': 'Deepfen-Schnapper getötet',
   'entities.quests.q_idols.title': 'Götzen aus der Tiefe',
   'entities.quests.q_idols.text':
-    'Die Fischmenschen klammern ausgebaggerte Götzen wie Heiligtümer. Nimm den Schnappern 5 davon ab.',
+    'Fenwicks Wärter sagen, die Fischmenschen baggern Götzen vom Seegrund und klammern sich an sie wie an heilige Reliquien. Wenn diese Götzen das sind, was ich befürchte, muss ich sie mit eigenen Augen sehen. Nimm den Deepfen-Schnappern 5 davon ab, sie geben sie nicht freiwillig her.',
   'entities.quests.q_idols.completion':
     'Gravecaller-Werk, älter als Morthen. Die Sekte begann hier, {playerName}.',
   'entities.quests.q_idols.objectives.0.label': 'Durchnässtes Götzenbild',
@@ -2595,7 +3426,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_aldrics_fallen_star.objectives.0.label': 'Unbekannte Alien-Waffen',
   'entities.quests.q_deepfen_purge.title': 'Zurück in die Untiefen',
   'entities.quests.q_deepfen_purge.text':
-    'Diese Götzen sind Kultwerk, und die Murlocs holen das alte Übel armvollweise hoch. Töte 14 weitere.',
+    'Aldric sagt, diese Götzen sind Kultwerk, was bedeutet, dass die Mudfins das alte Übel des Sumpfes armvollweise heraufholen. Ich dulde nicht, dass es auf meinen Damm gespült wird. Kehr in die Untiefen zurück und beende die Baggerei ein für alle Mal: 14 weitere Schnapper.',
   'entities.quests.q_deepfen_purge.completion':
     'Schonungslos und gründlich. Falls dieses Moor je austrocknet, wartet Wärterarbeit auf dich.',
   'entities.quests.q_deepfen_purge.objectives.0.label': 'Deepfen-Schnapper getötet',
@@ -2659,7 +3490,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_summoners.text':
     'Beschwörer rufen die Ertrunkenen wie Hunde zur Pfeife. Bring 8 zum Schweigen und hol 4 Chiffren.',
   'entities.quests.q_summoners.completion':
-    'Jede Chiffre ist von Diakon Voss gegengezeichnet und an den Mistcaller gerichtet. Morthens Meister, {playerName}. Wir haben ihn gefunden.',
+    "Jede Chiffre ist mit 'Diakon Voss' gegengezeichnet und weiter an einen 'Fogbinder' in der Bastion gerichtet. Morthens Meister, {playerName}. Wir haben ihn gefunden.",
   'entities.quests.q_summoners.objectives.0.label': 'Gravecaller-Beschwörer getötet',
   'entities.quests.q_summoners.objectives.1.label': 'Gravecaller-Chiffre',
   'entities.quests.q_deacon.title': 'Der Diakon des Moors',
@@ -2670,22 +3501,22 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_deacon.objectives.0.label': 'Diakon Voss getötet',
   'entities.quests.q_bastion_door.title': 'Die versunkene Bastion',
   'entities.quests.q_bastion_door.text':
-    'Die versunkene Bastion birgt den Mistcaller, und ihre Tür ist mit Grabsteinen versiegelt. Bring mir einen Wachstein, {playerName}.',
+    "Die versunkene Bastion, eine Ritterfeste, die vor einem Jahrhundert im Moor versank, ist es, worauf Voss' Briefe deuten und wo dieser Fogbinder seine Ertränkungshymnen singt. Der Kult hat ihre Tür mit Grabsteinen versiegelt. Bring mir einen der Wachsteine, {playerName}, und ich löse das Siegel.",
   'entities.quests.q_bastion_door.completion':
     'Das Siegel zerfällt wie morsches Tau. Die Tür steht offen, und die Dunkelheit lauscht.',
   'entities.quests.q_bastion_door.objectives.0.label': 'Bastion-Wachstein',
   'entities.quests.q_olen.title': 'Die Schande des Ritterkommandanten',
   'entities.quests.q_olen.text':
-    'Olen starb bei der Verteidigung der Bastion und bewacht nun als Marionette ihre Tür. Diese Schande endet, {playerName}. Geh mit vier Gefährten hinab und gib ihm Ruhe.',
+    'Ritter-Kommandant Olen hielt die Bastion, als sie sank, ertrank auf seinem Posten, statt ihn zu verlassen. Jeder Wärter lernt seinen Namen mit Stolz. Nun hat der Fogbinder ihn als Marionette erweckt, um genau die Tür zu bewachen, die er sterbend verteidigte. Diese Schande endet, {playerName}. Geh mit vier Gefährten hinab und gewähre Olen die Ruhe, die er sich verdient hat.',
   'entities.quests.q_olen.completion':
     'Seine Wacht ist endlich vorüber. Ich werde seinen Namen selbst ins Tor schlagen. Danke, {playerName}.',
   'entities.quests.q_olen.objectives.0.label': 'Ritterkommandant Olen zur Ruhe gelegt',
-  'entities.quests.q_mistcaller.title': 'Der Mistcaller',
+  'entities.quests.q_mistcaller.title': 'Der Fogbinder',
   'entities.quests.q_mistcaller.text':
-    'Vael wartet am Grund der Bastion, die Stimme, die hundert Reisende ertränkte. Nimm vier Gefährten und beende ihn, {playerName}.',
+    "Am Grund der Bastion wartet Vael der Fogbinder, Morthens Meister, Voss' Meister, die Stimme, die hundert Reisende ertränkte, um sich ein Heer zu erwecken. Er übersteigt jeden einzelnen Helden bei Weitem: Nimm vier Gefährten, nicht weniger. Beende ihn, {playerName}, und die Toten des Moores mögen endlich ruhen.",
   'entities.quests.q_mistcaller.completion':
     'Vael ist tot und der Nebel hebt sich, doch seine letzten Worte frieren Blut: Der Wyrm regt sich unter den Gipfeln. Ruh dich aus, solange du kannst, {playerName} - als Nächstes kommen die Berge.',
-  'entities.quests.q_mistcaller.objectives.0.label': 'Vael der Mistcaller getötet',
+  'entities.quests.q_mistcaller.objectives.0.label': 'Vael der Fogbinder getötet',
   'entities.quests.q_highwatch_summons.title': 'Die Wacht auf den Gipfeln',
   'entities.quests.q_highwatch_summons.text':
     'Vaels letzte Worte lassen mich nicht los, {playerName}. Nimm die Einberufung von Highwatch und sag Thessaly, dass Aldric hinter dir aufsteigt.',
@@ -2706,13 +3537,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalker_pelts.objectives.0.label': 'Balg eines Gratpirschers',
   'entities.quests.q_kobold_tunnels.title': 'Ärger in Deeprock',
   'entities.quests.q_kobold_tunnels.text':
-    'Die Kobolde von Deeprock graben gerade nach unten, als rufe etwas unter der Mauer. Ihre Tunnel laufen unter unserer Mauer, {playerName}. Töte 12 Tunnelgräber.',
+    'Die Tunnelgräber in den Deeprock-Bauen graben tiefer, als es einer Grubenratte zusteht, senkrecht hinab, als riefe sie etwas. Ihre Tunnel verlaufen unter unserer Mauer, {playerName}. Bereite dem ein Ende: Töte zwölf Deeprock-Tunnelgräber.',
   'entities.quests.q_kobold_tunnels.completion':
-    'Jeder Schacht führt senkrecht hinab. Kobolde graben nicht von allein so.',
+    'Senkrecht hinab, jeder einzelne Schacht, Wühler graben nicht von allein so. Ich muss meine Bücher zu Rate ziehen.',
   'entities.quests.q_kobold_tunnels.objectives.0.label': 'Deeprock-Tunnelgräber getötet',
   'entities.quests.q_glowing_wax.title': 'Seltsames Wachs',
   'entities.quests.q_glowing_wax.text':
-    "Das Wachs dieser Gräber leuchtet, {playerName}, und ist warm wie ein Herzschlag. Bring 6 Brocken für Caddis' Studien.",
+    'Caddis zeigte mir einen Wachsklumpen, den man einem dieser Tunnelgräber abgenommen hat, er leuchtet, {playerName}, und ist warm wie ein Herzschlag. Er will mehr für seine Studien, und ich will es von meiner Bedarfsliste streichen. Bring sechs Klumpen des leuchtenden Wachses zurück.',
   'entities.quests.q_glowing_wax.completion':
     'Noch immer warm. Dieses Leuchten passt zu keiner Flamme, die der Lehrmeister kennt.',
   'entities.quests.q_glowing_wax.objectives.0.label': 'Glühendes Wachs',
@@ -2892,7 +3723,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.1.label': 'Wolfslauf',
   'entities.zones.eastbrook_vale.pois.2.label': 'Eberwiese',
   'entities.zones.eastbrook_vale.pois.3.label': 'Spiegelsee',
-  'entities.zones.eastbrook_vale.pois.4.label': 'Webwood',
+  'entities.zones.eastbrook_vale.pois.4.label': 'Sableweb',
   'entities.zones.eastbrook_vale.pois.5.label': 'Kupfermine',
   'entities.zones.eastbrook_vale.pois.6.label': 'Banditenlager',
   'entities.zones.eastbrook_vale.pois.7.label': 'Gefallene Kapelle',
@@ -3024,8 +3855,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'WOC ist unser Community-Token. Es wird zum Spielen nicht benötigt. Tritt dem Discord bei, um über den Nutzen und das Schwungrad von WOC zu sprechen.',
   'mode.play': 'Spielen',
   'mode.playAria': 'World of ClaudeCraft spielen',
-  'mode.serverAria': 'Realm wählen: Online oder Offline',
-  'mode.serverLabel': 'Wähle deinen Realm',
+  'mode.serverAria': 'Welt wählen: Online oder Offline',
+  'mode.serverLabel': 'Wähle deine Welt',
   'mode.serverOffline': 'Offline',
   'mode.serverOfflineSub': 'Sofortige lokale Welt',
   'mode.serverOnline': 'Online',
@@ -3042,24 +3873,24 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'character.closeProfile': 'Profil schließen',
   'hud.keybinds.actions.attackMove': 'Angriffsbewegung',
   'hud.combat.cannotMove': 'Bewegungsunfähig!',
-  'auth.realm': 'Realm',
+  'auth.realm': 'Welt',
   'auth.newCharacter': 'Neuer Charakter',
   'auth.appearance': 'Aussehen',
   'auth.class': 'Klasse',
   'auth.name': 'Name',
   'auth.chromaOption': 'Chroma {n}',
-  'auth.noAccountPrompt': 'Neu im Reich?',
+  'auth.noAccountPrompt': 'Neu in der Welt?',
   'auth.haveAccountPrompt': 'Schon ein Konto?',
 
-  'entities.items.conjured_bread.name': 'Herbeigezaubertes Brot',
+  'entities.items.conjured_bread.name': 'Herbeigezauberter Haferkuchen',
   'entities.items.conjured_bread2.name': 'Herbeigezaubertes Schwarzbrot',
-  'entities.items.conjured_bread3.name': 'Herbeigezauberte Süße Schnecke',
+  'entities.items.conjured_bread3.name': 'Herbeigezauberter Honigkuchen',
   'entities.items.glimmerfin_koi.name': 'Schimmerflossen-Koi',
   'entities.items.raw_bog_eel.name': 'Roher Mooraal',
   'entities.items.raw_frostgill_trout.name': 'Rohe Frostkiemen-Forelle',
   'entities.items.raw_marsh_pike.name': 'Roher Sumpfhecht',
   'entities.items.raw_river_perch.name': 'Roher Flussbarsch',
-  'entities.items.raw_stonescale_carp.name': 'Roher Steinschuppen-Karpfen',
+  'entities.items.raw_stonescale_carp.name': 'Roher Slatefin-Karpfen',
   'entities.items.soggy_boot.name': 'Durchnässter Stiefel',
   'entities.items.elixir_of_the_bear.name': 'Elixier des Bären',
   'entities.items.healing_potion.name': 'Heiltrank',
@@ -3096,6 +3927,21 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.brightwood_venison.name': 'Hellholz-Wildbret',
   'entities.items.bramblehide_jerkin.name': 'Dornhaut-Wams',
   'entities.items.monarch_crown_helm.name': 'Krone des Monarchen',
+  'entities.items.copper_mining_pick.name': 'Kupfer-Grabpickel',
+  'entities.items.iron_mining_pick.name': 'Eisen-Grabpickel',
+  'entities.items.mithril_mining_pick.name': 'Mithril-Grabpickel',
+  'entities.items.handaxe.name': 'Handaxt',
+  'entities.items.felling_axe.name': 'Fällaxt',
+  'entities.items.ironbark_axe.name': 'Eisenrinden-Axt',
+  'entities.items.gathering_sickle.name': 'Erntesichel',
+  'entities.items.bronze_sickle.name': 'Bronzesichel',
+  'entities.items.silverleaf_sickle.name': 'Silberblatt-Sichel',
+  'entities.items.thorium_mining_pick.name': 'Thorium-Grabpickel',
+  'entities.items.arcanite_mining_pick.name': 'Arkanit-Grabpickel',
+  'entities.items.ashwood_axe.name': 'Eschenholzaxt',
+  'entities.items.elderwood_axe.name': 'Altholzaxt',
+  'entities.items.goldleaf_sickle.name': 'Goldblatt-Sichel',
+  'entities.items.sunpetal_sickle.name': 'Sonnenblütensichel',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Chatkanal hinzufügen',
   'hud.core.chatChannels.addTitle': 'Kanal hinzufügen',
@@ -3145,14 +3991,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'fiesta.augment.aug_keen_eye.name': 'Scharfes Auge',
   'fiesta.augment.aug_lightwell.desc':
     '+30% Heilung und +15% maximale Gesundheit. Verankert Euer Team.',
-  'fiesta.augment.aug_lightwell.name': 'Lichtbrunnen',
+  'fiesta.augment.aug_lightwell.name': 'Gravelight',
   'fiesta.augment.aug_mending.desc': 'Eure Heilung ist 20% wirksamer.',
   'fiesta.augment.aug_mending.name': 'Genesung',
   'fiesta.augment.aug_overdrive.desc':
     '+30% gesamter Schaden, +20% krit. Trefferchance, +20% Tempo. FIESTA!',
   'fiesta.augment.aug_overdrive.name': 'Vollgas',
   'fiesta.augment.aug_spellfire.desc': 'Eure Zauber verursachen 15% mehr Schaden.',
-  'fiesta.augment.aug_spellfire.name': 'Zauberfeuer',
+  'fiesta.augment.aug_spellfire.name': 'Grimfire',
   'fiesta.augment.aug_toughness.desc': 'Erhaltet 12% maximale Gesundheit.',
   'fiesta.augment.aug_toughness.name': 'Zähigkeit',
   'fiesta.augment.aug_unkillable.desc':
@@ -3314,6 +4160,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': 'Noch {count} Sekunden',
   'hudChrome.plurals.secondsRemaining.many': 'Noch {count} Sekunden',
   'hudChrome.plurals.secondsRemaining.other': 'Noch {count} Sekunden',
+  'hudChrome.plurals.playersMatching.one':
+    'Wer: {count} Spieler, die auf "{query}" passen, auf {realm}.',
+  'hudChrome.plurals.playersMatching.few':
+    'Wer: {count} Spieler, die auf "{query}" passen, auf {realm}.',
+  'hudChrome.plurals.playersMatching.many':
+    'Wer: {count} Spieler, die auf "{query}" passen, auf {realm}.',
+  'hudChrome.plurals.playersMatching.other':
+    'Wer: {count} Spieler, die auf "{query}" passen, auf {realm}.',
   'hudChrome.plurals.playersOnline.one': 'Wer: {count} Spieler online auf {realm}.',
   'hudChrome.plurals.playersOnline.few': 'Wer: {count} Spieler online auf {realm}.',
   'hudChrome.plurals.playersOnline.many': 'Wer: {count} Spieler online auf {realm}.',
@@ -3333,15 +4187,26 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, Geißel von Thornpeak',
   'itemUi.quality.legendary': 'Legendär',
   'entities.items.deathless_heartwood.name': 'Herzholz der todlosen Krone',
-  'entities.items.kingsbane_last_oath.name': 'Königsbann, letzter Eid von Thornpeak',
-  'entities.items.crownforged_dreadhelm.name': 'Kronengeschmiedeter Schreckenshelm',
-  'entities.items.crownforged_warspaulders.name': 'Kronengeschmiedete Kriegsschultern',
-  'entities.items.nighttalon_crown.name': 'Nachtklauenkrone',
-  'entities.items.nighttalon_shoulderguards.name': 'Nachtklauen-Schulterschützer',
-  'entities.items.soulflame_cowl.name': 'Seelenflammenkapuze',
-  'entities.items.soulflame_mantle.name': 'Seelenflammenmantel',
-  'entities.items.stormcallers_crown.name': 'Krone des Sturmrufers',
-  'entities.items.stormcallers_spaulders.name': 'Schulterplatten des Sturmrufers',
+  'entities.items.kingsbane_last_oath.name': 'Thronebane, letzter Eid von Thornpeak',
+  'entities.items.crownforged_dreadhelm.name': 'Bonewrought-Schreckenshelm',
+  'entities.items.crownforged_warspaulders.name': 'Bonewrought-Kriegsschultern',
+  'entities.items.nighttalon_crown.name': 'Direfang-Krone',
+  'entities.items.nighttalon_shoulderguards.name': 'Direfang-Schulterschützer',
+  'entities.items.soulflame_cowl.name': 'Wraithfire-Kapuze',
+  'entities.items.soulflame_mantle.name': 'Wraithfire-Mantel',
+  'entities.items.stormcallers_crown.name': 'Galecall-Krone',
+  'entities.items.crownforged_gauntlets.name': 'Kronengeschmiedete Stulpen',
+  'entities.items.nighttalon_grips.name': 'Nachtklauengriffe',
+  'entities.items.soulflame_gloves.name': 'Seelenflammenhandschuhe',
+  'entities.items.stormcallers_handguards.name': 'Handschützer des Sturmrufers',
+  'entities.items.crownforged_girdle.name': 'Kronengeschmiedeter Gürtel',
+  'entities.items.nighttalon_waistband.name': 'Nachtklauengurt',
+  'entities.items.soulflame_cord.name': 'Seelenflammenkordel',
+  'entities.items.stormcallers_waistguard.name': 'Gürtelschutz des Sturmrufers',
+  'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, der Erwachende Gipfel',
+  'entities.mobs.thunzharr_stormling.name': 'Geweckter Sturmling',
+  'hudChrome.worldBoss.spawn': '{name} erhebt sich über den Thornpeak-Höhen!',
+  'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'hud.chat.context.convertToRaid': 'In Schlachtzug umwandeln',
   'hud.chat.context.convertToParty': 'In Gruppe umwandeln',
   'hudChrome.raidConvert.leaderOnly': 'Nur der Schlachtzugsleiter darf in eine Gruppe umwandeln.',
@@ -3446,7 +4311,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.position': 'Position',
   'hudChrome.bugReport.rateLimited':
     'Du hast kürzlich mehrere Meldungen gesendet. Bitte warte einen Moment, bevor du eine weitere sendest.',
-  'hudChrome.bugReport.realm': 'Realm',
+  'hudChrome.bugReport.realm': 'Welt',
   'hudChrome.bugReport.screenshotAlt':
     'Screenshot der aktuellen Ansicht, der dieser Fehlermeldung beigefügt ist',
   'hudChrome.bugReport.submit': 'Meldung senden',
@@ -3512,22 +4377,28 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Jede Stufe macht dich widerstandsfähiger und schaltet neue Fähigkeiten frei, bis hinauf zur Höchststufe {cap}. Quests sind der schnellste Weg nach oben; Dungeons und Erkundung runden das Ganze ab.',
   'guide.combat.growTitle': 'Du wirst mit jeder Stufe stärker',
   'guide.combat.hitBody':
-    'Angriffe können danebengehen oder pariert, geblockt und ihnen ausgewichen werden, und das gilt auch für die des Gegners. Gegen Feinde nahe deiner eigenen Stufe zu kämpfen und deine Ausrüstung aktuell zu halten, sorgt dafür, dass deine Treffer sitzen.',
+    'Angriffe können danebengehen, oder es kann ihnen ausgewichen werden, und dasselbe gilt für die des Gegners, während Zaubern gänzlich widerstanden werden kann. Nahe deiner eigenen Stufe zu kämpfen ist es, was deine Treffer sitzen lässt; je größer der Stufenunterschied, desto öfter schlägst du ins Leere.',
   'guide.combat.hitTitle': 'Nicht jeder Schlag trifft',
   'guide.combat.intro':
     'Der Kampf folgt vertrauten Regeln aus klassischen MMOs. Du musst nichts davon studieren, um gut zu spielen, dies ist nur der grobe Aufbau, wie Kämpfe funktionieren.',
   'guide.combat.mitigationBody':
-    'Rüstung dämpft physische Treffer, und die richtige Ausrüstung schwächt Magie ab, daher sind Verbesserungen deine wichtigste Quelle für Standhaftigkeit. Schwerere Rüstungsklassen stecken mehr weg, doch nichts macht dich unverwundbar.',
-  'guide.combat.mitigationTitle': 'Rüstung und Ausrüstung halten dich auf den Beinen',
+    'Rüstung dämpft physische Treffer, bessere Rüstung ist also deine wichtigste Quelle für Standhaftigkeit im Nahkampf. Magie ist eine andere Sache: Zaubern trotzt du mit einem größeren Gesundheitsvorrat und der Chance, einem gänzlich zu widerstehen, nicht mit Rüstung. Schwerere Rüstungsklassen stecken mehr weg, doch nichts macht dich unverwundbar.',
+  'guide.combat.mitigationTitle': 'Rüstung und Gesundheit halten dich auf den Beinen',
   'guide.combat.resourcesBody':
     'Krieger bauen mitten im Kampf Wut auf, Schurken verbrauchen Energie, die stetig zurückkehrt, und Zauberwirker verwalten einen Vorrat an Mana. Deine Ressource zu beherrschen ist die halbe Miete, wenn es darum geht, deine Klasse gut zu spielen.',
   'guide.combat.resourcesTitle': 'Jede Klasse hat ihren eigenen Rhythmus',
-  'guide.controls.abilities': 'Fähigkeiten einsetzen',
+  'guide.controls.abilities':
+    'Aktionsleisten-Fähigkeiten einsetzen (die Zahlenreihe; eine zweite Leiste liegt auf dem Nummernblock)',
   'guide.controls.actionHeader': 'Aktion',
   'guide.controls.arena': 'Arena',
+  'guide.controls.controllerBody':
+    'Gamepads funktionieren ebenfalls, und die Controller-Unterstützung ist standardmäßig aktiviert. Der linke Stick bewegt dich, der rechte Stick richtet die Kamera aus, und die Aktions- und Schultertasten decken deine Fähigkeiten, das Springen und das Interagieren ab. Öffne ein beliebiges Fenster, um einen Bildschirmzeiger für Menüs einzublenden. Du kannst die Tasten neu belegen und Stick-Totzone, Kamerageschwindigkeit, Vibration und die invertierte Blickrichtung in den Controller-Einstellungen in den Optionen anpassen.',
+  'guide.controls.controllerHeading': 'Mit einem Controller',
+  'guide.controls.cycleFriendly': 'Freundliches Ziel durchschalten',
+  'guide.controls.gameMenu': 'Spielmenü und Optionen öffnen',
   'guide.controls.groupCamera': 'Kamera',
   'guide.controls.groupCombat': 'Anvisieren und Kampf',
-  'guide.controls.groupInterface': 'Fenster',
+  'guide.controls.groupInterface': 'Interface',
   'guide.controls.groupMovement': 'Bewegung',
   'guide.controls.intro':
     'Standardtasten für den Desktop. Jede Belegung lässt sich in den Optionen des Spiels ändern.',
@@ -3537,6 +4408,42 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Auf Smartphones und Tablets erscheinen die Touch-Steuerungen automatisch: ein Bewegungsstick links, ziehen an einer beliebigen Stelle rechts zum Umsehen und Bildschirmtasten für deine Fähigkeiten und Menüs.',
   'guide.controls.mobileHeading': 'Auf dem Mobilgerät',
   'guide.controls.talents': 'Talente',
+  'guide.controls.targetFriendly': 'Nächstes freundliches Ziel anvisieren',
+  'guide.delvesPage.affixesBody':
+    'Schwerere Läufe würfeln einen Modifikator aus, der den Abstieg verändert, von ruhelosen Toten über schlechte Luft bis zu brüchigem Dachwerk. Sie erhöhen Gefahr und Belohnung zugleich. Ein Tiefgang im Gruft-Stil kann jeden von diesen auswürfeln:',
+  'guide.delvesPage.affixesHeading': 'Laufmodifikatoren',
+  'guide.delvesPage.affixesLabel': 'Mögliche Modifikatoren',
+  'guide.delvesPage.companionBody':
+    'Ein Tiefgang schickt eine Gefährtin mit dir hinab, sodass ein Alleingang nie aussichtslos ist. Sie kämpft an deiner Seite, und je mehr du zwischen den Läufen in sie investierst, desto stärker wird sie, bis sie einen Verbündeten einmal pro Abstieg vom Rand des Todes zurückholen kann. Sie gehört dir für den Tiefgang und wartet zwischen den Läufen an der Tafel.',
+  'guide.delvesPage.companionFmt': '{name}, {role}',
+  'guide.delvesPage.companionHeading': 'Deine Gefährtin',
+  'guide.delvesPage.companionLabel': 'Gefährtin',
+  'guide.delvesPage.fromLevel': 'Ab Stufe {n}',
+  'guide.delvesPage.heading': 'Tiefgänge',
+  'guide.delvesPage.howBody':
+    'Sprich mit dem Hüter, um die Tafel zu öffnen, wähle eine Schwierigkeit und steig hinab. Jeder Lauf reiht ein paar kurze Kammern aneinander und endet bei seinem Wächter; räume ihn, um deine Belohnung zu beanspruchen und an die Oberfläche zurückzukehren. Bring einen Freund mit, wenn du einen hast, oder verlass dich auf deine Gefährtin, wenn nicht.',
+  'guide.delvesPage.howHeading': 'Wie ein Lauf abläuft',
+  'guide.delvesPage.intro':
+    'Tiefgänge sind kurze, wiederholbare Abstiege für einen oder zwei, mit einer treuen Gefährtin an deiner Seite, wann immer du allein hinabsteigst. Finde die Tafel, wähle einen Lauf und klettere mit der Beute wieder hinaus.',
+  'guide.delvesPage.keeperFmt': '{name}, {title}',
+  'guide.delvesPage.keeperLabel': 'Hüter',
+  'guide.delvesPage.lockpickBody':
+    'Manche Türen und Verstecke sind versiegelt, und eines zu öffnen ist eher eine kleine Nervenprobe als eine Frage der Werte: knacke das Schloss sauber und ruhig, und du verdienst einen besseren Preis als bei einem hastigen, verpatzten Versuch. Es ist freiwillig, aber der sorgfältige Tiefgänger ist der reichere.',
+  'guide.delvesPage.lockpickHeading': 'Schlösser und was sie verbergen',
+  'guide.delvesPage.marksBody':
+    'Tiefgänge zu räumen bringt Tiefgang-Marken ein, eine Währung, die getrennt von deinem Geld gehalten wird. Gib sie beim Hüter aus, um deine Gefährtin zu stärken und Ausrüstung zu ergattern, die du nirgendwo sonst findest.',
+  'guide.delvesPage.marksHeading': 'Tiefgang-Marken',
+  'guide.delvesPage.partyLabel': 'Für einen oder zwei',
+  'guide.delvesPage.tiersBody':
+    'Ein Tiefgang bietet mehr als eine Schwierigkeit. Die höhere macht die Gegner stärker und mischt einen Laufmodifikator hinein und zahlt dafür mehr aus. Sie verlangt außerdem, dass du ein paar Stufen auf dem Buckel hast, bevor sie dich einlässt.',
+  'guide.delvesPage.tiersHeading': 'Schwierigkeit',
+  'guide.delvesPage.tiersLabel': 'Schwierigkeiten',
+  'guide.delvesPage.whatBody':
+    'Ein Tiefgang ist ein kleiner instanzierter Dungeon, der nur für dich und höchstens einen Verbündeten erstellt wird, eine private Kopie, in der dich niemand stören kann. Du startest ihn an einer Tafel, die ein Tiefgang-Hüter draußen in der Welt verwaltet, lässt dich hinab, kämpfst dich durch eine Handvoll Räume und schließt mit einem einzelnen Wächter ab. Läufe sind schnell und auf Wiederholung ausgelegt, daher ist ein Tiefgang ein verlässliches Stück Fortschritt, wann immer die offene Welt versiegt.',
+  'guide.delvesPage.whatHeading': 'Was ein Tiefgang ist',
+  'guide.delvesPage.whereBody':
+    'Der erste Tiefgang, das Eingestürzte Reliquiar, öffnet sich am Reliquiarhügel im Eastbrook-Tal, dem Starttal. Bruder Halven verwaltet dort die Tafel, und er schickt dich hinab, sobald du bereit bist.',
+  'guide.delvesPage.whereHeading': 'Wo du einen findest',
   'guide.docTitle': '{page} - {brand}',
   'guide.dungeonsPage.bastionBody':
     'Eine überflutete Festung, ans Moor verloren, gehalten von ertrunkenen Verteidigern und der steigenden Flut selbst.',
@@ -3566,26 +4473,28 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.family.beast.desc':
     'Wilde Tiere aus Wald und Flur, von Wölfen und Ebern bis zu den Wesen, die ihnen nachstellen. Jäger können viele von ihnen zähmen.',
   'guide.family.beast.name': 'Wildtiere',
+  'guide.family.dragonkin.desc':
+    'Schuppige, schlangenhafte Wesen aus den alten Tiefen. Selten, stolz und weit stärker, als sie aussehen.',
+  'guide.family.dragonkin.name': 'Drachkin',
   'guide.family.elemental.desc':
     'Lebendiger Sturm und Stein, gebunden an die wilden Orte, wo die Elemente machtvoll wirken.',
   'guide.family.elemental.name': 'Elementare',
   'guide.family.humanoid.desc':
     'Banditen, Kultisten und andere, die das falsche Gewerbe ergriffen haben. Sie kämpfen mit Taktik, nicht nur mit Zähnen.',
   'guide.family.humanoid.name': 'Humanoide',
-  'guide.family.kobold.desc':
-    'Kerzenköpfige Schaufler, die Minen und Höhlen verseuchen und ihr Erz erbittert verteidigen.',
-  'guide.family.kobold.name': 'Kobolde',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.desc':
+    'Schlammverkrustete Schaufler, die Minen und Höhlen verseuchen und ihr Erz erbittert verteidigen.',
+  'guide.family.burrower.name': 'Wühler',
+  'guide.family.mudfin.desc':
     'Amphibische Moorbewohner, die in lärmenden, territorialen Rudeln das Seichte überschwemmen.',
-  'guide.family.murloc.name': 'Murlocs',
+  'guide.family.mudfin.name': 'Mudfins',
   'guide.family.ogre.desc':
     'Riesig, schwerfällig und gefährlich. Sie lagern an den hohen Pässen und schlagen zu wie ein Erdrutsch.',
   'guide.family.ogre.name': 'Oger',
   'guide.family.spider.desc':
-    'Netzweber und giftige Lauerer, die in dunklen, verwucherten Orten nisten.',
+    'Netzweber und giftige Lauerer, die in dunklen, verwucherten Orten nisten. Jäger können sie zähmen, genau wie Wildtiere.',
   'guide.family.spider.name': 'Spinnen',
-  'guide.family.troll.desc':
-    'Massige, schnell heilende Schläger, die im Moor und im Hochland hausen.',
+  'guide.family.troll.desc': 'Massige Schläger, die in den Sümpfen des Moors hausen.',
   'guide.family.troll.name': 'Trolle',
   'guide.family.undead.desc':
     'Die ruhelosen Toten, erweckt von dunkleren Händen. Sie ermüden nicht und sie fliehen nicht.',
@@ -3599,7 +4508,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.a4':
     'Ja. Es gibt einen sofort verfügbaren Einzelspieler-Offline-Modus, und die Online-Welt ist abgesehen von Dungeons und dem Schlachtzug vollständig im Alleingang spielbar.',
   'guide.faqPage.a5':
-    'Neun, die die klassischen Rollen Tank, Heiler und Schaden abdecken, jede mit ihrer eigenen Ressource und ihren charakteristischen Fähigkeiten.',
+    'Neun, die die klassischen Rollen Tank, Heiler und Schaden abdecken, jede mit einem Ressourcensystem (Wut, Mana oder Energie) und ihren eigenen charakteristischen Fähigkeiten.',
   'guide.faqPage.a6':
     'Stufe {cap}, erreicht über drei verbundene Gebiete voller Quests, Dungeons und Erkundung.',
   'guide.faqPage.a7':
@@ -3626,7 +4535,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Die Aufmerksamkeit eines Feindes. Der Spieler, der die meiste Bedrohung erzeugt, hält die Aggro und wird angegriffen.',
   'guide.glossary.aggroTerm': 'Aggro',
   'guide.glossary.dpsDef':
-    'Schaden pro Sekunde, ein grobes Maß dafür, wie schnell etwas Schaden austeilt.',
+    'Schaden pro Sekunde, ein grobes Maß dafür, wie schnell etwas Schaden austeilt. Wird auch für die schadensausteilende Rolle selbst verwendet, wie in: ein Tank, ein Heiler und drei DPS.',
   'guide.glossary.dpsTerm': 'DPS',
   'guide.glossary.eliteDef':
     'Ein Gegner, der stärker als normal ist, in der Regel für eine Gruppe gedacht. Dungeon- und seltene Gegner sind oft Elite.',
@@ -3644,6 +4553,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.pullDef':
     'Einen Feind oder eine Gruppe in einen Kampf ziehen, meist gezielt und immer nur einen Schwung auf einmal.',
   'guide.glossary.pullTerm': 'Pull',
+  'guide.glossary.raidDef':
+    'Eine größere Gruppe, hier bis zu zehn Spieler, gebildet für die härteste Endgame-Begegnung; eine Gruppe wird in einen umgewandelt, sobald sie voll ist.',
+  'guide.glossary.raidTerm': 'Schlachtzug',
   'guide.glossary.rareDef':
     'Ein seltener benannter Gegner, der durch ein Gebiet streift und bessere Beute fallen lässt.',
   'guide.glossary.rareTerm': 'Selten',
@@ -3661,7 +4573,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Steig jetzt ein oder komm einfach hallo sagen. Die Welt ist besser in Gesellschaft.',
   'guide.home.community.discord': 'Tritt dem Discord bei',
   'guide.home.community.github': 'Auf GitHub mit einem Stern versehen',
-  'guide.home.community.heading': 'Tritt dem Reich bei',
+  'guide.home.community.heading': 'Tritt der Welt bei',
   'guide.home.community.play': 'Jetzt spielen',
   'guide.home.ctaLearn': 'So wird gespielt',
   'guide.home.ctaPlay': 'Jetzt spielen',
@@ -3671,7 +4583,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.home.faq.a2':
     'Nein. Das Spiel ist ohne einen solchen vollständig spielbar. Der optionale Community-Token schaltet nur kosmetisches Beiwerk frei und wirkt sich niemals auf die Macht aus.',
   'guide.home.faq.a3':
-    'Ja. Es gibt einen sofort verfügbaren Einzelspieler-Modus in deinem Browser, dazu das gemeinsame Online-Reich.',
+    'Ja. Es gibt einen sofort verfügbaren Einzelspieler-Modus in deinem Browser, dazu die gemeinsame Online-Welt.',
   'guide.home.faq.a4':
     'Die Höchststufe ist {cap}, erreicht über drei Gebiete voller Quests, Dungeons und Erkundung.',
   'guide.home.faq.heading': 'Gut zu wissen',
@@ -3709,7 +4621,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.heading': 'Erkunde die Welt',
   'guide.home.world.levels': 'Stufe {min} bis {max}',
   'guide.home.world.marshBlurb':
-    'Versunkene Sümpfe und von der Flut zernagte Ruinen, Heimat von Murlocs und Schlimmerem.',
+    'Versunkene Sümpfe und von der Flut zernagte Ruinen, Heimat von Mudfins und Schlimmerem.',
   'guide.home.world.marshName': 'Mirefen-Moor',
   'guide.home.world.peaksBlurb':
     'Windgepeitschte Grate, die zu den kältesten Gefahren des Reichs emporsteigen.',
@@ -3721,7 +4633,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.basicsHeading': 'Die Grundlagen',
   'guide.howToPlay.controlsLink': 'Die vollständige Steuerungsübersicht ansehen',
   'guide.howToPlay.deathBody':
-    'Wenn du fällst, lässt du deinen Geist auf dem nächsten Friedhof frei und läufst zu deinem Körper zurück. Es geht keine Erfahrung verloren.',
+    'Wenn du fällst, lässt du deinen Geist frei und wirst auf dem nächsten Friedhof wiederbelebt, zurück bei voller Gesundheit, und findest dann deinen Weg dorthin zurück, wo du warst. Es geht keine Erfahrung verloren.',
   'guide.howToPlay.deathTitle': 'Der Tod ist nicht das Ende',
   'guide.howToPlay.firstHeading': 'Deine ersten 15 Minuten',
   'guide.howToPlay.groupingBody':
@@ -3730,7 +4642,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.intro':
     'Neu in dieser Art von Spiel? Du wirst schon in wenigen Minuten Quests erfüllen. Hier ist die Kurzfassung, Schritt für Schritt.',
   'guide.howToPlay.onlineBody':
-    'Spiele das gemeinsame Online-Reich mit allen anderen, oder starte eine sofort verfügbare Offline-Welt in deinem Browser, um die Grundlagen zu lernen.',
+    'Spiele die gemeinsame Online-Welt mit allen anderen, oder starte eine sofort verfügbare Offline-Welt in deinem Browser, um die Grundlagen zu lernen.',
   'guide.howToPlay.onlineTitle': 'Online oder offline',
   'guide.howToPlay.questsBody':
     'Nimm Quests von Personen mit einer Markierung über dem Kopf an, erfülle das Ziel und gib sie für Erfahrung, Gold und Ausrüstung ab. Die Verfolgungsanzeige auf dem Bildschirm behält deine Ziele im Blick.',
@@ -3770,6 +4682,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.nav.closeMenu': 'Menü schließen',
   'guide.nav.combat': 'Kampf',
   'guide.nav.controls': 'Steuerung',
+  'guide.nav.delves': 'Tiefgänge',
   'guide.nav.dungeons': 'Dungeons und Schlachtzüge',
   'guide.nav.faq': 'FAQ',
   'guide.nav.glossary': 'Glossar',
@@ -3794,18 +4707,18 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.intro':
     'Quests sind das Herz der Welt und der schnellste Weg zum Aufstieg. So funktionieren sie.',
   'guide.questsPage.objectivesBody':
-    'Erschlage bestimmte Gegner, sammle Gegenstände oder interagiere mit etwas in der Welt. Die Verfolgungsanzeige auf dem Bildschirm zählt deinen Fortschritt mit, während du vorankommst.',
+    'Erschlage bestimmte Gegner, sammle Gegenstände oder interagiere mit etwas in der Welt. Die Verfolgungsanzeige auf dem Bildschirm zählt deinen Fortschritt mit, während du vorankommst. Wenn du es dir anders überlegst, kannst du eine Quest aus deinem Questlog entfernen und sie später wieder bei ihrem Questgeber aufnehmen.',
   'guide.questsPage.objectivesTitle': 'Ziele',
   'guide.questsPage.partyBody':
-    'Gruppenmitglieder in der Nähe teilen sich den Tötungs- und Zielfortschritt, gemeinsam Quests zu erfüllen ist also schneller, niemals langsamer.',
+    'Gruppenmitglieder in der Nähe teilen sich den Tötungs- und Zielfortschritt, gemeinsam Quests zu erfüllen ist also schneller, niemals langsamer. Du kannst eine Quest auch mit deiner Gruppe teilen: Stelle sie mit dem Befehl /share als anklickbaren Link in den Chat, und jedes Mitglied in der Nähe, das die Voraussetzungen erfüllt, kann dieselbe Quest mit einem Klick aufnehmen.',
   'guide.questsPage.partyTitle': 'Quests in einer Gruppe erfüllen',
   'guide.questsPage.soloNote':
-    'Die Hauptgeschichte ist vollständig im Alleingang spielbar; nur ihre letzten Kapitel verlangen nach einer Gruppe.',
+    'Die Hauptgeschichte ist im Alleingang spielbar, bis hin zum Finale jedes Kapitels, das ein Dungeon für fünf Spieler ist.',
   'guide.questsPage.storyBody':
     'Schon bei deinen ersten Besorgungen in Eastbrook stimmt etwas mit den Toten nicht. Ein Kult ist am Werk, und die Spur führt nordwärts durch jedes Gebiet. Folge ihr, um zu erfahren, wer dahintersteckt.',
   'guide.questsPage.storyTitle': 'Ein roter Faden zieht sich durch alles',
   'guide.questsPage.turninBody':
-    'Kehre zum Questgeber zurück, die Karte zeigt dir, wo, für Erfahrung, Gold und oft ein Ausrüstungsstück, das zu deiner Klasse passt.',
+    'Bring eine abgeschlossene Quest zu ihrer Abgabemarkierung, die Karte zeigt dir, wo, für Erfahrung, Gold und oft ein Ausrüstungsstück, das zu deiner Klasse passt. Das ist meist derjenige, der sie dir gegeben hat, auch wenn dich manche Quests zu jemand anderem weiterschicken.',
   'guide.questsPage.turninTitle': 'Abgeben',
   'guide.resourceName.energy': 'Energie',
   'guide.resourceName.mana': 'Mana',
@@ -3820,7 +4733,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.intro':
     'World of ClaudeCraft ist ein zusammenhängendes Land, das du zu Fuß durchquerst, drei Gebiete von Süden nach Norden gereiht. Es gibt keine Schnellreise, die Reise selbst ist also Teil des Abenteuers.',
   'guide.worldPage.marshBlurb':
-    'Ein ertrunkenes Land aus Nebel und Ruinen. Murlocs überschwemmen das Seichte, und etwas Älteres regt sich unter dem Wasser, beobachtet aus der Brückenstadt Fenbridge.',
+    'Ein ertrunkenes Land aus Nebel und Ruinen. Mudfins überschwemmen das Seichte, und etwas Älteres regt sich unter dem Wasser, beobachtet aus der Brückenstadt Fenbridge.',
   'guide.worldPage.peaksBlurb':
     'Windgepeitschte Grate und alte Minenwerke, die zu den kältesten, höchsten Gefahren des Reichs emporsteigen, gehalten vom Außenposten Highwatch.',
   'guide.worldPage.valeBlurb':
@@ -3856,7 +4769,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.devotion_aura':
     'Eine anhaltende Selbststärkung, die die Rüstung erhöht, sodass Treffer sanfter ankommen.',
   'guide.abilityHook.divine_protection':
-    'Ein schneller heiliger Schild, der Schaden absorbiert, wenn es brenzlig wird.',
+    'Ein schneller Schutzschild, um Schaden abzufangen, wenn es brenzlig wird.',
   'guide.abilityHook.earth_shock':
     'Ein sofortiger Schock für schnellen Naturschaden, wenn du ihn jetzt brauchst.',
   'guide.abilityHook.eviscerate':
@@ -3912,7 +4825,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.rockbiter_weapon':
     'Verzaubert deine Waffe, sodass jeder Schwung im Nahkampf härter landet.',
   'guide.abilityHook.seal_of_righteousness':
-    'Verzaubert deine Schwünge mit heiligem Schaden, den du dann mit dem Richturteil verbrauchst.',
+    'Verzaubert deine Schwünge mit heiligem Schaden, den du dann mit Verdict verbrauchst.',
   'guide.abilityHook.serpent_sting': 'Setzt ein Gift, das über Zeit Naturschaden zufügt.',
   'guide.abilityHook.shadow_bolt':
     'Ein Schattenblitz, den du auf ein Ziel wirkst, dein erster Schadenszauber.',
@@ -3922,7 +4835,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Dein verlässlicher Schlag, der Kombopunkte aufbaut, die du später verbrauchst.',
   'guide.abilityHook.smite': 'Ein heiliger Blitz, um ein Ziel aus der Distanz abzutragen.',
   'guide.abilityHook.summon_imp':
-    'Ruft einen Wichtel herbei, der aus der Distanz Feuerblitze auf Gegner schleudert.',
+    'Ruft einen Emberkin herbei, der aus der Distanz Feuerblitze auf Gegner schleudert.',
   'guide.abilityHook.thorns':
     'Schützt einen Verbündeten, sodass Nahkampfangreifer sich beim Zuschlagen selbst verletzen.',
   'guide.abilityHook.thunder_clap': 'Trifft alles um dich herum und verlangsamt deren Angriffe.',
@@ -3931,7 +4844,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.augmentsNote':
     'Augmentierungen und Verstärkungen halten nur für das Match. Es geht um verspielte Builds aus dem Moment heraus, nicht um anhaltende Macht, sodass sich niemand den Sieg erkaufen kann.',
   'guide.arenaPage.coliseumBody':
-    'Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst. Gewinne, und dein Ansehen steigt, und die stärksten Kämpfer klettern die Bestenliste hinauf, für alle sichtbar.',
+    'Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst, eins gegen eins oder zwei gegen zwei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar.',
   'guide.arenaPage.coliseumHeading': 'Das Aschene Kolosseum',
   'guide.arenaPage.duelsBody':
     'Fordere jeden Spieler, dem du begegnest, zu einem freundschaftlichen Duell heraus. Es steht nichts auf dem Spiel außer dem Stolz, also ist es der einfachste Weg, eine Paarung zu lernen oder eine freundschaftliche Wette zu klären.',
@@ -3977,6 +4890,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.faqPage.q10': 'Was gibt es auf der Höchststufe zu tun?',
   'guide.faqPage.q11': 'Wie finde ich eine Gruppe?',
   'guide.faqPage.q9': 'Gibt es PvP?',
+  'guide.glossary.augmentDef':
+    'Eine zeitweilige Verstärkung, die du während eines 2-gegen-2-Fiesta-Arenakampfs wählst und die dein Repertoire nur für diesen Kampf umgestaltet.',
+  'guide.glossary.augmentTerm': 'Augmentierung',
   'guide.glossary.buffDef':
     'Ein hilfreicher Effekt auf dir oder einem Verbündeten, wie ein Segen, der für eine Weile einen Wert erhöht.',
   'guide.glossary.buffTerm': 'Stärkungszauber',
@@ -3986,6 +4902,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.debuffDef':
     'Ein schädlicher Effekt auf einem Ziel, wie eine Verlangsamung, eine Blutung oder geschwächte Rüstung.',
   'guide.glossary.debuffTerm': 'Schwächungszauber',
+  'guide.glossary.delveDef':
+    'Ein kurzer, wiederholbarer instanzierter Abstieg für einen oder zwei Spieler, gestartet an der Tafel eines Hüters, mit einer Gefährtin an deiner Seite.',
+  'guide.glossary.delveTerm': 'Tiefgang',
   'guide.glossary.dotDef':
     'Schaden über Zeit und Heilung über Zeit: Effekte, die in stetigen Schüben ticken, statt alles auf einmal.',
   'guide.glossary.dotTerm': 'DoT und HoT',
@@ -4004,18 +4923,18 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena und PvP',
   'guide.nav.talents': 'Talente',
   'guide.nav.wishIKnew': 'Was ich gern früher gewusst hätte',
-  'guide.petHook.doomguard':
+  'guide.petHook.wraithborn':
     'Ein Elite-Zauberwirker, der aus der Ferne schweren Schatten regnen lässt.',
-  'guide.petHook.felguard':
+  'guide.petHook.warfiend':
     'Ein robuster Nahkampfschläger, der Allrounder, sobald du ihn beschwören kannst.',
-  'guide.petHook.felhunter': 'Ein Schattenplänkler, der gegnerischen Zauberwirkern zusetzt.',
-  'guide.petHook.imp':
+  'guide.petHook.spellhound': 'Ein Schattenplänkler, der gegnerischen Zauberwirkern zusetzt.',
+  'guide.petHook.emberkin':
     'Ein Feuerblitz-Dämon für die Distanz, der Gegner aus sicherer Entfernung abträgt.',
-  'guide.petHook.infernal':
+  'guide.petHook.pyre_colossus':
     'Ein massiger Koloss mit zermalmendem Nahkampf, beschworen für rohe Kraft.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Ein schneller Nahkampfdämon, der hart zuschlägt, aber unter Druck einknickt.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Ein robuster Dämon, der verspottet und Treffer absorbiert, sodass du in Ruhe zaubern kannst.',
   'guide.related': 'Verwandtes',
   'guide.search.label': 'Suche',
@@ -4023,6 +4942,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.search.placeholder': 'Den Wegweiser durchsuchen',
   'guide.search.typeClass': 'Klasse',
   'guide.search.typeCreature': 'Kreaturen',
+  'guide.search.typeDelve': 'Tiefgang',
   'guide.search.typeDungeon': 'Dungeon',
   'guide.search.typePage': 'Seite',
   'guide.search.typeTerm': 'Begriff',
@@ -4047,8 +4967,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.talentsPage.intro':
     'Talente sind die Art, wie du eine Klasse zu deiner eigenen machst. Sie sind optional, nachsichtig und leicht zu ändern, sodass du ohne Sorge experimentieren kannst.',
   'guide.talentsPage.resetNote':
-    'Du kannst deine Talente jederzeit zurücksetzen, eine frühe Wahl ist also nie eine Falle. Probier Dinge aus, schau, was dir gefällt, und ändere deine Meinung frei.',
+    'Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle. Probier Dinge aus, schau, was dir gefällt, und ändere deine Meinung frei.',
   'guide.talentsPage.resetTitle': 'Nichts ist endgültig',
+  'guide.talentsPage.shareNote':
+    'Ein fertiger Build lässt sich in einen kurzen, teilbaren Code kopieren und einem Freund geben, der ihn direkt in sein eigenes Talentfenster einfügt, um ihn zu laden.',
   'guide.talentsPage.specsBody':
     'Jede Klasse hat eine Handvoll Spezialisierungen, jede mit ihrer eigenen Rolle und einem charakteristischen Schwerpunkt. Hier ist der Aufbau aller. Öffne eine Klasse für ihr volles Repertoire.',
   'guide.talentsPage.specsHeading': 'Spezialisierungen nach Klasse',
@@ -4061,7 +4983,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Jede Klasse kann sich behaupten und die Höchststufe erreichen. Wähle die Fantasie, die dir gefällt, nicht die, die jemand anderes als die beste bezeichnet.',
   'guide.wishPage.i1Title': 'Du kannst keine falsche Klasse wählen',
   'guide.wishPage.i2Body':
-    'Wenn du fällst, erscheinst du an einem Friedhof und läufst zu deinem Körper zurück. Es geht keine Erfahrung verloren, es ist also sicher, Risiken einzugehen und dazuzulernen.',
+    'Wenn du fällst, lässt du deinen Geist frei und wirst auf dem nächsten Friedhof wiederbelebt, und findest dann deinen Weg zurück. Es geht keine Erfahrung verloren, es ist also sicher, Risiken einzugehen und dazuzulernen.',
   'guide.wishPage.i2Title': 'Sterben kostet dich kaum etwas',
   'guide.wishPage.i3Body':
     'Sie schalten sich auf Stufe 10 frei und lassen sich zurücksetzen, wann immer du willst, deine frühen Entscheidungen sind also nie endgültig.',
@@ -4109,22 +5031,22 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.grubjaw':
     'Ein Moortroll, so gierig, dass die anderen Trolle nicht neben ihm graben wollen, von dem man sagt, er habe einem Händler die letzten zwei Packmaultiere gefressen, samt Geschirr und allem.',
   'guide.bestiary.flavor.mirejaw_frenzy':
-    'Ein Moor-Murloc, der sich mitten im Kampf in eine um sich schlagende Raserei steigert, das lauteste Wesen in einem lauten, territorialen Rudel.',
+    'Ein Moor-Mudfin, der sich mitten im Kampf in eine um sich schlagende Raserei steigert, das lauteste Wesen in einem lauten, territorialen Rudel.',
   'guide.bestiary.flavor.old_greyjaw':
     'Ein vernarbter alter Wolf, den keine Falle gehalten hat, dem drei Jagdhunde und der Arm eines Stalljungen zur Last gelegt werden. Er jagt allein in den tiefen Wäldern und wird umso wilder, je länger ein Kampf andauert.',
   'guide.bestiary.flavor.shardlord_kazzix':
     'Ein Sturmelementar, dem man Schultern gegeben hat und der über die fernen Felszacken hoch über Stormcrag wandelt, mit einem Herzsplitter, für den es sich lohnt, dem Blitz zu trotzen.',
   'guide.bestiary.notedLabel': 'Bemerkenswert',
   'guide.combat.ccBody':
-    'Massenkontrolle ist eine besondere Art von Schwächungszauber, die einschränkt, was ein Ziel tun kann: Betäubungen, Verwurzelungen und Verlangsamungen, Stille, die das Zaubern unterbindet, Entwaffnungen, Furchteffekte und Verwandlung, die einen Feind für einen Moment harmlos macht. Manche davon, wie Verwurzelungen, Furcht und Verwandlung, verlieren ihren Halt, wenn sie zu schnell erneut angewandt werden, sie lassen sich also nicht ewig aneinanderreihen.',
+    'Massenkontrolle ist eine besondere Art von Schwächungszauber, die einschränkt, was ein Ziel tun kann: Betäubungen, Verwurzelungen und Verlangsamungen, Stille, die das Zaubern unterbindet, Entwaffnungen, Furchteffekte und Verwandlungen, die einen Feind für einen Moment harmlos machen. Manche davon, wie Verwurzelungen, Furcht und Verwandlungen, verlieren ihren Halt, wenn sie zu schnell erneut angewandt werden, sie lassen sich also nicht ewig aneinanderreihen.',
   'guide.combat.deathBody':
-    'Erreicht deine Gesundheit null, wirst du niedergestreckt. Du belebst dich nach kurzer Wartezeit wieder und machst dort weiter, wo du aufgehört hast, ein Tod kostet dich also etwas Zeit, nicht deinen Fortschritt. Setze dich zwischen den Kämpfen, um zu essen und zu trinken, damit du den nächsten in voller Stärke beginnst.',
+    'Erreicht deine Gesundheit null, wirst du niedergestreckt. Lass deinen Geist frei, um auf dem nächsten Friedhof mit voller Gesundheit wiederbelebt zu werden, und finde dann deinen Weg zurück, ein Tod kostet dich also etwas Zeit, nicht deinen Fortschritt. Setze dich zwischen den Kämpfen, um zu essen und zu trinken, damit du den nächsten in voller Stärke beginnst.',
   'guide.combat.deathTitle': 'Wenn du fällst',
   'guide.combat.effectsBody':
     'Viele Fähigkeiten legen einen Effekt an, der nachwirkt. Hilfreiche (Stärkungszauber) erhöhen deine Werte, schirmen dich ab oder heilen dich nach und nach; schädliche (Schwächungszauber) zehren deine Gesundheit durch Schaden über Zeit auf oder schwächen dich. Achte auf die kleinen Symbole nahe deiner Aktionsleiste, um zu sehen, was auf dir liegt und wie lange es anhält.',
   'guide.combat.effectsTitle': 'Stärkungen, Schwächungen und Massenkontrolle',
   'guide.dungeonsPage.cryptLeadBody':
-    'Hoch oben auf den Gipfeln, abseits des eigentlichen Kampfes, liegt ein kälteres Geheimnis. Alte Gräber tragen eine Krone, an die sich keine Aufzeichnung erinnert, und die Toten, die sie bewachen, dienten einst einem vergessenen König. Lies ihre Steine, sammle die Schlusssteine, die sie hüteten, und du kannst eine Gruft entsiegeln, die drei treue Seelen mit ihrem Leben verschlossen hielten, und so eine zweite Prüfung für zehn Spieler öffnen, für jene, die den Hinweisen bis zum Ende folgen.',
+    'Hoch oben auf den Gipfeln, abseits des eigentlichen Kampfes, liegt ein kälteres Geheimnis. Alte Gräber tragen eine Krone, an die sich keine Aufzeichnung erinnert, und die Toten, die sie bewachen, dienten einst einem vergessenen König. Lies ihre Steine, sammle die Schlusssteine, die sie hüteten, und du kannst eine Gruft entsiegeln, die drei treue Seelen mit ihrem Leben verschlossen hielten, die optionale Prüfung, die dem Reich den Weg zu seinem Schlachtzug für zehn Spieler öffnet, für jene, die den Hinweisen bis zum Ende folgen.',
   'guide.dungeonsPage.cryptLeadTitle': 'Eine Tür, die die Toten verschlossen halten sollten',
   'guide.dungeonsPage.templeLoreBody':
     'Der Tempel hat seine eigene Legende, älter als der Kult, den du anderswo verfolgst. Am Ufer des Glimmermere, eines Bergsees, der das Mondlicht trinkt und die Ertrunkenen zurückgibt, hütet ein einsamer Wächter ein Tor aus fahlem Licht. Unter der Oberfläche führt eine Treppe aus kaltem Stein zu ihm hinab. Die Leute, die dort versanken, ertranken nicht durch ein Unglück: Sie waren der Bleiche Chor, der im Gebet untertauchte und niemals zu singen aufhörte. Die alten Wärter kratzten eine einzige Warnung in die Felsen, bevor das Wasser sie holte, ein Gebet an etwas, das sie den Ertränkten Mond nannten, mit einer ruhigeren Hand, die zwei Worte darunter setzte: er schläft nur.',
@@ -4136,12 +5058,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Geld gibt es in drei Münzen. Hundert Kupfer ergeben ein Silber, und hundert Silber ergeben ein Gold, dein Beutel füllt sich also von der kleinsten Münze her. Du verdienst es aus Questbelohnungen, indem du gefallene Feinde plünderst und indem du verkaufst, was du nicht mehr brauchst.',
   'guide.economy.coinTitle': 'Gold, Silber und Kupfer',
   'guide.economy.intro':
-    'Münzen halten die ganze Welt in Schwung: Sie kaufen Ausrüstung und Vorräte, bezahlen deine Reparaturen und Questkosten und wechseln zwischen Spielern den Besitzer. All das sammelst du ganz nebenbei beim Spielen ein, sieh diese Seite also als eine Karte, woher dein Geld kommt und wohin es geht.',
+    'Münzen halten die ganze Welt in Schwung: Sie kaufen deine Ausrüstung, Vorräte und dein Reisegerät und wechseln zwischen Spielern den Besitzer. All das sammelst du ganz nebenbei beim Spielen ein, sieh diese Seite also als eine Karte, woher dein Geld kommt und wohin es geht.',
   'guide.economy.junkBody':
     'Beute, für die du keine Verwendung hast, lässt sich immer noch an jeden Händler verkaufen, leere deine Taschen also, wann immer du durch eine Stadt kommst, statt sie volllaufen zu lassen. Wirklich wertlosen Kram kannst du auch einfach wegwerfen, um Platz zu schaffen.',
   'guide.economy.junkTitle': 'Plunder loswerden',
   'guide.economy.marketBody':
-    'Der Händler betreibt den Weltmarkt, eine von Spielern getragene Börse, an der du mit Leuten kaufen und verkaufst, denen du vielleicht nie begegnest. Sprich mit dem Händler, um ihn zu öffnen.',
+    'Der Händler betreibt den Weltmarkt, eine von Spielern getragene Börse, an der du mit Leuten kaufst und verkaufst, denen du vielleicht nie begegnest. Sprich mit dem Händler, um ihn zu öffnen. Der Händler führt dort auch einen festen Bestand eigener Waren, sodass es immer etwas zu kaufen gibt, selbst wenn keine anderen Spieler etwas eingestellt haben.',
   'guide.economy.marketBrowse':
     'Stöbern: Scrolle durch die Angebote oder suche nach Namen, um zu finden, was zum Verkauf steht. Jedes Angebot zeigt die Ware, den Verkäufer und den geforderten Preis für den ganzen Stapel.',
   'guide.economy.marketCollect':
@@ -4151,11 +5073,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.economy.marketPricing':
     'Die Preisgestaltung liegt bei dir. Etwas unter dem zu bieten, was andere verlangen, verkauft sich tendenziell schneller, während ein gesalzener Preis vielleicht unangetastet liegen bleibt. Stöbere erst, um zu sehen, wie der gängige Kurs aussieht, bevor du etwas einstellst.',
   'guide.economy.marketTitle': 'Der Weltmarkt',
+  'guide.economy.marksBody':
+    'Geld ist nicht das Einzige, was du anhäufst. Tiefgänge zahlen Tiefgang-Marken aus, eine eigene Währung, die du nur beim Tiefgang-Hüter ausgibst, für Verbesserungen deiner Gefährtin und Ausrüstung, die du nirgendwo sonst findest. Sie vermischen sich nie mit deinem Geld.',
+  'guide.economy.marksTitle': 'Eine zweite Währung: Tiefgang-Marken',
   'guide.economy.tradeBody':
     'Du kannst von Angesicht zu Angesicht mit jedem handeln, der nahe bei dir steht. Ihr beide legt Gegenstände und Münzen in ein gemeinsames Fenster, und der Tausch findet erst statt, sobald ihr ihn beide bestätigt, sodass keine Seite übers Ohr gehauen werden kann. Es ist der einfache Weg, einem Freund eine Beute zu reichen oder ein Geschäft abzuschließen.',
   'guide.economy.tradeTitle': 'Handeln mit anderen Spielern',
   'guide.economy.vendorsBody':
-    'Städte und Außenposten sind mit Händlern gespickt, jeder mit seinem eigenen Gewerbe. Versorger führen Speis und Trank, Waffenschmiede und Rüstungsschmiede haben Ausrüstung, Kräuterkundige handeln mit Reagenzien, und ein Quartiermeister hält praktisches Reisegerät bereit. Geh auf einen zu, um zu sehen, was er verkauft.',
+    'Städte und Außenposten sind mit Händlern gespickt, jeder mit seinem eigenen Gewerbe. Versorger führen Speis und Trank, Waffenschmiede und Rüstungsschmiede haben Ausrüstung, und ein Quartiermeister hält praktisches Reisegerät bereit. Geh auf einen zu, um zu sehen, was er verkauft.',
   'guide.economy.vendorsTitle': 'Händler und was sie führen',
   'guide.gear.consumablesElixirs':
     'Elixiere gewähren eine zeitweilige Stärkung, während du unterwegs bist, ein kleiner Vorteil, der hilft, wenn du ein Stück weiter gehen willst.',
@@ -4166,6 +5091,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.consumablesPotions':
     'Tränke stellen Gesundheit oder Mana in dem Moment her, in dem du sie benutzt, sogar mitten im Kampf, was sie zur rettenden Hilfe macht, wenn ein Pull schiefgeht. Sie teilen sich eine kurze Abklingzeit, plane also einen guten Moment für ihren Einsatz.',
   'guide.gear.consumablesTitle': 'Verbrauchsgüter',
+  'guide.gear.cosmeticsApply':
+    'Lege dein aktives Aussehen in der Aussehen-Zeile auf deinem Charakterbildschirm fest und wechsle frei zwischen allem, was du freigeschaltet hast.',
   'guide.gear.cosmeticsBody':
     'Manche Belohnungen ändern nur, wie dein Charakter aussieht, niemals wie stark du bist. Diese kosmetischen Skins lassen dich herausstechen, ohne das Spiel zu beeinflussen, trage also, welchen du magst.',
   'guide.gear.cosmeticsCache':
@@ -4173,17 +5100,19 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.cosmeticsRanks':
     'Kosmetik kommt in eigenen Seltenheitsstufen, und den selteneren hinterherzujagen macht Spaß. Sich eine höhere Stufe zu verdienen, schaltet auch die darunterliegenden Aussehen frei.',
   'guide.gear.cosmeticsSkins':
-    'Es gibt zwei kosmetische Linien zum Sammeln. Jede Klasse hat eine Handvoll alternativer Aussehen, eine frische Auslegung ihres Looks, die allein dir zum Tragen gehört. Daneben stehen Chromas: benannte Zweiton-Farbschemata, die ein Aussehen vollständig neu einfärben, von schlichten Metallen bis zu leuchtenden imperialen Farben.',
+    'Es gibt zwei kosmetische Linien zum Sammeln. Die meisten Klassen haben mehrere alternative Aussehen, eine frische Auslegung des Klassen-Looks, die allein dir zum Tragen gehört. Daneben stehen Chromas: benannte Zweiton-Farbschemata, die ein Aussehen vollständig neu einfärben, von schlichten Metallen bis zu leuchtenden imperialen Farben.',
   'guide.gear.cosmeticsTitle': 'Aussehen und Kosmetik',
   'guide.gear.fishingBody':
-    'Angeln ist ein ruhiger Tempowechsel. Rüste eine Angelrute aus, wirf ins offene Wasser und hole ein, was anbeißt. Du fängst meist Fisch, den du zu Speise kochen kannst, hin und wieder etwas Plunder zum Verkauf für ein paar Münzen, und ab und zu einen begehrten seltenen Fang. Was du findest, hängt vom Gewässer ab, in dem du angelst.',
+    'Angeln ist ein ruhiger Tempowechsel. Rüste eine Angelrute aus, wirf ins offene Wasser und hole ein, was anbeißt. Du fängst meist Fisch, der Nahrung ist, die du essen kannst, hin und wieder etwas Plunder zum Verkauf für ein paar Münzen, und ab und zu einen begehrten seltenen Fang. Was du findest, hängt vom Gewässer ab, in dem du angelst.',
   'guide.gear.fishingFood':
-    'Der Fisch, den du einholst, ist roh, und roher Fisch ist Nahrung. Koche deinen Fang, und er heilt mehr, wenn du dich zum Essen niedersetzt, wobei die besseren Fische aus den kälteren, tieferen Gewässern im Norden kommen. Eine Schnur im See ist eine stille Art, deinen Vorrat zwischen den Kämpfen gefüllt zu halten.',
+    'Der Fisch, den du einholst, ist Nahrung: Iss einen, während du dich zum Rasten niedersetzt, und er stellt Gesundheit wieder her, wobei die kräftigeren Fische aus den kälteren, tieferen Gewässern im Norden kommen. Eine Schnur im See ist eine stille Art, deinen Vorrat zwischen den Kämpfen gefüllt zu halten.',
   'guide.gear.fishingRare':
     'Hin und wieder fängt deine Schnur etwas weit Besseres als ein Abendessen: einen schimmernden begehrten Fisch, dem jeder Angler in jedem Gewässer durch Glück begegnen kann. Hak einen, und dein Logbuch leuchtet beim Fang auf. Es ist die Art glücklichen Zugs, der einen müßigen Nachmittag am See wert macht, davon zu erzählen.',
   'guide.gear.fishingTitle': 'Angeln',
   'guide.gear.intro':
     'Ausrüstung ist das, was dein Charakter trägt, und die Gegenstände, die du bei dir führst. Bessere Ausrüstung ist der verlässlichste Weg, stärker zu werden, und das meiste davon sammelst du ganz nebenbei beim Spielen ein.',
+  'guide.gear.itemLevelBody':
+    'Wenn du zwei Teile schnell vergleichen willst, aktiviere in den Optionen Gegenstandsstufe anzeigen. Jede Waffe und jedes Rüstungsteil zeigt dann eine Gegenstandsstufe, eine einzelne Zahl dafür, wie mächtig es ungefähr ist, je nachdem, woher es stammt, sodass du auf einen Blick erkennst, welche Verbesserung mehr Gewicht hat, sogar über verschiedene Ausrüstungsplätze hinweg.',
   'guide.gear.qualityBody':
     'Jeder Gegenstand hat eine Qualität, und sein Name ist passend gefärbt, sodass du seinen Wert auf einen Blick ablesen kannst. Vom Gewöhnlichsten zum Begehrtesten:',
   'guide.gear.qualityCommon': 'Gewöhnlich',
@@ -4195,6 +5124,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.qualityRare': 'Selten',
   'guide.gear.qualityTitle': 'Qualität auf einen Blick',
   'guide.gear.qualityUncommon': 'Ungewöhnlich',
+  'guide.gear.setsBody':
+    'Die seltenste Rüstung kommt in zusammengehörigen Familien, mehreren Teilen, die darauf zugeschnitten sind, als Einheit auszusehen und zu kämpfen. Trage genug Teile einer Familie gleichzeitig, und das Set erwacht und gewährt Boni zusätzlich zu den eigenen Werten jedes Teils, und je mehr Teile du trägst, desto stärker wird es. Diese fallen im härtesten Gruppeninhalt nahe der Höchststufe, weshalb die Jagd nach einem vollständigen Set ein klassisches Endgame-Ziel ist.',
+  'guide.gear.setsTitle': 'Sets und Set-Boni',
   'guide.gear.slotChest': 'Brust',
   'guide.gear.slotFeet': 'Füße',
   'guide.gear.slotGloves': 'Hände',
@@ -4204,7 +5136,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotShoulder': 'Schultern',
   'guide.gear.slotWaist': 'Taille',
   'guide.gear.slotsBody':
-    'Du hast einen Waffenplatz und sieben Rüstungsplätze. Jedes Stück, das du anlegst, ergänzt deinen Charakter, und du kannst frei kombinieren, während du Verbesserungen findest.',
+    'Du hast einen Waffenplatz und sieben Rüstungsplätze. Jede Klasse kann nur bestimmte Waffen führen und trägt Rüstung bis zu ihrer eigenen Gewichtsklasse, Stoff, Leder oder Kette, die Verbesserungen, die zu dir passen, sind also jene, die für deine Klasse gemacht sind. Innerhalb dessen füllst du jeden Platz mit dem besten Stück, das du findest.',
   'guide.gear.slotsTitle': 'Was du anlegen kannst',
   'guide.gear.sourcesBody':
     'Die meisten deiner frühen Verbesserungen sind Questbelohnungen, es zahlt sich also aus, Quests abzuschließen, statt zu grinden. Feinde lassen Ausrüstung fallen, wenn du sie bezwingst, Händler in der Stadt verkaufen solide Grundausstattung, und der Spielermarkt lässt dich von anderen Abenteurern kaufen.',
@@ -4253,9 +5185,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.progression.noRush':
     'Es gibt keine Eile. Die Welt ist dazu da, sie in deinem eigenen Tempo zu genießen, wandere also umher, nimm die Quests an, die dir ins Auge fallen, und lass deinen Helden auf dem Weg wachsen.',
   'guide.progression.prestigeBody':
-    'Erfahrung zählt auch nach der Höchststufe weiter. Sie speist eine kosmetische virtuelle Stufe, sodass deine Erfahrungsleiste weiter steigt, und einen langfristigen Prestigerang, den du dir für die Anerkennung verdienen kannst. Er ist rein optional und gewährt niemals Macht, nur ein Zeichen des Weges, den du gegangen bist.',
+    'Erfahrung zählt auch nach der Höchststufe weiter. Sie speist eine kosmetische virtuelle Stufe, sodass deine Erfahrungsleiste weiter steigt, und einen langfristigen Prestigerang, den du dir für die Anerkennung verdienen kannst. Das Überschreiten großer Meilensteine der Gesamterfahrung schaltet zudem kosmetische Titel und Namensschild-Ränder frei, die auf deinem Charakterbogen erscheinen. All das ist rein optional und gewährt niemals Macht, nur ein Zeichen des Weges, den du gegangen bist.',
   'guide.progression.restedBody':
-    'Wenn du dich abmeldest oder an einem sicheren Ort wie einem Gasthaus rastest, sammelt dein Charakter ausgeruhte Erfahrung an, während du fort bist. Sobald du das nächste Mal hinausgehst und kämpfst, gibt dieser Vorrat deinen Tötungen einen zusätzlichen Schub, bis er versiegt. Er baut sich mit der Zeit auf und beschleunigt deine frühen Stufen, sich in der Stadt abzumelden ist also nie verlorene Zeit.',
+    'Raste an einem sicheren Ort wie einem Gasthaus, außerhalb des Kampfes, und dein Charakter sammelt ausgeruhte Erfahrung an, während du dort sitzt. Sobald du das nächste Mal hinausgehst und kämpfst, gibt dieser Vorrat deinen Tötungen einen zusätzlichen Schub, bis er versiegt. Eine Pause im Gasthaus ist nie verlorene Zeit; sie beschleunigt deinen nächsten Abschnitt des Stufenaufstiegs.',
   'guide.progression.restedTitle': 'Ausgeruhte Erfahrung',
   'guide.progression.xpBody':
     'Erfahrung verdienst du, indem du Quests abschließt und Feinde bezwingst. Quests geben mit Abstand am meisten, der Questspur zu folgen ist also der schnellste Weg nach oben. Was du unterwegs erschlägst, füllt den Rest auf.',
@@ -4263,34 +5195,37 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sagaBody':
     'Die Hauptgeschichte ist eine einzige lange Verfolgung. Ein Todeskult ist an den Gräbern des Reichs am Werk, und jedes Kapitel, das du abschließt, weist ein Gebiet weiter die Straße hinauf. Du bekämpfst nie die ganze Verschwörung auf einmal; du ziehst an einem Faden, und er führt dich zur nächsten Hand, die ihn hält.',
   'guide.questsPage.sagaMarshBody':
-    'In Mirefen sind die Ertrinkungstode kein Zufall. Jemand füllt das Moor wie eine Opferbüchse und erweckt gehorsame Tote aus jedem Reisenden, den das Wasser holt. Verfolge die Befehle die Kette hinauf bis zu einem Nebelrufer in der ertrunkenen Bastion, dessen letzte Worte etwas noch Älteres benennen, das unter den Gipfeln erwacht.',
+    'In Mirefen sind die Ertrinkungstode kein Zufall. Jemand füllt das Moor wie eine Opferbüchse und erweckt gehorsame Tote aus jedem Reisenden, den das Wasser holt. Verfolge die Befehle die Kette hinauf bis zu einem Fogbinder in der ertrunkenen Bastion, dessen letzte Worte etwas noch Älteres benennen, das unter den Gipfeln erwacht.',
   'guide.questsPage.sagaMarshTitle': 'Das Moor: ein Zehnt an Seelen',
   'guide.questsPage.sagaPeaksBody':
-    'Auf Thornpeak wird das ganze Schema klar. Jede gestohlene Seele seit dem Tal war ein Zehnt, vergossen, um ein uraltes Wesen zu erwecken, das unter dem Berg versiegelt ist. Die Spur, die in einem Kapellenhof begann, endet hier, an einer Tür, die zehn brauchen, um sie zu öffnen. Wer dahinter wartet, lassen wir dich selbst herausfinden.',
+    'Auf Thornpeak wird das ganze Schema klar. Jede gestohlene Seele seit dem Tal war ein Zehnt, vergossen für das düstere Werk des Kults im Herzen des Berges. Die Spur, die in einem Kapellenhof begann, endet hier, in einem Abstieg für fünf Spieler, um der Hand hinter allem entgegenzutreten. Wer am Grund wartet, lassen wir dich selbst herausfinden.',
   'guide.questsPage.sagaPeaksTitle': 'Die Gipfel: wofür der Zehnt bestimmt war',
   'guide.questsPage.sagaTitle': 'Folge der Spur nach Norden',
   'guide.questsPage.sagaValeBody':
     'In Eastbrook wollen die Toten nicht ruhen, und das Zeichen dahinter gehört einer Sekte, die man längst für verschwunden hielt. Verfolge es bis zu einem Grabrufer, der in der Kapellengruft am Werk ist, und seine eigenen Papiere weisen dich zum Moor im Norden.',
   'guide.questsPage.sagaValeTitle': 'Das Tal: ein Name auf einem Siegel',
   'guide.questsPage.sideCryptBody':
-    'Hoch oben auf den Gipfeln verläuft ein stilleres Geheimnis: alte Gräber, gezeichnet mit einer Krone, an die sich keine Aufzeichnung erinnert. Lies die Toten, sammle, was sie hüteten, und entsiegle eine Gruft, die verschlossen bleiben sollte. Es ist die Spur eines Spürsinns, die den Weg zu einer zweiten Endgame-Prüfung für einen vollen Schlachtzug öffnet.',
+    'Hoch oben auf den Gipfeln verläuft ein stilleres Geheimnis: alte Gräber, gezeichnet mit einer Krone, an die sich keine Aufzeichnung erinnert. Lies die Toten, sammle, was sie hüteten, und entsiegle eine Gruft, die verschlossen bleiben sollte. Es ist die Spur eines Spürsinns, die den Weg zum Endgame-Schlachtzug des Reichs für zehn Spieler öffnet.',
   'guide.questsPage.sideCryptTitle': 'Der vergessene König',
+  'guide.questsPage.sideTempleBody':
+    'Ein Tor aus blassem Licht über einem hohen Bergsee in den Gipfeln öffnet sich zu einem versunkenen Schrein, in dem ein ertränkter Kult noch immer singt. Seine kurze Kette steht abseits der Hauptgeschichte, ein in sich geschlossenes Rätsel für jeden, der zum Ufer hinaufsteigt, die in den Fels geritzten Warnungen liest und hinabsteigt, um zu sehen, wozu sie dienten.',
+  'guide.questsPage.sideTempleTitle': 'Der ertränkte Tempel',
   'guide.questsPage.sideTitle': 'Fäden abseits der Hauptstraße',
   'guide.questsPage.sideWardenBody':
-    'Neben der Geschichte vergeben die Wächter des Tals und des Moores eine stehende Kopfgeldleiter. Arbeite dich an ihr empor, Feind für Feind, so wie es jeder Wächter vor dir getan hat, um sich seinen Platz zu verdienen. Es ist ehrlicher Aufstieg und eine Rundreise zu den schlimmsten Unruhestiftern jedes Gebiets.',
+    'Neben der Geschichte vergeben die Marschälle und Wächter des Tals und des Moores eine stehende Kopfgeldleiter. Arbeite dich an ihr empor, Feind für Feind, so wie sich jeder Kopfgeldjäger vor dir seinen Platz verdient hat. Es ist ehrlicher Aufstieg und eine Rundreise zu den schlimmsten Unruhestiftern jedes Gebiets.',
   'guide.questsPage.sideWardenTitle': 'Sich einen Namen machen',
   'guide.questsPage.typeGatherBody':
     'Sammle Gegenstände aus der Welt oder von dem, was Feinde fallen lassen: Kräuter, Erz, verlorene Briefe, die grausigen Reagenzien eines Kults. Manche Stücke fallen nur von einem bestimmten Feind, die Jagd und die Ausbeute gehören also zusammen.',
   'guide.questsPage.typeGatherTitle': 'Sammeln',
   'guide.questsPage.typeGroupBody':
-    'Jedes Kapitel der Hauptgeschichte endet an einer Dungeon-Tür. Die Einführung ist im Alleingang lösbar, doch der finale Schlag gegen den Schurken eines Kapitels ist für eine Gruppe von fünf gedacht (und der allerletzte für zehn).',
+    'Jedes Kapitel der Hauptgeschichte endet an einer Dungeon-Tür. Die Einführung ist im Alleingang lösbar, doch der finale Schlag gegen den Schurken eines Kapitels ist für eine Gruppe von fünf gedacht.',
   'guide.questsPage.typeGroupTitle': 'Gruppenfinale',
   'guide.questsPage.typeInteractBody':
     'Benutze, reinige oder lies etwas Festes in der Welt: ein geschändetes Grab, eine in einen Uferfelsen geritzte Warnung, eine versiegelte Grufttür. Geh zur Markierung und handle daran.',
   'guide.questsPage.typeInteractTitle': 'Interagieren',
   'guide.questsPage.typeMusterBody':
-    'Geleite ein freundliches Gesicht sicher von einem Ort zum anderen oder sammle die Verteidiger einer Stadt vor einem Vorstoß nach Norden. Diese halten dich in Bewegung mit den Leuten, in deren Geschichte du steckst.',
-  'guide.questsPage.typeMusterTitle': 'Geleiten und Aufbieten',
+    'Manche Quests lassen dich eine Stadt vor einem Vorstoß nach Norden mobilisieren: Dezimiere die Bedrohung an den Toren und trage zusammen, was die Verteidiger brauchen. Das sind Erschlage- und Sammelziele im Dienst der Leute, in deren Geschichte du steckst, und sie halten dich mit ihnen in Bewegung.',
+  'guide.questsPage.typeMusterTitle': 'Die Verteidigung aufbieten',
   'guide.questsPage.typeSlayBody':
     'Lichte ein Rudel Bestien aus oder brich den Griff eines Kults, indem du eine bestimmte Anzahl eines markierten Feindes bezwingst. Die erste Quest im Spiel, die Wölfe von der Straße bei Eastbrook zu räumen, ist eine davon.',
   'guide.questsPage.typeSlayTitle': 'Erschlagen',
@@ -4299,7 +5234,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.typesTitle': 'Die Arten von Quest, denen du begegnest',
   'guide.social.chanGeneral': 'Allgemein.',
   'guide.social.chanGeneralBody':
-    'Ein stets aktiver lokaler Kanal für die Leute um dich herum, gut, um eine Frage zu stellen oder zu plaudern.',
+    'Ein stets aktiver, reichsweiter Kanal, der jeden erreicht, der online ist, gut, um eine Frage zu stellen oder allgemein zu plaudern. Anders als Welt und Suche nach Gruppe musst du ihm nie beitreten.',
   'guide.social.chanGuild': 'Gilde und Offizier.',
   'guide.social.chanGuildBody':
     'Kanäle für deine Gilde. Der Gildenchat erreicht jedes Mitglied; der Offizierskanal ist nur für Offiziere.',
@@ -4348,11 +5283,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Gewöhnliche Beute kann an den Plündernden gehen, während bessere Beute zum Würfeln freigegeben wird, sodass jeder eine faire Chance hat.',
   'guide.social.lootCommonTitle': 'Gegenstände.',
   'guide.social.lootHeading': 'Gruppenbeute',
+  'guide.social.lootMasterBody':
+    'Der Anführer kann stattdessen die besseren Beutestücke selbst verwalten und jedes dem Mitglied geben, das es bekommen soll. So verhindert er, dass wertvolle Ausrüstung an einen zufälligen Wurf geht, wie eine organisierte Gruppe einen Dungeon angeht.',
+  'guide.social.lootMasterTitle': 'Plündermeister.',
   'guide.social.lootRollBody':
     'Wenn ein Gegenstand zum Würfeln freigegeben wird, wählt jedes berechtigte Mitglied Bedarf, wenn es ihn haben will, Gier, wenn es ihn nur nebenbei nähme, oder Passen, um sich herauszuhalten. Der höchste Wurf gewinnt.',
   'guide.social.lootRollTitle': 'Bedarf, Gier oder Passen.',
   'guide.social.partyBody':
-    'Lade einen anderen Spieler ein, indem du mit der rechten Maustaste auf seinen Namen klickst und ihn einlädst, oder mit einem Chatbefehl. Eine Gruppe fasst bis zu fünf Spieler, und einer von euch ist der Anführer.',
+    'Lade einen anderen Spieler ein, indem du mit der rechten Maustaste auf seinen Namen klickst und ihn einlädst. Eine Gruppe fasst bis zu fünf Spieler, und einer von euch ist der Anführer.',
   'guide.social.partyCredit':
     'Gruppenmitglieder in der Nähe teilen sich den Tötungs- und Questfortschritt, gemeinsam zu questen ist also schneller, niemals langsamer. Eine Gruppe ist auch der Weg, als Team einen Dungeon zu betreten.',
   'guide.social.partyHeading': 'Eine Gruppe bilden',
@@ -4373,11 +5311,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.stats.dodgeBody':
     'Ausweichen ist deine Chance, einem eingehenden Nahkampfangriff gänzlich zu entgehen. Du beginnst mit einer kleinen Grundchance, und Beweglichkeit hebt sie an, sodass flinke Klassen mehr Schläge entwischen.',
   'guide.stats.dodgeTitle': 'Ausweichen',
+  'guide.stats.dpsBody':
+    'Dein Charakterbogen zeigt außerdem eine Schätzung des Schadens pro Sekunde: ungefähr das, was deine Waffe, ihre Schlaggeschwindigkeit und deine Angriffskraft über die Zeit zusammen ergeben. Das ist ein schneller Weg, zwei Waffen auf einen Blick zu vergleichen.',
+  'guide.stats.dpsTitle': 'Schaden pro Sekunde',
   'guide.stats.growBody':
     'Zwei Dinge heben deine Werte. Jede Stufe fügt einen festen Betrag jedes Attributs hinzu, passend zu deiner Klasse, und die Ausrüstung, die du anlegst, ergänzt darüber hinaus. Deine Ausrüstung aktuell zu halten ist der verlässlichste Weg, stärker zu werden, bis hinauf zur Höchststufe.',
   'guide.stats.growHeading': 'Wie deine Werte wachsen',
   'guide.stats.intBody':
-    'Intelligenz vergrößert den Manavorrat eines Zauberwirkers und verbessert die Chance, dass seine Zauber kritisch treffen. Sie ist für die Klassen von Belang, die aus Mana wirken; für eine Wut- oder Energieklasse bewirkt sie wenig.',
+    'Intelligenz vergrößert den Manavorrat eines Zauberwirkers, erhöht seine Zaubermacht, sodass seine Zauber härter treffen, und verbessert die Chance, dass seine Zauber kritisch treffen. Sie ist für die Klassen von Belang, die aus Mana wirken; für eine Wut- oder Energieklasse bewirkt sie wenig.',
   'guide.stats.intTitle': 'Intelligenz',
   'guide.stats.intro':
     'Dein Charakter wird durch eine Handvoll Attribute beschrieben. Du musst sie nie auswendig kennen, um gut zu spielen, aber grob zu wissen, was jedes davon bewirkt, hilft dir, deinen Charakterbogen zu lesen und die richtigen Verbesserungen zu wählen.',
@@ -4387,6 +5328,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.stats.sheetBody':
     'Öffne im Spiel das Charakterfenster, um all das an einem Ort zu sehen: deine fünf Attribute auf der einen Seite und die Werte, die sie speisen, auf der anderen. Fahre über einen beliebigen Wert, und ein Tooltip schlüsselt auf, was er für deine Klasse bewirkt, sodass du auf einen Blick siehst, welche Zahlen eine Verbesserung tatsächlich bewegt hat.',
   'guide.stats.sheetHeading': 'Deinen Charakterbogen lesen',
+  'guide.stats.spBody':
+    'Zaubermacht ist das Gegenstück eines Zauberwirkers zur Angriffskraft: Sie erhöht den Schaden, den deine Zauber austeilen. Intelligenz speist sie, und Zauberausrüstung und Stärkungszauber legen noch mehr obendrauf, sodass ein Zauberwirker auf die Zaubermacht achtet, wie ein Nahkämpfer auf die Angriffskraft achtet.',
+  'guide.stats.spTitle': 'Zaubermacht',
   'guide.stats.spiBody':
     'Willenskraft bestimmt, wie schnell das Mana eines Zauberwirkers außerhalb des Kampfes zurückkehrt. Wie Intelligenz dient sie den Manaklassen und bedeutet den anderen wenig.',
   'guide.stats.spiTitle': 'Willenskraft',
@@ -4402,26 +5346,27 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.error':
     'Das 3D-Modell konnte nicht geladen werden. Die Abbildung oben zeigt diesen {name} weiterhin.',
   'guide.viewer.loading': 'Modell wird geladen...',
+  'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': '{name} in 3D ansehen',
   'guide.viewer.view3dShort': 'In 3D ansehen',
   'guide.worldPage.marshGreeter': 'Wächter Fenwick, Fenbridge',
   'guide.worldPage.marshGreeting':
     'Halt am Tor. Jenseits dieses Schilfs erledigt das Moor das Töten für uns.',
   'guide.worldPage.marshPlaceNotes':
-    'Fenbridge bewacht die einzige trockene Straße. Das Pirscherschilf und die Tieffenniederung wimmeln von Moorbestien und Murlocs; das Witwendickicht ist dicht mit Netzen versponnen; die Ertrunkene Kapelle und die Trollhügel beherbergen ältere Gefahren; das Grabruferlager ist der eingegrabene Kult, und die versunkene Bastion ist das instanzierte Herz des Moores.',
+    'Fenbridge bewacht die einzige trockene Straße. Das Pirscherschilf und die Deepfen-Niederung wimmeln von Moorbestien und Mudfins; das Witwendickicht ist dicht mit Netzen versponnen; die Ertrunkene Kapelle und die Trollhügel beherbergen ältere Gefahren; das Gravecaller-Lager ist der eingegrabene Kult, und die versunkene Bastion ist das instanzierte Herz des Moores.',
   'guide.worldPage.peaksGreeter': 'Hauptmann Thessaly, Highwatch',
   'guide.worldPage.peaksGreeting':
     'Zweihundert Jahre hat diese Mauer gehalten. Unter meiner Wache wird sie nicht brechen, doch sie ächzt.',
   'guide.worldPage.peaksPlaceNotes':
-    'Highwatch hält die Mauer. Der Pirscherkamm und die Tieffelsbaue gehören Bergkatzen und Kobolden; die Ogervorberge und Drogmars Kriegslager den Schlägern für Sold; Stormcrag knistert vor Elementaren, und der Glimmermere leuchtet darunter; die Wyrmkultzelte und die Wiedergängerfelder umringen das Hochland des Kults, mit dem Gravewyrm-Heiligtum auf seinem Gipfel.',
+    'Highwatch hält die Mauer. Der Pirscherkamm und die Deeprock-Baue gehören Bergkatzen und Wühlern; die Ogervorberge und Drogmars Kriegslager den Schlägern für Sold; Stormcrag knistert vor Elementaren, und der Glimmermere leuchtet darunter; die Wyrmkultzelte und die Wiedergängerfelder umringen das Hochland des Kults, mit dem Gravewyrm-Heiligtum auf seinem Gipfel.',
   'guide.worldPage.valeGreeter': 'Marschall Redbrook, Eastbrook',
   'guide.worldPage.valeGreeting':
     'Halt deine Klinge griffbereit. Das Tal ist nicht mehr, was es war.',
   'guide.worldPage.valePlaceNotes':
-    'Eastbrook ist deine erste Heimatbasis. Der Wolfslauf und die Eberwiese sind sanftes Jagdgebiet; der Spiegelsee ist stilles Wasser zum Angeln; der Netzwald und die Kupfergrube verbergen Spinnen und erzgierige Schaufler; ein Banditenlager und die Gefallene Kapelle bergen rauere Arbeit; Brightwood Glade ist ein ruhiger Wildtierhain im Norden.',
+    'Eastbrook ist deine erste Heimatbasis. Der Wolfslauf und die Eberwiese sind sanftes Jagdgebiet; der Spiegelsee ist stilles Wasser zum Angeln; das Sableweb und die Kupfergrube verbergen Spinnen und erzgierige Schaufler; ein Banditenlager und die Gefallene Kapelle bergen rauere Arbeit; der Reliquienhügel führt hinab in das Eingestürzte Reliquiar, die erste Tiefe des Reichs; und Brightwood Glade ist ein ruhiger, sonnenheller Hain im Norden.',
   'guide.worldPage.gladeTitle': 'Eine stille Ecke: Brightwood Glade',
   'guide.worldPage.gladeBody':
-    'Nicht jede Geschichte im Tal handelt von den Toten. Im Norden bewahrt ein sonnenheller Hain namens Brightwood Glade seinen eigenen, sanfteren Rhythmus, mit stillen Pfaden, grasenden Hirschen und wachsamen Tieren unter den Zweigen. Er ist ein ruhiger Gegenklang zu der Spur, der du folgst, und einen Blick wert, wenn die Straße dir Raum zum Umherstreifen lässt.',
+    'Nicht jede Geschichte im Tal handelt von den Toten. Im Norden bewahrt ein sonnenheller Hain namens Brightwood Glade seinen eigenen, sanfteren Rhythmus, ganz aus stillen Pfaden und geflecktem Licht unter den Zweigen. Er ist ein sanfter Gegenklang zu der Spur, der du folgst, und einen Blick wert, wenn die Straße dir Raum zum Umherstreifen lässt.',
   // APM telemetry label from release/v0.14.0
   'hudChrome.perf.labels.apm': 'APM',
   // Account-security portal (2FA, verified email change, GDPR export) from PR #833.
@@ -4775,15 +5720,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.disarm': 'Entwaffnet: kann keine Waffenangriffe nutzen',
   'hudChrome.auraEffect.lockout': 'Zauberschule gesperrt',
   'hudChrome.auraEffect.imbue': 'Waffe mit Bonuseffekten erfüllt',
-  'hudChrome.auraEffect.imbueRange': 'Waffe erfüllt: {min} bis {max} Bonusschaden bei Richturteil',
+  'hudChrome.auraEffect.imbueRange': 'Waffe erfüllt: {min} bis {max} Bonusschaden bei Verdict',
   'hudChrome.auraEffect.stealth': 'Verborgen; Bewegungstempo um {pct}% verringert',
-  'hudChrome.auraEffect.formBear': 'Bärengestalt: Gesundheit und Rüstung erhöht',
+  'hudChrome.auraEffect.formBear': 'Bruin Form: Gesundheit und Rüstung erhöht',
   'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
-  'hudChrome.auraEffect.formTravel': 'Reisegestalt: Bewegungstempo um {pct}% erhöht',
+  'hudChrome.auraEffect.formTravel': 'Fleet Form: Bewegungstempo um {pct}% erhöht',
   'hudChrome.auraEffect.defensiveStance':
-    'Verteidigungshaltung: weniger erlittener Schaden, mehr Bedrohung',
+    'Wehrhafte Haltung: weniger erlittener Schaden, mehr Bedrohung',
   'hudChrome.auraEffect.righteousFury':
-    'Rechtschaffener Zorn: stark erhöhte Bedrohung durch Heiligschaden',
+    'Brennender Eid: stark erhöhte Bedrohung durch Heiligschaden',
   'hudChrome.auraEffect.scale': 'Größe um {pct}% erhöht',
   'hudChrome.auraEffect.jump': 'Sprunghöhe um {pct}% erhöht',
   'hudChrome.auraEffect.school.physical': 'Physisch',
@@ -4812,26 +5757,38 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assigned': '{looter} hat {item} an {target} zugewiesen.',
   'hudChrome.masterLoot.unassigned': '{item} wurde nicht zugewiesen und ist fuer alle frei.',
   'hudChrome.masterLoot.leaderOnly': 'Nur der Gruppenleiter kann die Beutemethode aendern.',
-  'entities.itemSets.crownforged.name': 'Kronengeschmiedete Kriegstracht',
+  'entities.itemSets.boundstone_vanguard.name': 'Gebundstein-Vorhut',
+  'entities.itemSets.boundstone_vanguard.bonus3': 'Erhöht Angriffs- und Zaubertempo um 15%.',
+  'entities.itemSets.crownforged.name': 'Bonewrought-Kriegstracht',
   'entities.itemSets.crownforged.bonus2': 'Erhöht Angriffskraft um 40.',
-  'entities.itemSets.crownforged.bonus3': 'Erhöht Stärke um 15 und Ausdauer um 15.',
-  'entities.itemSets.deathlord.name': 'Kriegstracht des Todesfürsten',
+  'entities.itemSets.crownforged.bonus3':
+    'Erhöht Stärke um 15, Ausdauer um 15 sowie Angriffs- und Zaubertempo um 15%.',
+  'entities.itemSets.deathlord.name': 'Barrowlord-Kriegstracht',
   'entities.itemSets.deathlord.bonus2': 'Erhöht Angriffskraft um 40.',
   'entities.itemSets.deathlord.bonus3': 'Erhöht Stärke um 15 und Ausdauer um 15.',
-  'entities.itemSets.necromancers.name': 'Gewänder des Nekromanten',
-  'entities.itemSets.necromancers.bonus2': 'Verringert Zauberrückstoß durch Schaden um 50%.',
-  'entities.itemSets.necromancers.bonus3': 'Erlittener Schaden verzögert das Zauberwirken nicht.',
-  'entities.itemSets.nighttalon.name': 'Nachtkrallen-Ledertracht',
+  'entities.itemSets.greyjaw_stalker.name': 'Ausrüstung des Greyjaw-Pirschers',
+  'entities.itemSets.greyjaw_stalker.bonus3': 'Erhöht Angriffs- und Zaubertempo um 15%.',
+  'entities.itemSets.necromancers.name': 'Mournweave-Gewänder',
+  'entities.itemSets.necromancers.bonus2':
+    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+  'entities.itemSets.necromancers.bonus3': 'Erhöht Intelligenz um 10 und Ausdauer um 10.',
+  'entities.itemSets.nighttalon.name': 'Direfang-Pelz',
   'entities.itemSets.nighttalon.bonus2': 'Erhöht Angriffskraft um 40.',
   'entities.itemSets.nighttalon.bonus3':
-    'Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%.',
-  'entities.itemSets.soulflame.name': 'Seelenflammengewänder',
-  'entities.itemSets.soulflame.bonus2': 'Verringert Zauberrückstoß durch Schaden um 50%.',
-  'entities.itemSets.soulflame.bonus3': 'Erlittener Schaden verzögert das Zauberwirken nicht.',
-  'entities.itemSets.stormcallers.name': 'Gewänder des Sturmrufers',
-  'entities.itemSets.stormcallers.bonus2': 'Verringert Zauberrückstoß durch Schaden um 50%.',
-  'entities.itemSets.stormcallers.bonus3': 'Erlittener Schaden verzögert das Zauberwirken nicht.',
-  'entities.itemSets.wyrmshadow.name': 'Wyrmschattentracht',
+    'Erhöht Beweglichkeit um 15, kritische Trefferchance um 2% sowie Angriffs- und Zaubertempo um 15%.',
+  'entities.itemSets.soulflame.name': 'Wraithfire-Gewänder',
+  'entities.itemSets.soulflame.bonus2':
+    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+  'entities.itemSets.soulflame.bonus3':
+    'Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.',
+  'entities.itemSets.stormcallers.name': 'Galecall-Gewänder',
+  'entities.itemSets.stormcallers.bonus2':
+    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+  'entities.itemSets.stormcallers.bonus3':
+    'Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.',
+  'entities.itemSets.vale_arcanist.name': 'Ornat des Talarkanisten',
+  'entities.itemSets.vale_arcanist.bonus3': 'Erhöht Angriffs- und Zaubertempo um 15%.',
+  'entities.itemSets.wyrmshadow.name': 'Nightfang-Gewänder',
   'entities.itemSets.wyrmshadow.bonus2': 'Erhöht Angriffskraft um 40.',
   'entities.itemSets.wyrmshadow.bonus3':
     'Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%.',
@@ -4839,125 +5796,360 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
 
   // Mount / flight / racing / wager UI + Skyward Trials questline + Mount Charter deeds.
-  "hud.mounts.title": "Reittiere",
-  "hud.mounts.subtitle": "$WOC-Reittiere",
-  "hud.mounts.close": "Reittiere schließen",
-  "hud.mounts.summon": "Beschwören",
-  "hud.mounts.dismount": "Absteigen",
-  "hud.mounts.summoning": "Beschwöre {name}…",
-  "hud.mounts.riding": "Reitend",
-  "hud.mounts.flies": "Fliegt",
-  "hud.mounts.locked": "Verschlossen",
-  "hud.mounts.speed": "+{percent}% Tempo",
-  "hud.mounts.unlockAt": "Freigeschaltet bei {amount} $WOC",
-  "hud.mounts.supplyShare": "{percent} des Angebots",
-  "hud.mounts.qualifyHeader": "Ihr erfüllt die Bedingungen für {count} von {total} Reittieren.",
-  "hud.mounts.holdingHint": "Ihr haltet {amount} $WOC.",
-  "hud.mounts.noWallet": "Haltet mindestens {amount} $WOC — 0.1% des Angebots — auf einem verbundenen Wallet, um Euer erstes Reittier zu verdienen.",
-  "hud.mounts.cantInCombat": "Im Kampf könnt Ihr nicht aufsteigen.",
-  "hud.mounts.cantSwimming": "Beim Schwimmen könnt Ihr nicht aufsteigen.",
-  "hud.mounts.cantDead": "Tot könnt Ihr nicht aufsteigen.",
-  "hud.mounts.notEligible": "Eure $WOC-Bestände reichen für dieses Ross noch nicht.",
-  "hud.mounts.summonedBanner": "Ihr beschwört {name}.",
-  "hud.mounts.summonAria": "{name} beschwören",
-  "hud.mounts.dismountAria": "Von {name} absteigen",
-  "hud.mounts.lockedAria": "{name} — verschlossen; freigeschaltet bei {amount} $WOC",
-  "hud.mounts.activeAria": "{name} — derzeit aktiv",
-  "hud.mounts.owned": "Im Besitz",
-  "hud.mounts.mint": "Reitbrief prägen",
-  "hud.mounts.mintHint": "Prägt einen handelbaren Reitbrief für dieses Reittier — verkauft ihn für Gold, damit ein Nicht-Halter es verdienen kann.",
-  "hud.mounts.mintAria": "Einen handelbaren Reitbrief für {name} prägen",
-  "hud.mounts.mintedBanner": "Ihr prägt einen Reitbrief für {name}.",
-  "hud.mounts.earnedBanner": "Ihr habt {name} verdient — es gehört Euch für immer.",
-  "hud.mounts.alreadyOwnErr": "Dieses Reittier besitzt Ihr bereits.",
-  "hud.mounts.charterVoidErr": "Dieser Reitbrief ist ungültig.",
-  "hud.mounts.noCharterErr": "Für dieses Reittier kann kein Reitbrief geprägt werden.",
-  "hud.mounts.holdingsShortErr": "Eure Bestände decken dieses Reittier nicht.",
-  "hud.course.skytrials": "Himmelsproben",
-  "hud.course.skytrialsHint": "Fliegt einen zeitgewerteten Ringkurs auf einem fliegenden Reittier.",
-  "hud.course.needFlyer": "Beschwört ein fliegendes Reittier, um Himmelsproben zu fliegen.",
-  "hud.course.laps": "{count} Runden",
-  "hud.course.starting": "Fliegt durch den ersten Ring, um die Uhr zu starten",
-  "hud.course.finish": "Ziel!",
-  "hud.course.failed": "Lauf beendet — Ihr habt Euer Reittier verlassen",
-  "hud.course.aborted": "Lauf abgebrochen",
-  "hud.course.newBest": "Neue Bestzeit!",
-  "hud.course.board": "Rangliste",
-  "hud.course.boardTitle": "{name} — Bestzeiten",
-  "hud.course.noTimes": "Noch keine Zeiten — seid die Ersten.",
-  "hud.course.loadingBoard": "Lädt…",
-  "hud.course.racePartyHint": "Tretet gegen Eure Gruppe an — wer zuerst durch die Ringe fliegt, gewinnt.",
-  "hud.course.getReady": "Macht Euch bereit",
-  "hud.course.racing": "Rennen läuft",
-  "hud.wager.start": "Wettrennen",
-  "hud.wager.title": "Wettrennen",
-  "hud.wager.inviteGold": "{name} eröffnet ein Wettrennen — setzt {money} zum Antreten. Mithalten?",
-  "hud.wager.inviteCharter": "{name} eröffnet ein Wettrennen — setzt {money} + einen Reitbrief. Mithalten?",
-  "hud.wager.accept": "Wette annehmen",
-  "hud.wager.potCharter": "Topf {money} + {count}× Reitbrief",
-  "hud.wager.racers": "Teilnehmer ({count})",
-  "hud.wager.launch": "Rennen starten",
-  "hud.wager.cancel": "Abbrechen",
-  "hud.wager.leave": "Verlassen",
-  "hud.wager.waiting": "Warten auf einen Herausforderer, der den Einsatz hält…",
-  "hud.wager.won": "Ihr gewinnt die Wette — {money}!",
-  "hud.wager.wonCharter": "Ihr gewinnt die Wette — {money} + {count}× Reitbrief!",
-  "hud.wager.lost": "Ihr habt die Wette verloren.",
-  "hud.wager.refunded": "Wette abgesagt — Euer Einsatz wird erstattet.",
-  "hud.wager.antePrompt": "Wie viel Gold setzt Ihr auf dieses Rennen? (in Kupfer)",
-  "hud.wager.open": "Wette eröffnen",
-  "hud.wager.stakeCharter": "Auch einen Reitbrief setzen (der Sieger nimmt ihn)",
-  "hud.wager.errCourse": "Auf diesen Kurs kann nicht gewettet werden.",
-  "hud.wager.errFlyer": "Ihr müsst auf einem fliegenden Reittier sein, um zu wetten.",
-  "hud.wager.errBusy": "Ihr seid bereits in einer Wette.",
-  "hud.wager.errAnte": "Nennt eine Wette von mindestens 1 Kupfer.",
-  "hud.wager.errStake": "Das kann nicht als Wetteinsatz gesetzt werden.",
-  "hud.wager.errAfford": "Ihr könnt diese Wette nicht decken.",
-  "hud.wager.errExpired": "Dieses Wettangebot ist abgelaufen.",
-  "hud.wager.errGone": "Diese Wette ist nicht mehr offen.",
-  "hud.wager.errHost": "Nur der Gastgeber kann die Wette starten.",
-  "entities.items.charter_ashmane.name": "Reitbrief: Aschmähnen-Renner",
-  "entities.items.charter_emberhoof.name": "Reitbrief: Gluthuf-Streitross",
-  "entities.items.charter_bronzeflank.name": "Reitbrief: Bronzeflanken-Streithengst",
-  "entities.items.charter_silvermane.name": "Reitbrief: Silbermähnen-Hengst",
-  "entities.items.charter_stormhoof.name": "Reitbrief: Sturmhuf-Streitross",
-  "entities.items.charter_goldcrest.name": "Reitbrief: Goldkamm-Himmelsschreiter",
-  "entities.items.charter_verdant.name": "Reitbrief: Grünflügel der Wildnis",
-  "entities.items.charter_voidstrider.name": "Reitbrief: Leerschwingen-Schreiter",
-  "entities.items.charter_celestial.name": "Reitbrief: Himmlischer Seraph",
-  "entities.items.charter_worldbearer.name": "Reitbrief: Roch des Weltenträgers",
-  "entities.npcs.skytrial_master.name": "Himmelsmeister Vael",
-  "entities.npcs.skytrial_master.title": "Wächter der Himmelsproben",
-  "entities.npcs.skytrial_master.greeting": "Der Himmel ist ein Pfad, den nur wenige zu beschreiten wagen, {className}. Verdient ihn, und er trägt Euch.",
-  "entities.quests.q_skyward_first_flight.title": "Erster Flug",
-  "entities.quests.q_skyward_first_flight.text": "Auf dem Boden sitzt Ihr einem geflügelten Ross gut genug, {playerName} — nun führt es empor. Fliegt die Tal-Himmelsprobe: acht Ringe in einem geschlungenen Durchgang. Jagt noch nicht der Uhr nach. Bleibt nur in der Luft und durchfädelt jeden Ring.",
-  "entities.quests.q_skyward_first_flight.completion": "Ihr seid nicht gestürzt. Das ist mehr, als die meisten im ersten Durchgang schaffen. Der Himmel erinnert sich an jeden, der wiederkehrt.",
-  "entities.quests.q_skyward_first_flight.objectives.0.label": "Tal-Himmelsprobe abgeschlossen",
-  "entities.quests.q_skyward_time_trial.title": "Schlagt die Uhr",
-  "entities.quests.q_skyward_time_trial.text": "Nun tut es mit Absicht. Fliegt die Tal-Himmelsprobe erneut, {playerName}, doch beendet sie, ehe der Sand verrinnt. Eine saubere Linie durch jeden Ring, keine vergeudete Luft. Präzision, nicht Panik.",
-  "entities.quests.q_skyward_time_trial.completion": "Eine saubere Linie, von Ring zu Ring. Ihr reitet den Himmel nicht länger — Ihr fliegt ihn.",
-  "entities.quests.q_skyward_time_trial.objectives.0.label": "Tal-Himmelsprobe unter Sollzeit geflogen",
-  "entities.quests.q_skyward_ascendant.title": "Emporgestiegen",
-  "entities.quests.q_skyward_ascendant.text": "Eine Prüfung bleibt, {playerName}: der Tal-Rundkurs. Drei Runden des langen Rings, unter Sollzeit geflogen — kein Glück, nur Können. Meistert ihn, und der offene Himmel gehört Euch, von Rand zu Rand.",
-  "entities.quests.q_skyward_ascendant.completion": "Emporgestiegen und ungebrochen. Der Himmel gehört nun Euch, {playerName}. Nehmt diesen Reitbrief — ein Ross der Lüfte, verdient und nicht gekauft, das Euch trägt, wohin Ihr auch wollt.",
-  "entities.quests.q_skyward_ascendant.objectives.0.label": "Tal-Rundkurs unter Sollzeit geflogen",
+  'hud.mounts.title': 'Reittiere',
+  'hud.mounts.subtitle': '$WOC-Reittiere',
+  'hud.mounts.close': 'Reittiere schließen',
+  'hud.mounts.summon': 'Beschwören',
+  'hud.mounts.dismount': 'Absteigen',
+  'hud.mounts.summoning': 'Beschwöre {name}…',
+  'hud.mounts.riding': 'Reitend',
+  'hud.mounts.flies': 'Fliegt',
+  'hud.mounts.locked': 'Verschlossen',
+  'hud.mounts.speed': '+{percent}% Tempo',
+  'hud.mounts.unlockAt': 'Freigeschaltet bei {amount} $WOC',
+  'hud.mounts.supplyShare': '{percent} des Angebots',
+  'hud.mounts.qualifyHeader': 'Ihr erfüllt die Bedingungen für {count} von {total} Reittieren.',
+  'hud.mounts.holdingHint': 'Ihr haltet {amount} $WOC.',
+  'hud.mounts.noWallet':
+    'Haltet mindestens {amount} $WOC — 0.1% des Angebots — auf einem verbundenen Wallet, um Euer erstes Reittier zu verdienen.',
+  'hud.mounts.cantInCombat': 'Im Kampf könnt Ihr nicht aufsteigen.',
+  'hud.mounts.cantSwimming': 'Beim Schwimmen könnt Ihr nicht aufsteigen.',
+  'hud.mounts.cantDead': 'Tot könnt Ihr nicht aufsteigen.',
+  'hud.mounts.notEligible': 'Eure $WOC-Bestände reichen für dieses Ross noch nicht.',
+  'hud.mounts.summonedBanner': 'Ihr beschwört {name}.',
+  'hud.mounts.summonAria': '{name} beschwören',
+  'hud.mounts.dismountAria': 'Von {name} absteigen',
+  'hud.mounts.lockedAria': '{name} — verschlossen; freigeschaltet bei {amount} $WOC',
+  'hud.mounts.activeAria': '{name} — derzeit aktiv',
+  'hud.mounts.owned': 'Im Besitz',
+  'hud.mounts.mint': 'Reitbrief prägen',
+  'hud.mounts.mintHint':
+    'Prägt einen handelbaren Reitbrief für dieses Reittier — verkauft ihn für Gold, damit ein Nicht-Halter es verdienen kann.',
+  'hud.mounts.mintAria': 'Einen handelbaren Reitbrief für {name} prägen',
+  'hud.mounts.mintedBanner': 'Ihr prägt einen Reitbrief für {name}.',
+  'hud.mounts.earnedBanner': 'Ihr habt {name} verdient — es gehört Euch für immer.',
+  'hud.mounts.alreadyOwnErr': 'Dieses Reittier besitzt Ihr bereits.',
+  'hud.mounts.charterVoidErr': 'Dieser Reitbrief ist ungültig.',
+  'hud.mounts.noCharterErr': 'Für dieses Reittier kann kein Reitbrief geprägt werden.',
+  'hud.mounts.holdingsShortErr': 'Eure Bestände decken dieses Reittier nicht.',
+  'hud.course.skytrials': 'Himmelsproben',
+  'hud.course.skytrialsHint': 'Fliegt einen zeitgewerteten Ringkurs auf einem fliegenden Reittier.',
+  'hud.course.needFlyer': 'Beschwört ein fliegendes Reittier, um Himmelsproben zu fliegen.',
+  'hud.course.laps': '{count} Runden',
+  'hud.course.starting': 'Fliegt durch den ersten Ring, um die Uhr zu starten',
+  'hud.course.finish': 'Ziel!',
+  'hud.course.failed': 'Lauf beendet — Ihr habt Euer Reittier verlassen',
+  'hud.course.aborted': 'Lauf abgebrochen',
+  'hud.course.newBest': 'Neue Bestzeit!',
+  'hud.course.board': 'Rangliste',
+  'hud.course.boardTitle': '{name} — Bestzeiten',
+  'hud.course.noTimes': 'Noch keine Zeiten — seid die Ersten.',
+  'hud.course.loadingBoard': 'Lädt…',
+  'hud.course.racePartyHint':
+    'Tretet gegen Eure Gruppe an — wer zuerst durch die Ringe fliegt, gewinnt.',
+  'hud.course.getReady': 'Macht Euch bereit',
+  'hud.course.racing': 'Rennen läuft',
+  'hud.wager.start': 'Wettrennen',
+  'hud.wager.title': 'Wettrennen',
+  'hud.wager.inviteGold': '{name} eröffnet ein Wettrennen — setzt {money} zum Antreten. Mithalten?',
+  'hud.wager.inviteCharter':
+    '{name} eröffnet ein Wettrennen — setzt {money} + einen Reitbrief. Mithalten?',
+  'hud.wager.accept': 'Wette annehmen',
+  'hud.wager.potCharter': 'Topf {money} + {count}× Reitbrief',
+  'hud.wager.racers': 'Teilnehmer ({count})',
+  'hud.wager.launch': 'Rennen starten',
+  'hud.wager.cancel': 'Abbrechen',
+  'hud.wager.leave': 'Verlassen',
+  'hud.wager.waiting': 'Warten auf einen Herausforderer, der den Einsatz hält…',
+  'hud.wager.won': 'Ihr gewinnt die Wette — {money}!',
+  'hud.wager.wonCharter': 'Ihr gewinnt die Wette — {money} + {count}× Reitbrief!',
+  'hud.wager.lost': 'Ihr habt die Wette verloren.',
+  'hud.wager.refunded': 'Wette abgesagt — Euer Einsatz wird erstattet.',
+  'hud.wager.antePrompt': 'Wie viel Gold setzt Ihr auf dieses Rennen? (in Kupfer)',
+  'hud.wager.open': 'Wette eröffnen',
+  'hud.wager.stakeCharter': 'Auch einen Reitbrief setzen (der Sieger nimmt ihn)',
+  'hud.wager.errCourse': 'Auf diesen Kurs kann nicht gewettet werden.',
+  'hud.wager.errFlyer': 'Ihr müsst auf einem fliegenden Reittier sein, um zu wetten.',
+  'hud.wager.errBusy': 'Ihr seid bereits in einer Wette.',
+  'hud.wager.errAnte': 'Nennt eine Wette von mindestens 1 Kupfer.',
+  'hud.wager.errStake': 'Das kann nicht als Wetteinsatz gesetzt werden.',
+  'hud.wager.errAfford': 'Ihr könnt diese Wette nicht decken.',
+  'hud.wager.errExpired': 'Dieses Wettangebot ist abgelaufen.',
+  'hud.wager.errGone': 'Diese Wette ist nicht mehr offen.',
+  'hud.wager.errHost': 'Nur der Gastgeber kann die Wette starten.',
+  'entities.items.charter_ashmane.name': 'Reitbrief: Aschmähnen-Renner',
+  'entities.items.charter_emberhoof.name': 'Reitbrief: Gluthuf-Streitross',
+  'entities.items.charter_bronzeflank.name': 'Reitbrief: Bronzeflanken-Streithengst',
+  'entities.items.charter_silvermane.name': 'Reitbrief: Silbermähnen-Hengst',
+  'entities.items.charter_stormhoof.name': 'Reitbrief: Sturmhuf-Streitross',
+  'entities.items.charter_goldcrest.name': 'Reitbrief: Goldkamm-Himmelsschreiter',
+  'entities.items.charter_verdant.name': 'Reitbrief: Grünflügel der Wildnis',
+  'entities.items.charter_voidstrider.name': 'Reitbrief: Leerschwingen-Schreiter',
+  'entities.items.charter_celestial.name': 'Reitbrief: Himmlischer Seraph',
+  'entities.items.charter_worldbearer.name': 'Reitbrief: Roch des Weltenträgers',
+  'entities.npcs.skytrial_master.name': 'Himmelsmeister Vael',
+  'entities.npcs.skytrial_master.title': 'Wächter der Himmelsproben',
+  'entities.npcs.skytrial_master.greeting':
+    'Der Himmel ist ein Pfad, den nur wenige zu beschreiten wagen, {className}. Verdient ihn, und er trägt Euch.',
+  'entities.quests.q_skyward_first_flight.title': 'Erster Flug',
+  'entities.quests.q_skyward_first_flight.text':
+    'Auf dem Boden sitzt Ihr einem geflügelten Ross gut genug, {playerName} — nun führt es empor. Fliegt die Tal-Himmelsprobe: acht Ringe in einem geschlungenen Durchgang. Jagt noch nicht der Uhr nach. Bleibt nur in der Luft und durchfädelt jeden Ring.',
+  'entities.quests.q_skyward_first_flight.completion':
+    'Ihr seid nicht gestürzt. Das ist mehr, als die meisten im ersten Durchgang schaffen. Der Himmel erinnert sich an jeden, der wiederkehrt.',
+  'entities.quests.q_skyward_first_flight.objectives.0.label': 'Tal-Himmelsprobe abgeschlossen',
+  'entities.quests.q_skyward_time_trial.title': 'Schlagt die Uhr',
+  'entities.quests.q_skyward_time_trial.text':
+    'Nun tut es mit Absicht. Fliegt die Tal-Himmelsprobe erneut, {playerName}, doch beendet sie, ehe der Sand verrinnt. Eine saubere Linie durch jeden Ring, keine vergeudete Luft. Präzision, nicht Panik.',
+  'entities.quests.q_skyward_time_trial.completion':
+    'Eine saubere Linie, von Ring zu Ring. Ihr reitet den Himmel nicht länger — Ihr fliegt ihn.',
+  'entities.quests.q_skyward_time_trial.objectives.0.label':
+    'Tal-Himmelsprobe unter Sollzeit geflogen',
+  'entities.quests.q_skyward_ascendant.title': 'Emporgestiegen',
+  'entities.quests.q_skyward_ascendant.text':
+    'Eine Prüfung bleibt, {playerName}: der Tal-Rundkurs. Drei Runden des langen Rings, unter Sollzeit geflogen — kein Glück, nur Können. Meistert ihn, und der offene Himmel gehört Euch, von Rand zu Rand.',
+  'entities.quests.q_skyward_ascendant.completion':
+    'Emporgestiegen und ungebrochen. Der Himmel gehört nun Euch, {playerName}. Nehmt diesen Reitbrief — ein Ross der Lüfte, verdient und nicht gekauft, das Euch trägt, wohin Ihr auch wollt.',
+  'entities.quests.q_skyward_ascendant.objectives.0.label': 'Tal-Rundkurs unter Sollzeit geflogen',
 
   // Skytrial course + race HUD short labels (par/lap/ring/time/place/pot).
-  "hud.mounts.cardAria": "{name}: {flavor}",
-  "hud.course.start": "Fliegen",
-  "hud.course.give_up": "Aufgeben",
-  "hud.course.par": "Sollzeit {time}",
-  "hud.course.onePass": "1 Runde",
-  "hud.course.gate": "Ring {n}/{total}",
-  "hud.course.lap": "Runde {n}/{total}",
-  "hud.course.time": "Zeit",
-  "hud.course.beatPar": "Sollzeit um {time} unterboten",
-  "hud.course.offPar": "{time} über Sollzeit",
-  "hud.course.best": "Beste {time}",
-  "hud.course.you": "(Ihr)",
-  "hud.course.race": "Rennen",
-  "hud.course.go": "LOS!",
-  "hud.course.dnf": "DNF",
-  "hud.course.placeOf": "#{place} von {total}",
-  "hud.wager.pot": "Topf {money}",
+  'hud.mounts.cardAria': '{name}: {flavor}',
+  'hud.course.start': 'Fliegen',
+  'hud.course.give_up': 'Aufgeben',
+  'hud.course.par': 'Sollzeit {time}',
+  'hud.course.onePass': '1 Runde',
+  'hud.course.gate': 'Ring {n}/{total}',
+  'hud.course.lap': 'Runde {n}/{total}',
+  'hud.course.time': 'Zeit',
+  'hud.course.beatPar': 'Sollzeit um {time} unterboten',
+  'hud.course.offPar': '{time} über Sollzeit',
+  'hud.course.best': 'Beste {time}',
+  'hud.course.you': '(Ihr)',
+  'hud.course.race': 'Rennen',
+  'hud.course.go': 'LOS!',
+  'hud.course.dnf': 'DNF',
+  'hud.course.placeOf': '#{place} von {total}',
+  'hud.wager.pot': 'Topf {money}',
+  'hud.combat.floatingResist': 'Widerstand',
+  'hud.combat.resisted': '{target} widersteht Eurem {ability}.',
+  'hudChrome.abilityScaling.bonus': '(+{value})',
+  'hudChrome.itemArmorType.cloth': 'Stoff',
+  'hudChrome.itemArmorType.leather': 'Leder',
+  'hudChrome.itemArmorType.mail': 'Kette',
+  'hudChrome.spectate.banner': '{name} wird beobachtet',
+  'hudChrome.leaderboard.tabsLabel': 'Bestenlisten',
+  'hudChrome.leaderboard.tabPlayers': 'Spieler',
+  'hudChrome.leaderboard.tabGuilds': 'Gilden',
+  'hudChrome.leaderboard.guildName': 'Gilde',
+  'hudChrome.leaderboard.members': 'Mitglieder',
+  'hudChrome.leaderboard.topLevel': 'Top',
+  'hudChrome.leaderboard.guildXp': 'Gesamt-XP',
+  'hudChrome.leaderboard.guildEmpty': 'Noch keine platzierten Gilden.',
+  'hudChrome.discord.title': 'Discord',
+  'hudChrome.discord.panelTitle': 'World of ClaudeCraft',
+  'hudChrome.discord.open': 'Discord',
+  'hudChrome.discord.close': 'Schließen',
+  'hudChrome.discord.keybind': 'Discord-Panel',
+  'hudChrome.discord.disabled': 'Die Discord-Integration ist momentan nicht verfügbar.',
+  'hudChrome.discord.tiers.none': 'Ohne Rang',
+  'hudChrome.discord.tiers.initiate': 'Eingeweihter',
+  'hudChrome.discord.tiers.squire': 'Knappe',
+  'hudChrome.discord.tiers.footman': 'Fußsoldat',
+  'hudChrome.discord.tiers.knight': 'Ritter',
+  'hudChrome.discord.tiers.champion': 'Champion',
+  'hudChrome.discord.tiers.warlord': 'Kriegsfürst',
+  'hudChrome.discord.tiers.legend': 'Legende',
+  'hudChrome.discord.tiers.mythic': 'Mythisch',
+  'hudChrome.discord.loginCta': 'Mit Discord fortfahren',
+  'hudChrome.discord.choice.title': 'Mit Discord fortfahren',
+  'hudChrome.discord.choice.intro':
+    'Erstelle einen neuen Account oder verknüpfe dein Discord mit einem, den du bereits hast.',
+  'hudChrome.discord.choice.greeting': 'Willkommen, {name}!',
+  'hudChrome.discord.choice.createCta': 'Neuen Account erstellen',
+  'hudChrome.discord.choice.haveAccount': 'Schon einen Account?',
+  'hudChrome.discord.choice.linkCta': 'Bestehenden Account verknüpfen',
+  'hudChrome.discord.choice.linkSubmit': 'Account verknüpfen',
+  'hudChrome.discord.choice.error': 'Fortfahren nicht möglich. Bitte versuche es erneut.',
+  'hudChrome.discord.choice.expired':
+    'Dieser Discord-Login ist abgelaufen. Bitte logge dich erneut mit Discord ein.',
+  'hudChrome.discord.keep.title': 'Passwort festlegen',
+  'hudChrome.discord.keep.body':
+    'Dein Account verwendet Discord zum Einloggen. Lege ein Passwort fest, damit du dich nach dem Trennen weiterhin mit deinem Benutzernamen einloggen kannst.',
+  'hudChrome.discord.keep.usernameLabel': 'Dein Benutzername',
+  'hudChrome.discord.keep.confirmLabel': 'Passwort bestätigen',
+  'hudChrome.discord.keep.submit': 'Passwort festlegen und trennen',
+  'hudChrome.discord.keep.cancel': 'Abbrechen',
+  'hudChrome.discord.keep.mismatch': 'Die Passwörter stimmen nicht überein.',
+  'hudChrome.discord.keep.tooShort': 'Das Passwort muss mindestens 6 Zeichen lang sein.',
+  'hudChrome.discord.orEmail': 'oder E-Mail verwenden',
+  'hudChrome.discord.cta.title':
+    'Verknüpfe deinen Discord, um Punkte zu verdienen und aufzusteigen',
+  'hudChrome.discord.cta.stats': '{online} online · {total} Mitglieder auf dem Server',
+  'hudChrome.discord.cta.statsLoading': 'Tritt der Gemeinschaft bei und verdiene Belohnungen',
+  'hudChrome.discord.cta.button': 'Mit einem Klick verknüpfen',
+  'hudChrome.discord.cta.dismiss': 'Ausblenden',
+  'hudChrome.discord.link.cta': 'Discord verknüpfen',
+  'hudChrome.discord.link.relink': 'Discord erneut verknüpfen',
+  'hudChrome.discord.link.connecting': 'Discord wird geöffnet...',
+  'hudChrome.discord.link.benefits':
+    'Verknüpfe deinen Discord, um durch Spiel und Gemeinschaftsaktivität Punkte zu verdienen und die Statusstufen zu erklimmen.',
+  'hudChrome.discord.link.error':
+    'Discord konnte nicht verknüpft werden. Bitte versuche es erneut.',
+  'hudChrome.discord.link.success': 'Discord verknüpft.',
+  'hudChrome.discord.linkedAs': 'Verknüpft als {name}',
+  'hudChrome.discord.linkedTitle': 'Discord: {name}',
+  'hudChrome.discord.viewCharacter': '{name} ansehen',
+  'hudChrome.discord.viewProfile': 'Öffentliches Profil dieses Charakters öffnen',
+  'hudChrome.discord.unlink': 'Trennen',
+  'hudChrome.discord.visit': 'Discord besuchen',
+  'hudChrome.discord.unlinkConfirm': 'Discord-Konto von diesem Spielkonto trennen?',
+  'hudChrome.discord.statusLabel': 'Status',
+  'hudChrome.discord.rank': 'Rang',
+  'hudChrome.discord.points': 'Punkte',
+  'hudChrome.discord.lifetime': 'Gesamt',
+  'hudChrome.discord.toNext': '{points} bis zum nächsten Rang',
+  'hudChrome.discord.maxRank': 'Höchster Rang erreicht',
+  'hudChrome.discord.tiersTitle': 'Statusstufen',
+  'hudChrome.discord.tierLocked': 'Gesperrt',
+  'hudChrome.discord.tierCurrent': 'Aktuell',
+  'hudChrome.discord.earnTitle': 'So verdienst du Punkte',
+  'hudChrome.discord.earnBody':
+    'Verdiene Punkte durch Spielzeit im Spiel und durch Aktivität im Discord. Punkte erhöhen deine Statusstufe.',
+  'hudChrome.discord.memberSince': 'Mitglied seit',
+  'hudChrome.discord.memberSinceDays': '{days}T im Discord',
+  'hudChrome.discord.roleTag.levyst': 'Levy St',
+  'hudChrome.discord.roleTag.devs': 'Entwickler',
+  'hudChrome.discord.roleTag.mods': 'Mod',
+  'hudChrome.discord.roleTag.artists': 'Künstler',
+  'hudChrome.discord.guildMember': 'Verifiziertes Mitglied',
+  'hudChrome.discord.notMember': 'Noch nicht auf dem Server',
+  'hudChrome.discord.joinCta': 'Tritt dem Discord bei',
+  'hudChrome.discord.online': '{count} online',
+  'hudChrome.discord.community': 'Gemeinschaft',
+  'hudChrome.discord.rewards': 'Belohnungen',
+  'hudChrome.discord.voice.title': 'Sprachchat',
+  'hudChrome.discord.voice.channel': 'In {channel}',
+  'hudChrome.discord.voice.empty': 'Momentan ist niemand im Sprachkanal.',
+  'hudChrome.discord.voice.speaking': 'Spricht',
+  'hudChrome.discord.voice.muted': 'Stummgeschaltet',
+  'hudChrome.discord.voice.join': 'Sprachkanal beitreten',
+  'hudChrome.discord.voice.connect': 'Mit Sprachkanal verbinden',
+  'hudChrome.discord.swag.title': 'Fanartikel',
+  'hudChrome.discord.swag.claim': 'Einlösen',
+  'hudChrome.discord.swag.claimed': 'Eingelöst',
+  'hudChrome.discord.swag.locked': 'Gesperrt',
+  'hudChrome.discord.swag.free': 'Kostenlos',
+  'hudChrome.discord.swag.cost': '{points} Pkt',
+  'hudChrome.discord.swag.needTier': 'Erreiche einen höheren Rang, um dies einzulösen.',
+  'hudChrome.discord.swag.needPoints': 'Nicht genug Punkte.',
+  'hudChrome.discord.swag.claimError':
+    'Diese Belohnung konnte nicht eingelöst werden. Bitte versuche es erneut.',
+  'hudChrome.discord.swag.claimedToast': 'Eingelöst: {name}',
+  'hudChrome.discord.swag.titleDiscordian': 'Titel: Discordianer',
+  'hudChrome.discord.swag.titleSquire': 'Titel: Knappe des Reichs',
+  'hudChrome.discord.swag.chromaBlurple': 'Blurple-Mech-Chroma',
+  'hudChrome.discord.swag.titleChampion': 'Titel: Champion von Claudemoon',
+  'hudChrome.discord.swag.swagStickers': 'Stickerpaket (Versand)',
+  'hudChrome.discord.swag.swagTee': 'T-Shirt (Versand)',
+  'hudChrome.discord.relay.tooFast':
+    'Du postest zu schnell. Warte einen Moment und versuche es erneut.',
+  'hudChrome.discord.relay.lfg.label': 'Auf Gruppensuche',
+  'hudChrome.discord.relay.lfg.hint': 'Finde Spieler für einen Dungeon oder eine Quest',
+  'hudChrome.discord.relay.wts.label': 'Biete zum Verkauf',
+  'hudChrome.discord.relay.wts.hint': 'Biete einen Gegenstand oder Dienst zum Verkauf an',
+  'hudChrome.discord.relay.wtb.label': 'Suche zu kaufen',
+  'hudChrome.discord.relay.wtb.hint': 'Frage nach einem Gegenstand, den du kaufen möchtest',
+  'hudChrome.discord.relay.recruit.label': 'Gildenrekrutierung',
+  'hudChrome.discord.relay.recruit.hint': 'Wirb Spieler für deine Gilde an',
+  'hudChrome.discord.relay.event.label': 'Event / Schlachtzug',
+  'hudChrome.discord.relay.event.hint': 'Kündige einen Schlachtzug, ein Treffen oder ein Event an',
+  'hudChrome.discord.relay.help.label': 'Hilfe benötigt',
+  'hudChrome.discord.relay.help.hint': 'Bitte die Gemeinschaft um Hilfe',
+  'hudChrome.options.showSecondaryActionBar': 'Zweite Aktionsleiste anzeigen',
+  'errors.api.desktopCodeInvalid':
+    'Der Desktop-Anmeldecode ist ungültig oder abgelaufen. Bitte versuche es erneut.',
+  'desktop.crash.body': 'Die Spielansicht funktioniert nicht mehr. Neu laden?',
+  'desktop.crash.fatalBody':
+    'World of ClaudeCraft ist auf einen unerwarteten Fehler gestoßen und muss geschlossen werden.',
+  'desktop.crash.quit': 'Beenden',
+  'desktop.crash.reload': 'Neu laden',
+  'desktop.crash.title': 'World of ClaudeCraft',
+  'desktop.update.downloading': 'Update {version} wird heruntergeladen...',
+  'desktop.update.later': 'Später',
+  'desktop.update.ready':
+    'Update {version} ist bereit. Es wird beim Beenden installiert, oder starte jetzt neu.',
+  'desktop.update.restart': 'Jetzt neu starten',
+  'hudChrome.dailyRewards.close': 'Tägliche Belohnungen schließen',
+  'hudChrome.dailyRewards.endsIn': 'Endet in {time}',
+  'hudChrome.dailyRewards.error': 'Tägliche Belohnungen konnten nicht geladen werden.',
+  'hudChrome.dailyRewards.history': 'Bisherige Gewinner',
+  'hudChrome.dailyRewards.intro':
+    'Halte genügend WOC in deiner verifizierten Wallet, um tägliche Belohnungen freizuschalten. Verdiene Punkte mit einem täglichen Dreh und wechselnden Aufgaben und klettere dann in der täglichen Rangliste nach oben, um einen Anteil am Preispool zu erhalten.',
+  'hudChrome.dailyRewards.leaderboard': 'Tägliche Rangliste',
+  'hudChrome.dailyRewards.loading': 'Tägliche Belohnungen werden geladen...',
+  'hudChrome.dailyRewards.noHistory': 'Noch keine Auszahlungen.',
+  'hudChrome.dailyRewards.noLeaders': 'Noch keine Punkte.',
+  'hudChrome.dailyRewards.prize': 'Preispool',
+  'hudChrome.dailyRewards.reason.eligible': 'Belohnungen freigeschaltet.',
+  'hudChrome.dailyRewards.reason.no_wallet': 'Verbinde eine Wallet mit mindestens 20 USD in WOC.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'Der WOC-Preis ist nicht verfügbar, Belohnungen sind vorübergehend gesperrt.',
+  'hudChrome.dailyRewards.reason.under_minimum':
+    'Deine Wallet liegt unter dem Mindestwert von 20 USD in WOC.',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}Std {minutes}Min',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '<1Min',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}Min',
+  'hudChrome.dailyRewards.reset': 'Zurücksetzen',
+  'hudChrome.dailyRewards.score': 'Punktzahl',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.spinButton': 'Drehen',
+  'hudChrome.dailyRewards.spinClaimed': 'Erhalten: +{points} Punkte.',
+  'hudChrome.dailyRewards.spinClose': 'Täglichen Dreh schließen',
+  'hudChrome.dailyRewards.spinDialogTitle': 'Täglicher Belohnungsdreh',
+  'hudChrome.dailyRewards.spinReady': 'Ein Dreh ist bereit.',
+  'hudChrome.dailyRewards.spinResult': '+{points} Punkte',
+  'hudChrome.dailyRewards.spinTitle': 'Täglicher Dreh',
+  'hudChrome.dailyRewards.tasks': 'Aufgaben',
+  'hudChrome.dailyRewards.showChestButton': 'Truhe anzeigen',
+  'hudChrome.dailyRewards.hideChestButton': 'Truhe ausblenden',
+  'hudChrome.dailyRewards.title': 'Tägliche Belohnungen',
+  'hudChrome.dailyRewards.unknown': 'Unbekannt',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Verifiziere eine Solana-Wallet mit WOC, um tägliche Belohnungen freizuschalten.',
+  'hudChrome.dailyRewards.walletConnectButton': 'Wallet verifizieren',
+  'hudChrome.dailyRewards.walletConnectTitle': 'Wallet verifizieren',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Halte mindestens {amount} USD in WOC, um tägliche Belohnungen freizuschalten.',
+  'hudChrome.dailyRewards.walletHoldTitle': 'WOC halten',
+  'hudChrome.dailyRewards.walletPriceBody':
+    'Der WOC-Preis ist derzeit nicht verfügbar. Schau bald wieder vorbei.',
+  'hudChrome.dailyRewards.walletValue': 'Wallet-Wert (WOC)',
+  'hudChrome.nativeUpdate.body':
+    'Eine neue Version von World of ClaudeCraft ist verfügbar. Aktualisiere jetzt für die neuesten Fehlerbehebungen und Verbesserungen.',
+  'hudChrome.nativeUpdate.bodyWithVersion':
+    'Version {version} von World of ClaudeCraft ist verfügbar. Aktualisiere jetzt für die neuesten Fehlerbehebungen und Verbesserungen.',
+  'hudChrome.nativeUpdate.notNow': 'Jetzt nicht',
+  'hudChrome.nativeUpdate.title': 'Update verfügbar',
+  'hudChrome.nativeUpdate.update': 'Aktualisieren',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Die Rabenpost',
+  'entities.letters.ravenpost_welcome.subject': 'Die Raben fliegen nun für Euch',
+  'entities.letters.ravenpost_welcome.body':
+    'Reisender,\n\ndie Rabenpost hat ihre Sitzstangen im ganzen Tal eröffnet. Sucht die Rabensäulen in Eastbrook, Fenbridge und Highwatch: Von jeder aus könnt Ihr anderen Abenteurern Briefe, Münzen und Waren schicken und abholen, was die Raben Euch bringen.\n\nAnbei eine kleine Aufmerksamkeit für Eure erste Briefmarke.\n\nSchwingen hoch,\nDie Rabenpost',
+  'entities.letters.letter_q_wolves.sender': 'Marschall Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'In den Pferchen ist wieder Ruhe',
+  'entities.letters.letter_q_wolves.body':
+    'Die Hirten können endlich wieder ruhig schlafen, und das ist Euer Verdienst. Ich habe der Rabenpost aufgetragen, Euch eine Kleinigkeit aus der Wachkasse zu bringen.\n\nHaltet Eure Klinge geölt.\n- Marschall Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marschall Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Der alte Graukiefer, endlich',
+  'entities.letters.letter_q_greyjaw.body':
+    'Neuigkeiten verbreiten sich schnell in einer so kleinen Stadt. Die Hirten haben gestern Abend auf Eure Gesundheit getrunken, und Wilkes schwört, der Wolf sei so groß wie ein Karren gewesen. Lasst sie ruhig übertreiben: Ihr habt es Euch verdient.\n\nGönnt Euch ein Mahl auf Kosten der Wache.\n- Marschall Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Bruder Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Was Ihr im Dunkeln vollbracht habt',
+  'entities.letters.letter_q_hollow.body':
+    'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
+  'hudChrome.gathering.herbalism': 'Kräuterkunde',
+  'hudChrome.gathering.logging': 'Holzfällen',
+  'hudChrome.gathering.mining': 'Bergbau',
+  'hudChrome.gathering.title': 'Sammeln',
 };

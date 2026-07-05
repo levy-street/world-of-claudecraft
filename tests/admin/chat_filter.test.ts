@@ -36,10 +36,12 @@ vi.mock('../../src/admin/api', () => ({
 
 import { t } from '../../src/admin/i18n';
 import ChatFilter from '../../src/admin/pages/ChatFilter.svelte';
+import { grantPermissions } from './_grant';
 
 beforeEach(() => {
   apiPost.mockReset();
   apiPost.mockResolvedValue({});
+  grantPermissions();
 });
 
 describe('ChatFilter', () => {
@@ -86,5 +88,17 @@ describe('ChatFilter', () => {
     expect(apiPost).toHaveBeenCalledWith('/admin/api/moderation/accounts/9/lift-mute', {
       reason: 'appeal accepted',
     });
+  });
+
+  it('renders read-only without chatfilter.manage and moderation.act', async () => {
+    grantPermissions(['moderation.read']);
+    render(ChatFilter);
+
+    expect(await screen.findByText('darn')).toBeInTheDocument();
+    expect(screen.queryByText(t('chatFilter.saveConfig'))).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText(t('chatFilter.softPlaceholder'))).not.toBeInTheDocument();
+    expect(screen.queryByText(t('chatFilter.removeWord'))).not.toBeInTheDocument();
+    expect(screen.queryByText(t('chatMod.liftMute'))).not.toBeInTheDocument();
+    expect(screen.queryByText(t('chatMod.resetStrikes'))).not.toBeInTheDocument();
   });
 });

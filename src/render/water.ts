@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE, ZONES } from '../sim/data';
-import { terrainHeight, WATER_LEVEL } from '../sim/world';
+import { waterLevel } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { GFX, sharedUniforms, SUN_DIR } from './gfx';
+import { GFX, SUN_DIR, sharedUniforms } from './gfx';
 import { waterNormalish, waterNormalMaps } from './textures';
+import { shoreDepthAt } from './water_core';
 
 // Water for the whole zone strip.
 //
@@ -24,11 +25,13 @@ const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing — enough for the foam ban
 // so it does not pay network/decode/upload cost for water detail.
 const WATER_TEX: Record<string, THREE.Texture> = {};
 function kickWaterTex(key: string, file: string): void {
-  registerPreload(loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
-    tex.anisotropy = 4;
-    WATER_TEX[key] = tex;
-    return tex;
-  }));
+  registerPreload(
+    loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
+      tex.anisotropy = 4;
+      WATER_TEX[key] = tex;
+      return tex;
+    }),
+  );
 }
 if (GFX.standardMaterials) {
   kickWaterTex('n1', 'water_1_normal.jpg');
@@ -49,6 +52,14 @@ export interface WaterView {
   meshes: THREE.Mesh[];
   /** advances the legacy texture scroll (low tier); high tier uses uTime */
   update(time: number): void;
+  /**
+   * Editor-only: re-seat the surface at the ACTIVE waterLevel() and recompute
+   * the per-vertex shore depth from the CURRENT terrainHeight (after a
+   * water-level change or a sculpt near the shoreline). Updates the existing
+   * geometry in place (no geometry is replaced, so nothing leaks); the low
+   * Phong tier has no shore attribute and only repositions its one plane.
+   */
+  setLevel(): void;
 }
 
 const WATER_VERT = /* glsl */ `
@@ -149,25 +160,52 @@ function buildShaderWater(seed: number): WaterView {
     fog: true,
   });
 
+  // (Re)fill the per-vertex shore depth from the CURRENT terrain + water level,
+  // writing into the existing attribute in place (build and setLevel share it).
+  const fillShoreDepth = (geo: THREE.BufferGeometry): void => {
+    const pos = geo.attributes.position as THREE.BufferAttribute;
+    let attr = geo.attributes.aShoreDepth as THREE.BufferAttribute | undefined;
+    if (!attr) {
+      attr = new THREE.BufferAttribute(new Float32Array(pos.count), 1);
+      geo.setAttribute('aShoreDepth', attr);
+    }
+    const depths = attr.array as Float32Array;
+    for (let i = 0; i < pos.count; i++) {
+      depths[i] = shoreDepthAt(pos.getX(i), pos.getZ(i), seed);
+    }
+    attr.needsUpdate = true;
+  };
+
   const meshes: THREE.Mesh[] = [];
   for (const zone of ZONES) {
     const depth = zone.zMax - zone.zMin;
-    const geo = new THREE.PlaneGeometry(WORLD_SIZE, depth, SEGMENTS_PER_ZONE, SEGMENTS_PER_ZONE)
-      .rotateX(-Math.PI / 2);
+    const geo = new THREE.PlaneGeometry(
+      WORLD_SIZE,
+      depth,
+      SEGMENTS_PER_ZONE,
+      SEGMENTS_PER_ZONE,
+    ).rotateX(-Math.PI / 2);
     geo.translate(0, 0, (zone.zMin + zone.zMax) / 2);
-    const pos = geo.attributes.position as THREE.BufferAttribute;
-    const shoreDepth = new Float32Array(pos.count);
-    for (let i = 0; i < pos.count; i++) {
-      shoreDepth[i] = WATER_LEVEL - terrainHeight(pos.getX(i), pos.getZ(i), seed);
-    }
-    geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(shoreDepth, 1));
+    fillShoreDepth(geo);
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
     const mesh = new THREE.Mesh(geo, material);
-    mesh.position.y = WATER_LEVEL;
+    mesh.position.y = waterLevel();
     meshes.push(mesh);
   }
-  return { meshes, update: () => {} };
+  return {
+    meshes,
+    update: () => {},
+    setLevel(): void {
+      const y = waterLevel();
+      for (const mesh of meshes) {
+        mesh.position.y = y;
+        // vertices never move (only the attribute + the mesh transform change),
+        // so the baked bounding volumes stay valid.
+        fillShoreDepth(mesh.geometry);
+      }
+    },
+  };
 }
 
 function buildPhongWater(): WaterView {
@@ -176,8 +214,13 @@ function buildPhongWater(): WaterView {
   const [norm] = waterNormalMaps();
   norm.repeat.set(26, 78);
   const mat = new THREE.MeshPhongMaterial({
-    color: 0x2a6a96, transparent: true, opacity: 0.8, shininess: 140,
-    specular: 0xd8ecff, map: tex, normalMap: norm,
+    color: 0x2a6a96,
+    transparent: true,
+    opacity: 0.8,
+    shininess: 140,
+    specular: 0xd8ecff,
+    map: tex,
+    normalMap: norm,
     normalScale: new THREE.Vector2(0.8, 0.8),
   });
   const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
@@ -185,7 +228,7 @@ function buildPhongWater(): WaterView {
     new THREE.PlaneGeometry(WORLD_SIZE, worldDepth).rotateX(-Math.PI / 2),
     mat,
   );
-  mesh.position.set(0, WATER_LEVEL, (WORLD_MIN_Z + WORLD_MAX_Z) / 2);
+  mesh.position.set(0, waterLevel(), (WORLD_MIN_Z + WORLD_MAX_Z) / 2);
   return {
     meshes: [mesh],
     update(time: number): void {
@@ -194,9 +237,14 @@ function buildPhongWater(): WaterView {
       norm.offset.x = time * 0.006;
       norm.offset.y = time * 0.009;
     },
+    setLevel(): void {
+      mesh.position.y = waterLevel();
+    },
   };
 }
 
 export function buildWater(seed: number): WaterView {
-  return GFX.standardMaterials && hasWaterShaderAssets() ? buildShaderWater(seed) : buildPhongWater();
+  return GFX.standardMaterials && hasWaterShaderAssets()
+    ? buildShaderWater(seed)
+    : buildPhongWater();
 }

@@ -20,6 +20,7 @@
 // directly (already pure); only `entities` + the Nythraxis helpers route via the seam.
 
 import { MOBS } from '../data';
+import { combatProfileForMob } from '../mob_combat';
 import type { SimContext } from '../sim_context';
 import { addThreat, MELEE_SWITCH_MULT, RANGED_SWITCH_MULT } from '../threat';
 import type { Entity } from '../types';
@@ -33,6 +34,13 @@ const TRIVIAL_LEVEL_GAP = 10;
 // attacker. With no living threat left, it evades home instead of grabbing a
 // nearby bystander who never acted on the mob.
 export function retargetMob(ctx: SimContext, mob: Entity): void {
+  if (mob.ownerId !== null) {
+    mob.aggroTargetId = null;
+    mob.aiState = 'idle';
+    mob.inCombat = false;
+    mob.despawnTimer = undefined;
+    return;
+  }
   const next = highestThreatTarget(ctx, mob);
   if (next) {
     mob.aggroTargetId = next.id;
@@ -73,6 +81,16 @@ export function highestThreatTarget(ctx: SimContext, mob: Entity): Entity | null
   return best;
 }
 
+// Tick a forced-target (taunt/growl) window down by one sim step and expire the
+// forced target when it runs out, WITHOUT touching aggro. updateMobTarget does this
+// inline on the acting path; this is the slice the stunned-mob path needs, since a
+// stunned mob skips updateMobTarget entirely yet the taunt window is real-time and
+// must keep counting (a stun must not stretch the taunt). Draws no rng.
+export function tickForcedTarget(mob: Entity): void {
+  if (mob.forcedTargetTimer > 0) mob.forcedTargetTimer -= DT;
+  if (mob.forcedTargetTimer <= 0) mob.forcedTargetId = null;
+}
+
 // Classic pull-over rules, applied every AI tick while fighting: an attacker
 // takes aggro past 110% of the current target's threat in melee range of
 // the mob, or past 130% at range. A taunt forces the target outright.
@@ -95,6 +113,14 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
   const curThreat = mob.threat.get(cur.id) ?? 0;
   let best = cur;
   let bestT = curThreat;
+  // Melee vs ranged uses the mob's actual reach, floored at the classic 6yd
+  // (MELEE_RANGE * 1.2): normal mobs keep the 6yd boundary, while an oversized
+  // creature still counts a challenger standing at its feet as melee. The reach
+  // depends only on the mob, so compute it once outside the candidate loop.
+  const meleeReach = Math.max(
+    MELEE_RANGE * 1.2,
+    combatProfileForMob(mob.templateId, mob.scale).meleeRange,
+  );
   for (const [id, t] of mob.threat) {
     if (id === cur.id || t <= bestT) continue;
     const e = ctx.entities.get(id);
@@ -102,7 +128,7 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
       mob.threat.delete(id);
       continue;
     }
-    const inMelee = dist2d(mob.pos, e.pos) <= MELEE_RANGE * 1.2;
+    const inMelee = dist2d(mob.pos, e.pos) <= meleeReach;
     const needed = curThreat * (inMelee ? MELEE_SWITCH_MULT : RANGED_SWITCH_MULT);
     if (t > needed) {
       best = e;

@@ -1,10 +1,18 @@
-import { describe, it, expect } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { terrainHeight } from '../src/sim/world';
-import type { SimEvent } from '../src/sim/types';
+import { describe, expect, it } from 'vitest';
 import { COURSES } from '../src/sim/content/courses';
+import { Sim } from '../src/sim/sim';
+import type { SimEvent } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
-type P = { pos: { x: number; y: number; z: number }; prevPos: { x: number; y: number; z: number }; mountTier?: number; mountId?: string; kind: string; hostile?: boolean; aiState?: string };
+type P = {
+  pos: { x: number; y: number; z: number };
+  prevPos: { x: number; y: number; z: number };
+  mountTier?: number;
+  mountId?: string;
+  kind: string;
+  hostile?: boolean;
+  aiState?: string;
+};
 
 // A party of `n` flyers staged on open ground, all mounted on a flyer.
 function makeParty(n: number): { sim: Sim; pids: number[] } {
@@ -13,7 +21,8 @@ function makeParty(n: number): { sim: Sim; pids: number[] } {
   for (let i = 0; i < n; i++) {
     const pid = sim.addPlayer('warrior', `Racer${i}`);
     const e = sim.entities.get(pid) as unknown as P;
-    e.pos.x = 40 + i * 0.5; e.pos.z = 40;
+    e.pos.x = 40 + i * 0.5;
+    e.pos.z = 40;
     e.pos.y = terrainHeight(e.pos.x, e.pos.z, sim.cfg.seed);
     e.prevPos = { ...e.pos };
     e.mountTier = 11;
@@ -21,10 +30,17 @@ function makeParty(n: number): { sim: Sim; pids: number[] } {
     pids.push(pid);
   }
   for (const ent of sim.entities.values()) {
-    if (ent.kind === 'mob') { ent.hostile = false; ent.aggroTargetId = null; ent.aiState = 'idle'; }
+    if (ent.kind === 'mob') {
+      ent.hostile = false;
+      ent.aggroTargetId = null;
+      ent.aiState = 'idle';
+    }
   }
   // leader (pid 0) invites the rest into a party
-  for (let i = 1; i < n; i++) { sim.partyInvite(pids[i], pids[0]); sim.partyAccept(pids[i]); }
+  for (let i = 1; i < n; i++) {
+    sim.partyInvite(pids[i], pids[0]);
+    sim.partyAccept(pids[i]);
+  }
   return { sim, pids };
 }
 
@@ -33,7 +49,9 @@ function driveThroughCourse(sim: Sim, pid: number): SimEvent[] {
   const def = COURSES.skytrial_vale;
   const evs: SimEvent[] = [];
   for (const gate of def.checkpoints) {
-    e.pos.x = gate.x; e.pos.y = gate.y; e.pos.z = gate.z;
+    e.pos.x = gate.x;
+    e.pos.y = gate.y;
+    e.pos.z = gate.z;
     for (const ev of sim.tick()) evs.push(ev);
   }
   return evs;
@@ -63,7 +81,9 @@ describe('multi-racer races', () => {
     driveThroughCourse(sim, pids[1]);
     const fin2 = driveThroughCourse(sim, pids[2]);
     // the last finisher closes the race → everyone gets a raceResult with a place
-    const results = fin2.filter((e): e is Extract<SimEvent, { type: 'raceResult' }> => e.type === 'raceResult');
+    const results = fin2.filter(
+      (e): e is Extract<SimEvent, { type: 'raceResult' }> => e.type === 'raceResult',
+    );
     expect(results.length).toBe(3);
     const placeByPid = new Map(results.map((e) => [e.pid, e.place]));
     expect(placeByPid.get(pids[0])).toBe(1);
@@ -86,7 +106,9 @@ describe('multi-racer races', () => {
     sim.tick();
     // racer0 finishes; the race resolves with racer1 DNF
     const evs = driveThroughCourse(sim, pids[0]);
-    const results = evs.filter((e): e is Extract<SimEvent, { type: 'raceResult' }> => e.type === 'raceResult');
+    const results = evs.filter(
+      (e): e is Extract<SimEvent, { type: 'raceResult' }> => e.type === 'raceResult',
+    );
     expect(results.length).toBe(2);
     expect(results.find((e) => e.pid === pids[0])!.place).toBe(1);
     expect(results.find((e) => e.pid === pids[1])!.place).toBe(0); // DNF
