@@ -929,7 +929,11 @@ describe('delve reward chest + surface exit flow', () => {
 
   it('the Bountiful roll is deterministic for a given seed', () => {
     // Read the raw roll via enterReliquary (enterFinale pins it false). Same seed
-    // ⇒ same outcome; seed 42 is known to roll Bountiful (drives the fixtures above).
+    // gives the same outcome; seed 14 is known to roll Bountiful. Re-baselined
+    // from seed 42 after the Emberdeep Foundry content add shifted the shared rng
+    // stream during world init (foundry camps consume extra draws), which changed
+    // what seed 42 rolls here: re-pin this constant whenever new world content
+    // shifts the shared stream, same as this repo's parity golden regens.
     const rollFor = (seed: number) => {
       const s = makeSim('warrior', seed);
       s.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
@@ -937,7 +941,7 @@ describe('delve reward chest + surface exit flow', () => {
       return s.delveRunForPlayer(s.playerId)?.bountiful;
     };
     expect(rollFor(1234)).toBe(rollFor(1234));
-    expect(rollFor(42)).toBe(true);
+    expect(rollFor(14)).toBe(true);
   });
 
   it('a Bountiful Coffer refuses the lower antes and only opens at Hard-tier + Premium ante', () => {
@@ -2357,7 +2361,19 @@ describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
     const pulse = (affixes: string[]) => {
       const sim = makeSim('warrior');
       enterLitany(sim, 'normal');
+      // Explicitly pinned (not seed-derived): enterModule always resolves to
+      // litany_baptistry regardless of the shared rng stream.
       const run = enterModule(sim, 'litany_baptistry');
+      // Kill the module's trash so its melee swings can't land on the player
+      // during the pulse window and contaminate the pure blackwater-damage
+      // measurement below (the baptistry spawns deepfen_spearjaw mobs a few
+      // yards from this hazard zone; the Emberdeep Foundry content add shifted
+      // the shared rng stream enough that they now reach and hit the player
+      // inside the 20-tick window where they previously didn't).
+      for (const id of [...run.mobIds]) {
+        const mob = sim.entities.get(id);
+        if (mob) mob.dead = true;
+      }
       run.affixes = affixes;
       run.blackwaterTimer = 0;
       const h = DELVE_MODULES.litany_baptistry.hazards![0];
