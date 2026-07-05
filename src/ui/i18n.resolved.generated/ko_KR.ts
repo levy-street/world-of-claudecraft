@@ -2500,7 +2500,7 @@ export const ko_KR: EnTranslations = {
     "copyright": "2026 World of ClaudeCraft",
     "githubLink": "https://github.com/levy-street/world-of-claudecraft",
     "githubLabel": "오픈 소스 프로젝트",
-    "whitepaper": "Whitepaper",
+    "whitepaper": "백서",
     "terms": "서비스 이용약관",
     "privacy": "개인정보 처리방침",
     "discordLabel": "Discord 참여하기"

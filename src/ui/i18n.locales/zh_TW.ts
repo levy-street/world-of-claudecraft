@@ -507,6 +507,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.githubLabel': '開源專案',
+  'footer.whitepaper': '白皮書',
   'footer.terms': '服務條款',
   'footer.privacy': '隱私權政策',
   'footer.discordLabel': '加入Discord社區',

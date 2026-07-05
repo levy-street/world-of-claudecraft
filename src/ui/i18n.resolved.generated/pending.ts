@@ -10,7 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "footer.whitepaper",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -26,7 +25,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.title"
   ],
   "es_ES": [
-    "footer.whitepaper",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -42,7 +40,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.title"
   ],
   "fr_FR": [
-    "footer.whitepaper",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -58,7 +55,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.title"
   ],
   "fr_CA": [
-    "footer.whitepaper",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -75,7 +71,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
-    "footer.whitepaper",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -91,7 +86,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.title"
   ],
   "de_DE": [
-    "footer.whitepaper",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -106,20 +100,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title"
   ],
-  "zh_CN": [
-    "footer.whitepaper"
-  ],
-  "zh_TW": [
-    "footer.whitepaper"
-  ],
-  "ko_KR": [
-    "footer.whitepaper"
-  ],
-  "ja_JP": [
-    "footer.whitepaper"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
-    "footer.whitepaper",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -134,9 +119,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title"
   ],
-  "ru_RU": [
-    "footer.whitepaper"
-  ],
+  "ru_RU": [],
   "nl_NL": [
     "entities.items.charter_ashmane.name",
     "entities.items.charter_bronzeflank.name",

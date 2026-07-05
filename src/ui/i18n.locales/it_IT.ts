@@ -1183,6 +1183,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.githubLabel': 'Progetto open source',
+  'footer.whitepaper': 'Libro bianco',
   'footer.terms': 'Termini di servizio',
   'footer.privacy': 'Informativa sulla privacy',
   'footer.discordLabel': 'Entra nel Discord',

@@ -529,6 +529,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 World of ClaudeCraft',
   'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.githubLabel': '오픈 소스 프로젝트',
+  'footer.whitepaper': '백서',
   'footer.terms': '서비스 이용약관',
   'footer.privacy': '개인정보 처리방침',
   'footer.discordLabel': 'Discord 참여하기',
