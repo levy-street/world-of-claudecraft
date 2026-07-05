@@ -169,7 +169,7 @@ Useful overrides:
 GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
 GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch
 GLITCH_BUILD_TYPE=playtest npm run deploy:glitch
-GLITCH_DEPLOY_VERSION=0.20.5 npm run deploy:glitch
+GLITCH_DEPLOY_VERSION=0.20.6 npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=iframe npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=wasm npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_GAME_API_ORIGIN=https://dev.worldofclaudecraft.com npm run deploy:glitch
