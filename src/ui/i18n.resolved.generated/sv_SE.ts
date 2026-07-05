@@ -6897,6 +6897,16 @@ export const sv_SE: EnTranslations = {
         "title": "De dödas väktare",
         "greeting": "Vila nu, ande. Jag kan återbörda dig till din kropp, men överfarten tillbaka lämnar dig svag."
       },
+      "logol": {
+        "name": "Logol",
+        "title": "{{,,,}}",
+        "greeting": "You see me, then. Few do. I carry what gold cannot buy, stranger, only $WOC."
+      },
+      "logol_harbinger": {
+        "name": "Harbinger of the Nameless Order",
+        "title": "{{,,,}}",
+        "greeting": "A cloaked one walks the realm, seen only by eyes that have learned to look. Would you learn?"
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tidvattenväktare",
@@ -7703,6 +7713,36 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Skogsvarg dödad"
+          }
+        }
+      },
+      "q_logol_rumor": {
+        "title": "A Rumor of Logol",
+        "text": "They say a merchant walks between the moments. Sit with me, and I will tell you how to see him.",
+        "completion": "Good. The rumor is in you now. It will not leave.",
+        "objectives": {
+          "0": {
+            "label": "Hear the Harbinger out"
+          }
+        }
+      },
+      "q_logol_sign": {
+        "title": "The Sign in the Eye",
+        "text": "To see the unseen you must attune your eye. Walk a while, then return, and I will mark you.",
+        "completion": "The mark is set. Your eye is ready.",
+        "objectives": {
+          "0": {
+            "label": "Return to the Harbinger to be marked"
+          }
+        }
+      },
+      "q_logol_seen": {
+        "title": "Seen and Unseen",
+        "text": "It is done. When next you cross paths with the cloaked one, he will trade with you. Go, and watch the edges of the world.",
+        "completion": "Now you see him. His ledger is open to you. Spend wisely.",
+        "objectives": {
+          "0": {
+            "label": "Accept the Nameless Order sight"
           }
         }
       },

@@ -5993,4 +5993,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '약초학',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
+  'entities.npcs.logol.name': "로골",
+  'entities.npcs.logol.greeting': "나를 볼 수 있군. 그런 자는 드물지. 황금으로 살 수 없는 것을 지녔다, 나그네여. 값은 오직 $WOC 뿐이다.",
+  'entities.npcs.logol_harbinger.name': "이름 없는 결사의 선구자",
+  'entities.npcs.logol_harbinger.greeting': "망토를 두른 자가 이 땅을 걷는다. 보는 법을 익힌 눈에만 보이지. 배우겠는가?",
+  'entities.quests.q_logol_rumor.title': "로골의 소문",
+  'entities.quests.q_logol_rumor.text': "순간과 순간 사이를 걷는 상인이 있다더군. 앉게, 그를 보는 법을 일러주지.",
+  'entities.quests.q_logol_rumor.completion': "좋아. 소문은 이제 네 안에 있다. 떠나지 않을 것이다.",
+  'entities.quests.q_logol_rumor.objectives.0.label': "선구자의 말을 끝까지 듣기",
+  'entities.quests.q_logol_sign.text': "보이지 않는 것을 보려면 눈을 벼려야 한다. 잠시 걷다 돌아오라, 내가 표식을 새겨주마.",
+  'entities.quests.q_logol_sign.completion': "표식이 새겨졌다. 네 눈이 준비되었다.",
+  'entities.quests.q_logol_sign.objectives.0.label': "선구자에게 돌아가 표식 받기",
+  'entities.quests.q_logol_seen.title': "보이는 것과 보이지 않는 것",
+  'entities.quests.q_logol_seen.text': "이루어졌다. 다음에 망토를 두른 자와 마주치면 그가 너와 거래하리라. 가라, 세상의 가장자리를 지켜보라.",
+  'entities.quests.q_logol_seen.completion': "이제 그가 보인다. 그의 장부가 네게 열렸다. 현명하게 쓰라.",
+  'entities.quests.q_logol_seen.objectives.0.label': "이름 없는 결사의 시야를 받아들이기",
 };

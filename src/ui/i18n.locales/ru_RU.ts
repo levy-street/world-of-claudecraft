@@ -6119,4 +6119,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Травничество',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
+  'entities.npcs.logol.name': "Логол",
+  'entities.npcs.logol.greeting': "Значит, ты меня видишь. Немногим дано. Я несу то, что не купить золотом, странник, только за $WOC.",
+  'entities.npcs.logol_harbinger.name': "Предвестник Безымянного ордена",
+  'entities.npcs.logol_harbinger.greeting': "Некто в плаще бродит по этому краю, видимый лишь глазам, что научились смотреть. Хочешь научиться?",
+  'entities.quests.q_logol_rumor.title': "Слух о Логоле",
+  'entities.quests.q_logol_rumor.text': "Говорят, некий торговец ходит между мгновениями. Присядь, и я расскажу, как его увидеть.",
+  'entities.quests.q_logol_rumor.completion': "Хорошо. Теперь слух в тебе. Он не уйдёт.",
+  'entities.quests.q_logol_rumor.objectives.0.label': "Выслушать Предвестника",
+  'entities.quests.q_logol_sign.text': "Чтобы увидеть незримое, настрой свой взор. Пройдись немного, затем вернись, и я отмечу тебя.",
+  'entities.quests.q_logol_sign.completion': "Метка поставлена. Твой взор готов.",
+  'entities.quests.q_logol_sign.objectives.0.label': "Вернуться к Предвестнику за меткой",
+  'entities.quests.q_logol_seen.title': "Зримое и незримое",
+  'entities.quests.q_logol_seen.text': "Свершилось. Когда снова встретишь того, кто в плаще, он будет торговать с тобой. Ступай и смотри на края мира.",
+  'entities.quests.q_logol_seen.completion': "Теперь ты видишь его. Его книга открыта тебе. Трать с умом.",
+  'entities.quests.q_logol_seen.objectives.0.label': "Принять взор Безымянного ордена",
 };

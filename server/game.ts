@@ -101,6 +101,7 @@ import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { TickProfiler } from './tick_profiler';
 import { holderInfoForPubkey } from './woc_balance';
+import { LOGOL_ENABLED } from './woc_config';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const WORLD_SEED = 20061;
@@ -826,6 +827,10 @@ export class GameServer {
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
       worldBossAtBoot: true,
+      // Roaming merchant Logol appears only when the feature is enabled; keeping
+      // it off leaves the sim's tick draw order byte-identical (see
+      // src/sim/logol_roam.ts + docs/prd/woc/logol-merchant.md).
+      logolEnabled: LOGOL_ENABLED,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).

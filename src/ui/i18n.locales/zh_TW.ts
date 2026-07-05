@@ -5675,4 +5675,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '藥草學',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
+  'entities.npcs.logol.name': "洛戈爾",
+  'entities.npcs.logol.greeting': "你竟能看見我。少有人能。我帶著黃金買不到的東西，陌生人，只收 $WOC。",
+  'entities.npcs.logol_harbinger.name': "無名之序的先驅",
+  'entities.npcs.logol_harbinger.greeting': "一位披斗篷者行走於世間，唯有學會觀看的眼睛才能看見他。你願意學嗎？",
+  'entities.quests.q_logol_rumor.title': "洛戈爾的傳聞",
+  'entities.quests.q_logol_rumor.text': "據說有位商人行走於時刻之間。坐下來，我會告訴你如何看見他。",
+  'entities.quests.q_logol_rumor.completion': "很好。傳聞已入你心，它不會離去。",
+  'entities.quests.q_logol_rumor.objectives.0.label': "聽先驅把話說完",
+  'entities.quests.q_logol_sign.text': "要看見不可見之物，你須調校你的眼。走上一程，再回來，我便為你留印。",
+  'entities.quests.q_logol_sign.completion': "印記已成。你的眼已就緒。",
+  'entities.quests.q_logol_sign.objectives.0.label': "回到先驅處受印",
+  'entities.quests.q_logol_seen.title': "所見與不可見",
+  'entities.quests.q_logol_seen.text': "大功告成。當你再與披斗篷者相遇，他便會與你交易。去吧，留意世界的邊緣。",
+  'entities.quests.q_logol_seen.completion': "現在你能看見他了。他的帳簿向你敞開。花得明智些。",
+  'entities.quests.q_logol_seen.objectives.0.label': "接受無名之序的視界",
 };

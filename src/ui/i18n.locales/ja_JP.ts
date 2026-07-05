@@ -6003,4 +6003,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '薬草学',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
+  'entities.npcs.logol.name': "ロゴル",
+  'entities.npcs.logol.greeting': "私が見えるのか。見える者は少ない。黄金では買えぬ品を携えている、旅人よ。支払いは $WOC のみだ。",
+  'entities.npcs.logol_harbinger.name': "無名の団の先触れ",
+  'entities.npcs.logol_harbinger.greeting': "外套をまとった者がこの地を歩く。見ることを学んだ目にのみ映る。学ぶ気はあるか。",
+  'entities.quests.q_logol_rumor.title': "ロゴルの噂",
+  'entities.quests.q_logol_rumor.text': "瞬間の狭間を歩む商人がいるという。ここに座れ、彼を見る術を教えよう。",
+  'entities.quests.q_logol_rumor.completion': "よし。噂はもうお前の中にある。消えはしない。",
+  'entities.quests.q_logol_rumor.objectives.0.label': "先触れの話を最後まで聞く",
+  'entities.quests.q_logol_sign.text': "見えぬものを見るには、目を整えねばならぬ。しばし歩き、戻ってこい。印を授けよう。",
+  'entities.quests.q_logol_sign.completion': "印は刻まれた。お前の目は整った。",
+  'entities.quests.q_logol_sign.objectives.0.label': "先触れのもとへ戻り印を受ける",
+  'entities.quests.q_logol_seen.title': "見えるものと見えざるもの",
+  'entities.quests.q_logol_seen.text': "成った。次に外套の者と行き会えば、彼はお前と取引する。行け、世界の縁に目を凝らせ。",
+  'entities.quests.q_logol_seen.completion': "今やお前には彼が見える。彼の帳簿は開かれた。賢く使え。",
+  'entities.quests.q_logol_seen.objectives.0.label': "無名の団の眼を受け入れる",
 };

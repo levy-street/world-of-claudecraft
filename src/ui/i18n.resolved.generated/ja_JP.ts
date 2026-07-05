@@ -6897,6 +6897,16 @@ export const ja_JP: EnTranslations = {
         "title": "死者の番人",
         "greeting": "安らかに、魂よ。亡骸に戻すことはできるが、戻る道のりで弱ってしまうだろう。"
       },
+      "logol": {
+        "name": "ロゴル",
+        "title": "{{,,,}}",
+        "greeting": "私が見えるのか。見える者は少ない。黄金では買えぬ品を携えている、旅人よ。支払いは $WOC のみだ。"
+      },
+      "logol_harbinger": {
+        "name": "無名の団の先触れ",
+        "title": "{{,,,}}",
+        "greeting": "外套をまとった者がこの地を歩く。見ることを学んだ目にのみ映る。学ぶ気はあるか。"
+      },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
         "title": "潮見の番人",
@@ -7703,6 +7713,36 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フォレストウルフを討伐"
+          }
+        }
+      },
+      "q_logol_rumor": {
+        "title": "ロゴルの噂",
+        "text": "瞬間の狭間を歩む商人がいるという。ここに座れ、彼を見る術を教えよう。",
+        "completion": "よし。噂はもうお前の中にある。消えはしない。",
+        "objectives": {
+          "0": {
+            "label": "先触れの話を最後まで聞く"
+          }
+        }
+      },
+      "q_logol_sign": {
+        "title": "The Sign in the Eye",
+        "text": "見えぬものを見るには、目を整えねばならぬ。しばし歩き、戻ってこい。印を授けよう。",
+        "completion": "印は刻まれた。お前の目は整った。",
+        "objectives": {
+          "0": {
+            "label": "先触れのもとへ戻り印を受ける"
+          }
+        }
+      },
+      "q_logol_seen": {
+        "title": "見えるものと見えざるもの",
+        "text": "成った。次に外套の者と行き会えば、彼はお前と取引する。行け、世界の縁に目を凝らせ。",
+        "completion": "今やお前には彼が見える。彼の帳簿は開かれた。賢く使え。",
+        "objectives": {
+          "0": {
+            "label": "無名の団の眼を受け入れる"
           }
         }
       },
