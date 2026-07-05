@@ -26,6 +26,12 @@ export interface SeasonOps {
   closeSeason(seasonId: number): Promise<void>;
 }
 
+// LP staking ops, injected the same way (absent when the LP flag is off, so the
+// endpoint 404s exactly like an unconfigured secret).
+export interface LpOps {
+  runEpoch(): Promise<unknown>;
+}
+
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
 }
@@ -80,6 +86,7 @@ export async function handleInternalApi(
   res: http.ServerResponse,
   game: GameServer,
   seasonOps?: SeasonOps,
+  lpOps?: LpOps,
 ): Promise<void> {
   const url = new URL(req.url ?? '/', 'http://localhost');
 
@@ -118,6 +125,18 @@ export async function handleInternalApi(
     if (!Number.isInteger(seasonId)) return fail(res, 400, 'seasonId must be an integer');
     await seasonOps.closeSeason(seasonId);
     return ok(res, { seasonId, closed: true });
+  }
+
+  // Force one LP staking epoch cycle (ops/debug; the interval runner is the
+  // normal path). Result is whatever the runner reports (ran/reason/emission).
+  // POST-only, like the season ops above (v0.21.0 moved method checks
+  // per-endpoint, so this one carries its own).
+  if (url.pathname === '/internal/woc/lp/epoch') {
+    if (req.method !== 'POST') return fail(res, 404, 'unknown endpoint');
+    if (!lpOps) return fail(res, 404, 'unknown endpoint');
+    if (!authorize(req, res, 'WOC_OPS_SECRET', 'x-woc-ops-secret')) return;
+    const result = await lpOps.runEpoch();
+    return ok(res, result ?? { skipped: 'another process holds the epoch lock' });
   }
 
   if (url.pathname.startsWith('/internal/discord/')) {

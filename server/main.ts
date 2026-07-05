@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
+import { PublicKey } from '@solana/web3.js';
 import { type WebSocket, WebSocketServer } from 'ws';
 import {
   LEADERBOARD_MAX,
@@ -126,6 +127,10 @@ import {
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
+import { buildLpStakingService } from './lp_staking_boot';
+import { withLpEpochLock } from './lp_staking_db';
+import { handleLpTxBuild } from './lp_staking_routes';
+import type { LpStakingService } from './lp_staking_service';
 import {
   MAX_MAP_SAVE_BYTES,
   MapsService,
@@ -188,6 +193,7 @@ import {
   handleWalletLink,
   handleWalletUnlink,
 } from './wallet';
+import { isSolanaAddress } from './wallet_link';
 import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { WOC_DECIMALS } from './woc_config';
@@ -198,6 +204,14 @@ const PORT = Number(process.env.PORT ?? 8787);
 // How often the buyback keeper ticks. Its own policy decides whether a tick does
 // anything (threshold / cadence / fee floor), so this is just the poll interval.
 const PAYOUT_KEEPER_TICK_MS = Number(process.env.BUYBACK_KEEPER_TICK_MS ?? 5 * 60 * 1000);
+// How often the LP staking epoch runner polls. The service itself decides
+// whether an epoch is due (one per WOC_LP_EPOCH_SECONDS window), so this is
+// just the poll interval, like the keeper tick above.
+const LP_EPOCH_TICK_MS = Number(process.env.WOC_LP_EPOCH_TICK_MS ?? 60 * 1000);
+// The LP staking service, or null when the flag is off (the default: rail dark).
+let lpStaking: LpStakingService | null = null;
+// /api/woc/lp is public; a short TTL keeps the (DB + ledger) read off the hot path.
+let lpSummaryCache: { at: number; body: unknown } | null = null;
 // /api/woc/season is public and polled by every client; SeasonBodyCache keeps the
 // (cheap) read off the DB hot path with a short TTL. Season + pool change slowly,
 // so a few seconds of staleness is fine.
@@ -1513,6 +1527,31 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const { owner, fresh } = parseWocBalanceQuery(req.url ?? '');
       return handleWocBalance(res, owner, fresh);
     }
+    // LP staking vault. Every route 404s while the flag is off (rail dark).
+    // Reads are public; the tx builders return UNSIGNED transactions the staker
+    // signs in their own wallet (non-custodial), rate-limited like the balance
+    // proxy because they touch the RPC.
+    if (req.method === 'GET' && url === '/api/woc/lp') {
+      if (!lpStaking) return json(res, 404, { error: 'unknown endpoint' });
+      if (!lpSummaryCache || Date.now() - lpSummaryCache.at > 5000) {
+        lpSummaryCache = { at: Date.now(), body: await lpStaking.summary() };
+      }
+      return json(res, 200, lpSummaryCache.body);
+    }
+    if (req.method === 'GET' && url.startsWith('/api/woc/lp/position')) {
+      if (!lpStaking) return json(res, 404, { error: 'unknown endpoint' });
+      if (wocBalanceRateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      const owner = new URL(req.url ?? '/', 'http://localhost').searchParams.get('owner');
+      if (!isSolanaAddress(owner))
+        return json(res, 400, { error: 'owner must be a Solana address' });
+      const view = await lpStaking.positionView(new PublicKey(owner));
+      return json(res, 200, { position: view });
+    }
+    if (req.method === 'POST' && url.startsWith('/api/woc/lp/tx/')) {
+      if (!lpStaking) return json(res, 404, { error: 'unknown endpoint' });
+      if (wocBalanceRateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      return handleLpTxBuild(req, res, lpStaking, url.split('?')[0]);
+    }
     // Public read of the current $WOC reward season + its pool (verified sinks −
     // emissions = $WOC available to pay out this season). Derived from
     // on-chain-verified flows; { season: null } when no season is open.
@@ -1800,6 +1839,32 @@ async function main(): Promise<void> {
   await game.loadChatFilter();
   await game.loadBlockedIps();
   await game.bootArenaWager();
+  // LP staking vault (flag-gated OFF by default; buildLpStakingService returns
+  // null when WOC_LP_STAKING_ENABLED is unset and throws on a half-config).
+  lpStaking = await buildLpStakingService();
+  if (lpStaking) {
+    const lp = lpStaking;
+    let lpBusy = false;
+    const lpTick = async () => {
+      if (lpBusy) return;
+      lpBusy = true;
+      try {
+        const r = await withLpEpochLock(() => lp.runEpochIfDue());
+        if (r?.ran) {
+          console.log(
+            `[lp] epoch ${r.epochId}: emission=${r.emissionBase} forfeited=${r.forfeitedBase} stakers=${r.stakers}${r.reason ? ` (${r.reason})` : ''}`,
+          );
+        }
+      } catch (err) {
+        console.error('lp staking epoch failed:', err);
+      } finally {
+        lpBusy = false;
+      }
+    };
+    void lpTick();
+    setInterval(() => void lpTick(), LP_EPOCH_TICK_MS).unref();
+    console.log(`lp staking enabled (pool ${lpStaking.pool()})`);
+  }
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
     .then((count) => recordSitePresenceSample(count))
@@ -1908,7 +1973,29 @@ async function main(): Promise<void> {
     if (url.startsWith('/internal/')) {
       void (async () => {
         if (await handleDailyRewardInternalApi(req, res)) return;
-        await handleInternalApi(req, res, game, { openSeason, closeSeason });
+        await handleInternalApi(
+          req,
+          res,
+          game,
+          { openSeason, closeSeason },
+          lpStaking
+            ? {
+                runEpoch: async () => {
+                  const r = await withLpEpochLock(() => lpStaking!.runEpochIfDue());
+                  if (!r) return null;
+                  // bigint fields serialized as strings for the JSON response
+                  return {
+                    ran: r.ran,
+                    reason: r.reason ?? null,
+                    epochId: r.epochId?.toString() ?? null,
+                    emissionBase: r.emissionBase?.toString() ?? null,
+                    forfeitedBase: r.forfeitedBase?.toString() ?? null,
+                    stakers: r.stakers ?? null,
+                  };
+                },
+              }
+            : undefined,
+        );
       })();
     } else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);

@@ -37,15 +37,18 @@ export type FlowSource =
   | 'recirculated_rake' //       rake explicitly recirculated to fund #480
   | 'marketplace_buyback' //     protocol revenue bought $WOC on-market (real buy pressure)
   | 'identity_treasury' //       identity-fee treasury split swept in
+  | 'lp_forfeit_recycle' //      LP staking unvested accruals forfeited on unstake, returned to headroom
   // ---- outflows (emissions: sell pressure) ----
   | 'gamblefi_payout' //         #478 winner take (<= the two stakes, minus burn)
   | 'championship_prize' //      #479 graduated top-N prize
-  | 'leaderboard_payout'; //     #480 seasonal reward
+  | 'leaderboard_payout' //      #480 seasonal reward
+  | 'lp_emission'; //            LP staking epoch accrual reservation (bounded by inflows)
 
 const OUTFLOW_SOURCES: ReadonlySet<FlowSource> = new Set<FlowSource>([
   'gamblefi_payout',
   'championship_prize',
   'leaderboard_payout',
+  'lp_emission',
 ]);
 
 /** Which side of the ledger a source belongs to (pure). */

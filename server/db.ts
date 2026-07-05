@@ -10,6 +10,7 @@ import { DISCORD_SCHEMA } from './discord_db';
 import { FLOW_LEDGER_SCHEMA } from './flow_ledger_db';
 import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
+import { LP_STAKING_SCHEMA } from './lp_staking_db';
 import { MAPS_SCHEMA } from './maps_db';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { BUYBACK_BATCHES_SCHEMA } from './payout_db';
@@ -598,6 +599,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query(FLOW_LEDGER_SCHEMA);
     await client.query(BUYBACK_BATCHES_SCHEMA);
     await client.query(WAGER_MATCH_SCHEMA);
+    await client.query(LP_STAKING_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
     // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
     // unconditionally (idempotent) so the tables exist before the feature is
