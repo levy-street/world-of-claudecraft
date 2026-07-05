@@ -1,0 +1,21 @@
+[package]
+name = "woc_lp_vault"
+version = "0.1.0"
+description = "Non-custodial $WOC LP staking vault: per-staker time-locked LP token custody backing the off-chain veLP reward accrual (rewards flow through the woc_escrow distribution + flow ledger, never here)"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "woc_lp_vault"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = "0.30.1"
+anchor-spl = "0.30.1"
