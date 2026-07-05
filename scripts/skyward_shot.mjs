@@ -24,9 +24,17 @@ await page.waitForSelector('#btn-offline', { timeout: 15000 });
 await page.evaluate(() => document.querySelector('#btn-offline').click());
 await sleep(200);
 await page.type('#char-name', 'Aviar');
-await page.click('#offline-select .mini-class[data-class="warrior"]');
-await page.click('#btn-start-offline');
-await sleep(2800);
+await page.evaluate(() =>
+  document.querySelector('#offline-select .mini-class[data-class="warrior"]').click(),
+);
+await page.evaluate(() => document.querySelector('#btn-start-offline').click());
+await page.waitForFunction(
+  () =>
+    window.__game?.sim?.player &&
+    getComputedStyle(document.querySelector('#ui')).display !== 'none',
+  { timeout: 120000 },
+);
+await sleep(600);
 
 const offered = await page.evaluate(() => {
   const g = window.__game;
