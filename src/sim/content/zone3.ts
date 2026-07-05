@@ -2713,7 +2713,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'legendary',
     weapon: { min: 46, max: 74, speed: 2.8 },
-    stats: { str: 24, sta: 20 },
+    stats: { str: 24, agi: 15, sta: 20 },
     sellValue: 25000,
     requiredClass: ['warrior', 'paladin'],
   },

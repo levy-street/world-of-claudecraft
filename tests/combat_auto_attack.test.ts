@@ -185,7 +185,7 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     p.swingTimer = 0;
     const events = capture(sim);
     updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(p.swingTimer).toBeGreaterThan(0); // reset to ranged.speed * swingIntervalMult (at fire time)
+    expect(p.swingTimer).toBeGreaterThan(0); // reset to the weapon's speed * swingIntervalMult (at fire time)
     landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
   });
@@ -209,6 +209,55 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     p.swingTimer = 1;
     updatePlayerAutoAttack(sim.ctx, p, meta);
     expect(p.swingTimer).toBeLessThan(1); // the decrement runs before the !autoAttack bail
+  });
+});
+
+describe('auto_attack Auto Shot scales off the equipped weapon (ranged DPS)', () => {
+  // A hunter has no separate ranged slot, so Auto Shot fires with the equipped
+  // weapon: its cadence follows the weapon's speed (not the class ranged speed),
+  // and its damage follows the weapon's damage range (its DPS), on top of the
+  // agility-driven ranged attack power.
+  it('arms the cadence from the equipped weapon speed, not the class ranged speed', () => {
+    const { sim, p, meta } = makeSim('hunter', 20);
+    spawnDummy(sim, p, 20, 20); // beyond the 8yd dead zone, within 35
+    // A deliberately slow bow, distinct from the class ranged speed (2.3).
+    p.weapon = { min: 40, max: 60, speed: 4 };
+    p.rangedHaste = 0;
+    p.autoAttack = true;
+    p.swingTimer = 0;
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(p.swingTimer).toBeCloseTo(4 * sim.swingIntervalMult(p));
+    // and NOT the old class-fixed 2.3 cadence
+    expect(p.swingTimer).not.toBeCloseTo(2.3 * sim.swingIntervalMult(p));
+  });
+
+  it('a heavier-hitting weapon yields a bigger Auto Shot than a weak one', () => {
+    const shoot = (weaponMin: number, weaponMax: number): number => {
+      const { sim, p, meta } = makeSim('hunter', 20, 3);
+      const mob = spawnDummy(sim, p, 1, 20); // far below level -> floored miss chance
+      mob.armor = 0; // isolate the weapon-damage signal from armor mitigation
+      p.critChance = 0; // no crit variance
+      p.weapon = { min: weaponMin, max: weaponMax, speed: 2 };
+      p.autoAttack = true;
+      const events = capture(sim);
+      let best = 0;
+      // fire several shots so at least one lands past the floored miss chance
+      for (let s = 0; s < 12; s++) {
+        p.swingTimer = 0;
+        updatePlayerAutoAttack(sim.ctx, p, meta);
+        landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+      }
+      for (const e of events) {
+        if (e.type === 'damage' && e.ability === 'Auto Shot' && e.kind === 'hit') {
+          best = Math.max(best, e.amount ?? 0);
+        }
+      }
+      return best;
+    };
+    const weak = shoot(2, 4);
+    const strong = shoot(300, 320);
+    expect(weak).toBeGreaterThan(0);
+    expect(strong).toBeGreaterThan(weak * 10);
   });
 });
 
