@@ -1,9 +1,10 @@
 import * as THREE from 'three';
-import { CharacterVisual } from './visual';
-import { creatorSkinTexture } from './assets';
+import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
-import { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
+import { creatorSkinTexture } from './assets';
+import { VISUALS } from './manifest';
+import { CharacterVisual } from './visual';
 
 // ---------------------------------------------------------------------------
 // Portrait factory — a 2D "profile photo" rendered from the real 3D character
@@ -62,7 +63,12 @@ void assetsReady()
 function ensureRig(): void {
   if (renderer) return;
   const canvas = document.createElement('canvas');
-  renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+  renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true,
+    preserveDrawingBuffer: true,
+  });
   renderer.setPixelRatio(1);
   renderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
   renderer.shadowMap.enabled = false;
@@ -91,7 +97,11 @@ function ensureRig(): void {
  * GLBs are not preloaded yet. Cached after the first render. Callers should
  * fall back to a class crest while null and upgrade via {@link onPortraitsReady}.
  */
-export function playerPortraitDataUrl(cls: PlayerClass, skin = 0, creatorSkinId: string | null = null): string | null {
+export function playerPortraitDataUrl(
+  cls: PlayerClass,
+  skin = 0,
+  creatorSkinId: string | null = null,
+): string | null {
   return visualPortraitDataUrl(`player_${cls}`, skin, creatorSkinId);
 }
 
@@ -104,7 +114,11 @@ export function playerPortraitDataUrl(cls: PlayerClass, skin = 0, creatorSkinId:
  * build synchronously; URL atlases need {@link ensureCreatorSkin} first or fall
  * back to the numeric skin) so portraits match the equipped in-world look.
  */
-export function visualPortraitDataUrl(visualKey: string, skin = 0, creatorSkinId: string | null = null): string | null {
+export function visualPortraitDataUrl(
+  visualKey: string,
+  skin = 0,
+  creatorSkinId: string | null = null,
+): string | null {
   const key = creatorSkinId ? `${visualKey}:${skin}:${creatorSkinId}` : `${visualKey}:${skin}`;
   const cached = cache.get(key);
   if (cached) return cached;
@@ -129,8 +143,29 @@ export function visualPortraitDataUrl(visualKey: string, skin = 0, creatorSkinId
     scratchBox.setFromObject(visual.root);
     scratchBox.getCenter(scratchCenter);
     scratchBox.getSize(scratchSize);
+    // Box3.setFromObject reads skinned geometry in bind space through the node
+    // matrices, which some rigs (the Quaternius raptor, the floating ghost)
+    // report orders of magnitude off, framing the camera on empty space. The
+    // visual root is already normalized to the manifest height with feet at
+    // the origin, so when the measured box is implausible, frame from that
+    // known height instead.
+    const defH = VISUALS[visualKey]?.height ?? 1.8;
+    const implausible =
+      !Number.isFinite(scratchSize.y) ||
+      scratchSize.y < 0.3 * defH ||
+      scratchSize.y > 3 * defH ||
+      Math.abs(scratchCenter.x) > defH ||
+      Math.abs(scratchCenter.z) > defH;
+    if (implausible) {
+      // Generous footprint: long quadrupeds extend well past a biped's, and an
+      // oversized box only backs the camera off a little.
+      scratchBox.min.set(-0.5 * defH, 0, -0.9 * defH);
+      scratchBox.max.set(0.5 * defH, defH, 0.9 * defH);
+      scratchBox.getCenter(scratchCenter);
+      scratchBox.getSize(scratchSize);
+    }
     const h = scratchSize.y || 1.8;
-    const targetY = scratchBox.max.y - 0.30 * h; // look lower so the head/shoulders sit higher in the frame
+    const targetY = scratchBox.max.y - 0.3 * h; // look lower so the head/shoulders sit higher in the frame
     const extent = 0.44 * h; // vertical slice to show: head + shoulders (tighter = subject fills more)
     const dist = extent / 2 / Math.tan((CAM_FOV * Math.PI) / 180 / 2);
     camera!.position.set(scratchCenter.x + 0.04 * h, targetY + 0.02 * h, scratchBox.max.z + dist);

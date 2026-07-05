@@ -233,6 +233,18 @@
     height: var(--app-vh);
     display: block;
     z-index: 0;
+    transition: filter 0.6s ease;
+  }
+  /* Ghost (spirit) mode: drain the world to greyscale, the classic WoW death look.
+     Applied to the 3D canvas only so the HUD / resurrect prompt stay legible. Toggled
+     by the HUD (body.spirit-mode) whenever the local player is a released spirit. */
+  body.spirit-mode #game-canvas {
+    filter: grayscale(1) brightness(0.88);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #game-canvas {
+      transition: none;
+    }
   }
   .click-move-marker {
     position: absolute;

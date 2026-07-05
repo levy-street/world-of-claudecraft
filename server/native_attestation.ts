@@ -1,5 +1,5 @@
-import type { IncomingMessage } from 'node:http';
 import crypto from 'node:crypto';
+import type { IncomingMessage } from 'node:http';
 import { requestIp } from './ratelimit';
 import { isNativeAppRequest } from './web_login_guard';
 
@@ -46,7 +46,9 @@ function base64url(input: Buffer | string): string {
 function parseJsonObject(raw: string): Record<string, unknown> | null {
   try {
     const parsed = JSON.parse(raw) as unknown;
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : null;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : null;
   } catch {
     return null;
   }
@@ -56,6 +58,12 @@ function envSigningPem(raw: string | undefined): string {
   return (raw ?? '').replace(/\\n/g, '\n');
 }
 
+function normalizeBase64Url(value: unknown): string {
+  return typeof value === 'string'
+    ? value.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+    : '';
+}
+
 export function nativeAttestationRequired(env: NodeJS.ProcessEnv = process.env): boolean {
   const v = String(env.NATIVE_ATTESTATION_REQUIRED ?? '').toLowerCase();
   if (v === '1' || v === 'true') return true;
@@ -63,7 +71,10 @@ export function nativeAttestationRequired(env: NodeJS.ProcessEnv = process.env):
   return env.NODE_ENV === 'production';
 }
 
-export function createNativeAttestationChallenge(req: IncomingMessage, action: string): { challengeId: string; nonce: string; expiresInMs: number } {
+export function createNativeAttestationChallenge(
+  req: IncomingMessage,
+  action: string,
+): { challengeId: string; nonce: string; expiresInMs: number } {
   pruneChallenges();
   const challengeId = base64url(crypto.randomBytes(18));
   const nonce = base64url(crypto.randomBytes(32));
@@ -93,12 +104,20 @@ function pruneChallenges(): void {
   }
 }
 
-export async function verifyNativeAttestation(req: IncomingMessage, proof: unknown): Promise<boolean> {
+export async function verifyNativeAttestation(
+  req: IncomingMessage,
+  proof: unknown,
+): Promise<boolean> {
   if (!isNativeAppRequest(req)) return false;
   if (!nativeAttestationRequired()) return true;
   if (!proof || typeof proof !== 'object') return false;
   const src = proof as NativeAttestationProof;
-  if (typeof src.platform !== 'string' || typeof src.challengeId !== 'string' || typeof src.token !== 'string') return false;
+  if (
+    typeof src.platform !== 'string' ||
+    typeof src.challengeId !== 'string' ||
+    typeof src.token !== 'string'
+  )
+    return false;
   const challenge = consumeChallenge(src.challengeId, req);
   if (!challenge) return false;
   if (src.platform === 'android') return verifyAndroidIntegrity(src.token, challenge);
@@ -107,24 +126,29 @@ export async function verifyNativeAttestation(req: IncomingMessage, proof: unkno
 }
 
 async function googleAccessToken(): Promise<string | null> {
-  if (googleTokenCache && googleTokenCache.expiresAt - nowMs() > 60_000) return googleTokenCache.accessToken;
+  if (googleTokenCache && googleTokenCache.expiresAt - nowMs() > 60_000)
+    return googleTokenCache.accessToken;
   const raw = process.env.GOOGLE_PLAY_INTEGRITY_SERVICE_ACCOUNT_JSON;
-  const parsed = raw ? parseJsonObject(raw) as GoogleServiceAccount | null : null;
+  const parsed = raw ? (parseJsonObject(raw) as GoogleServiceAccount | null) : null;
   const googleCredentialField = ['private', 'key'].join('_');
   const clientEmail = parsed?.client_email ?? process.env.GOOGLE_PLAY_INTEGRITY_CLIENT_EMAIL;
-  const signingPem = envSigningPem(String(parsed?.[googleCredentialField] ?? process.env.GOOGLE_PLAY_INTEGRITY_SIGNING_PEM ?? ''));
+  const signingPem = envSigningPem(
+    String(parsed?.[googleCredentialField] ?? process.env.GOOGLE_PLAY_INTEGRITY_SIGNING_PEM ?? ''),
+  );
   const tokenUri = parsed?.token_uri ?? 'https://oauth2.googleapis.com/token';
   if (!clientEmail || !signingPem) return null;
 
   const iat = Math.floor(Date.now() / 1000);
   const jwtHeader = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
-  const jwtPayload = base64url(JSON.stringify({
-    iss: clientEmail,
-    scope: GOOGLE_SCOPE,
-    aud: tokenUri,
-    exp: iat + 3600,
-    iat,
-  }));
+  const jwtPayload = base64url(
+    JSON.stringify({
+      iss: clientEmail,
+      scope: GOOGLE_SCOPE,
+      aud: tokenUri,
+      exp: iat + 3600,
+      iat,
+    }),
+  );
   const signingInput = `${jwtHeader}.${jwtPayload}`;
   const signature = crypto.createSign('RSA-SHA256').update(signingInput).sign(signingPem);
   const assertion = `${signingInput}.${base64url(signature)}`;
@@ -138,7 +162,10 @@ async function googleAccessToken(): Promise<string | null> {
     signal: AbortSignal.timeout(5000),
   });
   if (!res.ok) return null;
-  const data = await res.json().catch(() => null) as { access_token?: string; expires_in?: number } | null;
+  const data = (await res.json().catch(() => null)) as {
+    access_token?: string;
+    expires_in?: number;
+  } | null;
   if (!data?.access_token) return null;
   googleTokenCache = {
     accessToken: data.access_token,
@@ -151,37 +178,44 @@ async function verifyAndroidIntegrity(token: string, challenge: NativeChallenge)
   const accessToken = await googleAccessToken();
   const packageName = process.env.GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME || DEFAULT_PACKAGE_NAME;
   if (!accessToken) return false;
-  const res = await fetch(`https://playintegrity.googleapis.com/v1/${packageName}:decodeIntegrityToken`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
+  const res = await fetch(
+    `https://playintegrity.googleapis.com/v1/${packageName}:decodeIntegrityToken`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ integrity_token: token }),
+      signal: AbortSignal.timeout(7000),
     },
-    body: JSON.stringify({ integrity_token: token }),
-    signal: AbortSignal.timeout(7000),
-  });
+  );
   if (!res.ok) return false;
-  const data = await res.json().catch(() => null) as Record<string, unknown> | null;
+  const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
   const payload = data?.tokenPayloadExternal as Record<string, unknown> | undefined;
   if (!payload) return false;
   const requestDetails = payload.requestDetails as Record<string, unknown> | undefined;
   const appIntegrity = payload.appIntegrity as Record<string, unknown> | undefined;
   const deviceIntegrity = payload.deviceIntegrity as Record<string, unknown> | undefined;
-  if (requestDetails?.nonce !== challenge.nonce) return false;
+  const verdictNonce = typeof requestDetails?.nonce === 'string' ? requestDetails.nonce : '';
+  const normalizedVerdictNonce = normalizeBase64Url(verdictNonce);
+  const normalizedExpectedNonce = normalizeBase64Url(challenge.nonce);
+  if (normalizedVerdictNonce !== normalizedExpectedNonce) return false;
   if (requestDetails?.requestPackageName !== packageName) return false;
   if (appIntegrity?.packageName !== packageName) return false;
   if (appIntegrity?.appRecognitionVerdict !== 'PLAY_RECOGNIZED') return false;
+  const verdictCerts = Array.isArray(appIntegrity?.certificateSha256Digest)
+    ? appIntegrity.certificateSha256Digest.filter((s): s is string => typeof s === 'string')
+    : [];
   const certs = String(process.env.GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS ?? '')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
   if (certs.length > 0) {
-    const verdictCerts = Array.isArray(appIntegrity?.certificateSha256Digest)
-      ? appIntegrity.certificateSha256Digest.filter((s): s is string => typeof s === 'string')
-      : [];
     if (!certs.some((cert) => verdictCerts.includes(cert))) return false;
   }
-  const requiredDevice = process.env.GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT || 'MEETS_DEVICE_INTEGRITY';
+  const requiredDevice =
+    process.env.GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT || 'MEETS_DEVICE_INTEGRITY';
   const deviceVerdicts = Array.isArray(deviceIntegrity?.deviceRecognitionVerdict)
     ? deviceIntegrity.deviceRecognitionVerdict.filter((s): s is string => typeof s === 'string')
     : [];
@@ -228,7 +262,10 @@ async function verifyAppleDeviceCheck(token: string, challengeId: string): Promi
   if (!jwt) return false;
   const bundleId = process.env.APPLE_BUNDLE_ID || DEFAULT_BUNDLE_ID;
   const env = String(process.env.APPLE_DEVICECHECK_ENV ?? 'production').toLowerCase();
-  const base = env === 'development' ? 'https://api.development.devicecheck.apple.com' : 'https://api.devicecheck.apple.com';
+  const base =
+    env === 'development'
+      ? 'https://api.development.devicecheck.apple.com'
+      : 'https://api.devicecheck.apple.com';
   const res = await fetch(`${base}/v1/validate_device_token`, {
     method: 'POST',
     headers: {

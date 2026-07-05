@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { solanaRpc, signatureStatus, fetchFinalizedTransaction } from '../server/solana_rpc';
+import { fetchFinalizedTransaction, signatureStatus, solanaRpc } from '../server/solana_rpc';
 
 // Exercise the real RPC plumbing by stubbing ONLY global fetch (transport). No db,
 // no network. Asserts the request the code issues + the value it decodes.
@@ -22,7 +22,12 @@ describe('solanaRpc — JSON-RPC transport', () => {
     const init = initOf(f);
     expect(init.method).toBe('POST');
     expect((init.headers as Record<string, string>)['Content-Type']).toBe('application/json');
-    expect(JSON.parse(init.body as string)).toEqual({ jsonrpc: '2.0', id: 1, method: 'getThing', params: ['a', { b: 1 }] });
+    expect(JSON.parse(init.body as string)).toEqual({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getThing',
+      params: ['a', { b: 1 }],
+    });
   });
 
   it('returns null on a non-2xx response (429/500)', async () => {
@@ -45,12 +50,20 @@ describe('solanaRpc — JSON-RPC transport', () => {
 
 describe('signatureStatus — landed? via getSignatureStatuses(searchTransactionHistory)', () => {
   it('finalized + no error => confirmed', async () => {
-    stubFetch(() => okJson({ result: { value: [{ confirmationStatus: 'finalized', err: null }] } }));
+    stubFetch(() =>
+      okJson({ result: { value: [{ confirmationStatus: 'finalized', err: null }] } }),
+    );
     expect(await signatureStatus('sig')).toBe('confirmed');
   });
 
   it('landed but reverted (err set) => failed, even if finalized', async () => {
-    stubFetch(() => okJson({ result: { value: [{ confirmationStatus: 'finalized', err: { InstructionError: [0, 'Custom'] } }] } }));
+    stubFetch(() =>
+      okJson({
+        result: {
+          value: [{ confirmationStatus: 'finalized', err: { InstructionError: [0, 'Custom'] } }],
+        },
+      }),
+    );
     expect(await signatureStatus('sig')).toBe('failed');
   });
 
@@ -60,7 +73,9 @@ describe('signatureStatus — landed? via getSignatureStatuses(searchTransaction
   });
 
   it('seen but only confirmed (not yet finalized) => unknown (we only trust finalized)', async () => {
-    stubFetch(() => okJson({ result: { value: [{ confirmationStatus: 'confirmed', err: null }] } }));
+    stubFetch(() =>
+      okJson({ result: { value: [{ confirmationStatus: 'confirmed', err: null }] } }),
+    );
     expect(await signatureStatus('sig')).toBe('unknown');
   });
 
@@ -71,7 +86,8 @@ describe('signatureStatus — landed? via getSignatureStatuses(searchTransaction
     const f = stubFetch(() => okJson({ result: { value: [null] } }));
     await signatureStatus('sigX');
     expect(JSON.parse(initOf(f).body as string)).toMatchObject({
-      method: 'getSignatureStatuses', params: [['sigX'], { searchTransactionHistory: true }],
+      method: 'getSignatureStatuses',
+      params: [['sigX'], { searchTransactionHistory: true }],
     });
   });
 });
@@ -80,8 +96,10 @@ describe('fetchFinalizedTransaction — request contract', () => {
   it('asks getTransaction at finalized/jsonParsed and returns result (or null)', async () => {
     const f = stubFetch(() => okJson({ result: { meta: { err: null } } }));
     expect(await fetchFinalizedTransaction('sig')).toEqual({ meta: { err: null } });
-    expect(JSON.parse(initOf(f).body as string).params)
-      .toEqual(['sig', { commitment: 'finalized', encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 }]);
+    expect(JSON.parse(initOf(f).body as string).params).toEqual([
+      'sig',
+      { commitment: 'finalized', encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 },
+    ]);
     stubFetch(() => notOk(404));
     expect(await fetchFinalizedTransaction('sig')).toBeNull();
   });

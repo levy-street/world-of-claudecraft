@@ -39,10 +39,29 @@ for (const a of process.argv.slice(2)) {
 const arg = (k) => argv.get(k);
 
 // --- config (env + argv), mirroring burn_keeper.ts defaults exactly --------
-const BURN_RPC_URL = (arg('rpc') ?? process.env.BURN_RPC_URL ?? process.env.SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
-const JUPITER_API = (arg('jupiter') ?? process.env.JUPITER_API ?? 'https://quote-api.jup.ag/v6').trim();
-const USDC_MINT = (arg('usdc') ?? process.env.USDC_MINT ?? process.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v').trim();
-const WOC_MINT = (arg('woc') ?? process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth').trim();
+const BURN_RPC_URL = (
+  arg('rpc') ??
+  process.env.BURN_RPC_URL ??
+  process.env.SOLANA_RPC_URL ??
+  'https://api.mainnet-beta.solana.com'
+).trim();
+const JUPITER_API = (
+  arg('jupiter') ??
+  process.env.JUPITER_API ??
+  'https://quote-api.jup.ag/v6'
+).trim();
+const USDC_MINT = (
+  arg('usdc') ??
+  process.env.USDC_MINT ??
+  process.env.VITE_USDC_MINT ??
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+).trim();
+const WOC_MINT = (
+  arg('woc') ??
+  process.env.WOC_MINT ??
+  process.env.VITE_WOC_MINT ??
+  '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
+).trim();
 const BURN_VAULT = (arg('vault') ?? process.env.MARKETPLACE_BURN_VAULT ?? '').trim();
 const SWAP_SIG = (arg('sig') ?? '').trim();
 
@@ -134,10 +153,18 @@ let quoteRaw = null;
         // human-readable USDC-per-WOC using fixed USDC(6) decimals (WOC decimals
         // come from step 3 — we keep this in base units to avoid guessing here).
         const usdcPerWocBaseUnits = Number(QUOTE_AMOUNT) / Number(outWoc);
-        pass(step, `outAmount=${outWoc.toString()} $WOC base units, routePlan length=${route.length}`);
-        info(`implied price: ${QUOTE_AMOUNT.toString()} USDC base units -> ${outWoc.toString()} $WOC base units (${usdcPerWocBaseUnits.toExponential(4)} USDC-bu per $WOC-bu)`);
+        pass(
+          step,
+          `outAmount=${outWoc.toString()} $WOC base units, routePlan length=${route.length}`,
+        );
+        info(
+          `implied price: ${QUOTE_AMOUNT.toString()} USDC base units -> ${outWoc.toString()} $WOC base units (${usdcPerWocBaseUnits.toExponential(4)} USDC-bu per $WOC-bu)`,
+        );
       } else if (!routeOk) {
-        fail(step, 'no route returned (empty/absent routePlan) — $WOC is NOT swappable on Jupiter; keeper premise is broken');
+        fail(
+          step,
+          'no route returned (empty/absent routePlan) — $WOC is NOT swappable on Jupiter; keeper premise is broken',
+        );
       } else {
         fail(step, `outAmount not a positive integer string (got ${JSON.stringify(out)})`);
       }
@@ -154,7 +181,12 @@ let quoteRaw = null;
 {
   const step = '2 swap';
   if (!vaultPubkey) {
-    fail(step, BURN_VAULT ? `MARKETPLACE_BURN_VAULT is not a valid pubkey: ${BURN_VAULT}` : 'MARKETPLACE_BURN_VAULT unset — cannot build a swap tx');
+    fail(
+      step,
+      BURN_VAULT
+        ? `MARKETPLACE_BURN_VAULT is not a valid pubkey: ${BURN_VAULT}`
+        : 'MARKETPLACE_BURN_VAULT unset — cannot build a swap tx',
+    );
   } else if (!quoteRaw) {
     fail(step, 'skipped — step 1 produced no quote to build from');
   } else {
@@ -187,7 +219,10 @@ let quoteRaw = null;
             const tx = VersionedTransaction.deserialize(buf); // never signed, never sent
             const ixCount = tx.message.compiledInstructions.length;
             if (ixCount >= 1) {
-              pass(step, `swapTransaction parsed (base64, ${buf.length} bytes); ${ixCount} instruction(s); NOT signed, NOT sent`);
+              pass(
+                step,
+                `swapTransaction parsed (base64, ${buf.length} bytes); ${ixCount} instruction(s); NOT signed, NOT sent`,
+              );
             } else {
               fail(step, 'deserialized swap tx has 0 instructions');
             }
@@ -225,7 +260,12 @@ let wocDecimals = null;
 {
   const step = '4 ata';
   if (!vaultPubkey) {
-    fail(step, BURN_VAULT ? `MARKETPLACE_BURN_VAULT is not a valid pubkey: ${BURN_VAULT}` : 'MARKETPLACE_BURN_VAULT unset — cannot derive ATA');
+    fail(
+      step,
+      BURN_VAULT
+        ? `MARKETPLACE_BURN_VAULT is not a valid pubkey: ${BURN_VAULT}`
+        : 'MARKETPLACE_BURN_VAULT unset — cannot derive ATA',
+    );
   } else {
     try {
       const mint = new PublicKey(WOC_MINT);
@@ -248,7 +288,10 @@ let wocDecimals = null;
 if (SWAP_SIG) {
   const step = '5 wocReceived';
   if (!BURN_VAULT) {
-    fail(step, 'a signature was given but MARKETPLACE_BURN_VAULT is unset — cannot measure the vault owner delta');
+    fail(
+      step,
+      'a signature was given but MARKETPLACE_BURN_VAULT is unset — cannot measure the vault owner delta',
+    );
   } else {
     try {
       const tx = await solanaRpc('getTransaction', [
@@ -276,12 +319,21 @@ if (SWAP_SIG) {
         const wocReceived = delta > 0n ? delta : 0n;
         const txErr = tx.meta?.err;
         if (txErr != null) {
-          fail(step, `tx ${SWAP_SIG} failed on-chain (meta.err=${JSON.stringify(txErr)}); wocReceived would be 0`);
+          fail(
+            step,
+            `tx ${SWAP_SIG} failed on-chain (meta.err=${JSON.stringify(txErr)}); wocReceived would be 0`,
+          );
         } else if (wocReceived > 0n) {
-          const human = wocDecimals != null ? ` (~${(Number(wocReceived) / 10 ** wocDecimals).toString()} $WOC at ${wocDecimals} decimals)` : '';
+          const human =
+            wocDecimals != null
+              ? ` (~${(Number(wocReceived) / 10 ** wocDecimals).toString()} $WOC at ${wocDecimals} decimals)`
+              : '';
           pass(step, `vault owner $WOC delta = ${wocReceived.toString()} base units${human}`);
         } else {
-          fail(step, `vault owner $WOC delta is ${delta.toString()} (<= 0) — keeper would mark this batch "no $WOC received"`);
+          fail(
+            step,
+            `vault owner $WOC delta is ${delta.toString()} (<= 0) — keeper would mark this batch "no $WOC received"`,
+          );
         }
       }
     } catch (e) {
@@ -289,7 +341,9 @@ if (SWAP_SIG) {
     }
   }
 } else {
-  info('[5 wocReceived] skipped (optional) — pass --sig=<swapSignature> to replay the $WOC-received parse against a real tx');
+  info(
+    '[5 wocReceived] skipped (optional) — pass --sig=<swapSignature> to replay the $WOC-received parse against a real tx',
+  );
 }
 
 console.log('');

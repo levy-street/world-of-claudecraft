@@ -19,7 +19,8 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
   `softWords`) · `snap` · `events` (pushed to `eventQueue`, drained by
   `drainEvents`) · `social` (sets `socialInfo`, flips `socialDirty`) · `socialpos`
   (in-place friend/guildmate position refresh) · `censor` (live soft-profanity
-  word-list update) · `error` (disconnect).
+  word-list update) · `spectate` (admin-only observed POV name/clear) · `error`
+  (disconnect).
 - **Client to server**: `auth` (`buildWebSocketAuthMessage`) · `input` (20 Hz move
   intent via `sendInput`, `setInterval` 50 ms) · `cmd` (every IWorld action via the
   private `cmd()` helper).

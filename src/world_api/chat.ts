@@ -1,4 +1,4 @@
-import { OVERHEAD_EMOTE_IDS, type OverheadEmoteId } from '../sim/types';
+import type { OverheadEmoteId } from '../sim/types';
 
 export const OVERHEAD_EMOTES = [
   { id: 'wave', label: 'Wave' },
@@ -16,8 +16,13 @@ export const OVERHEAD_EMOTES = [
   { id: 'kneel', label: 'Kneel' },
 ] as const satisfies readonly { id: OverheadEmoteId; label: string }[];
 
+// Sourced from the local OVERHEAD_EMOTES (not sim/types' OVERHEAD_EMOTE_IDS): the
+// IWorld seam imports sim/ for TYPES only, so the runtime id set is derived here
+// instead of value-importing the sim's array.
+const OVERHEAD_EMOTE_ID_SET: ReadonlySet<string> = new Set(OVERHEAD_EMOTES.map((e) => e.id));
+
 export function isOverheadEmoteId(value: unknown): value is OverheadEmoteId {
-  return typeof value === 'string' && (OVERHEAD_EMOTE_IDS as readonly string[]).includes(value);
+  return typeof value === 'string' && OVERHEAD_EMOTE_ID_SET.has(value);
 }
 
 export interface IWorldChat {

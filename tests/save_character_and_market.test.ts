@@ -13,7 +13,8 @@ vi.mock('pg', () => ({
 }));
 
 import { saveCharacterAndMarketState } from '../server/db';
-import type { CharacterState, MarketSave } from '../src/sim/sim';
+import { REALM } from '../server/realm';
+import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 
 beforeEach(() => {
   dbMock.query.mockReset();
@@ -33,13 +34,14 @@ const STATE = {
   inventory: [],
 } as unknown as CharacterState;
 const MARKET = { listings: [], collections: {} } as unknown as MarketSave;
+const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
 
 describe('saveCharacterAndMarketState', () => {
   it('writes the character row and the market row in ONE transaction (atomic escrow)', async () => {
     const client = clientStub();
     dbMock.connect.mockResolvedValueOnce(client as any);
 
-    await saveCharacterAndMarketState(42, 7, STATE, MARKET);
+    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL);
 
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     // Single transaction: BEGIN first, COMMIT last, no ROLLBACK.
@@ -54,16 +56,20 @@ describe('saveCharacterAndMarketState', () => {
     expect(client.release).toHaveBeenCalled();
   });
 
-  it('targets the market world_state key and the right character id', async () => {
+  it('targets the realm-scoped market world_state key and the right character id', async () => {
     const client = clientStub();
     dbMock.connect.mockResolvedValueOnce(client as any);
 
-    await saveCharacterAndMarketState(99, 12, STATE, MARKET);
+    await saveCharacterAndMarketState(99, 12, STATE, MARKET, MAIL);
 
     const charCall = client.query.mock.calls.find((c) => /UPDATE characters/i.test(String(c[0])));
     expect(charCall?.[1]).toEqual(expect.arrayContaining([99, 12]));
-    const marketCall = client.query.mock.calls.find((c) => /world_state/i.test(String(c[0])));
-    expect(marketCall?.[1]).toContain('market');
+    const worldCalls = client.query.mock.calls.filter((c) => /world_state/i.test(String(c[0])));
+    // The leave-flush market/mail writes must use the SAME realm-scoped keys
+    // that load/saveMarketState + load/saveMailState use, never the bare shared
+    // 'market' row, or the escrow lands in a key nothing reads back on next boot.
+    expect(worldCalls.map((c) => c[1][0])).toEqual([`market:${REALM}`, `mail:${REALM}`]);
+    for (const call of worldCalls) expect(call[1]).not.toContain('market');
   });
 
   it('rolls back and rethrows if either write fails, leaving no half-commit', async () => {
@@ -74,7 +80,7 @@ describe('saveCharacterAndMarketState', () => {
     });
     dbMock.connect.mockResolvedValueOnce(client as any);
 
-    await expect(saveCharacterAndMarketState(1, 1, STATE, MARKET)).rejects.toThrow('boom');
+    await expect(saveCharacterAndMarketState(1, 1, STATE, MARKET, MAIL)).rejects.toThrow('boom');
 
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls.some((s) => /ROLLBACK/.test(s))).toBe(true);

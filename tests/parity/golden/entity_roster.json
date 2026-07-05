@@ -7,7 +7,7 @@
     "addEntity roster + spatial grids",
     "despawn prologue: despawnTimer + DAMAGE_IDLE_DESPAWN idle-despawn (collect-then-drop)",
     "emitDueDelayedEvents drain (fires / guard-drops / stays-pending)",
-    "releaseSpirit outdoor graveyard respawn (full hp, ~10966)"
+    "releaseSpirit ghost release + Spirit Healer resurrect (Resurrection Sickness)"
   ],
   "draws": 4,
   "drawDigest": "7ba9533d",
@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 389,
-      "state": "f3159fdf",
+      "nextId": 402,
+      "state": "3bb1d408",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -29,16 +29,32 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -50,13 +66,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 388,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -99,9 +116,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 391,
-      "state": "cb3ad0ab",
-      "events": "2b429bb7",
+      "nextId": 404,
+      "state": "f7a5b0c2",
+      "events": "89419685",
       "rng": {
         "draws": 4,
         "digest": "7ba9533d"
@@ -110,8 +127,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 391,
-      "state": "6028455d",
+      "nextId": 404,
+      "state": "7c2e4690",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -121,8 +138,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 391,
-      "state": "19db0059",
+      "nextId": 404,
+      "state": "b4c61cec",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -135,17 +152,33 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -157,13 +190,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 99.25,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 50000,
-          "id": 388,
+          "id": 401,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -206,31 +240,47 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 391,
-      "state": "86e636bd",
-      "events": "2b429bb7",
+      "nextId": 404,
+      "state": "6daffc79",
+      "events": "741638a5",
       "rng": {
         "draws": 4,
         "digest": "7ba9533d"
       },
-      "label": "graveyard-release",
+      "label": "ghost-release",
       "players": [
         {
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -242,13 +292,21 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 99,
+          "comboUntil": -1,
+          "corpsePos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
           "critChance": 0.0645,
+          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
+          "ghost": true,
           "hp": 432,
-          "id": 388,
+          "id": 401,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -259,8 +317,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12,
-            "y": 1.500121,
+            "x": -14,
+            "y": 1.511848,
             "z": -14
           },
           "potionCooldownUntil": -1,
@@ -289,10 +347,124 @@
       ]
     },
     {
+      "tick": 5,
+      "time": 0.25,
+      "nextId": 404,
+      "state": "61fbcede",
+      "events": "d75be2de",
+      "rng": {
+        "draws": 4,
+        "digest": "7ba9533d"
+      },
+      "label": "healer-resurrect",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 401,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 27600,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 20,
+          "auras": [
+            {
+              "duration": 60,
+              "id": "resurrection_sickness",
+              "kind": "buff_allstats_pct",
+              "name": "Resurrection Sickness",
+              "remaining": 60,
+              "school": "shadow",
+              "sourceId": 401,
+              "value": -0.75
+            }
+          ],
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0535,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0535,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99.25,
+          "hp": 44,
+          "id": 401,
+          "kind": "player",
+          "level": 10,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 222,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -14,
+            "y": 1.511848,
+            "z": -14
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 2,
+          "stats": {
+            "agi": 7,
+            "armor": 192,
+            "int": 3,
+            "spi": 3,
+            "sta": 10,
+            "str": 10
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
       "tick": 6,
       "time": 0.3,
-      "nextId": 391,
-      "state": "a8509248",
+      "nextId": 404,
+      "state": "2195fdcd",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -302,8 +474,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 391,
-      "state": "e89b4d91",
+      "nextId": 404,
+      "state": "de2f3b45",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -316,17 +488,33 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -336,27 +524,40 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 82,
+          "attackPower": 20,
+          "auras": [
+            {
+              "duration": 60,
+              "id": "resurrection_sickness",
+              "kind": "buff_allstats_pct",
+              "name": "Resurrection Sickness",
+              "remaining": 59.9,
+              "school": "shadow",
+              "sourceId": 401,
+              "value": -0.75
+            }
+          ],
           "combatTimer": 99.1,
-          "critChance": 0.0645,
+          "comboUntil": -1,
+          "critChance": 0.0535,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.0645,
-          "fallStartY": 1.500121,
+          "dodgeChance": 0.0535,
+          "fallStartY": 1.511848,
           "fiveSecondRule": 99.35,
-          "hp": 432,
-          "id": 388,
+          "hp": 44,
+          "id": 401,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 432,
+          "maxHp": 222,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -12,
-            "y": 1.500121,
+            "x": -14,
+            "y": 1.511848,
             "z": -14
           },
           "potionCooldownUntil": -1,
@@ -366,14 +567,14 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
+          "spellPower": 2,
           "stats": {
-            "agi": 29,
-            "armor": 236,
-            "int": 10,
-            "spi": 11,
-            "sta": 40,
-            "str": 41
+            "agi": 7,
+            "armor": 192,
+            "int": 3,
+            "spi": 3,
+            "sta": 10,
+            "str": 10
           },
           "templateId": "warrior",
           "weapon": {

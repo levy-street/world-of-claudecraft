@@ -80,7 +80,6 @@ const NYTHRAXIS_DEATHLESS_CHANNEL = 5;
 const NYTHRAXIS_DEATHLESS_STUN = 5;
 const NYTHRAXIS_DEATHLESS_SOUL_REND_LOCKOUT = 15;
 const NYTHRAXIS_PHASE_TWO_SETTLE_DELAY = 5;
-const NYTHRAXIS_LOCKOUT_MS = 24 * 60 * 60 * 1000;
 const NYTHRAXIS_TRANSITION_DURATION = 21;
 const NYTHRAXIS_TRANSITION_STUN = 21.5;
 const NYTHRAXIS_FINAL_STAND_HP = 0.05;
@@ -210,6 +209,7 @@ export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   boss.castingAbility = null;
   boss.castRemaining = 0;
   boss.castTotal = 0;
+  boss.castTargetId = null;
   boss.channeling = false;
 }
 
@@ -471,7 +471,10 @@ export function nythraxisRoomMetas(ctx: SimContext, boss: Entity): PlayerMeta[] 
 }
 
 export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
-  const until = ctx.lockoutNowMs() + NYTHRAXIS_LOCKOUT_MS;
+  // Daily raid reset: lock until the next reset boundary the host supplies through the
+  // lockout seam (the authoritative server uses its realm-local 3 AM daily reset, so a
+  // realm's raids share one boundary; offline/headless fall back to a flat 24h day).
+  const until = ctx.raidResetMs(ctx.lockoutNowMs());
   for (const meta of nythraxisRoomMetas(ctx, boss)) {
     meta.raidLockouts.set('nythraxis_boss_arena', until);
   }
@@ -581,6 +584,7 @@ export function startNythraxisTransition(
   boss.castingAbility = null;
   boss.castRemaining = 0;
   boss.castTotal = 0;
+  boss.castTargetId = null;
   const transitionLines = [
     { speaker: 'nythraxis' as const, text: 'Another priest...', delay: 0 },
     { speaker: 'aldric' as const, text: 'Your kingdom is gone, Nythraxis', delay: 3.0 },
@@ -600,7 +604,7 @@ export function startNythraxisTransition(
   for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
     ctx.applyAura(e, {
       id: 'nythraxis_transition_stun',
-      name: 'War Stomp',
+      name: 'Shuddering Stomp',
       kind: 'stun',
       remaining: NYTHRAXIS_TRANSITION_STUN,
       duration: NYTHRAXIS_TRANSITION_STUN,
@@ -611,7 +615,7 @@ export function startNythraxisTransition(
   }
   ctx.applyAura(boss, {
     id: 'nythraxis_transition_pause',
-    name: 'War Stomp',
+    name: 'Shuddering Stomp',
     kind: 'stun',
     remaining: NYTHRAXIS_TRANSITION_STUN,
     duration: NYTHRAXIS_TRANSITION_STUN,
@@ -788,6 +792,7 @@ export function startNythraxisDeathlessRage(
   boss.castingAbility = 'nythraxis_deathless_rage';
   boss.castTotal = NYTHRAXIS_DEATHLESS_CAST;
   boss.castRemaining = NYTHRAXIS_DEATHLESS_CAST;
+  boss.castTargetId = null;
   boss.channeling = false;
   nythraxisSay(ctx, boss, 'nythraxis', 'Witness true eternity!', true);
   ctx.emit({
@@ -808,12 +813,14 @@ export function updateNythraxisDeathlessRage(
   boss.castingAbility = 'nythraxis_deathless_rage';
   boss.castTotal = NYTHRAXIS_DEATHLESS_CAST;
   boss.castRemaining = st.deathlessCastRemaining;
+  boss.castTargetId = null;
   updateNythraxisWardChannels(ctx, boss, st);
   if (nythraxisWardstoneInterruptReady(st)) {
     st.deathlessCastRemaining = 0;
     boss.castingAbility = null;
     boss.castRemaining = 0;
     boss.castTotal = 0;
+    boss.castTargetId = null;
     st.deathlessStunRemaining = NYTHRAXIS_DEATHLESS_STUN;
     ctx.applyAura(boss, {
       id: 'nythraxis_deathless_stun',
@@ -838,6 +845,7 @@ export function updateNythraxisDeathlessRage(
   boss.castingAbility = null;
   boss.castRemaining = 0;
   boss.castTotal = 0;
+  boss.castTargetId = null;
   nythraxisSay(ctx, boss, 'nythraxis', 'You cannot stop what was promised..', true);
   ctx.emit({
     type: 'spellfx',
@@ -889,6 +897,7 @@ export function updateNythraxisWardChannels(
     p.channeling = true;
     p.castTotal = NYTHRAXIS_DEATHLESS_CHANNEL;
     p.castRemaining = channel.remaining;
+    p.castTargetId = null;
     ctx.emit({
       type: 'spellfx',
       sourceId: ward.id,
@@ -916,6 +925,7 @@ export function clearNythraxisWardChannelCast(p: Entity): void {
   p.channeling = false;
   p.castRemaining = 0;
   p.castTotal = 0;
+  p.castTargetId = null;
 }
 
 export function nythraxisWardstones(ctx: SimContext, boss: Entity): Entity[] {
@@ -961,6 +971,7 @@ export function tryStartNythraxisWardChannel(
   player.channeling = true;
   player.castTotal = NYTHRAXIS_DEATHLESS_CHANNEL;
   player.castRemaining = NYTHRAXIS_DEATHLESS_CHANNEL;
+  player.castTargetId = null;
   ctx.emit({
     type: 'spellfx',
     sourceId: ward.id,

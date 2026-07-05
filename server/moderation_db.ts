@@ -8,7 +8,7 @@ export const REPORT_REASONS = [
   'other',
 ] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
-export type ModerationAction = 'ignore' | 'suspend' | 'ban' | 'unban';
+export type ModerationAction = 'ignore' | 'kick' | 'kill' | 'suspend' | 'ban' | 'unban';
 
 // The closed set of values ever written to account_moderation_actions.action. The
 // column is free-text in SQL, so this const is the single source of truth: every
@@ -16,6 +16,8 @@ export type ModerationAction = 'ignore' | 'suspend' | 'ban' | 'unban';
 // parameter is typed to this union, turning a mistyped action into a compile error
 // rather than a silently-persisted row that renders as actionUnknown.
 export const MODERATION_ACTIONS = [
+  'kick',
+  'kill',
   'suspend',
   'unsuspend',
   'ban',
@@ -548,6 +550,23 @@ export async function addAccountNote(input: {
     accountId: input.accountId,
     adminAccountId: input.adminAccountId,
     reason: note,
+  });
+}
+
+// Audit-only record for an in-game action whose live effect is owned by the
+// GameServer. Unlike account sanctions, this changes no persistent account state.
+export async function recordInGameAction(input: {
+  action: 'kick' | 'kill';
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  await recordModerationAction(pool, input.action, {
+    accountId: input.accountId,
+    adminAccountId: input.adminAccountId,
+    reason,
   });
 }
 

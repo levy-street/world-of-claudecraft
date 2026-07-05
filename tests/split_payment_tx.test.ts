@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { PublicKey } from '@solana/web3.js';
+import { describe, expect, it } from 'vitest';
 import { buildSplitPaymentTransaction, type SplitPaymentQuote } from '../src/net/wallet';
 
 // Exercises the REAL client purchase-transaction construction (the byte-level
@@ -27,7 +27,8 @@ const ata = (owner: string, mint: string) =>
   )[0];
 
 const quote = (over: Partial<SplitPaymentQuote> = {}): SplitPaymentQuote => ({
-  mint: USDC, memo: 'q_deadbeef',
+  mint: USDC,
+  memo: 'q_deadbeef',
   creator: { owner: CREATOR, amount: '7000000' },
   burn: { owner: VAULT, amount: '3000000' },
   ...over,
@@ -48,11 +49,14 @@ describe('buildSplitPaymentTransaction — the buyer 70/30 split payment', () =>
 
   it('encodes each TransferChecked per the SPL wire format (tag 12, u64-LE amount, u8 decimals)', () => {
     const [creatorIx, burnIx] = build().instructions;
-    for (const [ix, amount] of [[creatorIx, 7_000_000n], [burnIx, 3_000_000n]] as const) {
+    for (const [ix, amount] of [
+      [creatorIx, 7_000_000n],
+      [burnIx, 3_000_000n],
+    ] as const) {
       expect(ix.data).toHaveLength(10);
-      expect(ix.data[0]).toBe(12);                       // TransferChecked tag
-      expect(ix.data.readBigUInt64LE(1)).toBe(amount);   // amount in base units
-      expect(ix.data[9]).toBe(6);                        // USDC decimals
+      expect(ix.data[0]).toBe(12); // TransferChecked tag
+      expect(ix.data.readBigUInt64LE(1)).toBe(amount); // amount in base units
+      expect(ix.data[9]).toBe(6); // USDC decimals
     }
   });
 
@@ -60,14 +64,17 @@ describe('buildSplitPaymentTransaction — the buyer 70/30 split payment', () =>
     const [creatorIx, burnIx] = build().instructions;
     const buyerAta = ata(BUYER, USDC).toBase58();
     // keys: [source, mint, dest, owner]
-    for (const [ix, destOwner] of [[creatorIx, CREATOR], [burnIx, VAULT]] as const) {
-      expect(ix.keys[0].pubkey.toBase58()).toBe(buyerAta);          // source = buyer ATA (both legs)
+    for (const [ix, destOwner] of [
+      [creatorIx, CREATOR],
+      [burnIx, VAULT],
+    ] as const) {
+      expect(ix.keys[0].pubkey.toBase58()).toBe(buyerAta); // source = buyer ATA (both legs)
       expect(ix.keys[0]).toMatchObject({ isSigner: false, isWritable: true });
-      expect(ix.keys[1].pubkey.toBase58()).toBe(USDC);              // mint
+      expect(ix.keys[1].pubkey.toBase58()).toBe(USDC); // mint
       expect(ix.keys[1]).toMatchObject({ isSigner: false, isWritable: false });
       expect(ix.keys[2].pubkey.toBase58()).toBe(ata(destOwner, USDC).toBase58()); // dest = recipient ATA
       expect(ix.keys[2]).toMatchObject({ isSigner: false, isWritable: true });
-      expect(ix.keys[3].pubkey.toBase58()).toBe(BUYER);             // owner/authority = buyer
+      expect(ix.keys[3].pubkey.toBase58()).toBe(BUYER); // owner/authority = buyer
       expect(ix.keys[3]).toMatchObject({ isSigner: true, isWritable: false });
     }
   });
@@ -92,13 +99,20 @@ describe('buildSplitPaymentTransaction — the buyer 70/30 split payment', () =>
   });
 
   it('carries arbitrary base-unit amounts faithfully (no float rounding)', () => {
-    const tx = build(quote({ creator: { owner: CREATOR, amount: '699999993' }, burn: { owner: VAULT, amount: '300000007' } }));
+    const tx = build(
+      quote({
+        creator: { owner: CREATOR, amount: '699999993' },
+        burn: { owner: VAULT, amount: '300000007' },
+      }),
+    );
     expect(tx.instructions[0].data.readBigUInt64LE(1)).toBe(699_999_993n);
     expect(tx.instructions[1].data.readBigUInt64LE(1)).toBe(300_000_007n);
   });
 
   it('encodes zero-amount legs cleanly (degenerate / free skin) without dropping them', () => {
-    const tx = build(quote({ creator: { owner: CREATOR, amount: '0' }, burn: { owner: VAULT, amount: '0' } }));
+    const tx = build(
+      quote({ creator: { owner: CREATOR, amount: '0' }, burn: { owner: VAULT, amount: '0' } }),
+    );
     expect(tx.instructions).toHaveLength(3);
     expect(tx.instructions[0].data.readBigUInt64LE(1)).toBe(0n);
     expect(tx.instructions[1].data.readBigUInt64LE(1)).toBe(0n);
@@ -107,12 +121,16 @@ describe('buildSplitPaymentTransaction — the buyer 70/30 split payment', () =>
 
   it('carries the full u64 maximum amount with no precision loss', () => {
     const max = (2n ** 64n - 1n).toString();
-    const tx = build(quote({ creator: { owner: CREATOR, amount: max }, burn: { owner: VAULT, amount: '1' } }));
+    const tx = build(
+      quote({ creator: { owner: CREATOR, amount: max }, burn: { owner: VAULT, amount: '1' } }),
+    );
     expect(tx.instructions[0].data.readBigUInt64LE(1)).toBe(18_446_744_073_709_551_615n);
   });
 
   it('threads lastValidBlockHeight onto the transaction (the wallet confirm strategy needs it)', () => {
-    expect(buildSplitPaymentTransaction(quote(), BUYER, BLOCKHASH, 9999).lastValidBlockHeight).toBe(9999);
+    expect(buildSplitPaymentTransaction(quote(), BUYER, BLOCKHASH, 9999).lastValidBlockHeight).toBe(
+      9999,
+    );
   });
 
   it('faithfully encodes a multi-byte UTF-8 memo and an empty memo by BYTE length', () => {
@@ -123,13 +141,24 @@ describe('buildSplitPaymentTransaction — the buyer 70/30 split payment', () =>
   });
 
   it('FAILS LOUDLY on an out-of-range u64 amount rather than truncating', () => {
-    expect(() => build(quote({ creator: { owner: CREATOR, amount: (2n ** 64n).toString() }, burn: { owner: VAULT, amount: '1' } }))).toThrow();
+    expect(() =>
+      build(
+        quote({
+          creator: { owner: CREATOR, amount: (2n ** 64n).toString() },
+          burn: { owner: VAULT, amount: '1' },
+        }),
+      ),
+    ).toThrow();
   });
 
   it('rejects a malformed / non-integer amount string (no silent coercion)', () => {
     // BigInt('') is 0n (covered by the zero-amount case); 'abc' and '7.5' must throw.
     for (const bad of ['abc', '7.5', '12.0', '7,000']) {
-      expect(() => build(quote({ creator: { owner: CREATOR, amount: bad }, burn: { owner: VAULT, amount: '1' } }))).toThrow();
+      expect(() =>
+        build(
+          quote({ creator: { owner: CREATOR, amount: bad }, burn: { owner: VAULT, amount: '1' } }),
+        ),
+      ).toThrow();
     }
   });
 

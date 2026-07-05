@@ -131,6 +131,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
   it('ENTITY_EXCLUDE membership is exactly the pinned set', () => {
     expect([...ENTITY_EXCLUDE].sort()).toEqual([
       'color',
+      'equippedItems',
       'guild',
       'holderBalance',
       'holderTier',
@@ -141,6 +142,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'overheadEmoteId',
       'overheadEmoteSeq',
       'overheadEmoteUntil',
+      'potionCdRemaining',
       'prevFacing',
       'prevPos',
       'scale',
@@ -163,7 +165,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'known',
       'lastActiveTick',
       'lastWhisperFrom',
-      'marketFilter',
+      'marketQuery',
       'moveInput',
       'name',
       'pendingSkinCatalog',

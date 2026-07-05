@@ -78,8 +78,7 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
   it('rogue eviscerate: finisherDamage lands AND the combo-spend reset fires after the loop', () => {
     const { sim, p, meta } = makeSim('rogue', 20);
     const mob = spawnTarget(sim, p);
-    p.comboPoints = 5;
-    p.comboTargetId = mob.id;
+    p.comboPoints = 5; // character-bound: no target anchor needed
     const hp0 = mob.hp;
     const res = resolve(sim, 'eviscerate', p.id);
 

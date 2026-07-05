@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
+import type { SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -34,7 +34,9 @@ describe('/queued command', () => {
     e.queuedOnSwing = 'heroic_strike';
     e.resource = 50; // ample rage
     const reply = queuedReply(sim, a);
-    expect(reply).toMatch(/^Heroic Strike is queued for your next melee swing \(costs \d+ rage; you have 50\)\.$/);
+    expect(reply).toMatch(
+      /^Reaver Strike is queued for your next melee swing \(costs \d+ rage; you have 50\)\.$/,
+    );
     expect(reply).not.toContain('fizzle');
   });
 

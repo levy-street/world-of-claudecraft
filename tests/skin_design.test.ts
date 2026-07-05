@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { rgb, mix, shade, designHash } from '../src/render/characters/skin_design';
-import { SKIN_PATTERNS, SKIN_FINISHES, SKIN_DENSITIES, defaultDesignSpec, type SkinDesignSpec } from '../src/world_api';
+import { designHash, mix, rgb, shade } from '../src/render/characters/skin_design';
+import {
+  defaultDesignSpec,
+  SKIN_DENSITIES,
+  SKIN_FINISHES,
+  SKIN_PATTERNS,
+  type SkinDesignSpec,
+} from '../src/world_api';
 
 // The canvas builder itself needs a DOM 2D context (covered by the headless
 // capture), but its colour math is pure + DOM-free. These guard the regression
@@ -18,8 +24,8 @@ describe('skin_design colour helpers — hex invariant (render-loop safety)', ()
 
   it('shade() returns a valid hex (so it composes with mix/rgb) and clamps', () => {
     expect(shade('#2e8b57', 0.78)).toMatch(HEX6);
-    expect(shade('#ffffff', 2)).toBe('#ffffff');   // lighten clamps at 255
-    expect(shade('#202020', 0)).toBe('#000000');   // darken to black
+    expect(shade('#ffffff', 2)).toBe('#ffffff'); // lighten clamps at 255
+    expect(shade('#202020', 0)).toBe('#000000'); // darken to black
     expect(rgb(shade('#2e8b57', 0.78)).some(Number.isNaN)).toBe(false);
   });
 
@@ -30,7 +36,15 @@ describe('skin_design colour helpers — hex invariant (render-loop safety)', ()
   });
 
   it('REGRESSION: mix(shade(primary), secondary) never yields NaN — the exact crash', () => {
-    for (const primary of ['#2e8b57', '#8b1a1a', '#3a2a6e', '#1a4a6e', '#c9851a', '#000000', '#ffffff']) {
+    for (const primary of [
+      '#2e8b57',
+      '#8b1a1a',
+      '#3a2a6e',
+      '#1a4a6e',
+      '#c9851a',
+      '#000000',
+      '#ffffff',
+    ]) {
       const blended = mix(shade(primary, 0.78), '#0b3d2e', 0.35);
       expect(blended).not.toContain('NaN');
       expect(blended).toMatch(/^rgb\(\d+,\d+,\d+\)$/);
@@ -45,8 +59,12 @@ describe('designHash — stable cache key over the full spec', () => {
   });
   it('changes when ANY field changes (so the texture cache never serves a stale skin)', () => {
     const variants: Partial<SkinDesignSpec>[] = [
-      { primary: '#111111' }, { secondary: '#222222' }, { accent: '#333333' },
-      { pattern: SKIN_PATTERNS[2] }, { finish: SKIN_FINISHES[2] }, { density: SKIN_DENSITIES[2] },
+      { primary: '#111111' },
+      { secondary: '#222222' },
+      { accent: '#333333' },
+      { pattern: SKIN_PATTERNS[2] },
+      { finish: SKIN_FINISHES[2] },
+      { density: SKIN_DENSITIES[2] },
       { emissive: '#39ff88' },
     ];
     const seen = new Set([designHash(base)]);

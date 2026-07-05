@@ -13,10 +13,29 @@ vi.mock('pg', () => ({
 }));
 
 import {
-  createAccount, createCharacterCapped, deleteCharacter, grantAccountMechChroma, loadAccountCosmetics,
-  markAccountQuestComplete, openPlaySession, reclaimDeactivatedName, redeemPurchase, renameCharacter, revokeAccountMechChroma, touchLogin,
-  createBurnBatch, markBatchSwapped, markBatchBurning, markBatchBurned, markBatchFailed,
-  openBurnBatches, lastBurnAt, burnLedger, getCreatorSkin, getMarketplaceQuote,
+  backfillAccountEmailIfEmpty,
+  burnLedger,
+  createAccount,
+  createBurnBatch,
+  createCharacterCapped,
+  deleteCharacter,
+  getCreatorSkin,
+  getMarketplaceQuote,
+  grantAccountMechChroma,
+  lastBurnAt,
+  loadAccountCosmetics,
+  markAccountQuestComplete,
+  markBatchBurned,
+  markBatchBurning,
+  markBatchFailed,
+  markBatchSwapped,
+  openBurnBatches,
+  openPlaySession,
+  reclaimDeactivatedName,
+  redeemPurchase,
+  renameCharacter,
+  revokeAccountMechChroma,
+  touchLogin,
 } from '../server/db';
 import { REALM } from '../server/realm';
 
@@ -73,7 +92,18 @@ describe('renameCharacter', () => {
 
   it('returns the updated row on success and null when no row matched the gate', async () => {
     dbMock.query.mockResolvedValueOnce({
-      rows: [{ id: 42, account_id: 7, name: 'Newname', class: 'mage', level: 5, state: null, is_gm: false, force_rename: false }],
+      rows: [
+        {
+          id: 42,
+          account_id: 7,
+          name: 'Newname',
+          class: 'mage',
+          level: 5,
+          state: null,
+          is_gm: false,
+          force_rename: false,
+        },
+      ],
       rowCount: 1,
     } as any);
     expect((await renameCharacter(7, 42, 'Newname'))?.name).toBe('Newname');
@@ -93,7 +123,12 @@ describe('reclaimDeactivatedName', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: 99, name: 'SturdyStubs', deactivated_at: '2026-01-01T00:00:00Z', banned_at: null }], rowCount: 1 } as any) // holder lookup
+      .mockResolvedValueOnce({
+        rows: [
+          { id: 99, name: 'SturdyStubs', deactivated_at: '2026-01-01T00:00:00Z', banned_at: null },
+        ],
+        rowCount: 1,
+      } as any) // holder lookup
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // archive-name clash check: free
       .mockResolvedValueOnce({ rows: [], rowCount: 1 } as any) // UPDATE
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
@@ -119,7 +154,10 @@ describe('reclaimDeactivatedName', () => {
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: 99, name: 'SturdyStubs', deactivated_at: null, banned_at: null }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({
+        rows: [{ id: 99, name: 'SturdyStubs', deactivated_at: null, banned_at: null }],
+        rowCount: 1,
+      } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
     await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
@@ -141,29 +179,43 @@ describe('reclaimDeactivatedName', () => {
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
   });
 
-  it('leaves a banned account\'s name reserved even when the account is deactivated', async () => {
+  it("leaves a banned account's name reserved even when the account is deactivated", async () => {
     const client = clientStub();
     dbMock.connect.mockResolvedValue(client as any);
     client.query
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ id: 99, name: 'SturdyStubs', deactivated_at: '2026-01-01T00:00:00Z', banned_at: '2026-01-01T00:00:00Z' }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 99,
+            name: 'SturdyStubs',
+            deactivated_at: '2026-01-01T00:00:00Z',
+            banned_at: '2026-01-01T00:00:00Z',
+          },
+        ],
+        rowCount: 1,
+      } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
     await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
-    expect(client.query.mock.calls.map((c) => c[0]).some((s) => /UPDATE characters/i.test(s))).toBe(false);
+    expect(client.query.mock.calls.map((c) => c[0]).some((s) => /UPDATE characters/i.test(s))).toBe(
+      false,
+    );
   });
 });
 
 describe('account and session request metadata', () => {
   it('stores account creation IP and user agent when registering', async () => {
-    dbMock.query.mockResolvedValueOnce({ rows: [{ id: 7, username: 'alice', password_hash: 'hash' }] } as any);
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ id: 7, username: 'alice', password_hash: 'hash' }],
+    } as any);
 
     await createAccount('alice', 'hash', { ip: '203.0.113.4', userAgent: 'Mozilla/5.0' });
 
     const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toMatch(/created_ip/);
     expect(sql).toMatch(/created_user_agent/);
-    expect(params).toEqual(['alice', 'hash', '203.0.113.4', 'Mozilla/5.0']);
+    expect(params).toEqual(['alice', 'hash', '203.0.113.4', 'Mozilla/5.0', true]);
   });
 
   it('updates last login IP and user agent when logging in', async () => {
@@ -175,6 +227,25 @@ describe('account and session request metadata', () => {
     expect(sql).toMatch(/last_login_ip/);
     expect(sql).toMatch(/last_login_user_agent/);
     expect(params).toEqual([7, '203.0.113.5', 'Mozilla/5.0']);
+  });
+
+  it('backfills a recovery email only for accounts that have none (Discord capture)', async () => {
+    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    const filled = await backfillAccountEmailIfEmpty(7, 'from-discord@example.com', true);
+
+    const [sql, params] = dbMock.query.mock.calls[0];
+    // The guard is in the UPDATE (WHERE email IS NULL OR email = ''), never a
+    // read-then-write, and email_verified_at is stamped only when verified.
+    expect(sql).toMatch(/email IS NULL OR email = ''/);
+    expect(sql).toMatch(/email_verified_at = CASE WHEN/);
+    expect(params).toEqual([7, 'from-discord@example.com', true]);
+    expect(filled).toBe(true);
+  });
+
+  it('reports no backfill when the account already had a recovery email', async () => {
+    dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    const filled = await backfillAccountEmailIfEmpty(7, 'from-discord@example.com', false);
+    expect(filled).toBe(false);
   });
 
   it('stores play session IP and user agent when entering the world', async () => {
@@ -192,12 +263,14 @@ describe('account and session request metadata', () => {
 describe('account cosmetics', () => {
   it('loads normalized account cosmetic unlocks', async () => {
     dbMock.query.mockResolvedValueOnce({
-      rows: [{
-        cosmetics: {
-          completedQuestIds: ['q_aldrics_fallen_star', 4, 'q_aldrics_fallen_star'],
-          mechChromaIds: ['amber_crimson', null, 'onyx_gold'],
+      rows: [
+        {
+          cosmetics: {
+            completedQuestIds: ['q_aldrics_fallen_star', 4, 'q_aldrics_fallen_star'],
+            mechChromaIds: ['amber_crimson', null, 'onyx_gold'],
+          },
         },
-      }],
+      ],
     } as any);
 
     await expect(loadAccountCosmetics(7)).resolves.toEqual({
@@ -212,8 +285,19 @@ describe('account cosmetics', () => {
 
   it('persists account-wide quest completion without replacing existing cosmetic unlocks', async () => {
     dbMock.query
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: [], mechChromaIds: ['onyx_gold'] } }] } as any)
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['onyx_gold'] } }] } as any);
+      .mockResolvedValueOnce({
+        rows: [{ cosmetics: { completedQuestIds: [], mechChromaIds: ['onyx_gold'] } }],
+      } as any)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            cosmetics: {
+              completedQuestIds: ['q_aldrics_fallen_star'],
+              mechChromaIds: ['onyx_gold'],
+            },
+          },
+        ],
+      } as any);
 
     await expect(markAccountQuestComplete(7, 'q_aldrics_fallen_star')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
@@ -225,13 +309,28 @@ describe('account cosmetics', () => {
     expect(sql).toMatch(/UPDATE accounts/);
     expect(sql).toMatch(/cosmetics/);
     expect(params[0]).toBe(7);
-    expect(params[1]).toEqual({ completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['onyx_gold'], ownedCreatorSkinIds: [] });
+    expect(params[1]).toEqual({
+      completedQuestIds: ['q_aldrics_fallen_star'],
+      mechChromaIds: ['onyx_gold'],
+      ownedCreatorSkinIds: [],
+    });
   });
 
   it('persists mech chroma unlocks without replacing account quest lockouts', async () => {
     dbMock.query
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: [] } }] } as any)
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['amber_crimson'] } }] } as any);
+      .mockResolvedValueOnce({
+        rows: [{ cosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: [] } }],
+      } as any)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            cosmetics: {
+              completedQuestIds: ['q_aldrics_fallen_star'],
+              mechChromaIds: ['amber_crimson'],
+            },
+          },
+        ],
+      } as any);
 
     await expect(grantAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
@@ -242,8 +341,26 @@ describe('account cosmetics', () => {
 
   it('persists mech chroma removal without replacing account quest lockouts', async () => {
     dbMock.query
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['amber_crimson', 'onyx_gold'] } }] } as any)
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['onyx_gold'] } }] } as any);
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            cosmetics: {
+              completedQuestIds: ['q_aldrics_fallen_star'],
+              mechChromaIds: ['amber_crimson', 'onyx_gold'],
+            },
+          },
+        ],
+      } as any)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            cosmetics: {
+              completedQuestIds: ['q_aldrics_fallen_star'],
+              mechChromaIds: ['onyx_gold'],
+            },
+          },
+        ],
+      } as any);
 
     await expect(revokeAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
@@ -253,7 +370,11 @@ describe('account cosmetics', () => {
 
     const [sql, params] = dbMock.query.mock.calls[1];
     expect(sql).toMatch(/UPDATE accounts/);
-    expect(params[1]).toEqual({ completedQuestIds: ['q_aldrics_fallen_star'], mechChromaIds: ['onyx_gold'], ownedCreatorSkinIds: [] });
+    expect(params[1]).toEqual({
+      completedQuestIds: ['q_aldrics_fallen_star'],
+      mechChromaIds: ['onyx_gold'],
+      ownedCreatorSkinIds: [],
+    });
   });
 });
 
@@ -265,9 +386,21 @@ describe('createCharacterCapped', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // BEGIN
       .mockResolvedValueOnce({ rows: [{ id: 7 }], rowCount: 1 } as any)
       .mockResolvedValueOnce({ rows: [{ n: 9 }], rowCount: 1 } as any)
-      .mockResolvedValueOnce({ rows: [{
-        id: 42, account_id: 7, name: 'Captest', class: 'mage', level: 1, state: null, is_gm: false, force_rename: false,
-      }], rowCount: 1 } as any)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 42,
+            account_id: 7,
+            name: 'Captest',
+            class: 'mage',
+            level: 1,
+            state: null,
+            is_gm: false,
+            force_rename: false,
+          },
+        ],
+        rowCount: 1,
+      } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
 
     const row = await createCharacterCapped(7, 'Captest', 'mage', 10);
@@ -323,10 +456,17 @@ describe('createCharacterCapped', () => {
 
 describe('redeemPurchase — atomic redeem-once + grant', () => {
   const params = {
-    txSig: 'sig_abc', accountId: 42, quoteId: 'q_1', mint: 'MintXyz', skinId: 'skin_1',
-    grossUsdc: 10_000_000n, creatorUsdc: 7_000_000n, burnUsdc: 3_000_000n,
+    txSig: 'sig_abc',
+    accountId: 42,
+    quoteId: 'q_1',
+    mint: 'MintXyz',
+    skinId: 'skin_1',
+    grossUsdc: 10_000_000n,
+    creatorUsdc: 7_000_000n,
+    burnUsdc: 3_000_000n,
   };
-  const sqls = (client: { query: ReturnType<typeof vi.fn> }) => client.query.mock.calls.map((c) => String(c[0]).trim().split('\n')[0]);
+  const sqls = (client: { query: ReturnType<typeof vi.fn> }) =>
+    client.query.mock.calls.map((c) => String(c[0]).trim().split('\n')[0]);
 
   it('commits payment + sale + grant + quote-delete in one transaction and grants the skin', async () => {
     const client = clientStub();
@@ -334,7 +474,11 @@ describe('redeemPurchase — atomic redeem-once + grant', () => {
       .mockResolvedValueOnce({}) // BEGIN
       .mockResolvedValueOnce({ rowCount: 1 }) // INSERT onchain_payments (fresh)
       .mockResolvedValueOnce({}) // INSERT marketplace_sales
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: [] } }] }) // SELECT FOR UPDATE
+      .mockResolvedValueOnce({
+        rows: [
+          { cosmetics: { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: [] } },
+        ],
+      }) // SELECT FOR UPDATE
       .mockResolvedValueOnce({}) // UPDATE accounts cosmetics
       .mockResolvedValueOnce({}) // DELETE quote
       .mockResolvedValueOnce({}); // COMMIT
@@ -347,9 +491,13 @@ describe('redeemPurchase — atomic redeem-once + grant', () => {
     expect(order).toContain('COMMIT');
     expect(order).not.toContain('ROLLBACK');
     // The grant writes the new skin id into the account's owned set (inspect data).
-    const update = client.query.mock.calls.find((c) => /UPDATE accounts SET cosmetics/.test(String(c[0])));
+    const update = client.query.mock.calls.find((c) =>
+      /UPDATE accounts SET cosmetics/.test(String(c[0])),
+    );
     expect(update).toBeDefined();
-    expect((update![1][1] as { ownedCreatorSkinIds: string[] }).ownedCreatorSkinIds).toContain('skin_1');
+    expect((update![1][1] as { ownedCreatorSkinIds: string[] }).ownedCreatorSkinIds).toContain(
+      'skin_1',
+    );
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 
@@ -366,7 +514,9 @@ describe('redeemPurchase — atomic redeem-once + grant', () => {
     expect(order).toContain('ROLLBACK');
     expect(order).not.toContain('COMMIT');
     // It must NOT have recorded a sale or granted anything after the conflict.
-    expect(client.query.mock.calls.some((c) => /marketplace_sales|UPDATE accounts/.test(String(c[0])))).toBe(false);
+    expect(
+      client.query.mock.calls.some((c) => /marketplace_sales|UPDATE accounts/.test(String(c[0]))),
+    ).toBe(false);
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 
@@ -388,7 +538,10 @@ describe('redeemPurchase — atomic redeem-once + grant', () => {
 
   it('returns false (not throw) on a quote_id unique violation — concurrent same-quote second redeem', async () => {
     const client = clientStub();
-    const dup = Object.assign(new Error('duplicate key value violates unique constraint "marketplace_sales_quote_id_key"'), { code: '23505' });
+    const dup = Object.assign(
+      new Error('duplicate key value violates unique constraint "marketplace_sales_quote_id_key"'),
+      { code: '23505' },
+    );
     client.query
       .mockResolvedValueOnce({}) // BEGIN
       .mockResolvedValueOnce({ rowCount: 1 }) // INSERT onchain_payments (fresh signature)
@@ -410,14 +563,26 @@ describe('redeemPurchase — atomic redeem-once + grant', () => {
       .mockResolvedValueOnce({}) // BEGIN
       .mockResolvedValueOnce({ rowCount: 1 }) // onchain_payments
       .mockResolvedValueOnce({}) // marketplace_sales
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: ['skin_1'] } }] }) // SELECT FOR UPDATE — already owned
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            cosmetics: {
+              completedQuestIds: [],
+              mechChromaIds: [],
+              ownedCreatorSkinIds: ['skin_1'],
+            },
+          },
+        ],
+      }) // SELECT FOR UPDATE — already owned
       .mockResolvedValueOnce({}) // DELETE quote
       .mockResolvedValueOnce({}); // COMMIT
     dbMock.connect.mockResolvedValueOnce(client);
     await expect(redeemPurchase(params)).resolves.toBe(true);
     const order = sqls(client);
     expect(order).toContain('COMMIT');
-    expect(client.query.mock.calls.some((c) => /UPDATE accounts SET cosmetics/.test(String(c[0])))).toBe(false); // includes() guard skips the dup grant
+    expect(
+      client.query.mock.calls.some((c) => /UPDATE accounts SET cosmetics/.test(String(c[0]))),
+    ).toBe(false); // includes() guard skips the dup grant
   });
 
   it('rethrows (does NOT swallow to false) on a non-unique-violation mid-transaction error', async () => {
@@ -437,31 +602,59 @@ describe('redeemPurchase — atomic redeem-once + grant', () => {
   it('serializes the sale-insert params (bigints stringified, correct column order)', async () => {
     const client = clientStub();
     client.query
-      .mockResolvedValueOnce({}).mockResolvedValueOnce({ rowCount: 1 }).mockResolvedValueOnce({})
-      .mockResolvedValueOnce({ rows: [{ cosmetics: { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: [] } }] })
-      .mockResolvedValueOnce({}).mockResolvedValueOnce({});
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({ rowCount: 1 })
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({
+        rows: [
+          { cosmetics: { completedQuestIds: [], mechChromaIds: [], ownedCreatorSkinIds: [] } },
+        ],
+      })
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({});
     dbMock.connect.mockResolvedValueOnce(client);
     await redeemPurchase(params);
-    const sale = client.query.mock.calls.find((c) => /INSERT INTO marketplace_sales/.test(String(c[0])))!;
+    const sale = client.query.mock.calls.find((c) =>
+      /INSERT INTO marketplace_sales/.test(String(c[0])),
+    )!;
     expect(sale[1]).toEqual(['skin_1', 42, 'q_1', '10000000', '7000000', '3000000', 'sig_abc']);
   });
 });
 
 describe('burn_batches + ledger db helpers (real SQL + param shape over a mocked pool)', () => {
   const row = (over: Record<string, unknown> = {}) => ({
-    batch_id: 'b1', source: 'marketplace', usdc_in: '250000000', woc_bought: '0', woc_burned: '0',
-    buy_tx_sig: null, burn_tx_sig: null, status: 'swapping', fail_reason: null,
-    created_at: new Date('2026-06-21T00:00:00.000Z'), burn_broadcast_at: null, executed_at: null, ...over,
+    batch_id: 'b1',
+    source: 'marketplace',
+    usdc_in: '250000000',
+    woc_bought: '0',
+    woc_burned: '0',
+    buy_tx_sig: null,
+    burn_tx_sig: null,
+    status: 'swapping',
+    fail_reason: null,
+    created_at: new Date('2026-06-21T00:00:00.000Z'),
+    burn_broadcast_at: null,
+    executed_at: null,
+    ...over,
   });
 
   it('createBurnBatch: true on fresh insert, false on conflict; target-less ON CONFLICT + params', async () => {
     dbMock.query.mockResolvedValueOnce({ rowCount: 1 });
-    await expect(createBurnBatch({ batchId: 'b1', source: 'marketplace', usdcIn: 250_000_000n, buyTxSig: 'sig' })).resolves.toBe(true);
+    await expect(
+      createBurnBatch({
+        batchId: 'b1',
+        source: 'marketplace',
+        usdcIn: 250_000_000n,
+        buyTxSig: 'sig',
+      }),
+    ).resolves.toBe(true);
     const [sql, args] = dbMock.query.mock.calls[0];
     expect(String(sql)).toMatch(/ON CONFLICT DO NOTHING/);
     expect(args).toEqual(['b1', 'marketplace', '250000000', 'sig']);
     dbMock.query.mockResolvedValueOnce({ rowCount: 0 });
-    await expect(createBurnBatch({ batchId: 'b1', source: 'marketplace', usdcIn: 1n, buyTxSig: 'sig' })).resolves.toBe(false);
+    await expect(
+      createBurnBatch({ batchId: 'b1', source: 'marketplace', usdcIn: 1n, buyTxSig: 'sig' }),
+    ).resolves.toBe(false);
   });
 
   it('markBatch* write the right status, timestamp column, and stringified amount', async () => {
@@ -475,20 +668,41 @@ describe('burn_batches + ledger db helpers (real SQL + param shape over a mocked
     expect(calls[0][1]).toEqual(['b1', '700']);
     expect(String(calls[1][0])).toMatch(/status = 'burning'.*burn_broadcast_at = now\(\)/s); // staleness anchored to burn broadcast
     expect(calls[1][1]).toEqual(['b1', 'burnsig']);
-    expect(String(calls[2][0])).toMatch(/status = 'burned', woc_burned = \$2, executed_at = now\(\)/);
+    expect(String(calls[2][0])).toMatch(
+      /status = 'burned', woc_burned = \$2, executed_at = now\(\)/,
+    );
     expect(calls[2][1]).toEqual(['b1', '640']);
     expect((calls[3][1] as string[])[1]).toHaveLength(500); // fail_reason capped
   });
 
   it('openBurnBatches selects only the non-terminal set, oldest-first, mapped to bigints', async () => {
-    dbMock.query.mockResolvedValueOnce({ rows: [row({ usdc_in: '250000000', woc_bought: '5', woc_burned: '0' })] });
+    dbMock.query.mockResolvedValueOnce({
+      rows: [row({ usdc_in: '250000000', woc_bought: '5', woc_burned: '0' })],
+    });
     const open = await openBurnBatches();
-    expect(String(dbMock.query.mock.calls[0][0])).toMatch(/status IN \('swapping','swapped','burning'\) ORDER BY created_at/);
-    expect(open[0]).toMatchObject({ batchId: 'b1', usdcIn: 250_000_000n, wocBought: 5n, status: 'swapping', createdAt: '2026-06-21T00:00:00.000Z', burnBroadcastAt: null });
+    expect(String(dbMock.query.mock.calls[0][0])).toMatch(
+      /status IN \('swapping','swapped','burning'\) ORDER BY created_at/,
+    );
+    expect(open[0]).toMatchObject({
+      batchId: 'b1',
+      usdcIn: 250_000_000n,
+      wocBought: 5n,
+      status: 'swapping',
+      createdAt: '2026-06-21T00:00:00.000Z',
+      burnBroadcastAt: null,
+    });
   });
 
   it('mapBurnBatch passes through an already-string timestamp unchanged', async () => {
-    dbMock.query.mockResolvedValueOnce({ rows: [row({ created_at: '2026-01-02T03:04:05.000Z', executed_at: '2026-01-02T04:00:00.000Z', status: 'burned' })] });
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        row({
+          created_at: '2026-01-02T03:04:05.000Z',
+          executed_at: '2026-01-02T04:00:00.000Z',
+          status: 'burned',
+        }),
+      ],
+    });
     const [b] = await openBurnBatches();
     expect(b.createdAt).toBe('2026-01-02T03:04:05.000Z');
     expect(b.executedAt).toBe('2026-01-02T04:00:00.000Z');
@@ -502,13 +716,23 @@ describe('burn_batches + ledger db helpers (real SQL + param shape over a mocked
   });
 
   it('burnLedger clamps the limit and returns bigint cumulative totals', async () => {
-    for (const [input, expected] of [[0, 1], [99999, 500], [50.7, 50], [undefined, 100]] as const) {
-      dbMock.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ woc: '0', usdc: '0' }] });
+    for (const [input, expected] of [
+      [0, 1],
+      [99999, 500],
+      [50.7, 50],
+      [undefined, 100],
+    ] as const) {
+      dbMock.query
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [{ woc: '0', usdc: '0' }] });
       await burnLedger(input as number | undefined);
       expect(dbMock.query.mock.calls.at(-2)![1]).toEqual([expected]); // the rows-query LIMIT param
       dbMock.query.mockReset();
     }
-    dbMock.query.mockResolvedValueOnce({ rows: [row({ status: 'burned', woc_burned: '640', usdc_in: '250000000' })] })
+    dbMock.query
+      .mockResolvedValueOnce({
+        rows: [row({ status: 'burned', woc_burned: '640', usdc_in: '250000000' })],
+      })
       .mockResolvedValueOnce({ rows: [{ woc: '12000000', usdc: '9000000' }] });
     const led = await burnLedger(10);
     expect(led.cumulativeWocBurned).toBe(12_000_000n);
@@ -519,20 +743,58 @@ describe('burn_batches + ledger db helpers (real SQL + param shape over a mocked
   it('getCreatorSkin returns null when no row matches, and coerces field types when present', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [] });
     expect(await getCreatorSkin('nope')).toBeNull();
-    dbMock.query.mockResolvedValueOnce({ rows: [{
-      id: 'skin_1', creator_account_id: '7', creator_wallet: 'W', name: 'N', description: 'D',
-      skin_catalog: 'mech', fallback_skin: '3', target_class: null, asset_url: 'u', emissive_url: null, price_usdc: '10000000', status: 'live', sha256: null,
-    }] });
-    expect(await getCreatorSkin('skin_1')).toMatchObject({ creatorAccountId: 7, skinCatalog: 'mech', fallbackSkin: 3, targetClass: null, emissiveUrl: null, priceUsdc: 10_000_000n });
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: 'skin_1',
+          creator_account_id: '7',
+          creator_wallet: 'W',
+          name: 'N',
+          description: 'D',
+          skin_catalog: 'mech',
+          fallback_skin: '3',
+          target_class: null,
+          asset_url: 'u',
+          emissive_url: null,
+          price_usdc: '10000000',
+          status: 'live',
+          sha256: null,
+        },
+      ],
+    });
+    expect(await getCreatorSkin('skin_1')).toMatchObject({
+      creatorAccountId: 7,
+      skinCatalog: 'mech',
+      fallbackSkin: 3,
+      targetClass: null,
+      emissiveUrl: null,
+      priceUsdc: 10_000_000n,
+    });
   });
 
   it('getMarketplaceQuote coerces bigints + ISO expiry and returns null when absent', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [] });
     expect(await getMarketplaceQuote('q')).toBeNull();
-    dbMock.query.mockResolvedValueOnce({ rows: [{
-      quote_id: 'q_1', skin_id: 'skin_1', buyer_account_id: '42', creator_owner: 'C', burn_owner: 'V',
-      creator_usdc: '7000000', burn_usdc: '3000000', mint: 'M', expires_at: new Date('2026-06-21T00:05:00.000Z'),
-    }] });
-    expect(await getMarketplaceQuote('q_1')).toMatchObject({ buyerAccountId: 42, creatorUsdc: 7_000_000n, burnUsdc: 3_000_000n, expiresAt: '2026-06-21T00:05:00.000Z' });
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          quote_id: 'q_1',
+          skin_id: 'skin_1',
+          buyer_account_id: '42',
+          creator_owner: 'C',
+          burn_owner: 'V',
+          creator_usdc: '7000000',
+          burn_usdc: '3000000',
+          mint: 'M',
+          expires_at: new Date('2026-06-21T00:05:00.000Z'),
+        },
+      ],
+    });
+    expect(await getMarketplaceQuote('q_1')).toMatchObject({
+      buyerAccountId: 42,
+      creatorUsdc: 7_000_000n,
+      burnUsdc: 3_000_000n,
+      expiresAt: '2026-06-21T00:05:00.000Z',
+    });
   });
 });

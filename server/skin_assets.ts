@@ -31,7 +31,12 @@ export function validateSkinPng(buf: Buffer): SkinValidation {
     maxDecodedBytes: MAX_SKIN_DECODED_BYTES,
   });
   if (!info) return { ok: false, reason: 'invalid_png' };
-  return { ok: true, sha256: createHash('sha256').update(buf).digest('hex'), width: info.width, height: info.height };
+  return {
+    ok: true,
+    sha256: createHash('sha256').update(buf).digest('hex'),
+    width: info.width,
+    height: info.height,
+  };
 }
 
 // --- SSRF guard --------------------------------------------------------------
@@ -44,7 +49,9 @@ export function isBlockedIpv4(ip: string): boolean {
   if (o.some((n) => n > 255)) return true; // malformed -> block
   const [a, b] = o;
   return (
-    a === 0 || a === 10 || a === 127 || // this-net, private, loopback
+    a === 0 ||
+    a === 10 ||
+    a === 127 || // this-net, private, loopback
     (a === 169 && b === 254) || // link-local (incl. 169.254.169.254 metadata)
     (a === 172 && b >= 16 && b <= 31) || // private
     (a === 192 && b === 168) || // private
@@ -62,7 +69,13 @@ export function isBlockedIpv6(ip: string): boolean {
   const mapped = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.exec(lc);
   if (mapped) return isBlockedIpv4(mapped[1]);
   const head = lc.split(':')[0] ?? '';
-  if (head.startsWith('fe8') || head.startsWith('fe9') || head.startsWith('fea') || head.startsWith('feb')) return true; // fe80::/10 link-local
+  if (
+    head.startsWith('fe8') ||
+    head.startsWith('fe9') ||
+    head.startsWith('fea') ||
+    head.startsWith('feb')
+  )
+    return true; // fe80::/10 link-local
   if (head.startsWith('fc') || head.startsWith('fd')) return true; // fc00::/7 ULA
   return false;
 }
@@ -74,7 +87,11 @@ export function isBlockedIp(ip: string): boolean {
 /** Parse a string as an http(s) URL, or null. */
 export function asHttpUrl(raw: string): URL | null {
   let url: URL;
-  try { url = new URL(raw); } catch { return null; }
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
   return url.protocol === 'http:' || url.protocol === 'https:' ? url : null;
 }
 
@@ -102,13 +119,17 @@ export async function fetchRemoteImage(raw: string): Promise<Buffer> {
 
 // A plain bounded fetch for a TRUSTED, server-configured URL (our IPFS gateway) —
 // no SSRF vetting needed because the host isn't creator-supplied.
-async function fetchBounded(url: URL | string, opts: { redirect: RequestRedirect }): Promise<Buffer> {
+async function fetchBounded(
+  url: URL | string,
+  opts: { redirect: RequestRedirect },
+): Promise<Buffer> {
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
   try {
     const res = await fetch(url, { redirect: opts.redirect, signal: ac.signal });
     if (!res.ok) throw new Error(`fetch_failed_${res.status}`);
-    if (Number(res.headers.get('content-length') ?? '0') > MAX_SKIN_BYTES) throw new Error('too_large');
+    if (Number(res.headers.get('content-length') ?? '0') > MAX_SKIN_BYTES)
+      throw new Error('too_large');
     const buf = Buffer.from(await res.arrayBuffer());
     if (buf.length > MAX_SKIN_BYTES) throw new Error('too_large');
     return buf;
@@ -136,9 +157,16 @@ function cacheAtlas(key: string, bytes: Buffer): void {
 /** Load the atlas bytes for a skin's source, cached by a stable key (sha256/cid).
  *  self_hosted goes through the SSRF-safe fetch; hosted (gatewayUrl) is a trusted
  *  bounded fetch. Returns null when neither source is set. */
-export async function loadAtlasBytes(opts: { key: string; originUrl?: string | null; gatewayUrl?: string | null }): Promise<Buffer | null> {
+export async function loadAtlasBytes(opts: {
+  key: string;
+  originUrl?: string | null;
+  gatewayUrl?: string | null;
+}): Promise<Buffer | null> {
   const hit = atlasCache.get(opts.key);
-  if (hit) { cacheAtlas(opts.key, hit); return hit; }
+  if (hit) {
+    cacheAtlas(opts.key, hit);
+    return hit;
+  }
   let bytes: Buffer | null = null;
   if (opts.gatewayUrl) bytes = await fetchBounded(opts.gatewayUrl, { redirect: 'follow' });
   else if (opts.originUrl) bytes = await fetchRemoteImage(opts.originUrl);

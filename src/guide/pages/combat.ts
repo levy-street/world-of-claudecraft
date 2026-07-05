@@ -1,12 +1,12 @@
 // Combat overview. High level by design: concepts only, no formulas, coefficients, or
-// numbers, so there is nothing here to min-max or exploit (WoW-style altitude).
+// numbers, so there is nothing here to min-max or exploit (classic-guide altitude).
 
-import { t, formatNumber } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
-import { hrefFor } from '../routes';
-import { lead, related } from './ui';
+import { formatNumber, t } from '../../ui/i18n';
 import { LEVEL_CAP } from '../data';
+import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
+import { lead, related } from './ui';
 
 const BLOCKS = [
   ['guide.combat.hitTitle', 'guide.combat.hitBody'],
@@ -17,9 +17,10 @@ const BLOCKS = [
 export const combat: GuidePage = {
   titleKey: 'guide.nav.combat',
   render() {
-    const blocks = BLOCKS
-      .map(([title, body]) => `<section class="guide-block"><h2>${esc(t(title))}</h2><p>${esc(t(body))}</p></section>`)
-      .join('');
+    const blocks = BLOCKS.map(
+      ([title, body]) =>
+        `<section class="guide-block"><h2>${esc(t(title))}</h2><p>${esc(t(body))}</p></section>`,
+    ).join('');
     return `
       <article class="guide-article">
         <h1>${esc(t('guide.nav.combat'))}</h1>

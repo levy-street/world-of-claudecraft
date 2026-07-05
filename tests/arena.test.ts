@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { isArenaPos } from '../src/sim/data';
+import { arenaOrigin, isArenaPos } from '../src/sim/data';
+import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { eloDelta, Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -670,5 +671,27 @@ describe('arena: class ability target filters', () => {
     sim.castAbility(ability, a);
 
     expect(target.hp).toBeLessThan(startHp);
+  });
+});
+
+describe('arena: enclosing walls', () => {
+  it('melee auto-attack cannot land through the arena side wall', () => {
+    const { sim, a, b } = queueDuo();
+    startBout(sim);
+    const attacker = sim.entities.get(a)!;
+    const target = sim.entities.get(b)!;
+    const slot = sim.arenaMatchFor(a)!.slot ?? 0;
+    const o = arenaOrigin(slot);
+    // attacker just inside the +x wall, target just outside it, close enough
+    // to be within MELEE_RANGE but with the wall between them.
+    teleport(sim, a, o.x + DUNGEON_WALL_X - 1.5, o.z);
+    teleport(sim, b, o.x + DUNGEON_WALL_X + 1.5, o.z);
+    face(sim, a, b);
+    sim.targetEntity(b, a);
+    sim.startAutoAttack(a);
+    const startHp = target.hp;
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    // stays toggled on (mirrors the ranged LOS gate) but never lands a swing
+    expect(target.hp).toBe(startHp);
   });
 });
