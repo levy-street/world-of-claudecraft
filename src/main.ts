@@ -3940,7 +3940,7 @@ function ensureIdentityPrices(): void {
 // the list on success.
 function openPaidRenameEditor(row: HTMLElement, c: { id: number; name: string }): void {
   if (row.querySelector('.paid-rename-editor')) return; // already open on this row
-  const priceLabel = renameCharacterPriceWoc !== null ? formatWoc(renameCharacterPriceWoc) : '—';
+  const priceLabel = renameCharacterPriceWoc !== null ? formatWoc(renameCharacterPriceWoc) : '-';
   const editor = document.createElement('div');
   editor.className = 'paid-rename-editor';
   editor.innerHTML = `
@@ -3990,7 +3990,7 @@ function openPaidRenameEditor(row: HTMLElement, c: { id: number; name: string })
 // binds the character to it.
 function openMintSubdomainEditor(row: HTMLElement, c: { id: number; name: string }): void {
   if (row.querySelector('.paid-rename-editor')) return;
-  const priceLabel = renameCharacterPriceWoc !== null ? formatWoc(renameCharacterPriceWoc) : '—';
+  const priceLabel = renameCharacterPriceWoc !== null ? formatWoc(renameCharacterPriceWoc) : '-';
   const editor = document.createElement('div');
   editor.className = 'paid-rename-editor';
   editor.innerHTML = `
@@ -6417,12 +6417,14 @@ const HIRE_CURRENCIES: { key: HireCurrency; label: string }[] = [
   { key: 'USDC', label: 'USDC' },
 ];
 type GoalKind = 'reach_level' | 'clear_dungeon' | 'complete_quest' | 'survive' | 'escort';
-const GOAL_TYPES: { key: GoalKind; label: string }[] = [
-  { key: 'reach_level', label: 'Reach level' },
-  { key: 'clear_dungeon', label: 'Clear raid' },
-  { key: 'complete_quest', label: 'Quest' },
-  { key: 'survive', label: 'Bodyguard' },
-  { key: 'escort', label: 'Escort' },
+// Labels resolve through t() at render time (the panel re-renders per open, so
+// they always reflect the active language).
+const GOAL_TYPES: { key: GoalKind; labelKey: TranslationKey }[] = [
+  { key: 'reach_level', labelKey: 'walletPanel.goalReachLevel' },
+  { key: 'clear_dungeon', labelKey: 'walletPanel.goalClearDungeon' },
+  { key: 'complete_quest', labelKey: 'walletPanel.goalQuest' },
+  { key: 'survive', labelKey: 'walletPanel.goalBodyguard' },
+  { key: 'escort', labelKey: 'walletPanel.goalEscort' },
 ];
 
 function closeWalletPanel(): void {
@@ -6461,51 +6463,51 @@ function openWalletPanel(): void {
   let escortDest: { x: number; z: number } | null = null;
 
   el.innerHTML = `
-    <div class="panel-title"><span>Wallet</span><button type="button" class="x-btn" data-close aria-label="Close">✕</button></div>
-    <div class="wp-status"><span class="wp-dot" aria-hidden="true"></span><span class="wp-status-text">Wallet not connected</span><button type="button" class="btn wp-connect" data-connect>Connect</button></div>
+    <div class="panel-title"><span>${escapeHtml(t('walletPanel.title'))}</span><button type="button" class="x-btn" data-close aria-label="${escapeHtml(t('walletPanel.closeAria'))}">✕</button></div>
+    <div class="wp-status"><span class="wp-dot" aria-hidden="true"></span><span class="wp-status-text">${escapeHtml(t('walletPanel.notConnected'))}</span><button type="button" class="btn wp-connect" data-connect>${escapeHtml(t('walletPanel.connect'))}</button></div>
     <div class="wp-tabs" role="tablist">
-      <button type="button" class="wp-tab sel" data-tab="send" role="tab" aria-selected="true">Send</button>
-      <button type="button" class="wp-tab" data-tab="hire" role="tab" aria-selected="false">Hire</button>
-      <button type="button" class="wp-tab" data-tab="jobs" role="tab" aria-selected="false">Jobs</button>
+      <button type="button" class="wp-tab sel" data-tab="send" role="tab" aria-selected="true">${escapeHtml(t('walletPanel.tabSend'))}</button>
+      <button type="button" class="wp-tab" data-tab="hire" role="tab" aria-selected="false">${escapeHtml(t('walletPanel.tabHire'))}</button>
+      <button type="button" class="wp-tab" data-tab="jobs" role="tab" aria-selected="false">${escapeHtml(t('walletPanel.tabJobs'))}</button>
     </div>
 
     <div class="wp-body" data-body="send">
-      <div class="wp-section-label">Send to a player</div>
-      <div class="wp-row"><label>Currency</label><div class="wp-cur">${WALLET_CURRENCIES.map(
+      <div class="wp-section-label">${escapeHtml(t('walletPanel.sendSection'))}</div>
+      <div class="wp-row"><label>${escapeHtml(t('walletPanel.currency'))}</label><div class="wp-cur">${WALLET_CURRENCIES.map(
         (c) =>
           `<button type="button" data-cur="${c.key}"${c.key === currency ? ' class="sel"' : ''} aria-pressed="${c.key === currency}">${escapeHtml(c.label)}</button>`,
       ).join('')}</div></div>
-      <div class="wp-row"><label for="wp-recipient">Player name</label><input id="wp-recipient" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="Who are you sending to?"><div class="wp-resolve" data-resolve aria-live="polite"></div></div>
-      <div class="wp-row"><label for="wp-amount">Amount</label><div class="wp-amount"><input id="wp-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0"><button type="button" class="btn wp-max" data-max>Max</button></div><div class="wp-bal" data-bal>Balance: —</div></div>
-      <div class="wp-note">Sent directly wallet-to-wallet on Solana. Non-custodial — the game never holds your funds. Network fees apply.</div>
-      <button type="button" class="btn wp-send" data-send disabled>Send</button>
+      <div class="wp-row"><label for="wp-recipient">${escapeHtml(t('walletPanel.playerName'))}</label><input id="wp-recipient" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(t('walletPanel.recipientPlaceholder'))}"><div class="wp-resolve" data-resolve aria-live="polite"></div></div>
+      <div class="wp-row"><label for="wp-amount">${escapeHtml(t('walletPanel.amount'))}</label><div class="wp-amount"><input id="wp-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="${escapeHtml(t('walletPanel.amountPlaceholder'))}"><button type="button" class="btn wp-max" data-max>${escapeHtml(t('walletPanel.max'))}</button></div><div class="wp-bal" data-bal>${escapeHtml(t('walletPanel.balanceEmpty'))}</div></div>
+      <div class="wp-note">${escapeHtml(t('walletPanel.sendNote'))}</div>
+      <button type="button" class="btn wp-send" data-send disabled>${escapeHtml(t('walletPanel.send'))}</button>
       <div class="wp-feedback" data-feedback aria-live="polite"></div>
     </div>
 
     <div class="wp-body" data-body="hire" hidden>
-      <div class="wp-section-label">Hire a helper</div>
-      <div class="wp-online-only" data-h-offline hidden>Enter the world online to hire a helper.</div>
+      <div class="wp-section-label">${escapeHtml(t('walletPanel.hireSection'))}</div>
+      <div class="wp-online-only" data-h-offline hidden>${escapeHtml(t('walletPanel.hireOffline'))}</div>
       <div data-h-form>
-        <div class="wp-row"><label for="wp-h-name">Player name</label><input id="wp-h-name" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="Who will help you?"><div class="wp-resolve" data-h-resolve aria-live="polite"></div></div>
-        <div class="wp-row"><label>Reward currency</label><div class="wp-cur" data-h-cur>${HIRE_CURRENCIES.map(
+        <div class="wp-row"><label for="wp-h-name">${escapeHtml(t('walletPanel.playerName'))}</label><input id="wp-h-name" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(t('walletPanel.helperPlaceholder'))}"><div class="wp-resolve" data-h-resolve aria-live="polite"></div></div>
+        <div class="wp-row"><label>${escapeHtml(t('walletPanel.rewardCurrency'))}</label><div class="wp-cur" data-h-cur>${HIRE_CURRENCIES.map(
           (c) =>
             `<button type="button" data-hcur="${c.key}"${c.key === hCurrency ? ' class="sel"' : ''} aria-pressed="${c.key === hCurrency}">${escapeHtml(c.label)}</button>`,
         ).join('')}</div></div>
-        <div class="wp-row"><label for="wp-h-amount">Reward</label><div class="wp-amount"><input id="wp-h-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.0"></div><div class="wp-bal" data-h-bal>Balance: —</div></div>
-        <div class="wp-row"><label>Goal — paid when the server confirms it</label><div class="wp-cur wp-goals" data-h-goal>${GOAL_TYPES.map(
+        <div class="wp-row"><label for="wp-h-amount">${escapeHtml(t('walletPanel.reward'))}</label><div class="wp-amount"><input id="wp-h-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="${escapeHtml(t('walletPanel.amountPlaceholder'))}"></div><div class="wp-bal" data-h-bal>${escapeHtml(t('walletPanel.balanceEmpty'))}</div></div>
+        <div class="wp-row"><label>${escapeHtml(t('walletPanel.goalLabel'))}</label><div class="wp-cur wp-goals" data-h-goal>${GOAL_TYPES.map(
           (g) =>
-            `<button type="button" data-goal="${g.key}"${g.key === goalKind ? ' class="sel"' : ''} aria-pressed="${g.key === goalKind}">${escapeHtml(g.label)}</button>`,
+            `<button type="button" data-goal="${g.key}"${g.key === goalKind ? ' class="sel"' : ''} aria-pressed="${g.key === goalKind}">${escapeHtml(t(g.labelKey))}</button>`,
         ).join('')}</div></div>
         <div class="wp-row" data-h-params></div>
-        <div class="wp-note">The reward is locked in on-chain escrow and released to the helper automatically when the server confirms the goal — or refunded to you if it isn't met before the deadline.</div>
-        <button type="button" class="btn wp-send" data-h-post disabled>Post &amp; Lock Reward</button>
+        <div class="wp-note">${escapeHtml(t('walletPanel.escrowNote'))}</div>
+        <button type="button" class="btn wp-send" data-h-post disabled>${escapeHtml(t('walletPanel.post'))}</button>
         <div class="wp-feedback" data-h-feedback aria-live="polite"></div>
       </div>
     </div>
 
     <div class="wp-body" data-body="jobs" hidden>
-      <div class="wp-section-label">Your jobs</div>
-      <div data-jobs-list><div class="wp-jobs-empty">Loading…</div></div>
+      <div class="wp-section-label">${escapeHtml(t('walletPanel.jobsSection'))}</div>
+      <div data-jobs-list><div class="wp-jobs-empty">${escapeHtml(t('walletPanel.loading'))}</div></div>
       <div class="wp-feedback" data-jobs-msg aria-live="polite"></div>
     </div>`;
   document.body.appendChild(el);
@@ -6542,26 +6544,29 @@ function openWalletPanel(): void {
   const updateSendButton = (): void => {
     sendBtn.disabled =
       sending || !connectedAddress || !resolved || !amountIsValid() || overBalance();
-    sendBtn.textContent = sending ? 'Sending…' : 'Send';
+    sendBtn.textContent = sending ? t('walletPanel.sending') : t('walletPanel.send');
   };
 
   const updateBalanceDisplay = (): void => {
     const box = $$('[data-bal]');
     const label = WALLET_CURRENCIES.find((c) => c.key === currency)!.label;
     if (!connectedAddress) {
-      box.textContent = 'Connect a wallet to see your balance.';
+      box.textContent = t('walletPanel.connectForBalance');
       box.classList.remove('over');
       return;
     }
     const b = balances[currency];
     const over = overBalance();
     box.classList.toggle('over', over);
+    const amountHtml = `<b>${escapeHtml(formatNumber(b ?? 0, { maximumFractionDigits: BALANCE_DISPLAY_DIGITS[currency] }))} ${escapeHtml(label)}</b>`;
     box.innerHTML =
       b === undefined
-        ? 'Balance: …'
+        ? escapeHtml(t('walletPanel.balanceLoading'))
         : b === null
-          ? 'Balance: unavailable'
-          : `Balance: <b>${escapeHtml(formatNumber(b, { maximumFractionDigits: BALANCE_DISPLAY_DIGITS[currency] }))} ${escapeHtml(label)}</b>${over ? ' — exceeds balance' : ''}`;
+          ? escapeHtml(t('walletPanel.balanceUnavailable'))
+          : over
+            ? t('walletPanel.balanceExceeds', { amount: amountHtml })
+            : t('walletPanel.balance', { amount: amountHtml });
   };
 
   const loadBalances = async (address: string): Promise<void> => {
@@ -6590,15 +6595,15 @@ function openWalletPanel(): void {
     if (connectedAddress) {
       const linked =
         linkedWalletPubkey === connectedAddress
-          ? ' · <span style="color:#4ade80">linked ✓</span>'
+          ? ` · <span style="color:#4ade80">${escapeHtml(t('walletPanel.linkedBadge'))} ✓</span>`
           : '';
-      setStatus(
-        `Connected <code>${escapeHtml(shortenAddress(connectedAddress))}</code>${linked}`,
-        true,
-      );
+      const connectedHtml = t('walletPanel.connectedStatus', {
+        address: `<code>${escapeHtml(shortenAddress(connectedAddress))}</code>`,
+      });
+      setStatus(`${connectedHtml}${linked}`, true);
       void loadBalances(connectedAddress);
     } else {
-      setStatus('Wallet not connected', false);
+      setStatus(escapeHtml(t('walletPanel.notConnected')), false);
     }
     updateBalanceDisplay();
     updateSendButton();
@@ -6619,23 +6624,23 @@ function openWalletPanel(): void {
     }
     if (!api.token) {
       resolveBox.className = 'wp-resolve bad';
-      resolveBox.textContent = 'Log in and enter a realm to send to players.';
+      resolveBox.textContent = t('walletPanel.loginToSend');
       return;
     }
     resolveBox.className = 'wp-resolve pending';
-    resolveBox.textContent = 'Looking up player…';
+    resolveBox.textContent = t('walletPanel.lookingUp');
     const seq = ++resolveSeq;
     void api.resolveRecipient(q).then((r) => {
       if (walletPanelEl !== el || seq !== resolveSeq) return; // stale response
       if (r) {
         resolved = r;
         const self =
-          connectedAddress && r.pubkey === connectedAddress ? ' (this is your own wallet)' : '';
+          connectedAddress && r.pubkey === connectedAddress ? ` ${t('walletPanel.ownWallet')}` : '';
         resolveBox.className = 'wp-resolve ok';
         resolveBox.innerHTML = `✓ ${escapeHtml(r.name)} · <code>${escapeHtml(shortenAddress(r.pubkey))}</code>${escapeHtml(self)}`;
       } else {
         resolveBox.className = 'wp-resolve bad';
-        resolveBox.textContent = 'No player by that name has a verified wallet.';
+        resolveBox.textContent = t('walletPanel.noVerifiedWallet');
       }
       updateSendButton();
     });
@@ -6657,15 +6662,15 @@ function openWalletPanel(): void {
     sending = true;
     updateSendButton();
     feedbackBox.className = 'wp-feedback';
-    feedbackBox.textContent = 'Approve the transfer in your wallet…';
+    feedbackBox.textContent = t('walletPanel.approveTransfer');
     try {
       const wallet = await loadWallet();
       const signature = await wallet.sendTokens(currency, resolved.pubkey, amount);
       const label = WALLET_CURRENCIES.find((c) => c.key === currency)!.label;
       feedbackBox.className = 'wp-feedback ok';
       feedbackBox.innerHTML =
-        `Sent ${escapeHtml(amount)} ${escapeHtml(label)} to ${escapeHtml(resolved.name)}. ` +
-        `<a href="${escapeHtml(solscanTxUrl(signature, import.meta.env.VITE_SOLANA_RPC_URL))}" target="_blank" rel="noopener noreferrer">View transaction ↗</a>`;
+        `${escapeHtml(t('walletPanel.sent', { amount, currency: label, name: resolved.name }))} ` +
+        `<a href="${escapeHtml(solscanTxUrl(signature, import.meta.env.VITE_SOLANA_RPC_URL))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('walletPanel.viewTransaction'))} ↗</a>`;
       amountInput.value = '';
       if (connectedAddress) {
         void refreshWocBalance(connectedAddress);
@@ -6673,7 +6678,9 @@ function openWalletPanel(): void {
       }
     } catch (err: any) {
       feedbackBox.className = 'wp-feedback bad';
-      feedbackBox.textContent = err?.message ? `Send failed: ${err.message}` : 'Send failed.';
+      feedbackBox.textContent = err?.message
+        ? t('walletPanel.sendFailedWith', { message: err.message })
+        : t('walletPanel.sendFailed');
     } finally {
       sending = false;
       updateSendButton();
@@ -6774,65 +6781,67 @@ function openWalletPanel(): void {
   const updatePostButton = (): void => {
     postBtn.disabled =
       posting || !connectedAddress || !hResolved || !activeOnline || !hAmountValid() || !readGoal();
-    postBtn.textContent = posting ? 'Posting…' : 'Post & Lock Reward';
+    postBtn.textContent = posting ? t('walletPanel.posting') : t('walletPanel.post');
   };
 
   const updateHireBalance = (): void => {
     const box = $$('[data-h-bal]');
     const label = HIRE_CURRENCIES.find((c) => c.key === hCurrency)!.label;
     if (!connectedAddress) {
-      box.textContent = 'Connect a wallet to see your balance.';
+      box.textContent = t('walletPanel.connectForBalance');
       return;
     }
     const b = balances[hCurrency];
     box.innerHTML =
       b === undefined
-        ? 'Balance: …'
+        ? escapeHtml(t('walletPanel.balanceLoading'))
         : b === null
-          ? 'Balance: unavailable'
-          : `Balance: <b>${escapeHtml(formatNumber(b, { maximumFractionDigits: BALANCE_DISPLAY_DIGITS[hCurrency] }))} ${escapeHtml(label)}</b>`;
+          ? escapeHtml(t('walletPanel.balanceUnavailable'))
+          : t('walletPanel.balance', {
+              amount: `<b>${escapeHtml(formatNumber(b, { maximumFractionDigits: BALANCE_DISPLAY_DIGITS[hCurrency] }))} ${escapeHtml(label)}</b>`,
+            });
   };
 
   const renderGoalParams = (): void => {
     switch (goalKind) {
       case 'reach_level':
-        hParams.innerHTML =
-          '<label for="wp-g-level">Target level</label><input id="wp-g-level" class="cd-input" type="number" min="2" max="20" placeholder="2–20">';
+        hParams.innerHTML = `<label for="wp-g-level">${escapeHtml(t('walletPanel.targetLevel'))}</label><input id="wp-g-level" class="cd-input" type="number" min="2" max="20" placeholder="${escapeHtml(t('walletPanel.targetLevelPlaceholder'))}">`;
         break;
       case 'clear_dungeon':
-        hParams.innerHTML = `<label for="wp-g-dungeon">Raid / dungeon</label><select id="wp-g-dungeon" class="cd-input">${DUNGEON_LIST.map(
+        hParams.innerHTML = `<label for="wp-g-dungeon">${escapeHtml(t('walletPanel.raidDungeon'))}</label><select id="wp-g-dungeon" class="cd-input">${DUNGEON_LIST.map(
           (d) => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`,
         ).join('')}</select>`;
         break;
       case 'complete_quest': {
         const ids = activeOnline ? [...activeOnline.questLog.keys()] : [];
         hParams.innerHTML = ids.length
-          ? `<label for="wp-g-quest">Quest (one you're on)</label><select id="wp-g-quest" class="cd-input">${ids
+          ? `<label for="wp-g-quest">${escapeHtml(t('walletPanel.questOwn'))}</label><select id="wp-g-quest" class="cd-input">${ids
               .map(
                 (id) =>
                   `<option value="${escapeHtml(id)}">${escapeHtml(QUESTS[id]?.name ?? id)}</option>`,
               )
               .join('')}</select>`
-          : '<div class="wp-hint">You have no active quests to hire help for — pick one up first.</div>';
+          : `<div class="wp-hint">${escapeHtml(t('walletPanel.noActiveQuests'))}</div>`;
         break;
       }
       case 'survive':
-        hParams.innerHTML =
-          '<label for="wp-g-minutes">Protect me for (minutes)</label><input id="wp-g-minutes" class="cd-input" type="number" min="1" max="1440" placeholder="e.g. 10">';
+        hParams.innerHTML = `<label for="wp-g-minutes">${escapeHtml(t('walletPanel.protectMinutes'))}</label><input id="wp-g-minutes" class="cd-input" type="number" min="1" max="1440" placeholder="${escapeHtml(t('walletPanel.minutesPlaceholder'))}">`;
         break;
       case 'escort': {
         const at = escortDest
-          ? `Destination set: (${escortDest.x}, ${escortDest.z})`
-          : 'No destination set yet.';
+          ? t('walletPanel.destinationSet', { x: escortDest.x, z: escortDest.z })
+          : t('walletPanel.noDestination');
         hParams.innerHTML =
-          '<label>Escort destination</label><button type="button" class="btn wp-capture" data-h-capture>Use my current spot</button>' +
+          `<label>${escapeHtml(t('walletPanel.escortDestination'))}</label><button type="button" class="btn wp-capture" data-h-capture>${escapeHtml(t('walletPanel.useCurrentSpot'))}</button>` +
           `<div class="wp-hint" data-escort-readout>${escapeHtml(at)}</div>`;
         $$('[data-h-capture]').addEventListener('click', () => {
           if (!activeOnline) return;
           const p = activeOnline.player.pos;
           escortDest = { x: Math.round(p.x), z: Math.round(p.z) };
-          $$('[data-escort-readout]').textContent =
-            `Destination (${escortDest.x}, ${escortDest.z}) — travel off, then have your guard bring you back here.`;
+          $$('[data-escort-readout]').textContent = t('walletPanel.destinationHint', {
+            x: escortDest.x,
+            z: escortDest.z,
+          });
           updatePostButton();
         });
         break;
@@ -6856,11 +6865,11 @@ function openWalletPanel(): void {
     }
     if (!api.token) {
       hResolveBox.className = 'wp-resolve bad';
-      hResolveBox.textContent = 'Enter a realm online to hire a player.';
+      hResolveBox.textContent = t('walletPanel.hireLogin');
       return;
     }
     hResolveBox.className = 'wp-resolve pending';
-    hResolveBox.textContent = 'Looking up player…';
+    hResolveBox.textContent = t('walletPanel.lookingUp');
     const seq = ++hResolveSeq;
     void api.resolveRecipient(q).then((r) => {
       if (walletPanelEl !== el || seq !== hResolveSeq) return;
@@ -6870,7 +6879,7 @@ function openWalletPanel(): void {
         hResolveBox.innerHTML = `✓ ${escapeHtml(r.name)} · <code>${escapeHtml(shortenAddress(r.pubkey))}</code>`;
       } else {
         hResolveBox.className = 'wp-resolve bad';
-        hResolveBox.textContent = 'No player by that name has a verified wallet.';
+        hResolveBox.textContent = t('walletPanel.noVerifiedWallet');
       }
       updatePostButton();
     });
@@ -6882,13 +6891,13 @@ function openWalletPanel(): void {
     const amount = hAmountInput.value.trim();
     if (!goal) {
       hFeedback.className = 'wp-feedback bad';
-      hFeedback.textContent = 'Set a valid goal first.';
+      hFeedback.textContent = t('walletPanel.setGoalFirst');
       return;
     }
     posting = true;
     updatePostButton();
     hFeedback.className = 'wp-feedback';
-    hFeedback.textContent = 'Preparing the escrow…';
+    hFeedback.textContent = t('walletPanel.preparingEscrow');
     try {
       const quote = await api.jobQuote({
         characterId: activeOnline.characterId,
@@ -6897,10 +6906,10 @@ function openWalletPanel(): void {
         amount: Number(amount),
         milestone: goal,
       });
-      hFeedback.textContent = 'Approve the reward deposit in your wallet…';
+      hFeedback.textContent = t('walletPanel.approveDeposit');
       const wallet = await loadWallet();
       const signature = await wallet.signAndSubmitServerTx(quote.txBase64);
-      hFeedback.textContent = 'Locking the reward on-chain…';
+      hFeedback.textContent = t('walletPanel.lockingReward');
       let confirmed = false;
       for (let attempt = 0; attempt < 24 && !confirmed; attempt++) {
         try {
@@ -6909,19 +6918,20 @@ function openWalletPanel(): void {
         } catch (err: any) {
           const msg = String(err?.message ?? '');
           if (/retry|finaliz|confirm/i.test(msg)) {
-            hFeedback.textContent = 'Waiting for finalization…';
+            hFeedback.textContent = t('walletPanel.waitingFinalization');
             await new Promise((r) => window.setTimeout(r, 2500));
           } else {
             throw err;
           }
         }
       }
-      if (!confirmed)
-        throw new Error(
-          'Timed out confirming the deposit. If the reward was locked it will settle once it finalizes.',
-        );
+      if (!confirmed) throw new Error(t('walletPanel.confirmTimeout'));
       hFeedback.className = 'wp-feedback ok';
-      hFeedback.innerHTML = `Job posted — ${escapeHtml(formatNumber(Number(amount), { maximumFractionDigits: 4 }))} ${escapeHtml(hCurrency)} locked in escrow for ${escapeHtml(hResolved.name)}.`;
+      hFeedback.textContent = t('walletPanel.jobPosted', {
+        amount: formatNumber(Number(amount), { maximumFractionDigits: 4 }),
+        currency: HIRE_CURRENCIES.find((c) => c.key === hCurrency)!.label,
+        name: hResolved.name,
+      });
       hAmountInput.value = '';
       if (connectedAddress) {
         void refreshWocBalance(connectedAddress);
@@ -6929,7 +6939,9 @@ function openWalletPanel(): void {
       }
     } catch (err: any) {
       hFeedback.className = 'wp-feedback bad';
-      hFeedback.textContent = err?.message ? `Failed: ${err.message}` : 'Failed to post the job.';
+      hFeedback.textContent = err?.message
+        ? t('walletPanel.failedWith', { message: err.message })
+        : t('walletPanel.postFailed');
     } finally {
       posting = false;
       updatePostButton();
@@ -6981,23 +6993,21 @@ function openWalletPanel(): void {
   const jobStatusText = (j: JobSummary): string => {
     switch (j.status) {
       case 'pending_deposit':
-        return 'Awaiting your deposit';
+        return t('walletPanel.status.awaitingDeposit');
       case 'open':
-        return j.role === 'helper'
-          ? 'Offered to you — accept to begin'
-          : 'Open — waiting for the helper to accept';
+        return j.role === 'helper' ? t('walletPanel.status.offered') : t('walletPanel.status.open');
       case 'active':
-        return 'In progress';
+        return t('walletPanel.status.active');
       case 'released':
-        return 'Completed — helper paid ✓';
+        return t('walletPanel.status.completed');
       case 'refunded':
         return j.reason === 'expired'
-          ? 'Expired — refunded'
+          ? t('walletPanel.status.expired')
           : j.reason === 'subject_died'
-            ? 'Failed (you died) — refunded'
+            ? t('walletPanel.status.failedDied')
             : j.reason === 'cancelled'
-              ? 'Cancelled — refunded'
-              : 'Refunded';
+              ? t('walletPanel.status.cancelled')
+              : t('walletPanel.status.refunded');
     }
   };
 
@@ -7005,31 +7015,30 @@ function openWalletPanel(): void {
     const list = $$('[data-jobs-list]');
     $$('[data-jobs-msg]').textContent = '';
     if (!activeOnline || !api.token) {
-      list.innerHTML = '<div class="wp-jobs-empty">Enter the world online to manage jobs.</div>';
+      list.innerHTML = `<div class="wp-jobs-empty">${escapeHtml(t('walletPanel.jobsOffline'))}</div>`;
       return;
     }
-    list.innerHTML = '<div class="wp-jobs-empty">Loading…</div>';
+    list.innerHTML = `<div class="wp-jobs-empty">${escapeHtml(t('walletPanel.loading'))}</div>`;
     const jobs = await api.jobs(activeOnline.characterId);
     if (walletPanelEl !== el) return;
     if (!jobs.length) {
-      list.innerHTML =
-        '<div class="wp-jobs-empty">No jobs yet. Use the Hire tab to pay a player for help.</div>';
+      list.innerHTML = `<div class="wp-jobs-empty">${escapeHtml(t('walletPanel.jobsEmpty'))}</div>`;
       return;
     }
     list.innerHTML = jobs
       .map((j) => {
         const head =
           j.role === 'payer'
-            ? `You hired <b>${escapeHtml(j.helperName)}</b>`
-            : `<b>${escapeHtml(j.payerName)}</b> hired you`;
+            ? t('walletPanel.youHired', { name: `<b>${escapeHtml(j.helperName)}</b>` })
+            : t('walletPanel.hiredYou', { name: `<b>${escapeHtml(j.payerName)}</b>` });
         const amt = `${formatNumber(j.amount, { maximumFractionDigits: 4 })} ${j.currency}`;
         let action = '';
         if (j.status === 'open' && j.role === 'helper')
-          action = `<button type="button" class="btn wp-job-btn" data-accept="${escapeHtml(j.jobId)}">Accept job</button>`;
+          action = `<button type="button" class="btn wp-job-btn" data-accept="${escapeHtml(j.jobId)}">${escapeHtml(t('walletPanel.acceptJob'))}</button>`;
         else if (j.status === 'open' && j.role === 'payer')
-          action = `<button type="button" class="btn wp-job-btn" data-cancel="${escapeHtml(j.jobId)}">Cancel &amp; refund</button>`;
+          action = `<button type="button" class="btn wp-job-btn" data-cancel="${escapeHtml(j.jobId)}">${escapeHtml(t('walletPanel.cancelRefund'))}</button>`;
         else if (j.settleSig)
-          action = `<a class="wp-job-link" href="${escapeHtml(solscanTxUrl(j.settleSig, import.meta.env.VITE_SOLANA_RPC_URL))}" target="_blank" rel="noopener noreferrer">View payout ↗</a>`;
+          action = `<a class="wp-job-link" href="${escapeHtml(solscanTxUrl(j.settleSig, import.meta.env.VITE_SOLANA_RPC_URL))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('walletPanel.viewPayout'))} ↗</a>`;
         return `<div class="wp-job">
         <div class="wp-job-head">${head}<span class="wp-job-amt">${escapeHtml(amt)}</span></div>
         <div class="wp-job-goal">${escapeHtml(j.milestoneText)}</div>
@@ -7055,7 +7064,9 @@ function openWalletPanel(): void {
     } catch (err: any) {
       const msg = $$('[data-jobs-msg]');
       msg.className = 'wp-feedback bad';
-      msg.textContent = err?.message ? `Failed: ${err.message}` : 'Action failed.';
+      msg.textContent = err?.message
+        ? t('walletPanel.failedWith', { message: err.message })
+        : t('walletPanel.actionFailed');
     }
   };
 
