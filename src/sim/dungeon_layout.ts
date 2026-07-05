@@ -11,6 +11,8 @@ import type { Collider } from './colliders';
 // assume these exact footprints.
 export const DUNGEON_WALL_X = 23; // side wall centreline (|x|)
 export const DUNGEON_WALL_HW = 1; // wall half thickness
+/** Walkable half-width inside side-wall colliders (instance-local x). */
+export const DUNGEON_WALK_HALF_X = DUNGEON_WALL_X - DUNGEON_WALL_HW;
 export const DUNGEON_END_WALL_HW = 24; // front/back wall half width
 export const PILLAR_COLLIDER_R = 1.0; // centre-aisle pillar obstacle radius
 export const TOMB_HW = 1.1; // wall-side obstacle (sarcophagus/cargo) half extents
@@ -49,6 +51,16 @@ export interface DungeonLayout {
   wallX?: number;
   endWallHw?: number;
   floorHalfX?: number;
+  /** entrance archway z position; renderer places gate props here when set */
+  doorZ?: number;
+  /** floor scatter positions, renderer places props here AND collision circles back them */
+  clutter?: GridPoint[];
+  /** Room shell outline (CCW, simple, star-shaped from `shellPole`), instance-local.
+   * When present, render/collision derive the room's walls and floor mask from this
+   * polygon instead of the rectangular wallX/zMin/zMax shell. */
+  shellPolygon?: Array<{ x: number; z: number }>;
+  /** Star-shaping pole paired with `shellPolygon` (see geometry2d.polygonIsStarShaped). */
+  shellPole?: { x: number; z: number };
 }
 
 function grid(zFrom: number, zTo: number, zStep: number, xs: readonly number[]): GridPoint[] {
@@ -114,9 +126,12 @@ export const NYTHRAXIS_LAYOUT: DungeonLayout = (() => {
     floorHalfX: 228,
     pillars,
     tombs: [
-      { x: -210, z: 20 }, { x: 210, z: 20 },
-      { x: -210, z: 42 }, { x: 210, z: 42 },
-      { x: -210, z: 64 }, { x: 210, z: 64 },
+      { x: -210, z: 20 },
+      { x: 210, z: 20 },
+      { x: -210, z: 42 },
+      { x: 210, z: 42 },
+      { x: -210, z: 64 },
+      { x: 210, z: 64 },
     ],
     stubs: [],
     dais: { x: 0, z: 96, r: 13.5 },
@@ -161,19 +176,25 @@ export const ARENA_LAYOUT: DungeonLayout = {
   sideWallZ: 2,
   sideWallHd: 23,
   pillars: [
-    { x: -14, z: -10 }, { x: 14, z: -10 },
-    { x: -14, z: 14 }, { x: 14, z: 14 },
+    { x: -14, z: -10 },
+    { x: 14, z: -10 },
+    { x: -14, z: 14 },
+    { x: 14, z: 14 },
     // Cover/parkour posts, mirrored about the centre line (z=2) so neither side
     // is favoured. They give the Fiesta something to juke around (and ranked a
     // little cover too) without crowding the spawns at z=-14 / z=18.
-    { x: 0, z: -4 }, { x: 0, z: 8 },
-    { x: -9, z: -10 }, { x: 9, z: -10 },
-    { x: -9, z: 14 }, { x: 9, z: 14 },
+    { x: 0, z: -4 },
+    { x: 0, z: 8 },
+    { x: -9, z: -10 },
+    { x: 9, z: -10 },
+    { x: -9, z: 14 },
+    { x: 9, z: 14 },
   ],
   tombs: [],
   // Low flanking fences along the side lanes, also mirrored about z=2.
   stubs: [
-    { x: -11, z: 2, hw: 0.6, hd: 4 }, { x: 11, z: 2, hw: 0.6, hd: 4 },
+    { x: -11, z: 2, hw: 0.6, hd: 4 },
+    { x: 11, z: 2, hw: 0.6, hd: 4 },
   ],
   dais: { x: 0, z: 2, r: 8 },
 };
@@ -199,16 +220,28 @@ export function layoutColliders(layout: DungeonLayout): Collider[] {
   const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
   // side walls
   for (const sx of [-wallX, wallX]) {
-    out.push({ type: 'obb', x: sx, z: layout.sideWallZ, hw: DUNGEON_WALL_HW, hd: layout.sideWallHd, rot: 0 });
+    out.push({
+      type: 'obb',
+      x: sx,
+      z: layout.sideWallZ,
+      hw: DUNGEON_WALL_HW,
+      hd: layout.sideWallHd,
+      rot: 0,
+    });
   }
   // back wall, then front wall (entrance porch: chase cam fits inside)
   out.push({ type: 'obb', x: 0, z: layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
   out.push({ type: 'obb', x: 0, z: layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
   // chamber waists
-  for (const s of layout.stubs) out.push({ type: 'obb', x: s.x, z: s.z, hw: s.hw, hd: s.hd, rot: 0 });
+  for (const s of layout.stubs)
+    out.push({ type: 'obb', x: s.x, z: s.z, hw: s.hw, hd: s.hd, rot: 0 });
   // pillar obstacles
-  for (const p of layout.pillars) out.push({ type: 'circle', x: p.x, z: p.z, r: PILLAR_COLLIDER_R });
+  for (const p of layout.pillars)
+    out.push({ type: 'circle', x: p.x, z: p.z, r: PILLAR_COLLIDER_R });
   // wall-side obstacles (the boss dais is walkable: no collider)
-  for (const t of layout.tombs) out.push({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 });
+  for (const t of layout.tombs)
+    out.push({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 });
+  // floor clutter props (small circle per scatter point; renderer places matching props)
+  for (const c of layout.clutter ?? []) out.push({ type: 'circle', x: c.x, z: c.z, r: 0.8 });
   return out;
 }

@@ -6,11 +6,23 @@
 import * as THREE from 'three';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
-import type { EmoteClipSpec, VisualDef } from './manifest';
 import {
-  applyMaterials, assembleModel, ensureSkinTexture, prepareVisual, skinTexture, skinEmissiveTexture, tintedFarMaterials,
+  type AnimState,
+  type BaseState,
+  desiredBaseState,
+  locomotionTimeScale,
+} from './anim_state';
+import {
+  applyMaterials,
+  assembleModel,
+  ensureSkinTexture,
+  prepareVisual,
+  setHeldWeapon,
+  skinEmissiveTexture,
+  skinTexture,
+  tintedFarMaterials,
 } from './assets';
-import { desiredBaseState, locomotionTimeScale, type AnimState, type BaseState } from './anim_state';
+import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 
 export type { AnimState, BaseState } from './anim_state';
 
@@ -62,6 +74,7 @@ export class CharacterVisual {
   private key: string;
   private entityColor: number;
   private skinIndex: number;
+  private weaponItemId: string | null;
   private disposed = false;
   private ghosted = false;
   private mixer: THREE.AnimationMixer;
@@ -94,17 +107,38 @@ export class CharacterVisual {
   private soulRend = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
-  constructor(key: string, entityColor: number, skinIndex = 0) {
+  constructor(
+    key: string,
+    entityColor: number,
+    skinIndex = 0,
+    weaponItemId: string | null = null,
+    weaponOverride: WeaponLayoutOverride | null = null,
+  ) {
     const prep = prepareVisual(key);
-    this.def = prep.def;
+    // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
+    // wearer class's held-weapon layout (e.g. the rogue dual-wields in both hands).
+    // Override just attach + weaponSlots on a shallow def clone, leaving the rest of
+    // the def (clips/height/tint) intact and never mutating the shared cached def.
+    this.def = weaponOverride
+      ? { ...prep.def, attach: weaponOverride.attach, weaponSlots: weaponOverride.weaponSlots }
+      : prep.def;
     this.key = key;
     this.entityColor = entityColor;
     this.skinIndex = skinIndex;
+    this.weaponItemId = weaponItemId;
     this.height = prep.def.height;
 
-    // model: yaw/scale/feet normalization wrapper around the skinned clone
-    this.model = assembleModel(prep.def);
-    applyMaterials(this.model, prep.def, entityColor, skinTexture(key, skinIndex), skinEmissiveTexture(key, skinIndex));
+    // model: yaw/scale/feet normalization wrapper around the skinned clone. The
+    // equipped mainhand item (if the class swaps; see VisualDef.weaponSlot) picks
+    // the held weapon model, so the visual is born holding the right weapon.
+    this.model = assembleModel(this.def, weaponItemId);
+    applyMaterials(
+      this.model,
+      this.def,
+      entityColor,
+      skinTexture(key, skinIndex),
+      skinEmissiveTexture(key, skinIndex),
+    );
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
@@ -129,7 +163,10 @@ export class CharacterVisual {
 
     // far LOD + shadow proxy share the baked idle-pose geometry per key
     if (prep.idleGeo) {
-      this.farMesh = new THREE.Mesh(prep.idleGeo, tintedFarMaterials(prep.def, entityColor, prep.idleSrcMats));
+      this.farMesh = new THREE.Mesh(
+        prep.idleGeo,
+        tintedFarMaterials(prep.def, entityColor, prep.idleSrcMats),
+      );
       this.farMaterials = this.farMesh.material;
       this.farMesh.visible = false;
       this.poseWrap.add(this.farMesh);
@@ -193,7 +230,8 @@ export class CharacterVisual {
       if (!this.currentIsOneShot && this.current) {
         const timeScale = locomotionTimeScale(this.baseState, s, this.def.walkRef, this.def.runRef);
         if (timeScale !== null) {
-          if (timeScale < 0 && this.current.time <= 1e-3) this.current.time = Math.max(0, this.current.getClip().duration - 1e-3);
+          if (timeScale < 0 && this.current.time <= 1e-3)
+            this.current.time = Math.max(0, this.current.getClip().duration - 1e-3);
           this.current.timeScale = timeScale;
         }
       }
@@ -205,9 +243,10 @@ export class CharacterVisual {
     this.swimPitch += (wantPitch - this.swimPitch) * Math.min(1, dt * 8);
     this.poseWrap.rotation.x = this.swimPitch;
     this.poseWrap.rotation.z = 0;
-    this.poseWrap.position.y = s.swimming && !s.dead
-      ? SWIM_RISE + Math.sin(performance.now() / 500 + this.bobPhase) * 0.08
-      : 0;
+    this.poseWrap.position.y =
+      s.swimming && !s.dead
+        ? SWIM_RISE + Math.sin(performance.now() / 500 + this.bobPhase) * 0.08
+        : 0;
 
     // distant corpses show the static idle far mesh — tip it over
     if (this.farMesh && this.farMesh.visible) {
@@ -230,6 +269,13 @@ export class CharacterVisual {
   // -------------------------------------------------------------------------
   // One-shot triggers (sim events)
   // -------------------------------------------------------------------------
+
+  /** A one-shot (attack/hit/emote) is still playing. The renderer's spellfx
+   *  handler reads this to avoid restarting a windup-started throw animation
+   *  when the projectile releases mid-clip. */
+  get isMidOneShot(): boolean {
+    return this.currentIsOneShot;
+  }
 
   playAttack(): void {
     if (this.deadLock) return;
@@ -273,7 +319,11 @@ export class CharacterVisual {
     let name: string | null = null;
     for (const c of candidates) {
       const a = this.action(c);
-      if (a) { chosen = a; name = c; break; }
+      if (a) {
+        chosen = a;
+        name = c;
+        break;
+      }
     }
     if (!chosen) return null;
     for (const a of this.actions.values()) if (a !== chosen) a.stop();
@@ -371,17 +421,25 @@ export class CharacterVisual {
     // selected skin stayed on the default until a relog warmed the atlas cache.
     const pending = ensureSkinTexture(this.key, skinIndex);
     if (pending) {
-      void pending.then(() => {
-        // Bail if the model was disposed while the atlas was loading — applying
-        // materials to a torn-down model is wasted work (and re-snapshots a stale
-        // material map). Also guard that this is still the requested skin.
-        if (!this.disposed && this.skinIndex === skinIndex) this.applySkinMaterials(skinIndex);
-      }).catch((err) => console.error('failed to load skin atlas:', err));
+      void pending
+        .then(() => {
+          // Bail if the model was disposed while the atlas was loading — applying
+          // materials to a torn-down model is wasted work (and re-snapshots a stale
+          // material map). Also guard that this is still the requested skin.
+          if (!this.disposed && this.skinIndex === skinIndex) this.applySkinMaterials(skinIndex);
+        })
+        .catch((err) => console.error('failed to load skin atlas:', err));
     }
   }
 
   private applySkinMaterials(skinIndex: number): void {
-    applyMaterials(this.model, this.def, this.entityColor, skinTexture(this.key, skinIndex), skinEmissiveTexture(this.key, skinIndex));
+    applyMaterials(
+      this.model,
+      this.def,
+      this.entityColor,
+      skinTexture(this.key, skinIndex),
+      skinEmissiveTexture(this.key, skinIndex),
+    );
     // re-snapshot the material map ghost/restore relies on, then re-ghost if stealthed
     this.originalMaterials.clear();
     this.model.traverse((o) => {
@@ -389,6 +447,46 @@ export class CharacterVisual {
       if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
     });
     this.applyVisualMaterials();
+  }
+
+  /** Swap the held mainhand weapon model at runtime (gear equip/unequip); no-op if
+   *  unchanged or if this class keeps a fixed weapon (hunter crossbow, mobs/NPCs —
+   *  no VisualDef.weaponSlot). Mirrors setSkin: re-attach the prop, re-run the
+   *  shared material pass, re-snapshot the original-material map, then re-apply any
+   *  active ghost/soul-rend overlay. Cheap (one prop clone) and keeps the mixer/
+   *  animation state, unlike a full visual rebuild. */
+  setWeapon(weaponItemId: string | null): void {
+    if (weaponItemId === this.weaponItemId) return;
+    this.weaponItemId = weaponItemId;
+    if (!this.def.weaponSlots?.length) return;
+    setHeldWeapon(this.model, this.def, weaponItemId);
+    applyMaterials(
+      this.model,
+      this.def,
+      this.entityColor,
+      skinTexture(this.key, this.skinIndex),
+      skinEmissiveTexture(this.key, this.skinIndex),
+    );
+    // the model graph changed (weapon meshes added/removed): rebuild the caster
+    // list and re-snapshot originals, then re-apply ghost/stealth overlays.
+    this.originalMaterials.clear();
+    this.rebuildCasters();
+    this.applyVisualMaterials();
+  }
+
+  /** Rebuild the shadow-caster list and original-material snapshot after the model
+   *  graph changes (a weapon swap adds/removes bone-child meshes). */
+  private rebuildCasters(): void {
+    this.casters.length = 0;
+    this.model.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.castShadow = this.shadowOn;
+      mesh.receiveShadow = false;
+      if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
+      this.originalMaterials.set(mesh, mesh.material);
+      this.casters.push(mesh);
+    });
   }
 
   dispose(): void {
@@ -445,7 +543,11 @@ export class CharacterVisual {
     marked.transparent = true;
     marked.opacity = SOUL_REND_OPACITY;
     marked.depthWrite = false;
-    const withColor = marked as THREE.Material & { color?: THREE.Color; emissive?: THREE.Color; emissiveIntensity?: number };
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
     if (withColor.color) withColor.color.copy(SOUL_REND_TINT);
     if (withColor.emissive) {
       withColor.emissive.setHex(0x2a0000);
@@ -456,20 +558,28 @@ export class CharacterVisual {
   }
 
   private action(name: string | undefined): THREE.AnimationAction | null {
-    return name ? this.actions.get(name) ?? null : null;
+    return name ? (this.actions.get(name) ?? null) : null;
   }
 
   private baseAction(): THREE.AnimationAction | null {
     const c = this.def.clips;
     switch (this.baseState) {
-      case 'walk': return this.action(c.walk) ?? this.action(c.idle);
-      case 'walkBack': return this.action(c.walkBack) ?? this.action(c.walk);
-      case 'run': return this.action(c.run) ?? this.action(c.walk);
-      case 'cast': return this.action(c.cast) ?? this.action(c.idle);
-      case 'swim': return this.action(c.swim) ?? this.action(c.idle);
-      case 'sit': return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
-      case 'jump': return this.action(c.jump) ?? this.action(c.idle);
-      default: return this.action(c.idle);
+      case 'walk':
+        return this.action(c.walk) ?? this.action(c.idle);
+      case 'walkBack':
+        return this.action(c.walkBack) ?? this.action(c.walk);
+      case 'run':
+        return this.action(c.run) ?? this.action(c.walk);
+      case 'cast':
+        return this.action(c.cast) ?? this.action(c.idle);
+      case 'swim':
+        return this.action(c.swim) ?? this.action(c.idle);
+      case 'sit':
+        return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
+      case 'jump':
+        return this.action(c.jump) ?? this.action(c.idle);
+      default:
+        return this.action(c.idle);
     }
   }
 
@@ -497,7 +607,12 @@ export class CharacterVisual {
     return this.baseState === 'sit' && a === this.action(this.def.clips.sitDown);
   }
 
-  private playOneShot(name: string, timeScale: number, repeats = 1, emoteId: OverheadEmoteId | null = null): void {
+  private playOneShot(
+    name: string,
+    timeScale: number,
+    repeats = 1,
+    emoteId: OverheadEmoteId | null = null,
+  ): void {
     const a = this.action(name);
     if (!a) return;
     const prev = this.current;
@@ -575,9 +690,19 @@ export class CharacterVisual {
 function clipNamesOf(def: VisualDef): string[] {
   const c = def.clips;
   return [
-    c.idle, c.walk, c.run, c.death,
-    ...(c.attack ?? []), ...(c.hit ?? []),
-    c.cast, c.sitDown, c.sitIdle, c.swim, c.jump, c.walkBack, c.flourish,
+    c.idle,
+    c.walk,
+    c.run,
+    c.death,
+    ...(c.attack ?? []),
+    ...(c.hit ?? []),
+    c.cast,
+    c.sitDown,
+    c.sitIdle,
+    c.swim,
+    c.jump,
+    c.walkBack,
+    c.flourish,
     ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((n): n is string => !!n);
 }

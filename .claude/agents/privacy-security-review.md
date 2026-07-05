@@ -46,7 +46,11 @@ Once in scope, review the staged or recent changes by running `git diff --cached
 `git diff HEAD~1` if already committed). Then systematically check every rule below. Focus
 your reading on `server/` (`game.ts`, `db.ts`, `auth.ts`, `social_db.ts`, `admin.ts`,
 `admin_db.ts`, `moderation_db.ts`, `ratelimit.ts`, `turnstile.ts`, `ws_buffer.ts`,
-`http_util.ts`, `static_cache.ts`) and `src/admin/`, but check any file the diff touches.
+`http_util.ts`, `static_cache.ts`) plus the newer auth / secret / economy / privacy surfaces
+(`oauth.ts` / `oauth_db.ts`, `totp.ts`, `wallet.ts` / `wallet_link.ts` / `woc_balance.ts`,
+`account.ts`, the `email/` modules, `internal.ts`, `ip_block.ts` / `ip_block_db.ts`,
+`avatar.ts`, `native_attestation.ts`, `web_login_guard.ts`, the `bot_detector/` modules) and
+`src/admin/`, but check any file the diff touches.
 
 ---
 
@@ -88,6 +92,9 @@ production.
 - No `.env` or secret material added to the diff.
 - No server-only secret leaking into the Vite client bundle (anything imported by
   `src/main.ts` / the client entry ships to the browser). Server secrets stay in `server/`.
+- Treat as secret material (env-sourced, never logged, never bundled into the client): TOTP
+  secrets and recovery codes, OAuth client secrets, email verification / reset tokens, and the
+  ops shared secrets (`x-woc-deploy-secret` / `RESTART_COUNTDOWN_SECRET`).
 
 ### 4. Authentication & Sessions (CRITICAL)
 
@@ -98,8 +105,18 @@ production.
   or non-constant-time comparison of secrets.
 - Name and password validation (length, charset) must run server-side before use; flag
   validation that exists only on the client.
-- Turnstile (`server/turnstile.ts`) protects login/registration; flag a new auth entry
-  point that bypasses it.
+- The anti-bot gate is `passesTurnstile` in `server/main.ts` (wrapping `verifyTurnstile` from
+  `server/turnstile.ts`), covering registration/login. Flag any new auth entry point, including
+  OAuth consent / device-code and wallet-link, that bypasses it.
+- OAuth2 (`server/oauth.ts` / `oauth_db.ts`): tokens are read-scoped. Flag a read-scoped token
+  accepted where a full session token is required, a mutating route reachable with a read token,
+  or a dropped PKCE / `state` parameter.
+- TOTP 2FA (`server/totp.ts`): the secret and recovery codes are never logged or returned to the
+  client; a spent code or a replayed counter is rejected. Flag a missing replay guard.
+- Wallet linking (`server/wallet.ts` / `wallet_link.ts`): the ed25519 signature is verified
+  against a server-issued, single-use, short-lived challenge; the server never trusts a
+  client-asserted `$WOC` balance over `server/woc_balance.ts`. Flag a reused/absent challenge or
+  a client-supplied balance.
 
 ### 5. Parameterized SQL (CRITICAL)
 
@@ -137,6 +154,10 @@ production.
 - Auth here is a bearer token in the `Authorization` header (not a cookie session), so classic
   CSRF does not apply. If a change introduces any cookie-based credential, CSRF protection
   becomes required and its absence is then a finding.
+- Internal ops routes (`server/internal.ts`) must require the deploy shared secret compared with
+  `timingSafeEqual` (not `===`); flag a missing or non-constant-time check.
+- Account self-service (`server/account.ts`) is bearer-auth and account-scoped; flag any route
+  that mutates by a client-supplied account id without re-resolving the bearer (IDOR).
 
 ### 8. Account-Data Privacy & Logging (WARNING)
 
@@ -150,11 +171,15 @@ production.
   connection strings, or a full client IP. Flag such logging. (IP is intentionally persisted
   in the `accounts` / `play_sessions` tables for moderation; this rule is about logging a full
   IP to the console, not about storing it.)
+- Treat IP block records (`server/ip_block_db.ts`, the `blocked_ips` table) and email addresses
+  / tokens (`server/email/`) as PII: never returned to another player, never logged in full.
 
 ### 9. Static Serving & HTTP Safety (WARNING)
 
 - Static file serving (`server/static_cache.ts`, `server/http_util.ts`) must not allow path
   traversal (`../`) outside the served root. Flag unsanitized path joins from request URLs.
+- The avatar route (`server/avatar.ts`) must allowlist its `class` / `skin` parameters and never
+  join a raw URL segment into a filesystem path.
 - Responses set sane content types; auth cookies/headers (if any) use secure flags.
 
 ### 10. Determinism as Integrity (WARNING)

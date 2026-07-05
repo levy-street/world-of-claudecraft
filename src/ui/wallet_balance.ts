@@ -90,7 +90,8 @@ export function resolveWocBalanceUpdate(opts: {
   linkedAddress: string | null;
 }): WocBalanceUpdate {
   const { address, fresh, balance, currentAddress, linkedAddress } = opts;
-  if (currentAddress !== address && linkedAddress !== address) return { apply: false, setLinked: false };
+  if (currentAddress !== address && linkedAddress !== address)
+    return { apply: false, setLinked: false };
   if (fresh && balance === null) return { apply: false, setLinked: false };
   return { apply: true, setLinked: linkedAddress === address };
 }
@@ -118,7 +119,8 @@ export function shouldDisconnectUnverifiedWallet(opts: {
   verifyInProgress: boolean;
   linkStatusPending: boolean;
 }): boolean {
-  const { connectedAddress, linkedPubkey, verifyPending, verifyInProgress, linkStatusPending } = opts;
+  const { connectedAddress, linkedPubkey, verifyPending, verifyInProgress, linkStatusPending } =
+    opts;
   if (!connectedAddress) return false;
   if (verifyPending || verifyInProgress || linkStatusPending) return false;
   if (connectedAddress === linkedPubkey) return false;

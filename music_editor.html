@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<!-- World of ClaudeCraft music editor (dev tool, English-only like the perf
+     overlay; never part of a production build). Serves the REAL note data from
+     buildMusicThemes() through the REAL MusicSynth and mix chain, lets you
+     re-voice, re-level, move, and delete notes, and saves your edits to
+     src/game/music_overrides.generated.ts so the game and render tool use them.
+     Open under npm run dev: http://localhost:PORT/music_editor.html -->
+<head>
+  <meta charset="utf-8" />
+  <title>WoC Music Editor</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #14161c; color: #d7dae2; font: 13px/1.4 ui-monospace, Menlo, monospace; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    header { display: flex; gap: 8px; align-items: center; padding: 8px 12px; background: #1b1e27; border-bottom: 1px solid #2c3040; flex-wrap: wrap; }
+    header .grow { flex: 1; }
+    select, button, input[type="number"] { background: #262b38; color: #d7dae2; border: 1px solid #3a4054; border-radius: 4px; padding: 4px 8px; font: inherit; }
+    button { cursor: pointer; }
+    button:hover { background: #323950; }
+    button.primary { background: #2c5d8f; border-color: #3d7ab8; }
+    button.primary:hover { background: #366fa9; }
+    button.danger { border-color: #8f4040; }
+    #status { color: #9aa3b5; min-width: 220px; }
+    #status.ok { color: #7fd48a; }
+    #status.err { color: #e08a8a; }
+    main { flex: 1; display: flex; min-height: 0; }
+    #sidebar { width: 300px; overflow-y: auto; background: #191c24; border-right: 1px solid #2c3040; padding: 8px; }
+    .lane { border: 1px solid #2c3040; border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; }
+    .lane .row { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+    .lane .sw { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+    .lane .nm { flex: 1; font-weight: 700; }
+    .lane .ct { color: #9aa3b5; }
+    .lane button.tog { padding: 2px 7px; }
+    .lane button.tog.on { background: #2c5d8f; }
+    .lane select { flex: 1; }
+    .lane input[type="range"] { flex: 1; }
+    #rollwrap { flex: 1; overflow: auto; position: relative; }
+    canvas { display: block; cursor: crosshair; }
+    #selbar { display: flex; gap: 8px; align-items: center; padding: 6px 12px; background: #1b1e27; border-top: 1px solid #2c3040; }
+    #selbar .hint { color: #6f7890; }
+    kbd { background: #262b38; border: 1px solid #3a4054; border-radius: 3px; padding: 0 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>WoC Music Editor</strong>
+    <select id="themeSel"></select>
+    <span id="meta"></span>
+    <button type="button" id="playBtn" class="primary">Play</button>
+    <label><input type="checkbox" id="loopChk" checked /> loop</label>
+    <label>zoom <input type="number" id="zoomIn" min="8" max="80" step="2" value="26" style="width:64px" /></label>
+    <span class="grow"></span>
+    <button type="button" id="undoBtn">Undo</button>
+    <button type="button" id="revertBtn" class="danger">Revert theme</button>
+    <button type="button" id="downloadBtn">Download .ts</button>
+    <button type="button" id="saveBtn" class="primary">Save to game</button>
+    <span id="status"></span>
+  </header>
+  <main>
+    <div id="sidebar"></div>
+    <div id="rollwrap"><canvas id="roll"></canvas></div>
+  </main>
+  <div id="selbar">
+    <span id="selInfo">selection: 0 notes</span>
+    <select id="selInst"></select>
+    <button type="button" id="applyInstBtn">Set instrument</button>
+    <button type="button" id="velUpBtn">Vel +15%</button>
+    <button type="button" id="velDnBtn">Vel -15%</button>
+    <button type="button" id="delBtn" class="danger">Delete</button>
+    <span class="hint">click note = select and audition; shift+click = add; drag empty = marquee; drag notes = move (snap 1/4 beat, semitones); <kbd>ctrl+Z</kbd> undo; <kbd>del</kbd> delete; <kbd>esc</kbd> clear</span>
+  </div>
+  <script type="module">
+    import { buildMusicThemes, INSTRUMENTS, MusicSynth, THEME_TRIM } from '/src/game/music.ts';
+    import { MUSIC_OVERRIDES } from '/src/game/music_overrides.generated.ts';
+
+    const composed = buildMusicThemes(false);
+    const clone = (o) => JSON.parse(JSON.stringify(o));
+    const overrides = clone(MUSIC_OVERRIDES);
+    const themes = {};
+    for (const name of Object.keys(composed)) themes[name] = clone(overrides[name] ?? composed[name]);
+
+    let cur = localStorage.getItem('woc_music_editor_theme') ?? 'town_fenbridge';
+    if (!themes[cur]) cur = Object.keys(themes)[0];
+    let zoom = 26;
+    const ROW = 10;
+    let selection = new Set(); // event indices in themes[cur].events
+    const undoStack = {}; // name -> array of snapshots
+    const dirty = new Set();
+    const reverted = new Set(); // overrides to drop from the file on save
+    const muted = new Set();
+    const solo = new Set();
+
+    // ---- audio: the exact in-game chain, one gain per instrument lane ----
+    let ctx = null;
+    let synth = null;
+    let master = null;
+    let reverbSend = null;
+    const instGain = {};
+    const MAKEUP = 4.5;
+    function ensureAudio() {
+      if (ctx) return;
+      ctx = new AudioContext();
+      synth = new MusicSynth(ctx);
+      master = ctx.createGain();
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.knee.value = 18; comp.ratio.value = 2.2;
+      comp.attack.value = 0.015; comp.release.value = 0.25;
+      master.connect(comp); comp.connect(ctx.destination);
+      const irLen = Math.floor(ctx.sampleRate * 2.6);
+      const ir = ctx.createBuffer(2, irLen, ctx.sampleRate);
+      for (let ch = 0; ch < 2; ch++) {
+        const d = ir.getChannelData(ch);
+        for (let i = 0; i < irLen; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / irLen) ** 2.4;
+      }
+      const reverb = ctx.createConvolver(); reverb.buffer = ir;
+      reverbSend = ctx.createGain(); reverbSend.gain.value = 0.55;
+      reverbSend.connect(reverb); reverb.connect(master);
+      for (const inst of INSTRUMENTS) {
+        const g = ctx.createGain();
+        g.connect(master); g.connect(reverbSend);
+        instGain[inst] = g;
+      }
+    }
+    function applyMix() {
+      if (!ctx) return;
+      master.gain.value = 0.15 * MAKEUP * (THEME_TRIM[cur] ?? 1);
+      const anySolo = solo.size > 0;
+      for (const inst of INSTRUMENTS) {
+        instGain[inst].gain.value = muted.has(inst) || (anySolo && !solo.has(inst)) ? 0 : 1;
+      }
+    }
+
+    // ---- playback: lookahead scheduler like the in-game director ----
+    let playing = false;
+    let timer = 0;
+    let t0 = 0;
+    let nextIdx = 0;
+    let loopN = 0;
+    function play() {
+      ensureAudio();
+      void ctx.resume();
+      stop(false);
+      applyMix();
+      const t = themes[cur];
+      t.events.sort((a, b) => a.beat - b.beat);
+      playing = true; t0 = ctx.currentTime + 0.1; nextIdx = 0; loopN = 0;
+      playBtn.textContent = 'Stop';
+      timer = setInterval(() => {
+        const spb = 60 / t.bpm;
+        const loopBeats = t.bars * 4;
+        const horizon = ctx.currentTime + 0.45;
+        for (let guard = 0; guard < 500; guard++) {
+          if (nextIdx >= t.events.length) {
+            if (!loopChk.checked) { if ((t0 + (loopN + 1) * loopBeats * spb) < ctx.currentTime) stop(); return; }
+            nextIdx = 0; loopN++;
+          }
+          const e = t.events[nextIdx];
+          const when = t0 + (loopN * loopBeats + e.beat) * spb;
+          if (when > horizon) break;
+          if (when >= ctx.currentTime - 0.02) synth.playNote(e, when, spb, { gain: instGain[e.inst] ?? master, transpose: 0 });
+          nextIdx++;
+        }
+      }, 90);
+      requestAnimationFrame(drawPlayhead);
+    }
+    function stop(updateBtn = true) {
+      if (timer) clearInterval(timer);
+      timer = 0; playing = false;
+      if (ctx) master.gain.setTargetAtTime(0, ctx.currentTime, 0.04);
+      if (updateBtn) { playBtn.textContent = 'Play'; draw(); }
+    }
+    function auditionNote(e) {
+      ensureAudio(); void ctx.resume(); applyMix();
+      synth.playNote(e, ctx.currentTime + 0.02, 60 / themes[cur].bpm, { gain: instGain[e.inst] ?? master, transpose: 0 });
+    }
+
+    // ---- canvas ----
+    const roll = document.getElementById('roll');
+    const g2d = roll.getContext('2d');
+    const color = (inst) => `hsl(${(INSTRUMENTS.indexOf(inst) * 137.5) % 360} 65% 62%)`;
+    let pMin = 30, pMax = 90;
+    function bounds() {
+      const t = themes[cur];
+      pMin = 127; pMax = 0;
+      for (const e of t.events) { pMin = Math.min(pMin, e.midi); pMax = Math.max(pMax, e.midi); }
+      pMin -= 2; pMax += 2;
+    }
+    function draw() {
+      const t = themes[cur];
+      bounds();
+      const beats = t.bars * 4;
+      roll.width = beats * zoom + 40;
+      roll.height = (pMax - pMin + 1) * ROW + 20;
+      g2d.fillStyle = '#14161c'; g2d.fillRect(0, 0, roll.width, roll.height);
+      for (let m = pMin; m <= pMax; m++) {
+        const y = (pMax - m) * ROW + 10;
+        if ([1, 3, 6, 8, 10].includes(m % 12)) { g2d.fillStyle = '#181b22'; g2d.fillRect(0, y, roll.width, ROW); }
+        if (m % 12 === 0) { g2d.strokeStyle = '#2c3040'; g2d.beginPath(); g2d.moveTo(0, y + ROW); g2d.lineTo(roll.width, y + ROW); g2d.stroke(); g2d.fillStyle = '#4b5268'; g2d.fillText(`C${m / 12 - 1}`, 2, y + ROW - 1); }
+      }
+      for (let b = 0; b <= beats; b++) {
+        const x = b * zoom + 20;
+        g2d.strokeStyle = b % 4 === 0 ? '#333a4e' : '#20242f';
+        g2d.beginPath(); g2d.moveTo(x, 0); g2d.lineTo(x, roll.height); g2d.stroke();
+        if (b % 4 === 0) { g2d.fillStyle = '#4b5268'; g2d.fillText(String(b / 4 + 1), x + 2, 8); }
+      }
+      t.events.forEach((e, i) => {
+        if (muted.has(e.inst)) g2d.globalAlpha = 0.25;
+        const x = e.beat * zoom + 20;
+        const y = (pMax - e.midi) * ROW + 11;
+        const w = Math.max(3, e.dur * zoom - 1);
+        g2d.fillStyle = color(e.inst);
+        g2d.fillRect(x, y, w, ROW - 2);
+        g2d.globalAlpha = 1;
+        if (selection.has(i)) { g2d.strokeStyle = '#fff'; g2d.strokeRect(x - 0.5, y - 0.5, w + 1, ROW - 1); }
+      });
+      if (marquee) {
+        g2d.strokeStyle = '#7fb2e8';
+        g2d.strokeRect(Math.min(marquee.x0, marquee.x1), Math.min(marquee.y0, marquee.y1), Math.abs(marquee.x1 - marquee.x0), Math.abs(marquee.y1 - marquee.y0));
+      }
+    }
+    function drawPlayhead() {
+      if (!playing) return;
+      draw();
+      const t = themes[cur];
+      const spb = 60 / t.bpm;
+      const beat = ((ctx.currentTime - t0) / spb) % (t.bars * 4);
+      if (beat >= 0) {
+        const x = beat * zoom + 20;
+        g2d.strokeStyle = '#e8c97f'; g2d.beginPath(); g2d.moveTo(x, 0); g2d.lineTo(x, roll.height); g2d.stroke();
+      }
+      requestAnimationFrame(drawPlayhead);
+    }
+
+    // ---- editing ----
+    function snapshot() {
+      undoStack[cur] = undoStack[cur] ?? [];
+      undoStack[cur].push(clone(themes[cur]));
+      if (undoStack[cur].length > 60) undoStack[cur].shift();
+      dirty.add(cur);
+      reverted.delete(cur);
+      setStatus(`${cur} modified (unsaved)`, '');
+    }
+    function undo() {
+      const st = undoStack[cur];
+      if (!st || st.length === 0) return;
+      themes[cur] = st.pop();
+      selection.clear();
+      rebuildLanes(); draw();
+    }
+    function hitTest(px, py) {
+      const t = themes[cur];
+      for (let i = t.events.length - 1; i >= 0; i--) {
+        const e = t.events[i];
+        const x = e.beat * zoom + 20, y = (pMax - e.midi) * ROW + 11, w = Math.max(3, e.dur * zoom - 1);
+        if (px >= x && px <= x + w && py >= y && py <= y + ROW - 2) return i;
+      }
+      return -1;
+    }
+    let marquee = null;
+    let dragging = null;
+    roll.addEventListener('mousedown', (ev) => {
+      const r = roll.getBoundingClientRect();
+      const px = ev.clientX - r.left, py = ev.clientY - r.top;
+      const hit = hitTest(px, py);
+      if (hit >= 0) {
+        if (ev.shiftKey) { selection.has(hit) ? selection.delete(hit) : selection.add(hit); }
+        else if (!selection.has(hit)) { selection = new Set([hit]); auditionNote(themes[cur].events[hit]); }
+        dragging = { px, py, moved: false, base: clone([...selection].map((i) => themes[cur].events[i])) };
+      } else {
+        marquee = { x0: px, y0: py, x1: px, y1: py };
+        if (!ev.shiftKey) selection.clear();
+      }
+      draw(); updateSelBar();
+    });
+    window.addEventListener('mousemove', (ev) => {
+      const r = roll.getBoundingClientRect();
+      const px = ev.clientX - r.left, py = ev.clientY - r.top;
+      if (marquee) { marquee.x1 = px; marquee.y1 = py; draw(); return; }
+      if (dragging) {
+        const db = Math.round(((px - dragging.px) / zoom) / 0.25) * 0.25;
+        const dm = Math.round((dragging.py - py) / ROW);
+        if (db !== 0 || dm !== 0) {
+          if (!dragging.moved) { snapshot(); dragging.moved = true; }
+          const idx = [...selection];
+          idx.forEach((i, k) => {
+            const e = themes[cur].events[i];
+            e.beat = Math.max(0, dragging.base[k].beat + db);
+            e.midi = Math.min(120, Math.max(20, dragging.base[k].midi + dm));
+          });
+          draw();
+        }
+      }
+    });
+    window.addEventListener('mouseup', () => {
+      if (marquee) {
+        const x0 = Math.min(marquee.x0, marquee.x1), x1 = Math.max(marquee.x0, marquee.x1);
+        const y0 = Math.min(marquee.y0, marquee.y1), y1 = Math.max(marquee.y0, marquee.y1);
+        themes[cur].events.forEach((e, i) => {
+          const x = e.beat * zoom + 20, y = (pMax - e.midi) * ROW + 11, w = Math.max(3, e.dur * zoom - 1);
+          if (x + w >= x0 && x <= x1 && y + ROW - 2 >= y0 && y <= y1) selection.add(i);
+        });
+        marquee = null; draw(); updateSelBar();
+      }
+      dragging = null;
+    });
+    window.addEventListener('keydown', (ev) => {
+      if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLSelectElement) return;
+      if ((ev.metaKey || ev.ctrlKey) && ev.key.toLowerCase() === 'z') { ev.preventDefault(); undo(); }
+      if (ev.key === 'Escape') { selection.clear(); draw(); updateSelBar(); }
+      if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); deleteSelection(); }
+      if (ev.key === ' ') { ev.preventDefault(); playing ? stop() : play(); }
+    });
+    function mutateSelection(fn) {
+      if (selection.size === 0) return;
+      snapshot();
+      for (const i of selection) fn(themes[cur].events[i]);
+      rebuildLanes(); draw();
+    }
+    function deleteSelection() {
+      if (selection.size === 0) return;
+      snapshot();
+      themes[cur].events = themes[cur].events.filter((_, i) => !selection.has(i));
+      selection.clear();
+      rebuildLanes(); draw(); updateSelBar();
+    }
+
+    // ---- sidebar lanes ----
+    const sidebar = document.getElementById('sidebar');
+    function rebuildLanes() {
+      sidebar.innerHTML = '';
+      const t = themes[cur];
+      const counts = {};
+      for (const e of t.events) counts[e.inst] = (counts[e.inst] ?? 0) + 1;
+      for (const inst of INSTRUMENTS) {
+        if (!counts[inst]) continue;
+        const lane = document.createElement('div');
+        lane.className = 'lane';
+        const r1 = document.createElement('div'); r1.className = 'row';
+        const sw = document.createElement('div'); sw.className = 'sw'; sw.style.background = color(inst);
+        const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = inst;
+        const ct = document.createElement('div'); ct.className = 'ct'; ct.textContent = `${counts[inst]} notes`;
+        const mBtn = document.createElement('button'); mBtn.className = `tog${muted.has(inst) ? ' on' : ''}`; mBtn.textContent = 'M';
+        mBtn.onclick = () => { muted.has(inst) ? muted.delete(inst) : muted.add(inst); applyMix(); rebuildLanes(); draw(); };
+        const sBtn = document.createElement('button'); sBtn.className = `tog${solo.has(inst) ? ' on' : ''}`; sBtn.textContent = 'S';
+        sBtn.onclick = () => { solo.has(inst) ? solo.delete(inst) : solo.add(inst); applyMix(); rebuildLanes(); };
+        const selBtn = document.createElement('button'); selBtn.className = 'tog'; selBtn.textContent = 'sel';
+        selBtn.onclick = () => { selection = new Set(t.events.map((e, i) => e.inst === inst ? i : -1).filter((i) => i >= 0)); draw(); updateSelBar(); };
+        r1.append(sw, nm, ct, selBtn, mBtn, sBtn);
+        const r2 = document.createElement('div'); r2.className = 'row';
+        const instSel = document.createElement('select');
+        for (const o of INSTRUMENTS) { const op = document.createElement('option'); op.value = o; op.textContent = o; op.selected = o === inst; instSel.append(op); }
+        instSel.onchange = () => {
+          snapshot();
+          for (const e of t.events) if (e.inst === inst) e.inst = instSel.value;
+          rebuildLanes(); draw();
+        };
+        r2.append(instSel);
+        const r3 = document.createElement('div'); r3.className = 'row';
+        const lv = document.createElement('input'); lv.type = 'range'; lv.min = '0.25'; lv.max = '2'; lv.step = '0.05'; lv.value = '1';
+        const lvLabel = document.createElement('span'); lvLabel.textContent = 'level x1.00';
+        lv.oninput = () => { lvLabel.textContent = `level x${Number(lv.value).toFixed(2)}`; };
+        lv.onchange = () => {
+          const f = Number(lv.value);
+          if (f !== 1) {
+            snapshot();
+            for (const e of t.events) if (e.inst === inst) e.vel = Math.min(1, Math.max(0.005, e.vel * f));
+          }
+          lv.value = '1'; lvLabel.textContent = 'level x1.00';
+        };
+        r3.append(lv, lvLabel);
+        lane.append(r1, r2, r3);
+        sidebar.append(lane);
+      }
+    }
+
+    // ---- header and selection bar wiring ----
+    const themeSel = document.getElementById('themeSel');
+    const meta = document.getElementById('meta');
+    const playBtn = document.getElementById('playBtn');
+    const loopChk = document.getElementById('loopChk');
+    const zoomIn = document.getElementById('zoomIn');
+    const selInfo = document.getElementById('selInfo');
+    const selInst = document.getElementById('selInst');
+    const statusEl = document.getElementById('status');
+    function setStatus(text, cls) { statusEl.textContent = text; statusEl.className = cls; }
+    for (const name of Object.keys(themes)) { const o = document.createElement('option'); o.value = name; o.textContent = name + (overrides[name] ? ' *' : ''); themeSel.append(o); }
+    themeSel.value = cur;
+    for (const o of INSTRUMENTS) { const op = document.createElement('option'); op.value = o; op.textContent = o; selInst.append(op); }
+    function switchTheme(name) {
+      stop();
+      cur = name;
+      localStorage.setItem('woc_music_editor_theme', name);
+      selection.clear();
+      const t = themes[cur];
+      meta.textContent = `${t.bpm} bpm, ${t.bars} bars, ${t.events.length} notes, trim x${THEME_TRIM[cur] ?? 1}`;
+      applyMix(); rebuildLanes(); draw(); updateSelBar();
+    }
+    function updateSelBar() { selInfo.textContent = `selection: ${selection.size} notes`; }
+    themeSel.onchange = () => switchTheme(themeSel.value);
+    playBtn.onclick = () => (playing ? stop() : play());
+    zoomIn.onchange = () => { zoom = Number(zoomIn.value); draw(); };
+    document.getElementById('undoBtn').onclick = undo;
+    document.getElementById('applyInstBtn').onclick = () => mutateSelection((e) => { e.inst = selInst.value; });
+    document.getElementById('velUpBtn').onclick = () => mutateSelection((e) => { e.vel = Math.min(1, e.vel * 1.15); });
+    document.getElementById('velDnBtn').onclick = () => mutateSelection((e) => { e.vel = Math.max(0.005, e.vel / 1.15); });
+    document.getElementById('delBtn').onclick = deleteSelection;
+    document.getElementById('revertBtn').onclick = () => {
+      undoStack[cur] = undoStack[cur] ?? [];
+      undoStack[cur].push(clone(themes[cur]));
+      delete overrides[cur];
+      dirty.delete(cur);
+      reverted.add(cur);
+      themes[cur] = clone(composed[cur]);
+      selection.clear();
+      rebuildLanes(); draw(); updateSelBar();
+      setStatus(`${cur} reverted to composed (save to persist)`, '');
+    };
+    function payload() {
+      for (const name of dirty) overrides[name] = themes[name];
+      for (const name of reverted) delete overrides[name];
+      return overrides;
+    }
+    document.getElementById('saveBtn').onclick = async () => {
+      try {
+        const res = await fetch('/__music_editor/save', { method: 'POST', body: JSON.stringify(payload()) });
+        if (!res.ok) throw new Error(await res.text());
+        dirty.clear();
+        reverted.clear();
+        setStatus('saved to src/game/music_overrides.generated.ts', 'ok');
+      } catch (err) {
+        setStatus(`save failed: ${err}`, 'err');
+      }
+    };
+    document.getElementById('downloadBtn').onclick = () => {
+      const o = payload();
+      const lines = ["import type { Theme } from './music';", '', 'export const MUSIC_OVERRIDES: Record<string, Theme> = {'];
+      for (const [name, t] of Object.entries(o)) {
+        lines.push(`  ${name}: {`, `    bpm: ${t.bpm},`, `    bars: ${t.bars},`, '    events: [');
+        for (const e of [...t.events].sort((a, b) => a.beat - b.beat)) {
+          lines.push(`      { beat: ${e.beat}, midi: ${e.midi}, dur: ${e.dur}, vel: ${Number(e.vel.toFixed(3))}, inst: '${e.inst}' },`);
+        }
+        lines.push('    ],', '  },');
+      }
+      lines.push('};', '');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/plain' }));
+      a.download = 'music_overrides.generated.ts';
+      a.click();
+    };
+    switchTheme(cur);
+  </script>
+</body>
+</html>

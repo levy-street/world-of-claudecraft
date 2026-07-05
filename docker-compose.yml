@@ -21,6 +21,7 @@ services:
   # then open http://localhost:8787 — or put a TLS reverse proxy in front
   # for remote hosting (see README).
   game:
+    image: eastbrook-game:${EASTBROOK_IMAGE_TAG:-local}
     build:
       context: .
       args:
@@ -61,11 +62,57 @@ services:
       APPLE_DEVICECHECK_ENV: ${APPLE_DEVICECHECK_ENV:-production}
       # Runtime: protects the loopback-only deploy countdown endpoint.
       RESTART_COUNTDOWN_SECRET: ${RESTART_COUNTDOWN_SECRET:-}
-    # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
+      # Runtime: Discord OAuth + the secret-gated game <-> Discord bot channel.
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      DISCORD_GUILD_INVITE: ${DISCORD_GUILD_INVITE:-}
+      DISCORD_BOT_SECRET: ${DISCORD_BOT_SECRET:-}
+      # Runtime: the game server uses the bot token to auto-join a linking player to
+      # the official guild (guilds.join). Empty disables auto-join (verify-only).
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      # Runtime: GitHub OAuth for the in-game developer badge. Both id+secret must be
+      # set to enable "Link GitHub"; empty hides it exactly like Discord. GITHUB_REPO
+      # selects which repo's contributor stats back the badge (code default:
+      # levy-street/world-of-claudecraft); GITHUB_TOKEN lifts the GitHub API rate limit
+      # for the contributor + News/Releases fetches. See .env.example.
+      GITHUB_OAUTH_CLIENT_ID: ${GITHUB_OAUTH_CLIENT_ID:-}
+      GITHUB_OAUTH_CLIENT_SECRET: ${GITHUB_OAUTH_CLIENT_SECRET:-}
+      GITHUB_REPO: ${GITHUB_REPO:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      WOC_DAILY_REWARD_SERVICE_URL: ${WOC_DAILY_REWARD_SERVICE_URL:-}
+      WOC_DAILY_REWARD_SERVICE_SECRET: ${WOC_DAILY_REWARD_SERVICE_SECRET:-}
+      WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
+      # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"
     volumes:
       - ${EASTBROOK_MEDIA_DIR:-./media-cache}:/app/dist/media
+
+  discord-bot:
+    image: eastbrook-game:${EASTBROOK_IMAGE_TAG:-local}
+    container_name: eastbrook-discord-bot
+    profiles:
+      - discord
+    restart: unless-stopped
+    depends_on:
+      game:
+        condition: service_started
+    environment:
+      GAME_SERVER_URL: http://game:8787
+      PUBLIC_GAME_URL: ${PUBLIC_GAME_URL:-http://localhost:8787}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      DISCORD_BOT_SECRET: ${DISCORD_BOT_SECRET:-}
+      DISCORD_VOICE_CHANNEL_ID: ${DISCORD_VOICE_CHANNEL_ID:-}
+      DISCORD_WELCOME_CHANNEL_ID: ${DISCORD_WELCOME_CHANNEL_ID:-}
+      DISCORD_TEST_CHANNEL_ID: ${DISCORD_TEST_CHANNEL_ID:-}
+      DISCORD_RELAY_CHANNEL_ID: ${DISCORD_RELAY_CHANNEL_ID:-}
+      DISCORD_ACTIVITY_CHANNEL_ID: ${DISCORD_ACTIVITY_CHANNEL_ID:-}
+      DISCORD_DAILY_REWARDS_CHANNEL_ID: ${DISCORD_DAILY_REWARDS_CHANNEL_ID:-}
+      DISCORD_SYNC_NICKNAMES: ${DISCORD_SYNC_NICKNAMES:-1}
+    command: ["node", "dist-bot/bot.cjs"]
 
   mediawiki-db:
     image: mariadb:11

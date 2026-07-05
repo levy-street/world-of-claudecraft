@@ -6,8 +6,12 @@ function installStorage(): void {
   const map = new Map<string, string>();
   (globalThis as any).localStorage = {
     getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
-    setItem: (k: string, v: string) => { map.set(k, v); },
-    removeItem: (k: string) => { map.delete(k); },
+    setItem: (k: string, v: string) => {
+      map.set(k, v);
+    },
+    removeItem: (k: string) => {
+      map.delete(k);
+    },
     clear: () => map.clear(),
   };
 }
@@ -36,7 +40,8 @@ function makeInput() {
     activeElement: null,
     body: {
       classList: {
-        contains: (cls: string) => (cls === 'game-active' && gameActive) || (cls === 'mobile-touch' && mobileTouch),
+        contains: (cls: string) =>
+          (cls === 'game-active' && gameActive) || (cls === 'mobile-touch' && mobileTouch),
       },
     },
     fullscreenElement: null,
@@ -66,8 +71,12 @@ function makeInput() {
     documentListeners,
     cb,
     input,
-    setGameActive: (active: boolean) => { gameActive = active; },
-    setMobileTouch: (active: boolean) => { mobileTouch = active; },
+    setGameActive: (active: boolean) => {
+      gameActive = active;
+    },
+    setMobileTouch: (active: boolean) => {
+      mobileTouch = active;
+    },
   };
 }
 
@@ -102,22 +111,67 @@ describe('Input autorun', () => {
     expect(input.readMoveInput().forward).toBe(true);
   });
 
-  it('opening the Escape menu pauses but does not cancel autorun, and it resumes on close', () => {
+  it('keeps autorun running while the Escape menu is open, then keeps running after close', () => {
     // The classic complaint: autorun, then hit Escape to change a keybind or a
-    // setting. Suspending movement (the open menu) must only pause forward motion
-    // for that frame, never clear the autorun latch, so closing the menu resumes
-    // the run instead of stranding the player.
+    // setting. In a classic MMO the world never pauses, so the open menu must let
+    // the latched autorun keep driving the player forward (you keep running while
+    // you use the menu), not strand them in place for the duration of the menu.
     const { input } = makeInput();
     input.toggleAutorun();
     expect(input.readMoveInput().forward).toBe(true);
 
-    input.suspendMovement = true; // mirrors main.ts setting it while the game menu is open
-    expect(input.autorun).toBe(true); // latch survives the menu
-    expect(input.readMoveInput().forward).toBe(false); // held still while suspended
+    input.setSuspendMovement(true); // mirrors main.ts setting it while the game menu is open
+    expect(input.autorun).toBe(true); // latch untouched by the menu
+    expect(input.readMoveInput().forward).toBe(true); // keeps running while suspended
 
-    input.suspendMovement = false; // menu closed
+    input.setSuspendMovement(false); // menu closed
     expect(input.autorun).toBe(true);
-    expect(input.readMoveInput().forward).toBe(true); // run resumes
+    expect(input.readMoveInput().forward).toBe(true); // still running
+  });
+
+  it('still suppresses a held movement key while suspended (menu keystrokes do not leak)', () => {
+    // Suspending movement must keep protecting the world from raw key holds while
+    // a modal/chat is focused; only the deliberate autorun latch is allowed to
+    // keep moving. With no autorun engaged, a held forward key produces no motion.
+    const { input, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false }); // hold forward
+    expect(input.readMoveInput().forward).toBe(true);
+
+    input.setSuspendMovement(true); // game menu / chat open
+    expect(input.autorun).toBe(false);
+    expect(input.readMoveInput().forward).toBe(false); // held key is suppressed
+  });
+
+  it('drops stale held forward and jump state when movement suspension begins', () => {
+    const { input, windowListeners } = makeInput();
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.readMoveInput().jump).toBe(true);
+
+    input.setSuspendMovement(true);
+    input.setSuspendMovement(false);
+    now += 1;
+
+    expect(input.debugState().keys).toEqual([]);
+    expect(input.readMoveInput().forward).toBe(false);
+    expect(input.readMoveInput().jump).toBe(false);
+  });
+
+  it('keeps autorun latched when suspension clears stale held key state', () => {
+    const { input, windowListeners } = makeInput();
+    input.toggleAutorun();
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+
+    input.setSuspendMovement(true);
+    input.setSuspendMovement(false);
+
+    expect(input.autorun).toBe(true);
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.debugState().keys).toEqual([]);
   });
 });
 
@@ -153,9 +207,15 @@ describe('Input click-to-move marker pulses', () => {
 
   it('reroutes an active click-move path without pulsing the marker', () => {
     const { input } = makeInput();
-    input.setClickMoveTarget({ x: 3, z: 0 }, 0.5, 42, [{ x: 1, z: 0 }, { x: 3, z: 0 }]);
+    input.setClickMoveTarget({ x: 3, z: 0 }, 0.5, 42, [
+      { x: 1, z: 0 },
+      { x: 3, z: 0 },
+    ]);
     input.advanceClickMoveWaypoint();
-    input.rerouteClickMoveTarget({ x: 8, z: 0 }, [{ x: 5, z: 0 }, { x: 8, z: 0 }]);
+    input.rerouteClickMoveTarget({ x: 8, z: 0 }, [
+      { x: 5, z: 0 },
+      { x: 8, z: 0 },
+    ]);
     expect(input.clickMovePulse).toBe(1);
     expect(input.clickMoveGoal).toEqual({ x: 8, z: 0 });
     expect(input.clickMoveTarget).toEqual({ x: 5, z: 0 });
@@ -164,7 +224,10 @@ describe('Input click-to-move marker pulses', () => {
 
   it('clears path state when click-to-move stops', () => {
     const { input } = makeInput();
-    input.setClickMoveTarget({ x: 3, z: 0 }, 0.5, null, [{ x: 1, z: 0 }, { x: 3, z: 0 }]);
+    input.setClickMoveTarget({ x: 3, z: 0 }, 0.5, null, [
+      { x: 1, z: 0 },
+      { x: 3, z: 0 },
+    ]);
     input.clearClickMove();
     expect(input.clickMoveTarget).toBeNull();
     expect(input.clickMoveGoal).toBeNull();
@@ -182,21 +245,76 @@ describe('Input pointer lock', () => {
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
   });
 
-  it('requests pointer lock after mouse movement becomes an active drag', () => {
+  it('does not request pointer lock for a quick right-click with sub-threshold jitter (#116)', () => {
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const { canvas, canvasListeners, windowListeners } = makeInput();
+
+    // A real click jitters a few pixels well under CAMERA_DRAG_START_DISTANCE
+    // and releases before CAMERA_DRAG_START_MS: it must stay a click, never a
+    // drag, so the browser pointer-capture banner is never shown.
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+    now += 30;
+    windowListeners.get('mousemove')!({ movementX: 3, movementY: 2 });
+    now += 30;
+    windowListeners.get('mouseup')!({ button: 2, clientX: 103, clientY: 102, target: canvas });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('requests pointer lock the instant a press becomes an active drag (before any rotation)', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
 
     canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
-    windowListeners.get('mousemove')!({ movementX: 4, movementY: 0 });
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+    // This move crosses the drag threshold: lock must engage on the SAME frame so
+    // rotation never begins with a free cursor that can escape the window.
+    windowListeners.get('mousemove')!({ movementX: 4, movementY: 0 });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    // Continuing the drag does not re-request (avoids re-showing the banner).
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('requests pointer lock in Mouse Camera mode too (regression: cursor used to escape there)', () => {
+    const { canvas, input, canvasListeners, windowListeners } = makeInput();
+    input.setMouseCameraEnabled(true);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
+    windowListeners.get('mousemove')!({ movementX: 4, movementY: 0 });
 
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
 
+  it('does not request pointer lock when "Lock Cursor While Rotating" is off', () => {
+    const { canvas, input, canvasListeners, windowListeners } = makeInput();
+    input.setLockCursorOnRotate(false);
+
+    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
+    windowListeners.get('mousemove')!({ movementX: 4, movementY: 0 });
+    windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
   it('uses normal mouse dragging instead of pointer lock while browser fullscreen is active', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
-    (globalThis as any).document.fullscreenElement = (globalThis as any).document.documentElement ?? canvas;
+    (globalThis as any).document.fullscreenElement =
+      (globalThis as any).document.documentElement ?? canvas;
 
     canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
@@ -212,7 +330,12 @@ describe('Input pointer lock', () => {
     const yaw = input.camYaw;
     const pitch = input.camPitch;
 
-    canvasListeners.get('mousedown')!({ button: 0, clientX: 120, clientY: 160, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
     now += 40;
     windowListeners.get('mousemove')!({ movementX: 12, movementY: 3 });
     expect(input.isCameraDragActive()).toBe(false);
@@ -225,17 +348,24 @@ describe('Input pointer lock', () => {
   });
 
   it('starts camera drag by distance but discards the threshold-crossing movement', () => {
-    let now = 1000;
+    const now = 1000;
     vi.spyOn(performance, 'now').mockImplementation(() => now);
     const { canvas, input, canvasListeners, windowListeners } = makeInput();
     const yaw = input.camYaw;
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
     windowListeners.get('mousemove')!({ movementX: 4, movementY: 0 });
     expect(input.isCameraDragActive()).toBe(true);
+    // The threshold-crossing movement is still discarded (no rotation jump), but
+    // the lock now engages on this frame so the cursor is captured immediately.
     expect(input.camYaw).toBe(yaw);
-    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
     windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
@@ -248,7 +378,12 @@ describe('Input pointer lock', () => {
     const { input, canvasListeners, windowListeners } = makeInput();
     const yaw = input.camYaw;
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
     now += 150;
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
     expect(input.isCameraDragActive()).toBe(true);
@@ -265,7 +400,12 @@ describe('Input pointer lock', () => {
     input.setClickMoveMouseButton(0);
     const yaw = input.camYaw;
 
-    canvasListeners.get('mousedown')!({ button: 0, clientX: 120, clientY: 160, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
     now += 180;
     windowListeners.get('mousemove')!({ movementX: 40, movementY: 12 });
     expect(input.isCameraDragActive()).toBe(false);
@@ -283,12 +423,18 @@ describe('Input pointer lock', () => {
     input.setClickMoveMouseButton(2);
     const yaw = input.camYaw;
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
     now += 281;
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
     expect(input.isCameraDragActive()).toBe(true);
     expect(input.camYaw).toBe(yaw);
-    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+    // Lock engages on the activation frame (the click timer has expired).
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
     windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
@@ -303,7 +449,12 @@ describe('Input pointer lock', () => {
     input.setClickMoveMouseButton(0);
     const yaw = input.camYaw;
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100, preventDefault: vi.fn() });
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
     expect(input.isCameraDragActive()).toBe(true);
     expect(input.camYaw).toBe(yaw);
@@ -418,6 +569,35 @@ describe('Input Escape handling', () => {
     expect(cb.onUiKey).toHaveBeenCalledTimes(1);
     expect(cb.onUiKey).toHaveBeenCalledWith('escape');
   });
+
+  it('ignores repeated Escape keydown events so holding the menu key cannot retoggle', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'Escape', repeat: false });
+    windowListeners.get('keydown')!({ code: 'Escape', repeat: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledTimes(1);
+    expect(cb.onUiKey).toHaveBeenCalledWith('escape');
+  });
+});
+
+describe('Input Discord keybind', () => {
+  it("dispatches onUiKey('discord') for the default U key", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('discord');
+  });
+
+  it('is a normal interface key: suppressed while a modal blocks game keys', () => {
+    const { cb, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
+
+    expect(cb.onUiKey).not.toHaveBeenCalled();
+  });
 });
 
 describe('Input Space handling', () => {
@@ -457,15 +637,20 @@ describe('Input movement is not cancelled by a camera drag', () => {
   // Discord regression: walking with W (or any held key) then right/left-drag to
   // look around and releasing the button stopped movement, because exiting
   // pointer lock cleared the held keyboard keys.
-  function walkAndDrag(button: number, windowListeners: Map<string, (e: any) => void>, canvasListeners: Map<string, (e: any) => void>, documentListeners: Map<string, (e: any) => void>) {
-    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });        // hold forward
-    canvasListeners.get('mousedown')!({ button });                           // press camera button
-    windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });      // drag activates
-    windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });       // drag → pointer lock
+  function walkAndDrag(
+    button: number,
+    windowListeners: Map<string, (e: any) => void>,
+    canvasListeners: Map<string, (e: any) => void>,
+    documentListeners: Map<string, (e: any) => void>,
+  ) {
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false }); // hold forward
+    canvasListeners.get('mousedown')!({ button }); // press camera button
+    windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 }); // drag activates
+    windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 }); // drag → pointer lock
     (globalThis as any).document.pointerLockElement = (globalThis as any).document; // lock engaged
-    windowListeners.get('mouseup')!({ button });                             // release → exitPointerLock
-    (globalThis as any).document.pointerLockElement = null;                  // lock ends
-    documentListeners.get('pointerlockchange')!({});                         // browser fires change
+    windowListeners.get('mouseup')!({ button }); // release → exitPointerLock
+    (globalThis as any).document.pointerLockElement = null; // lock ends
+    documentListeners.get('pointerlockchange')!({}); // browser fires change
   }
 
   it('keeps walking forward after a right-drag ends', () => {
@@ -499,11 +684,11 @@ describe('keyboard jump latch', () => {
     windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: () => {} });
     windowListeners.get('keyup')!({ code: 'Space' }); // released almost immediately
     now.mockReturnValue(1010);
-    expect(input.readMoveInput().jump).toBe(true);   // still inside the latch window
+    expect(input.readMoveInput().jump).toBe(true); // still inside the latch window
     now.mockReturnValue(1140);
     expect(input.readMoveInput().jump).toBe(true);
     now.mockReturnValue(1200);
-    expect(input.readMoveInput().jump).toBe(false);  // latch expired
+    expect(input.readMoveInput().jump).toBe(false); // latch expired
     now.mockRestore();
   });
 
@@ -562,6 +747,120 @@ describe('Input emote wheel hold', () => {
     windowListeners.get('blur')!({});
 
     expect(cb.onEmoteWheel).toHaveBeenLastCalledWith(false);
+  });
+
+  it('stays open when its own modal state suspends movement', () => {
+    // Regression (v0.20.0): the open emote wheel counts toward hud.isModalOpen(),
+    // which main.ts feeds into setSuspendMovement every frame. The stale-input
+    // clear then closed the wheel one frame after the bound key opened it, so
+    // the X hotkey wheel flashed and vanished. Held wheel keys are never stale:
+    // onKeyUp is not modal-gated and releaseCapture covers focus loss.
+    const { cb, input, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onEmoteWheel).toHaveBeenCalledWith(true);
+
+    input.setSuspendMovement(true); // mirrors the frame loop reacting to the open wheel
+    expect(cb.onEmoteWheel).not.toHaveBeenCalledWith(false); // wheel stays open
+
+    windowListeners.get('keyup')!({ code: 'KeyX', preventDefault: vi.fn() });
+    expect(cb.onEmoteWheel).toHaveBeenCalledWith(false); // release still closes it
+  });
+
+  it('resumes held movement after the wheel closes instead of going stale', () => {
+    // Classic flow: run with W held, flick X to emote, keep running. The
+    // wheel-caused suspension must not clear the still-held movement keys.
+    const { input, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    input.setSuspendMovement(true); // the open wheel is the modal that suspends
+    expect(input.readMoveInput().forward).toBe(false); // movement frozen while the wheel is up
+
+    windowListeners.get('keyup')!({ code: 'KeyX', preventDefault: vi.fn() });
+    input.setSuspendMovement(false); // wheel closed, modal gone
+
+    expect(input.readMoveInput().forward).toBe(true); // W never went stale
+  });
+});
+
+describe('Input modifier combos', () => {
+  it('fires the bare action-bar slot, but not when a modifier is held', () => {
+    const { windowListeners, cb } = makeInput();
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false }); // slot0 = Attack
+    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
+    cb.onAbility.mockClear();
+    // Shift+1 is a distinct, unbound chord — it must NOT fire bare slot 0.
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
+    expect(cb.onAbility).not.toHaveBeenCalled();
+  });
+
+  it('dispatches a slot bound to Shift+1 only on the Shift chord', () => {
+    // persist a Shift+1 binding, then build the Input so its Keybinds loads it
+    const kb = new Keybinds();
+    expect(kb.bind('slot5', 0, 'Shift+Digit1')).toBe(true);
+    const { windowListeners, cb } = makeInput();
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
+    expect(cb.onAbility).toHaveBeenLastCalledWith(5);
+    cb.onAbility.mockClear();
+    // bare 1 still drives its own slot, unaffected by the modified binding
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false });
+    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
+  });
+
+  it('keeps movement working while a modifier is held (Shift+W still walks)', () => {
+    const { input, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false, shiftKey: true });
+    expect(input.readMoveInput().forward).toBe(true);
+  });
+
+  it('ignores a lone modifier keypress', () => {
+    const { input, cb, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'ShiftLeft', repeat: false });
+    expect(cb.onAbility).not.toHaveBeenCalled();
+    expect(cb.onUiKey).not.toHaveBeenCalled();
+    expect(input.readMoveInput().forward).toBe(false);
+  });
+
+  it('still polls a movement key even if storage holds a stray modifier combo for it', () => {
+    // Defensive: bind() strips modifiers from held actions, but hand-edited or
+    // corrupt storage could carry one. The per-frame poll must still match the
+    // bare physical key so movement cannot silently wedge.
+    localStorage.setItem('woc_keybinds', JSON.stringify({ forward: ['Shift+KeyW', null] }));
+    const { input, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    expect(input.readMoveInput().forward).toBe(true);
+  });
+
+  it('fires a held action and a distinct edge chord on the same press', () => {
+    // KeyX is the held emote-wheel key; also bind Shift+X to an ability slot.
+    // One Shift+X press must open the wheel (held, bare key) AND fire the slot
+    // (edge, full chord): the intentional held+edge co-fire.
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Shift+KeyX')).toBe(true);
+    const { windowListeners, cb } = makeInput();
+    windowListeners.get('keydown')!({
+      code: 'KeyX',
+      repeat: false,
+      shiftKey: true,
+      preventDefault: vi.fn(),
+    });
+    expect(cb.onEmoteWheel).toHaveBeenLastCalledWith(true); // held fired
+    expect(cb.onAbility).toHaveBeenLastCalledWith(3); // edge chord fired
+  });
+
+  it('folds Cmd/Meta into the chord, so Cmd+1 does not fire bare slot 0', () => {
+    // Bind Meta+1 to a slot; capture and dispatch both read e.metaKey, so the
+    // Cmd chord fires its own slot and never steals the bare-1 slot.
+    const kb = new Keybinds();
+    expect(kb.bind('slot7', 0, 'Meta+Digit1')).toBe(true);
+    const { windowListeners, cb } = makeInput();
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, metaKey: true });
+    expect(cb.onAbility).toHaveBeenLastCalledWith(7);
+    cb.onAbility.mockClear();
+    // bare 1 still drives slot 0, unaffected by the Cmd binding
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false });
+    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
   });
 });
 

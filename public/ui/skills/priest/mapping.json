@@ -8,54 +8,54 @@
     {
       "abilityId": "smite",
       "sourceFile": "13.png",
-      "output": "smite.png"
+      "output": "smite.webp"
     },
     {
       "abilityId": "lesser_heal",
       "sourceFile": "30.png",
-      "output": "lesser_heal.png"
+      "output": "lesser_heal.webp"
     },
     {
       "abilityId": "power_word_fortitude",
       "sourceFile": "50.png",
-      "output": "power_word_fortitude.png"
+      "output": "power_word_fortitude.webp"
     },
     {
       "abilityId": "power_word_shield",
       "sourceFile": "3.png",
-      "output": "power_word_shield.png"
+      "output": "power_word_shield.webp"
     },
     {
       "abilityId": "renew",
       "sourceFile": "25.png",
-      "output": "renew.png"
+      "output": "renew.webp"
     },
     {
       "abilityId": "mind_blast",
       "sourceFile": "35.png",
-      "output": "mind_blast.png"
+      "output": "mind_blast.webp"
     },
     {
       "abilityId": "heal",
       "sourceFile": "24.png",
-      "output": "heal.png"
+      "output": "heal.webp"
     },
     {
       "abilityId": "flash_heal",
       "sourceFile": "48.png",
-      "output": "flash_heal.png"
+      "output": "flash_heal.webp"
     },
     {
       "abilityId": "shadow_word_pain",
       "sourcePack": "generic-skill100",
       "sourceFile": "skill icon 9.png",
-      "output": "shadow_word_pain.png"
+      "output": "shadow_word_pain.webp"
     },
     {
       "abilityId": "mind_flay",
       "sourcePack": "_Missing_Priest",
       "sourceFile": "8.png",
-      "output": "mind_flay.png"
+      "output": "mind_flay.webp"
     }
   ],
   "deferredStayProcedural": {}

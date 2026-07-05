@@ -1,0 +1,664 @@
+/* index.extra.css: per-entry CSS for the index.html game entry, loaded only by
+   index.html (via a <link> in its <head>). It declares the canonical @layer order
+   up front (idempotent with the barrel) so the layer slots resolve regardless of
+   which sheet the browser parses first.
+
+   The ONLY per-entry rule today is the #rotate-device orientation gate.
+   Browser index.html suppresses the rotate overlay while the game is active,
+   whereas the native app can show it in portrait and play.html shows it in
+   portrait. This is the index side of that split; play.extra.css holds play's.
+   play.html does NOT load this file, so its !important suppress cannot leak
+   onto play. Layer name is flat (index-extra), NOT dotted, so it is a top-level
+   layer placed last by the order below, after hud-mobile. */
+@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+
+@layer index-extra {
+  body.mobile-touch.game-active:not(.native-app) #rotate-device {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  @media (orientation: portrait) {
+    body.native-app.mobile-touch.game-active #rotate-device {
+      display: flex;
+    }
+  }
+}
+
+/* ── Discord integration ───────────────────────────────────────────────────── */
+/* "or use email" divider under the first-class Continue with Discord button. */
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: var(--color-text-muted, #9a8f70);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.auth-or[hidden] {
+  display: none;
+}
+.auth-or::before,
+.auth-or::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: #463a1c;
+}
+/* The shared .auth-or has a bottom-only margin, which leaves the first-login chooser's
+   "already have an account?" divider hugging the Create button instead of centered
+   between the two choices. Give it symmetric vertical margin so it sits centered. */
+#discord-choice-panel .auth-or {
+  margin: 10px 0;
+}
+/* Linked-Discord PFP next to a nameplate name (and the inspect-card discord pfp). */
+.np-discord {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 3px;
+  border-radius: 50%;
+  border: 1.5px solid #5865f2;
+  object-fit: cover;
+  box-shadow: 0 1px 1px #000;
+}
+.inspect-discord-pfp {
+  border: 1.5px solid #5865f2 !important;
+}
+.inspect-discord-role {
+  color: #cfe0ff;
+}
+.inspect-dev-login {
+  color: #9fe6c2;
+}
+
+/* ── Discord in-game panel (#discord-window) + widget ─────────────────── */
+#discord-window {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 210;
+  width: 380px;
+  max-width: calc(100vw - 24px);
+  height: 620px;
+  max-height: calc(100vh - 48px);
+  flex-direction: column;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 14px;
+}
+#discord-window:not([hidden]) {
+  display: flex;
+}
+#discord-window .dc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 2px;
+  flex: 1 1 auto;
+}
+#discord-window .panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.dc-benefits {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+.dc-link-cta {
+  text-align: center;
+  padding: 12px 4px;
+}
+.dc-btn {
+  font-family: var(--ui-font);
+  font-size: 13px;
+  border-radius: 5px;
+  padding: 8px 14px;
+  border: 1px solid #463a1c;
+  background: #1a1410;
+  color: #e9dcb6;
+  cursor: var(--cursor-point);
+  min-height: 40px;
+  box-sizing: border-box;
+}
+.dc-btn:hover:not([disabled]) {
+  border-color: var(--gold);
+  color: #fff;
+}
+.dc-btn[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+.dc-btn-primary {
+  background: linear-gradient(180deg, #5865f2, #404ac4);
+  border-color: #2a2f7a;
+  color: #fff;
+  font-weight: 600;
+  width: 100%;
+}
+.dc-btn-primary:hover {
+  filter: brightness(1.1);
+}
+.dc-btn-ghost {
+  background: transparent;
+}
+.dc-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dc-tier-badge {
+  width: 44px;
+  height: 44px;
+  flex: none;
+}
+/* Discord profile picture with the rank badge tucked in the corner. */
+.dc-avatar-wrap {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 48px;
+}
+.dc-pfp {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #5865f2;
+  box-shadow: 0 1px 4px #0008;
+  background: #1a1410;
+}
+.dc-tier-corner {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 1px 2px #000);
+}
+.dc-account-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dc-account-name {
+  font-weight: 600;
+  color: #fff6df;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dc-tier-name {
+  color: var(--gold);
+  font-size: 13px;
+}
+.dc-member-ok {
+  color: #5bd86a;
+  font-size: 11px;
+}
+.dc-member-no {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+.dc-char-link {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #7fb2ff;
+  font-size: 11px;
+  cursor: var(--cursor-point);
+  text-decoration: underline;
+  font-family: var(--ui-font);
+}
+.dc-char-link:hover {
+  color: #a9ccff;
+}
+.dc-unlink {
+  flex: none;
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 11px;
+}
+.dc-visit {
+  flex: none;
+  min-height: 32px;
+  width: 34px;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #5865f2;
+  border-color: #2a2f7a;
+  color: #fff;
+}
+.dc-visit:hover:not([disabled]) {
+  background: #6b76f5;
+  border-color: #5865f2;
+  color: #fff;
+}
+.dc-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #d8cba0;
+}
+.dc-stat b {
+  color: #ffe9a8;
+}
+.dc-stat-sep {
+  color: #6a5c34;
+}
+.dc-section {
+  border-top: 1px solid #463a1c;
+  padding-top: 10px;
+}
+.dc-h3 {
+  font-family: var(--title-font);
+  color: var(--gold);
+  font-size: 13px;
+  margin: 0 0 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.dc-online {
+  color: #5bd86a;
+  font-size: 11px;
+  font-weight: 400;
+}
+.dc-swag-list,
+.dc-voice-list,
+.dc-tier-ladder {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dc-tier-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid #3a3118;
+  background: #1a1710;
+}
+.dc-tier-row.is-locked {
+  opacity: 0.45;
+}
+.dc-tier-row.is-current {
+  border-color: var(--dc-tier);
+  box-shadow:
+    0 0 0 1px var(--dc-tier) inset,
+    0 0 8px -2px var(--dc-tier);
+  background: #211c10;
+}
+.dc-tier-badge {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 50%;
+}
+.dc-tier-name {
+  flex: 1 1 auto;
+  font-size: 13px;
+  min-width: 0;
+  color: var(--dc-tier);
+  font-weight: 600;
+}
+.dc-tier-row.is-locked .dc-tier-name {
+  color: var(--color-text-muted);
+}
+.dc-tier-req {
+  font-size: 11px;
+  color: #d8cba0;
+  flex: none;
+}
+.dc-tier-chip {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  flex: none;
+}
+.dc-tier-chip.is-current {
+  background: var(--dc-tier);
+  color: #100;
+  font-weight: 700;
+}
+.dc-tier-chip.is-locked {
+  background: #2a2414;
+  color: #8a7d5a;
+}
+.dc-earn {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #c9bb92;
+  line-height: 1.4;
+}
+.dc-swag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dc-swag-name {
+  flex: 1 1 auto;
+  font-size: 13px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dc-swag-row.is-claimed .dc-swag-name {
+  color: var(--color-text-muted);
+}
+.dc-swag-cost {
+  font-size: 11px;
+  color: #d8cba0;
+  flex: none;
+}
+.dc-btn-claim {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 11px;
+  flex: none;
+}
+.dc-swag-claimed {
+  color: #5bd86a;
+  font-size: 11px;
+  flex: none;
+}
+.dc-voice-head {
+  color: #d8cba0;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.dc-voice-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.dc-voice-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #6a5c34;
+  flex: none;
+}
+.dc-voice-dot.is-speaking {
+  background: #5bd86a;
+  box-shadow: 0 0 6px #5bd86a;
+  animation: dcPulse 1.1s ease-in-out infinite;
+}
+.dc-voice-dot.is-muted {
+  background: #c0563f;
+}
+.dc-voice-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dc-voice-state {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  flex: none;
+}
+.dc-voice-empty {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  margin: 4px 0;
+}
+.dc-voice-join {
+  margin-top: 8px;
+  width: 100%;
+}
+.dc-widget-frame {
+  width: 100%;
+  height: 300px;
+  border: 1px solid #463a1c;
+  border-radius: 6px;
+  margin-top: 10px;
+  background: #1a1410;
+}
+@keyframes dcPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dc-voice-dot.is-speaking {
+    animation: none;
+  }
+}
+/* Unread-claimable badge on the side-rail Discord button. */
+#mm-discord {
+  position: relative;
+}
+
+/* Discord info line under the target frame healthbar (nickname + tag chips). */
+.uf-discord {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+.uf-discord.show {
+  display: flex;
+}
+.uf-dc-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff6df;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uf-dc-name img {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #5865f2;
+  object-fit: cover;
+}
+.uf-dc-chip {
+  font-size: 9.5px;
+  line-height: 1.4;
+  padding: 0 5px;
+  border-radius: 7px;
+  background: #2a2414;
+  color: #d8cba0;
+  border: 1px solid #463a1c;
+}
+.uf-dc-chip.role {
+  color: #100;
+  font-weight: 700;
+  background: var(--role, #888);
+  border-color: transparent;
+}
+.uf-dc-chip.rank {
+  color: #cfe0ff;
+}
+/* developer-badge chip on the target frame */
+.uf-dc-chip.dev {
+  color: #d7ffe9;
+}
+
+/* "!" community-command autocomplete dropdown above the chat input. */
+.chat-cmd-menu {
+  position: fixed;
+  z-index: 70;
+  background: #14110a;
+  border: 1px solid #463a1c;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px -6px #000a;
+  overflow: hidden;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.chat-cmd-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 10px;
+  cursor: var(--cursor-point, pointer);
+}
+.chat-cmd-row.on {
+  background: #2a2f7a;
+}
+.chat-cmd-id {
+  color: #8b9bff;
+  font-weight: 700;
+  font-size: 13px;
+  flex: none;
+  min-width: 56px;
+}
+.chat-cmd-row.on .chat-cmd-id {
+  color: #cfe0ff;
+}
+.chat-cmd-label {
+  color: #f0e6c8;
+  font-size: 13px;
+  flex: none;
+}
+.chat-cmd-hint {
+  color: var(--color-text-muted, #9a8f70);
+  font-size: 11px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Unlinked "Link your Discord" CTA banner, pinned top-center, dismissible. */
+#discord-cta-banner {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(620px, 94vw);
+  padding: 8px 10px 8px 14px;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(180deg, #5865f2, #4149b8);
+  border: 1px solid #2a2f7a;
+  box-shadow:
+    0 6px 20px -6px #000a,
+    0 0 0 1px #ffffff14 inset;
+}
+#discord-cta-banner[hidden] {
+  display: none;
+}
+#discord-cta-banner .dc-cta-logo {
+  flex: none;
+  opacity: 0.95;
+}
+#discord-cta-banner .dc-cta-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+#discord-cta-banner .dc-cta-title {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+#discord-cta-banner .dc-cta-stats {
+  font-size: 11.5px;
+  opacity: 0.9;
+}
+#discord-cta-banner .dc-cta-btn {
+  flex: none;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12.5px;
+  color: #2a2f7a;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+}
+#discord-cta-banner .dc-cta-btn:hover {
+  background: #eef0ff;
+}
+#discord-cta-banner .dc-cta-x {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: #ffffff22;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+#discord-cta-banner .dc-cta-x:hover {
+  background: #ffffff3a;
+}
+/* Phones: the desktop flex row squeezes the title column down to one word per line
+   (the fixed logo/button/dismiss starve it) and the vertically centered button then
+   overlaps it. Re-flow to a grid (logo + title + dismiss on top, the link button
+   full-width below) so the title gets the leftover space and wraps normally, with
+   mobile-floor (>=40px) tap targets. Gated on coarse-pointer too, not just a narrow
+   width, so landscape phones get the same layout (per src/ui/CLAUDE.md). */
+@media (max-width: 560px), (pointer: coarse) {
+  #discord-cta-banner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "logo text close"
+      "btn  btn  btn";
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 8px;
+    width: min(94vw, 440px);
+  }
+  #discord-cta-banner .dc-cta-logo {
+    grid-area: logo;
+  }
+  #discord-cta-banner .dc-cta-text {
+    grid-area: text;
+  }
+  #discord-cta-banner .dc-cta-x {
+    grid-area: close;
+    align-self: start;
+    width: 40px;
+    height: 40px;
+  }
+  #discord-cta-banner .dc-cta-btn {
+    grid-area: btn;
+    width: 100%;
+    min-height: 40px;
+  }
+  #discord-cta-banner .dc-cta-title {
+    font-size: 12.5px;
+  }
+}

@@ -10,11 +10,19 @@
 // SPECIFIC generated modules (en / en_XA / pending / loaders), never the index.ts barrel,
 // so the only reference to the barrel below is the dead re-export line - which Rollup
 // tree-shakes out of the app chunk.
+
+import type {
+  DeepPartial,
+  EnTranslations,
+  InterpolationValue,
+  InterpolationValues,
+  Leaves,
+  TranslationKey,
+} from './i18n.catalog';
 import { en } from './i18n.resolved.generated/en';
 import { en_XA } from './i18n.resolved.generated/en_XA';
-import { pending } from './i18n.resolved.generated/pending';
 import { LOCALE_LOADERS, SUPPORTED_LANGUAGES } from './i18n.resolved.generated/loaders';
-import type { Leaves, TranslationKey, InterpolationValue, InterpolationValues, DeepPartial, EnTranslations } from './i18n.catalog';
+import { pending } from './i18n.resolved.generated/pending';
 
 // Re-export the dense per-locale objects so const-importers of './i18n' keep an unchanged
 // surface: the S3 guard (tests/localization_fixes.test.ts) and the SHA harness
@@ -25,26 +33,48 @@ import type { Leaves, TranslationKey, InterpolationValue, InterpolationValues, D
 // tree-shakes the 13 non-en slices (and the barrel that assembles them) out of the app
 // chunk. THAT drop is the payload win of the lazy locale flip. `en` stays in the chunk via the eager
 // local import above (the universal English default), not via this line.
-export { en, es, es_ES, fr_FR, fr_CA, en_CA, it_IT, de_DE, zh_CN, zh_TW, ko_KR, ja_JP, pt_BR, ru_RU } from './i18n.resolved.generated';
+export {
+  da_DK,
+  de_DE,
+  en,
+  en_CA,
+  es,
+  es_ES,
+  fr_CA,
+  fr_FR,
+  id_ID,
+  it_IT,
+  ja_JP,
+  ko_KR,
+  nl_NL,
+  pl_PL,
+  pt_BR,
+  ru_RU,
+  sv_SE,
+  tr_TR,
+  vi_VN,
+  zh_CN,
+  zh_TW,
+} from './i18n.resolved.generated';
 // gameStrings is the post-cap/XP/leaderboard layer, which the table carries under the
 // `game` key. Source it from the eager generated dense `en` rather than re-exporting from
 // i18n.catalog, so importing './i18n' does not pull the full i18n.catalog base (en + shared content
 // layers, ~1 MB) into the client bundle - that module now exists only to feed the
 // generator. Same content, same export name.
 export const gameStrings = en.game;
-export type { Leaves, TranslationKey, InterpolationValue, InterpolationValues, DeepPartial };
+export type { DeepPartial, InterpolationValue, InterpolationValues, Leaves, TranslationKey };
 
-// The 14-locale set + its type derive from the generated SUPPORTED_LANGUAGES (the loaders
+// The 21-locale set + its type derive from the generated SUPPORTED_LANGUAGES (the loaders
 // surface), NOT `keyof typeof translations`: after the lazy flip the full `translations`
-// map is no longer eagerly imported. The two are pinned equal (same 14 codes, same order)
+// map is no longer eagerly imported. The two are pinned equal (same 21 codes, same order)
 // by tests/i18n_emit_shape.test.ts.
-export type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 export const supportedLanguages = [...SUPPORTED_LANGUAGES] as SupportedLanguage[];
 // Membership set for isSupportedLanguage / getStoredLanguage now that the `translations`
 // map (whose keys were the old membership test) is no longer imported.
 const SUPPORTED_SET: ReadonlySet<string> = new Set(SUPPORTED_LANGUAGES);
 
-let currentLanguage: SupportedLanguage = "en";
+let currentLanguage: SupportedLanguage = 'en';
 
 // --- en_XA dev-only pseudo-locale --------------------------------------
 //
@@ -58,7 +88,7 @@ let currentLanguage: SupportedLanguage = "en";
 // tableFor() is statically true in a production `vite build`, so Rollup
 // dead-code-eliminates the en_XA reference and tree-shakes the pseudo table out of
 // the shipped bundle entirely.
-const DEV_PSEUDO_LOCALE = "en_XA";
+const DEV_PSEUDO_LOCALE = 'en_XA';
 let pseudoActive = false;
 
 export function isSupportedLanguage(value: string): value is SupportedLanguage {
@@ -66,13 +96,13 @@ export function isSupportedLanguage(value: string): value is SupportedLanguage {
 }
 
 export function languageTag(lang: SupportedLanguage): string {
-  return lang.replace("_", "-");
+  return lang.replace('_', '-');
 }
 
 function browserStorage(): Storage | null {
   try {
     const storage = globalThis.localStorage;
-    return storage && typeof storage === "object" ? storage : null;
+    return storage && typeof storage === 'object' ? storage : null;
   } catch {
     return null;
   }
@@ -80,9 +110,9 @@ function browserStorage(): Storage | null {
 
 function getStoredLanguage(): SupportedLanguage | null {
   const storage = browserStorage();
-  if (!storage || typeof storage.getItem !== "function") return null;
+  if (!storage || typeof storage.getItem !== 'function') return null;
   try {
-    const saved = storage.getItem("locale");
+    const saved = storage.getItem('locale');
     return saved && isSupportedLanguage(saved) ? saved : null;
   } catch {
     return null;
@@ -91,18 +121,18 @@ function getStoredLanguage(): SupportedLanguage | null {
 
 function setStoredLanguage(lang: SupportedLanguage): void {
   const storage = browserStorage();
-  if (!storage || typeof storage.setItem !== "function") return;
+  if (!storage || typeof storage.setItem !== 'function') return;
   try {
-    storage.setItem("locale", lang);
+    storage.setItem('locale', lang);
   } catch {
     // Storage may be disabled or unavailable in test/browser privacy modes.
   }
 }
 
 // Initialize language from URL query or localStorage if available (browser environments)
-if (typeof window !== "undefined" && window.location) {
+if (typeof window !== 'undefined' && window.location) {
   const params = new URLSearchParams(window.location.search);
-  const langParam = params.get("lang");
+  const langParam = params.get('lang');
   if (langParam === DEV_PSEUDO_LOCALE && !isReleaseBuild()) {
     // Dev-only en_XA pseudo-locale: keep currentLanguage = "en" as the base and flip
     // the pseudo flag. en_XA is not a SupportedLanguage and is never persisted, so it
@@ -148,7 +178,7 @@ const resident: Partial<Record<SupportedLanguage, EnTranslations>> = { en };
 const inflight = new Map<SupportedLanguage, Promise<void>>();
 
 export function isLocaleResident(lang: SupportedLanguage): boolean {
-  return lang === "en" || resident[lang] !== undefined;
+  return lang === 'en' || resident[lang] !== undefined;
 }
 
 // Soft failure hook for a locale chunk that failed to load (a real risk once the lazy locale flip
@@ -162,7 +192,7 @@ function reportLocaleLoadFailure(lang: SupportedLanguage, err: unknown): void {
 }
 
 export async function ensureLocaleLoaded(lang: SupportedLanguage): Promise<void> {
-  if (lang === "en" || isLocaleResident(lang)) return; // English-instant / already loaded
+  if (lang === 'en' || isLocaleResident(lang)) return; // English-instant / already loaded
   const existing = inflight.get(lang);
   if (existing) return existing; // coalesce onto the in-flight import
   const loader = LOCALE_LOADERS[lang as keyof typeof LOCALE_LOADERS];
@@ -173,8 +203,9 @@ export async function ensureLocaleLoaded(lang: SupportedLanguage): Promise<void>
       // default OR the named export, but under raw vitest (node, no DOM) import('./es')
       // resolves the SOURCE .ts with NAMED exports only, so mod.default is undefined -
       // fall back to the export keyed by the locale code.
-      resident[lang] = (mod as { default?: EnTranslations }).default
-        ?? (mod as Record<string, EnTranslations>)[lang];
+      resident[lang] =
+        (mod as { default?: EnTranslations }).default ??
+        (mod as Record<string, EnTranslations>)[lang];
       inflight.delete(lang);
     })
     .catch((err) => {
@@ -203,7 +234,7 @@ export async function ensureLocaleLoaded(lang: SupportedLanguage): Promise<void>
 // import). English and an already-resident locale are no-ops; never speculative (only the
 // one active locale, never the other 12).
 export function prefetchLocale(lang: SupportedLanguage = currentLanguage): void {
-  if (lang === "en" || isLocaleResident(lang)) return;
+  if (lang === 'en' || isLocaleResident(lang)) return;
   void ensureLocaleLoaded(lang).catch(() => {
     // Swallowed: the awaited bootstrap/picker call re-runs the load and surfaces the error.
   });
@@ -214,7 +245,7 @@ export function prefetchLocale(lang: SupportedLanguage = currentLanguage): void 
 // No-op for English (the default - preserves the zero-non-en-bytes guarantee for an English
 // visitor), for an unresolved locale, and outside a browser (vitest/node has no window); it
 // never throws.
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   prefetchLocale();
 }
 
@@ -243,7 +274,8 @@ function interpolate(template: string, values?: InterpolationValues): string {
 // path pays nothing.
 function isReleaseBuild(): boolean {
   try {
-    if (typeof process !== "undefined" && process.env && process.env.I18N_RELEASE === "1") return true;
+    if (typeof process !== 'undefined' && process.env && process.env.I18N_RELEASE === '1')
+      return true;
   } catch {
     // No `process` (browser runtime) - fall through to the build-time flag.
   }
@@ -293,16 +325,16 @@ function tableFor(lang: SupportedLanguage): EnTranslations {
 }
 
 export function t(key: TranslationKey, values?: InterpolationValues): string {
-  const parts = key.split(".");
+  const parts = key.split('.');
   let current: unknown = tableFor(currentLanguage);
   for (const part of parts) {
-    if (current && typeof current === "object" && part in current) {
+    if (current && typeof current === 'object' && part in current) {
       current = (current as Record<string, unknown>)[part];
     } else {
       return onUntrackedKey(key);
     }
   }
-  if (typeof current !== "string") return onUntrackedKey(key);
+  if (typeof current !== 'string') return onUntrackedKey(key);
   if (PENDING_TOTAL > 0 && PENDING_SETS[currentLanguage]?.has(key) && isReleaseBuild()) {
     throw new Error(
       `i18n: key "${key}" is untranslated (pending) for locale "${currentLanguage}" on a release build; English must never ship to a translated player`,
@@ -312,23 +344,27 @@ export function t(key: TranslationKey, values?: InterpolationValues): string {
 }
 
 function translationValue(key: string, lang: SupportedLanguage): string | null {
-  const parts = key.split(".");
+  const parts = key.split('.');
   let current: unknown = tableFor(lang);
   for (const part of parts) {
-    if (current && typeof current === "object" && part in current) {
+    if (current && typeof current === 'object' && part in current) {
       current = (current as Record<string, unknown>)[part];
     } else {
       return null;
     }
   }
-  return typeof current === "string" ? current : null;
+  return typeof current === 'string' ? current : null;
 }
 
 export function hasTranslation(key: string, lang: SupportedLanguage = currentLanguage): boolean {
   return translationValue(key, lang) !== null;
 }
 
-export function tOptional(key: string, values?: InterpolationValues, lang: SupportedLanguage = currentLanguage): string | null {
+export function tOptional(
+  key: string,
+  values?: InterpolationValues,
+  lang: SupportedLanguage = currentLanguage,
+): string | null {
   const value = translationValue(key, lang);
   return value === null ? null : interpolate(value, values);
 }
@@ -363,11 +399,37 @@ export function tPlural(base: string, count: number, values?: InterpolationValue
   return t(key, merged);
 }
 
-export function formatNumber(value: number, options?: Intl.NumberFormatOptions, lang: SupportedLanguage = currentLanguage): string {
-  return new Intl.NumberFormat(languageTag(lang), options).format(value);
+// Constructing an Intl.NumberFormat parses locale data and is one of the costlier JS
+// ops; the HUD calls formatNumber on per-frame paths (aura stack counts, cast-bar
+// timers, the action bar). One formatter is cached per (language tag, options) so a
+// repeat format reuses it instead of rebuilding (mirrors pluralRulesCache). The key
+// folds the options by value, not identity, so two call sites passing equal options
+// share one formatter; a BCP-47 tag never contains '{', so tag + the options JSON is an
+// unambiguous key. NumberFormat instances are immutable, so sharing is safe.
+const numberFormatCache = new Map<string, Intl.NumberFormat>();
+function numberFormatFor(tag: string, options?: Intl.NumberFormatOptions): Intl.NumberFormat {
+  const key = options ? `${tag}${JSON.stringify(options)}` : tag;
+  let fmt = numberFormatCache.get(key);
+  if (!fmt) {
+    fmt = new Intl.NumberFormat(tag, options);
+    numberFormatCache.set(key, fmt);
+  }
+  return fmt;
 }
 
-export function formatDateTime(value: Date | number, options?: Intl.DateTimeFormatOptions, lang: SupportedLanguage = currentLanguage): string {
+export function formatNumber(
+  value: number,
+  options?: Intl.NumberFormatOptions,
+  lang: SupportedLanguage = currentLanguage,
+): string {
+  return numberFormatFor(languageTag(lang), options).format(value);
+}
+
+export function formatDateTime(
+  value: Date | number,
+  options?: Intl.DateTimeFormatOptions,
+  lang: SupportedLanguage = currentLanguage,
+): string {
   return new Intl.DateTimeFormat(languageTag(lang), options).format(value);
 }
 
@@ -377,7 +439,7 @@ export interface MoneyParts {
   copper: number;
 }
 
-export type MoneyDisplayStyle = "compact" | "long";
+export type MoneyDisplayStyle = 'compact' | 'long';
 
 export function moneyParts(copper: number): MoneyParts {
   const safeCopper = Number.isFinite(copper) ? Math.max(0, Math.floor(copper)) : 0;
@@ -388,25 +450,29 @@ export function moneyParts(copper: number): MoneyParts {
   };
 }
 
-export function formatMoney(copper: number, style: MoneyDisplayStyle = "compact"): string {
+export function formatMoney(copper: number, style: MoneyDisplayStyle = 'compact'): string {
   const parts = moneyParts(copper);
-  const unitKeys = style === "compact"
-    ? {
-      gold: "itemUi.money.goldShort",
-      silver: "itemUi.money.silverShort",
-      copper: "itemUi.money.copperShort",
-    } satisfies Record<keyof MoneyParts, TranslationKey>
-    : {
-      gold: "itemUi.money.gold",
-      silver: "itemUi.money.silver",
-      copper: "itemUi.money.copper",
-    } satisfies Record<keyof MoneyParts, TranslationKey>;
+  const unitKeys =
+    style === 'compact'
+      ? ({
+          gold: 'itemUi.money.goldShort',
+          silver: 'itemUi.money.silverShort',
+          copper: 'itemUi.money.copperShort',
+        } satisfies Record<keyof MoneyParts, TranslationKey>)
+      : ({
+          gold: 'itemUi.money.gold',
+          silver: 'itemUi.money.silver',
+          copper: 'itemUi.money.copper',
+        } satisfies Record<keyof MoneyParts, TranslationKey>);
   const rows: { value: number; unit: TranslationKey }[] = [];
   if (parts.gold > 0) rows.push({ value: parts.gold, unit: unitKeys.gold });
   if (parts.silver > 0 || parts.gold > 0) rows.push({ value: parts.silver, unit: unitKeys.silver });
-  if (parts.copper > 0 || rows.length === 0) rows.push({ value: parts.copper, unit: unitKeys.copper });
-  return rows.map(({ value, unit }) => {
-    const amount = formatNumber(value, { maximumFractionDigits: 0 });
-    return style === "compact" ? `${amount}${t(unit)}` : `${amount} ${t(unit)}`;
-  }).join(" ");
+  if (parts.copper > 0 || rows.length === 0)
+    rows.push({ value: parts.copper, unit: unitKeys.copper });
+  return rows
+    .map(({ value, unit }) => {
+      const amount = formatNumber(value, { maximumFractionDigits: 0 });
+      return style === 'compact' ? `${amount}${t(unit)}` : `${amount} ${t(unit)}`;
+    })
+    .join(' ');
 }

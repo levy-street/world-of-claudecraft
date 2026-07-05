@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { petPickTarget } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
-import { Entity } from '../src/sim/types';
+import type { Entity } from '../src/sim/types';
 
 // Anti-AFK gate on aggressive pet auto-pull (hunter/warlock). An aggressive pet
 // proactively pulls nearby hostiles only while the owner is actually playing; an
@@ -34,7 +35,8 @@ function findWildHostile(sim: Sim, excludeId: number): Entity {
 }
 
 function place(e: Entity, x: number, z: number): void {
-  e.pos.x = x; e.pos.z = z;
+  e.pos.x = x;
+  e.pos.z = z;
   e.prevPos = { ...e.pos };
 }
 
@@ -54,24 +56,24 @@ function setup() {
   owner.targetId = null;
   owner.autoAttack = false;
   const meta = sim.meta(pid)!;
-  const pick = (): Entity | null => (sim as any).petPickTarget(pet, owner);
+  const pick = (): Entity | null => petPickTarget((sim as any).ctx, pet, owner);
   return { sim, pid, owner, pet, target, meta, pick };
 }
 
 describe('aggressive pet AFK-farm gate', () => {
-  it('an ACTIVE owner\'s aggressive pet auto-pulls a nearby hostile', () => {
+  it("an ACTIVE owner's aggressive pet auto-pulls a nearby hostile", () => {
     const { sim, target, meta, pick } = setup();
     meta.lastActiveTick = sim.tickCount; // just acted
     expect(pick()?.id).toBe(target.id);
   });
 
-  it('an IDLE owner\'s aggressive pet does NOT auto-pull a non-engaging hostile', () => {
+  it("an IDLE owner's aggressive pet does NOT auto-pull a non-engaging hostile", () => {
     const { sim, meta, pick } = setup();
     meta.lastActiveTick = sim.tickCount - 100000; // long idle
     expect(pick()).toBeNull();
   });
 
-  it('an IDLE owner\'s pet STILL defends when a mob engages the owner', () => {
+  it("an IDLE owner's pet STILL defends when a mob engages the owner", () => {
     const { sim, owner, target, meta, pick } = setup();
     meta.lastActiveTick = sim.tickCount - 100000; // long idle
     target.aggroTargetId = owner.id; // the mob attacks the owner
@@ -92,7 +94,7 @@ describe('aggressive pet AFK-farm gate: activity stamping (end-to-end)', () => {
     sim.setPetMode('aggressive', pid);
     const target = findWildHostile(sim, pet.id);
     place(owner, 0, 0);
-    place(pet, 28, 0);   // within leash of the owner
+    place(pet, 28, 0); // within leash of the owner
     place(target, 33, 0); // 5yd from the pet, 33yd from the owner (no proximity aggro)
     target.aggroTargetId = null;
     owner.targetId = null;
@@ -107,13 +109,15 @@ describe('aggressive pet AFK-farm gate: activity stamping (end-to-end)', () => {
 
   it('a real movement tick stamps activity and re-opens the gate', () => {
     const { sim, owner, pet, target, meta } = setupE2E();
-    expect((sim as any).petPickTarget(pet, owner)).toBeNull(); // idle: no pull
+    expect(petPickTarget((sim as any).ctx, pet, owner)).toBeNull(); // idle: no pull
     meta.moveInput.forward = true; // hold a movement key
-    sim.tick();                    // updatePlayerMovement runs for real and stamps
+    sim.tick(); // updatePlayerMovement runs for real and stamps
     meta.moveInput.forward = false;
     expect(isFresh(sim, meta)).toBe(true);
-    place(owner, 0, 0); place(pet, 28, 0); place(target, 33, 0); // undo a tick of drift
-    expect((sim as any).petPickTarget(pet, owner)?.id).toBe(target.id);
+    place(owner, 0, 0);
+    place(pet, 28, 0);
+    place(target, 33, 0); // undo a tick of drift
+    expect(petPickTarget((sim as any).ctx, pet, owner)?.id).toBe(target.id);
   });
 
   it('a real ability cast stamps activity', () => {

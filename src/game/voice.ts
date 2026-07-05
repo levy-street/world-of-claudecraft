@@ -13,15 +13,51 @@ import { VOICE_LINES } from './voice_manifest.generated';
 // the SFX/ambience mix.
 const VOICE_BASE_GAIN = 0.9;
 
+// Distance-attenuation curve for a talking NPC (world yards). At or within
+// VOICE_FULL_DIST the line plays at full volume; past it the volume ramps down
+// linearly to silence at VOICE_SILENT_DIST, so a dialogue you walk away from
+// trails off as if heard from farther away. You open a dialog within
+// INTERACT_RANGE (5), so FULL sits just past it and never dips the line on open.
+export const VOICE_FULL_DIST = 6;
+export const VOICE_SILENT_DIST = 22;
+
+export function voiceDistanceGain(
+  dist: number,
+  full = VOICE_FULL_DIST,
+  silent = VOICE_SILENT_DIST,
+): number {
+  if (!(dist > full)) return 1; // also catches NaN / negative: play at full
+  if (dist >= silent) return 0;
+  return (silent - dist) / (silent - full);
+}
+
 class GameVoice {
   private el: HTMLAudioElement | null = null;
   private vol = 0.9; // 0..1, from the settings slider
   private enabled = true;
+  private playGain = 1; // per-line gain passed to play()
+  private distanceGain = 1; // live distance attenuation (1 = at the NPC)
+
+  private applyVolume(): void {
+    if (this.el)
+      this.el.volume = Math.min(1, this.vol * VOICE_BASE_GAIN * this.playGain * this.distanceGain);
+  }
 
   /** Set voice volume (0..1). Safe any time. */
   setVolume(v: number): void {
     this.vol = Math.min(1, Math.max(0, v));
-    if (this.el) this.el.volume = this.vol * VOICE_BASE_GAIN;
+    this.applyVolume();
+  }
+
+  /** Live distance attenuation (0 = out of earshot, 1 = at the NPC) for the current line. */
+  setDistanceGain(g: number): void {
+    this.distanceGain = Math.min(1, Math.max(0, g));
+    this.applyVolume();
+  }
+
+  /** True while a line is actively sounding (used to stop driving the fade once it ends). */
+  isPlaying(): boolean {
+    return !!this.el && !this.el.paused && !this.el.ended;
   }
 
   /** Enable/disable voice-over. Disabling also stops any line in progress. */
@@ -46,10 +82,14 @@ class GameVoice {
     this.stop();
     if (!this.el) this.el = new Audio();
     this.el.src = src;
-    this.el.volume = Math.min(1, this.vol * VOICE_BASE_GAIN * (opts?.gain ?? 1));
+    this.playGain = opts?.gain ?? 1;
+    this.distanceGain = 1; // a fresh line starts at full: you just clicked the NPC, you are close
+    this.applyVolume();
     // Autoplay restrictions / a missing file reject the promise — ignore, the
     // dialogue text is the source of truth and audio is an enhancement.
-    void this.el.play().catch(() => { /* no-op */ });
+    void this.el.play().catch(() => {
+      /* no-op */
+    });
   }
 }
 

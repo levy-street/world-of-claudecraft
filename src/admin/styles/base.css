@@ -1,0 +1,165 @@
+/* @layer base: element reset, body/link defaults, form controls (zero-specificity
+   :where() so component scoped styles always override), base button styling, native
+   control normalization, and the mobile-zoom !important floor. Imported after tokens
+   by the admin.css barrel. */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: var(--bg-app);
+    color: var(--text);
+    font-family: var(--ui-font);
+    font-size: var(--font-size-base);
+    line-height: 1.35;
+    min-height: 100vh;
+  }
+  a {
+    color: var(--gold-dim);
+  }
+
+  /* ---------- form controls ---------- */
+  :where(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+    select,
+    textarea
+  ) {
+    min-height: 34px;
+    padding: 7px 9px;
+    background: var(--control-bg);
+    color: var(--text);
+    caret-color: var(--gold);
+    border: 1px solid var(--control-border);
+    border-radius: 4px;
+    box-shadow:
+      inset 0 1px 0 #ffffff0a,
+      0 1px 1px #0008;
+    font: inherit;
+  }
+
+  :where(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+    select,
+    textarea
+  ):hover {
+    background: var(--control-bg-hover);
+    border-color: var(--control-border-hover);
+  }
+
+  :where(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+    select,
+    textarea
+  ):focus-visible {
+    outline: none;
+    border-color: var(--gold-dim);
+    box-shadow:
+      inset 0 1px 0 #ffffff0a,
+      0 0 0 2px #c8a83833;
+  }
+
+  :where(input, textarea)::placeholder {
+    color: var(--control-placeholder);
+    opacity: 1;
+  }
+
+  select,
+  option {
+    background-color: var(--control-bg);
+    color: var(--text);
+    color-scheme: dark;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text);
+    box-shadow: 0 0 0 1000px var(--control-bg) inset;
+  }
+
+  :where(button:not(.nav-scrim):not(.nav-toggle):not(.nav-close):not(.word-del):not(.btn-link)) {
+    min-height: 34px;
+    padding: 6px 12px;
+    background: linear-gradient(#211b10, #151109);
+    color: var(--text-soft);
+    border: 1px solid var(--control-border);
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  :where(
+    button:not(.nav-scrim):not(.nav-toggle):not(.nav-close):not(.word-del):not(.btn-link)
+  ):hover {
+    color: var(--text);
+    background: linear-gradient(#2a2112, #18120a);
+    border-color: var(--gold-dim);
+  }
+
+  :where(
+    button:not(.nav-scrim):not(.nav-toggle):not(.nav-close):not(.word-del):not(.btn-link)
+  ):focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  button.btn-sm {
+    min-height: 28px;
+    padding: 3px 8px;
+    font-size: var(--font-size-small);
+  }
+
+  button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  /* MMO-themed native controls (operators are users too): drop the cramped native
+     number steppers and recolor the datetime-local calendar picker to match the
+     gold-on-dark admin theme instead of the default light browser chrome. */
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="time"] {
+    color-scheme: dark;
+  }
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    /* tint the default dark glyph toward gold so it reads on the dark field */
+    filter: invert(72%) sepia(60%) saturate(450%) hue-rotate(2deg) brightness(95%);
+  }
+
+  /* Mobile zoom prevention: operators are users too, and the dashboard ships to
+     phones/tablets. iOS Safari auto-zooms the page when a focused control renders
+     below 16px (and ignores the viewport settings), so floor every focusable control
+     at 16px on coarse-pointer (touch) devices. !important beats unlayered scoped
+     styles; pointer:coarse leaves
+     desktop operators (fine pointer) at the compact 14px and is the only reliable
+     cross-browser fix. */
+  @media (pointer: coarse) {
+    input,
+    textarea,
+    select {
+      /* biome-ignore lint/complexity/noImportantStyles: required to prevent iOS focus zoom over unlayered component styles */
+      font-size: 16px !important;
+    }
+
+    button,
+    button.btn-sm {
+      min-height: 40px;
+    }
+  }
+}

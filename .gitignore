@@ -5,6 +5,10 @@ node_modules
 dist/
 dist-env/
 dist-server/
+release/
+release-steam/
+# generated main-process runtime bundles (scripts/electron-vendor.mjs)
+electron/vendor/
 media-cache/
 
 # i18n per-locale emit crash leftovers (the build sweeps these; never commit one)
@@ -17,12 +21,23 @@ src/admin/i18n.resolved.generated/*.tmp
 src/ui/i18n.status.json
 
 # private extensions (e.g. bot-detector)
-private/
+private/*
+!private/.dockerkeep
 
 # test artifacts & screenshots
 tmp/
+# PR-assist screenshot tour output + its CI-only ephemerals
+pr-shots/
+pr.diff
+.devpid
 .codex-research/
+.codex/
 .playwright-mcp/
+# Vitest Browser Mode failure screenshots + attachments (opt-in test:browser suite)
+tests/browser/__screenshots__/
+.vitest-attachments/
+# Mobile safe-area E2E before/after PNG output (scripts/mobile_*_safe_area.mjs)
+screenshots/
 
 # i18n release-fill worklist (generated; regenerate via `npm run i18n:worklist`)
 docs/i18n-scaling/worklist/
@@ -36,13 +51,34 @@ __pycache__/
 .env
 .env.*
 !.env.example
+# Meshy asset-gen tooling embeds an API key, never commit it
+scripts/generate_treasure_chest.mjs
 
 # editor & OS noise
 .DS_Store
 Thumbs.db
 *.log
 .idea/
-# .claude/: keep personal/local config out of git, but track the shared skills & agents
+# .claude/: keep personal/local config out of git, but track the shared team tooling
+# (agents, skills, commands, hooks, and the project hooks config). settings.local.json,
+# which is personal/local, stays ignored by the .claude/* rule above.
 .claude/*
 !.claude/skills/
 !.claude/agents/
+!.claude/commands/
+!.claude/hooks/
+!.claude/settings.json
+.cursor/
+
+# local SDK/tooling dump (extracted command-line tools, not project source)
+postgres/
+
+pr-assets-2fa
+
+.vite/
+
+# Discord app credentials + bot token, never commit it
+discord_bot_info.txt
+
+# bot build output
+dist-bot/

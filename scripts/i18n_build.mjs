@@ -29,9 +29,9 @@
 //   node scripts/i18n_build.mjs   (re)generate src/ui/i18n.resolved.generated/
 //   I18N_OUT_DIR=... node scripts/i18n_build.mjs   emit into a custom directory
 
-import * as esbuild from 'esbuild';
-import { writeFileSync, renameSync, mkdirSync, rmSync, readdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import * as esbuild from 'esbuild';
 import { flatten, unflatten } from './i18n_flatten.mjs';
 import { pseudoLocalize } from './i18n_pseudo.mjs';
 
@@ -64,6 +64,13 @@ const LOCALES = [
   'ja_JP',
   'pt_BR',
   'ru_RU',
+  'nl_NL',
+  'pl_PL',
+  'id_ID',
+  'tr_TR',
+  'sv_SE',
+  'vi_VN',
+  'da_DK',
 ];
 
 // Dialect locales declare a base locale. A dialect's (now
@@ -121,8 +128,12 @@ function deepMerge(base, over) {
     const overValue = over[key];
     const baseValue = base[key];
     const bothObjects =
-      overValue && typeof overValue === 'object' && !Array.isArray(overValue) &&
-      baseValue && typeof baseValue === 'object' && !Array.isArray(baseValue);
+      overValue &&
+      typeof overValue === 'object' &&
+      !Array.isArray(overValue) &&
+      baseValue &&
+      typeof baseValue === 'object' &&
+      !Array.isArray(baseValue);
     if (bothObjects) {
       deepMerge(baseValue, overValue);
     } else {
@@ -142,7 +153,7 @@ function fileBanner() {
     '// missing or renamed key), a back-compat barrel (index.ts) that re-exports every',
     '// slice and assembles the runtime `translations` map, per-locale lazy loaders',
     '// (loaders.ts), and the pending set (pending.ts). Regenerate with',
-    "// `npm run i18n:build` (also wired into `npm run build` and `pretest`).",
+    '// `npm run i18n:build` (also wired into `npm run build` and `pretest`).',
     '// Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.',
   ].join('\n');
 }
@@ -191,7 +202,9 @@ function emitPendingModule(pending) {
   return [
     fileBanner(),
     '',
-    'export const pending: Record<string, readonly string[]> = ' + JSON.stringify(pending, null, 2) + ';',
+    'export const pending: Record<string, readonly string[]> = ' +
+      JSON.stringify(pending, null, 2) +
+      ';',
     '',
   ].join('\n');
 }
@@ -210,7 +223,9 @@ function emitLoadersModule(locales) {
   }
   lines.push('};');
   lines.push('');
-  lines.push(`export const SUPPORTED_LANGUAGES = [${locales.map((l) => `'${l}'`).join(', ')}] as const;`);
+  lines.push(
+    `export const SUPPORTED_LANGUAGES = [${locales.map((l) => `'${l}'`).join(', ')}] as const;`,
+  );
   lines.push('');
   return lines.join('\n');
 }

@@ -221,7 +221,7 @@ Ground sparkles: highwatch_summons ×2 at (1,654),(-2,657); ogre_war_totem ×7 a
 | q_sanctum_gate | The Sanctum Gate | brother_aldric_highwatch | collect 3 sanctum_key_shard (sparkles, gate plaza) | 4000 | 2000 | — | requires q_voice_below |
 | q_korgath | The Bound Guardian | scout_maren_highwatch | kill 1 korgath_the_bound | 4200 | 2500 | korgaths_chainwraps (all) | requires q_sanctum_gate, minLevel 18, suggestedPlayers 5 |
 | q_velkhar | The Grand Necromancer | brother_aldric_highwatch | kill 1 grand_necromancer_velkhar | 4500 | 3000 | boneguard_breastplate / staff_of_velkhar / shadowmeld_tunic | requires q_sanctum_gate, minLevel 18, suggestedPlayers 5 |
-| q_gravewyrm | Korzul the Gravewyrm | brother_aldric_highwatch | kill 1 korzul_the_gravewyrm | 5300 | 25000 | gravewyrm_scale_hauberk / wyrmcult_grand_robe / wyrmscale_jerkin | requires q_velkhar, minLevel 18, suggestedPlayers 5 |
+| q_gravewyrm | Korzul the Gravewyrm | brother_aldric_highwatch | kill 1 korzul_the_gravewyrm | 5300 | 25000 | gravewyrm_scale_hauberk / wyrmcult_grand_robe / wyrmscale_jerkin | requires q_sanctum_gate, minLevel 18, suggestedPlayers 5 |
 
 Ceiling check: q_gravewyrm 5,300 at L19 = 24.9% of 21,300 (under ceiling). The 18→20 stretch (40,700 XP) is carried by the SOLO-able lead-up chain (q_wyrm_sigils + q_breaking_the_seal + q_voice_below + q_sanctum_gate = 16,200) plus revenant/necromancer arcs (13,000) plus dungeon quests (14,000) — per the corrected dungeon math, NOT by dungeon trash kills.
 
@@ -241,7 +241,7 @@ Ceiling check: q_gravewyrm 5,300 at L19 = 24.9% of 21,300 (under ceiling). The 1
 
 `DungeonDef`: `{ id: 'gravewyrm_sanctum', name: 'Gravewyrm Sanctum', index: 2, doorPos: {x:0, z:880}, entry: {x:0,z:0}, exitOffset: {x:0,z:-6}, interior: 'sanctum' (stretched 3-chamber variant of the crypt builder — see §7; fallback: 'crypt'), suggestedPlayers: 5, enterText: 'The air goes cold. Something vast breathes below...', leaveText: 'You stagger back into the mountain wind.' }`
 
-Entry gating: q_velkhar/q_gravewyrm gated minLevel 18, suggestedPlayers 5.
+Entry gating: q_korgath, q_velkhar, and q_gravewyrm all require q_sanctum_gate, minLevel 18, suggestedPlayers 5. They are available together once the Sanctum gate is opened, so one party run can clear all three boss quests.
 
 **Layout (linear, 3 chambers, z 0→150):** Chamber 1 "The Boneworks" (z 10–60, boneguard/drakonid packs) → Korgath's Hall (z 60–75) → Chamber 2 "The Ritual Vault" (z 75–115, Velkhar) → Chamber 3 "The Wyrm's Hollow" (z 115–150, Korzul on a raised dais ringed by drakonid guards).
 
@@ -466,7 +466,7 @@ Mage conjured-water upgrades: covered by the existing **ability-ranks companion 
 3. **DungeonDef.interior** (`src/sim/data.ts:1316`): widen literal `'crypt'` to `'crypt' | 'sanctum'`. Sunken Bastion ships on `'crypt'` (zero renderer work, optional marsh tint). `'sanctum'` = stretched 3-chamber crypt variant (z to ~155); if renderer budget is tight, the Sanctum also ships on `'crypt'` with the spawn list compressed to z≤98.
 4. **Dungeons** take `index: 1` (sunken_bastion) and `index: 2` (gravewyrm_sanctum) — `instanceOrigin` x-bands already generalize; no formula changes.
 5. **ZONES array**: append the two ZoneDef bands from §2/§3. `zoneAt`/`WORLD_MIN_Z`/`WORLD_MAX_Z` derive automatically; zone 1 geography untouched. Renderer needs `marsh` and `peaks` biome palettes (BiomeId already typed) — covered by the existing **graphics companion spec**.
-6. **XP/levels**: NO table work — `XP_TABLE` already holds vanilla values through 20 and `MAX_LEVEL = 20`. Only audit for stray hardcoded level-10 caps in level-up/ability-learn plumbing.
+6. **XP/levels**: NO table work — `XP_TABLE` already holds the classic-era curve values through 20 and `MAX_LEVEL = 20`. Only audit for stray hardcoded level-10 caps in level-up/ability-learn plumbing.
 7. **NPC recurrence**: new NpcDef entries `brother_aldric_fen`, `brother_aldric_highwatch`, `scout_maren_highwatch` share display names with their originals (engine treats them as distinct static NPCs; no engine change).
 8. **No new quest objective types** — every quest above is kill/collect with requiresQuest/minLevel/suggestedPlayers, collect via questId-gated loot entries or GROUND_OBJECTS sparkles (breadcrumbs implemented as a destination-gate sparkle). Rare spawns (grubjaw, shardlord_kazzix) reuse the old_greyjaw timer pattern.
 9. **Companion specs incorporated by reference** (already complete in `wf_0c329a02-def/journal.jsonl` — do not regenerate): ability ranks 1–20 for all nine classes (incl. the single new `finisherStun` AbilityEffect and mob-hp tuning anchor hp≈40+18L this spec's templates follow), the iconId-recipe icon system, and the tiered graphics plan.

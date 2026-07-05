@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
+import type { SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -40,15 +40,20 @@ describe('/gear command', () => {
     const a = sim.addPlayer('warrior', 'Aleph');
     const meta = sim.players.get(a)!;
     meta.equipment = {
-      mainhand: 'worn_sword', helmet: 'cryptbone_helm', shoulder: 'cryptbone_pauldrons',
-      chest: 'recruit_tunic', waist: 'mistveil_cord', legs: 'quilted_trousers',
-      gloves: 'mistveil_grips', feet: 'oiled_boots',
+      mainhand: 'worn_sword',
+      helmet: 'cryptbone_helm',
+      shoulder: 'cryptbone_pauldrons',
+      chest: 'recruit_tunic',
+      waist: 'mistveil_cord',
+      legs: 'quilted_trousers',
+      gloves: 'mistveil_grips',
+      feet: 'oiled_boots',
     };
     sim.tick();
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
     expect(text).toMatch(/^Equipped \(8\/8\):/);
-    expect(text).toContain('Worn Shortsword');
+    expect(text).toContain('Pitted Shortsword');
     expect(text).toContain('Quilted Trousers');
     expect(text).not.toContain('(empty)');
   });

@@ -17,7 +17,7 @@ export const DEFAULT_MOB_COMBAT_PROFILE: MobCombatProfile = {
   canLeash: true,
   swingWhilePursuing: false,
   immediateSwingOnEnterRange: false,
-  movingRangeBonus: 3,
+  movingRangeBonus: 1,
 };
 
 export const NYTHRAXIS_BOSS_COMBAT_PROFILE: MobCombatProfile = {
@@ -53,11 +53,15 @@ export function combatProfileForMob(templateId: string, scale: number): MobComba
   };
 }
 
-export function effectiveMobMeleeRange(
-  profile: MobCombatProfile,
-  targetMoved: boolean,
-  mobMoved: boolean,
-): number {
-  if (!targetMoved && !mobMoved) return profile.meleeRange;
+// Closing-distance grace. A 20 Hz tick samples positions discretely, so a mob that
+// is genuinely closing on its target can perpetually fall a fraction of a yard short
+// of a strict range check. To bridge that, a mob that *moved this tick* (i.e. is
+// pursuing) gets a small reach bonus. A stationary mob gets none: it is not closing,
+// so a player merely walking past must only be struck from the mob's true melee
+// range, never the inflated reach the old target-movement gate produced. This is the
+// fix for "excessive melee range" - hits landing while the player seems out of reach
+// when walking past packed camps.
+export function effectiveMobMeleeRange(profile: MobCombatProfile, mobMoved: boolean): number {
+  if (!mobMoved) return profile.meleeRange;
   return profile.meleeRange + profile.movingRangeBonus;
 }

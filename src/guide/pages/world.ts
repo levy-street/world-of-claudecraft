@@ -4,39 +4,44 @@
 // into it. Place and hub names are the English sim source (proper nouns), like creature
 // and class names elsewhere in the guide.
 
-import { t, formatNumber, type TranslationKey } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
-import { GUIDE_ZONES, GUIDE_FAMILIES, type GuideZoneInfo } from '../content.generated';
+import { formatNumber, type TranslationKey, t } from '../../ui/i18n';
+import { GUIDE_FAMILIES, GUIDE_ZONES, type GuideZoneInfo } from '../content.generated';
 import { hrefFor } from '../routes';
-import { pageHeader, related, loreQuote, loreFigure } from './ui';
 import type { GuidePage } from './types';
+import { loreFigure, loreQuote, pageHeader, related } from './ui';
 
 // Blurbs are keyed by biome (vale / marsh / peaks), so they never depend on zone order.
-const blurbKey = (biome: string): TranslationKey => `guide.worldPage.${biome}Blurb` as TranslationKey;
+const blurbKey = (biome: string): TranslationKey =>
+  `guide.worldPage.${biome}Blurb` as TranslationKey;
 // Per-biome hub greeting (the spoken line + its speaker proper noun) and place notes.
-const greetingKey = (biome: string): TranslationKey => `guide.worldPage.${biome}Greeting` as TranslationKey;
-const greeterText = (biome: string): string => t(`guide.worldPage.${biome}Greeter` as TranslationKey);
-const placeNotesKey = (biome: string): TranslationKey => `guide.worldPage.${biome}PlaceNotes` as TranslationKey;
+const greetingKey = (biome: string): TranslationKey =>
+  `guide.worldPage.${biome}Greeting` as TranslationKey;
+const greeterText = (biome: string): string =>
+  t(`guide.worldPage.${biome}Greeter` as TranslationKey);
+const placeNotesKey = (biome: string): TranslationKey =>
+  `guide.worldPage.${biome}PlaceNotes` as TranslationKey;
 const familyName = (family: string): string => t(`guide.family.${family}.name` as TranslationKey);
-const bandLabel = (z: GuideZoneInfo): string => t('guide.home.world.levels', { min: formatNumber(z.min), max: formatNumber(z.max) });
+const bandLabel = (z: GuideZoneInfo): string =>
+  t('guide.home.world.levels', { min: formatNumber(z.min), max: formatNumber(z.max) });
 
 // Which creature families live in a zone: any family with a creature whose level band
 // overlaps the zone's. Drives the spoiler-safe "who you will meet" cross-links.
 function residentFamilies(z: GuideZoneInfo): string[] {
-  return GUIDE_FAMILIES
-    .filter((fam) => fam.creatures.some((c) => c.min <= z.max && c.max >= z.min))
-    .map((fam) => fam.family);
+  return GUIDE_FAMILIES.filter((fam) =>
+    fam.creatures.some((c) => c.min <= z.max && c.max >= z.min),
+  ).map((fam) => fam.family);
 }
 
 function mapHtml(): string {
-  const bands = GUIDE_ZONES
-    .map((z) => `
+  const bands = GUIDE_ZONES.map(
+    (z) => `
       <a class="guide-worldmap-zone guide-zone-${esc(z.biome)}" href="#zone-${esc(z.biome)}">
         <span class="guide-worldmap-band">${esc(bandLabel(z))}</span>
         <span class="guide-worldmap-name">${esc(z.name)}</span>
         ${z.hub ? `<span class="guide-worldmap-hub">${esc(z.hub)}</span>` : ''}
-      </a>`)
-    .join('');
+      </a>`,
+  ).join('');
   return `
     <section class="guide-worldmap-wrap" aria-labelledby="guide-worldmap-h">
       <h2 class="guide-worldmap-h" id="guide-worldmap-h">${esc(t('guide.worldPage.mapHeading'))}</h2>
@@ -60,7 +65,10 @@ function residentsHtml(z: GuideZoneInfo): string {
   const families = residentFamilies(z);
   if (!families.length) return '';
   const links = families
-    .map((fam) => `<a class="guide-poi" href="${esc(hrefFor('bestiary'))}#fam-${esc(fam)}">${esc(familyName(fam))}</a>`)
+    .map(
+      (fam) =>
+        `<a class="guide-poi" href="${esc(hrefFor('bestiary'))}#fam-${esc(fam)}">${esc(familyName(fam))}</a>`,
+    )
     .join('');
   return `
     <div class="guide-zone-detail">
@@ -99,7 +107,6 @@ export const world: GuidePage = {
           <div class="guide-figures">
             ${loreFigure('Brother Aldric', 'guide.lore.aldricRole', 'guide.lore.aldricBody')}
             ${loreFigure('Scout Maren', 'guide.lore.marenRole', 'guide.lore.marenBody')}
-            ${loreFigure('Ranger Elwyn', 'guide.lore.elwynRole', 'guide.lore.elwynBody')}
           </div>
         </section>
 
@@ -112,6 +119,7 @@ export const world: GuidePage = {
           { href: hrefFor('bestiary'), key: 'guide.nav.bestiary' },
           { href: hrefFor('quests'), key: 'guide.nav.quests' },
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },
+          { href: hrefFor('delves'), key: 'guide.nav.delves' },
         ])}
       </article>`;
   },

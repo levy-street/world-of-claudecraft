@@ -15,9 +15,11 @@ feature or fix a bug.
 
 ## The one decision: sibling module or monolith edit
 
-The large files (`src/sim/sim.ts`, `src/ui/hud.ts`, then `src/main.ts`,
-`src/render/renderer.ts`) are sanctioned monoliths. Do not split them to hit a line
-count, and do not rewrite them as a side effect of your task. But before you add a
+The four logic monoliths (`src/ui/hud.ts` ~10k, `src/sim/sim.ts` ~7.5k, `src/main.ts`
+~6.4k, `src/render/renderer.ts` ~4.5k) are coordinators, not a license to grow them: do
+not split them to hit a line count, and do not rewrite them as a side effect of your task,
+but never GROW one either. `src/main.ts` especially is a firewall, not a home (its
+client-bootstrap helpers belong in `src/game/` or `src/ui/` siblings). Before you add a
 block of new logic to one, ask:
 
 > Does this behavior need the monolith's private mutable state (the live `Sim`
@@ -114,15 +116,28 @@ After an extraction or fix, these stay green (run the subset your change touches
 
 - `npx tsc --noEmit`
 - `npx vitest run tests/<affected>.test.ts` (or `npm test` for broad changes)
-- `npx vitest run tests/architecture.test.ts` if you touched `src/sim/`
+- `npx vitest run tests/architecture.test.ts` if you touched `src/sim/`, or added / renamed a
+  `src/ui` or `src/render` `*_view` / `*_core` pure core (the completeness sweep also checks
+  `UI_PURE_CORES` / `RENDER_PURE_CORES` registration)
 - `npx vitest run tests/localization_fixes.test.ts` if any player-visible text or a
   `src/sim`/`server` emit changed (the S3 i18n guard)
+- `npm run ci:changed` (Biome on the files you changed; this is what the `.githooks/pre-push`
+  floor runs, so clear it here, not at push time). If it flags formatting on your own files,
+  fix with a SCOPED `npx @biomejs/biome check --write <file>` per touched file, never a
+  whole-tree `--write` (the repo defers global Biome debt, so a whole-tree write buries your
+  change in thousands of unrelated reformats).
 - `npm run build` before a merge
 
 When you extract, the diff should read as move plus import, not rewrite. If you
 "improved" the moved code in the same change, that is scope creep: split it into a
 follow-up so the extraction stays reviewable. Delete the code you replaced; leave no
 dead duplicate, commented-out block, or unused import behind.
+
+Effort by model (the doctrine here is identical, only the effort scales): on Opus 4.8,
+after the extraction fan out a fresh subagent (or the `architecture-reviewer` for a
+`src/sim/` move) to review your move-diff for COVERAGE, every parity and correctness gap,
+before calling it done. On the Sonnet baseline, take small verifiable steps and lean on
+one investigator.
 
 ## Repo anti-patterns to avoid
 

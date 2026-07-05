@@ -10,7 +10,7 @@
 
 import { formatNumber, t } from './i18n';
 import type { PerfOverlayConfig } from './perf_overlay_config';
-import { paintFrameTimeGraph } from './perf_graph_painter';
+import { frameGraphCanvasMetrics, paintFrameTimeGraph } from './perf_graph_painter';
 import {
   DEFAULT_PERF_BG_RGB, DEFAULT_PERF_FG, overlayFractionFromPixel, overlayPixelPosition,
   PERF_OVERLAY_MARGIN, rgbaFromHex,
@@ -29,6 +29,7 @@ export class PerfOverlay {
   private readonly el: HTMLDivElement;
   private readonly badgesEl: HTMLDivElement;
   private readonly rowsEl: HTMLDivElement;
+  private readonly graphWrap: HTMLDivElement;
   private readonly canvas: HTMLCanvasElement;
   private readonly rowEls = new Map<PerfMetricKey, RowEls>();
 
@@ -53,9 +54,16 @@ export class PerfOverlay {
     this.badgesEl.className = 'perf-badges';
     this.rowsEl = document.createElement('div');
     this.rowsEl.className = 'perf-rows';
+    // The sparkline canvas lives in a fixed-height wrapper and is absolutely
+    // positioned (see CSS), so its large backing-store intrinsic width never
+    // feeds the shrink-wrapped panel's width: the panel sizes to its rows, and
+    // the graph can never get stuck at an old, wider metric set's width.
+    this.graphWrap = document.createElement('div');
+    this.graphWrap.className = 'perf-graph-wrap';
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'perf-graph';
-    this.el.append(this.badgesEl, this.rowsEl, this.canvas);
+    this.graphWrap.append(this.canvas);
+    this.el.append(this.badgesEl, this.rowsEl, this.graphWrap);
 
     // Drag-to-move (only active in placement mode). Pointer events cover mouse +
     // touch + pen consistently across Chromium/Firefox/Safari.
@@ -158,19 +166,19 @@ export class PerfOverlay {
 
   private renderGraph(view: PerfOverlayView): void {
     if (!view.graph || view.graph.samples.length < 2) {
-      this.canvas.style.display = 'none';
+      this.graphWrap.style.display = 'none';
       return;
     }
-    this.canvas.style.display = 'block';
-    const cssW = Math.max(60, this.rowsEl.clientWidth || this.el.clientWidth || 120);
+    this.graphWrap.style.display = 'block';
+    // Measure the wrapper, not the canvas: the wrapper follows the panel (which
+    // is sized by its rows), so the width never feeds back from the canvas.
+    const cssW = Math.max(60, this.graphWrap.clientWidth || this.rowsEl.clientWidth || this.el.clientWidth || 120);
     const cssH = 26;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const pxW = Math.max(1, Math.round(cssW * dpr));
-    const pxH = Math.max(1, Math.round(cssH * dpr));
+    const { pxW, pxH, dpr } = frameGraphCanvasMetrics(cssW, cssH, window.devicePixelRatio || 1);
+    // Only the HiDPI backing store is set here; the canvas display size is the
+    // wrapper's (CSS `position:absolute; inset:0`), so it can't pin the panel.
     if (this.canvas.width !== pxW) this.canvas.width = pxW;
     if (this.canvas.height !== pxH) this.canvas.height = pxH;
-    this.canvas.style.width = `${cssW}px`;
-    this.canvas.style.height = `${cssH}px`;
 
     const ctx = this.canvas.getContext('2d');
     if (!ctx) return;

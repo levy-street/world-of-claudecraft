@@ -1,4 +1,4 @@
-import * as http from 'node:http';
+import type * as http from 'node:http';
 import * as net from 'node:net';
 
 // Simple in-memory rate limiter (per client IP, sliding minute window).
@@ -38,7 +38,11 @@ export function normalizeIp(ip: string): string {
   let s = ip.toLowerCase();
   if (s.startsWith('::ffff:')) s = s.slice('::ffff:'.length);
   if (net.isIP(s) === 6) {
-    try { return new URL(`http://[${s}]`).hostname.slice(1, -1); } catch { return s; }
+    try {
+      return new URL(`http://[${s}]`).hostname.slice(1, -1);
+    } catch {
+      return s;
+    }
   }
   return s;
 }
@@ -60,7 +64,11 @@ function isPrivateOrLoopback(ip: string): boolean {
 function isTrustedProxy(ip: string): boolean {
   const configured = process.env.TRUSTED_PROXY_IPS;
   if (configured) {
-    return configured.split(',').map((s) => normalizeIp(s.trim())).filter(Boolean).includes(ip);
+    return configured
+      .split(',')
+      .map((s) => normalizeIp(s.trim()))
+      .filter(Boolean)
+      .includes(ip);
   }
   return isPrivateOrLoopback(ip);
 }
@@ -105,7 +113,8 @@ export function rateLimited(req: http.IncomingMessage, maxPerMinute = 20): boole
     // evict an IP that a stricter route has already limited. count >= L+1 means
     // a call at limit L would return true (rateLimited returns count > L). Shares
     // atOrOverLimit() with authThrottled() so the predicate can't drift.
-    const isLimited = (times: number[]) => atOrOverLimit(times, windowStart, STRICTEST_RATE_LIMIT + 1);
+    const isLimited = (times: number[]) =>
+      atOrOverLimit(times, windowStart, STRICTEST_RATE_LIMIT + 1);
 
     // Stage 1 — evict IPs whose window has fully expired (cheap, harmless).
     for (const [key, times] of attempts) {
@@ -197,8 +206,16 @@ function recordSlidingWindowAttempt<K>(
 }
 
 export function cardUploadRateLimited(req: http.IncomingMessage, accountId: number): boolean {
-  const ipLimited = recordSlidingWindowAttempt(cardUploadIpAttempts, requestIp(req), CARD_UPLOAD_MAX_PER_MINUTE);
-  const accountLimited = recordSlidingWindowAttempt(cardUploadAccountAttempts, accountId, CARD_UPLOAD_MAX_PER_MINUTE);
+  const ipLimited = recordSlidingWindowAttempt(
+    cardUploadIpAttempts,
+    requestIp(req),
+    CARD_UPLOAD_MAX_PER_MINUTE,
+  );
+  const accountLimited = recordSlidingWindowAttempt(
+    cardUploadAccountAttempts,
+    accountId,
+    CARD_UPLOAD_MAX_PER_MINUTE,
+  );
   return ipLimited || accountLimited;
 }
 
@@ -208,9 +225,74 @@ export function resetCardUploadRateLimits(): void {
   cardUploadAccountAttempts.clear();
 }
 
+// GLB asset uploads (POST /api/assets) get their own per-IP AND per-account
+// bucket, mirroring the player-card upload throttle above: an upload flood can
+// never burn a player's login budget (these maps are separate from the shared
+// `attempts` map, so STRICTEST_RATE_LIMIT is unaffected), and a single account
+// spraying uploads through many IPs is still capped by the account key.
+export const ASSET_UPLOAD_MAX_PER_MINUTE = 10;
+// Map saves are bigger writes (up to 2 MiB JSONB) but honest editors autosave;
+// 30/min leaves headroom for rapid save-as/fork flows while bounding floods.
+export const MAP_MUTATION_MAX_PER_MINUTE = 30;
+const mapMutationIpAttempts = new Map<string, number[]>();
+const mapMutationAccountAttempts = new Map<number, number[]>();
+
+/** Per-IP AND per-account throttle shared by every /api/maps mutation
+ * (create/save/fork/publish/unpublish/delete). */
+export function mapMutationRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    mapMutationIpAttempts,
+    requestIp(req),
+    MAP_MUTATION_MAX_PER_MINUTE,
+  );
+  const accountLimited = recordSlidingWindowAttempt(
+    mapMutationAccountAttempts,
+    accountId,
+    MAP_MUTATION_MAX_PER_MINUTE,
+  );
+  return ipLimited || accountLimited;
+}
+
+/** Reset map-mutation throttles. Test-only. */
+export function resetMapMutationRateLimits(): void {
+  mapMutationIpAttempts.clear();
+  mapMutationAccountAttempts.clear();
+}
+
+const assetUploadIpAttempts = new Map<string, number[]>();
+const assetUploadAccountAttempts = new Map<number, number[]>();
+
+export function assetUploadRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    assetUploadIpAttempts,
+    requestIp(req),
+    ASSET_UPLOAD_MAX_PER_MINUTE,
+  );
+  const accountLimited = recordSlidingWindowAttempt(
+    assetUploadAccountAttempts,
+    accountId,
+    ASSET_UPLOAD_MAX_PER_MINUTE,
+  );
+  return ipLimited || accountLimited;
+}
+
+/** Reset asset upload throttles. Test-only: keeps scoped buckets isolated. */
+export function resetAssetUploadRateLimits(): void {
+  assetUploadIpAttempts.clear();
+  assetUploadAccountAttempts.clear();
+}
+
 export function walletLinkRateLimited(req: http.IncomingMessage, accountId: number): boolean {
-  const ipLimited = recordSlidingWindowAttempt(walletLinkIpAttempts, requestIp(req), WALLET_LINK_MAX_PER_MINUTE);
-  const accountLimited = recordSlidingWindowAttempt(walletLinkAccountAttempts, accountId, WALLET_LINK_MAX_PER_MINUTE);
+  const ipLimited = recordSlidingWindowAttempt(
+    walletLinkIpAttempts,
+    requestIp(req),
+    WALLET_LINK_MAX_PER_MINUTE,
+  );
+  const accountLimited = recordSlidingWindowAttempt(
+    walletLinkAccountAttempts,
+    accountId,
+    WALLET_LINK_MAX_PER_MINUTE,
+  );
   return ipLimited || accountLimited;
 }
 
@@ -218,6 +300,59 @@ export function walletLinkRateLimited(req: http.IncomingMessage, accountId: numb
 export function resetWalletLinkRateLimits(): void {
   walletLinkIpAttempts.clear();
   walletLinkAccountAttempts.clear();
+}
+
+// Discord link/status/reward endpoints share one dedicated bucket (per IP AND
+// per account), separate from login/register so an OAuth-link or reward-claim
+// flood can't lock a user out of logging in. accountId 0 keys the unauthenticated
+// start/callback legs on IP only (the account isn't resolved yet).
+export const DISCORD_MAX_PER_MINUTE = 15;
+const discordIpAttempts = new Map<string, number[]>();
+const discordAccountAttempts = new Map<number, number[]>();
+
+export function discordRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    discordIpAttempts,
+    requestIp(req),
+    DISCORD_MAX_PER_MINUTE,
+  );
+  const accountLimited =
+    accountId > 0
+      ? recordSlidingWindowAttempt(discordAccountAttempts, accountId, DISCORD_MAX_PER_MINUTE)
+      : false;
+  return ipLimited || accountLimited;
+}
+
+/** Reset Discord throttles. Test-only: keeps scoped buckets isolated. */
+export function resetDiscordRateLimits(): void {
+  discordIpAttempts.clear();
+  discordAccountAttempts.clear();
+}
+
+// GitHub link/status endpoints share one dedicated bucket (per IP AND per
+// account), separate from login so an OAuth-link flood can't lock a user out of
+// logging in. accountId 0 keys the unauthenticated callback leg on IP only.
+export const GITHUB_MAX_PER_MINUTE = 15;
+const githubIpAttempts = new Map<string, number[]>();
+const githubAccountAttempts = new Map<number, number[]>();
+
+export function githubRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    githubIpAttempts,
+    requestIp(req),
+    GITHUB_MAX_PER_MINUTE,
+  );
+  const accountLimited =
+    accountId > 0
+      ? recordSlidingWindowAttempt(githubAccountAttempts, accountId, GITHUB_MAX_PER_MINUTE)
+      : false;
+  return ipLimited || accountLimited;
+}
+
+/** Reset GitHub throttles. Test-only: keeps scoped buckets isolated. */
+export function resetGithubRateLimits(): void {
+  githubIpAttempts.clear();
+  githubAccountAttempts.clear();
 }
 
 export const WOC_BALANCE_MAX_PER_MINUTE = 20;
@@ -231,12 +366,37 @@ const wocBalanceIpAttempts = new Map<string, number[]>();
  * lock them out of logging in (or vice-versa).
  */
 export function wocBalanceRateLimited(req: http.IncomingMessage): boolean {
-  return recordSlidingWindowAttempt(wocBalanceIpAttempts, requestIp(req), WOC_BALANCE_MAX_PER_MINUTE);
+  return recordSlidingWindowAttempt(
+    wocBalanceIpAttempts,
+    requestIp(req),
+    WOC_BALANCE_MAX_PER_MINUTE,
+  );
 }
 
 /** Reset the balance-proxy throttle. Test-only: keeps scoped buckets isolated. */
 export function resetWocBalanceRateLimits(): void {
   wocBalanceIpAttempts.clear();
+}
+
+// Public, unauthenticated read endpoints (the public character sheet, the /c/
+// profile page) get a generous per-IP bucket on their OWN map — decoupled from
+// login/register — to deter scraping without ever spilling into the auth
+// limiter. Higher ceiling than auth since legitimate companion apps and crawlers
+// poll these far more often than anyone logs in.
+export const PUBLIC_READ_MAX_PER_MINUTE = 60;
+const publicReadIpAttempts = new Map<string, number[]>();
+
+export function publicReadRateLimited(req: http.IncomingMessage): boolean {
+  return recordSlidingWindowAttempt(
+    publicReadIpAttempts,
+    requestIp(req),
+    PUBLIC_READ_MAX_PER_MINUTE,
+  );
+}
+
+/** Reset the public-read throttle. Test-only: keeps scoped buckets isolated. */
+export function resetPublicReadRateLimits(): void {
+  publicReadIpAttempts.clear();
 }
 
 // ---------------------------------------------------------------------------
@@ -278,7 +438,8 @@ export function authThrottled(username: string): boolean {
   const key = authKey(username);
   const windowStart = Date.now() - AUTH_FAIL_WINDOW_MS;
   const recent = (authFailures.get(key) ?? []).filter((t) => t > windowStart);
-  if (recent.length > 0) authFailures.set(key, recent); else authFailures.delete(key);
+  if (recent.length > 0) authFailures.set(key, recent);
+  else authFailures.delete(key);
   return isThrottled(recent, windowStart);
 }
 

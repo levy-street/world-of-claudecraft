@@ -1,32 +1,135 @@
-import { CLASSES, ITEMS, MOBS, NpcDef } from './data';
-import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
-import { EQUIP_SLOTS } from './types';
 import type { TalentModifiers } from './content/talents';
+import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
+import { meetsLevelRequirement } from './item_level_req';
+import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
+import { EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
 
 function baseEntity(id: number, pos: Vec3): Entity {
   return {
-    id, kind: 'mob', templateId: '', name: '', level: 1,
-    pos: { ...pos }, prevPos: { ...pos }, facing: 0, prevFacing: 0,
-    vx: 0, vz: 0, vy: 0, onGround: true, jumping: false, fallStartY: pos.y,
-    hp: 1, maxHp: 1, resource: 0, maxResource: 0, resourceType: null,
-    overheadEmoteId: null, overheadEmoteUntil: 0, overheadEmoteSeq: 0,
+    id,
+    kind: 'mob',
+    templateId: '',
+    name: '',
+    level: 1,
+    pos: { ...pos },
+    prevPos: { ...pos },
+    facing: 0,
+    prevFacing: 0,
+    vx: 0,
+    vz: 0,
+    vy: 0,
+    onGround: true,
+    jumping: false,
+    fallStartY: pos.y,
+    hp: 1,
+    maxHp: 1,
+    resource: 0,
+    maxResource: 0,
+    resourceType: null,
+    overheadEmoteId: null,
+    overheadEmoteUntil: 0,
+    overheadEmoteSeq: 0,
     stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
     weapon: { min: 1, max: 2, speed: 2 },
-    attackPower: 0, rangedPower: 0, critChance: 0.05, dodgeChance: 0.05, moveSpeed: 7, hostile: false,
-    targetId: null, autoAttack: false, swingTimer: 0,
-    inCombat: false, combatTimer: 99,
-    auras: [], ccDr: new Map(), castingAbility: null, castRemaining: 0, castTotal: 0,
-    channeling: false, channelTickTimer: 0, channelTickEvery: 0,
-    gcdRemaining: 0, cooldowns: new Map(), queuedOnSwing: null, fiveSecondRule: 99,
-    comboPoints: 0, comboTargetId: null, overpowerUntil: -1, potionCooldownUntil: -1, savedMana: 0,
-    chargeTargetId: null, chargeTimeLeft: 0, chargePath: [], followTargetId: null,
-    sitting: false, eating: null, drinking: null,
-    aiState: 'idle', tappedById: null, pulseTimer: 0, stompTimer: 0, stoneskinTimer: 0, terrifyTimer: 0, detonateTimer: Infinity, mendTimer: 0, wardTimer: 0, rallyTimer: 0, warcryTimer: 0, firedSummons: 0, summonedIds: [], enraged: false, healedThisPull: false,
-    threat: new Map(), forcedTargetId: null, forcedTargetTimer: 0, ownerId: null, petMode: 'defensive', petTauntTimer: 0, petPath: [], petPathCooldown: 0,
-    spawnPos: { ...pos }, leashAnchor: null, evadeStall: 0, fleeTimer: 0, fleeReturnTimer: 0, hasFled: false, wanderTarget: null, wanderTimer: 0,
-    aggroTargetId: null, respawnTimer: 0, corpseTimer: 0, lootable: false, loot: null,
-    xpValue: 0, questIds: [], vendorItems: [], objectItemId: null, dungeonId: null,
-    dead: false, scale: 1, color: 0xffffff, skinCatalog: 'class', skin: 0, guild: '',
+    attackPower: 0,
+    rangedPower: 0,
+    spellPower: 0,
+    meleeHaste: 0,
+    rangedHaste: 0,
+    spellHaste: 0,
+    critChance: 0.05,
+    dodgeChance: 0.05,
+    castPushbackReduction: 0,
+    knockbackResistance: 0,
+    moveSpeed: 7,
+    hostile: false,
+    targetId: null,
+    autoAttack: false,
+    swingTimer: 0,
+    inCombat: false,
+    combatTimer: 99,
+    auras: [],
+    stealthed: false,
+    ccDr: new Map(),
+    castingAbility: null,
+    castRemaining: 0,
+    castTotal: 0,
+    castTargetId: null,
+    castAim: null,
+    channeling: false,
+    channelTickTimer: 0,
+    channelTickEvery: 0,
+    gcdRemaining: 0,
+    cooldowns: new Map(),
+    queuedOnSwing: null,
+    fiveSecondRule: 99,
+    comboPoints: 0,
+    comboUntil: -1,
+    overpowerUntil: -1,
+    potionCooldownUntil: -1,
+    potionCdRemaining: 0,
+    savedMana: 0,
+    chargeTargetId: null,
+    chargeTimeLeft: 0,
+    chargePath: [],
+    followTargetId: null,
+    sitting: false,
+    eating: null,
+    drinking: null,
+    aiState: 'idle',
+    tappedById: null,
+    pulseTimer: 0,
+    stompTimer: 0,
+    bigCastTimer: 0,
+    yelledEngage: false,
+    stoneskinTimer: 0,
+    terrifyTimer: 0,
+    detonateTimer: Infinity,
+    mendTimer: 0,
+    wardTimer: 0,
+    rallyTimer: 0,
+    warcryTimer: 0,
+    firedSummons: 0,
+    summonedIds: [],
+    enraged: false,
+    healedThisPull: false,
+    threat: new Map(),
+    forcedTargetId: null,
+    forcedTargetTimer: 0,
+    ownerId: null,
+    petMode: 'defensive',
+    petTauntTimer: 0,
+    petPath: [],
+    petPathCooldown: 0,
+    spawnPos: { ...pos },
+    leashAnchor: null,
+    evadeStall: 0,
+    fleeTimer: 0,
+    fleeReturnTimer: 0,
+    hasFled: false,
+    wanderTarget: null,
+    wanderTimer: 0,
+    aggroTargetId: null,
+    respawnTimer: 0,
+    corpseTimer: 0,
+    lootFfaTimer: Infinity, // no FFA countdown until rollLoot starts it at death
+    lootable: false,
+    loot: null,
+    xpValue: 0,
+    questIds: [],
+    vendorItems: [],
+    objectItemId: null,
+    dungeonId: null,
+    dead: false,
+    ghost: false,
+    corpsePos: null,
+    scale: 1,
+    color: 0xffffff,
+    skinCatalog: 'class',
+    skin: 0,
+    mainhandItemId: null,
+    equippedItems: {},
+    guild: '',
   };
 }
 
@@ -44,7 +147,7 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
 
 export type PlayerEquipment = Partial<Record<EquipSlot, string>>;
 
-// Vanilla rules: first 20 stamina gives 1 hp each, the rest 10 hp each.
+// Classic-era rules: first 20 stamina gives 1 hp each, the rest 10 hp each.
 // First 20 intellect gives 1 mana each, the rest 15 mana each.
 function hpFromStamina(sta: number): number {
   // Floor at 0 so a Stamina-draining debuff (negative buff_sta) can never push
@@ -62,7 +165,12 @@ function manaFromIntellect(int: number): number {
 // Recompute all derived stats for the player from class, level, gear, buffs, and
 // precomputed talent modifiers. `mods` is the flat struct resolved at
 // allocation/respec time (computeTalentModifiers) — this never walks the tree.
-export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: PlayerEquipment, mods?: TalentModifiers): void {
+export function recalcPlayerStats(
+  e: Entity,
+  cls: PlayerClass,
+  equipment: PlayerEquipment,
+  mods?: TalentModifiers,
+): void {
   const def = CLASSES[cls];
   const lvl = e.level;
   const s: Stats = {
@@ -73,11 +181,22 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
     spi: def.baseStats.spi + def.statsPerLevel.spi * (lvl - 1),
     armor: def.baseStats.armor + def.statsPerLevel.armor * (lvl - 1),
   };
+  const setCounts = new Map<string, number>();
+  let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
   for (const slot of EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
     const item = ITEMS[itemId];
-    if (!item?.stats) continue;
+    if (!item) continue;
+    // Gear above the wearer's level is inert: it stays equipped (still rendered
+    // and occupying the slot, see the render mirrors below) but grants no stats,
+    // armor, spell power, or set pieces until the character reaches its required
+    // level. This only arises for a character loaded wearing gear equipped before
+    // the level gate existed; the equip path blocks equipping over-level gear.
+    if (!meetsLevelRequirement(lvl, item)) continue;
+    if (item.set) setCounts.set(item.set, (setCounts.get(item.set) ?? 0) + 1);
+    bonusSp += item.spellPower ?? 0;
+    if (!item.stats) continue;
     s.str += item.stats.str ?? 0;
     s.agi += item.stats.agi ?? 0;
     s.sta += item.stats.sta ?? 0;
@@ -85,21 +204,50 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
     s.spi += item.stats.spi ?? 0;
     s.armor += item.stats.armor ?? 0;
   }
+  // Item-set bonuses from equipped pieces. Flat primary stats join the gear
+  // totals so they feed every derivation below; AP/crit/pushback fold in at
+  // their own steps (bonusAp, critChance, castPushbackReduction, knockbackResistance).
+  const setEff = aggregateSetBonuses(setCounts);
+  s.str += setEff.str;
+  s.agi += setEff.agi;
+  s.sta += setEff.sta;
+  s.int += setEff.int;
+  s.spi += setEff.spi;
   // Buff auras
-  let bonusAp = 0;
+  let bonusAp = setEff.ap;
   let bonusDodge = 0;
   let bearForm = false;
   let catForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
+    // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
+    // effectiveAttackPower; players bake it here, so without this arm the debuff
+    // was a no-op versus enemy players (PvP).
+    else if (a.kind === 'debuff_ap') bonusAp -= a.value;
     else if (a.kind === 'buff_armor') s.armor += a.value;
     else if (a.kind === 'buff_int') s.int += a.value;
     else if (a.kind === 'buff_agi') s.agi += a.value;
     else if (a.kind === 'buff_spi') s.spi += a.value;
     else if (a.kind === 'buff_sta') s.sta += a.value;
     else if (a.kind === 'buff_allstats') {
-      s.str += a.value; s.agi += a.value; s.sta += a.value; s.int += a.value; s.spi += a.value;
+      s.str += a.value;
+      s.agi += a.value;
+      s.sta += a.value;
+      s.int += a.value;
+      s.spi += a.value;
+    } else if (a.kind === 'buff_spellpower') bonusSp += a.value;
+    else if (a.kind === 'buff_allstats_pct') {
+      // Percentage drain on the whole stat block (Resurrection Sickness: value
+      // -0.75 leaves stats at 25%). Applied to the base + gear total gathered so
+      // far; the only aura that ever carries this kind is player-only, so it never
+      // stacks with another pct drain in practice.
+      const m = 1 + a.value;
+      s.str = Math.round(s.str * m);
+      s.agi = Math.round(s.agi * m);
+      s.sta = Math.round(s.sta * m);
+      s.int = Math.round(s.int * m);
+      s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     else if (a.kind === 'form_bear') bearForm = true;
@@ -109,11 +257,21 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
   // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
   if (mods) {
     const m = mods.stats;
-    s.str += m.str; s.agi += m.agi; s.sta += m.sta; s.int += m.int; s.spi += m.spi;
+    s.str += m.str;
+    s.agi += m.agi;
+    s.sta += m.sta;
+    s.int += m.int;
+    s.spi += m.spi;
     s.armor += m.armor;
     bonusAp += m.ap;
     bonusDodge += m.dodge;
     if (m.staPct) s.sta = Math.round(s.sta * (1 + m.staPct));
+    // Primary-attribute multipliers, applied to the fully-summed attribute. agiPct lands
+    // before the agi-derived armor/dodge below so the percentage flows into them.
+    if (m.strPct) s.str = Math.round(s.str * (1 + m.strPct));
+    if (m.agiPct) s.agi = Math.round(s.agi * (1 + m.agiPct));
+    if (m.intPct) s.int = Math.round(s.int * (1 + m.intPct));
+    if (m.spiPct) s.spi = Math.round(s.spi * (1 + m.spiPct));
   }
   // Floor Agility at 0 so a draining debuff (negative buff_agi) can never push the
   // derived armor/dodge below what zero Agility would give.
@@ -133,19 +291,55 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
   s.spi = Math.max(0, s.spi);
 
   e.stats = s;
-  const weapon = (equipment.mainhand && ITEMS[equipment.mainhand]?.weapon) || { min: 1, max: 2, speed: 2 };
+  // An over-level mainhand is inert like any other gear: fall back to unarmed
+  // damage (and drop the weapon-type flags, e.g. dagger, that gate abilities)
+  // until the wearer is high enough level. The mainhand still stays worn (see
+  // e.mainhandItemId below) so the weapon model keeps rendering.
+  const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
+  const weapon =
+    mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
+      ? mainhand.weapon
+      : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
-  // Melee AP by class (vanilla-ish): warriors/paladins/shamans/druids 2/str,
+  // Render-only: the equipped mainhand item id drives the held weapon model on
+  // the client (mapped via ITEM_WEAPON_VARIANTS). Gated on the item actually being
+  // a weapon, mirroring the e.weapon derivation above (so a non-weapon mainhand,
+  // were one ever stored, never resolves to a held model).
+  e.mainhandItemId =
+    equipment.mainhand && ITEMS[equipment.mainhand]?.weapon ? equipment.mainhand : null;
+  // Render-only mirror of the full worn set, copied so a later mutation of the
+  // owning PlayerMeta.equipment never aliases into the entity. Synced in the
+  // identity wire (terse `eq`) for the inspect-another-player window.
+  e.equippedItems = { ...equipment };
+  // Melee AP by class (classic-era-ish): warriors/paladins/shamans/druids 2/str,
   // rogues str+agi, hunters str+agi, pure casters str.
   const apFromStats =
-    cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid' ? s.str * 2
-      : cls === 'rogue' || cls === 'hunter' ? s.str + s.agi
+    cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid'
+      ? s.str * 2
+      : cls === 'rogue' || cls === 'hunter'
+        ? s.str + s.agi
         : s.str;
-  e.attackPower = Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0)));
-  // Hunters: ranged AP = 2/agi (vanilla)
-  e.rangedPower = cls === 'hunter' ? Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))) : 0;
+  // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
+  // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
+  e.attackPower = Math.max(0, Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0))));
+  // Hunters: ranged AP = 2/agi (classic-era value)
+  e.rangedPower =
+    cls === 'hunter'
+      ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))))
+      : 0;
+  // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
+  // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
+  e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
+  // Haste from item-set bonuses (the only haste-gear source). ONE aggregated
+  // stat drives all three channels: faster melee and ranged auto-attack swings
+  // AND shorter spell casts/channels.
+  e.meleeHaste = setEff.haste;
+  e.rangedHaste = setEff.haste;
+  e.spellHaste = setEff.haste;
   // Crit: ~1% per 20 agi at low level
-  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0);
+  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
+  e.castPushbackReduction = setEff.castPushbackReduction;
+  e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
 
@@ -162,7 +356,7 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
 
   // Druid forms swap the resource bar, classic-style: bear runs on rage
   // (starts empty, fills from combat), cat on energy (starts full — friendlier
-  // than vanilla's 0). Mana is parked in savedMana and restored on shift-out.
+  // than the classic-era 0). Mana is parked in savedMana and restored on shift-out.
   const formResource: 'rage' | 'energy' | null = bearForm ? 'rage' : catForm ? 'energy' : null;
   if (formResource) {
     if (e.resourceType === 'mana') e.savedMana = e.resource;
@@ -184,6 +378,37 @@ export function recalcPlayerStats(e: Entity, cls: PlayerClass, equipment: Player
   }
 }
 
+// Derived stats + max vitals for an OFFLINE character (a stored CharacterState),
+// computed by reusing recalcPlayerStats on a throwaway entity rather than
+// re-deriving the numbers. With no auras and no active form, recalcPlayerStats
+// yields exactly the class/level/gear/talent stat block — the same numbers a
+// live player shows — so the character sheet stays in lockstep with the engine.
+// Resource max is the full pool for the class (mana from intellect, or 100 for
+// rage/energy); the sheet pairs it with the stored current value.
+export interface DerivedCharacterStats {
+  stats: Stats;
+  maxHp: number;
+  maxResource: number;
+  resourceType: Entity['resourceType'];
+}
+
+export function characterDerivedStats(
+  cls: PlayerClass,
+  level: number,
+  equipment: PlayerEquipment,
+  mods?: TalentModifiers,
+): DerivedCharacterStats {
+  const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
+  e.level = Math.max(1, Math.floor(level));
+  recalcPlayerStats(e, cls, equipment, mods);
+  return {
+    stats: e.stats,
+    maxHp: e.maxHp,
+    maxResource: e.maxResource,
+    resourceType: e.resourceType,
+  };
+}
+
 export function createMob(id: number, template: MobTemplate, level: number, pos: Vec3): Entity {
   const e = baseEntity(id, pos);
   e.kind = 'mob';
@@ -191,13 +416,17 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.name = template.name;
   e.level = level;
   e.hostile = true;
-  // Elite scaling, vanilla-style: ~2.3x health, ~1.5x damage.
+  // Elite scaling, classic-style: ~2.3x health, ~1.5x damage.
   const hpMult = template.elite ? 2.3 : 1;
   const dmgMult = template.elite ? 1.5 : 1;
   e.maxHp = Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
   e.hp = e.maxHp;
   const dmg = (template.dmgBase + template.dmgPerLevel * (level - 1)) * dmgMult;
-  e.weapon = { min: Math.round(dmg * 0.8), max: Math.round(dmg * 1.25), speed: template.attackSpeed };
+  e.weapon = {
+    min: Math.round(dmg * 0.8),
+    max: Math.round(dmg * 1.25),
+    speed: template.attackSpeed,
+  };
   // Armor scales from level 1 like hp/dmg above: a template has no armorBase,
   // so a level-1 mob gets 0 and each level adds armorPerLevel.
   e.stats.armor = Math.round(template.armorPerLevel * (level - 1));
@@ -215,6 +444,8 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.wardAllies) e.wardTimer = template.wardAllies.every;
   // Telegraph the first Stoneskin: one full interval after engage.
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
+  // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.
+  if (template.bigCast) e.bigCastTimer = template.bigCast.every;
   // Telegraph the first Rally the same way: one full interval after engage.
   if (template.rally) e.rallyTimer = template.rally.every;
   // Telegraph the first War Cadence the same way: one full interval after engage.
@@ -242,7 +473,7 @@ export function createNpc(id: number, def: NpcDef, pos: Vec3): Entity {
 export function createGroundObject(id: number, itemId: string, name: string, pos: Vec3): Entity {
   const e = baseEntity(id, pos);
   e.kind = 'object';
-  e.templateId = 'ground_' + itemId;
+  e.templateId = `ground_${itemId}`;
   e.name = name;
   e.level = 1;
   e.hostile = false;

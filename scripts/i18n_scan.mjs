@@ -44,13 +44,13 @@
 //   node scripts/i18n_scan.mjs   (re)generate src/ui/i18n.status.json + i18n.status.summary.json
 //   I18N_OUT_DIR=... node scripts/i18n_scan.mjs   emit both into a custom directory
 
-import * as esbuild from 'esbuild';
-import { writeFileSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { flatten } from './i18n_flatten.mjs';
-import { placeholdersOf, contentHash, PLACEHOLDER_RE } from './i18n_hash.mjs';
+import * as esbuild from 'esbuild';
 import { COPIED_ALLOW_IDS, V07_SLASH } from './i18n_blocked_seed.mjs';
+import { flatten } from './i18n_flatten.mjs';
+import { contentHash, PLACEHOLDER_RE, placeholdersOf } from './i18n_hash.mjs';
 
 const root = process.cwd();
 // I18N_OUT_DIR overrides the destination DIRECTORY for both emitted files (used by
@@ -69,8 +69,27 @@ const SUMMARY_PATH = path.join(OUT_DIR, 'i18n.status.summary.json');
 // the nested base; the rest are flat dotted-key overlays. The registry tracks the
 // 13 NON-`en` locales per key (`en` is the authoritative source, never "pending").
 const LOCALES = [
-  'en', 'es', 'es_ES', 'fr_FR', 'fr_CA', 'en_CA', 'it_IT', 'de_DE',
-  'zh_CN', 'zh_TW', 'ko_KR', 'ja_JP', 'pt_BR', 'ru_RU',
+  'en',
+  'es',
+  'es_ES',
+  'fr_FR',
+  'fr_CA',
+  'en_CA',
+  'it_IT',
+  'de_DE',
+  'zh_CN',
+  'zh_TW',
+  'ko_KR',
+  'ja_JP',
+  'pt_BR',
+  'ru_RU',
+  'nl_NL',
+  'pl_PL',
+  'id_ID',
+  'tr_TR',
+  'sv_SE',
+  'vi_VN',
+  'da_DK',
 ];
 const NON_EN = LOCALES.filter((l) => l !== 'en');
 
@@ -90,13 +109,19 @@ const SCOPE_RANK = { main: 0, sim: 1, server: 2, admin: 3 };
 // stable part of the id so the seed stays short; falls back to a generic cognate
 // note for the long tail of accepted borrowings.
 function cognateReason(scope, locale, key) {
-  if (key === 'who.statusCombat') return "'combat' is a real word in this locale and is identical to English.";
-  if (key === 'who.statusOnline') return "'online' is the accepted borrowed term in this locale; identical to English.";
-  if (key === 'detail.lengthHours') return "Numeric duration format ('{count} h') is identical across locales.";
+  if (key === 'who.statusCombat')
+    return "'combat' is a real word in this locale and is identical to English.";
+  if (key === 'who.statusOnline')
+    return "'online' is the accepted borrowed term in this locale; identical to English.";
+  if (key === 'detail.lengthHours')
+    return "Numeric duration format ('{count} h') is identical across locales.";
   if (key === 'app.title') return 'Admin brand title is not translated.';
-  if (key === 'class.paladin') return "'Paladin' is the canonical class name in this locale (cognate).";
-  if (key === 'chatMod.status') return "'Status' is the accepted term in this locale and is identical to English (matches detail.status).";
-  if (key === 'chatFilter.escalationTitle') return "'Escalation' is a borrowed term already used across this locale's admin strings.";
+  if (key === 'class.paladin')
+    return "'Paladin' is the canonical class name in this locale (cognate).";
+  if (key === 'chatMod.status')
+    return "'Status' is the accepted term in this locale and is identical to English (matches detail.status).";
+  if (key === 'chatFilter.escalationTitle')
+    return "'Escalation' is a borrowed term already used across this locale's admin strings.";
   return 'Accepted cognate or borrowed term that is legitimately identical to English.';
 }
 
@@ -121,7 +146,8 @@ async function loadSources() {
   lines.push("export { DICT as serverDICT } from './src/ui/server_i18n';");
   lines.push("export { DICT as simDICT } from './src/ui/sim_i18n';");
   lines.push("export { en as adminEn } from './src/admin/i18n.en';");
-  for (const lang of NON_EN) lines.push(`export { ${lang} as admin_${lang} } from './src/admin/i18n.locales/${lang}';`);
+  for (const lang of NON_EN)
+    lines.push(`export { ${lang} as admin_${lang} } from './src/admin/i18n.locales/${lang}';`);
   const build = await esbuild.build({
     stdin: {
       contents: lines.join('\n'),
@@ -141,7 +167,14 @@ async function loadSources() {
   for (const lang of NON_EN) overlays[lang] = mod[lang];
   const adminOverlays = {};
   for (const lang of NON_EN) adminOverlays[lang] = mod[`admin_${lang}`];
-  return { en: mod.en, overlays, serverDICT: mod.serverDICT, simDICT: mod.simDICT, adminEn: mod.adminEn, adminOverlays };
+  return {
+    en: mod.en,
+    overlays,
+    serverDICT: mod.serverDICT,
+    simDICT: mod.simDICT,
+    adminEn: mod.adminEn,
+    adminOverlays,
+  };
 }
 
 const isPresent = (v) => typeof v === 'string' && v.trim().length > 0;
@@ -190,7 +223,14 @@ async function main() {
         ? { state: 'translated', srcHash: enHash, by: 'human' }
         : { state: 'pending' };
     }
-    keyEntries.push({ composite: `main:${key}`, scope: 'main', key, enHash, placeholders: ph, locales });
+    keyEntries.push({
+      composite: `main:${key}`,
+      scope: 'main',
+      key,
+      enHash,
+      placeholders: ph,
+      locales,
+    });
   }
 
   // DICT scopes: sim / server. Each is a DENSE flat Record<locale, Record<key,string>>.
@@ -212,7 +252,14 @@ async function main() {
             : { state: 'pending' };
         }
       }
-      keyEntries.push({ composite: `${scope}:${key}`, scope, key, enHash, placeholders: ph, locales });
+      keyEntries.push({
+        composite: `${scope}:${key}`,
+        scope,
+        key,
+        enHash,
+        placeholders: ph,
+        locales,
+      });
     }
   };
   addDictScope('sim', simDICT);
@@ -255,7 +302,14 @@ async function main() {
             : { state: 'pending' };
         }
       }
-      keyEntries.push({ composite: `${scope}:${key}`, scope, key, enHash, placeholders: ph, locales });
+      keyEntries.push({
+        composite: `${scope}:${key}`,
+        scope,
+        key,
+        enHash,
+        placeholders: ph,
+        locales,
+      });
     }
   };
   addSparseScope('admin', adminEn, adminOverlays);
@@ -263,8 +317,7 @@ async function main() {
   // Deterministic ordering: by scope rank, then by key path (codepoint order).
   keyEntries.sort(
     (a, b) =>
-      SCOPE_RANK[a.scope] - SCOPE_RANK[b.scope] ||
-      (a.key < b.key ? -1 : a.key > b.key ? 1 : 0),
+      SCOPE_RANK[a.scope] - SCOPE_RANK[b.scope] || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0),
   );
 
   // Sanity: a blocked seed entry that points at a key not in the universe means
@@ -272,11 +325,15 @@ async function main() {
   const universe = new Set(keyEntries.map((e) => e.composite));
   for (const ck of blockedRows.keys()) {
     if (!universe.has(ck)) {
-      throw new Error(`i18n scan: blocked seed key "${ck}" is not in the key universe (stale seed?)`);
+      throw new Error(
+        `i18n scan: blocked seed key "${ck}" is not in the key universe (stale seed?)`,
+      );
     }
   }
 
-  let translated = 0, pending = 0, blocked = 0;
+  let translated = 0,
+    pending = 0,
+    blocked = 0;
   for (const e of keyEntries) {
     for (const lang of NON_EN) {
       const s = e.locales[lang].state;
@@ -286,8 +343,7 @@ async function main() {
     }
   }
 
-  const blockedSource = V07_SLASH
-    .slice()
+  const blockedSource = V07_SLASH.slice()
     .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
     .map((text) => ({ channel: 'sim', reason: V07_SLASH_REASON, text }));
 

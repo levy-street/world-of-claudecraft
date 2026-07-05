@@ -1,6 +1,6 @@
-import * as esbuild from 'esbuild';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import * as esbuild from 'esbuild';
 
 const root = process.cwd();
 const outDir = path.join(root, 'docs');
@@ -29,59 +29,219 @@ const build = await esbuild.build({
 
 const bundled = build.outputFiles[0].text;
 const dataUrl = `data:text/javascript;base64,${Buffer.from(bundled).toString('base64')}`;
-const {
-  ALL_CLASSES, CLASSES, GROUND_OBJECTS, ITEMS, MOBS, NPCS, QUESTS, REWARD_ARCHETYPE,
-} = await import(dataUrl);
+const { ALL_CLASSES, CLASSES, GROUND_OBJECTS, ITEMS, MOBS, NPCS, QUESTS, REWARD_ARCHETYPE } =
+  await import(dataUrl);
 
 const statKeys = ['str', 'agi', 'sta', 'int', 'spi', 'armor'];
 const NEW_LOOT_ADDED = [
-  { itemId: 'valeborn_spellblade', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale rare chase table' },
-  { itemId: 'bristleback_maul', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Elder Bristleback' },
-  { itemId: 'sableweb_slippers', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Sableweb Matriarch' },
-  { itemId: 'moggers_stomper_boots', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Mogger' },
-  { itemId: 'moggers_copper_cudgel', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale rare chase table' },
+  {
+    itemId: 'valeborn_spellblade',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Eastbrook Vale rare chase table',
+  },
+  {
+    itemId: 'bristleback_maul',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Eastbrook Vale - Elder Bristleback',
+  },
+  {
+    itemId: 'moggers_stomper_boots',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Eastbrook Vale - Mogger',
+  },
+  {
+    itemId: 'moggers_copper_cudgel',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Eastbrook Vale rare chase table',
+  },
   { itemId: 'moggers_shiv', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Mogger' },
-  { itemId: 'gorraks_cruel_chopper', section: 'Open World Existing Rare/Boss', subgroup: 'Eastbrook Vale - Gorrak' },
-  { itemId: 'mirejaw_biteblade', section: 'Open World Rare Spawn', subgroup: 'Mirefen - Mirejaw the Ravenous' },
-  { itemId: 'mirejaw_scale_vest', section: 'Open World Rare Spawn', subgroup: 'Mirefen - Mirejaw the Ravenous' },
-  { itemId: 'fen_reaver_glaive', section: 'Open World Rare Spawn', subgroup: 'Mirefen rare chase table' },
-  { itemId: 'mirejaw_oracle_staff', section: 'Open World Rare Spawn', subgroup: 'Mirefen - Mirejaw the Ravenous' },
-  { itemId: 'nhalias_dirgeblade', section: 'Open World Rare Spawn', subgroup: 'Mirefen rare chase table' },
-  { itemId: 'broodmother_silk_robe', section: 'Open World Existing Rare/Boss', subgroup: 'Mirefen - The Broodmother' },
-  { itemId: 'nhalias_funeral_wraps', section: 'Open World Rare Spawn', subgroup: 'Mirefen - Sister Nhalia' },
-  { itemId: 'voss_sanctified_mace', section: 'Open World Existing Rare/Boss', subgroup: 'Mirefen - Deacon Voss' },
-  { itemId: 'ironvein_pickblade', section: 'Open World Rare Spawn', subgroup: 'Highwatch - Ironvein Foreman' },
-  { itemId: 'ironvein_lantern_staff', section: 'Open World Rare Spawn', subgroup: 'Highwatch - Ironvein Foreman' },
-  { itemId: 'drogmar_warboots', section: 'Open World Existing Rare/Boss', subgroup: 'Highwatch - Warlord Drogmar' },
-  { itemId: 'marrowlord_boneboots', section: 'Open World Rare Spawn', subgroup: 'Highwatch - Marrowlord Varkas' },
+  {
+    itemId: 'gorraks_cruel_chopper',
+    section: 'Open World Existing Rare/Boss',
+    subgroup: 'Eastbrook Vale - Gorrak',
+  },
+  {
+    itemId: 'mirejaw_biteblade',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Mirefen - Mirejaw the Ravenous',
+  },
+  {
+    itemId: 'mirejaw_scale_vest',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Mirefen - Mirejaw the Ravenous',
+  },
+  {
+    itemId: 'fen_reaver_glaive',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Mirefen rare chase table',
+  },
+  {
+    itemId: 'mirejaw_oracle_staff',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Mirefen - Mirejaw the Ravenous',
+  },
+  {
+    itemId: 'nhalias_dirgeblade',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Mirefen rare chase table',
+  },
+  {
+    itemId: 'broodmother_silk_robe',
+    section: 'Open World Existing Rare/Boss',
+    subgroup: 'Mirefen - The Broodmother',
+  },
+  {
+    itemId: 'nhalias_funeral_wraps',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Mirefen - Sister Nhalia',
+  },
+  {
+    itemId: 'voss_sanctified_mace',
+    section: 'Open World Existing Rare/Boss',
+    subgroup: 'Mirefen - Deacon Voss',
+  },
+  {
+    itemId: 'ironvein_pickblade',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Highwatch - Ironvein Foreman',
+  },
+  {
+    itemId: 'ironvein_lantern_staff',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Highwatch - Ironvein Foreman',
+  },
+  {
+    itemId: 'drogmar_warboots',
+    section: 'Open World Existing Rare/Boss',
+    subgroup: 'Highwatch - Warlord Drogmar',
+  },
+  {
+    itemId: 'marrowlord_boneboots',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Highwatch - Marrowlord Varkas',
+  },
   { itemId: 'cryptbone_greaves', section: 'Dungeon - Hollow Crypt', subgroup: 'Morthen' },
   { itemId: 'greyjaw_hide_boots', section: 'Dungeon - Hollow Crypt', subgroup: 'Morthen' },
-  { itemId: 'hollowbone_hauberk', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Elder Bristleback' },
-  { itemId: 'gravewoven_raiment', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Sableweb Matriarch' },
-  { itemId: 'cryptstalker_jerkin', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Mogger' },
-  { itemId: 'hollowbound_legguards', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Elder Bristleback' },
-  { itemId: 'gravepath_treads', section: 'Open World Rare Spawn', subgroup: 'Eastbrook Vale - Sableweb Matriarch' },
-  { itemId: 'tideguard_greaves', section: 'Dungeon - Sunken Bastion', subgroup: 'Olen rare armor table' },
-  { itemId: 'tideguard_sabatons', section: 'Dungeon - Sunken Bastion', subgroup: 'Olen rare armor table' },
-  { itemId: 'drowned_prayer_leggings', section: 'Dungeon - Sunken Bastion', subgroup: 'Vael rare armor table' },
-  { itemId: 'drowned_prayer_sandals', section: 'Dungeon - Sunken Bastion', subgroup: 'Vael rare armor table' },
-  { itemId: 'eelscale_leggings', section: 'Dungeon - Sunken Bastion', subgroup: 'Olen rare armor table' },
-  { itemId: 'eelscale_treads', section: 'Dungeon - Sunken Bastion', subgroup: 'Vael rare armor table' },
-  { itemId: 'staff_of_velkhar', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korgath caster rare table' },
-  { itemId: 'shadowmeld_tunic', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korgath agility rare table' },
-  { itemId: 'wyrmcult_grand_robe', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korgath caster rare table' },
-  { itemId: 'gravewyrm_sabatons', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korgath strength rare table' },
-  { itemId: 'wyrmcult_soulsteps', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korgath caster rare table' },
-  { itemId: 'gravewyrm_stalkers_treads', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Velkhar rare armor table' },
-  { itemId: 'deathlord_warplate', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korzul epic armor table' },
-  { itemId: 'necromancers_starshroud', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korzul epic armor table' },
-  { itemId: 'wyrmshadow_harness', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korzul epic armor table' },
-  { itemId: 'deathlord_legguards', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Velkhar epic armor table' },
-  { itemId: 'deathlord_sabatons', section: 'Open World Rare Spawn', subgroup: 'Highwatch - Ironvein Foreman' },
-  { itemId: 'necromancers_soulsteps', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Velkhar epic armor table' },
-  { itemId: 'necromancers_legwraps', section: 'Open World Rare Spawn', subgroup: 'Highwatch - Marrowlord Varkas' },
-  { itemId: 'wyrmshadow_treads', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Korgath epic armor table' },
-  { itemId: 'wyrmshadow_legguards', section: 'Dungeon - Gravewyrm Sanctum', subgroup: 'Velkhar epic armor table' },
+  {
+    itemId: 'hollowbone_hauberk',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Eastbrook Vale - Elder Bristleback',
+  },
+  {
+    itemId: 'cryptstalker_jerkin',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Eastbrook Vale - Mogger',
+  },
+  {
+    itemId: 'hollowbound_legguards',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Eastbrook Vale - Elder Bristleback',
+  },
+  {
+    itemId: 'tideguard_greaves',
+    section: 'Dungeon - Sunken Bastion',
+    subgroup: 'Olen rare armor table',
+  },
+  {
+    itemId: 'tideguard_sabatons',
+    section: 'Dungeon - Sunken Bastion',
+    subgroup: 'Olen rare armor table',
+  },
+  {
+    itemId: 'drowned_prayer_leggings',
+    section: 'Dungeon - Sunken Bastion',
+    subgroup: 'Vael rare armor table',
+  },
+  {
+    itemId: 'drowned_prayer_sandals',
+    section: 'Dungeon - Sunken Bastion',
+    subgroup: 'Vael rare armor table',
+  },
+  {
+    itemId: 'eelscale_leggings',
+    section: 'Dungeon - Sunken Bastion',
+    subgroup: 'Olen rare armor table',
+  },
+  {
+    itemId: 'eelscale_treads',
+    section: 'Dungeon - Sunken Bastion',
+    subgroup: 'Vael rare armor table',
+  },
+  {
+    itemId: 'staff_of_velkhar',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korgath caster rare table',
+  },
+  {
+    itemId: 'shadowmeld_tunic',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korgath agility rare table',
+  },
+  {
+    itemId: 'wyrmcult_grand_robe',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korgath caster rare table',
+  },
+  {
+    itemId: 'gravewyrm_sabatons',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korgath strength rare table',
+  },
+  {
+    itemId: 'wyrmcult_soulsteps',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korgath caster rare table',
+  },
+  {
+    itemId: 'gravewyrm_stalkers_treads',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Velkhar rare armor table',
+  },
+  {
+    itemId: 'deathlord_warplate',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korzul epic armor table',
+  },
+  {
+    itemId: 'necromancers_starshroud',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korzul epic armor table',
+  },
+  {
+    itemId: 'wyrmshadow_harness',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korzul epic armor table',
+  },
+  {
+    itemId: 'deathlord_legguards',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Velkhar epic armor table',
+  },
+  {
+    itemId: 'deathlord_sabatons',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Highwatch - Ironvein Foreman',
+  },
+  {
+    itemId: 'necromancers_soulsteps',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Velkhar epic armor table',
+  },
+  {
+    itemId: 'necromancers_legwraps',
+    section: 'Open World Rare Spawn',
+    subgroup: 'Highwatch - Marrowlord Varkas',
+  },
+  {
+    itemId: 'wyrmshadow_treads',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Korgath epic armor table',
+  },
+  {
+    itemId: 'wyrmshadow_legguards',
+    section: 'Dungeon - Gravewyrm Sanctum',
+    subgroup: 'Velkhar epic armor table',
+  },
 ];
 
 function csvCell(value) {
@@ -221,7 +381,9 @@ for (const mob of Object.values(MOBS)) {
       drop_rate_decimal: entry.chance,
       roll_group: entry.rollGroup ?? '',
       gated_by_quest_id: entry.questId ?? '',
-      notes: entry.rollGroup ? 'Exclusive roll group: at most one item from this group is selected by the listed weights.' : '',
+      notes: entry.rollGroup
+        ? 'Exclusive roll group: at most one item from this group is selected by the listed weights.'
+        : '',
     });
   }
 }
@@ -233,7 +395,9 @@ for (const npc of Object.values(NPCS)) {
       source_id: npc.id,
       source_name: npc.name,
       source_detail: npc.title,
-      notes: ITEMS[itemId]?.buyValue ? `Vendor price ${money(ITEMS[itemId].buyValue)}` : 'Vendor listing has no buyValue on item definition.',
+      notes: ITEMS[itemId]?.buyValue
+        ? `Vendor price ${money(ITEMS[itemId].buyValue)}`
+        : 'Vendor listing has no buyValue on item definition.',
     });
   }
 }
@@ -246,7 +410,8 @@ for (const quest of Object.values(QUESTS)) {
       source_id: quest.id,
       source_name: quest.name,
       source_detail: `${obj.label} x${obj.count}`,
-      notes: 'Required by quest objective; see mob_drop or ground_object rows for acquisition source.',
+      notes:
+        'Required by quest objective; see mob_drop or ground_object rows for acquisition source.',
     });
   }
 
@@ -295,10 +460,12 @@ for (const [cls, def] of Object.entries(CLASSES)) {
   }
 }
 
-sourceRows.sort((a, b) =>
-  a.item_name.localeCompare(b.item_name)
-  || a.source_type.localeCompare(b.source_type)
-  || a.source_name.localeCompare(b.source_name));
+sourceRows.sort(
+  (a, b) =>
+    a.item_name.localeCompare(b.item_name) ||
+    a.source_type.localeCompare(b.source_type) ||
+    a.source_name.localeCompare(b.source_name),
+);
 
 const sourcesByItem = new Map();
 for (const row of sourceRows) {
@@ -332,8 +499,10 @@ const catalogRows = Object.values(ITEMS)
 
 const newLootRows = NEW_LOOT_ADDED.flatMap((meta) => {
   const item = ITEMS[meta.itemId];
-  const rows = (sourcesByItem.get(meta.itemId) ?? []).filter((row) =>
-    row.source_type === 'mob_drop' && (!meta.sourceIds || meta.sourceIds.includes(row.source_id)));
+  const rows = (sourcesByItem.get(meta.itemId) ?? []).filter(
+    (row) =>
+      row.source_type === 'mob_drop' && (!meta.sourceIds || meta.sourceIds.includes(row.source_id)),
+  );
   const sources = rows.length ? rows : [{}];
   return sources.map((source) => ({
     section: meta.section,
@@ -355,6 +524,12 @@ writeFileSync(path.join(outDir, 'item_catalog.csv'), toCsv(catalogRows));
 writeFileSync(path.join(outDir, 'item_sources.csv'), toCsv(sourceRows));
 writeFileSync(path.join(outDir, 'new_loot_added.csv'), toCsv(newLootRows));
 
-console.log(`Wrote ${path.relative(root, path.join(outDir, 'item_catalog.csv'))} (${catalogRows.length} items)`);
-console.log(`Wrote ${path.relative(root, path.join(outDir, 'item_sources.csv'))} (${sourceRows.length} item source rows)`);
-console.log(`Wrote ${path.relative(root, path.join(outDir, 'new_loot_added.csv'))} (${newLootRows.length} new loot rows)`);
+console.log(
+  `Wrote ${path.relative(root, path.join(outDir, 'item_catalog.csv'))} (${catalogRows.length} items)`,
+);
+console.log(
+  `Wrote ${path.relative(root, path.join(outDir, 'item_sources.csv'))} (${sourceRows.length} item source rows)`,
+);
+console.log(
+  `Wrote ${path.relative(root, path.join(outDir, 'new_loot_added.csv'))} (${newLootRows.length} new loot rows)`,
+);

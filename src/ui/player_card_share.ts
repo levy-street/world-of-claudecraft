@@ -16,7 +16,11 @@ export type AbsoluteUrl = string & { readonly [absoluteUrlBrand]: true };
  * PublishedCard.url must always be absolute so native/share-link consumers do
  * not need to know which realm produced the card.
  */
-export function absolutePublishedCardUrl(url: string, realmOrigin: string, pageOrigin: string): AbsoluteUrl {
+export function absolutePublishedCardUrl(
+  url: string,
+  realmOrigin: string,
+  pageOrigin: string,
+): AbsoluteUrl {
   return new URL(url, realmOrigin || pageOrigin).href as AbsoluteUrl;
 }
 

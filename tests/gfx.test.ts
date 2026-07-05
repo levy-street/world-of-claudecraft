@@ -1,10 +1,21 @@
-import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { NAMEPLATE_INTERVAL_LOW_SEC, nameplateIntervalSec } from '../src/game/ui_tier_knobs';
 import {
+  classifyGpuRenderer,
   configureMaskedDoubleSidedVegetationMaterial,
-  forcedTierFromSearch, graphicsPresetLabel, isConstrainedBrowser, isWeakIntegratedGpu,
-  shouldUseAutoGovernor, tierFromHints, GFX_BUDGETS, type GfxRuntimeHints,
-  GFX_BUCKET_BANDS, gfxInternalsForTest,
+  firstRunGraphicsPreset,
+  forcedTierFromSearch,
+  GFX_BUCKET_BANDS,
+  GFX_BUDGETS,
+  type GfxRuntimeHints,
+  gfxInternalsForTest,
+  graphicsPresetLabel,
+  isConstrainedBrowser,
+  isWeakIntegratedGpu,
+  resolveDefaultGraphicsPreset,
+  shouldUseAutoGovernor,
+  tierFromHints,
 } from '../src/render/gfx';
 
 const desktop: GfxRuntimeHints = {
@@ -15,10 +26,20 @@ const desktop: GfxRuntimeHints = {
 };
 
 describe('graphics tier resolution', () => {
-  it('resolves initial renderer startup with no persisted preset to ultra graphics', () => {
+  it('resolves an unset preset device-aware, matching the medium data-fx-level fallback', () => {
+    // The 3D tier (tierFromHints) and the HUD data-fx-level (graphicsPresetLabel(settings def))
+    // must agree on the unset/first-run default so they never diverge. An unrecognized device
+    // falls to MEDIUM on BOTH paths (settings.ts graphicsPreset def is 2 = medium); the old code
+    // fell back to ultra here while the HUD stayed medium, which this guards against.
     expect(desktop.graphicsPreset).toBeUndefined();
-    expect(graphicsPresetLabel(desktop.graphicsPreset)).toBe('ultra');
-    expect(tierFromHints(desktop, false)).toBe('ultra');
+    expect(tierFromHints(desktop, false)).toBe('medium'); // unknown GPU -> medium fallback
+    expect(graphicsPresetLabel(2)).toBe('medium'); // settings def -> same tier, no divergence
+    // A recognized strong desktop GPU lifts the unset 3D tier to ultra...
+    expect(
+      tierFromHints({ ...desktop, gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)' }, false),
+    ).toBe('ultra');
+    // ...and a recognized weak GPU drops it to low (the cost ceiling), not the old ultra default.
+    expect(tierFromHints({ ...desktop, gpuRenderer: 'Adreno (TM) 330' }, false)).toBe('low');
   });
 
   it('honors explicit URL tier overrides', () => {
@@ -32,18 +53,29 @@ describe('graphics tier resolution', () => {
 
   it('treats phone-class and low-memory browsers as constrained', () => {
     expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1, coarsePointer: true })).toBe(true);
-    expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1, narrowViewport: true })).toBe(true);
+    expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1, narrowViewport: true })).toBe(
+      true,
+    );
     expect(isConstrainedBrowser({ ...desktop, deviceMemory: 4 })).toBe(true);
     expect(isConstrainedBrowser({ ...desktop, maxTouchPoints: 1 })).toBe(false);
     expect(isConstrainedBrowser(desktop)).toBe(false);
   });
 
-  it('defaults missing presets to ultra while preserving legacy low and forced high', () => {
-    expect(tierFromHints(desktop, false)).toBe('ultra');
-    expect(tierFromHints({ ...desktop, graphicsPreset: 0 }, false)).toBe('low');
-    expect(tierFromHints(desktop, true)).toBe('ultra');
-    expect(tierFromHints({ ...desktop, maxTouchPoints: 1, coarsePointer: true }, false)).toBe('ultra');
-    expect(tierFromHints({ ...desktop, search: '?gfx=high', maxTouchPoints: 1, coarsePointer: true }, false)).toBe('high');
+  it('resolves an unset preset by device, honoring legacy explicit values and URL force', () => {
+    expect(tierFromHints(desktop, false)).toBe('medium'); // unknown device -> medium fallback
+    expect(tierFromHints({ ...desktop, graphicsPreset: 0 }, false)).toBe('low'); // legacy explicit 0
+    expect(tierFromHints(desktop, true)).toBe('low'); // software GL with no preset -> low floor
+    // unset + unknown mobile -> medium (not the old unset -> ultra default)
+    expect(tierFromHints({ ...desktop, maxTouchPoints: 1, coarsePointer: true }, false)).toBe(
+      'medium',
+    );
+    // a URL-forced tier always wins, even on a touch device or software GL
+    expect(
+      tierFromHints(
+        { ...desktop, search: '?gfx=high', maxTouchPoints: 1, coarsePointer: true },
+        false,
+      ),
+    ).toBe('high');
     expect(tierFromHints({ ...desktop, search: '?gfx=ultra' }, true)).toBe('ultra');
   });
 
@@ -56,7 +88,7 @@ describe('graphics tier resolution', () => {
     expect(tierFromHints({ ...desktop, search: '?gfx=low', graphicsPreset: 3 }, false)).toBe('low');
   });
 
-  it('labels presets and runs the budget governor unless Ultra or URL-forced', () => {
+  it('labels presets and runs the budget governor on every tier except ultra', () => {
     expect(graphicsPresetLabel(undefined)).toBe('ultra');
     expect(graphicsPresetLabel(0)).toBe('low');
     expect(graphicsPresetLabel(1)).toBe('low');
@@ -64,19 +96,17 @@ describe('graphics tier resolution', () => {
     expect(graphicsPresetLabel(3)).toBe('high');
     expect(graphicsPresetLabel(4)).toBe('ultra');
     expect(graphicsPresetLabel(5)).toBe('advanced');
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 0 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: undefined })).toBe(false);
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 1 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 2 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 3 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 4 })).toBe(false);
-    expect(shouldUseAutoGovernor({ search: '', graphicsPreset: 5 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '?gfx=low', graphicsPreset: 0 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '?gfx=high', graphicsPreset: 0 })).toBe(true);
-    expect(shouldUseAutoGovernor({ search: '?gfx=ultra', graphicsPreset: 0 })).toBe(false);
-    expect(shouldUseAutoGovernor({ search: '?gfx=ultra', graphicsPreset: 4 })).toBe(false);
-    expect(shouldUseAutoGovernor({ search: '?governor=0', graphicsPreset: 1 })).toBe(false);
-    expect(shouldUseAutoGovernor({ search: '?gfx=ultra&governor=1', graphicsPreset: 0 })).toBe(true);
+    // The governor follows the RESOLVED tier: ON for low/medium/high, OFF only at ultra. A
+    // first-run inconclusive device (the medium fallback) now keeps the governor ON to adapt; the
+    // old unset-preset -> ultra label used to opt it out (no runtime adaptation on weak devices).
+    expect(shouldUseAutoGovernor('low', '')).toBe(true);
+    expect(shouldUseAutoGovernor('medium', '')).toBe(true);
+    expect(shouldUseAutoGovernor('high', '')).toBe(true);
+    expect(shouldUseAutoGovernor('ultra', '')).toBe(false);
+    // The URL governor override beats the tier (force on even at ultra, off below it).
+    expect(shouldUseAutoGovernor('ultra', '?gfx=ultra&governor=1')).toBe(true);
+    expect(shouldUseAutoGovernor('low', '?governor=0')).toBe(false);
+    expect(shouldUseAutoGovernor('ultra', '?gfx=ultra')).toBe(false);
   });
 
   it('keeps every quality tier bounded by explicit runtime budgets', () => {
@@ -93,20 +123,22 @@ describe('graphics tier resolution', () => {
 
   it('defines tunable bucket bands for every quality tier', () => {
     for (const [tier, bands] of Object.entries(GFX_BUCKET_BANDS)) {
-      expect(Object.keys(bands).sort()).toEqual([
-        'characters',
-        'foliage',
-        'grass',
-        'lighting',
-        'materials',
-        'props',
-        'resolution',
-        'ui',
-        'vfx',
-        'waterSky',
-        'weapons',
-        'worldStreaming',
-      ].sort());
+      expect(Object.keys(bands).sort()).toEqual(
+        [
+          'characters',
+          'foliage',
+          'grass',
+          'lighting',
+          'materials',
+          'props',
+          'resolution',
+          'ui',
+          'vfx',
+          'waterSky',
+          'weapons',
+          'worldStreaming',
+        ].sort(),
+      );
       for (const band of Object.values(bands)) {
         expect(band.min).toBeGreaterThanOrEqual(0);
         expect(band.max).toBeLessThanOrEqual(1);
@@ -162,21 +194,264 @@ describe('graphics tier resolution', () => {
     expect(ultra.msaaSamples).toBe(4);
     expect(ultra.shadowMap).toBe(high.shadowMap);
     expect(ultra.pixelRatioCap).toBeGreaterThan(high.pixelRatioCap);
-    expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.high.grass.baseline);
-    expect(GFX_BUCKET_BANDS.ultra.foliage.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.high.foliage.baseline);
+    expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(
+      GFX_BUCKET_BANDS.high.grass.baseline,
+    );
+    expect(GFX_BUCKET_BANDS.ultra.foliage.baseline).toBeGreaterThan(
+      GFX_BUCKET_BANDS.high.foliage.baseline,
+    );
   });
 
-  it('detects older Intel integrated GPUs without overriding the ultra default', () => {
-    expect(isWeakIntegratedGpu('ANGLE (Intel, ANGLE Metal Renderer: Intel(R) Iris(TM) Plus Graphics 655)')).toBe(true);
+  it('detects older Intel integrated GPUs and lows the unset 3D tier instead of defaulting ultra', () => {
+    expect(
+      isWeakIntegratedGpu(
+        'ANGLE (Intel, ANGLE Metal Renderer: Intel(R) Iris(TM) Plus Graphics 655)',
+      ),
+    ).toBe(true);
     expect(isWeakIntegratedGpu('ANGLE (Apple, ANGLE Metal Renderer: Apple M2)')).toBe(false);
-    expect(tierFromHints({ ...desktop, gpuRenderer: 'ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)' }, false)).toBe('ultra');
+    // A recognized weak iGPU with no explicit preset now resolves the 3D tier to LOW (the cost
+    // ceiling), instead of the old unset -> ultra default that ignored the GPU string entirely.
+    expect(
+      tierFromHints(
+        { ...desktop, gpuRenderer: 'ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)' },
+        false,
+      ),
+    ).toBe('low');
+  });
+
+  it('classifies GPU renderer strings into device-capability buckets', () => {
+    expect(classifyGpuRenderer('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)')).toBe('strongDesktop');
+    expect(classifyGpuRenderer('ANGLE (Apple, ANGLE Metal Renderer: Apple M2)')).toBe(
+      'strongDesktop',
+    );
+    // AMD discrete + Intel Arc desktop -> strongDesktop (the "(TM)" Windows drivers print is tolerated)
+    expect(classifyGpuRenderer('ANGLE (AMD, AMD Radeon RX 6800 XT Direct3D11 vs_5_0 ps_5_0)')).toBe(
+      'strongDesktop',
+    );
+    expect(classifyGpuRenderer('AMD Radeon(TM) RX 580')).toBe('strongDesktop');
+    expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) Arc(TM) A770 Graphics)')).toBe(
+      'strongDesktop',
+    );
+    expect(classifyGpuRenderer('Adreno (TM) 730')).toBe('flagshipMobile');
+    expect(classifyGpuRenderer('Mali-G715')).toBe('flagshipMobile');
+    expect(classifyGpuRenderer('Apple A17 Pro GPU')).toBe('flagshipMobile');
+    // software rasterizers -> software. The bare "software" token stays in lockstep with
+    // isSoftwareGL so a string like "Apple Software Renderer" lows BOTH the 3D tier and the HUD
+    // data-fx-level (never one low, one medium).
+    expect(classifyGpuRenderer('Google SwiftShader')).toBe('software');
+    expect(classifyGpuRenderer('Mesa llvmpipe (LLVM 15.0.7, 256 bits)')).toBe('software');
+    expect(classifyGpuRenderer('Apple Software Renderer')).toBe('software');
+    // the codebase's named weak-integrated parts stay weak (checked before mid-integrated)
+    expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)')).toBe('weak');
+    expect(classifyGpuRenderer('Adreno (TM) 330')).toBe('weak');
+    expect(classifyGpuRenderer('PowerVR SGX 544')).toBe('weak');
+    // entry-level Mali Valhall (G51/G52) are weak (NOT shadowed by the mid Mali clause) -> LOW
+    expect(classifyGpuRenderer('Mali-G51')).toBe('weak');
+    expect(classifyGpuRenderer('Mali-G52')).toBe('weak');
+    // older Intel UHD desktop iGPU stays weak; the modern UHD 7xx desktop part is mid
+    expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11)')).toBe('weak');
+    expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) UHD Graphics 770)')).toBe('midIntegrated');
+    // newer integrated + mid mobile -> their own buckets (the MEDIUM path)
+    expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) Iris(R) Xe Graphics)')).toBe(
+      'midIntegrated',
+    );
+    // AMD Ryzen iGPUs print "(TM)" in Chrome's ANGLE string; both forms bucket midIntegrated
+    expect(classifyGpuRenderer('ANGLE (AMD, AMD Radeon(TM) Graphics Direct3D11)')).toBe(
+      'midIntegrated',
+    );
+    expect(classifyGpuRenderer('ANGLE (AMD, AMD Radeon(TM) Vega 8 Graphics)')).toBe(
+      'midIntegrated',
+    );
+    expect(classifyGpuRenderer('AMD Radeon Vega 8 Graphics')).toBe('midIntegrated');
+    expect(classifyGpuRenderer('Mali-G57')).toBe('midMobile');
+    // masked / unplaced / empty -> unknown -> the MEDIUM fallback path
+    expect(classifyGpuRenderer('Apple GPU')).toBe('unknown');
+    expect(classifyGpuRenderer(undefined)).toBe('unknown');
+    expect(classifyGpuRenderer('')).toBe('unknown');
+  });
+
+  describe('resolveDefaultGraphicsPreset: device-aware first-run default (medium fallback)', () => {
+    // preset numbers: 1 low, 2 medium, 3 high, 4 ultra (never 5/advanced as an auto-default).
+    const phone: GfxRuntimeHints = { ...desktop, maxTouchPoints: 5, coarsePointer: true };
+
+    it('falls back to MEDIUM for a masked/unknown or mid GPU with no corroborating signal', () => {
+      expect(resolveDefaultGraphicsPreset(desktop)).toBe(2); // no GPU/mem/cores -> medium
+      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Apple GPU' })).toBe(2); // masked
+      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Intel Iris Xe' })).toBe(2); // mid
+      // AMD Ryzen iGPU desktop (ample RAM + cores) must bucket midIntegrated -> MEDIUM, NOT be
+      // promoted to HIGH via the unknown-desktop branch (the "(TM)" misclassification regression).
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: 'ANGLE (AMD, AMD Radeon(TM) Graphics Direct3D11)',
+          deviceMemory: 8,
+          hardwareConcurrency: 16,
+        }),
+      ).toBe(2);
+    });
+
+    it('drops a software or weak GPU to LOW (only the GPU class can low, never RAM/cores)', () => {
+      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Google SwiftShader' })).toBe(
+        1,
+      );
+      // a bare "software" renderer (e.g. Apple's GPU-disabled fallback) lows on BOTH paths, even on
+      // a Chrome box with ample mem+cores (where the old asymmetry would have persisted it HIGH).
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: 'Apple Software Renderer',
+          deviceMemory: 8,
+          hardwareConcurrency: 16,
+        }),
+      ).toBe(1);
+      expect(tierFromHints({ ...desktop, gpuRenderer: 'Apple Software Renderer' }, false)).toBe(
+        'low',
+      );
+      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: 'Adreno (TM) 330' })).toBe(1);
+      // entry-level Mali-G52 budget phone -> LOW (must not be shadowed into the mid Mali bucket)
+      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Mali-G52' })).toBe(1);
+      // PITFALL 1: a thin RAM/core count NEVER pulls a tier down (a flagship iPhone reports
+      // cores=2 / mem=undefined); an unknown GPU with low mem+cores stays MEDIUM, not low.
+      expect(resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 2 })).toBe(2);
+      expect(
+        resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 4, hardwareConcurrency: 2 }),
+      ).toBe(2);
+    });
+
+    it('caps mobile at HIGH: flagship / strong-on-touch -> HIGH, weak phone -> LOW, else MEDIUM', () => {
+      expect(
+        resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 8 }),
+      ).toBe(3); // flagship phone
+      // an M-series iPad (strong GPU on a touch device) is capped at HIGH (ultra is desktop-only)
+      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple M2' })).toBe(3);
+      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 330' })).toBe(1); // old phone
+      expect(resolveDefaultGraphicsPreset(phone)).toBe(2); // typical/unknown phone -> medium
+    });
+
+    it('rewards a strong desktop: ULTRA with a corroborating signal (or unreported mem), else HIGH', () => {
+      const rtx = 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)';
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: rtx,
+          deviceMemory: 8,
+          hardwareConcurrency: 16,
+        }),
+      ).toBe(4);
+      // mem unreported (Firefox) with a recognized strong GPU still earns ULTRA
+      expect(resolveDefaultGraphicsPreset({ ...desktop, gpuRenderer: rtx })).toBe(4);
+      // a strong GPU but a present, sub-threshold mem+cores -> HIGH (corroboration absent)
+      expect(
+        resolveDefaultGraphicsPreset({
+          ...desktop,
+          gpuRenderer: rtx,
+          deviceMemory: 4,
+          hardwareConcurrency: 4,
+        }),
+      ).toBe(3);
+    });
+
+    it('raises an unknown desktop GPU to HIGH only with ample RAM AND cores', () => {
+      expect(
+        resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 8, hardwareConcurrency: 12 }),
+      ).toBe(3);
+      // ample on only one axis is not enough for the unknown bucket -> MEDIUM
+      expect(
+        resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 8, hardwareConcurrency: 4 }),
+      ).toBe(2);
+    });
+
+    it('a software/weak device lands on LOW, restoring the 1/15s nameplate cost ceiling', () => {
+      // The whole point of the default: a weak device -> low preset -> the data-fx-level low
+      // tier -> the restored nameplate staleness ceiling (the PR901 weak-GPU mitigation).
+      const preset = resolveDefaultGraphicsPreset({
+        ...desktop,
+        gpuRenderer: 'Google SwiftShader',
+      });
+      expect(preset).toBe(1);
+      const label = graphicsPresetLabel(preset);
+      expect(label).toBe('low');
+      expect(nameplateIntervalSec(label as 'low')).toBe(NAMEPLATE_INTERVAL_LOW_SEC);
+    });
+  });
+
+  describe('firstRunGraphicsPreset: device default applied at most once, never over a choice', () => {
+    function stubGpu(renderer: string | undefined): void {
+      gfxInternalsForTest.resetGpuRendererProbe();
+      const getParameter = vi.fn(() => renderer);
+      const getExtension = vi.fn((name: string) =>
+        name === 'WEBGL_lose_context'
+          ? { loseContext: vi.fn() }
+          : { UNMASKED_RENDERER_WEBGL: 0x9246 },
+      );
+      const getContext = vi.fn(() =>
+        renderer === undefined ? null : { getExtension, getParameter },
+      );
+      vi.stubGlobal('document', { createElement: vi.fn(() => ({ getContext })) });
+    }
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      gfxInternalsForTest.resetGpuRendererProbe();
+    });
+
+    it('returns null once a device default has been applied (never re-detects over a choice)', () => {
+      stubGpu('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)');
+      expect(firstRunGraphicsPreset(true)).toBeNull();
+    });
+
+    it('detects a recognized desktop GPU on first run, gated by the marker not the preset key', () => {
+      // The gate is the dedicated marker arg, NOT the graphicsPreset key (which Settings.save()
+      // def-fills the moment any setting is stored), so a strong desktop still resolves to a real
+      // high-or-ultra tier on first run even after an unrelated setting has been persisted.
+      stubGpu('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)');
+      const preset = firstRunGraphicsPreset(false);
+      expect(preset).not.toBeNull();
+      expect(preset).toBeGreaterThanOrEqual(3); // high or ultra, never the medium fallback
+    });
+
+    it('leaves a masked/inconclusive device unpersisted (null) so it re-detects later', () => {
+      stubGpu('Apple GPU'); // masked -> unknown -> medium fallback -> null (not persisted, re-probed next boot)
+      expect(firstRunGraphicsPreset(false)).toBeNull();
+    });
+  });
+
+  describe('probeGpuRenderer: one cached probe, context released (PR901 exhaustion guard)', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      gfxInternalsForTest.resetGpuRendererProbe();
+    });
+
+    it('creates exactly one WebGL context, loses it, and memoizes the renderer string', () => {
+      gfxInternalsForTest.resetGpuRendererProbe();
+      const loseContext = vi.fn();
+      const getParameter = vi.fn(() => 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)');
+      const getExtension = vi.fn((name: string) =>
+        name === 'WEBGL_lose_context' ? { loseContext } : { UNMASKED_RENDERER_WEBGL: 0x9246 },
+      );
+      const getContext = vi.fn(() => ({ getExtension, getParameter }));
+      const createElement = vi.fn(() => ({ getContext }));
+      vi.stubGlobal('document', { createElement });
+
+      const first = gfxInternalsForTest.probeGpuRenderer();
+      const second = gfxInternalsForTest.probeGpuRenderer();
+
+      expect(first).toBe('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)');
+      expect(second).toBe(first);
+      // Memoized: only the first call probes; the rest reuse the cached string.
+      expect(createElement).toHaveBeenCalledTimes(1);
+      expect(getContext).toHaveBeenCalledTimes(1);
+      // The throwaway probe context is released instead of left to leak (PR901).
+      expect(loseContext).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('keeps masked double-sided vegetation off the transparent blended path', () => {
-    const mat = configureMaskedDoubleSidedVegetationMaterial(new THREE.MeshBasicMaterial({
-      alphaTest: 0.3,
-      transparent: true,
-    }));
+    const mat = configureMaskedDoubleSidedVegetationMaterial(
+      new THREE.MeshBasicMaterial({
+        alphaTest: 0.3,
+        transparent: true,
+      }),
+    );
 
     expect(mat.alphaTest).toBe(0.3);
     expect(mat.side).toBe(THREE.DoubleSide);

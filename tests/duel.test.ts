@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { groundHeight } from '../src/sim/world';
 import type { Aura, Entity } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -9,7 +9,8 @@ function makeWorld() {
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
   const e = sim.entities.get(pid)!;
-  e.pos.x = x; e.pos.z = z;
+  e.pos.x = x;
+  e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
   (sim as any).rebucket(e);
@@ -17,7 +18,10 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 
 // Start an accepted duel between two adjacent players and run the countdown
 // out so the bout is live.
-function startedDuel(aClass: 'warrior' | 'mage' | 'hunter' | 'warlock' = 'warrior', bClass: 'warrior' | 'mage' | 'hunter' | 'warlock' = 'mage'): { sim: Sim; a: number; b: number } {
+function startedDuel(
+  aClass: 'warrior' | 'mage' | 'hunter' | 'warlock' = 'warrior',
+  bClass: 'warrior' | 'mage' | 'hunter' | 'warlock' = 'mage',
+): { sim: Sim; a: number; b: number } {
   const sim = makeWorld();
   const a = sim.addPlayer(aClass, 'Aleph', { autoEquip: true });
   const b = sim.addPlayer(bClass, 'Bet', { autoEquip: true });
@@ -50,10 +54,16 @@ function givePet(sim: Sim, ownerPid: number): Entity {
 // A bleed/poison style damage-over-time applied by the opponent.
 function opponentDot(sourceId: number): Aura {
   return {
-    id: 'test_bleed', name: 'Test Bleed', kind: 'dot',
-    remaining: 10, duration: 10, value: 40,
-    tickInterval: 1, tickTimer: 1,
-    sourceId, school: 'physical',
+    id: 'test_bleed',
+    name: 'Test Bleed',
+    kind: 'dot',
+    remaining: 10,
+    duration: 10,
+    value: 40,
+    tickInterval: 1,
+    tickTimer: 1,
+    sourceId,
+    school: 'physical',
   } as Aura;
 }
 
@@ -156,6 +166,9 @@ describe('duel: PvP combat affordances', () => {
     warlock.gcdRemaining = 0;
     warlock.resource = warlock.maxResource;
     sim.castAbility('curse_of_agony', a);
+    // The curse is a projectile now: it applies when the bolt reaches the warrior
+    // (projectile_travel), a few ticks after the cast, so let it land.
+    for (let i = 0; i < 20 && (sim as any).pendingProjectiles.length > 0; i++) sim.tick();
     expect(warrior.auras.some((aura) => aura.id === 'curse_of_agony')).toBe(true);
 
     warlock.gcdRemaining = 0;

@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { terrainHeight, WATER_LEVEL } from '../sim/world';
-import { PROPS, WORLD_MIN_Z } from '../sim/data';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import { hash2 } from '../sim/rng';
-import { GFX, surfaceMat } from './gfx';
+import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { GFX, sharedUniforms, surfaceMat } from './gfx';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -35,8 +35,12 @@ export interface PropsResult {
    * so the chase cam can pass through props without a wall in view.
    */
   update(
-    camX: number, camY: number, camZ: number,
-    eyeX: number, eyeY: number, eyeZ: number,
+    camX: number,
+    camY: number,
+    camZ: number,
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
     fogFar: number,
   ): void;
 }
@@ -98,34 +102,108 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   anvil: { url: '/models/props/anvil.glb', kit: 'qprops' },
   weaponStand: { url: '/models/props/weapon_stand.glb', kit: 'qprops' },
   lanternWall: { url: '/models/props/lantern_wall.glb', kit: 'qprops' },
+  // Meshy-generated portal door used as the overworld Reliquary Hill marker;
+  // has its own backing slab so the animated shader plane sits on the front face.
+  // No yaw here: the geometry is CACHED and shared by every delve marker, so a
+  // per-delve flip is applied to the placed group in buildProps, never baked.
+  delveEntrance2: { url: '/models/dungeon/delve_entrance_2.glb', kit: 'dungeon' },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
-const ACTIVE_PROP_KEYS = new Set<PropKey>(GFX.standardMaterials
-  ? Object.keys(PROP_ASSET_DEFS) as PropKey[]
-  : [
-    'house1', 'house2', 'house3', 'blacksmith', 'inn', 'bellTower', 'well',
-    'stand1', 'stand2', 'cart', 'fence', 'bonfire', 'oreRocks',
-    'tentOpen', 'tentSmall', 'rockLargeD', 'mushroomRed', 'column', 'columnBroken',
-    'dockPlatform', 'rowboat', 'graveRound', 'timberPillar', 'crateWooden', 'barrel',
-  ]);
+const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
+
+// The props the renderer actually RENDERS at the low graphics tier: a subset, since
+// low gfx drops the decorative/secondary props (anvils, gravestones beyond the round
+// one, extra rocks, statues, ...). Medium and higher render every entry in
+// PROP_ASSET_DEFS. This list scopes ONLY the per-tier work (material prewarm); it is
+// deliberately NOT the preload set (see preloadPropKeys below).
+const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
+  'house1',
+  'house2',
+  'house3',
+  'blacksmith',
+  'inn',
+  'bellTower',
+  'well',
+  'stand1',
+  'stand2',
+  'cart',
+  'fence',
+  'bonfire',
+  'oreRocks',
+  'tentOpen',
+  'tentSmall',
+  'rockLargeD',
+  'mushroomRed',
+  'column',
+  'columnBroken',
+  'dockPlatform',
+  'rowboat',
+  'graveRound',
+  'timberPillar',
+  'crateWooden',
+  'barrel',
+  'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
+];
+
+/**
+ * The props to PRELOAD, given the graphics tier guessed when this module was first
+ * imported. This MUST be tier-INDEPENDENT.
+ *
+ * buildProps() places props from the LIVE GFX tier, which is resolved later: the
+ * Renderer calls initGfxTier() (which reassigns the GFX global from the real WebGL
+ * context) AFTER this module froze its import-time GFX best-guess. If the import-time
+ * guess comes in LOWER than the render tier (e.g. a weak/hybrid-GPU probe guesses low,
+ * the high-performance renderer then resolves medium+), a tier-SCOPED preload set
+ * would omit props that buildProps then places, and propAsset() throws "prop asset
+ * not preloaded", the v0.16.0 farmCrate crash on world entry (red "Could not start
+ * the renderer" overlay). So every tier preloads the full PROP_ASSET_DEFS, mirroring
+ * foliage.ts, which sources its one frozen MODEL_URLS list for both preload and
+ * placement and is structurally immune to this class of bug. Because every placement
+ * key is typed PropKey (a key of PROP_ASSET_DEFS), the full set is provably a superset
+ * of anything buildProps can place, on every tier and device.
+ *
+ * The arg is retained to document the invariant and to let the guard test assert it at
+ * the lowest (most dangerous) import tier; the result intentionally ignores it.
+ */
+function preloadPropKeys(_importTierStandardMaterials: boolean): Set<PropKey> {
+  return new Set<PropKey>(ALL_PROP_KEYS);
+}
 
 // Headless sim/test imports never fetch; the browser kicks loads immediately.
 if (typeof window !== 'undefined') {
+  const preloadKeys = preloadPropKeys(GFX.standardMaterials);
   for (const [key, def] of Object.entries(PROP_ASSET_DEFS)) {
-    if (!ACTIVE_PROP_KEYS.has(key as PropKey)) continue;
-    registerPreload(loadGltf(def.url).then((gltf) => { loadedProps.set(key, gltf); }));
+    if (!preloadKeys.has(key as PropKey)) continue;
+    registerPreload(
+      loadGltf(def.url).then((gltf) => {
+        loadedProps.set(key, gltf);
+      }),
+    );
   }
 }
 
+/** Test-only window into the preload/prewarm key sets (see tests/render_asset_preload). */
+export const propPreloadInternalsForTest = {
+  allPropKeys: ALL_PROP_KEYS,
+  lowTierPropKeys: LOW_TIER_PROP_KEYS,
+  preloadPropKeys,
+};
+
 // Per-material look overrides, keyed `${kit}:${name}` (falls back to name).
 // Kenney/Quaternius flat materials need small nudges to sit in our lighting.
-const MAT_OVERRIDES: Record<string, {
-  color?: number; emissive?: number; emissiveIntensity?: number;
-  metalness?: number; roughness?: number;
-}> = {
+const MAT_OVERRIDES: Record<
+  string,
+  {
+    color?: number;
+    emissive?: number;
+    emissiveIntensity?: number;
+    metalness?: number;
+    roughness?: number;
+  }
+> = {
   'village:Windows': { emissive: 0x2a3c55, emissiveIntensity: 1.1, roughness: 0.4 },
   'village:Bell': { metalness: 0.6, roughness: 0.35 },
   'ore:Stone_Dark': { color: 0xb87333, metalness: 0.45, roughness: 0.5 },
@@ -150,14 +228,23 @@ const MAT_OVERRIDES: Record<string, {
 // for any other consumer, and the static merge may freely dispose ours.
 // ---------------------------------------------------------------------------
 
-interface AssetPart { geo: THREE.BufferGeometry; mat: THREE.Material }
-interface PropAsset { parts: AssetPart[]; size: THREE.Vector3 }
+interface AssetPart {
+  geo: THREE.BufferGeometry;
+  mat: THREE.Material;
+}
+interface PropAsset {
+  parts: AssetPart[];
+  size: THREE.Vector3;
+}
 
 const extractCache = new Map<string, PropAsset>();
 const matConvCache = new Map<string, THREE.Material>();
 
 /** denormalized float copy — meshopt/quantized attrs must not be transformed in place */
-function toFloatAttr(attr: THREE.BufferAttribute | THREE.InterleavedBufferAttribute, itemSize: number): THREE.BufferAttribute {
+function toFloatAttr(
+  attr: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+  itemSize: number,
+): THREE.BufferAttribute {
   const out = new Float32Array(attr.count * itemSize);
   for (let i = 0; i < attr.count; i++) {
     out[i * itemSize] = attr.getX(i);
@@ -167,7 +254,11 @@ function toFloatAttr(attr: THREE.BufferAttribute | THREE.InterleavedBufferAttrib
   return new THREE.BufferAttribute(out, itemSize);
 }
 
-function convertMaterial(src: THREE.Material, kit: string, hasVertexColors: boolean): THREE.Material {
+function convertMaterial(
+  src: THREE.Material,
+  kit: string,
+  hasVertexColors: boolean,
+): THREE.Material {
   const s = src as THREE.MeshStandardMaterial; // basic (unlit) shares the fields we read
   const ov = MAT_OVERRIDES[`${kit}:${s.name}`] ?? MAT_OVERRIDES[s.name];
   // hasVertexColors must key the cache: kits share material names between
@@ -176,12 +267,16 @@ function convertMaterial(src: THREE.Material, kit: string, hasVertexColors: bool
   const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
-  const color = ov?.color !== undefined ? new THREE.Color(ov.color) : (s.color?.clone() ?? new THREE.Color(0xffffff));
+  const color =
+    ov?.color !== undefined
+      ? new THREE.Color(ov.color)
+      : (s.color?.clone() ?? new THREE.Color(0xffffff));
   const map = s.map ?? null;
   let mat: THREE.Material;
   if (GFX.standardMaterials) {
     mat = new THREE.MeshStandardMaterial({
-      color, map,
+      color,
+      map,
       vertexColors: hasVertexColors,
       normalMap: s.normalMap ?? null,
       roughnessMap: s.roughnessMap ?? null,
@@ -194,7 +289,8 @@ function convertMaterial(src: THREE.Material, kit: string, hasVertexColors: bool
     });
   } else {
     mat = new THREE.MeshLambertMaterial({
-      color, map,
+      color,
+      map,
       vertexColors: hasVertexColors,
       emissive: new THREE.Color(ov?.emissive ?? 0x000000),
       emissiveIntensity: (ov?.emissiveIntensity ?? 1) * 0.6,
@@ -224,9 +320,18 @@ function propAsset(key: PropKey): PropAsset {
     const src = mesh.geometry;
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', toFloatAttr(src.getAttribute('position'), 3));
-    if (src.getAttribute('normal')) geo.setAttribute('normal', toFloatAttr(src.getAttribute('normal'), 3));
+    if (src.getAttribute('normal'))
+      geo.setAttribute('normal', toFloatAttr(src.getAttribute('normal'), 3));
     const uv = src.getAttribute('uv');
-    geo.setAttribute('uv', uv ? toFloatAttr(uv, 2) : new THREE.BufferAttribute(new Float32Array((src.getAttribute('position') as THREE.BufferAttribute).count * 2), 2));
+    geo.setAttribute(
+      'uv',
+      uv
+        ? toFloatAttr(uv, 2)
+        : new THREE.BufferAttribute(
+            new Float32Array((src.getAttribute('position') as THREE.BufferAttribute).count * 2),
+            2,
+          ),
+    );
     // authored vertex tints (trim-kit 'Vertex' materials depend on them);
     // toFloatAttr denormalizes the uint8 COLOR_0, alpha is 1.0 kit-wide
     const col = src.getAttribute('color');
@@ -244,7 +349,8 @@ function propAsset(key: PropKey): PropAsset {
     p.geo.computeBoundingBox();
     box.union(p.geo.boundingBox as THREE.Box3);
   }
-  const cx = (box.min.x + box.max.x) / 2, cz = (box.min.z + box.max.z) / 2;
+  const cx = (box.min.x + box.max.x) / 2,
+    cz = (box.min.z + box.max.z) / 2;
   for (const p of parts) {
     p.geo.translate(-cx, -box.min.y, -cz);
     p.geo.computeBoundingBox();
@@ -273,22 +379,42 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
     group.add(obj);
     idx++;
   };
-  for (const key of ACTIVE_PROP_KEYS) {
+  // castShadow so the depth/shadow program variant compiles too (ultra renders a
+  // shadow pass; structures cast shadows live). instanceColor covers the tinted
+  // instance variant the way the live placed props do; the plain InstancedMesh
+  // and Mesh cover the untinted and non-instanced paths.
+  const white = new THREE.Color(1, 1, 1);
+  // Prewarm only the props that actually render at the LIVE tier (this runs after
+  // initGfxTier via the Renderer, so GFX is authoritative here, unlike the import-time
+  // best-guess): low renders the LOW_TIER_PROP_KEYS subset, medium+ renders the full
+  // catalog. Keying off the live tier rather than an import-frozen guess means a low
+  // import guess on a medium+ renderer still prewarms every prop it will draw, so the
+  // props the low subset omits do not take a first-frame shader-compile hitch.
+  const prewarmKeys = GFX.standardMaterials ? ALL_PROP_KEYS : LOW_TIER_PROP_KEYS;
+  for (const key of prewarmKeys) {
     const asset = propAsset(key);
     for (const part of asset.parts) {
       const matKey = `${part.mat.uuid}:${part.geo.getAttribute('color') ? 'color' : 'plain'}`;
       if (seen.has(matKey)) continue;
       seen.add(matKey);
       const mesh = new THREE.Mesh(part.geo, part.mat);
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
       place(mesh);
       const instanced = new THREE.InstancedMesh(part.geo, part.mat, 1);
       instanced.setMatrixAt(0, instanceMatrix.identity());
       instanced.instanceMatrix.needsUpdate = true;
-      instanced.castShadow = false;
-      instanced.receiveShadow = false;
+      instanced.castShadow = true;
+      instanced.receiveShadow = true;
       place(instanced);
+      const tinted = new THREE.InstancedMesh(part.geo, part.mat, 1);
+      tinted.setMatrixAt(0, instanceMatrix.identity());
+      tinted.setColorAt(0, white);
+      tinted.instanceMatrix.needsUpdate = true;
+      if (tinted.instanceColor) tinted.instanceColor.needsUpdate = true;
+      tinted.castShadow = true;
+      tinted.receiveShadow = true;
+      place(tinted);
     }
   }
   return group;
@@ -314,7 +440,231 @@ function setScale(o: THREE.Object3D, s: Scale): void {
   else o.scale.set(s[0], s[1], s[2]);
 }
 
-export function buildProps(seed: number): PropsResult {
+// ---------------------------------------------------------------------------
+// Delve-mouth portal: a self-animating red "void" sheet that fills the entrance
+// arch, driven by the shared uTime clock (no per-frame JS plumbing, same
+// pattern as the Drowned-Temple water in dungeon.ts). A churning swirl + a
+// global breathing pulse take a deep near-black red up to a hot bright red; the
+// circular alpha mask hides the plane's rectangular edges so it reads as a glowing
+// mouth. On the composer tiers the hot core is pushed past 1.0 (uHdr) so it
+// blooms; on low/headless (no composer) the colour stays saturated so it still
+// reads without bloom.
+// ---------------------------------------------------------------------------
+const DELVE_PORTAL_VERT = /* glsl */ `
+  varying vec2 vUv;
+  varying vec3 vWPos;
+  #include <fog_pars_vertex>
+  void main() {
+    vUv = uv;
+    vec4 wp = modelMatrix * vec4(position, 1.0);
+    vWPos = wp.xyz;
+    vec4 mvPosition = viewMatrix * wp;
+    gl_Position = projectionMatrix * mvPosition;
+    #include <fog_vertex>
+  }
+`;
+const DELVE_PORTAL_FRAG = /* glsl */ `
+  uniform float uTime;
+  uniform vec3 uDim;
+  uniform vec3 uBright;
+  uniform vec3 uRim;
+  uniform float uHdr;
+  varying vec2 vUv;
+  varying vec3 vWPos;
+  #include <common>
+  #include <fog_pars_fragment>
+  void main() {
+    vec2 p = vUv * 2.0 - 1.0; // centre-origin -1..1
+    float r = length(p);
+
+    // spinning vortex: angular phase + time rotates concentric rings inward
+    float angle  = atan(p.y, p.x) / (2.0 * PI); // 0..1 around the disc
+    float vortex = sin((angle + uTime * 0.10) * PI * 12.0 + r * 10.0 - uTime * 2.0) * 0.5 + 0.5;
+
+    // three churning noise layers for organic variation
+    float swirl = sin(p.x * 5.0 + uTime * 1.0)
+                + sin(p.y * 6.0 - uTime * 0.85)
+                + sin((p.x + p.y) * 4.5 + uTime * 0.65);
+    float churn = 0.5 + 0.28 * (swirl / 3.0);
+
+    // slow ominous breathing pulse
+    float pulse = 0.5 + 0.5 * sin(uTime * 0.85);
+
+    // hot outer rim (caller-tinted; crimson by default, watery cyan for the drowned shrine)
+    vec3 rimCol = uRim * uHdr;
+
+    // zone blending: void core (uDim) → mid swirl (uBright) → rim
+    float toMid  = smoothstep(0.06, 0.55, r);
+    float toRim  = smoothstep(0.45, 0.85, r);
+    float ringEnergy = vortex * churn * smoothstep(0.90, 0.05, r);
+
+    vec3 col = uDim;
+    col = mix(col, uBright, toMid * (0.55 + 0.45 * ringEnergy));
+    col = mix(col, rimCol,  toRim * (0.45 + 0.55 * pulse));
+    col += uBright * smoothstep(0.28, 0.0, r) * 0.6 * uHdr; // core bloom
+
+    // fill the whole opening as a dark solid portal; feather only the outer rim
+    vec2 e = abs(p);
+    float fill = (1.0 - smoothstep(0.76, 1.0, e.x)) * (1.0 - smoothstep(0.76, 1.0, e.y));
+    float alpha = fill * (0.93 + 0.07 * pulse);
+
+    gl_FragColor = vec4(col, clamp(alpha, 0.0, 1.0));
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+    #include <fog_fragment>
+  }
+`;
+
+const delvePortalMatCache = new Map<string, THREE.ShaderMaterial>();
+function delvePortalMaterial(dim: number, bright: number, rim: number): THREE.ShaderMaterial {
+  const key = `${dim}_${bright}_${rim}`;
+  let mat = delvePortalMatCache.get(key);
+  if (mat) return mat;
+  mat = new THREE.ShaderMaterial({
+    uniforms: {
+      ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
+      uTime: sharedUniforms.uTime,
+      uDim: { value: new THREE.Color(dim) },
+      uBright: { value: new THREE.Color(bright) },
+      uRim: { value: new THREE.Color(rim) },
+      uHdr: { value: GFX.composer ? 2.8 : 1.0 },
+    },
+    vertexShader: DELVE_PORTAL_VERT,
+    fragmentShader: DELVE_PORTAL_FRAG,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.FrontSide,
+    fog: true,
+  });
+  delvePortalMatCache.set(key, mat);
+  return mat;
+}
+
+// The delve-entrance GLB bakes its stone AND its hanging veil into one shared
+// texture (single unnamed material), so the veil can't be recolored by material
+// name. For the drowned shrine we want that red veil to read as water: clone the
+// converted material and inject a red→blue recolor that only touches reddish
+// texels (R dominant over G/B), leaving the grey stone untouched. Cloned per
+// asset-part material so the default (purple) entrance keeps the original red veil.
+const drowningVeilMatCache = new Map<THREE.Material, THREE.Material>();
+function drownVeilMaterial(src: THREE.Material): THREE.Material {
+  const cached = drowningVeilMatCache.get(src);
+  if (cached) return cached;
+  const m = src.clone();
+  m.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <map_fragment>',
+      `#include <map_fragment>
+      // recolor the baked red veil to a murky Blackwater blue; red-dominance gates it
+      // so stone stays grey. The gate must SATURATE (smoothstep, full recolor by 0.15):
+      // texels here are linear-space, where even a bright red fold only reaches ~0.5
+      // dominance, and the old linear-strength mix left half the red channel intact,
+      // so the veil still read red in-game. Stone dominance measures under 0.01.
+      float _veilRed = smoothstep(0.02, 0.15, diffuseColor.r - max(diffuseColor.g, diffuseColor.b));
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.04, 0.13, 0.2) * (0.4 + diffuseColor.r), _veilRed);
+      `,
+    );
+  };
+  // a distinct program key so three doesn't reuse the un-injected cached program
+  m.customProgramCacheKey = () => 'drownVeil';
+  drowningVeilMatCache.set(src, m);
+  return m;
+}
+
+// Embers drifting up out of the delve mouth, a deterministic point cloud whose
+// whole motion (rise + sideways waver + life fade) is a function of uTime, so it
+// self-animates with no per-frame JS. Additive + HDR-boosted so it glows and
+// blooms on composer tiers; reads as warm sparks on low too.
+const DELVE_EMBER_VERT = /* glsl */ `
+  uniform float uTime;
+  uniform float uRise;
+  attribute float aPhase;
+  attribute float aSpeed;
+  attribute float aDrift;
+  varying float vLife;
+  void main() {
+    float t = fract(uTime * aSpeed + aPhase); // 0..1 life cycle
+    vLife = t;
+    vec3 pos = position;
+    pos.y += t * uRise;                                  // rise
+    pos.x += sin((t + aPhase) * 6.2831) * aDrift;        // lazy sideways waver
+    vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+    gl_PointSize = (95.0 / max(-mv.z, 1.0)) * (0.45 + 0.55 * sin(t * 3.14159));
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+const DELVE_EMBER_FRAG = /* glsl */ `
+  uniform float uHdr;
+  uniform vec3 uCol1;
+  uniform vec3 uCol2;
+  varying float vLife;
+  void main() {
+    vec2 c = gl_PointCoord - 0.5;
+    float d = length(c);
+    if (d > 0.5) discard;
+    float soft = smoothstep(0.5, 0.0, d);
+    float fade = sin(vLife * 3.14159);                   // fade in then out over life
+    vec3 col = mix(uCol1, uCol2, vLife) * uHdr;
+    gl_FragColor = vec4(col, soft * fade * 0.85);
+  }
+`;
+
+function buildDelveEmbers(
+  cx: number,
+  baseY: number,
+  cz: number,
+  halfW: number,
+  riseY: number,
+  col1: [number, number, number] = [1.0, 0.16, 0.09],
+  col2: [number, number, number] = [1.0, 0.5, 0.18],
+): THREE.Points {
+  const N = GFX.standardMaterials ? 48 : 28; // lighter on low
+  const positions = new Float32Array(N * 3);
+  const phase = new Float32Array(N);
+  const speed = new Float32Array(N);
+  const drift = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    positions[i * 3] = (hash2(i * 1.7, cx, 0x656d62) - 0.5) * halfW * 2;
+    positions[i * 3 + 1] = hash2(i * 2.3, cz, 0x656d62) * 1.5; // start low in the mouth
+    positions[i * 3 + 2] = (hash2(i * 3.1, cx + cz, 0x656d62) - 0.5) * 0.6;
+    phase[i] = hash2(i * 4.5, cx, 0x656d62);
+    speed[i] = 0.05 + hash2(i * 5.9, cz, 0x656d62) * 0.09;
+    drift[i] = 0.3 + hash2(i * 6.7, cx, 0x656d62) * 0.7;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('aPhase', new THREE.BufferAttribute(phase, 1));
+  geo.setAttribute('aSpeed', new THREE.BufferAttribute(speed, 1));
+  geo.setAttribute('aDrift', new THREE.BufferAttribute(drift, 1));
+  // motion happens in the shader, so bound it manually or it culls at rest
+  geo.boundingSphere = new THREE.Sphere(
+    new THREE.Vector3(0, riseY / 2, 0),
+    Math.max(halfW, riseY) + 1.5,
+  );
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: sharedUniforms.uTime,
+      uRise: { value: riseY },
+      uHdr: { value: GFX.composer ? 2.0 : 1.0 },
+      uCol1: { value: new THREE.Vector3(...col1) },
+      uCol2: { value: new THREE.Vector3(...col2) },
+    },
+    vertexShader: DELVE_EMBER_VERT,
+    fragmentShader: DELVE_EMBER_FRAG,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const pts = new THREE.Points(geo, mat);
+  pts.position.set(cx, baseY, cz);
+  pts.renderOrder = 4; // over the void + vault
+  return pts;
+}
+
+// `delveLabel` resolves a delve id to its localized display name for the carved
+// entrance sign. Passed in by renderer.ts (the only render-side i18n surface) so
+// props.ts itself stays string-table-free; falls back to the id if absent.
+export function buildProps(seed: number, delveLabel?: (delveId: string) => string): PropsResult {
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
   const fireLights: THREE.PointLight[] = [];
@@ -356,7 +706,12 @@ export function buildProps(seed: number): PropsResult {
   const lowProps = !usePbr;
   const recessMat = surfaceMat({ color: 0x14100b, roughness: 1 });
   const holeMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
-  const lanternMat = surfaceMat({ color: 0xffcc66, emissive: 0xff9933, emissiveIntensity: usePbr ? 2 : 1.2, roughness: 0.4 });
+  const lanternMat = surfaceMat({
+    color: 0xffcc66,
+    emissive: 0xff9933,
+    emissiveIntensity: usePbr ? 2 : 1.2,
+    roughness: 0.4,
+  });
 
   // emissive glass / black hole-fillers opt out of shadow casting; shadowed()
   // runs after the builders so a plain `castShadow = false` would be clobbered
@@ -372,9 +727,18 @@ export function buildProps(seed: number): PropsResult {
   }
 
   /** add one asset's meshes under `parent` with a local transform */
-  function addParts(parent: THREE.Object3D, key: PropKey, opts: {
-    x?: number; y?: number; z?: number; rot?: number; scale: Scale; euler?: THREE.Euler;
-  }): THREE.Group {
+  function addParts(
+    parent: THREE.Object3D,
+    key: PropKey,
+    opts: {
+      x?: number;
+      y?: number;
+      z?: number;
+      rot?: number;
+      scale: Scale;
+      euler?: THREE.Euler;
+    },
+  ): THREE.Group {
     const a = propAsset(key);
     const holder = new THREE.Group();
     for (const p of a.parts) holder.add(new THREE.Mesh(p.geo, p.mat));
@@ -392,7 +756,14 @@ export function buildProps(seed: number): PropsResult {
   const tmpQuat = new THREE.Quaternion();
   const tmpScale = new THREE.Vector3();
 
-  function addInstance(key: PropKey, x: number, y: number, z: number, rot: THREE.Euler | number, scale: Scale): void {
+  function addInstance(
+    key: PropKey,
+    x: number,
+    y: number,
+    z: number,
+    rot: THREE.Euler | number,
+    scale: Scale,
+  ): void {
     tmpPos.set(x, y, z);
     tmpQuat.setFromEuler(typeof rot === 'number' ? new THREE.Euler(0, rot, 0) : rot);
     if (typeof scale === 'number') tmpScale.setScalar(scale);
@@ -409,9 +780,14 @@ export function buildProps(seed: number): PropsResult {
 
   // ---- buildings: village houses / inn / composed chapel ------------------
   const housePool: PropKey[] = ['house1', 'house2', 'blacksmith'];
-  const houseHeight: Record<string, number> = { house1: 8.0, house2: 7.6, blacksmith: 6.6, inn: 7.6 };
+  const houseHeight: Record<string, number> = {
+    house1: 8.0,
+    house2: 7.6,
+    blacksmith: 6.6,
+    inn: 7.6,
+  };
 
-  for (const b of PROPS.buildings) {
+  for (const b of getActiveWorldContent().props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
     // roof Y mirrors the camera collider height in colliders.ts
@@ -436,7 +812,8 @@ export function buildProps(seed: number): PropsResult {
       registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
       continue;
     }
-    const asset: PropKey = b.kind === 'inn' ? 'inn' : housePool[Math.floor(keyRand(key, 3) * 0.999 * housePool.length)];
+    const asset: PropKey =
+      b.kind === 'inn' ? 'inn' : housePool[Math.floor(keyRand(key, 3) * 0.999 * housePool.length)];
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
@@ -447,7 +824,7 @@ export function buildProps(seed: number): PropsResult {
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
-  PROPS.stalls.forEach((s, i) => {
+  getActiveWorldContent().props.stalls.forEach((s, i) => {
     const key = s.x * 7.7 + s.z * 2.3;
     const g = new THREE.Group();
     const standKey: PropKey = i % 2 === 0 ? 'stand1' : 'stand2';
@@ -471,7 +848,7 @@ export function buildProps(seed: number): PropsResult {
   });
 
   // ---- wells ---------------------------------------------------------------
-  for (const w of PROPS.wells) {
+  for (const w of getActiveWorldContent().props.wells) {
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
@@ -482,49 +859,80 @@ export function buildProps(seed: number): PropsResult {
   }
 
   // ---- graveyards: 4 headstone shapes, leaning, instanced ------------------
-  const graveKinds: PropKey[] = lowProps ? ['graveRound'] : ['graveRound', 'graveCross', 'graveBevel', 'graveDecor'];
-  for (const gy of PROPS.graveyards) {
+  const graveKinds: PropKey[] = lowProps
+    ? ['graveRound']
+    : ['graveRound', 'graveCross', 'graveBevel', 'graveDecor'];
+  for (const gy of getActiveWorldContent().props.graveyards) {
     for (let i = 0; i < 6; i++) {
-      const gx = gy.x + (i % 3) * 2.2, gz = gy.z + Math.floor(i / 3) * 2.6;
+      const gx = gy.x + (i % 3) * 2.2,
+        gz = gy.z + Math.floor(i / 3) * 2.6;
       const s = 2.0 + keyRand(gx * 3 + gz, 4) * 0.5;
-      addInstance(graveKinds[i % graveKinds.length], gx, ground(gx, gz) - 0.06, gz, new THREE.Euler(
-        (propRand(gx, gz, 1) - 0.5) * 0.2,
-        i * 0.4 + (propRand(gx, gz, 2) - 0.5) * 0.5,
-        (propRand(gx, gz, 3) - 0.5) * 0.22,
-      ), s);
+      addInstance(
+        graveKinds[i % graveKinds.length],
+        gx,
+        ground(gx, gz) - 0.06,
+        gz,
+        new THREE.Euler(
+          (propRand(gx, gz, 1) - 0.5) * 0.2,
+          i * 0.4 + (propRand(gx, gz, 2) - 0.5) * 0.5,
+          (propRand(gx, gz, 3) - 0.5) * 0.22,
+        ),
+        s,
+      );
     }
   }
 
   // ---- town fences: village fence module repeated along the run ------------
-  for (const f of PROPS.fences) {
+  for (const f of getActiveWorldContent().props.fences) {
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
     const n = Math.max(1, Math.round(len / 2.35));
-    const dirx = (f.x2 - f.x1) / len, dirz = (f.z2 - f.z1) / len;
+    const dirx = (f.x2 - f.x1) / len,
+      dirz = (f.z2 - f.z1) / len;
     const yaw = Math.atan2(-dirz, dirx); // module length runs along local +x
     for (let i = 0; i < n; i++) {
-      const x0 = f.x1 + (f.x2 - f.x1) * (i / n), z0 = f.z1 + (f.z2 - f.z1) * (i / n);
-      const x1 = f.x1 + (f.x2 - f.x1) * ((i + 1) / n), z1 = f.z1 + (f.z2 - f.z1) * ((i + 1) / n);
-      const g0 = ground(x0, z0), g1 = ground(x1, z1);
+      const x0 = f.x1 + (f.x2 - f.x1) * (i / n),
+        z0 = f.z1 + (f.z2 - f.z1) * (i / n);
+      const x1 = f.x1 + (f.x2 - f.x1) * ((i + 1) / n),
+        z1 = f.z1 + (f.z2 - f.z1) * ((i + 1) / n);
+      const g0 = ground(x0, z0),
+        g1 = ground(x1, z1);
       const pitch = Math.atan2(g1 - g0, len / n);
-      const mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
+      const mx = (x0 + x1) / 2,
+        mz = (z0 + z1) / 2;
       const sy = 2.9 + (propRand(mx, mz, 1) - 0.5) * 0.5;
-      addInstance('fence', mx, (g0 + g1) / 2 - 0.05, mz,
-        new THREE.Euler(0, yaw, pitch, 'YZX'), [3.0, sy, 3.0]);
+      addInstance('fence', mx, (g0 + g1) / 2 - 0.05, mz, new THREE.Euler(0, yaw, pitch, 'YZX'), [
+        3.0,
+        sy,
+        3.0,
+      ]);
     }
   }
 
   // ---- campfires: hideable bonfire base + live animated flame + light ------
-  const flamePts = [[0, 0], [0.16, 0.1], [0.27, 0.28], [0.3, 0.45], [0.22, 0.66], [0.1, 0.84], [0.001, 0.95]]
-    .map(([r, y]) => new THREE.Vector2(r, y));
+  const flamePts = [
+    [0, 0],
+    [0.16, 0.1],
+    [0.27, 0.28],
+    [0.3, 0.45],
+    [0.22, 0.66],
+    [0.1, 0.84],
+    [0.001, 0.95],
+  ].map(([r, y]) => new THREE.Vector2(r, y));
   const flameGeo = new THREE.LatheGeometry(flamePts, 7);
-  for (const [x, z] of PROPS.campfires) {
+  for (const [x, z] of getActiveWorldContent().props.campfires) {
     const y = ground(x, z);
     const g = new THREE.Group();
     addParts(g, 'bonfire', { y: -0.05, rot: propRand(x, z, 1) * Math.PI * 2, scale: 4.3 });
-    const flame = new THREE.Mesh(flameGeo, new THREE.MeshLambertMaterial({
-      color: 0xffaa33, emissive: 0xff6600, emissiveIntensity: usePbr ? 2.2 : 1.4,
-      transparent: true, opacity: 0.92,
-    }));
+    const flame = new THREE.Mesh(
+      flameGeo,
+      new THREE.MeshLambertMaterial({
+        color: 0xffaa33,
+        emissive: 0xff6600,
+        emissiveIntensity: usePbr ? 2.2 : 1.4,
+        transparent: true,
+        opacity: 0.92,
+      }),
+    );
     flame.position.y = 0.16;
     flame.scale.setScalar(1.15);
     g.add(flame);
@@ -540,7 +948,7 @@ export function buildProps(seed: number): PropsResult {
   }
 
   // ---- bandit/war tents: Kenney ridge tents, opening on +z, hideable -------
-  for (const t of PROPS.tents) {
+  for (const t of getActiveWorldContent().props.tents) {
     const kind: PropKey = propRand(t.x, t.z, 2) < 0.55 ? 'tentOpen' : 'tentSmall';
     const a = propAsset(kind);
     const s = (3.0 * t.scale) / Math.max(a.size.x, a.size.z);
@@ -549,23 +957,23 @@ export function buildProps(seed: number): PropsResult {
     addParts(g, kind, { scale: [s, s * 1.32, s] });
     g.position.set(t.x, y - 0.06, t.z);
     g.rotation.set(
-      (propRand(t.x, t.z, 3) - 0.5) * 0.06, t.rot, (propRand(t.x, t.z, 4) - 0.5) * 0.06,
+      (propRand(t.x, t.z, 3) - 0.5) * 0.06,
+      t.rot,
+      (propRand(t.x, t.z, 4) - 0.5) * 0.06,
     );
     group.add(shadowed(g));
     registerHideable(g, circleFootprint(t.x, t.z, 1.5 * t.scale, y + 3.4 * t.scale, 3.0 * t.scale));
   }
 
   // ---- crates: camp clutter (wooden crate / barrel mix), hideable ----------
-  PROPS.crates.forEach(([x, z], i) => {
+  getActiveWorldContent().props.crates.forEach(([x, z], i) => {
     const kind: PropKey = i % 3 === 2 ? 'barrel' : 'crateWooden';
     const s = kind === 'barrel' ? 1.25 : 1.3 + propRand(x, z, 5) * 0.15;
     const y = ground(x, z);
     const g = new THREE.Group();
     addParts(g, kind, {
       scale: s,
-      euler: new THREE.Euler(
-        (propRand(x, z, 7) - 0.5) * 0.05, ((x * 13 + z * 7) % 1) * Math.PI, 0,
-      ),
+      euler: new THREE.Euler((propRand(x, z, 7) - 0.5) * 0.05, ((x * 13 + z * 7) % 1) * Math.PI, 0),
     });
     g.position.set(x, y - 0.04, z);
     group.add(shadowed(g));
@@ -573,11 +981,14 @@ export function buildProps(seed: number): PropsResult {
   });
 
   // ---- murloc mud huts: giant swamp mushrooms, doorway facing camp center --
-  const hutCenter = PROPS.mudHuts.reduce(
-    (acc, [hx, hz]) => ({ x: acc.x + hx / PROPS.mudHuts.length, z: acc.z + hz / PROPS.mudHuts.length }),
+  const hutCenter = getActiveWorldContent().props.mudHuts.reduce(
+    (acc, [hx, hz]) => ({
+      x: acc.x + hx / getActiveWorldContent().props.mudHuts.length,
+      z: acc.z + hz / getActiveWorldContent().props.mudHuts.length,
+    }),
     { x: 0, z: 0 },
   );
-  for (const [x, z] of PROPS.mudHuts) {
+  for (const [x, z] of getActiveWorldContent().props.mudHuts) {
     const y = ground(x, z);
     const g = new THREE.Group();
     const sxz = 13 + propRand(x, z, 15) * 3;
@@ -586,7 +997,9 @@ export function buildProps(seed: number): PropsResult {
       y: -0.15,
       scale: [sxz, sy, sxz],
       euler: new THREE.Euler(
-        (propRand(x, z, 13) - 0.5) * 0.1, propRand(x, z, 12) * Math.PI * 2, (propRand(x, z, 14) - 0.5) * 0.1,
+        (propRand(x, z, 13) - 0.5) * 0.1,
+        propRand(x, z, 12) * Math.PI * 2,
+        (propRand(x, z, 14) - 0.5) * 0.1,
       ),
     });
     // doorway decal aimed at the camp heart
@@ -601,7 +1014,9 @@ export function buildProps(seed: number): PropsResult {
       // toadstool cluster at the foot
       const a2 = face + 0.9 + propRand(x, z, 18);
       addParts(g, 'mushroomTan', {
-        x: Math.sin(a2) * 1.7, y: -0.05, z: Math.cos(a2) * 1.7,
+        x: Math.sin(a2) * 1.7,
+        y: -0.05,
+        z: Math.cos(a2) * 1.7,
         rot: propRand(x, z, 19) * Math.PI * 2,
         scale: 2.6 + propRand(x, z, 20) * 1.4,
       });
@@ -612,10 +1027,11 @@ export function buildProps(seed: number): PropsResult {
   }
 
   // ---- ruin rings: weathered monolith columns at the exact collider angles -
-  for (const r of PROPS.ruinRings) {
+  for (const r of getActiveWorldContent().props.ruinRings) {
     for (let i = 0; i < r.columns; i++) {
       const ang = (i / r.columns) * Math.PI * 2;
-      const x = r.x + Math.sin(ang) * r.ringR, z = r.z + Math.cos(ang) * r.ringR;
+      const x = r.x + Math.sin(ang) * r.ringR,
+        z = r.z + Math.cos(ang) * r.ringR;
       const intact = i % 4 === 1;
       const kind: PropKey = intact ? 'column' : 'columnBroken';
       const sy = intact ? 3.5 + (i % 2) * 0.5 : 1.7 + (i % 3) * 0.85;
@@ -624,7 +1040,8 @@ export function buildProps(seed: number): PropsResult {
       addParts(g, kind, {
         scale: [3.8, sy, 3.8],
         euler: new THREE.Euler(
-          0, propRand(x, z, 8) * Math.PI,
+          0,
+          propRand(x, z, 8) * Math.PI,
           (i % 3 === 0 ? 0.13 : 0.03) * (i % 2 ? 1 : -1),
         ),
       });
@@ -637,30 +1054,55 @@ export function buildProps(seed: number): PropsResult {
     const fy = ground(r.x - 2, r.z - 3);
     const g = new THREE.Group();
     addParts(g, 'statueHead', {
-      x: -0.4, y: -0.55, z: 0.3, scale: 2.3,
+      x: -0.4,
+      y: -0.55,
+      z: 0.3,
+      scale: 2.3,
       euler: new THREE.Euler(0.34, propRand(r.x, r.z, 30) * Math.PI * 2, 0.22),
     });
     addParts(g, 'statueBlock', {
-      x: 2.1, y: -0.2, z: -1.3, rot: propRand(r.x, r.z, 31) * Math.PI, scale: 2.1,
+      x: 2.1,
+      y: -0.2,
+      z: -1.3,
+      rot: propRand(r.x, r.z, 31) * Math.PI,
+      scale: 2.1,
     });
     addParts(g, 'column', {
-      x: -1.2, y: 0.62, z: -2.2, scale: 3.2,
-      euler: new THREE.Euler(Math.PI / 2 - 0.06, 0.6 + (propRand(r.x, r.z, 32) - 0.5) * 0.4, 0, 'YXZ'),
+      x: -1.2,
+      y: 0.62,
+      z: -2.2,
+      scale: 3.2,
+      euler: new THREE.Euler(
+        Math.PI / 2 - 0.06,
+        0.6 + (propRand(r.x, r.z, 32) - 0.5) * 0.4,
+        0,
+        'YXZ',
+      ),
     });
     g.position.set(r.x - 2, fy, r.z - 3);
     group.add(shadowed(g));
   }
 
   // ---- mine entrances: timber portal, rock mound, ore cart, lantern --------
-  for (const m of PROPS.mines) {
+  for (const m of getActiveWorldContent().props.mines) {
     const g = new THREE.Group();
     const abandonedCrypt = m.x < -140 && m.z > 590 && m.z < 630;
     for (const sx of [-1.45, 1.45]) {
       addParts(g, 'timberPillar', { x: sx, scale: [3.4, 3.5, 3.4] });
     }
     // lintel + cap beam: the same square timber laid across the posts
-    addParts(g, 'timberPillar', { y: 3.42, x: -2.2, euler: new THREE.Euler(0, 0, -Math.PI / 2), scale: [3.6, 4.4, 3.6] });
-    addParts(g, 'timberPillar', { y: 3.85, x: -2.45, euler: new THREE.Euler(0, 0, -Math.PI / 2), scale: [3.0, 4.9, 3.0] });
+    addParts(g, 'timberPillar', {
+      y: 3.42,
+      x: -2.2,
+      euler: new THREE.Euler(0, 0, -Math.PI / 2),
+      scale: [3.6, 4.4, 3.6],
+    });
+    addParts(g, 'timberPillar', {
+      y: 3.85,
+      x: -2.45,
+      euler: new THREE.Euler(0, 0, -Math.PI / 2),
+      scale: [3.0, 4.9, 3.0],
+    });
     const hole = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.1), holeMat);
     hole.position.set(0, 1.55, -0.2);
     noShadow.add(hole);
@@ -670,23 +1112,42 @@ export function buildProps(seed: number): PropsResult {
     // one giant scaled rock would read as a box
     const mound: [number, number, number, number][] = abandonedCrypt
       ? [
-        [0.2, 1.35, -3.2, 2.35], [-2.8, 0.25, -2.35, 1.75], [2.65, 0.3, -2.3, 1.75],
-        [-1.7, 0.1, -1.25, 1.15], [1.75, 0.1, -1.2, 1.1], [0.2, 2.8, -4.15, 2.0],
-        [-1.35, 1.45, -3.45, 1.55], [1.45, 1.5, -3.35, 1.5], [0, 0.15, -1.85, 1.2],
-        [-3.45, 0.6, -3.5, 1.15], [3.35, 0.65, -3.45, 1.1], [0.1, 3.35, -2.85, 1.25],
-      ]
+          [0.2, 1.35, -3.2, 2.35],
+          [-2.8, 0.25, -2.35, 1.75],
+          [2.65, 0.3, -2.3, 1.75],
+          [-1.7, 0.1, -1.25, 1.15],
+          [1.75, 0.1, -1.2, 1.1],
+          [0.2, 2.8, -4.15, 2.0],
+          [-1.35, 1.45, -3.45, 1.55],
+          [1.45, 1.5, -3.35, 1.5],
+          [0, 0.15, -1.85, 1.2],
+          [-3.45, 0.6, -3.5, 1.15],
+          [3.35, 0.65, -3.45, 1.1],
+          [0.1, 3.35, -2.85, 1.25],
+        ]
       : [
-        [0, 1.4, -3.0, 2.6], [-2.7, 0.3, -2.0, 1.9], [2.7, 0.35, -2.2, 2.0],
-        [-1.6, 0.1, -1.0, 1.2], [1.8, 0.1, -0.9, 1.1], [0.3, 3.0, -4.2, 2.3],
-        [-1.4, 1.6, -3.4, 1.8], [1.5, 1.7, -3.2, 1.7], [0, 0.2, -1.6, 1.4],
-      ];
-    const rockKinds: PropKey[] = lowProps ? ['rockLargeD'] : ['rockTallA', 'rockLargeD', 'rockTallH', 'rockLargeF'];
+          [0, 1.4, -3.0, 2.6],
+          [-2.7, 0.3, -2.0, 1.9],
+          [2.7, 0.35, -2.2, 2.0],
+          [-1.6, 0.1, -1.0, 1.2],
+          [1.8, 0.1, -0.9, 1.1],
+          [0.3, 3.0, -4.2, 2.3],
+          [-1.4, 1.6, -3.4, 1.8],
+          [1.5, 1.7, -3.2, 1.7],
+          [0, 0.2, -1.6, 1.4],
+        ];
+    const rockKinds: PropKey[] = lowProps
+      ? ['rockLargeD']
+      : ['rockTallA', 'rockLargeD', 'rockTallH', 'rockLargeF'];
     for (let i = 0; i < mound.length; i++) {
       const [rx, ry, rz, rr] = mound[i];
       const kind = rockKinds[(i * 2 + 1) % rockKinds.length];
       const a = propAsset(kind);
       addParts(g, kind, {
-        x: rx, y: ry, z: rz, scale: (2.1 * rr) / Math.max(a.size.x, a.size.z),
+        x: rx,
+        y: ry,
+        z: rz,
+        scale: (2.1 * rr) / Math.max(a.size.x, a.size.z),
         euler: new THREE.Euler(
           (propRand(m.x, m.z, i + 80) - 0.5) * 0.5,
           propRand(m.x, m.z, i + 70) * Math.PI,
@@ -712,12 +1173,13 @@ export function buildProps(seed: number): PropsResult {
     g.rotation.y = m.rot;
     group.add(shadowed(g));
     // mound circle behind the portal — same offset/radius as the collider
-    const mx = m.x - 3.4 * Math.sin(m.rot), mz = m.z - 3.4 * Math.cos(m.rot);
+    const mx = m.x - 3.4 * Math.sin(m.rot),
+      mz = m.z - 3.4 * Math.cos(m.rot);
     registerHideable(g, circleFootprint(mx, mz, 5, ground(mx, mz) + 5.2));
   }
 
   // ---- fishing docks: pirate-kit platforms, moored rowboat, stone hut ------
-  for (const d of PROPS.docks) {
+  for (const d of getActiveWorldContent().props.docks) {
     const y = ground(d.x, d.z);
     const g = new THREE.Group();
     const key = d.x * 3.3 + d.z * 1.7;
@@ -728,42 +1190,292 @@ export function buildProps(seed: number): PropsResult {
       const wx = d.x + lz * Math.sin(d.rot);
       const wz = d.z + lz * Math.cos(d.rot);
       addParts(g, 'dockPlatform', {
-        z: lz, y: Math.min(0, ground(wx, wz) - y + 0.15),
+        z: lz,
+        y: Math.min(0, ground(wx, wz) - y + 0.15),
         rot: (keyRand(key, i) - 0.5) * 0.04,
         scale: [0.78, 0.52, 0.85],
       });
     }
     const hut = propAsset('house3');
     addParts(g, 'house3', {
-      x: d.hutLocal.x, z: d.hutLocal.z,
+      x: d.hutLocal.x,
+      z: d.hutLocal.z,
       scale: [(d.hutLocal.hw * 2) / hut.size.x, 2.6 / hut.size.y, (d.hutLocal.hd * 2) / hut.size.z],
     });
     if (!lowProps) {
-      addParts(g, 'barrel', { x: 0.55, y: 0.52, z: -0.55, rot: keyRand(key, 5) * Math.PI, scale: 0.95 });
+      addParts(g, 'barrel', {
+        x: 0.55,
+        y: 0.52,
+        z: -0.55,
+        rot: keyRand(key, 5) * Math.PI,
+        scale: 0.95,
+      });
       addParts(g, 'barrel', { x: 1.45, z: 0.9, rot: keyRand(key, 6) * Math.PI, scale: 1.15 });
       addParts(g, 'crateWooden', { x: -0.6, y: 0.52, z: -2.2, rot: keyRand(key, 7), scale: 0.9 });
     }
     // rowboat beside the deck's far end: floats at water level when the
     // shore dips below it, otherwise sits hauled up on the bank
-    const boatLx = 2.4, boatLz = -5.0;
+    const boatLx = 2.4,
+      boatLz = -5.0;
     const boatWx = d.x + boatLx * Math.cos(d.rot) + boatLz * Math.sin(d.rot);
     const boatWz = d.z - boatLx * Math.sin(d.rot) + boatLz * Math.cos(d.rot);
     const boatGround = ground(boatWx, boatWz);
-    const isAfloat = boatGround < WATER_LEVEL - 0.1;
+    const wl = waterLevel();
+    const isAfloat = boatGround < wl - 0.1;
     addParts(g, 'rowboat', {
-      x: boatLx, z: boatLz,
-      y: (isAfloat ? WATER_LEVEL + 0.18 : boatGround + 0.06) - y,
-      rot: 0.5 + (keyRand(key, 8) - 0.5) * 0.4, scale: 0.85,
-      euler: isAfloat ? undefined : new THREE.Euler(0.04, 0.5 + (keyRand(key, 8) - 0.5) * 0.4, 0.16),
+      x: boatLx,
+      z: boatLz,
+      y: (isAfloat ? wl + 0.18 : boatGround + 0.06) - y,
+      rot: 0.5 + (keyRand(key, 8) - 0.5) * 0.4,
+      scale: 0.85,
+      euler: isAfloat
+        ? undefined
+        : new THREE.Euler(0.04, 0.5 + (keyRand(key, 8) - 0.5) * 0.4, 0.16),
     });
     g.position.set(d.x, y, d.z);
     g.rotation.y = d.rot;
     group.add(shadowed(g));
     // stone hut OBB — same offset/extents/rotation as the collider
-    const hc = Math.cos(d.rot), hs = Math.sin(d.rot);
+    const hc = Math.cos(d.rot),
+      hs = Math.sin(d.rot);
     const hx = d.x + d.hutLocal.x * hc + d.hutLocal.z * hs;
     const hz = d.z - d.hutLocal.x * hs + d.hutLocal.z * hc;
-    registerHideable(g, obbFootprint(hx, hz, d.hutLocal.hw, d.hutLocal.hd, d.rot, ground(hx, hz) + 2.9));
+    registerHideable(
+      g,
+      obbFootprint(hx, hz, d.hutLocal.hw, d.hutLocal.hd, d.rot, ground(hx, hz) + 2.9),
+    );
+  }
+
+  // ---- delve entrance: Meshy portal-door + animated void + carved name lintel -
+  // The portal-door model sits just behind Brother Halven, its mouth facing the
+  // hub players approach from (faceSign below: +z for Reliquary Hill, -z for the
+  // marsh); it has its own stone backing slab so the animated shader plane
+  // (FrontSide) reads as a solid void from the approach and is invisible from
+  // behind. The carved name slab rides the model's crown. All render-only,
+  // players enter by talking to Halven; leaveDelve drops them at doorPos.z - 4,
+  // on the mouth side for both delves.
+  const delvePortals: THREE.Mesh[] = [];
+  for (const dm of getActiveWorldContent().props.delveMarkers ?? []) {
+    if (!loadedProps.has('delveEntrance2')) continue;
+    const isDrowned = dm.delveId === 'drowned_litany';
+    // The portal mouth faces the hub the players approach from: Reliquary Hill's
+    // town is north (+z) of its door, Mirefen Marsh's hub (z~300) is SOUTH (-z)
+    // of the drowned door (z=505), so the whole assembly (arch, void plane,
+    // braziers, name slab) flips together for the drowned delve. The flip is on
+    // the placed group, never baked into the asset (its geometry is cached and
+    // shared by every marker).
+    const faceSign = isDrowned ? -1 : 1;
+
+    // Portal-door model with its own backing slab, no separate vault sphere needed.
+    const arch = propAsset('delveEntrance2');
+    const SX = 3.6,
+      SY = 3.6,
+      SZ = 3.6;
+    // The arch sits on the far side of Halven from the approach, so he greets
+    // arrivals with the glowing mouth framed behind him. The leaveDelve drop
+    // (doorPos.z - 4) stays on the mouth side for both delves.
+    const archZ = dm.z - faceSign * 4;
+    // Sample ground height at the arch's OWN placement (archZ), not Halven's
+    // (dm.z): marsh terrain can slope/dip between the two, and sampling the
+    // wrong z left the model's normalized (min-y at 0) base floating above the
+    // real ground a few units away.
+    const gy = ground(dm.x, archZ);
+    const ag = new THREE.Group();
+    for (const part of arch.parts) {
+      // drowned shrine: recolor the baked red veil to water-blue (stone unaffected)
+      const mat = isDrowned ? drownVeilMaterial(part.mat) : part.mat;
+      const m = new THREE.Mesh(part.geo, mat);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      ag.add(m);
+    }
+    ag.scale.set(SX, SY, SZ);
+    ag.position.set(dm.x, gy, archZ);
+    if (faceSign < 0) ag.rotation.y = Math.PI;
+    group.add(ag);
+
+    // portal opening: doorway is roughly half the model's width and a bit over
+    // half its height; the animated shader plane sits on the approach-facing front
+    // face. Tune these fractions after seeing the model in-game.
+    const openW = arch.size.x * SX * 0.5;
+    const openH = arch.size.y * SY * 0.55;
+    const openCY = gy + arch.size.y * SY * 0.32; // centre of the doorway opening
+    const faceZ = archZ + faceSign * ((arch.size.z * SZ) / 2); // approach-facing front face
+
+    // opaque dark backsplash filling the doorway behind the void plane, so no
+    // red leaks through from the rear and you can't see daylight through the
+    // opening, the portal reads as a solid one-way threshold. Slightly larger
+    // than the opening to cover the gap, recessed a touch into the model.
+    const backsplash = new THREE.Mesh(
+      new THREE.PlaneGeometry(openW * 1.1, openH * 1.1),
+      new THREE.MeshBasicMaterial({
+        color: isDrowned ? 0x01060f : 0x05030a, // deep blue-black for the drowned shrine
+        side: THREE.DoubleSide,
+      }),
+    );
+    backsplash.position.set(dm.x, openCY, faceZ - faceSign * 0.35);
+    group.add(backsplash);
+
+    // swirling void plane, FrontSide, drawn over the dark backsplash so the
+    // animated vortex reads against true black from the town approach.
+    const portalMat = isDrowned
+      ? delvePortalMaterial(0x01060c, 0x0c2c3a, 0x176079) // murky marsh water: black-blue → deep teal → dim cyan rim
+      : delvePortalMaterial(0x03000a, 0x6e0a85, 0xd90a1a); // default: void → purple → crimson rim
+    const portal = new THREE.Mesh(new THREE.PlaneGeometry(openW, openH), portalMat);
+    portal.position.set(dm.x, openCY, faceZ - faceSign * 0.05);
+    // FrontSide plane natively faces +z; turn it with the assembly.
+    if (faceSign < 0) portal.rotation.y = Math.PI;
+    portal.renderOrder = 3;
+    group.add(portal);
+    delvePortals.push(portal);
+
+    const mouthLightColor = isDrowned ? 0x1048c0 : 0x7010b0;
+    const mouthLight = new THREE.PointLight(mouthLightColor, 8, 18, 2);
+    mouthLight.position.set(dm.x, gy + 2.4, faceZ + faceSign * 0.4);
+    mouthLight.userData.baseIntensity = 8;
+    group.add(mouthLight);
+    fireLights.push(mouthLight);
+
+    // embers drifting up out of the mouth (self-animating; not a mesh, so the
+    // static merge skips it automatically)
+    const emberCol1: [number, number, number] = isDrowned
+      ? [0.1, 0.35, 1.0] // blue sparks for the drowned shrine
+      : [1.0, 0.16, 0.09];
+    const emberCol2: [number, number, number] = isDrowned
+      ? [0.55, 0.8, 1.0] // pale blue-white fade
+      : [1.0, 0.5, 0.18];
+    group.add(
+      buildDelveEmbers(
+        dm.x,
+        gy + 1.0,
+        faceZ + faceSign * 0.2,
+        openW * 0.34,
+        openH * 0.85,
+        emberCol1,
+        emberCol2,
+      ),
+    );
+
+    // two flaming braziers flanking the mouth, a tended-entrance read. Reuse
+    // the campfire flame + fire-light pattern so the renderer flickers them and
+    // sheds embers for free; the warm torch orange plays off the red void.
+    const postMat = surfaceMat({ color: 0x2a2622, roughness: 1 });
+    const bowlMat = surfaceMat({ color: 0x191512, roughness: 1 });
+    for (const side of [-1, 1]) {
+      const bx = dm.x + side * (openW * 0.5 + 0.7);
+      const bz = faceZ + faceSign * 0.5; // just in front of the mouth, on the approach side
+      const by = ground(bx, bz);
+      const bg = new THREE.Group();
+      const postH = 2.0;
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.33, postH, 8), postMat);
+      post.position.y = postH / 2;
+      bg.add(post);
+      const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.26, 0.38, 10), bowlMat);
+      bowl.position.y = postH + 0.1;
+      bg.add(bowl);
+      const flame = new THREE.Mesh(
+        flameGeo,
+        new THREE.MeshLambertMaterial({
+          color: 0xffaa33,
+          emissive: 0xff6a1e,
+          emissiveIntensity: usePbr ? 2.2 : 1.4,
+          transparent: true,
+          opacity: 0.92,
+        }),
+      );
+      flame.position.y = postH + 0.28;
+      flame.scale.setScalar(0.72);
+      bg.add(flame);
+      flames.push(flame);
+      noShadow.add(flame);
+      const light = new THREE.PointLight(0xff8a3a, 9, 13, 2);
+      light.position.y = postH + 0.55;
+      light.userData.baseIntensity = 8;
+      bg.add(light);
+      fireLights.push(light);
+      bg.position.set(bx, by, bz);
+      group.add(shadowed(bg));
+    }
+
+    // (ruin-column dressing removed, the portal-door model has its own pillars,
+    // so flanking rubble columns just cluttered and overpowered the silhouette.
+    // Mossy boulders flanking the approach feet keep it grounded without competing.)
+    const rubble: { kind: PropKey; dx: number; dz: number; s: Scale; rot?: number }[] = [
+      { kind: 'rockLargeD', dx: -8.5, dz: -1.8, s: 1.7, rot: 2.1 },
+      { kind: 'rockLargeD', dx: 8.0, dz: 2.2, s: 1.45, rot: 0.7 },
+    ];
+    for (const rb of rubble) {
+      const rx = dm.x + rb.dx,
+        rz = archZ + faceSign * rb.dz;
+      const rgrp = new THREE.Group();
+      addParts(rgrp, rb.kind, { scale: rb.s, rot: rb.rot });
+      rgrp.position.set(rx, ground(rx, rz) - 0.08, rz);
+      group.add(shadowed(rgrp));
+    }
+
+    // ---- carved name slab as the arch's approach-facing lintel-sign --------
+    const slabY = gy + arch.size.y * SY * 0.8; // mounted on the crown, above the mouth
+    const slabZ = faceZ + faceSign * 0.1; // proud of the front face so it never z-fights the arch
+
+    // stone backing box
+    const backMat = surfaceMat({ color: 0x3a3530 });
+    const backing = new THREE.Mesh(new THREE.BoxGeometry(4.4, 0.9, 0.18), backMat);
+    backing.position.set(dm.x, slabY, slabZ);
+    backing.castShadow = true;
+    group.add(backing);
+
+    // grimy canvas inscription on the approach-facing surface (turns with the
+    // assembly via the faceSign flip, so it reads -z for the drowned delve)
+    const CW = 512,
+      CH = 96;
+    const cv = document.createElement('canvas');
+    cv.width = CW;
+    cv.height = CH;
+    const ctx = cv.getContext('2d')!;
+
+    ctx.fillStyle = '#2b2722';
+    ctx.fillRect(0, 0, CW, CH);
+    ctx.strokeStyle = '#16120e';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(6, 6, CW - 12, CH - 12);
+
+    // horizontal grime streaks (deterministic)
+    for (let i = 0; i < 10; i++) {
+      const gx = hash2(dm.x + i * 1.3, dm.z, 0x6d61726b) * CW;
+      const gy2 = hash2(dm.z + i * 1.7, dm.x, 0x6d61726b) * CH;
+      const gw = 20 + hash2(i * 3.1, dm.x + dm.z, 0x6d61726b) * 55;
+      ctx.fillStyle = `rgba(6,4,2,${0.22 + hash2(i * 5.9, dm.z, 0x6d61726b) * 0.32})`;
+      ctx.fillRect(gx - gw / 2, gy2 - 1.8, gw, 3.6);
+    }
+
+    // carved text, shadow pass then bright pass for depth illusion. Shrink the
+    // font until the (localized) name fits inside the slab border so a long title
+    // like "THE COLLAPSED RELIQUARY" is never clipped at the canvas edges.
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const label = (delveLabel ? delveLabel(dm.delveId) : dm.delveId).toUpperCase();
+    const maxTextW = CW - 44; // inside the 6px stroke + breathing room
+    // Step down until it fits (kerning/hinting make a single proportional guess
+    // unreliable for wide-glyph locales, e.g. CJK names), with a 16px floor.
+    let fontPx = 34;
+    ctx.font = `bold ${fontPx}px Georgia, "Times New Roman", serif`;
+    while (fontPx > 16 && ctx.measureText(label).width > maxTextW) {
+      fontPx -= 1;
+      ctx.font = `bold ${fontPx}px Georgia, "Times New Roman", serif`;
+    }
+    ctx.fillStyle = '#120f0b';
+    ctx.fillText(label, CW / 2 + 2, CH / 2 + 2);
+    ctx.fillStyle = '#7d6e59';
+    ctx.fillText(label, CW / 2, CH / 2);
+
+    const tex = new THREE.CanvasTexture(cv);
+    const faceMat = new THREE.MeshBasicMaterial({ map: tex });
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.78), faceMat);
+    // sit flush on the approach-facing face of the backing (PlaneGeometry faces
+    // +z, so it turns with the assembly)
+    face.position.set(dm.x, slabY, slabZ + faceSign * 0.1);
+    if (faceSign < 0) face.rotation.y = Math.PI;
+    group.add(face);
   }
 
   // ---- flush instanced batches ---------------------------------------------
@@ -787,6 +1499,7 @@ export function buildProps(seed: number): PropsResult {
   // animated flames + camera-ghost props (hidden individually) stay un-merged
   const keep = new Set<THREE.Object3D>(flames);
   for (const m of keepFromMerge) keep.add(m);
+  for (const p of delvePortals) keep.add(p); // shader-driven void: keep its transparency/renderOrder
   const staticMeshes = mergeStaticMeshes(group, keep);
   for (const sm of staticMeshes) {
     const bounds = cullableBounds(sm, sm.geometry.boundingBox, sm.geometry.boundingSphere);
@@ -798,15 +1511,20 @@ export function buildProps(seed: number): PropsResult {
     flames,
     fireLights,
     update(
-      camX: number, camY: number, camZ: number,
-      eyeX: number, eyeY: number, eyeZ: number,
+      camX: number,
+      camY: number,
+      camZ: number,
+      eyeX: number,
+      eyeY: number,
+      eyeZ: number,
       fogFar: number,
     ): void {
       for (const c of cullables) {
         c.obj.visible = cullableVisible(c, camX, camZ, fogFar);
       }
       for (const h of hideables) {
-        const dx = camX - h.x, dz = camZ - h.z;
+        const dx = camX - h.x,
+          dz = camZ - h.z;
         if (Math.hypot(dx, dz) - h.cull >= fogFar) {
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
@@ -833,7 +1551,10 @@ export function buildProps(seed: number): PropsResult {
 }
 
 /** One material we flip on/off, remembering its original depth-write state. */
-interface ToggleMat { mat: THREE.Material; depthWrite: boolean }
+interface ToggleMat {
+  mat: THREE.Material;
+  depthWrite: boolean;
+}
 
 // A prop that the camera ghosts through and the renderer hides whenever the
 // eye-to-camera segment crosses its footprint (below `topY`). Either a circle
@@ -860,28 +1581,44 @@ function circleFootprint(x: number, z: number, r: number, topY: number, cull = r
   return { x, z, r, topY, cull };
 }
 
-function obbFootprint(x: number, z: number, hw: number, hd: number, rot: number, topY: number): Footprint {
+function obbFootprint(
+  x: number,
+  z: number,
+  hw: number,
+  hd: number,
+  rot: number,
+  topY: number,
+): Footprint {
   return { x, z, hw, hd, rot, topY, cull: Math.hypot(hw, hd) };
 }
 
 function pointInsideFootprint(h: Hideable, x: number, z: number): boolean {
-  const dx = x - h.x, dz = z - h.z;
+  const dx = x - h.x,
+    dz = z - h.z;
   if (h.r !== undefined) return dx * dx + dz * dz < h.r * h.r;
   // world -> OBB local (three.js rotation.y convention), mirrors colliders.rotY
-  const c = Math.cos(h.rot!), s = Math.sin(h.rot!);
+  const c = Math.cos(h.rot!),
+    s = Math.sin(h.rot!);
   const lx = dx * c - dz * s;
   const lz = dx * s + dz * c;
   return Math.abs(lx) < h.hw! && Math.abs(lz) < h.hd!;
 }
 
 function segmentCircleEntry(
-  ax: number, az: number, bx: number, bz: number,
-  cx: number, cz: number, r: number,
+  ax: number,
+  az: number,
+  bx: number,
+  bz: number,
+  cx: number,
+  cz: number,
+  r: number,
 ): number {
-  const dx = bx - ax, dz = bz - az;
+  const dx = bx - ax,
+    dz = bz - az;
   const a = dx * dx + dz * dz;
   if (a < 1e-12) return Infinity;
-  const fx = ax - cx, fz = az - cz;
+  const fx = ax - cx,
+    fz = az - cz;
   const c = fx * fx + fz * fz - r * r;
   if (c < 0) return 0;
   const b = 2 * (fx * dx + fz * dz);
@@ -890,34 +1627,48 @@ function segmentCircleEntry(
   return (-b - Math.sqrt(disc)) / (2 * a);
 }
 
-function segmentObbEntry(
-  h: Hideable,
-  ax: number, az: number, bx: number, bz: number,
-): number {
-  const c = Math.cos(h.rot!), s = Math.sin(h.rot!);
-  const adx = ax - h.x, adz = az - h.z;
-  const bdx = bx - h.x, bdz = bz - h.z;
+function segmentObbEntry(h: Hideable, ax: number, az: number, bx: number, bz: number): number {
+  const c = Math.cos(h.rot!),
+    s = Math.sin(h.rot!);
+  const adx = ax - h.x,
+    adz = az - h.z;
+  const bdx = bx - h.x,
+    bdz = bz - h.z;
   const lax = adx * c - adz * s;
   const laz = adx * s + adz * c;
   const lbx = bdx * c - bdz * s;
   const lbz = bdx * s + bdz * c;
   if (Math.abs(lax) < h.hw! && Math.abs(laz) < h.hd!) return 0;
 
-  const dx = lbx - lax, dz = lbz - laz;
-  let tmin = -Infinity, tmax = Infinity;
+  const dx = lbx - lax,
+    dz = lbz - laz;
+  let tmin = -Infinity,
+    tmax = Infinity;
   if (Math.abs(dx) < 1e-9) {
     if (lax < -h.hw! || lax > h.hw!) return Infinity;
   } else {
-    let t1 = (-h.hw! - lax) / dx, t2 = (h.hw! - lax) / dx;
-    if (t1 > t2) { const tmp = t1; t1 = t2; t2 = tmp; }
-    tmin = Math.max(tmin, t1); tmax = Math.min(tmax, t2);
+    let t1 = (-h.hw! - lax) / dx,
+      t2 = (h.hw! - lax) / dx;
+    if (t1 > t2) {
+      const tmp = t1;
+      t1 = t2;
+      t2 = tmp;
+    }
+    tmin = Math.max(tmin, t1);
+    tmax = Math.min(tmax, t2);
   }
   if (Math.abs(dz) < 1e-9) {
     if (laz < -h.hd! || laz > h.hd!) return Infinity;
   } else {
-    let t1 = (-h.hd! - laz) / dz, t2 = (h.hd! - laz) / dz;
-    if (t1 > t2) { const tmp = t1; t1 = t2; t2 = tmp; }
-    tmin = Math.max(tmin, t1); tmax = Math.min(tmax, t2);
+    let t1 = (-h.hd! - laz) / dz,
+      t2 = (h.hd! - laz) / dz;
+    if (t1 > t2) {
+      const tmp = t1;
+      t1 = t2;
+      t2 = tmp;
+    }
+    tmin = Math.max(tmin, t1);
+    tmax = Math.min(tmax, t2);
   }
   if (tmax < tmin || tmax < 0) return Infinity;
   return tmin;
@@ -925,16 +1676,23 @@ function segmentObbEntry(
 
 function cameraSegmentHitsFootprint(
   h: Hideable,
-  eyeX: number, eyeY: number, eyeZ: number,
-  camX: number, camY: number, camZ: number,
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  camX: number,
+  camY: number,
+  camZ: number,
 ): boolean {
-  if ((eyeY < h.topY && pointInsideFootprint(h, eyeX, eyeZ))
-    || (camY < h.topY && pointInsideFootprint(h, camX, camZ))) {
+  if (
+    (eyeY < h.topY && pointInsideFootprint(h, eyeX, eyeZ)) ||
+    (camY < h.topY && pointInsideFootprint(h, camX, camZ))
+  ) {
     return true;
   }
-  const t = h.r !== undefined
-    ? segmentCircleEntry(eyeX, eyeZ, camX, camZ, h.x, h.z, h.r)
-    : segmentObbEntry(h, eyeX, eyeZ, camX, camZ);
+  const t =
+    h.r !== undefined
+      ? segmentCircleEntry(eyeX, eyeZ, camX, camZ, h.x, h.z, h.r)
+      : segmentObbEntry(h, eyeX, eyeZ, camX, camZ);
   if (t < 0 || t > 1) return false;
   return eyeY + (camY - eyeY) * t < h.topY;
 }
@@ -1000,7 +1758,11 @@ function cullableVisible(c: PropCullable, camX: number, camZ: number, fogFar: nu
 // indexed glTF extracts and procedural shapes can share a bucket.
 function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE.Mesh[] {
   group.updateMatrixWorld(true);
-  interface Bucket { material: THREE.Material; castShadow: boolean; geoms: THREE.BufferGeometry[] }
+  interface Bucket {
+    material: THREE.Material;
+    castShadow: boolean;
+    geoms: THREE.BufferGeometry[];
+  }
   const buckets = new Map<string, Bucket>();
   const merged: THREE.Mesh[] = [];
   group.traverse((o) => {

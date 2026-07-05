@@ -1,19 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { ITEMS, MOBS } from '../src/sim/data';
-import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { Sim } from '../src/sim/sim';
 import { tEntity } from '../src/ui/entity_i18n';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 
-// The Quartermaster's Consignment — 12 uncommon gear pieces. Eight are stocked
-// by The Merchant on the World Market; four drop from Vale threats.
+// The Quartermaster's Consignment has 10 uncommon gear pieces. Eight are stocked
+// by The Merchant on the World Market; two drop from Vale threats.
 const VENDOR = [
-  'roadwardens_helm', 'wayfarers_hood', 'acolytes_circlet', 'reinforced_pauldrons',
-  'embroidered_mantle', 'sturdy_belt', 'silk_sash', 'roughspun_gloves',
+  'roadwardens_helm',
+  'wayfarers_hood',
+  'acolytes_circlet',
+  'reinforced_pauldrons',
+  'embroidered_mantle',
+  'sturdy_belt',
+  'silk_sash',
+  'roughspun_gloves',
 ] as const;
 
 const DROPS: Record<string, string> = {
-  bristlehide_spaulders: 'elder_bristleback',
-  sableweb_cord: 'sableweb_matriarch',
   gorraks_cleaver: 'gorrak',
   mossy_handwraps: 'tunnel_rat',
 };
@@ -21,8 +25,8 @@ const DROPS: Record<string, string> = {
 const ALL = [...VENDOR, ...Object.keys(DROPS)];
 
 describe("Quartermaster's Consignment gear pack", () => {
-  it('defines all 12 items as equippable uncommon gear', () => {
-    expect(ALL.length).toBe(12);
+  it('defines all 10 items as equippable uncommon gear', () => {
+    expect(ALL.length).toBe(10);
     for (const id of ALL) {
       const def = ITEMS[id];
       expect(def, id).toBeTruthy();
@@ -35,19 +39,25 @@ describe("Quartermaster's Consignment gear pack", () => {
     }
   });
 
-  it('stocks the eight consignment pieces on the Merchant\'s standing market', () => {
+  it("stocks the eight consignment pieces on the Merchant's standing market", () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const house = sim.marketListings.filter((l) => l.house);
     for (const id of VENDOR) {
-      expect(house.some((l) => l.itemId === id), `${id} on market`).toBe(true);
+      expect(
+        house.some((l) => l.itemId === id),
+        `${id} on market`,
+      ).toBe(true);
     }
   });
 
-  it('attaches the four looted pieces to the right mobs', () => {
+  it('attaches the two looted pieces to the right mobs', () => {
     for (const [item, mobId] of Object.entries(DROPS)) {
       const mob = MOBS[mobId];
       expect(mob, mobId).toBeTruthy();
-      expect(mob.loot.some((l) => l.itemId === item), `${item} drops from ${mobId}`).toBe(true);
+      expect(
+        mob.loot.some((l) => l.itemId === item),
+        `${item} drops from ${mobId}`,
+      ).toBe(true);
     }
   });
 

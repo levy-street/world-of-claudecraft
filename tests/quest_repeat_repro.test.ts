@@ -1,23 +1,27 @@
 // Regression for the "completed quests are offered again" report.
-// Player-named example: "A Warden's First Duty" (q_ledger_first_duty).
+// Uses a current Eastbrook quest; the original player-named ledger example was retired.
 //
 // Two independent guards:
 //  1. The completion engine latches a turned-in quest to 'done' and keeps it
 //     done across a serialize/deserialize round-trip (proves the engine is sound).
 //  2. No two quests share an identical giver + objective signature. The actual
-//     bug was content, not logic: the Warden's Ledger chain re-issued the same
-//     kill task from the same NPC as a main-story quest, so a finished quest was
+//     bug was content, not logic: a retired side chain re-issued the same kill
+//     task from the same NPC as a main-story quest, so a finished quest was
 //     indistinguishable from a brand-new one to the player.
 import { describe, expect, it } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 
-const QID = 'q_ledger_first_duty';
+const QID = 'q_wolves';
 
 function driveToTurnIn(sim: Sim): void {
   const quest = QUESTS[QID];
   const meta = (sim as any).primary;
-  meta.questLog.set(QID, { questId: QID, state: 'ready', counts: quest.objectives.map((o) => o.count) });
+  meta.questLog.set(QID, {
+    questId: QID,
+    state: 'ready',
+    counts: quest.objectives.map((o) => o.count),
+  });
   const npc = [...sim.entities.values()].find(
     (e) => e.kind === 'npc' && e.templateId === quest.turnInNpcId,
   )!;
@@ -25,7 +29,7 @@ function driveToTurnIn(sim: Sim): void {
   sim.turnInQuest(QID);
 }
 
-describe('completed quest does not repeat (q_ledger_first_duty)', () => {
+describe('completed quest does not repeat', () => {
   it('is "done" immediately after turn-in', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', playerName: 'W' });
     sim.setPlayerLevel(5);
@@ -50,10 +54,14 @@ describe('no quest duplicates another (same giver + identical objectives)', () =
     const sig = (id: string): string => {
       const q = QUESTS[id];
       const obj = q.objectives
-        .map((o) =>
-          (o.type === 'kill' ? `kill ${o.targetMobId}`
-            : o.type === 'collect' ? `collect ${o.itemId}`
-              : `interact ${(o as any).targetNpcId}`) + ` x${o.count}`)
+        .map(
+          (o) =>
+            (o.type === 'kill'
+              ? `kill ${o.targetMobId}`
+              : o.type === 'collect'
+                ? `collect ${o.itemId}`
+                : `interact ${(o as any).targetNpcId}`) + ` x${o.count}`,
+        )
         .join(' + ');
       return `${q.giverNpcId} :: ${obj}`;
     };

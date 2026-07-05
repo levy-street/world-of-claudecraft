@@ -14,12 +14,12 @@
 // contract; [GUARD] sections must remain green across the change.
 
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { type Entity } from '../src/sim/types';
-import { DUNGEONS, NPCS, QUESTS, instanceOrigin } from '../src/sim/data';
-import { groundHeight } from '../src/sim/world';
-import { ClientWorld } from '../src/net/online';
 import { handlePickedEntity, hoverCursorKind, isAttackableEntity } from '../src/game/interactions';
+import { ClientWorld } from '../src/net/online';
+import { DUNGEONS, instanceOrigin, NPCS, QUESTS } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 const ALDRIC_ID = 'brother_aldric_raid';
 const FINAL_QUEST = 'q_nythraxis_scourges_end';
@@ -40,7 +40,7 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 }
 
 function attune(sim: Sim, pid: number) {
-  sim.players.get(pid)!.questsDone.add('q_nythraxis_bound_guardian');
+  sim.players.get(pid)?.questsDone.add('q_nythraxis_bound_guardian');
 }
 
 function formRaid(sim: Sim, leaderPid: number) {
@@ -151,7 +151,9 @@ describe('[GUARD] dynamic NPCs are not auto-placed, ordinary NPCs are', () => {
 
   it('still surface-spawns the ordinary Highwatch Aldric NPC', () => {
     const sim = makeWorld();
-    const highwatch = [...sim.entities.values()].find((e) => e.templateId === 'brother_aldric_highwatch');
+    const highwatch = [...sim.entities.values()].find(
+      (e) => e.templateId === 'brother_aldric_highwatch',
+    );
     expect(highwatch, 'ordinary NPCs must keep auto-spawning').toBeTruthy();
     expect(highwatch?.kind).toBe('npc');
   });
@@ -165,10 +167,10 @@ describe('[SPEC] the encounter spawns Aldric as an NPC entity', () => {
     spawnAldric(sim);
     const a = aldric(sim);
     expect(a, 'Aldric should spawn at the phase-two transition').toBeTruthy();
-    expect(a!.kind).toBe('npc'); // RED today: he is created via createMob
-    expect(a!.hostile).toBe(false);
-    expect(a!.level).toBe(20);
-    expect(a!.questIds).toContain(FINAL_QUEST);
+    expect(a?.kind).toBe('npc'); // RED today: he is created via createMob
+    expect(a?.hostile).toBe(false);
+    expect(a?.level).toBe(20);
+    expect(a?.questIds).toContain(FINAL_QUEST);
   });
 
   it('registers Aldric inside the active instance', () => {
@@ -198,13 +200,16 @@ describe('[GUARD] the encounter can still find and animate Aldric', () => {
     const { b } = spawnAldric(sim);
     expect(aldric(sim)).toBeTruthy();
     (sim as any).resetNythraxisEncounter(b);
-    expect(aldric(sim), 'reset must drop Aldric (findNythraxisAldric must match him)').toBeUndefined();
+    expect(
+      aldric(sim),
+      'reset must drop Aldric (findNythraxisAldric must match him)',
+    ).toBeUndefined();
   });
 });
 
 // --- [GUARD] server-side turn-in authority ---------------------------------
 
-describe('[GUARD] turning in Scourge\'s End at Aldric works server-side', () => {
+describe("[GUARD] turning in Scourge's End at Aldric works server-side", () => {
   function readyToTurnIn(sim: Sim) {
     const { tankPid } = spawnAldric(sim);
     const a = aldric(sim)!;
@@ -228,7 +233,9 @@ describe('[GUARD] turning in Scourge\'s End at Aldric works server-side', () => 
     const sim = makeWorld();
     const { tankPid, meta } = readyToTurnIn(sim);
     teleport(sim, tankPid, 99999, 99999);
-    const events = sim.turnInQuest(FINAL_QUEST, tankPid) as unknown as { type: string; text?: string }[] | void;
+    const events = sim.turnInQuest(FINAL_QUEST, tankPid) as unknown as
+      | { type: string; text?: string }[]
+      | undefined;
     expect(meta.questsDone.has(FINAL_QUEST)).toBe(false);
     void events;
   });
@@ -255,15 +262,22 @@ describe('[SPEC] the online client recognizes Aldric as a quest NPC', () => {
   it('reconstructs questIds for an Aldric NPC identity record', () => {
     const client = bareClient(1);
     const wire = {
-      id: 7, k: 'npc', tid: ALDRIC_ID, nm: 'Brother Aldric', lv: 20,
-      x: 100, y: 0, z: 100, f: 0,
+      id: 7,
+      k: 'npc',
+      tid: ALDRIC_ID,
+      nm: 'Brother Aldric',
+      lv: 20,
+      x: 100,
+      y: 0,
+      z: 100,
+      f: 0,
     };
     (client as any).applySnapshot({ t: 'snap', ents: [wire] });
     const mirrored = client.entities.get(7);
     expect(mirrored, 'client should mirror the Aldric entity').toBeTruthy();
-    expect(mirrored!.kind).toBe('npc');
+    expect(mirrored?.kind).toBe('npc');
     // RED today: NPCS[ALDRIC_ID] is undefined, so questIds resolves to [].
-    expect(mirrored!.questIds).toContain(FINAL_QUEST);
+    expect(mirrored?.questIds).toContain(FINAL_QUEST);
   });
 });
 
@@ -271,12 +285,24 @@ describe('[SPEC] the online client recognizes Aldric as a quest NPC', () => {
 
 describe('client interaction classification', () => {
   function npcAldric(): Entity {
-    return { id: 9, kind: 'npc', templateId: ALDRIC_ID, hostile: false, dead: false,
-      pos: { x: 0, y: 0, z: 0 } } as Entity;
+    return {
+      id: 9,
+      kind: 'npc',
+      templateId: ALDRIC_ID,
+      hostile: false,
+      dead: false,
+      pos: { x: 0, y: 0, z: 0 },
+    } as Entity;
   }
   function mobAldric(): Entity {
-    return { id: 9, kind: 'mob', templateId: ALDRIC_ID, hostile: false, dead: false,
-      pos: { x: 0, y: 0, z: 0 } } as Entity;
+    return {
+      id: 9,
+      kind: 'mob',
+      templateId: ALDRIC_ID,
+      hostile: false,
+      dead: false,
+      pos: { x: 0, y: 0, z: 0 },
+    } as Entity;
   }
 
   it('[GUARD] an NPC Aldric shows the friendly cursor and is not attackable', () => {
@@ -298,14 +324,29 @@ describe('client interaction classification', () => {
     const a = npcAldric();
     let opened: number | null = null;
     const world: any = {
-      playerId: 1, player, entities: new Map<number, Entity>([[1, player], [9, a]]),
-      duelInfo: null, arenaInfo: null,
-      targetEntity: () => {}, enterDungeon: () => {}, leaveDungeon: () => {},
-      pickUpObject: () => {}, startAutoAttack: () => {},
+      playerId: 1,
+      player,
+      entities: new Map<number, Entity>([
+        [1, player],
+        [9, a],
+      ]),
+      duelInfo: null,
+      arenaInfo: null,
+      targetEntity: () => {},
+      enterDungeon: () => {},
+      leaveDungeon: () => {},
+      pickUpObject: () => {},
+      startAutoAttack: () => {},
     };
     const hud = {
-      openLoot: () => {}, openQuestDialog: (id: number) => { opened = id; },
-      showError: () => {}, closeContextMenu: () => {},
+      openLoot: () => {},
+      openQuestDialog: (id: number) => {
+        opened = id;
+      },
+      openDelveBoard: () => {},
+      openMailbox: () => {},
+      showError: () => {},
+      closeContextMenu: () => {},
     };
     handlePickedEntity(world, hud, 9, 2, 10, 20); // right-click, in range
     expect(opened).toBe(9);

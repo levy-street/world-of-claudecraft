@@ -1,200 +1,320 @@
 <div align="center">
 
+# World of ClaudeCraft
+
+**手作りの世界でクエストを進め、パーティを組み、レイドに挑もう。ブラウザで無料、オープンソース、web3対応、そして今すぐオンラインでプレイできます。**
+
+**公式サイト: https://worldofclaudecraft.com/**
+
+[![CI](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml/badge.svg)](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-ESM-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-r165-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![Vitest](https://img.shields.io/badge/Vitest-4.1-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.6.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.14.1-blue)](../../package.json)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.ja_JP.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
 
-[English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · **日本語** · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md)
+[English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · **日本語** · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md) · [Nederlands](README.nl_NL.md) · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · [Türkçe](README.tr_TR.md) · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · [Dansk](README.da_DK.md)
 
-</div>
-
-# World of ClaudeCraft — クラシックスタイルのMMO
-
-[コミュニティ Discord に参加する](https://discord.gg/GjhnUsBtw)
+[今すぐプレイ](https://worldofclaudecraft.com/) · [自分の世界をホストする](#host-your-own-world-one-command) · [エージェントを訓練する](#train-an-agent-headless-rl) · [Web3](#web3) · [コントリビュート](CONTRIBUTING.ja_JP.md) · [Discord](https://discord.gg/GjhnUsBtw)
 
 ![World of ClaudeCraft タイトル画面](../../docs/screenshots/title-screen.jpg)
 
-ホストしてプレイできる、クラシック時代のMMOの雰囲気を持つマイクロMMOです。
+</div>
 
-1. **オンラインでプレイ** — アカウント、Postgres に永続化されるキャラクター、そしてあなたと同じ世界にいる他のプレイヤーを備えた、本物のクライアント／サーバー型ゲーム。
-2. ブラウザで**オフラインでプレイ**して、すぐに世界へ飛び込めます。
+## これは何か
 
-どちらも**同じ決定論的なシミュレーションコア**（`src/sim/`）で動作するため、オフラインの世界は、権威あるマルチプレイヤーサーバーがオンラインの全員に対して実行するものとまったく同じ挙動になります。
+World of ClaudeCraft は、今すぐブラウザでプレイでき、コマンド一つで自分でホストでき、さらにはAIエージェントにプレイを学習させることもできる、完全なクラシック時代のMMOです。無料でオープンソース、[worldofclaudecraft.com](https://worldofclaudecraft.com/) で稼働中です。
 
-## Screenshots
+一つの共有された世界が、同じゲームコアから三つの場所で動きます。
+
+- **オフラインのブラウザ世界**。Play Offline をクリックすればすぐに入れます。
+- **権威ある（オーソリタティブな）マルチプレイヤーサーバー**。Postgres を背後に持つアカウントがライブな世界を共有します。
+- **ヘッドレスのRL環境**。Python が Gym インターフェース越しに本物のゲームを動かします。
+
+同じシードなら、どこでも同じ世界。そしてほとんど何一つ出荷済みアセットではありません。町も、クリーチャーも、呪文アイコンも、サウンドも、すべて実行時に生成されます。
+
+## 主な特徴
+
+- **9つのクラシッククラス**。それぞれにレベルアップで階位（ランク）を得る本格的なバニラ風のキットを備え、さらに完全な**タレントシステム**（クラスごとに3スペック、全27スペック）があります。
+- **レベル1から20までの3つのオープンワールドゾーン**、80近いクエスト、そして Gravecaller の陰謀をめぐる一本につながったストーリーライン。
+- **5つのインスタンスダンジョン**。うち4つは5人パーティのエリートレイド、1つはソロの納骨堂で、エリートスケーリング、AoEのボスメカニクス、クラスアーキタイプに応じた戦利品を備えています。
+- **スケーラブルな delve**。1人または2人のプレイヤーとAIの相棒のための小規模パーティモードで、Normal と Heroic のティアにわたり、毎回ランダム化された部屋から組み直されます。
+- **the Ashen Coliseum**。1v1と2v2のラダーを備えたランク制PvPアリーナに加え、2v2 Fiesta モード（強化アイテムの取得、縮小するリング、先に15キル）。
+- **本物のマルチプレイヤー**。パーティ、トレード、決闘、タップ権、パーティ分配XP、ウィスパー、離席ステータス、そしてすべての戦闘判定を握るサーバー。
+- **すべてが手続き的生成**。木組みの町、リグ付きのクリーチャー一族、キャンバスに描かれた呪文アイコン、WebAudio のサウンド、バイオームの天候、リアルタイムの影。世界に3Dモデルファイルはありません。
+- **21のロケールにローカライズ**。決定論的な「simがキーを発する」パイプラインを通じて。
+- **ヘッドレスのRL環境**。Gymnasium バインディング、報酬整形、ベンチマークモードを備えています。
+- **web3ネイティブ**。Solana ウォレットをリンクして $WOC 残高とコスメティックなホルダーバッジを表示できます。完全に任意で、ノンカストディアルです。
+
+## スクリーンショット
 
 ![Eastbrook の薬屋の外に集まるパーティ](../../docs/screenshots/party-questing.jpg)
 
 | | |
 |:---:|:---:|
-| ![Eastbrook のキャンプファイアの夕暮れ](../../docs/screenshots/eastbrook-dusk.jpg)<br>*Eastbrook のキャンプファイアの夕暮れ* | ![Hollow Crypt でのエリート敵の引き寄せ](../../docs/screenshots/hollow-crypt.jpg)<br>*Hollow Crypt で松明に照らされたエリート敵の引き寄せ* |
-| ![廃墟の礼拝堂にいる不浄な死者たち](../../docs/screenshots/restless-dead.jpg)<br>*廃墟の礼拝堂にいる不浄な死者たち* | ![Vale Bandits との乱戦](../../docs/screenshots/vale-bandits.jpg)<br>*盗賊の野営地で数で圧倒される* |
-| ![北の道で討ち取られる Old Greyjaw](../../docs/screenshots/old-greyjaw.jpg)<br>*レアスポーンの Old Greyjaw を北の道で討ち取る* | ![ベンダーとバッグの UI](../../docs/screenshots/vendor-and-bags.jpg)<br>*Smith Haldren の店で装備を整える — ツールチップ、バッグ、コイン* |
+| ![Eastbrook のキャンプファイアの夕暮れ](../../docs/screenshots/eastbrook-dusk.jpg)<br>*Eastbrook のキャンプファイアの夕暮れ* | ![the Hollow Crypt でのエリートプル](../../docs/screenshots/hollow-crypt.jpg)<br>*the Hollow Crypt の松明に照らされたエリートプル* |
+| ![崩れた礼拝堂の安らげぬ死者](../../docs/screenshots/restless-dead.jpg)<br>*崩れた礼拝堂の安らげぬ死者* | ![Vale Bandits との乱闘](../../docs/screenshots/vale-bandits.jpg)<br>*盗賊のキャンプで多勢に無勢* |
+| ![北の街道で討たれた Old Greyjaw](../../docs/screenshots/old-greyjaw.jpg)<br>*レアスポーンの Old Greyjaw、北の街道で討ち取られる* | ![ベンダーとバッグのUI](../../docs/screenshots/vendor-and-bags.jpg)<br>*Smith Haldren の店で装備を整える。ツールチップ、バッグ、コインつき* |
+| ![Glimmermere の岸辺のムーンゲート](../../docs/screenshots/glimmermere-moongate.jpg)<br>*Glimmermere のムーンゲートから這い上がる溺死者たち* | ![the Drowned Temple の祭壇上の Ysolei](../../docs/screenshots/drowned-temple-altar.jpg)<br>*Moonfire と the Drowned Temple の祭壇* |
 
-![World of Claude](../../worldofclaude.png)
+天候はバイオーム駆動かつレンダリングのみで、決定論的なsimには一切触れません。
 
-![World of ClaudeCraft コミュニティ](../../woc_community.png)
+| | | |
+|:---:|:---:|:---:|
+| ![Eastbrook Vale の晴天](../../docs/screenshots/weather-vale_clear.jpg)<br>*Vale の晴れ* | ![Mirefen Marsh の雨](../../docs/screenshots/weather-marsh_rain.jpg)<br>*Mirefen Marsh の雨* | ![Thornpeak Heights の雪](../../docs/screenshots/weather-peaks_snow.jpg)<br>*Thornpeak Heights の雪* |
 
----
+## プレイする
 
-## Host it (one command)
+入り口は二つあり、どちらも同じ世界が動きます。
+
+### オフライン、ブラウザで
+
+```bash
+npm install
+npm run dev        # then open http://localhost:5173 and click Play Offline
+```
+
+キャラクターに名前をつけ、9つのクラスのいずれかを選ぶと、**Eastbrook Vale**（レベル1から7）からスタートします。ここは6つの拠点に囲まれた市場町です。北には狼の通り道、東にはイノシシの草原、西には the Webwood、北西には Mirror Lake、南西にはコボルドの銅鉱の採掘場、北東には安らげぬ死者の崩れた礼拝堂、そして南東には Gorrak の盗賊キャンプがあります。北の街道は山道を登って **Mirefen Marsh**（6から13、拠点 Fenbridge）へ、さらに **Thornpeak Heights**（13から20、拠点 Highwatch）へと続きます。世界のシードは `src/main.ts` で固定されているので、訪れるたびに同じ場所です。
+
+### オンライン、他のプレイヤーと
+
+アカウントと永続キャラクターを備えた本物のクライアント/サーバーゲームを立ち上げるには、下の [自分の世界をホストする](#host-your-own-world-one-command) を参照してください。
+
+<a id="host-your-own-world-one-command"></a>
+
+## 自分の世界をホストする（コマンド一つ）
 
 ```bash
 cp .env.example .env
-# .env を編集し、長いランダムな POSTGRES_PASSWORD を設定する
-docker compose up -d --build     # postgres + ゲームサーバー、完全にビルド済み
-# http://localhost:8787 を開く — アカウント、キャラクター、世界のすべて
+# edit .env and set a long random POSTGRES_PASSWORD
+docker compose up -d --build     # postgres + game server, fully built
+# open http://localhost:8787 for accounts, characters, and the whole world
 ```
 
-**リモートホスティング**の場合：compose スタックを任意の VPS に置き、環境に本物の `POSTGRES_PASSWORD` を設定し、ポート 8787 を TLS リバースプロキシの前面に置きます（Caddy なら 2 行で済みます — `your.domain { reverse_proxy localhost:8787 }`）。WebSocket は自動的にプロキシされ、クライアントは https ページでは `wss://` を自動選択します。認証エンドポイントは IP ごとにレート制限され、パスワードは scrypt でハッシュ化され、トークンは 7 日後に失効します。本番環境では決して `ALLOW_DEV_COMMANDS=1` を設定しないでください（テストボットが使うレベル上げ／テレポートのチートが有効になります）。
+**リモートホスティング**の場合は、compose スタックを任意のVPSに置き、環境に本物の `POSTGRES_PASSWORD` を設定し、ポート8787の前段にTLSのリバースプロキシを立てます。Caddy なら2行で済みます（`your.domain { reverse_proxy localhost:8787 }`）。WebSocket は自動でプロキシされ、クライアントは https ページで `wss://` を自動選択します。認証エンドポイントはIPごとにレート制限され、パスワードは scrypt でハッシュ化され、トークンは7日で失効します。本番では決して `ALLOW_DEV_COMMANDS=1` を設定しないでください。テストボットが使うレベルアップやテレポートのチートが有効になってしまうからです。本番運用の完全ガイドは [DEPLOY.md](../../DEPLOY.md) を参照してください。
 
-## Develop online (hot reload)
+<a id="develop-online-with-hot-reload"></a>
+
+### ホットリロードでオンライン開発
 
 ```bash
 npm install
 cp .env.example .env
-# .env を編集し、POSTGRES_PASSWORD と DATABASE_URL に同じパスワードを設定する
-npm run db:up        # docker 上の postgres 16（ポート 5433、ボリュームで永続化）
-npm run server       # :8787 上の権威あるゲームサーバー（REST + WebSocket）
-npm run dev          # :5173 上のクライアント開発サーバー（/api と /ws をプロキシ）
+# set POSTGRES_PASSWORD and point DATABASE_URL at the same password
+npm run db:up        # postgres 16 in docker (port 5433, volume-persisted)
+npm run server       # authoritative game server on :8787 (REST + WebSocket)
+npm run dev          # client dev server on :5173 (proxies /api and /ws)
 ```
 
-http://localhost:5173 を開く → **Play Online** → アカウントを作成 → キャラクターを作成 → Enter World。2 つ目のブラウザ／タブを開いて再度ログインすると、町でお互いの姿が見えます。`Enter` でチャットが開きます。
+http://localhost:5173 を開き、**Play Online** を選び、アカウントを作成し、キャラクターを作成して Enter World を押します。2つ目のタブを開いて再度ログインすると、町でお互いの姿が見えます。`Enter` でチャットが開きます。Docker Compose スタックと並んで、本物の MediaWiki プレイヤーwiki が http://localhost:8080/wiki/ で立ち上がります。そのシードページは現在のゲームコンテンツから `npm run wiki:seed` で生成されます。
 
-- **アカウント**：scrypt でハッシュ化されたパスワード、7 日間有効なベアラートークン（`auth_tokens`）。
-- **キャラクター**：1 アカウントにつき最大 10 体。レベル／装備／バッグ／クエスト／位置／所持金は Postgres に JSONB として永続化され、30 秒ごと、ログアウト時、サーバーシャットダウン時に保存されます。名前はグローバルに一意で、文字のみ、クラシックスタイルです。
-- **サーバーは権威を持ちます**：クライアントは移動の意図 + コマンドを 20 Hz でストリーミングし、サーバーは世界（共有された 1 つの `Sim`）を実行して、関心範囲に絞ったスナップショット（~120 yd）とプレイヤーごとにルーティングされたイベントを送信します。すべての戦闘計算、ルートのロール、クエストの進行判定、ベンダー取引はサーバー側で行われ、クライアントはレンダラーに徹します。
-- **パーティ**（最大 5 人）：プレイヤーを右クリック → *Invite to Party*。パーティフレームは左側に表示され、メンバーはタップ権を共有し、討伐クエストの進行を分け合い、本物のバニラのグループボーナス（3／4／5 人で 1.166/1.3/1.43）で XP を分配します。パーティチャットは `/p message`。ミニマップ上のメンバーは青いブリップで表示されます。
-- **トレード**：プレイヤーを右クリック → *Trade*。両者がアイテム + 所持金をステージングし、両者が承諾する必要があり、交換はアトミックかつサーバーで検証されます（クエストアイテムは取引不可）。離れて歩くとキャンセルされます。
-- **決闘**：右クリック → *Challenge to a Duel*。3 秒のカウントダウン後、一方が 1 hp になるまで戦います — 誰も死なず、勝者はゾーン全体に告知されます。60 ヤード離れて逃げると不戦敗になります。
-- **The Ashen Coliseum**（1v1 ランク戦アリーナ）：`G`（または ⚔ ボタン）を押してアリーナパネルを開き、*Enter the Queue*。マッチメイキングはオンライン中で最もレーティングが近い挑戦者とあなたを組ませ、両者をプライベートで松明に照らされた闘技場へテレポートさせます。5 秒のカウントダウンで両ファイターを回復・リセットし、公平なスタートを切らせます。試合は一方が 1 hp で降参すると終了します（誰も死にません）。勝敗は永続的な **Elo レーティング**を動かし（全員 1500 から開始）、キューに入った場所に正確に戻ります。パネルにはあなたの順位、リアルタイムのオンラインラダー、そして歴代リーダーボード（`GET /api/arena/leaderboard`）が表示されます。
-- **マルチプレイヤーのルール**：クラシックなタップ権（最初にモブにダメージを与えたプレイヤーがそのルート／XP／クエスト進行を所有 — 他のプレイヤーには「You don't have permission to loot that.」と表示）、モブは犠牲者が死ぬと次の攻撃者にリターゲットし（無料のリセットなし）、参加／退出の告知、`/say` スタイルのチャット。
+何が永続化され、サーバーがどのように主導権を保つか。
 
-## The Hollow Crypt — 5-player elite instance
+- **アカウント**: scrypt でハッシュ化されたパスワードと7日間のベアラートークン（`auth_tokens`）。
+- **キャラクター**: アカウントごとに最大10体。レベル、装備、バッグ、クエスト、タレント、位置、所持金は Postgres に JSONB として永続化され、30秒ごと、ログアウト時、サーバー停止時に保存されます。名前はグローバルに一意で、英字のみ、クラシックなスタイルです。
+- **サーバーが権威を持つ**: クライアントは移動の意図とコマンドを20 Hzでストリーミングし、サーバーは一つの共有 `Sim` を動かして関心スコープ（~120 yd）のスナップショットとプレイヤーごとのイベントを返します。すべての戦闘判定、戦利品のドロップ、クエストの達成、ベンダー取引はサーバー側で解決されます。クライアントはレンダラーです。
 
-Brother Aldric のストーリーラインは *The Restless Dead* の先へと続きます：**Whispers Below**（廃墟の礼拝堂で Gravecaller の紋章を見つける）→ **The Binding Rite**（コボルトの採掘場から Blessed Tallow を、不浄な死者から Ghostly Essence を集める）→ **Into the Hollow**（*推奨プレイヤー数：5*）— 礼拝堂の地下にある地下墓地の最深部で Morthen the Gravecaller を倒します。
+<a id="train-an-agent-headless-rl"></a>
 
-- Fallen Chapel にある地下墓地の扉は、**あなたのパーティを専用のプライベートインスタンスのコピー**へとテレポートさせます（6 スロット。インスタンスは空になってから 5 分後にリセットされます）。
-- 内部：松明に照らされた回廊、ペアになった**エリート**雑魚の群れ（バニラのエリートスケーリング：体力 ~2.3 倍、ダメージ ~1.5 倍、XP 2 倍）、ミニボスの Sexton Marrow、そして 10 秒ごとに **Shadow Pulse** の AoE を使うレベル 10 のエリートボス Morthen。ダンジョンの雑魚はインスタンスがリセットされるまでリスポーンしません。
-- 報酬：クラスのアーキタイプごとのレア（青）武器、1 ゴールド、1500 XP。
-- これは本当に 5 人向けに調整されています：私たちの自動 5 ボットレイド（warrior、paladin、priest、mage、hunter が集中砲火 + ヒーラー AI で）は、~10 回の死亡を伴って ~5 分でクリアします（`node scripts/crypt_raid.mjs`、ALLOW_DEV_COMMANDS=1 が必要）。
+## エージェントを訓練する（ヘッドレスRL）
 
-```
-docker compose ps          # eastbrook-db（postgres:16-alpine、ヘルスチェック）
-node scripts/mp_integration.mjs   # 26 項目の API/WS/永続化テストスイート
-node scripts/mp_browser.mjs       # 2 つの本物のブラウザクライアントがお互いを見る
-```
-
-## The Sunken Bastion & Gravewyrm Sanctum
-
-陰謀は Morthen で終わりません。**The Sunken Bastion**（5 人用、~レベル 13、Mirefen 南東）には Vael the Mistcaller がいて、体力 60% と 30% で Drowned Thralls の波を召喚します。フィナーレは **Gravewyrm Sanctum**（5 人用、レベル 20、Thornpeak の地下）：エリートの骨兵とドラコニッドが詰まった 3 つの間、Korgath the Bound（体力 30% 未満で激昂）、Grand Necromancer Velkhar（さらなる雑魚の波）、そして **Korzul the Gravewyrm** — ここではエピック武器がドロップし、前段のクエストチェーンはソロで進められるため、誰もストーリーから締め出されることはありません。
-
-
-
-## Play offline
+同じ決定論的コアが [Gymnasium](https://gymnasium.farama.org/) 環境として動くので、エージェントはその再実装ではなく実際のゲームに対して学習します。env サーバー（`headless/env_server.ts`）は一つの `Sim` をラップし、stdio 越しに改行区切りのJSONで通信します。`python/` 内の Python バインディングがそれをサブプロセスとして起動し、おなじみの `reset` / `step` / `close` ループを公開します。
 
 ```bash
-npm run dev        # http://localhost:5173 を開く -> Play Offline
+npm run build:env    # bundle the env server to dist-env/env_server.cjs
+npm run env          # run it directly (NDJSON on stdio)
+npm run bench        # in-process throughput benchmark (no IPC)
+
+# drive it from Python
+pip install gymnasium numpy
+python python/example_random_agent.py
 ```
 
-キャラクターに名前を付け、9 つのクラスのいずれかを選ぶと、**Eastbrook Vale**（レベル 1～7）に入ります：6 つの拠点に囲まれた市場町で、北にはオオカミの生息地、東にはイノシシの草原、西には the Webwood、北西には Mirror Lake、南西にはコボルトの銅採掘場、北東には不浄な死者がいる廃墟の礼拝堂、南東には Gorrak の盗賊の野営地があります。北の道は山道を抜けて **Mirefen Marsh**（6～13、拠点：Fenbridge）へ登り、さらに **Thornpeak Heights**（13～20、拠点：Highwatch）へと続きます — 3 つのゾーン、~60 のクエスト、そして 1 つのストーリーライン：Gravecaller の陰謀が、Eastbrook の外にいる最初の不浄な骨から、峰々の地下にいる **Korzul the Gravewyrm** まで展開します。各拠点にはベンダー（誠実な白い装備を売る武器・防具の鍛冶屋を含む）、墓地、独自の音楽、そしてゾーンマップがあります。
+```python
+from wow_env import WoWClassicEnv
 
-### Controls (classic layout)
+env = WoWClassicEnv(player_class="warrior")   # warrior or mage
+obs, info = env.reset(seed=42)
+obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
+env.close()
+```
 
-| Input | Action |
+- **観測空間とアクション空間はコンテンツ由来です。** 起動時に env の `info` 応答から問い合わせて取得し、ハードコードしないでください。これらはゲームとともに成長します。現在のアクション空間は `Discrete(44)`（移動、ターゲット、攻撃、アビリティキット一式、インタラクト、飲食）、観測は276個のfloatの `Box`（自己、アビリティ、ターゲット、近くのモブ、最寄りのインタラクト対象、クエスト進捗）です。
+- **報酬**はティックごとのカウンター差分（XP、与ダメージと被ダメージ、キル、デス、クエスト進捗、レベルアップ）の加重和で、リセットごとに調整できます。各 `step` は1つのアクションを適用し、デフォルトでsimを5ティック進めるので、シミュレートされた1秒あたりおおよそ4回の意思決定になります。
+- **構造的に決定論的。** 壁時計もなく、`Math.random` もありません。リセットにシードを与えれば、エピソードはそのまま再生されます。
+
+プロトコルとバインディングは `headless/CLAUDE.md` と `python/CLAUDE.md` に文書化されています。
+
+<a id="web3"></a>
+
+## Web3
+
+World of ClaudeCraft は、Solana 上のコミュニティトークン **$WOC** を中心とした web3 ネイティブです。Solana ウォレットを接続し、署名一つでアカウントにリンクすると（ノンカストディアル、承認すべきトランザクションなし）、読み取り専用の $WOC 残高がコスメティックなホルダーティアバッジとともにHUDに表示されます。
+
+これはコスメティックのみで、プレイに必要ではありません。ゲーム内で消費したり獲得したりするものは何もなく、pay-to-win はなく、ウォレットを一度も接続しなくてもゲームは問題なく遊べます。
+
+**$WOC コントラクトアドレス（Solana）:**
+
+```
+3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth
+```
+
+トークンの詳細は [worldofclaudecraft.com](https://worldofclaudecraft.com/) で。
+
+## 世界をめぐる
+
+### 9つのクラス
+
+どのクラスも本物のバニラ風メカニクスを使い、レベル1から20を通じてランク付きの呪文を習得します（Lightning Bolt の R2 がレベル8、R3 がレベル14、R4 がレベル20で、Execute、Kidney Shot、Flash Heal、Stormstrike、Starfire のような高帯域のアビリティはそれぞれのクラシックなレベルで手に入ります）。
+
+- **Warrior**: rage、Heroic Strike（次の一振りで発動、GCD外）、Battle Shout、Charge、Rend、Thunder Clap、Hamstring、Bloodrage、Overpower（回避時のプロック）。
+- **Paladin**: Judgement で解き放つ Seal of Righteousness、Holy Light、Devotion Aura、Blessing of Might、Divine Protection（吸収）、Hammer of Justice（スタン）、Lay on Hands。
+- **Hunter**: 遠隔の Auto Shot（クラシックなデッドゾーンつきで8から35 yd）、Raptor Strike、Aspect of the Hawk、Serpent Sting、Arcane Shot、Concussive Shot、Mongoose Bite、Wing Clip、そしてレベル10からテイム可能なペット。
+- **Rogue**: energy とコンボポイント、Sinister Strike、Eviscerate、Backstab（背後、ダガー）、Gouge、Evasion、Slice and Dice、Sprint。
+- **Priest**: Smite、Lesser Heal、Power Word: Fortitude、Shadow Word: Pain、Power Word: Shield（吸収）、Renew（HoT）、Mind Blast。
+- **Shaman**: Lightning Bolt、Rockbiter Weapon（付呪）、Healing Wave、Earth Shock、Lightning Shield（とげ）、Flame Shock。
+- **Mage**: Fireball、Frost Armor、Arcane Intellect、Frostbolt、Conjure Water、Fire Blast、Arcane Missiles（チャネル）、Polymorph、Frost Nova。
+- **Warlock**: Shadow Bolt、Demon Skin、Immolate、Corruption、Life Tap、Curse of Agony、Drain Life、そして Imp から Doomguard まで召喚可能な7体の悪魔。
+- **Druid**: Wrath、Healing Touch、Mark of the Wild、Moonfire、Rejuvenation、Thorns、Entangling Roots、レベル10で Bear Form。
+
+ヒールとバフはパーティメンバーに届き、ヒールはクリティカルが出ることがあり、吸収シールドは体力より先にダメージを受け止めます。**クラスごとに3つのタレントスペック**（Arms/Fury/Protection、Balance/Feral/Restoration、など）にポイントを振り分けます。割り振りはサーバー検証され、ビルド文字列としてエクスポートできます。
+
+### ダンジョン
+
+Gravecaller のストーリーラインは4つの5人エリートインスタンスを貫き、探検者のためのソロの納骨堂が脇にひっそりと控えています。
+
+- **the Hollow Crypt**（5人）は the Fallen Chapel の地下にあります。対になったエリートのトラッシュ、Sexton Marrow のミニボス、そして10秒ごとに Shadow Pulse の AoE を落とす Morthen the Gravecaller。納骨堂の扉はパーティをプライベートなインスタンスのコピーへとテレポートさせ、無人になって5分後にリセットします。
+- **the Sunken Bastion**（5人、レベル13前後、Mirefen 南東）: Vael the Mistcaller が体力60%と30%で Drowned Thralls の波を召喚します。
+- **Gravewyrm Sanctum**（5人、レベル20、Thornpeak の地下）: エリートの骨衛兵とドラコニッドの3つの部屋、Korgath the Bound（30%未満で激昂）、Grand Necromancer Velkhar、そしてエピック武器がドロップする Korzul the Gravewyrm。
+- **the Drowned Temple**（5人）は Glimmermere のムーンゲートを抜けた先にあります。青白い月紫のインスタンスで、Choirmother Selthe を経て Ysolei, Avatar of the Drowned Moon へと続きます。彼女は9秒ごとに Lunar Tide を放ち、60%と30%で Moonspawn を召喚します。
+- **the Abandoned Crypt**（ソロ）は Thornpeak にあります。一人のための静かなキーストーンと日誌の探索で、その足跡が **Nythraxis, Scourge of Thornpeak** への王室の扉を解錠します。これは3つの魂のワードストーンにまたがって戦う10人レイドのフィナーレです。
+
+導入のクエストチェーンはソロで進められるので、ストーリーがグループ探しの壁の向こうに閉ざされることはありません。私たちの自動化された5体ボットのレイド（warrior、paladin、priest、mage、hunter、フォーカスファイアとヒーラーAIつき）は、the Hollow Crypt を約5分でクリアします（`node scripts/crypt_raid.mjs`、`ALLOW_DEV_COMMANDS=1` が必要）。
+
+### Delve
+
+Delve は1人または2人のプレイヤーのための、独立したスケーラブルな小規模パーティモードです。**The Collapsed Reliquary**（レベル7以上）は、毎回ランダム化された部屋から組み直される納骨堂で、Deacon Varric で終わります。ソロでこなすと、AIの相棒 Tessa があなたの隣で戦います。聖遺物庫の遺跡にいる Brother Halven が delve ボードを運営しており、Normal か Heroic かはあなた次第です。Heroic は敵のレベルを上げ、ランダムなアフィックスを加えて、より豊かな報酬をもたらします。
+
+### the Ashen Coliseum（ランク制PvP）
+
+`G` かアリーナボタンを押してキューに入ります。マッチメイキングが戦士たちをプライベートな松明の灯る闘技場へとテレポートさせ、短いカウントダウンで全員を回復・リセットして公平なスタートを切り、一方が1 hpで降参すると勝負が終わります。誰も死なず、キューに入ったまさにその場所に戻ります。
+
+- **1v1と2v2のランクラダー**。それぞれに永続的なElo風レーティング（全員1500からスタート）と歴代リーダーボード（`GET /api/arena/leaderboard`）を備えています。
+- **2v2 Fiesta**。より賑やかなパーティモードです。6分のキャップ内で先に15キルしたチームが勝ち、プレイヤーは伸びていくタイマーでリスポーンし、強化アイテムの取得が3つの波にわたって力をばらまき、閉じていくリングが戦いを一つに押し込めます。
+
+### 一緒に遊ぶ
+
+- **最大5人のパーティ**: プレイヤーを右クリックして Invite to Party。メンバーはタップ権とクエストの達成を共有し、本物のバニラのグループボーナス（3/4/5人で 1.166 / 1.3 / 1.43）でXPを分配し、ミニマップ上に点として表示されます。`/p` でパーティチャット、`/roll` で戦利品の決着。
+- **トレード**: 右クリックして Trade。両者がアイテムと所持金を出し合い、両者が承認しなければならず、交換はアトミックでサーバー検証されます。クエストアイテムはトレードできず、離れて歩くとキャンセルされます。
+- **決闘**: 右クリックして Challenge to a Duel。3秒のカウントダウンののち、一方が1 hpになるまで戦います。勝者はゾーン全体に告知され、60ヤード逃げると棄権になります。
+- **タップ権と離席ステータス**: モブに最初にダメージを与えたプレイヤーがその戦利品、XP、クエストの達成を所有します。`/afk` と `/dnd` であなたを離席状態にし、ウィスパーに自動返信します。
+
+### 世界とシステム
+
+- **飲食**: 座ると18秒かけて回復し、ダメージや立ち上がりで中断されます。そう、飲み食いは同時にできます。
+- **ベンダー**: 食料と水を買い取り、正直な白い装備を売ってくれます。コインはゴールド、シルバー、カッパーで表示されます。
+- **モブAI**: 徘徊、レベル差による近接アグロ、ソーシャルプル、追跡、リーシュとリセット、死体の戦利品、リスポーン、そして長いタイマーのレアスポーン（Old Greyjaw）。
+- **釣り**スポット。独自の戦利品テーブルとレアな釣果を備えています。
+- **コスメティックスキン**。アンコモン、レア、エピックのレアリティで抽選され、純粋に見た目のためのものです。
+- **死と復帰**: 魂を墓地に解き放ち、落下ダメージを受け、泳いでいる間は減速します。
+- **バイオーム天候**: Vale は晴れ、Marsh は雨、Peaks は雪で、ゾーン間を移動するとクロスフェードします。
+
+### 操作（クラシックレイアウト）
+
+| 入力 | アクション |
 |---|---|
-| `W`/`S` | 前進／後退 — `A`/`D` で旋回（右マウスボタンを押している間はストレイフ）、`Q`/`E` でストレイフ |
-| right-drag / left-drag | マウスルック／カメラのオービット &nbsp;·&nbsp; ホイールでズーム · `Space` でジャンプ |
-| `Tab` | 最も近い敵を順に選択 · 左クリックでターゲット · 右クリックで攻撃／ルート／会話 |
-| `1`–`9`, `0`, `-`, `=` | アクションバー |
-| `F` | インタラクト（死体をルート／オブジェクトを拾う／会話） |
-| `C` `P` `L` `M` `B` `G` | キャラクター · 呪文書 · クエストログ · ワールドマップ · バッグ · アリーナ（Ashen Coliseum） |
-| `V` / `R` / `Esc` | ネームプレート · オートラン · ウィンドウを閉じる／ターゲットを解除 |
+| `W` / `S` | 前進 / 後退。`A`/`D` で旋回（右マウス押下中はストレイフ）、`Q`/`E` でストレイフ |
+| 右ドラッグ / 左ドラッグ | マウスルック / カメラ周回。ホイールでズーム、`Space` でジャンプ |
+| `Tab` | 最寄りの敵を順に選択。左クリックでターゲット、右クリックで攻撃、戦利品入手、会話 |
+| `1`-`9`、`0`、`-`、`=` | アクションバー |
+| `F` | インタラクト（死体の戦利品入手、オブジェクトの拾得、会話） |
+| `C` `P` `L` `M` `B` `G` | キャラクター、呪文書、クエストログ、ワールドマップ、バッグ、アリーナ |
+| `V` / `R` / `Esc` | ネームプレート、オートラン、ウィンドウを閉じる、またはターゲット解除 |
 
-### Classic-fidelity checklist
+タッチ操作（移動スティック、カメラドラッグ、画面上のアクションボタン）はモバイルで自動的に表示されます。
 
-**Formulas（本物のバニラの数式）**
-- レイジ変換 `c = 0.0091L² + 3.23L + 4.27`；獲得は与ダメージで `7.5·d/c`、被ダメージで `2.5·d/c`
-- +3 レベルの崖（96/95/94/83%）を持つ呪文ヒット表；レベルに応じた近接ミス／回避
-- アーマー DR `armor/(armor + 85·AttackerLevel + 400)`
-- HP/マナのステータスルール：最初の 20 スタミナ → 各 1 hp、残り → 10；最初の 20 int → 各 1 マナ、残り → 15
-- XP カーブはレベル 20 まで 400/900/1400/…；モブ XP は `45 + 5·L`、本物のゼロ差グレーバンド付き
-- 1.5 秒の GCD（rogue は 1.0 秒）、武器の振り直しタイマー、5 秒マナルール
+## アーキテクチャ（一つのsim、三つのホスト）
 
-**9 つのバニラクラスすべて（習得レベルとランク値はバニラ準拠、1～20 — 呪文はレベルアップに伴いランクを獲得：Lightning Bolt R2 はレベル 8、R3 は 14、R4 は 20、加えて Execute、Kidney Shot、Flash Heal、Stormstrike、Starfire などの高レベル帯の新アビリティ）**
-- *Warrior*：レイジ、Heroic Strike（次の一振り、GCD 外）、Battle Shout、Charge、Rend、Thunder Clap、Hamstring、Bloodrage、Overpower（回避プロック）
-- *Paladin*：**Judgement** で解き放たれる Seal of Righteousness（武器の付与）、Holy Light、Devotion Aura、Blessing of Might、Divine Protection（吸収）、Hammer of Justice（スタン）、Lay on Hands
-- *Hunter*：**遠隔 Auto Shot**（クラシックなデッドゾーンを伴う 8～35 yd）、Raptor Strike、Aspect of the Hawk、Serpent Sting、Arcane Shot、Concussive Shot、Mongoose Bite（回避プロック）、Wing Clip
-- *Rogue*：エネルギー + **コンボポイント**、Sinister Strike、Eviscerate、Backstab（背後 + ダガー）、Gouge、Evasion、Slice and Dice、Sprint
-- *Priest*：Smite、Lesser Heal、Power Word: Fortitude、Shadow Word: Pain、**Power Word: Shield**（吸収）、**Renew**（HoT）、Mind Blast
-- *Shaman*：Lightning Bolt、**Rockbiter Weapon**（付与）、Healing Wave、Earth Shock、**Lightning Shield**（ソーン）、Flame Shock
-- *Mage*：Fireball、Frost Armor、Arcane Intellect、Frostbolt、Conjure Water、Fire Blast、Arcane Missiles（チャネル）、**Polymorph**、Frost Nova
-- *Warlock*：Shadow Bolt、Demon Skin、Immolate、Corruption、**Life Tap**、Curse of Agony、**Drain Life**（チャネルによる体力吸収）
-- *Druid*：Wrath、Healing Touch、Mark of the Wild、Moonfire、Rejuvenation、Thorns、Entangling Roots、**Bear Form**（レベル 10 で切り替え可能なシェイプシフト）
-- ヒールはパーティメンバーを対象にできます（パーティフレームをクリックしてからヒール）；バフは友好的なプレイヤーにかけられます；ヒールはクリティカルします；吸収シールドは体力の前にダメージを吸収します。
+このプロジェクトを結びつけている考え方は三つあります。
 
-**World & systems**
-- 飲食：座って 18 秒かけて回復、ダメージや立ち上がりで中断 — そして、はい、食べながら同時に飲むこともできます
-- ベンダー：食料／水の購入、グレー品の売却；所持金表示は g/s/c
-- きらめきを伴う地面のクエストオブジェクト（盗賊の補給品の箱を取り返す）
-- モブ AI：徘徊、レベル差による近接アグロ、ソーシャルプル（murloc はより遠くから引き寄せる — 仲間を連れて行こう）、追跡、リーシュ・回避・リセット、死体のルート、リスポーン；長いタイマーで出現するレアスポーン（Old Greyjaw）
-- 死亡 → 魂を解放 → 墓地；落下ダメージ；水泳は移動を遅くする
-- 放棄機能付きのクエストログ、挨拶を伴うゴシップダイアログ、クラスごとの報酬
+- **一つのsim、三つのホスト。** 同じ `src/sim/` のコードが、オフラインのブラウザ世界、オンラインサーバー、RL環境を動かします。挙動はどこでも同一でなければならず、テストはそれを保つために存在します。
+- **`IWorld` が唯一の継ぎ目。** `src/world_api.ts` が `IWorld` を定義します。オフラインの `Sim` は構造的にそれを満たし、オンラインの `ClientWorld` はサーバースナップショットをミラーリングして実装します。レンダラーとHUDは `IWorld` だけと話し、具体的な世界とは決して話さないので、新機能はまずインターフェースを拡張し、それから両方の世界を実装します。
+- **サーバーが権威を持つ。** クライアントは意図を送り、サーバーが結果を決めます。クライアントは戦闘、戦利品、経済を自分で解決することはありません。
 
-**Presentation**
-- すべてがプロシージャル：木組みの家、こけら葺きの屋根、礼拝堂、市場の露店、テント、揺らめく光のキャンプファイア、鉱山のポータル、崩れた柱、釣り桟橋、murloc の泥小屋、地形に描き込まれた道、草の房、松 + オークの木、アニメーションする水を湛えた湖、流れる雲、リアルタイムの影
-- 歩行／攻撃／詠唱／座り／死亡アニメーションを備えた、リグ済みの 12 のクリーチャーファミリー（wolf/boar/spider/murloc/kobold/skeleton/humanoid/troll/ogre/elemental/dragonkin/sheep）
-- すべての呪文、アイテム、バフのために描かれたプロシージャルアイコン — 実行時にキャンバス上に描画され、アセットファイルなし
-- クラシック UI：ポートレートのユニットフレーム、持続時間付きのバフ／デバフバー、クールダウンスイープ + 射程／リソースの色分けを備えたアクションバー、詠唱／チャネルバー、呪文書、キャラクターのペーパードール、クエストログ、ワールドマップ、ベンダー + ルートウィンドウ、金縁のツールチップ、フローティングコンバットテキスト、戦闘ログ、分割された XP バー、ブリップ付きミニマップとフルゾーンマップ
-- プロシージャルな WebAudio サウンド：近接／呪文のヒット、レベルアップのファンファーレ、クエストのチャイム、コインの音、死亡のスティング — オーディオファイルなし
+simは固定20 Hzのティック（`DT = 1/20`）で、すべてのランダム性は一つのシード付き `Rng` を通って流れ、`src/sim/` はDOM、ブラウザ、Three.js のインポートを一切持ちません。それこそが、同じコードを Node の env サーバー、権威あるゲームループ、ブラウザのタブへと一行も変えずにバンドルできる理由です。
 
-## Development
+### プロジェクト構成
+
+| パス | 内容 |
+|---|---|
+| `src/sim/` | 決定論的なゲームコア、真実の源。DOMもThreeの依存もなし。 |
+| `src/sim/content/` | コードとしてのデータ: 9つのクラス、アビリティ、ゾーン、ダンジョン、アイテム、タレント。 |
+| `src/render/` | Three.js レンダラー（手続き的なジオメトリ、テクスチャ、VFX）。世界を読むだけで、決して書き換えない。 |
+| `src/game/` | ローカル入力、カメラ、キーバインド、モバイル操作、手続き的な WebAudio。 |
+| `src/ui/` | クラシックHUD（フレーム、ウィンドウ、ツールチップ、マップ、フローティングコンバットテキスト）、手続き的アイコン、i18n。 |
+| `src/net/` | オンラインクライアント: REST認証に加え WebSocket の世界ミラー（`ClientWorld`）。 |
+| `src/admin/` | 管理ダッシュボードSPA（別の `admin.html` エントリ）。 |
+| `server/` | 権威あるサーバー: HTTPとWS、世界ループ、Postgres、認証、ソーシャル、モデレーション。 |
+| `headless/` + `python/` | RL env サーバー（`env_server.ts`）と Python Gym バインディング。 |
+| `tests/` | Vitest スイート。 |
+| `scripts/` | アセットビルドに加え、ブラウザE2E、スクリーンショット、統合スクリプト。 |
+| `public/` · `docs/` | 静的アセット（GLBモデル、テクスチャ、HDRI）と設計ドキュメント。 |
+
+ほとんどのディレクトリは独自の `CLAUDE.md` にローカルの慣習を備えています。プロジェクトの不変条件の全集合はルートの [`CLAUDE.md`](../../CLAUDE.md) にあります。
+
+## クラシックそのままに作られている
+
+戦闘、レベリング、脅威（threat）はすべて本物のクラシック時代のルールで動きます。rage と energy、命中と回避のテーブル、防具による軽減、本物のXPカーブ、スイングタイマー、グローバルクールダウン。近似ではなく、あなたの記憶のままに感じられます。正確な数値を読みたければ `src/sim/` にあります。
+
+そしてそのほとんど何一つ出荷済みアセットではありません。世界はコードから描かれます。
+
+- 手続き的な町、クリーチャー、地形、水、天候、リアルタイムの影。世界に3Dモデルファイルはありません。
+- 12のリグ付きクリーチャー一族。歩行、攻撃、詠唱、着座、死亡のフルアニメーションつき。
+- 呪文、アイテム、バフのアイコンは実行時にキャンバスに描かれます。
+- 完全なクラシックHUD（ユニットフレーム、アクションバー、ツールチップ、クエストログ、ワールドマップ、ミニマップ、フローティングコンバットテキスト）と、あらゆるサウンドのための手続き的 WebAudio。
+
+## 開発
 
 ```bash
-npm test                        # vitest スイート：数式、戦闘、AI、クエスト、9 クラスすべて、
-                                #   パーティ、決闘、トレード、エリート、クリプト
-npm run build                   # 本番用 web ビルド
-node scripts/smoke_browser.mjs  # warrior の E2E（`npm run dev` の実行が必要）
-node scripts/smoke_mage.mjs     # mage：詠唱、polymorph、conjure+飲む、死亡／解放
-node scripts/smoke_rogue.mjs    # rogue：コンボポイント、eviscerate、ベンダー、飲食
-node scripts/visual_tour.mjs    # ゾーン + UI のスクリーンショットツアーを tmp/ へ
-node scripts/mp_integration.mjs # 26 項目の API/WS/永続化テストスイート（サーバー稼働中）
-node scripts/social_e2e.mjs     # ワイヤー越しのトレード + 決闘（ALLOW_DEV_COMMANDS=1）
-node scripts/arena_visual.mjs   # 2 つのクライアントがキューに入り、Ashen Coliseum でランク 1v1 を戦う
-node scripts/crypt_raid.mjs     # 5 つのボットが Hollow Crypt をクリア（ALLOW_DEV_COMMANDS=1）
+npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons
+npm run build                   # production web build
+node scripts/smoke_browser.mjs  # warrior end-to-end (needs npm run dev)
+node scripts/smoke_mage.mjs     # mage: casting, polymorph, conjure and drink, death and release
+node scripts/visual_tour.mjs    # screenshot tour of the zone and UI into tmp/
+node scripts/tour_temple.mjs    # screenshot tour of the Glimmermere and Drowned Temple into tmp/
+node scripts/mp_integration.mjs # API, WS, and persistence checks (server running)
+node scripts/social_e2e.mjs     # trade and duel over the wire (ALLOW_DEV_COMMANDS=1)
+node scripts/arena_visual.mjs   # two clients queue and fight a ranked 1v1
+node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_COMMANDS=1)
 ```
 
-ブラウザエージェントは、押しっぱなしのキーをシミュレートする代わりに、`window.__game.controller` を通じて移動を駆動できます。`controller.move({ forward: true }, facingRadians)` や `{ f: 1, sr: 1 }` のようなコンパクトな websocket フラグを使います。移動を変えずに向きを更新するには `controller.face(facingRadians)` を、実際のキーボード入力に戻すには `controller.stop()` を呼び出します。オンラインプレイは同じ入力フレームをサーバーに送り、サーバーはブール／`1` の移動フラグと有限の向きの値のみを受け付けます。
+ロジックとユニットのテストは Vitest を使います。イテレーション中は単一ファイルを実行してください: `npx vitest run tests/sim.test.ts`。E2Eとビジュアルのスクリプトは `puppeteer-core` で本物のブラウザを動かし、`npm run dev` が動いている必要があります（しばしば `npm run server` も）。ブラウザエージェントは、押しっぱなしのキーをシミュレートする代わりに `window.__game.controller` 経由で移動を駆動できます。たとえば `controller.move({ forward: true }, facingRadians)` や `{ f: 1, sr: 1 }` のようなコンパクトなフラグです。
 
-Layout:
+サーバーコマンドについては上記の [オンライン開発](#develop-online-with-hot-reload) を、本番については [DEPLOY.md](../../DEPLOY.md) を、アセットライセンスについては [CREDITS.md](../../CREDITS.md) を参照してください。
 
-```
-src/sim/      決定論的な N プレイヤーのゲームコア（DOM インポートなし） — すべてのターゲットで共有
-src/render/   Three.js レンダラー：models.ts（リグ）、props.ts、textures.ts（プロシージャル）
-src/game/     入力 + カメラ + WebAudio シンセ
-src/ui/       クラシック HUD：フレーム、ウィンドウ、ツールチップ、マップ、FCT
-src/net/      オンラインクライアント：REST 認証 + WebSocket ワールドミラー（ClientWorld）
-src/world_api.ts  Sim と ClientWorld の両方が満たす IWorld インターフェース
-server/       ゲームサーバー：main.ts（HTTP+WS）、game.ts（ワールドループ）、db.ts、auth.ts
-docker-compose.yml  postgres:16-alpine
-tests/        vitest スイート
-scripts/      ブラウザ E2E + スクリーンショットツアー + マルチプレイヤー統合テスト
-```
+## ローカライゼーション
 
-名前、クエスト、ゾーンはオリジナルです。数式とメカニクスはバニラに準拠しています。ワールドシードは `src/main.ts` で固定されているため、世界は訪れるたびに同じ場所になります。
+プレイヤーに見えるすべての文字列は `t()` を通して解決され、ゲームは**21のロケール**で出荷されます（英語、2つのスペイン語、2つのフランス語、カナダ英語、イタリア語、ドイツ語、簡体字と繁体字の中国語、韓国語、日本語、ブラジルポルトガル語、ロシア語、オランダ語、ポーランド語、インドネシア語、トルコ語、スウェーデン語、ベトナム語、デンマーク語）。simとサーバーは言語非依存を保ちます。安定したキーか英語を発し、クライアントが境界で再ローカライズすることで、決定論を保ったままにします。コントリビューターは英語だけを追加し、メンテナーが各リリース前に他のロケールを一括で埋めます。ワークフローは `docs/i18n-scaling/translation-workflow.md` に文書化されています。
 
-## 貢献する
+## コントリビュート
 
-あらゆる形の貢献を歓迎します。コード、翻訳、バグ報告、そしてドキュメント、そのどれもが力になります。まずはセットアップとガイドラインをまとめた [CONTRIBUTING.md](CONTRIBUTING.ja_JP.md) から始めて、[行動規範](../../CODE_OF_CONDUCT.md)に従ってください。初めての方は、[`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) のラベルが付いた issue を探すか、[issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) を立てるか、[Discord](https://discord.gg/GjhnUsBtw) で気軽に挨拶してください。
+あらゆる種類の貢献を歓迎します。コード、翻訳、バグ報告、ドキュメント。まずはセットアップについて [CONTRIBUTING.ja_JP.md](CONTRIBUTING.ja_JP.md) から始め、[行動規範](../../CODE_OF_CONDUCT.md) を読み、脆弱性を報告する前に [SECURITY.md](../../SECURITY.md) を確認してください。初めてですか? [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) のラベルが付いた issue を探すか、[issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) を立てるか、[Discord](https://discord.gg/GjhnUsBtw) で挨拶してください。
 
-## License
+<div align="center">
 
-コードは [MIT ライセンス](../../LICENSE) です — フォークし、リミックスし、自分の世界をホストしてください。
+![World of Claude](../../worldofclaude.png)
 
-同梱されているサードパーティのアートアセット（モデル、テクスチャ、HDRI）は、それぞれ独自のライセンスの下にあります — MIT の water normal map を除き、すべて CC0 パブリックドメインで、[CREDITS.md](../../CREDITS.md) にパックごとに記載されています。
+![World of ClaudeCraft community](../../woc_community.png)
+
+</div>
+
+## ライセンス
+
+コードは [MITライセンス](../../LICENSE) です。フォークし、リミックスし、自分の世界をホストしてください。
+
+同梱されているサードパーティのアートアセット（モデル、テクスチャ、HDRI）はそれぞれのライセンスを保ちます。MITの水のノーマルマップを除き、すべてCC0パブリックドメインで、パックごとに [CREDITS.md](../../CREDITS.md) に文書化されています。

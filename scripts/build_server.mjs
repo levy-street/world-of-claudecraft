@@ -2,9 +2,9 @@
 // abstract `#bot-detector` specifier: the private implementation if its clone is
 // present, otherwise the open-source no-op stub. Mirrors the resolution in
 // vite.config.ts (vitest/dev) and tsconfig.json `paths` (typecheck).
-import * as esbuild from 'esbuild';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import * as esbuild from 'esbuild';
 
 const privateImpl = fileURLToPath(new URL('../private/bot_detector/src/index.ts', import.meta.url));
 const stubImpl = fileURLToPath(new URL('../server/bot_detector/stub.ts', import.meta.url));
@@ -17,6 +17,16 @@ await esbuild.build({
   format: 'cjs',
   external: ['pg-native', 'bufferutil', 'utf-8-validate'],
   outfile: 'dist-server/server.cjs',
+  alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
+});
+
+await esbuild.build({
+  entryPoints: ['scripts/migrate_old_cragmaw_pelt.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  external: ['pg-native'],
+  outfile: 'dist-server/migrate_old_cragmaw_pelt.cjs',
   alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
 });
 

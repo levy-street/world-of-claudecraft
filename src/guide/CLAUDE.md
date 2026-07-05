@@ -5,8 +5,7 @@
 
 # src/guide/ : the public guide / site wiki
 
-A client-rendered docs SPA: the branded, spoiler-safe front-of-house that teaches the
-game and showcases the classes, bestiary, world, quests, and group content. Separate
+A client-rendered docs SPA, the spoiler-safe public front of the game. Separate
 Vite entry (`guide.html`), mounted at `GUIDE_BASE` (`/wiki`). Deep paths
 (`/wiki/classes`) fall back to `guide.html` in BOTH `vite.config.ts` and
 `server/main.ts`. The shell file is still named `guide.html` and the module tree still
@@ -27,7 +26,7 @@ sim/render *data*, never the live world or `IWorld`.
 
 ## Generated data: it never drifts from the game
 `content.generated.ts` is built by `scripts/wiki/build_content.mjs` from the sim source
-of truth (CLASSES, ABILITIES, TALENTS, ZONES, DUNGEONS, the overworld + warlock-pet
+of truth (CLASSES, ABILITIES, TALENTS, ZONES, DUNGEONS, DELVES, the overworld + warlock-pet
 bestiary, render VISUALS). Regenerate with `npm run wiki:content` (it also runs in
 `pretest` and `build`). `tests/guide.test.ts` re-runs the generator and
 `git diff --exit-code`s the output, so a stale committed file fails CI. Do not edit it
@@ -40,12 +39,10 @@ localized spec/mastery prose resolves live through `src/ui/talent_i18n.ts`, not 
 here.
 
 ## i18n: English-only adds, like the rest of the client
-Every guide string is a `guide.*` `t()` key. The English source lives in
-`src/ui/i18n.catalog/guide.ts` (no per-locale blocks, so a new key compiles
-English-only). The 13 locale translations live in the `src/ui/i18n.locales/<lang>.ts`
-overlays and are filled by the maintainer at release (the maintainer-only helper
-`scripts/wiki/apply_guide_locales.mjs` batch-injects them); never hand-edit the
-overlays. Class/ability/spec NAMES stay English on purpose (proper nouns from the sim).
+Guide strings are `guide.*` `t()` keys; the English source lives in
+`src/ui/i18n.catalog/guide.ts` (no per-locale blocks, so a new key compiles English-only).
+The maintainer fills the locale overlays at release; never hand-edit them. Class/ability/
+spec NAMES stay English on purpose (proper nouns from the sim).
 
 ## Keep the wiki in sync (YOU MUST, when you add wiki-worthy content)
 The guide is the game's public reference, so new player-facing content should reach it
@@ -53,7 +50,13 @@ in the SAME change that adds it:
 - **Content the generator already covers** (a class, ability, talent, zone, dungeon,
   mob, warlock pet, or model): run `npm run wiki:content` and commit the regenerated
   `content.generated.ts`. Add a new descriptive `guide.*` prose key for any copy the
-  generator does not derive.
+  generator does not derive. **A new (or retinted) model also needs its still rendered**:
+  run `npm run wiki:stills` and commit the new `public/guide-stills/*.webp` (it needs a
+  headless browser, so it is NOT in `build`/`pretest`; the `tests/guide.test.ts` asset guard
+  fails (so CI fails) if a figure's baked still is missing on disk, plus a second guard fails
+  on an orphan WebP that no figure references). The stills are deterministic on one machine
+  but not byte-identical across machines/GPUs, so they are existence-gated, never diff-gated:
+  re-render on the swiftshader path.
 - **A brand-new content TYPE or system** (a new feature like delves, or a new page):
   extend `scripts/wiki/build_content.mjs` to emit it, add a `pages/<x>.ts` page plus a
   `GUIDE_ROUTES` entry and its `guide.*` keys, then regenerate the sitemap

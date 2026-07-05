@@ -1,12 +1,21 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { clickMoveButtonLabel, normalizeClickMoveButton, Settings, SETTING_RANGES } from '../src/game/settings';
+import {
+  clickMoveButtonLabel,
+  normalizeClickMoveButton,
+  SETTING_RANGES,
+  Settings,
+} from '../src/game/settings';
 
 function installStorage(): void {
   const map = new Map<string, string>();
   (globalThis as any).localStorage = {
     getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
-    setItem: (k: string, v: string) => { map.set(k, v); },
-    removeItem: (k: string) => { map.delete(k); },
+    setItem: (k: string, v: string) => {
+      map.set(k, v);
+    },
+    removeItem: (k: string) => {
+      map.delete(k);
+    },
     clear: () => map.clear(),
   };
 }
@@ -14,12 +23,29 @@ function installStorage(): void {
 beforeEach(() => installStorage());
 
 describe('Settings', () => {
-  it('defaults fresh sessions and initial logins to the ultra graphics preset', () => {
+  it('defaults fresh sessions and initial logins to the medium graphics preset', () => {
     const s = new Settings();
 
     expect(localStorage.getItem('woc_settings')).toBeNull();
-    expect(SETTING_RANGES.graphicsPreset.def).toBe(4);
-    expect(s.get('graphicsPreset')).toBe(4);
+    // def is MEDIUM (the Reset target + the pre-probe value); first-run device detection in
+    // main.ts persists a device-appropriate preset over it (see resolveDefaultGraphicsPreset).
+    expect(SETTING_RANGES.graphicsPreset.def).toBe(2);
+    expect(s.get('graphicsPreset')).toBe(2);
+  });
+
+  it('keeps graphicsDefaultApplied false through an unrelated save and clears it on reset', () => {
+    const s = new Settings();
+    expect(s.get('graphicsDefaultApplied')).toBe(false);
+    // save() persists the whole values object; an unrelated write must NOT flip the marker
+    // (that is what would silently defeat first-run device detection, since firstRunGraphicsPreset
+    // gates on this marker and never on the def-filled graphicsPreset key).
+    s.set('showFps', true);
+    expect(new Settings().get('graphicsDefaultApplied')).toBe(false);
+    // a conclusive detection sets it; reset() restores it to false so Reset re-detects.
+    s.set('graphicsDefaultApplied', true);
+    expect(new Settings().get('graphicsDefaultApplied')).toBe(true);
+    s.reset();
+    expect(s.get('graphicsDefaultApplied')).toBe(false);
   });
 
   it('starts at the documented defaults (camera calmer than the old 1.0)', () => {
@@ -39,6 +65,13 @@ describe('Settings', () => {
     expect(s.get('cameraFov')).toBe(SETTING_RANGES.cameraFov.def);
     expect(s.get('cameraFov')).toBe(60); // unchanged from the shipped look by default
     expect(s.get('mouseCamera')).toBe(false);
+    // walk-by autoloot is opt-in: auto-grabbing loot by walking past can feel jarring.
+    expect(s.get('walkByAutoloot')).toBe(false);
+    // both unit frames ship at their stock size; the scale sliders are opt-in tuning.
+    expect(s.get('playerFrameScale')).toBe(1);
+    expect(s.get('targetFrameScale')).toBe(1);
+    // the classic top-right aura corner stays the default; frame-anchoring is opt-in.
+    expect(s.get('aurasOnPlayerFrame')).toBe(false);
     expect(s.get('joystickDeadzone')).toBe(SETTING_RANGES.joystickDeadzone.def);
     // Interface Mode defaults to Auto (0): detect desktop vs touch from the device.
     expect(s.get('interfaceMode')).toBe(SETTING_RANGES.interfaceMode.def);
@@ -206,6 +239,8 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showFps')).toBe(false);
     expect(s.get('showWalletOnCharacterScreen')).toBe(true);
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
+    expect(s.get('showDevBadges')).toBe(true);
+    expect(s.get('showDailyRewardsChest')).toBe(true);
     expect(s.get('invertLookY')).toBe(false);
   });
 
@@ -227,16 +262,19 @@ describe('Interface & Comfort settings pack', () => {
     s.set('frostedPanels', true);
     s.set('showWalletOnCharacterScreen', false);
     s.set('showWalletOnPlayerCard', false);
+    s.set('showDevBadges', false);
     // a fresh instance reads the same backing store
     expect(new Settings().get('reduceMotion')).toBe(true);
     expect(new Settings().get('showFps')).toBe(true);
     expect(new Settings().get('showWalletOnCharacterScreen')).toBe(false);
     expect(new Settings().get('showWalletOnPlayerCard')).toBe(false);
+    expect(new Settings().get('showDevBadges')).toBe(false);
     s.reset();
     expect(s.get('reduceMotion')).toBe(false);
     expect(s.get('showFps')).toBe(false);
     expect(s.get('showWalletOnCharacterScreen')).toBe(true);
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
+    expect(s.get('showDevBadges')).toBe(true);
     expect(s.get('invertLookY')).toBe(false);
     expect(s.get('frostedPanels')).toBe(false);
   });

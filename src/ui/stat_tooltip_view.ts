@@ -15,7 +15,7 @@
 // catalog keys it builds always exist, but it never imports the i18n runtime.
 // ---------------------------------------------------------------------------
 import { esc } from './esc';
-import type { StatEffect, StatEffectKind, StatTooltipModel } from './stat_tooltip';
+import type { StatEffect, StatEffectKind, StatSource, StatTooltipModel } from './stat_tooltip';
 
 /** The localization + number-formatting surface the view borrows from the HUD.
  *  `t` takes a dotted catalog key (the HUD casts it to TranslationKey) plus
@@ -30,8 +30,14 @@ export interface StatTooltipI18n {
 // informational facts (white): regen rates, the armor cell's damage reduction,
 // and the dps the attack-power cell already folds in.
 const GAIN_KINDS: ReadonlySet<StatEffectKind> = new Set<StatEffectKind>([
-  'attackPower', 'rangedAttackPower', 'critPct', 'dodgePct',
-  'armor', 'maxHealth', 'maxMana', 'spellCritPct',
+  'attackPower',
+  'rangedAttackPower',
+  'critPct',
+  'dodgePct',
+  'armor',
+  'maxHealth',
+  'maxMana',
+  'spellCritPct',
 ]);
 
 const int0 = (deps: StatTooltipI18n, v: number) => deps.fmt(v, { maximumFractionDigits: 0 });
@@ -63,6 +69,53 @@ export function statEffectText(e: StatEffect, deps: StatTooltipI18n): string {
   }
 }
 
+// Crit and dodge are shown as percents (one decimal); every other stat's source
+// values are whole numbers.
+const isPercentStat = (model: StatTooltipModel) =>
+  model.stat === 'critChance' || model.stat === 'dodge';
+
+/** The catalog key for a stat's display name. Most reuse the shared
+ *  itemUi.stats.* labels; Spell Power is a character-sheet-only stat whose label
+ *  lives in the English-only HUD-chrome domain instead. */
+export function statNameKey(stat: StatTooltipModel['stat']): string {
+  return stat === 'spellPower' ? 'hudChrome.statInfo.names.spellPower' : `itemUi.stats.${stat}`;
+}
+
+/** The localized text of one upstream source line: "Base: 40", "From Agility:
+ *  +52", "Equipped gear: +85", "Mark of the Wild: +12", "Talents and effects:
+ *  +30". Buff lines carry the resolved aura name; the attribute line names the
+ *  primary it derives from when known. Contributions other than the base print
+ *  with an explicit sign so additions and reductions read clearly. */
+export function statSourceText(
+  source: StatSource,
+  model: StatTooltipModel,
+  deps: StatTooltipI18n,
+): string {
+  const fmt = (v: number) =>
+    isPercentStat(model) ? dec1(deps, Math.abs(v)) : int0(deps, Math.abs(v));
+  const signed = (v: number) => `${v < 0 ? '−' : '+'}${fmt(v)}`;
+  switch (source.kind) {
+    case 'base':
+      return deps.t('hudChrome.statInfo.sources.base', { value: fmt(source.value) });
+    case 'attributes':
+      return source.fromStat
+        ? deps.t('hudChrome.statInfo.sources.fromAttribute', {
+            stat: deps.t(`itemUi.stats.${source.fromStat}`),
+            value: signed(source.value),
+          })
+        : deps.t('hudChrome.statInfo.sources.attributes', { value: signed(source.value) });
+    case 'gear':
+      return deps.t('hudChrome.statInfo.sources.gear', { value: signed(source.value) });
+    case 'buff':
+      return deps.t('hudChrome.statInfo.sources.buff', {
+        name: source.name ?? '',
+        value: signed(source.value),
+      });
+    case 'talents':
+      return deps.t('hudChrome.statInfo.sources.talents', { value: signed(source.value) });
+  }
+}
+
 /** The localized note lines for a model (minor-for-class, the shared 5% base
  *  chance, the dps-estimate caveat), in display order. */
 export function statNoteTexts(model: StatTooltipModel, deps: StatTooltipI18n): string[] {
@@ -79,21 +132,34 @@ export function statBreakdownHeader(model: StatTooltipModel, deps: StatTooltipI1
   if (!model.isPrimary || !model.effects.length) return '';
   return deps.t('hudChrome.statInfo.fromYour', {
     value: int0(deps, model.statValue),
-    stat: deps.t(`itemUi.stats.${model.stat}`),
+    stat: deps.t(statNameKey(model.stat)),
   });
 }
 
+/** The "Made up of:" header above a stat's upstream source breakdown, or '' when
+ *  the stat has no source lines (the dps estimate). */
+export function statSourcesHeader(model: StatTooltipModel, deps: StatTooltipI18n): string {
+  if (!model.sources.length) return '';
+  return deps.t('hudChrome.statInfo.sources.header');
+}
+
 /** The floating tooltip's HTML: the stat name, the "what it does" prose, the
- *  optional "From your N {stat}" header, one line per contribution (green for a
- *  gain, white for an informational fact), then any note lines. */
+ *  optional "From your N {stat}" downstream header + effect lines, the upstream
+ *  "Made up of:" source breakdown (base / attributes / gear / each buff by name /
+ *  talents), then any note lines. */
 export function statTooltipHtml(model: StatTooltipModel, deps: StatTooltipI18n): string {
-  let html = `<div class="tt-title">${esc(deps.t(`itemUi.stats.${model.stat}`))}</div>`;
+  let html = `<div class="tt-title">${esc(deps.t(statNameKey(model.stat)))}</div>`;
   html += `<div class="tt-body">${esc(deps.t(`hudChrome.statInfo.desc.${model.stat}`))}</div>`;
   const header = statBreakdownHeader(model, deps);
   if (header) html += `<div class="tt-bd-head">${esc(header)}</div>`;
   for (const e of model.effects) {
     const cls = GAIN_KINDS.has(e.kind) ? 'tt-green' : 'tt-stat';
     html += `<div class="${cls}">${esc(statEffectText(e, deps))}</div>`;
+  }
+  const srcHeader = statSourcesHeader(model, deps);
+  if (srcHeader) html += `<div class="tt-bd-head">${esc(srcHeader)}</div>`;
+  for (const s of model.sources) {
+    html += `<div class="tt-stat">${esc(statSourceText(s, model, deps))}</div>`;
   }
   for (const note of statNoteTexts(model, deps)) html += `<div class="tt-sub">${esc(note)}</div>`;
   return html;
@@ -109,6 +175,9 @@ export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n):
   const header = statBreakdownHeader(model, deps);
   if (header) parts.push(header);
   for (const e of model.effects) parts.push(statEffectText(e, deps));
+  const srcHeader = statSourcesHeader(model, deps);
+  if (srcHeader) parts.push(srcHeader);
+  for (const s of model.sources) parts.push(statSourceText(s, model, deps));
   parts.push(...statNoteTexts(model, deps));
   return parts.join(' ');
 }
@@ -117,7 +186,8 @@ export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n):
  *  a one-decimal number for the dps estimate, otherwise a whole number. Sourced
  *  from model.statValue so the cell and the tooltip it opens cannot disagree. */
 export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): string {
-  if (model.stat === 'critChance' || model.stat === 'dodge') return `${dec1(deps, model.statValue)}%`;
+  if (model.stat === 'critChance' || model.stat === 'dodge')
+    return `${dec1(deps, model.statValue)}%`;
   if (model.stat === 'dps') return dec1(deps, model.statValue);
   return int0(deps, model.statValue);
 }
@@ -128,10 +198,12 @@ export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): s
  *  by matching the data-stat attribute. The value comes from formatNumber, so it
  *  is left unescaped (digits / separators / percent only). */
 export function statCellHtml(model: StatTooltipModel, deps: StatTooltipI18n): string {
-  const name = esc(deps.t(`itemUi.stats.${model.stat}`));
+  const name = esc(deps.t(statNameKey(model.stat)));
   const value = statValueText(model, deps);
   const aria = esc(statTooltipAria(model, deps));
-  return `<span class="stat-cell" data-stat="${model.stat}" tabindex="0" aria-describedby="statdesc-${model.stat}">`
-    + `${name}: <b>${value}</b>`
-    + `<span id="statdesc-${model.stat}" class="visually-hidden">${aria}</span></span>`;
+  return (
+    `<span class="stat-cell" data-stat="${model.stat}" tabindex="0" aria-describedby="statdesc-${model.stat}">` +
+    `${name}: <b>${value}</b>` +
+    `<span id="statdesc-${model.stat}" class="visually-hidden">${aria}</span></span>`
+  );
 }

@@ -62,6 +62,26 @@ describe('/targetbuffs command', () => {
     );
   });
 
+  it('tags combat-penalty debuffs (silence/disarm) as debuffs, sharing the HUD classifier', () => {
+    // Regression: these kinds were previously absent from the sim-local harmful set
+    // and so mis-tagged as [buff]. Unifying onto isDebuffAura fixes the drift.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.tick();
+    const target = sim.entities.get(b)!;
+    target.auras = [
+      aura({ name: 'Silenced', kind: 'silence', remaining: 4 }),
+      aura({ name: 'Disarm', kind: 'disarm', remaining: 6 }),
+      aura({ name: 'Sapped Might', kind: 'buff_ap', remaining: 8, value: -40 }),
+    ];
+    sim.targetEntity(b, a);
+    sim.chat('/targetbuffs', a);
+    expect(errorText(sim.tick())).toBe(
+      'Effects on Bet (3): Silenced [debuff] (4s), Disarm [debuff] (6s), Sapped Might [debuff] (8s).',
+    );
+  });
+
   it('responds to the /debuffs and /tb aliases', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');

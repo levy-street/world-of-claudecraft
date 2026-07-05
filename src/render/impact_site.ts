@@ -33,6 +33,8 @@ const SMOKE_COUNT_LOW = 3;
 
 export interface ImpactSiteView {
   group: THREE.Group;
+  /** Owned by the renderer's point-light budget, not the cull-toggled group. */
+  light: THREE.PointLight;
   update(px: number, pz: number, dt: number): void;
 }
 
@@ -41,7 +43,9 @@ export function impactSiteVisualY(x: number, z: number, seed: number): number {
 }
 
 export function impactSiteNavigationProbePoints(): { x: number; z: number }[] {
-  const points: { x: number; z: number }[] = [{ x: MIREFEN_IMPACT_SITE.x, z: MIREFEN_IMPACT_SITE.z }];
+  const points: { x: number; z: number }[] = [
+    { x: MIREFEN_IMPACT_SITE.x, z: MIREFEN_IMPACT_SITE.z },
+  ];
   for (const radius of [4, 8, 12]) {
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
@@ -55,7 +59,11 @@ export function impactSiteNavigationProbePoints(): { x: number; z: number }[] {
 }
 
 function radialJitter(angle: number, seed: number, salt: number): number {
-  return 0.9 + hash2(Math.round(Math.cos(angle) * 1000), Math.round(Math.sin(angle) * 1000), seed + salt) * 0.18;
+  return (
+    0.9 +
+    hash2(Math.round(Math.cos(angle) * 1000), Math.round(Math.sin(angle) * 1000), seed + salt) *
+      0.18
+  );
 }
 
 function colorAttr(hex: number): [number, number, number] {
@@ -94,7 +102,11 @@ function craterDecalMaterial(): THREE.ShaderMaterial {
 }
 
 function buildScorchGeometry(seed: number): THREE.BufferGeometry {
-  const positions: number[] = [MIREFEN_IMPACT_SITE.x, impactSiteVisualY(MIREFEN_IMPACT_SITE.x, MIREFEN_IMPACT_SITE.z, seed), MIREFEN_IMPACT_SITE.z];
+  const positions: number[] = [
+    MIREFEN_IMPACT_SITE.x,
+    impactSiteVisualY(MIREFEN_IMPACT_SITE.x, MIREFEN_IMPACT_SITE.z, seed),
+    MIREFEN_IMPACT_SITE.z,
+  ];
   const centerColor = colorAttr(0x030201);
   const colors: number[] = [...centerColor];
   const alphas: number[] = [0.58];
@@ -112,7 +124,12 @@ function buildScorchGeometry(seed: number): THREE.BufferGeometry {
       const z = MIREFEN_IMPACT_SITE.z + Math.sin(angle) * radius;
       positions.push(x, impactSiteVisualY(x, z, seed), z);
 
-      const char = ringT < 0.5 ? colorAttr(0x100805) : ringT < 0.82 ? colorAttr(0x322014) : colorAttr(0x17100a);
+      const char =
+        ringT < 0.5
+          ? colorAttr(0x100805)
+          : ringT < 0.82
+            ? colorAttr(0x322014)
+            : colorAttr(0x17100a);
       colors.push(...char);
       alphas.push(ringT < 0.5 ? 0.5 : ringT < 0.82 ? 0.32 : 0.04);
     }
@@ -146,7 +163,12 @@ function buildScorchGeometry(seed: number): THREE.BufferGeometry {
 
 function rimMaterial(): THREE.Material {
   return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.96, metalness: 0, flatShading: true })
+    ? new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        roughness: 0.96,
+        metalness: 0,
+        flatShading: true,
+      })
     : new THREE.MeshLambertMaterial({ vertexColors: true });
 }
 
@@ -196,13 +218,13 @@ function buildRimGeometry(seed: number): THREE.BufferGeometry {
 function meteorMaterial(): THREE.Material {
   return GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({
-      color: 0x171716,
-      roughness: 0.98,
-      metalness: 0.02,
-      emissive: 0x060302,
-      emissiveIntensity: 0.04,
-      flatShading: false,
-    })
+        color: 0x171716,
+        roughness: 0.98,
+        metalness: 0.02,
+        emissive: 0x060302,
+        emissiveIntensity: 0.04,
+        flatShading: false,
+      })
     : new THREE.MeshLambertMaterial({ color: 0x181716, emissive: 0x050201 });
 }
 
@@ -214,7 +236,8 @@ function buildMeteorGeometry(seed: number): THREE.BufferGeometry {
     const y = pos.getY(i);
     const z = pos.getZ(i);
     const theta = Math.atan2(z, x);
-    const rimWarp = 0.96 + Math.sin(theta * 3.0 + seed * 0.01) * 0.045 + Math.cos(theta * 5.0) * 0.025;
+    const rimWarp =
+      0.96 + Math.sin(theta * 3.0 + seed * 0.01) * 0.045 + Math.cos(theta * 5.0) * 0.025;
     const topFlatten = y > 0 ? 0.68 : 0.5;
     const undersideTuck = y < -0.2 ? 0.86 : 1;
     pos.setXYZ(
@@ -261,7 +284,12 @@ function buildCrack(seed: number, crackIndex: number, angle: number, length: num
 
 function pebbleMaterial(): THREE.Material {
   return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({ color: 0x2b2924, roughness: 0.95, metalness: 0.05, flatShading: true })
+    ? new THREE.MeshStandardMaterial({
+        color: 0x2b2924,
+        roughness: 0.95,
+        metalness: 0.05,
+        flatShading: true,
+      })
     : new THREE.MeshLambertMaterial({ color: 0x2b2924 });
 }
 
@@ -278,7 +306,11 @@ function addRimPebbles(group: THREE.Group, seed: number): void {
     const pebble = new THREE.Mesh(pebbleGeo, mat);
     pebble.position.set(x, impactSiteVisualY(x, z, seed) + s * 0.22, z);
     pebble.scale.set(s * 1.35, s * 0.68, s);
-    pebble.rotation.set(hash2(i, 3, seed + 504) * Math.PI, angle, hash2(i, 4, seed + 505) * Math.PI);
+    pebble.rotation.set(
+      hash2(i, 3, seed + 504) * Math.PI,
+      angle,
+      hash2(i, 4, seed + 505) * Math.PI,
+    );
     pebble.castShadow = true;
     pebble.receiveShadow = true;
     group.add(pebble);
@@ -355,7 +387,8 @@ export function buildImpactSite(seed: number): ImpactSiteView {
 
   const meteor = new THREE.Mesh(buildMeteorGeometry(seed), meteorMaterial());
   meteor.name = 'mirefen-impact-meteor';
-  const meteorY = terrainHeight(MIREFEN_IMPACT_SITE.meteor.x, MIREFEN_IMPACT_SITE.meteor.z, seed) + 0.42;
+  const meteorY =
+    terrainHeight(MIREFEN_IMPACT_SITE.meteor.x, MIREFEN_IMPACT_SITE.meteor.z, seed) + 0.42;
   meteor.position.set(MIREFEN_IMPACT_SITE.meteor.x, meteorY, MIREFEN_IMPACT_SITE.meteor.z);
   meteor.rotation.set(0.08, -0.55, -0.06);
   meteor.castShadow = true;
@@ -368,10 +401,7 @@ export function buildImpactSite(seed: number): ImpactSiteView {
     group.add(buildCrack(seed, i, angle, length));
   }
 
-  const glow = new THREE.Mesh(
-    new THREE.RingGeometry(0.9, 2.0, 40),
-    glowMaterial(0.16),
-  );
+  const glow = new THREE.Mesh(new THREE.RingGeometry(0.9, 2.0, 40), glowMaterial(0.16));
   glow.name = 'mirefen-impact-glow';
   glow.rotation.x = -Math.PI / 2;
   glow.position.set(
@@ -382,10 +412,15 @@ export function buildImpactSite(seed: number): ImpactSiteView {
   glow.renderOrder = 5;
   group.add(glow);
 
+  // NOT added to `group`: the group cull-toggles its visibility by distance, which
+  // would change the scene's visible point-light count (and recompile every nearby
+  // material) as the player nears/leaves. Instead the renderer adds this light to
+  // its constant-count point-light budget; baseIntensity lets it flicker with the
+  // campfire lights there.
   const light = new THREE.PointLight(0xff6a1a, GFX.standardMaterials ? 2.4 : 1.3, 12, 2);
   light.name = 'mirefen-impact-light';
   light.position.set(MIREFEN_IMPACT_SITE.meteor.x, meteorY + 1.1, MIREFEN_IMPACT_SITE.meteor.z);
-  group.add(light);
+  light.userData.baseIntensity = GFX.standardMaterials ? 2.4 : 1.3;
 
   const { points: embers, material: emberMat } = buildEmbers(seed);
   group.add(embers);
@@ -403,7 +438,11 @@ export function buildImpactSite(seed: number): ImpactSiteView {
     });
     const sprite = new THREE.Sprite(mat);
     sprite.name = 'mirefen-impact-smoke';
-    sprite.position.set(MIREFEN_IMPACT_SITE.meteor.x, meteorY + 1.2 + i * 0.35, MIREFEN_IMPACT_SITE.meteor.z);
+    sprite.position.set(
+      MIREFEN_IMPACT_SITE.meteor.x,
+      meteorY + 1.2 + i * 0.35,
+      MIREFEN_IMPACT_SITE.meteor.z,
+    );
     sprite.scale.setScalar(4.5 + i * 0.8);
     smoke.push(sprite);
     group.add(sprite);
@@ -412,6 +451,7 @@ export function buildImpactSite(seed: number): ImpactSiteView {
   let time = 0;
   return {
     group,
+    light,
     update(px: number, pz: number, dt: number): void {
       if (px > DUNGEON_X_THRESHOLD) {
         group.visible = false;
@@ -419,11 +459,12 @@ export function buildImpactSite(seed: number): ImpactSiteView {
       }
       const dx = px - MIREFEN_IMPACT_SITE.x;
       const dz = pz - MIREFEN_IMPACT_SITE.z;
-      group.visible = dx * dx + dz * dz < MIREFEN_IMPACT_SITE.cullRadius * MIREFEN_IMPACT_SITE.cullRadius;
+      group.visible =
+        dx * dx + dz * dz < MIREFEN_IMPACT_SITE.cullRadius * MIREFEN_IMPACT_SITE.cullRadius;
       if (!group.visible) return;
 
       time += dt;
-      light.intensity = (GFX.standardMaterials ? 2.4 : 1.3) + Math.sin(time * 4.5) * 0.24;
+      // light intensity is driven by the renderer's budgeted-light flicker now.
       (glow.material as THREE.MeshBasicMaterial).opacity = 0.12 + Math.sin(time * 3.1) * 0.035;
       glow.rotation.z += dt * 0.15;
       emberMat.opacity = 0.34 + Math.sin(time * 5.2) * 0.12;

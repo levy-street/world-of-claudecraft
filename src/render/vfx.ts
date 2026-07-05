@@ -20,6 +20,38 @@ function hdr(k: number): number {
   return GFX.composer ? k : 1;
 }
 
+// Per-school projectile colors, cached: a bolt burst used to allocate three
+// THREE.Color per launch. spawn() copies components into the attribute buffers
+// (and update() copies before mutating), never retaining the reference, so the
+// cached instances are effectively immutable. Keyed on GFX.composer so a tier
+// flip rebuilds the HDR-boosted variants.
+const projectileColorCache = new Map<
+  string,
+  { base: THREE.Color; core: THREE.Color; trail: THREE.Color }
+>();
+let projectileColorComposer: boolean | null = null;
+function projectileSchoolColors(school: string): {
+  base: THREE.Color;
+  core: THREE.Color;
+  trail: THREE.Color;
+} {
+  if (projectileColorComposer !== GFX.composer) {
+    projectileColorCache.clear();
+    projectileColorComposer = GFX.composer;
+  }
+  let c = projectileColorCache.get(school);
+  if (!c) {
+    const base = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff);
+    c = {
+      base,
+      core: base.clone().multiplyScalar(hdr(2.5)),
+      trail: base.clone().multiplyScalar(hdr(1.4)),
+    };
+    projectileColorCache.set(school, c);
+  }
+  return c;
+}
+
 // ---------------------------------------------------------------------------
 // Sprite atlas: 16 cherry-picked Kenney sprites in a 4x4 grid. Order defines
 // the cell index used by the shader — append only.
@@ -29,26 +61,52 @@ const ATLAS_GRID = 4;
 const ATLAS_CELL = 256;
 
 const SPRITE_FILES = [
-  'light_01', 'light_02', 'flare_01', 'spark_04',
-  'spark_06', 'star_07', 'magic_01', 'magic_04',
-  'twirl_01', 'flame_03', 'fire_01', 'smoke_05',
-  'trace_05', 'slash_02', 'dirt_02', 'circle_05',
+  'light_01',
+  'light_02',
+  'flare_01',
+  'spark_04',
+  'spark_06',
+  'star_07',
+  'magic_01',
+  'magic_04',
+  'twirl_01',
+  'flame_03',
+  'fire_01',
+  'smoke_05',
+  'trace_05',
+  'slash_02',
+  'dirt_02',
+  'circle_05',
 ] as const;
 
 // Named cell indices (keep in sync with SPRITE_FILES order)
 const SPR = {
-  glowSoft: 0, glowCore: 1, flash: 2, sparkle: 3,
-  sparkBurst: 4, star: 5, magicWisp: 6, magicRune: 7,
-  twirl: 8, flame: 9, firePuff: 10, smoke: 11,
-  trace: 12, slash: 13, debris: 14, ring: 15,
+  glowSoft: 0,
+  glowCore: 1,
+  flash: 2,
+  sparkle: 3,
+  sparkBurst: 4,
+  star: 5,
+  magicWisp: 6,
+  magicRune: 7,
+  twirl: 8,
+  flame: 9,
+  firePuff: 10,
+  smoke: 11,
+  trace: 12,
+  slash: 13,
+  debris: 14,
+  ring: 15,
 } as const;
 
 const spriteImages: (TexImageSource | null)[] = SPRITE_FILES.map(() => null);
 for (let i = 0; i < SPRITE_FILES.length; i++) {
-  registerPreload(loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
-    spriteImages[i] = tex.image as TexImageSource;
-    return tex;
-  }));
+  registerPreload(
+    loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
+      spriteImages[i] = tex.image as TexImageSource;
+      return tex;
+    }),
+  );
 }
 
 // Compose the atlas once. Any cell whose PNG is unavailable (e.g. unit tests
@@ -69,8 +127,12 @@ function buildAtlasTexture(): THREE.CanvasTexture {
       ctx.drawImage(img as CanvasImageSource, x, y, ATLAS_CELL, ATLAS_CELL);
     } else {
       const g = ctx.createRadialGradient(
-        x + ATLAS_CELL / 2, y + ATLAS_CELL / 2, 2,
-        x + ATLAS_CELL / 2, y + ATLAS_CELL / 2, ATLAS_CELL / 2,
+        x + ATLAS_CELL / 2,
+        y + ATLAS_CELL / 2,
+        2,
+        x + ATLAS_CELL / 2,
+        y + ATLAS_CELL / 2,
+        ATLAS_CELL / 2,
       );
       g.addColorStop(0, 'rgba(255,255,255,1)');
       g.addColorStop(0.4, 'rgba(255,255,255,0.5)');
@@ -137,7 +199,10 @@ export class Vfx {
   private tmpColor = new THREE.Color();
   private quality = 1;
 
-  constructor(scene: THREE.Scene, private anchor: EntityAnchor) {
+  constructor(
+    scene: THREE.Scene,
+    private anchor: EntityAnchor,
+  ) {
     this.pos = new Float32Array(CAPACITY * 3);
     this.vel = new Float32Array(CAPACITY * 3);
     this.col = new Float32Array(CAPACITY * 3);
@@ -232,8 +297,12 @@ export class Vfx {
     for (let i = 0; i < sprites.length; i++) {
       const a = (i / sprites.length) * Math.PI * 2;
       this.spawn(
-        at.x + Math.sin(a) * 1.2, at.y + 0.6 + (i % 4) * 0.25, at.z + Math.cos(a) * 1.2,
-        0, 0, 0,
+        at.x + Math.sin(a) * 1.2,
+        at.y + 0.6 + (i % 4) * 0.25,
+        at.z + Math.cos(a) * 1.2,
+        0,
+        0,
+        0,
         i % 3 === 0 ? 0xffd28a : i % 3 === 1 ? 0x8ed2ff : 0xd98aff,
         0.35 + (i % 4) * 0.08,
         1.0,
@@ -266,17 +335,31 @@ export class Vfx {
   }
 
   private spawn(
-    x: number, y: number, z: number,
-    vx: number, vy: number, vz: number,
-    color: THREE.Color | number, size: number, lifetime: number, gravity = 0,
-    sprite: number = SPR.glowSoft, rot: number = Math.random() * Math.PI * 2,
+    x: number,
+    y: number,
+    z: number,
+    vx: number,
+    vy: number,
+    vz: number,
+    color: THREE.Color | number,
+    size: number,
+    lifetime: number,
+    gravity = 0,
+    sprite: number = SPR.glowSoft,
+    rot: number = Math.random() * Math.PI * 2,
   ): void {
     const i = this.head;
     this.head = (this.head + 1) % CAPACITY;
-    this.pos[i * 3] = x; this.pos[i * 3 + 1] = y; this.pos[i * 3 + 2] = z;
-    this.vel[i * 3] = vx; this.vel[i * 3 + 1] = vy; this.vel[i * 3 + 2] = vz;
+    this.pos[i * 3] = x;
+    this.pos[i * 3 + 1] = y;
+    this.pos[i * 3 + 2] = z;
+    this.vel[i * 3] = vx;
+    this.vel[i * 3 + 1] = vy;
+    this.vel[i * 3 + 2] = vz;
     this.tmpColor.set(color as THREE.ColorRepresentation);
-    this.col[i * 3] = this.tmpColor.r; this.col[i * 3 + 1] = this.tmpColor.g; this.col[i * 3 + 2] = this.tmpColor.b;
+    this.col[i * 3] = this.tmpColor.r;
+    this.col[i * 3 + 1] = this.tmpColor.g;
+    this.col[i * 3 + 2] = this.tmpColor.b;
     this.size[i] = size;
     this.life[i] = lifetime;
     this.maxLife[i] = lifetime;
@@ -293,14 +376,14 @@ export class Vfx {
   projectile(sourceId: number, targetId: number, school: string): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
-    const color = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff);
+    const colors = projectileSchoolColors(school);
     const sprites = projectileSprites(school);
     this.projectiles.push({
       pos: from.clone(),
       targetId,
-      color,
-      coreColor: color.clone().multiplyScalar(hdr(2.5)),
-      trailColor: color.clone().multiplyScalar(hdr(1.4)),
+      color: colors.base,
+      coreColor: colors.core,
+      trailColor: colors.trail,
       speed: 26,
       ttl: 3,
       coreSprite: sprites.core,
@@ -339,12 +422,25 @@ export class Vfx {
       const sp = (2 + Math.random() * 4.5) * power;
       // fire bursts read as flame puffs; everything else as spark showers
       const sprite = isFire
-        ? (i % 3 === 0 ? SPR.firePuff : SPR.flame)
-        : (i % 3 === 0 ? SPR.star : i % 2 === 0 ? SPR.sparkle : SPR.sparkBurst);
+        ? i % 3 === 0
+          ? SPR.firePuff
+          : SPR.flame
+        : i % 3 === 0
+          ? SPR.star
+          : i % 2 === 0
+            ? SPR.sparkle
+            : SPR.sparkBurst;
       this.spawn(
-        at.x, at.y, at.z,
-        Math.sin(a) * sp, up * sp * 0.8, Math.cos(a) * sp,
-        c, 0.34 + Math.random() * 0.3 * power, 0.45 + Math.random() * 0.35, 7,
+        at.x,
+        at.y,
+        at.z,
+        Math.sin(a) * sp,
+        up * sp * 0.8,
+        Math.cos(a) * sp,
+        c,
+        0.34 + Math.random() * 0.3 * power,
+        0.45 + Math.random() * 0.35,
+        7,
         sprite,
       );
     }
@@ -366,7 +462,16 @@ export class Vfx {
       const a = (i / count) * Math.PI * 2;
       const sp = 11 + Math.random() * 3;
       this.spawn(
-        at.x, at.y + 0.25, at.z, Math.sin(a) * sp, 1.2, Math.cos(a) * sp, c, 0.5, 0.55, 6,
+        at.x,
+        at.y + 0.25,
+        at.z,
+        Math.sin(a) * sp,
+        1.2,
+        Math.cos(a) * sp,
+        c,
+        0.5,
+        0.55,
+        6,
         i % 4 === 0 ? SPR.magicRune : SPR.sparkle,
       );
     }
@@ -381,9 +486,16 @@ export class Vfx {
       const a = Math.random() * Math.PI * 2;
       const r = 0.4 + Math.random() * 0.7;
       this.spawn(
-        at.x + Math.sin(a) * r, at.y + Math.random() * 0.4, at.z + Math.cos(a) * r,
-        Math.sin(a) * 0.25, 1.6 + Math.random() * 1.4, Math.cos(a) * 0.25,
-        i % 3 === 0 ? green : gold, 0.3 + Math.random() * 0.25, 0.9 + Math.random() * 0.5, -1.2,
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 0.4,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.25,
+        1.6 + Math.random() * 1.4,
+        Math.cos(a) * 0.25,
+        i % 3 === 0 ? green : gold,
+        0.3 + Math.random() * 0.25,
+        0.9 + Math.random() * 0.5,
+        -1.2,
         i % 2 === 0 ? SPR.star : SPR.sparkle,
       );
     }
@@ -396,9 +508,17 @@ export class Vfx {
     for (let i = 0; i < count; i++) {
       const a = (i / count) * Math.PI * 2;
       this.spawn(
-        at.x + Math.sin(a) * 0.85, at.y + 0.2, at.z + Math.cos(a) * 0.85,
-        -Math.cos(a) * 1.6, 2.1, Math.sin(a) * 1.6,
-        color, 0.3, 0.8, -1.5, SPR.magicWisp,
+        at.x + Math.sin(a) * 0.85,
+        at.y + 0.2,
+        at.z + Math.cos(a) * 0.85,
+        -Math.cos(a) * 1.6,
+        2.1,
+        Math.sin(a) * 1.6,
+        color,
+        0.3,
+        0.8,
+        -1.5,
+        SPR.magicWisp,
       );
     }
   }
@@ -422,9 +542,16 @@ export class Vfx {
       const a = Math.random() * Math.PI * 2;
       const r = 0.3 + Math.random() * 0.9;
       this.spawn(
-        at.x + Math.sin(a) * r, at.y + Math.random() * 0.3, at.z + Math.cos(a) * r,
-        0, 4.5 + Math.random() * 3.5, 0,
-        i % 4 === 0 ? white : gold, 0.42, 1.1 + Math.random() * 0.4, -1,
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 0.3,
+        at.z + Math.cos(a) * r,
+        0,
+        4.5 + Math.random() * 3.5,
+        0,
+        i % 4 === 0 ? white : gold,
+        0.42,
+        1.1 + Math.random() * 0.4,
+        -1,
         i % 3 === 0 ? SPR.star : SPR.sparkle,
       );
     }
@@ -438,9 +565,16 @@ export class Vfx {
     const c = SCHOOL_COLORS[school] ?? 0xffffff;
     const a = Math.random() * Math.PI * 2;
     this.spawn(
-      at.x + Math.sin(a) * 0.5, at.y, at.z + Math.cos(a) * 0.5,
-      0, 0.9 + Math.random(), 0,
-      c, 0.26, 0.5, -0.5,
+      at.x + Math.sin(a) * 0.5,
+      at.y,
+      at.z + Math.cos(a) * 0.5,
+      0,
+      0.9 + Math.random(),
+      0,
+      c,
+      0.26,
+      0.5,
+      -0.5,
       school === 'fire' ? SPR.flame : SPR.magicWisp,
     );
   }
@@ -449,9 +583,17 @@ export class Vfx {
     if (!this.emitChance(9, dt)) return;
     const a = Math.random() * Math.PI * 2;
     this.spawn(
-      at.x + Math.sin(a) * 0.5, at.y + 0.55, at.z + Math.cos(a) * 0.5,
-      Math.sin(a) * 1.2, 1.1, Math.cos(a) * 1.2,
-      0xcfe9ff, 0.3, 0.55, 5, SPR.glowSoft,
+      at.x + Math.sin(a) * 0.5,
+      at.y + 0.55,
+      at.z + Math.cos(a) * 0.5,
+      Math.sin(a) * 1.2,
+      1.1,
+      Math.cos(a) * 1.2,
+      0xcfe9ff,
+      0.3,
+      0.55,
+      5,
+      SPR.glowSoft,
     );
   }
 
@@ -460,18 +602,34 @@ export class Vfx {
     if (Math.random() < 0.3) {
       // faint additive smoke puff drifting off the flame tip
       this.spawn(
-        at.x + (Math.random() - 0.5) * 0.3, at.y + 1.0, at.z + (Math.random() - 0.5) * 0.3,
-        (Math.random() - 0.5) * 0.35, 0.8 + Math.random() * 0.5, (Math.random() - 0.5) * 0.35,
-        0x36322e, 0.7 + Math.random() * 0.5, 1.8 + Math.random() * 0.9, -0.25, SPR.smoke,
+        at.x + (Math.random() - 0.5) * 0.3,
+        at.y + 1.0,
+        at.z + (Math.random() - 0.5) * 0.3,
+        (Math.random() - 0.5) * 0.35,
+        0.8 + Math.random() * 0.5,
+        (Math.random() - 0.5) * 0.35,
+        0x36322e,
+        0.7 + Math.random() * 0.5,
+        1.8 + Math.random() * 0.9,
+        -0.25,
+        SPR.smoke,
       );
       return;
     }
     // flame-tongue embers, mostly upright with a little flicker tilt
     this.spawn(
-      at.x + (Math.random() - 0.5) * 0.5, at.y + 0.5, at.z + (Math.random() - 0.5) * 0.5,
-      (Math.random() - 0.5) * 0.5, 1.6 + Math.random() * 1.2, (Math.random() - 0.5) * 0.5,
-      Math.random() < 0.4 ? 0xffd14d : 0xff7a2a, 0.2, 1.0 + Math.random() * 0.6, -0.4,
-      SPR.flame, (Math.random() - 0.5) * 0.6,
+      at.x + (Math.random() - 0.5) * 0.5,
+      at.y + 0.5,
+      at.z + (Math.random() - 0.5) * 0.5,
+      (Math.random() - 0.5) * 0.5,
+      1.6 + Math.random() * 1.2,
+      (Math.random() - 0.5) * 0.5,
+      Math.random() < 0.4 ? 0xffd14d : 0xff7a2a,
+      0.2,
+      1.0 + Math.random() * 0.6,
+      -0.4,
+      SPR.flame,
+      (Math.random() - 0.5) * 0.6,
     );
   }
 
@@ -498,9 +656,16 @@ export class Vfx {
           const a = Math.random() * Math.PI * 2;
           const sp = 2.5 + Math.random() * 4;
           this.spawn(
-            target.x, target.y, target.z,
-            Math.sin(a) * sp, Math.random() * 3, Math.cos(a) * sp,
-            this.tmpColor, 0.44, 0.55, 7,
+            target.x,
+            target.y,
+            target.z,
+            Math.sin(a) * sp,
+            Math.random() * 3,
+            Math.cos(a) * sp,
+            this.tmpColor,
+            0.44,
+            0.55,
+            7,
             k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
           );
         }
@@ -513,9 +678,17 @@ export class Vfx {
       this.spawn(pr.pos.x, pr.pos.y, pr.pos.z, 0, 0, 0, pr.coreColor, 1.0, 0.12, 0, pr.coreSprite);
       if (Math.random() < 0.35 + 0.65 * this.quality) {
         this.spawn(
-          pr.pos.x + (Math.random() - 0.5) * 0.25, pr.pos.y + (Math.random() - 0.5) * 0.25, pr.pos.z + (Math.random() - 0.5) * 0.25,
-          (Math.random() - 0.5) * 0.8, 0.4, (Math.random() - 0.5) * 0.8,
-          pr.trailColor, 0.32, 0.6, 1.5, pr.trailSprite,
+          pr.pos.x + (Math.random() - 0.5) * 0.25,
+          pr.pos.y + (Math.random() - 0.5) * 0.25,
+          pr.pos.z + (Math.random() - 0.5) * 0.25,
+          (Math.random() - 0.5) * 0.8,
+          0.4,
+          (Math.random() - 0.5) * 0.8,
+          pr.trailColor,
+          0.32,
+          0.6,
+          1.5,
+          pr.trailSprite,
         );
       }
     }

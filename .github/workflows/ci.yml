@@ -32,6 +32,55 @@ permissions:
 # superset (its `npm test` runs every PR-tier check plus the release-only ones).
 
 jobs:
+  # Biome formatter + linter, adopted as a forward ratchet: only files actually
+  # changed by this push/PR are checked (`--changed`), so the large existing tree
+  # is never retroactively reformatted, while every new diff must pass format+lint.
+  # `--no-errors-on-unmatched` keeps the job green when a change touches no
+  # Biome-eligible file (docs, assets, generated i18n).
+  lint:
+    name: Format + lint (Biome, changed files)
+    # Release branches are already validated on push. A release-to-main PR would
+    # otherwise run this changed-file ratchet against the entire release delta.
+    if: github.event_name != 'pull_request' || github.base_ref != 'main' || !startsWith(github.head_ref, 'release/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          # Full history so `biome --changed --since` can diff against the base ref.
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine base ref
+        id: base
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            git fetch --no-tags --depth=1 origin "$BASE_REF"
+            echo "ref=origin/$BASE_REF" >> "$GITHUB_OUTPUT"
+          elif [ -n "$BEFORE_SHA" ] && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            echo "ref=$BEFORE_SHA" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=HEAD~1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Biome check (changed files only)
+        env:
+          BASE_REF_RESOLVED: ${{ steps.base.outputs.ref }}
+        run: npx @biomejs/biome ci --changed --since="$BASE_REF_RESOLVED" --no-errors-on-unmatched
+
   pr-gate:
     name: PR gate (English-only legal)
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch'

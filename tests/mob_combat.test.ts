@@ -37,10 +37,29 @@ describe('mob combat profiles', () => {
     expect(NYTHRAXIS_ADD_COMBAT_PROFILE.immediateSwingOnEnterRange).toBe(true);
   });
 
-  it('only applies moving-target range grace when the profile allows it', () => {
-    expect(effectiveMobMeleeRange(DEFAULT_MOB_COMBAT_PROFILE, true, false))
+  it('keeps the closing-distance grace small so reach is not wildly inflated', () => {
+    // One tick of relative closing at 20 Hz is well under a yard; a flat 3 yd grace
+    // let an ordinary scale-1 mob swing from 8 yd. Keep the grace tick-justified.
+    expect(DEFAULT_MOB_COMBAT_PROFILE.movingRangeBonus).toBe(1);
+  });
+
+  it('grants the closing-distance grace only to a mob that actually moved this tick', () => {
+    // A pursuing mob (it repositioned) gets the small grace so a strict per-tick
+    // range check does not perpetually miss a target it is genuinely closing on.
+    expect(effectiveMobMeleeRange(DEFAULT_MOB_COMBAT_PROFILE, true))
       .toBe(DEFAULT_MOB_COMBAT_PROFILE.meleeRange + DEFAULT_MOB_COMBAT_PROFILE.movingRangeBonus);
-    expect(effectiveMobMeleeRange(NYTHRAXIS_BOSS_COMBAT_PROFILE, true, true))
+  });
+
+  it('gives a STATIONARY mob no reach grace, so walking past a packed camp is safe', () => {
+    // Regression for "excessive melee range": a mob standing in its camp must only
+    // strike from its true melee range. The player walking past (the target moving)
+    // must not inflate the stationary mob's reach.
+    expect(effectiveMobMeleeRange(DEFAULT_MOB_COMBAT_PROFILE, false))
+      .toBe(DEFAULT_MOB_COMBAT_PROFILE.meleeRange);
+  });
+
+  it('never grants grace to a profile that opts out (movingRangeBonus 0)', () => {
+    expect(effectiveMobMeleeRange(NYTHRAXIS_BOSS_COMBAT_PROFILE, true))
       .toBe(NYTHRAXIS_BOSS_COMBAT_PROFILE.meleeRange);
   });
 });

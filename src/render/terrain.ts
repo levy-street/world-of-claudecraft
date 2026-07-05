@@ -1,13 +1,12 @@
 import * as THREE from 'three';
-import {
-  WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES,
-} from '../sim/data';
+import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
-import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { biomeAt, roadDistance, terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
 import { impactCraterTerrainBlend } from './impact_terrain';
+import { chunkIntersectsRegion, normalTexelBounds } from './terrain_region_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
 
 // Chunked terrain across the whole 360x1080 zone strip.
@@ -38,11 +37,13 @@ const ALBEDO_ANISOTROPY = 8;
 const NORMAL_ANISOTROPY = 4;
 
 function kickTerrainTex(key: string, file: string, srgb: boolean): void {
-  registerPreload(loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
-    tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
-    TERRAIN_TEX[key] = tex;
-    return tex;
-  }));
+  registerPreload(
+    loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
+      tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
+      TERRAIN_TEX[key] = tex;
+      return tex;
+    }),
+  );
 }
 
 // ~15MB of JPEGs — skip when the URL already forces the Lambert tier (an
@@ -62,11 +63,16 @@ if (GFX.terrainSplat) {
 
 export function hasTerrainSplatAssets(): boolean {
   return Boolean(
-    TERRAIN_TEX.grassC && TERRAIN_TEX.grassN
-      && TERRAIN_TEX.dirtC && TERRAIN_TEX.dirtN
-      && TERRAIN_TEX.rockC && TERRAIN_TEX.rockN
-      && TERRAIN_TEX.sandC && TERRAIN_TEX.sandN
-      && TERRAIN_TEX.mudC && TERRAIN_TEX.snowC,
+    TERRAIN_TEX.grassC &&
+      TERRAIN_TEX.grassN &&
+      TERRAIN_TEX.dirtC &&
+      TERRAIN_TEX.dirtN &&
+      TERRAIN_TEX.rockC &&
+      TERRAIN_TEX.rockN &&
+      TERRAIN_TEX.sandC &&
+      TERRAIN_TEX.sandN &&
+      TERRAIN_TEX.mudC &&
+      TERRAIN_TEX.snowC,
   );
 }
 
@@ -102,14 +108,72 @@ const NORMAL_TEX_STRENGTH = 1.35;
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo
 // multiplies into (splat textures are authored near mid-gray).
-const BIOME_PALETTE: Record<BiomeId, { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }> = {
-  vale: { grass: 0x548545, grassDark: 0x3e6635, grassYellow: 0x768c44, dirt: 0x8a6f47, sand: 0xc2b283 },
-  marsh: { grass: 0x596d36, grassDark: 0x41522b, grassYellow: 0x71764a, dirt: 0x6e5a3e, sand: 0x8f7f5c },
-  peaks: { grass: 0x687a55, grassDark: 0x4d5c45, grassYellow: 0x8d9168, dirt: 0x7d6a50, sand: 0xb0a486 },
+const BIOME_PALETTE: Record<
+  BiomeId,
+  { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }
+> = {
+  vale: {
+    grass: 0x548545,
+    grassDark: 0x3e6635,
+    grassYellow: 0x768c44,
+    dirt: 0x8a6f47,
+    sand: 0xc2b283,
+  },
+  marsh: {
+    grass: 0x596d36,
+    grassDark: 0x41522b,
+    grassYellow: 0x71764a,
+    dirt: 0x6e5a3e,
+    sand: 0x8f7f5c,
+  },
+  peaks: {
+    grass: 0x687a55,
+    grassDark: 0x4d5c45,
+    grassYellow: 0x8d9168,
+    dirt: 0x7d6a50,
+    sand: 0xb0a486,
+  },
+  // Paint-only biomes (editor brush): flat palettes, no zone-band blend.
+  beach: {
+    grass: 0x9aa55e,
+    grassDark: 0x7a8a4e,
+    grassYellow: 0xb5b06a,
+    dirt: 0xb59a6b,
+    sand: 0xe2d3a4,
+  },
+  desert: {
+    grass: 0xb0a060,
+    grassDark: 0x8f8350,
+    grassYellow: 0xc4b070,
+    dirt: 0xa87f4f,
+    sand: 0xd8b581,
+  },
+  volcano: {
+    grass: 0x5a4a42,
+    grassDark: 0x40332e,
+    grassYellow: 0x6e5a4a,
+    dirt: 0x4a3a32,
+    sand: 0x6a5548,
+  },
+  cave: {
+    grass: 0x6a6a62,
+    grassDark: 0x50504a,
+    grassYellow: 0x7a7a6e,
+    dirt: 0x5a5248,
+    sand: 0x8a8274,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
-const ROCK_SLOPE_START: Record<BiomeId, number> = { vale: 0.55, marsh: 0.62, peaks: 0.45 };
+const ROCK_SLOPE_START: Record<BiomeId, number> = {
+  vale: 0.55,
+  marsh: 0.62,
+  peaks: 0.45,
+  beach: 0.7,
+  desert: 0.55,
+  volcano: 0.35,
+  cave: 0.4,
+};
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
@@ -124,8 +188,11 @@ interface VertexSample {
 
 // Shared scratch colors for the palette blend (hot loop, avoid allocation).
 const cTmp = new THREE.Color();
-const grassC = new THREE.Color(), grassDarkC = new THREE.Color(), grassYellowC = new THREE.Color();
-const dirtC = new THREE.Color(), sandC = new THREE.Color();
+const grassC = new THREE.Color(),
+  grassDarkC = new THREE.Color(),
+  grassYellowC = new THREE.Color();
+const dirtC = new THREE.Color(),
+  sandC = new THREE.Color();
 const dirtDarkC = new THREE.Color(0x73592f);
 const rockC = new THREE.Color(0x7a7a72);
 const impactAshC = new THREE.Color(0x18110d);
@@ -137,12 +204,48 @@ const lowShadeC = new THREE.Color(0x60745b);
 const zonePalettes = ZONES.map((zn) => {
   const p = BIOME_PALETTE[zn.biome];
   return {
-    grass: new THREE.Color(p.grass), grassDark: new THREE.Color(p.grassDark),
-    grassYellow: new THREE.Color(p.grassYellow), dirt: new THREE.Color(p.dirt), sand: new THREE.Color(p.sand),
+    grass: new THREE.Color(p.grass),
+    grassDark: new THREE.Color(p.grassDark),
+    grassYellow: new THREE.Color(p.grassYellow),
+    dirt: new THREE.Color(p.dirt),
+    sand: new THREE.Color(p.sand),
   };
 });
 
-function paletteAt(z: number): void {
+// Per-biome palettes for painted cells (a flat lookup, no z-blend).
+const biomePalettes: Record<BiomeId, (typeof zonePalettes)[number]> = {
+  vale: makeBiomePalette('vale'),
+  marsh: makeBiomePalette('marsh'),
+  peaks: makeBiomePalette('peaks'),
+  beach: makeBiomePalette('beach'),
+  desert: makeBiomePalette('desert'),
+  volcano: makeBiomePalette('volcano'),
+  cave: makeBiomePalette('cave'),
+};
+function makeBiomePalette(b: BiomeId): (typeof zonePalettes)[number] {
+  const p = BIOME_PALETTE[b];
+  return {
+    grass: new THREE.Color(p.grass),
+    grassDark: new THREE.Color(p.grassDark),
+    grassYellow: new THREE.Color(p.grassYellow),
+    dirt: new THREE.Color(p.dirt),
+    sand: new THREE.Color(p.sand),
+  };
+}
+
+// Palette at a point. A painted cell (biome differs from its zone band) uses that
+// biome's flat palette; otherwise the smooth zone-band blend. With no paint layer
+// `biome === zoneBiomeAt(z)` always, so this is the original z-blend exactly.
+function paletteAt(x: number, z: number, biome: BiomeId): void {
+  if (biome !== zoneBiomeAt(z)) {
+    const p = biomePalettes[biome];
+    grassC.copy(p.grass);
+    grassDarkC.copy(p.grassDark);
+    grassYellowC.copy(p.grassYellow);
+    dirtC.copy(p.dirt);
+    sandC.copy(p.sand);
+    return;
+  }
   grassC.copy(zonePalettes[0].grass);
   grassDarkC.copy(zonePalettes[0].grassDark);
   grassYellowC.copy(zonePalettes[0].grassYellow);
@@ -194,12 +297,24 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   const slope = Math.sqrt(hx * hx + hz * hz) / (2 * SLOPE_EPS);
   const invLen = 1 / Math.hypot(hx / (2 * SLOPE_EPS), 1, hz / (2 * SLOPE_EPS));
   const normal: [number, number, number] = [
-    -(hx / (2 * SLOPE_EPS)) * invLen, invLen, -(hz / (2 * SLOPE_EPS)) * invLen,
+    -(hx / (2 * SLOPE_EPS)) * invLen,
+    invLen,
+    -(hz / (2 * SLOPE_EPS)) * invLen,
   ];
 
-  paletteAt(z);
-  const biome = zoneBiomeAt(z);
+  const biome = biomeAt(x, z);
+  paletteAt(x, z, biome);
   const w: [number, number, number, number] = [1, 0, 0, 0];
+  // A painted cell re-bases the splat mix on its biome's dominant ground layer;
+  // without this the splat tier keeps the grass texture everywhere and the
+  // biome override only reads as the gentle vertex tint (invisible in practice).
+  // Shore/road/slope/snow blends below still layer on top, matching zone bands.
+  const painted = biome !== zoneBiomeAt(z);
+  if (painted) {
+    if (biome === 'marsh' || biome === 'cave') lerpSplat(w, 1, 0.8);
+    else if (biome === 'peaks' || biome === 'volcano') lerpSplat(w, 2, 0.75);
+    else if (biome === 'beach' || biome === 'desert') lerpSplat(w, 3, 0.9);
+  }
   const impact = impactCraterTerrainBlend(x, z);
 
   // base grass with patchy variation
@@ -210,8 +325,10 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   // the marsh reads muddier: patches of wet dirt across the lowland
   if (biome === 'marsh') lerpSplat(w, 1, 0.3 * v2 * clamp01((4 - h) / 6));
   // shoreline sand — color and splat weight share one feathered falloff so
-  // the beach blends out instead of cutting a razor-hard grass/sand line
-  const shore = clamp01((WATER_LEVEL + 1.6 - h) / 1.6);
+  // the beach blends out instead of cutting a razor-hard grass/sand line.
+  // waterLevel() (not the const) so the beach tracks a custom map's water.
+  const wl = waterLevel();
+  const shore = clamp01((wl + 1.6 - h) / 1.6);
   cTmp.lerp(sandC, shore);
   lerpSplat(w, 3, shore);
   // packed dirt at each hub settlement (same feather as the splat weight —
@@ -268,18 +385,24 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     snow = Math.max(snow, rimSnow);
     lerpSplat(w, 2, rim * 0.85);
   }
-  // mud rides the dirt layer wherever the marsh palette is active
-  const mud = marshWeightAt(z);
+  // mud rides the dirt layer wherever the marsh palette is active; a painted
+  // cell overrides the z-band weight (painted marsh is fully wet, any other
+  // painted biome suppresses band mud that would bleed into it)
+  const mud = painted ? (biome === 'marsh' ? 1 : 0) : marshWeightAt(z);
   if (GFX.lowPlus && !GFX.terrainSplat) {
     const ridge = clamp01((slope - 0.22) * 1.6);
-    const lowland = clamp01((WATER_LEVEL + 7 - h) / 12);
+    const lowland = clamp01((wl + 7 - h) / 12);
     const upland = clamp01((h - 8) / 22);
     cTmp.lerp(lowShadeC, 0.07 * ridge + 0.05 * lowland * mud);
     cTmp.lerp(lowSunC, 0.035 * (1 - shore) + 0.045 * upland);
     cTmp.multiplyScalar(0.98 + upland * 0.04 - ridge * 0.025);
   }
   return {
-    height: h, slope, normal, color: [cTmp.r, cTmp.g, cTmp.b], splat: w,
+    height: h,
+    slope,
+    normal,
+    color: [cTmp.r, cTmp.g, cTmp.b],
+    splat: w,
     extra: [mud, snow, impact.scorch, impact.ash],
   };
 }
@@ -289,7 +412,14 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
 // vertices sit on the chunk border but 0.3u lower, hiding LOD cracks.
 // ---------------------------------------------------------------------------
 
-function buildChunkGeometry(x0: number, z0: number, size: number, spacing: number, seed: number, withSplat: boolean): THREE.BufferGeometry {
+function buildChunkGeometry(
+  x0: number,
+  z0: number,
+  size: number,
+  spacing: number,
+  seed: number,
+  withSplat: boolean,
+): THREE.BufferGeometry {
   const nx = Math.max(4, Math.round(size / spacing));
   const nz = nx;
   const stepX = size / nx;
@@ -309,7 +439,8 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
   const sampleCache = new Map<number, VertexSample>();
   for (let gj = 0; gj < gh; gj++) {
     for (let gi = 0; gi < gw; gi++) {
-      const i = gi - 1, j = gj - 1; // interior indices; -1 / n+1 are skirt
+      const i = gi - 1,
+        j = gj - 1; // interior indices; -1 / n+1 are skirt
       const ci = Math.max(0, Math.min(nx, i));
       const cj = Math.max(0, Math.min(nz, j));
       const isSkirt = i !== ci || j !== cj;
@@ -349,7 +480,8 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
     }
   }
 
-  const quadsX = gw - 1, quadsZ = gh - 1;
+  const quadsX = gw - 1,
+    quadsZ = gh - 1;
   const indices = new Uint32Array(quadsX * quadsZ * 6);
   let k = 0;
   for (let gj = 0; gj < quadsZ; gj++) {
@@ -358,8 +490,12 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
       const b = a + 1;
       const c = a + gw;
       const d = c + 1;
-      indices[k++] = a; indices[k++] = c; indices[k++] = b;
-      indices[k++] = b; indices[k++] = c; indices[k++] = d;
+      indices[k++] = a;
+      indices[k++] = c;
+      indices[k++] = b;
+      indices[k++] = b;
+      indices[k++] = c;
+      indices[k++] = d;
     }
   }
 
@@ -382,26 +518,51 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
 // beyond the vertex density.
 // ---------------------------------------------------------------------------
 
-function terrainNormalTexture(seed: number): THREE.DataTexture {
-  const w = NORMAL_TEX_W, h = NORMAL_TEX_H;
+// Bake the normal texels [i0..i1] x [j0..j1] (inclusive) into `data`, sampling
+// the CURRENT terrainHeight. The full build and the editor's partial rebake
+// share this one path so a partial rebake is byte-identical to a full one:
+// heights are sampled one texel beyond the baked rect (clamped at the texture
+// border, exactly like the full bake's clamped derivative stencil).
+function bakeNormalRegion(
+  data: Uint8Array,
+  seed: number,
+  i0: number,
+  i1: number,
+  j0: number,
+  j1: number,
+): void {
+  const w = NORMAL_TEX_W,
+    h = NORMAL_TEX_H;
   const worldW = WORLD_MAX_X * 2;
   const worldD = WORLD_MAX_Z - WORLD_MIN_Z;
   const stepX = worldW / w;
   const stepZ = worldD / h;
-  const heights = new Float32Array(w * h);
-  for (let j = 0; j < h; j++) {
+  // height window: the baked rect plus the 1-texel derivative stencil
+  const hi0 = Math.max(0, i0 - 1),
+    hi1 = Math.min(w - 1, i1 + 1);
+  const hj0 = Math.max(0, j0 - 1),
+    hj1 = Math.min(h - 1, j1 + 1);
+  const hw = hi1 - hi0 + 1;
+  const heights = new Float32Array(hw * (hj1 - hj0 + 1));
+  for (let j = hj0; j <= hj1; j++) {
     const z = WORLD_MIN_Z + (j + 0.5) * stepZ;
-    for (let i = 0; i < w; i++) {
-      heights[j * w + i] = terrainHeight(-WORLD_MAX_X + (i + 0.5) * stepX, z, seed);
+    for (let i = hi0; i <= hi1; i++) {
+      heights[(j - hj0) * hw + (i - hi0)] = terrainHeight(
+        -WORLD_MAX_X + (i + 0.5) * stepX,
+        z,
+        seed,
+      );
     }
   }
-  const data = new Uint8Array(w * h * 4);
-  for (let j = 0; j < h; j++) {
-    for (let i = 0; i < w; i++) {
-      const iw = Math.max(0, i - 1), ie = Math.min(w - 1, i + 1);
-      const jn = Math.max(0, j - 1), js = Math.min(h - 1, j + 1);
-      const dhdx = (heights[j * w + ie] - heights[j * w + iw]) / ((ie - iw) * stepX);
-      const dhdz = (heights[js * w + i] - heights[jn * w + i]) / ((js - jn) * stepZ);
+  const hAt = (i: number, j: number): number => heights[(j - hj0) * hw + (i - hi0)];
+  for (let j = j0; j <= j1; j++) {
+    for (let i = i0; i <= i1; i++) {
+      const iw = Math.max(0, i - 1),
+        ie = Math.min(w - 1, i + 1);
+      const jn = Math.max(0, j - 1),
+        js = Math.min(h - 1, j + 1);
+      const dhdx = (hAt(ie, j) - hAt(iw, j)) / ((ie - iw) * stepX);
+      const dhdz = (hAt(i, js) - hAt(i, jn)) / ((js - jn) * stepZ);
       const nx = -dhdx * NORMAL_TEX_STRENGTH;
       const nz = -dhdz * NORMAL_TEX_STRENGTH;
       const inv = 1 / Math.hypot(nx, 1, nz);
@@ -412,7 +573,12 @@ function terrainNormalTexture(seed: number): THREE.DataTexture {
       data[o + 3] = 255;
     }
   }
-  const tex = new THREE.DataTexture(data, w, h, THREE.RGBAFormat);
+}
+
+function terrainNormalTexture(seed: number): THREE.DataTexture {
+  const data = new Uint8Array(NORMAL_TEX_W * NORMAL_TEX_H * 4);
+  bakeNormalRegion(data, seed, 0, NORMAL_TEX_W - 1, 0, NORMAL_TEX_H - 1);
+  const tex = new THREE.DataTexture(data, NORMAL_TEX_W, NORMAL_TEX_H, THREE.RGBAFormat);
   tex.colorSpace = THREE.NoColorSpace;
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
   tex.magFilter = THREE.LinearFilter;
@@ -425,7 +591,46 @@ function terrainNormalTexture(seed: number): THREE.DataTexture {
 // Materials
 // ---------------------------------------------------------------------------
 
-function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
+// Editor brush cursor: a soft additive ring projected onto the ground in world
+// XZ space, injected into BOTH terrain materials so it reads identically on the
+// splat and Lambert tiers. One shared uniform-value set per terrain view; the
+// uniform objects are installed once at material build (onBeforeCompile) and
+// per-frame updates only write .value, never rebuild a material. Radius 0
+// disables (the default), so the shipped game pays one uniform branch and
+// nothing else.
+interface BrushUniforms {
+  uBrushCenter: { value: THREE.Vector2 };
+  uBrushRadius: { value: number };
+  uBrushColor: { value: THREE.Color };
+}
+
+function makeBrushUniforms(): BrushUniforms {
+  return {
+    uBrushCenter: { value: new THREE.Vector2(0, 0) },
+    uBrushRadius: { value: 0 },
+    uBrushColor: { value: new THREE.Color(0x6fd2ff) },
+  };
+}
+
+// Two smoothsteps: a feathered rise to the radius and a feathered fall past it.
+const BRUSH_RING_GLSL = /* glsl */ `
+uniform vec2 uBrushCenter;
+uniform float uBrushRadius;
+uniform vec3 uBrushColor;
+vec3 wocBrushRing(vec2 p) {
+  if (uBrushRadius <= 0.0) return vec3(0.0);
+  float d = distance(p, uBrushCenter);
+  float w = max(0.28, uBrushRadius * 0.055);
+  float ring = smoothstep(uBrushRadius - w, uBrushRadius, d)
+             * (1.0 - smoothstep(uBrushRadius, uBrushRadius + w, d));
+  return uBrushColor * ring * 1.35;
+}
+`;
+
+function buildSplatMaterial(
+  normalTex: THREE.DataTexture,
+  brush: BrushUniforms,
+): THREE.MeshStandardMaterial {
   // Legacy canvas splats are still generated (result unused): textures.ts
   // shares one LCG across all generators, so dropping this call would shift
   // the look of every texture generated after it (foliage, props, ...).
@@ -436,10 +641,11 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
     vertexColors: true,
     roughness: 1.0,
     metalness: 0,
-    normalMap: terrainNormalTexture(seed),
+    normalMap: normalTex,
     normalScale: new THREE.Vector2(0.85, 0.85),
   });
   mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, brush);
     Object.assign(sh.uniforms, {
       uGrass: { value: t.grassC },
       uGrassN: { value: t.grassN },
@@ -454,26 +660,43 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
       uMacro: { value: macro },
     });
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', `#include <common>
+      .replace(
+        '#include <common>',
+        `#include <common>
         attribute vec4 aSplat;
         attribute vec4 aExtra;
         varying vec4 vSplat;
         varying vec4 vExtra;
         varying vec3 vWPos;
-        varying vec3 vWNorm;`)
-      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        varying vec3 vWNorm;`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
         vSplat = aSplat;
         vExtra = aExtra;
         vWPos = (modelMatrix * vec4(position, 1.0)).xyz;
-        vWNorm = objectNormal; // terrain mesh is untransformed: object == world`);
+        vWNorm = objectNormal; // terrain mesh is untransformed: object == world`,
+      );
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', `#include <common>
+      .replace(
+        '#include <common>',
+        `#include <common>
         varying vec4 vSplat;
         varying vec4 vExtra;
         varying vec3 vWPos;
         varying vec3 vWNorm;
-        uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro;`)
-      .replace('#include <map_fragment>', `
+        uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro;
+        ${BRUSH_RING_GLSL}`,
+      )
+      .replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+        totalEmissiveRadiance += wocBrushRing(vWPos.xz);`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `
         vec2 tuv = vWPos.xz * 0.22;
         // grass blends two scales so the 1K photo source never reads as tile
         vec3 grassAlb = mix(texture2D(uGrass, tuv).rgb, texture2D(uGrass, tuv * 0.31).rgb, 0.42);
@@ -512,15 +735,24 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
         // (vColor was authored as a full sRGB ground color, so re-centre it
         // around 1.0 before using it as a multiplier.)
         vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
-        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro;`)
-      .replace('#include <color_fragment>', `
+        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro;`,
+      )
+      .replace(
+        '#include <color_fragment>',
+        `
         // vertex color already folded into the splat albedo above (gently);
-        // the stock full multiply would re-tint the real textures to mush`)
-      .replace('#include <roughnessmap_fragment>', `
+        // the stock full multiply would re-tint the real textures to mush`,
+      )
+      .replace(
+        '#include <roughnessmap_fragment>',
+        `
         float roughnessFactor = roughness * mix(
           dot(vSplat, vec4(${ROUGH_GRASS}, mix(${ROUGH_DIRT}, ${ROUGH_MUD}, vExtra.x), ${ROUGH_ROCK}, ${ROUGH_SAND})),
-          ${ROUGH_SNOW}, vExtra.y);`)
-      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+          ${ROUGH_SNOW}, vExtra.y);`,
+      )
+      .replace(
+        '#include <normal_fragment_maps>',
+        `#include <normal_fragment_maps>
         // per-layer detail normals (GL-convention), weighted by splat
         vec3 gN = texture2D(uGrassN, tuv).xyz * 2.0 - 1.0;
         vec3 dN = texture2D(uDirtN, tuv * 0.8).xyz * 2.0 - 1.0;
@@ -540,21 +772,51 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
           vec3 rNz = texture2D(uRockN, vWPos.xy * 0.132).xyz * 2.0 - 1.0; // +-z faces
           vec3 wallPerturb = mix(vec3(rNz.x, rNz.y, 0.0), vec3(0.0, rNx.y, rNx.x), axisW);
           normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 0.8));
-        }`);
+        }`,
+      );
   };
   return mat;
 }
 
-function buildLambertMaterial(): THREE.MeshLambertMaterial {
+function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
   const detail = groundDetailTexture();
   // strip-planar uv: keep the legacy ~2.25u texture period in both axes
   detail.repeat.set(160, 480);
-  return new THREE.MeshLambertMaterial({
+  const mat = new THREE.MeshLambertMaterial({
     vertexColors: true,
     map: detail,
     emissive: GFX.lowPlus ? 0x182014 : 0x000000,
     emissiveIntensity: GFX.lowPlus ? 0.08 : 1,
   });
+  // The Lambert tier has no world-position varying of its own, so the brush
+  // patch carries one (r165 chunk names; same idiom as the splat patch above).
+  mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, brush);
+    sh.vertexShader = sh.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vWocWPos;`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+        vWocWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`,
+      );
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vWocWPos;
+        ${BRUSH_RING_GLSL}`,
+      )
+      .replace(
+        '#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+        totalEmissiveRadiance += wocBrushRing(vWocWPos.xz);`,
+      );
+  };
+  return mat;
 }
 
 // ---------------------------------------------------------------------------
@@ -565,18 +827,54 @@ export interface TerrainView {
   group: THREE.Group;
   /** hides chunks that sit entirely past the fog far plane */
   update(camX: number, camZ: number, fogFar: number): void;
+  /**
+   * Editor-only: re-mesh ONLY the chunks intersecting the world-space region
+   * (a sculpt brush footprint), swapping each geometry in place on the existing
+   * mesh (old geometry disposed, shared material kept). Cheap enough to run
+   * several times per second during a brush drag; the stale macro normal
+   * texture is NOT touched here (see rebakeNormalRegion, for stroke end).
+   */
+  rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
+  /**
+   * Editor-only: rebake the region's texels of the macro normal DataTexture
+   * from the current terrainHeight and flag it for re-upload. Byte-identical
+   * to a full bake over those texels. Call at stroke end, never per drag
+   * sample. No-op on the Lambert tier (it has no normal map).
+   */
+  rebakeNormalRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
+  /**
+   * Editor-only: project the brush ring at world (x, z) with the given radius
+   * (yards) onto both terrain materials. Writes uniform values only (no
+   * material rebuild). Radius <= 0 hides the ring, as does clearBrush().
+   */
+  setBrush(x: number, z: number, radius: number, color?: THREE.ColorRepresentation): void;
+  /** Editor-only: hide the brush ring. */
+  clearBrush(): void;
 }
 
 export function buildTerrain(seed: number): TerrainView {
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
-  const mat = lowGfx ? buildLambertMaterial() : buildSplatMaterial(seed);
+  const brush = makeBrushUniforms();
+  const normalTex = lowGfx ? null : terrainNormalTexture(seed);
+  const mat = normalTex ? buildSplatMaterial(normalTex, brush) : buildLambertMaterial(brush);
   const bands = lowGfx ? LOD_BANDS.low : LOD_BANDS.high;
   const group = new THREE.Group();
   group.name = 'terrain';
   const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
   const chunksX = Math.ceil((WORLD_MAX_X * 2) / CHUNK_SIZE);
   const chunksZ = Math.ceil(worldDepth / CHUNK_SIZE);
-  const chunks: { mesh: THREE.Mesh; x: number; z: number; half: number }[] = [];
+  // x/z/half feed the per-frame fog cull; x0/z0/size/spacing are the exact
+  // buildChunkGeometry inputs, kept so an editor rebuild re-runs the same build.
+  const chunks: {
+    mesh: THREE.Mesh;
+    x: number;
+    z: number;
+    half: number;
+    x0: number;
+    z0: number;
+    size: number;
+    spacing: number;
+  }[] = [];
 
   const bandIndexAt = (cx: number, cz: number): number => {
     const centerX = -WORLD_MAX_X + cx * CHUNK_SIZE + CHUNK_SIZE / 2;
@@ -595,8 +893,14 @@ export function buildTerrain(seed: number): TerrainView {
     mesh.receiveShadow = true;
     group.add(mesh);
     chunks.push({
-      mesh, x: x0 + size / 2, z: z0 + size / 2,
+      mesh,
+      x: x0 + size / 2,
+      z: z0 + size / 2,
       half: size / 2,
+      x0,
+      z0,
+      size,
+      spacing,
     });
   };
 
@@ -607,18 +911,39 @@ export function buildTerrain(seed: number): TerrainView {
   for (let cz = 0; cz < chunksZ; cz++) {
     for (let cx = 0; cx < chunksX; cx++) {
       if (built.has(cz * chunksX + cx)) continue;
-      const superOk = cx % 2 === 0 && cz % 2 === 0 && cx + 1 < chunksX && cz + 1 < chunksZ
-        && bandIndexAt(cx, cz) === farBand && bandIndexAt(cx + 1, cz) === farBand
-        && bandIndexAt(cx, cz + 1) === farBand && bandIndexAt(cx + 1, cz + 1) === farBand;
+      const superOk =
+        cx % 2 === 0 &&
+        cz % 2 === 0 &&
+        cx + 1 < chunksX &&
+        cz + 1 < chunksZ &&
+        bandIndexAt(cx, cz) === farBand &&
+        bandIndexAt(cx + 1, cz) === farBand &&
+        bandIndexAt(cx, cz + 1) === farBand &&
+        bandIndexAt(cx + 1, cz + 1) === farBand;
       if (superOk) {
-        for (const [dx, dz] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
+        for (const [dx, dz] of [
+          [0, 0],
+          [1, 0],
+          [0, 1],
+          [1, 1],
+        ]) {
           built.add((cz + dz) * chunksX + (cx + dx));
         }
-        addChunk(-WORLD_MAX_X + cx * CHUNK_SIZE, WORLD_MIN_Z + cz * CHUNK_SIZE, CHUNK_SIZE * 2, bands[farBand].spacing);
+        addChunk(
+          -WORLD_MAX_X + cx * CHUNK_SIZE,
+          WORLD_MIN_Z + cz * CHUNK_SIZE,
+          CHUNK_SIZE * 2,
+          bands[farBand].spacing,
+        );
       } else {
         built.add(cz * chunksX + cx);
         const band = bands[bandIndexAt(cx, cz)];
-        addChunk(-WORLD_MAX_X + cx * CHUNK_SIZE, WORLD_MIN_Z + cz * CHUNK_SIZE, CHUNK_SIZE, band.spacing);
+        addChunk(
+          -WORLD_MAX_X + cx * CHUNK_SIZE,
+          WORLD_MIN_Z + cz * CHUNK_SIZE,
+          CHUNK_SIZE,
+          band.spacing,
+        );
       }
     }
   }
@@ -631,6 +956,61 @@ export function buildTerrain(seed: number): TerrainView {
         const dz = Math.max(Math.abs(camZ - chunk.z) - chunk.half, 0);
         chunk.mesh.visible = Math.hypot(dx, dz) < fogFar;
       }
+    },
+    rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {
+      // No allocation beyond the replacement geometries: the chunk list is
+      // scanned in place and only intersecting chunks re-mesh.
+      for (const chunk of chunks) {
+        if (!chunkIntersectsRegion(chunk.x0, chunk.z0, chunk.size, minX, minZ, maxX, maxZ)) {
+          continue;
+        }
+        const geo = buildChunkGeometry(
+          chunk.x0,
+          chunk.z0,
+          chunk.size,
+          chunk.spacing,
+          seed,
+          !lowGfx,
+        );
+        chunk.mesh.geometry.dispose();
+        chunk.mesh.geometry = geo; // bounding box/sphere already computed by the build
+      }
+    },
+    rebakeNormalRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {
+      if (!normalTex) return; // Lambert tier: no macro normal map
+      // margin 1: texels just outside the region read sculpted heights through
+      // the derivative stencil, so they go stale too.
+      const bounds = normalTexelBounds(
+        minX,
+        minZ,
+        maxX,
+        maxZ,
+        -WORLD_MAX_X,
+        WORLD_MIN_Z,
+        WORLD_MAX_X * 2,
+        WORLD_MAX_Z - WORLD_MIN_Z,
+        NORMAL_TEX_W,
+        NORMAL_TEX_H,
+        1,
+      );
+      if (!bounds) return;
+      bakeNormalRegion(
+        normalTex.image.data as Uint8Array,
+        seed,
+        bounds.i0,
+        bounds.i1,
+        bounds.j0,
+        bounds.j1,
+      );
+      normalTex.needsUpdate = true;
+    },
+    setBrush(x: number, z: number, radius: number, color?: THREE.ColorRepresentation): void {
+      brush.uBrushCenter.value.set(x, z);
+      brush.uBrushRadius.value = Math.max(0, radius);
+      if (color !== undefined) brush.uBrushColor.value.set(color);
+    },
+    clearBrush(): void {
+      brush.uBrushRadius.value = 0;
     },
   };
 }

@@ -1,7 +1,12 @@
-import { describe, expect, it } from 'vitest';
-import bs58 from 'bs58';
 import { ed25519 } from '@noble/curves/ed25519';
-import { isSolanaAddress, verifySolanaSignature, buildLinkMessage } from '../server/wallet_link';
+import bs58 from 'bs58';
+import { describe, expect, it } from 'vitest';
+import {
+  buildLinkMessage,
+  decodeBase58,
+  isSolanaAddress,
+  verifySolanaSignature,
+} from '../server/wallet_link';
 
 // A Solana wallet signMessage() is exactly ed25519 over the raw UTF-8 bytes, so
 // a @noble/curves keypair is an accurate stand-in for a real wallet here.
@@ -31,7 +36,7 @@ describe('wallet link signature verification', () => {
 
   it('rejects a tampered message', () => {
     const signature = sign(message, wallet.priv);
-    expect(verifySolanaSignature(message + ' ', signature, wallet.address)).toBe(false);
+    expect(verifySolanaSignature(`${message} `, signature, wallet.address)).toBe(false);
   });
 
   it('rejects a signature produced by a different wallet', () => {
@@ -46,8 +51,36 @@ describe('wallet link signature verification', () => {
 
   it('rejects garbage / malformed input without throwing', () => {
     expect(verifySolanaSignature(message, 'not-a-signature', wallet.address)).toBe(false);
-    expect(verifySolanaSignature(message, bs58.encode(new Uint8Array(10)), wallet.address)).toBe(false);
+    expect(verifySolanaSignature(message, bs58.encode(new Uint8Array(10)), wallet.address)).toBe(
+      false,
+    );
     expect(verifySolanaSignature(message, sign(message, wallet.priv), 'has0OIlchars')).toBe(false);
+  });
+});
+
+describe('decodeBase58 length guard', () => {
+  // The decode is O(n^2) in the input length, so a hostile caller could pin the
+  // event loop with a very long string. The longest input we ever legitimately
+  // decode is a 64-byte ed25519 signature (~88 base58 chars), so anything past a
+  // generous 128-char cap is rejected before the decode runs.
+  it('decodes inputs at or below the cap', () => {
+    const sig = bs58.encode(
+      ed25519.sign(new TextEncoder().encode('m'), ed25519.utils.randomPrivateKey()),
+    );
+    expect(sig.length).toBeLessThanOrEqual(128);
+    expect(decodeBase58(sig)).not.toBeNull();
+    expect(decodeBase58('1'.repeat(128))).not.toBeNull();
+  });
+
+  it('rejects an over-long string without decoding it', () => {
+    // All-'1' is valid base58, so this is rejected by length alone, not charset.
+    expect(decodeBase58('1'.repeat(129))).toBeNull();
+    expect(decodeBase58('A'.repeat(10000))).toBeNull();
+  });
+
+  it('keeps over-long input out of isSolanaAddress and verifySolanaSignature', () => {
+    expect(isSolanaAddress('1'.repeat(129))).toBe(false);
+    expect(verifySolanaSignature('m', '1'.repeat(129), '1'.repeat(129))).toBe(false);
   });
 });
 
@@ -66,7 +99,13 @@ describe('isSolanaAddress', () => {
 
 describe('buildLinkMessage', () => {
   it('embeds account, wallet, nonce, and domain so the signed text is unambiguous', () => {
-    const m = buildLinkMessage({ domain: 'play.woc', accountId: 7, address: 'WALLET123', nonce: 'N1', issuedAt: 'T' });
+    const m = buildLinkMessage({
+      domain: 'play.woc',
+      accountId: 7,
+      address: 'WALLET123',
+      nonce: 'N1',
+      issuedAt: 'T',
+    });
     expect(m).toContain('Account: #7');
     expect(m).toContain('Wallet: WALLET123');
     expect(m).toContain('Nonce: N1');

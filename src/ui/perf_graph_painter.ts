@@ -24,6 +24,28 @@ export interface FrameGraphGeometry {
 /** Wild stalls are clamped so normal variance stays legible. */
 export const MAX_VISIBLE_MS = 100;
 
+export interface FrameGraphCanvasMetrics {
+  /** HiDPI backing-store dimensions (device pixels) for `canvas.width/height`. */
+  pxW: number;
+  pxH: number;
+  /** Device-pixel-ratio actually used (clamped to 2 to bound memory). */
+  dpr: number;
+}
+
+/** Device-pixel backing-store size for a measured CSS width/height. The canvas's
+ *  *display* width is deliberately left to CSS (`width:100%`) so it follows its
+ *  panel rather than pinning it: writing an absolute px display width once caused
+ *  the sparkline to prop the shrink-wrapped overlay open, leaving the graph stuck
+ *  at the expanded width when metrics were removed. Pure: no canvas, no DOM. */
+export function frameGraphCanvasMetrics(cssW: number, cssH: number, devicePixelRatio: number): FrameGraphCanvasMetrics {
+  const dpr = Math.min(2, devicePixelRatio > 0 ? devicePixelRatio : 1);
+  return {
+    pxW: Math.max(1, Math.round(cssW * dpr)),
+    pxH: Math.max(1, Math.round(cssH * dpr)),
+    dpr,
+  };
+}
+
 /** Map frame-time samples (ms, oldest->newest) to sparkline coordinates. The
  *  vertical range auto-scales from 2x target up to the worst sample, capped at
  *  MAX_VISIBLE_MS. Pure: no canvas, no DOM. */

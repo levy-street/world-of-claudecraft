@@ -26,9 +26,9 @@
 //   node scripts/i18n_admin_build.mjs
 //   I18N_OUT_DIR=... node scripts/i18n_admin_build.mjs   emit into a custom directory
 
-import * as esbuild from 'esbuild';
-import { writeFileSync, renameSync, mkdirSync, rmSync, readdirSync } from 'node:fs';
+import { mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import * as esbuild from 'esbuild';
 import { pseudoLocalize } from './i18n_pseudo.mjs';
 
 const root = process.cwd();
@@ -42,8 +42,27 @@ const OUT_DIR = process.env.I18N_OUT_DIR
 // Authoritative ordered locale set (mirrors scripts/i18n_build.mjs LOCALES). `en`
 // is the base; the rest are flat overlays. Drives emit order + supportedLanguages.
 const LOCALES = [
-  'en', 'es', 'es_ES', 'fr_FR', 'fr_CA', 'en_CA', 'it_IT', 'de_DE',
-  'zh_CN', 'zh_TW', 'ko_KR', 'ja_JP', 'pt_BR', 'ru_RU',
+  'en',
+  'es',
+  'es_ES',
+  'fr_FR',
+  'fr_CA',
+  'en_CA',
+  'it_IT',
+  'de_DE',
+  'zh_CN',
+  'zh_TW',
+  'ko_KR',
+  'ja_JP',
+  'pt_BR',
+  'ru_RU',
+  'nl_NL',
+  'pl_PL',
+  'id_ID',
+  'tr_TR',
+  'sv_SE',
+  'vi_VN',
+  'da_DK',
 ];
 
 // Dialect locales resolve through a base (base-resolution model): nested en -> base
@@ -57,7 +76,12 @@ function sourceModule(lang) {
 async function loadLocales() {
   const stub = LOCALES.map((lang) => `export { ${lang} } from '${sourceModule(lang)}';`).join('\n');
   const build = await esbuild.build({
-    stdin: { contents: stub, resolveDir: root, sourcefile: 'admin-i18n-build-entry.ts', loader: 'ts' },
+    stdin: {
+      contents: stub,
+      resolveDir: root,
+      sourcefile: 'admin-i18n-build-entry.ts',
+      loader: 'ts',
+    },
     bundle: true,
     platform: 'node',
     format: 'esm',
@@ -84,7 +108,7 @@ function fileBanner() {
     '// re-exports every slice and assembles the runtime `translations` map, per-locale',
     '// loaders (loaders.ts, parity scaffolding - admin is NOT lazy), and the pending',
     '// set (pending.ts). The admin SPA consumes ONLY this table (never the game locale',
-    "// table); regenerate with `npm run i18n:admin` (also wired into `npm run build`",
+    '// table); regenerate with `npm run i18n:admin` (also wired into `npm run build`',
     '// and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.',
   ].join('\n');
 }
@@ -131,7 +155,9 @@ function emitPendingModule(pending) {
   return [
     fileBanner(),
     '',
-    'export const pending: Record<string, readonly string[]> = ' + JSON.stringify(pending, null, 2) + ';',
+    'export const pending: Record<string, readonly string[]> = ' +
+      JSON.stringify(pending, null, 2) +
+      ';',
     '',
   ].join('\n');
 }
@@ -148,7 +174,9 @@ function emitLoadersModule(locales) {
   }
   lines.push('};');
   lines.push('');
-  lines.push(`export const SUPPORTED_LANGUAGES = [${locales.map((l) => `'${l}'`).join(', ')}] as const;`);
+  lines.push(
+    `export const SUPPORTED_LANGUAGES = [${locales.map((l) => `'${l}'`).join(', ')}] as const;`,
+  );
   lines.push('');
   return lines.join('\n');
 }
@@ -232,7 +260,9 @@ async function main() {
     if (lang === 'en') continue;
     for (const k of Object.keys(locales[lang] || {})) {
       if (!enKeySet.has(k)) {
-        throw new Error(`i18n:admin: overlay "${lang}" has key "${k}" not present in the admin en base (typo/stale?)`);
+        throw new Error(
+          `i18n:admin: overlay "${lang}" has key "${k}" not present in the admin en base (typo/stale?)`,
+        );
       }
     }
   }

@@ -8,77 +8,77 @@
     {
       "abilityId": "raptor_strike",
       "sourceFile": "49.png",
-      "output": "raptor_strike.png"
+      "output": "raptor_strike.webp"
     },
     {
       "abilityId": "mongoose_bite",
       "sourceFile": "48.png",
-      "output": "mongoose_bite.png"
+      "output": "mongoose_bite.webp"
     },
     {
       "abilityId": "arcane_shot",
       "sourceFile": "43.png",
-      "output": "arcane_shot.png"
+      "output": "arcane_shot.webp"
     },
     {
       "abilityId": "serpent_sting",
       "sourceFile": "31.png",
-      "output": "serpent_sting.png"
+      "output": "serpent_sting.webp"
     },
     {
       "abilityId": "concussive_shot",
       "sourceFile": "20.png",
-      "output": "concussive_shot.png"
+      "output": "concussive_shot.webp"
     },
     {
       "abilityId": "aimed_shot",
       "sourceFile": "19.png",
-      "output": "aimed_shot.png"
+      "output": "aimed_shot.webp"
     },
     {
       "abilityId": "rapid_fire",
       "sourceFile": "15.png",
-      "output": "rapid_fire.png"
+      "output": "rapid_fire.webp"
     },
     {
       "abilityId": "wing_clip",
       "sourceFile": "33.png",
-      "output": "wing_clip.png"
+      "output": "wing_clip.webp"
     },
     {
       "abilityId": "aspect_of_the_cheetah",
       "sourceFile": "25.png",
-      "output": "aspect_of_the_cheetah.png"
+      "output": "aspect_of_the_cheetah.webp"
     },
     {
       "abilityId": "aspect_of_the_hawk",
       "sourcePack": "generic-rpg100",
       "sourceFile": "skill 27.png",
-      "output": "aspect_of_the_hawk.png"
+      "output": "aspect_of_the_hawk.webp"
     },
     {
       "abilityId": "tame_beast",
       "sourcePack": "generic-skill100",
       "sourceFile": "skill icon 75.png",
-      "output": "tame_beast.png"
+      "output": "tame_beast.webp"
     },
     {
       "abilityId": "dismiss_pet",
       "sourcePack": "generic-rpg100",
       "sourceFile": "skill 70.png",
-      "output": "dismiss_pet.png"
+      "output": "dismiss_pet.webp"
     },
     {
       "abilityId": "revive_pet",
       "sourcePack": "_Missing_Icons_Hunter",
       "sourceFile": "42.png",
-      "output": "revive_pet.png"
+      "output": "revive_pet.webp"
     },
     {
       "abilityId": "aspect_of_the_monkey",
       "sourcePack": "_Missing_Icons_Hunter",
       "sourceFile": "41.png",
-      "output": "aspect_of_the_monkey.png"
+      "output": "aspect_of_the_monkey.webp"
     }
   ],
   "note": "5 beast/aspect-animal abilities lack art in the archer pack; they keep their procedural icons until a beast/companion pack is added.",
