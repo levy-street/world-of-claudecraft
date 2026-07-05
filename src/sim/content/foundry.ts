@@ -528,9 +528,13 @@ export const FOUNDRY_QUEST_ORDER = [
 export const FOUNDRY_CAMPS: CampDef[] = [
   { mobId: 'emberpact_zealot', center: { x: -138, z: 762 }, radius: 14, count: 6 },
   { mobId: 'emberpact_zealot', center: { x: -152, z: 784 }, radius: 14, count: 6 },
-  { mobId: 'cinderhound', center: { x: -162, z: 758 }, radius: 12, count: 5 },
+  // Was (-162,758) on the crag face itself (terrainSteepness 3.44, unwalkable);
+  // moved onto the walkable ground closer to the war-camp.
+  { mobId: 'cinderhound', center: { x: -152, z: 758 }, radius: 12, count: 5 },
   { mobId: 'cinderhound', center: { x: -144, z: 776 }, radius: 10, count: 4 },
-  { mobId: 'ashmaw_kilnborn', center: { x: -166, z: 788 }, radius: 3, count: 1 },
+  // Was (-166,788) on the crag face itself (terrainSteepness 3.06, unwalkable);
+  // moved onto the walkable slope just west.
+  { mobId: 'ashmaw_kilnborn', center: { x: -172, z: 788 }, radius: 3, count: 1 },
 ];
 
 export const FOUNDRY_OBJECTS: GroundObjectDef[] = [
