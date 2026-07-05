@@ -91,9 +91,12 @@ async function reviewStop(job, step, glbForReview) {
   if (UNTIL !== step) return false;
   // Render the RAW model into its own preview_model/ dir (not the canonical
   // preview/ that the library + final stage own), so the wizard can show the
-  // model-review shots distinctly from the finished/animated previews.
+  // model-review shots distinctly from the finished/animated previews. The step
+  // name is scoped per stop point (generate keeps the legacy name) so a later
+  // texture stop is not short-circuited by the generate stop's ledger entry.
   if (glbForReview) {
-    await job.step('preview_model', async () => {
+    const stepName = step === 'generate' ? 'preview_model' : `preview_model_${step}`;
+    await job.step(stepName, async () => {
       const { files, rendered } = await renderPreviewsIfPossible(
         glbForReview,
         job.path('preview_model'),
@@ -138,14 +141,15 @@ const STEP_ORDER = {
   weapon: [
     'concept',
     'generate',
+    'texture',
     'normalize',
     'icon',
     'preview',
     'preview_held',
     'preview_held_all',
   ],
-  prop: ['concept', 'generate', 'normalize', 'preview'],
-  creature: ['concept', 'generate', 'rig', 'retarget', 'assemble', 'preview'],
+  prop: ['concept', 'generate', 'texture', 'normalize', 'preview'],
+  creature: ['concept', 'generate', 'texture', 'rig', 'retarget', 'assemble', 'preview'],
   skin: ['texture', 'composite', 'render', 'recolor', 'repaint'],
   skinmodel: [
     'base_views',
@@ -337,6 +341,35 @@ async function generateStage(job, { input, prompt, model, faceLimit }) {
 /** Render turntable previews. The step LABEL may carry a parameter suffix (so
  *  a --flip/--rotate-y rerun re-renders), but files always land in the stable
  *  <job>/preview/ dir the docs point agents at (overwriting stale frames). */
+/** Optional stage 2.5: Tripo /models/texture, a UV-preserving repaint of the raw
+ *  model from a text prompt (--retexture "<prompt>", --texture-quality
+ *  standard|detailed). Once done it lives in the ledger, so later resumed runs
+ *  (finish/apply, which carry no --retexture) keep building from the textured
+ *  model; --redo texture (or a fresh --redo generate cascade) re-rolls it.
+ *  Returns { glb, taskId } or null when the stage never ran. */
+async function textureStage(job, gen) {
+  const done = job.state.steps.texture;
+  if (done?.status === 'done') return done.result;
+  const texPrompt = opt('retexture');
+  if (!texPrompt) return null;
+  return job.step('texture', async () => {
+    const dest = job.path('textured.glb');
+    const r = await tripo.textureModel({
+      // Upload the local raw GLB (a resumed job's generate task output URL can be
+      // expired server-side; local bytes never go stale).
+      input: gen.raw,
+      prompt: texPrompt,
+      textureQuality: opt('texture-quality') === 'standard' ? 'standard' : 'detailed',
+      onProgress: (p, s) => job.log(`  texture ${s} ${p}%`),
+      onTaskCreated: (id) => job.noteTask('texture', id),
+    });
+    const url = r.task.output?.model_url ?? r.task.output?.pbr_model_url;
+    if (!url) throw new Error('texture task returned no model_url');
+    await tripo.download(url, dest);
+    return { glb: dest, taskId: r.taskId };
+  });
+}
+
 async function previewStage(job, glbPath, label = 'preview') {
   return job.step(label, async () => {
     const outDir = job.path('preview');
@@ -419,6 +452,8 @@ async function cmdWeapon() {
     });
   }
   if (await reviewStop(job, 'generate', gen.raw)) return;
+  const tex = await textureStage(job, gen);
+  if (await reviewStop(job, 'texture', tex?.glb ?? gen.raw)) return;
 
   const flip = flag('flip');
   const roll = Number(opt('roll', 0)) || 0;
@@ -428,7 +463,7 @@ async function cmdWeapon() {
   const variant = `${flip ? '_flip' : ''}${roll ? `_roll${roll}` : ''}`;
   const built = job.path(`${name}.glb`);
   const norm = await job.step(`normalize${variant}`, () =>
-    normalizeWeapon(gen.raw, built, family, { flip, roll }),
+    normalizeWeapon(tex?.glb ?? gen.raw, built, family, { flip, roll }),
   );
   job.log(
     `normalized: scale ${norm.scale}, flipped ${norm.flipped}, auto-roll ${norm.autoRollDeg ?? 0}deg${roll ? `, manual roll ${roll}deg` : ''}`,
@@ -516,12 +551,14 @@ async function cmdProp() {
     faceLimit: faceLimitOpt(CATEGORY_SPECS.prop.faceLimit),
   });
   if (await reviewStop(job, 'generate', gen.raw)) return;
+  const tex = await textureStage(job, gen);
+  if (await reviewStop(job, 'texture', tex?.glb ?? gen.raw)) return;
 
   const built = job.path(`${name}.glb`);
   const rotateY = (Number(opt('rotate-y', 0)) * Math.PI) / 180;
   const rotVariant = String(opt('rotate-y', 0));
   await job.step(`normalize_r${rotVariant}`, () =>
-    normalizeProp(gen.raw, built, { height, rotateY }),
+    normalizeProp(tex?.glb ?? gen.raw, built, { height, rotateY }),
   );
 
   const check = await validateProp(built, { height });
@@ -580,19 +617,24 @@ async function cmdCreature() {
     faceLimit: faceLimitOpt(CATEGORY_SPECS.creature.faceLimit),
   });
   if (await reviewStop(job, 'generate', gen.raw)) return;
+  const tex = await textureStage(job, gen);
+  if (await reviewStop(job, 'texture', tex?.glb ?? gen.raw)) return;
+  // Rig whichever model the operator approved: the textured task when the
+  // texture stage ran, else the raw generate task.
+  const modelTaskForRig = tex?.taskId ?? gen.taskId;
 
   const rig = await job.step('rig', async () => {
     const prior = await reconnectTask(job, 'rig');
     if (prior) {
       // Rig task recovered from a crashed run. Re-derive the rig type via the
       // FREE rig-check so the animation plan matches what was rigged.
-      const checkId = await tripo.createTask('/animations/rig-check', { input: gen.taskId });
+      const checkId = await tripo.createTask('/animations/rig-check', { input: modelTaskForRig });
       const check = await tripo.pollTask(checkId);
       const type = opt('rig-type') ?? check.output?.rig_type ?? 'biped';
       return { rigTaskId: job.state.tasks.rig, rigType: type, rigModelVersion: 'reconnected' };
     }
     const r = await tripo.rigModel({
-      modelTaskId: gen.taskId,
+      modelTaskId: modelTaskForRig,
       rigType: opt('rig-type'),
       onProgress: (p, s) => job.log(`  rig ${s} ${p}%`),
       onTaskCreated: (id) => job.noteTask('rig', id),

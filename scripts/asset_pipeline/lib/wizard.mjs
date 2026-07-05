@@ -100,6 +100,8 @@ export function genArgs(lane, options = {}) {
     const n = Number(v);
     return Number.isFinite(n) && n >= lo && n <= hi ? n : null;
   };
+  const fl = num(o.faceLimit, 100, 20000);
+  if (fl != null) args.push('--face-limit', String(Math.round(fl)));
   if (lane === 'creature') {
     if (RIG_TYPE_SET.has(o.rigType)) args.push('--rig-type', o.rigType);
     const h = num(o.height, 0.1, 20);
@@ -117,14 +119,25 @@ export function genArgs(lane, options = {}) {
   return args;
 }
 
+/** Free-text prompt values ride argv as the value after a flag; the pipeline's
+ *  opt() skips values starting with "--" BUT flag() scans the whole argv, so a
+ *  "prompt" of literally "--apply" would flip the apply flag. Reject those. */
+function promptValue(p, label) {
+  const v = String(p ?? '').trim();
+  if (!v) return '';
+  if (v.startsWith('--')) throw new Error(`${label} must not start with --`);
+  return v;
+}
+
 /** Start (or restart) generating the model for a new/edited asset. Runs the
  *  concept + generate stages and stops for review (--until generate). When
  *  regenerate is true, redoes from the CONCEPT (not just generate) so the new
  *  candidate is a genuinely different creature and honors a changed prompt. */
-export function startModel({ lane, name, prompt, options, regenerate }) {
+export function startModel({ lane, name, prompt: rawPrompt, options, regenerate }) {
   if (!LANES.has(lane)) throw new Error(`unsupported lane: ${lane}`);
   const key = safeName(name);
   if (!key) throw new Error('name required');
+  const prompt = promptValue(rawPrompt, 'prompt');
   const gen = genArgs(lane, options);
   if (!prompt && !gen.includes('--image')) throw new Error('prompt or image required');
   const jobId = jobIdFor(lane, key);
@@ -139,6 +152,25 @@ export function startModel({ lane, name, prompt, options, regenerate }) {
   // image / gpt-image-2, a few credits) and cascades to a fresh model.
   if (regenerate) args.push('--redo', 'concept');
   spawnStep(jobId, args, regenerate ? 'regenerate-model' : 'model');
+  return { jobId };
+}
+
+/** Repaint the approved model's texture from a text prompt (Tripo
+ *  /models/texture, UV-preserving) and stop for review again. Repeatable: each
+ *  call is --redo texture, which also clears any downstream finish work so the
+ *  final asset always builds from the texture the operator approved. */
+export function textureAsset({ lane, jobId, texturePrompt, textureQuality, options }) {
+  if (!LANES.has(lane)) throw new Error(`unsupported lane: ${lane}`);
+  if (!existsSync(join(JOBS_ROOT, jobId, 'job.json'))) throw new Error('job not found');
+  const p = promptValue(texturePrompt, 'texture prompt');
+  if (!p) throw new Error('texture prompt required');
+  const args = [lane, '--job', jobId];
+  const nm = readJob(jobId)?.name;
+  if (nm) args.push('--name', nm);
+  args.push(...genArgs(lane, options));
+  args.push('--retexture', p, '--until', 'texture', '--redo', 'texture');
+  if (textureQuality === 'standard') args.push('--texture-quality', 'standard');
+  spawnStep(jobId, args, 'texture');
   return { jobId };
 }
 
@@ -255,6 +287,7 @@ export function wizardStatus(jobId) {
     const buf = readFileSync(outFile, 'utf8');
     tail = buf.slice(-4000);
   }
+  const hasTexture = job.steps?.texture?.status === 'done';
   return {
     jobId: id,
     exists: true,
@@ -267,11 +300,15 @@ export function wizardStatus(jobId) {
     previews: listPreviews(id),
     // Live-viewer GLBs: the wizard renders these in the operator's real browser,
     // so review works with no headless Chrome (previews above may be empty then).
-    modelGlb: jobGlb(id, 'raw.glb'),
+    // The model view prefers the textured build ONLY when the ledger says the
+    // texture step is done: a leftover textured.glb from a previous round (its
+    // ledger entry cleared by --redo generate) must not mask a fresh model.
+    modelGlb: (hasTexture ? jobGlb(id, 'textured.glb') : null) ?? jobGlb(id, 'raw.glb'),
     finalGlb: job.name ? jobGlb(id, `${job.name}.glb`) : null,
-    modelMeta: glbMeta(id, 'raw.glb'),
+    modelMeta: (hasTexture ? glbMeta(id, 'textured.glb') : null) ?? glbMeta(id, 'raw.glb'),
     finalMeta: job.name ? glbMeta(id, `${job.name}.glb`) : null,
-    generateTask: job.tasks?.generate ?? null,
+    textured: hasTexture,
+    generateTask: (hasTexture ? job.tasks?.texture : null) ?? job.tasks?.generate ?? null,
     log: tail,
   };
 }

@@ -144,7 +144,7 @@ class Wizard {
   // should not silently drop the operator out of an in-flight review.
   requestClose() {
     const s = this.state;
-    const started = s && (s.jobId || ['model', 'finish', 'save'].includes(s.phase));
+    const started = s && (s.jobId || ['model', 'texture', 'finish', 'save'].includes(s.phase));
     if (started && s.phase !== 'done') {
       const msg = this.polling
         ? 'A generation step is still running. Close the wizard anyway? The job is saved and you can resume it from the asset detail.'
@@ -188,8 +188,11 @@ class Wizard {
         height: '',
         family: '',
         rotateY: '',
+        faceLimit: '',
         ...(preset.options || {}),
       },
+      texturePrompt: '',
+      textureQuality: 'detailed',
       phase: 'prompt',
     };
     this.open();
@@ -200,10 +203,11 @@ class Wizard {
     const steps = [
       'Prompt',
       'Model',
+      'Texture',
       this.state.lane === 'creature' ? 'Animations' : 'Finish',
       'Save',
     ];
-    const order = ['prompt', 'model', 'finish', 'save'];
+    const order = ['prompt', 'model', 'texture', 'finish', 'save'];
     const ai = order.indexOf(active);
     return el(
       'div',
@@ -290,6 +294,10 @@ class Wizard {
                 alert('A description or a reference image is required.');
                 return;
               }
+              if (s.lane === 'prop' && !(Number(s.options.height) > 0)) {
+                alert('Props need a height in world units (the prop lane requires it).');
+                return;
+              }
               this.submitPrompt();
             },
           },
@@ -349,16 +357,43 @@ class Wizard {
     const models = (this._status.previews || []).filter((p) => p.group === 'model');
     this.closeViewer();
     this.resetModal();
+    // Texture repaint controls (Tripo /models/texture, UV-preserving): repaint
+    // the approved shape from a prompt, review again, repeat until it looks right.
+    const texIn = el('input', {
+      type: 'text',
+      placeholder: 'e.g. molten obsidian skin, glowing lava cracks',
+    });
+    texIn.value = s.texturePrompt || '';
+    texIn.oninput = () => {
+      s.texturePrompt = texIn.value;
+    };
+    const texQual = el(
+      'select',
+      {},
+      el('option', { value: 'detailed', selected: '' }, 'Detailed'),
+      el('option', { value: 'standard' }, 'Standard (cheaper)'),
+    );
+    texQual.value = s.textureQuality || 'detailed';
+    texQual.onchange = () => {
+      s.textureQuality = texQual.value;
+    };
     this.modal.append(
-      el('h2', {}, 'Review the model'),
+      el('h2', {}, this._status.textured ? 'Review the textured model' : 'Review the model'),
       el(
         'div',
         { class: 'wz-sub' },
-        'Drag to rotate, scroll to zoom. Keep this model, or regenerate for another candidate. Nothing is saved yet.',
+        'Drag to rotate, scroll to zoom. Keep this model, repaint its texture, or regenerate for another candidate. Nothing is saved yet.',
       ),
-      this.stepsBar('model'),
+      this.stepsBar(this._status.textured ? 'texture' : 'model'),
       this.reviewPreview(this._status.modelGlb, models, 'No model rendered; check the log.'),
       this.modelFingerprint(this._status.modelMeta, this._status.generateTask),
+      el(
+        'div',
+        { class: 'wz-field' },
+        el('label', {}, 'Repaint texture (optional, keeps the shape and UVs)'),
+        texIn,
+      ),
+      el('div', { class: 'wz-field' }, el('label', {}, 'Texture quality'), texQual),
       this.logBox(),
       el(
         'div',
@@ -367,11 +402,40 @@ class Wizard {
         el('button', { class: 'wz-btn', onclick: () => this.startModel(true) }, 'Regenerate model'),
         el(
           'button',
+          {
+            class: 'wz-btn',
+            onclick: () => {
+              if (!(s.texturePrompt || '').trim()) {
+                alert('Describe the texture to paint (e.g. "rusty iron, moss patches").');
+                return;
+              }
+              this.startTexture();
+            },
+          },
+          'Repaint texture',
+        ),
+        el(
+          'button',
           { class: 'wz-btn primary', onclick: () => this.startFinish(false) },
           s.lane === 'creature' ? 'Keep, add animations' : 'Keep, finish',
         ),
       ),
     );
+  }
+
+  async startTexture() {
+    const s = this.state;
+    s.phase = 'texture';
+    this.renderWorking('texture', 'Repainting the texture on the approved model...');
+    const r = await api('/api/wizard/texture', {
+      lane: s.lane,
+      jobId: s.jobId,
+      texturePrompt: s.texturePrompt,
+      textureQuality: s.textureQuality,
+      options: s.options,
+    });
+    if (r.error) return this.renderError(r.error, () => this.renderModelReview());
+    this.pollUntilIdle(() => this.renderModelReview());
   }
 
   async startFinish(regen) {
@@ -646,6 +710,10 @@ class Wizard {
       );
     }
     fields.push(
+      field(
+        'Face limit (optional)',
+        txt('faceLimit', 'triangles cap, e.g. 4000 (blank = lane default)', 'number'),
+      ),
       field(
         'Reference image (optional)',
         txt('image', 'URL or Tripo task id (task_...); overrides text for geometry'),

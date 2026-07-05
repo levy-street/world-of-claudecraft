@@ -543,6 +543,7 @@ export async function serveLibrary({ port = 5180 } = {}) {
     const body = await readBody(req);
     try {
       if (url === '/api/wizard/model') return sendJson(res, 200, wiz.startModel(body));
+      if (url === '/api/wizard/texture') return sendJson(res, 200, wiz.textureAsset(body));
       if (url === '/api/wizard/finish') return sendJson(res, 200, wiz.finishAsset(body));
       if (url === '/api/wizard/apply') return sendJson(res, 200, wiz.applyAsset(body));
       return sendJson(res, 404, { error: 'unknown action' });

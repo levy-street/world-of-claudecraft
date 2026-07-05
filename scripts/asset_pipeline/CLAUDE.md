@@ -224,7 +224,8 @@ or `src/`). The server runs until Ctrl-C.
 The live viewer also hosts a step-by-step asset CREATOR so an operator can generate an asset
 from the browser without the CLI: a "+ Create asset" button (and a "Regenerate this asset"
 button on each generatable asset's detail) opens a modal that walks
-prompt -> model (review, keep or regenerate) -> animations/finish (review) -> save. Each step
+prompt -> model (review, keep or regenerate) -> texture (optional repaint loop) ->
+animations/finish (review) -> save. Each step
 is human-gated: the operator sees the rendered result and only spends more credits on approve.
 Mechanics:
 - `wizard_ui.js` is the browser module (self-contained: injects its button + modal, exposes
@@ -246,13 +247,24 @@ Mechanics:
   a headless browser is NOT required. Server-side PNG previews degrade to a no-op when no local
   browser is installed (`renderPreviewsIfPossible`, `browser_path_resolve.mjs`), instead of failing
   the run. Weapon HUD icons and held renders still need a local browser (they rasterize an image).
-- The form exposes each lane's API generation options: model quality (`--model` low-poly/hifi) and
-  an optional reference image (`--image`, URL or `task_`/`file_` id) for all lanes; creatures add
-  rig type (`--rig-type` auto/biped/quadruped/hexapod/octopod/serpentine/aquatic) and `--height`;
-  weapons add `--family`; props add `--height` and `--rotate-y`. `genArgs` (in `lib/wizard.mjs`)
-  ALLOWLISTS every value before it becomes a spawn arg (an unchecked field could inject a flag such
-  as `--apply`, and an `--image` local path could read an arbitrary server file), and re-applies
-  them to BOTH the model and finish calls because rig type lands at the rig step (during finish).
+- The form exposes each lane's API generation options: model quality (`--model` low-poly/hifi),
+  `--face-limit`, and an optional reference image (`--image`, URL or `task_`/`file_` id) for all
+  lanes; creatures add rig type (`--rig-type` auto/biped/quadruped/hexapod/octopod/serpentine/
+  aquatic) and `--height`; weapons add `--family`; props add `--height` and `--rotate-y`.
+  `genArgs` (in `lib/wizard.mjs`) ALLOWLISTS every value before it becomes a spawn arg (an
+  unchecked field could inject a flag such as `--apply`, and an `--image` local path could read an
+  arbitrary server file), free-text prompts are rejected if they start with `--` (flag() scans the
+  whole argv), and the options are re-applied to the model, texture, AND finish calls because rig
+  type lands at the rig step (during finish).
+- The TEXTURE step is Tripo's `/models/texture` (UV-preserving repaint): the model-review screen
+  offers a texture prompt + quality (detailed/standard) and "Repaint texture", driven by the CLI
+  flags `--retexture "<prompt>" [--texture-quality standard] --until texture --redo texture`
+  (repeatable; each repaint clears downstream finish work so the final asset always builds from
+  the approved texture). The `texture` ledger step + `textured.glb` make finish/apply resume from
+  the textured model with no extra flags: weapons/props normalize `textured.glb`, creatures rig
+  the texture task id. `--redo generate` cascades over texture, so a regenerated model starts
+  clean; wizardStatus only surfaces `textured.glb` when the LEDGER says the texture step is done
+  (a leftover file from a cleared round must not mask a fresh model).
 
 ## Utility commands
 - `validate --file x.glb --kind weapon|prop|creature [--family sword] [--height n] [--clips ...]`
