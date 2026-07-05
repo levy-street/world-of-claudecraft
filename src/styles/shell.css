@@ -696,6 +696,36 @@
     gap: 12px;
     flex-wrap: wrap;
   }
+  .landing-graphics-control {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-light, #e8dcc0);
+    background: rgba(21, 21, 31, 0.7);
+    border: 1px solid var(--color-border-default, #4e3d1d);
+    border-radius: var(--radius-sm, 6px);
+  }
+  .landing-graphics-select {
+    min-height: 32px;
+    padding: 0 26px 0 10px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-light, #e8dcc0);
+    background: rgba(9, 10, 16, 0.9);
+    border: 1px solid rgba(255, 209, 0, 0.28);
+    border-radius: var(--radius-sm, 6px);
+    cursor: var(--cursor-point, pointer);
+  }
+  .landing-graphics-control:focus-within,
+  .landing-graphics-control:hover {
+    border-color: var(--color-primary, #ffd100);
+  }
   /* Landing accessibility toggle: cinematic trailer vs static high-contrast
      backdrop. Sits beside the language picker (the page's preferences area).
      ≥40px tall tap target, aria-pressed reflects state. */
@@ -1248,6 +1278,40 @@
     text-transform: uppercase;
     box-shadow: inset 0 0 8px #000;
     margin-top: var(--spacing-xs);
+  }
+
+  .desktop-download-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+  }
+
+  .desktop-download-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    min-width: 190px;
+    margin: 0;
+    padding: 8px 18px;
+    text-decoration: none;
+  }
+
+  .desktop-download-status {
+    display: inline-block;
+    max-width: 420px;
+    padding: 6px var(--spacing-sm);
+    background: rgba(0, 0, 0, 0.38);
+    border: 1px solid rgba(255, 209, 0, 0.22);
+    border-radius: var(--radius-sm);
+    color: var(--color-primary-dim);
+    font-family: var(--font-heading);
+    font-size: 10.5px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 8px #000;
   }
 
   /* "Browse the Wiki" launcher: reuses the .btn skin but renders as an anchor. */
@@ -2499,6 +2563,651 @@
     box-shadow: 0 0 10px var(--class-color);
   }
 
+  /* WoW-style full-screen character screens (the offline panel plus the two
+     online panels carry the cs-wow class). Desktop only: below 861px the
+     classic card layout above stays, and the ONLINE panels additionally keep
+     their card layout on touch bodies (the body.mobile-touch blocks below own
+     that styling), hence the body:not(.mobile-touch) prefix on their arms.
+     The wrappers collapse via display:contents so every piece anchors
+     against the FIXED full-viewport panel: the 3D turntable fills the center
+     over the landing backdrop, the class icons become the classic round
+     bottom rail (gold ring on the pick, name under each), the skin swatches
+     stand in as the left "race" column, the class summary docks right, the
+     name floats top-center, and the actions sit in the corners. On the
+     roster (#charselect-panel) the character list docks right instead, WoW
+     style, and the summary docks left. All the ids / buttons / rows stay
+     untouched, so the main.ts wiring is unchanged.
+     Intentionally starts before the shared 900px card foundation: this
+     takeover restates the sizing and inner grids required throughout the
+     861px to 899px range.
+     */
+  @media (min-width: 861px) {
+    #offline-select.cs-wow,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      /* The shared charselect sizing block below pins width/height with
+         !important (its card layout), so the full-screen takeover must
+         out-important it. */
+      width: auto !important;
+      max-width: none !important;
+      height: auto !important;
+      min-height: 0 !important;
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: linear-gradient(180deg, #0008 0%, #0002 18%, #0002 78%, #000c 100%);
+      box-shadow: none;
+      overflow: hidden;
+    }
+    /* The online panels' card layout is a grid, and grid-placement on an
+       absolutely-positioned child would anchor it to its grid AREA rather
+       than the full-screen panel: flatten. The create panel stays a block
+       (everything in it docks against the panel). The roster panel is a
+       column flexbox instead: the account bar sits IN FLOW at the top and
+       the stage (.cs-body) takes the rest, so when the wallet / developer
+       cards wrap the bar onto extra lines the docked columns shift down
+       with it. (The bar used to be absolute over hardcoded 150px column
+       offsets, which let a wrapped bar cover the top of the roster.) */
+    body:not(.mobile-touch) #charcreate-panel.cs-wow {
+      display: block;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow {
+      --cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));
+      --cs-roster-width: clamp(340px, 28vw, 440px);
+      --cs-details-width: var(--cs-roster-width);
+      --cs-dock-bottom: clamp(18px, 6.5vh, 96px);
+      display: flex;
+      flex-direction: column;
+    }
+    #offline-select.cs-wow .charselect-layout,
+    #offline-select.cs-wow .charselect-col-left,
+    #offline-select.cs-wow .charselect-col-right,
+    #offline-select.cs-wow .char-create,
+    #offline-select.cs-wow .auth-actions,
+    body:not(.mobile-touch)
+      #charcreate-panel.cs-wow
+      :is(
+        .cs-head,
+        .cs-body-create,
+        .cs-create-col,
+        .cs-detail-col,
+        .char-create,
+        .skin-picker,
+        .cs-form-actions
+      ),
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-detail-col {
+      display: contents;
+    }
+    /* The roster's stage region below the account bar: the 3D preview and
+       the two docked columns anchor to THIS box rather than the viewport,
+       so none of them can slide under the bar whatever height it wraps to.
+       Overrides the card layout's display: contents. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-body {
+      display: block;
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    #offline-select.cs-wow .auth-title,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .auth-title {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 8px #000;
+      z-index: 3;
+    }
+    /* The 3D turntable IS the stage: full viewport, chrome-free, behind the
+       UI. The online arms pin the container ids so this outranks the id-less
+       body:not(.mobile-touch) #charselect-panel .cs-preview sizing below. */
+    #offline-select.cs-wow .char-preview-container,
+    body:not(.mobile-touch)
+      :is(#charselect-panel, #charcreate-panel).cs-wow
+      :is(#online-preview-container, #charcreate-preview-container) {
+      position: absolute;
+      inset: 0;
+      height: auto;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      z-index: 1;
+    }
+    /* The selected character's name, centred over the top of the 3D stage so it
+       is unmistakable which character you are about to play. Truncates rather
+       than wrapping; non-interactive so it never blocks the turntable. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #charselect-preview-name {
+      display: block;
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      max-width: min(56%, 420px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+      font-family: var(--title-font);
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-shadow:
+        0 2px 8px #000,
+        0 0 14px rgba(0, 0, 0, 0.55);
+      pointer-events: none;
+    }
+    /* Name entry floats just under the title. */
+    #offline-select.cs-wow .auth-label {
+      position: absolute;
+      top: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      text-shadow: 0 1px 4px #000;
+    }
+    #offline-select.cs-wow .char-input-group,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .char-input-group {
+      position: absolute;
+      top: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      z-index: 3;
+    }
+    #offline-select.cs-wow .char-input-group input,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .char-input-group input {
+      text-align: center;
+      background: #10101acc;
+    }
+    /* The create form's Name / Class captions have no seat in the WoW layout. */
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .cs-section-header,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .skin-picker-header {
+      display: none;
+    }
+    /* The classic bottom class rail: round portrait medallions, gold ring on
+       the selection, the class name beneath in its class color. */
+    #offline-select.cs-wow .mini-class-row,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class-row {
+      position: absolute;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 14px;
+      z-index: 3;
+      /* The base row is width:100%/grid; the rail must shrink-wrap so the
+         translateX centering actually centers the nine medallions. */
+      width: max-content;
+      justify-content: center;
+    }
+    #offline-select.cs-wow .mini-class,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 84px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+    #offline-select.cs-wow .mini-class .mini-class-portrait,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class .mini-class-portrait {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      border: 3px solid #2c2c3a;
+      outline: 1px solid #000;
+      background: radial-gradient(circle at 35% 30%, #23233a, #0d0d16);
+      box-shadow: 0 3px 10px #000c;
+      transition:
+        border-color var(--transition-speed),
+        box-shadow var(--transition-speed),
+        transform var(--transition-speed);
+    }
+    #offline-select.cs-wow .mini-class:hover .mini-class-portrait,
+    #offline-select.cs-wow .mini-class:focus-visible .mini-class-portrait,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class:hover .mini-class-portrait,
+    body:not(.mobile-touch)
+      #charcreate-panel.cs-wow
+      .mini-class:focus-visible
+      .mini-class-portrait {
+      border-color: var(--class-color);
+      box-shadow: 0 0 12px var(--class-color);
+    }
+    #offline-select.cs-wow .mini-class:focus-visible,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class:focus-visible {
+      outline: 2px solid var(--color-border-focus);
+      outline-offset: 3px;
+      border-radius: 8px;
+    }
+    #offline-select.cs-wow .mini-class.sel .mini-class-portrait,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class.sel .mini-class-portrait {
+      border-color: var(--gold, #d4af37);
+      box-shadow:
+        0 0 0 2px #000,
+        0 0 16px var(--gold, #d4af37);
+    }
+    #offline-select.cs-wow .mini-class .mini-class-label,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class .mini-class-label {
+      font-size: 12px;
+      color: var(--class-color);
+      text-shadow: 0 1px 3px #000;
+    }
+    #offline-select.cs-wow .mini-class.sel .mini-class-label,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class.sel .mini-class-label {
+      color: #ffd100;
+    }
+    /* Appearance swatches as the left column (the "race" slot: one race, many
+       looks). display:flex is restated because the create panel's base
+       .cs-create-col .skin-row is a 4-up grid. */
+    #offline-select.cs-wow .skin-row,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .skin-row {
+      position: absolute;
+      left: 26px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: auto;
+      z-index: 3;
+    }
+    /* The create panel's portrait swatches size to their grid cell; give them
+       a fixed medallion size in the column. */
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .skin-swatch-portrait {
+      width: 56px;
+      height: 56px;
+      aspect-ratio: auto;
+    }
+    /* Class summary docks on the right, translucent so the stage shows through. */
+    #offline-select.cs-wow .class-details-panel,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .class-details-panel {
+      position: absolute;
+      right: 26px;
+      top: 110px;
+      bottom: 140px;
+      width: 360px;
+      overflow-y: auto;
+      background: #0d0d16d9;
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      z-index: 2;
+    }
+    /* Corner actions, classic layout: Back bottom-left, Enter World bottom-right. */
+    #offline-select.cs-wow #btn-start-offline {
+      position: absolute;
+      right: 26px;
+      bottom: 30px;
+      z-index: 3;
+      min-width: 180px;
+    }
+    #offline-select.cs-wow #btn-offline-back {
+      position: absolute;
+      left: 26px;
+      bottom: 30px;
+      z-index: 3;
+      min-width: 140px;
+    }
+    body:not(.mobile-touch) #charcreate-panel.cs-wow #btn-create-char {
+      position: absolute;
+      right: 26px;
+      bottom: 30px;
+      z-index: 3;
+      min-width: 180px;
+    }
+    body:not(.mobile-touch) #charcreate-panel.cs-wow #btn-charcreate-back {
+      position: absolute;
+      left: 26px;
+      bottom: 30px;
+      z-index: 3;
+      min-width: 140px;
+    }
+    #offline-select.cs-wow .auth-error,
+    body:not(.mobile-touch) #charcreate-panel.cs-wow .auth-error {
+      text-align: center;
+    }
+
+    /* While a full-screen cs-wow panel is up, the landing chrome that has no
+       business on a character screen (footer, SEO hero copy) would bleed
+       through the translucent stage: park it. The ONLINE panels deliberately
+       KEEP the site menu bar (pinned below); only the offline quick-play
+       panel still parks the whole chrome. The online arms keep the touch
+       gate, matching their layout arms. */
+    body[data-start-panel="offline-select"] :is(
+        .homepage-header,
+        .homepage-footer,
+        .official-site-copy
+      ),
+    body:not(.mobile-touch)[data-start-panel="charselect-panel"]
+      :is(.homepage-footer, .official-site-copy),
+    body:not(.mobile-touch)[data-start-panel="charcreate-panel"]
+      :is(.homepage-footer, .official-site-copy) {
+      visibility: hidden;
+    }
+
+    /* The online character screens keep the site menu bar: pin it over the
+       full-screen stage (the panel is fixed at z-index 60) so Play / Wiki /
+       News / Account stay reachable, and reserve its height on the panel
+       with a transparent top border. Absolutely-positioned children anchor
+       to the padding box (inside the border), so the border shifts the
+       cs-head bar, the docked columns, and the corner actions down
+       uniformly without touching any of their offsets. */
+    body:not(.mobile-touch)[data-start-panel="charselect-panel"] .homepage-header,
+    body:not(.mobile-touch)[data-start-panel="charcreate-panel"] .homepage-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 70;
+    }
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {
+      /* Matches the one-line desktop header height (logo row + its padding). */
+      border-top: 58px solid transparent;
+    }
+
+    /* The roster: the account chrome (realm / sort / wallet) is an in-flow
+       top bar (first flex row of the panel column; it grows when its cards
+       wrap and pushes the stage down), the character list docks right (WoW
+       style) with its actions at its foot, and the selected character's
+       summary docks left. display:flex is restated because the card layout
+       below unwraps .cs-head / .cs-head-row with display:contents. The
+       z-index keeps the bar's dropdown menus over the stage columns. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-head {
+      flex: 0 0 auto;
+      z-index: 3;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+      background: #0d0d16cc;
+      border-bottom: 1px solid var(--color-border-default);
+      padding: 10px 26px;
+      margin: 0;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-title {
+      margin: 0;
+      font-size: 20px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-head-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+      flex: 1 1 auto;
+      justify-content: flex-end;
+      margin: 0;
+    }
+    /* $WOC Wallet and Developer become two matching stacked cards on the
+       account bar: the service name reads as the card's own header, the
+       action row sits under it, and the helper caption anchors the foot,
+       instead of a label floating beside a button row with its caption
+       dangling underneath. Overrides the base .cs-wallet row layout (label
+       beside actions, separator border-top), which the card/mobile layouts
+       keep. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow :is(.cs-wallet-group, .cs-github-group) {
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 7px;
+      margin: 0;
+      padding: 9px 12px 8px;
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-label {
+      font-size: 11px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-main {
+      align-items: flex-start;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-actions {
+      justify-content: flex-start;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-help {
+      max-width: 300px;
+      font-size: 10px;
+    }
+    /* Below 1800px the two cards (verified wallet + linked developer) plus
+       the realm/sort controls no longer fit the account bar on one line
+       with their helper captions, so the bar wraps tall and eats stage
+       height: drop the captions (every action keeps its title/aria text)
+       so the wrapped cards stay short. */
+    @media (max-width: 1799px) {
+      body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-help {
+        display: none;
+      }
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-list-col {
+      position: absolute;
+      right: var(--cs-stage-gutter);
+      top: 18px;
+      bottom: var(--cs-dock-bottom);
+      width: var(--cs-roster-width);
+      /* The card layout gives the column height:100%; the dock stretches via
+         top/bottom instead. */
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #0d0d16d9;
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      z-index: 2;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-list-actions {
+      margin-top: auto;
+      flex-shrink: 0;
+      /* Enter World is a full-width hero row; Back + New Character wrap below. */
+      flex-wrap: wrap;
+    }
+    /* The docked roster carries a single Enter World button acting on the
+       selected character, so the per-row Enter World / Take Over buttons drop
+       out here (Delete stays per-row: it targets one specific character). */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .enter-world-btn,
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .take-over-btn {
+      display: none;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter {
+      display: block;
+      flex: 1 1 100%;
+      min-height: 44px;
+      font-family: var(--title-font);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      /* Filled-gold CTA, matching the Donate button (.donate-cta): this is the
+         hero action of the screen, so it reads as a primary call to action
+         rather than the darker .btn-primary gradient. */
+      background: #f0c34d;
+      color: #2a1c05;
+      border: 1px solid var(--gold-dim);
+      outline: none;
+      text-shadow: none;
+      box-shadow:
+        0 2px 10px rgba(255, 209, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter:hover:not(:disabled),
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter:focus-visible {
+      filter: brightness(1.08);
+      background: #ffd86b;
+      box-shadow:
+        0 0 14px rgba(255, 209, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      transform: translateY(-1px);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel {
+      position: absolute;
+      left: var(--cs-stage-gutter);
+      top: 18px;
+      bottom: var(--cs-dock-bottom);
+      width: var(--cs-details-width);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;
+      background: #0d0d16d9;
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      z-index: 2;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent);
+      border: 0;
+      border-radius: 999px;
+    }
+    body:not(.mobile-touch)
+      #charselect-panel.cs-wow
+      .class-details-panel::-webkit-scrollbar-thumb:hover {
+      background: color-mix(in srgb, var(--scrollbar-thumb) 68%, transparent);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      column-gap: 12px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {
+      overflow-wrap: anywhere;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions {
+      display: grid;
+      grid-template-columns: minmax(112px, 1fr);
+      gap: 6px;
+      align-items: stretch;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions .btn {
+      width: 100%;
+      white-space: nowrap;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(18px, 2vh, 28px);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-spells-section {
+      grid-column: 1;
+      padding-top: clamp(6px, 1vh, 12px);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row {
+      display: grid;
+      grid-template-columns: clamp(76px, 5vw, 92px) minmax(0, 1fr);
+      align-items: baseline;
+      gap: 12px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      text-transform: none;
+      line-height: 1.45;
+      white-space: normal;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge-resource::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 7px currentColor;
+      vertical-align: 1px;
+    }
+
+    /* The class summary's base type is sized for the small pre-game card
+       (10px to 12px); on the full-screen stage it reads too small. Scale the
+       whole details sheet up one step in every cs-wow panel. */
+    #offline-select.cs-wow .class-details-panel,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-panel {
+      font-size: clamp(13px, 0.72vw, 15px);
+    }
+    #offline-select.cs-wow .class-details-name,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-name {
+      font-size: clamp(24px, 1.35vw, 30px);
+    }
+    #offline-select.cs-wow .class-details-role,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-role {
+      font-size: clamp(13px, 0.7vw, 15px);
+    }
+    #offline-select.cs-wow .class-details-lore,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-lore {
+      font-size: clamp(14px, 0.78vw, 16px);
+      line-height: 1.55;
+    }
+    #offline-select.cs-wow .details-section-title,
+    body:not(.mobile-touch)
+      :is(#charselect-panel, #charcreate-panel).cs-wow
+      .details-section-title {
+      font-size: clamp(14px, 0.75vw, 16px);
+    }
+    #offline-select.cs-wow .details-stat-bar-row,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-bar-row {
+      font-size: clamp(13px, 0.7vw, 15px);
+      margin-bottom: 8px;
+    }
+    #offline-select.cs-wow .details-stat-label,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-label {
+      width: clamp(76px, 5vw, 92px);
+    }
+    #offline-select.cs-wow .details-stat-val,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-val {
+      width: 24px;
+    }
+    #offline-select.cs-wow .details-gear-row,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-gear-row {
+      font-size: clamp(13px, 0.7vw, 15px);
+    }
+    #offline-select.cs-wow .badge,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .badge {
+      font-size: 12px;
+    }
+    #offline-select.cs-wow .details-spell-item,
+    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-spell-item {
+      font-size: clamp(13px, 0.68vw, 15px);
+    }
+    #offline-select.cs-wow .details-spell-text strong,
+    body:not(.mobile-touch)
+      :is(#charselect-panel, #charcreate-panel).cs-wow
+      .details-spell-text
+      strong {
+      font-size: clamp(13px, 0.68vw, 15px);
+    }
+    #offline-select.cs-wow .details-spell-icon-img,
+    body:not(.mobile-touch)
+      :is(#charselect-panel, #charcreate-panel).cs-wow
+      .details-spell-icon-img {
+      width: 38px;
+      height: 38px;
+    }
+  }
+
   /* ---------- Skin picker (alternate body textures) ---------- */
   .skin-row {
     display: flex;
@@ -2678,6 +3387,64 @@
   }
   body.native-app.mobile-touch .auth-panel-premium input:focus-visible {
     box-shadow: none;
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #homepage-views-container,
+  body.native-app.mobile-touch[data-start-panel="realm-panel"] #homepage-views-container,
+  body.native-app.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container {
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #hero-view,
+  body.native-app.mobile-touch[data-start-panel="realm-panel"] #hero-view,
+  body.native-app.mobile-touch[data-start-panel="charselect-panel"] #hero-view {
+    gap: 10px;
+    min-height: calc(var(--app-vh) - 108px);
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #title-logo,
+  body.native-app.mobile-touch[data-start-panel="realm-panel"] #title-logo,
+  body.native-app.mobile-touch[data-start-panel="charselect-panel"] #title-logo {
+    width: min(220px, 30vw);
+    margin-bottom: 4px;
+  }
+  body.native-app.mobile-touch[data-start-panel="mode-select"] #title-logo {
+    width: min(188px, 28vw);
+    margin-bottom: 8px;
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel,
+  body.native-app.mobile-touch[data-start-panel="realm-panel"] #realm-panel {
+    width: min(680px, calc(100vw - 72px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    max-width: none;
+    max-height: calc(var(--app-vh) - 128px);
+    padding: 18px 22px;
+    overflow-y: auto;
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 18px;
+    align-items: end;
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-discord,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #auth-or-divider,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #cf-turnstile-container,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #login-error,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-actions,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-switch {
+    grid-column: 1 / -1;
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title {
+    margin-bottom: 4px;
+    font-size: 21px;
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-field {
+    margin-bottom: 10px;
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-actions-row {
+    margin-top: 2px;
+  }
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-switch {
+    margin-top: 8px;
   }
 
   .password-wrapper {
@@ -3410,6 +4177,13 @@
     padding: 0;
   }
 
+  /* The shared Enter World CTA belongs only to the desktop docked roster; every
+     other layout (mobile, narrow non-touch) drives entry from the per-row
+     buttons, so hide it by default and let the docked layout reveal it. */
+  #btn-charselect-enter {
+    display: none;
+  }
+
   .fatal-overlay {
     position: absolute;
     inset: 0;
@@ -3818,6 +4592,14 @@
     display: block;
     width: 100% !important;
     height: 100% !important;
+  }
+
+  /* The selected-character name plate over the 3D stage. Belongs to the desktop
+     docked layout (the only one with a full 3D turntable); mobile shows the name
+     on each roster card already, so it stays hidden by default and the docked
+     layout reveals it. */
+  .cs-preview-name {
+    display: none;
   }
 
   .char-input-group {
@@ -4693,7 +5475,7 @@
 
   /* Inspect-other-player profile window */
   #inspect-window {
-    width: 280px;
+    width: 420px;
   }
   .inspect-card {
     display: flex;
@@ -4747,6 +5529,38 @@
   .inspect-holder-sub {
     font-size: 11px;
     color: var(--color-text-muted);
+  }
+  /* Worn-gear paperdoll in the inspect/profile window (read-only). Reuses the
+     character-window .equip-col / .equip-slot styling, but the two columns flex
+     to share the narrower window instead of the char sheet's fixed 150px. */
+  .inspect-equip {
+    margin: 4px 14px 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border-default);
+  }
+  .inspect-equip-title {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .inspect-paperdoll {
+    justify-content: center;
+    gap: 8px;
+  }
+  .inspect-paperdoll .equip-col {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  /* Read-only gear, so the item name WRAPS instead of ellipsizing: a viewer must be
+     able to read the whole name (the wider window gives it room). Overrides the
+     shared .equip-slot .slot-item nowrap/ellipsis used by the editable char sheet. */
+  .inspect-paperdoll .slot-item {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   @media (min-width: 900px) {
@@ -4898,6 +5712,314 @@
     grid-template-columns: 0.85fr 1.15fr;
     gap: 7px;
     width: 100%;
+  }
+
+  @media (orientation: landscape) {
+    body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="charcreate-panel"] #homepage-views-container {
+      padding-top: max(8px, env(safe-area-inset-top));
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+    body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view {
+      min-height: calc(var(--app-vh) - 86px);
+      justify-content: flex-start;
+    }
+    body.mobile-touch #charselect-panel,
+    body.mobile-touch #charcreate-panel {
+      width: min(
+        1040px,
+        calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right))
+      );
+      height: min(560px, calc(var(--app-vh) - 96px));
+      min-height: 0;
+      max-height: none;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      padding: 0;
+    }
+    body.mobile-touch #charselect-panel .auth-title,
+    body.mobile-touch #charcreate-panel .auth-title {
+      font-size: 18px;
+      line-height: 1.1;
+      margin-bottom: 0;
+      letter-spacing: 1px;
+    }
+    body.mobile-touch #charselect-panel .cs-head,
+    body.mobile-touch #charcreate-panel .cs-head {
+      flex: 0 0 auto;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    body.mobile-touch #charselect-panel .cs-head-row {
+      width: 100%;
+      align-items: center;
+      gap: 8px;
+    }
+    body.mobile-touch #charselect-panel .cs-wallet,
+    body.mobile-touch #charselect-panel .cs-wallet-hidden-note {
+      display: none;
+    }
+    body.mobile-touch #charselect-panel .cs-controls {
+      gap: 6px;
+    }
+    body.mobile-touch #charselect-panel .cs-realm-btn {
+      min-height: 38px;
+      padding: 6px 10px;
+      gap: 6px;
+      font-size: 12px;
+    }
+    body.mobile-touch #charselect-panel .cs-realm-menu {
+      max-height: min(260px, calc(var(--app-vh) - 126px));
+    }
+    body.mobile-touch #charselect-panel .mobile-char-tabs {
+      display: none;
+    }
+    body.mobile-touch #charselect-panel[data-mobile-tab="characters"] .char-create,
+    body.mobile-touch #charselect-panel[data-mobile-tab="characters"] .charselect-col-right,
+    body.mobile-touch #charselect-panel[data-mobile-tab="create"] #char-list {
+      display: flex;
+    }
+    body.mobile-touch #charselect-panel .cs-body,
+    body.mobile-touch #charcreate-panel .cs-body {
+      display: grid;
+      grid-template-columns: minmax(250px, 0.78fr) minmax(430px, 1.22fr);
+      gap: 10px;
+      flex: 1 1 auto;
+      min-height: 0;
+      align-items: stretch;
+    }
+    body.mobile-touch #charselect-panel .cs-list-col,
+    body.mobile-touch #charselect-panel .cs-detail-col,
+    body.mobile-touch #charcreate-panel .cs-create-col,
+    body.mobile-touch #charcreate-panel .cs-detail-col {
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      padding: 10px;
+    }
+    body.mobile-touch #charselect-panel .cs-list-col {
+      gap: 8px;
+    }
+    body.mobile-touch #charselect-panel #char-list {
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      scrollbar-width: auto;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      padding: 0 4px 0 0;
+      gap: 6px;
+    }
+    body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+      border: 1px solid #35270f;
+      border-radius: 999px;
+    }
+    body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--scrollbar-thumb) 0%, #3a2b10 100%);
+      border: 1px solid var(--scrollbar-border);
+      border-radius: 999px;
+    }
+    body.mobile-touch #charselect-panel .cs-list-actions,
+    body.mobile-touch #charcreate-panel .cs-form-actions {
+      margin-top: 8px;
+      gap: 8px;
+    }
+    body.mobile-touch #charselect-panel .cs-list-actions {
+      position: absolute;
+      top: 28px;
+      right: 0;
+      z-index: 3;
+      margin-top: 0;
+      justify-content: flex-end;
+    }
+    body.mobile-touch #charselect-panel .cs-list-actions .btn {
+      flex: 0 0 auto;
+      min-width: 122px;
+      min-height: 38px;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    body.mobile-touch #charselect-panel .cs-list-actions .cs-new-btn {
+      min-width: 158px;
+    }
+    body.mobile-touch #char-list .char-row {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas: "portrait id" "actions actions";
+      column-gap: 9px;
+      row-gap: 6px;
+      padding: 7px 8px;
+      margin-bottom: 0;
+    }
+    body.mobile-touch #char-list .char-row .char-actions {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 6px;
+      width: 100%;
+    }
+    body.mobile-touch #char-list .char-row .btn {
+      min-height: 36px;
+      padding: 7px 8px;
+      font-size: 10.5px;
+    }
+    body.mobile-touch #char-list .portrait-sm {
+      width: 40px;
+      height: 40px;
+    }
+    body.mobile-touch #charselect-panel .cs-detail-col {
+      display: grid;
+      grid-template-columns: minmax(120px, 0.54fr) minmax(0, 1.46fr);
+      gap: 10px;
+      align-items: stretch;
+    }
+    body.mobile-touch #charselect-panel .cs-detail-col .cs-preview {
+      height: auto;
+      min-height: 0;
+      min-width: 0;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details {
+      box-sizing: border-box;
+      min-height: 0;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      scrollbar-width: auto;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      opacity: 1;
+      transform: none;
+      padding-right: 12px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details::-webkit-scrollbar {
+      width: 10px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+      border: 1px solid #35270f;
+      border-radius: 999px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--scrollbar-thumb) 0%, #3a2b10 100%);
+      border: 1px solid var(--scrollbar-border);
+      border-radius: 999px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .class-details-content {
+      max-width: 100%;
+      min-height: 0;
+      height: auto;
+      overflow: visible;
+      gap: 5px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .class-details-lore {
+      display: none;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .class-details-role {
+      display: none;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: stretch;
+      max-width: 100%;
+      min-width: 0;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid > * {
+      max-width: 100%;
+      min-width: 0;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-spells-section {
+      min-width: 0;
+      padding-top: 2px;
+      padding-bottom: 4px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .class-details-name {
+      font-size: 16px;
+      line-height: 1;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-section-title {
+      margin-bottom: 3px;
+      font-size: 10px;
+      line-height: 1.05;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-bar-row {
+      min-width: 0;
+      margin-bottom: 2px;
+      gap: 6px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-label {
+      flex: 0 0 64px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-val {
+      flex: 0 0 22px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-label,
+    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-val,
+    body.mobile-touch #charselect-panel #charselect-class-details .details-gear-row {
+      font-size: 10.5px;
+      margin-bottom: 3px;
+      line-height: 1.15;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-bar-track {
+      flex: 1 1 auto;
+      height: 8px;
+      min-width: 0;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-gear-row {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-spells-list {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 5px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-item {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      padding: 5px 7px;
+      gap: 6px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-icon-img {
+      width: 26px;
+      height: 26px;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-text {
+      min-width: 0;
+      font-size: 10.5px;
+      line-height: 1.12;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-text br {
+      display: none;
+    }
+    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-text strong {
+      font-size: 11.5px;
+    }
+    body.mobile-touch #charcreate-panel .cs-body {
+      grid-template-columns: minmax(310px, 0.95fr) minmax(360px, 1.05fr);
+    }
+    body.mobile-touch #charcreate-panel .mini-class-row {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+    body.mobile-touch #charcreate-panel .mini-class {
+      min-height: 38px;
+      padding: 6px 8px;
+    }
+    body.mobile-touch #charcreate-panel .cs-create-col .skin-row {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    body.mobile-touch #charcreate-panel .cs-detail-col .cs-preview {
+      height: 150px;
+      min-height: 150px;
+    }
   }
 
   body.mobile-touch .mobile-menu-toggle {
@@ -5816,5 +6938,47 @@
       animation: none;
       display: none;
     }
+  }
+
+  /* ---------- desktop update toast (Electron shell) ---------- */
+  /* Owned by src/ui/desktop_update_toast.ts: a fixed, non-blocking notice for
+     the auto-updater (website desktop builds only). Lives at shell level so it
+     renders on both the pre-game shell and in-world. */
+  #desktop-update-toast {
+    position: fixed;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    z-index: 260;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    max-width: min(440px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  #desktop-update-toast[hidden] {
+    display: none;
+  }
+  #desktop-update-toast button {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font: inherit;
+    cursor: var(--cursor-point);
+  }
+  #desktop-update-toast button:hover {
+    border-color: var(--color-primary);
+  }
+  #desktop-update-toast .desktop-update-restart {
+    border-color: var(--color-primary);
   }
 }

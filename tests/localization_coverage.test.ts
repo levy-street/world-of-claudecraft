@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { QUEST_LETTERS } from '../src/sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -355,6 +356,7 @@ describe('i18n Localization Key Coverage', () => {
     item: 'Rough Bracers',
     key: 'K',
     kind: 'Weapon',
+    slots: 14,
     label: 'Wolf',
     level: 10,
     losses: 4,
@@ -536,6 +538,13 @@ describe('i18n Localization Key Coverage', () => {
         kind: 'delve',
         id: entry.id,
         field: entry.field as 'name' | 'enterText' | 'leaveText',
+      };
+    }
+    if (entry.kind === 'letter') {
+      return {
+        kind: 'letter',
+        id: entry.id,
+        field: entry.field as 'sender' | 'subject' | 'body',
       };
     }
     throw new Error(`Unexpected entity kind: ${entry.kind}`);
@@ -852,7 +861,10 @@ describe('i18n Localization Key Coverage', () => {
         const rendered = tEntity(itemRequest(entry));
         expect(rendered.trim().length, `${lang}.${entry.key}`).toBeGreaterThan(0);
         expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.key);
-        if (lang !== 'en' && lang !== 'en_CA') {
+        // RELEASE-TIER ONLY: a sparse/English-only overlay renders the English fill
+        // for an untranslated item name, which is legal on a PR (a `pending` row)
+        // and blocked only at the release gate (matches the world-content check below).
+        if (RELEASE_TIER && lang !== 'en' && lang !== 'en_CA') {
           expect(
             rendered,
             `${lang}.${entry.key} should not copy canonical English item text`,
@@ -877,7 +889,9 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    expect(itemSetEntries).toHaveLength(7 * 3);
+    // 7 raid/dungeon families with name+bonus2+bonus3, plus 3 leveling haste
+    // kits carrying a single 3-piece tier (name+bonus3 only)
+    expect(itemSetEntries).toHaveLength(7 * 3 + 3 * 2);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -942,7 +956,9 @@ describe('i18n Localization Key Coverage', () => {
       ZONES.length * 2 +
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
-      Object.keys(DELVES).length * 3;
+      Object.keys(DELVES).length * 3 +
+      // Ravenpost authored letters: welcome + quest letters, 3 fields each.
+      (1 + Object.keys(QUEST_LETTERS).length) * 3;
     expect(worldEntries).toHaveLength(expectedWorldCount);
 
     for (const lang of supportedLanguages) {

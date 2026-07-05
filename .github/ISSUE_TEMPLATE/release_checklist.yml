@@ -20,13 +20,14 @@ body:
     attributes:
       label: Bump the version
       description: >
-        One command updates package.json, android/app/build.gradle
+        One command updates package.json, package-lock.json, the desktop
+        download links, the visible static page version, android/app/build.gradle
         (versionName + versionCode) and the iOS project (MARKETING_VERSION +
-        CURRENT_PROJECT_VERSION) in a single commit and tag. Do not edit these by hand.
+        CURRENT_PROJECT_VERSION). Do not edit these by hand.
       options:
-        - label: Ran `npm version <X.Y.Z>` (or `npm version minor`/`patch`/`major`) and pushed the resulting commit and tag.
+        - label: Ran `npm run release:prepare -- <X.Y.Z>` on the release branch.
           required: false
-        - label: Confirmed all three manifests show the new version and the native build numbers incremented.
+        - label: Ran `npm run release:check -- --version <X.Y.Z>` and confirmed every release surface is synchronized.
           required: false
   - type: checkboxes
     attributes:

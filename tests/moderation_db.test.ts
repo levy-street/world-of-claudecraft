@@ -27,6 +27,7 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  recordInGameAction,
 } from '../server/moderation_db';
 
 const { query, connect } = db;
@@ -455,6 +456,28 @@ describe('moderation report helpers', () => {
     expect(sql).not.toMatch(/UPDATE accounts/);
     expect(sql).not.toMatch(/player_reports/);
     expect(params).toEqual([2, 1, 'note', 'watching for repeat behavior', null]);
+  });
+
+  it('records in-game kick and kill actions without changing account state', async () => {
+    query.mockResolvedValue(queryResult([], 1));
+
+    await recordInGameAction({
+      action: 'kick',
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'griefing',
+    });
+    await recordInGameAction({
+      action: 'kill',
+      accountId: 3,
+      adminAccountId: 1,
+      reason: 'spawn camping',
+    });
+
+    expect(connect).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(query.mock.calls[0][1]).toEqual([2, 1, 'kick', 'griefing', null]);
+    expect(query.mock.calls[1][1]).toEqual([3, 1, 'kill', 'spawn camping', null]);
   });
 
   it('marks a character for forced rename and action-resolves its reports', async () => {

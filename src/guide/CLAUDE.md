@@ -26,7 +26,7 @@ sim/render *data*, never the live world or `IWorld`.
 
 ## Generated data: it never drifts from the game
 `content.generated.ts` is built by `scripts/wiki/build_content.mjs` from the sim source
-of truth (CLASSES, ABILITIES, TALENTS, ZONES, DUNGEONS, the overworld + warlock-pet
+of truth (CLASSES, ABILITIES, TALENTS, ZONES, DUNGEONS, DELVES, the overworld + warlock-pet
 bestiary, render VISUALS). Regenerate with `npm run wiki:content` (it also runs in
 `pretest` and `build`). `tests/guide.test.ts` re-runs the generator and
 `git diff --exit-code`s the output, so a stale committed file fails CI. Do not edit it
@@ -50,7 +50,13 @@ in the SAME change that adds it:
 - **Content the generator already covers** (a class, ability, talent, zone, dungeon,
   mob, warlock pet, or model): run `npm run wiki:content` and commit the regenerated
   `content.generated.ts`. Add a new descriptive `guide.*` prose key for any copy the
-  generator does not derive.
+  generator does not derive. **A new (or retinted) model also needs its still rendered**:
+  run `npm run wiki:stills` and commit the new `public/guide-stills/*.webp` (it needs a
+  headless browser, so it is NOT in `build`/`pretest`; the `tests/guide.test.ts` asset guard
+  fails (so CI fails) if a figure's baked still is missing on disk, plus a second guard fails
+  on an orphan WebP that no figure references). The stills are deterministic on one machine
+  but not byte-identical across machines/GPUs, so they are existence-gated, never diff-gated:
+  re-render on the swiftshader path.
 - **A brand-new content TYPE or system** (a new feature like delves, or a new page):
   extend `scripts/wiki/build_content.mjs` to emit it, add a `pages/<x>.ts` page plus a
   `GUIDE_ROUTES` entry and its `guide.*` keys, then regenerate the sitemap

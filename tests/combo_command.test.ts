@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
+import type { SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'rogue', noPlayer: true });
@@ -14,31 +14,17 @@ function errorText(events: SimEvent[], pid: number): string | undefined {
 }
 
 describe('/combo command', () => {
-  it('reports combo points and the target they are built on', () => {
+  it('reports the character-bound combo pool (no target anchor)', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('rogue', 'Aleph');
-    const foe = sim.addPlayer('warrior', 'Bet');
     sim.tick();
 
     const e = sim.entities.get(pid)!;
     e.comboPoints = 3;
-    e.comboTargetId = foe;
+    e.comboUntil = sim.time + 30; // keep the pool alive through the readout tick
 
     sim.chat('/combo', pid);
-    expect(errorText(sim.tick(), pid)).toBe('Combo points: 3/5 on Bet.');
-  });
-
-  it('omits the target when it can no longer be resolved', () => {
-    const sim = makeWorld();
-    const pid = sim.addPlayer('rogue', 'Aleph');
-    sim.tick();
-
-    const e = sim.entities.get(pid)!;
-    e.comboPoints = 5;
-    e.comboTargetId = 999999; // no such entity
-
-    sim.chat('/combo', pid);
-    expect(errorText(sim.tick(), pid)).toBe('Combo points: 5/5.');
+    expect(errorText(sim.tick(), pid)).toBe('Combo points: 3/5.');
   });
 
   it('reports an empty pool when no combo points are built up', () => {

@@ -41,7 +41,7 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
     name: 'Glimmermere Wader',
     minLevel: 15,
     maxLevel: 16,
-    family: 'murloc',
+    family: 'mudfin',
     hpBase: 70,
     hpPerLevel: 22,
     dmgBase: 10,
@@ -57,6 +57,7 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.05,
     color: 0x8fb6c4,
+    componentTags: ['gills', 'hide'],
   },
   drowned_votary: {
     id: 'drowned_votary',
@@ -103,6 +104,7 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.2,
     color: 0xbcd2e6,
+    componentTags: ['hide', 'claw', 'horn'],
   },
 };
 
@@ -231,7 +233,7 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     name: 'Moonspawn',
     minLevel: 16,
     maxLevel: 16,
-    family: 'murloc',
+    family: 'mudfin',
     hpBase: 44,
     hpPerLevel: 15,
     dmgBase: 8,
@@ -634,7 +636,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
   },
   moonshroud_breastplate: {
     id: 'moonshroud_breastplate',
-    name: 'Moonshroud Breastplate',
+    name: 'Moonwrack Breastplate',
     kind: 'armor',
     armorType: 'mail',
     slot: 'chest',
@@ -645,7 +647,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
   },
   moonshroud_robe: {
     id: 'moonshroud_robe',
-    name: 'Moonshroud Robe',
+    name: 'Moonwrack Robe',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'chest',
@@ -656,7 +658,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
   },
   moonshroud_tunic: {
     id: 'moonshroud_tunic',
-    name: 'Moonshroud Tunic',
+    name: 'Moonwrack Tunic',
     kind: 'armor',
     armorType: 'leather',
     slot: 'chest',

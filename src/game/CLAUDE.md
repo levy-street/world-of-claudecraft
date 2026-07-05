@@ -24,8 +24,9 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 
 ## Local invariants
 - **Never mutate sim state directly.** `input.ts` only records intent and fires
-  callbacks; only `interactions.ts` touches the world, and only through the
-  `IWorld`-shaped interfaces passed to it. Do not import `Sim`/`ClientWorld` here.
+  callbacks; only `interactions.ts` and `autoloot.ts` touch the world, and only
+  through the `IWorld`-shaped interfaces passed to them. Do not import
+  `Sim`/`ClientWorld` here.
 - **`audio.ts`/`music.ts` synthesize everything**, every procedural SFX and music
   note is built in code via WebAudio, with nothing to load. **`sfx.ts`/`voice.ts`
   are the exception:** they play pre-rendered clips under `public/audio/` (spatial
@@ -42,7 +43,7 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 - **Keybinds:** `Escape` is reserved (`isReservedCode`) and never bindable, it
   always toggles the game menu. A code lives on at most one action (rebinding
   steals it). Up to 2 codes/action (primary + secondary). The default layout is
-  vanilla-fidelity-critical and is covered by `tests/keybinds.test.ts`; keep it
+  classic-fidelity-critical and is covered by `tests/keybinds.test.ts`; keep it
   green. `mobile_controls.ts`/`settings.ts` have tests too.
 - **i18n (root `t()` rules apply), 3 local facts:** the one dynamic control label here,
   the mobile haptics toggle, is keyed (`t('hudChrome.mobile.haptics'/'…hapticsOff')` in

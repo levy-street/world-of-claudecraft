@@ -3,13 +3,13 @@
 // Deliberately no numeric talent trees or point allocations: that is build-guide territory
 // our guide does not ship. The spec cards reuse the shared class_view component.
 
-import { t } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
+import { t } from '../../ui/i18n';
+import { classCrest, className, specCardHtml } from '../class_view';
 import { GUIDE_CLASSES, type GuideClassInfo } from '../content.generated';
-import { className, classCrest, specCardHtml } from '../class_view';
 import { hrefFor } from '../routes';
-import { pageHeader, section, callout, related } from './ui';
 import type { GuidePage } from './types';
+import { callout, pageHeader, related, section } from './ui';
 
 function classBlock(c: GuideClassInfo): string {
   return `
@@ -32,7 +32,7 @@ export const talents: GuidePage = {
       <article class="guide-article guide-talents">
         ${pageHeader('guide.talentsPage.heading', 'guide.talentsPage.intro')}
         ${section('guide.talentsPage.whatHeading', `<p>${esc(t('guide.talentsPage.whatBody'))}</p>`)}
-        ${section('guide.talentsPage.howHeading', `<p>${esc(t('guide.talentsPage.howBody'))}</p>`)}
+        ${section('guide.talentsPage.howHeading', `<p>${esc(t('guide.talentsPage.howBody'))}</p><p>${esc(t('guide.talentsPage.shareNote'))}</p>`)}
         ${callout(esc(t('guide.talentsPage.resetNote')), { variant: 'note', titleKey: 'guide.talentsPage.resetTitle' })}
         ${section('guide.talentsPage.specsHeading', specOverview)}
         ${related([

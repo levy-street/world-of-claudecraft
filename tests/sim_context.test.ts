@@ -48,6 +48,7 @@ const CALLBACK_KEYS = [
   'fiestaTakedown',
   'fiestaDown',
   'rollLoot',
+  'rollWorldBossLoot',
   'applyHeal',
   'spellCrit',
   'applyAura',
@@ -64,6 +65,7 @@ const CALLBACK_KEYS = [
   // elsewhere - deduped, not re-added).
   'spendResource',
   'removeItem',
+  'canAddItem',
   'clearEntityMarker',
   'partyOf',
   'removeFromParty',
@@ -73,6 +75,8 @@ const CALLBACK_KEYS = [
   'onInventoryChangedForQuests',
   'checkQuestReady',
   'countItem',
+  'completeQuestForDev',
+  'completeCurrentQuestsForDev',
   // E1 entity-roster surface.
   'addEntity',
   'dropEntity',
@@ -133,8 +137,9 @@ const CALLBACK_KEYS = [
   'despawnPet',
   'respawnMob',
   'onBossDeath',
-  // I1 dungeon instancing + the shared raid-lockout clock.
+  // I1 dungeon instancing + the shared raid-lockout clock + the host reset boundary.
   'lockoutNowMs',
+  'raidResetMs',
   'instanceKeyFor',
   'instanceOriginOf',
   'enterDungeon',
@@ -187,6 +192,7 @@ const CALLBACK_KEYS = [
   // G2 social plumbing (hasPendingSocialInvite already listed above; deduped).
   'setPlayerLevel',
   'notice',
+  'spawnDevBot',
   // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
   'startFishing',
   'unlockMechChromaFromItem',
@@ -199,6 +205,8 @@ const CALLBACK_KEYS = [
   'targetEntity',
   'partyCapacity',
   'marketListingBelongsTo',
+  // Ravenpost mail: the quest turn-in letter hook.
+  'queueQuestLetter',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -282,6 +290,7 @@ function makeFakeHost() {
     fiestaTakedown: vi.fn(),
     fiestaDown: vi.fn(),
     rollLoot: vi.fn(),
+    rollWorldBossLoot: vi.fn(),
     applyHeal: vi.fn(),
     spellCrit: vi.fn(() => 0.05),
     applyAura: vi.fn(),
@@ -299,6 +308,8 @@ function makeFakeHost() {
     // elsewhere in this host - deduped).
     spendResource: vi.fn(),
     removeItem: vi.fn(),
+    canAddItem: vi.fn(() => true),
+    removeFungibleItem: vi.fn(),
     clearEntityMarker: vi.fn(),
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
@@ -307,7 +318,11 @@ function makeFakeHost() {
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),
+    countFungibleItem: vi.fn(() => 0),
+    completeQuestForDev: vi.fn(() => false),
+    completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),
+    raidResetMs: vi.fn((nowMs: number) => nowMs),
     instanceKeyFor: vi.fn(() => 'solo:0'),
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     enterDungeon: vi.fn(),
@@ -395,6 +410,7 @@ function makeFakeHost() {
     isHostileTo: vi.fn(() => false),
     lineOfSightBlocked: vi.fn(() => false),
     stopFollow: vi.fn(),
+    partyInvite: vi.fn(),
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
     breakGhostWolf: vi.fn(),
@@ -414,6 +430,7 @@ function makeFakeHost() {
     // G2 social plumbing (hasPendingSocialInvite already stubbed above; deduped).
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
+    spawnDevBot: vi.fn(),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),
@@ -426,6 +443,8 @@ function makeFakeHost() {
     targetEntity: vi.fn(),
     partyCapacity: vi.fn(() => 5),
     marketListingBelongsTo: vi.fn(() => false),
+    // Ravenpost mail: the quest turn-in letter hook.
+    queueQuestLetter: vi.fn(),
   };
   return { host, rng, entities, clock };
 }

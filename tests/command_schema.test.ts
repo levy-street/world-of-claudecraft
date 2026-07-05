@@ -11,8 +11,8 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 // server/game.ts dispatchMessage switch. This test pins the CURRENT contract by
 // re-deriving both sets directly from source (not from the brief's numbers) and
 // proving:
-//   - the send-set (99) is a SUBSET of the dispatch-set (106): zero send-only,
-//   - dispatch-set \ send-set is exactly the verified 7-entry dispatch-only
+//   - the send-set is a SUBSET of the dispatch-set: zero send-only,
+//   - dispatch-set \ send-set is exactly the verified dispatch-only
 //     allowlist (DISPATCH_ONLY_COMMANDS),
 //   - the send-set is disjoint from that allowlist,
 //   - the shared COMMAND_NAMES table equals the scanned dispatch universe.
@@ -22,10 +22,10 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
-// Verified counts on the current tree (re-derived below; do not hard-code 85/6).
-const EXPECTED_SEND_COUNT = 102;
-const EXPECTED_DISPATCH_COUNT = 109;
-const EXPECTED_DISPATCH_ONLY_COUNT = 7;
+// Verified counts on the current tree (re-derived below; never trust stale prose).
+const EXPECTED_SEND_COUNT = 118;
+const EXPECTED_DISPATCH_COUNT = 127;
+const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

@@ -132,6 +132,261 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     color: 0x7b7d7d,
   },
 
+  // =========================================================================
+  // The Drowned Litany (Mirefen Marsh delve, index 1). Fenbridge cult of the
+  // Gravecallers; flood-cult cantors + marsh predators. Levels 12-14.
+  // Abilities are MVP-simple here; richer telegraphs land in a later phase.
+  // =========================================================================
+
+  // --- Trash ---
+  drowned_cantor: {
+    id: 'drowned_cantor',
+    name: 'Drowned Cantor',
+    minLevel: 12,
+    maxLevel: 13,
+    family: 'undead',
+    hpBase: 46,
+    hpPerLevel: 14,
+    dmgBase: 6,
+    dmgPerLevel: 1.5,
+    attackSpeed: 2.4,
+    armorPerLevel: 7,
+    moveSpeed: 6.5,
+    aggroRadius: 12,
+    // Priority caster: holds at range chanting the Drowned Dirge (a ranged shadow
+    // bolt via the hostile-caster petSpell path, same field zone1/zone3 casters use)
+    // and channels Litany Pulse to heal wounded drowned allies. Kill it first.
+    petSpell: { name: 'Drowned Dirge', school: 'shadow', min: 5, max: 8, range: 20, every: 2.4 },
+    mendAlly: {
+      healMin: 12,
+      healMax: 18,
+      radius: 8,
+      every: 4,
+      name: 'Litany Pulse',
+      school: 'shadow',
+    },
+    loot: [{ copper: 10, chance: 1 }],
+    scale: 1.0,
+    color: 0x6f8a86,
+  },
+  reedbound_acolyte: {
+    id: 'reedbound_acolyte',
+    name: 'Reedbound Acolyte',
+    minLevel: 12,
+    maxLevel: 13,
+    family: 'humanoid',
+    hpBase: 40,
+    hpPerLevel: 12,
+    dmgBase: 6,
+    dmgPerLevel: 1.6,
+    attackSpeed: 2.6,
+    armorPerLevel: 6,
+    moveSpeed: 7,
+    aggroRadius: 15,
+    // Ranged attacker: hurls single-target Rotwater Vials from the back of the pack
+    // (the hostile-caster petSpell path; updateRangedPetAttack draws a projectile).
+    // Matches the PRD MVP "rotwater_vial: ranged damage at target".
+    // windup 0.85s (17 ticks): the telegraph before the vial leaves the hand,
+    // tuned so the Stone Cantor Cast clip's release pose (1.45s authored, at the
+    // visual def's 1.7x attackTimeScale) lands exactly on the release.
+    petSpell: {
+      name: 'Rotwater Vial',
+      school: 'nature',
+      min: 5,
+      max: 8,
+      range: 22,
+      every: 2.6,
+      windup: 0.85,
+    },
+    loot: [{ copper: 9, chance: 1 }],
+    scale: 0.95,
+    color: 0x5b6b4a,
+  },
+  deepfen_spearjaw: {
+    id: 'deepfen_spearjaw',
+    name: 'Deepfen Spearjaw',
+    minLevel: 12,
+    maxLevel: 13,
+    family: 'beast',
+    hpBase: 38,
+    hpPerLevel: 11,
+    dmgBase: 6,
+    dmgPerLevel: 1.5,
+    attackSpeed: 1.9,
+    armorPerLevel: 5,
+    moveSpeed: 8.5,
+    aggroRadius: 16,
+    // Mobile skirmisher: already the fastest marsh mob, and it whips itself into a
+    // stacking frenzy the longer it stays on a target (the spearjaw's optional
+    // frenzy; a true gap-close leap is a later mechanic).
+    frenzyOnHit: { chance: 0.3, hasteMult: 1.3, duration: 6, name: 'Feeding Frenzy' },
+    loot: [{ copper: 7, chance: 1 }],
+    scale: 0.9,
+    color: 0x3f5942,
+  },
+  mirefen_widowling: {
+    id: 'mirefen_widowling',
+    name: 'Mirefen Widowling',
+    minLevel: 12,
+    maxLevel: 13,
+    family: 'beast',
+    hpBase: 30,
+    hpPerLevel: 9,
+    dmgBase: 5,
+    dmgPerLevel: 1.3,
+    attackSpeed: 2.0,
+    armorPerLevel: 4,
+    moveSpeed: 8,
+    aggroRadius: 13,
+    // Control add: a landed bite snares the victim in marsh-silk webbing, slowing
+    // their movement so the pack can close (web_snare).
+    chillOnHit: { chance: 0.4, mult: 0.5, duration: 3, name: 'Web Snare' },
+    loot: [{ copper: 6, chance: 1 }],
+    scale: 0.8,
+    color: 0x2e2a34,
+  },
+  // Sinkhole Baptistry finale trigger: a stationary, defenseless 1hp sac. Dies
+  // to any single hit; the Drowned Litany room logic (drowned_litany_rooms.ts)
+  // spawns 2 mirefen_widowling adds and a small nature-damage burst on death.
+  // moveSpeed/aggroRadius/dmgBase are all 0, it never chases or fights back.
+  spider_egg_sac: {
+    id: 'spider_egg_sac',
+    name: 'Spider Egg-Sac',
+    minLevel: 12,
+    maxLevel: 13,
+    family: 'beast',
+    hpBase: 1,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0xc8dcc0,
+    // A puzzle object that dies to any single hit: no kill XP (the hatched
+    // widowlings are the real fight and pay normally).
+    xpMult: 0,
+  },
+  grave_silt_bulwark: {
+    id: 'grave_silt_bulwark',
+    name: 'Grave-Silt Bulwark',
+    minLevel: 13,
+    maxLevel: 13,
+    family: 'undead',
+    elite: true,
+    ccImmune: true,
+    hpBase: 84,
+    hpPerLevel: 26,
+    dmgBase: 11,
+    dmgPerLevel: 2.6,
+    attackSpeed: 3.0,
+    armorPerLevel: 18,
+    moveSpeed: 4.5,
+    aggroRadius: 9,
+    // Slow frontal cleave; periodic silt ward shields nearby allies.
+    cleave: { radius: 3.5, mult: 0.6, name: 'Silt Cleave' },
+    wardAllies: {
+      radius: 10,
+      every: 9,
+      amount: 45,
+      duration: 5,
+      name: 'Silt Ward',
+      school: 'nature',
+    },
+    loot: [{ copper: 64, chance: 1 }],
+    scale: 1.3,
+    color: 0x564a3a,
+  },
+  sump_troll_devourer: {
+    id: 'sump_troll_devourer',
+    name: 'Sump Troll Devourer',
+    minLevel: 13,
+    maxLevel: 14,
+    family: 'beast',
+    elite: true,
+    hpBase: 96,
+    hpPerLevel: 28,
+    dmgBase: 9,
+    dmgPerLevel: 2.3,
+    attackSpeed: 2.6,
+    armorPerLevel: 14,
+    moveSpeed: 6,
+    aggroRadius: 11,
+    // Elite bruiser: silt hide plus a periodic ground stomp.
+    stoneskin: { amount: 70, every: 11, duration: 4, name: 'Silt Hide' },
+    stomp: { radius: 6, every: 10, duration: 1.2, min: 10, max: 16, name: 'Sump Stomp' },
+    loot: [{ copper: 70, chance: 1 }],
+    scale: 1.4,
+    color: 0x4a5a3c,
+  },
+  choir_thrall: {
+    id: 'choir_thrall',
+    name: 'Bog Thrall',
+    minLevel: 12,
+    maxLevel: 12,
+    family: 'undead',
+    hpBase: 18,
+    hpPerLevel: 6,
+    dmgBase: 4,
+    dmgPerLevel: 1.1,
+    attackSpeed: 2.2,
+    armorPerLevel: 4,
+    moveSpeed: 7,
+    aggroRadius: 12,
+    // Swarm pressure: death whips nearby thralls into a brief frenzy.
+    packFrenzy: { radius: 12, hasteMult: 1.25, duration: 5 },
+    loot: [{ copper: 3, chance: 1 }],
+    scale: 0.8,
+    color: 0x7a8a86,
+  },
+
+  // --- Boss ---
+  sister_nhalia_drowned_canticle: {
+    id: 'sister_nhalia_drowned_canticle',
+    name: 'Sister Nhalia, the Drowned Canticle',
+    minLevel: 14,
+    maxLevel: 14,
+    family: 'undead',
+    elite: true,
+    boss: true,
+    hpBase: 110,
+    hpPerLevel: 24,
+    dmgBase: 9,
+    dmgPerLevel: 2.5,
+    attackSpeed: 2.2,
+    armorPerLevel: 20,
+    moveSpeed: 7,
+    aggroRadius: 14,
+    // Boss mechanics (Blackwater Mark, Cantor phases, Final Bell) are driven by
+    // delves/drowned_litany_boss.ts, not generic stomp/summonAdds/enrage traits.
+    loot: [{ copper: 340, chance: 1 }],
+    scale: 1.6,
+    color: 0x4f6b74,
+  },
+
+  // --- Companion (friendly, no loot): Edda Reedhand, Fenbridge lantern-bearer ---
+  edda_reedhand: {
+    id: 'edda_reedhand',
+    name: 'Edda Reedhand',
+    minLevel: 13,
+    maxLevel: 13,
+    family: 'humanoid',
+    hpBase: 58,
+    hpPerLevel: 16,
+    dmgBase: 4,
+    dmgPerLevel: 1.2,
+    attackSpeed: 2.6,
+    armorPerLevel: 8,
+    moveSpeed: 7,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1.0,
+    color: 0xf0e6c8,
+  },
+
   // --- Companion (friendly, no loot) ---
   acolyte_tessa: {
     id: 'acolyte_tessa',
@@ -150,5 +405,29 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 1.0,
     color: 0xebedef,
+  },
+
+  // Tolling Bell projectile entity: a non-hostile, non-AI mob the Drowned Litany
+  // boss driver creates for each bell in a volley and moves each tick. No aggro,
+  // no loot, no XP. Its templateId is NOT in DROWNED_LITANY_DELVE.bosses, so it
+  // cannot trigger onDelveBossDefeated. The boss driver removes it when it expires.
+  tolling_bell: {
+    id: 'tolling_bell',
+    name: 'Tolling Bell',
+    minLevel: 14,
+    maxLevel: 14,
+    family: 'undead',
+    hpBase: 1,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 0.6,
+    color: 0x8899aa,
+    ccImmune: true,
   },
 };

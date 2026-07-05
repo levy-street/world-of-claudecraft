@@ -7,10 +7,8 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import {
-  DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z,
-} from '../sim/data';
-import { terrainHeight, WATER_LEVEL } from '../sim/world';
+import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import { terrainHeight, terrainSteepnessAt, waterLevel } from '../sim/world';
 import { GFX } from './gfx';
 
 export interface CritterField {
@@ -23,6 +21,9 @@ const SPAWN_MIN = 16; // relocate ring around the player (min..max yd)
 const SPAWN_MAX = 30;
 const FLEE_DIST = 6; // critters bolt when the player gets this close
 const EDGE = 8; // keep clear of the world edges
+// Same rise/run limit the sim's movement uses (MAX_CLIMB_SLOPE): wildlife stays
+// off the unclimbable mountain walls and the world rim, like everything else.
+const MAX_WALK_SLOPE = 1.5;
 
 // The Eastbrook Vale / Mirefen Marsh boundary runs along the causeway at z=180.
 // Cheerful overworld critters (rabbits/squirrels/songbirds) thin out as the dry
@@ -44,7 +45,8 @@ export function causewayPopScale(pz: number): number {
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
-    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
     let t = Math.imul(a ^ (a >>> 15), 1 | a);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
@@ -56,41 +58,58 @@ type Species = 'rabbit' | 'squirrel' | 'bird';
 // Build one merged body per species out of primitives, feet resting at y=0.
 function buildSpeciesGeo(species: Species): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
-  const sphere = (r: number, sx: number, sy: number, sz: number, x: number, y: number, z: number) => {
+  const sphere = (
+    r: number,
+    sx: number,
+    sy: number,
+    sz: number,
+    x: number,
+    y: number,
+    z: number,
+  ) => {
     const g = new THREE.SphereGeometry(r, 8, 6);
-    g.scale(sx, sy, sz); g.translate(x, y, z); parts.push(g);
+    g.scale(sx, sy, sz);
+    g.translate(x, y, z);
+    parts.push(g);
   };
   if (species === 'bird') {
-    sphere(0.10, 1, 0.9, 1.4, 0, 0.12, 0); // body
-    sphere(0.07, 1, 1, 1, 0, 0.20, 0.10); // head
+    sphere(0.1, 1, 0.9, 1.4, 0, 0.12, 0); // body
+    sphere(0.07, 1, 1, 1, 0, 0.2, 0.1); // head
     const beak = new THREE.ConeGeometry(0.03, 0.08, 5);
-    beak.rotateX(Math.PI / 2); beak.translate(0, 0.20, 0.18); parts.push(beak);
+    beak.rotateX(Math.PI / 2);
+    beak.translate(0, 0.2, 0.18);
+    parts.push(beak);
     for (const s of [-1, 1]) sphere(0.07, 1.4, 0.25, 0.8, s * 0.09, 0.13, 0); // wings
   } else {
     const big = species === 'rabbit';
     sphere(0.18, 1, 0.9, 1.3, 0, 0.16, 0); // body
     sphere(0.12, 1, 1, 1, 0, 0.26, 0.18); // head
     if (big) {
-      for (const s of [-1, 1]) { // upright ears
+      for (const s of [-1, 1]) {
+        // upright ears
         const ear = new THREE.BoxGeometry(0.04, 0.18, 0.03);
-        ear.translate(s * 0.05, 0.40, 0.18); parts.push(ear);
+        ear.translate(s * 0.05, 0.4, 0.18);
+        parts.push(ear);
       }
       sphere(0.06, 1, 1, 1, 0, 0.16, -0.18); // cottontail
     } else {
-      sphere(0.13, 0.7, 1.5, 0.6, 0, 0.30, -0.20); // bushy squirrel tail
+      sphere(0.13, 0.7, 1.5, 0.6, 0, 0.3, -0.2); // bushy squirrel tail
     }
   }
   return mergeGeometries(parts.map((p) => p.toNonIndexed())) ?? parts[0];
 }
 
 const TINT: Record<Species, number> = {
-  rabbit: 0x9a8166, squirrel: 0xa05a30, bird: 0x6b8fb5,
+  rabbit: 0x9a8166,
+  squirrel: 0xa05a30,
+  bird: 0x6b8fb5,
 };
 
 interface Critter {
   mesh: THREE.Mesh;
   species: Species;
-  x: number; z: number;
+  x: number;
+  z: number;
   heading: number; // radians
   moving: boolean;
   speed: number;
@@ -111,7 +130,9 @@ export function buildCritters(seed: number): CritterField {
     bird: buildSpeciesGeo('bird'),
   };
   const mats: Record<Species, THREE.Material> = {
-    rabbit: matFor('rabbit'), squirrel: matFor('squirrel'), bird: matFor('bird'),
+    rabbit: matFor('rabbit'),
+    squirrel: matFor('squirrel'),
+    bird: matFor('bird'),
   };
   function matFor(s: Species): THREE.Material {
     const opts = { color: TINT[s], roughness: 0.85, metalness: 0 };
@@ -133,8 +154,15 @@ export function buildCritters(seed: number): CritterField {
     mesh.visible = false;
     group.add(mesh);
     critters.push({
-      mesh, species, x: 0, z: 0, heading: rng() * Math.PI * 2,
-      moving: false, speed: 0, hopPhase: 0, turnT: 0,
+      mesh,
+      species,
+      x: 0,
+      z: 0,
+      heading: rng() * Math.PI * 2,
+      moving: false,
+      speed: 0,
+      hopPhase: 0,
+      turnT: 0,
       baseY: species === 'bird' ? 0.25 + rng() * 0.4 : 0,
     });
   }
@@ -143,7 +171,8 @@ export function buildCritters(seed: number): CritterField {
     if (Math.abs(x) > WORLD_MAX_X - EDGE) return false;
     if (z < WORLD_MIN_Z + EDGE || z > WORLD_MAX_Z - EDGE) return false;
     if (x > DUNGEON_X_THRESHOLD - 24) return false;
-    return terrainHeight(x, z, seed) > WATER_LEVEL + 0.8;
+    if (terrainSteepnessAt(x, z, seed) > MAX_WALK_SLOPE) return false;
+    return terrainHeight(x, z, seed) > waterLevel() + 0.8;
   };
 
   const relocate = (c: Critter, px: number, pz: number): void => {
@@ -153,13 +182,18 @@ export function buildCritters(seed: number): CritterField {
       const x = px + Math.cos(ang) * d;
       const z = pz + Math.sin(ang) * d;
       if (validGround(x, z)) {
-        c.x = x; c.z = z; c.heading = rng() * Math.PI * 2;
-        c.turnT = 0.5 + rng() * 2; c.moving = false;
+        c.x = x;
+        c.z = z;
+        c.heading = rng() * Math.PI * 2;
+        c.turnT = 0.5 + rng() * 2;
+        c.moving = false;
         return;
       }
     }
     // no valid spot this frame — hide and retry next tick
-    c.x = px; c.z = pz; c.mesh.visible = false;
+    c.x = px;
+    c.z = pz;
+    c.mesh.visible = false;
   };
 
   return {
@@ -183,7 +217,8 @@ export function buildCritters(seed: number): CritterField {
           if (c.mesh.visible) c.mesh.visible = false;
           continue;
         }
-        const dx = c.x - px, dz = c.z - pz;
+        const dx = c.x - px,
+          dz = c.z - pz;
         const dist = Math.hypot(dx, dz);
         if (dist > CULL_RADIUS || !validGround(c.x, c.z)) {
           relocate(c, px, pz);
@@ -208,16 +243,28 @@ export function buildCritters(seed: number): CritterField {
         const baseSpeed = c.species === 'bird' ? 2.4 : 1.5;
         c.speed = c.moving ? (fleeing ? baseSpeed * 2.4 : baseSpeed) : 0;
         if (c.speed > 0) {
-          c.x += Math.cos(c.heading) * c.speed * dt;
-          c.z += Math.sin(c.heading) * c.speed * dt;
-          c.hopPhase += dt * (c.species === 'bird' ? 18 : 9);
+          const nx = c.x + Math.cos(c.heading) * c.speed * dt;
+          const nz = c.z + Math.sin(c.heading) * c.speed * dt;
+          if (validGround(nx, nz)) {
+            c.x = nx;
+            c.z = nz;
+            c.hopPhase += dt * (c.species === 'bird' ? 18 : 9);
+          } else {
+            // wall, water, or the world edge ahead: turn back instead of
+            // hopping up a face nothing can walk
+            c.heading += Math.PI + (rng() - 0.5);
+            c.turnT = 0.4 + rng();
+          }
         }
 
         const groundY = terrainHeight(c.x, c.z, seed);
         // rabbits/squirrels hop (sin arc while moving); birds bob in place
-        const motion = c.species === 'bird'
-          ? Math.sin(c.hopPhase) * 0.06
-          : (c.speed > 0 ? Math.abs(Math.sin(c.hopPhase)) * 0.16 : 0);
+        const motion =
+          c.species === 'bird'
+            ? Math.sin(c.hopPhase) * 0.06
+            : c.speed > 0
+              ? Math.abs(Math.sin(c.hopPhase)) * 0.16
+              : 0;
         c.mesh.position.set(c.x, groundY + c.baseY + motion, c.z);
         c.mesh.rotation.y = -c.heading + Math.PI / 2;
         c.mesh.visible = true;

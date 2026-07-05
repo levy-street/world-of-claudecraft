@@ -1,11 +1,11 @@
 // Social and Groups: chat channels, parties and party loot, friends and ignore, and
 // guilds. Systems and direction only, no moderation thresholds or filter internals.
 
-import { t } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
+import { t } from '../../ui/i18n';
 import { hrefFor } from '../routes';
-import { lead, section, p, related } from './ui';
 import type { GuidePage } from './types';
+import { lead, p, related, section } from './ui';
 
 // Each chat channel: a name and a one-line note on what it is for. Order follows the
 // in-game channel set (say is the local default; world and lfg are opt-in globals).
@@ -25,17 +25,18 @@ const LOOT = [
   ['guide.social.lootCoinTitle', 'guide.social.lootCoinBody'],
   ['guide.social.lootCommonTitle', 'guide.social.lootCommonBody'],
   ['guide.social.lootRollTitle', 'guide.social.lootRollBody'],
+  ['guide.social.lootMasterTitle', 'guide.social.lootMasterBody'],
 ] as const;
 
 export const social: GuidePage = {
   titleKey: 'guide.nav.social',
   render() {
-    const channels = CHANNELS
-      .map(([name, body]) => `<li><strong>${esc(t(name))}</strong> ${esc(t(body))}</li>`)
-      .join('');
-    const loot = LOOT
-      .map(([title, body]) => `<li><strong>${esc(t(title))}</strong> ${esc(t(body))}</li>`)
-      .join('');
+    const channels = CHANNELS.map(
+      ([name, body]) => `<li><strong>${esc(t(name))}</strong> ${esc(t(body))}</li>`,
+    ).join('');
+    const loot = LOOT.map(
+      ([title, body]) => `<li><strong>${esc(t(title))}</strong> ${esc(t(body))}</li>`,
+    ).join('');
     return `
       <article class="guide-article">
         <h1>${esc(t('guide.nav.social'))}</h1>

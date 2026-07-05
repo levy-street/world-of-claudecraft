@@ -124,6 +124,10 @@ const mobileControlsTs = readFileSync(
   new URL('../src/game/mobile_controls.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const characterPreviewTs = readFileSync(
+  new URL('../src/render/characters/preview.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // Per-frame keyed-pool painters. The per-member party rows,
 // the aura slots, and the FCT nodes used to be inline createElement / innerHTML in
 // hud.ts; they dissolved into these pooled painters, so the shape guards below grep
@@ -424,11 +428,12 @@ describe('client HTML shell', () => {
   it('routes the target elite class + name color + combo pips + hostile cue through the elided writers', () => {
     // The two raw writes the four original writers cannot express (the elite class and
     // the hostile/friendly name color) go through the toggleClass / setStyleProp,
-    // and the combo pip `on` toggle through toggleClass. No raw classList/style write
-    // on the target frame survives (those silently collapse the hot-DOM skip rate).
+    // and the combo pip `on` toggle (now on the PLAYER frame: combo points are
+    // character-bound) through toggleClass. No raw classList/style write on either
+    // frame survives (those silently collapse the hot-DOM skip rate).
     expect(hudTs).toContain("this.toggleClass(this.targetFrameEl, 'elite'");
     expect(hudTs).toMatch(/this\.setStyleProp\(\s*this\.targetNameEl,\s*'color',/);
-    expect(hudTs).toContain("this.toggleClass(pip as HTMLElement, 'on', i < points);");
+    expect(hudTs).toContain("this.toggleClass(pips[i] as HTMLElement, 'on', i < p.comboPoints);");
     // The forced-colors hostile cue is a non-color redundant marker on the target
     // name, routed through the same elided toggleClass writer (no raw class write on the
     // per-frame hot path) so it stays write-elided.
@@ -466,7 +471,32 @@ describe('client HTML shell', () => {
     expect(html).toContain('<li class="nav-item" id="nav-item-account" hidden>');
     expect(html).toContain('<li class="nav-item" id="nav-item-logout" hidden>');
     expect(mainTs).toContain('if (api.restoreSession()) {');
-    expect(mainTs).toContain('} else {\n    enterLoggedOutChrome();\n  }');
+    expect(mainTs).toContain(
+      "} else {\n    enterLoggedOutChrome();\n    if (isDesktopLoginPage()) show('#login-panel');\n  }",
+    );
+  });
+
+  it('keeps the Discord unlink panel clickable over the pre-game shell', () => {
+    const startZ = Number(shellCss.match(/#start-screen \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const modalZ = Number(shellCss.match(/\.modal-backdrop \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const discordZ = Number(indexExtraCss.match(/#discord-window \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    expect(discordZ).toBeGreaterThan(startZ);
+    expect(discordZ).toBeLessThan(modalZ);
+  });
+
+  it('keeps the Discord unlink modal at top level so it shows in-game', () => {
+    // #start-screen is display:none once the game starts (main.ts hides it) and is a
+    // lower z-index:100 stacking context, so a keep-modal nested inside it would be
+    // invisible in-game and trapped below the top-level #discord-window. It must be a
+    // top-level sibling declared above #start-screen, exactly like #discord-window.
+    const modalAt = html.indexOf('id="discord-keep-modal"');
+    const windowAt = html.indexOf('id="discord-window"');
+    const startAt = html.indexOf('id="start-screen"');
+    expect(modalAt).toBeGreaterThan(-1);
+    expect(windowAt).toBeGreaterThan(-1);
+    // Declared before #start-screen opens, hence a top-level sibling, never a descendant.
+    expect(modalAt).toBeLessThan(startAt);
+    expect(windowAt).toBeLessThan(startAt);
   });
 
   it('shows a logged-in Logout nav item next to Account', () => {
@@ -588,24 +618,32 @@ describe('client HTML shell', () => {
     expect(html).toContain(
       "if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {",
     );
-    expect(hudTs).toContain("fbq('trackCustom', eventName, data ?? {});");
-    expect(hudTs).toContain(
-      "if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });",
+    expect(hudTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
+    expect(hudTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    expect(hudTs).toContain('if (ev.level === 5) {');
+    expect(hudTs).toContain('characterId ? { eventID: `lvl5_$' + '{characterId}` } : undefined');
+    expect(mainTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
+    expect(mainTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    expect(mainTs).toContain(
+      'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',
     );
-    expect(mainTs).toContain("trackMetaPixel('AccountCreated');");
     expect(mainTs).toContain("'GitHubClick'");
     expect(mainTs).toContain("'DiscordClick'");
   });
 
-  it('excludes wallet verification surfaces from native app builds', () => {
+  it('excludes wallet verification surfaces from native and desktop app builds', () => {
     expect(hudCss).toContain('body.native-app #nav-btn-download,');
     expect(hudCss).toContain(
       'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
     );
     expect(hudCss).toContain('body.native-app #performance-tip,');
+    expect(hudCss).toContain(
+      'body.desktop-app #token-ca,\n  body.desktop-app .cs-wallet,\n  body.desktop-app .cs-wallet-hidden-note,\n  body.desktop-app .account-wallet-card,\n  body.desktop-app .official-site-copy',
+    );
     expect(html).toContain('<section class="account-card account-wallet-card">');
+    expect(mainTs).toContain("document.body.classList.toggle('desktop-app', DESKTOP_APP);");
     expect(mainTs).toContain(
-      "const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
+      "!NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
     );
     expect(mainTs).toContain("document.querySelector('.cs-wallet')?.remove();");
     expect(mainTs).toContain("document.querySelector('.account-wallet-card')?.remove();");
@@ -624,10 +662,70 @@ describe('client HTML shell', () => {
     );
   });
 
+  it('releases the start-screen character preview before entering the world', () => {
+    expect(mainTs).toContain('function releaseStartScreenPreview(): void {');
+    expect(mainTs).toContain('characterPreview.destroy();\n  characterPreview = null;');
+    expect(mainTs).toContain(
+      "$('#start-screen').style.display = 'none';\n  releaseStartScreenPreview();",
+    );
+    expect(characterPreviewTs).toContain('destroy(): void {\n    if (this.destroyed) return;');
+    expect(characterPreviewTs).toContain(
+      'this.unregisterContext?.();\n    this.unregisterContext = null;',
+    );
+    expect(characterPreviewTs).toContain('this.renderer.forceContextLoss();');
+    expect(characterPreviewTs).toContain('this.renderer.dispose();');
+  });
+
+  it('keeps the desktop character roster readable inside a centered cinematic stage', () => {
+    expect(shellCss).toContain('--cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));');
+    expect(shellCss).toContain('--cs-roster-width: clamp(340px, 28vw, 440px);');
+    expect(shellCss).toContain('--cs-details-width: var(--cs-roster-width);');
+    expect(shellCss).toContain(
+      '@media (min-width: 861px) {\n    #offline-select.cs-wow,\n    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-row {\n      display: grid;\n      grid-template-columns: auto minmax(0, 1fr) auto;',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions {\n      display: grid;\n      grid-template-columns: minmax(112px, 1fr);',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {\n      overflow-wrap: anywhere;',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {\n      grid-template-columns: minmax(0, 1fr);',
+    );
+    expect(shellCss).toContain(
+      'overflow-y: auto;\n      scrollbar-width: thin;\n      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar {\n      width: 6px;',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge {\n      padding: 0;\n      border: 0;\n      border-radius: 0;\n      background: none;\n      text-transform: none;',
+    );
+    expect(shellCss).toContain('font-size: clamp(13px, 0.72vw, 15px);');
+    expect(characterPreviewTs).toContain('const LIVE_PREVIEW_X = 0;');
+    expect(characterPreviewTs).toContain('this.camera.position.set(LIVE_PREVIEW_X, 1.45, 5.1);');
+    expect(characterPreviewTs).toContain(
+      'this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));',
+    );
+  });
+
   it('offers the quest log in the mobile controls drawer', () => {
     expect(html).toContain('id="mobile-extra-controls"');
     expect(html).toContain('id="mobile-quest"');
     expect(html).toContain('aria-label="Quest Log"');
+  });
+
+  it('offers a Discord entry in the mobile drawer, hidden until Discord is available', () => {
+    // Mobile has no keyboard, so the U-key Discord panel toggle is unreachable;
+    // this drawer button is the touch path into #discord-window (link / unlink).
+    expect(html).toContain('id="mobile-discord"');
+    // Carries the icon hook (hydrateIcons swaps [data-icon] for the inline SVG).
+    expect(html).toMatch(/id="mobile-discord"[^>]*data-icon="discord"/);
+    // Starts hidden; main.ts reveals it only when Discord is enabled and logged in.
+    expect(html).toMatch(/id="mobile-discord"\s+hidden/);
   });
 
   it('keeps the game menu free of duplicate and dev-only entries', () => {
@@ -717,7 +815,7 @@ describe('client HTML shell', () => {
     expect(html).toContain('<a class="community-link donate"');
     expect(hudMobileCss).toContain('body.mobile-touch.game-active #ui {\n    z-index: 80;\n  }');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #community-hud {\n    right: max(8px, env(safe-area-inset-right));\n    top: calc(max(8px, env(safe-area-inset-top)) + 158px);',
+      'body.mobile-touch #community-hud {\n    right: max(20px, calc(env(safe-area-inset-right) + 10px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 158px);',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch .community-toggle {\n    width: 44px;\n    height: 44px;',
@@ -784,8 +882,10 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('conic-gradient(\n      from var(--xp-ring-start),');
     expect(hudMobileCss).toContain('calc(var(--xp-fill, 0) * 360deg)');
     expect(hudMobileCss).toContain('transparent var(--xp-ring-arc) 360deg');
+    // Own HP/mana lives bottom-center (the one part of the screen every
+    // other mobile element deliberately leaves empty), not top-left.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: max(8px, env(safe-area-inset-left));\n    top: max(8px, env(safe-area-inset-top));\n    z-index: 21;',
+      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: 50%;\n    top: auto;\n    bottom: calc(14px + env(safe-area-inset-bottom));\n    z-index: 21;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #player-frame .portrait-wrap {\n    z-index: 3;\n  }',
@@ -803,10 +903,10 @@ describe('client HTML shell', () => {
       'body.mobile-touch #player-frame::before {\n      left: -5px;\n      top: -5px;\n      width: 73px;\n      height: 73px;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #target-frame {\n    left: max(8px, env(safe-area-inset-left));\n    top: calc(max(8px, env(safe-area-inset-top)) + 72px);',
+      'body.mobile-touch #target-frame {\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 72px);',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames {\n    position: fixed;\n    left: max(8px, env(safe-area-inset-left));\n    top: calc(max(8px, env(safe-area-inset-top)) + 74px);',
+      'body.mobile-touch #party-frames {\n    position: fixed;\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 74px);',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames.below-target {\n    top: calc(max(8px, env(safe-area-inset-top)) + 130px);',
@@ -903,6 +1003,50 @@ describe('client HTML shell', () => {
     );
     expect(shellCss).toContain(
       'body.native-app.mobile-touch[data-start-panel="login-panel"] .portal-ring,',
+    );
+    expect(shellCss).toContain(
+      'body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel {\n    display: grid;\n    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);',
+    );
+    expect(shellCss).toContain(
+      '@media (orientation: landscape) {\n    body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,\n    body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view {\n      justify-content: flex-start;\n      min-height: calc(var(--app-vh) - 86px);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch[data-start-panel="mode-select"] #title-logo {\n      width: min(176px, 24vw);\n      margin: 0;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch[data-start-panel="charselect-panel"] #title-logo,\n    body.mobile-touch[data-start-panel="charcreate-panel"] #title-logo {\n      display: none;',
+    );
+    expect(shellCss).toContain('height: min(560px, calc(var(--app-vh) - 96px));');
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-detail-col {\n      display: grid;\n      grid-template-columns: minmax(120px, 0.54fr) minmax(0, 1.46fr);',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #char-list {\n      overflow-y: auto;\n      scrollbar-gutter: stable;\n      scrollbar-width: auto;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar {\n      width: 8px;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #charselect-class-details {\n      box-sizing: border-box;\n      min-height: 0;\n      overflow-y: auto;',
+    );
+    expect(shellCss).toContain('scrollbar-gutter: stable;\n      scrollbar-width: auto;');
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid {\n      display: flex;\n      flex-direction: column;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #charselect-class-details .details-spells-list {\n      display: grid;\n      grid-template-columns: minmax(0, 1fr);',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-list-col,\n    body.mobile-touch #charselect-panel .cs-detail-col,\n    body.mobile-touch #charcreate-panel .cs-create-col,\n    body.mobile-touch #charcreate-panel .cs-detail-col {\n      min-height: 0;\n      height: 100%;\n      overflow: hidden;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-list-actions {\n      position: absolute;\n      top: 28px;\n      right: 0;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-list-actions .btn {\n      flex: 0 0 auto;\n      min-width: 122px;\n      min-height: 38px;',
     );
     expect(shellCss).toContain(
       'touch-action: manipulation;\n    -webkit-tap-highlight-color: transparent;',
@@ -1008,16 +1152,29 @@ describe('client HTML shell', () => {
       'max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));',
     );
     expect(hudMobileCss).toContain(
-      'max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
+      'max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-extra-controls {\n    display: flex;\n    flex-direction: column;\n  }',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-extra-controls .panel-title {\n    min-height: 32px;',
+    // Anchored to the drawer-header rule itself (not just the declarations,
+    // which any rule could carry): the 48px floor must stay on THIS selector.
+    const drawerTitleStart = hudMobileCss.indexOf(
+      'body.mobile-touch #mobile-extra-controls .panel-title {',
     );
+    expect(drawerTitleStart).toBeGreaterThan(-1);
+    const drawerTitleBody = hudMobileCss.slice(
+      drawerTitleStart,
+      hudMobileCss.indexOf('}', drawerTitleStart),
+    );
+    expect(drawerTitleBody).toContain('min-height: 48px;');
+    expect(drawerTitleBody).toContain('margin-bottom: 8px;');
+    expect(drawerTitleBody).toContain('padding-bottom: 6px;');
+    expect(drawerTitleBody).toContain('cursor: move;');
+    // Smaller than the old 560px cap: the More tray only holds short pill
+    // buttons now, not a wide desktop-style panel.
     expect(hudMobileCss).toContain(
-      'width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));',
+      'width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-extra-grid {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));',
@@ -1065,10 +1222,13 @@ describe('client HTML shell', () => {
     );
     // Landscape compacts the single play console instead of splitting two cards.
     expect(hudMobileCss).toContain(
-      '@media (orientation: landscape) {\n    body.mobile-touch .play-console {',
+      '@media (orientation: landscape) {\n    body.mobile-touch[data-start-panel="mode-select"] #homepage-views-container {',
     );
     expect(hudMobileCss).toContain(
-      '@media (orientation: landscape) {\n    body.mobile-touch .play-console {\n      width: 100%;\n      max-width: 460px;',
+      'body.mobile-touch[data-start-panel="mode-select"] #mode-select {\n      width: min(\n        620px,',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .play-console {\n      width: 100%;\n      max-width: none;\n      display: grid;\n      grid-template-columns: minmax(0, 1fr) minmax(140px, 0.46fr);',
     );
   });
 
@@ -1122,7 +1282,7 @@ describe('client HTML shell', () => {
 
   it('keeps the World Market to one scroll container with browse filters below the tabs', () => {
     expect(componentsCss).toContain(
-      '#market-window {\n    width: 470px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
+      '#market-window {\n    width: 560px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
     );
     expect(componentsCss).toContain(
       '#market-body {\n    overflow-y: auto;\n    flex: 1;\n    min-height: 0;',
@@ -1130,9 +1290,14 @@ describe('client HTML shell', () => {
     expect(componentsCss).toContain(
       '.mkt-page {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;',
     );
+    // On mobile the Market takes the full available height (not the vendor's 58vh
+    // cap) so its tall stacked-filter header cannot squeeze the listing body flat,
+    // and #market-body keeps a min-height floor; the window itself stays
+    // overflow:hidden so #market-body remains the single scroll container.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(58vh - 20px);\n    overflow: hidden;',
+      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow: hidden;',
     );
+    expect(hudMobileCss).toContain('body.mobile-touch #market-body {\n    min-height: 96px;');
     expect(marketWindowTs).toContain('buildMarketView'); // pagination + filtering delegated to the core
     expect(marketWindowTs).toContain('this.browsePage');
     expect(marketWindowTs).toContain('data-market-page="prev"');
@@ -1148,59 +1313,150 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
   });
 
-  it('keeps the mobile More and Autorun buttons in the combat row', () => {
+  it('anchors the mobile combat cluster to the thumb-reach corner, not dead-center', () => {
     const combatControls = html.slice(
       html.indexOf('<div id="mobile-combat-controls">'),
       html.indexOf('<div id="mobile-extra-controls"'),
     );
+    const combatGridEnd = combatControls.indexOf('</div>') + '</div>'.length;
+    const combatGrid = combatControls.slice(0, combatGridEnd);
+    const afterGrid = combatControls.slice(combatGridEnd);
     const primaryButtons = [...combatControls.matchAll(/<button class="mobile-btn"/g)];
-    const attack = combatControls.indexOf('id="mobile-attack-nearest"');
-    const autorun = combatControls.indexOf('id="mobile-autorun"');
-    const jump = combatControls.indexOf('id="mobile-jump"');
+    const attack = combatGrid.indexOf('id="mobile-attack-nearest"');
+    const jump = combatGrid.indexOf('id="mobile-jump"');
+    const target = combatGrid.indexOf('id="mobile-target"');
+    const interact = combatGrid.indexOf('id="mobile-interact"');
+    const autorun = afterGrid.indexOf('id="mobile-autorun"');
+    const chat = afterGrid.indexOf('id="mobile-chat"');
+    const more = afterGrid.indexOf('id="mobile-more"');
 
-    expect(primaryButtons).toHaveLength(7);
+    // The 4 core, frequently-pressed verbs live inside #mobile-combat-grid...
+    expect(primaryButtons).toHaveLength(8);
     expect(attack).toBeGreaterThanOrEqual(0);
-    expect(autorun).toBeGreaterThan(attack);
-    expect(jump).toBeGreaterThan(autorun);
-    expect(hudMobileCss).toContain('grid-template-columns: 124px repeat(6, 58px);');
-    expect(hudMobileCss).toContain('grid-template-columns: 115px repeat(6, 54px);');
-    expect(hudMobileCss).toContain('grid-template-columns: 96px repeat(6, 42px);');
+    expect(jump).toBeGreaterThan(attack);
+    expect(target).toBeGreaterThan(jump);
+    expect(interact).toBeGreaterThan(target);
+    // ...while the low-frequency verbs (a travel toggle, two menu-openers) sit
+    // outside the grid, so they can be pulled out to a top-corner row instead
+    // of crowding the thumb-reach cluster.
+    expect(autorun).toBeGreaterThanOrEqual(0);
+    expect(chat).toBeGreaterThan(autorun);
+    expect(more).toBeGreaterThan(chat);
+
+    // The cluster anchors to the corner above where the thumb rests, not the
+    // old dead-center strip (left: 50%) -- across every responsive breakpoint.
+    // It's now a flat row (Attack the "sun" plus Jump/Target/Use laid out flat
+    // beside it), not an orbit or a column, and there's no camera joystick to
+    // clear anymore (swipe-drag on canvas replaced it).
+    expect(hudMobileCss).not.toContain('left: 50%;\n    bottom: calc(3px');
     expect(hudMobileCss).toContain(
-      'position: absolute;\n    left: 50%;\n    bottom: calc(3px + env(safe-area-inset-bottom));',
+      'body.mobile-touch #mobile-combat-controls {\n    position: absolute;\n    left: auto;\n    right: max(32px, calc(env(safe-area-inset-right) + 18px));\n    bottom: calc(22px + env(safe-area-inset-bottom));\n    z-index: 30;\n  }',
     );
     expect(hudMobileCss).toContain(
-      'bottom: calc(2px + env(safe-area-inset-bottom));\n      grid-template-columns: 115px repeat(6, 54px);',
+      'body.mobile-touch #mobile-combat-grid {\n    position: relative;\n    width: 236px;\n    height: 64px;',
+    );
+    // Attack is slightly bigger than the other cluster buttons (64px vs 50px):
+    // it's the single most-pressed button, worth the extra thumb target.
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-attack-nearest {\n');
+    expect(hudMobileCss).toMatch(
+      /#mobile-attack-nearest \{[^}]*width: 64px;[^}]*height: 64px;[^}]*right: 0;[^}]*bottom: 0;[^}]*\}/,
     );
     expect(hudMobileCss).toContain(
-      'pointer-events: auto;\n    align-items: end;\n    z-index: 30;',
+      'body.mobile-touch #mobile-interact {\n    width: 50px;\n    height: 50px;\n    right: 70px;\n    bottom: 4px;\n  }',
     );
-    expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-target {\n    width: 50px;\n    height: 50px;\n    right: 126px;\n    bottom: 4px;\n  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-jump {\n    width: 50px;\n    height: 50px;\n    right: 182px;\n    bottom: 4px;\n  }',
+    );
+    expect(hudMobileCss).toContain('body.mobile-touch.mobile-left-handed #mobile-attack-nearest {');
+    // Autorun/Chat/More are fixed-positioned out of the grid into their own
+    // top-corner column, mirrored for the left-handed toggle.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-autorun,\n  body.mobile-touch #mobile-chat,\n  body.mobile-touch #mobile-more {\n    position: fixed;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-autorun,\n  body.mobile-touch.mobile-left-handed #mobile-chat,\n  body.mobile-touch.mobile-left-handed #mobile-more {',
+    );
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
   });
 
-  it('keeps the mobile spell bar in a scrollable row between the joysticks', () => {
+  it('removes the camera joystick UI (swipe-drag on canvas replaces it) and shrinks the move joystick', () => {
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-camera-joystick {\n    display: none;\n  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mobile-joystick {\n    position: absolute;\n    left: max(28px, calc(env(safe-area-inset-left) + 14px));\n    bottom: calc(22px + env(safe-area-inset-bottom));\n    width: 76px;\n    height: 76px;',
+    );
+    expect(mobileControlsTs).toContain('private swipeLookDownAt = 0;');
+    expect(mobileControlsTs).toContain('private lastSwipeTapAt = 0;');
+    expect(mobileControlsTs).toContain('this.callbacks.onRecenterCamera();');
+  });
+
+  it('pages the mobile spell bar as a 5-slot row above the combat cluster', () => {
     expect(hudMobileCss).toContain('width: min(30vw, 132px);');
     expect(hudMobileCss).toContain('min-width: 112px;');
     expect(hudMobileCss).toContain('height: min(36vh, 172px);');
-    expect(hudMobileCss).toContain('left: calc(max(18px, env(safe-area-inset-left)) + 154px);');
-    expect(hudMobileCss).toContain('right: calc(max(18px, env(safe-area-inset-right)) + 154px);');
-    expect(hudMobileCss).toContain('bottom: calc(64px + env(safe-area-inset-bottom));');
-    expect(hudMobileCss).toContain('left: calc(max(20px, env(safe-area-inset-left)) + 136px);');
-    expect(hudMobileCss).toContain('right: calc(max(20px, env(safe-area-inset-right)) + 136px);');
-    expect(hudMobileCss).toContain('bottom: calc(57px + env(safe-area-inset-bottom));');
+    expect(hudMobileCss).toContain('body.mobile-touch #actionbar {\n    position: fixed;');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #actionbar {\n    display: flex;\n    flex-wrap: nowrap;',
+      'body.mobile-touch .action-btn {\n    position: absolute;\n    width: 44px;\n    height: 44px;\n    bottom: 0;\n    border-radius: 50%;',
     );
-    expect(hudMobileCss).toContain('overflow-x: auto;\n    overflow-y: hidden;');
-    expect(hudMobileCss).toContain('touch-action: pan-x;');
-    expect(hudMobileCss).toContain('min-height: 50px;');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch .action-btn {\n    width: 42px;\n    height: 42px;\n    flex: 0 0 42px;',
+      '.action-btn.hotbar-ring-0:not(.mobile-hotbar-page-hidden):not(.empty)',
+    );
+    expect(hudMobileCss).toContain(
+      '.action-btn.hotbar-ring-1:not(.mobile-hotbar-page-hidden):not(.empty)',
+    );
+    expect(hudMobileCss).toContain(
+      '.action-btn.hotbar-ring-2:not(.mobile-hotbar-page-hidden):not(.empty)',
+    );
+    expect(hudMobileCss).toContain(
+      '.action-btn.hotbar-ring-3:not(.mobile-hotbar-page-hidden):not(.empty)',
+    );
+    expect(hudMobileCss).toContain(
+      '.action-btn.hotbar-ring-4:not(.mobile-hotbar-page-hidden):not(.empty)',
+    );
+    // #actionbar is a .panel on desktop; on mobile it's a bare positioning
+    // wrapper, so the inherited panel chrome must be stripped or a useless
+    // bordered square renders behind the 5-slot row.
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch #actionbar \{[^}]*border: none;[^}]*outline: none;[^}]*border-radius: 0;[^}]*box-shadow: none;[^}]*\}/,
+    );
+    // #mobile-combat-controls #mobile-hotbar-page (2 IDs), not a bare ID: a
+    // bare #mobile-hotbar-page loses its width/height to the icon-only
+    // #mobile-combat-controls .mobile-btn rule (1 ID + 1 class still outranks
+    // 1 bare ID) -- the same specificity trap the left-handed joystick swap
+    // hit earlier in this file.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-combat-controls #mobile-hotbar-page {',
+    );
+    // #mobile-controls is click-through by default; every interactive child
+    // (including this one) must re-enable pointer-events individually.
+    expect(hudMobileCss).toMatch(
+      /#mobile-combat-controls #mobile-hotbar-page \{[^}]*pointer-events: auto;[^}]*\}/,
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-hotbar-dragging #actionbar {\n    touch-action: none;\n  }',
     );
     expect(hudMobileCss).toContain('body.mobile-touch .action-btn.mobile-drag-source');
+    expect(hudMobileCss).toContain('body.mobile-touch.mobile-left-handed #actionbar {');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-combat-controls #mobile-hotbar-page {',
+    );
+
+    // Hud.cycleMobileHotbarPage pages a fixed 5-slot row across two pages
+    // (slots 1-5, 6-10); drag-to-reorder (bindMobileActionDrag) is untouched.
+    expect(hudTs).toContain('private static readonly MOBILE_HOTBAR_PAGE_SIZE = 5;');
+    expect(hudTs).toContain('private static readonly MOBILE_HOTBAR_SLOTS = 10;');
+    expect(hudTs).toContain('cycleMobileHotbarPage(): void {');
+    expect(hudTs).toContain('private applyMobileHotbarPage(): void {');
+    expect(html).toContain('id="mobile-hotbar-page"');
+    expect(mobileControlsTs).toContain('onCycleHotbarPage(): void;');
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-hotbar-page', () => this.callbacks.onCycleHotbarPage());",
+    );
+    expect(mainTs).toContain('onCycleHotbarPage: () => hud.cycleMobileHotbarPage(),');
   });
 
   it('seeds druid form bars with the form kit, and only clones normal for rogue stealth', () => {
@@ -1302,7 +1558,7 @@ describe('client HTML shell', () => {
       'body.mobile-touch.mobile-left-handed #mobile-extra-controls {\n    left: 50%;\n    right: auto;',
     );
     expect(hudMobileCss).toContain(
-      'max-height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
+      'max-height: calc(\n        var(--app-vh) -\n        28px -\n        env(safe-area-inset-top) -\n        env(safe-area-inset-bottom)\n      );',
     );
   });
 

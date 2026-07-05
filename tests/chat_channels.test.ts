@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
   CHAT_TAB_CHANNELS,
-  channelSendPrefix,
   channelNeedsJoin,
+  channelSendPrefix,
+  chatOpenTabLabelKey,
   composeChatLine,
+  composeWhisperReply,
+  isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
   serializeChatTabs,
+  WHISPER_TAB,
+  WHISPER_TAB_LABEL_KEY,
 } from '../src/ui/chat_channels';
 
 describe('chat channel tabs — pure model', () => {
@@ -70,11 +75,52 @@ describe('chat channel tabs — pure model', () => {
       expect(parseChatTabs(null)).toEqual([]);
       expect(parseChatTabs('not json')).toEqual([]);
       expect(parseChatTabs('{"a":1}')).toEqual([]); // not an array
-      expect(parseChatTabs('["world","bogus","whisper",42]')).toEqual(['world']);
+      // 'whisper' is a valid (filter-only) tab now; 'bogus'/42 are still dropped
+      expect(parseChatTabs('["world","bogus","whisper",42]')).toEqual(['world', 'whisper']);
+    });
+
+    it('round-trips the whisper collector tab alongside channels', () => {
+      expect(parseChatTabs(serializeChatTabs(['guild', WHISPER_TAB]))).toEqual([
+        'guild',
+        WHISPER_TAB,
+      ]);
     });
 
     it('drops duplicate entries, keeping first occurrence order', () => {
       expect(parseChatTabs('["lfg","world","lfg"]')).toEqual(['lfg', 'world']);
+    });
+  });
+
+  describe('whisper collector tab', () => {
+    it('is not a send-capable channel, but is a valid open tab', () => {
+      expect(isChatTabChannel(WHISPER_TAB)).toBe(false);
+      expect(CHAT_TAB_CHANNELS as readonly string[]).not.toContain(WHISPER_TAB);
+      expect(isChatOpenTab(WHISPER_TAB)).toBe(true);
+      expect(isChatOpenTab('guild')).toBe(true);
+      expect(isChatOpenTab('bogus')).toBe(false);
+      expect(isChatOpenTab(42)).toBe(false);
+    });
+
+    it('captions itself with the existing Whisper label (no new i18n key)', () => {
+      expect(chatOpenTabLabelKey(WHISPER_TAB)).toBe(WHISPER_TAB_LABEL_KEY);
+      expect(chatOpenTabLabelKey(WHISPER_TAB)).toBe('hud.chat.context.whisper');
+      expect(chatOpenTabLabelKey('party')).toBe('hud.core.chatChannels.names.party');
+    });
+
+    describe('composeWhisperReply', () => {
+      it('defaults plain text to a reply to the last whisperer', () => {
+        expect(composeWhisperReply('on my way')).toBe('/r on my way');
+        expect(composeWhisperReply('  hi  ')).toBe('/r hi');
+      });
+
+      it('lets an explicit slash command win (whisper a different player)', () => {
+        expect(composeWhisperReply('/w Bob meet me')).toBe('/w Bob meet me');
+        expect(composeWhisperReply('/p inc')).toBe('/p inc');
+      });
+
+      it('drops empty input', () => {
+        expect(composeWhisperReply('   ')).toBe('');
+      });
     });
   });
 

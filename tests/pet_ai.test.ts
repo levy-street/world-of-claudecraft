@@ -137,3 +137,29 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     expect(pet.petPath).toEqual([]);
   });
 });
+
+describe('pet proximity pull: a pet drags idle wild mobs like its owner', () => {
+  it('an idle wild mob inside the pet reach aggros the pet, not only when struck', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const mob = wildHostile(sim, [pet.id]);
+    // even level: not trivial-con, and the mob placed inside the radius floor (>=4yd)
+    mob.level = 10;
+    pet.level = 10;
+    mob.aiState = 'idle';
+    mob.aggroTargetId = null;
+    mob.inCombat = false;
+    place(owner, 500, 500); // owner far away: the mob cannot proximity-aggro the PLAYER
+    place(pet, 100, 100);
+    place(mob, 103, 100); // 3yd from the pet, well within the mob's detection radius
+    sim.rebucket(pet);
+    sim.rebucket(mob);
+    sim.rebucket(owner);
+    expect(pet.ownerId).toBe(pid); // a player-owned pet
+    expect(mob.aiState).toBe('idle');
+    // The pet's own tick pulls nearby idle wild mobs (no reliance on being hit first).
+    updatePet(sim.ctx, pet);
+    expect(mob.aggroTargetId).toBe(pet.id);
+    expect(mob.aiState).not.toBe('idle');
+  });
+});
