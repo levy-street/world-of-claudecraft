@@ -887,6 +887,32 @@ export const en_XA: EnTranslations = {
       "mob": "[[{level}] {name}]",
       "mobElite": "[[{level}+] {name}]"
     },
+    "wocSeason": {
+      "menu": "[$ŴÓÇ Šéášóñ]",
+      "title": "[$ŴÓÇ Ŕéŵáŕð Šéášóñ]",
+      "subtitle": "[Ţŕéášúŕý-ƒúñðéð þáýóúţš ţó ţóþ þļáýéŕš]",
+      "close": "[Çļóšé]",
+      "none": "[Ñó ŕéŵáŕð šéášóñ íš áçţíʋé ŕíĝĥţ ñóŵ.]",
+      "noneHint": "[Á šéášóñ óþéñš óñçé áŕéñá ŕáķé áñð ƀúýƀáçķš ƀéĝíñ ƒúñðíñĝ ţĥé þóóļ.]",
+      "statusActive": "[Áçţíʋé]",
+      "statusEnded": "[Éñðéð]",
+      "endsIn": "[Éñðš íñ]",
+      "endsInValue": "[{days}ð {hours}ĥ {minutes}ɱ]",
+      "ended": "[Ţĥíš šéášóñ ĥáš éñðéð.]",
+      "openEnded": "[Óþéñ-éñðéð]",
+      "poolLabel": "[Ŕéŵáŕð þóóļ áʋáíļáƀļé]",
+      "wocUnit": "[$ŴÓÇ]",
+      "emittedLabel": "[{pct}% óƒ ţĥé þóóļ þáíð óúţ šó ƒáŕ]",
+      "sinkLabel": "[Ƒúñðéð]",
+      "emissionLabel": "[Þáíð óúţ]",
+      "invariant": "[Þáýóúţš çáñ ñéʋéŕ éẋçééð ŵĥáţ ţĥé šéášóñ ţóóķ íñ: ƀúý > šéļļ, éñƒóŕçéð óñ-çĥáíñ.]",
+      "standingsTitle": "[Þŕóĵéçţéð ţóþ éáŕñéŕš]",
+      "colRank": "[#]",
+      "colPlayer": "[Þļáýéŕ]",
+      "colRating": "[Ŕáţíñĝ]",
+      "colReward": "[Ŕéŵáŕð ($ŴÓÇ)]",
+      "projectedNote": "[Þŕóĵéçţéð ƒŕóɱ ţĥé çúŕŕéñţ þóóļ + áŕéñá ŕáñķíñĝ; ƒíñáļ þáýóúţš šéţţļé áţ šéášóñ çļóšé.]"
+    },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",
       "familyDemon": "[Ðéɱóñ]",
@@ -2739,6 +2765,29 @@ export const en_XA: EnTranslations = {
       "sovereign": {
         "name": "[Šóʋéŕéíĝñ]",
         "flavor": "[Ţĥé ŕéáļɱ ƀéñðš ţĥé ķñéé: ţĥé éñţíŕé šúþþļý.]"
+      }
+    },
+    "guardianTierTitle": "[{tier} Ļíɋúíðíţý Ĝúáŕðíáñ]",
+    "guardianTiers": {
+      "wader": {
+        "name": "[Ŵáðéŕ]",
+        "title": "[Ŵáðéŕ óƒ ţĥé Šĥáļļóŵš]"
+      },
+      "tidewatcher": {
+        "name": "[Ţíðéŵáţçĥéŕ]",
+        "title": "[Ţíðéŵáţçĥéŕ óƒ ţĥé Ŕéáçĥ]"
+      },
+      "currentkeeper": {
+        "name": "[Çúŕŕéñţķééþéŕ]",
+        "title": "[Ķééþéŕ óƒ ţĥé Çúŕŕéñţ]"
+      },
+      "stormwarden": {
+        "name": "[Šţóŕɱŵáŕðéñ]",
+        "title": "[Ŵáŕðéñ óƒ ţĥé Šţóŕɱ]"
+      },
+      "abyssguard": {
+        "name": "[Áƀýššĝúáŕð]",
+        "title": "[Ĝúáŕð óƒ ţĥé Áƀýšš]"
       }
     }
   },

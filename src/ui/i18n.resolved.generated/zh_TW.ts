@@ -887,6 +887,32 @@ export const zh_TW: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "wocSeason": {
+      "menu": "$WOC 賽季",
+      "title": "$WOC 獎勵賽季",
+      "subtitle": "由金庫出資發放給頂尖玩家",
+      "close": "關閉",
+      "none": "目前沒有進行中的獎勵賽季。",
+      "noneHint": "當競技場抽成與回購開始為獎池注資時，賽季即會開啟。",
+      "statusActive": "進行中",
+      "statusEnded": "已結束",
+      "endsIn": "Ends in",
+      "endsInValue": "{days}d {hours}h {minutes}m",
+      "ended": "本賽季已結束。",
+      "openEnded": "無限期",
+      "poolLabel": "可用獎勵池",
+      "wocUnit": "$WOC",
+      "emittedLabel": "迄今已發放獎池的 {pct}%",
+      "sinkLabel": "已注資",
+      "emissionLabel": "Paid out",
+      "invariant": "發放永遠不會超過賽季收入：買入 > 賣出，鏈上強制執行。",
+      "standingsTitle": "預計最高收益者",
+      "colRank": "#",
+      "colPlayer": "玩家",
+      "colRating": "評分",
+      "colReward": "獎勵（$WOC）",
+      "projectedNote": "基於目前獎池與競技場排名的預測；最終發放於賽季結束時結算。"
+    },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",
       "familyDemon": "惡魔",
@@ -2739,6 +2765,29 @@ export const zh_TW: EnTranslations = {
       "sovereign": {
         "name": "君主",
         "flavor": "整個領域為你俯首：全部供應量。"
+      }
+    },
+    "guardianTierTitle": "{tier}流動性守護者",
+    "guardianTiers": {
+      "wader": {
+        "name": "涉水者",
+        "title": "淺灘涉水者"
+      },
+      "tidewatcher": {
+        "name": "望潮者",
+        "title": "潮汐守望者"
+      },
+      "currentkeeper": {
+        "name": "守流者",
+        "title": "海流看守者"
+      },
+      "stormwarden": {
+        "name": "風暴守衛",
+        "title": "風暴守望者"
+      },
+      "abyssguard": {
+        "name": "深淵衛士",
+        "title": "深淵守衛者"
       }
     }
   },

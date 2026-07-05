@@ -887,6 +887,32 @@ export const nl_NL: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "wocSeason": {
+      "menu": "$WOC Season",
+      "title": "$WOC Reward Season",
+      "subtitle": "Treasury-funded payouts to top players",
+      "close": "Close",
+      "none": "No reward season is active right now.",
+      "noneHint": "A season opens once arena rake and buybacks begin funding the pool.",
+      "statusActive": "Active",
+      "statusEnded": "Ended",
+      "endsIn": "Ends in",
+      "endsInValue": "{days}d {hours}h {minutes}m",
+      "ended": "This season has ended.",
+      "openEnded": "Open-ended",
+      "poolLabel": "Reward pool available",
+      "wocUnit": "$WOC",
+      "emittedLabel": "{pct}% of the pool paid out so far",
+      "sinkLabel": "Funded",
+      "emissionLabel": "Paid out",
+      "invariant": "Payouts can never exceed what the season took in: buy > sell, enforced on-chain.",
+      "standingsTitle": "Projected top earners",
+      "colRank": "#",
+      "colPlayer": "Player",
+      "colRating": "Rating",
+      "colReward": "Reward ($WOC)",
+      "projectedNote": "Projected from the current pool + arena ranking; final payouts settle at season close."
+    },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
       "familyDemon": "Demon",
@@ -2739,6 +2765,29 @@ export const nl_NL: EnTranslations = {
       "sovereign": {
         "name": "Soeverein",
         "flavor": "Het rijk buigt de knie: de gehele voorraad."
+      }
+    },
+    "guardianTierTitle": "{tier} Liquidity Guardian",
+    "guardianTiers": {
+      "wader": {
+        "name": "Wader",
+        "title": "Wader of the Shallows"
+      },
+      "tidewatcher": {
+        "name": "Tidewatcher",
+        "title": "Tidewatcher of the Reach"
+      },
+      "currentkeeper": {
+        "name": "Currentkeeper",
+        "title": "Keeper of the Current"
+      },
+      "stormwarden": {
+        "name": "Stormwarden",
+        "title": "Warden of the Storm"
+      },
+      "abyssguard": {
+        "name": "Abyssguard",
+        "title": "Guard of the Abyss"
       }
     }
   },

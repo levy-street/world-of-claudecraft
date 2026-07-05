@@ -1,0 +1,21 @@
+[package]
+name = "woc_escrow"
+version = "0.1.0"
+description = "Non-custodial $WOC GameFi escrow: winner-takes-all 1v1 match pots with burn rake (#478) + seasonal reward distribution (#480)"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "woc_escrow"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = "0.30.1"
+anchor-spl = "0.30.1"

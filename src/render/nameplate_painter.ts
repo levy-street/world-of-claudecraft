@@ -28,6 +28,12 @@ import {
 } from '../ui/dev_tier';
 import { tEntity } from '../ui/entity_i18n';
 import {
+  guardianAuraFilter,
+  guardianTierBadgeDataUrl,
+  guardianTierByIndex,
+  guardianTierDisplayName,
+} from '../ui/guardian_flair';
+import {
   holderTierBadgeDataUrl,
   holderTierByIndex,
   holderTierDisplayName,
@@ -234,6 +240,8 @@ export class NameplatePainter {
         v.nameEl.style.display = nameDisplay;
         // $WOC holder-tier flair (hidden only on a suppressed self plate).
         this.setNameplateTier(v, suppressSelf ? 0 : (e.holderTier ?? 0));
+        // Liquidity Guardian staking flair, same visibility rule.
+        this.setNameplateGuardian(v, suppressSelf ? 0 : (e.guardianTier ?? 0));
         // Developer-badge flair.
         this.setNameplateDevTier(v, suppressSelf || !showDevBadges ? 0 : (e.devTier ?? 0));
         // Linked-Discord PFP indicator.
@@ -396,6 +404,26 @@ export class NameplatePainter {
     } else {
       v.tierEl.removeAttribute('src');
       v.tierEl.style.display = 'none';
+    }
+  }
+
+  // Show/hide the Liquidity Guardian staking badge, the shield sibling of the
+  // holder disc above, plus its aura: the badge glows in the tier's colours so
+  // a guardian reads at a glance even at nameplate size. Cheap-diffed like the
+  // holder badge.
+  private setNameplateGuardian(v: EntityView, tier: number): void {
+    if (tier === v.guardianValue) return;
+    v.guardianValue = tier;
+    const def = guardianTierByIndex(tier);
+    if (def) {
+      v.guardianEl.src = guardianTierBadgeDataUrl(def, 32);
+      v.guardianEl.title = t('wallet.guardianTierTitle', { tier: guardianTierDisplayName(def) });
+      v.guardianEl.style.filter = guardianAuraFilter(def);
+      v.guardianEl.style.display = '';
+    } else {
+      v.guardianEl.removeAttribute('src');
+      v.guardianEl.style.filter = '';
+      v.guardianEl.style.display = 'none';
     }
   }
 

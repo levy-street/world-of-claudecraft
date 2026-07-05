@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
+import { PublicKey } from '@solana/web3.js';
 import { type WebSocket, WebSocketServer } from 'ws';
 import {
   LEADERBOARD_MAX,
@@ -106,6 +107,7 @@ import {
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
+import { activeSeasonStatus, closeSeason, openSeason } from './flow_ledger_db';
 import { GameServer } from './game';
 import {
   handleGitHubCallback,
@@ -125,6 +127,15 @@ import {
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
+import type { LpDistributor } from './lp_distributor';
+import { buildLpFeeKeeper } from './lp_fee_keeper';
+import { buildLpDistributor } from './lp_fee_share_boot';
+import { guardianFlairConfigured, guardianInfoForPubkey } from './lp_guardian';
+import { guardianTiersForNames } from './lp_guardian_db';
+import { buildLpStakingService } from './lp_staking_boot';
+import { withLpDistributorLock, withLpEpochLock } from './lp_staking_db';
+import { handleLpTxBuild } from './lp_staking_routes';
+import type { LpStakingService } from './lp_staking_service';
 import {
   MAX_MAP_SAVE_BYTES,
   MapsService,
@@ -142,6 +153,8 @@ import {
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
+import { withLpFeeKeeperLock, withPayoutKeeperLock } from './payout_db';
+import { buildPayoutKeeper } from './payout_keeper';
 import { handlePerfReport } from './perf_report';
 import {
   captureReferral,
@@ -167,6 +180,7 @@ import {
 } from './ratelimit';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
+import { rewardTierBpsFromEnv } from './reward_tiers';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
@@ -184,11 +198,42 @@ import {
   handleWalletLink,
   handleWalletUnlink,
 } from './wallet';
+import { isSolanaAddress } from './wallet_link';
 import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { WOC_DECIMALS } from './woc_config';
+import { SeasonBodyCache } from './woc_season_api';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
+// How often the buyback keeper ticks. Its own policy decides whether a tick does
+// anything (threshold / cadence / fee floor), so this is just the poll interval.
+const PAYOUT_KEEPER_TICK_MS = Number(process.env.BUYBACK_KEEPER_TICK_MS ?? 5 * 60 * 1000);
+// How often the LP staking epoch runner polls. The service itself decides
+// whether an epoch is due (one per WOC_LP_EPOCH_SECONDS window), so this is
+// just the poll interval, like the keeper tick above.
+const LP_EPOCH_TICK_MS = Number(process.env.WOC_LP_EPOCH_TICK_MS ?? 60 * 1000);
+// LP fee keeper + payout distributor poll intervals (their own policies decide
+// whether a tick does anything, like the buyback keeper above).
+const LP_FEE_KEEPER_TICK_MS = Number(process.env.WOC_LP_FEE_KEEPER_TICK_MS ?? 5 * 60 * 1000);
+const LP_PAYOUT_TICK_MS = Number(process.env.WOC_LP_PAYOUT_TICK_MS ?? 5 * 60 * 1000);
+// The LP fee-share distributor, or null when the flag is off (rail dark).
+let lpDistributor: LpDistributor | null = null;
+// The LP staking service, or null when the flag is off (the default: rail dark).
+let lpStaking: LpStakingService | null = null;
+// /api/woc/lp is public; a short TTL keeps the (DB + ledger) read off the hot path.
+let lpSummaryCache: { at: number; body: unknown } | null = null;
+// /api/woc/season is public and polled by every client; SeasonBodyCache keeps the
+// (cheap) read off the DB hot path with a short TTL. Season + pool change slowly,
+// so a few seconds of staleness is fine.
+const seasonBody = new SeasonBodyCache({
+  fetchSeason: activeSeasonStatus,
+  fetchLadder: (limit) => topArenaRatings(limit, '1v1'),
+  tierBps: rewardTierBpsFromEnv,
+  decimals: WOC_DECIMALS,
+  now: () => Date.now(),
+  ttlMs: 5000,
+});
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
@@ -273,6 +318,20 @@ const leaderboardCache: Record<
 
 async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
   const rows = await topLifetimeXp(LEADERBOARD_SIZE, { global: scope === 'global' });
+  // Liquidity Guardian prestige: one DB-mirror query per refresh (no chain
+  // reads), only when the LP staking rail is configured; absent otherwise.
+  const guardians =
+    guardianFlairConfigured() && lpStaking
+      ? await guardianTiersForNames(
+          rows.map((r) => r.name),
+          lpStaking.pool(),
+          lpGuardianMinStakeBase(),
+          Math.floor(Date.now() / 1000),
+        ).catch((err) => {
+          console.error('guardian tier leaderboard enrich failed:', err);
+          return new Map<string, number>();
+        })
+      : new Map<string, number>();
   const entries: LeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
     name: r.name,
@@ -281,10 +340,17 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     virtualLevel: virtualLevel(r.lifetimeXp),
     lifetimeXp: r.lifetimeXp,
     prestigeRank: r.prestigeRank,
+    ...(guardians.has(r.name) ? { guardianTier: guardians.get(r.name) } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   leaderboardCache[scope] = { at: Date.now(), entries };
   return entries;
+}
+
+// The flair dust floor shared with lp_guardian.ts (env-tuned, LP base units).
+function lpGuardianMinStakeBase(): bigint {
+  const v = process.env.WOC_LP_GUARDIAN_MIN_STAKE_BASE;
+  return v && /^[0-9]+$/.test(v) ? BigInt(v) : 1n;
 }
 
 async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
@@ -1493,6 +1559,50 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const { owner, fresh } = parseWocBalanceQuery(req.url ?? '');
       return handleWocBalance(res, owner, fresh);
     }
+    // LP staking vault. Every route 404s while the flag is off (rail dark).
+    // Reads are public; the tx builders return UNSIGNED transactions the staker
+    // signs in their own wallet (non-custodial), rate-limited like the balance
+    // proxy because they touch the RPC.
+    if (req.method === 'GET' && url === '/api/woc/lp') {
+      if (!lpStaking) return json(res, 404, { error: 'unknown endpoint' });
+      if (!lpSummaryCache || Date.now() - lpSummaryCache.at > 5000) {
+        lpSummaryCache = { at: Date.now(), body: await lpStaking.summary() };
+      }
+      return json(res, 200, lpSummaryCache.body);
+    }
+    if (req.method === 'GET' && url.startsWith('/api/woc/lp/guardian')) {
+      if (!guardianFlairConfigured()) return json(res, 404, { error: 'unknown endpoint' });
+      if (wocBalanceRateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      const owner = new URL(req.url ?? '/', 'http://localhost').searchParams.get('owner');
+      if (!isSolanaAddress(owner))
+        return json(res, 400, { error: 'owner must be a Solana address' });
+      const info = await guardianInfoForPubkey(owner);
+      return json(res, 200, { tier: info.tier });
+    }
+    if (req.method === 'GET' && url.startsWith('/api/woc/lp/position')) {
+      if (!lpStaking) return json(res, 404, { error: 'unknown endpoint' });
+      if (wocBalanceRateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      const owner = new URL(req.url ?? '/', 'http://localhost').searchParams.get('owner');
+      if (!isSolanaAddress(owner))
+        return json(res, 400, { error: 'owner must be a Solana address' });
+      const view = await lpStaking.positionView(new PublicKey(owner));
+      return json(res, 200, { position: view });
+    }
+    if (req.method === 'POST' && url.startsWith('/api/woc/lp/tx/')) {
+      if (!lpStaking) return json(res, 404, { error: 'unknown endpoint' });
+      if (wocBalanceRateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      return handleLpTxBuild(req, res, lpStaking, url.split('?')[0]);
+    }
+    // Public read of the current $WOC reward season + its pool (verified sinks −
+    // emissions = $WOC available to pay out this season). Derived from
+    // on-chain-verified flows; { season: null } when no season is open.
+    if (req.method === 'GET' && url === '/api/woc/season') {
+      // Season + pool, plus the projected per-player rewards (the realm's top
+      // arena-1v1 ladder split by the tier schedule: a projection of "if the
+      // season closed now"; the actual payout at close is the deferred escrow
+      // path). Built + short-TTL-cached by seasonBody (woc_season_api.ts).
+      return json(res, 200, await seasonBody.get());
+    }
     if (url.startsWith('/api/daily-rewards')) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -1769,6 +1879,80 @@ async function main(): Promise<void> {
   await game.loadMail();
   await game.loadChatFilter();
   await game.loadBlockedIps();
+  await game.bootArenaWager();
+  // LP staking vault (flag-gated OFF by default; buildLpStakingService returns
+  // null when WOC_LP_STAKING_ENABLED is unset and throws on a half-config).
+  lpStaking = await buildLpStakingService();
+  if (lpStaking) {
+    const lp = lpStaking;
+    let lpBusy = false;
+    const lpTick = async () => {
+      if (lpBusy) return;
+      lpBusy = true;
+      try {
+        const r = await withLpEpochLock(() => lp.runEpochIfDue());
+        if (r?.ran) {
+          console.log(
+            `[lp] epoch ${r.epochId}: emission=${r.emissionBase} forfeited=${r.forfeitedBase} stakers=${r.stakers}${r.reason ? ` (${r.reason})` : ''}`,
+          );
+        }
+      } catch (err) {
+        console.error('lp staking epoch failed:', err);
+      } finally {
+        lpBusy = false;
+      }
+    };
+    void lpTick();
+    setInterval(() => void lpTick(), LP_EPOCH_TICK_MS).unref();
+    console.log(`lp staking enabled (pool ${lpStaking.pool()})`);
+  }
+  // LP fee-share layer (flag-gated OFF by default, same posture as above):
+  // the distributor pays vested accruals from the LP distribution vault; the
+  // fee keeper swaps LP fee-vault USDC to $WOC and funds that vault. Both are
+  // single-flighted in-process AND cross-process (advisory locks).
+  lpDistributor = buildLpDistributor();
+  if (lpDistributor) {
+    const distributor = lpDistributor;
+    let payoutBusy = false;
+    const payoutTick = async () => {
+      if (payoutBusy) return;
+      payoutBusy = true;
+      try {
+        const r = await withLpDistributorLock(() => distributor.runCycle());
+        if (r && (r.paid > 0 || r.recovered > 0)) {
+          console.log(
+            `[lp] payouts: paid=${r.paid} (${r.paidBase} base) recovered=${r.recovered} skipped=${r.skipped}`,
+          );
+        }
+      } catch (err) {
+        console.error('lp payout cycle failed:', err);
+      } finally {
+        payoutBusy = false;
+      }
+    };
+    void payoutTick();
+    setInterval(() => void payoutTick(), LP_PAYOUT_TICK_MS).unref();
+    console.log('lp fee-share distributor enabled');
+
+    const lpFeeKeeper = buildLpFeeKeeper();
+    if (lpFeeKeeper) {
+      let lpFeeBusy = false;
+      const lpFeeTick = async () => {
+        if (lpFeeBusy) return;
+        lpFeeBusy = true;
+        try {
+          await withLpFeeKeeperLock(() => lpFeeKeeper.runCycle());
+        } catch (err) {
+          console.error('lp fee keeper cycle failed:', err);
+        } finally {
+          lpFeeBusy = false;
+        }
+      };
+      void lpFeeTick();
+      setInterval(() => void lpFeeTick(), LP_FEE_KEEPER_TICK_MS).unref();
+      console.log('lp fee keeper enabled');
+    }
+  }
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
     .then((count) => recordSitePresenceSample(count))
@@ -1827,6 +2011,36 @@ async function main(): Promise<void> {
   };
   warmLeaderboards();
   setInterval(warmLeaderboards, LEADERBOARD_TTL_MS).unref();
+
+  // Buyback keeper: drain the marketplace USDC vault on a cadence — swap to $WOC,
+  // then BURN it (deflationary) or TOP UP the #480 reward pool (recorded as a
+  // verified buyback inflow on the flow ledger). runCycle recovers any in-flight
+  // batch first, so the boot call resolves a crash mid-settle before new work.
+  // No-op unless configured (BUYBACK_VAULT + its signing secret; top_up also needs
+  // REWARD_POOL_VAULT + BUYBACK_SEASON_ID).
+  const payoutKeeper = buildPayoutKeeper();
+  if (payoutKeeper) {
+    // Two layers of mutual exclusion so the vault is never swapped twice at once:
+    // (1) keeperBusy — in-process single-flight, so a slow cycle can't overlap its
+    //     own next interval tick; (2) withPayoutKeeperLock — a cross-process
+    //     Postgres advisory lock, so sibling realm processes sharing this vault +
+    //     DB don't each run a cycle. Either layer alone leaves a double-swap window.
+    let keeperBusy = false;
+    const tick = async () => {
+      if (keeperBusy) return;
+      keeperBusy = true;
+      try {
+        await withPayoutKeeperLock(() => payoutKeeper.runCycle());
+      } catch (err) {
+        console.error('buyback keeper cycle failed:', err);
+      } finally {
+        keeperBusy = false;
+      }
+    };
+    void tick();
+    setInterval(() => void tick(), PAYOUT_KEEPER_TICK_MS).unref();
+    console.log('buyback keeper enabled');
+  }
   console.log('database ready');
 
   const server = http.createServer((req, res) => {
@@ -1847,7 +2061,43 @@ async function main(): Promise<void> {
     if (url.startsWith('/internal/')) {
       void (async () => {
         if (await handleDailyRewardInternalApi(req, res)) return;
-        await handleInternalApi(req, res, game);
+        await handleInternalApi(
+          req,
+          res,
+          game,
+          { openSeason, closeSeason },
+          lpStaking || lpDistributor
+            ? {
+                runEpoch: lpStaking
+                  ? async () => {
+                      const r = await withLpEpochLock(() => lpStaking!.runEpochIfDue());
+                      if (!r) return null;
+                      // bigint fields serialized as strings for the JSON response
+                      return {
+                        ran: r.ran,
+                        reason: r.reason ?? null,
+                        epochId: r.epochId?.toString() ?? null,
+                        emissionBase: r.emissionBase?.toString() ?? null,
+                        forfeitedBase: r.forfeitedBase?.toString() ?? null,
+                        stakers: r.stakers ?? null,
+                      };
+                    }
+                  : undefined,
+                runPayout: lpDistributor
+                  ? async () => {
+                      const r = await withLpDistributorLock(() => lpDistributor!.runCycle());
+                      if (!r) return null;
+                      return {
+                        recovered: r.recovered,
+                        paid: r.paid,
+                        paidBase: r.paidBase.toString(),
+                        skipped: r.skipped,
+                      };
+                    }
+                  : undefined,
+              }
+            : undefined,
+        );
       })();
     } else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);

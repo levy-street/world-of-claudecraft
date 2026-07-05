@@ -887,6 +887,32 @@ export const ja_JP: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "wocSeason": {
+      "menu": "$WOCシーズン",
+      "title": "$WOC報酬シーズン",
+      "subtitle": "トレジャリー資金による上位プレイヤーへの支払い",
+      "close": "閉じる",
+      "none": "現在アクティブな報酬シーズンはありません。",
+      "noneHint": "アリーナのレーキと買い戻しがプールに資金を供給し始めるとシーズンが開始されます。",
+      "statusActive": "アクティブ",
+      "statusEnded": "終了",
+      "endsIn": "Ends in",
+      "endsInValue": "{days}d {hours}h {minutes}m",
+      "ended": "このシーズンは終了しました。",
+      "openEnded": "期限なし",
+      "poolLabel": "利用可能な報酬プール",
+      "wocUnit": "$WOC",
+      "emittedLabel": "これまでにプールの{pct}%を支払い済み",
+      "sinkLabel": "資金済み",
+      "emissionLabel": "Paid out",
+      "invariant": "支払いがシーズンの収入を超えることはありません。買い > 売り、オンチェーンで強制されます。",
+      "standingsTitle": "予想上位獲得者",
+      "colRank": "#",
+      "colPlayer": "プレイヤー",
+      "colRating": "レーティング",
+      "colReward": "報酬($WOC)",
+      "projectedNote": "現在のプールとアリーナランキングからの予測。最終支払いはシーズン終了時に確定します。"
+    },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",
       "familyDemon": "デーモン",
@@ -2739,6 +2765,29 @@ export const ja_JP: EnTranslations = {
       "sovereign": {
         "name": "君主",
         "flavor": "レルムが膝をつきます: 供給量のすべて。"
+      }
+    },
+    "guardianTierTitle": "{tier} 流動性ガーディアン",
+    "guardianTiers": {
+      "wader": {
+        "name": "渚歩き",
+        "title": "浅瀬の渚歩き"
+      },
+      "tidewatcher": {
+        "name": "潮見守",
+        "title": "潮の見張り番"
+      },
+      "currentkeeper": {
+        "name": "海流の番人",
+        "title": "海流の守り手"
+      },
+      "stormwarden": {
+        "name": "嵐の守人",
+        "title": "嵐の監視者"
+      },
+      "abyssguard": {
+        "name": "深淵の衛士",
+        "title": "深淵の守護兵"
       }
     }
   },

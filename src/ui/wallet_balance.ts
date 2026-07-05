@@ -11,6 +11,7 @@ let enabled = false;
 let balance: number | null = null;
 let verified = false;
 let displayAvailable = false;
+let guardianTier = 0;
 let listener: (() => void) | null = null;
 
 /** Whether the wallet feature is enabled in this client build. */
@@ -36,6 +37,18 @@ export function verifiedWocBalance(): number | null {
 /** Whether any wallet is connected in this browser or linked to the account. */
 export function walletDisplayAvailable(): boolean {
   return displayAvailable;
+}
+
+/** The LINKED wallet's Liquidity Guardian tier (0 = none), server-verified. */
+export function verifiedGuardianTier(): number {
+  return guardianTier;
+}
+
+export function setGuardianTier(value: number): void {
+  const next = Number.isInteger(value) && value > 0 ? value : 0;
+  if (guardianTier === next) return;
+  guardianTier = next;
+  listener?.();
 }
 
 export function setWalletUiEnabled(value: boolean): void {

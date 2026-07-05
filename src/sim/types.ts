@@ -1681,6 +1681,12 @@ export interface Entity {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  // Liquidity Guardian flair (cosmetic): 0/undefined = none, 1-5 = Wader…Abyssguard.
+  // Set server-side from the player's woc_lp_vault LP-staking position (staked
+  // weight + tenure, see src/sim/guardian_tier.ts) and synced in identity fields
+  // like holderTier. The sim never reads it (no gameplay effect); it is a
+  // staking-gated honor badge only.
+  guardianTier?: number;
 }
 
 export interface NythraxisWardChannel {

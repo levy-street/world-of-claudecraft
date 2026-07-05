@@ -34,6 +34,8 @@ import {
 } from '../src/sim/types';
 import { type CommandName, isOverheadEmoteId } from '../src/world_api';
 import { recordOnlineSample } from './admin_db';
+import { buildArenaWagerService } from './arena_wager_boot';
+import type { ArenaWagerService } from './arena_wager_service';
 import { offensiveName } from './auth';
 import type {
   BotDetector,
@@ -79,6 +81,7 @@ import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { guardianInfoForPubkey } from './lp_guardian';
 import { trackReachedLevel5 } from './meta_capi';
 import {
   forceCharacterRename,
@@ -559,6 +562,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   }
   if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
   if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
+  if (e.guardianTier) out.gt = e.guardianTier; // Liquidity Guardian LP-staking flair (cosmetic)
   if (e.discordTier) out.dt = e.discordTier; // Discord status-tier flair (cosmetic)
   if (e.discordAvatar) out.dav = e.discordAvatar; // Discord PFP (linked indicator)
   if (e.discordName) out.dnm = e.discordName; // Discord handle / nickname (nameplate)
@@ -803,6 +807,10 @@ export class GameServer {
   // Throttle for the optional over-budget stutter log (PERF_TICK_LOG=1).
   private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
+  // #478 wagered arena. Null unless WOC_ARENA_WAGER_ENABLED is configured (see
+  // bootArenaWager). All escrow/coordinator logic lives in the service.
+  private arenaWager: ArenaWagerService | null = null;
+  private wagerPollInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.sim = new Sim({
@@ -1080,6 +1088,7 @@ export class GameServer {
             lap('tick');
             this.routeEvents(events);
             this.detectActivity(events);
+            if (this.arenaWager) this.handleWagerArenaEnds(events);
             lap('events');
             this.runAntibotTick();
             lap('antibot');
@@ -1119,6 +1128,13 @@ export class GameServer {
     this.holderTierInterval = setInterval(() => {
       void this.refreshAllHolderTiers();
     }, HOLDER_TIER_REFRESH_MS);
+    // Drive wager stake-timeouts off the 20 Hz loop (light: an in-memory scan, plus
+    // a blockhash fetch only when a pairing actually times out).
+    if (this.arenaWager) {
+      this.wagerPollInterval = setInterval(() => {
+        void this.arenaWager!.poll().catch((e) => console.error('[wager] poll failed:', e));
+      }, 2_000);
+    }
     // Reward in-game playtime: grant points to active online accounts off-loop.
     this.playtimeInterval = setInterval(() => {
       void this.grantPlaytimePoints();
@@ -1128,9 +1144,42 @@ export class GameServer {
     }, DAILY_REWARD_ACTIVITY_MS);
   }
 
+  // Construct the #478 wager service from env (no-op unless WOC_ARENA_WAGER_ENABLED),
+  // then recover any pot a previous crash left locked on-chain. Call after
+  // ensureSchema (the season + match store must be queryable) and before start().
+  async bootArenaWager(): Promise<void> {
+    this.arenaWager = await buildArenaWagerService(
+      (a, b) => this.sim.startWageredArena1v1(a, b),
+      (pid) => this.sim.meta(pid)?.arenaRating ?? 1500, // ARENA_BASE_RATING (sim.ts)
+      (pid, msg) => {
+        const s = this.clients.get(pid);
+        if (s) this.send(s, { t: 'wager', payload: msg });
+      },
+    );
+    if (!this.arenaWager) return;
+    const r = await this.arenaWager.recoverOnBoot();
+    console.log(
+      `[wager] arena wager enabled; boot recovery: ${r.refunded} refunded, ${r.reconciled} reconciled, ${r.staleCancelled} stale cancelled`,
+    );
+  }
+
+  // Bridge the sim's arenaEnd events into the wager coordinator so a finished
+  // wagered bout settles (or refunds a draw). onBoutEnd is idempotent, so the two
+  // per-player arenaEnd events for one match settle it exactly once.
+  private handleWagerArenaEnds(events: SimEvent[]): void {
+    for (const ev of events) {
+      if (ev.type !== 'arenaEnd' || ev.pid === undefined) continue;
+      const pid = ev.pid;
+      this.arenaWager!.onArenaEnd(pid, ev.won, ev.draw).catch((e) =>
+        console.error('[wager] settle failed for pid', pid, e),
+      );
+    }
+  }
+
   stop(): void {
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
+    if (this.wagerPollInterval) clearInterval(this.wagerPollInterval);
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
     if (this.dailyRewardActivityInterval) clearInterval(this.dailyRewardActivityInterval);
   }
@@ -1237,17 +1286,26 @@ export class GameServer {
   private async refreshHolderTier(session: ClientSession): Promise<void> {
     if (this.devTierPids.has(session.pid)) return; // dev override pinned this pid
     const wallet = await walletForAccount(session.accountId);
-    const { tier, balance } = wallet
-      ? await holderInfoForPubkey(wallet.pubkey)
-      : { tier: 0, balance: 0 };
+    // One wallet lookup drives BOTH cosmetic flairs: the $WOC holder tier (balance)
+    // and the Liquidity Guardian tier (LP staking position). Both are cached inside
+    // their readers and both fail closed to tier 0 when their feature is unconfigured.
+    const [{ tier, balance }, guardian] = await Promise.all([
+      wallet ? holderInfoForPubkey(wallet.pubkey) : Promise.resolve({ tier: 0, balance: 0 }),
+      wallet ? guardianInfoForPubkey(wallet.pubkey) : Promise.resolve({ tier: 0, stakedBase: 0n }),
+    ]);
     // The player may have left during the await; only apply if still the live
     // session for this pid.
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
-    if (e && ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance)) {
+    if (!e) return;
+    if ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance) {
       e.holderTier = tier; // identity diff re-broadcasts it to nearby players
       e.holderBalance = balance;
       console.log(`[woc] ${session.name} holder tier → ${tier} (${balance} $WOC)`);
+    }
+    if ((e.guardianTier ?? 0) !== guardian.tier) {
+      e.guardianTier = guardian.tier; // identity diff re-broadcasts the guardian flair
+      console.log(`[woc] ${session.name} guardian tier → ${guardian.tier}`);
     }
   }
 
@@ -1688,6 +1746,7 @@ export class GameServer {
     }
     void this.recordOnlineSnapshot();
     this.devTierPids.delete(session.pid);
+    this.arenaWager?.onLeave(session.pid);
     this.social.forget(session.characterId);
     // delete from clients first so friends see them as offline in the notice
     void this.social
@@ -2471,6 +2530,21 @@ export class GameServer {
       case 'buy':
         if (typeof msg.npc === 'number' && typeof msg.item === 'string')
           sim.buyItem(msg.npc, msg.item, pid);
+        break;
+      // #478 wagered arena (no-op unless the wager service is configured). The
+      // service validates every field + gates on wallet/holder/season.
+      case 'wager_queue':
+        this.arenaWager
+          ?.handleQueue(session, msg.stake)
+          .catch((e) => console.error('[wager] queue failed:', e));
+        break;
+      case 'wager_staked':
+        this.arenaWager
+          ?.handleStaked(session, msg.matchId, msg.signature)
+          .catch((e) => console.error('[wager] stake report failed:', e));
+        break;
+      case 'wager_cancel':
+        this.arenaWager?.handleCancel(session);
         break;
       case 'sell':
         if (typeof msg.item === 'string') {

@@ -510,6 +510,8 @@ export interface EntityView {
   comboSig: string; // cheap-diff for the combo pip row
   tierEl: HTMLImageElement; // $WOC holder-tier flair badge (other players)
   tierValue: number; // last-applied holderTier, to diff cheaply
+  guardianEl: HTMLImageElement; // Liquidity Guardian staking flair badge (other players)
+  guardianValue: number; // last-applied guardianTier, to diff cheaply
   devTierEl: HTMLImageElement; // developer-badge flair badge (other players)
   devTierValue: number; // last-applied devTier, to diff cheaply
   discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
@@ -3347,6 +3349,11 @@ export class Renderer {
     tierEl.className = 'np-tier';
     tierEl.alt = '';
     tierEl.style.display = 'none';
+    // Liquidity Guardian staking flair (shield), beside the holder disc
+    const guardianEl = document.createElement('img');
+    guardianEl.className = 'np-tier np-guardian';
+    guardianEl.alt = '';
+    guardianEl.style.display = 'none';
     // developer-badge flair, shown inline before the name for other players
     const devTierEl = document.createElement('img');
     devTierEl.className = 'np-dev-tier';
@@ -3388,6 +3395,7 @@ export class Renderer {
       raidMark,
       comboRow,
       marker,
+      guardianEl,
       tierEl,
       devTierEl,
       discordEl,
@@ -3449,6 +3457,7 @@ export class Renderer {
       castBar,
       castFill,
       castLabel,
+      guardianEl,
       tierEl,
       devTierEl,
       discordEl,
@@ -3463,6 +3472,7 @@ export class Renderer {
       nameplateHpWidth: '',
       comboSig: '',
       tierValue: 0,
+      guardianValue: 0,
       devTierValue: 0,
       discordAvatarSig: '',
       objectCasters,

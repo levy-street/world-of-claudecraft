@@ -31,6 +31,11 @@ import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_t
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import {
+  guardianTierBadgeDataUrl,
+  guardianTierByIndex,
+  guardianTierDisplayName,
+} from './guardian_flair';
 import { buildGuildLeaderboardView, type GuildLeaderboardRow } from './guild_leaderboard_view';
 import { formatNumber, t } from './i18n';
 import {
@@ -496,6 +501,13 @@ export class LeaderboardWindow {
     );
   }
 
+  private guardianHtml(r: LeaderboardRow): string {
+    const tier = guardianTierByIndex(r.guardianTier);
+    if (!tier) return '';
+    const title = t('wallet.guardianTierTitle', { tier: guardianTierDisplayName(tier) });
+    return `<img class="lb-guardian" src="${guardianTierBadgeDataUrl(tier, 16)}" alt="" title="${esc(title)}"> `;
+  }
+
   private rowHtml(r: LeaderboardRow): string {
     // &starf; renders the prestige star without a literal symbol glyph in source.
     const star =
@@ -506,7 +518,7 @@ export class LeaderboardWindow {
     const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
     return (
       `<div class="lb-row${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
-      `<span class="lb-name"${title}>${star}${esc(r.name)}${you}</span>` +
+      `<span class="lb-name"${title}>${star}${this.guardianHtml(r)}${esc(r.name)}${you}</span>` +
       `<span class="lb-lvl">${r.level}</span><span class="lb-vlvl">${r.virtualLevel}</span>` +
       `<span class="lb-xp">${formatXp(r.lifetimeXp)}</span></div>`
     );
