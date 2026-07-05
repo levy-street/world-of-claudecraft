@@ -35,6 +35,15 @@ const RIDGE_SIGMA = 18; // gaussian width of the wall
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
+export const MIREFEN_IMPACT_CRATER = {
+  x: 149.5,
+  z: 295,
+  bowlRadius: 20,
+  radius: 30,
+  depth: 2.6,
+  rimHeight: 0.95,
+} as const;
+
 function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
@@ -42,6 +51,26 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
+}
+
+export function mirefenImpactCraterOffset(x: number, z: number): number {
+  const dx = x - MIREFEN_IMPACT_CRATER.x;
+  const dz = z - MIREFEN_IMPACT_CRATER.z;
+  const d = Math.sqrt(dx * dx + dz * dz);
+  if (d >= MIREFEN_IMPACT_CRATER.radius) return 0;
+
+  const bowlT = d / MIREFEN_IMPACT_CRATER.bowlRadius;
+  const bowl = d < MIREFEN_IMPACT_CRATER.bowlRadius
+    ? -MIREFEN_IMPACT_CRATER.depth * (1 - smoothstep(0, 1, bowlT))
+    : 0;
+
+  const rimStart = MIREFEN_IMPACT_CRATER.bowlRadius * 0.82;
+  if (d <= rimStart) return bowl;
+  const rimT = (d - rimStart) / (MIREFEN_IMPACT_CRATER.radius - rimStart);
+  const rim = MIREFEN_IMPACT_CRATER.rimHeight
+    * smoothstep(0, 0.35, rimT)
+    * (1 - smoothstep(0.72, 1, rimT));
+  return bowl + rim;
 }
 
 // Blended biome shape at a given z. Zone interiors keep their exact shape;
@@ -126,6 +155,7 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
   const rim = Math.max(rimX, rimS, rimN);
   h += rim * 40;
+  h += mirefenImpactCraterOffset(x, z);
   return h;
 }
 
@@ -160,6 +190,15 @@ export interface Decoration {
   biome: BiomeId;
 }
 
+const DECORATION_EXCLUSION_RADIUS = 1.2;
+const DECORATION_EXCLUSIONS = [
+  { x: 2.456450840458274, z: 211.33819991815835 },
+];
+
+function isExcludedDecoration(x: number, z: number): boolean {
+  return DECORATION_EXCLUSIONS.some((p) => Math.hypot(x - p.x, z - p.z) < DECORATION_EXCLUSION_RADIUS);
+}
+
 export function zoneBiomeAt(z: number): BiomeId {
   for (const zone of ZONES) {
     if (z < zone.zMax) return zone.biome;
@@ -190,6 +229,7 @@ export function generateDecorations(seed: number): Decoration[] {
       const ox = (hash2(Math.round(gx), Math.round(gz), seed + 57) - 0.5) * step;
       const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * step;
       const x = gx + ox, z = gz + oz;
+      if (isExcludedDecoration(x, z)) continue;
       let inHub = false;
       for (const zone of ZONES) {
         const dx = x - zone.hub.x, dz = z - zone.hub.z;

@@ -124,19 +124,38 @@ For off-box safety, sync the directory to S3 occasionally:
   guild names remain globally unique across realms.
 - **Bot gate (Cloudflare Turnstile)**: login and registration can be gated by
   Turnstile so headless clients (the aiohttp/websockets bot wave) can't create or
-  sign into accounts. It is **off until configured** — both halves must be set or
+  sign into accounts. It is **off until configured**: both halves must be set or
   the gate silently does nothing:
-  - `TURNSTILE_SECRET` (server runtime, secret) — enables server-side verification.
-  - `VITE_TURNSTILE_SITEKEY` (public) — renders the widget. This is read by the
+  - `TURNSTILE_SECRET` (server runtime, secret): enables server-side verification.
+  - `VITE_TURNSTILE_SITEKEY` (public): renders the widget. This is read by the
     **client and inlined at `npm run build` time**, so it must be present when the
     image/bundle is built, not just at runtime. Use a separate Turnstile widget per
     environment (dev vs prod). If the origin's nginx (in the `ansible-scripts` repo)
     sets a Content-Security-Policy, it must allow `script-src`/`frame-src
     https://challenges.cloudflare.com` or the widget won't load.
-- **Never** set `ALLOW_DEV_COMMANDS=1` in production — it enables the
+- **Wallet linking**: the wallet UI uses injected Solana browser wallets and no
+  third-party wallet-connect project id. $WOC balance reads are server-side
+  only: set `SOLANA_RPC_URL` to a production Solana RPC endpoint and leave it
+  unprefixed so API keys are not bundled into the client. `WOC_MINT` defaults to
+  the canonical token mint and should only be overridden if that mint changes.
+  Set `PUBLIC_ORIGIN` in single-realm production so shared player-card pages
+  emit stable absolute Open Graph URLs.
+- **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
   level/teleport cheats used by the test bots.
-- Health check: `curl -s localhost:8787/api/status` on the box returns
-  `{"ok":true,"players_online":N,...}`.
+- **Bot detector (implementation)**: the open-source tree ships with a no-op stub
+  (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
+  nothing and never act. To bundle the real behavioral detector, clone the private
+  `bot_detector` repo into `private/bot_detector` **before** `npm run build` (or
+  `npm run build:server`). The Docker build copies `private/` into the build stage,
+  so the same rule applies to deploys that run `docker compose build`: the private
+  checkout must exist before the image is built. That directory is not part of the
+  public checkout. At build time, confirm which implementation was picked:
+  `[build:server] bot detector: stub (no-op)` vs `… bot detector: private`.
+- **Anti-bot runtime knobs**: `MAX_WS_PER_IP_HARD` (default `20`) caps simultaneous
+  WebSocket connections per source IP; extra connections are refused at the
+  handshake. `ANTIBOT_ENFORCE=1` lets the detector act on its findings (e.g. kick);
+  when unset, detection is observe-only. With the no-op stub, enforcement has no
+  effect regardless of this flag.
 - Logs: `sudo docker compose -f /opt/eastbrook/docker-compose.yml logs -f game`.
 - If the instance ever feels tight, stop → change instance type →
   start. Everything lives in Docker plus one EBS volume, so nothing

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { Sim, eloDelta } from '../src/sim/sim';
-import { groundHeight } from '../src/sim/world';
 import { isArenaPos } from '../src/sim/data';
+import { eloDelta, Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -10,14 +10,18 @@ function makeWorld() {
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
   const e = sim.entities.get(pid)!;
-  e.pos.x = x; e.pos.z = z;
+  e.pos.x = x;
+  e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
   (sim as any).rebucket(e);
 }
 
 // Queue two players and advance one tick so matchmaking seats them.
-function queueDuo(aClass: PlayerClass = 'warrior', bClass: PlayerClass = 'mage'): { sim: Sim; a: number; b: number } {
+function queueDuo(
+  aClass: PlayerClass = 'warrior',
+  bClass: PlayerClass = 'mage',
+): { sim: Sim; a: number; b: number } {
   const sim = makeWorld();
   const a = sim.addPlayer(aClass, 'Aleph');
   const b = sim.addPlayer(bClass, 'Bet');
@@ -38,8 +42,11 @@ function face(sim: Sim, pid: number, targetId: number) {
 function finishCast(sim: Sim, pid: number) {
   for (let i = 0; i < 20 * 4; i++) {
     sim.tick();
-    if (!sim.entities.get(pid)!.castingAbility) return;
+    if (!sim.entities.get(pid)!.castingAbility) break;
   }
+  // A spell's effects land when its projectile reaches the target (projectile_travel),
+  // a few ticks after the cast bar empties: tick until the in-flight bolt resolves.
+  for (let i = 0; i < 20 * 3 && (sim as any).pendingProjectiles.length > 0; i++) sim.tick();
 }
 
 // Run the countdown out so the bout goes live.
@@ -237,8 +244,8 @@ describe('arena: a full bout', () => {
     expect(sim.arenaMatchFor(b)).toBe(null);
     expect(isArenaPos(ea.pos.x)).toBe(false);
     expect(isArenaPos(eb.pos.x)).toBe(false);
-    expect(Math.hypot(ea.pos.x - 0, ea.pos.z - (-40))).toBeLessThan(3);
-    expect(Math.hypot(eb.pos.x - 6, eb.pos.z - (-40))).toBeLessThan(3);
+    expect(Math.hypot(ea.pos.x - 0, ea.pos.z - -40)).toBeLessThan(3);
+    expect(Math.hypot(eb.pos.x - 6, eb.pos.z - -40)).toBeLessThan(3);
     expect(ea.hp).toBe(ea.maxHp);
     expect(eb.hp).toBe(eb.maxHp);
     expect(eb.dead).toBe(false);
@@ -332,7 +339,10 @@ describe('arena: forfeit + persistence', () => {
   });
 });
 
-function queue2v2(classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest']): { sim: Sim; pids: number[] } {
+function queue2v2(classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest']): {
+  sim: Sim;
+  pids: number[];
+} {
   const sim = makeWorld();
   const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
   const pids = classes.map((cls, i) => sim.addPlayer(cls, names[i]));
@@ -415,7 +425,9 @@ describe('arena: 2v2 queue + matchmaking', () => {
     sim.arenaQueueJoin(member, '2v2');
     expect(sim.arenaQueue2v2.length).toBe(before);
     sim.arenaQueueJoin(leader, '2v2');
-    expect(sim.arenaQueue2v2.some((u) => u.pids.includes(leader) && u.pids.includes(member))).toBe(true);
+    expect(sim.arenaQueue2v2.some((u) => u.pids.includes(leader) && u.pids.includes(member))).toBe(
+      true,
+    );
   });
 
   it('leaving queue removes the whole premade unit', () => {
@@ -490,7 +502,15 @@ describe('arena: 2v2 combat', () => {
     one.sim.meta(one.a)!.arena2v2Rating = 1666;
     one.sim.meta(one.a)!.arena2v2Wins = 4;
     one.sim.meta(one.a)!.arena2v2Losses = 3;
-    (one.sim as any).dealDamage(one.sim.entities.get(one.a)!, one.sim.entities.get(one.b)!, 99999, false, 'physical', null, 'hit');
+    (one.sim as any).dealDamage(
+      one.sim.entities.get(one.a)!,
+      one.sim.entities.get(one.b)!,
+      99999,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
     one.sim.tick();
     expect(one.sim.meta(one.a)!.arenaWins).toBe(1);
     expect(one.sim.meta(one.a)!.arena2v2Rating).toBe(1666);
@@ -512,7 +532,15 @@ describe('arena: 2v2 combat', () => {
       losses: two.sim.meta(pid)!.arenaLosses,
     }));
     for (const pid of [b1, b2]) {
-      (two.sim as any).dealDamage(two.sim.entities.get(a1)!, two.sim.entities.get(pid)!, 99999, false, 'physical', null, 'hit');
+      (two.sim as any).dealDamage(
+        two.sim.entities.get(a1)!,
+        two.sim.entities.get(pid)!,
+        99999,
+        false,
+        'physical',
+        null,
+        'hit',
+      );
       two.sim.tick();
     }
     expect(two.sim.meta(a1)!.arena2v2Wins).toBe(1);
@@ -599,7 +627,12 @@ describe('arena: crowd control diminishing returns', () => {
 });
 
 describe('arena: class ability target filters', () => {
-  const aoeCases: Array<{ cls: PlayerClass; ability: string; level: number; setup?: (sim: Sim, pid: number) => void }> = [
+  const aoeCases: Array<{
+    cls: PlayerClass;
+    ability: string;
+    level: number;
+    setup?: (sim: Sim, pid: number) => void;
+  }> = [
     { cls: 'warrior', ability: 'thunder_clap', level: 20 },
     { cls: 'mage', ability: 'arcane_explosion', level: 20 },
     { cls: 'paladin', ability: 'consecration', level: 20 },
@@ -616,7 +649,12 @@ describe('arena: class ability target filters', () => {
     },
   ];
 
-  it.each(aoeCases)('lets $cls $ability hit active arena opponents', ({ cls, ability, level, setup }) => {
+  it.each(aoeCases)('lets $cls $ability hit active arena opponents', ({
+    cls,
+    ability,
+    level,
+    setup,
+  }) => {
     const { sim, a, b } = queueDuo(cls, 'warrior');
     startBout(sim);
     const caster = sim.entities.get(a)!;

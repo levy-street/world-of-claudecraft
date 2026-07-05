@@ -763,7 +763,7 @@ async function runChatAndCombat(page, scene, locale, viewport) {
     sim.targetEntity(wolf.id);
     sim.castAbility('fire_blast');
   }, scene.wolfId);
-  await page.evaluate(() => document.querySelector('[data-log-tab="combat"]')?.click());
+  await page.evaluate(() => document.querySelector('[data-tab="combat"]')?.click());
   await page.waitForFunction(() => document.querySelectorAll('#combatlog div').length > 0, { timeout: WAIT_TIMEOUT });
   await assertAuditBasics(page, `chat and combat ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
 }

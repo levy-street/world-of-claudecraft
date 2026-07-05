@@ -8,8 +8,8 @@ vi.hoisted(() => {
 });
 
 import { pool, getAccountsCount } from "../server/db";
-import { t, setLanguage, getLanguage } from "../src/ui/i18n";
-import { Api } from "../src/net/online";
+import { t, setLanguage, getLanguage, ensureLocaleLoaded } from "../src/ui/i18n";
+import { Api, apiUrl } from "../src/net/online";
 
 describe("i18n Translation Foundation", () => {
   beforeEach(() => {
@@ -36,7 +36,10 @@ describe("i18n Translation Foundation", () => {
     expect(t("game.talents.comingSoonBody")).toContain("does not have talent trees yet");
   });
 
-  it("updates language and retrieves Spanish translations", () => {
+  it("updates language and retrieves Spanish translations", async () => {
+    // Lazy locale flip: await the es chunk so the synchronous t() reads below resolve the
+    // Spanish table (the bootstrap/picker await the same way before rendering).
+    await ensureLocaleLoaded("es");
     setLanguage("es");
     expect(getLanguage()).toBe("es");
     expect(t("nav.home")).toBe("Inicio");
@@ -54,7 +57,7 @@ describe("i18n Translation Foundation", () => {
     expect(t("download.title")).toBe("Descargar Lanzador de Escritorio");
   });
 
-  it("supports and retrieves translations for all newly added locales", () => {
+  it("supports and retrieves translations for all newly added locales", async () => {
     const additionalLanguages = [
       { code: "es_ES", play: "Jugar" },
       { code: "fr_FR", play: "Jouer" },
@@ -71,6 +74,9 @@ describe("i18n Translation Foundation", () => {
     ] as const;
 
     for (const lang of additionalLanguages) {
+      // Lazy locale flip: await each locale chunk before the synchronous t() read so it
+      // resolves the now-resident locale table instead of the English fallback.
+      await ensureLocaleLoaded(lang.code);
       setLanguage(lang.code as any);
       expect(getLanguage()).toBe(lang.code);
       expect(t("nav.play")).toBe(lang.play);
@@ -181,5 +187,16 @@ describe("Api.projectStats", () => {
 
     const api = new Api();
     await expect(api.projectStats()).rejects.toThrow("Internal Server Error");
+  });
+});
+
+describe("Api URL helpers", () => {
+  it("keeps browser builds same-origin when no base is configured", () => {
+    expect(apiUrl("/api/status")).toBe("/api/status");
+  });
+
+  it("resolves native or realm calls against an absolute origin", () => {
+    expect(apiUrl("/api/status", "https://worldofclaudecraft.com/")).toBe("https://worldofclaudecraft.com/api/status");
+    expect(apiUrl("https://realm.example.com/api/status", "https://worldofclaudecraft.com")).toBe("https://realm.example.com/api/status");
   });
 });

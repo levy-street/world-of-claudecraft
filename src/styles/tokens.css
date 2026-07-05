@@ -1,0 +1,198 @@
+/* tokens.css: the :root design tokens (palette, typography, spacing, scrollbar,
+   cursors, viewport). Relocated verbatim from the inline <style> of index.html
+   under @layer tokens; every name and resolved value is preserved. The one change
+   is the cursor url()s, rewritten from page-relative './ui/cursors/...' to
+   root-absolute '/ui/cursors/...' so they resolve from a bundled stylesheet exactly
+   as they did inline (a relative url() in a bundled CSS file resolves against
+   src/styles/, not the page root).
+
+   The runtime-written custom properties stay here as :root defaults so the runtime
+   overrides still cascade on top: src/ui/theme.ts writes the --color-* accents and
+   the viewport resizer writes --app-vw / --app-vh, both onto documentElement inline
+   style, which always wins over this stylesheet rule. --range-fill is NOT a token
+   here: it is the slider track's inline var(--range-fill, 0%) fallback in base.css,
+   written per element by the HUD, never on :root. */
+@layer tokens {
+  :root {
+    --gold: #ffd100;
+    --gold-dim: #c8a838;
+    --border: #6f5a2a;
+    /* --panel-base is the single themeable frame colour; --panel-bg derives the
+       shipped gradient from it (overwritten wholesale by the theme system). */
+    --panel-base: #15151f;
+    --panel-bg: linear-gradient(170deg, #15151ff2 0%, #0b0b12f2 60%, #08080df2 100%);
+    /* Typography, Cinzel (heraldic display/headings), Alegreya Sans (UI + body),
+       Alegreya (serif flavour prose). Legacy token names alias the canonical set
+       so every existing usage resolves to the new system. */
+    --font-display: "Cinzel", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-ui: "Alegreya Sans", "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
+    --font-serif: "Alegreya", "Palatino Linotype", Palatino, Georgia, serif;
+    --title-font: var(--font-display);
+    --font-heading: var(--font-display);
+    --ui-font: var(--font-ui);
+    --font-sans: var(--font-ui);
+    --body-font: var(--font-ui);
+
+    /* --gold is the single source of truth for the primary accent */
+    --color-primary: var(--gold);
+    --color-primary-dim: var(--gold-dim);
+    --color-primary-glow: rgba(255, 209, 0, 0.2);
+    --color-primary-glow-heavy: rgba(255, 209, 0, 0.4);
+
+    /* resource bars / unit-frame states / auras (previously hardcoded across CSS + JS) */
+    --color-hp: #1eb838;
+    --color-mana: #2b7bd4;
+    --color-rage: #c0392b;
+    --color-energy: #e4c531;
+    --color-hostile: #ff6b5e;
+    --color-friendly: #9fdc7f;
+    --color-buff: #3a6ea8;
+    --color-debuff: #c0392b;
+
+    --color-bg-dark: #08080d;
+    --color-bg-input: #0a0a0f;
+    --color-border-default: #4e3d1d;
+    --color-border-focus: #c8a838;
+    --color-border-invalid: #ff8f85;
+    --color-border-valid: #48e060;
+
+    --color-text-light: #f0ebd8;
+    --color-text-muted: #998d6a;
+    /* Accent/gold for text on panel surfaces, and overlay text that floats
+       over the 3D world. The theme system (src/ui/theme.ts) recomputes
+       --color-accent/--color-gold per preset so they stay AA-readable on a
+       light panel, and keeps --color-text-overlay light with a text-shadow. */
+    --color-gold: var(--gold);
+    --color-accent: var(--gold);
+    --color-text-overlay: #f4eede;
+    --panel-edge: #08080d;
+    --color-text-error: #ff8f85;
+    --color-text-success: #7fdc4f;
+    /* Item-name color for an item with no quality (bags_window.ts uses this token
+       as the fallback when QUALITY_COLOR has no entry, so the painter carries no
+       raw hex). Exact pre-existing value. */
+    --color-quality-default: #fff;
+
+    /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
+       no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.
+       Exact pre-existing values. */
+    --color-slot-empty-text: #666;
+    --color-slot-empty-border: #444;
+
+    /* delve minimap / world-map schematic (resolved by delve_map_painter.ts via
+       getComputedStyle: a 2D canvas context cannot read a CSS var directly) */
+    --color-delve-room: #0e0c0a;
+    --color-delve-mob: #e74c3c;
+    --color-delve-mob-aggro: #ff8800;
+    --color-delve-party-dead: #9a9a9a;
+    --color-delve-label: #ffe9a0;
+    --color-delve-outline: #000;
+
+    /* overworld world-map window (resolved by map_window_painter.ts via
+       getComputedStyle: a 2D canvas context cannot read a CSS var directly).
+       Exact pre-existing values from the inline updateMapWindow/drawMapDetail. */
+    --color-map-label: #ffe9a0;
+    --color-map-outline: #000;
+    --color-map-portal-dot: #c084ff;
+    --color-map-portal-label: #e0c0ff;
+    --color-map-npc-quest: #ffd100;
+    --color-map-player: #fff;
+    --color-map-ally-friend: #4ade80;
+    --color-map-ally-guild: #60a5fa;
+    --color-map-rock: #8c8b86;
+    --color-map-tree: #2f6b34;
+    --color-map-oak: #4f8c3a;
+    --color-map-building-outline: #1a140a;
+    --color-map-building-chapel: #9b9080;
+    --color-map-building-inn: #8a6233;
+    --color-map-building-house: #7a5630;
+    --color-map-well: #5a7fa8;
+    --color-map-stall: #b07a3a;
+    --color-map-tent: #9a8a5a;
+    --color-map-mine: #6a5a4a;
+    --color-map-graveyard: #8a929c;
+    --color-map-mudhut: #7a6a4a;
+    --color-map-campfire: #ff9a3c;
+
+    /* overworld minimap markers (resolved by minimap_painter.ts via getComputedStyle:
+       a 2D canvas context cannot read a CSS var directly). Exact pre-existing values
+       from the inline updateMinimap overworld branch. */
+    --color-minimap-ally-friend: #4ade80;
+    --color-minimap-ally-guild: #60a5fa;
+    --color-minimap-npc-quest: #ffd100;
+    --color-minimap-portal: #c084ff;
+    --color-minimap-object-loot: #ffe97a;
+    --color-minimap-mob-aggro: #ff8800;
+    --color-minimap-mob: #e74c3c;
+    --color-minimap-mob-loot: #ffd100;
+    --color-minimap-party-dead: #9a9a9a;
+    --color-minimap-party-pip: #ffffffcc;
+    --color-minimap-player: #fff;
+    --color-minimap-outline: #000;
+
+    /* Talents window: tree arrows + tooltip accents (talents_window.ts references
+       these via var() so the painter carries no raw hex). Exact pre-existing values. */
+    --color-talent-arrow: #f5c843;
+    --color-talent-arrow-dim: #5a4a22;
+    --color-talent-opt-dim: #aaa;
+    --color-talent-hint: #8aa;
+    --color-talent-req: #caa;
+    --color-talent-dormant: #e0635a;
+
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+
+    --radius-sm: 4px;
+    --radius-md: 8px;
+
+    --transition-speed: 0.25s;
+    --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Custom scrollbar tokens */
+    --scrollbar-thumb: #5c4722;
+    --scrollbar-track: rgba(10, 10, 15, 0.7);
+    --scrollbar-thumb-hover: #7c6233;
+    --scrollbar-border: #7c6233;
+    --app-vw: 100vw;
+    --app-vh: 100vh;
+    /* effects tier (wired by src/ui/ui_effects_applier.ts from the pure
+       src/game/ui_effects_profile.ts resolver): data-fx-level (low | medium | high
+       | ultra) is stamped on the document root, and these three tokens are written
+       inline from the resolved profile. These :root values are the pre-boot / no-JS
+       fallback (full Ultra behaviour, so calc/var reads below resolve to today's
+       look exactly); the applier overrides them on every settings / reduced-motion
+       change. The effect buckets CONSUME them: --fx-shadow scales decorative glow
+       blur (0 at low), --fx-ambient-anim is the ambient-loop animation-play-state,
+       --motion-scale multiplies ambient durations (near-zero 0.001, never 0, under
+       reduced-motion so animationend still fires). The data-fx-level ATTRIBUTE
+       additionally drops glass whole-rule at the low tier (below). */
+    --fx-shadow: 1;
+    --fx-ambient-anim: running;
+    --motion-scale: 1;
+    /* Shared with src/game/cursors.ts, keep hotspots in sync.
+       --cursor-arrow = default; --cursor-point = interactive/hover (gauntlet finger). */
+    --cursor-arrow: url("/ui/cursors/arrow.png") 7 2, default;
+    --cursor-point: url("/ui/cursors/gauntlet.png") 6 4, pointer;
+    --cursor-grab: url("/ui/cursors/hand-grab.png") 11 16, grabbing;
+    /* Back-compat aliases */
+    --cursor-hand: var(--cursor-arrow);
+    --cursor-sword: var(--cursor-point);
+    --cursor-shield: var(--cursor-point);
+  }
+
+  /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal
+     mirroring the engine-tier body.fx-reduced / body.fx-minimal cut (the
+     backdrop-filter rules ship a -webkit- twin + a solid translucent fallback, so
+     dropping the blur leaves a clean opaque panel). It is !important so it crosses
+     cascade layers and wins over the opt-in frosted panels; a low-tier player then
+     computes backdrop-filter:none, so the per-pixel composite over the WebGL canvas
+     never runs. Ultra/high/medium are untouched (data-fx-level only matches "low"). */
+  :root[data-fx-level="low"] *,
+  :root[data-fx-level="low"] *::before,
+  :root[data-fx-level="low"] *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

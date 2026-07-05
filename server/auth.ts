@@ -114,8 +114,11 @@ export function validUsernameShape(u: unknown): u is string {
   return typeof u === 'string' && /^[A-Za-z0-9_]{3,24}$/.test(u);
 }
 
+export const MIN_PASSWORD_LENGTH = 6;
+export const MAX_PASSWORD_LENGTH = 128;
+
 export function validPassword(p: unknown): p is string {
-  return typeof p === 'string' && p.length >= 6 && p.length <= 128;
+  return typeof p === 'string' && p.length >= MIN_PASSWORD_LENGTH && p.length <= MAX_PASSWORD_LENGTH;
 }
 
 export function validCharName(n: unknown): n is string {

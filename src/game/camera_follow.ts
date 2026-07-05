@@ -20,6 +20,15 @@ export interface CameraFollowResult {
   lastInterpFacing: number;
 }
 
+export interface CameraFollowMoveInput {
+  forward: boolean;
+  back: boolean;
+  turnLeft: boolean;
+  turnRight: boolean;
+  strafeLeft: boolean;
+  strafeRight: boolean;
+}
+
 const SETTLE_RATE = 6;
 const MAX_SETTLE_STEP = 0.16;
 const CLICK_MOVE_SETTLE_RATE = 1.8;
@@ -37,6 +46,16 @@ const MAX_AUTO_YAW_SPEED = 3.6; // rad/sec; caps all non-manual camera follow mo
 // explicitly — otherwise it never takes the same smooth path right-mouse uses.
 export function cameraIsManual(mouselookActive: boolean, mouseCameraMode: boolean): boolean {
   return mouselookActive || mouseCameraMode;
+}
+
+export function cameraFollowShouldSettle(mi: CameraFollowMoveInput, clickMoving: boolean): boolean {
+  return clickMoving
+    || mi.forward
+    || mi.back
+    || mi.turnLeft
+    || mi.turnRight
+    || mi.strafeLeft
+    || mi.strafeRight;
 }
 
 export function wrapAngle(d: number): number {

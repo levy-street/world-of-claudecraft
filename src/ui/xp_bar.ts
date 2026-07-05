@@ -3,7 +3,7 @@
 // tested directly. All display strings route through i18n's t().
 
 import { MAX_LEVEL, virtualLevelProgress, xpForLevel } from '../sim/types';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 
 export interface XpBarInput {
   level: number;
@@ -22,10 +22,17 @@ export interface XpBarView {
   postCap: boolean; // true → distinct prestige/gold styling
 }
 
-// Thousands-separated integer (locale-independent grouping so snapshots are
-// stable across machines).
+// Locale-grouped non-negative integer XP count (e.g. en "1,000"). Routes
+// through formatNumber so the digit grouping/numerals follow the active locale.
 export function formatXp(n: number): string {
-  return Math.floor(Math.max(0, n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return formatNumber(Math.floor(Math.max(0, n)), { maximumFractionDigits: 0 });
+}
+
+// Locale-formatted whole percent. The fraction is floored to a whole percent
+// first (matching the classic truncate-don't-round behaviour, byte-identical in
+// en) and then formatted as a percent so the symbol/placement localizes.
+function formatPercent(frac: number): string {
+  return formatNumber(Math.floor(frac * 100) / 100, { style: 'percent', maximumFractionDigits: 0 });
 }
 
 export function xpBarView(input: XpBarInput): XpBarView {
@@ -44,7 +51,7 @@ export function xpBarView(input: XpBarInput): XpBarView {
     return {
       fillFrac: clamp01(frac),
       restedFrac: Math.max(0, restedFrac),
-      label: `${formatXp(xp)} / ${formatXp(need)} ${t('game.xp.suffix')} (${Math.floor(frac * 100)}%)${restedLabel}`,
+      label: `${formatXp(xp)} / ${formatXp(need)} ${t('game.xp.suffix')} (${formatPercent(frac)})${restedLabel}`,
       postCap: false,
     };
   }
@@ -63,12 +70,11 @@ export function xpBarView(input: XpBarInput): XpBarView {
   // At/after the cap with overflow on: fill toward the next virtual level.
   const prog = virtualLevelProgress(lifetimeXp);
   const extra = prog.level - MAX_LEVEL;
-  const pct = Math.floor((prog.into / prog.span) * 100);
   // FR-3.3 format: "Lv 20 (+7)  ·  1,284,500 total XP  ·  62% to next"
   const label =
     `${t('game.xp.lv')} ${MAX_LEVEL} (+${extra})  ·  ` +
     `${formatXp(lifetimeXp)} ${t('game.xp.totalXp')}  ·  ` +
-    `${pct}% ${t('game.xp.toNext')}`;
+    `${formatPercent(prog.into / prog.span)} ${t('game.xp.toNext')}`;
   return { fillFrac: clamp01(prog.into / prog.span), restedFrac: 0, label, postCap: true };
 }
 

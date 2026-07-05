@@ -159,7 +159,7 @@ OUT OF SCOPE (do NOT do here):
   (Phases 25/27).
 - New image assets; structural id/class renames; any new `IWorld` member, SimEvent,
   wire field, endpoint, or table (NONE expected; if a label needs one, STOP).
-- Editing the 13 locale overlays (`src/ui/i18n.locales/<lang>.ts`): add `en` only;
+- Editing the 20 locale overlays (`src/ui/i18n.locales/<lang>.ts`): add `en` only;
   the maintainer batch-fills locales at release.
 
 STEP 3 - VALIDATION + MULTI-AGENT REVIEW.

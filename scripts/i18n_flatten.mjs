@@ -15,8 +15,8 @@
 // so a future key that breaks the contract fails loud instead of silently dropping
 // a translation.
 //
-// Used by scripts/i18n_build.mjs (unflatten, at every build) and the one-time
-// migration scripts/i18n_flatten_locales.mjs (flatten).
+// Used by scripts/i18n_build.mjs (flatten + unflatten, at every build), the registry
+// scanner (scripts/i18n_scan.mjs), and the fill worklist (scripts/i18n_fill_worklist.mjs).
 
 export function flatten(node, prefix = '', out = {}) {
   for (const key of Object.keys(node)) {

@@ -41,6 +41,10 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     deny: 'The ward stone will not budge.',
     enough: 'You already have the Bastion ward stone.',
   },
+  unknown_alien_weaponry: {
+    deny: 'The meteor debris is too hot to handle without Aldric expecting it.',
+    enough: 'You already recovered enough alien wreckage.',
+  },
   highwatch_summons: {
     deny: 'The summons are sealed with Highwatch wax.',
     enough: 'You already have the Highwatch summons.',

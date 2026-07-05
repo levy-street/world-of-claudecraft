@@ -1,0 +1,820 @@
+# i18n: Per-locale Lazy Loading, Build/Artifact Hygiene, and the English-only Contributor Workflow
+
+| | |
+|---|---|
+| **Phase** | 3 |
+| **Status** | Partially landed. The docs/policy package (Section 5; migration Step 5) is ALREADY APPLIED in commit a36a94c7 (the commit that added this doc): the live root, `src/ui`, and `src/admin` CLAUDE.md files and `docs/i18n-scaling/translation-workflow.md` already match the target text below. The code work (Section 4; migration Steps 1-4: per-locale emit split, async loader, lazy flip, artifact/CI hygiene) remains unimplemented. |
+| **Date** | 2026-06-17 |
+| **Supersedes / extends** | The completed i18n packet (Phases 1-8): the sparse-overlay model, the generated resolved table, the status registry, the two-tier release gate, and the thin synchronous runtime. This document does not re-litigate any of that. It changes how the resolved table is **shipped**, **stored**, and **emitted**, and it ratifies the contributor policy the packet's machinery already permits. |
+| **Implementation** | A later pass (Opus 4.8 + ultracode), sequenced per the migration plan (Section 6). |
+| **Owner doc home** | `docs/i18n-scaling/` |
+
+This is the canonical lazy-locales design. It integrates the build-emit, runtime-bootstrap, bundling-cache, test-ci-gates, docs-and-CLAUDE.md, and migration findings into one plan. Where individual investigations disagreed, the resolved recommendation is stated once and the rejected alternative is noted in the trade-off ledgers.
+
+---
+
+## 1. Context and motivation
+
+World of ClaudeCraft is six days old. Content is being added daily: new zones, dungeons, abilities, items, talents, and the player-visible strings that come with them. Every one of those strings is a `t()` key, and the i18n system is on the critical path of both the bundle and the contributor workflow.
+
+Two pressures are converging.
+
+**The shipping cliff (mobile / low-bandwidth players).** The client ships **every locale to every user, eagerly, in the main chunk.** `src/ui/i18n.ts` statically imports `translations` plus all 14 locale consts from the `src/ui/i18n.resolved.generated/` barrel (a static `index.ts`), so all 14 locales land in the main client chunk regardless of which language the user selected. The numbers, measured against the current post-merge tree (pre-v0.10 gzip estimates; re-measure against a v0.10.0 production build):
+
+- Main client chunk: **3.73 MB raw / 1.13 MB gzip.**
+- The resolved table alone is **2.1 MB raw / 583 KB gzip** of that chunk.
+- About 13 of the 14 locales (**~540 KB gzip**) is non-English data that a default-English user never needs. Per-locale share is **~42 KB gzip.**
+
+A player on a poor mobile connection downloads roughly half a megabyte of compressed translation data they will never read. The game's audience skews toward exactly the low-bandwidth, mobile-first segment that this penalizes hardest.
+
+**The contributor cliff (token budgets).** The project's collaborators, several on small Claude Code plans, are slowed by a documented policy that contradicts the system that actually ships. The root `CLAUDE.md` mandates that a contributor adding a player-visible string must add "a real translation to every locale ... No English copy, placeholder, or `// TODO`." In practice the sparse-overlay model plus the two-tier release gate already make an English-only PR correct and safe: omitted keys are English-filled and marked `pending`, the PR-tier gate permits that, and the release-tier gate blocks shipping any `pending` row. The documented mandate forces contributors to spend their entire token budget producing 13 machine translations per string that the maintainer would re-do at release anyway.
+
+Both pressures resolve to the same architectural move: **ship only the data actually needed, and make English-only the explicit, documented contract.** Phase 3 does both, while keeping the system clean, scalable, and well-architected for fast-growing content, and while honoring the project's invariant that `t()` is synchronous.
+
+---
+
+## 2. Goals and non-goals
+
+### Goals
+
+1. **Ship English eagerly and nothing else.** A non-English locale is downloaded only when a user actually selects or needs it, as its own content-hashed chunk, cached immutably after first fetch. Target a ~540 KB gzip reduction of the main chunk for the default English visitor.
+2. **Keep `t()` synchronous.** No caller of `t()` becomes `async`. English is the eager default and the universal synchronous fallback; a non-English locale's chunk is dynamic-`import()`ed and resolved before the first paint that needs it.
+3. **No layout shift, no language flash.** The active locale is resident before the first localized paint; live switches re-render once, in the final language, with no mixed-language intermediate frame.
+4. **Fix the IDE and repo-churn wounds.** Stop shipping the former ~55,888-line single generated file (already split into the per-locale directory in Step 1) and committing megabytes of machine-generated diff per content PR.
+5. **Ratify English-only PRs as the documented contributor contract** (ALREADY DONE: applied in commit a36a94c7), with the token-budget rationale, reconciling the root `CLAUDE.md` contradiction. The maintainer fills all locales before release. This goal is met in-tree; it remains listed for completeness.
+6. **Preserve every existing guarantee at equal-or-greater strength:** determinism (byte-reproducible resolved output, the SHA baseline), the two-tier gate (PR English-legal, release `pending=0`), tsc key-completeness per locale, and the sim/server S3 matcher guard.
+7. **Admin parity in mental model.** The admin dashboard's i18n stays structurally identical to the game's, even where its small size makes some optimizations optional.
+
+### Non-goals
+
+- **Per-domain (sub-locale) lazy loading.** Splitting a single locale into shell / hud / quest sub-chunks loaded on panel-open is out of scope; it is noted as a future possibility but blocks on panel-open hooks and buys little against the per-locale win at today's sizes. Revisit only on an explicit tripwire: a per-locale chunk exceeding roughly 60 to 75 KB gzip, or the shell/HUD becoming independently route-loaded. At 2,581 keys per locale the catalog is already past i18next's rough 300-segment editorial heuristic for splitting namespaces, so this is a when-not-if for the largest locales as content grows, not a never.
+- **Changing `t()`'s signature or inner loop, the overlay model, or the resolve/merge/pending build logic.** Only emit shape, storage, runtime table-source, and the bootstrap gate change.
+- **Service worker / offline app shell.** Out of scope; HTTP immutable caching already does what Phase 3 needs.
+- **Refactoring the matchers (`talent_i18n.ts` procedural builders).** Noted as a separate concern for a later phase; not part of Phase 3.
+- **Re-baselining the resolved SHA.** Phase 3 is behavior-preserving for resolved output; the resolved-table SHA must not move during a phase. `npm run i18n:hash -- --check` stays green against the baseline committed in `src/ui/i18n.resolved.sha256` at the start of that phase (currently `9606d9cf..` after the 2026-06-18 v0.10.0 merge; the old `d74aeb6..` was the release/v0.9 baseline). A move within a phase is a real bug, never grounds to re-baseline; the one legitimate exception is Phase 2's three-key fill (Section 4.1.4), which intentionally advances the baseline.
+
+---
+
+## 3. Current state (grounded)
+
+### 3.1 Runtime and the sync-t() constraint
+
+`src/ui/i18n.ts` is a 275-line thin runtime. `t()`, `tOptional()`, `hasTranslation()`, `translationValue()`, and the `formatNumber` / `formatDateTime` / `formatMoney` / `moneyParts` formatters are all synchronous. `t()` is called **600-plus times in `hud.ts`** alone (a `\bt\(` scan of the current 7,133-line file counts ~663 occurrences across 574 matching lines), on hot paths inside the render loop and event handlers, plus dozens more across the homepage shell. The exact number is not load-bearing; the argument holds at any count above a handful.
+
+The load-bearing constraint that shapes the entire design:
+
+> **`t()` must stay synchronous.** Making it `async` would force `await` through 600-plus call sites (in `hud.ts` alone) and is a determinism and timing hazard. Therefore the active locale's table must already be resident in memory before any `t()` call that needs it fires.
+
+Language detection runs synchronously at module import (`?lang=` URL param, then `localStorage.locale`, then default `en`), setting a module-scoped `currentLanguage`. `tableFor(lang)` returns `translations[lang]` (or the dev pseudo-locale `en_XA` behind a `!import.meta.env.PROD` guard). The first `t()` call is in the `Hud` constructor (`hud.ts:356`; the first `t()` in the body is at `:379`), reached inside `startGame()` after the loading screen has painted; the homepage shell calls `t()` even earlier via `translatePage()`.
+
+### 3.2 Shipping shape
+
+Migration Step 1 (per-locale emit split) is DONE. `src/ui/i18n.resolved.generated/` is now a generated **directory** (**2,565,789 B / ~2.57 MB**): one dense `export const <lang>: EnTranslations = { ... }` module per locale (`en.ts` + the 13 locale slices + `en_XA.ts`), a `pending.ts`, a static barrel `index.ts` that assembles `translations`, and a dormant `loaders.ts` exporting `LOCALE_LOADERS` dynamic `import()`s plus `SUPPORTED_LANGUAGES`. The old monolithic `src/ui/i18n.resolved.generated.ts` is gone. `src/ui/i18n.ts` still statically imports the barrel, so Rollup keeps all 14 locales in the main chunk; the barrel is static and `loaders.ts` is unused, so there is no runtime dynamic import yet (the lazy flip is Step 3).
+
+The admin app is a separate Vite entry (`admin.html` -> `src/admin/main.ts`) with its own `src/admin/i18n.resolved.generated/` directory (**177,290 B**, 219 keys, flat keys), mirroring the game's structure (per-locale slices + barrel + dormant loaders + pending).
+
+### 3.3 Committed artifacts
+
+| Artifact | Size | Lines | Shipped to client | Committed today |
+|---|---|---|---|---|
+| `src/ui/i18n.resolved.generated/` (per-locale dir) | 2.57 MB | n/a (directory) | Yes (main chunk) | Yes |
+| `src/admin/i18n.resolved.generated/` (per-locale dir) | 177,290 B | n/a (directory) | Yes (admin chunk) | Yes |
+| `src/ui/i18n.status.json` | 4.74 MB | 187,366 | No (build/test only) | Yes |
+| `src/ui/i18n.resolved.sha256` | 65 B | 1 | No | Yes |
+
+Human-edited sources stay small and are the real review surface: `src/ui/i18n.en.ts` (still a single ~11,922-line file, authoritative nested English, drives `TranslationKey`), each full game overlay `src/ui/i18n.locales/<lang>.ts` (flat sparse `Partial<Record<TranslationKey,string>>`; the three dialect overlays `es_ES`/`fr_CA`/`en_CA` are far smaller), and the small admin overlays `src/admin/i18n.locales/<lang>.ts`.
+
+### 3.4 Totals, dialects, and the build pipeline
+
+There are **2,581 keys** and **~33,553 non-English rows** (translated 33,507; blocked 46; pending 0) across 14 shipped locales: `en, es, es_ES, fr_FR, fr_CA, en_CA, it_IT, de_DE, zh_CN, zh_TW, ko_KR, ja_JP, pt_BR, ru_RU`, plus a dev-only `en_XA` pseudo-locale that is already tree-shaken out of production via an `import.meta.env.PROD` guard in `tableFor()`. Dialects resolve at build time via `DIALECT_BASE` (`es_ES` -> `es`, `fr_CA` -> `fr_FR`, `en_CA` -> `en`); the resolved table is dense, so each emitted locale (including each dialect) is a standalone full table with no import-time composition.
+
+The build scripts:
+- `scripts/i18n_build.mjs` emits the dense game table as the per-locale directory (one dense module per locale plus the barrel that assembles the `translations` map; Step 1 done).
+- `scripts/i18n_admin_build.mjs` emits the admin table (same per-locale directory shape).
+- `scripts/i18n_scan.mjs` emits `i18n.status.json`.
+- `scripts/i18n_resolved_hash.mjs` emits/checks the committed `src/ui/i18n.resolved.sha256` baseline.
+
+`pretest` already runs `i18n:build && i18n:admin && i18n:scan` before every test invocation, so the generated artifacts are always freshly regenerated before tests read them. This is load-bearing for the storage decisions in Section 4.5.
+
+### 3.5 The two-tier CI gate
+
+`.github/workflows/ci.yml` has two tiers:
+- **PR-tier** (`pull_request`, push to `main` / `dev-*`, manual dispatch): runs `npm test` **without** `I18N_RELEASE_TIER`. English-only is legal; `pending` keys pass.
+- **Release-tier** (push to `release/**`): sets `I18N_RELEASE_TIER=1` and fails on any `pending` row.
+
+Reproducibility tests (`tests/i18n_resolved_equivalence.test.ts`, `tests/i18n_status_registry.test.ts`, `tests/i18n_admin_catalog.test.ts`) assert the committed generated artifacts are git-tracked and regenerate byte-identically (`git diff --exit-code`). The release detection in `src/ui/i18n.ts` and `src/admin/i18n.ts` uses `isReleaseBuild()` = `I18N_RELEASE=1` or `import.meta.env.PROD`: non-release fills `pending` keys from English silently; release hard-fails on a `pending` key as a never-fires backstop.
+
+### 3.6 The reproducibility hash is computed from exports, not file bytes
+
+This is the single most important enabling fact for a safe migration. `scripts/i18n_resolved_hash.mjs` esbuild-bundles `src/ui/i18n.ts`, reads `i18n.supportedLanguages`, reassembles `translations` by name (`for (const lang of supportedLanguages) translations[lang] = i18n[lang]`), deep-sorts keys, and hashes the result. **As long as `src/ui/i18n.ts` keeps re-exporting all 14 locale consts by name and `supportedLanguages` stays the same ordered set, the SHA baseline is invariant under any change to how those consts are produced** (one file, per-locale files, or an aggregate). The byte-equivalence gate therefore does not have to move in lockstep with the emit refactor.
+
+### 3.7 The contributor-policy contradiction
+
+The root `CLAUDE.md` i18n invariant (around lines 70-98) currently mandates a real translation to every locale on every contribution. `src/ui/CLAUDE.md` already documents the correct sparse-overlay workflow. The contradiction lives only in the root file and is the lone remaining documentation conflict; the policy resolution is Section 4.6 and the exact CLAUDE.md edits are Section 5.
+
+---
+
+## 4. Proposed architecture
+
+### 4.1 Per-locale lazy loading with a synchronous-t() first-paint bootstrap
+
+**Shape.** English is statically imported (eager), serving the dual role of **default locale** and **universal synchronous fallback**. Every non-English locale becomes a dynamic `import()` of its own content-hashed chunk, keyed through a generated loader registry. The runtime keeps a mutable **resident-table map**; reads resolve against it, falling back to English when a locale is not yet resident.
+
+The runtime (`src/ui/i18n.ts`) changes its import surface and gains two small async functions; `t()`'s inner loop is unchanged.
+
+```ts
+// Eager: English table + pending lists + a generated registry of lazy loaders.
+import { en } from './i18n.resolved.generated/en';
+import { pending } from './i18n.resolved.generated/pending';
+import { LOCALE_LOADERS, SUPPORTED_LANGUAGES } from './i18n.resolved.generated/loaders';
+//   LOCALE_LOADERS: Record<Exclude<SupportedLanguage,'en'>, () => Promise<{ default: EnTranslations }>>
+// en_XA stays a dev-only static import behind the existing import.meta.env.PROD guard.
+
+const resident: Partial<Record<SupportedLanguage, EnTranslations>> = { en };
+const inflight = new Map<SupportedLanguage, Promise<void>>();
+```
+
+`tableFor()` changes only its last line, adding the English fallback:
+
+```ts
+function tableFor(lang: SupportedLanguage): ResolvedTable {
+  if (!import.meta.env.PROD && pseudoActive && lang === currentLanguage) {
+    return en_XA;                        // dev-only, unchanged, tree-shaken in prod
+  }
+  return resident[lang] ?? resident.en!; // English until the locale chunk lands
+}
+```
+
+`t()` and the other read paths are byte-for-byte what they are today; they call `tableFor()`, which already abstracts the table source. A read for a not-yet-resident locale silently renders English (the universal fallback), which is the existing non-release "pending key" semantics extended to "whole locale not yet resident," and is only observable in the sub-second window before the bootstrap gate completes (Section 4.1.2) or on a hard chunk failure (Section 4.1.4).
+
+The new async surface is idempotent, coalescing, English-instant, and failure-soft:
+
+```ts
+export async function ensureLocaleLoaded(lang: SupportedLanguage): Promise<void> {
+  if (lang === 'en' || resident[lang]) return;        // instant: eager or already loaded
+  let p = inflight.get(lang);
+  if (!p) {
+    p = (async () => {
+      const mod = await LOCALE_LOADERS[lang]();        // dynamic import() -> its own chunk
+      resident[lang] = mod.default ?? (mod as any)[lang]; // shape-tolerant (see Section 4.1.5)
+    })().catch((err) => {
+      inflight.delete(lang);                           // allow retry on a later switch
+      reportLocaleLoadFailure(lang, err);              // console.warn in dev; telemetry hook in prod
+      throw err;                                       // caller decides: bootstrap swallows; switch reverts
+    });
+    inflight.set(lang, p);
+  }
+  return p;
+}
+
+export function isLocaleResident(lang: SupportedLanguage): boolean {
+  return lang === 'en' || resident[lang] !== undefined;
+}
+```
+
+This is a hand-rolled instance of a proven pattern, not a novel mechanism. i18next ships the active language eagerly and lazy-loads the rest (`partialBundledLanguages` plus a backend), with `fallbackLng` covering any not-yet-loaded key; vue-i18n awaits `loadLocaleMessages(lang)` then flips the locale so `$t` stays synchronous; LinguiJS and react-intl render only once the active catalog is set. The resident-table map plus English fallback is the same contract expressed without a framework, which is why keeping `t()` synchronous is compatible with lazy loading.
+
+`setLanguage(lang)` stays synchronous and unchanged in signature: it flips `currentLanguage`, persists to `localStorage`, and clears `pseudoActive`. It does **not** load. Loading is the caller's responsibility via `ensureLocaleLoaded`, awaited before `setLanguage` so the table is resident the instant `currentLanguage` flips. `supportedLanguages` is derived from the generated `SUPPORTED_LANGUAGES` constant (since a fully-populated static `translations` object no longer exists in the runtime).
+
+#### 4.1.1 Two t()-bearing surfaces, one early gate
+
+There are two distinct surfaces that call `t()`:
+- The **homepage shell** (`#start-screen`, language picker, auth, realm select), whose first localized paint happens at module init / early DOM wiring via `translatePage()`.
+- The **in-game HUD**, whose first `t()` is `new Hud(...)` inside `startGame()`, after `mountGameUi()` -> `translatePage()`.
+
+The gate strategy: **fire the locale fetch at the earliest point, await it at the boundaries.**
+
+1. **Fire-and-forget at import.** Immediately after language detection, `void ensureLocaleLoaded(currentLanguage)`. This starts the ~42 KB chunk download in parallel with the main chunk parse, asset fetches, and homepage content, so the locale is usually resident by the time anything needs it. This doubles as the prefetch of the stored locale (Section 4.2.4).
+2. **Await before the in-game HUD mounts.** Insert one line in `startGame()`, after the loading-screen paint (`await nextPaint()`) and before `mountGameUi()`:
+
+   ```ts
+   await nextPaint();
+   await ensureLocaleLoaded(currentLanguage);  // NEW: resident before HUD's first t()
+   mountGameUi();                              // -> translatePage() -> new Hud() -> t()
+   ```
+
+   This await runs after `assetsReady` (models / textures / HDRI), which on any real connection dwarfs a 42 KB locale chunk that has been downloading since import. The locale chunk wins the race essentially always; the await is a correctness backstop, not a new latency source.
+3. **Await the homepage shell's first localized render** behind the same `ensureLocaleLoaded`. Because step 1 already started it, this usually resolves instantly.
+
+#### 4.1.2 No-flash / no-layout-shift policy
+
+Two strategies, applied per surface:
+
+- **HUD: block the localized paint behind the loading screen.** Because the HUD's first render is already behind a loading screen and `assetsReady`, awaiting the locale costs nothing perceptible and guarantees the HUD is born in the correct language. No English-then-swap is ever visible in-game. This is the default.
+- **Homepage and admin: paint English structure, upgrade in place** only if the chunk is genuinely slow. Render the page immediately; if `ensureLocaleLoaded` has not resolved, render English, then call `translatePage()` once on resolution to upgrade the text. Homepage layout is already content-length-agnostic per `src/ui/CLAUDE.md` (`width:100%` + `max-width`, fluid type, no fixed-width text containers), so the upgrade causes no layout shift. The parallel pre-fetch from step 1 makes this path rare.
+
+Reduced-motion users get no cross-fade on the upgrade (consistent with the existing `prefers-reduced-motion` policy). Numbers / dates / money already route through `Intl` formatters keyed on `currentLanguage`, so they are correct the moment the locale is current, regardless of table residency.
+
+#### 4.1.3 Live language switch
+
+The existing handler (`src/main.ts` lines 3398-3401) reads `langSelect.value` as a raw `string` and narrows with `if (!isSupportedLanguage(selected)) return;` before calling `setLanguage`. The Phase 3 handler keeps that narrowing exactly, then wraps the swap in an async helper that loads the chunk first and re-renders in one frame:
+
+```ts
+langSelect.addEventListener('change', () => {
+  const selected = langSelect.value;               // raw string from the <select>
+  if (!isSupportedLanguage(selected)) {            // narrow FIRST (matches today's guard;
+    langSelect.value = getLanguage();              //   guards a stale en_XA / tampered DOM)
+    return;
+  }
+  void switchLanguage(selected);
+});
+
+async function switchLanguage(selected: SupportedLanguage): Promise<void> {
+  langSelect.disabled = true;                      // prevent re-entrancy mid-load
+  showLanguageSwitchPending(selected);             // tiny inline spinner on the picker only
+  try {
+    await ensureLocaleLoaded(selected);            // fetch chunk (cache hit if revisited)
+  } catch {
+    showToast(t('settings.languageLoadFailed'));   // English toast (always resident)
+    langSelect.value = getLanguage();              // revert the <select> to reality
+    return;
+  } finally {
+    langSelect.disabled = false;
+    hideLanguageSwitchPending();
+  }
+  setLanguage(selected);                           // flip currentLanguage + persist (sync)
+  updateUrlLangParam(selected);
+  translatePage();                                 // full DOM re-localize
+  refreshLocalizedDynamicShell();                  // HUD dynamic text
+  document.dispatchEvent(new CustomEvent('woc:languagechange', { detail: { language: selected } }));
+}
+```
+
+The `isSupportedLanguage` guard stays ahead of the `await`, so a `<select>` value that is not a supported language (a stale `en_XA`, a tampered DOM) never reaches `ensureLocaleLoaded` with a non-key. The table is resident before `currentLanguage` flips, so `translatePage()` runs once with the final language: no mixed-language intermediate frame, no layout shift. The picker disables during load so a user spamming the dropdown cannot interleave two swaps; `ensureLocaleLoaded` coalescing makes a duplicate request a no-op. Once a locale is resident it stays resident for the session, so switching back is instant.
+
+#### 4.1.4 Failure and offline behavior
+
+English is always resident, so failure degrades gracefully:
+
+- **Boot-time chunk failure** (returning non-English user, offline or a chunk 404 after a bad deploy): `ensureLocaleLoaded` rejects, the bootstrap swallows it (the `void` / try-catch), the app boots in English, and a non-blocking toast (`t('settings.languageLoadUnavailable')`) explains the fallback. The game is fully playable in English; the user can retry by reselecting the language when back online. `inflight` is cleared on failure so the retry re-fetches.
+- **Switch-time chunk failure:** the picker reverts, the current language is untouched, a toast is shown.
+- **Mid-session offline:** already-resident locales keep working; a switch to a not-yet-loaded locale fails soft to English with a toast.
+- **No render path can throw on a missing locale,** because `tableFor()` falls back to `resident.en!`. The only throws in `t()` remain the dev-only untracked-key throw and the release-only pending-key backstop, both unchanged and orthogonal to lazy loading.
+
+Three new `t()` keys are required, added to `en` first and registry-filled by the maintainer per the new policy: `settings.languageLoadFailed`, `settings.languageLoadUnavailable`, and `settings.languageLoading` (aria-live label for the picker spinner). These are player-visible, so they live in `en` and ship in the eager English table; the fallback message is therefore guaranteed renderable even when a locale chunk is what failed.
+
+#### 4.1.5 Test-environment correctness (node, no DOM, raw import)
+
+Vitest runs in the default **node** environment (no jsdom / happy-dom; none is in `package.json`). Consequences the loader must respect:
+- `typeof window === "undefined"` in tests, so module-init detection takes the `else` branch and `currentLanguage` defaults to `en` / stored. The existing `i18n.ts` already handles this.
+- Dynamic `import()` works in node ESM but resolves the **source `.ts`** with named exports (`export const es`), not a Vite-built default-exporting chunk, so `mod.default` is `undefined` there. Hence the shape-tolerant `mod.default ?? mod[lang]` read.
+- Vite's chunk-splitting and `import.meta.env.PROD` static replacement do not apply under raw vitest. Any new `import.meta` access reuses the existing try-catch guard pattern in `isReleaseBuild()`.
+
+### 4.2 Mobile / low-bandwidth UX, caching, prefetch, no layout shift
+
+#### 4.2.1 Quantified payload reduction
+
+| Quantity | Today | After Phase 3 |
+|---|---|---|
+| Resolved table in main chunk (raw) | 2.1 MB | ~160 KB (en only) |
+| Resolved table in main chunk (gzip) | 583 KB | **~42 KB (en only)** |
+| Non-English locale data in main chunk (gzip) | ~540 KB (13 locales) | **0 KB** (moved to 13 lazy chunks) |
+| Per-locale lazy chunk (gzip) | n/a | ~42 KB each, content-hashed |
+| Main client chunk total (gzip) | 1.13 MB | **~590 KB** |
+
+Net main-chunk reduction is roughly **540 KB gzip, about 48 percent** off the current main bundle. An English-only first visitor downloads ~590 KB gzip instead of 1.13 MB. A returning non-English user downloads the ~590 KB main chunk plus one per-locale chunk in parallel during boot, still well under half of today's payload, and the locale chunk is immutable-cached so subsequent visits re-fetch nothing.
+
+**Per-locale chunk sizes are measured, not assumed.** Slicing each locale's block out of the current `i18n.resolved.generated.ts` and gzipping the raw (un-minified) source gives a tight band: Latin locales (`es`, `fr_FR`, `pt_BR`, `de_DE`) 37-38 KB gzip, CJK (`zh_CN`/`zh_TW` ~39 KB, `ja_JP`/`ko_KR` ~40 KB), and Russian the largest at ~44 KB gzip. After Vite minification the shipped chunk is somewhat smaller than the source-gzip figure, which is why the ~42 KB per-locale estimate holds as the round number. The worst-case mobile user (Russian) pays roughly one extra ~44 KB source / ~42 KB shipped chunk on top of the ~590 KB main bundle. The ~42 KB figure is the Latin/average; CJK and Russian sit at the top of the band, not as an open unknown. The 38 to 46 KB band is explained by gzip mechanics rather than raw character weight: CJK glyphs are 3 bytes each in UTF-8 but compress well because the strings are short and repetitive, so `zh_CN` and `zh_TW` land mid-band; Cyrillic is 2 bytes per character with longer words, which is why `ru_RU` is the largest. The spread is small enough that no locale is an outlier requiring special handling.
+
+#### 4.2.2 Parallelism on a returning non-English user (cold cache)
+
+```
+t0  main chunk requested ------------------+
+                                           +-- parsed -> module init
+t0  ensureLocaleLoaded(ru_RU) fired -------+   (locale chunk requested in parallel)
+       | main chunk ~590 KB gzip               | ru_RU chunk ~42 KB gzip
+       v                                        v (lands first; it is ~14x smaller)
+   shell renders (await resolves instantly: chunk already resident)
+       v
+   startGame -> assetsReady (models / HDRI, the real long pole)
+       v
+   await ensureLocaleLoaded(ru_RU)  <- already resolved, no-op
+   mountGameUi -> HUD in Russian, no flash
+```
+
+The locale chunk downloads in parallel with the main bundle and is ~14x smaller, so it is essentially never the critical path.
+
+#### 4.2.3 Caching
+
+No server change is required; the existing policy already does exactly what we need:
+- Vite content-hashes every chunk under `/assets/` (for example `es-a1b2c3d4.js`). `server/static_cache.ts` serves `/assets/*` as `Cache-Control: public, max-age=31536000, immutable`, so each locale chunk is fetched at most once per content version, then served from the HTTP cache and the in-memory module cache for the session.
+- **Per-locale cache isolation is a real win the monolith cannot offer.** Changing one locale's strings rehashes only that locale's chunk. An English-only PR (the common case) rehashes the `en` chunk and the main bundle; the 13 non-English chunks keep their hashes and are not re-downloaded by anyone. Today, any translation change rehashes the single 2.1 MB blob and forces every user to re-download all 14 locales.
+- `index.html` is served `no-cache` with ETag revalidation, so a deploy is picked up on the next reload; content-hashed immutable chunks make a returning mid-deploy session safe (old chunks remain fetchable until reload). No service worker is needed.
+
+#### 4.2.4 Prefetch
+
+Two complementary mechanisms, both behind the immutable cache:
+1. **Runtime prefetch (primary, ships in Phase 3):** the Section 4.1.1 step-1 `void ensureLocaleLoaded(currentLanguage)` is the prefetch of the stored locale; it starts the fetch at the earliest possible module point with zero build or markup coupling.
+2. **`<link rel="modulepreload">` for the stored locale (ship in Phase 3; not optional):** Vite only auto-injects `modulepreload` hints for statically analyzable imports, so a locale chosen at runtime via `LOCALE_LOADERS[lang]()` gets no hint: the browser discovers the locale chunk only after the main chunk has parsed and executed the dynamic import, a main-then-locale request waterfall. The runtime prefetch (mechanism 1) starts the fetch earlier within the same execution, but the only way to make the locale chunk a high-priority, parser-discoverable request is an explicit `<link rel="modulepreload">` in `<head>`. A tiny inline script reads `localStorage.locale` and injects the preload before the main module parses; resolve the chunk's hashed filename from Vite's post-build `manifest.json`. The build/server coupling is the price of closing the waterfall and is now treated as worth paying, not a marginal bump. Match the `crossorigin` attribute to the module request so the preloaded chunk is reused rather than double-fetched. Prefer `rel="modulepreload"` over `rel="prefetch"` (the stored-locale user needs it this load). Do **not** speculatively preload other locales; that re-introduces the bloat being removed.
+
+### 4.3 Build emit to per-locale modules
+
+The single generated file becomes a generated directory, one dense module per locale plus a thin barrel.
+
+```
+src/ui/i18n.resolved.generated/        (generated; git-tracked; one banner per file)
+  index.ts        barrel: re-exports every locale + en_XA + pending; assembles `translations`
+  pending.ts      export const pending: Record<string, readonly string[]>
+  loaders.ts      export const LOCALE_LOADERS = { es: () => import('./es'), ... };
+                  export const SUPPORTED_LANGUAGES = [...] as const;
+  en.ts           export const en: EnTranslations = { ...dense nested... }
+  es.ts
+  es_ES.ts        (dense; dialect already resolved at build time, standalone)
+  fr_FR.ts
+  fr_CA.ts
+  en_CA.ts
+  it_IT.ts
+  de_DE.ts
+  zh_CN.ts
+  zh_TW.ts
+  ko_KR.ts
+  ja_JP.ts
+  pt_BR.ts
+  ru_RU.ts
+  en_XA.ts        (dev-only pseudo-locale; RE-EXPORTED by the barrel for existing
+                   `import { en_XA }` consumers, but never in LOCALE_LOADERS or `translations`)
+```
+
+`en_XA` is re-exported by the barrel so the existing `import { en_XA } from './i18n.resolved.generated'` in `src/ui/i18n.ts` and the `import { en, en_XA } from "../src/ui/i18n.resolved.generated"` in `tests/i18n_pseudo_locale.test.ts` keep resolving against the directory's `index.ts` unchanged. The distinction is "not a lazy-loadable locale and not in `translations`," not "not in the barrel": it is present in the barrel's export surface but absent from `LOCALE_LOADERS` (so it is never dynamic-`import()`ed as a chunk) and absent from `translations` / `SUPPORTED_LANGUAGES` (so it never enters the picker, hreflang, or the release gate). Its only runtime reachability stays the `!import.meta.env.PROD` branch of `tableFor()`, which keeps it tree-shaken from the production bundle.
+
+Each locale module is the const that exists today, lifted verbatim with its `: EnTranslations` annotation intact, so the tsc completeness guarantee holds per file: a renamed or missing key red-fails that file's annotation exactly as today.
+
+**Why a barrel `index.ts`.** The barrel re-exports every locale name (plus `en_XA` and `pending`) and the `translations` map, preserving the exact import surface tests and the hash harness expect. This makes the emit refactor independently shippable with zero behavioral change: the eager runtime can statically import the barrel (all 14 still in the main chunk, hash unchanged, the only win being IDE health and per-locale diffs), and the lazy flip is then a pure one-file runtime edit that stops importing locale names from the barrel and switches to the `loaders.ts` thunks. The barrel is the rollback target for the lazy flip (Section 6).
+
+**Directory-index resolution is a proven pattern in this repo, not an assumption.** The whole refactor rests on `'./i18n.resolved.generated'` (and later `'./i18n.en'`) resolving to a directory's `index.ts` with no consumer change. The project uses `moduleResolution: "Bundler"`, under which directory-index resolution is not automatic for every toolchain, so this is worth grounding. It already works here: `src/render/characters/` is a directory with an `index.ts` imported as `from './characters'` (`src/render/renderer.ts:12`) and `from './render/characters'` (`src/main.ts:18`), and the tree builds and ships today. The i18n directories follow the identical shape, so the resolution claim is demonstrated, not hoped.
+
+**Generator changes (`scripts/i18n_build.mjs`).** The resolve / merge / pending / pseudo logic is unchanged; only the emit and write stage changes. It removes the output directory first (`rmSync(dir, { recursive: true, force: true })`) then recreates it so a deleted locale never leaves an orphan, computes each module's content fully in memory, and writes them all (atomic-rename or write-all-then-nothing to avoid a torn directory on crash). Key order stays driven by the `en` walk; `JSON.stringify(table, null, 2)` formatting is unchanged, so per-file byte-identity falls out for free. An `I18N_OUT_DIR` environment override is added so the determinism test (the `assertDeterministic` double-generation check, Sections 4.5 and 7) can generate into a temp dir.
+
+**Dialects stay build-time dense.** `es_ES.ts` is a fully dense standalone const; it does not `import { es }` and spread it. This keeps every locale module eagerly- or lazily-loadable with identical semantics, removes any "load es before es_ES" ordering dependency (critical for sync-`t()` after a single `await`), and avoids a transitive chunk dependency. The byte redundancy is exactly today's behavior (the monolith already emits dense dialects), so there is no regression.
+
+**Admin mirror.** `scripts/i18n_admin_build.mjs` gets the identical transform into `src/admin/i18n.resolved.generated/` (flat keys, `: AdminTranslations`). Admin is small, so the IDE motivation is weak, but parity is the reason: one mental model, one test shape, one barrel convention. See the file-splitting policy (Section 4.4) and the admin-lazy decision (Section 4.1, deferred) for the asymmetry that is intentional.
+
+> Do not confuse this with the existing `scripts/i18n_admin_split.mjs`. That script was the one-time **source-shape** migration that split the monolithic admin DICT into the overlay model (`src/admin/i18n.en.ts` + `src/admin/i18n.locales/<lang>.ts`); it is unrelated to Phase 3. Phase 3's admin change lives in `scripts/i18n_admin_build.mjs`'s emit stage (the resolved-table directory split), not in `i18n_admin_split.mjs`, which is not touched.
+
+**IDE-health math.** Formerly one ~55,888-line file. After the split (done in Step 1), 14 locale files of roughly 3,500-4,000 lines each, a ~20-line `index.ts`, a ~50-line `pending.ts`, a small `loaders.ts`, and a ~3,500-line `en_XA.ts`. No generated file exceeds ~4,000 lines, comfortably within instant-open territory. Git diffs become per-locale: a `de_DE`-only translation pass diffs only `de_DE.ts`, eliminating the cross-locale merge-conflict surface of the monolith.
+
+### 4.4 File-splitting policy (generated and human-edited)
+
+This section defines when to split, honoring the project rule "do not split a module just to hit a line count."
+
+#### 4.4.1 Generated files: split by locale (done in 4.3)
+
+The generated resolved table is split per locale because the split (a) fixes a severe IDE choke, (b) is the natural granularity for content-hashed lazy chunks, and (c) makes diffs reviewable. This is the principled exception to "do not split for line count": the trigger is IDE/LSP harm and bundle granularity, not vanity.
+
+#### 4.4.2 Human-edited files: the three-part split-decision rule
+
+> Split a human-edited i18n source module by **top-level domain namespace** only when **all three** hold:
+> 1. **IDE/LSP harm is observed, not hypothesized:** the file is >= ~3,000 lines **and** is a `typeof` / `Leaves`-typed nested literal (the depth-6 inference is what makes the LSP re-check expensive on every dependent keystroke), **or** it regularly triggers LSP lag or a hang on save.
+> 2. **A pre-existing top-level seam matches a translation domain.** A split follows one of the file's existing `export const <domain>Strings = { ... }` blocks, one domain per file, never an arbitrary mid-object cut.
+> 3. **The public surface is unchanged.** After the split, `import { t, type TranslationKey } from './i18n'` and `import type { EnTranslations } from './i18n.en'` resolve identically; the `en` const and every type are still assembled in one place (the file becomes a thin barrel that composes `en`).
+>
+> Do **not** split: a flat (non-nested-typed) file; a file under ~1,500 lines; a build-only data layer; or to make line counts look nicer.
+
+The thresholds (~3,000 lines for nested-typed, ~1,500 floor, no flat files) are deliberately higher than a generic linter would pick, to honor the project's large-module norm. The trigger is the interaction of size and nested-`Leaves` typing, which is why `i18n.en.ts` (11,922 lines, nested, depth-6) hurts and `server_i18n.ts` (197 lines, flat) does not.
+
+#### 4.4.3 `src/ui/i18n.en.ts`: split now, by existing domain seams
+
+`i18n.en.ts` already exposes top-level `export const <domain>Strings` blocks. Re-home them into a directory; Node and esbuild resolve `./i18n.en` to the directory's `index.ts`, so no consumer (the build script's `sourceModule('en')`, the runtime's `import type`) changes.
+
+```
+src/ui/i18n.en/
+  index.ts        barrel: imports each domain, composes `en`, defines
+                  Leaves / TranslationKey / EnTranslations / Interpolation* types
+                  (the module other code imports as './i18n.en')
+  shell.ts        shellStrings              (~2,918 lines; the single biggest LSP cost center)
+  hud.ts          hudStrings               (~1,266; co-located with hud.ts's ~560 t() calls)
+  abilities.ts    abilityStrings + classAbilityNames   (~1,929; one ability domain)
+  quests.ts       questStrings             (~782)
+  items.ts        itemStrings + itemNames  (~947; one item domain)
+  game.ts         gameStrings + dialect variants
+  _merge.ts       mergeStrings + mergeEntities + mergeExtra (build-time content-merge layer)
+```
+
+Notes on the cuts:
+- `shell.ts` is the highest-value split (over 50 percent above the threshold, and the homepage/auth layer is edited independently from in-game HUD work).
+- `abilities.ts` and `items.ts` each fuse two related sub-domains that are individually below the 1,500 floor (`abilityStrings` ~554, `itemStrings` ~241, `itemNames` ~706) into one above-floor domain, rather than creating sub-floor fragments. This honors the floor by merging up, not splitting down. These region line counts are approximate: the `abilities` and `items` regions interleave build helper consts (for example `ITEM_ENTITY_IDS`, `MERGE_ITEM_IDS`) and per-locale spreads, so recompute the exact seam boundaries at split time rather than treating these figures as precise.
+- `_merge.ts` keeps the build-time merge layers as TS source (underscore-prefixed to flag "internal composition, not a player-facing domain"). They stay TS, not moved into the `.mjs` generator, because that would split human-editable content across the TS/JS boundary and lose the tsc completeness guarantee for those keys.
+- The barrel composes `en` exactly as today and is the only place `EnTranslations` / `TranslationKey` / `Leaves` are defined, so `Leaves<typeof en, 6>` is still computed over one assembled `en`.
+
+#### 4.4.4 Overlays and matchers: do not split now
+
+- **Overlays (`src/ui/i18n.locales/<lang>.ts`)** are flat sparse `Partial<Record<TranslationKey,string>>`, so they fail criterion 1 (no nested-`Leaves` cost); an LSP opens a ~2,051-line flat object instantly. Splitting them would also fragment the translator workflow. Keep them single-file per locale. **Future trigger:** if an overlay exceeds ~4,000 lines, revisit and split by the same domain seams as `i18n.en/` (`de_DE/shell.ts`, `de_DE/hud.ts`, ...) so the human layout mirrors the English source. Until then, do nothing.
+- **`talent_i18n.ts` (4,359 lines)** is a matcher, not an `en`-domain block; its pain is procedural-type inference, not nested-literal depth, so the right cut is by effect-builder family, owned by the matcher concern, in a later phase. Out of scope for Phase 3.
+
+### 4.5 Generated-artifacts git and CI strategy
+
+The decision is driven by a per-artifact test: is the committed copy doing reviewable work, or only churn? The two artifacts are not symmetric, so the decisions are not symmetric.
+
+| Artifact | Decision | Reason |
+|---|---|---|
+| `src/ui/i18n.status.json` (4.74 MB, build/test-only, never shipped to the client, but CURRENTLY GIT-TRACKED) | **Gitignore** (via `git rm --cached`, Step 4) | Pure churn; a human never reads its 187k-line diff; nothing depends on its committed state. It is committed today, so Step 4 must `git rm --cached` it, not merely add a gitignore rule. |
+| `src/ui/i18n.resolved.generated/` (game, ~2.57 MB) | **Keep committed** (split per file, DONE in Step 1) | Language changes should be reviewable in the PR; the per-locale split fixes the IDE choke and makes diffs reviewable. Determinism is anchored by the SHA baseline plus tsc. |
+| `src/admin/i18n.resolved.generated/` (~177 KB) | **Keep committed** | Small, reviewable, low churn; no IDE pain. |
+| `src/ui/i18n.resolved.sha256` (65 B) | **Keep committed** | It is the determinism anchor; non-negotiable. |
+
+**Resolution of a cross-proposal disagreement.** One investigation argued for gitignoring the game resolved table as well (its correctness is double-anchored by the SHA baseline and tsc, so committing it adds no correctness and costs ~2.57 MB churn). The decisive counter-priorities are the maintainer's stated requirement that language changes stay **reviewable in PRs** and the audience for those reviews (native-speaker contributors checking a locale's diff). **Resolution: keep the game resolved table committed, but split per file (DONE in Step 1).** The per-locale split is what makes "committed" tolerable: the IDE no longer chokes on a single dense file, and a single-locale change diffs one per-locale file instead of rehashing a ~2.57 MB blob. The churn that remains (an English edit touches `en.ts` and the 13 English-filled rows in other locale files) is the price of reviewability, paid in per-file diffs a reviewer can actually read. Only `i18n.status.json` is gitignored, because its diff has zero review value and it is never shipped.
+
+**Reproducibility-gate redesign.** Today, reproducibility is proven by "regenerate, then `git diff --exit-code` against the committed copy," which is only meaningful for a committed file. For the gitignored `i18n.status.json` we replace it with a direct determinism check: generate twice into temp dirs (via the `I18N_OUT_DIR` override) and assert byte-identical output. A shared helper `tests/helpers/i18n_determinism.ts` provides `assertDeterministic({ script, outFiles })`. The committed artifacts keep their existing `git diff --exit-code` gate, now pointed at directories.
+
+**Each gate guarantees a distinct property; keep all three.** Determinism (the same input produces byte-identical output) is proven by the `assertDeterministic` double-generation check. Freshness (the committed artifact equals what the generator produces now, so nobody forgot to regenerate) is proven by `git diff --exit-code` against the committed directories. Completeness (every key exists in `en`) is proven by tsc over the `: EnTranslations` annotation. The redesign swaps the freshness gate for the determinism gate ONLY for the gitignored `i18n.status.json`, which has no committed copy to diff against; the committed resolved-table directories keep the `git diff` freshness gate AND gain the determinism check, not one in place of the other. Harden `assertDeterministic` against same-machine blind spots by pinning the Node version and lockfile and perturbing `TZ`, `LC_ALL`, and the temp-dir path between the two generations, so any latent timestamp, locale, or path-ordering dependency surfaces. Mark the committed per-locale tables `linguist-generated` in `.gitattributes` so GitHub collapses them by default in PR diffs while keeping them expandable on demand.
+
+**Audit trail for the gitignored registry (recommended).** Gitignoring `i18n.status.json` loses the historical record of pending/translated/blocked at each commit. Restore it with a small committed `src/ui/i18n.status.summary.json` (a few KB): counts, per-locale rollup, a `universeHash`, no per-key bodies. It is diff-reviewable (a reviewer sees pending counts move per locale across a release fill), low-churn (numbers change only when coverage changes, not on every English edit), and `i18n_status_registry.test.ts` cross-checks that the committed summary's counts equal the recomputed-from-full-registry counts (an added guarantee, not a weakening).
+
+**CI plumbing.** `pretest` already runs `i18n:build && i18n:admin && i18n:scan`, so `npm test` regenerates the gitignored `status.json` before any test reads it. The one gap is `npx tsc --noEmit`, which runs before `npm run build` and imports generated modules. Add an aggregate `i18n:gen` script (`i18n:build && i18n:admin && i18n:scan`) and a `Generate i18n artifacts` step to both CI jobs, after `npm ci` and before the typecheck. The two-tier structure (job split by git ref, `I18N_RELEASE_TIER=1` on release) is untouched; generators do not branch on the tier flag (it gates test assertions, never generation).
+
+### 4.6 Contributor workflow change
+
+The policy decision, stated decisively: **adopt English-only PRs as the explicit, documented contract.** The sparse-overlay model plus the two-tier gate already make English-only PRs correct and safe; the docs simply forbid what the system permits. The roles:
+
+| Role | Does | Does NOT |
+|---|---|---|
+| **Contributor** (incl. small-plan Claude Code agents) | Add the key to `en` (`i18n.en.ts`); render via `t()`; for `src/sim/` or `server/` emits, register the matcher rule in `sim_i18n.ts` / `server_i18n.ts` in the same change; regenerate and commit the generated artifacts. | Touch the 13 `i18n.locales/<lang>.ts` overlays. Write any non-English translation. Put English copy, a placeholder, or `// TODO` into an overlay as a fake translation. Hand-edit `*.resolved.generated` or `i18n.status.json`. |
+| **Maintainer** (Fernando) | Fill all non-English overlays before release via `npm run i18n:worklist`; regenerate; update the SHA baseline; ship from `release/**`. | n/a |
+
+**Why this is correct and not a loosening of any invariant.** The invariant "every player-visible string is a `t()` key" is unchanged and still enforced by tsc (the `TranslationKey` type) and the `t()` untracked-key throw; contributors still cannot ship a hard-coded literal. The deleted clause ("a real translation to every locale") was never an invariant; it was a workflow demand the build does not need. Omitted keys are English-filled and marked `pending`, and the release-tier gate hard-fails on any `pending` row, so full-locale completeness is still mandatory at the only point it matters: shipping to players. Translating one's own locale is **permitted but not required**, so a native-speaker contributor can still help without it ever reading as an obligation.
+
+**The deliberate prohibition that survives, re-aimed.** Do not stuff English / `// TODO` / a placeholder into a non-English overlay to fake a translation. Omitting the key is the right move; faking it in the overlay would mark the row `translated` and slip past the release gate. The old bullet's useful half is preserved, pointed at its correct target.
+
+**Forward notes (out of scope for Phase 3; recorded so they are not rediscovered later).** If an RTL locale is ever added (none of the 14 shipped locales are RTL today), add an `en-XB` fake-bidi pseudo-locale alongside `en_XA` to catch bidi and layout bugs, per Google and Android pseudo-localization practice. Separately, the code-driven English-only flow is the right fit at this scale (one maintainer, machine-fill plus review); the threshold to migrate to a dedicated translation management system (Crowdin, Weblate, Lokalise, Phrase) is multiple concurrent human translators or a need for translation memory across releases. Neither is needed now, but both are cheap to note now and expensive to retrofit blind.
+
+---
+
+## 5. Exact CLAUDE.md changes
+
+STATUS: ALREADY APPLIED. These documentation edits landed in commit a36a94c7 (the same commit that added this doc). The live root, `src/ui`, and `src/admin` CLAUDE.md files and `docs/i18n-scaling/translation-workflow.md` already match the target ('With:') text in each subsection below; verified 2026-06-17. The Replace/With blocks are retained as the historical record of exactly what changed. No further action is required for Section 5.
+
+> Punctuation note: each "Replace:" block reproduces the live CLAUDE.md text verbatim (including its em dashes) so the match is exact; the "With:" blocks are authored em-dash-free per the project's no-em-dash rule, except where a replacement reproduces and extends an existing bullet whose sibling lines use the file's ` -- ` bullet style (the admin `i18n.ts` bullet in 5.3), where the leading punctuation is preserved to keep that bullet consistent with its neighbors. The em dashes that remain in this section are confined to those verbatim-quote and bullet-style-preserving fences, never the doc's own prose.
+
+### 5.1 Root `/Users/fernando/Documents/world-of-claudecraft/CLAUDE.md`
+_Applied: live `CLAUDE.md:70-91` already matches the With text for Edits A and B (verified 2026-06-17)._
+
+**Edit A. Soften the invariant intro line (currently around line 70).**
+
+Replace:
+
+```
+- **i18n: every player-visible string is a `t()` key, in every locale.** Each
+```
+
+With:
+
+```
+- **i18n: every player-visible string is a `t()` key.** (Translated in every locale
+  *by release*: see the contributor/maintainer split below; English-only PRs are
+  legal.) Each
+```
+
+This keeps the invariant absolute ("is a `t()` key") while moving "in every locale" to a release-time obligation. Lines 71-75 (the tsc / matcher-gap explanation) are unchanged.
+
+**Edit B. Replace the "every locale" mandate bullet (currently lines 76-79).**
+
+Replace:
+
+```
+  - **Add the key to `en` first, then a real translation to every locale** in
+    `translations` (`Object.keys(translations)`/`supportedLanguages` is the
+    authoritative set — never author against a printed list). No English copy,
+    placeholder, or `// TODO`; no "temporary English."
+```
+
+With:
+
+```
+  - **Contributors add ENGLISH only; the maintainer fills every locale before
+    release.** Add the key to `en` first (`src/ui/i18n.en.ts`) and render it via
+    `t()`. Do **not** edit the 13 `src/ui/i18n.locales/<lang>.ts` overlays: the build
+    English-fills any omitted key and the registry (`i18n.status.json`) marks it
+    `pending`. This is intentional: translating 13 locales per PR would drain
+    small-plan contributors' token budgets and bloat the diff; the maintainer
+    (Fernando) batch-fills all locales at release via `npm run i18n:worklist`.
+    Completeness is still mandatory, just enforced later: the **release-tier gate**
+    (push to `release/**`, `I18N_RELEASE_TIER=1`) hard-fails on any `pending` row,
+    and `t()` hard-fails a pending key in a release build. The **PR-tier gate**
+    (no env var) intentionally permits English-only. `supportedLanguages` is the
+    authoritative locale set; never author against a printed list. **Never put English
+    copy, a placeholder, or a `// TODO` into a non-English overlay** as a stand-in
+    translation. Full roles + glossary: `docs/i18n-scaling/translation-workflow.md`.
+```
+
+The replacement deliberately cites only `supportedLanguages` as the authoritative locale set, dropping the old text's `Object.keys(translations)`. The current file pairs the two, but after the Step 3 flip the runtime no longer holds a fully-populated `translations` object (the doc derives `supportedLanguages` from the generated `SUPPORTED_LANGUAGES`; Section 4.1). The runtime export name `supportedLanguages` is preserved across the flip, so citing it is correct in both the pre- and post-flip world; citing `Object.keys(translations)` would name an object that no longer exists in the runtime once lazy loading lands. This is intentional, not an omission.
+
+**Preserved verbatim (no edit):** the "final rendered text comes from `t()`" bullet, the "classify by render sink" bullet (including the admin-dashboard scope), the "sim/server stay language-agnostic plus the S3 guard `tests/localization_fixes.test.ts`" bullet, and the emoji/symbols bullet. These remain real invariants.
+
+> Implementer verification: the root bullet cites the S3 guard as `tests/localization_fixes.test.ts`; confirm the path still exists at implementation time, and if it has moved, fix the reference in the same commit so the two CLAUDE.md files never name different guards.
+
+### 5.2 `/Users/fernando/Documents/world-of-claudecraft/src/ui/CLAUDE.md`
+_Applied: live `src/ui/CLAUDE.md` already matches the With text for Edits A (`:71`), B (`:90-95`), and C (`:103-110`) (verified 2026-06-17)._
+
+This file already documents the correct model; the work is alignment, not rewrite.
+
+**Edit A. Header (currently line 71).**
+
+Replace:
+
+```
+## i18n - IMPORTANT (sparse-overlay model; English-only PRs are legal)
+```
+
+With:
+
+```
+## i18n - IMPORTANT (sparse-overlay model; contributors add ENGLISH ONLY)
+```
+
+**Edit B. Step 1 of the contributor workflow (currently around lines 90-92).**
+
+Replace:
+
+```
+**Contributor workflow (add a player-visible string):**
+1. Add the key to `en` (`i18n.en.ts`) and render it through `t()`. Do NOT edit the
+   13 overlays - the build fills them from English and the registry marks them `pending`.
+```
+
+With:
+
+```
+**Contributor workflow (add a player-visible string): add ENGLISH ONLY:**
+1. Add the key to `en` (`i18n.en.ts`) and render it through `t()`. **Never edit the 13
+   `i18n.locales/<lang>.ts` overlays, and never put English/`// TODO`/a placeholder
+   into one as a fake translation.** Leave the key omitted; the build English-fills it
+   and the registry marks it `pending`. (Translating 13 locales per PR would drain
+   small-plan token budgets; the maintainer batch-fills them at release.)
+```
+
+**Edit C. The PR step and maintainer line (currently around lines 100-103).**
+
+Replace:
+
+```
+4. Open the PR. It is green at the PR-tier gate, which does not require translations;
+   `tsc` still guarantees English completeness.
+
+The maintainer fills the `pending` slice at release time from `npm run i18n:worklist`.
+```
+
+With:
+
+```
+4. Open the PR. It is green at the **PR-tier gate** (no `I18N_RELEASE_TIER`), which does
+   not require translations; `tsc` + the `t()` untracked-key throw still guarantee
+   English completeness.
+
+The maintainer fills the `pending` slice at release time via `npm run i18n:worklist`,
+then ships from `release/**` where the **release-tier gate** (`I18N_RELEASE_TIER=1`)
+hard-fails on any `pending` row. Run `I18N_RELEASE_TIER=1 npm test` locally to dry-run
+that gate.
+```
+
+The file map, the `t()`-behavior paragraph, and the existing pointer to `translation-workflow.md` are already correct and stay unchanged.
+
+### 5.3 `/Users/fernando/Documents/world-of-claudecraft/src/admin/CLAUDE.md`
+_Applied: live `src/admin/CLAUDE.md:21` already matches the With text for Edit A (verified 2026-06-17)._
+
+**Edit A. Extend the existing i18n bullet (currently line 21).**
+
+Replace:
+
+```
+- `i18n.ts` — the dashboard's own `t()` layer (`classLabel`, `zoneLabel`, `reasonLabel`, `localizeAdminError`). Operators are users, so **all rendered admin text routes through it** (the root i18n invariant applies here too).
+```
+
+With:
+
+```
+- `i18n.ts` — the dashboard's own `t()` layer (`classLabel`, `zoneLabel`, `reasonLabel`, `localizeAdminError`). Operators are users, so **all rendered admin text routes through it** (the root i18n invariant applies here too). Admin has its OWN sparse-overlay set, independent of the game: author English in `i18n.en.ts` (flat dotted keys) and render via `t()`; **never edit the 13 `i18n.locales/<lang>.ts` admin overlays** (the maintainer fills them at release). Regenerate `i18n.resolved.generated` with `npm run i18n:admin`; the release-tier gate enforces no `pending` admin rows.
+```
+
+This mirrors the game contract while flagging the two admin specifics: it is a separate overlay set, and its English source is flat (not nested).
+
+### 5.4 `/Users/fernando/Documents/world-of-claudecraft/docs/i18n-scaling/translation-workflow.md` (ALREADY CREATED)
+
+Both the root and `src/ui/CLAUDE.md` point here. This file ALREADY EXISTS (102 lines, created in commit a36a94c7) and already covers every section of the structure below, so the pointer is not dangling. The structure below is retained as the record of what the file contains:
+
+```
+# i18n Translation Workflow
+
+Contributors add English strings only; the maintainer fills every locale before
+release. This doc is the canonical roles reference; the root + src/ui CLAUDE.md
+bullets point here.
+
+## Roles at a glance        (the contributor/maintainer table from Section 4.6)
+## Adding a player-visible string   (the 4 steps, verbatim from src/ui/CLAUDE.md)
+## The two-tier gate        (PR-tier permits English-only; release-tier enforces pending=0)
+## The pending set + en_XA  (English-fill in dev; hard-fail at release; ?lang=en_XA QA)
+## Maintainer release workflow  (i18n:worklist -> fill overlays -> i18n:build/scan ->
+                                 i18n:hash --write -> push release/**)
+## Admin parity             (separate overlay set; flat English; npm run i18n:admin)
+## Locked-terms glossary    (the glossary ALREADY EXISTS at scripts/i18n_glossary.json:
+                             hand-maintained verbatim brand terms + category key-patterns;
+                             i18n:worklist ships it verbatim with every per-language batch.
+                             This section documents and points to it, not a new home.)
+## Adding a new locale       (create overlays; add to translations map; i18n:build/scan)
+```
+
+The maintainer section uses the real script names: `npm run i18n:worklist` (mapped to `scripts/i18n_fill_worklist.mjs`), `npm run i18n:build`, `npm run i18n:scan`, `npm run i18n:admin`, `npm run i18n:hash -- --write`.
+
+---
+
+## 6. Migration plan
+
+Each step is independently shippable and leaves `npm test` and `npm run build` green. The ordering principle: change the producer before the consumer; keep a back-compat surface until the consumer is migrated; flip the consumer last; do CI/git/docs last so a revert of the risky middle steps never strands the gate.
+
+### Step 1: Split the build emit into per-locale modules plus a back-compat barrel (producer only) - DONE
+
+DONE: the per-locale emit split has landed. `scripts/i18n_build.mjs` writes `src/ui/i18n.resolved.generated/` (per-locale modules, `pending.ts`, `loaders.ts`, `en_XA.ts`, and the barrel `index.ts` that re-exports everything incl. `en_XA` and `pending`). The directory resolves the same `'./i18n.resolved.generated'` specifier via `index.ts`, so `src/ui/i18n.ts` does not change. Mirror to `scripts/i18n_admin_build.mjs`.
+
+- **Verify:** `npm run i18n:build && git diff --exit-code` regenerates identically; `npm run i18n:hash -- --check` still prints OK against the unchanged baseline; `npm test`; `npm run build` records a gzip within noise of 1.13 MB (no bundle change expected, all 14 still pulled through the static barrel import).
+- **Watch:** the barrel must re-export `en_XA` and `pending` or tests importing those by name go red; write all files atomically to avoid a torn directory.
+- **Rollback:** pure revert of the build scripts plus restore the single file; no runtime/CI/test surface touched.
+
+### Step 2: Introduce the async loader and bootstrap behind `tableFor()`, still statically importing everything (additive)
+
+Add `ensureLocaleLoaded`, `isLocaleResident`, the `resident` / `inflight` maps, and the `tableFor()` English-fallback line to `src/ui/i18n.ts`, while keeping the static imports. Pre-populate `resident[currentLanguage]` synchronously from the still-static table so behavior is unchanged (the await is a no-op). Wire the bootstrap await into `startGame()` (between the loading-screen paint and `mountGameUi()`), the homepage shell, and the picker handler (`switchLanguage`). Mirror in admin (`ensureAdminLocaleLoaded` before `localizeStatic()`).
+
+- **Verify:** `npm test` plus a new test asserting `t()` is synchronous and correct for a non-en `currentLanguage` before and after an awaited `ensureLocaleLoaded`; `?lang=es` in dev shows no flash and no console error; `i18n:hash --check` OK.
+- **Watch:** shape-tolerant loader read (`mod.default ?? mod[lang]`) for the node/vitest source-`.ts` path; bundle may tick up slightly (loaders map + 13 lazy chunks now emitted alongside the still-static statics). Do not advertise a bundle win yet.
+- **Rollback:** revert the `i18n.ts` additions and the call-site awaits; no artifact/CI change.
+
+### Step 3: Flip the static import to lazy (the actual payload reduction)
+
+Change `src/ui/i18n.ts` to import only `en` + `pending` + `LOCALE_LOADERS` + `SUPPORTED_LANGUAGES` (plus dev-only `en_XA`). This is the step that turns the build red unless three existing tests are fixed in the same commit, because each one switches language and reads `t()` (or mocks the table) synchronously, which is exactly the contract that changes here. They are not "import-path updates"; they are the canary tests for the whole flip.
+
+**3.1 Required test edits (these break at Step 3 if untouched):**
+
+- **`tests/homepage_foundation.test.ts` (build-breaker).** The loop at lines 73-77 (block 57-78) iterates 12 non-English locales (`es` is covered separately at lines 39-55) doing `setLanguage(lang.code); expect(t("nav.play")).toBe(lang.play)` (for example expects "Jugar", "Играть", "开始游戏") with **no `await ensureLocaleLoaded`**. Under lazy loading, after `setLanguage("ru_RU")` the `ru_RU` chunk is not resident, so `tableFor()` returns `resident.en` and `t("nav.play")` yields "Play" -> the assertion fails. **Fix:** make the loop body `await ensureLocaleLoaded(lang.code)` before asserting (the test runner already supports async `it`), or read the locale table directly instead of through `t()`. This is the canonical "switch-and-read-synchronously" pattern; any future test that flips `setLanguage` to a non-en locale and reads `t()` in the same tick must do the same await.
+- **`tests/i18n_t_behavior.test.ts` pending-injection mock (silent breakage).** The mock (`loadWithPending`, lines 58-75) injects the synthetic pending key by overriding `actual.translations.es` / `.en` and `actual.pending.es` on the `i18n.resolved.generated` module, then imports `../src/ui/i18n`. This works **today** because the runtime reads `translations[lang]`. After the flip the runtime reads `en` eagerly + `resident.es` populated by `LOCALE_LOADERS.es()` (a dynamic import of `./es`), so mocking the barrel's `translations` no longer feeds the synthetic key into the table the runtime reads; both the non-release "English fill" and release "hard-fail on pending" cases would stop exercising the real path (the key is simply absent -> `onUntrackedKey`, a different throw). **Fix:** re-point the mock to the new seam: mock `LOCALE_LOADERS.es` (and the per-locale `es` module) to return the synthetic table, or pre-seed `resident.es` via a small test-only hook, then `await ensureLocaleLoaded("es")` before asserting. Section 7 marks this row "changes" accordingly.
+- **`tests/localization_fixes.test.ts` (the S3 guard) under Option 3b.** This file imports all 14 locale consts from `../src/ui/i18n` (lines 9-11) and also `fs.readFileSync`s `src/ui/i18n.status.json` (line 25). If Option 3b stops `i18n.ts` re-exporting the consts, this test goes red. Under Option 3a it stays green untouched. This is one of the decisive reasons to prefer 3a (below).
+
+**3.2 The test/hash import surface: prefer 3a, gate on the probe.** A larger set of tests than the doc previously implied import locale consts from `../src/ui/i18n` (not from the generated path): `tests/localization_fixes.test.ts` (all 14, the S3 guard), `tests/i18n_status_registry.test.ts` (`en`, `supportedLanguages`), and `tests/localization_coverage.test.ts`. Others import from the generated path directly (which becomes the directory via the barrel, so they are unaffected): `tests/i18n_dialect_resolution.test.ts`, `tests/i18n_build_gapfill.test.ts`, `tests/i18n_pseudo_locale.test.ts`, and `tests/i18n_t_behavior.test.ts` (`pending`). `tests/i18n_overlay_key_membership.test.ts` imports the per-locale *overlays* (`src/ui/i18n.locales/<lang>.ts`), untouched by either option.
+
+- **Option 3a (preferred):** keep `i18n.ts` re-exporting the dense consts (it already does today, at `src/ui/i18n.ts:18`) so all the `../src/ui/i18n` importers above stay green with zero edits, and verify via a hard build-size probe that Rollup tree-shakes the 13 statics out of the *app* chunk. The premise is plausible but finicky: the existing `gameStrings = en.game` indirection (`src/ui/i18n.ts:19-24`) was added precisely to stop a re-export from pulling `i18n.en`'s ~1 MB base into the client, which is the exact class of hazard at play. So 3a is the recommended path **only if** the re-exported consts are reachable solely by tests, never by any app-imported symbol, confirmed by the probe. If the probe passes, 3a ships and no `../src/ui/i18n` const-importer is touched.
+- **Option 3b (fallback, only if 3a's probe fails):** point the const-importing tests and `scripts/i18n_resolved_hash.mjs` at the generated `index.ts` directly, so `i18n.ts` need not re-export the dense statics and tree-shaking is guaranteed. The hash value is identical (same `translations` object hashed); only the source module the harness reads from moves. This costs editing every `../src/ui/i18n` const-importer listed above, **including the S3 guard `tests/localization_fixes.test.ts`** -- a reason to exhaust 3a first. Make 3b its own commit so a bisect can isolate a gate change from an artifact change.
+
+- **Verify:** `dist/assets/` shows a `main-*.js` gzip dropped to ~590 KB, 13 content-hashed locale chunks (~42 KB gzip each), and `en` is not a separate chunk; `i18n:hash --check` OK; the build-size probe decides 3a vs 3b; `npm test` (with the 3.1 test edits) green, plus new tests for loader-rejection -> English fallback, non-en current language renders translated, the pending/release hard-fail path still throws; throttled-mobile TTI probe; E2E visual no-layout-shift on swap.
+- **Rollback:** revert `i18n.ts` to the static barrel import (Step 2 state); single-file revert, all-14-in-main restored instantly. This is why the barrel is retained through Step 3.
+
+### Step 4: Artifacts, git, and CI (retire the back-compat role; settle storage)
+
+Gitignore `src/ui/i18n.status.json`; `git rm --cached` it. Add the `i18n:gen` aggregate script and the `Generate i18n artifacts` CI step to both jobs. Replace the `status.json` reproducibility sub-suite in `tests/i18n_status_registry.test.ts` with the `assertDeterministic` double-generation check (keep all validation sub-suites, including the release-tier `pending===0`). Repoint the directory-path tracking/diff checks in `tests/i18n_resolved_equivalence.test.ts`. Add `I18N_OUT_DIR` to the generators. Optionally emit and commit `i18n.status.summary.json` with the cross-check. Optionally lower `chunkSizeWarningLimit` now that main is ~590 KB.
+
+- **Verify:** fresh clone -> `npm ci && npm test` green with `status.json` absent pre-build (proves `pretest` regenerates it); `I18N_RELEASE_TIER=1 npm test` green and red on a synthetic pending row; `i18n:hash --check` OK; `git status` clean after build with no megabyte files tracked.
+- **Rollback:** un-ignore `status.json`, restore its reproducibility sub-suite, re-point the hash harness if 3b; isolated from runtime, so the Step 3 bundle win is not regressed.
+
+### Step 5: CLAUDE.md and docs (DONE except a worklist-index tidy)
+
+ALREADY DONE in commit a36a94c7: the Section 5 edits to the root, `src/ui`, and `src/admin` CLAUDE.md files, and the creation of `docs/i18n-scaling/translation-workflow.md`. The only remaining Step 5 work is to update the worklist index to mark Phase 3 done and record the final chunk shape and bootstrap contract, written against shipped reality once Steps 1-4 land. Do NOT re-apply the CLAUDE.md edits or recreate the workflow doc.
+
+- **Verify:** `grep -rn "every locale" CLAUDE.md src/*/CLAUDE.md` returns only release-time framings; `npx vitest run tests/localization_fixes.test.ts` and `npm test` stay green (doc-only edits).
+
+### Phased deploy
+
+Steps 1-2 land back-to-back (producer-only / additive). Step 3 is the behavior change: land it, soak on a preview deploy with the throttled-mobile probe and a manual `?lang=` sweep across all 14 before promoting; its rollback is a single-file revert. Step 4 (CI/git) only after Step 3 has soaked clean for a release cycle, never bundled with the runtime flip. Step 5 (docs) last.
+
+---
+
+## 7. Testing and CI changes
+
+**Canary inventory: every test that imports locale consts or reads a generated artifact.** Verified in-repo so the impact analysis is complete, not sampled. Note that, contrary to a "most tests import from the generated path" assumption, the heaviest importers read locale consts from `../src/ui/i18n` (which re-exports all 14 today at `src/ui/i18n.ts:18`):
+
+| Test / file | Imports from | Disposition |
+|---|---|---|
+| `tests/localization_fixes.test.ts` (the S3 guard) | all 14 consts from `../src/ui/i18n` (lines 9-11); `fs.readFileSync` of `src/ui/i18n.status.json` (line 25) | Green under 3a (consts still re-exported). **Breaks under 3b** (must repoint the const import). The `status.json` read is satisfied by `pretest`; running this file in isolation needs `npm run i18n:scan` first. |
+| `tests/i18n_status_registry.test.ts` | `en`, `supportedLanguages` from `../src/ui/i18n`; also reads the registry | Green under 3a; repoint under 3b. Registry read satisfied by `pretest`. |
+| `tests/localization_coverage.test.ts` | locale consts (via `../src/ui/i18n` or the generated path) | Green under 3a; update import source under 3b. |
+| `tests/i18n_dialect_resolution.test.ts` | consts from `../src/ui/i18n.resolved.generated` (becomes the directory) | Resolves through the barrel; unaffected by 3a/3b. |
+| `tests/i18n_build_gapfill.test.ts` | `en, es, es_ES, en_CA` from `../src/ui/i18n.resolved.generated` | Resolves through the barrel; unaffected. |
+| `tests/i18n_pseudo_locale.test.ts` | `en, en_XA` from `../src/ui/i18n.resolved.generated` | Resolves through the barrel (which re-exports `en_XA`); unaffected. |
+| `tests/i18n_overlay_key_membership.test.ts` | per-locale **overlays** `src/ui/i18n.locales/<lang>.ts` | Overlays are unchanged by Phase 3; unaffected by either option. |
+
+**Test changes by file:**
+
+| Test / file | Change |
+|---|---|
+| `tests/homepage_foundation.test.ts` | **Changes (build-breaker at Step 3).** The loop at lines 73-77 iterates 12 non-en locales (`es` covered separately at lines 39-55) doing `setLanguage(lang.code); expect(t("nav.play")).toBe(lang.play)` with no await. Under lazy loading `t()` returns English -> fails. Fix: `await ensureLocaleLoaded(lang.code)` before each assertion (async `it`), or read the locale table directly. This is the canonical switch-and-read-synchronously edit; any future test doing the same must add the await. |
+| `tests/i18n_t_behavior.test.ts` | **Changes at Step 3.** The pending-injection mock (`loadWithPending`, lines 58-75) patches `translations`/`pending` on the generated module; after the flip the runtime reads `en` eagerly + `resident.es` via `LOCALE_LOADERS.es()`, so the mock no longer feeds the table the runtime reads (the key falls to `onUntrackedKey`, a different throw). Re-point the mock to `LOCALE_LOADERS.es` / the per-locale `es` module (or pre-seed `resident.es` via a test hook) and `await ensureLocaleLoaded("es")` before asserting. The release-only empty-`pending` assertion (using `realPending` imported from the generated path) is unchanged. Add a non-en-current-language sync-`t()` case and a loader-rejection -> English-fallback case. |
+| `tests/i18n_resolved_equivalence.test.ts` | Keep the SHA `--check` and hash-equality tests unchanged (the hash reads `i18n.ts` exports, split-agnostic). Repoint the `git ls-files --error-unmatch` and `git diff --exit-code` checks at the `src/ui/i18n.resolved.generated/` directory. Optionally add an `assertDeterministic` double-gen check. |
+| `tests/i18n_status_registry.test.ts` | Keep all validation sub-suites (universe coverage, enHash re-derivation, counts, blocked rows, release-tier `pending===0`). Replace the reproducibility sub-suite (`git ls-files` + `git diff`) with `assertDeterministic({ script: i18n_scan.mjs, ... })`. Add the summary-vs-body counts cross-check if the summary ships. Under 3b, repoint the `en` / `supportedLanguages` import. |
+| `tests/localization_fixes.test.ts` (S3 guard) | No **logic** change. Now depends on `pretest` (or `npm run i18n:scan`) having regenerated the gitignored `status.json`; running it in isolation requires `npm run i18n:scan` first. **Under 3b only:** repoint its 14-const import from `../src/ui/i18n` to the generated `index.ts`. |
+| `tests/i18n_admin_catalog.test.ts` | If admin gets the directory split, repoint its reproducibility check at the directory; otherwise no change. Bundle-isolation, overlay-key, and admin.html static-key checks unchanged. |
+| `tests/localization_coverage.test.ts` | No logic change; if import paths move to the generated directory or the `i18n.en/` barrel (3b), update the import source. Structural checks run at both tiers; copied-English checks remain release-tier only. |
+| `tests/helpers/i18n_determinism.ts` | New shared helper: `assertDeterministic({ script, outFiles, env? })` runs a generator twice into temp dirs (via `I18N_OUT_DIR`) and asserts byte-identical output. |
+
+**CI (`.github/workflows/ci.yml`):** add a `Generate i18n artifacts` step (`npm run i18n:gen`) to both the PR-tier and release-tier jobs, after `npm ci` and before the typecheck and build. The release-tier job keeps `I18N_RELEASE_TIER=1`; generators do not branch on it. No `manualChunks` change in `vite.config.ts` (Rollup auto-splits on the `loaders.ts` `import()` thunks). No `server/static_cache.ts` change (existing `/assets/*` immutable policy covers the new chunks).
+
+**On the necessity of the new CI step (narrow, not broad).** `npx tsc --noEmit` does **not** import `i18n.status.json` (it is JSON, imported by no `.ts`), so a missing `status.json` cannot break the typecheck; and the committed `src/ui/i18n.resolved.generated/` directory that tsc and the build *do* consume stays committed, so it is present regardless. Furthermore `npm run build` already runs `i18n:build && i18n:admin && i18n:scan` as its first commands, so the build step regenerates `status.json` on its own. The `Generate i18n artifacts` step is therefore load-bearing only for a tool that reads the gitignored `status.json` *outside* the `pretest`-wrapped `npm test` and *outside* `npm run build`. Inside `npm test`, `pretest` already regenerates it. Keep the step as belt-and-suspenders for any future CI job or manually-run test that reads `status.json` directly, but state its rationale precisely: "materialize the gitignored `status.json` for non-`npm test`, non-`npm run build` consumers," not "the typecheck imports generated modules" (it does not).
+
+**Determinism and two-tier guarantees, proven.** The SHA baseline (git-independent, read from `i18n.ts` exports) plus tsc (committed-status-independent) plus double-generation byte-equality cover determinism at equal-or-greater strength than today. The two-tier guarantee lives entirely in test assertions gated on `process.env.I18N_RELEASE_TIER === "1"` and the CI job split by git ref; none of those touch the committed/gitignored status of any artifact, so gitignoring `status.json` changes nothing about what is asserted or when.
+
+---
+
+## 8. Risks and mitigations / rollback
+
+| ID | Risk | Where | Mitigation |
+|---|---|---|---|
+| R1 | First-paint English flash / await stall on slow mobile. | Step 3 | Await `ensureLocaleLoaded(lang)` behind the loading screen, before `mountGameUi()` (the first `t()`-bearing mount). No localizable DOM mounts before the await. The only text that can render before the ensure resolves is the single loading-screen caption (one string), shown in English for the sub-second boot window to a non-en user. Resolve this by design rather than leaving it to QA: render that one caption from the eager `en` table deliberately (it is a generic spinner label), so there is no full-page flash, only one intentional English boot caption, never a mixed-language page. |
+| R2 | Sync-`t()` contract violation (600-plus hud.ts call sites). | Steps 2-3 | `t()` signature never changes; the only async surface is `ensureLocaleLoaded` (bootstrap + picker). `tableFor()` reads `resident[lang] ?? resident.en`. Regression test forces a non-en current language and asserts `t()` is synchronous and correct after the awaited ensure. |
+| R3 | Rollup fails to tree-shake the 13 statics if `i18n.ts` re-exports them for tests/hash (Option 3a), so Step 3 yields no bundle win. | Step 3 | Prefer 3a (it keeps every `../src/ui/i18n` const-importer green, including the S3 guard), but gate it on a **hard** build-size probe of `dist/assets/main-*.js` gzip; if not ~590 KB, fall to Option 3b (tests/hash import from the generated `index.ts`). The premise is finicky: the existing `gameStrings = en.game` indirection (`src/ui/i18n.ts:19-24`) was added precisely to stop a re-export from pulling a ~1 MB base into the client, the same hazard class. So 3a is sound only if the re-exported consts are reachable solely by tests, never by an app-imported symbol -- which acceptance criterion 4 (Section 9) is the pass/fail of. |
+| R4 | `en_XA` dev-path regression. | Steps 1-3 | Keep `en_XA` in its own generated file, imported only inside the `!import.meta.env.PROD` branch of `tableFor()` (existing guard, untouched). Never route `en_XA` through `LOCALE_LOADERS` (would ship it or make it async). Keep the pseudo-locale test green every step; add an assertion that a prod build tree-shakes the `en_XA` chunk out. |
+| R5 | Dialect chunks. A naive design might compose `{...es, ...es_ES}` at import time, breaking determinism or double-downloading the base. | Steps 1, 3 | Each dialect is a standalone dense chunk; `LOCALE_LOADERS.es_ES` imports only `es_ES.ts`, never composes with `es` at runtime. Matches today's build-time-only merge. `en_CA` is near-empty but stays lazy for uniformity. |
+| R6 | Reproducibility-gate transition breaks the byte-equivalence proof or moves the SHA baseline. | Steps 3-4 | The hash is computed from `i18n.ts` exports, so the baseline is invariant as long as `supportedLanguages` and the 14 named exports are reachable from the harness. Change the gate harness in its own commit; run `i18n:hash --check` plus `I18N_RELEASE_TIER=1 npm test` before push; never re-baseline to make a red gate green. |
+| R7 | Admin parity vs. effort. | All steps | Do the admin per-locale **file** split (Step 1) for IDE/diff parity, but **defer admin lazy-loading**: admin is 163 KB / ~38 KB gzip, operators are not the mobile/low-bandwidth audience Priority 1 targets, so keep admin's static import. Document the asymmetry so a future reader does not read it as an oversight. Admin bundle-isolation test still passes (per-locale files stay under `src/admin/`). |
+| R8 | SSR / test-env dynamic-import divergence (vitest node, no DOM, source-`.ts` import, no Vite rewrite). | Steps 2-3 | Shape-tolerant loader (`mod.default ?? mod[lang]`); reuse the `isReleaseBuild()` try-catch pattern for any new `import.meta` access; module-init already handles `typeof window === "undefined"`. Add a vitest case that hydrates a locale under node. |
+| R9 | Tests importing locale consts go red. | Steps 1, 3 | Step 1's barrel re-exports every name incl. `en_XA` + `pending`, so generated-path importers (`i18n_dialect_resolution`, `i18n_build_gapfill`, `i18n_pseudo_locale`, the `pending` import in `i18n_t_behavior`) stay green. Under Step 3 Option 3a the `../src/ui/i18n` const-importers (`localization_fixes` the S3 guard, `i18n_status_registry`, `localization_coverage`) also stay green untouched; only Option 3b repoints them and the hash harness. The full canary list (Section 7) is enumerated, not sampled; run the full suite each step. Separately, the switch-and-read tests (`homepage_foundation`, the `i18n_t_behavior` mock) change at Step 3 regardless of 3a/3b -- see Step 3.1. |
+| R10 | Torn write of the generated directory (build crash mid-loop). | Step 1 | Buffer all file contents in memory and write only after all are computed, or write to a temp dir and atomic-rename. |
+| R11 | Returning user mid-deploy referencing stale chunk hashes. | Steps 3-4 | Content-hashed chunks + `Cache-Control: immutable` on `/assets/*` keep old chunks fetchable until reload; `index.html` is `no-cache`, so a reload re-bootstraps against the new manifest. Loader-rejection -> English fallback covers the rare 404 window. No service worker, no extra invalidation. |
+
+---
+
+## 9. Acceptance criteria and metrics
+
+**Hard acceptance gates (all hold at end of Step 3, re-confirmed after Step 4):**
+1. `npm run i18n:hash -- --check` prints OK against the unchanged baseline at every step.
+2. `npm test` green (PR tier); `I18N_RELEASE_TIER=1 npm test` green on a fully-translated tree; the gate-teeth test still throws on a synthetic `pending` row.
+3. `npm run build` green; `npx tsc --noEmit` green.
+4. A default-English visitor downloads **zero** non-English locale bytes (no `es-*.js` ... `ru_RU-*.js` request in the default-load network trace, and no non-English locale data baked into `main-*.js`). This criterion is the acceptance form of the R3 tree-shake probe (Section 8): if Option 3a is chosen and the build-size probe shows Rollup did not fully drop the re-exported consts from the app chunk, this criterion fails and forces Option 3b (and then the Step 3.1 test repoints). The dev-only `en_XA` is excluded from this check: it is correctly tree-shaken from production, so a tester must not flag its absence (or a stray dev-build reference) as a violation.
+5. `?lang=es` and one CJK locale (e.g. `zh_CN`) render fully localized with **no English flash** and **no layout shift** on first paint or in-session swap.
+6. Loader rejection (simulated 404) degrades to English with no client crash and no rejected bootstrap.
+7. `?lang=en_XA` works in dev; the prod bundle contains no `en_XA` in any chunk.
+8. The switch-and-read tests are green: `tests/homepage_foundation.test.ts` (now awaiting `ensureLocaleLoaded` per non-en locale) and `tests/i18n_t_behavior.test.ts` (mock re-pointed to the lazy seam) both pass, proving the lazy flip did not silently regress a synchronous `setLanguage` + `t()` path.
+
+**Quantitative targets (record before/after; the delta is the criterion):**
+
+| Metric | Baseline | Target (post-Step-3) | How measured |
+|---|---|---|---|
+| Main chunk gzip | 1.13 MB | <= 0.62 MB | `gzip -c dist/assets/main-*.js \| wc -c` |
+| i18n share of main chunk gzip | 583 KB | <= ~45 KB (English only) | bundle analysis |
+| Per-locale chunk gzip | n/a | ~37-38 KB Latin, ~39-40 KB CJK, ~44 KB RU (source-gzip; minified ship is smaller) | per-chunk `gzip ... \| wc -c`; confirm against `dist/assets/<lang>-*.js` |
+| Locale chunk count | 0 | 13 non-en + standalone dialects | `ls dist/assets/*-*.js` |
+| TTI, default-English, Slow-4G + 4x CPU | record on `main` first | measurable improvement (transfer ~0.45 MB gzip lighter) | puppeteer `scripts/*.mjs` with throttling, median of N |
+| TTI, `?lang=es`, Slow-4G + 4x CPU | record | <= baseline (en + es chunks parallel during the loading screen) | same harness, `?lang=es` |
+| First-paint flash, non-en user | n/a | 0 frames of English-then-localized | screenshot diff first paint vs. settled |
+
+Set the absolute TTI baseline by running the throttled probe on `main` before Step 3; absolute milliseconds depend on the runner, so the acceptance criterion is the delta (English faster, non-en not slower).
+
+---
+
+## 10. Open questions / decisions for the maintainer
+
+1. **Admin lazy-loading: defer or do now?** Recommendation: defer (Section 8 R7). Admin gets the per-locale file split for IDE/diff parity but keeps its static import, because operators are not the low-bandwidth audience. Confirm this asymmetry is acceptable, or request full admin lazy-loading for strict parity. DECISION (closed): defer admin lazy-loading; do the per-locale file split for parity only.
+2. **`i18n.status.summary.json`: ship it?** Recommendation: yes (Section 4.5). A few KB restores the audit trail lost by gitignoring `i18n.status.json` and gives release reviewers a one-glance coverage delta. Skippable if the overlay git history plus the SHA baseline are deemed sufficient. DECISION (closed): ship `i18n.status.summary.json`.
+3. **Option 3a vs. 3b for the test/hash import surface.** Recommendation: prefer 3a, fall back to 3b only on a failed tree-shake probe (Section 8 R3, Step 3.2). 3a is favored because it keeps every `../src/ui/i18n` const-importer green untouched, including the S3 guard `tests/localization_fixes.test.ts` and `tests/i18n_status_registry.test.ts` / `tests/localization_coverage.test.ts`; 3b requires editing all of them plus the hash harness. The decision is mechanical, not a judgment call: the build-size probe (acceptance criterion 4) passes -> 3a ships; it fails -> 3b. Confirm there is no reason to force 3b up front. DECISION (closed): prefer 3a, fall back to 3b only on a failed tree-shake probe (mechanical, gated on acceptance criterion 4).
+4. **`modulepreload` link for the stored locale.** DECISION (closed): ship BOTH in Phase 3. Runtime prefetch plus an explicit `<link rel="modulepreload">` for the stored locale (Section 4.2.4), the latter promoted into Step 4 as a real deliverable because it is the only mechanism that closes the runtime-selected-locale waterfall.
+5. **Locked-terms glossary home.** The glossary already exists and is wired in at `scripts/i18n_glossary.json` (hand-maintained; `npm run i18n:worklist` ships it verbatim with every per-language batch; `tests/i18n_fill_worklist.test.ts` exercises `expandGlossaryTerms`). `translation-workflow.md` should document and point to it, not invent a new home. Recommendation: keep it at `scripts/i18n_glossary.json` (co-located with the tool that consumes it). Decision: confirm `scripts/` is the right long-term home, or move it under `docs/i18n-scaling/` if it is to be treated as a doc rather than tool input. DECISION (closed): keep it at `scripts/i18n_glossary.json`, co-located with the tool that consumes it.
+6. **`i18n.en.ts` directory split: Phase 3 or 3.5?** It is independently shippable (Step 5-adjacent) and the public surface is unchanged, but it is the largest human-source change. Confirm whether to land it in Phase 3 or hold it for a follow-up while the bundle/policy wins ship first.
+
+---
+
+## 11. Appendix: measured numbers and file inventory
+
+### 11.1 Measured numbers (pending=0)
+
+Bundle/gzip figures below are pre-v0.10 estimates that need a production build to re-confirm; the key/row/line/byte counts are verified against the current post-v0.10.0-merge tree.
+
+- Main client chunk: 3.73 MB raw / 1.13 MB gzip (pre-v0.10 estimate).
+- Resolved table within the main chunk: 2.1 MB raw / 583 KB gzip (pre-v0.10 estimate).
+- Non-English locale data a default user never needs: ~540 KB gzip (13 of 14 locales; pre-v0.10 estimate).
+- Per-locale share: ~42 KB gzip average. Measured per-locale source-gzip band (sliced from the generated file): Latin 37-38 KB, CJK 39-40 KB, Russian ~44 KB (the largest); minified shipped chunks run somewhat below these.
+- Totals: 2,581 keys; ~33,553 non-English rows (translated 33,507; blocked 46; pending 0); 14 shipped locales + dev-only `en_XA`.
+- Dialects: `es_ES` -> `es`, `fr_CA` -> `fr_FR`, `en_CA` -> `en` (resolved at build time via `DIALECT_BASE`).
+- `t()` call sites in `hud.ts`: ~663 occurrences across 574 matching lines (in a 7,133-line file) by a `\bt\(` scan (the round "~560" cited elsewhere is the CLAUDE.md figure and undercounts; both make the same point). Synchronous, hot-path.
+
+### 11.2 File inventory
+
+| File | Size | Lines | Kind | IDE risk today | Phase 3 disposition |
+|---|---|---|---|---|---|
+| `src/ui/i18n.ts` | 11.5 KB | 275 | runtime | none | Add `resident`/`inflight`, `ensureLocaleLoaded`, `isLocaleResident`; eager-en + loaders imports; `tableFor` English fallback. `t()` loop unchanged. |
+| `src/ui/i18n.en.ts` | ~920 KB | 11,922 | source (nested) | high | Not yet split (still one file); Step 5/3.5 splits into `src/ui/i18n.en/` by existing domain seams (Section 4.4.3). |
+| `src/ui/i18n.resolved.generated/` (per-locale dir) | 2.57 MB | n/a (directory) | generated | resolved | DONE (Step 1): per locale + barrel + dormant loaders (Section 4.3). Stays committed. |
+| `src/ui/i18n.status.json` | 4.74 MB | 187,366 | generated (build/test-only) | severe | Gitignore; regenerated by `pretest` `i18n:scan`; optional committed summary. |
+| `src/ui/i18n.resolved.sha256` | 65 B | 1 | generated baseline | none | Keep committed; the determinism anchor. |
+| `src/ui/i18n.locales/<lang>.ts` (13) | ~150 KB avg | ~2,051 (full); dialects far smaller | source (flat sparse) | none | No split (flat); revisit at ~4,000 lines. |
+| `src/admin/i18n.ts` | 7.8 KB | 161 | runtime | none | Mirror runtime changes; admin lazy-loading deferred (R7). |
+| `src/admin/i18n.en.ts` | 10.6 KB | 237 | source (flat) | none | No change. |
+| `src/admin/i18n.resolved.generated/` (per-locale dir) | 177,290 B | n/a (directory; 219 keys) | generated | none | DONE (Step 1): per-locale file split for parity; stays committed; static import retained. |
+| `src/admin/i18n.locales/<lang>.ts` (13) | ~8-11 KB | ~210 avg | source (flat) | none | No change. |
+| `src/ui/sim_i18n.ts` | 112 KB | 2,020 | matcher | borderline | No change this phase. |
+| `src/ui/talent_i18n.ts` | 188 KB | 4,359 | matcher | high (procedural inference) | Out of scope; later phase (cut by effect-builder family). |
+| `src/ui/server_i18n.ts` | 84.2 KB | 197 | matcher | none | No change. |
+| `src/ui/entity_i18n.ts` | 13.4 KB | 297 | matcher | none | No change. |
+| `src/ui/world_entity_i18n.ts` | 7.5 KB | 167 | matcher | none | No change (only cross-import in game i18n). |
+
+### 11.3 Key files touched by Phase 3 (absolute paths)
+
+- `/Users/fernando/Documents/world-of-claudecraft/scripts/i18n_build.mjs` (Step 1 emit + `I18N_OUT_DIR`)
+- `/Users/fernando/Documents/world-of-claudecraft/scripts/i18n_admin_build.mjs` (Step 1 admin)
+- `/Users/fernando/Documents/world-of-claudecraft/scripts/i18n_scan.mjs` (Step 4 `I18N_OUT_DIR`, optional summary)
+- `/Users/fernando/Documents/world-of-claudecraft/scripts/i18n_resolved_hash.mjs` (Step 3 Option 3b only)
+- `/Users/fernando/Documents/world-of-claudecraft/src/ui/i18n.ts` (Steps 2-3 loader + flip)
+- `/Users/fernando/Documents/world-of-claudecraft/src/main.ts` (Step 2 bootstrap await before `mountGameUi`; picker `switchLanguage`)
+- `/Users/fernando/Documents/world-of-claudecraft/src/admin/i18n.ts` and `/Users/fernando/Documents/world-of-claudecraft/src/admin/main.ts` (admin parity)
+- `/Users/fernando/Documents/world-of-claudecraft/tests/homepage_foundation.test.ts` (Step 3: `await ensureLocaleLoaded` before each non-en `t()` assertion)
+- `/Users/fernando/Documents/world-of-claudecraft/tests/i18n_t_behavior.test.ts` (Step 3: re-point the pending-injection mock to `LOCALE_LOADERS` / `resident`; add sync-`t()` and loader-rejection cases)
+- `/Users/fernando/Documents/world-of-claudecraft/tests/i18n_resolved_equivalence.test.ts`, `/Users/fernando/Documents/world-of-claudecraft/tests/i18n_status_registry.test.ts` (Step 4 gates; 3b also repoints the latter's `../src/ui/i18n` import)
+- `/Users/fernando/Documents/world-of-claudecraft/tests/localization_fixes.test.ts` (the S3 guard; no logic change, now depends on `pretest` for `status.json`; under 3b repoint its 14-const import)
+- `/Users/fernando/Documents/world-of-claudecraft/tests/helpers/i18n_determinism.ts` (new)
+- `/Users/fernando/Documents/world-of-claudecraft/.gitignore` (Step 4 `status.json`)
+- `/Users/fernando/Documents/world-of-claudecraft/.github/workflows/ci.yml` (Step 4 `i18n:gen` step)
+- `/Users/fernando/Documents/world-of-claudecraft/package.json` (Step 4 `i18n:gen` script)
+- `/Users/fernando/Documents/world-of-claudecraft/CLAUDE.md`, `/Users/fernando/Documents/world-of-claudecraft/src/ui/CLAUDE.md`, `/Users/fernando/Documents/world-of-claudecraft/src/admin/CLAUDE.md` (Step 5 policy)
+- `/Users/fernando/Documents/world-of-claudecraft/docs/i18n-scaling/translation-workflow.md` (Step 5, new)

@@ -24,6 +24,21 @@ const SPAWN_MAX = 30;
 const FLEE_DIST = 6; // critters bolt when the player gets this close
 const EDGE = 8; // keep clear of the world edges
 
+// The Eastbrook Vale / Mirefen Marsh boundary runs along the causeway at z=180.
+// Cheerful overworld critters (rabbits/squirrels/songbirds) thin out as the dry
+// vale gives way to the sunken fen, so we taper the active pool to a sparse
+// floor across this band — fewest right on the causeway crossing.
+const CAUSEWAY_Z = 180; // zone boundary between Eastbrook and Mirefen
+const CAUSEWAY_FALLOFF = 80; // half-width (yd) of the thinned-out band
+const CAUSEWAY_FLOOR = 0.3; // density multiplier at the centre of the band
+
+// Smooth 1 → CAUSEWAY_FLOOR → 1 dip as the player crosses the causeway band.
+export function causewayPopScale(pz: number): number {
+  const t = Math.min(1, Math.abs(pz - CAUSEWAY_Z) / CAUSEWAY_FALLOFF);
+  const eased = t * t * (3 - 2 * t); // smoothstep
+  return CAUSEWAY_FLOOR + (1 - CAUSEWAY_FLOOR) * eased;
+}
+
 // A tiny seeded RNG so placement/wander variety stays off Math.random (matching
 // the render layer's deterministic-generation convention).
 function mulberry32(seed: number): () => number {
@@ -157,7 +172,17 @@ export function buildCritters(seed: number): CritterField {
       }
       group.visible = true;
 
-      for (const c of critters) {
+      // Thin the active pool across the Eastbrook↔Mirefen causeway band. The
+      // tail of the array is parked (hidden, not relocated) so the survivors
+      // keep their natural wander instead of the whole flock flickering.
+      const active = Math.round(critters.length * causewayPopScale(pz));
+
+      for (let i = 0; i < critters.length; i++) {
+        const c = critters[i];
+        if (i >= active) {
+          if (c.mesh.visible) c.mesh.visible = false;
+          continue;
+        }
         const dx = c.x - px, dz = c.z - pz;
         const dist = Math.hypot(dx, dz);
         if (dist > CULL_RADIUS || !validGround(c.x, c.z)) {

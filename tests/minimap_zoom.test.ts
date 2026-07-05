@@ -6,7 +6,7 @@ import {
   nextMinimapZoom,
   isMinMinimapZoom,
   isMaxMinimapZoom,
-  formatMinimapZoom,
+  minimapZoomValue,
 } from '../src/ui/minimap_zoom';
 
 describe('minimap zoom', () => {
@@ -40,10 +40,13 @@ describe('minimap zoom', () => {
     expect(isMaxMinimapZoom(2)).toBe(false);
   });
 
-  it('formats a compact, trailing-zero-free readout', () => {
-    expect(formatMinimapZoom(1)).toBe('1×');
-    expect(formatMinimapZoom(1.5)).toBe('1.5×');
-    expect(formatMinimapZoom(2)).toBe('2×');
-    expect(formatMinimapZoom(3)).toBe('3×');
+  it('exposes the snapped numeric value (the HUD formats + appends "×")', () => {
+    expect(minimapZoomValue(1)).toBe(1);
+    expect(minimapZoomValue(1.5)).toBe(1.5);
+    expect(minimapZoomValue(2)).toBe(2);
+    expect(minimapZoomValue(3)).toBe(3);
+    // garbage snaps to the nearest preset just like clampMinimapZoom
+    expect(minimapZoomValue(99)).toBe(3);
+    expect(minimapZoomValue(NaN)).toBe(1);
   });
 });

@@ -9,6 +9,7 @@
 // Verification is gated by TURNSTILE_SECRET being set (see server/main.ts): with
 // no secret configured (local dev / tests) the caller skips this entirely, so
 // `npm run dev` stays frictionless.
+import { recordUsageMetric } from './provider_usage';
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const VERIFY_TIMEOUT_MS = 5000;
@@ -24,6 +25,7 @@ export async function verifyTurnstile(
   fetchImpl: typeof fetch = fetch,
 ): Promise<boolean> {
   if (!token || !secret) return false;
+  recordUsageMetric('turnstile.verify');
   try {
     const form = new URLSearchParams({ secret, response: token });
     if (remoteIp) form.set('remoteip', remoteIp);
@@ -33,10 +35,16 @@ export async function verifyTurnstile(
       body: form,
       signal: AbortSignal.timeout(VERIFY_TIMEOUT_MS),
     });
-    if (!res.ok) return false;
+    if (!res.ok) {
+      recordUsageMetric('turnstile.verify.failure');
+      return false;
+    }
     const data = (await res.json().catch(() => null)) as { success?: boolean } | null;
-    return data?.success === true;
+    const verified = data?.success === true;
+    if (!verified) recordUsageMetric('turnstile.verify.failure');
+    return verified;
   } catch {
+    recordUsageMetric('turnstile.verify.failure');
     return false;
   }
 }

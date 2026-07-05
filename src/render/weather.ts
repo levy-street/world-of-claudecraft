@@ -31,10 +31,15 @@ interface PrecipStyle {
 }
 
 const STYLES: Record<Precip, PrecipStyle> = {
-  // soft, slow, wind-swayed flakes — sized up so they read against bright snowfields
-  snow: { color: 0xffffff, size: 2.7, fall: 6.5, fallVar: 2.5, sway: 1.6, target: 0.95, texture: 'flake' },
-  // fast, near-vertical streaks with a faint cool tint
-  rain: { color: 0x9fc4e0, size: 2.4, fall: 52, fallVar: 14, sway: 0.5, target: 0.7, texture: 'streak' },
+  // soft, slow, wind-swayed flakes. `size` is in world units (sizeAttenuation),
+  // so it must read as a real flake (~a hand's width), not a boulder — anything
+  // approaching a yard stays huge on screen even far off and looks like flying
+  // snowballs. Kept just above the ambient motes (0.5) so it still registers
+  // against bright snowfields.
+  snow: { color: 0xffffff, size: 0.45, fall: 6.5, fallVar: 2.5, sway: 1.6, target: 0.95, texture: 'flake' },
+  // fast, near-vertical streaks with a faint cool tint; a touch taller than a
+  // flake so the streak still reads, but nowhere near the old yard-long drops.
+  rain: { color: 0x9fc4e0, size: 0.6, fall: 52, fallVar: 14, sway: 0.5, target: 0.7, texture: 'streak' },
 };
 
 // Tiny deterministic RNG (mulberry32) so particle seeding never reaches for

@@ -23,7 +23,18 @@ function spawnSummoner(sim: Sim, target: Entity): Entity {
 
 // Force a single landed swing (silence chance is rolled per landed hit).
 function swing(sim: Sim, mob: Entity, target: Entity) {
-  (sim as any).mobSwing(mob, target);
+  // Force the swing to land regardless of world-gen RNG state. mobSwing's first
+  // rng.next() is the miss/dodge roll; return a high value for just that call so
+  // the hit always connects, then restore the real RNG for damage/crit rolls.
+  const rng = (sim as any).rng;
+  const realNext = rng.next.bind(rng);
+  let firstRoll = true;
+  rng.next = () => { if (firstRoll) { firstRoll = false; return 0.999; } return realNext(); };
+  try {
+    (sim as any).mobSwing(mob, target);
+  } finally {
+    rng.next = realNext;
+  }
 }
 
 describe('mob silence ("Silencing Shriek")', () => {

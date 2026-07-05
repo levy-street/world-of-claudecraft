@@ -8,6 +8,8 @@ vi.mock('../server/db', () => ({
   insertChatLogs: vi.fn(async () => {}),
   loadMarketState: vi.fn(async () => ({ listings: [], collections: new Map() })),
   saveMarketState: vi.fn(async () => {}),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
 import { GameServer, ClientSession } from '../server/game';

@@ -87,7 +87,18 @@ export function manualMovementOverrides(mi: {
   return mi.forward || mi.back || mi.turnLeft || mi.turnRight || mi.strafeLeft || mi.strafeRight;
 }
 
-export function clickMoveShouldCancel(mi: {
+// How an active click-to-move run should resolve this frame:
+// - 'cancel'  : a real interrupt (mouselook, death, feature disabled, or a manual
+//               directional key). The destination is discarded.
+// - 'pause'   : movement is suspended by an open game menu (or a load transition).
+//               The destination is kept and the player simply holds still, so the
+//               run resumes the moment the menu closes, the same way autorun
+//               survives the menu instead of being cancelled by it.
+// - 'continue': keep walking toward the destination.
+// Cancel wins over pause: a genuine interrupt during a menu still ends the run.
+export type ClickMoveAction = 'cancel' | 'pause' | 'continue';
+
+export function resolveClickMoveAction(mi: {
   forward: boolean; back: boolean; turnLeft: boolean; turnRight: boolean;
   strafeLeft: boolean; strafeRight: boolean; jump: boolean;
 }, state: {
@@ -95,10 +106,10 @@ export function clickMoveShouldCancel(mi: {
   movementSuspended: boolean;
   playerDead: boolean;
   enabled: boolean;
-}): boolean {
-  return state.mouselook
-    || state.movementSuspended
-    || state.playerDead
-    || !state.enabled
-    || manualMovementOverrides(mi);
+}): ClickMoveAction {
+  if (state.mouselook || state.playerDead || !state.enabled || manualMovementOverrides(mi)) {
+    return 'cancel';
+  }
+  if (state.movementSuspended) return 'pause';
+  return 'continue';
 }

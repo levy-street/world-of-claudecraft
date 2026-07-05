@@ -1,0 +1,25 @@
+/* index.extra.css: per-entry CSS for the index.html game entry, loaded only by
+   index.html (via a <link> in its <head>). It declares the canonical @layer order
+   up front (idempotent with the barrel) so the layer slots resolve regardless of
+   which sheet the browser parses first.
+
+   The ONLY per-entry rule today is the #rotate-device orientation gate.
+   Browser index.html suppresses the rotate overlay while the game is active,
+   whereas the native app can show it in portrait and play.html shows it in
+   portrait. This is the index side of that split; play.extra.css holds play's.
+   play.html does NOT load this file, so its !important suppress cannot leak
+   onto play. Layer name is flat (index-extra), NOT dotted, so it is a top-level
+   layer placed last by the order below, after hud-mobile. */
+@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+
+@layer index-extra {
+  body.mobile-touch.game-active:not(.native-app) #rotate-device {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  @media (orientation: portrait) {
+    body.native-app.mobile-touch.game-active #rotate-device {
+      display: flex;
+    }
+  }
+}

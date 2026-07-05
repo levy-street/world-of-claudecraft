@@ -1,0 +1,36 @@
+/* @layer tokens: the :root design tokens (palette, typography, font sizes). Semantic
+   color tokens are the single source of truth for values that recur across this sheet
+   and the scoped component <style> blocks; genuinely one-off colors stay inline at
+   their call site. Imported first by the admin.css barrel. */
+@layer tokens {
+  :root {
+    --gold: #ffd100;
+    --gold-dim: #c8a838;
+    --border: #40371f;
+    --border-soft: #463a1c;
+    --border-subtle: #2a2414;
+    --panel-bg: linear-gradient(170deg, #15151f 0%, #0b0b12 60%, #08080d 100%);
+    --bg-app: #060609;
+    --surface-sunken: #090910;
+    --surface-inset: #0d0d14;
+    --btn-flat-bg: #1a1410;
+    --title-font: "Palatino Linotype", Palatino, Georgia, serif;
+    --ui-font: "Arial", "Helvetica", sans-serif;
+    --text: #e8d8a8;
+    --text-bright: #fff;
+    --text-soft: #c9b27a;
+    --text-dim: #9a8c66;
+    --color-danger: #ff7a5e;
+    --color-danger-border: #b34a3a;
+    --row-hover: #1d1d2a;
+    --control-bg: #292933;
+    --control-bg-hover: #1e1e2b;
+    --control-border: #51462d;
+    --control-border-hover: #68572c;
+    --control-placeholder: #746b52;
+    --font-size-base: 14px;
+    --font-size-small: 12px;
+    --font-size-table: 14px;
+    --font-size-section: 14px;
+  }
+}

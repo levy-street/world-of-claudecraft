@@ -7,7 +7,7 @@ user-invocable: true
 
 # Feature Plan: Multi-Phase Implementation Planning (Opus 4.8)
 
-Break a large feature into a phased implementation plan designed for multiple Claude Code sessions. Every phase runs as its own fresh session and uses **Opus 4.8 at max effort** (`ultracode` where the phase warrants deterministic multi-agent orchestration). The whole point is to **save context per phase**: the orchestrator delegates reading and fan-out to subagents and keeps only conclusions, so each session stays sharp.
+Break a large feature into a phased implementation plan designed for multiple Claude Code sessions. Every phase runs as its own fresh session and uses **Opus 4.8 at xhigh effort** (`ultracode` where the phase warrants deterministic multi-agent orchestration). The whole point is to **save context per phase**: the orchestrator delegates reading and fan-out to subagents and keeps only conclusions, so each session stays sharp.
 
 The user will provide a feature description either inline (e.g., `/feature-plan add a guild bank`) or you will ask them to describe it.
 
@@ -60,7 +60,7 @@ Hard rules (Opus 4.8 + this repo):
 
 ## Context Discipline (how each phase stays cheap)
 
-- The orchestrator (main loop) does **not** read large docs or sprawl across source files. It spawns an Explore agent that returns a focused summary. (`src/sim/sim.ts` and `src/ui/hud.ts` are each ~5k+ lines and `src/ui/i18n.ts` is ~13k lines; never read them whole in the main loop.)
+- The orchestrator (main loop) does **not** read large docs or sprawl across source files. It spawns an Explore agent that returns a focused summary. (`src/ui/hud.ts` ~10k, `src/sim/sim.ts` ~7.5k, `src/main.ts` ~6.4k; the big i18n surface is now `src/ui/i18n.catalog/*` plus the generated overlays, not `i18n.ts`; never read these whole in the main loop.)
 - Give each implementation agent ONLY the slice of context it needs (the Explore summary + its own files), never the raw planning docs.
 - Delegate web/doc lookups to a subagent (classic-era MMO formula references, a Three.js or GLB asset technique, the `pg` Postgres driver, Cloudflare Turnstile, any third-party surface); keep raw docs out of the main context.
 - For 12+ phase packets, use per-phase resume files so a fresh session resumes from a checkpoint, not from scratch.
@@ -153,12 +153,12 @@ Prefer many small phases over fewer large ones. A phase that tries to do too muc
 7. The final QA phase closes the packet: once it passes, it offers **Packet teardown** (below), deleting `docs/{feature-name}/` only on explicit user confirmation so the PR does not ship the planning scaffolding.
 
 **Team Workflow section (include at top of plan):**
-Every phase runs on **Opus 4.8 at max effort** (1m context variant where the file load demands it; `ultracode` for batch-heavy phases). Include this standard workflow:
+Every phase runs on **Opus 4.8 at xhigh effort** (1m context variant where the file load demands it; `ultracode` for batch-heavy phases). Include this standard workflow:
 1. **Step 0 - Pre-flight**: Verify `git status` is clean (and that no concurrent session is mid-change in your files). Scan your Claude Code memory (the `MEMORY.md` index and any entries matching the phase domain), if you use it.
 2. **Step 1 - Load Context**: Spawn an Explore agent to read planning docs and relevant source files. The main agent does NOT read large docs directly. The Explore agent returns a focused summary.
 3. **Step 2 - Choose Orchestration + Execute**: Pick the lightest tool from the Orchestration Toolbox. Default: parallel Agent fan-out, one agent per vertical slice (give each ONLY the Explore summary, not raw planning docs). For batch-heavy/audit/content-sweep phases, run an `ultracode` Workflow (pipeline + adversarial-verify) instead. Use `isolation: "worktree"` only when agents mutate overlapping files in parallel.
 4. **Step 3 - Validation + Multi-Agent Review Dispatch**:
-   - Run validation (see the matrix in `state.md`): `npx tsc --noEmit`; `npx vitest run tests/<affected>.ts` (or `npm test` for broad changes). If any player-visible text was added or an emit changed, run `npx vitest run tests/localization_fixes.test.ts` (the S3 i18n drift guard). If the wire protocol / snapshots changed, run `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`. If assets changed, `npm run asset:budget`. Before a big merge, mirror CI: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
+   - Run validation (see the matrix in `state.md`): `npx tsc --noEmit`; `npx vitest run tests/<affected>.ts` (or `npm test` for broad changes). If `src/sim/` changed, run `npx vitest run tests/architecture.test.ts` (the sim-purity guard: no render/ui/game/net/three imports, no DOM globals, no nondeterminism). If any player-visible text was added or an emit changed, run `npx vitest run tests/localization_fixes.test.ts` (the S3 i18n drift guard). If the wire protocol / snapshots changed, run `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`. If assets changed, `npm run asset:budget`. Before a big merge, mirror CI: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
    - Spawn review agents using the **Review Dispatch Matrix** below. Spawn ONLY the agents
      whose surface this change actually touches. Most phases trigger one or two, not all
      four; a docs/test-only change triggers none. (Each agent also self-gates and exits
@@ -175,6 +175,7 @@ Match the change surface to the agent. Spawn an agent ONLY when its row matches 
 | `privacy-security-review` | `server/`, `src/admin/`, `src/net/`, a deploy/secret file (Docker/compose/env/CI yml/`DEPLOY.md`), OR introduces SQL / auth / a secret / `ALLOW_DEV_COMMANDS` / a new `Math.random`\|`Date.now`\|`performance.now` in `src/sim/` | a pure `src/ui` / `src/render` / `src/game` / `src/sim/content` / docs / test change |
 | `migration-safety` | `server/db.ts`, `server/social_db.ts`, a `server/*_db.ts`, or a `characters.state` JSONB serialize/deserialize path | any diff with no DDL and no persisted-state shape change |
 | `cross-platform-sync` | `src/world_api.ts` (IWorld), `src/sim/` behavior/obs/`SimEvent`, `src/net/online.ts`, `server/game.ts` wire/dispatch, the matchers `src/ui/sim_i18n.ts`\|`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) | a pure i18n *catalog* refactor (only `src/ui/i18n.ts` + locale data, `t()` keys unchanged) - `tsc` (`: typeof en`) + the resolved-equivalence test already cover it |
+| `architecture-reviewer` | a `src/sim/` change: determinism, rng draw-order, tick-phase order, the `SimContext` seam, or a move-not-rewrite relocation | a non-sim change, or a pure data/content/test change |
 | `qa-checklist` | a phase / deliverable set is COMPLETE (it self-scales via its per-category Skip rules) | per-commit / mid-phase work, or a docs/test-only change |
 
 If NO row matches (e.g. a docs-only, test-only, or comment change), spawn NO review agent.
@@ -192,6 +193,7 @@ The starter prompts suggest a default split (sim + server + client + tests), but
 
 **Code Hygiene section (include in Team Workflow):**
 Every phase must enforce:
+- **Module-first**: new self-contained behavior goes in its own focused module behind an existing seam (`IWorld`, a `src/sim/content/` record, a `src/render/<thing>.ts`), not appended to a monolith (`sim.ts`, `hud.ts`, `renderer.ts`). Do not split a monolith for line count. Fix bugs test-first. See the `extract-and-test` skill and the root Modularity section.
 - **New code gets tests**: Every new ability, system, command, `IWorld` member, server endpoint, query, and behavior gets unit tests. Sim: combat math, abilities, AI, economy. Server: command dispatch, persistence, snapshots. Net: wire round-trip. UI: data transforms, frame logic. E2E (`scripts/*.mjs`): user flows where applicable. If you wrote it, test it.
 - **Determinism tests**: For sim changes, assert same-seed-same-result; never introduce `Math.random` / `Date.now` / `performance.now` into `src/sim/`.
 - **Test maintenance**: Update/remove tests when modifying existing code. When placeholder content is replaced with real content, update the tests. Never leave orphaned or broken tests.
@@ -206,7 +208,7 @@ Every phase must enforce:
 ```
 This is Phase N of the {Feature Name} feature: {Phase Title}.
 
-Model: Opus 4.8, max effort, 1m context variant where the file load demands it.
+Model: Opus 4.8, xhigh effort (reserve max for genuinely frontier problems), 1m context variant where the file load demands it.
 Harness: Claude Code.
 ULTRACODE: add the keyword `ultracode` to this prompt if this phase is batch-heavy
 (content sweeps across many tables, many-locale i18n additions, exhaustive audit) so you
@@ -278,6 +280,8 @@ STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
     |`src/ui/server_i18n.ts`, or the RL surface (`headless/`, `python/`) changed. A pure
     i18n catalog refactor (only `src/ui/i18n.ts` + locale data, keys unchanged) is NOT in
     scope - `tsc` + the resolved-equivalence test cover it.
+  - `architecture-reviewer` - ONLY if `src/sim/` changed (determinism, rng draw-order,
+    tick-phase order, the `SimContext` seam, or a move-not-rewrite relocation).
   - `qa-checklist` - when this phase completes a deliverable set.
   - If none of the above match, spawn no review agent.
 - Prompt each agent you spawn for COVERAGE not filtering. Resume any that truncates with the
@@ -319,7 +323,7 @@ STOPPING RULES:
 ```
 This is Phase N QA of the {Feature Name} feature: Verify {Phase Title}.
 
-Model: Opus 4.8, max effort, 1m context variant where the file load demands it.
+Model: Opus 4.8, xhigh effort (reserve max for genuinely frontier problems), 1m context variant where the file load demands it.
 Harness: Claude Code.
 ULTRACODE: for a large or high-risk phase, add `ultracode` so you can run an
 adversarial-verify Workflow (each finding independently confirmed by a skeptic agent
@@ -379,6 +383,8 @@ check `git diff --name-only` against the phase-start commit - do not run all fou
 - `cross-platform-sync` - ONLY if IWorld / `src/sim` behavior/obs/`SimEvent` / `ClientWorld`
   / `wireEntity` dispatch / the `sim_i18n`|`server_i18n` matchers / the RL surface changed.
   A pure i18n catalog refactor (keys unchanged) is NOT in scope.
+- `architecture-reviewer` - ONLY if `src/sim/` changed (determinism, rng draw-order,
+  tick-phase, the `SimContext` seam, or a move-not-rewrite relocation).
 - `qa-checklist` - yes (this is the phase-completion QA gate).
 Resume any review agent that truncates mid-analysis with: *"Stop reading more files. Output the full report now. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."*
 
@@ -467,6 +473,7 @@ Cross-phase cheat sheet. Contains ONLY what the next session needs:
   - **ui/render**: `npx tsc --noEmit` + `npx vitest run tests/localization_fixes.test.ts` (if text) + a mobile screenshot script.
   - **headless/RL**: `npm run build:env` + `npx vitest run tests/env_protocol.test.ts` + a short `npm run bench`.
   - **full-stack / pre-merge**: `npm test && npx tsc --noEmit && npm run build:env && npm run build:server && npm run build`.
+  - **any code change (Biome / CI ratchet)**: `npm run ci:changed` (Biome on the files you changed, what the `.githooks/pre-push` floor runs). Fix formatting with a SCOPED `npx @biomejs/biome check --write <file>`, never a whole-tree `--write`.
 - Key file paths (existing + created by this feature)
 - New files created per phase
 - New `IWorld` members added per phase

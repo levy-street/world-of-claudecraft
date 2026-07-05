@@ -1,22 +1,84 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
+import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
 export const RUN_SPEED = 7; // yards/sec, classic run speed
 export const TURN_SPEED = Math.PI; // rad/sec keyboard turning
 export const MELEE_RANGE = 5; // yards
+export const MELEE_ARC = 2.2; // radians half-arc within which melee swings connect
 export const INTERACT_RANGE = 5;
+// /yell broadcast radius and ground-object respawn delay: neutral consts shared by
+// code that stays on Sim (the chat router, pickUpObject) and an extracted slice (the
+// Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
+export const YELL_RANGE = 100;
+export const OBJECT_RESPAWN = 30;
+// Pet tuning shared between the pet-AI slice (src/sim/pet/pet_ai.ts) and code that
+// stays on Sim, so it lives in this neutral module (the slice-only PET_* consts live
+// in pet_ai.ts). PET_GROWL_INTERVAL is read by the moved updatePet auto-taunt arm AND
+// the on-Sim manual-growl command; PET_TELEPORT_DISTANCE by the moved petFollow heel,
+// an on-Sim follow check, AND the I2c delve companion AI (delves/companion.ts) heel warp.
+export const PET_GROWL_INTERVAL = 10; // controlled pets can tank by forcing attention
+export const PET_TELEPORT_DISTANCE = 60; // owner this far AND no route exists: pet warps to heel (last resort)
+// Leash distance: how far a pulled mob may be dragged from its leash anchor before
+// it evades home. Shared between the mob-locomotion slice (chase/flee leash checks)
+// and the profiled-combat path that stays on Sim, so it lives in this neutral module.
+export const LEASH_DISTANCE = 45;
+export const DUNGEON_LEASH_DISTANCE = 70;
+// Nythraxis add template id. Used by the mob-locomotion slice (the add branch of
+// updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
+export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
 export const GCD = 1.5; // seconds
 export const CAST_PUSHBACK_SEC = 0.5; // vanilla: each hit delays a cast by 0.5s
 export const CHANNEL_PUSHBACK_FRACTION = 0.25; // vanilla: each hit shaves 25% off a channel
+// Tolerance for "this per-tick timer is effectively complete" comparisons (casting,
+// channels, ground-AoE pulses). Shared across sim modules (sim.ts + entity_roster.ts).
+export const CAST_COMPLETE_EPS = 1e-9;
 export const FISHING_CAST_ID = 'fishing';
 export const FISHING_CAST_NAME = 'Fishing';
 export const FISHING_CAST_TIME = 5;
+// Seconds an empty instance idles before it resets. Shared by the dungeon instance
+// reaper (instances/dungeons.ts) and the delve reaper (sim.ts). NYTHRAXIS_BOSS_ID
+// (the dungeon raid-door seal also keys off it) lives lower in this file (C1 relocation).
+export const INSTANCE_EMPTY_TIMEOUT = 300;
+// Delve pressure-plate trigger radius (yards). Shared by the I2a run module
+// (delves/runs.ts: plate stepping + chest/exit proximity) and the I2b lockpick
+// controller still on Sim (resolveLockChest proximity gate). Relocated from sim.ts.
+export const DELVE_PLATE_RADIUS = 2.5;
+// Max purchasable companion rank. Shared by the I2a run module (companionUpgrade cap)
+// and the I2c companion AI (delves/companion.ts: updateDelveCompanion heal-pct index).
+export const DELVE_COMPANION_MAX_RANK = 3;
+// The warlock Demon Heal channel id. Shared by the casting/channel path on Sim (C4a
+// relocation) and the P1b pet-command healPet/applyDemonHealTick slice; here so both
+// import it cycle-free. (P1b's identical relocation deduped to this one decl.)
+export const DEMON_HEAL_CAST_ID = 'demon_heal';
+// Companion heal cadence (seconds). Shared by the I2c companion AI (delves/companion.ts:
+// updateDelveCompanion wanderTimer reset) and Sim.spawnDelveCompanion (initial timer).
+export const DELVE_COMPANION_HEAL_INTERVAL = 3;
+// PET_TELEPORT_DISTANCE (the pet/companion last-resort heel warp) was relocated to this
+// module by P1a (above); the I2c companion AI shares that same const, not re-declared here.
 
 export type PlayerClass =
-  | 'warrior' | 'paladin' | 'hunter' | 'rogue' | 'priest'
-  | 'shaman' | 'mage' | 'warlock' | 'druid';
-export type ArenaFormat = '1v1' | '2v2';
+  | 'warrior'
+  | 'paladin'
+  | 'hunter'
+  | 'rogue'
+  | 'priest'
+  | 'shaman'
+  | 'mage'
+  | 'warlock'
+  | 'druid';
+
+// Classes that command a persistent pet (hunter beast, warlock demon). Pure
+// predicate, here so the pet-command slice imports it without a sim.ts cycle.
+export function isPetClass(cls: PlayerClass): boolean {
+  return cls === 'hunter' || cls === 'warlock';
+}
+// '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
+// dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
+// ring) — see docs/design and the Fiesta region of sim.ts.
+export type ArenaFormat = '1v1' | '2v2' | 'fiesta';
 
 export interface ArenaStanding {
   rating: number;
@@ -31,13 +93,33 @@ export interface ArenaCombatant {
   level: number;
 }
 export const ALL_CLASSES: PlayerClass[] = [
-  'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid',
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'priest',
+  'shaman',
+  'mage',
+  'warlock',
+  'druid',
 ];
 export type ResourceType = 'rage' | 'mana' | 'energy';
 export const OVERHEAD_EMOTE_IDS = [
-  'wave', 'laugh', 'question', 'cheer', 'dance', 'point', 'flex', 'salute', 'cry', 'bow', 'clap', 'roar', 'kneel',
+  'wave',
+  'laugh',
+  'question',
+  'cheer',
+  'dance',
+  'point',
+  'flex',
+  'salute',
+  'cry',
+  'bow',
+  'clap',
+  'roar',
+  'kneel',
 ] as const;
-export type OverheadEmoteId = typeof OVERHEAD_EMOTE_IDS[number];
+export type OverheadEmoteId = (typeof OVERHEAD_EMOTE_IDS)[number];
 
 export interface Vec3 {
   x: number;
@@ -50,11 +132,53 @@ export type EntityKind = 'player' | 'mob' | 'npc' | 'object';
 export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
 export type AuraKind =
-  | 'dot' | 'slow' | 'stun' | 'root' | 'incapacitate' | 'polymorph'
-  | 'attackspeed' | 'debuff_ap' | 'buff_ap' | 'buff_armor' | 'buff_int' | 'buff_agi' | 'buff_dodge' | 'buff_speed' | 'buff_haste'
-  | 'hot' | 'absorb' | 'imbue' | 'buff_sta' | 'buff_allstats' | 'thorns' | 'form_bear'
-  | 'form_cat' | 'stealth' | 'defensive_stance' | 'righteous_fury' | 'sunder' | 'mortal_wound' | 'silence' | 'blind' | 'disarm' | 'expose' | 'spellvuln' | 'lockout'
-  | 'vulnerability' | 'hex' | 'tongues' | 'cost_tax' | 'heal_absorb' | 'critvuln' | 'buff_spi';
+  | 'dot'
+  | 'slow'
+  | 'stun'
+  | 'root'
+  | 'incapacitate'
+  | 'polymorph'
+  | 'attackspeed'
+  | 'debuff_ap'
+  | 'buff_ap'
+  | 'buff_armor'
+  | 'buff_int'
+  | 'buff_agi'
+  | 'buff_dodge'
+  | 'buff_speed'
+  | 'buff_haste'
+  | 'buff_spellpower'
+  | 'hot'
+  | 'absorb'
+  | 'imbue'
+  | 'buff_sta'
+  | 'buff_allstats'
+  | 'thorns'
+  | 'form_bear'
+  | 'form_cat'
+  | 'form_travel'
+  | 'stealth'
+  | 'defensive_stance'
+  | 'righteous_fury'
+  | 'sunder'
+  | 'mortal_wound'
+  | 'silence'
+  | 'blind'
+  | 'disarm'
+  | 'expose'
+  | 'spellvuln'
+  | 'lockout'
+  | 'vulnerability'
+  | 'hex'
+  | 'tongues'
+  | 'cost_tax'
+  | 'heal_absorb'
+  | 'critvuln'
+  | 'buff_spi'
+  // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
+  // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
+  | 'buff_scale'
+  | 'buff_jump';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -71,9 +195,18 @@ export interface Aura {
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
+  charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
+  icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
+  icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
 }
 
-export type CrowdControlDrCategory = 'root' | 'polymorph' | 'fear';
+export type CrowdControlDrCategory =
+  | 'root'
+  | 'polymorph'
+  | 'fear'
+  | 'openerStun'
+  | 'controlledStun'
+  | 'randomStun';
 
 export interface CrowdControlDrState {
   stage: number;
@@ -106,20 +239,62 @@ export type EquipSlot =
   | 'gloves'
   | 'feet';
 
-export type ItemUse =
-  | { type: 'fishing' };
+// The eight equip slots, in the canonical paperdoll order. Single source for
+// the entity loop and the server's unequip-command validation.
+export const EQUIP_SLOTS: readonly EquipSlot[] = [
+  'mainhand',
+  'helmet',
+  'shoulder',
+  'chest',
+  'waist',
+  'legs',
+  'gloves',
+  'feet',
+];
 
-export interface ItemDef {
+export type SkinCatalog = 'class' | 'mech';
+
+export type ItemUse =
+  | { type: 'fishing' }
+  | { type: 'mechChroma'; chromaId: string }
+  // Opens the client-side event skin-select overlay. The server rolls a rank on
+  // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
+  | { type: 'skinSelect'; catalog?: SkinCatalog };
+
+// Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
+// rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
+export type SkinRank = 'uncommon' | 'rare' | 'epic';
+
+export type ArmorType = 'cloth' | 'leather' | 'mail';
+
+type ItemKind =
+  | 'weapon'
+  | 'armor'
+  | 'quest'
+  | 'junk'
+  | 'food'
+  | 'drink'
+  | 'tool'
+  | 'potion'
+  | 'elixir';
+
+interface BaseItemDef {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'quest' | 'junk' | 'food' | 'drink' | 'tool' | 'potion' | 'elixir';
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
+  // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
+  // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
+  // not one of the six primary attributes.
+  spellPower?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
   questId?: string;
+  noVendorSell?: boolean;
+  noDiscard?: boolean;
+  noMarketList?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
   /** Shown when the quest is active but the collect count is already met. */
@@ -134,9 +309,60 @@ export interface ItemDef {
   // `aura` is a flavor name shown in the buff frame; `value` is the stat amount,
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
-  quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic'; // gray/white/green/blue/purple name colors
+  quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
+  /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
+  set?: string;
 }
+
+// Item-set bonuses (classic "tier set" style). Flat effects fold into
+// recalcPlayerStats: primary stats feed the AP/crit/HP derivations, `ap`/`crit`
+// add at their derivation steps, and `castPushbackReduction` (0..1) scales the
+// damage-driven cast pushback in Sim.pushbackCast. Balance values are authored in
+// content/item_sets.ts, never inline in engine code.
+export interface SetBonusEffect {
+  str?: number;
+  agi?: number;
+  sta?: number;
+  int?: number;
+  spi?: number;
+  ap?: number; // flat attack power
+  crit?: number; // flat crit chance, 0..1
+  castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
+}
+
+export interface SetBonusTier {
+  pieces: number; // equipped-piece threshold that unlocks this tier
+  effect: SetBonusEffect;
+  text: string; // English source, localized at the client tooltip
+}
+
+export interface ItemSet {
+  id: string;
+  name: string; // English source
+  bonuses: SetBonusTier[]; // ascending by `pieces`
+}
+
+export interface ArmorItemDef extends BaseItemDef {
+  kind: 'armor';
+  slot: Exclude<EquipSlot, 'mainhand'>;
+  armorType: ArmorType;
+  weapon?: never;
+}
+
+export interface WeaponItemDef extends BaseItemDef {
+  kind: 'weapon';
+  slot: 'mainhand';
+  weapon: WeaponInfo;
+  armorType?: never;
+}
+
+export interface OtherItemDef extends BaseItemDef {
+  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  armorType?: never;
+}
+
+export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
 
 export interface InvSlot {
   itemId: string;
@@ -146,6 +372,8 @@ export interface InvSlot {
 export interface LootSlot extends InvSlot {
   // Quest corpse loot can be personal: each listed player can take one copy.
   personalFor?: number[];
+  // Need/greed loot that everyone passed on becomes free-for-all corpse loot.
+  openToAll?: boolean;
 }
 
 export interface CorpseLoot {
@@ -154,18 +382,42 @@ export interface CorpseLoot {
 }
 
 export type CurrencyLootStrategy = 'looter-takes-all' | 'fair-split';
-export type ItemLootStrategy = 'looter-takes-all' | 'random';
+export type LootRollChoice = 'need' | 'greed' | 'pass';
+export type ItemLootStrategy = 'looter-takes-all' | 'need-greed';
+
+// An open need-greed roll a player may still answer. Carried both on the
+// transient `lootRoll` SimEvent and (for reliable re-delivery) on the self
+// snapshot, so a client that missed the event can re-show the prompt from
+// authoritative state rather than losing the roll permanently.
+export interface LootRollPrompt {
+  rollId: number;
+  itemId: string;
+  itemName: string;
+  quality: ItemDef['quality'];
+  expiresAt: number;
+}
+
+// Master loot intercepts roll-worthy drops at/above a quality threshold and hands
+// the assignment decision to a single designated looter (the leader, or 0 = leader).
+export type MasterLootThreshold = 'uncommon' | 'rare' | 'epic';
+export interface MasterLootSettings {
+  enabled: boolean;
+  looter: number; // pid of the master looter; 0 means "the current leader"
+  threshold: MasterLootThreshold;
+}
 
 export interface LootStrategies {
   currency: CurrencyLootStrategy;
   commonItems: ItemLootStrategy;
   premiumItems: ItemLootStrategy;
+  master: MasterLootSettings;
 }
 
 export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
   currency: 'fair-split',
-  commonItems: 'random',
-  premiumItems: 'random',
+  commonItems: 'looter-takes-all',
+  premiumItems: 'need-greed',
+  master: { enabled: false, looter: 0, threshold: 'uncommon' },
 };
 
 export interface LootEntry {
@@ -179,8 +431,17 @@ export interface LootEntry {
 }
 
 export type MobFamily =
-  | 'beast' | 'humanoid' | 'murloc' | 'spider' | 'kobold' | 'undead'
-  | 'troll' | 'ogre' | 'elemental' | 'dragonkin' | 'demon';
+  | 'beast'
+  | 'humanoid'
+  | 'murloc'
+  | 'spider'
+  | 'kobold'
+  | 'undead'
+  | 'troll'
+  | 'ogre'
+  | 'elemental'
+  | 'dragonkin'
+  | 'demon';
 export type PetMode = 'passive' | 'defensive' | 'aggressive';
 export type PetRole = 'melee_tank' | 'ranged_dps';
 
@@ -210,7 +471,15 @@ export interface MobTemplate {
   ccImmune?: boolean;
   respawnMult?: number;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
-  aoePulse?: { min: number; max: number; radius: number; every: number; name: string; school?: string; fx?: 'nova' | 'projectile' };
+  aoePulse?: {
+    min: number;
+    max: number;
+    radius: number;
+    every: number;
+    name: string;
+    school?: string;
+    fx?: 'nova' | 'projectile';
+  };
   // Boss mechanic: spawn adds when hp first drops below each threshold (descending fractions).
   summonAdds?: { mobId: string; count: number; atHpPct: number[] };
   // Boss mechanic: damage multiplier (and optional swing-speed haste) once hp
@@ -229,13 +498,26 @@ export interface MobTemplate {
   // connecting. The single shared aura slot is refreshed each hit; left alone it
   // falls off after `duration`s, undoing the ramp — so burning the mob down or
   // kiting it out of melee both reset its fury.
-  rampage?: { ap: number; maxStacks: number; duration: number; name: string; school?: Aura['school'] };
+  rampage?: {
+    ap: number;
+    maxStacks: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Support mechanic ("Mend"): while in combat, periodically heal every wounded
   // living friendly mob within `radius` (incl. itself) for `healMin..healMax`.
   // Telegraphed: the first cast lands one full `every` interval after combat
   // opens. Resets on evade/respawn. Routes through the normal heal path, so it
   // shows green floating text and grants no threat to the menders themselves.
-  mendAlly?: { healMin: number; healMax: number; radius: number; every: number; name: string; school?: Aura['school'] };
+  mendAlly?: {
+    healMin: number;
+    healMax: number;
+    radius: number;
+    every: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Support mechanic ("Ward"): the defensive twin of `mendAlly`. While in combat,
   // periodically wrap every living friendly mob within `radius` (incl. itself) in
   // a damage-absorbing barrier soaking a flat `amount` for `duration`s — a leader
@@ -243,7 +525,14 @@ export interface MobTemplate {
   // before any HP loss), so there is no new aura kind or combat math. Telegraphed:
   // the first ward lands one full `every` interval after combat opens. Resets on
   // evade/respawn. Refreshes each interval, replacing any partially-soaked ward.
-  wardAllies?: { radius: number; every: number; amount: number; duration: number; name: string; school?: Aura['school'] };
+  wardAllies?: {
+    radius: number;
+    every: number;
+    amount: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Commander mechanic ("Rallying Banner"): periodically empowers every friendly
   // mob in range (including the caster) with a refreshing `buff_ap` aura worth
   // `ap` attack power for `duration`s — the support twin of mendAlly, granting
@@ -251,17 +540,39 @@ export interface MobTemplate {
   // effectiveAttackPower already folds for mobs, so no new aura kind or combat
   // math. Telegraphed like stomp/mendAlly: the first rally only lands one full
   // interval after combat opens.
-  rally?: { radius: number; every: number; ap: number; duration: number; name: string; school?: Aura['school'] };
+  rally?: {
+    radius: number;
+    every: number;
+    ap: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Support "War Cadence": periodically quicken the swing speed of every nearby
   // friendly mob (including the caster) by `hasteMult` for `duration`s. Rides the
   // existing buff_haste primitive (the same aura packFrenzy uses, already folded
   // into swingIntervalMult), so it needs no new combat math. Telegraphed and
   // reset on evade/respawn exactly like mendAlly.
-  warcry?: { radius: number; every: number; hasteMult: number; duration: number; name: string; school?: Aura['school'] };
+  warcry?: {
+    radius: number;
+    every: number;
+    hasteMult: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Boss mechanic ("War Stomp"): periodic ground slam that stuns nearby players
   // for `duration`s (and optionally deals min..max damage). Telegraphed: the
   // first slam only lands one full `every` interval after combat starts.
-  stomp?: { radius: number; every: number; duration: number; min?: number; max?: number; name: string; school?: string };
+  stomp?: {
+    radius: number;
+    every: number;
+    duration: number;
+    min?: number;
+    max?: number;
+    name: string;
+    school?: string;
+  };
   // Periodic self-shield: the mob wraps itself in a damage-absorbing barrier
   // every `every` seconds, soaking up to `amount` damage for `duration` seconds.
   // Reuses the existing `absorb` aura (soaked first in dealDamage) — no new combat math.
@@ -272,59 +583,135 @@ export interface MobTemplate {
   // but it applies the same `fear_incap` aura the player-cast Fear uses (driven
   // by `updateFearMovement`) instead of a stun. Telegraphed: the first wail only
   // lands one full `every` interval after combat opens. No new aura kind.
-  terrify?: { radius: number; every: number; duration: number; name: string; school?: Aura['school'] };
+  terrify?: {
+    radius: number;
+    every: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Melee mechanic: each landed swing also splashes onto other players near the
   // primary target for `mult` of the (pre-armor) hit. Classic-WoW Cleave.
   cleave?: { radius: number; mult: number; name?: string };
   // On-hit debuff: a chance per landed melee swing to inflict a stacking-refresh
   // damage-over-time poison on the struck target (spiders, serpents, scorpions).
-  venom?: { chance: number; perTick: number; interval: number; duration: number; name: string; school?: string };
+  venom?: {
+    chance: number;
+    perTick: number;
+    interval: number;
+    duration: number;
+    name: string;
+    school?: string;
+  };
   // On-hit rot: a landed melee swing has `chance` to fester a refreshing SHADOW
   // damage-over-time wound on the victim ("Soulrot"). The same on-hit DoT seam as
   // `venom` (nature/poison) and `bleed` (physical), but shadow-school — the
   // undead/necrotic flavour, and it bites every class (resisted by shadow, not
   // nature/physical mitigation). Refreshes (never stacks) like venom.
-  soulrot?: { chance: number; perTick: number; interval: number; duration: number; name: string; school?: Aura['school'] };
+  soulrot?: {
+    chance: number;
+    perTick: number;
+    interval: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit bleed: a landed melee swing has `chance` to open a refreshing PHYSICAL
   // damage-over-time wound on the victim ("Rend"). Distinct from `venom` (a
   // nature/poison DoT) — bleeds are physical-school, the predator/beast flavour
   // of the same on-hit DoT seam. Refreshes (never stacks) like venom.
-  bleed?: { chance: number; perTick: number; interval: number; duration: number; name: string; school?: Aura['school'] };
+  bleed?: {
+    chance: number;
+    perTick: number;
+    interval: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit frostbite: a landed melee swing has `chance` to open a refreshing
   // damage-over-time frost burn on the struck target — the frost twin of venom
   // (chilling/elemental creatures). Reuses the 'dot' aura; school defaults to 'frost'.
-  frostbite?: { chance: number; perTick: number; interval: number; duration: number; name: string; school?: string };
+  frostbite?: {
+    chance: number;
+    perTick: number;
+    interval: number;
+    duration: number;
+    name: string;
+    school?: string;
+  };
   // Burning fuse: a landed swing may set a refreshing fire DoT (the fire-school
   // sibling of venom; sappers, ember-touched creatures). Defaults to the 'fire' school.
-  smolder?: { chance: number; perTick: number; interval: number; duration: number; name: string; school?: string };
+  smolder?: {
+    chance: number;
+    perTick: number;
+    interval: number;
+    duration: number;
+    name: string;
+    school?: string;
+  };
   // On-hit debuff: the fire-school twin of `venom` — a chance per landed melee
   // swing to set a stacking-refresh burning damage-over-time (cinder/ember mobs,
   // demolitionists carrying blasting powder). Same DoT seam, school defaults 'fire'.
-  cinder?: { chance: number; perTick: number; interval: number; duration: number; name: string; school?: string };
+  cinder?: {
+    chance: number;
+    perTick: number;
+    interval: number;
+    duration: number;
+    name: string;
+    school?: string;
+  };
   // On-hit arcane DoT: the arcane-school sibling of venom (nature) / bleed
   // (physical) / soulrot (shadow) / frostbite (frost) / cinder (fire). A landed
   // swing may brand the victim with a searing arcane rune that festers as a
   // refreshing damage-over-time. Reuses the `dot` aura; only the default school
   // differs. Carried by corrupt spellcasters that channel raw arcane energy.
-  arcaneRot?: { chance: number; perTick: number; interval: number; duration: number; name: string; school?: string };
+  arcaneRot?: {
+    chance: number;
+    perTick: number;
+    interval: number;
+    duration: number;
+    name: string;
+    school?: string;
+  };
   // On-hit debuff: a *stacking* poison DoT. Unlike `venom` (a single fixed-value
   // DoT that merely refreshes), each landed swing adds a stack — the per-tick
   // damage is `perTick * stacks`, ramping up to `maxStacks` — so the longer the
   // creature stays on its target the worse the venom bites (classic "Deadly
   // Poison"). Reuses the `dot` aura kind; the shared slot carries the stack count.
-  stackPoison?: { chance: number; perTick: number; interval: number; duration: number; maxStacks: number; name: string; school?: string };
+  stackPoison?: {
+    chance: number;
+    perTick: number;
+    interval: number;
+    duration: number;
+    maxStacks: number;
+    name: string;
+    school?: string;
+  };
   // On-death mechanic ("Death Throes"): a volatile creature does not detonate
   // the instant it dies. Its corpse destabilizes for `delay` seconds (a
   // telegraph players can run from), then bursts for min..max `school` damage
   // to everyone within `radius`. Deterministic: the fuse rides the corpse tick.
-  deathThroes?: { min: number; max: number; radius: number; delay: number; name: string; school?: Aura['school'] };
+  deathThroes?: {
+    min: number;
+    max: number;
+    radius: number;
+    delay: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Classic beast "Frenzy": when a mob with this trait dies, nearby living
   // same-family hostile mobs briefly attack faster (hasteMult, e.g. 1.3 = +30%
   // swing speed) for `duration` seconds. Applied as a buff_haste aura.
   packFrenzy?: { radius: number; hasteMult: number; duration: number };
   // Melee mechanic: a landed swing has `chance` to inflict a Mortal Wound debuff
   // that reduces all healing the victim receives by `healReduction` for `duration`.
-  mortalStrike?: { chance: number; healReduction: number; duration: number; name: string; school?: string };
+  mortalStrike?: {
+    chance: number;
+    healReduction: number;
+    duration: number;
+    name: string;
+    school?: string;
+  };
   // Heal-absorb mechanic: a landed swing has `chance` to brand the victim with a
   // necrotic blight that devours the next `amount` points of incoming healing
   // (a consumable shield, not a percentage) before fading after `duration`.
@@ -347,14 +734,27 @@ export interface MobTemplate {
   // armor: a stacking `sunder` debuff (up to `maxStacks`) so the victim takes
   // more physical damage from everyone until it expires. Rides the existing
   // sunder aura; no new aura kind.
-  corrode?: { chance: number; armor: number; maxStacks: number; duration: number; name: string; school?: Aura['school'] };
+  corrode?: {
+    chance: number;
+    armor: number;
+    maxStacks: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Combat mechanic: a landed melee hit has `chance` to curse the victim with a
   // spell-vulnerability debuff (`spellvuln`) that amplifies all NON-physical
   // (magic) damage they take by `amp` (e.g. 0.15 = +15%) from every attacker for
   // `duration`. The arcane twin of `corrode` — corrode shreds armor (physical
   // mitigation); this raises magic damage taken. Holy is excluded so healing-
   // school spells stay unaffected.
-  spellVuln?: { chance: number; amp: number; duration: number; name: string; school?: Aura['school'] };
+  spellVuln?: {
+    chance: number;
+    amp: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Melee mechanic: a landed swing has `chance` to knock the victim off-balance,
   // cutting their dodge chance by `dodgeReduction` (a flat fraction, e.g. 0.05)
   // for `duration` seconds — so the attacker (and everyone else) lands more hits.
@@ -373,7 +773,13 @@ export interface MobTemplate {
   // their ATTACK SPEED (an `attackspeed` aura, `mult` > 1 lengthens the swing
   // interval) for `duration`s. Rides the existing swingIntervalMult hook — no new
   // combat math. Distinct from a movement snare (`slow`) or an AP cut (`debuff_ap`).
-  slowStrike?: { chance: number; mult: number; duration: number; name: string; school?: Aura['school'] };
+  slowStrike?: {
+    chance: number;
+    mult: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit knockback: a landed melee swing has `chance` to physically hurl the
   // struck player `distance` yards straight away from the mob — an instantaneous
   // positional shove, not an aura. The displacement is terrain-clamped (it stops
@@ -387,7 +793,13 @@ export interface MobTemplate {
   // haste-resolved cast time — no new combat math. Distinct from `slowStrike` (melee
   // swing speed) and `silence` (a full spell lockout): a casting victim still casts,
   // just slower. Inert against rage/energy melee classes that never hard-cast.
-  tongues?: { chance: number; mult: number; duration: number; name: string; school?: Aura['school'] };
+  tongues?: {
+    chance: number;
+    mult: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit mechanic ("Mana Burn"): a landed melee swing has `chance` to drain a
   // flat `amount` of mana from a mana-using victim (casters). Rage/energy users
   // are unaffected. Drains only what mana the victim still has; no overkill.
@@ -402,14 +814,26 @@ export interface MobTemplate {
   // pool (recalcPlayerStats clamps current mana down with the smaller ceiling).
   // Rides the existing buff_int aura with a NEGATIVE value, so there is no new
   // resource math. Only meaningful on mana users — applied to them alone.
-  enfeeble?: { chance: number; int: number; duration: number; name: string; school?: Aura['school'] };
+  enfeeble?: {
+    chance: number;
+    int: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit curse: a landed melee swing has `chance` to drain `sta` Stamina from
   // the victim for `duration`s, shrinking their maximum-HP pool (recalcPlayerStats
   // re-derives maxHp from Stamina and scales current HP down with the smaller
   // ceiling, clamped to a 1-HP floor — it never kills outright). Rides the
   // existing buff_sta aura with a NEGATIVE value, so there is no new HP math.
   // Affects every class (all players have Stamina), unlike enfeeble (mana only).
-  enervate?: { chance: number; sta: number; duration: number; name: string; school?: Aura['school'] };
+  enervate?: {
+    chance: number;
+    sta: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit disease ("plague"): a landed melee swing has `chance` to rot the
   // victim's vitality, draining `sta` Stamina for `duration`. recalcPlayerStats
   // folds the smaller Stamina through to a smaller maxHp (and current HP scales
@@ -439,13 +863,26 @@ export interface MobTemplate {
   // once in dealDamage as a damage multiplier (the offensive mirror of Defensive
   // Stance's 10% cut). Players only — amplifying a fellow mob would let a friendly
   // pet soften enemies for its owner.
-  vulnerability?: { chance: number; amp: number; duration: number; name: string; school?: Aura['school'] };
+  vulnerability?: {
+    chance: number;
+    amp: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Pet mechanic: this creature is a ranged caster (warlock Imp) — instead of
   // closing to melee, it stays at `range` and hurls bolts of `school` damage.
   // updatePet reads this; the bolt damage comes from the mob's weapon range.
   petRanged?: { range: number; school: Aura['school'] };
   petRole?: PetRole;
-  petSpell?: { name: string; school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature'; min: number; max: number; range: number; every: number };
+  petSpell?: {
+    name: string;
+    school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+    min: number;
+    max: number;
+    range: number;
+    every: number;
+  };
   // On-hit mechanic: chance to silence the victim, locking out spell (non-physical) casts for a duration.
   silence?: { chance: number; duration: number; name: string; school?: string };
   // On-hit mechanic: a landed melee swing has `chance` to blind the victim,
@@ -485,7 +922,13 @@ export interface MobTemplate {
   // (Intellect → mana-pool size): this attacks the REGEN axis. Only meaningful
   // on mana users; applied to them alone. Hostile mobs only (a friendly pet,
   // mobSwing's other caller, never debuffs the party).
-  siphonSpirit?: { chance: number; spi: number; duration: number; name: string; school?: Aura['school'] };
+  siphonSpirit?: {
+    chance: number;
+    spi: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Innate "spiked hide" trait: melee attackers take flat damage back on every
   // connecting swing — the mob-side equivalent of the druid Thorns aura.
   thorns?: { value: number; school?: Aura['school']; name?: string };
@@ -507,13 +950,25 @@ export interface MobTemplate {
   // this throttles the victim's whole offensive/support output — classic witch-
   // doctor / curse-of-weakness flavour. Rides a dedicated `hex` aura kind read in
   // dealDamage (outgoing) and applyHeal (outgoing).
-  hex?: { chance: number; reductionPct: number; duration: number; name: string; school?: Aura['school'] };
+  hex?: {
+    chance: number;
+    reductionPct: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit affix ("Find Weakness"): a landed melee swing has `chance` to leave the
   // victim's flesh exposed, so CRITICAL hits against them (from anyone, any school)
   // deal an extra `critDamage` fraction for `duration`s. Read once in the dealDamage
   // funnel (crit-only). Distinct from a flat-damage vuln (expose/spellvuln) — this
   // sharpens only the rare crits, the way a predator's bite finds the soft spot.
-  critVuln?: { chance: number; critDamage: number; duration: number; name: string; school?: Aura['school'] };
+  critVuln?: {
+    chance: number;
+    critDamage: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit purge ("Devour Magic"): a landed melee swing has `chance` to strip
   // one beneficial enhancement aura off the player victim — a positive buff_*
   // stat buff, a heal-over-time, an absorb shield, or a weapon imbue. Forms,
@@ -526,7 +981,13 @@ export interface MobTemplate {
 
 export type AbilityEffect =
   | { type: 'weaponDamage'; bonus: number } // on-next-swing bonus (heroic strike)
-  | { type: 'weaponStrike'; bonus: number; cannotBeDodged?: boolean; requiresBehind?: boolean; weaponMult?: number } // instant special attack (sinister strike, overpower, backstab)
+  | {
+      type: 'weaponStrike';
+      bonus: number;
+      cannotBeDodged?: boolean;
+      requiresBehind?: boolean;
+      weaponMult?: number;
+    } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
@@ -544,10 +1005,27 @@ export type AbilityEffect =
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
   | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  | {
+      type: 'groundAoE';
+      min: number;
+      max: number;
+      radius: number;
+      duration: number;
+      interval: number;
+    }
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
-  | { type: 'selfBuff'; kind: AuraKind; value: number; duration: number }
+  | {
+      type: 'selfBuff';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      // thorns auras only: a charge-limited reflect (Lightning Shield) caps how
+      // many melee hits reflect, gated by an internal cooldown between reflects.
+      charges?: number;
+      internalCooldown?: number;
+    }
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
@@ -580,6 +1058,12 @@ export interface AbilityDef {
   range: number; // yards; 0 = melee range
   minRange?: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
+  // non-physical damage scales with Spell Power; physical damage scales with melee
+  // Attack Power (on top of the weapon/finisher paths, which already carry AP).
+  // 'ranged' marks a hunter "attack spell" that scales off Ranged Attack Power
+  // instead (Arcane Shot, Serpent Sting, Aimed Shot), regardless of school.
+  scalesWith?: 'ranged';
   requiresTarget: boolean;
   targetType?: 'enemy' | 'friendly'; // friendly = self or allied player (defaults to enemy)
   onNextSwing?: boolean; // heroic strike style: no GCD, queues on swing
@@ -592,6 +1076,11 @@ export interface AbilityDef {
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
   requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Mutually exclusive self-buff group: casting one ability in the group cancels
+  // any active buff from a sibling in the same group (e.g. hunter aspects, where
+  // only one aspect may be active at a time). Distinct from form toggles, which
+  // are excluded by aura kind, not by group.
+  exclusiveGroup?: string;
   requiresStealth?: boolean; // ambush
   requiresOutOfCombat?: boolean; // stealth
   learnLevel: number;
@@ -618,6 +1107,11 @@ export interface NpcDef {
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
   greeting: string;
+  // Registered but not surface-placed at world init. The owning system spawns
+  // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
+  // mid-fight). Keeping the def in NPCS lets the online client reconstruct its
+  // questIds and treat it as a turn-in NPC.
+  dynamic?: boolean;
 }
 
 export interface CampDef {
@@ -645,6 +1139,8 @@ export interface DungeonObjectSpawn {
   name: string;
   x: number; // relative to instance origin
   z: number;
+  templateId?: 'dungeon_door' | 'dungeon_exit';
+  dungeonId?: string;
 }
 
 export interface DungeonDef {
@@ -652,11 +1148,12 @@ export interface DungeonDef {
   name: string;
   index: number; // x-band for instance origins; must be unique
   doorPos: { x: number; z: number }; // overworld entrance portal
+  overworldDoor?: boolean; // false for rooms only reached by internal instance doors
   entry: { x: number; z: number }; // player arrival point (instance-local)
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
-  interior: 'crypt' | 'sanctum' | 'temple'; // renderer + collider interior builder key
+  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis'; // renderer + collider interior builder key
   suggestedPlayers: number;
   enterText: string;
   leaveText: string;
@@ -695,7 +1192,12 @@ export interface ZonePropsDef {
   wells: { x: number; z: number; r: number }[];
   stalls: { x: number; z: number; rot: number; r: number }[];
   mines: { x: number; z: number; rot: number }[];
-  docks: { x: number; z: number; rot: number; hutLocal: { x: number; z: number; hw: number; hd: number } }[];
+  docks: {
+    x: number;
+    z: number;
+    rot: number;
+    hutLocal: { x: number; z: number; hw: number; hd: number };
+  }[];
   tents: { x: number; z: number; rot: number; scale: number }[];
   crates: [number, number][];
   campfires: [number, number][];
@@ -703,12 +1205,25 @@ export interface ZonePropsDef {
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
   fences: { x1: number; z1: number; x2: number; z2: number }[];
   graveyards: { x: number; z: number }[]; // 6-headstone cluster anchor
+  // delveId resolves to the delve's localized name at render time (the carved
+  // entrance sign), so the marker carries no hardcoded English label.
+  delveMarkers?: { x: number; z: number; delveId: string }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {
   return {
-    buildings: [], wells: [], stalls: [], mines: [], docks: [], tents: [],
-    crates: [], campfires: [], mudHuts: [], ruinRings: [], fences: [], graveyards: [],
+    buildings: [],
+    wells: [],
+    stalls: [],
+    mines: [],
+    docks: [],
+    tents: [],
+    crates: [],
+    campfires: [],
+    mudHuts: [],
+    ruinRings: [],
+    fences: [],
+    graveyards: [],
   };
 }
 
@@ -727,6 +1242,7 @@ export interface QuestDef {
   name: string;
   giverNpcId: string;
   turnInNpcId: string;
+  turnInNpcIds?: string[];
   text: string;
   completionText: string;
   objectives: QuestObjective[];
@@ -734,8 +1250,22 @@ export interface QuestDef {
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
   requiresQuest?: string; // prerequisite quest id (must be turned in)
+  requiredItems?: string[]; // quest items obtained earlier (e.g. a prerequisite reward) that this
+  // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block
   minLevel?: number;
+  retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
+  shareable?: boolean; // quest-link sharing allowed (default true; set false to opt out)
   suggestedPlayers?: number; // group quests ("Suggested players: 5")
+}
+
+export function questTurnInNpcIds(quest: QuestDef): readonly string[] {
+  return quest.turnInNpcIds && quest.turnInNpcIds.length > 0
+    ? quest.turnInNpcIds
+    : [quest.turnInNpcId];
+}
+
+export function isQuestTurnInNpc(quest: QuestDef, templateId: string): boolean {
+  return questTurnInNpcIds(quest).includes(templateId);
 }
 
 export type QuestState = 'unavailable' | 'available' | 'active' | 'ready' | 'done';
@@ -769,6 +1299,7 @@ export interface Entity {
   templateId: string; // mob/npc template id, or class for player
   name: string;
   level: number;
+  guild: string;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
@@ -798,8 +1329,10 @@ export interface Entity {
   weapon: WeaponInfo;
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
+  spellPower: number; // casters: added to spell damage via per-spell coefficients
   critChance: number; // 0..1
   dodgeChance: number;
+  castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   moveSpeed: number;
   hostile: boolean;
   // combat
@@ -809,6 +1342,10 @@ export interface Entity {
   inCombat: boolean;
   combatTimer: number; // time since last combat event
   auras: Aura[];
+  // cached `auras.some(a => a.kind === 'stealth')`, refreshed in updateAuras.
+  // Hosts read it per interest-scan visit (O(viewers x neighbors)); recomputing
+  // it from auras each visit was a measurable cost in crowds.
+  stealthed: boolean;
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
   castingAbility: string | null;
   castRemaining: number;
@@ -845,6 +1382,10 @@ export interface Entity {
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
+  petAutoTaunt?: boolean; // right-click autocast toggle for controlled pet Growl
+  petManualTauntPending?: boolean; // manual Growl command waiting until the pet reaches range
+  petPath: Vec3[]; // controlled pet heel route around obstacles; consumed front-to-back (like chargePath)
+  petPathCooldown: number; // seconds until this pet may recompute its heel path again
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
   stoneskinTimer: number; // periodic self-absorb barrier countdown
@@ -858,10 +1399,12 @@ export interface Entity {
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
   enraged: boolean; // enrage mechanic active
   healedThisPull: boolean; // desperation self-heal already used this pull
+  nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
   fleeTimer: number; // seconds left in a low-HP panic flee; counts down in the 'flee' state
+  fleeReturnTimer: number; // grace after a panic flee hits leash edge, letting it run back before normal leash reset resumes
   hasFled: boolean; // a cowardly mob flees only once per pull; cleared when it resets at spawn
   wanderTarget: Vec3 | null;
   wanderTimer: number;
@@ -871,9 +1414,12 @@ export interface Entity {
   gm?: boolean;
   respawnTimer: number;
   corpseTimer: number;
+  lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
   despawnTimer?: number;
+  damageIdleDespawnTimer?: number;
   lootable: boolean;
   loot: CorpseLoot | null;
+  lootRecipientIds?: number[];
   xpValue: number;
   // npc
   questIds: string[];
@@ -885,13 +1431,77 @@ export interface Entity {
   dead: boolean;
   scale: number;
   color: number;
+  skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  // Equipped mainhand item id (players only; null otherwise). Render-only: the
+  // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
+  // synced in identity fields (terse `mh`). The sim never reads it for gameplay.
+  mainhandItemId: string | null;
+  // $WOC holder-tier flair (cosmetic): 0/undefined = none, 1-10 = Ember…Sovereign.
+  // Set server-side from the player's connected-wallet balance and synced in
+  // identity fields like skin. The sim never reads it (no gameplay effect).
+  holderTier?: number;
+  // Exact $WOC balance backing the tier, for the inspect-profile readout. Rides
+  // alongside holderTier in identity fields; like it, the sim never reads it.
+  holderBalance?: number;
 }
+
+export interface NythraxisWardChannel {
+  objectId: number;
+  playerId: number | null;
+  remaining: number;
+  complete: boolean;
+}
+
+export interface NythraxisSoulRendMark {
+  playerId: number;
+  remaining: number;
+}
+
+export interface NythraxisDialogueCue {
+  at: number;
+  speaker: 'nythraxis' | 'aldric';
+  text: string;
+}
+
+export interface NythraxisEncounterState {
+  phase: 1 | 'transition' | 2 | 'dead';
+  introSpoken: boolean;
+  transitionStarted: boolean;
+  transitionTimer: number;
+  transitionCues: NythraxisDialogueCue[];
+  transitionReleased: boolean;
+  dialogueBusyUntil?: number;
+  dialogueToken?: number;
+  gravebreakerTimer: number;
+  gravebreakerCasts?: number;
+  raiseFallenTimer: number;
+  soulRendTimer: number;
+  soulRendMarks: NythraxisSoulRendMark[];
+  soulRendLockout: number;
+  deathlessTimer: number;
+  deathlessCastRemaining: number;
+  deathlessStunRemaining: number;
+  wardChannels: NythraxisWardChannel[];
+  finalStand: boolean;
+  deathSpoken: boolean;
+}
+
+export type ErrorReason = 'target_dead';
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
-  | { type: 'damage'; sourceId: number; targetId: number; amount: number; crit: boolean; school: string; ability: string | null; kind: 'hit' | 'miss' | 'dodge' | 'parry' }
+  | {
+      type: 'damage';
+      sourceId: number;
+      targetId: number;
+      amount: number;
+      crit: boolean;
+      school: string;
+      ability: string | null;
+      kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
+    }
   | { type: 'heal'; targetId: number; amount: number }
   | { type: 'death'; entityId: number; killerId: number }
   | { type: 'xp'; amount: number; rested?: number }
@@ -902,7 +1512,25 @@ export type SimEvent = { pid?: number } & (
   | { type: 'milestoneUnlocked'; milestoneId: string }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
-  | { type: 'error'; text: string }
+  | {
+      type: 'lootRoll';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+      expiresAt: number;
+    }
+  // master loot: sent only to the master looter; candidates are the eligible recipients
+  | {
+      type: 'masterLoot';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+      expiresAt: number;
+      candidates: { pid: number; name: string }[];
+    }
+  | { type: 'error'; text: string; reason?: ErrorReason }
   | { type: 'questAccepted'; questId: string }
   | { type: 'questProgress'; questId: string; text: string }
   | { type: 'questReady'; questId: string }
@@ -913,12 +1541,33 @@ export type SimEvent = { pid?: number } & (
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }
   | { type: 'respawn' }
-  | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId: string }
+  // itemId names the single item for buy/sell/buyback; it is omitted for the
+  // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
+  | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is
   // a world-wide broadcast
-  | { type: 'chat'; fromPid: number; from: string; text: string; channel?: 'say' | 'yell' | 'whisper' | 'general' | 'party' | 'guild' | 'officer' | 'world' | 'lfg' | 'emote' | 'roll'; entityId?: number; to?: string }
+  | {
+      type: 'chat';
+      fromPid: number;
+      from: string;
+      text: string;
+      channel?:
+        | 'say'
+        | 'yell'
+        | 'whisper'
+        | 'general'
+        | 'party'
+        | 'guild'
+        | 'officer'
+        | 'world'
+        | 'lfg'
+        | 'emote'
+        | 'roll';
+      entityId?: number;
+      to?: string;
+    }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
   // a guild invitation from an online guild officer/leader; resolved by name
   // server-side so it carries no pid
@@ -932,16 +1581,117 @@ export type SimEvent = { pid?: number } & (
   // Ashen Coliseum arena: queue state, match lifecycle, and rating result
   | { type: 'arenaQueued'; position: number; format: ArenaFormat }
   | { type: 'arenaUnqueued' }
-  | { type: 'arenaFound'; format: ArenaFormat; oppName: string; oppClass: PlayerClass; oppLevel: number; allies: ArenaCombatant[]; enemies: ArenaCombatant[] }
+  | {
+      type: 'arenaFound';
+      format: ArenaFormat;
+      oppName: string;
+      oppClass: PlayerClass;
+      oppLevel: number;
+      allies: ArenaCombatant[];
+      enemies: ArenaCombatant[];
+    }
   | { type: 'arenaCountdown'; seconds: number }
   | { type: 'arenaStart' }
-  | { type: 'arenaEnd'; format: ArenaFormat; won: boolean; draw: boolean; oppName: string; ratingBefore: number; ratingAfter: number; allies: ArenaCombatant[]; enemies: ArenaCombatant[] }
-  | { type: 'heal2'; sourceId: number; targetId: number; amount: number; crit: boolean; ability: string }
-  // visual-only cue for the renderer: spell projectiles, dot ticks, aoe novas
-  | { type: 'spellfx'; sourceId: number; targetId: number; school: string; fx: 'projectile' | 'tick' | 'nova' }
+  | {
+      type: 'arenaEnd';
+      format: ArenaFormat;
+      won: boolean;
+      draw: boolean;
+      oppName: string;
+      ratingBefore: number;
+      ratingAfter: number;
+      allies: ArenaCombatant[];
+      enemies: ArenaCombatant[];
+    }
+  // 2v2 Fiesta party mode. All carry pid (personal — delivered to each combatant).
+  // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment
+  // wave just opened. `fiestaWord`: an exaggerated word-pop cue (the client maps
+  // `flavor` to a localized exclamation). `fiestaDown`: you were dropped and will
+  // respawn in `seconds`. `augmentOffer`: pick one of these augment ids.
+  // `augmentChosen`: a fighter locked in an augment (own or ally, for flavor).
+  | { type: 'fiestaScore'; a: number; b: number; limit: number; team: 'A' | 'B' }
+  | { type: 'fiestaWave'; wave: number; totalWaves: number }
+  | {
+      type: 'fiestaWord';
+      flavor: 'firstblood' | 'kill' | 'doublekill' | 'spree' | 'shutdown' | 'revived' | 'ringclose';
+      n?: number;
+    }
+  | { type: 'fiestaDown'; seconds: number }
+  | { type: 'augmentOffer'; tier: 'silver' | 'gold' | 'prismatic'; wave: number; choices: string[] }
+  | { type: 'augmentChosen'; augmentId: string; byPid: number; byName: string; mine: boolean }
+  // A fighter grabbed a ring power-up (world event so everyone sees the glow).
+  // Whether it's "mine" is decided client-side (entityId === local player).
+  | { type: 'fiestaPowerup'; entityId: number; defId: string; glow: number; duration: number }
+  | {
+      type: 'heal2';
+      sourceId: number;
+      targetId: number;
+      amount: number;
+      crit: boolean;
+      ability: string;
+    }
+  // visual-only cue for the renderer: spell projectiles, channel beams, dot ticks, aoe novas
+  | {
+      type: 'spellfx';
+      sourceId: number;
+      targetId: number;
+      school: string;
+      fx: 'projectile' | 'beam' | 'tick' | 'nova';
+    }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
   | { type: 'log'; text: string; color?: string; entityId?: number }
+  | { type: 'delveEntered'; delveId: string; tierId: string }
+  | { type: 'delveComplete'; delveId: string; tierId: string }
+  | { type: 'delveFailed'; delveId: string; tierId: string }
+  | { type: 'delveLoreUnlock'; loreId: string }
+  | { type: 'companionBark'; barkId: string; pid?: number }
+  // Lockpicking minigame ("Tumbler's Path"). All personal (pid-scoped). The sim
+  // emits structured data only, the client builds every visible string. Cells
+  // are always limited to the fog window (anti-cheat: the full lock is never
+  // serialized).
+  | { type: 'lockpickOffer'; objectId: number; bountiful: boolean }
+  | {
+      type: 'lockpickSession';
+      sessionId: string;
+      objectId: number;
+      w: number;
+      h: number;
+      col: number;
+      row: number;
+      page: number;
+      pageCount: number;
+      tries: number;
+      triesTotal: number;
+      lootTier: LootTier;
+      allowed: Exclude<PickAction, 'abort'>[];
+      visible: VisibleCell[];
+      stepTimeoutMs: number | null;
+    }
+  | {
+      type: 'lockpickStep';
+      sessionId: string;
+      col: number;
+      row: number;
+      page: number;
+      pageCount: number;
+      tries: number;
+      triesTotal: number;
+      result: StepResult;
+      visible: VisibleCell[];
+    }
+  | {
+      type: 'lockpickEnd';
+      sessionId: string;
+      outcome: 'success' | 'fail' | 'abandoned';
+      lootTier?: LootTier;
+    }
+  | { type: 'lockpickBonus'; tier: LootTier; marks: number; copper: number }
+  | { type: 'delveChestLoot'; chestId: number; items: { itemId: string; count: number }[] }
+  // personal cue (carries `pid`) to open the cosmetic skin-select overlay with
+  // the server-rolled rank. Text-free on purpose — the client renders its own
+  // localized copy, so no sim/server i18n matcher rule is needed.
+  | { type: 'skinEvent'; rank: SkinRank; catalog?: SkinCatalog }
 );
 
 export interface MoveInput {
@@ -962,14 +1712,24 @@ export interface SimConfig {
   playerName?: string;
   noPlayer?: boolean; // multiplayer server: start with an empty world and addPlayer() later
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
+  lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
 }
 
 export function emptyMoveInput(): MoveInput {
-  return { forward: false, back: false, turnLeft: false, turnRight: false, strafeLeft: false, strafeRight: false, jump: false };
+  return {
+    forward: false,
+    back: false,
+    turnLeft: false,
+    turnRight: false,
+    strafeLeft: false,
+    strafeRight: false,
+    jump: false,
+  };
 }
 
 export function dist2d(a: Vec3, b: Vec3): number {
-  const dx = a.x - b.x, dz = a.z - b.z;
+  const dx = a.x - b.x,
+    dz = a.z - b.z;
   return Math.sqrt(dx * dx + dz * dz);
 }
 
@@ -989,10 +1749,18 @@ export function normAngle(a: number): number {
 
 // XP required to go from level L to L+1 (real vanilla values, levels 1..20)
 export const XP_TABLE = [
-  400, 900, 1400, 2100, 2800, 3600, 4500, 5400, 6500, 7600,
-  8800, 10100, 11400, 12900, 14400, 16000, 17700, 19400, 21300, 23200,
+  400, 900, 1400, 2100, 2800, 3600, 4500, 5400, 6500, 7600, 8800, 10100, 11400, 12900, 14400, 16000,
+  17700, 19400, 21300, 23200,
 ];
 export const MAX_LEVEL = 20;
+
+// Shared sim constants relocated here (C1) so both sim.ts and the extracted damage
+// core (src/sim/combat/damage.ts) can import them without a sim.ts cycle.
+export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/credit
+// Nythraxis raid boss template id. Used by the damage-core death path (lockout on
+// boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
+// the encounter. Kept here as the neutral shared seam in the meantime.
+export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];
@@ -1044,7 +1812,8 @@ export function xpToReachLevel(level: number): number {
 // cached table — never recomputed per frame, never per combat tick.
 export function virtualLevel(lifetimeXp: number): number {
   const xp = Math.max(0, lifetimeXp);
-  let lo = 1, hi = MAX_VIRTUAL_LEVEL;
+  let lo = 1,
+    hi = MAX_VIRTUAL_LEVEL;
   while (lo < hi) {
     const mid = (lo + hi + 1) >> 1;
     if (VLEVEL_CUM[mid] <= xp) lo = mid;
@@ -1055,7 +1824,11 @@ export function virtualLevel(lifetimeXp: number): number {
 
 // Progress within the current virtual level: how much lifetime XP into it, and
 // how much that level costs in total. Pre-cap callers use the level bar instead.
-export function virtualLevelProgress(lifetimeXp: number): { level: number; into: number; span: number } {
+export function virtualLevelProgress(lifetimeXp: number): {
+  level: number;
+  into: number;
+  span: number;
+} {
   const level = virtualLevel(lifetimeXp);
   const floor = VLEVEL_CUM[level];
   const next = VLEVEL_CUM[Math.min(level + 1, MAX_VIRTUAL_LEVEL)];
@@ -1173,4 +1946,230 @@ export function meleeMissChance(attackerLevel: number, targetLevel: number): num
 export function armorReduction(armor: number, attackerLevel: number): number {
   const a = Math.max(0, armor);
   return Math.min(0.75, a / (a + 85 * attackerLevel + 400));
+}
+
+// ---------------------------------------------------------------------------
+// Spell Power: caster damage scaling (vanilla-style cast-time / DoT-duration
+// coefficient model). Casters convert Intellect into Spell Power; Spell Power
+// then adds to each spell's damage via a per-spell coefficient. Hunter "attack
+// spells" (Arcane Shot, Serpent Sting, Aimed Shot) instead scale off Ranged
+// Attack Power, mirroring the physical attack-power path. The pure coefficient
+// helpers live in src/sim/spell_scaling.ts; these are the tuning knobs.
+// ---------------------------------------------------------------------------
+// Spell Power gained per point of Intellect (1 Spell Power per 2 Intellect). Tuned
+// (see tests/spell_power.test.ts) so a fully-leveled caster gets a meaningful but
+// not dominant damage lift, scaling further as caster gear adds Int + Spell Power.
+export const SPELL_POWER_PER_INT = 0.5;
+// Direct nuke coefficient = clamp(castTime, MIN, MAX) / DIVISOR (vanilla 3.5). The
+// max equals the divisor so the direct coefficient caps at 1.0 (a 3.5s+ cast gets
+// full Spell Power; a 6s Pyroblast does not exceed it).
+export const SPELL_COEFF_DIVISOR = 3.5;
+export const SPELL_COEFF_MIN_CAST = 1.5; // instant / sub-1.5s casts use this floor
+export const SPELL_COEFF_MAX_CAST = 3.5; // longer casts cap at a 1.0 coefficient
+// Total DoT coefficient = duration / DURATION (vanilla 15), spread across ticks.
+export const SPELL_DOT_COEFF_DURATION = 15;
+// AoE spells take a reduced coefficient (vanilla AoE penalty).
+export const SPELL_AOE_COEFF_MULT = 0.333;
+// Hunter ranged "attack spells" scale off Ranged Attack Power using the same
+// cast/duration shape, scaled down by this factor (RAP is far larger than SP).
+// Tuned so Arcane Shot / Aimed Shot / Serpent Sting gain a ~20-30% lift at cap.
+export const RANGED_SPELL_AP_SCALE = 0.15;
+// Melee physical "attack spells" (warrior Rend/Execute/Cleave, rogue Rupture/
+// Garrote bleeds, druid feral bleeds, etc.) take the flat-damage portion of a
+// special and scale it off melee Attack Power with the same shape. Melee AP is
+// the same magnitude as Ranged AP, so it reuses the same scale-down factor. The
+// weapon-swing and finisher portions already carry AP through their own paths;
+// this only lifts the flat directDamage / DoT / AoE riders.
+export const MELEE_SPELL_AP_SCALE = 0.15;
+
+// ---------------------------------------------------------------------------
+// Delves, replayable modular instances (see docs/prd/delves.md)
+// ---------------------------------------------------------------------------
+
+export type DelveTheme = 'crypt' | 'cave' | 'mine' | 'ruin' | 'sewer' | 'vault' | 'lair';
+
+export type DelveObjectiveKind =
+  | 'kill_boss'
+  | 'recover_artifact'
+  | 'seal_portal'
+  | 'survive_ambush'
+  | 'escort_researcher'
+  | 'investigate_clues';
+
+export interface DelveRewardTable {
+  copperMin: number;
+  copperMax: number;
+  firstClearXp: number;
+  repeatClearXp: number;
+}
+
+export interface DelveTierDef {
+  id: string;
+  label: string;
+  enemyLevelBonus: number;
+  affixCount: number;
+  rewardMult: number;
+  // Minimum player level required to select this tier (the Heroic gate). Omit for
+  // an unrestricted tier. Enforced server-side in `enterDelve`.
+  minPlayerLevel?: number;
+  // Per-tier reward overrides; fall back to `delve.baseRewards` when omitted, so a
+  // tier's XP/copper lives in content data, not inline in sim logic.
+  firstClearXp?: number;
+  repeatClearXp?: number;
+  copperMin?: number;
+  copperMax?: number;
+  unlock?: { delveId: string; tierId: string; clears: number };
+}
+
+export interface DelvePatrol {
+  mobId: string;
+  from: { x: number; z: number };
+  to: { x: number; z: number };
+}
+
+export interface DelveSpawnSet {
+  id: string;
+  weight: number;
+  spawns: DungeonSpawn[];
+  patrols?: DelvePatrol[];
+}
+
+export interface DelveInteractableSlot {
+  x: number;
+  z: number;
+  variants: string[];
+}
+
+export interface DelveModuleDef {
+  id: string;
+  interior: 'crypt' | 'cave' | 'mine';
+  layout: string;
+  length: number;
+  spawnSets: DelveSpawnSet[];
+  interactableSlots: DelveInteractableSlot[];
+  sideRoom?: { chance: number; moduleId: string };
+}
+
+export interface DelveDef {
+  id: string;
+  name: string;
+  theme: DelveTheme;
+  index: number;
+  minLevel: number;
+  suggestedPlayers: number;
+  doorPos: { x: number; z: number };
+  modules: string[];
+  moduleCount: [number, number];
+  finaleModuleId: string;
+  bosses: string[];
+  objective: DelveObjectiveKind;
+  tiers: DelveTierDef[];
+  baseRewards: DelveRewardTable;
+  boardNpcId: string;
+  // Companion auto-hired for solo runs (e.g. Acolyte Tessa). Omit for delves that
+  // ship without a companion. De-hardcodes the solo-spawn branch in `enterDelve`.
+  autoCompanionId?: string;
+  enterText: string;
+  leaveText: string;
+}
+
+export interface DelveObjectiveState {
+  kind: DelveObjectiveKind;
+  counts: number[];
+  complete: boolean;
+}
+
+export interface DelveCompanionState {
+  companionId: string;
+  entityId: number;
+}
+
+export interface DelveRun {
+  delveId: string;
+  slot: number;
+  partyKey: string | null;
+  seed: number;
+  tierId: string;
+  affixes: string[];
+  modules: string[];
+  moduleIndex: number;
+  origin: { x: number; z: number };
+  mobIds: number[];
+  objectIds: number[];
+  objective: DelveObjectiveState;
+  companion?: DelveCompanionState;
+  completed: boolean;
+  emptyFor: number;
+  deathsThisRun: Record<number, number>;
+  objectState: Record<number, DelveObjectState>;
+  raiseDeadChannel: DelveRaiseDeadChannel | null;
+  restlessPending: DelveRestlessPending[];
+  badAirTimer: number;
+  companionBarks: string[];
+  /** True when the current module exit portal is active (trash cleared + plate if any). */
+  exitPortalOpen: boolean;
+  /** §7.6, this run rolled Bountiful (ultra-rare): the reward chest is a purple
+   * Coffer that only yields to a Hard-tier + Premium-ante lockpick solve and
+   * guarantees a signature rare. Rolled once at run start (Heroic 5% / Normal 2%). */
+  bountiful: boolean;
+  /** Entity id of the reward chest spawned after the finale boss dies, or null if not yet spawned. */
+  rewardChestId: number | null;
+  /** Entity id of the surface-exit portal spawned after the chest is opened, or null if not yet opened. */
+  surfaceExitId: number | null;
+  /** Active lockpicking attempt on the finale chest (single interactor, v1), or null. In-memory only. */
+  lockpick: LockSession | null;
+}
+
+export interface DelveDailyState {
+  date: string;
+  firstClearXp: string[];
+  markClears: number;
+}
+
+export interface DelveCompanionDef {
+  id: string;
+  name: string;
+  role: 'healer' | 'tank' | 'scout' | 'dps';
+  mobTemplateId: string;
+}
+
+export interface DelveAffixDef {
+  id: string;
+  name: string;
+  themes: DelveTheme[];
+  blessing?: boolean;
+}
+
+export interface DelveObjectState {
+  kind: string;
+  triggered: boolean;
+  hp: number;
+  maxHp: number;
+  linkIds: number[];
+  open: boolean;
+  // Lockpick chest gating (kind === 'locked_chest'). attemptAvailable is granted
+  // when the chest spawns (boss defeated) and consumed on a SUCCESS or FAILED
+  // attempt, a FAILED chest can only be retried by re-clearing the delve.
+  attemptAvailable?: boolean;
+  looted?: boolean;
+  lootedTier?: LootTier;
+  /** Item slots waiting on the post-unlock loot screen. */
+  pendingLoot?: { itemId: string; count: number }[];
+  /** Entity id of the player who picked the lock; only they may collect the loot. */
+  lootOwnerId?: number;
+}
+
+export interface DelveRaiseDeadChannel {
+  graveId: number;
+  bossId: number;
+  mobId: string;
+  count: number;
+  remaining: number;
+}
+
+export interface DelveRestlessPending {
+  at: number;
+  x: number;
+  z: number;
+  mobId: string;
 }

@@ -18,6 +18,12 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const root = process.cwd();
+// Only the GAME table is SHA-gated here. The admin resolved table
+// (src/admin/i18n.resolved.generated/) is intentionally NOT hashed: its byte-identity
+// is enforced by tests/i18n_admin_catalog.test.ts (regenerate + `git diff --exit-code`),
+// an exact in-tree check that makes a content-addressed admin baseline redundant. The
+// game table also needs this hash because it doubles as the release-gate tripwire. Do
+// not "restore" a missing src/admin/i18n.resolved.sha256 - there has never been one.
 export const BASELINE_PATH = path.join(root, 'src/ui/i18n.resolved.sha256');
 
 // Recursively sort object keys so the serialization is independent of insertion

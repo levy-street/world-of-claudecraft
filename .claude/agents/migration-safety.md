@@ -2,10 +2,11 @@
 name: migration-safety
 description: >
   Schema and persisted-state safety analyzer for World of ClaudeCraft (Postgres via `pg`).
-  There are no migration files: the schema is inline DDL in server/db.ts (SCHEMA) and
-  server/social_db.ts (SOCIAL_SCHEMA), re-applied at every boot under an advisory lock, and
-  character state is JSONB. Reviews changes for additive/idempotent DDL, JSONB save/load
-  back-compat, index coverage, parameterized SQL, and boot safety. Read-only.
+  There are no migration files: the schema is inline DDL in server/db.ts (SCHEMA),
+  server/social_db.ts (SOCIAL_SCHEMA), and server/oauth_db.ts (OAUTH_SCHEMA), each re-applied
+  at every boot under an advisory lock, and persisted state lives in JSONB. Reviews changes for
+  additive/idempotent DDL, JSONB save/load back-compat, index coverage, parameterized SQL, and
+  boot safety. Read-only.
 tools: Read, Grep, Glob, Bash
 model: opus
 maxTurns: 15
@@ -18,10 +19,13 @@ analyze code but never modify files.
 
 ## How this project's schema works (read this first)
 
-- **There is no migrations directory.** The schema is an inline SQL string: `SCHEMA` in
-  `server/db.ts`, with `SOCIAL_SCHEMA` (`server/social_db.ts`) concatenated onto it and run
-  as one DDL batch. Ordering matters: a new `ALTER`/`CREATE` must come after the table it
-  depends on.
+- **There is no migrations directory.** The schema is inline SQL applied in order by
+  `ensureSchema()` as separate `client.query(...)` calls, NOT one concatenated batch: `SCHEMA`
+  (`server/db.ts`), then `SOCIAL_SCHEMA` (`server/social_db.ts`), then `OAUTH_SCHEMA`
+  (`server/oauth_db.ts`). Order is load-bearing both within and across them: a new
+  `ALTER`/`CREATE` must come after the table it depends on, and because `SOCIAL_SCHEMA` /
+  `OAUTH_SCHEMA` run after `SCHEMA`, they may `ALTER` a table that `SCHEMA` creates (for example
+  `social_db.ts` alters `characters`).
 - The DDL is **re-applied on every boot** by `ensureSchema()`, inside a transaction held
   under a Postgres advisory lock (`pg_advisory_xact_lock(...)`) so concurrent realm boots
   serialize. It therefore MUST be safe to run repeatedly.
@@ -29,6 +33,11 @@ analyze code but never modify files.
   and so on) is stored as **JSONB** in `characters.state`. Most "schema" changes are really
   changes to the shape of that JSONB blob, handled by the serialize/deserialize code in
   `server/db.ts` / `server/game.ts`, not by DDL.
+- `characters.state` is not the only persisted JSONB shape. The World Market is a JSONB row in
+  `world_state.data` (key/value store; the market row, via `saveMarketState` / `loadMarketState`
+  / `MarketSave` in `server/db.ts`), and `accounts.cosmetics` is JSONB too. The same back-compat
+  rules (default new fields on load, keep reading old keys, write on every save) apply to all of
+  them.
 - Saves happen on a ~30s cadence (accumulated inside the sim loop via `AUTOSAVE_SECONDS`, not
   a standalone interval), and also on player leave and on SIGINT/SIGTERM shutdown.
 
@@ -40,10 +49,12 @@ that out wastes budget. Gate yourself before reading any file:
 
 1. Get the changed files only (cheap): `git diff --cached --name-only`, or if nothing is
    staged, `git diff --name-only "$(git merge-base HEAD main)"..HEAD`.
-2. You are IN SCOPE if any changed path is `server/db.ts`, `server/social_db.ts`, any
-   `server/*_db.ts`, or a file that serializes/deserializes `characters.state` JSONB
-   (today `server/db.ts` and `server/game.ts`). A grep of the changed set for `SCHEMA`,
-   `CREATE TABLE`, `ALTER TABLE`, `characters.state`, or a save/load function confirms it.
+2. You are IN SCOPE if any changed path is `server/db.ts`, `server/social_db.ts`,
+   `server/oauth_db.ts`, any other `server/*_db.ts` (for example `chat_filter_db.ts`), or a
+   file that serializes/deserializes a persisted JSONB blob (`characters.state` in
+   `server/db.ts` / `server/game.ts`; `world_state` / `MarketSave` in `server/db.ts`). A grep
+   of the changed set for `SCHEMA`, `CREATE TABLE`, `ALTER TABLE`, `characters.state`,
+   `world_state`, or a save/load function confirms it.
 3. EARLY EXIT: if nothing matched, output exactly this and STOP (do not read the `SCHEMA`):
 
    > **Schema & Persistence Safety Review - out of scope.** No DDL or `characters.state`

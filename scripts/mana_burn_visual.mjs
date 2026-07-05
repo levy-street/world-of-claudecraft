@@ -80,7 +80,7 @@ const frame = await page.$('#player-frame');
 if (frame) await frame.screenshot({ path: 'tmp/mana_burn_frame.png' });
 
 // Switch to the Combat Log tab so the "You gain Mana Sear." lines are visible.
-await page.evaluate(() => document.querySelector('.chat-tab[data-log-tab="combat"]')?.click());
+await page.evaluate(() => document.querySelector('.chat-tab[data-tab="combat"]')?.click());
 await sleep(200);
 const log = await page.$('#chatlog-wrap');
 if (log) await log.screenshot({ path: 'tmp/mana_burn_log.png' });

@@ -9,6 +9,7 @@ import {
   WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z,
 } from '../src/sim/data';
 import { ALL_CLASSES, XP_TABLE, MAX_LEVEL, ZoneDef } from '../src/sim/types';
+import { canEquipItem } from '../src/sim/equipment_rules';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const WORLD_SEED = 20061; // production seed (main.ts / server/game.ts)
@@ -135,7 +136,7 @@ describe('content referential integrity', () => {
         if (!itemId) continue;
         const item = ITEMS[itemId];
         if (!item) continue; // missing items are caught by the integrity test
-        if (item.requiredClass && !item.requiredClass.includes(cls)) {
+        if (!canEquipItem(cls, item)) {
           problems.push(`${q.id}: ${cls} receives ${itemId} but cannot equip it`);
         }
       }

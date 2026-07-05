@@ -10,9 +10,20 @@ export interface RestStateInput {
   drinking: boolean;
 }
 
+// The tooltip text is surfaced as a translation key (resolved by the HUD via
+// t()) rather than baked English, so this module stays DOM/i18n-free. '' means
+// "no indicator / no tooltip". The eating/drinking keys reuse the existing
+// hud.core.* entries; the bare-sit case uses the hudChrome.rest.resting key.
+export type RestLabelKey =
+  | ''
+  | 'hud.core.eatingDrinking'
+  | 'hud.core.eating'
+  | 'hud.core.drinking'
+  | 'hudChrome.rest.resting';
+
 export interface RestView {
   resting: boolean; // any seated state → show the indicator
-  label: string; // tooltip / aria text ('' when not resting)
+  labelKey: RestLabelKey; // i18n key for the tooltip / aria text ('' when not resting)
   glyph: string; // single-char marker shown on the portrait
 }
 
@@ -22,9 +33,9 @@ export interface RestView {
 // sit (no consumable) reads as classic "Resting".
 export function restView(input: RestStateInput): RestView {
   const { sitting, eating, drinking } = input;
-  if (eating && drinking) return { resting: true, label: 'Eating & drinking', glyph: 'z' };
-  if (eating) return { resting: true, label: 'Eating', glyph: 'z' };
-  if (drinking) return { resting: true, label: 'Drinking', glyph: 'z' };
-  if (sitting) return { resting: true, label: 'Resting', glyph: 'z' };
-  return { resting: false, label: '', glyph: 'z' };
+  if (eating && drinking) return { resting: true, labelKey: 'hud.core.eatingDrinking', glyph: 'z' };
+  if (eating) return { resting: true, labelKey: 'hud.core.eating', glyph: 'z' };
+  if (drinking) return { resting: true, labelKey: 'hud.core.drinking', glyph: 'z' };
+  if (sitting) return { resting: true, labelKey: 'hudChrome.rest.resting', glyph: 'z' };
+  return { resting: false, labelKey: '', glyph: 'z' };
 }

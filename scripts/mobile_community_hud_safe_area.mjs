@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const URL = process.env.URL || 'http://localhost:5173/';
 const OUT = 'screenshots';
@@ -84,16 +85,7 @@ try {
       return false;
     }
   };
-  await click('div[role=button][aria-label*=Offline]');
-  // Offline character creation: name + class + Enter World.
-  try {
-    await page.waitForSelector('#char-name', { timeout: 8000, visible: true });
-    await page.type('#char-name', 'Notchy');
-    await new Promise((r) => setTimeout(r, 200));
-  } catch {}
-  await click('#offline-select .mini-class[data-class=warrior]');
-  await click('#btn-start-offline');
-  await new Promise((r) => setTimeout(r, 1200));
+  await enterOfflineGame(page, { charClass: 'warrior', charName: 'Notchy', settleMs: 1200 });
   await click('#mobile-preflight-continue');
   await new Promise((r) => setTimeout(r, 2500));
 

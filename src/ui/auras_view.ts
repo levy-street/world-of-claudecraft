@@ -1,0 +1,249 @@
+// Pure derivation of the aura strip (the #buff-bar player buffs/debuffs and the
+// #tf-debuffs target debuffs).
+//
+// This is the per-frame HOT core: hud.update() rendered each entity's auras every
+// frame. The old renderAuras used an ad-hoc `__sig` cache + an innerHTML wipe; this
+// core replaces the derivation half, and auras_painter.ts replaces the DOM half with
+// a typed keyed per-aura node pool (Top risk 3: the pool's tooltip closure reads a
+// LIVE mutable slot, never a captured aura).
+//
+// Component contract: the core is INSTANCE-PARAMETERIZED by the aura
+// MODE ('all' for the buff bar, 'debuffs' for the target frame). createAurasView(mode,
+// deps) preallocates a per-aura slot pool ONCE and returns a tick(entity) that mutates
+// it IN PLACE and returns the SAME { slots, count } container every call, so a correct
+// frame allocates no new array/object garbage (the reused-reference allocation proxy,
+// tests/util/alloc_probe.ts). Two modes yield two independent views (the buff bar and
+// the target debuffs are two instances, not a code fork).
+//
+// The DEBUFF allowlist lives HERE (it is presentation/domain classification, lifted
+// out of the old painter-side branch). The core stays DOM-free and i18n-MECHANISM-free
+// (no i18n runtime import): the localized aura name + the formatted stack count are
+// produced by INJECTED deps each frame (so the i18n keys keep firing and the painter
+// never concats), while the icon identity and the duration text are pure.
+//
+// Parity: the input is a structural subset of IWorld's Entity.auras that
+// BOTH the offline Sim and the online ClientWorld mirror expose. Aura.stacks is
+// OPTIONAL (the wire sends it only when > 1), so the core treats a missing stacks the
+// same as 1 (no stacks badge), and a Sim-shaped aura {stacks:1} and a ClientWorld
+// mirror aura {stacks:undefined} derive identical output.
+
+import type { AuraKind } from '../sim/types';
+import type { AuraSchool } from './aura_effect';
+
+// The aura kinds that read as a DEBUFF even when they reuse a buff_* kind is handled
+// separately below. Lifted verbatim from the old inline `renderAuras` allowlist; a
+// Set so the per-frame classification is O(1) and the table is built once at load, not
+// per aura. A negative-value stat aura (a mob's attack-power sap, an intellect-draining
+// curse) is also a debuff (see isAuraDebuff).
+export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'dot',
+  'slow',
+  'root',
+  'stun',
+  'incapacitate',
+  'polymorph',
+  'attackspeed',
+  'debuff_ap',
+  'sunder',
+  'mortal_wound',
+  'silence',
+  'disarm',
+  'blind',
+  'expose',
+  'spellvuln',
+  'lockout',
+  'vulnerability',
+  'hex',
+  'tongues',
+  'cost_tax',
+  'heal_absorb',
+  'critvuln',
+]);
+
+// Below this many seconds remaining the duration label is shown; at/above it the aura
+// reads as effectively permanent and the label is blank (byte-faithful to the old
+// `a.remaining < 99 ? ... : ''`).
+const DURATION_HIDE_THRESHOLD = 99;
+
+/** Which aura strip a view drives: every aura, buffs only (the player buff row), or
+ *  debuffs only (the player debuff row and the target frame). */
+export type AuraMode = 'all' | 'buffs' | 'debuffs';
+
+/** The aura fields the core reads. A structural subset of sim `Aura` that both worlds
+ *  mirror. `stacks` is optional (the wire omits it when 1). */
+export interface AuraInput {
+  id: string;
+  name: string;
+  kind: AuraKind;
+  remaining: number;
+  value: number;
+  // Optional effect-descriptor inputs (DoT/HoT tick interval, secondary values, magic
+  // school). Present on the offline Sim aura; the online ClientWorld mirror may omit
+  // them, in which case auraEffectDescriptor falls back to its defaults.
+  value2?: number;
+  value3?: number;
+  tickInterval?: number;
+  school?: AuraSchool;
+  stacks?: number;
+  // Remaining charges on a charge-limited aura (e.g. Lightning Shield's 3 reflects). Present
+  // on the offline Sim aura and mirrored over the wire; undefined for ordinary auras. When
+  // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
+  // and unlike stacks it shows even at 1 so the player sees the shield about to drop.
+  charges?: number;
+}
+
+/** The entity fields the core reads: just its aura list. */
+export interface AurasEntityInput {
+  auras: readonly AuraInput[];
+}
+
+/** Injected host helpers. The core produces localized text without importing the i18n
+ *  runtime (testable with spies); each fires its key/lookup every frame so an in-game
+ *  language switch lands on the next tick. */
+export interface AurasDeps {
+  /** The icon identity the painter resolves to a background-image URL (host:
+   *  `ABILITIES[id] ? id : 'aura_' + kind`). */
+  iconId(aura: AuraInput): string;
+  /** The localized aura display name, for the tooltip (host: `ABILITIES[id] ?
+   *  abilityDisplayName(...) : auraDisplayNameFromSource(name)`). */
+  auraName(aura: AuraInput): string;
+  /** The formatted stack count (host: `formatNumber(stacks, {maximumFractionDigits:0})`). */
+  formatStacks(stacks: number): string;
+  /** The one-line aura effect-summary HTML the tooltip prepends (or '' when the aura has
+   *  no descriptor). Injected so the i18n-free core never calls t(): the host builds the
+   *  localized, esc'd HTML from the pure aura_effect descriptor. */
+  auraEffectHtml(aura: AuraInput): string;
+  /** The localized duration unit suffix appended to the remaining-seconds count (host:
+   *  `t('hudChrome.unitFrame.durationUnitSeconds')`, English 's'). Frame-constant: tick() reads
+   *  it ONCE per frame (not per aura, unlike the per-aura deps above), and re-reads each frame so
+   *  an in-game language switch still lands on the next tick. */
+  durationUnitSuffix(): string;
+}
+
+/** One aura's derived state. All fields are mutated IN PLACE each tick; the object
+ *  reference is stable across ticks (no per-frame garbage). The painter keys its node
+ *  pool by `key` and copies `name`/`remaining` into a LIVE pooled record the tooltip
+ *  reads. */
+export interface AuraSlotState {
+  /** The pool BASE key: the aura id. Stable per logical aura across frames. NOTE the id
+   *  is NOT unique per entity: the sim dedups by id+sourceId (sim.ts), so one entity can
+   *  carry several auras sharing an ability id from different sources (two casters' same
+   *  DoT, two healers' same HoT). The painter disambiguates same-id duplicates within a
+   *  frame onto distinct nodes (auras_painter.ts), so the core leaves the base id here. */
+  key: string;
+  /** The icon identity the painter resolves + elides by. */
+  iconKey: string;
+  /** Whether this aura reads as a debuff (drives the `debuff` class, not a color). */
+  isDebuff: boolean;
+  /** The remaining-duration label, or '' when effectively permanent. */
+  durationText: string;
+  /** The stack-count label, or '' when the aura does not stack past 1. */
+  stacksText: string;
+  /** The localized aura name, for the tooltip (read live by the pooled closure). */
+  name: string;
+  /** Raw seconds remaining, for the tooltip (read live by the pooled closure). */
+  remaining: number;
+  /** Whether this aura is the player's own cancelable buff (mode 'buffs', not a debuff):
+   *  the buff bar offers right-click-cancel, a target's debuff strip is read-only. */
+  cancelable: boolean;
+  /** The one-line effect-summary HTML for the tooltip (or '' when none), read live by the
+   *  pooled closure. */
+  effectHtml: string;
+}
+
+/** The whole strip's derived state: the reused slot pool plus the active count. Both
+ *  the object and the array are reused across ticks; `count` is how many leading slots
+ *  are active this frame (slots.length is the high-water capacity, never truncated, so
+ *  the pooled slot references stay stable). */
+export interface AurasState {
+  slots: AuraSlotState[];
+  count: number;
+}
+
+export interface AurasView {
+  /** Derive this frame's state, mutating the reused pool in place. */
+  tick(entity: AurasEntityInput): AurasState;
+}
+
+/** Whether an aura reads as a debuff: an allowlisted kind, or a negative-value stat
+ *  buff (a buff_* kind whose value saps rather than grants, e.g. a mob stat-sap riding
+ *  buff_int/buff_ap with a negative value). Byte-faithful to the old inline
+ *  classification, lifted into the core.
+ *
+ *  PARITY: the `value < 0` branch fires identically in both worlds. The wire carries the
+ *  aura value SPARSELY (server/game.ts WireAura sends it only when negative, the sole case
+ *  that flips this classification; src/net/online.ts decodes `a.value ?? 0`), so a
+ *  negative-value buff_* stat-sap shows the debuff border online and offline, and the
+ *  low-tier debuff-priority aura cap (auras_painter.ts) can never hide it. The allowlisted
+ *  kinds (dot, debuff_ap, ...) never depended on value and have always classified the same
+ *  in both worlds (the kind is on the wire). The end-to-end encode/decode round trip is
+ *  pinned in tests/snapshots.test.ts. */
+export function isAuraDebuff(aura: AuraInput): boolean {
+  return DEBUFF_AURA_KINDS.has(aura.kind) || (aura.kind.startsWith('buff_') && aura.value < 0);
+}
+
+function makeSlotState(): AuraSlotState {
+  return {
+    key: '',
+    iconKey: '',
+    isDebuff: false,
+    durationText: '',
+    stacksText: '',
+    name: '',
+    remaining: 0,
+    cancelable: false,
+    effectHtml: '',
+  };
+}
+
+/**
+ * Build an aura view bound to one mode. The slot pool is preallocated lazily and grows
+ * only to the high-water aura count (amortized zero allocation in steady state);
+ * tick() mutates it in place and returns the SAME { slots, count } container every
+ * call. Each createAurasView yields an INDEPENDENT view: the buff bar and
+ * the target debuffs never share a pool.
+ */
+export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
+  const slots: AuraSlotState[] = [];
+  const state: AurasState = { slots, count: 0 };
+
+  return {
+    tick(entity: AurasEntityInput): AurasState {
+      let count = 0;
+      // Frame-constant, so read once per tick instead of per aura (it still re-reads each frame,
+      // so an in-game language switch lands on the next tick).
+      const durSuffix = deps.durationUnitSuffix();
+      for (const a of entity.auras) {
+        const debuff = isAuraDebuff(a);
+        if (mode === 'debuffs' && !debuff) continue;
+        if (mode === 'buffs' && debuff) continue;
+        // Grow the pool only when this frame needs a slot it has never held before.
+        if (count >= slots.length) slots.push(makeSlotState());
+        const slot = slots[count];
+        slot.key = a.id;
+        slot.iconKey = deps.iconId(a);
+        slot.isDebuff = debuff;
+        slot.durationText =
+          a.remaining < DURATION_HIDE_THRESHOLD ? `${Math.ceil(a.remaining)}${durSuffix}` : '';
+        // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
+        // badge shows a stack count, and only when it stacks past 1.
+        slot.stacksText =
+          a.charges !== undefined
+            ? deps.formatStacks(a.charges)
+            : a.stacks && a.stacks > 1
+              ? deps.formatStacks(a.stacks)
+              : '';
+        slot.name = deps.auraName(a);
+        slot.remaining = a.remaining;
+        // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
+        // a helpful buff is cancelable, a debuff never. The target debuff strip
+        // (mode 'debuffs') is read-only, so nothing there is cancelable.
+        slot.cancelable = mode === 'buffs' && !debuff;
+        slot.effectHtml = deps.auraEffectHtml(a);
+        count++;
+      }
+      state.count = count;
+      return state;
+    },
+  };
+}

@@ -6,7 +6,7 @@ import { fr_CA as frCAOverlay } from "../src/ui/i18n.locales/fr_CA";
 import { en_CA as enCAOverlay } from "../src/ui/i18n.locales/en_CA";
 
 // Declared-base dialect resolution, asserted on the GENERATED resolved
-// table (src/ui/i18n.resolved.generated.ts). The dialects are divergence-only
+// table (the per-locale slices under src/ui/i18n.resolved.generated/). The dialects are divergence-only
 // overlays (es_ES over es, fr_CA over fr_FR, en_CA over en) and the build
 // (scripts/i18n_build.mjs DIALECT_BASE + base-then-overlay deepMerge) resolves a
 // dialect as nested en -> base overlay -> dialect overlay. Two semantics this pins

@@ -14,7 +14,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { en } from "../src/ui/i18n.en";
+import { en } from "../src/ui/i18n.catalog";
 import { pending as realPending } from "../src/ui/i18n.resolved.generated";
 import { t, setLanguage, type TranslationKey } from "../src/ui/i18n";
 
@@ -51,31 +51,39 @@ describe("t(): untracked key (absent from the table and from en)", () => {
 });
 
 describe("t(): pending key (untranslated; the dense table English-fills it)", () => {
-  const GEN = "../src/ui/i18n.resolved.generated";
+  // After the lazy locale flip the runtime no longer reads the barrel's `translations`
+  // map; it reads the eager `en` slice plus a `resident.es` that ensureLocaleLoaded("es")
+  // populates from LOCALE_LOADERS.es() (a dynamic import of ./es), plus the static
+  // `pending` set. So inject the synthetic pending key at THOSE seams: add it to the es
+  // slice (so resident.es carries it after the await) and list it in pending.es (so the
+  // release hard-fail fires). Mocking the old barrel `translations` would no longer feed
+  // the table the runtime reads - the lookup would miss and throw an UNTRACKED error, a
+  // different throw - so the assertion below would silently test the wrong thing.
+  const ES = "../src/ui/i18n.resolved.generated/es";
+  const PENDING = "../src/ui/i18n.resolved.generated/pending";
+  const SAMPLE = "__samplePendingKey";
+  const FILL = "English fill {name}";
 
-  // Re-import i18n fresh with a generated module whose `pending` lists a synthetic
-  // top-level key (so injecting it into the nested table is a single shallow copy).
   async function loadWithPending() {
     vi.resetModules();
-    vi.doMock(GEN, async () => {
-      const actual = await vi.importActual<typeof import("../src/ui/i18n.resolved.generated")>(GEN);
-      const SAMPLE = "__samplePendingKey";
-      const FILL = "English fill {name}";
-      return {
-        ...actual,
-        translations: {
-          ...actual.translations,
-          es: { ...actual.translations.es, [SAMPLE]: FILL },
-          en: { ...actual.translations.en, [SAMPLE]: FILL },
-        },
-        pending: { ...actual.pending, es: ["__samplePendingKey"] },
-      };
+    vi.doMock(ES, async () => {
+      const actual = await vi.importActual<typeof import("../src/ui/i18n.resolved.generated/es")>(ES);
+      const table = { ...actual.es, [SAMPLE]: FILL };
+      // Expose both `es` (the source named export) and `default` (the production-chunk
+      // shape) so the loader's shape-tolerant `mod.default ?? mod.es` read resolves without
+      // the vitest mock proxy throwing on an undefined `default` access.
+      return { es: table, default: table };
+    });
+    vi.doMock(PENDING, async () => {
+      const actual = await vi.importActual<typeof import("../src/ui/i18n.resolved.generated/pending")>(PENDING);
+      return { pending: { ...actual.pending, es: [...(actual.pending.es ?? []), SAMPLE] } };
     });
     return await import("../src/ui/i18n");
   }
 
   afterEach(() => {
-    vi.doUnmock(GEN);
+    vi.doUnmock(ES);
+    vi.doUnmock(PENDING);
     vi.resetModules();
   });
 
@@ -83,6 +91,7 @@ describe("t(): pending key (untranslated; the dense table English-fills it)", ()
     delete process.env.I18N_RELEASE;
     const mod = await loadWithPending();
     mod.setLanguage("es");
+    await mod.ensureLocaleLoaded("es"); // make resident.es carry the synthetic key
     const tm = mod.t as unknown as (k: string, v?: Record<string, string | number>) => string;
     expect(tm("__samplePendingKey", { name: "Aki" })).toBe("English fill Aki");
   });
@@ -91,6 +100,7 @@ describe("t(): pending key (untranslated; the dense table English-fills it)", ()
     process.env.I18N_RELEASE = "1";
     const mod = await loadWithPending();
     mod.setLanguage("es");
+    await mod.ensureLocaleLoaded("es");
     const tm = mod.t as unknown as (k: string) => string;
     expect(() => tm("__samplePendingKey")).toThrow(/pending/);
   });

@@ -54,7 +54,7 @@ async function loginAndEnter(page, username, password, charName, cls, fresh) {
     const rows = [...document.querySelectorAll('.char-row')];
     const row = rows.find((r) => r.querySelector('.char-name')?.textContent === name);
     if (!row) return false;
-    row.querySelector('button').click();
+    row.querySelector('.enter-world-btn').click();
     return true;
   }, charName);
   if (!entered) throw new Error(`could not enter world as ${charName}`);

@@ -20,8 +20,8 @@
 // PERMANENT invariant and survives the sparse relax, so this guard stays.
 
 import { describe, expect, it } from 'vitest';
-import { en } from '../src/ui/i18n.en';
-import type { TranslationKey } from '../src/ui/i18n.en';
+import { en } from '../src/ui/i18n.catalog';
+import type { TranslationKey } from '../src/ui/i18n.catalog';
 import { es } from '../src/ui/i18n.locales/es';
 import { es_ES } from '../src/ui/i18n.locales/es_ES';
 import { fr_FR } from '../src/ui/i18n.locales/fr_FR';

@@ -7,6 +7,8 @@ vi.mock('../server/db', () => ({
   openPlaySession: vi.fn(async () => 1),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
 import { GameServer, ClientSession } from '../server/game';
@@ -88,6 +90,7 @@ function bareClient(pid: number): ClientWorld {
   const c: any = Object.create(ClientWorld.prototype);
   c.cfg = { seed: 20061, playerClass: 'warrior' };
   c.entities = new Map();
+  c.missingSince = new Map(); // despawn-grace bookkeeping (set by the real field initializer)
   c.playerId = pid;
   c.moveInput = {};
   c.inventory = [];

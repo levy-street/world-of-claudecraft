@@ -36,7 +36,7 @@ const setup = await page.evaluate(() => {
   const p = sim.player;
   sim.setPlayerLevel(20, p.id);
   p.hp = p.maxHp; p.mana = p.maxMana;
-  // dismiss any auto-summoned imp so only the succubus is on screen
+  // dismiss any existing demon so only the succubus is on screen
   for (const e of [...sim.entities.values()]) {
     if (e.kind === 'mob' && e.ownerId === p.id) sim.removeEntity?.(e.id);
   }

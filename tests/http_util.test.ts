@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import { describe, expect, it } from 'vitest';
 import type * as http from 'node:http';
-import { readBody, isUniqueViolation } from '../server/http_util';
+import { readBody, isUniqueViolation, readBinaryBody, isPng } from '../server/http_util';
 
 // Minimal IncomingMessage stand-in: an emitter that records whether the
 // request was destroyed so we can assert readBody stops reading the socket.
@@ -53,6 +53,59 @@ describe('readBody', () => {
     await expect(promise).rejects.toThrow('body too large');
     // Late chunks arriving after the abort must not be appended or throw.
     expect(() => req.emit('data', 'y'.repeat(1024 * 1024))).not.toThrow();
+  });
+});
+
+describe('readBinaryBody', () => {
+  it('rejects and destroys the request when the body exceeds maxBytes', async () => {
+    const req = fakeReq();
+    const promise = readBinaryBody(req, 10);
+    // Two 6-byte chunks: the cap is breached on the second chunk (12 > 10).
+    req.emit('data', Buffer.from('aaaaaa'));
+    req.emit('data', Buffer.from('bbbbbb'));
+    await expect(promise).rejects.toThrow('body too large');
+    expect(req.destroyed).toBe(true);
+  });
+
+  it('resolves to the concatenated chunks when under the cap', async () => {
+    const req = fakeReq();
+    const promise = readBinaryBody(req, 64);
+    const a = Buffer.from([0x01, 0x02, 0x03]);
+    const b = Buffer.from([0x04, 0x05]);
+    req.emit('data', a);
+    req.emit('data', b);
+    req.emit('end');
+    const result = await promise;
+    expect(result.equals(Buffer.concat([a, b]))).toBe(true);
+  });
+
+  it('propagates a stream error as a rejection', async () => {
+    const req = fakeReq();
+    const promise = readBinaryBody(req, 64);
+    req.emit('error', new Error('stream broke'));
+    await expect(promise).rejects.toThrow('stream broke');
+  });
+});
+
+describe('isPng', () => {
+  // The 8-byte PNG signature, matching the constant inside http_util.
+  const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
+  it('rejects exactly the bare 8-byte signature with no payload', () => {
+    // Load-bearing boundary: isPng requires length strictly greater than 8.
+    expect(isPng(PNG_MAGIC)).toBe(false);
+  });
+
+  it('accepts the signature plus at least one payload byte', () => {
+    expect(isPng(Buffer.concat([PNG_MAGIC, Buffer.from([0])]))).toBe(true);
+  });
+
+  it('rejects bytes that are not a PNG signature', () => {
+    expect(isPng(Buffer.from('not a png'))).toBe(false);
+  });
+
+  it('rejects an empty buffer', () => {
+    expect(isPng(Buffer.alloc(0))).toBe(false);
   });
 });
 

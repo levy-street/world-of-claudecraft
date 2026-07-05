@@ -6,20 +6,25 @@
 // A magnetic bearing is therefore -facing, normalised to [0, 360): N=0, E=90,
 // S=180, W=270 — the standard clockwise compass rose.
 
+// Language-agnostic rose-point id. This is NOT display text — the HUD render
+// boundary maps it to localized text via t(`hudChrome.compass.${id}`). The ids
+// double as stable DOM map keys, so they must never be localized here.
+export type CardinalId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW';
+
 export interface CompassMark {
-  label: string; // 'N', 'NE', 'E', ...
+  label: CardinalId; // rose-point id (e.g. 'N', 'NE'); the HUD t()s it for display
   offsetFrac: number; // -1 (left edge) .. 0 (centre) .. 1 (right edge)
   major: boolean; // true for the four cardinals (N/E/S/W)
 }
 
 export interface CompassView {
   bearing: number; // 0..360, where the player is looking
-  heading: string; // nearest rose point label to the bearing
+  heading: CardinalId; // nearest rose point id to the bearing (HUD t()s it)
   marks: CompassMark[]; // rose points within the visible window, left→right
 }
 
 // 8-point rose at 45° spacing.
-const ROSE: { label: string; deg: number; major: boolean }[] = [
+const ROSE: { label: CardinalId; deg: number; major: boolean }[] = [
   { label: 'N', deg: 0, major: true },
   { label: 'NE', deg: 45, major: false },
   { label: 'E', deg: 90, major: true },
@@ -44,8 +49,8 @@ function angleDelta(a: number, b: number): number {
   return d;
 }
 
-// Nearest rose label to a bearing (used for the centred heading readout).
-export function headingLabel(bearing: number): string {
+// Nearest rose-point id to a bearing (used for the centred heading readout).
+export function headingLabel(bearing: number): CardinalId {
   let best = ROSE[0];
   let bestAbs = 360;
   for (const p of ROSE) {

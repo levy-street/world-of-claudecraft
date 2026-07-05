@@ -135,6 +135,7 @@ export class Vfx {
   private head = 0;
   private projectiles: Projectile[] = [];
   private tmpColor = new THREE.Color();
+  private quality = 1;
 
   constructor(scene: THREE.Scene, private anchor: EntityAnchor) {
     this.pos = new Float32Array(CAPACITY * 3);
@@ -211,6 +212,7 @@ export class Vfx {
       `,
     });
     this.points = new THREE.Points(geo, mat);
+    this.points.userData.renderCategory = 'vfx';
     this.points.frustumCulled = false;
     this.points.renderOrder = 5;
     scene.add(this.points);
@@ -219,6 +221,48 @@ export class Vfx {
   setViewportScale(heightPx: number, fovDeg: number): void {
     const mat = this.points.material as THREE.ShaderMaterial;
     mat.uniforms.uScale.value = heightPx / (2 * Math.tan((fovDeg * Math.PI) / 360));
+  }
+
+  setQuality(level: number): void {
+    this.quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
+  }
+
+  prewarm(at: THREE.Vector3): void {
+    const sprites = Object.values(SPR);
+    for (let i = 0; i < sprites.length; i++) {
+      const a = (i / sprites.length) * Math.PI * 2;
+      this.spawn(
+        at.x + Math.sin(a) * 1.2, at.y + 0.6 + (i % 4) * 0.25, at.z + Math.cos(a) * 1.2,
+        0, 0, 0,
+        i % 3 === 0 ? 0xffd28a : i % 3 === 1 ? 0x8ed2ff : 0xd98aff,
+        0.35 + (i % 4) * 0.08,
+        1.0,
+        0,
+        sprites[i],
+        0,
+      );
+    }
+    this.update(0);
+  }
+
+  clear(): void {
+    this.projectiles.length = 0;
+    this.life.fill(0);
+    this.size.fill(0);
+    this.alphaAttr.fill(0);
+    const geo = this.points.geometry;
+    (geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
+    (geo.attributes.aAlpha as THREE.BufferAttribute).needsUpdate = true;
+  }
+
+  private scaledCount(count: number): number {
+    if (count <= 1) return count;
+    const scale = 0.45 + 0.55 * this.quality;
+    return Math.max(1, Math.min(count, Math.round(count * scale)));
+  }
+
+  private emitChance(ratePerSecond: number, dt: number): boolean {
+    return Math.random() <= dt * ratePerSecond * (0.35 + 0.65 * this.quality);
   }
 
   private spawn(
@@ -264,10 +308,32 @@ export class Vfx {
     });
   }
 
+  beam(sourceId: number, targetId: number, school: string): void {
+    const from = this.anchor(sourceId, 0.62);
+    const to = this.anchor(targetId, 0.55);
+    if (!from || !to) return;
+    const color = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.9));
+    const dir = to.clone().sub(from);
+    const len = dir.length();
+    if (len <= 0.001) return;
+    dir.multiplyScalar(1 / len);
+    const steps = Math.min(30, Math.max(8, Math.ceil(len / 1.25)));
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps;
+      const jitter = (Math.random() - 0.5) * 0.18;
+      const x = from.x + (to.x - from.x) * f + (Math.random() - 0.5) * 0.12;
+      const y = from.y + (to.y - from.y) * f + jitter;
+      const z = from.z + (to.z - from.z) * f + (Math.random() - 0.5) * 0.12;
+      this.spawn(x, y, z, -dir.x * 0.8, 0.08, -dir.z * 0.8, color, 0.34, 0.18, 0, SPR.glowCore);
+    }
+    this.spawn(to.x, to.y, to.z, 0, 0.2, 0, color, 0.9, 0.2, 0, SPR.magicRune);
+  }
+
   burst(at: THREE.Vector3, school: string, count = 18, power = 1): void {
     const c = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     const isFire = school === 'fire';
-    for (let i = 0; i < count; i++) {
+    const scaledCount = this.scaledCount(count);
+    for (let i = 0; i < scaledCount; i++) {
       const a = Math.random() * Math.PI * 2;
       const up = Math.random() * 0.9 + 0.1;
       const sp = (2 + Math.random() * 4.5) * power;
@@ -295,8 +361,9 @@ export class Vfx {
     const c = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     // one expanding rune ring at the centre sells the shockwave
     this.spawn(at.x, at.y + 0.3, at.z, 0, 0.3, 0, c, 1.5, 0.4, 0, SPR.ring, 0);
-    for (let i = 0; i < 34; i++) {
-      const a = (i / 34) * Math.PI * 2;
+    const count = this.scaledCount(34);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2;
       const sp = 11 + Math.random() * 3;
       this.spawn(
         at.x, at.y + 0.25, at.z, Math.sin(a) * sp, 1.2, Math.cos(a) * sp, c, 0.5, 0.55, 6,
@@ -310,7 +377,7 @@ export class Vfx {
     if (!at) return;
     const green = new THREE.Color(0xbaf7a0).multiplyScalar(hdr(1.8));
     const gold = new THREE.Color(0xffe9a0).multiplyScalar(hdr(1.8));
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < this.scaledCount(22); i++) {
       const a = Math.random() * Math.PI * 2;
       const r = 0.4 + Math.random() * 0.7;
       this.spawn(
@@ -325,8 +392,9 @@ export class Vfx {
   buffSwirl(targetId: number, color = 0xffe9a0): void {
     const at = this.anchor(targetId, 0.2);
     if (!at) return;
-    for (let i = 0; i < 14; i++) {
-      const a = (i / 14) * Math.PI * 2;
+    const count = this.scaledCount(14);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2;
       this.spawn(
         at.x + Math.sin(a) * 0.85, at.y + 0.2, at.z + Math.cos(a) * 0.85,
         -Math.cos(a) * 1.6, 2.1, Math.sin(a) * 1.6,
@@ -350,7 +418,7 @@ export class Vfx {
     if (!at) return;
     const white = new THREE.Color(0xfff8e0).multiplyScalar(hdr(1.8));
     const gold = new THREE.Color(0xffd14d).multiplyScalar(hdr(1.8));
-    for (let i = 0; i < 46; i++) {
+    for (let i = 0; i < this.scaledCount(46); i++) {
       const a = Math.random() * Math.PI * 2;
       const r = 0.3 + Math.random() * 0.9;
       this.spawn(
@@ -364,7 +432,7 @@ export class Vfx {
 
   // continuous emitters (called per frame)
   castSparkle(entityId: number, school: string, dt: number): void {
-    if (Math.random() > dt * 30) return;
+    if (!this.emitChance(30, dt)) return;
     const at = this.anchor(entityId, 0.66);
     if (!at) return;
     const c = SCHOOL_COLORS[school] ?? 0xffffff;
@@ -378,7 +446,7 @@ export class Vfx {
   }
 
   swimRipple(at: THREE.Vector3, dt: number): void {
-    if (Math.random() > dt * 9) return;
+    if (!this.emitChance(9, dt)) return;
     const a = Math.random() * Math.PI * 2;
     this.spawn(
       at.x + Math.sin(a) * 0.5, at.y + 0.55, at.z + Math.cos(a) * 0.5,
@@ -388,7 +456,7 @@ export class Vfx {
   }
 
   campfireEmber(at: THREE.Vector3, dt: number): void {
-    if (Math.random() > dt * 6) return;
+    if (!this.emitChance(6, dt)) return;
     if (Math.random() < 0.3) {
       // faint additive smoke puff drifting off the flame tip
       this.spawn(
@@ -426,7 +494,7 @@ export class Vfx {
         // impact: school-tinted cross-flash + burst that survives a 30fps frame
         this.tmpColor.copy(pr.color).multiplyScalar(hdr(1.6));
         this.spawn(target.x, target.y, target.z, 0, 0.5, 0, this.tmpColor, 1.1, 0.22, 0, SPR.flash);
-        for (let k = 0; k < 22; k++) {
+        for (let k = 0; k < this.scaledCount(22); k++) {
           const a = Math.random() * Math.PI * 2;
           const sp = 2.5 + Math.random() * 4;
           this.spawn(
@@ -443,11 +511,13 @@ export class Vfx {
       pr.pos.add(dir);
       // bright HDR core (blooms into a comet) + sparkling trail
       this.spawn(pr.pos.x, pr.pos.y, pr.pos.z, 0, 0, 0, pr.coreColor, 1.0, 0.12, 0, pr.coreSprite);
-      this.spawn(
-        pr.pos.x + (Math.random() - 0.5) * 0.25, pr.pos.y + (Math.random() - 0.5) * 0.25, pr.pos.z + (Math.random() - 0.5) * 0.25,
-        (Math.random() - 0.5) * 0.8, 0.4, (Math.random() - 0.5) * 0.8,
-        pr.trailColor, 0.32, 0.6, 1.5, pr.trailSprite,
-      );
+      if (Math.random() < 0.35 + 0.65 * this.quality) {
+        this.spawn(
+          pr.pos.x + (Math.random() - 0.5) * 0.25, pr.pos.y + (Math.random() - 0.5) * 0.25, pr.pos.z + (Math.random() - 0.5) * 0.25,
+          (Math.random() - 0.5) * 0.8, 0.4, (Math.random() - 0.5) * 0.8,
+          pr.trailColor, 0.32, 0.6, 1.5, pr.trailSprite,
+        );
+      }
     }
 
     // advance the pool

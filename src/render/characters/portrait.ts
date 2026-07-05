@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { CharacterVisual } from './visual';
 import { assetsReady } from '../assets/preload';
 import { PlayerClass } from '../../sim/types';
+import { trackWebGLContext } from '../context_release';
 
 // ---------------------------------------------------------------------------
 // Portrait factory — a 2D "profile photo" rendered from the real 3D character
@@ -64,6 +65,8 @@ function ensureRig(): void {
   renderer.setPixelRatio(1);
   renderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
   renderer.shadowMap.enabled = false;
+  // Hand this offscreen context back on page teardown (see context_release.ts).
+  trackWebGLContext(renderer);
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(CAM_FOV, 1, 0.1, 100);
@@ -88,7 +91,16 @@ function ensureRig(): void {
  * fall back to a class crest while null and upgrade via {@link onPortraitsReady}.
  */
 export function playerPortraitDataUrl(cls: PlayerClass, skin = 0): string | null {
-  const key = `${cls}:${skin}`;
+  return visualPortraitDataUrl(`player_${cls}`, skin);
+}
+
+/**
+ * As {@link playerPortraitDataUrl} but for any visual key (e.g. `player_mech`),
+ * so cosmetic-only bodies can be previewed as swatch thumbnails. The asset must
+ * already be loaded (callers preload first); returns null until then.
+ */
+export function visualPortraitDataUrl(visualKey: string, skin = 0): string | null {
+  const key = `${visualKey}:${skin}`;
   const cached = cache.get(key);
   if (cached) return cached;
   if (!assetsAreReady) return null;
@@ -96,7 +108,7 @@ export function playerPortraitDataUrl(cls: PlayerClass, skin = 0): string | null
   let visual: CharacterVisual | null = null;
   try {
     ensureRig();
-    visual = new CharacterVisual(`player_${cls}`, 0xffffff, skin);
+    visual = new CharacterVisual(visualKey, 0xffffff, skin);
     mount!.add(visual.root);
     mount!.rotation.y = 0;
     // Settle the rig into a stable idle frame before measuring/capturing.
@@ -119,7 +131,7 @@ export function playerPortraitDataUrl(cls: PlayerClass, skin = 0): string | null
     cache.set(key, url);
     return url;
   } catch (err) {
-    if (import.meta.env?.DEV) console.warn(`[portrait] failed for ${cls}:${skin}`, err);
+    if (import.meta.env?.DEV) console.warn(`[portrait] failed for ${key}`, err);
     return null;
   } finally {
     if (visual) {

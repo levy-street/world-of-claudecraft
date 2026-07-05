@@ -191,6 +191,47 @@ export class GameAudio {
     this.tone(392, 0.18, 0.18, 'triangle');
     this.tone(523, 0.3, 0.18, 'triangle', 0.12);
   }
+
+  // ---- 2v2 Fiesta — bright, arcade-y, dopamine-forward cues ---------------
+
+  // A takedown landed: punchy stinger, brighter the bigger the moment (tier
+  // 0 = plain kill … 3 = first blood / shutdown / spree).
+  fiestaWord(tier = 0): void {
+    const base = [523, 587, 659, 784][Math.min(3, tier)];
+    this.tone(base, 0.16, 0.2, 'square');
+    this.tone(base * 1.5, 0.22, 0.16, 'triangle', 0.05);
+    if (tier >= 2) { this.tone(base * 2, 0.3, 0.14, 'triangle', 0.1); this.noise(0.35, 5200, 0.1, 0.7, 'highpass'); }
+  }
+
+  // Your team scored a point — quick, satisfying blip (higher when it's yours).
+  fiestaScorePing(mine: boolean): void {
+    this.tone(mine ? 1320 : 740, 0.08, 0.12, 'square');
+    if (mine) this.tone(1760, 0.12, 0.1, 'square', 0.05);
+  }
+
+  // A new augment wave drops: triumphant rising fanfare — the party escalates.
+  fiestaWave(): void {
+    [523, 659, 784, 1046].forEach((f, i) => this.tone(f, 0.4, 0.18, 'triangle', i * 0.08));
+    this.noise(0.6, 5000, 0.08, 0.9, 'highpass');
+  }
+
+  // Locked in an augment: sparkly power-up swell.
+  fiestaAugment(): void {
+    this.tone(660, 0.25, 0.16, 'sine', 0, 1100);
+    this.tone(990, 0.3, 0.12, 'sine', 0.06, 1480);
+    this.noise(0.4, 6000, 0.07, 0.85, 'highpass');
+  }
+
+  // You went down — short descending "aww", not punishing.
+  fiestaDown(): void {
+    this.tone(440, 0.3, 0.16, 'sawtooth', 0, 180);
+  }
+
+  // You're back in — quick upward pop.
+  fiestaRevive(): void {
+    this.tone(523, 0.12, 0.14, 'triangle', 0, 784);
+    this.tone(784, 0.18, 0.12, 'triangle', 0.08);
+  }
 }
 
 export const audio = new GameAudio();

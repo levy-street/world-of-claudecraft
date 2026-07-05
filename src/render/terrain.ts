@@ -7,6 +7,7 @@ import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/wo
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { impactCraterTerrainBlend } from './impact_terrain';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
 
 // Chunked terrain across the whole 360x1080 zone strip.
@@ -118,7 +119,7 @@ interface VertexSample {
   normal: [number, number, number];
   color: [number, number, number];
   splat: [number, number, number, number]; // grass, dirt, rock, sand
-  extra: [number, number]; // mud (marsh dirt variant), snow cover
+  extra: [number, number, number, number]; // mud, snow, impact scorch, impact ash
 }
 
 // Shared scratch colors for the palette blend (hot loop, avoid allocation).
@@ -127,8 +128,12 @@ const grassC = new THREE.Color(), grassDarkC = new THREE.Color(), grassYellowC =
 const dirtC = new THREE.Color(), sandC = new THREE.Color();
 const dirtDarkC = new THREE.Color(0x73592f);
 const rockC = new THREE.Color(0x7a7a72);
+const impactAshC = new THREE.Color(0x18110d);
+const impactScorchC = new THREE.Color(0x2a160c);
 const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
 const snowCapC = new THREE.Color(0xedf3fa);
+const lowSunC = new THREE.Color(0xe7d9a5);
+const lowShadeC = new THREE.Color(0x60745b);
 const zonePalettes = ZONES.map((zn) => {
   const p = BIOME_PALETTE[zn.biome];
   return {
@@ -195,6 +200,7 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   paletteAt(z);
   const biome = zoneBiomeAt(z);
   const w: [number, number, number, number] = [1, 0, 0, 0];
+  const impact = impactCraterTerrainBlend(x, z);
 
   // base grass with patchy variation
   const v = (Math.sin(x * 0.21) * Math.cos(z * 0.17) + 1) / 2;
@@ -242,6 +248,12 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
   }
+  if (impact.scorch > 0) {
+    cTmp.lerp(impactScorchC, 0.88 * impact.scorch);
+    cTmp.lerp(impactAshC, 0.58 * impact.ash);
+    lerpSplat(w, 1, impact.dirt);
+    lerpSplat(w, 2, impact.rock);
+  }
   // the rim wall reads as distant sunlit peaks, not a black cliff
   const edge = Math.max(
     Math.abs(x) - (WORLD_MAX_X - 32),
@@ -258,9 +270,17 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   }
   // mud rides the dirt layer wherever the marsh palette is active
   const mud = marshWeightAt(z);
+  if (GFX.lowPlus && !GFX.terrainSplat) {
+    const ridge = clamp01((slope - 0.22) * 1.6);
+    const lowland = clamp01((WATER_LEVEL + 7 - h) / 12);
+    const upland = clamp01((h - 8) / 22);
+    cTmp.lerp(lowShadeC, 0.07 * ridge + 0.05 * lowland * mud);
+    cTmp.lerp(lowSunC, 0.035 * (1 - shore) + 0.045 * upland);
+    cTmp.multiplyScalar(0.98 + upland * 0.04 - ridge * 0.025);
+  }
   return {
     height: h, slope, normal, color: [cTmp.r, cTmp.g, cTmp.b], splat: w,
-    extra: [mud, snow],
+    extra: [mud, snow, impact.scorch, impact.ash],
   };
 }
 
@@ -283,7 +303,7 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
   const colors = new Float32Array(count * 3);
   const uvs = new Float32Array(count * 2);
   const splats = withSplat ? new Float32Array(count * 4) : null;
-  const extras = withSplat ? new Float32Array(count * 2) : null;
+  const extras = withSplat ? new Float32Array(count * 4) : null;
 
   const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
   const sampleCache = new Map<number, VertexSample>();
@@ -321,8 +341,10 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
         splats[vi * 4 + 3] = s.splat[3];
       }
       if (extras) {
-        extras[vi * 2] = s.extra[0];
-        extras[vi * 2 + 1] = s.extra[1];
+        extras[vi * 4] = s.extra[0];
+        extras[vi * 4 + 1] = s.extra[1];
+        extras[vi * 4 + 2] = s.extra[2];
+        extras[vi * 4 + 3] = s.extra[3];
       }
     }
   }
@@ -347,7 +369,7 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
   if (splats) geo.setAttribute('aSplat', new THREE.BufferAttribute(splats, 4));
-  if (extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(extras, 2));
+  if (extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(extras, 4));
   geo.setIndex(new THREE.BufferAttribute(indices, 1));
   geo.computeBoundingBox();
   geo.computeBoundingSphere();
@@ -434,9 +456,9 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', `#include <common>
         attribute vec4 aSplat;
-        attribute vec2 aExtra;
+        attribute vec4 aExtra;
         varying vec4 vSplat;
-        varying vec2 vExtra;
+        varying vec4 vExtra;
         varying vec3 vWPos;
         varying vec3 vWNorm;`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>
@@ -447,7 +469,7 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
         varying vec4 vSplat;
-        varying vec2 vExtra;
+        varying vec4 vExtra;
         varying vec3 vWPos;
         varying vec3 vWNorm;
         uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro;`)
@@ -476,6 +498,11 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
         alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb, vExtra.y);
         // gentle macro brightness swing breaks distant tiling
         float macro = mix(0.92, 1.08, texture2D(uMacro, vWPos.xz * 0.012).r);
+        // Meteor impact terrain is authored by the same crater profile as the
+        // heightfield. Apply it in albedo space so the PBR textures do not wash
+        // the crater floor back toward marsh sand.
+        vec3 impactAlb = mix(vec3(0.20, 0.08, 0.035), vec3(0.055, 0.040, 0.032), vExtra.w);
+        alb = mix(alb, impactAlb, clamp(vExtra.z * 0.86 + vExtra.w * 0.18, 0.0, 0.96));
         // very-low-frequency hue drift (~100u wavelength) keeps distant
         // hills from flattening into one uniform lawn green
         float macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;
@@ -522,7 +549,12 @@ function buildLambertMaterial(): THREE.MeshLambertMaterial {
   const detail = groundDetailTexture();
   // strip-planar uv: keep the legacy ~2.25u texture period in both axes
   detail.repeat.set(160, 480);
-  return new THREE.MeshLambertMaterial({ vertexColors: true, map: detail });
+  return new THREE.MeshLambertMaterial({
+    vertexColors: true,
+    map: detail,
+    emissive: GFX.lowPlus ? 0x182014 : 0x000000,
+    emissiveIntensity: GFX.lowPlus ? 0.08 : 1,
+  });
 }
 
 // ---------------------------------------------------------------------------

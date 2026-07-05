@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
 import {
-  clearHotbarSlot, parseHotbarActions, placeAbilityOnSlot, placeItemOnSlot, syncHotbarActions,
+  buildDefaultFormBar, classHasFormBars, clearHotbarSlot, hotbarActionsEqual, parseHotbarActions,
+  placeAbilityOnSlot, placeItemOnSlot, shouldSeedFormBar, syncHotbarActions,
 } from '../src/ui/hotbar';
 
 const abilityIds = new Set(['fireball', 'frost_armor', 'arcane_intellect', 'polymorph', 'shared_id']);
@@ -171,6 +172,106 @@ describe('hotbar slot clearing', () => {
 
     expect(clearHotbarSlot(slotMap, -1)).toEqual(slotMap);
     expect(clearHotbarSlot(slotMap, 3)).toEqual(slotMap);
+  });
+});
+
+describe('default form bar', () => {
+  it('places the form kit in order starting at the first slot and pads with null', () => {
+    const bar = buildDefaultFormBar(['bear_form', 'maul', 'growl'], 5);
+
+    expect(bar).toEqual([
+      { type: 'ability', id: 'bear_form' },
+      { type: 'ability', id: 'maul' },
+      { type: 'ability', id: 'growl' },
+      null,
+      null,
+    ]);
+  });
+
+  it('drops duplicate ability ids', () => {
+    const bar = buildDefaultFormBar(['maul', 'maul', 'growl'], 4);
+
+    expect(bar).toEqual([
+      { type: 'ability', id: 'maul' },
+      { type: 'ability', id: 'growl' },
+      null,
+      null,
+    ]);
+  });
+
+  it('drops overflow past the slot count', () => {
+    const bar = buildDefaultFormBar(['a', 'b', 'c', 'd'], 2);
+
+    expect(bar).toEqual([
+      { type: 'ability', id: 'a' },
+      { type: 'ability', id: 'b' },
+    ]);
+  });
+
+  it('does not mutate the input list', () => {
+    const ids = ['maul', 'growl'];
+    buildDefaultFormBar(ids, 4);
+    expect(ids).toEqual(['maul', 'growl']);
+  });
+});
+
+describe('hotbar actions equality', () => {
+  it('treats slot-by-slot identical layouts as equal', () => {
+    const a = [{ type: 'ability' as const, id: 'maul' }, null, { type: 'item' as const, id: 'baked_bread' }];
+    const b = [{ type: 'ability' as const, id: 'maul' }, null, { type: 'item' as const, id: 'baked_bread' }];
+
+    expect(hotbarActionsEqual(a, b)).toBe(true);
+  });
+
+  it('distinguishes differing ids, types, null gaps, and lengths', () => {
+    const base = [{ type: 'ability' as const, id: 'maul' }, null];
+
+    expect(hotbarActionsEqual(base, [{ type: 'ability' as const, id: 'growl' }, null])).toBe(false);
+    expect(hotbarActionsEqual(base, [{ type: 'item' as const, id: 'maul' }, null])).toBe(false);
+    expect(hotbarActionsEqual(base, [{ type: 'ability' as const, id: 'maul' }, { type: 'ability' as const, id: 'growl' }])).toBe(false);
+    expect(hotbarActionsEqual(base, [{ type: 'ability' as const, id: 'maul' }])).toBe(false);
+    expect(hotbarActionsEqual([null, null], [null, null])).toBe(true);
+  });
+});
+
+describe('classes with per-form action bars', () => {
+  it('only the druid has form bars — every other class is single-bar', () => {
+    const classIds = Object.keys(CLASSES);
+    // sanity: the full roster is present so this stays exhaustive as classes are added
+    expect(classIds.length).toBeGreaterThanOrEqual(9);
+    expect(classIds).toContain('druid');
+
+    expect(classHasFormBars('druid')).toBe(true);
+    for (const id of classIds) {
+      expect(classHasFormBars(id)).toBe(id === 'druid');
+    }
+    // the form-bar-only "Reset bar" button must never leak onto these
+    for (const id of ['warrior', 'mage', 'rogue', 'priest', 'hunter', 'paladin', 'shaman', 'warlock']) {
+      expect(classHasFormBars(id)).toBe(false);
+    }
+  });
+});
+
+describe('form bar seeding decision', () => {
+  const maul = { type: 'ability' as const, id: 'maul' };
+  const wrath = { type: 'ability' as const, id: 'wrath' };
+  const caster = [wrath, { type: 'ability' as const, id: 'moonfire' }, null];
+
+  it('seeds an empty form bar', () => {
+    expect(shouldSeedFormBar([null, null, null], caster, false)).toBe(true);
+  });
+
+  it('seeds (migrates) a form bar that is a byte-identical clone of the caster bar', () => {
+    expect(shouldSeedFormBar([...caster], caster, false)).toBe(true);
+  });
+
+  it('keeps a deliberately customized form bar', () => {
+    expect(shouldSeedFormBar([maul, null, null], caster, false)).toBe(false);
+  });
+
+  it('never re-seeds once the form bar has been marked', () => {
+    expect(shouldSeedFormBar([null, null, null], caster, true)).toBe(false);
+    expect(shouldSeedFormBar([...caster], caster, true)).toBe(false);
   });
 });
 

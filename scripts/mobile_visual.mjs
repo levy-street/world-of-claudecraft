@@ -2,10 +2,13 @@
 // on-screen touch controls (body.mobile-touch) activate, then captures the touch
 // HUD, the expanded "More" tray, and the new Haptics toggle in both states.
 // Needs `npm run dev` (:5173). Writes PNGs into tmp/.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
+
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 fs.mkdirSync('tmp', { recursive: true });
 
@@ -18,22 +21,26 @@ const page = await browser.newPage();
 // Landscape phone: coarse pointer + small enough to satisfy PHONE_TOUCH_QUERY.
 await page.emulate({
   name: 'phone-landscape',
-  userAgent: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36',
-  viewport: { width: 900, height: 420, deviceScaleFactor: 2, isMobile: true, hasTouch: true, isLandscape: true },
+  userAgent:
+    'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36',
+  viewport: {
+    width: 900,
+    height: 420,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+    isLandscape: true,
+  },
 });
 
 const errors = [];
 page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-page.on('console', (msg) => { if (msg.type() === 'error') errors.push('CONSOLE: ' + msg.text()); });
+page.on('console', (msg) => {
+  if (msg.type() === 'error') errors.push('CONSOLE: ' + msg.text());
+});
 
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-await page.waitForSelector('#btn-offline', { timeout: 30000 });
-await page.evaluate(() => document.querySelector('#btn-offline').click());
-await new Promise((r) => setTimeout(r, 200));
-await page.type('#char-name', 'Touchscreen');
-await page.click('#offline-select .mini-class[data-class="warrior"]');
-await page.click('#btn-start-offline');
-await new Promise((r) => setTimeout(r, 2800));
+await enterOfflineGame(page, { charClass: 'warrior', charName: 'Touchscreen', settleMs: 2800 });
 
 // Dismiss the landscape/fullscreen preflight if it's up.
 await page.evaluate(() => {
@@ -52,7 +59,11 @@ await page.screenshot({ path: 'tmp/mobile_02_more_tray.png' });
 
 const before = await page.evaluate(() => {
   const b = document.getElementById('mobile-haptics');
-  return { exists: !!b, pressed: b?.getAttribute('aria-pressed'), label: b?.querySelector('.mobile-label')?.textContent };
+  return {
+    exists: !!b,
+    pressed: b?.getAttribute('aria-pressed'),
+    label: b?.querySelector('.mobile-label')?.textContent,
+  };
 });
 console.log('haptics button (default):', JSON.stringify(before));
 
@@ -70,7 +81,11 @@ const after = await page.evaluate(() => {
 console.log('haptics button (after toggle):', JSON.stringify(after));
 await page.screenshot({ path: 'tmp/mobile_03_haptics_off.png' });
 
-const ok = before.exists && before.pressed === 'true' && after.pressed === 'false' && after.persisted === '0';
+const ok =
+  before.exists &&
+  before.pressed === 'true' &&
+  after.pressed === 'false' &&
+  after.persisted === '0';
 console.log('haptics toggle:', ok ? 'OK' : 'FAIL');
 
 if (errors.length) {

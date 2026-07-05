@@ -20,7 +20,7 @@ export type UiIconName =
   | 'chat' | 'interact' | 'emote'
   // hand-authored geometrics
   | 'close' | 'prev' | 'next' | 'more' | 'meters'
-  | 'whisper' | 'music' | 'talents' | 'skull' | 'jump' | 'autorun' | 'nameplates' | 'vibrate';
+  | 'whisper' | 'music' | 'talents' | 'skull' | 'jump' | 'autorun' | 'nameplates' | 'vibrate' | 'lock';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -60,6 +60,8 @@ const ICONS: Record<UiIconName, string> = {
   autorun: '<path d="M136 264 256 152 376 264M136 392 256 280 376 392" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
   // phone handset flanked by vibration waves (hand-authored to match the bar glyphs)
   vibrate: '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',
+  // hand-authored padlock — shackle over a solid body (nonzero fill merges them)
+  lock: '<path d="M256 96a72 72 0 0 0-72 72v64h40v-64a32 32 0 0 1 64 0v64h40v-64a72 72 0 0 0-72-72zM150 224a26 26 0 0 0-26 26v140a26 26 0 0 0 26 26h212a26 26 0 0 0 26-26V250a26 26 0 0 0-26-26z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

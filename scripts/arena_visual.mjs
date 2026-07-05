@@ -40,7 +40,7 @@ async function login(page, charName, cls) {
   await sleep(700);
   await page.evaluate((name) => {
     const rows = [...document.querySelectorAll('.char-row')];
-    rows.find((r) => r.querySelector('.char-name')?.textContent === name)?.querySelector('button')?.click();
+    rows.find((r) => r.querySelector('.char-name')?.textContent === name)?.querySelector('.enter-world-btn')?.click();
   }, charName);
   await page.waitForFunction(() => window.__game?.world?.entities?.size > 5, { timeout: 20000, polling: 500 });
 }

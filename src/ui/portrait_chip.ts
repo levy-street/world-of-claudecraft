@@ -6,6 +6,7 @@
 // hydrates: while the character GLBs are still preloading the chip shows the
 // class crest as a placeholder and upgrades to the real portrait once ready.
 import { t } from './i18n';
+import { esc } from './esc';
 import { iconDataUrl } from './icons';
 import { PlayerClass } from '../sim/types';
 import { playerPortraitDataUrl, onPortraitsReady, portraitsReady } from '../render/characters/portrait';
@@ -22,10 +23,6 @@ export interface PortraitChipOpts {
   badge?: boolean;
 }
 
-function attr(value: string): string {
-  return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 /** Class crest data URL — the placeholder before the 3D portrait is ready and
  *  the small class badge overlaid on the portrait. */
 function crestUrl(cls: PlayerClass): string {
@@ -40,7 +37,7 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   const src = portrait ?? crestUrl(cls);
   const pending = portrait ? '' : ' data-portrait-pending="1"';
   const fallbackCls = portrait ? '' : ' is-fallback';
-  const alt = attr(t('character.portraitAlt', { name }));
+  const alt = esc(t('character.portraitAlt', { name }));
   const badgeHtml = badge
     ? `<img class="portrait-badge" src="${crestUrl(cls)}" alt="" aria-hidden="true" draggable="false">`
     : '';

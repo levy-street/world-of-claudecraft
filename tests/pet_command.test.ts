@@ -6,6 +6,10 @@ function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'hunter', noPlayer: true });
 }
 
+function makeClassWorld(cls: Parameters<Sim['addPlayer']>[0]) {
+  return new Sim({ seed: 42, playerClass: cls, noPlayer: true });
+}
+
 function errorText(events: SimEvent[]): string | undefined {
   const err = events.find((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error');
   return err?.text;
@@ -26,6 +30,37 @@ function givePet(sim: Sim, ownerPid: number): Entity {
 }
 
 describe('/pet command', () => {
+  it('does not spawn new warlocks with a demon by default', () => {
+    const sim = makeClassWorld('warlock');
+    const pid = sim.addPlayer('warlock', 'Wick');
+
+    expect(sim.petOf(pid)).toBeNull();
+  });
+
+  it('restores a saved warlock demon without spawning a default imp', () => {
+    const first = makeClassWorld('warlock');
+    const pid = first.addPlayer('warlock', 'Wick');
+    first.setPlayerLevel(20, pid);
+    first.castAbility('summon_voidwalker', pid);
+    for (let i = 0; i < 20 * 6; i++) first.tick();
+    const saved = first.serializeCharacter(pid)!;
+    expect(saved.pet?.templateId).toBe('voidwalker');
+
+    const restored = makeClassWorld('warlock');
+    const restoredPid = restored.addPlayer('warlock', 'Wick', { state: saved });
+    const pets = [...restored.entities.values()].filter((e) => e.kind === 'mob' && e.ownerId === restoredPid);
+
+    expect(pets).toHaveLength(1);
+    expect(pets[0].templateId).toBe('voidwalker');
+  });
+
+  it('does not spawn non-warlocks with a default pet', () => {
+    const sim = makeClassWorld('mage');
+    const pid = sim.addPlayer('mage', 'NoPet');
+
+    expect(sim.petOf(pid)).toBeNull();
+  });
+
   it('reports name, level, family, and health for an active pet', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('hunter', 'Aleph');

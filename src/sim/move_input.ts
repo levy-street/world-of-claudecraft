@@ -42,7 +42,12 @@ export function normalizeMoveFacing(raw: unknown): number | null {
     : null;
 }
 
-export function parseMoveInputFrame(raw: unknown): { moveInput: MoveInput; facing: number | null } {
+export interface MoveInputFrame {
+  moveInput: MoveInput;
+  facing: number | null;
+}
+
+export function parseMoveInputFrame(raw: unknown): MoveInputFrame {
   if (!isRecord(raw)) return { moveInput: emptyMoveInput(), facing: null };
   return {
     moveInput: sanitizeMoveInput(raw.mi),

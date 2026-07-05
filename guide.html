@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<!-- Content surface, NOT the game: allow pinch-zoom and user scaling (WCAG 1.4.4 /
+     1.4.10). The game shell locks scaling; this page intentionally does not. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#08080d" />
+<meta name="color-scheme" content="dark" />
+<title>World of ClaudeCraft Guide: How to Play, Classes, Bestiary</title>
+<meta name="description" content="The official guide to World of ClaudeCraft, a classic-style browser MMO. Learn how to play, explore the nine classes, the bestiary, quests, dungeons, and the world." />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="manifest" href="/manifest.webmanifest" />
+
+<!-- Canonical + social. The Guide is the site wiki, served at /wiki.
+     The canonical, og:url, hreflang set, and JSON-LD below are the static first-paint
+     defaults for non-JS crawlers; src/guide/head.ts rewrites them per route at runtime. -->
+<link rel="canonical" href="https://worldofclaudecraft.com/wiki" />
+
+<!-- GEO / Multilingual Alternates (mirrors index.html; head.ts refreshes per route). -->
+<link rel="alternate" hreflang="en" href="https://worldofclaudecraft.com/wiki" />
+<link rel="alternate" hreflang="es" href="https://worldofclaudecraft.com/wiki?lang=es" />
+<link rel="alternate" hreflang="es-ES" href="https://worldofclaudecraft.com/wiki?lang=es_ES" />
+<link rel="alternate" hreflang="fr-FR" href="https://worldofclaudecraft.com/wiki?lang=fr_FR" />
+<link rel="alternate" hreflang="fr-CA" href="https://worldofclaudecraft.com/wiki?lang=fr_CA" />
+<link rel="alternate" hreflang="en-CA" href="https://worldofclaudecraft.com/wiki?lang=en_CA" />
+<link rel="alternate" hreflang="it-IT" href="https://worldofclaudecraft.com/wiki?lang=it_IT" />
+<link rel="alternate" hreflang="de-DE" href="https://worldofclaudecraft.com/wiki?lang=de_DE" />
+<link rel="alternate" hreflang="zh-CN" href="https://worldofclaudecraft.com/wiki?lang=zh_CN" />
+<link rel="alternate" hreflang="zh-TW" href="https://worldofclaudecraft.com/wiki?lang=zh_TW" />
+<link rel="alternate" hreflang="ko-KR" href="https://worldofclaudecraft.com/wiki?lang=ko_KR" />
+<link rel="alternate" hreflang="ja-JP" href="https://worldofclaudecraft.com/wiki?lang=ja_JP" />
+<link rel="alternate" hreflang="pt-BR" href="https://worldofclaudecraft.com/wiki?lang=pt_BR" />
+<link rel="alternate" hreflang="ru-RU" href="https://worldofclaudecraft.com/wiki?lang=ru_RU" />
+<link rel="alternate" hreflang="nl-NL" href="https://worldofclaudecraft.com/wiki?lang=nl_NL" />
+<link rel="alternate" hreflang="pl-PL" href="https://worldofclaudecraft.com/wiki?lang=pl_PL" />
+<link rel="alternate" hreflang="id-ID" href="https://worldofclaudecraft.com/wiki?lang=id_ID" />
+<link rel="alternate" hreflang="tr-TR" href="https://worldofclaudecraft.com/wiki?lang=tr_TR" />
+<link rel="alternate" hreflang="sv-SE" href="https://worldofclaudecraft.com/wiki?lang=sv_SE" />
+<link rel="alternate" hreflang="vi-VN" href="https://worldofclaudecraft.com/wiki?lang=vi_VN" />
+<link rel="alternate" hreflang="da-DK" href="https://worldofclaudecraft.com/wiki?lang=da_DK" />
+<link rel="alternate" hreflang="x-default" href="https://worldofclaudecraft.com/wiki" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="World of ClaudeCraft" />
+<meta property="og:title" content="World of ClaudeCraft Guide" />
+<meta property="og:description" content="Learn how to play World of ClaudeCraft: classes, bestiary, quests, dungeons, and the world." />
+<meta property="og:url" content="https://worldofclaudecraft.com/wiki" />
+<meta property="og:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="World of ClaudeCraft Guide" />
+<meta name="twitter:description" content="Learn how to play World of ClaudeCraft: classes, bestiary, quests, dungeons, and the world." />
+<meta name="twitter:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
+
+<!-- Structured Data (Schema.org JSON-LD). The WebSite + SearchAction is the first-paint
+     default for non-JS crawlers; head.ts swaps in per-route data (BreadcrumbList, FAQPage,
+     VideoGame, DefinedTermSet) at runtime. -->
+<script id="guide-structured-data" type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "World of ClaudeCraft",
+      "url": "https://worldofclaudecraft.com/wiki",
+      "inLanguage": "en",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://worldofclaudecraft.com/wiki?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- LCP: the overview hero backdrop. Preload it high-priority since the SPA renders the
+     hero after the module parses, so the image is not otherwise parser-discoverable. -->
+<link rel="preload" as="image" href="/loading-screen.jpg" fetchpriority="high" />
+
+<!-- i18n stored-locale modulepreload (mirrors index.html / play.html). For a returning
+     visitor whose stored locale is non-English, preload that locale's content-hashed
+     chunk before the main module parses. The production build templates the
+     { locale: chunkUrl } map over the sentinel; in dev the sentinel is undefined and the
+     try/catch makes this a no-op. Reads ONLY localStorage.locale; one same-origin preload. -->
+<script>
+  (function () {
+    try {
+      var loc = localStorage.getItem('locale');
+      if (!loc) return;
+      var map = __I18N_LOCALE_CHUNKS__;
+      var href = map && map[loc];
+      if (typeof href !== 'string') return;
+      var link = document.createElement('link');
+      link.rel = 'modulepreload';
+      link.href = href;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    } catch (e) {
+      // No stored locale / no templated map (dev) / storage blocked: do nothing.
+    }
+  })();
+</script>
+</head>
+<body class="guide-body">
+<div id="guide-app"></div>
+<noscript>
+  <div style="max-width:640px;margin:48px auto;padding:0 24px;color:#f0ebd8;font-family:Georgia,serif;">
+    <h1>World of ClaudeCraft Guide</h1>
+    <p>This guide needs JavaScript enabled. You can still
+      <a href="/play" style="color:#ffd100">play the game</a> or browse the
+      <a href="/wiki" style="color:#ffd100">community wiki</a>.</p>
+  </div>
+</noscript>
+<script type="module" src="/src/guide/main.ts"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@ Contributors add **English strings only**; the maintainer fills every locale
 before release. This is the canonical roles reference; the root `CLAUDE.md` and
 `src/ui/CLAUDE.md` i18n sections point here.
 
-The reason for the split is practical: translating all 13 non-English locales on
+The reason for the split is practical: translating all 20 non-English locales on
 every PR would drain the token budget of contributors on smaller Claude Code
 plans and bloat each diff with machine translations the maintainer re-does at
 release anyway. The sparse-overlay model plus the two-tier release gate make an
@@ -14,27 +14,112 @@ English-only PR correct and safe, so that is the contract.
 
 | Role | Does | Does NOT |
 |---|---|---|
-| **Contributor** (incl. small-plan Claude Code agents) | Add the key to `en` (`src/ui/i18n.en.ts`, or `src/admin/i18n.en.ts` for the admin app); render it via `t()`. For text emitted from `src/sim/` or `server/`, register the matcher RULE in `src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts` in the same change. Regenerate and commit the generated artifacts. | Touch the 13 `i18n.locales/<lang>.ts` overlays. Write any non-English translation. Put English copy, a placeholder, or `// TODO` into an overlay as a stand-in translation. Hand-edit `*.resolved.generated*` or `i18n.status.json`. |
+| **Contributor** (incl. small-plan Claude Code agents) | Add the key to `en` (a `src/ui/i18n.catalog/<domain>.ts` module, or `src/admin/i18n.en.ts` for the admin app); render it via `t()`. For text emitted from `src/sim/` or `server/`, register the matcher RULE in `src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts` in the same change. Regenerate and commit the generated artifacts. | Touch the 20 `i18n.locales/<lang>.ts` overlays. Write any non-English translation. Put English copy, a placeholder, or `// TODO` into an overlay as a stand-in translation. Hand-edit `*.resolved.generated*` or `i18n.status.json`. |
 | **Maintainer** (Fernando) | Fill all non-English overlays before release via `npm run i18n:worklist`; regenerate; update the SHA baseline; ship from a `release/**` branch. | n/a |
 
 Translating your own locale is **permitted but never required** of a contributor.
 
-## Adding a player-visible string
+## Adding a player-visible string (by origin)
 
-1. Add the key to `en` (`src/ui/i18n.en.ts`) and render it through `t()`. Never
-   edit the 13 `src/ui/i18n.locales/<lang>.ts` overlays, and never fake a
-   translation by putting English / `// TODO` / a placeholder into one. Leave the
-   key omitted: the build English-fills it and the registry marks it `pending`.
-2. If the string originates in `src/sim/` or `server/` (which stay
-   language-agnostic), register a matcher RULE matching the emit's origin
-   (`sim_i18n.ts` for a `src/sim/` emit, `server_i18n.ts` for a `server/` emit) in
-   the same change. The S3 guard (`tests/localization_fixes.test.ts`) accepts
-   recognition by either matcher and fails if a new emit is recognized by neither.
-3. Run `npm run i18n:scan` (and `npm run i18n:build`; if the resolved table
-   changed, also `npm run i18n:hash -- --write`) and commit the regenerated files.
-4. Open the PR. It is green at the PR-tier gate, which does not require
-   translations; `tsc` and the `t()` untracked-key throw still guarantee English
-   completeness.
+Pick the recipe for where the string is emitted. In all four, add ENGLISH only,
+then `npm run i18n:gen` (= `i18n:build` + `i18n:admin` + `i18n:scan`) and commit;
+if the game resolved table changed, also `npm run i18n:hash -- --write`. Never
+edit the `i18n.locales/<lang>.ts` overlays and never fake a translation in one.
+
+1. **Client UI (`src/ui`, `src/render`, `src/game`, `index.html`).** Add the key
+   to `en` and render via `t()` (numbers/dates via the formatters, below).
+   - **Prefer the English-only catalog module `src/ui/i18n.catalog/hud_chrome.ts`**
+     (namespace `hudChrome.*`) for new HUD chrome. It has no per-locale blocks, so
+     an English add compiles on its own. `shell.ts` is the other English-only domain.
+   - The catalog domains `hud`, `game`, `quests`, `items`, `abilities` carry
+     tsc-ENFORCED inline per-locale blocks (via `merge.ts` cross-refs and
+     `: typeof ...` consts). Adding a key to one of those en blocks red-fails `tsc`
+     (TS2719) until you also add it to every inline non-en block. Avoid that by
+     using `hud_chrome.ts`/`shell.ts` instead. **Never put `as const` on a catalog
+     domain object** (it narrows the literal types and breaks the `en_XA` pseudo-locale).
+   - `index.html` / `admin.html` static text uses `data-i18n` / `data-i18n-title` /
+     `data-i18n-aria` attributes pointing at a key; the boot localizer fills them.
+2. **`src/sim/` emit.** sim stays language-agnostic. Emit stable English, then in
+   `src/ui/sim_i18n.ts` add the English to `baseEnTable` + all 21 `BASE_DICT` blocks
+   and an `EXACT`/`RULES` matcher so `localizeSimText` re-renders it. `BASE_DICT` is
+   `Record<SupportedLanguage, ...>` so `tsc` forces all 21 locales; fill dialects
+   inline as **es_ES = es, fr_CA = fr_FR, en_CA = English**. The 7 newest locales
+   (nl_NL, pl_PL, id_ID, tr_TR, sv_SE, vi_VN, da_DK) are spread in via
+   `...BASE_NEW`/`...PET_NEW` from the generated `sim_i18n.newlocales.ts` (regenerated
+   by the new-locale fill pipeline), so a new key must be English-filled in those
+   blocks too or `tsc` red-fails on the missing locale. Broad `(.+)` RULES go
+   LAST (after every more-specific form); the catch-all `unleashes` rule is the last
+   entry by design.
+3. **`server/` emit.** Same idea in `src/ui/server_i18n.ts`: add the English to the
+   inline `DICT` (all 21 locales, same dialect rule) + an `EXACT`/`RULES` matcher so
+   `localizeServerText` re-renders it. Numbers/durations spliced into a server
+   message localize via a helper (see `localizeServerDuration`, which re-renders
+   `formatDuration`'s `N second/minute/hour/day` output through `tServer`).
+   - A sim/server string can alternatively be recognized by a **hud-local matcher**
+     (`localizeErrorText` / `localizeSystemText` / `localizeLootText` in `hud.ts`,
+     which map to `t()` keys in `main` scope). These run first at runtime; the S3
+     guard accepts recognition by any of the three paths.
+4. **Admin (`src/admin`).** Operators are users. Add the flat key to
+   `src/admin/i18n.en.ts` and render via the admin `t()`. A server operator-error
+   string surfaced in the dashboard needs both a key AND an `ADMIN_ERROR_KEYS`
+   entry in `src/admin/i18n.ts` (lowercased server message -> key), like
+   `error.moderationFailed`. Admin numbers/dates localize via `Intl.*` with
+   `adminLanguage()` (see `fmtDate` / `fmtBytes` in `src/admin/format.ts`).
+
+The PR is green at the PR-tier gate (no translations required), with one always-on
+exception: a NEW *wordy* English value (a run of 4+ consecutive lowercase letters after
+stripping `{tokens}`, i.e. most real prose) also needs its five non-Latin fills
+(`zh_CN`/`zh_TW`/`ja_JP`/`ko_KR`/`ru_RU`) in the same change, or `tests/i18n_completeness.test.ts`
+(the always-on M16 check) reds even at PR tier; the maintainer normally adds those five at
+merge, and only brand/URL leaves may stay byte-identical. `tsc` and the `t()` untracked-key
+throw still guarantee English completeness.
+
+## The S3 drift guard and its blind spots
+
+`tests/localization_fixes.test.ts` (the S3 guard) parses `src/sim/sim.ts` AND
+`server/game.ts` at test time and asserts every player-facing emit it can see is
+recognized by a matcher (or is on a documented backstop). It scans: `emit({type:
+'log'|'loot', text})` (literal and ternary), `this.error(id, lit)`,
+`this.notice/stopFollow(id, lit)` (and their ternaries), `return 'Sentence.'`;
+plus on the server `type:'log'|'error'|'loot', text:` (literal and ternary) and
+`sendChatNotice(s, lit)`. It CANNOT see, so it will not catch:
+
+- **Variable-routed emits** where the text is a variable, not an inline literal:
+  `broadcastSystem(text)`, `chatMuteMessage()`, and `this.error(id, line)` looping
+  over a built array (e.g. the `/help` `helpLines()` readout). Localize or
+  backstop these by hand.
+- **`?? 'English'` fallbacks** inside an emit argument (`this.error(id, def?.x ??
+  'literal')`). Cover those with a targeted test (see `tests/sim_item_i18n.test.ts`).
+
+## English-by-design backstops (`scripts/i18n_blocked_seed.mjs`)
+
+- **`V07_SLASH`** is the allow-list of v0.7 slash-command / diagnostic readouts
+  (`/pet`, `/quest`, `/bags`, `/who`, the `/help` command reference, ...) that ship
+  ENGLISH by design. These are command-reference dumps full of `/command` tokens;
+  do not translate them unless doing a dedicated pass. The S3 guard skips strings
+  on this list. Interactive transactional feedback (channel join/leave, `/follow`,
+  presence) was deliberately moved OFF this list and IS localized.
+- **`COPIED_ALLOW_IDS`** allow-lists rows whose translation is byte-identical to
+  English on purpose (true cognates / brand / units), e.g. French `time.minute` /
+  `time.minutes`. Without it the release-tier copied-English guard (H3b) would flag
+  them. Add a row here only for a genuine cognate, with a comment saying why.
+
+## Formatting numbers, dates, money, durations
+
+Never build a user-visible number/date/percent/coordinate by hand. Use
+`formatNumber` / `formatDateTime` / `formatMoney` (`src/ui/i18n.ts`), or `Intl.*`
+keyed off the active locale on the admin side. To keep English output
+byte-identical to a historical hand-rolled form, pass `useGrouping: false` and the
+matching fraction-digit options (see `coords.ts`, `meters.ts`, `xp_bar.ts`,
+`clock.ts`). Units/separators that must reorder per locale belong in a `t()` key
+with the digits spliced in as a `{placeholder}` (see `hudChrome.meters.*`,
+`admin bytes.*`).
+
+## Dev-channel text stays English
+
+`console.*`, `throw new Error(...)`, assertion messages, and any string that only
+reaches a developer log or support report are NOT localized and must stay English
+so logs and the source match. If one string feeds both a log and the UI, split it.
 
 ## The two-tier gate
 

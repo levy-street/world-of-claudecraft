@@ -6,7 +6,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import { normalizeCharName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
-import { rateLimited, requestIp, authThrottled, recordAuthFailure, clearAuthFailures, authFailureCount, resetAuthFailures, trackedIpCount, resetRateLimits } from '../server/ratelimit';
+import {
+  rateLimited,
+  requestIp,
+  authThrottled,
+  recordAuthFailure,
+  clearAuthFailures,
+  authFailureCount,
+  resetAuthFailures,
+  trackedIpCount,
+  resetRateLimits,
+  cardUploadRateLimited,
+  CARD_UPLOAD_MAX_PER_MINUTE,
+  resetCardUploadRateLimits,
+  walletLinkRateLimited,
+  WALLET_LINK_MAX_PER_MINUTE,
+  resetWalletLinkRateLimits,
+  wocBalanceRateLimited,
+  WOC_BALANCE_MAX_PER_MINUTE,
+  resetWocBalanceRateLimits,
+} from '../server/ratelimit';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   const req: any = new EventEmitter();
@@ -45,6 +64,16 @@ describe('websocket authentication', () => {
       t: 'auth',
       token: 'a'.repeat(64),
       character: 42,
+      clientSeed: '',
+    });
+  });
+
+  it('carries the client seed when one is supplied', () => {
+    expect(buildWebSocketAuthMessage('a'.repeat(64), 42, 'seed-123')).toEqual({
+      t: 'auth',
+      token: 'a'.repeat(64),
+      character: 42,
+      clientSeed: 'seed-123',
     });
   });
 });
@@ -52,7 +81,12 @@ describe('websocket authentication', () => {
 describe('rate-limit client IP selection', () => {
   // The attempts map is module-level shared state; reset it so the flood tests
   // below (and any future ordering changes) can't leak entries between cases.
-  beforeEach(() => resetRateLimits());
+  beforeEach(() => {
+    resetRateLimits();
+    resetCardUploadRateLimits();
+    resetWalletLinkRateLimits();
+    resetWocBalanceRateLimits();
+  });
 
   it('ignores spoofed x-forwarded-for from untrusted direct clients', () => {
     const req = fakeReq({ 'x-forwarded-for': '203.0.113.55' }, '198.51.100.10');
@@ -113,6 +147,59 @@ describe('rate-limit client IP selection', () => {
     expect(aliceLimited).toBe(true);
     // ...while another player behind the same proxy is unaffected
     expect(rateLimited(fakeReq({ 'x-forwarded-for': '198.51.100.201' }, '172.18.0.1'))).toBe(false);
+  });
+
+  it('rate-limits card uploads by account across client IPs', () => {
+    const accountId = 77;
+    for (let i = 0; i < CARD_UPLOAD_MAX_PER_MINUTE; i++) {
+      expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': `203.0.113.${i + 1}` }, '172.18.0.1'), accountId)).toBe(false);
+    }
+    expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': '203.0.113.250' }, '172.18.0.1'), accountId)).toBe(true);
+  });
+
+  it('rate-limits card uploads by client IP across accounts', () => {
+    const ip = '203.0.113.220';
+    for (let i = 0; i < CARD_UPLOAD_MAX_PER_MINUTE; i++) {
+      expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 1000 + i)).toBe(false);
+    }
+    expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 2000)).toBe(true);
+  });
+
+  it('rate-limits wallet link/challenge attempts by account across client IPs', () => {
+    const accountId = 77;
+    for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
+      expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': `203.0.114.${i + 1}` }, '172.18.0.1'), accountId)).toBe(false);
+    }
+    expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': '203.0.114.250' }, '172.18.0.1'), accountId)).toBe(true);
+  });
+
+  it('rate-limits wallet link/challenge attempts by client IP across accounts', () => {
+    const ip = '203.0.114.220';
+    for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
+      expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 1000 + i)).toBe(false);
+    }
+    expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 2000)).toBe(true);
+  });
+
+  it('rate-limits the $WOC balance proxy per IP on its OWN bucket (decoupled from login/register)', () => {
+    const ip = '203.0.115.10';
+    const req = () => fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1');
+    for (let i = 0; i < WOC_BALANCE_MAX_PER_MINUTE; i++) {
+      expect(wocBalanceRateLimited(req())).toBe(false);
+    }
+    expect(wocBalanceRateLimited(req())).toBe(true); // 21st balance read from this IP is limited
+    // Crucially, exhausting the balance bucket must NOT spill into the shared
+    // register/login limiter — the player can still log in from the same IP.
+    expect(rateLimited(req())).toBe(false);
+  });
+
+  it('keeps the balance proxy unaffected by an exhausted login/register budget', () => {
+    const ip = '203.0.115.20';
+    const req = () => fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1');
+    for (let i = 0; i < 21; i++) rateLimited(req()); // burn the shared login/register bucket
+    expect(rateLimited(req())).toBe(true);
+    // The balance proxy has its own bucket, so a card/bag open still succeeds.
+    expect(wocBalanceRateLimited(req())).toBe(false);
   });
 
   it('keeps limiting a persistent attacker after the memory backstop evicts', () => {

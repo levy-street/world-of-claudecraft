@@ -28,7 +28,17 @@ describe('mob demoralize-on-hit', () => {
 
     const baseAp = (sim as any).effectiveAttackPower(victim);
 
-    (sim as any).mobSwing(bones, victim);
+    // Force this single swing to land regardless of world-gen RNG state (mobSwing's
+    // first rng.next() is the miss/dodge roll).
+    const rng = (sim as any).rng;
+    const realNext = rng.next.bind(rng);
+    let firstRoll = true;
+    rng.next = () => { if (firstRoll) { firstRoll = false; return 0.999; } return realNext(); };
+    try {
+      (sim as any).mobSwing(bones, victim);
+    } finally {
+      rng.next = realNext;
+    }
 
     const aura = victim.auras.find((a) => a.name === 'Withering Wail');
     expect(aura).toBeTruthy();

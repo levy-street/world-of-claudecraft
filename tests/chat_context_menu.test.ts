@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { chatPlayerContextActions } from '../src/ui/player_context_menu';
-import { setLanguage } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 
 describe('chat player context menu', () => {
   afterEach(() => setLanguage('en'));
@@ -45,7 +45,10 @@ describe('chat player context menu', () => {
     expect(actions.map((a) => a.id)).not.toContain('report');
   });
 
-  it('localizes chat context action labels', () => {
+  it('localizes chat context action labels', async () => {
+    // Lazy locale flip: await the locale chunk so the synchronous t() label reads resolve
+    // German rather than the English fallback (the bootstrap awaits the same way before paint).
+    await ensureLocaleLoaded('de_DE');
     setLanguage('de_DE');
     const actions = chatPlayerContextActions({
       playerName: 'Badmage',

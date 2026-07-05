@@ -54,8 +54,11 @@ yourself before reading any file:
    > **Parity / Sync Report - out of scope.** This change touches no parity surface (no
    > IWorld / `src/sim` / `ClientWorld` / `wireEntity` / `SimEvent` / sim-server i18n
    > matcher / RL-env file). Nothing to audit. Note: an i18n *catalog* refactor that only
-   > moves `t()` keys (`src/ui/i18n.ts` + locale data, keys unchanged) is guarded by `tsc`
-   > (each locale is `: typeof en`) and the resolved-equivalence test, not by parity review.
+   > moves `t()` keys (catalog modules under `src/ui/i18n.catalog/` plus the overlays under
+   > `src/ui/i18n.locales/`, keys unchanged; the runtime reads the generated bundles under
+   > `src/ui/i18n.resolved.generated/`) is guarded by the generated-bundle reproducibility
+   > tests (`tests/i18n_emit_shape.test.ts`, `tests/i18n_completeness.test.ts`) and the
+   > resolved-hash harness, not by parity review.
 
 4. Otherwise proceed, focusing only on the matched surfaces.
 
@@ -134,8 +137,16 @@ For every new or changed member of the `SimEvent` union (`src/sim/types.ts`):
 - Run `npx vitest run tests/localization_fixes.test.ts` and read the result. If S3 (or any
   guard) fails, surface the exact failing emit string and which matcher table needs the
   key/RULE. Do not just say "tests fail".
-- Every `t()` key must exist in all locales in `translations` (each locale is `: typeof en`,
-  so `npx tsc --noEmit` catches a missing/renamed key). Run it if i18n keys changed.
+- Locale completeness is no longer an eager `translations` map: only `en` is static-imported
+  and the dense locales load lazily from the generated bundles, with overlays as partial maps.
+  A missing non-English fill is English-filled at build and marked `pending`; the PR tier
+  allows English-only and the release tier (`I18N_RELEASE_TIER=1`) hard-fails on a `pending`
+  row. One always-on exception (M16): a new *wordy* English value (a run of 4+ consecutive
+  lowercase letters) also needs its five non-Latin fills (`zh_CN`/`zh_TW`/`ja_JP`/`ko_KR`/
+  `ru_RU`) in the same change, or `tests/i18n_completeness.test.ts` reds even at PR tier (the
+  maintainer normally adds them at merge). For key/placeholder parity run
+  `npx vitest run tests/i18n_completeness.test.ts tests/i18n_emit_shape.test.ts`;
+  `npx tsc --noEmit` still type-checks the emit/catalog shape against the English catalog.
 - Numbers, money, and dates must go through `formatNumber` / `formatMoney` / `formatDateTime`
   rather than raw string building.
 
@@ -146,6 +157,13 @@ For every new or changed member of the `SimEvent` union (`src/sim/types.ts`):
   `performance.now` introduced into `src/sim/` (all randomness must go through `Rng`).
 - Flag any new import in `src/sim/` from `render/`, `ui/`, `game/`, or `net/`, or any
   DOM/Three.js import - that breaks the "runs unchanged in Node" invariant and the env host.
+- Run the sim-purity guard and report its real status: `npx vitest run tests/architecture.test.ts`
+  (it scans every `src/sim/` file for the forbidden imports and for
+  `Math.random`/`Date.now`/`performance.now`).
+- Note: game-system logic may now live in `src/sim/<system>/` modules behind the `SimContext`
+  seam (`src/sim/sim_context.ts`), but `Sim` still satisfies `IWorld` from `src/sim/sim.ts`, so
+  the parity surface is unchanged. The move-not-rewrite / draw-order audit of those modules is
+  the separate `architecture-reviewer` agent; this agent stays on cross-host parity.
 
 ### Check 7 (WARNING) - RL Env / Python Binding Surface
 

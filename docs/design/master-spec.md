@@ -221,7 +221,7 @@ Ground sparkles: highwatch_summons ×2 at (1,654),(-2,657); ogre_war_totem ×7 a
 | q_sanctum_gate | The Sanctum Gate | brother_aldric_highwatch | collect 3 sanctum_key_shard (sparkles, gate plaza) | 4000 | 2000 | — | requires q_voice_below |
 | q_korgath | The Bound Guardian | scout_maren_highwatch | kill 1 korgath_the_bound | 4200 | 2500 | korgaths_chainwraps (all) | requires q_sanctum_gate, minLevel 18, suggestedPlayers 5 |
 | q_velkhar | The Grand Necromancer | brother_aldric_highwatch | kill 1 grand_necromancer_velkhar | 4500 | 3000 | boneguard_breastplate / staff_of_velkhar / shadowmeld_tunic | requires q_sanctum_gate, minLevel 18, suggestedPlayers 5 |
-| q_gravewyrm | Korzul the Gravewyrm | brother_aldric_highwatch | kill 1 korzul_the_gravewyrm | 5300 | 25000 | gravewyrm_scale_hauberk / wyrmcult_grand_robe / wyrmscale_jerkin | requires q_velkhar, minLevel 18, suggestedPlayers 5 |
+| q_gravewyrm | Korzul the Gravewyrm | brother_aldric_highwatch | kill 1 korzul_the_gravewyrm | 5300 | 25000 | gravewyrm_scale_hauberk / wyrmcult_grand_robe / wyrmscale_jerkin | requires q_sanctum_gate, minLevel 18, suggestedPlayers 5 |
 
 Ceiling check: q_gravewyrm 5,300 at L19 = 24.9% of 21,300 (under ceiling). The 18→20 stretch (40,700 XP) is carried by the SOLO-able lead-up chain (q_wyrm_sigils + q_breaking_the_seal + q_voice_below + q_sanctum_gate = 16,200) plus revenant/necromancer arcs (13,000) plus dungeon quests (14,000) — per the corrected dungeon math, NOT by dungeon trash kills.
 
@@ -241,7 +241,7 @@ Ceiling check: q_gravewyrm 5,300 at L19 = 24.9% of 21,300 (under ceiling). The 1
 
 `DungeonDef`: `{ id: 'gravewyrm_sanctum', name: 'Gravewyrm Sanctum', index: 2, doorPos: {x:0, z:880}, entry: {x:0,z:0}, exitOffset: {x:0,z:-6}, interior: 'sanctum' (stretched 3-chamber variant of the crypt builder — see §7; fallback: 'crypt'), suggestedPlayers: 5, enterText: 'The air goes cold. Something vast breathes below...', leaveText: 'You stagger back into the mountain wind.' }`
 
-Entry gating: q_velkhar/q_gravewyrm gated minLevel 18, suggestedPlayers 5.
+Entry gating: q_korgath, q_velkhar, and q_gravewyrm all require q_sanctum_gate, minLevel 18, suggestedPlayers 5. They are available together once the Sanctum gate is opened, so one party run can clear all three boss quests.
 
 **Layout (linear, 3 chambers, z 0→150):** Chamber 1 "The Boneworks" (z 10–60, boneguard/drakonid packs) → Korgath's Hall (z 60–75) → Chamber 2 "The Ritual Vault" (z 75–115, Velkhar) → Chamber 3 "The Wyrm's Hollow" (z 115–150, Korzul on a raised dais ringed by drakonid guards).
 

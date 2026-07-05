@@ -40,9 +40,9 @@ export function isMaxMinimapZoom(z: number): boolean {
   return clampMinimapZoom(z) === MINIMAP_ZOOM_LEVELS[MINIMAP_ZOOM_LEVELS.length - 1];
 }
 
-// Compact readout, e.g. "1×" / "1.5×" / "2×". Trailing-zero-free so 1.5 stays
-// "1.5×" but 2.0 reads "2×".
-export function formatMinimapZoom(z: number): string {
-  const v = clampMinimapZoom(z);
-  return `${Number(v.toFixed(1))}×`;
+// Numeric zoom value (snapped to a valid preset) for the HUD readout. The HUD
+// formats it via formatNumber so the digits follow the active locale, then
+// appends the literal "×" symbol (U+00D7) — no digits are baked here.
+export function minimapZoomValue(z: number): number {
+  return clampMinimapZoom(z);
 }

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
-import { loadHdr } from './assets/loader';
+import { loadHdr, loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
 import { cloudTexture, skyTexture } from './textures';
@@ -69,11 +69,72 @@ function shouldUseLiteHdri(): boolean {
 
 const BIOME_HDRI = shouldUseLiteHdri() ? BIOME_HDRI_1K : BIOME_HDRI_2K;
 
+const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
+  vale: '/env/vale_backdrop.webp',
+  marsh: '/env/marsh_backdrop.webp',
+  peaks: '/env/peaks_backdrop.webp',
+};
+
+const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
+  vale: '/env/vale_backdrop_4k.webp',
+  marsh: '/env/marsh_backdrop_4k.webp',
+  peaks: '/env/peaks_backdrop_4k.webp',
+};
+
+const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
+  vale: 0,
+  marsh: 0,
+  peaks: 0,
+};
+
+interface NetworkInformationLike {
+  readonly effectiveType?: string;
+  readonly saveData?: boolean;
+}
+
+type NavigatorWithBackdropHints = Navigator & {
+  readonly connection?: NetworkInformationLike;
+  readonly deviceMemory?: number;
+  readonly mozConnection?: NetworkInformationLike;
+  readonly webkitConnection?: NetworkInformationLike;
+};
+
+/** Typed read of the Save-Data client hint (the user asked to conserve data). */
+export function navigatorSaveData(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const nav = navigator as NavigatorWithBackdropHints;
+  const connection = nav.connection ?? nav.mozConnection ?? nav.webkitConnection;
+  return !!connection?.saveData;
+}
+
+function shouldUseLiteBackdrop(): boolean {
+  if (typeof location !== 'undefined') {
+    const params = new URLSearchParams(location.search);
+    const forced = params.get('backdrop') ?? params.get('skybox');
+    if (forced === '4k' || forced === 'lite') return true;
+    if (forced === '8k' || forced === 'high') return false;
+  }
+  if (typeof navigator !== 'undefined') {
+    const nav = navigator as NavigatorWithBackdropHints;
+    const connection = nav.connection ?? nav.mozConnection ?? nav.webkitConnection;
+    if (connection?.saveData) return true;
+    if (connection?.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType)) return true;
+    if (nav.deviceMemory !== undefined && nav.deviceMemory <= 4) return true;
+    if (nav.maxTouchPoints > 0 && typeof matchMedia !== 'undefined') {
+      if (matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 900px)').matches) return true;
+    }
+  }
+  return false;
+}
+
+const BIOME_BACKDROP = shouldUseLiteBackdrop() ? BIOME_BACKDROP_4K : BIOME_BACKDROP_8K;
+
 // Measured brightest-texel u (sun azimuth in equirect space) per HDRI — see
 // tmp/analyze_hdr.mjs. Used to rotate each map so its sun matches SUN_ANCHOR.
 const HDRI_SUN_U: Record<BiomeId, number> = { vale: 0.595, marsh: 0.657, peaks: 0.631 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
+const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};
 // 2K HDRs are ~17MB on disk; 1K is ~4MB. Pick the lighter set for phone /
 // low-memory browser sessions before preload starts, and skip entirely when
 // the URL already forces the gradient-dome tier. An auto-detected software-GL
@@ -86,11 +147,24 @@ if (GFX.standardMaterials) {
       hdriStore[biome] = tex;
       return tex;
     }));
+    registerPreload(loadTexture(BIOME_BACKDROP[biome], { srgb: true }).then((tex) => {
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = true;
+      backdropStore[biome] = tex;
+      return tex;
+    }).catch(() => undefined));
   }
 }
 
 export function hasSkyHdriAssets(): boolean {
   return Boolean(hdriStore.vale && hdriStore.marsh && hdriStore.peaks);
+}
+
+export function hasBackdropAssets(): boolean {
+  return Boolean(backdropStore.vale && backdropStore.marsh && backdropStore.peaks);
 }
 
 export interface SkyView {
@@ -128,6 +202,11 @@ const SKY_FRAG = /* glsl */ `
   uniform vec2 uTuneA; // x: radiance gain, y: clamp (bloom economy)
   uniform vec2 uTuneB;
   uniform vec3 uSunDir;
+  uniform sampler2D uBackdropA;
+  uniform sampler2D uBackdropB;
+  uniform float uBackdropStrength;
+  uniform float uBackdropBiasA;
+  uniform float uBackdropBiasB;
   varying vec3 vDir;
 
   vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec2 tune) {
@@ -137,9 +216,44 @@ const SKY_FRAG = /* glsl */ `
     return min(texture2D(map, uv).rgb * tune.x, vec3(tune.y));
   }
 
+  float hash12(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+  }
+
+  float noise2(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    float a = hash12(i);
+    float b = hash12(i + vec2(1.0, 0.0));
+    float c = hash12(i + vec2(0.0, 1.0));
+    float d = hash12(i + vec2(1.0, 1.0));
+    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+  }
+
+  vec3 sampleBackdrop(sampler2D map, vec3 dir, float yBias) {
+    float flatLen = max(length(dir.xz), 0.08);
+    vec2 flatDir = dir.xz / flatLen;
+    float u = atan(flatDir.y, flatDir.x) * 0.15915494 + 0.5;
+    float h = dir.y / flatLen;
+    float v = clamp(0.36 + h * 0.32 + yBias, 0.0, 1.0);
+    vec3 col = texture2D(map, vec2(u, v)).rgb;
+    float skyMask = smoothstep(0.54, 0.9, v);
+    float brush = noise2(vec2(u * 22.0, v * 9.0)) * 0.55
+      + noise2(vec2(u * 47.0 + 11.0, v * 18.0 + 3.0)) * 0.45;
+    float cloudLift = smoothstep(0.58, 0.92, brush) * skyMask * 0.08;
+    col += (brush - 0.5) * skyMask * 0.045;
+    col = mix(col, col + vec3(0.09, 0.085, 0.075), cloudLift);
+    return col;
+  }
+
   void main() {
     vec3 dir = normalize(vDir);
     vec3 c = mix(sampleSky(uSkyA, dir, uOffA, uTuneA), sampleSky(uSkyB, dir, uOffB, uTuneB), uMix);
+    vec3 backA = sampleBackdrop(uBackdropA, dir, uBackdropBiasA);
+    vec3 backB = sampleBackdrop(uBackdropB, dir, uBackdropBiasB);
+    vec3 backdrop = mix(backA, backB, uMix);
+    c = mix(c, backdrop, uBackdropStrength);
     float sunAmt = pow(max(dot(dir, uSunDir), 0.0), 8.0);
     c += vec3(1.0, 0.85, 0.6) * sunAmt * 0.3;                        // warm glow around the anchor sun
     float sunCore = pow(max(dot(dir, uSunDir), 0.0), 90.0);
@@ -196,8 +310,11 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
   }
 
   const sun = sunDir.clone().normalize();
+  const backdropsReady = hasBackdropAssets();
   const tuneVec = (b: BiomeId): THREE.Vector2 =>
     new THREE.Vector2(HDRI_TUNE[b].gain, HDRI_TUNE[b].clamp);
+  const backdropTex = (b: BiomeId): THREE.Texture =>
+    (backdropsReady ? backdropStore[b] : hdriStore[b]) as THREE.Texture;
   const start = biomeBlendAt(0);
   const uniforms = {
     uSkyA: { value: hdriStore[start.from] as THREE.Texture },
@@ -208,6 +325,11 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uTuneA: { value: tuneVec(start.from) },
     uTuneB: { value: tuneVec(start.to) },
     uSunDir: { value: sun },
+    uBackdropA: { value: backdropTex(start.from) },
+    uBackdropB: { value: backdropTex(start.to) },
+    uBackdropStrength: { value: backdropsReady ? 1 : 0 },
+    uBackdropBiasA: { value: BACKDROP_Y_BIAS[start.from] },
+    uBackdropBiasB: { value: BACKDROP_Y_BIAS[start.to] },
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -232,6 +354,10 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
         uniforms.uOffB.value = sunOffsetU(next.to, sun);
         uniforms.uTuneA.value.copy(tuneVec(next.from));
         uniforms.uTuneB.value.copy(tuneVec(next.to));
+        uniforms.uBackdropA.value = backdropTex(next.from);
+        uniforms.uBackdropB.value = backdropTex(next.to);
+        uniforms.uBackdropBiasA.value = BACKDROP_Y_BIAS[next.from];
+        uniforms.uBackdropBiasB.value = BACKDROP_Y_BIAS[next.to];
         uniforms.uMix.value = next.t;
         cur = next;
         return;

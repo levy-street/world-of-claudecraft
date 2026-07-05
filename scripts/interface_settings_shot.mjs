@@ -53,8 +53,9 @@ const box = await page.evaluate(() => {
 });
 if (box && box.width > 0) await page.screenshot({ path: 'tmp/interface_settings_panel.png', clip: box });
 
-// Apply a few settings live, close the menu, and show them in-world: FPS readout
-// on, frosted panels on, slightly faded HUD + larger combat text.
+// Apply a few settings live, close the menu, and show them in-world: performance
+// overlay on (showFps master toggle; configured in Options > Performance), frosted
+// panels on, slightly faded HUD + larger combat text.
 await page.evaluate(() => {
   const hud = window.__game.hud;
   const apply = hud.optionsHooks.onSettingChange;

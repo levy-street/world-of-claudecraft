@@ -1,0 +1,47 @@
+// Economy & Trade overview: coin, vendors, the World Market, and player trading.
+// Systems and direction only, no prices or stock lists (WoW-style altitude).
+
+import { t } from '../../ui/i18n';
+import { esc } from '../../ui/esc';
+import { hrefFor } from '../routes';
+import { lead, section, p, related } from './ui';
+import type { GuidePage } from './types';
+
+// Heading + one body paragraph each, in reading order.
+const BLOCKS = [
+  ['guide.economy.coinTitle', 'guide.economy.coinBody'],
+  ['guide.economy.vendorsTitle', 'guide.economy.vendorsBody'],
+  ['guide.economy.buyingTitle', 'guide.economy.buyingBody'],
+  ['guide.economy.junkTitle', 'guide.economy.junkBody'],
+  ['guide.economy.tradeTitle', 'guide.economy.tradeBody'],
+] as const;
+
+export const economy: GuidePage = {
+  titleKey: 'guide.nav.economy',
+  render() {
+    const blocks = BLOCKS
+      .map(([title, body]) => section(title, p(body)))
+      .join('');
+    return `
+      <article class="guide-article">
+        <h1>${esc(t('guide.nav.economy'))}</h1>
+        ${lead('guide.economy.intro')}
+        ${blocks}
+
+        <section class="guide-block">
+          <h2>${esc(t('guide.economy.marketTitle'))}</h2>
+          <p>${esc(t('guide.economy.marketBody'))}</p>
+          <p>${esc(t('guide.economy.marketBrowse'))}</p>
+          <p>${esc(t('guide.economy.marketPost'))}</p>
+          <p>${esc(t('guide.economy.marketCollect'))}</p>
+          <p>${esc(t('guide.economy.marketPricing'))}</p>
+        </section>
+
+        ${related([
+          { href: hrefFor('gear'), key: 'guide.nav.gear' },
+          { href: hrefFor('social'), key: 'guide.nav.social' },
+          { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
+        ])}
+      </article>`;
+  },
+};

@@ -1,0 +1,139 @@
+{
+  "class": "warrior",
+  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "iconSize": 128,
+  "sourcePacks": [
+    "tmp/asset_src/warrior-skill-icons",
+    "tmp/asset_src/berserker-skill-icons (fallback for rage/fury)"
+  ],
+  "runtimeDir": "public/ui/skills/warrior",
+  "abilities": [
+    {
+      "abilityId": "heroic_strike",
+      "sourcePack": "warrior",
+      "sourceFile": "3.png",
+      "output": "heroic_strike.webp"
+    },
+    {
+      "abilityId": "battle_shout",
+      "sourcePack": "warrior",
+      "sourceFile": "43.png",
+      "output": "battle_shout.webp"
+    },
+    {
+      "abilityId": "commanding_shout",
+      "sourcePack": "berserker",
+      "sourceFile": "48.png",
+      "output": "commanding_shout.webp"
+    },
+    {
+      "abilityId": "charge",
+      "sourcePack": "berserker",
+      "sourceFile": "27.png",
+      "output": "charge.webp"
+    },
+    {
+      "abilityId": "rend",
+      "sourcePack": "berserker",
+      "sourceFile": "44.png",
+      "output": "rend.webp"
+    },
+    {
+      "abilityId": "thunder_clap",
+      "sourcePack": "warrior",
+      "sourceFile": "7.png",
+      "output": "thunder_clap.webp"
+    },
+    {
+      "abilityId": "hamstring",
+      "sourcePack": "warrior",
+      "sourceFile": "33.png",
+      "output": "hamstring.webp"
+    },
+    {
+      "abilityId": "bloodrage",
+      "sourcePack": "berserker",
+      "sourceFile": "1.png",
+      "output": "bloodrage.webp"
+    },
+    {
+      "abilityId": "overpower",
+      "sourcePack": "berserker",
+      "sourceFile": "12.png",
+      "output": "overpower.webp"
+    },
+    {
+      "abilityId": "execute",
+      "sourcePack": "berserker",
+      "sourceFile": "35.png",
+      "output": "execute.webp"
+    },
+    {
+      "abilityId": "slam",
+      "sourcePack": "warrior",
+      "sourceFile": "4.png",
+      "output": "slam.webp"
+    },
+    {
+      "abilityId": "cleave",
+      "sourcePack": "warrior",
+      "sourceFile": "1.png",
+      "output": "cleave.webp"
+    },
+    {
+      "abilityId": "defensive_stance",
+      "sourcePack": "warrior",
+      "sourceFile": "9.png",
+      "output": "defensive_stance.webp"
+    },
+    {
+      "abilityId": "demoralizing_shout",
+      "sourcePack": "warrior",
+      "sourceFile": "36.png",
+      "output": "demoralizing_shout.webp"
+    },
+    {
+      "abilityId": "sunder_armor",
+      "sourcePack": "berserker",
+      "sourceFile": "8.png",
+      "output": "sunder_armor.webp"
+    },
+    {
+      "abilityId": "mortal_strike",
+      "sourcePack": "warrior",
+      "sourceFile": "21.png",
+      "output": "mortal_strike.webp"
+    },
+    {
+      "abilityId": "bloodthirst",
+      "sourcePack": "berserker",
+      "sourceFile": "34.png",
+      "output": "bloodthirst.webp"
+    },
+    {
+      "abilityId": "shield_slam",
+      "sourcePack": "berserker",
+      "sourceFile": "25.png",
+      "output": "shield_slam.webp"
+    },
+    {
+      "abilityId": "whirlwind",
+      "sourcePack": "warrior",
+      "sourceFile": "13.png",
+      "output": "whirlwind.webp"
+    },
+    {
+      "abilityId": "berserker_rage",
+      "sourcePack": "berserker",
+      "sourceFile": "47.png",
+      "output": "berserker_rage.webp"
+    },
+    {
+      "abilityId": "taunt",
+      "sourcePack": "generic-skill100",
+      "sourceFile": "skill icon 37.png",
+      "output": "taunt.webp"
+    }
+  ],
+  "deferredStayProcedural": {}
+}
