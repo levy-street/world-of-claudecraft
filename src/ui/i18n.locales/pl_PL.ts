@@ -1121,6 +1121,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'download.desc':
     'Pobierz samodzielny launcher dla zoptymalizowanej wydajności i gry na pełnym ekranie.',
   'download.title': 'Pobierz launcher na komputer',
+  'download.macCta': 'Pobierz dla macOS',
+  'download.windowsPending': 'Build Windows w przygotowaniu.',
   'entities.abilities.adrenaline_rush.description':
     'Twoja krew wrze, natychmiast przywracając 60 energii.',
   'entities.abilities.adrenaline_rush.name': 'Przyspieszona krew',

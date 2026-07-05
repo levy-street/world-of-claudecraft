@@ -1123,6 +1123,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Hang Sâu',
   'download.desc': 'Tải trình khởi chạy độc lập để có hiệu năng tối ưu và chơi toàn màn hình.',
   'download.title': 'Tải Trình Khởi Chạy Trên Máy Tính',
+  'download.macCta': 'Tải xuống cho macOS',
+  'download.windowsPending': 'Bản dựng Windows đang chờ.',
   'entities.abilities.adrenaline_rush.description':
     'Máu ngươi sôi sục, lập tức hồi lại 60 năng lượng.',
   'entities.abilities.adrenaline_rush.name': 'Huyết Tăng Tốc',

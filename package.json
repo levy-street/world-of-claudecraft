@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "private": true,
   "license": "MIT",
   "author": "levy-street",
@@ -9,6 +9,8 @@
   "description": "World of Claudecraft: a classic-style micro-MMO + headless RL training environment",
   "scripts": {
     "dev": "vite",
+    "release:check": "node scripts/release_version.mjs check",
+    "release:prepare": "node scripts/release_version.mjs prepare",
     "version:sync": "node scripts/version_sync.mjs",
     "version": "node scripts/version_sync.mjs && git add android/app/build.gradle ios/App/App.xcodeproj/project.pbxproj",
     "build": "npm run i18n:build && npm run i18n:admin && npm run i18n:scan && npm run wiki:content && npm run sitemap:build && node scripts/build_media_manifest.mjs generate && vite build && node scripts/check_backdrop_survival.mjs && node scripts/build_media_manifest.mjs emit",

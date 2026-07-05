@@ -1124,6 +1124,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Hämta den fristående startaren för optimerad prestanda och spel i helskärm.',
   'download.title': 'Ladda ner skrivbordsstartaren',
+  'download.macCta': 'Ladda ner för macOS',
+  'download.windowsPending': 'Windows-bygge väntar.',
   'entities.abilities.adrenaline_rush.description':
     'Ditt blod hettar upp och återställer omedelbart 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Kvickat blod',

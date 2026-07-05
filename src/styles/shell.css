@@ -1256,6 +1256,40 @@
     margin-top: var(--spacing-xs);
   }
 
+  .desktop-download-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+  }
+
+  .desktop-download-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    min-width: 190px;
+    margin: 0;
+    padding: 8px 18px;
+    text-decoration: none;
+  }
+
+  .desktop-download-status {
+    display: inline-block;
+    max-width: 420px;
+    padding: 6px var(--spacing-sm);
+    background: rgba(0, 0, 0, 0.38);
+    border: 1px solid rgba(255, 209, 0, 0.22);
+    border-radius: var(--radius-sm);
+    color: var(--color-primary-dim);
+    font-family: var(--font-heading);
+    font-size: 10.5px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 8px #000;
+  }
+
   /* "Browse the Wiki" launcher: reuses the .btn skin but renders as an anchor. */
   .wiki-cta {
     display: inline-block;

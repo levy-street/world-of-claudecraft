@@ -1116,6 +1116,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Hent den selvstændige launcher for optimeret ydeevne og fuldskærmsspil.',
   'download.title': 'Download Desktop-launcher',
+  'download.macCta': 'Download til macOS',
+  'download.windowsPending': 'Windows-build afventer.',
   'entities.abilities.adrenaline_rush.description':
     'Dit blod koger, og genopretter øjeblikkeligt 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Fremskyndet Blod',

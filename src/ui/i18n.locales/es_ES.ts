@@ -25,6 +25,8 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'wiki.title': 'Wiki y guía del juego',
   'news.title': 'Noticias y actualizaciones',
   'download.title': 'Descargar lanzador de escritorio',
+  'download.macCta': 'Descargar version macOS',
+  'download.windowsPending': 'Compilacion de Windows pendiente.',
   'mode.onlineTitle': 'Jugar en línea',
   'mode.onlineAria': 'Jugar en línea: conéctate al mundo compartido persistente',
   'mode.offlineTitle': 'Jugar en solitario',
