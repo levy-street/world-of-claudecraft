@@ -2747,7 +2747,10 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'legendary',
     weapon: { min: 46, max: 74, speed: 2.8 },
-    stats: { str: 24, agi: 15, sta: 20 },
+    // Rebalanced into a str/agi/sta hybrid within the fixed 44-pt legendary
+    // mainhand budget: 15 agi makes it a viable hunter ranged weapon (ranged AP +
+    // crit) while it stays usable by its warrior/paladin owners.
+    stats: { str: 15, agi: 15, sta: 14 },
     sellValue: 25000,
     requiredClass: ['warrior', 'paladin'],
   },
