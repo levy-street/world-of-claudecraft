@@ -12,7 +12,7 @@ import { guideStrings } from './guide';
 import { hudStrings } from './hud';
 import { hudChromeStrings } from './hud_chrome';
 import { itemNames, itemStrings } from './items';
-import { mergeEntities, mergeExtra, mergeStrings } from './merge';
+import { mergeEntities, mergeExtra, mergeSkywardEn, mergeStrings } from './merge';
 import { questStrings } from './quests';
 import { shellStrings } from './shell';
 
@@ -1054,11 +1054,12 @@ export const en = {
     },
     itemSets: itemSetEntityText,
     mobs: { ...worldNames.en.entities.mobs, ...mergeEntities.en.mobs, ...mergeExtra.en.mobs },
-    npcs: { ...worldNames.en.entities.npcs, ...mergeExtra.en.npcs },
+    npcs: { ...worldNames.en.entities.npcs, ...mergeExtra.en.npcs, ...mergeSkywardEn.npcs },
     quests: {
       ...worldNames.en.entities.quests,
       ...mergeEntities.en.quests,
       ...mergeExtra.en.quests,
+      ...mergeSkywardEn.quests,
     },
     dungeons: { ...worldNames.en.entities.dungeons, ...mergeExtra.en.dungeons },
     delves: { ...worldNames.en.entities.delves },

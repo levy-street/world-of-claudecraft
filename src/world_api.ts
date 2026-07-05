@@ -61,6 +61,7 @@ import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMail } from './world_api/mail';
 import type { IWorldMarket } from './world_api/market';
+import type { IWorldMounts } from './world_api/mounts';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
@@ -113,6 +114,13 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
+export type {
+  MountTrialLeaderEntry,
+  RaceInfo,
+  RaceParticipant,
+  WagerInfo,
+  WagerMember,
+} from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type { PlayerProfessionsView } from './world_api/professions';
 export type {
@@ -156,6 +164,7 @@ export interface IWorld
     IWorldMail,
     IWorldDungeons,
     IWorldDelves,
+    IWorldMounts,
     IWorldDailyRewards,
     IWorldTelemetry,
     IWorldProfessions {}
@@ -295,6 +304,17 @@ export const COMMAND_NAMES = [
   'collect_delve_chest_loot',
   'delve_rite_choose',
   'telemetry',
+  'summon_mount',
+  'dismiss_mount',
+  'start_course',
+  'abort_course',
+  'mint_charter',
+  'start_race',
+  'wager_propose',
+  'wager_join',
+  'wager_decline',
+  'wager_leave',
+  'wager_launch',
   'equip_bag',
   'unequip_bag',
   'mail_send',

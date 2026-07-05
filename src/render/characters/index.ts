@@ -6,6 +6,7 @@ import type { Entity, PlayerClass } from '../../sim/types';
 import { mechHeldWeaponOverride, visualKeyFor } from './manifest';
 import { CharacterVisual } from './visual';
 
+export { createMountVisual, MountVisual } from './mount';
 export { CharacterPreview } from './preview';
 export type { AnimState } from './visual';
 export { CharacterVisual } from './visual';
