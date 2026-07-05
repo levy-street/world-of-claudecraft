@@ -2654,6 +2654,31 @@
       border-radius: 0;
       z-index: 1;
     }
+    /* The selected character's name, centred over the top of the 3D stage so it
+       is unmistakable which character you are about to play. Truncates rather
+       than wrapping; non-interactive so it never blocks the turntable. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #charselect-preview-name {
+      display: block;
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      max-width: min(56%, 420px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+      font-family: var(--title-font);
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-shadow:
+        0 2px 8px #000,
+        0 0 14px rgba(0, 0, 0, 0.55);
+      pointer-events: none;
+    }
     /* Name entry floats just under the title. */
     #offline-select.cs-wow .auth-label {
       position: absolute;
@@ -2969,6 +2994,44 @@
     body:not(.mobile-touch) #charselect-panel.cs-wow .cs-list-actions {
       margin-top: auto;
       flex-shrink: 0;
+      /* Enter World is a full-width hero row; Back + New Character wrap below. */
+      flex-wrap: wrap;
+    }
+    /* The docked roster carries a single Enter World button acting on the
+       selected character, so the per-row Enter World / Take Over buttons drop
+       out here (Delete stays per-row: it targets one specific character). */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .enter-world-btn,
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .take-over-btn {
+      display: none;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter {
+      display: block;
+      flex: 1 1 100%;
+      min-height: 44px;
+      font-family: var(--title-font);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      /* Filled-gold CTA, matching the Donate button (.donate-cta): this is the
+         hero action of the screen, so it reads as a primary call to action
+         rather than the darker .btn-primary gradient. */
+      background: #f0c34d;
+      color: #2a1c05;
+      border: 1px solid var(--gold-dim);
+      outline: none;
+      text-shadow: none;
+      box-shadow:
+        0 2px 10px rgba(255, 209, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter:hover:not(:disabled),
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter:focus-visible {
+      filter: brightness(1.08);
+      background: #ffd86b;
+      box-shadow:
+        0 0 14px rgba(255, 209, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      transform: translateY(-1px);
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel {
       position: absolute;
@@ -4090,6 +4153,13 @@
     padding: 0;
   }
 
+  /* The shared Enter World CTA belongs only to the desktop docked roster; every
+     other layout (mobile, narrow non-touch) drives entry from the per-row
+     buttons, so hide it by default and let the docked layout reveal it. */
+  #btn-charselect-enter {
+    display: none;
+  }
+
   .fatal-overlay {
     position: absolute;
     inset: 0;
@@ -4498,6 +4568,14 @@
     display: block;
     width: 100% !important;
     height: 100% !important;
+  }
+
+  /* The selected-character name plate over the 3D stage. Belongs to the desktop
+     docked layout (the only one with a full 3D turntable); mobile shows the name
+     on each roster card already, so it stays hidden by default and the docked
+     layout reveals it. */
+  .cs-preview-name {
+    display: none;
   }
 
   .char-input-group {
