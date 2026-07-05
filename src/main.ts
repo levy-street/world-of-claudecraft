@@ -189,6 +189,7 @@ import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
 import {
   resolveWocBalanceUpdate,
+  setGuardianTier,
   setWalletDisplayAvailable,
   setWalletUiEnabled,
   setWocBalance,
@@ -5383,7 +5384,14 @@ async function refreshWocBalance(address: string, fresh = false): Promise<void> 
   });
   if (!apply) return;
   connectedWocBalance = balance;
-  if (setLinked) linkedWocBalance = balance;
+  if (setLinked) {
+    linkedWocBalance = balance;
+    // The Liquidity Guardian flair follows the linked wallet only (verified
+    // identity); best-effort, 0 whenever the LP staking rail is dark.
+    void wallet.fetchGuardianTier(address).then((tier) => {
+      if (linkedWalletPubkey === address) setGuardianTier(tier);
+    });
+  }
   updateWalletButton();
 }
 
@@ -6019,6 +6027,7 @@ async function refreshWalletLinkStatus(): Promise<void> {
   if (!WALLET_ENABLED) {
     linkedWalletPubkey = null;
     linkedWocBalance = null;
+    setGuardianTier(0);
     connectedWocBalance = null;
     walletLinkStatusPending = false;
     updateWalletButton();
@@ -6027,6 +6036,7 @@ async function refreshWalletLinkStatus(): Promise<void> {
   if (!api.token) {
     linkedWalletPubkey = null;
     linkedWocBalance = null;
+    setGuardianTier(0);
     walletLinkStatusPending = false;
     updateWalletButton();
     return;
@@ -6039,6 +6049,7 @@ async function refreshWalletLinkStatus(): Promise<void> {
     const wallet = await api.linkedWallet();
     linkedWalletPubkey = wallet?.pubkey ?? null;
     linkedWocBalance = null;
+    setGuardianTier(0);
     statusKnown = true;
   } catch (err) {
     // Transient failure (offline/5xx): we genuinely don't know the link status, so
@@ -6054,8 +6065,10 @@ async function refreshWalletLinkStatus(): Promise<void> {
     try {
       const wallet = await loadWallet();
       const balance = await wallet.fetchWocBalance(pubkey);
+      const guardianTier = await wallet.fetchGuardianTier(pubkey);
       if (linkedWalletPubkey === pubkey) {
         linkedWocBalance = balance;
+        setGuardianTier(guardianTier);
         updateWalletButton();
       }
     } catch (err) {
@@ -6152,6 +6165,7 @@ async function unlinkVerifiedWallet(): Promise<void> {
     await api.unlinkWallet();
     linkedWalletPubkey = null;
     linkedWocBalance = null;
+    setGuardianTier(0);
     await disconnectUnverifiedWallet();
     updateWalletButton();
   } catch (err) {

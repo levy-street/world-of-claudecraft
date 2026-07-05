@@ -48,7 +48,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "es_ES": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -89,7 +100,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "fr_FR": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -130,7 +152,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "fr_CA": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -171,7 +204,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "en_CA": [],
   "it_IT": [
@@ -213,7 +257,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "de_DE": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -254,7 +309,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "zh_CN": [
     "hudChrome.wocSeason.colRank",
@@ -323,7 +389,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "ru_RU": [
     "hudChrome.wocSeason.colRank",
@@ -371,7 +448,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "pl_PL": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -412,7 +500,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "id_ID": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -453,7 +552,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "tr_TR": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -494,7 +604,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "sv_SE": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -535,7 +656,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "vi_VN": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -576,7 +708,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ],
   "da_DK": [
     "hudChrome.corpseHarvest.alreadyHarvested",
@@ -617,6 +760,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.statusEnded",
     "hudChrome.wocSeason.subtitle",
     "hudChrome.wocSeason.title",
-    "hudChrome.wocSeason.wocUnit"
+    "hudChrome.wocSeason.wocUnit",
+    "wallet.guardianTierTitle",
+    "wallet.guardianTiers.abyssguard.name",
+    "wallet.guardianTiers.abyssguard.title",
+    "wallet.guardianTiers.currentkeeper.name",
+    "wallet.guardianTiers.currentkeeper.title",
+    "wallet.guardianTiers.stormwarden.name",
+    "wallet.guardianTiers.stormwarden.title",
+    "wallet.guardianTiers.tidewatcher.name",
+    "wallet.guardianTiers.tidewatcher.title",
+    "wallet.guardianTiers.wader.name",
+    "wallet.guardianTiers.wader.title"
   ]
 };

@@ -1,17 +1,18 @@
-# TODOs: feat/woc-lp-fee-share
+# TODOS: feat/woc-liquidity-guardian
 
-- [x] Worktree stacked on feat/woc-lp-staking-vault
-- [x] woc_escrow_client.ts distribution encoders + distributionPda + ATA idempotent ix
-- [x] flow_ledger.ts: lp_fee_revenue + lp_buyback_drip inflows
-- [x] payout_db.ts: source filter on openBuybackBatches/lastSettleAt (+ marketplace passes source)
-- [x] payout_keeper.ts: drip split in signTerminal + drip credit in onSettled (pure splitDrip)
-- [x] lp_fee_keeper.ts: LP fee vault keeper (fund_distribution settle, lp_fee_revenue credit)
-- [x] lp_staking_db.ts: lp_payouts table + distributor methods (ownersWithOpenAccruals, payouts state machine, addPaid guard)
-- [x] lp_distributor.ts: claim computation + allocation + durable payout machine
-- [x] lp_fee_share_boot.ts + main.ts wiring + internal lp/payout ops
-- [x] Unit tests (encoders, drip, distributor, keeper coexistence)
-- [x] Real-Pg integration (lp_payouts + payout_db filter)
-- [x] Devnet distribution lifecycle + drip-split settle w/ sigs
-- [x] tsc parity + biome + regression run
-- [ ] LARP check + prod readiness + score
-- [ ] Commits
+- [x] Reuse the shared holder-flair pipeline (no parallel flair system)
+- [x] src/sim/guardian_tier.ts pure ladder + seasoning gate (veLP lockstep)
+- [x] server/lp_guardian.ts RPC reader (fail-closed, cached)
+- [x] server/lp_guardian_db.ts leaderboard decoration (one query, zero chain reads)
+- [x] src/ui/guardian_flair.ts client presentation
+- [x] src/render/nameplate_painter.ts aura + badge
+- [x] Entity.guardianTier (cosmetic identity field)
+- [x] game.ts wireEntity encode (gt) + folded refresh loop (one wallet lookup)
+- [x] online.ts decode gt -> guardianTier
+- [x] main.ts leaderboard enrichment
+- [x] i18n wallet.guardianTiers.* names + titles
+- [x] tests: guardian_tier, lp_guardian, guardian_broadcast (wire round-trip),
+      lp_guardian_db.integration (real Postgres) all green; architecture + snapshots
+      + bandwidth regressions green
+- [x] tsc clean, biome clean on changed files
+- [ ] M16 non-Latin fills for guardian titles (maintainer at release; same as #799)

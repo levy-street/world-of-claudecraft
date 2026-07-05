@@ -2766,6 +2766,29 @@ export const en_XA: EnTranslations = {
         "name": "[Šóʋéŕéíĝñ]",
         "flavor": "[Ţĥé ŕéáļɱ ƀéñðš ţĥé ķñéé: ţĥé éñţíŕé šúþþļý.]"
       }
+    },
+    "guardianTierTitle": "[{tier} Ļíɋúíðíţý Ĝúáŕðíáñ]",
+    "guardianTiers": {
+      "wader": {
+        "name": "[Ŵáðéŕ]",
+        "title": "[Ŵáðéŕ óƒ ţĥé Šĥáļļóŵš]"
+      },
+      "tidewatcher": {
+        "name": "[Ţíðéŵáţçĥéŕ]",
+        "title": "[Ţíðéŵáţçĥéŕ óƒ ţĥé Ŕéáçĥ]"
+      },
+      "currentkeeper": {
+        "name": "[Çúŕŕéñţķééþéŕ]",
+        "title": "[Ķééþéŕ óƒ ţĥé Çúŕŕéñţ]"
+      },
+      "stormwarden": {
+        "name": "[Šţóŕɱŵáŕðéñ]",
+        "title": "[Ŵáŕðéñ óƒ ţĥé Šţóŕɱ]"
+      },
+      "abyssguard": {
+        "name": "[Áƀýššĝúáŕð]",
+        "title": "[Ĝúáŕð óƒ ţĥé Áƀýšš]"
+      }
     }
   },
   "playerCard": {

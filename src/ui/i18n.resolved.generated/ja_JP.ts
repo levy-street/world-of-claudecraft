@@ -2766,6 +2766,29 @@ export const ja_JP: EnTranslations = {
         "name": "君主",
         "flavor": "レルムが膝をつきます: 供給量のすべて。"
       }
+    },
+    "guardianTierTitle": "{tier} 流動性ガーディアン",
+    "guardianTiers": {
+      "wader": {
+        "name": "渚歩き",
+        "title": "浅瀬の渚歩き"
+      },
+      "tidewatcher": {
+        "name": "潮見守",
+        "title": "潮の見張り番"
+      },
+      "currentkeeper": {
+        "name": "海流の番人",
+        "title": "海流の守り手"
+      },
+      "stormwarden": {
+        "name": "嵐の守人",
+        "title": "嵐の監視者"
+      },
+      "abyssguard": {
+        "name": "深淵の衛士",
+        "title": "深淵の守護兵"
+      }
     }
   },
   "playerCard": {

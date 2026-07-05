@@ -8,6 +8,7 @@
 // The caller (the HUD) assembles PlayerCardData from IWorld; this module only
 // knows how to draw it.
 import { type DevTier, devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
+import { guardianTierByIndex, guardianTierTitle } from './guardian_flair';
 import {
   type HolderTier,
   holderTierBadgeDataUrl,
@@ -53,6 +54,8 @@ export interface PlayerCardData {
   topPercent: number | null;
   /** Verified linked wallet's $WOC balance (null when unlinked). Drives the badge. */
   balance: number | null;
+  /** Liquidity Guardian staking flair tier (0 = none), server-verified. */
+  guardianTier: number;
   /** Developer-badge tier index (0/null = none, 1-5). Drives the dev badge. */
   devTier: number | null;
   /** Merged-PR count behind the dev tier (null when unknown). */
@@ -352,6 +355,21 @@ function drawHeader(
     x,
     158,
   );
+
+  // Liquidity Guardian cosmetic title: one line under the subtitle in the
+  // rung's colour, only for a verified, seasoned LP staker (tier 0 hides it).
+  const guardian = guardianTierByIndex(data.guardianTier);
+  if (guardian) {
+    ctx.fillStyle = guardian.ring;
+    ctx.font = `700 17px ${TITLE_FONT}`;
+    fillTextClamped(
+      ctx,
+      t('wallet.guardianTierTitle', { tier: guardianTierTitle(guardian) }),
+      x,
+      182,
+      540,
+    );
+  }
 }
 
 function drawBadge(

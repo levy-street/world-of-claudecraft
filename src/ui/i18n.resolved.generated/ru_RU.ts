@@ -2766,6 +2766,29 @@ export const ru_RU: EnTranslations = {
         "name": "Суверен",
         "flavor": "Мир преклоняет колено: все предложение."
       }
+    },
+    "guardianTierTitle": "{tier}, страж ликвидности",
+    "guardianTiers": {
+      "wader": {
+        "name": "Бродник",
+        "title": "Бродник отмелей"
+      },
+      "tidewatcher": {
+        "name": "Смотритель приливов",
+        "title": "Смотритель прилива"
+      },
+      "currentkeeper": {
+        "name": "Хранитель течений",
+        "title": "Хранитель течения"
+      },
+      "stormwarden": {
+        "name": "Штормовой страж",
+        "title": "Страж шторма"
+      },
+      "abyssguard": {
+        "name": "Страж бездны",
+        "title": "Часовой бездны"
+      }
     }
   },
   "playerCard": {

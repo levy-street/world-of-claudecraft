@@ -130,6 +130,8 @@ import { pruneExpiredBlockedIps } from './ip_block_db';
 import type { LpDistributor } from './lp_distributor';
 import { buildLpFeeKeeper } from './lp_fee_keeper';
 import { buildLpDistributor } from './lp_fee_share_boot';
+import { guardianFlairConfigured, guardianInfoForPubkey } from './lp_guardian';
+import { guardianTiersForNames } from './lp_guardian_db';
 import { buildLpStakingService } from './lp_staking_boot';
 import { withLpDistributorLock, withLpEpochLock } from './lp_staking_db';
 import { handleLpTxBuild } from './lp_staking_routes';
@@ -316,6 +318,20 @@ const leaderboardCache: Record<
 
 async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
   const rows = await topLifetimeXp(LEADERBOARD_SIZE, { global: scope === 'global' });
+  // Liquidity Guardian prestige: one DB-mirror query per refresh (no chain
+  // reads), only when the LP staking rail is configured; absent otherwise.
+  const guardians =
+    guardianFlairConfigured() && lpStaking
+      ? await guardianTiersForNames(
+          rows.map((r) => r.name),
+          lpStaking.pool(),
+          lpGuardianMinStakeBase(),
+          Math.floor(Date.now() / 1000),
+        ).catch((err) => {
+          console.error('guardian tier leaderboard enrich failed:', err);
+          return new Map<string, number>();
+        })
+      : new Map<string, number>();
   const entries: LeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
     name: r.name,
@@ -324,10 +340,17 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     virtualLevel: virtualLevel(r.lifetimeXp),
     lifetimeXp: r.lifetimeXp,
     prestigeRank: r.prestigeRank,
+    ...(guardians.has(r.name) ? { guardianTier: guardians.get(r.name) } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   leaderboardCache[scope] = { at: Date.now(), entries };
   return entries;
+}
+
+// The flair dust floor shared with lp_guardian.ts (env-tuned, LP base units).
+function lpGuardianMinStakeBase(): bigint {
+  const v = process.env.WOC_LP_GUARDIAN_MIN_STAKE_BASE;
+  return v && /^[0-9]+$/.test(v) ? BigInt(v) : 1n;
 }
 
 async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
@@ -1546,6 +1569,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         lpSummaryCache = { at: Date.now(), body: await lpStaking.summary() };
       }
       return json(res, 200, lpSummaryCache.body);
+    }
+    if (req.method === 'GET' && url.startsWith('/api/woc/lp/guardian')) {
+      if (!guardianFlairConfigured()) return json(res, 404, { error: 'unknown endpoint' });
+      if (wocBalanceRateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      const owner = new URL(req.url ?? '/', 'http://localhost').searchParams.get('owner');
+      if (!isSolanaAddress(owner))
+        return json(res, 400, { error: 'owner must be a Solana address' });
+      const info = await guardianInfoForPubkey(owner);
+      return json(res, 200, { tier: info.tier });
     }
     if (req.method === 'GET' && url.startsWith('/api/woc/lp/position')) {
       if (!lpStaking) return json(res, 404, { error: 'unknown endpoint' });

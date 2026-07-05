@@ -1333,6 +1333,7 @@ export class ClientWorld implements IWorld {
         e.devTier = w.dvt ?? 0; // developer-badge tier (cosmetic, server-set)
         e.devMergedPrs = typeof w.dvc === 'number' ? w.dvc : undefined; // merged-PR count
         e.githubLogin = typeof w.dgl === 'string' ? w.dgl : undefined; // GitHub login
+        e.guardianTier = w.gt ?? 0; // Liquidity Guardian LP-staking flair (cosmetic, server-set)
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;

@@ -15,6 +15,8 @@ export interface LeaderboardEntry {
   virtualLevel: number;
   lifetimeXp: number;
   prestigeRank: number;
+  /** Liquidity Guardian staking flair tier (0/absent = none). Cosmetic only. */
+  guardianTier?: number;
   realm?: string; // present on the global (cross-realm) home-page board
 }
 

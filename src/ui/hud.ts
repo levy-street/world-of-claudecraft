@@ -337,6 +337,7 @@ import { renderVendorWindow } from './vendor_window';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
+  verifiedGuardianTier,
   verifiedWocBalance,
   walletDisplayAvailable,
   walletUiEnabled,
@@ -10786,6 +10787,7 @@ export class Hud {
       gear,
       topPercent,
       balance: showWallet ? verifiedWocBalance() : null,
+      guardianTier: showWallet ? verifiedGuardianTier() : 0,
       devTier: showDevBadges ? (p.devTier ?? null) : null,
       devMergedPrs: showDevBadges ? (p.devMergedPrs ?? null) : null,
       referralHandle: referral?.slug ?? this.cardSlug(p.name),
@@ -11189,9 +11191,9 @@ export class Hud {
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       el.style.display = 'none';
     });
-  }
+  }}
 
-  toggleDailyRewards(): void {
+  toggleDailyRewards(): void {{
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.toggle();
     this.refreshDailyRewardsLauncher(true);

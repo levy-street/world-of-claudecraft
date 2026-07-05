@@ -40,6 +40,8 @@ export interface LeaderboardRow {
   virtualLevel: number;
   lifetimeXp: number;
   prestigeRank: number;
+  /** Liquidity Guardian staking flair tier (0 = none). Cosmetic only. */
+  guardianTier: number;
   me: boolean;
 }
 
@@ -108,6 +110,7 @@ export function buildLeaderboardView(input: LeaderboardInput): LeaderboardView {
     virtualLevel: e.virtualLevel,
     lifetimeXp: e.lifetimeXp,
     prestigeRank: e.prestigeRank,
+    guardianTier: e.guardianTier ?? 0,
     me: e.name === viewer.name,
   }));
   const onPage = rows.some((r) => r.me);

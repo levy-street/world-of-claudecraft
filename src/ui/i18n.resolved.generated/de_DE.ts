@@ -2766,6 +2766,29 @@ export const de_DE: EnTranslations = {
         "name": "Souverän",
         "flavor": "Das Reich beugt das Knie: das gesamte Angebot."
       }
+    },
+    "guardianTierTitle": "{tier} Liquidity Guardian",
+    "guardianTiers": {
+      "wader": {
+        "name": "Wader",
+        "title": "Wader of the Shallows"
+      },
+      "tidewatcher": {
+        "name": "Tidewatcher",
+        "title": "Tidewatcher of the Reach"
+      },
+      "currentkeeper": {
+        "name": "Currentkeeper",
+        "title": "Keeper of the Current"
+      },
+      "stormwarden": {
+        "name": "Stormwarden",
+        "title": "Warden of the Storm"
+      },
+      "abyssguard": {
+        "name": "Abyssguard",
+        "title": "Guard of the Abyss"
+      }
     }
   },
   "playerCard": {

@@ -2766,6 +2766,29 @@ export const zh_CN: EnTranslations = {
         "name": "君主",
         "flavor": "整个领域为你俯首：全部供应量。"
       }
+    },
+    "guardianTierTitle": "{tier}流动性守护者",
+    "guardianTiers": {
+      "wader": {
+        "name": "涉水者",
+        "title": "浅滩涉水者"
+      },
+      "tidewatcher": {
+        "name": "望潮者",
+        "title": "潮汐守望者"
+      },
+      "currentkeeper": {
+        "name": "守流者",
+        "title": "海流看守者"
+      },
+      "stormwarden": {
+        "name": "风暴守卫",
+        "title": "风暴守望者"
+      },
+      "abyssguard": {
+        "name": "深渊卫士",
+        "title": "深渊守卫者"
+      }
     }
   },
   "playerCard": {

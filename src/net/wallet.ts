@@ -406,6 +406,22 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
   }
 }
 
+// ── Liquidity Guardian tier ──────────────────────────────────────────────────
+// Read through the server proxy (GET /api/woc/lp/guardian): the staking-gated
+// cosmetic tier of the wallet's LP position. 0 when the wallet has no seasoned
+// stake, the LP staking rail is dark, or the read fails (flair never guesses).
+export async function fetchGuardianTier(owner: string): Promise<number> {
+  try {
+    const res = await fetch(`/api/woc/lp/guardian?owner=${encodeURIComponent(owner)}`);
+    if (!res.ok) return 0;
+    const data = (await res.json()) as { tier?: number };
+    return typeof data.tier === 'number' && Number.isInteger(data.tier) ? data.tier : 0;
+  } catch (err) {
+    console.error('[wallet] guardian tier read failed', err);
+    return 0;
+  }
+}
+
 // ── $WOC reward season ────────────────────────────────────────────────────────
 // Read of the server's flow-ledger season state (GET /api/woc/season): the
 // current reward season + its pool (verified sinks − emissions). Public + cheap.

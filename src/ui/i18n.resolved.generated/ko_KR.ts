@@ -2766,6 +2766,29 @@ export const ko_KR: EnTranslations = {
         "name": "군주",
         "flavor": "렐름이 무릎을 꿇습니다: 전체 공급량."
       }
+    },
+    "guardianTierTitle": "{tier} 유동성 수호자",
+    "guardianTiers": {
+      "wader": {
+        "name": "물결 걷는 자",
+        "title": "얕은 여울을 걷는 자"
+      },
+      "tidewatcher": {
+        "name": "조수 감시자",
+        "title": "밀물의 감시자"
+      },
+      "currentkeeper": {
+        "name": "해류 지킴이",
+        "title": "해류의 관리인"
+      },
+      "stormwarden": {
+        "name": "폭풍 수호대",
+        "title": "폭풍의 파수꾼"
+      },
+      "abyssguard": {
+        "name": "심연 경비병",
+        "title": "심연의 보초"
+      }
     }
   },
   "playerCard": {

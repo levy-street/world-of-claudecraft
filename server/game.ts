@@ -81,6 +81,7 @@ import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { guardianInfoForPubkey } from './lp_guardian';
 import { trackReachedLevel5 } from './meta_capi';
 import {
   forceCharacterRename,
@@ -561,6 +562,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   }
   if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
   if (e.holderBalance) out.hb = Math.round(e.holderBalance); // exact $WOC, for inspect
+  if (e.guardianTier) out.gt = e.guardianTier; // Liquidity Guardian LP-staking flair (cosmetic)
   if (e.discordTier) out.dt = e.discordTier; // Discord status-tier flair (cosmetic)
   if (e.discordAvatar) out.dav = e.discordAvatar; // Discord PFP (linked indicator)
   if (e.discordName) out.dnm = e.discordName; // Discord handle / nickname (nameplate)
@@ -1284,17 +1286,26 @@ export class GameServer {
   private async refreshHolderTier(session: ClientSession): Promise<void> {
     if (this.devTierPids.has(session.pid)) return; // dev override pinned this pid
     const wallet = await walletForAccount(session.accountId);
-    const { tier, balance } = wallet
-      ? await holderInfoForPubkey(wallet.pubkey)
-      : { tier: 0, balance: 0 };
+    // One wallet lookup drives BOTH cosmetic flairs: the $WOC holder tier (balance)
+    // and the Liquidity Guardian tier (LP staking position). Both are cached inside
+    // their readers and both fail closed to tier 0 when their feature is unconfigured.
+    const [{ tier, balance }, guardian] = await Promise.all([
+      wallet ? holderInfoForPubkey(wallet.pubkey) : Promise.resolve({ tier: 0, balance: 0 }),
+      wallet ? guardianInfoForPubkey(wallet.pubkey) : Promise.resolve({ tier: 0, stakedBase: 0n }),
+    ]);
     // The player may have left during the await; only apply if still the live
     // session for this pid.
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
-    if (e && ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance)) {
+    if (!e) return;
+    if ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance) {
       e.holderTier = tier; // identity diff re-broadcasts it to nearby players
       e.holderBalance = balance;
       console.log(`[woc] ${session.name} holder tier → ${tier} (${balance} $WOC)`);
+    }
+    if ((e.guardianTier ?? 0) !== guardian.tier) {
+      e.guardianTier = guardian.tier; // identity diff re-broadcasts the guardian flair
+      console.log(`[woc] ${session.name} guardian tier → ${guardian.tier}`);
     }
   }
 
