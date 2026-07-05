@@ -46,6 +46,7 @@ import {
   useTouchInterface,
 } from './game/mobile_controls';
 import { mouselookReleaseFacing } from './game/mouselook_release';
+import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
@@ -2354,6 +2355,10 @@ async function startGame(
       ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
       : null;
 
+    const visualFacingFor = (
+      mi: ReturnType<typeof input.readMoveInput>,
+      baseFacing: number,
+    ): number | null => (!movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null);
     if (offlineSim) {
       acc += frameDt;
       // Supply the UTC day for the delve daily reset (the sim never reads the wall
@@ -2400,8 +2405,11 @@ async function startGame(
       renderer.camDist = input.camDist;
       syncGroundAimReticle();
       perf.setNetwork(null);
+      const offlineRenderFacing =
+        visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
+        movementFacing;
       perf.time('renderer', () =>
-        perf.trace('renderer.sync', () => renderer.sync(acc / DT, frameDt, movementFacing), {
+        perf.trace('renderer.sync', () => renderer.sync(acc / DT, frameDt, offlineRenderFacing), {
           mode: 'offline',
           views: renderer.views.size,
           alpha: acc / DT,
@@ -2427,6 +2435,8 @@ async function startGame(
       onlineInputEchoMs,
     );
     const netFacing = movementFacing ?? resolved.facing;
+    const onlineRenderFacing =
+      visualFacingFor(resolved.mi, netFacing ?? world.player.facing) ?? movementFacing;
     Object.assign(net.moveInput, resolved.mi);
     net.setMouselookFacing(netFacing);
     // Online streams facing every frame, so the latched release yaw is consumed
@@ -2502,7 +2512,7 @@ async function startGame(
           renderer.sync(
             alpha,
             frameDt,
-            net.spectating === null ? movementFacing : null,
+            net.spectating === null ? onlineRenderFacing : null,
             ONLINE_SELF_RENDER_ALPHA_LEAD,
           ),
         {

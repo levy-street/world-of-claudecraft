@@ -848,8 +848,8 @@ export class Input {
       // BOTH camera modes, so rotation never begins with a free cursor that can
       // reach the screen edge (movementX clamps to 0 and the camera freezes) or
       // slip onto a second monitor. One lock per drag, none for a plain click
-      // (#116); fullscreen stays a plain drag because Chrome forces its own
-      // "press and hold Esc" prompt there.
+      // (#116). Fullscreen uses the same lock path so right-drag mouselook
+      // behaves identically there.
       if (
         !this.pointerLockRequestedForDrag &&
         shouldEngagePointerLock({

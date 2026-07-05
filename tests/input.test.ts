@@ -311,7 +311,7 @@ describe('Input pointer lock', () => {
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
   });
 
-  it('uses normal mouse dragging instead of pointer lock while browser fullscreen is active', () => {
+  it('requests pointer lock while browser fullscreen is active', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
     (globalThis as any).document.fullscreenElement =
       (globalThis as any).document.documentElement ?? canvas;
@@ -320,7 +320,7 @@ describe('Input pointer lock', () => {
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
 
-    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
 
   it('does not rotate the camera before the drag threshold, so short sloppy clicks stay stable', () => {
