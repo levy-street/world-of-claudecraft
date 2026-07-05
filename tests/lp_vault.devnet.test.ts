@@ -49,8 +49,10 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 (RUN ? describe : describe.skip)('woc_lp_vault: full staking lifecycle on live devnet', () => {
   const conn = new Connection(RPC, 'confirmed');
-  const staker = kp('/tmp/lp_staker.json');
-  const authority = kp(process.env.SOLANA_DEVNET_DEPLOYER ?? '');
+  // Keypairs load lazily behind the RUN gate: describe.skip still evaluates this
+  // body at collection time, and a missing keyfile must not crash the whole run.
+  const staker = RUN ? kp('/tmp/lp_staker.json') : Keypair.generate();
+  const authority = RUN ? kp(process.env.SOLANA_DEVNET_DEPLOYER ?? '') : Keypair.generate();
   const ids = { programId: PROGRAM, lpMint: LP_MINT };
   const pool = poolPda(PROGRAM, LP_MINT);
   const position = positionPda(PROGRAM, pool, staker.publicKey);

@@ -44,8 +44,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 (RUN ? describe : describe.skip)('LP fee-share distribution + drip split on live devnet', () => {
   const conn = new Connection(RPC, 'confirmed');
-  const authority = kp(process.env.SOLANA_DEVNET_DEPLOYER ?? '');
-  const dripVault = kp('/tmp/lp_drip_vault.json');
+  // Lazy behind the RUN gate: collection must not crash without the keyfiles.
+  const authority = RUN ? kp(process.env.SOLANA_DEVNET_DEPLOYER ?? '') : Keypair.generate();
+  const dripVault = RUN ? kp('/tmp/lp_drip_vault.json') : Keypair.generate();
   const recipient = Keypair.generate(); // brand new wallet: no SOL, no token account
   const seasonId = BigInt(Date.now());
   const ids = { programId: PROGRAM, mint: MINT, seasonId };
