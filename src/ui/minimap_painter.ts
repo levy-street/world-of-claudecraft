@@ -52,6 +52,10 @@ const PIP_MIN_RADIUS = 1;
 // rare), so this names the default explicitly: deterministic and pixel-identical in the
 // common case where no online ally is adjacent.
 const PLAYER_ARROW_OUTLINE_WIDTH = 1;
+// Gather node dot (issue 1124): ready draws slightly larger + outlined so it reads as
+// "actionable" against the dimmer, outline-less cooldown dot.
+const GATHER_NODE_READY_RADIUS = 3;
+const GATHER_NODE_COOLDOWN_RADIUS = 2;
 
 // Party / player arrow triangle geometry (canvas-local, drawn under a rotation).
 const PARTY_ARROW_TIP_X = 6;
@@ -117,6 +121,8 @@ const MINIMAP_COLOR_TOKENS = {
   partyPip: '--color-minimap-party-pip',
   player: '--color-minimap-player',
   outline: '--color-minimap-outline',
+  gatherReady: '--color-minimap-gather-ready',
+  gatherCooldown: '--color-minimap-gather-cooldown',
 } as const;
 
 /** The resolved minimap marker colors for one redraw. */
@@ -311,6 +317,22 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           ctx.restore();
+          break;
+        case 'gather-node':
+          if (m.ready) {
+            ctx.fillStyle = colors.gatherReady;
+            ctx.strokeStyle = colors.outline;
+            ctx.lineWidth = MARKER_OUTLINE_WIDTH;
+            ctx.beginPath();
+            ctx.arc(m.mx, m.my, GATHER_NODE_READY_RADIUS, 0, FULL_CIRCLE);
+            ctx.fill();
+            ctx.stroke();
+          } else {
+            ctx.fillStyle = colors.gatherCooldown;
+            ctx.beginPath();
+            ctx.arc(m.mx, m.my, GATHER_NODE_COOLDOWN_RADIUS, 0, FULL_CIRCLE);
+            ctx.fill();
+          }
           break;
       }
     }

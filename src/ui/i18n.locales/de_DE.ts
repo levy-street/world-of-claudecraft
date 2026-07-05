@@ -1210,6 +1210,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Neuigkeiten und Updates',
   'news.desc': 'Lies die neuesten Patchnotes, Events und Community-Updates.',
   'download.title': 'Desktop-Launcher herunterladen',
+  'download.macCta': 'Download fuer macOS',
+  'download.windowsPending': 'Windows-Build ausstehend.',
   'download.desc': 'Hol dir den eigenständigen Launcher für optimierte Leistung und Vollbildspiel.',
   'comingSoon.placeholder': 'Demnächst...',
   'comingSoon.featureComingSoon': 'Diese Funktion ist demnächst in der Welt verfügbar.',
@@ -3935,6 +3937,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Erntesichel',
   'entities.items.bronze_sickle.name': 'Bronzesichel',
   'entities.items.silverleaf_sickle.name': 'Silberblatt-Sichel',
+  'entities.items.thorium_mining_pick.name': 'Thorium-Grabpickel',
+  'entities.items.arcanite_mining_pick.name': 'Arkanit-Grabpickel',
+  'entities.items.ashwood_axe.name': 'Eschenholzaxt',
+  'entities.items.elderwood_axe.name': 'Altholzaxt',
+  'entities.items.goldleaf_sickle.name': 'Goldblatt-Sichel',
+  'entities.items.sunpetal_sickle.name': 'Sonnenblütensichel',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Chatkanal hinzufügen',
   'hud.core.chatChannels.addTitle': 'Kanal hinzufügen',
@@ -6006,4 +6014,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Was Ihr im Dunkeln vollbracht habt',
   'entities.letters.letter_q_hollow.body':
     'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
+  'hudChrome.gathering.herbalism': 'Kräuterkunde',
+  'hudChrome.gathering.logging': 'Holzfällen',
+  'hudChrome.gathering.mining': 'Bergbau',
+  'hudChrome.gathering.title': 'Sammeln',
 };

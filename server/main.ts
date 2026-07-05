@@ -32,6 +32,8 @@ import {
 } from './account';
 import { handleAdminApi, parsePageParams } from './admin';
 import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
+import { permissionsForRoles } from './admin_permissions';
+import { loadAntibotConfig } from './antibot_config_db';
 import {
   hashPassword,
   newToken,
@@ -131,6 +133,7 @@ import {
   mapsErrorStatus,
 } from './maps';
 import { PgMapsDb } from './maps_db';
+import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import {
   cleanReportReason,
   createPlayerReport,
@@ -165,6 +168,7 @@ import {
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
+import { adminRolesForAccount } from './staff_db';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { passesTurnstile } from './turnstile';
 import {
@@ -726,6 +730,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/register') {
       const body = await readBody(req);
+      const meta = requestMetadata(req);
       if (!(await passesTurnstile(req, body, TURNSTILE_SECRET)))
         return json(res, 403, { error: 'verification failed, please try again' });
       if (!validUsernameShape(body.username))
@@ -741,11 +746,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (existing) return json(res, 409, { error: 'username already taken' });
       let account: Awaited<ReturnType<typeof createAccount>>;
       try {
-        account = await createAccount(
-          body.username,
-          await hashPassword(body.password),
-          requestMetadata(req),
-        );
+        account = await createAccount(body.username, await hashPassword(body.password), meta);
       } catch (err: any) {
         // a concurrent registration can win the insert after our findAccount
         // check; the username UNIQUE index is the real guard. Surface it as a
@@ -765,10 +766,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         locale: null,
         marketing_opt_in: false,
       });
+      void trackAccountCreated(
+        account.id,
+        {
+          email: signupEmail,
+          ...metaRequestUserData(req, meta),
+        },
+        metaEventSourceUrl(req),
+      );
       void createSuspiciousRegistrationReport({
         accountId: account.id,
         username: account.username,
-        ...requestMetadata(req),
+        ...meta,
       }).catch((err) => console.error('suspicious registration report failed:', err));
       // Capture the referral when this account signed up via a card link
       // (?ref=<slug>). Best-effort: never block or fail registration on it.
@@ -777,7 +786,12 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       );
       // emailMissing is always false here (email is required above); sent so the
       // client can use one uniform post-auth check across register and login.
-      return json(res, 200, { token, username: account.username, emailMissing: false });
+      return json(res, 200, {
+        token,
+        username: account.username,
+        accountId: account.id,
+        emailMissing: false,
+      });
     }
     if (req.method === 'POST' && url === '/api/login') {
       const body = await readBody(req);
@@ -1770,6 +1784,17 @@ async function main(): Promise<void> {
   }
   await ensureSchema();
   await seedOAuthClients();
+  // Bot detector: replay this realm's saved config overrides onto the fresh
+  // detector. Boot applies what it can; a stale entry (schema drift after a
+  // deploy) is skipped and logged, never allowed to drop the whole document.
+  const storedAntibotConfig = await loadAntibotConfig();
+  const antibotOverrides =
+    typeof storedAntibotConfig.data === 'object' && storedAntibotConfig.data !== null
+      ? (storedAntibotConfig.data as Record<string, unknown>)
+      : {};
+  for (const error of game.applyAntibotConfig(antibotOverrides).errors) {
+    console.warn(`bot-detector config override skipped: ${error}`);
+  }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   const pruned = await pruneChatLogs(CHAT_LOG_RETENTION_DAYS);
@@ -1955,8 +1980,11 @@ async function main(): Promise<void> {
     // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
     // is handled inside game.join(); this guard blocks egregious bot farms before
     // they consume a session slot.
-    const ip = requestMetadata(req).ip;
-    const isAdmin = await isAdminAccount(accountId);
+    const meta = requestMetadata(req);
+    const ip = meta.ip;
+    const staff = await adminRolesForAccount(accountId);
+    const isAdmin = staff !== null;
+    const adminPermissions = staff ? [...permissionsForRoles(staff.roles)] : [];
     if (
       isConnectionRefused({
         blocked: game.isIpBlocked(ip),
@@ -1978,12 +2006,15 @@ async function main(): Promise<void> {
       character.state,
       character.is_gm,
       {
-        ...requestMetadata(req),
+        ...meta,
+        ...metaRequestUserData(req, meta),
+        sourceUrl: metaEventSourceUrl(req),
         mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
         reason: chatMute.reason,
         chatStrikes: status.chatStrikes,
         accountCosmetics,
         isAdmin,
+        adminPermissions,
         clientSeed,
       },
     );

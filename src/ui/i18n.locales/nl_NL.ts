@@ -1141,6 +1141,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Download de losse launcher voor optimale prestaties en schermvullend spelen.',
   'download.title': 'Desktop-launcher downloaden',
+  'download.macCta': 'Download voor macOS',
+  'download.windowsPending': 'Windows-build volgt later.',
   'entities.abilities.adrenaline_rush.description':
     'Je bloed kookt en herstelt onmiddellijk 60 energie.',
   'entities.abilities.adrenaline_rush.name': 'Versneld Bloed',
@@ -1820,6 +1822,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Oogstsikkel',
   'entities.items.bronze_sickle.name': 'Bronzen Sikkel',
   'entities.items.silverleaf_sickle.name': 'Zilverbladsikkel',
+  'entities.items.thorium_mining_pick.name': 'Thorium Mijnpik',
+  'entities.items.arcanite_mining_pick.name': 'Arcaniet Mijnpik',
+  'entities.items.ashwood_axe.name': 'Essenhouten Bijl',
+  'entities.items.elderwood_axe.name': 'Oudhouten Bijl',
+  'entities.items.goldleaf_sickle.name': 'Goudbladsikkel',
+  'entities.items.sunpetal_sickle.name': 'Zonneblaadjessikkel',
   'entities.items.moongate_rubbing.name': 'Bezweringsafdruk',
   'entities.items.moonpale_scale.name': 'Maanbleke Schub',
   'entities.items.moonscale_saber.name': 'Maanschub-Sabel',
@@ -5936,4 +5944,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Wat je in het donker hebt gedaan',
   'entities.letters.letter_q_hollow.body':
     'Weinigen zullen ooit weten wat er in die kom begraven lag, en nog minder zouden het geloven. Ik weet het, en ik zal het niet vergeten.\n\nMoge je pad verlicht blijven.\n- Broeder Aldric',
+  'hudChrome.gathering.herbalism': 'Kruidenkunde',
+  'hudChrome.gathering.logging': 'Houtkap',
+  'hudChrome.gathering.mining': 'Mijnbouw',
+  'hudChrome.gathering.title': 'Verzamelen',
 };

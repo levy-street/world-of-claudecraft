@@ -163,9 +163,13 @@ for (const mode of ['unreleased', 'ghost'] as const) {
       teleport(sim, p, vendor.pos.x + 1, vendor.pos.z);
       makeDead(sim, mode);
       sim.drainEvents();
+      // Starting bags may already hold the vendor's item (a warrior spawns with
+      // starter rations, and the first vendor found sells that same food), so
+      // pin the refused buy as "count unchanged", not "count zero".
+      const before = sim.countItem(itemId);
       sim.buyItem(vendor.id, itemId);
       expect(deadErrors(sim.drainEvents())).toBe(1);
-      expect(sim.countItem(itemId)).toBe(0);
+      expect(sim.countItem(itemId)).toBe(before);
     });
 
     it('turnInQuest is refused and the quest stays ready in the log', () => {

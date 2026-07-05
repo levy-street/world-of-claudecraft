@@ -1197,6 +1197,12 @@ export const zh_TW: EnTranslations = {
     "social": {
       "lastSeen": "最後上線: {when}",
       "lastSeenNever": "從未"
+    },
+    "gathering": {
+      "title": "採集",
+      "mining": "採礦",
+      "logging": "伐木",
+      "herbalism": "藥草學"
     }
   },
   "guide": {
@@ -2535,7 +2541,9 @@ export const zh_TW: EnTranslations = {
   },
   "download": {
     "title": "下載電腦版啟動器",
-    "desc": "獲取獨立啟動器，以獲得更優化的效能和全螢幕遊戲體驗。"
+    "desc": "獲取獨立啟動器，以獲得更優化的效能和全螢幕遊戲體驗。",
+    "macCta": "下載 macOS 版",
+    "windowsPending": "Windows 版本即將推出。"
   },
   "comingSoon": {
     "placeholder": "敬請期待...",
@@ -5682,6 +5690,24 @@ export const zh_TW: EnTranslations = {
       },
       "silverleaf_sickle": {
         "name": "銀葉鐮刀"
+      },
+      "thorium_mining_pick": {
+        "name": "釷礦採礦鎬"
+      },
+      "arcanite_mining_pick": {
+        "name": "秘法採礦鎬"
+      },
+      "ashwood_axe": {
+        "name": "白蠟木斧"
+      },
+      "elderwood_axe": {
+        "name": "古木斧"
+      },
+      "goldleaf_sickle": {
+        "name": "金葉鐮刀"
+      },
+      "sunpetal_sickle": {
+        "name": "陽瓣鐮刀"
       },
       "bristleback_maul": {
         "name": "加洛格拉斯戰錘"

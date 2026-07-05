@@ -1197,6 +1197,12 @@ export const vi_VN: EnTranslations = {
     "social": {
       "lastSeen": "Lần cuối trực tuyến: {when}",
       "lastSeenNever": "chưa bao giờ"
+    },
+    "gathering": {
+      "title": "Thu thập",
+      "mining": "Khai mỏ",
+      "logging": "Đốn gỗ",
+      "herbalism": "Thảo dược học"
     }
   },
   "guide": {
@@ -2535,7 +2541,9 @@ export const vi_VN: EnTranslations = {
   },
   "download": {
     "title": "Tải Trình Khởi Chạy Trên Máy Tính",
-    "desc": "Tải trình khởi chạy độc lập để có hiệu năng tối ưu và chơi toàn màn hình."
+    "desc": "Tải trình khởi chạy độc lập để có hiệu năng tối ưu và chơi toàn màn hình.",
+    "macCta": "Tải xuống cho macOS",
+    "windowsPending": "Bản dựng Windows đang chờ."
   },
   "comingSoon": {
     "placeholder": "Sắp Ra Mắt...",
@@ -5682,6 +5690,24 @@ export const vi_VN: EnTranslations = {
       },
       "silverleaf_sickle": {
         "name": "Liềm Lá Bạc"
+      },
+      "thorium_mining_pick": {
+        "name": "Cuốc Khai Khoáng Thorium"
+      },
+      "arcanite_mining_pick": {
+        "name": "Cuốc Khai Khoáng Arcanite"
+      },
+      "ashwood_axe": {
+        "name": "Rìu Gỗ Tần Bì"
+      },
+      "elderwood_axe": {
+        "name": "Rìu Gỗ Cổ Thụ"
+      },
+      "goldleaf_sickle": {
+        "name": "Liềm Lá Vàng"
+      },
+      "sunpetal_sickle": {
+        "name": "Liềm Cánh Hoa Mặt Trời"
       },
       "bristleback_maul": {
         "name": "Búa Gallowglass"

@@ -618,11 +618,15 @@ describe('client HTML shell', () => {
     expect(html).toContain(
       "if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {",
     );
-    expect(hudTs).toContain("fbq('trackCustom', eventName, data ?? {});");
-    expect(hudTs).toContain(
-      "if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });",
+    expect(hudTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
+    expect(hudTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    expect(hudTs).toContain('if (ev.level === 5) {');
+    expect(hudTs).toContain('characterId ? { eventID: `lvl5_$' + '{characterId}` } : undefined');
+    expect(mainTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
+    expect(mainTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    expect(mainTs).toContain(
+      'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',
     );
-    expect(mainTs).toContain("trackMetaPixel('AccountCreated');");
     expect(mainTs).toContain("'GitHubClick'");
     expect(mainTs).toContain("'DiscordClick'");
   });

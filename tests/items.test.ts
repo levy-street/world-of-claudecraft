@@ -44,6 +44,9 @@ function vendorPlayer(sim: Sim, name = 'Aleph') {
   p.pos.z = wilkes.pos.z;
   anySim.rebucket(p);
   const meta = anySim.players.get(pid)!;
+  // Start from empty bags: these tests pin absolute counts, and fresh
+  // characters now carry starter rations.
+  meta.inventory.length = 0;
   return { pid, wilkes, p, meta };
 }
 

@@ -11,6 +11,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_CA: Partial<Record<TranslationKey, string>> = {
+  'download.macCta': 'Telecharger la version macOS',
+  'download.windowsPending': 'Version Windows a venir.',
   // Stat tooltips inherit the fr_FR base: none of these strings has a genuine
   // Quebec-specific form, so per the divergence-only policy fr_CA carries no
   // hudChrome.statInfo.* overrides.

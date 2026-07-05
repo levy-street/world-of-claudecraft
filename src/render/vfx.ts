@@ -171,6 +171,9 @@ interface Projectile {
   ttl: number;
   coreSprite: number;
   trailSprite: number;
+  // When set, the flying head renders as a short jagged electric bolt streak
+  // (a lightning "bolt-shaped" projectile) instead of a smooth glowing comet.
+  lightning?: boolean;
 }
 
 // fire reads as flame tongues; everything else as sparkling magic
@@ -410,6 +413,28 @@ export class Vfx {
       this.spawn(x, y, z, -dir.x * 0.8, 0.08, -dir.z * 0.8, color, 0.34, 0.18, 0, SPR.glowCore);
     }
     this.spawn(to.x, to.y, to.z, 0, 0.2, 0, color, 0.9, 0.2, 0, SPR.magicRune);
+  }
+
+  // A "bolt-shaped" traveling projectile: fires a homing bolt with the SAME
+  // travel + impact timing as a normal spell projectile (so the damage lands when
+  // it arrives, no flash-then-wait), but its flying head renders as a short jagged
+  // blue-white electric streak instead of a round glowing comet (the shape is
+  // drawn in the projectile update loop). Original procedural effect (no assets).
+  lightningProjectile(sourceId: number, targetId: number): void {
+    const from = this.anchor(sourceId, 0.62);
+    if (!from) return;
+    this.projectiles.push({
+      pos: from.clone(),
+      targetId,
+      color: new THREE.Color(0x66b8ff).multiplyScalar(hdr(1.7)), // electric blue (impact tint)
+      coreColor: new THREE.Color(0xeaf6ff).multiplyScalar(hdr(3.0)), // hot white-blue head
+      trailColor: new THREE.Color(0x3f9bff).multiplyScalar(hdr(1.9)), // crackle
+      speed: 26,
+      ttl: 3,
+      coreSprite: SPR.glowCore,
+      trailSprite: SPR.sparkle,
+      lightning: true,
+    });
   }
 
   burst(at: THREE.Vector3, school: string, count = 18, power = 1): void {
@@ -672,24 +697,89 @@ export class Vfx {
         this.projectiles.splice(i, 1);
         continue;
       }
+      const ux = dir.x / dist; // unit travel direction (before the step scale below)
+      const uy = dir.y / dist;
+      const uz = dir.z / dist;
       dir.multiplyScalar(step / dist);
       pr.pos.add(dir);
-      // bright HDR core (blooms into a comet) + sparkling trail
-      this.spawn(pr.pos.x, pr.pos.y, pr.pos.z, 0, 0, 0, pr.coreColor, 1.0, 0.12, 0, pr.coreSprite);
-      if (Math.random() < 0.35 + 0.65 * this.quality) {
+      if (pr.lightning) {
+        // The flying head is a short jagged electric streak trailing back along
+        // the travel direction: a few segments, each kicked perpendicular for the
+        // zig-zag, so it reads as a lightning bolt shape rather than a round comet.
+        const ph = Math.hypot(ux, uz) || 1;
+        const perpX = -uz / ph;
+        const perpZ = ux / ph;
+        let lat = 0;
+        let vy = 0;
+        for (let s = 0; s < 5; s++) {
+          lat = lat * 0.45 + (Math.random() - 0.5) * 0.75;
+          vy = vy * 0.45 + (Math.random() - 0.5) * 0.55;
+          const back = s * 0.55;
+          const x = pr.pos.x - ux * back + perpX * lat;
+          const y = pr.pos.y - uy * back + vy;
+          const z = pr.pos.z - uz * back + perpZ * lat;
+          const head = s === 0;
+          this.spawn(
+            x,
+            y,
+            z,
+            0,
+            0,
+            0,
+            head ? pr.coreColor : pr.color,
+            head ? 0.5 : 0.36,
+            0.13,
+            0,
+            SPR.glowCore,
+          );
+          this.spawn(x, y, z, 0, 0, 0, pr.trailColor, head ? 0.7 : 0.5, 0.15, 0, SPR.glowSoft);
+        }
+        // an occasional crackle spark flung off the head
+        if (Math.random() < 0.6) {
+          this.spawn(
+            pr.pos.x + (Math.random() - 0.5) * 0.3,
+            pr.pos.y + (Math.random() - 0.5) * 0.3,
+            pr.pos.z + (Math.random() - 0.5) * 0.3,
+            (Math.random() - 0.5) * 1.4,
+            0.3,
+            (Math.random() - 0.5) * 1.4,
+            pr.trailColor,
+            0.22,
+            0.3,
+            1.5,
+            SPR.sparkle,
+          );
+        }
+      } else {
+        // bright HDR core (blooms into a comet) + sparkling trail
         this.spawn(
-          pr.pos.x + (Math.random() - 0.5) * 0.25,
-          pr.pos.y + (Math.random() - 0.5) * 0.25,
-          pr.pos.z + (Math.random() - 0.5) * 0.25,
-          (Math.random() - 0.5) * 0.8,
-          0.4,
-          (Math.random() - 0.5) * 0.8,
-          pr.trailColor,
-          0.32,
-          0.6,
-          1.5,
-          pr.trailSprite,
+          pr.pos.x,
+          pr.pos.y,
+          pr.pos.z,
+          0,
+          0,
+          0,
+          pr.coreColor,
+          1.0,
+          0.12,
+          0,
+          pr.coreSprite,
         );
+        if (Math.random() < 0.35 + 0.65 * this.quality) {
+          this.spawn(
+            pr.pos.x + (Math.random() - 0.5) * 0.25,
+            pr.pos.y + (Math.random() - 0.5) * 0.25,
+            pr.pos.z + (Math.random() - 0.5) * 0.25,
+            (Math.random() - 0.5) * 0.8,
+            0.4,
+            (Math.random() - 0.5) * 0.8,
+            pr.trailColor,
+            0.32,
+            0.6,
+            1.5,
+            pr.trailSprite,
+          );
+        }
       }
     }
 

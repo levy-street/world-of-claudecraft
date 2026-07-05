@@ -188,6 +188,9 @@ import {
   drainGatheringGrants,
   emptyGatheringProficiency,
   gatheringSkillsView,
+  gatherNodeById,
+  harvestNode as harvestNodeImpl,
+  isNodeHarvestableBy,
   normalizeGatheringProficiency,
 } from './professions/gathering';
 import {
@@ -225,10 +228,9 @@ import {
 } from './spirit';
 import { spawnVoiceNpcEcho } from './voice_npc_spawn';
 import {
-  emptyWorldBossDaily,
   rollWorldBossLoot as rollWorldBossLootImpl,
+  scaleWorldBossHp,
   WORLD_BOSSES,
-  type WorldBossDaily,
   type WorldBossDef,
 } from './world_boss';
 
@@ -731,6 +733,12 @@ export interface PlayerMeta {
   // Grants queued by the `/dev gather` cheat, drained once per player per tick
   // (see drainGatheringGrants). Session-only, never persisted.
   pendingGatherGrants: { professionId: GatheringProfessionId; amount: number }[];
+  // Per-player, per-node gather-node respawn readiness (#1121): nodeId ->
+  // sim.time (seconds) at or after which THIS player may harvest that node
+  // again. Absent means never harvested (always ready). Session-only, never
+  // persisted, and never shared across players: see
+  // src/sim/professions/gathering.ts (isNodeHarvestableBy/resolveHarvest).
+  nodeHarvestReadyAt: Record<string, number>;
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -796,10 +804,9 @@ export interface PlayerMeta {
   companionUpgrades: Record<string, number>;
   delveLoreUnlocked: Set<string>;
   delveDaily: { date: string; firstClearXp: Set<string>; markClears: number };
-  // World-boss daily loot record (persisted in CharacterState). Resets at the UTC
-  // day boundary; holds the boss ids already looted today so a player can take
-  // personal loot from each world boss only once per day. See world_boss.ts.
-  worldBossDaily: WorldBossDaily;
+  // World-boss loot lockouts live in `raidLockouts` (keyed worldboss:<mobId>), so the
+  // eligibility gate and the rendered raid-lockout countdown are one value. See
+  // world_boss.ts (markWorldBossLooted / isWorldBossLootEligible).
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -897,9 +904,11 @@ export interface CharacterState {
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
-  // World-boss daily loot record. Optional so saves from before world bosses load
-  // cleanly (addPlayer falls back to an empty record).
-  worldBossDaily?: { date: string; looted: string[] };
+  // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
+  // legacy per-day `worldBossDaily` field is intentionally dropped: pre-migration saves
+  // that still carry it just ignore it (a player locked at deploy may loot once more, a
+  // one-time, player-friendly transition), and their lockouts persist via raidLockouts
+  // from then on.
   // Flat per-craft skill tracking (#1126; JSONB, additive back-compat: absent or
   // partial on older saves loads the missing crafts as 0, see normalizeCraftSkills).
   craftSkills?: Record<string, number>;
@@ -1304,7 +1313,11 @@ export class Sim {
         const boss = this.entities.get(liveId);
         if (!boss) {
           this.worldBossEntityIds[i] = null;
-        } else if (boss.dead) {
+        } else if (!boss.dead) {
+          // Grow the HP pool with the raid size (retail-style, up to the cap).
+          scaleWorldBossHp(this.ctx, boss, def);
+        }
+        if (boss?.dead) {
           // Lootable corpse lingers WORLD_BOSS_CORPSE_SECONDS for contributors to
           // loot, then is removed; respawnTimer is Infinity (handleDeath) so the
           // normal in-place respawn never fires; only this scheduler respawns it.
@@ -1334,6 +1347,10 @@ export class Sim {
     const mob = createMob(this.nextId++, template, template.maxLevel, pos);
     mob.facing = 0;
     mob.prevFacing = 0;
+    // World bosses use participant HP scaling (see scaleWorldBossHp), so their pool
+    // starts at the def base rather than the template's level-formula HP.
+    mob.maxHp = def.hpScale.base;
+    mob.hp = def.hpScale.base;
     this.addEntity(mob);
     // Anchorless log (no pid, no entityId) => routeEvents broadcasts to every
     // connected player as a system notice. Localized by sim_i18n's worldBossSpawn
@@ -1412,6 +1429,7 @@ export class Sim {
       restedXp: 0,
       gatheringProficiency: emptyGatheringProficiency(),
       pendingGatherGrants: [],
+      nodeHarvestReadyAt: {},
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
@@ -1443,8 +1461,14 @@ export class Sim {
       companionUpgrades: {},
       delveLoreUnlocked: new Set(),
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
-      worldBossDaily: emptyWorldBossDaily(),
     };
+    // A fresh character sets out provisioned (class-defined starter rations);
+    // a saved character loads its own bags from savedState below.
+    if (!savedState) {
+      for (const it of classDef.startItems) {
+        meta.inventory.push({ itemId: it.itemId, count: it.count });
+      }
+    }
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
@@ -1536,12 +1560,9 @@ export class Sim {
           markClears: s.delveDaily.markClears,
         };
       }
-      if (s.worldBossDaily) {
-        meta.worldBossDaily = {
-          date: s.worldBossDaily.date,
-          looted: new Set(s.worldBossDaily.looted),
-        };
-      }
+      // Legacy s.worldBossDaily is intentionally not restored: world-boss lockouts now
+      // ride raidLockouts (loaded above), so a pre-migration save just drops its stale
+      // daily record.
     }
 
     // Resolve the flat talent struct once, before the stat pass + ability
@@ -1792,10 +1813,7 @@ export class Sim {
         markClears: meta.delveDaily.markClears,
       },
       mailWelcomed: meta.mailWelcomed,
-      worldBossDaily: {
-        date: meta.worldBossDaily.date,
-        looted: [...meta.worldBossDaily.looted],
-      },
+      // World-boss lockouts serialize via raidLockouts (above), not a separate field.
     };
     return sanitizeRemovedZone1Content(state).state;
   }
@@ -4167,7 +4185,7 @@ export class Sim {
     const playerPull = target.kind === 'player' || target.ownerId !== null;
     if (engageYell && playerPull && !mob.yelledEngage) {
       mob.yelledEngage = true;
-      emitMobYell(this.ctx, mob, engageYell);
+      emitMobYell(this.ctx, mob, engageYell, MOBS[mob.templateId]?.battleYells?.range);
     }
     if (social) {
       const family = MOBS[mob.templateId]?.family;
@@ -4466,7 +4484,8 @@ export class Sim {
       const thresholds = tmpl.summonAdds.atHpPct;
       while (mob.firedSummons < thresholds.length && hpFrac <= thresholds[mob.firedSummons]) {
         mob.firedSummons++;
-        if (tmpl.yells?.summon) emitMobYell(this.ctx, mob, tmpl.yells.summon);
+        if (tmpl.yells?.summon)
+          emitMobYell(this.ctx, mob, tmpl.yells.summon, tmpl.battleYells?.range);
         const run = this.delveRunForMob(mob.id);
         if (
           run &&
@@ -4484,7 +4503,8 @@ export class Sim {
     const enrageAllowed = !enrageRun || enrageRun.tierId === 'heroic';
     if (tmpl.enrage && enrageAllowed && !mob.enraged && hpFrac <= tmpl.enrage.belowHpPct) {
       mob.enraged = true;
-      if (tmpl.yells?.enrage) emitMobYell(this.ctx, mob, tmpl.yells.enrage);
+      if (tmpl.yells?.enrage)
+        emitMobYell(this.ctx, mob, tmpl.yells.enrage, tmpl.battleYells?.range);
       this.emit({ type: 'aura', targetId: mob.id, name: 'Enrage', gained: true });
       this.emit({
         type: 'log',
@@ -4715,16 +4735,35 @@ export class Sim {
     });
     const [topThreatId] = threatEntries(boss, 1)[0] ?? [];
     const victimId = boss.aggroTargetId ?? topThreatId ?? null;
-    const victim = victimId !== null ? this.entities.get(victimId) : null;
+    let victim = victimId !== null ? (this.entities.get(victimId) ?? null) : null;
+    if (!victim || victim.dead || victim.kind !== 'player') {
+      // Fallback so freshly-summoned adds always have a nearby enemy to charge even if
+      // the boss's own target just died or dropped: pick the closest live player.
+      let best: Entity | null = null;
+      let bestD = Infinity;
+      this.playerGrid.forEachInRadius(boss.pos.x, boss.pos.z, LEASH_DISTANCE, (pl, d2) => {
+        if (pl.kind === 'player' && !pl.dead && d2 < bestD) {
+          bestD = d2;
+          best = pl;
+        }
+      });
+      victim = best;
+    }
+    // World bosses erupt their adds from directly underneath them (centered, a tight
+    // 1yd cluster spread only enough to not stack on one point); ordinary summoners keep
+    // the wider 3.5yd ring beside the boss.
+    const spawnRadius = MOBS[boss.templateId]?.worldBoss ? 1 : 3.5;
     for (let k = 0; k < count; k++) {
       const ang = (k / count) * Math.PI * 2 + 0.7;
       const pos = this.groundPos(
-        boss.pos.x + Math.sin(ang) * 3.5,
-        boss.pos.z + Math.cos(ang) * 3.5,
+        boss.pos.x + Math.sin(ang) * spawnRadius,
+        boss.pos.z + Math.cos(ang) * spawnRadius,
       );
       const level = this.rng.int(template.minLevel, template.maxLevel);
       const add = createMob(this.nextId++, template, level, pos);
-      add.spawnPos = { ...boss.spawnPos }; // leashes with the boss; stays dead in instances
+      // Leash to the boss's ORIGINAL spawn (not his current, possibly-kited position):
+      // pulled too far from it, the add's chase-case leash check evades it home.
+      add.spawnPos = { ...boss.spawnPos };
       add.tappedById = boss.tappedById;
       this.addEntity(add);
       boss.summonedIds.push(add.id);
@@ -5024,6 +5063,29 @@ export class Sim {
     items.buyBackItem(this.ctx, itemId, pid);
   }
 
+  // Gather-node harvest (#1121): a thin delegate onto
+  // src/sim/professions/gathering.ts, resolved on the deterministic tick the
+  // command arrives on, same as buyItem/useItem above.
+  harvestNode(nodeId: string, pid?: number): void {
+    harvestNodeImpl(this.ctx, nodeId, pid);
+  }
+
+  // IWorld read surface (IWorldProfessions): whether the given node is
+  // harvestable right now BY THIS PLAYER specifically (per-player respawn
+  // timer, #1121). Never reflects another player's cooldown for the same node.
+  // Takes an explicit pid (mirrors gatheringProficiencyFor) so both the
+  // local-viewer getter below and tests can check any player's own timer.
+  nodeHarvestableByMeFor(nodeId: string, pid: number): boolean {
+    const meta = this.players.get(pid);
+    if (!meta) return false;
+    if (!gatherNodeById(nodeId)) return false;
+    return isNodeHarvestableBy(meta, nodeId, this.time);
+  }
+
+  nodeHarvestableByMe(nodeId: string): boolean {
+    return this.nodeHarvestableByMeFor(nodeId, this.primaryId);
+  }
+
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
     const def = ITEMS[itemId];
     if (!def?.slot) return;
@@ -5065,6 +5127,10 @@ export class Sim {
   // non-primary party member the same way lootCorpse does.
   autoLoot(mobId: number, pid?: number): void {
     interaction.autoLootForParty(this.ctx, mobId, pid ?? this.primaryId);
+  }
+
+  harvestCorpse(mobId: number, pid?: number): void {
+    interaction.harvestCorpse(this.ctx, mobId, pid);
   }
 
   pickUpObject(objId: number, pid?: number): void {
@@ -6497,6 +6563,17 @@ export class Sim {
 
   get craftSkills(): Record<string, number> {
     return this.craftSkillsFor(this.primaryId);
+  }
+
+  // Read-only gathering-profession proficiency surface for IWorld. Stubbed
+  // directly on IWorld pending issue #1164 (a broader professions facet); see
+  // that issue for the eventual reconciliation.
+  gatheringProficiencyFor(pid: number): Record<string, number> {
+    return { ...(this.players.get(pid)?.gatheringProficiency ?? emptyGatheringProficiency()) };
+  }
+
+  get gatheringProficiency(): Record<string, number> {
+    return this.gatheringProficiencyFor(this.primaryId);
   }
 
   delveShopOffers(delveId: string): DelveShopOffer[] {

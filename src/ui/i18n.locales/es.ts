@@ -1195,6 +1195,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Noticias y Actualizaciones',
   'news.desc': 'Lee las últimas notas del parche, eventos y noticias de la comunidad.',
   'download.title': 'Descargar Lanzador de Escritorio',
+  'download.macCta': 'Descargar para macOS',
+  'download.windowsPending': 'Compilacion para Windows pendiente.',
   'download.desc':
     'Consigue el lanzador independiente para un rendimiento optimizado y juego a pantalla completa.',
   'comingSoon.placeholder': 'Próximamente...',
@@ -3919,6 +3921,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Hoz de Recolección',
   'entities.items.bronze_sickle.name': 'Hoz de Bronce',
   'entities.items.silverleaf_sickle.name': 'Hoz de Hoja de Plata',
+  'entities.items.thorium_mining_pick.name': 'Pico de Minería de Torio',
+  'entities.items.arcanite_mining_pick.name': 'Pico de Minería de Arcanita',
+  'entities.items.ashwood_axe.name': 'Hacha de Fresno',
+  'entities.items.elderwood_axe.name': 'Hacha de Madera Añeja',
+  'entities.items.goldleaf_sickle.name': 'Hoz de Hoja Dorada',
+  'entities.items.sunpetal_sickle.name': 'Hoz de Pétalo Solar',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Añadir canal de chat',
   'hud.core.chatChannels.addTitle': 'Añadir canal',
@@ -5977,4 +5985,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Lo que hiciste en la oscuridad',
   'entities.letters.letter_q_hollow.body':
     'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
+  'hudChrome.gathering.herbalism': 'Herboristería',
+  'hudChrome.gathering.logging': 'Tala',
+  'hudChrome.gathering.mining': 'Minería',
+  'hudChrome.gathering.title': 'Recolección',
 };

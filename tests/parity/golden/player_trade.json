@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "04a31f2f",
+      "state": "86d6850b",
       "events": "6cbb98f1",
       "rng": {
         "draws": 0,
@@ -63,16 +63,20 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
               "count": 3,
               "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -99,16 +103,20 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 2,
+              "count": 7,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -216,7 +224,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "20c423b1",
+      "state": "f669b11a",
       "events": "27a26705",
       "rng": {
         "draws": 0,
@@ -249,20 +257,20 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
-              "itemId": "wolf_fang"
+              "count": 6,
+              "itemId": "baked_bread"
             },
             {
               "count": 1,
-              "itemId": "baked_bread"
+              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -289,8 +297,12 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
+              "count": 6,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             },
             {
               "count": 2,
@@ -298,11 +310,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -410,7 +422,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "20c423b1",
+      "state": "f669b11a",
       "events": "c00485a7",
       "rng": {
         "draws": 0,
@@ -443,20 +455,20 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
-              "itemId": "wolf_fang"
+              "count": 6,
+              "itemId": "baked_bread"
             },
             {
               "count": 1,
-              "itemId": "baked_bread"
+              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -483,8 +495,12 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
+              "count": 6,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             },
             {
               "count": 2,
@@ -492,11 +508,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -604,7 +620,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 402,
-      "state": "20c423b1",
+      "state": "f669b11a",
       "events": "a4365a6e",
       "rng": {
         "draws": 0,
@@ -637,20 +653,20 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
-              "itemId": "wolf_fang"
+              "count": 6,
+              "itemId": "baked_bread"
             },
             {
               "count": 1,
-              "itemId": "baked_bread"
+              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -677,8 +693,12 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
+              "count": 6,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             },
             {
               "count": 2,
@@ -686,11 +706,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -798,7 +818,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 402,
-      "state": "dfa8a618",
+      "state": "5095c99f",
       "events": "eb0174f4",
       "rng": {
         "draws": 0,
@@ -831,20 +851,20 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
-              "itemId": "wolf_fang"
+              "count": 6,
+              "itemId": "baked_bread"
             },
             {
               "count": 1,
-              "itemId": "baked_bread"
+              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -871,8 +891,12 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
+              "count": 6,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             },
             {
               "count": 2,
@@ -880,11 +904,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -992,7 +1016,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 402,
-      "state": "dfa8a618",
+      "state": "5095c99f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1025,20 +1049,20 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
-              "itemId": "wolf_fang"
+              "count": 6,
+              "itemId": "baked_bread"
             },
             {
               "count": 1,
-              "itemId": "baked_bread"
+              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1065,8 +1089,12 @@
           "gatheringProficiency": {},
           "inventory": [
             {
-              "count": 1,
+              "count": 6,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             },
             {
               "count": 2,
@@ -1074,11 +1102,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

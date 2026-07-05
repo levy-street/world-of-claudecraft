@@ -102,6 +102,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // Miring Pounce: the prowler drags its prey into the sucking mire, slowing
     // the victim's swings (+30% swing interval) for 8s.
     slowStrike: { chance: 0.3, mult: 1.3, duration: 8, name: 'Miring Pounce', school: 'physical' },
+    componentTags: ['hide', 'claw'],
   },
   deepfen_murloc: {
     id: 'deepfen_murloc',
@@ -143,6 +144,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       name: 'Tide Cadence',
       school: 'frost',
     },
+    componentTags: ['gills', 'hide'],
   },
   mirejaw_the_ravenous: {
     id: 'mirejaw_the_ravenous',
@@ -253,6 +255,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0x283747,
+    componentTags: ['venomSac', 'hide'],
   },
   mirefen_broodmother: {
     id: 'mirefen_broodmother',
@@ -339,6 +342,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.15,
     color: 0x229954,
+    componentTags: ['claw', 'tusk'],
   },
   grubjaw: {
     id: 'grubjaw',

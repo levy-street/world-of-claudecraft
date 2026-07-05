@@ -1215,6 +1215,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'news.desc':
     'Lisez les dernières notes de mise à jour, les événements et les nouvelles de la communauté.',
   'download.title': 'Télécharger le lanceur de bureau',
+  'download.macCta': 'Telecharger pour macOS',
+  'download.windowsPending': 'Build Windows en attente.',
   'download.desc':
     'Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.',
   'comingSoon.placeholder': 'Bientôt disponible...',
@@ -3947,6 +3949,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Faucille de Récolte',
   'entities.items.bronze_sickle.name': 'Faucille de Bronze',
   'entities.items.silverleaf_sickle.name': "Faucille Feuille d'Argent",
+  'entities.items.thorium_mining_pick.name': 'Pic de Minage au Thorium',
+  'entities.items.arcanite_mining_pick.name': 'Pic de Minage en Arcanite',
+  'entities.items.ashwood_axe.name': 'Hache en Bois de Frêne',
+  'entities.items.elderwood_axe.name': 'Hache en Bois Ancien',
+  'entities.items.goldleaf_sickle.name': "Faucille Feuille d'Or",
+  'entities.items.sunpetal_sickle.name': 'Faucille Pétale de Soleil',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Ajouter un canal de discussion',
   'hud.core.chatChannels.addTitle': 'Ajouter un canal',
@@ -6025,4 +6033,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Ce que vous avez accompli dans le noir',
   'entities.letters.letter_q_hollow.body':
     'Rares sont ceux qui sauront jamais ce qui était enterré dans ce creux, et plus rares encore ceux qui le croiraient. Moi, je le sais, et je ne l’oublierai pas.\n\nQue votre route reste éclairée.\n- Frère Aldric',
+  'hudChrome.gathering.herbalism': 'Herboristerie',
+  'hudChrome.gathering.logging': 'Bûcheronnage',
+  'hudChrome.gathering.mining': 'Minage',
+  'hudChrome.gathering.title': 'Récolte',
 };

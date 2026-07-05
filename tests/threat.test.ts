@@ -888,8 +888,9 @@ describe('hunter pets', () => {
     expect(sim.tick().some((e) => e.type === 'error' && /only eat food/.test(e.text))).toBe(true);
     expect(sim.countItem('minor_healing_potion')).toBe(1);
 
+    const breadBefore = sim.countItem('baked_bread');
     sim.feedPet('baked_bread');
-    expect(sim.countItem('baked_bread')).toBe(0);
+    expect(sim.countItem('baked_bread')).toBe(breadBefore - 1);
     expect(pet.auras.some((a) => a.id === 'feed_pet' && a.kind === 'hot')).toBe(true);
     const hpAfterFeed = pet.hp;
     for (let i = 0; i < 20 * 5; i++) sim.tick();
@@ -1595,10 +1596,11 @@ describe('warlock demon summons', () => {
     const demon = summonImp(sim);
     demon.hp = Math.max(1, demon.maxHp - 50);
     sim.addItem('baked_bread', 1);
+    const breadBefore = sim.countItem('baked_bread');
 
     sim.feedPet('baked_bread');
     expect(sim.tick().some((e) => e.type === 'error' && /Only hunters/.test(e.text))).toBe(true);
-    expect(sim.countItem('baked_bread')).toBe(1);
+    expect(sim.countItem('baked_bread')).toBe(breadBefore);
 
     const manaBefore = sim.player.resource;
     sim.healPet();

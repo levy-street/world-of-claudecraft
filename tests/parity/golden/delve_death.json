@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "e879a5f6",
+      "state": "30a13eeb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -46,12 +46,18 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -112,7 +118,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "5f428d19",
+      "state": "39324c88",
       "events": "23be8555",
       "rng": {
         "draws": 1,
@@ -143,13 +149,19 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -209,7 +221,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 410,
-      "state": "35af7534",
+      "state": "6ddfab5b",
       "events": "c2d0b576",
       "rng": {
         "draws": 1,
@@ -240,13 +252,19 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -307,7 +325,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 410,
-      "state": "35af7534",
+      "state": "6ddfab5b",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -338,13 +356,19 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

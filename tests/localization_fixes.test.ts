@@ -894,6 +894,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // the "<name> awakens!" summon log; the boss yells are variable-routed chat, not
     // scanned). Literals are byte-identical after the move so their matchers are unchanged.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/encounters/nythraxis.ts'), 'utf8'),
+    // #1121: per-player node harvest command denials (dead gate, unknown node,
+    // range, respawn timer, bag-full pre-check).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/gathering.ts'), 'utf8'),
     socialSrc,
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The

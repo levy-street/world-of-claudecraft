@@ -1140,6 +1140,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh.',
   'download.title': 'Unduh Peluncur Desktop',
+  'download.macCta': 'Unduh untuk macOS',
+  'download.windowsPending': 'Build Windows tertunda.',
   'entities.abilities.adrenaline_rush.description':
     'Darahmu mendidih, seketika memulihkan 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Darah Terpacu',
@@ -1823,6 +1825,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Sabit Panen',
   'entities.items.bronze_sickle.name': 'Sabit Perunggu',
   'entities.items.silverleaf_sickle.name': 'Sabit Daun Perak',
+  'entities.items.thorium_mining_pick.name': 'Beliung Tambang Thorium',
+  'entities.items.arcanite_mining_pick.name': 'Beliung Tambang Arcanite',
+  'entities.items.ashwood_axe.name': 'Kapak Kayu Abu',
+  'entities.items.elderwood_axe.name': 'Kapak Kayu Tua',
+  'entities.items.goldleaf_sickle.name': 'Sabit Daun Emas',
+  'entities.items.sunpetal_sickle.name': 'Sabit Kelopak Matahari',
   'entities.items.moongate_rubbing.name': 'Gosokan Penangkal',
   'entities.items.moonpale_scale.name': 'Sisik Pucat Bulan',
   'entities.items.moonscale_saber.name': 'Sabel Sisik Bulan',
@@ -5934,4 +5942,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Apa yang kaulakukan dalam gelap',
   'entities.letters.letter_q_hollow.body':
     'Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric',
+  'hudChrome.gathering.herbalism': 'Herbalisme',
+  'hudChrome.gathering.logging': 'Penebangan',
+  'hudChrome.gathering.mining': 'Penambangan',
+  'hudChrome.gathering.title': 'Pengumpulan',
 };

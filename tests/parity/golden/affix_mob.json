@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "d35a4a11",
+      "state": "74bced36",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,12 +47,18 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -111,7 +117,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 403,
-      "state": "df59d233",
+      "state": "38a0ccd2",
       "events": "81a55ed7",
       "rng": {
         "draws": 14,
@@ -122,7 +128,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 403,
-      "state": "2cf5e637",
+      "state": "5e411fd6",
       "events": "684ef1dc",
       "rng": {
         "draws": 28,
@@ -133,7 +139,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 403,
-      "state": "5c410834",
+      "state": "bcfc12b7",
       "events": "36a8ae1e",
       "rng": {
         "draws": 57,
@@ -167,13 +173,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 54100,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -369,7 +381,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 403,
-      "state": "2792461d",
+      "state": "bc2a3df4",
       "events": "741638a5",
       "rng": {
         "draws": 71,
@@ -403,13 +415,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 54100,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

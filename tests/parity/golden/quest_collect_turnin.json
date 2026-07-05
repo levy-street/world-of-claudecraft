@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "e9f653f8",
+      "state": "bfa7da0d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -46,12 +46,18 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -110,7 +116,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7cbf99fc",
+      "state": "5a75baf7",
       "events": "27c7a42a",
       "rng": {
         "draws": 0,
@@ -140,7 +146,14 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_boars",
@@ -156,8 +169,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -216,7 +228,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7779a07d",
+      "state": "f7f31690",
       "events": "01e3a6cf",
       "rng": {
         "draws": 0,
@@ -251,10 +263,15 @@
           "inventory": [
             {
               "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
               "itemId": "boar_hide"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_boars",
@@ -270,8 +287,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -330,7 +346,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "01dfd4e4",
+      "state": "b62cd4bf",
       "events": "f2ada81f",
       "rng": {
         "draws": 0,
@@ -364,11 +380,16 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
               "count": 4,
               "itemId": "boar_hide"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_boars",
@@ -384,8 +405,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -444,7 +464,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "c7e560d4",
+      "state": "3b8d7f63",
       "events": "c3882f07",
       "rng": {
         "draws": 0,
@@ -479,10 +499,15 @@
           "inventory": [
             {
               "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
               "itemId": "boar_hide"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_boars",
@@ -498,8 +523,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -558,7 +582,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "1289c23d",
+      "state": "34fe0840",
       "events": "1dce54bf",
       "rng": {
         "draws": 0,
@@ -593,8 +617,15 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 350,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_boars"
           ],
@@ -602,7 +633,6 @@
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 350
         }
       ],
@@ -662,7 +692,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 401,
-      "state": "77b11143",
+      "state": "898d84a6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -697,8 +727,15 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 350,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_boars"
           ],
@@ -706,7 +743,6 @@
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 350
         }
       ],

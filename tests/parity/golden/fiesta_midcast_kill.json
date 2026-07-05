@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 404,
-      "state": "88ff4a07",
+      "state": "43f78479",
       "events": "a1a98eff",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 404,
-      "state": "8b93d561",
+      "state": "f66a177b",
       "events": "6e60008d",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 404,
-      "state": "3f261b87",
+      "state": "325cfdf9",
       "events": "9b3dbf7d",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 404,
-      "state": "58f327f9",
+      "state": "f7f25b53",
       "events": "e324e10d",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "9cc5415a",
+      "state": "73b02664",
       "events": "eac8ab97",
       "rng": {
         "draws": 300,
@@ -114,7 +114,14 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -125,8 +132,7 @@
               "war_toughness": 3
             },
             "spec": "arms"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -157,7 +163,18 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -168,8 +185,7 @@
               "mag_wand_specialization": 2
             },
             "spec": "arcane"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -202,7 +218,14 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -213,8 +236,7 @@
               "rog_malice": 3
             },
             "spec": "assassination"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -245,7 +267,18 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -256,8 +289,7 @@
               "hun_lethal_shots": 3
             },
             "spec": "beast_mastery"
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -466,7 +498,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "c8aeba56",
+      "state": "0f035ad6",
       "events": "abc18e50",
       "rng": {
         "draws": 300,
@@ -505,7 +537,14 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -516,8 +555,7 @@
               "war_toughness": 3
             },
             "spec": "arms"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -548,7 +586,18 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -559,8 +608,7 @@
               "mag_wand_specialization": 2
             },
             "spec": "arcane"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -593,7 +641,14 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -604,8 +659,7 @@
               "rog_malice": 3
             },
             "spec": "assassination"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -636,7 +690,18 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -647,8 +712,7 @@
               "hun_lethal_shots": 3
             },
             "spec": "beast_mastery"
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -855,7 +919,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 404,
-      "state": "173298dc",
+      "state": "51a44bb2",
       "events": "d24eb35d",
       "rng": {
         "draws": 300,
@@ -895,7 +959,14 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -906,8 +977,7 @@
               "war_toughness": 3
             },
             "spec": "arms"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -938,7 +1008,18 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -949,8 +1030,7 @@
               "mag_wand_specialization": 2
             },
             "spec": "arcane"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -984,7 +1064,14 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -995,8 +1082,7 @@
               "rog_malice": 3
             },
             "spec": "assassination"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1027,7 +1113,18 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -1038,8 +1135,7 @@
               "hun_lethal_shots": 3
             },
             "spec": "beast_mastery"
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -1246,7 +1342,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 404,
-      "state": "951d8d2a",
+      "state": "f95b8948",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1257,7 +1353,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 404,
-      "state": "dc0ef102",
+      "state": "50b95d20",
       "events": "741638a5",
       "rng": {
         "draws": 523,
@@ -1297,7 +1393,14 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -1308,8 +1411,7 @@
               "war_toughness": 3
             },
             "spec": "arms"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1340,7 +1442,18 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -1351,8 +1464,7 @@
               "mag_wand_specialization": 2
             },
             "spec": "arcane"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1386,7 +1498,14 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -1397,8 +1516,7 @@
               "rog_malice": 3
             },
             "spec": "assassination"
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1429,7 +1547,18 @@
             }
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {
@@ -1440,8 +1569,7 @@
               "hun_lethal_shots": 3
             },
             "spec": "beast_mastery"
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

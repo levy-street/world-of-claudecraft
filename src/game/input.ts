@@ -522,7 +522,7 @@ export class Input {
 
   setControllerMoveInput(input: unknown, facing?: unknown): void {
     this.controllerMoveInput = sanitizeMoveInput(input);
-    if (arguments.length > 1) this.controllerFacing = sanitizeMoveFacing(facing);
+    if (facing !== undefined) this.controllerFacing = sanitizeMoveFacing(facing);
   }
 
   setControllerFacing(facing: unknown): void {

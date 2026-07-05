@@ -809,8 +809,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     // atomic swap moved goods + coin both directions.
     expect(sim.countItem('wolf_fang', a)).toBe(1); // 3 - 2
     expect(sim.countItem('wolf_fang', b)).toBe(2);
-    expect(sim.countItem('baked_bread', a)).toBe(1);
-    expect(sim.countItem('baked_bread', b)).toBe(1); // 2 - 1
+    expect(sim.countItem('baked_bread', a)).toBe(6); // 5 starter + 1 traded
+    expect(sim.countItem('baked_bread', b)).toBe(6); // 5 starter + 2 - 1
     expect(sim.players.get(a)?.copper).toBe(80); // 100 - 30 + 10
     expect(sim.players.get(b)?.copper).toBe(70); // 50 - 10 + 30
     // every session ended cleared (swap close + explicit cancel + drift sweep).

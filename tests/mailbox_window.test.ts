@@ -43,7 +43,7 @@ describe('mailbox_window: mail outcomes repaint the inventory cluster', () => {
 
 describe('mailbox_window: house style', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
-    expect(painter.includes('—'), 'em dash found').toBe(false);
-    expect(painter.includes('–'), 'en dash found').toBe(false);
+    expect(painter.includes('\u2014'), 'em dash found').toBe(false);
+    expect(painter.includes('\u2013'), 'en dash found').toBe(false);
   });
 });

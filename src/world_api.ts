@@ -9,7 +9,7 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 23 domain facets (each IWorld member assigned exactly once; 159
+// FACET MAP: the 22 domain facets (each IWorld member assigned exactly once; 169
 // total). One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
@@ -35,14 +35,15 @@
 //   delves.ts           IWorldDelves         delve runs, lockpick, companion
 //   daily_rewards.ts    IWorldDailyRewards   daily WOC-holder rewards
 //   telemetry.ts        IWorldTelemetry      fire-and-forget metrics sink
-//   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (stub, #1164)
+//   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (#1164; node
+//                                            harvest read + action landed in #1121)
 //
 // THREE GATES pin this seam (run before any facet edit):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
 //                                          ALL_DELTA_KEYS (25) + TERSE_TO_IWORLD mapping.
 //   tests/command_schema.test.ts   (W0b)  COMMAND_NAMES universe; ClientWorld send-set
 //                                          subset-of dispatch-set; DISPATCH_ONLY (7).
-//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (159) present + same-kind on
+//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (169) present + same-kind on
 //                                          Sim + ClientWorld; aggregate == disjoint
 //                                          union of the 22 facets.
 // ---------------------------------------------------------------------------
@@ -191,6 +192,7 @@ export const COMMAND_NAMES = [
   'stopattack',
   'interact',
   'loot',
+  'harvestCorpse',
   'lootRoll',
   'pickup',
   'accept',
@@ -205,6 +207,7 @@ export const COMMAND_NAMES = [
   'sell',
   'buyback',
   'sell_all_junk',
+  'harvest_node',
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',

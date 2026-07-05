@@ -90,6 +90,31 @@ CREATE INDEX IF NOT EXISTS characters_lifetime_xp
 CREATE INDEX IF NOT EXISTS characters_lifetime_xp_global
   ON characters (${LIFETIME_XP_EXPR} DESC);
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE;
+-- Fine-grained admin roles. admin_roles is the single SOURCE OF TRUTH for what
+-- an operator may do (staff_db.ts effectiveAdminRoles derives nothing from
+-- is_admin); is_admin stays only the "is staff" flag every existing call-site
+-- reads AND the kill switch: is_admin FALSE means not staff whatever admin_roles
+-- says, so a manual "SET is_admin = FALSE" always revokes. Every role write
+-- keeps is_admin in sync (is_admin = roles non-empty). Derivation flows one way
+-- only: roles -> is_admin, never back.
+--
+-- The column is nullable ON PURPOSE, three-valued: NULL = "roles never defined"
+-- (a pre-permission legacy account, or a brand-new non-staff row), '{}' = an
+-- EXPLICIT empty set (fully revoked). The one-time backfill below keys on NULL,
+-- so it migrates a genuine legacy admin exactly once and then no-ops forever; a
+-- manual half-revoke ("SET admin_roles = '{}'" without touching is_admin) writes
+-- '{}', not NULL, so it can never be resurrected to a role. Legacy admins are
+-- migrated to the admin role (the full toolset MINUS staff.manage), not
+-- superadmin:
+-- staff-role management requires a deliberate superadmin grant via
+-- scripts/grant_admin.mjs. The DROP NOT NULL reconciles any pre-release column
+-- that was created with the earlier "NOT NULL DEFAULT '{}'" shape.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS admin_roles TEXT[];
+ALTER TABLE accounts ALTER COLUMN admin_roles DROP NOT NULL;
+UPDATE accounts SET admin_roles = '{admin}' WHERE is_admin AND admin_roles IS NULL;
+-- Staff-page lookup: accounts is the largest table, so give the rare staff
+-- rows a small partial index.
+CREATE INDEX IF NOT EXISTS accounts_staff ON accounts(username) WHERE is_admin;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS suspended_until TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS banned_at TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS moderation_reason TEXT;
@@ -295,11 +320,44 @@ CREATE TABLE IF NOT EXISTS blocked_ip_actions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS blocked_ip_actions_ip ON blocked_ip_actions(ip, created_at DESC);
+-- Audit trail for staff role changes (dashboard staff page; the grant script
+-- writes here too, with admin_account_id NULL).
+CREATE TABLE IF NOT EXISTS admin_role_changes (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  admin_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  roles_before TEXT[] NOT NULL,
+  roles_after TEXT[] NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Serves the global history view (ORDER BY created_at DESC, id DESC LIMIT n).
+CREATE INDEX IF NOT EXISTS admin_role_changes_created ON admin_role_changes(created_at DESC, id DESC);
 CREATE TABLE IF NOT EXISTS world_state (
   key TEXT PRIMARY KEY,
   data JSONB NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Bot-detector runtime config overrides (the admin Bot Detector > Configuration
+-- panel): one JSONB document per realm ({ [fieldId]: value }, validated by the
+-- detector). Applied live on save and re-applied at boot right after the
+-- detector is constructed.
+CREATE TABLE IF NOT EXISTS bot_detector_config (
+  realm TEXT PRIMARY KEY DEFAULT '${REALM_SQL_DEFAULT}',
+  data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_by INT REFERENCES accounts(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS bot_detector_config_changes (
+  id BIGSERIAL PRIMARY KEY,
+  realm TEXT NOT NULL,
+  admin_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  before_data JSONB NOT NULL,
+  after_data JSONB NOT NULL,
+  note TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS bot_detector_config_changes_realm
+  ON bot_detector_config_changes(realm, created_at DESC, id DESC);
 -- Chat moderation: per-account timed mute + running strike count for the
 -- hard-word (slur) enforcement ladder. A mute blocks chat only, never login.
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_muted_until TIMESTAMPTZ;

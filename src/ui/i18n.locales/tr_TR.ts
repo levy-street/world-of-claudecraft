@@ -1127,6 +1127,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'download.desc':
     'Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.',
   'download.title': 'Masaüstü Başlatıcısını İndir',
+  'download.macCta': 'macOS için indir',
+  'download.windowsPending': 'Windows derlemesi beklemede.',
   'entities.abilities.adrenaline_rush.description':
     'Kanın kaynar, anında 60 enerji geri kazandırır.',
   'entities.abilities.adrenaline_rush.name': 'Hızlanan Kan',
@@ -1789,6 +1791,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Toplama Orağı',
   'entities.items.bronze_sickle.name': 'Bronz Orak',
   'entities.items.silverleaf_sickle.name': 'Gümüşyaprak Orağı',
+  'entities.items.thorium_mining_pick.name': 'Toryum Maden Kazması',
+  'entities.items.arcanite_mining_pick.name': 'Arkanit Maden Kazması',
+  'entities.items.ashwood_axe.name': 'Dişbudak Baltası',
+  'entities.items.elderwood_axe.name': 'Kadim Ağaç Baltası',
+  'entities.items.goldleaf_sickle.name': 'Altınyaprak Orağı',
+  'entities.items.sunpetal_sickle.name': 'Güneşyaprağı Orağı',
   'entities.items.moongate_rubbing.name': 'Koruyucu İz Baskısı',
   'entities.items.moonpale_scale.name': 'Ay Solgunu Pul',
   'entities.items.moonscale_saber.name': 'Aypulu Pala',
@@ -5852,4 +5860,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Karanlıkta yaptıkların',
   'entities.letters.letter_q_hollow.body':
     'O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric',
+  'hudChrome.gathering.herbalism': 'Bitkicilik',
+  'hudChrome.gathering.logging': 'Ağaç kesme',
+  'hudChrome.gathering.mining': 'Madencilik',
+  'hudChrome.gathering.title': 'Toplama',
 };

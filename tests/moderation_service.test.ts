@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  canAttemptModerationCommands,
   type ModerationAudit,
   type ModerationHost,
   ModerationService,
@@ -8,11 +9,12 @@ import {
 
 type Session = ModerationSession;
 
-const admin = (pid: number, accountId: number): Session => ({
+const admin = (pid: number, accountId: number, permissions?: readonly string[]): Session => ({
   pid,
   accountId,
   characterId: accountId + 500,
   isAdmin: true,
+  adminPermissions: new Set(permissions ?? ['moderation.act', 'moderation.spectate']),
   name: `Admin${pid}`,
 });
 const player = (pid: number, accountId: number): Session => ({
@@ -20,6 +22,7 @@ const player = (pid: number, accountId: number): Session => ({
   accountId,
   characterId: accountId + 500,
   isAdmin: false,
+  adminPermissions: new Set(),
   name: `Player${pid}`,
 });
 
@@ -221,6 +224,50 @@ describe('ModerationService', () => {
     expect(context.ban).not.toHaveBeenCalled();
     expect(context.notices).toEqual([]);
     expect(context.systemNotices).toEqual([]);
+  });
+
+  it('refuses commands outside the actor permission set, per command', () => {
+    const actorActOnly = admin(1, 11, ['moderation.act']);
+    const actorSpectateOnly = admin(2, 22, ['moderation.spectate']);
+    const target = player(3, 33);
+    const actContext = setup({ actor: actorActOnly, sessions: [target] });
+    const spectateContext = setup({ actor: actorSpectateOnly, sessions: [target] });
+
+    expect(actContext.service.handleChatCommand(actorActOnly, '/spectate Player3')).toBe(true);
+    expect(actContext.spectated).toEqual([]);
+    expect(actContext.notices.map((notice) => notice.text)).toEqual([
+      "You don't have permission to do that.",
+    ]);
+    expect(actContext.service.handleChatCommand(actorActOnly, '/kick "Player3" griefing')).toBe(
+      true,
+    );
+    expect(actContext.recordAction).toHaveBeenCalledTimes(1);
+
+    expect(
+      spectateContext.service.handleChatCommand(actorSpectateOnly, '/ban "Player3" cheating'),
+    ).toBe(true);
+    expect(spectateContext.ban).not.toHaveBeenCalled();
+    expect(spectateContext.notices.map((notice) => notice.text)).toEqual([
+      "You don't have permission to do that.",
+    ]);
+    expect(spectateContext.service.handleChatCommand(actorSpectateOnly, '/spectate Player3')).toBe(
+      true,
+    );
+    expect(spectateContext.spectated).toEqual([{ moderator: actorSpectateOnly, target }]);
+
+    // /unspectate follows the spectate permission, not moderation.act.
+    expect(spectateContext.service.handleChatCommand(actorSpectateOnly, '/unspectate')).toBe(true);
+    expect(spectateContext.unspectated).toEqual([actorSpectateOnly]);
+    expect(actContext.service.handleChatCommand(actorActOnly, '/unspectate')).toBe(true);
+    expect(actContext.unspectated).toEqual([]);
+  });
+
+  it('gates the dispatch attempt on the moderation permissions', () => {
+    expect(canAttemptModerationCommands(admin(1, 11))).toBe(true);
+    expect(canAttemptModerationCommands(admin(1, 11, ['moderation.act']))).toBe(true);
+    expect(canAttemptModerationCommands(admin(1, 11, ['moderation.spectate']))).toBe(true);
+    expect(canAttemptModerationCommands(admin(1, 11, ['botdetector.read']))).toBe(false);
+    expect(canAttemptModerationCommands(player(1, 11))).toBe(false);
   });
 
   it('starts, switches, and stops spectating without an audit write', () => {

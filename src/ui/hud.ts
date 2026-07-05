@@ -96,6 +96,7 @@ import {
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
+import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
   type DailyRewardStatus,
   type DelveRunInfo,
@@ -443,10 +444,15 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
   dead: false,
   outOfRange: false,
 };
-const trackMetaPixel = (eventName: string, data?: Record<string, unknown>): void => {
+const trackMetaPixel = (
+  eventName: string,
+  data?: Record<string, unknown>,
+  options?: Record<string, unknown>,
+): void => {
   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
   if (typeof fbq !== 'function') return;
-  fbq('trackCustom', eventName, data ?? {});
+  if (options) fbq('trackCustom', eventName, data ?? {}, options);
+  else fbq('trackCustom', eventName, data ?? {});
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
@@ -672,6 +678,9 @@ function mobVoiceFamily(templateId: string): string | null {
 
 /** Sustained cast-loop clip for an ability's school, or null (physical/unknown). */
 function castKeyForAbility(ability: string): string | null {
+  // Per-ability custom cast loop overrides (a player-provided clip that fits the
+  // spell better than its school default). Loops for the whole cast, any rank.
+  if (ability === 'lightning_bolt') return 'cast_lightning_bolt';
   const school = ABILITIES[ability]?.school;
   return school && SFX_CAST_SCHOOLS.has(school) ? `cast_${school}` : null;
 }
@@ -5773,7 +5782,16 @@ export class Hud {
     const i18n: RaidLockoutI18n = {
       title: t('hudChrome.raidLockout.title'),
       allReady: t('hudChrome.raidLockout.allReady'),
-      raidName: (id) => dungeonDisplayName(id),
+      // A looted world boss shows in the raid-lockout timer under a world-boss lockout id
+      // (see markWorldBossLooted in src/sim/world_boss.ts). worldBossIdFromLockout keeps
+      // the prefix convention in one place: it returns the boss mob id (localize as a mob
+      // name) or null for an ordinary dungeon/raid id.
+      raidName: (id) => {
+        const bossId = worldBossIdFromLockout(id);
+        return bossId !== null
+          ? tEntity({ kind: 'mob', id: bossId, field: 'name' })
+          : dungeonDisplayName(id);
+      },
       duration: (ms) => this.formatLockoutDuration(ms),
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);
@@ -7268,7 +7286,14 @@ export class Hud {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
-          if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });
+          if (ev.level === 5) {
+            const characterId = (this.sim as unknown as { characterId?: number }).characterId;
+            trackMetaPixel(
+              'ReachedLevel5',
+              { level: ev.level },
+              characterId ? { eventID: `lvl5_${characterId}` } : undefined,
+            );
+          }
           // First talent point (and spec) unlock — nudge the player to the panel.
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
             this.showBanner(t('game.talents.unlockBanner'));

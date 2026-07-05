@@ -171,6 +171,12 @@ export interface AuraSlotState {
   iconKey: string;
   /** Whether this aura reads as a debuff (drives the `debuff` class, not a color). */
   isDebuff: boolean;
+  /** The debuff's magic school ('' for a buff), driving the WoW-style per-school
+   *  border tint (data-school on the node; the stylesheet maps it to a token).
+   *  PARITY: the wire sends `school` sparsely (server/game.ts omits 'physical');
+   *  the decode default and this fallback are both 'physical', so a debuff tints
+   *  identically under a Sim-shaped and a ClientWorld-mirror aura. */
+  school: string;
   /** The remaining-duration label, or '' when effectively permanent. */
   durationText: string;
   /** The stack-count label, or '' when the aura does not stack past 1. */
@@ -223,6 +229,7 @@ function makeSlotState(): AuraSlotState {
     key: '',
     iconKey: '',
     isDebuff: false,
+    school: '',
     durationText: '',
     stacksText: '',
     name: '',
@@ -259,6 +266,7 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
         slot.key = a.id;
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
+        slot.school = debuff ? (a.school ?? 'physical') : '';
         slot.durationText =
           TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)
             ? ''

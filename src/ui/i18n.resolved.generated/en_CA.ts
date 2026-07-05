@@ -1197,6 +1197,12 @@ export const en_CA: EnTranslations = {
     "social": {
       "lastSeen": "Last seen: {when}",
       "lastSeenNever": "never"
+    },
+    "gathering": {
+      "title": "Gathering",
+      "mining": "Mining",
+      "logging": "Logging",
+      "herbalism": "Herbalism"
     }
   },
   "guide": {
@@ -2535,7 +2541,9 @@ export const en_CA: EnTranslations = {
   },
   "download": {
     "title": "Download Desktop Launcher",
-    "desc": "Get the standalone launcher for optimized performance and full-screen play."
+    "desc": "Get the standalone launcher for optimized performance and full-screen play.",
+    "macCta": "Download for macOS",
+    "windowsPending": "Windows build pending."
   },
   "comingSoon": {
     "placeholder": "Coming Soon...",
@@ -5682,6 +5690,24 @@ export const en_CA: EnTranslations = {
       },
       "silverleaf_sickle": {
         "name": "Silverleaf Sickle"
+      },
+      "thorium_mining_pick": {
+        "name": "Thorium Mining Pick"
+      },
+      "arcanite_mining_pick": {
+        "name": "Arcanite Mining Pick"
+      },
+      "ashwood_axe": {
+        "name": "Ashwood Axe"
+      },
+      "elderwood_axe": {
+        "name": "Elderwood Axe"
+      },
+      "goldleaf_sickle": {
+        "name": "Goldleaf Sickle"
+      },
+      "sunpetal_sickle": {
+        "name": "Sunpetal Sickle"
       },
       "bristleback_maul": {
         "name": "Gallowglass Hammer"

@@ -544,6 +544,61 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 25,
     buyValue: 150,
   },
+  // Crafted base tools, tier 4 and 5 (#1135). Same shape and gating as the
+  // vendor tools above (infinite-durability, `use.tier` gates node AND
+  // monster-material tier access via src/sim/professions/tools.ts), but these
+  // are produced by a profession, never sold by any vendor: no `buyValue` and
+  // deliberately absent from every NPC `vendorItems` list. `quality` (rarity)
+  // is independent of `use.tier` and never affects gating: only the tool's
+  // `use.tier` value is read by the gate.
+  thorium_mining_pick: {
+    id: 'thorium_mining_pick',
+    name: 'Thorium Mining Pick',
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'gatherTool', professionId: 'mining', tier: 4 },
+    sellValue: 60,
+  },
+  arcanite_mining_pick: {
+    id: 'arcanite_mining_pick',
+    name: 'Arcanite Mining Pick',
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'gatherTool', professionId: 'mining', tier: 5 },
+    sellValue: 150,
+  },
+  ashwood_axe: {
+    id: 'ashwood_axe',
+    name: 'Ashwood Axe',
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'gatherTool', professionId: 'logging', tier: 4 },
+    sellValue: 60,
+  },
+  elderwood_axe: {
+    id: 'elderwood_axe',
+    name: 'Elderwood Axe',
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'gatherTool', professionId: 'logging', tier: 5 },
+    sellValue: 150,
+  },
+  goldleaf_sickle: {
+    id: 'goldleaf_sickle',
+    name: 'Goldleaf Sickle',
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'gatherTool', professionId: 'herbalism', tier: 4 },
+    sellValue: 60,
+  },
+  sunpetal_sickle: {
+    id: 'sunpetal_sickle',
+    name: 'Sunpetal Sickle',
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'gatherTool', professionId: 'herbalism', tier: 5 },
+    sellValue: 150,
+  },
   // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
   // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.
   event_skin_token: {

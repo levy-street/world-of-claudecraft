@@ -57,6 +57,7 @@ import {
   type FoliagePerfStats,
   type FoliageView,
 } from './foliage';
+import { buildGatherNodes } from './gather_nodes';
 import {
   GFX,
   type GfxBucketBands,
@@ -78,6 +79,7 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
+import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
@@ -1256,6 +1258,12 @@ export class Renderer {
       setRenderCategory(this.placedAssetsView.group, 'props');
       this.scene.add(this.placedAssetsView.group);
     }
+
+    const gatherNodes = buildGatherNodes(this.sim.cfg.seed);
+    setRenderCategory(gatherNodes.group, 'props');
+    this.scene.add(gatherNodes.group);
+    // Baked into world space at build with no per-frame update(), same as props.
+    freezeStaticMatrices(gatherNodes.group);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -2818,6 +2826,7 @@ export class Renderer {
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
+        else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
         // A mob that hurls an instant bolt with NO windup (the warlock
@@ -5181,6 +5190,7 @@ export class Renderer {
     );
     this.raycaster.setFromCamera(ndc, this.camera);
     const hits = this.raycaster.intersectObjects(this.clickTargets, true);
+    const directHitIds: number[] = [];
     for (const hit of hits) {
       let o: THREE.Object3D | null = hit.object;
       while (o) {
@@ -5192,16 +5202,22 @@ export class Renderer {
           const hitView = this.views.get(id);
           if (hitView && !hitView.group.visible) break;
           const e = this.sim.entities.get(id);
-          if (e?.kind === 'object' && !e.lootable) return null;
           // The graveyard angel is hidden from the living, so it must not be
           // click-pickable either (the capsule proxy ignores `visible`): skip it
           // unless the local player is a released spirit.
           if (e?.templateId === 'spirit_healer' && !this.sim.player?.ghost) break;
-          return id;
+          directHitIds.push(id);
+          break;
         }
         o = o.parent;
       }
     }
+    const directPick = resolveDirectPickEntityId(
+      directHitIds,
+      this.sim.entities,
+      this.sim.player.targetId,
+    );
+    if (directHitIds.length > 0) return directPick;
     // Forgiving assist: nothing under the ray, so snap to the nearest
     // targetable character within a small screen radius — chibi proportions
     // and melee scrums (often hidden behind the player's own model) make

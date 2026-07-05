@@ -536,6 +536,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Новости и обновления',
   'news.desc': 'Читайте описание последних обновлений, информацию о событиях и новости сообщества.',
   'download.title': 'Скачать загрузчик для ПК',
+  'download.macCta': 'Скачать для macOS',
+  'download.windowsPending': 'Сборка для Windows готовится.',
   'download.desc':
     'Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.',
   'comingSoon.placeholder': 'Скоро...',
@@ -3307,6 +3309,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Серп для сбора',
   'entities.items.bronze_sickle.name': 'Бронзовый серп',
   'entities.items.silverleaf_sickle.name': 'Серебролистный серп',
+  'entities.items.thorium_mining_pick.name': 'Ториевая кирка',
+  'entities.items.arcanite_mining_pick.name': 'Арканитовая кирка',
+  'entities.items.ashwood_axe.name': 'Ясеневый топор',
+  'entities.items.elderwood_axe.name': 'Топор из древнего дерева',
+  'entities.items.goldleaf_sickle.name': 'Золотолистный серп',
+  'entities.items.sunpetal_sickle.name': 'Солнцелепестковый серп',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
@@ -5913,4 +5921,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.moongateCommunion.title': 'Единение у лунных врат',
   'hudChrome.calendar.events.moongateCommunion.note':
     'Паломники собираются у лунных врат храма под срединной луной.',
+  'hudChrome.gathering.title': 'Собирательство',
+  'hudChrome.gathering.mining': 'Горное дело',
+  'hudChrome.gathering.logging': 'Лесозаготовка',
+  'hudChrome.gathering.herbalism': 'Травничество',
 };

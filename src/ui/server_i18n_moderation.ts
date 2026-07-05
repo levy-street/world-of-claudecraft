@@ -3,6 +3,7 @@ type Messages = Record<string, string>;
 const en: Messages = {
   'moderation.quotedNameRequired': 'Enclose the character name in double quotes.',
   'moderation.invalidTarget': "You can't moderate that player.",
+  'moderation.noPermission': "You don't have permission to do that.",
   'moderation.kicked': 'Kicked {name}.',
   'moderation.killConfirm': 'Killed {name}.',
   'moderation.renameConfirm': 'Required {name} to rename.',
@@ -24,6 +25,7 @@ const en: Messages = {
 const es: Messages = {
   'moderation.quotedNameRequired': 'Escribe el nombre del personaje entre comillas dobles.',
   'moderation.invalidTarget': 'No puedes moderar a ese jugador.',
+  'moderation.noPermission': 'No tienes permiso para hacer eso.',
   'moderation.kicked': 'Has expulsado a {name}.',
   'moderation.killConfirm': 'Has matado a {name}.',
   'moderation.renameConfirm': 'Has obligado a {name} a renombrarse.',
@@ -45,6 +47,7 @@ const es: Messages = {
 const fr: Messages = {
   'moderation.quotedNameRequired': 'Entourez le nom du personnage de guillemets doubles.',
   'moderation.invalidTarget': 'Vous ne pouvez pas modérer ce joueur.',
+  'moderation.noPermission': "Vous n'avez pas la permission de faire cela.",
   'moderation.kicked': '{name} a été expulsé.',
   'moderation.killConfirm': '{name} a été tué.',
   'moderation.renameConfirm': '{name} doit se renommer.',
@@ -67,6 +70,7 @@ const fr: Messages = {
 const it: Messages = {
   'moderation.quotedNameRequired': 'Racchiudi il nome del personaggio tra virgolette doppie.',
   'moderation.invalidTarget': 'Non puoi moderare quel giocatore.',
+  'moderation.noPermission': 'Non hai il permesso di farlo.',
   'moderation.kicked': '{name} è stato espulso.',
   'moderation.killConfirm': '{name} è stato ucciso.',
   'moderation.renameConfirm': '{name} deve rinominarsi.',
@@ -89,6 +93,7 @@ const it: Messages = {
 const de: Messages = {
   'moderation.quotedNameRequired': 'Setzt den Charakternamen in doppelte Anführungszeichen.',
   'moderation.invalidTarget': 'Diesen Spieler könnt ihr nicht moderieren.',
+  'moderation.noPermission': 'Dazu habt ihr keine Berechtigung.',
   'moderation.kicked': '{name} wurde entfernt.',
   'moderation.killConfirm': '{name} wurde getötet.',
   'moderation.renameConfirm': '{name} muss sich umbenennen.',
@@ -111,6 +116,7 @@ const de: Messages = {
 const zhCN: Messages = {
   'moderation.quotedNameRequired': '请用双引号括住角色名称。',
   'moderation.invalidTarget': '你不能管理该玩家。',
+  'moderation.noPermission': '你没有权限执行该操作。',
   'moderation.kicked': '已踢出 {name}。',
   'moderation.killConfirm': '已击杀 {name}。',
   'moderation.renameConfirm': '已要求 {name} 改名。',
@@ -132,6 +138,7 @@ const zhCN: Messages = {
 const zhTW: Messages = {
   'moderation.quotedNameRequired': '請用雙引號括住角色名稱。',
   'moderation.invalidTarget': '你不能管理該玩家。',
+  'moderation.noPermission': '你沒有權限執行該操作。',
   'moderation.kicked': '已踢出 {name}。',
   'moderation.killConfirm': '已擊殺 {name}。',
   'moderation.renameConfirm': '已要求 {name} 改名。',
@@ -153,6 +160,7 @@ const zhTW: Messages = {
 const ko: Messages = {
   'moderation.quotedNameRequired': '캐릭터 이름을 큰따옴표로 묶으십시오.',
   'moderation.invalidTarget': '해당 플레이어를 관리할 수 없습니다.',
+  'moderation.noPermission': '그렇게 할 권한이 없습니다.',
   'moderation.kicked': '{name}님을 추방했습니다.',
   'moderation.killConfirm': '{name}님을 처치했습니다.',
   'moderation.renameConfirm': '{name}님에게 이름 변경을 요구했습니다.',
@@ -174,6 +182,7 @@ const ko: Messages = {
 const ja: Messages = {
   'moderation.quotedNameRequired': 'キャラクター名を二重引用符で囲んでください。',
   'moderation.invalidTarget': 'そのプレイヤーをモデレートできません。',
+  'moderation.noPermission': 'それを行う権限がありません。',
   'moderation.kicked': '{name} をキックしました。',
   'moderation.killConfirm': '{name} を倒しました。',
   'moderation.renameConfirm': '{name} に改名を要求しました。',
@@ -195,6 +204,7 @@ const ja: Messages = {
 const pt: Messages = {
   'moderation.quotedNameRequired': 'Coloque o nome do personagem entre aspas duplas.',
   'moderation.invalidTarget': 'Você não pode moderar esse jogador.',
+  'moderation.noPermission': 'Você não tem permissão para fazer isso.',
   'moderation.kicked': '{name} foi expulso.',
   'moderation.killConfirm': '{name} foi morto.',
   'moderation.renameConfirm': '{name} deve renomear-se.',
@@ -217,6 +227,7 @@ const pt: Messages = {
 const ru: Messages = {
   'moderation.quotedNameRequired': 'Заключите имя персонажа в двойные кавычки.',
   'moderation.invalidTarget': 'Вы не можете модерировать этого игрока.',
+  'moderation.noPermission': 'У вас нет прав на это действие.',
   'moderation.kicked': '{name} исключён.',
   'moderation.killConfirm': '{name} убит.',
   'moderation.renameConfirm': '{name} должен сменить имя.',
@@ -238,6 +249,7 @@ const ru: Messages = {
 const da: Messages = {
   'moderation.quotedNameRequired': 'Sæt figurens navn i dobbelte anførselstegn.',
   'moderation.invalidTarget': 'Du kan ikke moderere denne spiller.',
+  'moderation.noPermission': 'Du har ikke tilladelse til at gøre det.',
   'moderation.kicked': '{name} blev smidt ud.',
   'moderation.killConfirm': '{name} blev dræbt.',
   'moderation.renameConfirm': '{name} skal skifte navn.',
@@ -259,6 +271,7 @@ const da: Messages = {
 const id: Messages = {
   'moderation.quotedNameRequired': 'Apit nama karakter dengan tanda kutip ganda.',
   'moderation.invalidTarget': 'Anda tidak dapat memoderasi pemain itu.',
+  'moderation.noPermission': 'Anda tidak memiliki izin untuk melakukan itu.',
   'moderation.kicked': '{name} telah dikeluarkan.',
   'moderation.killConfirm': '{name} telah dibunuh.',
   'moderation.renameConfirm': '{name} diwajibkan mengganti nama.',
@@ -280,6 +293,7 @@ const id: Messages = {
 const nl: Messages = {
   'moderation.quotedNameRequired': 'Zet de naam van het personage tussen dubbele aanhalingstekens.',
   'moderation.invalidTarget': 'Je kunt die speler niet modereren.',
+  'moderation.noPermission': 'Je hebt geen toestemming om dat te doen.',
   'moderation.kicked': '{name} is verwijderd.',
   'moderation.killConfirm': '{name} is gedood.',
   'moderation.renameConfirm': '{name} moet de naam wijzigen.',
@@ -302,6 +316,7 @@ const nl: Messages = {
 const pl: Messages = {
   'moderation.quotedNameRequired': 'Umieść nazwę postaci w podwójnym cudzysłowie.',
   'moderation.invalidTarget': 'Nie możesz moderować tego gracza.',
+  'moderation.noPermission': 'Nie masz uprawnień, aby to zrobić.',
   'moderation.kicked': 'Gracz {name} został wyrzucony.',
   'moderation.killConfirm': 'Gracz {name} został zabity.',
   'moderation.renameConfirm': 'Gracz {name} musi zmienić nazwę.',
@@ -323,6 +338,7 @@ const pl: Messages = {
 const sv: Messages = {
   'moderation.quotedNameRequired': 'Sätt karaktärens namn inom dubbla citattecken.',
   'moderation.invalidTarget': 'Du kan inte moderera den spelaren.',
+  'moderation.noPermission': 'Du har inte behörighet att göra det.',
   'moderation.kicked': '{name} har sparkats ut.',
   'moderation.killConfirm': '{name} har dödats.',
   'moderation.renameConfirm': '{name} måste byta namn.',
@@ -344,6 +360,7 @@ const sv: Messages = {
 const tr: Messages = {
   'moderation.quotedNameRequired': 'Karakter adını çift tırnak içine alın.',
   'moderation.invalidTarget': 'Bu oyuncuyu denetleyemezsiniz.',
+  'moderation.noPermission': 'Bunu yapma izniniz yok.',
   'moderation.kicked': '{name} oyundan atıldı.',
   'moderation.killConfirm': '{name} öldürüldü.',
   'moderation.renameConfirm': '{name} adını değiştirmek zorunda.',
@@ -365,6 +382,7 @@ const tr: Messages = {
 const vi: Messages = {
   'moderation.quotedNameRequired': 'Đặt tên nhân vật trong dấu ngoặc kép.',
   'moderation.invalidTarget': 'Bạn không thể kiểm duyệt người chơi đó.',
+  'moderation.noPermission': 'Bạn không có quyền làm điều đó.',
   'moderation.kicked': '{name} đã bị đuổi.',
   'moderation.killConfirm': '{name} đã bị hạ.',
   'moderation.renameConfirm': '{name} phải đổi tên.',

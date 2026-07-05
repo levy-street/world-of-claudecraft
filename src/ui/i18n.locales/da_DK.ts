@@ -1116,6 +1116,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Hent den selvstændige launcher for optimeret ydeevne og fuldskærmsspil.',
   'download.title': 'Download Desktop-launcher',
+  'download.macCta': 'Download til macOS',
+  'download.windowsPending': 'Windows-build afventer.',
   'entities.abilities.adrenaline_rush.description':
     'Dit blod koger, og genopretter øjeblikkeligt 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Fremskyndet Blod',
@@ -1778,6 +1780,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Høstsegl',
   'entities.items.bronze_sickle.name': 'Bronzesegl',
   'entities.items.silverleaf_sickle.name': 'Sølvbladsegl',
+  'entities.items.thorium_mining_pick.name': 'Thoriumminehakke',
+  'entities.items.arcanite_mining_pick.name': 'Arkanitminehakke',
+  'entities.items.ashwood_axe.name': 'Askeøkse',
+  'entities.items.elderwood_axe.name': 'Gammeltræsøkse',
+  'entities.items.goldleaf_sickle.name': 'Guldbladssegl',
+  'entities.items.sunpetal_sickle.name': 'Solkronbladssegl',
   'entities.items.moongate_rubbing.name': 'Værneaftryk',
   'entities.items.moonpale_scale.name': 'Måneblegt Skæl',
   'entities.items.moonscale_saber.name': 'Måneskæl-Sabel',
@@ -5845,4 +5853,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Det, du gjorde i mørket',
   'entities.letters.letter_q_hollow.body':
     'Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric',
+  'hudChrome.gathering.herbalism': 'Urtekundskab',
+  'hudChrome.gathering.logging': 'Skovhugst',
+  'hudChrome.gathering.mining': 'Minedrift',
+  'hudChrome.gathering.title': 'Indsamling',
 };

@@ -529,7 +529,11 @@ describe('delta snapshots', () => {
     expect(server.sim.countItem('widow_venom_sac', session.pid)).toBe(4);
     expect(meta.questLog.get('q_widows')).toMatchObject({ counts: [10, 4], state: 'active' });
     const snap = lastSnap(fc.sent);
-    expect(snap.self.inv).toEqual([{ itemId: 'widow_venom_sac', count: 4 }]);
+    // The wire mirrors the whole inventory (starter rations included); pin the
+    // discarded stack's mirrored count.
+    expect(snap.self.inv.filter((s: { itemId: string }) => s.itemId === 'widow_venom_sac')).toEqual(
+      [{ itemId: 'widow_venom_sac', count: 4 }],
+    );
     expect(snap.self.qlog).toEqual([{ questId: 'q_widows', counts: [10, 4], state: 'active' }]);
   });
 

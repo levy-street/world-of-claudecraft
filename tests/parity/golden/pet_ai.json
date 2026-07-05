@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "b85d6580",
+      "state": "87710a96",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,12 +48,22 @@
             "mainhand": "rusty_hatchet"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -114,7 +124,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 405,
-      "state": "4d824d93",
+      "state": "d8c4e39b",
       "events": "934af100",
       "rng": {
         "draws": 14,
@@ -125,7 +135,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 405,
-      "state": "f1b00d94",
+      "state": "e0cd1296",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -136,7 +146,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 405,
-      "state": "61c30afa",
+      "state": "5c307898",
       "events": "f379bd29",
       "rng": {
         "draws": 107,
@@ -147,7 +157,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 405,
-      "state": "bfa603f5",
+      "state": "f03ef431",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -158,7 +168,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 405,
-      "state": "5f47bbc5",
+      "state": "cfd8a8a1",
       "events": "63dfb14d",
       "rng": {
         "draws": 307,
@@ -169,7 +179,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "064026e2",
+      "state": "90a6bf60",
       "events": "741638a5",
       "rng": {
         "draws": 418,
@@ -180,7 +190,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "1c9814ba",
+      "state": "b6d13ad8",
       "events": "741638a5",
       "rng": {
         "draws": 418,
@@ -213,13 +223,23 @@
             "mainhand": "rusty_hatchet"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -498,7 +518,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 405,
-      "state": "6e99fca5",
+      "state": "07e5a5c1",
       "events": "741638a5",
       "rng": {
         "draws": 518,
@@ -509,7 +529,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 405,
-      "state": "c57b3a21",
+      "state": "647a28bd",
       "events": "741638a5",
       "rng": {
         "draws": 637,
@@ -520,7 +540,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "809fde7a",
+      "state": "00495b18",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -531,7 +551,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "809fde7a",
+      "state": "00495b18",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -564,13 +584,23 @@
             "mainhand": "rusty_hatchet"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

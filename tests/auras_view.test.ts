@@ -135,6 +135,19 @@ describe('createAurasView: derivation per mode', () => {
     expect(s.remaining).toBe(4.2);
   });
 
+  it('derives the debuff school for the border tint (physical fallback; buffs carry none)', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'venom', kind: 'dot', school: 'nature' }),
+        // No school on the aura (the wire omits 'physical') -> the physical fallback.
+        aura({ id: 'rend', kind: 'dot' }),
+        // A buff never tints: school stays '' even when the aura carries one.
+        aura({ id: 'might', kind: 'buff_ap', value: 50, school: 'holy' }),
+      ]),
+    );
+    expect(state.slots.slice(0, 3).map((s) => s.school)).toEqual(['nature', 'physical', '']);
+  });
+
   it('appends the INJECTED duration units (so an in-game language switch lands next tick)', () => {
     // The units are a fired dep, not hardcoded letters: a localized host swaps them per language.
     const localized: AurasDeps = {

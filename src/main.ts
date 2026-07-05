@@ -454,10 +454,15 @@ function resetTurnstile(): void {
   if (ts && turnstileWidgetId !== undefined) ts.reset(turnstileWidgetId);
 }
 
-function trackMetaPixel(eventName: string, data?: Record<string, unknown>): void {
+function trackMetaPixel(
+  eventName: string,
+  data?: Record<string, unknown>,
+  options?: Record<string, unknown>,
+): void {
   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
   if (typeof fbq !== 'function') return;
-  fbq('trackCustom', eventName, data ?? {});
+  if (options) fbq('trackCustom', eventName, data ?? {}, options);
+  else fbq('trackCustom', eventName, data ?? {});
 }
 
 function trackCommunityLinkClicks(): void {
@@ -6744,8 +6749,19 @@ function wireStartScreens(): void {
         }
       } else {
         const email = ($('#login-email') as unknown as HTMLInputElement).value.trim();
-        await api.register(username, password, email, token, REFERRAL_SLUG, nativeAttestation);
-        trackMetaPixel('AccountCreated');
+        const registered = await api.register(
+          username,
+          password,
+          email,
+          token,
+          REFERRAL_SLUG,
+          nativeAttestation,
+        );
+        trackMetaPixel(
+          'AccountCreated',
+          {},
+          registered.accountId ? { eventID: `acct_${registered.accountId}` } : undefined,
+        );
       }
     } catch (err) {
       // Auth itself failed (bad credentials, taken username, Turnstile reject…).

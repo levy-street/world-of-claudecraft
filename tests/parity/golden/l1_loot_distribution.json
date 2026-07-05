@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 404,
-      "state": "e71f8538",
+      "state": "aa927736",
       "events": "250fc689",
       "rng": {
         "draws": 1,
@@ -65,16 +65,20 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
               "count": 1,
               "itemId": "worn_sword"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -101,12 +105,22 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -133,12 +147,18 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -304,7 +324,7 @@
           "fallStartY": 1.603905,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 42,
+          "hp": 54,
           "id": 403,
           "kind": "mob",
           "level": 2,
@@ -326,7 +346,7 @@
             402
           ],
           "lootable": true,
-          "maxHp": 42,
+          "maxHp": 54,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -359,7 +379,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 404,
-      "state": "b0f8cddc",
+      "state": "82825b54",
       "events": "49a5a06b",
       "rng": {
         "draws": 3,
@@ -394,6 +414,10 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
               "count": 1,
               "itemId": "worn_sword"
             },
@@ -403,11 +427,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -434,12 +458,22 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -466,12 +500,18 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -637,7 +677,7 @@
           "fallStartY": 1.603905,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 42,
+          "hp": 54,
           "id": 403,
           "kind": "mob",
           "level": 2,
@@ -664,7 +704,7 @@
             402
           ],
           "lootable": true,
-          "maxHp": 42,
+          "maxHp": 54,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -698,7 +738,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 404,
-      "state": "08a3e2d7",
+      "state": "019a16e3",
       "events": "25ad109a",
       "rng": {
         "draws": 3,
@@ -733,6 +773,10 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
               "count": 1,
               "itemId": "worn_sword"
             },
@@ -742,11 +786,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -775,6 +819,14 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
               "count": 1,
               "itemId": "gnarled_staff"
             },
@@ -784,11 +836,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -815,12 +867,18 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -986,7 +1044,7 @@
           "fallStartY": 1.603905,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 42,
+          "hp": 54,
           "id": 403,
           "kind": "mob",
           "level": 2,
@@ -996,7 +1054,7 @@
             401,
             402
           ],
-          "maxHp": 42,
+          "maxHp": 54,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1030,7 +1088,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 404,
-      "state": "97d8985c",
+      "state": "b3223742",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1065,6 +1123,10 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
               "count": 1,
               "itemId": "worn_sword"
             },
@@ -1074,11 +1136,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1107,6 +1169,14 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            },
+            {
               "count": 1,
               "itemId": "gnarled_staff"
             },
@@ -1116,11 +1186,11 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1147,12 +1217,18 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -1319,7 +1395,7 @@
           "fallStartY": 1.603905,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 42,
+          "hp": 54,
           "id": 403,
           "inCombat": true,
           "kind": "mob",
@@ -1330,7 +1406,7 @@
           },
           "level": 2,
           "lootFfaTimer": "Infinity",
-          "maxHp": 42,
+          "maxHp": 54,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,

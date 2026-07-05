@@ -94,7 +94,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     minLevel: 1,
     maxLevel: 2,
     family: 'beast',
-    hpBase: 28,
+    hpBase: 40,
     hpPerLevel: 14,
     dmgBase: 3,
     dmgPerLevel: 1.6,
@@ -111,6 +111,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     scale: 0.9,
     color: 0x7f8c8d,
     packFrenzy: { radius: 12, hasteMult: 1.3, duration: 8 },
+    componentTags: ['hide', 'fang'],
   },
   old_greyjaw: {
     id: 'old_greyjaw',
@@ -138,6 +139,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.25,
     color: 0x566061,
+    componentTags: ['hide', 'fang', 'claw'],
   },
   wild_boar: {
     id: 'wild_boar',
@@ -145,7 +147,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     minLevel: 2,
     maxLevel: 3,
     family: 'beast',
-    hpBase: 34,
+    hpBase: 38,
     hpPerLevel: 16,
     dmgBase: 4,
     dmgPerLevel: 1.8,
@@ -163,6 +165,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.85,
     color: 0x935116,
+    componentTags: ['hide', 'tusk'],
   },
   webwood_spider: {
     id: 'webwood_spider',
@@ -170,7 +173,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     minLevel: 2,
     maxLevel: 4,
     family: 'spider',
-    hpBase: 30,
+    hpBase: 36,
     hpPerLevel: 15,
     dmgBase: 4,
     dmgPerLevel: 1.7,
@@ -194,6 +197,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.9,
     color: 0x4a235a,
+    componentTags: ['venomSac', 'silk'],
   },
   mogger: {
     id: 'mogger',
@@ -275,6 +279,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.8,
     color: 0x52be80,
+    componentTags: ['gills', 'hide'],
     // Mudfin Hex: the skulker's oracle-chant briefly turns a foe into a critter.
     // Low chance and it breaks the instant the victim takes damage (the murloc's
     // own next bite ends it), so it's a brief flavor incap — but a murloc pack

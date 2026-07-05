@@ -1197,6 +1197,12 @@ export const tr_TR: EnTranslations = {
     "social": {
       "lastSeen": "Son görülme: {when}",
       "lastSeenNever": "hiç"
+    },
+    "gathering": {
+      "title": "Toplama",
+      "mining": "Madencilik",
+      "logging": "Ağaç kesme",
+      "herbalism": "Bitkicilik"
     }
   },
   "guide": {
@@ -2535,7 +2541,9 @@ export const tr_TR: EnTranslations = {
   },
   "download": {
     "title": "Masaüstü Başlatıcısını İndir",
-    "desc": "Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin."
+    "desc": "Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.",
+    "macCta": "macOS için indir",
+    "windowsPending": "Windows derlemesi beklemede."
   },
   "comingSoon": {
     "placeholder": "Yakında...",
@@ -5682,6 +5690,24 @@ export const tr_TR: EnTranslations = {
       },
       "silverleaf_sickle": {
         "name": "Gümüşyaprak Orağı"
+      },
+      "thorium_mining_pick": {
+        "name": "Toryum Maden Kazması"
+      },
+      "arcanite_mining_pick": {
+        "name": "Arkanit Maden Kazması"
+      },
+      "ashwood_axe": {
+        "name": "Dişbudak Baltası"
+      },
+      "elderwood_axe": {
+        "name": "Kadim Ağaç Baltası"
+      },
+      "goldleaf_sickle": {
+        "name": "Altınyaprak Orağı"
+      },
+      "sunpetal_sickle": {
+        "name": "Güneşyaprağı Orağı"
       },
       "bristleback_maul": {
         "name": "Gallowglass Balyozu"

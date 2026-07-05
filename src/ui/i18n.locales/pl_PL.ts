@@ -1121,6 +1121,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'download.desc':
     'Pobierz samodzielny launcher dla zoptymalizowanej wydajności i gry na pełnym ekranie.',
   'download.title': 'Pobierz launcher na komputer',
+  'download.macCta': 'Pobierz dla macOS',
+  'download.windowsPending': 'Build Windows w przygotowaniu.',
   'entities.abilities.adrenaline_rush.description':
     'Twoja krew wrze, natychmiast przywracając 60 energii.',
   'entities.abilities.adrenaline_rush.name': 'Przyspieszona krew',
@@ -1792,6 +1794,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Sierp do Zbioru',
   'entities.items.bronze_sickle.name': 'Brązowy Sierp',
   'entities.items.silverleaf_sickle.name': 'Sierp Srebrnolistny',
+  'entities.items.thorium_mining_pick.name': 'Torowy Kilof Górniczy',
+  'entities.items.arcanite_mining_pick.name': 'Arkanitowy Kilof Górniczy',
+  'entities.items.ashwood_axe.name': 'Siekiera z Jesionu',
+  'entities.items.elderwood_axe.name': 'Siekiera ze Starodrzewu',
+  'entities.items.goldleaf_sickle.name': 'Sierp Złotolistny',
+  'entities.items.sunpetal_sickle.name': 'Sierp Słonecznopłatkowy',
   'entities.items.moongate_rubbing.name': 'Odbitka ochronnego znaku',
   'entities.items.moonpale_scale.name': 'Księżycowoblada łuska',
   'entities.items.moonscale_saber.name': 'Szabla z księżycowej łuski',
@@ -5889,4 +5897,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'To, czego dokonałeś w mroku',
   'entities.letters.letter_q_hollow.body':
     'Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric',
+  'hudChrome.gathering.herbalism': 'Zielarstwo',
+  'hudChrome.gathering.logging': 'Wyrąb',
+  'hudChrome.gathering.mining': 'Górnictwo',
+  'hudChrome.gathering.title': 'Zbieractwo',
 };

@@ -46,6 +46,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.loot = null;
   mob.lootRecipientIds = undefined;
   mob.tappedById = null;
+  mob.harvestClaimedBy = null;
   mob.ownerId = null;
   mob.hostile = true;
   mob.pos = { ...mob.spawnPos };

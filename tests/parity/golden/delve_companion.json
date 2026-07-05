@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "d35a4a11",
+      "state": "74bced36",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,12 +47,18 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -111,7 +117,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 410,
-      "state": "17241eb2",
+      "state": "1c44f8e1",
       "events": "f072cbc1",
       "rng": {
         "draws": 4,
@@ -122,7 +128,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 410,
-      "state": "99d28f3d",
+      "state": "fb51f7ec",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -133,7 +139,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 410,
-      "state": "5ce8f02d",
+      "state": "3f4b939c",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -144,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 410,
-      "state": "eed41166",
+      "state": "7c5c1345",
       "events": "b93c7dc5",
       "rng": {
         "draws": 4,
@@ -155,7 +161,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 410,
-      "state": "974e15c7",
+      "state": "ad328156",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -166,7 +172,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 410,
-      "state": "24311c3e",
+      "state": "6980549d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -177,7 +183,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 410,
-      "state": "59484b19",
+      "state": "fecb8688",
       "events": "99a32fc8",
       "rng": {
         "draws": 6,
@@ -188,7 +194,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 410,
-      "state": "6a4a972b",
+      "state": "54067d7a",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -199,7 +205,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 410,
-      "state": "6a4a972b",
+      "state": "54067d7a",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -232,13 +238,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -379,7 +391,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 410,
-      "state": "6d84d228",
+      "state": "589a73cf",
       "events": "1aaa30ce",
       "rng": {
         "draws": 8,
@@ -412,13 +424,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -573,7 +591,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 410,
-      "state": "d7d0a0c0",
+      "state": "fdeaa087",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -584,7 +602,7 @@
       "tick": 49,
       "time": 2.45,
       "nextId": 410,
-      "state": "8920dbba",
+      "state": "bc513da9",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -617,13 +635,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -722,7 +746,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 410,
-      "state": "da5eeee5",
+      "state": "7278fdb4",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -733,7 +757,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 410,
-      "state": "2a509682",
+      "state": "60cd37b1",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -766,13 +790,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -872,7 +902,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 410,
-      "state": "2a509682",
+      "state": "60cd37b1",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -905,13 +935,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11200,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

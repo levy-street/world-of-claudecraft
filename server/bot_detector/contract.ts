@@ -54,6 +54,40 @@ export interface CalibrationHistogram {
   overflowCount: number; // observations above the last bucket bound
 }
 
+// The detector's operator-tunable runtime configuration, published for the admin
+// dashboard. Which fields exist, and their ids, groups, and labels, are decided
+// entirely by the implementation at runtime; this shape is deliberately generic
+// (the CalibrationHistogram precedent). The host persists an override document
+// ({ [fieldId]: value }), audits before/after values, and replays it through
+// applyConfig at boot. Config fields are operator-visible and MUST NOT expose secrets.
+export type ConfigFieldType = 'string' | 'number' | 'boolean' | 'select' | 'multi_select';
+
+export type ConfigValue = string | number | boolean | string[];
+
+export interface ConfigFieldOption {
+  value: string;
+  label: string;
+}
+
+export interface ConfigField {
+  id: string;
+  group: string; // section heading the dashboard renders fields under
+  label: string;
+  type: ConfigFieldType;
+  defaultValue: ConfigValue;
+  value: ConfigValue; // currently applied (the default unless overridden)
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string; // e.g. 'ms'
+  options?: ConfigFieldOption[]; // select / multi_select choices
+  help?: string;
+}
+
+export interface ConfigApplyResult {
+  errors: string[];
+}
+
 export interface SuspiciousEvidence {
   kind: string;
   weight: number;
@@ -97,4 +131,12 @@ export interface BotDetector {
   ): EnforcementAction;
   listSuspiciousPlayers(): SuspiciousPlayer[];
   listCalibrationHistograms(): CalibrationHistogram[];
+  // The full operator-tunable surface: schema plus currently applied values.
+  describeConfig(): ConfigField[];
+  // Validates an override document ({ [fieldId]: value }) and REPLACES all previous
+  // overrides with it (an absent id reverts that field to its default). Valid entries
+  // apply immediately; invalid ones are skipped and reported in `errors`, so a strict
+  // caller rejects on any error (re-applying its previous document) while boot applies
+  // what it can and logs the rest.
+  applyConfig(overrides: Record<string, unknown>): ConfigApplyResult;
 }

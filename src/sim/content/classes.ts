@@ -19,6 +19,9 @@ export interface ClassDef {
   resourceType: 'rage' | 'mana' | 'energy';
   startWeapon: string;
   startChest: string;
+  // Consumables in a fresh character's bags: every class carries food; the
+  // mana classes also carry water. Saved characters load their own bags.
+  startItems: { itemId: string; count: number }[];
   // hunters: auto shot (8yd deadzone). casters: wand (wand:true → no deadzone,
   // fires a magic-school bolt so they don't run into melee to auto-attack, #94)
   ranged?: WeaponInfo & {
@@ -30,6 +33,14 @@ export interface ClassDef {
   abilities: string[]; // full kit, in learn order
   color: number;
 }
+
+// Starter rations (#food-and-drink): 5 loaves for everyone, plus 5 waters for
+// the classes that drink to restore mana (rage/energy classes carry bread only).
+const START_RATIONS = [{ itemId: 'baked_bread', count: 5 }];
+const START_RATIONS_MANA = [
+  { itemId: 'baked_bread', count: 5 },
+  { itemId: 'spring_water', count: 5 },
+];
 
 export const CLASSES: Record<PlayerClass, ClassDef> = {
   warrior: {
@@ -44,6 +55,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'rage',
     startWeapon: 'worn_sword',
     startChest: 'recruit_tunic',
+    startItems: START_RATIONS,
     abilities: [
       'heroic_strike',
       'battle_shout',
@@ -76,6 +88,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
+    startItems: START_RATIONS_MANA,
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'arcane' },
     abilities: [
       'fireball',
@@ -108,6 +121,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'energy',
     startWeapon: 'rusty_dagger',
     startChest: 'footpad_jerkin',
+    startItems: START_RATIONS,
     abilities: [
       'sinister_strike',
       'eviscerate',
@@ -145,6 +159,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'training_mace',
     startChest: 'recruit_tunic',
+    startItems: START_RATIONS_MANA,
     abilities: [
       'seal_of_righteousness',
       'holy_light',
@@ -174,6 +189,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
+    startItems: START_RATIONS_MANA,
     ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
     abilities: [
       'raptor_strike',
@@ -206,6 +222,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
+    startItems: START_RATIONS_MANA,
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'holy' },
     abilities: [
       'smite',
@@ -233,6 +250,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'training_mace',
     startChest: 'footpad_jerkin',
+    startItems: START_RATIONS_MANA,
     abilities: [
       'lightning_bolt',
       'rockbiter_weapon',
@@ -261,6 +279,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
+    startItems: START_RATIONS_MANA,
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'shadow' },
     abilities: [
       'shadow_bolt',
@@ -296,6 +315,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'gnarled_staff',
     startChest: 'footpad_jerkin',
+    startItems: START_RATIONS_MANA,
     abilities: [
       'wrath',
       'healing_touch',
@@ -2269,6 +2289,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'nature',
     requiresTarget: true,
+    projectileFx: 'lightning', // a jagged electric bolt instead of the default glowing bolt
     effects: [{ type: 'directDamage', min: 15, max: 17 }],
     ranks: [
       {

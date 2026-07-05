@@ -526,6 +526,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'news.title': 'ニュース & アップデート',
   'news.desc': '最新のパッチノート、イベント、コミュニティの更新情報を確認しましょう。',
   'download.title': 'デスクトップランチャーのダウンロード',
+  'download.macCta': 'macOS版をダウンロード',
+  'download.windowsPending': 'Windows版は準備中です。',
   'download.desc':
     '最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。',
   'comingSoon.placeholder': '近日公開...',
@@ -3272,6 +3274,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': '採集の鎌',
   'entities.items.bronze_sickle.name': '青銅の鎌',
   'entities.items.silverleaf_sickle.name': '銀葉の鎌',
+  'entities.items.thorium_mining_pick.name': 'トリウムの採掘ピック',
+  'entities.items.arcanite_mining_pick.name': 'アーケナイトの採掘ピック',
+  'entities.items.ashwood_axe.name': 'タモ材の斧',
+  'entities.items.elderwood_axe.name': '古木の斧',
+  'entities.items.goldleaf_sickle.name': '金葉の鎌',
+  'entities.items.sunpetal_sickle.name': '陽花弁の鎌',
   'entities.mobs.nythraxis_skeleton_warrior.name': '蘇った王家の衛兵',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'ナイスラクシス、ソーンピークの災厄',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
@@ -5794,4 +5802,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ハルヴェン修道士が海図に印を。崩落した聖遺物庫に挑む好日。',
   'hudChrome.calendar.events.moongateCommunion.title': '月門の集い',
   'hudChrome.calendar.events.moongateCommunion.note': '月半ばの月の下、巡礼者が神殿の月門に集う。',
+  'hudChrome.gathering.title': '採集',
+  'hudChrome.gathering.mining': '採掘',
+  'hudChrome.gathering.logging': '伐採',
+  'hudChrome.gathering.herbalism': '薬草学',
 };

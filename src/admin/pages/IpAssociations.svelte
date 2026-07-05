@@ -115,7 +115,7 @@
   <PageHeader
     title={t('ipAssociations.title', { ip })}
     badge={data?.blocked ? blockedBadge : undefined}
-    actions={data ? pageActions : undefined}
+    actions={data && auth.can('ipblocks.manage') ? pageActions : undefined}
   />
 
   <a class="back-link" href={routeHref({ page: 'shared-ips' })} onclick={back}>{t('ipAssociations.back')}</a>

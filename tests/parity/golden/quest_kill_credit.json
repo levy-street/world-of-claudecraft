@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "d35a4a11",
+      "state": "74bced36",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,12 +47,18 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -111,7 +117,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "2904828e",
+      "state": "19959b59",
       "events": "00bafcff",
       "rng": {
         "draws": 0,
@@ -142,8 +148,15 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_wolves",
@@ -159,8 +172,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -219,8 +231,8 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "f58bba20",
-      "events": "7d1a20e0",
+      "state": "a031b238",
+      "events": "d894ee18",
       "rng": {
         "draws": 40,
         "digest": "0e96c13c"
@@ -241,7 +253,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 8336,
+            "damageDealt": 8432,
             "kills": 8,
             "questProgress": 8
           },
@@ -254,8 +266,15 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_wolves",
@@ -271,8 +290,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -332,7 +350,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 409,
-      "state": "f2231791",
+      "state": "4448f63d",
       "events": "272aafab",
       "rng": {
         "draws": 40,
@@ -355,7 +373,7 @@
           "companionUpgrades": {},
           "copper": 75,
           "counters": {
-            "damageDealt": 8336,
+            "damageDealt": 8432,
             "kills": 8,
             "questProgress": 8,
             "questsCompleted": 1,
@@ -370,8 +388,15 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27850,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
           ],
@@ -379,7 +404,6 @@
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 250
         }
       ],
@@ -440,7 +464,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "18931e09",
+      "state": "e2c8f9f5",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -463,7 +487,7 @@
           "companionUpgrades": {},
           "copper": 75,
           "counters": {
-            "damageDealt": 8336,
+            "damageDealt": 8432,
             "kills": 8,
             "questProgress": 8,
             "questsCompleted": 1,
@@ -478,8 +502,15 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27850,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
           ],
@@ -487,7 +518,6 @@
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 250
         }
       ],

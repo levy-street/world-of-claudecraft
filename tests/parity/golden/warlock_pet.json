@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "40c888b9",
+      "state": "08ab3f3d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -47,12 +47,22 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -112,7 +122,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 401,
-      "state": "1ff56f1d",
+      "state": "e63ed119",
       "events": "3acb3014",
       "rng": {
         "draws": 0,
@@ -123,7 +133,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 401,
-      "state": "9cbe0967",
+      "state": "788974df",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -134,7 +144,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 401,
-      "state": "10a7ee80",
+      "state": "97b24592",
       "events": "741638a5",
       "rng": {
         "draws": 100,
@@ -145,7 +155,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 401,
-      "state": "11bb5f25",
+      "state": "d6008541",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -156,7 +166,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 402,
-      "state": "75fb4ff5",
+      "state": "ed0b1831",
       "events": "2796152c",
       "rng": {
         "draws": 271,
@@ -167,7 +177,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 403,
-      "state": "6b861f5f",
+      "state": "3102ffb7",
       "events": "26a41d9d",
       "rng": {
         "draws": 366,
@@ -178,7 +188,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 403,
-      "state": "7ab26a96",
+      "state": "77873654",
       "events": "9caad040",
       "rng": {
         "draws": 495,
@@ -189,7 +199,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 403,
-      "state": "362b417e",
+      "state": "c369b3fc",
       "events": "05346f1a",
       "rng": {
         "draws": 636,
@@ -200,7 +210,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 403,
-      "state": "e59e4aa3",
+      "state": "5af4978b",
       "events": "cfc18f2e",
       "rng": {
         "draws": 774,
@@ -211,7 +221,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 403,
-      "state": "683d9a38",
+      "state": "5cae556a",
       "events": "ced2e436",
       "rng": {
         "draws": 943,
@@ -222,7 +232,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 403,
-      "state": "eec8c4fd",
+      "state": "85697a39",
       "events": "cfc18f2e",
       "rng": {
         "draws": 1021,
@@ -233,7 +243,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 403,
-      "state": "4dfcc8eb",
+      "state": "bb4b2193",
       "events": "741638a5",
       "rng": {
         "draws": 1021,
@@ -266,13 +276,23 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -446,7 +466,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 403,
-      "state": "8e02beb4",
+      "state": "c0015676",
       "events": "852d6621",
       "rng": {
         "draws": 1050,
@@ -479,13 +499,23 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

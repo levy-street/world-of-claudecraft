@@ -1197,6 +1197,12 @@ export const fr_FR: EnTranslations = {
     "social": {
       "lastSeen": "Vu pour la dernière fois : {when}",
       "lastSeenNever": "jamais"
+    },
+    "gathering": {
+      "title": "Récolte",
+      "mining": "Minage",
+      "logging": "Bûcheronnage",
+      "herbalism": "Herboristerie"
     }
   },
   "guide": {
@@ -2535,7 +2541,9 @@ export const fr_FR: EnTranslations = {
   },
   "download": {
     "title": "Télécharger le lanceur de bureau",
-    "desc": "Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran."
+    "desc": "Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.",
+    "macCta": "Telecharger pour macOS",
+    "windowsPending": "Build Windows en attente."
   },
   "comingSoon": {
     "placeholder": "Bientôt disponible...",
@@ -5682,6 +5690,24 @@ export const fr_FR: EnTranslations = {
       },
       "silverleaf_sickle": {
         "name": "Faucille Feuille d'Argent"
+      },
+      "thorium_mining_pick": {
+        "name": "Pic de Minage au Thorium"
+      },
+      "arcanite_mining_pick": {
+        "name": "Pic de Minage en Arcanite"
+      },
+      "ashwood_axe": {
+        "name": "Hache en Bois de Frêne"
+      },
+      "elderwood_axe": {
+        "name": "Hache en Bois Ancien"
+      },
+      "goldleaf_sickle": {
+        "name": "Faucille Feuille d'Or"
+      },
+      "sunpetal_sickle": {
+        "name": "Faucille Pétale de Soleil"
       },
       "bristleback_maul": {
         "name": "Marteau Gallowglass"

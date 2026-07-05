@@ -30,7 +30,7 @@
 // Markers carry the identity (the party class id) the painter resolves
 // to a color, never the resolved color.
 
-import { isDelvePos, QUESTS, zoneAt } from '../sim/data';
+import { GATHER_NODES, isDelvePos, QUESTS, zoneAt } from '../sim/data';
 import { isQuestTurnInNpc } from '../sim/types';
 import type { IWorld } from '../world_api';
 
@@ -81,7 +81,12 @@ export type MinimapMarker =
   // An off-map party member: an edge-pinned arrow pointing toward them.
   | { kind: 'party-arrow'; mx: number; my: number; angle: number; cls: string; dead: boolean }
   // The local player: a facing arrow at the centre.
-  | { kind: 'player'; mx: number; my: number; angle: number };
+  | { kind: 'player'; mx: number; my: number; angle: number }
+  // A gatherable world node (ore/wood/herb, #1121): `ready` distinguishes
+  // harvestable-for-THIS-viewer from on-cooldown-for-this-viewer (per-player,
+  // see IWorldProfessions#nodeHarvestableByMe; two viewers can see opposite
+  // states for the same node id).
+  | { kind: 'gather-node'; mx: number; my: number; ready: boolean };
 
 /** Everything the painter draws for one overworld minimap frame: the marker list (in
  *  draw order) plus the committed zone id (the painter localizes the #zone-label). */
@@ -221,6 +226,20 @@ export function createMinimapMarkers(): MinimapMarkers {
             });
           }
         }
+      }
+
+      // Gatherable world nodes (issue 1124): static content positions (never entities), each
+      // classified ready/cooldown for THIS viewer only via nodeHarvestableByMe.
+      for (const node of GATHER_NODES) {
+        const dx = -(node.pos.x - p.pos.x) * pxPerYard;
+        const dz = -(node.pos.z - p.pos.z) * pxPerYard;
+        if (dx * dx + dz * dz > rim2) continue;
+        markers.push({
+          kind: 'gather-node',
+          mx: half + dx,
+          my: half + dz,
+          ready: world.nodeHarvestableByMe(node.id),
+        });
       }
 
       // The local player's facing arrow, drawn last at the centre.

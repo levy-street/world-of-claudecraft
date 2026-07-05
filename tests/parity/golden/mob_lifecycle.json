@@ -31,8 +31,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 405,
-      "state": "460ad568",
-      "events": "77e640a2",
+      "state": "58c92eab",
+      "events": "afc1696f",
       "rng": {
         "draws": 5,
         "digest": "ca7bbe9c"
@@ -52,7 +52,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 1084,
+            "damageDealt": 1096,
             "kills": 1,
             "xpGained": 84
           },
@@ -65,13 +65,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 84,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 84
         }
       ],
@@ -153,7 +159,7 @@
             400
           ],
           "lootable": true,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -204,7 +210,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 402,
           "inCombat": true,
           "kind": "mob",
@@ -215,7 +221,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -270,7 +276,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 403,
           "inCombat": true,
           "kind": "mob",
@@ -281,7 +287,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -323,12 +329,12 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 98,
+          "hp": 102,
           "id": 404,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 98,
+          "maxHp": 102,
           "moveSpeed": 7.5,
           "onGround": true,
           "overpowerUntil": -1,
@@ -360,7 +366,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "60217248",
+      "state": "d6d5b2cd",
       "events": "6ff1c8ee",
       "rng": {
         "draws": 8,
@@ -381,7 +387,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 2281,
+            "damageDealt": 2293,
             "kills": 2,
             "xpGained": 198
           },
@@ -394,13 +400,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 198,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 198
         }
       ],
@@ -482,7 +494,7 @@
             400
           ],
           "lootable": true,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -533,7 +545,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 402,
           "inCombat": true,
           "kind": "mob",
@@ -544,7 +556,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -599,7 +611,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 403,
           "inCombat": true,
           "kind": "mob",
@@ -610,7 +622,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -652,12 +664,12 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 98,
+          "hp": 102,
           "id": 404,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 98,
+          "maxHp": 102,
           "moveSpeed": 7.5,
           "onGround": true,
           "overpowerUntil": -1,
@@ -742,7 +754,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "0ec8f2b2",
+      "state": "8f78639b",
       "events": "e7eb4dcc",
       "rng": {
         "draws": 9,
@@ -763,7 +775,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 2281,
+            "damageDealt": 2293,
             "damageTaken": 18,
             "kills": 2,
             "xpGained": 198
@@ -777,13 +789,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 198,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 198
         }
       ],
@@ -866,7 +884,7 @@
             400
           ],
           "lootable": true,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -917,7 +935,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 402,
           "inCombat": true,
           "kind": "mob",
@@ -928,7 +946,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -983,7 +1001,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 403,
           "inCombat": true,
           "kind": "mob",
@@ -994,7 +1012,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1036,12 +1054,12 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 98,
+          "hp": 102,
           "id": 404,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 98,
+          "maxHp": 102,
           "moveSpeed": 7.5,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1126,8 +1144,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "4aa16ca8",
-      "events": "27ca8bd0",
+      "state": "e5bfcde6",
+      "events": "70ed87d1",
       "rng": {
         "draws": 15,
         "digest": "ca70052b"
@@ -1147,7 +1165,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 3365,
+            "damageDealt": 3389,
             "damageTaken": 18,
             "kills": 3,
             "xpGained": 282
@@ -1161,13 +1179,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 282,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 282
         }
       ],
@@ -1250,7 +1274,7 @@
             400
           ],
           "lootable": true,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1301,7 +1325,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 402,
           "inCombat": true,
           "kind": "mob",
@@ -1312,7 +1336,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1367,7 +1391,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 403,
           "inCombat": true,
           "kind": "mob",
@@ -1378,7 +1402,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1420,12 +1444,12 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 98,
+          "hp": 102,
           "id": 404,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 98,
+          "maxHp": 102,
           "moveSpeed": 7.5,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1514,12 +1538,12 @@
           "fallStartY": 54.410541,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 406,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": 59.95,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1553,8 +1577,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "6898f17e",
-      "events": "d0bb0054",
+      "state": "64bf5ed5",
+      "events": "d9e22721",
       "rng": {
         "draws": 20,
         "digest": "e612091c"
@@ -1574,7 +1598,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 4449,
+            "damageDealt": 4485,
             "damageTaken": 18,
             "kills": 4,
             "xpGained": 366
@@ -1588,13 +1612,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 366,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 366
         }
       ],
@@ -1677,7 +1707,7 @@
             400
           ],
           "lootable": true,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1728,7 +1758,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 402,
           "inCombat": true,
           "kind": "mob",
@@ -1739,7 +1769,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1794,7 +1824,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 403,
           "inCombat": true,
           "kind": "mob",
@@ -1805,7 +1835,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1847,12 +1877,12 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 98,
+          "hp": 102,
           "id": 404,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 98,
+          "maxHp": 102,
           "moveSpeed": 7.5,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1941,12 +1971,12 @@
           "fallStartY": 54.410541,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 406,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": 59.95,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2007,7 +2037,7 @@
           "lootRecipientIds": [
             400
           ],
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2041,7 +2071,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "6898f17e",
+      "state": "64bf5ed5",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2062,7 +2092,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 4449,
+            "damageDealt": 4485,
             "damageTaken": 18,
             "kills": 4,
             "xpGained": 366
@@ -2076,13 +2106,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 366,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 366
         }
       ],
@@ -2165,7 +2201,7 @@
             400
           ],
           "lootable": true,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2216,7 +2252,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 402,
           "inCombat": true,
           "kind": "mob",
@@ -2227,7 +2263,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2282,7 +2318,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 403,
           "inCombat": true,
           "kind": "mob",
@@ -2293,7 +2329,7 @@
           },
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2335,12 +2371,12 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 98,
+          "hp": 102,
           "id": 404,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
-          "maxHp": 98,
+          "maxHp": 102,
           "moveSpeed": 7.5,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2429,12 +2465,12 @@
           "fallStartY": 54.410541,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 84,
+          "hp": 96,
           "id": 406,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": 59.95,
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2495,7 +2531,7 @@
           "lootRecipientIds": [
             400
           ],
-          "maxHp": 84,
+          "maxHp": 96,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,

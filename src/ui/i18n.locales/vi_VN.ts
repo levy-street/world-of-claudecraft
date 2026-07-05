@@ -1123,6 +1123,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Hang Sâu',
   'download.desc': 'Tải trình khởi chạy độc lập để có hiệu năng tối ưu và chơi toàn màn hình.',
   'download.title': 'Tải Trình Khởi Chạy Trên Máy Tính',
+  'download.macCta': 'Tải xuống cho macOS',
+  'download.windowsPending': 'Bản dựng Windows đang chờ.',
   'entities.abilities.adrenaline_rush.description':
     'Máu ngươi sôi sục, lập tức hồi lại 60 năng lượng.',
   'entities.abilities.adrenaline_rush.name': 'Huyết Tăng Tốc',
@@ -1797,6 +1799,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Liềm Thu Hoạch',
   'entities.items.bronze_sickle.name': 'Liềm Đồng',
   'entities.items.silverleaf_sickle.name': 'Liềm Lá Bạc',
+  'entities.items.thorium_mining_pick.name': 'Cuốc Khai Khoáng Thorium',
+  'entities.items.arcanite_mining_pick.name': 'Cuốc Khai Khoáng Arcanite',
+  'entities.items.ashwood_axe.name': 'Rìu Gỗ Tần Bì',
+  'entities.items.elderwood_axe.name': 'Rìu Gỗ Cổ Thụ',
+  'entities.items.goldleaf_sickle.name': 'Liềm Lá Vàng',
+  'entities.items.sunpetal_sickle.name': 'Liềm Cánh Hoa Mặt Trời',
   'entities.items.moongate_rubbing.name': 'Bản Rập Bùa Phòng Hộ',
   'entities.items.moonpale_scale.name': 'Vảy Trăng Nhợt',
   'entities.items.moonscale_saber.name': 'Mã Tấu Vảy Trăng',
@@ -5881,4 +5889,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Điều bạn đã làm trong bóng tối',
   'entities.letters.letter_q_hollow.body':
     'Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric',
+  'hudChrome.gathering.herbalism': 'Thảo dược học',
+  'hudChrome.gathering.logging': 'Đốn gỗ',
+  'hudChrome.gathering.mining': 'Khai mỏ',
+  'hudChrome.gathering.title': 'Thu thập',
 };

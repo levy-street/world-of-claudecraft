@@ -1124,6 +1124,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Hämta den fristående startaren för optimerad prestanda och spel i helskärm.',
   'download.title': 'Ladda ner skrivbordsstartaren',
+  'download.macCta': 'Ladda ner för macOS',
+  'download.windowsPending': 'Windows-bygge väntar.',
   'entities.abilities.adrenaline_rush.description':
     'Ditt blod hettar upp och återställer omedelbart 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Kvickat blod',
@@ -1787,6 +1789,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Skördeskära',
   'entities.items.bronze_sickle.name': 'Bronsskära',
   'entities.items.silverleaf_sickle.name': 'Silverbladsskära',
+  'entities.items.thorium_mining_pick.name': 'Toriumhacka',
+  'entities.items.arcanite_mining_pick.name': 'Arkanithacka',
+  'entities.items.ashwood_axe.name': 'Askträdsyxa',
+  'entities.items.elderwood_axe.name': 'Gammelträdsyxa',
+  'entities.items.goldleaf_sickle.name': 'Guldbladsskära',
+  'entities.items.sunpetal_sickle.name': 'Solkronbladsskära',
   'entities.items.moongate_rubbing.name': 'Skyddande avgnidning',
   'entities.items.moonpale_scale.name': 'Månblekt fjäll',
   'entities.items.moonscale_saber.name': 'Månfjällsabel',
@@ -5865,4 +5873,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Det du gjorde i mörkret',
   'entities.letters.letter_q_hollow.body':
     'Få kommer någonsin att veta vad som låg begravet i den sänkan, och ännu färre skulle tro det. Jag vet, och jag kommer inte att glömma.\n\nMå din väg förbli upplyst.\n- Broder Aldric',
+  'hudChrome.gathering.herbalism': 'Örtkunskap',
+  'hudChrome.gathering.logging': 'Skogsavverkning',
+  'hudChrome.gathering.mining': 'Gruvdrift',
+  'hudChrome.gathering.title': 'Insamling',
 };
