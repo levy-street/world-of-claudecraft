@@ -50,6 +50,14 @@ import { baseSwingSpeed } from './form_swing';
 import { rangedShotProfile } from './ranged_shot';
 import { applyThornsReaction } from './thorns_charge';
 
+// Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
+// dedicated ranged-weapon slot, so the mainhand doubles as the "bow"; a full melee
+// weapon's damage on ranged would push a fully geared hunter's white DPS well past
+// the melee classes (measured ~+30%), so only part of it carries to the shot. The
+// agility-driven ranged attack-power term is unaffected, and wands (the caster
+// sidearm, fixed class damage) are exempt.
+const RANGED_WEAPON_COEFF = 0.6;
+
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -197,7 +205,13 @@ export function rangedSwing(
       ctx.enterCombat(atk, tgt);
       return;
     }
-    let dmg = ctx.rng.range(ranged.min, ranged.max) + (atk.rangedPower / 14) * ranged.speed;
+    // Only part of a melee weapon's roll carries to a hunter's Auto Shot (see
+    // RANGED_WEAPON_COEFF); a wand deals its full fixed damage. The ranged AP term
+    // (agility) is unaffected either way.
+    const weaponRoll = ctx.rng.range(ranged.min, ranged.max);
+    let dmg =
+      (ranged.wand ? weaponRoll : weaponRoll * RANGED_WEAPON_COEFF) +
+      (atk.rangedPower / 14) * ranged.speed;
     // ranged white hits suffer the same higher-level crit suppression as melee
     const critChance = Math.max(0.005, atk.critChance - Math.max(0, tgt.level - atk.level) * 0.002);
     const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, atk) ? 1 : critChance);
