@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "523de5c3",
+      "state": "9a387532",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -27,7 +27,6 @@
       "players": [
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -64,7 +63,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -125,8 +125,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 405,
-      "state": "d106bee2",
-      "events": "934af100",
+      "state": "57fa4eae",
+      "events": "4a93738b",
       "rng": {
         "draws": 14,
         "digest": "547eb3f4"
@@ -136,7 +136,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 405,
-      "state": "02b30cc5",
+      "state": "cb6341cd",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -147,7 +147,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 405,
-      "state": "3a88ba8b",
+      "state": "6deaeb4c",
       "events": "f379bd29",
       "rng": {
         "draws": 107,
@@ -158,7 +158,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 405,
-      "state": "5f0368f4",
+      "state": "38098689",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -169,7 +169,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 405,
-      "state": "1f57cba4",
+      "state": "bfb0feda",
       "events": "63dfb14d",
       "rng": {
         "draws": 307,
@@ -180,7 +180,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "1d47d2a3",
+      "state": "a4ae3e1f",
       "events": "741638a5",
       "rng": {
         "draws": 418,
@@ -191,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "c6fcbdcb",
+      "state": "fb500381",
       "events": "741638a5",
       "rng": {
         "draws": 418,
@@ -201,7 +201,6 @@
       "players": [
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -214,7 +213,7 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 26
+            "damageDealt": 21
           },
           "craftSkills": {},
           "delveClears": {},
@@ -241,7 +240,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -464,7 +464,7 @@
           "fiveSecondRule": 99,
           "forcedTargetTimer": -0.05,
           "hostile": true,
-          "hp": 49940,
+          "hp": 49945,
           "id": 404,
           "inCombat": true,
           "kind": "mob",
@@ -501,11 +501,11 @@
           "threat": [
             [
               400,
-              26
+              21
             ],
             [
               403,
-              60
+              55
             ]
           ],
           "weapon": {
@@ -520,7 +520,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 405,
-      "state": "30e138c4",
+      "state": "42784917",
       "events": "741638a5",
       "rng": {
         "draws": 518,
@@ -531,7 +531,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 405,
-      "state": "5e3f7b48",
+      "state": "a5ab823d",
       "events": "741638a5",
       "rng": {
         "draws": 637,
@@ -542,7 +542,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "1a652815",
+      "state": "741d303e",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -553,7 +553,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "1a652815",
+      "state": "741d303e",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -563,7 +563,6 @@
       "players": [
         {
           "activeLoadout": -1,
-          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -576,7 +575,7 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 26
+            "damageDealt": 21
           },
           "craftSkills": {},
           "delveClears": {},
@@ -603,7 +602,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -709,7 +709,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.566983,
+          "facing": -1.570796,
           "fallStartY": 52.026485,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -725,9 +725,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 165.036181,
-            "y": 41.053989,
-            "z": -2.575985
+            "x": 164.88,
+            "y": 39.746386,
+            "z": -2
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -813,7 +813,7 @@
           "fallStartY": 54.397438,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49940,
+          "hp": 49945,
           "id": 404,
           "inCombat": true,
           "kind": "mob",
@@ -826,7 +826,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 165.047208,
-            "y": 38.285248,
+            "y": 40.034879,
             "z": 14.480686
           },
           "potionCooldownUntil": -1,
