@@ -99,9 +99,13 @@ describe('mailbox_window: recipient autocomplete wiring', () => {
 
   it('resets suggestion model and debounce timer when the send form is rebuilt and on close', () => {
     expect(painter).toMatch(/renderSend\([\s\S]{0,220}clearTimeout\(this\.recipientSuggestTimer\)/);
-    expect(painter).toMatch(/renderSend\([\s\S]{0,320}this\.recipientSuggest = \{ items: \[], index: -1 \}/);
+    expect(painter).toMatch(
+      /renderSend\([\s\S]{0,320}this\.recipientSuggest = \{ items: \[], index: -1 \}/,
+    );
     expect(painter).toMatch(/close\([\s\S]{0,220}clearTimeout\(this\.recipientSuggestTimer\)/);
-    expect(painter).toMatch(/close\([\s\S]{0,320}this\.recipientSuggest = \{ items: \[], index: -1 \}/);
+    expect(painter).toMatch(
+      /close\([\s\S]{0,320}this\.recipientSuggest = \{ items: \[], index: -1 \}/,
+    );
   });
 
   it('routes keyboard wrap-around through wrappedSuggestionIndex view helper', () => {

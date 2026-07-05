@@ -3338,6 +3338,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': '自动奔跑',
   'hudChrome.mobile.haptics': '震动反馈',
   'hudChrome.mobile.hapticsOff': '震动反馈：关',
+  'hudChrome.mobile.hotbarPage': '技能',
+  'hudChrome.mobile.hotbarPageAria': '显示下一组技能',
   'hudChrome.mobile.jump': '跳跃',
   'hudChrome.mobile.leaderboard': '排行榜',
   'hudChrome.mobile.nameplates': '姓名板',

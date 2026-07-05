@@ -738,6 +738,12 @@ export class Hud {
   // keybind dispatch all work across both with no per-bar bookkeeping.
   private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
   private static readonly BAR_ABILITY_SLOTS = 22;
+  // Mobile hotbar: exactly two pages of 5 visible spell buttons (slots 1-5,
+  // then 6-10), toggled by one page-switch button. Slot 11 has no mobile
+  // page and is reachable only on the desktop bar.
+  private static readonly MOBILE_HOTBAR_PAGE_SIZE = 5;
+  private static readonly MOBILE_HOTBAR_SLOTS = 10;
+  private mobileHotbarPage = 0;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
@@ -4736,6 +4742,37 @@ export class Hud {
       },
       (iconKey) => this.actionBarIconBg(iconKey),
     );
+    this.applyMobileHotbarPage();
+  }
+
+  /** Cycles which of the mobile hotbar's two 5-slot pages is showing (the
+   *  #mobile-hotbar-page toggle button). Event-driven, not per-frame, so it
+   *  writes the DOM directly rather than through the elided writer facet. */
+  cycleMobileHotbarPage(): void {
+    const pages = Math.ceil(Hud.MOBILE_HOTBAR_SLOTS / Hud.MOBILE_HOTBAR_PAGE_SIZE);
+    this.mobileHotbarPage = (this.mobileHotbarPage + 1) % pages;
+    this.applyMobileHotbarPage();
+  }
+
+  /** Shows only this.mobileHotbarPage's slice of ability slots (each assigned
+   *  a fixed position within the page via a hotbar-ring-N class), hiding the
+   *  rest: page 1 is slots 1-5, page 2 is slots 6-10. Hidden slots stay fully
+   *  live (cooldowns keep ticking, aura/proc state is untouched) -- paging
+   *  only toggles which buttons are painted, never which abilities exist. */
+  private applyMobileHotbarPage(): void {
+    const size = Hud.MOBILE_HOTBAR_PAGE_SIZE;
+    for (let slot = 1; slot <= Hud.MOBILE_HOTBAR_SLOTS; slot++) {
+      const btn = this.abilityButtons[slot]?.btn;
+      if (!btn) continue;
+      const index = slot - 1;
+      const page = Math.floor(index / size);
+      const ringPos = index % size;
+      btn.classList.toggle('mobile-hotbar-page-hidden', page !== this.mobileHotbarPage);
+      for (let r = 0; r < size; r++) btn.classList.toggle(`hotbar-ring-${r}`, r === ringPos);
+    }
+    // Slot 11 has no mobile page: always hidden on the touch hotbar.
+    const overflow = this.abilityButtons[Hud.MOBILE_HOTBAR_SLOTS + 1]?.btn;
+    overflow?.classList.add('mobile-hotbar-page-hidden');
   }
 
   // Resolve a core icon key to the slot label's background-image value. Kept on the

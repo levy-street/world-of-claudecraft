@@ -494,11 +494,7 @@ export class MailboxWindow {
     });
   }
 
-  private selectRecipient(
-    body: HTMLElement,
-    input: HTMLInputElement,
-    name: string,
-  ): void {
+  private selectRecipient(body: HTMLElement, input: HTMLInputElement, name: string): void {
     input.value = name;
     this.renderRecipientSuggest(body, []);
   }

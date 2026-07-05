@@ -3339,6 +3339,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': '自動奔跑',
   'hudChrome.mobile.haptics': '觸覺回饋',
   'hudChrome.mobile.hapticsOff': '觸覺回饋已關閉',
+  'hudChrome.mobile.hotbarPage': '技能',
+  'hudChrome.mobile.hotbarPageAria': '顯示下一組技能',
   'hudChrome.mobile.jump': '跳躍',
   'hudChrome.mobile.leaderboard': '排行榜',
   'hudChrome.mobile.nameplates': '名條',

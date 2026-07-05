@@ -3481,6 +3481,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'オートラン',
   'hudChrome.mobile.haptics': '振動',
   'hudChrome.mobile.hapticsOff': '振動オフ',
+  'hudChrome.mobile.hotbarPage': 'スキル',
+  'hudChrome.mobile.hotbarPageAria': '次のスキルセットを表示',
   'hudChrome.mobile.jump': 'ジャンプ',
   'hudChrome.mobile.leaderboard': 'ランキング',
   'hudChrome.mobile.nameplates': 'ネームプレート',
