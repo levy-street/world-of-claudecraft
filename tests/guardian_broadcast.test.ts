@@ -9,6 +9,7 @@ vi.mock('../server/db', () => ({
   saveCharacterState: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),

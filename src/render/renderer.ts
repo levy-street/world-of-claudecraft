@@ -3457,6 +3457,7 @@ export class Renderer {
       castBar,
       castFill,
       castLabel,
+      guardianEl,
       tierEl,
       devTierEl,
       discordEl,

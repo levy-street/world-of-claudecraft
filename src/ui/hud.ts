@@ -11191,9 +11191,9 @@ export class Hud {
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       el.style.display = 'none';
     });
-  }}
+  }
 
-  toggleDailyRewards(): void {{
+  toggleDailyRewards(): void {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.toggle();
     this.refreshDailyRewardsLauncher(true);
