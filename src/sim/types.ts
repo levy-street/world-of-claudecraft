@@ -361,6 +361,7 @@ export interface SetBonusEffect {
   int?: number;
   spi?: number;
   ap?: number; // flat attack power
+  sp?: number; // flat spell power (mirrors `ap` for the caster archetype)
   crit?: number; // flat crit chance, 0..1
   // Haste fraction (0.15 = 15% faster). ONE stat: it speeds melee and ranged
   // auto-attack swings AND shortens spell cast/channel time, all together
