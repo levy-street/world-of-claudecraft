@@ -1,42 +1,50 @@
-// Hodric's Castle: the Gauntlet, a 10-racer obstacle-course race (Fall Guys
-// spirit, classic-MMO body). Queue at the Herald, race the course defined in
-// sim/hodrics_layout.ts, first over the finish line takes the crown.
+// Hodric's Castle: the Gauntlet, a 10-racer obstacle-course ELIMINATION SHOW
+// (Fall Guys spirit, classic-MMO body). Queue at the Herald, race three
+// rounds of Lord Hodric's ever-rebuilt gauntlet: round 1 qualifies six,
+// round 2 qualifies three, and the final crowns one. The eliminated are
+// flung to the spectator gallery by Hodric's catapult and watch the rest.
 //
 // Follows the Ashen Coliseum arena module shape: state lives on Sim (live
 // SimContext views), this module holds only functions, and the whole system
 // costs zero work and ZERO rng draws while nobody queues or races.
 //
 // DETERMINISM CONTRACT:
+// - Every round races a GENERATED course (src/sim/hodrics_course.ts): a pure
+//   function of a seed derived from tickCount + matchId + round, registered
+//   in the slot's active-course registry so the base sim's ground/collider
+//   routing and the renderer all read the same value. No shared-rng draws.
 // - Obstacle poses are pure functions of absolute sim time (hodrics_layout);
 //   the race physics below reads them, it never advances them.
-// - The race itself draws NO randomness at all. The per-match `rng` sub-stream
-//   (seeded off tickCount + nextHcMatchId, the fiesta mechanism) exists solely
-//   for bot skill variance in social/hodrics_bots.ts and never touches the
-//   shared stream, so parity goldens cannot fork.
-// - Racers cannot die on the course: there are no damage sources in the band,
-//   falls are caught at the kill plane and respawn at the last checkpoint.
+// - The race itself draws NO randomness at all. The per-match `rng`
+//   sub-stream (seeded off tickCount + nextHcMatchId, the fiesta mechanism)
+//   exists solely for bot skill variance in social/hodrics_bots.ts and never
+//   touches the shared stream, so parity goldens cannot fork.
+// - Racers cannot die on the course: there are no damage sources in the
+//   band, falls are caught at the kill plane and respawn at the last
+//   checkpoint (or the gallery, for the eliminated).
 
 import { HC_HERALD, HC_HERALD_ID, HC_HERALD_POS } from '../content/hodrics';
 import { DUNGEON_X_THRESHOLD, hodricsOrigin, isHodricsPos } from '../data';
 import { createNpc } from '../entity';
 import {
-  HC_AXES,
-  HC_BOULDER_LANES,
-  HC_CHECKPOINTS,
-  HC_DRAWSPANS,
-  HC_FIELD_SIZE,
-  HC_FINISH_Z,
-  HC_FLAILS,
-  HC_KILL_Y,
-  HC_ROTORS,
-  hcAxeHead,
+  type HcCourse,
   hcCheckpointSpawn,
+  hcCourseFor,
+  hcStartPlate,
+  hodricsOnSpinner,
+  hodricsSurfaceAt,
+  resetHodricsCourse,
+  setActiveHodricsCourse,
+} from '../hodrics_course';
+import {
+  HC_FIELD_SIZE,
+  HC_KILL_Y,
+  hcAxeHead,
   hcDrawspanX,
   hcFlailBob,
   hcLaneBoulders,
+  hcPusherX,
   hcRotorAngle,
-  hcStartPlate,
-  hodricsSurfaceAt,
 } from '../hodrics_layout';
 import { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
@@ -50,8 +58,20 @@ import { arenaDequeue, isArenaQueued, placeInArena, resetForArena } from './aren
 
 export const HC_COUNTDOWN = 5; // seconds on the start plates before GO
 export const HC_RETURN_DELAY = 10; // podium moment on the keep before going home
-export const HC_MAX_DURATION = 240; // seconds; stragglers place by progress
 export const HC_BOT_BACKFILL_WAIT = 30; // seconds a human waits before bots fill the field
+
+/** The show: three rounds, the field shrinking each time. */
+export const HC_ROUNDS = 3;
+/** How many racers advance out of each round (the last number is the crown). */
+export const HC_QUALIFY: readonly number[] = [6, 3, 1];
+/** Per-round time limits; expiry ranks the unfinished by progress. */
+export const HC_ROUND_TIME: readonly number[] = [110, 110, 130];
+/** Intermission between rounds: eliminations fly, the castle rebuilds. */
+export const HC_INTERMISSION = 6;
+/** Intermission timers (counting down from HC_INTERMISSION) at which the
+ * catapult launches the eliminated, then drops them in the gallery. */
+const HC_GALLERY_AT = 3.4;
+
 // No level gate: the Gauntlet has no combat, run speed is identical for every
 // racer, so a day-one character can race the realm's best on even legs.
 
@@ -59,29 +79,32 @@ export const HC_BOT_BACKFILL_WAIT = 30; // seconds a human waits before bots fil
 // airborne velocity with no air control, so a knock is committed, exactly the
 // tumbling feel we want). Immunity keeps chained obstacles from stunlocking:
 // hammer/axe/boulder yeets are big committed launches with a long grace, the
-// spinning log is a ground-level SHOVE with a short one, so a slow log keeps
-// bulldozing you sideways instead of ping-ponging you into the air.
+// spinning log and the piston rams are ground-level SHOVES with a short one.
 export const HC_LAUNCH_IMMUNITY = 0.9; // seconds of no re-hit after any launch or respawn
 const HC_IMMUNITY: Record<HcKnockKind, number> = {
   flail: 0.9,
   axe: 0.9,
   log: 0.4,
   boulder: 0.9,
+  piston: 0.5,
 };
 const HC_BODY_R = 0.5; // racer body radius (PLAYER_BODY_RADIUS)
 const HC_BODY_HALF_H = 0.9; // capsule half height for vertical overlap tests
-const HC_ROPE_Z = -86; // countdown holding line at the yard mouth
 
 const KNOCK_FLAIL = { v: 13, vy: 6.5 };
 const KNOCK_AXE = { v: 14, vy: 7 };
 const KNOCK_ROTOR = { tangential: 7.5, radial: 2.5, vy: 2.8 };
 const KNOCK_BOULDER = { vz: -12, vx: 3, vy: 6 };
+const KNOCK_PISTON = { v: 8.5, vy: 3.2 };
 
 // Landing squash: a hard landing (drop past this) rebounds into a small hop,
 // the gameshow-bouncy feel. Chained bounces decay since each peak is lower.
 const HC_BOUNCE_MIN_DROP = 3.2;
 const HC_BOUNCE_FACTOR = 0.5; // rebound vy = min(cap, drop * factor)
 const HC_BOUNCE_VY_CAP = 3.4;
+
+/** The catapult: the send-off arc for the freshly eliminated. */
+const HC_YEET_VY = 15;
 
 // ---------------------------------------------------------------------------
 // State shapes (backing fields live on Sim, reached as live ctx views)
@@ -98,11 +121,13 @@ export interface HcRacer {
   cls: PlayerClass;
   bot: boolean;
   seat: number; // start plate + respawn lane
-  checkpoint: number; // last banked HC_CHECKPOINTS index
-  furthestZ: number; // monotonic course progress (instance-local z)
-  finished: boolean;
-  finishTime: number; // race clock seconds at the finish line
-  place: number; // 1..N once assigned (finish order, then progress)
+  checkpoint: number; // last banked course checkpoint index (this round)
+  furthestZ: number; // monotonic course progress this round (instance-local z)
+  finished: boolean; // crossed THIS round's line (a qualification, or the crown)
+  finishTime: number; // round clock seconds at the line
+  place: number; // FINAL match placement 1..N once assigned
+  eliminatedRound: number; // 0 while still racing; the round that cut them
+  credited: boolean; // hcRaces/hcWins recorded (exactly once per match)
   falls: number;
   lastLaunchAt: number; // sim time of the last launch/respawn (immunity)
   immunity: number; // per-kind re-hit grace applied at the last launch
@@ -114,13 +139,21 @@ export interface HcRacer {
 export interface HcMatch {
   id: number;
   slot: number;
-  state: 'countdown' | 'active' | 'over';
-  timer: number; // countdown remaining, then aftermath remaining in 'over'
-  clock: number; // elapsed active race seconds
+  state: 'countdown' | 'active' | 'intermission' | 'over';
+  round: number; // 1..HC_ROUNDS
+  timer: number; // countdown, then intermission, then aftermath remaining
+  clock: number; // elapsed active seconds THIS round
+  /** Seed base for the match; each round derives its course seed from it. */
+  seedBase: number;
+  courseSeed: number;
+  course: HcCourse;
   racers: Map<number, HcRacer>;
   returns: Map<number, { x: number; z: number; facing: number }>;
   botPids: number[];
-  nextPlace: number;
+  /** Next place handed to a round-3 finisher (counts up from 1). */
+  topPlace: number;
+  /** Next place handed to the eliminated/deserters (counts down from N). */
+  bottomPlace: number;
   /** Bot-variance sub-stream only; the race itself never draws from it. */
   rng: Rng;
 }
@@ -128,7 +161,7 @@ export interface HcMatch {
 export interface HcStanding {
   races: number;
   wins: number;
-  best: number | null; // fastest personal finish, seconds
+  best: number | null; // fastest personal final-round finish, seconds
 }
 
 export function hcStanding(meta: PlayerMeta): HcStanding {
@@ -143,6 +176,11 @@ export function addHcResult(meta: PlayerMeta, won: boolean, timeS: number | null
   meta.hcRaces = (meta.hcRaces ?? 0) + 1;
   if (won) meta.hcWins = (meta.hcWins ?? 0) + 1;
   if (timeS !== null && (meta.hcBest === undefined || timeS < meta.hcBest)) meta.hcBest = timeS;
+}
+
+/** The round's course seed: pure in (seedBase, round), distinct per round. */
+export function hcRoundSeed(seedBase: number, round: number): number {
+  return (seedBase ^ Math.imul(round, 0x85ebca6b)) >>> 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -268,6 +306,11 @@ export function startHcMatch(ctx: SimContext, pids: number[]): void {
     return;
   }
   ctx.hcBusySlots.add(slot);
+  const matchId = ctx.nextHcMatchId++;
+  const seedBase = (ctx.tickCount * 2654435761 + matchId * 40503) >>> 0;
+  const courseSeed = hcRoundSeed(seedBase, 1);
+  const course = hcCourseFor(courseSeed, 0);
+  setActiveHodricsCourse(slot, course);
   const returns = new Map<number, { x: number; z: number; facing: number }>();
   const racers = new Map<number, HcRacer>();
   const botPids: number[] = [];
@@ -286,10 +329,12 @@ export function startHcMatch(ctx: SimContext, pids: number[]): void {
       bot,
       seat,
       checkpoint: 0,
-      furthestZ: HC_CHECKPOINTS[0].z,
+      furthestZ: course.checkpoints[0].z,
       finished: false,
       finishTime: 0,
       place: 0,
+      eliminatedRound: 0,
+      credited: false,
       falls: 0,
       lastLaunchAt: -99,
       immunity: HC_LAUNCH_IMMUNITY,
@@ -299,17 +344,22 @@ export function startHcMatch(ctx: SimContext, pids: number[]): void {
     });
   }
   const match: HcMatch = {
-    id: ctx.nextHcMatchId++,
+    id: matchId,
     slot,
     state: 'countdown',
+    round: 1,
     timer: HC_COUNTDOWN,
     clock: 0,
+    seedBase,
+    courseSeed,
+    course,
     racers,
     returns,
     botPids,
-    nextPlace: 1,
+    topPlace: 1,
+    bottomPlace: pids.length,
     // The fiesta per-match sub-stream: one derivation, zero shared draws.
-    rng: new Rng((ctx.tickCount * 2654435761 + ctx.nextHcMatchId * 40503) >>> 0),
+    rng: new Rng((ctx.tickCount * 2654435761 + matchId * 40503) >>> 0),
   };
   for (const pid of pids) ctx.hcMatches.set(pid, match);
   const field = pids.map((pid) => {
@@ -319,9 +369,10 @@ export function startHcMatch(ctx: SimContext, pids: number[]): void {
   for (let seat = 0; seat < pids.length; seat++) {
     const e = entities[seat]!;
     arenaDequeue(ctx, pids[seat]);
-    placeInArena(ctx, e, origin, hcStartPlate(seat));
+    placeInArena(ctx, e, origin, hcStartPlate(course, seat));
     resetForArena(ctx, e);
     ctx.emit({ type: 'hcFound', field, pid: pids[seat] });
+    ctx.emit({ type: 'hcRoundStart', round: 1, pid: pids[seat] });
     ctx.emit({ type: 'hcCountdown', seconds: HC_COUNTDOWN, pid: pids[seat] });
     ctx.emit({
       type: 'log',
@@ -334,6 +385,19 @@ export function startHcMatch(ctx: SimContext, pids: number[]): void {
 
 export function hcMatchFor(ctx: SimContext, pid: number): HcMatch | null {
   return ctx.hcMatches.get(pid) ?? null;
+}
+
+/** Racers still in the running: not eliminated, not gone. */
+function aliveRacers(match: HcMatch): HcRacer[] {
+  return [...match.racers.values()].filter((r) => !r.left && r.eliminatedRound === 0);
+}
+
+/** This round's qualification target, shrunk for short (deserted) fields. */
+export function hcQualifyTarget(match: HcMatch): number {
+  const alive = aliveRacers(match).length;
+  const base = HC_QUALIFY[match.round - 1] ?? 1;
+  if (match.round >= HC_ROUNDS) return 1;
+  return Math.max(1, Math.min(base, alive - 1));
 }
 
 export function updateHodrics(ctx: SimContext): void {
@@ -349,12 +413,15 @@ export function updateHodrics(ctx: SimContext): void {
 }
 
 function updateHcMatch(ctx: SimContext, match: HcMatch): void {
-  // Desertion sweep: logged out, or somehow fled the crag mid-race.
+  // Desertion sweep: logged out, or somehow fled the crag mid-race. A
+  // deserter who had no place yet takes the worst unassigned one.
   for (const racer of match.racers.values()) {
-    if (racer.left || racer.finished) continue;
+    if (racer.left) continue;
     const e = ctx.entities.get(racer.pid);
     if (!e || (match.state !== 'over' && !isHodricsPos(e.pos.x))) {
       racer.left = true;
+      if (racer.place === 0) racer.place = match.bottomPlace--;
+      if (racer.eliminatedRound === 0) racer.eliminatedRound = match.round;
       ctx.hcMatches.delete(racer.pid);
     }
   }
@@ -366,7 +433,7 @@ function updateHcMatch(ctx: SimContext, match: HcMatch): void {
   const humanPresent = [...match.racers.values()].some((r) => !r.bot && !r.left);
   if (!humanPresent) {
     // Nothing but bots left racing: score it and fold the instance.
-    endHcMatch(ctx, match);
+    finalizeMatch(ctx, match);
     return;
   }
   if (match.state === 'countdown') {
@@ -375,7 +442,9 @@ function updateHcMatch(ctx: SimContext, match: HcMatch): void {
     const after = Math.ceil(match.timer);
     if (after < before && after > 0) {
       for (const racer of match.racers.values()) {
-        if (!racer.left) ctx.emit({ type: 'hcCountdown', seconds: after, pid: racer.pid });
+        if (!racer.left && racer.eliminatedRound === 0) {
+          ctx.emit({ type: 'hcCountdown', seconds: after, pid: racer.pid });
+        }
       }
     }
     holdAtRope(ctx, match);
@@ -383,7 +452,7 @@ function updateHcMatch(ctx: SimContext, match: HcMatch): void {
       match.state = 'active';
       match.timer = 0;
       for (const racer of match.racers.values()) {
-        if (racer.left) continue;
+        if (racer.left || racer.eliminatedRound > 0) continue;
         ctx.emit({ type: 'hcStart', pid: racer.pid });
         ctx.emit({
           type: 'log',
@@ -395,22 +464,38 @@ function updateHcMatch(ctx: SimContext, match: HcMatch): void {
     }
     return;
   }
+  if (match.state === 'intermission') {
+    const before = match.timer;
+    match.timer -= DT;
+    // The catapult flight ends in the gallery: one clean teleport for
+    // everyone cut this round, once the arc has had its moment.
+    if (before > HC_GALLERY_AT && match.timer <= HC_GALLERY_AT) {
+      seatGallery(ctx, match);
+    }
+    if (match.timer <= 0) beginNextRound(ctx, match);
+    return;
+  }
   match.clock += DT;
   racePhysics(ctx, match);
-  const allDone = [...match.racers.values()].every((r) => r.finished || r.left);
-  const humansDone = [...match.racers.values()].every((r) => r.bot || r.finished || r.left);
-  if (allDone || humansDone || match.clock >= HC_MAX_DURATION) endHcMatch(ctx, match);
+  const alive = aliveRacers(match);
+  const target = hcQualifyTarget(match);
+  const finishers = alive.filter((r) => r.finished).length;
+  const roundTime = HC_ROUND_TIME[match.round - 1] ?? 120;
+  if (finishers >= target || alive.every((r) => r.finished) || match.clock >= roundTime) {
+    resolveRound(ctx, match);
+  }
 }
 
-// Countdown: a soft rope at the yard mouth so nobody false-starts the bridge.
+// Countdown: a soft rope at the yard mouth so nobody false-starts the course.
 function holdAtRope(ctx: SimContext, match: HcMatch): void {
   const origin = hodricsOrigin(match.slot);
+  const ropeZ = match.course.ropeZ;
   for (const racer of match.racers.values()) {
-    if (racer.left) continue;
+    if (racer.left || racer.eliminatedRound > 0) continue;
     const e = ctx.entities.get(racer.pid);
     if (!e) continue;
-    if (e.pos.z - origin.z > HC_ROPE_Z) {
-      e.pos.z = origin.z + HC_ROPE_Z;
+    if (e.pos.z - origin.z > ropeZ) {
+      e.pos.z = origin.z + ropeZ;
       e.vx = 0;
       e.vz = 0;
     }
@@ -418,23 +503,167 @@ function holdAtRope(ctx: SimContext, match: HcMatch): void {
 }
 
 // ---------------------------------------------------------------------------
-// Race physics: platform carry, obstacle launches, falls, progress, finish.
-// Runs AFTER the base per-player movement phase each tick, so it is the
-// vertical authority for the analytic platforms and the safety net under the
-// chasm. Every pose it tests comes from the layout's pure time functions.
+// Round resolution: qualification, elimination, the catapult, the rebuild.
+// ---------------------------------------------------------------------------
+
+/** Standing order for a round: finishers by time, then progress, then seat. */
+function roundStanding(match: HcMatch): HcRacer[] {
+  return aliveRacers(match).sort((a, b) => {
+    if (a.finished !== b.finished) return a.finished ? -1 : 1;
+    if (a.finished && b.finished) return a.finishTime - b.finishTime;
+    return b.furthestZ - a.furthestZ || a.seat - b.seat;
+  });
+}
+
+function resolveRound(ctx: SimContext, match: HcMatch): void {
+  const standing = roundStanding(match);
+  const target = hcQualifyTarget(match);
+
+  if (match.round >= HC_ROUNDS || standing.length <= 1) {
+    finalizeMatch(ctx, match);
+    return;
+  }
+
+  const origin = hodricsOrigin(match.slot);
+  const qualified = standing.slice(0, target);
+  const cut = standing.slice(target);
+  for (const racer of qualified) {
+    ctx.emit({ type: 'hcQualified', round: match.round, pid: racer.pid });
+  }
+  // Worst standing takes the worst place, counting down the board.
+  for (let i = cut.length - 1; i >= 0; i--) {
+    const racer = cut[i];
+    racer.eliminatedRound = match.round;
+    racer.place = match.bottomPlace--;
+    if (!racer.bot && !racer.credited) {
+      const meta = ctx.players.get(racer.pid);
+      if (meta) {
+        addHcResult(meta, false, null);
+        racer.credited = true;
+      }
+    }
+    // Hodric's catapult: the send-off. The gallery teleport lands mid-flight
+    // (seatGallery), so the whole field watches the losers arc skyward.
+    const e = ctx.entities.get(racer.pid);
+    if (e) {
+      const dir = e.pos.x - origin.x >= 0 ? 1 : -1;
+      e.vx = dir * 2.5;
+      e.vy = HC_YEET_VY;
+      e.vz = -3;
+      e.onGround = false;
+      e.jumping = false;
+      e.fallStartY = e.pos.y;
+    }
+    ctx.emit({ type: 'hcEliminated', place: racer.place, round: match.round, pid: racer.pid });
+  }
+  match.state = 'intermission';
+  match.timer = HC_INTERMISSION;
+}
+
+/** Drop everyone eliminated (any round) onto the gallery balcony. */
+function seatGallery(ctx: SimContext, match: HcMatch): void {
+  const origin = hodricsOrigin(match.slot);
+  const g = match.course.gallery;
+  const out = [...match.racers.values()].filter((r) => !r.left && r.eliminatedRound > 0);
+  for (let i = 0; i < out.length; i++) {
+    const e = ctx.entities.get(out[i].pid);
+    if (!e) continue;
+    const col = i % 4;
+    const row = Math.floor(i / 4);
+    e.pos = {
+      x: origin.x + g.x - 4.5 + col * 3,
+      y: g.y,
+      z: origin.z + g.z - 3 + row * 3,
+    };
+    e.prevPos = { ...e.pos };
+    e.facing = Math.PI / 2; // face the course
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    e.fallStartY = e.pos.y;
+    ctx.rebucket(e);
+  }
+}
+
+/** Rebuild the castle (new course seed) and plate the survivors. */
+function beginNextRound(ctx: SimContext, match: HcMatch): void {
+  const alive = aliveRacers(match);
+  if (alive.length <= 1) {
+    finalizeMatch(ctx, match);
+    return;
+  }
+  match.round += 1;
+  // A short field can skip ahead: no round should eliminate nobody.
+  while (match.round < HC_ROUNDS && alive.length <= (HC_QUALIFY[match.round - 1] ?? 1)) {
+    match.round += 1;
+  }
+  match.courseSeed = hcRoundSeed(match.seedBase, match.round);
+  match.course = hcCourseFor(match.courseSeed, match.round - 1);
+  setActiveHodricsCourse(match.slot, match.course);
+  match.clock = 0;
+  match.state = 'countdown';
+  match.timer = HC_COUNTDOWN;
+  const origin = hodricsOrigin(match.slot);
+  for (const racer of alive) {
+    const e = ctx.entities.get(racer.pid);
+    if (!e) continue;
+    racer.checkpoint = 0;
+    racer.furthestZ = match.course.checkpoints[0].z;
+    racer.finished = false;
+    racer.finishTime = 0;
+    racer.lastLaunchAt = -99;
+    racer.immunity = HC_LAUNCH_IMMUNITY;
+    racer.airborne = false;
+    placeInArena(ctx, e, origin, hcStartPlate(match.course, racer.seat));
+    racer.peakY = e.pos.y;
+    ctx.emit({ type: 'hcRoundStart', round: match.round, pid: racer.pid });
+    ctx.emit({ type: 'hcCountdown', seconds: HC_COUNTDOWN, pid: racer.pid });
+    ctx.emit({
+      type: 'log',
+      text: 'Lord Hodric rebuilds his gauntlet. New course, same crown!',
+      color: '#c9a2ff',
+      pid: racer.pid,
+    });
+  }
+  // Spectators hear the new round too.
+  for (const racer of match.racers.values()) {
+    if (!racer.left && racer.eliminatedRound > 0) {
+      ctx.emit({ type: 'hcRoundStart', round: match.round, pid: racer.pid });
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Race physics: platform carry, spinner carry, obstacle launches, falls,
+// progress, finish. Runs AFTER the base per-player movement phase each tick,
+// so it is the vertical authority for the analytic platforms and the safety
+// net under the chasm. Every pose it tests comes from pure time functions.
 // ---------------------------------------------------------------------------
 
 function racePhysics(ctx: SimContext, match: HcMatch): void {
   const origin = hodricsOrigin(match.slot);
+  const course = match.course;
   const t = ctx.time;
   for (const racer of match.racers.values()) {
     if (racer.left) continue;
     const e = ctx.entities.get(racer.pid);
     if (!e) continue;
-    ridePlatforms(e, e.pos.x - origin.x, e.pos.z - origin.z, t);
+
+    // Spectators: only the safety net (rails make falls near-impossible).
+    if (racer.eliminatedRound > 0) {
+      if (e.pos.y < HC_KILL_Y) respawnAtCheckpoint(ctx, match, racer, e);
+      continue;
+    }
+
+    const lx = e.pos.x - origin.x;
+    const lz = e.pos.z - origin.z;
+    ridePlatforms(course, e, lx, lz, t);
+    rideSpinners(course, e, lx, lz);
 
     if (!racer.finished && t - racer.lastLaunchAt >= racer.immunity) {
-      testObstacleHits(ctx, racer, e, e.pos.x - origin.x, e.pos.z - origin.z, t);
+      testObstacleHits(ctx, course, racer, e, e.pos.x - origin.x, e.pos.z - origin.z, t);
     }
 
     // Kill plane: the chasm swallows nobody, it hands them back to the line.
@@ -452,9 +681,9 @@ function racePhysics(ctx: SimContext, match: HcMatch): void {
     } else {
       if (racer.airborne) {
         const drop = racer.peakY - e.pos.y;
-        const lx = e.pos.x - origin.x;
-        const lz = e.pos.z - origin.z;
-        if (drop > HC_BOUNCE_MIN_DROP && !ridingPlatform(lx, lz, e.pos.y, t)) {
+        const plx = e.pos.x - origin.x;
+        const plz = e.pos.z - origin.z;
+        if (drop > HC_BOUNCE_MIN_DROP && !ridingPlatform(course, plx, plz, e.pos.y, t)) {
           e.vy = Math.min(HC_BOUNCE_VY_CAP, drop * HC_BOUNCE_FACTOR);
           e.onGround = false;
           e.fallStartY = e.pos.y;
@@ -464,32 +693,58 @@ function racePhysics(ctx: SimContext, match: HcMatch): void {
       racer.peakY = e.pos.y;
     }
 
-    // Progress banks only on solid ground (a flail yeet is not progress).
+    // Progress banks only on solid ground (a hammer yeet is not progress).
     if (e.onGround) {
       const localZ = e.pos.z - origin.z;
       const localX = e.pos.x - origin.x;
       const onCourse =
-        hodricsSurfaceAt(localX, localZ) !== null || ridingPlatform(localX, localZ, e.pos.y, t);
+        hodricsSurfaceAt(course, localX, localZ) !== null ||
+        hodricsOnSpinner(course, localX, localZ) !== null ||
+        ridingPlatform(course, localX, localZ, e.pos.y, t);
       if (onCourse && localZ > racer.furthestZ) racer.furthestZ = localZ;
       if (onCourse) {
         const nextCp = racer.checkpoint + 1;
-        if (nextCp < HC_CHECKPOINTS.length && localZ >= HC_CHECKPOINTS[nextCp].z) {
+        if (nextCp < course.checkpoints.length && localZ >= course.checkpoints[nextCp].z) {
           racer.checkpoint = nextCp;
           ctx.emit({ type: 'hcCheckpoint', index: nextCp, pid: racer.pid });
         }
-        if (!racer.finished && localZ >= HC_FINISH_Z && e.pos.y > 13) {
+        if (
+          !racer.finished &&
+          localZ >= course.finishZ &&
+          e.pos.y > course.finishY - 1 &&
+          match.state === 'active'
+        ) {
           racer.finished = true;
-          racer.place = match.nextPlace++;
           racer.finishTime = match.clock;
-          ctx.emit({ type: 'hcFinish', place: racer.place, timeS: match.clock, pid: racer.pid });
-          // Credit the finish NOW, not at endHcMatch: a racer who quits the
-          // instant they cross the line (a very likely thing to do right
-          // after winning) would otherwise have their PlayerMeta gone
-          // (removePlayer deletes it synchronously) by the time the match
-          // finally ends for everyone else, silently losing the win.
-          if (!racer.bot) {
-            const meta = ctx.players.get(racer.pid);
-            if (meta) addHcResult(meta, racer.place === 1, racer.finishTime);
+          if (match.round >= HC_ROUNDS) {
+            // The final: places count up from the crown.
+            racer.place = match.topPlace++;
+            ctx.emit({
+              type: 'hcFinish',
+              place: racer.place,
+              timeS: match.clock,
+              pid: racer.pid,
+            });
+            // Credit the finish NOW, not at finalizeMatch: a racer who quits
+            // the instant they cross the line would otherwise have their
+            // PlayerMeta gone (removePlayer deletes it synchronously) by the
+            // time the match ends, silently losing the crown.
+            if (!racer.bot && !racer.credited) {
+              const meta = ctx.players.get(racer.pid);
+              if (meta) {
+                addHcResult(meta, racer.place === 1, racer.finishTime);
+                racer.credited = true;
+              }
+            }
+          } else {
+            // Qualification: in-round order is just for the banner.
+            const qualOrder = aliveRacers(match).filter((r) => r.finished).length;
+            ctx.emit({
+              type: 'hcFinish',
+              place: qualOrder,
+              timeS: match.clock,
+              pid: racer.pid,
+            });
           }
         }
       }
@@ -497,9 +752,9 @@ function racePhysics(ctx: SimContext, match: HcMatch): void {
   }
 }
 
-/** True when a point rides one of the Drawspan platforms at deck height. */
-function ridingPlatform(lx: number, lz: number, y: number, t: number): boolean {
-  for (const d of HC_DRAWSPANS) {
+/** True when a point rides one of the drawspan platforms at deck height. */
+function ridingPlatform(course: HcCourse, lx: number, lz: number, y: number, t: number): boolean {
+  for (const d of course.drawspans) {
     const px = hcDrawspanX(d, t);
     if (
       Math.abs(lx - px) <= d.halfX &&
@@ -512,13 +767,13 @@ function ridingPlatform(lx: number, lz: number, y: number, t: number): boolean {
   return false;
 }
 
-// The Drawspan platforms are the one dynamic floor in the game. The base sim
-// only knows the static ground (the chasm below the gap), so this pass is
+// The drawspan platforms are one of two dynamic floors in the game. The base
+// sim only knows the static ground (the chasm below the gap), so this pass is
 // their vertical authority: it catches landings, pins riders to the deck, and
 // carries them with the platform's analytic delta. A racer the platform
 // slides out from under simply stops matching the rect and falls next tick.
-function ridePlatforms(e: Entity, lx: number, lz: number, t: number): void {
-  for (const d of HC_DRAWSPANS) {
+function ridePlatforms(course: HcCourse, e: Entity, lx: number, lz: number, t: number): void {
+  for (const d of course.drawspans) {
     const px = hcDrawspanX(d, t);
     if (Math.abs(lz - d.zCenter) > d.halfZ || Math.abs(lx - px) > d.halfX) continue;
     const grounded = e.onGround && Math.abs(e.pos.y - d.y) < 0.3;
@@ -537,8 +792,27 @@ function ridePlatforms(e: Entity, lx: number, lz: number, t: number): void {
   }
 }
 
+// The other dynamic floor: spinner discs. The disc top is static ground (the
+// course ground function knows the circle), but standing on one carries the
+// rider around the hub by the disc's angular speed. Pure rotation, no rng.
+function rideSpinners(course: HcCourse, e: Entity, lx: number, lz: number): void {
+  if (!e.onGround) return;
+  const d = hodricsOnSpinner(course, lx, lz);
+  if (!d || Math.abs(e.pos.y - d.y) > 0.6) return;
+  const relX = lx - d.cx;
+  const relZ = lz - d.cz;
+  const dth = d.omega * DT;
+  const cos = Math.cos(dth);
+  const sin = Math.sin(dth);
+  const nx = relX * cos - relZ * sin;
+  const nz = relX * sin + relZ * cos;
+  e.pos.x += nx - relX;
+  e.pos.z += nz - relZ;
+}
+
 function testObstacleHits(
   ctx: SimContext,
+  course: HcCourse,
   racer: HcRacer,
   e: Entity,
   lx: number,
@@ -548,8 +822,8 @@ function testObstacleHits(
   const groundY = e.pos.y;
   const coreY = groundY + HC_BODY_HALF_H;
 
-  // Flails over the bridge: a sphere on a chain, swinging across x.
-  for (const f of HC_FLAILS) {
+  // Hammer flails over the bridges: a fat bob on an arm, swinging across x.
+  for (const f of course.flails) {
     const bob = hcFlailBob(f, t);
     const dx = lx - bob.x;
     const dz = lz - f.z;
@@ -563,9 +837,9 @@ function testObstacleHits(
     }
   }
 
-  // Log rotors on the plaza: a full-diameter beam, jumpable over the top.
-  for (const r of HC_ROTORS) {
-    if (coreY - HC_BODY_HALF_H > r.beamTopY) continue; // cleared it airborne
+  // Log rotors on the courts: a full-diameter beam, jumpable over the top.
+  for (const r of course.rotors) {
+    if (coreY - HC_BODY_HALF_H > r.y + r.beamTopY) continue; // cleared it airborne
     const a = hcRotorAngle(r, t);
     const ux = Math.cos(a);
     const uz = Math.sin(a);
@@ -585,8 +859,8 @@ function testObstacleHits(
     }
   }
 
-  // Pendulum axes over the wall walk.
-  for (const a of HC_AXES) {
+  // Pendulum axes over the wall walks.
+  for (const a of course.axes) {
     const head = hcAxeHead(a, t);
     const dx = lx - head.x;
     const dz = lz - a.z;
@@ -600,8 +874,21 @@ function testObstacleHits(
     }
   }
 
-  // Boulders rolling down the alley: knocked back downhill.
-  for (const lane of HC_BOULDER_LANES) {
+  // Piston rams shoving across the ledges: a ground-level push toward the
+  // open edge; ride it out or time the gap.
+  for (const p of course.pushers) {
+    if (Math.abs(coreY - (p.y + HC_BODY_HALF_H)) > 1.6) continue;
+    const hx = hcPusherX(p, t);
+    const dx = lx - hx;
+    const dz = lz - p.z;
+    if (Math.hypot(dx, dz) < p.headR + HC_BODY_R) {
+      launch(ctx, racer, e, -p.side * KNOCK_PISTON.v, KNOCK_PISTON.vy, 0.8, 'piston');
+      return;
+    }
+  }
+
+  // Boulders rolling down the climbs: knocked back downhill.
+  for (const lane of course.boulderLanes) {
     for (const b of hcLaneBoulders(lane, t)) {
       const dx = lx - lane.x;
       const dz = lz - b.z;
@@ -649,7 +936,11 @@ function launch(
 
 function respawnAtCheckpoint(ctx: SimContext, match: HcMatch, racer: HcRacer, e: Entity): void {
   const origin = hodricsOrigin(match.slot);
-  const s = hcCheckpointSpawn(racer.checkpoint, racer.seat);
+  // Spectators fall back to the gallery, never onto the course.
+  const s =
+    racer.eliminatedRound > 0
+      ? { x: match.course.gallery.x, z: match.course.gallery.z }
+      : hcCheckpointSpawn(match.course, racer.checkpoint, racer.seat);
   e.pos = ctx.groundPos(origin.x + s.x, origin.z + s.z);
   e.prevPos = { ...e.pos };
   e.facing = 0;
@@ -673,13 +964,23 @@ function respawnAtCheckpoint(ctx: SimContext, match: HcMatch, racer: HcRacer, e:
 // Scoring + return
 // ---------------------------------------------------------------------------
 
-export function endHcMatch(ctx: SimContext, match: HcMatch): void {
-  // Unfinished racers place by furthest progress, ties broken by seat.
-  const open = [...match.racers.values()]
-    .filter((r) => !r.finished)
-    .sort((a, b) => b.furthestZ - a.furthestZ || a.seat - b.seat);
-  for (const racer of open) racer.place = match.nextPlace++;
-
+/** Assign every remaining place and close the show (podium, then home). */
+export function finalizeMatch(ctx: SimContext, match: HcMatch): void {
+  // Whoever is still alive and unplaced ranks by this round's standing,
+  // worst first off the bottom of the board.
+  const open = roundStanding(match).filter((r) => r.place === 0);
+  for (let i = open.length - 1; i >= 0; i--) {
+    open[i].place = match.bottomPlace--;
+  }
+  for (const racer of match.racers.values()) {
+    if (!racer.bot && !racer.left && !racer.credited) {
+      const meta = ctx.players.get(racer.pid);
+      if (meta) {
+        addHcResult(meta, racer.place === 1, racer.finished ? racer.finishTime : null);
+        racer.credited = true;
+      }
+    }
+  }
   const field = [...match.racers.values()]
     .sort((a, b) => a.place - b.place)
     .map((r) => ({
@@ -689,14 +990,6 @@ export function endHcMatch(ctx: SimContext, match: HcMatch): void {
       timeS: r.finished ? r.finishTime : null,
     }));
   for (const racer of match.racers.values()) {
-    // Finishers were already credited the instant they crossed the line (see
-    // racePhysics), so their PlayerMeta being gone by now (a disconnect right
-    // after winning) can never cost them the result. Only score the stragglers
-    // here, exactly once, while their meta is still live.
-    if (!racer.finished && !racer.bot && !racer.left) {
-      const meta = ctx.players.get(racer.pid);
-      if (meta) addHcResult(meta, racer.place === 1, null);
-    }
     if (racer.left) continue;
     ctx.emit({
       type: 'hcEnd',
@@ -713,6 +1006,7 @@ export function endHcMatch(ctx: SimContext, match: HcMatch): void {
 export function returnFromHcMatch(ctx: SimContext, match: HcMatch): void {
   for (const racer of match.racers.values()) ctx.hcMatches.delete(racer.pid);
   ctx.hcBusySlots.delete(match.slot);
+  resetHodricsCourse(match.slot);
   for (const racer of match.racers.values()) {
     const e = ctx.entities.get(racer.pid);
     const ret = match.returns.get(racer.pid);

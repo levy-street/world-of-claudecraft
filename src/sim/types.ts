@@ -150,7 +150,7 @@ export interface ArenaCombatant {
 
 // Hodric's Castle Gauntlet event payload shapes. The obstacle that launched a
 // racer (for the HUD cue), the roster reveal row, and the final placement row.
-export type HcKnockKind = 'flail' | 'axe' | 'log' | 'boulder';
+export type HcKnockKind = 'flail' | 'axe' | 'log' | 'boulder' | 'piston';
 
 export interface HcFieldEntry {
   name: string;
@@ -2437,6 +2437,12 @@ export type SimEvent = { pid?: number } & (
   | { type: 'hcFound'; field: HcFieldEntry[] }
   | { type: 'hcCountdown'; seconds: number }
   | { type: 'hcStart' }
+  // `hcRoundStart`: a round is being plated (1..3); Hodric rebuilds between.
+  | { type: 'hcRoundStart'; round: number }
+  // `hcQualified`: banked a spot in the next round.
+  | { type: 'hcQualified'; round: number }
+  // `hcEliminated`: cut this round; final placement is already assigned.
+  | { type: 'hcEliminated'; place: number; round: number }
   | { type: 'hcKnocked'; kind: HcKnockKind }
   | { type: 'hcFall' }
   | { type: 'hcCheckpoint'; index: number }

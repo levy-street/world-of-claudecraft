@@ -14,25 +14,27 @@
 // this reaches Sim internals directly (addPlayer / removePlayer / entity
 // steering), so it takes `Sim`, not the ctx seam.
 //
-// DETERMINISM: the racing brain (planHcBotStep) is a pure function of course
-// time, position, and pid. Bot "skill" is a fixed hash of the pid (some
-// challengers are reliably clumsy), and misjudgements pulse on a tick hash.
-// NOTHING here draws from any rng stream: same seed, same race, every time.
+// GENERATED COURSES: the racing brain is SEGMENT-DRIVEN, not course-driven.
+// Lord Hodric rebuilds his gauntlet every round, but always out of the same
+// segment vocabulary (hodrics_course.ts), so the brain looks up the section
+// under its feet and applies that segment's hand-tuned tactic to whatever
+// obstacles the generator placed in it. Any seed, same competence.
+//
+// DETERMINISM: the racing brain (planHcBotStep) is a pure function of the
+// course, time, position, and pid. Bot "skill" is a fixed hash of the pid
+// (some challengers are reliably clumsy), and misjudgements pulse on a tick
+// hash. NOTHING here draws from any rng stream: same seed, same race.
 
 import { hodricsOrigin } from '../data';
+import { type HcCourse, hcSectionAt } from '../hodrics_course';
 import {
-  HC_AXES,
-  HC_BOULDER_LANES,
-  HC_DRAWSPANS,
   HC_FIELD_SIZE,
-  HC_FLAILS,
-  HC_ROTORS,
   hcAxeHead,
   hcDrawspanX,
   hcFlailBob,
   hcLaneBoulders,
+  hcPusherExt,
   hcRotorAngle,
-  hcSectionAt,
 } from '../hodrics_layout';
 import type { Sim } from '../sim';
 import { angleTo, emptyMoveInput, type PlayerClass, TICK_RATE } from '../types';
@@ -204,14 +206,26 @@ function driveHcBot(sim: Sim, pid: number): void {
   if (!match) return;
   const racer = match.racers.get(pid);
   if (!racer || racer.finished || racer.left) return;
+  // The eliminated idle in the gallery, politely applauding.
+  if (racer.eliminatedRound > 0) {
+    e.facing = Math.PI / 2;
+    return;
+  }
   if (match.state === 'countdown') {
-    e.facing = 0; // eyes on the bridge
+    e.facing = 0; // eyes on the course
     return;
   }
   if (match.state !== 'active') return;
   if (!e.onGround) return; // airborne is ballistic; there is no air control
   const origin = hodricsOrigin(match.slot);
-  const plan = planHcBotStep(e.pos.x - origin.x, e.pos.z - origin.z, sim.time, pid, sim.tickCount);
+  const plan = planHcBotStep(
+    match.course,
+    e.pos.x - origin.x,
+    e.pos.z - origin.z,
+    sim.time,
+    pid,
+    sim.tickCount,
+  );
   if (!plan) return; // deliberate hold: waiting out an obstacle window
   e.facing = angleTo(e.pos, { x: origin.x + plan.x, y: e.pos.y, z: origin.z + plan.z });
   meta.moveInput.forward = true;
@@ -229,12 +243,13 @@ export interface HcBotPlan {
 const BOT_APPROACH = 6.5;
 
 /**
- * The racing brain: from an instance-local position and the course clock,
- * pick the next steering target, or null to hold position. Pure and rng-free
- * (the only "personality" is the pid hash), so it is unit-testable and
- * identical on every host.
+ * The racing brain: from the round's course, an instance-local position and
+ * the course clock, pick the next steering target, or null to hold position.
+ * Pure and rng-free (the only "personality" is the pid hash), so it is
+ * unit-testable and identical on every host.
  */
 export function planHcBotStep(
+  course: HcCourse,
   lx: number,
   lz: number,
   t: number,
@@ -242,15 +257,21 @@ export function planHcBotStep(
   tick: number,
 ): HcBotPlan | null {
   const clumsy = botMisjudges(pid, tick);
-  const section = hcSectionAt(lz);
+  const span = hcSectionAt(course, lz);
+  const inSpan = <T extends { z?: number; cz?: number; zCenter?: number }>(defs: readonly T[]) =>
+    defs.filter((d) => {
+      const z = d.z ?? d.cz ?? d.zCenter ?? 0;
+      return z >= span.z0 - 0.5 && z <= span.z1 + 0.5;
+    });
 
-  if (section === 'start_yard') {
-    // Funnel toward the bridge mouth.
-    return { x: lx * 0.3, z: -80 };
+  if (span.id === 'start_yard' || span.id === 'landing') {
+    // Funnel toward the next section's mouth.
+    return { x: lx * 0.3, z: span.z1 + 1.5 };
   }
 
-  if (section === 'flail_bridge') {
-    const next = HC_FLAILS.find((f) => f.z > lz - 0.5 && f.z - lz < 6.5);
+  if (span.id === 'hammer_bridge') {
+    const flails = inSpan(course.flails).sort((a, b) => a.z - b.z);
+    const next = flails.find((f) => f.z > lz - 0.5 && f.z - lz < 6.5);
     if (!next) return { x: 0, z: lz + 8 };
     const arrival = t + Math.max(0, next.z - lz) / BOT_APPROACH;
     const bob = hcFlailBob(next, arrival);
@@ -262,29 +283,25 @@ export function planHcBotStep(
     return { x: hugX, z: next.z + 2.5 };
   }
 
-  if (section === 'log_court') {
-    // Serpentine line through the plaza: in the gate, up the right corridor
-    // (clear of rotor 1), cross the middle, down the left corridor (clear of
-    // rotor 2), out the far gate. The chain is monotone in z and the target is
-    // always the first waypoint still AHEAD, so a knockback simply re-enters
-    // the chain at the right stage and nothing ever deadlocks on a waypoint.
-    const WAYPOINTS = [
-      { x: 0, z: -32 },
-      { x: 10, z: -27 },
-      { x: 10, z: -15 },
-      { x: -9, z: -8 },
-      { x: -9, z: 3 },
-      { x: 0, z: 11 },
-      { x: 0, z: 18 },
-    ];
-    let target: HcBotPlan = WAYPOINTS[WAYPOINTS.length - 1];
-    for (const w of WAYPOINTS) {
+  if (span.id === 'rotor_court') {
+    // Serpentine line: enter the gate, pass each rotor on the side opposite
+    // its hub offset, exit the far gate. The chain is monotone in z and the
+    // target is always the first waypoint still AHEAD, so a knockback simply
+    // re-enters the chain at the right stage and nothing ever deadlocks.
+    const rotors = inSpan(course.rotors).sort((a, b) => a.cz - b.cz);
+    const waypoints: HcBotPlan[] = [{ x: 0, z: span.z0 + 2 }];
+    for (const r of rotors) {
+      waypoints.push({ x: -Math.sign(r.cx || 1) * 9.5, z: r.cz });
+    }
+    waypoints.push({ x: 0, z: span.z1 - 2 }, { x: 0, z: span.z1 + 2 });
+    let target: HcBotPlan = waypoints[waypoints.length - 1];
+    for (const w of waypoints) {
       if (w.z >= lz + 1.2) {
         target = w;
         break;
       }
     }
-    for (const r of HC_ROTORS) {
+    for (const r of rotors) {
       const relX = lx - r.cx;
       const relZ = lz - r.cz;
       const d = Math.hypot(relX, relZ);
@@ -303,8 +320,9 @@ export function planHcBotStep(
     return target;
   }
 
-  if (section === 'axe_walk') {
-    const next = HC_AXES.find((a) => a.z > lz - 0.5 && a.z - lz < 8.5);
+  if (span.id === 'axe_walk') {
+    const axes = inSpan(course.axes).sort((a, b) => a.z - b.z);
+    const next = axes.find((a) => a.z > lz - 0.5 && a.z - lz < 8.5);
     if (!next) return { x: 0, z: lz + 8 };
     const arrival = t + Math.max(0, next.z - lz) / BOT_APPROACH;
     const head = hcAxeHead(next, arrival);
@@ -312,32 +330,45 @@ export function planHcBotStep(
     return { x: 0, z: next.z + 2.5 };
   }
 
-  if (section === 'drawspan') {
-    const [a, b] = HC_DRAWSPANS;
-    const pxA = hcDrawspanX(a, t);
-    const pxB = hcDrawspanX(b, t);
-    if (lz < 57.4) {
-      // Wait at the lip; step on when platform A slides under the middle.
-      if (Math.abs(pxA - lx) < 2.0 && Math.abs(pxA) < 2.6) return { x: pxA, z: 60 };
-      return Math.abs(lx) > 0.8 ? { x: 0, z: 56.6 } : null;
+  if (span.id === 'drawspan') {
+    const decks = inSpan(course.drawspans).sort((a, b) => a.zCenter - b.zCenter);
+    if (decks.length === 0) return { x: 0, z: span.z1 + 2 };
+    const first = decks[0];
+    const lip = span.z0 - 0.6;
+    if (lz < lip) {
+      // Wait at the lip; step on when the first deck slides under the middle.
+      const px = hcDrawspanX(first, t);
+      if (Math.abs(px - lx) < 2.0 && Math.abs(px) < 2.6) return { x: px, z: span.z0 + 2 };
+      return Math.abs(lx) > 0.8 ? { x: 0, z: lip - 0.8 } : null;
     }
-    if (lz < 66.6) {
-      // Riding A: creep to the north edge while being carried.
-      return { x: lx, z: 66.9 };
+    // Which deck (or seam) are we at?
+    for (let i = 0; i < decks.length; i++) {
+      const d = decks[i];
+      const seam = d.zCenter + d.halfZ;
+      if (lz < seam - 1.4) {
+        // Riding deck i: creep to its north edge while being carried.
+        return { x: lx, z: seam - 1.1 };
+      }
+      if (lz < seam + 0.9 && i + 1 < decks.length) {
+        // At the seam: cross only while this deck and the next align.
+        const px = hcDrawspanX(d, t);
+        const pn = hcDrawspanX(decks[i + 1], t);
+        if (Math.abs(pn - lx) < 2.4 && Math.abs(px - lx) < 2.6) {
+          return { x: lx * 0.3, z: seam + 2.5 };
+        }
+        return null;
+      }
     }
-    if (lz < 67.9) {
-      // At the seam: cross only while the pair meets in the middle.
-      if (Math.abs(pxB - lx) < 2.4 && Math.abs(pxA - lx) < 2.6) return { x: lx * 0.3, z: 70.5 };
-      return null;
-    }
-    // Riding B: roll off north onto the far landing (always safe, they tile).
-    return { x: lx * 0.5, z: 80 };
+    // Past the last deck: roll off north onto the landing.
+    return { x: lx * 0.5, z: span.z1 + 2 };
   }
 
-  if (section === 'boulder_alley') {
-    let best = HC_BOULDER_LANES[0];
+  if (span.id === 'boulder_climb') {
+    const lanes = inSpan(course.boulderLanes.map((l) => ({ ...l, z: (l.zTop + l.zEnd) / 2 })));
+    if (lanes.length === 0) return { x: 0, z: span.z1 + 2 };
+    let best = lanes[0];
     let bestScore = -Infinity;
-    for (const lane of HC_BOULDER_LANES) {
+    for (const lane of lanes) {
       let gap = 60;
       for (const boulder of hcLaneBoulders(lane, t)) {
         if (boulder.z > lz - 1) gap = Math.min(gap, boulder.z - lz);
@@ -351,6 +382,43 @@ export function planHcBotStep(
     return { x: clumsy ? lx : best.x, z: lz + 6 };
   }
 
+  if (span.id === 'piston_ledge') {
+    const rams = inSpan(course.pushers).sort((a, b) => a.z - b.z);
+    const next = rams.find((p) => p.z > lz - 0.8 && p.z - lz < 5.5);
+    if (!next) return { x: 0, z: lz + 7 };
+    const arrival = t + Math.max(0, next.z - lz) / BOT_APPROACH;
+    const extNow = hcPusherExt(next, t);
+    const extThen = hcPusherExt(next, arrival);
+    if (!clumsy && (extThen > 0.3 || extNow > 0.55) && next.z - lz < 4.5) {
+      // The ram owns the ledge when we would arrive: hold short of it.
+      return next.z - lz > 3 ? { x: 0, z: lz + 0.8 } : null;
+    }
+    return { x: 0, z: next.z + 2.4 };
+  }
+
+  if (span.id === 'spinner_court') {
+    const discs = inSpan(course.spinners).sort((a, b) => a.cz - b.cz);
+    // Targets: each disc hub in order, then the exit tongue.
+    const targets: HcBotPlan[] = discs.map((d) => ({ x: d.cx, z: d.cz }));
+    targets.push({ x: 0, z: span.z1 - 1.5 }, { x: 0, z: span.z1 + 2 });
+    let target: HcBotPlan = targets[targets.length - 1];
+    for (const w of targets) {
+      if (w.z >= lz + 1.6) {
+        target = w;
+        break;
+      }
+    }
+    // Hop the rim gap: when near the current disc's far edge with the target
+    // beyond it, jump so the seam cannot eat the step.
+    for (const d of discs) {
+      const rel = Math.hypot(lx - d.cx, lz - d.cz);
+      if (rel <= d.r && rel > d.r - 1.6 && target.z > d.cz + d.r - 1) {
+        return { ...target, jump: true };
+      }
+    }
+    return target;
+  }
+
   // Red Ascent and the keep: straight to the crown.
-  return { x: 0, z: 125 };
+  return { x: 0, z: course.finishZ + 5 };
 }
