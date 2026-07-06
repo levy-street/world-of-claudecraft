@@ -29,6 +29,7 @@ import { routes as dailyRewardRoutes } from '../daily_rewards';
 import { routes as desktopLoginRoutes } from '../desktop_login_routes';
 import { routes as discordRoutes } from '../discord';
 import { routes as githubRoutes } from '../github';
+import { routes as governanceRoutes } from '../governance';
 import { routes as internalRoutes } from '../internal';
 import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
@@ -117,6 +118,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...reportsRoutes,
   ...discordRoutes,
   ...githubRoutes,
+  ...governanceRoutes,
   ...desktopLoginRoutes,
   ...dailyRewardRoutes,
   ...mapsRoutes,

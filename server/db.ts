@@ -597,6 +597,53 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- Off-chain $WOC governance (PR #468). Advisory, Snapshot-style holder voting;
+-- the server stores proposals and ballots only, never keys or on-chain state.
+-- Realm-scoped like everything else (one process = one realm). A ballot's weight
+-- is the voter's $WOC balance FROZEN at cast time (governance_core.weightForBalance),
+-- so a later balance change never alters a recorded vote.
+CREATE TABLE IF NOT EXISTS governance_proposals (
+  id BIGSERIAL PRIMARY KEY,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  category TEXT NOT NULL,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL DEFAULT '',
+  created_by_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  opens_at TIMESTAMPTZ NOT NULL,
+  closes_at TIMESTAMPTZ NOT NULL,
+  quorum BIGINT NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS governance_proposals_realm_created
+  ON governance_proposals(realm, created_at DESC);
+-- One ballot per wallet per proposal (the PRIMARY KEY enforces it). weight is the
+-- whole-$WOC snapshot frozen at cast time; account_id records who cast it (a wallet
+-- must be linked to the account to vote).
+CREATE TABLE IF NOT EXISTS governance_votes (
+  proposal_id BIGINT NOT NULL REFERENCES governance_proposals(id) ON DELETE CASCADE,
+  wallet TEXT NOT NULL,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  choice TEXT NOT NULL,
+  weight BIGINT NOT NULL,
+  cast_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (proposal_id, wallet)
+);
+CREATE INDEX IF NOT EXISTS governance_votes_proposal ON governance_votes(proposal_id);
+-- Single-use, short-lived sign-to-vote challenges (mirrors wallet_link_challenges):
+-- the full message the wallet must sign is stored server-side so the client cannot
+-- choose what gets signed, and consuming a challenge deletes it (replay protection).
+CREATE TABLE IF NOT EXISTS governance_vote_challenges (
+  nonce TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  proposal_id BIGINT NOT NULL REFERENCES governance_proposals(id) ON DELETE CASCADE,
+  wallet TEXT NOT NULL,
+  choice TEXT NOT NULL,
+  message TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS governance_vote_challenges_account
+  ON governance_vote_challenges(account_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
