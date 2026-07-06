@@ -6,7 +6,7 @@ import {
   WORLD_MAX_X,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
-import { hodricsGroundWorld } from './hodrics_layout';
+import { hodricsGroundWorld } from './hodrics_course';
 import { fbm2, hash2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';

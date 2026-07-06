@@ -6,7 +6,6 @@ import {
   delveModuleLocal,
   dungeonAt,
   getActiveWorldContent,
-  hodricsOriginAt,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
@@ -25,7 +24,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
-import { hodricsColliders } from './hodrics_layout';
+import { hodricsCollidersAt } from './hodrics_course';
 import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import { generateDecorations, groundHeight } from './world';
@@ -277,8 +276,6 @@ const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
 const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
-// Hodric's Castle course walls, from the same layout the renderer dresses.
-const HODRICS_COLLIDERS: Collider[] = hodricsColliders();
 
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
@@ -462,9 +459,11 @@ export function resolvePosition(
     return { x: local.x + o.x, z: local.z + o.z };
   }
   if (isHodricsPos(x)) {
-    const o = hodricsOriginAt(z);
-    const local = resolveAgainst(HODRICS_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
-    return { x: local.x + o.x, z: local.z + o.z };
+    // Lord Hodric rebuilds his course every round: walls come from the
+    // slot's ACTIVE generated course, not a static layout.
+    const hc = hodricsCollidersAt(z);
+    const local = resolveAgainst(hc.colliders, x - hc.ox, z - hc.oz, r, ignoreFences);
+    return { x: local.x + hc.ox, z: local.z + hc.oz };
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
@@ -743,15 +742,15 @@ export function cameraOcclusion(
     );
   }
   if (isHodricsPos(ax)) {
-    const o = hodricsOriginAt(az);
+    const hc = hodricsCollidersAt(az);
     return sweepColliders(
-      HODRICS_COLLIDERS,
-      ax - o.x,
+      hc.colliders,
+      ax - hc.ox,
       ay,
-      az - o.z,
-      bx - o.x,
+      az - hc.oz,
+      bx - hc.ox,
       by,
-      bz - o.z,
+      bz - hc.oz,
       pad,
       true,
     );
@@ -817,8 +816,8 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
     return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
   }
   if (isHodricsPos(x)) {
-    const o = hodricsOriginAt(z);
-    return overlapsAny(HODRICS_COLLIDERS, x - o.x, z - o.z, false);
+    const hc = hodricsCollidersAt(z);
+    return overlapsAny(hc.colliders, x - hc.ox, z - hc.oz, false);
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
