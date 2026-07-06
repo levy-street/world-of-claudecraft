@@ -231,27 +231,59 @@ export function applyRadialDeadzone(x: number, y: number, dz: number): { x: numb
  * Left-stick vector → 8-way movement flags. Mirrors mobile's mapJoystickVector:
  * past the deadzone, each axis fires once it clears 85% of the deadzone, so the
  * diagonals engage cleanly. Up on the stick (y < 0) is forward.
+ *
+ * `invertX` swaps strafe-left/right, `invertY` swaps forward/back, for players
+ * who prefer a flipped movement axis. Both default off, so the classic mapping is
+ * unchanged. The invert is applied to the raw axis before the flag test (and the
+ * deadzone check is magnitude-based, so it is invert-independent).
  */
-export function stickToMoveFlags(x: number, y: number, dz: number): MoveFlags {
+export function stickToMoveFlags(
+  x: number,
+  y: number,
+  dz: number,
+  invertX = false,
+  invertY = false,
+): MoveFlags {
   const mag = Math.hypot(x, y);
   // `<` (not the `<=` applyRadialDeadzone uses) deliberately mirrors mobile's
   // mapJoystickVector gate; a value landing exactly on dz is rare and harmless,
   // so do not "unify" the two comparisons.
   if (mag < dz) return { forward: false, back: false, strafeLeft: false, strafeRight: false };
+  const px = invertX ? -x : x;
+  const py = invertY ? -y : y;
   const axis = dz * 0.85;
   return {
-    forward: y < -axis,
-    back: y > axis,
-    strafeLeft: x < -axis,
-    strafeRight: x > axis,
+    forward: py < -axis,
+    back: py > axis,
+    strafeLeft: px < -axis,
+    strafeRight: px > axis,
   };
+}
+
+/**
+ * Left-stick vector → desired character-facing OFFSET from the camera's forward
+ * direction (radians), for camera-relative steering, or null inside the deadzone.
+ * Stick up (y < 0) is camera-forward (offset 0); pulling down faces back toward the
+ * camera (±pi). The horizontal sign matches the camera yaw convention: camYaw
+ * INCREASES turning screen-left (the right-stick look decreases it turning right,
+ * see stickToLook), so a stick pushed LEFT (x < 0) must produce a POSITIVE offset
+ * to face screen-left, hence atan2(-x, ...). The caller adds the live camera yaw
+ * to get a world facing and turns the character toward it. Pure (no camYaw
+ * dependency) so it is unit-testable; the magnitude is intentionally ignored (any
+ * deflection past the deadzone steers at full run, matching the move-flag stick).
+ */
+export function stickSteerOffset(x: number, y: number, dz: number): number | null {
+  if (Math.hypot(x, y) < dz) return null;
+  return Math.atan2(-x, -y);
 }
 
 /**
  * Right-stick vector → per-frame camera yaw/pitch deltas (radians). `speed` is
  * the configured turn rate; `dt` scales by frame time for resolution-independent
  * motion. Pushing the stick right turns the camera right; pushing up looks up
- * unless `invertY`. Returns zero inside the deadzone.
+ * unless `invertY`. `invertX` flips the horizontal turn (push right turns left),
+ * defaulting off so the classic mapping is unchanged. Returns zero inside the
+ * deadzone.
  */
 export function stickToLook(
   x: number,
@@ -260,11 +292,13 @@ export function stickToLook(
   speed: number,
   invertY: boolean,
   dt: number,
+  invertX = false,
 ): LookDelta {
   const v = applyRadialDeadzone(x, y, dz);
   if (v.x === 0 && v.y === 0) return { yaw: 0, pitch: 0 };
+  const yawSign = invertX ? 1 : -1;
   const pitchSign = invertY ? 1 : -1;
-  return { yaw: -v.x * speed * dt, pitch: pitchSign * v.y * speed * dt };
+  return { yaw: yawSign * v.x * speed * dt, pitch: pitchSign * v.y * speed * dt };
 }
 
 /** Indices of buttons that went from up→down between the previous and current

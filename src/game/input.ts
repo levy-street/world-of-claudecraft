@@ -187,6 +187,9 @@ export class Input {
     strafeLeft: false,
     strafeRight: false,
   };
+  // Desired world facing while camera-relative steering is active (null = idle or
+  // steering off). Consumed by the frame loop to turn the character toward it.
+  private gamepadSteer: number | null = null;
   private touchJumpUntil = 0;
   private keyJumpUntil = 0;
   private touchLookActive = false;
@@ -502,7 +505,19 @@ export class Input {
       this.gamepadMove.strafeLeft ||
       this.gamepadMove.strafeRight;
     this.gamepadMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    this.gamepadSteer = null;
     if (changed) this.noteIntent('move');
+  }
+
+  // Desired world facing from the left stick when camera-relative steering is on
+  // (null when idle or steering is off). The frame loop turns the character toward
+  // it in resolveMove; set/cleared each poll by GamepadManager.
+  setGamepadSteer(facing: number | null): void {
+    this.gamepadSteer = facing;
+  }
+  /** The gamepad's steer-to facing this frame, or null when not steering. */
+  gamepadSteerTarget(): number | null {
+    return this.gamepadSteer;
   }
 
   // Latch a gamepad jump-button tap the same way touch jumps latch, so reads

@@ -589,6 +589,7 @@ export const cs_CZ: EnTranslations = {
     "controller": {
       "title": "Ovladač",
       "enable": "Zapnout ovladač",
+      "steerCharacter": "Left Stick Steers Character",
       "invertY": "Invertovat kameru (Y)",
       "deadzone": "Mrtvá zóna páčky",
       "cameraSpeed": "Rychlost kamery",

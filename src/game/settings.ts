@@ -128,6 +128,11 @@ export const BOOL_SETTINGS = {
   // on by default: poll a connected controller for input. Off ignores the pad
   // entirely (keyboard/mouse/touch unaffected).
   gamepadEnabled: { def: true },
+  // on by default (pad only): the left stick steers the character (camera-relative
+  // directional movement, the character turns to face where it moves), instead of
+  // the classic camera-fixed strafe. The natural third-person console feel; flip
+  // off to keep the left stick strafing without turning.
+  gamepadSteerCharacter: { def: true },
   // off by default: invert the vertical axis of the right-stick camera, the
   // classic console/flight-sim preference. Independent of mouse/touch invert.
   gamepadInvertY: { def: false },

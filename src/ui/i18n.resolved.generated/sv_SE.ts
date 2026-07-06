@@ -589,6 +589,7 @@ export const sv_SE: EnTranslations = {
     "controller": {
       "title": "Handkontroll",
       "enable": "Aktivera handkontroll",
+      "steerCharacter": "Left Stick Steers Character",
       "invertY": "Invertera kamera (Y)",
       "deadzone": "Spakens dödzon",
       "cameraSpeed": "Kamerahastighet",

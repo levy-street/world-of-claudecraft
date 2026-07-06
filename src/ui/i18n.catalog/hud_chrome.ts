@@ -674,6 +674,9 @@ export const hudChromeStrings = {
   controller: {
     title: 'Controller',
     enable: 'Enable Controller',
+    // Camera-relative left-stick steering toggle (the character turns to face where
+    // it moves). Wordy value: its five non-Latin fills ship with this change.
+    steerCharacter: 'Left Stick Steers Character',
     invertY: 'Invert Camera (Y)',
     deadzone: 'Stick Deadzone',
     cameraSpeed: 'Camera Speed',

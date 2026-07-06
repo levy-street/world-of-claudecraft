@@ -229,6 +229,11 @@ import type { IWorld, LeaderboardEntry } from './world_api';
 
 const WORLD_SEED = 20061; // fixed: World of ClaudeCraft is a persistent place
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
+// Gamepad camera-relative steering: how fast the character turns to face the left
+// stick's direction, and the heading error past which it turns in place instead of
+// running (so a hard reversal pivots rather than arcing wide).
+const GAMEPAD_STEER_TURN_RATE = 9; // rad/sec; snappy pad steering, still eased (no instant snap)
+const GAMEPAD_STEER_WALK_ANGLE = 2.0; // rad (~115deg); beyond this, turn in place before running
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
 const CLICK_MOVE_REROUTE_DISTANCE = 4; // yards; live entity targets can move this far before we recompute the path
 const CLICK_MOVE_FENCE_JUMP_LOOKAHEAD = 2; // yards ahead; auto-jump when a click-move path is about to cross a fence
@@ -1557,6 +1562,10 @@ async function startGame(
       gamepad.setInvertY(settings.set('gamepadInvertY', !!value));
       return;
     }
+    if (key === 'gamepadSteerCharacter') {
+      gamepad.setSteerCharacter(settings.set('gamepadSteerCharacter', !!value));
+      return;
+    }
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
       return;
@@ -2212,6 +2221,21 @@ async function startGame(
     attackMoveTick();
     const mi = input.readMoveInput();
     let facing: number | null = mouselook ? input.camYaw : null;
+    // Gamepad camera-relative steering: the left stick sets a target world facing;
+    // turn the character toward it and run forward once roughly aimed (so a hard
+    // reversal pivots in place instead of arcing wide). Mirrors the click-to-move
+    // facing easing. Skipped under mouselook or an active click-move, which own the
+    // heading. readMoveInput already requested forward for the steer stick.
+    const steerTarget = input.gamepadSteerTarget();
+    if (steerTarget !== null && !mouselook && !input.clickMoveTarget) {
+      const smooth = stepAngleToward(playerFacing, steerTarget, GAMEPAD_STEER_TURN_RATE * DT);
+      facing = smooth;
+      mi.forward = Math.abs(wrapAngle(steerTarget - smooth)) < GAMEPAD_STEER_WALK_ANGLE;
+      mi.back = false;
+      mi.strafeLeft = false;
+      mi.strafeRight = false;
+      return { mi, facing };
+    }
     if (input.clickMoveTarget) {
       const action = resolveClickMoveAction(mi, {
         mouselook,

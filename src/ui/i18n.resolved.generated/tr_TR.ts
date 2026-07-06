@@ -589,6 +589,7 @@ export const tr_TR: EnTranslations = {
     "controller": {
       "title": "Oyun Kolu",
       "enable": "Oyun Kolunu Etkinleştir",
+      "steerCharacter": "Left Stick Steers Character",
       "invertY": "Kamerayı Ters Çevir (Y)",
       "deadzone": "Çubuk Ölü Bölgesi",
       "cameraSpeed": "Kamera Hızı",

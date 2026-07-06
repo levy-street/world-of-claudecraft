@@ -589,6 +589,7 @@ export const pt_BR: EnTranslations = {
     "controller": {
       "title": "Controle",
       "enable": "Ativar Controle",
+      "steerCharacter": "Left Stick Steers Character",
       "invertY": "Inverter Câmera (Y)",
       "deadzone": "Zona Morta do Analógico",
       "cameraSpeed": "Velocidade da Câmera",

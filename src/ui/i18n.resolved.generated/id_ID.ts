@@ -589,6 +589,7 @@ export const id_ID: EnTranslations = {
     "controller": {
       "title": "Kontroler",
       "enable": "Aktifkan Kontroler",
+      "steerCharacter": "Left Stick Steers Character",
       "invertY": "Balikkan Kamera (Y)",
       "deadzone": "Zona Mati Tuas",
       "cameraSpeed": "Kecepatan Kamera",

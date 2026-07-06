@@ -589,6 +589,7 @@ export const es_ES: EnTranslations = {
     "controller": {
       "title": "Mando",
       "enable": "Activar mando",
+      "steerCharacter": "Left Stick Steers Character",
       "invertY": "Invertir cámara (Y)",
       "deadzone": "Zona muerta del stick",
       "cameraSpeed": "Velocidad de cámara",

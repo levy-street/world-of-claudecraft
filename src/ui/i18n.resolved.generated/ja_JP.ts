@@ -589,6 +589,7 @@ export const ja_JP: EnTranslations = {
     "controller": {
       "title": "コントローラー",
       "enable": "コントローラーを有効化",
+      "steerCharacter": "左スティックで方向転換",
       "invertY": "カメラ反転（Y軸）",
       "deadzone": "スティックの遊び",
       "cameraSpeed": "カメラ速度",

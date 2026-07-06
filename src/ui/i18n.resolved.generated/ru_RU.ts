@@ -589,6 +589,7 @@ export const ru_RU: EnTranslations = {
     "controller": {
       "title": "Геймпад",
       "enable": "Включить геймпад",
+      "steerCharacter": "Поворот персонажа левым стиком",
       "invertY": "Инверсия камеры (Y)",
       "deadzone": "Мёртвая зона стика",
       "cameraSpeed": "Скорость камеры",

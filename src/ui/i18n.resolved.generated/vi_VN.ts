@@ -589,6 +589,7 @@ export const vi_VN: EnTranslations = {
     "controller": {
       "title": "Tay Cầm",
       "enable": "Bật Tay Cầm",
+      "steerCharacter": "Left Stick Steers Character",
       "invertY": "Đảo Ngược Camera (Y)",
       "deadzone": "Vùng Chết Cần Điều Khiển",
       "cameraSpeed": "Tốc Độ Camera",

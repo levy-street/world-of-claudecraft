@@ -589,6 +589,7 @@ export const zh_CN: EnTranslations = {
     "controller": {
       "title": "手柄",
       "enable": "启用手柄",
+      "steerCharacter": "左摇杆转向角色",
       "invertY": "反转镜头（Y轴）",
       "deadzone": "摇杆死区",
       "cameraSpeed": "镜头速度",

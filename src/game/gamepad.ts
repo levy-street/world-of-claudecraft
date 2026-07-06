@@ -14,6 +14,7 @@ import {
   GP,
   risingEdges,
   STANDARD_BUTTON_COUNT,
+  stickSteerOffset,
   stickToLook,
   stickToMoveFlags,
   TRIGGER_THRESHOLD,
@@ -46,6 +47,7 @@ export class GamepadManager {
   private deadzone = 0.18;
   private camSpeed = 2.4;
   private invertY = false;
+  private steerCharacter = true;
   private vibration = 1;
   private lastHealth: number | null = null;
   private cursorEl: HTMLDivElement | null = null;
@@ -100,6 +102,9 @@ export class GamepadManager {
   }
   setInvertY(on: boolean): void {
     this.invertY = on;
+  }
+  setSteerCharacter(on: boolean): void {
+    this.steerCharacter = on;
   }
   setVibration(v: number): void {
     this.vibration = Math.min(1, Math.max(0, v));
@@ -192,10 +197,36 @@ export class GamepadManager {
     }
     this.hideCursor();
 
-    // Movement: left stick.
+    // Movement: left stick. Two modes: camera-relative steering (the character
+    // turns to face the stick direction and runs, a facing the frame loop turns
+    // toward in resolveMove), or the classic camera-fixed 8-way strafe. Steering
+    // feeds forward-only move flags plus the target facing; strafe feeds the flags
+    // and clears the facing.
     const lx = pad.axes[AXIS.LEFT_X] ?? 0;
     const ly = pad.axes[AXIS.LEFT_Y] ?? 0;
-    this.input.setGamepadMove(stickToMoveFlags(lx, ly, this.deadzone));
+    if (this.steerCharacter) {
+      const offset = stickSteerOffset(lx, ly, this.deadzone);
+      if (offset === null) {
+        this.input.setGamepadSteer(null);
+        this.input.setGamepadMove({
+          forward: false,
+          back: false,
+          strafeLeft: false,
+          strafeRight: false,
+        });
+      } else {
+        this.input.setGamepadSteer(this.input.camYaw + offset);
+        this.input.setGamepadMove({
+          forward: true,
+          back: false,
+          strafeLeft: false,
+          strafeRight: false,
+        });
+      }
+    } else {
+      this.input.setGamepadSteer(null);
+      this.input.setGamepadMove(stickToMoveFlags(lx, ly, this.deadzone));
+    }
 
     // Camera: right stick.
     const rx = pad.axes[AXIS.RIGHT_X] ?? 0;

@@ -589,6 +589,7 @@ export const en_XA: EnTranslations = {
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",
       "enable": "[Éñáƀļé Çóñţŕóļļéŕ]",
+      "steerCharacter": "[Ļéƒţ Šţíçķ Šţééŕš Çĥáŕáçţéŕ]",
       "invertY": "[Íñʋéŕţ Çáɱéŕá (Ý)]",
       "deadzone": "[Šţíçķ Ðéáðžóñé]",
       "cameraSpeed": "[Çáɱéŕá Šþééð]",

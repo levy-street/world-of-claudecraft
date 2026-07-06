@@ -589,6 +589,7 @@ export const ko_KR: EnTranslations = {
     "controller": {
       "title": "컨트롤러",
       "enable": "컨트롤러 사용",
+      "steerCharacter": "왼쪽 스틱으로 캐릭터 회전",
       "invertY": "카메라 반전(Y축)",
       "deadzone": "스틱 데드존",
       "cameraSpeed": "카메라 속도",
