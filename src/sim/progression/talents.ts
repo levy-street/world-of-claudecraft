@@ -35,8 +35,9 @@
 import {
   cloneAllocation,
   computeTalentModifiers,
+  DEFAULT_LOADOUT_SLOTS,
   FIRST_TALENT_LEVEL,
-  MAX_LOADOUTS,
+  MAX_LOADOUT_SLOTS,
   pointsSpent,
   repairAllocation,
   SAVED_LOADOUT_BAR_SLOTS,
@@ -64,6 +65,13 @@ function talentLockReason(ctx: SimContext, p: Entity): string | null {
   if (p.inCombat) return 'You cannot change talents in combat.';
   if (ctx.arenaMatches.has(p.id)) return 'You cannot change talents during an arena match.';
   return null;
+}
+
+// The per-character saved-loadout cap: the free default plus the $WOC-unlocked
+// bonus, clamped to the hard MAX_LOADOUT_SLOTS ceiling (#472).
+export function loadoutSlotCapFor(meta: PlayerMeta): number {
+  const bonus = Math.max(0, Math.floor(meta.loadoutSlotBonus ?? 0));
+  return Math.min(MAX_LOADOUT_SLOTS, DEFAULT_LOADOUT_SLOTS + bonus);
 }
 
 export function talentPointBudget(ctx: SimContext, pid?: number): { total: number; spent: number } {
@@ -212,8 +220,9 @@ export function saveTalentLoadout(
     ctx.emit({ type: 'log', pid: r.e.id, text: `Saved build "${clean}".`, color: '#ffd100' });
     return existing;
   }
-  if (r.meta.loadouts.length >= MAX_LOADOUTS) {
-    ctx.error(r.e.id, `You can save at most ${MAX_LOADOUTS} loadouts.`);
+  const slotCount = loadoutSlotCapFor(r.meta);
+  if (r.meta.loadouts.length >= slotCount) {
+    ctx.error(r.e.id, `You can save at most ${slotCount} loadouts.`);
     return -1;
   }
   r.meta.loadouts.push(lo);

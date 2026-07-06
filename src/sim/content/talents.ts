@@ -152,6 +152,14 @@ export interface SavedLoadout {
 export const MAX_LOADOUTS = 10;
 export const SAVED_LOADOUT_BAR_SLOTS = 22;
 
+// Loadout-slot economy (#472). Every character keeps its existing DEFAULT_LOADOUT_SLOTS
+// saved-build slots for free (unchanged from the pre-feature behavior); a
+// $WOC-paid unlock raises that per-character cap by one, up to the hard
+// MAX_LOADOUT_SLOTS ceiling ABOVE the free default. The effective cap is stored
+// per character as a bonus over the default; see src/sim/progression/paid_respec.ts.
+export const DEFAULT_LOADOUT_SLOTS = MAX_LOADOUTS;
+export const MAX_LOADOUT_SLOTS = 20;
+
 export interface ResolvedAbilityMod {
   dmgPct: number;
   flatDmg: number;

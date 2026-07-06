@@ -778,6 +778,10 @@ export interface PlayerMeta {
   fiestaRestore: { level: number; xp: number; talents: TalentAllocation } | null;
   loadouts: SavedLoadout[];
   activeLoadout: number; // index into loadouts, or -1 for none
+  // Extra saved-loadout slots unlocked for $WOC (#472), a bonus over the free
+  // DEFAULT_LOADOUT_SLOTS. The effective save cap is DEFAULT_LOADOUT_SLOTS +
+  // loadoutSlotBonus, clamped to MAX_LOADOUT_SLOTS. Set server-side only.
+  loadoutSlotBonus: number;
   raidLockouts: Map<string, number>; // dungeon id -> epoch ms expiry
   // Transient presence status. Set by /afk and /dnd, cleared when the player
   // chats again. Session-only — never persisted, so it resets on login.
@@ -870,6 +874,9 @@ export interface CharacterState {
   talents?: TalentAllocation;
   loadouts?: SavedLoadout[];
   activeLoadout?: number;
+  // Extra loadout slots unlocked for $WOC (#472), a bonus over the free default
+  // (optional so pre-feature saves load with zero bonus). Server-authoritative.
+  loadoutSlots?: number;
   raidLockouts?: Record<string, number>;
   // Ability/potion cooldowns as remaining-time deltas (JSONB; optional so pre-fix
   // saves load cleanly with no cooldowns). Persisted so logging out and back in no
@@ -1450,6 +1457,7 @@ export class Sim {
       fiestaRestore: null,
       loadouts: [],
       activeLoadout: -1,
+      loadoutSlotBonus: 0,
       raidLockouts: new Map(),
       away: null,
       marketQuery: defaultMarketQuery(),
@@ -1540,6 +1548,9 @@ export class Sim {
           bar: [...(l.bar ?? [])],
         }));
       if (typeof s.activeLoadout === 'number') meta.activeLoadout = s.activeLoadout;
+      if (typeof s.loadoutSlots === 'number' && Number.isFinite(s.loadoutSlots)) {
+        meta.loadoutSlotBonus = Math.max(0, Math.floor(s.loadoutSlots));
+      }
       if (s.raidLockouts) {
         const now = this.lockoutNowMs();
         for (const [dungeonId, until] of Object.entries(s.raidLockouts)) {
@@ -1791,6 +1802,7 @@ export class Sim {
         bar: [...l.bar],
       })),
       activeLoadout: meta.activeLoadout,
+      loadoutSlots: meta.loadoutSlotBonus,
       raidLockouts: Object.fromEntries(
         [...meta.raidLockouts].filter(([, until]) => until > this.lockoutNowMs()),
       ),
