@@ -126,6 +126,14 @@ Node server, `/api`, `/ws`, and Postgres persistence, so the Glitch build must r
 the server container for players to share the same live world. The Dockerfile
 listens on port 3000 as required by Glitch's Node runtime.
 
+The `node` entry point is `index.html`, not `package.json`. Glitch uses the
+package start script to run the server, then loads the browser entry point from
+inside the running app. The Glitch play page also performs a cross-site
+`no-cors` public shell probe from `https://www.glitch.fun`; public document and
+static responses from that origin use `Cross-Origin-Resource-Policy:
+cross-origin` so Chrome does not block the probe. Sensitive `/api`,
+`/admin/api`, `/oauth`, and `/internal` responses remain `same-origin`.
+
 Glitch's Node runtime builds the client inside Docker. Because Vite inlines
 `VITE_*` values at build time, the repo includes `glitch.public.env` as a blank
 public Docker-build template. `npm run deploy:glitch` replaces only that file
@@ -186,6 +194,13 @@ The script:
 5. For `node`, zips the source tree without `node_modules`, `dist`, `.env`, docs, tests, or local agent folders.
 6. Uploads the archive with `entry=index.html`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
 7. Waits for the Glitch deployment job to complete.
+8. For `node`, runs an Azure Container App post-deploy check unless
+   `GLITCH_AZURE_POST_DEPLOY=0` is set:
+   - enforces `--min-replicas 1 --max-replicas 1`
+   - waits for the latest revision to become healthy with one replica
+   - detects the realm singleton rollout error in Azure logs
+   - deactivates active revisions and activates the latest revision fresh when
+     Azure overlaps the old and new same-realm processes
 
 If the local predeploy check fails, fix that failure locally first. Do not upload
 another Glitch build until the check passes. When the check runs against Azure
@@ -197,7 +212,9 @@ replica. `REALM_SINGLETON_LOCK=1` intentionally prevents two server processes
 from hosting `Claudemoon` at the same time. If Azure tries to roll or scale to a
 second replica, the new process exits with `Realm "Claudemoon" is already hosted
 by another game server process` and the revision fails activation. After a node
-deploy, verify and enforce the scale cap with Azure CLI:
+deploy, `npm run deploy:glitch` handles this post-deploy check automatically for
+the default Glitch Container App. The manual commands below are still useful for
+inspection or recovery:
 
 ```bash
 az containerapp update \
@@ -215,6 +232,9 @@ az containerapp revision list \
 Useful overrides:
 
 ```bash
+GLITCH_AZURE_CONTAINERAPP_NAME=world-of-claudecraft-node npm run deploy:glitch
+GLITCH_AZURE_RESOURCE_GROUP=openai-resource-group npm run deploy:glitch
+GLITCH_AZURE_POST_DEPLOY=0 npm run deploy:glitch  # skip Azure health handoff only for non-Azure experiments
 GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
 GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch  # static iframe/wasm only; node preflight still builds
 GLITCH_BUILD_TYPE=playtest npm run deploy:glitch

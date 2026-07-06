@@ -44,6 +44,20 @@ describe('Glitch deploy process guardrails', () => {
     expect(preflight).toContain('slice(-6)');
   });
 
+  it('runs the Azure post-deploy handoff after the Glitch upload', () => {
+    const deployScript = readFileSync(join(root, 'scripts/glitch_deploy.mjs'), 'utf8');
+
+    expect(deployScript).toContain('runAzurePostDeployCheck');
+    expect(deployScript).toContain('GLITCH_AZURE_POST_DEPLOY');
+    expect(deployScript).toContain('--min-replicas');
+    expect(deployScript).toContain('--max-replicas');
+    expect(deployScript).toContain('already hosted by another game server process');
+    expect(deployScript).toContain('activate');
+    expect(deployScript.indexOf('await run(process.execPath, deployArgs, env)')).toBeLessThan(
+      deployScript.indexOf('await runAzurePostDeployCheck()'),
+    );
+  });
+
   it('documents the Azure single-replica invariant for the MMO realm', () => {
     const docs = readFileSync(join(root, 'docs/glitch-deployment.md'), 'utf8');
 
@@ -51,5 +65,6 @@ describe('Glitch deploy process guardrails', () => {
     expect(docs).toContain('--max-replicas 1');
     expect(docs).toContain('REALM_SINGLETON_LOCK=1');
     expect(docs).toContain('Realm "Claudemoon" is already hosted');
+    expect(docs).toContain('GLITCH_AZURE_POST_DEPLOY=0');
   });
 });

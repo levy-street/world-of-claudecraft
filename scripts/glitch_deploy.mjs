@@ -27,6 +27,10 @@ const gameApiOrigin =
   env.VITE_API_ORIGIN || env.GLITCH_GAME_API_ORIGIN || 'https://worldofclaudecraft.com';
 const dryRun = env.GLITCH_DEPLOY_DRY_RUN === '1';
 const skipBuild = env.GLITCH_DEPLOY_SKIP_BUILD === '1';
+const azurePostDeploy = env.GLITCH_AZURE_POST_DEPLOY !== '0';
+const azureContainerAppName = env.GLITCH_AZURE_CONTAINERAPP_NAME || 'world-of-claudecraft-node';
+const azureResourceGroup = env.GLITCH_AZURE_RESOURCE_GROUP || 'openai-resource-group';
+const azurePostDeployTimeoutMs = Number(env.GLITCH_AZURE_POST_DEPLOY_TIMEOUT_MS || 180_000);
 const preflightScript = path.join(ROOT, 'scripts/glitch_predeploy_check.mjs');
 
 if (!deployToken) {
@@ -104,6 +108,10 @@ try {
   await run(process.execPath, deployArgs, env);
 } finally {
   await nodeArchive?.cleanup();
+}
+
+if (nodeDeployment && !dryRun && azurePostDeploy) {
+  await runAzurePostDeployCheck();
 }
 
 async function ensureCli() {
@@ -227,6 +235,196 @@ function customVariables(sourceEnv) {
   return vars;
 }
 
+async function runAzurePostDeployCheck() {
+  console.log('Running Azure Container App post-deploy health check...');
+  await runCapture('az', ['--version'], env);
+  await run(
+    'az',
+    [
+      'containerapp',
+      'update',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--min-replicas',
+      '1',
+      '--max-replicas',
+      '1',
+      '--output',
+      'none',
+    ],
+    env,
+  );
+
+  let singletonHandoffDone = false;
+  const latestRevision = await readLatestAzureRevisionName();
+  const deadline = Date.now() + azurePostDeployTimeoutMs;
+  while (Date.now() < deadline) {
+    const revisions = await readAzureRevisions();
+    const latest = revisions.find((revision) => revision.name === latestRevision);
+    if (
+      latest?.healthState === 'Healthy' &&
+      latest.runningState !== 'Failed' &&
+      Number(latest.replicas || 0) === 1
+    ) {
+      console.log(`Azure post-deploy: ${latestRevision} is healthy with one replica.`);
+      return;
+    }
+
+    if (!singletonHandoffDone && latest && revisionFailed(latest)) {
+      const logs = await readAzureRevisionLogs(latestRevision);
+      if (logs.includes('already hosted by another game server process')) {
+        console.log(
+          `Azure post-deploy: ${latestRevision} hit the realm singleton during rollout; deactivating active revisions and activating the latest revision fresh.`,
+        );
+        await deactivateOlderAzureRevisions(revisions, latestRevision);
+        await run(
+          'az',
+          [
+            'containerapp',
+            'revision',
+            'deactivate',
+            '--name',
+            azureContainerAppName,
+            '--resource-group',
+            azureResourceGroup,
+            '--revision',
+            latestRevision,
+            '--output',
+            'none',
+          ],
+          env,
+        );
+        await sleep(20_000);
+        await run(
+          'az',
+          [
+            'containerapp',
+            'revision',
+            'activate',
+            '--name',
+            azureContainerAppName,
+            '--resource-group',
+            azureResourceGroup,
+            '--revision',
+            latestRevision,
+            '--output',
+            'none',
+          ],
+          env,
+        );
+        singletonHandoffDone = true;
+      }
+    }
+
+    await sleep(10_000);
+  }
+
+  const finalRevisions = await readAzureRevisions();
+  const latestLogs = await readAzureRevisionLogs(latestRevision).catch(() => '');
+  fail(
+    [
+      `Azure post-deploy: ${latestRevision} did not become healthy within ${azurePostDeployTimeoutMs}ms.`,
+      `Revision state: ${JSON.stringify(finalRevisions)}`,
+      latestLogs ? `Log tail:\n${redact(latestLogs)}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n'),
+  );
+}
+
+function revisionFailed(revision) {
+  return revision.healthState === 'Unhealthy' || revision.runningState === 'Failed';
+}
+
+async function deactivateOlderAzureRevisions(revisions, latestRevision) {
+  for (const revision of revisions) {
+    if (!revision.active || revision.name === latestRevision) continue;
+    await run(
+      'az',
+      [
+        'containerapp',
+        'revision',
+        'deactivate',
+        '--name',
+        azureContainerAppName,
+        '--resource-group',
+        azureResourceGroup,
+        '--revision',
+        revision.name,
+        '--output',
+        'none',
+      ],
+      env,
+    );
+  }
+}
+
+async function readLatestAzureRevisionName() {
+  const result = await runCapture(
+    'az',
+    [
+      'containerapp',
+      'show',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--query',
+      'properties.latestRevisionName',
+      '--output',
+      'tsv',
+    ],
+    env,
+  );
+  const revision = result.stdout.trim();
+  if (!revision) fail('Azure post-deploy: could not read the latest revision name.');
+  return revision;
+}
+
+async function readAzureRevisions() {
+  const result = await runCapture(
+    'az',
+    [
+      'containerapp',
+      'revision',
+      'list',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--query',
+      '[].{name:name,active:properties.active,healthState:properties.healthState,runningState:properties.runningState,replicas:properties.replicas}',
+      '--output',
+      'json',
+    ],
+    env,
+  );
+  return JSON.parse(result.stdout);
+}
+
+async function readAzureRevisionLogs(revision) {
+  const result = await runCapture(
+    'az',
+    [
+      'containerapp',
+      'logs',
+      'show',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--revision',
+      revision,
+      '--tail',
+      '120',
+    ],
+    env,
+  );
+  return redact(`${result.stdout}\n${result.stderr}`);
+}
+
 function run(command, args, commandEnv, cwd = ROOT) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
@@ -243,6 +441,58 @@ function run(command, args, commandEnv, cwd = ROOT) {
       reject(new Error(`${command} exited with status ${code}`));
     });
   });
+}
+
+function runCapture(command, args, commandEnv, cwd = ROOT) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd,
+      env: commandEnv,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => {
+      stdout += String(chunk);
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += String(chunk);
+    });
+    child.on('error', reject);
+    child.on('exit', (code) => {
+      if (code === 0) {
+        resolve({ stdout, stderr });
+        return;
+      }
+      reject(
+        new Error(
+          `${command} exited with status ${code}\n${redact(stdout)}\n${redact(stderr)}`.trim(),
+        ),
+      );
+    });
+  });
+}
+
+function redact(value) {
+  let out = value;
+  for (const key of [
+    'DATABASE_URL',
+    'GLITCH_TITLE_TOKEN',
+    'GLITCH_API_TOKEN',
+    'GLITCH_SERVER_TITLE_TOKEN',
+    'VITE_GLITCH_TITLE_TOKEN',
+  ]) {
+    const secret = env[key];
+    if (secret) out = out.split(secret).join('[REDACTED]');
+  }
+  return out
+    .replace(/postgres:\/\/[^\s"'`]+/g, '[DATABASE_URL_REDACTED]')
+    .replace(/gl_deploy_[A-Za-z0-9]+/g, '[DEPLOY_TOKEN_REDACTED]')
+    .replace(/[0-9a-f]{8}-[0-9a-f-]{27,}\.[A-Za-z0-9]+/gi, '[TITLE_TOKEN_REDACTED]');
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function loadEnvFile(file) {
