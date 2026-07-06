@@ -5,6 +5,7 @@ import type { Entity, SimEvent } from '../src/sim/types';
 import {
   isWorldBossLootEligible,
   markWorldBossLooted,
+  WORLD_BOSS_CORPSE_SECONDS,
   WORLD_BOSS_INTERVAL_SECONDS,
   WORLD_BOSSES,
   worldBossLockoutId,
@@ -424,6 +425,80 @@ describe('world boss personal loot', () => {
       return JSON.stringify(boss.loot?.items ?? []);
     };
     expect(run()).toBe(run());
+  });
+});
+
+describe('world boss loot roster survives contributor death and grouping', () => {
+  it('keeps a contributor who DIED to the boss on the loot roster (not just the hate table)', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const p2 = sim.addPlayer('mage', 'Bru');
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    const e2 = (sim as any).entities.get(p2) as Entity;
+    // Both land a hit: both go on the hate table AND the permanent damager roster.
+    (sim as any).dealDamage(e1, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    (sim as any).dealDamage(e2, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    expect(boss.threat.has(p2)).toBe(true);
+
+    // p2 dies to the boss: handleDeath drops them from EVERY hate table (the classic
+    // "the dead fall off threat" prune) so the boss re-targets. This is exactly what
+    // used to strip a fallen raider's loot rights.
+    (sim as any).dealDamage(boss, e2, 999_999, false, 'physical', 'Boss', 'hit', true);
+    expect(e2.dead).toBe(true);
+    expect(boss.threat.has(p2)).toBe(false); // pruned off the live hate table...
+    expect(boss.bossDamagers.has(p2)).toBe(true); // ...but kept on the permanent roster
+
+    // p1 lands the killing blow.
+    (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+
+    // Both contributors get their own personal drop, including the one who died.
+    const owners = (boss.loot?.items ?? []).flatMap((s) => s.personalFor ?? []);
+    expect(owners).toContain(p1);
+    expect(owners).toContain(p2);
+  });
+
+  it('lets a slain world boss corpse linger far longer than a normal corpse', () => {
+    const sim = makeSim();
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+    expect(boss.corpseTimer).toBe(WORLD_BOSS_CORPSE_SECONDS);
+    // Generous enough that a corpse-runner can resurrect and walk back before it drops.
+    expect(WORLD_BOSS_CORPSE_SECONDS).toBeGreaterThanOrEqual(900);
+  });
+
+  it('never routes a world-boss epic through a party need/greed roll (personal loot only)', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const p2 = sim.addPlayer('mage', 'Bru');
+    // Party them up: the default party loot strategy rolls premium (epic) items as
+    // need/greed. If a boss epic ever reached the shared path, this is where it would.
+    sim.partyInvite(p1, p2);
+    sim.partyAccept(p2);
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    const e2 = (sim as any).entities.get(p2) as Entity;
+    (sim as any).dealDamage(e1, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    (sim as any).dealDamage(e2, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+
+    // Every slot is a single-owner personal drop even for a grouped raid: an epic can
+    // never enter a shared (need/greed) roll the party would have to fight over.
+    for (const slot of boss.loot?.items ?? []) {
+      expect(slot.personalFor && slot.personalFor.length === 1).toBe(true);
+      expect(slot.openToAll).toBeFalsy();
+    }
+    // Looting the personal drops opens NO group roll: they go straight to the bags.
+    e1.pos = { ...boss.pos };
+    sim.lootCorpse(boss.id, p1);
+    expect((sim as any).pendingLootRolls.size).toBe(0);
   });
 });
 
