@@ -12,7 +12,12 @@ import {
   readBrowserEnv,
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
-import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import {
+  cameraFollowShouldSettle,
+  gamepadCameraHold,
+  updateFollowCameraYaw,
+  wrapAngle,
+} from './game/camera_follow';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveShouldWalk,
@@ -1557,6 +1562,24 @@ async function startGame(
       gamepad.setInvertY(settings.set('gamepadInvertY', !!value));
       return;
     }
+    if (key === 'gamepadInvertX') {
+      gamepad.setInvertX(settings.set('gamepadInvertX', !!value));
+      return;
+    }
+    if (key === 'gamepadInvertMoveX') {
+      gamepad.setInvertMoveX(settings.set('gamepadInvertMoveX', !!value));
+      return;
+    }
+    if (key === 'gamepadInvertMoveY') {
+      gamepad.setInvertMoveY(settings.set('gamepadInvertMoveY', !!value));
+      return;
+    }
+    if (key === 'gamepadCameraAutoFollow') {
+      // Read live in updateCamera(); persist here so the boot apply-loop and the
+      // options toggle both keep it in sync (no subsystem push needed).
+      settings.set('gamepadCameraAutoFollow', !!value);
+      return;
+    }
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
       return;
@@ -2172,6 +2195,16 @@ async function startGame(
     // handoff stays smooth even in pure-follow (non-camera-driven) mode.
     if (wasClickMoving && !clickMoving) lastInterpFacing = interpFacing;
     wasClickMoving = clickMoving;
+    // The gamepad holds the camera fixed (no auto-settle) while the right stick
+    // is aiming it (plus a short release grace), and, when the pad's camera
+    // auto-follow is off, for as long as the pad is driving movement. This keeps
+    // the follow from fighting the stick mid-turn or swinging the view back on
+    // release. Scoped to pad-sourced input, so keyboard/mouse follow is untouched.
+    const gamepadHold = gamepadCameraHold(
+      input.isGamepadLookActive(),
+      settings.get('gamepadCameraAutoFollow'),
+      input.isGamepadMoving(),
+    );
     const next = updateFollowCameraYaw({
       camYaw: input.camYaw,
       interpFacing,
@@ -2182,6 +2215,7 @@ async function startGame(
       clickMoving,
       cameraDriven: input.isMouseCameraMode() && cameraMoveActive(),
       orbiting: input.leftDown && input.isCameraDragActive(),
+      gamepadHold,
     });
     input.camYaw = next.camYaw;
     lastInterpFacing = next.lastInterpFacing; // track through mouselook too, no snap on release

@@ -72,6 +72,34 @@ describe('stickToMoveFlags', () => {
     expect(f.forward).toBe(false);
     expect(f.strafeLeft).toBe(false);
   });
+
+  it('invertX swaps strafe left/right, leaving forward/back alone', () => {
+    const f = stickToMoveFlags(1, 0, 0.2, true, false);
+    expect(f.strafeLeft).toBe(true);
+    expect(f.strafeRight).toBe(false);
+    const up = stickToMoveFlags(0, -1, 0.2, true, false);
+    expect(up.forward).toBe(true);
+    expect(up.back).toBe(false);
+  });
+
+  it('invertY swaps forward/back, leaving strafe alone', () => {
+    const f = stickToMoveFlags(0, -1, 0.2, false, true);
+    expect(f.back).toBe(true);
+    expect(f.forward).toBe(false);
+    const right = stickToMoveFlags(1, 0, 0.2, false, true);
+    expect(right.strafeRight).toBe(true);
+    expect(right.strafeLeft).toBe(false);
+  });
+
+  it('invert flags do not change the magnitude deadzone gate', () => {
+    // Inside the deadzone, no flag fires regardless of invert (magnitude-based).
+    expect(stickToMoveFlags(0.1, 0.1, 0.25, true, true)).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+  });
 });
 
 describe('stickToLook', () => {
@@ -90,6 +118,22 @@ describe('stickToLook', () => {
     const normal = stickToLook(0, -1, 0.2, 2, false, 0.016);
     const inverted = stickToLook(0, -1, 0.2, 2, true, 0.016);
     expect(Math.sign(normal.pitch)).toBe(-Math.sign(inverted.pitch));
+  });
+
+  it('inverts yaw when invertX is set, without touching pitch', () => {
+    const normal = stickToLook(1, 0, 0.2, 2, false, 0.016);
+    const inverted = stickToLook(1, 0, 0.2, 2, false, 0.016, true);
+    expect(Math.sign(normal.yaw)).toBe(-Math.sign(inverted.yaw));
+    // push-right normally turns right (negative yaw); inverted turns left.
+    expect(inverted.yaw).toBeGreaterThan(0);
+    expect(inverted.pitch).toBe(normal.pitch);
+  });
+
+  it('invertX and invertY compose independently', () => {
+    const both = stickToLook(1, -1, 0.2, 2, true, 0.016, true);
+    const plain = stickToLook(1, -1, 0.2, 2, false, 0.016, false);
+    expect(Math.sign(both.yaw)).toBe(-Math.sign(plain.yaw));
+    expect(Math.sign(both.pitch)).toBe(-Math.sign(plain.pitch));
   });
 });
 

@@ -20,6 +20,10 @@ const TOUCH_LOOK_PITCH_RATE = 2.2;
 // or the camera joystick, so desktop and the joystick are unaffected.
 const TOUCH_DRAG_SENS_MULT = 2.2;
 const TOUCH_JUMP_LATCH_MS = 220;
+// Grace after the last right-stick look sample during which the follow-camera
+// still treats the pad as aiming, so a momentary deadzone dip (or the analog
+// snap-back on release) does not immediately re-engage the auto-settle.
+const GAMEPAD_LOOK_GRACE_MS = 180;
 // A keyboard jump press is latched the same way a touch tap is: a fast spacebar
 // tap can be pressed and released entirely between two 20Hz input samples (or
 // sim-tick gaps), so reading the raw key-held state silently drops it. Holding
@@ -189,6 +193,11 @@ export class Input {
   };
   private touchJumpUntil = 0;
   private keyJumpUntil = 0;
+  // Latched while the gamepad right stick is actively aiming the camera, plus a
+  // short grace window after release. Lets the follow-camera treat gamepad look
+  // like mouse-orbit (suspend auto-follow while the player owns the camera), so
+  // the settle no longer fights the stick or snaps the view back on release.
+  private gamepadLookUntil = 0;
   private touchLookActive = false;
   private touchLookVector = { x: 0, y: 0 };
   // multiplier on the touch look (camera joystick) rate; setTouchLookSpeed
@@ -513,11 +522,31 @@ export class Input {
 
   // Apply the right-stick camera deltas (already in radians, computed by the
   // pure stickToLook core). Clamps pitch to the same range as touch/mouse look.
+  // Latches "gamepad look active" (+ a short grace) so the follow-camera suspends
+  // its auto-settle while the player is aiming, mirroring mouse-orbit.
   applyGamepadLook(yawDelta: number, pitchDelta: number): void {
     if (yawDelta === 0 && pitchDelta === 0) return;
     this.camYaw += yawDelta;
     this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + pitchDelta));
+    this.gamepadLookUntil = performance.now() + GAMEPAD_LOOK_GRACE_MS;
     this.noteIntent('look');
+  }
+
+  /** True while the gamepad right stick is aiming the camera (or within the grace
+   *  window just after release): the follow-camera treats this like mouse-orbit. */
+  isGamepadLookActive(): boolean {
+    return performance.now() < this.gamepadLookUntil;
+  }
+
+  /** True while the gamepad left stick is driving movement, so the camera-follow
+   *  toggle can scope "no auto-recenter" to pad-sourced movement only. */
+  isGamepadMoving(): boolean {
+    return (
+      this.gamepadMove.forward ||
+      this.gamepadMove.back ||
+      this.gamepadMove.strafeLeft ||
+      this.gamepadMove.strafeRight
+    );
   }
 
   updateTouchLook(dt: number): void {

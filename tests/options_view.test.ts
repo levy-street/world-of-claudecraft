@@ -238,16 +238,22 @@ describe('options_view: audio dispatch matrix (cluster 4)', () => {
 // Cluster 5: controller + the remaining interface toggles
 // ---------------------------------------------------------------------------
 describe('options_view: controller dispatch matrix (cluster 5)', () => {
-  it('lists the enable/invert toggles then the three controller sliders', () => {
+  it('lists the enable/follow/invert toggles then the three controller sliders', () => {
     const controls = buildControllerControls(makeSource());
     expect(keysOf(controls)).toEqual([
       'gamepadEnabled',
+      'gamepadCameraAutoFollow',
+      'gamepadInvertX',
       'gamepadInvertY',
+      'gamepadInvertMoveX',
+      'gamepadInvertMoveY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
       'gamepadVibration',
     ]);
     expect(find(controls, 'gamepadEnabled')).toMatchObject({ control: 'boolToggle' });
+    expect(find(controls, 'gamepadCameraAutoFollow')).toMatchObject({ control: 'boolToggle' });
+    expect(find(controls, 'gamepadInvertX')).toMatchObject({ control: 'boolToggle' });
     // camera speed renders with a one-decimal readout, not a percent
     expect(find(controls, 'gamepadCameraSpeed')).toMatchObject({
       control: 'slider',

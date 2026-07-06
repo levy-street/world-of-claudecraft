@@ -13,6 +13,12 @@ export interface CameraFollowInput {
   // value the camera itself just produced, which feeds back into a wobble. We
   // still advance lastInterpFacing so re-coupling later doesn't snap.
   cameraDriven?: boolean;
+  // True while the gamepad is holding the camera under the player's manual aim:
+  // the right stick is aiming it (plus a short release grace), or the pad's
+  // camera auto-follow is off while the pad is driving movement. Behaves exactly
+  // like `orbiting` (the settle is suspended and the camera stays where aimed),
+  // but is a distinct input so the two sources stay independently testable.
+  gamepadHold?: boolean;
 }
 
 export interface CameraFollowResult {
@@ -48,14 +54,32 @@ export function cameraIsManual(mouselookActive: boolean, mouseCameraMode: boolea
   return mouselookActive || mouseCameraMode;
 }
 
+/**
+ * Whether the gamepad should hold the follow-camera fixed this frame (the value
+ * passed as CameraFollowInput.gamepadHold). True while the right stick is aiming
+ * the camera (`lookActive`, which includes the short post-release grace), or, when
+ * the pad's camera auto-follow is off, while the pad is driving movement
+ * (`padMoving`). Pad-only inputs: the caller passes gamepad-sourced state, so
+ * keyboard/mouse movement never sets this and their follow behavior is untouched.
+ */
+export function gamepadCameraHold(
+  lookActive: boolean,
+  autoFollow: boolean,
+  padMoving: boolean,
+): boolean {
+  return lookActive || (!autoFollow && padMoving);
+}
+
 export function cameraFollowShouldSettle(mi: CameraFollowMoveInput, clickMoving: boolean): boolean {
-  return clickMoving
-    || mi.forward
-    || mi.back
-    || mi.turnLeft
-    || mi.turnRight
-    || mi.strafeLeft
-    || mi.strafeRight;
+  return (
+    clickMoving ||
+    mi.forward ||
+    mi.back ||
+    mi.turnLeft ||
+    mi.turnRight ||
+    mi.strafeLeft ||
+    mi.strafeRight
+  );
 }
 
 export function wrapAngle(d: number): number {
@@ -89,15 +113,21 @@ function clickMoveSettleScale(absDelta: number): number {
 
 export function updateFollowCameraYaw(input: CameraFollowInput): CameraFollowResult {
   let camYaw = input.camYaw;
+  // The gamepad manual-aim hold behaves identically to a left-drag orbit: freeze
+  // the camera and keep lastInterpFacing synced so re-coupling later never snaps.
+  const holding = input.orbiting || !!input.gamepadHold;
   if (!input.mouselook && !input.cameraDriven) {
-    if (input.orbiting) return { camYaw, lastInterpFacing: input.interpFacing };
+    if (holding) return { camYaw, lastInterpFacing: input.interpFacing };
     let targetYaw = camYaw;
-    if (input.lastInterpFacing !== null && !input.clickMoving) targetYaw += wrapAngle(input.interpFacing - input.lastInterpFacing);
-    if (input.moving && !input.orbiting) {
+    if (input.lastInterpFacing !== null && !input.clickMoving)
+      targetYaw += wrapAngle(input.interpFacing - input.lastInterpFacing);
+    if (input.moving) {
       const delta = wrapAngle(input.interpFacing - targetYaw);
       const clickMoveScale = input.clickMoving ? clickMoveSettleScale(Math.abs(delta)) : 1;
       const rate = input.clickMoving ? CLICK_MOVE_SETTLE_RATE * clickMoveScale : SETTLE_RATE;
-      const maxStep = input.clickMoving ? CLICK_MOVE_MAX_SETTLE_STEP * clickMoveScale : MAX_SETTLE_STEP;
+      const maxStep = input.clickMoving
+        ? CLICK_MOVE_MAX_SETTLE_STEP * clickMoveScale
+        : MAX_SETTLE_STEP;
       const step = delta * (1 - Math.exp(-Math.max(0, input.frameDt) * rate));
       targetYaw += clamp(step, -maxStep, maxStep);
     }

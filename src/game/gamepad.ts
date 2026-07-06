@@ -46,6 +46,9 @@ export class GamepadManager {
   private deadzone = 0.18;
   private camSpeed = 2.4;
   private invertY = false;
+  private invertX = false;
+  private invertMoveX = false;
+  private invertMoveY = false;
   private vibration = 1;
   private lastHealth: number | null = null;
   private cursorEl: HTMLDivElement | null = null;
@@ -100,6 +103,15 @@ export class GamepadManager {
   }
   setInvertY(on: boolean): void {
     this.invertY = on;
+  }
+  setInvertX(on: boolean): void {
+    this.invertX = on;
+  }
+  setInvertMoveX(on: boolean): void {
+    this.invertMoveX = on;
+  }
+  setInvertMoveY(on: boolean): void {
+    this.invertMoveY = on;
   }
   setVibration(v: number): void {
     this.vibration = Math.min(1, Math.max(0, v));
@@ -195,12 +207,14 @@ export class GamepadManager {
     // Movement: left stick.
     const lx = pad.axes[AXIS.LEFT_X] ?? 0;
     const ly = pad.axes[AXIS.LEFT_Y] ?? 0;
-    this.input.setGamepadMove(stickToMoveFlags(lx, ly, this.deadzone));
+    this.input.setGamepadMove(
+      stickToMoveFlags(lx, ly, this.deadzone, this.invertMoveX, this.invertMoveY),
+    );
 
     // Camera: right stick.
     const rx = pad.axes[AXIS.RIGHT_X] ?? 0;
     const ry = pad.axes[AXIS.RIGHT_Y] ?? 0;
-    const look = stickToLook(rx, ry, this.deadzone, this.camSpeed, this.invertY, dt);
+    const look = stickToLook(rx, ry, this.deadzone, this.camSpeed, this.invertY, dt, this.invertX);
     this.input.applyGamepadLook(look.yaw, look.pitch);
 
     // Edge actions: one-shot on each button's rising edge.

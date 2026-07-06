@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { cameraFollowShouldSettle, cameraIsManual, updateFollowCameraYaw, wrapAngle } from '../src/game/camera_follow';
+import {
+  cameraFollowShouldSettle,
+  cameraIsManual,
+  gamepadCameraHold,
+  updateFollowCameraYaw,
+  wrapAngle,
+} from '../src/game/camera_follow';
 
 describe('camera follow', () => {
   it('wraps angles to the shortest signed turn', () => {
@@ -81,14 +87,19 @@ describe('camera follow', () => {
   });
 
   it('treats keyboard turning as active follow movement', () => {
-    expect(cameraFollowShouldSettle({
-      forward: false,
-      back: false,
-      strafeLeft: false,
-      strafeRight: false,
-      turnLeft: true,
-      turnRight: false,
-    }, false)).toBe(true);
+    expect(
+      cameraFollowShouldSettle(
+        {
+          forward: false,
+          back: false,
+          strafeLeft: false,
+          strafeRight: false,
+          turnLeft: true,
+          turnRight: false,
+        },
+        false,
+      ),
+    ).toBe(true);
   });
 
   it('does not auto-follow while the camera drives the facing (mouse-camera move)', () => {
@@ -121,6 +132,72 @@ describe('camera follow', () => {
     expect(next.camYaw).toBe(1);
   });
 
+  it('gamepadHold freezes the camera and re-syncs facing, like an orbit drag', () => {
+    // While the right stick aims the camera (or auto-follow is off while the pad
+    // moves), the settle must NOT pull camYaw back toward the character's facing.
+    const next = updateFollowCameraYaw({
+      camYaw: 1,
+      interpFacing: 0.4,
+      lastInterpFacing: 0.1,
+      frameDt: 1 / 60,
+      mouselook: false,
+      moving: true,
+      orbiting: false,
+      gamepadHold: true,
+    });
+    expect(next.camYaw).toBe(1);
+    // lastInterpFacing tracks so re-coupling on release never snaps.
+    expect(next.lastInterpFacing).toBe(0.4);
+  });
+
+  it('resumes the auto-settle the moment gamepadHold clears (release grace over)', () => {
+    const held = updateFollowCameraYaw({
+      camYaw: 1,
+      interpFacing: 0.4,
+      lastInterpFacing: 0.4,
+      frameDt: 1 / 60,
+      mouselook: false,
+      moving: true,
+      orbiting: false,
+      gamepadHold: true,
+    });
+    expect(held.camYaw).toBe(1);
+    const released = updateFollowCameraYaw({
+      camYaw: 1,
+      interpFacing: 0.4,
+      lastInterpFacing: 0.4,
+      frameDt: 1 / 60,
+      mouselook: false,
+      moving: true,
+      orbiting: false,
+      gamepadHold: false,
+    });
+    // Now it eases toward the character's facing (0.4 < 1), so camYaw drops.
+    expect(released.camYaw).toBeLessThan(1);
+    // and only eases (rate-limited), never snaps past the target.
+    expect(released.camYaw).toBeGreaterThan(0.4);
+  });
+
+  describe('gamepadCameraHold (the follow-suppression composition)', () => {
+    it('holds while the right stick is aiming, regardless of auto-follow or movement', () => {
+      // lookActive dominates: the stick is being aimed, so never fight it.
+      expect(gamepadCameraHold(true, true, false)).toBe(true);
+      expect(gamepadCameraHold(true, true, true)).toBe(true);
+      expect(gamepadCameraHold(true, false, false)).toBe(true);
+    });
+
+    it('with auto-follow ON, releases the hold once the stick is idle (classic follow resumes)', () => {
+      expect(gamepadCameraHold(false, true, false)).toBe(false);
+      // even while moving on the pad, auto-follow ON means the camera trails behind.
+      expect(gamepadCameraHold(false, true, true)).toBe(false);
+    });
+
+    it('with auto-follow OFF, keeps holding while the pad drives movement, but not when idle', () => {
+      expect(gamepadCameraHold(false, false, true)).toBe(true);
+      expect(gamepadCameraHold(false, false, false)).toBe(false);
+    });
+  });
+
   it('decouples click-to-move turns from the camera and eases only gently', () => {
     const next = updateFollowCameraYaw({
       camYaw: Math.PI,
@@ -139,8 +216,8 @@ describe('camera follow', () => {
   it('treats mouse-camera mode as manual control even though mouselook reports false', () => {
     // Right-mouse mouselook already counts as manual; Mouse Camera mode reports
     // mouselook=false on desktop but must be folded in so it takes the same path.
-    expect(cameraIsManual(true, false)).toBe(true);   // classic right-mouse mouselook
-    expect(cameraIsManual(false, true)).toBe(true);   // Mouse Camera mode (always on)
+    expect(cameraIsManual(true, false)).toBe(true); // classic right-mouse mouselook
+    expect(cameraIsManual(false, true)).toBe(true); // Mouse Camera mode (always on)
     expect(cameraIsManual(true, true)).toBe(true);
     expect(cameraIsManual(false, false)).toBe(false); // classic, hands off — follow runs
   });
@@ -158,18 +235,23 @@ describe('camera follow', () => {
       let intended = Math.PI;
       let lastInterpFacing: number | null = camYaw;
       for (let f = 0; f < 90; f++) {
-        camYaw += dragPerFrame;        // the player's drag this frame
-        intended += dragPerFrame;      // where the drag actually asked the camera to point
+        camYaw += dragPerFrame; // the player's drag this frame
+        intended += dragPerFrame; // where the drag actually asked the camera to point
         const next = updateFollowCameraYaw({
-          camYaw, interpFacing: camYaw, frameDt: dt, lastInterpFacing,
-          mouselook: manual, moving: true, orbiting: false,
+          camYaw,
+          interpFacing: camYaw,
+          frameDt: dt,
+          lastInterpFacing,
+          mouselook: manual,
+          moving: true,
+          orbiting: false,
         });
         camYaw = next.camYaw;
         lastInterpFacing = next.lastInterpFacing;
       }
       return Math.abs(wrapAngle(camYaw - intended));
     };
-    expect(simulate(true)).toBeCloseTo(0, 6);   // fixed: camera goes exactly where dragged
+    expect(simulate(true)).toBeCloseTo(0, 6); // fixed: camera goes exactly where dragged
     expect(simulate(false)).toBeGreaterThan(0.5); // old wiring: drifts >0.5 rad (~30°+)
   });
 

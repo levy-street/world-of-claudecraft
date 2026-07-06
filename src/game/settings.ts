@@ -131,6 +131,19 @@ export const BOOL_SETTINGS = {
   // off by default: invert the vertical axis of the right-stick camera, the
   // classic console/flight-sim preference. Independent of mouse/touch invert.
   gamepadInvertY: { def: false },
+  // off by default: invert the horizontal axis of the right-stick camera (push
+  // right turns the camera left). Independent of the vertical invert above.
+  gamepadInvertX: { def: false },
+  // off by default: invert the left-stick movement axes. MoveX swaps strafe
+  // left/right; MoveY swaps forward/back. For players who prefer a flipped
+  // movement stick; independent of the camera inverts.
+  gamepadInvertMoveX: { def: false },
+  gamepadInvertMoveY: { def: false },
+  // on by default: while moving, auto-recenter the camera behind the character
+  // after the right stick is released (the classic follow-cam). Off keeps the
+  // camera exactly where the stick last aimed it while moving on the pad. Either
+  // way the follow no longer fights the stick WHILE it is being held.
+  gamepadCameraAutoFollow: { def: true },
   // off by default: mirrors the touch layout so the movement joystick sits on
   // the right and the camera joystick on the left, for left-thumb-dominant
   // players. CSS-only swap gated on body.mobile-left-handed; ignored on desktop.

@@ -347,7 +347,11 @@ export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
 export function buildControllerControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
     boolToggle(s, 'gamepadEnabled', 'hudChrome.controller.enable'),
+    boolToggle(s, 'gamepadCameraAutoFollow', 'hudChrome.controller.cameraAutoFollow'),
+    boolToggle(s, 'gamepadInvertX', 'hudChrome.controller.invertX'),
     boolToggle(s, 'gamepadInvertY', 'hudChrome.controller.invertY'),
+    boolToggle(s, 'gamepadInvertMoveX', 'hudChrome.controller.invertMoveX'),
+    boolToggle(s, 'gamepadInvertMoveY', 'hudChrome.controller.invertMoveY'),
     slider(s, 'gamepadStickDeadzone', 'hudChrome.controller.deadzone'),
     slider(s, 'gamepadCameraSpeed', 'hudChrome.controller.cameraSpeed', 'oneDecimal'),
     slider(s, 'gamepadVibration', 'hudChrome.controller.vibration'),
