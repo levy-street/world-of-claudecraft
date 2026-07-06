@@ -5524,6 +5524,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'marketplace.equip': '装备',
   'marketplace.equipped': '已装备',
   'marketplace.ownedBadge': '已拥有',
+  'marketplace.featuredBadge': '推荐',
   'marketplace.noResults': '没有符合搜索条件的皮肤。',
   'marketplace.designTitle': '设计你的皮肤',
   'marketplace.designIntro': '为身体重新上色并添加图案,所有人看到的效果都一样,无需上传文件。',

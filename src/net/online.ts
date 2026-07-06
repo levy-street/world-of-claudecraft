@@ -567,6 +567,21 @@ export class Api {
     }
   }
 
+  // Premium (featured) listing slots: the ordered set of currently-featured skin
+  // ids so the marketplace can surface them first with a badge. Page-origin,
+  // best-effort - degrades to empty (no featured rail) on any failure or when the
+  // feature flag is off server-side.
+  async premiumListings(): Promise<string[]> {
+    try {
+      const res = await fetch('/api/marketplace/premium');
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.enabled && Array.isArray(data.featuredSkinIds) ? data.featuredSkinIds : [];
+    } catch {
+      return [];
+    }
+  }
+
   // Public, factual buy-and-burn ledger: cumulative $WOC burned + recent batches
   // (amounts as base-unit strings, explorer-verifiable tx sigs). Page-origin,
   // best-effort — degrades to empty so a transparency widget can simply omit it.

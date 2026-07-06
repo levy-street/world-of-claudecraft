@@ -701,6 +701,23 @@ CREATE TABLE IF NOT EXISTS burn_batches (
 );
 CREATE INDEX IF NOT EXISTS burn_batches_status ON burn_batches(status);
 CREATE INDEX IF NOT EXISTS burn_batches_executed ON burn_batches(executed_at DESC);
+-- Premium (featured) listing slots. A bounded set of slot indexes (0..N-1, N from
+-- config): a creator burns to feature one of their live listings in a slot for a
+-- fixed, config-driven window. slot_index is the PRIMARY KEY so a slot holds at
+-- most one active feature; the expiry sweep frees a slot by deleting its row once
+-- expires_at passes. pay_tx_sig references onchain_payments so the SAME per-signature
+-- replay guard the skin purchase uses also gates a slot claim (no double-feature on
+-- a replayed payment).
+CREATE TABLE IF NOT EXISTS premium_slots (
+  slot_index  INT PRIMARY KEY,
+  skin_id     TEXT NOT NULL REFERENCES creator_skins(id) ON DELETE CASCADE,
+  buyer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  pay_tx_sig  TEXT NOT NULL UNIQUE REFERENCES onchain_payments(tx_sig),
+  expires_at  TIMESTAMPTZ NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS premium_slots_expires ON premium_slots(expires_at);
+CREATE INDEX IF NOT EXISTS premium_slots_skin ON premium_slots(skin_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -2928,6 +2945,113 @@ export async function redeemPurchase(p: {
     // per-signature gate already passed, so this is the same-quote double-pay — treat
     // it as already-redeemed (one grant, one sale) rather than a 500.
     if ((e as { code?: string })?.code === '23505') return false;
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+// --------------------------------------------------------------------------
+// Premium (featured) listing slots
+// --------------------------------------------------------------------------
+
+export interface PremiumSlotRow {
+  slotIndex: number;
+  skinId: string;
+  buyerAccountId: number;
+  payTxSig: string;
+  expiresAt: string;
+}
+
+function mapPremiumSlot(row: Record<string, unknown>): PremiumSlotRow {
+  return {
+    slotIndex: Number(row.slot_index),
+    skinId: row.skin_id as string,
+    buyerAccountId: Number(row.buyer_account_id),
+    payTxSig: row.pay_tx_sig as string,
+    expiresAt: iso(row.expires_at),
+  };
+}
+
+/** Active (not-yet-expired) premium slots, ordered by slot index. The expiry
+ *  filter is applied in SQL so a slot past its window is never returned as
+ *  featured even before the sweep physically deletes it. */
+export async function listActivePremiumSlots(): Promise<PremiumSlotRow[]> {
+  const res = await pool.query(
+    'SELECT * FROM premium_slots WHERE expires_at > now() ORDER BY slot_index',
+  );
+  return res.rows.map(mapPremiumSlot);
+}
+
+/** Delete every expired slot; returns the count freed. Idempotent; safe to run
+ *  on a timer. */
+export async function pruneExpiredPremiumSlots(): Promise<number> {
+  const res = await pool.query('DELETE FROM premium_slots WHERE expires_at <= now()');
+  return res.rowCount ?? 0;
+}
+
+/**
+ * Atomically claim a premium slot on a verified payment: consume the payment
+ * signature (the SAME per-signature replay guard as a skin purchase), then insert
+ * the slot row. Runs the expiry sweep first, inside the transaction, so an expired
+ * slot is freed before the free-slot search. Returns:
+ *   - 'ok' with the claimed slotIndex on success,
+ *   - 'already_redeemed' if the signature was already consumed (a replay),
+ *   - 'exhausted' if every slot index in [0, slotCount) is held by an active feature.
+ */
+export async function claimPremiumSlot(p: {
+  txSig: string;
+  accountId: number;
+  quoteId: string;
+  mint: string;
+  skinId: string;
+  grossUsdc: bigint;
+  slotCount: number;
+  expiresAt: string;
+}): Promise<
+  { ok: true; slotIndex: number } | { ok: false; reason: 'already_redeemed' | 'exhausted' }
+> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Consume the signature FIRST (the replay guard). A replayed signature is a
+    // no-op insert -> already redeemed. Reuses onchain_payments exactly as
+    // redeemPurchase does.
+    const ins = await client.query(
+      `INSERT INTO onchain_payments (tx_sig, account_id, reference, amount, mint)
+       VALUES ($1,$2,$3,$4,$5) ON CONFLICT (tx_sig) DO NOTHING`,
+      [p.txSig, p.accountId, p.quoteId, p.grossUsdc.toString(), p.mint],
+    );
+    if ((ins.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return { ok: false, reason: 'already_redeemed' };
+    }
+    // Free any expired slots inside the same transaction, then find the lowest
+    // free slot index in [0, slotCount).
+    await client.query('DELETE FROM premium_slots WHERE expires_at <= now()');
+    const held = await client.query('SELECT slot_index FROM premium_slots FOR UPDATE');
+    const taken = new Set<number>(held.rows.map((r) => Number(r.slot_index)));
+    let slotIndex = -1;
+    for (let i = 0; i < p.slotCount; i++) {
+      if (!taken.has(i)) {
+        slotIndex = i;
+        break;
+      }
+    }
+    if (slotIndex < 0) {
+      await client.query('ROLLBACK');
+      return { ok: false, reason: 'exhausted' };
+    }
+    await client.query(
+      `INSERT INTO premium_slots (slot_index, skin_id, buyer_account_id, pay_tx_sig, expires_at)
+       VALUES ($1,$2,$3,$4,$5)`,
+      [slotIndex, p.skinId, p.accountId, p.txSig, p.expiresAt],
+    );
+    await client.query('DELETE FROM marketplace_quotes WHERE quote_id = $1', [p.quoteId]);
+    await client.query('COMMIT');
+    return { ok: true, slotIndex };
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
     throw e;
   } finally {
     client.release();

@@ -5525,6 +5525,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'marketplace.equip': '裝備',
   'marketplace.equipped': '已裝備',
   'marketplace.ownedBadge': '已擁有',
+  'marketplace.featuredBadge': '推薦',
   'marketplace.noResults': '沒有符合搜尋條件的造型。',
   'marketplace.designTitle': '設計你的造型',
   'marketplace.designIntro': '為身體重新上色並加上圖案,所有人看到的效果都相同,無需上傳檔案。',

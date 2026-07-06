@@ -2498,6 +2498,7 @@ export const en_XA: EnTranslations = {
     "equip": "[Éɋúíþ]",
     "equipped": "[Éɋúíþþéð]",
     "ownedBadge": "[Óŵñéð]",
+    "featuredBadge": "[Ƒéáţúŕéð]",
     "noResults": "[Ñó šķíñš ɱáţçĥ ýóúŕ šéáŕçĥ.]",
     "designTitle": "[Ðéšíĝñ ýóúŕ šķíñ]",
     "designIntro": "[Ŕéçóļóŕ áñð þáţţéŕñ á ƀóðý — íţ ŕéñðéŕš ţĥé šáɱé ƒóŕ éʋéŕýóñé, ñó ƒíļéš ţó úþļóáð.]",

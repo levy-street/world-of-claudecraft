@@ -1727,6 +1727,7 @@ async function startGame(
     };
     attachMarketplaceHooks({
       listSkins: () => api.creatorSkins(),
+      featuredSkinIds: () => api.premiumListings(),
       ownedSkinIds: () => online.accountCosmetics.ownedCreatorSkinIds,
       isWalletConnected: () => (walletMod ? walletMod.currentWallet().isConnected : false),
       connectWallet: async () => {

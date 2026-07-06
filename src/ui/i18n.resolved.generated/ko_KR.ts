@@ -2498,6 +2498,7 @@ export const ko_KR: EnTranslations = {
     "equip": "장착",
     "equipped": "장착됨",
     "ownedBadge": "보유 중",
+    "featuredBadge": "추천",
     "noResults": "검색과 일치하는 스킨이 없습니다.",
     "designTitle": "스킨 디자인하기",
     "designIntro": "몸체의 색과 패턴을 바꿔 보세요. 모두에게 동일하게 표시되며 파일 업로드가 필요 없습니다.",

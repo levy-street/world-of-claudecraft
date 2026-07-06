@@ -2498,6 +2498,7 @@ export const es_ES: EnTranslations = {
     "equip": "Equip",
     "equipped": "Equipped",
     "ownedBadge": "Owned",
+    "featuredBadge": "Featured",
     "noResults": "No skins match your search.",
     "designTitle": "Design your skin",
     "designIntro": "Recolor and pattern a body — it renders the same for everyone, no files to upload.",

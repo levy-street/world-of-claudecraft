@@ -5958,6 +5958,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'marketplace.equip': 'Надеть',
   'marketplace.equipped': 'Надето',
   'marketplace.ownedBadge': 'В коллекции',
+  'marketplace.featuredBadge': 'Рекомендуемое',
   'marketplace.noResults': 'По вашему запросу облики не найдены.',
   'marketplace.designTitle': 'Создайте свой облик',
   'marketplace.designIntro':

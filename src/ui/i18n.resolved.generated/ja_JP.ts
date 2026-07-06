@@ -2498,6 +2498,7 @@ export const ja_JP: EnTranslations = {
     "equip": "装備",
     "equipped": "装備中",
     "ownedBadge": "所持済み",
+    "featuredBadge": "注目",
     "noResults": "検索に一致するスキンはありません。",
     "designTitle": "スキンをデザイン",
     "designIntro": "ボディの色とパターンを変えられます。誰にでも同じように表示され、ファイルのアップロードは不要です。",

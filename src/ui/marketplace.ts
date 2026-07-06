@@ -36,6 +36,9 @@ export interface MarketplaceListing {
 export interface MarketplaceHooks {
   // The live creator skins (public registry metadata).
   listSkins(): Promise<CreatorSkinRegistryEntry[]>;
+  // The ids of currently-featured (premium-slot) skins, ordered slot 0 first.
+  // Empty when premium listings are disabled server-side.
+  featuredSkinIds(): Promise<string[]>;
   // Creator-skin ids the player already owns (the equip allow-list, client view).
   ownedSkinIds(): string[];
   // Whether a Solana wallet is currently connected (the payer / payout dest).
@@ -164,7 +167,28 @@ function thumbSrc(skin: CreatorSkinRegistryEntry): string {
   return '';
 }
 
-function renderBrowse(content: HTMLElement, skins: CreatorSkinRegistryEntry[]): void {
+// Order featured (premium-slot) skins first, in slot order, then the rest in their
+// registry order. Featured ids that no longer resolve to a live skin are skipped.
+function orderByFeatured(
+  skins: CreatorSkinRegistryEntry[],
+  featured: string[],
+): CreatorSkinRegistryEntry[] {
+  const featuredSet = new Set(featured);
+  const byId = new Map(skins.map((s) => [s.id, s]));
+  const head: CreatorSkinRegistryEntry[] = [];
+  for (const id of featured) {
+    const s = byId.get(id);
+    if (s) head.push(s);
+  }
+  const tail = skins.filter((s) => !featuredSet.has(s.id));
+  return [...head, ...tail];
+}
+
+function renderBrowse(
+  content: HTMLElement,
+  skins: CreatorSkinRegistryEntry[],
+  featured: string[],
+): void {
   content.innerHTML =
     `<div class="market-browse">` +
     `<input type="text" class="market-search" aria-label="${esc(t('marketplace.search'))}" placeholder="${esc(t('marketplace.search'))}">` +
@@ -172,11 +196,13 @@ function renderBrowse(content: HTMLElement, skins: CreatorSkinRegistryEntry[]): 
     `</div>`;
   const grid = content.querySelector('.market-grid') as HTMLElement;
   const search = content.querySelector('.market-search') as HTMLInputElement;
+  const featuredSet = new Set(featured);
+  const ordered = orderByFeatured(skins, featured);
 
   const draw = (filter: string): void => {
     const owned = new Set(hooks?.ownedSkinIds() ?? []);
     const q = filter.trim().toLowerCase();
-    const shown = skins.filter(
+    const shown = ordered.filter(
       (s) => !q || s.name.toLowerCase().includes(q) || s.creator.toLowerCase().includes(q),
     );
     grid.innerHTML = '';
@@ -187,21 +213,29 @@ function renderBrowse(content: HTMLElement, skins: CreatorSkinRegistryEntry[]): 
       grid.appendChild(empty);
       return;
     }
-    for (const skin of shown) grid.appendChild(buildCard(skin, owned.has(skin.id)));
+    for (const skin of shown)
+      grid.appendChild(buildCard(skin, owned.has(skin.id), featuredSet.has(skin.id)));
   };
 
   search.addEventListener('input', () => draw(search.value));
   draw('');
 }
 
-function buildCard(skin: CreatorSkinRegistryEntry, isOwned: boolean): HTMLElement {
+function buildCard(
+  skin: CreatorSkinRegistryEntry,
+  isOwned: boolean,
+  isFeatured: boolean,
+): HTMLElement {
   const card = document.createElement('div');
-  card.className = 'market-card';
+  card.className = isFeatured ? 'market-card market-card-featured' : 'market-card';
   card.setAttribute('role', 'listitem');
   const src = thumbSrc(skin);
   const klass = skin.targetClass ? esc(skin.targetClass) : esc(t('marketplace.anyClass'));
   card.innerHTML =
     `<div class="market-thumb-wrap">${src ? `<img class="market-thumb" src="${esc(src)}" alt="" draggable="false">` : `<div class="market-thumb market-thumb-empty"></div>`}` +
+    (isFeatured
+      ? `<span class="market-featured-badge">${esc(t('marketplace.featuredBadge'))}</span>`
+      : '') +
     (isOwned ? `<span class="market-owned-badge">${esc(t('marketplace.ownedBadge'))}</span>` : '') +
     `</div>` +
     `<div class="market-card-name">${esc(skin.name)}</div>` +
@@ -572,6 +606,7 @@ function setTab(
   tab: 'browse' | 'create',
   content: HTMLElement,
   skins: CreatorSkinRegistryEntry[],
+  featured: string[],
 ): void {
   activeTab = tab;
   overlay?.querySelectorAll('.market-tab').forEach((b) => {
@@ -582,7 +617,7 @@ function setTab(
   });
   if (tab === 'browse') {
     destroyDesignerPreview();
-    renderBrowse(content, skins);
+    renderBrowse(content, skins, featured);
   } else renderCreate(content);
 }
 
@@ -608,13 +643,13 @@ export async function openMarketplace(): Promise<void> {
   el.querySelector('[data-close]')?.addEventListener('click', () => close());
   const content = el.querySelector('.market-content') as HTMLElement;
 
-  const skins = await hooks.listSkins();
+  const [skins, featured] = await Promise.all([hooks.listSkins(), hooks.featuredSkinIds()]);
   // The user may have closed the overlay while the registry was loading.
   if (el.style.display === 'none') return;
   for (const b of Array.from(el.querySelectorAll('.market-tab'))) {
     b.addEventListener('click', () =>
-      setTab((b as HTMLElement).dataset.tab as 'browse' | 'create', content, skins),
+      setTab((b as HTMLElement).dataset.tab as 'browse' | 'create', content, skins, featured),
     );
   }
-  setTab(activeTab, content, skins);
+  setTab(activeTab, content, skins, featured);
 }

@@ -5833,6 +5833,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'marketplace.equip': '장착',
   'marketplace.equipped': '장착됨',
   'marketplace.ownedBadge': '보유 중',
+  'marketplace.featuredBadge': '추천',
   'marketplace.noResults': '검색과 일치하는 스킨이 없습니다.',
   'marketplace.designTitle': '스킨 디자인하기',
   'marketplace.designIntro':

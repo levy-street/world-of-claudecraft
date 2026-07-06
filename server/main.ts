@@ -74,6 +74,7 @@ import {
   isAdminAccount,
   lifetimeXpRankForCharacter,
   lifetimeXpStanding,
+  listActivePremiumSlots,
   listCharacters,
   listCompanionTokens,
   loadAccountCosmetics,
@@ -82,6 +83,7 @@ import {
   primarySlugForAccount,
   pruneChatLogs,
   pruneClientPerfReports,
+  pruneExpiredPremiumSlots,
   pruneMarketplaceQuotes,
   reclaimDeactivatedName,
   referralCountForAccount,
@@ -169,6 +171,13 @@ import {
   handleCardRoutes,
   handleCardUpload,
 } from './player_card';
+import {
+  premiumListingsEnabled,
+  premiumSlotCount,
+  premiumSlotPriceUsdc,
+  quotePremiumSlot,
+  verifyPremiumPurchase,
+} from './premium_listings';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
@@ -1713,6 +1722,83 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       game.applyCreatorSkinGrant(accountId, result.skinId);
       return json(res, 200, { ok: true, skinId: result.skinId });
     }
+    // Premium (featured) listing slots (#471). Public read: the ordered set of
+    // currently-featured skin ids (slot 0 first) plus the fixed slot count + fee,
+    // so the browse grid can surface featured listings first with a badge. Reports
+    // enabled:false (never a 503) when the flag is off, so the UI simply omits the
+    // premium rail. Reuses the marketplace's split-payment + burn-vault path for the
+    // fee; only the slot ledger + expiry sweep are premium-specific.
+    if (req.method === 'GET' && url === '/api/marketplace/premium') {
+      if (!premiumListingsEnabled()) return json(res, 200, { enabled: false });
+      const body = await cachedPublicRead('premium-slots', async () => {
+        const slots = await listActivePremiumSlots();
+        return {
+          enabled: true,
+          slotCount: premiumSlotCount(),
+          priceUsdc: premiumSlotPriceUsdc().toString(),
+          featuredSkinIds: slots.map((s) => s.skinId),
+        };
+      });
+      return json(res, 200, body);
+    }
+    if (
+      req.method === 'POST' &&
+      url.startsWith('/api/marketplace/skins/') &&
+      url.endsWith('/premium-quote')
+    ) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      if (!premiumListingsEnabled())
+        return json(res, 503, { error: 'premium listings unavailable' });
+      const skinId = decodeURIComponent(
+        url.slice('/api/marketplace/skins/'.length, -'/premium-quote'.length),
+      );
+      const skin = await getCreatorSkin(skinId);
+      if (!skin || skin.status !== 'live') return json(res, 404, { error: 'listing not live' });
+      // Only the listing's own creator may pay to feature it.
+      if (skin.creatorAccountId !== accountId) return json(res, 403, { error: 'not your listing' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      const quote = await quotePremiumSlot(skin, accountId);
+      return json(res, 200, {
+        quoteId: quote.quoteId,
+        skinId: quote.skinId,
+        mint: quote.mint,
+        memo: quote.quoteId,
+        creator: { owner: quote.creatorOwner, amount: quote.creatorUsdc.toString() },
+        burn: { owner: quote.burnOwner, amount: quote.burnUsdc.toString() },
+        gross: (quote.creatorUsdc + quote.burnUsdc).toString(),
+        expiresAt: quote.expiresAt,
+      });
+    }
+    if (req.method === 'POST' && url === '/api/marketplace/premium-buy') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      if (!premiumListingsEnabled())
+        return json(res, 503, { error: 'premium listings unavailable' });
+      const body = await readBody(req);
+      const quoteId = typeof body.quoteId === 'string' ? body.quoteId : '';
+      const signature = typeof body.signature === 'string' ? body.signature : '';
+      if (!quoteId || !signature)
+        return json(res, 400, { error: 'quoteId and signature required' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      const result = await verifyPremiumPurchase({
+        quoteId,
+        signature,
+        buyerAccountId: accountId,
+        buyerWallet: wallet.pubkey,
+      });
+      if (!result.ok) return json(res, 400, { error: result.reason });
+      invalidatePublicRead('premium-slots');
+      return json(res, 200, {
+        ok: true,
+        slotIndex: result.slotIndex,
+        expiresAt: result.expiresAt,
+      });
+    }
     // Creator self-serve listing (the in-browser designer "Sell" path). Lists a
     // procedural design 'live' under the creator's own linked wallet (the 70%
     // payout dest), grants the creator their own creation, and freshens the
@@ -2057,6 +2143,12 @@ async function main(): Promise<void> {
       // unbought quotes would otherwise accrue unbounded).
       void pruneMarketplaceQuotes().catch((err) =>
         console.error('marketplace quote prune failed:', err),
+      );
+      // Sweep expired premium (featured) slots so a lapsed feature stops showing
+      // and its slot frees for the next buyer (claimPremiumSlot also sweeps inline,
+      // this reaps slots no one is currently claiming into).
+      void pruneExpiredPremiumSlots().catch((err) =>
+        console.error('premium slot prune failed:', err),
       );
       void pruneDiscordOAuthStates(pool).catch((err) =>
         console.error('discord oauth state prune failed:', err),

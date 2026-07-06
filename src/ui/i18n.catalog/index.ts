@@ -137,6 +137,7 @@ export const en = {
     equip: 'Equip',
     equipped: 'Equipped',
     ownedBadge: 'Owned',
+    featuredBadge: 'Featured',
     noResults: 'No skins match your search.',
     // Create / designer tab
     designTitle: 'Design your skin',

@@ -5838,6 +5838,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'marketplace.equip': '装備',
   'marketplace.equipped': '装備中',
   'marketplace.ownedBadge': '所持済み',
+  'marketplace.featuredBadge': '注目',
   'marketplace.noResults': '検索に一致するスキンはありません。',
   'marketplace.designTitle': 'スキンをデザイン',
   'marketplace.designIntro':

@@ -2498,6 +2498,7 @@ export const zh_CN: EnTranslations = {
     "equip": "装备",
     "equipped": "已装备",
     "ownedBadge": "已拥有",
+    "featuredBadge": "推荐",
     "noResults": "没有符合搜索条件的皮肤。",
     "designTitle": "设计你的皮肤",
     "designIntro": "为身体重新上色并添加图案,所有人看到的效果都一样,无需上传文件。",

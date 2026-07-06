@@ -2498,6 +2498,7 @@ export const zh_TW: EnTranslations = {
     "equip": "裝備",
     "equipped": "已裝備",
     "ownedBadge": "已擁有",
+    "featuredBadge": "推薦",
     "noResults": "沒有符合搜尋條件的造型。",
     "designTitle": "設計你的造型",
     "designIntro": "為身體重新上色並加上圖案,所有人看到的效果都相同,無需上傳檔案。",

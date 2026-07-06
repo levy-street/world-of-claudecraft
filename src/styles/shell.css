@@ -7035,6 +7035,22 @@
     font-weight: 700;
     border: 1px solid #2f7d4c;
   }
+  .market-featured-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #5a3d0e;
+    color: #f2cf7a;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid #a8801f;
+  }
+  .market-card-featured {
+    border-color: #a8801f;
+    box-shadow: 0 0 0 1px #a8801f inset;
+  }
   .market-card-name {
     font-weight: 700;
     color: #f3ead2;
