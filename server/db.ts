@@ -624,6 +624,27 @@ CREATE TABLE IF NOT EXISTS woc_payments (
   reference TEXT NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Featured-talent checkout sales ledger (docs/prd/woc/talent-checkout.md). A row
+-- is one settled multi-currency purchase: the currency the buyer paid in, the
+-- total, and the 80/20 split recorded per sale (talent_base + treasury_base ===
+-- amount_base). The tx_sig UNIQUE constraint is the double-spend replay guard,
+-- exactly like woc_payments. The talent-checkout quote reuses woc_quotes
+-- (kind='talent'). See server/talent.ts + server/talent_db.ts.
+CREATE TABLE IF NOT EXISTS talent_sales (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  tx_sig TEXT NOT NULL UNIQUE,
+  ware_id TEXT NOT NULL,
+  talent_id TEXT NOT NULL,
+  currency TEXT NOT NULL,
+  amount_base BIGINT NOT NULL,
+  talent_base BIGINT NOT NULL,
+  treasury_base BIGINT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS talent_sales_account ON talent_sales(account_id);
+CREATE INDEX IF NOT EXISTS talent_sales_talent ON talent_sales(talent_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -766,6 +787,10 @@ export interface AccountCosmetics {
   // so the existing `{ completedQuestIds, mechChromaIds }` literals keep
   // compiling; normalizeAccountCosmetics always populates it for loaded rows.
   logolWareIds?: string[];
+  // Featured-talent wares bought through the multi-currency checkout (docs/prd/
+  // woc/talent-checkout.md), account-bound and cosmetic-only. Optional for the
+  // same back-compat reason as logolWareIds.
+  talentWareIds?: string[];
 }
 
 function uniqueStrings(value: unknown): string[] {
@@ -786,6 +811,7 @@ export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
     completedQuestIds: uniqueStrings(src.completedQuestIds),
     mechChromaIds: uniqueStrings(src.mechChromaIds),
     logolWareIds: uniqueStrings(src.logolWareIds),
+    talentWareIds: uniqueStrings(src.talentWareIds),
   };
 }
 
@@ -824,6 +850,16 @@ export async function grantAccountLogolWare(
   const owned = cosmetics.logolWareIds ?? [];
   const logolWareIds = owned.includes(wareId) ? owned : [...owned, wareId];
   return saveAccountCosmetics(accountId, { ...cosmetics, logolWareIds });
+}
+
+export async function grantAccountTalentWare(
+  accountId: number,
+  wareId: string,
+): Promise<AccountCosmetics> {
+  const cosmetics = await loadAccountCosmetics(accountId);
+  const owned = cosmetics.talentWareIds ?? [];
+  const talentWareIds = owned.includes(wareId) ? owned : [...owned, wareId];
+  return saveAccountCosmetics(accountId, { ...cosmetics, talentWareIds });
 }
 
 export async function grantAccountMechChroma(

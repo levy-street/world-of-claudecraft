@@ -1205,6 +1205,17 @@ export const ja_JP: EnTranslations = {
       "mining": "採掘",
       "logging": "伐採",
       "herbalism": "薬草学"
+    },
+    "talentCheckout": {
+      "title": "注目クリエイターの品",
+      "currencyLabel": "支払い通貨",
+      "currencyUsdc": "USDC",
+      "currencySol": "SOL",
+      "currencyWoc": "$WOC",
+      "buy": "Buy",
+      "purchased": "{ware} を購入しました。",
+      "failed": "購入を完了できませんでした。もう一度お試しください。",
+      "unavailable": "注目クリエイターのプログラムは現在開いていません。"
     }
   },
   "apiError": {

@@ -1205,6 +1205,17 @@ export const ko_KR: EnTranslations = {
       "mining": "채광",
       "logging": "벌목",
       "herbalism": "약초학"
+    },
+    "talentCheckout": {
+      "title": "주목받는 크리에이터 상품",
+      "currencyLabel": "결제 통화",
+      "currencyUsdc": "USDC",
+      "currencySol": "SOL",
+      "currencyWoc": "$WOC",
+      "buy": "Buy",
+      "purchased": "{ware}을(를) 구매했습니다.",
+      "failed": "구매를 완료하지 못했습니다. 다시 시도해 주세요.",
+      "unavailable": "주목받는 크리에이터 프로그램은 현재 열려 있지 않습니다."
     }
   },
   "apiError": {

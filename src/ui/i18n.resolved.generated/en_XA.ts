@@ -1205,6 +1205,17 @@ export const en_XA: EnTranslations = {
       "mining": "[Ɱíñíñĝ]",
       "logging": "[Ļóĝĝíñĝ]",
       "herbalism": "[Ĥéŕƀáļíšɱ]"
+    },
+    "talentCheckout": {
+      "title": "[Ƒéáţúŕéð Çŕéáţóŕ Ŵáŕéš]",
+      "currencyLabel": "[Þáý ŵíţĥ]",
+      "currencyUsdc": "[ÚŠÐÇ]",
+      "currencySol": "[ŠÓĻ]",
+      "currencyWoc": "[$ŴÓÇ]",
+      "buy": "[Ɓúý]",
+      "purchased": "[Þúŕçĥášéð {ware}.]",
+      "failed": "[Ţĥáţ þúŕçĥášé çóúļð ñóţ ƀé çóɱþļéţéð. Þļéášé ţŕý áĝáíñ.]",
+      "unavailable": "[Ţĥé ƒéáţúŕéð çŕéáţóŕ þŕóĝŕáɱ íš ñóţ óþéñ ŕíĝĥţ ñóŵ.]"
     }
   },
   "apiError": {

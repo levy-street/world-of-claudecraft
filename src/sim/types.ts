@@ -1301,6 +1301,28 @@ export interface LogolWare {
   rarity: 'rare' | 'epic' | 'legendary';
 }
 
+// Featured-talent wares on the Logol pipeline (docs/prd/woc/talent-checkout.md).
+// A buyer pays in their CHOICE of currency, so a ware carries a human-readable
+// price PER currency; the server converts the chosen leg to base units and
+// splits it 80/20 (talent/treasury). Cosmetic-only, account-bound, reusing
+// LogolWareKind (title/flair/transmog/mount). The sim never reads these; the
+// checkout is server-side (server/talent.ts).
+export interface TalentWarePrice {
+  usdc: number; // whole USDC
+  sol: number; // whole SOL
+  woc: number; // whole $WOC
+}
+
+export interface TalentWare {
+  id: string;
+  talentId: string; // the featured creator who owns the ware and its 80% payout
+  kind: LogolWareKind;
+  name: string;
+  description: string;
+  price: TalentWarePrice;
+  rarity: 'rare' | 'epic' | 'legendary';
+}
+
 // Ground interactables (sparkle objects)
 export interface GroundObjectDef {
   itemId: string;

@@ -94,9 +94,9 @@ describe('sheet routes use the right gate', () => {
     expect(block).not.toContain('bearerReadAccount');
   });
 
-  it('bearerReadAccount gates exactly the six read routes (owner /sheet, /api/me/characters, /api/maps, /api/assets/mine, /api/logol/info, /api/logol/inventory)', () => {
+  it('bearerReadAccount gates exactly the eight read routes (owner /sheet, /api/me/characters, /api/maps, /api/assets/mine, /api/logol/info, /api/logol/inventory, /api/talent/storefront, /api/talent/inventory)', () => {
     const count = (MAIN.match(/bearerReadAccount\(req, res\)/g) ?? []).length;
-    expect(count).toBe(6);
+    expect(count).toBe(8);
   });
 });
 

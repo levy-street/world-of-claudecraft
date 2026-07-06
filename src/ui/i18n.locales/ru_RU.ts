@@ -6119,6 +6119,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Травничество',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Featured-talent checkout (docs/prd/woc/talent-checkout.md). M16 non-Latin
+  // fills for the wordy new hudChrome.talentCheckout.* leaves.
+  'hudChrome.talentCheckout.title': 'Товары приглашённых авторов',
+  'hudChrome.talentCheckout.currencyLabel': 'Валюта оплаты',
+  'hudChrome.talentCheckout.purchased': 'Покупка {ware} совершена.',
+  'hudChrome.talentCheckout.failed': 'Не удалось завершить покупку. Попробуйте ещё раз.',
+  'hudChrome.talentCheckout.unavailable': 'Программа приглашённых авторов сейчас недоступна.',
   // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
   'entities.npcs.logol.name': "Логол",
   'entities.npcs.logol.greeting': "Значит, ты меня видишь. Немногим дано. Я несу то, что не купить золотом, странник, только за $WOC.",

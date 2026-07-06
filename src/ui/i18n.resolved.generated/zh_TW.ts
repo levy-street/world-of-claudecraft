@@ -1205,6 +1205,17 @@ export const zh_TW: EnTranslations = {
       "mining": "採礦",
       "logging": "伐木",
       "herbalism": "藥草學"
+    },
+    "talentCheckout": {
+      "title": "特邀創作者商品",
+      "currencyLabel": "支付貨幣",
+      "currencyUsdc": "USDC",
+      "currencySol": "SOL",
+      "currencyWoc": "$WOC",
+      "buy": "Buy",
+      "purchased": "已購買 {ware}。",
+      "failed": "此次購買無法完成。請重試。",
+      "unavailable": "特邀創作者計畫目前未開放。"
     }
   },
   "apiError": {

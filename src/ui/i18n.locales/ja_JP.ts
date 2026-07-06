@@ -6003,6 +6003,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '薬草学',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Featured-talent checkout (docs/prd/woc/talent-checkout.md). M16 non-Latin
+  // fills for the wordy new hudChrome.talentCheckout.* leaves.
+  'hudChrome.talentCheckout.title': '注目クリエイターの品',
+  'hudChrome.talentCheckout.currencyLabel': '支払い通貨',
+  'hudChrome.talentCheckout.purchased': '{ware} を購入しました。',
+  'hudChrome.talentCheckout.failed': '購入を完了できませんでした。もう一度お試しください。',
+  'hudChrome.talentCheckout.unavailable': '注目クリエイターのプログラムは現在開いていません。',
   // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
   'entities.npcs.logol.name': "ロゴル",
   'entities.npcs.logol.greeting': "私が見えるのか。見える者は少ない。黄金では買えぬ品を携えている、旅人よ。支払いは $WOC のみだ。",

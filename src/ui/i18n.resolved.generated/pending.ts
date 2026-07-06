@@ -28,7 +28,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "es_ES": [
     "entities.npcs.logol.greeting",
@@ -49,7 +58,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "fr_FR": [
     "entities.npcs.logol.greeting",
@@ -70,7 +88,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "fr_CA": [
     "entities.npcs.logol.greeting",
@@ -91,7 +118,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "en_CA": [],
   "it_IT": [
@@ -113,7 +149,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "de_DE": [
     "entities.npcs.logol.greeting",
@@ -134,31 +179,56 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "zh_CN": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc"
   ],
   "zh_TW": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc"
   ],
   "ko_KR": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc"
   ],
   "ja_JP": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc"
   ],
   "pt_BR": [
     "entities.npcs.logol.greeting",
@@ -179,13 +249,26 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "ru_RU": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc"
   ],
   "cs_CZ": [
     "entities.npcs.logol.greeting",
@@ -206,7 +289,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "nl_NL": [
     "entities.npcs.logol.greeting",
@@ -227,7 +319,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "pl_PL": [
     "entities.npcs.logol.greeting",
@@ -248,7 +349,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "id_ID": [
     "entities.npcs.logol.greeting",
@@ -269,7 +379,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "tr_TR": [
     "entities.npcs.logol.greeting",
@@ -290,7 +409,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "sv_SE": [
     "entities.npcs.logol.greeting",
@@ -311,7 +439,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "vi_VN": [
     "entities.npcs.logol.greeting",
@@ -332,7 +469,16 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ],
   "da_DK": [
     "entities.npcs.logol.greeting",
@@ -353,6 +499,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
     "entities.quests.q_logol_sign.title",
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.talentCheckout.buy",
+    "hudChrome.talentCheckout.currencyLabel",
+    "hudChrome.talentCheckout.currencySol",
+    "hudChrome.talentCheckout.currencyUsdc",
+    "hudChrome.talentCheckout.currencyWoc",
+    "hudChrome.talentCheckout.failed",
+    "hudChrome.talentCheckout.purchased",
+    "hudChrome.talentCheckout.title",
+    "hudChrome.talentCheckout.unavailable"
   ]
 };

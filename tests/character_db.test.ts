@@ -266,6 +266,7 @@ describe('account cosmetics', () => {
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson', 'onyx_gold'],
       logolWareIds: [],
+      talentWareIds: [],
     });
 
     expect(dbMock.query.mock.calls[0][0]).toContain('cosmetics');
@@ -292,6 +293,7 @@ describe('account cosmetics', () => {
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
       logolWareIds: [],
+      talentWareIds: [],
     });
 
     const [sql, params] = dbMock.query.mock.calls[1];
@@ -302,6 +304,7 @@ describe('account cosmetics', () => {
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
       logolWareIds: [],
+      talentWareIds: [],
     });
   });
 
@@ -325,6 +328,7 @@ describe('account cosmetics', () => {
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson'],
       logolWareIds: [],
+      talentWareIds: [],
     });
   });
 
@@ -355,6 +359,7 @@ describe('account cosmetics', () => {
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
       logolWareIds: [],
+      talentWareIds: [],
     });
 
     const [sql, params] = dbMock.query.mock.calls[1];
@@ -363,6 +368,7 @@ describe('account cosmetics', () => {
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
       logolWareIds: [],
+      talentWareIds: [],
     });
   });
 });

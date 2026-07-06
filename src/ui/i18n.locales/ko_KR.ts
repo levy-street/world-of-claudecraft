@@ -5993,6 +5993,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '약초학',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Featured-talent checkout (docs/prd/woc/talent-checkout.md). M16 non-Latin
+  // fills for the wordy new hudChrome.talentCheckout.* leaves.
+  'hudChrome.talentCheckout.title': '주목받는 크리에이터 상품',
+  'hudChrome.talentCheckout.currencyLabel': '결제 통화',
+  'hudChrome.talentCheckout.purchased': '{ware}을(를) 구매했습니다.',
+  'hudChrome.talentCheckout.failed': '구매를 완료하지 못했습니다. 다시 시도해 주세요.',
+  'hudChrome.talentCheckout.unavailable': '주목받는 크리에이터 프로그램은 현재 열려 있지 않습니다.',
   // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
   'entities.npcs.logol.name': "로골",
   'entities.npcs.logol.greeting': "나를 볼 수 있군. 그런 자는 드물지. 황금으로 살 수 없는 것을 지녔다, 나그네여. 값은 오직 $WOC 뿐이다.",

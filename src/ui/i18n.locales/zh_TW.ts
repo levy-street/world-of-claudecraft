@@ -5675,6 +5675,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '藥草學',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Featured-talent checkout (docs/prd/woc/talent-checkout.md). M16 non-Latin
+  // fills for the wordy new hudChrome.talentCheckout.* leaves.
+  'hudChrome.talentCheckout.title': '特邀創作者商品',
+  'hudChrome.talentCheckout.currencyLabel': '支付貨幣',
+  'hudChrome.talentCheckout.purchased': '已購買 {ware}。',
+  'hudChrome.talentCheckout.failed': '此次購買無法完成。請重試。',
+  'hudChrome.talentCheckout.unavailable': '特邀創作者計畫目前未開放。',
   // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
   'entities.npcs.logol.name': "洛戈爾",
   'entities.npcs.logol.greeting': "你竟能看見我。少有人能。我帶著黃金買不到的東西，陌生人，只收 $WOC。",

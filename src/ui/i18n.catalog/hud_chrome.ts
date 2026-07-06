@@ -1351,4 +1351,19 @@ export const hudChromeStrings = {
     logging: 'Logging',
     herbalism: 'Herbalism',
   },
+  // Featured-talent multi-currency checkout (docs/prd/woc/talent-checkout.md).
+  // Player-facing labels for the checkout surface: the currency choice (USDC /
+  // SOL / $WOC are brand tokens, kept identical across locales), the buy action,
+  // and the settled/failed toasts. {ware} is a cosmetic ware name.
+  talentCheckout: {
+    title: 'Featured Creator Wares',
+    currencyLabel: 'Pay with',
+    currencyUsdc: 'USDC',
+    currencySol: 'SOL',
+    currencyWoc: '$WOC',
+    buy: 'Buy',
+    purchased: 'Purchased {ware}.',
+    failed: 'That purchase could not be completed. Please try again.',
+    unavailable: 'The featured creator program is not open right now.',
+  },
 };

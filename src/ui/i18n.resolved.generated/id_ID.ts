@@ -1205,6 +1205,17 @@ export const id_ID: EnTranslations = {
       "mining": "Penambangan",
       "logging": "Penebangan",
       "herbalism": "Herbalisme"
+    },
+    "talentCheckout": {
+      "title": "Featured Creator Wares",
+      "currencyLabel": "Pay with",
+      "currencyUsdc": "USDC",
+      "currencySol": "SOL",
+      "currencyWoc": "$WOC",
+      "buy": "Buy",
+      "purchased": "Purchased {ware}.",
+      "failed": "That purchase could not be completed. Please try again.",
+      "unavailable": "The featured creator program is not open right now."
     }
   },
   "apiError": {

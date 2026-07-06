@@ -1205,6 +1205,17 @@ export const es_ES: EnTranslations = {
       "mining": "Minería",
       "logging": "Tala",
       "herbalism": "Herboristería"
+    },
+    "talentCheckout": {
+      "title": "Featured Creator Wares",
+      "currencyLabel": "Pay with",
+      "currencyUsdc": "USDC",
+      "currencySol": "SOL",
+      "currencyWoc": "$WOC",
+      "buy": "Buy",
+      "purchased": "Purchased {ware}.",
+      "failed": "That purchase could not be completed. Please try again.",
+      "unavailable": "The featured creator program is not open right now."
     }
   },
   "apiError": {

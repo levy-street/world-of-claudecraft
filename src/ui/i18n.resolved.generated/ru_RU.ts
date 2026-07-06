@@ -1205,6 +1205,17 @@ export const ru_RU: EnTranslations = {
       "mining": "Горное дело",
       "logging": "Лесозаготовка",
       "herbalism": "Травничество"
+    },
+    "talentCheckout": {
+      "title": "Товары приглашённых авторов",
+      "currencyLabel": "Валюта оплаты",
+      "currencyUsdc": "USDC",
+      "currencySol": "SOL",
+      "currencyWoc": "$WOC",
+      "buy": "Buy",
+      "purchased": "Покупка {ware} совершена.",
+      "failed": "Не удалось завершить покупку. Попробуйте ещё раз.",
+      "unavailable": "Программа приглашённых авторов сейчас недоступна."
     }
   },
   "apiError": {

@@ -5674,6 +5674,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '草药学',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Featured-talent checkout (docs/prd/woc/talent-checkout.md). M16 non-Latin
+  // fills for the wordy new hudChrome.talentCheckout.* leaves.
+  'hudChrome.talentCheckout.title': '特邀创作者商品',
+  'hudChrome.talentCheckout.currencyLabel': '支付货币',
+  'hudChrome.talentCheckout.purchased': '已购买 {ware}。',
+  'hudChrome.talentCheckout.failed': '此次购买无法完成。请重试。',
+  'hudChrome.talentCheckout.unavailable': '特邀创作者计划当前未开放。',
   // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
   'entities.npcs.logol.name': "洛戈尔",
   'entities.npcs.logol.greeting': "你竟能看见我。少有人能。我带着黄金买不到的东西，陌生人，只收 $WOC。",
