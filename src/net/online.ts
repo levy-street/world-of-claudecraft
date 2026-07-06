@@ -639,6 +639,39 @@ export class Api {
     return { ok: res.ok, status: res.status, reason: data.reason, data };
   }
 
+  // ── $WOC paid respec + loadout-slot actions (#472) ────────────────────────
+  // The SAME quote / paycontext / confirm shape as the identity actions, on the
+  // /api/respec/* routes. 404s while PAID_RESPEC_ENABLED is off; callers treat
+  // that as "hide the paid UI".
+  async respecPrices(): Promise<{ respec: number; loadout_slot: number }> {
+    return this.get('/api/respec/prices');
+  }
+
+  // Quote a burn price. `body.kind` is 'respec' | 'unlock_loadout_slot'.
+  async respecQuote(body: { kind: string; characterId: number }): Promise<WocIdentityQuote> {
+    return this.post('/api/respec/quote', body);
+  }
+
+  async respecPayContext(quoteId: string): Promise<WocIdentityPayContext> {
+    return this.get(`/api/respec/paycontext?quoteId=${encodeURIComponent(quoteId)}`);
+  }
+
+  async respecConfirm(
+    quoteId: string,
+    signature: string,
+  ): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    const res = await fetch(apiUrl('/api/respec/confirm', this.base), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
+      body: JSON.stringify({ quoteId, signature }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, reason: data.reason, data };
+  }
+
   // ── Discord link/login + status ────────────────────────────────────────────
   // Returns the discord.com authorize URL the browser navigates to (login = new
   // session, link = attach to the current account).

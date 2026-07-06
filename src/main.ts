@@ -167,6 +167,7 @@ import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { openPaidRenameEditor } from './ui/paid_rename';
+import { openPaidRespecEditor, type RespecAction } from './ui/paid_respec';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
@@ -3939,8 +3940,27 @@ function ensureIdentityPrices(): Promise<void> {
   return identityPricesPromise;
 }
 
+// $WOC-paid respec + loadout-slot prices (#472), fetched once and cached. A 404
+// (PAID_RESPEC_ENABLED off server-side) or any failure leaves both null, which
+// hides the paid-respec entry point entirely, mirroring the identity price gate.
+let respecPriceWoc: number | null = null;
+let loadoutSlotPriceWoc: number | null = null;
+let respecPricesPromise: Promise<void> | null = null;
+function ensureRespecPrices(): Promise<void> {
+  if (!respecPricesPromise) {
+    respecPricesPromise = api
+      .respecPrices()
+      .then((p) => {
+        respecPriceWoc = typeof p.respec === 'number' ? p.respec : null;
+        loadoutSlotPriceWoc = typeof p.loadout_slot === 'number' ? p.loadout_slot : null;
+      })
+      .catch(() => {});
+  }
+  return respecPricesPromise;
+}
+
 async function refreshCharacters(): Promise<void> {
-  if (WALLET_ENABLED) await ensureIdentityPrices();
+  if (WALLET_ENABLED) await Promise.all([ensureIdentityPrices(), ensureRespecPrices()]);
   if (api.realm) $('#charselect-realm').textContent = api.realm;
   updateSortButtonLabel();
   const listEl = $('#char-list');
@@ -3985,6 +4005,10 @@ async function refreshCharacters(): Promise<void> {
               : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button>${
                   WALLET_ENABLED && renameCharacterPriceWoc !== null
                     ? `<button class="btn paid-rename-btn" type="button">${escapeHtml(t('character.rename'))}</button>`
+                    : ''
+                }${
+                  WALLET_ENABLED && respecPriceWoc !== null
+                    ? `<button class="btn paid-respec-btn" type="button">${escapeHtml(t('character.respec'))}</button>`
                     : ''
                 }<button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
         }`;
@@ -4039,6 +4063,17 @@ async function refreshCharacters(): Promise<void> {
             formatWoc,
             pay: payCharacterRename,
             onRenamed: () => refreshCharacters(),
+            errorText: paidRenameErrorText,
+          });
+        });
+        row.querySelector('.paid-respec-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openPaidRespecEditor(row, c, {
+            respecPriceWoc,
+            loadoutSlotPriceWoc,
+            formatWoc,
+            pay: payCharacterRespec,
+            onApplied: () => refreshCharacters(),
             errorText: paidRenameErrorText,
           });
         });
@@ -6221,6 +6256,35 @@ async function payCharacterRename(
   });
   refreshWocBalanceOnDemand();
   return { name: typeof applied?.name === 'string' ? applied.name : name };
+}
+
+// Full $WOC-paid respec / loadout-slot unlock (#472): ensure wallet, then
+// quote -> burn -> confirm via the SAME injected-IO flow as rename, pointed at
+// the /api/respec/* endpoints. The action id is the quote `kind`.
+async function payCharacterRespec(
+  action: RespecAction,
+  characterId: number,
+  onStatus: (message: string) => void,
+): Promise<unknown> {
+  const linked = await ensureWalletLinked();
+  if (!linked) throw new Error(t('woc.linkWalletFirst'));
+  const wallet = await loadWallet();
+  const applied = await payWocIdentityFlow({
+    quote: () => api.respecQuote({ kind: action, characterId }),
+    payContext: (quoteId) => api.respecPayContext(quoteId),
+    signAndSend: (tx) => wallet.signAndSendWocTransaction(tx),
+    confirm: (quoteId, signature) => api.respecConfirm(quoteId, signature),
+    onStage: (stage, quote) => {
+      if (stage === 'quoting') onStatus(t('woc.quoting'));
+      else if (stage === 'approve')
+        onStatus(t('woc.approveBurn', { amount: formatWoc(quote?.priceWoc ?? 0) }));
+      else if (stage === 'confirming') onStatus(t('woc.confirming'));
+      else onStatus(t('woc.finalizing'));
+    },
+    sleep: (ms) => new Promise((resolve) => window.setTimeout(resolve, ms)),
+  });
+  refreshWocBalanceOnDemand();
+  return applied;
 }
 
 // Localize a paid-rename failure: flow-level codes map to woc.* keys; server

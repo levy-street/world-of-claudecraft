@@ -2492,6 +2492,33 @@
   .paid-rename-editor .paid-rename-status:empty {
     display: none;
   }
+  .paid-respec-editor {
+    flex: 1 0 100%;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(78, 61, 29, 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .paid-respec-editor .paid-respec-hint {
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+  }
+  .paid-respec-editor .paid-respec-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .paid-respec-editor .paid-respec-status {
+    color: #ffbf66;
+    font-size: 11.5px;
+    min-height: 14px;
+  }
+  .paid-respec-editor .paid-respec-status:empty {
+    display: none;
+  }
   .char-create {
     margin-top: 14px;
     border-top: 1px solid rgba(78, 61, 29, 0.3);
