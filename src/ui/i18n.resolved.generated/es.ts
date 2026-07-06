@@ -313,7 +313,13 @@ export const es: EnTranslations = {
       "hapticsOff": "Vibración desactivada",
       "toggleHaptics": "Alternar vibración",
       "hotbarPage": "Habilidades",
-      "hotbarPageAria": "Mostrar el siguiente conjunto de habilidades"
+      "hotbarPageAria": "Mostrar el siguiente conjunto de habilidades",
+      "actionRing": "Combat actions",
+      "actionPageToggle": "Switch action page",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "Swap target",
+      "targetCycleShort": "Target",
+      "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Usa el joystick de movimiento para moverte y arrastra la pantalla para mirar alrededor. Da unos pasos para empezar.",
@@ -420,7 +426,9 @@ export const es: EnTranslations = {
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
-      "showDailyRewardsChest": "Mostrar cofre de recompensas diarias"
+      "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
+      "mobileCameraJoystick": "Camera joystick",
+      "mobileLeftHanded": "Left-handed layout"
     },
     "controller": {
       "title": "Mando",

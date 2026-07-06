@@ -54,7 +54,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "es_ES": [
     "abilityUi.resources.fury",
@@ -101,7 +109,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "fr_FR": [
     "abilityUi.resources.fury",
@@ -148,7 +164,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "fr_CA": [
     "abilityUi.resources.fury",
@@ -195,7 +219,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "en_CA": [],
   "it_IT": [
@@ -243,7 +275,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "de_DE": [
     "abilityUi.resources.fury",
@@ -290,7 +330,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "zh_CN": [
     "classDetails.resources.fury",
@@ -298,7 +346,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.spellbookPageLabel"
   ],
   "zh_TW": [
     "classDetails.resources.fury",
@@ -306,7 +356,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.spellbookPageLabel"
   ],
   "ko_KR": [
     "classDetails.resources.fury",
@@ -314,7 +366,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.spellbookPageLabel"
   ],
   "ja_JP": [
     "classDetails.resources.fury",
@@ -322,7 +376,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.spellbookPageLabel"
   ],
   "pt_BR": [
     "abilityUi.resources.fury",
@@ -369,7 +425,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "ru_RU": [
     "classDetails.resources.fury",
@@ -377,7 +441,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.spellbookPageLabel"
   ],
   "nl_NL": [
     "abilityUi.resources.fury",
@@ -424,7 +490,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "pl_PL": [
     "abilityUi.resources.fury",
@@ -471,7 +545,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "id_ID": [
     "abilityUi.resources.fury",
@@ -518,7 +600,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "tr_TR": [
     "abilityUi.resources.fury",
@@ -565,7 +655,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "sv_SE": [
     "abilityUi.resources.fury",
@@ -612,7 +710,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "vi_VN": [
     "abilityUi.resources.fury",
@@ -659,7 +765,15 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ],
   "da_DK": [
     "abilityUi.resources.fury",
@@ -706,6 +820,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded"
   ]
 };

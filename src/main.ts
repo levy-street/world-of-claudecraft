@@ -45,6 +45,7 @@ import {
   setInterfaceMode,
   useTouchInterface,
 } from './game/mobile_controls';
+import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
 import { createPerfMonitor } from './game/perf';
@@ -419,6 +420,7 @@ function syncBuildInfo(): void {
 
 function syncAppViewport(): void {
   syncAppViewportShared();
+  applyMobileHudLayout();
 }
 
 function preventMobileZoom(): void {
@@ -1101,10 +1103,14 @@ async function startGame(
     gameInputReady,
   }));
 
+  // The ring's attack toggle acquires the nearest attackable enemy when tapped
+  // with no live hostile target (the HUD falls back to plain castSlot(0) until
+  // this is wired); the Target button cycles targets via the Tab path below.
+  hud.onMobileAttackNearest = () => attackNearest();
+
   const mobileControls = new MobileControls(input, {
-    onAttackNearest: () => attackNearest(),
+    onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
-    onTarget: () => world.tabTarget(),
     onInteract: () => interactKey(),
     onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),
@@ -1126,7 +1132,6 @@ async function startGame(
       return music.enabled;
     },
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
-    onCycleHotbarPage: () => hud.cycleMobileHotbarPage(),
   });
   mobileControls.start();
   // reflect the current music state on the touch toggle (it may already be off
@@ -1299,6 +1304,12 @@ async function startGame(
     if (key === 'leftHandedTouch') {
       const v = settings.set('leftHandedTouch', !!value);
       document.body.classList.toggle('mobile-left-handed', v);
+      return;
+    }
+    if (key === 'mobileCameraJoystick') {
+      const v = settings.set('mobileCameraJoystick', !!value);
+      document.body.classList.toggle('mobile-camera-joystick-on', v);
+      mobileControls.setCameraJoystickEnabled(v);
       return;
     }
     if (key === 'touchInvertLook') {

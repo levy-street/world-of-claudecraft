@@ -313,7 +313,13 @@ export const sv_SE: EnTranslations = {
       "hapticsOff": "Haptik av",
       "toggleHaptics": "Växla haptik",
       "hotbarPage": "Förmågor",
-      "hotbarPageAria": "Visa nästa uppsättning förmågor"
+      "hotbarPageAria": "Visa nästa uppsättning förmågor",
+      "actionRing": "Combat actions",
+      "actionPageToggle": "Switch action page",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "Swap target",
+      "targetCycleShort": "Target",
+      "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
@@ -420,7 +426,9 @@ export const sv_SE: EnTranslations = {
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
-      "showDailyRewardsChest": "Visa kistan för dagliga belöningar"
+      "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
+      "mobileCameraJoystick": "Camera joystick",
+      "mobileLeftHanded": "Left-handed layout"
     },
     "controller": {
       "title": "Handkontroll",

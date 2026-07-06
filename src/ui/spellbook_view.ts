@@ -14,10 +14,18 @@
 // summary / rank label and resolves the icon. The known-vs-bar shape is the same
 // for the offline Sim and the online ClientWorld mirror (both expose `known` +
 // the bar), so the two produce identical rows.
+//
+// Phase 4 of the mobile combat HUD rework adds an optional `mobilePage` per row:
+// which mobile action-ring page (Phase 1, mobile_action_page_view.ts) the row's
+// bar slot falls on, so the touch-only painter can label it ("Page 1"/"Page 2").
+// The page math is NOT duplicated here: sourceSlotsForMobilePage is imported
+// from mobile_action_page_view.ts and this module only looks up which page's
+// slot set contains the row's barSlot.
 
 import { ABILITIES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { PlayerClass } from '../sim/types';
+import { MOBILE_ACTION_PAGE_COUNT, sourceSlotsForMobilePage } from './mobile_action_page_view';
 
 /** One spell row: the class kit entry plus its learned / bar state. */
 export interface SpellbookRow {
@@ -32,6 +40,11 @@ export interface SpellbookRow {
   onBar: boolean;
   /** Learned, off the bar, but the bar is full, so the add control is disabled. */
   toggleDisabled: boolean;
+  /** The mobile action-ring page (0-indexed) this row's bar slot falls on, or
+   *  null when the row is off-bar or its slot is outside the ring's reachable
+   *  span (slot 0 / the attack toggle, slot 11, or the secondary bar). Touch-only
+   *  presentation; desktop rendering ignores this field. */
+  mobilePage: number | null;
 }
 
 /** The full spellbook view-model. */
@@ -57,6 +70,12 @@ export interface SpellbookInput {
   hasFreeSlot: boolean;
   /** The class has per-form bars (druid), so the reset-bar button is shown. */
   hasFormBars: boolean;
+  /** Optional: the hotbar's ability id per bar slot (index 0 = barSlot 1, matching
+   *  Hud.hotbarActions' own index = barSlot-1 convention), used to derive each
+   *  row's mobilePage. Omitted (or an ability id not found here) yields
+   *  mobilePage: null, so callers that don't care about mobile paging (or run
+   *  before this data is wired) see no behavior change. */
+  abilityIdByBarSlot?: readonly (string | null)[];
 }
 
 /**
@@ -78,6 +97,7 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
       rank: known?.rank ?? 0,
       onBar,
       toggleDisabled: known !== null && !onBar && !input.hasFreeSlot,
+      mobilePage: onBar ? mobilePageForAbility(abilityId, input.abilityIdByBarSlot) : null,
     };
   });
   return {
@@ -86,4 +106,24 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
     rows,
     empty: rows.length === 0,
   };
+}
+
+/**
+ * The mobile action-ring page (0-indexed) whose source slots
+ * (sourceSlotsForMobilePage) contain this ability's bar slot, or null when the
+ * slot lookup is missing, the ability isn't on the bar, or its slot sits outside
+ * every page's span (slot 0's attack toggle, slot 11, or the secondary bar).
+ */
+function mobilePageForAbility(
+  abilityId: string,
+  abilityIdByBarSlot: readonly (string | null)[] | undefined,
+): number | null {
+  if (!abilityIdByBarSlot) return null;
+  const slotIndex = abilityIdByBarSlot.indexOf(abilityId);
+  if (slotIndex === -1) return null;
+  const barSlot = slotIndex + 1; // index 0 = barSlot 1
+  for (let page = 0; page < MOBILE_ACTION_PAGE_COUNT; page++) {
+    if (sourceSlotsForMobilePage(page).includes(barSlot)) return page;
+  }
+  return null;
 }

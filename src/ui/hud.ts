@@ -107,7 +107,7 @@ import {
   type PartyInfo,
 } from '../world_api';
 import { type AbilityScaling, abilityDamageBonus } from './ability_damage';
-import { ActionBarPainter } from './action_bar_painter';
+import { ActionBarPainter, type ActionBarSlotElements } from './action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarView,
@@ -270,6 +270,13 @@ import {
   nextMinimapZoom,
 } from './minimap_zoom';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
+import {
+  clampMobilePage,
+  mobilePageCount,
+  nextMobilePage,
+  sourceSlotForMobileButton,
+} from './mobile_action_page_view';
+import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -736,12 +743,6 @@ export class Hud {
   // keybind dispatch all work across both with no per-bar bookkeeping.
   private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
   private static readonly BAR_ABILITY_SLOTS = 22;
-  // Mobile hotbar: exactly two pages of 5 visible spell buttons (slots 1-5,
-  // then 6-10), toggled by one page-switch button. Slot 11 has no mobile
-  // page and is reachable only on the desktop bar.
-  private static readonly MOBILE_HOTBAR_PAGE_SIZE = 5;
-  private static readonly MOBILE_HOTBAR_SLOTS = 10;
-  private mobileHotbarPage = 0;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
@@ -759,6 +760,22 @@ export class Hud {
   // second/third bar is another descriptor, not a code fork.
   private actionBarView!: ActionBarView;
   private actionBarPainter!: ActionBarPainter;
+  // The mobile action ring: a SECOND createActionBarView instance over a 6-slot
+  // descriptor (slot 0 attack, slots 1-5 resolve through
+  // sourceSlotForMobileButton(mobileActionPage, i-1)). mobileActionPage is the
+  // only mutable state; cycling it never rebuilds the descriptor (the closures
+  // re-resolve), which is what keeps the view allocation-stable across page
+  // flips. Both fields stay undefined on desktop-only sessions where the ring DOM
+  // is absent (buildActionBar only builds them when #mobile-action-ring exists).
+  private mobileActionPage = 0;
+  private mobileActionRingView: ActionBarView | undefined;
+  private mobileActionRingPainter: MobileActionRingPainter | undefined;
+  // Acquire-nearest fallback for the ring's attack toggle when the player has
+  // no live hostile target: wired by main.ts to the same nearest-attackable
+  // pick the touch layer uses (the HUD cannot resolve attackability itself,
+  // that helper lives behind the game-layer seam). Null until wired; the
+  // attack handler then falls back to the plain castSlot(0) toggle.
+  onMobileAttackNearest: (() => void) | null = null;
   private hotbarActions: HotbarAction[] = []; // index = barSlot-1
   private loadedSlotMapFromStorage = false;
   private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
@@ -3424,6 +3441,11 @@ export class Hud {
     abilityTooltip: (known) => this.abilityTooltip(known),
     barAbilityIds: () =>
       this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
+    // Index 0 = barSlot 1 (hotbarActions' own index = barSlot-1 convention), used
+    // to derive each row's mobile action-ring page (Phase 4). Non-ability slots
+    // (empty or an item) map to null, never mistaken for an ability id.
+    abilityIdByBarSlot: () =>
+      this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
     hasFreeSlot: () => this.firstEmptyHotbarIndex() !== -1,
     addToBar: (id) => this.addAbilityToHotbar(id),
     removeFromBar: (id) => this.removeAbilityFromHotbar(id),
@@ -4275,6 +4297,7 @@ export class Hud {
     this.dragAction = null;
     this.clearActionDropTargets();
     this.loadSlotMap();
+    this.mobileActionPage = clampMobilePage(this.mobileActionPage);
   }
 
   // Drop unlearned ability ids; place newly learned abilities in the first
@@ -4308,6 +4331,7 @@ export class Hud {
     if (synced.changed) this.saveSlotMap();
     if (initialClassSeed) this.markClassBarSeeded();
     this.knownAbilityIdsAtLastSlotSync = new Set(knownAbilityIds);
+    this.mobileActionPage = clampMobilePage(this.mobileActionPage);
   }
 
   private actionForSlot(barSlot: number): HotbarAction {
@@ -4496,6 +4520,16 @@ export class Hud {
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.flashActionSlot(barSlot);
     }
+  }
+
+  // Advance the mobile action ring to its next page. Mutates mobileActionPage
+  // ONLY: the ring descriptor's per-slot closures (built once in buildActionBar)
+  // resolve sourceSlotForMobileButton(mobileActionPage, i) fresh every tick, so no
+  // descriptor rebuild is needed and hidden-page cooldowns keep ticking (their
+  // state lives on hotbarActions + sim, not on the view). The next update() call
+  // repaints the ring from the new page.
+  private cycleMobileActionPage(): void {
+    this.mobileActionPage = nextMobilePage(this.mobileActionPage);
   }
 
   private flashActionSlot(barSlot: number): void {
@@ -4745,37 +4779,141 @@ export class Hud {
       },
       (iconKey) => this.actionBarIconBg(iconKey),
     );
-    this.applyMobileHotbarPage();
+
+    this.buildMobileActionRing();
   }
 
-  /** Cycles which of the mobile hotbar's two 5-slot pages is showing (the
-   *  #mobile-hotbar-page toggle button). Event-driven, not per-frame, so it
-   *  writes the DOM directly rather than through the elided writer facet. */
-  cycleMobileHotbarPage(): void {
-    const pages = Math.ceil(Hud.MOBILE_HOTBAR_SLOTS / Hud.MOBILE_HOTBAR_PAGE_SIZE);
-    this.mobileHotbarPage = (this.mobileHotbarPage + 1) % pages;
-    this.applyMobileHotbarPage();
-  }
+  // Build the mobile action ring: a SECOND createActionBarView instance over a
+  // 6-slot descriptor (slot 0 the fixed attack toggle, slots 1-5 the paged action
+  // buttons) plus a MobileActionRingPainter reusing ActionBarPainter for the
+  // per-slot writes. The static container/buttons live in index.html/play.html
+  // (#mobile-action-ring); on a build that omits them (neither game entry does,
+  // but this stays defensive like the #actionbar2-less template case above) the
+  // ring silently stays unbuilt and update() skips painting it.
+  private buildMobileActionRing(): void {
+    const attackBtn = document.getElementById('mobile-action-attack') as HTMLButtonElement | null;
+    const slotBtns = Array.from(
+      document.querySelectorAll<HTMLButtonElement>('.mobile-action-slot'),
+    ).sort((a, b) => Number(a.dataset.mobileIndex ?? 0) - Number(b.dataset.mobileIndex ?? 0));
+    const pageToggle = document.getElementById('mobile-action-page-toggle');
+    const pageIndicator = pageToggle?.querySelector<HTMLElement>('.mobile-action-page-indicator');
+    if (!attackBtn || slotBtns.length !== 5 || !pageToggle || !pageIndicator) return;
 
-  /** Shows only this.mobileHotbarPage's slice of ability slots (each assigned
-   *  a fixed position within the page via a hotbar-ring-N class), hiding the
-   *  rest: page 1 is slots 1-5, page 2 is slots 6-10. Hidden slots stay fully
-   *  live (cooldowns keep ticking, aura/proc state is untouched) -- paging
-   *  only toggles which buttons are painted, never which abilities exist. */
-  private applyMobileHotbarPage(): void {
-    const size = Hud.MOBILE_HOTBAR_PAGE_SIZE;
-    for (let slot = 1; slot <= Hud.MOBILE_HOTBAR_SLOTS; slot++) {
-      const btn = this.abilityButtons[slot]?.btn;
-      if (!btn) continue;
-      const index = slot - 1;
-      const page = Math.floor(index / size);
-      const ringPos = index % size;
-      btn.classList.toggle('mobile-hotbar-page-hidden', page !== this.mobileHotbarPage);
-      for (let r = 0; r < size; r++) btn.classList.toggle(`hotbar-ring-${r}`, r === ringPos);
-    }
-    // Slot 11 has no mobile page: always hidden on the touch hotbar.
-    const overflow = this.abilityButtons[Hud.MOBILE_HOTBAR_SLOTS + 1]?.btn;
-    overflow?.classList.add('mobile-hotbar-page-hidden');
+    const ringButtons = [attackBtn, ...slotBtns];
+    const ringEls: ActionBarSlotElements[] = ringButtons.map((btn) => {
+      const label = document.createElement('span');
+      label.className = 'icon-label';
+      const countEl = document.createElement('span');
+      countEl.className = 'item-count';
+      const keybindEl = document.createElement('span');
+      keybindEl.className = 'keybind';
+      const cdOverlay = document.createElement('div');
+      cdOverlay.className = 'cd-overlay';
+      const cdText = document.createElement('div');
+      cdText.className = 'cdtext';
+      btn.append(label, countEl, keybindEl, cdOverlay, cdText);
+      return { btn, label, countEl, keybindEl, cdOverlay, cdText };
+    });
+
+    // Wire clicks: attack -> the classic toggle via castSlot(0) while the
+    // player is auto-attacking or holds a live hostile target, and the
+    // acquire-nearest fallback (the old Closest behavior, injected by main.ts
+    // as onMobileAttackNearest) otherwise, so a bare tap with nothing targeted
+    // picks the closest enemy and starts swinging instead of erroring. Slot
+    // buttons -> castSlot(the resolved source slot for the CURRENT page at
+    // click time, not a captured page). Mirrors the desktop action-btn click
+    // pattern exactly (peek-guard consume, audio.click, blur) so
+    // long-press-to-inspect on touch behaves the same way.
+    attackBtn.addEventListener('click', () => {
+      if (this.peekGuard.consume()) {
+        this.hideTooltip();
+        attackBtn.blur();
+        return;
+      }
+      audio.click();
+      const p = this.sim.player;
+      const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
+      const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
+      if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {
+        this.castSlot(0);
+      } else {
+        this.onMobileAttackNearest();
+      }
+      attackBtn.blur();
+    });
+    slotBtns.forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        if (this.peekGuard.consume()) {
+          this.hideTooltip();
+          btn.blur();
+          return;
+        }
+        audio.click();
+        this.castSlot(sourceSlotForMobileButton(this.mobileActionPage, i));
+        btn.blur();
+      });
+    });
+    pageToggle.addEventListener('click', () => {
+      if (this.peekGuard.consume()) {
+        this.hideTooltip();
+        (pageToggle as HTMLElement).blur();
+        return;
+      }
+      audio.click();
+      this.cycleMobileActionPage();
+      (pageToggle as HTMLElement).blur();
+    });
+
+    this.mobileActionRingView = createActionBarView(
+      {
+        slots: [
+          {
+            slotIndex: 0,
+            isAttack: true,
+            hasAction: () => false,
+            ability: () => null,
+            item: () => null,
+            keybindLabel: () => '',
+          },
+          ...Array.from({ length: 5 }, (_, i) => ({
+            slotIndex: i + 1,
+            isAttack: false,
+            hasAction: () =>
+              this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null,
+            ability: () => this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)),
+            item: () => this.itemForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)),
+            keybindLabel: () => '',
+          })),
+        ],
+      },
+      {
+        t,
+        abilityName: abilityDisplayName,
+        itemName: itemDisplayName,
+        slotLabel: (i) => formatAbilityNumber(i + 1),
+        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+      },
+    );
+    this.mobileActionRingPainter = new MobileActionRingPainter(
+      this.writerFacet,
+      {
+        bar: {
+          container: document.getElementById('mobile-action-ring') as HTMLElement,
+          slots: ringEls,
+        },
+        pageToggle: pageToggle as HTMLElement,
+        pageIndicator,
+      },
+      // The ring's primary attack slot shows the same crisp data-icon="attack"
+      // glyph as the (now-secondary) Target Closest button instead of the
+      // painted ability-icon background desktop's attack toggle uses: an empty
+      // background here leaves the inline SVG hydrateIcons() already inserted
+      // into #mobile-action-attack's markup visible underneath. Every other
+      // slot (abilities/items/empty) still resolves through actionBarIconBg
+      // exactly like desktop, so desktop's own attack toggle is untouched.
+      (iconKey) => (iconKey === ATTACK_ICON_KEY ? '' : this.actionBarIconBg(iconKey)),
+      t,
+    );
   }
 
   // Resolve a core icon key to the slot label's background-image value. Kept on the
@@ -5581,6 +5719,22 @@ export class Hud {
     this.actionBarPainter.paint(
       this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
     );
+
+    // mobile action ring: the paged touch combat cluster, gated on the touch-mode
+    // signal so desktop skips the tick+paint entirely (both the view and painter
+    // stay undefined when the ring DOM never got built, e.g. an older cached
+    // template). Reuses the exact same world snapshot as the desktop bar.
+    if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
+      this.mobileActionRingPainter.paint(
+        this.mobileActionRingView.tick({
+          player: p,
+          target: target ?? null,
+          inventory: sim.inventory,
+        }),
+        this.mobileActionPage,
+        mobilePageCount(),
+      );
+    }
 
     // xp bar: pre-cap shows the level bar; post-cap fills toward the next virtual
     // level (Max-Level XP Overflow), with distinct prestige/gold styling. The

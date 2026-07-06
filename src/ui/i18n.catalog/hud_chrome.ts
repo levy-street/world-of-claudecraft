@@ -229,8 +229,40 @@ export const hudChromeStrings = {
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
     toggleHaptics: 'Toggle haptics',
+    // The v0.22.0 base's touch-hotbar paging button ("Skills", #mobile-hotbar-page):
+    // superseded by the paged action ring below, whose page toggle owns ability
+    // paging on touch. The keys stay (already filled in all 20 locales) per the
+    // hud.core.mobileTarget precedent for retired-but-translated chrome keys.
     hotbarPage: 'Skills',
     hotbarPageAria: 'Show next set of skills',
+    // Paged mobile action ring (Phase 1 of the mobile combat HUD rework): the
+    // ring container's accessible name, the page-cycle toggle's accessible name,
+    // and the page indicator text painted on the toggle. The per-button
+    // aria labels reuse abilityUi.actionBar.slotAria/emptySlotAria/attackName via
+    // the shared action_bar_view core, so no per-slot key lives here.
+    actionRing: 'Combat actions',
+    actionPageToggle: 'Switch action page',
+    // The bare page number ("1"/"2", painted big and gold over the swap-arrows
+    // glyph) rather than "Page 1 of 2": the toggle button already carries the
+    // full "Switch action page" accessible name via actionPageToggle above, so
+    // the indicator span only needs to be legible at a glance, not restate the
+    // count in words. "{page}" is token-only, so it is exempt from the M16
+    // non-Latin-fill requirement.
+    actionPageIndicator: '{page}',
+    // Target swap (#mobile-target-cycle, replacing the old Target Closest
+    // button): a crosshair-icon secondary button that cycles the hostile
+    // target via the Tab-target path (acquire-nearest now lives on the ring's
+    // attack toggle itself), kept visually distinct from the ring's primary
+    // attack toggle. targetCycle is the accessible name/title;
+    // targetCycleShort is the tiny on-button caption (space is tight at the
+    // button's 44-60px width, so it stays one word).
+    targetCycle: 'Swap target',
+    targetCycleShort: 'Target',
+    // Phase 4: a small touch-only label on each bar-assigned spellbook row,
+    // naming which mobile action-ring page (Phase 1) the ability's bar slot
+    // falls on. "Page {page}" is not wordy (one word plus a token), so it is
+    // exempt from the M16 non-Latin-fill requirement.
+    spellbookPageLabel: 'Page {page}',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -412,6 +444,14 @@ export const hudChromeStrings = {
     // by default). The abilities bound to its slots stay castable via their keybinds.
     showSecondaryActionBar: 'Show Secondary Action Bar',
     showDailyRewardsChest: 'Show Daily Rewards Chest',
+    // Touch-only Graphics panel toggles (mobile combat HUD rework, phase 2).
+    // Camera joystick: hidden and off by default, swipe-look on open gameplay
+    // space is the primary camera path; this opts into the dedicated stick.
+    mobileCameraJoystick: 'Camera joystick',
+    // Mirrors the touch layout (movement joystick right, camera joystick left)
+    // for left-thumb-dominant players; the same setting as the Key Bindings
+    // panel's leftHandedTouch row, surfaced again here alongside the joystick.
+    mobileLeftHanded: 'Left-handed layout',
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through

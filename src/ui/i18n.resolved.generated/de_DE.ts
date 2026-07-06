@@ -313,7 +313,13 @@ export const de_DE: EnTranslations = {
       "hapticsOff": "Haptik aus",
       "toggleHaptics": "Haptik umschalten",
       "hotbarPage": "Fähigkeiten",
-      "hotbarPageAria": "Nächste Fähigkeitengruppe anzeigen"
+      "hotbarPageAria": "Nächste Fähigkeitengruppe anzeigen",
+      "actionRing": "Combat actions",
+      "actionPageToggle": "Switch action page",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "Swap target",
+      "targetCycleShort": "Target",
+      "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Nutze den Bewegungsstick zum Bewegen und zieh über den Bildschirm, um dich umzusehen. Mach ein paar Schritte, um zu beginnen.",
@@ -420,7 +426,9 @@ export const de_DE: EnTranslations = {
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
-      "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen"
+      "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
+      "mobileCameraJoystick": "Camera joystick",
+      "mobileLeftHanded": "Left-handed layout"
     },
     "controller": {
       "title": "Controller",

@@ -313,7 +313,13 @@ export const id_ID: EnTranslations = {
       "hapticsOff": "Haptik Nonaktif",
       "toggleHaptics": "Alihkan haptik",
       "hotbarPage": "Kemampuan",
-      "hotbarPageAria": "Tampilkan rangkaian kemampuan berikutnya"
+      "hotbarPageAria": "Tampilkan rangkaian kemampuan berikutnya",
+      "actionRing": "Combat actions",
+      "actionPageToggle": "Switch action page",
+      "actionPageIndicator": "{page}",
+      "targetCycle": "Swap target",
+      "targetCycleShort": "Target",
+      "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
@@ -420,7 +426,9 @@ export const id_ID: EnTranslations = {
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
-      "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian"
+      "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
+      "mobileCameraJoystick": "Camera joystick",
+      "mobileLeftHanded": "Left-handed layout"
     },
     "controller": {
       "title": "Kontroler",

@@ -46,6 +46,7 @@ export type UiIconName =
   | 'skull'
   | 'jump'
   | 'autorun'
+  | 'swap'
   | 'nameplates'
   | 'vibrate'
   | 'lock'
@@ -113,6 +114,9 @@ const ICONS: Record<UiIconName, string> = {
   jump: '<path d="M256 56 400 216 320 216 320 344 192 344 192 216 112 216Z"/><rect x="144" y="408" width="224" height="40" rx="14"/>',
   autorun:
     '<path d="M136 264 256 152 376 264M136 392 256 280 376 392" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+  // hand-authored swap: two opposing horizontal arrows (the mobile action-ring
+  // page-cycle badge), matching the jump/autorun glyph weight
+  swap: '<path d="M96 150 340 150 340 118 436 174 340 230 340 198 96 198ZM416 314 172 314 172 282 76 338 172 394 172 362 416 362Z"/>',
   // phone handset flanked by vibration waves (hand-authored to match the bar glyphs)
   vibrate:
     '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',
