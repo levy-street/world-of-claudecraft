@@ -265,6 +265,8 @@ describe('account cosmetics', () => {
     await expect(loadAccountCosmetics(7)).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson', 'onyx_gold'],
+      logolWareIds: [],
+      talentWareIds: [],
     });
 
     expect(dbMock.query.mock.calls[0][0]).toContain('cosmetics');
@@ -290,6 +292,8 @@ describe('account cosmetics', () => {
     await expect(markAccountQuestComplete(7, 'q_aldrics_fallen_star')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+      logolWareIds: [],
+      talentWareIds: [],
     });
 
     const [sql, params] = dbMock.query.mock.calls[1];
@@ -299,6 +303,8 @@ describe('account cosmetics', () => {
     expect(params[1]).toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+      logolWareIds: [],
+      talentWareIds: [],
     });
   });
 
@@ -321,6 +327,8 @@ describe('account cosmetics', () => {
     await expect(grantAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['amber_crimson'],
+      logolWareIds: [],
+      talentWareIds: [],
     });
   });
 
@@ -350,6 +358,8 @@ describe('account cosmetics', () => {
     await expect(revokeAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+      logolWareIds: [],
+      talentWareIds: [],
     });
 
     const [sql, params] = dbMock.query.mock.calls[1];
@@ -357,6 +367,8 @@ describe('account cosmetics', () => {
     expect(params[1]).toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+      logolWareIds: [],
+      talentWareIds: [],
     });
   });
 });

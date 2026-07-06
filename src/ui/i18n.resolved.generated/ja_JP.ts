@@ -1205,6 +1205,17 @@ export const ja_JP: EnTranslations = {
       "mining": "採掘",
       "logging": "伐採",
       "herbalism": "薬草学"
+    },
+    "talentCheckout": {
+      "title": "注目クリエイターの品",
+      "currencyLabel": "支払い通貨",
+      "currencyUsdc": "USDC",
+      "currencySol": "SOL",
+      "currencyWoc": "$WOC",
+      "buy": "Buy",
+      "purchased": "{ware} を購入しました。",
+      "failed": "購入を完了できませんでした。もう一度お試しください。",
+      "unavailable": "注目クリエイターのプログラムは現在開いていません。"
     }
   },
   "apiError": {
@@ -6897,6 +6908,16 @@ export const ja_JP: EnTranslations = {
         "title": "死者の番人",
         "greeting": "安らかに、魂よ。亡骸に戻すことはできるが、戻る道のりで弱ってしまうだろう。"
       },
+      "logol": {
+        "name": "ロゴル",
+        "title": "{{,,,}}",
+        "greeting": "私が見えるのか。見える者は少ない。黄金では買えぬ品を携えている、旅人よ。支払いは $WOC のみだ。"
+      },
+      "logol_harbinger": {
+        "name": "無名の団の先触れ",
+        "title": "{{,,,}}",
+        "greeting": "外套をまとった者がこの地を歩く。見ることを学んだ目にのみ映る。学ぶ気はあるか。"
+      },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
         "title": "潮見の番人",
@@ -7703,6 +7724,36 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フォレストウルフを討伐"
+          }
+        }
+      },
+      "q_logol_rumor": {
+        "title": "ロゴルの噂",
+        "text": "瞬間の狭間を歩む商人がいるという。ここに座れ、彼を見る術を教えよう。",
+        "completion": "よし。噂はもうお前の中にある。消えはしない。",
+        "objectives": {
+          "0": {
+            "label": "先触れの話を最後まで聞く"
+          }
+        }
+      },
+      "q_logol_sign": {
+        "title": "The Sign in the Eye",
+        "text": "見えぬものを見るには、まずありふれたものを見据えることだ。谷の森オオカミを狩り、目が澄むまで続けよ。済んだら戻ってこい。",
+        "completion": "印は刻まれた。お前の目は整った。",
+        "objectives": {
+          "0": {
+            "label": "森のオオカミを狩る"
+          }
+        }
+      },
+      "q_logol_seen": {
+        "title": "見えるものと見えざるもの",
+        "text": "支度は整った。外套の者がこの地を歩くとき、多くは十字路に立つ。彼を見つけ、言葉を交わし、私のもとへ戻れ。",
+        "completion": "今やお前には彼が見える。彼の帳簿は開かれた。賢く使え。",
+        "objectives": {
+          "0": {
+            "label": "ロゴルを見つけて言葉を交わす"
           }
         }
       },

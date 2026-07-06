@@ -5993,4 +5993,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '약초학',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Featured-talent checkout (docs/prd/woc/talent-checkout.md). M16 non-Latin
+  // fills for the wordy new hudChrome.talentCheckout.* leaves.
+  'hudChrome.talentCheckout.title': '주목받는 크리에이터 상품',
+  'hudChrome.talentCheckout.currencyLabel': '결제 통화',
+  'hudChrome.talentCheckout.purchased': '{ware}을(를) 구매했습니다.',
+  'hudChrome.talentCheckout.failed': '구매를 완료하지 못했습니다. 다시 시도해 주세요.',
+  'hudChrome.talentCheckout.unavailable': '주목받는 크리에이터 프로그램은 현재 열려 있지 않습니다.',
+  // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
+  'entities.npcs.logol.name': "로골",
+  'entities.npcs.logol.greeting': "나를 볼 수 있군. 그런 자는 드물지. 황금으로 살 수 없는 것을 지녔다, 나그네여. 값은 오직 $WOC 뿐이다.",
+  'entities.npcs.logol_harbinger.name': "이름 없는 결사의 선구자",
+  'entities.npcs.logol_harbinger.greeting': "망토를 두른 자가 이 땅을 걷는다. 보는 법을 익힌 눈에만 보이지. 배우겠는가?",
+  'entities.quests.q_logol_rumor.title': "로골의 소문",
+  'entities.quests.q_logol_rumor.text': "순간과 순간 사이를 걷는 상인이 있다더군. 앉게, 그를 보는 법을 일러주지.",
+  'entities.quests.q_logol_rumor.completion': "좋아. 소문은 이제 네 안에 있다. 떠나지 않을 것이다.",
+  'entities.quests.q_logol_rumor.objectives.0.label': "선구자의 말을 끝까지 듣기",
+  'entities.quests.q_logol_sign.text': "보이지 않는 것을 보려면 먼저 평범한 것을 똑바로 보아야 한다. 골짜기의 숲 늑대를 사냥하여 눈이 맑아지면 내게 돌아오라.",
+  'entities.quests.q_logol_sign.completion': "표식이 새겨졌다. 네 눈이 준비되었다.",
+  'entities.quests.q_logol_sign.objectives.0.label': "숲 늑대 사냥하기",
+  'entities.quests.q_logol_seen.title': "보이는 것과 보이지 않는 것",
+  'entities.quests.q_logol_seen.text': "준비가 되었다. 망토를 두른 자는 이 땅을 걸을 때면 대개 교차로에 머문다. 그를 찾아 말을 나눈 뒤 내게 돌아오라.",
+  'entities.quests.q_logol_seen.completion': "이제 그가 보인다. 그의 장부가 네게 열렸다. 현명하게 쓰라.",
+  'entities.quests.q_logol_seen.objectives.0.label': "로골을 찾아 대화하기",
 };

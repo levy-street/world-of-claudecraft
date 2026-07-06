@@ -1284,6 +1284,45 @@ export interface CampDef {
   count: number;
 }
 
+// A prestige cosmetic sold by the roaming merchant Logol (docs/prd/woc/
+// logol-merchant.md), priced solely in $WOC and granted to the account
+// (AccountCosmetics.logolWareIds), never to a character. COSMETIC-ONLY: a ware
+// never grants or scales a stat. `title`/`flair` need no new render system;
+// `transmog`/`mount` are defined for extensibility but ship no entries yet
+// (blocked on render work). Data-as-code in src/sim/content/logol.ts.
+export type LogolWareKind = 'title' | 'flair' | 'transmog' | 'mount';
+
+export interface LogolWare {
+  id: string;
+  kind: LogolWareKind;
+  name: string;
+  description: string;
+  priceWoc: number; // human-readable $WOC (the server converts to base units)
+  rarity: 'rare' | 'epic' | 'legendary';
+}
+
+// Featured-talent wares on the Logol pipeline (docs/prd/woc/talent-checkout.md).
+// A buyer pays in their CHOICE of currency, so a ware carries a human-readable
+// price PER currency; the server converts the chosen leg to base units and
+// splits it 80/20 (talent/treasury). Cosmetic-only, account-bound, reusing
+// LogolWareKind (title/flair/transmog/mount). The sim never reads these; the
+// checkout is server-side (server/talent.ts).
+export interface TalentWarePrice {
+  usdc: number; // whole USDC
+  sol: number; // whole SOL
+  woc: number; // whole $WOC
+}
+
+export interface TalentWare {
+  id: string;
+  talentId: string; // the featured creator who owns the ware and its 80% payout
+  kind: LogolWareKind;
+  name: string;
+  description: string;
+  price: TalentWarePrice;
+  rarity: 'rare' | 'epic' | 'legendary';
+}
+
 // Ground interactables (sparkle objects)
 export interface GroundObjectDef {
   itemId: string;
@@ -1638,6 +1677,12 @@ export interface Entity {
   // npc
   questIds: string[];
   vendorItems: string[];
+  // Runtime-only base URL of a dynamic NPC's pre-generated voice clips (e.g. the
+  // roaming merchant Logol, whose lines are a fixed developer-authored voice
+  // clone served from /audio/logol). Unset for every ordinary NPC. The static
+  // NpcDef never carries it; logol_roam.ts stamps it on the spawned entity.
+  // Cosmetic/presentation only; the sim never reads it.
+  npcVoiceClipBaseUrl?: string;
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals
@@ -2142,6 +2187,12 @@ export interface SimConfig {
   // Offline worlds and parity traces keep the default (first rise after one
   // interval), so this never fires inside a short deterministic scenario.
   worldBossAtBoot?: boolean;
+  // Enable the roaming merchant Logol's world-event scheduler (logol_roam.ts).
+  // Default false, so offline worlds, headless RL, and every parity/golden trace
+  // never run the roam code and its draw order stays byte-identical. The
+  // authoritative server sets this from LOGOL_ENABLED. See docs/prd/woc/
+  // logol-merchant.md (Determinism).
+  logolEnabled?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.

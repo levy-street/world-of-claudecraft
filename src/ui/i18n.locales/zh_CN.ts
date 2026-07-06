@@ -5674,4 +5674,27 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '草药学',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Featured-talent checkout (docs/prd/woc/talent-checkout.md). M16 non-Latin
+  // fills for the wordy new hudChrome.talentCheckout.* leaves.
+  'hudChrome.talentCheckout.title': '特邀创作者商品',
+  'hudChrome.talentCheckout.currencyLabel': '支付货币',
+  'hudChrome.talentCheckout.purchased': '已购买 {ware}。',
+  'hudChrome.talentCheckout.failed': '此次购买无法完成。请重试。',
+  'hudChrome.talentCheckout.unavailable': '特邀创作者计划当前未开放。',
+  // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
+  'entities.npcs.logol.name': "洛戈尔",
+  'entities.npcs.logol.greeting': "你竟能看见我。少有人能。我带着黄金买不到的东西，陌生人，只收 $WOC。",
+  'entities.npcs.logol_harbinger.name': "无名之序的先驱",
+  'entities.npcs.logol_harbinger.greeting': "一位披斗篷者行走于世间，唯有学会观看的眼睛才能看见他。你愿意学吗？",
+  'entities.quests.q_logol_rumor.title': "洛戈尔的传闻",
+  'entities.quests.q_logol_rumor.text': "据说有位商人行走于时刻之间。坐下来，我会告诉你如何看见他。",
+  'entities.quests.q_logol_rumor.completion': "很好。传闻已入你心，它不会离去。",
+  'entities.quests.q_logol_rumor.objectives.0.label': "听先驱把话说完",
+  'entities.quests.q_logol_sign.text': "要看见不可见之物，先要凝视寻常之物。去猎杀谷地的森林狼，直到你的眼澄澈，再回到我这里。",
+  'entities.quests.q_logol_sign.completion': "印记已成。你的眼已就绪。",
+  'entities.quests.q_logol_sign.objectives.0.label': "猎杀森林狼",
+  'entities.quests.q_logol_seen.title': "所见与不可见",
+  'entities.quests.q_logol_seen.text': "你准备好了。披斗篷者若行走此界，多半守在十字路口。找到他，与他交谈，再回到我这里。",
+  'entities.quests.q_logol_seen.completion': "现在你能看见他了。他的账簿向你敞开。花得明智些。",
+  'entities.quests.q_logol_seen.objectives.0.label': "找到洛戈尔并与他交谈",
 };

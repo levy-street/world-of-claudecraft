@@ -6119,4 +6119,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Травничество',
   // Release v0.22.0 locale fill.
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  // Featured-talent checkout (docs/prd/woc/talent-checkout.md). M16 non-Latin
+  // fills for the wordy new hudChrome.talentCheckout.* leaves.
+  'hudChrome.talentCheckout.title': 'Товары приглашённых авторов',
+  'hudChrome.talentCheckout.currencyLabel': 'Валюта оплаты',
+  'hudChrome.talentCheckout.purchased': 'Покупка {ware} совершена.',
+  'hudChrome.talentCheckout.failed': 'Не удалось завершить покупку. Попробуйте ещё раз.',
+  'hudChrome.talentCheckout.unavailable': 'Программа приглашённых авторов сейчас недоступна.',
+  // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md).
+  'entities.npcs.logol.name': "Логол",
+  'entities.npcs.logol.greeting': "Значит, ты меня видишь. Немногим дано. Я несу то, что не купить золотом, странник, только за $WOC.",
+  'entities.npcs.logol_harbinger.name': "Предвестник Безымянного ордена",
+  'entities.npcs.logol_harbinger.greeting': "Некто в плаще бродит по этому краю, видимый лишь глазам, что научились смотреть. Хочешь научиться?",
+  'entities.quests.q_logol_rumor.title': "Слух о Логоле",
+  'entities.quests.q_logol_rumor.text': "Говорят, некий торговец ходит между мгновениями. Присядь, и я расскажу, как его увидеть.",
+  'entities.quests.q_logol_rumor.completion': "Хорошо. Теперь слух в тебе. Он не уйдёт.",
+  'entities.quests.q_logol_rumor.objectives.0.label': "Выслушать Предвестника",
+  'entities.quests.q_logol_sign.text': "Чтобы увидеть незримое, сперва вглядись в обыденное. Истребляй лесных волков долины, пока твой взор не прояснится, затем вернись ко мне.",
+  'entities.quests.q_logol_sign.completion': "Метка поставлена. Твой взор готов.",
+  'entities.quests.q_logol_sign.objectives.0.label': "Истребить лесных волков",
+  'entities.quests.q_logol_seen.title': "Зримое и незримое",
+  'entities.quests.q_logol_seen.text': "Ты готов. Тот, кто в плаще, держится перекрёстка, когда вообще ходит по этому краю. Найди его, поговори с ним и вернись ко мне.",
+  'entities.quests.q_logol_seen.completion': "Теперь ты видишь его. Его книга открыта тебе. Трать с умом.",
+  'entities.quests.q_logol_seen.objectives.0.label': "Найти Логола и поговорить с ним",
 };

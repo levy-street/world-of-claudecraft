@@ -147,6 +147,7 @@ import { configureInternalRuntime, handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
 import { configureLeaderboardRuntime, type ReleaseEntry } from './leaderboard';
+import { logolConfirm, logolInfo, logolInventory, logolQuote } from './logol';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -198,6 +199,7 @@ import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import { talentConfirm, talentInventory, talentQuote, talentStorefront } from './talent';
 import { passesTurnstile } from './turnstile';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
@@ -1675,6 +1677,53 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleDailyRewardApi(req, res, accountId);
+    }
+    // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md). Reads
+    // (info/inventory) accept a read token; mutations (quote/confirm) need a full
+    // token. The shop is further gated inside the handlers on the quest unlock.
+    if (req.method === 'GET' && url === '/api/logol/info') {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      return logolInfo(res, accountId);
+    }
+    if (req.method === 'GET' && url === '/api/logol/inventory') {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      return logolInventory(res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/logol/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return logolQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/logol/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return logolConfirm(req, res, accountId);
+    }
+    // Featured-talent multi-currency checkout (docs/prd/woc/talent-checkout.md),
+    // stacked on the Logol pipeline. Reads (storefront/inventory) accept a read
+    // token; mutations (quote/confirm) need a full token. The feature is gated
+    // inside the handlers on TALENT_PROGRAM_ENABLED (default OFF, fail closed).
+    if (req.method === 'GET' && url === '/api/talent/storefront') {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      return talentStorefront(res, accountId);
+    }
+    if (req.method === 'GET' && url === '/api/talent/inventory') {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      return talentInventory(res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/talent/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return talentQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/talent/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return talentConfirm(req, res, accountId);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {

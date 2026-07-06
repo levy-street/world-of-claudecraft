@@ -1205,6 +1205,17 @@ export const pt_BR: EnTranslations = {
       "mining": "Mineração",
       "logging": "Lenharia",
       "herbalism": "Herborismo"
+    },
+    "talentCheckout": {
+      "title": "Featured Creator Wares",
+      "currencyLabel": "Pay with",
+      "currencyUsdc": "USDC",
+      "currencySol": "SOL",
+      "currencyWoc": "$WOC",
+      "buy": "Buy",
+      "purchased": "Purchased {ware}.",
+      "failed": "That purchase could not be completed. Please try again.",
+      "unavailable": "The featured creator program is not open right now."
     }
   },
   "apiError": {
@@ -6897,6 +6908,16 @@ export const pt_BR: EnTranslations = {
         "title": "Vigia dos Mortos",
         "greeting": "Descanse agora, espírito. Posso devolver você ao seu corpo, mas a travessia de volta deixa você fraco."
       },
+      "logol": {
+        "name": "Logol",
+        "title": "{{,,,}}",
+        "greeting": "You see me, then. Few do. I carry what gold cannot buy, stranger, only $WOC."
+      },
+      "logol_harbinger": {
+        "name": "Harbinger of the Nameless Order",
+        "title": "{{,,,}}",
+        "greeting": "A cloaked one walks the realm, seen only by eyes that have learned to look. Would you learn?"
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Vigia das Marés",
@@ -7703,6 +7724,36 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lobo da Floresta morto"
+          }
+        }
+      },
+      "q_logol_rumor": {
+        "title": "A Rumor of Logol",
+        "text": "They say a merchant walks between the moments. Sit with me, and I will tell you how to see him.",
+        "completion": "Good. The rumor is in you now. It will not leave.",
+        "objectives": {
+          "0": {
+            "label": "Hear the Harbinger out"
+          }
+        }
+      },
+      "q_logol_sign": {
+        "title": "The Sign in the Eye",
+        "text": "To see the unseen you must first look hard at the ordinary. Cull the wolves of the vale until your eye unclouds, then return to me.",
+        "completion": "The mark is set. Your eye is ready.",
+        "objectives": {
+          "0": {
+            "label": "Cull forest wolves"
+          }
+        }
+      },
+      "q_logol_seen": {
+        "title": "Seen and Unseen",
+        "text": "You are ready. The cloaked one keeps to the crossroads when he walks this realm at all. Find him, speak with him, and return to me.",
+        "completion": "Now you see him. His ledger is open to you. Spend wisely.",
+        "objectives": {
+          "0": {
+            "label": "Find Logol and speak with him"
           }
         }
       },
