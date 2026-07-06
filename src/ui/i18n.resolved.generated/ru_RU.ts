@@ -319,7 +319,7 @@ export const ru_RU: EnTranslations = {
       "actionPageIndicator": "{page}",
       "targetCycle": "Сменить цель",
       "targetCycleShort": "Цель",
-      "spellbookPageLabel": "Page {page}"
+      "spellbookPageLabel": "Стр. {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",

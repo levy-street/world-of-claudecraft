@@ -314,12 +314,12 @@ export const sv_SE: EnTranslations = {
       "toggleHaptics": "Växla haptik",
       "hotbarPage": "Förmågor",
       "hotbarPageAria": "Visa nästa uppsättning förmågor",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
+      "actionRing": "Stridsåtgärder",
+      "actionPageToggle": "Byt åtgärdssida",
       "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "targetCycle": "Byt mål",
+      "targetCycleShort": "Mål",
+      "spellbookPageLabel": "Sida {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
@@ -427,8 +427,8 @@ export const sv_SE: EnTranslations = {
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileCameraJoystick": "Kamerajoystick",
+      "mobileLeftHanded": "Vänsterhänt layout"
     },
     "controller": {
       "title": "Handkontroll",
@@ -1060,16 +1060,16 @@ export const sv_SE: EnTranslations = {
       }
     },
     "crafting": {
-      "title": "Crafting",
-      "close": "Close crafting",
-      "craft": "Craft",
-      "reagentsNeeded": "Requires:",
+      "title": "Tillverkning",
+      "close": "Stäng tillverkning",
+      "craft": "Tillverka",
+      "reagentsNeeded": "Kräver:",
       "reagentLine": "{name} x{have}/{required}",
-      "empty": "No recipes known yet.",
-      "resultAria": "Craft {name}",
-      "craftedToast": "Crafted: {name}",
-      "insufficientMaterials": "You do not have the materials for that.",
-      "unknownRecipe": "That recipe does not exist."
+      "empty": "Inga recept kända än.",
+      "resultAria": "Tillverka {name}",
+      "craftedToast": "Tillverkat: {name}",
+      "insufficientMaterials": "Du har inte materialet för det.",
+      "unknownRecipe": "Det receptet finns inte."
     },
     "devBadge": {
       "title": "Utvecklare",
@@ -3483,7 +3483,7 @@ export const sv_SE: EnTranslations = {
     "rendererFailed": "Kunde inte starta renderaren: försök läsa om sidan. {error}",
     "enterTimeout": "Kunde inte gå in i världen. Anslutningen tog för lång tid. Körs spelservern?",
     "connectionLost": "Anslutningen till servern bröts.",
-    "reconnecting": "Connection lost. Reconnecting...",
+    "reconnecting": "Anslutningen bröts. Ansluter igen...",
     "connectionRejected": "Servern stängde anslutningen."
   },
   "errors": {

@@ -6,7 +6,7 @@
 // Provides the jest-dom matchers (toBeInTheDocument, etc.) and unmounts every rendered
 // component after each test so the jsdom document stays clean between cases.
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/svelte';
+import { act, cleanup, setup } from '@testing-library/svelte';
 import { afterEach, beforeEach } from 'vitest';
 
 const storage = globalThis.localStorage as Partial<Storage> | undefined;
@@ -32,5 +32,11 @@ if (
   });
 }
 
-beforeEach(() => localStorage.clear());
-afterEach(() => cleanup());
+beforeEach(async () => {
+  await setup();
+  localStorage.clear();
+});
+afterEach(async () => {
+  await act();
+  cleanup();
+});

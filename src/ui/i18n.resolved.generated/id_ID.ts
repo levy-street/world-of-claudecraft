@@ -314,12 +314,12 @@ export const id_ID: EnTranslations = {
       "toggleHaptics": "Alihkan haptik",
       "hotbarPage": "Kemampuan",
       "hotbarPageAria": "Tampilkan rangkaian kemampuan berikutnya",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
+      "actionRing": "Aksi tempur",
+      "actionPageToggle": "Ganti halaman aksi",
       "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
+      "targetCycle": "Ganti target",
       "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "spellbookPageLabel": "Halaman {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
@@ -427,8 +427,8 @@ export const id_ID: EnTranslations = {
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileCameraJoystick": "Joystick kamera",
+      "mobileLeftHanded": "Tata letak kidal"
     },
     "controller": {
       "title": "Kontroler",
@@ -1060,16 +1060,16 @@ export const id_ID: EnTranslations = {
       }
     },
     "crafting": {
-      "title": "Crafting",
-      "close": "Close crafting",
-      "craft": "Craft",
-      "reagentsNeeded": "Requires:",
+      "title": "Peracikan",
+      "close": "Tutup peracikan",
+      "craft": "Racik",
+      "reagentsNeeded": "Membutuhkan:",
       "reagentLine": "{name} x{have}/{required}",
-      "empty": "No recipes known yet.",
-      "resultAria": "Craft {name}",
-      "craftedToast": "Crafted: {name}",
-      "insufficientMaterials": "You do not have the materials for that.",
-      "unknownRecipe": "That recipe does not exist."
+      "empty": "Belum ada resep yang diketahui.",
+      "resultAria": "Racik {name}",
+      "craftedToast": "Diracik: {name}",
+      "insufficientMaterials": "Kamu tidak memiliki bahan untuk itu.",
+      "unknownRecipe": "Resep itu tidak ada."
     },
     "devBadge": {
       "title": "Pengembang",
@@ -3483,7 +3483,7 @@ export const id_ID: EnTranslations = {
     "rendererFailed": "Tidak bisa memulai perender: coba muat ulang. {error}",
     "enterTimeout": "Tidak bisa masuk dunia. Koneksi kehabisan waktu. Apakah server gim berjalan?",
     "connectionLost": "Koneksi ke server terputus.",
-    "reconnecting": "Connection lost. Reconnecting...",
+    "reconnecting": "Koneksi terputus. Menghubungkan ulang...",
     "connectionRejected": "Server menutup koneksi."
   },
   "errors": {

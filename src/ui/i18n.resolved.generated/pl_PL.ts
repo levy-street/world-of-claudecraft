@@ -314,12 +314,12 @@ export const pl_PL: EnTranslations = {
       "toggleHaptics": "Przełącz wibracje",
       "hotbarPage": "Umiejętności",
       "hotbarPageAria": "Pokaż następny zestaw umiejętności",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
+      "actionRing": "Akcje bojowe",
+      "actionPageToggle": "Przełącz stronę akcji",
       "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "targetCycle": "Zmień cel",
+      "targetCycleShort": "Cel",
+      "spellbookPageLabel": "Strona {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Użyj gałki ruchu, aby się poruszać, i przeciągaj ekran, aby się rozglądać. Zrób kilka kroków, by zacząć.",
@@ -427,8 +427,8 @@ export const pl_PL: EnTranslations = {
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileCameraJoystick": "Joystick kamery",
+      "mobileLeftHanded": "Układ dla leworęcznych"
     },
     "controller": {
       "title": "Kontroler",
@@ -1060,16 +1060,16 @@ export const pl_PL: EnTranslations = {
       }
     },
     "crafting": {
-      "title": "Crafting",
-      "close": "Close crafting",
-      "craft": "Craft",
-      "reagentsNeeded": "Requires:",
+      "title": "Wytwarzanie",
+      "close": "Zamknij wytwarzanie",
+      "craft": "Wytwórz",
+      "reagentsNeeded": "Wymaga:",
       "reagentLine": "{name} x{have}/{required}",
-      "empty": "No recipes known yet.",
-      "resultAria": "Craft {name}",
-      "craftedToast": "Crafted: {name}",
-      "insufficientMaterials": "You do not have the materials for that.",
-      "unknownRecipe": "That recipe does not exist."
+      "empty": "Nie znasz jeszcze żadnych receptur.",
+      "resultAria": "Wytwórz {name}",
+      "craftedToast": "Wytworzono: {name}",
+      "insufficientMaterials": "Nie masz wymaganych materiałów.",
+      "unknownRecipe": "Ta receptura nie istnieje."
     },
     "devBadge": {
       "title": "Deweloper",
@@ -3483,7 +3483,7 @@ export const pl_PL: EnTranslations = {
     "rendererFailed": "Nie udało się uruchomić renderera: spróbuj odświeżyć. {error}",
     "enterTimeout": "Nie udało się wejść do świata. Upłynął limit czasu połączenia. Czy serwer gry jest uruchomiony?",
     "connectionLost": "Połączenie z serwerem zostało utracone.",
-    "reconnecting": "Connection lost. Reconnecting...",
+    "reconnecting": "Połączenie utracone. Ponowne łączenie...",
     "connectionRejected": "Serwer zamknął połączenie."
   },
   "errors": {

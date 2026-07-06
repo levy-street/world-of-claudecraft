@@ -403,6 +403,32 @@ async function getGuildLeaderboard(scope: 'realm' | 'global'): Promise<GuildLead
   }
 }
 
+export function seedLeaderboardCachesForTests(opts: {
+  leaderboard?: Partial<Record<'realm' | 'global', LeaderboardEntry[]>>;
+  guildLeaderboard?: Partial<Record<'realm' | 'global', GuildLeaderboardEntry[]>>;
+}): void {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('seedLeaderboardCachesForTests must not be called in production');
+  }
+  const now = Date.now();
+  for (const scope of ['realm', 'global'] as const) {
+    const entries = opts.leaderboard?.[scope];
+    if (entries) leaderboardCache[scope] = { at: now, entries: [...entries] };
+    const guildEntries = opts.guildLeaderboard?.[scope];
+    if (guildEntries) guildLeaderboardCache[scope] = { at: now, entries: [...guildEntries] };
+  }
+}
+
+export function resetLeaderboardCachesForTests(): void {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('resetLeaderboardCachesForTests must not be called in production');
+  }
+  leaderboardCache.realm = null;
+  leaderboardCache.global = null;
+  guildLeaderboardCache.realm = null;
+  guildLeaderboardCache.global = null;
+}
+
 // ---------------------------------------------------------------------------
 // News & Updates: GitHub Releases proxy (read-only, public).
 // The home-page "News & Updates" view pulls published releases from the public

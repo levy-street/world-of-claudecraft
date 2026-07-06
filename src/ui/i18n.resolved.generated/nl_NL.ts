@@ -314,12 +314,12 @@ export const nl_NL: EnTranslations = {
       "toggleHaptics": "Haptiek aan/uit",
       "hotbarPage": "Vaardigheden",
       "hotbarPageAria": "Toon de volgende set vaardigheden",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
+      "actionRing": "Gevechtsacties",
+      "actionPageToggle": "Actiepagina wisselen",
       "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "targetCycle": "Doel wisselen",
+      "targetCycleShort": "Doel",
+      "spellbookPageLabel": "Pagina {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Gebruik de bewegingsstick om te bewegen en sleep over het scherm om rond te kijken. Zet een paar stappen om te beginnen.",
@@ -427,8 +427,8 @@ export const nl_NL: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileCameraJoystick": "Camerajoystick",
+      "mobileLeftHanded": "Linkshandige indeling"
     },
     "controller": {
       "title": "Controller",
@@ -1061,15 +1061,15 @@ export const nl_NL: EnTranslations = {
     },
     "crafting": {
       "title": "Crafting",
-      "close": "Close crafting",
-      "craft": "Craft",
-      "reagentsNeeded": "Requires:",
+      "close": "Crafting sluiten",
+      "craft": "Maken",
+      "reagentsNeeded": "Vereist:",
       "reagentLine": "{name} x{have}/{required}",
-      "empty": "No recipes known yet.",
-      "resultAria": "Craft {name}",
-      "craftedToast": "Crafted: {name}",
-      "insufficientMaterials": "You do not have the materials for that.",
-      "unknownRecipe": "That recipe does not exist."
+      "empty": "Nog geen recepten bekend.",
+      "resultAria": "{name} maken",
+      "craftedToast": "Gemaakt: {name}",
+      "insufficientMaterials": "Je hebt de materialen daarvoor niet.",
+      "unknownRecipe": "Dat recept bestaat niet."
     },
     "devBadge": {
       "title": "Ontwikkelaar",
@@ -3483,7 +3483,7 @@ export const nl_NL: EnTranslations = {
     "rendererFailed": "Kon de renderer niet starten: probeer opnieuw te laden. {error}",
     "enterTimeout": "Kon de wereld niet betreden. De verbinding is verlopen. Draait de gameserver?",
     "connectionLost": "De verbinding met de server is verbroken.",
-    "reconnecting": "Connection lost. Reconnecting...",
+    "reconnecting": "Verbinding verbroken. Opnieuw verbinden...",
     "connectionRejected": "De server heeft de verbinding gesloten."
   },
   "errors": {

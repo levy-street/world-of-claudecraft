@@ -319,7 +319,7 @@ export const ko_KR: EnTranslations = {
       "actionPageIndicator": "{page}",
       "targetCycle": "대상 전환",
       "targetCycleShort": "대상",
-      "spellbookPageLabel": "Page {page}"
+      "spellbookPageLabel": "{page}페이지"
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",

@@ -297,9 +297,11 @@ export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
   // plugin is scoped to Vitest so it cannot affect production client builds.
+  // Admin tests import their own setup; plugin setupFiles resolve through /@fs
+  // and break when this repo runs from a symlinked git worktree.
   plugins: [
     svelte(),
-    ...(process.env.VITEST ? [svelteTesting()] : []),
+    ...(process.env.VITEST ? [svelteTesting({ autoCleanup: false })] : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     musicEditorSavePlugin(),

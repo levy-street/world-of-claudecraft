@@ -16,7 +16,7 @@ function installStorage(): void {
   };
 }
 
-function makeInput() {
+function makeInput(canUseGameKeys?: () => boolean) {
   const canvasListeners = new Map<string, (event: any) => void>();
   const windowListeners = new Map<string, (event: any) => void>();
   const documentListeners = new Map<string, (event: any) => void>();
@@ -62,6 +62,7 @@ function makeInput() {
     onEmoteWheel: vi.fn(),
     onClickPick: vi.fn(),
     onAttackMove: vi.fn(),
+    canUseGameKeys,
   };
   const input = new Input(canvas as any, cb, new Keybinds());
   return {
@@ -172,6 +173,30 @@ describe('Input autorun', () => {
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.debugState().keys).toEqual([]);
+  });
+
+  it('does not replay an interface edge key held across menu suspension', () => {
+    let gameKeys = true;
+    const { input, cb, windowListeners } = makeInput(() => gameKeys);
+
+    windowListeners.get('keydown')!({ code: 'KeyO', repeat: false });
+    expect(cb.onUiKey).toHaveBeenCalledTimes(1);
+    expect(cb.onUiKey).toHaveBeenLastCalledWith('social');
+
+    gameKeys = false;
+    input.setSuspendMovement(true);
+    gameKeys = true;
+    input.setSuspendMovement(false);
+
+    // Some browsers can deliver a fresh non-repeat keydown for a still-held key
+    // after focus/modal state changes. That stale edge must not reopen the menu.
+    windowListeners.get('keydown')!({ code: 'KeyO', repeat: false });
+    expect(cb.onUiKey).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('keyup')!({ code: 'KeyO' });
+    windowListeners.get('keydown')!({ code: 'KeyO', repeat: false });
+    expect(cb.onUiKey).toHaveBeenCalledTimes(2);
+    expect(cb.onUiKey).toHaveBeenLastCalledWith('social');
   });
 });
 

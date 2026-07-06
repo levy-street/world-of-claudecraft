@@ -5588,4 +5588,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': '採礦',
   'hudChrome.gathering.logging': '伐木',
   'hudChrome.gathering.herbalism': '藥草學',
+  // v0.21.0 release i18n fill: crafting, mobile HUD, and reconnect chrome.
+  'hudChrome.crafting.reagentLine': "{name} x{have}/{required}",
+  'hudChrome.mobile.actionPageIndicator': "{page}",
+  'hudChrome.mobile.spellbookPageLabel': "第 {page} 頁",
 };

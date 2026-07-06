@@ -319,7 +319,7 @@ export const zh_CN: EnTranslations = {
       "actionPageIndicator": "{page}",
       "targetCycle": "切换目标",
       "targetCycleShort": "目标",
-      "spellbookPageLabel": "Page {page}"
+      "spellbookPageLabel": "第 {page} 页"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",

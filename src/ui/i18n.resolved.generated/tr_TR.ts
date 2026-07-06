@@ -314,12 +314,12 @@ export const tr_TR: EnTranslations = {
       "toggleHaptics": "Dokunsal geri bildirimi aç/kapat",
       "hotbarPage": "Yetenekler",
       "hotbarPageAria": "Sonraki yetenek grubunu göster",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
+      "actionRing": "Savaş eylemleri",
+      "actionPageToggle": "Eylem sayfasını değiştir",
       "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "targetCycle": "Hedef değiştir",
+      "targetCycleShort": "Hedef",
+      "spellbookPageLabel": "Sayfa {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.",
@@ -427,8 +427,8 @@ export const tr_TR: EnTranslations = {
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileCameraJoystick": "Kamera joysticki",
+      "mobileLeftHanded": "Solak düzen"
     },
     "controller": {
       "title": "Oyun Kolu",
@@ -1060,16 +1060,16 @@ export const tr_TR: EnTranslations = {
       }
     },
     "crafting": {
-      "title": "Crafting",
-      "close": "Close crafting",
-      "craft": "Craft",
-      "reagentsNeeded": "Requires:",
+      "title": "Üretim",
+      "close": "Üretimi kapat",
+      "craft": "Üret",
+      "reagentsNeeded": "Gerektirir:",
       "reagentLine": "{name} x{have}/{required}",
-      "empty": "No recipes known yet.",
-      "resultAria": "Craft {name}",
-      "craftedToast": "Crafted: {name}",
-      "insufficientMaterials": "You do not have the materials for that.",
-      "unknownRecipe": "That recipe does not exist."
+      "empty": "Henüz bilinen tarif yok.",
+      "resultAria": "{name} üret",
+      "craftedToast": "Üretildi: {name}",
+      "insufficientMaterials": "Bunun için gereken malzemelere sahip değilsin.",
+      "unknownRecipe": "Bu tarif mevcut değil."
     },
     "devBadge": {
       "title": "Geliştirici",
@@ -3483,7 +3483,7 @@ export const tr_TR: EnTranslations = {
     "rendererFailed": "Görüntüleyici başlatılamadı: yeniden yüklemeyi deneyin. {error}",
     "enterTimeout": "Dünyaya girilemedi. Bağlantı zaman aşımına uğradı. Oyun sunucusu çalışıyor mu?",
     "connectionLost": "Sunucuyla bağlantı koptu.",
-    "reconnecting": "Connection lost. Reconnecting...",
+    "reconnecting": "Bağlantı kesildi. Yeniden bağlanılıyor...",
     "connectionRejected": "Sunucu bağlantıyı kapattı."
   },
   "errors": {

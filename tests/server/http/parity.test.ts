@@ -25,7 +25,9 @@
 //   - runParity resets every limiter bucket + the ratelimit clock + auth-failure
 //     bucket before EACH dispatcher pass, so a limiter tripped on the old pass can
 //     never bleed into the new pass and falsely register as a divergence. The
-//     named-assertion captures below reuse the same per-pass isolation.
+//     named-assertion captures below reuse the same per-pass isolation. The tier-2
+//     store is swapped to the shared in-memory fake while this harness runs, so
+//     db-free route contracts stay db-free even under the full-suite worker load.
 //   - The GitHub releases proxy does a network fetch; it is pinned deterministic
 //     by stubbing global fetch to reject (the real graceful-degradation contract:
 //     an unreachable GitHub yields an empty feed), exactly as characterization does.
@@ -33,9 +35,11 @@
 //     deterministically falls through to the 404 unknown-endpoint arm on both passes.
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import type { RateLimitStore } from '../../../server/http/types';
 import {
   DISCORD_MAX_PER_MINUTE,
   discordRateLimited,
+  rateLimitTier2Store,
   resetAuthFailures,
   resetCardUploadRateLimits,
   resetCharacterMutationRateLimits,
@@ -46,11 +50,13 @@ import {
   resetReportsCreateRateLimits,
   resetWalletLinkRateLimits,
   resetWocBalanceRateLimits,
+  setRateLimitTier2Store,
 } from '../../../server/ratelimit';
 import { NATIVE_APP_ORIGINS } from '../../../server/web_login_guard';
 import {
   captureResponse,
   type Dispatch,
+  FakeRateLimitStore,
   makeReq,
   normalizeResponse,
   type ParityFixture,
@@ -122,7 +128,7 @@ const API_REQUEST_CORPUS: readonly ApiRequestSpec[] = [
   // --- GitHub releases proxy, network stubbed to empty (characterization block 3)
   { name: 'releases_get_empty', method: 'GET', url: '/api/releases' },
 
-  // --- leaderboard payload shapes, empty cache (characterization block 4) ------
+  // --- leaderboard payload shapes, seeded empty cache (characterization block 4)
   { name: 'leaderboard_default', method: 'GET', url: '/api/leaderboard' },
   { name: 'leaderboard_guilds', method: 'GET', url: '/api/leaderboard?board=guilds' },
   // ?board=devs (open-source contributor board, added by the release/v0.18.0 merge):
@@ -270,6 +276,7 @@ function isolate(): void {
   resetReportsCreateRateLimits();
   resetAuthFailures();
   resetRateLimitClock();
+  resetParityTier2Store();
 }
 
 type MainModule = typeof import('../../../server/main');
@@ -293,6 +300,12 @@ let oldDispatch: Dispatch;
 let newDispatch: Dispatch;
 let report: ParityReport;
 let savedDevCommands: string | undefined;
+let savedTier2Store: RateLimitStore | null = null;
+let parityTier2Store: FakeRateLimitStore | null = null;
+
+function resetParityTier2Store(): void {
+  parityTier2Store?.reset();
+}
 
 // Capture one fixture request through BOTH modes, each preceded by a full limiter
 // reset, and return the two normalized responses for a focused named assertion.
@@ -338,16 +351,26 @@ beforeAll(async () => {
   vi.stubGlobal('fetch', () => Promise.reject(new Error('network disabled for parity harness')));
 
   const main = (await import('../../../server/main')) as MainModule;
+  main.seedLeaderboardCachesForTests({
+    leaderboard: { realm: [], global: [] },
+    guildLeaderboard: { realm: [], global: [] },
+  });
+  savedTier2Store = rateLimitTier2Store();
+  parityTier2Store = new FakeRateLimitStore();
+  setRateLimitTier2Store(parityTier2Store);
   oldDispatch = makeModedDispatch(main, 'legacy');
   newDispatch = makeModedDispatch(main, 'new');
 
   const fixtures = API_REQUEST_CORPUS.map(specToFixture);
-  report = await runParity({ oldDispatch, newDispatch, fixtures });
+  report = await runParity({ oldDispatch, newDispatch, fixtures, reset: resetParityTier2Store });
 });
 
 afterAll(async () => {
   const main = (await import('../../../server/main')) as MainModule;
   main.resetApiDispatchModeForTests();
+  main.resetLeaderboardCachesForTests();
+  setRateLimitTier2Store(savedTier2Store);
+  parityTier2Store = null;
   vi.unstubAllGlobals();
   if (savedDevCommands === undefined) delete process.env[DEV_COMMANDS_ENV];
   else process.env[DEV_COMMANDS_ENV] = savedDevCommands;

@@ -5908,4 +5908,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': '採掘',
   'hudChrome.gathering.logging': '伐採',
   'hudChrome.gathering.herbalism': '薬草学',
+  // v0.21.0 release i18n fill: crafting, mobile HUD, and reconnect chrome.
+  'hudChrome.crafting.reagentLine': "{name} x{have}/{required}",
+  'hudChrome.mobile.actionPageIndicator': "{page}",
+  'hudChrome.mobile.spellbookPageLabel': "ページ {page}",
 };

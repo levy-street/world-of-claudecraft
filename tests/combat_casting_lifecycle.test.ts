@@ -96,6 +96,29 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(secondTarget.hp).toBe(secondHp0);
   });
 
+  it('keeps the public tick cast lifecycle locked to the cast-start target', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const firstTarget = spawnTarget(sim, p, 12, 6);
+    const firstHp0 = firstTarget.hp;
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castTargetId).toBe(firstTarget.id);
+
+    const secondTarget = spawnTarget(sim, p, 12, 8);
+    const secondHp0 = secondTarget.hp;
+    expect(p.targetId).toBe(secondTarget.id);
+    sim.rng.chance = () => true;
+
+    for (let i = 0; i < 200 && p.castingAbility; i++) sim.tick();
+    expect(p.castingAbility).toBeNull();
+    expect(p.castTargetId).toBeNull();
+
+    for (let i = 0; i < 200 && firstTarget.hp === firstHp0; i++) sim.tick();
+    expect(firstTarget.hp).toBeLessThan(firstHp0);
+    expect(secondTarget.hp).toBe(secondHp0);
+  });
+
   it('resolves a completed friendly heal against the target locked at cast start', () => {
     const { sim, p, meta } = makeSim('priest', 12);
     const ally = sim.entities.get(sim.addPlayer('warrior', 'Ally')) as AnyEntity;

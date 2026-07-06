@@ -6025,4 +6025,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': 'Горное дело',
   'hudChrome.gathering.logging': 'Лесозаготовка',
   'hudChrome.gathering.herbalism': 'Травничество',
+  // v0.21.0 release i18n fill: crafting, mobile HUD, and reconnect chrome.
+  'hudChrome.crafting.reagentLine': "{name} x{have}/{required}",
+  'hudChrome.mobile.actionPageIndicator': "{page}",
+  'hudChrome.mobile.spellbookPageLabel': "Стр. {page}",
 };

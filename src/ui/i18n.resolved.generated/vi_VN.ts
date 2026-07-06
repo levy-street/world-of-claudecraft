@@ -314,12 +314,12 @@ export const vi_VN: EnTranslations = {
       "toggleHaptics": "Bật/tắt phản hồi rung",
       "hotbarPage": "Kỹ Năng",
       "hotbarPageAria": "Hiện bộ kỹ năng tiếp theo",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
+      "actionRing": "Hành động chiến đấu",
+      "actionPageToggle": "Đổi trang hành động",
       "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "targetCycle": "Đổi mục tiêu",
+      "targetCycleShort": "Mục tiêu",
+      "spellbookPageLabel": "Trang {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -427,8 +427,8 @@ export const vi_VN: EnTranslations = {
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileCameraJoystick": "Cần điều khiển camera",
+      "mobileLeftHanded": "Bố cục thuận tay trái"
     },
     "controller": {
       "title": "Tay Cầm",
@@ -1060,16 +1060,16 @@ export const vi_VN: EnTranslations = {
       }
     },
     "crafting": {
-      "title": "Crafting",
-      "close": "Close crafting",
-      "craft": "Craft",
-      "reagentsNeeded": "Requires:",
+      "title": "Chế tạo",
+      "close": "Đóng chế tạo",
+      "craft": "Chế tạo",
+      "reagentsNeeded": "Cần:",
       "reagentLine": "{name} x{have}/{required}",
-      "empty": "No recipes known yet.",
-      "resultAria": "Craft {name}",
-      "craftedToast": "Crafted: {name}",
-      "insufficientMaterials": "You do not have the materials for that.",
-      "unknownRecipe": "That recipe does not exist."
+      "empty": "Chưa biết công thức nào.",
+      "resultAria": "Chế tạo {name}",
+      "craftedToast": "Đã chế tạo: {name}",
+      "insufficientMaterials": "Bạn không có đủ nguyên liệu cho việc đó.",
+      "unknownRecipe": "Công thức đó không tồn tại."
     },
     "devBadge": {
       "title": "Nhà phát triển",
@@ -3483,7 +3483,7 @@ export const vi_VN: EnTranslations = {
     "rendererFailed": "Không thể khởi động bộ kết xuất: thử tải lại. {error}",
     "enterTimeout": "Không thể vào thế giới. Kết nối đã quá thời gian. Máy chủ trò chơi có đang chạy không?",
     "connectionLost": "Đã mất kết nối tới máy chủ.",
-    "reconnecting": "Connection lost. Reconnecting...",
+    "reconnecting": "Mất kết nối. Đang kết nối lại...",
     "connectionRejected": "Máy chủ đã đóng kết nối."
   },
   "errors": {

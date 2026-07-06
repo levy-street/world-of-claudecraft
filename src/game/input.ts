@@ -100,6 +100,7 @@ export interface InputDebugState {
 
 export class Input {
   keys = new Set<string>();
+  private downCombosByCode = new Map<string, Set<string>>();
   leftDown = false;
   rightDown = false;
   camYaw = Math.PI;
@@ -614,6 +615,7 @@ export class Input {
     // normally, so clearing keys here would cancel a walk the instant a camera
     // drag ends (every right/left-drag exits pointer lock on release).
     if (reason !== 'pointerlock') this.keys.clear();
+    if (reason !== 'pointerlock') this.downCombosByCode.clear();
     if (reason !== 'pointerlock' && this.emoteWheelHeldCodes.size > 0) {
       this.emoteWheelHeldCodes.clear();
       this.cb.onEmoteWheel(false);
@@ -659,6 +661,16 @@ export class Input {
     }
     const tag = (document.activeElement?.tagName ?? '').toLowerCase();
     if (tag === 'input' || tag === 'textarea') return;
+    const downCombo = makeCombo(e.code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    const downCombos = this.downCombosByCode.get(e.code);
+    if (downCombos?.has(downCombo)) return;
+    if (downCombos) downCombos.add(downCombo);
+    else this.downCombosByCode.set(e.code, new Set([downCombo]));
     if (e.code === 'Escape') {
       this.cb.onUiKey('escape');
       return;
@@ -706,6 +718,7 @@ export class Input {
   }
 
   private onKeyUp(e: KeyboardEvent): void {
+    this.downCombosByCode.delete(e.code);
     if (this.keys.delete(e.code)) this.noteIntent('move');
     if (this.emoteWheelHeldCodes.delete(e.code) && this.emoteWheelHeldCodes.size === 0) {
       this.cb.onEmoteWheel(false);

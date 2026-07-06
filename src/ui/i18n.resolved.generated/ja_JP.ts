@@ -319,7 +319,7 @@ export const ja_JP: EnTranslations = {
       "actionPageIndicator": "{page}",
       "targetCycle": "ターゲット切替",
       "targetCycleShort": "標的",
-      "spellbookPageLabel": "Page {page}"
+      "spellbookPageLabel": "ページ {page}"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
