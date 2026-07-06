@@ -58,6 +58,7 @@ import {
   dungeonAt,
   ITEMS,
   isDelvePos,
+  isHodricsPos,
   MOBS,
   NPCS,
   QUESTS,
@@ -7610,16 +7611,15 @@ export class Hud {
       // override inside Eastbrook Vale; the zone LABEL stays Eastbrook Vale,
       // the Sowfield is a poi, not a zone).
       const atSowfield = !inDungeon && isAtSowfield(p.pos.x, p.pos.z);
+      // Hodric's Castle is open-air (the zone banner/subzone suppression above
+      // is still correct: it is an instance), so it takes the ordinary
+      // outdoor zone theme instead of the dungeon murk.
+      const inHodrics = isHodricsPos(p.pos.x);
+      const musicInDungeon = (inDungeon && !inHodrics) || inNythraxisArena;
       const zone = atSowfield
         ? 'vale_cup'
-        : musicZoneForLocation(
-            currentZone.id,
-            currentZone.biome,
-            inHub,
-            inDungeon || inNythraxisArena,
-            instanceId,
-          );
-      const musicDungeonId = inDungeon || inNythraxisArena ? instanceId : null;
+        : musicZoneForLocation(currentZone.id, currentZone.biome, inHub, musicInDungeon, instanceId);
+      const musicDungeonId = (inDungeon && !inHodrics) || inNythraxisArena ? instanceId : null;
       if (shouldResetMusicForDungeonEntry(this.lastMusicDungeonId, musicDungeonId)) {
         music.resetForDungeonEntry(musicDungeonId);
       }
