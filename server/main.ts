@@ -147,6 +147,7 @@ import { configureInternalRuntime, handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
 import { configureLeaderboardRuntime, type ReleaseEntry } from './leaderboard';
+import { logolConfirm, logolInfo, logolInventory, logolQuote } from './logol';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -1675,6 +1676,29 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleDailyRewardApi(req, res, accountId);
+    }
+    // Logol, the roaming $WOC merchant (docs/prd/woc/logol-merchant.md). Reads
+    // (info/inventory) accept a read token; mutations (quote/confirm) need a full
+    // token. The shop is further gated inside the handlers on the quest unlock.
+    if (req.method === 'GET' && url === '/api/logol/info') {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      return logolInfo(res, accountId);
+    }
+    if (req.method === 'GET' && url === '/api/logol/inventory') {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      return logolInventory(res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/logol/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return logolQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/logol/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return logolConfirm(req, res, accountId);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {

@@ -6897,6 +6897,16 @@ export const vi_VN: EnTranslations = {
         "title": "Người Gác Cõi Chết",
         "greeting": "Nghỉ ngơi đi, hỡi linh hồn. Ta có thể đưa ngươi trở lại thân xác, nhưng chuyến vượt trở về sẽ khiến ngươi suy yếu."
       },
+      "logol": {
+        "name": "Logol",
+        "title": "{{,,,}}",
+        "greeting": "You see me, then. Few do. I carry what gold cannot buy, stranger, only $WOC."
+      },
+      "logol_harbinger": {
+        "name": "Harbinger of the Nameless Order",
+        "title": "{{,,,}}",
+        "greeting": "A cloaked one walks the realm, seen only by eyes that have learned to look. Would you learn?"
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Người Canh Thủy Triều",
@@ -7703,6 +7713,36 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Sói rừng bị giết"
+          }
+        }
+      },
+      "q_logol_rumor": {
+        "title": "A Rumor of Logol",
+        "text": "They say a merchant walks between the moments. Sit with me, and I will tell you how to see him.",
+        "completion": "Good. The rumor is in you now. It will not leave.",
+        "objectives": {
+          "0": {
+            "label": "Hear the Harbinger out"
+          }
+        }
+      },
+      "q_logol_sign": {
+        "title": "The Sign in the Eye",
+        "text": "To see the unseen you must first look hard at the ordinary. Cull the wolves of the vale until your eye unclouds, then return to me.",
+        "completion": "The mark is set. Your eye is ready.",
+        "objectives": {
+          "0": {
+            "label": "Cull forest wolves"
+          }
+        }
+      },
+      "q_logol_seen": {
+        "title": "Seen and Unseen",
+        "text": "You are ready. The cloaked one keeps to the crossroads when he walks this realm at all. Find him, speak with him, and return to me.",
+        "completion": "Now you see him. His ledger is open to you. Spend wisely.",
+        "objectives": {
+          "0": {
+            "label": "Find Logol and speak with him"
           }
         }
       },

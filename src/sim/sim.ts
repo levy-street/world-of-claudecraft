@@ -152,6 +152,7 @@ import {
   paginateLeaderboard,
 } from './leaderboard_page';
 import type { Ante, PickAction } from './lockpick';
+import { type LogolRoamState, makeLogolRoamState, updateLogolRoam } from './logol_roam';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
 // Sim keeps thin same-named delegates that call these.
@@ -1078,6 +1079,12 @@ export class Sim {
   postOffice!: PostOffice;
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
+  // Roaming merchant Logol (docs/prd/woc/logol-merchant.md): the scheduler runs
+  // only when logolEnabled (server sets it from LOGOL_ENABLED), so it never
+  // perturbs offline/headless/parity runs. logolRoam holds the single live-entity
+  // id it reconciles against the sim clock each tick.
+  private readonly logolEnabled: boolean;
+  private logolRoam: LogolRoamState = makeLogolRoamState();
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
@@ -1090,6 +1097,7 @@ export class Sim {
 
   constructor(cfg: SimConfig) {
     this.devCommands = cfg.devCommands ?? false;
+    this.logolEnabled = cfg.logolEnabled ?? false;
     this.cfg = {
       seed: cfg.seed,
       playerClass: cfg.playerClass,
@@ -1098,6 +1106,7 @@ export class Sim {
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
+      logolEnabled: this.logolEnabled,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
@@ -2834,6 +2843,11 @@ export class Sim {
     this.tickCount++;
     this.updatePendingMobRespawns();
     this.updateWorldBosses();
+    // Weekly merchant world event: gated off by default and driven by the
+    // host-injected wall clock (the raid-lockout seam), never the shared rng,
+    // so it never shifts the parity draw order and a realm restart never moves
+    // the weekly window. See src/sim/logol_roam.ts.
+    if (this.logolEnabled) updateLogolRoam(this.ctx, this.logolRoam, this.cfg.lockoutNowMs());
     tickGroundAoEs(this.ctx);
 
     runDespawnDecay(this.ctx);

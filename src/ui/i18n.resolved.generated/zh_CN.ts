@@ -6897,6 +6897,16 @@ export const zh_CN: EnTranslations = {
         "title": "亡者的守护者",
         "greeting": "安息吧，灵魂。我可以让你重返躯体，但归途会让你变得虚弱。"
       },
+      "logol": {
+        "name": "洛戈尔",
+        "title": "{{,,,}}",
+        "greeting": "你竟能看见我。少有人能。我带着黄金买不到的东西，陌生人，只收 $WOC。"
+      },
+      "logol_harbinger": {
+        "name": "无名之序的先驱",
+        "title": "{{,,,}}",
+        "greeting": "一位披斗篷者行走于世间，唯有学会观看的眼睛才能看见他。你愿意学吗？"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
@@ -7703,6 +7713,36 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败森林之狼"
+          }
+        }
+      },
+      "q_logol_rumor": {
+        "title": "洛戈尔的传闻",
+        "text": "据说有位商人行走于时刻之间。坐下来，我会告诉你如何看见他。",
+        "completion": "很好。传闻已入你心，它不会离去。",
+        "objectives": {
+          "0": {
+            "label": "听先驱把话说完"
+          }
+        }
+      },
+      "q_logol_sign": {
+        "title": "The Sign in the Eye",
+        "text": "要看见不可见之物，先要凝视寻常之物。去猎杀谷地的森林狼，直到你的眼澄澈，再回到我这里。",
+        "completion": "印记已成。你的眼已就绪。",
+        "objectives": {
+          "0": {
+            "label": "猎杀森林狼"
+          }
+        }
+      },
+      "q_logol_seen": {
+        "title": "所见与不可见",
+        "text": "你准备好了。披斗篷者若行走此界，多半守在十字路口。找到他，与他交谈，再回到我这里。",
+        "completion": "现在你能看见他了。他的账簿向你敞开。花得明智些。",
+        "objectives": {
+          "0": {
+            "label": "找到洛戈尔并与他交谈"
           }
         }
       },

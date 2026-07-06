@@ -124,6 +124,8 @@ const NPC_IDS = [
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
+  'logol', // weekly $WOC merchant, cloaked in infinity (dynamically spawned per visit)
+  'logol_harbinger', // fixed lore NPC who gives Logol's shop-unlock quest chain
 ] as const;
 
 const QUEST_IDS = [
@@ -203,6 +205,9 @@ const QUEST_IDS = [
   'q_mogger',
   'q_archetype_acceptance',
   'q_prof_make_amends',
+  'q_logol_rumor', // Logol shop-unlock chain, step 1
+  'q_logol_sign', // Logol shop-unlock chain, step 2
+  'q_logol_seen', // Logol shop-unlock chain, step 3 (turn-in opens the shop)
 ] as const;
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;

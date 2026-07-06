@@ -1,6 +1,10 @@
 export interface AccountCosmetics {
   completedQuestIds: string[];
   mechChromaIds: string[];
+  // Prestige cosmetics bought from the roaming merchant Logol, account-bound
+  // (docs/prd/woc/logol-merchant.md). Cosmetic-only; the sim never reads them.
+  // Optional so existing cosmetics literals keep compiling.
+  logolWareIds?: string[];
 }
 
 export interface IWorldCosmetics {
