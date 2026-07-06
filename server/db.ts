@@ -323,6 +323,25 @@ CREATE TABLE IF NOT EXISTS account_moderation_actions (
   expires_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS account_moderation_actions_account ON account_moderation_actions(account_id, created_at DESC);
+-- Sanctioned write path for out-of-game character progression. An external
+-- system (a companion app, live event, or admin tool) APPENDS rows here; the
+-- game server applies any unconsumed grants to the character at load time and
+-- stamps applied_at, so it never races the authoritative sim save. source_key
+-- is the writer's idempotency key, uniquely indexed so the same grant can't be
+-- applied twice.
+CREATE TABLE IF NOT EXISTS character_grants (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT REFERENCES accounts(id) ON DELETE CASCADE,
+  character_id INT REFERENCES characters(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  amount BIGINT NOT NULL DEFAULT 0,
+  reason TEXT NOT NULL DEFAULT '',
+  source_key TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  applied_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS character_grants_pending ON character_grants(character_id) WHERE applied_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS character_grants_source_key ON character_grants(source_key) WHERE source_key IS NOT NULL;
 CREATE TABLE IF NOT EXISTS blocked_ips (
   id SERIAL PRIMARY KEY,
   ip TEXT NOT NULL UNIQUE,
@@ -2038,6 +2057,59 @@ export async function saveCharacterAndMarketState(
       `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
        ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
       [mailStateKey(REALM), JSON.stringify(mail)],
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Apply any unconsumed character_grants to this character's stored state, then
+// stamp them applied. Called at LOAD time (before the character enters the sim)
+// so it never races the authoritative save in saveCharacterState. Grants of
+// kind 'xp' add to state.xp; the sim recomputes level from xp on join. No-op
+// (grants stay pending) if the character has no saved state yet: they apply
+// after the first real save. Idempotent: applied rows are skipped.
+export async function applyPendingCharacterGrants(characterId: number): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const pending = await client.query(
+      `SELECT id, kind, amount FROM character_grants
+       WHERE character_id = $1 AND applied_at IS NULL
+       ORDER BY id FOR UPDATE`,
+      [characterId],
+    );
+    if (pending.rowCount === 0) {
+      await client.query('COMMIT');
+      return;
+    }
+    const xpAdd = pending.rows
+      .filter((r) => r.kind === 'xp')
+      .reduce((sum, r) => sum + Number(r.amount), 0);
+    if (xpAdd > 0) {
+      const updated = await client.query(
+        `UPDATE characters
+         SET state = jsonb_set(state, '{xp}',
+               to_jsonb(COALESCE((state->>'xp')::bigint, 0) + $2::bigint), true),
+             updated_at = now()
+         WHERE id = $1 AND state IS NOT NULL
+         RETURNING id`,
+        [characterId, String(xpAdd)],
+      );
+      if (updated.rowCount === 0) {
+        // No saved state yet; leave grants pending until the first real save.
+        await client.query('ROLLBACK');
+        return;
+      }
+    }
+    await client.query(
+      `UPDATE character_grants SET applied_at = now()
+       WHERE character_id = $1 AND applied_at IS NULL`,
+      [characterId],
     );
     await client.query('COMMIT');
   } catch (err) {
