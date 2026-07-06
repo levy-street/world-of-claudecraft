@@ -176,6 +176,14 @@ import {
 } from './ratelimit';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
+import {
+  handleRespecConfirm,
+  handleRespecPayContext,
+  handleRespecPrices,
+  handleRespecQuote,
+  registerRespecActions,
+} from './respec';
+import { makeRespecActions } from './respec_actions';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { validateGuildName } from './social';
 import { adminRolesForAccount } from './staff_db';
@@ -269,6 +277,16 @@ registerIdentityActions(
         await game.saveMail();
       }
     },
+  }),
+);
+
+// $WOC-paid respec + loadout-slot actions (#472): the same quote/confirm payment
+// flow, editing an OFFLINE character's saved state. Registered unconditionally;
+// the routes are fail-closed behind PAID_RESPEC_ENABLED (see server/respec.ts).
+registerRespecActions(
+  makeRespecActions({
+    isCharacterOnline: (characterId) =>
+      [...game.clients.values()].some((s) => s.characterId === characterId),
   }),
 );
 
@@ -1494,6 +1512,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleIdentityConfirm(req, res, accountId);
+    }
+    // $WOC-paid respec + loadout-slot actions (#472): the same quote / pay /
+    // confirm shape as identity, on its own SEPARATE fail-closed flag
+    // (PAID_RESPEC_ENABLED); each handler 404s when the feature is off.
+    if (req.method === 'GET' && url === '/api/respec/prices') {
+      return handleRespecPrices(res);
+    }
+    if (req.method === 'POST' && url === '/api/respec/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleRespecQuote(req, res, accountId);
+    }
+    if (req.method === 'GET' && url.startsWith('/api/respec/paycontext')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleRespecPayContext(res, accountId, url);
+    }
+    if (req.method === 'POST' && url === '/api/respec/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleRespecConfirm(req, res, accountId);
     }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the

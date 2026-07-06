@@ -2130,6 +2130,61 @@ export async function saveCharacterState(
   );
 }
 
+// Result of a $WOC-paid offline state edit (respec / loadout-slot unlock, #472).
+export type OfflineStateMutation =
+  | { ok: true }
+  | { ok: false; reason: 'not_found' | 'no_state' | 'unchanged' };
+
+// Apply a pure transform to an OFFLINE character's persisted JSONB state in one
+// transaction (row-locked so a concurrent write can't tear it), mirroring how a
+// paid rename edits the stored row. `transform` is a sim-pure function of the
+// loaded CharacterState that returns the new state, or null to abort (e.g. the
+// loadout cap is already at the ceiling). The caller has already verified the
+// character is offline and not in combat; this is purely the persistence write.
+export async function mutateOfflineCharacterState(
+  accountId: number,
+  characterId: number,
+  transform: (state: CharacterState) => CharacterState | null,
+): Promise<OfflineStateMutation> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const res = await client.query(
+      `SELECT state FROM characters
+        WHERE id = $1 AND account_id = $2 AND realm = $3
+        FOR UPDATE`,
+      [characterId, accountId, REALM],
+    );
+    const row = res.rows[0];
+    if (!row) {
+      await client.query('ROLLBACK');
+      return { ok: false, reason: 'not_found' };
+    }
+    const state = row.state as CharacterState | null;
+    if (!state) {
+      await client.query('ROLLBACK');
+      return { ok: false, reason: 'no_state' };
+    }
+    const next = transform(state);
+    if (!next) {
+      await client.query('ROLLBACK');
+      return { ok: false, reason: 'unchanged' };
+    }
+    const cleanState = sanitizeRemovedZone1Content(next).state;
+    await client.query('UPDATE characters SET state = $2, updated_at = now() WHERE id = $1', [
+      characterId,
+      JSON.stringify(cleanState),
+    ]);
+    await client.query('COMMIT');
+    return { ok: true };
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 // Persist a character row AND this realm's World Market + Ravenpost mail blobs
 // in ONE transaction. They live in different tables (characters / world_state),
 // but a Market listing and a mail attachment are both escrows: the item leaves
