@@ -227,3 +227,11 @@ drift visually obvious.
 - **WARNING**: A functional gap or asymmetry that could cause issues. Should fix soon.
 - **INFO**: Intentional asymmetry that is acceptable.
 - **PASSED**: Verified consistent across the relevant sources and mirrors.
+
+## Delivering your report
+
+The review only counts once the report is DELIVERED. End with the complete report as your final
+message, never a status line or a promise to report later. If a SendMessage tool is available
+(it is injected when you run as a background teammate), ALSO send the full report (never a
+one-line summary) to `main` as your FINAL action; going idle without sending it is a failed
+review that costs the orchestrator a nudge round-trip.

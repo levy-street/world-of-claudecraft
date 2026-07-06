@@ -1,5 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import type * as http from 'node:http';
+import { DELVES } from '../src/sim/data';
+import type { LootTier } from '../src/sim/lockpick';
 import type {
   DailyRewardHistory,
   DailyRewardLeaderboardEntry,
@@ -8,7 +10,15 @@ import type {
   DailyRewardStatus,
 } from '../src/world_api';
 import { type DailyRewardDb, type DailyRewardTaskSeed, PgDailyRewardDb } from './daily_rewards_db';
-import { walletForAccount } from './db';
+import { accountAndScopeForToken, moderationStatusForAccount, walletForAccount } from './db';
+import { ctxAccountId } from './http/context';
+import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
+import {
+  DAILY_REWARD_SECRET_ENV,
+  DAILY_REWARD_SECRET_HEADER,
+  requireInternalSecretFailClosed,
+} from './http/middleware/require_internal_secret';
+import type { Ctx, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
 import { cachedWocBalance } from './woc_balance';
 
@@ -20,6 +30,17 @@ const DEFAULT_CONFIG_TTL_MS = 5 * 60_000;
 const DAILY_REWARD_CONFIG_TTL_MS = Number(
   process.env.WOC_DAILY_REWARD_CONFIG_TTL_MS ?? DEFAULT_CONFIG_TTL_MS,
 );
+
+// Lenient coerce-and-clamp decode defaults for the daily-rewards paginated reads
+// (Number(param) || DEFAULT). These are the fallback page/limit when a query param
+// is absent or non-numeric; the coercion shape is UNCHANGED, only the literal is
+// named. Exported so their values are pinned by tests/server/tunables.test.ts.
+export const DAILY_DEFAULT_PAGE = 0; // page index (count, zero-based)
+export const DAILY_PLAYER_LEADERBOARD_PAGE_SIZE = 20; // rows per player leaderboard page (count)
+export const DAILY_HISTORY_LIMIT = 30; // player payout-history rows (count)
+export const DAILY_OPS_PENDING_PAYOUTS_LIMIT = 20; // ops pending-payouts rows (count)
+export const DAILY_OPS_PAYOUT_HISTORY_LIMIT = 100; // ops payout-history rows (count)
+export const DAILY_OPS_LEADERBOARD_PAGE_SIZE = 50; // rows per ops leaderboard page (count)
 
 export const DAILY_REWARD_SPLITS = [
   0.2, 0.15, 0.12, 0.1, 0.09, 0.08, 0.075, 0.07, 0.065, 0.05,
@@ -448,6 +469,83 @@ function onlineMultiplierPoints(
   return { points: Math.max(0, Math.floor(basePoints * multiplier)), multiplier };
 }
 
+function delveClearPoints(
+  task: { points: number; basePoints: number; config: Record<string, unknown> },
+  delveId: string,
+  tierId: string,
+  onlineMinutes: number,
+): {
+  points: number;
+  multiplier: number;
+  baseClearPoints: number;
+  levelBonus: number;
+  tierMultiplier: number;
+  preOnlinePoints: number;
+} | null {
+  const delve = DELVES[delveId];
+  if (!delve?.tiers.some((tier) => tier.id === tierId)) return null;
+  const taskConfig = task.config ?? {};
+  const baseClearPoints = numberConfig(
+    taskConfig,
+    'baseClearPoints',
+    task.basePoints ?? task.points,
+  );
+  const levelBaseline = numberConfig(taskConfig, 'levelBaseline', 7);
+  const pointsPerLevel = numberConfig(taskConfig, 'pointsPerLevel', 1);
+  const normalTierMultiplier = numberConfig(taskConfig, 'normalTierMultiplier', 1);
+  const heroicTierMultiplier = numberConfig(taskConfig, 'heroicTierMultiplier', 1.5);
+  const tierMultiplier = tierId === 'heroic' ? heroicTierMultiplier : normalTierMultiplier;
+  const levelBonus = Math.max(0, delve.minLevel - levelBaseline) * pointsPerLevel;
+  const preOnlinePoints = Math.max(0, Math.floor((baseClearPoints + levelBonus) * tierMultiplier));
+  const { points, multiplier } = onlineMultiplierPoints(preOnlinePoints, taskConfig, onlineMinutes);
+  return {
+    points,
+    multiplier,
+    baseClearPoints,
+    levelBonus,
+    tierMultiplier,
+    preOnlinePoints,
+  };
+}
+
+function delveChestOpenPoints(
+  task: { config: Record<string, unknown> },
+  chestTier: LootTier,
+  bountiful: boolean,
+  onlineMinutes: number,
+): {
+  points: number;
+  multiplier: number;
+  chestBasePoints: number;
+  chestTier: LootTier;
+  bountifulMultiplier: number;
+  preOnlinePoints: number;
+} | null {
+  const taskConfig = task.config ?? {};
+  const chestBasePoints =
+    chestTier === 'premium'
+      ? numberConfig(taskConfig, 'premiumChestPoints', 20)
+      : chestTier === 'medium'
+        ? numberConfig(taskConfig, 'mediumChestPoints', 10)
+        : chestTier === 'low'
+          ? numberConfig(taskConfig, 'lowChestPoints', 5)
+          : null;
+  if (chestBasePoints === null) return null;
+  const bountifulMultiplier = bountiful
+    ? numberConfig(taskConfig, 'bountifulChestMultiplier', 1.5)
+    : 1;
+  const preOnlinePoints = Math.max(0, Math.floor(chestBasePoints * bountifulMultiplier));
+  const { points, multiplier } = onlineMultiplierPoints(preOnlinePoints, taskConfig, onlineMinutes);
+  return {
+    points,
+    multiplier,
+    chestBasePoints,
+    chestTier,
+    bountifulMultiplier,
+    preOnlinePoints,
+  };
+}
+
 function currentTaskMultiplier(
   task: { type: string; points: number; basePoints: number; config: Record<string, unknown> },
   onlineMinutes: number,
@@ -455,6 +553,9 @@ function currentTaskMultiplier(
   if (task.type === 'quest_completion')
     return questCompletionPoints(task, onlineMinutes).multiplier;
   if (task.type === 'arena_result')
+    return onlineMultiplierPoints(task.basePoints ?? task.points, task.config ?? {}, onlineMinutes)
+      .multiplier;
+  if (task.type === 'delve_clear')
     return onlineMultiplierPoints(task.basePoints ?? task.points, task.config ?? {}, onlineMinutes)
       .multiplier;
   return null;
@@ -668,6 +769,100 @@ export class DailyRewardService {
     return awardedPoints;
   }
 
+  async recordDelveClear(
+    accountId: number,
+    characterId: number | null,
+    delveId: string,
+    tierId: string,
+    completedAt: Date = new Date(),
+  ): Promise<number> {
+    if (!DELVES[delveId]) return 0;
+    const { day, config } = await dailyRewardClock(completedAt);
+    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+    await this.db.seedTasks(day, config.tasks);
+    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!eligibility.eligible) return 0;
+    const tasks = await this.db.tasksForType(day, 'delve_clear');
+    if (tasks.length === 0) return 0;
+    const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
+    for (const task of tasks) {
+      const clearPoints = delveClearPoints(task, delveId, tierId, onlineMinutes);
+      if (!clearPoints || clearPoints.points <= 0) continue;
+      const recorded = await this.db.addPoints(
+        day,
+        accountId,
+        'task',
+        clearPoints.points,
+        `task:${task.taskId}:delve:${delveId}:${tierId}:character:${characterId ?? 'account'}:${completedAt.toISOString()}`,
+        {
+          taskId: task.taskId,
+          taskType: task.type,
+          delveId,
+          tierId,
+          characterId,
+          onlineMinutes,
+          multiplier: clearPoints.multiplier,
+          baseClearPoints: clearPoints.baseClearPoints,
+          levelBonus: clearPoints.levelBonus,
+          tierMultiplier: clearPoints.tierMultiplier,
+          preOnlinePoints: clearPoints.preOnlinePoints,
+        },
+      );
+      if (recorded) awardedPoints += clearPoints.points;
+    }
+    return awardedPoints;
+  }
+
+  async recordDelveChestOpen(
+    accountId: number,
+    characterId: number | null,
+    delveId: string,
+    tierId: string,
+    chestTier: LootTier,
+    bountiful: boolean,
+    openedAt: Date = new Date(),
+  ): Promise<number> {
+    if (!DELVES[delveId]) return 0;
+    const { day, config } = await dailyRewardClock(openedAt);
+    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+    await this.db.seedTasks(day, config.tasks);
+    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!eligibility.eligible) return 0;
+    const tasks = await this.db.tasksForType(day, 'delve_clear');
+    if (tasks.length === 0) return 0;
+    const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
+    for (const task of tasks) {
+      const chestPoints = delveChestOpenPoints(task, chestTier, bountiful, onlineMinutes);
+      if (!chestPoints || chestPoints.points <= 0) continue;
+      const recorded = await this.db.addPoints(
+        day,
+        accountId,
+        'task',
+        chestPoints.points,
+        `task:${task.taskId}:delve_chest:${delveId}:${tierId}:${chestTier}:${bountiful ? 'bountiful' : 'standard'}:character:${characterId ?? 'account'}:${openedAt.toISOString()}`,
+        {
+          taskId: task.taskId,
+          taskType: task.type,
+          bonusType: 'delve_chest',
+          delveId,
+          tierId,
+          characterId,
+          chestTier: chestPoints.chestTier,
+          bountiful,
+          onlineMinutes,
+          multiplier: chestPoints.multiplier,
+          chestBasePoints: chestPoints.chestBasePoints,
+          bountifulMultiplier: chestPoints.bountifulMultiplier,
+          preOnlinePoints: chestPoints.preOnlinePoints,
+        },
+      );
+      if (recorded) awardedPoints += chestPoints.points;
+    }
+    return awardedPoints;
+  }
+
   async history(limit = 30): Promise<DailyRewardHistory> {
     const rows = await this.db.recentPayouts(limit);
     return {
@@ -767,8 +962,8 @@ export async function handleDailyRewardApi(
       200,
       await dailyRewardService.leaderboardPage(
         day,
-        Number(url.searchParams.get('page')) || 0,
-        Number(url.searchParams.get('pageSize')) || 20,
+        Number(url.searchParams.get('page')) || DAILY_DEFAULT_PAGE,
+        Number(url.searchParams.get('pageSize')) || DAILY_PLAYER_LEADERBOARD_PAGE_SIZE,
         accountId,
       ),
     );
@@ -782,7 +977,9 @@ export async function handleDailyRewardApi(
     return json(
       res,
       200,
-      await dailyRewardService.history(Number(url.searchParams.get('limit')) || 30),
+      await dailyRewardService.history(
+        Number(url.searchParams.get('limit')) || DAILY_HISTORY_LIMIT,
+      ),
     );
   }
   return json(res, 404, { error: 'unknown endpoint' });
@@ -800,14 +997,14 @@ export async function handleDailyRewardInternalApi(
   }
   if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/pending-payouts') {
     const data = await dailyRewardService.pendingPayouts(
-      Number(url.searchParams.get('limit')) || 20,
+      Number(url.searchParams.get('limit')) || DAILY_OPS_PENDING_PAYOUTS_LIMIT,
     );
     json(res, 200, { success: true, data, error: null });
     return true;
   }
   if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/payout-history') {
     const data = await dailyRewardService.payoutHistory(
-      Number(url.searchParams.get('limit')) || 100,
+      Number(url.searchParams.get('limit')) || DAILY_OPS_PAYOUT_HISTORY_LIMIT,
     );
     json(res, 200, { success: true, data, error: null });
     return true;
@@ -817,8 +1014,8 @@ export async function handleDailyRewardInternalApi(
     const { day } = requestedDay ? { day: requestedDay } : await dailyRewardClock();
     const data = await dailyRewardService.leaderboardPage(
       day,
-      Number(url.searchParams.get('page')) || 0,
-      Number(url.searchParams.get('pageSize')) || 50,
+      Number(url.searchParams.get('page')) || DAILY_DEFAULT_PAGE,
+      Number(url.searchParams.get('pageSize')) || DAILY_OPS_LEADERBOARD_PAGE_SIZE,
     );
     json(res, 200, { success: true, data, error: null });
     return true;
@@ -833,3 +1030,163 @@ export async function handleDailyRewardInternalApi(
   json(res, 404, { success: false, data: null, error: 'unknown endpoint' });
   return true;
 }
+
+// ── Route layer ────────────────────────────
+// Both daily-rewards families as RouteDefs for the shared dispatcher:
+//   GET  /api/daily-rewards                        player status (JSON)
+//   GET  /api/daily-rewards/leaderboard            paginated daily leaderboard (JSON)
+//   POST /api/daily-rewards/spin                   player spin (JSON)
+//   GET  /api/daily-rewards/history                payout history (JSON)
+//   POST /internal/daily-rewards/pending-payouts   payout service ops
+//   POST /internal/daily-rewards/payout-history    payout service ops
+//   POST /internal/daily-rewards/leaderboard       payout service ops
+//   POST /internal/daily-rewards/mark-payout       payout service ops
+// The legacy dispatch stays as the flag-off rollback path until the ladder-deletion PR: the
+// main.ts prefix arm (startsWith('/api/daily-rewards'), bearerActiveAccount
+// BEFORE delegating) for the player family, and the /internal composite
+// delegate (handleDailyRewardInternalApi tried FIRST, ordering load-bearing)
+// for the ops family.
+//
+// PARITY-FIRST BY CONSTRUCTION: each thin handler calls the SAME sub-dispatcher
+// the ladder serves (handleDailyRewardApi / handleDailyRewardInternalApi)
+// UNCHANGED, so every body, the in-family 404 'unknown endpoint', the lenient
+// Number(...)|| limit decodes, and mark-payout's validation prose are
+// byte-identical with zero dual-edit drift. No withBody anywhere: spin reads no
+// body (a body reader would invent 400/413 behavior legacy does not have) and
+// mark-payout SELF-READS via the core's un-caught readBody (the
+// dailyRewardsOpsBodyValidationRemap deviation). Off-table shapes (wrong
+// method, unknown subpath, the no-slash '/api/daily-rewardsX' sibling, HEAD)
+// resolve unmatched and delegate to the ladder unchanged. v0.20.0 grew each
+// family by its paginated leaderboard read (four player + four ops routes).
+//
+// The player guard is the shared legacy-body createActiveGuard (mirrors the
+// prefix arm's bearerActiveAccount byte-for-byte). The ops gate is the
+// FAIL-CLOSED requireInternalSecretFailClosed variant: env-unset AND mismatch
+// both answer the legacy 401 { success: false, data: null, error: 'not
+// authenticated' } (never the other internal gates' feature-off 404, never a
+// RESTART_COUNTDOWN_SECRET fallback). The gated core re-runs its own
+// internalAuthorized check (same env + header, per request), which passes
+// whenever the gate passed; keeping the core's check intact is what keeps the
+// composite delegate's legacy behavior frozen. NO rate limiter on any of the
+// eight (legacy has none; spin's only guards are the one-spin-per-day 409 and
+// the wallet-eligibility 403, and adding a throttle is a maintainer fork, not
+// a silent add).
+// dailyRewardService stays module-owned and importable by game.ts regardless of
+// route-table state; no boot injection is needed.
+
+// The bearer + moderation reads the player guard needs. Built LAZILY (a
+// function, not a module-scope object literal): game.ts imports this module, so
+// an eager literal would break every test that partial-mocks server/db and
+// loads the game (the lazy-db-bundle rule).
+function makeRealDailyRewardDb() {
+  return { accountAndScopeForToken, moderationStatusForAccount };
+}
+type DailyRewardGuardDb = ReturnType<typeof makeRealDailyRewardDb>;
+let realDailyRewardDb: DailyRewardGuardDb | undefined;
+let dailyRewardDbOverride: DailyRewardGuardDb | undefined;
+function dailyRewardGuardDb(): BearerActiveGuardDb {
+  if (dailyRewardDbOverride) return dailyRewardDbOverride;
+  realDailyRewardDb ??= makeRealDailyRewardDb();
+  return realDailyRewardDb;
+}
+
+/** Override the guard db with a fake (test-only; merges over the real reads). */
+export function setDailyRewardDbForTests(overrides: Partial<DailyRewardGuardDb>): void {
+  realDailyRewardDb ??= makeRealDailyRewardDb();
+  dailyRewardDbOverride = { ...realDailyRewardDb, ...overrides };
+}
+
+/** Restore the real guard db after a setDailyRewardDbForTests override (test-only). */
+export function resetDailyRewardDbForTests(): void {
+  dailyRewardDbOverride = undefined;
+}
+
+/** Full active session gate (mirrors the prefix arm's bearerActiveAccount). */
+const activeGuard = createActiveGuard(() => dailyRewardGuardDb());
+
+/** The fail-closed payout-service gate, one instance shared by the four ops routes. */
+const dailyRewardOpsGate = requireInternalSecretFailClosed({
+  header: DAILY_REWARD_SECRET_HEADER,
+  envVar: DAILY_REWARD_SECRET_ENV,
+});
+
+/** A player route: the guard resolved the account; the shared core dispatches. */
+async function dailyRewardPlayerHandler(ctx: Ctx): Promise<void> {
+  return handleDailyRewardApi(ctx.req, ctx.res, ctxAccountId(ctx));
+}
+
+/**
+ * An ops route: the gate passed; the shared core re-checks the same secret and
+ * dispatches. It always handles a request whose path the router matched (the
+ * boolean is its prefix check, true for every registered ops path).
+ */
+async function dailyRewardOpsHandler(ctx: Ctx): Promise<void> {
+  await handleDailyRewardInternalApi(ctx.req, ctx.res);
+}
+
+// The route table. registry.ts spreads this into apiRoutes; the ops rows carry
+// surface 'internal' + meta.envelope 'admin' (the internal fail() envelope IS
+// the admin { success, data, error } shape; EnvelopeKind is a frozen
+// server/http/types.ts contract with no separate internal member).
+export const routes: RouteDef[] = [
+  {
+    method: 'GET',
+    path: '/api/daily-rewards',
+    surface: 'api',
+    middleware: [activeGuard],
+    handler: dailyRewardPlayerHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/daily-rewards/leaderboard',
+    surface: 'api',
+    middleware: [activeGuard],
+    handler: dailyRewardPlayerHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/daily-rewards/spin',
+    surface: 'api',
+    middleware: [activeGuard],
+    handler: dailyRewardPlayerHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/daily-rewards/history',
+    surface: 'api',
+    middleware: [activeGuard],
+    handler: dailyRewardPlayerHandler,
+  },
+  {
+    method: 'POST',
+    path: '/internal/daily-rewards/pending-payouts',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/internal/daily-rewards/payout-history',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/internal/daily-rewards/leaderboard',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/internal/daily-rewards/mark-payout',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+];

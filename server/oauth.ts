@@ -9,7 +9,7 @@
 // token in localStorage 'woc_session'): the page POSTs that token to approve, so
 // the flow rides the existing browser auth and passes the anti-bot login gates
 // without this code touching them. The approval POST requires a FULL session
-// token (a read token cannot authorize new read tokens — no escalation).
+// token (a read token cannot authorize new read tokens, no escalation).
 
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import type * as http from 'node:http';
@@ -21,6 +21,8 @@ import {
   revokeReadToken,
   saveToken,
 } from './db';
+import { logger } from './http/logger';
+import type { RouteDef, RouteMeta } from './http/types';
 import { json, readBinaryBody } from './http_util';
 import {
   approveDeviceCode,
@@ -184,12 +186,12 @@ export async function handleOAuth(
     if (req.method === 'POST' && path === '/oauth/device') return await approveDevice(req, res);
     oauthError(res, 404, 'not_found');
   } catch (err) {
-    console.error('oauth error:', err);
+    logger.error({ err }, 'oauth error');
     oauthError(res, 500, 'server_error');
   }
 }
 
-// GET /oauth/authorize — render the in-browser consent page.
+// GET /oauth/authorize: render the in-browser consent page.
 async function renderAuthorize(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const q = new URL(req.url ?? '/', 'http://localhost').searchParams;
   const clientId = q.get('client_id') ?? '';
@@ -225,7 +227,7 @@ async function renderAuthorize(req: http.IncomingMessage, res: http.ServerRespon
   );
 }
 
-// POST /oauth/authorize — the consent page approves, using the web session token.
+// POST /oauth/authorize: the consent page approves, using the web session token.
 async function approveAuthorize(
   req: http.IncomingMessage,
   res: http.ServerResponse,
@@ -268,7 +270,7 @@ async function approveAuthorize(
   json(res, 200, { redirect });
 }
 
-// POST /oauth/revoke — RFC 7009 token revocation. Deletes the presented token,
+// POST /oauth/revoke: RFC 7009 token revocation. Deletes the presented token,
 // restricted to scope='read' rows so it can never invalidate a full web session.
 // Always 200, even for an unknown/already-revoked token (RFC 7009 §2.2).
 async function revokeEndpoint(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
@@ -278,7 +280,7 @@ async function revokeEndpoint(req: http.IncomingMessage, res: http.ServerRespons
   json(res, 200, { ok: true });
 }
 
-// POST /oauth/token — exchange a code (PKCE) or poll a device code.
+// POST /oauth/token: exchange a code (PKCE) or poll a device code.
 async function tokenEndpoint(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const body = await readForm(req);
   const grant = body.grant_type ?? '';
@@ -343,7 +345,7 @@ async function issueReadToken(
   });
 }
 
-// POST /oauth/device_authorization — start the device flow.
+// POST /oauth/device_authorization: start the device flow.
 async function deviceAuthorization(
   req: http.IncomingMessage,
   res: http.ServerResponse,
@@ -376,7 +378,7 @@ async function deviceAuthorization(
   });
 }
 
-// POST /oauth/device — approve a device code by user_code (web session).
+// POST /oauth/device: approve a device code by user_code (web session).
 async function approveDevice(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const accountId = await fullSessionAccount(req);
   if (accountId === null) return oauthError(res, 401, 'access_denied', 'log in first');
@@ -485,7 +487,7 @@ function renderDevicePage(res: http.ServerResponse): void {
     var code=document.getElementById('code').value;
     fetch('/oauth/device',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:JSON.stringify({user_code:code})})
       .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,j:j}; }); })
-      .then(function(x){ document.getElementById('msg').textContent=x.ok?'Device approved — you can return to your device.':(x.j.error_description||x.j.error||'failed'); if(x.ok)document.getElementById('msg').style.color='#abd473'; })
+      .then(function(x){ document.getElementById('msg').textContent=x.ok?'Device approved. You can return to your device.':(x.j.error_description||x.j.error||'failed'); if(x.ok)document.getElementById('msg').style.color='#abd473'; })
       .catch(function(){ document.getElementById('msg').textContent='network error'; });
   };
 </script>
@@ -501,3 +503,75 @@ function htmlError(res: http.ServerResponse, status: number, title: string, deta
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(title)}</title>${PAGE_STYLE}</head>
 <body><main><h1>${escapeHtml(title)}</h1><p>${escapeHtml(detail)}</p></main></body></html>`);
 }
+
+// ── Route table ───────────────────────────
+// The 5 OAuth POST JSON endpoints as RouteDefs for the shared dispatcher.
+// PARITY-FIRST: each thin Ctx handler calls the EXISTING core function above
+// UNCHANGED (the cores self-read their body via readForm, resolve the web
+// session via fullSessionAccount in-handler, and write every status/body
+// themselves), so responses are byte-identical to the legacy handleOAuth
+// ladder. No requireAccount, no withBody, no schema: the consent POSTs
+// authenticate via the browser web session, NOT the API bearer scope gate.
+//
+// The GET consent/device HTML pages (renderAuthorize, renderDevicePage) stay
+// OFF this table on purpose: a GET to these paths resolves methodNotAllowed
+// and the dispatcher DELEGATES it to the legacy handleOAuth ladder, which
+// renders the HTML exactly as today. Same for HEAD and for any unknown /oauth
+// path (the legacy 404 { error: 'not_found' }).
+//
+// The one divergence is an UNEXPECTED handler throw (oauthBodyValidationRemap,
+// tests/server/http/known_deviations.ts): withErrors serializes it through
+// serializeOauth as 500 { error: 'server_error', error_description: ... } plus
+// an X-Request-Id header, where the legacy handleOAuth catch writes the bare
+// 500 { error: 'server_error' }. Same status, same RFC 6749 code; the
+// description field and header are additive.
+
+const OAUTH_META: RouteMeta = { envelope: 'oauth' };
+
+export const routes: RouteDef[] = [
+  {
+    method: 'POST',
+    path: '/oauth/authorize',
+    surface: 'oauth',
+    meta: OAUTH_META,
+    handler: async (ctx) => {
+      await approveAuthorize(ctx.req, ctx.res);
+    },
+  },
+  {
+    method: 'POST',
+    path: '/oauth/token',
+    surface: 'oauth',
+    meta: OAUTH_META,
+    handler: async (ctx) => {
+      await tokenEndpoint(ctx.req, ctx.res);
+    },
+  },
+  {
+    method: 'POST',
+    path: '/oauth/revoke',
+    surface: 'oauth',
+    meta: OAUTH_META,
+    handler: async (ctx) => {
+      await revokeEndpoint(ctx.req, ctx.res);
+    },
+  },
+  {
+    method: 'POST',
+    path: '/oauth/device_authorization',
+    surface: 'oauth',
+    meta: OAUTH_META,
+    handler: async (ctx) => {
+      await deviceAuthorization(ctx.req, ctx.res);
+    },
+  },
+  {
+    method: 'POST',
+    path: '/oauth/device',
+    surface: 'oauth',
+    meta: OAUTH_META,
+    handler: async (ctx) => {
+      await approveDevice(ctx.req, ctx.res);
+    },
+  },
+];

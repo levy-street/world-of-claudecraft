@@ -157,6 +157,24 @@ If a new column is added to an EXISTING table:
 
 - Seed data must be idempotent and contain no secrets or credentials.
 
+### Check 11 - Previous-Release Load Path / Mixed Fleets (CRITICAL)
+
+When the change adds a one-shot backfill or data migration, or retains a legacy row/artifact
+for rollback:
+- Read the PREVIOUSLY DEPLOYED release's load and migration path from git history
+  (`git show <prior-release-ref>:<file>`), not just the current tree. The dangerous old code in
+  a mixed fleet is often the previous release's own lazy migration, not its writers: a
+  claim-and-delete load path that adopts and DELETES a retained artifact destroys the rollback
+  story and duplicates partitioned data, strictly worse than a stale writer autosaving the old
+  key.
+- Verify any operator runbook or mixed-fleet caveat describes the ACTUAL old-code behavior;
+  flag every claim the git history contradicts, and require the runbook's verification queries
+  to cover each variant (including an artifact row that is NULL/missing, not only one that is
+  newer than the completion marker).
+- Merge semantics: a merge-by-key step that sums values and concatenates items conserves
+  VALUE, not row count. Do not demand a row-count post-merge assertion (it false-positives on
+  legitimate key merges); require value-conservation unit pins instead.
+
 ## Output Format
 
 Present findings in this exact format:
@@ -192,3 +210,11 @@ All schema and persistence safety checks passed.
 ```
 
 Always begin by listing what you reviewed and which tables / JSONB blobs are affected.
+
+## Delivering your report
+
+The review only counts once the report is DELIVERED. End with the complete report as your final
+message, never a status line or a promise to report later. If a SendMessage tool is available
+(it is injected when you run as a background teammate), ALSO send the full report (never a
+one-line summary) to `main` as your FINAL action; going idle without sending it is a failed
+review that costs the orchestrator a nudge round-trip.

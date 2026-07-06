@@ -736,6 +736,23 @@ export const zh_CN: EnTranslations = {
       "summaryMaster": "拾取设置：队长分配，分配者{name}，品质门槛{threshold}。",
       "summaryGroup": "拾取设置：小队拾取。"
     },
+    "corpseHarvest": {
+      "title": "采集",
+      "harvestButton": "采集",
+      "concentrateHint": "选择的部位越少，每个部位的品质越高。",
+      "alreadyHarvested": "这具尸体已经被采集过了。",
+      "componentAria": "采集{component}",
+      "components": {
+        "hide": "兽皮",
+        "fang": "尖牙",
+        "silk": "丝线",
+        "venomSac": "毒囊",
+        "gills": "鱼鳃",
+        "claw": "爪",
+        "horn": "角",
+        "tusk": "獠牙"
+      }
+    },
     "party": {
       "promoteLeader": "提升为队长",
       "inviteUsage": "邀请谁？用法：/invite <名称>。"
@@ -1032,6 +1049,18 @@ export const zh_CN: EnTranslations = {
         }
       }
     },
+    "crafting": {
+      "title": "制作",
+      "close": "关闭制作",
+      "craft": "制作",
+      "reagentsNeeded": "需要:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "尚无已知配方。",
+      "resultAria": "制作{name}",
+      "craftedToast": "已制作:{name}",
+      "insufficientMaterials": "你没有足够的材料。",
+      "unknownRecipe": "该配方不存在。"
+    },
     "devBadge": {
       "title": "开发者",
       "tiers": {
@@ -1169,6 +1198,101 @@ export const zh_CN: EnTranslations = {
     "social": {
       "lastSeen": "最后在线: {when}",
       "lastSeenNever": "从未"
+    },
+    "gathering": {
+      "title": "采集",
+      "mining": "采矿",
+      "logging": "伐木",
+      "herbalism": "草药学"
+    }
+  },
+  "apiError": {
+    "validation": {
+      "failed": "部分字段无效。请检查表单后重试。"
+    },
+    "json": {
+      "malformed": "无法读取该请求。请重试。"
+    },
+    "body": {
+      "too_large": "该请求过大。请减少数据后重试。",
+      "unsupported_media_type": "不支持的请求格式。"
+    },
+    "db": {
+      "conflict": "该更改与另一次更新发生冲突。请重试。"
+    },
+    "rate_limit": {
+      "exceeded": "请求过于频繁。请在 {seconds} 后重试。"
+    },
+    "internal": {
+      "error": "我们这边出了点问题。请重试。"
+    },
+    "auth": {
+      "token_missing": "你需要登录后才能执行此操作。",
+      "token_invalid": "你的会话已过期。请重新登录。",
+      "forbidden": "你没有执行此操作的权限。",
+      "invalid_credentials": "用户名或密码无效。",
+      "required": "尚未认证。",
+      "web_login_only": "只能从游戏客户端登录。",
+      "too_many_attempts": "尝试次数过多。请等待一分钟后重试。",
+      "too_many_failed_attempts": "尝试失败次数过多。请等待几分钟后再试。",
+      "current_password_incorrect": "当前密码不正确。",
+      "password_incorrect": "密码不正确。",
+      "verification_failed": "验证失败，请重试。"
+    },
+    "account": {
+      "username_invalid": "用户名必须为 3-24 个字符，并使用字母、数字或下划线。",
+      "username_not_allowed": "该用户名不可使用。",
+      "username_taken": "该用户名已被占用。",
+      "username_mismatch": "该用户名与您的账户不匹配。",
+      "password_too_short": "密码至少需要 6 个字符。",
+      "password_too_long": "新密码最多只能包含 128 个字符。",
+      "characters_online": "请先登出所有角色再进行注销。",
+      "deactivated": "此账户已注销。请联系管理员以恢复。",
+      "not_found": "未找到账户。"
+    },
+    "character": {
+      "name_invalid": "角色名称无效。请使用 2-16 个字母。",
+      "name_not_allowed": "该角色名称不可使用。",
+      "invalid_class": "职业无效。",
+      "limit_reached": "已达到角色数量上限。",
+      "name_taken": "该名称已被占用。",
+      "not_found": "未找到角色。",
+      "online": "角色当前在线。",
+      "rename_not_permitted": "不允许为此角色改名。",
+      "delete_confirm": "输入角色名称以确认删除。",
+      "already_in_world": "角色已在世界中。",
+      "taken_over": "你的角色已被另一个会话接管。",
+      "rename_required": "此角色必须先改名才能进入世界。"
+    },
+    "moderation": {
+      "suspended_until": "此账号被停用至 {date}。",
+      "suspended": "该账号已被暂停。",
+      "banned": "此账号已被封禁。",
+      "force_rename": "管理员要求你的一个角色进行改名。"
+    },
+    "email": {
+      "invalid": "请输入有效的邮箱地址。",
+      "unchanged": "这已经是你的邮箱地址了。"
+    },
+    "two_factor": {
+      "code_invalid": "验证码无效，请重试。",
+      "setup_required": "请先开始双重验证设置。",
+      "already_enabled": "双重验证已启用。",
+      "not_enabled": "双重验证未启用。"
+    },
+    "origin": {
+      "cross_site": "出于安全原因，请求已被拦截。"
+    },
+    "discord": {
+      "not_configured": "Discord 集成当前不可用。",
+      "expired": "该 Discord 登录已过期，请重新使用 Discord 登录。",
+      "already_linked": "该 Discord 账号已关联到另一个账号。",
+      "password_required": "取消关联 Discord 账号前请先设置密码。",
+      "unknown_swag": "该奖励不可用。",
+      "link_required": "请先关联你的 Discord 账号。",
+      "swag_claimed": "你已经领取过此奖励。",
+      "swag_tier": "达到更高段位即可领取。",
+      "swag_points": "积分不足。"
     }
   },
   "guide": {
@@ -1196,6 +1320,7 @@ export const zh_CN: EnTranslations = {
       "delves": "探秘",
       "reference": "参考",
       "controls": "操作键",
+      "settings": "设置和性能",
       "combat": "战斗",
       "talents": "天赋",
       "arena": "竞技场与 PvP",
@@ -1363,6 +1488,66 @@ export const zh_CN: EnTranslations = {
       "mobileBody": "在手机和平板上会自动出现触控操作:左侧是移动摇杆,在右侧任意位置拖动即可环顾四周,屏幕上还有用于使用技能和打开菜单的按钮。",
       "controllerHeading": "使用手柄",
       "controllerBody": "手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开任意窗口，即可调出用于操作菜单的屏幕指针。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角。"
+    },
+    "settingsPage": {
+      "heading": "设置和性能",
+      "intro": "把画面调到最美，或把帧数拉到最高。三套现成方案，外加每个图形选项的真实作用。",
+      "wherePath": "本页的一切都在游戏里：按 Esc，到图形、界面和性能监视器中查看。",
+      "fairnessTitle": "公平源自设计",
+      "fairnessBody": "这里没有任何选项会拿画面换战力。调低设置只会舍弃视觉上的修饰，绝不会砍掉你作战所需的信息：从“低”到“超高”，你的减益效果、施法条、队伍血量和伤害数字完全一致。用配置一般的机器游玩，绝不会吃亏。",
+      "loadoutsHeading": "三套现成方案",
+      "loadoutsIntro": "先从最像你设备的那套方案开始，然后每次只调一个选项，直到感觉合适为止。",
+      "recommended": "推荐",
+      "whyLabel": "推荐理由：",
+      "tagReload": "需重新加载",
+      "fpsTitle": "帧数优先",
+      "fpsTagline": "适合较老的笔记本、核显设备，以及用电池游玩的场合。",
+      "fpsWhy": "图形质量是总开关，渲染质量则是效果最猛的滑块：调到 70% 时，世界只需绘制大约一半的像素，而界面依旧清晰锐利。",
+      "balancedTitle": "均衡",
+      "balancedTagline": "大多数设备的最佳平衡点，也是我们的默认建议。",
+      "balancedWhy": "“中”档就有真实的阴影和完整的材质，“高”档再加上环境光遮蔽和泛光。只要低于“超高”，内置保护机制就会在激烈战斗掉帧时自动兜底，所以均衡方案不必时刻盯着，也能一直流畅。",
+      "visualsTitle": "极致画质",
+      "visualsTagline": "为高性能台式机准备的截图模式。",
+      "visualsWhy": "“超高”会以显示器支持的最高分辨率渲染，并启用最丰富的光照。它还会关闭内置保护机制，而且仅限桌面端：手机和应用端最高到“高”为止。",
+      "value50to70": "50% 到 70%",
+      "value90to100": "90% 到 100%",
+      "value100": "100%",
+      "valueHighOrMedium": "游戏 PC 选“高”，笔记本选“中”",
+      "valueOnOptional": "开启（可选）",
+      "howHeading": "这些选项如何生效",
+      "factDetectTitle": "游戏会先自动调校",
+      "factDetectBody": "首次启动时，游戏会检测你的设备并选好合适的档位：性能一般的手机是“低”，强力台式机则是“超高”。你自己做出的任何选择永远优先。",
+      "factReloadTitle": "两类选项",
+      "factReloadBody": "图形质量和“高级”下的各个选项要在重新加载后才会生效，需要时面板会提供“立即重新加载”按钮。其余选项在你改动的那一刻立即生效。",
+      "factGovernorTitle": "内置保护机制",
+      "factGovernorBody": "在“超高”以下的所有档位，大型战斗骤然吃紧时，游戏会悄悄暂时精简草地、特效和光照，随后再恢复原样。选择“超高”，就等于告诉游戏你宁可保留每一处细节。",
+      "advancedHeading": "“高级”预设：自由搭配",
+      "advancedBody": "“高级”以“高”档位为起点，额外解锁四个独立选项，让你把帧数花在真正看得出差别的地方：地形细节、植被密度、特效和光照，以及阴影质量。这些选项和图形质量一样，重新加载后才会生效。",
+      "advancedMixes": "两套人气搭配：把阴影质量保持在“高”、特效和光照调到“低”，画面干净利落、没有泛光，跑起来也轻快；或者反过来，保留泛光，让阴影更柔和。",
+      "tableHeading": "每个选项，逐一说明",
+      "colSetting": "选项",
+      "colDoes": "作用",
+      "colImpact": "FPS 影响",
+      "impactNone": "无",
+      "impactLight": "小",
+      "impactModerate": "中等",
+      "impactHeavy": "大",
+      "rowGraphicsQuality": "总开关。每调一档，分辨率、阴影、材质、植被和光照特效都会一起变化。这是单项改动里差别最大的一个。",
+      "rowRenderQuality": "以更低的内部分辨率绘制 3D 世界再放大呈现，界面保持锐利。对较弱的设备和高分辨率屏幕而言，这是见效最快、最猛的滑块。",
+      "rowFieldOfView": "决定屏幕能装下多大的世界：从拉近的 55 度到开阔的 100 度。纯属舒适度选择；视野越宽，绘制量略微增加。",
+      "rowBrightness": "调整场景曝光，偏暗或偏亮，纯看个人喜好。",
+      "rowWeather": "环境雨雪。纯氛围效果，关闭后在暴风雨天能省下一点性能。",
+      "rowBrowserEffects": "决定界面本身可以多华丽：玻璃模糊、辉光、菜单动画。“自动”会根据你的浏览器自行匹配；无论怎么选，3D 世界都不受影响。",
+      "rowTerrainDetail": "细腻混合的地表纹理，或更简洁、更省性能的地形外观，二选一。",
+      "rowFoliageDensity": "决定角色周围的草地长多远、长多密。",
+      "rowEffectsQuality": "控制泛光、环境光遮蔽，以及有多少火把和法术能投射真实光照。在“高级”各选项中，这一项省下的性能最多。",
+      "rowShadowQuality": "决定阴影的锐利程度。“低”仍保留阴影，只是边缘更柔和。",
+      "rowFrostedPanels": "在窗口背后加一层毛玻璃模糊。效果漂亮，但也正是性能较弱的浏览器最吃力的那类特效；想要经典的清爽外观就保持关闭。",
+      "rowReduceMotion": "移除界面动画，让窗口即刻显示。它首先是一项无障碍选项，顺带还有一点性能收益。",
+      "rowPerfOverlay": "在屏幕上实时显示 FPS、帧时间等数据。调校本页选项时先打开它，调完再隐藏。",
+      "tableFoot": "在找视距滑块或 FPS 上限？不用找了：可视距离已包含在各画质档位里，帧率则与你的显示器保持同步。",
+      "mobileTitle": "手机与平板",
+      "mobileBody": "移动端会替你多打理一些：游戏自动选择档位，把分辨率稍微压低以兼顾电量和发热，最高的几个档位也仅在桌面端开放。上面的方案依然适用，只是手机最高到“高”为止。"
     },
     "combat": {
       "intro": "战斗遵循经典 MMO 中熟悉的规则。你完全不必钻研这些就能玩得很好,这里只是介绍一下战斗大致的运作方式。",
@@ -2507,7 +2692,11 @@ export const zh_CN: EnTranslations = {
   },
   "download": {
     "title": "下载电脑版启动器",
-    "desc": "获取独立启动器，以获得更优化的性能和全屏游戏体验。"
+    "desc": "获取独立启动器，以获得更优化的性能和全屏游戏体验。",
+    "macCta": "下载 macOS 版",
+    "linuxCta": "下载 Linux 版",
+    "linuxHint": "AppImage 格式：赋予可执行权限后直接运行，无需安装。",
+    "windowsPending": "Windows 版本即将推出。"
   },
   "comingSoon": {
     "placeholder": "敬请期待...",
@@ -3347,6 +3536,7 @@ export const zh_CN: EnTranslations = {
     "rendererFailed": "无法启动渲染器：请尝试刷新。{error}",
     "enterTimeout": "无法进入世界。连接已超时。游戏服务器是否正在运行？",
     "connectionLost": "与服务器的连接已断开。",
+    "reconnecting": "连接已断开。正在重新连接...",
     "connectionRejected": "服务器关闭了连接。"
   },
   "errors": {
@@ -3379,9 +3569,12 @@ export const zh_CN: EnTranslations = {
       "webLoginOnly": "只能从游戏客户端登录。",
       "accountSuspended": "此账号被停用至 {date}。",
       "alreadyInWorld": "角色已在世界中。",
+      "accountSessionLimit": "此账号已有太多角色在世界中。",
       "takenOver": "你的角色已被另一个会话接管。",
       "renameBeforeEntering": "此角色必须先改名才能进入世界。",
-      "renameNotPermitted": "不允许为此角色改名。"
+      "renameNotPermitted": "不允许为此角色改名。",
+      "unsupportedMediaType": "不支持的请求格式。",
+      "crossSiteOrigin": "出于安全原因，请求已被拦截。"
     }
   },
   "desktop": {
@@ -5655,6 +5848,24 @@ export const zh_CN: EnTranslations = {
       "silverleaf_sickle": {
         "name": "银叶镰刀"
       },
+      "thorium_mining_pick": {
+        "name": "钍矿采矿镐"
+      },
+      "arcanite_mining_pick": {
+        "name": "秘法采矿镐"
+      },
+      "ashwood_axe": {
+        "name": "白蜡木斧"
+      },
+      "elderwood_axe": {
+        "name": "古木斧"
+      },
+      "goldleaf_sickle": {
+        "name": "金叶镰刀"
+      },
+      "sunpetal_sickle": {
+        "name": "阳瓣镰刀"
+      },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"
       },
@@ -7471,6 +7682,26 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败莫格"
+          }
+        }
+      },
+      "q_archetype_acceptance": {
+        "title": "属于你自己的技艺",
+        "text": "东溪的每一位匠人最终都会选定一门属于自己的技艺。用一件事证明自己吧，{playerName}，宣告你的道路。",
+        "completion": "你的道路已经选定；愿你走得稳当。",
+        "objectives": {
+          "0": {
+            "label": "击败森林之狼"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "弥补",
+        "text": "若要放下一门技艺、转投另一门，匠人必须先为放弃的道路做出弥补，{playerName}。",
+        "completion": "弥补已经完成；一条新的道路已向你敞开。",
+        "objectives": {
+          "0": {
+            "label": "击败森林之狼"
           }
         }
       },

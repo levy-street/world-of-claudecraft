@@ -2,8 +2,16 @@ import * as THREE from 'three';
 import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
+import { mechAssetsReady, preloadMechAssets } from './assets';
 import type { WeaponLayoutOverride } from './manifest';
+import {
+  appearanceSignature,
+  type PreviewAppearance,
+  previewAppearanceVisual,
+} from './preview_appearance';
 import { CharacterVisual } from './visual';
+
+export type { PreviewAppearance } from './preview_appearance';
 
 const PREVIEW_ANIM_STATE = {
   speed: 0,
@@ -16,6 +24,8 @@ const PREVIEW_ANIM_STATE = {
   sitting: false,
 };
 
+const LIVE_PREVIEW_X = 0;
+
 export class CharacterPreview {
   private container: HTMLElement;
   private canvas: HTMLCanvasElement;
@@ -25,6 +35,9 @@ export class CharacterPreview {
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
   private currentSkin = 0;
+  // Identity of the appearance last requested via setAppearance, so an async mech
+  // re-apply can bail out if a newer selection superseded it.
+  private appearanceSig: string | null = null;
   private clock = new THREE.Clock();
   private animationFrameId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -62,8 +75,8 @@ export class CharacterPreview {
         ? this.container.clientWidth / this.container.clientHeight
         : 1;
     this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-    this.camera.position.set(-0.15, 1.45, 5.1);
-    this.camera.lookAt(new THREE.Vector3(-0.15, 1.3, 0));
+    this.camera.position.set(LIVE_PREVIEW_X, 1.45, 5.1);
+    this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));
 
     // 4. Initialize Character Group
     this.characterGroup = new THREE.Group();
@@ -97,8 +110,33 @@ export class CharacterPreview {
    *  freshly created character in-world). */
   setClass(cls: PlayerClass, weaponItemId?: string | null): void {
     if (this.destroyed) return;
+    // A class-driven selection (create/offline picker, or a panel switch) supersedes
+    // any pending async mech re-apply, so invalidate the tracked appearance.
+    this.appearanceSig = null;
     const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
     this.setVisualKey(`player_${cls}`, weapon);
+  }
+
+  /** Show a character's real, in-world appearance: the class rig or the Combat Mech
+   *  cosmetic body, its appearance skin, and the actually-equipped mainhand (no
+   *  weapon when unarmed). Mirrors createCharacterVisual so the char-select roster
+   *  and the character sheet match the world. The mech's cosmetic assets load
+   *  lazily; while they are not ready this shows the class body and re-applies once
+   *  loaded, unless a newer selection has superseded this one. */
+  setAppearance(a: PreviewAppearance): void {
+    if (this.destroyed) return;
+    this.currentSkin = a.skin;
+    const sig = appearanceSignature(a);
+    this.appearanceSig = sig;
+    if (a.skinCatalog === 'mech' && !mechAssetsReady()) {
+      this.setVisualKey(`player_${a.cls}`, a.mainhandItemId ?? null);
+      void preloadMechAssets().then(() => {
+        if (!this.destroyed && this.appearanceSig === sig) this.setAppearance(a);
+      });
+      return;
+    }
+    const v = previewAppearanceVisual(a);
+    this.setVisualKey(v.visualKey, v.weaponItemId, v.weaponOverride);
   }
 
   /** Set the active model by raw visual key (e.g. `player_mech` for the cosmetic
@@ -139,6 +177,9 @@ export class CharacterPreview {
   /** Swap the previewed skin (alternate body texture); persists across setClass. */
   setSkin(skinIndex: number): void {
     if (this.destroyed) return;
+    // Same invalidation as setClass: a standalone skin change (dataset fallback,
+    // char-create skin hover) is not the appearance a pending mech re-apply targets.
+    this.appearanceSig = null;
     this.currentSkin = skinIndex;
     this.currentVisual?.setSkin(skinIndex);
   }
@@ -312,7 +353,7 @@ export class CharacterPreview {
     this.renderer.setSize(prevSize.x, prevSize.y, false);
     this.camera.aspect = prevAspect;
     this.camera.position.copy(prevPos);
-    this.camera.lookAt(new THREE.Vector3(-0.15, 1.3, 0));
+    this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));
     this.camera.updateProjectionMatrix();
     this.characterGroup.rotation.y = prevRotY;
     this.renderer.render(this.scene, this.camera);

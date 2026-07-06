@@ -155,6 +155,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.controls.intro',
   },
   {
+    id: 'settings',
+    sub: 'reference/settings',
+    navKey: 'guide.nav.settings',
+    group: 'reference',
+    descKey: 'guide.settingsPage.intro',
+  },
+  {
     id: 'combat',
     sub: 'reference/combat',
     navKey: 'guide.nav.combat',

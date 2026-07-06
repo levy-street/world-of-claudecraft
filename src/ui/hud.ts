@@ -97,6 +97,7 @@ import {
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
+import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
   type DailyRewardStatus,
   type DelveRunInfo,
@@ -164,6 +165,10 @@ import {
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
 import { formatMinimapCoords } from './coords';
+import { corpseHarvestView } from './corpse_harvest_view';
+import { renderCorpseHarvestPicker } from './corpse_harvest_window';
+import { buildCraftingView } from './crafting_view';
+import { renderCraftingWindow } from './crafting_window';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { DelveMapPainter } from './delve_map_painter';
 import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
@@ -372,6 +377,37 @@ export interface OptionsHooks {
   gamepad: GamepadBindingsHooks;
 }
 
+export interface BehaviorHooks {
+  onTalkInteraction(event: HudTalkInteractionEvent): void;
+  onMerchantInteraction(event: HudMerchantInteractionEvent): void;
+}
+
+export interface HudTalkInteractionEvent {
+  kind: 'open' | 'option';
+  npcId: string;
+  npcEntityId?: number;
+  optionKey?: string;
+  questId?: string;
+  questState?: string;
+  questCount?: number;
+  hasVendor?: boolean;
+  hasMarket?: boolean;
+  source?: string;
+}
+
+export interface HudMerchantInteractionEvent {
+  kind: 'open' | 'option';
+  merchantType: 'vendor' | 'market';
+  vendorId?: string;
+  vendorEntityId?: number;
+  optionKey?: string;
+  itemId?: string;
+  stockCount?: number;
+  buybackCount?: number;
+  proceeds?: number;
+  source?: string;
+}
+
 export interface ThemeHooks {
   get(): ThemeState;
   setPreset(id: PresetId): void;
@@ -444,10 +480,15 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
   dead: false,
   outOfRange: false,
 };
-const trackMetaPixel = (eventName: string, data?: Record<string, unknown>): void => {
+const trackMetaPixel = (
+  eventName: string,
+  data?: Record<string, unknown>,
+  options?: Record<string, unknown>,
+): void => {
   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
   if (typeof fbq !== 'function') return;
-  fbq('trackCustom', eventName, data ?? {});
+  if (options) fbq('trackCustom', eventName, data ?? {}, options);
+  else fbq('trackCustom', eventName, data ?? {});
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
@@ -673,6 +714,9 @@ function mobVoiceFamily(templateId: string): string | null {
 
 /** Sustained cast-loop clip for an ability's school, or null (physical/unknown). */
 function castKeyForAbility(ability: string): string | null {
+  // Per-ability custom cast loop overrides (a player-provided clip that fits the
+  // spell better than its school default). Loops for the whole cast, any rank.
+  if (ability === 'lightning_bolt') return 'cast_lightning_bolt';
   const school = ABILITIES[ability]?.school;
   return school && SFX_CAST_SCHOOLS.has(school) ? `cast_${school}` : null;
 }
@@ -756,6 +800,7 @@ export class Hud {
   private mobileHotbarDrag: MobileHotbarDrag | null = null;
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
+  private behaviorHooks: BehaviorHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
   // Soft swear terms from the server (online only), masked in chat when the
@@ -1945,6 +1990,9 @@ export class Hud {
         break;
       case 'vendor-window':
         this.closeVendor();
+        break;
+      case 'crafting-window':
+        this.closeCrafting();
         break;
       case 'loot-window':
         this.closeLoot();
@@ -5773,7 +5821,16 @@ export class Hud {
     const i18n: RaidLockoutI18n = {
       title: t('hudChrome.raidLockout.title'),
       allReady: t('hudChrome.raidLockout.allReady'),
-      raidName: (id) => dungeonDisplayName(id),
+      // A looted world boss shows in the raid-lockout timer under a world-boss lockout id
+      // (see markWorldBossLooted in src/sim/world_boss.ts). worldBossIdFromLockout keeps
+      // the prefix convention in one place: it returns the boss mob id (localize as a mob
+      // name) or null for an ordinary dungeon/raid id.
+      raidName: (id) => {
+        const bossId = worldBossIdFromLockout(id);
+        return bossId !== null
+          ? tEntity({ kind: 'mob', id: bossId, field: 'name' })
+          : dungeonDisplayName(id);
+      },
       duration: (ms) => this.formatLockoutDuration(ms),
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);
@@ -7268,7 +7325,14 @@ export class Hud {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
-          if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });
+          if (ev.level === 5) {
+            const characterId = (this.sim as unknown as { characterId?: number }).characterId;
+            trackMetaPixel(
+              'ReachedLevel5',
+              { level: ev.level },
+              characterId ? { eventID: `lvl5_${characterId}` } : undefined,
+            );
+          }
           // First talent point (and spec) unlock — nudge the player to the panel.
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
             this.showBanner(t('game.talents.unlockBanner'));
@@ -7316,6 +7380,25 @@ export class Hud {
             audio.coin();
           else audio.lootItem();
           if ($('#bags').style.display !== 'none') this.renderBags();
+          break;
+        }
+        case 'craftResult': {
+          if (ev.ok && ev.itemId) {
+            const item = ITEMS[ev.itemId];
+            const name = item ? itemDisplayName(item) : ev.itemId;
+            this.log(t('hudChrome.crafting.craftedToast', { name }), '#7fdc4f');
+            audio.lootItem();
+          } else if (!ev.ok) {
+            this.log(
+              t(
+                ev.reason === 'unknown_recipe'
+                  ? 'hudChrome.crafting.unknownRecipe'
+                  : 'hudChrome.crafting.insufficientMaterials',
+              ),
+              '#ff6b6b',
+            );
+          }
+          if ($('#crafting-window').style.display === 'block') this.renderCrafting();
           break;
         }
         case 'lootRoll': {
@@ -8899,6 +8982,16 @@ export class Hud {
     const npc = this.sim.entities.get(npcId);
     if (npc?.kind !== 'npc') return;
     this.questDialogOpenedAtMs = performance.now();
+    const def = NPCS[npc.templateId];
+    this.behaviorHooks?.onTalkInteraction({
+      kind: 'open',
+      npcId: npc.templateId,
+      npcEntityId: npc.id,
+      questCount: npc.questIds.length,
+      hasVendor: npc.vendorItems.length > 0,
+      hasMarket: !!def?.market,
+      source: 'quest_dialog',
+    });
     if ($('#quest-dialog').style.display !== 'block')
       this.questDialogTrap = this.focusManager.open({ root: () => $('#quest-dialog') });
     this.closeOtherWindows('#quest-dialog');
@@ -8974,30 +9067,81 @@ export class Hud {
     }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
-      item.addEventListener('click', () =>
-        this.renderQuestDetail(npc, (item as HTMLElement).dataset.quest ?? ''),
-      );
+      item.addEventListener('click', () => {
+        const questId = (item as HTMLElement).dataset.quest ?? '';
+        const questState = this.sim.questState(questId);
+        this.behaviorHooks?.onTalkInteraction({
+          kind: 'option',
+          npcId: npc.templateId,
+          npcEntityId: npc.id,
+          optionKey: questState === 'ready' ? 'quest_turnin_detail' : 'quest_offer_detail',
+          questId,
+          questState,
+          source: 'quest_dialog',
+        });
+        this.renderQuestDetail(npc, questId);
+      });
     });
     el.querySelectorAll('[data-discuss]').forEach((item) => {
       item.addEventListener('click', () => {
+        const questId = (item as HTMLElement).dataset.discuss ?? '';
+        this.behaviorHooks?.onTalkInteraction({
+          kind: 'option',
+          npcId: npc.templateId,
+          npcEntityId: npc.id,
+          optionKey: 'quest_discuss',
+          questId,
+          questState: this.sim.questState(questId),
+          source: 'quest_dialog',
+        });
         this.sim.targetEntity(npc.id);
         this.sim.interact();
         (item as HTMLButtonElement).disabled = true;
       });
     });
     el.querySelector('[data-vendor]')?.addEventListener('click', () => {
+      this.behaviorHooks?.onTalkInteraction({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'vendor',
+        source: 'quest_dialog',
+      });
       this.closeQuestDialog(false);
       this.openVendor(npc.id);
     });
     el.querySelector('[data-market]')?.addEventListener('click', () => {
+      this.behaviorHooks?.onTalkInteraction({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'world_market',
+        source: 'quest_dialog',
+      });
       this.closeQuestDialog(false);
       this.openMarket();
     });
     el.querySelector('[data-delve-board]')?.addEventListener('click', () => {
+      this.behaviorHooks?.onTalkInteraction({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'delve_board',
+        source: 'quest_dialog',
+      });
       this.closeQuestDialog(false);
       this.openDelveBoard(npc.id);
     });
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
+    el.querySelector('[data-close]')?.addEventListener('click', () => {
+      this.behaviorHooks?.onTalkInteraction({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'close',
+        source: 'quest_dialog',
+      });
+      this.closeQuestDialog();
+    });
     el.style.display = 'block';
     this.questDialogTrap?.focusFirst();
   }
@@ -9048,6 +9192,15 @@ export class Hud {
       btn.type = 'button';
       btn.textContent = t('questUi.dialog.accept');
       btn.addEventListener('click', () => {
+        this.behaviorHooks?.onTalkInteraction({
+          kind: 'option',
+          npcId: npc.templateId,
+          npcEntityId: npc.id,
+          optionKey: 'quest_accept',
+          questId,
+          questState: state,
+          source: 'quest_detail',
+        });
         this.sim.acceptQuest(questId);
         this.sim.reportTelemetry('quest_accept', {
           timeMs: performance.now() - this.questDialogOpenedAtMs,
@@ -9061,6 +9214,15 @@ export class Hud {
       btn.type = 'button';
       btn.textContent = t('questUi.dialog.completeQuest');
       btn.addEventListener('click', () => {
+        this.behaviorHooks?.onTalkInteraction({
+          kind: 'option',
+          npcId: npc.templateId,
+          npcEntityId: npc.id,
+          optionKey: 'quest_complete',
+          questId,
+          questState: state,
+          source: 'quest_detail',
+        });
         this.sim.turnInQuest(questId);
         this.sim.reportTelemetry('quest_turnin', {
           timeMs: performance.now() - this.questDialogOpenedAtMs,
@@ -9073,9 +9235,31 @@ export class Hud {
     back.className = 'btn';
     back.type = 'button';
     back.textContent = t('questUi.dialog.back');
-    back.addEventListener('click', () => this.renderGossip(npc));
+    back.addEventListener('click', () => {
+      this.behaviorHooks?.onTalkInteraction({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'back',
+        questId,
+        questState: state,
+        source: 'quest_detail',
+      });
+      this.renderGossip(npc);
+    });
     el.appendChild(back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
+    el.querySelector('[data-close]')?.addEventListener('click', () => {
+      this.behaviorHooks?.onTalkInteraction({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'close_detail',
+        questId,
+        questState: state,
+        source: 'quest_detail',
+      });
+      this.closeQuestDialog();
+    });
     el.style.display = 'block';
     this.questDialogTrap?.focusFirst();
   }
@@ -9462,17 +9646,20 @@ export class Hud {
 
   openLoot(mobId: number, screenX: number, screenY: number): void {
     const mob = this.sim.entities.get(mobId);
-    if (!mob?.loot) return;
-    const visibleItems = mob.loot.items.filter(
-      (s) => !s.personalFor || s.personalFor.includes(this.sim.playerId),
-    );
-    if (mob.loot.copper <= 0 && visibleItems.length === 0) return;
+    if (!mob) return;
+    const componentTags = MOBS[mob.templateId]?.componentTags;
+    const harvestable = !!componentTags?.length && mob.harvestClaimedBy === null;
+    const visibleItems = mob.loot
+      ? mob.loot.items.filter((s) => !s.personalFor || s.personalFor.includes(this.sim.playerId))
+      : [];
+    const hasLoot = !!mob.loot && (mob.loot.copper > 0 || visibleItems.length > 0);
+    if (!hasLoot && !harvestable) return;
     this.closeOtherWindows('#loot-window');
     this.openLootMobId = mobId;
     this.openLootChestId = null;
     const el = $('#loot-window');
     let html = `<div class="panel-title"><span>${esc(entityDisplayName(mob))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
-    if (mob.loot.copper > 0) {
+    if (mob.loot && mob.loot.copper > 0) {
       html += `<div class="loot-item"><img class="item-icon q-common" src="${iconDataUrl('item', 'coin_gold')}" alt="" draggable="false"><span>${this.moneyHtml(mob.loot.copper)}</span></div>`;
     }
     for (const s of visibleItems) {
@@ -9484,14 +9671,24 @@ export class Hud {
       const itemId = (row as HTMLElement).dataset.item ?? '';
       this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
     });
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.textContent = t('itemUi.loot.takeAll');
-    btn.addEventListener('click', () => {
-      this.sim.lootCorpse(mobId);
-      this.closeLoot();
-    });
-    el.appendChild(btn);
+    if (hasLoot) {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.textContent = t('itemUi.loot.takeAll');
+      btn.addEventListener('click', () => {
+        this.sim.lootCorpse(mobId);
+        this.closeLoot();
+      });
+      el.appendChild(btn);
+    }
+    if (harvestable && componentTags) {
+      renderCorpseHarvestPicker(el, corpseHarvestView(componentTags, new Set()), {
+        onHarvest: (chosen) => {
+          this.sim.harvestCorpse(mobId, chosen);
+          this.closeLoot();
+        },
+      });
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeLoot());
     this.placePopupAt(el, screenX - 115, screenY - 30, 260, 280, 10, 10);
     el.style.transform = 'none'; // loot pops at the cursor, not the centred slot
@@ -9512,6 +9709,16 @@ export class Hud {
   openVendor(npcId: number): void {
     this.closeOtherWindows(['#vendor-window', '#bags']);
     this.openVendorNpcId = npcId;
+    const npc = this.sim.entities.get(npcId);
+    this.behaviorHooks?.onMerchantInteraction({
+      kind: 'open',
+      merchantType: 'vendor',
+      vendorId: npc?.templateId,
+      vendorEntityId: npcId,
+      stockCount: npc?.kind === 'npc' ? npc.vendorItems.length : undefined,
+      buybackCount: this.sim.vendorBuyback.length,
+      source: 'npc',
+    });
     document.body.classList.add('vendor-open');
     this.renderVendor();
     this.renderBags();
@@ -9541,6 +9748,20 @@ export class Hud {
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.renderVendor();
     };
+    const trackMerchantOption = (
+      optionKey: string,
+      extra: Partial<HudMerchantInteractionEvent> = {},
+    ) => {
+      this.behaviorHooks?.onMerchantInteraction({
+        kind: 'option',
+        merchantType: 'vendor',
+        vendorId: npc.kind === 'npc' ? npc.templateId : undefined,
+        vendorEntityId: npc.id,
+        optionKey,
+        source: 'vendor_window',
+        ...extra,
+      });
+    };
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
@@ -9548,10 +9769,22 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onBuy: (itemId) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId)),
-        onBuyBack: (itemId) => buyAndRefresh(() => this.sim.buyBackItem(itemId)),
-        onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
-        onClose: () => this.closeVendor(),
+        onBuy: (itemId) => {
+          trackMerchantOption('buy', { itemId });
+          buyAndRefresh(() => this.sim.buyItem(npc.id, itemId));
+        },
+        onBuyBack: (itemId) => {
+          trackMerchantOption('buyback', { itemId });
+          buyAndRefresh(() => this.sim.buyBackItem(itemId));
+        },
+        onSellJunk: () => {
+          trackMerchantOption('sell_junk', { proceeds: junkProceeds });
+          buyAndRefresh(() => this.sim.sellAllJunk());
+        },
+        onClose: () => {
+          trackMerchantOption('close');
+          this.closeVendor();
+        },
         sellJunk: {
           enabled: junk.length > 0,
           proceeds: junkProceeds,
@@ -9586,10 +9819,59 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
+  // Crafting (#1127): a minimal common-tier crafting window. Anywhere,
+  // anytime (no vendor/NPC gate): lists every known recipe with a Craft
+  // button enabled only when the player holds every required reagent.
+  // -------------------------------------------------------------------------
+
+  toggleCrafting(): void {
+    if ($('#crafting-window').style.display === 'block') {
+      this.closeCrafting();
+      return;
+    }
+    this.openCrafting();
+  }
+
+  openCrafting(): void {
+    this.closeOtherWindows('#crafting-window');
+    this.renderCrafting();
+  }
+
+  private renderCrafting(): void {
+    renderCraftingWindow(
+      $('#crafting-window'),
+      buildCraftingView(this.sim.recipeList, this.sim.inventory, ITEMS),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onCraft: (recipeId) => {
+          this.sim.craftItem(recipeId);
+          this.renderCrafting();
+          if ($('#bags').style.display !== 'none') this.renderBags();
+        },
+        onClose: () => this.closeCrafting(),
+      },
+    );
+  }
+
+  closeCrafting(): void {
+    $('#crafting-window').style.display = 'none';
+    this.hideTooltip();
+  }
+
+  // -------------------------------------------------------------------------
   // The World Market — the Merchant's auction house
   // -------------------------------------------------------------------------
 
   openMarket(): void {
+    const npc = this.nearbyMarketNpc();
+    this.behaviorHooks?.onMerchantInteraction({
+      kind: 'open',
+      merchantType: 'market',
+      vendorId: npc?.templateId ?? 'world_market',
+      vendorEntityId: npc?.id,
+      source: npc ? 'npc' : 'direct',
+    });
     this.marketWindow.open();
   }
 
@@ -12071,6 +12353,10 @@ export class Hud {
 
   attachOptions(hooks: OptionsHooks): void {
     this.optionsHooks = hooks;
+  }
+
+  attachBehavior(hooks: BehaviorHooks): void {
+    this.behaviorHooks = hooks;
   }
 
   attachReporting(hooks: ReportHooks): void {

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
-import { terrainHeight, waterLevel } from '../sim/world';
+import { terrainHeight, waterLevel, waterLevelAt } from '../sim/world';
 import { GFX } from './gfx';
 
 // Ambient leaping fish — a RENDER-ONLY decoration, no sim/IWorld/server state.
@@ -65,7 +65,9 @@ export function fishLeapPose(
 }
 
 // PURE (unit-tested): is (x, z) deep, in-bounds open water fit for a leap?
-// `depthAt` returns waterLevel() - terrainHeight at that spot (negative on land).
+// `depthAt` returns waterLevelAt() - terrainHeight at that spot (negative on
+// land, and always negative outside every declared lake since waterLevelAt()
+// is -Infinity there, so a dry sunken feature never gets fish).
 export function isLeapableWater(
   x: number,
   z: number,
@@ -137,7 +139,7 @@ export function buildFish(seed: number): FishView {
     side: THREE.DoubleSide,
   });
 
-  const depthAt = (x: number, z: number): number => waterLevel() - terrainHeight(x, z, seed);
+  const depthAt = (x: number, z: number): number => waterLevelAt(x, z) - terrainHeight(x, z, seed);
 
   const fish: Fish[] = [];
   for (let i = 0; i < count; i++) {

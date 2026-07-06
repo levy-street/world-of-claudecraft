@@ -425,6 +425,18 @@ export function formatNumber(
   return numberFormatFor(languageTag(lang), options).format(value);
 }
 
+// A localized "N seconds" duration phrase (the API rate-limit error renders a
+// server-supplied retry delay this way; the server sends the raw seconds and never
+// localizes). Uses Intl's unit style so each locale's plural rules apply, including
+// the Slavic 3-form split; shares the cached NumberFormat pool with formatNumber.
+export function formatDuration(seconds: number, lang: SupportedLanguage = currentLanguage): string {
+  return numberFormatFor(languageTag(lang), {
+    style: 'unit',
+    unit: 'second',
+    unitDisplay: 'long',
+  }).format(seconds);
+}
+
 export function formatDateTime(
   value: Date | number,
   options?: Intl.DateTimeFormatOptions,

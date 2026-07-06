@@ -344,7 +344,13 @@ export function castAbility(
       if (eff.type === 'polymorph') {
         if (target.kind === 'mob') {
           const fam = MOBS[target.templateId]?.family;
-          if (fam === 'undead' || target.templateId === 'gorrak') {
+          // Undead/gorrak are lore-exempt; cc-immune mobs (raid bosses) reject it here so
+          // the cast never reaches the effect's sheep full-heal side effect.
+          if (
+            fam === 'undead' ||
+            target.templateId === 'gorrak' ||
+            MOBS[target.templateId]?.ccImmune
+          ) {
             ctx.error(p.id, 'This creature cannot be polymorphed.');
             return;
           }
@@ -718,7 +724,9 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       sourceId: p.id,
       targetId: target.id,
       school: ability.school,
-      fx: 'projectile',
+      // A spell may override the flying-bolt visual (e.g. Lightning Bolt draws a
+      // jagged electric strike); the projectile MECHANIC below is unchanged.
+      fx: ability.projectileFx ?? 'projectile',
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the
     // target (projectile_travel), not this tick. A target that dies before impact

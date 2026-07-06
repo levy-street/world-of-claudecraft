@@ -9,8 +9,9 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 23 domain facets (each IWorld member assigned exactly once; 159
-// total). One interface per file under ./world_api/; aux types travel with their
+// FACET MAP: the domain facets (each IWorld member assigned exactly once; the
+// authoritative member COUNT lives in the pinned gates below, not this prose).
+// One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
 //   entity_roster.ts    IWorldEntityRoster   cfg/entities/player/moveInput/realm reads
@@ -35,16 +36,19 @@
 //   delves.ts           IWorldDelves         delve runs, lockpick, companion
 //   daily_rewards.ts    IWorldDailyRewards   daily WOC-holder rewards
 //   telemetry.ts        IWorldTelemetry      fire-and-forget metrics sink
-//   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (stub, #1164)
+//   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (#1164; node
+//                                            harvest read + action landed in #1121; recipe
+//                                            content + basic crafting action landed in #1127)
 //
-// THREE GATES pin this seam (run before any facet edit):
+// THREE GATES pin this seam (run before any facet edit; the literal counts are
+// pinned THERE and re-stale here, so this prose stays count-free):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
-//                                          ALL_DELTA_KEYS (25) + TERSE_TO_IWORLD mapping.
+//                                          ALL_DELTA_KEYS + TERSE_TO_IWORLD mapping.
 //   tests/command_schema.test.ts   (W0b)  COMMAND_NAMES universe; ClientWorld send-set
-//                                          subset-of dispatch-set; DISPATCH_ONLY (7).
-//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (159) present + same-kind on
+//                                          subset-of dispatch-set; DISPATCH_ONLY.
+//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS present + same-kind on
 //                                          Sim + ClientWorld; aggregate == disjoint
-//                                          union of the 22 facets.
+//                                          union of the facets.
 // ---------------------------------------------------------------------------
 
 import type { IWorldChat } from './world_api/chat';
@@ -113,7 +117,7 @@ export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
-export type { PlayerProfessionsView } from './world_api/professions';
+export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
@@ -191,6 +195,7 @@ export const COMMAND_NAMES = [
   'stopattack',
   'interact',
   'loot',
+  'harvestCorpse',
   'lootRoll',
   'pickup',
   'accept',
@@ -205,6 +210,8 @@ export const COMMAND_NAMES = [
   'sell',
   'buyback',
   'sell_all_junk',
+  'harvest_node',
+  'craft_item',
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',

@@ -170,12 +170,12 @@ export function spawnDrownedLitanyRite(
 /** Lock in the chosen difficulty: generate the seeded sequence and start playback.
  * Shared per run (the first chooser commits it); returns false if not awaiting. */
 export function chooseDrownedLitanyRiteIntensity(
-  ctx: SimContext,
+  _ctx: SimContext,
   run: DelveRun,
   intensity: RiteIntensity,
 ): boolean {
   const st = run.drownedLitanyRite;
-  if (!st || !st.awaitingChoice) return false;
+  if (!st?.awaitingChoice) return false;
   // Reject unknown intensities outright (riteCeiling would crash on a raw
   // string later); every caller validates, this is the shared backstop.
   // Object.hasOwn so Object.prototype keys ('toString', 'constructor') cannot
@@ -239,7 +239,16 @@ function openDrownedReliquary(
   grantRiteBonus(ctx, run, tier);
   openDelveSurfaceExit(ctx, run);
   for (const pid of members) {
-    ctx.emit({ type: 'delveChestLoot', chestId: st.reliquaryId, items: partyLoot[pid], pid });
+    ctx.emit({
+      type: 'delveChestLoot',
+      chestId: st.reliquaryId,
+      delveId: run.delveId,
+      tierId: run.tierId,
+      lootTier: tier,
+      bountiful: isCoffer,
+      items: partyLoot[pid],
+      pid,
+    });
   }
   emitPartyLog(ctx, run, 'The Drowned Reliquary opens.', '#8cf');
 }

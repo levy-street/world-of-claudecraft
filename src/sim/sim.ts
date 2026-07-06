@@ -87,6 +87,7 @@ import {
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
+  COMMON_RECIPES,
   DEEPFEN_SHALLOWS_LAKE,
   DELVE_COMPANIONS,
   DELVE_LIST,
@@ -185,11 +186,26 @@ import {
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import {
+  type ArchetypeState,
+  acceptArchetypeQuest as acceptArchetypeQuestImpl,
+  advanceAmendsProgress as advanceAmendsProgressImpl,
+  archetypeStateFor,
+  emptyArchetypeState,
+  normalizeArchetypeState,
+  requiredAmendsProgress,
+  switchArchetype as switchArchetypeImpl,
+} from './professions/archetype';
+import { type CraftResult, craftItem as craftItemImpl } from './professions/crafting';
+import {
   drainGatheringGrants,
   emptyGatheringProficiency,
   gatheringSkillsView,
+  gatherNodeById,
+  harvestNode as harvestNodeImpl,
+  isNodeHarvestableBy,
   normalizeGatheringProficiency,
 } from './professions/gathering';
+import type { ProfessionRecipeRecord as RecipeDef } from './professions/types';
 import {
   craftSkillsFor,
   emptyCraftSkills,
@@ -224,10 +240,9 @@ import {
   spawnOverworldSpiritHealers,
 } from './spirit';
 import {
-  emptyWorldBossDaily,
   rollWorldBossLoot as rollWorldBossLootImpl,
+  scaleWorldBossHp,
   WORLD_BOSSES,
-  type WorldBossDaily,
   type WorldBossDef,
 } from './world_boss';
 
@@ -358,6 +373,7 @@ import {
   terrainDownhill,
   terrainSteepnessAt,
   waterLevel,
+  waterLevelAt,
 } from './world';
 
 // TRIVIAL_LEVEL_GAP moved to mob/targeting.ts (used only by isTrivialTo).
@@ -489,9 +505,11 @@ const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
 };
 // PACK_FRENZY_AURA_ID moved to mob/lifecycle.ts (M4; used only by frenzyPackmates).
 // BLOOD_FRENZY_AURA_ID moved to combat/damage.ts (C1; used only by maybeFrenzyOnHit).
-// Body bobs just below the water line (a function: custom maps move the water).
-function swimSurfaceY(): number {
-  return waterLevel() - 0.75;
+// Body bobs just below the water line at this location (terrain/feature-aware:
+// -Infinity outside a declared lake, so this is never called off a waterline
+// that doesn't exist there).
+function swimSurfaceY(x: number, z: number): number {
+  return waterLevelAt(x, z) - 0.75;
 }
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const SWIM_SPEED_MULT = 0.65;
@@ -730,6 +748,17 @@ export interface PlayerMeta {
   // Grants queued by the `/dev gather` cheat, drained once per player per tick
   // (see drainGatheringGrants). Session-only, never persisted.
   pendingGatherGrants: { professionId: GatheringProfessionId; amount: number }[];
+  // Per-player, per-node gather-node respawn readiness (#1121): nodeId ->
+  // sim.time (seconds) at or after which THIS player may harvest that node
+  // again. Absent means never harvested (always ready). Session-only, never
+  // persisted, and never shared across players: see
+  // src/sim/professions/gathering.ts (isNodeHarvestableBy/resolveHarvest).
+  nodeHarvestReadyAt: Record<string, number>;
+  // Outcome of this player's most recent craftItem command (#1127). Session-only,
+  // never persisted: the IWorld craft-result surface for the client to render a
+  // toast/log line off, without deciding the outcome itself. Null until the
+  // player's first craft attempt.
+  lastCraftResult: CraftResult | null;
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -782,6 +811,11 @@ export interface PlayerMeta {
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
+  // Session-only World Market browse filter. The market is capped at
+  // MARKET_WIRE_LIMIT listings per snapshot to bound wire cost, so this
+  // server-side substring filter (matched against item names) is how a player
+  // reaches goods past the cap. Never persisted, resets on login.
+  marketFilter: string;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
@@ -789,16 +823,18 @@ export interface PlayerMeta {
   // One-time Ravenpost welcome letter sent (persisted in CharacterState, so
   // existing characters get the service announcement exactly once).
   mailWelcomed: boolean;
+  // Active-archetype state and quest-gated switching (#1129, superseded scope: see
+  // professions/archetype.ts). Never touches craftSkills. Persisted in CharacterState.
+  archetype: ArchetypeState;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;
   delveClears: Record<string, number>;
   companionUpgrades: Record<string, number>;
   delveLoreUnlocked: Set<string>;
   delveDaily: { date: string; firstClearXp: Set<string>; markClears: number };
-  // World-boss daily loot record (persisted in CharacterState). Resets at the UTC
-  // day boundary; holds the boss ids already looted today so a player can take
-  // personal loot from each world boss only once per day. See world_boss.ts.
-  worldBossDaily: WorldBossDaily;
+  // World-boss loot lockouts live in `raidLockouts` (keyed worldboss:<mobId>), so the
+  // eligibility gate and the rendered raid-lockout countdown are one value. See
+  // world_boss.ts (markWorldBossLooted / isWorldBossLootEligible).
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -829,11 +865,11 @@ export interface CharacterState {
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
   restedXp?: number;
   // Gathering profession proficiency (JSONB; optional so pre-professions saves
-  // load cleanly, defaulting every profession to 0). Key is `professions`
-  // (not `gatheringProficiency`), reserved by the settled professions
-  // contract (src/sim/professions/CLAUDE.md, #1164) parallel to the existing
-  // `delveDaily`/`companionUpgrades` persisted fields.
+  // load cleanly, defaulting every profession to 0). `professions` is the legacy
+  // pre-rename key, kept for back-compat with old saves; `gatheringProficiency`
+  // is the current key both read (preferred) and written going forward.
   professions?: Partial<Record<string, number>>;
+  gatheringProficiency?: Partial<Record<string, number>>;
   copper: number;
   hp: number;
   resource: number;
@@ -896,12 +932,20 @@ export interface CharacterState {
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
+  // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
+  // legacy per-day `worldBossDaily` field is intentionally dropped: pre-migration saves
+  // that still carry it just ignore it (a player locked at deploy may loot once more, a
+  // one-time, player-friendly transition), and their lockouts persist via raidLockouts
+  // from then on.
   // World-boss daily loot record. Optional so saves from before world bosses load
   // cleanly (addPlayer falls back to an empty record).
   worldBossDaily?: { date: string; looted: string[] };
   // Flat per-craft skill tracking (#1126; JSONB, additive back-compat: absent or
   // partial on older saves loads the missing crafts as 0, see normalizeCraftSkills).
   craftSkills?: Record<string, number>;
+  // Active-archetype state (#1129, superseded scope; JSONB, back-compat: absent on
+  // older saves loads as emptyArchetypeState, see normalizeArchetypeState).
+  archetype?: Partial<ArchetypeState>;
 }
 
 export interface PetState {
@@ -1303,7 +1347,11 @@ export class Sim {
         const boss = this.entities.get(liveId);
         if (!boss) {
           this.worldBossEntityIds[i] = null;
-        } else if (boss.dead) {
+        } else if (!boss.dead) {
+          // Grow the HP pool with the raid size (retail-style, up to the cap).
+          scaleWorldBossHp(this.ctx, boss, def);
+        }
+        if (boss?.dead) {
           // Lootable corpse lingers WORLD_BOSS_CORPSE_SECONDS for contributors to
           // loot, then is removed; respawnTimer is Infinity (handleDeath) so the
           // normal in-place respawn never fires; only this scheduler respawns it.
@@ -1333,6 +1381,10 @@ export class Sim {
     const mob = createMob(this.nextId++, template, template.maxLevel, pos);
     mob.facing = 0;
     mob.prevFacing = 0;
+    // World bosses use participant HP scaling (see scaleWorldBossHp), so their pool
+    // starts at the def base rather than the template's level-formula HP.
+    mob.maxHp = def.hpScale.base;
+    mob.hp = def.hpScale.base;
     this.addEntity(mob);
     // Anchorless log (no pid, no entityId) => routeEvents broadcasts to every
     // connected player as a system notice. Localized by sim_i18n's worldBossSpawn
@@ -1411,6 +1463,8 @@ export class Sim {
       restedXp: 0,
       gatheringProficiency: emptyGatheringProficiency(),
       pendingGatherGrants: [],
+      nodeHarvestReadyAt: {},
+      lastCraftResult: null,
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
@@ -1437,13 +1491,21 @@ export class Sim {
       marketQuery: defaultMarketQuery(),
       craftSkills: emptyCraftSkills(),
       mailWelcomed: false,
+      marketFilter: '',
+      archetype: emptyArchetypeState(),
       delveMarks: 0,
       delveClears: {},
       companionUpgrades: {},
       delveLoreUnlocked: new Set(),
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
-      worldBossDaily: emptyWorldBossDaily(),
     };
+    // A fresh character sets out provisioned (class-defined starter rations);
+    // a saved character loads its own bags from savedState below.
+    if (!savedState) {
+      for (const it of classDef.startItems) {
+        meta.inventory.push({ itemId: it.itemId, count: it.count });
+      }
+    }
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
@@ -1461,7 +1523,12 @@ export class Sim {
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
-      meta.gatheringProficiency = normalizeGatheringProficiency(s.professions);
+      // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
+      // is the current one. Prefer the current field, fall back to the legacy one so
+      // saves from before the rename still load correctly.
+      meta.gatheringProficiency = normalizeGatheringProficiency(
+        s.gatheringProficiency ?? s.professions,
+      );
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
@@ -1524,6 +1591,7 @@ export class Sim {
       }
       meta.craftSkills = normalizeCraftSkills(s.craftSkills);
       meta.mailWelcomed = s.mailWelcomed === true;
+      meta.archetype = normalizeArchetypeState(s.archetype);
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -1533,12 +1601,6 @@ export class Sim {
           date: s.delveDaily.date,
           firstClearXp: new Set(s.delveDaily.firstClearXp),
           markClears: s.delveDaily.markClears,
-        };
-      }
-      if (s.worldBossDaily) {
-        meta.worldBossDaily = {
-          date: s.worldBossDaily.date,
-          looted: new Set(s.worldBossDaily.looted),
         };
       }
     }
@@ -1724,6 +1786,7 @@ export class Sim {
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
       professions: { ...meta.gatheringProficiency },
+      gatheringProficiency: { ...meta.gatheringProficiency },
       copper: meta.copper,
       hp: e.hp,
       // A druid saved while shifted runs on rage/energy with its mana parked in
@@ -1781,6 +1844,7 @@ export class Sim {
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
       craftSkills: { ...meta.craftSkills },
+      archetype: { ...meta.archetype },
       delveMarks: meta.delveMarks,
       delveClears: { ...meta.delveClears },
       companionUpgrades: { ...meta.companionUpgrades },
@@ -1791,10 +1855,7 @@ export class Sim {
         markClears: meta.delveDaily.markClears,
       },
       mailWelcomed: meta.mailWelcomed,
-      worldBossDaily: {
-        date: meta.worldBossDaily.date,
-        looted: [...meta.worldBossDaily.looted],
-      },
+      // World-boss lockouts serialize via raidLockouts (above), not a separate field.
     };
     return sanitizeRemovedZone1Content(state).state;
   }
@@ -3032,8 +3093,8 @@ export class Sim {
 
   isSwimming(e: Entity): boolean {
     return (
-      groundHeight(e.pos.x, e.pos.z, this.cfg.seed) < waterLevel() - SWIM_DEPTH &&
-      e.pos.y <= swimSurfaceY() + 0.15
+      groundHeight(e.pos.x, e.pos.z, this.cfg.seed) < waterLevelAt(e.pos.x, e.pos.z) - SWIM_DEPTH &&
+      e.pos.y <= swimSurfaceY(e.pos.x, e.pos.z) + 0.15
     );
   }
 
@@ -3074,7 +3135,7 @@ export class Sim {
     // deep water and cliffs end the charge early rather than dragging the player in
     const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
     const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < waterLevel() - SWIM_DEPTH) return done(false);
+    if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return done(false);
     if (
       h1 > h0 &&
       ((h1 - h0) / step > MAX_CLIMB_SLOPE ||
@@ -3142,7 +3203,7 @@ export class Sim {
     const nz = p.pos.z + Math.cos(p.facing) * step;
     const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
     const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < waterLevel() - SWIM_DEPTH) return true; // don't trail into deep water
+    if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return true; // don't trail into deep water
     if (
       h1 > h0 &&
       step > 1e-5 &&
@@ -3294,10 +3355,10 @@ export class Sim {
 
     // Vertical: jumping, gravity, swimming, fall damage
     const ground = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
-    const deepWater = ground < waterLevel() - SWIM_DEPTH;
-    if (deepWater && p.pos.y <= swimSurfaceY() + 0.05) {
+    const deepWater = ground < waterLevelAt(p.pos.x, p.pos.z) - SWIM_DEPTH;
+    if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z) + 0.05) {
       // treading water at the surface
-      p.pos.y = swimSurfaceY();
+      p.pos.y = swimSurfaceY(p.pos.x, p.pos.z);
       p.vy = 0;
       p.vx = 0;
       p.vz = 0;
@@ -3326,9 +3387,9 @@ export class Sim {
       p.vy -= GRAVITY * DT;
       p.pos.y += p.vy * DT;
       p.fallStartY = Math.max(p.fallStartY, p.pos.y);
-      if (deepWater && p.pos.y <= swimSurfaceY()) {
+      if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z)) {
         // splashing into deep water breaks the fall
-        p.pos.y = swimSurfaceY();
+        p.pos.y = swimSurfaceY(p.pos.x, p.pos.z);
         p.vy = 0;
         p.vx = 0;
         p.vz = 0;
@@ -3571,6 +3632,16 @@ export class Sim {
       !this.isNythraxisScriptedControl(target, aura)
     )
       return;
+    // Slow immunity is separate from ccImmune: snares (kind 'slow') are not control auras,
+    // so a slowImmune raid boss shrugs off Frostbolt/Hamstring-style movement snares while
+    // still taking a self-applied slow (e.g. a scripted mechanic) through sourceId === self.
+    if (
+      target.kind === 'mob' &&
+      MOBS[target.templateId]?.slowImmune &&
+      aura.kind === 'slow' &&
+      aura.sourceId !== target.id
+    )
+      return;
     const existing = target.auras.findIndex(
       (a) => a.id === aura.id && a.sourceId === aura.sourceId,
     );
@@ -3642,7 +3713,7 @@ export class Sim {
         nz = cz + uz * adv;
       const h0 = groundHeight(cx, cz, this.cfg.seed);
       const h1 = groundHeight(nx, nz, this.cfg.seed);
-      if (h1 < waterLevel() - SWIM_DEPTH) break; // would land in deep water
+      if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) break; // would land in deep water
       if (
         h1 > h0 &&
         ((h1 - h0) / adv > MAX_CLIMB_SLOPE ||
@@ -4166,7 +4237,7 @@ export class Sim {
     const playerPull = target.kind === 'player' || target.ownerId !== null;
     if (engageYell && playerPull && !mob.yelledEngage) {
       mob.yelledEngage = true;
-      emitMobYell(this.ctx, mob, engageYell);
+      emitMobYell(this.ctx, mob, engageYell, MOBS[mob.templateId]?.battleYells?.range);
     }
     if (social) {
       const family = MOBS[mob.templateId]?.family;
@@ -4387,7 +4458,7 @@ export class Sim {
       e.pos.x = nx;
       e.pos.z = nz;
       const g = groundHeight(nx, nz, this.cfg.seed);
-      e.pos.y = Math.max(g, swimSurfaceY()); // ride the surface while phasing, don't sink under terrain/water
+      e.pos.y = Math.max(g, swimSurfaceY(nx, nz)); // ride the surface while phasing, don't sink under terrain/water
       return d - step < 0.3;
     }
     // Mobs have no nav mesh. Try the straight path first; only if a prop or the
@@ -4399,15 +4470,22 @@ export class Sim {
       bestProgress = 1e-3;
     // Swimmers ride the water surface, so slope checks clamp submerged ground
     // to the waterline (a sloped lake bed is not a wall; see pathfind rideHeight).
-    const wl = waterLevel();
-    const ride = (h: number): number => (canSwim && h < wl ? wl : h);
+    // The waterline itself is terrain/feature-aware: outside a declared lake's
+    // footprint there is no waterline at all, so a dry sunken feature never
+    // reads as a shore.
+    const ride = (x: number, z: number, h: number): number => {
+      const wl = waterLevelAt(x, z);
+      return canSwim && h < wl ? wl : h;
+    };
     let h0 = Number.NaN; // lazily sampled: only steep cells pay for heights
     for (const off of MOVE_SLIDE_FAN) {
       const a = desired + off;
       const nx = e.pos.x + Math.sin(a) * step;
       const nz = e.pos.z + Math.cos(a) * step;
       // landlocked creatures stop at the waterline instead of walking under it
-      if (!canSwim && groundHeight(nx, nz, this.cfg.seed) < waterLevel() - SWIM_DEPTH) continue;
+      if (!canSwim && groundHeight(nx, nz, this.cfg.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH) {
+        continue;
+      }
       // Mobs, pets, and feared players obey the wall rule too: no uphill step
       // onto unwalkably steep ground. Screened to the wall bands so the hot
       // open-world fan pays nothing; inside a band the memoized cell steepness
@@ -4415,8 +4493,9 @@ export class Sim {
       // is a NEW gate for these movers, so the finer per-step cliff check
       // players get is not replicated here.
       if (nearSteepWalls(nx, nz) && terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE) {
-        if (Number.isNaN(h0)) h0 = ride(groundHeight(e.pos.x, e.pos.z, this.cfg.seed));
-        if (ride(groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
+        if (Number.isNaN(h0))
+          h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, this.cfg.seed));
+        if (ride(nx, nz, groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
       }
       const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       const progress = d - Math.hypot(r.x - dest.x, r.z - dest.z);
@@ -4430,7 +4509,8 @@ export class Sim {
     e.pos.x = bestX;
     e.pos.z = bestZ;
     const g = groundHeight(bestX, bestZ, this.cfg.seed);
-    e.pos.y = canSwim && g < waterLevel() - SWIM_DEPTH ? swimSurfaceY() : g;
+    e.pos.y =
+      canSwim && g < waterLevelAt(bestX, bestZ) - SWIM_DEPTH ? swimSurfaceY(bestX, bestZ) : g;
     return dist2d(e.pos, dest) < 0.3;
   }
 
@@ -4465,7 +4545,8 @@ export class Sim {
       const thresholds = tmpl.summonAdds.atHpPct;
       while (mob.firedSummons < thresholds.length && hpFrac <= thresholds[mob.firedSummons]) {
         mob.firedSummons++;
-        if (tmpl.yells?.summon) emitMobYell(this.ctx, mob, tmpl.yells.summon);
+        if (tmpl.yells?.summon)
+          emitMobYell(this.ctx, mob, tmpl.yells.summon, tmpl.battleYells?.range);
         const run = this.delveRunForMob(mob.id);
         if (
           run &&
@@ -4483,7 +4564,8 @@ export class Sim {
     const enrageAllowed = !enrageRun || enrageRun.tierId === 'heroic';
     if (tmpl.enrage && enrageAllowed && !mob.enraged && hpFrac <= tmpl.enrage.belowHpPct) {
       mob.enraged = true;
-      if (tmpl.yells?.enrage) emitMobYell(this.ctx, mob, tmpl.yells.enrage);
+      if (tmpl.yells?.enrage)
+        emitMobYell(this.ctx, mob, tmpl.yells.enrage, tmpl.battleYells?.range);
       this.emit({ type: 'aura', targetId: mob.id, name: 'Enrage', gained: true });
       this.emit({
         type: 'log',
@@ -4714,16 +4796,35 @@ export class Sim {
     });
     const [topThreatId] = threatEntries(boss, 1)[0] ?? [];
     const victimId = boss.aggroTargetId ?? topThreatId ?? null;
-    const victim = victimId !== null ? this.entities.get(victimId) : null;
+    let victim = victimId !== null ? (this.entities.get(victimId) ?? null) : null;
+    if (!victim || victim.dead || victim.kind !== 'player') {
+      // Fallback so freshly-summoned adds always have a nearby enemy to charge even if
+      // the boss's own target just died or dropped: pick the closest live player.
+      let best: Entity | null = null;
+      let bestD = Infinity;
+      this.playerGrid.forEachInRadius(boss.pos.x, boss.pos.z, LEASH_DISTANCE, (pl, d2) => {
+        if (pl.kind === 'player' && !pl.dead && d2 < bestD) {
+          bestD = d2;
+          best = pl;
+        }
+      });
+      victim = best;
+    }
+    // World bosses erupt their adds from directly underneath them (centered, a tight
+    // 1yd cluster spread only enough to not stack on one point); ordinary summoners keep
+    // the wider 3.5yd ring beside the boss.
+    const spawnRadius = MOBS[boss.templateId]?.worldBoss ? 1 : 3.5;
     for (let k = 0; k < count; k++) {
       const ang = (k / count) * Math.PI * 2 + 0.7;
       const pos = this.groundPos(
-        boss.pos.x + Math.sin(ang) * 3.5,
-        boss.pos.z + Math.cos(ang) * 3.5,
+        boss.pos.x + Math.sin(ang) * spawnRadius,
+        boss.pos.z + Math.cos(ang) * spawnRadius,
       );
       const level = this.rng.int(template.minLevel, template.maxLevel);
       const add = createMob(this.nextId++, template, level, pos);
-      add.spawnPos = { ...boss.spawnPos }; // leashes with the boss; stays dead in instances
+      // Leash to the boss's ORIGINAL spawn (not his current, possibly-kited position):
+      // pulled too far from it, the add's chase-case leash check evades it home.
+      add.spawnPos = { ...boss.spawnPos };
       add.tappedById = boss.tappedById;
       this.addEntity(add);
       boss.summonedIds.push(add.id);
@@ -4896,11 +4997,11 @@ export class Sim {
   private hasFishableWaterAhead(p: Entity): boolean {
     const sin = Math.sin(p.facing);
     const cos = Math.cos(p.facing);
-    return FISHING_SAMPLE_DISTANCES.some(
-      (d) =>
-        groundHeight(p.pos.x + sin * d, p.pos.z + cos * d, this.cfg.seed) <
-        waterLevel() - SWIM_DEPTH,
-    );
+    return FISHING_SAMPLE_DISTANCES.some((d) => {
+      const x = p.pos.x + sin * d;
+      const z = p.pos.z + cos * d;
+      return groundHeight(x, z, this.cfg.seed) < waterLevelAt(x, z) - SWIM_DEPTH;
+    });
   }
 
   private isAtDeepfenShallowsFishingSpot(p: Entity): boolean {
@@ -5015,6 +5116,63 @@ export class Sim {
     items.buyBackItem(this.ctx, itemId, pid);
   }
 
+  // Gather-node harvest (#1121): a thin delegate onto
+  // src/sim/professions/gathering.ts, resolved on the deterministic tick the
+  // command arrives on, same as buyItem/useItem above.
+  harvestNode(nodeId: string, pid?: number): void {
+    harvestNodeImpl(this.ctx, nodeId, pid);
+  }
+
+  // IWorld read surface (IWorldProfessions): whether the given node is
+  // harvestable right now BY THIS PLAYER specifically (per-player respawn
+  // timer, #1121). Never reflects another player's cooldown for the same node.
+  // Takes an explicit pid (mirrors gatheringProficiencyFor) so both the
+  // local-viewer getter below and tests can check any player's own timer.
+  nodeHarvestableByMeFor(nodeId: string, pid: number): boolean {
+    const meta = this.players.get(pid);
+    if (!meta) return false;
+    if (!gatherNodeById(nodeId)) return false;
+    return isNodeHarvestableBy(meta, nodeId, this.time);
+  }
+
+  nodeHarvestableByMe(nodeId: string): boolean {
+    return this.nodeHarvestableByMeFor(nodeId, this.primaryId);
+  }
+
+  // IWorld read surface (IWorldProfessions, #1127): the static common-tier
+  // recipe list, a plain content read (no per-player state), same shape both
+  // worlds can serve without a wire round-trip.
+  get recipeList(): readonly RecipeDef[] {
+    return COMMON_RECIPES;
+  }
+
+  // Common-tier crafting command (#1127): a thin delegate onto
+  // src/sim/professions/crafting.ts, resolved on the deterministic tick the
+  // command arrives on, same as harvestNode/buyItem/useItem above. Stashes
+  // the outcome on the resolved player's PlayerMeta so the IWorld
+  // lastCraftResult read surface (below) reflects it.
+  craftItem(recipeId: string, pid?: number): void {
+    const result = craftItemImpl(this.ctx, recipeId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    if (meta) meta.lastCraftResult = result;
+    this.emit({
+      type: 'craftResult',
+      ok: result.ok,
+      recipeId: result.recipeId,
+      itemId: result.itemId,
+      count: result.count,
+      quality: result.quality,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
+  }
+
+  // IWorld read surface (IWorldProfessions, #1127): the local viewer's most
+  // recent craft-result, or null before their first craft attempt this session.
+  get lastCraftResult(): CraftResult | null {
+    return this.players.get(this.primaryId)?.lastCraftResult ?? null;
+  }
+
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
     const def = ITEMS[itemId];
     if (!def?.slot) return;
@@ -5056,6 +5214,10 @@ export class Sim {
   // non-primary party member the same way lootCorpse does.
   autoLoot(mobId: number, pid?: number): void {
     interaction.autoLootForParty(this.ctx, mobId, pid ?? this.primaryId);
+  }
+
+  harvestCorpse(mobId: number, components?: string[], pid?: number): void {
+    interaction.harvestCorpse(this.ctx, mobId, components, pid);
   }
 
   pickUpObject(objId: number, pid?: number): void {
@@ -6488,6 +6650,81 @@ export class Sim {
 
   get craftSkills(): Record<string, number> {
     return this.craftSkillsFor(this.primaryId);
+  }
+
+  /** The active-archetype craft id, or null before the zone-1 acceptance quest has
+   *  ever been completed (see professions/archetype.ts). */
+  activeArchetypeFor(pid: number): string | null {
+    return archetypeStateFor(this.ctx, pid).activeArchetype;
+  }
+
+  get activeArchetype(): string | null {
+    return this.activeArchetypeFor(this.primaryId);
+  }
+
+  /** Total successful archetype switches this character has ever made. */
+  archetypeSwitchCountFor(pid: number): number {
+    return archetypeStateFor(this.ctx, pid).switchCount;
+  }
+
+  get archetypeSwitchCount(): number {
+    return this.archetypeSwitchCountFor(this.primaryId);
+  }
+
+  /** Amends progress accrued toward the CURRENT switch's threshold, and the
+   *  threshold itself (see requiredAmendsProgress: it scales with switchCount). */
+  archetypeAmendsProgressFor(pid: number): number {
+    return archetypeStateFor(this.ctx, pid).amendsProgress;
+  }
+
+  get archetypeAmendsProgress(): number {
+    return this.archetypeAmendsProgressFor(this.primaryId);
+  }
+
+  archetypeAmendsRequiredFor(pid: number): number {
+    return requiredAmendsProgress(archetypeStateFor(this.ctx, pid).switchCount);
+  }
+
+  get archetypeAmendsRequired(): number {
+    return this.archetypeAmendsRequiredFor(this.primaryId);
+  }
+
+  /** Stub entry point for the zone-1 acceptance quest's completion (see
+   *  professions/archetype.ts for what is stubbed and why). No-op (returns false)
+   *  if an archetype is already set. */
+  acceptArchetypeQuest(craftId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    return acceptArchetypeQuestImpl(this.ctx, r.meta.entityId, craftId);
+  }
+
+  /** Stub entry point for one completion of the repeatable "make amends" quest
+   *  (see professions/archetype.ts). No-op before an archetype has ever been
+   *  chosen. */
+  advanceAmendsProgress(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    advanceAmendsProgressImpl(this.ctx, r.meta.entityId);
+  }
+
+  /** Attempt to switch the active archetype to a different craft; blocked (a
+   *  complete no-op) unless enough amends progress has accrued. See
+   *  professions/archetype.ts switchArchetype for the full gating rule. */
+  switchArchetype(craftId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    if (!r) return false;
+    return switchArchetypeImpl(this.ctx, r.meta.entityId, craftId);
+  }
+
+  // Read-only gathering-profession proficiency surface for IWorld. Stubbed
+  // directly on IWorld pending issue #1164 (a broader professions facet); see
+  // that issue for the eventual reconciliation.
+  gatheringProficiencyFor(pid: number): Record<string, number> {
+    return { ...(this.players.get(pid)?.gatheringProficiency ?? emptyGatheringProficiency()) };
+  }
+
+  get gatheringProficiency(): Record<string, number> {
+    return this.gatheringProficiencyFor(this.primaryId);
   }
 
   delveShopOffers(delveId: string): DelveShopOffer[] {

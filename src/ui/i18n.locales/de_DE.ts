@@ -1210,6 +1210,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Neuigkeiten und Updates',
   'news.desc': 'Lies die neuesten Patchnotes, Events und Community-Updates.',
   'download.title': 'Desktop-Launcher herunterladen',
+  'download.macCta': 'Download fuer macOS',
+  'download.windowsPending': 'Windows-Build ausstehend.',
   'download.desc': 'Hol dir den eigenständigen Launcher für optimierte Leistung und Vollbildspiel.',
   'comingSoon.placeholder': 'Demnächst...',
   'comingSoon.featureComingSoon': 'Diese Funktion ist demnächst in der Welt verfügbar.',
@@ -3935,6 +3937,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Erntesichel',
   'entities.items.bronze_sickle.name': 'Bronzesichel',
   'entities.items.silverleaf_sickle.name': 'Silberblatt-Sichel',
+  'entities.items.thorium_mining_pick.name': 'Thorium-Grabpickel',
+  'entities.items.arcanite_mining_pick.name': 'Arkanit-Grabpickel',
+  'entities.items.ashwood_axe.name': 'Eschenholzaxt',
+  'entities.items.elderwood_axe.name': 'Altholzaxt',
+  'entities.items.goldleaf_sickle.name': 'Goldblatt-Sichel',
+  'entities.items.sunpetal_sickle.name': 'Sonnenblütensichel',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Chatkanal hinzufügen',
   'hud.core.chatChannels.addTitle': 'Kanal hinzufügen',
@@ -4105,6 +4113,20 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': 'SO',
   'hudChrome.compass.SW': 'SW',
   'hudChrome.compass.W': 'W',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Dieser Kadaver wurde bereits verwertet.',
+  'hudChrome.corpseHarvest.componentAria': '{component} verwerten',
+  'hudChrome.corpseHarvest.components.claw': 'Klaue',
+  'hudChrome.corpseHarvest.components.fang': 'Fangzahn',
+  'hudChrome.corpseHarvest.components.gills': 'Kiemen',
+  'hudChrome.corpseHarvest.components.hide': 'Haut',
+  'hudChrome.corpseHarvest.components.horn': 'Horn',
+  'hudChrome.corpseHarvest.components.silk': 'Seide',
+  'hudChrome.corpseHarvest.components.tusk': 'Stoßzahn',
+  'hudChrome.corpseHarvest.components.venomSac': 'Giftsack',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.',
+  'hudChrome.corpseHarvest.harvestButton': 'Verwerten',
+  'hudChrome.corpseHarvest.title': 'Verwerten',
   'hudChrome.emoteEditor.done': 'Fertig',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Verbeugen',
@@ -6006,4 +6028,195 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Was Ihr im Dunkeln vollbracht habt',
   'entities.letters.letter_q_hollow.body':
     'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
+  'hudChrome.gathering.herbalism': 'Kräuterkunde',
+  'hudChrome.gathering.logging': 'Holzfällen',
+  'hudChrome.gathering.mining': 'Bergbau',
+  'hudChrome.gathering.title': 'Sammeln',
+  'errors.api.accountSessionLimit': 'Zu viele Charaktere dieses Kontos sind bereits in der Welt.',
+  'errors.api.crossSiteOrigin': 'Anfrage aus Sicherheitsgründen blockiert.',
+  'errors.api.unsupportedMediaType': 'Nicht unterstütztes Anfrageformat.',
+  'apiError.account.characters_online':
+    'Melde alle deine Charaktere ab, bevor du das Konto deaktivierst.',
+  'apiError.account.deactivated':
+    'Dieses Konto wurde deaktiviert. Wende dich an einen Administrator, um es wiederherzustellen.',
+  'apiError.account.not_found': 'Konto nicht gefunden.',
+  'apiError.account.password_too_long': 'Das neue Passwort darf höchstens 128 Zeichen lang sein.',
+  'apiError.account.password_too_short': 'Das Passwort muss mindestens 6 Zeichen lang sein.',
+  'apiError.account.username_invalid':
+    'Der Benutzername muss 3-24 Zeichen lang sein und Buchstaben, Ziffern oder Unterstrich verwenden.',
+  'apiError.account.username_mismatch': 'Dieser Benutzername passt nicht zu deinem Konto.',
+  'apiError.account.username_not_allowed': 'Dieser Benutzername ist nicht erlaubt.',
+  'apiError.account.username_taken': 'Dieser Benutzername ist bereits vergeben.',
+  'apiError.auth.current_password_incorrect': 'Dein aktuelles Passwort ist falsch.',
+  'apiError.auth.forbidden': 'Du hast keine Berechtigung, das zu tun.',
+  'apiError.auth.invalid_credentials': 'Benutzername oder Passwort ungültig.',
+  'apiError.auth.password_incorrect': 'Dein Passwort ist falsch.',
+  'apiError.auth.required': 'Nicht angemeldet.',
+  'apiError.auth.token_invalid': 'Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.',
+  'apiError.auth.token_missing': 'Du musst angemeldet sein, um das zu tun.',
+  'apiError.auth.too_many_attempts': 'Zu viele Versuche. Warte eine Minute und versuche es erneut.',
+  'apiError.auth.too_many_failed_attempts':
+    'Zu viele fehlgeschlagene Versuche. Warte ein paar Minuten und versuche es erneut.',
+  'apiError.auth.verification_failed': 'Verifizierung fehlgeschlagen. Bitte versuche es erneut.',
+  'apiError.auth.web_login_only': 'Anmeldungen sind nur über den Spiel-Client erlaubt.',
+  'apiError.body.too_large': 'Diese Anfrage ist zu groß. Versuche es mit weniger Daten erneut.',
+  'apiError.body.unsupported_media_type': 'Nicht unterstütztes Anfrageformat.',
+  'apiError.character.already_in_world': 'Der Charakter ist bereits in der Welt.',
+  'apiError.character.delete_confirm': 'Gib den Charakternamen ein, um das Löschen zu bestätigen.',
+  'apiError.character.invalid_class': 'Ungültige Klasse.',
+  'apiError.character.limit_reached': 'Charakterlimit erreicht.',
+  'apiError.character.name_invalid': 'Ungültiger Charaktername. Verwende 2-16 Buchstaben.',
+  'apiError.character.name_not_allowed': 'Dieser Charaktername ist nicht erlaubt.',
+  'apiError.character.name_taken': 'Dieser Name ist bereits vergeben.',
+  'apiError.character.not_found': 'Charakter nicht gefunden.',
+  'apiError.character.online': 'Der Charakter ist derzeit online.',
+  'apiError.character.rename_not_permitted': 'Das Umbenennen dieses Charakters ist nicht erlaubt.',
+  'apiError.character.rename_required':
+    'Dieser Charakter muss vor dem Betreten der Welt umbenannt werden.',
+  'apiError.character.taken_over': 'Dein Charakter wurde von einer anderen Sitzung übernommen.',
+  'apiError.db.conflict':
+    'Diese Änderung kollidierte mit einer anderen Aktualisierung. Bitte versuche es erneut.',
+  'apiError.discord.already_linked':
+    'Dieses Discord-Konto ist bereits mit einem anderen Konto verknüpft.',
+  'apiError.discord.expired':
+    'Diese Discord-Anmeldung ist abgelaufen. Bitte melde dich erneut mit Discord an.',
+  'apiError.discord.link_required': 'Verknüpfe zuerst dein Discord-Konto.',
+  'apiError.discord.not_configured': 'Die Discord-Integration ist derzeit nicht verfügbar.',
+  'apiError.discord.password_required':
+    'Lege ein Passwort fest, bevor du dein Discord-Konto trennst.',
+  'apiError.discord.swag_claimed': 'Du hast diese Belohnung bereits beansprucht.',
+  'apiError.discord.swag_points': 'Nicht genügend Punkte.',
+  'apiError.discord.swag_tier': 'Erreiche einen höheren Rang, um dies zu beanspruchen.',
+  'apiError.discord.unknown_swag': 'Diese Belohnung ist nicht verfügbar.',
+  'apiError.email.invalid': 'Gib eine gültige E-Mail-Adresse ein.',
+  'apiError.email.unchanged': 'Das ist bereits deine E-Mail-Adresse.',
+  'apiError.internal.error':
+    'Auf unserer Seite ist etwas schiefgelaufen. Bitte versuche es erneut.',
+  'apiError.json.malformed': 'Diese Anfrage konnte nicht gelesen werden. Bitte versuche es erneut.',
+  'apiError.moderation.banned': 'Dieses Konto wurde gesperrt.',
+  'apiError.moderation.force_rename':
+    'Ein Moderator verlangt, dass einer deiner Charaktere umbenannt wird.',
+  'apiError.moderation.suspended': 'Dieses Konto ist suspendiert.',
+  'apiError.moderation.suspended_until': 'Dieses Konto ist bis {date} suspendiert.',
+  'apiError.origin.cross_site': 'Anfrage aus Sicherheitsgründen blockiert.',
+  'apiError.rate_limit.exceeded': 'Zu viele Anfragen. Versuche es in {seconds} erneut.',
+  'apiError.two_factor.already_enabled': 'Zwei-Faktor ist bereits aktiviert.',
+  'apiError.two_factor.code_invalid': 'Dieser Code ist ungültig, versuche es erneut.',
+  'apiError.two_factor.not_enabled': 'Zwei-Faktor ist nicht aktiviert.',
+  'apiError.two_factor.setup_required': 'Starte zuerst die Zwei-Faktor-Einrichtung.',
+  'apiError.validation.failed':
+    'Einige Felder sind ungültig. Prüfe das Formular und versuche es erneut.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Für Linux herunterladen',
+  'download.linuxHint':
+    'AppImage: Machen Sie es ausführbar und führen Sie es dann aus. Keine Installation erforderlich.',
+  'loading.reconnecting': 'Verbindung verloren. Verbindung wird wieder hergestellt...',
+  'guide.nav.settings': 'Einstellungen und Leistung',
+  'guide.settingsPage.advancedBody':
+    '„Advanced“ beginnt mit der High-Stufe und schaltet vier zusätzliche Auswahlmöglichkeiten frei, sodass Sie Ihre Frames dort platzieren können, wo Sie sie tatsächlich bemerken: Geländedetails, Laubdichte, Effekte und Beleuchtung sowie Schattenqualität. Sie gelten ebenso wie die Grafikqualität nach einem Neuladen.',
+  'guide.settingsPage.advancedHeading': 'Das Advanced-Preset: Mischen Sie Ihr eigenes',
+  'guide.settingsPage.advancedMixes':
+    'Zwei Lieblingsmischungen: Behalten Sie „Schattenqualität“ auf High bei und stellen Sie „Effekte und Beleuchtung“ auf Low ein, um einen klaren, schimmerfreien Look mit hellem Verlauf zu erzielen, oder machen Sie den umgekehrten Weg, um die Blüte beizubehalten und die Schatten weicher zu machen.',
+  'guide.settingsPage.balancedTagline':
+    'Der Sweet Spot für die meisten Maschinen und unser Standardratschlag.',
+  'guide.settingsPage.balancedTitle': 'Ausgewogen',
+  'guide.settingsPage.balancedWhy':
+    'Medium bringt echte Schatten und vollständige Materialien; High fügt Ambient Occlusion und Bloom hinzu. Unterhalb von Ultra fängt ein eingebautes Sicherheitsnetz plötzliche Einbrüche bei geschäftigen Kämpfen ab, sodass Balanced reibungslos bleibt, ohne dass man aufpassen muss.',
+  'guide.settingsPage.colDoes': 'Was es bewirkt',
+  'guide.settingsPage.colImpact': 'FPS Auswirkungen',
+  'guide.settingsPage.colSetting': 'Einstellung',
+  'guide.settingsPage.factDetectBody':
+    'Beim ersten Start erkennt das Spiel Ihr Gerät und wählt eine sinnvolle Stufe aus, von Low auf einem einfachen Telefon bis Ultra auf einem leistungsstarken Desktop. Jede Entscheidung, die Sie selbst treffen, gewinnt immer.',
+  'guide.settingsPage.factDetectTitle': 'Das Spiel stimmt sich zunächst selbst ab',
+  'guide.settingsPage.factGovernorBody':
+    'Auf jeder Stufe unter Ultra lichtet das Spiel still und leise Gras, Effekte und Beleuchtung für einen Moment, wenn ein großer Kampf zunimmt, und stellt sie dann wieder her. Wenn Sie Ultra wählen, bedeutet dies, dass Sie lieber jedes Detail behalten möchten.',
+  'guide.settingsPage.factGovernorTitle': 'Ein eingebautes Sicherheitsnetz',
+  'guide.settingsPage.factReloadBody':
+    'Die Auswahl „Grafikqualität“ und „Erweitert“ werden nach einem Neuladen wirksam und das Bedienfeld bietet bei Bedarf die Schaltfläche „Jetzt neu laden“. Jede andere Option gilt in dem Moment, in dem Sie sie ändern.',
+  'guide.settingsPage.factReloadTitle': 'Zwei Arten von Optionen',
+  'guide.settingsPage.fairnessBody':
+    'Hier gibt es keine Möglichkeit, Schönheit gegen Macht einzutauschen. Lower-Einstellungen verlieren nur kosmetischen Glanz, niemals Informationen, mit denen Sie kämpfen: Ihre Debuffs, Zauberbalken, Gruppengesundheit und Schadenszahlen sind von Low bis Ultra identisch. Das Spielen auf einem bescheidenen Automaten ist niemals ein Handicap.',
+  'guide.settingsPage.fairnessTitle': 'Fair durch Design',
+  'guide.settingsPage.fpsTagline': 'Für ältere Laptops, integrierte Grafik und Akkubetrieb.',
+  'guide.settingsPage.fpsTitle': 'Bestes FPS',
+  'guide.settingsPage.fpsWhy':
+    'Die Grafikqualität ist der Hauptschalter und die Renderqualität der stärkste Schieberegler: Bei 70 % zeichnet die Welt etwa die Hälfte der Pixel, während die Benutzeroberfläche perfekt scharf bleibt.',
+  'guide.settingsPage.heading': 'Einstellungen und Leistung',
+  'guide.settingsPage.howHeading': 'Wie sich die Optionen verhalten',
+  'guide.settingsPage.impactHeavy': 'Schwer',
+  'guide.settingsPage.impactLight': 'Licht',
+  'guide.settingsPage.impactModerate': 'Mäßig',
+  'guide.settingsPage.impactNone': 'Keiner',
+  'guide.settingsPage.intro':
+    'Sorgen Sie dafür, dass das Spiel optimal aussieht oder am schnellsten läuft. Drei vorgefertigte Loadouts, plus was jede Grafikoption wirklich kann.',
+  'guide.settingsPage.loadoutsHeading': 'Drei fertige Loadouts',
+  'guide.settingsPage.loadoutsIntro':
+    'Beginnen Sie mit der Ausstattung, die Ihrer Maschine ähnelt, und passen Sie dann eine Option nach der anderen an, bis sie sich richtig anfühlt.',
+  'guide.settingsPage.mobileBody':
+    'Mobile verwaltet mehr für Sie: Das Spiel wählt die Stufe aus, hält die Auflösung etwas niedriger, um den Akku und die Hitze zu schonen, und behält die höchsten Stufen nur für den Desktop bei. Die oben genannten Loadouts gelten weiterhin; Telefone sind bei High einfach leer.',
+  'guide.settingsPage.mobileTitle': 'Auf Handys und Tablets',
+  'guide.settingsPage.recommended': 'Empfohlen',
+  'guide.settingsPage.rowBrightness': 'Szenenbelichtung, dunkler oder heller. Reine Vorliebe.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Wie ausgefallen das Interface selbst sein darf: Glasunschärfe, Leuchten, animierte Menüs. Passt automatisch zu Ihrem Browser; Die 3D-Welt bleibt so oder so unberührt.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Blüte, Umgebungsokklusion und wie viele Fackeln und Zaubersprüche echtes Licht werfen. Die größte Ersparnis unter den Advanced Pickern.',
+  'guide.settingsPage.rowFieldOfView':
+    'Wie viel von der Welt passt auf den Bildschirm, von gezoomten 55 bis hin zu schwungvollen 100 Grad? Eine komfortable Wahl; breitere Ansichten ziehen etwas mehr an.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Wie weit und wie dicht das Gras um deinen Charakter herum wächst.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Ein verschwommenes Milchglas hinter den Fenstern. Hübsch und genau der Effekt, den ein schwächerer Browser empfindet. Lassen Sie es weg, um den klassischen, klaren Look zu erhalten.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Der Hauptschalter. Jeder Schritt ändert gemeinsam Auflösung, Schatten, Materialien, Blattwerk und Lichteffekte. Der größte einzelne Unterschied, den Sie machen können.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Eine Bildschirmanzeige von FPS, Frame-Time und mehr. Schalten Sie es ein, während Sie diese Seite optimieren, und blenden Sie es dann wieder aus.',
+  'guide.settingsPage.rowReduceMotion':
+    'Entfernt Schnittstellenanimationen, sodass Fenster sofort angezeigt werden. Zunächst eine Barrierefreiheitsoption mit einem kleinen Leistungsbonus.',
+  'guide.settingsPage.rowRenderQuality':
+    'Zeichnet die 3D-Welt mit einer niedrigeren internen Auflösung und skaliert sie; Die Schnittstelle bleibt scharf. Der stärkste Sofort-Slider auf schwächeren Maschinen und hochauflösenden Bildschirmen.',
+  'guide.settingsPage.rowShadowQuality':
+    'Schattenschärfe. Low behält die Schatten bei, mildert aber ihre Kanten.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Reichhaltige, gemischte Bodentexturen im Vergleich zu einem einfacheren, schnelleren Gelände-Look.',
+  'guide.settingsPage.rowWeather':
+    'Umgebungsregen und Schnee. Nur Atmosphäre, und das Ausschalten spart bei Gewittern ein wenig.',
+  'guide.settingsPage.tableFoot':
+    'Suchen Sie nach einem Schieberegler für die Zugentfernung oder einer FPS-Kappe? Es gibt nichts, wonach Sie suchen müssen: Der Betrachtungsabstand ist Teil jeder Qualitätsstufe und die Bildgeschwindigkeit folgt Ihrer Anzeige.',
+  'guide.settingsPage.tableHeading': 'Jede Option, erklärt',
+  'guide.settingsPage.tagReload': 'nach dem Neuladen',
+  'guide.settingsPage.value100': '100 %',
+  'guide.settingsPage.value50to70': '50 bis 70 %',
+  'guide.settingsPage.value90to100': '90 bis 100 %',
+  'guide.settingsPage.valueHighOrMedium': 'High auf einem Gaming-PC, Medium auf einem Laptop',
+  'guide.settingsPage.valueOnOptional': 'Ein (optional)',
+  'guide.settingsPage.visualsTagline': 'Screenshot-Modus für leistungsstarke Desktop-Rechner.',
+  'guide.settingsPage.visualsTitle': 'Beste Visuals',
+  'guide.settingsPage.visualsWhy':
+    'Ultra rendert mit der höchsten Auflösung, die Ihr Display bietet, mit der sattesten Beleuchtung. Es schaltet auch das Sicherheitsnetz aus und ist nur für den Desktop verfügbar: Telefone und die App sind ab High verfügbar.',
+  'guide.settingsPage.wherePath':
+    'Alles auf dieser Seite lebt im Spiel: Drücken Sie Esc und sehen Sie sich Grafik, Benutzeroberfläche und Leistungsüberlagerung an.',
+  'guide.settingsPage.whyLabel': 'Warum es funktioniert:',
+  'hudChrome.crafting.close': 'Enges Basteln',
+  'hudChrome.crafting.craft': 'Handwerk',
+  'hudChrome.crafting.craftedToast': 'Hergestellt: {name}',
+  'hudChrome.crafting.empty': 'Noch keine Rezepte bekannt.',
+  'hudChrome.crafting.insufficientMaterials': 'Dafür fehlen Ihnen die Materialien.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Erfordert:',
+  'hudChrome.crafting.resultAria': 'Basteln {name}',
+  'hudChrome.crafting.title': 'Basteln',
+  'hudChrome.crafting.unknownRecipe': 'Dieses Rezept existiert nicht.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Ein Handwerk, das Sie Ihr Eigen nennen können',
+  'entities.quests.q_archetype_acceptance.text':
+    'Jeder Kunsthandwerker aus Eastbrook entscheidet sich schließlich für ein Handwerk, das er sein Eigen nennen kann. Beweisen Sie sich mit einer einzigen Tat, {playerName}, und erklären Sie Ihren Weg.',
+  'entities.quests.q_archetype_acceptance.completion': 'Dein Weg ist gewählt; geh gut damit.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Waldwolf getötet',
+  'entities.quests.q_prof_make_amends.title': 'Wiedergutmachung leisten',
+  'entities.quests.q_prof_make_amends.text':
+    'Um ein Handwerk einem anderen zu überlassen, muss ein Handwerker zunächst den nicht gegangenen Weg wiedergutmachen, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Änderungen vorgenommen; ein neuer Weg steht dir offen.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Waldwolf getötet',
 };

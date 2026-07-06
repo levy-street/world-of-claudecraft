@@ -236,6 +236,28 @@ For off-box safety, sync the directory to S3 occasionally:
   handshake. `ANTIBOT_ENFORCE=1` lets the detector act on its findings (e.g. kick);
   when unset, detection is observe-only. With the no-op stub, enforcement has no
   effect regardless of this flag.
+- **Metrics endpoint**: `GET /metrics` (Prometheus exposition) is **off until
+  configured**: it answers 404 unless `METRICS_TOKEN` is set in the server
+  runtime env. When set, the scraper must send `Authorization: Bearer <token>`
+  (anything else gets an opaque 401). Configure the token on **both** the server
+  and the Prometheus scrape job in the same change or scraping goes dark.
+  `/livez` and `/readyz` stay open for load-balancer checks.
+- **API dispatch (rollback)**: every REST surface (`/api`, `/admin/api`, `/oauth`,
+  `/internal`) runs through the in-house request pipeline by default. To roll back to
+  the old handler ladder, set `API_DISPATCH=legacy` in the server runtime env and
+  restart the process: it is one flag, no code redeploy. Leaving it unset (or `new`)
+  keeps the new pipeline. The boot log warns with an `ALERT` line only when the legacy
+  ladder is serving in production, which after this default flip means the warn fires
+  exactly when someone has rolled back (`API_DISPATCH=legacy`), a deliberate choice
+  worth noticing rather than a routine boot.
+- **Env hygiene: no empty numeric placeholders.** A SET-BUT-EMPTY numeric env
+  line (`CHAT_LOG_RETENTION_DAYS=`, `PORT=`, `MAX_WS_PER_IP_HARD=`,
+  `PERF_REPORT_RETENTION_DAYS=`) now means the DEFAULT, not `0`. Before the
+  validated config loader, `CHAT_LOG_RETENTION_DAYS=` resolved to `0` (keep chat
+  logs forever); the same line now resolves to the 90-day default and pruning
+  turns ON. Audit deployed env files for empty placeholder lines: delete the
+  line to take the default, or set an explicit value (`CHAT_LOG_RETENTION_DAYS=0`
+  is still keep-forever).
 - Logs: `sudo docker compose -f /opt/eastbrook/docker-compose.yml logs -f game`.
 - If the instance ever feels tight, stop → change instance type →
   start. Everything lives in Docker plus one EBS volume, so nothing

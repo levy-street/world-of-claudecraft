@@ -295,6 +295,13 @@ Skip if no `src/sim/content/` files are in scope.
   it locally with `npm run ci:changed`. Confirm the diff reformatted ONLY files it intentionally
   changed: a stray whole-tree `biome --write` that drags an unrelated monolith into the diff is a
   `[FAIL]` (the repo defers the global Biome chore; never reformat the legacy tree).
+- Locally, `npm run gate` (`scripts/gate.mjs`) runs those CI checks end to end (changed-files
+  biome pulled forward as an early fast-fail, then the remaining pr-gate steps; release-tier
+  automatically on a `release/**` branch) with vitest workers capped at half the cores;
+  recommend it over ad-hoc shell chains, which mask
+  exit codes when piped (`npm test | tail` reports green on a red run) and flake the heavy sim
+  suites when an unbounded run saturates the cores (failing files that pass in one isolated
+  `npx vitest run` call are load flakes, not regressions).
 - No em dashes, en dashes, or emojis in code, comments, docs, commit/PR text, or player copy. Do
   NOT strip a dash that is native to a locale overlay (for example ru); that is correct there.
 - On a `release/**` branch, the release-tier i18n gate shows pending=0 and the release malware
@@ -309,6 +316,7 @@ Skip if no `src/sim/content/` files are in scope.
 | `src/world_api.ts` (IWorld), `src/sim/`, `src/net/online.ts`, `server/game.ts` wire/dispatch, or the sim/server i18n matchers | cross-platform-sync |
 | `src/sim/` (determinism, rng draw-order, tick-phase, SimContext seam, move-not-rewrite on a relocation) | architecture-reviewer |
 | a release tag / `release/**` branch | release-malware-audit (plus `I18N_RELEASE_TIER=1`) |
+| new or rewritten tests, or acceptance criteria that claim coverage | test-coverage-auditor |
 | any completed deliverable set | this gate is the default |
 
 Consuming an already-landed `IWorld` member does not change it; do not dispatch
@@ -359,3 +367,11 @@ If there are any FAIL items, follow the summary with a consolidated action list 
 what to fix). Be thorough, cross-reference every rule, and do not guess: if you cannot verify
 something from code alone, mark it `[VERIFY]`, not `[PASS]`. If you run long and risk truncation,
 stop reading files and emit the full report now in this format.
+
+## Delivering your report
+
+The review only counts once the report is DELIVERED. End with the complete report as your final
+message, never a status line or a promise to report later. If a SendMessage tool is available
+(it is injected when you run as a background teammate), ALSO send the full report (never a
+one-line summary) to `main` as your FINAL action; going idle without sending it is a failed
+review that costs the orchestrator a nudge round-trip.

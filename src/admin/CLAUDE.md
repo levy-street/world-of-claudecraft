@@ -18,11 +18,11 @@ type-checked by `npm run check:admin` (svelte-check over `tsconfig.admin.json`).
 - `App.svelte`: root, auth gate (login vs dashboard), URL-backed typed routing, `{#key session.locale}` re-render.
 - `admin.css`: the style **barrel** (mirrors the game client's `src/styles/index.css`). It declares the one canonical `@layer tokens, base, components` order and `@imports` the modules under `src/admin/styles/` in that order, holding no rules of its own; Lightning CSS inlines the local `@imports` into one stylesheet at build (no runtime waterfall). Imported once from `main.ts`.
 - `styles/`: the layered CSS modules, each opening its own `@layer`: `tokens.css` (`:root` design tokens), `base.css` (reset, form controls via zero-specificity `:where()`, base buttons, native-control normalization, the `@media (pointer: coarse)` mobile-zoom `!important` floor), then three `@layer components` modules imported in source order: `components.css` (panel, login, layout, chat filter, stat cards, tables, badges, detail grid, controls), `charts.css` (charts grid + SVG primitives + range tabs), `moderation.css` (moderation detail + `mod-confirm`). Layer names are FLAT, never dotted (a dot is a sublayer separator that reorders the cascade). Svelte component `<style>` blocks are scoped and UNLAYERED, so they always win over these layered primitives regardless of specificity (the intended direction: the barrel is the low-priority base, components override locally); the mobile-zoom floor survives via `!important`. Colors that recur across the modules and the scoped styles are semantic `--tokens` in `tokens.css` (`--bg-app`, `--surface-sunken`/`--surface-inset`, `--btn-flat-bg`, `--border-soft`/`--border-subtle`, `--text-bright`/`--text-soft`, `--color-danger`/`--color-danger-border`), not hand-typed hex at each call site; genuinely one-off colors stay inline. Component-specific layout is scoped `<style>`.
-- `state/`: runes singletons: `auth.svelte.ts` (token/name, login, logout, `handleAuthFailure`), `session.svelte.ts` (locale signal), `poll.ts` (interval helper + refresh constants).
+- `state/`: runes singletons: `auth.svelte.ts` (token/name/roles/permissions, login, `hydrate` via `/me`, logout, `handleAuthFailure`, `can(permission)`), `session.svelte.ts` (locale signal), `poll.ts` (interval helper + refresh constants).
 - `navigation.ts`: typed page/IP route parsing, URL serialization, History API interception, and optional navigation context for native links.
-- `components/`: shared UI: `Login`, `AdminShell`, `AdminNav`, `AccountModal`, `AccountLink`, `Panel`, `Badge`, `AccountIndicators`, `IpLink`, `StatCard`, `Pager`, `BarChart` (native SVG, no `{@html}`), `ConfirmDialog`, `ModerationActionPrompt`, `AccountModerationActions`, `ChatModerationControls`, `ModerationHistory`, `ScreenshotOverlay`, `OnlineTable`, `CharactersTable`, `ProviderUsage`, `WordList`, `ChatModeration`, `IpBlockSection`.
-- `pages/`: one per route: `Overview`, `Usage`, `Accounts`, `Characters`, `Moderation` (+ `ModerationDetail`), `SharedIps`, `ChatFilter`, `BlockedIps`, `BugReports`, plus the shared `AccountDetail`. `pages.ts` is the navigation tree.
-- Host-agnostic helpers (plain `.ts`, unit-tested directly): `moderation_actions.ts` (builds the suspend/ban/chat-mute/force-rename/ban-ip request + validation), `ip_block.ts` (`knownAccountIps`), `block_expiry.ts`, `labels.ts` (`reasonLabel`).
+- `components/`: shared UI: `Login`, `AdminShell`, `AdminNav`, `AccountModal`, `AccountLink`, `Panel`, `CollapsiblePanel`, `AntibotConfigHistory`, `Badge`, `AccountIndicators`, `IpLink`, `StatCard`, `Pager`, `BarChart` (native SVG, no `{@html}`), `ConfirmDialog`, `ModerationActionPrompt`, `AccountModerationActions`, `ChatModerationControls`, `ModerationHistory`, `ScreenshotOverlay`, `OnlineTable`, `CharactersTable`, `ProviderUsage`, `WordList`, `ChatModeration`, `IpBlockSection`.
+- `pages/`: one per route: `Overview`, `Usage`, `Accounts`, `Characters`, `Moderation` (+ `ModerationDetail`), `SharedIps`, `ChatFilter`, `BlockedIps`, `BugReports`, `AntibotConfig` (schema-driven bot-detector tuning; field labels are server data, chrome is `t()`), `Staff` (role management, gated `staff.manage`), plus the shared `AccountDetail`. `pages.ts` is the navigation tree (each item carries its `permission`; `visibleNavSections`/`firstVisiblePage` drive the sidebar filter and route-guard fallback).
+- Host-agnostic helpers (plain `.ts`, unit-tested directly): `moderation_actions.ts` (builds the suspend/ban/chat-mute/force-rename/ban-ip request + validation), `ip_block.ts` (`knownAccountIps`), `block_expiry.ts`, `labels.ts` (`reasonLabel`), `field_input.ts` (feature-neutral operator-entered field value helpers), `antibot_config.ts` (form state + override-document parsing for the AntibotConfig page), `antibot_config_history.ts` (before/after audit diff formatting), `permissions.ts` (client mirror of the server permission vocabulary; parity pinned by `tests/admin_permissions.test.ts`).
 - Reused as-is: `api.ts` (fetch wrapper, `apiLogin/apiGet/apiPost`, `ApiError`, token in `localStorage`), `types.ts` (endpoint response shapes), `format.ts` (`fmtDuration/Date/Relative/Copper/Bytes/Number/Percent`), `i18n.ts` (+ `i18n.en.ts`, `i18n.locales/`, `i18n.resolved.generated/`).
 
 ## i18n: operators are users, so all rendered text routes through `t()`
@@ -38,21 +38,29 @@ literal `t('...')` in this dir and fails on an untracked key.
 
 ## Talks to server/admin.ts over `/admin/api`
 All responses use the `{ success, data, error }` envelope (unwrapped in `api.ts`).
-GET: `/overview`, `/online`, `/suspicious-players`, `/activity`, `/accounts?search&page`,
+GET: `/me`, `/overview`, `/online`, `/suspicious-players`, `/antibot-config`, `/activity`, `/accounts?search&page`,
 `/accounts/:id`, `/shared-ips?sort&dir&online&page`, `/ip-associations?ip&page`,
 `/characters?sort&dir&page`, `/moderation/queue`, `/moderation/accounts/:id`, `/chat-filter`,
-`/blocked-ips`, `/bug-reports?page`, `/bug-reports/:id/screenshot`.
+`/blocked-ips`, `/bug-reports?page`, `/bug-reports/:id/screenshot`, `/staff`, `/staff/history`.
 POST: `/login`, `/moderation/accounts/:id/{suspend,unsuspend,ban,unban,chat-mute,lift-mute,reset-strikes}`,
 `/moderation/characters/:id/force-rename`, `/moderation/reports/:id/ignore`,
 `/chat-filter/words`, `/chat-filter/words/:id/delete`, `/chat-filter/config`,
-`/blocked-ips`, `/blocked-ips/delete`. In dev, Vite proxies `/admin/api` to `:8787`.
+`/antibot-config` (validates, applies to the live detector, persists per realm),
+`/antibot-config/history` (latest 50 audited config changes),
+`/blocked-ips`, `/blocked-ips/delete`, `/staff/roles`. In dev, Vite proxies `/admin/api` to `:8787`.
 
 ## Auth: server-side, not client-side
 Login (`POST /admin/api/login`) and **every** endpoint are gated in `server/admin.ts`:
-a `Bearer <64-hex>` token whose account has `is_admin = TRUE`. The `admin.*` host is
-just routing, **not** security. `state/auth.svelte.ts` only stores the token and shows
-the login screen on 401/403 (`handleAuthFailure`). Never gate an action on client-read
-state.
+a `Bearer <64-hex>` token whose account has at least one staff role
+(`accounts.admin_roles`; `is_admin` is the derived "is staff" flag), and every route is
+authorized against the declared permission map in `server/admin_routes.ts`
+(docs/prd/admin-permissions.md has the full model). The `admin.*` host is just routing,
+**not** security. `state/auth.svelte.ts` mirrors the token plus the operator's
+roles/permissions for PRESENTATION only (sidebar filtering, the route guard in
+`App.svelte`, hiding action buttons via `auth.can(...)`); the server re-checks every
+call. `handleAuthFailure` logs out on **401 only**; a 403 means "missing permission"
+and surfaces inline via `localizeAdminError`, never a logout. Never gate an action on
+client-read state.
 
 ## Adding a panel / table / chart
 1. Add the response shape to `types.ts` (match the server return exactly).

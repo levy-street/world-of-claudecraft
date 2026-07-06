@@ -74,6 +74,23 @@ stripping `{tokens}`, i.e. most real prose) also needs its five non-Latin fills
 merge, and only brand/URL leaves may stay byte-identical. `tsc` and the `t()` untracked-key
 throw still guarantee English completeness.
 
+## REST API errors (localize by code, not by English)
+
+A REST error from `server/` is a **stable code, never English**. `server/http/error_codes.ts`
+is the append-only catalog keyed `<domain>.<reason>` (for example `auth.invalid_credentials`);
+a handler raises the code and the server never emits the player-facing sentence. The client
+localizes code-first: `userFacingApiError` (`src/ui/api_error_i18n.ts`) maps a code VERBATIM to
+the `t()` key `apiError.<domain>.<reason>` via the `API_ERROR_KEYS` table, and the English source
+for those keys lives in the catalog module `src/ui/i18n.catalog/api_error.ts` (namespace
+`apiError.*`, append-only). Only two leaves carry a placeholder, formatted client-side:
+`apiError.moderation.suspended_until` splices `{date}` and `apiError.rate_limit.exceeded` splices
+`{seconds}` (an already-localized duration phrase), never on the server.
+
+Contributors add English only here too: append the code to `error_codes.ts`, add the `apiError.*`
+English catalog entry, and add the `API_ERROR_KEYS` mapping, in the same change (the
+`npm run new:endpoint` scaffold does all three). `tests/api_error_code_parity.test.ts` fails a
+server code that has no client key.
+
 ## Rewording an existing English value (the staleness blind spot)
 
 Adding a NEW key is safe: the locale starts `pending` and the release gate forces a

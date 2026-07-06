@@ -11,6 +11,7 @@ the inner loop.
 |---|---|---|---|---|
 | Instant copy gate | `Stop` hook -> `.claude/hooks/qa-stop.sh` | end of every Claude Code turn | milliseconds | yes, on a hard-invariant hit |
 | Deterministic floor | `.githooks/pre-push` | once per `git push` | seconds | yes, on red |
+| Full local gate | `npm run gate` -> `scripts/gate.mjs` | on demand, before calling a change done | minutes | yes, on red |
 | Judgment review | `/qa` command + the `qa-checklist` agent + the domain reviewers | when you finish a unit of work | an agent run | no (advisory locally, enforced at PR review) |
 
 ### 1. Instant copy gate (every turn)
@@ -32,6 +33,20 @@ the push diff. It blocks the push on any failure. Bypass in a genuine emergency 
 clone's `core.hooksPath` at `.githooks` so the floor actually runs (idempotent, and it never
 clobbers an existing hook setup).
 
+### 2b. Full local gate (on demand)
+
+`npm run gate` (`scripts/gate.mjs`) runs the CI checks locally: the pr-gate job's steps with
+the parallel lint job's changed-files biome pulled forward as an early fast-fail (i18n artifact
+generation plus the freshness diff, the malware scan, biome, the full test suite, `tsc`, the
+env/server/client builds). On a `release/**` branch it sets `I18N_RELEASE_TIER=1`, mirroring
+the release-gate job. It stops at the first failure and caps vitest workers at half the cores.
+The freshness step compares the regenerated i18n artifacts against the staged/committed copies,
+so stage them after an i18n change or the step fails (with a hint saying exactly that). It exists because ad-hoc shell chains get this wrong in two
+known ways: piping `npm test` through `tail` masks vitest's exit code (a red run can print
+"PASS"), and an unbounded full run saturates every core and flakes the heavy sim suites when
+other work shares the machine (failing files that then pass in isolation are load flakes, not
+regressions).
+
 ### 3. Judgment review (when you finish a feature)
 
 Determinism, three-host parity, server authority, persistence safety, i18n correctness,
@@ -44,7 +59,9 @@ pass.
 
 ## The reviewer agents
 
-All read-only, all in `.claude/agents/`:
+All read-only, all in `.claude/agents/`. When orchestrating them from a Workflow, run them
+free-text: forcing a StructuredOutput schema on a specialized reviewer can exhaust the
+retry cap and return null instead of a report.
 
 - **`qa-checklist`** - the evergreen end-of-contribution gate (also reachable as `/qa`). The
   default; it dispatches the others by domain.
@@ -56,6 +73,9 @@ All read-only, all in `.claude/agents/`:
   back-compat, indexes, parameterized SQL, boot safety).
 - **`privacy-security-review`** - server authority / anti-cheat, dev-command gating, secrets,
   auth (including OAuth, TOTP, and wallet linking), and account-data privacy.
+- **`test-coverage-auditor`** - test decisiveness and pin quality: every claimed behavior has an
+  assertion that would fail on regression, no constant-self-comparison pins, load-bearing
+  SQL/keys pinned to literals, every arm of an "either/all" claim exercised.
 - **`release-malware-audit`** - the release gate for deliberately planted malicious code
   (triages `scripts/malware_scan.mjs`).
 

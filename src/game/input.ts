@@ -56,7 +56,8 @@ export interface InputCallbacks {
       | 'arena'
       | 'leaderboard'
       | 'calendar'
-      | 'discord',
+      | 'discord'
+      | 'crafting',
   ): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
@@ -522,7 +523,7 @@ export class Input {
 
   setControllerMoveInput(input: unknown, facing?: unknown): void {
     this.controllerMoveInput = sanitizeMoveInput(input);
-    if (arguments.length > 1) this.controllerFacing = sanitizeMoveFacing(facing);
+    if (facing !== undefined) this.controllerFacing = sanitizeMoveFacing(facing);
   }
 
   setControllerFacing(facing: unknown): void {
@@ -736,6 +737,9 @@ export class Input {
         return;
       case 'bags':
         this.cb.onUiKey('bags');
+        return;
+      case 'crafting':
+        this.cb.onUiKey('crafting');
         return;
       case 'char':
         this.cb.onUiKey('char');

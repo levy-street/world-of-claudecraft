@@ -28,6 +28,7 @@ dependency set. The one sanctioned exception is the standalone admin dashboard
 | `src/world_api.ts` | `IWorld`, the seam render/ui depend on (see Architecture). |
 | `src/main.ts` | Client entry; fixes the world seed. |
 | `server/` | Authoritative game server: HTTP+WS, world loop, Postgres, auth, social, moderation. |
+| `server/http/` | The REST request pipeline spine: table router, middleware onion, per-domain `RouteDef` tables, typed schemas, stable error codes. |
 | `headless/` + `python/` | RL env server (`env_server.ts`) + Python Gym bindings. |
 | `tests/` | Vitest suite. |
 | `scripts/` | Asset build + browser E2E / screenshot / integration scripts (`.mjs`). |
@@ -39,7 +40,12 @@ Most directories above have their own `CLAUDE.md` with local conventions; read i
 - `npm run dev`: Vite client on :5173 (proxies `/api`, `/admin/api`, `/ws` to :8787).
 - `npm run server`: esbuild-bundle + run the authoritative server on :8787.
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
-- `npm run build`: generate media manifest, then `vite build`, then emit manifest. Four entries (game, admin, play, guide).
+- `npm run gate`: the full CI-equivalent pre-merge gate (i18n gen + freshness, malware scan,
+  changed-files biome, full tests with bounded workers, `tsc`, all builds; release-tier
+  automatically on a `release/**` branch). Exit-code-safe; use it instead of an ad-hoc `&&` chain
+  before calling a change done (piping `npm test` through `tail` masks its exit code, and an
+  unbounded run flakes heavy suites under core contention).
+- `npm run build`: generate media manifest, then `vite build`, then emit manifest. Five entries (game, admin, play, guide, editor).
 - `npm run env` / `npm run bench`: build + run the headless RL env server.
 - `npm run db:up` / `npm run db:down`: Postgres 16 in Docker (dev DB on :5433).
 - `npm run realms`: run multiple realm processes locally.
@@ -59,6 +65,8 @@ See `README.md` for the full host/develop/play guide and the classic-fidelity ch
   20 Hz; the server runs the one shared `Sim` and returns interest-scoped
   (~120 yd) snapshots + per-player events. All combat, loot, quest credit, and
   economy resolve server-side. The client is a renderer; it never decides outcomes.
+  REST requests run through the in-house pipeline seam (`server/http/`): a new endpoint is a
+  `RouteDef` module behind the registry, never an inline route in `main.ts` (see `server/http/CLAUDE.md`).
 
 ## Invariants, YOU MUST keep these
 - **`src/sim/` has zero DOM/browser/Three.js imports** and never imports from
@@ -157,6 +165,9 @@ Use the seams this repo already has, do not invent new ones:
   Player-facing content also feeds the `/wiki` guide: run `npm run wiki:content` (auto in
   `pretest`/`build`, freshness-gated by `tests/guide.test.ts`) and add any new `guide.*`
   prose keys (see `src/guide/CLAUDE.md`).
+- New server REST endpoint: a `RouteDef` module (`server/<domain>.ts` `export const routes`)
+  registered in `server/http/registry.ts`, never an inline handler in `main.ts`. Scaffold with
+  `npm run new:endpoint` (see `server/http/CLAUDE.md`).
 - New multi-file subsystem: a directory with an `index.ts` barrel exposing only its
   public surface (templates: `src/render/characters/`, `src/ui/i18n.catalog/`), plus a local `CLAUDE.md`.
 
@@ -214,8 +225,10 @@ correct.
   pass. The repo ships purpose-built reviewers in `.claude/agents/` (dispatch via `/qa`):
   `qa-checklist` (the end-of-contribution gate), `architecture-reviewer` (determinism + the
   `SimContext` seam for `src/sim/`), `cross-platform-sync`, `migration-safety`,
-  `privacy-security-review`, and the `release-malware-audit` release gate; plus the
-  `feature-plan` and `extract-and-test` skills. Prefer those over ad-hoc subagents.
+  `privacy-security-review`, `test-coverage-auditor` (assertion decisiveness + pin quality),
+  and the `release-malware-audit` release gate; plus the `feature-plan`, `extract-and-test`,
+  and `release-merge-audit` (after any release merge into a feature branch) skills. Prefer
+  those over ad-hoc subagents.
 - **State rule scope literally.** 4.8 follows instructions literally and will not
   generalize a rule across cases unless told. When an invariant covers every case (every
   player string is a `t()` key; all sim randomness goes through `Rng`), say "every" or

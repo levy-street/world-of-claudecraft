@@ -16,13 +16,24 @@ vi.mock('pg', () => ({
   }),
 }));
 
-import { loadMarketState, marketStateKey, saveMarketState } from '../server/db';
+import {
+  closeMarketWriteGateForTests,
+  loadMarketState,
+  marketStateKey,
+  openMarketWriteGate,
+  saveMarketState,
+  saveWorldState,
+} from '../server/db';
 import { REALM } from '../server/realm';
 
 beforeEach(() => {
   dbMock.query.mockReset();
   dbMock.clientQuery.mockReset();
   dbMock.connect.mockClear();
+  // Every test starts from the boot default: the market write gate is CLOSED
+  // until ensureSchema's backfill opens it. Tests that need to write open it
+  // explicitly.
+  closeMarketWriteGateForTests();
 });
 
 describe('market state realm scoping', () => {
@@ -35,8 +46,69 @@ describe('market state realm scoping', () => {
     expect(marketStateKey('Stormhaven')).toBe('market:Stormhaven');
     expect(marketStateKey('Ironforge')).not.toBe(marketStateKey('Stormhaven'));
   });
+});
 
-  it('saves under the realm-scoped key', async () => {
+describe('loadMarketState (pure read, backfill owns migration)', () => {
+  it('returns the realm-scoped row when it exists, with a single read', async () => {
+    const own = { listings: [{ id: 7 }], collections: [], nextListingId: 8 };
+    dbMock.query.mockResolvedValueOnce({ rows: [{ data: own }] });
+
+    const loaded = await loadMarketState();
+
+    expect(loaded).toEqual(own);
+    // Exactly one read, keyed to this realm: no marker probe, no legacy read,
+    // no write-back, no transaction.
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    expect(dbMock.query.mock.calls[0][1][0]).toBe(`market:${REALM}`);
+    expect(dbMock.connect).not.toHaveBeenCalled();
+  });
+
+  it('returns null when the backfill marker exists and no realm row does (legacy ignored)', async () => {
+    dbMock.query
+      .mockResolvedValueOnce({ rows: [] }) // SELECT market:<realm> -> absent
+      .mockResolvedValueOnce({ rows: [{ data: { backfilledBy: REALM } }] }); // SELECT marker -> present
+
+    const loaded = await loadMarketState();
+
+    // A backfilled database never serves the stale legacy blob: an empty market
+    // for this realm is the correct answer.
+    expect(loaded).toBeNull();
+    // Two reads only: the realm key, then the marker. The bare legacy 'market'
+    // row is never read once the marker is present.
+    expect(dbMock.query).toHaveBeenCalledTimes(2);
+    expect(dbMock.query.mock.calls[0][1][0]).toBe(`market:${REALM}`);
+    expect(dbMock.query.mock.calls[1][1][0]).toBe('market_backfill_done');
+    const keysRead = dbMock.query.mock.calls.map((c) => c[1][0]);
+    expect(keysRead).not.toContain('market');
+    expect(dbMock.connect).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the retained legacy row on a pre-backfill database (no marker), reading only', async () => {
+    const legacy = { listings: [{ id: 3 }], collections: [], nextListingId: 4 };
+    dbMock.query
+      .mockResolvedValueOnce({ rows: [] }) // SELECT market:<realm> -> absent
+      .mockResolvedValueOnce({ rows: [] }) // SELECT marker -> absent
+      .mockResolvedValueOnce({ rows: [{ data: legacy }] }); // SELECT market (legacy) -> present
+
+    const loaded = await loadMarketState();
+
+    expect(loaded).toEqual(legacy);
+    // Three plain reads: realm, marker, then the bare legacy 'market' key.
+    expect(dbMock.query).toHaveBeenCalledTimes(3);
+    expect(dbMock.query.mock.calls[2][1][0]).toBe('market');
+    // The legacy row is READ-ONLY on this path: no adoption INSERT, no DELETE,
+    // and no transaction (the backfill owns adoption, not loadMarketState).
+    const sqls = dbMock.query.mock.calls.map((c) => String(c[0]));
+    expect(sqls.every((s) => s.trimStart().startsWith('SELECT'))).toBe(true);
+    expect(sqls.some((s) => /INSERT/i.test(s))).toBe(false);
+    expect(sqls.some((s) => /DELETE/i.test(s))).toBe(false);
+    expect(dbMock.connect).not.toHaveBeenCalled();
+  });
+});
+
+describe('market write gate', () => {
+  it('saveMarketState writes the realm-scoped key when the gate is open', async () => {
+    openMarketWriteGate();
     dbMock.query.mockResolvedValueOnce({ rowCount: 1, rows: [] });
 
     const save = { listings: [], collections: [], nextListingId: 1 } as never;
@@ -47,62 +119,26 @@ describe('market state realm scoping', () => {
     expect(params[0]).toBe(`market:${REALM}`);
   });
 
-  it('loads the realm-scoped row when it exists, untouched', async () => {
-    const own = { listings: [{ id: 7 }], collections: [], nextListingId: 8 };
-    dbMock.query.mockResolvedValueOnce({ rows: [{ data: own }] });
+  it('blocks a market write when the gate is closed, issuing no SQL', async () => {
+    closeMarketWriteGateForTests();
+    const save = { listings: [], collections: [], nextListingId: 1 } as never;
 
-    const loaded = await loadMarketState();
+    await expect(saveMarketState(save)).rejects.toThrow(/market write blocked/);
+    // A direct saveWorldState to a realm-market key is gated identically.
+    await expect(saveWorldState('market:Ironforge', save)).rejects.toThrow(/market write blocked/);
 
-    expect(loaded).toEqual(own);
-    // exactly one read, keyed to this realm; no legacy fallback, no write-back
-    expect(dbMock.query).toHaveBeenCalledTimes(1);
-    expect(dbMock.query.mock.calls[0][1][0]).toBe(`market:${REALM}`);
+    expect(dbMock.query).not.toHaveBeenCalled();
+    expect(dbMock.connect).not.toHaveBeenCalled();
   });
 
-  it('migrates the legacy shared "market" row into the realm key on first boot, then deletes it', async () => {
-    const legacy = { listings: [{ id: 3 }], collections: [], nextListingId: 4 };
-    // realm-scoped key absent
-    dbMock.query.mockResolvedValueOnce({ rows: [] }); // SELECT market:<realm>
-    // the migration itself runs on a dedicated transactional client
-    dbMock.clientQuery
-      .mockResolvedValueOnce({}) // BEGIN
-      .mockResolvedValueOnce({ rows: [{ data: legacy }] }) // SELECT ... FOR UPDATE market
-      .mockResolvedValueOnce({ rowCount: 1, rows: [] }) // INSERT market:<realm>
-      .mockResolvedValueOnce({}) // DELETE market
-      .mockResolvedValueOnce({}); // COMMIT
+  it('rejects a write to the bare legacy "market" key even with the gate open', async () => {
+    openMarketWriteGate();
 
-    const loaded = await loadMarketState();
-
-    expect(loaded).toEqual(legacy);
-    expect(dbMock.connect).toHaveBeenCalledTimes(1);
-    // the claiming read targeted the bare shared key, row-locked
-    const selectCall = dbMock.clientQuery.mock.calls[1];
-    expect(selectCall[0]).toContain('FOR UPDATE');
-    expect(selectCall[1][0]).toBe('market');
-    // the legacy listings are copied into this realm's key so they are not stranded
-    const writeCall = dbMock.clientQuery.mock.calls[2];
-    expect(writeCall[0]).toContain('INTO world_state');
-    expect(writeCall[1][0]).toBe(`market:${REALM}`);
-    expect(writeCall[1][1]).toBe(JSON.stringify(legacy));
-    // the legacy row is deleted so a later-added realm can never re-adopt (and
-    // duplicate) the same listings
-    const deleteCall = dbMock.clientQuery.mock.calls[3];
-    expect(deleteCall[0]).toContain('DELETE FROM world_state');
-    expect(deleteCall[1][0]).toBe('market');
-  });
-
-  it('returns null and writes nothing when neither key exists', async () => {
-    dbMock.query.mockResolvedValueOnce({ rows: [] }); // SELECT market:<realm>
-    dbMock.clientQuery
-      .mockResolvedValueOnce({}) // BEGIN
-      .mockResolvedValueOnce({ rows: [] }) // SELECT ... FOR UPDATE market
-      .mockResolvedValueOnce({}); // COMMIT
-
-    const loaded = await loadMarketState();
-
-    expect(loaded).toBeNull();
-    expect(dbMock.query).toHaveBeenCalledTimes(1); // no write-back on the pool
-    // no INSERT/DELETE issued when there is nothing to migrate: just BEGIN, SELECT, COMMIT
-    expect(dbMock.clientQuery).toHaveBeenCalledTimes(3);
+    // The retained legacy row is a rollback artifact: it must never be written,
+    // gate open or not.
+    await expect(saveWorldState('market', { listings: [] })).rejects.toThrow(
+      /legacy market key is read-only/,
+    );
+    expect(dbMock.query).not.toHaveBeenCalled();
   });
 });

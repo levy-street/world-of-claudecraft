@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
+import { fbm2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
-import { biomeAt, roadDistance, terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
+import { biomeAt, roadDistance, terrainHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
@@ -90,8 +91,8 @@ const ROUGH_SNOW = 0.72;
 const LOD_BANDS = {
   high: [
     { maxHubDist: 95, spacing: 1.2 },
-    { maxHubDist: 185, spacing: 2.0 },
-    { maxHubDist: Infinity, spacing: 3.5 },
+    { maxHubDist: 185, spacing: 1.6 },
+    { maxHubDist: Infinity, spacing: 2.6 },
   ],
   low: [
     { maxHubDist: 95, spacing: 3.0 },
@@ -119,48 +120,61 @@ const BIOME_PALETTE: Record<
     dirt: 0x8a6f47,
     sand: 0xc2b283,
   },
+  // Darker, murkier and more desaturated than the vale so the swamp reads as
+  // gloomy lowland rather than "vale but slightly duller". Pushed further
+  // toward drab olive/brown than a first pass so it reads at a glance.
   marsh: {
-    grass: 0x596d36,
-    grassDark: 0x41522b,
-    grassYellow: 0x71764a,
-    dirt: 0x6e5a3e,
-    sand: 0x8f7f5c,
+    grass: 0x3f4d28,
+    grassDark: 0x2c3a1e,
+    grassYellow: 0x505c34,
+    dirt: 0x4f4028,
+    sand: 0x655741,
   },
+  // Cooler and greyer than the vale/marsh's warm greens, pushing toward sage
+  // and stone since altitude thins out the lush growth. Pushed further blue-
+  // grey than a first pass so peaks are unmistakably a different biome.
   peaks: {
-    grass: 0x687a55,
-    grassDark: 0x4d5c45,
-    grassYellow: 0x8d9168,
-    dirt: 0x7d6a50,
-    sand: 0xb0a486,
+    grass: 0x7a8878,
+    grassDark: 0x5c6862,
+    grassYellow: 0x9aa192,
+    dirt: 0x8a7d6a,
+    sand: 0xbdb49c,
   },
   // Paint-only biomes (editor brush): flat palettes, no zone-band blend.
+  // Coastal green-blue, brighter sand than the desert's.
   beach: {
-    grass: 0x9aa55e,
-    grassDark: 0x7a8a4e,
-    grassYellow: 0xb5b06a,
-    dirt: 0xb59a6b,
-    sand: 0xe2d3a4,
+    grass: 0x9ab86a,
+    grassDark: 0x7d9a5a,
+    grassYellow: 0xb8c278,
+    dirt: 0xc2a575,
+    sand: 0xf0e4bc,
   },
+  // Warmer and browner than the beach, less green. Pushed further orange
+  // than a first pass to separate it clearly from the beach at a glance.
   desert: {
-    grass: 0xb0a060,
-    grassDark: 0x8f8350,
-    grassYellow: 0xc4b070,
-    dirt: 0xa87f4f,
-    sand: 0xd8b581,
+    grass: 0xcbaa5e,
+    grassDark: 0xa88d48,
+    grassYellow: 0xe0c070,
+    dirt: 0xc08f4a,
+    sand: 0xecc890,
   },
+  // Dark, red-tinted ash rather than the cave's neutral grey. Pushed darker
+  // still so it reads as scorched ground, not just "dirty".
   volcano: {
-    grass: 0x5a4a42,
-    grassDark: 0x40332e,
-    grassYellow: 0x6e5a4a,
-    dirt: 0x4a3a32,
-    sand: 0x6a5548,
+    grass: 0x3c2c28,
+    grassDark: 0x281c18,
+    grassYellow: 0x503830,
+    dirt: 0x2c2018,
+    sand: 0x4c342c,
   },
+  // Neutral blue-grey stone, distinct from volcano's warm ash. Pushed cooler
+  // and darker so it reads as underground rock, not daylight dirt.
   cave: {
-    grass: 0x6a6a62,
-    grassDark: 0x50504a,
-    grassYellow: 0x7a7a6e,
-    dirt: 0x5a5248,
-    sand: 0x8a8274,
+    grass: 0x585e66,
+    grassDark: 0x3e444c,
+    grassYellow: 0x6a7078,
+    dirt: 0x484e56,
+    sand: 0x767c86,
   },
 };
 
@@ -195,6 +209,7 @@ const dirtC = new THREE.Color(),
   sandC = new THREE.Color();
 const dirtDarkC = new THREE.Color(0x73592f);
 const rockC = new THREE.Color(0x7a7a72);
+const wetRockC = new THREE.Color(0x3f4442); // dark wet-rock shoreline (peaks/volcano/cave)
 const impactAshC = new THREE.Color(0x18110d);
 const impactScorchC = new THREE.Color(0x2a160c);
 const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
@@ -236,7 +251,7 @@ function makeBiomePalette(b: BiomeId): (typeof zonePalettes)[number] {
 // Palette at a point. A painted cell (biome differs from its zone band) uses that
 // biome's flat palette; otherwise the smooth zone-band blend. With no paint layer
 // `biome === zoneBiomeAt(z)` always, so this is the original z-blend exactly.
-function paletteAt(x: number, z: number, biome: BiomeId): void {
+function paletteAt(_x: number, z: number, biome: BiomeId): void {
   if (biome !== zoneBiomeAt(z)) {
     const p = biomePalettes[biome];
     grassC.copy(p.grass);
@@ -317,20 +332,34 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   }
   const impact = impactCraterTerrainBlend(x, z);
 
-  // base grass with patchy variation
-  const v = (Math.sin(x * 0.21) * Math.cos(z * 0.17) + 1) / 2;
+  // base grass with patchy variation: a coarse fbm layer for dry/lush
+  // patches plus a fine one for grain, replacing the old pure-sine tint
+  // (sine repeats on a visible grid at a distance; noise reads as natural
+  // ground cover instead).
+  const v = fbm2(x * 0.045, z * 0.045, seed + 53, 3);
   cTmp.copy(grassC).lerp(grassDarkC, v);
-  const v2 = (Math.sin(x * 0.043 + 5) * Math.cos(z * 0.05 + 2) + 1) / 2;
+  const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
   cTmp.lerp(grassYellowC, v2 * 0.35);
   // the marsh reads muddier: patches of wet dirt across the lowland
   if (biome === 'marsh') lerpSplat(w, 1, 0.3 * v2 * clamp01((4 - h) / 6));
-  // shoreline sand — color and splat weight share one feathered falloff so
-  // the beach blends out instead of cutting a razor-hard grass/sand line.
-  // waterLevel() (not the const) so the beach tracks a custom map's water.
-  const wl = waterLevel();
+  // shoreline blend, biome-specific: marsh has no sandy beach (wet mud
+  // instead), rocky/ashen biomes get a darker wet-rock tint, everywhere else
+  // keeps the classic sandy bank. Color and splat weight share one feathered
+  // falloff so the shore blends out instead of cutting a razor-hard edge.
+  // waterLevelAt(x, z) (not the flat const) so the beach only tracks water inside
+  // a declared lake's footprint; a dry sunken feature elsewhere gets no shore tint.
+  const wl = waterLevelAt(x, z);
   const shore = clamp01((wl + 1.6 - h) / 1.6);
-  cTmp.lerp(sandC, shore);
-  lerpSplat(w, 3, shore);
+  if (biome === 'marsh') {
+    cTmp.lerp(dirtDarkC, shore);
+    lerpSplat(w, 1, shore);
+  } else if (biome === 'peaks' || biome === 'volcano' || biome === 'cave') {
+    cTmp.lerp(wetRockC, shore);
+    lerpSplat(w, 2, shore);
+  } else {
+    cTmp.lerp(sandC, shore);
+    lerpSplat(w, 3, shore);
+  }
   // packed dirt at each hub settlement (same feather as the splat weight —
   // a constant lerp stamped a clean-edged brown disc on the grass)
   for (const zn of ZONES) {
@@ -351,17 +380,23 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     cTmp.lerp(dirtC, t);
     lerpSplat(w, 1, t);
   }
+  // Break up the rock/snow blend so cliffs read as striated stone and snow
+  // reads as patchy drifts instead of a single flat tone / a clean cutoff.
+  const rockStreak = fbm2(x * 0.09, z * 0.09, seed + 41, 3);
+  const snowPatch = fbm2(x * 0.06, z * 0.06, seed + 47, 3);
   const rockStart = ROCK_SLOPE_START[biome];
   if (slope > rockStart) {
     const t = Math.min(1, (slope - rockStart) * 2);
     cTmp.lerp(rockC, t);
+    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
     lerpSplat(w, 2, t);
   }
   // high ground (ridges, peaks) goes rocky then snowy
   let snow = 0;
   if (h > 22) {
-    cTmp.lerp(rockC, clamp01((h - 22) / 10) * 0.7);
-    snow = clamp01((h - 34) / 14) * 0.85;
+    const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
+    cTmp.lerp(rockC, rockT);
+    snow = clamp01((h - 34 + (snowPatch - 0.5) * 8) / 14) * 0.85;
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
   }
@@ -371,15 +406,18 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     lerpSplat(w, 1, impact.dirt);
     lerpSplat(w, 2, impact.rock);
   }
-  // the rim wall reads as distant sunlit peaks, not a black cliff
+  // the rim wall reads as distant sunlit peaks, not a black cliff. The haze
+  // kicks in well before the wall itself (edge starts negative deep inland)
+  // so from a zone's centre the rim reads as atmospheric haze rather than a
+  // crisp silhouette, reinforcing the reduced BIOME_FOG draw distance.
   const edge = Math.max(
-    Math.abs(x) - (WORLD_MAX_X - 32),
-    WORLD_MIN_Z + 32 - z,
-    z - (WORLD_MAX_Z - 32),
+    Math.abs(x) - (WORLD_MAX_X - 70),
+    WORLD_MIN_Z + 70 - z,
+    z - (WORLD_MAX_Z - 70),
   );
-  const rim = clamp01(edge / 26);
+  const rim = clamp01(edge / 64);
   if (rim > 0) {
-    cTmp.lerp(hazyPeakC, rim * 0.9);
+    cTmp.lerp(hazyPeakC, rim * 0.95);
     const rimSnow = clamp01((h - 26) / 16) * rim * 0.8;
     cTmp.lerp(snowCapC, rimSnow);
     snow = Math.max(snow, rimSnow);

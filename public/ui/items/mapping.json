@@ -1,8 +1,15 @@
 {
   "license": "CraftPix premium (royalty-free commercial). Icons purchased by Levy Street account - callum@levystreet.com",
   "iconSize": 128,
-  "note": "Resource/consumable item icons, curated + verified from CraftPix packs. WebP only.",
+  "note": "Item icons (resources, consumables, quest items, and armor equipment), curated + verified from CraftPix packs. WebP only.",
   "entries": [
+    {
+      "itemId": "acolytes_circlet",
+      "name": "Acolyte's Circlet",
+      "sourcePack": "helmets",
+      "sourceFile": "3.png",
+      "confidence": "medium"
+    },
     {
       "itemId": "alien_armor_plate",
       "name": "Alien Armor Plate",
@@ -32,10 +39,24 @@
       "confidence": "high"
     },
     {
+      "itemId": "apprentice_robe",
+      "name": "Threadbare Robe",
+      "sourcePack": "armor",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "baked_bread",
       "name": "Freshly Baked Bread",
       "sourcePack": "cooking",
       "sourceFile": "38.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "bandit_bandana",
+      "name": "Red Bandana",
+      "sourcePack": "generic100b",
+      "sourceFile": "25.png",
       "confidence": "high"
     },
     {
@@ -53,11 +74,25 @@
       "confidence": "high"
     },
     {
+      "itemId": "blessed_wax",
+      "name": "Blessed Tallow",
+      "sourcePack": "alchemist",
+      "sourceFile": "18.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "boar_hide",
       "name": "Bristly Boar Hide",
       "sourcePack": "craft_resources",
       "sourceFile": "34.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "bogiron_hauberk",
+      "name": "Bogiron Hauberk",
+      "sourcePack": "equipment",
+      "sourceFile": "33.png",
+      "confidence": "medium"
     },
     {
       "itemId": "bogiron_nugget",
@@ -74,11 +109,74 @@
       "confidence": "high"
     },
     {
+      "itemId": "boneguard_breastplate",
+      "name": "Boneguard Breastplate",
+      "sourcePack": "armor",
+      "sourceFile": "31.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "boneplate_vest",
+      "name": "Boneplate Vest",
+      "sourcePack": "armor",
+      "sourceFile": "23.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "boundstone_girdle",
+      "name": "Boundstone Girdle",
+      "sourcePack": "belts",
+      "sourceFile": "34.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "boundstone_helm",
+      "name": "Boundstone Helm",
+      "sourcePack": "equipment",
+      "sourceFile": "51.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "bramblehide_jerkin",
+      "name": "Bramblehide Jerkin",
+      "sourcePack": "armor",
+      "sourceFile": "25.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "brightwood_venison",
       "name": "Brightwood Venison",
       "sourcePack": "hunting",
       "sourceFile": "4.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "briny_idol",
+      "name": "Briny Idol",
+      "sourcePack": "fishing",
+      "sourceFile": "47.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "broodmother_silk_robe",
+      "name": "Broodmother's Silk Robe",
+      "sourcePack": "armor",
+      "sourceFile": "38.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "captains_crest",
+      "name": "Crypt Keystone Upper",
+      "sourcePack": "generic100b",
+      "sourceFile": "76.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "caravan_quilted_vest",
+      "name": "Caravan Quilted Vest",
+      "sourcePack": "equipment",
+      "sourceFile": "36.png",
+      "confidence": "high"
     },
     {
       "itemId": "chipped_tusk",
@@ -93,6 +191,13 @@
       "sourcePack": "cooking",
       "sourceFile": "49.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "conjured_bread2",
+      "name": "Conjured Black Loaf",
+      "sourcePack": "generic100b",
+      "sourceFile": "87.png",
+      "confidence": "medium"
     },
     {
       "itemId": "conjured_bread3",
@@ -123,6 +228,13 @@
       "confidence": "medium"
     },
     {
+      "itemId": "copper_mining_pick",
+      "name": "Copper Mining Pick",
+      "sourcePack": "farming",
+      "sourceFile": "2.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "cracked_fetish",
       "name": "Cracked Fetish",
       "sourcePack": "generic100b",
@@ -144,10 +256,52 @@
       "confidence": "high"
     },
     {
+      "itemId": "cragmaw_huntcord",
+      "name": "Cragmaw's Huntcord",
+      "sourcePack": "belts",
+      "sourceFile": "39.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "cragmaw_prowlboots",
+      "name": "Cragmaw Prowlboots",
+      "sourcePack": "boots",
+      "sourceFile": "44.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "cragwalker_boots",
+      "name": "Cragwalker Boots",
+      "sourcePack": "boots",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "crimson_amber_armor_plate",
       "name": "Crimson Amber",
       "sourcePack": "blacksmith",
       "sourceFile": "25.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "crownforged_dreadhelm",
+      "name": "Bonewrought Dreadhelm",
+      "sourcePack": "helmets",
+      "sourceFile": "36.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "crownforged_gauntlets",
+      "name": "Crownforged Gauntlets",
+      "sourcePack": "gloves",
+      "sourceFile": "39.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "crownforged_girdle",
+      "name": "Crownforged Girdle",
+      "sourcePack": "belts",
+      "sourceFile": "36.png",
       "confidence": "high"
     },
     {
@@ -165,6 +319,27 @@
       "confidence": "high"
     },
     {
+      "itemId": "cryptbone_greaves",
+      "name": "Cryptbone Greaves",
+      "sourcePack": "greaves",
+      "sourceFile": "15.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "cryptbone_helm",
+      "name": "Cryptbone Helm",
+      "sourcePack": "helmets",
+      "sourceFile": "32.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "cryptstalker_jerkin",
+      "name": "Gravestalker Jerkin",
+      "sourcePack": "armor",
+      "sourceFile": "13.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "cult_cipher",
       "name": "Gravecaller Cipher",
       "sourcePack": "generic100b",
@@ -179,6 +354,41 @@
       "confidence": "high"
     },
     {
+      "itemId": "deacon_reliquary_helm",
+      "name": "Deacon's Reliquary Helm",
+      "sourcePack": "helmets",
+      "sourceFile": "38.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "deathlord_legguards",
+      "name": "Barrowlord Legguards",
+      "sourcePack": "greaves",
+      "sourceFile": "45.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "deathlord_sabatons",
+      "name": "Barrowlord Sabatons",
+      "sourcePack": "equipment",
+      "sourceFile": "6.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "deathlord_warplate",
+      "name": "Barrowlord Warplate",
+      "sourcePack": "armor",
+      "sourceFile": "33.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "deathlords_dread_visage",
+      "name": "Barrowlord's Dread Visage",
+      "sourcePack": "helmets",
+      "sourceFile": "24.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "deepfen_pearl",
       "name": "Deepfen Pearl",
       "sourcePack": "gems",
@@ -186,10 +396,87 @@
       "confidence": "high"
     },
     {
+      "itemId": "drogmar_warboots",
+      "name": "Drogmar's Warboots",
+      "sourcePack": "boots",
+      "sourceFile": "15.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "drowned_offering",
       "name": "Drowned Offering",
       "sourcePack": "generic100b",
       "sourceFile": "93.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "drowned_prayer_leggings",
+      "name": "Drowned Prayer Leggings",
+      "sourcePack": "greaves",
+      "sourceFile": "44.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "drowned_prayer_sandals",
+      "name": "Drowned Prayer Sandals",
+      "sourcePack": "boots",
+      "sourceFile": "13.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "drownedguard_breastplate",
+      "name": "Drownedguard Breastplate",
+      "sourcePack": "equipment",
+      "sourceFile": "32.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "drownstep_sabatons",
+      "name": "Drownstep Sabatons",
+      "sourcePack": "boots",
+      "sourceFile": "39.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "drownstep_slippers",
+      "name": "Drownstep Slippers",
+      "sourcePack": "boots",
+      "sourceFile": "21.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "drownstep_treads",
+      "name": "Drownstep Treads",
+      "sourcePack": "boots",
+      "sourceFile": "36.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "eastbrook_chain_vest",
+      "name": "Eastbrook Chainmail Vest",
+      "sourcePack": "equipment",
+      "sourceFile": "44.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "eastbrook_wool_trousers",
+      "name": "Eastbrook Wool Trousers",
+      "sourcePack": "greaves",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "eelscale_leggings",
+      "name": "Eelscale Leggings",
+      "sourcePack": "greaves",
+      "sourceFile": "42.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "eelscale_treads",
+      "name": "Eelscale Treads",
+      "sourcePack": "boots",
+      "sourceFile": "30.png",
       "confidence": "medium"
     },
     {
@@ -207,10 +494,24 @@
       "confidence": "high"
     },
     {
+      "itemId": "emberwing_legguards",
+      "name": "Emberwing Legguards",
+      "sourcePack": "greaves",
+      "sourceFile": "32.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "event_skin_token",
       "name": "Mysterious Cosmetic Cache",
       "sourcePack": "generic100b",
       "sourceFile": "46.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "felling_axe",
+      "name": "Felling Axe",
+      "sourcePack": "farming",
+      "sourceFile": "17.png",
       "confidence": "high"
     },
     {
@@ -228,6 +529,27 @@
       "confidence": "medium"
     },
     {
+      "itemId": "fenmist_robe",
+      "name": "Fenmist Robe",
+      "sourcePack": "armor",
+      "sourceFile": "45.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "fenwalker_boots",
+      "name": "Fenwalker Boots",
+      "sourcePack": "equipment",
+      "sourceFile": "2.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "footpad_jerkin",
+      "name": "Cutpurse Jerkin",
+      "sourcePack": "armor",
+      "sourceFile": "12.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "forest_pink_armor_plate",
       "name": "Forest Pink",
       "sourcePack": "blacksmith",
@@ -239,6 +561,13 @@
       "name": "Frayed Prayer Beads",
       "sourcePack": "generic100b",
       "sourceFile": "39.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "gathering_sickle",
+      "name": "Gathering Sickle",
+      "sourcePack": "farming",
+      "sourceFile": "4.png",
       "confidence": "high"
     },
     {
@@ -270,10 +599,24 @@
       "confidence": "high"
     },
     {
+      "itemId": "grave_captain_voss",
+      "name": "Grave of Royal Assassin Voss",
+      "sourcePack": "generic100c",
+      "sourceFile": "skill 62.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "grave_high_priest_malric",
       "name": "Grave of High Priest Malric",
       "sourcePack": "generic100b",
       "sourceFile": "95.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "grave_sir_aldren",
+      "name": "Grave of Captain Aldren",
+      "sourcePack": "generic100c",
+      "sourceFile": "skill 78.png",
       "confidence": "medium"
     },
     {
@@ -284,11 +627,60 @@
       "confidence": "high"
     },
     {
+      "itemId": "gravepath_treads",
+      "name": "Gravepath Treads",
+      "sourcePack": "boots",
+      "sourceFile": "37.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "gravewalker_softboots",
+      "name": "Gravewalker Softboots",
+      "sourcePack": "boots",
+      "sourceFile": "31.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "gravewoven_raiment",
+      "name": "Gravewoven Raiment",
+      "sourcePack": "armor",
+      "sourceFile": "41.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "gravewyrm_gauntlets",
+      "name": "Gravewyrm Gauntlets",
+      "sourcePack": "gloves",
+      "sourceFile": "15.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "gravewyrm_sabatons",
+      "name": "Gravewyrm Sabatons",
+      "sourcePack": "boots",
+      "sourceFile": "29.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "gravewyrm_scale_hauberk",
+      "name": "Gravewyrm Scale Hauberk",
+      "sourcePack": "armor",
+      "sourceFile": "34.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "gravewyrm_sigil",
       "name": "Gravewyrm Sigil",
       "sourcePack": "generic100a",
       "sourceFile": "skill 16.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "gravewyrm_stalkers_treads",
+      "name": "Gravewyrm Stalker's Treads",
+      "sourcePack": "boots",
+      "sourceFile": "28.png",
+      "confidence": "medium"
     },
     {
       "itemId": "greyjaw_fang",
@@ -298,10 +690,31 @@
       "confidence": "high"
     },
     {
+      "itemId": "greyjaw_hide_boots",
+      "name": "Greyjaw Hide Boots",
+      "sourcePack": "boots",
+      "sourceFile": "16.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "greyjaw_pelt_cloak",
+      "name": "Greyjaw's Pelt Leggings",
+      "sourcePack": "greaves",
+      "sourceFile": "17.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "grubjaw_tusk",
       "name": "Grubjaw's Tusk",
       "sourcePack": "generic100b",
       "sourceFile": "91.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "handaxe",
+      "name": "Handaxe",
+      "sourcePack": "farming",
+      "sourceFile": "16.png",
       "confidence": "high"
     },
     {
@@ -312,11 +725,39 @@
       "confidence": "high"
     },
     {
+      "itemId": "highwatch_breastplate",
+      "name": "Highwatch Breastplate",
+      "sourcePack": "armor",
+      "sourceFile": "9.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "highwatch_summons",
       "name": "Highwatch Summons",
       "sourcePack": "generic100b",
       "sourceFile": "1.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "hobnail_boots",
+      "name": "Hobnailed Boots",
+      "sourcePack": "boots",
+      "sourceFile": "18.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "hollowbone_hauberk",
+      "name": "Hollowbone Hauberk",
+      "sourcePack": "armor",
+      "sourceFile": "36.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "hollowbound_legguards",
+      "name": "Hollowbound Legguards",
+      "sourcePack": "greaves",
+      "sourceFile": "30.png",
+      "confidence": "medium"
     },
     {
       "itemId": "imperial_crimson_armor_plate",
@@ -340,6 +781,20 @@
       "confidence": "medium"
     },
     {
+      "itemId": "iron_mining_pick",
+      "name": "Iron Mining Pick",
+      "sourcePack": "farming",
+      "sourceFile": "8.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "ironbark_axe",
+      "name": "Ironbark Axe",
+      "sourcePack": "farming",
+      "sourceFile": "18.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "ivory_copper_armor_plate",
       "name": "Ivory Copper",
       "sourcePack": "blacksmith",
@@ -354,6 +809,27 @@
       "confidence": "high"
     },
     {
+      "itemId": "kings_signet",
+      "name": "King's Signet",
+      "sourcePack": "jewelry",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "knight_commanders_greaves",
+      "name": "Knight-Commander's Greaves",
+      "sourcePack": "greaves",
+      "sourceFile": "21.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "korgaths_chainwraps",
+      "name": "Korgath's Chainwraps",
+      "sourcePack": "greaves",
+      "sourceFile": "24.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "lesser_healing_potion",
       "name": "Lesser Healing Potion",
       "sourcePack": "alchemist",
@@ -365,6 +841,13 @@
       "name": "Lesser Mana Potion",
       "sourcePack": "generic100b",
       "sourceFile": "66.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "linen_pouch",
+      "name": "Linen Pouch",
+      "sourcePack": "generic100b",
+      "sourceFile": "34.png",
       "confidence": "high"
     },
     {
@@ -396,11 +879,53 @@
       "confidence": "high"
     },
     {
+      "itemId": "marrowlord_boneboots",
+      "name": "Marrowlord Boneboots",
+      "sourcePack": "equipment",
+      "sourceFile": "3.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "marrowtread_boots",
+      "name": "Marrowtread Boots",
+      "sourcePack": "boots",
+      "sourceFile": "24.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "marsh_mint_tea",
       "name": "Marsh Mint Tea",
       "sourcePack": "generic100b",
       "sourceFile": "82.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "marshcloth_robe",
+      "name": "Marshcloth Robe",
+      "sourcePack": "armor",
+      "sourceFile": "8.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "marshstrider_boots",
+      "name": "Marshstrider Boots",
+      "sourcePack": "equipment",
+      "sourceFile": "11.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "milepost_boots",
+      "name": "Milepost Boots",
+      "sourcePack": "boots",
+      "sourceFile": "45.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "militia_vest",
+      "name": "Militia Chainvest",
+      "sourcePack": "armor",
+      "sourceFile": "19.png",
+      "confidence": "medium"
     },
     {
       "itemId": "minor_healing_potion",
@@ -414,6 +939,48 @@
       "name": "Mire Prowler Pelt",
       "sourcePack": "hunting",
       "sourceFile": "36.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "mirejaw_scale_vest",
+      "name": "Mirejaw Scale Vest",
+      "sourcePack": "armor",
+      "sourceFile": "10.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "mistveil_cord",
+      "name": "Mistveil Cord",
+      "sourcePack": "belts",
+      "sourceFile": "9.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "mistveil_grips",
+      "name": "Mistveil Grips",
+      "sourcePack": "gloves",
+      "sourceFile": "12.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "mithril_mining_pick",
+      "name": "Mithril Mining Pick",
+      "sourcePack": "farming",
+      "sourceFile": "9.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "moggers_stomper_boots",
+      "name": "Mogger's Stomper Boots",
+      "sourcePack": "boots",
+      "sourceFile": "22.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "monarch_crown_helm",
+      "name": "Monarch's Crown",
+      "sourcePack": "helmets",
+      "sourceFile": "45.png",
       "confidence": "high"
     },
     {
@@ -431,10 +998,31 @@
       "confidence": "medium"
     },
     {
+      "itemId": "moonshroud_breastplate",
+      "name": "Moonwrack Breastplate",
+      "sourcePack": "armor",
+      "sourceFile": "29.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "moonshroud_robe",
+      "name": "Moonwrack Robe",
+      "sourcePack": "armor",
+      "sourceFile": "46.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "morthen_grimoire",
       "name": "Morthen's Grimoire",
       "sourcePack": "generic100b",
       "sourceFile": "71.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "mossy_handwraps",
+      "name": "Mossgrown Handwraps",
+      "sourcePack": "gloves",
+      "sourceFile": "46.png",
       "confidence": "high"
     },
     {
@@ -445,6 +1033,62 @@
       "confidence": "medium"
     },
     {
+      "itemId": "necromancers_legwraps",
+      "name": "Mournweave Legwraps",
+      "sourcePack": "greaves",
+      "sourceFile": "25.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "necromancers_soulsteps",
+      "name": "Mournweave Soulsteps",
+      "sourcePack": "boots",
+      "sourceFile": "33.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "necromancers_starshroud",
+      "name": "Mournweave Starshroud",
+      "sourcePack": "armor",
+      "sourceFile": "49.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "nhalias_funeral_wraps",
+      "name": "Nhalia's Funeral Wraps",
+      "sourcePack": "greaves",
+      "sourceFile": "11.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "nighttalon_crown",
+      "name": "Direfang Crown",
+      "sourcePack": "equipment",
+      "sourceFile": "49.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "nighttalon_grips",
+      "name": "Nighttalon Grips",
+      "sourcePack": "gloves",
+      "sourceFile": "44.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "nighttalon_waistband",
+      "name": "Nighttalon Waistband",
+      "sourcePack": "belts",
+      "sourceFile": "30.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "oathbound_greaves",
+      "name": "Oathbound Greaves",
+      "sourcePack": "greaves",
+      "sourceFile": "3.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "ogre_toe_ring",
       "name": "Ogre Toe Ring",
       "sourcePack": "generic100b",
@@ -452,10 +1096,52 @@
       "confidence": "high"
     },
     {
+      "itemId": "ogre_war_totem",
+      "name": "Ogre War Totem",
+      "sourcePack": "equipment",
+      "sourceFile": "84.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "oiled_boots",
+      "name": "Oiled Leather Boots",
+      "sourcePack": "boots",
+      "sourceFile": "11.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "old_cragmaws_pelt",
       "name": "Old Cragmaw's Pelt",
       "sourcePack": "hunting",
       "sourceFile": "33.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "orange_steel_armor_plate",
+      "name": "Orange Steel",
+      "sourcePack": "blacksmith",
+      "sourceFile": "26.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "outrider_brigandine",
+      "name": "Outrider Brigandine",
+      "sourcePack": "armor",
+      "sourceFile": "22.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "outrider_legguards",
+      "name": "Outrider Legguards",
+      "sourcePack": "greaves",
+      "sourceFile": "16.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "outrider_sabatons",
+      "name": "Outrider Sabatons",
+      "sourcePack": "boots",
+      "sourceFile": "19.png",
       "confidence": "high"
     },
     {
@@ -473,6 +1159,20 @@
       "confidence": "medium"
     },
     {
+      "itemId": "peakwool_robe",
+      "name": "Peakwool Robe",
+      "sourcePack": "armor",
+      "sourceFile": "48.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "pilgrims_leggings",
+      "name": "Pilgrim's Leggings",
+      "sourcePack": "greaves",
+      "sourceFile": "49.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "pink_forest_armor_plate",
       "name": "Pink Forest",
       "sourcePack": "gems",
@@ -485,6 +1185,13 @@
       "sourcePack": "gems",
       "sourceFile": "28.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "quilted_trousers",
+      "name": "Quilted Trousers",
+      "sourcePack": "greaves",
+      "sourceFile": "35.png",
+      "confidence": "high"
     },
     {
       "itemId": "raw_bog_eel",
@@ -529,6 +1236,69 @@
       "confidence": "medium"
     },
     {
+      "itemId": "recruit_tunic",
+      "name": "Levyman's Tunic",
+      "sourcePack": "armor",
+      "sourceFile": "18.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "reedwoven_jerkin",
+      "name": "Reedwoven Jerkin",
+      "sourcePack": "armor",
+      "sourceFile": "3.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "reedwoven_trousers",
+      "name": "Reedwoven Trousers",
+      "sourcePack": "greaves",
+      "sourceFile": "7.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "reliquary_cloth_chest",
+      "name": "Shroud of the Reliquary",
+      "sourcePack": "equipment",
+      "sourceFile": "41.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "reliquary_gloves_rog",
+      "name": "Bonewarden Grips",
+      "sourcePack": "gloves",
+      "sourceFile": "21.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "reliquary_helm",
+      "name": "Ossuary Watch Helm",
+      "sourcePack": "helmets",
+      "sourceFile": "25.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "reliquary_legs",
+      "name": "Vaultbound Legwraps",
+      "sourcePack": "greaves",
+      "sourceFile": "12.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "reliquary_plate_chest",
+      "name": "Reliquary Guard Hauberk",
+      "sourcePack": "armor",
+      "sourceFile": "24.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "revenant_silk_robe",
+      "name": "Revenant Silk Robe",
+      "sourcePack": "armor",
+      "sourceFile": "47.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "ridge_stalker_pelt",
       "name": "Ridge Stalker Pelt",
       "sourcePack": "hunting",
@@ -536,10 +1306,24 @@
       "confidence": "medium"
     },
     {
+      "itemId": "ridgestalker_treads",
+      "name": "Ridgestalker Treads",
+      "sourcePack": "boots",
+      "sourceFile": "17.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "ritual_phylactery",
       "name": "Ritual Phylactery",
       "sourcePack": "generic100b",
       "sourceFile": "86.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "roadwardens_helm",
+      "name": "Roadwarden's Helm",
+      "sourcePack": "helmets",
+      "sourceFile": "48.png",
       "confidence": "high"
     },
     {
@@ -557,6 +1341,13 @@
       "confidence": "high"
     },
     {
+      "itemId": "roughspun_gloves",
+      "name": "Roughspun Gloves",
+      "sourcePack": "gloves",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "royal_seal",
       "name": "Ancient Diary",
       "sourcePack": "generic100b",
@@ -569,6 +1360,62 @@
       "sourcePack": "craft_resources",
       "sourceFile": "3.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "sableweb_cord",
+      "name": "Sableweb Cord",
+      "sourcePack": "belts",
+      "sourceFile": "24.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "sableweb_slippers",
+      "name": "Sableweb Slippers",
+      "sourcePack": "boots",
+      "sourceFile": "12.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "sanctum_key_shard",
+      "name": "Sanctum Key Shard",
+      "sourcePack": "gems",
+      "sourceFile": "24.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "selthes_seastriders",
+      "name": "Selthe's Sea-Striders",
+      "sourcePack": "boots",
+      "sourceFile": "48.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "sextons_slippers",
+      "name": "Sexton's Slippers",
+      "sourcePack": "boots",
+      "sourceFile": "47.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "shadow_jerkin",
+      "name": "Shadowstitch Jerkin",
+      "sourcePack": "armor",
+      "sourceFile": "15.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "silk_sash",
+      "name": "Woven Silk Sash",
+      "sourcePack": "belts",
+      "sourceFile": "46.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "silverleaf_sickle",
+      "name": "Silverleaf Sickle",
+      "sourcePack": "farming",
+      "sourceFile": "5.png",
+      "confidence": "high"
     },
     {
       "itemId": "silvermist_cordial",
@@ -585,6 +1432,13 @@
       "confidence": "high"
     },
     {
+      "itemId": "skullsmasher_warbelt",
+      "name": "Skullsmasher's Warbelt",
+      "sourcePack": "armor",
+      "sourceFile": "17.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "smoked_eel",
       "name": "Smoked Mirefen Eel",
       "sourcePack": "cooking",
@@ -596,6 +1450,34 @@
       "name": "Soft Down Tuft",
       "sourcePack": "craft_resources",
       "sourceFile": "44.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "soggy_moccasin",
+      "name": "Soggy Moccasin",
+      "sourcePack": "equipment",
+      "sourceFile": "12.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "soulflame_cord",
+      "name": "Soulflame Cord",
+      "sourcePack": "belts",
+      "sourceFile": "12.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "soulflame_cowl",
+      "name": "Wraithfire Cowl",
+      "sourcePack": "helmets",
+      "sourceFile": "21.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "soulflame_gloves",
+      "name": "Soulflame Gloves",
+      "sourcePack": "equipment",
+      "sourceFile": "22.png",
       "confidence": "high"
     },
     {
@@ -613,6 +1495,13 @@
       "confidence": "high"
     },
     {
+      "itemId": "stalkerhide_jerkin",
+      "name": "Stalkerhide Jerkin",
+      "sourcePack": "armor",
+      "sourceFile": "20.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "steel_orange_armor_plate",
       "name": "Steel Orange",
       "sourcePack": "blacksmith",
@@ -624,6 +1513,41 @@
       "name": "Storm Core",
       "sourcePack": "gems",
       "sourceFile": "92.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "stormcallers_crown",
+      "name": "Galecall Crown",
+      "sourcePack": "helmets",
+      "sourceFile": "34.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "stormcallers_handguards",
+      "name": "Stormcaller's Handguards",
+      "sourcePack": "equipment",
+      "sourceFile": "21.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "stormcallers_waistguard",
+      "name": "Stormcaller's Waistguard",
+      "sourcePack": "belts",
+      "sourceFile": "27.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "stormshard_leggings",
+      "name": "Stormshard Leggings",
+      "sourcePack": "greaves",
+      "sourceFile": "41.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "sturdy_belt",
+      "name": "Sturdy Traveler's Belt",
+      "sourcePack": "belts",
+      "sourceFile": "4.png",
       "confidence": "high"
     },
     {
@@ -641,10 +1565,45 @@
       "confidence": "medium"
     },
     {
+      "itemId": "tanned_leather_jerkin",
+      "name": "Tanned Leather Jerkin",
+      "sourcePack": "equipment",
+      "sourceFile": "43.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "the_codfather",
       "name": "The Codfather",
       "sourcePack": "generic100b",
       "sourceFile": "14.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "tideguard_greaves",
+      "name": "Tideguard Greaves",
+      "sourcePack": "greaves",
+      "sourceFile": "31.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "tideguard_sabatons",
+      "name": "Tideguard Sabatons",
+      "sourcePack": "boots",
+      "sourceFile": "25.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "tidescale_vest",
+      "name": "Tidescale Vest",
+      "sourcePack": "equipment",
+      "sourceFile": "39.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "tidewatchers_wraps",
+      "name": "Tidewatcher's Wraps",
+      "sourcePack": "greaves",
+      "sourceFile": "10.png",
       "confidence": "medium"
     },
     {
@@ -662,6 +1621,13 @@
       "confidence": "high"
     },
     {
+      "itemId": "trail_leggings",
+      "name": "Trailworn Leggings",
+      "sourcePack": "greaves",
+      "sourceFile": "39.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "troll_fetish",
       "name": "Mirefen Troll Fetish",
       "sourcePack": "generic100b",
@@ -669,10 +1635,59 @@
       "confidence": "high"
     },
     {
+      "itemId": "trollhide_leggings",
+      "name": "Trollhide Leggings",
+      "sourcePack": "greaves",
+      "sourceFile": "5.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "unknown_alien_weaponry",
+      "name": "Unknown Alien Weaponry",
+      "sourcePack": "generic100c",
+      "sourceFile": "skill 33.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "valespun_robe",
+      "name": "Valespun Robe",
+      "sourcePack": "armor",
+      "sourceFile": "2.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "vanguard_azure_armor_plate",
       "name": "Vanguard Azure",
       "sourcePack": "gems",
       "sourceFile": "55.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "vanguard_chrome_armor_plate",
+      "name": "Vanguard Chrome",
+      "sourcePack": "blacksmith",
+      "sourceFile": "42.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "varric_shadow_cowl",
+      "name": "Varric's Shadow Cowl",
+      "sourcePack": "helmets",
+      "sourceFile": "23.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "wanderers_chestguard",
+      "name": "Wanderer's Chestguard",
+      "sourcePack": "equipment",
+      "sourceFile": "31.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "wayfarers_hood",
+      "name": "Wayfarer's Hood",
+      "sourcePack": "helmets",
+      "sourceFile": "12.png",
       "confidence": "high"
     },
     {
@@ -697,6 +1712,13 @@
       "confidence": "medium"
     },
     {
+      "itemId": "windguard_leggings",
+      "name": "Windguard Leggings",
+      "sourcePack": "greaves",
+      "sourceFile": "8.png",
+      "confidence": "medium"
+    },
+    {
       "itemId": "wolf_fang",
       "name": "Cracked Wolf Fang",
       "sourcePack": "generic100b",
@@ -704,10 +1726,80 @@
       "confidence": "high"
     },
     {
+      "itemId": "wolfhide_satchel",
+      "name": "Wolfhide Satchel",
+      "sourcePack": "generic100b",
+      "sourceFile": "28.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "woven_robe",
+      "name": "Valewoven Robe",
+      "sourcePack": "armor",
+      "sourceFile": "40.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "wyrmcult_grand_robe",
+      "name": "Wyrmcult Grand Robe",
+      "sourcePack": "armor",
+      "sourceFile": "44.png",
+      "confidence": "high"
+    },
+    {
       "itemId": "wyrmcult_orders",
       "name": "Wyrmcult Orders",
       "sourcePack": "generic100b",
       "sourceFile": "81.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "wyrmcult_soulsteps",
+      "name": "Wyrmcult Soulsteps",
+      "sourcePack": "equipment",
+      "sourceFile": "14.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "wyrmscale_jerkin",
+      "name": "Wyrmscale Jerkin",
+      "sourcePack": "equipment",
+      "sourceFile": "47.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "wyrmshadow_harness",
+      "name": "Nightfang Harness",
+      "sourcePack": "armor",
+      "sourceFile": "35.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "wyrmshadow_legguards",
+      "name": "Nightfang Legguards",
+      "sourcePack": "greaves",
+      "sourceFile": "20.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "wyrmshadow_talongrips",
+      "name": "Nightfang Talongrips",
+      "sourcePack": "gloves",
+      "sourceFile": "25.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "wyrmshadow_treads",
+      "name": "Nightfang Treads",
+      "sourcePack": "equipment",
+      "sourceFile": "7.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "ysols_pearl_greaves",
+      "name": "Ysolei's Pearl Greaves",
+      "sourcePack": "greaves",
+      "sourceFile": "22.png",
       "confidence": "medium"
     }
   ]

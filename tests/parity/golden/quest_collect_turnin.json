@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "e9f653f8",
+      "state": "709b504e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -26,6 +26,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -46,12 +47,18 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -110,7 +117,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7cbf99fc",
+      "state": "133de552",
       "events": "27c7a42a",
       "rng": {
         "draws": 0,
@@ -120,6 +127,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -140,7 +148,14 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_boars",
@@ -156,8 +171,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -216,7 +230,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "7779a07d",
+      "state": "c1b5ba87",
       "events": "01e3a6cf",
       "rng": {
         "draws": 0,
@@ -226,6 +240,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -251,10 +266,15 @@
           "inventory": [
             {
               "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
               "itemId": "boar_hide"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_boars",
@@ -270,8 +290,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -330,7 +349,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "01dfd4e4",
+      "state": "0d24d40e",
       "events": "f2ada81f",
       "rng": {
         "draws": 0,
@@ -340,6 +359,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -364,11 +384,16 @@
           "gatheringProficiency": {},
           "inventory": [
             {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
               "count": 4,
               "itemId": "boar_hide"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_boars",
@@ -384,8 +409,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -444,7 +468,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "c7e560d4",
+      "state": "049a3694",
       "events": "c3882f07",
       "rng": {
         "draws": 0,
@@ -454,6 +478,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -479,10 +504,15 @@
           "inventory": [
             {
               "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
               "itemId": "boar_hide"
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_boars",
@@ -498,8 +528,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -558,7 +587,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "1289c23d",
+      "state": "0db6a4eb",
       "events": "1dce54bf",
       "rng": {
         "draws": 0,
@@ -568,6 +597,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -593,8 +623,15 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 350,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_boars"
           ],
@@ -602,7 +639,6 @@
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 350
         }
       ],
@@ -662,7 +698,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 401,
-      "state": "77b11143",
+      "state": "6852e485",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -672,6 +708,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -697,8 +734,15 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 350,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_boars"
           ],
@@ -706,7 +750,6 @@
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 350
         }
       ],

@@ -21,6 +21,32 @@ export interface GlitchBehaviorTrackerOptions {
   now?: () => number;
 }
 
+export interface GlitchTalkInteractionInput {
+  kind: 'open' | 'option';
+  npcId: string;
+  npcEntityId?: number;
+  optionKey?: string;
+  questId?: string;
+  questState?: string;
+  questCount?: number;
+  hasVendor?: boolean;
+  hasMarket?: boolean;
+  source?: string;
+}
+
+export interface GlitchMerchantInteractionInput {
+  kind: 'open' | 'option';
+  merchantType: 'vendor' | 'market';
+  vendorId?: string;
+  vendorEntityId?: number;
+  optionKey?: string;
+  itemId?: string;
+  stockCount?: number;
+  buybackCount?: number;
+  proceeds?: number;
+  source?: string;
+}
+
 const KEY_MAX = 100;
 const METADATA_STRING_MAX = 160;
 const POSITION_BUCKET_SIZE = 25;
@@ -114,6 +140,24 @@ export class GlitchBehaviorTracker {
 
   trackChat(actionKey: string, metadata: Metadata, world: IWorld): void {
     this.track('chat', actionKey, { ...worldMetadata(world), ...metadata });
+  }
+
+  trackTalkInteraction(input: GlitchTalkInteractionInput, world: IWorld): void {
+    for (const event of talkBehaviorEventInputs(input)) {
+      this.track(event.stepKey, event.actionKey, {
+        ...worldMetadata(world),
+        ...sanitizeMetadata(event.metadata ?? {}),
+      });
+    }
+  }
+
+  trackMerchantInteraction(input: GlitchMerchantInteractionInput, world: IWorld): void {
+    for (const event of merchantBehaviorEventInputs(input)) {
+      this.track(event.stepKey, event.actionKey, {
+        ...worldMetadata(world),
+        ...sanitizeMetadata(event.metadata ?? {}),
+      });
+    }
   }
 
   trackDisconnect(reason: string, world: IWorld | null): void {
@@ -229,13 +273,13 @@ export function behaviorEventInputsFromSimEvent(
         },
       ];
     case 'questAccepted':
-      return [{ stepKey: 'quest', actionKey: 'accept', metadata: { quest_id: ev.questId } }];
+      return questLifecycleEventInputs(ev.questId, 'accept');
     case 'questProgress':
-      return [{ stepKey: 'quest', actionKey: 'progress', metadata: { quest_id: ev.questId } }];
+      return questLifecycleEventInputs(ev.questId, 'progress');
     case 'questReady':
-      return [{ stepKey: 'quest', actionKey: 'ready', metadata: { quest_id: ev.questId } }];
+      return questLifecycleEventInputs(ev.questId, 'ready');
     case 'questDone':
-      return [{ stepKey: 'quest', actionKey: 'complete', metadata: { quest_id: ev.questId } }];
+      return questLifecycleEventInputs(ev.questId, 'complete');
     case 'castStart':
       return [
         {
@@ -258,6 +302,11 @@ export function behaviorEventInputsFromSimEvent(
           stepKey: 'economy_vendor',
           actionKey: ev.action,
           metadata: { item_id: ev.itemId ?? null },
+        },
+        {
+          stepKey: merchantOutcomeStepKey(ev.action),
+          actionKey: 'complete',
+          metadata: { item_id: ev.itemId ?? null, merchant_type: 'vendor' },
         },
       ];
     case 'mailbox':
@@ -441,6 +490,89 @@ export function behaviorEventInputsFromSimEvent(
         },
       ];
   }
+  return [];
+}
+
+export function questLifecycleEventInputs(
+  questId: string,
+  stage: 'detail' | 'accept' | 'progress' | 'ready' | 'complete',
+  metadata: Record<string, unknown> = {},
+): GlitchBehaviorEventInput[] {
+  const baseMetadata = { quest_id: questId, quest_stage: stage, ...metadata };
+  const actionKey = stage === 'detail' ? 'view_detail' : stage;
+  return [
+    { stepKey: 'quest', actionKey, metadata: baseMetadata },
+    {
+      stepKey: questStageStepKey(questId, stage),
+      actionKey: 'reach',
+      metadata: baseMetadata,
+    },
+  ];
+}
+
+export function talkBehaviorEventInputs(
+  input: GlitchTalkInteractionInput,
+): GlitchBehaviorEventInput[] {
+  const metadata = {
+    npc_id: input.npcId,
+    npc_entity_id: input.npcEntityId,
+    option_key: input.optionKey,
+    quest_id: input.questId,
+    quest_state: input.questState,
+    quest_count: input.questCount,
+    has_vendor: input.hasVendor,
+    has_market: input.hasMarket,
+    source: input.source,
+  };
+  if (input.kind === 'open') {
+    return [{ stepKey: 'talk_open', actionKey: 'open', metadata }];
+  }
+
+  const optionKey = normalizeKey(input.optionKey ?? 'unknown');
+  const events: GlitchBehaviorEventInput[] = [
+    { stepKey: 'talk_option', actionKey: `select_${optionKey}`, metadata },
+  ];
+  if (
+    input.questId &&
+    (optionKey === 'quest_offer_detail' ||
+      optionKey === 'quest_turnin_detail' ||
+      optionKey === 'quest_discuss')
+  ) {
+    events.push(...questLifecycleEventInputs(input.questId, 'detail', metadata));
+  }
+  return events;
+}
+
+export function merchantBehaviorEventInputs(
+  input: GlitchMerchantInteractionInput,
+): GlitchBehaviorEventInput[] {
+  const metadata = {
+    merchant_type: input.merchantType,
+    vendor_id: input.vendorId,
+    vendor_entity_id: input.vendorEntityId,
+    option_key: input.optionKey,
+    item_id: input.itemId,
+    stock_count: input.stockCount,
+    buyback_count: input.buybackCount,
+    proceeds: input.proceeds,
+    source: input.source,
+  };
+  if (input.kind === 'open') {
+    return [{ stepKey: 'merchant_open', actionKey: input.merchantType, metadata }];
+  }
+
+  const optionKey = normalizeKey(input.optionKey ?? 'unknown');
+  const events: GlitchBehaviorEventInput[] = [
+    { stepKey: 'merchant_option', actionKey: optionKey, metadata },
+  ];
+  if (optionKey === 'buy' || optionKey === 'sell_junk' || optionKey === 'buyback') {
+    events.push({
+      stepKey: merchantOutcomeStepKey(optionKey === 'sell_junk' ? 'sell' : optionKey),
+      actionKey: 'attempt',
+      metadata,
+    });
+  }
+  return events;
 }
 
 export function worldMetadata(world: IWorld): Metadata {
@@ -465,6 +597,10 @@ export function levelStepKey(level: number): string {
   return `level_${String(safe).padStart(2, '0')}`;
 }
 
+export function questStageStepKey(questId: string, stage: string): string {
+  return `quest_${normalizeKey(questId)}_${normalizeKey(stage)}`;
+}
+
 export function disconnectReasonKey(reason: string): string {
   const normalized = reason.trim().toLowerCase();
   if (normalized.includes('lost')) return 'connection_lost';
@@ -473,6 +609,12 @@ export function disconnectReasonKey(reason: string): string {
   if (normalized.includes('not authenticated')) return 'not_authenticated';
   if (normalized.includes('timeout')) return 'timeout';
   return 'unknown';
+}
+
+function merchantOutcomeStepKey(action: string): string {
+  const normalized = normalizeKey(action);
+  if (normalized === 'sell_junk') return 'merchant_sell';
+  return `merchant_${normalized}`;
 }
 
 function sanitizeMetadata(input: Record<string, unknown>): Metadata {

@@ -191,6 +191,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.valueMaster': 'Мастер добычи',
   'hudChrome.lootSettings.leaderOption': 'Мастер добычи: лидер группы (вы)',
   'hudChrome.lootSettings.masterOption': 'Мастер добычи: {name}',
+  'hudChrome.corpseHarvest.title': 'Сбор',
+  'hudChrome.corpseHarvest.harvestButton': 'Собрать',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Чем меньше выбрано компонентов, тем выше их качество.',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Этот труп уже был собран.',
+  'hudChrome.corpseHarvest.componentAria': 'Собрать {component}',
+  'hudChrome.corpseHarvest.components.hide': 'Шкура',
+  'hudChrome.corpseHarvest.components.fang': 'Клык',
+  'hudChrome.corpseHarvest.components.silk': 'Шелк',
+  'hudChrome.corpseHarvest.components.venomSac': 'Мешок с ядом',
+  'hudChrome.corpseHarvest.components.gills': 'Жабры',
+  'hudChrome.corpseHarvest.components.claw': 'Коготь',
+  'hudChrome.corpseHarvest.components.horn': 'Рог',
+  'hudChrome.corpseHarvest.components.tusk': 'Бивень',
   'hudChrome.theme.preset': 'Тема интерфейса',
   'hudChrome.theme.customColors': 'Настраиваемые цвета',
   'hudChrome.theme.reset': 'Сброс',
@@ -536,6 +550,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Новости и обновления',
   'news.desc': 'Читайте описание последних обновлений, информацию о событиях и новости сообщества.',
   'download.title': 'Скачать загрузчик для ПК',
+  'download.macCta': 'Скачать для macOS',
+  'download.linuxCta': 'Скачать для Linux',
+  'download.linuxHint':
+    'Формат AppImage: сделайте файл исполняемым и запустите его, установка не требуется.',
+  'download.windowsPending': 'Сборка для Windows готовится.',
   'download.desc':
     'Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.',
   'comingSoon.placeholder': 'Скоро...',
@@ -811,6 +830,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.enterTimeout':
     'Не удалось войти в мир. Время подключения истекло. Запущен ли игровой сервер?',
   'loading.connectionLost': 'Соединение с сервером потеряно.',
+  'loading.reconnecting': 'Соединение потеряно. Повторное подключение...',
   'loading.connectionRejected': 'Сервер закрыл соединение.',
   'errors.nothingInteract': 'Нет объекта для взаимодействия.',
   'errors.noEnemyNearby': 'Рядом нет врагов.',
@@ -842,9 +862,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'errors.api.accountBanned': 'Эта учетная запись заблокирована.',
   'errors.api.accountSuspended': 'Эта учетная запись заблокирована до {date}.',
   'errors.api.alreadyInWorld': 'Персонаж уже находится в мире.',
+  'errors.api.accountSessionLimit':
+    'Слишком много персонажей этой учетной записи уже находятся в мире.',
   'errors.api.takenOver': 'Вашего персонажа перехватила другая сессия.',
   'errors.api.renameBeforeEntering': 'Перед входом в мир этому персонажу нужно сменить имя.',
   'errors.api.renameNotPermitted': 'Переименование этого персонажа не разрешено.',
+  'errors.api.unsupportedMediaType': 'Неподдерживаемый формат запроса.',
+  'errors.api.crossSiteOrigin': 'Запрос заблокирован по соображениям безопасности.',
   'realm.noRealms': 'Нет доступных миров.',
   'realm.loading': 'Загрузка миров...',
   'realm.recommended': 'Рекомендуется',
@@ -3040,6 +3064,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.completion':
     'Моггер наконец мертв. Поля Истврука стали безопаснее, а вы покидаете долину с еще одной историей, достойной пересказа.',
   'entities.quests.q_mogger.objectives.0.label': 'Моггер убит',
+  'entities.quests.q_archetype_acceptance.title': 'Ремесло по душе',
+  'entities.quests.q_archetype_acceptance.text':
+    'Рано или поздно каждый ремесленник Иствуда выбирает одно ремесло своим призванием. Докажи себя одним делом, {playerName}, и объяви свой путь.',
+  'entities.quests.q_archetype_acceptance.completion': 'Твой путь избран; иди по нему с честью.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Лесной волк убит',
+  'entities.quests.q_prof_make_amends.title': 'Искупление',
+  'entities.quests.q_prof_make_amends.text':
+    'Чтобы оставить одно ремесло ради другого, ремесленник должен сперва искупить путь, которым не пошёл, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Искупление свершилось; перед тобой открыт новый путь.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Лесной волк убит',
   'entities.quests.q_drowned_choir.title': 'Утонувший хор',
   'entities.quests.q_drowned_choir.text':
     'Бродяги действуют не одни. Среди них ходят Утонувшие служители — культ, что затонул вместе с храмом, всё ещё в истлевших облачениях, всё ещё поющий молитву с прибрежных скал. Заставь умолкнуть восьмерых из них и принеси мне шесть подношений, что они несут. Хочу знать, что они задумали поднести своей богине.',
@@ -3307,6 +3342,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Серп для сбора',
   'entities.items.bronze_sickle.name': 'Бронзовый серп',
   'entities.items.silverleaf_sickle.name': 'Серебролистный серп',
+  'entities.items.thorium_mining_pick.name': 'Ториевая кирка',
+  'entities.items.arcanite_mining_pick.name': 'Арканитовая кирка',
+  'entities.items.ashwood_axe.name': 'Ясеневый топор',
+  'entities.items.elderwood_axe.name': 'Топор из древнего дерева',
+  'entities.items.goldleaf_sickle.name': 'Золотолистный серп',
+  'entities.items.sunpetal_sickle.name': 'Солнцелепестковый серп',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
@@ -3792,6 +3833,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.nav.dungeons': 'Подземелья и рейды',
   'guide.nav.reference': 'Справочник',
   'guide.nav.controls': 'Управление',
+  'guide.nav.settings': 'Настройки и производительность',
   'guide.nav.combat': 'Бой',
   'guide.nav.glossary': 'Глоссарий',
   'guide.nav.faq': 'ЧаВо',
@@ -3939,6 +3981,91 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileHeading': 'На мобильных устройствах',
   'guide.controls.mobileBody':
     'На телефонах и планшетах сенсорное управление появляется автоматически: джойстик передвижения слева, перетаскивание в любой точке справа для обзора и экранные кнопки для способностей и меню.',
+  'guide.settingsPage.heading': 'Настройки и производительность',
+  'guide.settingsPage.intro':
+    'Настройте игру на максимум красоты или на максимум скорости. Три готовых набора настроек, а также объяснение, что на самом деле делает каждый графический параметр.',
+  'guide.settingsPage.wherePath':
+    'Все, о чем рассказывает эта страница, находится прямо в игре: нажмите Esc и загляните в разделы «Графика», «Интерфейс» и «Оверлей производительности».',
+  'guide.settingsPage.fairnessTitle': 'Честность по замыслу',
+  'guide.settingsPage.fairnessBody':
+    'Ни одна настройка здесь не разменивает красоту на игровое преимущество. Низкие уровни убирают только косметический лоск и никогда не отнимают информацию, которой вы сражаетесь: ваши дебаффы, полосы применения заклинаний, здоровье группы и цифры урона одинаковы что на уровне «Низкое», что на «Ультра». Скромная машина никогда не ставит вас в невыгодное положение.',
+  'guide.settingsPage.loadoutsHeading': 'Три готовых набора настроек',
+  'guide.settingsPage.loadoutsIntro':
+    'Начните с набора, который лучше всего описывает вашу машину, а затем меняйте по одной настройке за раз, пока результат вас не устроит.',
+  'guide.settingsPage.recommended': 'Рекомендуем',
+  'guide.settingsPage.whyLabel': 'Почему это работает:',
+  'guide.settingsPage.tagReload': 'после перезагрузки',
+  'guide.settingsPage.fpsTitle': 'Максимум FPS',
+  'guide.settingsPage.fpsTagline': 'Для старых ноутбуков, встроенной графики и игры от батареи.',
+  'guide.settingsPage.fpsWhy':
+    '«Качество графики» служит главным переключателем, а «Качество рендера» остается самым сильным ползунком: при 70% мир отрисовывается примерно вдвое меньшим числом пикселей, а интерфейс сохраняет идеальную четкость.',
+  'guide.settingsPage.balancedTitle': 'Баланс',
+  'guide.settingsPage.balancedTagline':
+    'Золотая середина для большинства машин и наш совет по умолчанию.',
+  'guide.settingsPage.balancedWhy':
+    '«Среднее» включает настоящие тени и полноценные материалы, а «Высокое» добавляет объемное затенение и блум. На уровнях ниже «Ультра» встроенная подстраховка сглаживает внезапные просадки в жарких боях, поэтому «Баланс» остается плавным без лишней возни.',
+  'guide.settingsPage.visualsTitle': 'Лучшая картинка',
+  'guide.settingsPage.visualsTagline': 'Режим скриншотов для мощных настольных машин.',
+  'guide.settingsPage.visualsWhy':
+    '«Ультра» отрисовывает игру в самом высоком разрешении вашего экрана и с самым богатым освещением. Этот уровень также отключает встроенную подстраховку и доступен только на настольных компьютерах: телефоны и приложение ограничены уровнем «Высокое».',
+  'guide.settingsPage.value50to70': 'От 50 до 70%',
+  'guide.settingsPage.value90to100': 'От 90 до 100%',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.valueHighOrMedium': '«Высокое» на игровом ПК, «Среднее» на ноутбуке',
+  'guide.settingsPage.valueOnOptional': 'Вкл. (по желанию)',
+  'guide.settingsPage.howHeading': 'Как ведут себя настройки',
+  'guide.settingsPage.factDetectTitle': 'Игра сначала настраивается сама',
+  'guide.settingsPage.factDetectBody':
+    'При первом запуске игра оценивает ваше устройство и подбирает разумный уровень: от уровня «Низкое» на скромном телефоне до «Ультра» на мощном настольном компьютере. Но любой ваш собственный выбор всегда важнее автоматики.',
+  'guide.settingsPage.factReloadTitle': 'Два типа настроек',
+  'guide.settingsPage.factReloadBody':
+    '«Качество графики» и параметры пресета «Расширенное» вступают в силу после перезагрузки, и при необходимости панель предложит кнопку «Перезагрузить сейчас». Все остальные настройки применяются в тот же момент, как вы их меняете.',
+  'guide.settingsPage.factGovernorTitle': 'Встроенная подстраховка',
+  'guide.settingsPage.factGovernorBody':
+    'На любом уровне ниже «Ультра» игра при резком скачке нагрузки в большом бою незаметно и ненадолго упрощает траву, эффекты и освещение, а затем возвращает их обратно. Выбирая «Ультра», вы сообщаете ей, что предпочитаете сохранить каждую деталь.',
+  'guide.settingsPage.advancedHeading': 'Пресет «Расширенное»: соберите свое сочетание',
+  'guide.settingsPage.advancedBody':
+    'Пресет «Расширенное» начинается с уровня «Высокое» и открывает четыре дополнительных параметра, чтобы вы тратили кадры там, где действительно замечаете разницу: «Детализация местности», «Плотность растительности», «Эффекты и освещение» и «Качество теней». Как и «Качество графики», они применяются после перезагрузки.',
+  'guide.settingsPage.advancedMixes':
+    'Два любимых сочетания: оставьте «Качество теней» на уровне «Высокое», а «Эффекты и освещение» поставьте на «Низкое», чтобы получить четкую картинку без свечения, которая почти не нагружает машину; или сделайте наоборот, чтобы сохранить блум и смягчить тени.',
+  'guide.settingsPage.tableHeading': 'Все настройки с пояснениями',
+  'guide.settingsPage.colSetting': 'Параметр',
+  'guide.settingsPage.colDoes': 'Что делает',
+  'guide.settingsPage.colImpact': 'Влияние на FPS',
+  'guide.settingsPage.impactNone': 'Нет',
+  'guide.settingsPage.impactLight': 'Слабое',
+  'guide.settingsPage.impactModerate': 'Умеренное',
+  'guide.settingsPage.impactHeavy': 'Сильное',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Главный переключатель. Каждая ступень одновременно меняет разрешение, тени, материалы, растительность и световые эффекты. Самая большая разница, которую можно получить одним действием.',
+  'guide.settingsPage.rowRenderQuality':
+    'Отрисовывает трехмерный мир в пониженном внутреннем разрешении и растягивает картинку; интерфейс остается четким. Самый действенный мгновенный ползунок на слабых машинах и экранах высокого разрешения.',
+  'guide.settingsPage.rowFieldOfView':
+    'Сколько мира помещается на экране: от приближенных 55 до размашистых 100 градусов. Вопрос удобства; широкий обзор нагружает отрисовку чуть сильнее.',
+  'guide.settingsPage.rowBrightness': 'Экспозиция сцены, темнее или светлее. Чистое дело вкуса.',
+  'guide.settingsPage.rowWeather':
+    'Фоновые дождь и снег. Только атмосфера; отключение немного экономит ресурсы в грозу.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Насколько нарядным разрешено быть самому интерфейсу: размытие в стиле стекла, свечение, анимированные меню. Режим «Авто» подстраивается под ваш браузер; трехмерный мир в любом случае не затрагивается.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Богатые, плавно смешанные текстуры земли либо более простой и быстрый вид местности.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Как далеко и как густо растет трава вокруг вашего персонажа.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Блум, объемное затенение и то, сколько факелов и заклинаний отбрасывают настоящий свет. Самая большая экономия среди параметров пресета «Расширенное».',
+  'guide.settingsPage.rowShadowQuality':
+    'Четкость теней. Уровень «Низкое» сохраняет тени, но смягчает их края.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Размытие в стиле матового стекла позади окон. Красиво, и именно такие эффекты первым чувствует слабый браузер; оставьте его выключенным ради классической четкой картинки.',
+  'guide.settingsPage.rowReduceMotion':
+    'Убирает анимацию интерфейса, и окна появляются мгновенно. В первую очередь это настройка специальных возможностей, но она дает и небольшой прирост производительности.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Экранная сводка с FPS, временем кадра и другими показателями. Включите ее, пока подбираете настройки с этой страницы, а затем снова скройте.',
+  'guide.settingsPage.tableFoot':
+    'Ищете ползунок дальности прорисовки или ограничитель FPS? Искать нечего: дальность обзора входит в каждый уровень качества, а темп кадров подстраивается под ваш экран.',
+  'guide.settingsPage.mobileTitle': 'На телефонах и планшетах',
+  'guide.settingsPage.mobileBody':
+    'На мобильных устройствах игра берет больше на себя: сама выбирает уровень, держит разрешение чуть ниже, чтобы беречь батарею и не перегревать устройство, и оставляет самые высокие уровни только настольным компьютерам. Наборы выше по-прежнему применимы, просто телефоны ограничены уровнем «Высокое».',
   'guide.combat.intro':
     'Бой подчиняется привычным правилам классических MMO. Чтобы хорошо играть, изучать их вовсе не обязательно, это лишь общее представление о том, как устроены сражения.',
   'guide.combat.hitTitle': 'Не каждый удар достигает цели',
@@ -5805,6 +5932,79 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}м',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.crafting.title': 'Крафт',
+  'hudChrome.crafting.close': 'Закрыть крафт',
+  'hudChrome.crafting.craft': 'Создать',
+  'hudChrome.crafting.reagentsNeeded': 'Требуется:',
+  'hudChrome.crafting.empty': 'Известных рецептов пока нет.',
+  'hudChrome.crafting.resultAria': 'Создать {name}',
+  'hudChrome.crafting.craftedToast': 'Создано: {name}',
+  'hudChrome.crafting.insufficientMaterials': 'У вас недостаточно материалов.',
+  'hudChrome.crafting.unknownRecipe': 'Такого рецепта не существует.',
+  // apiError.* server error-code catalog (M16 non-Latin fill, Phase 22)
+  'apiError.validation.failed':
+    'Некоторые поля заполнены неверно. Проверьте форму и попробуйте снова.',
+  'apiError.json.malformed': 'Не удалось прочитать запрос. Повторите попытку.',
+  'apiError.body.too_large': 'Запрос слишком большой. Повторите попытку с меньшим объёмом данных.',
+  'apiError.body.unsupported_media_type': 'Неподдерживаемый формат запроса.',
+  'apiError.db.conflict': 'Изменение конфликтует с другим обновлением. Повторите попытку.',
+  'apiError.rate_limit.exceeded': 'Слишком много запросов. Повторите попытку через {seconds}.',
+  'apiError.internal.error': 'На нашей стороне произошла ошибка. Повторите попытку.',
+  'apiError.auth.token_missing': 'Чтобы сделать это, необходимо войти в систему.',
+  'apiError.auth.token_invalid': 'Ваша сессия истекла. Войдите снова.',
+  'apiError.auth.forbidden': 'У вас нет прав для этого действия.',
+  'apiError.auth.invalid_credentials': 'Неверное имя пользователя или пароль.',
+  'apiError.auth.required': 'Нет авторизации.',
+  'apiError.auth.web_login_only': 'Вход разрешён только из игрового клиента.',
+  'apiError.auth.too_many_attempts': 'Слишком много попыток. Подождите минуту и попробуйте снова.',
+  'apiError.auth.too_many_failed_attempts':
+    'Слишком много неудачных попыток. Подождите несколько минут и попробуйте снова.',
+  'apiError.auth.current_password_incorrect': 'Текущий пароль неверен.',
+  'apiError.auth.password_incorrect': 'Неверный пароль.',
+  'apiError.auth.verification_failed': 'Проверка не пройдена. Повторите попытку.',
+  'apiError.account.username_invalid':
+    'Имя пользователя должно содержать 3-24 символа: буквы, цифры или нижнее подчеркивание.',
+  'apiError.account.username_not_allowed': 'Это имя пользователя запрещено.',
+  'apiError.account.username_taken': 'Это имя пользователя уже занято.',
+  'apiError.account.username_mismatch': 'Это имя пользователя не совпадает с вашим аккаунтом.',
+  'apiError.account.password_too_short': 'Пароль должен содержать не менее 6 символов.',
+  'apiError.account.password_too_long': 'Новый пароль должен содержать не более 128 символов.',
+  'apiError.account.characters_online': 'Выйдите из всех персонажей перед деактивацией.',
+  'apiError.account.deactivated':
+    'Этот аккаунт деактивирован. Для восстановления обратитесь к администратору.',
+  'apiError.account.not_found': 'Аккаунт не найден.',
+  'apiError.character.name_invalid': 'Недопустимое имя персонажа. Используйте 2-16 букв.',
+  'apiError.character.name_not_allowed': 'Это имя персонажа запрещено.',
+  'apiError.character.invalid_class': 'Недопустимый класс.',
+  'apiError.character.limit_reached': 'Достигнут лимит персонажей.',
+  'apiError.character.name_taken': 'Это имя уже занято.',
+  'apiError.character.not_found': 'Персонаж не найден.',
+  'apiError.character.online': 'Персонаж сейчас в сети.',
+  'apiError.character.rename_not_permitted': 'Переименование этого персонажа не разрешено.',
+  'apiError.character.delete_confirm': 'Введите имя персонажа, чтобы подтвердить удаление.',
+  'apiError.character.already_in_world': 'Персонаж уже находится в мире.',
+  'apiError.character.taken_over': 'Вашего персонажа перехватила другая сессия.',
+  'apiError.character.rename_required': 'Перед входом в мир этому персонажу нужно сменить имя.',
+  'apiError.moderation.suspended_until': 'Эта учетная запись заблокирована до {date}.',
+  'apiError.moderation.suspended': 'Эта учетная запись заблокирована.',
+  'apiError.moderation.banned': 'Эта учетная запись заблокирована.',
+  'apiError.moderation.force_rename': 'Модератор требует переименовать одного из ваших персонажей.',
+  'apiError.email.invalid': 'Введите корректный адрес эл. почты.',
+  'apiError.email.unchanged': 'Это уже ваш текущий адрес email.',
+  'apiError.two_factor.code_invalid': 'Этот код недействителен, попробуйте ещё раз.',
+  'apiError.two_factor.setup_required': 'Сначала начните настройку двухфакторной аутентификации.',
+  'apiError.two_factor.already_enabled': 'Двухфакторная аутентификация уже включена.',
+  'apiError.two_factor.not_enabled': 'Двухфакторная аутентификация не включена.',
+  'apiError.origin.cross_site': 'Запрос заблокирован по соображениям безопасности.',
+  'apiError.discord.not_configured': 'Интеграция с Discord сейчас недоступна.',
+  'apiError.discord.expired': 'Этот вход через Discord истёк. Войдите через Discord ещё раз.',
+  'apiError.discord.already_linked': 'Этот аккаунт Discord уже привязан к другому аккаунту.',
+  'apiError.discord.password_required': 'Перед отвязкой аккаунта Discord задайте пароль.',
+  'apiError.discord.unknown_swag': 'Эта награда недоступна.',
+  'apiError.discord.link_required': 'Сначала привяжите аккаунт Discord.',
+  'apiError.discord.swag_claimed': 'Вы уже получили эту награду.',
+  'apiError.discord.swag_tier': 'Достигните более высокого ранга, чтобы получить это.',
+  'apiError.discord.swag_points': 'Недостаточно очков.',
   // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': 'Почтовый ящик',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',
@@ -5913,4 +6113,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.moongateCommunion.title': 'Единение у лунных врат',
   'hudChrome.calendar.events.moongateCommunion.note':
     'Паломники собираются у лунных врат храма под срединной луной.',
+  'hudChrome.gathering.title': 'Собирательство',
+  'hudChrome.gathering.mining': 'Горное дело',
+  'hudChrome.gathering.logging': 'Лесозаготовка',
+  'hudChrome.gathering.herbalism': 'Травничество',
+  // Release v0.22.0 locale fill.
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
 };

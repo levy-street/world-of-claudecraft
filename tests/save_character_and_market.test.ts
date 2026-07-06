@@ -12,13 +12,21 @@ vi.mock('pg', () => ({
   },
 }));
 
-import { saveCharacterAndMarketState } from '../server/db';
+import {
+  closeMarketWriteGateForTests,
+  openMarketWriteGate,
+  saveCharacterAndMarketState,
+} from '../server/db';
 import { REALM } from '../server/realm';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 
 beforeEach(() => {
   dbMock.query.mockReset();
   dbMock.connect.mockReset();
+  // The escrow flush writes the realm-market row, so it is gated on the boot
+  // backfill. Open the gate by default so the escrow-transaction pins run; the
+  // closed-gate case below re-closes it explicitly.
+  openMarketWriteGate();
 });
 
 function clientStub() {
@@ -51,7 +59,7 @@ describe('saveCharacterAndMarketState', () => {
     // Both rows are written on the same client (so they commit or fail together).
     expect(sqls.some((s) => /UPDATE characters/i.test(s))).toBe(true);
     expect(sqls.some((s) => /world_state/i.test(s))).toBe(true);
-    // Nothing leaks onto the bare pool — atomicity would be lost otherwise.
+    // Nothing leaks onto the bare pool: atomicity would be lost otherwise.
     expect(dbMock.query).not.toHaveBeenCalled();
     expect(client.release).toHaveBeenCalled();
   });
@@ -72,7 +80,7 @@ describe('saveCharacterAndMarketState', () => {
     for (const call of worldCalls) expect(call[1]).not.toContain('market');
   });
 
-  it('rolls back and rethrows if either write fails, leaving no half-commit', async () => {
+  it('rolls back and rethrows if the character write fails, leaving no half-commit', async () => {
     const client = clientStub();
     client.query.mockImplementation((sql: string) => {
       if (/UPDATE characters/i.test(sql)) throw new Error('boom');
@@ -86,5 +94,37 @@ describe('saveCharacterAndMarketState', () => {
     expect(sqls.some((s) => /ROLLBACK/.test(s))).toBe(true);
     expect(sqls.some((s) => /^COMMIT/.test(s))).toBe(false);
     expect(client.release).toHaveBeenCalled();
+  });
+
+  it('rolls back and rethrows if the market write fails, undoing the character write', async () => {
+    const client = clientStub();
+    client.query.mockImplementation((sql: string) => {
+      if (/world_state/i.test(sql)) throw new Error('market boom');
+      return Promise.resolve({ rows: [], rowCount: 0 } as any);
+    });
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    await expect(saveCharacterAndMarketState(1, 1, STATE, MARKET, MAIL)).rejects.toThrow(
+      'market boom',
+    );
+
+    const sqls = client.query.mock.calls.map((c) => String(c[0]));
+    // The character UPDATE already ran on this client; ROLLBACK must undo it.
+    expect(sqls.some((s) => /UPDATE characters/i.test(s))).toBe(true);
+    expect(sqls.some((s) => /ROLLBACK/.test(s))).toBe(true);
+    expect(sqls.some((s) => /^COMMIT/.test(s))).toBe(false);
+    expect(client.release).toHaveBeenCalled();
+  });
+
+  it('blocks the escrow flush when the market write gate is closed, before any SQL', async () => {
+    closeMarketWriteGateForTests();
+
+    // The gate assertion runs before pool.connect, so no client is checked out
+    // and no BEGIN is issued: the flush cannot race ahead of the boot backfill.
+    await expect(saveCharacterAndMarketState(5, 3, STATE, MARKET, MAIL)).rejects.toThrow(
+      /market write blocked/,
+    );
+    expect(dbMock.connect).not.toHaveBeenCalled();
+    expect(dbMock.query).not.toHaveBeenCalled();
   });
 });

@@ -3,8 +3,8 @@
 // SimContext callbacks resolve to the still-on-Sim methods), proving the slice runs
 // behind the seam and that the thin Sim delegates route to it.
 
-import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { afterEach, describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD, MOBS, setActiveWorldContent } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   blockedTowardSpawn,
@@ -14,7 +14,7 @@ import {
 } from '../src/sim/mob/locomotion';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { MELEE_RANGE } from '../src/sim/types';
+import { MELEE_RANGE, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 type AnyEntity = ReturnType<typeof createMob> & Record<string, any>;
@@ -23,6 +23,8 @@ function makeSim() {
   return new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
 }
 const ctxOf = (sim: Sim): SimContext => (sim as unknown as { ctx: SimContext }).ctx;
+
+afterEach(() => setActiveWorldContent(null));
 
 describe('mob/locomotion: recoverFromFlee (pure helper, no ctx)', () => {
   it('returns to chase out of melee, attack in melee; clears the flee timer', () => {
@@ -92,6 +94,29 @@ describe('mob/locomotion: blockedTowardSpawn', () => {
     const mob = createMob(900002, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 }) as AnyEntity;
     (sim as any).addEntity(mob);
     expect(blockedTowardSpawn(ctxOf(sim), mob, { ...mob.pos })).toBe(false);
+  });
+
+  // #1519 follow-up: this check must read the per-position water surface
+  // (waterLevelAt), not the flat waterLevel() constant, or a dry sunken
+  // feature outside every declared lake still reads as deep water here and
+  // wrongly holds a non-swimmer in evade phasing on the way back to spawn.
+  it('a dry sunken feature outside any declared lake never blocks a non-swimmer evading toward spawn', () => {
+    const dry = { x: 30, y: 0, z: 40 }; // open ground, clear of the built-in lake and colliders
+    const withSunkenFeature: WorldContent = {
+      ...BUILTIN_WORLD,
+      terrainEdits: [{ x: dry.x, z: dry.z, radius: 6, delta: -25, falloff: 'flat', mode: 'add' }],
+    };
+    setActiveWorldContent(withSunkenFeature);
+
+    const sim = makeSim();
+    const mob = createMob(900003, MOBS.forest_wolf, 5, {
+      x: dry.x - 3,
+      y: 0,
+      z: dry.z,
+    }) as AnyEntity;
+    (sim as any).addEntity(mob);
+
+    expect(blockedTowardSpawn(ctxOf(sim), mob, dry)).toBe(false);
   });
 });
 

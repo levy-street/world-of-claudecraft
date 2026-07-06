@@ -1,7 +1,13 @@
-import * as http from 'node:http';
-import { accountForToken, getCharacter, insertClientPerfReport, type ClientPerfReportInsert } from './db';
+import type * as http from 'node:http';
+import {
+  accountForToken,
+  type ClientPerfReportInsert,
+  getCharacter,
+  insertClientPerfReport,
+} from './db';
+import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
-import { requestIp } from './ratelimit';
+import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
 const PERF_REPORT_SCHEMA_VERSION = 1;
@@ -27,9 +33,11 @@ const PERF_REPORT_MAX_TRACKED_SESSIONS = 20_000;
 const perfReportAttempts = new Map<string, number[]>();
 const perfReportLastInsertBySession = new Map<string, number>();
 
-function rateLimitedPerfReport(req: http.IncomingMessage): boolean {
+// Time reads route through rateLimitNow (the shared ratelimit.ts clock seam) so a
+// test can drive the window via setRateLimitClock, exactly like the other limiters.
+function rateLimitedPerfReport(req: http.IncomingMessage): RateLimitOutcome {
   const ip = requestIp(req);
-  const now = Date.now();
+  const now = rateLimitNow();
   const windowStart = now - PERF_REPORT_WINDOW_MS;
   const updated = (perfReportAttempts.get(ip) ?? []).filter((t) => t > windowStart);
   updated.push(now);
@@ -37,12 +45,19 @@ function rateLimitedPerfReport(req: http.IncomingMessage): boolean {
 
   if (perfReportAttempts.size > PERF_REPORT_MAX_TRACKED_IPS) {
     for (const [key, times] of perfReportAttempts) {
-      if (times.length === 0 || times[times.length - 1] <= windowStart) perfReportAttempts.delete(key);
+      if (times.length === 0 || times[times.length - 1] <= windowStart)
+        perfReportAttempts.delete(key);
       if (perfReportAttempts.size <= PERF_REPORT_MAX_TRACKED_IPS) break;
     }
   }
 
-  return updated.length > PERF_REPORT_MAX_PER_MINUTE;
+  return windowedRateLimitOutcome(
+    updated.length,
+    PERF_REPORT_MAX_PER_MINUTE,
+    updated[0],
+    PERF_REPORT_WINDOW_MS,
+    now,
+  );
 }
 
 function throttleKey(req: http.IncomingMessage, sessionId: string): string {
@@ -50,7 +65,11 @@ function throttleKey(req: http.IncomingMessage, sessionId: string): string {
   return `${requestIp(req)}:${session}`;
 }
 
-function shouldStorePerfReport(req: http.IncomingMessage, sessionId: string, now = Date.now()): boolean {
+function shouldStorePerfReport(
+  req: http.IncomingMessage,
+  sessionId: string,
+  now = Date.now(),
+): boolean {
   const key = throttleKey(req, sessionId);
   const previous = perfReportLastInsertBySession.get(key);
   perfReportLastInsertBySession.delete(key);
@@ -126,7 +145,12 @@ function bucketGpu(renderer: string): string {
   }
   if (/nvidia|geforce|rtx|gtx/.test(r)) return 'nvidia';
   if (/amd|radeon/.test(r)) return 'amd';
-  return renderer.slice(0, 48).replace(/[^\w.-]+/g, '-').toLowerCase() || 'other';
+  return (
+    renderer
+      .slice(0, 48)
+      .replace(/[^\w.-]+/g, '-')
+      .toLowerCase() || 'other'
+  );
 }
 
 function viewportBucket(body: Record<string, unknown>): string {
@@ -183,18 +207,25 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
   for (const key of scalarKeys) {
     if (value[key] !== undefined) out[key] = value[key];
   }
-  const entries = Array.isArray(value.entries) ? value.entries : Array.isArray(value.manifestEntries) ? value.manifestEntries : [];
-  out.entries = entries.slice(0, 24).filter(isRecord).map((entry) => ({
-    id: textIn(entry.id, 80),
-    category: textIn(entry.category, 24),
-    required: Boolean(entry.required),
-    status: textIn(entry.status, 16),
-    elapsedMs: nullableNumberIn(entry.elapsedMs, 0, 60_000),
-    remainingMsAfter: nullableNumberIn(entry.remainingMsAfter, 0, 60_000),
-    programDelta: nullableNumberIn(entry.programDelta, -10_000, 10_000),
-    textureDelta: nullableNumberIn(entry.textureDelta, -10_000, 10_000),
-    detail: textIn(entry.detail, 160),
-  }));
+  const entries = Array.isArray(value.entries)
+    ? value.entries
+    : Array.isArray(value.manifestEntries)
+      ? value.manifestEntries
+      : [];
+  out.entries = entries
+    .slice(0, 24)
+    .filter(isRecord)
+    .map((entry) => ({
+      id: textIn(entry.id, 80),
+      category: textIn(entry.category, 24),
+      required: Boolean(entry.required),
+      status: textIn(entry.status, 16),
+      elapsedMs: nullableNumberIn(entry.elapsedMs, 0, 60_000),
+      remainingMsAfter: nullableNumberIn(entry.remainingMsAfter, 0, 60_000),
+      programDelta: nullableNumberIn(entry.programDelta, -10_000, 10_000),
+      textureDelta: nullableNumberIn(entry.textureDelta, -10_000, 10_000),
+      detail: textIn(entry.detail, 160),
+    }));
   return out;
 }
 
@@ -244,7 +275,10 @@ async function authenticatedAccountId(req: http.IncomingMessage): Promise<number
   return accountForToken(m[1]);
 }
 
-async function authenticatedCharacterId(accountId: number | null, value: unknown): Promise<number | null> {
+async function authenticatedCharacterId(
+  accountId: number | null,
+  value: unknown,
+): Promise<number | null> {
   if (accountId === null) return null;
   const id = intIn(value, 1, Number.MAX_SAFE_INTEGER, 0);
   if (id <= 0) return null;
@@ -252,12 +286,18 @@ async function authenticatedCharacterId(accountId: number | null, value: unknown
   return character ? id : null;
 }
 
-export async function handlePerfReport(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+export async function handlePerfReport(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
   if (req.method !== 'POST') return json(res, 405, { ok: false });
-  if (rateLimitedPerfReport(req)) return json(res, 200, { ok: true });
+  if (!rateLimitedPerfReport(req).allowed) return json(res, 200, { ok: true });
 
   const devTraceAllowed = allowDevTrace(req);
-  const body = await readBody(req, devTraceAllowed ? PERF_REPORT_DEV_TRACE_MAX_BODY_BYTES : PERF_REPORT_MAX_BODY_BYTES) as Record<string, unknown>;
+  const body = (await readBody(
+    req,
+    devTraceAllowed ? PERF_REPORT_DEV_TRACE_MAX_BODY_BYTES : PERF_REPORT_MAX_BODY_BYTES,
+  )) as Record<string, unknown>;
   const sessionId = textIn(body.sessionId, 64);
   if (!shouldStorePerfReport(req, sessionId)) return json(res, 200, { ok: true });
 
@@ -269,14 +309,23 @@ export async function handlePerfReport(req: http.IncomingMessage, res: http.Serv
   const source = choiceIn(body.source, ['gameplay', 'benchmark'], 'gameplay');
 
   const row: ClientPerfReportInsert = {
-    schemaVersion: intIn(body.schemaVersion, 1, PERF_REPORT_SCHEMA_VERSION, PERF_REPORT_SCHEMA_VERSION),
+    schemaVersion: intIn(
+      body.schemaVersion,
+      1,
+      PERF_REPORT_SCHEMA_VERSION,
+      PERF_REPORT_SCHEMA_VERSION,
+    ),
     releaseVersion,
     buildId,
     sessionId,
     accountId,
     characterId: await authenticatedCharacterId(accountId, body.characterId),
     realm: REALM,
-    graphicsPreset: choiceIn(body.graphicsPreset, ['auto', 'low', 'medium', 'high', 'ultra', 'advanced'], 'auto'),
+    graphicsPreset: choiceIn(
+      body.graphicsPreset,
+      ['auto', 'low', 'medium', 'high', 'ultra', 'advanced'],
+      'auto',
+    ),
     gfxTier: choiceIn(body.gfxTier, ['low', 'medium', 'high', 'ultra'], 'low'),
     autoGovernor: Boolean(body.autoGovernor),
     targetFps: intIn(body.targetFps, 0, 240, 0),
@@ -300,11 +349,23 @@ export async function handlePerfReport(req: http.IncomingMessage, res: http.Serv
     deviceMemory: nullableNumberIn(body.deviceMemory, 0, 1024),
     hardwareConcurrency: intIn(body.hardwareConcurrency, 0, 1024, 0),
     mobileTouch: Boolean(body.mobileTouch),
-    browserFamily: choiceIn(body.browserFamily, ['chrome', 'safari', 'firefox', 'edge', 'other'], browserFamily(userAgent)),
-    osFamily: choiceIn(body.osFamily, ['macos', 'windows', 'ios', 'android', 'linux', 'other'], osFamily(userAgent)),
+    browserFamily: choiceIn(
+      body.browserFamily,
+      ['chrome', 'safari', 'firefox', 'edge', 'other'],
+      browserFamily(userAgent),
+    ),
+    osFamily: choiceIn(
+      body.osFamily,
+      ['macos', 'windows', 'ios', 'android', 'linux', 'other'],
+      osFamily(userAgent),
+    ),
     glVendor: textIn(body.glVendor, 80),
     glRendererBucket: bucketGpu(glRenderer || textIn(body.glRendererBucket, 80)),
-    zoneOrScenario: textIn(body.zoneOrScenario, 80, source === 'benchmark' ? 'benchmark' : 'gameplay'),
+    zoneOrScenario: textIn(
+      body.zoneOrScenario,
+      80,
+      source === 'benchmark' ? 'benchmark' : 'gameplay',
+    ),
     source,
     rawSummary: rawSummary(body.rawSummary, devTraceAllowed),
   };

@@ -1188,6 +1188,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Notícias e atualizações',
   'news.desc': 'Leia as últimas notas do patch, eventos e atualizações da comunidade.',
   'download.title': 'Baixar launcher para desktop',
+  'download.macCta': 'Baixar para macOS',
+  'download.windowsPending': 'Build para Windows pendente.',
   'download.desc':
     'Obtenha o launcher independente para desempenho otimizado e jogo em tela cheia.',
   'comingSoon.placeholder': 'Em breve...',
@@ -3898,6 +3900,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Foice de Coleta',
   'entities.items.bronze_sickle.name': 'Foice de Bronze',
   'entities.items.silverleaf_sickle.name': 'Foice Folha de Prata',
+  'entities.items.thorium_mining_pick.name': 'Picareta de Tório',
+  'entities.items.arcanite_mining_pick.name': 'Picareta de Arcanita',
+  'entities.items.ashwood_axe.name': 'Machado de Freixo',
+  'entities.items.elderwood_axe.name': 'Machado de Madeira Antiga',
+  'entities.items.goldleaf_sickle.name': 'Foice Folha Dourada',
+  'entities.items.sunpetal_sickle.name': 'Foice Pétala Solar',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Adicionar canal de chat',
   'hud.core.chatChannels.addTitle': 'Adicionar canal',
@@ -4064,6 +4072,20 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': 'SE',
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Este cadáver já foi coletado.',
+  'hudChrome.corpseHarvest.componentAria': 'Coletar {component}',
+  'hudChrome.corpseHarvest.components.claw': 'Garra',
+  'hudChrome.corpseHarvest.components.fang': 'Presa',
+  'hudChrome.corpseHarvest.components.gills': 'Guelras',
+  'hudChrome.corpseHarvest.components.hide': 'Pele',
+  'hudChrome.corpseHarvest.components.horn': 'Chifre',
+  'hudChrome.corpseHarvest.components.silk': 'Seda',
+  'hudChrome.corpseHarvest.components.tusk': 'Presa',
+  'hudChrome.corpseHarvest.components.venomSac': 'Bolsa de veneno',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Quanto menos componentes você escolher, maior a qualidade de cada um.',
+  'hudChrome.corpseHarvest.harvestButton': 'Coletar',
+  'hudChrome.corpseHarvest.title': 'Coleta',
   'hudChrome.emoteEditor.done': 'Concluído',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Reverência',
@@ -5948,4 +5970,191 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'O que você fez na escuridão',
   'entities.letters.letter_q_hollow.body':
     'Poucos saberão o que estava enterrado naquela baixada, e menos ainda acreditariam. Eu sei, e não vou esquecer.\n\nQue seu caminho continue iluminado.\n- Irmão Aldric',
+  'hudChrome.gathering.herbalism': 'Herborismo',
+  'hudChrome.gathering.logging': 'Lenharia',
+  'hudChrome.gathering.mining': 'Mineração',
+  'hudChrome.gathering.title': 'Coleta',
+  'errors.api.accountSessionLimit': 'Personagens demais desta conta já estão no mundo.',
+  'errors.api.crossSiteOrigin': 'Solicitação bloqueada por motivos de segurança.',
+  'errors.api.unsupportedMediaType': 'Formato de solicitação não suportado.',
+  'apiError.account.characters_online': 'Desconecte todos os seus personagens antes de desativar.',
+  'apiError.account.deactivated':
+    'Esta conta foi desativada. Contate um administrador para restaurá-la.',
+  'apiError.account.not_found': 'Conta não encontrada.',
+  'apiError.account.password_too_long': 'A nova senha deve ter no máximo 128 caracteres.',
+  'apiError.account.password_too_short': 'A senha deve ter pelo menos 6 caracteres.',
+  'apiError.account.username_invalid':
+    'O usuário deve ter 3-24 caracteres e usar letras, números ou sublinhado.',
+  'apiError.account.username_mismatch': 'Esse nome de usuário não corresponde à sua conta.',
+  'apiError.account.username_not_allowed': 'Esse nome de usuário não é permitido.',
+  'apiError.account.username_taken': 'Esse nome de usuário já está em uso.',
+  'apiError.auth.current_password_incorrect': 'Sua senha atual está incorreta.',
+  'apiError.auth.forbidden': 'Você não tem permissão para fazer isso.',
+  'apiError.auth.invalid_credentials': 'Usuário ou senha inválidos.',
+  'apiError.auth.password_incorrect': 'Sua senha está incorreta.',
+  'apiError.auth.required': 'Não autenticado.',
+  'apiError.auth.token_invalid': 'Sua sessão expirou. Faça login novamente.',
+  'apiError.auth.token_missing': 'Você precisa fazer login para isso.',
+  'apiError.auth.too_many_attempts': 'Tentativas demais. Aguarde um minuto e tente novamente.',
+  'apiError.auth.too_many_failed_attempts':
+    'Tentativas malsucedidas demais. Aguarde alguns minutos e tente novamente.',
+  'apiError.auth.verification_failed': 'Falha na verificação. Tente novamente.',
+  'apiError.auth.web_login_only': 'O login só é permitido pelo cliente do jogo.',
+  'apiError.body.too_large': 'Essa solicitação é grande demais. Tente novamente com menos dados.',
+  'apiError.body.unsupported_media_type': 'Formato de solicitação não suportado.',
+  'apiError.character.already_in_world': 'O personagem já está no mundo.',
+  'apiError.character.delete_confirm': 'Digite o nome do personagem para confirmar a exclusão.',
+  'apiError.character.invalid_class': 'Classe inválida.',
+  'apiError.character.limit_reached': 'Limite de personagens alcançado.',
+  'apiError.character.name_invalid': 'Nome de personagem inválido. Use 2-16 letras.',
+  'apiError.character.name_not_allowed': 'Esse nome de personagem não é permitido.',
+  'apiError.character.name_taken': 'Esse nome já está em uso.',
+  'apiError.character.not_found': 'Personagem não encontrado.',
+  'apiError.character.online': 'O personagem está online no momento.',
+  'apiError.character.rename_not_permitted': 'Não é permitido renomear este personagem.',
+  'apiError.character.rename_required':
+    'Este personagem precisa ser renomeado antes de entrar no mundo.',
+  'apiError.character.taken_over': 'Seu personagem foi assumido por outra sessão.',
+  'apiError.db.conflict': 'Essa alteração conflitou com outra atualização. Tente novamente.',
+  'apiError.discord.already_linked': 'Essa conta do Discord já está vinculada a outra conta.',
+  'apiError.discord.expired': 'O login com o Discord expirou. Faça login com o Discord novamente.',
+  'apiError.discord.link_required': 'Vincule sua conta do Discord primeiro.',
+  'apiError.discord.not_configured': 'A integração com o Discord não está disponível no momento.',
+  'apiError.discord.password_required':
+    'Defina uma senha antes de desvincular sua conta do Discord.',
+  'apiError.discord.swag_claimed': 'Você já resgatou esta recompensa.',
+  'apiError.discord.swag_points': 'Pontos insuficientes.',
+  'apiError.discord.swag_tier': 'Alcance uma classificação mais alta para resgatar isto.',
+  'apiError.discord.unknown_swag': 'Essa recompensa não está disponível.',
+  'apiError.email.invalid': 'Insira um endereço de e-mail válido.',
+  'apiError.email.unchanged': 'Esse já é o seu endereço de e-mail.',
+  'apiError.internal.error': 'Algo deu errado do nosso lado. Tente novamente.',
+  'apiError.json.malformed': 'Não foi possível ler essa solicitação. Tente novamente.',
+  'apiError.moderation.banned': 'Esta conta foi banida.',
+  'apiError.moderation.force_rename':
+    'Um moderador exige que um dos seus personagens seja renomeado.',
+  'apiError.moderation.suspended': 'Esta conta está suspensa.',
+  'apiError.moderation.suspended_until': 'Esta conta está suspensa até {date}.',
+  'apiError.origin.cross_site': 'Solicitação bloqueada por motivos de segurança.',
+  'apiError.rate_limit.exceeded': 'Solicitações demais. Tente novamente em {seconds}.',
+  'apiError.two_factor.already_enabled': 'A autenticação em duas etapas já está ativada.',
+  'apiError.two_factor.code_invalid': 'Esse código não é válido, tente novamente.',
+  'apiError.two_factor.not_enabled': 'A autenticação em duas etapas não está ativada.',
+  'apiError.two_factor.setup_required':
+    'Inicie a configuração da autenticação em duas etapas primeiro.',
+  'apiError.validation.failed':
+    'Alguns campos são inválidos. Verifique o formulário e tente novamente.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Baixar para Linux',
+  'download.linuxHint': 'AppImage: torne-o executável e execute-o. Não é necessária instalação.',
+  'loading.reconnecting': 'Conexão perdida. Reconectando...',
+  'guide.nav.settings': 'Configurações e desempenho',
+  'guide.settingsPage.advancedBody':
+    'Avançado começa no nível High e desbloqueia quatro seletores extras, para que você possa passar seus quadros onde realmente os percebe: detalhes do terreno, densidade da folhagem, efeitos e iluminação e qualidade da sombra. Assim como a qualidade gráfica, eles se aplicam após uma recarga.',
+  'guide.settingsPage.advancedHeading': 'A predefinição avançada: misture a sua própria',
+  'guide.settingsPage.advancedMixes':
+    'Duas mixagens favoritas: mantenha a qualidade da sombra em High e defina Efeitos e iluminação em Low para uma aparência nítida e sem brilho que flui com luz, ou faça o inverso para manter o brilho e suavizar as sombras.',
+  'guide.settingsPage.balancedTagline':
+    'O ponto ideal para a maioria das máquinas e nosso conselho padrão.',
+  'guide.settingsPage.balancedTitle': 'Equilibrado',
+  'guide.settingsPage.balancedWhy':
+    'Medium traz sombras reais e materiais completos; High adiciona oclusão e brilho de ambiente. Abaixo de Ultra, uma rede de segurança integrada absorve quedas repentinas em lutas intensas, de modo que o Equilibrado permanece tranquilo sem ser babá.',
+  'guide.settingsPage.colDoes': 'O que isso faz',
+  'guide.settingsPage.colImpact': 'Impacto de FPS',
+  'guide.settingsPage.colSetting': 'Contexto',
+  'guide.settingsPage.factDetectBody':
+    'Na primeira inicialização, o jogo lê seu dispositivo e escolhe um nível sensato, de Low em um telefone modesto a Ultra em um desktop robusto. Qualquer escolha que você fizer sempre vence.',
+  'guide.settingsPage.factDetectTitle': 'O jogo se ajusta primeiro',
+  'guide.settingsPage.factGovernorBody':
+    'Em cada nível abaixo de Ultra, o jogo reduz silenciosamente a grama, os efeitos e a iluminação por um momento quando uma grande luta aumenta e depois os restaura. Escolher Ultra indica que você prefere manter todos os detalhes.',
+  'guide.settingsPage.factGovernorTitle': 'Uma rede de segurança integrada',
+  'guide.settingsPage.factReloadBody':
+    'A qualidade gráfica e os seletores avançados entram em vigor após uma recarga, e o painel oferece um botão Recarregar agora quando necessário. Todas as outras opções se aplicam no momento em que você as altera.',
+  'guide.settingsPage.factReloadTitle': 'Dois tipos de opções',
+  'guide.settingsPage.fairnessBody':
+    'Nenhuma opção aqui troca beleza por poder. As configurações de Lower perdem apenas o polimento cosmético, nunca as informações com as quais você luta: seus debuffs, barras de elenco, saúde do grupo e números de dano são idênticos de Low a Ultra. Jogar em uma máquina modesta nunca é uma desvantagem.',
+  'guide.settingsPage.fairnessTitle': 'Justo por design',
+  'guide.settingsPage.fpsTagline': 'Para laptops mais antigos, gráficos integrados e bateria.',
+  'guide.settingsPage.fpsTitle': 'Melhor FPS',
+  'guide.settingsPage.fpsWhy':
+    'A qualidade gráfica é a chave mestra e a qualidade de renderização é o controle deslizante mais forte: em 70%, o mundo desenha cerca de metade dos pixels enquanto a interface permanece perfeitamente nítida.',
+  'guide.settingsPage.heading': 'Configurações e desempenho',
+  'guide.settingsPage.howHeading': 'Como as opções se comportam',
+  'guide.settingsPage.impactHeavy': 'Pesado',
+  'guide.settingsPage.impactLight': 'Luz',
+  'guide.settingsPage.impactModerate': 'Moderado',
+  'guide.settingsPage.impactNone': 'Nenhum',
+  'guide.settingsPage.intro':
+    'Faça com que o jogo tenha a melhor aparência ou rode mais rápido. Três loadouts prontos, além do que cada opção gráfica realmente faz.',
+  'guide.settingsPage.loadoutsHeading': 'Três loadouts prontos',
+  'guide.settingsPage.loadoutsIntro':
+    'Comece com o carregamento que se parece com a sua máquina e ajuste uma opção de cada vez até parecer certo.',
+  'guide.settingsPage.mobileBody':
+    'O celular gerencia mais para você: o jogo escolhe o nível, mantém a resolução um pouco mais baixa para proteger a bateria e o calor e mantém os níveis mais altos apenas para desktop. Os loadouts acima ainda se aplicam; os telefones simplesmente atingem o limite de High.',
+  'guide.settingsPage.mobileTitle': 'Em telefones e tablets',
+  'guide.settingsPage.recommended': 'Recomendado',
+  'guide.settingsPage.rowBrightness':
+    'Exposição da cena, mais escura ou mais clara. Preferência pura.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Quão sofisticada é a própria interface: desfoque de vidro, brilho, menus animados. Corresponde automaticamente ao seu navegador; o mundo 3D permanece intocado de qualquer maneira.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloom, oclusão ambiental e quantas tochas e feitiços lançam luz real. A maior economia entre os selecionadores avançados.',
+  'guide.settingsPage.rowFieldOfView':
+    'Quanto do mundo cabe na tela, de um zoom de 55 a 100 graus. Uma escolha de conforto; visualizações mais amplas atraem um pouco mais.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Quão longe e quão espessa a grama cresce ao redor do seu personagem.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Um borrão de vidro fosco atrás das janelas. Bonito e exatamente o tipo de efeito que um navegador mais fraco sente; deixe-o desligado para obter o visual clássico e nítido.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'O interruptor mestre. Cada etapa altera a resolução, sombras, materiais, folhagens e efeitos de iluminação juntos. A maior diferença que você pode fazer.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Uma leitura na tela de FPS, tempo de quadro e muito mais. Ative-o enquanto você ajusta esta página e oculte-o novamente.',
+  'guide.settingsPage.rowReduceMotion':
+    'Remove animações da interface para que as janelas apareçam instantaneamente. Uma opção de acessibilidade em primeiro lugar, com um pequeno bônus de desempenho.',
+  'guide.settingsPage.rowRenderQuality':
+    'Desenha o mundo 3D em uma resolução interna mais baixa e o amplia; a interface permanece nítida. O controle deslizante instantâneo mais forte em máquinas mais fracas e telas de alta resolução.',
+  'guide.settingsPage.rowShadowQuality':
+    'Crocância da sombra. Low mantém as sombras, mas suaviza suas bordas.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Texturas de solo ricas e combinadas versus uma aparência de terreno mais simples e rápida.',
+  'guide.settingsPage.rowWeather':
+    'Chuva ambiente e neve. Apenas atmosfera, e desligá-lo economiza um pouco durante as tempestades.',
+  'guide.settingsPage.tableFoot':
+    'Procurando um controle deslizante de distância de desenho ou um limite FPS? Não há nada para procurar: a distância de visualização faz parte de cada nível de qualidade e o ritmo dos quadros segue a sua exibição.',
+  'guide.settingsPage.tableHeading': 'Cada opção, explicada',
+  'guide.settingsPage.tagReload': 'depois de recarregar',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 a 70%',
+  'guide.settingsPage.value90to100': '90 a 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High em um PC para jogos, Medium em um laptop',
+  'guide.settingsPage.valueOnOptional': 'Ligado (opcional)',
+  'guide.settingsPage.visualsTagline': 'Modo de captura de tela para máquinas desktop poderosas.',
+  'guide.settingsPage.visualsTitle': 'Melhores recursos visuais',
+  'guide.settingsPage.visualsWhy':
+    'Ultra é renderizado na resolução mais alta que sua tela oferece com a iluminação mais rica. Ele também desativa a rede de segurança e é apenas para desktop: os telefones e o aplicativo atingem o limite de High.',
+  'guide.settingsPage.wherePath':
+    'Tudo nesta página está no jogo: pressione Esc e procure em Gráficos, Interface e Sobreposição de desempenho.',
+  'guide.settingsPage.whyLabel': 'Por que funciona:',
+  'hudChrome.crafting.close': 'Fechar elaboração',
+  'hudChrome.crafting.craft': 'Arte',
+  'hudChrome.crafting.craftedToast': 'Feito: {name}',
+  'hudChrome.crafting.empty': 'Nenhuma receita conhecida ainda.',
+  'hudChrome.crafting.insufficientMaterials': 'Você não tem os materiais para isso.',
+  'hudChrome.crafting.reagentLine': '{name}x{have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Requer:',
+  'hudChrome.crafting.resultAria': 'Artesanato {name}',
+  'hudChrome.crafting.title': 'Artesanato',
+  'hudChrome.crafting.unknownRecipe': 'Essa receita não existe.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Um ofício para chamar de seu',
+  'entities.quests.q_archetype_acceptance.text':
+    'Cada artesão de Eastbrook eventualmente escolhe um ofício para chamar de seu. Prove seu valor com uma única ação, {playerName}, e declare seu caminho.',
+  'entities.quests.q_archetype_acceptance.completion': 'Seu caminho está escolhido; ande bem.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Lobo da Floresta morto',
+  'entities.quests.q_prof_make_amends.title': 'Fazendo as pazes',
+  'entities.quests.q_prof_make_amends.text':
+    'Para separar um ofício para outro, um artesão deve primeiro reparar o caminho não percorrido, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Reparações feitas; um novo caminho está aberto para você.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Lobo da Floresta morto',
 };

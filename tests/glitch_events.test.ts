@@ -3,6 +3,8 @@ import {
   behaviorEventBody,
   behaviorEventInputsFromSimEvent,
   GlitchBehaviorTracker,
+  merchantBehaviorEventInputs,
+  talkBehaviorEventInputs,
 } from '../src/game/glitch_events';
 import type { SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
@@ -71,7 +73,16 @@ describe('Glitch behavioral events', () => {
     ];
 
     expect(input.flatMap((ev) => behaviorEventInputsFromSimEvent(ev, world()))).toEqual([
-      { stepKey: 'quest', actionKey: 'complete', metadata: { quest_id: 'q_wolves' } },
+      {
+        stepKey: 'quest',
+        actionKey: 'complete',
+        metadata: { quest_id: 'q_wolves', quest_stage: 'complete' },
+      },
+      {
+        stepKey: 'quest_q_wolves_complete',
+        actionKey: 'reach',
+        metadata: { quest_id: 'q_wolves', quest_stage: 'complete' },
+      },
       { stepKey: 'level_02', actionKey: 'reach', metadata: { level: 2 } },
       {
         stepKey: 'lockpick',
@@ -82,6 +93,109 @@ describe('Glitch behavioral events', () => {
         stepKey: 'delve',
         actionKey: 'fail',
         metadata: { delve_id: 'drowned_litany', tier_id: 't1' },
+      },
+    ]);
+  });
+
+  it('maps talk and merchant interactions to funnel stage keys', () => {
+    expect(
+      talkBehaviorEventInputs({
+        kind: 'option',
+        npcId: 'marshal_redbrook',
+        npcEntityId: 12,
+        optionKey: 'quest_offer_detail',
+        questId: 'q_wolves',
+        questState: 'available',
+      }),
+    ).toEqual([
+      {
+        stepKey: 'talk_option',
+        actionKey: 'select_quest_offer_detail',
+        metadata: {
+          npc_id: 'marshal_redbrook',
+          npc_entity_id: 12,
+          option_key: 'quest_offer_detail',
+          quest_id: 'q_wolves',
+          quest_state: 'available',
+          quest_count: undefined,
+          has_vendor: undefined,
+          has_market: undefined,
+          source: undefined,
+        },
+      },
+      {
+        stepKey: 'quest',
+        actionKey: 'view_detail',
+        metadata: {
+          quest_id: 'q_wolves',
+          quest_stage: 'detail',
+          npc_id: 'marshal_redbrook',
+          npc_entity_id: 12,
+          option_key: 'quest_offer_detail',
+          quest_state: 'available',
+          quest_count: undefined,
+          has_vendor: undefined,
+          has_market: undefined,
+          source: undefined,
+        },
+      },
+      {
+        stepKey: 'quest_q_wolves_detail',
+        actionKey: 'reach',
+        metadata: {
+          quest_id: 'q_wolves',
+          quest_stage: 'detail',
+          npc_id: 'marshal_redbrook',
+          npc_entity_id: 12,
+          option_key: 'quest_offer_detail',
+          quest_state: 'available',
+          quest_count: undefined,
+          has_vendor: undefined,
+          has_market: undefined,
+          source: undefined,
+        },
+      },
+    ]);
+
+    expect(
+      merchantBehaviorEventInputs({
+        kind: 'option',
+        merchantType: 'vendor',
+        vendorId: 'trader_wilkes',
+        vendorEntityId: 18,
+        optionKey: 'buy',
+        itemId: 'hearth_bread',
+      }),
+    ).toEqual([
+      {
+        stepKey: 'merchant_option',
+        actionKey: 'buy',
+        metadata: {
+          merchant_type: 'vendor',
+          vendor_id: 'trader_wilkes',
+          vendor_entity_id: 18,
+          option_key: 'buy',
+          item_id: 'hearth_bread',
+          stock_count: undefined,
+          buyback_count: undefined,
+          proceeds: undefined,
+          source: undefined,
+        },
+      },
+      {
+        stepKey: 'merchant_buy',
+        actionKey: 'attempt',
+        metadata: {
+          merchant_type: 'vendor',
+          vendor_id: 'trader_wilkes',
+          vendor_entity_id: 18,
+          option_key: 'buy',
+          item_id: 'hearth_bread',
+          stock_count: undefined,
+          buyback_count: undefined,
+          proceeds: undefined,
+          source: undefined,
+        },
       },
     ]);
   });
@@ -121,6 +235,7 @@ describe('Glitch behavioral events', () => {
       { step_key: 'input', action_key: 'first_intent', metadata: { input_kind: 'keyboard' } },
       { step_key: 'progression', action_key: 'xp_gain', metadata: { amount: 12 } },
       { step_key: 'quest', action_key: 'accept', metadata: { quest_id: 'q_wolves' } },
+      { step_key: 'quest_q_wolves_accept', action_key: 'reach' },
       { step_key: 'zone_mirefen_marsh', action_key: 'enter' },
       { step_key: 'level_06', action_key: 'reach' },
     ]);

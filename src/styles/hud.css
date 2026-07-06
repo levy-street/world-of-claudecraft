@@ -879,11 +879,13 @@
     max-width: 320px;
     pointer-events: auto;
   }
-  /* Debuffs sit in their own row beneath the buff row (classic layout). */
+  /* Debuffs sit in their own row well beneath the buff row (classic layout),
+     level with the minimap's lower edge (the mail badge), so a wrapping wall of
+     raid buffs and their duration labels never crowds the debuff row. */
   #debuff-bar {
     position: absolute;
     right: 196px;
-    top: 50px;
+    top: 172px;
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: wrap;
@@ -945,8 +947,29 @@
     background-position: center;
     background-repeat: no-repeat;
   }
+  /* A debuff reads as harmful at a glance: a thicker border (border-box, so no
+     layout shift) tinted by magic school, WoW-style (physical keeps the base red). */
   .buff.debuff {
     border-color: var(--color-debuff);
+    border-width: 2px;
+  }
+  .buff.debuff[data-school="fire"] {
+    border-color: var(--color-debuff-fire);
+  }
+  .buff.debuff[data-school="frost"] {
+    border-color: var(--color-debuff-frost);
+  }
+  .buff.debuff[data-school="arcane"] {
+    border-color: var(--color-debuff-arcane);
+  }
+  .buff.debuff[data-school="shadow"] {
+    border-color: var(--color-debuff-shadow);
+  }
+  .buff.debuff[data-school="nature"] {
+    border-color: var(--color-debuff-nature);
+  }
+  .buff.debuff[data-school="holy"] {
+    border-color: var(--color-debuff-holy);
   }
   /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
   .buff.cancelable {

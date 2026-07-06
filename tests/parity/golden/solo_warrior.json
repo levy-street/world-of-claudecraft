@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "d35a4a11",
+      "state": "7dfedf0b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -27,6 +27,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -48,12 +49,18 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -112,7 +119,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 402,
-      "state": "32875040",
+      "state": "c73fe898",
       "events": "b208f192",
       "rng": {
         "draws": 6,
@@ -123,7 +130,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 402,
-      "state": "ad4aa7e5",
+      "state": "63d4c129",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -134,7 +141,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 402,
-      "state": "2372d053",
+      "state": "89e9d46d",
       "events": "e161a3dc",
       "rng": {
         "draws": 98,
@@ -145,7 +152,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 402,
-      "state": "79ad293d",
+      "state": "e5e347a9",
       "events": "76a7f7e3",
       "rng": {
         "draws": 154,
@@ -155,6 +162,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -180,13 +188,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -308,7 +322,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 402,
-      "state": "4379d8e1",
+      "state": "efbb028d",
       "events": "741638a5",
       "rng": {
         "draws": 172,
@@ -318,6 +332,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -343,13 +358,19 @@
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

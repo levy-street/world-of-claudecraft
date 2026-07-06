@@ -45,6 +45,12 @@ export interface ProfessionRecipeRecord {
   skillReq: number;
   // Skill at which the recipe stops granting skill-ups ("grey"/trivial).
   trivialAt: number;
+  // Base item-level budget this recipe's output is balanced against (issue
+  // #1127). Informational for now: the higher-tier gating (P4), the wheel
+  // (P5), and archetype-exclusive combos (P8) read this later to scale the
+  // quality roll and gate access. A common-tier recipe always has skillReq 0
+  // per the free-floor rule.
+  itemLevelBudget: number;
 }
 
 // One performed craft (a runtime instance of a RecipeRecord being worked),

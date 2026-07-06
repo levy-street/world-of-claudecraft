@@ -1116,6 +1116,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Hent den selvstændige launcher for optimeret ydeevne og fuldskærmsspil.',
   'download.title': 'Download Desktop-launcher',
+  'download.macCta': 'Download til macOS',
+  'download.windowsPending': 'Windows-build afventer.',
   'entities.abilities.adrenaline_rush.description':
     'Dit blod koger, og genopretter øjeblikkeligt 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Fremskyndet Blod',
@@ -1778,6 +1780,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Høstsegl',
   'entities.items.bronze_sickle.name': 'Bronzesegl',
   'entities.items.silverleaf_sickle.name': 'Sølvbladsegl',
+  'entities.items.thorium_mining_pick.name': 'Thoriumminehakke',
+  'entities.items.arcanite_mining_pick.name': 'Arkanitminehakke',
+  'entities.items.ashwood_axe.name': 'Askeøkse',
+  'entities.items.elderwood_axe.name': 'Gammeltræsøkse',
+  'entities.items.goldleaf_sickle.name': 'Guldbladssegl',
+  'entities.items.sunpetal_sickle.name': 'Solkronbladssegl',
   'entities.items.moongate_rubbing.name': 'Værneaftryk',
   'entities.items.moonpale_scale.name': 'Måneblegt Skæl',
   'entities.items.moonscale_saber.name': 'Måneskæl-Sabel',
@@ -4585,6 +4593,20 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Nulstil knaplayout',
   'hudChrome.controller.title': 'Controller',
   'hudChrome.controller.vibration': 'Vibration',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Dette kadaver er allerede blevet høstet.',
+  'hudChrome.corpseHarvest.componentAria': 'Høst {component}',
+  'hudChrome.corpseHarvest.components.claw': 'Klo',
+  'hudChrome.corpseHarvest.components.fang': 'Hugtand',
+  'hudChrome.corpseHarvest.components.gills': 'Gæller',
+  'hudChrome.corpseHarvest.components.hide': 'Skind',
+  'hudChrome.corpseHarvest.components.horn': 'Horn',
+  'hudChrome.corpseHarvest.components.silk': 'Silke',
+  'hudChrome.corpseHarvest.components.tusk': 'Stødtand',
+  'hudChrome.corpseHarvest.components.venomSac': 'Giftsæk',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Jo færre dele du vælger, desto højere kvalitetsgrad får hver enkelt.',
+  'hudChrome.corpseHarvest.harvestButton': 'Høst',
+  'hudChrome.corpseHarvest.title': 'Høst',
   'hudChrome.emoteEditor.done': 'Færdig',
   'hudChrome.emoteEditor.title': 'Følelsesudtryk',
   'hudChrome.emoteWheel.edit': 'Rediger',
@@ -5845,4 +5867,188 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Det, du gjorde i mørket',
   'entities.letters.letter_q_hollow.body':
     'Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric',
+  'hudChrome.gathering.herbalism': 'Urtekundskab',
+  'hudChrome.gathering.logging': 'Skovhugst',
+  'hudChrome.gathering.mining': 'Minedrift',
+  'hudChrome.gathering.title': 'Indsamling',
+  'errors.api.accountSessionLimit': 'For mange karakterer på denne konto er allerede i verdenen.',
+  'errors.api.crossSiteOrigin': 'Anmodningen blev blokeret af sikkerhedsmæssige årsager.',
+  'errors.api.unsupportedMediaType': 'Anmodningsformatet understøttes ikke.',
+  'apiError.account.characters_online': 'Log ud af alle dine karakterer, før du deaktiverer.',
+  'apiError.account.deactivated':
+    'Denne konto er blevet deaktiveret. Kontakt en administrator for at genoprette den.',
+  'apiError.account.not_found': 'Kontoen blev ikke fundet.',
+  'apiError.account.password_too_long': 'Den nye adgangskode må højst være på 128 tegn.',
+  'apiError.account.password_too_short': 'Adgangskoden skal være på mindst 6 tegn.',
+  'apiError.account.username_invalid':
+    'Brugernavnet skal være på 3-24 tegn og bruge bogstaver, cifre eller understregning.',
+  'apiError.account.username_mismatch': 'Det brugernavn passer ikke til din konto.',
+  'apiError.account.username_not_allowed': 'Det brugernavn er ikke tilladt.',
+  'apiError.account.username_taken': 'Det brugernavn er allerede optaget.',
+  'apiError.auth.current_password_incorrect': 'Din nuværende adgangskode er forkert.',
+  'apiError.auth.forbidden': 'Du har ikke tilladelse til at gøre det.',
+  'apiError.auth.invalid_credentials': 'Ugyldigt brugernavn eller adgangskode.',
+  'apiError.auth.password_incorrect': 'Din adgangskode er forkert.',
+  'apiError.auth.required': 'Ikke godkendt.',
+  'apiError.auth.token_invalid': 'Din session er udløbet. Log venligst ind igen.',
+  'apiError.auth.token_missing': 'Du skal være logget ind for at gøre det.',
+  'apiError.auth.too_many_attempts': 'For mange forsøg. Vent et minut og prøv igen.',
+  'apiError.auth.too_many_failed_attempts':
+    'For mange mislykkede forsøg. Vent et par minutter og prøv igen.',
+  'apiError.auth.verification_failed': 'Verificeringen mislykkedes. Prøv venligst igen.',
+  'apiError.auth.web_login_only': 'Login er kun tilladt fra spilklienten.',
+  'apiError.body.too_large': 'Anmodningen er for stor. Prøv igen med færre data.',
+  'apiError.body.unsupported_media_type': 'Anmodningsformatet understøttes ikke.',
+  'apiError.character.already_in_world': 'Karakteren er allerede i verdenen.',
+  'apiError.character.delete_confirm': 'Skriv karakterens navn for at bekræfte sletning.',
+  'apiError.character.invalid_class': 'Ugyldig klasse.',
+  'apiError.character.limit_reached': 'Grænsen for antal karakterer er nået.',
+  'apiError.character.name_invalid': 'Ugyldigt karakternavn. Brug 2-16 bogstaver.',
+  'apiError.character.name_not_allowed': 'Det karakternavn er ikke tilladt.',
+  'apiError.character.name_taken': 'Det navn er optaget.',
+  'apiError.character.not_found': 'Karakteren blev ikke fundet.',
+  'apiError.character.online': 'Karakteren er i øjeblikket online.',
+  'apiError.character.rename_not_permitted': 'Det er ikke tilladt at omdøbe denne karakter.',
+  'apiError.character.rename_required':
+    'Denne karakter skal omdøbes, før den kan komme ind i verdenen.',
+  'apiError.character.taken_over': 'Din karakter blev overtaget af en anden session.',
+  'apiError.db.conflict': 'Ændringen kom i konflikt med en anden opdatering. Prøv venligst igen.',
+  'apiError.discord.already_linked': 'Den Discord-konto er allerede knyttet til en anden konto.',
+  'apiError.discord.expired': 'Det Discord-login er udløbet. Log venligst ind med Discord igen.',
+  'apiError.discord.link_required': 'Knyt din Discord-konto først.',
+  'apiError.discord.not_configured': 'Discord-integration er ikke tilgængelig lige nu.',
+  'apiError.discord.password_required':
+    'Angiv en adgangskode, før du fjerner tilknytningen til din Discord-konto.',
+  'apiError.discord.swag_claimed': 'Du har allerede indløst denne belønning.',
+  'apiError.discord.swag_points': 'Ikke nok point.',
+  'apiError.discord.swag_tier': 'Nå en højere rang for at indløse denne.',
+  'apiError.discord.unknown_swag': 'Den belønning er ikke tilgængelig.',
+  'apiError.email.invalid': 'Indtast en gyldig e-mailadresse.',
+  'apiError.email.unchanged': 'Det er allerede din e-mailadresse.',
+  'apiError.internal.error': 'Der gik noget galt hos os. Prøv venligst igen.',
+  'apiError.json.malformed': 'Anmodningen kunne ikke læses. Prøv venligst igen.',
+  'apiError.moderation.banned': 'Denne konto er blevet udelukket.',
+  'apiError.moderation.force_rename': 'En moderator kræver, at en af dine karakterer omdøbes.',
+  'apiError.moderation.suspended': 'Denne konto er suspenderet.',
+  'apiError.moderation.suspended_until': 'Denne konto er suspenderet indtil {date}.',
+  'apiError.origin.cross_site': 'Anmodningen blev blokeret af sikkerhedsmæssige årsager.',
+  'apiError.rate_limit.exceeded': 'For mange anmodninger. Prøv igen om {seconds}.',
+  'apiError.two_factor.already_enabled': 'To-faktor er allerede aktiveret.',
+  'apiError.two_factor.code_invalid': 'Den kode er ikke gyldig, prøv igen.',
+  'apiError.two_factor.not_enabled': 'To-faktor er ikke aktiveret.',
+  'apiError.two_factor.setup_required': 'Start opsætning af to-faktor først.',
+  'apiError.validation.failed': 'Nogle felter er ugyldige. Tjek formularen og prøv igen.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Download til Linux',
+  'download.linuxHint':
+    'AppImage: gør det eksekverbart, og kør det derefter. Ingen installation nødvendig.',
+  'loading.reconnecting': 'Forbindelse mistet. Genopretter forbindelse...',
+  'guide.nav.settings': 'Indstillinger og ydeevne',
+  'guide.settingsPage.advancedBody':
+    'Avanceret starter fra High-niveauet og låser op for fire ekstra vælgere, så du kan bruge dine rammer, hvor du rent faktisk bemærker dem: Terrændetaljer, Løvtæthed, Effekter og belysning og Skyggekvalitet. Ligesom grafikkvalitet gælder de efter en genindlæsning.',
+  'guide.settingsPage.advancedHeading': 'Den avancerede forudindstilling: bland din egen',
+  'guide.settingsPage.advancedMixes':
+    'To yndlingsblandinger: Hold Shadow Quality på High og indstil Effects & Lighting til Low for et sprødt, glødfrit look, der kører let, eller gør det omvendte for at bevare blomstringen og blødgøre skyggerne.',
+  'guide.settingsPage.balancedTagline':
+    'Det søde sted for de fleste maskiner og vores standardråd.',
+  'guide.settingsPage.balancedTitle': 'Balanceret',
+  'guide.settingsPage.balancedWhy':
+    'Medium bringer ægte skygger og fulde materialer; High tilføjer omgivende okklusion og blomstring. Under Ultra absorberer et indbygget sikkerhedsnet pludselige fald i travle kampe, så Balanced forbliver glat uden at passe baby.',
+  'guide.settingsPage.colDoes': 'Hvad den gør',
+  'guide.settingsPage.colImpact': 'FPS virkning',
+  'guide.settingsPage.colSetting': 'Indstilling',
+  'guide.settingsPage.factDetectBody':
+    'Ved din første lancering læser spillet din enhed og vælger et fornuftigt niveau, fra Low på en beskeden telefon til Ultra på et stærkt skrivebord. Ethvert valg, du selv træffer, vinder altid.',
+  'guide.settingsPage.factDetectTitle': 'Spillet tuner sig selv først',
+  'guide.settingsPage.factGovernorBody':
+    'På hvert niveau under Ultra tynder spillet stille og roligt græs, effekter og belysning et øjeblik, når en stor kamp spidser til, og genopretter dem derefter. Hvis du vælger Ultra, fortæller det, at du hellere vil beholde alle detaljer.',
+  'guide.settingsPage.factGovernorTitle': 'Et indbygget sikkerhedsnet',
+  'guide.settingsPage.factReloadBody':
+    'Grafikkvalitet og de avancerede vælgere træder i kraft efter en genindlæsning, og panelet tilbyder en Genindlæs nu-knap, når det er nødvendigt. Hver anden mulighed gælder i det øjeblik, du ændrer den.',
+  'guide.settingsPage.factReloadTitle': 'To slags muligheder',
+  'guide.settingsPage.fairnessBody':
+    'Ingen mulighed her bytter skønhed for magt. Lower indstillinger afgiver kun kosmetisk polering, aldrig information, du kæmper med: dine debuffs, cast bars, partysundhed og skadetal er identiske fra Low til Ultra. At spille på en beskeden maskine er aldrig et handicap.',
+  'guide.settingsPage.fairnessTitle': 'Fair af design',
+  'guide.settingsPage.fpsTagline': 'Til ældre bærbare computere, integreret grafik og batterispil.',
+  'guide.settingsPage.fpsTitle': 'Bedste FPS',
+  'guide.settingsPage.fpsWhy':
+    'Grafikkvalitet er hovedafbryderen, og gengivelseskvalitet er den stærkeste skyder: Med 70 % trækker verden omkring halvdelen af ​​pixels, mens grænsefladen forbliver perfekt skarp.',
+  'guide.settingsPage.heading': 'Indstillinger og ydeevne',
+  'guide.settingsPage.howHeading': 'Hvordan mulighederne opfører sig',
+  'guide.settingsPage.impactHeavy': 'Tung',
+  'guide.settingsPage.impactLight': 'Lys',
+  'guide.settingsPage.impactModerate': 'Moderat',
+  'guide.settingsPage.impactNone': 'Ingen',
+  'guide.settingsPage.intro':
+    'Få spillet til at se bedst ud, eller kør det hurtigste. Tre færdige loadouts, plus hvad enhver grafikfunktion virkelig gør.',
+  'guide.settingsPage.loadoutsHeading': 'Tre færdige loadouts',
+  'guide.settingsPage.loadoutsIntro':
+    'Start fra belastningen, der lyder som din maskine, og juster derefter én mulighed ad gangen, indtil den føles rigtig.',
+  'guide.settingsPage.mobileBody':
+    'Mobile klarer mere for dig: Spillet vælger niveauet, holder opløsningen et tryk lavere for at beskytte batteri og varme og beholder de højeste niveauer kun på skrivebordet. Ovenstående belastninger gælder stadig; telefoner fyldes blot ud ved High.',
+  'guide.settingsPage.mobileTitle': 'På telefoner og tablets',
+  'guide.settingsPage.recommended': 'Anbefales',
+  'guide.settingsPage.rowBrightness': 'Sceneeksponering, mørkere eller lysere. Ren præference.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Hvor fancy selve grænsefladen får lov at være: glassløring, glød, animerede menuer. Auto matcher din browser; 3D-verdenen er uberørt på begge måder.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Blomstring, omgivende okklusion, og hvor mange fakler og besværgelser, der kaster rigtigt lys. Den største enkeltbesparelse blandt de avancerede vælgere.',
+  'guide.settingsPage.rowFieldOfView':
+    'Hvor meget af verden passer på skærmen, fra zoomet 55 til fejende 100 grader. Et komfortvalg; bredere visninger trækker lidt mere.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Hvor langt og hvor tykt græsset vokser omkring din karakter.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Sløring af matteret glas bag vinduer. Smuk, og præcis den slags effekt en svagere browser føler; lad det være for det klassiske sprøde look.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Hovedafbryderen. Hvert trin ændrer opløsning, skygger, materialer, løv og lyseffekter sammen. Den største enkeltstående forskel, du kan gøre.',
+  'guide.settingsPage.rowPerfOverlay':
+    'En skærmudlæsning af FPS, billedtid og mere. Slå den til, mens du tuner denne side, og skjul den derefter igen.',
+  'guide.settingsPage.rowReduceMotion':
+    'Fjerner grænsefladeanimationer, så vinduer vises med det samme. Først en tilgængelighedsmulighed med en lille præstationsbonus.',
+  'guide.settingsPage.rowRenderQuality':
+    'Tegner 3D-verdenen med en lavere intern opløsning og skalerer den op; grænsefladen forbliver skarp. Den stærkeste øjeblikkelige skyder på svagere maskiner og højopløselige skærme.',
+  'guide.settingsPage.rowShadowQuality':
+    'Skygge sprødhed. Low bevarer skygger, men blødgør deres kanter.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Rige, blandede jordstrukturer kontra et enklere, hurtigere terrænlook.',
+  'guide.settingsPage.rowWeather':
+    'Omgivende regn og sne. Kun atmosfære, og at slukke for den sparer lidt under storme.',
+  'guide.settingsPage.tableFoot':
+    'Leder du efter en skyder til trækafstand eller en FPS kasket? Der er ikke noget at jage efter: Visningsafstand er en del af hvert kvalitetsniveau, og frame pacing følger din skærm.',
+  'guide.settingsPage.tableHeading': 'Hver mulighed, forklaret',
+  'guide.settingsPage.tagReload': 'efter genindlæsning',
+  'guide.settingsPage.value100': '100 %',
+  'guide.settingsPage.value50to70': '50 til 70 %',
+  'guide.settingsPage.value90to100': '90 til 100 %',
+  'guide.settingsPage.valueHighOrMedium': 'High på en gaming-pc, Medium på en bærbar computer',
+  'guide.settingsPage.valueOnOptional': 'Til (valgfrit)',
+  'guide.settingsPage.visualsTagline': 'Skærmbilledetilstand til kraftfulde stationære maskiner.',
+  'guide.settingsPage.visualsTitle': 'Bedste Visuals',
+  'guide.settingsPage.visualsWhy':
+    'Ultra gengiver med den højeste opløsning, din skærm tilbyder med den rigeste belysning. Det slukker også for sikkerhedsnettet, og det er kun til desktop: telefoner og appen topper ud ved High.',
+  'guide.settingsPage.wherePath':
+    'Alt på denne side lever i spillet: Tryk på Esc og kig i Grafik, Interface og Performance Overlay.',
+  'guide.settingsPage.whyLabel': 'Hvorfor virker det:',
+  'hudChrome.crafting.close': 'Tæt håndværk',
+  'hudChrome.crafting.craft': 'Håndværk',
+  'hudChrome.crafting.craftedToast': 'Udformet: {name}',
+  'hudChrome.crafting.empty': 'Ingen opskrifter kendt endnu.',
+  'hudChrome.crafting.insufficientMaterials': 'Det har du ikke materialerne til.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Kræver:',
+  'hudChrome.crafting.resultAria': 'Håndværk {name}',
+  'hudChrome.crafting.title': 'Håndværk',
+  'hudChrome.crafting.unknownRecipe': 'Den opskrift findes ikke.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Et håndværk at kalde dit eget',
+  'entities.quests.q_archetype_acceptance.text':
+    'Hver eneste håndværker fra Eastbrook sætter sig til sidst over på et håndværk, som de kalder deres eget. Bevis dig selv med en enkelt gerning, {playerName}, og erklær din vej.',
+  'entities.quests.q_archetype_acceptance.completion': 'Din vej er valgt; gå det godt.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Skovulv dræbt',
+  'entities.quests.q_prof_make_amends.title': 'Gøre bod',
+  'entities.quests.q_prof_make_amends.text':
+    'For at afsætte et håndværk til et andet, skal en håndværker først råde bod på stien, der ikke er gået, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Foretagne ændringer; en ny vej er åben for dig.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Skovulv dræbt',
 };

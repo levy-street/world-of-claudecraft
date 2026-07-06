@@ -38,6 +38,8 @@ import { offensiveName } from './auth';
 import type {
   BotDetector,
   BotTrackingContext,
+  ConfigApplyResult,
+  ConfigField,
   SessionRuntimeSnapshot,
   SuspiciousPlayer,
 } from './bot_detector/contract';
@@ -76,14 +78,20 @@ import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
+import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { trackReachedLevel5 } from './meta_capi';
 import {
   forceCharacterRename,
   moderateAccount,
   muteAccountChat,
   recordInGameAction,
 } from './moderation_db';
-import { type ModerationHost, ModerationService } from './moderation_service';
+import {
+  canAttemptModerationCommands,
+  type ModerationHost,
+  ModerationService,
+} from './moderation_service';
 import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -139,6 +147,8 @@ const WHO_RESULT_LIMIT = 50;
 // between an account's characters, so the old allowance of a second online
 // character (self-trade by dual-boxing) is no longer needed. GMs are exempt.
 const MAX_ACTIVE_SESSIONS_PER_ACCOUNT = 1;
+// WS protocol-level ping cadence; see the keepalive interval in start().
+const WS_KEEPALIVE_PING_MS = 30_000;
 const RESTART_COUNTDOWN_TOTAL_SECONDS = 600;
 const RESTART_COUNTDOWN_STEPS = [
   { atSeconds: 0, text: 'Server restart in 10 minutes.' },
@@ -149,7 +159,6 @@ const RESTART_COUNTDOWN_STEPS = [
   { atSeconds: 590, text: 'Server restart in 10 seconds.' },
   { atSeconds: 600, text: 'Server restarting now.' },
 ] as const;
-const ANTIBOT_ENFORCE = process.env.ANTIBOT_ENFORCE === '1';
 // Clients stream movement intent every 50ms. If that stream goes silent while
 // the last packet held a key down, stop applying it instead of turning/running
 // forever. 750ms leaves room for normal jitter and short browser stalls.
@@ -191,6 +200,7 @@ type ClientMessage = Record<string, unknown> & {
   mode?: string;
   n?: string;
   name?: string;
+  node?: string;
   npc?: number;
   objectId?: number;
   price?: number;
@@ -271,6 +281,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'sell',
   'buyback',
   'loot',
+  'harvestCorpse',
   'pickup',
   'interact',
   'accept',
@@ -347,6 +358,15 @@ export interface ClientSession {
   joinedAt: number;
   dbSessionId: number | null; // play_sessions row, set once the insert lands
   left: boolean; // set in leave(); guards against the open-session insert landing after disconnect
+  // linkdead grace: true while the socket has dropped but the character is
+  // held in-world awaiting a reconnect. graceUntil is the epoch-ms deadline
+  // at which the held session is fully torn down via leave().
+  linkdead: boolean;
+  graceUntil: number;
+  // true while a keepalive ping is outstanding; the pong handler (attached
+  // next to the close/error handlers in ws_auth.ts) clears it. Still set at
+  // the next sweep means the socket is black-holed: terminate into the grace.
+  awaitingPong: boolean;
   chatTokens: number;
   chatLastRefill: number;
   chatLastRateError: number;
@@ -397,7 +417,14 @@ export interface ClientSession {
   socialTrackedIds?: number[];
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
+  userAgent: string;
+  fbp: string;
+  fbc: string;
+  sourceUrl: string;
   isAdmin: boolean;
+  // Expanded admin permissions, snapshotted at join like isAdmin (a role change
+  // applies at the next login). Gates the in-game moderation commands.
+  adminPermissions: ReadonlySet<string>;
   // Seed the client sends at auth; signs its challenge answers.
   clientSeed: string;
   // Behavioral bot-detection state. Ephemeral — reset on every join.
@@ -735,6 +762,7 @@ export class GameServer {
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
   private holderTierInterval: NodeJS.Timeout | null = null;
+  private keepaliveInterval: NodeJS.Timeout | null = null;
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
@@ -1070,6 +1098,7 @@ export class GameServer {
             lap('antibot');
             acc -= DT;
           }
+          this.expireLinkdeadSessions();
           this.broadcastSnapshots();
           lap('broadcast');
           this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
@@ -1111,6 +1140,42 @@ export class GameServer {
     this.dailyRewardActivityInterval = setInterval(() => {
       void this.recordDailyRewardActivity();
     }, DAILY_REWARD_ACTIVITY_MS);
+    this.keepaliveInterval = setInterval(() => {
+      this.pingLiveSessions();
+    }, WS_KEEPALIVE_PING_MS);
+  }
+
+  // Protocol-level WS liveness sweep, every WS_KEEPALIVE_PING_MS. Two jobs:
+  // the pings keep NAT/proxy idle timers from silently dropping a quiet
+  // connection (an AFK player's client sends no input frames, the classic
+  // "kicked while AFK" report), and a peer that missed a whole ping interval
+  // (no pong; browsers answer automatically) is a black-holed socket (no
+  // FIN/RST ever arrives, e.g. a mobile WiFi-to-cellular handoff), so it is
+  // terminated into the linkdead grace. Without the pong check, a re-auth for
+  // the same character keeps hitting 'character already in world' until TCP
+  // gives up on the dead socket, which can take minutes; with it, the
+  // client's reconnect backoff resumes within a ping interval or two (the
+  // client tolerates that rejection mid-reconnect, src/net/reconnect_policy.ts).
+  pingLiveSessions(): void {
+    for (const session of this.clients.values()) {
+      if (session.linkdead || session.ws.readyState !== 1) continue;
+      if (session.awaitingPong) {
+        const ws = session.ws;
+        try {
+          ws.terminate();
+        } catch {
+          /* socket already torn down */
+        }
+        this.socketClosed(session, ws);
+        continue;
+      }
+      session.awaitingPong = true;
+      try {
+        session.ws.ping();
+      } catch {
+        /* socket torn down mid-iteration */
+      }
+    }
   }
 
   stop(): void {
@@ -1118,6 +1183,7 @@ export class GameServer {
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
     if (this.dailyRewardActivityInterval) clearInterval(this.dailyRewardActivityInterval);
+    if (this.keepaliveInterval) clearInterval(this.keepaliveInterval);
   }
 
   // Grant playtime reward points to each online account that has been ACTIVE (gave
@@ -1298,10 +1364,13 @@ export class GameServer {
   private runAntibotTick(): void {
     const now = Date.now();
     for (const session of this.clients.values()) {
+      // Enforcement gating lives in the detector's own runtime config (which
+      // defaults to the ANTIBOT_ENFORCE env var and is operator-tunable live),
+      // so the host-side kill-switch parameter is always granted here.
       const action = this.botDetector.handleTick(
         session.botTrackingContext,
         now,
-        ANTIBOT_ENFORCE,
+        true,
         this.captureBotDetectionSnapshot(session, now),
       );
       if (action === 'kick') {
@@ -1440,6 +1509,19 @@ export class GameServer {
       .catch((err) => console.error('failed to save account mech chroma:', err));
   }
 
+  /**
+   * Grant a mech-chroma cosmetic to an account by id (a Discord swag claim, whose
+   * points/claim are already resolved durably server-side). Best-effort live update:
+   * persist the grant, then push the refreshed cosmetics to any online session on the
+   * account. The live push is a no-op when the account is offline. Injected into the
+   * ported Discord swag route via configureDiscordRuntime (server/discord.ts).
+   */
+  grantMechChromaToAccount(accountId: number, chromaId: string): void {
+    void grantAccountMechChroma(accountId, chromaId)
+      .then((cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics))
+      .catch((err) => console.error('failed to grant swag mech chroma:', err));
+  }
+
   private unequipAccountMechChroma(session: ClientSession, chromaId: string): void {
     const skin = mechChromaSkinIndex(chromaId);
     const itemId = mechChromaItemId(chromaId);
@@ -1475,21 +1557,43 @@ export class GameServer {
         accountCosmetics?: AccountCosmetics;
         chatStrikes?: number;
         isAdmin?: boolean;
+        adminPermissions?: readonly string[];
         clientSeed?: string;
+        fbp?: string | null;
+        fbc?: string | null;
+        sourceUrl?: string | null;
       } = {},
   ): ClientSession | { error: string } {
-    if (this.sessionsByCharacterId.has(characterId)) return { error: 'character already in world' };
     // Anti-bot: cap simultaneous online characters per account. Accounts can
     // still own up to 10 characters; this only limits live sessions. GMs are
-    // exempt for supervision.
-    if (!isGm) {
-      let activeForAccount = 0;
-      for (const s of this.clients.values()) {
-        if (s.accountId === accountId) activeForAccount++;
-      }
-      if (activeForAccount >= MAX_ACTIVE_SESSIONS_PER_ACCOUNT) {
-        return { error: 'too many characters on this account are already in the world' };
-      }
+    // exempt for supervision. Linkdead sessions are special-cased (planJoin):
+    // the same character resumes its held session, and a different character
+    // on the account displaces them instead of being blocked by them.
+    const sameCharacter = this.sessionsByCharacterId.get(characterId) ?? null;
+    let liveOtherSessions = 0;
+    const linkdeadOthers: ClientSession[] = [];
+    for (const s of this.clients.values()) {
+      if (s.accountId !== accountId || s === sameCharacter) continue;
+      if (s.linkdead) linkdeadOthers.push(s);
+      else liveOtherSessions++;
+    }
+    const plan = planJoin({
+      accountId,
+      isGm,
+      sameCharacter,
+      liveOtherSessions,
+      maxPerAccount: MAX_ACTIVE_SESSIONS_PER_ACCOUNT,
+    });
+    if (plan.action === 'reject') return { error: plan.error };
+    if (plan.action === 'resume' && sameCharacter) {
+      return this.resumeSession(sameCharacter, ws, cls, meta);
+    }
+    // Logging in on a different character ends the account's linkdead grace
+    // now instead of at the end of its window: the player has moved on, so
+    // the held character logs out. leave() removes it from `clients`
+    // synchronously, so the new session's slot accounting stays correct.
+    for (const s of linkdeadOthers) {
+      void this.leave(s, 'replaced by a new character login');
     }
     const pid = this.sim.addPlayer(cls, name, { state: state ?? undefined, characterId });
     if (isGm) {
@@ -1521,6 +1625,9 @@ export class GameServer {
       joinedAt: Date.now(),
       dbSessionId: null,
       left: false,
+      linkdead: false,
+      graceUntil: 0,
+      awaitingPong: false,
       chatTokens: CHAT_RATE_BURST,
       chatLastRefill: Date.now() / 1000,
       chatLastRateError: 0,
@@ -1542,7 +1649,16 @@ export class GameServer {
       lastWireRev: -1,
       sentEnts: new Map(),
       ip: sessionIp,
+      userAgent: meta.userAgent ?? '',
+      fbp: meta.fbp ?? '',
+      fbc: meta.fbc ?? '',
+      sourceUrl: meta.sourceUrl ?? '',
       isAdmin: meta.isAdmin ?? false,
+      // Permissions come only from the explicit set main.ts computes from the
+      // account's roles; no is_admin fallback (fail closed, matching
+      // staff_db.effectiveAdminRoles). A staff member with zero permissions has
+      // no in-game moderation commands.
+      adminPermissions: new Set(meta.adminPermissions ?? []),
       clientSeed: meta.clientSeed ?? '',
       botTrackingContext,
       spectating: null,
@@ -1607,6 +1723,106 @@ export class GameServer {
     return session;
   }
 
+  // Rebind a linkdead session to a fresh socket. The character never left the
+  // world, so this only swaps the transport, refreshes the per-login account
+  // metadata, and resets the per-connection wire/input state so the new client
+  // receives a full snapshot (its input sequence also restarts at 1). The play
+  // session row stays open (the player was online the whole time) and no
+  // presence announce fires (friends never saw them leave).
+  private resumeSession(
+    session: ClientSession,
+    ws: WebSocket,
+    cls: import('../src/sim/types').PlayerClass,
+    meta: Parameters<GameServer['join']>[7] = {},
+  ): ClientSession {
+    session.ws = ws;
+    session.linkdead = false;
+    session.graceUntil = 0;
+    session.awaitingPong = false;
+    const sessionIp = meta.ip ?? '';
+    if (sessionIp !== session.ip) {
+      this.releaseIpSession(session.ip);
+      session.ip = sessionIp;
+      this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
+    }
+    session.userAgent = meta.userAgent ?? '';
+    session.clientSeed = meta.clientSeed ?? '';
+    // per-login account state, freshly loaded by the auth path like any join
+    session.chatMutedUntil = meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null;
+    session.chatMuteReason = meta.reason ?? '';
+    session.chatStrikes = meta.chatStrikes ?? session.chatStrikes;
+    session.isAdmin = meta.isAdmin ?? false;
+    session.adminPermissions = new Set(meta.adminPermissions ?? []);
+    session.lastInputSeq = 0;
+    session.lastInputAt = this.sim.time;
+    session.lastSent = {};
+    session.sentEnts = new Map();
+    session.selfHeavyDirty = true;
+    session.lastWireRev = -1;
+    session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    this.send(session, {
+      t: 'hello',
+      pid: session.pid,
+      seed: this.sim.cfg.seed,
+      name: session.name,
+      cls,
+      realm: REALM,
+      softWords: this.chatFilter.softWords(),
+      chatMutedUntil: session.chatMutedUntil ?? null,
+    });
+    // No self "entered the world" notice here: on a seamless reconnect the
+    // player never saw themselves leave (and friends never got a presence
+    // flap), so the fresh join notice would read as a glitch.
+    void this.sendSocialSnapshot(session.characterId);
+    return session;
+  }
+
+  // Entry point for a dropped socket (the ws 'close'/'error' handlers in
+  // main.ts, plus the backpressure terminate). Instead of logging the
+  // character out, hold the session linkdead for LINKDEAD_GRACE_MS so an
+  // accidental disconnect can resume seamlessly; the character stays in the
+  // sim and stays online for friends, analytics, and the play session row.
+  // Returns true when grace began (false: the session was already torn down,
+  // already linkdead, or the event came from a stale pre-resume socket).
+  socketClosed(session: ClientSession, ws: WebSocket): boolean {
+    // A late close/error from a socket that a resume already replaced must
+    // not tear down the live session riding the new socket.
+    if (session.ws !== ws) return false;
+    if (session.left || session.linkdead || !this.clients.has(session.pid)) return false;
+    if (session.spectating) this.exitSpectate(session, false);
+    session.linkdead = true;
+    session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
+    // Stop any held movement now; the sim keeps ticking this entity (it can
+    // still be attacked, healed, or die while linkdead, like any player).
+    const meta = this.sim.meta(session.pid);
+    if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+    // Safety flush so a process crash during the grace window loses nothing.
+    void this.saveCharacter(session, { withMarket: true }).catch((err) =>
+      console.error(`linkdead save failed for ${session.name}:`, err),
+    );
+    return true;
+  }
+
+  // Tick-driven teardown of linkdead sessions whose grace window ran out.
+  private expireLinkdeadSessions(): void {
+    if (this.clients.size === 0) return;
+    const now = Date.now();
+    for (const session of this.clients.values()) {
+      if (!session.linkdead || now < session.graceUntil) continue;
+      console.log(
+        `- ${session.name} left (linkdead grace expired), ${this.clients.size - 1} online`,
+      );
+      void this.leave(session, 'linkdead grace expired');
+    }
+  }
+
+  private releaseIpSession(ip: string): void {
+    if (!ip) return;
+    const prev = this.ipSessionCounts.get(ip) ?? 1;
+    if (prev <= 1) this.ipSessionCounts.delete(ip);
+    else this.ipSessionCounts.set(ip, prev - 1);
+  }
+
   // Load the player's block list, send their friends/ignore/guild panel, and
   // let friends + guildmates know they've come online.
   private async initSocial(session: ClientSession): Promise<void> {
@@ -1650,11 +1866,7 @@ export class GameServer {
     session.left = true;
     this.clients.delete(session.pid);
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
-    if (session.ip) {
-      const prev = this.ipSessionCounts.get(session.ip) ?? 1;
-      if (prev <= 1) this.ipSessionCounts.delete(session.ip);
-      else this.ipSessionCounts.set(session.ip, prev - 1);
-    }
+    this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
     this.devTierPids.delete(session.pid);
     this.social.forget(session.characterId);
@@ -1878,6 +2090,16 @@ export class GameServer {
 
   suspiciousPlayers(): SuspiciousPlayer[] {
     return this.botDetector.listSuspiciousPlayers();
+  }
+
+  antibotConfigFields(): ConfigField[] {
+    return this.botDetector.describeConfig();
+  }
+
+  // Validates and applies live (invalid entries are skipped and reported; the
+  // admin save path rejects on any error and re-applies its previous document).
+  applyAntibotConfig(overrides: Record<string, unknown>): ConfigApplyResult {
+    return this.botDetector.applyConfig(overrides);
   }
 
   detectionCalibration(): DetectionCalibrationSnapshot {
@@ -2274,7 +2496,8 @@ export class GameServer {
     if (session.spectating) {
       if (msg.cmd !== 'chat' || typeof msg.text !== 'string') return;
       const text = msg.text.trim();
-      if (session.isAdmin && this.moderation.handleChatCommand(session, text)) return;
+      if (canAttemptModerationCommands(session) && this.moderation.handleChatCommand(session, text))
+        return;
       if (this.isSpectateLocalChat(session, text)) {
         this.sendChatNotice(session, 'Local chat is unavailable while spectating.');
         return;
@@ -2350,6 +2573,14 @@ export class GameServer {
         break;
       case 'autoloot':
         if (typeof msg.id === 'number') sim.autoLoot(msg.id, pid);
+        break;
+      case 'harvestCorpse':
+        if (typeof msg.id === 'number') {
+          const components = Array.isArray(msg.components)
+            ? msg.components.filter((c): c is string => typeof c === 'string')
+            : undefined;
+          sim.harvestCorpse(msg.id, components, pid);
+        }
         break;
       case 'lootRoll':
         if (
@@ -2430,6 +2661,12 @@ export class GameServer {
       case 'buyback':
         if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
         break;
+      case 'harvest_node':
+        if (typeof msg.node === 'string') sim.harvestNode(msg.node, pid);
+        break;
+      case 'craft_item':
+        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
+        break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
@@ -2488,7 +2725,11 @@ export class GameServer {
       case 'chat': {
         if (typeof msg.text !== 'string') break;
         const text = msg.text.trim();
-        if (session.isAdmin && this.moderation.handleChatCommand(session, text)) break;
+        if (
+          canAttemptModerationCommands(session) &&
+          this.moderation.handleChatCommand(session, text)
+        )
+          break;
         if (this.isChatMuted(session)) break;
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
@@ -3138,6 +3379,9 @@ export class GameServer {
     forEachGuarded(
       this.clients.values(),
       (session) => {
+        // no transport while linkdead; the resume path resets sentEnts/lastSent
+        // so the fresh socket starts from a full snapshot anyway
+        if (session.linkdead) return;
         const p = this.sim.entities.get(session.pid);
         const meta = this.sim.meta(session.pid);
         if (!p || !meta) return;
@@ -3391,8 +3635,15 @@ export class GameServer {
     // Gathering profession proficiency (Mining/Logging/Herbalism), a small
     // per-player read, so kept per-tick like the other small maps above. Wire
     // key `prof` and IWorld member `professionsState` are the settled names
-    // for the professions facet (#1164, src/sim/professions/CLAUDE.md).
+    // for the professions facet (#1164, src/sim/professions/CLAUDE.md). `gprof`
+    // mirrors the raw per-craft proficiency map for the `gatheringProficiency`
+    // IWorld data member (#1119), independent of the `professionsState` view.
     maybe('prof', this.sim.professionsStateFor(anchorSession.pid));
+    // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
+    // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
+    // shape used by the `/dev gather` chat cheat and existing consumers. Wire
+    // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
+    maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
     // stats + weapon stay per-tick: recalcPlayerStats re-derives them on every
     // stat-affecting aura gain/loss (Bear/Cat Form, shouts, debuffs, elixir
     // wear-off, a buff cast on you by someone else), none of which mark this
@@ -3520,6 +3771,21 @@ export class GameServer {
   private detectActivity(events: SimEvent[]): void {
     const now = Date.now();
     for (const ev of events) {
+      if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (s) {
+          void trackReachedLevel5(
+            s.characterId,
+            {
+              clientIp: s.ip,
+              clientUserAgent: s.userAgent,
+              fbp: s.fbp,
+              fbc: s.fbc,
+            },
+            s.sourceUrl,
+          );
+        }
+      }
       if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (!s) continue;
@@ -3607,6 +3873,31 @@ export class GameServer {
           `arena:${s.accountId}:${ev.ratingAfter}`,
           now,
         );
+      } else if (ev.type === 'delveObjectiveComplete' && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        void dailyRewardService
+          .recordDelveClear(s.accountId, s.characterId, ev.delveId, ev.tierId)
+          .then((points) => {
+            if (points > 0) this.sendDailyRewardPointsGained(s, points);
+          })
+          .catch((err) => console.error('daily reward delve task failed:', err));
+      } else if (ev.type === 'delveChestLoot' && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        void dailyRewardService
+          .recordDelveChestOpen(
+            s.accountId,
+            s.characterId,
+            ev.delveId,
+            ev.tierId,
+            ev.lootTier,
+            ev.bountiful,
+          )
+          .then((points) => {
+            if (points > 0) this.sendDailyRewardPointsGained(s, points);
+          })
+          .catch((err) => console.error('daily reward delve chest task failed:', err));
       }
     }
   }
@@ -4120,12 +4411,17 @@ export class GameServer {
     // 'close' handler funnels into the idempotent leave() for normal cleanup.
     if (isBackpressureExceeded(session.ws.bufferedAmount)) {
       if (!session.left) {
+        const ws = session.ws;
         try {
-          session.ws.terminate();
+          ws.terminate();
         } catch {
           /* socket already torn down */
         }
-        void this.leave(session, 'backpressure');
+        // a stuck reader is a network-quality problem, exactly what the
+        // linkdead grace exists for: hold the character and let the client
+        // reconnect on a fresh socket (terminate's own close event is a
+        // no-op after this; socketClosed is idempotent per socket)
+        this.socketClosed(session, ws);
       }
       return;
     }

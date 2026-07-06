@@ -20,6 +20,7 @@ import {
   slugAvailable,
   upsertPlayerCard,
 } from './db';
+import { logger } from './http/logger';
 import { isUniqueViolation, json, parsePngInfo, readBinaryBody } from './http_util';
 import { PLAYERCARD_NEW } from './player_card.newlocales';
 import { recordUsageMetric } from './provider_usage';
@@ -660,7 +661,7 @@ export async function handleCardRoutes(
     if (m[2]) return await serveCardImage(res, slug);
     return await serveCardPage(req, res, slug);
   } catch (err) {
-    console.error('player-card route error:', err);
+    logger.error({ err }, 'player-card route error');
     res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end('internal error');
   }

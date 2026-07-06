@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "e879a5f6",
+      "state": "71c5bba0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -25,6 +25,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -46,12 +47,18 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -112,7 +119,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 402,
-      "state": "8f8b70c8",
+      "state": "9402db52",
       "events": "aba0e338",
       "rng": {
         "draws": 9,
@@ -123,7 +130,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 402,
-      "state": "7a080da4",
+      "state": "365557d6",
       "events": "60422bb3",
       "rng": {
         "draws": 15,
@@ -134,7 +141,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 402,
-      "state": "e351c616",
+      "state": "b979e756",
       "events": "811b3577",
       "rng": {
         "draws": 90,
@@ -145,7 +152,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 402,
-      "state": "163bdc42",
+      "state": "de9177e2",
       "events": "741638a5",
       "rng": {
         "draws": 143,
@@ -155,6 +162,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -179,13 +187,19 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

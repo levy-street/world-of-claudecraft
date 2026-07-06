@@ -55,3 +55,51 @@ export function craftSkillsFor(ctx: SimContext, pid: number): CraftSkills {
   const meta = ctx.players.get(pid);
   return meta ? { ...meta.craftSkills } : emptyCraftSkills();
 }
+
+// Tiered mastery gating (issue #1128), layered onto the flat skill state above.
+//
+// A player's "tier capability" in a craft is derived from their current flat
+// skill value in that craft via a simple, fixed bucket: every TIER_SKILL_STEP
+// points of skill unlocks one more tier. Tier 0 ("common") is the free floor:
+// skill 0-24 has common-tier capability, 25-49 tier-1 capability, 50-74 tier-2,
+// and so on. Recipes bucket their skillReq the same way, so a recipe's tier
+// and a player's capability tier are directly comparable.
+//
+// Skill-progress rule on a successful craft:
+// - common tier (recipe tier 0): always the full amount, regardless of the
+//   player's capability (the free floor from #1126/#1127 holds unconditionally).
+// - recipe tier at or above the player's capability: full amount (this is how
+//   capability advances in the first place).
+// - recipe exactly one tier below capability: reduced amount (diminishing
+//   returns for crafting something already mastered).
+// - recipe two or more tiers below capability: zero (no progress at all).
+export const TIER_SKILL_STEP = 25;
+
+/** Bucket a flat skill value into a tier index. Skill 0-24 -> tier 0 (common),
+ *  25-49 -> tier 1, 50-74 -> tier 2, etc. Never negative. */
+export function tierForSkill(skill: number): number {
+  if (!(skill > 0)) return 0;
+  return Math.floor(skill / TIER_SKILL_STEP);
+}
+
+/** A player's current tier capability in one craft, derived from their flat
+ *  skill value in that craft (0 if the craft or player is unknown). */
+export function tierCapability(skills: CraftSkills, craftId: string): number {
+  return tierForSkill(skills[craftId] ?? 0);
+}
+
+// Multiplier applied to a one-tier-below craft's skill-progress amount.
+const REDUCED_TIER_MULTIPLIER = 0.5;
+
+/** The skill-progress multiplier for crafting a recipe of `recipeTier` given a
+ *  player's `capabilityTier` in that craft. Common tier (recipeTier 0) is
+ *  always 1 (the free floor), independent of capability. Otherwise: full (1)
+ *  at or above capability, reduced (0.5) one tier below, zero two or more
+ *  tiers below. */
+export function tierProgressMultiplier(capabilityTier: number, recipeTier: number): number {
+  if (recipeTier <= 0) return 1;
+  const tiersBelow = capabilityTier - recipeTier;
+  if (tiersBelow <= 0) return 1;
+  if (tiersBelow === 1) return REDUCED_TIER_MULTIPLIER;
+  return 0;
+}

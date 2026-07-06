@@ -14,6 +14,19 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import {
+  type AdminPermission,
+  ASSIGNABLE_ADMIN_ROLES,
+  permissionsForRoles,
+  SUPERADMIN_ROLE,
+  sanitizeRoles,
+} from './admin_permissions';
+import { adminPathKnown, permissionForAdminRoute } from './admin_routes';
+import {
+  listAntibotConfigHistory,
+  loadAntibotConfig,
+  saveAntibotConfigChange,
+} from './antibot_config_db';
 import { newToken, verifyPassword } from './auth';
 import { getBugReportScreenshot, listBugReports } from './bug_report_db';
 import {
@@ -39,6 +52,19 @@ import {
 } from './db';
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
+import { ctxAccountId } from './http/context';
+import { logger } from './http/logger';
+import {
+  ADMIN_META,
+  type AdminAuthDb,
+  adminIdentityOf,
+  adminTargetId,
+  adminTargetMeta,
+  createRequireAdmin,
+  requireAdminTarget,
+} from './http/middleware/require_admin';
+import { enum_ } from './http/schema';
+import type { Ctx, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
 import { PgMapsDb } from './maps_db';
@@ -54,22 +80,59 @@ import {
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
+import {
+  adminRolesForAccount,
+  listStaff,
+  roleChangeHistory,
+  setAccountAdminRoles,
+} from './staff_db';
 import { PgUserAssetsDb } from './user_assets_db';
 
 // Admin API: everything under /admin/api/*. Auth is a bearer token whose
-// account has is_admin = TRUE — the admin.* hostname is routing, not security.
+// account has at least one staff role (accounts.admin_roles; is_admin stays
+// the derived "is staff" flag): the admin.* hostname is routing, not security.
+// Authorization is per route: every route is declared with a permission in
+// admin_routes.ts and gated centrally in handleAdminApi before any handler
+// runs, so a route absent from that table can never execute.
 
 const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
+const ANTIBOT_CONFIG_NOTE_MAX = 500;
 
 const IP_BLOCK_KICK_MESSAGE = 'Connection to the server was lost.';
 
 // Map editor moderation reads/writes go straight to the db layer (like the
-// other *_db imports here); the player-facing rules stay in maps.ts.
-const adminMapsDb = new PgMapsDb(pool);
-const adminUserAssetsDb = new PgUserAssetsDb(pool);
+// other *_db imports here); the player-facing rules stay in maps.ts. LAZY
+// memoized accessors (the liveGame()/activeConfig() shape) rather than
+// module-scope construction, so a partial vi.mock of './db' that omits `pool`
+// cannot hand the backends undefined at import time, and a test can override
+// them via the setters below (the file's lazy AdminDb doctrine).
+let adminMapsDbInstance: PgMapsDb | null = null;
+function adminMapsDb(): PgMapsDb {
+  adminMapsDbInstance ??= new PgMapsDb(pool);
+  return adminMapsDbInstance;
+}
+let adminUserAssetsDbInstance: PgUserAssetsDb | null = null;
+function adminUserAssetsDb(): PgUserAssetsDb {
+  adminUserAssetsDbInstance ??= new PgUserAssetsDb(pool);
+  return adminUserAssetsDbInstance;
+}
+
+/** Override the map editor moderation backends with fakes (test-only). */
+export function setAdminMapsDbForTests(maps: PgMapsDb, userAssets: PgUserAssetsDb): void {
+  adminMapsDbInstance = maps;
+  adminUserAssetsDbInstance = userAssets;
+}
+
+/** Restore the real Postgres map editor moderation backends (test-only). */
+export function resetAdminMapsDbForTests(): void {
+  adminMapsDbInstance = null;
+  adminUserAssetsDbInstance = null;
+}
+
+let antibotConfigSaveTail: Promise<void> = Promise.resolve();
 
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
@@ -131,25 +194,41 @@ function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeen
 }
 
 function getBlockedIpsForAccount(
-  game: GameServer,
+  blocker: { isIpBlocked(ip: string): boolean },
   detail: { lastLoginIp: string | null; recentSessions: { ip: string | null }[] },
 ): string[] {
   const ips = new Set<string>();
   if (detail.lastLoginIp) ips.add(detail.lastLoginIp);
   for (const s of detail.recentSessions) if (s.ip) ips.add(s.ip);
-  return [...ips].filter((ip) => game.isIpBlocked(ip));
+  return [...ips].filter((ip) => blocker.isIpBlocked(ip));
 }
 
-async function adminAccountId(req: http.IncomingMessage): Promise<number | null> {
+interface AdminIdentity {
+  accountId: number;
+  username: string;
+  roles: string[];
+  permissions: ReadonlySet<AdminPermission>;
+}
+
+// Roles are re-read on every request, so a dashboard revocation applies to the
+// next call (a revoked operator's next request 401s: no roles means not staff).
+async function adminIdentity(req: http.IncomingMessage): Promise<AdminIdentity | null> {
   const m = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
   if (!m) return null;
   const accountId = await accountForToken(m[1]);
   if (accountId === null) return null;
-  return (await isAdminAccount(accountId)) ? accountId : null;
+  const staff = await adminRolesForAccount(accountId);
+  if (staff === null) return null;
+  return {
+    accountId,
+    username: staff.username,
+    roles: staff.roles,
+    permissions: permissionsForRoles(staff.roles),
+  };
 }
 
 async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
-  if (rateLimited(req, ADMIN_LOGIN_MAX_PER_MINUTE)) {
+  if (!rateLimited(req, ADMIN_LOGIN_MAX_PER_MINUTE).allowed) {
     return fail(res, 429, 'too many attempts, wait a minute and try again');
   }
   const body = await readBody(req);
@@ -157,13 +236,82 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
   if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
     return fail(res, 401, 'invalid username or password');
   }
-  if (!(await isAdminAccount(account.id))) {
+  const staff = await adminRolesForAccount(account.id);
+  if (staff === null) {
     return fail(res, 403, 'this account does not have admin access');
   }
   await touchLogin(account.id);
   const token = newToken();
   await saveToken(token, account.id);
-  ok(res, { token, username: account.username });
+  ok(res, {
+    token,
+    username: account.username,
+    roles: staff.roles,
+    permissions: [...permissionsForRoles(staff.roles)],
+  });
+}
+
+// Bot-detector config: the body's override document is validated and applied
+// LIVE by the detector; validation or persistence failure re-applies the previous
+// effective document. The current override set and its before/after audit row are
+// committed atomically, then the saved overrides are replayed at the next boot.
+async function handleAntibotConfigSave(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  game: GameServer,
+  adminId: number,
+): Promise<void> {
+  const body = await readBody(req);
+  const overrides = body.overrides;
+  if (typeof overrides !== 'object' || overrides === null || Array.isArray(overrides)) {
+    return fail(res, 400, 'an overrides object is required');
+  }
+  const note =
+    typeof body.note === 'string' ? body.note.trim().slice(0, ANTIBOT_CONFIG_NOTE_MAX) : '';
+  return serializeAntibotConfigSave(async () => {
+    const previousEffective = effectiveAntibotOverrides(game);
+    const result = game.applyAntibotConfig(overrides as Record<string, unknown>);
+    if (result.errors.length > 0) {
+      game.applyAntibotConfig(previousEffective);
+      return fail(res, 400, result.errors.join('; '));
+    }
+    const effective = effectiveAntibotOverrides(game);
+    try {
+      const saved = await saveAntibotConfigChange(effective, adminId, note);
+      ok(res, { fields: game.antibotConfigFields(), updatedAt: saved.updatedAt });
+    } catch (err) {
+      game.applyAntibotConfig(previousEffective);
+      throw err;
+    }
+  });
+}
+
+function serializeAntibotConfigSave(run: () => Promise<void>): Promise<void> {
+  const pending = antibotConfigSaveTail.then(run, run);
+  antibotConfigSaveTail = pending.then(
+    () => undefined,
+    () => undefined,
+  );
+  return pending;
+}
+
+// Typed as the Pick so the migrated antibot save handler can pass the injected
+// AdminRuntime; the legacy caller's full GameServer is assignable to it.
+function effectiveAntibotOverrides(
+  game: Pick<GameServer, 'antibotConfigFields'>,
+): Record<string, unknown> {
+  const effective: Record<string, unknown> = {};
+  for (const field of game.antibotConfigFields()) {
+    if (!configValueEquals(field.value, field.defaultValue)) effective[field.id] = field.value;
+  }
+  return effective;
+}
+
+function configValueEquals(a: unknown, b: unknown): boolean {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((entry) => b.includes(entry));
+  }
+  return a === b;
 }
 
 export async function handleAdminApi(
@@ -178,8 +326,73 @@ export async function handleAdminApi(
       return await handleLogin(req, res);
     }
 
-    const accountId = await adminAccountId(req);
-    if (accountId === null) return fail(res, 401, 'admin authentication required');
+    const identity = await adminIdentity(req);
+    if (identity === null) return fail(res, 401, 'admin authentication required');
+    const accountId = identity.accountId;
+
+    // Central authorization gate: resolve the route's declared permission
+    // before any handler runs. Fail closed on unmapped routes.
+    if (req.method !== 'GET' && req.method !== 'POST') {
+      return fail(res, 405, 'method not allowed');
+    }
+    const routePermission = permissionForAdminRoute(req.method, path);
+    if (routePermission === null) {
+      return adminPathKnown(path)
+        ? fail(res, 405, 'method not allowed')
+        : fail(res, 404, 'unknown admin endpoint');
+    }
+    if (routePermission !== 'any' && !identity.permissions.has(routePermission)) {
+      return fail(res, 403, 'you do not have permission to do this');
+    }
+
+    if (req.method === 'GET' && path === '/admin/api/me') {
+      return ok(res, {
+        username: identity.username,
+        roles: identity.roles,
+        permissions: [...identity.permissions],
+      });
+    }
+
+    // Staff role management. superadmin is out of the dashboard's reach in
+    // both directions (grant and revoke): it moves only via the grant script
+    // or SQL, so a compromised dashboard session cannot mint one. Own-account
+    // edits are refused so an operator cannot lock themselves out silently.
+    if (req.method === 'GET' && path === '/admin/api/staff') {
+      return ok(res, { rows: await listStaff(), assignableRoles: [...ASSIGNABLE_ADMIN_ROLES] });
+    }
+    if (req.method === 'GET' && path === '/admin/api/staff/history') {
+      return ok(res, { rows: await roleChangeHistory(50) });
+    }
+    if (req.method === 'POST' && path === '/admin/api/staff/roles') {
+      const body = await readBody(req);
+      const roles = sanitizeRoles(body.roles);
+      if (roles === null) return fail(res, 400, 'unknown role');
+      if (roles.includes(SUPERADMIN_ROLE)) {
+        return fail(res, 400, 'superadmin roles are managed via the grant script');
+      }
+      const target = typeof body.username === 'string' ? await findAccount(body.username) : null;
+      if (!target) return fail(res, 404, 'account not found');
+      if (target.id === accountId) {
+        return fail(res, 400, 'you cannot change your own roles');
+      }
+      const currentStaff = await adminRolesForAccount(target.id);
+      if (currentStaff?.roles.includes(SUPERADMIN_ROLE)) {
+        return fail(res, 400, 'superadmin roles are managed via the grant script');
+      }
+      const change = await setAccountAdminRoles({
+        accountId: target.id,
+        roles,
+        actorAccountId: accountId,
+      });
+      if (!change) return fail(res, 404, 'account not found');
+      // In-game permissions are snapshotted at WS join, so force the account's
+      // live sessions to reconnect: a revoked moderator loses in-game commands
+      // immediately instead of at their next voluntary relog.
+      if (change.before.join(',') !== change.after.join(',')) {
+        game.disconnectAccount(target.id, IP_BLOCK_KICK_MESSAGE);
+      }
+      return ok(res, { ok: true, username: target.username, roles: change.after });
+    }
 
     const actionMatch =
       /^\/admin\/api\/moderation\/accounts\/(\d+)\/(suspend|unsuspend|ban|unban)$/.exec(path);
@@ -220,7 +433,7 @@ export async function handleAdminApi(
                     : 'until reviewed';
               emailSecurityIncident(target, action, reasonText, until);
             })
-            .catch((err) => console.error('security-incident email failed:', err));
+            .catch((err) => logger.error({ err }, 'security-incident email failed'));
         }
         return ok(res, { ok: true });
       } catch (err) {
@@ -386,14 +599,18 @@ export async function handleAdminApi(
     // byte GET and reject re-uploads of the same hash).
     const mapUnpublishMatch = /^\/admin\/api\/maps\/(\d+)\/unpublish$/.exec(path);
     if (req.method === 'POST' && mapUnpublishMatch) {
-      const done = await adminMapsDb.setStatus(Number(mapUnpublishMatch[1]), null, 'private');
+      const done = await adminMapsDb().setStatus(Number(mapUnpublishMatch[1]), null, 'private');
       return done ? ok(res, { ok: true }) : fail(res, 404, 'map_not_found');
     }
     const assetBlockMatch = /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/.exec(path);
     if (req.method === 'POST' && assetBlockMatch) {
       const status = assetBlockMatch[2] === 'block' ? 'blocked' : 'active';
-      const done = await adminUserAssetsDb.setStatus(Number(assetBlockMatch[1]), status);
+      const done = await adminUserAssetsDb().setStatus(Number(assetBlockMatch[1]), status);
       return done ? ok(res, { ok: true }) : fail(res, 404, 'asset_not_found');
+    }
+
+    if (req.method === 'POST' && path === '/admin/api/antibot-config') {
+      return await handleAntibotConfigSave(req, res, game, accountId);
     }
 
     if (req.method !== 'GET') return fail(res, 405, 'method not allowed');
@@ -427,11 +644,24 @@ export async function handleAdminApi(
             serverStats.online,
           ),
         },
-        usage: providerUsageSnapshot(),
       });
+    }
+
+    // Provider usage (request counts + cache stats) is its own permission
+    // (ops_usage.read), held only by admin/superadmin, so it lives on a
+    // dedicated route rather than riding inside the analytics.read overview.
+    if (path === '/admin/api/provider-usage') {
+      return ok(res, { usage: providerUsageSnapshot() });
     }
     if (path === '/admin/api/online') {
       return ok(res, { players: game.liveSessions() });
+    }
+    if (path === '/admin/api/antibot-config') {
+      const stored = await loadAntibotConfig();
+      return ok(res, { fields: game.antibotConfigFields(), updatedAt: stored.updatedAt });
+    }
+    if (path === '/admin/api/antibot-config/history') {
+      return ok(res, { entries: await listAntibotConfigHistory() });
     }
     if (path === '/admin/api/suspicious-players') {
       return ok(res, { players: game.suspiciousPlayers() });
@@ -565,18 +795,1234 @@ export async function handleAdminApi(
     }
     if (path === '/admin/api/maps') {
       const { page, limit } = parsePageParams(url.searchParams);
-      const { rows, total } = await adminMapsDb.listAdmin(limit, (page - 1) * limit);
+      const { rows, total } = await adminMapsDb().listAdmin(limit, (page - 1) * limit);
       return ok(res, { rows, total, page, limit });
     }
     if (path === '/admin/api/user-assets') {
       const { page, limit } = parsePageParams(url.searchParams);
-      const { rows, total } = await adminUserAssetsDb.listAdmin(limit, (page - 1) * limit);
+      const { rows, total } = await adminUserAssetsDb().listAdmin(limit, (page - 1) * limit);
       return ok(res, { rows, total, page, limit });
     }
 
     fail(res, 404, 'unknown admin endpoint');
   } catch (err) {
-    console.error('admin api error:', err);
+    logger.error({ err }, 'admin api error');
     fail(res, 500, 'internal error');
   }
 }
+
+// ===========================================================================
+// Route layer, ported onto RouteDefs.
+//
+// The ~30 handleAdminApi branches move off the inline if-ladder above onto the
+// shared server/http/ pipeline the registry dispatcher serves under API_DISPATCH
+// 'new' (server/main.ts routes /admin/api through its own flag-gated dispatcher
+// whose delegate is the legacy handleAdminApi, kept as the flag-off rollback path
+// until the ladder-deletion PR, next release). This follows the server/discord.ts +
+// server/reports.ts template:
+//
+//  - PARITY-FIRST bodies + envelope. Every migrated handler reproduces its legacy
+//    branch's logic and writes the SAME { success, data, error } admin envelope
+//    (ok/fail) byte-for-byte. The envelope is FROZEN (a contract test pins the
+//    success / error / data:{ ok:true } variants); it is NOT problem+json. Each
+//    RouteDef carries surface 'admin' + meta.envelope 'admin' so an UNEXPECTED throw
+//    also serializes through the withErrors boundary as the admin envelope
+//    (serializeAdmin: { success:false, data:null, error: code }) rather than
+//    problem+json. That 500 body differs from the legacy outer-catch 500
+//    { ...error: 'internal error' } only in the error string (the code 'internal.error'
+//    vs the prose 'internal error'): same status + shape, recorded as the
+//    adminBodyValidationRemap deviation (harness-invisible; no fixture drives an
+//    internal throw). The happy + guard paths never reach withErrors.
+//
+//  - AUTH is the legacy-body admin gate (createRequireAdmin), mirroring
+//    adminIdentity(req) EXACTLY (v0.22.0 staff roles): bearer -> accountForToken ->
+//    staff_db.adminRolesForAccount (fail closed; no roles means not staff), a
+//    uniform 401 { ...error: 'admin authentication required' } on any failure, then
+//    the CENTRAL AUTHORIZATION gate: the route's declared permission resolves from
+//    ADMIN_ROUTE_PERMISSIONS (server/admin_routes.ts) against the concrete request
+//    path, fail-closed (unmapped -> 404 'unknown admin endpoint' / 405; missing
+//    permission -> 403), mirroring the legacy handleAdminApi preamble byte-for-byte.
+//    NO read-only-scope 403 and NO moderation gate (legacy admin auth applies
+//    neither). Mounted on every route except login (anonymous by design).
+//    requireAdmin runs BEFORE the :id / :action decode, so an unauthenticated
+//    malformed request 401s exactly as legacy did (auth precedes route/method).
+//
+//  - The admin.login limiter stays the legacy in-handler rateLimited(req,
+//    ADMIN_LOGIN_MAX_PER_MINUTE), NOT the new coded POLICIES table (rate_limit.ts):
+//    its own per-minute ceiling, isolated from the account/IP policy set, keeping the
+//    429 body byte-identical. Its own isolated limiter STORE is the two-tier limiter
+//    end-state; parity-first keeps the legacy shared-store call in-handler.
+//
+//  - The enum-segment route restructures. The legacy regex route
+//    /moderation/accounts/:id/(suspend|unsuspend|ban|unban) violates the table
+//    router's no-regex-routing guard, so it becomes /moderation/accounts/:id/:action with a
+//    schema-validated enum action. Since v0.22.0 an action outside the four is
+//    404d fail-closed by the central permission gate BEFORE the decode, identically
+//    on both arms (the adminEnumInvalid422 deviation is superseded; the 422 enum
+//    decode remains as an unreachable defensive backstop). The literal
+//    sibling routes (reactivate / chat-mute / lift-mute / note / reset-strikes) sort
+//    most-specific-first ahead of :action, so each still matches its own path.
+//
+//  - The :id routes carry an OPERATOR-scoped admin loader (requireAdminTarget), which
+//    decodes the :id (a NON-NUMERIC id is 404d fail-closed by the central gate before
+//    the decode on both arms; a degenerate DIGIT-STRING id, '0'/'00'/past-2^53, still
+//    422s here where legacy runs the handler, the narrowed adminIdParamDecode
+//    deviation) and marks the route ownerScope 'operator', EXCLUDED
+//    from the account-owner deny-by-default coverage clause. The operator scope grants
+//    universal authority (an admin moderates any account), so the loader authorizes no
+//    cross-scope object and emits no per-object 403/404; the handlers keep their own
+//    legacy resource-not-found 404 ('account not found') byte-for-byte (see
+//    require_admin.ts for the parity-first operator-denial note).
+//
+//  - RUNTIME injection. The game-session side effects (disconnect, chat-mute-live,
+//    filter/IP reload, live reads) are main.ts-local singletons, injected once at boot
+//    via configureAdminRuntime so `export const routes` stays a static array
+//    registry.ts spreads (avoiding a main -> registry -> admin -> main cycle). The DB
+//    reads/writes are bundled behind setAdminDbForTests for pool-less unit tests.
+// ===========================================================================
+
+/**
+ * The main.ts game-session methods the admin routes need (boot-injected). It is a
+ * subset of GameServer, so main.ts passes the live `game` directly; admin.ts can
+ * only reach these methods, and the exact GameServer signatures flow through Pick.
+ */
+export type AdminRuntime = Pick<
+  GameServer,
+  | 'adminStats'
+  | 'liveSessions'
+  | 'suspiciousPlayers'
+  | 'detectionCalibration'
+  | 'isIpBlocked'
+  | 'liveSharedIps'
+  | 'liveAccountIds'
+  | 'disconnectAccount'
+  | 'muteAccountChat'
+  | 'liftChatMuteLive'
+  | 'resetChatStrikesLive'
+  | 'reloadChatFilter'
+  | 'reloadBlockedIps'
+  | 'disconnectByIp'
+  | 'antibotConfigFields'
+  | 'applyAntibotConfig'
+>;
+
+let runtime: AdminRuntime | null = null;
+
+/** Inject the main.ts game-session hooks the admin routes need (boot). */
+export function configureAdminRuntime(rt: AdminRuntime): void {
+  runtime = rt;
+}
+
+/** Clear the injected runtime so a unit test can install its own fake. */
+export function resetAdminRuntimeForTests(): void {
+  runtime = null;
+}
+
+/** The injected runtime, or a loud failure if a request somehow beat boot wiring. */
+function useAdminRuntime(): AdminRuntime {
+  if (runtime === null) {
+    throw new Error('admin runtime is not configured; call configureAdminRuntime');
+  }
+  return runtime;
+}
+
+// The DB reads/writes (plus the login-path auth + rate-limit primitives) the admin
+// route layer needs, bundled behind a test-only setter so they can be driven with a
+// fake and no Postgres; production never calls the setter. The same functions the
+// legacy handleAdminApi ladder calls directly, so both dispatch paths are identical.
+//
+// The bundle is built LAZILY (makeRealAdminDb is a function, not a module-load object
+// literal): a legacy-only unit test that partial-mocks an admin *_db module (e.g.
+// tests/admin.test.ts mocks moderation_db without addAccountNote) never calls the new
+// handlers or setAdminDbForTests, so the missing binding is never dereferenced. An
+// eager literal would touch every binding at module load and break that partial mock.
+function makeRealAdminDb() {
+  return {
+    accountDetail,
+    associationsForIp,
+    classDistribution,
+    clientPerfRaw,
+    clientPerfSummary,
+    levelDistribution,
+    listAccounts,
+    listCharacters,
+    listSharedIps,
+    onlineHistory,
+    overviewCounts,
+    registrationsByDay,
+    sessionsByDay,
+    listBugReports,
+    getBugReportScreenshot,
+    listFilterWords,
+    addFilterWord,
+    removeFilterWord,
+    getFilterConfig,
+    updateFilterConfig,
+    chatModerationForAccount,
+    chatModeratedAccounts,
+    resetChatStrikes,
+    cleanIp,
+    listBlockedIps,
+    addBlockedIp,
+    removeBlockedIp,
+    addAccountNote,
+    forceCharacterRename,
+    ignoreReport,
+    liftAccountChatMute,
+    moderateAccount,
+    moderationQueue,
+    moderationReportsForAccount,
+    muteAccountChat,
+    accountForToken,
+    accountMailTarget,
+    findAccount,
+    // Target-account staff check (the "admin accounts cannot be suspended / banned /
+    // chat muted" guards); the CALLER gate resolves roles via adminRolesForAccount.
+    isAdminAccount,
+    saveToken,
+    setAccountDeactivated,
+    touchLogin,
+    newToken,
+    verifyPassword,
+    emailSecurityIncident,
+    providerUsageSnapshot,
+    rateLimited,
+    // Staff-role reads/writes (accounts.admin_roles + the audit trail).
+    adminRolesForAccount,
+    listStaff,
+    roleChangeHistory,
+    setAccountAdminRoles,
+    // Bot-detector runtime-config persistence (per-realm JSONB + audit history).
+    loadAntibotConfig,
+    listAntibotConfigHistory,
+    saveAntibotConfigChange,
+  };
+}
+
+type AdminDb = ReturnType<typeof makeRealAdminDb>;
+
+// The real bundle, memoized on first use (never at module load). A test override
+// merges over it; both stay lazy so the module imports cleanly under a partial mock.
+let realAdminDb: AdminDb | undefined;
+let adminDbOverride: AdminDb | undefined;
+
+/** The active admin db: a setAdminDbForTests override if present, else the real bundle. */
+function adminDb(): AdminDb {
+  if (adminDbOverride) return adminDbOverride;
+  realAdminDb ??= makeRealAdminDb();
+  return realAdminDb;
+}
+
+/** Override the admin db with a fake (test-only; merges over the real reads/writes). */
+export function setAdminDbForTests(overrides: Partial<AdminDb>): void {
+  realAdminDb ??= makeRealAdminDb();
+  adminDbOverride = { ...realAdminDb, ...overrides };
+}
+
+/** Restore the real admin db after a setAdminDbForTests override (test-only). */
+export function resetAdminDbForTests(): void {
+  adminDbOverride = undefined;
+}
+
+// The admin-auth gate reads its two db functions (accountForToken,
+// adminRolesForAccount) off the active bundle, so a setAdminDbForTests fake drives
+// it too. AdminDb is a superset of AdminAuthDb, so the getter is assignable.
+const requireAdmin = createRequireAdmin((): AdminAuthDb => adminDb());
+
+/**
+ * The four moderation actions the enum route accepts. The central permission gate
+ * 404s a fifth action before the decode (its table keys the literal alternation),
+ * so the 422 arm below is an unreachable defensive backstop.
+ */
+const MODERATION_ACTION_SCHEMA = enum_(['suspend', 'unsuspend', 'ban', 'unban'] as const);
+
+// ---------------------------------------------------------------------------
+// Thin Ctx handlers. Each reproduces its legacy handleAdminApi branch, calling
+// adminDb().* (injectable) and useAdminRuntime().* (the game side effects) so every
+// ported body is byte-identical.
+// ---------------------------------------------------------------------------
+
+/** POST /admin/api/login: anonymous, its own in-handler rateLimited limiter. */
+async function loginHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().rateLimited(ctx.req, ADMIN_LOGIN_MAX_PER_MINUTE).allowed) {
+    return fail(ctx.res, 429, 'too many attempts, wait a minute and try again');
+  }
+  const body = await readBody(ctx.req);
+  const account =
+    typeof body.username === 'string' ? await adminDb().findAccount(body.username) : null;
+  if (
+    !account ||
+    !(await adminDb().verifyPassword(String(body.password ?? ''), account.password_hash))
+  ) {
+    return fail(ctx.res, 401, 'invalid username or password');
+  }
+  const staff = await adminDb().adminRolesForAccount(account.id);
+  if (staff === null) {
+    return fail(ctx.res, 403, 'this account does not have admin access');
+  }
+  await adminDb().touchLogin(account.id);
+  const token = adminDb().newToken();
+  await adminDb().saveToken(token, account.id);
+  ok(ctx.res, {
+    token,
+    username: account.username,
+    roles: staff.roles,
+    permissions: [...permissionsForRoles(staff.roles)],
+  });
+}
+
+/** GET /admin/api/overview: headline counts merged with live server stats. */
+async function overviewHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const counts = await adminDb().overviewCounts();
+  const serverStats = rt.adminStats();
+  ok(ctx.res, {
+    ...counts,
+    peakOnlineToday: Math.max(counts.peakOnlineToday, serverStats.online),
+    peakOnlineAllTime: Math.max(counts.peakOnlineAllTime, serverStats.online),
+    server: {
+      ...serverStats,
+      peakOnline: Math.max(serverStats.peakOnline, counts.peakOnlineAllTime, serverStats.online),
+    },
+  });
+}
+
+/** GET /admin/api/me: the caller's own staff identity (any staff role). */
+async function meHandler(ctx: Ctx): Promise<void> {
+  const identity = adminIdentityOf(ctx);
+  ok(ctx.res, {
+    username: identity.username,
+    roles: identity.roles,
+    permissions: [...identity.permissions],
+  });
+}
+
+/**
+ * GET /admin/api/provider-usage: request counts + cache stats. Its own permission
+ * (ops_usage.read), held only by admin/superadmin, so it lives on a dedicated
+ * route rather than riding inside the analytics.read overview.
+ */
+async function providerUsageHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, { usage: adminDb().providerUsageSnapshot() });
+}
+
+// Staff role management. superadmin is out of the dashboard's reach in both
+// directions (grant and revoke): it moves only via the grant script or SQL, so a
+// compromised dashboard session cannot mint one. Own-account edits are refused so
+// an operator cannot lock themselves out silently.
+
+/** GET /admin/api/staff: every staff account plus the dashboard-grantable roles. */
+async function staffListHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, {
+    rows: await adminDb().listStaff(),
+    assignableRoles: [...ASSIGNABLE_ADMIN_ROLES],
+  });
+}
+
+/** GET /admin/api/staff/history: the most recent role-change audit rows. */
+async function staffHistoryHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, { rows: await adminDb().roleChangeHistory(50) });
+}
+
+/** POST /admin/api/staff/roles: replace a target account's dashboard-grantable roles. */
+async function staffRolesHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const roles = sanitizeRoles(body.roles);
+  if (roles === null) return fail(ctx.res, 400, 'unknown role');
+  if (roles.includes(SUPERADMIN_ROLE)) {
+    return fail(ctx.res, 400, 'superadmin roles are managed via the grant script');
+  }
+  const target =
+    typeof body.username === 'string' ? await adminDb().findAccount(body.username) : null;
+  if (!target) return fail(ctx.res, 404, 'account not found');
+  const accountId = adminIdentityOf(ctx).accountId;
+  if (target.id === accountId) {
+    return fail(ctx.res, 400, 'you cannot change your own roles');
+  }
+  const currentStaff = await adminDb().adminRolesForAccount(target.id);
+  if (currentStaff?.roles.includes(SUPERADMIN_ROLE)) {
+    return fail(ctx.res, 400, 'superadmin roles are managed via the grant script');
+  }
+  const change = await adminDb().setAccountAdminRoles({
+    accountId: target.id,
+    roles,
+    actorAccountId: accountId,
+  });
+  if (!change) return fail(ctx.res, 404, 'account not found');
+  // In-game permissions are snapshotted at WS join, so force the account's
+  // live sessions to reconnect: a revoked moderator loses in-game commands
+  // immediately instead of at their next voluntary relog.
+  if (change.before.join(',') !== change.after.join(',')) {
+    useAdminRuntime().disconnectAccount(target.id, IP_BLOCK_KICK_MESSAGE);
+  }
+  ok(ctx.res, { ok: true, username: target.username, roles: change.after });
+}
+
+/** GET /admin/api/antibot-config: the detector's tunable fields + last-saved stamp. */
+async function antibotConfigGetHandler(ctx: Ctx): Promise<void> {
+  const stored = await adminDb().loadAntibotConfig();
+  ok(ctx.res, { fields: useAdminRuntime().antibotConfigFields(), updatedAt: stored.updatedAt });
+}
+
+/** GET /admin/api/antibot-config/history: the append-only override audit trail. */
+async function antibotConfigHistoryHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, { entries: await adminDb().listAntibotConfigHistory() });
+}
+
+/**
+ * POST /admin/api/antibot-config: validate-apply-persist, mirroring the legacy
+ * handleAntibotConfigSave byte-for-byte (shared serializer tail, so saves from
+ * both dispatch arms serialize through the one in-flight chain; validation or
+ * persistence failure re-applies the previous effective document).
+ */
+async function antibotConfigSaveHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const body = await readBody(ctx.req);
+  const overrides = body.overrides;
+  if (typeof overrides !== 'object' || overrides === null || Array.isArray(overrides)) {
+    return fail(ctx.res, 400, 'an overrides object is required');
+  }
+  const note =
+    typeof body.note === 'string' ? body.note.trim().slice(0, ANTIBOT_CONFIG_NOTE_MAX) : '';
+  return serializeAntibotConfigSave(async () => {
+    const previousEffective = effectiveAntibotOverrides(rt);
+    const result = rt.applyAntibotConfig(overrides as Record<string, unknown>);
+    if (result.errors.length > 0) {
+      rt.applyAntibotConfig(previousEffective);
+      return fail(ctx.res, 400, result.errors.join('; '));
+    }
+    const effective = effectiveAntibotOverrides(rt);
+    try {
+      const saved = await adminDb().saveAntibotConfigChange(
+        effective,
+        adminIdentityOf(ctx).accountId,
+        note,
+      );
+      ok(ctx.res, { fields: rt.antibotConfigFields(), updatedAt: saved.updatedAt });
+    } catch (err) {
+      rt.applyAntibotConfig(previousEffective);
+      throw err;
+    }
+  });
+}
+
+/** GET /admin/api/online: live player rows. */
+async function onlineHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, { players: useAdminRuntime().liveSessions() });
+}
+
+/** GET /admin/api/suspicious-players: bot-detector flags. */
+async function suspiciousPlayersHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, { players: useAdminRuntime().suspiciousPlayers() });
+}
+
+/** GET /admin/api/detection-calibration: bot-detector calibration histograms. */
+async function detectionCalibrationHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, useAdminRuntime().detectionCalibration());
+}
+
+/** GET /admin/api/online-history: bucketed online + site-user history. */
+async function onlineHistoryHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, await adminDb().onlineHistory(ctx.url.searchParams.get('range') ?? '30d'));
+}
+
+/** GET /admin/api/activity: registrations + sessions + class/level distributions. */
+async function activityHandler(ctx: Ctx): Promise<void> {
+  const [registrations, sessions, classes, levels] = await Promise.all([
+    adminDb().registrationsByDay(ACTIVITY_WINDOW_DAYS),
+    adminDb().sessionsByDay(ACTIVITY_WINDOW_DAYS),
+    adminDb().classDistribution(),
+    adminDb().levelDistribution(),
+  ]);
+  ok(ctx.res, { days: ACTIVITY_WINDOW_DAYS, registrations, sessions, classes, levels });
+}
+
+/** GET /admin/api/perf/summary: aggregated client-perf percentiles. */
+async function perfSummaryHandler(ctx: Ctx): Promise<void> {
+  const hours = Number(ctx.url.searchParams.get('hours') ?? '24');
+  ok(ctx.res, await adminDb().clientPerfSummary(hours));
+}
+
+/** GET /admin/api/perf/raw: keyset-paged raw perf rows (hasMore math preserved). */
+async function perfRawHandler(ctx: Ctx): Promise<void> {
+  const hours = Number(ctx.url.searchParams.get('hours') ?? '24');
+  const limit = Number(ctx.url.searchParams.get('limit') ?? '100');
+  const beforeIdParam = ctx.url.searchParams.get('beforeId');
+  const beforeId = beforeIdParam === null ? undefined : Number(beforeIdParam);
+  const rows = await adminDb().clientPerfRaw(hours, limit, beforeId);
+  ok(ctx.res, {
+    rows,
+    nextBeforeId: rows.length > 0 ? rows[rows.length - 1].id : null,
+    hasMore:
+      rows.length >= Math.min(1000, Math.max(1, Math.floor(Number.isFinite(limit) ? limit : 100))),
+  });
+}
+
+/** GET /admin/api/accounts: paged account search (search clamped to 64 chars). */
+async function accountsHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const search = (ctx.url.searchParams.get('search') ?? '').slice(0, 64);
+  ok(ctx.res, await adminDb().listAccounts(search, page, limit));
+}
+
+/** GET /admin/api/shared-ips: paged shared IPs; the online=1 branch reads live. */
+async function sharedIpsHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const { sort, dir } = sharedIpSortParams(ctx.url.searchParams);
+  if (ctx.url.searchParams.get('online') === '1') {
+    const rows = sortSharedIpRows(rt.liveSharedIps(), sort, dir);
+    const offset = (page - 1) * limit;
+    ok(ctx.res, {
+      rows: rows.slice(offset, offset + limit).map((row) => ({
+        ...row,
+        blocked: rt.isIpBlocked(row.ip),
+      })),
+      total: rows.length,
+      page,
+      limit,
+    });
+    return;
+  }
+  const sharedIps = await adminDb().listSharedIps(page, limit, sort, dir);
+  ok(ctx.res, {
+    ...sharedIps,
+    rows: sharedIps.rows.map((row) => ({ ...row, blocked: rt.isIpBlocked(row.ip) })),
+  });
+}
+
+/** GET /admin/api/ip-associations: accounts tied to one IP, with live online flags. */
+async function ipAssociationsHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const ip = adminDb().cleanIp(ctx.url.searchParams.get('ip'));
+  if (!ip) return fail(ctx.res, 400, 'a valid IP address is required');
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const associations = await adminDb().associationsForIp(ip, page, limit);
+  const onlineAccountIds = rt.liveAccountIds();
+  ok(ctx.res, {
+    ...associations,
+    accounts: associations.accounts.map((account) => ({
+      ...account,
+      online: onlineAccountIds.has(account.accountId),
+    })),
+    blocked: rt.isIpBlocked(ip),
+  });
+}
+
+/** GET /admin/api/blocked-ips: the block list. */
+async function blockedIpsGetHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, { rows: await adminDb().listBlockedIps() });
+}
+
+/** POST /admin/api/blocked-ips: add a block, reload the live list, kick the IP. */
+async function blockedIpsPostHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const body = await readBody(ctx.req);
+  try {
+    const ip = await adminDb().addBlockedIp({
+      ip: body.ip,
+      reason: body.reason,
+      createdByAccountId: ctxAccountId(ctx),
+      expiresAt: body.expiresAt,
+    });
+    if (!ip) return fail(ctx.res, 400, 'a valid IP address is required');
+    await rt.reloadBlockedIps();
+    rt.disconnectByIp(ip, IP_BLOCK_KICK_MESSAGE);
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'failed to block IP');
+  }
+}
+
+/** POST /admin/api/blocked-ips/delete: remove a block, reload the live list. */
+async function blockedIpsDeleteHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const body = await readBody(ctx.req);
+  if (!adminDb().cleanIp(body.ip)) return fail(ctx.res, 400, 'a valid IP address is required');
+  const removed = await adminDb().removeBlockedIp(body.ip, ctxAccountId(ctx));
+  if (removed) await rt.reloadBlockedIps();
+  return removed ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'IP not found');
+}
+
+/** POST /admin/api/moderation/accounts/:id/:action: the schema-validated sanction. */
+async function moderateActionHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const actionDecoded = MODERATION_ACTION_SCHEMA.decode(ctx.params.action, '/action');
+  // A raw { ok:false, issues } maps to 422 validation.failed. Unreachable in
+  // production (the central permission gate 404s a fifth action pre-decode); kept
+  // as the defensive backstop the superseded adminEnumInvalid422 entry documents.
+  if (!actionDecoded.ok) throw actionDecoded;
+  const action = actionDecoded.value;
+  if (
+    (action === 'suspend' || action === 'ban') &&
+    (await adminDb().isAdminAccount(targetAccountId))
+  ) {
+    return fail(ctx.res, 400, 'admin accounts cannot be suspended or banned');
+  }
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().moderateAccount({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      action,
+      reason: body.reason,
+      expiresAt: body.expiresAt,
+    });
+    if (action === 'suspend' || action === 'ban') {
+      const statusText =
+        action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+      rt.disconnectAccount(targetAccountId, statusText);
+      // Notify the affected account of the moderation action. Best-effort and fully
+      // isolated: a mail-target lookup or send failure must never turn a successful
+      // moderation action into an error response.
+      void adminDb()
+        .accountMailTarget(targetAccountId)
+        .then((target) => {
+          if (!target) return;
+          const reasonText =
+            typeof body.reason === 'string' && body.reason.trim()
+              ? body.reason.trim()
+              : 'not specified';
+          const until =
+            action === 'ban'
+              ? 'permanent'
+              : typeof body.expiresAt === 'string' && body.expiresAt
+                ? body.expiresAt
+                : 'until reviewed';
+          adminDb().emailSecurityIncident(target, action, reasonText, until);
+        })
+        .catch((err) => logger.error({ err }, 'security-incident email failed'));
+    }
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'moderation action failed');
+  }
+}
+
+/** POST /admin/api/moderation/accounts/:id/reactivate: reverse a self-deactivation. */
+async function reactivateHandler(ctx: Ctx): Promise<void> {
+  try {
+    await adminDb().setAccountDeactivated(adminTargetId(ctx), false);
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'reactivation failed');
+  }
+}
+
+/** POST /admin/api/moderation/accounts/:id/chat-mute: timed chat mute + live push. */
+async function chatMuteHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  if (await adminDb().isAdminAccount(targetAccountId)) {
+    return fail(ctx.res, 400, 'admin accounts cannot be chat muted');
+  }
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().muteAccountChat({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+      expiresAt: body.expiresAt,
+    });
+    rt.muteAccountChat(targetAccountId, String(body.expiresAt ?? ''), String(body.reason ?? ''));
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'chat mute failed');
+  }
+}
+
+/** POST /admin/api/moderation/reports/:id/ignore: resolve one open report. */
+async function ignoreReportHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const ignored = await adminDb().ignoreReport(adminTargetId(ctx), ctxAccountId(ctx), body.note);
+  return ignored ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'open report not found');
+}
+
+/** POST /admin/api/moderation/characters/:id/force-rename: flag + kick the owner. */
+async function forceRenameHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const body = await readBody(ctx.req);
+  try {
+    const result = await adminDb().forceCharacterRename({
+      characterId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    rt.disconnectAccount(
+      result.accountId,
+      'A moderator requires one of your characters to be renamed.',
+    );
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'force rename failed');
+  }
+}
+
+/** POST /admin/api/moderation/accounts/:id/lift-mute: clear a chat mute + live push. */
+async function liftMuteHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().liftAccountChatMute({
+      accountId: id,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    rt.liftChatMuteLive(id);
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'chat unmute failed');
+  }
+}
+
+/** POST /admin/api/moderation/accounts/:id/note: append a non-punitive audit note. */
+async function noteHandler(ctx: Ctx): Promise<void> {
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().addAccountNote({
+      accountId: id,
+      adminAccountId: ctxAccountId(ctx),
+      note: body.reason,
+    });
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'failed to add note');
+  }
+}
+
+/** POST /admin/api/moderation/accounts/:id/reset-strikes: zero strikes + live push. */
+async function resetStrikesHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const reset = await adminDb().resetChatStrikes(id);
+  if (reset) rt.resetChatStrikesLive(id);
+  return reset ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'account not found');
+}
+
+/** GET /admin/api/moderation/queue: accounts with open reports. */
+async function moderationQueueHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, { rows: await adminDb().moderationQueue(useAdminRuntime().liveAccountIds()) });
+}
+
+/** GET /admin/api/moderation/accounts/:id: full moderation detail for one account. */
+async function moderationAccountDetailHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const [detail, reports, chat] = await Promise.all([
+    adminDb().accountDetail(id),
+    adminDb().moderationReportsForAccount(id),
+    adminDb().chatModerationForAccount(id),
+  ]);
+  if (!detail) return fail(ctx.res, 404, 'account not found');
+  ok(ctx.res, {
+    account: { ...detail, online: rt.liveAccountIds().has(id) },
+    reports,
+    chat,
+    blockedIps: getBlockedIpsForAccount(rt, detail),
+  });
+}
+
+/** GET /admin/api/accounts/:id: one account's detail with a live online flag. */
+async function accountDetailHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const id = adminTargetId(ctx);
+  const detail = await adminDb().accountDetail(id);
+  if (!detail) return fail(ctx.res, 404, 'account not found');
+  ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
+}
+
+/** GET /admin/api/chat-filter: word lists + escalation config + moderated accounts. */
+async function chatFilterGetHandler(ctx: Ctx): Promise<void> {
+  const [soft, hard, config, accounts] = await Promise.all([
+    adminDb().listFilterWords('soft'),
+    adminDb().listFilterWords('hard'),
+    adminDb().getFilterConfig(),
+    adminDb().chatModeratedAccounts(),
+  ]);
+  ok(ctx.res, { soft, hard, config, accounts });
+}
+
+/** POST /admin/api/chat-filter/words: add a filter word + reload the live filter. */
+async function chatFilterWordsHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const tier = cleanTier(body.tier);
+  if (!tier) return fail(ctx.res, 400, 'tier must be "soft" or "hard"');
+  const added = await adminDb().addFilterWord(body.word, tier);
+  if (!added) return fail(ctx.res, 400, 'word is empty after normalization');
+  await useAdminRuntime().reloadChatFilter();
+  return ok(ctx.res, { ok: true });
+}
+
+/** POST /admin/api/chat-filter/words/:id/delete: remove a filter word + reload. */
+async function chatFilterWordDeleteHandler(ctx: Ctx): Promise<void> {
+  const removed = await adminDb().removeFilterWord(adminTargetId(ctx));
+  if (removed) await useAdminRuntime().reloadChatFilter();
+  return removed ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'word not found');
+}
+
+/** POST /admin/api/chat-filter/config: update the escalation config + reload. */
+async function chatFilterConfigHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const config = await adminDb().updateFilterConfig({
+    warningsBeforeMute: body.warningsBeforeMute,
+    muteLadderSeconds: body.muteLadderSeconds,
+  });
+  await useAdminRuntime().reloadChatFilter();
+  return ok(ctx.res, config);
+}
+
+/** GET /admin/api/bug-reports: paged bug reports (screenshot omitted from the list). */
+async function bugReportsHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const { rows, total } = await adminDb().listBugReports(limit, (page - 1) * limit);
+  ok(ctx.res, { rows, total, page, limit });
+}
+
+/** GET /admin/api/bug-reports/:id/screenshot: one report's screenshot on demand. */
+async function bugScreenshotHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, { screenshot: await adminDb().getBugReportScreenshot(adminTargetId(ctx)) });
+}
+
+/** GET /admin/api/characters: paged, sortable character search. */
+async function charactersHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const search = ctx.url.searchParams.get('search') ?? '';
+  const sort = ctx.url.searchParams.get('sort') ?? 'level';
+  const dir = ctx.url.searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
+  ok(ctx.res, await adminDb().listCharacters(search, sort, dir, page, limit));
+}
+
+// Map editor moderation (v0.20.0 release merge, migrated in-merge). Each handler
+// mirrors its legacy handleAdminApi arm byte-for-byte over the same module-scope
+// db singletons (adminMapsDb / adminUserAssetsDb).
+
+/** GET /admin/api/maps: the paginated all-maps moderation list. */
+async function adminMapsListHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const { rows, total } = await adminMapsDb().listAdmin(limit, (page - 1) * limit);
+  ok(ctx.res, { rows, total, page, limit });
+}
+
+/** GET /admin/api/user-assets: the paginated uploaded-GLB moderation list. */
+async function adminUserAssetsListHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const { rows, total } = await adminUserAssetsDb().listAdmin(limit, (page - 1) * limit);
+  ok(ctx.res, { rows, total, page, limit });
+}
+
+/** POST /admin/api/maps/:id/unpublish: force a published map back to private. */
+async function adminMapUnpublishHandler(ctx: Ctx): Promise<void> {
+  const done = await adminMapsDb().setStatus(adminTargetId(ctx), null, 'private');
+  return done ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'map_not_found');
+}
+
+/** POST /admin/api/user-assets/:id/(block|unblock): flip an upload's moderation flag. */
+function adminAssetStatusHandler(status: 'blocked' | 'active') {
+  return async (ctx: Ctx): Promise<void> => {
+    const done = await adminUserAssetsDb().setStatus(adminTargetId(ctx), status);
+    return done ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'asset_not_found');
+  };
+}
+const adminAssetBlockHandler = adminAssetStatusHandler('blocked');
+const adminAssetUnblockHandler = adminAssetStatusHandler('active');
+
+// ---------------------------------------------------------------------------
+// The route table. registry.ts spreads this into apiRoutes. login is anonymous
+// (no requireAdmin, its own in-handler limiter); every other route carries
+// requireAdmin, and each :id route also carries requireAdminTarget (operator-scope
+// loader). All registered so an unsupported method / unknown path delegates to the
+// legacy handleAdminApi ladder (the dispatcher delegates notFound / methodNotAllowed
+// until the ladder-deletion PR, next release).
+// ---------------------------------------------------------------------------
+
+export const routes: RouteDef[] = [
+  {
+    method: 'POST',
+    path: '/admin/api/login',
+    surface: 'admin',
+    meta: ADMIN_META,
+    handler: loginHandler,
+  },
+
+  // Reads (17a).
+  {
+    method: 'GET',
+    path: '/admin/api/me',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: meHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/overview',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: overviewHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/provider-usage',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: providerUsageHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/online',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: onlineHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/suspicious-players',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: suspiciousPlayersHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/detection-calibration',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: detectionCalibrationHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/online-history',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: onlineHistoryHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/activity',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: activityHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/perf/summary',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: perfSummaryHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/perf/raw',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: perfRawHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/accounts',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: accountsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/shared-ips',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: sharedIpsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/ip-associations',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: ipAssociationsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/blocked-ips',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: blockedIpsGetHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/accounts/:id',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountDetailHandler,
+  },
+
+  // Staff-role management (release v0.22.0 fine-grained permissions).
+  {
+    method: 'GET',
+    path: '/admin/api/staff',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: staffListHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/staff/history',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: staffHistoryHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/staff/roles',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: staffRolesHandler,
+  },
+
+  // Bot-detector runtime config (release v0.22.0 #1433).
+  {
+    method: 'GET',
+    path: '/admin/api/antibot-config',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: antibotConfigGetHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/antibot-config/history',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: antibotConfigHistoryHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/antibot-config',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: antibotConfigSaveHandler,
+  },
+
+  // IP block writes (17a).
+  {
+    method: 'POST',
+    path: '/admin/api/blocked-ips',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: blockedIpsPostHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/blocked-ips/delete',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: blockedIpsDeleteHandler,
+  },
+
+  // Moderation (17b). The enum :action route sorts most-specific-LAST behind the
+  // literal sibling action routes, so each resolves to its own handler.
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/reactivate',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: reactivateHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/chat-mute',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: chatMuteHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/lift-mute',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: liftMuteHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/note',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: noteHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/reset-strikes',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: resetStrikesHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/:action',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: moderateActionHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/reports/:id/ignore',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('report')],
+    meta: adminTargetMeta('report'),
+    handler: ignoreReportHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/force-rename',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('character')],
+    meta: adminTargetMeta('character'),
+    handler: forceRenameHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/moderation/queue',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: moderationQueueHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/moderation/accounts/:id',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: moderationAccountDetailHandler,
+  },
+
+  // Chat filter (17b).
+  {
+    method: 'GET',
+    path: '/admin/api/chat-filter',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: chatFilterGetHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/chat-filter/words',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: chatFilterWordsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/chat-filter/words/:id/delete',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('word')],
+    meta: adminTargetMeta('word'),
+    handler: chatFilterWordDeleteHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/chat-filter/config',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: chatFilterConfigHandler,
+  },
+
+  // Bug reports + characters (17b).
+  {
+    method: 'GET',
+    path: '/admin/api/bug-reports',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: bugReportsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/bug-reports/:id/screenshot',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('bugReport')],
+    meta: adminTargetMeta('bugReport'),
+    handler: bugScreenshotHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/characters',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: charactersHandler,
+  },
+
+  // Map editor moderation (v0.20.0 release merge, migrated in-merge). The
+  // (block|unblock) legacy regex group becomes two literal-suffix :id routes
+  // (the publish/unpublish shape), so no enum decode and no 422 surface.
+  {
+    method: 'GET',
+    path: '/admin/api/maps',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: adminMapsListHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/user-assets',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: adminUserAssetsListHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/maps/:id/unpublish',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('map')],
+    meta: adminTargetMeta('map'),
+    handler: adminMapUnpublishHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/user-assets/:id/block',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('user_asset')],
+    meta: adminTargetMeta('user_asset'),
+    handler: adminAssetBlockHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/user-assets/:id/unblock',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('user_asset')],
+    meta: adminTargetMeta('user_asset'),
+    handler: adminAssetUnblockHandler,
+  },
+];

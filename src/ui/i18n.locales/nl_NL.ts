@@ -1141,6 +1141,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Download de losse launcher voor optimale prestaties en schermvullend spelen.',
   'download.title': 'Desktop-launcher downloaden',
+  'download.macCta': 'Download voor macOS',
+  'download.windowsPending': 'Windows-build volgt later.',
   'entities.abilities.adrenaline_rush.description':
     'Je bloed kookt en herstelt onmiddellijk 60 energie.',
   'entities.abilities.adrenaline_rush.name': 'Versneld Bloed',
@@ -1820,6 +1822,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Oogstsikkel',
   'entities.items.bronze_sickle.name': 'Bronzen Sikkel',
   'entities.items.silverleaf_sickle.name': 'Zilverbladsikkel',
+  'entities.items.thorium_mining_pick.name': 'Thorium Mijnpik',
+  'entities.items.arcanite_mining_pick.name': 'Arcaniet Mijnpik',
+  'entities.items.ashwood_axe.name': 'Essenhouten Bijl',
+  'entities.items.elderwood_axe.name': 'Oudhouten Bijl',
+  'entities.items.goldleaf_sickle.name': 'Goudbladsikkel',
+  'entities.items.sunpetal_sickle.name': 'Zonneblaadjessikkel',
   'entities.items.moongate_rubbing.name': 'Bezweringsafdruk',
   'entities.items.moonpale_scale.name': 'Maanbleke Schub',
   'entities.items.moonscale_saber.name': 'Maanschub-Sabel',
@@ -5936,4 +5944,206 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Wat je in het donker hebt gedaan',
   'entities.letters.letter_q_hollow.body':
     'Weinigen zullen ooit weten wat er in die kom begraven lag, en nog minder zouden het geloven. Ik weet het, en ik zal het niet vergeten.\n\nMoge je pad verlicht blijven.\n- Broeder Aldric',
+  'hudChrome.gathering.herbalism': 'Kruidenkunde',
+  'hudChrome.gathering.logging': 'Houtkap',
+  'hudChrome.gathering.mining': 'Mijnbouw',
+  'hudChrome.gathering.title': 'Verzamelen',
+  'hudChrome.corpseHarvest.title': 'Oogsten',
+  'hudChrome.corpseHarvest.harvestButton': 'Oogsten',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Dit kadaver is al geoogst.',
+  'hudChrome.corpseHarvest.componentAria': 'Oogst {component}',
+  'hudChrome.corpseHarvest.components.hide': 'Huid',
+  'hudChrome.corpseHarvest.components.fang': 'Tand',
+  'hudChrome.corpseHarvest.components.silk': 'Zijde',
+  'hudChrome.corpseHarvest.components.venomSac': 'Gifzak',
+  'hudChrome.corpseHarvest.components.gills': 'Kieuwen',
+  'hudChrome.corpseHarvest.components.claw': 'Klauw',
+  'hudChrome.corpseHarvest.components.horn': 'Hoorn',
+  'hudChrome.corpseHarvest.components.tusk': 'Slagtand',
+  'errors.api.accountSessionLimit': 'Te veel personages op dit account zijn al in de wereld.',
+  'errors.api.crossSiteOrigin': 'Verzoek geblokkeerd om veiligheidsredenen.',
+  'errors.api.unsupportedMediaType': 'Niet-ondersteund verzoekformaat.',
+  'apiError.account.characters_online':
+    'Log al je personages uit voordat je het account deactiveert.',
+  'apiError.account.deactivated':
+    'Dit account is gedeactiveerd. Neem contact op met een beheerder om het te herstellen.',
+  'apiError.account.not_found': 'Account niet gevonden.',
+  'apiError.account.password_too_long': 'Nieuw wachtwoord mag maximaal 128 tekens lang zijn.',
+  'apiError.account.password_too_short': 'Wachtwoord moet minstens 6 tekens lang zijn.',
+  'apiError.account.username_invalid':
+    'Gebruikersnaam moet 3-24 tekens lang zijn en letters, cijfers of een liggend streepje bevatten.',
+  'apiError.account.username_mismatch': 'Die gebruikersnaam komt niet overeen met je account.',
+  'apiError.account.username_not_allowed': 'Die gebruikersnaam is niet toegestaan.',
+  'apiError.account.username_taken': 'Die gebruikersnaam is al in gebruik.',
+  'apiError.auth.current_password_incorrect': 'Je huidige wachtwoord is onjuist.',
+  'apiError.auth.forbidden': 'Je hebt geen toestemming om dat te doen.',
+  'apiError.auth.invalid_credentials': 'Ongeldige gebruikersnaam of wachtwoord.',
+  'apiError.auth.password_incorrect': 'Je wachtwoord is onjuist.',
+  'apiError.auth.required': 'Niet geauthenticeerd.',
+  'apiError.auth.token_invalid': 'Je sessie is verlopen. Log opnieuw in.',
+  'apiError.auth.token_missing': 'Je moet ingelogd zijn om dat te doen.',
+  'apiError.auth.too_many_attempts': 'Te veel pogingen. Wacht een minuut en probeer het opnieuw.',
+  'apiError.auth.too_many_failed_attempts':
+    'Te veel mislukte pogingen. Wacht een paar minuten en probeer het opnieuw.',
+  'apiError.auth.verification_failed': 'Verificatie mislukt. Probeer het opnieuw.',
+  'apiError.auth.web_login_only': 'Inloggen is alleen toegestaan vanuit de spelclient.',
+  'apiError.body.too_large': 'Dat verzoek is te groot. Probeer het opnieuw met minder gegevens.',
+  'apiError.body.unsupported_media_type': 'Niet-ondersteund verzoekformaat.',
+  'apiError.character.already_in_world': 'Personage is al in de wereld.',
+  'apiError.character.delete_confirm': 'Typ de personagenaam om de verwijdering te bevestigen.',
+  'apiError.character.invalid_class': 'Ongeldige klasse.',
+  'apiError.character.limit_reached': 'Maximumaantal personages bereikt.',
+  'apiError.character.name_invalid': 'Ongeldige personagenaam. Gebruik 2-16 letters.',
+  'apiError.character.name_not_allowed': 'Die personagenaam is niet toegestaan.',
+  'apiError.character.name_taken': 'Die naam is al in gebruik.',
+  'apiError.character.not_found': 'Personage niet gevonden.',
+  'apiError.character.online': 'Personage is momenteel online.',
+  'apiError.character.rename_not_permitted': 'Dit personage hernoemen is niet toegestaan.',
+  'apiError.character.rename_required':
+    'Dit personage moet hernoemd worden voordat het de wereld kan betreden.',
+  'apiError.character.taken_over': 'Je personage is overgenomen door een andere sessie.',
+  'apiError.db.conflict': 'Die wijziging conflicteerde met een andere update. Probeer het opnieuw.',
+  'apiError.discord.already_linked': 'Dat Discord-account is al gekoppeld aan een ander account.',
+  'apiError.discord.expired':
+    'Die Discord-aanmelding is verlopen. Meld je opnieuw aan met Discord.',
+  'apiError.discord.link_required': 'Koppel eerst je Discord-account.',
+  'apiError.discord.not_configured': 'Discord-integratie is momenteel niet beschikbaar.',
+  'apiError.discord.password_required':
+    'Stel een wachtwoord in voordat je je Discord-account ontkoppelt.',
+  'apiError.discord.swag_claimed': 'Je hebt deze beloning al geclaimd.',
+  'apiError.discord.swag_points': 'Niet genoeg punten.',
+  'apiError.discord.swag_tier': 'Bereik een hogere rang om dit te claimen.',
+  'apiError.discord.unknown_swag': 'Die beloning is niet beschikbaar.',
+  'apiError.email.invalid': 'Voer een geldig e-mailadres in.',
+  'apiError.email.unchanged': 'Dat is al je e-mailadres.',
+  'apiError.internal.error': 'Er is iets misgegaan aan onze kant. Probeer het opnieuw.',
+  'apiError.json.malformed': 'Dat verzoek kon niet worden gelezen. Probeer het opnieuw.',
+  'apiError.moderation.banned': 'Dit account is verbannen.',
+  'apiError.moderation.force_rename':
+    'Een moderator vereist dat een van je personages wordt hernoemd.',
+  'apiError.moderation.suspended': 'Dit account is geschorst.',
+  'apiError.moderation.suspended_until': 'Dit account is geschorst tot {date}.',
+  'apiError.origin.cross_site': 'Verzoek geblokkeerd om veiligheidsredenen.',
+  'apiError.rate_limit.exceeded': 'Te veel verzoeken. Probeer het opnieuw over {seconds}.',
+  'apiError.two_factor.already_enabled': 'Tweefactorauthenticatie is al ingeschakeld.',
+  'apiError.two_factor.code_invalid': 'Die code is niet geldig, probeer het opnieuw.',
+  'apiError.two_factor.not_enabled': 'Tweefactorauthenticatie is niet ingeschakeld.',
+  'apiError.two_factor.setup_required': 'Stel eerst tweefactorauthenticatie in.',
+  'apiError.validation.failed':
+    'Sommige velden zijn ongeldig. Controleer het formulier en probeer het opnieuw.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Downloaden voor Linux',
+  'download.linuxHint':
+    'AppImage: maak het uitvoerbaar en voer het vervolgens uit. Geen installatie nodig.',
+  'loading.reconnecting': 'Verbinding verbroken. Opnieuw verbinding maken...',
+  'guide.nav.settings': 'Instellingen en prestaties',
+  'guide.settingsPage.advancedBody':
+    'Geavanceerd begint vanaf het niveau High en ontgrendelt vier extra keuzemogelijkheden, zodat u uw frames kunt besteden waar u ze daadwerkelijk opmerkt: terreindetail, bladdichtheid, effecten en belichting en schaduwkwaliteit. Net als Grafische kwaliteit zijn ze van toepassing na een herlaadbeurt.',
+  'guide.settingsPage.advancedHeading': 'De geavanceerde preset: mix je eigen preset',
+  'guide.settingsPage.advancedMixes':
+    'Twee favoriete mixen: houd Schaduwkwaliteit op High en stel Effecten en belichting in op Low voor een heldere, gloedvrije look die licht is, of doe het omgekeerde om de bloei te behouden en de schaduwen te verzachten.',
+  'guide.settingsPage.balancedTagline':
+    'De goede plek voor de meeste machines en ons standaardadvies.',
+  'guide.settingsPage.balancedTitle': 'Evenwichtig',
+  'guide.settingsPage.balancedWhy':
+    'Medium brengt echte schaduwen en volledige materialen; High voegt omgevingsocclusie en bloei toe. Onder Ultra absorbeert een ingebouwd veiligheidsnet plotselinge dipjes tijdens drukke gevechten, zodat Balanced soepel blijft zonder te babysitten.',
+  'guide.settingsPage.colDoes': 'Wat het doet',
+  'guide.settingsPage.colImpact': 'FPS impact',
+  'guide.settingsPage.colSetting': 'Instelling',
+  'guide.settingsPage.factDetectBody':
+    'Bij de eerste keer opstarten leest de game je apparaat en kiest een verstandig niveau, van Low op een bescheiden telefoon tot Ultra op een sterke desktop. Elke keuze die je zelf maakt, wint altijd.',
+  'guide.settingsPage.factDetectTitle': 'Het spel stemt zichzelf eerst af',
+  'guide.settingsPage.factGovernorBody':
+    'Op elk niveau onder Ultra verdunt het spel stilletjes het gras, de effecten en de verlichting voor een moment wanneer een groot gevecht een piek bereikt, en herstelt deze vervolgens. Als u Ultra kiest, geeft u aan dat u liever elk detail behoudt.',
+  'guide.settingsPage.factGovernorTitle': 'Een ingebouwd veiligheidsnet',
+  'guide.settingsPage.factReloadBody':
+    'Grafische kwaliteit en de geavanceerde keuzemogelijkheden worden van kracht na het herladen, en het paneel biedt indien nodig een knop Nu opnieuw laden. Elke andere optie is van toepassing op het moment dat u deze wijzigt.',
+  'guide.settingsPage.factReloadTitle': 'Twee soorten opties',
+  'guide.settingsPage.fairnessBody':
+    'Geen enkele optie hier ruilt schoonheid in voor macht. De instellingen van Lower geven alleen cosmetisch poetsmiddel af, nooit informatie waarmee je vecht: je debuffs, cast bars, party health en schadecijfers zijn identiek van Low tot Ultra. Spelen op een bescheiden machine is nooit een handicap.',
+  'guide.settingsPage.fairnessTitle': 'Eerlijk door ontwerp',
+  'guide.settingsPage.fpsTagline':
+    'Voor oudere laptops, geïntegreerde grafische kaart en batterijweergave.',
+  'guide.settingsPage.fpsTitle': 'Beste FPS',
+  'guide.settingsPage.fpsWhy':
+    'Grafische kwaliteit is de hoofdschakelaar en Renderkwaliteit is de sterkste schuifregelaar: met 70% tekent de wereld ongeveer de helft van de pixels terwijl de interface perfect scherp blijft.',
+  'guide.settingsPage.heading': 'Instellingen en prestaties',
+  'guide.settingsPage.howHeading': 'Hoe de opties zich gedragen',
+  'guide.settingsPage.impactHeavy': 'Zwaar',
+  'guide.settingsPage.impactLight': 'Licht',
+  'guide.settingsPage.impactModerate': 'Gematigd',
+  'guide.settingsPage.impactNone': 'Geen',
+  'guide.settingsPage.intro':
+    'Zorg ervoor dat het spel er op zijn best uitziet of het snelst werkt. Drie kant-en-klare configuraties, plus wat elke grafische optie werkelijk doet.',
+  'guide.settingsPage.loadoutsHeading': 'Drie kant-en-klare uitrustingen',
+  'guide.settingsPage.loadoutsIntro':
+    'Begin met de uitrusting die klinkt als jouw machine en pas vervolgens één optie tegelijk aan totdat het goed voelt.',
+  'guide.settingsPage.mobileBody':
+    'Mobiel beheert meer voor je: de game kiest het niveau, houdt de resolutie iets lager om de batterij en de hitte te beschermen, en houdt de hoogste niveaus alleen voor desktops. De bovenstaande uitrustingen zijn nog steeds van toepassing; telefoons eindigen gewoon op High.',
+  'guide.settingsPage.mobileTitle': 'Op telefoons en tablets',
+  'guide.settingsPage.recommended': 'Aanbevolen',
+  'guide.settingsPage.rowBrightness': 'Scènebelichting, donkerder of helderder. Puur voorkeur.',
+  'guide.settingsPage.rowBrowserEffects':
+    "Hoe mooi mag de interface zelf zijn: glasvervaging, gloed, geanimeerde menu's. Automatische match met uw browser; de 3D-wereld blijft hoe dan ook onaangeroerd.",
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloei, omgevingsocclusie en hoeveel fakkels en spreuken echt licht werpen. De grootste besparing onder de geavanceerde plukkers.',
+  'guide.settingsPage.rowFieldOfView':
+    'Hoeveel van de wereld past op het scherm, van een ingezoomde 55 tot een overweldigende 100 graden. Een comfortkeuze; bredere uitzichten trekken iets meer aan.',
+  'guide.settingsPage.rowFoliageDensity': 'Hoe ver en hoe dik het gras rond jouw karakter groeit.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Een matglazen waas achter ramen. Mooi, en precies het soort effect dat een zwakkere browser voelt; laat het uit voor de klassieke, frisse look.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'De hoofdschakelaar. Elke stap verandert samen de resolutie, schaduwen, materialen, bladeren en lichteffecten. Het grootste verschil dat je kunt maken.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Een uitlezing op het scherm van FPS, frametijd en meer. Schakel het in terwijl u deze pagina afstemt en verberg het vervolgens weer.',
+  'guide.settingsPage.rowReduceMotion':
+    'Verwijdert interface-animaties zodat vensters onmiddellijk verschijnen. Eerst een toegankelijkheidsoptie, met een kleine prestatiebonus.',
+  'guide.settingsPage.rowRenderQuality':
+    'Tekent de 3D-wereld met een lagere interne resolutie en schaalt deze op; de interface blijft scherp. De sterkste instant slider op zwakkere machines en schermen met hoge resolutie.',
+  'guide.settingsPage.rowShadowQuality':
+    'Schaduwscherpte. Low behoudt schaduwen maar verzacht de randen.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Rijke, gemengde grondtexturen versus een eenvoudiger, sneller terreinuiterlijk.',
+  'guide.settingsPage.rowWeather':
+    'Omgevingsregen en sneeuw. Alleen sfeer, en uitzetten scheelt een beetje bij storm.',
+  'guide.settingsPage.tableFoot':
+    'Op zoek naar een trekafstandsschuif of een FPS dop? Er is niets om naar te zoeken: de kijkafstand maakt deel uit van elk kwaliteitsniveau en de framestimulatie volgt uw weergave.',
+  'guide.settingsPage.tableHeading': 'Elke optie uitgelegd',
+  'guide.settingsPage.tagReload': 'na herladen',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 tot 70%',
+  'guide.settingsPage.value90to100': '90 tot 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High op een gaming-pc, Medium op een laptop',
+  'guide.settingsPage.valueOnOptional': 'Aan (optioneel)',
+  'guide.settingsPage.visualsTagline': 'Screenshotmodus voor krachtige desktopmachines.',
+  'guide.settingsPage.visualsTitle': 'Beste beelden',
+  'guide.settingsPage.visualsWhy':
+    'Ultra wordt weergegeven met de hoogste resolutie die uw scherm biedt, met de rijkste verlichting. Het schakelt ook het vangnet uit, en het is alleen voor desktops: telefoons en de app eindigen op High.',
+  'guide.settingsPage.wherePath':
+    'Alles op deze pagina leeft in het spel: druk op Esc en kijk in Graphics, Interface en Performance Overlay.',
+  'guide.settingsPage.whyLabel': 'Waarom het werkt:',
+  'hudChrome.crafting.close': 'Sluit het maken',
+  'hudChrome.crafting.craft': 'Ambacht',
+  'hudChrome.crafting.craftedToast': 'Gemaakt: {name}',
+  'hudChrome.crafting.empty': 'Nog geen recepten bekend.',
+  'hudChrome.crafting.insufficientMaterials': 'Daar heb je de materialen niet voor.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Vereist:',
+  'hudChrome.crafting.resultAria': 'Ambacht {name}',
+  'hudChrome.crafting.title': 'Knutselen',
+  'hudChrome.crafting.unknownRecipe': 'Dat recept bestaat niet.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Een ambacht dat u het uwe kunt noemen',
+  'entities.quests.q_archetype_acceptance.text':
+    'Elke ambachtsman van Eastbrook kiest uiteindelijk voor één ambacht dat hij zijn eigen ambacht noemt. Bewijs jezelf met één enkele daad, {playerName}, en geef je pad aan.',
+  'entities.quests.q_archetype_acceptance.completion': 'Jouw pad is gekozen; loop er goed mee.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Boswolf gedood',
+  'entities.quests.q_prof_make_amends.title': 'Het goedmaken',
+  'entities.quests.q_prof_make_amends.text':
+    'Om het ene vaartuig voor het andere opzij te zetten, moet een ambachtsman eerst het niet bewandelde pad goedmaken, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Wijzigingen aangebracht; er ligt een nieuw pad voor je open.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Boswolf gedood',
 };

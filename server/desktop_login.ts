@@ -3,8 +3,10 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { newToken } from './auth';
 import { requestIp } from './ratelimit';
 
-const DESKTOP_LOGIN_TTL_MS = 5 * 60 * 1000;
-const DESKTOP_LOGIN_CODE_BYTES = 20;
+// How long a minted desktop-login handoff code stays valid (5 minutes). Exported
+// as the single source of truth so its value is pinned by tests/server/tunables.test.ts.
+export const DESKTOP_LOGIN_TTL_MS = 5 * 60 * 1000;
+const DESKTOP_LOGIN_CODE_BYTES = 20; // single-use code entropy, in bytes (160 bits)
 
 interface DesktopLoginCode {
   accountId: number;
@@ -66,30 +68,35 @@ export function desktopLoginCodeCountForTest(): number {
 // Everything the two route handlers need from the host (main.ts wires the real
 // db/auth implementations; tests inject stubs so no Postgres is required).
 // Shapes are structural subsets of the real functions on purpose.
+//
+// Scope fix: the create leg no longer resolves its own bearer (the
+// original deps carried the scope-blind accountForToken, which let a read-scope
+// companion/OAuth token mint a handoff code that exchange then traded for a
+// FULL session, a scope escalation). Both serving paths now authenticate with
+// the full-session resolver BEFORE calling issueDesktopLoginCode: the legacy
+// arm via bearerActiveAccount, the RouteDef via the shared createActiveGuard.
 export interface DesktopLoginRouteDeps {
-  bearerToken(req: IncomingMessage): string | null;
   readBody(req: IncomingMessage): Promise<Record<string, unknown>>;
   json(res: ServerResponse, status: number, body: unknown): void;
   requestMetadata(req: IncomingMessage): { ip: string; userAgent: string };
-  accountForToken(token: string): Promise<number | null>;
   accountById(accountId: number): Promise<{ id: number; username: string } | null>;
   moderationStatusForAccount(accountId: number): Promise<{ locked: boolean; message: string }>;
   touchLogin(accountId: number, meta: { ip: string; userAgent: string }): Promise<void>;
   saveToken(token: string, accountId: number): Promise<void>;
 }
 
-// POST /api/desktop-login/create: a logged-in BROWSER session (the /desktop-login
-// page) mints a short-lived, single-use, IP-bound handoff code for the desktop
-// app. Auth and moderation gated exactly like a login.
-export async function handleDesktopLoginCreate(
+// POST /api/desktop-login/create, the post-auth core: a logged-in BROWSER
+// session (the /desktop-login page) mints a short-lived, single-use, IP-bound
+// handoff code for the desktop app. The caller has already authenticated the
+// account (full active session, read tokens rejected, moderation gated); this
+// re-reads the username row and re-checks moderation exactly as the pre-18b
+// handler did, so the minted-code and locked-403 bodies stay byte-identical.
+export async function issueDesktopLoginCode(
   req: IncomingMessage,
   res: ServerResponse,
   deps: DesktopLoginRouteDeps,
+  accountId: number,
 ): Promise<void> {
-  const token = deps.bearerToken(req);
-  if (!token) return deps.json(res, 401, { error: 'not authenticated' });
-  const accountId = await deps.accountForToken(token);
-  if (accountId === null) return deps.json(res, 401, { error: 'not authenticated' });
   const account = await deps.accountById(accountId);
   if (account === null) return deps.json(res, 401, { error: 'not authenticated' });
   const status = await deps.moderationStatusForAccount(account.id);

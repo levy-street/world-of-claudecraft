@@ -597,6 +597,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.result.removed': 'Etkinlik takvimden kaldırıldı.',
   'hudChrome.calendar.title': 'Etkinlik Takvimi',
   'hudChrome.calendar.titlePlaceholder': 'Etkinlik başlığı',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Bu leş zaten toplandı.',
+  'hudChrome.corpseHarvest.componentAria': '{component} topla',
+  'hudChrome.corpseHarvest.components.claw': 'Pençe',
+  'hudChrome.corpseHarvest.components.fang': 'Diş',
+  'hudChrome.corpseHarvest.components.gills': 'Solungaç',
+  'hudChrome.corpseHarvest.components.hide': 'Post',
+  'hudChrome.corpseHarvest.components.horn': 'Boynuz',
+  'hudChrome.corpseHarvest.components.silk': 'İpek',
+  'hudChrome.corpseHarvest.components.tusk': 'Azı Dişi',
+  'hudChrome.corpseHarvest.components.venomSac': 'Zehir Kesesi',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.',
+  'hudChrome.corpseHarvest.harvestButton': 'Topla',
+  'hudChrome.corpseHarvest.title': 'Toplama',
   'hudChrome.dailyRewards.disclaimer':
     'WOC fiyatı hızla değişebilir. Olağan fiyat dalgalanmalarının seni dışarıda bırakmaması için 20 USD asgarisinden fazlasını tutmanı öneririz. Bu bir yatırım tavsiyesi değildir.',
   'hudChrome.dailyRewards.hideChestConfirmBody':
@@ -1127,6 +1141,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'download.desc':
     'Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.',
   'download.title': 'Masaüstü Başlatıcısını İndir',
+  'download.macCta': 'macOS için indir',
+  'download.windowsPending': 'Windows derlemesi beklemede.',
   'entities.abilities.adrenaline_rush.description':
     'Kanın kaynar, anında 60 enerji geri kazandırır.',
   'entities.abilities.adrenaline_rush.name': 'Hızlanan Kan',
@@ -1789,6 +1805,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Toplama Orağı',
   'entities.items.bronze_sickle.name': 'Bronz Orak',
   'entities.items.silverleaf_sickle.name': 'Gümüşyaprak Orağı',
+  'entities.items.thorium_mining_pick.name': 'Toryum Maden Kazması',
+  'entities.items.arcanite_mining_pick.name': 'Arkanit Maden Kazması',
+  'entities.items.ashwood_axe.name': 'Dişbudak Baltası',
+  'entities.items.elderwood_axe.name': 'Kadim Ağaç Baltası',
+  'entities.items.goldleaf_sickle.name': 'Altınyaprak Orağı',
+  'entities.items.sunpetal_sickle.name': 'Güneşyaprağı Orağı',
   'entities.items.moongate_rubbing.name': 'Koruyucu İz Baskısı',
   'entities.items.moonpale_scale.name': 'Ay Solgunu Pul',
   'entities.items.moonscale_saber.name': 'Aypulu Pala',
@@ -5852,4 +5874,192 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Karanlıkta yaptıkların',
   'entities.letters.letter_q_hollow.body':
     'O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric',
+  'hudChrome.gathering.herbalism': 'Bitkicilik',
+  'hudChrome.gathering.logging': 'Ağaç kesme',
+  'hudChrome.gathering.mining': 'Madencilik',
+  'hudChrome.gathering.title': 'Toplama',
+  'errors.api.accountSessionLimit': 'Bu hesaba ait çok fazla karakter zaten dünyada.',
+  'errors.api.crossSiteOrigin': 'Güvenlik nedeniyle istek engellendi.',
+  'errors.api.unsupportedMediaType': 'Desteklenmeyen istek biçimi.',
+  'apiError.account.characters_online':
+    'Devre dışı bırakmadan önce tüm karakterlerinizden çıkış yapın.',
+  'apiError.account.deactivated':
+    'Bu hesap devre dışı bırakıldı. Geri yüklemek için bir yöneticiyle iletişime geçin.',
+  'apiError.account.not_found': 'Hesap bulunamadı.',
+  'apiError.account.password_too_long': 'Yeni parola en fazla 128 karakter olmalıdır.',
+  'apiError.account.password_too_short': 'Parola en az 6 karakter olmalıdır.',
+  'apiError.account.username_invalid':
+    'Kullanıcı adı 3-24 karakter olmalı ve harf, rakam veya alt çizgi kullanmalıdır.',
+  'apiError.account.username_mismatch': 'Bu kullanıcı adı hesabınızla eşleşmiyor.',
+  'apiError.account.username_not_allowed': 'Bu kullanıcı adına izin verilmiyor.',
+  'apiError.account.username_taken': 'Bu kullanıcı adı zaten alınmış.',
+  'apiError.auth.current_password_incorrect': 'Mevcut parolanız yanlış.',
+  'apiError.auth.forbidden': 'Bunu yapma izniniz yok.',
+  'apiError.auth.invalid_credentials': 'Geçersiz kullanıcı adı veya parola.',
+  'apiError.auth.password_incorrect': 'Parolanız yanlış.',
+  'apiError.auth.required': 'Kimlik doğrulanmadı.',
+  'apiError.auth.token_invalid': 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.',
+  'apiError.auth.token_missing': 'Bunu yapmak için giriş yapmış olmanız gerekir.',
+  'apiError.auth.too_many_attempts': 'Çok fazla deneme. Bir dakika bekleyip tekrar deneyin.',
+  'apiError.auth.too_many_failed_attempts':
+    'Çok fazla başarısız deneme. Birkaç dakika bekleyip tekrar deneyin.',
+  'apiError.auth.verification_failed': 'Doğrulama başarısız oldu. Lütfen tekrar deneyin.',
+  'apiError.auth.web_login_only': 'Girişlere yalnızca oyun istemcisinden izin verilir.',
+  'apiError.body.too_large': 'Bu istek çok büyük. Daha az veriyle tekrar deneyin.',
+  'apiError.body.unsupported_media_type': 'Desteklenmeyen istek biçimi.',
+  'apiError.character.already_in_world': 'Karakter zaten dünyada.',
+  'apiError.character.delete_confirm': 'Silmeyi onaylamak için karakter adını yazın.',
+  'apiError.character.invalid_class': 'Geçersiz sınıf.',
+  'apiError.character.limit_reached': 'Karakter sınırına ulaşıldı.',
+  'apiError.character.name_invalid': 'Geçersiz karakter adı. 2-16 harf kullanın.',
+  'apiError.character.name_not_allowed': 'Bu karakter adına izin verilmiyor.',
+  'apiError.character.name_taken': 'Bu ad alınmış.',
+  'apiError.character.not_found': 'Karakter bulunamadı.',
+  'apiError.character.online': 'Karakter şu anda çevrimiçi.',
+  'apiError.character.rename_not_permitted':
+    'Bu karakterin yeniden adlandırılmasına izin verilmiyor.',
+  'apiError.character.rename_required':
+    'Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.',
+  'apiError.character.taken_over': 'Karakteriniz başka bir oturum tarafından devralındı.',
+  'apiError.db.conflict': 'Bu değişiklik başka bir güncellemeyle çakıştı. Lütfen tekrar deneyin.',
+  'apiError.discord.already_linked': 'Bu Discord hesabı zaten başka bir hesaba bağlı.',
+  'apiError.discord.expired':
+    'Bu Discord girişinin süresi doldu. Lütfen tekrar Discord ile giriş yapın.',
+  'apiError.discord.link_required': 'Önce Discord hesabınızı bağlayın.',
+  'apiError.discord.not_configured': 'Discord entegrasyonu şu anda kullanılamıyor.',
+  'apiError.discord.password_required':
+    'Discord hesabınızın bağlantısını kaldırmadan önce bir parola belirleyin.',
+  'apiError.discord.swag_claimed': 'Bu ödülü zaten aldınız.',
+  'apiError.discord.swag_points': 'Yeterli puan yok.',
+  'apiError.discord.swag_tier': 'Bunu almak için daha yüksek bir rütbeye ulaşın.',
+  'apiError.discord.unknown_swag': 'Bu ödül mevcut değil.',
+  'apiError.email.invalid': 'Geçerli bir e-posta adresi girin.',
+  'apiError.email.unchanged': 'Bu zaten sizin e-posta adresiniz.',
+  'apiError.internal.error': 'Bizim tarafımızda bir şeyler ters gitti. Lütfen tekrar deneyin.',
+  'apiError.json.malformed': 'Bu istek okunamadı. Lütfen tekrar deneyin.',
+  'apiError.moderation.banned': 'Bu hesap yasaklandı.',
+  'apiError.moderation.force_rename':
+    'Bir moderatör, karakterlerinizden birinin yeniden adlandırılmasını gerektiriyor.',
+  'apiError.moderation.suspended': 'Bu hesap askıya alındı.',
+  'apiError.moderation.suspended_until': 'Bu hesap {date} tarihine kadar askıya alındı.',
+  'apiError.origin.cross_site': 'Güvenlik nedeniyle istek engellendi.',
+  'apiError.rate_limit.exceeded': 'Çok fazla istek. {seconds} içinde tekrar deneyin.',
+  'apiError.two_factor.already_enabled': 'İki adımlı doğrulama zaten etkin.',
+  'apiError.two_factor.code_invalid': 'Bu kod geçerli değil, tekrar deneyin.',
+  'apiError.two_factor.not_enabled': 'İki adımlı doğrulama etkin değil.',
+  'apiError.two_factor.setup_required': 'Önce iki adımlı doğrulama kurulumunu başlatın.',
+  'apiError.validation.failed': 'Bazı alanlar geçersiz. Formu kontrol edip tekrar deneyin.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Linux için indirin',
+  'download.linuxHint':
+    'AppImage: yürütülebilir hale getirin ve ardından çalıştırın. Kurulum gerekmez.',
+  'loading.reconnecting': 'Bağlantı kesildi. Yeniden bağlanılıyor...',
+  'guide.nav.settings': 'Ayarlar ve Performans',
+  'guide.settingsPage.advancedBody':
+    'Gelişmiş, High seviyesinden başlar ve dört ekstra seçicinin kilidini açar, böylece karelerinizi gerçekten fark ettiğiniz yerde geçirebilirsiniz: Arazi Detayı, Yeşillik Yoğunluğu, Efektler ve Aydınlatma ve Gölge Kalitesi. Grafik Kalitesi gibi, yeniden yükleme sonrasında uygulanırlar.',
+  'guide.settingsPage.advancedHeading': 'Gelişmiş ön ayar: kendinizinkini karıştırın',
+  'guide.settingsPage.advancedMixes':
+    "En sevdiğiniz iki karışım: Gölge Kalitesini High'de tutun ve ışık veren net, parlamayan bir görünüm için Efektler ve Aydınlatma'yı Low olarak ayarlayın veya çiçeklenmeyi korumak ve gölgeleri yumuşatmak için tam tersini yapın.",
+  'guide.settingsPage.balancedTagline': 'Çoğu makine için en uygun nokta ve varsayılan tavsiyemiz.',
+  'guide.settingsPage.balancedTitle': 'Dengeli',
+  'guide.settingsPage.balancedWhy':
+    "Medium gerçek gölgeler ve dolu materyaller getiriyor; High ortam tıkanıklığını ve çiçeklenmeyi ekler. Ultra'ün altında yerleşik bir güvenlik ağı, yoğun kavgalarda ani düşüşleri emer, böylece Dengeli, bebek bakıcılığı gerektirmeden sorunsuz kalır.",
+  'guide.settingsPage.colDoes': 'Ne işe yarar',
+  'guide.settingsPage.colImpact': 'FPS etkisi',
+  'guide.settingsPage.colSetting': 'Ayar',
+  'guide.settingsPage.factDetectBody':
+    "İlk başlatışınızda oyun cihazınızı okur ve mütevazı bir telefondaki Low'dan güçlü bir masaüstündeki Ultra'e kadar mantıklı bir katman seçer. Kendi yaptığınız herhangi bir seçim her zaman kazanır.",
+  'guide.settingsPage.factDetectTitle': 'Oyun önce kendini ayarlar',
+  'guide.settingsPage.factGovernorBody':
+    "Ultra'ün altındaki her kademede oyun, büyük bir kavganın arttığı an için çimleri, efektleri ve ışıklandırmayı sessizce inceltiyor ve ardından bunları yeniden canlandırıyor. Ultra'ü seçmek her ayrıntıyı saklamayı tercih ettiğinizi gösterir.",
+  'guide.settingsPage.factGovernorTitle': 'Yerleşik bir güvenlik ağı',
+  'guide.settingsPage.factReloadBody':
+    'Grafik Kalitesi ve Gelişmiş seçiciler, yeniden yükleme sonrasında devreye girer ve gerektiğinde panelde Şimdi Yeniden Yükle düğmesi sunulur. Diğer tüm seçenekler, değiştirdiğiniz anda geçerli olur.',
+  'guide.settingsPage.factReloadTitle': 'İki çeşit seçenek',
+  'guide.settingsPage.fairnessBody':
+    "Burada güzelliği güçle takas eden hiçbir seçenek yok. Lower ayarları yalnızca kozmetik cilayı değiştirir, asla savaştığınız bilgileri değiştirmez: debuff'larınız, kullanım çubuklarınız, grup sağlığınız ve hasar numaralarınız Low ile Ultra arasında aynıdır. Mütevazı bir makinede oynamak asla bir dezavantaj değildir.",
+  'guide.settingsPage.fairnessTitle': 'Tasarım gereği fuar',
+  'guide.settingsPage.fpsTagline':
+    'Daha eski dizüstü bilgisayarlar, entegre grafikler ve pille çalışma için.',
+  'guide.settingsPage.fpsTitle': 'En iyi FPS',
+  'guide.settingsPage.fpsWhy':
+    "Grafik Kalitesi ana anahtardır ve İşleme Kalitesi en güçlü kaydırıcıdır: %70'te dünya piksellerin kabaca yarısını çekerken arayüz mükemmel derecede keskin kalır.",
+  'guide.settingsPage.heading': 'Ayarlar ve Performans',
+  'guide.settingsPage.howHeading': 'Seçeneklerin nasıl davrandığı',
+  'guide.settingsPage.impactHeavy': 'Ağır',
+  'guide.settingsPage.impactLight': 'Işık',
+  'guide.settingsPage.impactModerate': 'Ilıman',
+  'guide.settingsPage.impactNone': 'Hiçbiri',
+  'guide.settingsPage.intro':
+    'Oyunun en iyi şekilde görünmesini sağlayın veya en hızlı şekilde çalıştırın. Üç hazır ekipman ve ayrıca her grafik seçeneğinin gerçekte yaptığı şey.',
+  'guide.settingsPage.loadoutsHeading': 'Üç hazır yükleme',
+  'guide.settingsPage.loadoutsIntro':
+    'Makinenize benzeyen ekipmanla başlayın, ardından size doğru gelene kadar her seferinde bir seçeneği ayarlayın.',
+  'guide.settingsPage.mobileBody':
+    "Mobil sizin için daha fazlasını yönetir: Oyun katmanı seçer, pili ve ısıyı korumak için çözünürlüğü bir dokunuş daha düşük tutar ve en yüksek katmanları yalnızca masaüstünde tutar. Yukarıdaki yüklemeler hala geçerlidir; telefonlar High'de doruğa ulaşır.",
+  'guide.settingsPage.mobileTitle': 'Telefonlarda ve tabletlerde',
+  'guide.settingsPage.recommended': 'Tavsiye edilen',
+  'guide.settingsPage.rowBrightness': 'Sahne pozlaması, daha koyu veya daha parlak. Saf tercih.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Arayüzün kendisinin ne kadar süslü olmasına izin veriliyor: cam bulanıklığı, parıltı, animasyonlu menüler. Otomatik olarak tarayıcınızla eşleşir; 3D dünyasına her iki durumda da dokunulmaz.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloom, ortamın kapanması ve kaç tane meşale ve büyünün gerçek ışık saçtığı. Gelişmiş toplayıcılar arasında en büyük tasarruf.',
+  'guide.settingsPage.rowFieldOfView':
+    'Yakınlaştırılmış 55 dereceden geniş 100 dereceye kadar dünyanın ne kadarı ekrana sığıyor? Konforlu bir seçim; daha geniş görüşler biraz daha fazla çeker.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Karakterinizin etrafındaki çimlerin ne kadar uzağa ve ne kadar kalın büyüdüğü.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Pencerelerin arkasında buzlu cam bulanıklığı. Güzel ve tam olarak daha zayıf bir tarayıcının hissettiği türden bir etki; Klasik net görünüm için onu bırakın.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Ana şalter. Her adım çözünürlüğü, gölgeleri, malzemeleri, bitki örtüsünü ve ışık efektlerini birlikte değiştirir. Yaratabileceğiniz en büyük fark.',
+  'guide.settingsPage.rowPerfOverlay':
+    'FPS, kare süresi ve daha fazlasının ekrandan okunması. Bu sayfayı ayarlarken açın, ardından tekrar gizleyin.',
+  'guide.settingsPage.rowReduceMotion':
+    'Pencerelerin anında görünmesi için arayüz animasyonlarını kaldırır. Öncelikle küçük bir performans bonusuyla erişilebilirlik seçeneği.',
+  'guide.settingsPage.rowRenderQuality':
+    '3 boyutlu dünyayı daha düşük bir dahili çözünürlükte çizer ve ölçeklendirir; arayüz keskin kalır. Daha zayıf makinelerde ve yüksek çözünürlüklü ekranlarda en güçlü anlık kaydırıcı.',
+  'guide.settingsPage.rowShadowQuality':
+    'Gölge netliği. Low gölgeleri korur ancak kenarlarını yumuşatır.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Daha basit, daha hızlı bir arazi görünümüne karşı zengin, harmanlanmış zemin dokuları.',
+  'guide.settingsPage.rowWeather':
+    'Ortam yağmur ve kar. Yalnızca atmosfer ve onu kapatmak fırtınalar sırasında biraz tasarruf sağlar.',
+  'guide.settingsPage.tableFoot':
+    'Bir çekme mesafesi kaydırıcısı veya FPS başlığı mı arıyorsunuz? Aranacak hiçbir şey yok: Görüş mesafesi her kalite katmanının bir parçasıdır ve çerçeve ilerleme hızı ekranınızı takip eder.',
+  'guide.settingsPage.tableHeading': 'Her seçenek açıklandı',
+  'guide.settingsPage.tagReload': 'yeniden yükledikten sonra',
+  'guide.settingsPage.value100': '%100',
+  'guide.settingsPage.value50to70': '%50 ila %70',
+  'guide.settingsPage.value90to100': '%90 - %100',
+  'guide.settingsPage.valueHighOrMedium': 'High oyun bilgisayarında, Medium dizüstü bilgisayarda',
+  'guide.settingsPage.valueOnOptional': 'Açık (isteğe bağlı)',
+  'guide.settingsPage.visualsTagline': 'Güçlü masaüstü makineler için ekran görüntüsü modu.',
+  'guide.settingsPage.visualsTitle': 'En İyi Görseller',
+  'guide.settingsPage.visualsWhy':
+    "Ultra, ekranınızın sunduğu en zengin ışıklandırmayla en yüksek çözünürlükte oluşturulur. Ayrıca güvenlik ağını da kapatır ve yalnızca masaüstünde kullanılabilir: telefonlar ve uygulama High'de zirveye çıkar.",
+  'guide.settingsPage.wherePath':
+    "Bu sayfadaki her şey oyunda mevcuttur: Esc tuşuna basın ve Grafikler, Arayüz ve Performans Arayüzü'ne bakın.",
+  'guide.settingsPage.whyLabel': 'Neden işe yarıyor:',
+  'hudChrome.crafting.close': 'İşçiliği kapat',
+  'hudChrome.crafting.craft': 'Zanaat',
+  'hudChrome.crafting.craftedToast': 'Hazırlanma Tarihi: {name}',
+  'hudChrome.crafting.empty': 'Henüz bilinen bir tarif yok.',
+  'hudChrome.crafting.insufficientMaterials': 'Bunun için malzemeleriniz yok.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Gereklilikler:',
+  'hudChrome.crafting.resultAria': '{name} zanaatı',
+  'hudChrome.crafting.title': 'işçiliği',
+  'hudChrome.crafting.unknownRecipe': 'O tarif mevcut değil.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Kendinize Ait Bir Zanaat',
+  'entities.quests.q_archetype_acceptance.text':
+    "Eastbrook'un her zanaatkarı eninde sonunda kendilerine ait bir zanaatta karar kılıyor. Tek bir hareketle kendinizi kanıtlayın, {playerName}, ve yolunuzu ilan edin.",
+  'entities.quests.q_archetype_acceptance.completion': 'Yolunuz seçilmiştir; iyi yürü.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Orman kurdu öldürüldü',
+  'entities.quests.q_prof_make_amends.title': 'Değişiklikler Yapmak',
+  'entities.quests.q_prof_make_amends.text':
+    'Bir zanaatı diğerine ayırmak için, bir zanaatkarın öncelikle yürümediği yolu telafi etmesi gerekir, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Değişiklikler yapıldı; önünüze yeni bir yol açılıyor.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Orman kurdu öldürüldü',
 };

@@ -662,6 +662,10 @@ export function onDelveBossDefeated(ctx: SimContext, run: DelveRun): void {
   const layout = DELVE_MODULE_LAYOUTS[moduleId];
   const zBase = delveModuleZOffset(run);
   const dais = layout?.dais ?? { x: 0, z: 52 };
+  const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [];
+  for (const pid of members) {
+    ctx.emit({ type: 'delveObjectiveComplete', delveId: run.delveId, tierId: run.tierId, pid });
+  }
   // Drop any stale module_exit (same z as dais / north passage) before placing rewards.
   for (const id of [...run.objectIds]) {
     if (run.objectState[id]?.kind !== 'module_exit') continue;
@@ -685,7 +689,7 @@ export function onDelveBossDefeated(ctx: SimContext, run: DelveRun): void {
   run.rewardChestId = chest.id;
   run.objectState[chest.id].attemptAvailable = true;
   if (!run.partyKey) return;
-  for (const pid of ctx.partyMembersForKey(run.partyKey)) {
+  for (const pid of members) {
     ctx.emit({
       type: 'log',
       text: 'The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.',

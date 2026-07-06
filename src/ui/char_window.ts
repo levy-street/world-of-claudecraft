@@ -18,6 +18,7 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
+import type { GatheringProfessionId } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -25,6 +26,7 @@ import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
@@ -92,6 +94,16 @@ export interface CharWindowDeps extends PainterHostPresentation {
   openPrestige(): void;
 }
 
+// Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
+const GATHERING_PROFESSION_LABEL_KEY: Record<
+  GatheringProfessionId,
+  'hudChrome.gathering.mining' | 'hudChrome.gathering.logging' | 'hudChrome.gathering.herbalism'
+> = {
+  mining: 'hudChrome.gathering.mining',
+  logging: 'hudChrome.gathering.logging',
+  herbalism: 'hudChrome.gathering.herbalism',
+};
+
 const SHARE_GLYPH =
   '<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>';
 
@@ -148,6 +160,7 @@ export class CharWindow {
     html += `<div class="char-stats">${STAT_GRID.map((stat) => this.deps.statCellHtml(stat)).join('')}</div>`;
     html += this.deps.talentSummaryHtml();
     html += this.deps.progressionHtml(p.level);
+    html += this.gatheringHtml(world);
     html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -175,6 +188,20 @@ export class CharWindow {
     this.deps.renderPreview();
     this.deps.renderSkinPicker();
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+  }
+
+  // The "Gathering" section (issue 1124): one row per gathering profession, showing
+  // the viewer's own proficiency points (IWorldProfessions#professionsState).
+  // Data comes from the pure gathering_view.ts core; this painter only formats it.
+  private gatheringHtml(world: IWorld): string {
+    const rows = buildGatheringProficiencyRows(world);
+    const items = rows
+      .map(
+        (r) =>
+          `<span>${esc(t(GATHERING_PROFESSION_LABEL_KEY[r.professionId]))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`,
+      )
+      .join('');
+    return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
   }
 
   private buildSlotRow(cell: PaperdollSlot): HTMLElement {

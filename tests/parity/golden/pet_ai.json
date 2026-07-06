@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "b85d6580",
+      "state": "523de5c3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -27,6 +27,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -48,12 +49,22 @@
             "mainhand": "rusty_hatchet"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -114,7 +125,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 405,
-      "state": "4d824d93",
+      "state": "d106bee2",
       "events": "934af100",
       "rng": {
         "draws": 14,
@@ -125,7 +136,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 405,
-      "state": "f1b00d94",
+      "state": "02b30cc5",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -136,7 +147,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 405,
-      "state": "61c30afa",
+      "state": "3a88ba8b",
       "events": "f379bd29",
       "rng": {
         "draws": 107,
@@ -147,7 +158,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 405,
-      "state": "bfa603f5",
+      "state": "5f0368f4",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -158,7 +169,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 405,
-      "state": "5f47bbc5",
+      "state": "1f57cba4",
       "events": "63dfb14d",
       "rng": {
         "draws": 307,
@@ -169,7 +180,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "064026e2",
+      "state": "1d47d2a3",
       "events": "741638a5",
       "rng": {
         "draws": 418,
@@ -180,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "1c9814ba",
+      "state": "c6fcbdcb",
       "events": "741638a5",
       "rng": {
         "draws": 418,
@@ -190,6 +201,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -213,13 +225,23 @@
             "mainhand": "rusty_hatchet"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -498,7 +520,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 405,
-      "state": "6e99fca5",
+      "state": "30e138c4",
       "events": "741638a5",
       "rng": {
         "draws": 518,
@@ -509,7 +531,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 405,
-      "state": "c57b3a21",
+      "state": "5e3f7b48",
       "events": "741638a5",
       "rng": {
         "draws": 637,
@@ -520,7 +542,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "809fde7a",
+      "state": "1a652815",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -531,7 +553,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "809fde7a",
+      "state": "1a652815",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -541,6 +563,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -564,13 +587,23 @@
             "mainhand": "rusty_hatchet"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -676,7 +709,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.570796,
+          "facing": -1.566983,
           "fallStartY": 52.026485,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -692,9 +725,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 164.88,
-            "y": 39.746386,
-            "z": -2
+            "x": 165.036181,
+            "y": 41.053989,
+            "z": -2.575985
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -793,7 +826,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 165.047208,
-            "y": 40.034879,
+            "y": 38.285248,
             "z": 14.480686
           },
           "potionCooldownUntil": -1,

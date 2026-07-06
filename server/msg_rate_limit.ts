@@ -13,11 +13,11 @@
 // Legitimate traffic is at most ~20 input frames/sec plus occasional cast/cmd
 // frames. Burst covers a reconnect catch-up spike; refill comfortably clears
 // that burst while capping sustained throughput well above 20 Hz.
-export const MSG_RATE_BURST = 60;
-export const MSG_RATE_REFILL_PER_SECOND = 40;
+export const MSG_RATE_BURST = 60; // bucket capacity, in frames (tokens)
+export const MSG_RATE_REFILL_PER_SECOND = 40; // sustained refill, frames (tokens) per second
 // Consecutive over-budget frames (each already dropped) before the connection
 // is kicked outright, mirroring the chat cooldown-then-kick ladder.
-export const MSG_RATE_VIOLATIONS_FOR_KICK = 200;
+export const MSG_RATE_VIOLATIONS_FOR_KICK = 200; // consecutive dropped frames before kick (count)
 
 export interface MsgRateBucketState {
   tokens: number;

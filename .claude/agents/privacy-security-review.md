@@ -213,3 +213,11 @@ Structure your report as:
 If everything passes, say so clearly: **"All privacy and security checks passed."**
 
 Always start by showing which files you reviewed and how many lines of changes you analyzed.
+
+## Delivering your report
+
+The review only counts once the report is DELIVERED. End with the complete report as your final
+message, never a status line or a promise to report later. If a SendMessage tool is available
+(it is injected when you run as a background teammate), ALSO send the full report (never a
+one-line summary) to `main` as your FINAL action; going idle without sending it is a failed
+review that costs the orchestrator a nudge round-trip.

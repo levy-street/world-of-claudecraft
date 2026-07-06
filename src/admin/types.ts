@@ -65,6 +65,11 @@ export interface Overview {
   peakOnlineAllTime: number;
   siteUsersNow: number;
   server: ServerStats;
+}
+
+// Provider usage is served on its own ops_usage.read-gated route, not inside
+// the overview payload.
+export interface ProviderUsageResponse {
   usage: ProviderUsageSnapshot;
 }
 
@@ -431,4 +436,72 @@ export interface LinePoint {
   value: number;
   secondaryValue?: number;
   title?: string;
+}
+
+// Bot Detector > Configuration. Field ids, groups, labels, and help arrive as
+// server data (the detector decides them at runtime; the evidence-detail
+// precedent), so they render as-is rather than through t().
+export type AntibotConfigValue = string | number | boolean | string[];
+
+export interface AntibotConfigField {
+  id: string;
+  group: string;
+  label: string;
+  type: 'string' | 'number' | 'boolean' | 'select' | 'multi_select';
+  defaultValue: AntibotConfigValue;
+  value: AntibotConfigValue;
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
+  options?: { value: string; label: string }[];
+  help?: string;
+}
+
+export interface AntibotConfigCatalog {
+  fields: AntibotConfigField[];
+  updatedAt: string | null;
+}
+
+export interface AntibotConfigHistoryEntry {
+  id: number;
+  beforeData: Record<string, AntibotConfigValue>;
+  afterData: Record<string, AntibotConfigValue>;
+  note: string;
+  createdAt: string;
+  adminAccountId: number | null;
+  adminUsername: string | null;
+}
+
+export interface AntibotConfigHistory {
+  entries: AntibotConfigHistoryEntry[];
+}
+
+// Staff page (role management). assignableRoles never contains superadmin:
+// it is grantable only via the grant script, and superadmin rows render
+// read-only.
+export interface StaffRow {
+  accountId: number;
+  username: string;
+  roles: string[];
+  lastLogin: string | null;
+}
+
+export interface StaffData {
+  rows: StaffRow[];
+  assignableRoles: string[];
+}
+
+export interface RoleChangeRow {
+  id: number;
+  accountId: number;
+  username: string | null;
+  adminUsername: string | null;
+  rolesBefore: string[];
+  rolesAfter: string[];
+  createdAt: string;
+}
+
+export interface StaffHistoryData {
+  rows: RoleChangeRow[];
 }

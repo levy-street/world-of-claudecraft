@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "40c888b9",
+      "state": "35a51728",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -26,6 +26,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -47,12 +48,22 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -112,7 +123,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 401,
-      "state": "1ff56f1d",
+      "state": "ac691038",
       "events": "3acb3014",
       "rng": {
         "draws": 0,
@@ -123,7 +134,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 401,
-      "state": "9cbe0967",
+      "state": "dea81de2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -134,7 +145,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 401,
-      "state": "10a7ee80",
+      "state": "7c8ccfb1",
       "events": "741638a5",
       "rng": {
         "draws": 100,
@@ -145,7 +156,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 401,
-      "state": "11bb5f25",
+      "state": "d5cf61d0",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -156,7 +167,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 402,
-      "state": "75fb4ff5",
+      "state": "eea5d140",
       "events": "2796152c",
       "rng": {
         "draws": 271,
@@ -167,7 +178,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 403,
-      "state": "6b861f5f",
+      "state": "770b0db4",
       "events": "26a41d9d",
       "rng": {
         "draws": 366,
@@ -178,7 +189,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 403,
-      "state": "7ab26a96",
+      "state": "b71ff925",
       "events": "9caad040",
       "rng": {
         "draws": 495,
@@ -189,7 +200,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 403,
-      "state": "362b417e",
+      "state": "e0ae3553",
       "events": "05346f1a",
       "rng": {
         "draws": 636,
@@ -200,7 +211,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 403,
-      "state": "e59e4aa3",
+      "state": "f453afa0",
       "events": "cfc18f2e",
       "rng": {
         "draws": 774,
@@ -211,7 +222,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 403,
-      "state": "683d9a38",
+      "state": "0f0bb4f7",
       "events": "ced2e436",
       "rng": {
         "draws": 943,
@@ -222,7 +233,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 403,
-      "state": "eec8c4fd",
+      "state": "7ee4e9e6",
       "events": "cfc18f2e",
       "rng": {
         "draws": 1021,
@@ -233,7 +244,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 403,
-      "state": "4dfcc8eb",
+      "state": "7535d2ec",
       "events": "741638a5",
       "rng": {
         "draws": 1021,
@@ -243,6 +254,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -266,13 +278,23 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -446,7 +468,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 403,
-      "state": "8e02beb4",
+      "state": "79a5122f",
       "events": "852d6621",
       "rng": {
         "draws": 1050,
@@ -456,6 +478,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -479,13 +502,23 @@
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
           "lifetimeXp": 44000,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [

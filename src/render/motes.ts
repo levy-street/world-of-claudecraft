@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import type { BiomeId } from '../sim/types';
-import { terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
+import { terrainHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { GFX } from './gfx';
 
 // ---------------------------------------------------------------------------
@@ -94,7 +94,7 @@ export function buildMotes(seed: number): MotesView {
     const z = pz + Math.sin(ang) * r;
     if (Math.abs(x) > WORLD_MAX_X - 8 || z < WORLD_MIN_Z + 8 || z > WORLD_MAX_Z - 8) return false;
     const h = terrainHeight(x, z, seed);
-    if (h < waterLevel() + 0.5) return false; // no motes hovering over open water
+    if (h < waterLevelAt(x, z) + 0.5) return false; // no motes hovering over open water
     homeX[i] = x;
     homeZ[i] = z;
     baseY[i] = h;

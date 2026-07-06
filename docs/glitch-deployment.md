@@ -18,7 +18,8 @@ It is off by default. A Glitch-enabled build activates only when
   Glitch players share the same live realm as regular web players.
 - Starts an Aegis install heartbeat every 60 seconds.
 - Sends optional behavioral events for launch, auth, world loading, input, UI
-  surfaces, chat intent, zone entry, level reach, quests, combat friction,
+  surfaces, chat intent, zone entry, level reach, quest lifecycles, quest
+  dialogue choices, NPC talk options, merchant/store actions, combat friction,
   economy, social systems, delves, lockpicking, and disconnects.
 - Exposes helper functions for progression run submission, leaderboard reads,
   achievements reads, and stats reads. Automatic leaderboard or achievement
@@ -60,9 +61,24 @@ Useful dashboard funnels to create from emitted `step_key` values:
 | --- | --- |
 | Glitch launch to first intent | `glitch_launch`, `glitch_auth`, `world_load`, `world_session`, `input` |
 | Early progression | `zone_eastbrook_vale`, `level_02`, `quest`, `level_06`, `zone_mirefen_marsh` |
+| Generic quest lifecycle | `talk_open`, `talk_option`, `quest`, `quest` |
+| Specific quest lifecycle | `talk_open`, `quest_<quest_id>_detail`, `quest_<quest_id>_accept`, `quest_<quest_id>_ready`, `quest_<quest_id>_complete` |
+| NPC dialogue choice usage | `talk_open`, `talk_option` |
+| Merchant purchase flow | `merchant_open`, `merchant_option`, `merchant_buy` |
+| Merchant sell flow | `merchant_open`, `merchant_option`, `merchant_sell` |
 | Delve friction | `delve`, `lockpick`, `delve` |
 | Social engagement | `ui_social`, `social_party`, `social_trade`, `social_guild` |
 | Disconnect diagnosis | `world_session`, `disconnect` |
+
+Quest-specific funnel keys are generated from stable quest ids. For example,
+`q_wolves` emits `quest_q_wolves_detail`, `quest_q_wolves_accept`,
+`quest_q_wolves_ready`, and `quest_q_wolves_complete`. The generic `quest` key is
+still emitted for aggregate quest reports. Dialogue option choices use
+`step_key=talk_option` with action keys such as `select_quest_offer_detail`,
+`select_quest_accept`, `select_vendor`, `select_world_market`, and
+`select_close`. Merchant/store choices use `step_key=merchant_option` with
+action keys such as `buy`, `buyback`, `sell_junk`, and `close`; successful sim
+outcomes also emit `merchant_buy`, `merchant_buyback`, or `merchant_sell`.
 
 ## Database
 
@@ -169,7 +185,7 @@ Useful overrides:
 GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
 GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch
 GLITCH_BUILD_TYPE=playtest npm run deploy:glitch
-GLITCH_DEPLOY_VERSION=0.20.6 npm run deploy:glitch
+GLITCH_DEPLOY_VERSION=0.22.0 npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=iframe npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=wasm npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_GAME_API_ORIGIN=https://dev.worldofclaudecraft.com npm run deploy:glitch

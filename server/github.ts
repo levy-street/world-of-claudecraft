@@ -11,7 +11,7 @@
 import type http from 'node:http';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { newToken } from './auth';
-import { pool } from './db';
+import { accountAndScopeForToken, moderationStatusForAccount, pool } from './db';
 import { mergedPrsForLogin } from './github_contributors';
 import {
   consumeGitHubOAuthState,
@@ -30,6 +30,10 @@ import {
   parseGitHubUser,
   parseTokenResponse,
 } from './github_oauth';
+import { ctxAccountId } from './http/context';
+import { logger } from './http/logger';
+import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
+import type { Ctx, Middleware, Next, RouteDef } from './http/types';
 import { json } from './http_util';
 import { recordUsageMetric } from './provider_usage';
 import { githubRateLimited } from './ratelimit';
@@ -98,7 +102,7 @@ export async function handleGitHubCallback(
   // authenticated request), so key the bucket on IP alone, mirroring how the
   // Discord first-time-login chooser endpoints rate-limit their own
   // also-unauthenticated entry points (handleDiscordLoginNew/handleDiscordLoginLink).
-  if (githubRateLimited(req, 0)) {
+  if (!githubRateLimited(req, 0).allowed) {
     recordUsageMetric('github.link.rate_limited');
     return bouncePage(res, 429, { ok: false, error: 'rate_limited' });
   }
@@ -137,7 +141,7 @@ export async function handleGitHubCallback(
     }
     return bouncePage(res, 200, { ok: true, login: user.login });
   } catch (err) {
-    console.error('github callback error:', err);
+    logger.error({ err }, 'github callback error');
     recordUsageMetric('github.link.failure');
     return bouncePage(res, 500, { ok: false, error: 'server_error' });
   }
@@ -267,3 +271,145 @@ function bouncePage(res: http.ServerResponse, status: number, payload: BouncePay
   res.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(html);
 }
+
+// ── Route layer ──────────────────────────────
+// The four GitHub-link endpoints as RouteDefs for the shared dispatcher,
+// mirroring the Discord family template (server/discord.ts):
+//   POST   /api/auth/github/start      OAuth start (JSON { url }; full session)
+//   GET    /api/auth/github/callback   OAuth callback (HTML bounce; NON-JSON)
+//   GET    /api/github                 link status (JSON; full session)
+//   DELETE /api/github                 unlink (JSON; full session)
+// The legacy handleApi arms stay in main.ts as the flag-off rollback path until the
+// ladder-deletion PR (next release). PARITY-FIRST: the thin handlers reuse the SAME
+// handleGitHub*
+// functions UNCHANGED, so every body is the legacy JSON / HTML-bounce byte-for-
+// byte. The auth gate is the shared legacy-body createActiveGuard (mirrors
+// bearerActiveAccount), never the problem+json requireAccount. The rate guards
+// reproduce the legacy arms exactly: start's 429 records the
+// github.link.rate_limited usage metric, status/unlink's plain 429 does not,
+// and the callback self-limits inside handleGitHubCallback (IP-keyed).
+//
+// GROUND TRUTH, deliberately preserved: the legacy github family carries NO
+// isIpBlocked gate anywhere (unlike Discord, whose login-mode callback can mint
+// a session; github is link-only, the account is already authenticated), so
+// none is added here. Adding one would be a security-posture change, a
+// maintainer fork, not a silent port.
+//
+// The callback carries meta.envelope 'html' so even an UNEXPECTED throw
+// escaping handleGitHubCallback (e.g. consumeGitHubOAuthState on a failing db)
+// serializes as an HTML error, never problem+json, which would break the
+// window.opener.postMessage popup contract. The unexpected-throw divergence for
+// all four routes is the githubBodyValidationRemap known deviation (legacy
+// counterfactual: the bare-return arms escape handleApi's outer catch and the
+// request HANGS).
+
+// The bearer + moderation reads the auth guard needs. Built LAZILY (a function,
+// not a module-scope object literal) so importing this module never dereferences
+// the db.ts bindings: an unrelated test that partial-mocks server/db and pulls
+// this module in transitively must not throw on a missing export (the
+// lazy-db-bundle rule).
+function makeRealGithubDb() {
+  return { accountAndScopeForToken, moderationStatusForAccount };
+}
+type GithubGuardDb = ReturnType<typeof makeRealGithubDb>;
+let realGithubDb: GithubGuardDb | undefined;
+let githubDbOverride: GithubGuardDb | undefined;
+function githubDb(): BearerActiveGuardDb {
+  if (githubDbOverride) return githubDbOverride;
+  realGithubDb ??= makeRealGithubDb();
+  return realGithubDb;
+}
+
+/** Override the guard db with a fake (test-only; merges over the real reads). */
+export function setGithubDbForTests(overrides: Partial<GithubGuardDb>): void {
+  realGithubDb ??= makeRealGithubDb();
+  githubDbOverride = { ...realGithubDb, ...overrides };
+}
+
+/** Restore the real guard db after a setGithubDbForTests override (test-only). */
+export function resetGithubDbForTests(): void {
+  githubDbOverride = undefined;
+}
+
+/** Mutating + account-scoped gate for start/status/unlink (mirrors bearerActiveAccount). */
+const activeGuard = createActiveGuard(() => githubDb());
+
+/**
+ * start's rate guard: the legacy arm records the github.link.rate_limited usage
+ * metric on a 429 (status/unlink do not), so start gets its own guard. Runs
+ * AFTER the auth guard, exactly like the legacy arm (auth first, then limit).
+ */
+const githubStartRateGuard: Middleware = async (ctx: Ctx, next: Next) => {
+  if (!githubRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    recordUsageMetric('github.link.rate_limited');
+    json(ctx.res, 429, { error: 'rate limited' });
+    return;
+  }
+  await next();
+};
+
+/** status/unlink's plain rate guard (no usage metric), after the auth guard. */
+const githubActiveRateGuard: Middleware = async (ctx: Ctx, next: Next) => {
+  if (!githubRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    json(ctx.res, 429, { error: 'rate limited' });
+    return;
+  }
+  await next();
+};
+
+/** POST /api/auth/github/start: OAuth start (link-only; account resolved by the guard). */
+async function githubStartHandler(ctx: Ctx): Promise<void> {
+  return handleGitHubStart(ctx.req, ctx.res, { accountId: ctxAccountId(ctx) });
+}
+
+/** GET /api/auth/github/callback: OAuth callback (HTML bounce; never problem+json). */
+async function githubCallbackHandler(ctx: Ctx): Promise<void> {
+  return handleGitHubCallback(ctx.req, ctx.res);
+}
+
+/** GET /api/github: link status + dev badge for the account portal. */
+async function githubStatusHandler(ctx: Ctx): Promise<void> {
+  return handleGitHubStatus(ctx.req, ctx.res, ctxAccountId(ctx));
+}
+
+/** DELETE /api/github: unlink (no password-keep dance; link-only flow). */
+async function githubUnlinkHandler(ctx: Ctx): Promise<void> {
+  return handleGitHubUnlink(ctx.req, ctx.res, ctxAccountId(ctx));
+}
+
+// The route table. registry.ts spreads this into apiRoutes. The callback carries
+// no auth middleware (a github.com redirect has no bearer; the OAuth state row is
+// the credential); the other three are [activeGuard, rate guard], matching the
+// legacy order (auth resolves first, the limiter keys on ip+account).
+export const routes: RouteDef[] = [
+  {
+    method: 'POST',
+    path: '/api/auth/github/start',
+    surface: 'api',
+    middleware: [activeGuard, githubStartRateGuard],
+    handler: githubStartHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/auth/github/callback',
+    surface: 'api',
+    // HTML bounce page, never problem+json: an escaping throw serializes as an
+    // HTML error (dispatch.ts threads meta.envelope into withErrors -> mapError).
+    meta: { envelope: 'html' },
+    handler: githubCallbackHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/github',
+    surface: 'api',
+    middleware: [activeGuard, githubActiveRateGuard],
+    handler: githubStatusHandler,
+  },
+  {
+    method: 'DELETE',
+    path: '/api/github',
+    surface: 'api',
+    middleware: [activeGuard, githubActiveRateGuard],
+    handler: githubUnlinkHandler,
+  },
+];

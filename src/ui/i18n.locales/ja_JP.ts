@@ -193,6 +193,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.valueMaster': 'マスタールート',
   'hudChrome.lootSettings.leaderOption': '分配担当：パーティリーダー（あなた）',
   'hudChrome.lootSettings.masterOption': '分配担当：{name}',
+  'hudChrome.corpseHarvest.title': '採取',
+  'hudChrome.corpseHarvest.harvestButton': '採取',
+  'hudChrome.corpseHarvest.concentrateHint': '選ぶ部位が少ないほど、各部位の品質が高くなります。',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'この死体はすでに採取されています。',
+  'hudChrome.corpseHarvest.componentAria': '{component}を採取',
+  'hudChrome.corpseHarvest.components.hide': '毛皮',
+  'hudChrome.corpseHarvest.components.fang': '牙',
+  'hudChrome.corpseHarvest.components.silk': '絹糸',
+  'hudChrome.corpseHarvest.components.venomSac': '毒袋',
+  'hudChrome.corpseHarvest.components.gills': 'えら',
+  'hudChrome.corpseHarvest.components.claw': '爪',
+  'hudChrome.corpseHarvest.components.horn': '角',
+  'hudChrome.corpseHarvest.components.tusk': '牙',
   'hudChrome.theme.preset': 'UIテーマ',
   'hudChrome.theme.customColors': 'カスタムカラー',
   'hudChrome.theme.reset': 'リセット',
@@ -526,6 +539,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'news.title': 'ニュース & アップデート',
   'news.desc': '最新のパッチノート、イベント、コミュニティの更新情報を確認しましょう。',
   'download.title': 'デスクトップランチャーのダウンロード',
+  'download.macCta': 'macOS版をダウンロード',
+  'download.linuxCta': 'Linux版をダウンロード',
+  'download.linuxHint':
+    'AppImage形式です。実行権限を付けてそのまま起動でき、インストールは不要です。',
+  'download.windowsPending': 'Windows版は準備中です。',
   'download.desc':
     '最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。',
   'comingSoon.placeholder': '近日公開...',
@@ -797,6 +815,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.enterTimeout':
     '世界に入れませんでした。接続がタイムアウトしました。ゲームサーバーは動作していますか？',
   'loading.connectionLost': 'サーバーとの接続が切断されました。',
+  'loading.reconnecting': 'サーバーとの接続が切断されました。再接続しています...',
   'loading.connectionRejected': 'サーバーが接続を閉じました。',
   'errors.nothingInteract': '操作できるものがありません。',
   'errors.noEnemyNearby': '近くに敵がいません。',
@@ -828,9 +847,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'errors.api.accountBanned': 'このアカウントは利用停止されています。',
   'errors.api.accountSuspended': 'このアカウントは {date} まで停止されています。',
   'errors.api.alreadyInWorld': 'キャラクターは既に世界にいます。',
+  'errors.api.accountSessionLimit': 'このアカウントでは既に多くのキャラクターが世界にいます。',
   'errors.api.takenOver': 'あなたのキャラクターは別のセッションに引き継がれました。',
   'errors.api.renameBeforeEntering': 'このキャラクターは世界に入る前に名前変更が必要です。',
   'errors.api.renameNotPermitted': 'このキャラクターの名前変更は許可されていません。',
+  'errors.api.unsupportedMediaType': 'サポートされていないリクエスト形式です。',
+  'errors.api.crossSiteOrigin': 'セキュリティ上の理由によりリクエストがブロックされました。',
   'realm.noRealms': '利用可能なワールドがありません。',
   'realm.loading': 'ワールドを読み込み中...',
   'realm.recommended': 'おすすめ',
@@ -3008,6 +3030,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.completion':
     'モガーはついに死にました。イーストブルックの畑は安全になり、あなたは語る価値のある物語をもう一つ抱えて谷を去ります。',
   'entities.quests.q_mogger.objectives.0.label': 'モガーを討伐',
+  'entities.quests.q_archetype_acceptance.title': '己が選ぶべき技',
+  'entities.quests.q_archetype_acceptance.text':
+    'イーストブルックの職人は皆いずれ、己が選ぶべき一つの技に落ち着く。{playerName}よ、一つの行いで己を証明し、進むべき道を宣言せよ。',
+  'entities.quests.q_archetype_acceptance.completion':
+    'あなたの道は定まった。その道をしかと歩むがいい。',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'フォレストウルフを討伐',
+  'entities.quests.q_prof_make_amends.title': '償い',
+  'entities.quests.q_prof_make_amends.text':
+    '一つの技を捨て、別の技へと移るには、職人はまず歩まなかった道への償いを果たさねばならぬ、{playerName}よ。',
+  'entities.quests.q_prof_make_amends.completion':
+    '償いは果たされた。新たな道があなたに開かれている。',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'フォレストウルフを討伐',
   'entities.quests.q_drowned_choir.title': '溺れし聖歌隊',
   'entities.quests.q_drowned_choir.text':
     '渡り手どもは独りで動いているのではない。その中に溺れし信徒たちが歩いている——神殿とともに沈んだ教団だ。腐った祭服をまとったまま、岸の岩場から祈りを歌い続けている。八体を沈黙させ、奴らが携える供物を六つ持ち帰れ。奴らが女神に何を捧げようとしているのか、私は知りたいのだ。',
@@ -3272,6 +3306,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': '採集の鎌',
   'entities.items.bronze_sickle.name': '青銅の鎌',
   'entities.items.silverleaf_sickle.name': '銀葉の鎌',
+  'entities.items.thorium_mining_pick.name': 'トリウムの採掘ピック',
+  'entities.items.arcanite_mining_pick.name': 'アーケナイトの採掘ピック',
+  'entities.items.ashwood_axe.name': 'タモ材の斧',
+  'entities.items.elderwood_axe.name': '古木の斧',
+  'entities.items.goldleaf_sickle.name': '金葉の鎌',
+  'entities.items.sunpetal_sickle.name': '陽花弁の鎌',
   'entities.mobs.nythraxis_skeleton_warrior.name': '蘇った王家の衛兵',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'ナイスラクシス、ソーンピークの災厄',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
@@ -3744,6 +3784,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.nav.dungeons': 'ダンジョンとレイド',
   'guide.nav.reference': 'リファレンス',
   'guide.nav.controls': '操作方法',
+  'guide.nav.settings': '設定とパフォーマンス',
   'guide.nav.combat': '戦闘',
   'guide.nav.glossary': '用語集',
   'guide.nav.faq': 'FAQ',
@@ -3892,6 +3933,91 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileHeading': 'モバイルでは',
   'guide.controls.mobileBody':
     'スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、右側はどこでもドラッグして視点操作、そしてアビリティやメニュー用の画面上ボタンが現れます。',
+  'guide.settingsPage.heading': '設定とパフォーマンス',
+  'guide.settingsPage.intro':
+    '見た目を最高にするのも、動作を最速にするのも自由自在。すぐに使える3つの構成と、各グラフィックオプションの本当の働きを紹介します。',
+  'guide.settingsPage.wherePath':
+    'このページの内容はすべてゲーム内にあります。Escキーを押して、グラフィック、インターフェース、パフォーマンスオーバーレイの各項目を確認してください。',
+  'guide.settingsPage.fairnessTitle': '公平さは設計から',
+  'guide.settingsPage.fairnessBody':
+    'ここにあるオプションは、見た目と引き換えに強さを得るものではありません。設定を下げて削られるのは装飾的な美しさだけで、戦いに使う情報は決して失われません。デバフ、詠唱バー、パーティの体力、ダメージ数値は「低」から「ウルトラ」まで完全に同一です。控えめなマシンでのプレイが不利になることはありません。',
+  'guide.settingsPage.loadoutsHeading': 'すぐに使える3つの構成',
+  'guide.settingsPage.loadoutsIntro':
+    'お使いのマシンに近そうな構成から始めて、しっくりくるまでオプションを1つずつ調整していきましょう。',
+  'guide.settingsPage.recommended': 'おすすめ',
+  'guide.settingsPage.whyLabel': 'なぜ効くのか：',
+  'guide.settingsPage.tagReload': '再読み込み後',
+  'guide.settingsPage.fpsTitle': 'FPS優先',
+  'guide.settingsPage.fpsTagline': '古めのノートPC、内蔵グラフィック、バッテリー駆動でのプレイに。',
+  'guide.settingsPage.fpsWhy':
+    'グラフィック品質が全体を束ねるマスタースイッチで、描画品質は最も効き目の大きいスライダーです。70%にするとワールドの描画ピクセル数はおよそ半分になりますが、インターフェースは完全にくっきりしたままです。',
+  'guide.settingsPage.balancedTitle': 'バランス',
+  'guide.settingsPage.balancedTagline':
+    'ほとんどの環境にちょうどいい、まずおすすめしたい構成です。',
+  'guide.settingsPage.balancedWhy':
+    '「中」では本格的な影とフルマテリアルが有効になり、「高」ではアンビエントオクルージョンとブルームが加わります。ウルトラ未満のティアでは内蔵のセーフティネットが激しい戦闘での急な負荷を吸収してくれるため、バランス構成は手をかけなくても滑らかに動き続けます。',
+  'guide.settingsPage.visualsTitle': '最高画質',
+  'guide.settingsPage.visualsTagline': '強力なデスクトップマシンのためのスクリーンショットモード。',
+  'guide.settingsPage.visualsWhy':
+    'ウルトラは、ディスプレイが対応する最高解像度と最も豊かな照明で描画します。セーフティネットもオフになり、デスクトップ専用です。スマートフォンとアプリ版では上限が「高」になります。',
+  'guide.settingsPage.value50to70': '50%から70%',
+  'guide.settingsPage.value90to100': '90%から100%',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.valueHighOrMedium': 'ゲーミングPCなら「高」、ノートPCなら「中」',
+  'guide.settingsPage.valueOnOptional': 'オン（お好みで）',
+  'guide.settingsPage.howHeading': 'オプションの仕組み',
+  'guide.settingsPage.factDetectTitle': 'まずはゲームが自動調整',
+  'guide.settingsPage.factDetectBody':
+    '初回起動時にゲームがお使いの端末を読み取り、控えめなスマートフォンなら「低」、強力なデスクトップなら「ウルトラ」まで、無理のないティアを自動で選びます。自分で選んだ設定は常にそれより優先されます。',
+  'guide.settingsPage.factReloadTitle': 'オプションは2種類',
+  'guide.settingsPage.factReloadBody':
+    'グラフィック品質と「詳細」の各設定は再読み込み後に反映され、必要なときはパネルに「今すぐ再読み込み」ボタンが表示されます。それ以外のオプションは、変更した瞬間に適用されます。',
+  'guide.settingsPage.factGovernorTitle': '内蔵のセーフティネット',
+  'guide.settingsPage.factGovernorBody':
+    'ウルトラ未満のすべてのティアでは、大規模な戦闘で負荷が跳ね上がった瞬間、ゲームが草やエフェクト、照明をさりげなく一時的に間引き、収まればすぐ元に戻します。ウルトラを選ぶことは、細部をひとつも削らないでほしいという意思表示になります。',
+  'guide.settingsPage.advancedHeading': '「詳細」プリセット：自分だけの組み合わせ',
+  'guide.settingsPage.advancedBody':
+    '「詳細」プリセットは「高」ティアを出発点に、地形の詳細、草木の密度、エフェクトと照明、影の品質という4つの追加設定を開放します。本当に違いを実感できるところへフレームを振り分けられるようになります。グラフィック品質と同じく、変更は再読み込み後に適用されます。',
+  'guide.settingsPage.advancedMixes':
+    'おすすめの組み合わせを2つ。影の品質を「高」に保ちつつエフェクトと照明を「低」にすると、光の演出を抑えたくっきり軽快な画面になります。逆にすれば、ブルームの輝きを残したまま影を柔らかくできます。',
+  'guide.settingsPage.tableHeading': '全オプション解説',
+  'guide.settingsPage.colSetting': '設定項目',
+  'guide.settingsPage.colDoes': '効果',
+  'guide.settingsPage.colImpact': 'FPSへの影響',
+  'guide.settingsPage.impactNone': 'なし',
+  'guide.settingsPage.impactLight': '小',
+  'guide.settingsPage.impactModerate': '中',
+  'guide.settingsPage.impactHeavy': '大',
+  'guide.settingsPage.rowGraphicsQuality':
+    '全体を束ねるマスタースイッチです。段階を変えるたびに、解像度、影、マテリアル、草木、照明エフェクトがまとめて切り替わります。単独では最も大きな違いを生む項目です。',
+  'guide.settingsPage.rowRenderQuality':
+    '3Dワールドを低めの内部解像度で描画してから拡大します。インターフェースはくっきりしたままです。非力なマシンや高解像度の画面では、即座に効く最強のスライダーです。',
+  'guide.settingsPage.rowFieldOfView':
+    '画面に収まる世界の広さを、ズームの効いた55度から見渡すような100度まで調整できます。快適さで選ぶ項目ですが、視野を広げるほど描画量はわずかに増えます。',
+  'guide.settingsPage.rowBrightness':
+    '画面全体の露出を暗くも明るくも調整できます。純粋に好みの問題です。',
+  'guide.settingsPage.rowWeather':
+    '環境演出としての雨と雪です。雰囲気づくりだけの要素なので、オフにすると嵐の間の負荷が少し軽くなります。',
+  'guide.settingsPage.rowBrowserEffects':
+    'インターフェース自体の演出の豪華さを決めます。ガラスのぼかし、発光、メニューのアニメーションなどです。「自動」ならお使いのブラウザに合わせて調整され、どちらにしても3Dワールドには影響しません。',
+  'guide.settingsPage.rowTerrainDetail':
+    '豊かにブレンドされた地面のテクスチャにするか、シンプルで軽快な地形表示にするかを選びます。',
+  'guide.settingsPage.rowFoliageDensity': 'キャラクターの周囲に生える草の範囲と密度を調整します。',
+  'guide.settingsPage.rowEffectsQuality':
+    'ブルーム、アンビエントオクルージョン、そして実際に光を放つ松明や呪文の数を制御します。「詳細」の設定の中では、単独で最も大きく負荷を減らせる項目です。',
+  'guide.settingsPage.rowShadowQuality':
+    '影のくっきり具合を調整します。「低」でも影は残り、輪郭が柔らかくなるだけです。',
+  'guide.settingsPage.rowFrostedPanels':
+    'ウィンドウの背後にすりガラスのぼかしをかけます。美しい反面、非力なブラウザにはまさに応える種類のエフェクトです。昔ながらのくっきりした表示が好みなら、オフのままにしておきましょう。',
+  'guide.settingsPage.rowReduceMotion':
+    'インターフェースのアニメーションをなくし、ウィンドウを即座に表示します。第一にはアクセシビリティのためのオプションですが、パフォーマンスもわずかに向上します。',
+  'guide.settingsPage.rowPerfOverlay':
+    'FPSやフレームタイムなどを画面上に表示します。このページの設定を調整する間だけオンにして、終わったらまた非表示に戻しましょう。',
+  'guide.settingsPage.tableFoot':
+    '描画距離のスライダーやFPS上限をお探しですか。探す必要はありません。視界距離は各品質ティアに組み込まれており、フレームペーシングはお使いのディスプレイに従います。',
+  'guide.settingsPage.mobileTitle': 'スマートフォンとタブレットでは',
+  'guide.settingsPage.mobileBody':
+    'モバイルではゲームがより多くを自動で管理します。ティアの選択はゲーム側が行い、バッテリーの消耗と発熱を抑えるために解像度をわずかに低めに保ち、最上位ティアはデスクトップ専用のままにします。上記の構成はそのまま役立ちますが、スマートフォンでは上限が「高」になります。',
   'guide.combat.intro':
     '戦闘はおなじみのクラシックMMOのルールに沿っています。うまく遊ぶために細かく学ぶ必要はまったくありません。これは戦いの仕組みの概要にすぎません。',
   'guide.combat.hitTitle': 'すべての一撃が命中するわけではない',
@@ -5689,6 +5815,83 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.crafting.title': '製作',
+  'hudChrome.crafting.close': '製作を閉じる',
+  'hudChrome.crafting.craft': '製作',
+  'hudChrome.crafting.reagentsNeeded': '必要素材:',
+  'hudChrome.crafting.empty': '既知のレシピはありません。',
+  'hudChrome.crafting.resultAria': '{name}を製作',
+  'hudChrome.crafting.craftedToast': '製作しました:{name}',
+  'hudChrome.crafting.insufficientMaterials': '材料が不足しています。',
+  'hudChrome.crafting.unknownRecipe': 'そのレシピは存在しません。',
+  // apiError.* server error-code catalog (M16 non-Latin fill, Phase 22)
+  'apiError.validation.failed': '一部の項目が無効です。入力内容を確認してもう一度お試しください。',
+  'apiError.json.malformed': 'リクエストを読み取れませんでした。もう一度お試しください。',
+  'apiError.body.too_large': 'リクエストが大きすぎます。データを減らしてもう一度お試しください。',
+  'apiError.body.unsupported_media_type': 'サポートされていないリクエスト形式です。',
+  'apiError.db.conflict': 'その変更が別の更新と競合しました。もう一度お試しください。',
+  'apiError.rate_limit.exceeded': 'リクエストが多すぎます。{seconds} 後に再度お試しください。',
+  'apiError.internal.error': 'サーバー側で問題が発生しました。もう一度お試しください。',
+  'apiError.auth.token_missing': 'この操作を行うにはログインが必要です。',
+  'apiError.auth.token_invalid': 'セッションの有効期限が切れました。もう一度ログインしてください。',
+  'apiError.auth.forbidden': 'この操作を行う権限がありません。',
+  'apiError.auth.invalid_credentials': 'ユーザー名またはパスワードが正しくありません。',
+  'apiError.auth.required': '認証されていません。',
+  'apiError.auth.web_login_only': 'ログインはゲームクライアントからのみ可能です。',
+  'apiError.auth.too_many_attempts': '試行回数が多すぎます。1分待ってから再試行してください。',
+  'apiError.auth.too_many_failed_attempts':
+    '試行回数が多すぎます。数分待ってから再度お試しください。',
+  'apiError.auth.current_password_incorrect': '現在のパスワードが正しくありません。',
+  'apiError.auth.password_incorrect': 'パスワードが正しくありません。',
+  'apiError.auth.verification_failed': '確認に失敗しました。もう一度お試しください。',
+  'apiError.account.username_invalid':
+    'ユーザー名は3-24文字で、英字、数字、アンダースコアを使用してください。',
+  'apiError.account.username_not_allowed': 'そのユーザー名は使用できません。',
+  'apiError.account.username_taken': 'そのユーザー名は既に使われています。',
+  'apiError.account.username_mismatch': 'そのユーザー名はアカウントと一致しません。',
+  'apiError.account.password_too_short': 'パスワードは6文字以上である必要があります。',
+  'apiError.account.password_too_long': '新しいパスワードは128文字以内にしてください。',
+  'apiError.account.characters_online':
+    '無効化する前にすべてのキャラクターからログアウトしてください。',
+  'apiError.account.deactivated':
+    'このアカウントは無効化されています。復元するには管理者に連絡してください。',
+  'apiError.account.not_found': 'アカウントが見つかりません。',
+  'apiError.character.name_invalid': 'キャラクター名が無効です。2-16文字の英字を使用してください。',
+  'apiError.character.name_not_allowed': 'そのキャラクター名は使用できません。',
+  'apiError.character.invalid_class': '無効なクラスです。',
+  'apiError.character.limit_reached': 'キャラクター数の上限に達しました。',
+  'apiError.character.name_taken': 'その名前は既に使われています。',
+  'apiError.character.not_found': 'キャラクターが見つかりません。',
+  'apiError.character.online': 'キャラクターは現在オンラインです。',
+  'apiError.character.rename_not_permitted': 'このキャラクターの名前変更は許可されていません。',
+  'apiError.character.delete_confirm': '削除を確認するにはキャラクター名を入力してください。',
+  'apiError.character.already_in_world': 'キャラクターは既に世界にいます。',
+  'apiError.character.taken_over': 'あなたのキャラクターは別のセッションに引き継がれました。',
+  'apiError.character.rename_required': 'このキャラクターは世界に入る前に名前変更が必要です。',
+  'apiError.moderation.suspended_until': 'このアカウントは {date} まで停止されています。',
+  'apiError.moderation.suspended': 'このアカウントは停止されています。',
+  'apiError.moderation.banned': 'このアカウントは利用停止されています。',
+  'apiError.moderation.force_rename':
+    'モデレーターがあなたのキャラクターのいずれかに改名を要求しています。',
+  'apiError.email.invalid': '有効なメールアドレスを入力してください。',
+  'apiError.email.unchanged': 'すでに現在のメールアドレスです。',
+  'apiError.two_factor.code_invalid': 'そのコードは無効です。もう一度お試しください。',
+  'apiError.two_factor.setup_required': 'まず二段階認証の設定を開始してください。',
+  'apiError.two_factor.already_enabled': '二段階認証は既に有効です。',
+  'apiError.two_factor.not_enabled': '二段階認証は有効になっていません。',
+  'apiError.origin.cross_site': 'セキュリティ上の理由によりリクエストがブロックされました。',
+  'apiError.discord.not_configured': 'Discord連携は現在利用できません。',
+  'apiError.discord.expired':
+    'このDiscordログインは期限切れです。もう一度Discordでログインしてください。',
+  'apiError.discord.already_linked':
+    'そのDiscordアカウントは既に別のアカウントに連携されています。',
+  'apiError.discord.password_required':
+    'Discordアカウントの連携を解除する前にパスワードを設定してください。',
+  'apiError.discord.unknown_swag': 'その報酬は利用できません。',
+  'apiError.discord.link_required': 'まずDiscordアカウントを連携してください。',
+  'apiError.discord.swag_claimed': 'この報酬は既に受け取っています。',
+  'apiError.discord.swag_tier': 'これを受け取るにはより高いランクが必要です。',
+  'apiError.discord.swag_points': 'ポイントが足りません。',
   // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': 'メールボックス',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',
@@ -5794,4 +5997,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ハルヴェン修道士が海図に印を。崩落した聖遺物庫に挑む好日。',
   'hudChrome.calendar.events.moongateCommunion.title': '月門の集い',
   'hudChrome.calendar.events.moongateCommunion.note': '月半ばの月の下、巡礼者が神殿の月門に集う。',
+  'hudChrome.gathering.title': '採集',
+  'hudChrome.gathering.mining': '採掘',
+  'hudChrome.gathering.logging': '伐採',
+  'hudChrome.gathering.herbalism': '薬草学',
+  // Release v0.22.0 locale fill.
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
 };

@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Readable } from 'node:stream';
-import bs58 from 'bs58';
 import { ed25519 } from '@noble/curves/ed25519';
+import bs58 from 'bs58';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Follow the repo's DB-test pattern: stub DATABASE_URL + mock the pg Pool so
 // db.ts loads and every pool.query is a spy we control. This lets us drive the
@@ -11,11 +11,22 @@ const dbMock = vi.hoisted(() => {
   return { query: vi.fn() };
 });
 vi.mock('pg', () => ({
-  Pool: vi.fn(function Pool() { return { query: dbMock.query }; }),
+  Pool: vi.fn(function Pool() {
+    return { query: dbMock.query };
+  }),
 }));
 
-import { handleWalletChallenge, handleWalletLink, handleWalletGet, handleWalletUnlink } from '../server/wallet';
-import { resetWalletLinkRateLimits, walletLinkRateLimited, WALLET_LINK_MAX_PER_MINUTE } from '../server/ratelimit';
+import {
+  resetWalletLinkRateLimits,
+  WALLET_LINK_MAX_PER_MINUTE,
+  walletLinkRateLimited,
+} from '../server/ratelimit';
+import {
+  handleWalletChallenge,
+  handleWalletGet,
+  handleWalletLink,
+  handleWalletUnlink,
+} from '../server/wallet';
 
 // ── fakes for http.IncomingMessage / ServerResponse ─────────────────────────
 function makeReq(body: unknown): any {
@@ -40,8 +51,14 @@ function makeRes(): any {
   return {
     statusCode: 0,
     body: '',
-    writeHead(status: number) { this.statusCode = status; return this; },
-    end(data: string) { this.body = data ?? ''; return this; },
+    writeHead(status: number) {
+      this.statusCode = status;
+      return this;
+    },
+    end(data: string) {
+      this.body = data ?? '';
+      return this;
+    },
   };
 }
 async function call(handler: any, body: unknown, accountId = 1) {
@@ -64,19 +81,26 @@ let ownerRows: any[] = [];
 let walletRows: any[] = [];
 
 beforeEach(() => {
-  challengeRows = []; ownerRows = []; walletRows = [];
+  challengeRows = [];
+  ownerRows = [];
+  walletRows = [];
   resetWalletLinkRateLimits();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => {
     // The real queries are multi-line; collapse whitespace so routing is robust.
     const s = String(sql).replace(/\s+/g, ' ').trim();
-    if (s.includes('DELETE FROM wallet_link_challenges WHERE nonce')) return Promise.resolve({ rows: challengeRows });
-    if (s.includes('DELETE FROM wallet_link_challenges WHERE expires_at')) return Promise.resolve({ rows: [] }); // prune
+    if (s.includes('DELETE FROM wallet_link_challenges WHERE nonce'))
+      return Promise.resolve({ rows: challengeRows });
+    if (s.includes('DELETE FROM wallet_link_challenges WHERE expires_at'))
+      return Promise.resolve({ rows: [] }); // prune
     if (s.includes('INSERT INTO wallet_link_challenges')) return Promise.resolve({ rows: [] });
-    if (s.includes('SELECT account_id FROM wallet_links WHERE pubkey')) return Promise.resolve({ rows: ownerRows });
+    if (s.includes('SELECT account_id FROM wallet_links WHERE pubkey'))
+      return Promise.resolve({ rows: ownerRows });
     if (s.includes('INSERT INTO wallet_links')) return Promise.resolve({ rows: [] });
-    if (s.includes('SELECT account_id, pubkey, linked_at FROM wallet_links')) return Promise.resolve({ rows: walletRows });
-    if (s.includes('DELETE FROM wallet_links WHERE account_id')) return Promise.resolve({ rows: [] }); // unlink
+    if (s.includes('SELECT account_id, pubkey, linked_at FROM wallet_links'))
+      return Promise.resolve({ rows: walletRows });
+    if (s.includes('DELETE FROM wallet_links WHERE account_id'))
+      return Promise.resolve({ rows: [] }); // unlink
     return Promise.resolve({ rows: [] });
   });
 });
@@ -90,7 +114,9 @@ describe('POST /api/wallet/link/challenge', () => {
     expect(data.message).toContain(w.address);
     expect(data.message).toContain('World of ClaudeCraft');
     // the challenge is persisted with the account + address it was issued for
-    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO wallet_link_challenges'));
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO wallet_link_challenges'),
+    );
     expect(insert?.[1]).toEqual([data.nonce, 1, w.address, data.message, expect.any(String)]);
   });
 
@@ -101,7 +127,7 @@ describe('POST /api/wallet/link/challenge', () => {
 
   it('rate-limits before reading the body or writing challenge rows', async () => {
     for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
-      expect(walletLinkRateLimited(makeReq({}), 1)).toBe(false);
+      expect(walletLinkRateLimited(makeReq({}), 1).allowed).toBe(true);
     }
     dbMock.query.mockClear();
     const { req, wasRead } = makeUnreadableReq();
@@ -120,17 +146,27 @@ describe('POST /api/wallet/link', () => {
     const message = 'link challenge message';
     challengeRows = [{ address: w.address, message }];
     ownerRows = []; // wallet not yet owned by anyone
-    const { status, data } = await call(handleWalletLink, { address: w.address, signature: sign(message, w.priv), nonce: 'n1' });
+    const { status, data } = await call(handleWalletLink, {
+      address: w.address,
+      signature: sign(message, w.priv),
+      nonce: 'n1',
+    });
     expect(status).toBe(200);
     expect(data).toEqual({ pubkey: w.address, linked: true });
-    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO wallet_links'));
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO wallet_links'),
+    );
     expect(insert?.[1]).toEqual([1, w.address]);
   });
 
   it('rejects an expired / already-used challenge with 400', async () => {
     const w = makeWallet();
     challengeRows = []; // consume returns nothing
-    const { status } = await call(handleWalletLink, { address: w.address, signature: sign('x', w.priv), nonce: 'n1' });
+    const { status } = await call(handleWalletLink, {
+      address: w.address,
+      signature: sign('x', w.priv),
+      nonce: 'n1',
+    });
     expect(status).toBe(400);
   });
 
@@ -139,7 +175,11 @@ describe('POST /api/wallet/link', () => {
     const other = makeWallet();
     const message = 'm';
     challengeRows = [{ address: other.address, message }]; // challenge was for a different wallet
-    const { status } = await call(handleWalletLink, { address: w.address, signature: sign(message, w.priv), nonce: 'n1' });
+    const { status } = await call(handleWalletLink, {
+      address: w.address,
+      signature: sign(message, w.priv),
+      nonce: 'n1',
+    });
     expect(status).toBe(400);
   });
 
@@ -148,7 +188,11 @@ describe('POST /api/wallet/link', () => {
     const message = 'the real message';
     challengeRows = [{ address: w.address, message }];
     const forged = sign('a different message', w.priv); // valid sig, wrong payload
-    const { status } = await call(handleWalletLink, { address: w.address, signature: forged, nonce: 'n1' });
+    const { status } = await call(handleWalletLink, {
+      address: w.address,
+      signature: forged,
+      nonce: 'n1',
+    });
     expect(status).toBe(401);
   });
 
@@ -157,11 +201,17 @@ describe('POST /api/wallet/link', () => {
     const message = 'm';
     challengeRows = [{ address: w.address, message }];
     ownerRows = [{ account_id: 999 }]; // owned by a different account
-    const { status, data } = await call(handleWalletLink, { address: w.address, signature: sign(message, w.priv), nonce: 'n1' }, 1);
+    const { status, data } = await call(
+      handleWalletLink,
+      { address: w.address, signature: sign(message, w.priv), nonce: 'n1' },
+      1,
+    );
     expect(status).toBe(409);
     expect(data.error).toMatch(/another account/i);
     // must NOT have attempted the upsert
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links')),
+    ).toBe(false);
   });
 
   it('returns 409 (not 500) on the TOCTOU race: pre-check passes but the INSERT hits a unique violation', async () => {
@@ -176,20 +226,37 @@ describe('POST /api/wallet/link', () => {
     // routing (notably the pubkey pre-check returning NO rows ⇒ check passes).
     dbMock.query.mockImplementation((sql: string) => {
       const s = String(sql).replace(/\s+/g, ' ').trim();
-      if (s.includes('DELETE FROM wallet_link_challenges WHERE nonce')) return Promise.resolve({ rows: challengeRows });
-      if (s.includes('DELETE FROM wallet_link_challenges WHERE expires_at')) return Promise.resolve({ rows: [] });
+      if (s.includes('DELETE FROM wallet_link_challenges WHERE nonce'))
+        return Promise.resolve({ rows: challengeRows });
+      if (s.includes('DELETE FROM wallet_link_challenges WHERE expires_at'))
+        return Promise.resolve({ rows: [] });
       if (s.includes('INSERT INTO wallet_link_challenges')) return Promise.resolve({ rows: [] });
-      if (s.includes('SELECT account_id FROM wallet_links WHERE pubkey')) return Promise.resolve({ rows: [] }); // pre-check passes
-      if (s.includes('INSERT INTO wallet_links')) return Promise.reject(Object.assign(new Error('duplicate key value violates unique constraint "wallet_links_pubkey_key"'), { code: '23505' }));
-      if (s.includes('SELECT account_id, pubkey, linked_at FROM wallet_links')) return Promise.resolve({ rows: walletRows });
-      if (s.includes('DELETE FROM wallet_links WHERE account_id')) return Promise.resolve({ rows: [] });
+      if (s.includes('SELECT account_id FROM wallet_links WHERE pubkey'))
+        return Promise.resolve({ rows: [] }); // pre-check passes
+      if (s.includes('INSERT INTO wallet_links'))
+        return Promise.reject(
+          Object.assign(
+            new Error('duplicate key value violates unique constraint "wallet_links_pubkey_key"'),
+            { code: '23505' },
+          ),
+        );
+      if (s.includes('SELECT account_id, pubkey, linked_at FROM wallet_links'))
+        return Promise.resolve({ rows: walletRows });
+      if (s.includes('DELETE FROM wallet_links WHERE account_id'))
+        return Promise.resolve({ rows: [] });
       return Promise.resolve({ rows: [] });
     });
-    const { status, data } = await call(handleWalletLink, { address: w.address, signature: sign(message, w.priv), nonce: 'n1' }, 1);
+    const { status, data } = await call(
+      handleWalletLink,
+      { address: w.address, signature: sign(message, w.priv), nonce: 'n1' },
+      1,
+    );
     expect(status).toBe(409);
     expect(data.error).toMatch(/another account/i);
     // the pre-check found nothing, so the INSERT was genuinely attempted (the race path)
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links'))).toBe(true);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links')),
+    ).toBe(true);
   });
 
   it('trims surrounding whitespace on the address and still links', async () => {
@@ -205,7 +272,9 @@ describe('POST /api/wallet/link', () => {
     expect(status).toBe(200);
     expect(data).toEqual({ pubkey: w.address, linked: true });
     // the trimmed address, not the padded input, is what gets persisted
-    const insert = dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO wallet_links'));
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO wallet_links'),
+    );
     expect(insert?.[1]).toEqual([1, w.address]);
   });
 
@@ -223,7 +292,9 @@ describe('POST /api/wallet/link', () => {
     );
     expect(status).toBe(400);
     expect(data.error).toMatch(/expired or already used/i);
-    expect(dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links'))).toBe(false);
+    expect(
+      dbMock.query.mock.calls.some((c) => String(c[0]).includes('INSERT INTO wallet_links')),
+    ).toBe(false);
   });
 
   it('rejects missing fields with 400', async () => {
@@ -233,7 +304,7 @@ describe('POST /api/wallet/link', () => {
 
   it('rate-limits before reading the body or consuming challenge rows', async () => {
     for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
-      expect(walletLinkRateLimited(makeReq({}), 1)).toBe(false);
+      expect(walletLinkRateLimited(makeReq({}), 1).allowed).toBe(true);
     }
     dbMock.query.mockClear();
     const { req, wasRead } = makeUnreadableReq();
@@ -267,7 +338,9 @@ describe('DELETE /api/wallet/link', () => {
     const { status, data } = await call(handleWalletUnlink, {});
     expect(status).toBe(200);
     expect(data).toEqual({ unlinked: true });
-    const del = dbMock.query.mock.calls.find((c) => String(c[0]).includes('DELETE FROM wallet_links WHERE account_id'));
+    const del = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('DELETE FROM wallet_links WHERE account_id'),
+    );
     expect(del?.[1]).toEqual([1]);
   });
 });

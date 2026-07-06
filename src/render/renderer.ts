@@ -29,7 +29,7 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
-import { groundHeight, waterLevel, zoneBiomeAt } from '../sim/world';
+import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
@@ -57,6 +57,7 @@ import {
   type FoliagePerfStats,
   type FoliageView,
 } from './foliage';
+import { buildGatherNodes } from './gather_nodes';
 import {
   GFX,
   type GfxBucketBands,
@@ -78,6 +79,7 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
+import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
@@ -1257,6 +1259,12 @@ export class Renderer {
       this.scene.add(this.placedAssetsView.group);
     }
 
+    const gatherNodes = buildGatherNodes(this.sim.cfg.seed);
+    setRenderCategory(gatherNodes.group, 'props');
+    this.scene.add(gatherNodes.group);
+    // Baked into world space at build with no per-frame update(), same as props.
+    freezeStaticMatrices(gatherNodes.group);
+
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
     // frame (see drapeRingLocalY / sync) so it stays legible on slopes instead
@@ -1504,7 +1512,7 @@ export class Renderer {
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
   private surfaceAt(x: number, z: number, y: number): Surface {
     if (x > DUNGEON_X_THRESHOLD) return 'stone'; // dungeon interiors are stone halls
-    const wl = waterLevel();
+    const wl = waterLevelAt(x, z);
     if (groundHeight(x, z, this.sim.cfg.seed) < wl && y <= wl + 0.3) return 'water';
     const biome = zoneBiomeAt(z);
     if (biome === 'vale') return 'grass';
@@ -2818,6 +2826,7 @@ export class Renderer {
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
+        else if (ev.fx === 'lightning') this.vfx.lightningProjectile(ev.sourceId, ev.targetId);
         else if (ev.fx === 'tick') this.vfx.tick(ev.targetId, ev.school);
         else this.vfx.nova(ev.targetId, ev.school);
         // A mob that hurls an instant bolt with NO windup (the warlock
@@ -3601,14 +3610,18 @@ export class Renderer {
 
   // Outdoor fog presets per biome (high tier eases between them as the
   // player crosses zone bands; low keeps the legacy vale fog everywhere).
+  // far/near trimmed from the original release so a zone's own mountains (the
+  // rim wall, the inter-zone ridges) fade into haze instead of standing out
+  // crisp when viewed from the zone's hub/centre; ratio near:far kept roughly
+  // constant per biome so the fog gradient itself doesn't change shape.
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
-    vale: { color: 0xa6c6e0, near: 130, far: 470 },
-    marsh: { color: 0xa3b294, near: 80, far: 330 },
-    peaks: { color: 0xbdd3ec, near: 160, far: 560 },
-    beach: { color: 0xbcd6e6, near: 150, far: 520 },
-    desert: { color: 0xd8c9a8, near: 140, far: 500 },
-    volcano: { color: 0x8a7468, near: 70, far: 300 },
-    cave: { color: 0x76807c, near: 60, far: 260 },
+    vale: { color: 0xa6c6e0, near: 95, far: 340 },
+    marsh: { color: 0xa3b294, near: 60, far: 240 },
+    peaks: { color: 0xbdd3ec, near: 110, far: 390 },
+    beach: { color: 0xbcd6e6, near: 105, far: 370 },
+    desert: { color: 0xd8c9a8, near: 100, far: 360 },
+    volcano: { color: 0x8a7468, near: 50, far: 220 },
+    cave: { color: 0x76807c, near: 45, far: 190 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
@@ -3726,7 +3739,7 @@ export class Renderer {
           ? 'nythraxis'
           : inside
             ? 'dungeon'
-            : camY < waterLevel() - 0.05
+            : camY < waterLevelAt(px, pz) - 0.05
               ? 'underwater'
               : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
@@ -4208,13 +4221,15 @@ export class Renderer {
       }
 
       // swimming pose: prone at the surface (derived here — the sim is unaware).
-      // The cheap feet-depth test gates the expensive terrain-noise sample: an
-      // entity whose feet are above the swim line can't be swimming, so the vast
-      // majority (everyone on land) skip groundHeight() entirely each frame.
+      // waterLevelAt is -Infinity outside a declared lake, so the cheap feet-depth
+      // test also gates entities standing in a dry sunken feature: they can't be
+      // swimming there, and the vast majority (everyone on land) skip
+      // groundHeight() entirely each frame.
+      const wl = waterLevelAt(e.pos.x, e.pos.z);
       const swimming =
         !e.dead &&
-        e.pos.y <= waterLevel() - 0.5 &&
-        groundHeight(e.pos.x, e.pos.z, this.sim.cfg.seed) < waterLevel() - 0.8;
+        e.pos.y <= wl - 0.5 &&
+        groundHeight(e.pos.x, e.pos.z, this.sim.cfg.seed) < wl - 0.8;
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       if (polyed && !v.sheepVisual) {
@@ -4967,10 +4982,36 @@ export class Renderer {
   /**
    * Re-seat the water surface at the ACTIVE waterLevel() and recompute the
    * shoreline depth attribute from the current terrain (after a water-level
-   * edit or a shoreline sculpt). Editor-only.
+   * edit or a shoreline sculpt). A cheap in-place update: it does NOT change
+   * which lakes exist or where they are, only their shared level/shore depth.
+   * Editor-only.
    */
   rebuildWater(): void {
     this.waterView.setLevel();
+  }
+
+  /**
+   * Full water rebuild: dispose every existing lake mesh and rebuild from the
+   * CURRENT `waterBodies()` (declared lake list). Needed after the editor adds,
+   * removes, or moves a lake marker: `rebuildWater()` only reseats existing
+   * meshes in place, so a moved marker would otherwise leave the water mesh,
+   * shader `uCenter`/`uRadius`, and shore-depth attribute at the OLD footprint
+   * while the terrain basin itself has already moved. Editor-only.
+   */
+  rebuildWaterBodies(): void {
+    for (const mesh of this.waterView.meshes) {
+      this.scene.remove(mesh);
+      mesh.geometry.dispose();
+      const mat = mesh.material as THREE.Material | THREE.Material[];
+      if (Array.isArray(mat)) for (const m of mat) m.dispose();
+      else mat.dispose();
+    }
+    this.waterView = buildWater(this.sim.cfg.seed);
+    for (const mesh of this.waterView.meshes) {
+      setRenderCategory(mesh, 'water');
+      this.scene.add(mesh);
+      freezeStaticMatrices(mesh);
+    }
   }
 
   /**
@@ -5103,7 +5144,7 @@ export class Renderer {
               : null;
       // Only at the water's edge / in it — sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
-      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevel() + 0.4;
+      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       sink.ambience(biome, inDungeon, precip, nearWater);
     }
   }
@@ -5181,6 +5222,7 @@ export class Renderer {
     );
     this.raycaster.setFromCamera(ndc, this.camera);
     const hits = this.raycaster.intersectObjects(this.clickTargets, true);
+    const directHitIds: number[] = [];
     for (const hit of hits) {
       let o: THREE.Object3D | null = hit.object;
       while (o) {
@@ -5192,16 +5234,22 @@ export class Renderer {
           const hitView = this.views.get(id);
           if (hitView && !hitView.group.visible) break;
           const e = this.sim.entities.get(id);
-          if (e?.kind === 'object' && !e.lootable) return null;
           // The graveyard angel is hidden from the living, so it must not be
           // click-pickable either (the capsule proxy ignores `visible`): skip it
           // unless the local player is a released spirit.
           if (e?.templateId === 'spirit_healer' && !this.sim.player?.ghost) break;
-          return id;
+          directHitIds.push(id);
+          break;
         }
         o = o.parent;
       }
     }
+    const directPick = resolveDirectPickEntityId(
+      directHitIds,
+      this.sim.entities,
+      this.sim.player.targetId,
+    );
+    if (directHitIds.length > 0) return directPick;
     // Forgiving assist: nothing under the ray, so snap to the nearest
     // targetable character within a small screen radius — chibi proportions
     // and melee scrums (often hidden behind the player's own model) make

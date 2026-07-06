@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "e879a5f6",
+      "state": "71c5bba0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -26,6 +26,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -47,12 +48,18 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -113,8 +120,8 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 412,
-      "state": "1846a7f9",
-      "events": "32297f59",
+      "state": "7f332569",
+      "events": "b2a5ec1f",
       "rng": {
         "draws": 3,
         "digest": "ad960248"
@@ -124,7 +131,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 412,
-      "state": "23f5b519",
+      "state": "36fc28c9",
       "events": "b93c7dc5",
       "rng": {
         "draws": 3,
@@ -135,7 +142,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 412,
-      "state": "6d37cda3",
+      "state": "d5e18f0f",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -146,7 +153,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 412,
-      "state": "8ca25449",
+      "state": "42e1d339",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -157,7 +164,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 412,
-      "state": "11d92fe7",
+      "state": "147d0563",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -168,7 +175,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 412,
-      "state": "7a6fb345",
+      "state": "d94d90d5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -179,7 +186,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 413,
-      "state": "0ed837a3",
+      "state": "e4b8990f",
       "events": "3b915263",
       "rng": {
         "draws": 3,
@@ -189,6 +196,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -214,13 +222,19 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11398,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 198
         }
       ],
@@ -319,7 +333,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 413,
-      "state": "752715f3",
+      "state": "f0d84c9f",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -330,7 +344,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 413,
-      "state": "d67b64a7",
+      "state": "f89e5323",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -340,6 +354,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -365,13 +380,19 @@
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 11398,
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {},
           "xp": 198
         }
       ],

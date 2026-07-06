@@ -142,6 +142,7 @@ const UI_PURE_CORES = [
   'src/ui/options_view.ts',
   'src/ui/vendor_view.ts',
   'src/ui/loot_settings_view.ts',
+  'src/ui/crafting_view.ts',
   'src/ui/market_view.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
@@ -160,6 +161,7 @@ const UI_PURE_CORES = [
   'src/ui/action_bar_view.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
+  'src/ui/gathering_view.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
   'src/ui/window_resize_core.ts',
@@ -168,6 +170,7 @@ const UI_PURE_CORES = [
   'src/ui/live_region_politeness.ts',
   'src/ui/discord_widget_view.ts',
   'src/ui/desktop_update_view.ts',
+  'src/ui/corpse_harvest_view.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));

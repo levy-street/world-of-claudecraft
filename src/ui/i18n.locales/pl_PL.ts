@@ -1121,6 +1121,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'download.desc':
     'Pobierz samodzielny launcher dla zoptymalizowanej wydajności i gry na pełnym ekranie.',
   'download.title': 'Pobierz launcher na komputer',
+  'download.macCta': 'Pobierz dla macOS',
+  'download.windowsPending': 'Build Windows w przygotowaniu.',
   'entities.abilities.adrenaline_rush.description':
     'Twoja krew wrze, natychmiast przywracając 60 energii.',
   'entities.abilities.adrenaline_rush.name': 'Przyspieszona krew',
@@ -1792,6 +1794,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Sierp do Zbioru',
   'entities.items.bronze_sickle.name': 'Brązowy Sierp',
   'entities.items.silverleaf_sickle.name': 'Sierp Srebrnolistny',
+  'entities.items.thorium_mining_pick.name': 'Torowy Kilof Górniczy',
+  'entities.items.arcanite_mining_pick.name': 'Arkanitowy Kilof Górniczy',
+  'entities.items.ashwood_axe.name': 'Siekiera z Jesionu',
+  'entities.items.elderwood_axe.name': 'Siekiera ze Starodrzewu',
+  'entities.items.goldleaf_sickle.name': 'Sierp Złotolistny',
+  'entities.items.sunpetal_sickle.name': 'Sierp Słonecznopłatkowy',
   'entities.items.moongate_rubbing.name': 'Odbitka ochronnego znaku',
   'entities.items.moonpale_scale.name': 'Księżycowoblada łuska',
   'entities.items.moonscale_saber.name': 'Szabla z księżycowej łuski',
@@ -4613,6 +4621,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Resetuj układ przycisków',
   'hudChrome.controller.title': 'Kontroler',
   'hudChrome.controller.vibration': 'Wibracje',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Z tego truchła już wszystko zebrano.',
+  'hudChrome.corpseHarvest.componentAria': 'Zbierz: {component}',
+  'hudChrome.corpseHarvest.components.claw': 'Pazur',
+  'hudChrome.corpseHarvest.components.fang': 'Kieł',
+  'hudChrome.corpseHarvest.components.gills': 'Skrzela',
+  'hudChrome.corpseHarvest.components.hide': 'Skóra',
+  'hudChrome.corpseHarvest.components.horn': 'Róg',
+  'hudChrome.corpseHarvest.components.silk': 'Jedwab',
+  'hudChrome.corpseHarvest.components.tusk': 'Cios',
+  'hudChrome.corpseHarvest.components.venomSac': 'Worek jadowy',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Im mniej części wybierzesz, tym wyższa jakość każdej z nich.',
+  'hudChrome.corpseHarvest.harvestButton': 'Zbierz',
+  'hudChrome.corpseHarvest.title': 'Zbieranie',
   'hudChrome.emoteEditor.done': 'Gotowe',
   'hudChrome.emoteEditor.title': 'Emotki',
   'hudChrome.emoteWheel.edit': 'Edytuj',
@@ -5889,4 +5911,193 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'To, czego dokonałeś w mroku',
   'entities.letters.letter_q_hollow.body':
     'Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric',
+  'hudChrome.gathering.herbalism': 'Zielarstwo',
+  'hudChrome.gathering.logging': 'Wyrąb',
+  'hudChrome.gathering.mining': 'Górnictwo',
+  'hudChrome.gathering.title': 'Zbieractwo',
+  'errors.api.accountSessionLimit': 'Zbyt wiele postaci na tym koncie jest już w świecie.',
+  'errors.api.crossSiteOrigin': 'Żądanie zablokowane ze względów bezpieczeństwa.',
+  'errors.api.unsupportedMediaType': 'Nieobsługiwany format żądania.',
+  'apiError.account.characters_online': 'Wyloguj wszystkie swoje postacie przed dezaktywacją.',
+  'apiError.account.deactivated':
+    'To konto zostało dezaktywowane. Skontaktuj się z administratorem, aby je przywrócić.',
+  'apiError.account.not_found': 'Nie znaleziono konta.',
+  'apiError.account.password_too_long': 'Nowe hasło może mieć maksymalnie 128 znaków.',
+  'apiError.account.password_too_short': 'Hasło musi mieć co najmniej 6 znaków.',
+  'apiError.account.username_invalid':
+    'Nazwa użytkownika musi mieć od 3 do 24 znaków i zawierać litery, cyfry lub podkreślenie.',
+  'apiError.account.username_mismatch': 'Ta nazwa użytkownika nie pasuje do Twojego konta.',
+  'apiError.account.username_not_allowed': 'Ta nazwa użytkownika jest niedozwolona.',
+  'apiError.account.username_taken': 'Ta nazwa użytkownika jest już zajęta.',
+  'apiError.auth.current_password_incorrect': 'Twoje obecne hasło jest nieprawidłowe.',
+  'apiError.auth.forbidden': 'Nie masz uprawnień, aby to zrobić.',
+  'apiError.auth.invalid_credentials': 'Nieprawidłowa nazwa użytkownika lub hasło.',
+  'apiError.auth.password_incorrect': 'Twoje hasło jest nieprawidłowe.',
+  'apiError.auth.required': 'Brak uwierzytelnienia.',
+  'apiError.auth.token_invalid': 'Twoja sesja wygasła. Zaloguj się ponownie.',
+  'apiError.auth.token_missing': 'Musisz być zalogowany, aby to zrobić.',
+  'apiError.auth.too_many_attempts': 'Zbyt wiele prób. Odczekaj minutę i spróbuj ponownie.',
+  'apiError.auth.too_many_failed_attempts':
+    'Zbyt wiele nieudanych prób. Odczekaj kilka minut i spróbuj ponownie.',
+  'apiError.auth.verification_failed': 'Weryfikacja nie powiodła się. Spróbuj ponownie.',
+  'apiError.auth.web_login_only': 'Logowanie jest dozwolone tylko z klienta gry.',
+  'apiError.body.too_large':
+    'To żądanie jest zbyt duże. Spróbuj ponownie z mniejszą ilością danych.',
+  'apiError.body.unsupported_media_type': 'Nieobsługiwany format żądania.',
+  'apiError.character.already_in_world': 'Postać jest już w świecie.',
+  'apiError.character.delete_confirm': 'Wpisz imię postaci, aby potwierdzić usunięcie.',
+  'apiError.character.invalid_class': 'Nieprawidłowa klasa.',
+  'apiError.character.limit_reached': 'Osiągnięto limit postaci.',
+  'apiError.character.name_invalid': 'Nieprawidłowe imię postaci. Użyj od 2 do 16 liter.',
+  'apiError.character.name_not_allowed': 'To imię postaci jest niedozwolone.',
+  'apiError.character.name_taken': 'To imię jest już zajęte.',
+  'apiError.character.not_found': 'Nie znaleziono postaci.',
+  'apiError.character.online': 'Postać jest obecnie online.',
+  'apiError.character.rename_not_permitted': 'Zmiana imienia tej postaci jest niedozwolona.',
+  'apiError.character.rename_required': 'Tę postać trzeba przemianować przed wejściem do świata.',
+  'apiError.character.taken_over': 'Twoją postać przejęła inna sesja.',
+  'apiError.db.conflict': 'Ta zmiana koliduje z inną aktualizacją. Spróbuj ponownie.',
+  'apiError.discord.already_linked': 'To konto Discord jest już połączone z innym kontem.',
+  'apiError.discord.expired':
+    'Logowanie przez Discord wygasło. Zaloguj się ponownie przez Discord.',
+  'apiError.discord.link_required': 'Najpierw połącz swoje konto Discord.',
+  'apiError.discord.not_configured': 'Integracja z Discord jest obecnie niedostępna.',
+  'apiError.discord.password_required': 'Ustaw hasło przed odłączeniem swojego konta Discord.',
+  'apiError.discord.swag_claimed': 'Już odebrałeś tę nagrodę.',
+  'apiError.discord.swag_points': 'Za mało punktów.',
+  'apiError.discord.swag_tier': 'Osiągnij wyższą rangę, aby to odebrać.',
+  'apiError.discord.unknown_swag': 'Ta nagroda jest niedostępna.',
+  'apiError.email.invalid': 'Podaj prawidłowy adres e-mail.',
+  'apiError.email.unchanged': 'To jest już Twój adres e-mail.',
+  'apiError.internal.error': 'Coś poszło nie tak po naszej stronie. Spróbuj ponownie.',
+  'apiError.json.malformed': 'Nie udało się odczytać żądania. Spróbuj ponownie.',
+  'apiError.moderation.banned': 'To konto zostało zbanowane.',
+  'apiError.moderation.force_rename': 'Moderator wymaga zmiany imienia jednej z Twoich postaci.',
+  'apiError.moderation.suspended': 'To konto jest zawieszone.',
+  'apiError.moderation.suspended_until': 'To konto jest zawieszone do {date}.',
+  'apiError.origin.cross_site': 'Żądanie zablokowane ze względów bezpieczeństwa.',
+  'apiError.rate_limit.exceeded': 'Zbyt wiele żądań. Spróbuj ponownie za {seconds}.',
+  'apiError.two_factor.already_enabled': 'Uwierzytelnianie dwuskładnikowe jest już włączone.',
+  'apiError.two_factor.code_invalid': 'Ten kod jest nieprawidłowy, spróbuj ponownie.',
+  'apiError.two_factor.not_enabled': 'Uwierzytelnianie dwuskładnikowe nie jest włączone.',
+  'apiError.two_factor.setup_required':
+    'Najpierw rozpocznij konfigurację uwierzytelniania dwuskładnikowego.',
+  'apiError.validation.failed':
+    'Niektóre pola są nieprawidłowe. Sprawdź formularz i spróbuj ponownie.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Pobierz dla Linuksa',
+  'download.linuxHint':
+    'AppImage: uczyń go wykonywalnym, a następnie uruchom. Nie wymaga instalacji.',
+  'loading.reconnecting': 'Połączenie utracone. Ponowne łączenie...',
+  'guide.nav.settings': 'Ustawienia i wydajność',
+  'guide.settingsPage.advancedBody':
+    'Zaawansowany zaczyna się od poziomu High i odblokowuje cztery dodatkowe selektory, dzięki czemu możesz spędzać klatki tam, gdzie je faktycznie zauważasz: szczegóły terenu, gęstość listowia, efekty i oświetlenie oraz jakość cieni. Podobnie jak jakość grafiki, obowiązują one po przeładowaniu.',
+  'guide.settingsPage.advancedHeading': 'Zaawansowane ustawienie wstępne: miksuj własne',
+  'guide.settingsPage.advancedMixes':
+    'Dwie ulubione kombinacje: ustaw Jakość cienia na High i ustaw Efekty i oświetlenie na Low, aby uzyskać wyraźny, pozbawiony blasku wygląd, ale działając lekko, lub wykonaj odwrotną operację, aby zachować rozkwit i zmiękczyć cienie.',
+  'guide.settingsPage.balancedTagline':
+    'Najlepszy sposób na większość maszyn i nasza domyślna rada.',
+  'guide.settingsPage.balancedTitle': 'Zrównoważony',
+  'guide.settingsPage.balancedWhy':
+    'Medium przynosi prawdziwe cienie i pełne materiały; High dodaje okluzję otoczenia i rozkwit. Poniżej Ultra wbudowana siatka zabezpieczająca pochłania nagłe spadki podczas intensywnych walk, więc Balanced działa płynnie bez konieczności opieki nad dziećmi.',
+  'guide.settingsPage.colDoes': 'Co to robi',
+  'guide.settingsPage.colImpact': 'wpływ FPS',
+  'guide.settingsPage.colSetting': 'Ustawienie',
+  'guide.settingsPage.factDetectBody':
+    'Przy pierwszym uruchomieniu gra odczytuje Twoje urządzenie i wybiera rozsądny poziom, od Low na skromnym telefonie do Ultra na mocnym komputerze stacjonarnym. Każdy wybór, którego sam dokonasz, zawsze wygrywa.',
+  'guide.settingsPage.factDetectTitle': 'Gra najpierw sama się dostraja',
+  'guide.settingsPage.factGovernorBody':
+    'Na każdym poziomie poniżej Ultra gra po cichu przerzedza trawę, efekty i oświetlenie na chwilę, gdy nasili się wielka walka, a następnie je przywraca. Wybranie Ultra mówi, że wolisz zachować każdy szczegół.',
+  'guide.settingsPage.factGovernorTitle': 'Wbudowana siatka zabezpieczająca',
+  'guide.settingsPage.factReloadBody':
+    'Jakość grafiki i selektory Zaawansowane zaczynają działać po ponownym załadowaniu, a w razie potrzeby na panelu znajduje się przycisk Odśwież teraz. Każda inna opcja ma zastosowanie w momencie jej zmiany.',
+  'guide.settingsPage.factReloadTitle': 'Dwa rodzaje opcji',
+  'guide.settingsPage.fairnessBody':
+    'Żadna opcja nie zastąpi piękna w zamian za moc. Ustawienia Lower usuwają tylko kosmetyczne poprawki, nigdy informacje, z którymi walczysz: twoje debuffy, rzucane paski, zdrowie drużyny i liczby obrażeń są identyczne od Low do Ultra. Gra na skromnej maszynie nigdy nie jest utrudnieniem.',
+  'guide.settingsPage.fairnessTitle': 'Uczciwe według projektu',
+  'guide.settingsPage.fpsTagline':
+    'Do starszych laptopów, zintegrowanej grafiki i odtwarzania na baterii.',
+  'guide.settingsPage.fpsTitle': 'Najlepszy FPS',
+  'guide.settingsPage.fpsWhy':
+    'Jakość grafiki to główny przełącznik, a Jakość renderowania to najsilniejszy suwak: przy ustawieniu 70% świat rysuje mniej więcej połowę pikseli, podczas gdy interfejs pozostaje idealnie ostry.',
+  'guide.settingsPage.heading': 'Ustawienia i wydajność',
+  'guide.settingsPage.howHeading': 'Jak zachowują się opcje',
+  'guide.settingsPage.impactHeavy': 'Ciężki',
+  'guide.settingsPage.impactLight': 'Światło',
+  'guide.settingsPage.impactModerate': 'Umiarkowany',
+  'guide.settingsPage.impactNone': 'Nic',
+  'guide.settingsPage.intro':
+    'Spraw, aby gra wyglądała najlepiej lub działała najszybciej. Trzy gotowe zestawy wyposażenia plus to, co naprawdę robi każda opcja graficzna.',
+  'guide.settingsPage.loadoutsHeading': 'Trzy gotowe zestawy wyposażenia',
+  'guide.settingsPage.loadoutsIntro':
+    'Zacznij od wyposażenia, które brzmi jak Twoja maszyna, a następnie dostosowuj jedną opcję na raz, aż poczujesz, że jest właściwa.',
+  'guide.settingsPage.mobileBody':
+    'Urządzenia mobilne zarządzają za Ciebie więcej: gra wybiera poziom, utrzymuje rozdzielczość nieco niższą, aby chronić baterię i ciepło, a najwyższe poziomy utrzymuje tylko na komputerach stacjonarnych. Powyższe wyposażenie nadal obowiązuje; telefony po prostu osiągają szczyt w High.',
+  'guide.settingsPage.mobileTitle': 'Na telefonach i tabletach',
+  'guide.settingsPage.recommended': 'Zalecony',
+  'guide.settingsPage.rowBrightness':
+    'Ekspozycja sceny, ciemniejsza lub jaśniejsza. Czysta preferencja.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Jak fantazyjny może być sam interfejs: rozmycie szkła, poświata, animowane menu. Automatycznie dopasowuje się do Twojej przeglądarki; tak czy inaczej świat 3D pozostaje nietknięty.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloom, okluzja otoczenia oraz ilość pochodni i zaklęć rzucających prawdziwe światło. Największa pojedyncza oszczędność wśród zaawansowanych zbieraczy.',
+  'guide.settingsPage.rowFieldOfView':
+    'Jaka część świata mieści się na ekranie, od powiększenia 55 do 100 stopni. Komfortowy wybór; szersze widoki rysują nieco więcej.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Jak daleko i jak gęsta trawa rośnie wokół twojej postaci.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Rozmazana plama za oknami. Ładne i dokładnie takie, jakie daje słabsza przeglądarka; zostaw to, aby uzyskać klasyczny, wyrazisty wygląd.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Główny wyłącznik. Każdy krok zmienia rozdzielczość, cienie, materiały, listowie i efekty świetlne. Największa pojedyncza różnica, jaką możesz zrobić.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Odczyt na ekranie FPS, czasu trwania klatki i innych informacji. Włącz tę opcję podczas dostrajania tej strony, a następnie ukryj ją ponownie.',
+  'guide.settingsPage.rowReduceMotion':
+    'Usuwa animacje interfejsu, dzięki czemu okna pojawiają się natychmiast. Najpierw opcja dostępności, z niewielką premią za wydajność.',
+  'guide.settingsPage.rowRenderQuality':
+    'Rysuje świat 3D w niższej rozdzielczości wewnętrznej i skaluje go w górę; interfejs pozostaje ostry. Najsilniejszy błyskawiczny suwak na słabszych maszynach i ekranach o wysokiej rozdzielczości.',
+  'guide.settingsPage.rowShadowQuality':
+    'Wyrazistość cieni. Low utrzymuje cienie, ale zmiękcza ich krawędzie.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Bogate, mieszane tekstury podłoża w porównaniu z prostszym, szybszym wyglądem terenu.',
+  'guide.settingsPage.rowWeather':
+    'Deszcz i śnieg w otoczeniu. Tylko atmosfera, a wyłączenie jej trochę oszczędza podczas burz.',
+  'guide.settingsPage.tableFoot':
+    'Szukasz suwaka odległości rysowania lub ograniczenia FPS? Nie ma na co polować: odległość oglądania jest częścią każdego poziomu jakości, a tempo klatek dostosowuje się do wyświetlacza.',
+  'guide.settingsPage.tableHeading': 'Każda opcja wyjaśniona',
+  'guide.settingsPage.tagReload': 'po ponownym załadowaniu',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 do 70%',
+  'guide.settingsPage.value90to100': '90 do 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High na komputerze do gier, Medium na laptopie',
+  'guide.settingsPage.valueOnOptional': 'Włączone (opcjonalnie)',
+  'guide.settingsPage.visualsTagline': 'Tryb zrzutu ekranu dla wydajnych komputerów stacjonarnych.',
+  'guide.settingsPage.visualsTitle': 'Najlepsze efekty wizualne',
+  'guide.settingsPage.visualsWhy':
+    'Ultra renderuje w najwyższej rozdzielczości, jaką oferuje Twój wyświetlacz, z najbogatszym oświetleniem. Wyłącza także siatkę zabezpieczającą i działa tylko na komputerze stacjonarnym: telefony i aplikacja są dostępne o godzinie High.',
+  'guide.settingsPage.wherePath':
+    'Wszystko na tej stronie jest obecne w grze: naciśnij Esc i zajrzyj do opcji Grafika, Interfejs i Nakładka wydajności.',
+  'guide.settingsPage.whyLabel': 'Dlaczego to działa:',
+  'hudChrome.crafting.close': 'Zamknij rzemiosło',
+  'hudChrome.crafting.craft': 'Rzemiosło',
+  'hudChrome.crafting.craftedToast': 'Wykonane: {name}',
+  'hudChrome.crafting.empty': 'Nie są jeszcze znane żadne przepisy.',
+  'hudChrome.crafting.insufficientMaterials': 'Nie masz na to materiałów.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Wymaga:',
+  'hudChrome.crafting.resultAria': 'Craft {name}',
+  'hudChrome.crafting.title': 'Rzemiosło',
+  'hudChrome.crafting.unknownRecipe': 'Ten przepis nie istnieje.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Rzemiosło, które możesz nazwać własnym',
+  'entities.quests.q_archetype_acceptance.text':
+    'Każdy rzemieślnik z Eastbrook ostatecznie decyduje się na jedno rzemiosło, które nazywa swoim własnym. Wykaż się jednym czynem, {playerName}, i zadeklaruj swoją ścieżkę.',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Twoja ścieżka została wybrana; chodź dobrze.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Leśny Wilk zabity',
+  'entities.quests.q_prof_make_amends.title': 'Zadośćuczynienie',
+  'entities.quests.q_prof_make_amends.text':
+    'Aby odłożyć jeden statek na drugi, rzemieślnik musi najpierw zadośćuczynić za ścieżkę, którą nie przeszedł, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Poprawki dokonane; otwiera się przed tobą nowa droga.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Leśny Wilk zabity',
 };

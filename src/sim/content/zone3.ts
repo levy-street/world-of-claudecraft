@@ -101,6 +101,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.95,
     color: 0x8c8270,
+    componentTags: ['hide', 'claw'],
   },
   // The apex of the southern ridge: a grizzled, scar-pelted old cat that has
   // outlived three generations of its pack. A rare elite counterpart to the
@@ -135,6 +136,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.3,
     color: 0x6e6453,
+    componentTags: ['hide', 'fang', 'claw'],
   },
   deeprock_kobold: {
     id: 'deeprock_kobold',
@@ -818,6 +820,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     elite: true,
     canSwim: false,
     ccImmune: true,
+    // A raid boss cannot be perma-snared by a wall of Frostbolts / Hamstrings: slows do
+    // not stick to him (ccImmune already blocks stun/root/etc; slow is separate).
+    slowImmune: true,
     // Raid-tier health: ~20k base at level 20, ~44k after the elite multiplier, a
     // sustained fight for a gathered raid, far above the solo/small-group rares
     // (Varkas and Bound Guardian scale the same way from ~2k / ~1.3k base).
@@ -851,6 +856,22 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       name: 'Seismic Stomp',
       school: 'nature',
     },
+    // Howling Gale: the anti-kite snare. Gale-force winds pin every player within 40yd
+    // to 70% move speed for 6s, re-slammed every 5s (so uptime is permanent while you
+    // stand in the storm, and the snare lingers if you flee the radius). Unlike the
+    // other pulses this one also fires while Thunzharr is CHASING, so a hunter whose
+    // run speed (7) outpaces the boss (5.8) can no longer kite it forever: once snared
+    // to 4.9yd/s the boss (5.8) still closes and the melee, Thunderclap, and Stomp come
+    // online. A gentle 30% snare, not a hard 80% one: it denies a permanent kite without
+    // rooting the raid in place.
+    aoeSlow: {
+      radius: 40,
+      mult: 0.7,
+      duration: 6,
+      every: 5,
+      name: 'Howling Gale',
+      school: 'nature',
+    },
     summonAdds: { mobId: 'thunzharr_stormling', count: 2, atHpPct: [0.66, 0.33] },
     knockback: { chance: 0.3, distance: 7, name: 'Tectonic Heave' },
     stoneskin: { amount: 500, every: 18, duration: 9, name: 'Mountainhide', school: 'nature' },
@@ -873,11 +894,26 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       summon: 'Rise, stormlings! Tear them loose from my slopes!',
       enrage: 'The peak breaks, and the sky falls with it!',
     },
+    // Loud: a mountain-sized voice. Every yell (engage/summon/enrage + these battle
+    // cries) carries 350yd, far past the 100yd default, and he bellows one of these
+    // lines every 9s in combat so the whole of Thornpeak knows he is awake.
+    battleYells: {
+      every: 9,
+      range: 350,
+      lines: [
+        'THUNDER ANSWERS! The peak has teeth again!',
+        'Run, little climbers! The mountain runs faster!',
+        'Every stone remembers your name, and none forgive!',
+        'I am the storm the summit swallowed!',
+      ],
+    },
     enrage: { belowHpPct: 0.2, dmgMult: 1.5, hasteMult: 1.25 },
     // Personal loot table: rolled INDEPENDENTLY for every contributor (see
-    // rollWorldBossLoot). A guaranteed storm trophy, plus one epic Tier-2 set glove
-    // (~32%) and one epic Tier-2 set belt (~32%), each from its own mutually-exclusive
-    // roll group.
+    // rollWorldBossLoot). A guaranteed storm trophy, plus AT MOST ONE epic Tier-2 set
+    // piece. The glove group rolls first at ~32%; the belt group also rolls at ~32% but
+    // the one-gear cap keeps it only when the glove roll missed, so its EFFECTIVE drop
+    // rate is ~22% (0.68 x 0.32) and a single kill never hands out both a glove and a belt.
+    // Keep the glove entries first if this ordering skew is ever retuned.
     loot: [
       { itemId: 'inert_storm_shard', chance: 1 },
       { itemId: 'crownforged_gauntlets', chance: 0.08, rollGroup: 'thunzharr_t2' },
@@ -889,7 +925,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'soulflame_cord', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
       { itemId: 'stormcallers_waistguard', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
     ],
-    scale: 1.7,
+    scale: 8, // a large, imposing world boss that reads on the skyline without being mountain-sized. Visual scale is DECOUPLED from combat reach: his melee is pinned to a ~17yd (scale-5) body in combatProfileForMob (mob_combat.ts), so the Howling Gale snare, not a giant swing, is what keeps him unkitable.
     color: 0x7d8a99,
   },
   // Stormlings: lesser storm elementals Thunzharr tears loose from itself at the
