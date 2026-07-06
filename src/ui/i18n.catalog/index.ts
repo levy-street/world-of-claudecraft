@@ -133,7 +133,7 @@ export const en = {
   },
   stats: {
     title: 'World Status',
-    accountsCreated: 'Players',
+    accountsCreated: 'Total players',
     playersOnline: 'Players Online',
     realmName: 'World Name',
   },
@@ -181,23 +181,21 @@ export const en = {
   },
   mode: {
     onlineTitle: 'Play Online',
-    onlineDesc:
-      "Log in to the world. Your characters live on the server and you share the world with everyone else who's on.",
+    onlineDesc: 'Play on the live server. Your characters are saved online.',
     onlineAria: 'Play Online: log in to the persistent shared world',
     offlineTitle: 'Play Offline',
-    offlineDesc:
-      'Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.',
+    offlineDesc: 'Play a local offline world in your browser. Nothing is saved.',
     offlineAria: 'Play Offline: start an instant local single-player session',
     tipTitle: 'TIP:',
     tipText:
       'For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.',
-    serverOnline: 'Online',
-    serverOffline: 'Offline',
+    serverOnline: 'Server Online',
+    serverOffline: 'Server Offline',
     play: 'Play',
     playAria: 'Play World of ClaudeCraft',
     serverLabel: 'Choose your world',
-    serverAria: 'Select world: Online or Offline',
-    serverOfflineSub: 'Instant local world',
+    serverAria: 'Select server mode: Server Online or Server Offline',
+    serverOfflineSub: 'Local offline world',
     caLabel: '$WOC Contract Address',
     caCopyAria: 'Copy contract address',
     caNote:

@@ -4591,7 +4591,7 @@ async function loadProjectStats(): Promise<void> {
 
   // If cache exists and is fresh (within TTL), use it and skip API request
   if (cached && Date.now() - cached.timestamp < STATS_CACHE_TTL_MS) {
-    setAll(accountEls, String(cached.accounts_created));
+    setAll(accountEls, formatNumber(cached.accounts_created, { maximumFractionDigits: 0 }));
     return;
   }
 
@@ -4599,7 +4599,7 @@ async function loadProjectStats(): Promise<void> {
   try {
     const data = await api.projectStats();
 
-    setAll(accountEls, String(data.accounts_created));
+    setAll(accountEls, formatNumber(data.accounts_created, { maximumFractionDigits: 0 }));
 
     // Save to cache with timestamp
     if (typeof localStorage !== 'undefined') {
@@ -4615,9 +4615,9 @@ async function loadProjectStats(): Promise<void> {
     console.error('Failed to fetch project stats:', err);
     // If API fails, fall back to cached data (even if expired)
     if (cached) {
-      setAll(accountEls, String(cached.accounts_created));
+      setAll(accountEls, formatNumber(cached.accounts_created, { maximumFractionDigits: 0 }));
     } else {
-      setAll(accountEls, '–');
+      setAll(accountEls, '-');
     }
   }
 }

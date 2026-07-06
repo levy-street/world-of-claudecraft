@@ -20,7 +20,10 @@ describe("i18n Translation Foundation", () => {
   it("retrieves English translations by default", () => {
     expect(getLanguage()).toBe("en");
     expect(t("nav.home")).toBe("Home");
+    expect(t("stats.accountsCreated")).toBe("Total players");
     expect(t("stats.playersOnline")).toBe("Players Online");
+    expect(t("mode.serverOnline")).toBe("Server Online");
+    expect(t("mode.serverOffline")).toBe("Server Offline");
     expect(t("footer.copyright")).toBe("2026 World of ClaudeCraft");
     expect(t("footer.githubLabel")).toBe("Open Source Project");
     expect(t("nav.highscores")).toBe("High Scores");

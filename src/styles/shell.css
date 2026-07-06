@@ -1108,8 +1108,8 @@
     color: var(--color-text-muted);
   }
 
-  /* Realm stats, live counts shown in the realm dropdown (trigger sub-line +
-     the opened Online option). */
+  /* Realm stats shown in the server selector (trigger sub-line +
+     the opened Server Online option). */
   .realm-status-sep {
     display: inline-block;
     width: 1px;
@@ -1118,18 +1118,15 @@
     vertical-align: middle;
     background: rgba(255, 209, 0, 0.3);
   }
-  .server-realm-line .stats-value,
-  .server-opt-stats .stats-value {
-    font-family: var(--font-ui);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--color-text-light);
-    margin-right: 2px;
+  .server-realm-line,
+  .server-opt-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
   }
   .server-opt-stats {
-    display: block;
-    margin-top: 6px;
-    font-size: 12px;
+    margin-top: 8px;
+    font-size: 13px;
     color: var(--color-text-muted);
   }
   .server-realm-line[hidden],
@@ -1938,10 +1935,10 @@
   .server-select-trigger {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     width: 100%;
-    min-height: 58px;
-    padding: 10px 16px;
+    min-height: 66px;
+    padding: 13px 18px;
     cursor: var(--cursor-point);
     text-align: left;
     color: var(--color-text-light);
@@ -1968,8 +1965,8 @@
   }
   .server-dot {
     flex: none;
-    width: 10px;
-    height: 10px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     background: var(--color-text-muted);
     box-shadow: 0 0 8px currentColor;
@@ -1987,21 +1984,40 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 3px;
   }
   .server-select-value {
     font-family: var(--font-ui);
     font-weight: 700;
-    font-size: 16px;
+    font-size: 18px;
+    word-spacing: 2px;
     color: var(--color-text-light);
-    line-height: 1.2;
+    line-height: 1.25;
   }
   .server-select-sub {
-    font-size: 12px;
+    font-size: 13.5px;
     color: var(--color-text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: normal;
+  }
+  .server-stat-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1;
     white-space: nowrap;
+  }
+  .server-stat-line .stats-value {
+    font-family: var(--font-ui);
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-text-light);
+  }
+  .server-stat-line span {
+    font-family: var(--font-ui);
+    line-height: 1;
   }
   .server-select-chevron {
     flex: none;
@@ -2053,9 +2069,9 @@
   .server-select-option {
     display: flex;
     align-items: flex-start;
-    gap: 11px;
-    padding: 11px 12px;
-    min-height: 44px;
+    gap: 13px;
+    padding: 13px 14px;
+    min-height: 52px;
     border-radius: var(--radius-sm);
     cursor: var(--cursor-point);
     transition: background var(--transition-speed) var(--transition-ease);
@@ -2082,11 +2098,12 @@
   .server-opt-name {
     font-family: var(--font-ui);
     font-weight: 700;
-    font-size: 14.5px;
+    font-size: 16px;
+    word-spacing: 1.5px;
     color: var(--color-text-light);
   }
   .server-opt-desc {
-    font-size: 12px;
+    font-size: 12.5px;
     line-height: 1.45;
     color: var(--color-text-muted);
   }
