@@ -763,8 +763,8 @@ describe('delve reward chest + surface exit flow', () => {
     enterReliquary(sim);
     const run = sim.delveRunForPlayer(sim.playerId)!;
     // Pin the normal (non-Bountiful) chest so these fixtures aren't at the mercy of
-    // the ultra-rare roll (seed 42 happens to roll Bountiful). The Bountiful-Coffer
-    // tests below opt back in explicitly with `run.bountiful = true`.
+    // the ultra-rare roll (which shifts with any world-content change). The
+    // Bountiful-Coffer tests below opt back in explicitly with `run.bountiful = true`.
     run.bountiful = false;
     // Jump straight to the finale as the only module
     run.modules = ['reliquary_finale'];
@@ -946,7 +946,10 @@ describe('delve reward chest + surface exit flow', () => {
 
   it('the Bountiful roll is deterministic for a given seed', () => {
     // Read the raw roll via enterReliquary (enterFinale pins it false). Same seed
-    // ⇒ same outcome; seed 42 is known to roll Bountiful (drives the fixtures above).
+    // ⇒ same outcome. The known-true seed shifts whenever world content changes
+    // the shared draw stream (the Mirror World moved it 42 → 24 → 48, and the
+    // mirror-camp density bump moved it back to 24); re-probe on the next content
+    // change rather than weakening the pin.
     const rollFor = (seed: number) => {
       const s = makeSim('warrior', seed);
       s.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
@@ -954,7 +957,7 @@ describe('delve reward chest + surface exit flow', () => {
       return s.delveRunForPlayer(s.playerId)?.bountiful;
     };
     expect(rollFor(1234)).toBe(rollFor(1234));
-    expect(rollFor(42)).toBe(true);
+    expect(rollFor(24)).toBe(true);
   });
 
   it('a Bountiful Coffer refuses the lower antes and only opens at Hard-tier + Premium ante', () => {
@@ -2376,15 +2379,20 @@ describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
       enterLitany(sim, 'normal');
       const run = enterModule(sim, 'litany_baptistry');
       run.affixes = affixes;
-      run.blackwaterTimer = 0;
       const h = DELVE_MODULES.litany_baptistry.hazards![0];
       const zBase = delveModuleZOffset(run.modules, 0);
       const p = sim.player;
       p.pos.x = run.origin.x + h.x;
       p.pos.z = run.origin.z + zBase + h.z;
       p.prevPos = { ...p.pos };
+      // Fire exactly one Blackwater pulse and measure only that pulse. The old
+      // fixed 20-tick window (one pulse interval) was fragile to the delve run's
+      // timer PHASE: content additions shift it, letting a second unbuffed pulse
+      // land in the window and dilute the high_water multiplier. Priming the
+      // timer isolates a single pulse so the +35% is measured cleanly.
+      run.blackwaterTimer = 1e6;
       const hp0 = p.hp;
-      for (let i = 0; i < 20; i++) sim.tick();
+      sim.tick();
       return hp0 - p.hp;
     };
     const base = pulse([]);

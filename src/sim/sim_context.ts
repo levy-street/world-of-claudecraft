@@ -547,6 +547,9 @@ export interface SimContextCallbacks {
   // predicate. unlockMechChromaFromItem's return value flows out through useItem to the
   // server `use` case (result?.type === 'mechChroma').
   startFishing(p: Entity, meta: PlayerMeta): void;
+  // Deepdream consumables (items.ts 'slumber' / 'mirrorShard' use branches).
+  startSlumber(pid: number): void;
+  consumeMirrorShard(pid: number): void;
   unlockMechChromaFromItem(
     meta: PlayerMeta,
     itemId: string,
@@ -908,6 +911,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     spawnDevBot: host.spawnDevBot,
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: host.startFishing,
+    // Dream engine (the state lives on Sim; the host literal pre-binds these).
+    startSlumber: host.startSlumber,
+    consumeMirrorShard: host.consumeMirrorShard,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,
     openSkinSelect: host.openSkinSelect,
     isSwimming: host.isSwimming,

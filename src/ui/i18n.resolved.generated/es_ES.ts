@@ -3747,6 +3747,7 @@ export const es_ES: EnTranslations = {
       "eatingDrinking": "Comiendo y bebiendo...",
       "secondsRemaining": "Quedan {seconds} segundos",
       "enteringZone": "Entrando en {zone}.",
+      "deepdreamZone": "El Sueño Profundo",
       "welcomeZone": "¡Bienvenido a {zone}!",
       "levelBanner": "¡Nivel {level}!",
       "levelLog": "Has alcanzado el nivel {level}.",
@@ -4388,6 +4389,13 @@ export const es_ES: EnTranslations = {
       "nythraxisDeathlessKingWarning": "Las tres reliquias cuentan la misma historia: Aldren luchó para defender a su rey, Malric rompió el límite de la muerte y Voss intentó detener lo que vino después. El sello se debilita, y la cripta abandonada es el camino hacia abajo.",
       "browseGoods": "Déjame ver tus mercancías.",
       "browseGoodsAria": "Ver mercancías de {name}",
+      "brewDraught": "Prepárame un Bebedizo del Sueño Profundo.",
+      "brewDraughtAria": "Pedir a {name} que prepare un Bebedizo del Sueño Profundo",
+      "gargoyleBow": "Inclinarse.",
+      "gargoyleBowAria": "Inclinarse ante {name}",
+      "gargoyleAttack": "Atacar.",
+      "gargoyleAttackAria": "Atacar a {name}",
+      "gargoyleShimmer": "La estatua reverbera de energía...",
       "worldMarket": "Muéstrame el Mercado Mundial.",
       "worldMarketAria": "Abrir el Mercado Mundial",
       "accept": "Aceptar",
@@ -5867,6 +5875,45 @@ export const es_ES: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Hoz de Pétalo Solar"
       },
+      "white_sheet": {
+        "name": "Sábana Blanca"
+      },
+      "spirit_horn": {
+        "name": "Cuerno Espiritual"
+      },
+      "black_hood": {
+        "name": "Capucha Negra"
+      },
+      "deepdream_draught": {
+        "name": "Bebedizo del Sueño Profundo"
+      },
+      "mirror_shard": {
+        "name": "Esquirla de Espejo"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Espadaespejo Fantasmal"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Mantomortaja Fantasmal"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Coraza Espectral"
+      },
+      "ghostly_palegrips": {
+        "name": "Guantes Pálidos Fantasmales"
+      },
+      "ghostly_hushboots": {
+        "name": "Botas Silentes Fantasmales"
+      },
+      "ghostly_glasscord": {
+        "name": "Cíngulo de Vidrio Fantasmal"
+      },
+      "warden_sigil": {
+        "name": "Sigilo del Guardián"
+      },
+      "drowned_lumen": {
+        "name": "Lumen Ahogado"
+      },
       "bristleback_maul": {
         "name": "Martillo Gallowglass"
       },
@@ -6667,6 +6714,36 @@ export const es_ES: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Elemental de tormenta despierto"
       },
+      "spirit_unicorn": {
+        "name": "Unicornio Espiritual"
+      },
+      "hooded_reaper": {
+        "name": "Segador"
+      },
+      "mistshade_lurker": {
+        "name": "Acechador de la bruma"
+      },
+      "gloaming_maw": {
+        "name": "Las Fauces del Ocaso"
+      },
+      "poverty_ghost": {
+        "name": "Fantasma de la Pobreza"
+      },
+      "player_echo": {
+        "name": "Eco"
+      },
+      "gargoyle_awakened": {
+        "name": "Centinela Gárgola"
+      },
+      "gloomhulk": {
+        "name": "Brutopenumbra"
+      },
+      "mirrorbound_sentry": {
+        "name": "Centinela Especular"
+      },
+      "voidfang_stalker": {
+        "name": "Acechador Pálmillo"
+      },
       "ironvein_foreman": {
         "name": "Capataz Vena de Hierro"
       },
@@ -6896,6 +6973,51 @@ export const es_ES: EnTranslations = {
         "name": "El Guardián Pálido",
         "title": "Custodio de los Muertos",
         "greeting": "Descansa, espíritu. Puedo devolverte a tu cuerpo, pero el cruce de vuelta te deja débil."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa la Insomne",
+        "title": "Guardiana Espectral de la Corona Lumen",
+        "greeting": "Guardé la Corona de Lumen en vida, y la Corona mantiene honesto el cristal: cada espejo de este valle muestra algo verdadero, salvo uno. La muerte no me ha eximido del puesto, {playerName}, porque ese aún no deja de presionar. La luz de la Corona se apaga, y donde falla, el valle se filtra. Cuida por qué lado del cristal caminas. Últimamente le cuesta distinguirlo."
+      },
+      "veilwright_ollo": {
+        "name": "Velero Ollo",
+        "title": "Tratante del Mercado Velado",
+        "greeting": "Abrigos de muertos, suspiros embotellados, precios honrados: el velo provee. Cuanto hay en mi tabla lo dejó alguien que ya no posee nada; el truco está en distinguir de qué han terminado los muertos y qué aún aferran. Yérralo, y vienen al puesto a medianoche. Pregunta a la Guardiana por la luz del pozo, si quieres la versión triste. Yo solo vendo los abrigos."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen la Bruja de la Bruma",
+        "title": "Destiladora de sueños de la Hondonada",
+        "greeting": "La bruma mantiene despiertos a los tuyos. Yo puedo prepararte el otro sueño: el que responde."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Centinela Gárgola",
+        "title": "Guardián del Espejo",
+        "greeting": "Los ojos de piedra chirrían hacia ti. Está escuchando."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Centinela Gárgola",
+        "title": "Guardián del Espejo",
+        "greeting": "Los ojos de piedra chirrían hacia ti. Está escuchando."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Centinela Gárgola",
+        "title": "Guardián del Espejo",
+        "greeting": "Los ojos de piedra chirrían hacia ti. Está escuchando."
+      },
+      "dread_sentinel_a": {
+        "name": "Centinela Pavoroso",
+        "title": "Guardián del Espejo Sable",
+        "greeting": "Tu muerte te aguarda."
+      },
+      "dread_sentinel_b": {
+        "name": "Centinela Pavoroso",
+        "title": "Guardián del Espejo Sable",
+        "greeting": "Guardamos la calzada en vida. La guardamos aún."
+      },
+      "dread_sentinel_c": {
+        "name": "Centinela Pavoroso",
+        "title": "Guardián del Espejo Sable",
+        "greeting": "Vuelve atrás. El cristal negro no es para los vivos... ni lo fue jamás para nosotros."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const es_ES: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "Una receta para el sueño profundo",
+        "text": "El bebedizo pide tres voces, {playerName}: dos sábanas blancas de los fantasmas de la pobreza que no poseen otra cosa, dos cuernos de los unicornios espirituales que pastan en la penumbra, y dos capuchas cortadas a los segadores que vigilan el cinturón. Tráemelos y te herviré un sueño con dientes.",
+        "completion": "Sábana, cuerno, capucha — los pobres, los radiantes, los pacientes. Al caldero le caes bien. Bébelo en un lugar blando, caminante: conocerás a quien llevas dentro.",
+        "objectives": {
+          "0": {
+            "label": "Sábana Blanca"
+          },
+          "1": {
+            "label": "Cuerno Espiritual"
+          },
+          "2": {
+            "label": "Capucha Negra"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Enfréntate a tu Eco",
+        "text": "Bebe el bebedizo y el sueño pondrá un espejo ante ti: tu Eco, cada cicatriz y cada truco tuyo al otro lado. Vence lo que eres, {playerName}, y tráeme la cara que se te quede.",
+        "completion": "Volviste, y el espejo no. Lo que te haya dejado en la mano es tuyo: el sueño solo paga ese precio una vez.",
+        "objectives": {
+          "0": {
+            "label": "Tu Eco derrotado"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "El Peaje del Guardián",
+        "text": "El destello se resuelve en palabras tras tus ojos: los segadores atestan mi cristal, {playerName}. Diézmalos, y el camino a Highwatch será tuyo.",
+        "completion": "La piedra zumba una vez, satisfecha. Tras ella, el espejo se aclara como un aliento contenido al fin liberado.",
+        "objectives": {
+          "0": {
+            "label": "Segador abatido"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "Un Peaje de Sábanas",
+        "text": "El destello se resuelve en palabras tras tus ojos: tráeme cuatro sábanas blancas de los pobres muertos, {playerName}. El camino a Eastbrook se abre para quien paga en tela.",
+        "completion": "Las sábanas se hunden en la piedra y desaparecen. El espejo tras ella despierta con luz.",
+        "objectives": {
+          "0": {
+            "label": "Sábana Blanca"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Resplandor Segado",
+        "text": "El destello se resuelve en palabras tras tus ojos: las manadas espirituales arden demasiado para el cristal, {playerName}. Abate cinco, y Fenbridge estará a un paso.",
+        "completion": "La piedra bebe la luz que derramaste. El espejo tras ella se abre como un ojo.",
+        "objectives": {
+          "0": {
+            "label": "Unicornio Espiritual abatido"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "La Radiancia Menguante",
+        "text": "Sientes mi frío y me tomas por una leyenda. Soy un puesto, {playerName}. La Corona de Lumen que guardé no es un aro de oro: es la luz de cada espejo de aquí, la juntura que mantiene a vivos y muertos en reflejos separados para que ninguno ahogue al otro. Esa luz falla, y se ve en los Centinelas Reflejados: antes eran la propia radiancia de la Corona haciendo guardia; ahora son cristal repleto de luz robada, atestando las ruinas del norte porque la juntura ya no les dice dónde plantarse. Rompe ocho. Cada esquirla que disperses es un poco de luz devuelta, y un poco de prueba de que se te puede confiar el resto.",
+        "completion": "Las esquirlas regresan flotando hacia el pozo como nieve que cae hacia arriba, y por un aliento el valle entero es un matiz más claro. No durará. Pero tú reparas junturas en vez de cortarlas, {playerName}: eso es más raro aquí de lo que crees. También rompiste la OTRA corona, ¿verdad? La de hierro, bajo Thornpeak. Entonces, por primera vez en trescientos años, esta luz quizá vuelva. Quédate. El valle lleva mucho esperando manos que cierren heridas.",
+        "objectives": {
+          "0": {
+            "label": "Centinela Reflejado destrozado"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Lo que los Pobres Aún Guardan",
+        "text": "Los Fantasmas de la Pobreza de la orilla sur nada tuvieron en vida, {playerName}: nada salvo la sábana en que los enterraron, porque la parroquia no podía costear ataúd. Ahora la luz de la Corona es demasiado tenue para soltar su asidero, y vagan aferrando lo único que jamás fue suyo. No lo tomes por crueldad; es amor sin dónde ponerse. Tráeme cinco de sus sábanas. Posaré cada una en el pozo y diré el nombre que fue demasiado pobre para ser tallado. En eso consiste el rito entero: ser pobre, y muerto, y aún así llamado por su nombre.",
+        "completion": "Cinco sábanas, cinco nombres. Los digo al pozo y el agua los recoge como una madre retira el abrigo de un niño dormido. Los fantasmas de la orilla son menos esta noche, {playerName}: no muertos, liberados. Esto hacía la Corona entera: sostenía a los muertos lo bastante cerca para poder soltarlos. Ahora lo hacemos a mano, tú y yo, cinco nombres cada vez. Es más lento. No es nada.",
+        "objectives": {
+          "0": {
+            "label": "Sábana Blanca"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "Los Nombres de los Guardianes",
+        "text": "A los tres que rondan el Cañón Negro los llaman Centinelas Pavorosos quienes huyen de ellos. Yo los llamé una vez por su nombre: eran mi orden, {playerName}, los últimos hombres que sostuvieron en vida la calzada del Espejo Sable, y nunca se retiraron, ni siquiera cuando sus corazones lo hicieron. Ninguna hoja los libra ya; el cristal negro los cabalga demasiado hondo para caer. Pero ese cristal se ha filtrado de los guardianes a los segadores que atestan la calzada, y con los largos años los segadores han arrancado sueltos los sigilos de los guardianes. Tráeme tres, cortados de los segadores del cañón, para que diga los tres nombres en voz alta una última vez.",
+        "completion": "Corwin. Aldous. Brenna. Ya está: dichos, y decirlo pesa menos que sostenerlo jamás. Pronto podrán detenerse; yo me encargaré. Pero atenta a lo que se acerca, {playerName}: los sigilos arrancados sueltos significan que el cristal de esa calzada adelgaza, y la herida en su extremo ha esperado exactamente esto. Debo reavivar la Corona y apuntalar el Sable antes de que algo del otro lado note que la puerta se queda desnuda. Hay una última cosa que necesito, y está bajo el agua negra.",
+        "objectives": {
+          "0": {
+            "label": "Sigilo del Guardián"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Lo que el Cristal Quiere",
+        "text": "Venciste a tu Eco y lo creíste una prueba de ti mismo, {playerName}. No lo era. Yo destilo el Sueño Profundo de sábana, cuerno y capucha, pero aquello contra lo que tu sueño alzó un espejo, la cosa que entró vistiendo tu cara, eso no lo destilo yo. Se filtra, del cristal negro del cañón. Los segadores que atestan la boca del cañón están espesos de la misma filtración; abate ocho y observa hacia dónde reptan sus sombras. Entonces mostraré a los propios ojos de Nerissa dónde sangra de veras su herida.",
+        "completion": "Al noreste. Siempre al noreste, siempre hacia el Sable, ¿lo viste? Tu Eco no era TÚ, viajero. Era una esquirla de lo que sea que vive tras esa puerta, vestida con el reflejo más cercano que pudo robar: el tuyo. El sueño no es más que el punto más fino que ha hallado la filtración; el cañón es el más ancho. Díselo a Nerissa. Ella se ha ganado la verdad de ello, y tú también.",
+        "objectives": {
+          "0": {
+            "label": "Segador abatido en la boca del cañón"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Reavivar la Corona de Lumen",
+        "text": "Los guardianes tienen nombre y la calzada adelgaza, así que debo hacer ahora lo que he postergado desde que morí: encender la Corona de Lumen una última vez y presionar el Sable cerrado desde este lado. La última chispa verdadera de la Corona la tragó las Fauces del Ocaso cuando cayó en el estanque; por eso la cosa brilla por dentro. Recórtale de nuevo la luz, {playerName}. El cristal negro enviará sus moles lóbregas a detener el rito; abate a cuatro. Tráeme una chispa ahogada mientras aún recuerdo cómo sostener una. El último deber de un guardián es volverse alguien que ya no necesita guardar.",
+        "completion": "Arde. Tras toda esta oscuridad, aún conoce mi mano. Mira: el cristal es VERDADERO de nuevo; sin latido tras el agua, sin alma perdida entre un mundo y su reflejo. Y el peso al fin se me ha ido. No me desvanezco, {playerName}; me RELEVAN. Esto no es romper el Sable, solo sostenerlo; no tengo fuerza para romper lo que aguarda ahí, y no me atrevería. Pero sostenido una edad más, está sostenido. Cuando una compañía más valiente que nosotros al fin cruce ADENTRO de esa puerta, hallarán listo el otro lado. Diles en Highwatch que su guardiana montó la vigilia hasta el final, y luego fue relevada. El cristal te recordará. Cuida de darle algo digno de reflejar.",
+        "objectives": {
+          "0": {
+            "label": "Las Fauces del Ocaso abatidas"
+          },
+          "1": {
+            "label": "Lumen Ahogado"
+          },
+          "2": {
+            "label": "Mole Lóbrega quebrada"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "El Coro Ahogado",
         "text": "Los vadeadores no actúan solos. Entre ellos caminan los Devotos Ahogados: la secta que se hundió con el templo, aún con sus vestiduras putrefactas, aún entonando la plegaria desde las rocas de la orilla. Silencia a ocho de ellos y tráeme seis de las ofrendas que portan. Quiero saber qué pretenden entregar a su diosa.",
@@ -7870,6 +8104,48 @@ export const es_ES: EnTranslations = {
           },
           "9": {
             "label": "Santuario del Gravewyrm"
+          },
+          "10": {
+            "label": "La Puerta del Espejo"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "El Mundo Espejo",
+        "welcome": "El cristal te recuerda. Cuida de qué lado de él caminas.",
+        "pois": {
+          "0": {
+            "label": "El Mundo Espejo"
+          },
+          "1": {
+            "label": "Plaza de la Puerta del Espejo"
+          },
+          "2": {
+            "label": "La Corona de Lumen"
+          },
+          "3": {
+            "label": "El Mercado Velado"
+          },
+          "4": {
+            "label": "El Archivo Silente"
+          },
+          "5": {
+            "label": "El Lago Espejo"
+          },
+          "6": {
+            "label": "El Pantano Brumoso"
+          },
+          "7": {
+            "label": "Hondonada de la Bruja"
+          },
+          "8": {
+            "label": "Espejo de Eastbrook"
+          },
+          "9": {
+            "label": "Espejo de Fenbridge"
+          },
+          "10": {
+            "label": "el Cañón Negro"
           }
         }
       }

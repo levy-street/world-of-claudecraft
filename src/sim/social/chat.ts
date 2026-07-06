@@ -142,8 +142,9 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   }
 
   if (ctx.devCommands) {
-    // null means "handled, nothing to broadcast": returning it here is what
-    // keeps a dev command from falling through to the unknown-command error.
+    // null = handled with no channel message (the contract), undefined = not a
+    // dev command. Returning only on non-null sent every HANDLED command
+    // tumbling into the unknown-command error below — it ran, then said it didn't.
     const devHandled = handleDevChat(ctx, raw, r.meta.entityId);
     if (devHandled !== undefined) return devHandled;
   }

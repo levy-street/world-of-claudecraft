@@ -43,6 +43,20 @@ async function glbAnimationNames(path: string): Promise<Set<string>> {
   );
 }
 
+async function glbNodeNames(path: string): Promise<Set<string>> {
+  await MeshoptDecoder.ready;
+  const io = new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+  const doc = await io.read(path);
+  return new Set(
+    doc
+      .getRoot()
+      .listNodes()
+      .map((node) => node.getName()),
+  );
+}
+
 describe('character visual manifest', () => {
   it('uses the custom boar death clip without relying on a speed override', () => {
     expect(VISUALS.mob_boar.clips.death).toBe('Dying');
@@ -80,5 +94,41 @@ describe('character visual manifest', () => {
       'models/weapons/dagger.glb',
       'models/weapons/dagger.glb',
     ]);
+  });
+
+  // The Mirror World's Tripo quadrupeds ship only a 'Walk' clip, so their swing is
+  // a procedural bone overlay (visual.ts) instead of a baked Attack clip. Lock in
+  // the wiring: the tag, the walk-only clip set, and — the load-bearing bit — that
+  // the head/spine bone chain the overlay curls actually exists in each GLB.
+  describe('procedural attack (walk-only quadrupeds)', () => {
+    const QUADS = [
+      { key: 'mob_maw', kind: 'chomp' },
+      { key: 'mob_voidfang', kind: 'lungeBite' },
+      { key: 'mob_unicorn', kind: 'gore' },
+    ] as const;
+
+    it('tags each walk-only quad with a procedural attack kind and no real Attack clip', () => {
+      for (const { key, kind } of QUADS) {
+        const visual = VISUALS[key];
+        expect(visual.proceduralAttack, key).toBe(kind);
+        // WALK_ONLY_QUAD_CLIPS points every slot (incl. attack) at the walk cycle.
+        expect(visual.clips.attack, key).toEqual([visual.clips.walk]);
+      }
+    });
+
+    it('each quad GLB ships Walk only and carries the driven tripoHead/tripoSpine chain', async () => {
+      for (const { key } of QUADS) {
+        const url = `public/${VISUALS[key].url}`;
+        const anims = await glbAnimationNames(url);
+        expect([...anims], `${key} clips`).toContain('Walk');
+        expect(anims.has('Attack'), `${key} must have no baked Attack`).toBe(false);
+        // resolveProcAttack() curls the tripoHead_* chain (+ tripoSpine_*); if a
+        // re-export renamed/dropped these, the swing would silently no-op.
+        const nodes = await glbNodeNames(url);
+        expect(nodes.has('tripoHead_0'), `${key} tripoHead_0`).toBe(true);
+        expect(nodes.has('tripoHead_1'), `${key} tripoHead_1`).toBe(true);
+        expect(nodes.has('tripoSpine_0'), `${key} tripoSpine_0`).toBe(true);
+      }
+    });
   });
 });

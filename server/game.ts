@@ -584,6 +584,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
+  if (e.mirrorClass) out.mc = e.mirrorClass; // Deepdream Echo → wear this class model
   return out;
 }
 
@@ -2631,6 +2632,17 @@ export class GameServer {
           this.resyncQuests(session);
         }
         break;
+      case 'brew_draught':
+        // Morwen's repeatable Deepdream brew — fully validated in the sim
+        // (recipe quest done, witch proximity, 2/2/2 parts in bags).
+        sim.brewDraught(pid);
+        break;
+      case 'gargoyle_bow':
+        sim.bowToGargoyle(pid);
+        break;
+      case 'gargoyle_wake':
+        sim.wakeGargoyle(pid);
+        break;
       case 'qlinkaccept':
         if (typeof msg.quest === 'string' && typeof msg.from === 'number') {
           sim.acceptLinkedQuest(msg.quest, msg.from, pid);
@@ -3678,6 +3690,7 @@ export class GameServer {
       maybe('cosmetics', anchorSession.accountCosmetics);
       maybe('qlog', [...meta.questLog.values()]);
       maybe('qdone', [...meta.questsDone]);
+      maybe('bowed', [...meta.bowedGargoyles]);
       maybe('milestones', [...meta.unlockedMilestones]);
       // talents/spec/loadouts: the client recomputes its known abilities from this.
       maybe('tal', {
@@ -4393,6 +4406,7 @@ export class GameServer {
   private resyncQuests(session: ClientSession): void {
     delete session.lastSent.qlog;
     delete session.lastSent.qdone;
+    delete session.lastSent.bowed;
     session.selfHeavyDirty = true; // ensure the gated heavy block re-runs next snapshot
   }
 

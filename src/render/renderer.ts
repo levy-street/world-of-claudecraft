@@ -7,6 +7,8 @@ import {
   arenaOrigin,
   CLASSES,
   DELVE_MODULE_Z_START,
+  DREAM_X,
+  DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   defaultDelveModules,
@@ -20,6 +22,7 @@ import {
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isDreamPos,
   MOBS,
   NPCS,
   WORLD_MAX_Z,
@@ -47,7 +50,7 @@ import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
-import { buildDoorBody } from './door_portal';
+import { buildDoorBody, buildMirrorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
@@ -73,6 +76,7 @@ import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import { buildMailboxPillar } from './mailbox';
+import { buildMist, type MistView } from './mist';
 import { buildMotes, type MotesView } from './motes';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { NameplatePainter } from './nameplate_painter';
@@ -88,6 +92,7 @@ import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
+import { buildSealife, type SealifeView } from './sealife';
 import { drapeRingLocalY } from './selection_ring';
 import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import { buildClouds, buildSky, type SkyView } from './sky';
@@ -671,12 +676,194 @@ function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCateg
 
 function isPersistentPortalObject(e: Entity): boolean {
   return (
-    e.kind === 'object' && (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
+    e.kind === 'object' &&
+    (e.templateId === 'dungeon_door' ||
+      e.templateId === 'dungeon_exit' ||
+      e.templateId === 'portal_pad')
   );
 }
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
+}
+
+// Deterministic PRNG for Mirror World sky placement — the render convention
+// forbids Math.random (see sealife.ts). Seeded off a fixed constant so the
+// asteroid field is identical every session.
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Paint one Mirror World asteroid: an irregular basalt-violet glass chip with a
+// single cold-silver moonlit rim (sun-facing) and an occasional warm fleck.
+// NormalBlending so the solid chip occludes the stars behind it as it drifts.
+function makeAsteroidTexture(rng: () => number, warm: boolean): THREE.CanvasTexture {
+  const S = 64;
+  const cx = 32;
+  const cy = 32;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const x = c.getContext('2d')!;
+  const n = 8 + Math.floor(rng() * 4);
+  x.beginPath();
+  for (let i = 0; i < n; i++) {
+    const ang = (i / n) * Math.PI * 2;
+    const r = 11 + rng() * 9;
+    const px = cx + Math.cos(ang) * r;
+    const py = cy + Math.sin(ang) * r * (0.7 + rng() * 0.5);
+    if (i === 0) x.moveTo(px, py);
+    else x.lineTo(px, py);
+  }
+  x.closePath();
+  // dark glass body
+  x.fillStyle = '#201c33';
+  x.fill();
+  x.save();
+  x.clip();
+  // cold silver moonlit rim on the upper-right (the shared sun side)
+  const g = x.createRadialGradient(cx + 11, cy - 11, 1, cx + 11, cy - 11, 28);
+  g.addColorStop(0, 'rgba(222,232,252,1)');
+  g.addColorStop(0.4, 'rgba(170,188,230,0.55)');
+  g.addColorStop(1, 'rgba(120,136,196,0)');
+  x.fillStyle = g;
+  x.fillRect(0, 0, S, S);
+  if (warm) {
+    const wg = x.createRadialGradient(cx - 6, cy + 7, 0, cx - 6, cy + 7, 10);
+    wg.addColorStop(0, 'rgba(216,180,122,0.5)');
+    wg.addColorStop(1, 'rgba(216,180,122,0)');
+    x.fillStyle = wg;
+    x.fillRect(0, 0, S, S);
+  }
+  x.restore();
+  return new THREE.CanvasTexture(c);
+}
+
+// Art parameters for one of the three Mirror World moons (see The Sundered
+// Orrery). Colours are canvas rgba strings; the disc is additive so its dark
+// side simply adds nothing and vanishes into the sky (only the lit limb shows).
+interface MoonArt {
+  lit: string; // lit-limb colour
+  dark: string; // terminator/dark colour (alpha 0 so it fades to sky)
+  halo: string; // bloom-halo centre colour
+  illum: number; // illuminated fraction 0..1 (phase): 1 full, ~0.3 crescent
+  litDir: [number, number]; // canvas-space unit dir of the lit limb
+  detail: 'maria' | 'bands' | 'ice';
+  ring?: boolean; // Cael's foreshortened dust ring
+  crack?: boolean; // Sable's rose-ember fracture glow
+  earthshine?: string; // Vire's faint full-disc ashen glow behind the crescent
+}
+
+// Paint a moon's core disc (phase-shaded, with per-world detail) and its soft
+// bloom halo onto 128px canvases. Pure 2D art; no RNG (fixed detail positions).
+function makeMoonTextures(a: MoonArt): { core: THREE.CanvasTexture; halo: THREE.CanvasTexture } {
+  const S = 128;
+  const R = 48;
+  const cx = 64;
+  const cy = 64;
+  const core = document.createElement('canvas');
+  core.width = core.height = S;
+  const x = core.getContext('2d')!;
+  x.save();
+  x.beginPath();
+  x.arc(cx, cy, R, 0, Math.PI * 2);
+  x.clip();
+  // faint full-disc earthshine so a crescent still reads as a whole sphere
+  if (a.earthshine) {
+    x.fillStyle = a.earthshine;
+    x.fillRect(0, 0, S, S);
+  }
+  // phase shading: a lit gradient offset toward the lit limb; the offset grows
+  // as the illuminated fraction shrinks, sweeping the terminator across
+  const off = R * (1 - a.illum) * 1.15;
+  const lx = cx + a.litDir[0] * off;
+  const ly = cy + a.litDir[1] * off;
+  const g = x.createRadialGradient(lx, ly, 2, lx, ly, R * 1.75);
+  g.addColorStop(0, a.lit);
+  g.addColorStop(0.5, a.lit);
+  g.addColorStop(1, a.dark);
+  x.fillStyle = g;
+  x.fillRect(0, 0, S, S);
+  if (a.detail === 'maria') {
+    for (const [mx, my, mr, al] of [
+      [52, 52, 14, 0.16],
+      [80, 60, 11, 0.12],
+      [60, 82, 9, 0.1],
+    ] as const) {
+      const mg = x.createRadialGradient(mx, my, 0, mx, my, mr);
+      mg.addColorStop(0, `rgba(58,64,108,${al})`);
+      mg.addColorStop(1, 'rgba(58,64,108,0)');
+      x.fillStyle = mg;
+      x.fillRect(0, 0, S, S);
+    }
+  } else if (a.detail === 'bands') {
+    x.globalAlpha = 0.16;
+    for (let i = 0; i < 4; i++) {
+      x.fillStyle = i % 2 === 0 ? '#e6c690' : '#a8824e';
+      x.fillRect(0, cy - R + 6 + i * R * 0.5, S, R * 0.26);
+    }
+    x.globalAlpha = 1;
+  } else {
+    // ice: a cold teal rim on the shadowed limb, opposite the lit side
+    const rg = x.createRadialGradient(
+      cx - a.litDir[0] * R * 0.7,
+      cy - a.litDir[1] * R * 0.7,
+      R * 0.35,
+      cx,
+      cy,
+      R,
+    );
+    rg.addColorStop(0, 'rgba(63,154,148,0)');
+    rg.addColorStop(1, 'rgba(63,154,148,0.5)');
+    x.fillStyle = rg;
+    x.fillRect(0, 0, S, S);
+  }
+  if (a.crack) {
+    x.strokeStyle = 'rgba(184,84,126,0.5)';
+    x.lineWidth = 1.4;
+    x.beginPath();
+    x.moveTo(48, 28);
+    x.lineTo(60, 64);
+    x.lineTo(52, 98);
+    x.moveTo(60, 64);
+    x.lineTo(86, 74);
+    x.stroke();
+  }
+  x.restore();
+  if (a.ring) {
+    // a thin foreshortened ellipse, brighter at the ansae (tips), drawn over
+    // the disc — reads as a ringed world at sprite scale
+    x.save();
+    x.translate(cx, cy);
+    x.rotate(-0.34);
+    x.scale(1, 0.3);
+    x.strokeStyle = 'rgba(207,200,184,0.55)';
+    x.lineWidth = 4;
+    x.beginPath();
+    x.arc(0, 0, R * 1.28, 0, Math.PI * 2);
+    x.stroke();
+    x.strokeStyle = 'rgba(207,200,184,0.24)';
+    x.lineWidth = 2.2;
+    x.beginPath();
+    x.arc(0, 0, R * 1.06, 0, Math.PI * 2);
+    x.stroke();
+    x.restore();
+  }
+  const halo = document.createElement('canvas');
+  halo.width = halo.height = S;
+  const hx = halo.getContext('2d')!;
+  const hg = hx.createRadialGradient(cx, cy, 2, cx, cy, 64);
+  hg.addColorStop(0, a.halo);
+  hg.addColorStop(1, 'rgba(0,0,0,0)');
+  hx.fillStyle = hg;
+  hx.fillRect(0, 0, S, S);
+  return { core: new THREE.CanvasTexture(core), halo: new THREE.CanvasTexture(halo) };
 }
 
 export class Renderer {
@@ -821,6 +1008,23 @@ export class Renderer {
   private sky!: THREE.Mesh;
   private skyView!: SkyView;
   private sunSprites: THREE.Sprite[] = [];
+  // The Sundered Orrery: three moons of the Mirror World, each a core disc + a
+  // soft bloom halo at a fixed sky direction. Shown only in the mirror band
+  // (fading with skyView.mirrorFactor()); the warm sun sprites + god-rays hide
+  // there. Sable (index 0) rides SUN_DIR so the vale's glints track it.
+  private moons: { dir: THREE.Vector3; core: THREE.Sprite; halo: THREE.Sprite }[] = [];
+  // Near asteroid field: moonlit glass chips drifting along the belt plane,
+  // nearer than the moons so they parallax against the fixed painted sky.
+  private asteroids: {
+    sprite: THREE.Sprite;
+    base: THREE.Vector3;
+    radius: number;
+    spin: number;
+    drift: number;
+    phase: number;
+  }[] = [];
+  private asteroidAxis = new THREE.Vector3(-0.5, 0.6, 0.3).normalize(); // = nBelt
+  private orreryScratch = new THREE.Vector3();
   private sunDir = new THREE.Vector3();
   private sunAzimuth = new THREE.Vector3(SUN_DIR.x, 0, SUN_DIR.z).normalize();
   private clouds: THREE.Sprite[] = [];
@@ -833,7 +1037,9 @@ export class Renderer {
   private fish: FishView;
   private critters: CritterField;
   private motes: MotesView;
+  private mist: MistView;
   private birds: BirdsView;
+  private sealife: SealifeView;
   private impactSite: ImpactSiteView;
   private fogScratch = new THREE.Color();
   private flames: THREE.Mesh[];
@@ -1134,6 +1340,160 @@ export class Renderer {
       this.scene.add(sp);
     }
 
+    // The Sundered Orrery: three moons hang over the Mirror World, each a
+    // different world caught in a different phase — the alien gut-punch that
+    // proves this is not our sky. Each is an additive core disc (phase-shaded on
+    // a canvas, with maria / bands+ring / crescent+earthshine detail) plus a
+    // soft bloom halo, both hidden until the mirror cross-fade reveals them.
+    // Sable, the primary, is bound to SUN_DIR so the vale's glints track it.
+    const moonTex = (a: MoonArt): { core: THREE.CanvasTexture; halo: THREE.CanvasTexture } =>
+      makeMoonTextures(a);
+    // direction helper: start from the sun azimuth, rotate around Y, tilt to elevation
+    const upY = new THREE.Vector3(0, 1, 0);
+    const moonDir = (azOffset: number, elev: number): THREE.Vector3 => {
+      const a = this.sunAzimuth.clone().applyAxisAngle(upY, azOffset);
+      const ce = Math.cos(elev);
+      return new THREE.Vector3(a.x * ce, Math.sin(elev), a.z * ce).normalize();
+    };
+    const D2R = Math.PI / 180;
+    const moonDefs: { dir: THREE.Vector3; coreScale: number; haloScale: number; art: MoonArt }[] = [
+      {
+        // SABLE — the Broken Sister: the dominant moon. Azimuth locked to the
+        // sun so the vale's glints track it, but eased down to 46deg elevation
+        // (from SUN_DIR's 54deg) so it sits inside the player's max look-up frame.
+        dir: moonDir(0, 46 * D2R),
+        coreScale: 60,
+        haloScale: 168,
+        art: {
+          lit: 'rgba(226,236,255,1)',
+          dark: 'rgba(30,28,52,0)',
+          halo: 'rgba(190,208,246,0.55)',
+          illum: 0.82,
+          litDir: [0.5, -0.62],
+          detail: 'maria',
+          crack: true,
+        },
+      },
+      {
+        // CAEL — the Ringed Wanderer: warm banded gas-giant, low + wide.
+        dir: moonDir(150 * D2R, 27 * D2R),
+        coreScale: 34,
+        haloScale: 82,
+        art: {
+          lit: 'rgba(224,192,138,1)',
+          dark: 'rgba(52,40,60,0)',
+          halo: 'rgba(180,150,110,0.32)',
+          illum: 0.7,
+          litDir: [-0.6, -0.4],
+          detail: 'bands',
+          ring: true,
+        },
+      },
+      {
+        // VIRE — the Ice Spark: tiny cold crescent, high, with earthshine ghost.
+        dir: moonDir(-102 * D2R, 45 * D2R),
+        coreScale: 19,
+        haloScale: 46,
+        art: {
+          lit: 'rgba(232,244,255,1)',
+          dark: 'rgba(26,24,48,0)',
+          halo: 'rgba(180,214,224,0.4)',
+          illum: 0.34,
+          litDir: [0.72, -0.34],
+          detail: 'ice',
+          earthshine: 'rgba(26,24,48,0.5)',
+        },
+      },
+    ];
+    for (const def of moonDefs) {
+      const { core, halo } = moonTex(def.art);
+      const mkSprite = (
+        tex: THREE.CanvasTexture,
+        scale: number,
+        baseOpacity: number,
+      ): THREE.Sprite => {
+        const sp = new THREE.Sprite(
+          new THREE.SpriteMaterial({
+            map: tex,
+            transparent: true,
+            fog: false,
+            depthWrite: false,
+            depthTest: false,
+            blending: THREE.AdditiveBlending,
+            opacity: 0,
+          }),
+        );
+        setRenderCategory(sp, 'sky');
+        sp.scale.set(scale, scale, 1);
+        sp.renderOrder = -9;
+        sp.visible = false;
+        sp.userData.baseOpacity = baseOpacity;
+        this.scene.add(sp);
+        return sp;
+      };
+      const haloBase = LOW_GFX ? 0.6 : SUN_HALO_OPACITY;
+      this.moons.push({
+        dir: def.dir,
+        core: mkSprite(core, def.coreScale, 1),
+        halo: mkSprite(halo, def.haloScale, haloBase),
+      });
+    }
+
+    // Near asteroids — the shattered-glass belt we are passing through, feeding
+    // the painted arc that recedes to the horizon. Deterministic placement
+    // biased to lie along the belt plane, with a loose cluster toward Cael so
+    // the ringed moon visibly sheds the belt. Nearer than the moons (radius
+    // 300..460 vs 760) for parallax as the camera turns.
+    const rng = mulberry32(0xa57e10);
+    const rockCount = LOW_GFX ? 9 : 18;
+    const caelAz = moonDefs[1].dir.clone().setY(0).normalize();
+    const perp = new THREE.Vector3().crossVectors(this.asteroidAxis, upY).normalize();
+    const rockTex = [
+      makeAsteroidTexture(rng, false),
+      makeAsteroidTexture(rng, true),
+      makeAsteroidTexture(rng, false),
+    ];
+    for (let i = 0; i < rockCount; i++) {
+      // base direction: spread around the belt great circle, jittered off-plane
+      const theta = rng() * Math.PI * 2;
+      const onBelt = new THREE.Vector3()
+        .addScaledVector(perp, Math.cos(theta))
+        .addScaledVector(
+          new THREE.Vector3().crossVectors(this.asteroidAxis, perp),
+          Math.sin(theta),
+        );
+      onBelt.addScaledVector(this.asteroidAxis, (rng() - 0.5) * 0.35); // off-plane scatter
+      // a third of the rocks cluster toward Cael's azimuth
+      if (i % 3 === 0) onBelt.lerp(caelAz, 0.35 + rng() * 0.25);
+      onBelt.y = Math.abs(onBelt.y) * 0.5 + 0.12; // keep them above the horizon
+      onBelt.normalize();
+      const sprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: rockTex[i % rockTex.length],
+          transparent: true,
+          fog: false,
+          depthWrite: false,
+          depthTest: false,
+          opacity: 0,
+        }),
+      );
+      setRenderCategory(sprite, 'sky');
+      const sc = 6.5 + rng() * 8.5;
+      sprite.scale.set(sc, sc * (0.7 + rng() * 0.5), 1);
+      sprite.renderOrder = -8; // in front of the moons (they are nearer)
+      sprite.visible = false;
+      sprite.userData.baseOpacity = 1;
+      this.scene.add(sprite);
+      this.asteroids.push({
+        sprite,
+        base: onBelt,
+        radius: 250 + rng() * 150, // nearer than before → bigger + more parallax
+        spin: (rng() - 0.5) * 0.22,
+        drift: 0.011 + rng() * 0.02, // livelier drift along the belt
+        phase: rng() * Math.PI * 2,
+      });
+    }
+
     // god-ray shafts: elongated additive gradient sprites hanging sunward of
     // the camera; opacity follows how directly the camera faces the sun
     if (!LOW_GFX) {
@@ -1208,8 +1568,12 @@ export class Renderer {
     this.scene.add(this.critters.group);
     this.motes = buildMotes(this.sim.cfg.seed);
     this.scene.add(this.motes.group);
+    this.mist = buildMist(this.sim.cfg.seed);
+    this.scene.add(this.mist.group);
     this.birds = buildBirds(this.sim.cfg.seed);
     this.scene.add(this.birds.group);
+    this.sealife = buildSealife(this.sim.cfg.seed);
+    this.scene.add(this.sealife.group);
     this.impactSite = buildImpactSite(this.sim.cfg.seed);
     this.scene.add(this.impactSite.group);
     this.scene.add(this.impactSite.light);
@@ -2062,10 +2426,12 @@ export class Renderer {
       this.skyView.setCameraZ(this.camera.position.z, dt);
       this.updateEnvBiome(dt);
     }
+    const mirrorFactor = this.skyView.mirrorFactor();
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
+      sp.visible = this.fogState === 'outdoor' && mirrorFactor < 0.5;
     }
+    this.updateMoons(mirrorFactor);
     this.updateGodRays();
     this.nameplatePainter.update(true);
     this.updateChatBubbles();
@@ -3013,7 +3379,9 @@ export class Renderer {
 
   // Shared object-view resources: views must not own materials/textures, or
   // interest churn leaks them (removeView only disposes per-view geometry). The
-  // dungeon door/portal resources moved to door_portal.ts (same shared tagging).
+  // dungeon door/portal resources moved to door_portal.ts (same shared tagging);
+  // the Mirror World standing-mirror body (buildMirrorBody) rides that module's
+  // shared portal geometry + pad-tinted shimmer too.
   private sparkleMat: THREE.SpriteMaterial | null = null;
 
   private buildDoorPrewarmGroup(): THREE.Group {
@@ -3059,6 +3427,14 @@ export class Renderer {
       const built = buildMailboxPillar(e.id);
       body = built.group;
       height = built.height;
+      objectMesh = body!;
+    } else if (e.kind === 'object' && e.templateId === 'portal_pad') {
+      // Every Mirror World portal — the Mirrorgates, the Lumen Lift, the
+      // clouded grotto mirrors — is a standing mirror.
+      const built = buildMirrorBody(this.lowGfx);
+      body = built.body;
+      portal = built.portal;
+      height = 4.4;
       objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
       // Delve interactables: skip the object pool (each is unique/stateful) and
@@ -3429,6 +3805,9 @@ export class Renderer {
 
   private isHostilePlayer(target: Entity): boolean {
     if (target.kind !== 'player' || target.dead || target.id === this.sim.playerId) return false;
+    // hostile-flagged player-kind entities (the Deepdream Echo) read hostile on
+    // every host — the flag rides the snapshot identity, so no match state needed
+    if (target.hostile) return true;
     if (this.sim.duelInfo?.state === 'active' && this.sim.duelInfo.otherPid === target.id)
       return true;
     const match = this.sim.arenaInfo?.match;
@@ -3450,8 +3829,14 @@ export class Renderer {
   // Delve module interiors build asynchronously; track in-flight keys so a
   // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
   private pendingInteriors = new Set<string>();
-  private fogState: 'outdoor' | 'dungeon' | 'temple' | 'nythraxis' | 'delve' | 'underwater' =
-    'outdoor';
+  private fogState:
+    | 'outdoor'
+    | 'dungeon'
+    | 'temple'
+    | 'nythraxis'
+    | 'delve'
+    | 'underwater'
+    | 'dream' = 'outdoor';
 
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
@@ -3474,8 +3859,34 @@ export class Renderer {
     desert: { color: 0xd8c9a8, near: 100, far: 360 },
     volcano: { color: 0x8a7468, near: 50, far: 220 },
     cave: { color: 0x76807c, near: 45, far: 190 },
+    // the Mirror World: a luminous silver-violet murk. Open enough that the
+    // vale reveals its scale on arrival — distant rim, shore, and ledge resolve
+    // as ghost-silhouettes in the mist rather than vanishing at arm's length,
+    // yet the far edges still fade to mystery so the country keeps its secrets.
+    mirror: { color: 0x201d38, near: 30, far: 165 },
   };
+  // Cool moonlight key for the mirror band: the shared sun/hemi lights lerp
+  // toward these so every lit surface reads as night (silver light, cold slate
+  // ground-bounce) instead of dim daytime. Non-mirror zones ease back to warm.
+  private static MIRROR_SUN_COLOR = 0x9fb0d8;
+  private static MIRROR_HEMI_GROUND = 0x2a3044;
+  private static WARM_SUN_COLOR = 0xffedd0;
+  private static WARM_HEMI_GROUND = 0x465f39;
+  private sunColorScratch = new THREE.Color();
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
+
+  // Outdoor sun/sky-ambient scale per biome — the Mirror World keeps only a
+  // wash of pale gloaming; brazier light and the rim glow carry the country.
+  private static BIOME_LIGHT: Record<BiomeId, { sun: number; hemi: number }> = {
+    vale: { sun: 1, hemi: 1 },
+    marsh: { sun: 1, hemi: 1 },
+    peaks: { sun: 1, hemi: 1 },
+    beach: { sun: 1, hemi: 1 },
+    desert: { sun: 1, hemi: 1 },
+    volcano: { sun: 1, hemi: 1 },
+    cave: { sun: 1, hemi: 1 },
+    mirror: { sun: 0.08, hemi: 0.34 },
+  };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
@@ -3528,6 +3939,31 @@ export class Renderer {
     this.buildAllDelveModules(delveId, run.slot, run.origin, run.modules as DelveModuleId[]);
   }
 
+  // The shadow realm has no built architecture — its surreal read comes from
+  // the mist (updateAmbience 'dream' fog/light). We lay one faint reflective
+  // disc under each dream slot so the duelists cast a hint of a footing in the
+  // void rather than floating over pure black. Built once per session, lazily.
+  private dreamGroundBuilt = false;
+
+  private ensureDreamRealmNear(_px: number, _pz: number): void {
+    if (this.dreamGroundBuilt) return;
+    this.dreamGroundBuilt = true;
+    const disc = new THREE.Mesh(
+      new THREE.CircleGeometry(60, 48),
+      new THREE.MeshStandardMaterial({
+        color: 0x14122e,
+        roughness: 0.15,
+        metalness: 0.6,
+        transparent: true,
+        opacity: 0.55,
+      }),
+    );
+    disc.rotation.x = -Math.PI / 2;
+    disc.position.set(DREAM_X, DUNGEON_FLOOR_Y + 0.02, 0);
+    disc.renderOrder = -1;
+    this.scene.add(disc);
+  }
+
   private ensureDelveInteriorsNear(px: number, pz: number): void {
     const delve = delveAt(px);
     if (!delve) return;
@@ -3548,7 +3984,9 @@ export class Renderer {
   private updateAmbience(px: number, camY: number, dt: number): void {
     const inside = px > DUNGEON_X_THRESHOLD;
     const pz = this.sim.player.pos.z;
-    if (isDelvePos(px)) {
+    if (isDreamPos(px)) {
+      this.ensureDreamRealmNear(px, pz);
+    } else if (isDelvePos(px)) {
       this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
@@ -3579,21 +4017,25 @@ export class Renderer {
     }
     // the Drowned Temple reads as submerged: a teal murk instead of the
     // crypt's near-black, so its flooded halls feel underwater, not just dark
-    const inDelve = inside && isDelvePos(px);
-    const interior = inside && !inDelve && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
+    const inDream = isDreamPos(px);
+    const inDelve = inside && !inDream && isDelvePos(px);
+    const interior =
+      inside && !inDream && !inDelve && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
-    const desired = inDelve
-      ? 'delve'
-      : inTemple
-        ? 'temple'
-        : inNythraxis
-          ? 'nythraxis'
-          : inside
-            ? 'dungeon'
-            : camY < waterLevelAt(px, pz) - 0.05
-              ? 'underwater'
-              : 'outdoor';
+    const desired = inDream
+      ? 'dream'
+      : inDelve
+        ? 'delve'
+        : inTemple
+          ? 'temple'
+          : inNythraxis
+            ? 'nythraxis'
+            : inside
+              ? 'dungeon'
+              : camY < waterLevelAt(px, pz) - 0.05
+                ? 'underwater'
+                : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     if (desired !== this.fogState) {
       this.fogState = desired;
@@ -3622,6 +4064,12 @@ export class Renderer {
         fog.color.setHex(0x17506e);
         fog.near = 2;
         fog.far = 48;
+      } else if (desired === 'dream') {
+        // the shadow realm: a surreal indigo mist that swallows everything a
+        // few strides out, so only you and your Echo read against the void
+        fog.color.setHex(0x161430);
+        fog.near = 5;
+        fog.far = 42;
       } else {
         const preset = this.outdoorFogPreset();
         fog.color.setHex(preset.color);
@@ -3636,9 +4084,16 @@ export class Renderer {
           desired === 'dungeon' ||
           desired === 'temple' ||
           desired === 'nythraxis' ||
-          desired === 'delve';
-        this.sun.intensity = underground ? DUNGEON_SUN_INTENSITY : SUN_INTENSITY;
-        this.hemi.intensity = underground ? DUNGEON_HEMI_INTENSITY : HEMI_INTENSITY;
+          desired === 'delve' ||
+          desired === 'dream';
+        const outdoorLight = Renderer.BIOME_LIGHT[zoneBiomeAt(this.sim.player.pos.z)];
+        this.sun.intensity = underground ? DUNGEON_SUN_INTENSITY : SUN_INTENSITY * outdoorLight.sun;
+        this.hemi.intensity = underground
+          ? DUNGEON_HEMI_INTENSITY
+          : HEMI_INTENSITY * outdoorLight.hemi;
+        // the dream keeps a faint cool ambient so the duel stays readable in
+        // the mist, brighter than a lightless dungeon
+        if (desired === 'dream') this.hemi.intensity = HEMI_INTENSITY * 0.72;
         this.scene.environmentIntensity = underground
           ? DUNGEON_ENV_INTENSITY
           : this.envOutdoorIntensity;
@@ -3653,6 +4108,23 @@ export class Renderer {
       fog.color.lerp(this.fogScratch.setHex(preset.color), k);
       fog.near += (preset.near - fog.near) * k;
       fog.far += (preset.far - fog.far) * k;
+      const biome = zoneBiomeAt(this.sim.player.pos.z);
+      const light = Renderer.BIOME_LIGHT[biome];
+      this.sun.intensity += (SUN_INTENSITY * light.sun - this.sun.intensity) * k;
+      this.hemi.intensity += (HEMI_INTENSITY * light.hemi - this.hemi.intensity) * k;
+      // Moonlight key: ease the shared warm daylight toward cold silver in the
+      // Mirror World so lit surfaces read as night, and back to warm elsewhere.
+      const mirror = biome === 'mirror';
+      this.sun.color.lerp(
+        this.sunColorScratch.setHex(mirror ? Renderer.MIRROR_SUN_COLOR : Renderer.WARM_SUN_COLOR),
+        k,
+      );
+      this.hemi.groundColor.lerp(
+        this.sunColorScratch.setHex(
+          mirror ? Renderer.MIRROR_HEMI_GROUND : Renderer.WARM_HEMI_GROUND,
+        ),
+        k,
+      );
     }
   }
 
@@ -4402,8 +4874,12 @@ export class Renderer {
     worldStart = markWorldPhase('lights', worldStart);
 
     // clouds drift (the high cirrus layer crawls slower); on the lit tiers
-    // they tint warm sunward / cool anti-sun to anchor the key light's azimuth
+    // they tint warm sunward / cool anti-sun to anchor the key light's azimuth.
+    // The Mirror World sky is a starless black void — daylight clouds would
+    // drag the outside world in, so they hide while the camera is in the band.
+    const cloudsHidden = zoneBiomeAt(this.sim.player.pos.z) === 'mirror';
     for (const cl of this.clouds) {
+      cl.visible = !cloudsHidden;
       cl.position.x += dt * ((cl.userData.drift as number | undefined) ?? 1.6);
       if (cl.position.x > 320) cl.position.x = -320;
       if (!this.lowGfx) {
@@ -4470,7 +4946,9 @@ export class Renderer {
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.critters.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
+    this.mist.update(p.pos.x, p.pos.z, dt);
     this.birds.update(p.pos.x, p.pos.z, dt);
+    this.sealife.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
     worldStart = markWorldPhase('fish', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
@@ -4497,10 +4975,14 @@ export class Renderer {
       this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.z) : null,
     );
     worldStart = markWorldPhase('sky', worldStart);
+    // In the Mirror World the warm sun disc gives way to the three moons; the
+    // sun hides once the alien-sky cross-fade passes its midpoint.
+    const mirrorFactor = this.skyView.mirrorFactor();
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
+      sp.visible = this.fogState === 'outdoor' && mirrorFactor < 0.5;
     }
+    this.updateMoons(mirrorFactor);
     worldStart = markWorldPhase('sunSprites', worldStart);
     this.updateGodRays();
     worldStart = markWorldPhase('godRays', worldStart);
@@ -4705,9 +5187,41 @@ export class Renderer {
   }
 
   // light shafts fade in as the camera turns toward the sun, outdoor only
+  // Position the Mirror World orrery — three moons at fixed sky directions plus
+  // the near asteroid field drifting along the belt — and fade it in/out with
+  // the alien-sky cross-fade. Moons are camera-locked; rocks slowly orbit the
+  // belt axis and tumble, giving parallax against the fixed painted sky.
+  private updateMoons(mirrorFactor: number): void {
+    const show = this.fogState === 'outdoor' && mirrorFactor > 0.01;
+    for (const m of this.moons) {
+      m.core.visible = show;
+      m.halo.visible = show;
+      if (!show) continue;
+      // position core + halo at the same sky direction (reuse one scratch, no
+      // per-frame array/vector allocation in this hot path)
+      this.orreryScratch.copy(this.camera.position).addScaledVector(m.dir, 760);
+      m.core.position.copy(this.orreryScratch);
+      m.halo.position.copy(this.orreryScratch);
+      m.core.material.opacity = (m.core.userData.baseOpacity as number) * mirrorFactor;
+      m.halo.material.opacity = (m.halo.userData.baseOpacity as number) * mirrorFactor;
+    }
+    for (const a of this.asteroids) {
+      a.sprite.visible = show;
+      if (!show) continue;
+      // slowly rotate the base direction around the belt axis for a coherent drift
+      this.orreryScratch
+        .copy(a.base)
+        .applyAxisAngle(this.asteroidAxis, this.time * a.drift + a.phase);
+      a.sprite.position.copy(this.camera.position).addScaledVector(this.orreryScratch, a.radius);
+      a.sprite.material.rotation = this.time * a.spin + a.phase;
+      a.sprite.material.opacity = (a.sprite.userData.baseOpacity as number) * mirrorFactor;
+    }
+  }
+
   private updateGodRays(): void {
     if (this.godRays.length === 0) return;
-    const outdoor = this.fogState === 'outdoor';
+    // Warm sun shafts have no place under the Mirror World's cold moon.
+    const outdoor = this.fogState === 'outdoor' && zoneBiomeAt(this.sim.player.pos.z) !== 'mirror';
     // azimuth-only alignment — the chase cam always pitches down while the
     // sun sits high, so a full 3D dot product would never light the shafts
     this.camera.getWorldDirection(this.tmpV);

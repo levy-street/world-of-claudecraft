@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
+      "nextId": 457,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "7a61430c",
+      "nextId": 458,
+      "state": "d17076fe",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,7 +61,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -75,6 +75,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -93,7 +94,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -102,6 +103,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -136,9 +138,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "1a684162",
-      "events": "531aebc5",
+      "nextId": 458,
+      "state": "4dfc7178",
+      "events": "f4823bf9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -163,7 +165,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -185,6 +187,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -203,7 +206,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -212,6 +215,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -246,9 +250,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "652e46c6",
-      "events": "a6017c57",
+      "nextId": 458,
+      "state": "6e2fe180",
+      "events": "4bacc05b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -273,7 +277,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -300,6 +304,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -318,7 +323,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 120,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -327,6 +332,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -361,9 +367,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "2cfbbb1e",
-      "events": "6eca1d53",
+      "nextId": 458,
+      "state": "fd90260c",
+      "events": "52c842eb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -388,7 +394,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -415,6 +421,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -433,7 +440,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 110,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -442,6 +449,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -476,9 +484,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "4ffc71a0",
-      "events": "695c81aa",
+      "nextId": 458,
+      "state": "1b6aa30a",
+      "events": "c5cefa52",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -503,7 +511,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -533,6 +541,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -551,7 +560,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -560,6 +569,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -594,9 +604,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "17c6851e",
-      "events": "1df0a44d",
+      "nextId": 458,
+      "state": "55ca6ec8",
+      "events": "e31adf21",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -621,7 +631,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -651,6 +661,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -681,7 +692,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -690,6 +701,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -725,9 +737,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "1ba40f09",
-      "events": "fdae55a8",
+      "nextId": 458,
+      "state": "cd47973d",
+      "events": "ead0f608",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -752,7 +764,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -778,6 +790,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -808,7 +821,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -817,6 +830,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -852,9 +866,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "894e1b00",
-      "events": "4b948de8",
+      "nextId": 458,
+      "state": "5ff050c4",
+      "events": "eb98b3b8",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -879,7 +893,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -905,6 +919,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -923,7 +938,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 457,
               "value": 12
             }
           ],
@@ -947,7 +962,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -956,6 +971,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -991,9 +1007,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "09e2b45e",
-      "events": "3efe81a4",
+      "nextId": 458,
+      "state": "2bdb4be4",
+      "events": "180a8898",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1018,7 +1034,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1048,6 +1064,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1066,7 +1083,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 457,
               "value": 12
             }
           ],
@@ -1090,7 +1107,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1099,6 +1116,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1134,9 +1152,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "72facea9",
-      "events": "fc57ebc8",
+      "nextId": 458,
+      "state": "8b4e875b",
+      "events": "308bb1bc",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1161,7 +1179,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1191,6 +1209,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1215,7 +1234,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 457,
               "value": 12
             }
           ],
@@ -1239,7 +1258,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1248,6 +1267,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1283,9 +1303,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "8a59b5c2",
-      "events": "7c2d5847",
+      "nextId": 458,
+      "state": "f387222e",
+      "events": "4551359b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1310,7 +1330,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1336,6 +1356,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1364,7 +1385,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 457,
               "value": 12
             }
           ],
@@ -1388,7 +1409,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1397,6 +1418,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1432,9 +1454,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "156b4720",
-      "events": "daa824d5",
+      "nextId": 458,
+      "state": "98ccf3da",
+      "events": "9ba99c19",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1459,7 +1481,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1489,6 +1511,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1517,7 +1540,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 457,
               "value": 12
             }
           ],
@@ -1541,7 +1564,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1550,6 +1573,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,
@@ -1585,8 +1609,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "156b4720",
+      "nextId": 458,
+      "state": "98ccf3da",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1612,7 +1636,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1642,6 +1666,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1670,7 +1695,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 457,
               "value": 12
             }
           ],
@@ -1694,7 +1719,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1703,6 +1728,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": -3.662525,

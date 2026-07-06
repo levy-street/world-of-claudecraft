@@ -18,7 +18,12 @@ export const OVERHEAD_EMOTES = [
 
 // Sourced from the local OVERHEAD_EMOTES (not sim/types' OVERHEAD_EMOTE_IDS): the
 // IWorld seam imports sim/ for TYPES only, so the runtime id set is derived here
-// instead of value-importing the sim's array.
+// instead of value-importing the sim's array. This type-level check fails the build
+// if the sim adds an emote id we don't list here, keeping the local set exhaustive
+// so the guard can never reject a valid emote.
+type _EmotesExhaustive = Exclude<OverheadEmoteId, (typeof OVERHEAD_EMOTES)[number]['id']>;
+const _emotesExhaustive: _EmotesExhaustive[] = [];
+void _emotesExhaustive;
 const OVERHEAD_EMOTE_ID_SET: ReadonlySet<string> = new Set(OVERHEAD_EMOTES.map((e) => e.id));
 
 export function isOverheadEmoteId(value: unknown): value is OverheadEmoteId {

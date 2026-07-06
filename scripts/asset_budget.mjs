@@ -13,7 +13,11 @@ const DEFAULT_BUDGETS_MIB = {
     env: 34,
     'models/chars': 18,
     'models/biome': 4,
-    'models/creatures': 4,
+    // raised from 4 for the Mirror World bespoke set (11 project-commissioned Tripo
+    // models: gargoyle, poverty ghost, mistshade, reaper, gloomhulk, sentry, unicorn,
+    // voidfang, gloaming maw, + the two town NPCs nerissa & morwen). Each ships
+    // meshopt-compressed with a 512-1024 webp atlas (~0.25-0.7 MiB).
+    'models/creatures': 9,
     'models/props': 4,
     'models/foliage': 4,
     'models/dungeon': 2,

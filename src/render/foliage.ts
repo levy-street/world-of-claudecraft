@@ -119,6 +119,7 @@ const PINE_TINT: Record<BiomeId, number> = {
   desert: 0xa8a468,
   volcano: 0x6a5f52,
   cave: 0x77837a,
+  mirror: 0x5a5578,
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0xa7b886,
@@ -128,6 +129,7 @@ const OAK_TINT: Record<BiomeId, number> = {
   desert: 0xb0a468,
   volcano: 0x74624f,
   cave: 0x84907f,
+  mirror: 0x625c80,
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x8d8d85,
@@ -137,6 +139,7 @@ const ROCK_TINT: Record<BiomeId, number> = {
   desert: 0xb08d6a,
   volcano: 0x4a4038,
   cave: 0x6a6a66,
+  mirror: 0x6a6678,
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xffffff,
@@ -146,6 +149,7 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   desert: 0xe6d2ac,
   volcano: 0xb8a394,
   cave: 0xc4c8c2,
+  mirror: 0xd9d3e8,
 };
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
@@ -155,6 +159,7 @@ const GRASS_TINT: Record<BiomeId, number> = {
   desert: 0xdcc890,
   volcano: 0x8a7a68,
   cave: 0xa2a89c,
+  mirror: 0x9a92b8,
 };
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 const DRESS_TINT: Record<BiomeId, number> = {
@@ -165,6 +170,7 @@ const DRESS_TINT: Record<BiomeId, number> = {
   desert: 0xc0aa74,
   volcano: 0x7a6a58,
   cave: 0x8a948a,
+  mirror: 0x6f6890,
 };
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
@@ -983,8 +989,19 @@ function buildTrees(
 
   for (const bucket of buckets.values()) {
     const { items } = bucket;
-    const pines = items.filter((d) => d.kind === 'tree');
-    const oaks = items.filter((d) => d.kind === 'tree2' && d.biome !== 'marsh');
+    // The Mirror World's trees are bare "ghost trees" (dead-glass wood, no
+    // canopy) — the leafy oak/pine look never fit the ghostly vale. Route BOTH
+    // tree kinds there to the bare dead-tree model, and drop the ones on the
+    // steep rim where the coarse terrain mesh chord sags and they'd float.
+    const isMirrorTree = (d: Decoration): boolean =>
+      d.biome === 'mirror' && (d.kind === 'tree' || d.kind === 'tree2');
+    const ghosts = items.filter(
+      (d) => isMirrorTree(d) && !tooSteep(d.x, d.z, seed, MIRROR_TREE_MAX_SLOPE),
+    );
+    const pines = items.filter((d) => d.kind === 'tree' && d.biome !== 'mirror');
+    const oaks = items.filter(
+      (d) => d.kind === 'tree2' && d.biome !== 'marsh' && d.biome !== 'mirror',
+    );
     const swamps = items.filter((d) => d.kind === 'tree2' && d.biome === 'marsh');
     // marsh swamp trees split between twisted (mossy) and dead (bare) models
     const twisteds = swamps.filter((d) => hashAt(d.x, d.z, 19) >= 0.35);
@@ -1026,6 +1043,9 @@ function buildTrees(
     placeSpecies(parent, seed, bucket, oaks, oakSpec, register, hideRegistry);
     placeSpecies(parent, seed, bucket, twisteds, twistedSpec, register, hideRegistry);
     placeSpecies(parent, seed, bucket, deads, deadSpec, register, hideRegistry);
+    // Mirror World ghost trees: the same bare dead-tree model, silver-violet
+    // bark via TRUNK_TINT.mirror (applied per-biome inside placeSpecies).
+    placeSpecies(parent, seed, bucket, ghosts, deadSpec, register, hideRegistry);
 
     if (rocks.length > 0) {
       const isCluster = (r: Decoration): boolean => hashAt(r.x, r.z, 7) > 0.72;
@@ -1102,6 +1122,7 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   desert: 0.07,
   volcano: 0.05,
   cave: 0.08,
+  mirror: 0.08,
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
@@ -1136,13 +1157,18 @@ const DRESS_SCALE: Record<DressKind, [number, number]> = {
   mushroom: [0.9, 0.8],
 };
 
-function tooSteep(x: number, z: number, seed: number): boolean {
+function tooSteep(x: number, z: number, seed: number, maxSlope: number = GRASS_MAX_SLOPE): boolean {
   const hx =
     terrainHeight(x + GRASS_SLOPE_EPS, z, seed) - terrainHeight(x - GRASS_SLOPE_EPS, z, seed);
   const hz =
     terrainHeight(x, z + GRASS_SLOPE_EPS, seed) - terrainHeight(x, z - GRASS_SLOPE_EPS, seed);
-  return Math.hypot(hx, hz) / (2 * GRASS_SLOPE_EPS) > GRASS_MAX_SLOPE;
+  return Math.hypot(hx, hz) / (2 * GRASS_SLOPE_EPS) > maxSlope;
 }
+
+// Mirror-World "ghost trees" (bare dead-glass wood) are dropped above this
+// slope: on the steep vale rim the coarse terrain mesh chord sags below the
+// point-sampled ground height, which would leave a tree visibly floating.
+const MIRROR_TREE_MAX_SLOPE = 0.85;
 
 function generateDressing(seed: number): DressingSpot[] {
   const out: DressingSpot[] = [];

@@ -15,10 +15,12 @@ export type MusicZone =
   | 'town_eastbrook'
   | 'town_fenbridge'
   | 'town_highwatch'
+  | 'town_mirror'
   | 'vale'
   | 'vale_legacy'
   | 'marsh'
   | 'peaks'
+  | 'mirror'
   | 'dungeon_hollow_crypt'
   | 'dungeon_sunken_bastion'
   | 'dungeon_gravewyrm_sanctum';
@@ -27,6 +29,7 @@ const TOWN_MUSIC: Record<string, MusicZone> = {
   eastbrook_vale: 'town_eastbrook',
   mirefen_marsh: 'town_fenbridge',
   thornpeak_heights: 'town_highwatch',
+  mirror_world: 'town_mirror',
 };
 
 // Per-zone overworld overrides (empty: every zone plays its biome theme, so
@@ -690,6 +693,65 @@ function composeTownHighwatch(): Theme {
   return { bpm: 96, bars: 20, events: ev };
 }
 
+function composeTownMirror(): Theme {
+  const ev: NoteEvent[] = [];
+  // A minor nocturne under glass: slow harp lattices, low choir glow, and tiny
+  // bell glints like drifting lume-motes — a town asleep inside the mist.
+  const Am = { root: 57, minor: true },
+    F = { root: 53 },
+    C = { root: 60 },
+    G = { root: 55 };
+  const Em = { root: 52, minor: true },
+    Dm = { root: 50, minor: true };
+  const chords: ChordDef[] = [Am, F, C, G, Am, Em, F, G, Am, C, G, F, Dm, F, Em, Am];
+
+  chords.forEach((c, bar) => {
+    const b0 = bar * 4;
+    const t = triad(c);
+    pushPedal(ev, b0, c.root, 'pad', 0.16);
+    if (bar % 2 === 0) pushNote(ev, b0, c.root - 12, 4.1, 0.09, 'choir');
+    pushNote(ev, b0, c.root - 24, 3.6, 0.22, 'bass');
+    const lattice = [t[0], t[2], t[1] + 12, t[0] + 12, t[2], t[1] + 12, t[2] + 12, t[1] + 12];
+    pushRepeated(ev, b0, lattice, 0.5, 0.4, 0.12, 'harp');
+    if (bar % 2 === 1)
+      pushRepeated(ev, b0 + 1.25, [t[2] + 24, t[0] + 24, t[1] + 24], 1, 0.5, 0.07, 'tinyBell');
+  });
+
+  const glow: Phrase = [
+    [0, 69, 1.5],
+    [2, 72, 1],
+    [3, 71, 1],
+    [4, 69, 1.5],
+    [6, 67, 1],
+    [7, 64, 1],
+    [8, 65, 1.5],
+    [10, 69, 1],
+    [11, 72, 1],
+    [12, 71, 1.5],
+    [14, 69, 1.5],
+  ];
+  const answer: Phrase = [
+    [0, 76, 1.5],
+    [2, 74, 1],
+    [3, 72, 1],
+    [4, 71, 1.5],
+    [6, 72, 1],
+    [7, 74, 1],
+    [8, 76, 1.5],
+    [10, 79, 1],
+    [11, 76, 1],
+    [12, 74, 1.5],
+    [14, 72, 1.5],
+  ];
+  pushPhrase(ev, 8, glow, 0.13, 'flute');
+  pushPhrase(ev, 24, answer, 0.1, 'harp');
+  pushPhrase(ev, 40, glow, 0.11, 'flute');
+  pushPhrase(ev, 56, glow.slice(0, 7), 0.09, 'tinyBell');
+
+  ev.sort((a, b) => a.beat - b.beat);
+  return { bpm: 64, bars: 16, events: ev };
+}
+
 function composeVale(): Theme {
   const ev: NoteEvent[] = [];
   // A dorian overworld: playful and looping, with sparse orchestral depth.
@@ -1004,6 +1066,46 @@ function composeMarsh(): Theme {
 
   ev.sort((a, b) => a.beat - b.beat);
   return { bpm: 76, bars: 24, events: ev };
+}
+
+function composeMirror(): Theme {
+  const ev: NoteEvent[] = [];
+  // E aeolian mist drift: long choir swells over slow bass pulses, a sparse
+  // harp, and a low reed line — the gloom beyond the lamplight.
+  const Em = { root: 52, minor: true },
+    C = { root: 60 },
+    Am = { root: 57, minor: true };
+  const G = { root: 55 },
+    D = { root: 62 };
+  const chords: ChordDef[] = [Em, Em, C, Am, Em, G, Am, Em, C, Em, Am, D, Em, C, Am, Em];
+
+  chords.forEach((c, bar) => {
+    const b0 = bar * 4;
+    const t = triad(c);
+    pushPedal(ev, b0, c.root, 'pad', 0.2);
+    if (bar % 2 === 0) pushNote(ev, b0, c.root - 12, 4.1, 0.1, 'choir');
+    pushNote(ev, b0, c.root - 24, 2.4, 0.3, 'bass');
+    pushNote(ev, b0 + 2.5, c.root - 17, 1.2, 0.14, 'bass');
+    if (bar % 2 === 1)
+      pushRepeated(ev, b0 + 0.5, [t[0], t[2], t[1] + 12, t[2]], 0.75, 0.5, 0.1, 'harp');
+    if (bar % 4 === 2) pushDrumHits(ev, b0, [0.5, 2.75], 'woodBlock', 0.07, 66);
+  });
+
+  const drift: Phrase = [
+    [0, 64, 2],
+    [2.5, 62, 1],
+    [4, 59, 2],
+    [6.5, 60, 1],
+    [8, 64, 2],
+    [10.5, 67, 1],
+    [12, 66, 2],
+    [14, 64, 1.5],
+  ];
+  pushPhrase(ev, 16, drift, 0.11, 'reed');
+  pushPhrase(ev, 48, drift, 0.09, 'choir');
+
+  ev.sort((a, b) => a.beat - b.beat);
+  return { bpm: 56, bars: 16, events: ev };
 }
 
 function composePeaks(): Theme {
@@ -1733,10 +1835,12 @@ const STORAGE_KEY = 'ev_music_on';
 //   town_eastbrook  0 -> D (Eastbrook is D major)
 //   town_fenbridge  5 -> G (Fenbridge is G major)
 //   town_highwatch  9 -> B (Highwatch is B minor)
+//   town_mirror  7 -> A (the Mirror World nocturne is A minor)
 //   vale  7 -> A (vale is A dorian)
 //   vale_legacy  7 -> A (original vale is A dorian)
 //   marsh  2 -> E (marsh is E aeolian)
 //   peaks  0 -> D (peaks anthem is D major)
+//   mirror  2 -> E (the mist drift is E aeolian)
 //   dungeon_hollow_crypt      0 -> D
 //   dungeon_sunken_bastion    2 -> E
 //   dungeon_gravewyrm_sanctum 9 -> B
@@ -1744,10 +1848,12 @@ const COMBAT_TRANSPOSE: Record<MusicZone, number> = {
   town_eastbrook: 0,
   town_fenbridge: 5,
   town_highwatch: 9,
+  town_mirror: 7,
   vale: 7,
   vale_legacy: 7,
   marsh: 2,
   peaks: 0,
+  mirror: 2,
   dungeon_hollow_crypt: 0,
   dungeon_sunken_bastion: 2,
   dungeon_gravewyrm_sanctum: 9,
@@ -1758,10 +1864,12 @@ export function buildMusicThemes(withOverrides = true): Record<string, Theme> {
     town_eastbrook: composeTownEastbrook(),
     town_fenbridge: composeTownFenbridge(),
     town_highwatch: composeTownHighwatch(),
+    town_mirror: composeTownMirror(),
     vale: composeVale(),
     vale_legacy: composeLegacyVale(),
     marsh: composeMarsh(),
     peaks: composePeaks(),
+    mirror: composeMirror(),
     dungeon_hollow_crypt: composeDungeonHollowCrypt(),
     dungeon_sunken_bastion: composeDungeonSunkenBastion(),
     dungeon_gravewyrm_sanctum: composeDungeonGravewyrmSanctum(),
@@ -1784,10 +1892,12 @@ export const THEME_TRIM: Record<string, number> = {
   town_eastbrook: 1.0,
   town_fenbridge: 1.65,
   town_highwatch: 2.15,
+  town_mirror: 2.4,
   vale: 3.3,
   vale_legacy: 1.35,
   marsh: 1.85,
   peaks: 2.05,
+  mirror: 2.8,
   dungeon_hollow_crypt: 2.95,
   dungeon_sunken_bastion: 2.95,
   dungeon_gravewyrm_sanctum: 1.8,

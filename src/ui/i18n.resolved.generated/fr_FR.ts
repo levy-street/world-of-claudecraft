@@ -3747,6 +3747,7 @@ export const fr_FR: EnTranslations = {
       "eatingDrinking": "Mange et boit...",
       "secondsRemaining": "{seconds} secondes restantes",
       "enteringZone": "Entrée dans {zone}.",
+      "deepdreamZone": "Le Songe Profond",
       "welcomeZone": "Bienvenue à {zone} !",
       "levelBanner": "Niveau {level} !",
       "levelLog": "Vous avez atteint le niveau {level} !",
@@ -4388,6 +4389,13 @@ export const fr_FR: EnTranslations = {
       "nythraxisDeathlessKingWarning": "Les trois reliques racontent la même histoire : Aldren combattit pour défendre son roi, Malric franchit la frontière de la mort, et Voss tenta d'arrêter ce qui suivit. Le sceau faiblit, et la crypte abandonnée est le chemin vers les profondeurs.",
       "browseGoods": "Laissez-moi voir vos marchandises.",
       "browseGoodsAria": "Voir les marchandises de {name}",
+      "brewDraught": "Prépare-moi un Philtre de Rêve profond.",
+      "brewDraughtAria": "Demander à {name} de préparer un Philtre de Rêve profond",
+      "gargoyleBow": "S'incliner.",
+      "gargoyleBowAria": "S'incliner devant {name}",
+      "gargoyleAttack": "Attaquer.",
+      "gargoyleAttackAria": "Attaquer {name}",
+      "gargoyleShimmer": "La statue frémit d'énergie...",
       "worldMarket": "Montrez-moi le marché mondial.",
       "worldMarketAria": "Ouvrir le marché mondial",
       "accept": "Accepter",
@@ -5867,6 +5875,45 @@ export const fr_FR: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Faucille Pétale de Soleil"
       },
+      "white_sheet": {
+        "name": "Drap blanc"
+      },
+      "spirit_horn": {
+        "name": "Corne spectrale"
+      },
+      "black_hood": {
+        "name": "Capuche noire"
+      },
+      "deepdream_draught": {
+        "name": "Philtre de Rêve profond"
+      },
+      "mirror_shard": {
+        "name": "Éclat de Miroir"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Lame-miroir spectrale"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Manteceau spectral"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Justaucorps spectral"
+      },
+      "ghostly_palegrips": {
+        "name": "Poignes blêmes spectrales"
+      },
+      "ghostly_hushboots": {
+        "name": "Bottes feutrées spectrales"
+      },
+      "ghostly_glasscord": {
+        "name": "Cordelière de verre spectrale"
+      },
+      "warden_sigil": {
+        "name": "Sceau du gardien"
+      },
+      "drowned_lumen": {
+        "name": "Lumen noyé"
+      },
       "bristleback_maul": {
         "name": "Marteau Gallowglass"
       },
@@ -6667,6 +6714,36 @@ export const fr_FR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Élémentaire de tempête éveillé"
       },
+      "spirit_unicorn": {
+        "name": "Licorne spectrale"
+      },
+      "hooded_reaper": {
+        "name": "Faucheur"
+      },
+      "mistshade_lurker": {
+        "name": "Rôdeur des brumes"
+      },
+      "gloaming_maw": {
+        "name": "La Gueule du Crépuscule"
+      },
+      "poverty_ghost": {
+        "name": "Fantôme de misère"
+      },
+      "player_echo": {
+        "name": "Écho"
+      },
+      "gargoyle_awakened": {
+        "name": "Sentinelle gargouille"
+      },
+      "gloomhulk": {
+        "name": "Colosse des ombres"
+      },
+      "mirrorbound_sentry": {
+        "name": "Sentinelle spéculaire"
+      },
+      "voidfang_stalker": {
+        "name": "Rôdeur pâlecroc"
+      },
       "ironvein_foreman": {
         "name": "Contremaître Veinefer"
       },
@@ -6896,6 +6973,51 @@ export const fr_FR: EnTranslations = {
         "name": "Le Veilleur pâle",
         "title": "Gardien des morts",
         "greeting": "Repose-toi maintenant, esprit. Je peux te rendre à ton corps, mais la traversée du retour te laisse affaibli."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa la Sans-Repos",
+        "title": "Gardienne spectrale de la Couronne de Lumen",
+        "greeting": "J'ai porté la Couronne de Lumen dans la vie, et la Couronne garde le verre honnête - chaque miroir de ce val montre une chose vraie, sauf un. La mort ne m'a pas relevée de mon poste, {playerName}, car celui-là ne cesse de presser. La lumière de la Couronne faiblit, et là où elle faillit, le val transparaît. Prends garde au côté du verre où tu marches. Ces temps-ci, il a peine à le dire."
+      },
+      "veilwright_ollo": {
+        "name": "Ollo le Tisse-Voile",
+        "title": "Marchand du Marché voilé",
+        "greeting": "Manteaux de morts, soupirs en bouteille, prix honnêtes : le voile pourvoit. Tout sur mon étal fut posé par quelqu'un qui ne possède plus rien ; l'astuce, c'est de distinguer ce dont les morts en ont fini de ce qu'ils serrent encore. Trompe-toi, et ils viennent à l'étal à minuit. Demande à la Gardienne la lumière du puits, si tu veux la version triste. Moi, je ne vends que les manteaux."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen la Sorcière des Brumes",
+        "title": "Brasseuse de rêves du Creux",
+        "greeting": "La brume garde les tiens éveillés. Je peux te brasser l’autre sommeil — celui qui répond."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Sentinelle gargouille",
+        "title": "Gardienne du Miroir",
+        "greeting": "Des yeux de pierre grincent vers toi. Elle écoute."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Sentinelle gargouille",
+        "title": "Gardienne du Miroir",
+        "greeting": "Des yeux de pierre grincent vers toi. Elle écoute."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Sentinelle gargouille",
+        "title": "Gardienne du Miroir",
+        "greeting": "Des yeux de pierre grincent vers toi. Elle écoute."
+      },
+      "dread_sentinel_a": {
+        "name": "Sentinelle funeste",
+        "title": "Gardien du Miroir de sable",
+        "greeting": "Ta mort t’attend."
+      },
+      "dread_sentinel_b": {
+        "name": "Sentinelle funeste",
+        "title": "Gardien du Miroir de sable",
+        "greeting": "Nous tenions la chaussée dans la vie. Nous la tenons encore."
+      },
+      "dread_sentinel_c": {
+        "name": "Sentinelle funeste",
+        "title": "Gardien du Miroir de sable",
+        "greeting": "Fais demi-tour. Le verre noir n'est pas pour les vivants... ni ne le fut jamais pour nous."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const fr_FR: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "Une recette de sommeil profond",
+        "text": "Le philtre réclame trois voix, {playerName} : deux draps blancs pris aux fantômes de misère qui ne possèdent rien d'autre, deux cornes des licornes spectrales qui paissent dans la pénombre, et deux capuches taillées aux faucheurs qui veillent sur la ceinture. Apporte-les et je te brasserai un sommeil qui a des dents.",
+        "completion": "Drap, corne, capuche — les pauvres, les radieux, les patients. Le chaudron t'aime bien. Bois-le dans un endroit doux, voyageur : tu rencontreras qui tu portes en toi.",
+        "objectives": {
+          "0": {
+            "label": "Drap blanc"
+          },
+          "1": {
+            "label": "Corne spectrale"
+          },
+          "2": {
+            "label": "Capuche noire"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Affronte ton Écho",
+        "text": "Bois le philtre et le rêve dressera un miroir devant toi — ton Écho, chaque cicatrice et chaque tour à toi de l’autre côté. Bats ce que tu es, {playerName}, et rapporte-moi la tête que tu feras.",
+        "completion": "Tu es revenu, et le miroir non. Ce qu’il t’a laissé dans la main est à toi — le rêve ne paie ce prix qu’une fois.",
+        "objectives": {
+          "0": {
+            "label": "Ton Écho vaincu"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "Le Tribut du Gardien",
+        "text": "La lueur se change en mots derrière tes yeux : les faucheurs encombrent mon verre, {playerName}. Éclaircis-les, et la voie vers Highwatch sera tienne.",
+        "completion": "La pierre vibre une fois, satisfaite. Derrière elle, le miroir s’éclaircit comme un souffle enfin relâché.",
+        "objectives": {
+          "0": {
+            "label": "Faucheur abattu"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "Un Tribut de draps",
+        "text": "La lueur se change en mots derrière tes yeux : apporte-moi quatre draps blancs pris aux pauvres morts, {playerName}. La route d’Eastbrook s’ouvre à qui paie en toile.",
+        "completion": "Les draps s’enfoncent dans la pierre et disparaissent. Le miroir derrière elle s’éveille de lumière.",
+        "objectives": {
+          "0": {
+            "label": "Drap blanc"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Éclat moissonné",
+        "text": "La lueur se change en mots derrière tes yeux : les hardes spectrales brûlent trop fort pour le verre, {playerName}. Abats-en cinq, et Fenbridge n’est plus qu’un pas.",
+        "completion": "La pierre boit la lumière que tu as versée. Le miroir derrière elle s’ouvre comme un œil.",
+        "objectives": {
+          "0": {
+            "label": "Licorne spectrale abattue"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "La Radiance déclinante",
+        "text": "Tu sens mon froid et me prends pour une légende. Je suis un poste, {playerName}. La Couronne de Lumen que j'ai gardée n'est pas un cercle d'or : c'est la lumière de chaque miroir d'ici, la jointure qui tient vivants et morts en reflets séparés, pour que l'un ne noie pas l'autre. Cette lumière faiblit, et cela se voit aux Sentinelles du miroir : jadis la radiance même de la Couronne montant la garde, elles ne sont plus que verre gorgé de lumière volée, s'entassant dans les ruines du nord car la jointure ne leur dit plus où se tenir. Brise-en huit. Chaque éclat que tu disperses est un peu de lumière rendue, et un peu de preuve qu'on peut te confier le reste.",
+        "completion": "Les éclats dérivent vers le puits comme une neige qui tombe vers le haut, et l'espace d'un souffle, tout le val s'éclaircit d'une nuance. Cela ne durera pas. Mais toi, tu répares les jointures au lieu de les trancher, {playerName} : c'est plus rare ici que tu ne le crois. Tu as aussi brisé l'AUTRE couronne, n'est-ce pas ? Celle de fer, sous Thornpeak. Alors, pour la première fois en trois cents ans, cette lumière pourrait revenir. Reste. Le val attend depuis longtemps des mains qui referment les plaies.",
+        "objectives": {
+          "0": {
+            "label": "Sentinelle du miroir brisée"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Ce que les pauvres gardent encore",
+        "text": "Les Spectres de misère de la rive sud n'avaient rien de leur vivant, {playerName} : rien que le drap dans lequel on les a ensevelis, car la paroisse ne pouvait payer de cercueil. Aujourd'hui la lumière de la Couronne est trop mince pour dénouer leur étreinte, et ils errent, serrant la seule chose qui fut jamais leur. N'y vois pas cruauté ; c'est de l'amour sans où se poser. Rapporte-moi cinq de leurs draps. Je poserai chacun dans le puits et dirai le nom trop pauvre pour être gravé. Tel est tout le rite : être pauvre, et mort, et pourtant appelé par son nom.",
+        "completion": "Cinq draps, cinq noms. Je les dis au puits et l'eau les emporte comme une mère ôte un manteau à un enfant endormi. Les spectres de la rive sont moins nombreux ce soir, {playerName} : non pas tués, libérés. Voilà ce que faisait la Couronne entière : elle tenait les morts assez près pour pouvoir les laisser aller. Nous le faisons à la main, désormais, toi et moi, cinq noms à la fois. C'est plus lent. Ce n'est pas rien.",
+        "objectives": {
+          "0": {
+            "label": "Drap blanc"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "Les noms des gardiens",
+        "text": "Les trois qui arpentent le Canyon noir, ceux qui les fuient les nomment Sentinelles de l'effroi. Je les ai jadis appelés par leur nom : c'était mon ordre, {playerName}, les derniers hommes à tenir de leur vivant la chaussée du Miroir Sable, et ils n'ont jamais cédé, pas même quand leur cœur a cédé. Nulle lame ne les délivre plus ; le verre noir les chevauche trop profond pour qu'ils tombent. Mais ce verre s'est glissé des gardiens vers les faucheurs qui grouillent sur la chaussée, et au long des ans les faucheurs ont arraché les sceaux des gardiens. Rapporte-m'en trois, pris aux faucheurs du canyon, que je dise les trois noms à voix haute une dernière fois.",
+        "completion": "Corwin. Aldous. Brenna. Voilà : dits, et le dire pèse moins que jamais ne pesa le tenir. Bientôt ils pourront s'arrêter ; je m'en occuperai. Mais prends garde à ce qui approche, {playerName} : les sceaux arrachés signifient que le verre de cette chaussée s'amincit, et la plaie à son bout a attendu exactement cela. Je dois rallumer la Couronne et étayer le Sable avant que quelque chose, de l'autre côté, ne remarque que la porte reste nue. Il me reste une dernière chose à trouver, et elle gît sous l'eau noire.",
+        "objectives": {
+          "0": {
+            "label": "Sceau du gardien"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Ce que veut le verre",
+        "text": "Tu as vaincu ton Écho et cru à une épreuve de toi-même, {playerName}. Il n'en était rien. Je distille le Songe profond de drap, de corne et de capuche, mais ce contre quoi ton rêve dressa un miroir, la chose entrée en portant ton visage, cela je ne le distille pas. Cela s'infiltre, du verre noir du canyon. Les faucheurs qui grouillent à l'entrée du canyon sont épais de la même infiltration ; abats-en huit et regarde de quel côté rampent leurs ombres. Alors je montrerai aux yeux mêmes de Nerissa où sa plaie saigne vraiment.",
+        "completion": "Au nord-est. Toujours au nord-est, toujours vers le Sable — l'as-tu vu ? Ton Écho, ce n'était pas TOI, voyageur. C'était un éclat de ce qui vit derrière cette porte, vêtu du reflet le plus proche qu'il pût dérober : le tien. Le rêve n'est que l'endroit le plus mince que l'infiltration ait trouvé ; le canyon est le plus large. Dis-le à Nerissa. Elle en a mérité la vérité, et toi aussi.",
+        "objectives": {
+          "0": {
+            "label": "Faucheur abattu à l'entrée du canyon"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Rallumer la Couronne de Lumen",
+        "text": "Les gardiens ont un nom et la chaussée s'amincit, aussi dois-je faire à présent ce que j'ai différé depuis ma mort : allumer la Couronne de Lumen une dernière fois et presser le Sable clos de ce côté. La dernière vraie étincelle de la Couronne fut avalée par la Gueule crépusculaire quand elle tomba dans la mare — voilà pourquoi la chose luit du dedans. Retaille-lui la lumière, {playerName}. Le verre noir enverra ses colosses lugubres arrêter le rite ; abats-en quatre. Rapporte-moi une étincelle noyée tant que je me rappelle encore comment en tenir une. Le dernier devoir d'un gardien est de devenir quelqu'un qui n'a plus besoin de garder.",
+        "completion": "Elle brûle. Après toutes ces ténèbres, elle connaît encore ma main. Regarde : le verre est VRAI de nouveau ; nul battement derrière l'eau, nulle âme perdue entre un monde et son reflet. Et le poids m'a enfin quittée. Je ne m'évanouis pas, {playerName} ; on me RELÈVE. Ce n'est pas briser le Sable, seulement le tenir ; je n'ai pas la force de briser ce qui attend là, et je n'oserais pas. Mais tenu un âge de plus, il est tenu. Quand une compagnie plus brave que nous franchira enfin cette porte, elle trouvera l'autre côté prêt. Dis à Highwatch que leur gardienne a monté la garde jusqu'au bout, puis a été relevée. Le verre se souviendra de toi. Veille à lui donner quelque chose qui vaille d'être reflété.",
+        "objectives": {
+          "0": {
+            "label": "La Gueule crépusculaire abattue"
+          },
+          "1": {
+            "label": "Lumen noyé"
+          },
+          "2": {
+            "label": "Colosse lugubre brisé"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Le Chœur noyé",
         "text": "Les pataugeurs n'agissent pas seuls. Parmi eux marchent les Dévots noyés — la secte qui a sombré avec le temple, encore vêtue de ses ornements putréfiés, chantant toujours la prière depuis les rochers du rivage. Réduis-en huit au silence et rapporte-moi six des offrandes qu'ils portent. Je veux savoir ce qu'ils comptent donner à leur déesse.",
@@ -7870,6 +8104,48 @@ export const fr_FR: EnTranslations = {
           },
           "9": {
             "label": "Sanctuaire du Gravewyrm"
+          },
+          "10": {
+            "label": "La Porte-Miroir"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "Le Monde-Miroir",
+        "welcome": "Le verre se souvient de toi. Prends garde au côté où tu marches.",
+        "pois": {
+          "0": {
+            "label": "Le Monde-Miroir"
+          },
+          "1": {
+            "label": "Place de la Porte-Miroir"
+          },
+          "2": {
+            "label": "La Couronne de Lumen"
+          },
+          "3": {
+            "label": "Le Marché Voilé"
+          },
+          "4": {
+            "label": "L'Archive Silencieuse"
+          },
+          "5": {
+            "label": "Le Lac-Miroir"
+          },
+          "6": {
+            "label": "La Fagne des Brumes"
+          },
+          "7": {
+            "label": "Le Creux de la Sorcière"
+          },
+          "8": {
+            "label": "Miroir d'Eastbrook"
+          },
+          "9": {
+            "label": "Miroir de Fenbridge"
+          },
+          "10": {
+            "label": "le Canyon Noir"
           }
         }
       }

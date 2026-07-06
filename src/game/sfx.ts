@@ -390,10 +390,9 @@ class Sfx {
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
     this.ambient('amb_wind_vale', !inDungeon && (biome === 'vale' || biome === 'beach') ? 0.12 : 0);
     this.ambient('amb_birds', !inDungeon && biome === 'vale' ? 0.1 : 0);
-    this.ambient(
-      'amb_wind_marsh',
-      !inDungeon && (biome === 'marsh' || biome === 'cave') ? 0.13 : 0,
-    );
+    // the Mirror World borrows the low marsh hum, quieter, as a muffled mist bed
+    const marshBed = biome === 'marsh' || biome === 'cave' ? 0.13 : biome === 'mirror' ? 0.08 : 0;
+    this.ambient('amb_wind_marsh', !inDungeon ? marshBed : 0);
     this.ambient(
       'amb_wind_peaks',
       !inDungeon && (biome === 'peaks' || biome === 'desert' || biome === 'volcano') ? 0.18 : 0,

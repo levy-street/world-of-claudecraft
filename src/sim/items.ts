@@ -141,6 +141,14 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     return;
   }
   if (p.dead) return;
+  if (def.use?.type === 'slumber') {
+    ctx.startSlumber(meta.entityId);
+    return;
+  }
+  if (def.use?.type === 'mirrorShard') {
+    ctx.consumeMirrorShard(meta.entityId);
+    return;
+  }
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");

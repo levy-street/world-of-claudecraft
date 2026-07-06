@@ -28,6 +28,7 @@ const MOTE_TINT: Record<BiomeId, number> = {
   desert: 0xecd9a0,
   volcano: 0xe8a070,
   cave: 0xa8c4b8,
+  mirror: 0xe8e4ff,
 };
 
 const RADIUS = 26; // motes live within this ring of the player

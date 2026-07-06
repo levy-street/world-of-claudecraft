@@ -24,7 +24,7 @@
 // Node, the browser, and the headless RL env.
 
 import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
-import { QUESTS, questRewardItemId } from '../data';
+import { PAD_QUEST_LOCKS, PORTAL_PADS, QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
@@ -47,6 +47,7 @@ export function computeQuestState(
   questLog: Map<string, QuestProgress>,
   questsDone: Set<string>,
   playerLevel: number,
+  bowedGargoyles?: ReadonlySet<string>,
 ): QuestState {
   if (questsDone.has(questId)) return 'done';
   const qp = questLog.get(questId);
@@ -54,6 +55,8 @@ export function computeQuestState(
   const quest = QUESTS[questId];
   if (!quest) return 'unavailable';
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
+  // A gargoyle toll stays hidden until the statue has been bowed to.
+  if (quest.requiresBow && !bowedGargoyles?.has(quest.giverNpcId)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
   if (quest.retired) return 'unavailable';
   return 'available';
@@ -62,7 +65,13 @@ export function computeQuestState(
 export function questState(ctx: SimContext, questId: string, pid?: number): QuestState {
   const r = ctx.resolve(pid);
   if (!r) return 'unavailable';
-  return computeQuestState(questId, r.meta.questLog, r.meta.questsDone, r.e.level);
+  return computeQuestState(
+    questId,
+    r.meta.questLog,
+    r.meta.questsDone,
+    r.e.level,
+    r.meta.bowedGargoyles,
+  );
 }
 
 function questNpcFor(
@@ -244,6 +253,29 @@ export function turnInQuestCore(
   meta.questLog.delete(questId);
   meta.questsDone.add(questId);
   meta.counters.questsCompleted++;
+  // A paid gargoyle toll unseals its town mirror: burst FX at the pad and a
+  // typed event so the client can swap the dead glass for a lit portal.
+  for (const [padId, lockQuest] of Object.entries(PAD_QUEST_LOCKS)) {
+    if (lockQuest !== questId) continue;
+    for (const e of ctx.entities.values()) {
+      if (
+        e.templateId === 'portal_pad' &&
+        PORTAL_PADS.some(
+          (p) => p.id === padId && Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z) < 2,
+        )
+      ) {
+        ctx.emit({ type: 'spellfx', fx: 'nova', sourceId: e.id, targetId: e.id, school: 'arcane' });
+        break;
+      }
+    }
+    ctx.emit({ type: 'mirrorUnlocked', padId, pid: meta.entityId });
+    ctx.emit({
+      type: 'log',
+      text: 'The toll is paid. Behind the statue, the mirror clears.',
+      color: '#b9f',
+      pid: meta.entityId,
+    });
+  }
   if (quest.copperReward > 0) {
     meta.copper += quest.copperReward;
     ctx.emit({

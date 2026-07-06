@@ -10,13 +10,13 @@
     "jammed chest (attemptAvailable=false) + surface exit opens"
   ],
   "draws": 3,
-  "drawDigest": "ad960248",
+  "drawDigest": "76e01e1e",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "71c5bba0",
+      "nextId": 458,
+      "state": "afdd5c4c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -56,6 +56,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -74,7 +75,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -83,6 +84,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -119,78 +121,78 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 412,
-      "state": "7f332569",
-      "events": "b2a5ec1f",
+      "nextId": 472,
+      "state": "7cfddd53",
+      "events": "e0c60515",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 412,
-      "state": "36fc28c9",
-      "events": "b93c7dc5",
+      "nextId": 472,
+      "state": "7df0bd33",
+      "events": "7bd8c231",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 412,
-      "state": "d5e18f0f",
+      "nextId": 472,
+      "state": "ce9ac6e5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 412,
-      "state": "42e1d339",
+      "nextId": 472,
+      "state": "158ffba3",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 412,
-      "state": "147d0563",
+      "nextId": 472,
+      "state": "57900901",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 412,
-      "state": "d94d90d5",
+      "nextId": 472,
+      "state": "e5676e37",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       }
     },
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 413,
-      "state": "e4b8990f",
-      "events": "3b915263",
+      "nextId": 473,
+      "state": "fbf610e5",
+      "events": "73a2f011",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       },
       "label": "lockpick-jammed",
       "players": [
@@ -216,7 +218,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -231,6 +233,7 @@
           "lifetimeXp": 11398,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -249,7 +252,7 @@
           "dodgeChance": 0.0715,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 400,
+          "id": 457,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -259,6 +262,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 4800,
@@ -299,7 +303,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 411,
+          "id": 471,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -332,23 +336,23 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 413,
-      "state": "f0d84c9f",
+      "nextId": 473,
+      "state": "5b6604f5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       }
     },
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 413,
-      "state": "f89e5323",
+      "nextId": 473,
+      "state": "00004bc1",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "ad960248"
+        "digest": "76e01e1e"
       },
       "label": "final",
       "players": [
@@ -374,7 +378,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -389,6 +393,7 @@
           "lifetimeXp": 11398,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -407,7 +412,7 @@
           "dodgeChance": 0.0715,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 400,
+          "id": 457,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -417,6 +422,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 4800,
@@ -457,7 +463,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 411,
+          "id": 471,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

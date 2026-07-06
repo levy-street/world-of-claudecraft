@@ -120,6 +120,9 @@ const WATER_FRAG = /* glsl */ `
     float fresnel = 0.05 + 0.95 * pow(1.0 - max(dot(N, V), 0.0), 4.0);
     float depth = clamp(vShoreDepth / 6.0, 0.0, 1.0);
     vec3 col = mix(uShallow, uDeep, depth);
+    // Mirror World band: pools go dark silver-indigo and lose the sun
+    float gloom = smoothstep(897.0, 917.0, vWPos.z);
+    col = mix(col, mix(vec3(0.10, 0.105, 0.17), vec3(0.045, 0.05, 0.10), depth), gloom);
     // dappled shimmer — fades with distance so it never reads as speckle
     float shimmer = max(n1.x * 0.7 + n2.y * 0.55, 0.0) * exp(-camDist * 0.022);
     col *= 0.92 + 0.4 * shimmer;
@@ -128,16 +131,17 @@ const WATER_FRAG = /* glsl */ `
     vec3 skyRef = mix(uSkyColor, fogColor, 0.5);
     col = mix(col, skyRef, min(fresnel * 0.65, 0.42));
     float sunAlign = max(dot(reflect(-uSunDir, N), V), 0.0);
-    col += uSunColor * pow(sunAlign, 130.0) * 2.6;                   // sparkle glints (>1 -> bloom)
-    col += uSunColor * pow(sunAlign, 28.0) * 0.30;                   // wider lobe: survives steep cameras
-    col += uSunColor * pow(sunAlign, 6.0) * 0.05;                    // faint warm sheen sunward
+    float sunK = 1.0 - gloom * 0.92;
+    col += uSunColor * pow(sunAlign, 130.0) * 2.6 * sunK;            // sparkle glints (>1 -> bloom)
+    col += uSunColor * pow(sunAlign, 28.0) * 0.30 * sunK;            // wider lobe: survives steep cameras
+    col += uSunColor * pow(sunAlign, 6.0) * 0.05 * sunK;             // faint warm sheen sunward
     // shoreline foam: wide animated band hugging the waterline (the shore
     // attribute is per-vertex at ~2u, so the band must span several units)
     float foamBand = smoothstep(3.2, 0.1, vShoreDepth + n1.x * 0.7);
     foamBand *= foamBand;
     float foamWave = 0.62 + 0.38 * sin(uTime * 1.7 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0);
     float foam = foamBand * foamWave;
-    col = mix(col, vec3(1.05), clamp(foam, 0.0, 0.9));
+    col = mix(col, mix(vec3(1.05), vec3(0.5, 0.52, 0.68), gloom), clamp(foam, 0.0, 0.9));
     float alpha = max(mix(0.84, 0.96, depth), foam * 0.95);
     gl_FragColor = vec4(col, alpha);
     #include <tonemapping_fragment>

@@ -91,14 +91,23 @@ function doorNythraxisClickMaterial(): THREE.MeshBasicMaterial {
   return nythraxisClickMat;
 }
 
-function doorPortalMaterial(entering: boolean, lowGfx: boolean): THREE.MeshBasicMaterial {
-  const key = `${entering}:${lowGfx}`;
+// Portal shimmer tint by kind. Violet marks dungeon entrances, blue instance
+// exits; `pad` is the pale silver shimmer of the Mirror World's standing
+// mirrors (buildMirrorBody rides it on the glass).
+const PORTAL_TINTS = {
+  enter: 0x9a5df0,
+  exit: 0x6ab8ff,
+  pad: 0xb9c2dd,
+} as const;
+type PortalKind = keyof typeof PORTAL_TINTS;
+
+function doorPortalMaterial(kind: PortalKind, lowGfx: boolean): THREE.MeshBasicMaterial {
+  const key = `${kind}:${lowGfx}`;
   const existing = portalMats.get(key);
   if (existing) return existing;
-  const tint = entering ? 0x9a5df0 : 0x6ab8ff;
   const material = markSharedMaterial(
     new THREE.MeshBasicMaterial({
-      color: tint,
+      color: PORTAL_TINTS[kind],
       transparent: true,
       opacity: 0.55,
       side: THREE.DoubleSide,
@@ -143,9 +152,82 @@ export function buildDoorBody(
     plinth.castShadow = true;
     body.add(plinth);
   }
-  const portal = new THREE.Mesh(doorPortalGeometry(), doorPortalMaterial(entering, lowGfx));
+  const portal = new THREE.Mesh(
+    doorPortalGeometry(),
+    doorPortalMaterial(entering ? 'enter' : 'exit', lowGfx),
+  );
   portal.position.y = 2.15;
   portal.scale.set(1, 1.35, 1);
+  body.add(portal);
+  return { body, portal };
+}
+
+// Shared frame/glass materials for the Mirror World's standing mirrors. Process-
+// lifetime like the door resources above, so the renderer's per-view disposal
+// guard leaves them alone (the mirror's per-view body geometry is not shared and
+// is freed on interest churn).
+let mirrorFrameMat: THREE.Material | null = null;
+let mirrorGlassMat: THREE.Material | null = null;
+
+function mirrorFrameMaterial(): THREE.Material {
+  mirrorFrameMat ??= markSharedMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0x2e2a3e,
+      roughness: 0.55,
+      metalness: 0.35,
+      emissive: 0x14122a,
+      emissiveIntensity: 0.6,
+    }),
+  );
+  return mirrorFrameMat;
+}
+
+function mirrorGlassMaterial(): THREE.Material {
+  mirrorGlassMat ??= markSharedMaterial(
+    new THREE.MeshStandardMaterial({
+      color: 0xcfd6e6,
+      roughness: 0.05,
+      metalness: 1,
+      envMapIntensity: 2.5,
+      emissive: 0x0c0c18,
+      emissiveIntensity: 0.3,
+    }),
+  );
+  return mirrorGlassMat;
+}
+
+// A standing mirror — every Mirror World portal pad renders as one: a dark
+// ornate frame on a plinth around a polished metal oval, with the pad-tinted
+// door shimmer riding the returned `portal` mesh so the renderer's existing
+// portal animation path (spin + opacity pulse) breathes it for free. High
+// metalness + the scene env map make the glass read as a true reflection of its
+// surroundings (bright sky on the Thornpeak ridge, pale gloaming inside the
+// dome).
+export function buildMirrorBody(lowGfx: boolean): { body: THREE.Group; portal?: THREE.Mesh } {
+  const frameMat = mirrorFrameMaterial();
+  const glassMat = mirrorGlassMaterial();
+  const body = new THREE.Group();
+  const plinth = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.5, 1.4), frameMat);
+  plinth.position.y = 0.25;
+  plinth.castShadow = true;
+  body.add(plinth);
+  const frame = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.16, 10, 40), frameMat);
+  frame.position.y = 2.5;
+  frame.scale.set(1, 1.45, 1);
+  frame.castShadow = true;
+  body.add(frame);
+  const glass = new THREE.Mesh(new THREE.CircleGeometry(1.3, 40), glassMat);
+  glass.position.y = 2.5;
+  glass.scale.set(1, 1.45, 1);
+  body.add(glass);
+  const backing = new THREE.Mesh(new THREE.CircleGeometry(1.3, 40), frameMat);
+  backing.position.set(0, 2.5, -0.03);
+  backing.scale.set(1, 1.45, 1);
+  backing.rotation.y = Math.PI;
+  body.add(backing);
+  const portal = new THREE.Mesh(doorPortalGeometry(), doorPortalMaterial('pad', lowGfx));
+  portal.position.set(0, 2.5, 0.06);
+  portal.scale.set(0.62, 0.9, 1);
   body.add(portal);
   return { body, portal };
 }

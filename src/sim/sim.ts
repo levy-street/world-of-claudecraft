@@ -92,10 +92,12 @@ import {
   DELVE_COMPANIONS,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
+  DREAM_SLOT_COUNT,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   delveAt,
   delveOrigin,
+  dreamOrigin,
   dungeonAt,
   FISHING_RARE_ID,
   FISHING_TABLES,
@@ -104,8 +106,15 @@ import {
   ITEMS,
   isArenaPos,
   isDelvePos,
+  isDreamPos,
   MOBS,
+  NPCS,
+  PAD_LOCKED_ALL,
+  PAD_QUEST_LOCKS,
+  PLAYER_START,
+  PORTAL_PADS,
   QUESTS,
+  REWARD_ARCHETYPE,
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
@@ -348,6 +357,7 @@ import {
   MELEE_RANGE,
   type MobFamily,
   type MoveInput,
+  mobXpValue,
   normAngle,
   type OverheadEmoteId,
   PARTY_MEMBER_AURA_CAP,
@@ -518,6 +528,33 @@ const DEEPFEN_FISHING_SHORE_MARGIN = 10;
 const THE_CODFATHER_ITEM_ID = 'the_codfather';
 const THE_CODFATHER_QUEST_ID = 'q_the_codfather';
 // DOOR_TRIGGER_RADIUS moved to instances/dungeons.ts (I1: read only by updateDoorTriggers).
+const PORTAL_PAD_TRIGGER_RADIUS = 2.0; // walk-in range of an overworld portal pad
+
+// The Deepdream (Mirror World): the falling-asleep hold, the win/loss aftermath
+// pauses before waking, and the size of a Mirror Shard's permanent grant.
+const DREAM_FALL_ASLEEP = 3;
+const DREAM_AFTERMATH_WIN = 4;
+const DREAM_AFTERMATH_LOSS = 2.5;
+const MIRROR_SHARD_STAT_GAIN = 3;
+const WITCH_BREW_RANGE = 8; // yards from Morwen within which she brews
+const GARGOYLE_TALK_RANGE = 8; // yards from a sentinel within which gossip acts land
+const GARGOYLE_RESTONE_DELAY = 60; // seconds after the boss dies before the statue returns
+
+// One player's dream in flight: the falling-asleep hold, the live duel, or
+// the brief aftermath before waking home at `ret`.
+interface DreamRun {
+  state: 'falling' | 'active' | 'over';
+  timer: number;
+  slot: number;
+  ret: { x: number; z: number; facing: number };
+  /** The Echo bot's player pid (a full addPlayer clone, not a mob id). */
+  echoId: number | null;
+  /** Opening ritual: self/party buffs the Echo casts before it engages. */
+  echoBuffs?: string[];
+  /** Cadence beats spent trying the current buff (give up past 25). */
+  echoBuffTries?: number;
+  won: boolean;
+}
 // NYTHRAXIS_PARTY_INTERACT_RANGE / NYTHRAXIS_VISION_LINE_DELAY moved to
 // encounters/nythraxis.ts (N1) with the crypt-quest helpers that read them.
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
@@ -780,6 +817,13 @@ export interface PlayerMeta {
   arena2v2Rating: number;
   arena2v2Wins: number;
   arena2v2Losses: number;
+  // The Deepdream chain: once-ever Mirror-Shard drop latch + the permanent
+  // stat grants shards have bought. Persisted via CharacterState; the grants
+  // are mirrored onto the entity (Entity.permanentStats) for recalcPlayerStats.
+  mirrorShardWon: boolean;
+  // statues this character has bowed to (gargoyle toll-quest gate); persisted
+  bowedGargoyles: Set<string>;
+  permanentStats: { str: number; agi: number; sta: number; int: number; spi: number };
   // Talents & Specializations. `talents` is the active allocation; `talentMods`
   // is its precomputed flat struct — resolved only on allocation/respec/loadout
   // change (recomputeTalents), never walked on the combat or stat hot path.
@@ -894,6 +938,9 @@ export interface CharacterState {
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
+  mirrorShardWon?: boolean;
+  bowedGargoyles?: string[];
+  permanentStats?: { str: number; agi: number; sta: number; int: number; spi: number };
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
@@ -1245,6 +1292,24 @@ export class Sim {
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx);
 
+    // Overworld portal pads (the Mirror World's standing mirrors):
+    // plain ground objects whose walk-in trigger teleports within the shared
+    // world (updatePortalPadTriggers) — no instancing. createGroundObject
+    // draws no RNG, so appending them here leaves world-gen draws untouched.
+    for (const pad of PORTAL_PADS) {
+      const obj = createGroundObject(
+        this.nextId++,
+        '',
+        pad.name,
+        this.groundPos(pad.pos.x, pad.pos.z),
+      );
+      obj.templateId = 'portal_pad';
+      obj.objectItemId = null;
+      obj.lootable = false; // walk-in only; never an interact/loot target
+      this.addEntity(obj);
+      this.portalPads.push({ entityId: obj.id, padId: pad.id, dest: { ...pad.dest } });
+    }
+
     for (const delve of DELVE_LIST) {
       for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
         const origin = delveOrigin(delve.index, i);
@@ -1418,6 +1483,11 @@ export class Sim {
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
+    } else if (savedPos && isDreamPos(savedPos.x)) {
+      // A crash mid-dream persisted a shadow-realm position: wake at the
+      // Witch's Hollow instead (normal saves persist the waking-world return
+      // spot — see serializeCharacter).
+      savedPos = { x: -110, z: 1162 };
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
@@ -1478,6 +1548,11 @@ export class Sim {
       arena2v2Rating: savedArena2v2.rating,
       arena2v2Wins: savedArena2v2.wins,
       arena2v2Losses: savedArena2v2.losses,
+      mirrorShardWon: savedState?.mirrorShardWon ?? false,
+      bowedGargoyles: new Set(savedState?.bowedGargoyles ?? []),
+      permanentStats: savedState?.permanentStats
+        ? { ...savedState.permanentStats }
+        : { str: 0, agi: 0, sta: 0, int: 0, spi: 0 },
       talents: emptyAllocation(),
       talentMods: emptyModifiers(),
       fiestaAugments: [],
@@ -1509,6 +1584,8 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    // Mirror-Shard grants onto the entity before the login-time stat recalcs.
+    player.permanentStats = { ...meta.permanentStats };
     if (this.primaryId === -1) this.primaryId = player.id;
 
     if (savedState) {
@@ -1714,6 +1791,9 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
+    // Deepdream teardown: free the slot + the Echo (position already persisted
+    // as the waking-world return spot by serializeCharacter).
+    this.abandonDream(pid);
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
@@ -1798,7 +1878,14 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: { x: e.pos.x, z: e.pos.z },
+      // A mid-dream save must never write the shadow-realm band: persist the
+      // waking-world return spot instead (same rule as the fiesta snapshot).
+      pos: this.dreamRuns.has(pid)
+        ? {
+            x: (this.dreamRuns.get(pid) as DreamRun).ret.x,
+            z: (this.dreamRuns.get(pid) as DreamRun).ret.z,
+          }
+        : { x: e.pos.x, z: e.pos.z },
       facing: e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
@@ -1823,6 +1910,9 @@ export class Sim {
       arena1v1Rating: meta.arenaRating,
       arena1v1Wins: meta.arenaWins,
       arena1v1Losses: meta.arenaLosses,
+      mirrorShardWon: meta.mirrorShardWon,
+      bowedGargoyles: [...meta.bowedGargoyles],
+      permanentStats: { ...meta.permanentStats },
       arena2v2Rating: meta.arena2v2Rating,
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
@@ -2138,6 +2228,10 @@ export class Sim {
   }
   get questsDone(): Set<string> {
     return this.primary.questsDone;
+  }
+
+  get bowedGargoyles(): Set<string> {
+    return this.primary.bowedGargoyles;
   }
   raidLockouts(): import('../world_api').RaidLockout[] {
     const now = this.lockoutNowMs();
@@ -2651,6 +2745,8 @@ export class Sim {
       // that reassign a Sim method post-construction. startFishing/unlockMechChromaFromItem/
       // openSkinSelect are private on Sim; isSwimming is public. The owning facets stay TBD.
       startFishing: (p, meta) => sim.startFishing(p, meta),
+      startSlumber: (pid) => sim.startSlumber(pid),
+      consumeMirrorShard: (pid) => sim.consumeMirrorShard(pid),
       unlockMechChromaFromItem: (meta, itemId, chromaId) =>
         sim.unlockMechChromaFromItem(meta, itemId, chromaId),
       openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
@@ -2847,6 +2943,7 @@ export class Sim {
       if (!p.dead) {
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
+        this.updatePortalPadTriggers(p);
         this.updateCasting(p, meta);
         this.updatePlayerAutoAttack(p, meta);
         updateRegen(this.ctx, p, meta);
@@ -2864,6 +2961,8 @@ export class Sim {
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
     }
+    this.updateDreams();
+    this.updateGargoyles();
 
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
@@ -3304,7 +3403,13 @@ export class Sim {
       // cliffs, steep mountainsides, and the world rim are walls, not ramps:
       // an uphill step is blocked when the step itself is too steep OR when it
       // lands on ground whose true gradient is unwalkable (so approaching at an
-      // angle cannot cheat the limit)
+      // angle cannot cheat the limit). This holds in the air too (the airborne
+      // branch below), or a player could spam-jump to ratchet up an unclimbable
+      // face (e.g. hop the zone ridges / mirror vale rim): grounded moves pin
+      // nx/nz, airborne moves also kill horizontal velocity so the jump just
+      // falls straight down instead of carrying forward into the wall. (Charge
+      // and knockback return before this block and do their own slope handling,
+      // so only plain jump/run movement is affected.)
       if (p.onGround && !swimming) {
         const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
         const h1 = groundHeight(nx, nz, this.cfg.seed);
@@ -5349,6 +5454,9 @@ export class Sim {
   // Player death/respawn lives in entity_roster.ts (E1, merged E2). Thin delegate
   // keeps the public IWorld surface (`sim.releaseSpirit`) resolving unchanged.
   releaseSpirit(pid?: number): void {
+    // A death inside the Deepdream has no corpse run: updateDreams is already
+    // waking the sleeper, so a mid-aftermath release must not graveyard them.
+    if (this.dreamRuns.has(pid ?? this.primaryId)) return;
     releasePlayerSpirit(this.ctx, pid);
   }
 
@@ -5408,6 +5516,12 @@ export class Sim {
       if (!attackerPlayer) return false;
       if (attackerPlayer.dead) return false;
       if (attackerPlayer.id === target.id) return false;
+      // Deepdream: a dreamer and their Echo are mutually lethal inside the
+      // dream (pets on either side unwrap to their owners above/below).
+      const dreamA = this.dreamRuns.get(attackerPlayer.id);
+      if (dreamA && dreamA.state === 'active' && dreamA.echoId === target.id) return true;
+      const dreamT = this.dreamRuns.get(target.id);
+      if (dreamT && dreamT.state === 'active' && dreamT.echoId === attackerPlayer.id) return true;
       const duel = this.duels.get(attackerPlayer.id);
       if (
         duel &&
@@ -6104,6 +6218,632 @@ export class Sim {
 
   private updateDoorTriggers(p: Entity): void {
     updateDoorTriggersImpl(this.ctx, p);
+  }
+
+  // Overworld portal pads (mirrors): entity id ↔ destination, registered at
+  // world init. Same walk-in idiom as dungeon doors, but the teleport stays in
+  // the one shared overworld — no instance claiming, no per-party copies.
+  private portalPads: { entityId: number; padId: string; dest: { x: number; z: number } }[] = [];
+
+  private updatePortalPadTriggers(p: Entity): void {
+    if (p.kind !== 'player' || p.pos.x > DUNGEON_X_THRESHOLD) return;
+    for (const pad of this.portalPads) {
+      const obj = this.entities.get(pad.entityId);
+      if (!obj) continue;
+      if (dist2d(p.pos, obj.pos) < PORTAL_PAD_TRIGGER_RADIUS) {
+        // Sealed mirrors bounce instead of carrying: the Black Mirror knows no
+        // one, and each town mirror stays dark until its statue's toll is paid.
+        const meta = this.players.get(p.id);
+        const lockQuest = PAD_QUEST_LOCKS[pad.padId];
+        const sealedToAll = PAD_LOCKED_ALL.has(pad.padId);
+        if (sealedToAll || (lockQuest && meta && !meta.questsDone.has(lockQuest))) {
+          let dx = p.pos.x - obj.pos.x;
+          let dz = p.pos.z - obj.pos.z;
+          let d = Math.hypot(dx, dz);
+          if (d < 0.01) {
+            // dead-center (a teleport onto the glass): push straight south
+            dx = 0;
+            dz = 1;
+            d = 1;
+          }
+          const push = PORTAL_PAD_TRIGGER_RADIUS + 0.6;
+          p.pos = this.groundPos(obj.pos.x + (dx / d) * push, obj.pos.z + (dz / d) * push);
+          p.prevPos = { ...p.pos };
+          this.rebucket(p);
+          const now = this.time;
+          const lastAt = this.padDenyAt.get(p.id) ?? -10;
+          if (now - lastAt > 2.5) {
+            this.padDenyAt.set(p.id, now);
+            this.error(
+              p.id,
+              sealedToAll
+                ? 'The Sable Mirror does not know you. Yet.'
+                : 'The mirror is dark. Its keeper expects a courtesy first.',
+            );
+          }
+          return;
+        }
+        p.pos = this.groundPos(pad.dest.x, pad.dest.z);
+        p.prevPos = { ...p.pos };
+        this.rebucket(p);
+        p.targetId = null;
+        p.autoAttack = false;
+        return;
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // The Deepdream — drink Morwen's draught, fall asleep, duel your Echo in the
+  // shadow realm, wake where you slept. Solo slots far past every other
+  // off-world band (DREAM_X in data.ts). Mirrors the arena's save-return /
+  // clean-slate / aftermath flow, but for one player against a stat-clone mob.
+  // Dying in the dream costs nothing: no corpse run, you simply wake.
+  // ---------------------------------------------------------------------------
+
+  private dreamRuns = new Map<number, DreamRun>();
+  // throttle for the sealed-mirror bounce message (pid -> last denial time)
+  private padDenyAt = new Map<number, number>();
+  // awakened-gargoyle bookkeeping: mob entity id -> which statue it was and
+  // where the plinth stands (respawnAt set once the boss dies)
+  private awakenedGargoyles = new Map<
+    number,
+    { npcTemplateId: string; home: { x: number; z: number }; respawnAt: number | null }
+  >();
+  private dreamBusySlots = new Set<number>();
+
+  // Entry point for the Deepdream Draught (items.ts 'slumber' use).
+  startSlumber(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r || r.e.dead) return;
+    const { meta, e: p } = r;
+    if (this.dreamRuns.has(meta.entityId)) return;
+    if (this.arenaMatches.has(meta.entityId)) {
+      this.error(meta.entityId, 'You are busy.');
+      return;
+    }
+    if (p.inCombat) {
+      this.error(meta.entityId, "You can't do that while in combat.");
+      return;
+    }
+    if (this.isSwimming(p)) {
+      this.error(meta.entityId, "You can't do that while swimming.");
+      return;
+    }
+    this.removeItem('deepdream_draught', 1, meta.entityId);
+    p.sitting = true;
+    p.autoAttack = false;
+    p.targetId = null;
+    this.dreamRuns.set(meta.entityId, {
+      state: 'falling',
+      timer: DREAM_FALL_ASLEEP,
+      slot: -1,
+      ret: { x: p.pos.x, z: p.pos.z, facing: p.facing },
+      echoId: null,
+      won: false,
+    });
+    this.emit({ type: 'slumber', pid: meta.entityId });
+    this.emit({
+      type: 'log',
+      text: 'Sleep takes hold — the dream pulls you under.',
+      color: '#b9f',
+      pid: meta.entityId,
+    });
+  }
+
+  private updateDreams(): void {
+    if (this.dreamRuns.size === 0) return;
+    for (const [pid, run] of this.dreamRuns) {
+      const p = this.entities.get(pid);
+      if (!p) continue; // a leaver is torn down in removePlayer (abandonDream)
+      if (run.state === 'falling') {
+        run.timer -= DT;
+        if (run.timer <= 0) this.enterDream(pid, run);
+      } else if (run.state === 'active') {
+        this.driveEcho(pid, run);
+        const echo = run.echoId === null ? null : this.entities.get(run.echoId);
+        if (p.dead) {
+          // No corpse run in a dream: a short fade, then you just wake.
+          run.state = 'over';
+          run.won = false;
+          run.timer = DREAM_AFTERMATH_LOSS;
+          this.emit({
+            type: 'log',
+            text: 'The Echo scatters you like breath on glass.',
+            color: '#b9f',
+            pid,
+          });
+        } else if (!echo || echo.dead) {
+          const meta = this.players.get(pid);
+          run.state = 'over';
+          run.won = true;
+          run.timer = DREAM_AFTERMATH_WIN;
+          // The Echo is a player-kind bot, so the mob-kill quest path never
+          // fires — grant the "Face Your Echo" credit by its quest key here.
+          if (meta)
+            onMobKilledForQuests(
+              this.ctx,
+              { templateId: 'player_echo' } as unknown as Entity,
+              meta,
+            );
+          // Every win pays regular kill XP for an even-level foe (the quest's
+          // own xp/gold reward stays once-ever at Morwen's turn-in).
+          if (meta && echo) this.grantXp(mobXpValue(echo.level, p.level), meta, { fromKill: true });
+          // Once the quest is done, later Echoes drop like a normal humanoid
+          // of the band: roll the template table straight into the bags (the
+          // corpse is a player entity and never lootable).
+          if (meta?.questsDone.has('q_face_your_echo')) {
+            let copper = 0;
+            for (const entry of MOBS.player_echo.loot) {
+              if (!this.rng.chance(entry.chance)) continue;
+              if (entry.copper)
+                copper += this.rng.int(
+                  Math.ceil(entry.copper * 0.6),
+                  Math.ceil(entry.copper * 1.4),
+                );
+              if (entry.itemId) this.addItem(entry.itemId, 1, pid);
+            }
+            if (copper > 0) {
+              meta.copper += copper;
+              // the canonical money-pickup line: 'loot' events run through the
+              // client's localizeLootText matcher, same as corpse copper
+              this.emit({ type: 'loot', text: `You loot ${formatMoney(copper)}.`, pid });
+            }
+          }
+          // Its shadow dies with it: the Echo's pet must not maul the victor
+          // through the aftermath fade.
+          const echoPet = run.echoId === null ? null : this.petOf(run.echoId, true);
+          if (echoPet) this.despawnPersistentPet(echoPet);
+          if (meta && !meta.mirrorShardWon) {
+            meta.mirrorShardWon = true;
+            this.addItem('mirror_shard', 1, pid);
+            this.emit({
+              type: 'log',
+              text: 'The Echo shatters — a Mirror Shard is left where it stood.',
+              color: '#f6f',
+              pid,
+            });
+          } else {
+            this.emit({
+              type: 'log',
+              text: 'The Echo shatters. It leaves nothing behind this time.',
+              color: '#b9f',
+              pid,
+            });
+          }
+        }
+      } else {
+        run.timer -= DT;
+        if (run.timer <= 0) this.wakeFromDream(pid, run);
+      }
+    }
+  }
+
+  private enterDream(pid: number, run: DreamRun): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { e: p } = r;
+    let slot = -1;
+    for (let i = 0; i < DREAM_SLOT_COUNT; i++) {
+      if (!this.dreamBusySlots.has(i)) {
+        slot = i;
+        break;
+      }
+    }
+    if (slot === -1) {
+      // every dream slot is occupied: hand the draught back and stay awake
+      this.dreamRuns.delete(pid);
+      p.sitting = false;
+      this.addItem('deepdream_draught', 1, pid);
+      this.error(pid, 'The dream is crowded tonight. Try again soon.');
+      return;
+    }
+    this.dreamBusySlots.add(slot);
+    run.slot = slot;
+    run.state = 'active';
+    const origin = dreamOrigin(slot);
+    this.resetForArena(p); // a clean slate — the duel is decided by play
+    p.pos = this.groundPos(origin.x, origin.z);
+    p.prevPos = { ...p.pos };
+    p.facing = 0;
+    this.rebucket(p);
+    // The Echo: a full bot-player clone — same class, level, gear, talents,
+    // skin, and Mirror-Shard gains, so every derived stat, the whole ability
+    // kit, and the silhouette mirror exactly. It is driven each tick by
+    // driveEcho through the real castAbility path (the fiesta-bot pattern).
+    const meta = this.players.get(pid);
+    const cls = p.templateId as PlayerClass;
+    const echoPid = this.addPlayer(cls, p.name); // it answers to your name
+    const echo = this.entities.get(echoPid);
+    const echoMeta = this.players.get(echoPid);
+    if (!echo || !echoMeta || !meta) {
+      // cannot happen in-process; a null echoId simply ends the dream as a win
+      run.echoId = null;
+      return;
+    }
+    this.setPlayerLevel(p.level, echoPid);
+    echoMeta.equipment = { ...meta.equipment };
+    echoMeta.permanentStats = { ...meta.permanentStats };
+    // mirror talents the silent login-restore way — applyTalents would toast
+    // 'Talents updated.' into the dreamer's offline chat
+    echoMeta.talents = cloneAllocation(meta.talents);
+    echoMeta.talentMods = computeTalentModifiers(cls, echoMeta.talents);
+    this.refreshKnownAbilities(echoMeta, false);
+    this.setPlayerSkin(echoPid, meta.skin, meta.skinCatalog);
+    this.resetForArena(echo); // recalc with the mirrored kit; full hp/resource
+    echo.pos = this.groundPos(origin.x, origin.z + 12);
+    echo.prevPos = { ...echo.pos };
+    echo.facing = Math.PI;
+    echo.prevFacing = Math.PI;
+    this.rebucket(echo);
+    echo.hostile = true; // reads red on every host; the sim gate is the dream pairing
+    echo.moveSpeed += 0.5; // a half-step quicker: you cannot simply outrun yourself
+    run.echoId = echoPid;
+    // Mirror the dreamer's companion. An owned pet (alive, dead, or a demon
+    // already at heel) fights for the Echo too; a summoner Echo with nothing
+    // at heel still always fields its strongest known demon.
+    const myPet = this.petOf(pid, true);
+    let echoPetTemplate: string | null = myPet ? myPet.templateId : null;
+    if (!echoPetTemplate) {
+      for (const k of echoMeta.known) {
+        for (const ef of k.def.effects) {
+          if (ef.type === 'summonDemon') echoPetTemplate = ef.mobId; // last known = strongest
+        }
+      }
+    }
+    if (echoPetTemplate) {
+      const echoPet = petCommands.createDemonPet(this.ctx, echo, echoPetTemplate);
+      if (echoPet) {
+        if (myPet) echoPet.name = myPet.name; // your own beast, answering to its name
+        echoPet.petMode = 'defensive';
+      }
+    }
+    // Bring the dreamer's living pet along: the dream band is thousands of
+    // yards from the waking world, and the pet-AI catch-up teleport must not
+    // be left to a cross-world line-of-sight probe.
+    if (myPet && !myPet.dead) {
+      myPet.pos = this.groundPos(p.pos.x + 2, p.pos.z + 1);
+      myPet.prevPos = { ...myPet.pos };
+      this.rebucket(myPet);
+    }
+    this.emit({
+      type: 'log',
+      text: 'Across the mist, something wearing your face stands up.',
+      color: '#b9f',
+      pid,
+    });
+  }
+
+  // Steer the Echo like a practice bot: face the dreamer, close to the kit's
+  // engage range, keep swinging, and fire the mirrored abilities through the
+  // real castAbility path (which no-ops on cooldown/cost, like a player).
+  private driveEcho(dreamerPid: number, run: DreamRun): void {
+    if (run.echoId === null) return;
+    const echo = this.entities.get(run.echoId);
+    const echoMeta = this.players.get(run.echoId);
+    const dreamer = this.entities.get(dreamerPid);
+    if (!echo || !echoMeta || echo.dead || !dreamer || dreamer.dead) return;
+    echoMeta.moveInput = emptyMoveInput();
+    echo.facing = angleTo(echo.pos, dreamer.pos);
+    // Opening ritual: raise every self/party buff in the kit before engaging
+    // (Battle Shout, fortitude-style wards — friendly casts self-target here).
+    if (run.echoBuffs === undefined) {
+      run.echoBuffs = echoMeta.known
+        .filter((k) =>
+          k.def.effects.some((ef) => ef.type === 'selfBuff' || ef.type === 'buffTarget'),
+        )
+        // an aura the clone already carries (its starting stance) is not worth
+        // a beat; learned order keeps the cheap level-1 shout at the front
+        .filter((k) => !echo.auras.some((a) => a.kind === k.def.id || a.name === k.def.name))
+        .map((k) => k.def.id);
+    }
+    // Never clip your own cast: hold position while channeling/casting.
+    if (echo.castingAbility) return;
+    const engage = CLASSES[echoMeta.cls].ranged ? 22 : MELEE_RANGE * 0.9;
+    if (dist2d(echo.pos, dreamer.pos) > engage) echoMeta.moveInput.forward = true;
+    echo.targetId = dreamer.id;
+    if (!echo.autoAttack) this.startAutoAttack(run.echoId);
+    // One deliberate action per cadence beat — hammering castAbility every
+    // tick fights the swing cycle and reads as a mob that only ever melees.
+    if (this.tickCount % 12 !== run.echoId % 12) return;
+    if (run.echoBuffs.length > 0) {
+      const next = run.echoBuffs[0];
+      this.castAbility(next, run.echoId);
+      if (echo.castingAbility || echo.gcdRemaining > 0) {
+        run.echoBuffs.shift(); // it fired — the next buff takes a later beat
+        run.echoBuffTries = 0;
+      } else {
+        // not yet affordable (a rage-starved shout builds toward it) — retry,
+        // but let go eventually so an already-active stance can't stall us
+        run.echoBuffTries = (run.echoBuffTries ?? 0) + 1;
+        if (run.echoBuffTries > 25) {
+          run.echoBuffs.shift();
+          run.echoBuffTries = 0;
+        }
+      }
+      return;
+    }
+    const abilityId = this.pickEchoAbility(echoMeta, echo, run.echoId);
+    if (abilityId) this.castAbility(abilityId, run.echoId);
+  }
+
+  // The Echo's rotation: mend itself when pressed (friendly heals self-target
+  // when the current target is hostile), keep its summon standing, then a
+  // varied pick across EVERY castable spell in the mirrored kit — dots,
+  // debuffs, strikes — so the duel reads like fighting a player, not a mob.
+  private pickEchoAbility(meta: PlayerMeta, echo: Entity, echoPid: number): string | null {
+    if (echo.hp < echo.maxHp * 0.55) {
+      for (const k of meta.known) {
+        if (k.def.targetType === 'friendly' && k.def.effects.some((ef) => ef.type === 'heal'))
+          return k.def.id;
+      }
+    }
+    // A summoner whose shadow-pet has fallen raises it again, mid-duel.
+    const pet = this.petOf(echoPid, true);
+    if (!pet || pet.dead) {
+      for (const k of meta.known) {
+        if (k.def.effects.some((ef) => ef.type === 'summonDemon' || ef.type === 'summonPet'))
+          return k.def.id;
+      }
+    }
+    const candidates: string[] = [];
+    for (const k of meta.known) {
+      const def = k.def;
+      if (def.targetType === 'friendly' || !def.requiresTarget) continue;
+      const offensive = def.effects.some(
+        (ef) =>
+          ef.type === 'directDamage' ||
+          ef.type === 'weaponDamage' ||
+          ef.type === 'weaponStrike' ||
+          ef.type === 'dot' ||
+          ef.type === 'sunder' ||
+          ef.type === 'slow' ||
+          ef.type === 'stun' ||
+          ef.type === 'root',
+      );
+      if (offensive) candidates.push(def.id);
+    }
+    if (candidates.length === 0) return null;
+    return candidates[this.rng.int(0, candidates.length - 1)];
+  }
+
+  private wakeFromDream(pid: number, run: DreamRun): void {
+    this.dreamRuns.delete(pid);
+    if (run.slot >= 0) this.dreamBusySlots.delete(run.slot);
+    if (run.echoId !== null && this.entities.has(run.echoId)) {
+      // drop any player targets on the departing Echo so the removal is clean
+      for (const meta of this.players.values()) {
+        const e = this.entities.get(meta.entityId);
+        if (e?.targetId === run.echoId) e.targetId = null;
+      }
+      this.removePlayer(run.echoId); // full bot teardown, including its pet
+    }
+    const p = this.entities.get(pid);
+    if (!p) return;
+    this.resetForArena(p); // revives, heals, and clears combat leftovers
+    p.pos = this.groundPos(run.ret.x, run.ret.z);
+    p.prevPos = { ...p.pos };
+    p.facing = run.ret.facing;
+    this.rebucket(p);
+    // ...and the pet walks out of the dream at their heel.
+    const pet = this.petOf(pid, true);
+    if (pet && !pet.dead) {
+      pet.pos = this.groundPos(p.pos.x + 2, p.pos.z + 1);
+      pet.prevPos = { ...pet.pos };
+      this.rebucket(pet);
+    }
+    this.emit({ type: 'respawn', pid });
+    this.emit({ type: 'log', text: 'You wake where sleep took you.', color: '#b9f', pid });
+  }
+
+  // Leaver teardown: free the slot and the Echo; the return position was
+  // already persisted by serializeCharacter's dream override.
+  private abandonDream(pid: number): void {
+    const run = this.dreamRuns.get(pid);
+    if (!run) return;
+    this.dreamRuns.delete(pid);
+    if (run.slot >= 0) this.dreamBusySlots.delete(run.slot);
+    if (run.echoId !== null && this.entities.has(run.echoId)) this.removePlayer(run.echoId);
+  }
+
+  // Morwen re-brews on demand once the recipe quest is done (the quest itself
+  // rewards the first draught): same parts, no quest-state involved, so the
+  // chain is repeatable forever — only the shard is once-ever.
+  brewDraught(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r || r.e.dead) return;
+    const { meta, e: p } = r;
+    if (!meta.questsDone.has('q_deepdream_recipe')) {
+      this.error(meta.entityId, 'Morwen has nothing to brew for you yet.');
+      return;
+    }
+    let witchNear = false;
+    for (const e of this.entities.values()) {
+      if (
+        e.kind === 'npc' &&
+        e.templateId === 'mistwitch_morwen' &&
+        dist2d(p.pos, e.pos) < WITCH_BREW_RANGE
+      ) {
+        witchNear = true;
+        break;
+      }
+    }
+    if (!witchNear) {
+      this.error(meta.entityId, 'Morwen is not close enough to brew.');
+      return;
+    }
+    const parts: [string, number][] = [
+      ['white_sheet', 2],
+      ['spirit_horn', 2],
+      ['black_hood', 2],
+    ];
+    for (const [id, n] of parts) {
+      if (this.countItem(id, meta.entityId) < n) {
+        this.error(meta.entityId, 'You are missing ingredients for the draught.');
+        return;
+      }
+    }
+    for (const [id, n] of parts) this.removeItem(id, n, meta.entityId);
+    this.addItem('deepdream_draught', 1, meta.entityId);
+    this.emit({
+      type: 'log',
+      text: 'Morwen ladles a fresh Deepdream Draught into your pack.',
+      color: '#b9f',
+      pid: meta.entityId,
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // Mirror-guardian gargoyles. Three sentinels stand as NPCs beside the town
+  // mirrors. Gossip offers a bow (answered with the statue's head-nod — the
+  // npcBow event) or a challenge, which swaps the statue for the level-99
+  // gargoyle_awakened boss. The stone returns 60s after the boss dies, or
+  // immediately if it fully resets (leash), so the mirror is never left
+  // unguarded — or camped by an unkillable wanderer.
+  // -------------------------------------------------------------------------
+
+  private nearestGargoyleSentinel(p: Entity): Entity | null {
+    let best: Entity | null = null;
+    let bestD = GARGOYLE_TALK_RANGE;
+    for (const e of this.entities.values()) {
+      if (
+        e.kind !== 'npc' ||
+        !(e.templateId.startsWith('gargoyle_sentinel') || e.templateId.startsWith('dread_sentinel'))
+      )
+        continue;
+      const d = dist2d(p.pos, e.pos);
+      if (d < bestD) {
+        bestD = d;
+        best = e;
+      }
+    }
+    return best;
+  }
+
+  bowToGargoyle(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r || r.e.dead) return;
+    const npc = this.nearestGargoyleSentinel(r.e);
+    if (!npc || !npc.templateId.startsWith('gargoyle_sentinel')) {
+      this.error(r.meta.entityId, 'There is no gargoyle within reach.');
+      return;
+    }
+    // The courtesy is a real bow — play the emote — and it stirs the statue:
+    // its toll-quest opens in the same beat. The "shimmers with energy" line
+    // is client dialog copy (questUi).
+    this.playEmote('bow', r.meta.entityId);
+    if (!r.meta.bowedGargoyles.has(npc.templateId)) {
+      r.meta.bowedGargoyles.add(npc.templateId);
+      r.meta.wireRev++;
+    }
+  }
+
+  wakeGargoyle(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r || r.e.dead) return;
+    const npc = this.nearestGargoyleSentinel(r.e);
+    if (!npc) {
+      this.error(r.meta.entityId, 'There is no gargoyle within reach.');
+      return;
+    }
+    const home = { x: npc.pos.x, z: npc.pos.z };
+    const npcTemplateId = npc.templateId;
+    this.dropEntity(npc.id);
+    const mob = createMob(
+      this.nextId++,
+      MOBS.gargoyle_awakened,
+      99,
+      this.groundPos(home.x, home.z),
+    );
+    mob.hostile = true;
+    this.addEntity(mob);
+    // The challenger asked for this: open on them immediately.
+    mob.threat.set(r.meta.entityId, 200);
+    mob.aggroTargetId = r.meta.entityId;
+    mob.inCombat = true;
+    this.awakenedGargoyles.set(mob.id, { npcTemplateId, home, respawnAt: null });
+    // the waking moment: stone bursts outward as the wyrm takes its first step
+    this.emit({
+      type: 'spellfx',
+      fx: 'nova',
+      sourceId: mob.id,
+      targetId: mob.id,
+      school: 'shadow',
+    });
+    this.emit({
+      type: 'log',
+      text: 'Stone splits along old seams — the sentinel steps off its plinth.',
+      color: '#f66',
+      pid: r.meta.entityId,
+    });
+  }
+
+  private updateGargoyles(): void {
+    if (this.awakenedGargoyles.size === 0) return;
+    for (const [mobId, st] of this.awakenedGargoyles) {
+      const mob = this.entities.get(mobId);
+      if (st.respawnAt !== null) {
+        // stone is due back once the corpse window has passed
+        if (this.time >= st.respawnAt) {
+          if (mob) this.dropEntity(mobId);
+          this.respawnGargoyleSentinel(st.npcTemplateId, st.home);
+          this.awakenedGargoyles.delete(mobId);
+        }
+        continue;
+      }
+      if (!mob) {
+        // despawned by some other system: put the statue straight back
+        this.respawnGargoyleSentinel(st.npcTemplateId, st.home);
+        this.awakenedGargoyles.delete(mobId);
+        continue;
+      }
+      if (mob.dead) {
+        st.respawnAt = this.time + GARGOYLE_RESTONE_DELAY;
+      } else if (
+        !mob.inCombat &&
+        mob.hp >= mob.maxHp &&
+        dist2d(mob.pos, { x: st.home.x, y: 0, z: st.home.z }) < 6
+      ) {
+        // fury spent (full leash reset at home): it climbs back onto the plinth
+        this.dropEntity(mobId);
+        this.respawnGargoyleSentinel(st.npcTemplateId, st.home);
+        this.awakenedGargoyles.delete(mobId);
+        this.emit({
+          type: 'log',
+          text: 'Its fury spent, the gargoyle climbs back onto its plinth and stills into stone.',
+          color: '#b9f',
+        });
+      }
+    }
+  }
+
+  private respawnGargoyleSentinel(npcTemplateId: string, home: { x: number; z: number }): void {
+    const def = NPCS[npcTemplateId];
+    if (!def) return;
+    const npc = createNpc(this.nextId++, def, this.groundPos(home.x, home.z));
+    this.addEntity(npc);
+  }
+
+  // The Mirror Shard: one permanent point-bundle for the class archetype's
+  // primary attribute (items.ts 'mirrorShard' use).
+  consumeMirrorShard(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r || r.e.dead) return;
+    const { meta, e: p } = r;
+    this.removeItem('mirror_shard', 1, meta.entityId);
+    const arch = REWARD_ARCHETYPE[meta.cls];
+    const stat: 'str' | 'agi' | 'int' =
+      arch === 'warrior' ? 'str' : arch === 'rogue' ? 'agi' : 'int';
+    meta.permanentStats[stat] += MIRROR_SHARD_STAT_GAIN;
+    p.permanentStats = { ...meta.permanentStats };
+    recalcPlayerStats(p, meta.cls, meta.equipment, this.playerMods(meta));
+    const text =
+      stat === 'str'
+        ? 'The Mirror Shard sinks in. Your strength grows — permanently.'
+        : stat === 'agi'
+          ? 'The Mirror Shard sinks in. Your reflexes sharpen — permanently.'
+          : 'The Mirror Shard sinks in. Your mind deepens — permanently.';
+    this.emit({ type: 'log', text, color: '#f6f', pid: meta.entityId });
   }
 
   enterDungeon(dungeonId: string, pid?: number): void {

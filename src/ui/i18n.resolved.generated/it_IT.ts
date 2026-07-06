@@ -3747,6 +3747,7 @@ export const it_IT: EnTranslations = {
       "eatingDrinking": "Mangiando e bevendo...",
       "secondsRemaining": "{seconds} secondi rimanenti",
       "enteringZone": "Entrata in {zone}.",
+      "deepdreamZone": "Il Sogno Profondo",
       "welcomeZone": "Benvenuto a {zone}!",
       "levelBanner": "Livello {level}!",
       "levelLog": "Hai raggiunto il livello {level}!",
@@ -4388,6 +4389,13 @@ export const it_IT: EnTranslations = {
       "nythraxisDeathlessKingWarning": "Le tre reliquie raccontano la stessa storia: Aldren combatté per difendere il suo re, Malric spezzò il confine della morte e Voss tentò di fermare ciò che seguì. Il sigillo si indebolisce, e la cripta abbandonata è la via verso il basso.",
       "browseGoods": "Fammi vedere la tua merce.",
       "browseGoodsAria": "Vedi la merce di {name}",
+      "brewDraught": "Preparami un Intruglio del Sonno Profondo.",
+      "brewDraughtAria": "Chiedi a {name} di preparare un Intruglio del Sonno Profondo",
+      "gargoyleBow": "Inchinarsi.",
+      "gargoyleBowAria": "Inchinarsi davanti a {name}",
+      "gargoyleAttack": "Attaccare.",
+      "gargoyleAttackAria": "Attaccare {name}",
+      "gargoyleShimmer": "La statua vibra di energia...",
       "worldMarket": "Mostrami il Mercato Mondiale.",
       "worldMarketAria": "Apri il Mercato Mondiale",
       "accept": "Accetta",
@@ -5867,6 +5875,45 @@ export const it_IT: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Falcetto Petalo di Sole"
       },
+      "white_sheet": {
+        "name": "Lenzuolo Bianco"
+      },
+      "spirit_horn": {
+        "name": "Corno Spirituale"
+      },
+      "black_hood": {
+        "name": "Cappuccio Nero"
+      },
+      "deepdream_draught": {
+        "name": "Intruglio del Sonno Profondo"
+      },
+      "mirror_shard": {
+        "name": "Scheggia di Specchio"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Spadaspecchio Spettrale"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Mantospoglia Spettrale"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Farsetto Spettrale"
+      },
+      "ghostly_palegrips": {
+        "name": "Presa Pallida Spettrale"
+      },
+      "ghostly_hushboots": {
+        "name": "Stivali Ovattati Spettrali"
+      },
+      "ghostly_glasscord": {
+        "name": "Cordone di Vetro Spettrale"
+      },
+      "warden_sigil": {
+        "name": "Sigillo del guardiano"
+      },
+      "drowned_lumen": {
+        "name": "Lumen annegato"
+      },
       "bristleback_maul": {
         "name": "Martello Gallowglass"
       },
@@ -6667,6 +6714,36 @@ export const it_IT: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Elementale di tempesta ridestato"
       },
+      "spirit_unicorn": {
+        "name": "Unicorno Spirituale"
+      },
+      "hooded_reaper": {
+        "name": "Mietitore"
+      },
+      "mistshade_lurker": {
+        "name": "Appostatore delle brume"
+      },
+      "gloaming_maw": {
+        "name": "Le Fauci del Crepuscolo"
+      },
+      "poverty_ghost": {
+        "name": "Fantasma della Povertà"
+      },
+      "player_echo": {
+        "name": "Eco"
+      },
+      "gargoyle_awakened": {
+        "name": "Sentinella Gargolla"
+      },
+      "gloomhulk": {
+        "name": "Bruto del Buio"
+      },
+      "mirrorbound_sentry": {
+        "name": "Sentinella Speculare"
+      },
+      "voidfang_stalker": {
+        "name": "Predatore Palidenti"
+      },
       "ironvein_foreman": {
         "name": "Caposquadra Venaferrata"
       },
@@ -6896,6 +6973,51 @@ export const it_IT: EnTranslations = {
         "name": "Il Custode Pallido",
         "title": "Guardiano dei Morti",
         "greeting": "Riposa ora, spirito. Posso restituirti al tuo corpo, ma il ritorno dalla traversata ti lascia debole."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa la Senza Riposo",
+        "title": "Custode Spettrale della Corona di Lumen",
+        "greeting": "Custodii la Corona di Lumen in vita, e la Corona tiene onesto il vetro - ogni specchio di questa valle mostra una cosa vera, tranne uno. La morte non mi ha sollevata dal posto, {playerName}, perché quello non smette di premere. La luce della Corona si spegne, e dove viene meno, la valle trapela. Bada da quale lato del vetro cammini. Ultimamente fatica a distinguerlo."
+      },
+      "veilwright_ollo": {
+        "name": "Ollo il Tessivelo",
+        "title": "Mercante del Mercato Velato",
+        "greeting": "Cappotti di morti, sospiri in bottiglia, prezzi onesti - il velo provvede. Tutto sul mio banco fu deposto da chi ora non possiede nulla; il trucco è capire di cosa i morti hanno finito da ciò che ancora stringono. Sbaglia, e vengono al banco a mezzanotte. Chiedi alla Custode della luce nel pozzo, se vuoi la versione triste. Io vendo solo i cappotti."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen la Strega delle Brume",
+        "title": "Distillatrice di sogni della Conca",
+        "greeting": "La bruma tiene svegli i tuoi. Io posso prepararti l’altro sonno — quello che risponde."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Sentinella Gargolla",
+        "title": "Guardiana dello Specchio",
+        "greeting": "Occhi di pietra stridono verso di te. Sta ascoltando."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Sentinella Gargolla",
+        "title": "Guardiana dello Specchio",
+        "greeting": "Occhi di pietra stridono verso di te. Sta ascoltando."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Sentinella Gargolla",
+        "title": "Guardiana dello Specchio",
+        "greeting": "Occhi di pietra stridono verso di te. Sta ascoltando."
+      },
+      "dread_sentinel_a": {
+        "name": "Sentinella Tetra",
+        "title": "Guardiano dello Specchio Cupo",
+        "greeting": "La tua morte ti attende."
+      },
+      "dread_sentinel_b": {
+        "name": "Sentinella Tetra",
+        "title": "Guardiano dello Specchio Cupo",
+        "greeting": "In vita tenemmo la strada rialzata. La teniamo ancora."
+      },
+      "dread_sentinel_c": {
+        "name": "Sentinella Tetra",
+        "title": "Guardiano dello Specchio Cupo",
+        "greeting": "Torna indietro. Il vetro nero non è per i vivi... né lo fu mai per noi."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const it_IT: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "Una ricetta per il sonno profondo",
+        "text": "La pozione vuole tre voci, {playerName}: due lenzuola bianche dei fantasmi della povertà che non possiedono altro, due corni degli unicorni spirituali che pascolano nella penombra, e due cappucci tagliati ai mietitori che sorvegliano la cintura. Portameli e ti distillerò un sonno coi denti.",
+        "completion": "Lenzuolo, corno, cappuccio — i poveri, i radiosi, i pazienti. Al calderone piaci. Bevila in un posto morbido, viandante: incontrerai chi porti con te.",
+        "objectives": {
+          "0": {
+            "label": "Lenzuolo Bianco"
+          },
+          "1": {
+            "label": "Corno Spirituale"
+          },
+          "2": {
+            "label": "Cappuccio Nero"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Affronta il tuo Eco",
+        "text": "Bevi l’intruglio e il sogno ti porrà uno specchio davanti — il tuo Eco, ogni tua cicatrice e ogni tuo trucco dall’altra parte. Sconfiggi ciò che sei, {playerName}, e riportami la faccia che farai.",
+        "completion": "Sei tornato tu, e lo specchio no. Ciò che ti ha lasciato in mano è tuo — il sogno paga quel prezzo una sola volta.",
+        "objectives": {
+          "0": {
+            "label": "Il tuo Eco sconfitto"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "Il Pedaggio del Guardiano",
+        "text": "Il bagliore si fa parole dietro i tuoi occhi: i mietitori affollano il mio vetro, {playerName}. Diradali, e la via per Highwatch sarà tua.",
+        "completion": "La pietra ronza una volta, appagata. Dietro di essa, lo specchio si schiarisce come un respiro trattenuto e finalmente liberato.",
+        "objectives": {
+          "0": {
+            "label": "Mietitore abbattuto"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "Un Pedaggio di Lenzuola",
+        "text": "Il bagliore si fa parole dietro i tuoi occhi: portami quattro lenzuola bianche dai poveri morti, {playerName}. La strada per Eastbrook si apre a chi paga in stoffa.",
+        "completion": "Le lenzuola affondano nella pietra e svaniscono. Lo specchio dietro di essa si sveglia di luce.",
+        "objectives": {
+          "0": {
+            "label": "Lenzuolo Bianco"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Splendore Falciato",
+        "text": "Il bagliore si fa parole dietro i tuoi occhi: le mandrie spirituali ardono troppo per il vetro, {playerName}. Abbattine cinque, e Fenbridge è a un passo.",
+        "completion": "La pietra beve la luce che hai versato. Lo specchio dietro di essa si apre come un occhio.",
+        "objectives": {
+          "0": {
+            "label": "Unicorno Spirituale abbattuto"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "Il Fulgore che si Spegne",
+        "text": "Senti il mio freddo e mi credi una favola. Sono un posto di guardia, {playerName}. La Corona di Lumen che custodii non è un cerchio d'oro: è la luce di ogni specchio qui, la giuntura che tiene vivi e morti in riflessi separati perché l'uno non anneghi l'altro. Quella luce viene meno, e lo vedi nelle Sentinelle speculari: un tempo la radianza stessa della Corona in ronda, ora sono vetro colmo di luce rubata, che affolla le rovine a nord perché la giuntura non dice più loro dove stare. Frantumane otto. Ogni scheggia che disperdi è un po' di luce restituita, e un po' di prova che ci si può fidare di te per il resto.",
+        "completion": "Le schegge tornano fluttuando verso il pozzo come neve che cade all'insù, e per un respiro l'intera valle è d'una sfumatura più chiara. Non durerà. Ma tu ricuci le giunture invece di reciderle, {playerName}: è più raro qui di quanto tu creda. Hai spezzato anche l'ALTRA corona, non è vero? Quella di ferro, sotto Thornpeak. Allora, per la prima volta in trecento anni, questa luce potrebbe tornare. Resta. La valle ha atteso a lungo mani che chiudano ferite.",
+        "objectives": {
+          "0": {
+            "label": "Sentinella speculare frantumata"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Ciò che i Poveri Ancora Serbano",
+        "text": "I Fantasmi della Miseria sulla riva sud in vita non ebbero nulla, {playerName}: nulla se non il lenzuolo in cui li seppellirono, ché la parrocchia non poteva permettersi una bara. Ora la luce della Corona è troppo esile per sciogliere la loro presa, e vagano stringendo l'unica cosa che sia mai stata loro. Non crederlo crudeltà; è amore senza dove posarsi. Portami cinque dei loro lenzuoli. Poserò ciascuno nel pozzo e dirò il nome troppo povero per essere inciso. In questo consiste tutto il rito: essere poveri, e morti, e ancora chiamati per nome.",
+        "completion": "Cinque lenzuoli, cinque nomi. Li dico al pozzo e l'acqua li accoglie come una madre solleva il cappotto da un bimbo addormentato. I fantasmi sulla riva sono meno, stanotte, {playerName}: non uccisi, liberati. Questo faceva la Corona intera: teneva i morti abbastanza vicini da poterli lasciare andare. Ora lo facciamo a mano, tu ed io, cinque nomi per volta. È più lento. Non è nulla.",
+        "objectives": {
+          "0": {
+            "label": "Lenzuolo Bianco"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "I Nomi dei Guardiani",
+        "text": "I tre che percorrono il Canyon Nero, chi fugge da loro li chiama Sentinelle del Terrore. Un tempo li chiamai per nome: erano il mio ordine, {playerName}, gli ultimi uomini a tenere in vita la strada rialzata dello Specchio Sable, e non desistettero mai, nemmeno quando i loro cuori lo fecero. Nessuna lama li libera più; il vetro nero li cavalca troppo a fondo perché cadano. Ma quel vetro è passato dai guardiani ai mietitori che affollano la strada, e nei lunghi anni i mietitori hanno strappato via i sigilli dei guardiani. Portamene tre, tolti ai mietitori del canyon, ch'io dica i tre nomi ad alta voce un'ultima volta.",
+        "completion": "Corwin. Aldous. Brenna. Ecco: detti, e dirlo pesa meno di quanto mai pesò il tenerli. Presto potranno fermarsi; ci penserò io. Ma bada a ciò che s'avvicina, {playerName}: i sigilli strappati via significano che il vetro di quella strada s'assottiglia, e la ferita al suo capo ha atteso esattamente questo. Devo riaccendere la Corona e puntellare il Sable prima che qualcosa, dall'altra parte, s'accorga che la porta resta scoperta. Mi manca un'ultima cosa, e giace sotto l'acqua nera.",
+        "objectives": {
+          "0": {
+            "label": "Sigillo del guardiano"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Ciò che il Vetro Vuole",
+        "text": "Hai vinto il tuo Eco e l'hai creduto una prova di te, {playerName}. Non lo era. Io distillo il Sogno Profondo da lenzuolo, corno e cappuccio, ma ciò contro cui il tuo sogno alzò uno specchio, la cosa entrata indossando il tuo volto, quella non la distillo io. Filtra dentro, dal vetro nero del canyon. I mietitori che affollano l'imbocco del canyon sono densi della stessa infiltrazione; abbattine otto e osserva verso dove strisciano le loro ombre. Allora mostrerò agli occhi stessi di Nerissa dove la sua ferita davvero sanguina.",
+        "completion": "A nordest. Sempre a nordest, sempre verso il Sable — l'hai visto? Il tuo Eco non eri TU, viandante. Era una scheggia di ciò che vive dietro quella porta, vestita col riflesso più vicino che poté rubare: il tuo. Il sogno è solo il punto più sottile che l'infiltrazione abbia trovato; il canyon il più largo. Dillo a Nerissa. Se n'è meritata la verità, e anche tu.",
+        "objectives": {
+          "0": {
+            "label": "Mietitore abbattuto all'imbocco del canyon"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Riaccendere la Corona di Lumen",
+        "text": "I guardiani hanno un nome e la strada s'assottiglia, dunque devo fare ora ciò che ho rimandato da quando morii: accendere la Corona di Lumen un'ultima volta e premere chiuso il Sable da questo lato. L'ultima vera scintilla della Corona la inghiottì le Fauci del Crepuscolo quando cadde nel laghetto — per questo la cosa brilla di dentro. Ritagliale di nuovo la luce, {playerName}. Il vetro nero manderà i suoi colossi tenebrosi a fermare il rito; abbattine quattro. Portami una scintilla annegata finché ricordo ancora come tenerne una. L'ultimo dovere d'un custode è divenire qualcuno che non ha più bisogno di custodire.",
+        "completion": "Brucia. Dopo tutto questo buio, conosce ancora la mia mano. Guarda: il vetro è di nuovo VERO; nessun battito dietro l'acqua, nessun'anima perduta tra un mondo e il suo riflesso. E il peso mi ha lasciata, alfine. Non svanisco, {playerName}; mi si dà il CAMBIO. Questo non è spezzare il Sable, solo tenerlo; non ho la forza di spezzare ciò che attende là, né oserei. Ma tenuto un'era di più, è tenuto. Quando una compagnia più ardita di noi varcherà infine DENTRO quella porta, troverà l'altro lato pronto. Di' a Highwatch che la loro custode tenne la veglia fino alla fine, e poi fu data il cambio. Il vetro ti ricorderà. Bada di dargli qualcosa che valga la pena di riflettere.",
+        "objectives": {
+          "0": {
+            "label": "Le Fauci del Crepuscolo abbattute"
+          },
+          "1": {
+            "label": "Lumen annegato"
+          },
+          "2": {
+            "label": "Colosso Tenebroso spezzato"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Il Coro Annegato",
         "text": "I guadatori non agiscono da soli. Tra loro camminano i Devoti Annegati — la setta che affondò col tempio, ancora nelle loro vesti marcite, ancora intenti a cantare la preghiera dalle rocce della riva. Riducine otto al silenzio e portami sei delle offerte che recano. Voglio sapere cosa intendono donare alla loro dea.",
@@ -7870,6 +8104,48 @@ export const it_IT: EnTranslations = {
           },
           "9": {
             "label": "Santuario del Gravewyrm"
+          },
+          "10": {
+            "label": "La Porta-Specchio"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "Il Mondo Specchio",
+        "welcome": "Il vetro ti ricorda. Bada da quale lato di esso cammini.",
+        "pois": {
+          "0": {
+            "label": "Il Mondo Specchio"
+          },
+          "1": {
+            "label": "Piazza della Porta-Specchio"
+          },
+          "2": {
+            "label": "La Corona di Lumen"
+          },
+          "3": {
+            "label": "Il Mercato Velato"
+          },
+          "4": {
+            "label": "L'Archivio Silente"
+          },
+          "5": {
+            "label": "Il Lago-Specchio"
+          },
+          "6": {
+            "label": "La Palude delle Brume"
+          },
+          "7": {
+            "label": "La Conca della Strega"
+          },
+          "8": {
+            "label": "Specchio di Eastbrook"
+          },
+          "9": {
+            "label": "Specchio di Fenbridge"
+          },
+          "10": {
+            "label": "il Canyon Nero"
           }
         }
       }

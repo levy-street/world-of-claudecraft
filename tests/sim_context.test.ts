@@ -195,6 +195,8 @@ const CALLBACK_KEYS = [
   'spawnDevBot',
   // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
   'startFishing',
+  'startSlumber',
+  'consumeMirrorShard',
   'unlockMechChromaFromItem',
   'openSkinSelect',
   'isSwimming',
@@ -433,6 +435,8 @@ function makeFakeHost() {
     spawnDevBot: vi.fn(),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
+    startSlumber: vi.fn(),
+    consumeMirrorShard: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),
     openSkinSelect: vi.fn(),
     isSwimming: vi.fn(() => false),

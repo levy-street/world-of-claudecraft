@@ -2687,6 +2687,142 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Lều Giáo Phái Cuồng Long',
   'entities.zones.thornpeak_heights.pois.8.label': 'Cánh Đồng Vong Linh',
   'entities.zones.thornpeak_heights.pois.9.label': 'Thánh Đường Mộ Long',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Cổng Gương',
+  'entities.zones.mirror_world.name': 'Thế Giới Gương',
+  'entities.zones.mirror_world.welcome':
+    'Tấm kính vẫn nhớ ngươi. Hãy để ý ngươi đang đi ở phía nào của nó.',
+  'entities.zones.mirror_world.pois.0.label': 'Thế Giới Gương',
+  'entities.zones.mirror_world.pois.1.label': 'Quảng trường Cổng Gương',
+  'entities.zones.mirror_world.pois.2.label': 'Vương Miện Lumen',
+  'entities.zones.mirror_world.pois.3.label': 'Chợ Màn Che',
+  'entities.zones.mirror_world.pois.4.label': 'Văn Khố Tĩnh Lặng',
+  'entities.zones.mirror_world.pois.5.label': 'Hồ Gương',
+  'entities.zones.mirror_world.pois.6.label': 'Đầm Sương',
+  'entities.zones.mirror_world.pois.7.label': 'Thung Lũng Phù Thủy',
+  'entities.zones.mirror_world.pois.8.label': 'Gương Eastbrook',
+  'entities.zones.mirror_world.pois.9.label': 'Gương Fenbridge',
+  'entities.mobs.poverty_ghost.name': 'Hồn Ma Bần Cùng',
+  'entities.mobs.spirit_unicorn.name': 'Kỳ Lân Linh Hồn',
+  'entities.mobs.hooded_reaper.name': 'Tử Thần',
+  'entities.mobs.gloomhulk.name': 'Khối U Ám',
+  'entities.mobs.mirrorbound_sentry.name': 'Vệ Binh Kính Buộc',
+  'entities.mobs.voidfang_stalker.name': 'Kẻ Rình Nanh Nhợt',
+  'entities.npcs.dread_sentinel_a.name': 'Vệ Binh Kinh Hoàng',
+  'entities.npcs.dread_sentinel_a.title': 'Người Canh Gương U Tối',
+  'entities.npcs.dread_sentinel_a.greeting': 'Cái chết đang chờ ngươi.',
+  'entities.npcs.dread_sentinel_b.name': 'Vệ Binh Kinh Hoàng',
+  'entities.npcs.dread_sentinel_b.title': 'Người Canh Gương U Tối',
+  'entities.npcs.dread_sentinel_b.greeting': 'Khi sống, ta giữ con đê. Nay ta vẫn giữ.',
+  'entities.npcs.dread_sentinel_c.name': 'Vệ Binh Kinh Hoàng',
+  'entities.npcs.dread_sentinel_c.title': 'Người Canh Gương U Tối',
+  'entities.npcs.dread_sentinel_c.greeting':
+    'Quay lại đi. Tấm kính đen không dành cho người sống... mà cũng chưa từng dành cho chúng ta.',
+  'entities.quests.q_gargoyle_south.title': 'Lệ Phí của Người Canh',
+  'entities.quests.q_gargoyle_south.text':
+    'Ánh lung linh hóa thành lời sau mắt ngươi: lũ tử thần chen chúc nơi tấm kính của ta, {playerName}. Hãy tỉa bớt chúng, và con đường đến Highwatch sẽ là của ngươi.',
+  'entities.quests.q_gargoyle_south.completion':
+    'Đá ngân lên một tiếng, mãn nguyện. Phía sau nó, tấm gương trong dần như một hơi thở nén cuối cùng được buông ra.',
+  'entities.quests.q_gargoyle_south.objectives.0.label': 'Đã hạ Tử Thần',
+  'entities.quests.q_gargoyle_west.title': 'Lệ Phí bằng Vải Trắng',
+  'entities.quests.q_gargoyle_west.text':
+    'Ánh lung linh hóa thành lời sau mắt ngươi: mang cho ta bốn tấm vải trắng từ những người chết nghèo hèn, {playerName}. Con đường đến Eastbrook mở ra cho kẻ trả bằng vải.',
+  'entities.quests.q_gargoyle_west.completion':
+    'Những tấm vải chìm vào đá và biến mất. Tấm gương phía sau bừng tỉnh cùng ánh sáng.',
+  'entities.quests.q_gargoyle_west.objectives.0.label': 'Vải Trắng',
+  'entities.quests.q_gargoyle_north.title': 'Ánh Rạng Bị Gặt',
+  'entities.quests.q_gargoyle_north.text':
+    'Ánh lung linh hóa thành lời sau mắt ngươi: những bầy linh hồn cháy quá sáng đối với tấm kính, {playerName}. Hạ năm con, và Fenbridge chỉ còn một bước.',
+  'entities.quests.q_gargoyle_north.completion':
+    'Đá uống lấy thứ ánh sáng ngươi đã đổ ra. Tấm gương phía sau mở ra như một con mắt.',
+  'entities.quests.q_gargoyle_north.objectives.0.label': 'Đã hạ Kỳ Lân Linh Hồn',
+  'entities.zones.mirror_world.pois.10.label': 'Hẻm Núi Đen',
+  'entities.mobs.gargoyle_awakened.name': 'Lính Gác Gargoyle',
+  'entities.mobs.mistshade_lurker.name': 'Kẻ Rình Bóng Sương',
+  'entities.mobs.gloaming_maw.name': 'Hàm Hoàng Hôn',
+  'entities.mobs.player_echo.name': 'Tiếng Vọng',
+  'entities.npcs.keeper_nerissa.name': 'Nerissa Không Yên Nghỉ',
+  'entities.npcs.keeper_nerissa.title': 'Hồn Giữ Vương Miện Lumen',
+  'entities.npcs.keeper_nerissa.greeting':
+    'Ta đã giữ Vương Miện Lumen khi còn sống, và Vương Miện giữ cho tấm kính trung thực - mỗi tấm gương trong thung lũng này phản chiếu một điều thật, trừ một. Cái chết chẳng miễn cho ta khỏi phận sự, {playerName}, vì cái một đó vẫn chưa ngừng ép. Ánh sáng của Vương Miện đang lụi, và nơi nó suy tàn, thung lũng rỉ qua. Hãy để ý mình bước bên nào của tấm kính. Dạo này nó khó lòng phân biệt.',
+  'entities.items.warden_sigil.name': 'Ấn Ký Người Gác',
+  'entities.items.drowned_lumen.name': 'Lumen Chìm',
+  'entities.quests.q_the_failing_radiance.title': 'Ánh Sáng Lụi Tàn',
+  'entities.quests.q_the_failing_radiance.text':
+    'Ngươi cảm nhận cái lạnh của ta và ngỡ ta là chuyện xưa. Ta là một phận sự, {playerName}. Vương Miện Lumen ta canh giữ chẳng phải vòng vàng: nó là ánh sáng trong mọi tấm gương nơi đây, đường nối giữ người sống và kẻ chết trong những phản chiếu tách biệt để bên này không nhấn chìm bên kia. Ánh sáng ấy đang lụi, và ngươi thấy điều đó nơi những Lính Gương: xưa là chính hào quang của Vương Miện đứng gác, nay chỉ là kính chứa đầy ánh sáng bị đánh cắp, chen chúc trong tàn tích phương bắc vì đường nối không còn bảo chúng phải đứng đâu. Đập vỡ tám tên. Mỗi mảnh vỡ ngươi làm tan là chút ánh sáng trả về, và chút bằng chứng rằng ta có thể giao phó phần còn lại cho ngươi.',
+  'entities.quests.q_the_failing_radiance.completion':
+    'Những mảnh vỡ trôi ngược về phía giếng như tuyết rơi lên trời, và trong một hơi thở cả thung lũng sáng lên một sắc độ. Chẳng bền đâu. Nhưng ngươi vá lành đường nối thay vì cắt đứt chúng, {playerName}: điều đó ở đây hiếm hơn ngươi tưởng. Ngươi cũng đã đập vỡ chiếc vương miện KIA, phải không? Chiếc bằng sắt, dưới lòng Thornpeak. Vậy thì lần đầu tiên sau ba trăm năm, ánh sáng này có thể trở lại. Ở lại đi. Thung lũng đã đợi từ lâu những bàn tay biết khép miệng vết thương.',
+  'entities.quests.q_the_failing_radiance.objectives.0.label': 'Lính Gương bị đập vỡ',
+  'entities.quests.q_what_the_poor_keep.title': 'Điều Người Nghèo Còn Giữ',
+  'entities.quests.q_what_the_poor_keep.text':
+    'Những Hồn Ma Nghèo nơi bờ nam khi sống chẳng có gì, {playerName}: chẳng có gì ngoài tấm vải liệm mà họ được chôn, bởi giáo xứ không đủ tiền mua quan tài. Nay ánh sáng của Vương Miện đã quá mỏng để buông lơi tay họ, và họ lang thang, ôm chặt thứ duy nhất từng thuộc về mình. Đừng nghĩ đó là tàn nhẫn; đó là tình thương không biết đặt vào đâu. Hãy đem cho ta năm tấm vải của họ. Ta sẽ đặt từng tấm xuống giếng và gọi cái tên nghèo đến mức chẳng được khắc lên đá. Toàn bộ nghi lễ chỉ có vậy: nghèo, và chết, mà vẫn được gọi bằng tên.',
+  'entities.quests.q_what_the_poor_keep.completion':
+    'Năm tấm vải, năm cái tên. Ta đọc chúng vào lòng giếng, và nước đón lấy như người mẹ nhấc chiếc áo khỏi đứa con đang ngủ. Đêm nay hồn ma nơi bờ nước thưa hơn, {playerName}: chẳng phải bị giết, mà được giải thoát. Đây là điều Vương Miện nguyên vẹn từng làm: giữ kẻ chết đủ gần để có thể buông họ ra. Nay ta làm bằng tay, ngươi và ta, mỗi lần năm cái tên. Chậm hơn. Nhưng chẳng phải là vô nghĩa.',
+  'entities.quests.q_what_the_poor_keep.objectives.0.label': 'Tấm Vải Trắng',
+  'entities.quests.q_the_wardens_names.title': 'Tên Của Những Người Gác',
+  'entities.quests.q_the_wardens_names.text':
+    'Ba kẻ đi lại nơi Hẻm Đen bị những người bỏ chạy gọi là Lính Gác Kinh Hoàng. Xưa ta từng gọi họ bằng tên: họ là dòng của ta, {playerName}, những người cuối cùng khi sống giữ con đê của Gương Sable, và họ chưa từng rời gác, ngay cả khi tim họ đã ngừng. Chẳng lưỡi kiếm nào giải thoát họ nữa; tấm kính đen cưỡi họ quá sâu để có thể ngã xuống. Nhưng tấm kính ấy đã lan từ những người gác sang lũ tử thần chen chúc trên con đê, và qua bao năm dài, lũ tử thần đã giằng lỏng ấn ký của những người gác. Hãy đem cho ta ba chiếc, cắt từ lũ tử thần nơi hẻm, để ta đọc to ba cái tên một lần cuối.',
+  'entities.quests.q_the_wardens_names.completion':
+    'Corwin. Aldous. Brenna. Đó: đã nói ra, và nói ra nhẹ hơn cả việc gánh giữ chúng bấy lâu. Chẳng bao lâu nữa họ có thể dừng lại; ta sẽ lo liệu. Nhưng hãy đề phòng thứ đang đến gần, {playerName}: những ấn ký bị giằng lỏng nghĩa là tấm kính trên con đê ấy đang mỏng đi, và vết thương ở cuối đường đã chờ đúng điều này. Ta phải thắp lại Vương Miện và chống đỡ Sable trước khi có thứ gì bên kia nhận ra cánh cửa đã trơ trọi. Còn một thứ cuối ta cần - và nó nằm dưới làn nước đen.',
+  'entities.quests.q_the_wardens_names.objectives.0.label': 'Ấn Ký Người Gác',
+  'entities.quests.q_what_the_glass_wants.title': 'Điều Tấm Kính Muốn',
+  'entities.quests.q_what_the_glass_wants.text':
+    'Ngươi đã thắng Tiếng Vọng của mình và ngỡ đó là thử thách chính mình, {playerName}. Không phải vậy. Ta chưng cất Mộng Sâu từ vải, sừng và mũ trùm, nhưng cái mà giấc mơ ngươi dựng gương đối mặt, cái bước vào mang gương mặt ngươi, cái đó ta không chưng. Nó rỉ vào, từ tấm kính đen nơi hẻm. Lũ tử thần chen chúc nơi cửa hẻm đặc quánh cùng thứ rỉ ấy; hạ tám tên và nhìn xem bóng chúng bò về hướng nào. Bấy giờ ta sẽ chỉ cho chính đôi mắt Nerissa nơi vết thương của bà thật sự đang rỉ máu.',
+  'entities.quests.q_what_the_glass_wants.completion':
+    'Về phía đông bắc. Luôn về đông bắc, luôn hướng về Sable — ngươi thấy chứ? Tiếng Vọng của ngươi chẳng phải là NGƯƠI, lữ khách. Nó là một mảnh vỡ của bất cứ thứ gì trú ngụ sau cánh cửa ấy, khoác lấy hình phản chiếu gần nhất mà nó trộm được: của ngươi. Giấc mơ chỉ là chỗ mỏng nhất mà kẽ rỉ tìm ra; cái hẻm là chỗ rộng nhất. Hãy nói với Nerissa. Bà đã xứng đáng biết sự thật ấy, và ngươi cũng vậy.',
+  'entities.quests.q_what_the_glass_wants.objectives.0.label': 'Tử Thần bị hạ nơi cửa hẻm',
+  'entities.quests.q_relight_the_lumen_crown.title': 'Thắp Lại Vương Miện Lumen',
+  'entities.quests.q_relight_the_lumen_crown.text':
+    'Những người gác đã có tên và con đê đang mỏng đi, nên giờ ta phải làm điều ta trì hoãn từ khi chết: thắp Vương Miện Lumen một lần cuối và ép Sable đóng lại từ phía này. Tia sáng thật cuối cùng của Vương Miện đã bị Hàm Nhá Nhem nuốt khi nó ngã xuống đầm — nên cái vật ấy mới rực sáng từ bên trong. Hãy cắt ánh sáng ấy ra khỏi nó, {playerName}. Tấm kính đen sẽ phái những Khối U Ám của nó đến chặn nghi lễ; hạ bốn tên. Đem cho ta một tia sáng chìm khi ta còn nhớ cách nâng giữ một tia. Phận sự cuối cùng của người gác là trở thành kẻ không còn cần phải gác nữa.',
+  'entities.quests.q_relight_the_lumen_crown.completion':
+    'Nó cháy. Sau ngần ấy bóng tối, nó vẫn nhận ra bàn tay ta. Nhìn xem: tấm kính lại CHÂN THẬT rồi; không còn nhịp đập sau làn nước, không còn linh hồn nào lạc giữa một thế giới và hình phản chiếu của nó. Và gánh nặng cuối cùng đã rời khỏi ta. Ta không tan biến, {playerName}; ta được THAY GÁC. Đây không phải là phá vỡ Sable, chỉ là gắng giữ nó; ta không đủ sức phá thứ đang chờ nơi ấy, và cũng chẳng dám. Nhưng giữ thêm được một thời đại nữa, thì là đã giữ. Khi một đoàn người can trường hơn ta rốt cuộc bước VÀO cánh cửa đó, họ sẽ thấy phía bên kia đã sẵn sàng. Hãy nói ở Highwatch rằng người gác của họ đã đứng canh đến cùng, rồi được thay phiên. Tấm kính sẽ nhớ ngươi. Hãy liệu mà cho nó một điều gì đó đáng để phản chiếu.',
+  'entities.quests.q_relight_the_lumen_crown.objectives.0.label': 'Hàm Nhá Nhem bị hạ',
+  'entities.quests.q_relight_the_lumen_crown.objectives.1.label': 'Lumen Chìm',
+  'entities.quests.q_relight_the_lumen_crown.objectives.2.label': 'Khối U Ám bị đập tan',
+  'entities.npcs.veilwright_ollo.name': 'Thợ Dệt Màn Ollo',
+  'entities.npcs.veilwright_ollo.title': 'Thương Nhân Chợ Màn Che',
+  'entities.npcs.veilwright_ollo.greeting':
+    'Áo choàng người chết, tiếng thở dài đóng chai, giá cả thật thà - tấm màn ban cho. Mọi thứ trên quầy ta đều do kẻ nay chẳng còn gì đặt xuống; mẹo là phân biệt điều người chết đã xong với điều họ còn nắm chặt. Lầm đi, nửa đêm họ đến quầy. Hỏi Người Giữ về ánh sáng dưới giếng, nếu ngươi muốn bản buồn. Ta chỉ bán áo choàng thôi.',
+  'entities.npcs.gargoyle_sentinel_south.name': 'Lính Gác Gargoyle',
+  'entities.npcs.gargoyle_sentinel_south.title': 'Hộ Vệ Tấm Gương',
+  'entities.npcs.gargoyle_sentinel_south.greeting':
+    'Đôi mắt đá nghiến ken két quay về phía ngươi. Nó đang lắng nghe.',
+  'entities.npcs.gargoyle_sentinel_west.name': 'Lính Gác Gargoyle',
+  'entities.npcs.gargoyle_sentinel_west.title': 'Hộ Vệ Tấm Gương',
+  'entities.npcs.gargoyle_sentinel_west.greeting':
+    'Đôi mắt đá nghiến ken két quay về phía ngươi. Nó đang lắng nghe.',
+  'entities.npcs.gargoyle_sentinel_north.name': 'Lính Gác Gargoyle',
+  'entities.npcs.gargoyle_sentinel_north.title': 'Hộ Vệ Tấm Gương',
+  'entities.npcs.gargoyle_sentinel_north.greeting':
+    'Đôi mắt đá nghiến ken két quay về phía ngươi. Nó đang lắng nghe.',
+  'entities.npcs.mistwitch_morwen.name': 'Morwen Phù Thủy Sương Mù',
+  'entities.npcs.mistwitch_morwen.title': 'Người Ủ Mộng của Thung Lũng',
+  'entities.npcs.mistwitch_morwen.greeting':
+    'Sương mù khiến phần lớn các ngươi không ngủ được. Ta có thể ủ cho ngươi giấc ngủ còn lại — loại biết trả lời.',
+  'entities.quests.q_deepdream_recipe.title': 'Công Thức Giấc Ngủ Sâu',
+  'entities.quests.q_deepdream_recipe.text':
+    'Thuốc cần ba giọng nói, {playerName}: hai tấm vải trắng từ những hồn ma bần cùng chẳng còn gì khác, hai chiếc sừng của kỳ lân linh hồn gặm cỏ trong màn tối, và hai chiếc mũ trùm cắt từ các tử thần canh vành đai. Mang về đây, ta sẽ nấu cho ngươi một giấc ngủ có răng.',
+  'entities.quests.q_deepdream_recipe.completion':
+    'Vải, sừng, mũ trùm — kẻ nghèo, kẻ rạng rỡ, kẻ nhẫn nại. Cái vạc ưng ngươi đấy. Hãy uống ở nơi êm ái, lữ khách: ngươi sẽ gặp kẻ mình vẫn mang theo bấy lâu.',
+  'entities.quests.q_deepdream_recipe.objectives.0.label': 'Vải Trắng',
+  'entities.quests.q_deepdream_recipe.objectives.1.label': 'Sừng Linh Hồn',
+  'entities.quests.q_deepdream_recipe.objectives.2.label': 'Mũ Trùm Đen',
+  'entities.quests.q_face_your_echo.title': 'Đối Mặt Tiếng Vọng Của Ngươi',
+  'entities.quests.q_face_your_echo.text':
+    'Uống dược, và giấc mơ sẽ dựng một tấm gương trước mặt ngươi — Tiếng Vọng của ngươi, từng vết sẹo và từng ngón nghề của ngươi ở phía bên kia. Hãy đánh bại chính mình, {playerName}, rồi mang gương mặt lúc ấy về cho ta.',
+  'entities.quests.q_face_your_echo.completion':
+    'Ngươi trở về, còn tấm gương thì không. Thứ nó để lại trong tay ngươi là của ngươi — giấc mơ chỉ trả cái giá đó một lần.',
+  'entities.quests.q_face_your_echo.objectives.0.label': 'Tiếng Vọng của ngươi bị đánh bại',
+  'entities.items.white_sheet.name': 'Vải Trắng',
+  'entities.items.spirit_horn.name': 'Sừng Linh Hồn',
+  'entities.items.black_hood.name': 'Mũ Trùm Đen',
+  'entities.items.deepdream_draught.name': 'Dược Mộng Sâu',
+  'entities.items.mirror_shard.name': 'Mảnh Gương',
+  'entities.items.ghostly_mirrorblade.name': 'Kiếm Gương Ma Quái',
+  'entities.items.ghostly_shroudmantle.name': 'Áo Choàng Vải Liệm Ma Quái',
+  'entities.items.ghostly_wraithjerkin.name': 'Áo Giáp Oán Hồn Ma Quái',
+  'entities.items.ghostly_palegrips.name': 'Găng Nhợt Nhạt Ma Quái',
+  'entities.items.ghostly_hushboots.name': 'Giày Lặng Câm Ma Quái',
+  'entities.items.ghostly_glasscord.name': 'Thắt Lưng Thủy Tinh Ma Quái',
   'entities.zones.thornpeak_heights.welcome':
     'Đội Trưởng Thessaly đang trấn giữ bức tường ở Vọng Đài Cao, vất vả lắm mới giữ nổi.',
   'errors.api.accountBanned': 'Tài khoản này đã bị cấm.',
@@ -5265,6 +5401,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.back': 'Quay Lại',
   'questUi.dialog.browseGoods': 'Để ta xem qua hàng hóa của ngươi.',
   'questUi.dialog.browseGoodsAria': 'Xem hàng hóa từ {name}',
+  'questUi.dialog.brewDraught': 'Pha cho tôi một Dược Mộng Sâu.',
+  'questUi.dialog.brewDraughtAria': 'Nhờ {name} pha một Dược Mộng Sâu',
+  'questUi.dialog.gargoyleBow': 'Cúi chào.',
+  'questUi.dialog.gargoyleBowAria': 'Cúi chào {name}',
+  'questUi.dialog.gargoyleAttack': 'Tấn công.',
+  'questUi.dialog.gargoyleAttackAria': 'Tấn công {name}',
+  'questUi.dialog.gargoyleShimmer': 'Bức tượng lung linh năng lượng...',
+  'hud.core.deepdreamZone': 'Giấc Mơ Sâu',
   'questUi.dialog.close': 'Đóng hộp thoại nhiệm vụ',
   'questUi.dialog.completeQuest': 'Hoàn Thành Nhiệm Vụ',
   'questUi.dialog.continue': 'Tiếp Tục',

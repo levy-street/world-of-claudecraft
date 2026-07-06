@@ -16,6 +16,7 @@ import type {
   MobTemplate,
   NpcDef,
   PlayerClass,
+  PortalPadDef,
   QuestDef,
   QuestState,
   WorldContent,
@@ -44,6 +45,19 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import {
+  MIRROR_WORLD_CAMPS,
+  MIRROR_WORLD_ITEMS,
+  MIRROR_WORLD_MOBS,
+  MIRROR_WORLD_NPCS,
+  MIRROR_WORLD_OBJECTS,
+  MIRROR_WORLD_PORTAL_PADS,
+  MIRROR_WORLD_PROPS,
+  MIRROR_WORLD_QUEST_ORDER,
+  MIRROR_WORLD_QUESTS,
+  MIRROR_WORLD_ROADS,
+  MIRROR_WORLD_ZONE,
+} from './content/mirror_world';
 import { COMMON_RECIPES as COMMON_RECIPES_CONTENT } from './content/recipes';
 import {
   TEMPLE_CAMPS,
@@ -153,6 +167,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   ZONE3_ITEMS,
   TEMPLE_ITEMS,
   DELVE_ITEMS,
+  MIRROR_WORLD_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -167,6 +182,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
+  ...MIRROR_WORLD_MOBS,
 };
 
 export const NPCS: Record<string, NpcDef> = {
@@ -180,6 +196,7 @@ export const NPCS: Record<string, NpcDef> = {
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
   [SPIRIT_HEALER_NPC_ID]: SPIRIT_HEALER,
+  ...MIRROR_WORLD_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -191,6 +208,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
   ...TEMPLE_QUESTS,
+  ...MIRROR_WORLD_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -198,6 +216,7 @@ export const QUEST_ORDER: string[] = [
   ...ZONE2_QUEST_ORDER,
   ...ZONE3_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
+  ...MIRROR_WORLD_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -211,6 +230,8 @@ export const CAMPS: CampDef[] = [
   ...TEMPLE_CAMPS,
   ...ZONE1_CHAPEL_CAMPS,
   { mobId: 'grix_the_tunnelking', center: { x: -95, z: -78 }, radius: 4, count: 1 },
+  // The Mirror World (zone 4) appended last, same determinism rule as above.
+  ...MIRROR_WORLD_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -218,20 +239,31 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE2_OBJECTS,
   ...ZONE3_OBJECTS,
   ...TEMPLE_OBJECTS,
+  ...MIRROR_WORLD_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
 
 export const COMMON_RECIPES = [...COMMON_RECIPES_CONTENT];
 
-export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS];
+export const ROADS: { x: number; z: number }[][] = [
+  ...ZONE1_ROADS,
+  ...ZONE2_ROADS,
+  ...ZONE3_ROADS,
+  ...MIRROR_WORLD_ROADS,
+];
 
 export const PROPS: ZonePropsDef = mergeProps([
   ZONE1_PROPS,
   ZONE2_PROPS,
   ZONE3_PROPS,
   TEMPLE_PROPS,
+  MIRROR_WORLD_PROPS,
 ]);
+
+// Overworld portal pads (walk-in teleports; see Sim.updatePortalPadTriggers).
+export const PORTAL_PADS: PortalPadDef[] = [...MIRROR_WORLD_PORTAL_PADS];
+export { PAD_LOCKED_ALL, PAD_QUEST_LOCKS } from './content/mirror_world';
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
   return {
@@ -287,7 +319,7 @@ export const GROUP_XP_BONUS = [1, 1, 1.166, 1.3, 1.43];
 // graveyard, its lakes, and a biome palette the renderer keys off.
 // ---------------------------------------------------------------------------
 
-export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE];
+export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE, MIRROR_WORLD_ZONE];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]
 export const WORLD_MIN_X = -WORLD_SIZE / 2;
@@ -464,7 +496,28 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
 }
 
 export function isDelvePos(x: number): boolean {
-  return x >= DELVE_BAND_X_MIN;
+  return x >= DELVE_BAND_X_MIN && x < DREAM_X_MIN;
+}
+
+// ---------------------------------------------------------------------------
+// The shadow realm — the Deepdream Draught's solo Echo duel. Its slots sit in
+// their own far-off band past every other one (delve rooms grow east from
+// DELVE_X_MIN by index*600; DREAM_X_MIN caps them so the bands can never
+// collide — indexes 0..2 fit with headroom). Flat ground + void rendering.
+// ---------------------------------------------------------------------------
+
+export const DREAM_X_MIN = 7000; // x at/after this = the shadow realm
+export const DREAM_X = 8000; // dream slots share this x; slots stack along z
+export const DREAM_SLOT_COUNT = 8;
+const DREAM_Z0 = -1250;
+const DREAM_SLOT_SPACING = 200; // > interest radius so dreamers never see each other
+
+export function dreamOrigin(slot: number): { x: number; z: number } {
+  return { x: DREAM_X, z: DREAM_Z0 + slot * DREAM_SLOT_SPACING };
+}
+
+export function isDreamPos(x: number): boolean {
+  return x >= DREAM_X_MIN;
 }
 
 export function delveAt(x: number): DelveDef | null {

@@ -31,6 +31,12 @@ function pathMaxSteepness(
 }
 
 const RIDGE_ZS = ZONES.slice(0, -1).map((zone) => zone.zMax);
+// The Mirror World trench seal (the ridge before a `mirror` zone) has NO road
+// pass by design - the Mirrorgate pads are the only crossing - so it is excluded
+// from the walkable-pass check (it must stay impassable).
+const PASSABLE_RIDGE_ZS = ZONES.slice(0, -1)
+  .filter((_, i) => ZONES[i + 1].biome !== 'mirror')
+  .map((zone) => zone.zMax);
 
 describe('impassable terrain walls', () => {
   // CLIMB_LIMIT is deliberately a literal (an independent pin, not a
@@ -97,7 +103,7 @@ describe('impassable terrain walls', () => {
   });
 
   it('the road pass through each ridge stays gently walkable', () => {
-    for (const rz of RIDGE_ZS) {
+    for (const rz of PASSABLE_RIDGE_ZS) {
       for (let x = -8; x <= 8; x += 2) {
         const max = pathMaxSteepness(WORLD_SEED, { x, z: rz - 50 }, { x, z: rz + 50 });
         expect(max, `pass across ridge z=${rz} at x=${x}`).toBeLessThan(1.0);

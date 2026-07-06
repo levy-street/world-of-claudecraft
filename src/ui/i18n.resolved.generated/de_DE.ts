@@ -3747,6 +3747,7 @@ export const de_DE: EnTranslations = {
       "eatingDrinking": "Essen und Trinken...",
       "secondsRemaining": "Noch {seconds} Sekunden",
       "enteringZone": "Betrete {zone}.",
+      "deepdreamZone": "Der Tieftraum",
       "welcomeZone": "Willkommen in {zone}!",
       "levelBanner": "Stufe {level}!",
       "levelLog": "Ihr habt Stufe {level} erreicht!",
@@ -4388,6 +4389,13 @@ export const de_DE: EnTranslations = {
       "nythraxisDeathlessKingWarning": "Die drei Relikte erzählen dieselbe Geschichte: Aldren kämpfte, um seinen König zu verteidigen, Malric durchbrach die Grenze des Todes, und Voss versuchte aufzuhalten, was danach kam. Das Siegel wird schwächer, und die verlassene Krypta ist der Weg hinab.",
       "browseGoods": "Lasst mich Eure Waren ansehen.",
       "browseGoodsAria": "Waren von {name} ansehen",
+      "brewDraught": "Braue mir einen Tieftraum-Trank.",
+      "brewDraughtAria": "{name} bitten, einen Tieftraum-Trank zu brauen",
+      "gargoyleBow": "Sich verneigen.",
+      "gargoyleBowAria": "Sich vor {name} verneigen",
+      "gargoyleAttack": "Angreifen.",
+      "gargoyleAttackAria": "{name} angreifen",
+      "gargoyleShimmer": "Die Statue flimmert vor Energie...",
       "worldMarket": "Zeigt mir den Weltmarkt.",
       "worldMarketAria": "Weltmarkt öffnen",
       "accept": "Annehmen",
@@ -5867,6 +5875,45 @@ export const de_DE: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Sonnenblütensichel"
       },
+      "white_sheet": {
+        "name": "Weißes Laken"
+      },
+      "spirit_horn": {
+        "name": "Geisterhorn"
+      },
+      "black_hood": {
+        "name": "Schwarze Kapuze"
+      },
+      "deepdream_draught": {
+        "name": "Tieftraum-Trank"
+      },
+      "mirror_shard": {
+        "name": "Spiegelsplitter"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Geisterhafte Spiegelklinge"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Geisterhafter Leichentuchmantel"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Geisterhaftes Wichtwams"
+      },
+      "ghostly_palegrips": {
+        "name": "Geisterhafte Bleichgriffe"
+      },
+      "ghostly_hushboots": {
+        "name": "Geisterhafte Stillstiefel"
+      },
+      "ghostly_glasscord": {
+        "name": "Geisterhafte Glasschnur"
+      },
+      "warden_sigil": {
+        "name": "Wächtersigel"
+      },
+      "drowned_lumen": {
+        "name": "Ertrunkenes Lumen"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-Hammer"
       },
@@ -6667,6 +6714,36 @@ export const de_DE: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Geweckter Sturmling"
       },
+      "spirit_unicorn": {
+        "name": "Geist-Einhorn"
+      },
+      "hooded_reaper": {
+        "name": "Schnitter"
+      },
+      "mistshade_lurker": {
+        "name": "Nebelschatten-Lauerer"
+      },
+      "gloaming_maw": {
+        "name": "Der Dämmerschlund"
+      },
+      "poverty_ghost": {
+        "name": "Armutsgeist"
+      },
+      "player_echo": {
+        "name": "Echo"
+      },
+      "gargoyle_awakened": {
+        "name": "Gargoyle-Wache"
+      },
+      "gloomhulk": {
+        "name": "Düsterkoloss"
+      },
+      "mirrorbound_sentry": {
+        "name": "Spiegelwächter"
+      },
+      "voidfang_stalker": {
+        "name": "Falzahn-Pirscher"
+      },
       "ironvein_foreman": {
         "name": "Eisenader-Vorarbeiter"
       },
@@ -6896,6 +6973,51 @@ export const de_DE: EnTranslations = {
         "name": "Der Bleiche Hüter",
         "title": "Wächter der Toten",
         "greeting": "Ruhe nun, Geist. Ich kann dich in deinen Körper zurückbringen, doch die Rückkehr lässt dich geschwächt zurück."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa die Ruhelose",
+        "title": "Geist-Bewahrerin der Lumenkrone",
+        "greeting": "Ich trug die Lumenkrone im Leben, und die Krone hält das Glas ehrlich - jeder Spiegel in diesem Tal zeigt etwas Wahres, bis auf einen. Der Tod hat mich nicht von meinem Posten entbunden, {playerName}, denn jener drängt noch immer. Das Licht der Krone erlischt, und wo es versagt, blutet das Tal hindurch. Achte darauf, auf welcher Seite des Glases du gehst. In letzter Zeit fällt ihm das Unterscheiden schwer."
+      },
+      "veilwright_ollo": {
+        "name": "Schleierwirker Ollo",
+        "title": "Schleiermarkt-Händler",
+        "greeting": "Mäntel toter Männer, Seufzer in Flaschen, ehrliche Preise - der Schleier versorgt. Alles auf meinem Tisch legte jemand ab, der nun nichts mehr besitzt; die Kunst ist, zu erkennen, womit die Toten fertig sind und was sie noch umklammern. Irrst du dich, kommen sie um Mitternacht an den Stand. Frag die Hüterin nach dem Licht im Brunnen, willst du die traurige Fassung. Ich verkaufe nur die Mäntel."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen die Nebelhexe",
+        "title": "Traumbrauerin der Mulde",
+        "greeting": "Der Nebel hält die meisten von euch wach. Ich braue dir die andere Art von Schlaf — die Art, die zurückspricht."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Gargoyle-Wache",
+        "title": "Hüter des Spiegels",
+        "greeting": "Steinerne Augen knirschen zu dir herüber. Es hört zu."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Gargoyle-Wache",
+        "title": "Hüter des Spiegels",
+        "greeting": "Steinerne Augen knirschen zu dir herüber. Es hört zu."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Gargoyle-Wache",
+        "title": "Hüter des Spiegels",
+        "greeting": "Steinerne Augen knirschen zu dir herüber. Es hört zu."
+      },
+      "dread_sentinel_a": {
+        "name": "Grauenswache",
+        "title": "Wärter des Düsterspiegels",
+        "greeting": "Dein Tod erwartet dich."
+      },
+      "dread_sentinel_b": {
+        "name": "Grauenswache",
+        "title": "Wärter des Düsterspiegels",
+        "greeting": "Im Leben hielten wir den Damm. Wir halten ihn noch."
+      },
+      "dread_sentinel_c": {
+        "name": "Grauenswache",
+        "title": "Wärter des Düsterspiegels",
+        "greeting": "Kehr um. Das schwarze Glas ist nicht für die Lebenden - noch war es das je für uns."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const de_DE: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "Ein Rezept für tiefen Schlaf",
+        "text": "Der Trank verlangt drei Stimmen, {playerName}: zwei weiße Laken von den Armutsgeistern, die sonst nichts besitzen, zwei Hörner der Geist-Einhörner, die im Düster grasen, und zwei Kapuzen, den Schnittern abgeschnitten, die den Gürtel bewachen. Bring sie mir, und ich braue dir einen Schlaf mit Zähnen.",
+        "completion": "Laken, Horn, Kapuze — die Armen, die Strahlenden, die Geduldigen. Der Kessel mag dich. Trink ihn an einem weichen Ort, Wanderer: du wirst treffen, wen du mit dir trägst.",
+        "objectives": {
+          "0": {
+            "label": "Weißes Laken"
+          },
+          "1": {
+            "label": "Geisterhorn"
+          },
+          "2": {
+            "label": "Schwarze Kapuze"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Stell dich deinem Echo",
+        "text": "Trink den Trank, und der Traum stellt dir einen Spiegel hin — dein Echo, jede Narbe und jeder deiner Tricks auf der anderen Seite. Besiege, was du bist, {playerName}, und bring mir den Blick auf deinem Gesicht zurück.",
+        "completion": "Du bist zurückgekehrt, und der Spiegel nicht. Was er dir in der Hand gelassen hat, gehört dir — der Traum zahlt diesen Preis nur einmal.",
+        "objectives": {
+          "0": {
+            "label": "Dein Echo besiegt"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "Der Zoll des Wächters",
+        "text": "Das Schimmern wird zu Worten hinter deinen Augen: die Schnitter drängen sich an meinem Glas, {playerName}. Lichte sie, und der Weg nach Highwatch gehört dir.",
+        "completion": "Der Stein summt einmal, zufrieden. Dahinter klart der Spiegel auf wie ein endlich losgelassener Atem.",
+        "objectives": {
+          "0": {
+            "label": "Schnitter erlegt"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "Ein Zoll aus Laken",
+        "text": "Das Schimmern wird zu Worten hinter deinen Augen: bring mir vier weiße Laken von den armen Toten, {playerName}. Der Weg nach Eastbrook öffnet sich dem, der in Tuch zahlt.",
+        "completion": "Die Laken sinken in den Stein und sind fort. Der Spiegel dahinter erwacht im Licht.",
+        "objectives": {
+          "0": {
+            "label": "Weißes Laken"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Geerntetes Leuchten",
+        "text": "Das Schimmern wird zu Worten hinter deinen Augen: die Geisterherden brennen dem Glas zu hell, {playerName}. Erlege fünf, und Fenbridge ist nur einen Schritt entfernt.",
+        "completion": "Der Stein trinkt das Licht, das du vergossen hast. Der Spiegel dahinter öffnet sich wie ein Auge.",
+        "objectives": {
+          "0": {
+            "label": "Geist-Einhorn erlegt"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "Der schwindende Glanz",
+        "text": "Du spürst meine Kälte und hältst mich für eine Sage. Ich bin ein Posten, {playerName}. Die Lumenkrone, die ich hütete, ist kein goldener Reif - sie ist das Licht in jedem Spiegel hier, die Naht, die Lebende und Tote in getrennten Spiegelbildern hält, damit keins das andere ertränkt. Dieses Licht versagt, und du siehst es an den Spiegelgebundenen Wachen: einst die Radiance der Krone selbst auf Wache, sind sie nun Glas voll gestohlenen Lichts, das die Nordruinen füllt, weil die Naht ihnen nicht mehr sagt, wo sie stehen sollen. Zerschlag acht. Jeder Splitter, den du zerstreust, ist ein wenig Licht, zurückgegeben - und ein wenig Beweis, dass man dir den Rest anvertrauen kann.",
+        "completion": "Die Splitter treiben zum Brunnen zurück wie Schnee, der nach oben fällt, und für einen Atemzug ist das ganze Tal eine Nuance heller. Es wird nicht währen. Doch du flickst Nähte, statt sie zu durchtrennen, {playerName} - das ist hier seltener, als du denkst. Du hast auch die ANDERE Krone zerbrochen, nicht wahr? Die eiserne, unter Thornpeak. Dann könnte dies Licht zum ersten Mal seit dreihundert Jahren wiederkehren. Bleib. Das Tal hat lange auf Hände gewartet, die Wunden schließen.",
+        "objectives": {
+          "0": {
+            "label": "Spiegelgebundene Wache zerschlagen"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Was die Armen noch behalten",
+        "text": "Die Armseligen Geister am Südufer besaßen im Leben nichts, {playerName} - nichts als das Laken, in dem man sie begrub, denn die Gemeinde konnte keinen Sarg bezahlen. Nun ist das Licht der Krone zu dünn, ihren Griff zu lösen, und sie irren umher und umklammern das Einzige, das je ihnen gehörte. Halt es nicht für Grausamkeit; es ist Liebe, die nirgends hinkann. Bring mir fünf ihrer Laken. Ich lege jedes in den Brunnen und spreche den Namen, der zu arm war, um eingemeißelt zu werden. Das ist der ganze Ritus: arm zu sein, und tot, und dennoch beim Namen gerufen.",
+        "completion": "Fünf Laken, fünf Namen. Ich spreche sie in den Brunnen, und das Wasser nimmt sie, wie eine Mutter einem schlafenden Kind den Mantel abstreift. Die Geister am Ufer sind heute Nacht weniger, {playerName} - nicht erschlagen, erlöst. Das tat die ganze Krone einst: sie hielt die Toten nah genug, um sie loslassen zu können. Nun tun wir es von Hand, du und ich, fünf Namen auf einmal. Es ist langsamer. Es ist nicht nichts.",
+        "objectives": {
+          "0": {
+            "label": "Weißes Laken"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "Die Namen der Wächter",
+        "text": "Die drei, die den Schwarzen Canyon durchschreiten, nennen jene, die vor ihnen fliehen, Dräuende Wachen. Ich rief sie einst bei Namen: sie waren mein Orden, {playerName}, die letzten Männer, die im Leben den Damm des Sablespiegels hielten, und sie standen nie ab, nicht einmal, als ihre Herzen es taten. Keine Klinge befreit sie mehr; das schwarze Glas reitet sie zu tief, als dass sie fielen. Doch dieses Glas kroch von den Wächtern zu den Schnittern, die den Damm überfüllen, und über die langen Jahre haben die Schnitter die Sigel der Wächter losgerissen. Bring mir drei, den Schnittern der Schlucht abgenommen, dass ich die drei Namen ein letztes Mal laut spreche.",
+        "completion": "Corwin. Aldous. Brenna. So: gesprochen, und das Sprechen wiegt leichter, als das Halten je wog. Bald dürfen sie ruhen; ich werde dafür sorgen. Doch acht auf das, was naht, {playerName}: die losgerissenen Sigel bedeuten, dass das Glas jenes Damms dünner wird, und die Wunde an seinem Ende hat genau darauf gewartet. Ich muss die Krone neu entzünden und das Sable stützen, ehe etwas jenseits bemerkt, dass die Tür bloß liegt. Ein Letztes brauche ich noch - und es liegt unter dem schwarzen Wasser.",
+        "objectives": {
+          "0": {
+            "label": "Wächtersigel"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Was das Glas will",
+        "text": "Du hast deinen Echo besiegt und es für eine Prüfung deiner selbst gehalten, {playerName}. Das war es nicht. Ich braue den Tieftraum aus Laken, Horn und Kapuze - doch das, wogegen dein Traum einen Spiegel stellte, das Ding, das in deinem Gesicht hereinkam, das braue ich nicht. Es sickert herein, aus dem schwarzen Glas der Schlucht. Die Schnitter, die den Schluchtmund überfüllen, sind dick von demselben Leck; erschlag acht und sieh, wohin ihre Schatten kriechen. Dann zeige ich Nerissas eigenen Augen, wo ihre Wunde wahrhaft blutet.",
+        "completion": "Nach Nordosten. Immer nach Nordosten, immer zum Sable — hast du es gesehen? Dein Echo warst nicht DU, Wanderer. Es war ein Splitter dessen, was hinter jenem Tor haust, gekleidet in das nächste Spiegelbild, das es stehlen konnte: deins. Der Traum ist nur die dünnste Stelle, die das Leck gefunden hat; die Schlucht die breiteste. Sag es Nerissa. Sie hat sich die Wahrheit darüber verdient, und du auch.",
+        "objectives": {
+          "0": {
+            "label": "Schnitter am Schluchtmund erlegt"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Die Lumenkrone neu entzünden",
+        "text": "Die Wächter haben Namen und der Damm wird dünner, so muss ich nun tun, was ich seit meinem Tod aufschob: die Lumenkrone ein letztes Mal entzünden und das Sable von dieser Seite zudrücken. Den letzten wahren Funken der Krone verschluckte der Dämmerschlund, als er in den Weiher fiel — darum glüht das Ding von innen. Schneid ihm das Licht wieder heraus, {playerName}. Das schwarze Glas wird seine Düsterkolosse senden, den Ritus zu hemmen; erschlag vier. Bring mir einen ertrunkenen Funken, solang ich noch weiß, wie man einen hält. Die letzte Pflicht eines Hüters ist, jemand zu werden, der nicht mehr hüten muss.",
+        "completion": "Sie brennt. Nach all der Finsternis kennt sie noch meine Hand. Sieh: das Glas ist wieder WAHR; kein Herzschlag hinter dem Wasser, keine Seele verloren zwischen einer Welt und ihrem Spiegelbild. Und die Last ist endlich von mir. Ich vergehe nicht, {playerName}; ich werde ABGELÖST. Dies ist kein Brechen des Sable, nur ein Halten; ich habe nicht die Kraft, zu brechen, was dort wartet, und würde es nicht wagen. Doch ein Zeitalter länger gehalten, ist es gehalten. Wenn eine tapferere Schar als wir endlich in jenes Tor hineingeht, wird sie die andere Seite bereit finden. Sag es in Highwatch, dass ihre Hüterin die Wache bis zuletzt hielt und dann abgelöst wurde. Das Glas wird sich deiner erinnern. Sieh zu, dass du ihm etwas gibst, das des Spiegelns wert ist.",
+        "objectives": {
+          "0": {
+            "label": "Der Dämmerschlund erschlagen"
+          },
+          "1": {
+            "label": "Ertrunkenes Lumen"
+          },
+          "2": {
+            "label": "Düsterkoloss zerschmettert"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Der Ertränkte Chor",
         "text": "Die Wäter handeln nicht allein. Unter ihnen wandeln die Ertränkten Andächtigen — der Kult, der mit dem Tempel versank, noch immer in seinen verfaulten Gewändern, noch immer das Gebet von den Uferfelsen singend. Bringe acht von ihnen zum Schweigen und bring mir sechs der Opfergaben, die sie bei sich tragen. Ich will wissen, was sie ihrer Göttin darbringen wollen.",
@@ -7870,6 +8104,48 @@ export const de_DE: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm-Heiligtum"
+          },
+          "10": {
+            "label": "Das Spiegeltor"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "Die Spiegelwelt",
+        "welcome": "Das Glas erinnert sich an dich. Achte darauf, auf welcher Seite du gehst.",
+        "pois": {
+          "0": {
+            "label": "Die Spiegelwelt"
+          },
+          "1": {
+            "label": "Spiegeltor-Platz"
+          },
+          "2": {
+            "label": "Die Lumenkrone"
+          },
+          "3": {
+            "label": "Der Verschleierte Markt"
+          },
+          "4": {
+            "label": "Das Stille Archiv"
+          },
+          "5": {
+            "label": "Der Spiegelsee"
+          },
+          "6": {
+            "label": "Das Nebelfenn"
+          },
+          "7": {
+            "label": "Hexenmulde"
+          },
+          "8": {
+            "label": "Spiegel von Eastbrook"
+          },
+          "9": {
+            "label": "Spiegel von Fenbridge"
+          },
+          "10": {
+            "label": "die Schwarze Schlucht"
           }
         }
       }

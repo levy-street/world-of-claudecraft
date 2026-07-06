@@ -365,7 +365,7 @@ describe('talent primitive P3: empower next', () => {
     // so the free charge must not be consumed at cast start or the player would
     // pay full price anyway. Regression for the start-consume bug.
     const { sim, p } = makeSim('mage');
-    spawnTarget(sim, p);
+    const mob = spawnTarget(sim, p);
     p.resource = 0;
     p.auras.push(aura('next_cast_free'));
 
@@ -374,9 +374,24 @@ describe('talent primitive P3: empower next', () => {
     expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
 
     const events = [];
-    for (let i = 0; i < 200 && p.castingAbility; i++) events.push(...sim.tick());
+    // This test exercises the free-cast COST path, not mob AI. Keep the target
+    // pinned adjacent (clear line of sight) so the hostile wolf can't wander --
+    // its aggro timing shifts with unrelated content additions, and drifting it
+    // behind a collider would fail the cast's line-of-sight check instead.
+    const pin = () => {
+      mob.pos.x = p.pos.x;
+      mob.pos.z = p.pos.z + 4;
+      mob.prevPos = { ...mob.pos };
+    };
+    for (let i = 0; i < 200 && p.castingAbility; i++) {
+      pin();
+      events.push(...sim.tick());
+    }
     // the bolt may still be in flight after the cast completes; let it land
-    for (let i = 0; i < 40; i++) events.push(...sim.tick());
+    for (let i = 0; i < 40; i++) {
+      pin();
+      events.push(...sim.tick());
+    }
     expect(p.castingAbility).toBeNull();
     // Consumed at completion (where the bill lands), the cast resolved for free
     // (no mana error despite starting at 0), and the hit actually landed.

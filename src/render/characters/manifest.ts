@@ -14,6 +14,10 @@ export interface EmoteClipSpec {
   repeats?: number;
 }
 
+/** Procedural attack style for walk-only quadruped rigs (see VisualDef.proceduralAttack).
+ *  The motion curve + bone chain for each lives in the render layer (visual.ts). */
+export type ProcAttackKind = 'chomp' | 'lungeBite' | 'gore';
+
 export interface ClipMap {
   idle: string;
   walk: string;
@@ -56,8 +60,14 @@ export interface VisualDef {
   clips: ClipMap;
   /** floating rigs hover: mesh bottom sits this far above the pivot */
   hover?: number;
+  /** Statue mode: pose on the idle clip's first frame and never animate. */
+  frozen?: boolean;
   /** yaw applied so the model faces +Z (facing-0 convention) */
   yaw?: number;
+  /** Model-space orientation fix in radians, baked BEFORE the height measurement
+   *  so a Z-up source asset (Tripo/Blender) is stood upright and scaled right.
+   *  x: pitch (Z-up→Y-up is -Math.PI/2); z: roll. Applied under the runtime yaw. */
+  orient?: { x?: number; z?: number };
   /** KayKit chars ship every accessory visible: non-skinned mesh nodes to KEEP.
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
@@ -77,6 +87,12 @@ export interface VisualDef {
   runRef?: number;
   attackTimeScale?: number;
   deathTimeScale?: number;
+  /** Bone-driven procedural attack for Tripo quadruped rigs that ship ONLY a
+   *  'Walk' clip (no baked 'Attack'): the render layer curls the head/spine bone
+   *  chain on a load->strike->recover envelope + a short forward lunge when the
+   *  sim fires a physical swing. The maw chomps, the voidfang lunge-bites, the
+   *  unicorn gores. No-op for rigs whose GLB carries a real Attack clip. */
+  proceduralAttack?: ProcAttackKind;
   /** Skip the boot preload sweep (manifestUrls); the asset is fetched on demand
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
@@ -177,12 +193,32 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// Quaternius ghost rig — it never walks, it drifts.
+const GHOST: ClipMap = {
+  idle: 'Flying_Idle',
+  walk: 'Fast_Flying',
+  run: 'Fast_Flying',
+  attack: ['Punch', 'Headbutt'],
+  hit: ['HitReact'],
+  death: 'Death',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Run',
   attack: ['Attack'],
+  hit: ['HitRecieve'],
+  death: 'Death',
+};
+
+// Quaternius crab rig (crabenemy.glb) — no Run clip; Walk covers both.
+const CRAB: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Bite_Front', 'Bite_InPlace'],
   hit: ['HitRecieve'],
   death: 'Death',
 };
@@ -195,6 +231,72 @@ const FLOATING: ClipMap = {
   attack: ['Headbutt', 'Punch'],
   hit: ['HitReact'],
   death: 'Death',
+};
+
+// Bespoke floating spirits (poverty_ghost.glb and kin): legless draped shades that
+// hover rather than walk, so idle covers all locomotion (position is server-driven;
+// the drift comes from `hover` + translation). Rigged/animated via Tripo Studio,
+// clips baked by scripts/combine_fbx_to_glb.mjs. `Attack` is a slow spectral reach
+// (Tripo cast_a_spell) so the sheet billows on the swing.
+const SPIRIT_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Idle',
+  run: 'Idle',
+  attack: ['Attack'],
+  hit: ['HitReact'],
+  death: 'Death',
+};
+
+// Shared clip set for the Mirror World's bespoke grounded combat bipeds (reaper,
+// and the brutes/sentries as they land): a Tripo humanoid rig with the game's
+// core loop. No dedicated run cycle — Walk covers both (server drives speed).
+const MIRROR_COMBAT_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Attack'],
+  hit: ['HitReact'],
+  death: 'Death',
+};
+
+// Walk-only quadruped set (spirit unicorn and kin). Tripo's quadruped auto-rig
+// only ships a single Walk cycle — no idle/gallop/attack/death for four-legged
+// models — so every ClipMap slot points at Walk. With --strip-root the creature
+// walk-cycles in place, which reads as a restless drift on a spirit; not ideal for
+// a distinct attack/death pose, but keeps a bespoke body over the placeholder.
+const WALK_ONLY_QUAD_CLIPS: ClipMap = {
+  idle: 'Walk',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Walk'],
+  death: 'Walk',
+};
+
+// Stationary bespoke-NPC set: one signature clip baked as 'Idle' (Nerissa's
+// standing warden idle; Morwen's perpetual cast/stir over her kettle). Town NPCs
+// never walk or fight, so every slot points at Idle — the render never asks for a
+// clip the GLB doesn't ship.
+const NPC_IDLE_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Idle',
+  run: 'Idle',
+  attack: ['Idle'],
+  death: 'Idle',
+};
+
+// Bespoke winged gargoyle (gargoyle.glb): project-commissioned model rigged and
+// animated via Tripo Studio's humanoid rig + animation library, clips baked in by
+// scripts/combine_fbx_to_glb.mjs. Serves both the frozen statue (idle frame 0) and
+// the awakened boss; `flourish` is the "Wake" one-shot (stone stirring, wings
+// unfurling) played when a statue rouses into the boss.
+const GARGOYLE_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['HitReact'],
+  death: 'Death',
+  flourish: 'Wake',
 };
 
 const SPIDER: ClipMap = {
@@ -598,6 +700,121 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.45,
   },
+  // Mirror World belt spirits — each moving off the placeholder rig onto its own
+  // bespoke Tripo body as they land. Poverty ghost + mistshade are done (own
+  // floating GLBs, SPIRIT_CLIPS); the unicorn/reaper/etc. still ride placeholders
+  // below until their models ship.
+  mob_mistshade: {
+    url: `${CREATURES}/mistshade_lurker.glb`,
+    height: 3.3,
+    orient: { x: -Math.PI / 2 },
+    hover: 0.25,
+    clips: SPIRIT_CLIPS,
+    // bespoke grey-violet smoke texture carries it; faint entity wash for variety.
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mob_ghost: {
+    url: `${CREATURES}/poverty_ghost.glb`,
+    height: 3.3,
+    orient: { x: -Math.PI / 2 },
+    hover: 0.25,
+    clips: SPIRIT_CLIPS,
+    // bespoke pale-sheet texture carries the look; a faint entity wash keeps the
+    // per-spawn colour variation the belt camp expects.
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mob_reaper: {
+    url: `${CREATURES}/hooded_reaper.glb`,
+    height: 2.85,
+    orient: { x: -Math.PI / 2 },
+    clips: MIRROR_COMBAT_CLIPS,
+    // bespoke near-black robe carries it; faint entity wash for per-spawn variety.
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mob_gloomhulk: {
+    url: `${CREATURES}/gloomhulk.glb`,
+    height: 2.9,
+    orient: { x: -Math.PI / 2 },
+    clips: MIRROR_COMBAT_CLIPS,
+    // slow the swing so the brute reads heavy, not twitchy.
+    attackTimeScale: 0.8,
+    // bespoke charcoal-and-glass texture carries it; faint entity wash for variety.
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  // Mirrorbound Sentry: hollow armored husk with mirror-glass plates. Its own
+  // bespoke body (was sharing the KayKit skeleton_warrior). The baked dark-iron +
+  // silver-plate texture carries it; only a whisper of cool tint.
+  mob_sentry: {
+    url: `${CREATURES}/mirrorbound_sentry.glb`,
+    height: 2.75,
+    orient: { x: -Math.PI / 2 },
+    clips: MIRROR_COMBAT_CLIPS,
+    tint: 0x9aa0b0,
+    tintStrength: 0.15,
+  },
+  // Spirit Unicorn: bespoke translucent unicorn (was a pale-tinted stag). Walk-only
+  // (Tripo quadruped limitation) — the baked pale-blue ghost texture carries the look.
+  mob_unicorn: {
+    url: `${CREATURES}/spirit_unicorn.glb`,
+    height: 2.6,
+    orient: { x: -Math.PI / 2 },
+    // the bespoke unicorn GLB (replaced the old stag) shares the Tripo quadruped
+    // forward axis of the maw/palefang; PI walked it sideways, PI/2 is head-first.
+    yaw: Math.PI / 2,
+    clips: WALK_ONLY_QUAD_CLIPS,
+    // walk-only rig: the horn gore is a procedural bone overlay (visual.ts).
+    proceduralAttack: 'gore',
+    tint: 'entity',
+    tintStrength: 0.15,
+  },
+  // Voidfang Stalker: bespoke gaunt spectral hound (was the shared fox). Walk-only
+  // (Tripo quadruped limitation) — the baked grey-blue ghost texture carries the
+  // wraith-predator read; with the in-place walk it drift-prowls the causeway.
+  mob_voidfang: {
+    url: `${CREATURES}/voidfang_stalker.glb`,
+    height: 1.7,
+    orient: { x: -Math.PI / 2 },
+    // this GLB's forward is 180° from facing-0, so at -PI/2 it prowled tail-first
+    // ("walking backwards"); +PI/2 turns it head-first along its travel.
+    yaw: Math.PI / 2,
+    clips: WALK_ONLY_QUAD_CLIPS,
+    // walk-only rig: the pounce/snap bite is a procedural bone overlay (visual.ts).
+    proceduralAttack: 'lungeBite',
+    tint: 0x9aa0b0,
+    tintStrength: 0.12,
+  },
+  // Gloaming Maw: bespoke all-jaws void predator (new key; previously fell back to
+  // the demon family). Walk-only quadruped — the baked black-violet void texture and
+  // huge fanged maw carry the horror; only a whisper of cool tint so it seats in the
+  // moonlit Mirror-World palette without dulling the violet.
+  mob_maw: {
+    url: `${CREATURES}/gloaming_maw.glb`,
+    height: 2.75,
+    orient: { x: -Math.PI / 2 },
+    yaw: Math.PI / 2,
+    clips: WALK_ONLY_QUAD_CLIPS,
+    // walk-only rig: the jaw chomp is a procedural bone overlay (visual.ts) — the
+    // 4-segment tripoHead chain gapes open then snaps shut on the strike.
+    proceduralAttack: 'chomp',
+    tint: 0x9aa0b0,
+    tintStrength: 0.1,
+  },
+  mob_gargoyle: {
+    url: `${CREATURES}/gargoyle.glb`,
+    height: 7.5,
+    orient: { x: -Math.PI / 2 },
+    hover: 0.2,
+    clips: GARGOYLE_CLIPS,
+    // the model ships its own weathered-stone basecolor; only a whisper of cool
+    // tint so it settles into the moonlit Mirror-World palette without flooding
+    // the sculpted grey.
+    tint: 0x9aa0b0,
+    tintStrength: 0.15,
+  },
   mob_kobold: {
     url: `${CREATURES}/goblin.glb`,
     height: 2.1,
@@ -942,6 +1159,67 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Idle',
     },
   },
+
+  // -- Mirror World (Vale of Glass) NPCs + statues -------------------------
+  // Wandering shade near the belt camp: the drifting Quaternius ghost rig.
+  npc_ghost: {
+    url: `${CREATURES}/ghost.glb`,
+    height: 1.9,
+    hover: 0.3,
+    clips: GHOST,
+    tint: 0xbfe4f2,
+    tintStrength: 0.5,
+  },
+  npc_shroud: {
+    url: `${ENEMIES}/necromancer.glb`,
+    height: 2.3,
+    clips: skeletonClips(['Spellcast_Raise']),
+    tint: 0x4a4066,
+    tintStrength: 0.55,
+  },
+  // The statue form: the same bespoke gargoyle, frozen on its idle's first frame.
+  // `frozen` parks the mixer there — statues do not sway. It rouses into the
+  // awakened boss (mob_gargoyle) on Sim.wakeGargoyle, playing the Wake flourish.
+  npc_gargoyle: {
+    url: `${CREATURES}/gargoyle.glb`,
+    height: 7.5,
+    orient: { x: -Math.PI / 2 },
+    clips: GARGOYLE_CLIPS,
+    frozen: true,
+    // heavier cool wash than the boss: weathered, lifeless stone at rest.
+    tint: 0x9a9aa8,
+    tintStrength: 0.35,
+  },
+  npc_mistwitch: {
+    url: `${PLAYERS}/mage.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    tint: 0x6a4a8f,
+    tintStrength: 0.5,
+  },
+  // Nerissa the Unresting: bespoke ghost-warden (was the shared Quaternius ghost).
+  // Pale blue-white spectral keeper, iron keys at the belt; hovers at her post. The
+  // baked translucent-ghost texture carries the look, so only a light cool wash.
+  npc_nerissa: {
+    url: `${CREATURES}/nerissa.glb`,
+    height: 2.9,
+    orient: { x: -Math.PI / 2 },
+    hover: 0.3,
+    clips: NPC_IDLE_CLIPS,
+    tint: 0xbfe4f2,
+    tintStrength: 0.25,
+  },
+  // Morwen the Mistwitch: bespoke gaunt hag (was a violet-tinted mage). Near-black
+  // shroud, ember eyes, skeletal hands; her single clip is the cast/stir so she
+  // perpetually weaves over her kettle. Baked dark-violet texture, faint tint only.
+  npc_morwen: {
+    url: `${CREATURES}/morwen.glb`,
+    height: 2.75,
+    orient: { x: -Math.PI / 2 },
+    clips: NPC_IDLE_CLIPS,
+    tint: 0x6a5a8f,
+    tintStrength: 0.12,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -971,6 +1249,17 @@ const MOB_KEYS: Record<string, string> = {
   tolling_bell: 'mob_tolling_bell',
   reedbound_acolyte: 'mob_reedbound_acolyte',
   edda_reedhand: 'npc_edda_reedhand',
+  // Mirror World belt spirits — species-specific rigs; the mistshade takes a
+  // heavier-tinted variant of the murloc/frog rig so it reads as a shadow.
+  poverty_ghost: 'mob_ghost',
+  gloomhulk: 'mob_gloomhulk',
+  mirrorbound_sentry: 'mob_sentry',
+  voidfang_stalker: 'mob_voidfang',
+  gloaming_maw: 'mob_maw',
+  mistshade_lurker: 'mob_mistshade',
+  spirit_unicorn: 'mob_unicorn',
+  hooded_reaper: 'mob_reaper',
+  gargoyle_awakened: 'mob_gargoyle',
   // gravecaller cult + necromancers: dark-robed casters
   gravecaller_cultist: 'mob_dark_caster',
   gravecaller_summoner: 'mob_dark_caster',
@@ -1026,10 +1315,21 @@ const FAMILY_KEYS: Record<string, string> = {
 };
 
 const NPC_KEYS: Record<string, string> = {
+  keeper_nerissa: 'npc_nerissa',
+  veilwright_ollo: 'npc_shroud',
+  gargoyle_sentinel_south: 'npc_gargoyle',
+  gargoyle_sentinel_west: 'npc_gargoyle',
+  gargoyle_sentinel_north: 'npc_gargoyle',
+  // The Black Mirror causeway wardens are gargoyle statues too — without these
+  // they fell through to npc_villager and rendered as townsfolk.
+  dread_sentinel_a: 'npc_gargoyle',
+  dread_sentinel_b: 'npc_gargoyle',
+  dread_sentinel_c: 'npc_gargoyle',
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
   loremaster_caddis: 'npc_mage',
+  mistwitch_morwen: 'npc_morwen',
   smith_haldren: 'npc_smith',
   armorer_hode: 'npc_smith',
   foreman_odell: 'npc_smith',
@@ -1054,6 +1354,11 @@ export function visualKeyFor(e: Entity): string {
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
   if (e.kind === 'mob') {
+    // The Deepdream Echo wears the dreamer's own class silhouette (its dark
+    // entity tint reads it as a shadow of you). mirrorClass is set at spawn.
+    if (e.mirrorClass) {
+      return VISUALS[`player_${e.mirrorClass}`] ? `player_${e.mirrorClass}` : 'player_warrior';
+    }
     const override = MOB_KEYS[e.templateId];
     if (override) return override;
     const family = MOBS[e.templateId]?.family;

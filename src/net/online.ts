@@ -942,6 +942,7 @@ export class ClientWorld implements IWorld {
   activeLoadout = -1;
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
+  bowedGargoyles = new Set<string>();
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
   // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
   // field (pet state lives on the owned-mob entity wire). ---
@@ -1494,6 +1495,7 @@ export class ClientWorld implements IWorld {
         e.githubLogin = typeof w.dgl === 'string' ? w.dgl : undefined; // GitHub login
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
+        e.mirrorClass = typeof w.mc === 'string' ? (w.mc as PlayerClass) : undefined; // Deepdream Echo
         e.dungeonId = w.dgn ?? null;
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
@@ -1756,6 +1758,7 @@ export class ClientWorld implements IWorld {
       if (s.qlog !== undefined)
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
+      if (s.bowed !== undefined) this.bowedGargoyles = new Set(s.bowed);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
@@ -1854,7 +1857,13 @@ export class ClientWorld implements IWorld {
   // -----------------------------------------------------------------------
 
   questState(questId: string): QuestState {
-    const state = computeQuestState(questId, this.questLog, this.questsDone, this.player.level);
+    const state = computeQuestState(
+      questId,
+      this.questLog,
+      this.questsDone,
+      this.player.level,
+      this.bowedGargoyles,
+    );
     const pending = this.pendingQuestCommands?.get(questId);
     if (
       (pending === 'accept' && state === 'available') ||
@@ -2334,6 +2343,15 @@ export class ClientWorld implements IWorld {
   }
   leaveDungeon(): void {
     this.cmd({ cmd: 'leave_dungeon' });
+  }
+  brewDraught(): void {
+    this.cmd({ cmd: 'brew_draught' });
+  }
+  bowToGargoyle(): void {
+    this.cmd({ cmd: 'gargoyle_bow' });
+  }
+  wakeGargoyle(): void {
+    this.cmd({ cmd: 'gargoyle_wake' });
   }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.

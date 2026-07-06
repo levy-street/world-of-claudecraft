@@ -3747,6 +3747,7 @@ export const sv_SE: EnTranslations = {
       "eatingDrinking": "Äter & dricker...",
       "secondsRemaining": "{seconds} sekunder kvar",
       "enteringZone": "Träder in i {zone}.",
+      "deepdreamZone": "Djupdrömmen",
       "welcomeZone": "Välkommen till {zone}!",
       "levelBanner": "Nivå {level}!",
       "levelLog": "Du har nått nivå {level}!",
@@ -4388,6 +4389,13 @@ export const sv_SE: EnTranslations = {
       "nythraxisDeathlessKingWarning": "De tre relikerna berättar samma historia: Aldren stred för att försvara sin kung, Malric bröt dödens gräns, och Voss försökte hejda det som följde. Sigillet försvagas, och den övergivna kryptan är vägen nedåt.",
       "browseGoods": "Låt mig se dina varor.",
       "browseGoodsAria": "Bläddra bland varor från {name}",
+      "brewDraught": "Brygg mig en Djupdröm-brygd.",
+      "brewDraughtAria": "Be {name} brygga en Djupdröm-brygd",
+      "gargoyleBow": "Buga.",
+      "gargoyleBowAria": "Buga för {name}",
+      "gargoyleAttack": "Anfall.",
+      "gargoyleAttackAria": "Anfall {name}",
+      "gargoyleShimmer": "Statyn skimrar av energi...",
       "worldMarket": "Visa mig Världsmarknaden.",
       "worldMarketAria": "Öppna Världsmarknaden",
       "accept": "Acceptera",
@@ -5867,6 +5875,45 @@ export const sv_SE: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Solkronbladsskära"
       },
+      "white_sheet": {
+        "name": "Vitt Lakan"
+      },
+      "spirit_horn": {
+        "name": "Andehorn"
+      },
+      "black_hood": {
+        "name": "Svart Huva"
+      },
+      "deepdream_draught": {
+        "name": "Djupdröm-brygd"
+      },
+      "mirror_shard": {
+        "name": "Spegelskärva"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Spöklik Spegelklinga"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Spöklik Svepningsmantel"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Spöklik Vålnadsväst"
+      },
+      "ghostly_palegrips": {
+        "name": "Spöklika Bleka Grepp"
+      },
+      "ghostly_hushboots": {
+        "name": "Spöklika Tysta Stövlar"
+      },
+      "ghostly_glasscord": {
+        "name": "Spöklik Glassnodd"
+      },
+      "warden_sigil": {
+        "name": "Väktarsigill"
+      },
+      "drowned_lumen": {
+        "name": "Dränkt lumen"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-hammare"
       },
@@ -6667,6 +6714,36 @@ export const sv_SE: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Väckt stormyngel"
       },
+      "spirit_unicorn": {
+        "name": "Andeenhörning"
+      },
+      "hooded_reaper": {
+        "name": "Skördeman"
+      },
+      "mistshade_lurker": {
+        "name": "Dimskugge-lurare"
+      },
+      "gloaming_maw": {
+        "name": "Skymningsgapet"
+      },
+      "poverty_ghost": {
+        "name": "Fattigdomsspöke"
+      },
+      "player_echo": {
+        "name": "Eko"
+      },
+      "gargoyle_awakened": {
+        "name": "Gargoylvakt"
+      },
+      "gloomhulk": {
+        "name": "Dysterkoloss"
+      },
+      "mirrorbound_sentry": {
+        "name": "Spegelbunden Vakt"
+      },
+      "voidfang_stalker": {
+        "name": "Blektand-Smygare"
+      },
       "ironvein_foreman": {
         "name": "Järnådersförman"
       },
@@ -6896,6 +6973,51 @@ export const sv_SE: EnTranslations = {
         "name": "Den bleka väktaren",
         "title": "De dödas väktare",
         "greeting": "Vila nu, ande. Jag kan återbörda dig till din kropp, men överfarten tillbaka lämnar dig svag."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa den Rastlösa",
+        "title": "Spökväktare av Lumenkronan",
+        "greeting": "Jag bar Lumenkronan i livet, och Kronan håller glaset ärligt - varje spegel i denna dal visar något sant, utom en. Döden har inte befriat mig från posten, {playerName}, ty den ena slutar inte trycka. Kronans ljus falnar, och där det sviker blöder dalen igenom. Akta på vilken sida av glaset du går. På sistone har det svårt att avgöra."
+      },
+      "veilwright_ollo": {
+        "name": "Slöjvävaren Ollo",
+        "title": "Handlare på Slöjmarknaden",
+        "greeting": "Döda mäns rockar, buteljerade suckar, ärliga priser - slöjan förser. Allt på mitt bord lades ner av någon som nu inget äger; konsten är att skilja vad de döda är klara med från vad de ännu kramar. Missta dig, och de kommer till ståndet vid midnatt. Fråga Väktaren om ljuset i brunnen, vill du ha den sorgliga versionen. Jag säljer bara rockarna."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen Dimhäxan",
+        "title": "Sänkans drömbryggerska",
+        "greeting": "Dimman håller de flesta av er vakna. Jag kan brygga dig den andra sortens sömn — den som svarar."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Gargoylvakt",
+        "title": "Spegelns Väktare",
+        "greeting": "Stenögon gnisslar åt ditt håll. Den lyssnar."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Gargoylvakt",
+        "title": "Spegelns Väktare",
+        "greeting": "Stenögon gnisslar åt ditt håll. Den lyssnar."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Gargoylvakt",
+        "title": "Spegelns Väktare",
+        "greeting": "Stenögon gnisslar åt ditt håll. Den lyssnar."
+      },
+      "dread_sentinel_a": {
+        "name": "Fasans Vakt",
+        "title": "Väktare av Skuggspegeln",
+        "greeting": "Din död väntar dig."
+      },
+      "dread_sentinel_b": {
+        "name": "Fasans Vakt",
+        "title": "Väktare av Skuggspegeln",
+        "greeting": "I livet höll vi vägbanken. Vi håller den än."
+      },
+      "dread_sentinel_c": {
+        "name": "Fasans Vakt",
+        "title": "Väktare av Skuggspegeln",
+        "greeting": "Vänd om. Det svarta glaset är inte för de levande - inte heller var det någonsin för oss."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const sv_SE: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "Ett recept på djup sömn",
+        "text": "Brygden kräver tre röster, {playerName}: två vita lakan från fattigdomsspökena som inget annat äger, två horn från andeenhörningarna som betar i dunklet, och två huvor skurna från skördemännen som vaktar bältet. Ta hit dem så brygger jag dig en sömn med tänder.",
+        "completion": "Lakan, horn, huva — de fattiga, de strålande, de tålmodiga. Kitteln gillar dig. Drick den någonstans mjukt, vandrare: du kommer att möta den du burit på.",
+        "objectives": {
+          "0": {
+            "label": "Vitt Lakan"
+          },
+          "1": {
+            "label": "Andehorn"
+          },
+          "2": {
+            "label": "Svart Huva"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Möt ditt Eko",
+        "text": "Drick brygden så ställer drömmen en spegel framför dig — ditt Eko, varje ärr och varje knep du har på andra sidan. Besegra det du är, {playerName}, och kom tillbaka med minen du gör.",
+        "completion": "Du kom tillbaka, och det gjorde inte spegeln. Vad den lämnade i din hand är ditt — drömmen betalar det priset bara en gång.",
+        "objectives": {
+          "0": {
+            "label": "Ditt Eko besegrat"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "Väktarens Tull",
+        "text": "Skenet blir till ord bakom dina ögon: skördemännen trängs vid mitt glas, {playerName}. Gallra dem, och vägen till Highwatch är din.",
+        "completion": "Stenen brummar en gång, nöjd. Bakom den klarnar spegeln som ett äntligen släppt, hållet andetag.",
+        "objectives": {
+          "0": {
+            "label": "Skördeman fälld"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "En Tull av Lakan",
+        "text": "Skenet blir till ord bakom dina ögon: hämta mig fyra vita lakan från de fattiga döda, {playerName}. Vägen till Eastbrook öppnas för den som betalar i tyg.",
+        "completion": "Lakanen sjunker in i stenen och är borta. Spegeln bakom den vaknar med ljus.",
+        "objectives": {
+          "0": {
+            "label": "Vitt Lakan"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Skördad Strålglans",
+        "text": "Skenet blir till ord bakom dina ögon: andehjordarna brinner för klart för glaset, {playerName}. Fäll fem, och Fenbridge är ett steg bort.",
+        "completion": "Stenen dricker ljuset du spillde. Spegeln bakom den öppnar sig som ett öga.",
+        "objectives": {
+          "0": {
+            "label": "Andeenhörning fälld"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "Det falnande skenet",
+        "text": "Du känner min köld och tar mig för en saga. Jag är en post, {playerName}. Lumenkronan jag vaktade är ingen guldring: den är ljuset i varje spegel här, fogen som håller levande och döda i skilda speglingar så att ingen dränker den andra. Det ljuset sviker, och du ser det på de Spegelbundna vakterna: en gång Kronans egen strålglans på vakt, nu glas fyllt av stulet ljus, som trängs i de norra ruinerna för att fogen inte längre säger dem var de ska stå. Krossa åtta. Varje skärva du skingrar är en smula ljus återgivet, och en smula bevis på att man kan anförtro dig resten.",
+        "completion": "Skärvorna driver tillbaka mot brunnen som snö som faller uppåt, och för ett andetag är hela dalen en nyans ljusare. Det varar inte. Men du lagar fogar i stället för att skära dem, {playerName}: det är ovanligare här än du tror. Du krossade också den ANDRA kronan, inte sant? Järnkronan, under Thornpeak. Då kan detta ljus för första gången på trehundra år komma åter. Stanna. Dalen har länge väntat på händer som sluter sår.",
+        "objectives": {
+          "0": {
+            "label": "Spegelbunden vakt krossad"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Vad de fattiga än behåller",
+        "text": "De Fattiga vålnaderna vid södra stranden ägde intet i livet, {playerName}: intet utom lakanet de begravdes i, ty församlingen hade ej råd med kista. Nu är Kronans ljus för tunt att lösa deras grepp, och de vandrar och kramar det enda som någonsin var deras. Se det ej som grymhet; det är kärlek utan var att ta vägen. Hämta mig fem av deras lakan. Jag lägger vart och ett i brunnen och säger namnet som var för fattigt att ristas. Däri består hela riten: att vara fattig, och död, och ändå kallad vid namn.",
+        "completion": "Fem lakan, fem namn. Jag säger dem i brunnen och vattnet tar dem som en mor lyfter en rock av ett sovande barn. Vålnaderna vid stranden är färre i natt, {playerName}: inte dräpta, befriade. Detta gjorde hela Kronan: den höll de döda nära nog för att kunna släppa dem. Nu gör vi det för hand, du och jag, fem namn i taget. Det går långsammare. Det är inte ingenting.",
+        "objectives": {
+          "0": {
+            "label": "Vitt lakan"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "Väktarnas namn",
+        "text": "De tre som vandrar Svarta ravinen kallas Skräckvakter av dem som flyr dem. Jag kallade dem en gång vid namn: de var min orden, {playerName}, de sista män som i livet höll Sobelspegelns vägbank, och de vek aldrig, inte ens när deras hjärtan gjorde det. Ingen klinga befriar dem längre; det svarta glaset rider dem för djupt för att de ska falla. Men det glaset har krupit från väktarna till skördarna som trängs på vägbanken, och genom de långa åren har skördarna slitit loss väktarnas sigill. Hämta mig tre, tagna från ravinens skördare, så att jag säger de tre namnen högt en sista gång.",
+        "completion": "Corwin. Aldous. Brenna. Så: sagda, och att säga dem väger lättare än att hålla dem någonsin gjorde. Snart får de sluta; det ska jag se till. Men akta det som nalkas, {playerName}: de lossryckta sigillen betyder att glaset på den vägbanken tunnas, och såret vid dess ände har väntat på just detta. Jag måste tända Kronan på nytt och stötta Sobeln innan något på andra sidan märker att dörren står blottad. Det finns en sista sak jag behöver - och den ligger under det svarta vattnet.",
+        "objectives": {
+          "0": {
+            "label": "Väktarsigill"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Vad glaset vill",
+        "text": "Du besegrade din Eko och trodde det en prövning av dig själv, {playerName}. Det var det inte. Jag brygger Djupdrömmen av lakan, horn och huva, men det din dröm reste en spegel mot, tinget som kom in i ditt ansikte, det brygger jag inte. Det sipprar in, ur ravinens svarta glas. Skördarna som trängs vid ravinens mynning är tjocka av samma läcka; fäll åtta och se vart deras skuggor kryper. Då ska jag visa Nerissas egna ögon var hennes sår sannerligen blöder.",
+        "completion": "Åt nordost. Alltid åt nordost, alltid mot Sobeln — såg du det? Din Eko var inte DU, vandrare. Den var en skärva av vad som än bor bakom den porten, klädd i den närmaste spegling den kunde stjäla: din. Drömmen är bara den tunnaste plats läckan funnit; ravinen den bredaste. Säg det till Nerissa. Hon har förtjänat sanningen om det, och det har du med.",
+        "objectives": {
+          "0": {
+            "label": "Skördare fälld vid ravinens mynning"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Tänd Lumenkronan på nytt",
+        "text": "Väktarna har namn och vägbanken tunnas, så nu måste jag göra det jag skjutit upp sedan jag dog: tända Lumenkronan en sista gång och pressa Sobeln sluten från denna sida. Kronans sista sanna gnista slukades av Skymningsgapet när det föll i dammen — därför glöder tinget inifrån. Skär ljuset ut ur det igen, {playerName}. Det svarta glaset sänder sina dysterkolosser att hejda riten; fäll fyra. Hämta mig en dränkt gnista medan jag ännu minns hur man håller en. En väktares sista plikt är att bli någon som inte längre behöver vakta.",
+        "completion": "Den brinner. Efter allt detta mörker känner den ännu min hand. Se: glaset är SANT igen; ingen hjärtslag bakom vattnet, ingen själ förlorad mellan en värld och dess spegling. Och tyngden har äntligen lämnat mig. Jag förbleknar inte, {playerName}; jag blir AVLÖST. Detta är inte att bryta Sobeln, blott att hålla den; jag har ej kraften att bryta det som väntar där, och jag skulle inte våga. Men hållen en tidsålder till, är den hållen. När ett tapprare följe än vi till sist går IN genom den porten, ska de finna andra sidan redo. Säg i Highwatch att deras väktare höll vakan till slutet, och sedan blev avlöst. Glaset ska minnas dig. Se till att ge det något värt att spegla.",
+        "objectives": {
+          "0": {
+            "label": "Skymningsgapet fällt"
+          },
+          "1": {
+            "label": "Dränkt lumen"
+          },
+          "2": {
+            "label": "Dysterkoloss krossad"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Den drunknade kören",
         "text": "Vadarna agerar inte ensamma. Bland dem vandrar de Drunknade tillbedjarna - kulten som sjönk med templet, fortfarande i sina ruttna skrudar, fortfarande sjungande bönen från strandklipporna. Tysta åtta av dem och hämta mig sex av de offergåvor de bär. Jag vill veta vad de tänker ge sin gudinna.",
@@ -7870,6 +8104,48 @@ export const sv_SE: EnTranslations = {
           },
           "9": {
             "label": "Gravlindormens helgedom"
+          },
+          "10": {
+            "label": "Spegelporten"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "Spegelvärlden",
+        "welcome": "Glaset minns dig. Se upp med vilken sida av det du går på.",
+        "pois": {
+          "0": {
+            "label": "Spegelvärlden"
+          },
+          "1": {
+            "label": "Spegelportens torg"
+          },
+          "2": {
+            "label": "Lumenkronan"
+          },
+          "3": {
+            "label": "Den Beslöjade Marknaden"
+          },
+          "4": {
+            "label": "Det Tysta Arkivet"
+          },
+          "5": {
+            "label": "Spegelsjön"
+          },
+          "6": {
+            "label": "Dimkärret"
+          },
+          "7": {
+            "label": "Häxans Sänka"
+          },
+          "8": {
+            "label": "Eastbrooks Spegel"
+          },
+          "9": {
+            "label": "Fenbridges Spegel"
+          },
+          "10": {
+            "label": "Den Svarta Ravinen"
           }
         }
       }

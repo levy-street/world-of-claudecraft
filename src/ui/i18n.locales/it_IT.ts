@@ -2153,6 +2153,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.readyQuestAria': 'Missione pronta da consegnare: {name}',
   'questUi.dialog.browseGoods': 'Fammi vedere la tua merce.',
   'questUi.dialog.browseGoodsAria': 'Vedi la merce di {name}',
+  'questUi.dialog.brewDraught': 'Preparami un Intruglio del Sonno Profondo.',
+  'questUi.dialog.brewDraughtAria': 'Chiedi a {name} di preparare un Intruglio del Sonno Profondo',
+  'questUi.dialog.gargoyleBow': 'Inchinarsi.',
+  'questUi.dialog.gargoyleBowAria': 'Inchinarsi davanti a {name}',
+  'questUi.dialog.gargoyleAttack': 'Attaccare.',
+  'questUi.dialog.gargoyleAttackAria': 'Attaccare {name}',
+  'questUi.dialog.gargoyleShimmer': 'La statua vibra di energia...',
+  'hud.core.deepdreamZone': 'Il Sogno Profondo',
   'questUi.dialog.worldMarket': 'Mostrami il Mercato Mondiale.',
   'questUi.dialog.worldMarketAria': 'Apri il Mercato Mondiale',
   'questUi.dialog.accept': 'Accetta',
@@ -3728,6 +3736,144 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Tende del Culto del Wyrm',
   'entities.zones.thornpeak_heights.pois.8.label': 'Campi dei revenant',
   'entities.zones.thornpeak_heights.pois.9.label': 'Santuario del Gravewyrm',
+  'entities.zones.thornpeak_heights.pois.10.label': 'La Porta-Specchio',
+  'entities.zones.mirror_world.name': 'Il Mondo Specchio',
+  'entities.zones.mirror_world.welcome': 'Il vetro ti ricorda. Bada da quale lato di esso cammini.',
+  'entities.zones.mirror_world.pois.0.label': 'Il Mondo Specchio',
+  'entities.zones.mirror_world.pois.1.label': 'Piazza della Porta-Specchio',
+  'entities.zones.mirror_world.pois.2.label': 'La Corona di Lumen',
+  'entities.zones.mirror_world.pois.3.label': 'Il Mercato Velato',
+  'entities.zones.mirror_world.pois.4.label': "L'Archivio Silente",
+  'entities.zones.mirror_world.pois.5.label': 'Il Lago-Specchio',
+  'entities.zones.mirror_world.pois.6.label': 'La Palude delle Brume',
+  'entities.zones.mirror_world.pois.7.label': 'La Conca della Strega',
+  'entities.zones.mirror_world.pois.8.label': 'Specchio di Eastbrook',
+  'entities.zones.mirror_world.pois.9.label': 'Specchio di Fenbridge',
+  'entities.mobs.poverty_ghost.name': 'Fantasma della Povertà',
+  'entities.mobs.spirit_unicorn.name': 'Unicorno Spirituale',
+  'entities.mobs.hooded_reaper.name': 'Mietitore',
+  'entities.mobs.gloomhulk.name': 'Bruto del Buio',
+  'entities.mobs.mirrorbound_sentry.name': 'Sentinella Speculare',
+  'entities.mobs.voidfang_stalker.name': 'Predatore Palidenti',
+  'entities.npcs.dread_sentinel_a.name': 'Sentinella Tetra',
+  'entities.npcs.dread_sentinel_a.title': 'Guardiano dello Specchio Cupo',
+  'entities.npcs.dread_sentinel_a.greeting': 'La tua morte ti attende.',
+  'entities.npcs.dread_sentinel_b.name': 'Sentinella Tetra',
+  'entities.npcs.dread_sentinel_b.title': 'Guardiano dello Specchio Cupo',
+  'entities.npcs.dread_sentinel_b.greeting':
+    'In vita tenemmo la strada rialzata. La teniamo ancora.',
+  'entities.npcs.dread_sentinel_c.name': 'Sentinella Tetra',
+  'entities.npcs.dread_sentinel_c.title': 'Guardiano dello Specchio Cupo',
+  'entities.npcs.dread_sentinel_c.greeting':
+    'Torna indietro. Il vetro nero non è per i vivi... né lo fu mai per noi.',
+  'entities.quests.q_gargoyle_south.title': 'Il Pedaggio del Guardiano',
+  'entities.quests.q_gargoyle_south.text':
+    'Il bagliore si fa parole dietro i tuoi occhi: i mietitori affollano il mio vetro, {playerName}. Diradali, e la via per Highwatch sarà tua.',
+  'entities.quests.q_gargoyle_south.completion':
+    'La pietra ronza una volta, appagata. Dietro di essa, lo specchio si schiarisce come un respiro trattenuto e finalmente liberato.',
+  'entities.quests.q_gargoyle_south.objectives.0.label': 'Mietitore abbattuto',
+  'entities.quests.q_gargoyle_west.title': 'Un Pedaggio di Lenzuola',
+  'entities.quests.q_gargoyle_west.text':
+    'Il bagliore si fa parole dietro i tuoi occhi: portami quattro lenzuola bianche dai poveri morti, {playerName}. La strada per Eastbrook si apre a chi paga in stoffa.',
+  'entities.quests.q_gargoyle_west.completion':
+    'Le lenzuola affondano nella pietra e svaniscono. Lo specchio dietro di essa si sveglia di luce.',
+  'entities.quests.q_gargoyle_west.objectives.0.label': 'Lenzuolo Bianco',
+  'entities.quests.q_gargoyle_north.title': 'Splendore Falciato',
+  'entities.quests.q_gargoyle_north.text':
+    'Il bagliore si fa parole dietro i tuoi occhi: le mandrie spirituali ardono troppo per il vetro, {playerName}. Abbattine cinque, e Fenbridge è a un passo.',
+  'entities.quests.q_gargoyle_north.completion':
+    'La pietra beve la luce che hai versato. Lo specchio dietro di essa si apre come un occhio.',
+  'entities.quests.q_gargoyle_north.objectives.0.label': 'Unicorno Spirituale abbattuto',
+  'entities.zones.mirror_world.pois.10.label': 'il Canyon Nero',
+  'entities.mobs.gargoyle_awakened.name': 'Sentinella Gargolla',
+  'entities.mobs.mistshade_lurker.name': 'Appostatore delle brume',
+  'entities.mobs.gloaming_maw.name': 'Le Fauci del Crepuscolo',
+  'entities.mobs.player_echo.name': 'Eco',
+  'entities.npcs.keeper_nerissa.name': 'Nerissa la Senza Riposo',
+  'entities.npcs.keeper_nerissa.title': 'Custode Spettrale della Corona di Lumen',
+  'entities.npcs.keeper_nerissa.greeting':
+    'Custodii la Corona di Lumen in vita, e la Corona tiene onesto il vetro - ogni specchio di questa valle mostra una cosa vera, tranne uno. La morte non mi ha sollevata dal posto, {playerName}, perché quello non smette di premere. La luce della Corona si spegne, e dove viene meno, la valle trapela. Bada da quale lato del vetro cammini. Ultimamente fatica a distinguerlo.',
+  'entities.items.warden_sigil.name': 'Sigillo del guardiano',
+  'entities.items.drowned_lumen.name': 'Lumen annegato',
+  'entities.quests.q_the_failing_radiance.title': 'Il Fulgore che si Spegne',
+  'entities.quests.q_the_failing_radiance.text':
+    "Senti il mio freddo e mi credi una favola. Sono un posto di guardia, {playerName}. La Corona di Lumen che custodii non è un cerchio d'oro: è la luce di ogni specchio qui, la giuntura che tiene vivi e morti in riflessi separati perché l'uno non anneghi l'altro. Quella luce viene meno, e lo vedi nelle Sentinelle speculari: un tempo la radianza stessa della Corona in ronda, ora sono vetro colmo di luce rubata, che affolla le rovine a nord perché la giuntura non dice più loro dove stare. Frantumane otto. Ogni scheggia che disperdi è un po' di luce restituita, e un po' di prova che ci si può fidare di te per il resto.",
+  'entities.quests.q_the_failing_radiance.completion':
+    "Le schegge tornano fluttuando verso il pozzo come neve che cade all'insù, e per un respiro l'intera valle è d'una sfumatura più chiara. Non durerà. Ma tu ricuci le giunture invece di reciderle, {playerName}: è più raro qui di quanto tu creda. Hai spezzato anche l'ALTRA corona, non è vero? Quella di ferro, sotto Thornpeak. Allora, per la prima volta in trecento anni, questa luce potrebbe tornare. Resta. La valle ha atteso a lungo mani che chiudano ferite.",
+  'entities.quests.q_the_failing_radiance.objectives.0.label': 'Sentinella speculare frantumata',
+  'entities.quests.q_what_the_poor_keep.title': 'Ciò che i Poveri Ancora Serbano',
+  'entities.quests.q_what_the_poor_keep.text':
+    "I Fantasmi della Miseria sulla riva sud in vita non ebbero nulla, {playerName}: nulla se non il lenzuolo in cui li seppellirono, ché la parrocchia non poteva permettersi una bara. Ora la luce della Corona è troppo esile per sciogliere la loro presa, e vagano stringendo l'unica cosa che sia mai stata loro. Non crederlo crudeltà; è amore senza dove posarsi. Portami cinque dei loro lenzuoli. Poserò ciascuno nel pozzo e dirò il nome troppo povero per essere inciso. In questo consiste tutto il rito: essere poveri, e morti, e ancora chiamati per nome.",
+  'entities.quests.q_what_the_poor_keep.completion':
+    "Cinque lenzuoli, cinque nomi. Li dico al pozzo e l'acqua li accoglie come una madre solleva il cappotto da un bimbo addormentato. I fantasmi sulla riva sono meno, stanotte, {playerName}: non uccisi, liberati. Questo faceva la Corona intera: teneva i morti abbastanza vicini da poterli lasciare andare. Ora lo facciamo a mano, tu ed io, cinque nomi per volta. È più lento. Non è nulla.",
+  'entities.quests.q_what_the_poor_keep.objectives.0.label': 'Lenzuolo Bianco',
+  'entities.quests.q_the_wardens_names.title': 'I Nomi dei Guardiani',
+  'entities.quests.q_the_wardens_names.text':
+    "I tre che percorrono il Canyon Nero, chi fugge da loro li chiama Sentinelle del Terrore. Un tempo li chiamai per nome: erano il mio ordine, {playerName}, gli ultimi uomini a tenere in vita la strada rialzata dello Specchio Sable, e non desistettero mai, nemmeno quando i loro cuori lo fecero. Nessuna lama li libera più; il vetro nero li cavalca troppo a fondo perché cadano. Ma quel vetro è passato dai guardiani ai mietitori che affollano la strada, e nei lunghi anni i mietitori hanno strappato via i sigilli dei guardiani. Portamene tre, tolti ai mietitori del canyon, ch'io dica i tre nomi ad alta voce un'ultima volta.",
+  'entities.quests.q_the_wardens_names.completion':
+    "Corwin. Aldous. Brenna. Ecco: detti, e dirlo pesa meno di quanto mai pesò il tenerli. Presto potranno fermarsi; ci penserò io. Ma bada a ciò che s'avvicina, {playerName}: i sigilli strappati via significano che il vetro di quella strada s'assottiglia, e la ferita al suo capo ha atteso esattamente questo. Devo riaccendere la Corona e puntellare il Sable prima che qualcosa, dall'altra parte, s'accorga che la porta resta scoperta. Mi manca un'ultima cosa, e giace sotto l'acqua nera.",
+  'entities.quests.q_the_wardens_names.objectives.0.label': 'Sigillo del guardiano',
+  'entities.quests.q_what_the_glass_wants.title': 'Ciò che il Vetro Vuole',
+  'entities.quests.q_what_the_glass_wants.text':
+    "Hai vinto il tuo Eco e l'hai creduto una prova di te, {playerName}. Non lo era. Io distillo il Sogno Profondo da lenzuolo, corno e cappuccio, ma ciò contro cui il tuo sogno alzò uno specchio, la cosa entrata indossando il tuo volto, quella non la distillo io. Filtra dentro, dal vetro nero del canyon. I mietitori che affollano l'imbocco del canyon sono densi della stessa infiltrazione; abbattine otto e osserva verso dove strisciano le loro ombre. Allora mostrerò agli occhi stessi di Nerissa dove la sua ferita davvero sanguina.",
+  'entities.quests.q_what_the_glass_wants.completion':
+    "A nordest. Sempre a nordest, sempre verso il Sable — l'hai visto? Il tuo Eco non eri TU, viandante. Era una scheggia di ciò che vive dietro quella porta, vestita col riflesso più vicino che poté rubare: il tuo. Il sogno è solo il punto più sottile che l'infiltrazione abbia trovato; il canyon il più largo. Dillo a Nerissa. Se n'è meritata la verità, e anche tu.",
+  'entities.quests.q_what_the_glass_wants.objectives.0.label':
+    "Mietitore abbattuto all'imbocco del canyon",
+  'entities.quests.q_relight_the_lumen_crown.title': 'Riaccendere la Corona di Lumen',
+  'entities.quests.q_relight_the_lumen_crown.text':
+    "I guardiani hanno un nome e la strada s'assottiglia, dunque devo fare ora ciò che ho rimandato da quando morii: accendere la Corona di Lumen un'ultima volta e premere chiuso il Sable da questo lato. L'ultima vera scintilla della Corona la inghiottì le Fauci del Crepuscolo quando cadde nel laghetto — per questo la cosa brilla di dentro. Ritagliale di nuovo la luce, {playerName}. Il vetro nero manderà i suoi colossi tenebrosi a fermare il rito; abbattine quattro. Portami una scintilla annegata finché ricordo ancora come tenerne una. L'ultimo dovere d'un custode è divenire qualcuno che non ha più bisogno di custodire.",
+  'entities.quests.q_relight_the_lumen_crown.completion':
+    "Brucia. Dopo tutto questo buio, conosce ancora la mia mano. Guarda: il vetro è di nuovo VERO; nessun battito dietro l'acqua, nessun'anima perduta tra un mondo e il suo riflesso. E il peso mi ha lasciata, alfine. Non svanisco, {playerName}; mi si dà il CAMBIO. Questo non è spezzare il Sable, solo tenerlo; non ho la forza di spezzare ciò che attende là, né oserei. Ma tenuto un'era di più, è tenuto. Quando una compagnia più ardita di noi varcherà infine DENTRO quella porta, troverà l'altro lato pronto. Di' a Highwatch che la loro custode tenne la veglia fino alla fine, e poi fu data il cambio. Il vetro ti ricorderà. Bada di dargli qualcosa che valga la pena di riflettere.",
+  'entities.quests.q_relight_the_lumen_crown.objectives.0.label':
+    'Le Fauci del Crepuscolo abbattute',
+  'entities.quests.q_relight_the_lumen_crown.objectives.1.label': 'Lumen annegato',
+  'entities.quests.q_relight_the_lumen_crown.objectives.2.label': 'Colosso Tenebroso spezzato',
+  'entities.npcs.veilwright_ollo.name': 'Ollo il Tessivelo',
+  'entities.npcs.veilwright_ollo.title': 'Mercante del Mercato Velato',
+  'entities.npcs.veilwright_ollo.greeting':
+    'Cappotti di morti, sospiri in bottiglia, prezzi onesti - il velo provvede. Tutto sul mio banco fu deposto da chi ora non possiede nulla; il trucco è capire di cosa i morti hanno finito da ciò che ancora stringono. Sbaglia, e vengono al banco a mezzanotte. Chiedi alla Custode della luce nel pozzo, se vuoi la versione triste. Io vendo solo i cappotti.',
+  'entities.npcs.gargoyle_sentinel_south.name': 'Sentinella Gargolla',
+  'entities.npcs.gargoyle_sentinel_south.title': 'Guardiana dello Specchio',
+  'entities.npcs.gargoyle_sentinel_south.greeting':
+    'Occhi di pietra stridono verso di te. Sta ascoltando.',
+  'entities.npcs.gargoyle_sentinel_west.name': 'Sentinella Gargolla',
+  'entities.npcs.gargoyle_sentinel_west.title': 'Guardiana dello Specchio',
+  'entities.npcs.gargoyle_sentinel_west.greeting':
+    'Occhi di pietra stridono verso di te. Sta ascoltando.',
+  'entities.npcs.gargoyle_sentinel_north.name': 'Sentinella Gargolla',
+  'entities.npcs.gargoyle_sentinel_north.title': 'Guardiana dello Specchio',
+  'entities.npcs.gargoyle_sentinel_north.greeting':
+    'Occhi di pietra stridono verso di te. Sta ascoltando.',
+  'entities.npcs.mistwitch_morwen.name': 'Morwen la Strega delle Brume',
+  'entities.npcs.mistwitch_morwen.title': 'Distillatrice di sogni della Conca',
+  'entities.npcs.mistwitch_morwen.greeting':
+    'La bruma tiene svegli i tuoi. Io posso prepararti l’altro sonno — quello che risponde.',
+  'entities.quests.q_deepdream_recipe.title': 'Una ricetta per il sonno profondo',
+  'entities.quests.q_deepdream_recipe.text':
+    'La pozione vuole tre voci, {playerName}: due lenzuola bianche dei fantasmi della povertà che non possiedono altro, due corni degli unicorni spirituali che pascolano nella penombra, e due cappucci tagliati ai mietitori che sorvegliano la cintura. Portameli e ti distillerò un sonno coi denti.',
+  'entities.quests.q_deepdream_recipe.completion':
+    'Lenzuolo, corno, cappuccio — i poveri, i radiosi, i pazienti. Al calderone piaci. Bevila in un posto morbido, viandante: incontrerai chi porti con te.',
+  'entities.quests.q_deepdream_recipe.objectives.0.label': 'Lenzuolo Bianco',
+  'entities.quests.q_deepdream_recipe.objectives.1.label': 'Corno Spirituale',
+  'entities.quests.q_deepdream_recipe.objectives.2.label': 'Cappuccio Nero',
+  'entities.quests.q_face_your_echo.title': 'Affronta il tuo Eco',
+  'entities.quests.q_face_your_echo.text':
+    'Bevi l’intruglio e il sogno ti porrà uno specchio davanti — il tuo Eco, ogni tua cicatrice e ogni tuo trucco dall’altra parte. Sconfiggi ciò che sei, {playerName}, e riportami la faccia che farai.',
+  'entities.quests.q_face_your_echo.completion':
+    'Sei tornato tu, e lo specchio no. Ciò che ti ha lasciato in mano è tuo — il sogno paga quel prezzo una sola volta.',
+  'entities.quests.q_face_your_echo.objectives.0.label': 'Il tuo Eco sconfitto',
+  'entities.items.white_sheet.name': 'Lenzuolo Bianco',
+  'entities.items.spirit_horn.name': 'Corno Spirituale',
+  'entities.items.black_hood.name': 'Cappuccio Nero',
+  'entities.items.deepdream_draught.name': 'Intruglio del Sonno Profondo',
+  'entities.items.mirror_shard.name': 'Scheggia di Specchio',
+  'entities.items.ghostly_mirrorblade.name': 'Spadaspecchio Spettrale',
+  'entities.items.ghostly_shroudmantle.name': 'Mantospoglia Spettrale',
+  'entities.items.ghostly_wraithjerkin.name': 'Farsetto Spettrale',
+  'entities.items.ghostly_palegrips.name': 'Presa Pallida Spettrale',
+  'entities.items.ghostly_hushboots.name': 'Stivali Ovattati Spettrali',
+  'entities.items.ghostly_glasscord.name': 'Cordone di Vetro Spettrale',
   'entities.dungeons.hollow_crypt.name': 'La Cripta Vuota',
   'entities.dungeons.hollow_crypt.enterText': 'Scendi nella Cripta Vuota...',
   'entities.dungeons.hollow_crypt.leaveText': 'Risali alla luce del giorno.',

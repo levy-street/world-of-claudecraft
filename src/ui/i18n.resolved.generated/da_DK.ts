@@ -3747,6 +3747,7 @@ export const da_DK: EnTranslations = {
       "eatingDrinking": "Spiser & Drikker...",
       "secondsRemaining": "{seconds} sekunder tilbage",
       "enteringZone": "Træder ind i {zone}.",
+      "deepdreamZone": "Dybdrømmen",
       "welcomeZone": "Velkommen til {zone}!",
       "levelBanner": "Niveau {level}!",
       "levelLog": "Du har nået niveau {level}!",
@@ -4388,6 +4389,13 @@ export const da_DK: EnTranslations = {
       "nythraxisDeathlessKingWarning": "De tre relikvier fortæller den samme historie: Aldren kæmpede for at forsvare sin konge, Malric brød dødens grænse, og Voss forsøgte at standse det, der fulgte. Seglet svækkes, og den forladte krypt er vejen ned.",
       "browseGoods": "Lad mig se dine varer.",
       "browseGoodsAria": "Gennemse varer fra {name}",
+      "brewDraught": "Bryg mig en Dybdrøm-eliksir.",
+      "brewDraughtAria": "Bed {name} om at brygge en Dybdrøm-eliksir",
+      "gargoyleBow": "Buk dig.",
+      "gargoyleBowAria": "Buk for {name}",
+      "gargoyleAttack": "Angrib.",
+      "gargoyleAttackAria": "Angrib {name}",
+      "gargoyleShimmer": "Statuen flimrer af energi...",
       "worldMarket": "Vis mig World Market.",
       "worldMarketAria": "Åbn World Market",
       "accept": "Accepter",
@@ -5867,6 +5875,45 @@ export const da_DK: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Solkronbladssegl"
       },
+      "white_sheet": {
+        "name": "Hvidt Lagen"
+      },
+      "spirit_horn": {
+        "name": "Åndehorn"
+      },
+      "black_hood": {
+        "name": "Sort Hætte"
+      },
+      "deepdream_draught": {
+        "name": "Dybdrøm-eliksir"
+      },
+      "mirror_shard": {
+        "name": "Spejlskår"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Spøgelses-spejlklinge"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Spøgelses-ligklædekappe"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Spøgelses-genfærdstrøje"
+      },
+      "ghostly_palegrips": {
+        "name": "Spøgelses-blege greb"
+      },
+      "ghostly_hushboots": {
+        "name": "Spøgelses-tavse støvler"
+      },
+      "ghostly_glasscord": {
+        "name": "Spøgelses-glassnor"
+      },
+      "warden_sigil": {
+        "name": "Vogtersegl"
+      },
+      "drowned_lumen": {
+        "name": "Druknet lumen"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-Hammer"
       },
@@ -6667,6 +6714,36 @@ export const da_DK: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Vækket Stormling"
       },
+      "spirit_unicorn": {
+        "name": "Åndeenhjørning"
+      },
+      "hooded_reaper": {
+        "name": "Høstmand"
+      },
+      "mistshade_lurker": {
+        "name": "Tågeskygge-lurer"
+      },
+      "gloaming_maw": {
+        "name": "Tusmørkegabet"
+      },
+      "poverty_ghost": {
+        "name": "Fattigdomsspøgelse"
+      },
+      "player_echo": {
+        "name": "Ekko"
+      },
+      "gargoyle_awakened": {
+        "name": "Gargoilvagt"
+      },
+      "gloomhulk": {
+        "name": "Dysterkolos"
+      },
+      "mirrorbound_sentry": {
+        "name": "Spejlbunden Vagt"
+      },
+      "voidfang_stalker": {
+        "name": "Blegtand-Stalker"
+      },
       "ironvein_foreman": {
         "name": "Jernåre-Formand"
       },
@@ -6896,6 +6973,51 @@ export const da_DK: EnTranslations = {
         "name": "Den Blege Vogter",
         "title": "De Dødes Vogter",
         "greeting": "Hvil nu, ånd. Jeg kan føre dig tilbage til din krop, men overfarten tilbage efterlader dig svækket."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa den Hvileløse",
+        "title": "Spøgelsesvogter af Lumenkronen",
+        "greeting": "Jeg bar Lumenkronen i livet, og Kronen holder glasset ærligt - hvert spejl i denne dal viser noget sandt, på nær ét. Døden har ikke fritaget mig fra posten, {playerName}, for det ene holder ikke op med at presse. Kronens lys svigter, og hvor det svigter, siver dalen igennem. Pas på hvilken side af glasset du går på. På det seneste har det svært ved at se det."
+      },
+      "veilwright_ollo": {
+        "name": "Slørvæver Ollo",
+        "title": "Handlende på Slørmarkedet",
+        "greeting": "Døde mænds frakker, sukke på flaske, ærlige priser - sløret sørger for det. Alt på mit bord blev lagt fra af nogen, der nu intet ejer; kunsten er at skelne, hvad de døde er færdige med, fra hvad de stadig klamrer sig til. Tag fejl, og de kommer til boden ved midnat. Spørg Vogteren om lyset i brønden, vil du have den triste version. Jeg sælger kun frakkerne."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen Tågeheksen",
+        "title": "Lavningens drømmebrygger",
+        "greeting": "Tågen holder de fleste af jer vågne. Jeg kan brygge dig den anden slags søvn — den slags, der svarer igen."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Gargoilvagt",
+        "title": "Spejlets Vogter",
+        "greeting": "Stenøjne knirker hen imod dig. Den lytter."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Gargoilvagt",
+        "title": "Spejlets Vogter",
+        "greeting": "Stenøjne knirker hen imod dig. Den lytter."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Gargoilvagt",
+        "title": "Spejlets Vogter",
+        "greeting": "Stenøjne knirker hen imod dig. Den lytter."
+      },
+      "dread_sentinel_a": {
+        "name": "Rædselsvagt",
+        "title": "Vogter af Skyggespejlet",
+        "greeting": "Din død venter dig."
+      },
+      "dread_sentinel_b": {
+        "name": "Rædselsvagt",
+        "title": "Vogter af Skyggespejlet",
+        "greeting": "I livet holdt vi dæmningsvejen. Vi holder den endnu."
+      },
+      "dread_sentinel_c": {
+        "name": "Rædselsvagt",
+        "title": "Vogter af Skyggespejlet",
+        "greeting": "Vend om. Det sorte glas er ikke for de levende - og var det aldrig for os."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const da_DK: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "En opskrift på dyb søvn",
+        "text": "Brygget kræver tre stemmer, {playerName}: to hvide lagner fra fattigdomsspøgelserne, der intet andet ejer, to horn fra åndeenhjørningerne, der græsser i mørket, og to hætter skåret af høstmændene, der vogter bæltet. Bring dem, så brygger jeg dig en søvn med tænder.",
+        "completion": "Lagen, horn, hætte — de fattige, de strålende, de tålmodige. Kedlen kan lide dig. Drik det et blødt sted, vandringsmand: du vil møde den, du har båret på.",
+        "objectives": {
+          "0": {
+            "label": "Hvidt Lagen"
+          },
+          "1": {
+            "label": "Åndehorn"
+          },
+          "2": {
+            "label": "Sort Hætte"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Mød dit Ekko",
+        "text": "Drik brygget, og drømmen stiller et spejl foran dig — dit Ekko, hvert ar og hvert af dine tricks på den anden side. Besejr det, du er, {playerName}, og bring mig dit ansigt bagefter.",
+        "completion": "Du kom tilbage, og det gjorde spejlet ikke. Hvad det efterlod i din hånd, er dit — drømmen betaler kun den pris én gang.",
+        "objectives": {
+          "0": {
+            "label": "Dit Ekko besejret"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "Vogterens Told",
+        "text": "Skæret bliver til ord bag dine øjne: høstmændene trænges om mit glas, {playerName}. Tynd dem ud, og vejen til Highwatch er din.",
+        "completion": "Stenen brummer én gang, tilfreds. Bag den klarer spejlet op som et endelig sluppet, holdt vejr.",
+        "objectives": {
+          "0": {
+            "label": "Høstmand fældet"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "En Told af Lagner",
+        "text": "Skæret bliver til ord bag dine øjne: bring mig fire hvide lagner fra de fattige døde, {playerName}. Vejen til Eastbrook åbner sig for den, der betaler i klæde.",
+        "completion": "Lagnerne synker ned i stenen og er væk. Spejlet bag den vågner med lys.",
+        "objectives": {
+          "0": {
+            "label": "Hvidt Lagen"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Høstet Stråleglans",
+        "text": "Skæret bliver til ord bag dine øjne: åndehjordene brænder for klart for glasset, {playerName}. Fæld fem, og Fenbridge er kun et skridt væk.",
+        "completion": "Stenen drikker det lys, du spildte. Spejlet bag den åbner sig som et øje.",
+        "objectives": {
+          "0": {
+            "label": "Åndeenhjørning fældet"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "Den svindende stråleglans",
+        "text": "Du mærker min kulde og tror, jeg er et sagn. Jeg er en post, {playerName}. Lumenkronen, jeg vogtede, er ingen guldring: den er lyset i hvert spejl her, sømmen der holder levende og døde i adskilte spejlbilleder, så det ene ikke drukner det andet. Det lys svigter, og du ser det på de Spejlbundne vagter: engang Kronens egen stråleglans på vagt, nu glas fyldt af stjålet lys, der trænges i de nordlige ruiner, fordi sømmen ikke længere siger dem, hvor de skal stå. Knus otte. Hver skår, du spreder, er en smule lys givet tilbage, og en smule bevis på, at man kan betro dig resten.",
+        "completion": "Skårene driver tilbage mod brønden som sne, der falder opad, og et åndedrag lang er hele dalen en nuance lysere. Det varer ikke. Men du reparerer sømme i stedet for at skære dem over, {playerName}: det er sjældnere her, end du tror. Du knuste også den ANDEN krone, ikke sandt? Jernkronen, under Thornpeak. Så kan dette lys for første gang i tre hundrede år vende tilbage. Bliv. Dalen har længe ventet på hænder, der lukker sår.",
+        "objectives": {
+          "0": {
+            "label": "Spejlbunden vagt knust"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Hvad de fattige stadig gemmer",
+        "text": "De Fattige genfærd ved sydbredden ejede intet i livet, {playerName}: intet uden lagenet, de blev begravet i, for sognet havde ikke råd til en kiste. Nu er Kronens lys for tyndt til at løsne deres greb, og de vandrer og klamrer sig til det eneste, der nogensinde var deres. Tag det ikke for grusomhed; det er kærlighed uden sted at gøre af sig. Bring mig fem af deres lagner. Jeg lægger hvert i brønden og siger navnet, der var for fattigt til at hugges i sten. Deri består hele riten: at være fattig, og død, og dog kaldt ved navn.",
+        "completion": "Fem lagner, fem navne. Jeg siger dem i brønden, og vandet tager dem, som en mor løfter en frakke af et sovende barn. Genfærdene ved bredden er færre i nat, {playerName}: ikke dræbte, befriede. Dette gjorde hele Kronen: den holdt de døde nær nok til at kunne slippe dem. Nu gør vi det med hånden, du og jeg, fem navne ad gangen. Det er langsommere. Det er ikke ingenting.",
+        "objectives": {
+          "0": {
+            "label": "Hvidt lagen"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "Vogternes navne",
+        "text": "De tre, der vandrer Sorte Kløft, kaldes Rædselsvogtere af dem, der flygter for dem. Jeg kaldte dem engang ved navn: de var min orden, {playerName}, de sidste mænd, der i livet holdt Sabelspejlets dæmningsvej, og de veg aldrig, ikke engang da deres hjerter gjorde det. Ingen klinge befrier dem mere; det sorte glas rider dem for dybt til at falde. Men det glas er krøbet fra vogterne til høstmændene, der trænges på dæmningen, og gennem de lange år har høstmændene revet vogternes segl løs. Bring mig tre, taget fra kløftens høstmænd, så jeg kan sige de tre navne højt en sidste gang.",
+        "completion": "Corwin. Aldous. Brenna. Sådan: sagt, og at sige dem vejer lettere, end det at holde dem nogensinde gjorde. Snart må de holde op; det skal jeg sørge for. Men agt på det, der nærmer sig, {playerName}: de løsrevne segl betyder, at glasset på den dæmning tyndes, og såret ved dens ende har ventet på netop dette. Jeg må genantænde Kronen og støtte Sablen, før noget på den anden side mærker, at døren ligger blottet. Der er en sidste ting, jeg behøver - og den ligger under det sorte vand.",
+        "objectives": {
+          "0": {
+            "label": "Vogtersegl"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Hvad glasset vil",
+        "text": "Du besejrede din Ekko og troede, det var en prøve på dig selv, {playerName}. Det var det ikke. Jeg brygger Dybdrømmen af lagen, horn og hætte, men det, din drøm rejste et spejl imod, tingen der kom ind i dit ansigt, det brygger jeg ikke. Det siver ind fra kløftens sorte glas. Høstmændene, der trænges ved kløftmundingen, er tætte af samme lækage; fæld otte og se, hvorhen deres skygger kryber. Så viser jeg Nerissas egne øjne, hvor hendes sår i sandhed bløder.",
+        "completion": "Mod nordøst. Altid mod nordøst, altid mod Sablen — så du det? Din Ekko var ikke DIG, vandrer. Den var et skår af hvad end der bor bag den port, klædt i det nærmeste spejlbillede, den kunne stjæle: dit. Drømmen er blot det tyndeste sted, lækagen har fundet; kløften det bredeste. Sig det til Nerissa. Hun har fortjent sandheden om det, og det har du med.",
+        "objectives": {
+          "0": {
+            "label": "Høstmand fældet ved kløftmundingen"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Genantænd Lumenkronen",
+        "text": "Vogterne har navn, og dæmningen tyndes, så nu må jeg gøre det, jeg har udskudt, siden jeg døde: tænde Lumenkronen en sidste gang og presse Sablen lukket fra denne side. Kronens sidste sande gnist blev slugt af Tusmørkegabet, da det faldt i dammen — derfor gløder tingen indefra. Skær lyset ud af det igen, {playerName}. Det sorte glas sender sine dysterkolosser for at standse riten; fæld fire. Bring mig en druknet gnist, mens jeg endnu husker, hvordan man holder en. En vogters sidste pligt er at blive en, der ikke længere behøver at vogte.",
+        "completion": "Den brænder. Efter alt dette mørke kender den endnu min hånd. Se: glasset er SANDT igen; ingen hjerteslag bag vandet, ingen sjæl fortabt mellem en verden og dens spejlbillede. Og vægten har endelig forladt mig. Jeg svinder ikke, {playerName}; jeg bliver AFLØST. Dette er ikke at bryde Sablen, kun at holde den; jeg har ikke kraften til at bryde det, der venter dér, og jeg ville ikke vove det. Men holdt en tidsalder til, er den holdt. Når et modigere følge end vi til sidst går IND gennem den port, skal de finde den anden side rede. Sig i Highwatch, at deres vogter holdt vagten til det sidste og så blev afløst. Glasset vil huske dig. Sørg for at give det noget værd at spejle.",
+        "objectives": {
+          "0": {
+            "label": "Tusmørkegabet fældet"
+          },
+          "1": {
+            "label": "Druknet lumen"
+          },
+          "2": {
+            "label": "Dysterkolos knust"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Det Druknede Kor",
         "text": "Vaderne handler ikke alene. Blandt dem vandrer de Druknede Tilbedere - kulten, der sank med templet, stadig i deres rådne ornater, stadig syngende bønnen fra strandklipperne. Bring otte af dem til tavshed, og bring mig seks af de offergaver, de bærer. Jeg vil vide, hvad de agter at give deres gudinde.",
@@ -7870,6 +8104,48 @@ export const da_DK: EnTranslations = {
           },
           "9": {
             "label": "Gravormens Helligdom"
+          },
+          "10": {
+            "label": "Spejlporten"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "Spejlverdenen",
+        "welcome": "Glasset husker dig. Pas på, hvilken side af det du går på.",
+        "pois": {
+          "0": {
+            "label": "Spejlverdenen"
+          },
+          "1": {
+            "label": "Spejlportens Plads"
+          },
+          "2": {
+            "label": "Lumenkronen"
+          },
+          "3": {
+            "label": "Det Tilslørede Marked"
+          },
+          "4": {
+            "label": "Det Tavse Arkiv"
+          },
+          "5": {
+            "label": "Spejlsøen"
+          },
+          "6": {
+            "label": "Tågekæret"
+          },
+          "7": {
+            "label": "Heksens Lavning"
+          },
+          "8": {
+            "label": "Eastbrooks Spejl"
+          },
+          "9": {
+            "label": "Fenbridges Spejl"
+          },
+          "10": {
+            "label": "Den Sorte Kløft"
           }
         }
       }

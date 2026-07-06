@@ -176,6 +176,14 @@ const BIOME_PALETTE: Record<
     dirt: 0x484e56,
     sand: 0x767c86,
   },
+  // the Mirror World: ashen silver-lilac moss over slate, pale bone-sand paths
+  mirror: {
+    grass: 0x5a5668,
+    grassDark: 0x3e3a4c,
+    grassYellow: 0x6e6880,
+    dirt: 0x474352,
+    sand: 0x8d8a99,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -187,6 +195,7 @@ const ROCK_SLOPE_START: Record<BiomeId, number> = {
   desert: 0.55,
   volcano: 0.35,
   cave: 0.4,
+  mirror: 0.5,
 };
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
@@ -236,6 +245,7 @@ const biomePalettes: Record<BiomeId, (typeof zonePalettes)[number]> = {
   desert: makeBiomePalette('desert'),
   volcano: makeBiomePalette('volcano'),
   cave: makeBiomePalette('cave'),
+  mirror: makeBiomePalette('mirror'),
 };
 function makeBiomePalette(b: BiomeId): (typeof zonePalettes)[number] {
   const p = BIOME_PALETTE[b];
@@ -393,6 +403,13 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   }
   // high ground (ridges, peaks) goes rocky then snowy
   let snow = 0;
+  // the Mirror World reads silvered: patchy ashen "moss" rides the pale snow
+  // layer so the green grass albedo never dominates the dome
+  if (biome === 'mirror') {
+    const silver = 0.1 + 0.13 * v;
+    snow = Math.max(snow, silver);
+    cTmp.lerp(snowCapC, silver * 0.3);
+  }
   if (h > 22) {
     const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
     cTmp.lerp(rockC, rockT);

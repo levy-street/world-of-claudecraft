@@ -3747,6 +3747,7 @@ export const id_ID: EnTranslations = {
       "eatingDrinking": "Makan & Minum...",
       "secondsRemaining": "{seconds} detik tersisa",
       "enteringZone": "Memasuki {zone}.",
+      "deepdreamZone": "Mimpi Dalam",
       "welcomeZone": "Selamat datang di {zone}!",
       "levelBanner": "Level {level}!",
       "levelLog": "Kamu telah mencapai level {level}!",
@@ -4388,6 +4389,13 @@ export const id_ID: EnTranslations = {
       "nythraxisDeathlessKingWarning": "Ketiga pusaka itu menceritakan kisah yang sama: Aldren berjuang membela rajanya, Malric menerobos batas kematian, dan Voss berupaya menghentikan apa yang menyusul. Segel itu kian melemah, dan kripta terbengkalai adalah jalan turun ke bawah.",
       "browseGoods": "Biar kulihat-lihat daganganmu.",
       "browseGoodsAria": "Lihat dagangan dari {name}",
+      "brewDraught": "Buatkan aku Ramuan Mimpi Dalam.",
+      "brewDraughtAria": "Minta {name} membuat Ramuan Mimpi Dalam",
+      "gargoyleBow": "Membungkuk.",
+      "gargoyleBowAria": "Membungkuk kepada {name}",
+      "gargoyleAttack": "Serang.",
+      "gargoyleAttackAria": "Serang {name}",
+      "gargoyleShimmer": "Patung itu berkilau oleh energi...",
       "worldMarket": "Tunjukkan World Market kepadaku.",
       "worldMarketAria": "Buka World Market",
       "accept": "Terima",
@@ -5867,6 +5875,45 @@ export const id_ID: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Sabit Kelopak Matahari"
       },
+      "white_sheet": {
+        "name": "Kain Putih"
+      },
+      "spirit_horn": {
+        "name": "Tanduk Roh"
+      },
+      "black_hood": {
+        "name": "Tudung Hitam"
+      },
+      "deepdream_draught": {
+        "name": "Ramuan Mimpi Dalam"
+      },
+      "mirror_shard": {
+        "name": "Pecahan Cermin"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Bilah-cermin Hantu"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Mantel Kain Kafan Hantu"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Rompi Arwah Hantu"
+      },
+      "ghostly_palegrips": {
+        "name": "Sarung Tangan Pucat Hantu"
+      },
+      "ghostly_hushboots": {
+        "name": "Sepatu Bot Senyap Hantu"
+      },
+      "ghostly_glasscord": {
+        "name": "Tali Kaca Hantu"
+      },
+      "warden_sigil": {
+        "name": "Sigil Penjaga"
+      },
+      "drowned_lumen": {
+        "name": "Lumen Tenggelam"
+      },
       "bristleback_maul": {
         "name": "Palu Gallowglass"
       },
@@ -6667,6 +6714,36 @@ export const id_ID: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Anak Badai Terjaga"
       },
+      "spirit_unicorn": {
+        "name": "Unicorn Roh"
+      },
+      "hooded_reaper": {
+        "name": "Penuai"
+      },
+      "mistshade_lurker": {
+        "name": "Pengintai Bayang Kabut"
+      },
+      "gloaming_maw": {
+        "name": "Mulut Senja"
+      },
+      "poverty_ghost": {
+        "name": "Hantu Kemiskinan"
+      },
+      "player_echo": {
+        "name": "Gema"
+      },
+      "gargoyle_awakened": {
+        "name": "Penjaga Gargoyle"
+      },
+      "gloomhulk": {
+        "name": "Bruta Kelam"
+      },
+      "mirrorbound_sentry": {
+        "name": "Penjaga Terikat Cermin"
+      },
+      "voidfang_stalker": {
+        "name": "Pengintai Taring Pucat"
+      },
       "ironvein_foreman": {
         "name": "Mandor Ironvein"
       },
@@ -6896,6 +6973,51 @@ export const id_ID: EnTranslations = {
         "name": "Sang Penjaga Pucat",
         "title": "Penjaga Para Mati",
         "greeting": "Beristirahatlah, arwah. Aku bisa mengembalikanmu ke tubuhmu, tapi penyeberangan kembali akan membuatmu lemah."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa yang Tak Beristirahat",
+        "title": "Penjaga Arwah Mahkota Lumen",
+        "greeting": "Kujaga Mahkota Lumen semasa hidup, dan Mahkota menjaga kaca tetap jujur - setiap cermin di lembah ini menampakkan hal yang benar, kecuali satu. Kematian tak membebaskanku dari pos ini, {playerName}, sebab yang satu itu belum berhenti menekan. Cahaya Mahkota meredup, dan di tempat ia gagal, lembah ini merembes. Perhatikan di sisi kaca mana kau melangkah. Belakangan ia sukar membedakannya."
+      },
+      "veilwright_ollo": {
+        "name": "Penenun Tirai Ollo",
+        "title": "Pedagang Pasar Tirai",
+        "greeting": "Mantel orang mati, keluh dalam botol, harga jujur - tabir menyediakan. Semua di mejaku ditaruh oleh mereka yang kini tak punya apa-apa; kuncinya membedakan apa yang sudah tuntas bagi si mati dari apa yang masih mereka genggam. Salah, dan mereka datang ke lapak tengah malam. Tanyakan pada Sang Penjaga soal cahaya di sumur, bila kau mau versi sedihnya. Aku hanya menjual mantelnya."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen si Penyihir Kabut",
+        "title": "Peramu Mimpi dari Lembah",
+        "greeting": "Kabut membuat kebanyakan kalian terjaga. Aku bisa meramu tidur yang satunya — yang menjawab balik."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Penjaga Gargoyle",
+        "title": "Pengawal Cermin",
+        "greeting": "Mata batu berderak menoleh ke arahmu. Ia mendengarkan."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Penjaga Gargoyle",
+        "title": "Pengawal Cermin",
+        "greeting": "Mata batu berderak menoleh ke arahmu. Ia mendengarkan."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Penjaga Gargoyle",
+        "title": "Pengawal Cermin",
+        "greeting": "Mata batu berderak menoleh ke arahmu. Ia mendengarkan."
+      },
+      "dread_sentinel_a": {
+        "name": "Penjaga Menyeramkan",
+        "title": "Penjaga Cermin Kelam",
+        "greeting": "Kematianmu menantimu."
+      },
+      "dread_sentinel_b": {
+        "name": "Penjaga Menyeramkan",
+        "title": "Penjaga Cermin Kelam",
+        "greeting": "Kami menjaga tanggul semasa hidup. Masih kami jaga."
+      },
+      "dread_sentinel_c": {
+        "name": "Penjaga Menyeramkan",
+        "title": "Penjaga Cermin Kelam",
+        "greeting": "Berbaliklah. Kaca hitam bukan untuk yang hidup... dan tak pernah pula untuk kami."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const id_ID: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "Resep Tidur Nyenyak",
+        "text": "Ramuan ini butuh tiga suara, {playerName}: dua kain putih dari hantu kemiskinan yang tak punya apa-apa lagi, dua tanduk unicorn roh yang merumput dalam kelam, dan dua tudung yang dipotong dari para penuai penjaga sabuk. Bawakan, dan kuseduhkan tidur yang bertaring.",
+        "completion": "Kain, tanduk, tudung — si miskin, si bercahaya, si sabar. Kualinya menyukaimu. Minumlah di tempat yang empuk, pengembara: kau akan bertemu siapa yang selama ini kaubawa.",
+        "objectives": {
+          "0": {
+            "label": "Kain Putih"
+          },
+          "1": {
+            "label": "Tanduk Roh"
+          },
+          "2": {
+            "label": "Tudung Hitam"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Hadapi Gemamu",
+        "text": "Minum ramuannya dan mimpi akan menegakkan cermin di hadapanmu — Gemamu, tiap bekas luka dan tiap tipuanmu di sisi seberang. Kalahkan dirimu sendiri, {playerName}, dan bawakan aku wajahmu setelahnya.",
+        "completion": "Kau kembali, dan cerminnya tidak. Apa yang ia tinggalkan di tanganmu adalah milikmu — mimpi hanya membayar harga itu sekali.",
+        "objectives": {
+          "0": {
+            "label": "Gemamu dikalahkan"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "Upeti sang Penjaga",
+        "text": "Kilau itu mengurai jadi kata di balik matamu: para penuai memenuhi kacaku, {playerName}. Kurangi mereka, dan jalan ke Highwatch jadi milikmu.",
+        "completion": "Batu berdengung sekali, puas. Di belakangnya, cermin menjernih seperti napas tertahan yang akhirnya dilepas.",
+        "objectives": {
+          "0": {
+            "label": "Penuai ditumbangkan"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "Upeti berupa Kain",
+        "text": "Kilau itu mengurai jadi kata di balik matamu: bawakan aku empat kain putih dari orang mati yang miskin, {playerName}. Jalan ke Eastbrook terbuka bagi yang membayar dengan kain.",
+        "completion": "Kain-kain itu tenggelam ke dalam batu dan lenyap. Cermin di belakangnya bangun dengan cahaya.",
+        "objectives": {
+          "0": {
+            "label": "Kain Putih"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Cahaya yang Dituai",
+        "text": "Kilau itu mengurai jadi kata di balik matamu: kawanan roh menyala terlalu terang bagi kaca, {playerName}. Tumbangkan lima, dan Fenbridge tinggal selangkah.",
+        "completion": "Batu meminum cahaya yang kaututupahkan. Cermin di belakangnya membuka seperti sebuah mata.",
+        "objectives": {
+          "0": {
+            "label": "Unicorn Roh ditumbangkan"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "Cahaya yang Meredup",
+        "text": "Kaurasakan dinginku dan kaukira aku dongeng. Aku sebuah pos, {playerName}. Mahkota Lumen yang kujaga bukan lingkar emas: ia cahaya di setiap cermin di sini, jahitan yang menahan yang hidup dan yang mati dalam pantulan terpisah agar tak saling menenggelamkan. Cahaya itu memudar, dan tampak pada Penjaga Cermin: dahulu radiansi Mahkota sendiri berjaga, kini kaca penuh cahaya curian, memenuhi reruntuhan utara sebab jahitan tak lagi memberitahu mereka di mana berdiri. Hancurkan delapan. Tiap serpih yang kauhamburkan adalah secuil cahaya yang kembali, dan secuil bukti bahwa sisanya boleh dipercayakan padamu.",
+        "completion": "Serpihan-serpihan itu melayang kembali ke sumur bagai salju yang jatuh ke atas, dan untuk satu tarikan napas seluruh lembah sedikit lebih terang. Takkan bertahan. Tapi kau menambal jahitan alih-alih memutusnya, {playerName}: itu lebih langka di sini daripada yang kaukira. Kau juga menghancurkan mahkota yang SATUNYA, bukan? Yang besi, di bawah Thornpeak. Maka, untuk pertama kali dalam tiga ratus tahun, cahaya ini mungkin kembali. Tinggallah. Lembah ini lama menanti tangan yang menutup luka.",
+        "objectives": {
+          "0": {
+            "label": "Penjaga Cermin dihancurkan"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Yang Masih Dijaga Si Miskin",
+        "text": "Hantu-hantu Papa di tepi selatan tak punya apa-apa semasa hidup, {playerName}: tak ada selain kain kafan tempat mereka dikubur, sebab paroki tak sanggup membeli peti. Kini cahaya Mahkota terlalu tipis untuk melepas genggaman mereka, dan mereka mengembara sambil mendekap satu-satunya yang pernah jadi milik mereka. Jangan kaukira ini kekejaman; ini cinta yang tak tahu hendak ditaruh di mana. Bawakan aku lima kain mereka. Kubaringkan tiap helai di sumur dan kuucap nama yang terlalu miskin untuk dipahat. Itulah seluruh ritusnya: menjadi miskin, dan mati, namun tetap dipanggil dengan nama.",
+        "completion": "Lima kain, lima nama. Kuucap ke sumur dan air menerimanya seperti seorang ibu mengangkat mantel dari anak yang tidur. Hantu-hantu di tepian malam ini lebih sedikit, {playerName}: bukan dibunuh, dibebaskan. Inilah yang dilakukan Mahkota utuh dulu: menahan yang mati cukup dekat agar bisa melepaskannya. Kini kita lakukan dengan tangan, kau dan aku, lima nama sekali waktu. Lebih lambat. Bukan berarti sia-sia.",
+        "objectives": {
+          "0": {
+            "label": "Kain Putih"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "Nama Para Penjaga",
+        "text": "Tiga yang mondar-mandir di Ngarai Hitam disebut Penjaga Gentar oleh mereka yang lari darinya. Dulu kupanggil mereka dengan nama: mereka ordoku, {playerName}, orang-orang terakhir yang semasa hidup menjaga tanggul Cermin Sable, dan tak pernah mundur, bahkan saat jantung mereka berhenti. Tak ada bilah yang membebaskan mereka kini; kaca hitam menunggangi terlalu dalam untuk mereka jatuh. Tapi kaca itu telah merambat dari para penjaga ke para pemanen yang memenuhi tanggul, dan selama tahun-tahun panjang para pemanen mencabik lepas sigil para penjaga. Bawakan aku tiga, dipotong dari para pemanen ngarai, agar kusebut ketiga nama itu lantang sekali terakhir.",
+        "completion": "Corwin. Aldous. Brenna. Nah: terucap, dan mengucapkannya terasa lebih ringan daripada menahannya selama ini. Sebentar lagi mereka boleh berhenti; itu urusanku. Tapi awasi yang mendekat, {playerName}: sigil-sigil yang tercabik lepas berarti kaca di tanggul itu menipis, dan luka di ujungnya telah menanti tepat hal ini. Aku harus menyalakan kembali Mahkota dan menopang Sable sebelum sesuatu di seberang sadar pintunya telah telanjang. Ada satu hal terakhir yang kubutuhkan - dan ia terbaring di bawah air hitam.",
+        "objectives": {
+          "0": {
+            "label": "Sigil Penjaga"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Yang Diinginkan Kaca",
+        "text": "Kau mengalahkan Gemamu dan mengiranya ujian atas dirimu, {playerName}. Bukan. Aku menyuling Mimpi Dalam dari kain, tanduk, dan tudung, tapi hal yang di hadapannya mimpimu memasang cermin, sosok yang masuk mengenakan wajahmu, itu bukan aku yang menyuling. Ia merembes, dari kaca hitam di ngarai. Para pemanen yang memenuhi mulut ngarai kental oleh rembesan yang sama; tumbangkan delapan dan amati ke mana bayang mereka merayap. Lalu akan kutunjukkan pada mata Nerissa sendiri di mana lukanya benar-benar berdarah.",
+        "completion": "Ke timur laut. Selalu ke timur laut, selalu menuju Sable — kaulihat? Gemamu bukanlah DIRIMU, pengembara. Ia serpihan dari apa pun yang bersemayam di balik pintu itu, mengenakan pantulan terdekat yang bisa ia curi: milikmu. Mimpi hanyalah titik tertipis yang ditemukan rembesan itu; ngarai yang terlebar. Katakan pada Nerissa. Ia telah pantas atas kebenarannya, dan begitu pula kau.",
+        "objectives": {
+          "0": {
+            "label": "Pemanen ditumbangkan di mulut ngarai"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Nyalakan Kembali Mahkota Lumen",
+        "text": "Para penjaga sudah bernama dan tanggul menipis, maka kini harus kulakukan apa yang kutunda sejak aku mati: menyalakan Mahkota Lumen sekali terakhir dan menekan Sable menutup dari sisi ini. Percik sejati terakhir Mahkota ditelan Sang Rahang Senja saat ia jatuh ke telaga — itulah sebab benda itu bercahaya dari dalam. Potong keluar lagi cahayanya, {playerName}. Kaca hitam akan mengirim raksasa-raksasa suramnya untuk menghentikan ritus; tumbangkan empat. Bawakan aku percik yang tenggelam selagi aku masih ingat cara memegangnya. Tugas terakhir seorang penjaga adalah menjadi seseorang yang tak lagi perlu menjaga.",
+        "completion": "Ia menyala. Setelah segala gelap ini, ia masih mengenali tanganku. Lihat: kaca itu SEJATI lagi; tak ada detak di balik air, tak ada jiwa yang tersesat antara dunia dan pantulannya. Dan beban itu akhirnya lepas dariku. Aku tak lenyap, {playerName}; aku DIGANTIKAN. Ini bukan mematahkan Sable, hanya menahannya; aku tak berdaya mematahkan apa yang menanti di sana, dan takkan berani. Tapi tertahan satu zaman lagi, ia tertahan. Ketika suatu rombongan yang lebih berani dari kita akhirnya masuk KE DALAM pintu itu, mereka akan mendapati sisi seberang telah siap. Katakan di Highwatch bahwa penjaga mereka berjaga sampai akhir, lalu digantikan. Kaca akan mengingatmu. Pastikan kauberi ia sesuatu yang layak dipantulkan.",
+        "objectives": {
+          "0": {
+            "label": "Sang Rahang Senja ditumbangkan"
+          },
+          "1": {
+            "label": "Lumen Tenggelam"
+          },
+          "2": {
+            "label": "Raksasa Suram dihancurkan"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Paduan Suara Tenggelam",
         "text": "Para pengarung tak bergerak sendiri. Di antara mereka berjalan para Pemuja Tenggelam, sekte yang karam bersama kuil, masih dalam busana lapuk, masih menyanyikan doa dari batu karang tepi pantai. Bungkam delapan dari mereka, dan bawakan padaku enam persembahan yang mereka bawa. Aku ingin tahu apa yang hendak mereka berikan pada dewi mereka.",
@@ -7870,6 +8104,48 @@ export const id_ID: EnTranslations = {
           },
           "9": {
             "label": "Sanktum Gravewyrm"
+          },
+          "10": {
+            "label": "Gerbang Cermin"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "Dunia Cermin",
+        "welcome": "Kaca ini mengingatmu. Perhatikan di sisi mana kau berjalan.",
+        "pois": {
+          "0": {
+            "label": "Dunia Cermin"
+          },
+          "1": {
+            "label": "Alun-alun Gerbang Cermin"
+          },
+          "2": {
+            "label": "Mahkota Lumen"
+          },
+          "3": {
+            "label": "Pasar Berkerudung"
+          },
+          "4": {
+            "label": "Arsip Sunyi"
+          },
+          "5": {
+            "label": "Danau Cermin"
+          },
+          "6": {
+            "label": "Rawa Kabut"
+          },
+          "7": {
+            "label": "Lembah Penyihir"
+          },
+          "8": {
+            "label": "Cermin Eastbrook"
+          },
+          "9": {
+            "label": "Cermin Fenbridge"
+          },
+          "10": {
+            "label": "Ngarai Hitam"
           }
         }
       }

@@ -188,6 +188,35 @@ function staticWorldColliders(seed: number): Collider[] {
     });
   }
 
+  // Mirror World dome glass: each dome ring becomes a run of OBB wall
+  // segments, skipping any open gap arcs. The glass is see-through, so the
+  // chase cam ghosts through instead of pulling in.
+  for (const dome of PROPS.domes ?? []) {
+    const segLen = 6;
+    const segments = Math.max(12, Math.ceil((2 * Math.PI * dome.r) / segLen));
+    for (let i = 0; i < segments; i++) {
+      const bearing = -Math.PI + ((i + 0.5) / segments) * 2 * Math.PI;
+      const inGap = dome.gaps.some((g) => {
+        const mid = (g.from + g.to) / 2;
+        const half = (g.to - g.from) / 2;
+        let d = bearing - mid;
+        while (d > Math.PI) d -= 2 * Math.PI;
+        while (d < -Math.PI) d += 2 * Math.PI;
+        return Math.abs(d) < half;
+      });
+      if (inGap) continue;
+      out.push({
+        type: 'obb',
+        x: dome.x + Math.sin(bearing) * dome.r,
+        z: dome.z + Math.cos(bearing) * dome.r,
+        hw: (Math.PI * dome.r) / segments + 0.4, // half segment arc + overlap
+        hd: 0.9,
+        rot: bearing,
+        camGhost: true,
+      });
+    }
+  }
+
   // trees & large rocks from the deterministic decoration field
   for (const d of generateDecorations(seed)) {
     if (d.kind === 'rock') {

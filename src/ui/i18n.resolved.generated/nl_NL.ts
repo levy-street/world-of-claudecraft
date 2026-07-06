@@ -3747,6 +3747,7 @@ export const nl_NL: EnTranslations = {
       "eatingDrinking": "Aan het eten & drinken...",
       "secondsRemaining": "{seconds} seconden resterend",
       "enteringZone": "{zone} betreden.",
+      "deepdreamZone": "De Diepdroom",
       "welcomeZone": "Welkom in {zone}!",
       "levelBanner": "Niveau {level}!",
       "levelLog": "Je hebt niveau {level} bereikt!",
@@ -4388,6 +4389,13 @@ export const nl_NL: EnTranslations = {
       "nythraxisDeathlessKingWarning": "De drie relikwieën vertellen hetzelfde verhaal: Aldren vocht om zijn koning te verdedigen, Malric verbrak de grens van de dood, en Voss probeerde te stoppen wat volgde. Het zegel verzwakt, en de verlaten crypte is de weg naar beneden.",
       "browseGoods": "Laat me je waren bekijken.",
       "browseGoodsAria": "Bekijk waren van {name}",
+      "brewDraught": "Brouw een Diepdroom-drank voor me.",
+      "brewDraughtAria": "Vraag {name} om een Diepdroom-drank te brouwen",
+      "gargoyleBow": "Buigen.",
+      "gargoyleBowAria": "Buigen voor {name}",
+      "gargoyleAttack": "Aanvallen.",
+      "gargoyleAttackAria": "{name} aanvallen",
+      "gargoyleShimmer": "Het beeld trilt van energie...",
       "worldMarket": "Toon me de Wereldmarkt.",
       "worldMarketAria": "Open de Wereldmarkt",
       "accept": "Aanvaarden",
@@ -5867,6 +5875,45 @@ export const nl_NL: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Zonneblaadjessikkel"
       },
+      "white_sheet": {
+        "name": "Wit Laken"
+      },
+      "spirit_horn": {
+        "name": "Geestenhoorn"
+      },
+      "black_hood": {
+        "name": "Zwarte Kap"
+      },
+      "deepdream_draught": {
+        "name": "Diepdroom-drank"
+      },
+      "mirror_shard": {
+        "name": "Spiegelscherf"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Spookachtige Spiegelkling"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Spookachtige Lijkwademantel"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Spookachtig Schimwambuis"
+      },
+      "ghostly_palegrips": {
+        "name": "Spookachtige Bleke Grepen"
+      },
+      "ghostly_hushboots": {
+        "name": "Spookachtige Stille Laarzen"
+      },
+      "ghostly_glasscord": {
+        "name": "Spookachtig Glaskoord"
+      },
+      "warden_sigil": {
+        "name": "Wachterszegel"
+      },
+      "drowned_lumen": {
+        "name": "Verdronken Lumen"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-Hamer"
       },
@@ -6667,6 +6714,36 @@ export const nl_NL: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Gewekte Stormling"
       },
+      "spirit_unicorn": {
+        "name": "Geesteneenhoorn"
+      },
+      "hooded_reaper": {
+        "name": "Maaier"
+      },
+      "mistshade_lurker": {
+        "name": "Mistschaduw-loerder"
+      },
+      "gloaming_maw": {
+        "name": "De Schemermuil"
+      },
+      "poverty_ghost": {
+        "name": "Armoedegeest"
+      },
+      "player_echo": {
+        "name": "Echo"
+      },
+      "gargoyle_awakened": {
+        "name": "Gargouillewachter"
+      },
+      "gloomhulk": {
+        "name": "Schemerkolos"
+      },
+      "mirrorbound_sentry": {
+        "name": "Spiegelwachter"
+      },
+      "voidfang_stalker": {
+        "name": "Bleektand-Sluiper"
+      },
       "ironvein_foreman": {
         "name": "IJzerader-Voorman"
       },
@@ -6896,6 +6973,51 @@ export const nl_NL: EnTranslations = {
         "name": "De Bleke Hoeder",
         "title": "Wachter van de Doden",
         "greeting": "Rust nu, geest. Ik kan je terugbrengen naar je lichaam, maar de overtocht terug laat je verzwakt achter."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa de Rusteloze",
+        "title": "Geestbewaarster van de Lumenkroon",
+        "greeting": "Ik droeg de Lumenkroon in het leven, en de Kroon houdt het glas eerlijk - elke spiegel in dit dal toont iets waars, op één na. De dood heeft mij niet van mijn post ontheven, {playerName}, want die ene houdt niet op te drukken. Het licht van de Kroon dooft, en waar het faalt, bloedt het dal erdoorheen. Let op welke kant van het glas je bewandelt. De laatste tijd kan het dat moeilijk zien."
+      },
+      "veilwright_ollo": {
+        "name": "Sluierwever Ollo",
+        "title": "Handelaar van de Sluiermarkt",
+        "greeting": "Jassen van dode mannen, gebottelde zuchten, eerlijke prijzen - de sluier voorziet. Alles op mijn tafel is neergelegd door iemand die nu niets meer bezit; de kunst is te onderscheiden waar de doden klaar mee zijn van wat ze nog omklemmen. Vergis je, en ze komen om middernacht naar de kraam. Vraag de Hoedster naar het licht in de put, wil je de droeve versie. Ik verkoop enkel de jassen."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen de Mistheks",
+        "title": "Droombrouwster van de Kom",
+        "greeting": "De mist houdt de meesten van jullie wakker. Ik kan je de andere slaap brouwen — de soort die terugpraat."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Gargouillewachter",
+        "title": "Wachter van de Spiegel",
+        "greeting": "Stenen ogen knarsen jouw kant op. Hij luistert."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Gargouillewachter",
+        "title": "Wachter van de Spiegel",
+        "greeting": "Stenen ogen knarsen jouw kant op. Hij luistert."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Gargouillewachter",
+        "title": "Wachter van de Spiegel",
+        "greeting": "Stenen ogen knarsen jouw kant op. Hij luistert."
+      },
+      "dread_sentinel_a": {
+        "name": "Grauwe Wachter",
+        "title": "Bewaarder van de Duisterspiegel",
+        "greeting": "Je dood wacht op je."
+      },
+      "dread_sentinel_b": {
+        "name": "Grauwe Wachter",
+        "title": "Bewaarder van de Duisterspiegel",
+        "greeting": "In het leven hielden wij de dam. Wij houden hem nog."
+      },
+      "dread_sentinel_c": {
+        "name": "Grauwe Wachter",
+        "title": "Bewaarder van de Duisterspiegel",
+        "greeting": "Keer terug. Het zwarte glas is niet voor de levenden - noch was het dat ooit voor ons."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const nl_NL: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "Een recept voor diepe slaap",
+        "text": "Het brouwsel vraagt drie stemmen, {playerName}: twee witte lakens van de armoedegeesten die verder niets bezitten, twee hoorns van de geesteneenhoorns die in het duister grazen, en twee kappen gesneden van de maaiers die de gordel bewaken. Breng ze en ik brouw je een slaap met tanden.",
+        "completion": "Laken, hoorn, kap — de armen, de stralenden, de geduldigen. De ketel mag je. Drink het ergens zachts, zwerver: je zult ontmoeten wie je al die tijd meedroeg.",
+        "objectives": {
+          "0": {
+            "label": "Wit Laken"
+          },
+          "1": {
+            "label": "Geestenhoorn"
+          },
+          "2": {
+            "label": "Zwarte Kap"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Zie je Echo onder ogen",
+        "text": "Drink de drank en de droom zet een spiegel voor je neer — jouw Echo, elk litteken en elke truc van jou aan de andere kant. Versla wat je bent, {playerName}, en breng me je gezicht daarna.",
+        "completion": "Jij kwam terug, en de spiegel niet. Wat hij in je hand achterliet is van jou — de droom betaalt die prijs maar één keer.",
+        "objectives": {
+          "0": {
+            "label": "Je Echo verslagen"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "De Tol van de Bewaarder",
+        "text": "De glans wordt tot woorden achter je ogen: de maaiers verdringen zich aan mijn glas, {playerName}. Dun ze uit, en de weg naar Highwatch is de jouwe.",
+        "completion": "De steen bromt één keer, tevreden. Erachter klaart de spiegel op als een eindelijk gelaten ingehouden adem.",
+        "objectives": {
+          "0": {
+            "label": "Maaier geveld"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "Een Tol van Lakens",
+        "text": "De glans wordt tot woorden achter je ogen: breng me vier witte lakens van de arme doden, {playerName}. De weg naar Eastbrook opent zich voor wie in doek betaalt.",
+        "completion": "De lakens zinken in de steen en zijn weg. De spiegel erachter ontwaakt met licht.",
+        "objectives": {
+          "0": {
+            "label": "Wit Laken"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Geoogste Glans",
+        "text": "De glans wordt tot woorden achter je ogen: de geestenkudden branden te fel voor het glas, {playerName}. Vel er vijf, en Fenbridge is een stap ver.",
+        "completion": "De steen drinkt het licht dat je vergoot. De spiegel erachter opent zich als een oog.",
+        "objectives": {
+          "0": {
+            "label": "Geesteneenhoorn geveld"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "De Wegkwijnende Glans",
+        "text": "Je voelt mijn kou en houdt me voor een verhaal. Ik ben een post, {playerName}. De Lumenkroon die ik hoedde is geen gouden reep: ze is het licht in elke spiegel hier, de naad die levenden en doden in gescheiden spiegelbeelden houdt, opdat het ene het andere niet verdrinkt. Dat licht faalt, en je ziet het aan de Spiegelgebonden Wachten: eens de gloed van de Kroon zelf op wacht, nu glas vol gestolen licht, dat de noordelijke ruïnes verdringt omdat de naad hun niet meer zegt waar te staan. Breek er acht. Elke scherf die je verstrooit is een beetje licht teruggegeven, en een beetje bewijs dat men je de rest kan toevertrouwen.",
+        "completion": "De scherven drijven terug naar de put als sneeuw die opwaarts valt, en één ademtocht lang is heel het dal een tint lichter. Het zal niet duren. Maar jij herstelt naden in plaats van ze door te snijden, {playerName}: dat is hier zeldzamer dan je denkt. Jij brak ook de ANDERE kroon, nietwaar? De ijzeren, onder Thornpeak. Dan zou dit licht voor het eerst in driehonderd jaar kunnen terugkeren. Blijf. Het dal wacht al lang op handen die wonden sluiten.",
+        "objectives": {
+          "0": {
+            "label": "Spiegelgebonden Wacht verbrijzeld"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Wat de Armen Nog Bewaren",
+        "text": "De Armoedegeesten aan de zuidoever bezaten in het leven niets, {playerName}: niets dan het laken waarin ze begraven werden, want de parochie kon geen kist bekostigen. Nu is het licht van de Kroon te dun om hun greep te lossen, en ze dwalen rond, het enige omklemmend dat ooit van hen was. Zie het niet als wreedheid; het is liefde die nergens heen kan. Breng me vijf van hun lakens. Ik leg elk in de put en spreek de naam uit die te arm was om te beitelen. Daarin bestaat het hele ritueel: arm te zijn, en dood, en toch bij naam geroepen.",
+        "completion": "Vijf lakens, vijf namen. Ik zeg ze in de put en het water neemt ze zoals een moeder een jas van een slapend kind tilt. De geesten aan de oever zijn vanavond met minder, {playerName}: niet gedood, verlost. Dit deed de hele Kroon: ze hield de doden dicht genoeg om hen te kunnen laten gaan. Nu doen we het met de hand, jij en ik, vijf namen tegelijk. Het is trager. Het is niet niets.",
+        "objectives": {
+          "0": {
+            "label": "Wit Laken"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "De Namen der Wachters",
+        "text": "De drie die de Zwarte Canyon doorkruisen, worden Schrikwachten genoemd door wie voor hen vlucht. Ik riep hen ooit bij naam: ze waren mijn orde, {playerName}, de laatste mannen die in het leven de dam van de Sabelspiegel hielden, en ze weken nooit, zelfs niet toen hun harten dat deden. Geen kling bevrijdt hen nog; het zwarte glas berijdt hen te diep om te vallen. Maar dat glas is van de wachters op de maaiers overgeslagen die de dam verdringen, en door de lange jaren hebben de maaiers de zegels der wachters losgerukt. Breng me er drie, van de maaiers van de canyon genomen, opdat ik de drie namen een laatste maal hardop zeg.",
+        "completion": "Corwin. Aldous. Brenna. Ziezo: gezegd, en het zeggen weegt lichter dan het houden ooit woog. Weldra mogen ze rusten; daar zal ik voor zorgen. Maar let op wat nadert, {playerName}: de losgerukte zegels betekenen dat het glas van die dam dunner wordt, en de wond aan het eind ervan heeft juist hierop gewacht. Ik moet de Kroon herontsteken en het Sabel stutten voor iets aan de overzijde merkt dat de deur bloot ligt. Er is een laatste ding dat ik nodig heb - en het ligt onder het zwarte water.",
+        "objectives": {
+          "0": {
+            "label": "Wachterszegel"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Wat het Glas Wil",
+        "text": "Je versloeg je Echo en hield het voor een beproeving van jezelf, {playerName}. Dat was het niet. Ik brouw de Diepdroom uit laken, hoorn en kap, maar datgene waartegen je droom een spiegel zette, het ding dat binnenkwam met jouw gezicht, dat brouw ik niet. Het sijpelt binnen, uit het zwarte glas van de canyon. De maaiers die de canyonmond verdringen zijn dik van datzelfde lek; vel er acht en zie waarheen hun schaduwen kruipen. Dan toon ik Nerissa's eigen ogen waar haar wond werkelijk bloedt.",
+        "completion": "Naar het noordoosten. Altijd naar het noordoosten, altijd richting het Sabel — zag je het? Je Echo was niet JIJ, reiziger. Het was een scherf van wat er ook achter die poort huist, gekleed in het dichtstbijzijnde spiegelbeeld dat het kon stelen: het jouwe. De droom is slechts de dunste plek die het lek gevonden heeft; de canyon de breedste. Zeg het Nerissa. Zij heeft de waarheid ervan verdiend, en jij ook.",
+        "objectives": {
+          "0": {
+            "label": "Maaier geveld bij de canyonmond"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "De Lumenkroon Herontsteken",
+        "text": "De wachters hebben een naam en de dam wordt dunner, dus moet ik nu doen wat ik sinds mijn dood heb uitgesteld: de Lumenkroon een laatste maal ontsteken en het Sabel van deze zijde dichtdrukken. De laatste ware vonk van de Kroon werd door de Schemermuil verzwolgen toen die in de poel viel — daarom gloeit het ding van binnen. Snijd het licht er weer uit, {playerName}. Het zwarte glas zal zijn somberkolossen sturen om het ritueel te stuiten; vel er vier. Breng me een verdronken vonk zolang ik nog weet hoe je er een vasthoudt. De laatste plicht van een hoeder is iemand te worden die niet meer hoeven hoeft.",
+        "completion": "Ze brandt. Na al dit duister kent ze nog mijn hand. Kijk: het glas is weer WAAR; geen hartslag achter het water, geen ziel verloren tussen een wereld en haar spiegelbeeld. En het gewicht is eindelijk van me af. Ik verga niet, {playerName}; ik word AFGELOST. Dit is geen breken van het Sabel, slechts een houden; ik heb niet de kracht te breken wat daar wacht, en zou het niet wagen. Maar een tijdperk langer gehouden, is het gehouden. Wanneer een dapperder gezelschap dan wij eindelijk die poort BINNENgaat, zullen ze de overzijde gereed vinden. Zeg in Highwatch dat hun hoedster de wacht tot het einde hield, en toen werd afgelost. Het glas zal je heugen. Zorg dat je het iets geeft dat het spiegelen waard is.",
+        "objectives": {
+          "0": {
+            "label": "De Schemermuil geveld"
+          },
+          "1": {
+            "label": "Verdronken Lumen"
+          },
+          "2": {
+            "label": "Somberkolos gebroken"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Het Verdronken Koor",
         "text": "De waders handelen niet alleen. Tussen hen lopen de Verdronken Aanbidders, de sekte die met de tempel zonk, nog in hun verrotte gewaden, nog steeds het gebed zingend vanaf de oeverrotsen. Breng er acht tot zwijgen, en breng me zes van de offergaven die ze dragen. Ik wil weten wat ze hun godin willen geven.",
@@ -7870,6 +8104,48 @@ export const nl_NL: EnTranslations = {
           },
           "9": {
             "label": "Grafwurm-Heiligdom"
+          },
+          "10": {
+            "label": "De Spiegelpoort"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "De Spiegelwereld",
+        "welcome": "Het glas herinnert zich jou. Let op aan welke kant ervan je loopt.",
+        "pois": {
+          "0": {
+            "label": "De Spiegelwereld"
+          },
+          "1": {
+            "label": "Spiegelpoortplein"
+          },
+          "2": {
+            "label": "De Lumenkroon"
+          },
+          "3": {
+            "label": "De Gesluierde Markt"
+          },
+          "4": {
+            "label": "Het Stille Archief"
+          },
+          "5": {
+            "label": "Het Spiegelmeer"
+          },
+          "6": {
+            "label": "Het Mistven"
+          },
+          "7": {
+            "label": "Heksenkom"
+          },
+          "8": {
+            "label": "Spiegel van Eastbrook"
+          },
+          "9": {
+            "label": "Spiegel van Fenbridge"
+          },
+          "10": {
+            "label": "de Zwarte Kloof"
           }
         }
       }

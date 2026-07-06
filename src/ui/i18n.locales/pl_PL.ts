@@ -2660,6 +2660,142 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Namioty Kultu Żmija',
   'entities.zones.thornpeak_heights.pois.8.label': 'Pola Upiorów',
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanktuarium Grobowego Żmija',
+  'entities.zones.thornpeak_heights.pois.10.label': 'Zwierciadlana Brama',
+  'entities.zones.mirror_world.name': 'Świat Zwierciadeł',
+  'entities.zones.mirror_world.welcome':
+    'Szkło cię pamięta. Uważaj, po której jego stronie idziesz.',
+  'entities.zones.mirror_world.pois.0.label': 'Świat Zwierciadeł',
+  'entities.zones.mirror_world.pois.1.label': 'Plac Zwierciadlanej Bramy',
+  'entities.zones.mirror_world.pois.2.label': 'Korona Lumenu',
+  'entities.zones.mirror_world.pois.3.label': 'Zasłonięty Targ',
+  'entities.zones.mirror_world.pois.4.label': 'Ciche Archiwum',
+  'entities.zones.mirror_world.pois.5.label': 'Zwierciadlane Jezioro',
+  'entities.zones.mirror_world.pois.6.label': 'Mgielne Trzęsawisko',
+  'entities.zones.mirror_world.pois.7.label': 'Kotlina Wiedźmy',
+  'entities.zones.mirror_world.pois.8.label': 'Zwierciadło Eastbrook',
+  'entities.zones.mirror_world.pois.9.label': 'Zwierciadło Fenbridge',
+  'entities.mobs.poverty_ghost.name': 'Duch Ubóstwa',
+  'entities.mobs.spirit_unicorn.name': 'Duchowy Jednorożec',
+  'entities.mobs.hooded_reaper.name': 'Żniwiarz',
+  'entities.mobs.gloomhulk.name': 'Mrokolos',
+  'entities.mobs.mirrorbound_sentry.name': 'Zwierciadlny Strażnik',
+  'entities.mobs.voidfang_stalker.name': 'Bladokły Łowca',
+  'entities.npcs.dread_sentinel_a.name': 'Straszliwy Strażnik',
+  'entities.npcs.dread_sentinel_a.title': 'Dozorca Mrocznego Zwierciadła',
+  'entities.npcs.dread_sentinel_a.greeting': 'Twoja śmierć na ciebie czeka.',
+  'entities.npcs.dread_sentinel_b.name': 'Straszliwy Strażnik',
+  'entities.npcs.dread_sentinel_b.title': 'Dozorca Mrocznego Zwierciadła',
+  'entities.npcs.dread_sentinel_b.greeting': 'Za życia strzegliśmy grobli. Strzeżemy jej wciąż.',
+  'entities.npcs.dread_sentinel_c.name': 'Straszliwy Strażnik',
+  'entities.npcs.dread_sentinel_c.title': 'Dozorca Mrocznego Zwierciadła',
+  'entities.npcs.dread_sentinel_c.greeting':
+    'Zawróć. Czarne szkło nie jest dla żywych... ani nigdy nie było dla nas.',
+  'entities.quests.q_gargoyle_south.title': 'Myto Dozorcy',
+  'entities.quests.q_gargoyle_south.text':
+    'Migotanie układa się w słowa za twoimi oczami: żniwiarze tłoczą się u mojego szkła, {playerName}. Przerzedź ich, a droga do Highwatch będzie twoja.',
+  'entities.quests.q_gargoyle_south.completion':
+    'Kamień brzęczy raz, ukontentowany. Za nim zwierciadło przejaśnia się jak wreszcie wypuszczony wstrzymany oddech.',
+  'entities.quests.q_gargoyle_south.objectives.0.label': 'Żniwiarz ubity',
+  'entities.quests.q_gargoyle_west.title': 'Myto z Prześcieradeł',
+  'entities.quests.q_gargoyle_west.text':
+    'Migotanie układa się w słowa za twoimi oczami: przynieś mi cztery białe prześcieradła od biednych zmarłych, {playerName}. Droga do Eastbrook otwiera się dla tych, którzy płacą płótnem.',
+  'entities.quests.q_gargoyle_west.completion':
+    'Prześcieradła toną w kamieniu i znikają. Zwierciadło za nim budzi się światłem.',
+  'entities.quests.q_gargoyle_west.objectives.0.label': 'Białe Prześcieradło',
+  'entities.quests.q_gargoyle_north.title': 'Zżęty Blask',
+  'entities.quests.q_gargoyle_north.text':
+    'Migotanie układa się w słowa za twoimi oczami: duchowe stada płoną dla szkła zbyt jasno, {playerName}. Ubij pięć, a Fenbridge jest o krok.',
+  'entities.quests.q_gargoyle_north.completion':
+    'Kamień pije światło, które rozlałeś. Zwierciadło za nim otwiera się jak oko.',
+  'entities.quests.q_gargoyle_north.objectives.0.label': 'Duchowy Jednorożec ubity',
+  'entities.zones.mirror_world.pois.10.label': 'Czarny Kanion',
+  'entities.mobs.gargoyle_awakened.name': 'Gargulec Strażniczy',
+  'entities.mobs.mistshade_lurker.name': 'Czatownik mgieł',
+  'entities.mobs.gloaming_maw.name': 'Paszcza Zmierzchu',
+  'entities.mobs.player_echo.name': 'Echo',
+  'entities.npcs.keeper_nerissa.name': 'Nerissa Niespokojna',
+  'entities.npcs.keeper_nerissa.title': 'Widmowa Strażniczka Korony Lumen',
+  'entities.npcs.keeper_nerissa.greeting':
+    'Strzegłam Korony Lumenu za życia, a Korona utrzymuje szkło uczciwym - każde zwierciadło w tej dolinie pokazuje rzecz prawdziwą, prócz jednego. Śmierć nie zwolniła mnie z posterunku, {playerName}, bo tamto wciąż napiera. Światło Korony gaśnie, a gdzie słabnie, tam dolina przesiąka. Uważaj, po której stronie szkła stąpasz. Ostatnio z trudem to rozróżnia.',
+  'entities.items.warden_sigil.name': 'Sygil strażnika',
+  'entities.items.drowned_lumen.name': 'Utopiony lumen',
+  'entities.quests.q_the_failing_radiance.title': 'Gasnący blask',
+  'entities.quests.q_the_failing_radiance.text':
+    'Czujesz mój chłód i masz mnie za legendę. Jestem posterunkiem, {playerName}. Korona Lumenu, którą strzegłam, to nie złoty krąg: to światło każdego tutejszego zwierciadła, spoina trzymająca żywych i umarłych w osobnych odbiciach, by jedno nie utopiło drugiego. To światło słabnie, a widać to po Lustrzanych strażnikach: niegdyś sam blask Korony na warcie, dziś są szkłem pełnym skradzionego światła, tłoczącym się w północnych ruinach, bo spoina już im nie mówi, gdzie stać. Roztrzaskaj ośmiu. Każdy odłamek, który rozproszysz, to odrobina zwróconego światła i odrobina dowodu, że można ci powierzyć resztę.',
+  'entities.quests.q_the_failing_radiance.completion':
+    'Odłamki dryfują z powrotem ku studni jak śnieg padający w górę, i na jedno tchnienie cała dolina jaśnieje o odcień. To nie potrwa. Lecz ty zszywasz spoiny, zamiast je przecinać, {playerName}: to tu rzadsze, niż sądzisz. Rozbiłeś też TĘ DRUGĄ koronę, prawda? Żelazną, pod Thornpeak. Zatem po raz pierwszy od trzystu lat to światło może powrócić. Zostań. Dolina długo czekała na dłonie, które zamykają rany.',
+  'entities.quests.q_the_failing_radiance.objectives.0.label': 'Lustrzany strażnik roztrzaskany',
+  'entities.quests.q_what_the_poor_keep.title': 'Co biedni wciąż chowają',
+  'entities.quests.q_what_the_poor_keep.text':
+    'Ubogie Duchy z południowego brzegu za życia nie miały nic, {playerName}: nic prócz prześcieradła, w którym je pogrzebano, bo parafii nie było stać na trumnę. Teraz światło Korony jest zbyt wątłe, by rozluźnić ich uścisk, i błąkają się, ściskając jedyną rzecz, jaka kiedykolwiek była ich. Nie miej tego za okrucieństwo; to miłość, która nie ma gdzie się podziać. Przynieś mi pięć ich prześcieradeł. Złożę każde w studni i wypowiem imię zbyt ubogie, by je wykuć. Na tym polega cały obrzęd: być ubogim, i martwym, a mimo to wołanym po imieniu.',
+  'entities.quests.q_what_the_poor_keep.completion':
+    'Pięć prześcieradeł, pięć imion. Wypowiadam je do studni, a woda przyjmuje je, jak matka zdejmuje płaszcz ze śpiącego dziecka. Duchów na brzegu jest tej nocy mniej, {playerName}: nie zabitych, uwolnionych. To czyniła cała Korona: trzymała zmarłych dość blisko, by móc ich puścić. Teraz robimy to ręcznie, ty i ja, po pięć imion naraz. Wolniej. To nie nic.',
+  'entities.quests.q_what_the_poor_keep.objectives.0.label': 'Białe prześcieradło',
+  'entities.quests.q_the_wardens_names.title': 'Imiona strażników',
+  'entities.quests.q_the_wardens_names.text':
+    'Trzech, co przemierzają Czarny Kanion, uciekający zwą Strażnikami Grozy. Niegdyś wołałam ich po imieniu: byli mym zakonem, {playerName}, ostatnimi, którzy za życia trzymali groblę Sobolowego Zwierciadła, i nigdy nie ustąpili, nawet gdy ustały ich serca. Żadne ostrze już ich nie uwolni; czarne szkło dosiada ich zbyt głęboko, by mieli paść. Lecz to szkło przeszło od strażników na żniwiarzy tłoczących się na grobli, a przez długie lata żniwiarze powyrywali sygile strażników. Przynieś mi trzy, ścięte ze żniwiarzy kanionu, bym wypowiedziała trzy imiona na głos ostatni raz.',
+  'entities.quests.q_the_wardens_names.completion':
+    'Corwin. Aldous. Brenna. Oto: wypowiedziane, a mówić je lżej, niż kiedykolwiek ciążyło ich trzymanie. Wkrótce będą mogli spocząć; ja się o to postaram. Lecz strzeż się tego, co nadchodzi, {playerName}: powyrywane sygile znaczą, że szkło owej grobli cieńczeje, a rana na jej końcu czekała właśnie na to. Muszę rozpalić Koronę i podeprzeć Sobolowe, nim coś po drugiej stronie spostrzeże, że drzwi stoją odsłonięte. Zostało mi jedno, ostatnie - a leży pod czarną wodą.',
+  'entities.quests.q_the_wardens_names.objectives.0.label': 'Sygil strażnika',
+  'entities.quests.q_what_the_glass_wants.title': 'Czego pragnie szkło',
+  'entities.quests.q_what_the_glass_wants.text':
+    'Pokonałeś swe Echo i wziąłeś to za próbę samego siebie, {playerName}. Nie było nią. Warzę Głęboki Sen z prześcieradła, rogu i kaptura, lecz to, przeciw czemu twój sen wystawił zwierciadło, rzecz, co weszła w twej twarzy, tego nie warzę ja. Przesącza się z czarnego szkła kanionu. Żniwiarze tłoczący się u wylotu kanionu są gęści od tego samego przecieku; powal ośmiu i patrz, dokąd pełzną ich cienie. Wtedy pokażę własnym oczom Nerissy, gdzie jej rana naprawdę krwawi.',
+  'entities.quests.q_what_the_glass_wants.completion':
+    'Na północny wschód. Zawsze na północny wschód, zawsze ku Sobolowemu — widziałeś? Twe Echo nie było TOBĄ, wędrowcze. Było odłamkiem tego, co żyje za owymi wrotami, odzianym w najbliższe odbicie, jakie mogło ukraść: twoje. Sen to tylko najcieńsze miejsce, jakie znalazł przeciek; kanion — najszersze. Powiedz to Nerissie. Zasłużyła na prawdę o tym, a i ty też.',
+  'entities.quests.q_what_the_glass_wants.objectives.0.label': 'Żniwiarz powalony u wylotu kanionu',
+  'entities.quests.q_relight_the_lumen_crown.title': 'Rozpalić Koronę Lumenu',
+  'entities.quests.q_relight_the_lumen_crown.text':
+    'Strażnicy mają imiona, a grobla cieńczeje, muszę więc uczynić teraz to, co odkładałam od śmierci: rozpalić Koronę Lumenu ostatni raz i przycisnąć Sobolowe od tej strony. Ostatnią prawdziwą iskrę Korony połknęła Zmierzchowa Paszcza, gdy padła w staw — dlatego to coś jarzy się od środka. Wytnij z niej światło z powrotem, {playerName}. Czarne szkło pośle swe mroczne kolosy, by przerwać obrzęd; powal czterech. Przynieś mi utopioną iskrę, póki jeszcze pamiętam, jak taką trzymać. Ostatnią powinnością strażnika jest stać się kimś, kto już strzec nie musi.',
+  'entities.quests.q_relight_the_lumen_crown.completion':
+    'Płonie. Po całym tym mroku wciąż zna mą dłoń. Patrz: szkło znów jest PRAWDZIWE; żadnego bicia za wodą, żadnej duszy zgubionej między światem a jego odbiciem. I ciężar wreszcie ze mnie zszedł. Nie znikam, {playerName}; zostaję ZLUZOWANA. To nie skruszenie Sobolowego, jeno trzymanie; nie mam siły skruszyć tego, co tam czeka, i nie śmiałabym. Lecz trzymane o wiek dłużej — jest trzymane. Gdy dzielniejsza od nas kompania wreszcie wejdzie DO owych wrót, zastanie drugą stronę gotową. Powiedz w Highwatch, że ich strażniczka trwała na warcie do końca, a potem została zluzowana. Szkło cię zapamięta. Zadbaj, byś dał mu coś godnego odbicia.',
+  'entities.quests.q_relight_the_lumen_crown.objectives.0.label': 'Zmierzchowa Paszcza pokonana',
+  'entities.quests.q_relight_the_lumen_crown.objectives.1.label': 'Utopiony lumen',
+  'entities.quests.q_relight_the_lumen_crown.objectives.2.label': 'Mroczny kolos strzaskany',
+  'entities.npcs.veilwright_ollo.name': 'Ollo Tkacz Zasłon',
+  'entities.npcs.veilwright_ollo.title': 'Kupiec Zasłoniętego Targu',
+  'entities.npcs.veilwright_ollo.greeting':
+    'Płaszcze zmarłych, westchnienia w butelkach, uczciwe ceny - zasłona zapewni. Wszystko na mym stole odłożył ktoś, kto już nic nie posiada; sztuką jest odróżnić, z czym umarli skończyli, od tego, co wciąż ściskają. Pomyl się, a przyjdą do straganu o północy. Spytaj Strażniczki o światło w studni, jeśli chcesz smutnej wersji. Ja tylko sprzedaję płaszcze.',
+  'entities.npcs.gargoyle_sentinel_south.name': 'Gargulec Strażniczy',
+  'entities.npcs.gargoyle_sentinel_south.title': 'Strażnik Zwierciadła',
+  'entities.npcs.gargoyle_sentinel_south.greeting':
+    'Kamienne oczy ze zgrzytem zwracają się ku tobie. Słucha.',
+  'entities.npcs.gargoyle_sentinel_west.name': 'Gargulec Strażniczy',
+  'entities.npcs.gargoyle_sentinel_west.title': 'Strażnik Zwierciadła',
+  'entities.npcs.gargoyle_sentinel_west.greeting':
+    'Kamienne oczy ze zgrzytem zwracają się ku tobie. Słucha.',
+  'entities.npcs.gargoyle_sentinel_north.name': 'Gargulec Strażniczy',
+  'entities.npcs.gargoyle_sentinel_north.title': 'Strażnik Zwierciadła',
+  'entities.npcs.gargoyle_sentinel_north.greeting':
+    'Kamienne oczy ze zgrzytem zwracają się ku tobie. Słucha.',
+  'entities.npcs.mistwitch_morwen.name': 'Morwen, Wiedźma Mgieł',
+  'entities.npcs.mistwitch_morwen.title': 'Warzycielka snów z Kotliny',
+  'entities.npcs.mistwitch_morwen.greeting':
+    'Mgła nie daje większości z was zasnąć. Ja uwarzę ci ten drugi sen — taki, który odpowiada.',
+  'entities.quests.q_deepdream_recipe.title': 'Przepis na głęboki sen',
+  'entities.quests.q_deepdream_recipe.text':
+    'Wywar potrzebuje trzech głosów, {playerName}: dwóch białych prześcieradeł od duchów ubóstwa, które nie mają nic innego, dwóch rogów duchowych jednorożców pasących się w mroku i dwóch kapturów ściętych żniwiarzom pilnującym pasa. Przynieś je, a uwarzę ci sen z zębami.',
+  'entities.quests.q_deepdream_recipe.completion':
+    'Prześcieradło, róg, kaptur — biedni, promienni, cierpliwi. Kocioł cię polubił. Wypij go w miękkim miejscu, wędrowcze: spotkasz tego, kogo nosisz w sobie.',
+  'entities.quests.q_deepdream_recipe.objectives.0.label': 'Białe Prześcieradło',
+  'entities.quests.q_deepdream_recipe.objectives.1.label': 'Duchowy Róg',
+  'entities.quests.q_deepdream_recipe.objectives.2.label': 'Czarny Kaptur',
+  'entities.quests.q_face_your_echo.title': 'Stań twarzą w twarz ze swoim Echem',
+  'entities.quests.q_face_your_echo.text':
+    'Wypij napar, a sen postawi przed tobą zwierciadło — twoje Echo, każdą twoją bliznę i każdą sztuczkę po drugiej stronie. Pokonaj to, czym jesteś, {playerName}, i przynieś mi swoją minę po wszystkim.',
+  'entities.quests.q_face_your_echo.completion':
+    'Wróciłeś ty, a zwierciadło nie. Co zostawiło ci w dłoni, jest twoje — sen płaci tę cenę tylko raz.',
+  'entities.quests.q_face_your_echo.objectives.0.label': 'Twoje Echo pokonane',
+  'entities.items.white_sheet.name': 'Białe Prześcieradło',
+  'entities.items.spirit_horn.name': 'Duchowy Róg',
+  'entities.items.black_hood.name': 'Czarny Kaptur',
+  'entities.items.deepdream_draught.name': 'Napar Głębokiego Snu',
+  'entities.items.mirror_shard.name': 'Zwierciadlany Odłamek',
+  'entities.items.ghostly_mirrorblade.name': 'Upiorne Lustrzane Ostrze',
+  'entities.items.ghostly_shroudmantle.name': 'Upiorny Płaszcz Całunowy',
+  'entities.items.ghostly_wraithjerkin.name': 'Upiorny Kaftan Zjawy',
+  'entities.items.ghostly_palegrips.name': 'Upiorne Blade Chwyty',
+  'entities.items.ghostly_hushboots.name': 'Upiorne Ciche Buty',
+  'entities.items.ghostly_glasscord.name': 'Upiorny Szklany Sznur',
   'entities.zones.thornpeak_heights.welcome':
     'Kapitan Thessaly utrzymuje mur w Wysokiej Strażnicy, ledwie.',
   'errors.api.accountBanned': 'To konto zostało zbanowane.',
@@ -5260,6 +5396,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'questUi.dialog.back': 'Wstecz',
   'questUi.dialog.browseGoods': 'Pokaż mi swoje towary.',
   'questUi.dialog.browseGoodsAria': 'Przeglądaj towary od: {name}',
+  'questUi.dialog.brewDraught': 'Uwarz mi Napar Głębokiego Snu.',
+  'questUi.dialog.brewDraughtAria': 'Poproś {name} o uwarzenie Naparu Głębokiego Snu',
+  'questUi.dialog.gargoyleBow': 'Pokłoń się.',
+  'questUi.dialog.gargoyleBowAria': 'Pokłoń się {name}',
+  'questUi.dialog.gargoyleAttack': 'Zaatakuj.',
+  'questUi.dialog.gargoyleAttackAria': 'Zaatakuj {name}',
+  'questUi.dialog.gargoyleShimmer': 'Posąg drga od energii...',
+  'hud.core.deepdreamZone': 'Głęboki Sen',
   'questUi.dialog.close': 'Zamknij okno dialogowe zadania',
   'questUi.dialog.completeQuest': 'Ukończ zadanie',
   'questUi.dialog.continue': 'Dalej',

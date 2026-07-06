@@ -10,14 +10,14 @@
     "max-level overflow -> lifetimeXp / virtualLevelUp (accrueLifetimeXp, C1)",
     "cosmetic prestige accept + below-threshold reject (prestige, G1b)"
   ],
-  "draws": 75,
-  "drawDigest": "cc652885",
+  "draws": 86,
+  "drawDigest": "49472aa0",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "7dfedf0b",
+      "nextId": 458,
+      "state": "91dd477f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -43,7 +43,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -57,6 +57,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -75,7 +76,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -84,6 +85,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -118,9 +120,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 401,
-      "state": "1e45bee3",
-      "events": "b93c7dc5",
+      "nextId": 458,
+      "state": "829c5575",
+      "events": "7bd8c231",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -129,8 +131,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 401,
-      "state": "05b9c7cf",
+      "nextId": 458,
+      "state": "e298623d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -140,23 +142,23 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "7a04dc49",
+      "nextId": 458,
+      "state": "f676f59f",
       "events": "741638a5",
       "rng": {
-        "draws": 75,
-        "digest": "cc652885"
+        "draws": 86,
+        "digest": "49472aa0"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "7a04dc49",
+      "nextId": 458,
+      "state": "f676f59f",
       "events": "741638a5",
       "rng": {
-        "draws": 75,
-        "digest": "cc652885"
+        "draws": 86,
+        "digest": "49472aa0"
       },
       "label": "rested-accrued",
       "players": [
@@ -178,7 +180,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -192,6 +194,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "restedXp": 0.125,
           "talents": {
             "choices": {},
@@ -211,7 +214,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 90,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -220,6 +223,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 12,
@@ -254,12 +258,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "fadd9f5a",
-      "events": "1cded724",
+      "nextId": 458,
+      "state": "656b737e",
+      "events": "acf2a29c",
       "rng": {
-        "draws": 75,
-        "digest": "cc652885"
+        "draws": 86,
+        "digest": "49472aa0"
       },
       "label": "rested-consumed",
       "players": [
@@ -283,7 +287,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -298,6 +302,7 @@
           "lifetimeXp": 160,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -318,7 +323,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 90,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -327,6 +332,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 12,
@@ -361,12 +367,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "07f909a7",
-      "events": "c434cdff",
+      "nextId": 458,
+      "state": "217e59e5",
+      "events": "224dca6b",
       "rng": {
-        "draws": 75,
-        "digest": "cc652885"
+        "draws": 86,
+        "digest": "49472aa0"
       },
       "label": "ding",
       "players": [
@@ -391,7 +397,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -406,6 +412,7 @@
           "lifetimeXp": 610,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -426,7 +433,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 128,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -435,6 +442,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 12,
@@ -469,12 +477,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "4196cc4b",
-      "events": "5079bfdf",
+      "nextId": 458,
+      "state": "d2d7f973",
+      "events": "e77ac877",
       "rng": {
-        "draws": 75,
-        "digest": "cc652885"
+        "draws": 86,
+        "digest": "49472aa0"
       },
       "label": "overflow",
       "players": [
@@ -499,7 +507,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -514,6 +522,7 @@
           "lifetimeXp": 190400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -534,7 +543,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -543,6 +552,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 12,
@@ -577,12 +587,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "33837b88",
-      "events": "dee49cdf",
+      "nextId": 458,
+      "state": "faa1f950",
+      "events": "494a6d97",
       "rng": {
-        "draws": 75,
-        "digest": "cc652885"
+        "draws": 86,
+        "digest": "49472aa0"
       },
       "label": "prestige-accept",
       "players": [
@@ -607,7 +617,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -622,6 +632,7 @@
           "lifetimeXp": 190400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "prestigeRank": 1,
           "restedXp": 920,
           "talents": {
@@ -642,7 +653,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -651,6 +662,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 12,
@@ -685,12 +697,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "33837b88",
+      "nextId": 458,
+      "state": "faa1f950",
       "events": "741638a5",
       "rng": {
-        "draws": 75,
-        "digest": "cc652885"
+        "draws": 86,
+        "digest": "49472aa0"
       },
       "label": "prestige-reject",
       "players": [
@@ -715,7 +727,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -730,6 +742,7 @@
           "lifetimeXp": 190400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "prestigeRank": 1,
           "restedXp": 920,
           "talents": {
@@ -750,7 +763,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -759,6 +772,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 12,
@@ -793,12 +807,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 401,
-      "state": "33837b88",
+      "nextId": 458,
+      "state": "faa1f950",
       "events": "741638a5",
       "rng": {
-        "draws": 75,
-        "digest": "cc652885"
+        "draws": 86,
+        "digest": "49472aa0"
       },
       "label": "final",
       "players": [
@@ -823,7 +837,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 457,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -838,6 +852,7 @@
           "lifetimeXp": 190400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "permanentStats": {},
           "prestigeRank": 1,
           "restedXp": 920,
           "talents": {
@@ -858,7 +873,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 400,
+          "id": 457,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -867,6 +882,7 @@
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
+          "permanentStats": {},
           "petMode": "defensive",
           "pos": {
             "x": 12,

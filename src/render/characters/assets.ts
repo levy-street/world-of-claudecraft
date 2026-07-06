@@ -526,6 +526,15 @@ export function assembleModel(def: VisualDef, weaponItemId?: string | null): THR
     if (fix.rotY) node.rotateY(fix.rotY);
     if (fix.rotZ) node.rotateZ(fix.rotZ);
   }
+  // Model-space orientation fix (Z-up source assets → Y-up engine): wrap the
+  // whole rig in a group so the rotation is baked ahead of the height
+  // measurement (normScale) and rides under the runtime yaw/scale wrapper.
+  if (def.orient && (def.orient.x || def.orient.z)) {
+    const oriented = new THREE.Group();
+    oriented.rotation.set(def.orient.x ?? 0, 0, def.orient.z ?? 0);
+    oriented.add(root);
+    return oriented;
+  }
   return root;
 }
 

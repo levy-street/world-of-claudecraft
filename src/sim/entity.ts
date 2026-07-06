@@ -217,6 +217,15 @@ export function recalcPlayerStats(
   s.sta += setEff.sta;
   s.int += setEff.int;
   s.spi += setEff.spi;
+  // Permanent Mirror-Shard grants (mirrored onto the entity at login/consume)
+  // join the gear totals so they feed every derivation below.
+  if (e.permanentStats) {
+    s.str += e.permanentStats.str;
+    s.agi += e.permanentStats.agi;
+    s.sta += e.permanentStats.sta;
+    s.int += e.permanentStats.int;
+    s.spi += e.permanentStats.spi;
+  }
   // Buff auras
   let bonusAp = setEff.ap;
   let bonusDodge = 0;

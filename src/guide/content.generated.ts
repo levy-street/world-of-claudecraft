@@ -1281,9 +1281,32 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Glimmermere",
       "Wyrmcult Tents",
       "Revenant Fields",
-      "Gravewyrm Sanctum"
+      "Gravewyrm Sanctum",
+      "The Tidegate"
     ],
     "welcome": "Captain Thessaly holds the wall at Highwatch — barely."
+  },
+  {
+    "id": "mirror_world",
+    "name": "The Mirror World",
+    "min": 15,
+    "max": 20,
+    "biome": "mirror",
+    "hub": "the Lumen Hollow",
+    "pois": [
+      "the Lumen Hollow",
+      "the Mirror Court",
+      "the Overlook",
+      "The Mirrormere",
+      "the Moonmeadow",
+      "the Sorrowstones",
+      "the Gloomcrags",
+      "the Darkwood",
+      "Witch's Hollow",
+      "Stargazer's Ledge",
+      "the Black Canyon"
+    ],
+    "welcome": "The glass remembers you. Mind which side of it you walk."
   }
 ];
 

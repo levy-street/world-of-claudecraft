@@ -58,6 +58,10 @@ export function paintTerrainRows(
         r = 92;
         g = 100;
         b = 82;
+      } else if (biome === 'mirror') {
+        r = 84;
+        g = 80;
+        b = 100;
       }
       if (h < waterLevelAt(x, z)) {
         r = 38;
@@ -76,6 +80,27 @@ export function paintTerrainRows(
         r = 88;
         g = 102;
         b = 62;
+      }
+      if (biome === 'mirror') {
+        // re-cool every band: the glass country is slate
+        if (h < wl) {
+          r = 46;
+          g = 48;
+          b = 74;
+        } // Mirrormere silver-dark
+        else if (h > 26) {
+          r = 132;
+          g = 130;
+          b = 148;
+        } else if (h > 11) {
+          r = 108;
+          g = 104;
+          b = 126;
+        } else if (h > 6) {
+          r = 92;
+          g = 88;
+          b = 110;
+        }
       }
       let nearHub = false;
       for (const zn of ZONES) {

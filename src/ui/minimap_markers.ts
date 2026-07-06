@@ -162,7 +162,9 @@ export function createMinimapMarkers(): MinimapMarkers {
           markers.push({ kind: 'npc', mx, my, glyph: hasReady ? '?' : hasAvail ? '!' : '•' });
         } else if (
           e.kind === 'object' &&
-          (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
+          (e.templateId === 'dungeon_door' ||
+            e.templateId === 'dungeon_exit' ||
+            e.templateId === 'portal_pad')
         ) {
           markers.push({ kind: 'portal', mx, my });
         } else if (e.kind === 'object' && e.lootable) {

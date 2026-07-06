@@ -22,7 +22,7 @@ import {
   skinTexture,
   tintedFarMaterials,
 } from './assets';
-import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import type { EmoteClipSpec, ProcAttackKind, VisualDef, WeaponLayoutOverride } from './manifest';
 
 export type { AnimState, BaseState } from './anim_state';
 
@@ -38,6 +38,172 @@ const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
+
+// ---------------------------------------------------------------------------
+// Procedural attack overlay — for the Mirror World's walk-only Tripo quadrupeds
+// (gloaming maw / voidfang / spirit unicorn) whose GLB ships ONLY a 'Walk' clip
+// and so has no baked swing. On a sim swing (playAttack) a short
+// load->strike->recover clock curls the rig's Tripo head/spine bone chain on top
+// of whatever the Walk clip poses that frame, plus a brief forward lunge. It is a
+// quaternion POST-multiply applied AFTER mixer.update() (the same layer as the
+// swim pitch), so the next mixer.update() overwrites it and it never accumulates.
+// Bones live in the source Tripo Z-up frame (inside the orient wrapper), so axis
+// and sign are tuning knobs verified against the live renderer, not assumed.
+// ---------------------------------------------------------------------------
+type Axis3 = 'x' | 'y' | 'z';
+
+interface ProcBoneShare {
+  /** GLB node name (Tripo bone) */
+  n: string;
+  /** signed share of peakDeg this bone rotates (tip-biased along the chain) */
+  w: number;
+  /** normalized envelope phase delay 0..1 (a tail flick lags the strike) */
+  phase?: number;
+}
+
+interface ProcAttackSpec {
+  axis: Axis3;
+  /** global sign flip for the pitch */
+  sign: number;
+  /** base peak rotation (deg); each bone rotates w * peakDeg about `axis` */
+  peakDeg: number;
+  durSec: number;
+  /** forward body lunge in world units (+Z faces the target at facing-0) */
+  lunge: number;
+  lungeSign: number;
+  bones: ProcBoneShare[];
+  // shared amount curve a(u): ease to `loadVal` (wind-up), fast snap to
+  // `strikeVal` (the strike), brief hold, then ease to 0 with `overshoot`.
+  loadFrac: number;
+  loadVal: number;
+  strikeFrac: number;
+  strikeVal: number;
+  holdFrac: number;
+  overshoot: number;
+  // forward-lunge bump: a half-sine peaking inside [lungeStart, lungeStart+span]
+  lungeStart: number;
+  lungeSpan: number;
+}
+
+const clamp01 = (t: number): number => (t < 0 ? 0 : t > 1 ? 1 : t);
+const smooth = (t: number): number => t * t * (3 - 2 * t);
+
+/** signed amount a(u) for a procedural attack over its normalized clock u∈[0,1] */
+function procAmount(u: number, s: ProcAttackSpec): number {
+  if (u <= 0) return 0;
+  if (u < s.loadFrac) return smooth(u / s.loadFrac) * s.loadVal;
+  const strikeEnd = s.loadFrac + s.strikeFrac;
+  if (u < strikeEnd) {
+    const k = (u - s.loadFrac) / s.strikeFrac;
+    return s.loadVal + k * k * (s.strikeVal - s.loadVal); // ease-in: the snap is fast
+  }
+  const holdEnd = strikeEnd + s.holdFrac;
+  if (u < holdEnd) return s.strikeVal;
+  const k = clamp01((u - holdEnd) / Math.max(1e-3, 1 - holdEnd));
+  return s.strikeVal * (1 - smooth(k)) + s.overshoot * Math.sin(Math.PI * k);
+}
+
+/** forward-lunge bump 0..1 over the strike window */
+function procLunge(u: number, s: ProcAttackSpec): number {
+  return Math.sin(Math.PI * clamp01((u - s.lungeStart) / s.lungeSpan));
+}
+
+const PROC_ATTACKS: Record<ProcAttackKind, ProcAttackSpec> = {
+  // maw: gape the 4-segment mouth wide (a:0→+1), then snap shut a hair past
+  // neutral (a:+1→-0.15) for a fanged clack; the front end dips and lunges on
+  // the bite. Tip-biased so the jaw hinges open instead of rotating as a block.
+  chomp: {
+    // local-z is the head-chain pitch axis on these Tripo quadruped exports; the
+    // maw's chain is mirrored vs the hound/unicorn, so its sign is negated (z/-1
+    // sends the mouth down+forward). Chain rotations COMPOUND, so keep the summed
+    // weight small (~1.55 -> ~40deg at the jaw tip): a clean down-bite, not the
+    // contorted gullet-curl an aggressive tip-bias produced. No spine bone (its
+    // counter-rotation was what bent the neck weirdly) — the lunge carries the drive.
+    axis: 'z',
+    sign: -1,
+    peakDeg: 26,
+    durSec: 0.4,
+    lunge: 0.5,
+    lungeSign: 1,
+    bones: [
+      { n: 'tripoHead_0', w: 0.35 },
+      { n: 'tripoHead_1', w: 0.4 },
+      { n: 'tripoHead_2', w: 0.4 },
+      { n: 'tripoHead_3', w: 0.4 },
+    ],
+    // brief rear-up wind, decisive down-bite, short hold, ease back.
+    loadFrac: 0.25,
+    loadVal: -0.22,
+    strikeFrac: 0.2,
+    strikeVal: 1,
+    holdFrac: 0.08,
+    overshoot: -0.08,
+    lungeStart: 0.25,
+    lungeSpan: 0.32,
+  },
+  // voidfang: cock the head back (a:0→-0.28), then whip it down+forward into the
+  // pounce (a:-0.28→+1); the back arches with the strike, a fast light snap.
+  lungeBite: {
+    // z/+1 snaps the head down (measured dUp -0.37 at full strike).
+    axis: 'z',
+    sign: 1,
+    peakDeg: 46,
+    durSec: 0.45,
+    lunge: 0.32,
+    lungeSign: 1,
+    bones: [
+      { n: 'tripoHead_0', w: 0.3 },
+      { n: 'tripoHead_1', w: 0.35 },
+      { n: 'tripoHead_2', w: 0.35 },
+      { n: 'tripoSpine_2', w: 0.22 },
+      { n: 'tripoSpine_1', w: 0.1 },
+    ],
+    loadFrac: 0.3,
+    loadVal: -0.28,
+    strikeFrac: 0.22,
+    strikeVal: 1,
+    holdFrac: 0,
+    overshoot: -0.08,
+    lungeStart: 0.28,
+    lungeSpan: 0.3,
+  },
+  // unicorn: lift the horn to load (a:0→-0.32), drive it down+forward to gore
+  // (a:-0.32→+1), hold the skewer, then toss the head up on recover.
+  gore: {
+    // z/+1 dips the horn down+forward (measured down at the horn-base joint; the
+    // horn tip beyond it swings further). A touch stronger than the design's 22deg
+    // so the gore reads decisively on the small unicorn body.
+    axis: 'z',
+    sign: 1,
+    peakDeg: 32,
+    durSec: 0.5,
+    lunge: 0.32,
+    lungeSign: 1,
+    bones: [
+      { n: 'tripoHead_1', w: 1.0 },
+      { n: 'tripoHead_0', w: 0.64 },
+      { n: 'tripoSpine_1', w: 0.27 },
+      { n: 'tripoSpine_0', w: 0.14 },
+    ],
+    loadFrac: 0.28,
+    loadVal: -0.32,
+    strikeFrac: 0.22,
+    strikeVal: 1,
+    holdFrac: 0.08,
+    overshoot: -0.12,
+    lungeStart: 0.28,
+    lungeSpan: 0.3,
+  },
+};
+
+interface ResolvedProcAttack {
+  spec: ProcAttackSpec;
+  axis: THREE.Vector3;
+  bones: { bone: THREE.Object3D; w: number; phase: number }[];
+}
+
+// scratch for the per-frame bone post-multiply (no per-frame allocation)
+const _procQuat = new THREE.Quaternion();
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -99,8 +265,13 @@ export class CharacterVisual {
   private initialized = false;
   private attackIdx = 0;
   private hitCooldown = 0;
+  private frozePose = false;
   private pendingDt = 0;
   private swimPitch = 0;
+  /** resolved bone chain for a walk-only rig's procedural swing (null otherwise) */
+  private procAttack: ResolvedProcAttack | null = null;
+  /** procedural-attack clock in seconds; < 0 means no swing in progress */
+  private attackClock = -1;
 
   private shadowOn = true;
   private far = false;
@@ -198,6 +369,33 @@ export class CharacterVisual {
       idle.play();
       this.current = idle;
     }
+
+    this.resolveProcAttack();
+  }
+
+  /** Resolve the procedural-attack bone chain by name (walk-only rigs only). Cached
+   *  once; missing bones are skipped so a rig/name mismatch degrades gracefully. */
+  private resolveProcAttack(): void {
+    const kind = this.def.proceduralAttack;
+    if (!kind) return;
+    const spec = PROC_ATTACKS[kind];
+    const bones: ResolvedProcAttack['bones'] = [];
+    for (const b of spec.bones) {
+      // GLTFLoader sanitizes node names (strips [].:/), so try both spellings.
+      const node =
+        this.model.getObjectByName(b.n) ?? this.model.getObjectByName(b.n.replace(/[[\].:/]/g, ''));
+      if (node) bones.push({ bone: node, w: b.w, phase: b.phase ?? 0 });
+    }
+    if (bones.length === 0) return; // nothing resolved — leave the swing a no-op
+    this.procAttack = {
+      spec,
+      axis: new THREE.Vector3(
+        spec.axis === 'x' ? 1 : 0,
+        spec.axis === 'y' ? 1 : 0,
+        spec.axis === 'z' ? 1 : 0,
+      ),
+      bones,
+    };
   }
 
   // -------------------------------------------------------------------------
@@ -207,6 +405,14 @@ export class CharacterVisual {
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean): void {
+    // Statue mode: hold the first idle frame forever — stone does not sway.
+    if (this.def.frozen) {
+      if (!this.frozePose) {
+        this.frozePose = true;
+        this.poseFreeze([this.def.clips.idle], 0);
+      }
+      return;
+    }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
 
     // death is a level sim-side — edge-trigger the clip locally
@@ -259,11 +465,47 @@ export class CharacterVisual {
       }
     }
 
+    // procedural swing clock: advances in wall-time even while throttled so a
+    // distant swing still elapses; the pose itself is only applied when animating.
+    if (this.attackClock >= 0) {
+      this.attackClock += dt;
+      if (!this.procAttack || this.attackClock >= this.procAttack.spec.durSec) {
+        this.attackClock = -1;
+        this.poseWrap.position.z = 0;
+      }
+    }
+
     this.pendingDt = Math.min(MIXER_DT_CAP, this.pendingDt + dt);
     if (animate) {
       this.mixer.update(this.pendingDt);
       this.pendingDt = 0;
+      this.applyProcAttack();
     }
+  }
+
+  /** Curl the resolved bone chain over the live clip pose for the current swing
+   *  frame. Runs AFTER mixer.update() so it wins over the Walk clip; a pure
+   *  quaternion post-multiply the next mixer.update() overwrites, so it never
+   *  accumulates. No-op unless a procedural swing is in progress. */
+  private applyProcAttack(): void {
+    const pa = this.procAttack;
+    if (!pa || this.attackClock < 0) return;
+    if (this.deadLock) {
+      // died mid-swing — drop the overlay so the chomp never rides the death pose
+      this.attackClock = -1;
+      this.poseWrap.position.z = 0;
+      return;
+    }
+    const s = pa.spec;
+    const u = Math.min(1, this.attackClock / s.durSec);
+    const peak = THREE.MathUtils.degToRad(s.peakDeg) * s.sign;
+    for (const b of pa.bones) {
+      const a = procAmount(clamp01(u - b.phase), s) * b.w;
+      if (a === 0) continue;
+      _procQuat.setFromAxisAngle(pa.axis, a * peak);
+      b.bone.quaternion.multiply(_procQuat);
+    }
+    this.poseWrap.position.z = s.lunge * procLunge(u, s) * s.lungeSign;
   }
 
   // -------------------------------------------------------------------------
@@ -279,6 +521,12 @@ export class CharacterVisual {
 
   playAttack(): void {
     if (this.deadLock) return;
+    // walk-only rigs animate the swing procedurally (a bone overlay), (re)starting
+    // the clock and leaving the locomotion loop live — no one-shot clip.
+    if (this.procAttack) {
+      this.attackClock = 0;
+      return;
+    }
     const clips = this.def.clips.attack;
     if (clips.length === 0) return;
     const name = clips[this.attackIdx++ % clips.length];
@@ -491,6 +739,7 @@ export class CharacterVisual {
 
   dispose(): void {
     this.disposed = true;
+    this.procAttack = null; // bone refs belong to the skeleton disposed below
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
     this.root.removeFromParent();

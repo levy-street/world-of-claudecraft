@@ -3747,6 +3747,7 @@ export const tr_TR: EnTranslations = {
       "eatingDrinking": "Yenip İçiliyor...",
       "secondsRemaining": "{seconds} saniye kaldı",
       "enteringZone": "{zone} bölgesine giriliyor.",
+      "deepdreamZone": "Derin Rüya",
       "welcomeZone": "{zone} bölgesine hoş geldin!",
       "levelBanner": "Seviye {level}!",
       "levelLog": "{level}. seviyeye ulaştın!",
@@ -4388,6 +4389,13 @@ export const tr_TR: EnTranslations = {
       "nythraxisDeathlessKingWarning": "Üç kutsal emanet de aynı hikayeyi anlatıyor: Aldren kralını savunmak için savaştı, Malric ölümün sınırını aştı ve Voss ardından gelene engel olmaya çalıştı. Mühür zayıflıyor ve terk edilmiş mahzen aşağı inen yol.",
       "browseGoods": "Mallarına bir göz atayım.",
       "browseGoodsAria": "{name} kişisinin mallarına göz at",
+      "brewDraught": "Bana bir Derinrüya İksiri demle.",
+      "brewDraughtAria": "{name}'dan bir Derinrüya İksiri demlemesini iste",
+      "gargoyleBow": "Eğil.",
+      "gargoyleBowAria": "{name} önünde eğil",
+      "gargoyleAttack": "Saldır.",
+      "gargoyleAttackAria": "{name} üzerine saldır",
+      "gargoyleShimmer": "Heykel enerjiyle titreşiyor...",
       "worldMarket": "Bana Dünya Pazarı'nı göster.",
       "worldMarketAria": "Dünya Pazarı'nı aç",
       "accept": "Kabul Et",
@@ -5867,6 +5875,45 @@ export const tr_TR: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Güneşyaprağı Orağı"
       },
+      "white_sheet": {
+        "name": "Beyaz Çarşaf"
+      },
+      "spirit_horn": {
+        "name": "Ruh Boynuzu"
+      },
+      "black_hood": {
+        "name": "Kara Kukuleta"
+      },
+      "deepdream_draught": {
+        "name": "Derinrüya İksiri"
+      },
+      "mirror_shard": {
+        "name": "Ayna Parçası"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Hayaletimsi Ayna Kılıcı"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Hayaletimsi Kefen Pelerini"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Hayaletimsi Hortlak Yeleği"
+      },
+      "ghostly_palegrips": {
+        "name": "Hayaletimsi Soluk Kavramalar"
+      },
+      "ghostly_hushboots": {
+        "name": "Hayaletimsi Sessiz Çizmeler"
+      },
+      "ghostly_glasscord": {
+        "name": "Hayaletimsi Cam Kuşağı"
+      },
+      "warden_sigil": {
+        "name": "Muhafız Mührü"
+      },
+      "drowned_lumen": {
+        "name": "Boğulmuş Lümen"
+      },
       "bristleback_maul": {
         "name": "Gallowglass Balyozu"
       },
@@ -6667,6 +6714,36 @@ export const tr_TR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Uyanmış Fırtına Dölü"
       },
+      "spirit_unicorn": {
+        "name": "Ruh Tekboynuzu"
+      },
+      "hooded_reaper": {
+        "name": "Orakçı"
+      },
+      "mistshade_lurker": {
+        "name": "Sis gölgesi pusucusu"
+      },
+      "gloaming_maw": {
+        "name": "Alacakaranlık Ağzı"
+      },
+      "poverty_ghost": {
+        "name": "Yoksulluk Hayaleti"
+      },
+      "player_echo": {
+        "name": "Yankı"
+      },
+      "gargoyle_awakened": {
+        "name": "Gargoyl Nöbetçisi"
+      },
+      "gloomhulk": {
+        "name": "Kasvet Devi"
+      },
+      "mirrorbound_sentry": {
+        "name": "Ayna Nöbetçisi"
+      },
+      "voidfang_stalker": {
+        "name": "Solukdiş Sürücü"
+      },
       "ironvein_foreman": {
         "name": "Demirdamar Ustabaşı"
       },
@@ -6896,6 +6973,51 @@ export const tr_TR: EnTranslations = {
         "name": "Solgun Bekçi",
         "title": "Ölülerin Muhafızı",
         "greeting": "Dinlen şimdi, ruh. Seni bedenine geri döndürebilirim, ama geri geçiş seni güçsüz bırakır."
+      },
+      "keeper_nerissa": {
+        "name": "Uyumaz Nerissa",
+        "title": "Lumen Tacının Hayalet Bekçisi",
+        "greeting": "Lümen Tacı'nı hayatta korudum, ve Taç camı dürüst tutar - bu vadideki her ayna gerçek bir şey gösterir, biri hariç. Ölüm beni görevden azat etmedi, {playerName}, çünkü o biri hâlâ bastırmaktan vazgeçmiyor. Tacın ışığı sönüyor, ve nerede zayıflarsa vadi oradan sızıyor. Camın hangi tarafında yürüdüğüne dikkat et. Son zamanlarda onu ayırt etmekte zorlanıyor."
+      },
+      "veilwright_ollo": {
+        "name": "Perde Dokuyucusu Ollo",
+        "title": "Perde Pazarı Taciri",
+        "greeting": "Ölülerin paltoları, şişelenmiş iç çekişler, dürüst fiyatlar - peçe sağlar. Tezgâhımdaki her şeyi artık hiçbir şeyi olmayan biri bıraktı; hüner, ölülerin işinin bittiğini hâlâ kavradıklarından ayırmakta. Yanılırsan gece yarısı tezgâha gelirler. Üzücü hâlini istersen kuyudaki ışığı Muhafız'a sor. Ben yalnızca paltoları satarım."
+      },
+      "mistwitch_morwen": {
+        "name": "Sis Cadısı Morwen",
+        "title": "Çukurun Düş Demleyicisi",
+        "greeting": "Sis çoğunuzu uyutmaz. Ben sana öteki uykuyu demlerim — cevap veren türden."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Gargoyl Nöbetçisi",
+        "title": "Aynanın Muhafızı",
+        "greeting": "Taş gözler gıcırdayarak sana döner. Dinliyor."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Gargoyl Nöbetçisi",
+        "title": "Aynanın Muhafızı",
+        "greeting": "Taş gözler gıcırdayarak sana döner. Dinliyor."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Gargoyl Nöbetçisi",
+        "title": "Aynanın Muhafızı",
+        "greeting": "Taş gözler gıcırdayarak sana döner. Dinliyor."
+      },
+      "dread_sentinel_a": {
+        "name": "Dehşet Nöbetçisi",
+        "title": "Karanlık Ayna Bekçisi",
+        "greeting": "Ölümün seni bekliyor."
+      },
+      "dread_sentinel_b": {
+        "name": "Dehşet Nöbetçisi",
+        "title": "Karanlık Ayna Bekçisi",
+        "greeting": "Geçidi hayatta tuttuk. Hâlâ tutuyoruz."
+      },
+      "dread_sentinel_c": {
+        "name": "Dehşet Nöbetçisi",
+        "title": "Karanlık Ayna Bekçisi",
+        "greeting": "Geri dön. Kara cam yaşayanlar için değil... bizim için de hiç olmadı."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const tr_TR: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "Derin Uyku Tarifi",
+        "text": "İksir üç ses ister, {playerName}: başka hiçbir şeyi olmayan yoksulluk hayaletlerinden iki beyaz çarşaf, alacakaranlıkta otlayan ruh tekboynuzlarından iki boynuz ve kuşağı gözetleyen orakçılardan kesilmiş iki kukuleta. Getir, sana dişli bir uyku kaynatayım.",
+        "completion": "Çarşaf, boynuz, kukuleta — yoksullar, ışıyanlar, sabırlılar. Kazan senden hoşlandı. Yumuşak bir yerde iç, gezgin: hep taşıdığın kişiyle karşılaşacaksın.",
+        "objectives": {
+          "0": {
+            "label": "Beyaz Çarşaf"
+          },
+          "1": {
+            "label": "Ruh Boynuzu"
+          },
+          "2": {
+            "label": "Kara Kukuleta"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Yankınla Yüzleş",
+        "text": "İksiri iç, düş önüne bir ayna dikecek — Yankın; her yara izin, her numaran öbür tarafta. Ne isen onu yen, {playerName}, ve o anki yüzünü bana geri getir.",
+        "completion": "Sen döndün, ayna dönmedi. Elinde bıraktığı şey senindir — düş o bedeli yalnız bir kez öder.",
+        "objectives": {
+          "0": {
+            "label": "Yankın yenildi"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "Bekçinin Geçiş Bedeli",
+        "text": "Parıltı gözlerinin ardında söze dönüşür: orakçılar camımı dolduruyor, {playerName}. Onları seyrelt, Highwatch yolu senin olsun.",
+        "completion": "Taş bir kez, hoşnut, uğuldar. Ardında ayna, sonunda bırakılan tutulmuş bir nefes gibi berraklaşır.",
+        "objectives": {
+          "0": {
+            "label": "Orakçı öldürüldü"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "Çarşaflardan Bir Bedel",
+        "text": "Parıltı gözlerinin ardında söze dönüşür: yoksul ölülerden bana dört beyaz çarşaf getir, {playerName}. Eastbrook yolu, bezle ödeyene açılır.",
+        "completion": "Çarşaflar taşın içine gömülür ve yok olur. Ardındaki ayna ışıkla uyanır.",
+        "objectives": {
+          "0": {
+            "label": "Beyaz Çarşaf"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Biçilen Işıltı",
+        "text": "Parıltı gözlerinin ardında söze dönüşür: ruh sürüleri cam için fazla parlak yanıyor, {playerName}. Beş tanesini biç, Fenbridge bir adım ötede.",
+        "completion": "Taş, döktüğün ışığı içer. Ardındaki ayna bir göz gibi açılır.",
+        "objectives": {
+          "0": {
+            "label": "Ruh Tekboynuzu öldürüldü"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "Sönen Parıltı",
+        "text": "Soğukluğumu duyup beni bir efsane sanıyorsun. Ben bir nöbetim, {playerName}. Koruduğum Lümen Tacı altın bir halka değil: buradaki her aynanın ışığı, dirilerle ölüleri ayrı yansımalarda tutan, birinin ötekini boğmasını önleyen dikiştir. O ışık sönüyor, ve bunu Ayna Nöbetçilerinde görürsün: bir zamanlar Tacın ışıltısı nöbet tutardı, şimdi çalınmış ışıkla dolu camdan başka bir şey değiller; kuzey harabelerini dolduruyorlar, çünkü dikiş artık nerede duracaklarını söylemiyor. Sekizini kır. Dağıttığın her kıymık, geri verilen bir tutam ışık - ve gerisi için sana güvenilebileceğinin bir tutam kanıtıdır.",
+        "completion": "Kıymıklar yukarı düşen kar gibi kuyuya doğru süzülüyor, ve bir nefeslik süre bütün vadi bir ton daha aydınlanıyor. Sürmez. Ama sen dikişleri kesmek yerine onarıyorsun, {playerName}: bu burada sandığından daha nadirdir. ÖTEKİ tacı da kırdın, değil mi? Thornpeak'in altındaki demir olanı. Öyleyse üç yüz yılda ilk kez bu ışık geri gelebilir. Kal. Vadi, yaraları kapatan eller için çok bekledi.",
+        "objectives": {
+          "0": {
+            "label": "Ayna Nöbetçisi paramparça"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "Yoksulların Hâlâ Sakladığı",
+        "text": "Güney kıyısındaki Yoksul Hayaletlerin sağlığında hiçbir şeyi yoktu, {playerName}: gömüldükleri örtüden başka; çünkü cemaat bir tabuta gücü yetmiyordu. Şimdi Tacın ışığı, tutuşlarını gevşetemeyecek kadar ince, ve kendilerine ait olan tek şeyi kavrayarak dolanıyorlar. Bunu zalimlik sanma; kendine yer bulamayan bir sevgidir bu. Bana beş örtülerini getir. Her birini kuyuya yatırıp, oyulacak kadar bile parası olmayan adı söyleyeceğim. Bütün ayin bundan ibaret: yoksul olmak, ölü olmak, ve yine de adıyla çağrılmak.",
+        "completion": "Beş örtü, beş ad. Onları kuyuya söylüyorum, ve su onları, bir annenin uyuyan çocuğun üstünden paltoyu alışı gibi alıyor. Kıyıdaki hayaletler bu gece daha az, {playerName}: öldürülmüş değil, azat edilmiş. Bütün Tacın yaptığı buydu: ölüleri bırakabilecek kadar yakın tutmak. Şimdi bunu elle yapıyoruz, sen ve ben, her seferinde beş ad. Daha yavaş. Hiçbir şey değil, değil.",
+        "objectives": {
+          "0": {
+            "label": "Beyaz Örtü"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "Muhafızların Adları",
+        "text": "Kara Kanyon'da volta atan üçüne, onlardan kaçanlar Dehşet Nöbetçileri der. Bir zamanlar onları adlarıyla çağırdım: onlar benim tarikatımdı, {playerName}, Samur Ayna'nın geçidini hayatta tutan son adamlar; ve kalpleri durduğunda bile nöbeti bırakmadılar. Artık hiçbir kılıç onları kurtarmaz; kara cam onları düşemeyecek kadar derinden sürüyor. Ama o cam, muhafızlardan geçidi dolduran orakçılara sıçradı, ve uzun yıllar boyunca orakçılar muhafızların mühürlerini koparıp aldı. Bana üç tane getir, kanyonun orakçılarından kesilmiş, ki üç adı son bir kez yüksek sesle söyleyeyim.",
+        "completion": "Corwin. Aldous. Brenna. İşte: söylendiler, ve söylemek, onları tutmanın hiç olmadığı kadar hafif. Yakında durabilecekler; bunu ben sağlarım. Ama yaklaşana dikkat et, {playerName}: koparılıp alınan mühürler, o geçidin camının inceldiği anlamına gelir, ve ucundaki yara tam da bunu bekliyordu. Öteki taraftan bir şey kapının açıkta kaldığını fark etmeden Tacı yeniden yakmalı ve Samur'u payandalamalıyım. İhtiyacım olan son bir şey var - ve kara suyun altında yatıyor.",
+        "objectives": {
+          "0": {
+            "label": "Muhafız Mührü"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "Camın İstediği",
+        "text": "Yankı'nı yendin ve bunu bir öz sınavı sandın, {playerName}. Değildi. Ben Derin Düş'ü örtüden, boynuzdan ve başlıktan damıtırım, ama düşünün karşısına ayna diktiği şey, senin yüzünle içeri giren o şey, onu ben damıtmam. O, kanyonun kara camından sızar. Kanyon ağzını dolduran orakçılar aynı sızıntıyla kalınlaşmış; sekizini devir ve gölgelerinin nereye süründüğüne bak. O zaman Nerissa'nın kendi gözlerine, yarasının gerçekte nerede kanadığını göstereceğim.",
+        "completion": "Kuzeydoğuya. Hep kuzeydoğuya, hep Samur'a doğru — gördün mü? Yankın SEN değildin, gezgin. O kapının ardında her ne yaşıyorsa, ondan bir kıymıktı; çalabildiği en yakın yansımayı giymişti: seninkini. Rüya, sızıntının bulduğu en ince yerdir yalnızca; kanyon ise en geniş. Nerissa'ya söyle. Bunun gerçeğini hak etti, sen de.",
+        "objectives": {
+          "0": {
+            "label": "Kanyon ağzında Orakçı devrildi"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Lümen Tacı'nı Yeniden Yak",
+        "text": "Muhafızların adları söylendi ve geçit inceliyor, o yüzden şimdi öldüğümden beri ertelediğimi yapmalıyım: Lümen Tacı'nı son bir kez yakıp Samur'u bu taraftan kapalı tutmalıyım. Tacın son gerçek kıvılcımını, gölete düştüğünde Alacakaranlık Ağzı yuttu — o yüzden o şey içten içe parlar. Işığı ondan geri kes, {playerName}. Kara cam, ayini durdurmak için kasvet devlerini yollayacak; dördünü devir. Ben hâlâ birini nasıl tutacağımı hatırlarken bana boğulmuş bir kıvılcım getir. Bir bekçinin son görevi, artık beklemeye ihtiyacı olmayan biri hâline gelmektir.",
+        "completion": "Yanıyor. Onca karanlığın ardından hâlâ elimi tanıyor. Bak: cam yeniden GERÇEK; suyun ardında bir kalp atışı yok, bir dünya ile yansıması arasında yitmiş bir ruh yok. Ve yük nihayet üstümden kalktı. Yok olmuyorum, {playerName}; NÖBETİM devralınıyor. Bu, Samur'u kırmak değil, yalnızca tutmaktır; orada bekleyeni kıracak gücüm yok, ve buna cüret de etmezdim. Ama bir çağ daha tutuldu mu, tutulmuştur. Bizden daha yürekli bir bölük o kapıdan sonunda İÇERİ girdiğinde, öte tarafı hazır bulacaklar. Highwatch'ta söyle: bekçileri nöbeti sonuna dek tuttu, sonra da devraldılar. Cam seni anacak. Ona yansıtmaya değer bir şey vermeye bak.",
+        "objectives": {
+          "0": {
+            "label": "Alacakaranlık Ağzı öldürüldü"
+          },
+          "1": {
+            "label": "Boğulmuş Lümen"
+          },
+          "2": {
+            "label": "Kasvet Devi kırıldı"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Boğulmuş Koro",
         "text": "Su yürüyücüleri tek başına hareket etmiyor. Aralarında Boğulmuş Müritler yürüyor — tapınakla birlikte batan tarikat, hâlâ çürümüş cüppeleri içinde, hâlâ kıyı kayalarından duayı söyleyerek. Sekizini sustur ve bana taşıdıkları adaklardan altısını getir. Tanrıçalarına ne sunmak istediklerini öğrenmek istiyorum.",
@@ -7870,6 +8104,48 @@ export const tr_TR: EnTranslations = {
           },
           "9": {
             "label": "Mezarejderi Mabedi"
+          },
+          "10": {
+            "label": "Ayna Kapısı"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "Ayna Dünyası",
+        "welcome": "Cam seni hatırlıyor. Onun hangi tarafında yürüdüğüne dikkat et.",
+        "pois": {
+          "0": {
+            "label": "Ayna Dünyası"
+          },
+          "1": {
+            "label": "Ayna Kapısı Meydanı"
+          },
+          "2": {
+            "label": "Lumen Tacı"
+          },
+          "3": {
+            "label": "Perdeli Pazar"
+          },
+          "4": {
+            "label": "Sessiz Arşiv"
+          },
+          "5": {
+            "label": "Ayna Gölü"
+          },
+          "6": {
+            "label": "Sis Bataklığı"
+          },
+          "7": {
+            "label": "Cadı Çukuru"
+          },
+          "8": {
+            "label": "Eastbrook Aynası"
+          },
+          "9": {
+            "label": "Fenbridge Aynası"
+          },
+          "10": {
+            "label": "Kara Kanyon"
           }
         }
       }

@@ -1,3 +1,4 @@
+import { MIRROR_LAYOUT } from './content/mirror_world';
 import { DUNGEON_FLOOR_Y, DUNGEON_X_THRESHOLD, getActiveWorldContent, WORLD_MAX_X } from './data';
 import { fbm2, hash2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent } from './types';
@@ -84,15 +85,23 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   desert: { hill: 15, base: 2.5, hubHeight: 2 },
   volcano: { hill: 42, base: 9, hubHeight: 6 },
   cave: { hill: 9, base: 1, hubHeight: 1 },
+  // Placeholder shape only: the Mirror World band is fully replaced by
+  // mirrorSurface() below (vale bowl, terraces, mere, grotto).
+  mirror: { hill: 6, base: -2, hubHeight: 5.5 },
 };
 
 // Per-active-content derived terrain inputs: the ridge walls between zone bands
 // and the world z-bounds. Recomputed only when the active content object changes
 // (identity check), so the hot terrain path stays cheap. For the built-in world
 // these match the old module-level constants exactly.
+//
+// Each inter-zone ridge is opened by a road pass — except the Mirror World
+// trench seal (the band before a `mirror` zone), which has no pass and is too
+// steep to climb: the Mirrorgate portal pads are the only way across (see
+// content/mirror_world.ts).
 interface WorldDerived {
   content: WorldContent;
-  ridges: { z: number; passX: number }[];
+  ridges: { z: number; passX: number; sealed: boolean }[];
   minZ: number;
   maxZ: number;
 }
@@ -100,9 +109,13 @@ let derivedCache: WorldDerived | null = null;
 function world(): WorldDerived {
   const content = getActiveWorldContent();
   if (!derivedCache || derivedCache.content !== content) {
-    const ridges: { z: number; passX: number }[] = [];
+    const ridges: { z: number; passX: number; sealed: boolean }[] = [];
     for (let i = 0; i + 1 < content.zones.length; i++) {
-      ridges.push({ z: content.zones[i].zMax, passX: 0 });
+      ridges.push({
+        z: content.zones[i].zMax,
+        passX: 0,
+        sealed: content.zones[i + 1].biome === 'mirror',
+      });
     }
     derivedCache = {
       content,
@@ -120,6 +133,11 @@ function world(): WorldDerived {
 // tests/terrain_walls.test.ts guards this.
 const RIDGE_HEIGHT = 40;
 const RIDGE_SIGMA = 10; // gaussian width of the wall
+// The sealed Mirror World trench wall: no pass, taller and narrower so its face
+// stays steeper than PLAYER_MAX_CLIMB_SLOPE (1.5) even at the crest jitter's low
+// swing — the Mirrorgate pads are the only crossing.
+const SEAL_RIDGE_HEIGHT = MIRROR_LAYOUT.sealRidge.height;
+const SEAL_RIDGE_SIGMA = MIRROR_LAYOUT.sealRidge.sigma;
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
@@ -416,6 +434,142 @@ function baseHeight(x: number, z: number, seed: number): number {
       }
     }
   }
+  // The Mirror World (zone 4) replaces the generic shape wholesale: the black
+  // plain, the domed country's terraces, the mirror-pools, the grotto island.
+  // Blended in just past the trench seal so zone 3 keeps its exact shape.
+  if (z > MIRROR_BLEND_START) {
+    const t = smoothstep(MIRROR_BLEND_START, MIRROR_BLEND_END, z);
+    h = lerp(h, mirrorSurface(x, z, seed), t);
+  }
+  return h;
+}
+
+// ---------------------------------------------------------------------------
+// The Mirror World (zone 4) — the domed-country profile. A pure function of
+// (x, z): the whole landmass lives INSIDE the glass (only the black plain
+// beyond it). City terraces stack over the belt, which six radial berms split
+// into districts — each berm spans the full belt and is pierced by one gate,
+// so the paths through the gates are the only routes (the berm faces and the
+// terrace lips are steeper than the climb limit everywhere else). Pools carve
+// the in-dome mirror-water; the grotto island hides outside on the plain.
+// Layout numbers live in content/mirror_world.ts (MIRROR_LAYOUT) beside the
+// dome colliders and spawns that must stay in sync with them.
+// ---------------------------------------------------------------------------
+
+// The blend starts just NORTH of the trench-seal crest (z 900): the drop to
+// the ocean floor happens behind the wall, so the south climbing face keeps
+// its full rise and stays steeper than the climb limit along every column.
+const MIRROR_BLEND_START = 906;
+const MIRROR_BLEND_END = 934;
+// Terrace lips: ramp run at the stairs (walkable) vs off the stairs (steeper
+// than PLAYER_MAX_CLIMB_SLOPE, so the stairs and lift are the only ways up).
+const TERRACE_RAMP_RUN = 9;
+const TERRACE_CLIFF_RUN = 1.6;
+
+function angleDiff(a: number, b: number): number {
+  let d = a - b;
+  while (d > Math.PI) d -= 2 * Math.PI;
+  while (d < -Math.PI) d += 2 * Math.PI;
+  return Math.abs(d);
+}
+
+function mirrorSurface(x: number, z: number, seed: number): number {
+  const L = MIRROR_LAYOUT;
+
+  // ---- the vale bowl: rolling floor inside, an unclimbable mountain rim,
+  // ---- and highland beyond. q is the normalized ellipse radius (1 = rim).
+  const nx = (x - L.vale.x) / L.vale.rx;
+  const nz = (z - L.vale.z) / L.vale.rz;
+  const q = Math.hypot(nx, nz);
+  let h = L.valeFloor + (fbm2(x * 0.028 + 40, z * 0.028 + 40, seed + 23, 3) - 0.5) * 4;
+  // rim: rise 48 over ~0.16*rx ≈ 24 world units → slope ~2, no climbing over
+  const rimJitter = 1 + (fbm2(x * 0.02 + 7, z * 0.02 + 7, seed + 31, 2) - 0.5) * 0.2;
+  h += smoothstep(0.86, 1.02, q) * L.vale.rimHeight * rimJitter;
+
+  // ---- the Mirrormere: one real lake — wading shore into a swimmable bowl
+  {
+    const d = Math.hypot(x - L.lake.x, z - L.lake.z);
+    if (d < L.lake.r + 10) {
+      const t = smoothstep(L.lake.r * 0.5, L.lake.r + 10, d);
+      h = L.lake.floor * (1 - t) + h * t;
+    }
+  }
+
+  // ---- the town rise (flat crown, walkable skirt) and the Mirror Court
+  {
+    const d = Math.hypot(x - L.townRise.x, z - L.townRise.z);
+    if (d < L.townRise.r + 16) {
+      const t = smoothstep(L.townRise.r * 0.75, L.townRise.r + 16, d);
+      h = Math.max(h, L.townRise.h * (1 - t) + h * t);
+    }
+    const dc = Math.hypot(x - L.court.x, z - L.court.z);
+    if (dc < L.court.r + 8) {
+      const t = smoothstep(L.court.r * 0.7, L.court.r + 8, dc);
+      h = Math.max(h, L.court.h * (1 - t) + h * t);
+    }
+  }
+
+  // ---- graveyard knoll
+  {
+    const d = Math.hypot(x - L.knoll.x, z - L.knoll.z);
+    if (d < L.knoll.r + 14) {
+      const t = smoothstep(L.knoll.r * 0.5, L.knoll.r + 14, d);
+      h = Math.max(h, L.knoll.h * (1 - t) + h * t);
+    }
+  }
+
+  // ---- the witch's hollow: a shallow bowl, gentle approach from the SE
+  {
+    const d = Math.hypot(x - L.hollow.x, z - L.hollow.z);
+    if (d < L.hollow.r + 12) {
+      const t = smoothstep(L.hollow.r * 0.6, L.hollow.r + 12, d);
+      h = L.hollow.h * (1 - t) + h * t;
+    }
+  }
+
+  // ---- pockets carved into the wall: overlook (arrival), ledge (lift-only),
+  // ---- grotto (clouded-mirror only). Each flattens its disc; the rim keeps
+  // ---- everything around them sheer.
+  for (const p of [L.overlook, L.ledge, L.grotto]) {
+    const d = Math.hypot(x - p.x, z - p.z);
+    if (d < p.r * 1.9) {
+      const t = smoothstep(p.r * 0.75, p.r * 1.9, d);
+      h = p.h * (1 - t) + h * t;
+    }
+  }
+
+  // ---- the arrival stair: one walkable ramp from the overlook to the town
+  {
+    const st = L.stairs;
+    if (Math.abs(x - st.x) < st.halfWidth + 5 && z > st.zTop - 4 && z < st.zBottom + 6) {
+      const t = smoothstep(st.zTop, st.zBottom, z);
+      const ramp = st.hTop * (1 - t) + st.hBottom * t;
+      const lip = smoothstep(st.halfWidth, st.halfWidth + 5, Math.abs(x - st.x));
+      h = ramp * (1 - lip) + h * lip;
+    }
+  }
+
+  // ---- the black canyon: a walkable stone floor between sheer rim walls
+  {
+    const c = L.canyon;
+    let best = Infinity;
+    for (let i = 0; i < c.points.length - 1; i++) {
+      const a = c.points[i];
+      const b = c.points[i + 1];
+      const abx = b.x - a.x;
+      const abz = b.z - a.z;
+      const len2 = abx * abx + abz * abz;
+      const t = Math.max(0, Math.min(1, ((x - a.x) * abx + (z - a.z) * abz) / len2));
+      const d = Math.hypot(x - (a.x + abx * t), z - (a.z + abz * t));
+      if (d < best) best = d;
+    }
+    if (best < c.halfWidth + 4) {
+      const lip = smoothstep(c.halfWidth, c.halfWidth + 4, best);
+      const floor = 3.5 + (fbm2(x * 0.09, z * 0.09, seed + 61, 2) - 0.5) * 0.6;
+      h = floor * (1 - lip) + h * lip;
+    }
+  }
+
   return h;
 }
 
@@ -447,25 +601,32 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const beyond = Math.max(0, w.minZ - z, z - w.maxZ, Math.abs(x) - WORLD_MAX_X);
   const mountainDetail = 1 - smoothstep(OUTSIDE_FADE_START, OUTSIDE_FADE_END, beyond);
 
-  // Mountain ridge walls between zones, pierced by the road pass
+  // Mountain ridge walls between zones, pierced by the road pass. The sealed
+  // Mirror World trench wall is taller, narrower, and has no pass — the
+  // Mirrorgate pads are the only crossing.
   let mountainAdd = 0;
   for (const ridge of w.ridges) {
+    const sigma = ridge.sealed ? SEAL_RIDGE_SIGMA : RIDGE_SIGMA;
     const dz = Math.abs(z - ridge.z);
-    if (dz < RIDGE_SIGMA * 3) {
-      const profile = Math.exp(-(dz * dz) / (2 * RIDGE_SIGMA * RIDGE_SIGMA));
-      const pass = smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
+    if (dz < sigma * 3) {
+      const profile = Math.exp(-(dz * dz) / (2 * sigma * sigma));
+      const pass = ridge.sealed
+        ? 1
+        : smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
       // jagged crest so the wall reads as mountains, not a berm: a coarse layer
       // for peak/saddle shape plus a finer layer for crag/shoulder detail.
       // Combined variance kept tight so the lowest saddle still beats the
-      // climb limit (tests/terrain_walls.test.ts).
+      // climb limit (tests/terrain_walls.test.ts). The sealed trench wall keeps
+      // a single gentle crest so its face never dips below climb-blocking slope.
       // (each noise term is scaled by mountainDetail separately: multiplying
       // by an exact 1 keeps in-world samples bit-identical, where regrouping
       // the sum would drift them by ULPs and desync the parity goldens)
-      const crest =
-        1 +
-        (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4 * mountainDetail +
-        (fbm2(x * 0.11, ridge.z * 0.11, seed + 23, 2) - 0.5) * 0.14 * mountainDetail;
-      mountainAdd += RIDGE_HEIGHT * crest * profile * pass;
+      const crest = ridge.sealed
+        ? 1 + (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.2 * mountainDetail
+        : 1 +
+          (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4 * mountainDetail +
+          (fbm2(x * 0.11, ridge.z * 0.11, seed + 23, 2) - 0.5) * 0.14 * mountainDetail;
+      mountainAdd += (ridge.sealed ? SEAL_RIDGE_HEIGHT : RIDGE_HEIGHT) * crest * profile * pass;
     }
   }
 
@@ -477,7 +638,26 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X - 6, Math.abs(x));
   const rimS = smoothstep(w.minZ + 30, w.minZ + 6, z);
   const rimN = smoothstep(w.maxZ - 30, w.maxZ - 6, z);
-  const rim = Math.max(rimX, rimS, rimN);
+  let rim = Math.max(rimX, rimS, rimN);
+  // The Mirror World's black canyon is a designed walkable corridor out to the
+  // Sable gate in the NE rim zone. Release's terraced rim would stair-step a
+  // cliff across its floor, so open the rim along the canyon centreline (the
+  // wall still resumes just past the canyon lip, and the gate collider caps it).
+  if (z > MIRROR_LAYOUT.canyon.points[0].z - 8) {
+    const c = MIRROR_LAYOUT.canyon;
+    let cBest = Infinity;
+    for (let i = 0; i < c.points.length - 1; i++) {
+      const a = c.points[i];
+      const b = c.points[i + 1];
+      const abx = b.x - a.x;
+      const abz = b.z - a.z;
+      const len2 = abx * abx + abz * abz;
+      const ct = Math.max(0, Math.min(1, ((x - a.x) * abx + (z - a.z) * abz) / len2));
+      const cd = Math.hypot(x - (a.x + abx * ct), z - (a.z + abz * ct));
+      if (cd < cBest) cBest = cd;
+    }
+    rim *= smoothstep(c.halfWidth, c.halfWidth + 6, cBest);
+  }
   // The rim wall used to be a perfectly smooth berm (no noise at all), which
   // read as artificial from a distance. Give it the same two-layer jagged
   // crest as the inter-zone ridges: a coarse peak/saddle layer plus a finer
@@ -665,6 +845,10 @@ export function generateDecorations(seed: number): Decoration[] {
       } else if (biome === 'cave') {
         if (r > 0.16) continue;
         kind = 'rock';
+      } else if (biome === 'mirror') {
+        // the mist country: sparse rubble and the rare bare ghost-tree
+        if (r > 0.16) continue;
+        kind = r < 0.05 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
         kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';

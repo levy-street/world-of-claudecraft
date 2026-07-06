@@ -46,7 +46,7 @@ import {
   nameplateScreenTransform,
 } from './nameplate_projection';
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
-import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
+import { FRIENDLY, HOSTILE_PLAYER, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
 const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
@@ -206,11 +206,13 @@ export class NameplatePainter {
         // plate, and when the player has turned developer badges off.
         const devOutline =
           suppressSelf || !showDevBadges ? null : devTierNameOutlineColor(e.devTier ?? 0);
+        // a mutually-lethal player (the Deepdream Echo) must not read friendly blue
+        const hostilePlate = this.isHostilePlayer(e);
         this.setNameplateStatic(
           v,
-          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}`,
+          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}|${hostilePlate ? 'h' : ''}`,
           displayName,
-          roleColor ?? '#7fb8ff',
+          hostilePlate ? HOSTILE_PLAYER : (roleColor ?? '#7fb8ff'),
           hpDisplay,
           '',
           'np-marker',

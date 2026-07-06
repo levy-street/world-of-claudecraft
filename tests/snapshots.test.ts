@@ -1838,6 +1838,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
+  'bowed',
   'buyback',
   'cds',
   'corpse',
@@ -1981,6 +1982,7 @@ function dirtyEveryDeltaField(): {
   meta.restedXp = 222;
   meta.prestigeRank = 3;
   meta.delveMarks = 7;
+  meta.bowedGargoyles.add('court_south'); // 'bowed' delta key (gargoyle-bow state)
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
@@ -2147,9 +2149,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 31 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(31);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(31);
+  it('ALL_DELTA_KEYS contains exactly 32 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(32);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(32);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2161,7 +2163,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(31);
+    expect(scraped.size).toBe(32);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

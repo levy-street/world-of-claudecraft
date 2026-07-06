@@ -3624,6 +3624,37 @@
     white-space: nowrap;
   }
 
+  /* ---------- Deepdream sleep fade ---------- */
+  /* Full-screen indigo wash + blur that eases in as the Deepdream Draught takes
+     hold, then clears when the sleeper reaches the shadow realm. JS adds
+     .active (fade in over the fall-asleep hold) then removes it on arrival.
+     Above the world, below HUD frames; never eats pointer events. */
+  #dream-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(40, 30, 90, 0.35) 0%,
+      rgba(12, 8, 34, 0.86) 70%,
+      rgba(4, 2, 14, 0.98) 100%
+    );
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    transition: opacity 2.6s ease-in;
+  }
+  #dream-overlay.active {
+    opacity: 1;
+  }
+  body.reduce-motion #dream-overlay,
+  :root[data-fx-level="low"] #dream-overlay {
+    transition: opacity 0.4s linear;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
   /* ---------- low-health screen vignette ---------- */
   /* Pulsing red edge glow that fades in as the player nears death. Opacity and
      pulse cadence are driven from JS via the --lhv-* custom properties; the

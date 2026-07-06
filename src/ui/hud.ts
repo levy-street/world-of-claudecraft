@@ -48,6 +48,7 @@ import {
   dungeonAt,
   ITEMS,
   isDelvePos,
+  isDreamPos,
   MOBS,
   NPCS,
   QUESTS,
@@ -925,6 +926,7 @@ export class Hud {
   private resurrectHealerBtnEl = $('#resurrect-healer-btn');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
+  private dreamOverlayEl = document.getElementById('dream-overlay');
   private hotWriteCache = new Map<HTMLElement, string>();
   // Multi-slot caches for the per-frame writers: one element holds many
   // custom properties / toggled classes, so these key per (element, prop) and
@@ -3128,7 +3130,8 @@ export class Hud {
   // the marker core; redraws from the fastHud (~10Hz) band. classCss colors the party
   // discs/arrows; zoneDisplayName localizes the '#zone-label' it writes via setText.
   private readonly minimapPainter = new MinimapPainter(this.writerFacet, classCss, (zoneId) =>
-    zoneDisplayName(zoneId),
+    // the dream band has no zone entry; label it as the dream instead of the fallback
+    isDreamPos(this.sim.player.pos.x) ? t('hud.core.deepdreamZone') : zoneDisplayName(zoneId),
   );
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),
@@ -5565,6 +5568,9 @@ export class Hud {
     }
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
+    // The slumber fade covers the fall-asleep teleport; lift it as soon as the
+    // dreamer is standing in the dream band (waking is handled by 'respawn').
+    if (isDreamPos(p.pos.x)) this.dreamOverlayEl?.classList.remove('active');
     const currentZone = zoneAt(p.pos.z);
     if (mediumHud) {
       // zone transitions: banner + welcome hint when crossing into a new band.
@@ -7977,6 +7983,14 @@ export class Hud {
         }
         case 'respawn':
           this.log(t('hud.system.respawn'), '#7fdc4f');
+          // Waking from the Deepdream (or any teleport home) clears the sleep fade.
+          this.dreamOverlayEl?.classList.remove('active');
+          break;
+        case 'slumber':
+          // The draught took hold: ease the indigo sleep wash in over the
+          // fall-asleep hold; the shadow-realm arrival ('respawn') clears it.
+          this.dreamOverlayEl?.classList.add('active');
+          audio.death(); // a soft, low tone reads as drifting under
           break;
         case 'castStart':
           break; // cast-loop SFX is spatial now (see playEventSfx)
@@ -8962,7 +8976,7 @@ export class Hud {
     this.renderGossip(npc);
   }
 
-  private renderGossip(npc: Entity): void {
+  private renderGossip(npc: Entity, greetingOverride?: string): void {
     this.openGossipNpcId = npc.id;
     this.openQuestDetailId = null;
     const el = $('#quest-dialog');
@@ -8991,7 +9005,7 @@ export class Hud {
     const npcName = def ? npcDisplayName(npc.templateId) : mobDisplayName(npc.templateId);
     const npcTitle = def ? npcDisplayTitle(def.id) : '';
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(npcName)}<span class="quest-muted"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
-    html += `<div class="qd-text">"${esc(def ? npcGreeting(def.id, this.sim.cfg.playerClass, this.sim.player.name) : t('questUi.dialog.greetingFallback'))}"</div>`;
+    html += `<div class="qd-text">"${esc(greetingOverride ?? (def ? npcGreeting(def.id, this.sim.cfg.playerClass, this.sim.player.name) : t('questUi.dialog.greetingFallback')))}"</div>`;
     if (interesting.length > 0) {
       for (const qid of interesting) {
         const st = this.sim.questState(qid);
@@ -9024,6 +9038,25 @@ export class Hud {
         : t('delveUi.board.openDelve');
       html += `<button type="button" class="qd-list-item" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(openLabel)}</button>`;
     }
+    // Morwen brews a fresh Deepdream Draught on demand once her recipe quest is
+    // done — repeatable forever (the server re-validates parts + proximity).
+    const canBrew =
+      npc.templateId === 'mistwitch_morwen' && this.sim.questsDone.has('q_deepdream_recipe');
+    if (canBrew) {
+      html += `<button type="button" class="qd-list-item" data-brew="1" aria-label="${esc(t('questUi.dialog.brewDraughtAria', { name: npcName }))}"><span class="gold">${svgIcon('interact')}</span> ${esc(t('questUi.dialog.brewDraught'))}</button>`;
+    }
+    // Statue guardians: the mirror statues offer a courtesy or a challenge;
+    // the dread sentinels of the Black Mirror only offer the challenge. The
+    // server re-validates proximity; the wake swaps stone for the level-99 boss.
+    if (npc.templateId.startsWith('gargoyle_sentinel')) {
+      html += `<button type="button" class="qd-list-item" data-gargoyle-bow="1" aria-label="${esc(t('questUi.dialog.gargoyleBowAria', { name: npcName }))}"><span class="gold">${svgIcon('interact')}</span> ${esc(t('questUi.dialog.gargoyleBow'))}</button>`;
+    }
+    if (
+      npc.templateId.startsWith('gargoyle_sentinel') ||
+      npc.templateId.startsWith('dread_sentinel')
+    ) {
+      html += `<button type="button" class="qd-list-item" data-gargoyle-wake="1" aria-label="${esc(t('questUi.dialog.gargoyleAttackAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(t('questUi.dialog.gargoyleAttack'))}</button>`;
+    }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
       item.addEventListener('click', () =>
@@ -9048,6 +9081,22 @@ export class Hud {
     el.querySelector('[data-delve-board]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);
       this.openDelveBoard(npc.id);
+    });
+    el.querySelector('[data-brew]')?.addEventListener('click', () => {
+      this.sim.brewDraught();
+      this.renderGossip(npc); // keep the dialog open for repeat brews
+    });
+    el.querySelector('[data-gargoyle-bow]')?.addEventListener('click', () => {
+      this.sim.bowToGargoyle();
+      // The statue shimmers: swap the greeting copy in place, then re-render
+      // so the newly-opened toll quest row appears under it.
+      window.setTimeout(() => {
+        this.renderGossip(npc, t('questUi.dialog.gargoyleShimmer'));
+      }, 120);
+    });
+    el.querySelector('[data-gargoyle-wake]')?.addEventListener('click', () => {
+      this.sim.wakeGargoyle();
+      this.closeQuestDialog(false); // the conversation is very much over
     });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';

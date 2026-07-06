@@ -44,6 +44,7 @@ export function isFriendlyPet(
 // its own wider classic spread (mobTooltipConColor), so recoloring the tooltip
 // never touches the overhead nameplates.
 export const FRIENDLY = '#9fdc7f';
+export const HOSTILE_PLAYER = '#ff5a4a';
 export function mobNameColor(levelDiff: number, dead: boolean, friendly: boolean): string {
   if (dead) return '#999';
   if (friendly) return FRIENDLY;

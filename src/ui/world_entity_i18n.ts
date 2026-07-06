@@ -97,6 +97,17 @@ const MOB_IDS = [
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
+  // The Mirror World (zone 4) — the belt beasts + the shadow-realm Echo
+  'spirit_unicorn',
+  'hooded_reaper',
+  'mistshade_lurker',
+  'gloaming_maw',
+  'poverty_ghost',
+  'player_echo',
+  'gargoyle_awakened',
+  'gloomhulk',
+  'mirrorbound_sentry',
+  'voidfang_stalker',
 ] as const;
 
 const NPC_IDS = [
@@ -124,6 +135,15 @@ const NPC_IDS = [
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
+  'keeper_nerissa', // Mirror World, the Lumen Crown
+  'veilwright_ollo', // Mirror World, the Veiled Market vendor
+  'mistwitch_morwen', // Mirror World, the Witch's Hollow — Deepdream chain
+  'gargoyle_sentinel_south', // the three mirror-guardians (bow or wake)
+  'gargoyle_sentinel_west',
+  'gargoyle_sentinel_north',
+  'dread_sentinel_a', // the Black Mirror causeway wardens (attack-only)
+  'dread_sentinel_b',
+  'dread_sentinel_c',
 ] as const;
 
 const QUEST_IDS = [
@@ -203,9 +223,21 @@ const QUEST_IDS = [
   'q_mogger',
   'q_archetype_acceptance',
   'q_prof_make_amends',
+  // The Mirror World (zone 4) — the Deepdream chain
+  'q_deepdream_recipe',
+  'q_face_your_echo',
+  'q_gargoyle_south',
+  'q_gargoyle_west',
+  'q_gargoyle_north',
+  // The Keeper's Vigil — Nerissa's Lumen Crown arc
+  'q_the_failing_radiance',
+  'q_what_the_poor_keep',
+  'q_the_wardens_names',
+  'q_what_the_glass_wants',
+  'q_relight_the_lumen_crown',
 ] as const;
 
-const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
+const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights', 'mirror_world'] as const;
 const DUNGEON_IDS = [
   'hollow_crypt',
   'sunken_bastion',

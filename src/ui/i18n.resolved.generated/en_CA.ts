@@ -3747,6 +3747,7 @@ export const en_CA: EnTranslations = {
       "eatingDrinking": "Eating & Drinking...",
       "secondsRemaining": "{seconds} seconds remaining",
       "enteringZone": "Entering {zone}.",
+      "deepdreamZone": "The Deepdream",
       "welcomeZone": "Welcome to {zone}!",
       "levelBanner": "Level {level}!",
       "levelLog": "You have reached level {level}!",
@@ -4388,6 +4389,13 @@ export const en_CA: EnTranslations = {
       "nythraxisDeathlessKingWarning": "The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and the abandoned crypt is the way down.",
       "browseGoods": "Let me browse your goods.",
       "browseGoodsAria": "Browse goods from {name}",
+      "brewDraught": "Brew me a Deepdream Draught.",
+      "brewDraughtAria": "Ask {name} to brew a Deepdream Draught",
+      "gargoyleBow": "Bow down.",
+      "gargoyleBowAria": "Bow to {name}",
+      "gargoyleAttack": "Attack.",
+      "gargoyleAttackAria": "Attack {name}",
+      "gargoyleShimmer": "The statue shimmers with energy...",
       "worldMarket": "Show me the World Market.",
       "worldMarketAria": "Open the World Market",
       "accept": "Accept",
@@ -5867,6 +5875,45 @@ export const en_CA: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Sunpetal Sickle"
       },
+      "white_sheet": {
+        "name": "White Sheet"
+      },
+      "spirit_horn": {
+        "name": "Spirit Horn"
+      },
+      "black_hood": {
+        "name": "Black Hood"
+      },
+      "deepdream_draught": {
+        "name": "Deepdream Draught"
+      },
+      "mirror_shard": {
+        "name": "Mirror Shard"
+      },
+      "ghostly_mirrorblade": {
+        "name": "Ghostly Mirrorblade"
+      },
+      "ghostly_shroudmantle": {
+        "name": "Ghostly Shroudmantle"
+      },
+      "ghostly_wraithjerkin": {
+        "name": "Ghostly Wraithjerkin"
+      },
+      "ghostly_palegrips": {
+        "name": "Ghostly Palegrips"
+      },
+      "ghostly_hushboots": {
+        "name": "Ghostly Hushboots"
+      },
+      "ghostly_glasscord": {
+        "name": "Ghostly Glasscord"
+      },
+      "warden_sigil": {
+        "name": "Warden Sigil"
+      },
+      "drowned_lumen": {
+        "name": "Drowned Lumen"
+      },
       "bristleback_maul": {
         "name": "Gallowglass Hammer"
       },
@@ -6667,6 +6714,36 @@ export const en_CA: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Roused Stormling"
       },
+      "spirit_unicorn": {
+        "name": "Spirit Unicorn"
+      },
+      "hooded_reaper": {
+        "name": "Reaper"
+      },
+      "mistshade_lurker": {
+        "name": "Mistshade Lurker"
+      },
+      "gloaming_maw": {
+        "name": "The Gloaming Maw"
+      },
+      "poverty_ghost": {
+        "name": "Poverty Ghost"
+      },
+      "player_echo": {
+        "name": "Echo"
+      },
+      "gargoyle_awakened": {
+        "name": "Gargoyle Sentinel"
+      },
+      "gloomhulk": {
+        "name": "Gloomhulk"
+      },
+      "mirrorbound_sentry": {
+        "name": "Mirrorbound Sentry"
+      },
+      "voidfang_stalker": {
+        "name": "Palefang Stalker"
+      },
       "ironvein_foreman": {
         "name": "Ironvein Foreman"
       },
@@ -6896,6 +6973,51 @@ export const en_CA: EnTranslations = {
         "name": "The Pale Keeper",
         "title": "Warden of the Dead",
         "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
+      },
+      "keeper_nerissa": {
+        "name": "Nerissa the Unresting",
+        "title": "Ghost-Keeper of the Lumen Crown",
+        "greeting": "I kept the Lumen Crown in life, and the Crown keeps the glass honest - every mirror in this vale shows a true thing, save one. Death has not excused me from the post, {playerName}, because that one is not done pressing. The light of the Crown is failing, and where it fails, the vale bleeds through. Mind which side of the glass you walk. Lately it has trouble telling."
+      },
+      "veilwright_ollo": {
+        "name": "Veilwright Ollo",
+        "title": "Shroud-Market Trader",
+        "greeting": "Dead men's coats, bottled sighs, honest prices - the veil provides. Everything on my table was set down by someone who owns nothing now; the trick is telling what the dead are DONE with from what they still clutch. Get it wrong and they come to the stall at midnight. Ask the Keeper about the light in the well, if you want the sad version. I only sell the coats."
+      },
+      "mistwitch_morwen": {
+        "name": "Morwen the Mistwitch",
+        "title": "Dreambrewer of the Hollow",
+        "greeting": "The mist keeps most of you awake. I can brew you the other kind of sleep - the kind that answers back."
+      },
+      "gargoyle_sentinel_south": {
+        "name": "Gargoyle Statue",
+        "title": "Guardian of the Mirror",
+        "greeting": "Weathered stone, crouched and waiting. It does not move. It is listening."
+      },
+      "gargoyle_sentinel_west": {
+        "name": "Gargoyle Statue",
+        "title": "Guardian of the Mirror",
+        "greeting": "Weathered stone, crouched and waiting. It does not move. It is listening."
+      },
+      "gargoyle_sentinel_north": {
+        "name": "Gargoyle Statue",
+        "title": "Guardian of the Mirror",
+        "greeting": "Weathered stone, crouched and waiting. It does not move. It is listening."
+      },
+      "dread_sentinel_a": {
+        "name": "Dread Sentinel",
+        "title": "Warden of the Sable Mirror",
+        "greeting": "Your death awaits."
+      },
+      "dread_sentinel_b": {
+        "name": "Dread Sentinel",
+        "title": "Warden of the Sable Mirror",
+        "greeting": "We held the causeway in life. We hold it still."
+      },
+      "dread_sentinel_c": {
+        "name": "Dread Sentinel",
+        "title": "Warden of the Sable Mirror",
+        "greeting": "Turn back. The black glass is not for the living - nor was it ever for us."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7706,6 +7828,118 @@ export const en_CA: EnTranslations = {
           }
         }
       },
+      "q_deepdream_recipe": {
+        "title": "A Recipe for Deep Sleep",
+        "text": "The draught wants three voices, {playerName}: two white sheets off the poverty ghosts who own nothing else, two horns of the spirit unicorns that graze the gloom, and two hoods cut from the reapers who watch the belt. Bring them and I will brew you a sleep with teeth.",
+        "completion": "Sheet, horn, hood - the poor, the radiant, the patient. The kettle likes you. Drink it somewhere soft, wanderer: you will meet whoever you have been carrying.",
+        "objectives": {
+          "0": {
+            "label": "White Sheet"
+          },
+          "1": {
+            "label": "Spirit Horn"
+          },
+          "2": {
+            "label": "Black Hood"
+          }
+        }
+      },
+      "q_face_your_echo": {
+        "title": "Face Your Echo",
+        "text": "Drink the draught and the dream will set a mirror before you - your Echo, every scar and every trick of yours on the other side of it. Beat what you are, {playerName}, and bring me back the look on your face.",
+        "completion": "You came back, and the mirror did not. Whatever it left in your hand is yours - the dream only pays that price once.",
+        "objectives": {
+          "0": {
+            "label": "Your Echo defeated"
+          }
+        }
+      },
+      "q_gargoyle_south": {
+        "title": "The Keeper's Toll",
+        "text": "The shimmer resolves into words behind your eyes: the reapers crowd my glass, {playerName}. Thin them, and the way to Highwatch is yours.",
+        "completion": "The stone hums once, satisfied. Behind it, the mirror clears like a held breath let go.",
+        "objectives": {
+          "0": {
+            "label": "Reaper culled"
+          }
+        }
+      },
+      "q_gargoyle_west": {
+        "title": "A Toll of Sheets",
+        "text": "The shimmer resolves into words behind your eyes: bring me four white sheets off the poor dead, {playerName}. The road to Eastbrook opens for those who pay in cloth.",
+        "completion": "The sheets sink into the stone and are gone. The mirror behind it wakes with light.",
+        "objectives": {
+          "0": {
+            "label": "White Sheet"
+          }
+        }
+      },
+      "q_gargoyle_north": {
+        "title": "Radiance Culled",
+        "text": "The shimmer resolves into words behind your eyes: the spirit herds burn too bright for the glass, {playerName}. Cull five, and Fenbridge is a step away.",
+        "completion": "The stone drinks the light you spilled. The mirror behind it opens like an eye.",
+        "objectives": {
+          "0": {
+            "label": "Spirit Unicorn culled"
+          }
+        }
+      },
+      "q_the_failing_radiance": {
+        "title": "The Failing Radiance",
+        "text": "You feel the cold of me and think I am a story. I am a post, {playerName}. The Lumen Crown I kept is no gold circlet - it is the light in every mirror here, the seam that holds the living and the dead in separate reflections so neither drowns the other. That light is failing, and you can see it in the Mirrorbound Sentries: once they were the Crown's own radiance walking guard, now they are glass full of stolen light, crowding the north ruins because the seam no longer tells them where to stand. Break eight. Each shard you scatter is a little light returned - and a little proof you can be trusted with the rest.",
+        "completion": "The shards drift back toward the well like snow falling upward, and for one breath the whole vale is a shade brighter. It will not last. But you mend seams instead of cutting them, {playerName} - that is rarer here than you would think. You broke the OTHER crown too, did you not - the iron one, beneath Thornpeak. Then for the first time in three hundred years, this light might come back. Stay. The vale has been waiting for hands that close wounds.",
+        "objectives": {
+          "0": {
+            "label": "Mirrorbound Sentry shattered"
+          }
+        }
+      },
+      "q_what_the_poor_keep": {
+        "title": "What the Poor Still Keep",
+        "text": "The Poverty Ghosts on the south shore owned nothing in life, {playerName} - nothing but the sheet they were buried in, because the parish could spare no coffin. Now the Crown's light is too thin to loose their grip, so they wander clutching the one thing that was ever theirs. Do not think this cruelty; it is love with nowhere to put itself. Bring me five of their sheets. I will lay each in the well and speak the name that was too poor to be carved. That is the whole of the rite: to be poor, and dead, and still called by name.",
+        "completion": "Five sheets, five names. I say them into the well and the water takes them the way a mother lifts a coat off a sleeping child. The ghosts on the shore are fewer tonight, {playerName} - not slain, released. This is what the Crown did when it was whole: it held the dead close enough to let them go. We do it by hand now, you and I, five names at a time. It is slower. It is not nothing.",
+        "objectives": {
+          "0": {
+            "label": "White Sheet"
+          }
+        }
+      },
+      "q_the_wardens_names": {
+        "title": "The Wardens' Names",
+        "text": "The three that pace the Black Canyon are called Dread Sentinels by those who flee them. I called them by name once - they were my order, {playerName}, the last men to hold the Sable Mirror's causeway in life, and they never stood down, not even when their hearts did. No blade frees them now; the black glass rides them too deep to fall. But that glass has crept from the wardens into the reapers that swarm the causeway, and over the long years the reapers have torn the wardens' sigils loose. Bring me three, cut from the reapers at the canyon, so I may say the three names aloud one final time.",
+        "completion": "Corwin. Aldous. Brenna. There - said, and the saying is lighter than the holding ever was. They can stop soon; I will see to it. But mind what draws near, {playerName}: the sigils torn loose mean the glass on that causeway is thinning, and the wound at its end has been waiting exactly this long. I must relight the Crown and shore the Sable before something on the far side notices the door is going bare. There is one last thing I need - and it is under the black water.",
+        "objectives": {
+          "0": {
+            "label": "Warden Sigil"
+          }
+        }
+      },
+      "q_what_the_glass_wants": {
+        "title": "What the Glass Wants",
+        "text": "You beat your Echo and thought it a trial of self, {playerName}. It was not. I brew the Deepdream from sheet and horn and hood - but the thing your dream set a mirror against, the thing that walked in wearing your face, that I do not brew. It leaks in, from the black glass in the canyon. The reapers crowding the canyon mouth are thick with the same leak; cull eight of them and mark which way their shadows crawl. Then I will show Nerissa's own eyes where her wound truly weeps.",
+        "completion": "Northeast. Always northeast, always toward the Sable - did you mark it? Your Echo was not YOU, wanderer. It was a splinter of whatever lives behind that gate, dressed in the nearest reflection it could steal: yours. The dream is only the thinnest place the leak has found; the canyon is the widest. Tell Nerissa. She has earned the truth of it, and so have you.",
+        "objectives": {
+          "0": {
+            "label": "Reaper culled at the canyon mouth"
+          }
+        }
+      },
+      "q_relight_the_lumen_crown": {
+        "title": "Relight the Lumen Crown",
+        "text": "The wardens are named and the causeway thins, so I must do now what I have put off since I died: light the Lumen Crown one last time and press the Sable shut from this side. The Crown's last true spark was swallowed by the Gloaming Maw when it fell in the mere - that is why the thing glows from the inside. Cut the light back out of it, {playerName}. The black glass will send its gloomhulks to stop the rite; put four of them down. Bring me a drowned spark while I still remember how to hold one. A keeper's last duty is to become someone who no longer needs to keep.",
+        "completion": "It burns. After all this dark it still knows my hand. Look - the glass is TRUE again: no heartbeat behind the water, no soul lost between a world and its reflection. And the weight is off me at last. I am not vanishing, {playerName}; I am being RELIEVED. This is not the breaking of the Sable - only the holding of it; I have not the strength to break what waits there, and I would not dare. But held one more age, it is held. When some braver company than us finally walks INTO that gate, they will find the far side ready. Tell them in Highwatch that their keeper stood the vigil to the end, and then was let go. The glass will remember you. See that you give it something worth reflecting.",
+        "objectives": {
+          "0": {
+            "label": "The Gloaming Maw slain"
+          },
+          "1": {
+            "label": "Drowned Lumen"
+          },
+          "2": {
+            "label": "Gloomhulk broken"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "The Drowned Choir",
         "text": "The waders do not act alone. Among them walk the Drowned Votaries — the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.",
@@ -7870,6 +8104,48 @@ export const en_CA: EnTranslations = {
           },
           "9": {
             "label": "Gravewyrm Sanctum"
+          },
+          "10": {
+            "label": "The Tidegate"
+          }
+        }
+      },
+      "mirror_world": {
+        "name": "The Mirror World",
+        "welcome": "The glass remembers you. Mind which side of it you walk.",
+        "pois": {
+          "0": {
+            "label": "the Lumen Hollow"
+          },
+          "1": {
+            "label": "the Mirror Court"
+          },
+          "2": {
+            "label": "the Overlook"
+          },
+          "3": {
+            "label": "The Mirrormere"
+          },
+          "4": {
+            "label": "the Moonmeadow"
+          },
+          "5": {
+            "label": "the Sorrowstones"
+          },
+          "6": {
+            "label": "the Gloomcrags"
+          },
+          "7": {
+            "label": "the Darkwood"
+          },
+          "8": {
+            "label": "Witch's Hollow"
+          },
+          "9": {
+            "label": "Stargazer's Ledge"
+          },
+          "10": {
+            "label": "the Black Canyon"
           }
         }
       }

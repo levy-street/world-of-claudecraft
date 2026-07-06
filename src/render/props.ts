@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
+import { getActiveWorldContent, PROPS, WORLD_MIN_Z } from '../sim/data';
 import { hash2 } from '../sim/rng';
-import { terrainHeight, waterLevel } from '../sim/world';
+import { terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
@@ -661,6 +661,28 @@ function buildDelveEmbers(
   return pts;
 }
 
+// --- Mirror World gothic wash ------------------------------------------------
+// The Vale of Glass (biome 'mirror') reuses Eastbrook's village GLBs, so there we
+// clone each structure material and drain its colour toward a cold spectral slate
+// with a faint inner glow — otherwise a sunny cottage sits jarringly in the dense
+// 0x100e1c murk. Clone-first guarantees zero cross-zone leak into the shared
+// prop-asset cache; the emissive keeps the silhouette legible in fog far=40.
+const MIRROR_STRUCT_TINT = new THREE.Color(0x3a4258);
+function mirrorizeGroup(g: THREE.Object3D, emissiveHex = 0x0c1830, emissiveI = 0.4): void {
+  g.traverse((o) => {
+    if (!(o instanceof THREE.Mesh)) return;
+    const src = o.material;
+    if (Array.isArray(src)) return;
+    const mat = src.clone() as THREE.MeshStandardMaterial;
+    if (mat.color) mat.color.lerp(MIRROR_STRUCT_TINT, 0.6);
+    if (mat.emissive) {
+      mat.emissive.setHex(emissiveHex);
+      mat.emissiveIntensity = emissiveI;
+    }
+    o.material = mat;
+  });
+}
+
 // `delveLabel` resolves a delve id to its localized display name for the carved
 // entrance sign. Passed in by renderer.ts (the only render-side i18n surface) so
 // props.ts itself stays string-table-free; falls back to the id if absent.
@@ -790,6 +812,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   for (const b of getActiveWorldContent().props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
+    const isMirror = zoneBiomeAt(b.z) === 'mirror';
     // roof Y mirrors the camera collider height in colliders.ts
     const roofY = y + (b.kind === 'chapel' ? 10.8 : b.kind === 'inn' ? 7.8 : 8.0);
     if (b.kind === 'chapel') {
@@ -808,6 +831,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       });
       g.position.set(b.x, y - 0.12, b.z);
       g.rotation.y = b.rot;
+      // the Silent Archive: colder wash + a stronger cold glass-and-bone glow
+      if (isMirror) mirrorizeGroup(g, 0x14325a, 0.55);
       group.add(shadowed(g));
       registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
       continue;
@@ -819,6 +844,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
     g.position.set(b.x, y - 0.12, b.z);
     g.rotation.y = b.rot;
+    // dark-timber / silvered-shingle wash for the Mirror-World houses + inn
+    if (isMirror) mirrorizeGroup(g);
     group.add(shadowed(g));
     registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
   }
@@ -843,6 +870,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     }
     g.position.set(s.x, ground(s.x, s.z) - 0.06, s.z);
     g.rotation.y = s.rot;
+    if (zoneBiomeAt(s.z) === 'mirror') mirrorizeGroup(g);
     group.add(shadowed(g));
     registerHideable(g, circleFootprint(s.x, s.z, s.r, ground(s.x, s.z) + 3.1));
   });
@@ -854,6 +882,22 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
     g.position.set(w.x, ground(w.x, w.z) - 0.1, w.z);
     g.rotation.y = propRand(w.x, w.z, 1) * Math.PI;
+    if (zoneBiomeAt(w.z) === 'mirror') {
+      // the Lumen Well — heart of the town: cold stone + a glowing cyan wellspring
+      // disc at the mouth (emissive blooms on high-gfx) so it reads as a beacon.
+      mirrorizeGroup(g, 0x0a2440, 0.45);
+      const spring = new THREE.Mesh(
+        new THREE.CircleGeometry(0.72, 22),
+        new THREE.MeshLambertMaterial({
+          color: 0x0a1830,
+          emissive: 0x7fd8ff,
+          emissiveIntensity: GFX.standardMaterials ? 2.2 : 1.4,
+        }),
+      );
+      spring.rotation.x = -Math.PI / 2;
+      spring.position.set(0, 1.7, 0);
+      g.add(spring);
+    }
     group.add(shadowed(g));
     registerHideable(g, circleFootprint(w.x, w.z, w.r, ground(w.x, w.z) + 3.7));
   }
@@ -1244,6 +1288,30 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       g,
       obbFootprint(hx, hz, d.hutLocal.hw, d.hutLocal.hd, d.rot, ground(hx, hz) + 2.9),
     );
+  }
+
+  // ---- Mirror World dome glass: one translucent shell per PROPS.domes ring --
+  // Movement is blocked by the collider ring (sim/colliders.ts); this is only
+  // the visual shell. The mist + crushed sky do most of the selling — the
+  // shell catches rim light so the glass reads from inside and outside.
+  for (const dome of PROPS.domes ?? []) {
+    const shell = new THREE.Mesh(
+      new THREE.SphereGeometry(dome.r, 48, 20, 0, Math.PI * 2, 0, Math.PI / 2),
+      new THREE.MeshStandardMaterial({
+        color: 0xd8dcec,
+        transparent: true,
+        opacity: 0.08,
+        roughness: 0.12,
+        metalness: 0,
+        emissive: 0x2c2a45,
+        emissiveIntensity: 0.4,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      }),
+    );
+    shell.position.set(dome.x, ground(dome.x, dome.z) - 1.5, dome.z);
+    shell.renderOrder = 2;
+    group.add(shell);
   }
 
   // ---- delve entrance: Meshy portal-door + animated void + carved name lintel -
