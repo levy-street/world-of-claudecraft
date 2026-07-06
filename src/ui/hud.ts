@@ -8774,6 +8774,10 @@ export class Hud {
     this.hodricsWindow.setPracticeHook(fn);
   }
 
+  toggleHodricsWindow(): void {
+    this.hodricsWindow.toggle();
+  }
+
   // The pinned in-match banner: opponent name + countdown / live match timer.
   private updateArenaStatus(): void {
     const el = $('#arena-status');

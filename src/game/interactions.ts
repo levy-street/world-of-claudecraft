@@ -1,3 +1,4 @@
+import { HC_HERALD_NPC_ID } from '../sim/content/hodrics';
 import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
@@ -23,6 +24,7 @@ export interface PickInteractionHud {
   openQuestDialog(npcId: number): void;
   openDelveBoard(npcId: number): void;
   openGauntletRecruit(): void;
+  toggleHodricsWindow(): void;
   openMailbox(): void;
   showError(text: string): void;
   closeContextMenu(): void;
@@ -159,6 +161,7 @@ export function handlePickedEntity(
         } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else if (e.templateId === 'gauntlet_recruiter') hud.openGauntletRecruit();
+        else if (e.templateId === HC_HERALD_NPC_ID) hud.toggleHodricsWindow();
         else hud.openQuestDialog(id);
       } else hud.showError(t('questUi.errors.tooFar'));
     } else if (
@@ -195,6 +198,7 @@ export function handlePickedEntity(
         if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else if (e.templateId === 'gauntlet_recruiter') hud.openGauntletRecruit();
+        else if (e.templateId === HC_HERALD_NPC_ID) hud.toggleHodricsWindow();
         else hud.openQuestDialog(id);
       }
     }

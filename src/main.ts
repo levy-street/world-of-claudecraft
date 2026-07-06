@@ -125,6 +125,7 @@ import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
+import { HC_HERALD_NPC_ID } from './sim/content/hodrics';
 import { ITEMS, isDelvePos, setActiveWorldContent } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
@@ -2091,6 +2092,8 @@ async function startGame(
     if (bestNpc !== null) {
       const npc = world.entities.get(bestNpc);
       if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
+      else if (npc?.kind === 'npc' && npc.templateId === HC_HERALD_NPC_ID)
+        hud.toggleHodricsWindow();
       else hud.openQuestDialog(bestNpc);
       return;
     }
