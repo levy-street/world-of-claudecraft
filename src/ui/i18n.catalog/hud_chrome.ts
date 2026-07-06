@@ -1351,4 +1351,43 @@ export const hudChromeStrings = {
     logging: 'Logging',
     herbalism: 'Herbalism',
   },
+  // Off-chain $WOC governance panel (PR #468). Advisory, Snapshot-style holder
+  // voting; every string here is rendered through t() by src/ui/governance_panel.ts.
+  governance: {
+    title: 'Governance',
+    close: 'Close governance',
+    subtitle: 'Advisory $WOC holder voting',
+    loading: 'Loading proposals...',
+    error: 'Could not load governance proposals.',
+    empty: 'There are no proposals yet.',
+    refresh: 'Refresh',
+    open: 'Open',
+    closed: 'Closed',
+    closesAt: 'Closes {date}',
+    closedAt: 'Closed {date}',
+    quorum: 'Quorum: {current} of {needed} $WOC',
+    quorumReached: 'Quorum reached',
+    category: {
+      content: 'Content',
+      cosmetic: 'Cosmetic',
+      treasury: 'Treasury',
+    },
+    tally: {
+      for: 'For',
+      against: 'Against',
+      abstain: 'Abstain',
+      voters: '{count} voters',
+    },
+    vote: {
+      for: 'Vote For',
+      against: 'Vote Against',
+      abstain: 'Abstain',
+      needWallet: 'Link a wallet to vote.',
+      alreadyVoted: 'You voted: {choice}',
+      signing: 'Check your wallet to sign...',
+      submitting: 'Submitting vote...',
+      success: 'Your vote was recorded.',
+      failed: 'Your vote could not be recorded.',
+    },
+  },
 };

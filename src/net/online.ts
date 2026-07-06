@@ -170,6 +170,35 @@ export interface ReleaseEntry {
   publishedAt: string; // ISO 8601
 }
 
+// Off-chain $WOC governance DTOs (PR #468), the exact JSON the /api/governance/*
+// routes return. Times are ms-since-epoch. Advisory / off-chain only.
+export type GovernanceCategory = 'content' | 'cosmetic' | 'treasury';
+export type GovernanceVoteChoice = 'for' | 'against' | 'abstain';
+
+export interface GovernanceProposal {
+  id: number;
+  category: GovernanceCategory;
+  title: string;
+  body: string;
+  createdAt: number;
+  opensAt: number;
+  closesAt: number;
+  quorum: number;
+  open: boolean;
+}
+
+export interface GovernanceTally {
+  proposalId: number;
+  for: number;
+  against: number;
+  abstain: number;
+  totalWeight: number;
+  voterCount: number;
+  quorum: number;
+  quorumReached: boolean;
+  open: boolean;
+}
+
 export interface AccountInfo {
   username: string;
   email: string;
@@ -599,6 +628,37 @@ export class Api {
 
   async unlinkWallet(): Promise<void> {
     await this.delete('/api/wallet/link', {});
+  }
+
+  // ── Off-chain $WOC governance voting (PR #468) ────────────────────────────
+  // Advisory, off-chain only. These forward to the flag-gated /api/governance/*
+  // routes; a flag-off deployment answers a coded 503 the caller surfaces.
+  async governanceProposals(): Promise<GovernanceProposal[]> {
+    const data = await this.get('/api/governance/proposals');
+    return (data.proposals ?? []) as GovernanceProposal[];
+  }
+
+  async governanceTally(proposalId: number): Promise<GovernanceTally> {
+    const data = await this.get(`/api/governance/proposals/${proposalId}/tally`);
+    return data.tally as GovernanceTally;
+  }
+
+  // Step 1 of a vote: ask the server for the exact message to sign for this ballot.
+  async governanceVoteChallenge(
+    proposalId: number,
+    choice: GovernanceVoteChoice,
+  ): Promise<{ nonce: string; message: string }> {
+    return this.post(`/api/governance/proposals/${proposalId}/vote/challenge`, { choice });
+  }
+
+  // Step 2 of a vote: submit the wallet's signature; the server verifies + records it.
+  async governanceVote(
+    proposalId: number,
+    choice: GovernanceVoteChoice,
+    signature: string,
+    nonce: string,
+  ): Promise<{ voted: boolean; choice: GovernanceVoteChoice; weight: number }> {
+    return this.post(`/api/governance/proposals/${proposalId}/vote`, { choice, signature, nonce });
   }
 
   // ── Discord link/login + status ────────────────────────────────────────────

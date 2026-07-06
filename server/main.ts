@@ -93,6 +93,7 @@ import {
   topGuilds,
   topLifetimeXp,
   touchLogin,
+  walletForAccount,
 } from './db';
 import {
   type DesktopLoginRouteDeps,
@@ -119,6 +120,8 @@ import {
 } from './github';
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { configureGovernanceRuntime } from './governance';
+import { PgGovernanceDb } from './governance_db';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { handleClientError } from './http/client_error';
@@ -214,7 +217,7 @@ import {
   handleWalletUnlink,
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest } from './web_login_guard';
-import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { cachedWocBalance, handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { createWsAuth } from './ws_auth';
 import { bufferHandshakeMessages } from './ws_buffer';
 
@@ -1907,6 +1910,20 @@ configureAccountRuntime({
 // arms stay intact as the flag-off rollback path.
 configureWalletRuntime({
   liveLevelForCharacter: (characterId) => liveGame().liveLevelForCharacter(characterId),
+});
+
+// Inject the governance runtime the ported governance routes (server/governance.ts)
+// need but cannot import without a cycle: the Postgres GovernanceDb, the EXISTING
+// holder-balance pipeline (cachedWocBalance, used ONLY to weight a vote), the linked
+// wallet read, the admin check that gates proposal creation, and the wall clock. The
+// whole surface is fail-closed behind governanceEnabled() (GOVERNANCE_ENABLED, default
+// OFF); this wiring only supplies the dependencies, it does not enable the feature.
+configureGovernanceRuntime({
+  db: new PgGovernanceDb(),
+  walletBalance: (pubkey) => cachedWocBalance(pubkey),
+  linkedWallet: async (accountId) => (await walletForAccount(accountId))?.pubkey ?? null,
+  canCreateProposal: (accountId) => isAdminAccount(accountId),
+  now: () => Date.now(),
 });
 
 // Inject the one main.ts-local singleton the ported report handler

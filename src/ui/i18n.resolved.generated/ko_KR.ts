@@ -1205,6 +1205,43 @@ export const ko_KR: EnTranslations = {
       "mining": "채광",
       "logging": "벌목",
       "herbalism": "약초학"
+    },
+    "governance": {
+      "title": "거버넌스",
+      "close": "거버넌스 닫기",
+      "subtitle": "$WOC 보유자 자문 투표",
+      "loading": "제안을 불러오는 중……",
+      "error": "거버넌스 제안을 불러올 수 없습니다.",
+      "empty": "아직 제안이 없습니다.",
+      "refresh": "새로 고침",
+      "open": "진행 중",
+      "closed": "종료됨",
+      "closesAt": "{date}에 종료",
+      "closedAt": "{date}에 종료됨",
+      "quorum": "정족수: {needed} $WOC 중 {current}",
+      "quorumReached": "정족수 도달",
+      "category": {
+        "content": "콘텐츠",
+        "cosmetic": "외형",
+        "treasury": "재정"
+      },
+      "tally": {
+        "for": "찬성",
+        "against": "반대",
+        "abstain": "기권",
+        "voters": "투표자 {count}명"
+      },
+      "vote": {
+        "for": "찬성 투표",
+        "against": "반대 투표",
+        "abstain": "기권",
+        "needWallet": "투표하려면 지갑을 연결하세요.",
+        "alreadyVoted": "투표함: {choice}",
+        "signing": "지갑에서 서명하세요……",
+        "submitting": "투표 제출 중……",
+        "success": "투표가 기록되었습니다.",
+        "failed": "투표를 기록할 수 없습니다."
+      }
     }
   },
   "apiError": {
@@ -1294,6 +1331,19 @@ export const ko_KR: EnTranslations = {
       "swag_claimed": "이미 이 보상을 받았습니다.",
       "swag_tier": "이 보상을 받으려면 더 높은 등급에 도달하세요.",
       "swag_points": "포인트가 부족합니다."
+    },
+    "governance": {
+      "disabled": "거버넌스 투표를 현재 사용할 수 없습니다.",
+      "forbidden": "제안을 생성할 권한이 없습니다.",
+      "not_found": "해당 제안을 찾을 수 없습니다.",
+      "invalid_input": "제안 항목을 확인한 뒤 다시 시도하세요.",
+      "wallet_not_linked": "투표하기 전에 지갑을 연결하세요.",
+      "wallet_mismatch": "해당 지갑은 계정에 연결되어 있지 않습니다.",
+      "window_closed": "이 제안의 투표가 종료되었습니다.",
+      "already_voted": "이 지갑은 이미 이 제안에 투표했습니다.",
+      "challenge_invalid": "투표 요청이 만료되었습니다. 다시 시도하세요.",
+      "bad_signature": "지갑 서명을 확인할 수 없습니다.",
+      "balance_unavailable": "$WOC 잔액을 읽을 수 없습니다. 다시 시도하세요."
     }
   },
   "guide": {

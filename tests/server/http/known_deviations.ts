@@ -61,6 +61,7 @@ export const DEVIATION_ID = {
   securityHeadersAllSurfaces: 'security-headers-all-surfaces',
   mapsAssetsRateLimitedBodyToCode: 'maps-assets-rate-limited-body-to-code',
   mapsAssetsIdParamDecode: 'maps-assets-id-param-decode-422',
+  governanceNewFamilyRegistryOnly: 'governance-new-family-registry-only',
 } as const;
 export type DeviationId = (typeof DEVIATION_ID)[keyof typeof DEVIATION_ID];
 
@@ -1381,6 +1382,33 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       'rename route documents in characterBodyValidationRemap. Unit-pinned in ' +
       'tests/server/maps_routes.test.ts; becomes the real behavior when the legacy arm ' +
       'is removed.',
+  },
+  {
+    id: DEVIATION_ID.governanceNewFamilyRegistryOnly,
+    routes: [
+      '/api/governance/proposals',
+      '/api/governance/proposals/:id/tally',
+      '/api/governance/proposals/:id/vote/challenge',
+      '/api/governance/proposals/:id/vote',
+    ],
+    currentBehavior:
+      'The off-chain $WOC governance family (PR #468) is a NEW surface that never had a ' +
+      'legacy handleApi arm: it was born on the server/http/ registry pipeline. It is ' +
+      'served ONLY by the registry dispatcher under API_DISPATCH=new; the legacy ladder ' +
+      '404s these paths, so an API_DISPATCH=legacy rollback disables the whole family.',
+    intendedBehavior:
+      'The five routes (create proposal, list proposals, tally, vote challenge, vote) are ' +
+      'registered RouteDefs behind the governanceGate middleware, which fails every route ' +
+      'closed with a coded 503 governance.disabled when the governanceEnabled() flag ' +
+      '(GOVERNANCE_ENABLED, default OFF) is off. Being registry-owned-only they carry no ' +
+      'legacy arm to keep byte-parity against, so each inventory row is flagged ' +
+      'unreachable (no legacy dispatch arm), mirroring the swag-claim orphan.',
+    introducedInPhase: null,
+    reason:
+      'A brand-new advisory, off-chain voting surface with no legacy predecessor. It is ' +
+      'registry-only by construction (there is nothing to roll back to), so it is not part ' +
+      'of the legacy-parity corpus; its behavior is pinned by tests/server/governance.test.ts ' +
+      '(the full onion) and tests/server/governance_core.test.ts (the pure rules).',
   },
 ];
 

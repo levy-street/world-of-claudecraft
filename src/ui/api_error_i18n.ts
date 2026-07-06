@@ -107,6 +107,18 @@ export const API_ERROR_KEYS = {
   'discord.swag_claimed': 'apiError.discord.swag_claimed',
   'discord.swag_tier': 'apiError.discord.swag_tier',
   'discord.swag_points': 'apiError.discord.swag_points',
+  // governance: off-chain $WOC governance failures (server/governance.ts, PR #468).
+  'governance.disabled': 'apiError.governance.disabled',
+  'governance.forbidden': 'apiError.governance.forbidden',
+  'governance.not_found': 'apiError.governance.not_found',
+  'governance.invalid_input': 'apiError.governance.invalid_input',
+  'governance.wallet_not_linked': 'apiError.governance.wallet_not_linked',
+  'governance.wallet_mismatch': 'apiError.governance.wallet_mismatch',
+  'governance.window_closed': 'apiError.governance.window_closed',
+  'governance.already_voted': 'apiError.governance.already_voted',
+  'governance.challenge_invalid': 'apiError.governance.challenge_invalid',
+  'governance.bad_signature': 'apiError.governance.bad_signature',
+  'governance.balance_unavailable': 'apiError.governance.balance_unavailable',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

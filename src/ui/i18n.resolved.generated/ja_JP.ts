@@ -1205,6 +1205,43 @@ export const ja_JP: EnTranslations = {
       "mining": "採掘",
       "logging": "伐採",
       "herbalism": "薬草学"
+    },
+    "governance": {
+      "title": "ガバナンス",
+      "close": "ガバナンスを閉じる",
+      "subtitle": "$WOC 保有者による諮問投票",
+      "loading": "提案を読み込み中……",
+      "error": "ガバナンス提案を読み込めませんでした。",
+      "empty": "まだ提案はありません。",
+      "refresh": "更新",
+      "open": "受付中",
+      "closed": "終了",
+      "closesAt": "{date} に終了",
+      "closedAt": "{date} に終了",
+      "quorum": "定足数：{needed} $WOC 中 {current}",
+      "quorumReached": "定足数に達しました",
+      "category": {
+        "content": "コンテンツ",
+        "cosmetic": "装飾",
+        "treasury": "財務"
+      },
+      "tally": {
+        "for": "賛成",
+        "against": "反対",
+        "abstain": "棄権",
+        "voters": "{count} 人が投票"
+      },
+      "vote": {
+        "for": "賛成に投票",
+        "against": "反対に投票",
+        "abstain": "棄権",
+        "needWallet": "投票するにはウォレットを連携してください。",
+        "alreadyVoted": "投票済み：{choice}",
+        "signing": "ウォレットで署名してください……",
+        "submitting": "投票を送信中……",
+        "success": "投票を記録しました。",
+        "failed": "投票を記録できませんでした。"
+      }
     }
   },
   "apiError": {
@@ -1294,6 +1331,19 @@ export const ja_JP: EnTranslations = {
       "swag_claimed": "この報酬は既に受け取っています。",
       "swag_tier": "これを受け取るにはより高いランクが必要です。",
       "swag_points": "ポイントが足りません。"
+    },
+    "governance": {
+      "disabled": "ガバナンス投票は現在利用できません。",
+      "forbidden": "提案を作成する権限がありません。",
+      "not_found": "その提案は見つかりませんでした。",
+      "invalid_input": "提案の入力内容を確認して再試行してください。",
+      "wallet_not_linked": "投票する前にウォレットを連携してください。",
+      "wallet_mismatch": "そのウォレットはアカウントに連携されていません。",
+      "window_closed": "この提案の投票は終了しました。",
+      "already_voted": "このウォレットはすでにこの提案に投票済みです。",
+      "challenge_invalid": "投票リクエストの有効期限が切れました。もう一度お試しください。",
+      "bad_signature": "ウォレットの署名を検証できませんでした。",
+      "balance_unavailable": "$WOC 残高を読み取れませんでした。もう一度お試しください。"
     }
   },
   "guide": {

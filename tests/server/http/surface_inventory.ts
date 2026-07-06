@@ -1012,6 +1012,70 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     unreachable: true,
   },
 
+  // Off-chain $WOC governance (server/governance.ts, PR #468). A NEW family: it has
+  // NO legacy handleApi arm (it was born on the registry pipeline), so like the
+  // swag-claim orphan every row is flagged `unreachable` to record "no legacy
+  // dispatch arm". The registry dispatcher DOES serve these under API_DISPATCH=new;
+  // the flag records that they are registry-owned-only, which excludes them from the
+  // source-scan + param-regex freshness gates (they have no legacy regex to compare).
+  // The whole family is additionally behind the governanceEnabled() flag (default OFF),
+  // which fails every route closed with governance.disabled.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/governance/proposals',
+    handler: 'createProposalHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/governance/proposals',
+    handler: 'listProposalsHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/governance/proposals/:id/tally',
+    handler: 'tallyHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.publicRead,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/governance/proposals/:id/vote/challenge',
+    handler: 'voteChallengeHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'WALLET_LINK_POLICY',
+    requireOwnedExpected: REQUIRE_OWNED.publicRead,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/governance/proposals/:id/vote',
+    handler: 'voteHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'WALLET_LINK_POLICY',
+    requireOwnedExpected: REQUIRE_OWNED.publicRead,
+    unreachable: true,
+  },
+
   // -------------------------------------------------------------------------
   // admin handleAdminApi (/admin/api/*)
   // -------------------------------------------------------------------------

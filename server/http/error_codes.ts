@@ -172,6 +172,35 @@ export const ERROR_CODES = deepFreeze({
   'discord.swag_tier': { params: [] },
   // identity: "points" (not enough reward points to claim this swag reward)
   'discord.swag_points': { params: [] },
+
+  // --- Off-chain $WOC governance family (PR #468). Advisory holder voting; every
+  // endpoint fails closed with governance.disabled when the governanceEnabled flag
+  // is off. Emitted as RFC 9457 problem+json (the modern pipeline style); the client
+  // matcher localizes each code verbatim. ---
+
+  // identity: the governanceEnabled flag is off; every governance endpoint refuses.
+  'governance.disabled': { params: [] },
+  // identity: only an admin (or a governance-flagged account) may create a proposal.
+  'governance.forbidden': { params: [] },
+  // identity: the proposal id does not exist in this realm.
+  'governance.not_found': { params: [] },
+  // identity: a create-proposal field failed validation (category/title/body/window/quorum).
+  'governance.invalid_input': { params: [] },
+  // identity: the caller has no linked wallet, so they cannot vote.
+  'governance.wallet_not_linked': { params: [] },
+  // identity: the presented wallet is not the one linked to this account.
+  'governance.wallet_mismatch': { params: [] },
+  // identity: the voting window for this proposal has closed (or not yet opened).
+  'governance.window_closed': { params: [] },
+  // identity: this wallet has already voted on this proposal (one vote per wallet).
+  'governance.already_voted': { params: [] },
+  // identity: the sign-to-vote challenge expired or was already used; request a new one.
+  'governance.challenge_invalid': { params: [] },
+  // identity: the wallet signature over the challenge did not verify.
+  'governance.bad_signature': { params: [] },
+  // identity: the $WOC balance read failed (RPC error), so the weight cannot be
+  // snapshotted; the vote is not recorded and the caller should retry.
+  'governance.balance_unavailable': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */
