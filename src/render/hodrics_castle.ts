@@ -68,7 +68,7 @@ export function ensureHodricsAssets(): Promise<void> {
 
 if (typeof window !== 'undefined') registerPreload(ensureHodricsAssets());
 
-// A static prop is a plain recursive clone (no skinning to preserve) —
+// A static prop is a plain recursive clone (no skinning to preserve):
 // consumers must not mutate the cached source scene. Marked so dispose()
 // leaves the shared source geometry alone.
 function cloneModel(key: CastleModelKey): THREE.Object3D {
@@ -82,7 +82,7 @@ function cloneModel(key: CastleModelKey): THREE.Object3D {
 // ---------------------------------------------------------------------------
 // Palette: saturated gameshow candy. Every course material carries a small
 // emissive lift of its own hue so shadow faces read as a deeper tone of the
-// same color, never mud — the flat-lit cartoon look under a single sun.
+// same color, never mud (the flat-lit cartoon look under a single sun).
 // ---------------------------------------------------------------------------
 
 const PINK_WALL = 0xe878b0;

@@ -3812,7 +3812,7 @@ export class Renderer {
     | 'underwater'
     | 'practice' = 'outdoor';
   // Hodric's Castle: built once per race slot on approach, kept for the
-  // session (the builtInteriors precedent — no teardown), and driven every
+  // session (the builtInteriors precedent, no teardown), and driven every
   // frame with the renderer's interpolated clock (this.time). A slot only
   // ever enters `hodricsCastles` once its async build resolves; `pending`
   // tracks in-flight builds so the approach gate does not re-schedule one.
@@ -5041,7 +5041,7 @@ export class Renderer {
     // Hodric's Castle obstacles: analytic pose at the render-interpolated
     // clock. this.time already tracks sim.time + alpha*DT (both advance from
     // the same tick origin), so this matches the sim's collision poses phase
-    // for phase — the whole "what you see is what you collide with" contract.
+    // for phase, the whole "what you see is what you collide with" contract.
     for (const castle of this.hodricsCastles.values()) castle.update(this.time);
     worldStart = markWorldPhase('props', worldStart);
     this.foliage.update(

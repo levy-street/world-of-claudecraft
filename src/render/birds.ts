@@ -137,8 +137,8 @@ export function buildBirds(seed: number): BirdsView {
   }
 
   function update(px: number, pz: number, dt: number): void {
-    // No birds inside dungeons / arena interiors — the sky isn't rendered
-    // there. Hodric's Castle is the one instance band that IS open-air.
+    // No birds inside dungeons / arena interiors (the sky isn't rendered
+    // there). Hodric's Castle is the one instance band that IS open-air.
     group.visible = px <= DUNGEON_X_THRESHOLD || isHodricsPos(px);
     if (!group.visible) return;
 
