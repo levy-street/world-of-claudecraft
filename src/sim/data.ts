@@ -505,6 +505,12 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
   return { x: DELVE_X_MIN + delveIndex * 600, z: DELVE_Z0 + slot * DELVE_SLOT_SPACING };
 }
 
+// East edge of the delve band. Delve rooms sit at DELVE_X_MIN + index*600, so
+// the cap leaves room for indices 0..6; a delve at index 7+ would cross into
+// the Hodric's Castle band beyond and must move the cap first (pinned by
+// tests/hodrics_layout.test.ts).
+export const DELVE_BAND_X_MAX = 9000;
+
 export function isDelvePos(x: number): boolean {
   // Capped east by the Protect Yumi maze band, the same move the delve band
   // made to isArenaPos when it was added.
@@ -590,6 +596,44 @@ export const DELVES: Record<string, DelveDef> = {
   [DROWNED_LITANY_DELVE.id]: DROWNED_LITANY_DELVE,
 };
 export const DELVE_LIST: DelveDef[] = Object.values(DELVES).sort((a, b) => a.index - b.index);
+
+// ---------------------------------------------------------------------------
+// Hodric's Castle, the obstacle-race gauntlet. Its race instances live in
+// their own far-off x-band past the delve cap (and clear of x 9600..10200,
+// reserved for the battleground band on its feature branch). Unlike the other
+// instance bands the ground here is NOT flat: world.groundHeight routes the
+// band to the course terraces in sim/hodrics_layout.ts.
+// ---------------------------------------------------------------------------
+
+export const HODRICS_X = 11100; // race instances share this x; slots stack along z
+export const HODRICS_X_MIN = 10800;
+export const HODRICS_X_MAX = 11400;
+export const HODRICS_SLOT_COUNT = 2; // concurrent races the world can host
+const HODRICS_Z0 = -1250;
+const HODRICS_SLOT_SPACING = 800; // clears the course footprint (~280yd) + interest radius
+
+export function hodricsOrigin(slot: number): { x: number; z: number } {
+  return { x: HODRICS_X, z: HODRICS_Z0 + slot * HODRICS_SLOT_SPACING };
+}
+
+export function isHodricsPos(x: number): boolean {
+  return x >= HODRICS_X_MIN && x < HODRICS_X_MAX;
+}
+
+/** Nearest race instance origin to a far-off position, matched by z-band. */
+export function hodricsOriginAt(z: number): { x: number; z: number; slot: number } {
+  let best = 0,
+    bestD = Infinity;
+  for (let i = 0; i < HODRICS_SLOT_COUNT; i++) {
+    const d = Math.abs(z - hodricsOrigin(i).z);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  const o = hodricsOrigin(best);
+  return { x: o.x, z: o.z, slot: best };
+}
 export const DELVE_MODULES: Record<string, DelveModuleDef> = {
   ...COLLAPSED_RELIQUARY_MODULES,
   ...DROWNED_LITANY_MODULES,

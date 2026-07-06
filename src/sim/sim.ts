@@ -119,6 +119,7 @@ import {
   ITEMS,
   isArenaPos,
   isDelvePos,
+  isHodricsPos,
   MOBS,
   NPCS,
   QUESTS,
@@ -4152,6 +4153,7 @@ export class Sim {
 
   // Body moved to player_motion.ts (MV1); thin delegate (also bound on the seam).
   isSwimming(e: Entity): boolean {
+    if (isHodricsPos(e.pos.x)) return false;
     return isSwimmingImpl(e, this.cfg.seed);
   }
 

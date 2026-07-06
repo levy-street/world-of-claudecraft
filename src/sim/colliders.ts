@@ -6,10 +6,12 @@ import {
   delveModuleLocal,
   dungeonAt,
   getActiveWorldContent,
+  hodricsOriginAt,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isHodricsPos,
   isYumiMazePos,
   yumiMazeOriginAt,
 } from './data';
@@ -23,6 +25,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { hodricsColliders } from './hodrics_layout';
 import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import { generateDecorations, groundHeight } from './world';
@@ -274,6 +277,8 @@ const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
 const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
+// Hodric's Castle course walls, from the same layout the renderer dresses.
+const HODRICS_COLLIDERS: Collider[] = hodricsColliders();
 
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
@@ -454,6 +459,11 @@ export function resolvePosition(
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
     const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
+    return { x: local.x + o.x, z: local.z + o.z };
+  }
+  if (isHodricsPos(x)) {
+    const o = hodricsOriginAt(z);
+    const local = resolveAgainst(HODRICS_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
     return { x: local.x + o.x, z: local.z + o.z };
   }
   if (x > DUNGEON_X_THRESHOLD) {
@@ -732,6 +742,20 @@ export function cameraOcclusion(
       true,
     );
   }
+  if (isHodricsPos(ax)) {
+    const o = hodricsOriginAt(az);
+    return sweepColliders(
+      HODRICS_COLLIDERS,
+      ax - o.x,
+      ay,
+      az - o.z,
+      bx - o.x,
+      by,
+      bz - o.z,
+      pad,
+      true,
+    );
+  }
   if (ax > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(ax, az);
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
@@ -791,6 +815,10 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
     return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
+  }
+  if (isHodricsPos(x)) {
+    const o = hodricsOriginAt(z);
+    return overlapsAny(HODRICS_COLLIDERS, x - o.x, z - o.z, false);
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
