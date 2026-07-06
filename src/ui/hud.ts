@@ -10176,6 +10176,59 @@ export class Hud {
         case 'hcStart':
           this.showBanner(t('hudChrome.hc.banner.go'));
           audio.duelStart();
+          triggerHaptic([15, 40, 25], loadHapticsEnabled());
+          break;
+        case 'hcRoundStart':
+          this.showBanner(
+            t('hudChrome.hc.banner.round', {
+              round: formatNumber(ev.round, { maximumFractionDigits: 0 }),
+            }),
+          );
+          break;
+        case 'hcQualified':
+          this.showBanner(t('hudChrome.hc.banner.qualified'));
+          this.log(t('hudChrome.hc.log.qualified'), '#7ee787');
+          audio.duelEnd();
+          this.renderer.fiestaAugmentBurst(this.sim.playerId);
+          triggerHaptic([20, 40, 45], loadHapticsEnabled());
+          break;
+        case 'hcEliminated':
+          this.showBanner(t('hudChrome.hc.banner.eliminated'));
+          this.log(
+            t('hudChrome.hc.log.eliminated', {
+              round: formatNumber(ev.round, { maximumFractionDigits: 0 }),
+            }),
+            '#ff9a6a',
+          );
+          this.renderer.addShake(0.45);
+          this.renderer.fiestaKillBurst(this.sim.playerId, 'fire');
+          triggerHaptic([40, 60, 80], loadHapticsEnabled());
+          break;
+        case 'hcRoundStart':
+          this.showBanner(
+            t('hudChrome.hc.banner.round', {
+              round: formatNumber(ev.round, { maximumFractionDigits: 0 }),
+            }),
+          );
+          break;
+        case 'hcQualified':
+          this.showBanner(t('hudChrome.hc.banner.qualified'));
+          this.log(t('hudChrome.hc.log.qualified'), '#7ee787');
+          audio.duelEnd();
+          this.renderer.fiestaAugmentBurst(this.sim.playerId);
+          triggerHaptic([20, 40, 45], loadHapticsEnabled());
+          break;
+        case 'hcEliminated':
+          this.showBanner(t('hudChrome.hc.banner.eliminated'));
+          this.log(
+            t('hudChrome.hc.log.eliminated', {
+              round: formatNumber(ev.round, { maximumFractionDigits: 0 }),
+            }),
+            '#ff9a6a',
+          );
+          this.renderer.addShake(0.45);
+          this.renderer.fiestaKillBurst(this.sim.playerId, 'fire');
+          triggerHaptic([40, 60, 80], loadHapticsEnabled());
           break;
         case 'hcKnocked':
           this.renderer.addShake(0.5);
@@ -10854,6 +10907,12 @@ export class Hud {
       'Trade cancelled.': 'hud.logs.tradeCancelled',
       'Loot method set to Group Loot.': 'hudChrome.masterLoot.methodGroup',
       'Loot Settings: Group Loot.': 'hudChrome.masterLoot.summaryGroup',
+      'You join the Gauntlet queue. Lord Hodric oils the flails in your honor.':
+        'hudChrome.hc.flavor.queueJoin',
+      "The gates of Hodric's Castle grind open. Race to the crown!":
+        'hudChrome.hc.flavor.gatesOpen',
+      'GO! The Gauntlet is open!': 'hudChrome.hc.flavor.go',
+      'Lord Hodric rebuilds his gauntlet. New course, same crown!': 'hudChrome.hc.flavor.rebuild',
     };
     const key = exact[text];
     if (key) return t(key);

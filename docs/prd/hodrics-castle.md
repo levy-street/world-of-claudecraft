@@ -1,18 +1,23 @@
 # Hodric's Castle
 
-A 10-player obstacle-course race minigame in the spirit of Fall Guys / Stumble
-Guys, set on a floating castle island. Players queue up, race the gauntlet
-through six obstacle sections, and the first challenger through the finish arch
-takes Lord Hodric's crown. Bots fill empty slots so a race always starts.
+A 10-player obstacle-course elimination show in the spirit of Fall Guys /
+Stumble Guys, set on a floating castle island. Players queue up and race THREE
+rounds of Lord Hodric's ever-rebuilt gauntlet: the field is culled each round
+(six survive, then three) and the last racer standing takes the crown. Every
+round is a freshly generated course. Bots fill empty slots so a show always
+starts.
 
 Status: in development on `feature/hodrics-castle` (base `release/v0.22.0`).
 
 ## Fantasy and lore
 
 Lord Hodric, the Mad Warden of the high crag, opens his castle causeway to all
-comers: race his gauntlet and the crown is yours until the next challenger
-takes it. The course is his old siege-defense line, kept oiled and swinging by
-his groundskeepers out of pride. Nobody remembers a war it was used in.
+comers: survive three rounds of his gauntlet and the crown is yours. He rebuilds
+the course between every round ("my castle bores me by breakfast"), tearing the
+old siege-defenses down and raising new ones from the same mad kit of hammers,
+logs, axes, drawspans, boulders, pistons, and spinning plates. The losers of
+each round are flung to his gallery balcony by catapult to watch, with snacks.
+Nobody remembers a war any of it was used in.
 
 Naming style follows the existing world (Gravemarch, the Sowfield, the Ashen
 Coliseum): the place is "Hodric's Castle", the event is "the Gauntlet", the
@@ -22,57 +27,73 @@ winner's flourish is "Hodric's Crown".
 
 - 10 racers per match: any mix of real players and bots.
 - Queue at the Gauntlet Herald NPC in the open world; solo practice runs the
-  course offline against 9 bots (same code path as online).
+  show offline against 9 bots (same code path as online).
 - Lobby forms, short backfill window, then bots top the field up to 10.
-- 5 second countdown at the start gates, then one race, roughly 90 to 150
-  seconds for a decent run.
-- Finish order is the placement. The race ends when everyone has finished or
-  the 4:00 cap expires (unfinished racers place by course progress).
-- Falling off the course is never elimination: you respawn at the last
-  checkpoint after a short daze. The punishment is time, not death.
+- **Three rounds.** Each round: a 5s countdown at the plates, a race on a
+  freshly generated course, then a cut. Round 1 qualifies 6, round 2 qualifies
+  3, round 3 crowns the winner. Per-round time caps (110 / 110 / 130s) rank the
+  unfinished by progress if nobody has cleared the target in time.
+- **Elimination, not death.** Racers cut at the end of a round are launched by
+  Hodric's catapult and land on the railed spectator gallery, where they watch
+  the rest of the show. Their final placement is fixed at elimination time
+  (round-1 cuts take 7-10, round-2 cuts take 4-6, the final decides 1-3).
+- Between rounds a short intermission plays the catapult + gallery beat, then
+  the castle rebuilds (a new course seed) and the survivors re-plate.
+- Falling off the course mid-round is never elimination: you respawn at the last
+  checkpoint. The punishment is time, not death.
 - Combat is irrelevant inside: abilities and mounts are disabled, run speed is
   standardized for every racer (fiesta-style), so level and gear confer zero
   advantage.
 - Winner takes a title flourish and the crown moment (fanfare, fireworks);
-  placements award copper on a small curve; a daily-task arm stays dormant
-  until a `hodrics_result` task type is seeded (same pattern as
+  qualifying and elimination each get their own banner + juice; a daily-task arm
+  stays dormant until a `hodrics_result` task type is seeded (same pattern as
   `arena_result`).
 
-## The course
+## The course (procedurally generated per round)
 
-Eight beats, matching the reference art (start at the low grass yard, finish
-at the keep). Between beats, checkpoints; below everything, a kill plane.
+A course is a VALUE, not a fixed layout: `generateHcCourse(seed, difficulty)`
+(`src/sim/hodrics_course.ts`) is a pure function from a 32-bit seed to a
+complete race (surfaces, colliders, checkpoints, obstacles, bot hints),
+assembled from a library of hand-tuned parametric segments. The match derives a
+distinct seed per round (round 1 seed, round 2 seed, round 3 seed) so Hodric's
+rebuild is real: a different course each round, same match. Difficulty rises
+with the round (more obstacles, tighter timing).
 
-1. **Start Yard.** Grass terrace with the purple START arch between two banner
-   towers. Ten start plates in two rows. Countdown here.
-2. **The Flail Bridge (swinging maces).** A wooden causeway over the chasm.
-   Spiked flails on chains swing across it from overhead gantries in an
-   alternating rhythm. A hit throws you sideways, and the causeway has no
-   rails: you can be thrown clean off. Checkpoint 1 on the far landing.
-3. **The Log Court (spinning logs).** A walled purple-stone plaza with two
-   great rotating log sweepers on round daises, turning in opposite
-   directions. The sweep shoves you back and drops you on your rear; walls
-   keep you in, so the cost is time and dignity. Checkpoint 2 at the far gate.
-4. **The Axe Walk (swinging axes).** A crenellated wall-walk where giant
-   pendulum axes swing through slots in the battlements. Narrow safe windows;
-   a hit is a hard sideways knock. Checkpoint 3 at the end of the walk.
-5. **The Drawspan (moving bridge).** A gilded platform slides back and forth
-   across a gap on Hodric's chain-work. Time your crossing; the platform
-   carries you while you stand on it. Fall and you drop to the moat ledge and
-   respawn at checkpoint 3. Checkpoint 4 on the far side.
-6. **Boulder Alley (rolling boulders).** An uphill stone lane toward the keep.
-   Boulders release from the top on a staggered schedule and roll down the
-   lanes. A hit bowls you back downhill. Checkpoint 5 at the top.
-7. **The Red Ascent (final ramp).** The steep red ramp to the finish: pure
-   sprint, slightly slowed by the grade, so close races stay close to the very
-   end.
-8. **The Finish Arch.** Purple arch, gold crown, two flag towers. Crossing
-   fires the fanfare, fireworks, and the placement banner.
+Every generated course is: **Start Yard** (grass, plates, countdown, START
+arch) then **3 obstacle segments in round 1 / 4 after** drawn without immediate
+repeats from the segment pool, each separated by a **stone landing +
+checkpoint**, then a **Red Ascent** ramp and the **Finish Keep** (crown arch,
+confetti, flag towers). Funnel walls are auto-emitted at every width change;
+open edges over the chasm are deliberate (falls are part of the game). A railed
+**gallery** balcony floats beside the yard for the eliminated.
 
-Visual language (from the reference): grey castle stone with purple banner and
-carpet accents, gold/crown highlights, tan wood causeways and gantries, green
-grass terraces, pine trees on the crag edges, torch flames, floating-island
-underside falling away to clouds.
+The obstacle segment library (each parameterized: count, spacing, speed, phase):
+
+- **Hammer Bridge (swinging maces).** A narrow wooden causeway; fat striped
+  hammer heads swing across it on rigid arms from overhead gantries. A hit
+  throws you sideways off the open deck.
+- **Rotor Court (spinning logs).** A walled plaza with barber-pole log sweepers
+  on daises turning in alternating directions. The sweep is a ground-level
+  shove: it bulldozes you, walls keep you in.
+- **Axe Walk (swinging axes).** A crenellated carpet walk under gold pendulum
+  axes on steel arms. Narrow safe windows; a hit is a hard sideways knock.
+- **Drawspan (sliding platforms).** Gilded platforms slide across a chasm gap in
+  antiphase; time the crossing, they carry you while you stand on them. Fall and
+  you drop to the kill plane.
+- **Boulder Climb (rolling boulders).** An uphill stone lane; beach-ball
+  boulders release from the top on staggered schedules and roll down the lanes,
+  bowling you back downhill.
+- **Piston Ledge (pusher rams).** A one-sided ledge over the chasm; wall-mounted
+  rams jab out across it on a punchy cycle to shove racers toward the open edge.
+- **Spinner Court (rotating plates).** Rotating candy discs bridge a chasm gap
+  between two tongues; the disc carries you around its hub as you cross, so you
+  must walk against the spin and hop the rim gaps.
+
+Visual language (from the reference `fallguys.webp`): bright candy gameshow
+castle. Pink crenellated walls, cyan cone-roofed turrets with gold finials,
+candy torus arches, striped floors (banded bridges, checkered plazas/keeps),
+festival pennants, drifting clouds, confetti. All procedural geometry + canvas
+textures except a couple of CC0 banner/torch GLBs.
 
 ## Physics (the seamless-feel contract)
 
@@ -101,18 +122,38 @@ analytic too (a fixed release schedule per lane), not entities.
   follows the bob's instantaneous velocity, plus a touch of lift.
 - **Rotors (logs)**: beam segment rotating at fixed angular speed; impulse is
   radial + tangential so it throws you along the sweep, never through a wall.
-- **Moving platform**: analytic triangle-wave position; racers standing on it
-  inherit the platform delta before collision resolution (carry, no sliding).
-- **Boulders**: lane entities on a staggered release schedule (the only rng in
-  the course, drawn from the per-match stream); constant roll speed downhill,
-  despawn at the base wall.
-- **Height and falls.** The course band has its own ground-height function
-  from the layout module (terraces, chasm, moat ledge). Leaving a platform's
+- **Drawspan platforms**: analytic triangle-wave position; racers standing on
+  one inherit the platform delta before collision resolution (carry, no
+  sliding).
+- **Spinner discs**: the disc top is static ground; standing on one rotates the
+  rider around the hub by the disc's angular speed each tick. Cross by walking
+  against the spin.
+- **Piston rams**: analytic asymmetric extension (fast jab, slower retract,
+  flush dwell); a contact is a ground-level shove toward the open edge.
+- **Boulders**: analytic release schedule per lane (one boulder per period,
+  no rng); constant roll speed down the lane, self-contained ground line.
+- **Height and falls.** The course band's ground-height comes from the ACTIVE
+  generated course's surfaces (terraces, ramps, chasm). Leaving a platform's
   support means gravity takes over; dropping past the kill plane teleports you
-  to your last checkpoint with a short daze.
-- **Determinism.** No obstacle reads shared world rng. The per-match stream is
-  seeded from tickCount + match id (the fiesta mechanism), so world parity
-  goldens never fork.
+  to your last checkpoint.
+- **Determinism.** No obstacle pose or course-generation step reads shared
+  world rng: `generateHcCourse` uses its own local `Rng` seeded from the round
+  seed, and the per-match sub-stream (tickCount + match id, the fiesta
+  mechanism) is used only for bot skill variance. World parity goldens never
+  fork. The active course per slot lives in a registry
+  (`hodrics_course.ts`) written purely from sim state, so every host (offline,
+  server, headless) and the renderer converge on identical geometry.
+
+### Generation quality (by construction, not luck)
+
+`generateHcCourse` cannot produce an unfair or broken course: segments are
+parameterized designs (not noise), the assembler funnels every width change and
+reserves a length budget so nothing overruns the band, and `validateHcCourse`
+asserts the invariants (continuous center-line except the deliberate gap
+sections, monotone checkpoints on real ground, obstacles inside their spans,
+hop-crossable spinner chains, rotor sweeps clearing their gates). The test suite
+sweeps the validator across 240 seeds x 3 difficulties (720 courses) plus
+segment-coverage and determinism checks.
 
 ### Game-feel layer (the gameshow rework)
 

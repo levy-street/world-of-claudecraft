@@ -35,6 +35,12 @@ import {
   ZONES,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
+import {
+  hcCourseFor,
+  hcIdleCourseSeed,
+  hodricsSlotAt,
+  setActiveHodricsCourse,
+} from '../sim/hodrics_course';
 import { HC_HALF_Z } from '../sim/hodrics_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
@@ -3968,24 +3974,38 @@ export class Renderer {
         }
       }
     } else if (inside && isHodricsPos(px)) {
-      // build the Hodric's Castle race slot the player was matched into (or
-      // is approaching in practice); the course footprint is ~280yd long, so
-      // gate on a window wide enough to cover it end to end.
+      // Build (or REBUILD) the Hodric's Castle race slot the player is in.
+      // Lord Hodric regenerates his course every round, so the desired seed
+      // comes from the live match info (idle attract seed between matches);
+      // a seed change tears the old build down and raises the new castle.
       for (let i = 0; i < HODRICS_SLOT_COUNT; i++) {
-        if (this.hodricsCastles.has(i) || this.pendingHodricsSlots.has(i)) continue;
+        if (this.pendingHodricsSlots.has(i)) continue;
         const o = hodricsOrigin(i);
-        if (Math.abs(px - o.x) < 60 && Math.abs(pz - o.z) < HC_HALF_Z + 40) {
-          this.pendingHodricsSlots.add(i);
-          void buildHodricsCastle(this.scene, o.x, o.z)
-            .then((view) => {
-              this.hodricsCastles.set(i, view);
-              this.pendingHodricsSlots.delete(i);
-            })
-            .catch((err) => {
-              this.pendingHodricsSlots.delete(i);
-              console.error("Failed to build Hodric's Castle:", err);
-            });
+        if (Math.abs(px - o.x) >= 60 || Math.abs(pz - o.z) >= HC_HALF_Z + 40) continue;
+        const match = this.sim.hcInfo?.match ?? null;
+        const mySlot = hodricsSlotAt(pz);
+        const seed = match && i === mySlot ? match.courseSeed : hcIdleCourseSeed(i);
+        const difficulty = match && i === mySlot ? Math.max(0, match.round - 1) : 0;
+        const built = this.hodricsCastles.get(i);
+        if (built && built.seed === seed) continue;
+        const course = hcCourseFor(seed, difficulty);
+        // Keep the client's collision/camera view of the band in lockstep
+        // with what is drawn (idempotent when the sim already wrote it).
+        setActiveHodricsCourse(i, course);
+        if (built) {
+          built.dispose(this.scene);
+          this.hodricsCastles.delete(i);
         }
+        this.pendingHodricsSlots.add(i);
+        void buildHodricsCastle(this.scene, o.x, o.z, course)
+          .then((view) => {
+            this.hodricsCastles.set(i, view);
+            this.pendingHodricsSlots.delete(i);
+          })
+          .catch((err) => {
+            this.pendingHodricsSlots.delete(i);
+            console.error("Failed to build Hodric's Castle:", err);
+          });
       }
     } else if (inside) {
       void ensureDungeonAssets().catch(() => undefined);

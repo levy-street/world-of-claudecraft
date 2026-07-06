@@ -1,54 +1,47 @@
-// Hodric's Castle course: built from the SAME plain-data layout the sim
-// derives its colliders from (src/sim/hodrics_layout.ts), so what you see is
-// what you collide with, plus the animated obstacles.
+// Hodric's Castle course renderer: builds whatever course the generator
+// produced (src/sim/hodrics_course.ts) from the SAME plain-data value the sim
+// collides against, so what you see is what you collide with, for every seed
+// Lord Hodric dreams up between rounds.
 //
 // LOOK: a bright gameshow castle (the Fall Guys reference in the PRD): candy
-// pink crenellated walls, cyan cone-roofed towers, striped hammer pendulums
-// on rigid arms under A-frame gantries, barber-pole log rotors, beach-ball
-// boulders that visibly roll, pennant strings, drifting cartoon clouds, and
-// confetti on the finish keep. Everything is procedural geometry + canvas
-// textures except a handful of CC0 GLB set pieces (arch gates, the finish
-// castle bulk, banners, torches).
+// pink crenellated walls, cyan cone-roofed turrets, striped hammer pendulums
+// on rigid arms under gantries, barber-pole log rotors, piston rams, rotating
+// candy discs, beach-ball boulders that visibly roll, pennant strings,
+// drifting cartoon clouds, a railed spectator gallery, and confetti on the
+// finish keep. Everything is procedural geometry + canvas textures except a
+// couple of CC0 GLB set pieces (banners, torches).
 //
 // Obstacles are POSED, never simulated here: every frame calls the exact same
 // pure pose functions the sim's race physics reads (hcFlailBob, hcAxeHead,
-// hcRotorAngle, hcDrawspanX, hcLaneBoulders), evaluated at the renderer's
-// interpolated clock (`this.time` on Renderer, passed in as `t`). That is the
-// whole "what you see is what you collide with" contract for a moving part:
-// sim and render read one function, never two. Clouds, flag flutter, and
-// boulder roll are pure functions of the same t (cosmetic, no collision).
+// hcRotorAngle, hcDrawspanX, hcLaneBoulders, hcPusherX, hcSpinnerAngle),
+// evaluated at the renderer's interpolated clock (`this.time` on Renderer,
+// passed in as `t`). Clouds, flag flutter, and boulder roll are pure
+// functions of the same t (cosmetic, no collision).
 //
-// Built once per race slot (on approach) and left in the scene for the
-// session, the DungeonInteriors precedent (builtInteriors never tears down).
+// REBUILDS: the castle is rebuilt whenever the active course seed changes
+// (each round of a match); dispose() releases the old build's procedural
+// geometry (GLB clones share their source geometry and are skipped).
 
 import * as THREE from 'three';
+import type { HcCourse } from '../sim/hodrics_course';
+import { hodricsGroundLocal } from '../sim/hodrics_course';
 import {
-  HC_AXES,
-  HC_BOULDER_LANES,
   HC_CHASM_Y,
-  HC_DRAWSPANS,
-  HC_FLAILS,
-  HC_ROTORS,
-  HC_SURFACES,
   type HcSurface,
-  hcAxeHead,
   hcDrawspanX,
-  hcFlailBob,
   hcLaneBoulders,
   hcPendulumAngle,
+  hcPusherX,
   hcRotorAngle,
-  hodricsColliders,
-  hodricsGroundLocal,
+  hcSpinnerAngle,
 } from '../sim/hodrics_layout';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { surfaceMat } from './gfx';
 
 // ---------------------------------------------------------------------------
-// Asset preload: a handful of CC0 GLB set pieces, cloned (not instanced) —
-// the course builds once per slot (at most HODRICS_SLOT_COUNT = 2), so a few
-// dozen extra draw calls per build costs nothing worth an InstancedMesh
-// pipeline. Obstacles and towers are procedural (see below), no GLBs.
+// Asset preload: a couple of CC0 GLB set pieces, cloned (not instanced).
+// Obstacles, towers, and arches are procedural, no GLBs.
 // ---------------------------------------------------------------------------
 
 const CASTLE_MODELS = {
@@ -76,11 +69,14 @@ export function ensureHodricsAssets(): Promise<void> {
 if (typeof window !== 'undefined') registerPreload(ensureHodricsAssets());
 
 // A static prop is a plain recursive clone (no skinning to preserve) —
-// consumers must not mutate the cached source scene.
+// consumers must not mutate the cached source scene. Marked so dispose()
+// leaves the shared source geometry alone.
 function cloneModel(key: CastleModelKey): THREE.Object3D {
   const src = modelCache.get(key);
   if (!src) throw new Error(`hodrics castle asset not preloaded: ${key}`);
-  return src.clone(true);
+  const obj = src.clone(true);
+  obj.userData.sharedGeometry = true;
+  return obj;
 }
 
 // ---------------------------------------------------------------------------
@@ -94,6 +90,7 @@ const PINK_LIGHT = 0xf7aed2;
 const CYAN_ROOF = 0x35b3e6;
 const GOLD = 0xf2b13c;
 const STEEL = 0x8f96a6;
+const RED = 0xe8344a;
 const RED_STRIPE = '#e8344a';
 const YELLOW_STRIPE = '#ffc93c';
 const ORANGE_STRIPE = '#ff9438';
@@ -101,7 +98,6 @@ const CREAM = '#f6efdc';
 
 const WALL_HEIGHT = 4;
 const POST_HEIGHT = 7.4;
-const HC_FINISH_ARCH_Z = 119;
 
 // Emissive-lifted candy material (cached by surfaceMat).
 function candyMat(color: number, opts: { map?: THREE.Texture; flatShading?: boolean } = {}) {
@@ -116,8 +112,7 @@ function candyMat(color: number, opts: { map?: THREE.Texture; flatShading?: bool
 }
 
 // ---------------------------------------------------------------------------
-// Procedural canvas textures: stripes and checkers, built lazily per style
-// (the module loads under Node in vitest transforms; no document at import).
+// Procedural canvas textures: stripes and checkers, built lazily per style.
 // ---------------------------------------------------------------------------
 
 const texCache = new Map<string, THREE.CanvasTexture>();
@@ -176,7 +171,7 @@ function hash01(i: number, salt: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// Floors: candy-coded per section from HC_SURFACES.
+// Floors: candy-coded per section from the course's surfaces.
 // ---------------------------------------------------------------------------
 
 function floorMaterial(s: HcSurface): THREE.Material {
@@ -184,7 +179,7 @@ function floorMaterial(s: HcSurface): THREE.Material {
     case 'grass':
       return candyMat(0x8ccb4a);
     case 'wood': {
-      // The Flail Bridge: bold yellow/orange bands across the walk.
+      // Bridges: bold yellow/orange bands across the walk.
       const bands = Math.max(4, Math.round((s.z1 - s.z0) / 2));
       return candyMat(0xffffff, {
         map: bandsTex(`bridge${bands}`, [YELLOW_STRIPE, ORANGE_STRIPE], bands, true),
@@ -198,6 +193,8 @@ function floorMaterial(s: HcSurface): THREE.Material {
       return candyMat(0xd8344a);
     case 'keep':
       return candyMat(0xffffff, { map: checkerTex('keep', '#f6e6b8', '#e8b64c', 8) });
+    case 'gallery':
+      return candyMat(0xffffff, { map: checkerTex('gallery', '#f7d9e8', CREAM, 6) });
   }
 }
 
@@ -260,25 +257,25 @@ function buildRampFloor(s: HcSurface): THREE.Mesh {
   return mesh;
 }
 
-function buildFloors(group: THREE.Group): void {
-  for (const s of HC_SURFACES) {
+function buildFloors(group: THREE.Group, course: HcCourse): void {
+  for (const s of course.surfaces) {
     group.add(s.y1 === undefined ? buildFlatFloor(s) : buildRampFloor(s));
   }
 }
 
 // ---------------------------------------------------------------------------
-// Walls + crenellations + towers, from the same hodricsColliders() the sim
+// Walls + crenellations + posts, from the same course colliders the sim
 // resolves movement against.
 // ---------------------------------------------------------------------------
 
 // Ground height under a wall element. Anything probing the chasm (a gantry
-// post beside the open bridge deck) roots at the course base instead.
-function wallBaseAt(lx: number, lz: number): number {
-  const g = hodricsGroundLocal(lx, lz);
+// post beside an open bridge deck) roots at the course base instead.
+function wallBaseAt(course: HcCourse, lx: number, lz: number): number {
+  const g = hodricsGroundLocal(course, lx, lz);
   return g <= HC_CHASM_Y + 1 ? 0 : g;
 }
 
-function buildWalls(group: THREE.Group): void {
+function buildWalls(group: THREE.Group, course: HcCourse): void {
   const wallMat = candyMat(PINK_WALL);
   const merlonPlacements: { x: number; z: number; y: number; alongX: boolean }[] = [];
 
@@ -304,15 +301,22 @@ function buildWalls(group: THREE.Group): void {
     }
   };
 
-  // Walls rise from the LOCAL course height (the keep terrace sits at y 14,
-  // the alley climbs 0 to 8): a flat base under level ground, stepped
+  // Walls rise from the LOCAL course height (terraces climb), with stepped
   // battlement segments where the ground slopes underneath.
-  for (const c of hodricsColliders()) {
+  for (const c of course.colliders) {
     if (c.type === 'obb') {
       const alongX = c.hw >= c.hd;
       const half = alongX ? c.hw : c.hd;
-      const end0 = wallBaseAt(alongX ? c.x - half + 0.1 : c.x, alongX ? c.z : c.z - half + 0.1);
-      const end1 = wallBaseAt(alongX ? c.x + half - 0.1 : c.x, alongX ? c.z : c.z + half - 0.1);
+      const end0 = wallBaseAt(
+        course,
+        alongX ? c.x - half + 0.1 : c.x,
+        alongX ? c.z : c.z - half + 0.1,
+      );
+      const end1 = wallBaseAt(
+        course,
+        alongX ? c.x + half - 0.1 : c.x,
+        alongX ? c.z : c.z + half - 0.1,
+      );
       if (Math.abs(end1 - end0) < 0.5) {
         addWallBox(c.x, c.z, c.hw, c.hd, Math.min(end0, end1));
       } else {
@@ -327,12 +331,12 @@ function buildWalls(group: THREE.Group): void {
             sz,
             alongX ? stepLen / 2 : c.hw,
             alongX ? c.hd : stepLen / 2,
-            wallBaseAt(sx, sz),
+            wallBaseAt(course, sx, sz),
           );
         }
       }
     } else {
-      buildTowerPost(group, c.x, c.z, c.r);
+      buildTowerPost(group, course, c.x, c.z, c.r);
     }
   }
 
@@ -352,12 +356,20 @@ function buildWalls(group: THREE.Group): void {
   group.add(inst);
 }
 
-// Collider posts become festive turret poles: the flail gantry pair (r 0.45)
-// reads as steel A-frame uprights, the arch posts as gold-capped pink poles.
-function buildTowerPost(group: THREE.Group, x: number, z: number, r: number): void {
+// Collider posts become festive poles: gantry pairs (r < 0.5) read as steel
+// uprights rooted at their flail's deck, the arch posts as gold-capped pink
+// poles.
+function buildTowerPost(
+  group: THREE.Group,
+  course: HcCourse,
+  x: number,
+  z: number,
+  r: number,
+): void {
   const gantry = r < 0.5;
-  const base = wallBaseAt(x, z);
-  const h = gantry ? HC_FLAILS[0].pivotY + 0.6 : POST_HEIGHT;
+  const flail = gantry ? course.flails.find((f) => Math.abs(f.z - z) < 0.2) : undefined;
+  const base = flail ? flail.y : wallBaseAt(course, x, z);
+  const h = gantry ? (flail?.pivotY ?? 7) + 0.6 : POST_HEIGHT;
   const pole = new THREE.Mesh(
     new THREE.CylinderGeometry(r, r * 1.15, h, 10),
     gantry ? candyMat(STEEL) : candyMat(PINK_WALL),
@@ -372,9 +384,8 @@ function buildTowerPost(group: THREE.Group, x: number, z: number, r: number): vo
   }
 }
 
-// A candy gate arch: a half-torus rainbow of pink spanning its collider
-// posts, crowned with a gold ball. The posts themselves come from
-// hodricsColliders() via buildTowerPost.
+// A candy gate arch: a half-torus of pink spanning its collider posts,
+// crowned with a gold ball.
 function buildCandyArch(group: THREE.Group, halfSpan: number, z: number, baseY: number): void {
   const arch = new THREE.Mesh(
     new THREE.TorusGeometry(halfSpan, 0.55, 10, 28, Math.PI),
@@ -388,29 +399,17 @@ function buildCandyArch(group: THREE.Group, halfSpan: number, z: number, baseY: 
   group.add(ball);
 }
 
-// The finish backdrop: a broad pink keep block behind the terrace wall with
-// three cone-roofed turrets, the reference image's skyline. Extends well
-// below the terrace so the chasm never peeks through behind the finish.
-function buildKeepBackdrop(group: THREE.Group): void {
-  const bulk = new THREE.Mesh(new THREE.BoxGeometry(24, 16, 6), candyMat(PINK_WALL));
-  bulk.position.set(0, 10, 136);
-  bulk.castShadow = true;
-  bulk.receiveShadow = true;
-  group.add(bulk);
-  buildTurret(group, -9, 136, 14, 1.2);
-  buildTurret(group, 9, 136, 14, 1.2);
-  buildTurret(group, 0, 137, 14, 1.7);
-}
-
 // Pure-dressing corner turrets (no collider): pink drum + cyan cone + gold
-// ball, the castle silhouette of the reference image.
+// ball, the castle silhouette of the reference image. The drum sinks a few
+// units so turrets rooted beside raised terraces read grounded.
 function buildTurret(group: THREE.Group, x: number, z: number, baseY: number, scale = 1): void {
-  const drumH = 7 * scale;
+  const sink = 5;
+  const drumH = 7 * scale + sink;
   const drum = new THREE.Mesh(
     new THREE.CylinderGeometry(1.6 * scale, 1.8 * scale, drumH, 12),
     candyMat(PINK_WALL),
   );
-  drum.position.set(x, baseY + drumH / 2, z);
+  drum.position.set(x, baseY - sink + drumH / 2, z);
   drum.castShadow = true;
   group.add(drum);
   const roofH = 3.2 * scale;
@@ -418,16 +417,33 @@ function buildTurret(group: THREE.Group, x: number, z: number, baseY: number, sc
     new THREE.ConeGeometry(2.2 * scale, roofH, 12),
     candyMat(CYAN_ROOF, { flatShading: true }),
   );
-  roof.position.set(x, baseY + drumH + roofH / 2, z);
+  roof.position.set(x, baseY - sink + drumH + roofH / 2, z);
   roof.castShadow = true;
   group.add(roof);
   const ball = new THREE.Mesh(new THREE.SphereGeometry(0.42 * scale, 10, 8), candyMat(GOLD));
-  ball.position.set(x, baseY + drumH + roofH + 0.3 * scale, z);
+  ball.position.set(x, baseY - sink + drumH + roofH + 0.3 * scale, z);
   group.add(ball);
 }
 
+// The finish backdrop: a broad pink keep block behind the terrace wall with
+// three cone-roofed turrets. Extends well below the terrace so the chasm
+// never peeks through behind the finish.
+function buildKeepBackdrop(group: THREE.Group, course: HcCourse): void {
+  const keep = course.sections[course.sections.length - 1];
+  const z = keep.z1 + 4;
+  const y = course.finishY;
+  const bulk = new THREE.Mesh(new THREE.BoxGeometry(24, 16, 6), candyMat(PINK_WALL));
+  bulk.position.set(0, y - 4, z);
+  bulk.castShadow = true;
+  bulk.receiveShadow = true;
+  group.add(bulk);
+  buildTurret(group, -9, z, y, 1.2);
+  buildTurret(group, 9, z, y, 1.2);
+  buildTurret(group, 0, z + 1, y, 1.7);
+}
+
 // ---------------------------------------------------------------------------
-// Dressing: GLB set pieces, corner turrets, pennant strings, confetti.
+// Dressing: GLB set pieces, turrets, pennants, gallery canopy, confetti.
 // ---------------------------------------------------------------------------
 
 function placeProp(
@@ -452,66 +468,6 @@ function placeProp(
   group.add(obj);
 }
 
-function buildDressing(group: THREE.Group): void {
-  // Candy arches over the yard mouth and the finish line (their posts are
-  // colliders, drawn by buildTowerPost), and the keep skyline behind it all.
-  buildCandyArch(group, 7, -104, 0);
-  buildCandyArch(group, 5, HC_FINISH_ARCH_Z, 14);
-  buildKeepBackdrop(group);
-
-  // Corner turrets: the start yard's four corners, the court gates, and the
-  // finish terrace, tracing the course silhouette in pink-and-cyan.
-  buildTurret(group, -16, -116, 0);
-  buildTurret(group, 16, -116, 0);
-  buildTurret(group, -16, -85, 0);
-  buildTurret(group, 16, -85, 0);
-  buildTurret(group, -14, -35, 0, 0.85);
-  buildTurret(group, 14, -35, 0, 0.85);
-  buildTurret(group, -14, 15, 0, 0.85);
-  buildTurret(group, 14, 15, 0, 0.85);
-  buildTurret(group, -13.8, 76.5, 0, 0.85);
-  buildTurret(group, 13.8, 76.5, 0, 0.85);
-  buildTurret(group, -14, 132, 14, 0.9);
-  buildTurret(group, 14, 132, 14, 0.9);
-
-  // Banners along the Log Court walls and the finish gate.
-  const bannerSpots: [number, number, number][] = [
-    [-13.5, 0, -30],
-    [13.5, 0, -30],
-    [-13.5, 0, 5],
-    [13.5, 0, 5],
-    [-13.5, 14, 118],
-    [13.5, 14, 118],
-  ];
-  for (const [x, y, z] of bannerSpots) {
-    placeProp(
-      group,
-      x < 0 ? 'bannerBlue' : 'bannerRed',
-      x,
-      y,
-      z,
-      x < 0 ? Math.PI / 2 : -Math.PI / 2,
-      1.3,
-    );
-  }
-
-  // Torches at the checkpoint landings, rooted on the local course height.
-  const torchSpots: [number, number][] = [
-    [-13, -40],
-    [13, -40],
-    [-11, 78],
-    [11, 78],
-    [-9, 104],
-    [9, 104],
-  ];
-  for (const [x, z] of torchSpots) placeProp(group, 'torchLit', x, wallBaseAt(x, z), z, 0, 1.2);
-
-  buildPennants(group);
-  buildConfetti(group);
-}
-
-// Pennant strings: triangle flags on a sagging line across the course at the
-// section gates. One instanced draw, per-instance festival colors.
 const FLAG_COLORS = [0x35b3e6, 0xffc93c, 0xef5d8f, 0xf6efdc];
 
 interface PennantSpan {
@@ -521,18 +477,10 @@ interface PennantSpan {
   z: number;
 }
 
-const PENNANT_SPANS: PennantSpan[] = [
-  { x0: -16, x1: 16, y: 9.5, z: -85 },
-  { x0: -14, x1: 14, y: 8.5, z: -35 },
-  { x0: -14, x1: 14, y: 8.5, z: 15 },
-  { x0: -12, x1: 12, y: 8.5, z: 50 },
-  { x0: -12, x1: 12, y: 8.5, z: 78 },
-  { x0: -14, x1: 14, y: 23, z: 118 },
-];
-
-function buildPennants(group: THREE.Group): void {
-  const flagsPerSpan = PENNANT_SPANS.map((s) => Math.floor((s.x1 - s.x0) / 2.1));
+function buildPennants(group: THREE.Group, spans: PennantSpan[]): void {
+  const flagsPerSpan = spans.map((s) => Math.floor((s.x1 - s.x0) / 2.1));
   const total = flagsPerSpan.reduce((a, b) => a + b, 0);
+  if (total <= 0) return;
   const geo = new THREE.BufferGeometry();
   geo.setAttribute(
     'position',
@@ -548,8 +496,8 @@ function buildPennants(group: THREE.Group): void {
   const one = new THREE.Vector3(1, 1, 1);
   const color = new THREE.Color();
   let i = 0;
-  for (let s = 0; s < PENNANT_SPANS.length; s++) {
-    const span = PENNANT_SPANS[s];
+  for (let s = 0; s < spans.length; s++) {
+    const span = spans[s];
     const n = flagsPerSpan[s];
     for (let k = 0; k < n; k++) {
       const f = (k + 0.5) / n;
@@ -567,7 +515,8 @@ function buildPennants(group: THREE.Group): void {
 
 // Confetti sprinkle on the finish keep floor: one instanced draw of tiny
 // tilted quads in festival colors, deterministically scattered.
-function buildConfetti(group: THREE.Group): void {
+function buildConfetti(group: THREE.Group, course: HcCourse): void {
+  const keep = course.sections[course.sections.length - 1];
   const N = 110;
   const geo = new THREE.PlaneGeometry(0.28, 0.28);
   const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
@@ -579,7 +528,11 @@ function buildConfetti(group: THREE.Group): void {
   const one = new THREE.Vector3(1, 1, 1);
   const color = new THREE.Color();
   for (let i = 0; i < N; i++) {
-    pos.set(-13 + hash01(i, 1) * 26, 14.03 + hash01(i, 2) * 0.03, 119 + hash01(i, 3) * 12);
+    pos.set(
+      -13 + hash01(i, 1) * 26,
+      course.finishY + 0.03 + hash01(i, 2) * 0.03,
+      keep.z0 + 1 + hash01(i, 3) * (keep.z1 - keep.z0 - 2),
+    );
     e.set(-Math.PI / 2, 0, hash01(i, 4) * Math.PI);
     q.setFromEuler(e);
     m.compose(pos, q, one);
@@ -587,6 +540,64 @@ function buildConfetti(group: THREE.Group): void {
     inst.setColorAt(i, color.setHex(FLAG_COLORS[i % FLAG_COLORS.length]));
   }
   group.add(inst);
+}
+
+function buildDressing(group: THREE.Group, course: HcCourse): void {
+  const yard = course.sections[0];
+  const keep = course.sections[course.sections.length - 1];
+
+  // Candy arches over the yard gate and the finish line (their posts are
+  // course colliders, drawn by buildTowerPost), the skyline behind it all.
+  buildCandyArch(group, 7, yard.z0 + 24, 0);
+  buildCandyArch(group, 5, course.finishZ, course.finishY);
+  buildKeepBackdrop(group, course);
+
+  // Turrets trace the silhouette: yard corners, every landing, the keep.
+  buildTurret(group, -16, yard.z0, 0);
+  buildTurret(group, 16, yard.z0, 0);
+  buildTurret(group, -16, yard.z1, 0);
+  buildTurret(group, 16, yard.z1, 0);
+  const pennantSpans: PennantSpan[] = [{ x0: -16, x1: 16, y: 9.5, z: yard.z1 }];
+  for (const s of course.sections) {
+    if (s.id !== 'landing') continue;
+    const y = wallBaseAt(course, 0, s.z0 + 3.5);
+    buildTurret(group, -13.8, s.z0 + 3.5, y, 0.85);
+    buildTurret(group, 13.8, s.z0 + 3.5, y, 0.85);
+    pennantSpans.push({ x0: -13.8, x1: 13.8, y: y + 8.5, z: s.z0 + 3.5 });
+    placeProp(group, 'torchLit', -11, y, s.z0 + 1.5, 0, 1.2);
+    placeProp(group, 'torchLit', 11, y, s.z0 + 1.5, 0, 1.2);
+  }
+  buildTurret(group, -14, keep.z1, course.finishY, 0.9);
+  buildTurret(group, 14, keep.z1, course.finishY, 0.9);
+  pennantSpans.push({ x0: -14, x1: 14, y: course.finishY + 9, z: course.finishZ - 1 });
+
+  // Banners flank the finish gate.
+  placeProp(group, 'bannerBlue', -13.5, course.finishY, keep.z0 + 0.5, Math.PI / 2, 1.3);
+  placeProp(group, 'bannerRed', 13.5, course.finishY, keep.z0 + 0.5, -Math.PI / 2, 1.3);
+
+  // The gallery: canopy on gold poles over the balcony (its floor and railed
+  // walls come from the course surfaces/colliders like everything else).
+  const g = course.gallery;
+  const canopy = new THREE.Mesh(
+    new THREE.ConeGeometry(9, 3, 4),
+    candyMat(CYAN_ROOF, { flatShading: true }),
+  );
+  canopy.rotation.y = Math.PI / 4;
+  canopy.position.set(g.x, g.y + 9.5, g.z);
+  group.add(canopy);
+  for (const [dx, dz] of [
+    [-4.5, -6],
+    [4.5, -6],
+    [-4.5, 6],
+    [4.5, 6],
+  ]) {
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 8.4, 8), candyMat(GOLD));
+    pole.position.set(g.x + dx, g.y + 4.2, g.z + dz);
+    group.add(pole);
+  }
+
+  buildPennants(group, pennantSpans);
+  buildConfetti(group, course);
 }
 
 // ---------------------------------------------------------------------------
@@ -609,7 +620,7 @@ const CLOUDS: CloudDef[] = [
   { x: 34, y: 27, z: 30, scale: 0.9, speed: 1.05 },
   { x: -30, y: 33, z: 70, scale: 1.4, speed: 0.55 },
   { x: 26, y: 30, z: 105, scale: 1.1, speed: 0.8 },
-  { x: -20, y: 36, z: 132, scale: 1.3, speed: 0.65 },
+  { x: -20, y: 36, z: 125, scale: 1.3, speed: 0.65 },
 ];
 
 // Each cloud is 4 overlapping puffs; one InstancedMesh total.
@@ -662,9 +673,8 @@ function poseClouds(inst: THREE.InstancedMesh, t: number): void {
 // Obstacles: analytic pose, evaluated fresh every frame from `t`.
 // ---------------------------------------------------------------------------
 
-// Rigs store only the THREE objects; pose math re-reads the def arrays by
-// index (rigs are built 1:1 from HC_FLAILS/HC_AXES/HC_ROTORS/HC_DRAWSPANS, so
-// index i always means the same obstacle in both places).
+// Rigs store only the THREE objects; pose math re-reads the course def arrays
+// by index (rigs are built 1:1, so index i always means the same obstacle).
 interface PendulumRig {
   /** Pivots at the gantry; arm + head hang below and swing via rotation.z. */
   pivot: THREE.Group;
@@ -682,6 +692,15 @@ interface BoulderRig {
   pool: THREE.Object3D[];
 }
 
+interface PusherRig {
+  head: THREE.Group;
+  arm: THREE.Mesh;
+}
+
+interface SpinnerRig {
+  disc: THREE.Group;
+}
+
 // The gameshow hammer: a fat yellow cylinder head with a red center band and
 // gold caps, its axis along the course (z), hanging on a rigid grey arm.
 function buildHammerHead(bobR: number): THREE.Group {
@@ -696,7 +715,7 @@ function buildHammerHead(bobR: number): THREE.Group {
     head.add(mesh);
   };
   seg(0xffc93c, -halfLen, -halfLen * 0.33);
-  seg(0xe8344a, -halfLen * 0.33, halfLen * 0.33);
+  seg(RED, -halfLen * 0.33, halfLen * 0.33);
   seg(0xffc93c, halfLen * 0.33, halfLen);
   const capGeo = new THREE.CylinderGeometry(bobR * 0.55, bobR * 0.55, 0.3, 12);
   capGeo.rotateX(Math.PI / 2);
@@ -708,7 +727,7 @@ function buildHammerHead(bobR: number): THREE.Group {
   return head;
 }
 
-// The axe pendulum: a broad gold crescent blade on a crimson arm.
+// The axe pendulum: a broad gold crescent blade on a crimson boss.
 function buildAxeHeadMesh(headR: number): THREE.Group {
   const head = new THREE.Group();
   const bladeGeo = new THREE.CylinderGeometry(headR, headR, 0.5, 18, 1, false, 0, Math.PI);
@@ -718,7 +737,7 @@ function buildAxeHeadMesh(headR: number): THREE.Group {
   const blade = new THREE.Mesh(bladeGeo, candyMat(GOLD, { flatShading: true }));
   blade.castShadow = true;
   head.add(blade);
-  const boss = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 8), candyMat(0xe8344a));
+  const boss = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 8), candyMat(RED));
   head.add(boss);
   return head;
 }
@@ -726,6 +745,7 @@ function buildAxeHeadMesh(headR: number): THREE.Group {
 function buildPendulum(
   group: THREE.Group,
   z: number,
+  deckY: number,
   pivotY: number,
   armLen: number,
   head: THREE.Group,
@@ -733,7 +753,7 @@ function buildPendulum(
   uprights = false,
 ): PendulumRig {
   const pivot = new THREE.Group();
-  pivot.position.set(0, pivotY, z);
+  pivot.position.set(0, deckY + pivotY, z);
   const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, armLen, 8), candyMat(STEEL));
   arm.position.y = -armLen / 2;
   arm.castShadow = true;
@@ -741,19 +761,18 @@ function buildPendulum(
   head.position.y = -armLen;
   pivot.add(head);
   group.add(pivot);
-  // Crossbeam between the gantry posts, with a gold pivot hub. The flail
-  // bridge already has collider gantry posts (drawn by buildTowerPost); the
-  // axe walk has none, so uprights are drawn here when asked.
+  // Crossbeam between the gantry posts, with a gold pivot hub. Bridges get
+  // collider gantry posts (drawn by buildTowerPost); walks draw uprights.
   if (gantryHalfX !== null) {
     const beam = new THREE.Mesh(
       new THREE.BoxGeometry(gantryHalfX * 2 + 0.6, 0.5, 0.5),
       candyMat(STEEL),
     );
-    beam.position.set(0, pivotY + 0.25, z);
+    beam.position.set(0, deckY + pivotY + 0.25, z);
     beam.castShadow = true;
     group.add(beam);
     const hub = new THREE.Mesh(new THREE.SphereGeometry(0.34, 10, 8), candyMat(GOLD));
-    hub.position.set(0, pivotY, z);
+    hub.position.set(0, deckY + pivotY, z);
     group.add(hub);
     if (uprights) {
       for (const sx of [-gantryHalfX, gantryHalfX]) {
@@ -761,7 +780,7 @@ function buildPendulum(
           new THREE.CylinderGeometry(0.22, 0.28, pivotY + 0.5, 8),
           candyMat(STEEL),
         );
-        pole.position.set(sx, (pivotY + 0.5) / 2, z);
+        pole.position.set(sx, deckY + (pivotY + 0.5) / 2, z);
         pole.castShadow = true;
         group.add(pole);
       }
@@ -771,15 +790,22 @@ function buildPendulum(
 }
 
 // Barber-pole rotor log: alternating red/white segments plus a gold hub.
-function buildRotorBeam(group: THREE.Group, cx: number, cz: number, r: number, beamHalf: number) {
+function buildRotorBeam(
+  group: THREE.Group,
+  cx: number,
+  cz: number,
+  deckY: number,
+  r: number,
+  beamHalf: number,
+): RotorRig {
   const beam = new THREE.Group();
-  beam.position.set(cx, 0.85, cz);
+  beam.position.set(cx, deckY + 0.85, cz);
   const segs = 8;
   const segLen = (r * 2) / segs;
   for (let i = 0; i < segs; i++) {
     const g = new THREE.CylinderGeometry(beamHalf, beamHalf, segLen, 10);
     g.rotateZ(Math.PI / 2);
-    const mesh = new THREE.Mesh(g, candyMat(i % 2 === 0 ? 0xe8344a : 0xf6efdc));
+    const mesh = new THREE.Mesh(g, candyMat(i % 2 === 0 ? RED : 0xf6efdc));
     mesh.position.x = -r + segLen * (i + 0.5);
     mesh.castShadow = true;
     beam.add(mesh);
@@ -791,26 +817,84 @@ function buildRotorBeam(group: THREE.Group, cx: number, cz: number, r: number, b
   return { beam };
 }
 
-function buildObstacles(group: THREE.Group): {
+// Piston ram: a padded red head on a steel arm out of a pink wall housing.
+function buildPusher(
+  group: THREE.Group,
+  d: { z: number; y: number; side: number; wallX: number; headR: number },
+): PusherRig {
+  const housing = new THREE.Mesh(new THREE.BoxGeometry(1.6, 3.2, 2.6), candyMat(PINK_WALL));
+  housing.position.set(d.wallX + d.side * 0.8, d.y + 1.6, d.z);
+  housing.castShadow = true;
+  group.add(housing);
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 0.5), candyMat(STEEL));
+  arm.position.set(d.wallX, d.y + 1.1, d.z);
+  arm.castShadow = true;
+  group.add(arm);
+  const head = new THREE.Group();
+  const pad = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.2, 2.2), candyMat(RED));
+  pad.castShadow = true;
+  head.add(pad);
+  const face = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.7, 1.7), candyMat(0xf6efdc));
+  face.position.x = -d.side * 0.5;
+  head.add(face);
+  head.position.set(d.wallX, d.y + 1.1, d.z);
+  group.add(head);
+  return { head, arm };
+}
+
+// Spinner plate: a two-tone candy disc on a support column, rotating.
+function buildSpinner(
+  group: THREE.Group,
+  d: { cx: number; cz: number; y: number; r: number },
+): SpinnerRig {
+  const disc = new THREE.Group();
+  disc.position.set(d.cx, d.y, d.cz);
+  for (let hemi = 0; hemi < 2; hemi++) {
+    const g = new THREE.CylinderGeometry(d.r, d.r, 0.5, 20, 1, false, hemi * Math.PI, Math.PI);
+    const mesh = new THREE.Mesh(g, candyMat(hemi === 0 ? RED : 0xf6efdc));
+    mesh.position.y = -0.25;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    disc.add(mesh);
+  }
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.7, 12), candyMat(GOLD));
+  hub.position.y = 0.1;
+  disc.add(hub);
+  group.add(disc);
+  const column = new THREE.Mesh(
+    new THREE.CylinderGeometry(d.r * 0.28, d.r * 0.36, 9, 12),
+    candyMat(PINK_WALL),
+  );
+  column.position.set(d.cx, d.y - 4.75, d.cz);
+  group.add(column);
+  return { disc };
+}
+
+function buildObstacles(
+  group: THREE.Group,
+  course: HcCourse,
+): {
   flails: PendulumRig[];
   axes: PendulumRig[];
   rotors: RotorRig[];
   drawspans: DrawspanRig[];
   boulders: BoulderRig[];
+  pushers: PusherRig[];
+  spinners: SpinnerRig[];
 } {
-  const flails: PendulumRig[] = HC_FLAILS.map((f) =>
-    buildPendulum(group, f.z, f.pivotY, f.chainLen, buildHammerHead(f.bobR), 6.9),
+  const flails: PendulumRig[] = course.flails.map((f) =>
+    buildPendulum(group, f.z, f.y, f.pivotY, f.chainLen, buildHammerHead(f.bobR), 6.9),
   );
 
-  const axes: PendulumRig[] = HC_AXES.map((a) =>
-    buildPendulum(group, a.z, a.pivotY, a.armLen, buildAxeHeadMesh(a.headR), 4.9, true),
+  const axes: PendulumRig[] = course.axes.map((a) =>
+    buildPendulum(group, a.z, a.y, a.pivotY, a.armLen, buildAxeHeadMesh(a.headR), 4.9, true),
   );
 
-  const rotors: RotorRig[] = HC_ROTORS.map((r) =>
-    buildRotorBeam(group, r.cx, r.cz, r.r, r.beamHalf),
+  const rotors: RotorRig[] = course.rotors.map((r) =>
+    buildRotorBeam(group, r.cx, r.cz, r.y, r.r, r.beamHalf),
   );
 
-  const drawspans: DrawspanRig[] = HC_DRAWSPANS.map((d) => {
+  const drawspans: DrawspanRig[] = course.drawspans.map((d) => {
     const deckTex = bandsTex('drawspan', ['#7ec8ef', '#f6efdc'], 6, false);
     const geo = new THREE.BoxGeometry(d.halfX * 2, 0.5, d.halfZ * 2);
     const mesh = new THREE.Mesh(geo, candyMat(0xffffff, { map: deckTex }));
@@ -826,11 +910,11 @@ function buildObstacles(group: THREE.Group): {
     return { mesh };
   });
 
-  const boulders: BoulderRig[] = HC_BOULDER_LANES.map((lane, laneIdx) => {
+  const boulders: BoulderRig[] = course.boulderLanes.map((lane, laneIdx) => {
     const travel = (lane.zTop - lane.zEnd) / lane.speed;
     const poolSize = Math.max(2, Math.ceil(travel / lane.period) + 1);
     const ballTex = bandsTex(
-      `ball${laneIdx}`,
+      `ball${laneIdx % 3}`,
       [RED_STRIPE, CREAM, '#35b3e6', CREAM, YELLOW_STRIPE, CREAM],
       6,
       false,
@@ -849,45 +933,75 @@ function buildObstacles(group: THREE.Group): {
     return { pool };
   });
 
-  return { flails, axes, rotors, drawspans, boulders };
+  const pushers: PusherRig[] = course.pushers.map((p) => buildPusher(group, p));
+  const spinners: SpinnerRig[] = course.spinners.map((d) => buildSpinner(group, d));
+
+  return { flails, axes, rotors, drawspans, boulders, pushers, spinners };
 }
 
 // ---------------------------------------------------------------------------
-// Public build + update
+// Public build + update + dispose
 // ---------------------------------------------------------------------------
 
 export interface HodricsCastleView {
   group: THREE.Group;
+  /** The course this build renders; the renderer rebuilds on seed change. */
+  seed: number;
   update(t: number): void;
+  dispose(scene: THREE.Scene): void;
 }
 
 export async function buildHodricsCastle(
   scene: THREE.Scene,
   ox: number,
   oz: number,
+  course: HcCourse,
 ): Promise<HodricsCastleView> {
   await ensureHodricsAssets();
   const group = new THREE.Group();
   group.position.set(ox, 0, oz);
-  buildFloors(group);
-  buildWalls(group);
-  buildDressing(group);
-  const obstacles = buildObstacles(group);
+  buildFloors(group, course);
+  buildWalls(group, course);
+  buildDressing(group, course);
+  const obstacles = buildObstacles(group, course);
   const clouds = buildClouds(group);
   scene.add(group);
-  return { group, update: buildUpdate(obstacles, clouds) };
+  return {
+    group,
+    seed: course.seed,
+    update: buildUpdate(course, obstacles, clouds),
+    dispose(s: THREE.Scene) {
+      s.remove(group);
+      group.traverse((o) => {
+        // GLB clones share their source geometry; everything else here is
+        // per-build procedural geometry, safe to free. Materials are shared
+        // via the surfaceMat cache and stay alive.
+        if (o.userData.sharedGeometry) return;
+        let shared = false;
+        for (let p = o.parent; p; p = p.parent) {
+          if (p.userData.sharedGeometry) {
+            shared = true;
+            break;
+          }
+        }
+        if (!shared && (o as THREE.Mesh).isMesh) (o as THREE.Mesh).geometry.dispose();
+      });
+    },
+  };
 }
 
-// Real per-frame updater, closed over the same HC_FLAILS/HC_AXES/HC_ROTORS/
-// HC_DRAWSPANS/HC_BOULDER_LANES defs the rig arrays were built from (indices
-// line up 1:1, so no lookup is needed at update time).
+// Real per-frame updater, closed over the course def arrays the rig arrays
+// were built from (indices line up 1:1, so no lookup at update time).
 function buildUpdate(
+  course: HcCourse,
   obstacles: {
     flails: PendulumRig[];
     axes: PendulumRig[];
     rotors: RotorRig[];
     drawspans: DrawspanRig[];
     boulders: BoulderRig[];
+    pushers: PusherRig[];
+    spinners: SpinnerRig[];
   },
   clouds: THREE.InstancedMesh,
 ): (t: number) => void {
@@ -896,23 +1010,34 @@ function buildUpdate(
     // then sit at exactly hcFlailBob/hcAxeHead's analytic position (same
     // sin/cos), while staying visually rigid.
     for (let i = 0; i < obstacles.flails.length; i++) {
-      const def = HC_FLAILS[i];
+      const def = course.flails[i];
       obstacles.flails[i].pivot.rotation.z = hcPendulumAngle(def.amp, def.period, def.phase, t);
     }
     for (let i = 0; i < obstacles.axes.length; i++) {
-      const def = HC_AXES[i];
+      const def = course.axes[i];
       obstacles.axes[i].pivot.rotation.z = hcPendulumAngle(def.amp, def.period, def.phase, t);
     }
     for (let i = 0; i < obstacles.rotors.length; i++) {
-      const def = HC_ROTORS[i];
-      obstacles.rotors[i].beam.rotation.y = hcRotorAngle(def, t);
+      obstacles.rotors[i].beam.rotation.y = hcRotorAngle(course.rotors[i], t);
     }
     for (let i = 0; i < obstacles.drawspans.length; i++) {
-      const def = HC_DRAWSPANS[i];
-      obstacles.drawspans[i].mesh.position.x = hcDrawspanX(def, t);
+      obstacles.drawspans[i].mesh.position.x = hcDrawspanX(course.drawspans[i], t);
+    }
+    for (let i = 0; i < obstacles.pushers.length; i++) {
+      const def = course.pushers[i];
+      const rig = obstacles.pushers[i];
+      const hx = hcPusherX(def, t);
+      rig.head.position.x = hx;
+      // Arm stretches from the wall face to the head.
+      const len = Math.max(0.05, Math.abs(hx - def.wallX));
+      rig.arm.scale.x = len;
+      rig.arm.position.x = (hx + def.wallX) / 2;
+    }
+    for (let i = 0; i < obstacles.spinners.length; i++) {
+      obstacles.spinners[i].disc.rotation.y = hcSpinnerAngle(course.spinners[i], t);
     }
     for (let i = 0; i < obstacles.boulders.length; i++) {
-      const lane = HC_BOULDER_LANES[i];
+      const lane = course.boulderLanes[i];
       const rig = obstacles.boulders[i];
       const active = hcLaneBoulders(lane, t);
       for (let k = 0; k < rig.pool.length; k++) {

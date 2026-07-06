@@ -13,13 +13,18 @@ import type { HcInfo } from '../src/world_api';
 
 const MATCH_ACTIVE: HcInfo['match'] = {
   state: 'active',
+  round: 1,
+  rounds: 3,
+  qualify: 6,
+  courseSeed: 12345,
   countdown: 0,
   clock: 12,
   timeLeft: 228,
-  section: 'log_court',
+  section: 'rotor_court',
   checkpoint: 1,
   finished: false,
   place: null,
+  eliminated: false,
   falls: 0,
   racers: [],
 };

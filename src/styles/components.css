@@ -6475,6 +6475,17 @@
   .hc-row.left {
     opacity: 0.45;
   }
+  .hc-row.out {
+    opacity: 0.5;
+  }
+  .hc-row.out .hc-fill {
+    background: #6a6a74;
+  }
+  .hc-strip .hc-round,
+  .hc-strip .hc-advance {
+    color: #ffd75e;
+    font-weight: 600;
+  }
   .hc-row .hc-name {
     width: 110px;
     overflow: hidden;

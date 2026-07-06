@@ -15,6 +15,7 @@ function racer(over: Partial<HcRacerView> = {}): HcRacerView {
     progress: 0,
     finished: false,
     place: null,
+    eliminated: false,
     left: false,
     ...over,
   };
@@ -34,6 +35,10 @@ describe('buildHcHudView', () => {
       standing: null,
       match: {
         state: 'countdown',
+        round: 1,
+        rounds: 3,
+        qualify: 6,
+        courseSeed: 777,
         countdown: 3,
         clock: 0,
         timeLeft: 240,
@@ -41,34 +46,40 @@ describe('buildHcHudView', () => {
         checkpoint: 0,
         finished: false,
         place: null,
+        eliminated: false,
         falls: 0,
         racers: [],
       },
     });
-    expect(view).toEqual({ kind: 'countdown', seconds: 3, sig: 'c3' });
+    expect(view).toEqual({ kind: 'countdown', round: 1, rounds: 3, seconds: 3, sig: 'c1:3' });
   });
 
   it('is an over view once the match state is over, won vs placed', () => {
     const base = {
       state: 'over' as const,
+      round: 3,
+      rounds: 3,
+      qualify: 1,
+      courseSeed: 777,
       countdown: 0,
       clock: 90,
       timeLeft: 0,
       section: 'finish_keep',
       checkpoint: 4,
+      eliminated: false,
       falls: 1,
       racers: [],
     };
     const won = buildHcHudView({
       queued: null,
       standing: null,
-      match: { ...base, finished: true, place: 1 },
+      match: { ...base, finished: true, place: 1, eliminated: false },
     });
     expect(won).toEqual({ kind: 'over', place: 1, won: true, sig: 'o1' });
     const placed = buildHcHudView({
       queued: null,
       standing: null,
-      match: { ...base, finished: true, place: 4 },
+      match: { ...base, finished: true, place: 4, eliminated: false },
     });
     expect(placed).toEqual({ kind: 'over', place: 4, won: false, sig: 'o4' });
   });
@@ -79,6 +90,10 @@ describe('buildHcHudView', () => {
       standing: null,
       match: {
         state: 'active',
+        round: 1,
+        rounds: 3,
+        qualify: 6,
+        courseSeed: 777,
         countdown: 0,
         clock: 30,
         timeLeft: 210,
@@ -86,6 +101,7 @@ describe('buildHcHudView', () => {
         checkpoint: 2,
         finished: false,
         place: null,
+        eliminated: false,
         falls: 0,
         racers: [
           racer({ name: 'Leader', progress: 0.9 }),
@@ -110,6 +126,10 @@ describe('buildHcHudView', () => {
       standing: null,
       match: {
         state: 'active',
+        round: 1,
+        rounds: 3,
+        qualify: 6,
+        courseSeed: 777,
         countdown: 0,
         clock: 5,
         timeLeft: 235,
@@ -117,6 +137,7 @@ describe('buildHcHudView', () => {
         checkpoint: 0,
         finished: false,
         place: null,
+        eliminated: false,
         falls: 0,
         racers: [racer({ name: 'A' }), racer({ name: 'B' })],
       },
@@ -130,6 +151,10 @@ describe('buildHcHudView', () => {
       standing: null,
       match: {
         state: 'active',
+        round: 1,
+        rounds: 3,
+        qualify: 6,
+        courseSeed: 777,
         countdown: 0,
         clock: 60,
         timeLeft: 180,
@@ -137,6 +162,7 @@ describe('buildHcHudView', () => {
         checkpoint: 4,
         finished: true,
         place: 2,
+        eliminated: false,
         falls: 0,
         racers: [racer({ you: true, finished: true, place: 2, progress: 1 })],
       },
@@ -150,13 +176,18 @@ describe('buildHcHudView', () => {
   it('the render-skip signature is stable for identical input and changes on real change', () => {
     const match: NonNullable<HcInfo['match']> = {
       state: 'active',
+      round: 1,
+      rounds: 3,
+      qualify: 6,
+      courseSeed: 777,
       countdown: 0,
       clock: 10,
       timeLeft: 230,
-      section: 'log_court',
+      section: 'rotor_court',
       checkpoint: 1,
       finished: false,
       place: null,
+      eliminated: false,
       falls: 0,
       racers: [racer({ you: true, progress: 0.2 })],
     };

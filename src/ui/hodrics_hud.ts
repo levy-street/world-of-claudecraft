@@ -22,11 +22,14 @@ export interface HodricsHudDeps {
 // so the lookup is explicit rather than a template string).
 const SECTION_KEYS = {
   start_yard: 'hudChrome.hc.section.start_yard',
-  flail_bridge: 'hudChrome.hc.section.flail_bridge',
-  log_court: 'hudChrome.hc.section.log_court',
+  hammer_bridge: 'hudChrome.hc.section.hammer_bridge',
+  rotor_court: 'hudChrome.hc.section.rotor_court',
   axe_walk: 'hudChrome.hc.section.axe_walk',
   drawspan: 'hudChrome.hc.section.drawspan',
-  boulder_alley: 'hudChrome.hc.section.boulder_alley',
+  boulder_climb: 'hudChrome.hc.section.boulder_climb',
+  piston_ledge: 'hudChrome.hc.section.piston_ledge',
+  spinner_court: 'hudChrome.hc.section.spinner_court',
+  landing: 'hudChrome.hc.section.landing',
   red_ascent: 'hudChrome.hc.section.red_ascent',
   finish_keep: 'hudChrome.hc.section.finish_keep',
 } as const;
@@ -58,8 +61,27 @@ export class HodricsHud {
   }
 
   private html(view: Exclude<HcHudView, { kind: 'hidden' }>): string {
+    const roundChip = (round: number, rounds: number) =>
+      `<span class="hc-round">${esc(
+        t('hudChrome.hc.round', {
+          round: formatNumber(round, { maximumFractionDigits: 0 }),
+          rounds: formatNumber(rounds, { maximumFractionDigits: 0 }),
+        }),
+      )}</span>`;
     if (view.kind === 'countdown') {
-      return `<div class="hc-countdown">${esc(formatNumber(view.seconds, { maximumFractionDigits: 0 }))}</div>`;
+      return (
+        `<div class="hc-strip">${roundChip(view.round, view.rounds)}</div>` +
+        `<div class="hc-countdown">${esc(formatNumber(view.seconds, { maximumFractionDigits: 0 }))}</div>`
+      );
+    }
+    if (view.kind === 'intermission') {
+      const note = view.eliminated
+        ? t('hudChrome.hc.intermissionEliminated')
+        : t('hudChrome.hc.intermissionQualified');
+      return (
+        `<div class="hc-over">${esc(t('hudChrome.hc.intermissionRebuild'))}</div>` +
+        `<div class="hc-strip"><span class="hc-section">${esc(note)}</span></div>`
+      );
     }
     if (view.kind === 'over') {
       const text = view.won
@@ -69,33 +91,45 @@ export class HodricsHud {
           });
       return `<div class="hc-over">${esc(text)}</div>`;
     }
-    const rank = view.finished
-      ? t('hudChrome.hc.finishPlace', {
-          place: formatNumber(view.place ?? 0, { maximumFractionDigits: 0 }),
-        })
-      : t('hudChrome.hc.rank', {
-          rank: formatNumber(view.rank, { maximumFractionDigits: 0 }),
-          total: formatNumber(view.fieldSize, { maximumFractionDigits: 0 }),
-        });
+    const rank = view.spectating
+      ? t('hudChrome.hc.spectating')
+      : view.finished && view.place !== null
+        ? t('hudChrome.hc.finishPlace', {
+            place: formatNumber(view.place, { maximumFractionDigits: 0 }),
+          })
+        : view.finished
+          ? t('hudChrome.hc.intermissionQualified')
+          : t('hudChrome.hc.rank', {
+              rank: formatNumber(view.rank, { maximumFractionDigits: 0 }),
+              total: formatNumber(view.fieldSize, { maximumFractionDigits: 0 }),
+            });
     const sectionKey =
       SECTION_KEYS[view.section as keyof typeof SECTION_KEYS] ?? SECTION_KEYS.start_yard;
-    const section = t(sectionKey);
+    const section = view.spectating ? '' : t(sectionKey);
     const clock = t('hudChrome.hc.timeLeft', {
       seconds: formatNumber(view.timeLeft, { maximumFractionDigits: 0 }),
     });
+    const advance = t('hudChrome.hc.advance', {
+      count: formatNumber(view.qualify, { maximumFractionDigits: 0 }),
+    });
     const strip =
       `<div class="hc-strip">` +
+      roundChip(view.round, view.rounds) +
       `<span class="hc-rank">${esc(rank)}</span>` +
-      `<span class="hc-section">${esc(section)}</span>` +
+      (section ? `<span class="hc-section">${esc(section)}</span>` : '') +
+      `<span class="hc-advance">${esc(advance)}</span>` +
       `<span class="hc-clock">${esc(clock)}</span>` +
       `</div>`;
     const rows = view.rows
       .map((r) => {
         const pct = Math.round(r.progress * 100);
-        const cls = `hc-row${r.you ? ' you' : ''}${r.bot ? ' bot' : ''}${r.left ? ' left' : ''}`;
-        const badge = r.finished
-          ? `<span class="hc-place">${esc(formatNumber(r.place ?? 0, { maximumFractionDigits: 0 }))}</span>`
-          : '';
+        const cls = `hc-row${r.you ? ' you' : ''}${r.bot ? ' bot' : ''}${r.left ? ' left' : ''}${
+          r.eliminated ? ' out' : ''
+        }`;
+        const badge =
+          r.finished || (r.eliminated && r.place !== null)
+            ? `<span class="hc-place">${esc(formatNumber(r.place ?? 0, { maximumFractionDigits: 0 }))}</span>`
+            : '';
         return (
           `<div class="${cls}">` +
           `<span class="hc-name">${esc(r.name)}</span>` +
