@@ -512,7 +512,7 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
 // East edge of the delve band. Delve rooms sit at DELVE_X_MIN + index*600, so
 // the cap leaves room for indices 0..6; a delve at index 7+ would cross into
 // the Hodric's Castle band beyond and must move the cap first (pinned by
-// tests/hodrics_layout.test.ts).
+// tests/hodrics_course.test.ts's band-footprint checks).
 export const DELVE_BAND_X_MAX = 9000;
 
 export function isDelvePos(x: number): boolean {
@@ -624,20 +624,6 @@ export function isHodricsPos(x: number): boolean {
   return x >= HODRICS_X_MIN && x < HODRICS_X_MAX;
 }
 
-/** Nearest race instance origin to a far-off position, matched by z-band. */
-export function hodricsOriginAt(z: number): { x: number; z: number; slot: number } {
-  let best = 0,
-    bestD = Infinity;
-  for (let i = 0; i < HODRICS_SLOT_COUNT; i++) {
-    const d = Math.abs(z - hodricsOrigin(i).z);
-    if (d < bestD) {
-      bestD = d;
-      best = i;
-    }
-  }
-  const o = hodricsOrigin(best);
-  return { x: o.x, z: o.z, slot: best };
-}
 export const DELVE_MODULES: Record<string, DelveModuleDef> = {
   ...COLLAPSED_RELIQUARY_MODULES,
   ...DROWNED_LITANY_MODULES,

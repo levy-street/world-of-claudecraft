@@ -15,16 +15,16 @@
 //   routing and the renderer all read the same value. No shared-rng draws.
 // - Obstacle poses are pure functions of absolute sim time (hodrics_layout);
 //   the race physics below reads them, it never advances them.
-// - The race itself draws NO randomness at all. The per-match `rng`
-//   sub-stream (seeded off tickCount + nextHcMatchId, the fiesta mechanism)
-//   exists solely for bot skill variance in social/hodrics_bots.ts and never
-//   touches the shared stream, so parity goldens cannot fork.
+// - The race itself draws NO randomness at all, from any stream. Bot skill
+//   variance (social/hodrics_bots.ts) is a pure hash of the pid and tick, not
+//   an rng draw, so nothing here touches the shared stream and parity goldens
+//   cannot fork.
 // - Racers cannot die on the course: there are no damage sources in the
 //   band, falls are caught at the kill plane and respawn at the last
 //   checkpoint (or the gallery, for the eliminated).
 
 import { HC_HERALD, HC_HERALD_ID, HC_HERALD_POS } from '../content/hodrics';
-import { DUNGEON_X_THRESHOLD, hodricsOrigin, isHodricsPos } from '../data';
+import { DUNGEON_X_THRESHOLD, HODRICS_SLOT_COUNT, hodricsOrigin, isHodricsPos } from '../data';
 import { createNpc } from '../entity';
 import {
   type HcCourse,
@@ -46,7 +46,6 @@ import {
   hcPusherX,
   hcRotorAngle,
 } from '../hodrics_layout';
-import { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity, type HcKnockKind, type PlayerClass } from '../types';
@@ -154,8 +153,6 @@ export interface HcMatch {
   topPlace: number;
   /** Next place handed to the eliminated/deserters (counts down from N). */
   bottomPlace: number;
-  /** Bot-variance sub-stream only; the race itself never draws from it. */
-  rng: Rng;
 }
 
 export interface HcStanding {
@@ -273,7 +270,7 @@ export function pruneHcQueue(ctx: SimContext): void {
 // ---------------------------------------------------------------------------
 
 export function freeHcSlot(ctx: SimContext): number | null {
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < HODRICS_SLOT_COUNT; i++) {
     if (!ctx.hcBusySlots.has(i)) return i;
   }
   return null;
@@ -358,8 +355,6 @@ export function startHcMatch(ctx: SimContext, pids: number[]): void {
     botPids,
     topPlace: 1,
     bottomPlace: pids.length,
-    // The fiesta per-match sub-stream: one derivation, zero shared draws.
-    rng: new Rng((ctx.tickCount * 2654435761 + matchId * 40503) >>> 0),
   };
   for (const pid of pids) ctx.hcMatches.set(pid, match);
   const field = pids.map((pid) => {

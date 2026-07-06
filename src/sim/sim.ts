@@ -2292,6 +2292,15 @@ export class Sim {
     // before the leave save (vcupResolveDesertion is a public delegate).
     valeCupMod.vcupDequeue(this.ctx, pid);
     valeCupMod.vcupResolveDesertion(this.ctx, pid);
+    hodricsMod.hcQueueLeave(this.ctx, pid);
+    const hcMatch = this.hcMatches.get(pid);
+    if (hcMatch) {
+      const racer = hcMatch.racers.get(pid);
+      if (racer) racer.left = true;
+      this.hcMatches.delete(pid);
+      const anyLive = [...hcMatch.racers.values()].some((r) => !r.left && this.entities.has(r.pid));
+      if (!anyLive) hodricsMod.returnFromHcMatch(this.ctx, hcMatch);
+    }
     this.party.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);

@@ -574,6 +574,39 @@ describe('backfill', () => {
     const botsLeft = [...sim.players.values()].filter((m) => m.isHcBot === true);
     expect(botsLeft).toHaveLength(0);
   }, 30000);
+
+  it('all-human lobbies that fully disconnect free their slots (no leak)', () => {
+    // Regression: removePlayer marks a leaver and deletes their pid, but a
+    // match with no bots to keep it alive becomes unreachable from
+    // updateHodrics once its LAST racer leaves, leaking the slot + the pinned
+    // course forever. With only two slots, two such leaks would stop all
+    // races; proven here through the public API (a fresh field can still
+    // start) by leaking BOTH slots and requiring recovery.
+    const sim = makeSim();
+    // Twenty humans: matchmaking seats two full all-human fields (both slots).
+    const first = Array.from({ length: 20 }, (_, i) => sim.addPlayer('warrior', `First${i}`));
+    for (const pid of first) sim.hcQueueJoin(pid);
+    ff(sim, 3);
+    const slots = new Set(
+      first.map((pid) => sim.hcMatches.get(pid)?.slot).filter((s) => s !== undefined),
+    );
+    expect(slots.size).toBe(2); // both slots in use
+    for (const pid of first) {
+      const m = sim.hcMatches.get(pid);
+      expect(m && m.racers.get(pid)?.bot).toBe(false);
+    }
+
+    // Every human in both matches logs out: both slots must be freed, not
+    // leaked, or no future race can ever start.
+    for (const pid of first) sim.removePlayer(pid);
+    ff(sim, 2);
+
+    // A fresh full field claims a freed slot immediately.
+    const next = Array.from({ length: 10 }, (_, i) => sim.addPlayer('rogue', `Next${i}`));
+    for (const pid of next) sim.hcQueueJoin(pid);
+    ff(sim, 2);
+    expect(sim.hcMatches.get(next[0])).toBeTruthy();
+  }, 20000);
 });
 
 describe('the Gauntlet Herald', () => {

@@ -35,12 +35,7 @@ import {
   ZONES,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
-import {
-  hcCourseFor,
-  hcIdleCourseSeed,
-  hodricsSlotAt,
-  setActiveHodricsCourse,
-} from '../sim/hodrics_course';
+import { hcCourseFor, hcIdleCourseSeed, hodricsSlotAt } from '../sim/hodrics_course';
 import { HC_HALF_Z } from '../sim/hodrics_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
@@ -3988,10 +3983,13 @@ export class Renderer {
         const difficulty = match && i === mySlot ? Math.max(0, match.round - 1) : 0;
         const built = this.hodricsCastles.get(i);
         if (built && built.seed === seed) continue;
+        // Read-only: the active-course registry (which collision/camera
+        // sampling reads) is authored by the WORLD, not the renderer, keeping
+        // "render never mutates the world" intact. The offline Sim writes it
+        // in the match module; the online ClientWorld writes it from the wire
+        // (net/online.ts). Both go through the same memoized hcCourseFor, so
+        // what we build here always matches what the sim collides against.
         const course = hcCourseFor(seed, difficulty);
-        // Keep the client's collision/camera view of the band in lockstep
-        // with what is drawn (idempotent when the sim already wrote it).
-        setActiveHodricsCourse(i, course);
         if (built) {
           built.dispose(this.scene);
           this.hodricsCastles.delete(i);
