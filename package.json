@@ -26,6 +26,10 @@
     "electron:pack:steam": "node scripts/electron-build.mjs pack steam",
     "electron:build": "node scripts/electron-build.mjs build",
     "electron:build:steam": "node scripts/electron-build.mjs build steam",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:lite": "tauri build --config src-tauri/tauri.lite.conf.json",
     "preview": "vite preview",
     "format": "biome format --write .",
     "format:check": "biome format .",
@@ -95,6 +99,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.0",
+    "@tauri-apps/cli": "^2.1.0",
     "@capacitor/android": "^8.4.0",
     "@capacitor/cli": "^8.4.0",
     "@capacitor/core": "^8.4.0",
