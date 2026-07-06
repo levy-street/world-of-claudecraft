@@ -1,6 +1,8 @@
 # Native Character Marketplace + buyback-burn
 
-> **Status:** DRAFT / implementation plan. Originally PR 3 of the $WOC stack (stacked on `feat/woc-sns-tradeable`, then PR 1, then #473). Flag-gated; no behavior change on `main` by default. This PR carries only the on-chain escrow program (section A) with its devnet proofs; the keeper (B), client UI (C), and server integration land in follow-up PRs.
+> **Status:** DRAFT / implementation plan. Originally PR 3 of the $WOC stack (stacked on `feat/woc-sns-tradeable`, then PR 1, then #473). Flag-gated; no behavior change on `main` by default.
+>
+> **The on-chain escrow program moved out of this repo (#1497 split).** The `character_market` Anchor program (section A) and its devnet proofs now live in the economy service (`levy-street/woc-daily-rewards-service`, `solana/programs/character_market`), behind the service handler at `service/src/economy/character-market`. The game no longer builds or verifies the program itself: when the client UI (section C) is built, it consumes the typed SDK seam (`@woc/economy-sdk` `economy/character_market`, program id `BE55pNoRLSCch5NmLcU6tg6NZFLe6yFw4Jnr3HfZBMpp`) over the secret-gated internal HTTP the game server already uses, so the Rust toolchain and the on-chain verification path stay in the service. This branch therefore removes the migrated program crate and the `Anchor.toml` that only existed to build it; no player UI is added here (there is none yet to refactor).
 
 ## Summary
 List a bound character for sale in **USDC** (`EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`) at a seller-chosen price. On sale: **70% to the seller, 30% to buying `$WOC` on a DEX and burning it.** Every secondary-market trade becomes deflationary pressure on `$WOC`, capturing gray-market RMT value on-platform. Shares the buyback-burn primitive with stubs #469 / #466.
