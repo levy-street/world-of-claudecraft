@@ -189,6 +189,13 @@ import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import {
+  GovernancePanel,
+  type GovernancePanelProposal,
+  type GovernancePanelTally,
+  type GovernanceVoteChoice,
+  type GovernanceVoteResult,
+} from './governance_panel';
+import {
   type AimPoint,
   abilityAoeRadius,
   cancelGroundAim,
@@ -397,6 +404,20 @@ export interface GamepadBindingsHooks {
 export interface ReportHooks {
   submit(targetPid: number, reason: string, details: string): Promise<void>;
   submitByName?(targetName: string, reason: string, details: string): Promise<void>;
+}
+
+// Off-chain $WOC governance hooks (PR #468), wired online-only by main.ts (it owns
+// the REST Api + wallet signing). The panel reads through these; hud.ts never touches
+// src/net. Absent (null) => governance disabled, so the toggle is a no-op.
+export interface GovernanceHooks {
+  /** True when a verified wallet is linked (voting requires one). */
+  hasLinkedWallet(): boolean;
+  /** Fetch the current proposals (newest first); rejects with a server error. */
+  listProposals(): Promise<GovernancePanelProposal[]>;
+  /** Fetch one proposal's weighted tally; rejects with a server error. */
+  tally(proposalId: number): Promise<GovernancePanelTally>;
+  /** Run the challenge -> sign -> submit vote flow; never throws (returns a result). */
+  castVote(proposalId: number, choice: GovernanceVoteChoice): Promise<GovernanceVoteResult>;
 }
 
 export interface BugReportPayload {
@@ -771,6 +792,7 @@ export class Hud {
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
+  private governanceHooks: GovernanceHooks | null = null;
   // Soft swear terms from the server (online only), masked in chat when the
   // player's "Filter Profanity" setting is on. Fed by main.ts from ClientWorld.
   private profanityWords: string[] = [];
@@ -1998,6 +2020,9 @@ export class Hud {
         break;
       case 'daily-rewards-window':
         this.dailyRewardsWindow.close();
+        break;
+      case 'governance-window':
+        this.governancePanel.close();
         break;
       case 'emote-editor':
         this.closeEmoteEditor();
@@ -3404,6 +3429,19 @@ export class Hud {
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+  });
+  // Off-chain $WOC governance panel (PR #468), its own module the HUD composes. The
+  // data + vote deps route through the online-only governanceHooks (main.ts owns the
+  // REST Api + wallet); the DOM/focus deps are the standard windowFocus seam.
+  private readonly governancePanel = new GovernancePanel({
+    root: () => $('#governance-window'),
+    closeOthers: () => this.closeOtherWindows('#governance-window'),
+    hasLinkedWallet: () => this.governanceHooks?.hasLinkedWallet() ?? false,
+    listProposals: () => this.requireGovernance().listProposals(),
+    tally: (proposalId) => this.requireGovernance().tally(proposalId),
+    castVote: (proposalId, choice) => this.requireGovernance().castVote(proposalId, choice),
+    ...this.windowFocus('#governance-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
@@ -12149,6 +12187,27 @@ export class Hud {
 
   attachReporting(hooks: ReportHooks): void {
     this.reportHooks = hooks;
+  }
+
+  // Wired online-only (main.ts). Its presence is what enables the governance panel;
+  // absent, toggleGovernance() is a no-op. main.ts additionally gates the wiring on
+  // the server governanceEnabled flag, so an offline or flag-off client never opens it.
+  attachGovernance(hooks: GovernanceHooks): void {
+    this.governanceHooks = hooks;
+  }
+
+  /** The wired governance hooks, or a loud failure (the panel only calls when enabled). */
+  private requireGovernance(): GovernanceHooks {
+    if (this.governanceHooks === null) {
+      throw new Error('governance is not enabled');
+    }
+    return this.governanceHooks;
+  }
+
+  /** Open or close the governance panel. A no-op until governance is wired (online + flag on). */
+  toggleGovernance(): void {
+    if (this.governanceHooks === null) return;
+    this.governancePanel.toggle();
   }
 
   // Only wired online (main.ts), so its presence is what gates the "Report a Bug"

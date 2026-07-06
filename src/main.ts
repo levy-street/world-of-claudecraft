@@ -1081,6 +1081,9 @@ async function startGame(
           case 'discord':
             toggleDiscordPanel();
             break;
+          case 'governance':
+            hud.toggleGovernance();
+            break;
           case 'chat':
             openChat();
             break;
@@ -1629,6 +1632,31 @@ async function startGame(
           screenshot: payload.screenshot,
           meta: payload.meta,
         }),
+    });
+    // Off-chain $WOC governance (PR #468). Wired online-only; main.ts owns the REST
+    // Api + wallet signing. The server governanceEnabled flag (default OFF) is the
+    // real gate: when off, every call returns a coded 503 the panel surfaces. The
+    // vote flow mirrors the wallet-link challenge -> sign -> submit, and never throws
+    // (it returns a localized result the panel renders inline).
+    hud.attachGovernance({
+      hasLinkedWallet: () => linkedWalletPubkey !== null,
+      listProposals: () => api.governanceProposals(),
+      tally: (proposalId) => api.governanceTally(proposalId),
+      castVote: async (proposalId, choice) => {
+        const address = linkedWalletPubkey;
+        if (address === null) {
+          return { ok: false, message: t('hudChrome.governance.vote.needWallet') };
+        }
+        try {
+          const wallet = await loadWallet();
+          const { message, nonce } = await api.governanceVoteChallenge(proposalId, choice);
+          const signature = await wallet.signMessageBase58(message);
+          const result = await api.governanceVote(proposalId, choice, signature, nonce);
+          return { ok: true, choice: result.choice };
+        } catch (err) {
+          return { ok: false, message: userFacingApiError(err) };
+        }
+      },
     });
   }
   function interactKey(): void {
