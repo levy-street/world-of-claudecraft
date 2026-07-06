@@ -37,6 +37,7 @@ import type {
 } from './sim';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
+import type { HcMatch, HcQueueUnit } from './social/hodrics';
 import type { SpatialGrid } from './spatial';
 import type {
   AbilityDef,
@@ -137,6 +138,13 @@ export interface SimContextPrimitives {
   arenaQueueYumi5: ArenaQueueUnit[];
   readonly yumiBusySlots: Set<number>;
   readonly yumiCatMatches: Map<number, ArenaMatch>;
+  // Hodric's Castle Gauntlet state (social/hodrics.ts), the arena shape: the
+  // queue is reassigned by prune filters (read-write), matches/slots mutate in
+  // place, and the match-id counter is bumped via `ctx.nextHcMatchId++`.
+  hcQueue: HcQueueUnit[];
+  readonly hcMatches: Map<number, HcMatch>;
+  readonly hcBusySlots: Set<number>;
+  nextHcMatchId: number;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -889,6 +897,24 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set nextArenaMatchId(v) {
       host.nextArenaMatchId = v;
+    },
+    get hcQueue() {
+      return host.hcQueue;
+    },
+    set hcQueue(v) {
+      host.hcQueue = v;
+    },
+    get hcMatches() {
+      return host.hcMatches;
+    },
+    get hcBusySlots() {
+      return host.hcBusySlots;
+    },
+    get nextHcMatchId() {
+      return host.nextHcMatchId;
+    },
+    set nextHcMatchId(v) {
+      host.nextHcMatchId = v;
     },
     get delveRuns() {
       return host.delveRuns;

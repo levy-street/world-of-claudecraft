@@ -147,6 +147,23 @@ export interface ArenaCombatant {
   cls: PlayerClass;
   level: number;
 }
+
+// Hodric's Castle Gauntlet event payload shapes. The obstacle that launched a
+// racer (for the HUD cue), the roster reveal row, and the final placement row.
+export type HcKnockKind = 'flail' | 'axe' | 'log' | 'boulder';
+
+export interface HcFieldEntry {
+  name: string;
+  cls: PlayerClass;
+  bot: boolean;
+}
+
+export interface HcResultRow {
+  name: string;
+  place: number;
+  bot: boolean;
+  timeS: number | null;
+}
 export const ALL_CLASSES: PlayerClass[] = [
   'warrior',
   'paladin',
@@ -2411,6 +2428,18 @@ export type SimEvent = { pid?: number } & (
       allies: ArenaCombatant[];
       enemies: ArenaCombatant[];
     }
+  // Hodric's Castle Gauntlet: queue state, race lifecycle, and the placement
+  // result. All carry pid (personal, delivered to each racer).
+  | { type: 'hcQueued'; position: number }
+  | { type: 'hcUnqueued' }
+  | { type: 'hcFound'; field: HcFieldEntry[] }
+  | { type: 'hcCountdown'; seconds: number }
+  | { type: 'hcStart' }
+  | { type: 'hcKnocked'; kind: HcKnockKind }
+  | { type: 'hcFall' }
+  | { type: 'hcCheckpoint'; index: number }
+  | { type: 'hcFinish'; place: number; timeS: number }
+  | { type: 'hcEnd'; place: number; won: boolean; field: HcResultRow[] }
   // 2v2 Fiesta party mode. All carry pid (personal — delivered to each combatant).
   // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment
   // wave just opened. `fiestaWord`: an exaggerated word-pop cue (the client maps

@@ -266,10 +266,17 @@ export interface HcDrawspanDef {
   phase: number;
 }
 
-/** The Drawspan: two gilded platforms sliding across the gap in antiphase. */
+/**
+ * The Drawspan: two gilded platforms sliding across the gap in antiphase.
+ * Their z-spans tile the gap exactly (58..68 and 68..78, zero slivers against
+ * the landings or each other), so the crossing is purely an x-timing problem:
+ * the pair mirrors through x 0 and both cover the middle for about 2.5 s
+ * twice per period. Wait for the meet, walk straight across; a confident
+ * jump can also clear misaligned platforms early.
+ */
 export const HC_DRAWSPANS: readonly HcDrawspanDef[] = [
-  { xMin: -7, xMax: 7, zCenter: 63, halfX: 3.2, halfZ: 3.4, y: 0, period: 7.2, phase: 0 },
-  { xMin: -7, xMax: 7, zCenter: 73, halfX: 3.2, halfZ: 3.4, y: 0, period: 7.2, phase: 0.5 },
+  { xMin: -6, xMax: 6, zCenter: 63, halfX: 3.2, halfZ: 5, y: 0, period: 9.6, phase: 0 },
+  { xMin: -6, xMax: 6, zCenter: 73, halfX: 3.2, halfZ: 5, y: 0, period: 9.6, phase: 0.5 },
 ];
 
 /** Platform center x at time t (triangle wave: constant speed, no rng). */

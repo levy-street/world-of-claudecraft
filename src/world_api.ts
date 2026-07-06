@@ -70,6 +70,7 @@ import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
 import type { IWorldGauntlet } from './world_api/gauntlet';
+import type { IWorldHodrics } from './world_api/hodrics';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
@@ -153,6 +154,7 @@ export type {
 } from './world_api/dungeon_finder';
 export type { RaidLockout } from './world_api/dungeons';
 export type { GauntletRunView } from './world_api/gauntlet';
+export type { HcInfo, HcMatchInfo, HcRacerView, HcStandingView } from './world_api/hodrics';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
@@ -217,7 +219,8 @@ export interface IWorld
     IWorldValeCup,
     IWorldDungeonFinder,
     IWorldDeeds,
-    IWorldGauntlet {}
+    IWorldGauntlet,
+    IWorldHodrics {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -371,6 +374,8 @@ export const COMMAND_NAMES = [
   'resurrect_healer',
   'gauntlet_join',
   'gauntlet_leave',
+  'hc_queue',
+  'hc_leave',
   'bank_deposit',
   'bank_withdraw',
   'bank_buy_slots',
@@ -466,7 +471,8 @@ export type WorldFacet =
   | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
   | 'IWorldDeeds'
-  | 'IWorldGauntlet';
+  | 'IWorldGauntlet'
+  | 'IWorldHodrics';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -642,4 +648,6 @@ export const COMMAND_FACETS = {
   deed_set_title: 'IWorldDeeds',
   gauntlet_join: 'IWorldGauntlet',
   gauntlet_leave: 'IWorldGauntlet',
+  hc_queue: 'IWorldHodrics',
+  hc_leave: 'IWorldHodrics',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

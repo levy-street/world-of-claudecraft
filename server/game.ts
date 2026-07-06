@@ -305,6 +305,8 @@ export function mobZonePhase(mob: Entity): string {
 
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
+const HC_WIRE_HZ = 2;
+const HC_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * HC_WIRE_HZ)));
 // Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
 // queue sizes, so 2 Hz keeps the window/indicator live without re-serializing
 // the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
@@ -621,6 +623,7 @@ export interface ClientSession {
   lastVcupWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
+  lastHcWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -1322,6 +1325,7 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    moderator.lastHcWireTick = -HC_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
@@ -1347,6 +1351,7 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    moderator.lastHcWireTick = -HC_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
@@ -2458,6 +2463,7 @@ export class GameServer {
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastVcupWireTick: -VC_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
+      lastHcWireTick: -HC_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -2619,6 +2625,9 @@ export class GameServer {
     session.selfHeavyDirty = true;
     session.lastWireRev = -1;
     session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    session.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
+    session.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    session.lastHcWireTick = -HC_WIRE_INTERVAL_TICKS;
     this.send(session, {
       t: 'hello',
       pid: session.pid,
@@ -4154,6 +4163,12 @@ export class GameServer {
           sim.arenaAugmentPick(msg.augment, pid);
         break;
       }
+      case 'hc_queue':
+        sim.hcQueueJoin(pid);
+        break;
+      case 'hc_leave':
+        sim.hcQueueLeave(pid);
+        break;
 
       // The Vale Cup (boarball queue at the Sowfield, docs/prd/vale-cup.md).
       // Deliberately NOT in HEAVY_SELF_CMDS: queueing mutates no heavy self
@@ -4937,6 +4952,10 @@ export class GameServer {
       session.lastDfWireTick = this.sim.tickCount;
       maybe('df', this.sim.dungeonFinderInfoFor(anchorSession.pid));
       maybe('dfb', this.sim.dungeonFinderBoardView());
+    }
+    if (this.sim.tickCount - session.lastHcWireTick >= HC_WIRE_INTERVAL_TICKS) {
+      session.lastHcWireTick = this.sim.tickCount;
+      maybe('hc', this.sim.hcInfoFor(anchorSession.pid));
     }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market

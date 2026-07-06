@@ -355,6 +355,9 @@ import * as duelMod from './social/duel';
 // A4: Protect Yumi (formats yumi3/yumi5); match logic in social/yumi.ts, reached
 // via ctx callbacks + the two hostility arms in isHostileTo/isFriendlyTo.
 import * as yumiMod from './social/yumi';
+import type { HcMatch, HcQueueUnit } from './social/hodrics';
+import * as hodricsMod from './social/hodrics';
+import * as hcBotsMod from './social/hodrics_bots';
 
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts. Re-exported so the
 // public path `import { Sim, eloDelta } from './sim'` (tests/arena.test.ts) holds.
@@ -981,6 +984,10 @@ export interface PlayerMeta {
   vcupBetWins: number;
   vcupBetLosses: number;
   vcupBetNet: number;
+  hcRaces?: number;
+  hcWins?: number;
+  hcBest?: number;
+  isHcBot?: boolean;
   // Talents & Specializations. `talents` is the active allocation; `talentMods`
   // is its precomputed flat struct — resolved only on allocation/respec/loadout
   // change (recomputeTalents), never walked on the combat or stat hot path.
@@ -1169,6 +1176,10 @@ export interface CharacterState {
   vcupBetWins?: number;
   vcupBetLosses?: number;
   vcupBetNet?: number;
+  hcRaces?: number;
+  hcWins?: number;
+  hcBest?: number;
+  hcReturnPos?: { x: number; z: number; facing: number } | null;
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
@@ -1378,6 +1389,12 @@ export class Sim {
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
   // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
   vcup: VcState = createVcState();
+  hcQueue: HcQueueUnit[] = [];
+  hcMatches = new Map<number, HcMatch>();
+  private hcBusySlots = new Set<number>();
+  private nextHcMatchId = 1;
+  hcPracticeBotPids: number[] = [];
+  hcFillBotPids: number[] = [];
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -3159,6 +3176,12 @@ export class Sim {
       set nextArenaMatchId(v) {
         sim.nextArenaMatchId = v;
       },
+      get hcQueue() { return sim.hcQueue; },
+      set hcQueue(v) { sim.hcQueue = v; },
+      get hcMatches() { return sim.hcMatches; },
+      get hcBusySlots() { return sim.hcBusySlots; },
+      get nextHcMatchId() { return sim.nextHcMatchId; },
+      set nextHcMatchId(v) { sim.nextHcMatchId = v; },
       get delveRuns() {
         return sim.delveRuns;
       },
@@ -3930,6 +3953,8 @@ export class Sim {
     lap?.('duels');
     this.updateArena();
     lap?.('arena');
+    this.updateHodrics();
+    lap?.('hodrics');
     this.updateTradesAndInvites();
     this.updateReadyChecks();
     lap?.('trades');
@@ -6992,6 +7017,16 @@ export class Sim {
   private updateArena(): void {
     arenaMod.updateArena(this.ctx);
   }
+
+  private updateHodrics(): void {
+    hodricsMod.updateHodrics(this.ctx);
+    hcBotsMod.updateHcBots(this);
+  }
+
+  hcQueueJoin(pid?: number): void { hodricsMod.hcQueueJoin(this.ctx, pid); }
+  hcQueueLeave(pid?: number): void { hodricsMod.hcQueueLeave(this.ctx, pid); }
+  hcInfoFor(pid: number) { return hodricsMod.hcInfoFor(this.ctx, pid); }
+  hcPracticeStart(): boolean { return hcBotsMod.hcPracticeStart(this); }
 
   // A3: createFiestaState (FiestaState factory + per-match sub-Rng seed) moved to
   // social/fiesta.ts. Thin delegate keeps the ctx.createFiestaState seam binding
