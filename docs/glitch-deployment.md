@@ -174,16 +174,49 @@ npm run deploy:glitch
 The script:
 
 1. Loads `.env` and `.env.local` if present.
-2. Clones or updates the Glitch CLI deploy tool under the system temp directory.
-3. For `node`, zips the source tree without `node_modules`, `dist`, `.env`, docs, tests, or local agent folders.
-4. Uploads the archive with `entry=index.html`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
-5. Waits for the Glitch deployment job to complete.
+2. For `node`, refuses any `GLITCH_ENTRY_POINT` other than `index.html`.
+3. Runs the mandatory local predeploy check before any upload:
+   - `npm run build`
+   - `npm run build:server`
+   - starts `dist-server/server.cjs` locally with production env and a temporary
+     `REALM_NAME`
+   - verifies `GET /api/project-stats`
+   - verifies `POST /api/site-presence` with the same JSON shape the live page sends
+4. Clones or updates the Glitch CLI deploy tool under the system temp directory.
+5. For `node`, zips the source tree without `node_modules`, `dist`, `.env`, docs, tests, or local agent folders.
+6. Uploads the archive with `entry=index.html`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
+7. Waits for the Glitch deployment job to complete.
+
+If the local predeploy check fails, fix that failure locally first. Do not upload
+another Glitch build until the check passes. When the check runs against Azure
+Postgres from a developer machine, the machine's public IP must be allowed by
+the Azure Flexible Server firewall for the duration of the check.
+
+The live Glitch Container App for this single-realm MMO must run exactly one
+replica. `REALM_SINGLETON_LOCK=1` intentionally prevents two server processes
+from hosting `Claudemoon` at the same time. If Azure tries to roll or scale to a
+second replica, the new process exits with `Realm "Claudemoon" is already hosted
+by another game server process` and the revision fails activation. After a node
+deploy, verify and enforce the scale cap with Azure CLI:
+
+```bash
+az containerapp update \
+  --name world-of-claudecraft-node \
+  --resource-group openai-resource-group \
+  --min-replicas 1 \
+  --max-replicas 1
+
+az containerapp revision list \
+  --name world-of-claudecraft-node \
+  --resource-group openai-resource-group \
+  --query "[].{name:name,healthState:properties.healthState,runningState:properties.runningState,replicas:properties.replicas}"
+```
 
 Useful overrides:
 
 ```bash
 GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
-GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch
+GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch  # static iframe/wasm only; node preflight still builds
 GLITCH_BUILD_TYPE=playtest npm run deploy:glitch
 GLITCH_DEPLOY_VERSION=0.22.0 npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=iframe npm run deploy:glitch

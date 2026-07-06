@@ -266,6 +266,11 @@ CREATE TABLE IF NOT EXISTS site_presence_sessions (
   ip_hash TEXT NOT NULL DEFAULT '',
   user_agent_hash TEXT NOT NULL DEFAULT ''
 );
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS page TEXT NOT NULL DEFAULT 'unknown';
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS first_seen_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS ip_hash TEXT NOT NULL DEFAULT '';
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS user_agent_hash TEXT NOT NULL DEFAULT '';
 CREATE INDEX IF NOT EXISTS site_presence_sessions_last_seen
   ON site_presence_sessions(last_seen_at DESC);
 CREATE TABLE IF NOT EXISTS admin_site_presence_samples (
@@ -273,6 +278,8 @@ CREATE TABLE IF NOT EXISTS admin_site_presence_samples (
   sampled_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   active_visitors INT NOT NULL
 );
+ALTER TABLE admin_site_presence_samples ADD COLUMN IF NOT EXISTS sampled_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE admin_site_presence_samples ADD COLUMN IF NOT EXISTS active_visitors INT NOT NULL DEFAULT 0;
 CREATE INDEX IF NOT EXISTS admin_site_presence_samples_sampled
   ON admin_site_presence_samples(sampled_at DESC);
 CREATE TABLE IF NOT EXISTS chat_logs (

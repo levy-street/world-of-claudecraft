@@ -27,6 +27,7 @@ const gameApiOrigin =
   env.VITE_API_ORIGIN || env.GLITCH_GAME_API_ORIGIN || 'https://worldofclaudecraft.com';
 const dryRun = env.GLITCH_DEPLOY_DRY_RUN === '1';
 const skipBuild = env.GLITCH_DEPLOY_SKIP_BUILD === '1';
+const preflightScript = path.join(ROOT, 'scripts/glitch_predeploy_check.mjs');
 
 if (!deployToken) {
   fail('Set GLITCH_TITLE_TOKEN to a deploy-scoped Glitch token before deploying.');
@@ -43,12 +44,21 @@ if (staticClientDeployment && env.GLITCH_ALLOW_STATIC_CLIENT_DEPLOY !== '1') {
 }
 
 if (nodeDeployment) {
+  if (entryPoint !== 'index.html') {
+    fail(
+      'World of ClaudeCraft Glitch node deployments must use GLITCH_ENTRY_POINT=index.html. The Dockerfile launches the Node server; package.json is not a valid entry file for this title.',
+    );
+  }
   if (!env.DATABASE_URL) {
     fail('Set DATABASE_URL before deploying the Glitch node MMO build.');
   }
   if (!env.GLITCH_SERVER_TITLE_TOKEN) {
     fail('Set GLITCH_SERVER_TITLE_TOKEN before deploying the Glitch node MMO build.');
   }
+}
+
+if (nodeDeployment && !dryRun) {
+  await runGlitchPreflight();
 }
 
 await ensureCli();
@@ -104,6 +114,15 @@ async function ensureCli() {
     await run('git', ['pull', '--ff-only'], env, CLI_DIR);
   }
   await run('npm', ['install', '--omit=dev'], env, CLI_DIR);
+}
+
+async function runGlitchPreflight() {
+  console.log('Running mandatory Glitch node predeploy check before upload...');
+  await run(process.execPath, [preflightScript], {
+    ...env,
+    VITE_GLITCH_ENABLED: '1',
+    VITE_GLITCH_TITLE_ID: TITLE_ID,
+  });
 }
 
 function readPackageVersion() {
