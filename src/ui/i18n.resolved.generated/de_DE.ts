@@ -1205,6 +1205,43 @@ export const de_DE: EnTranslations = {
       "mining": "Bergbau",
       "logging": "Holzfällen",
       "herbalism": "Kräuterkunde"
+    },
+    "governance": {
+      "title": "Governance",
+      "close": "Close governance",
+      "subtitle": "Advisory $WOC holder voting",
+      "loading": "Loading proposals...",
+      "error": "Could not load governance proposals.",
+      "empty": "There are no proposals yet.",
+      "refresh": "Refresh",
+      "open": "Open",
+      "closed": "Closed",
+      "closesAt": "Closes {date}",
+      "closedAt": "Closed {date}",
+      "quorum": "Quorum: {current} of {needed} $WOC",
+      "quorumReached": "Quorum reached",
+      "category": {
+        "content": "Content",
+        "cosmetic": "Cosmetic",
+        "treasury": "Treasury"
+      },
+      "tally": {
+        "for": "For",
+        "against": "Against",
+        "abstain": "Abstain",
+        "voters": "{count} voters"
+      },
+      "vote": {
+        "for": "Vote For",
+        "against": "Vote Against",
+        "abstain": "Abstain",
+        "needWallet": "Link a wallet to vote.",
+        "alreadyVoted": "You voted: {choice}",
+        "signing": "Check your wallet to sign...",
+        "submitting": "Submitting vote...",
+        "success": "Your vote was recorded.",
+        "failed": "Your vote could not be recorded."
+      }
     }
   },
   "apiError": {
@@ -1294,6 +1331,19 @@ export const de_DE: EnTranslations = {
       "swag_claimed": "Du hast diese Belohnung bereits beansprucht.",
       "swag_tier": "Erreiche einen höheren Rang, um dies zu beanspruchen.",
       "swag_points": "Nicht genügend Punkte."
+    },
+    "governance": {
+      "disabled": "Governance voting is not available right now.",
+      "forbidden": "You do not have permission to create a proposal.",
+      "not_found": "That proposal could not be found.",
+      "invalid_input": "Check the proposal fields and try again.",
+      "wallet_not_linked": "Link a wallet before voting.",
+      "wallet_mismatch": "That wallet is not linked to your account.",
+      "window_closed": "Voting on this proposal has closed.",
+      "already_voted": "This wallet has already voted on this proposal.",
+      "challenge_invalid": "That vote request expired. Please try again.",
+      "bad_signature": "The wallet signature could not be verified.",
+      "balance_unavailable": "Could not read your $WOC balance. Please try again."
     }
   },
   "guide": {

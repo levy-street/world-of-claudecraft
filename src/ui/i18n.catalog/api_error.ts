@@ -167,4 +167,19 @@ export const apiErrorStrings = {
     // reuses hudChrome.discord.swag.needPoints
     swag_points: 'Not enough points.',
   },
+  // governance: the off-chain $WOC governance family (server/governance.ts, PR #468).
+  // Advisory holder voting; every endpoint fails closed when the feature flag is off.
+  governance: {
+    disabled: 'Governance voting is not available right now.',
+    forbidden: 'You do not have permission to create a proposal.',
+    not_found: 'That proposal could not be found.',
+    invalid_input: 'Check the proposal fields and try again.',
+    wallet_not_linked: 'Link a wallet before voting.',
+    wallet_mismatch: 'That wallet is not linked to your account.',
+    window_closed: 'Voting on this proposal has closed.',
+    already_voted: 'This wallet has already voted on this proposal.',
+    challenge_invalid: 'That vote request expired. Please try again.',
+    bad_signature: 'The wallet signature could not be verified.',
+    balance_unavailable: 'Could not read your $WOC balance. Please try again.',
+  },
 };

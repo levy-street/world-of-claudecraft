@@ -1205,6 +1205,43 @@ export const zh_TW: EnTranslations = {
       "mining": "採礦",
       "logging": "伐木",
       "herbalism": "藥草學"
+    },
+    "governance": {
+      "title": "治理",
+      "close": "關閉治理",
+      "subtitle": "$WOC 持有者諮詢投票",
+      "loading": "正在載入提案……",
+      "error": "無法載入治理提案。",
+      "empty": "目前沒有提案。",
+      "refresh": "重新整理",
+      "open": "進行中",
+      "closed": "已結束",
+      "closesAt": "{date} 結束",
+      "closedAt": "{date} 已結束",
+      "quorum": "法定票數：{needed} $WOC 中的 {current}",
+      "quorumReached": "已達到法定票數",
+      "category": {
+        "content": "內容",
+        "cosmetic": "外觀",
+        "treasury": "資金"
+      },
+      "tally": {
+        "for": "贊成",
+        "against": "反對",
+        "abstain": "棄權",
+        "voters": "{count} 名投票者"
+      },
+      "vote": {
+        "for": "投贊成票",
+        "against": "投反對票",
+        "abstain": "棄權",
+        "needWallet": "連結錢包後即可投票。",
+        "alreadyVoted": "你已投票：{choice}",
+        "signing": "請在錢包中簽章……",
+        "submitting": "正在提交投票……",
+        "success": "你的投票已記錄。",
+        "failed": "無法記錄你的投票。"
+      }
     }
   },
   "apiError": {
@@ -1294,6 +1331,19 @@ export const zh_TW: EnTranslations = {
       "swag_claimed": "你已經領取過此獎勵。",
       "swag_tier": "達到更高階級才能領取此項目。",
       "swag_points": "點數不足。"
+    },
+    "governance": {
+      "disabled": "治理投票目前無法使用。",
+      "forbidden": "你沒有建立提案的權限。",
+      "not_found": "找不到該提案。",
+      "invalid_input": "請檢查提案欄位後再試。",
+      "wallet_not_linked": "投票前請先連結錢包。",
+      "wallet_mismatch": "該錢包未連結到你的帳戶。",
+      "window_closed": "該提案的投票已結束。",
+      "already_voted": "此錢包已對該提案投過票。",
+      "challenge_invalid": "該投票請求已過期，請再試一次。",
+      "bad_signature": "無法驗證錢包簽章。",
+      "balance_unavailable": "無法讀取你的 $WOC 餘額，請重試。"
     }
   },
   "guide": {
