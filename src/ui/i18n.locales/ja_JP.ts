@@ -5900,9 +5900,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.governance.wallet_mismatch': 'そのウォレットはアカウントに連携されていません。',
   'apiError.governance.window_closed': 'この提案の投票は終了しました。',
   'apiError.governance.already_voted': 'このウォレットはすでにこの提案に投票済みです。',
-  'apiError.governance.challenge_invalid': '投票リクエストの有効期限が切れました。もう一度お試しください。',
+  'apiError.governance.challenge_invalid':
+    '投票リクエストの有効期限が切れました。もう一度お試しください。',
   'apiError.governance.bad_signature': 'ウォレットの署名を検証できませんでした。',
-  'apiError.governance.balance_unavailable': '$WOC 残高を読み取れませんでした。もう一度お試しください。',
+  'apiError.governance.balance_unavailable':
+    '$WOC 残高を読み取れませんでした。もう一度お試しください。',
   // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': 'メールボックス',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',

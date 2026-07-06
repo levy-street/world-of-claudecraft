@@ -6015,7 +6015,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.governance.already_voted': 'Этот кошелёк уже голосовал по этому предложению.',
   'apiError.governance.challenge_invalid': 'Срок запроса на голосование истёк. Повторите попытку.',
   'apiError.governance.bad_signature': 'Не удалось проверить подпись кошелька.',
-  'apiError.governance.balance_unavailable': 'Не удалось прочитать ваш баланс $WOC. Повторите попытку.',
+  'apiError.governance.balance_unavailable':
+    'Не удалось прочитать ваш баланс $WOC. Повторите попытку.',
   // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': 'Почтовый ящик',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',

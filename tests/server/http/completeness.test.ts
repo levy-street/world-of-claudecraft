@@ -100,7 +100,17 @@ function isCovered(
 const ORPHAN_DEVIATION = KNOWN_DEVIATIONS.find(
   (d) => d.id === DEVIATION_ID.swagClaimOrphanUnreachable,
 );
-const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
+// The off-chain $WOC governance family (PR #468) is likewise registry-owned-only
+// with no legacy arm, so its routes are excluded from the must-legacy-serve set
+// exactly like the swag-claim orphan (see the governanceNewFamilyRegistryOnly
+// deviation). Referencing the deviation keeps the exclusion documented, not silent.
+const GOVERNANCE_DEVIATION = KNOWN_DEVIATIONS.find(
+  (d) => d.id === DEVIATION_ID.governanceNewFamilyRegistryOnly,
+);
+const EXCLUDED_PATHS = new Set<string>([
+  ...(ORPHAN_DEVIATION?.routes ?? []),
+  ...(GOVERNANCE_DEVIATION?.routes ?? []),
+]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
 // documented unreachable orphan.
@@ -293,6 +303,14 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/assets/mine' },
     { method: 'GET', path: '/api/assets/:file' },
     { method: 'DELETE', path: '/api/assets/:id' },
+    // Off-chain $WOC governance (server/governance.ts, PR #468). A NEW family with no
+    // legacy arm (registry-owned-only), so every path is in EXCLUDED_PATHS and the
+    // must-legacy-serve check skips them, exactly like the swag-claim orphan.
+    { method: 'POST', path: '/api/governance/proposals' },
+    { method: 'GET', path: '/api/governance/proposals' },
+    { method: 'GET', path: '/api/governance/proposals/:id/tally' },
+    { method: 'POST', path: '/api/governance/proposals/:id/vote/challenge' },
+    { method: 'POST', path: '/api/governance/proposals/:id/vote' },
   ];
   const MIGRATED_PATHS = MIGRATED_ROUTES.map((r) => r.path);
 

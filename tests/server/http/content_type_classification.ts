@@ -131,4 +131,9 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/assets/mine': PROBLEM_JSON,
   '/api/assets/:file': BINARY,
   '/api/assets/:id': PROBLEM_JSON,
+  // Off-chain $WOC governance (server/governance.ts, PR #468). All problem+json.
+  '/api/governance/proposals': PROBLEM_JSON,
+  '/api/governance/proposals/:id/tally': PROBLEM_JSON,
+  '/api/governance/proposals/:id/vote/challenge': PROBLEM_JSON,
+  '/api/governance/proposals/:id/vote': PROBLEM_JSON,
 };
