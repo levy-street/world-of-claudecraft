@@ -10,51 +10,107 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "es_ES": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "fr_FR": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "fr_CA": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "en_CA": [],
   "it_IT": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "de_DE": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "ru_RU": [],
   "nl_NL": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "pl_PL": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "id_ID": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "tr_TR": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "sv_SE": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "vi_VN": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ],
   "da_DK": [
-    "entities.itemSets.necromancers.bonus4"
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
   ]
 };

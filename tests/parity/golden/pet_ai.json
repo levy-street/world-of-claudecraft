@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 401,
-      "state": "9a387532",
+      "state": "523de5c3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -27,6 +27,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -63,8 +64,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -125,7 +125,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 405,
-      "state": "5d3fe7a3",
+      "state": "455b7756",
       "events": "1cf9ced6",
       "rng": {
         "draws": 14,
@@ -136,7 +136,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 405,
-      "state": "dfdea844",
+      "state": "7ab3f64f",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -147,7 +147,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 405,
-      "state": "5e5de61c",
+      "state": "3c895217",
       "events": "f379bd29",
       "rng": {
         "draws": 107,
@@ -158,7 +158,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 405,
-      "state": "98e39edd",
+      "state": "c0881880",
       "events": "741638a5",
       "rng": {
         "draws": 186,
@@ -169,7 +169,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 405,
-      "state": "56846f16",
+      "state": "8286d0d9",
       "events": "63dfb14d",
       "rng": {
         "draws": 307,
@@ -180,7 +180,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "e232a87f",
+      "state": "a9ea43ca",
       "events": "741638a5",
       "rng": {
         "draws": 418,
@@ -191,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "9df8f963",
+      "state": "bf9a4e16",
       "events": "741638a5",
       "rng": {
         "draws": 418,
@@ -201,6 +201,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -240,8 +241,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -520,7 +520,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 405,
-      "state": "750285c1",
+      "state": "9b943bec",
       "events": "741638a5",
       "rng": {
         "draws": 518,
@@ -531,7 +531,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 405,
-      "state": "dcbe5301",
+      "state": "559fba48",
       "events": "741638a5",
       "rng": {
         "draws": 637,
@@ -542,7 +542,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "5eaf54a8",
+      "state": "c5d553a5",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -553,7 +553,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "5eaf54a8",
+      "state": "c5d553a5",
       "events": "741638a5",
       "rng": {
         "draws": 777,
@@ -563,6 +563,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -602,8 +603,7 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          },
-          "worldBossDaily": {}
+          }
         }
       ],
       "entities": [
@@ -709,7 +709,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.570796,
+          "facing": -1.566983,
           "fallStartY": 52.026485,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -725,9 +725,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 164.88,
-            "y": 39.746386,
-            "z": -2
+            "x": 165.036181,
+            "y": 41.053989,
+            "z": -2.575985
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -826,7 +826,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 165.047208,
-            "y": 40.034879,
+            "y": 38.285248,
             "z": 14.480686
           },
           "potionCooldownUntil": -1,
