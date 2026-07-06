@@ -570,6 +570,15 @@ export const ko_KR: EnTranslations = {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
     },
+    "itemProc": {
+      "onMeleeHit": "적중 시 확률 ({chance}%): {effect}",
+      "onSpellDamage": "피해 주문 시 확률 ({chance}%): {effect}",
+      "onHeal": "치유 시 확률 ({chance}%): {effect}",
+      "chainArc": "{school} {name}({damage})으로 대상을 강타하고 주변의 적 {jumps}명에게 감소하는 피해로 도약합니다",
+      "attackSlow": "대상의 공격 속도를 {duration}초 동안 {pct}% 감소시킵니다",
+      "dot": "{name}을 유발하여 {duration}초 동안 {total}의 {school} 지속 피해를 입힙니다",
+      "hot": "{name}을 피워 {duration}초 동안 {total}의 생명력을 회복시킵니다"
+    },
     "questShare": {
       "notShareable": "이 퀘스트는 공유할 수 없습니다.",
       "notInSharerParty": "{name}님의 파티에 속해 있어야 이 퀘스트를 수락할 수 있습니다.",

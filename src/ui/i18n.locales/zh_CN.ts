@@ -4885,6 +4885,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': '攻击强度提高 40 点。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 点，致命一击几率提高 2%。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemProc.onMeleeHit': '命中时几率（{chance}%）：{effect}',
+  'hudChrome.itemProc.onSpellDamage': '造成伤害的法术几率（{chance}%）：{effect}',
+  'hudChrome.itemProc.onHeal': '治疗时几率（{chance}%）：{effect}',
+  'hudChrome.itemProc.chainArc': '以{school}{name}（{damage}）轰击目标，并跳跃至{jumps}个附近敌人，造成递减伤害',
+  'hudChrome.itemProc.attackSlow': '并使目标攻击速度降低{pct}%，持续{duration}秒',
+  'hudChrome.itemProc.dot': '引发{name}，一种{school}持续伤害效果，在{duration}秒内造成{total}点伤害',
+  'hudChrome.itemProc.hot': '绽放{name}，一种持续治疗效果，在{duration}秒内恢复{total}点生命',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   // Discord integration (two-way login, rewards, relay, in-game flair).

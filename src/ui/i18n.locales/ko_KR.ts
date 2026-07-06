@@ -5150,6 +5150,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
+  'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
+  'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
+  'hudChrome.itemProc.onHeal': '치유 시 확률 ({chance}%): {effect}',
+  'hudChrome.itemProc.chainArc': '{school} {name}({damage})으로 대상을 강타하고 주변의 적 {jumps}명에게 감소하는 피해로 도약합니다',
+  'hudChrome.itemProc.attackSlow': '대상의 공격 속도를 {duration}초 동안 {pct}% 감소시킵니다',
+  'hudChrome.itemProc.dot': '{name}을 유발하여 {duration}초 동안 {total}의 {school} 지속 피해를 입힙니다',
+  'hudChrome.itemProc.hot': '{name}을 피워 {duration}초 동안 {total}의 생명력을 회복시킵니다',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   // Discord integration (two-way login, rewards, relay, in-game flair).

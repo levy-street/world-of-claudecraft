@@ -570,6 +570,15 @@ export const en_XA: EnTranslations = {
       "header": "[{name} ({have}/{total})]",
       "bonusLine": "[({pieces}) {bonus}]"
     },
+    "itemProc": {
+      "onMeleeHit": "[Çĥáñçé óñ ĥíţ ({chance}%): {effect}]",
+      "onSpellDamage": "[Çĥáñçé óñ ýóúŕ ðáɱáĝíñĝ šþéļļš ({chance}%): {effect}]",
+      "onHeal": "[Çĥáñçé óñ ýóúŕ ĥéáļš ({chance}%): {effect}]",
+      "chainArc": "[ƀļášţš ţĥé ţáŕĝéţ ŵíţĥ á {school} {name} ({damage}) ţĥáţ ļéáþš ţó {jumps} ñéáŕƀý ƒóéš ƒóŕ ðéçáýíñĝ ðáɱáĝé]",
+      "attackSlow": "[áñð šļóŵš ţĥé ţáŕĝéţ áţţáçķ šþééð ƀý {pct}% ƒóŕ {duration} šéç]",
+      "dot": "[ƒéšţéŕš {name}, á {school} ðáɱáĝé-óʋéŕ-ţíɱé ðéáļíñĝ {total} óʋéŕ {duration} šéç]",
+      "hot": "[ƀļóóɱš {name}, á ĥéáļ-óʋéŕ-ţíɱé ŕéšţóŕíñĝ {total} óʋéŕ {duration} šéç]"
+    },
     "questShare": {
       "notShareable": "[Ţĥíš ɋúéšţ çáñ'ţ ƀé šĥáŕéð.]",
       "notInSharerParty": "[Ýóú ɱúšţ ƀé íñ {name}'š þáŕţý ţó áççéþţ ţĥáţ ɋúéšţ.]",

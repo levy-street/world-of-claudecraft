@@ -345,6 +345,7 @@ import {
   wocBalance,
   wocBalanceVerified,
 } from './wallet_balance';
+import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { formatXp, xpBarView } from './xp_bar';
@@ -3785,11 +3786,66 @@ export class Hud {
       const meets = this.sim.player.level >= req;
       html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }))}</div>`;
     }
+    html += this.itemProcBlock(item);
     html += this.itemSetBlock(item);
     if (item.sellValue > 0)
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
     if (compare) html += this.itemCompareBlock(item);
     return html;
+  }
+
+  // Legendary "chance on action" procs: one green trigger line per proc, each
+  // wrapping its joined effect fragments. Reads ItemDef.weaponProcs through the
+  // pure weapon_proc_view core so the derived numbers stay unit-tested.
+  private itemProcBlock(item: ItemDef): string {
+    const lines = weaponProcLines(item.kind === 'weapon' ? item.weaponProcs : undefined);
+    if (!lines.length) return '';
+    let html = '';
+    for (const line of lines) {
+      const effect = line.effects.map((e) => this.procEffectText(e)).join(' ');
+      const triggerKey =
+        line.trigger === 'meleeHit'
+          ? 'hudChrome.itemProc.onMeleeHit'
+          : line.trigger === 'spellDamage'
+            ? 'hudChrome.itemProc.onSpellDamage'
+            : 'hudChrome.itemProc.onHeal';
+      html += `<div class="tt-green">${esc(
+        t(triggerKey, {
+          chance: formatNumber(line.chancePct, { maximumFractionDigits: 0 }),
+          effect,
+        }),
+      )}</div>`;
+    }
+    return html;
+  }
+
+  // One effect fragment (chain arc / attack slow / dot / hot) as localized text.
+  private procEffectText(e: WeaponProcEffectDesc): string {
+    const n = (v: number | undefined): string => formatNumber(v ?? 0, { maximumFractionDigits: 0 });
+    switch (e.kind) {
+      case 'chainArc':
+        return t('hudChrome.itemProc.chainArc', {
+          school: e.school ?? '',
+          name: e.name ?? '',
+          damage: n(e.damage),
+          jumps: n(e.jumps),
+        });
+      case 'attackSlow':
+        return t('hudChrome.itemProc.attackSlow', { pct: n(e.slowPct), duration: n(e.duration) });
+      case 'dot':
+        return t('hudChrome.itemProc.dot', {
+          name: e.name ?? '',
+          school: e.school ?? '',
+          total: n(e.total),
+          duration: n(e.duration),
+        });
+      case 'hot':
+        return t('hudChrome.itemProc.hot', {
+          name: e.name ?? '',
+          total: n(e.total),
+          duration: n(e.duration),
+        });
+    }
   }
 
   // How many equipped pieces belong to the given set (read from IWorld.equipment

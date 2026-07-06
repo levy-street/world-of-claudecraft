@@ -604,6 +604,19 @@ export const hudChromeStrings = {
     header: '{name} ({have}/{total})',
     bonusLine: '({pieces}) {bonus}',
   },
+  // Legendary weapon "chance on action" procs, rendered in the item tooltip from
+  // the ItemDef.weaponProcs data (see src/ui/weapon_proc_view.ts). One trigger
+  // line wraps the joined effect fragments below it.
+  itemProc: {
+    onMeleeHit: 'Chance on hit ({chance}%): {effect}',
+    onSpellDamage: 'Chance on your damaging spells ({chance}%): {effect}',
+    onHeal: 'Chance on your heals ({chance}%): {effect}',
+    chainArc:
+      'blasts the target with a {school} {name} ({damage}) that leaps to {jumps} nearby foes for decaying damage',
+    attackSlow: 'and slows the target attack speed by {pct}% for {duration} sec',
+    dot: 'festers {name}, a {school} damage-over-time dealing {total} over {duration} sec',
+    hot: 'blooms {name}, a heal-over-time restoring {total} over {duration} sec',
+  },
   // Quest-link sharing: the chat-link affordance and its sim-emitted notices
   // (re-localized through the hud-local localizeErrorText/localizeSystemText arms).
   questShare: {

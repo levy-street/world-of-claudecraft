@@ -570,6 +570,15 @@ export const ru_RU: EnTranslations = {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
     },
+    "itemProc": {
+      "onMeleeHit": "Шанс при попадании ({chance}%): {effect}",
+      "onSpellDamage": "Шанс от уронных заклинаний ({chance}%): {effect}",
+      "onHeal": "Шанс при исцелении ({chance}%): {effect}",
+      "chainArc": "поражает цель эффектом «{name}» ({school}, {damage}) и перескакивает на {jumps} ближайших врагов с затухающим уроном",
+      "attackSlow": "и снижает скорость атаки цели на {pct}% на {duration} сек",
+      "dot": "вызывает «{name}», периодический урон ({school}), нанося {total} за {duration} сек",
+      "hot": "распускает «{name}», периодическое исцеление, восполняя {total} за {duration} сек"
+    },
     "questShare": {
       "notShareable": "Этим заданием нельзя поделиться.",
       "notInSharerParty": "Вы должны состоять в группе игрока {name}, чтобы принять это задание.",
