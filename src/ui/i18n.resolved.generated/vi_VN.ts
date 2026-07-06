@@ -2583,7 +2583,7 @@ export const vi_VN: EnTranslations = {
   },
   "stats": {
     "title": "Trạng Thái Thế Giới",
-    "accountsCreated": "Người Chơi",
+    "accountsCreated": "Tổng số người chơi",
     "playersOnline": "Người Chơi Trực Tuyến",
     "realmName": "Tên Thế Giới"
   },

@@ -2583,7 +2583,7 @@ export const ja_JP: EnTranslations = {
   },
   "stats": {
     "title": "ワールドステータス",
-    "accountsCreated": "プレイヤー",
+    "accountsCreated": "総プレイヤー数",
     "playersOnline": "オンラインプレイヤー数",
     "realmName": "ワールド名"
   },

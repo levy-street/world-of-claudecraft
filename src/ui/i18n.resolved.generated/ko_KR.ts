@@ -2583,7 +2583,7 @@ export const ko_KR: EnTranslations = {
   },
   "stats": {
     "title": "월드 상태",
-    "accountsCreated": "플레이어",
+    "accountsCreated": "전체 플레이어",
     "playersOnline": "현재 접속자 수",
     "realmName": "월드 이름"
   },

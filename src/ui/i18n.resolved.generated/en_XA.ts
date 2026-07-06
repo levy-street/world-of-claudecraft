@@ -2583,7 +2583,7 @@ export const en_XA: EnTranslations = {
   },
   "stats": {
     "title": "[Ŵóŕļð Šţáţúš]",
-    "accountsCreated": "[Þļáýéŕš]",
+    "accountsCreated": "[Ţóţáļ Þļáýéŕš]",
     "playersOnline": "[Þļáýéŕš Óñļíñé]",
     "realmName": "[Ŵóŕļð Ñáɱé]"
   },

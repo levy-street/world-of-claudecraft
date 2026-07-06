@@ -4544,11 +4544,16 @@ async function loadProjectStats(): Promise<void> {
   // Realm status now lives in the realm dropdown, both in the trigger sub-line
   // and inside the Online option, so update every instance by class.
   const accountEls = document.querySelectorAll<HTMLElement>('.js-stat-accounts');
-  if (!accountEls.length) return;
+  const onlineEls = document.querySelectorAll<HTMLElement>('.js-stat-online');
+  if (!accountEls.length && !onlineEls.length) return;
   const setAll = (els: NodeListOf<HTMLElement>, text: string): void => {
     els.forEach((el) => {
       el.textContent = text;
     });
+  };
+  const renderStats = (stats: { accounts_created: number; players_online: number }): void => {
+    setAll(accountEls, String(stats.accounts_created));
+    setAll(onlineEls, String(stats.players_online));
   };
 
   // 1. Try to read from localStorage first
@@ -4569,7 +4574,7 @@ async function loadProjectStats(): Promise<void> {
 
   // If cache exists and is fresh (within TTL), use it and skip API request
   if (cached && Date.now() - cached.timestamp < STATS_CACHE_TTL_MS) {
-    setAll(accountEls, String(cached.accounts_created));
+    renderStats(cached);
     return;
   }
 
@@ -4577,7 +4582,7 @@ async function loadProjectStats(): Promise<void> {
   try {
     const data = await api.projectStats();
 
-    setAll(accountEls, String(data.accounts_created));
+    renderStats(data);
 
     // Save to cache with timestamp
     if (typeof localStorage !== 'undefined') {
@@ -4593,9 +4598,10 @@ async function loadProjectStats(): Promise<void> {
     console.error('Failed to fetch project stats:', err);
     // If API fails, fall back to cached data (even if expired)
     if (cached) {
-      setAll(accountEls, String(cached.accounts_created));
+      renderStats(cached);
     } else {
-      setAll(accountEls, '–');
+      setAll(accountEls, '-');
+      setAll(onlineEls, '-');
     }
   }
 }

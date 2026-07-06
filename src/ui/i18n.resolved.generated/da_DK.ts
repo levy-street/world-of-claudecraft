@@ -2583,7 +2583,7 @@ export const da_DK: EnTranslations = {
   },
   "stats": {
     "title": "Verdensstatus",
-    "accountsCreated": "Spillere",
+    "accountsCreated": "Spillere i alt",
     "playersOnline": "Spillere online",
     "realmName": "Verdensnavn"
   },

@@ -2583,7 +2583,7 @@ export const de_DE: EnTranslations = {
   },
   "stats": {
     "title": "Weltstatus",
-    "accountsCreated": "Spieler",
+    "accountsCreated": "Spieler insgesamt",
     "playersOnline": "Spieler online",
     "realmName": "Weltname"
   },

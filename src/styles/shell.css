@@ -1118,6 +1118,17 @@
     vertical-align: middle;
     background: rgba(255, 209, 0, 0.3);
   }
+  .server-realm-line,
+  .server-opt-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .server-stat-line {
+    display: block;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
   .server-realm-line .stats-value,
   .server-opt-stats .stats-value {
     font-family: var(--font-ui);
@@ -1127,7 +1138,6 @@
     margin-right: 2px;
   }
   .server-opt-stats {
-    display: block;
     margin-top: 6px;
     font-size: 12px;
     color: var(--color-text-muted);
@@ -2001,7 +2011,7 @@
     color: var(--color-text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
   }
   .server-select-chevron {
     flex: none;

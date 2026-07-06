@@ -2583,7 +2583,7 @@ export const id_ID: EnTranslations = {
   },
   "stats": {
     "title": "Status Dunia",
-    "accountsCreated": "Pemain",
+    "accountsCreated": "Total Pemain",
     "playersOnline": "Pemain Online",
     "realmName": "Nama Dunia"
   },

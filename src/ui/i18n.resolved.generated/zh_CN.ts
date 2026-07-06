@@ -2583,7 +2583,7 @@ export const zh_CN: EnTranslations = {
   },
   "stats": {
     "title": "服务器状态",
-    "accountsCreated": "玩家",
+    "accountsCreated": "总玩家数",
     "playersOnline": "在线玩家数",
     "realmName": "服务器名称"
   },
