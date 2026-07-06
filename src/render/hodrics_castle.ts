@@ -48,7 +48,6 @@ const CASTLE_MODELS = {
   torchLit: 'models/dungeon/torch_lit.glb',
   flailHead: 'models/weapons/hammer_a.glb',
   axeHead: 'models/weapons/axe_2handed.glb',
-  log: 'models/resources/wood_log_a.glb',
   boulder: 'models/biome/desert_boulder_1.glb',
 } as const;
 
@@ -94,6 +93,7 @@ const SURFACE_COLOR: Record<HcSurface['kind'], number> = {
 const WALL_COLOR = 0x74747c;
 const WALL_HEIGHT = 4;
 const POST_HEIGHT = 7.4;
+const HC_FINISH_ARCH_Z = 119;
 
 // ---------------------------------------------------------------------------
 // Static geometry: floors (from HC_SURFACES) + walls/posts (from the same
@@ -247,8 +247,6 @@ function buildDressing(group: THREE.Group): void {
   ];
   for (const [x, z] of torchSpots) placeProp(group, 'torchLit', x, 0, z, 0, 1.2);
 }
-
-const HC_FINISH_ARCH_Z = 119;
 
 // ---------------------------------------------------------------------------
 // Obstacles: analytic pose, evaluated fresh every frame from `t`.

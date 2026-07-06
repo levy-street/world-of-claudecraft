@@ -413,7 +413,7 @@ function racePhysics(ctx: SimContext, match: HcMatch): void {
     ridePlatforms(e, e.pos.x - origin.x, e.pos.z - origin.z, t);
 
     if (!racer.finished && t - racer.lastLaunchAt >= HC_LAUNCH_IMMUNITY) {
-      testObstacleHits(ctx, match, racer, e, e.pos.x - origin.x, e.pos.z - origin.z, t);
+      testObstacleHits(ctx, racer, e, e.pos.x - origin.x, e.pos.z - origin.z, t);
     }
 
     // Kill plane: the chasm swallows nobody, it hands them back to the line.
@@ -440,6 +440,15 @@ function racePhysics(ctx: SimContext, match: HcMatch): void {
           racer.place = match.nextPlace++;
           racer.finishTime = match.clock;
           ctx.emit({ type: 'hcFinish', place: racer.place, timeS: match.clock, pid: racer.pid });
+          // Credit the finish NOW, not at endHcMatch: a racer who quits the
+          // instant they cross the line (a very likely thing to do right
+          // after winning) would otherwise have their PlayerMeta gone
+          // (removePlayer deletes it synchronously) by the time the match
+          // finally ends for everyone else, silently losing the win.
+          if (!racer.bot) {
+            const meta = ctx.players.get(racer.pid);
+            if (meta) addHcResult(meta, racer.place === 1, racer.finishTime);
+          }
         }
       }
     }
@@ -488,7 +497,6 @@ function ridePlatforms(e: Entity, lx: number, lz: number, t: number): void {
 
 function testObstacleHits(
   ctx: SimContext,
-  match: HcMatch,
   racer: HcRacer,
   e: Entity,
   lx: number,
@@ -634,9 +642,13 @@ export function endHcMatch(ctx: SimContext, match: HcMatch): void {
       timeS: r.finished ? r.finishTime : null,
     }));
   for (const racer of match.racers.values()) {
-    const meta = ctx.players.get(racer.pid);
-    if (meta && !racer.bot && !racer.left) {
-      addHcResult(meta, racer.place === 1, racer.finished ? racer.finishTime : null);
+    // Finishers were already credited the instant they crossed the line (see
+    // racePhysics), so their PlayerMeta being gone by now (a disconnect right
+    // after winning) can never cost them the result. Only score the stragglers
+    // here, exactly once, while their meta is still live.
+    if (!racer.finished && !racer.bot && !racer.left) {
+      const meta = ctx.players.get(racer.pid);
+      if (meta) addHcResult(meta, racer.place === 1, null);
     }
     if (racer.left) continue;
     ctx.emit({

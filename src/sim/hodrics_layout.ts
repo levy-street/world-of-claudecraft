@@ -25,8 +25,7 @@ import { hodricsOriginAt } from './data';
 // Footprint and vertical constants
 // ---------------------------------------------------------------------------
 
-/** Course half extents, used by proximity checks and the renderer build gate. */
-export const HC_HALF_X = 34;
+/** Course half length, used by the renderer's approach-proximity build gate. */
 export const HC_HALF_Z = 140;
 
 /** Chasm floor far below the course (visual depth for the falling camera). */

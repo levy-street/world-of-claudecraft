@@ -120,12 +120,14 @@ import {
   isArenaPos,
   isDelvePos,
   isHodricsPos,
+  hodricsOrigin,
   MOBS,
   NPCS,
   QUESTS,
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
+import { HC_CHECKPOINTS, hcProgressFrac, hcSectionAt } from './hodrics_layout';
 import * as deedsMod from './deeds';
 import {
   createDeedRuntime,
@@ -7028,8 +7030,62 @@ export class Sim {
 
   hcQueueJoin(pid?: number): void { hodricsMod.hcQueueJoin(this.ctx, pid); }
   hcQueueLeave(pid?: number): void { hodricsMod.hcQueueLeave(this.ctx, pid); }
-  hcInfoFor(pid: number) { return hodricsMod.hcInfoFor(this.ctx, pid); }
+  hcInfoFor(pid: number): import('../world_api').HcInfo | null {
+    const meta = this.players.get(pid);
+    if (!meta) return null;
+    const match = this.hcMatches.get(pid) ?? null;
+    const queuedAt = hodricsMod.hcQueuePosition(this.ctx, pid);
+    const standing = hodricsMod.hcStanding(meta);
+    let matchInfo: import('../world_api').HcMatchInfo | null = null;
+    if (match) {
+      const origin = hodricsOrigin(match.slot);
+      const me = match.racers.get(pid) ?? null;
+      const e = this.entities.get(pid);
+      const myZ = e ? e.pos.z - origin.z : HC_CHECKPOINTS[0].z;
+      const racers = [...match.racers.values()]
+        .map((r) => {
+          const re = this.entities.get(r.pid);
+          const liveZ = re && !r.left ? Math.max(r.furthestZ, re.pos.z - origin.z) : r.furthestZ;
+          return {
+            name: r.name,
+            cls: r.cls,
+            bot: r.bot,
+            you: r.pid === pid,
+            progress: r.finished ? 1 : hcProgressFrac(liveZ),
+            finished: r.finished,
+            place: r.place > 0 ? r.place : null,
+            left: r.left,
+          };
+        })
+        .sort((a, b) => {
+          if (a.place !== null && b.place !== null) return a.place - b.place;
+          if (a.place !== null) return -1;
+          if (b.place !== null) return 1;
+          return b.progress - a.progress;
+        });
+      matchInfo = {
+        state: match.state,
+        countdown: match.state === 'countdown' ? Math.max(0, Math.ceil(match.timer)) : 0,
+        clock: match.clock,
+        timeLeft: Math.max(0, hodricsMod.HC_MAX_DURATION - match.clock),
+        section: hcSectionAt(myZ),
+        checkpoint: me?.checkpoint ?? 0,
+        finished: me?.finished ?? false,
+        place: me && me.place > 0 ? me.place : null,
+        falls: me?.falls ?? 0,
+        racers,
+      };
+    }
+    return {
+      queued: queuedAt > 0 ? { position: queuedAt } : null,
+      standing: standing.races > 0 ? standing : null,
+      match: matchInfo,
+    };
+  }
   hcPracticeStart(): boolean { return hcBotsMod.hcPracticeStart(this); }
+  get hcInfo(): import('../world_api').HcInfo | null {
+    return this.primaryId === -1 ? null : this.hcInfoFor(this.primaryId);
+  }
 
   // A3: createFiestaState (FiestaState factory + per-match sub-Rng seed) moved to
   // social/fiesta.ts. Thin delegate keeps the ctx.createFiestaState seam binding

@@ -35,7 +35,7 @@ import {
   hcSectionAt,
 } from '../hodrics_layout';
 import type { Sim } from '../sim';
-import { angleTo, DT, emptyMoveInput, type PlayerClass, TICK_RATE } from '../types';
+import { angleTo, emptyMoveInput, type PlayerClass, TICK_RATE } from '../types';
 import * as hodricsMod from './hodrics';
 
 // Lord Hodric's court challengers: the pool both harnesses draw names from.
@@ -134,6 +134,13 @@ export function startHcPractice(sim: Sim): boolean {
 }
 
 export function stopHcPractice(sim: Sim): void {
+  // The human is queued alongside the bots (startHcPractice) but was never
+  // released here: toggling off before matchmaking has run (zero ticks
+  // elapsed) left the player stuck in ctx.hcQueue forever. A match, once
+  // formed, still gets torn down below via the bots' shared HcMatch.
+  hodricsMod.hcQueueLeave(sim.ctx, sim.primaryId);
+  const myMatch = sim.hcMatches.get(sim.primaryId);
+  if (myMatch) hodricsMod.returnFromHcMatch(sim.ctx, myMatch);
   for (const pid of sim.hcPracticeBotPids) {
     hodricsMod.hcQueueLeave(sim.ctx, pid);
     const match = sim.hcMatches.get(pid);
@@ -204,14 +211,7 @@ function driveHcBot(sim: Sim, pid: number): void {
   if (match.state !== 'active') return;
   if (!e.onGround) return; // airborne is ballistic; there is no air control
   const origin = hodricsOrigin(match.slot);
-  const plan = planHcBotStep(
-    e.pos.x - origin.x,
-    e.pos.z - origin.z,
-    e.pos.y,
-    sim.time,
-    pid,
-    sim.tickCount,
-  );
+  const plan = planHcBotStep(e.pos.x - origin.x, e.pos.z - origin.z, sim.time, pid, sim.tickCount);
   if (!plan) return; // deliberate hold: waiting out an obstacle window
   e.facing = angleTo(e.pos, { x: origin.x + plan.x, y: e.pos.y, z: origin.z + plan.z });
   meta.moveInput.forward = true;
@@ -237,7 +237,6 @@ const BOT_APPROACH = 6.5;
 export function planHcBotStep(
   lx: number,
   lz: number,
-  y: number,
   t: number,
   pid: number,
   tick: number,

@@ -120,8 +120,9 @@ The whole course dresses from packs already bundled under `public/models/`
 (license provenance in `CREDITS.md`): the KayKit Dungeon Remastered kit for
 castle walls, arches, gates, ~60 banner variants, torches and braziers; KayKit
 Medieval Hexagon castle/tower/bridge silhouettes for the skyline; KayKit
-warhammers as flail heads and battleaxes for the pendulums; Quaternius logs
-and boulders for the rotors and Boulder Alley. Character rigs already carry
+warhammers as flail heads and battleaxes for the pendulums; a procedural log
+beam for the Log Court rotors and Quaternius boulders for Boulder Alley.
+Character rigs already carry
 `Jump_Idle` (airborne), `Death_A`/`Lie_Idle` (ragdoll/daze), and a real
 `Cheer` clip (finish celebration). No new binary assets are required; the
 finish confetti is a new `vfx.ts` burst recipe over the existing Kenney

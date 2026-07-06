@@ -213,16 +213,127 @@ describe('race physics', () => {
     expect(Math.abs(pxNow - px0)).toBeGreaterThan(1);
   }, 20000);
 
-  it('abilities are barred mid-race', () => {
+  it('abilities are barred mid-race, through every cast entry point', () => {
     const sim = makeSim();
     const events: SimEvent[] = [];
     const pid = startActiveRace(sim, events);
     const meta = sim.players.get(pid)!;
     const known = meta.known[0]?.def.id;
     expect(known).toBeTruthy();
+
     const before = sim.entities.get(pid)!.castingAbility;
     sim.castAbility(known!, pid);
     expect(sim.entities.get(pid)!.castingAbility).toBe(before);
+
+    // The hotbar is the primary way a real player casts; it must funnel
+    // through the same guard, not just the named /cast entry point.
+    const slot = meta.known.findIndex((k) => k.def.id === known);
+    sim.castAbilityBySlot(slot, pid);
+    expect(sim.entities.get(pid)!.castingAbility).toBe(before);
+
+    // Ground-targeted casts (offline, the local player only) share the guard too.
+    sim.primaryId = pid;
+    sim.castAbilityAt(known!, { x: 0, z: 0 });
+    expect(sim.entities.get(pid)!.castingAbility).toBe(before);
+  }, 20000);
+});
+
+describe('practice toggle', () => {
+  it('a fast start-then-stop before any tick releases the player from the queue', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Impatient');
+    expect(sim.hcPracticeStart()).toBe(true);
+    // Toggle off with zero ticks elapsed: matchmaking has not run yet, so the
+    // player is still queued, not matched. Regression for a bug where
+    // stopHcPractice only released the bots, leaving the human stuck.
+    expect(sim.hcPracticeStart()).toBe(false);
+    expect(sim.hcQueue.some((u) => u.pid === pid)).toBe(false);
+    expect(sim.hcMatches.has(pid)).toBe(false);
+    expect(sim.hcPracticeBotPids).toHaveLength(0);
+    // A fresh practice start still works afterward (queue is genuinely clean).
+    expect(sim.hcPracticeStart()).toBe(true);
+    expect(sim.hcQueue.some((u) => u.pid === pid)).toBe(true);
+  });
+
+  it('stopping mid-race (after matchmaking) tears down the whole match', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'QuickQuitter');
+    sim.hcPracticeStart();
+    ff(sim, 1); // let matchmaking seat the full field
+    expect(sim.hcMatches.has(pid)).toBe(true);
+    sim.hcPracticeStart(); // toggles off (hcPracticeActive is true: bots exist)
+    expect(sim.hcMatches.has(pid)).toBe(false);
+    expect(sim.hcQueue.some((u) => u.pid === pid)).toBe(false);
+    expect(sim.hcPracticeBotPids).toHaveLength(0);
+    expect([...sim.players.values()].some((m) => m.isHcBot === true)).toBe(false);
+  });
+});
+
+describe('mid-race save and reload', () => {
+  it('serializes hcReturnPos while racing and relocates there on reload', () => {
+    const sim = makeSim();
+    const events: SimEvent[] = [];
+    const pid = startActiveRace(sim, events);
+    const preQueuePos = sim.hcMatches.get(pid)!.returns.get(pid)!;
+
+    // Save mid-race: the character's live pos is deep in the race band, but
+    // the persisted CharacterState must never resume a reload there.
+    const state = sim.serializeCharacter(pid)!;
+    expect(state.pos.x).toBeGreaterThan(10000); // inside the Hodric's band
+    expect(state.hcReturnPos).toEqual(preQueuePos);
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid2 = sim2.addPlayer('warrior', 'Reloaded', { state });
+    const e2 = sim2.entities.get(pid2)!;
+    expect(isHodricsPos(e2.pos.x)).toBe(false);
+    expect(e2.pos.x).toBeCloseTo(preQueuePos.x, 0);
+    expect(e2.pos.z).toBeCloseTo(preQueuePos.z, 0);
+  }, 20000);
+
+  it('falls back to the world start when no return position was ever recorded', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Ghost');
+    // A character saved mid-race with no hcReturnPos on file (e.g. an older
+    // save format) must not relocate INTO the race band on reload.
+    const state = sim.serializeCharacter(pid)!;
+    state.pos = { x: 11100, z: -1250 };
+    state.hcReturnPos = undefined;
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid2 = sim2.addPlayer('warrior', 'Ghost2', { state });
+    const e2 = sim2.entities.get(pid2)!;
+    expect(isHodricsPos(e2.pos.x)).toBe(false);
+  });
+});
+
+describe('disconnect right after finishing', () => {
+  it('credits the win the instant you cross the line, not at match end', () => {
+    const sim = makeSim();
+    const events: SimEvent[] = [];
+    const pid = startActiveRace(sim, events);
+    const match = sim.hcMatches.get(pid)!;
+    const origin = hodricsOrigin(match.slot);
+
+    // Walk the human over the line while the other 9 bots are still racing
+    // the earlier sections (a race can run up to HC_MAX_DURATION seconds).
+    place(sim, pid, origin.x, origin.z + 116, 13);
+    const meta = sim.players.get(pid)!;
+    sim.entities.get(pid)!.facing = 0;
+    meta.moveInput.forward = true;
+    ff(sim, 3 * TICK_RATE, events);
+    expect(events.some((ev) => ev.type === 'hcFinish' && ev.pid === pid)).toBe(true);
+    // The lone human finishing ends practice immediately (nothing left to
+    // wait for but bots); endHcMatch's own crediting loop now skips
+    // already-finished racers entirely, so this can only be the finish-time
+    // credit, which is exactly what the fix adds.
+    expect(sim.players.get(pid)!.hcWins).toBe(1);
+    expect(sim.players.get(pid)!.hcRaces).toBe(1);
+
+    // Disconnecting immediately must not claw the win back or crash the
+    // still-running match for the rest of the field.
+    sim.removePlayer(pid);
+    expect(sim.hcMatches.has(pid)).toBe(false);
+    expect(() => ff(sim, 60 * TICK_RATE)).not.toThrow();
   }, 20000);
 });
 

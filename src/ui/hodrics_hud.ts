@@ -92,7 +92,7 @@ export class HodricsHud {
     const rows = view.rows
       .map((r) => {
         const pct = Math.round(r.progress * 100);
-        const cls = `hc-row${r.you ? ' you' : ''}${r.left ? ' left' : ''}`;
+        const cls = `hc-row${r.you ? ' you' : ''}${r.bot ? ' bot' : ''}${r.left ? ' left' : ''}`;
         const badge = r.finished
           ? `<span class="hc-place">${esc(formatNumber(r.place ?? 0, { maximumFractionDigits: 0 }))}</span>`
           : '';
