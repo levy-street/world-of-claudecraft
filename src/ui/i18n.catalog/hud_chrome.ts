@@ -35,6 +35,68 @@ export const hudChromeStrings = {
       survivorsLeft: '{count} still standing', spectating: 'Spectating', leave: 'Leave', victory: 'Victory',
       podiumTitle: 'Final Standings', placeFirst: '1st', placeSecond: '2nd', placeThird: '3rd',
     },
+  // Hodric's Castle Gauntlet: the Herald's race window, the in-race HUD strip
+  // and board, banners, and log lines.
+  hc: {
+    title: "Hodric's Castle",
+    close: 'Close the Gauntlet window',
+    zoneName: "Hodric's Castle",
+    offlineNote: 'The Gauntlet desk has not synced yet. One moment.',
+    howto:
+      'Race the castle gauntlet: dodge the flails, weave the logs, time the axes, ride the Drawspan, outrun the boulders. First over the line takes the crown. Falls only cost time.',
+    joinQueue: 'Join the Gauntlet',
+    leaveQueue: 'Leave the queue',
+    queuedAt: 'In the queue at position {position}. The field fills to ten.',
+    inMatchNote: 'You are racing. Eyes forward!',
+    practice: 'Practice vs the Court',
+    practiceNote: "Race Lord Hodric's own court: nine challengers, no waiting.",
+    record: 'Crowns {wins} / Races {races}',
+    bestTime: 'Best run {seconds}s',
+    bestNone: 'No finish on the books yet',
+    rank: 'Position {rank} / {total}',
+    finishPlace: 'Finished #{place}',
+    timeLeft: '{seconds}s',
+    overWon: 'The crown is yours!',
+    overPlaced: 'Race over: #{place}',
+    section: {
+      start_yard: 'Start Yard',
+      flail_bridge: 'The Flail Bridge',
+      log_court: 'The Log Court',
+      axe_walk: 'The Axe Walk',
+      drawspan: 'The Drawspan',
+      boulder_alley: 'Boulder Alley',
+      red_ascent: 'The Red Ascent',
+      finish_keep: 'The Finish Keep',
+    },
+    banner: {
+      found: 'The Gauntlet calls!',
+      go: 'GO!',
+      finish: 'Finished #{place}!',
+      crown: "You take Hodric's crown!",
+    },
+    log: {
+      queued: 'You join the Gauntlet queue (position {position}).',
+      unqueued: 'You leave the Gauntlet queue.',
+      fall: 'The chasm takes you. Back to the checkpoint.',
+      checkpoint: 'Checkpoint {index} banked.',
+      placed: 'You finish the Gauntlet in place {place}.',
+    },
+    // Sim-emitted flavor text (re-localized client-side via the hud.ts
+    // localizeSystemText exact map; see sim/social/hodrics.ts).
+    flavor: {
+      queueJoin: 'You join the Gauntlet queue. Lord Hodric oils the flails in your honor.',
+      gatesOpen: "The gates of Hodric's Castle grind open. Race to the crown!",
+      go: 'GO! The Gauntlet is open!',
+    },
+    // Sim-emitted error toasts (re-localized client-side via the hud.ts
+    // localizeErrorText exact map).
+    err: {
+      legsOnly: 'Legs only in the Gauntlet: abilities are barred.',
+      inMatch: 'You are already racing the Gauntlet.',
+      dead: 'You cannot queue for the Gauntlet while dead.',
+      arenaConflict: 'Leave the Coliseum before racing the Gauntlet.',
+    },
+  },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
   // button and "You have died." title reuse the hud.core.* keys; these are the
   // ghost-state additions shown once the spirit has been released.

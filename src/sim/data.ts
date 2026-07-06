@@ -50,6 +50,7 @@ import {
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
   TOOL_RECIPES as TOOL_RECIPES_CONTENT,
 } from './content/recipes';
+import { HC_HERALD, HC_HERALD_NPC_ID } from './content/hodrics';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -209,6 +210,9 @@ export const NPCS: Record<string, NpcDef> = {
   // The Gauntlet event NPCs (all dynamic: the recruiter spawns only while the
   // event window is open; the watcher/contestants spawn per run in the band).
   ...GAUNTLET_NPCS,
+   // The Gauntlet Herald (dynamic: true): spawned guarded at world init with a
+  // reserved out-of-band id (social/hodrics.ts spawnHcHerald), zero rng.
+   [HC_HERALD_NPC_ID]: HC_HERALD,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -599,15 +603,15 @@ export const DELVE_LIST: DelveDef[] = Object.values(DELVES).sort((a, b) => a.ind
 
 // ---------------------------------------------------------------------------
 // Hodric's Castle, the obstacle-race gauntlet. Its race instances live in
-// their own far-off x-band past the delve cap (and clear of x 9600..10200,
-// reserved for the battleground band on its feature branch). Unlike the other
-// instance bands the ground here is NOT flat: world.groundHeight routes the
-// band to the course terraces in sim/hodrics_layout.ts.
+// their own far-off x-band, after the survival Gauntlet and before the Vale
+// Cup practice pitches. Unlike the other instance bands the ground here is
+// NOT flat: world.groundHeight routes the band to the course terraces in
+// sim/hodrics_layout.ts.
 // ---------------------------------------------------------------------------
 
-export const HODRICS_X = 11100; // race instances share this x; slots stack along z
-export const HODRICS_X_MIN = 10800;
-export const HODRICS_X_MAX = 11400;
+export const HODRICS_X = 20300; // race instances share this x; slots stack along z
+export const HODRICS_X_MIN = 20000;
+export const HODRICS_X_MAX = 20600;
 export const HODRICS_SLOT_COUNT = 2; // concurrent races the world can host
 const HODRICS_Z0 = -1250;
 const HODRICS_SLOT_SPACING = 800; // clears the course footprint (~280yd) + interest radius

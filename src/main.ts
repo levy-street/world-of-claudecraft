@@ -995,6 +995,10 @@ async function startGame(
   // through IWorld). Private instanced practice works online AND offline, so the
   // button is always available.
   hud.setVcupPracticeAvailable(true);
+  // Offline only: the Gauntlet practice race vs Lord Hodric's court.
+  if (offlineSim) hud.setHcPracticeHook(() => void offlineSim.hcPracticeStart());
+   // Offline only: the Gauntlet practice race vs Lord Hodric's court.
+   if (offlineSim) hud.setHcPracticeHook(() => void offlineSim.hcPracticeStart());
 
   const chatInput = $('#chat-input') as unknown as HTMLTextAreaElement;
   const clickMoveMarker = $('#click-move-marker') as HTMLDivElement;

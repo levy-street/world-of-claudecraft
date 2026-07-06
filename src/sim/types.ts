@@ -2430,6 +2430,8 @@ export type SimEvent = { pid?: number } & (
     }
   // Hodric's Castle Gauntlet: queue state, race lifecycle, and the placement
   // result. All carry pid (personal, delivered to each racer).
+  // `hodricsWindow`: the Herald was talked to, open the race window (mailbox shape).
+  | { type: 'hodricsWindow' }
   | { type: 'hcQueued'; position: number }
   | { type: 'hcUnqueued' }
   | { type: 'hcFound'; field: HcFieldEntry[] }

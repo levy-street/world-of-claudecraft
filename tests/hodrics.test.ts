@@ -255,6 +255,40 @@ describe('backfill', () => {
   }, 30000);
 });
 
+describe('the Gauntlet Herald', () => {
+  it('is spawned guarded at world init with the reserved id', () => {
+    const sim = makeSim();
+    const npc = sim.entities.get(1_000_000_100)!;
+    expect(npc).toBeTruthy();
+    expect(npc.kind).toBe('npc');
+    expect(npc.templateId).toBe('hodrics_herald');
+    // A second Sim never collides with him (guarded spawn, no nextId churn).
+    const sim2 = makeSim();
+    expect(sim2.entities.get(1_000_000_100)!.templateId).toBe('hodrics_herald');
+  });
+
+  it('talking to him opens the race window instead of quest dialog', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Walker');
+    const herald = sim.entities.get(1_000_000_100)!;
+    place(sim, pid, herald.pos.x + 1, herald.pos.z);
+    sim.interact(pid);
+    const evs = sim.tick();
+    expect(evs.some((ev) => ev.type === 'hodricsWindow' && ev.pid === pid)).toBe(true);
+  });
+
+  it('targeted interact (already-targeted path) also opens the window', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Walker2');
+    const herald = sim.entities.get(1_000_000_100)!;
+    place(sim, pid, herald.pos.x + 1, herald.pos.z);
+    sim.entities.get(pid)!.targetId = herald.id;
+    sim.interact(pid);
+    const evs = sim.tick();
+    expect(evs.some((ev) => ev.type === 'hodricsWindow' && ev.pid === pid)).toBe(true);
+  });
+});
+
 describe('determinism', () => {
   it('same seed, same script, identical race', () => {
     const run = () => {

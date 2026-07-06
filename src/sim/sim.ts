@@ -1668,6 +1668,9 @@ export class Sim {
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx);
+    // The Gauntlet Herald: guarded, reserved-id, zero rng (goldens never see
+    // him). See social/hodrics.ts spawnHcHerald and HC_HERALD_ID.
+    hodricsMod.spawnHcHerald(this.ctx);
 
     // Groundskeeper Bram at the Sowfield gate (Vale Cup). Placed through the
     // SAME findSafePos path as the generic NPC loop above, but under a RESERVED

@@ -286,6 +286,8 @@ import {
 } from './ground_aim';
 import { buildHeroicVendorView } from './heroic_vendor_view';
 import { renderHeroicVendorWindow } from './heroic_vendor_window';
+import { HodricsHud } from './hodrics_hud';
+import { HodricsWindow } from './hodrics_window';
 import {
   holderTierBadgeDataUrl,
   holderTierByIndex,
@@ -2377,6 +2379,9 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.valeCupWindow.close();
         break;
+      case 'hodrics-window':
+        this.hodricsWindow.close();
+        break;
       case 'vendor-window':
         this.closeVendor();
         this.closeHeroicVendor();
@@ -4035,6 +4040,15 @@ export class Hud {
   });
   // Latch for the kickoff auto-close of the queue window (arena pattern).
   private vcupMatchSeen = false;
+  private readonly hodricsWindow = new HodricsWindow({
+    root: () => $('#hodrics-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#hodrics-window'),
+    ...this.windowFocus('#hodrics-window'),
+  });
+  private readonly hodricsHud = new HodricsHud({
+    root: () => $('#hodrics-hud'),
+  });
   // Character window painter (char_view.ts paperdoll core + char_window.ts painter).
   // It composes the presentation bag (icon/tooltip) for the equip slots and routes
   // the HUD-built stat / talent / progression fragments plus the unequip + drag
@@ -5043,6 +5057,8 @@ export class Hud {
     this.vcupMatchHud.relocalize();
     this.vcupBriefing.relocalize();
     this.vcupCharge.relocalize();
+    this.hodricsWindow.relocalize();
+    this.hodricsHud.relocalize();
     const dialog = $('#quest-dialog');
     if (dialog.style.display !== 'block' || this.openGossipNpcId === null) return;
     const npc = this.sim.entities.get(this.openGossipNpcId);
@@ -7669,6 +7685,8 @@ export class Hud {
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
       if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
+      if ($('#hodrics-window').style.display === 'block') this.hodricsWindow.render();
+      this.hodricsHud.render(sim.hcInfo);
       if (this.openLootMobId !== null) {
         const mob = sim.entities.get(this.openLootMobId);
         if (!mob?.lootable || dist2d(p.pos, mob.pos) > 7) this.closeLoot();
@@ -8750,6 +8768,10 @@ export class Hud {
   /** Offline builds enable the Vale Cup practice-vs-bots button (main.ts). */
   setVcupPracticeAvailable(on: boolean): void {
     this.valeCupWindow.setPracticeAvailable(on);
+  }
+
+  setHcPracticeHook(fn: (() => void) | null): void {
+    this.hodricsWindow.setPracticeHook(fn);
   }
 
   // The pinned in-match banner: opponent name + countdown / live match timer.
@@ -10123,6 +10145,68 @@ export class Hud {
             this.showBanner(t('hudChrome.vcup.bannerLoss'));
             this.combatLog(t('hudChrome.vcup.logLoss'), '#ff7a6a');
             audio.death();
+          }
+          break;
+        case 'hodricsWindow':
+          if (!this.hodricsWindow.isOpen) this.hodricsWindow.toggle();
+          break;
+        case 'hcQueued':
+          this.log(
+            t('hudChrome.hc.log.queued', {
+              position: formatNumber(ev.position, { maximumFractionDigits: 0 }),
+            }),
+            '#c9a2ff',
+          );
+          break;
+        case 'hcUnqueued':
+          this.log(t('hudChrome.hc.log.unqueued'), '#c9a2ff');
+          break;
+        case 'hcFound':
+          this.showBanner(t('hudChrome.hc.banner.found'));
+          audio.duelChallenge();
+          break;
+        case 'hcCountdown':
+          audio.duelCountdownTick();
+          break;
+        case 'hcStart':
+          this.showBanner(t('hudChrome.hc.banner.go'));
+          audio.duelStart();
+          break;
+        case 'hcKnocked':
+          this.renderer.addShake(0.5);
+          audio.fiestaWord(1);
+          break;
+        case 'hcFall':
+          this.log(t('hudChrome.hc.log.fall'), '#ff9a6a');
+          break;
+        case 'hcCheckpoint':
+          this.log(
+            t('hudChrome.hc.log.checkpoint', {
+              index: formatNumber(ev.index, { maximumFractionDigits: 0 }),
+            }),
+            '#c9a2ff',
+          );
+          break;
+        case 'hcFinish':
+          this.showBanner(
+            t('hudChrome.hc.banner.finish', {
+              place: formatNumber(ev.place, { maximumFractionDigits: 0 }),
+            }),
+          );
+          audio.duelEnd();
+          break;
+        case 'hcEnd':
+          if (ev.won) {
+            this.showBanner(t('hudChrome.hc.banner.crown'));
+            this.combatLog(t('hudChrome.hc.banner.crown'), '#ffd75e');
+            audio.fiestaWave();
+          } else {
+            this.combatLog(
+              t('hudChrome.hc.log.placed', {
+                place: formatNumber(ev.place, { maximumFractionDigits: 0 }),
+              }),
+              '#c9a2ff',
+            );
           }
           break;
         case 'fiestaWord': {

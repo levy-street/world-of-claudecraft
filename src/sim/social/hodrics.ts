@@ -16,7 +16,9 @@
 // - Racers cannot die on the course: there are no damage sources in the band,
 //   falls are caught at the kill plane and respawn at the last checkpoint.
 
+import { HC_HERALD, HC_HERALD_ID, HC_HERALD_POS } from '../content/hodrics';
 import { DUNGEON_X_THRESHOLD, hodricsOrigin, isHodricsPos } from '../data';
+import { createNpc } from '../entity';
 import {
   HC_AXES,
   HC_BOULDER_LANES,
@@ -123,6 +125,21 @@ export function addHcResult(meta: PlayerMeta, won: boolean, timeS: number | null
   meta.hcRaces = (meta.hcRaces ?? 0) + 1;
   if (won) meta.hcWins = (meta.hcWins ?? 0) + 1;
   if (timeS !== null && (meta.hcBest === undefined || timeS < meta.hcBest)) meta.hcBest = timeS;
+}
+
+// ---------------------------------------------------------------------------
+// The Gauntlet Herald
+// ---------------------------------------------------------------------------
+
+/**
+ * Spawn Herald Osric at world init. Guarded and RESERVED-id (see HC_HERALD_ID
+ * in content/hodrics.ts): he never touches the nextId sequence or the shared
+ * rng stream, so the parity goldens cannot see him.
+ */
+export function spawnHcHerald(ctx: SimContext): void {
+  if (ctx.entities.has(HC_HERALD_ID)) return;
+  const npc = createNpc(HC_HERALD_ID, HC_HERALD, ctx.groundPos(HC_HERALD_POS.x, HC_HERALD_POS.z));
+  ctx.addEntity(npc);
 }
 
 // ---------------------------------------------------------------------------

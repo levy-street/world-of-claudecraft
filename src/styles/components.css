@@ -6386,6 +6386,114 @@
     margin: 4px 0 2px;
     font-family: Georgia, serif;
   }
+  /* Hodric's Castle Gauntlet: the Herald window bits and the in-race strip +
+     ten-racer progress board. Race information is actionable, so nothing here
+     is ever tier-shed (root CLAUDE.md graphics-fairness invariant). */
+  #hodrics-window {
+    width: 340px;
+  }
+  .hc-standing {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #e8d9a8;
+    margin: 6px 0;
+    font-family: var(--title-font);
+  }
+  .hc-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .hc-queued {
+    font-size: 12px;
+    color: #c9a2ff;
+    font-family: var(--title-font);
+  }
+  #hodrics-hud {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    pointer-events: none;
+    text-align: center;
+  }
+  .hc-countdown {
+    font-family: var(--title-font);
+    font-size: 64px;
+    color: #ffd75e;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+  .hc-over {
+    font-family: var(--title-font);
+    font-size: 28px;
+    color: #ffd75e;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+  .hc-strip {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    align-items: baseline;
+    background: rgba(20, 12, 30, 0.72);
+    border: 1px solid #6a4a9a;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #e8d9ff;
+  }
+  .hc-strip .hc-clock {
+    color: #b6ad8c;
+  }
+  .hc-board {
+    margin-top: 4px;
+    background: rgba(20, 12, 30, 0.6);
+    border: 1px solid #4a3a6a;
+    border-radius: 6px;
+    padding: 4px 8px;
+    min-width: 220px;
+  }
+  .hc-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    color: #cfc4e8;
+    line-height: 1.5;
+  }
+  .hc-row.you {
+    color: #ffd75e;
+  }
+  .hc-row.left {
+    opacity: 0.45;
+  }
+  .hc-row .hc-name {
+    width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+  }
+  .hc-row .hc-bar {
+    flex: 1;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .hc-row .hc-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #7a4ad8, #c9a2ff);
+  }
+  .hc-row .hc-place {
+    color: #ffd75e;
+    min-width: 14px;
+  }
   .arena-brackets {
     display: flex;
     gap: 6px;

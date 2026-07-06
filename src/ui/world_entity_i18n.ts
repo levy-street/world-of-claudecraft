@@ -142,6 +142,7 @@ const NPC_IDS = [
   'gauntlet_recruiter', // Maro Half-Mask, the Herald of the Gauntlet (town square)
   'gauntlet_watcher', // The Stone Warden (the sentinel-trial watcher, instance-local)
   'gauntlet_contestant', // NPC backfill contestants (per-run rolled names override this)
+   'hodrics_herald', // Herald Osric, the Gauntlet race desk (Eastbrook edge)
 ] as const;
 
 const QUEST_IDS = [

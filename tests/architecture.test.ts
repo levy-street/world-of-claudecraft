@@ -201,6 +201,8 @@ const UI_PURE_CORES = [
   'src/ui/town_focus_view.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/gauntlet_hud_view.ts',
+   'src/ui/hodrics_window_view.ts',
+   'src/ui/hodrics_hud_view.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));
