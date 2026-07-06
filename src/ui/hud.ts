@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import type { GamepadKind } from '../game/gamepad_map';
 import { type Keybinds, keyCapLabel } from '../game/keybinds';
+import { loadHapticsEnabled, triggerHaptic } from '../game/mobile_controls';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
@@ -10190,6 +10191,7 @@ export class Hud {
             }),
             '#c9a2ff',
           );
+          triggerHaptic(12, loadHapticsEnabled());
           break;
         case 'hcFinish':
           this.showBanner(
@@ -10198,12 +10200,17 @@ export class Hud {
             }),
           );
           audio.duelEnd();
+          this.renderer.addShake(0.3);
+          this.renderer.fiestaAugmentBurst(this.sim.playerId);
+          triggerHaptic([20, 40, 20, 40, 70], loadHapticsEnabled());
           break;
         case 'hcEnd':
           if (ev.won) {
             this.showBanner(t('hudChrome.hc.banner.crown'));
             this.combatLog(t('hudChrome.hc.banner.crown'), '#ffd75e');
             audio.fiestaWave();
+            this.renderer.fiestaKillBurst(this.sim.playerId, 'holy');
+            triggerHaptic([30, 50, 30, 50, 90], loadHapticsEnabled());
           } else {
             this.combatLog(
               t('hudChrome.hc.log.placed', {

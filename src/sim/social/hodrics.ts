@@ -57,16 +57,31 @@ export const HC_BOT_BACKFILL_WAIT = 30; // seconds a human waits before bots fil
 
 // A hit launches the racer on a ballistic arc (the base sim integrates
 // airborne velocity with no air control, so a knock is committed, exactly the
-// tumbling feel we want). Immunity keeps chained obstacles from stunlocking.
+// tumbling feel we want). Immunity keeps chained obstacles from stunlocking:
+// hammer/axe/boulder yeets are big committed launches with a long grace, the
+// spinning log is a ground-level SHOVE with a short one, so a slow log keeps
+// bulldozing you sideways instead of ping-ponging you into the air.
 export const HC_LAUNCH_IMMUNITY = 0.9; // seconds of no re-hit after any launch or respawn
+const HC_IMMUNITY: Record<HcKnockKind, number> = {
+  flail: 0.9,
+  axe: 0.9,
+  log: 0.4,
+  boulder: 0.9,
+};
 const HC_BODY_R = 0.5; // racer body radius (PLAYER_BODY_RADIUS)
 const HC_BODY_HALF_H = 0.9; // capsule half height for vertical overlap tests
 const HC_ROPE_Z = -86; // countdown holding line at the yard mouth
 
-const KNOCK_FLAIL = { v: 10, vy: 5 };
-const KNOCK_AXE = { v: 11, vy: 5.5 };
-const KNOCK_ROTOR = { tangential: 8.5, radial: 3, vy: 4.2 };
-const KNOCK_BOULDER = { vz: -9.5, vx: 2.5, vy: 4.5 };
+const KNOCK_FLAIL = { v: 13, vy: 6.5 };
+const KNOCK_AXE = { v: 14, vy: 7 };
+const KNOCK_ROTOR = { tangential: 7.5, radial: 2.5, vy: 2.8 };
+const KNOCK_BOULDER = { vz: -12, vx: 3, vy: 6 };
+
+// Landing squash: a hard landing (drop past this) rebounds into a small hop,
+// the gameshow-bouncy feel. Chained bounces decay since each peak is lower.
+const HC_BOUNCE_MIN_DROP = 3.2;
+const HC_BOUNCE_FACTOR = 0.5; // rebound vy = min(cap, drop * factor)
+const HC_BOUNCE_VY_CAP = 3.4;
 
 // ---------------------------------------------------------------------------
 // State shapes (backing fields live on Sim, reached as live ctx views)
@@ -90,6 +105,9 @@ export interface HcRacer {
   place: number; // 1..N once assigned (finish order, then progress)
   falls: number;
   lastLaunchAt: number; // sim time of the last launch/respawn (immunity)
+  immunity: number; // per-kind re-hit grace applied at the last launch
+  airborne: boolean; // was off the ground last tick (landing-bounce edge)
+  peakY: number; // highest y since leaving the ground (bounce drop metric)
   left: boolean; // logged out or fled the crag mid-race
 }
 
@@ -274,6 +292,9 @@ export function startHcMatch(ctx: SimContext, pids: number[]): void {
       place: 0,
       falls: 0,
       lastLaunchAt: -99,
+      immunity: HC_LAUNCH_IMMUNITY,
+      airborne: false,
+      peakY: e.pos.y,
       left: false,
     });
   }
@@ -412,7 +433,7 @@ function racePhysics(ctx: SimContext, match: HcMatch): void {
     if (!e) continue;
     ridePlatforms(e, e.pos.x - origin.x, e.pos.z - origin.z, t);
 
-    if (!racer.finished && t - racer.lastLaunchAt >= HC_LAUNCH_IMMUNITY) {
+    if (!racer.finished && t - racer.lastLaunchAt >= racer.immunity) {
       testObstacleHits(ctx, racer, e, e.pos.x - origin.x, e.pos.z - origin.z, t);
     }
 
@@ -420,6 +441,27 @@ function racePhysics(ctx: SimContext, match: HcMatch): void {
     if (e.pos.y < HC_KILL_Y) {
       respawnAtCheckpoint(ctx, match, racer, e);
       continue;
+    }
+
+    // Landing squash-and-rebound: a hard landing pops a small decaying hop
+    // (gameshow bounce). The drawspan decks are exempt, ridePlatforms is
+    // their vertical authority and a bounce would fight its deck pinning.
+    if (!e.onGround) {
+      racer.airborne = true;
+      if (e.pos.y > racer.peakY) racer.peakY = e.pos.y;
+    } else {
+      if (racer.airborne) {
+        const drop = racer.peakY - e.pos.y;
+        const lx = e.pos.x - origin.x;
+        const lz = e.pos.z - origin.z;
+        if (drop > HC_BOUNCE_MIN_DROP && !ridingPlatform(lx, lz, e.pos.y, t)) {
+          e.vy = Math.min(HC_BOUNCE_VY_CAP, drop * HC_BOUNCE_FACTOR);
+          e.onGround = false;
+          e.fallStartY = e.pos.y;
+        }
+      }
+      racer.airborne = !e.onGround;
+      racer.peakY = e.pos.y;
     }
 
     // Progress banks only on solid ground (a flail yeet is not progress).
@@ -600,6 +642,8 @@ function launch(
   e.jumping = false;
   e.fallStartY = e.pos.y;
   racer.lastLaunchAt = ctx.time;
+  racer.immunity = HC_IMMUNITY[kind];
+  racer.peakY = e.pos.y;
   ctx.emit({ type: 'hcKnocked', kind, pid: racer.pid });
 }
 
@@ -619,6 +663,9 @@ function respawnAtCheckpoint(ctx: SimContext, match: HcMatch, racer: HcRacer, e:
   ctx.rebucket(e);
   racer.falls++;
   racer.lastLaunchAt = ctx.time; // spawn grace shares the immunity window
+  racer.immunity = HC_LAUNCH_IMMUNITY;
+  racer.airborne = false;
+  racer.peakY = e.pos.y;
   ctx.emit({ type: 'hcFall', pid: racer.pid });
 }
 

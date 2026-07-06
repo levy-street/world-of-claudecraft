@@ -114,14 +114,43 @@ analytic too (a fixed release schedule per lane), not entities.
   seeded from tickCount + match id (the fiesta mechanism), so world parity
   goldens never fork.
 
+### Game-feel layer (the gameshow rework)
+
+The shipped feel iterates past the v1 numbers toward the reference image's
+bounce-house energy, all still deterministic and analytic:
+
+- **Punchier launches.** Hammer/axe/boulder knock velocities are tuned up
+  (flail 13/6.5, axe 14/7, boulder 12 downhill) so a hit reads as a real yeet;
+  falls off the open bridge sides are an intended, frequent outcome.
+- **Per-kind re-hit grace.** Big launches keep the 0.9 s immunity; the
+  spinning log is a ground-level SHOVE (vy 2.8) with a short 0.4 s grace, so a
+  slow rotor bulldozes you sideways rather than ping-ponging you airborne.
+- **Landing bounce.** A landing after a drop past 3.2 units rebounds into a
+  small decaying hop (vy = min(3.4, drop x 0.5)); chained bounces decay since
+  each peak is lower. Drawspan decks are exempt (their carry pass is the
+  vertical authority there).
+- **No fall damage in the band.** The base sim's fall damage is suppressed for
+  the whole Hodric's band, closing the loop on "the course has no damage
+  sources": a hammer yeet can cost you time, never health.
+- **Haptics + juice (client-side).** Own-racer events drive the sanctioned
+  Fiesta juice channels: camera shake on knocks/falls/finish, mobile vibration
+  patterns per event (countdown tick, GO, knocked, fall, checkpoint, finish,
+  crown), and the gold ascension pillar + holy nova as finish/crown fireworks.
+  All cosmetic; no tier or setting changes race outcomes.
+
 ## Assets (all CC0, already in the repo)
 
-The whole course dresses from packs already bundled under `public/models/`
-(license provenance in `CREDITS.md`): the KayKit Dungeon Remastered kit for
-castle walls, arches, gates, ~60 banner variants, torches and braziers; KayKit
-Medieval Hexagon castle/tower/bridge silhouettes for the skyline; KayKit
-warhammers as flail heads and battleaxes for the pendulums; a procedural log
-beam for the Log Court rotors and Quaternius boulders for Boulder Alley.
+The course is a bright gameshow castle matching the reference image: candy
+pink crenellated walls (instanced merlon rows), cyan cone-roofed turrets with
+gold finials, candy torus arches over the start and finish, yellow/orange
+striped bridge and checkered plaza/keep floors (procedural canvas textures),
+striped hammer heads and gold crescent axes on rigid steel pendulum arms,
+barber-pole rotor logs, cyan-striped drawspan decks with gold rails,
+beach-ball boulders that visibly roll, pennant strings and keep-floor
+confetti (single instanced draws), and drifting cartoon clouds posed from the
+same absolute clock as the obstacles. The only GLB set pieces kept are the
+KayKit banners and torches (license provenance in `CREDITS.md`); everything
+else is procedural geometry, so nothing new ships in the asset budget.
 Character rigs already carry
 `Jump_Idle` (airborne), `Death_A`/`Lie_Idle` (ragdoll/daze), and a real
 `Cheer` clip (finish celebration). No new binary assets are required; the

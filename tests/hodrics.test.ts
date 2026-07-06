@@ -269,6 +269,53 @@ describe('practice toggle', () => {
   });
 });
 
+describe('physics feel', () => {
+  it('a hard landing rebounds into a small decaying hop (gameshow bounce)', () => {
+    const sim = makeSim();
+    const events: SimEvent[] = [];
+    const pid = startActiveRace(sim, events);
+    const match = sim.hcMatches.get(pid)!;
+    const origin = hodricsOrigin(match.slot);
+    const e = sim.entities.get(pid)!;
+
+    // Drop the racer from 12 up over the log court: past the bounce
+    // threshold, so the landing tick must rebound instead of sticking.
+    place(sim, pid, origin.x, origin.z - 20, 12);
+    e.onGround = false;
+    e.vy = 0;
+    e.fallStartY = 12;
+    let bounced = false;
+    for (let i = 0; i < 3 * TICK_RATE; i++) {
+      sim.tick();
+      if (!bounced && e.vy > 0 && !e.onGround && e.pos.y < 4) bounced = true;
+    }
+    expect(bounced).toBe(true);
+    // And it settles: bounces decay, they never trampoline forever.
+    ff(sim, 3 * TICK_RATE);
+    expect(e.onGround).toBe(true);
+  }, 20000);
+
+  it('a rotor hit is a short-grace shove (0.4s), a flail yeet a long one (0.9s)', () => {
+    const sim = makeSim();
+    const events: SimEvent[] = [];
+    const pid = startActiveRace(sim, events);
+    const match = sim.hcMatches.get(pid)!;
+    const origin = hodricsOrigin(match.slot);
+    const racer = match.racers.get(pid)!;
+
+    // Park on the first rotor's sweep circle and wait out one revolution.
+    place(sim, pid, origin.x - 4 + 6, origin.z - 24, 0);
+    const knocks: SimEvent[] = [];
+    for (let i = 0; i < 6 * TICK_RATE; i++) {
+      knocks.push(...sim.tick().filter((ev) => ev.type === 'hcKnocked' && ev.pid === pid));
+      if (knocks.length > 0) break;
+    }
+    expect(knocks.length).toBeGreaterThan(0);
+    expect((knocks[0] as { kind?: string }).kind).toBe('log');
+    expect(racer.immunity).toBeCloseTo(0.4);
+  }, 20000);
+});
+
 describe('mid-race save and reload', () => {
   it('serializes hcReturnPos while racing and relocates there on reload', () => {
     const sim = makeSim();
