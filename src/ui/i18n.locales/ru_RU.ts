@@ -3726,6 +3726,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.other': 'Список игроков: на {realm} в сети {count} игрока.',
   'hudChrome.controller.title': 'Геймпад',
   'hudChrome.controller.enable': 'Включить геймпад',
+  'hudChrome.controller.showControls': 'Показать управление',
   'hudChrome.controller.invertY': 'Инверсия камеры (Y)',
   'hudChrome.controller.deadzone': 'Мёртвая зона стика',
   'hudChrome.controller.cameraSpeed': 'Скорость камеры',

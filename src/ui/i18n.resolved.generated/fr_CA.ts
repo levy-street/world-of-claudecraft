@@ -596,7 +596,11 @@ export const fr_CA: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
-      "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran."
+      "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Surcouche de performance",

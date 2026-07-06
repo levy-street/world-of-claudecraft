@@ -682,6 +682,17 @@ export const hudChromeStrings = {
     resetButtons: 'Reset Button Layout',
     menuAction: 'Game Menu',
     help: 'Left stick moves, right stick looks. Open a window to use the on-screen pointer.',
+    // Onboarding overlay shown once on a first controller connect (and from the
+    // Show Controls button below). The overlay title reuses `title`, the intro
+    // reuses `help`, and the button section reuses `buttons`. Move/Look/Got it are
+    // kept short and non-wordy so they need no per-locale fill; the stick columns
+    // use non-localized hardware tokens ("L-Stick" / "R-Stick") like the button
+    // glyphs. showControls is the one wordy add (its five non-Latin fills ship with
+    // this change).
+    showControls: 'Show Controls',
+    guideMove: 'Move',
+    guideLook: 'Look',
+    guideDismiss: 'Got it',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in

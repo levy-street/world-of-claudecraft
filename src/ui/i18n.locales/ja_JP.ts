@@ -3686,6 +3686,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.other': 'Who：{realm}に{count}人のプレイヤーがオンラインです。',
   'hudChrome.controller.title': 'コントローラー',
   'hudChrome.controller.enable': 'コントローラーを有効化',
+  'hudChrome.controller.showControls': '操作を表示',
   'hudChrome.controller.invertY': 'カメラ反転（Y軸）',
   'hudChrome.controller.deadzone': 'スティックの遊び',
   'hudChrome.controller.cameraSpeed': 'カメラ速度',

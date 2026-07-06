@@ -596,7 +596,11 @@ export const pt_BR: EnTranslations = {
       "buttons": "Disposição dos Botões",
       "resetButtons": "Redefinir Disposição dos Botões",
       "menuAction": "Menu do Jogo",
-      "help": "O analógico esquerdo move, o direito controla a câmera. Abra uma janela para usar o ponteiro na tela."
+      "help": "O analógico esquerdo move, o direito controla a câmera. Abra uma janela para usar o ponteiro na tela.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Sobreposição de Desempenho",

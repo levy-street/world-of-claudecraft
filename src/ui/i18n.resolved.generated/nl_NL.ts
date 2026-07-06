@@ -596,7 +596,11 @@ export const nl_NL: EnTranslations = {
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",
       "menuAction": "Spelmenu",
-      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken."
+      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Prestatie-overlay",

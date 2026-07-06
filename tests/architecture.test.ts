@@ -184,6 +184,7 @@ const UI_PURE_CORES = [
   'src/ui/roving_index.ts',
   'src/ui/live_region_politeness.ts',
   'src/ui/discord_widget_view.ts',
+  'src/ui/controller_guide_view.ts',
   'src/ui/desktop_update_view.ts',
   'src/ui/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',

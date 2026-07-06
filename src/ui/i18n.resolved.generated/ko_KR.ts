@@ -596,7 +596,11 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
-      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
+      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다.",
+      "showControls": "조작 표시",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "성능 오버레이",

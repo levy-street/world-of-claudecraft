@@ -596,7 +596,11 @@ export const zh_TW: EnTranslations = {
       "buttons": "按鍵配置",
       "resetButtons": "重設按鍵配置",
       "menuAction": "遊戲選單",
-      "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。"
+      "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。",
+      "showControls": "顯示操作說明",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "效能監視器",

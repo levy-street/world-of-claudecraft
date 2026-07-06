@@ -1369,7 +1369,7 @@ async function startGame(
     onInputEdge: () => inputMeter.record(performance.now()),
     isPointerMode: () => hud.isWindowOpen(),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
-    onConnectionChange: () => hud.refreshControllerLabels(),
+    onConnectionChange: () => hud.onGamepadConnectionChange(gamepad.isConnected()),
   });
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
@@ -1744,8 +1744,16 @@ async function startGame(
       // The connected pad's brand lives on the manager, not the (hardware-agnostic)
       // bindings, so surface it here for the Controller panel's glyph labels.
       kind: () => gamepad.getKind(),
+      showGuide: () => hud.openControllerGuide(),
     },
   });
+  // A pad already visible to getGamepads() at load (e.g. re-enabling the setting
+  // with one plugged in, or Firefox, which reports connected pads before any
+  // input) was acquired by gamepad.start() during the boot apply-loop above,
+  // BEFORE the options seam was attached, so its connect fired with null hooks and
+  // skipped the first-connect guide. Run the check once now that the hooks exist.
+  // A no-op when no pad is connected or the guide was already seen.
+  if (gamepad.isConnected()) hud.onGamepadConnectionChange(true);
   if (online) {
     hud.attachReporting({
       submit: (targetPid, reason, details) =>

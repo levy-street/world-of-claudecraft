@@ -596,7 +596,11 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
-      "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce."
+      "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Performance overlay",

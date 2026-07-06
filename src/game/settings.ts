@@ -128,6 +128,10 @@ export const BOOL_SETTINGS = {
   // on by default: poll a connected controller for input. Off ignores the pad
   // entirely (keyboard/mouse/touch unaffected).
   gamepadEnabled: { def: true },
+  // internal flag (no UI toggle): set once the controls guide has auto-shown on a
+  // first controller connect, so it never pops again. The player can reopen it any
+  // time from the Controller options panel.
+  gamepadGuideSeen: { def: false },
   // off by default: invert the vertical axis of the right-stick camera, the
   // classic console/flight-sim preference. Independent of mouse/touch invert.
   gamepadInvertY: { def: false },

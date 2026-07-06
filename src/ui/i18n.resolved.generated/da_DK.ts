@@ -596,7 +596,11 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
-      "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren."
+      "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Ydelsesoverlay",

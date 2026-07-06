@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6623,
-    "rows": 139083,
-    "translated": 137544,
-    "pending": 1346,
+    "keys": 6627,
+    "rows": 139167,
+    "translated": 137553,
+    "pending": 1421,
     "blocked": 193,
     "blockedSource": 94
   },
@@ -460411,6 +460411,222 @@
         }
       }
     },
+    "main:hudChrome.controller.guideDismiss": {
+      "scope": "main",
+      "enHash": "efa80f5a4260a907",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "efa80f5a4260a907",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
+    "main:hudChrome.controller.guideLook": {
+      "scope": "main",
+      "enHash": "617ae52fa320b1cf",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "617ae52fa320b1cf",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
+    "main:hudChrome.controller.guideMove": {
+      "scope": "main",
+      "enHash": "41674ac07599e06c",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "41674ac07599e06c",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
     "main:hudChrome.controller.help": {
       "scope": "main",
       "enHash": "33e33c5eae60616e",
@@ -460856,6 +461072,88 @@
           "state": "translated",
           "srcHash": "d5adc5d1051b578a",
           "by": "human"
+        }
+      }
+    },
+    "main:hudChrome.controller.showControls": {
+      "scope": "main",
+      "enHash": "223c1ab446726ac7",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "223c1ab446726ac7",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "translated",
+          "srcHash": "223c1ab446726ac7",
+          "by": "human"
+        },
+        "zh_TW": {
+          "state": "translated",
+          "srcHash": "223c1ab446726ac7",
+          "by": "human"
+        },
+        "ko_KR": {
+          "state": "translated",
+          "srcHash": "223c1ab446726ac7",
+          "by": "human"
+        },
+        "ja_JP": {
+          "state": "translated",
+          "srcHash": "223c1ab446726ac7",
+          "by": "human"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "translated",
+          "srcHash": "223c1ab446726ac7",
+          "by": "human"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
         }
       }
     },

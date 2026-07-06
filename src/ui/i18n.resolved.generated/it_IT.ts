@@ -596,7 +596,11 @@ export const it_IT: EnTranslations = {
       "buttons": "Disposizione dei pulsanti",
       "resetButtons": "Ripristina disposizione dei pulsanti",
       "menuAction": "Menu di gioco",
-      "help": "Lo stick sinistro muove, quello destro orienta la telecamera. Apri una finestra per usare il puntatore a schermo."
+      "help": "Lo stick sinistro muove, quello destro orienta la telecamera. Apri una finestra per usare il puntatore a schermo.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Pannello prestazioni",

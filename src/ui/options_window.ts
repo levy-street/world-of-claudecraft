@@ -173,6 +173,31 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
 };
 
 /**
+ * Localized display name for a gamepad-bound action id, shared by the Controller
+ * panel's remap rows and the onboarding guide overlay so the two never drift.
+ * Handles the two specials the pad adds on top of the keybind registry ('escape'
+ * -> game menu; 'none' -> unbound), the action-bar slots (via the injected
+ * `slotActionName`, which resolves the ability/item currently in that slot), and
+ * every ordinary edge action (via BIND_ACTION_LABEL_KEYS, falling back to the
+ * English BIND_ACTIONS label then the raw id).
+ */
+export function gamepadActionDisplayName(
+  actionId: string,
+  slotActionName: (slot: number) => string | null,
+): string {
+  if (actionId === GAMEPAD_NONE) return t('hud.options.unbound');
+  if (actionId === 'escape') return t('hudChrome.controller.menuAction');
+  if (actionId.startsWith('slot')) {
+    const slot = Number(actionId.slice(4));
+    if (slot === 0) return t('hud.keybinds.actions.attack');
+    return slotActionName(slot) ?? t('hud.keybinds.actions.actionBarSlot', { slot: slot + 1 });
+  }
+  const key = BIND_ACTION_LABEL_KEYS[actionId];
+  if (key) return t(key);
+  return BIND_ACTIONS.find((a) => a.id === actionId)?.label ?? actionId;
+}
+
+/**
  * Hud-supplied glue. Standalone (the window composes no PainterHostPresentation:
  * it renders no item rows). It reads the live world's bug-report slice and routes
  * the options seam (settings, locale switch, theme, gamepad), the bug-report
@@ -1236,6 +1261,18 @@ export class OptionsWindow {
     note.className = 'set-note';
     note.textContent = t('hudChrome.controller.help');
     body.appendChild(note);
+
+    if (hooks) {
+      const showGuide = document.createElement('button');
+      showGuide.type = 'button';
+      showGuide.className = 'btn';
+      showGuide.textContent = t('hudChrome.controller.showControls');
+      showGuide.addEventListener('click', () => {
+        audio.click();
+        hooks.gamepad.showGuide();
+      });
+      body.appendChild(showGuide);
+    }
 
     const head = document.createElement('div');
     head.className = 'kb-cat';

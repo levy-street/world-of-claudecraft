@@ -596,7 +596,11 @@ export const es_ES: EnTranslations = {
       "buttons": "Distribución de botones",
       "resetButtons": "Restablecer distribución de botones",
       "menuAction": "Menú del juego",
-      "help": "El stick izquierdo mueve, el derecho controla la cámara. Abre una ventana para usar el puntero en pantalla."
+      "help": "El stick izquierdo mueve, el derecho controla la cámara. Abre una ventana para usar el puntero en pantalla.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Superposición de rendimiento",

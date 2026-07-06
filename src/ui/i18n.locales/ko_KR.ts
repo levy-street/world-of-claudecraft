@@ -3679,6 +3679,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.',
   'hudChrome.controller.title': '컨트롤러',
   'hudChrome.controller.enable': '컨트롤러 사용',
+  'hudChrome.controller.showControls': '조작 표시',
   'hudChrome.controller.invertY': '카메라 반전(Y축)',
   'hudChrome.controller.deadzone': '스틱 데드존',
   'hudChrome.controller.cameraSpeed': '카메라 속도',

@@ -3535,6 +3535,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.other': '查询：{realm}上有{count}名玩家在线。',
   'hudChrome.controller.title': '手柄',
   'hudChrome.controller.enable': '启用手柄',
+  'hudChrome.controller.showControls': '显示操作说明',
   'hudChrome.controller.invertY': '反转镜头（Y轴）',
   'hudChrome.controller.deadzone': '摇杆死区',
   'hudChrome.controller.cameraSpeed': '镜头速度',

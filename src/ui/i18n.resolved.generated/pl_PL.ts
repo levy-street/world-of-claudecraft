@@ -596,7 +596,11 @@ export const pl_PL: EnTranslations = {
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",
       "menuAction": "Menu gry",
-      "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego."
+      "help": "Lewa gałka porusza, prawa gałka rozgląda. Otwórz okno, aby użyć wskaźnika ekranowego.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Nakładka wydajności",

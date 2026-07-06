@@ -184,6 +184,7 @@ import {
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
 import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
+import { ControllerGuide } from './controller_guide';
 import { formatMinimapCoords } from './coords';
 import { corpseHarvestView } from './corpse_harvest_view';
 import { renderCorpseHarvestPicker } from './corpse_harvest_window';
@@ -305,7 +306,7 @@ import {
 } from './mobile_action_page_view';
 import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import { MovableFrame } from './movable_frame';
-import { OptionsWindow } from './options_window';
+import { gamepadActionDisplayName, OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
 import { loadPartyCollapsed, savePartyCollapsed } from './party_collapse';
 import type { PartyRowAuraDeps } from './party_frame_row';
@@ -440,6 +441,8 @@ export interface GamepadBindingsHooks {
   // Detected brand of the connected pad, so the panel labels each button with the
   // glyph printed on that controller ('generic' combined labels when none/unknown).
   kind(): GamepadKind;
+  // Open the controls onboarding overlay (the panel's Show Controls button).
+  showGuide(): void;
 }
 
 export interface ReportHooks {
@@ -3772,12 +3775,7 @@ export class Hud {
     options: () => this.optionsHooks,
     bugReport: () => this.bugReportHooks,
     keybinds: () => this.keybinds,
-    slotActionName: (slot) => {
-      const ability = this.abilityForSlot(slot);
-      if (ability) return abilityDisplayName(ability.def);
-      const item = this.itemForSlot(slot);
-      return item ? itemDisplayName(item) : null;
-    },
+    slotActionName: (slot) => this.slotActionName(slot),
     refreshKeybindLabels: () => this.refreshKeybindLabels(),
     buildDropdown: (options, current, onChange, placeholder, a11y) =>
       this.buildDropdown(options, current, onChange, placeholder, a11y),
@@ -3801,6 +3799,16 @@ export class Hud {
       this.chatClock = clock;
       localStorage.setItem('chatClock', clock);
     },
+  });
+  // Controller onboarding overlay. Reads the live pad layout through the same
+  // gamepad options seam the Controller panel uses, and shares the action-label
+  // resolver so the two never drift. All closures are lazy (optionsHooks is set
+  // later via attachOptions).
+  private readonly controllerGuide = new ControllerGuide({
+    focusManager: this.focusManager,
+    entries: () => this.optionsHooks?.gamepad.entries() ?? [],
+    kind: () => this.optionsHooks?.gamepad.kind() ?? 'generic',
+    actionLabel: (id) => gamepadActionDisplayName(id, (slot) => this.slotActionName(slot)),
   });
   // Leaderboard window painter (leaderboard_view.ts async-free core + leaderboard_
   // window.ts painter). It owns the page index + focus opener and the one
@@ -14097,6 +14105,7 @@ export class Hud {
     return (
       this.optionsOpen ||
       this.emoteWheelOpen ||
+      this.controllerGuide.isOpen() ||
       $('#emote-editor').style.display === 'block' ||
       this.cardModalEl !== null
     );
@@ -14141,6 +14150,32 @@ export class Hud {
     this.optionsWindow.refreshControllerLabels();
   }
 
+  /** Localized name of the ability/item currently in an action-bar slot (null if
+   *  empty), for the Controller panel + guide action labels. Slot 0 is Attack. */
+  private slotActionName(slot: number): string | null {
+    const ability = this.abilityForSlot(slot);
+    if (ability) return abilityDisplayName(ability.def);
+    const item = this.itemForSlot(slot);
+    return item ? itemDisplayName(item) : null;
+  }
+
+  /** Open the controller onboarding overlay (from the Show Controls button). */
+  openControllerGuide(): void {
+    this.controllerGuide.open();
+  }
+
+  /** Called by main.ts when a pad connects OR disconnects. Always re-labels the
+   *  Controller panel; on a genuine connect (not an unplug) auto-shows the controls
+   *  guide once, the first time ever. Later connects only re-label. */
+  onGamepadConnectionChange(connected: boolean): void {
+    this.refreshControllerLabels();
+    if (!connected) return;
+    if (this.optionsHooks && !this.optionsHooks.settings.get('gamepadGuideSeen')) {
+      this.optionsHooks.onSettingChange('gamepadGuideSeen', true);
+      this.controllerGuide.open();
+    }
+  }
+
   // -------------------------------------------------------------------------
 
   // Historical name retained for the existing call sites. Opening a window no
@@ -14152,6 +14187,10 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
+    if (this.controllerGuide.isOpen()) {
+      this.controllerGuide.close();
+      return true;
+    }
     if (this.openLootChestId !== null) {
       this.closeLoot();
       return true;

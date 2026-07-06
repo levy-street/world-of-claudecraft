@@ -596,7 +596,11 @@ export const id_ID: EnTranslations = {
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
       "menuAction": "Menu Game",
-      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar."
+      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Lapisan Performa",

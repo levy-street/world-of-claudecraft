@@ -2698,6 +2698,60 @@
     color: #ffe6a8;
   }
 
+  /* controller onboarding overlay (shown on first pad connect + Show Controls) */
+  #controller-guide {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 340px;
+    max-width: calc(100vw - 32px);
+    --window-pad: 14px;
+    z-index: 60;
+  }
+  #controller-guide .cg-intro {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+  }
+  #controller-guide .cg-head {
+    margin: 12px 0 6px;
+  }
+  #controller-guide .cg-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  #controller-guide .cg-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #controller-guide .cg-glyph {
+    flex: 0 0 auto;
+    min-width: 64px;
+    text-align: center;
+    padding: 3px 8px;
+    font-size: 12px;
+    border: 1px solid #4a3d1d;
+    border-radius: 4px;
+    background: linear-gradient(#2c2c3a, #15151f);
+    color: #ffd9a0;
+  }
+  #controller-guide .cg-action {
+    font-size: 12.5px;
+    color: var(--color-text-light);
+  }
+  #controller-guide .cd-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+  #controller-guide .cd-ok {
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+  }
+
   .native-update-backdrop {
     position: fixed;
     inset: 0;

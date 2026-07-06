@@ -596,7 +596,11 @@ export const sv_SE: EnTranslations = {
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",
       "menuAction": "Spelmeny",
-      "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren."
+      "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Prestandaöverlägg",

@@ -596,7 +596,11 @@ export const en: EnTranslations = {
       "buttons": "Button Layout",
       "resetButtons": "Reset Button Layout",
       "menuAction": "Game Menu",
-      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
+      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Performance Overlay",

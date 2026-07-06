@@ -596,7 +596,11 @@ export const tr_TR: EnTranslations = {
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",
       "menuAction": "Oyun Menüsü",
-      "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın."
+      "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın.",
+      "showControls": "Show Controls",
+      "guideMove": "Move",
+      "guideLook": "Look",
+      "guideDismiss": "Got it"
     },
     "perf": {
       "title": "Performans Katmanı",
