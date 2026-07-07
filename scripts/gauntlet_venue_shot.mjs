@@ -216,6 +216,28 @@ if (tracePath && tracePath.length > 20) {
   check(prog > 0, `in-world trace registered progress (${prog})`);
   await page.screenshot({ path: 'tmp/gauntlet_sigil_traced.png' });
   console.log('shot: tmp/gauntlet_sigil_traced.png');
+
+  // The desk-trial station lock: a live sigils player is held at the lectern,
+  // so 2s of forward input must not move them while the trial stays live (the
+  // guard skips gracefully if the trial happened to resolve first).
+  const mark = await page.evaluate(() => {
+    const me = window.__game.sim.entities.get(window.__game.world.playerId);
+    return { x: me.pos.x, z: me.pos.z };
+  });
+  await page.keyboard.down('w');
+  await sleep(2000);
+  await page.keyboard.up('w');
+  const held = await page.evaluate(() => {
+    const g = window.__game;
+    const me = g.sim.entities.get(g.world.playerId);
+    return { x: me.pos.x, z: me.pos.z, live: !!g.world.gauntletRun?.sigils };
+  });
+  if (held.live) {
+    const drift = Math.hypot(held.x - mark.x, held.z - mark.z);
+    check(drift < 0.6, `station lock held during the sigils trial (drift ${drift.toFixed(2)}yd)`);
+  } else {
+    console.log('SKIP  station-lock check (sigils trial resolved before the hold window)');
+  }
 }
 
 await browser.close();
