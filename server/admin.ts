@@ -27,7 +27,13 @@ import {
   loadAntibotConfig,
   saveAntibotConfigChange,
 } from './antibot_config_db';
-import { newToken, verifyPassword } from './auth';
+import {
+  hashPassword,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  newToken,
+  verifyPassword,
+} from './auth';
 import { getBugReportScreenshot, listBugReports } from './bug_report_db';
 import {
   addFilterWord,
@@ -41,14 +47,17 @@ import {
   type WordTier,
 } from './chat_filter_db';
 import {
+  accountById,
   accountForToken,
   accountMailTarget,
   findAccount,
   isAdminAccount,
   pool,
+  revokeTokensExcept,
   saveToken,
   setAccountDeactivated,
   touchLogin,
+  updatePasswordHash,
 } from './db';
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
@@ -77,6 +86,7 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  recordPasswordReset,
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
@@ -542,6 +552,42 @@ export async function handleAdminApi(
       return reset ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
     }
 
+    // Set a new password on any account (admin-initiated credential reset). The
+    // audit row is written first (no live effect without its record), then every
+    // device is signed out: all tokens revoked plus a live WS disconnect, since
+    // token revocation alone leaves an already-open socket connected.
+    const resetPasswordMatch = /^\/admin\/api\/accounts\/(\d+)\/reset-password$/.exec(path);
+    if (req.method === 'POST' && resetPasswordMatch) {
+      const targetAccountId = Number(resetPasswordMatch[1]);
+      if ((await isAdminAccount(targetAccountId)) && !identity.roles.includes(SUPERADMIN_ROLE)) {
+        return fail(res, 400, 'only a superadmin can reset a staff password');
+      }
+      const body = await readBody(req);
+      const password = body.password;
+      if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
+        return fail(res, 400, `password must be at least ${MIN_PASSWORD_LENGTH} chars`);
+      }
+      if (password.length > MAX_PASSWORD_LENGTH) {
+        return fail(res, 400, `password must be at most ${MAX_PASSWORD_LENGTH} chars`);
+      }
+      if (!(await accountById(targetAccountId))) {
+        return fail(res, 404, 'account not found');
+      }
+      try {
+        await recordPasswordReset({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
+        await updatePasswordHash(targetAccountId, await hashPassword(password));
+        await revokeTokensExcept(targetAccountId, null);
+        game.disconnectAccount(targetAccountId, IP_BLOCK_KICK_MESSAGE);
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'password reset failed');
+      }
+    }
+
     // Chat filter: word list + escalation config management. Every edit reloads
     // the live filter and pushes the new soft list to connected clients.
     if (req.method === 'POST' && path === '/admin/api/chat-filter/words') {
@@ -1001,6 +1047,13 @@ function makeRealAdminDb() {
     touchLogin,
     newToken,
     verifyPassword,
+    // Admin-initiated password reset: existence check, credential write, sign out
+    // every device, and its moderation-history audit row.
+    accountById,
+    hashPassword,
+    updatePasswordHash,
+    revokeTokensExcept,
+    recordPasswordReset,
     emailSecurityIncident,
     providerUsageSnapshot,
     rateLimited,
@@ -1568,6 +1621,49 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
 }
 
+/**
+ * POST /admin/api/accounts/:id/reset-password: set a new password on any account.
+ * Audit row first (no live effect without its record), then the credential write,
+ * then every device is signed out: all tokens revoked plus a live WS disconnect
+ * (token revocation alone leaves an already-open socket connected). A staff
+ * target is refused unless the actor is a superadmin, mirroring the
+ * isAdminAccount guard on suspend/ban/chat-mute.
+ */
+async function resetPasswordHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  if (
+    (await adminDb().isAdminAccount(targetAccountId)) &&
+    !adminIdentityOf(ctx).roles.includes(SUPERADMIN_ROLE)
+  ) {
+    return fail(ctx.res, 400, 'only a superadmin can reset a staff password');
+  }
+  const body = await readBody(ctx.req);
+  const password = body.password;
+  if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
+    return fail(ctx.res, 400, `password must be at least ${MIN_PASSWORD_LENGTH} chars`);
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    return fail(ctx.res, 400, `password must be at most ${MAX_PASSWORD_LENGTH} chars`);
+  }
+  if (!(await adminDb().accountById(targetAccountId))) {
+    return fail(ctx.res, 404, 'account not found');
+  }
+  try {
+    await adminDb().recordPasswordReset({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    await adminDb().updatePasswordHash(targetAccountId, await adminDb().hashPassword(password));
+    await adminDb().revokeTokensExcept(targetAccountId, null);
+    rt.disconnectAccount(targetAccountId, IP_BLOCK_KICK_MESSAGE);
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'password reset failed');
+  }
+}
+
 /** GET /admin/api/chat-filter: word lists + escalation config + moderated accounts. */
 async function chatFilterGetHandler(ctx: Ctx): Promise<void> {
   const [soft, hard, config, accounts] = await Promise.all([
@@ -1817,6 +1913,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: accountDetailHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/accounts/:id/reset-password',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: resetPasswordHandler,
   },
 
   // Staff-role management (release v0.22.0 fine-grained permissions).

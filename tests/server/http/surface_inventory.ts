@@ -1116,6 +1116,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
+    path: '/admin/api/accounts/:id/reset-password',
+    handler: 'resetPasswordMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/accounts\/(\d+)\/reset-password$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
     path: '/admin/api/chat-filter/words',
     handler: 'handleAdminApi arm: /admin/api/chat-filter/words',
     contentType: PROBLEM_JSON,

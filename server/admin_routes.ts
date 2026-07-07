@@ -32,6 +32,11 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
 
   { method: 'GET', pattern: '/admin/api/accounts', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/accounts\/(\d+)$/, permission: 'accounts.read' },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/reset-password$/,
+    permission: 'accounts.password',
+  },
   { method: 'GET', pattern: '/admin/api/shared-ips', permission: 'moderation.read' },
   { method: 'GET', pattern: '/admin/api/ip-associations', permission: 'accounts.read' },
 
