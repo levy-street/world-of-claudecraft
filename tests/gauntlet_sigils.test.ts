@@ -66,7 +66,7 @@ function pointAtArc(o: SigilOutline, frac: number): [number, number] {
 }
 
 // Drive one sim into the sigils trial and hand back the live per-player state,
-// with the shape optionally forced and the crack/progress cursor reset so a test
+// with the shape optionally forced and the crack/coverage state reset so a test
 // controls the trace from a known start.
 function startTrialSim(seed: number, shapeId?: number) {
   const sim = makeSim(seed);
@@ -78,7 +78,9 @@ function startTrialSim(seed: number, shapeId?: number) {
   if (!trial || trial.kind !== 'sigils') throw new Error('expected the sigils trial to be live');
   const sp = trial.players.get(pid)!;
   if (shapeId !== undefined) sp.shapeId = shapeId;
-  sp.progress = 0;
+  sp.covered.fill(false);
+  sp.coveredCount = 0;
+  sp.carveBank = 0;
   sp.crack = 0;
   sp.shatters = 0;
   sp.done = false;
@@ -140,13 +142,16 @@ describe('sigil trial scoring', () => {
     );
   });
 
-  it('a clean, on-path trace at legal speed reaches done with no shatter', () => {
+  it('a clean, on-path freedraw drag reaches done with no shatter', () => {
     const { sim, pid, run, sp } = startTrialSim(5, 0); // ring: no thin, no self-proximity
     const n = GAUNTLET.sigils.outlinePoints;
     const outline = sigilOutline(sp.shapeSeed, 0, n);
-    for (let i = 0; i < 20 * 80 && !sp.done; i++) {
-      const target = Math.min(0.999, sp.progress + 0.9 * GAUNTLET.sigils.speedCap * DT);
-      const [x, y] = pointAtArc(outline, target);
+    // Walk the arc forward at ~half the carve cap (an honest continuous drag).
+    const paceFracPerTick = ((0.5 * GAUNTLET.sigils.coverageCapPerS) / n) * DT * 20;
+    let frac = 0.25; // freedraw: the stroke may begin anywhere on the outline
+    for (let i = 0; i < 20 * 60 && !sp.done; i++) {
+      frac = (frac + paceFracPerTick) % 1;
+      const [x, y] = pointAtArc(outline, frac);
       sim.gauntletTrace([x, y], pid);
       sim.tick();
     }
@@ -159,7 +164,43 @@ describe('sigil trial scoring', () => {
     expect(c.vitality).toBe(GAUNTLET.vitalityMax);
   }, 20000);
 
-  it('feeding the whole outline in one instant does not complete: progress is speed-capped', () => {
+  it('tracing the arc BACKWARD still accrues coverage (order-free)', () => {
+    const { sim, pid, sp } = startTrialSim(11, 0);
+    const n = GAUNTLET.sigils.outlinePoints;
+    const outline = sigilOutline(sp.shapeSeed, 0, n);
+    const paceFracPerTick = ((0.5 * GAUNTLET.sigils.coverageCapPerS) / n) * DT * 20;
+    let frac = 0.6;
+    for (let i = 0; i < 20 * 3; i++) {
+      frac = (frac - paceFracPerTick + 1) % 1;
+      const [x, y] = pointAtArc(outline, frac);
+      sim.gauntletTrace([x, y], pid);
+      sim.tick();
+    }
+    expect(sp.coveredCount).toBeGreaterThan(0);
+    expect(sp.crack).toBe(0);
+  });
+
+  it('tracing the same arc twice adds nothing', () => {
+    const { sim, pid, sp } = startTrialSim(12, 0);
+    const n = GAUNTLET.sigils.outlinePoints;
+    const outline = sigilOutline(sp.shapeSeed, 0, n);
+    const retrace = () => {
+      // the same short arc window, walked over 3 seconds
+      for (let i = 0; i < 20 * 3; i++) {
+        const [x, y] = pointAtArc(outline, 0.3 + 0.1 * ((i % 20) / 20));
+        sim.gauntletTrace([x, y], pid);
+        sim.tick();
+      }
+    };
+    retrace();
+    const afterFirst = sp.coveredCount;
+    expect(afterFirst).toBeGreaterThan(0);
+    retrace();
+    expect(sp.coveredCount).toBe(afterFirst); // already carved; nothing new
+    expect(sp.crack).toBe(0); // staying on the band never cracks
+  });
+
+  it('feeding the whole outline in one instant is capped by the carve rate', () => {
     const { sim, pid, sp } = startTrialSim(6, 0);
     const n = GAUNTLET.sigils.outlinePoints;
     const outline = sigilOutline(sp.shapeSeed, 0, n);
@@ -167,20 +208,55 @@ describe('sigil trial scoring', () => {
     const pts: number[] = [];
     for (let i = 0; i < n; i++) pts.push(outline.xs[i], outline.ys[i]);
     sim.gauntletTrace(pts, pid);
-    // progress advanced at most speedCap * one tick, nowhere near done
-    expect(sp.progress).toBeLessThanOrEqual(GAUNTLET.sigils.speedCap * DT + 1e-6);
+    // carved at most the banked budget (one second's worth at the cap), far
+    // from done, and on-band spam never cracks
+    expect(sp.coveredCount).toBeLessThanOrEqual(GAUNTLET.sigils.coverageCapPerS);
     expect(sp.done).toBe(false);
-    // reaching past the cap on nearly every point accrued over-speed crack
-    expect(sp.crack).toBeGreaterThan(0);
+    expect(sp.crack).toBe(0);
   });
 
-  it('tracing off the line accrues crack and shatters: a vitality chunk and a fresh shape', () => {
+  it('off-band points accrue crack (double when far out) and never coverage', () => {
+    const { sim, pid, sp } = startTrialSim(13, 0);
+    const outline = sigilOutline(sp.shapeSeed, 0, GAUNTLET.sigils.outlinePoints);
+    // A graze just outside the band vs a wild point far outside it: build both
+    // from the outline's own geometry so the distances are known.
+    const [px, py] = pointAtArc(outline, 0);
+    const dx = px - 0.5;
+    const dy = py - 0.5;
+    const len = Math.hypot(dx, dy);
+    const graze: [number, number] = [
+      px + (dx / len) * 1.5 * GAUNTLET.sigils.tolerance,
+      py + (dy / len) * 1.5 * GAUNTLET.sigils.tolerance,
+    ];
+    sim.tick();
+    sim.gauntletTrace([graze[0], graze[1]], pid);
+    const grazeCrack = sp.crack;
+    expect(grazeCrack).toBeGreaterThan(0);
+    expect(sp.coveredCount).toBe(0);
+    // the unit-square center sits ~0.36+ from the ring, past 2x tolerance
+    sp.crack = 0;
+    sp.lastPointAt = sim.time;
+    sim.tick();
+    sim.gauntletTrace([0.5, 0.5], pid);
+    expect(sp.coveredCount).toBe(0);
+    expect(sp.crack).toBeCloseTo(grazeCrack * 2, 6); // the far-off doubling
+  });
+
+  it('full crack shatters: a vitality chunk, coverage resets, and play continues', () => {
     const { sim, pid, run, sp } = startTrialSim(7, 0);
     const c = run.contestants.find((k) => k.entityId === pid)!;
     const startVitality = c.vitality;
     const oldSeed = sp.shapeSeed;
-    // The unit-square center sits well inside the ring (radius ~0.4), far past
-    // tolerance (0.06): every fed point is off the line.
+    // Carve a little first so the shatter observably resets coverage.
+    const outline = sigilOutline(sp.shapeSeed, 0, GAUNTLET.sigils.outlinePoints);
+    const [ox, oy] = pointAtArc(outline, 0.5);
+    for (let i = 0; i < 20; i++) {
+      sim.gauntletTrace([ox, oy], pid);
+      sim.tick();
+    }
+    expect(sp.coveredCount).toBeGreaterThan(0);
+    // The unit-square center sits well inside the ring, far past tolerance:
+    // every fed point is off the line.
     for (let i = 0; i < 20 * 30 && sp.shatters === 0; i++) {
       sim.gauntletTrace([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], pid);
       sim.tick();
@@ -188,8 +264,17 @@ describe('sigil trial scoring', () => {
     expect(sp.shatters).toBe(1);
     expect(c.vitality).toBe(startVitality - GAUNTLET.sigils.shatterDamage);
     expect(sp.crack).toBe(0); // reset on shatter
-    expect(sp.progress).toBe(0);
+    expect(sp.coveredCount).toBe(0);
+    expect(sp.covered.some(Boolean)).toBe(false);
     expect(sp.shapeSeed).not.toBe(oldSeed); // a fresh etching
+    // play continues: the fresh pane accepts new coverage
+    const fresh = sigilOutline(sp.shapeSeed, sp.shapeId, GAUNTLET.sigils.outlinePoints);
+    const [nx, ny] = pointAtArc(fresh, 0.2);
+    for (let i = 0; i < 20; i++) {
+      sim.gauntletTrace([nx, ny], pid);
+      sim.tick();
+    }
+    expect(sp.coveredCount).toBeGreaterThan(0);
   }, 20000);
 
   it('a player who traced nothing takes damageMax at the timeout', () => {
@@ -215,7 +300,7 @@ describe('sigil trial scoring', () => {
         sim.gauntletTrace([0.5, 0.5, 0.5, 0.5], pid);
         sim.tick();
         snap.push(
-          `${sp.crack.toFixed(6)}|${sp.progress}|${sp.shatters}|${sp.shapeSeed}|${c.vitality}`,
+          `${sp.crack.toFixed(6)}|${sp.coveredCount}|${sp.shatters}|${sp.shapeSeed}|${c.vitality}`,
         );
       }
       return snap;

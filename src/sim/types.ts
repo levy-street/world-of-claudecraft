@@ -2790,17 +2790,19 @@ export interface GauntletSentinelTuning {
   npcHesitateMaxS: number;
 }
 
-// Trial 2, Sugarglass Sigils: trace a seeded etched outline without cracking
-// it. The sim owns scoring: the client streams quantized trace points and the
-// server accrues crack for off-path distance and over-speed progress.
+// Trial 2, Sugarglass Sigils: freedraw the seeded etched outline without
+// cracking it. The sim owns scoring: the client streams quantized trace points;
+// each on-band point carves the outline vertices near its arc position (any
+// order, any direction), and off-band points accrue crack.
 export interface GauntletSigilsTuning {
   durationS: number;
   outlinePoints: number; // polyline resolution a shape is sampled at
   tolerance: number; // max shape-local distance from the outline before crack accrues
-  speedCap: number; // max outline-fraction progress per second (teleport-jumps buy nothing)
+  // Max NEW outline vertices carved per second (a clean continuous drag never
+  // hits it; packet spam and teleport-taps buy nothing past it).
+  coverageCapPerS: number;
   crackMax: number; // the crack meter
   crackOffPath: number; // crack per second while tracing outside the tolerance
-  crackOverSpeed: number; // crack per second while over the speed cap
   thinSectionMult: number; // crack multiplier on a shape's marked thin segments
   shatterDamage: number; // vitality chunk on a shatter (a fresh shape follows)
   damageMax: number; // end-of-trial damage at zero progress
@@ -2893,7 +2895,10 @@ export interface GauntletRunView {
     shapeId: number;
     crack: number;
     crackMax: number;
-    progress: number; // 0..1 outline fraction
+    progress: number; // 0..1 covered fraction of the outline
+    // 24-bit coverage mask: bit k is set when any vertex in the k-th 24th of
+    // the arc is covered (the venue tints its outline segments from this).
+    coveredMask: number;
   } | null;
   pull: {
     beatAnchor: number; // absolute sim time of beat 0; client derives the metronome

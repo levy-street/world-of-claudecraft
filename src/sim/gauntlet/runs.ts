@@ -35,7 +35,13 @@ import type { GauntletRun } from './state';
 import { gauntletCourtShove, startCourt, updateCourt } from './trial_court';
 import { gauntletPullBeat, startPull, updatePull } from './trial_pull';
 import { startSentinel, updateSentinel } from './trial_sentinel';
-import { gauntletTraceSigils, startSigils, updateSigils } from './trial_sigils';
+import {
+  gauntletTraceSigils,
+  sigilCoverage,
+  sigilCoveredMask,
+  startSigils,
+  updateSigils,
+} from './trial_sigils';
 import { startSpan, updateSpan } from './trial_span';
 import { dropWagerPartners, gauntletWagerAct, startWager, updateWager } from './trial_wager';
 import { aliveContestants, eliminateContestant, emitToRunPlayers } from './vitality';
@@ -607,7 +613,8 @@ export function gauntletRunWire(ctx: SimContext, pid: number): GauntletRunView |
         shapeId: sp.shapeId,
         crack: Math.round(sp.crack),
         crackMax: GAUNTLET.sigils.crackMax,
-        progress: Math.round(sp.progress * 100) / 100,
+        progress: Math.round(sigilCoverage(sp) * 100) / 100,
+        coveredMask: sigilCoveredMask(sp),
       };
     })(),
     pull:

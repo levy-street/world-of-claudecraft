@@ -72,7 +72,15 @@ export interface GauntletSigilsPlayer {
   shapeSeed: number; // (seed, shapeId) fully determine the outline everywhere
   shapeId: number; // 0 ring, 1 wedge, 2 star, 3 crown (ascending difficulty)
   crack: number;
-  progress: number; // 0..1 outline fraction, clamped by the speed cap
+  // Order-free freedraw coverage: one flag per outline vertex, marked as the
+  // stroke passes near that vertex's arc position; progress is the covered
+  // fraction (coveredCount / covered.length). Reset on shatter.
+  covered: boolean[];
+  coveredCount: number;
+  // Fractional carve budget carried between batches (accrues at
+  // coverageCapPerS, banks at most one second's worth), so the cap is
+  // independent of batch cadence.
+  carveBank: number;
   lastPointAt: number; // sim time of the last accepted trace batch
   shatters: number;
   done: boolean;

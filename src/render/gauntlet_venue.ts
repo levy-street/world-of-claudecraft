@@ -631,7 +631,7 @@ interface SpanRig {
 // The etched lectern slab: the sigils trial's input surface. World-space rect
 // (center + HALF-extent u/v vectors of the interaction square on the face),
 // the outline tube segments rebuilt per shape, the crack-tinted face material,
-// and the cursor mote fed from the hud's stroke glue.
+// and the cursor mote + freedraw stroke trail fed from the hud's stroke glue.
 interface SigilRig {
   rect: {
     center: { x: number; y: number; z: number };
@@ -642,11 +642,15 @@ interface SigilRig {
   tracedMat: THREE.Material;
   paleMat: THREE.Material;
   thinMat: THREE.Material;
-  activeMat: THREE.Material;
   outlineGroup: THREE.Group;
   segs: THREE.Mesh[];
   segThin: boolean[];
   mote: THREE.Mesh;
+  // The player's own stroke on the slab: a preallocated FIFO line trail (the
+  // mote is the tip). Written on stroke events only, never per frame.
+  stroke: THREE.Line;
+  strokePos: THREE.BufferAttribute;
+  strokeLen: number;
   faceCenter: THREE.Vector3; // instance-local face center
   uDir: THREE.Vector3; // unit, down-slope (the etching's y axis)
   vDir: THREE.Vector3; // unit, across the face (the etching's x axis)
@@ -717,8 +721,11 @@ const DRUM_FLASH_S = 0.12;
 const posMod = (a: number, b: number): number => ((a % b) + b) % b;
 
 // Outline tint granularity: the polyline is grouped into this many tube
-// segments, tinted gold as the traced fraction passes each one.
+// segments, tinted gold per the wire's coveredMask bits (one bit per segment;
+// freedraw is order-free, so segments light wherever the stroke has carved).
 const SIGIL_SEGMENTS = 24;
+// The freedraw stroke trail's FIFO capacity (points).
+const SIGIL_TRAIL_MAX = 64;
 
 // One lectern: a stone stand on the dais with the angled sugarglass slab.
 // Returns the slab mesh (the interactive one carries the crack-tinted face
@@ -800,17 +807,7 @@ function buildSigilPavilion(group: THREE.Group, ox: number, oz: number): SigilRi
     emissiveIntensity: 0.6,
     roughness: 0.5,
   });
-  // The FRONTIER segment: the sim scores the trace as an arc walked from the
-  // outline's start vertex, so this bright marker is what tells the player
-  // where the etching wants their finger NOW (it is the start cue at trial
-  // open and the direction cue as it crawls forward).
-  const activeMat = new THREE.MeshStandardMaterial({
-    color: 0xdff6ff,
-    emissive: 0xbfefff,
-    emissiveIntensity: 2.2,
-    roughness: 0.3,
-  });
-  venueOwnedMats.push(faceMat, tracedMat, paleMat, thinMat, activeMat);
+  venueOwnedMats.push(faceMat, tracedMat, paleMat, thinMat);
   buildLectern(group, x, z, 0, faceMat);
 
   // A cosmetic lectern ring for the NPC field (plain glass, no etching).
@@ -854,22 +851,74 @@ function buildSigilPavilion(group: THREE.Group, ox: number, oz: number): SigilRi
   mote.visible = false;
   group.add(mote);
 
+  // The freedraw stroke trail: a fixed-capacity line whose points are written
+  // into the preallocated buffer on stroke events (drawRange bounds the live
+  // FIFO window); faded out by clearing on stroke end and on a fresh shape.
+  const strokePos = new THREE.BufferAttribute(new Float32Array(SIGIL_TRAIL_MAX * 3), 3);
+  strokePos.setUsage(THREE.DynamicDrawUsage);
+  const strokeGeo = new THREE.BufferGeometry();
+  strokeGeo.setAttribute('position', strokePos);
+  strokeGeo.setDrawRange(0, 0);
+  const strokeMat = new THREE.LineBasicMaterial({
+    color: 0xffe9a8,
+    transparent: true,
+    opacity: 0.9,
+  });
+  venueOwnedMats.push(strokeMat);
+  const stroke = new THREE.Line(strokeGeo, strokeMat);
+  stroke.frustumCulled = false;
+  stroke.visible = false;
+  group.add(stroke);
+
   return {
     rect,
     faceMat,
     tracedMat,
     paleMat,
     thinMat,
-    activeMat,
     outlineGroup,
     segs: [],
     segThin: [],
     mote,
+    stroke,
+    strokePos,
+    strokeLen: 0,
     faceCenter,
     uDir,
     vDir,
     normal,
   };
+}
+
+// Append the newest stroke point to the trail (FIFO shift once full). Event
+// driven: runs per claimed stroke sample, never per frame.
+const strokeScratch = new THREE.Vector3();
+function pushSigilStrokePoint(rig: SigilRig, u: number, v: number): void {
+  const half = GAUNTLET_VENUE.sigils.slab.etchHalf;
+  strokeScratch
+    .copy(rig.faceCenter)
+    .addScaledVector(rig.uDir, (u * 2 - 1) * half)
+    .addScaledVector(rig.vDir, (v * 2 - 1) * half)
+    .addScaledVector(rig.normal, 0.06);
+  const arr = rig.strokePos.array as Float32Array;
+  if (rig.strokeLen >= SIGIL_TRAIL_MAX) {
+    arr.copyWithin(0, 3);
+    rig.strokeLen = SIGIL_TRAIL_MAX - 1;
+  }
+  arr[rig.strokeLen * 3] = strokeScratch.x;
+  arr[rig.strokeLen * 3 + 1] = strokeScratch.y;
+  arr[rig.strokeLen * 3 + 2] = strokeScratch.z;
+  rig.strokeLen++;
+  rig.strokePos.needsUpdate = true;
+  rig.stroke.geometry.setDrawRange(0, rig.strokeLen);
+  rig.stroke.visible = true;
+}
+
+function clearSigilStroke(rig: SigilRig): void {
+  if (rig.strokeLen === 0) return;
+  rig.strokeLen = 0;
+  rig.stroke.geometry.setDrawRange(0, 0);
+  rig.stroke.visible = false;
 }
 
 function clearSigilOutline(rig: SigilRig): void {
@@ -1246,7 +1295,9 @@ export interface GauntletVenueView {
     u: { x: number; y: number; z: number };
     v: { x: number; y: number; z: number };
   };
-  /** Place (or hide, null) the trace cursor mote at a rect-local 0..1 point. */
+  /** Place the trace cursor mote at a rect-local 0..1 point and extend the
+   * freedraw stroke trail behind it; null hides the mote and clears the trail
+   * (stroke end). */
   setSigilCursor(p: { u: number; v: number } | null): void;
   /** The venue's live click targets (the wager stones/pebbles), for pickVenueTarget. */
   pickTargets(): { id: string; object: THREE.Object3D }[];
@@ -1324,7 +1375,7 @@ export async function buildGauntletVenue(
   let lastRevealKey = 'unset';
   let lastRevealed: number[] = [];
   let lastSigilShapeKey = '';
-  let lastSigilProgressKey = -1;
+  let lastSigilMaskKey = -1;
   let lastSigilCrackKey = -1;
   // Pull rig state: the eased knot offset, plus a live flag so the rope lays
   // out once at idle (build leaves the halves unstretched) and resets once
@@ -1366,14 +1417,18 @@ export async function buildGauntletVenue(
         lastRevealed = revealed ? [...revealed] : [];
       }
       // The sigil slab: rebuild the etched outline on a fresh shape, tint the
-      // traced segments gold as progress passes them, and lerp the face toward
-      // red with the crack. Every write is elided on a quantized key.
+      // carved segments gold from the coverage mask (freedraw is order-free,
+      // so segments light wherever the stroke has carved), and lerp the face
+      // toward red with the crack. Every write is elided on a quantized key.
       const sig = mine?.sigils ?? null;
       const shapeKey = sig ? `${sig.shapeSeed}:${sig.shapeId}` : '';
       if (shapeKey !== lastSigilShapeKey) {
         lastSigilShapeKey = shapeKey;
-        lastSigilProgressKey = -1;
+        lastSigilMaskKey = -1;
         lastSigilCrackKey = -1;
+        // A fresh pane (a shatter, the next trial, or the run ending) drops
+        // whatever stroke was mid-flight.
+        clearSigilStroke(sigilRig);
         if (sig) {
           rebuildSigilOutline(sigilRig, sig.shapeSeed, sig.shapeId);
         } else {
@@ -1383,25 +1438,16 @@ export async function buildGauntletVenue(
         }
       }
       if (sig) {
-        const progressKey = Math.min(
-          SIGIL_SEGMENTS,
-          Math.max(0, Math.floor(sig.progress * SIGIL_SEGMENTS)),
-        );
-        if (progressKey !== lastSigilProgressKey) {
-          lastSigilProgressKey = progressKey;
+        const maskKey = sig.coveredMask >>> 0;
+        if (maskKey !== lastSigilMaskKey) {
+          lastSigilMaskKey = maskKey;
           for (let i = 0; i < sigilRig.segs.length; i++) {
-            // Behind the frontier: traced gold. The frontier segment itself
-            // burns bright, telling the player where to trace NEXT (progress
-            // is an arc from the outline's start vertex, so without this the
-            // gold fill can begin nowhere near their finger).
             sigilRig.segs[i].material =
-              i < progressKey
+              (maskKey & (1 << i)) !== 0
                 ? sigilRig.tracedMat
-                : i === progressKey
-                  ? sigilRig.activeMat
-                  : sigilRig.segThin[i]
-                    ? sigilRig.thinMat
-                    : sigilRig.paleMat;
+                : sigilRig.segThin[i]
+                  ? sigilRig.thinMat
+                  : sigilRig.paleMat;
           }
         }
         const crackFrac = sig.crackMax > 0 ? Math.min(1, Math.max(0, sig.crack / sig.crackMax)) : 0;
@@ -1495,7 +1541,9 @@ export async function buildGauntletVenue(
     },
     setSigilCursor(p: { u: number; v: number } | null) {
       if (!p) {
+        // Stroke end: the mote lifts and the freedraw trail clears with it.
         sigilRig.mote.visible = false;
+        clearSigilStroke(sigilRig);
         return;
       }
       const half = GAUNTLET_VENUE.sigils.slab.etchHalf;
@@ -1505,9 +1553,13 @@ export async function buildGauntletVenue(
         .addScaledVector(sigilRig.vDir, (p.v * 2 - 1) * half)
         .addScaledVector(sigilRig.normal, 0.05);
       sigilRig.mote.visible = true;
+      pushSigilStrokePoint(sigilRig, p.u, p.v);
     },
     dispose(s: THREE.Scene) {
       s.remove(group);
+      // The stroke trail is a Line (not a Mesh), so the mesh traversal below
+      // never reaches its geometry.
+      sigilRig.stroke.geometry.dispose();
       group.traverse((o) => {
         if (o.userData.sharedGeometry) return;
         let shared = false;

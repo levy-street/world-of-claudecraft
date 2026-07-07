@@ -248,15 +248,16 @@ export const GAUNTLET: GauntletDef = {
   sigils: {
     durationS: 90,
     outlinePoints: 96,
-    // Loosened twice after playtests: the first cut (0.06 tolerance, 0.05
-    // cap) read as pixel-hunting, and the in-world slab (a projected surface,
-    // not a flat canvas) earns an even wider band and gentler crack rates so
-    // the danger stays in the thin sections rather than in hand jitter.
+    // Loosened twice after playtests: the first cut (0.06 tolerance) read as
+    // pixel-hunting, and the in-world slab (a projected surface, not a flat
+    // canvas) earns a wide band and gentle crack rates so the danger stays in
+    // the thin sections rather than in hand jitter.
     tolerance: 0.14, // shape-local units (the outline lives in a unit square)
-    speedCap: 0.09, // outline fraction per second: a clean trace takes ~12s
+    // Freedraw coverage: a clean continuous drag carves ~8 vertices/s of the
+    // 96, so 14 never caps honest play while spam buys nothing past it.
+    coverageCapPerS: 14,
     crackMax: 100,
     crackOffPath: 12,
-    crackOverSpeed: 10,
     thinSectionMult: 1.4,
     shatterDamage: 12,
     damageMax: 26,
