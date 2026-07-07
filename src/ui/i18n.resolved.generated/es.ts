@@ -1073,18 +1073,6 @@ export const es: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Elaboración",
-      "close": "Cerrar elaboración",
-      "craft": "Artesanía",
-      "reagentsNeeded": "Requiere:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Aún no se conocen recetas.",
-      "resultAria": "Elaboración {name}",
-      "craftedToast": "Elaborado: {name}",
-      "insufficientMaterials": "No tienes los materiales para eso.",
-      "unknownRecipe": "Esa receta no existe."
-    },
     "devBadge": {
       "title": "Desarrollador",
       "tiers": {
@@ -1228,6 +1216,19 @@ export const es: EnTranslations = {
       "mining": "Minería",
       "logging": "Tala",
       "herbalism": "Herboristería"
+    },
+    "crafting": {
+      "title": "Elaboración",
+      "close": "Cerrar elaboración",
+      "craft": "Artesanía",
+      "reagentsNeeded": "Requiere:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Aún no se conocen recetas.",
+      "resultAria": "Elaboración {name}",
+      "craftedToast": "Elaborado: {name}",
+      "insufficientMaterials": "No tienes los materiales para eso.",
+      "unknownRecipe": "Esa receta no existe.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {

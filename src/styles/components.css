@@ -4150,6 +4150,21 @@
     align-items: center;
   }
   #map-canvas {
+    /* Authored display size matching the 560x560 backing store (index.html /
+       play.html). Without a CSS length the canvas box is a replaced intrinsic size,
+       which does NOT scale in lockstep with the window frame under the #ui
+       zoom var(--ui-scale): the map underfilled the frame below 100% and clipped
+       past it above 100% (issue 1559). A px length zoom-scales exactly like the
+       frame, so the map fills its window at every UI scale; the 100% look is
+       unchanged. The mobile rule below overrides this with width 100% to fill the
+       responsive window.
+       box-sizing: content-box so the 2px border sits OUTSIDE the 560 content box:
+       under the global border-box reset, a plain width:560px would make the content
+       box 556 and downscale the 560 backing (~0.7%). content-box keeps the content
+       box exactly 560, so the map stays a crisp 1:1 at 100%. */
+    box-sizing: content-box;
+    width: 560px;
+    height: 560px;
     border: 2px solid var(--border);
     outline: 1px solid #000;
     border-radius: 4px;

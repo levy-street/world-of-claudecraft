@@ -99,6 +99,15 @@ export interface ToolEffectDef {
   bonus: number;
   /** Charges the effect starts with when freshly slotted onto a tool. */
   startingDurability: number;
+  /**
+   * Which craft on the CRAFT_RING produces this effect (#1134). All three
+   * starter tool effects are Enchanter work, so they share `'enchanting'`;
+   * this is what `../professions/tools.ts` reads to decide whether a
+   * recharger's specialization in THAT craft earns the additional
+   * specialization recharge discount, composed on top of the
+   * original-crafter discount (#1137).
+   */
+  craftId: string;
 }
 
 export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
@@ -110,6 +119,7 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'quantity',
     bonus: 1,
     startingDurability: 20,
+    craftId: 'enchanting',
   },
   artisans_eye: {
     id: 'artisans_eye',
@@ -119,6 +129,7 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'quality',
     bonus: 1,
     startingDurability: 20,
+    craftId: 'enchanting',
   },
   quickening_charm: {
     id: 'quickening_charm',
@@ -128,6 +139,7 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'respawnSpeed',
     bonus: 1,
     startingDurability: 20,
+    craftId: 'enchanting',
   },
 };
 
@@ -289,3 +301,44 @@ export const TOOL_RECIPE_STUBS: ToolRecipeStub[] = [
     ],
   },
 ];
+
+// Specialization perk thresholds (#1134): a pure additive bonus layer on top
+// of the crafting path (P3, #1127) and the ten-craft wheel (P5, #1125/#1128).
+// Per craft on CRAFT_RING, a player whose skill IN THAT CRAFT reaches
+// `specializedSkillThreshold` unlocks two perks: a material-cost discount on
+// recipes performed in that craft (read by ../professions/wheel.ts and
+// applied in ../professions/crafting.ts), and, when that same specialized
+// player is also the ORIGINAL CRAFTER of a tool effect (#1137), an
+// additional discount on top of the existing original-crafter recharge
+// discount (composed, never replacing it, in ../professions/tools.ts).
+//
+// Every craft on the ring gets an entry (data-driven, not hardcoded in
+// logic): thresholds and percents are placeholders pending maintainer
+// confirmation against the design doc (same 403-Forbidden caveat noted above
+// CRAFT_RING), kept deliberately uniform across crafts and poles so no single
+// craft is silently favored until real balance numbers land.
+export interface PerkThresholdDef {
+  /** Skill level (0 to 100) in this craft required to count as "specialized". */
+  specializedSkillThreshold: number;
+  /** Percent (0 to 1) shaved off recipe material quantities once specialized. */
+  materialDiscountPct: number;
+  /**
+   * Additional percent (0 to 1) shaved off a recharge, on top of the
+   * original-crafter discount, when the original crafter is also specialized
+   * in this craft.
+   */
+  rechargeDiscountPct: number;
+}
+
+export const PERK_THRESHOLDS: Record<string, PerkThresholdDef> = Object.fromEntries(
+  CRAFT_RING.map((craft) => [
+    craft.id,
+    { specializedSkillThreshold: 75, materialDiscountPct: 0.2, rechargeDiscountPct: 0.25 },
+  ]),
+);
+
+// Mobile crafting station (#1134): how long a placed station stays usable
+// before it expires. See ../professions/mobile_station.ts for the placement
+// mechanic itself and why it is currently inert (no town/crafting-station
+// proximity gate exists anywhere in the engine yet for it to bypass).
+export const MOBILE_CRAFTING_STATION_DURATION_TICKS = 20 * 60 * 10; // 10 minutes

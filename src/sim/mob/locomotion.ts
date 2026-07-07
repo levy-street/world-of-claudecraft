@@ -1,11 +1,14 @@
 // Mob locomotion (M2), extracted from the Sim monolith.
 //
-// This module owns the mob-AI locomotion core: the ~460-line updateMob dispatcher
-// (its corpse-tick prologue, the vision/owner/Nythraxis-add early returns, the
-// stun/polymorph/fear guard, and the idle/chase/attack/flee/evade switch) plus its
-// movement satellites resetEvadingMob, recoverFromFlee, and blockedTowardSpawn. The
-// boss-mechanic, pet, Nythraxis, and corpse-lifecycle branches the dispatcher
-// interleaves stay on Sim and are reached through the SimContext seam.
+// This module owns the mob-AI locomotion core: the updateMob dispatcher (its
+// corpse-tick prologue, the vision/owner/Nythraxis-add early returns, the
+// stun/polymorph/fear guard, and the idle/chase/attack/flee/evade switch), the
+// melee-gated boss attack mechanics (runMobAttackMechanics) and engaged-tick
+// pulses, plus the movement satellites resetEvadingMob, recoverFromFlee, and
+// blockedTowardSpawn. The engaged chase/attack states route through the general
+// combat-profile runner in the sibling mob/combat_profile.ts; the pet, Nythraxis
+// encounter, and corpse-lifecycle branches the dispatcher interleaves stay on Sim
+// and are reached through the SimContext seam.
 //
 // PRIME DIRECTIVE: this is a MOVE, not a rewrite. Every function below is the former
 // `Sim` method verbatim, with `this.X` rewritten to `ctx.X` (the SimContext seam),
@@ -44,8 +47,9 @@ import {
   type Vec3,
 } from '../types';
 import { groundHeight, waterLevelAt } from '../world';
+import { updateMobCombatProfile } from './combat_profile';
 import { rallyFleeingAllies } from './social_aggro';
-import { isTrivialTo, retargetMob, tickForcedTarget, updateMobTarget } from './targeting';
+import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
 import { emitMobYell } from './yells';
 
 const EVADE_SPEED_MULT = 1.6;
@@ -248,261 +252,15 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       }
       break;
     }
-    case 'chase': {
-      if (ctx.usesProfiledMobCombat(mob)) {
-        ctx.updateProfiledMobCombat(mob);
-        break;
-      }
-      updateMobTarget(ctx, mob);
-      const target = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : null;
-      if (!target || target.dead) {
-        retargetMob(ctx, mob);
-        break;
-      }
-      if (ctx.maybeFlee(mob, target)) break;
-      const spell = MOBS[mob.templateId]?.petSpell;
-      const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
-      const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
-      if (mob.fleeReturnTimer > 0) {
-        mob.fleeReturnTimer = Math.max(0, mob.fleeReturnTimer - DT);
-        if (dist2d(mob.pos, leashAnchor) <= leash - 1) mob.fleeReturnTimer = 0;
-      }
-      // Nythraxis is a raid boss: he never leashes/resets from being kited.
-      // Only a full wipe resets him (handled in updateNythraxisEncounter).
-      if (!isNythraxis && dist2d(mob.pos, leashAnchor) > leash && mob.fleeReturnTimer <= 0) {
-        mob.aiState = 'evade';
-        mob.aggroTargetId = null;
-        clearThreat(mob);
-        mob.leashAnchor = null;
-        break;
-      }
-      // Anti-kite snare fires while chasing a fleeing target (the kite case).
-      pulseAntiKiteSnare(ctx, mob);
-      pulseLoudYell(ctx, mob);
-      const d = dist2d(mob.pos, target.pos);
-      if (spell && d <= spell.range) {
-        mob.aiState = 'attack';
-        mob.swingTimer = Math.min(mob.swingTimer, 0.4);
-        break;
-      }
-      mob.swingTimer = Math.max(0, mob.swingTimer - DT);
-      if (ctx.tryMobMeleeSwingInRange(mob, target)) break;
-      if (!ctx.isRooted(mob))
-        ctx.moveToward(mob, target.pos, mob.moveSpeed * ctx.moveSpeedMult(mob));
-      else mob.facing = angleTo(mob.pos, target.pos);
-      if (ctx.tryMobMeleeSwingInRange(mob, target)) break;
-      break;
-    }
+    case 'chase':
     case 'attack': {
-      if (ctx.usesProfiledMobCombat(mob)) {
-        ctx.updateProfiledMobCombat(mob);
-        break;
-      }
-      updateMobTarget(ctx, mob);
-      const target = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : null;
-      if (!target || target.dead) {
-        retargetMob(ctx, mob);
-        break;
-      }
-      if (ctx.maybeFlee(mob, target)) break;
-      // Anti-kite snare also fires in melee (slows ranged players around the boss).
-      pulseAntiKiteSnare(ctx, mob);
-      pulseLoudYell(ctx, mob);
-      const d = dist2d(mob.pos, target.pos);
-      const spell = MOBS[mob.templateId]?.petSpell;
-      if (spell) {
-        if (d > spell.range) {
-          mob.aiState = 'chase';
-          break;
-        }
-        ctx.updateRangedPetAttack(mob, target, spell);
-        break;
-      }
-      if (d > ctx.mobEffectiveMeleeRange(mob)) {
-        mob.aiState = 'chase';
-        break;
-      }
-      mob.facing = angleTo(mob.pos, target.pos);
-      mob.swingTimer -= DT;
-      if (mob.swingTimer <= 0) {
-        ctx.mobSwing(mob, target);
-        mob.swingTimer = mob.weapon.speed * ctx.swingIntervalMult(mob);
-      }
-      // Boss/miniboss pulse mechanic.
-      const pulse = MOBS[mob.templateId]?.aoePulse;
-      if (pulse) {
-        mob.pulseTimer -= DT;
-        if (mob.pulseTimer <= 0) {
-          mob.pulseTimer = pulse.every;
-          const school = pulse.school ?? 'shadow';
-          ctx.emit({
-            type: 'spellfx',
-            sourceId: mob.id,
-            targetId: mob.id,
-            school,
-            fx: pulse.fx ?? 'nova',
-          });
-          for (const meta of ctx.players.values()) {
-            const pe = ctx.entities.get(meta.entityId);
-            if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= pulse.radius) {
-              const dmg = Math.round(ctx.rng.range(pulse.min, pulse.max));
-              ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
-            }
-          }
-        }
-      }
-      // Boss/miniboss War Stomp: a periodic ground slam that stuns (and
-      // optionally damages) nearby players. Telegraphed via createMob, which
-      // seeds stompTimer to one full interval so the first slam never lands
-      // the instant combat opens.
-      const stomp = MOBS[mob.templateId]?.stomp;
-      if (stomp) {
-        mob.stompTimer -= DT;
-        if (mob.stompTimer <= 0) {
-          mob.stompTimer = stomp.every;
-          const school = stomp.school ?? 'physical';
-          ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-          ctx.emit({
-            type: 'log',
-            text: `${mob.name} unleashes ${stomp.name}!`,
-            color: '#ff9933',
-            entityId: mob.id,
-          });
-          for (const meta of ctx.players.values()) {
-            const pe = ctx.entities.get(meta.entityId);
-            if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > stomp.radius) continue;
-            if (stomp.min !== undefined && stomp.max !== undefined) {
-              const dmg = Math.round(ctx.rng.range(stomp.min, stomp.max));
-              ctx.dealDamage(mob, pe, dmg, false, school, stomp.name, 'hit', true);
-            }
-            if (pe.dead) continue; // a fatal slam shouldn't also stun the corpse
-            ctx.applyAura(pe, {
-              id: 'stomp_stun',
-              name: stomp.name,
-              kind: 'stun',
-              remaining: stomp.duration,
-              duration: stomp.duration,
-              value: 0,
-              sourceId: mob.id,
-              school: school as Aura['school'],
-            });
-          }
-        }
-      }
-      // Telegraphed hardcast (bigCast): a periodic big spell with a REAL cast bar.
-      // The cadence timer ticks like aoePulse; at zero the mob starts casting
-      // (castingAbility carries the castId, the same entity fields the Nythraxis
-      // Deathless Rage cast uses) and keeps meleeing while the bar fills, then the
-      // spell lands as an AoE nova on every living player in radius. All rng here
-      // draws only for templates that declare bigCast (today only the Thunzharr
-      // world boss), so the parity golden scenarios see no new draws. If the mob
-      // leaves the attack state mid-cast the bar freezes and resumes on return,
-      // matching how the sibling timers pause; evade/death clear it.
-      const bigCast = MOBS[mob.templateId]?.bigCast;
-      if (bigCast) {
-        if (mob.castingAbility === bigCast.castId) {
-          mob.castRemaining = Math.max(0, mob.castRemaining - DT);
-          if (mob.castRemaining <= 0) {
-            mob.castingAbility = null;
-            mob.castTotal = 0;
-            mob.castRemaining = 0;
-            mob.castTargetId = null;
-            const school = (bigCast.school ?? 'nature') as Aura['school'];
-            ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-            ctx.emit({
-              type: 'log',
-              text: `${mob.name} unleashes ${bigCast.name}!`,
-              color: '#ff9933',
-              entityId: mob.id,
-            });
-            for (const meta of ctx.players.values()) {
-              const pe = ctx.entities.get(meta.entityId);
-              if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= bigCast.radius) {
-                const dmg = Math.round(ctx.rng.range(bigCast.min, bigCast.max));
-                ctx.dealDamage(mob, pe, dmg, false, school, bigCast.name, 'hit', true);
-              }
-            }
-          }
-        } else {
-          mob.bigCastTimer -= DT;
-          if (mob.bigCastTimer <= 0) {
-            mob.bigCastTimer = bigCast.every + bigCast.castTime;
-            mob.castingAbility = bigCast.castId;
-            mob.castTotal = bigCast.castTime;
-            mob.castRemaining = bigCast.castTime;
-            mob.castTargetId = null;
-            mob.channeling = false;
-            if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
-          }
-        }
-      }
-      // Stoneskin: a periodic self-absorb barrier. Telegraphed via createMob,
-      // which seeds stoneskinTimer to one full interval so the first barrier
-      // never snaps up the instant combat opens. Reuses the `absorb` aura,
-      // which dealDamage already soaks before any health is lost.
-      const stoneskin = MOBS[mob.templateId]?.stoneskin;
-      if (stoneskin) {
-        mob.stoneskinTimer -= DT;
-        if (mob.stoneskinTimer <= 0) {
-          mob.stoneskinTimer = stoneskin.every;
-          const school = (stoneskin.school ?? 'physical') as Aura['school'];
-          ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-          ctx.emit({
-            type: 'log',
-            text: `${mob.name} unleashes ${stoneskin.name}!`,
-            color: '#c9c2b5',
-            entityId: mob.id,
-          });
-          ctx.applyAura(mob, {
-            id: `stoneskin_${mob.templateId}`,
-            name: stoneskin.name,
-            kind: 'absorb',
-            remaining: stoneskin.duration,
-            duration: stoneskin.duration,
-            value: stoneskin.amount,
-            sourceId: mob.id,
-            school,
-          });
-        }
-      }
-      // Banshee's Wail: a periodic, telegraphed scream that terrifies nearby
-      // players into fleeing. The fear analogue of War Stomp — same timed,
-      // room-wide cadence — but it applies the `fear_incap` aura the on-hit
-      // `dread` and player-cast Fear share, so `updateFearMovement` drives the
-      // panic. Telegraphed via createMob, which seeds terrifyTimer to one full
-      // interval so the first wail never lands the instant combat opens.
-      const terrify = MOBS[mob.templateId]?.terrify;
-      if (terrify) {
-        mob.terrifyTimer -= DT;
-        if (mob.terrifyTimer <= 0) {
-          mob.terrifyTimer = terrify.every;
-          const school = terrify.school ?? 'shadow';
-          ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-          ctx.emit({
-            type: 'log',
-            text: `${mob.name} unleashes ${terrify.name}!`,
-            color: '#ff9933',
-            entityId: mob.id,
-          });
-          for (const meta of ctx.players.values()) {
-            const pe = ctx.entities.get(meta.entityId);
-            if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > terrify.radius) continue;
-            const remaining = ctx.diminishedCrowdControlDuration(mob, pe, 'fear', terrify.duration);
-            if (remaining === null) continue;
-            ctx.applyAura(pe, {
-              id: 'fear_incap',
-              name: terrify.name,
-              kind: 'incapacitate',
-              remaining,
-              duration: remaining,
-              value: ctx.rng.range(-Math.PI, Math.PI),
-              sourceId: mob.id,
-              school,
-              breaksOnDamage: true,
-            });
-          }
-        }
-      }
+      const result = updateMobCombatProfile(ctx, mob, () => {
+        // The anti-kite snare and loud battle cries fire once per engaged tick,
+        // from either engaged state (mid-chase is the kite case they exist for).
+        pulseAntiKiteSnare(ctx, mob);
+        pulseLoudYell(ctx, mob);
+      });
+      if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
       break;
     }
     case 'flee': {
@@ -571,6 +329,173 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         mob.evadeStall += DT; // pinned on something
       }
       break;
+    }
+  }
+}
+
+function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
+  // Boss/miniboss pulse mechanic.
+  const pulse = MOBS[mob.templateId]?.aoePulse;
+  if (pulse) {
+    mob.pulseTimer -= DT;
+    if (mob.pulseTimer <= 0) {
+      mob.pulseTimer = pulse.every;
+      const school = pulse.school ?? 'shadow';
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: mob.id,
+        targetId: mob.id,
+        school,
+        fx: pulse.fx ?? 'nova',
+      });
+      for (const meta of ctx.players.values()) {
+        const pe = ctx.entities.get(meta.entityId);
+        if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= pulse.radius) {
+          const dmg = Math.round(ctx.rng.range(pulse.min, pulse.max));
+          ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
+        }
+      }
+    }
+  }
+  // Boss/miniboss War Stomp: a periodic ground slam that stuns and optionally
+  // damages nearby players. Telegraphed via createMob, which seeds stompTimer to
+  // one full interval so the first slam never lands the instant combat opens.
+  const stomp = MOBS[mob.templateId]?.stomp;
+  if (stomp) {
+    mob.stompTimer -= DT;
+    if (mob.stompTimer <= 0) {
+      mob.stompTimer = stomp.every;
+      const school = stomp.school ?? 'physical';
+      ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+      ctx.emit({
+        type: 'log',
+        text: `${mob.name} unleashes ${stomp.name}!`,
+        color: '#ff9933',
+        entityId: mob.id,
+      });
+      for (const meta of ctx.players.values()) {
+        const pe = ctx.entities.get(meta.entityId);
+        if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > stomp.radius) continue;
+        if (stomp.min !== undefined && stomp.max !== undefined) {
+          const dmg = Math.round(ctx.rng.range(stomp.min, stomp.max));
+          ctx.dealDamage(mob, pe, dmg, false, school, stomp.name, 'hit', true);
+        }
+        if (pe.dead) continue; // a fatal slam should not also stun the corpse
+        ctx.applyAura(pe, {
+          id: 'stomp_stun',
+          name: stomp.name,
+          kind: 'stun',
+          remaining: stomp.duration,
+          duration: stomp.duration,
+          value: 0,
+          sourceId: mob.id,
+          school: school as Aura['school'],
+        });
+      }
+    }
+  }
+  // Telegraphed hardcast (bigCast): a periodic big spell with a real cast bar.
+  // The cadence timer ticks like aoePulse; at zero the mob starts casting and
+  // keeps meleeing while the bar fills, then the spell lands as an AoE nova on
+  // every living player in radius.
+  const bigCast = MOBS[mob.templateId]?.bigCast;
+  if (bigCast) {
+    if (mob.castingAbility === bigCast.castId) {
+      mob.castRemaining = Math.max(0, mob.castRemaining - DT);
+      if (mob.castRemaining <= 0) {
+        mob.castingAbility = null;
+        mob.castTotal = 0;
+        mob.castRemaining = 0;
+        mob.castTargetId = null;
+        const school = (bigCast.school ?? 'nature') as Aura['school'];
+        ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${bigCast.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
+        for (const meta of ctx.players.values()) {
+          const pe = ctx.entities.get(meta.entityId);
+          if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= bigCast.radius) {
+            const dmg = Math.round(ctx.rng.range(bigCast.min, bigCast.max));
+            ctx.dealDamage(mob, pe, dmg, false, school, bigCast.name, 'hit', true);
+          }
+        }
+      }
+    } else {
+      mob.bigCastTimer -= DT;
+      if (mob.bigCastTimer <= 0) {
+        mob.bigCastTimer = bigCast.every + bigCast.castTime;
+        mob.castingAbility = bigCast.castId;
+        mob.castTotal = bigCast.castTime;
+        mob.castRemaining = bigCast.castTime;
+        mob.castTargetId = null;
+        mob.channeling = false;
+        if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
+      }
+    }
+  }
+  // Stoneskin: a periodic self-absorb barrier. Telegraphed via createMob, which
+  // seeds stoneskinTimer to one full interval so the first barrier never snaps up
+  // the instant combat opens.
+  const stoneskin = MOBS[mob.templateId]?.stoneskin;
+  if (stoneskin) {
+    mob.stoneskinTimer -= DT;
+    if (mob.stoneskinTimer <= 0) {
+      mob.stoneskinTimer = stoneskin.every;
+      const school = (stoneskin.school ?? 'physical') as Aura['school'];
+      ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+      ctx.emit({
+        type: 'log',
+        text: `${mob.name} unleashes ${stoneskin.name}!`,
+        color: '#c9c2b5',
+        entityId: mob.id,
+      });
+      ctx.applyAura(mob, {
+        id: `stoneskin_${mob.templateId}`,
+        name: stoneskin.name,
+        kind: 'absorb',
+        remaining: stoneskin.duration,
+        duration: stoneskin.duration,
+        value: stoneskin.amount,
+        sourceId: mob.id,
+        school,
+      });
+    }
+  }
+  // Banshee's Wail: a periodic, telegraphed scream that terrifies nearby players
+  // into fleeing. It applies the `fear_incap` aura that `updateFearMovement` drives.
+  const terrify = MOBS[mob.templateId]?.terrify;
+  if (terrify) {
+    mob.terrifyTimer -= DT;
+    if (mob.terrifyTimer <= 0) {
+      mob.terrifyTimer = terrify.every;
+      const school = terrify.school ?? 'shadow';
+      ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+      ctx.emit({
+        type: 'log',
+        text: `${mob.name} unleashes ${terrify.name}!`,
+        color: '#ff9933',
+        entityId: mob.id,
+      });
+      for (const meta of ctx.players.values()) {
+        const pe = ctx.entities.get(meta.entityId);
+        if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > terrify.radius) continue;
+        const remaining = ctx.diminishedCrowdControlDuration(mob, pe, 'fear', terrify.duration);
+        if (remaining === null) continue;
+        ctx.applyAura(pe, {
+          id: 'fear_incap',
+          name: terrify.name,
+          kind: 'incapacitate',
+          remaining,
+          duration: remaining,
+          value: ctx.rng.range(-Math.PI, Math.PI),
+          sourceId: mob.id,
+          school,
+          breaksOnDamage: true,
+        });
+      }
     }
   }
 }

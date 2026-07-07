@@ -13,7 +13,12 @@
 // imports, no Math.random/Date.now, host-agnostic so it runs offline, on the
 // server, and in the headless RL env unchanged.
 
-import { CRAFT_RING } from '../content/professions';
+import {
+  CRAFT_RING,
+  craftById,
+  PERK_THRESHOLDS,
+  type PerkThresholdDef,
+} from '../content/professions';
 import type { SimContext } from '../sim_context';
 
 /** Per-craft skill values, keyed by CraftDef.id. Every craft is always present. */
@@ -102,4 +107,69 @@ export function tierProgressMultiplier(capabilityTier: number, recipeTier: numbe
   if (tiersBelow <= 0) return 1;
   if (tiersBelow === 1) return REDUCED_TIER_MULTIPLIER;
   return 0;
+}
+
+// Specialization-perk eligibility reads over the ten-craft wheel (#1134).
+// These are pure leaf reads over the live `CraftSkills` record above (P5,
+// #1128 landed on this base): the eligibility gate every perk in #1134
+// reads is the material-cost discount (crafting.ts), the additional
+// recharge discount (tools.ts), and the mobile crafting station
+// (mobile_station.ts).
+
+/** Alias kept for #1134 call sites; identical to the live `CraftSkills` record. */
+export type CraftSkillState = CraftSkills;
+
+/** The player's skill in `craftId`, defaulting to 0 when untracked. */
+export function skillInCraft(skills: CraftSkillState, craftId: string): number {
+  return skills[craftId] ?? 0;
+}
+
+function thresholdFor(craftId: string): PerkThresholdDef {
+  // Throws on an unknown craft id, same as craftById/adjacentCrafts above:
+  // every craft on CRAFT_RING has a PERK_THRESHOLDS entry (see content).
+  craftById(craftId);
+  const threshold = PERK_THRESHOLDS[craftId];
+  if (!threshold) {
+    throw new Error(`no perk threshold registered for craft id: ${craftId}`);
+  }
+  return threshold;
+}
+
+/**
+ * True only when the player's skill in `craftId` has reached that craft's
+ * specialization threshold (read from content, never hardcoded here). This
+ * is the single eligibility gate every perk in this issue reads: the
+ * material-cost discount (crafting.ts), the additional recharge discount
+ * (tools.ts), and the mobile crafting station (mobile_station.ts).
+ */
+export function isSpecialized(skills: CraftSkillState, craftId: string): boolean {
+  return skillInCraft(skills, craftId) >= thresholdFor(craftId).specializedSkillThreshold;
+}
+
+/**
+ * The multiplier to apply to a recipe's material quantities when crafted in
+ * `craftId`: 1 (no discount) when not specialized, or
+ * `1 - materialDiscountPct` once specialized. Never negative or zero-clamped
+ * here; `crafting.ts` owns rounding and the floor-at-1 rule when it applies
+ * this to an actual integer quantity.
+ */
+export function materialCostMultiplier(skills: CraftSkillState, craftId: string): number {
+  if (!isSpecialized(skills, craftId)) return 1;
+  return 1 - thresholdFor(craftId).materialDiscountPct;
+}
+
+/**
+ * The ADDITIONAL multiplier (#1134) an original crafter's recharge discount
+ * composes with when that crafter is also specialized in `craftId`: 1 (no
+ * additional discount) when not specialized, or `1 - rechargeDiscountPct`
+ * once specialized. `tools.ts` multiplies this into its existing
+ * original-crafter discount rather than replacing it: the tick-cost half
+ * always drops strictly, but the material half is an integer ceil, so with
+ * today's placeholder constants a small base material cost can floor at the
+ * same integer as the plain original-crafter discount (see the recharge test
+ * for the material-cost bound actually asserted).
+ */
+export function rechargeDiscountMultiplier(skills: CraftSkillState, craftId: string): number {
+  if (!isSpecialized(skills, craftId)) return 1;
+  return 1 - thresholdFor(craftId).rechargeDiscountPct;
 }

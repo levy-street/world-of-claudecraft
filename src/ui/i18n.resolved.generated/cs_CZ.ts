@@ -1073,18 +1073,6 @@ export const cs_CZ: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Výroba",
-      "close": "Zavřít výrobu",
-      "craft": "Vyrobit",
-      "reagentsNeeded": "Vyžaduje:",
-      "reagentLine": "{name} x{have}/{required}",
-      "empty": "Zatím nejsou známy žádné recepty.",
-      "resultAria": "Vyrobit {name}",
-      "craftedToast": "Vyrobeno: {name}",
-      "insufficientMaterials": "Na to nemáš materiály.",
-      "unknownRecipe": "Tento recept neexistuje."
-    },
     "devBadge": {
       "title": "Vývojář",
       "tiers": {
@@ -1228,6 +1216,19 @@ export const cs_CZ: EnTranslations = {
       "mining": "Těžba",
       "logging": "Dřevorubectví",
       "herbalism": "Bylinkářství"
+    },
+    "crafting": {
+      "title": "Výroba",
+      "close": "Zavřít výrobu",
+      "craft": "Vyrobit",
+      "reagentsNeeded": "Vyžaduje:",
+      "reagentLine": "{name} x{have}/{required}",
+      "empty": "Zatím nejsou známy žádné recepty.",
+      "resultAria": "Vyrobit {name}",
+      "craftedToast": "Vyrobeno: {name}",
+      "insufficientMaterials": "Na to nemáš materiály.",
+      "unknownRecipe": "Tento recept neexistuje.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {

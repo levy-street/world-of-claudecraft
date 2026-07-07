@@ -1073,18 +1073,6 @@ export const tr_TR: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "işçiliği",
-      "close": "İşçiliği kapat",
-      "craft": "Zanaat",
-      "reagentsNeeded": "Gereklilikler:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Henüz bilinen bir tarif yok.",
-      "resultAria": "{name} zanaatı",
-      "craftedToast": "Hazırlanma Tarihi: {name}",
-      "insufficientMaterials": "Bunun için malzemeleriniz yok.",
-      "unknownRecipe": "O tarif mevcut değil."
-    },
     "devBadge": {
       "title": "Geliştirici",
       "tiers": {
@@ -1228,6 +1216,19 @@ export const tr_TR: EnTranslations = {
       "mining": "Madencilik",
       "logging": "Ağaç kesme",
       "herbalism": "Bitkicilik"
+    },
+    "crafting": {
+      "title": "işçiliği",
+      "close": "İşçiliği kapat",
+      "craft": "Zanaat",
+      "reagentsNeeded": "Gereklilikler:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Henüz bilinen bir tarif yok.",
+      "resultAria": "{name} zanaatı",
+      "craftedToast": "Hazırlanma Tarihi: {name}",
+      "insufficientMaterials": "Bunun için malzemeleriniz yok.",
+      "unknownRecipe": "O tarif mevcut değil.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {

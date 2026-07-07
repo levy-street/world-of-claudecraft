@@ -211,7 +211,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 403,
-      "state": "f453afa0",
+      "state": "61dc0b1e",
       "events": "cfc18f2e",
       "rng": {
         "draws": 774,
@@ -222,7 +222,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 403,
-      "state": "0f0bb4f7",
+      "state": "151b110d",
       "events": "ced2e436",
       "rng": {
         "draws": 943,
@@ -233,8 +233,8 @@
       "tick": 220,
       "time": 11,
       "nextId": 403,
-      "state": "7ee4e9e6",
-      "events": "cfc18f2e",
+      "state": "34b6e8f6",
+      "events": "9be5fb17",
       "rng": {
         "draws": 1021,
         "digest": "c5358026"
@@ -244,7 +244,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 403,
-      "state": "7535d2ec",
+      "state": "c7d0fdb9",
       "events": "741638a5",
       "rng": {
         "draws": 1021,
@@ -267,7 +267,7 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 22
+            "damageDealt": 23
           },
           "craftSkills": {},
           "delveClears": {},
@@ -303,7 +303,7 @@
           "attackPower": 11,
           "autoAttack": true,
           "castTotal": 5,
-          "combatTimer": 0.4,
+          "combatTimer": 0.45,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -360,7 +360,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 1.892547,
+          "facing": 2.077895,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 350,
@@ -378,7 +378,7 @@
           "petMode": "aggressive",
           "petTauntTimer": 10,
           "pos": {
-            "x": 6,
+            "x": 4.8,
             "y": 1.5,
             "z": -2
           },
@@ -406,18 +406,18 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.249046,
+          "facing": -1.063698,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "forcedTargetId": 401,
           "forcedTargetTimer": 3,
           "hostile": true,
-          "hp": 49954,
+          "hp": 49953,
           "id": 402,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 7,
+            "x": 5.8,
             "y": 1.5,
             "z": -2
           },
@@ -429,7 +429,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 7,
+            "x": 5.8,
             "y": 1.5,
             "z": -2
           },
@@ -449,7 +449,7 @@
           "threat": [
             [
               400,
-              23
+              24
             ],
             [
               401,
@@ -468,7 +468,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 403,
-      "state": "79a5122f",
+      "state": "d5f2d017",
       "events": "852d6621",
       "rng": {
         "draws": 1050,
@@ -491,7 +491,7 @@
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 22
+            "damageDealt": 23
           },
           "craftSkills": {},
           "delveClears": {},
@@ -527,7 +527,7 @@
           "attackPower": 11,
           "autoAttack": true,
           "castTotal": 5,
-          "combatTimer": 0.6,
+          "combatTimer": 0.65,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -603,7 +603,7 @@
           "petMode": "aggressive",
           "petTauntTimer": 9.8,
           "pos": {
-            "x": 6,
+            "x": 4.8,
             "y": 1.5,
             "z": -2
           },
@@ -638,12 +638,12 @@
           "forcedTargetId": 401,
           "forcedTargetTimer": 2.8,
           "hostile": true,
-          "hp": 49944,
+          "hp": 49943,
           "id": 402,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 7,
+            "x": 5.8,
             "y": 1.5,
             "z": -2
           },
@@ -655,7 +655,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 7,
+            "x": 5.8,
             "y": 1.5,
             "z": -2
           },
@@ -675,7 +675,7 @@
           "threat": [
             [
               400,
-              23
+              24
             ],
             [
               401,

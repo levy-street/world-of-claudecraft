@@ -85,10 +85,10 @@ import {
 import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
+  ALL_RECIPES,
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
-  COMMON_RECIPES,
   DEEPFEN_SHALLOWS_LAKE,
   DELVE_COMPANIONS,
   DELVE_LIST,
@@ -169,6 +169,11 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import {
+  mobCombatProfile as mobCombatProfileFn,
+  mobEffectiveMeleeRange as mobEffectiveMeleeRangeFn,
+  tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeFn,
+} from './mob/combat_profile';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -177,7 +182,7 @@ import {
   updateMobTarget as updateMobTargetFn,
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
-import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from './mob_combat';
+import type { MobCombatProfile } from './mob_combat';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -303,7 +308,6 @@ import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
-  clearThreat,
   TAUNT_FORCE_SECONDS,
   threatEntries,
   threatModifier,
@@ -326,7 +330,6 @@ import {
   type DelveModuleDef,
   type DelveRun,
   DT,
-  DUNGEON_LEASH_DISTANCE,
   dist2d,
   type Entity,
   type EquipSlot,
@@ -870,6 +873,10 @@ export interface CharacterState {
   // load cleanly, defaulting every profession to 0). `professions` is the legacy
   // pre-rename key, kept for back-compat with old saves; `gatheringProficiency`
   // is the current key both read (preferred) and written going forward.
+  // load cleanly, defaulting every profession to 0). Key is `professions`
+  // (not `gatheringProficiency`), reserved by the settled professions
+  // contract (src/sim/professions/CLAUDE.md, #1164) parallel to the existing
+  // `delveDaily`/`companionUpgrades` persisted fields.
   professions?: Partial<Record<string, number>>;
   gatheringProficiency?: Partial<Record<string, number>>;
   copper: number;
@@ -2510,9 +2517,6 @@ export class Sim {
       mobSwing: sim.mobSwing.bind(sim),
       updateRangedPetAttack: sim.updateRangedPetAttack.bind(sim),
       fleeMoveSpeed: sim.fleeMoveSpeed.bind(sim),
-      usesProfiledMobCombat: sim.usesProfiledMobCombat.bind(sim),
-      updateProfiledMobCombat: sim.updateProfiledMobCombat.bind(sim),
-      tryMobMeleeSwingInRange: sim.tryMobMeleeSwingInRange.bind(sim),
       maybeFlee: sim.maybeFlee.bind(sim),
       aggroMob: sim.aggroMob.bind(sim),
       // C3 moved the CC predicates to combat/cc.ts; ctx.isStunned/isRooted (consumed by
@@ -2521,7 +2525,6 @@ export class Sim {
       isRooted: isRooted,
       moveSpeedMult: sim.moveSpeedMult.bind(sim),
       swingIntervalMult: sim.swingIntervalMult.bind(sim),
-      mobEffectiveMeleeRange: sim.mobEffectiveMeleeRange.bind(sim),
       mobCanSwim: sim.mobCanSwim.bind(sim),
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
       // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
@@ -4144,84 +4147,15 @@ export class Sim {
   }
 
   private mobCombatProfile(mob: Entity): MobCombatProfile {
-    return combatProfileForMob(mob.templateId, mob.scale);
+    return mobCombatProfileFn(mob);
   }
 
   private mobEffectiveMeleeRange(mob: Entity): number {
-    const profile = this.mobCombatProfile(mob);
-    const mobMoved = dist2d(mob.pos, mob.prevPos) > 0.05;
-    return effectiveMobMeleeRange(profile, mobMoved);
+    return mobEffectiveMeleeRangeFn(mob);
   }
 
   private tryMobMeleeSwingInRange(mob: Entity, target: Entity): boolean {
-    if (dist2d(mob.pos, target.pos) > this.mobEffectiveMeleeRange(mob)) return false;
-    mob.aiState = 'attack';
-    mob.facing = angleTo(mob.pos, target.pos);
-    if (mob.swingTimer <= 0) {
-      this.mobSwing(mob, target);
-      mob.swingTimer = mob.weapon.speed * this.swingIntervalMult(mob);
-    }
-    return true;
-  }
-
-  private usesProfiledMobCombat(mob: Entity): boolean {
-    const profile = this.mobCombatProfile(mob);
-    return profile.swingWhilePursuing || profile.immediateSwingOnEnterRange || !profile.canLeash;
-  }
-
-  private updateProfiledMobCombat(mob: Entity): void {
-    const profile = this.mobCombatProfile(mob);
-    this.updateMobTarget(mob);
-    const target = mob.aggroTargetId !== null ? this.entities.get(mob.aggroTargetId) : null;
-    if (!target || target.dead) {
-      this.retargetMob(mob);
-      return;
-    }
-    if (this.maybeFlee(mob, target)) return;
-
-    if (profile.canLeash) {
-      const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
-      const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
-      if (mob.fleeReturnTimer > 0) {
-        mob.fleeReturnTimer = Math.max(0, mob.fleeReturnTimer - DT);
-        if (dist2d(mob.pos, leashAnchor) <= leash - 1) mob.fleeReturnTimer = 0;
-      }
-      if (dist2d(mob.pos, leashAnchor) > leash && mob.fleeReturnTimer <= 0) {
-        mob.aiState = 'evade';
-        mob.aggroTargetId = null;
-        clearThreat(mob);
-        mob.leashAnchor = null;
-        return;
-      }
-    }
-
-    mob.swingTimer = Math.max(0, mob.swingTimer - DT);
-    if (profile.swingWhilePursuing || mob.aiState === 'attack') {
-      this.tryMobMeleeSwingInRange(mob, target);
-    }
-
-    if (dist2d(mob.pos, target.pos) > profile.desiredRange) {
-      if (!isRooted(mob)) {
-        this.moveToward(
-          mob,
-          target.pos,
-          mob.moveSpeed * profile.chaseSpeedMult * this.moveSpeedMult(mob),
-        );
-      } else {
-        mob.facing = angleTo(mob.pos, target.pos);
-      }
-    } else {
-      mob.facing = angleTo(mob.pos, target.pos);
-    }
-
-    if (
-      profile.immediateSwingOnEnterRange ||
-      profile.swingWhilePursuing ||
-      mob.aiState === 'attack'
-    ) {
-      this.tryMobMeleeSwingInRange(mob, target);
-    }
-    mob.aiState = dist2d(mob.pos, target.pos) <= profile.meleeRange ? 'attack' : 'chase';
+    return tryMobMeleeSwingInRangeFn(this.ctx, mob, target);
   }
 
   aggroMob(mob: Entity, target: Entity, social: boolean): void {
@@ -5152,11 +5086,12 @@ export class Sim {
     return this.nodeHarvestableByMeFor(nodeId, this.primaryId);
   }
 
-  // IWorld read surface (IWorldProfessions, #1127): the static common-tier
-  // recipe list, a plain content read (no per-player state), same shape both
-  // worlds can serve without a wire round-trip.
+  // IWorld read surface (IWorldProfessions, #1127): the full recipe list
+  // (common tier plus combo recipes, #1132), a plain content read (no
+  // per-player state), same shape both worlds can serve without a wire
+  // round-trip.
   get recipeList(): readonly RecipeDef[] {
-    return COMMON_RECIPES;
+    return ALL_RECIPES;
   }
 
   // Common-tier crafting command (#1127): a thin delegate onto

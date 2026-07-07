@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
-  MOVE_HOLD_TIME, newLocoTrack, updateLocomotion,
-} from '../src/render/locomotion';
-import { desiredBaseState, locomotionTimeScale, type AnimState } from '../src/render/characters/anim_state';
+  type AnimState,
+  desiredBaseState,
+  locomotionTimeScale,
+  pickProxyHeight,
+} from '../src/render/characters/anim_state';
+import { MOVE_HOLD_TIME, newLocoTrack, updateLocomotion } from '../src/render/locomotion';
 
 const FPS = 1 / 60;
 const BASE_ANIM_STATE: AnimState = {
@@ -98,8 +101,41 @@ describe('locomotion animation state', () => {
   });
 
   it('reverses forward locomotion for Ghost Wolf-style backpedal', () => {
-    const state = { ...BASE_ANIM_STATE, moving: true, backwards: true, reverseBackpedal: true, speed: 7 };
+    const state = {
+      ...BASE_ANIM_STATE,
+      moving: true,
+      backwards: true,
+      reverseBackpedal: true,
+      speed: 7,
+    };
     expect(desiredBaseState(state, true)).toBe('run');
     expect(locomotionTimeScale('run', state)).toBeLessThan(0);
+  });
+});
+
+describe('pickProxyHeight (corpse pick-capsule flatten, issue 1486)', () => {
+  it('uses the full standing height while alive', () => {
+    expect(pickProxyHeight(1.8, 0.4, false)).toBe(1.8);
+    expect(pickProxyHeight(3.0, 1.2, false)).toBe(3.0);
+  });
+
+  it('collapses a dead entity to a low, ground-hugging profile well under standing height', () => {
+    // A humanoid: standing 1.8, radius 0.4 -> flat ~0.8, far below the upright column
+    // that caused the phantom hitbox.
+    const flat = pickProxyHeight(1.8, 0.4, true);
+    expect(flat).toBeLessThan(1.8);
+    expect(flat).toBe(0.8);
+  });
+
+  it('never exceeds the standing height for a wide, short creature', () => {
+    // radius*2 would be 2.4 but standing height is only 1.0: clamp to the height so
+    // the dead proxy is never TALLER than the living one.
+    expect(pickProxyHeight(1.0, 1.2, true)).toBe(1.0);
+  });
+
+  it('scales the flat profile with body radius (long/wide creatures stay clickable)', () => {
+    // A larger creature keeps a proportionally larger (but still sub-standing) flat
+    // footprint so its corpse is not an unclickable sliver.
+    expect(pickProxyHeight(3.0, 1.0, true)).toBe(2.0);
   });
 });

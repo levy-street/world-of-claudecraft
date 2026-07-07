@@ -52,3 +52,14 @@ export function locomotionTimeScale(
 function clamp(v: number, lo: number, hi: number): number {
   return Math.min(hi, Math.max(lo, v));
 }
+
+/** The vertical extent (scale.y) for an entity's click/pick proxy. The proxy is a
+ *  unit cylinder scaled to (radius*2, standHeight, radius*2) and rooted at the feet.
+ *  A living entity uses its full standing height; a dead (lying) one collapses to a
+ *  low, ground-hugging profile (roughly its own body width tall) so a near-eye click
+ *  behind or above the flat corpse no longer intersects an invisible upright column
+ *  (issue 1486), while the ground-level footprint stays clickable for looting. */
+export function pickProxyHeight(standHeight: number, radius: number, dead: boolean): number {
+  if (!dead) return standHeight;
+  return Math.min(standHeight, radius * 2);
+}

@@ -1893,8 +1893,7 @@ describe('mob auto attacks against moving targets', () => {
     );
   }
 
-  it('continues landing melee swings after the target moves around melee range', () => {
-    const sim = makeSim();
+  function orbitScenario(sim: ReturnType<typeof makeSim>, angularSpeed: number) {
     const p = sim.player;
     p.maxHp = 1_000_000;
     p.hp = p.maxHp;
@@ -1915,7 +1914,7 @@ describe('mob auto attacks against moving targets', () => {
       const t = i / 20;
       if (t > 2) {
         const oldPos = { ...p.pos };
-        const angle = (t - 2) * 1.6;
+        const angle = (t - 2) * angularSpeed;
         p.pos.x = wolf.spawnPos.x + Math.sin(angle) * 8;
         p.pos.z = wolf.spawnPos.z + Math.cos(angle) * 8;
         p.pos.y = groundHeight(p.pos.x, p.pos.z, sim.cfg.seed);
@@ -1924,9 +1923,37 @@ describe('mob auto attacks against moving targets', () => {
       const events = sim.tick();
       if (damageTimesFrom(events, wolf.id, p.id)) hitTimes.push(i / 20);
     }
+    return { p, wolf, hitTimes };
+  }
 
-    expect(hitTimes.length).toBeGreaterThanOrEqual(6);
+  it('continues landing melee swings after the target moves around melee range', () => {
+    // The target circles at 7 yd/s (0.875 rad/s at r=8), a legitimately attainable
+    // player run speed. Pursuit combat must keep the wolf (8 yd/s) glued at its
+    // desired range, landing a swing on every full weapon cadence, all the way to
+    // the end of the window. This is STRONGER than the legacy stop-go behavior,
+    // which hovered at the reach boundary and only connected every ~3.5s.
+    const sim = makeSim();
+    const { hitTimes } = orbitScenario(sim, 0.875);
+
+    expect(hitTimes.length).toBeGreaterThanOrEqual(9);
     expect(hitTimes.at(-1)).toBeGreaterThan(15);
+  });
+
+  it('stays locked onto a super-speed circler it cannot catch (kited, never resets)', () => {
+    // At 12.8 yd/s (1.6 rad/s at r=8) the orbiter outruns the wolf outright: a
+    // sustained speed no player reaches without stacked cooldowns. Fluid pursuit
+    // settles into a tail-chase just outside reach, so the circler CAN kite the
+    // wolf hit-free after the opening contact: that is the deliberate trade for
+    // hit-and-run combat (the mobs that must not be kiteable carry anti-kite
+    // pulses instead, see aoeSlow). What the wolf must never do is give up:
+    // it stays engaged and on the target the whole window.
+    const sim = makeSim();
+    const { p, wolf, hitTimes } = orbitScenario(sim, 1.6);
+
+    expect(hitTimes.length).toBeGreaterThanOrEqual(3); // the opening contact still lands
+    expect(wolf.aggroTargetId).toBe(p.id);
+    expect(wolf.inCombat).toBe(true);
+    expect(['chase', 'attack']).toContain(wolf.aiState);
   });
 });
 

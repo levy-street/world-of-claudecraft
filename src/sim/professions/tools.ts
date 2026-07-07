@@ -18,6 +18,7 @@ import {
 import type { Rng } from '../rng';
 import type { ItemDef, ItemUse } from '../types';
 import type { MaterialRarity } from './gathering';
+import { type CraftSkillState, rechargeDiscountMultiplier } from './wheel';
 
 export interface GatherToolUse {
   type: 'gatherTool';
@@ -250,8 +251,28 @@ export function isOriginalCrafter(slot: ToolEffectSlot, rechargerId: string): bo
 // Pure: the materials/time a recharge of this slot would cost `rechargerId`.
 // Strictly less for the original crafter than for anyone else (a generic
 // Enchanter/Scribe), on both dimensions.
-export function rechargeCost(slot: ToolEffectSlot, rechargerId: string): RechargeCost {
-  const discount = isOriginalCrafter(slot, rechargerId) ? ORIGINAL_CRAFTER_DISCOUNT : 1;
+//
+// Specialization recharge discount (#1134): when `rechargerId` is also the
+// original crafter AND `rechargerSkills` shows them specialized in the
+// effect's craft (`TOOL_EFFECTS[slot.effectId].craftId`, per
+// ../content/professions.ts), an ADDITIONAL discount from
+// `rechargeDiscountMultiplier` (wheel.ts) composes with (multiplies into,
+// never replaces) the existing original-crafter discount. A non-original
+// recharger never sees this discount even if `rechargerSkills` shows them
+// specialized: the perk is specifically for recharging one's OWN work.
+// `rechargerSkills` is optional and defaults to empty (no specialization),
+// so existing #1137 call sites that don't yet pass it behave unchanged.
+export function rechargeCost(
+  slot: ToolEffectSlot,
+  rechargerId: string,
+  rechargerSkills: CraftSkillState = {},
+): RechargeCost {
+  const isOriginal = isOriginalCrafter(slot, rechargerId);
+  let discount = isOriginal ? ORIGINAL_CRAFTER_DISCOUNT : 1;
+  if (isOriginal) {
+    const craftId = TOOL_EFFECTS[slot.effectId].craftId;
+    discount *= rechargeDiscountMultiplier(rechargerSkills, craftId);
+  }
   return {
     materials: Math.ceil(RECHARGE_BASE_MATERIALS * discount),
     ticks: Math.ceil(RECHARGE_BASE_TICKS * discount),
@@ -278,8 +299,9 @@ export function rechargeEffect(
   slot: ToolEffectSlot,
   rechargerId: string,
   materialsProvided: number,
+  rechargerSkills: CraftSkillState = {},
 ): RechargeResult {
-  const cost = rechargeCost(slot, rechargerId);
+  const cost = rechargeCost(slot, rechargerId, rechargerSkills);
   if (materialsProvided < cost.materials) {
     return { success: false, cost };
   }
@@ -335,11 +357,10 @@ export function resolveToolEffectUse(
 }
 
 // INTEGRATION NOTE (#1136, extended by #1137 and #1138, consumption curve
-// added by #1139): the node-harvest outcome path (#1121) and the
-// recipe-crafting outcome path (#1127) are not present on this branch (this
-// branch is stacked directly on #1135, the crafted-tool-tiers PR), so there
-// is no live call site to wire `resolveToolEffectUse`/`rechargeEffect` into
-// yet. Once either lands, its outcome-producing function should: build the
+// added by #1139): the node-harvest outcome path (#1121) is not present on
+// this branch, so there is no live call site to wire
+// `resolveToolEffectUse`/`rechargeEffect` into yet. Once it lands, its
+// outcome-producing function should: build the
 // base HarvestOutcome, then call `resolveToolEffectUse(slot, outcome,
 // toolRarity, targetRarity, rng, confirmed)` using the SAME `Rng` the caller
 // already draws from (never a fresh one) so the depletion roll (when it

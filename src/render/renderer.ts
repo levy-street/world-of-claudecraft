@@ -5121,9 +5121,16 @@ export class Renderer {
       if (id === this.sim.playerId || !v.visual || !v.group.visible) continue;
       const e = this.sim.entities.get(id);
       if (!e || (e.dead && !e.lootable)) continue;
-      // body midpoint anchor (also the in-front-of-camera cull)
+      // A lying corpse (dead + lootable) has no upright body: collapse its sloppy
+      // column to a ground-level point so a near-eye click above/behind the flat
+      // body no longer snaps to it (issue 1486). Like the flattened pick proxy, this
+      // sheds the upright column; the exact drop is approximate (a ground-level
+      // anchor inside the 26px assist radius is all this path needs), not a parity
+      // match of the proxy's min(standHeight, radius*2) height.
+      const dead = !!e.dead;
+      // body midpoint anchor (also the in-front-of-camera cull); ground-hug if dead
       this.tmpV.copy(v.group.position);
-      this.tmpV.y += v.height * e.scale * 0.5;
+      this.tmpV.y += v.height * e.scale * (dead ? 0.15 : 0.5);
       this.tmpV.project(this.camera);
       if (this.tmpV.z > 1) continue;
       const midX = (this.tmpV.x * 0.5 + 0.5) * this.viewport.width;
@@ -5133,16 +5140,19 @@ export class Renderer {
       // front of the camera: a point behind the near plane projects to bogus
       // screen coords that could steal an unrelated click (close / first-person
       // camera puts the head behind the near plane). Same guard the real
-      // nameplate path uses before trusting its projection.
-      this.tmpV2.copy(v.group.position);
-      this.tmpV2.y += v.height * e.scale + 1.0;
+      // nameplate path uses before trusting its projection. A dead corpse has no
+      // overhead column at all, so keep top == mid (the ground point).
       let topX = midX;
       let topY = midY;
-      if (isProjectedNameplateAnchorVisible(this.camera, this.tmpV2, this.tmpV3)) {
-        this.tmpV2.project(this.camera);
-        if (this.tmpV2.z <= 1) {
-          topX = (this.tmpV2.x * 0.5 + 0.5) * this.viewport.width;
-          topY = (-this.tmpV2.y * 0.5 + 0.5) * this.viewport.height;
+      if (!dead) {
+        this.tmpV2.copy(v.group.position);
+        this.tmpV2.y += v.height * e.scale + 1.0;
+        if (isProjectedNameplateAnchorVisible(this.camera, this.tmpV2, this.tmpV3)) {
+          this.tmpV2.project(this.camera);
+          if (this.tmpV2.z <= 1) {
+            topX = (this.tmpV2.x * 0.5 + 0.5) * this.viewport.width;
+            topY = (-this.tmpV2.y * 0.5 + 0.5) * this.viewport.height;
+          }
         }
       }
       candidates.push({ id, midX, midY, topX, topY });

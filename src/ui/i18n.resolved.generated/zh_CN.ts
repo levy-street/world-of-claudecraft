@@ -1073,18 +1073,6 @@ export const zh_CN: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "制作",
-      "close": "关闭制作",
-      "craft": "制作",
-      "reagentsNeeded": "需要:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "尚无已知配方。",
-      "resultAria": "制作{name}",
-      "craftedToast": "已制作:{name}",
-      "insufficientMaterials": "你没有足够的材料。",
-      "unknownRecipe": "该配方不存在。"
-    },
     "devBadge": {
       "title": "开发者",
       "tiers": {
@@ -1228,6 +1216,19 @@ export const zh_CN: EnTranslations = {
       "mining": "采矿",
       "logging": "伐木",
       "herbalism": "草药学"
+    },
+    "crafting": {
+      "title": "制作",
+      "close": "关闭制作",
+      "craft": "制作",
+      "reagentsNeeded": "需要:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "尚无已知配方。",
+      "resultAria": "制作{name}",
+      "craftedToast": "已制作:{name}",
+      "insufficientMaterials": "你没有足够的材料。",
+      "unknownRecipe": "该配方不存在。",
+      "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。"
     }
   },
   "apiError": {

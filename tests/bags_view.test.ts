@@ -6,6 +6,7 @@ import {
   bagItemAction,
   bagQualityKey,
   bagShiftLinks,
+  bagsWindowShown,
   bagTooltipHintKey,
   buildBagGrid,
 } from '../src/ui/bags_view';
@@ -41,6 +42,25 @@ describe('bagShiftLinks', () => {
     expect(bagShiftLinks({ ...NO_MODE, marketSell: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, petFeed: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, vendorOpen: true })).toBe(false);
+  });
+});
+
+describe('bagsWindowShown', () => {
+  it('reads the cold-load empty display as NOT shown so the first toggle opens (issue #1538)', () => {
+    // The regression: the window is hidden by the .window CSS rule, so on a fresh
+    // page load the inline display is '' (never 'none'). The old `!== 'none'` check
+    // treated '' as shown and ran the close branch on the first press.
+    expect(bagsWindowShown('')).toBe(false);
+  });
+  it('reads an explicitly hidden window as NOT shown', () => {
+    expect(bagsWindowShown('none')).toBe(false);
+  });
+  it('reads any non-hidden value as shown (not pinned to the current shown value)', () => {
+    // #bags is only ever assigned 'flex' today, but the guard checks the hidden
+    // values (none / '') rather than pinning to 'flex', so it stays correct if the
+    // shown value ever changes. Assert a non-'flex' non-hidden value still closes.
+    expect(bagsWindowShown('flex')).toBe(true);
+    expect(bagsWindowShown('block')).toBe(true);
   });
 });
 

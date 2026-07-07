@@ -7,6 +7,8 @@ import { planVersionSync } from './version_sync.mjs';
 const VERSION_RE = /^\d+\.\d+\.\d+$/;
 const RELEASE_REF_RE = /(?:^|refs\/heads\/)release\/v?(\d+\.\d+\.\d+)$/;
 const MAC_DMG_RE = /world-of-claudecraft-\d+\.\d+\.\d+-mac-universal\.dmg/g;
+const LINUX_APPIMAGE_RE = /world-of-claudecraft-\d+\.\d+\.\d+-linux-x86_64\.AppImage/g;
+const DESKTOP_VERSION_RE = /export const DESKTOP_VERSION = '(\d+\.\d+\.\d+)';/;
 const GAME_VERSION_RE = /(<div\b[^>]*\bid=["']game-version["'][^>]*>)v[^<]*(<\/div>)/;
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -15,6 +17,7 @@ const PATHS = {
   packageLock: 'package-lock.json',
   gradle: 'android/app/build.gradle',
   pbxproj: 'ios/App/App.xcodeproj/project.pbxproj',
+  desktopModule: 'src/game/desktop_download.ts',
   htmlFiles: ['index.html', 'play.html'],
 };
 
@@ -83,9 +86,21 @@ export function setDesktopDownloadVersion(html, version, path) {
     throw new Error(`${path} is missing a macOS desktop download URL`);
   }
   MAC_DMG_RE.lastIndex = 0;
-  return html.replace(
-    MAC_DMG_RE,
-    `world-of-claudecraft-${normalizeVersion(version)}-mac-universal.dmg`,
+  const normalized = normalizeVersion(version);
+  // The Linux AppImage link is index.html-only (play.html links only the dmg),
+  // so it rewrites where present and is never required.
+  return html
+    .replace(MAC_DMG_RE, `world-of-claudecraft-${normalized}-mac-universal.dmg`)
+    .replace(LINUX_APPIMAGE_RE, `world-of-claudecraft-${normalized}-linux-x86_64.AppImage`);
+}
+
+export function setDesktopModuleVersion(source, version, path) {
+  if (!DESKTOP_VERSION_RE.test(source)) {
+    throw new Error(`${path} is missing the DESKTOP_VERSION constant`);
+  }
+  return source.replace(
+    DESKTOP_VERSION_RE,
+    `export const DESKTOP_VERSION = '${normalizeVersion(version)}';`,
   );
 }
 
@@ -102,6 +117,7 @@ export function planReleaseVersion({
   packageLock,
   gradle,
   pbxproj,
+  desktopModule,
   htmlFiles,
 }) {
   const normalized = normalizeVersion(version);
@@ -118,6 +134,7 @@ export function planReleaseVersion({
     packageLock: setPackageLockVersion(packageLock, normalized),
     gradle: nativePlan.gradle,
     pbxproj: nativePlan.pbxproj,
+    desktopModule: setDesktopModuleVersion(desktopModule, normalized, PATHS.desktopModule),
     htmlFiles: nextHtmlFiles,
   };
 }
@@ -154,6 +171,7 @@ export function collectReleaseVersionFailures({
   packageLock,
   gradle,
   pbxproj,
+  desktopModule,
   htmlFiles,
 }) {
   const expected = normalizeVersion(version);
@@ -193,7 +211,15 @@ export function collectReleaseVersionFailures({
     }
   }
 
+  const desktopVersion = desktopModule.match(DESKTOP_VERSION_RE)?.[1] ?? null;
+  if (desktopVersion !== expected) {
+    failures.push(
+      `${PATHS.desktopModule} DESKTOP_VERSION is ${desktopVersion}, expected ${expected}`,
+    );
+  }
+
   const expectedArtifact = `world-of-claudecraft-${expected}-mac-universal.dmg`;
+  const expectedLinuxArtifact = `world-of-claudecraft-${expected}-linux-x86_64.AppImage`;
   for (const [path, html] of Object.entries(htmlFiles)) {
     const gameVersion = readGameVersion(html);
     if (gameVersion !== expected) {
@@ -201,6 +227,12 @@ export function collectReleaseVersionFailures({
     }
     if (!html.includes(expectedArtifact)) {
       failures.push(`${path} is missing the macOS desktop download URL for ${expected}`);
+    }
+    // Only pages that carry a Linux link must have it on the release version;
+    // play.html links only the dmg and stays exempt.
+    LINUX_APPIMAGE_RE.lastIndex = 0;
+    if (LINUX_APPIMAGE_RE.test(html) && !html.includes(expectedLinuxArtifact)) {
+      failures.push(`${path} has a stale Linux desktop download URL, expected ${expected}`);
     }
     if (/coming soon/i.test(html)) {
       failures.push(`${path} still contains Coming Soon in the download panel`);
@@ -216,6 +248,7 @@ function readReleaseFiles() {
     packageLock: readFileSync(resolve(ROOT, PATHS.packageLock), 'utf8'),
     gradle: readFileSync(resolve(ROOT, PATHS.gradle), 'utf8'),
     pbxproj: readFileSync(resolve(ROOT, PATHS.pbxproj), 'utf8'),
+    desktopModule: readFileSync(resolve(ROOT, PATHS.desktopModule), 'utf8'),
     htmlFiles: Object.fromEntries(
       PATHS.htmlFiles.map((path) => [path, readFileSync(resolve(ROOT, path), 'utf8')]),
     ),
@@ -227,6 +260,7 @@ function writeReleaseFiles(plan) {
   writeFileSync(resolve(ROOT, PATHS.packageLock), plan.packageLock);
   writeFileSync(resolve(ROOT, PATHS.gradle), plan.gradle);
   writeFileSync(resolve(ROOT, PATHS.pbxproj), plan.pbxproj);
+  writeFileSync(resolve(ROOT, PATHS.desktopModule), plan.desktopModule);
   for (const [path, html] of Object.entries(plan.htmlFiles)) {
     writeFileSync(resolve(ROOT, path), html);
   }

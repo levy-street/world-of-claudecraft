@@ -94,6 +94,19 @@ export function bagShiftLinks(mode: BagMode): boolean {
   return !mode.vendorOpen;
 }
 
+/** Whether the #bags window is currently shown, from its inline display value.
+ *  Shown = any non-hidden value (#bags is only ever assigned 'flex' today), NOT
+ *  hidden ('none') and NOT the cold-load empty ''. The '' case is the bug (issue
+ *  #1538): the .window stylesheet rule hides the window, so a fresh page load
+ *  leaves the inline display '' (never 'none'). It must read as NOT shown so the
+ *  first toggle OPENS instead of taking the close branch (and playing the close
+ *  sound) against an already-hidden window. Guards on the hidden values rather
+ *  than pinning to a specific shown value (mirroring close() and the closeAll
+ *  precedent), so it stays correct if the shown value ever changes. */
+export function bagsWindowShown(display: string): boolean {
+  return display !== 'none' && display !== '';
+}
+
 /** The tooltip hint sub-line for a bag item, matching the original tooltip's
  *  mode-then-kind branch. Returns '' when no hint applies (e.g. a material). */
 export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipHintKey {

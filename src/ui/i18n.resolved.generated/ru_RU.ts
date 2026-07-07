@@ -1073,18 +1073,6 @@ export const ru_RU: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Крафт",
-      "close": "Закрыть крафт",
-      "craft": "Создать",
-      "reagentsNeeded": "Требуется:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "Известных рецептов пока нет.",
-      "resultAria": "Создать {name}",
-      "craftedToast": "Создано: {name}",
-      "insufficientMaterials": "У вас недостаточно материалов.",
-      "unknownRecipe": "Такого рецепта не существует."
-    },
     "devBadge": {
       "title": "Разработчик",
       "tiers": {
@@ -1228,6 +1216,19 @@ export const ru_RU: EnTranslations = {
       "mining": "Горное дело",
       "logging": "Лесозаготовка",
       "herbalism": "Травничество"
+    },
+    "crafting": {
+      "title": "Крафт",
+      "close": "Закрыть крафт",
+      "craft": "Создать",
+      "reagentsNeeded": "Требуется:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Известных рецептов пока нет.",
+      "resultAria": "Создать {name}",
+      "craftedToast": "Создано: {name}",
+      "insufficientMaterials": "У вас недостаточно материалов.",
+      "unknownRecipe": "Такого рецепта не существует.",
+      "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта."
     }
   },
   "apiError": {

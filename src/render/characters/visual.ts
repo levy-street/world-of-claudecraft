@@ -11,6 +11,7 @@ import {
   type BaseState,
   desiredBaseState,
   locomotionTimeScale,
+  pickProxyHeight,
 } from './anim_state';
 import {
   applyMaterials,
@@ -69,6 +70,9 @@ export class CharacterVisual {
   readonly height: number;
   /** invisible capsule for picking (userData.entityId set by the renderer) */
   readonly clickProxy: THREE.Mesh;
+  /** click-capsule radius (measured body extent); the pick proxy's standing scale.y
+   *  is `height`, collapsed to a flat profile while dead (see enterDeath/revive). */
+  private readonly clickRadius: number;
 
   private def: VisualDef;
   private key: string;
@@ -181,6 +185,7 @@ export class CharacterVisual {
     // capsule from measured body extents — long/wide creatures (wolves,
     // dragons) were nearly unclickable with a height-derived sliver
     const r = prep.clickRadius;
+    this.clickRadius = r;
     this.clickProxy = new THREE.Mesh(clickGeo(), clickMat());
     this.clickProxy.scale.set(r * 2, this.height, r * 2);
     this.clickProxy.visible = false;
@@ -649,6 +654,13 @@ export class CharacterVisual {
     this.deadLock = true;
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
+    // Collapse the upright pick capsule to a flat, ground-hugging profile so a
+    // near-eye click behind or above the now-lying corpse no longer intersects an
+    // invisible standing column (issue 1486). The ground-level footprint stays, so
+    // a lootable corpse remains clickable. Restored in revive(). Set here (not the
+    // per-frame update) since it only changes on the death/revive edge, and this
+    // runs on every enterDeath path including the created-already-dead snapshot.
+    this.clickProxy.scale.y = pickProxyHeight(this.height, this.clickRadius, true);
     const death = this.action(this.def.clips.death);
     if (!death) return;
     const prev = this.current;
@@ -674,6 +686,8 @@ export class CharacterVisual {
     this.deadLock = false;
     this.baseState = 'idle';
     this.currentOneShotIsEmote = false;
+    // Restore the upright pick capsule (the corpse-flatten from enterDeath).
+    this.clickProxy.scale.y = pickProxyHeight(this.height, this.clickRadius, false);
     const death = this.action(this.def.clips.death);
     if (death) death.stop();
     const flourish = this.action(this.def.clips.flourish);

@@ -27,10 +27,10 @@ export interface CraftResultView {
   itemId?: string;
   count?: number;
   quality?: MaterialRarity;
-  reason?: 'unknown_recipe' | 'insufficient_materials';
+  reason?: 'unknown_recipe' | 'insufficient_materials' | 'combo_requirement_unmet';
 }
 
-// The professions read-surface facet (#1164, extended by #1127, #1129). `Sim`
+// The professions read-surface facet (#1164, extended by #1121/#1127/#1129). `Sim`
 // (src/sim/sim.ts `professionsState`/`professionsStateFor`) and `ClientWorld`
 // (src/net/online.ts, mirrored from the `prof` wire delta) both implement
 // this; see src/sim/professions/CLAUDE.md for the settled wire/persistence

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { COMMON_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { COMBO_RECIPES, COMMON_RECIPES, recipeById } from '../src/sim/content/recipes';
 import {
   hasRecipeMaterials,
+  meetsComboRequirement,
   resolveCraft,
   resolveCraftForRecipe,
 } from '../src/sim/professions/crafting';
@@ -197,10 +198,11 @@ describe('craftItem command (#1127)', () => {
     expect(sim.countItem('tough_jerky', pid)).toBe(1);
   });
 
-  it('the IWorld recipeList read surface exposes the common-tier recipe content', () => {
+  it('the IWorld recipeList read surface exposes every recipe, common and combo alike (#1132 review)', () => {
     const sim = makeSim();
-    expect(sim.recipeList.length).toBe(COMMON_RECIPES.length);
-    expect(sim.recipeList.map((r) => r.id).sort()).toEqual(COMMON_RECIPES.map((r) => r.id).sort());
+    const allIds = [...COMMON_RECIPES, ...COMBO_RECIPES].map((r) => r.id).sort();
+    expect(sim.recipeList.length).toBe(COMMON_RECIPES.length + COMBO_RECIPES.length);
+    expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });
 
   it('denies a craft with an error event and leaves lastCraftResult reflecting the denial', () => {
@@ -292,6 +294,108 @@ describe('tiered mastery gating (#1128)', () => {
     resolveCraftForRecipe((highCapSim as any).ctx, highPid, commonRecipe);
     const highMeta = (highCapSim as any).players.get(highPid);
     expect(highMeta.craftSkills.cooking).toBe(101); // still the full floor point
+  });
+});
+
+describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
+  // recipe_ironbound_warplate_helm requires BOTH armorcrafting and
+  // weaponcrafting at tier 1 (skill >= 25): confirmed adjacent via
+  // src/sim/content/professions.ts adjacentCrafts('armorcrafting').
+  const comboRecipe = COMBO_RECIPES.find((r) => r.id === 'recipe_ironbound_warplate_helm')!;
+
+  function setSkill(sim: Sim, pid: number, craftId: string, value: number) {
+    const meta = (sim as any).players.get(pid);
+    meta.craftSkills[craftId] = value;
+  }
+
+  it('every combo recipe carries a comboRequirement naming two crafts and a minTier', () => {
+    expect(COMBO_RECIPES.length).toBeGreaterThanOrEqual(2);
+    for (const recipe of COMBO_RECIPES) {
+      expect(recipe.comboRequirement).toBeDefined();
+      expect(recipe.comboRequirement!.craftA).not.toBe(recipe.comboRequirement!.craftB);
+      expect(recipe.comboRequirement!.minTier).toBeGreaterThan(0);
+    }
+  });
+
+  it('meetsComboRequirement is true with no comboRequirement on the recipe', () => {
+    const commonRecipe = recipeById('recipe_tough_jerky')!;
+    expect(meetsComboRequirement({}, commonRecipe)).toBe(true);
+  });
+
+  it('a player with both required crafts at or above minTier CAN craft the combo recipe', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    setSkill(sim, pid, 'armorcrafting', 25);
+    setSkill(sim, pid, 'weaponcrafting', 25);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
+
+    expect(result.ok).toBe(true);
+    expect(result.itemId).toBe(comboRecipe.resultItemId);
+    expect(sim.countItem(comboRecipe.resultItemId, pid)).toBe(1);
+  });
+
+  it('missing craftB denies the craft even with craftA and an unrelated craft very high', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    setSkill(sim, pid, 'armorcrafting', 100); // craftA very high
+    setSkill(sim, pid, 'weaponcrafting', 0); // craftB missing entirely
+    setSkill(sim, pid, 'cooking', 100); // unrelated craft, also very high
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('combo_requirement_unmet');
+    // Denied with no side effect: reagents untouched, no item granted.
+    expect(sim.countItem('bone_fragments', pid)).toBe(4);
+    expect(sim.countItem('linen_scrap', pid)).toBe(2);
+    expect(sim.countItem(comboRecipe.resultItemId, pid)).toBe(0);
+  });
+
+  it('a player whose only high skill is an unrelated craft cannot craft the combo recipe', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // No skill at all in either required craft; sky-high skill in a third,
+    // unrelated craft never substitutes for either half of the pair.
+    setSkill(sim, pid, 'cooking', 200);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('combo_requirement_unmet');
+  });
+
+  it('one craft below minTier still denies even though the other meets it', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    setSkill(sim, pid, 'armorcrafting', 25); // meets minTier 1
+    setSkill(sim, pid, 'weaponcrafting', 24); // one point short of tier 1
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('combo_requirement_unmet');
+  });
+
+  it('craftItem via the Sim command surface denies a combo recipe missing craftB', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    setSkill(sim, pid, 'armorcrafting', 25);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    sim.craftItem(comboRecipe.id, pid);
+
+    expect(sim.lastCraftResult?.ok).toBe(false);
+    expect(sim.lastCraftResult?.reason).toBe('combo_requirement_unmet');
   });
 });
 

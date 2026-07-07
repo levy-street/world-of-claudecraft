@@ -2103,7 +2103,7 @@ export type SimEvent = { pid?: number } & (
       itemId?: string;
       count?: number;
       quality?: ItemDef['quality'];
-      reason?: 'unknown_recipe' | 'insufficient_materials';
+      reason?: 'unknown_recipe' | 'insufficient_materials' | 'combo_requirement_unmet';
     }
 );
 

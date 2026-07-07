@@ -1073,18 +1073,6 @@ export const pt_BR: EnTranslations = {
         }
       }
     },
-    "crafting": {
-      "title": "Artesanato",
-      "close": "Fechar elaboração",
-      "craft": "Arte",
-      "reagentsNeeded": "Requer:",
-      "reagentLine": "{name}x{have}/{required}",
-      "empty": "Nenhuma receita conhecida ainda.",
-      "resultAria": "Artesanato {name}",
-      "craftedToast": "Feito: {name}",
-      "insufficientMaterials": "Você não tem os materiais para isso.",
-      "unknownRecipe": "Essa receita não existe."
-    },
     "devBadge": {
       "title": "Desenvolvedor",
       "tiers": {
@@ -1228,6 +1216,19 @@ export const pt_BR: EnTranslations = {
       "mining": "Mineração",
       "logging": "Lenharia",
       "herbalism": "Herborismo"
+    },
+    "crafting": {
+      "title": "Artesanato",
+      "close": "Fechar elaboração",
+      "craft": "Arte",
+      "reagentsNeeded": "Requer:",
+      "reagentLine": "{name}x{have}/{required}",
+      "empty": "Nenhuma receita conhecida ainda.",
+      "resultAria": "Artesanato {name}",
+      "craftedToast": "Feito: {name}",
+      "insufficientMaterials": "Você não tem os materiais para isso.",
+      "unknownRecipe": "Essa receita não existe.",
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
     }
   },
   "apiError": {
