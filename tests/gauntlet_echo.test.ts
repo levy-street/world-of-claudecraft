@@ -141,6 +141,25 @@ describe("the Keeper's Echo: rounds and sequences", () => {
     void before; // the new draw MAY coincide by chance; the schedule is the pin
   });
 
+  it('every graded tap is judged to the clicker: green on a hit, red on a miss', () => {
+    const { sim, pid } = reachEcho(21);
+    const ep = reachAnswerWindow(sim, pid);
+    const first = ep.seq[0];
+    const second = ep.seq[1];
+    sim.gauntletEcho(first, pid); // the correct first step
+    let judges = sim.tick().filter((e) => e.type === 'gauntletEchoJudge');
+    expect(judges).toEqual([{ type: 'gauntletEchoJudge', stone: first, ok: true, pid }]);
+    // A wrong stone is judged red (and the miss re-deals the round after it).
+    const wrong = (second + 1) % GAUNTLET.echo.stones;
+    sim.gauntletEcho(wrong, pid);
+    judges = sim.tick().filter((e) => e.type === 'gauntletEchoJudge');
+    expect(judges).toEqual([{ type: 'gauntletEchoJudge', stone: wrong, ok: false, pid }]);
+    // A tap outside the answer window drops silently: never judged.
+    expect(ep.showStartAt).toBeGreaterThan(sim.time); // the re-deal's watch phase lies ahead
+    sim.gauntletEcho(ep.seq[0], pid);
+    expect(sim.tick().filter((e) => e.type === 'gauntletEchoJudge')).toEqual([]);
+  });
+
   it('timing out the answer window is a miss too', () => {
     const { sim, pid } = reachEcho(6);
     const run = sim.gauntletRuns[0]!;

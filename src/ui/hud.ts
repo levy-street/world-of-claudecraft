@@ -10434,6 +10434,13 @@ export class Hud {
           this.renderer.addShake(0.14);
           break;
         }
+        case 'gauntletEchoJudge': {
+          // The sim's verdict for the viewer's own stone tap: the venue
+          // flashes the clicked stone green (correct) or red (a miss).
+          const run = this.sim.gauntletRun;
+          if (run) this.renderer.gauntletEchoJudge(run.originX, run.originZ, ev.stone, ev.ok);
+          break;
+        }
         case 'gauntletPoof': {
           audio.gauntletPoof();
           this.fiestaWordPop(

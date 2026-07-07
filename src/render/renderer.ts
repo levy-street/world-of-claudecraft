@@ -3888,6 +3888,11 @@ export class Renderer {
     this.gauntletVenueAt(ox, oz)?.setSigilCursor(p);
   }
 
+  /** Flash the clicked echo stone with the sim's verdict (green ok, red miss). */
+  gauntletEchoJudge(ox: number, oz: number, stone: number, ok: boolean): void {
+    this.gauntletVenueAt(ox, oz)?.echoJudge(stone, ok);
+  }
+
   /**
    * Raycast the venues' live click targets (the echo table's rune stones)
    * and return the nearest hit id, or null. Only visible targets count, so

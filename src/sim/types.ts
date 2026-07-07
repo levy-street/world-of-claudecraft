@@ -2707,6 +2707,9 @@ export type SimEvent = { pid?: number } & (
   // `gauntletPoof`: a contestant was knocked out at (x, z) (drives the knockout
   // VFX/SFX and the survivor counter). `gauntletEliminated`: YOU were knocked
   // out (the client shows the eliminated overlay + spectator chrome).
+  // `gauntletEchoJudge`: the sim graded YOUR echo stone tap (trial 4); the
+  // client flashes the clicked stone green (`ok`) or red so every click has
+  // visible success/failure feedback.
   // `gauntletPodium`: the run resolved; `won` is whether you took first.
   | {
       type: 'gauntletPhase';
@@ -2722,6 +2725,7 @@ export type SimEvent = { pid?: number } & (
       cause: GauntletDamageCause;
       vitality: number;
     }
+  | { type: 'gauntletEchoJudge'; stone: number; ok: boolean }
   | {
       type: 'gauntletPoof';
       entityId: number;

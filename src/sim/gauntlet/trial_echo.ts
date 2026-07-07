@@ -105,10 +105,15 @@ export function gauntletEchoTap(
   if (!Number.isInteger(stone) || stone < 0 || stone >= t.stones) return;
   const showEndsAt = ep.showStartAt + ep.seq.length * t.stepS;
   if (ctx.time < showEndsAt || ctx.time >= ep.inputEndsAt) return;
+  // Every GRADED tap is judged to the clicker (out-of-window taps above drop
+  // silently, they were never in play): the client flashes the clicked stone
+  // green or red so success and failure both read instantly.
   if (stone !== ep.seq[ep.progress]) {
+    ctx.emit({ type: 'gauntletEchoJudge', stone, ok: false, pid });
     missRound(ctx, run, pid, ep);
     return;
   }
+  ctx.emit({ type: 'gauntletEchoJudge', stone, ok: true, pid });
   ep.progress++;
   if (ep.progress < ep.seq.length) return;
   // Round cleared: the next one grows, or the trial is beaten.

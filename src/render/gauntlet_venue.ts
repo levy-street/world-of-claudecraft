@@ -691,6 +691,10 @@ const ECHO_FLASH = 2.4;
 // A flash lights the stone for this fraction of its step (the gap between
 // flashes is what makes a repeated stone readable).
 const ECHO_FLASH_DUTY = 0.72;
+// The click-verdict flash: the judged stone burns green (a correct tap) or
+// red (a miss) this long, overriding the sequence glow.
+const ECHO_JUDGE_S = 0.4;
+const ECHO_JUDGE_FLASH = 2.6;
 
 // The drum's flash length as the viewer's circle spawns, seconds.
 const DRUM_FLASH_S = 0.12;
@@ -1272,6 +1276,9 @@ export interface GauntletVenueView {
   setSigilCursor(p: { u: number; v: number } | null): void;
   /** The venue's live click targets (the echo rune stones), for pickVenueTarget. */
   pickTargets(): { id: string; object: THREE.Object3D }[];
+  /** Flash the clicked echo stone with its sim-graded verdict: green for a
+   * correct tap, red for a miss (the gauntletEchoJudge event). */
+  echoJudge(stone: number, ok: boolean): void;
   dispose(scene: THREE.Scene): void;
 }
 
@@ -1358,6 +1365,9 @@ export async function buildGauntletVenue(
   let lastEchoKey = 'unset';
   let lastEchoFlashKey = -2;
   let echoAnchored = false;
+  // The click-verdict flash (echoJudge): applied once when set, restored once
+  // on expiry; the sequence-glow writer skips the judged stone while it holds.
+  let echoJudgeState: { stone: number; ok: boolean; until: number; applied: boolean } | null = null;
   return {
     group,
     update(t: number, run: GauntletRunView | null, viewer?: { x: number; y: number; z: number }) {
@@ -1481,6 +1491,22 @@ export async function buildGauntletVenue(
           for (const s of echoRig.stones) s.visible = !echo.done;
         }
       }
+      // The click-verdict flash rides over the sequence glow: applied once
+      // when armed, restored once on expiry (or when the duel ends mid-hold),
+      // with the flash key reset so the glow writer re-asserts afterward.
+      if (echoJudgeState) {
+        const jm = echoRig.stoneMats[echoJudgeState.stone];
+        if (t >= echoJudgeState.until || !echo || echo.done) {
+          jm.emissive.setHex(GLASS_TINT);
+          jm.emissiveIntensity = ECHO_IDLE;
+          echoJudgeState = null;
+          lastEchoFlashKey = -2;
+        } else if (!echoJudgeState.applied) {
+          echoJudgeState.applied = true;
+          jm.emissive.setHex(echoJudgeState.ok ? GREEN_LIGHT : RED_LIGHT);
+          jm.emissiveIntensity = ECHO_JUDGE_FLASH;
+        }
+      }
       if (echo && !echo.done) {
         // Which stone burns right now: step k of the watch phase while inside
         // its flash duty window, else none (idle glow). One int key.
@@ -1491,6 +1517,7 @@ export async function buildGauntletVenue(
         if (flashing !== lastEchoFlashKey) {
           lastEchoFlashKey = flashing;
           for (let k = 0; k < echoRig.stoneMats.length; k++) {
+            if (echoJudgeState?.applied && k === echoJudgeState.stone) continue;
             echoRig.stoneMats[k].emissiveIntensity = k === flashing ? ECHO_FLASH : ECHO_IDLE;
           }
         }
@@ -1513,6 +1540,17 @@ export async function buildGauntletVenue(
     },
     pickTargets() {
       return echoRig.pickList;
+    },
+    echoJudge(stone: number, ok: boolean) {
+      if (stone < 0 || stone >= echoRig.stoneMats.length) return;
+      if (echoJudgeState?.applied) {
+        // A rapid follow-up tap: restore the previous stone before re-arming.
+        const prev = echoRig.stoneMats[echoJudgeState.stone];
+        prev.emissive.setHex(GLASS_TINT);
+        prev.emissiveIntensity = ECHO_IDLE;
+        lastEchoFlashKey = -2;
+      }
+      echoJudgeState = { stone, ok, until: lastT + ECHO_JUDGE_S, applied: false };
     },
     setSigilCursor(p: { u: number; v: number } | null) {
       if (!p) {
