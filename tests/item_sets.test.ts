@@ -120,9 +120,10 @@ describe('aggregateSetBonuses (pure resolver)', () => {
   it('every set definition lists ascending tiers ending at its authored cap', () => {
     for (const set of Object.values(ITEM_SETS)) {
       const pieces = set.bonuses.map((b) => b.pieces);
-      // raid/dungeon families carry 2- and 3-piece tiers; the leveling haste
-      // kits deliberately carry the single 3-piece tier; Mournweave adds a 4-piece proc.
-      const expected = set.id === SET_NECROMANCERS ? '2,3,4' : pieces.length === 1 ? '3' : '2,3';
+      // every epic (raid/dungeon) family carries 2-, 3-, and 4-piece tiers (the
+      // 4-piece is a proc); the leveling haste kits deliberately carry the
+      // single 3-piece tier.
+      const expected = pieces.length === 1 ? '3' : '2,3,4';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });
@@ -138,7 +139,7 @@ describe('item set tooltip model', () => {
       },
     });
     expect(model?.totalPieces).toBe(4);
-    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 3]);
+    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 3, 4]);
   });
 
   it('hides bonus tiers that cannot be reached by the currently authored set pieces', () => {

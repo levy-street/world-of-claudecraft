@@ -238,6 +238,13 @@ const baseEnTable = {
   'aura.feedingFrenzy': 'Feeding Frenzy',
   'aura.demoralized': 'Demoralized',
   'aura.resurrectionSickness': "The Keeper's Toll",
+  // 4-piece set-bonus proc buffs (src/sim/content/item_sets.ts SetProc names).
+  'aura.clearcasting': 'Clearcasting',
+  'aura.gravemight': 'Gravemight',
+  'aura.fangrush': 'Fangrush',
+  'aura.marrowguard': 'Marrowguard',
+  'aura.baredFangs': 'Bared Fangs',
+  'aura.soulblaze': 'Soulblaze',
 } as const;
 
 const petEnTable = {
@@ -1901,6 +1908,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBear': 'Macht des Bären',
   },
   zh_CN: {
+    'aura.clearcasting': '清晰施法',
+    'aura.gravemight': '墓冢之力',
+    'aura.fangrush': '獠牙疾袭',
+    'aura.marrowguard': '骨髓守护',
+    'aura.baredFangs': '獠牙毕露',
+    'aura.soulblaze': '灼魂之焰',
     'groundPickup.supplyCrateDeny': '箱子被钉得严严实实。',
     'groundPickup.gravecallerSigilDeny': '徽记排斥着你的触碰。',
     'groundPickup.ledgerPageDeny': '账页装订得太紧，无法取下。',
@@ -2104,6 +2117,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBear': '巨熊之力',
   },
   zh_TW: {
+    'aura.clearcasting': '清晰施法',
+    'aura.gravemight': '墓塚之力',
+    'aura.fangrush': '獠牙疾襲',
+    'aura.marrowguard': '骨髓守護',
+    'aura.baredFangs': '獠牙畢露',
+    'aura.soulblaze': '灼魂之焰',
     'groundPickup.supplyCrateDeny': '箱子被牢牢釘死了。',
     'groundPickup.gravecallerSigilDeny': '徽記排斥你的觸碰。',
     'groundPickup.ledgerPageDeny': '帳頁裝訂得太緊，無法取下。',
@@ -2307,6 +2326,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBear': '巨熊之力',
   },
   ko_KR: {
+    'aura.clearcasting': '선명한 시전',
+    'aura.gravemight': '무덤의 위력',
+    'aura.fangrush': '송곳니 질주',
+    'aura.marrowguard': '골수 수호',
+    'aura.baredFangs': '드러낸 송곳니',
+    'aura.soulblaze': '영혼의 불길',
     'groundPickup.supplyCrateDeny': '상자는 못질로 굳게 닫혀 있습니다.',
     'groundPickup.gravecallerSigilDeny': '인장이 당신의 손길을 밀어냅니다.',
     'groundPickup.ledgerPageDeny': '장부 페이지가 너무 단단히 묶여 있어 뜯어낼 수 없습니다.',
@@ -2516,6 +2541,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBear': '곰의 힘',
   },
   ja_JP: {
+    'aura.clearcasting': 'クリアキャスティング',
+    'aura.gravemight': 'グレイブマイト',
+    'aura.fangrush': 'ファングラッシュ',
+    'aura.marrowguard': 'マローガード',
+    'aura.baredFangs': '剥き出しの牙',
+    'aura.soulblaze': 'ソウルブレイズ',
     'groundPickup.supplyCrateDeny': '木箱は釘で固く打ち付けられています。',
     'groundPickup.gravecallerSigilDeny': '印章はあなたの手を拒んでいます。',
     'groundPickup.ledgerPageDeny': '帳簿のページは固く綴じられていて、抜き取れません。',
@@ -2942,6 +2973,12 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBear': 'Força do Urso',
   },
   ru_RU: {
+    'aura.clearcasting': 'Ясность',
+    'aura.gravemight': 'Могильная мощь',
+    'aura.fangrush': 'Клыкастый порыв',
+    'aura.marrowguard': 'Костная защита',
+    'aura.baredFangs': 'Оскал',
+    'aura.soulblaze': 'Пламя души',
     'groundPickup.supplyCrateDeny': 'Ящик наглухо заколочен.',
     'groundPickup.gravecallerSigilDeny': 'Сигил отвергает ваше прикосновение.',
     'groundPickup.ledgerPageDeny':
@@ -3824,6 +3861,13 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Feeding Frenzy': 'aura.feedingFrenzy',
   Demoralized: 'aura.demoralized',
   'Resurrection Sickness': 'aura.resurrectionSickness',
+  // 4-piece set-bonus proc buffs (item_sets.ts): shown in the buff frame.
+  Clearcasting: 'aura.clearcasting',
+  Gravemight: 'aura.gravemight',
+  Fangrush: 'aura.fangrush',
+  Marrowguard: 'aura.marrowguard',
+  'Bared Fangs': 'aura.baredFangs',
+  Soulblaze: 'aura.soulblaze',
 };
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];

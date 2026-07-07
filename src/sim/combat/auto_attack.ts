@@ -220,6 +220,9 @@ export function rangedSwing(
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
     ctx.dealDamage(atk, tgt, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+    // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
+    // inside applySetProcs, so proc-less players draw no rng.
+    if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
   });
 }
 
@@ -305,6 +308,10 @@ export function meleeSwing(
     false,
     { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
   );
+  // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
+  // the weaponStrike ability path, which resolves through this shell). Gated on
+  // setProcs inside applySetProcs, so proc-less players draw no rng.
+  if (crit && attacker.kind === 'player') ctx.applySetProcs(attacker, target, 'weaponCrit');
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
