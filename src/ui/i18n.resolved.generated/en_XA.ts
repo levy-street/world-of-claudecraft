@@ -793,6 +793,8 @@ export const en_XA: EnTranslations = {
       "masterOption": "[Ɱášţéŕ Ļóóţéŕ: {name}]"
     },
     "bags": {
+      "cannotDestroy": "[Ţĥíš íţéɱ çáññóţ ƀé ðéšţŕóýéð.]",
+      "rightClickDestroy": "[Ŕíĝĥţ-çļíçķ ţó ðéšţŕóý]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",

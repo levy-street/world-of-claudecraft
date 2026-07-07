@@ -18,6 +18,8 @@ export interface BagItemInfo {
   noMarketList?: boolean;
   /** Truthy when the item has a generic "use" effect (e.g. fishing). */
   use?: unknown;
+  /** Protected from destruction (the sim's discardItem also no-ops these). */
+  noDiscard?: boolean;
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
@@ -105,6 +107,23 @@ export function bagShiftLinks(mode: BagMode): boolean {
  *  precedent), so it stays correct if the shown value ever changes. */
 export function bagsWindowShown(display: string): boolean {
   return display !== 'none' && display !== '';
+}
+
+/** What a right-click (destroy affordance) on a bag item does. 'discard' opens the
+ *  destroy prompt, 'discardBlocked' rejects a protected item with feedback, 'none'
+ *  means the destroy affordance is inert. */
+export type BagDestroyAction = 'discard' | 'discardBlocked' | 'none';
+
+/** Decide the right-click destroy affordance for a bag item. Inert in the
+ *  transactional modes (trade / mail / market / vendor / pet-feed), whose own
+ *  click/contextmenu owns the slot; a noDiscard item is protected with feedback,
+ *  every other item can be destroyed (mirrors the sim's discardItem rule, which
+ *  accepts any non-noDiscard item). Left-click use/equip is unaffected. */
+export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAction {
+  if (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen || mode.petFeed)
+    return 'none';
+  if (item.noDiscard) return 'discardBlocked';
+  return 'discard';
 }
 
 /** The tooltip hint sub-line for a bag item, matching the original tooltip's

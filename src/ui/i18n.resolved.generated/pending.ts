@@ -11,6 +11,8 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -28,6 +30,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -45,6 +49,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -62,6 +68,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -80,6 +88,8 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -97,6 +107,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -130,6 +142,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -151,6 +165,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -178,6 +194,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -195,6 +213,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -212,6 +232,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -229,6 +251,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -246,6 +270,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -263,6 +289,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
@@ -280,6 +308,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.bags.cannotDestroy",
+    "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
     "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
