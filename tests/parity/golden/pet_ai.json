@@ -125,8 +125,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 405,
-      "state": "f30c756e",
-      "events": "934af100",
+      "state": "60887ddc",
+      "events": "1cf9ced6",
       "rng": {
         "draws": 14,
         "digest": "547eb3f4"
@@ -136,7 +136,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 405,
-      "state": "59379fcc",
+      "state": "309e6476",
       "events": "741638a5",
       "rng": {
         "draws": 14,
@@ -147,7 +147,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 405,
-      "state": "7f4989ff",
+      "state": "52c6d1c3",
       "events": "de291d13",
       "rng": {
         "draws": 109,
@@ -158,7 +158,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 405,
-      "state": "d7976f3c",
+      "state": "64565460",
       "events": "741638a5",
       "rng": {
         "draws": 187,
@@ -169,7 +169,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 405,
-      "state": "6a78f0a1",
+      "state": "74c9e625",
       "events": "946ffbd9",
       "rng": {
         "draws": 306,
@@ -180,7 +180,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "5be70d70",
+      "state": "46b42834",
       "events": "741638a5",
       "rng": {
         "draws": 427,
@@ -191,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 405,
-      "state": "d6f46685",
+      "state": "f29ac59f",
       "events": "741638a5",
       "rng": {
         "draws": 427,
@@ -214,7 +214,7 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 26
+            "damageDealt": 20
           },
           "craftSkills": {},
           "delveClears": {},
@@ -464,7 +464,7 @@
           "fiveSecondRule": 99,
           "forcedTargetTimer": -0.05,
           "hostile": true,
-          "hp": 49938,
+          "hp": 49944,
           "id": 404,
           "inCombat": true,
           "kind": "mob",
@@ -501,11 +501,11 @@
           "threat": [
             [
               400,
-              26
+              20
             ],
             [
               403,
-              62
+              56
             ]
           ],
           "weapon": {
@@ -520,7 +520,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 405,
-      "state": "2918e190",
+      "state": "648e8db1",
       "events": "741638a5",
       "rng": {
         "draws": 520,
@@ -531,7 +531,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 405,
-      "state": "1a936b09",
+      "state": "19088700",
       "events": "741638a5",
       "rng": {
         "draws": 641,
@@ -542,7 +542,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "95404b2f",
+      "state": "e29fc3ba",
       "events": "741638a5",
       "rng": {
         "draws": 773,
@@ -553,7 +553,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 405,
-      "state": "95404b2f",
+      "state": "e29fc3ba",
       "events": "741638a5",
       "rng": {
         "draws": 773,
@@ -576,7 +576,7 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 26
+            "damageDealt": 20
           },
           "craftSkills": {},
           "delveClears": {},
@@ -813,7 +813,7 @@
           "fallStartY": 54.397438,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49938,
+          "hp": 49944,
           "id": 404,
           "inCombat": true,
           "kind": "mob",
