@@ -47,8 +47,8 @@ import {
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 
-// How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
-// is handleDeath, so the constant lives here with the death-domain code.
+// Finite unlooted-corpse window for normal slain mobs. Once it expires, the
+// respawn path may clear any loot still on the reused mob entity.
 const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';

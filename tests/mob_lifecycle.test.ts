@@ -17,8 +17,9 @@ import {
   frenzyPackmates,
   respawnMob,
 } from '../src/sim/mob/lifecycle';
+import { updateMob } from '../src/sim/mob/locomotion';
 import { Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import type { Entity, PlayerClass } from '../src/sim/types';
 
 const SEED = 88;
 
@@ -34,6 +35,19 @@ const spawn = (sim: Sim, key: string, level: number, x = 0, z = 0): any => {
   const mob = createMob((sim as any).nextId++, MOBS[key], level, { x, y: 0, z }) as any;
   (sim as any).addEntity(mob);
   return mob;
+};
+
+const loadLootableCorpseState = (mob: Entity, recipientId = 123, harvesterId = 456) => {
+  mob.dead = true;
+  mob.aiState = 'dead';
+  mob.hp = 0;
+  mob.lootable = true;
+  mob.loot = { copper: 17, items: [{ itemId: 'minor_health_potion', count: 1 }] };
+  mob.tappedById = recipientId;
+  mob.lootRecipientIds = [recipientId];
+  mob.harvestClaimedBy = harvesterId;
+  mob.corpseTimer = 0;
+  mob.respawnTimer = 0;
 };
 
 describe('mob_lifecycle module: frenzyPackmates', () => {
@@ -118,6 +132,78 @@ describe('mob_lifecycle module: Death Throes', () => {
 });
 
 describe('mob_lifecycle module: respawnMob + despawnSummonedAdds', () => {
+  it('respawnMob clears corpse loot state from a reused wild mob entity', () => {
+    const sim = makeSim();
+    const mob = spawn(sim, 'forest_wolf', 5, 40, 40);
+    const spawnPos = { ...mob.spawnPos };
+    loadLootableCorpseState(mob);
+    mob.pos = { x: 55, y: mob.pos.y, z: 55 };
+
+    respawnMob(ctxOf(sim), mob);
+
+    expect(mob.dead).toBe(false);
+    expect(mob.lootable).toBe(false);
+    expect(mob.loot).toBe(null);
+    expect(mob.tappedById).toBe(null);
+    expect(mob.lootRecipientIds).toBeUndefined();
+    expect(mob.harvestClaimedBy).toBe(null);
+    expect(mob.hp).toBe(mob.maxHp);
+    expect(mob.aiState).toBe('idle');
+    expect(mob.pos.x).toBe(spawnPos.x);
+    expect(mob.pos.z).toBe(spawnPos.z);
+  });
+
+  it('updateMob does not respawn a lootable corpse before corpse expiry', () => {
+    const sim = makeSim();
+    const mob = spawn(sim, 'forest_wolf', 5, 40, 40);
+    loadLootableCorpseState(mob);
+    mob.corpseTimer = 5;
+
+    updateMob(ctxOf(sim), mob);
+
+    expect(mob.dead).toBe(true);
+    expect(mob.lootable).toBe(true);
+    expect(mob.loot).toEqual({
+      copper: 17,
+      items: [{ itemId: 'minor_health_potion', count: 1 }],
+    });
+  });
+
+  it('updateMob respawns a lootable corpse and expires its loot after corpse expiry', () => {
+    const sim = makeSim();
+    const mob = spawn(sim, 'forest_wolf', 5, 40, 40);
+    loadLootableCorpseState(mob);
+    mob.corpseTimer = 0.01;
+
+    updateMob(ctxOf(sim), mob);
+
+    expect(mob.dead).toBe(false);
+    expect(mob.lootable).toBe(false);
+    expect(mob.loot).toBe(null);
+    expect(mob.tappedById).toBe(null);
+    expect(mob.lootRecipientIds).toBeUndefined();
+    expect(mob.harvestClaimedBy).toBe(null);
+  });
+
+  it('updateMob lets a non-lootable corpse respawn once its respawn timer has elapsed', () => {
+    const sim = makeSim();
+    const mob = spawn(sim, 'forest_wolf', 5, 40, 40);
+    mob.dead = true;
+    mob.aiState = 'dead';
+    mob.hp = 0;
+    mob.lootable = false;
+    mob.loot = null;
+    mob.corpseTimer = 5;
+    mob.respawnTimer = 0;
+
+    updateMob(ctxOf(sim), mob);
+
+    expect(mob.dead).toBe(false);
+    expect(mob.lootable).toBe(false);
+    expect(mob.hp).toBe(mob.maxHp);
+    expect(mob.aiState).toBe('idle');
+  });
+
   it('respawnMob resets a slain wild mob to its spawn point at full hp, idle', () => {
     const sim = makeSim();
     const mob = spawn(sim, 'forest_wolf', 5, 40, 40);

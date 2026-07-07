@@ -42,6 +42,8 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   }
   ctx.clearNonPlayerStatAuras(mob);
   mob.dead = false;
+  // Corpse-decay boundary for reused mob entities: leftover loot rights and
+  // corpse harvest claims end before this entity becomes a fresh live spawn.
   mob.lootable = false;
   mob.loot = null;
   mob.lootRecipientIds = undefined;

@@ -91,6 +91,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     // dungeon mobs stay dead until the instance resets
     const isInstanceMob = mob.spawnPos.x > DUNGEON_X_THRESHOLD;
+    // A lootable corpse blocks in-place respawn only while its corpse window is
+    // active. Once that window expires, uncollected loot expires with the corpse.
     if (!isInstanceMob && mob.respawnTimer <= 0 && (mob.corpseTimer <= 0 || !mob.lootable)) {
       ctx.respawnMob(mob);
     }
