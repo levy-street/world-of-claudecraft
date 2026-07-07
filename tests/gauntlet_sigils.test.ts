@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { GAUNTLET } from '../src/sim/content/gauntlet';
+import { GAUNTLET, GAUNTLET_VENUE, sigilRingAngle } from '../src/sim/content/gauntlet';
 import { type SigilOutline, sigilOutline } from '../src/sim/gauntlet/sigil_shapes';
 import { Sim } from '../src/sim/sim';
 import { DT } from '../src/sim/types';
@@ -140,6 +140,23 @@ describe('sigil trial scoring', () => {
       GAUNTLET.targetSurvivorsPerTrial.length,
       ...savedTargets,
     );
+  });
+
+  it('the NPC field mans the ring lecterns during the trial', () => {
+    const { sim, run } = startTrialSim(31);
+    const { x, z, ring } = GAUNTLET_VENUE.sigils;
+    const npcs = run.contestants.filter((c) => !c.player && c.eliminatedAtTrial === null);
+    expect(npcs.length).toBeGreaterThan(ring.count); // the ring fills, extras rank behind
+    for (let i = 0; i < ring.count; i++) {
+      const e = sim.entities.get(npcs[i].entityId)!;
+      const a = sigilRingAngle(i, ring.count);
+      expect(e.pos.x).toBeCloseTo(run.origin.x + x + Math.sin(a) * (ring.radius + 1.6), 3);
+      expect(e.pos.z).toBeCloseTo(run.origin.z + z + Math.cos(a) * (ring.radius + 1.6), 3);
+    }
+    // the overflow rank stands one step further out at the same station angle
+    const extra = sim.entities.get(npcs[ring.count].entityId)!;
+    const a0 = sigilRingAngle(0, ring.count);
+    expect(extra.pos.x).toBeCloseTo(run.origin.x + x + Math.sin(a0) * (ring.radius + 3.2), 3);
   });
 
   it('a clean, on-path freedraw drag reaches done with no shatter', () => {

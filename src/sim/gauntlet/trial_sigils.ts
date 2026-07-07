@@ -10,9 +10,9 @@
 // geometry is the pure, shared sigil_shapes module; every numeric knob is
 // GAUNTLET.sigils.
 
-import { GAUNTLET, GAUNTLET_VENUE } from '../content/gauntlet';
+import { GAUNTLET, GAUNTLET_VENUE, sigilRingAngle } from '../content/gauntlet';
 import type { SimContext } from '../sim_context';
-import { placeContestantsAt, seatLivePlayersAt } from './contestants';
+import { seatLivePlayersAt } from './contestants';
 import { type SigilOutline, sigilOutline } from './sigil_shapes';
 import type {
   GauntletContestant,
@@ -50,11 +50,33 @@ function lecternSpot(i: number): { x: number; z: number; facing: number } {
   return { x: px, z: pz, facing: Math.atan2(x - px, z - pz) };
 }
 
+// The NPC field mans the cosmetic lectern ring: one etcher per station facing
+// its own slab (and the pavilion center), extras ranked up behind, so the
+// pavilion reads as a working hall rather than a waiting crowd. Direct pos
+// writes, no rng draws.
+function seatNpcsAtRingLecterns(ctx: SimContext, run: GauntletRun): void {
+  const { x, z, ring } = GAUNTLET_VENUE.sigils;
+  const npcs = aliveContestants(run).filter((c) => !c.player);
+  for (let i = 0; i < npcs.length; i++) {
+    const e = ctx.entities.get(npcs[i].entityId);
+    if (!e) continue;
+    const a = sigilRingAngle(i % ring.count, ring.count);
+    const r = ring.radius + 1.6 + Math.floor(i / ring.count) * 1.6;
+    const px = run.origin.x + x + Math.sin(a) * r;
+    const pz = run.origin.z + z + Math.cos(a) * r;
+    e.pos = ctx.groundPos(px, pz);
+    e.prevPos = { ...e.pos };
+    e.facing = Math.atan2(run.origin.x + x - px, run.origin.z + z - pz);
+    ctx.rebucket(e);
+  }
+}
+
 export function startSigils(ctx: SimContext, run: GauntletRun): GauntletSigilsState {
-  // The NPC crowd gathers off the dais; the players are then seated AT the
-  // lectern (and runs.ts pins them there for the trial).
-  placeContestantsAt(ctx, run, GAUNTLET_VENUE.sigils.x, GAUNTLET_VENUE.sigils.z + 14, 10);
+  // Everyone is at a station for this one: the players AT the interactive
+  // lectern (runs.ts pins them there for the trial), the NPC field at the
+  // cosmetic ring lecterns.
   seatLivePlayersAt(ctx, run, (i) => lecternSpot(i));
+  seatNpcsAtRingLecterns(ctx, run);
   const players = new Map<number, GauntletSigilsPlayer>();
   for (const [pid, ps] of run.playerStates) {
     if (ps.spectating) continue;

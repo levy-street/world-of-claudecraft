@@ -139,6 +139,11 @@ export const GAUNTLET_VENUE = {
     x: -44,
     z: 10,
     radius: 10,
+    // The cosmetic lectern ring around the interactive one: the NPC field
+    // mans these stations during the trial (one etcher per lectern, extras
+    // ranked behind). Venue geometry and sim placement share these numbers
+    // plus sigilRingAngle below.
+    ring: { count: 12, radius: 6.5 },
     slab: {
       faceAcross: 2.2, // face width, the etching's x axis (yards)
       faceSlope: 1.6, // face run up the tilt, the etching's y axis
@@ -204,6 +209,16 @@ export const GAUNTLET_VENUE = {
     },
   },
 } as const;
+
+// The i-th ring lectern's angle (the venue's sin/cos convention: position =
+// anchor + (sin a, cos a) * radius). The ring spreads evenly around the dais
+// but skips a wedge at a = PI/2 (+x), keeping the player's approach corridor
+// to the interactive lectern clear. Pure and shared: the venue builds the
+// lecterns and the sim seats the NPC etchers from the same angles.
+export function sigilRingAngle(i: number, count: number): number {
+  const gap = 0.9; // the approach wedge (radians)
+  return Math.PI / 2 + gap / 2 + ((2 * Math.PI - gap) * (i + 0.5)) / count;
+}
 
 export const GAUNTLET: GauntletDef = {
   fieldSize: 30,

@@ -24,7 +24,7 @@
 // run is live the Warden idles and the lamps hold a low amber.
 
 import * as THREE from 'three';
-import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE } from '../sim/content/gauntlet';
+import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE, sigilRingAngle } from '../sim/content/gauntlet';
 import { sigilOutline } from '../sim/gauntlet/sigil_shapes';
 import type { GauntletRunView } from '../sim/types';
 import { loadGltf } from './assets/loader';
@@ -806,14 +806,18 @@ function buildSigilPavilion(group: THREE.Group, ox: number, oz: number): SigilRi
   venueOwnedMats.push(faceMat, tracedMat, paleMat, thinMat);
   buildLectern(group, x, z, 0, faceMat);
 
-  // A cosmetic lectern ring for the NPC field (plain glass, no etching).
+  // The cosmetic lectern ring the NPC field mans during the trial (plain
+  // glass, no etching): stations at the SAME shared angles the sim seats the
+  // etchers from, each slab tilted radially outward toward its etcher.
   const cosmeticFace = surfaceMat({ color: 0x2b3450, roughness: 0.3 });
-  for (const a of [0.9, 2.4, 3.9, 5.4]) {
+  const { ring } = GAUNTLET_VENUE.sigils;
+  for (let i = 0; i < ring.count; i++) {
+    const a = sigilRingAngle(i, ring.count);
     buildLectern(
       group,
-      x + Math.sin(a) * 6.5,
-      z + Math.cos(a) * 6.5,
-      a + Math.PI / 2,
+      x + Math.sin(a) * ring.radius,
+      z + Math.cos(a) * ring.radius,
+      a - Math.PI / 2,
       cosmeticFace,
     );
   }
