@@ -2179,9 +2179,9 @@ async function startGame(
     // click anywhere on the canvas claims the current beat (the venue's drum
     // is the metronome), pre-empting picking entirely.
     if (button === 0 && hud.gauntletPullClick()) return;
-    // Keeper's Wager: clicks on the table's choice stones / held pebbles are
-    // the input; anything off the targets falls through to the normal pick.
-    if (button === 0 && hud.gauntletWagerClick(x, y)) return;
+    // The Keeper's Echo: clicks on the table's rune stones are the input;
+    // anything off the stones falls through to the normal pick.
+    if (button === 0 && hud.gauntletEchoClick(x, y)) return;
     if (hud.isGroundAimActive()) {
       if (button === 2) {
         hud.cancelGroundAim();

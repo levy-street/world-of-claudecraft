@@ -3773,29 +3773,22 @@ export class Hud {
   // The Gauntlet HUD cluster painter (vitality / countdown / chips / light pill),
   // driven per frame from the gauntletRun wire view via gauntletHudModel. All writes
   // route through the shared elided-writer facet, like the other hot painters.
-  private readonly gauntletHudPainter = new GauntletHudPainter(
-    this.writerFacet,
-    {
-      root: $('#gauntlet-hud'),
-      phase: $('#gauntlet-phase'),
-      countdownBar: $('#gauntlet-countdown'),
-      countdownFill: $('#gauntlet-countdown .fill'),
-      countdownTimer: $('#gauntlet-countdown .timer'),
-      survivors: $('#gauntlet-survivors'),
-      prize: $('#gauntlet-prize'),
-      light: $('#gauntlet-light'),
-      hint: $('#gauntlet-hint'),
-      wagerStrip: $('#gauntlet-wager-strip'),
-      wagerLabel: $('#gauntlet-wager-strip .gh-wager-label'),
-      wagerDec: $('#gauntlet-wager-dec'),
-      wagerInc: $('#gauntlet-wager-inc'),
-      wagerStake: $('#gauntlet-wager-stake'),
-      wagerRound: $('#gauntlet-wager-round'),
-      court: $('#gauntlet-court'),
-      courtRole: $('#gauntlet-court-role'),
-    },
-    { onWagerAdjust: (delta) => this.gauntletWagerAdjust(delta) },
-  );
+  private readonly gauntletHudPainter = new GauntletHudPainter(this.writerFacet, {
+    root: $('#gauntlet-hud'),
+    phase: $('#gauntlet-phase'),
+    countdownBar: $('#gauntlet-countdown'),
+    countdownFill: $('#gauntlet-countdown .fill'),
+    countdownTimer: $('#gauntlet-countdown .timer'),
+    survivors: $('#gauntlet-survivors'),
+    prize: $('#gauntlet-prize'),
+    light: $('#gauntlet-light'),
+    hint: $('#gauntlet-hint'),
+    echoStrip: $('#gauntlet-echo-strip'),
+    echoRound: $('#gauntlet-echo-round'),
+    echoClock: $('#gauntlet-echo-clock'),
+    court: $('#gauntlet-court'),
+    courtRole: $('#gauntlet-court-role'),
+  });
   // The in-world sigils stage: while trial 2 is live for a live contestant,
   // updateGauntletHud registers the venue's lectern slab as the world-aim
   // surface (main.ts routes claimed pointer strokes back through onPoint),
@@ -3811,10 +3804,6 @@ export class Hud {
   // Which desk-style trial currently holds the authored camera focus pose
   // (movement trials keep the chase cam and never appear here).
   private gauntletFocusKey: keyof typeof GAUNTLET_VENUE.focus | null = null;
-  // The wager strip's LOCAL stake pick (the wire never projects it; the server
-  // re-clamps every send). Reset to 1 whenever a fresh wager trial opens.
-  private gauntletWagerStake = 1;
-  private gauntletWagerWasLive = false;
   // Edge detector for the court trial's shove-ready ring flash on the rival.
   private gauntletShoveWasReady = false;
   // Wall-clock estimator for the countdown (IWorld exposes no sim clock online); see
@@ -11391,13 +11380,7 @@ export class Hud {
   private updateGauntletHud(): void {
     const run = this.sim.gauntletRun;
     const time = this.gauntletTimeNow();
-    // Reset the local stake pick when a fresh wager trial opens.
-    const wagerLive = !!run?.wager;
-    if (wagerLive && !this.gauntletWagerWasLive) this.gauntletWagerStake = 1;
-    this.gauntletWagerWasLive = wagerLive;
-    this.gauntletHudPainter.paint(
-      gauntletHudModel({ run, time, wagerStake: this.gauntletWagerStake }),
-    );
+    this.gauntletHudPainter.paint(gauntletHudModel({ run, time }));
     // Trials are legs-only (the sim rejects every cast; see casting_lifecycle):
     // the ability rows hide so the bar cannot even suggest pressing one. The
     // frame stack (player frame, xp bar) stays.
@@ -11406,7 +11389,7 @@ export class Hud {
     this.setDisplay(this.actionbar2El, legsOnly ? 'none' : '');
     if (this.gauntletRecruit.isOpen)
       this.gauntletRecruit.update({ eventOpen: this.sim.gauntletOpen, run, time });
-    // Trial input surfaces live in the world (the lectern slab, the wager
+    // Trial input surfaces live in the world (the lectern slab, the echo
     // table); the desk-style trials also hold an authored camera focus pose.
     this.updateGauntletFocus();
     this.updateSigilsStage();
@@ -11437,8 +11420,8 @@ export class Hud {
       ? ('sigils' as const)
       : live?.pull
         ? ('pull' as const)
-        : live?.wager
-          ? ('wager' as const)
+        : live?.echo
+          ? ('echo' as const)
           : null;
     if (key === this.gauntletFocusKey) return;
     this.gauntletFocusKey = key;
@@ -11447,14 +11430,14 @@ export class Hud {
       return;
     }
     const f = GAUNTLET_VENUE.focus[key];
-    // The wager pose slides to the viewer's own duel row: pairs spread along
-    // z, and the sim has already seated the viewer at their mat when the
-    // trial's view member appears.
+    // The echo pose slides to the viewer's own table row: players spread
+    // along z, and the sim has already seated the viewer at their mat when
+    // the trial's view member appears.
     let dz = 0;
-    if (key === 'wager') {
+    if (key === 'echo') {
       const pz = this.sim.player?.pos.z;
       if (pz !== undefined) {
-        const w = GAUNTLET_VENUE.wager;
+        const w = GAUNTLET_VENUE.echo;
         const half = w.size / 2 - 1.5;
         const rowZ = Math.max(w.z - half, Math.min(w.z + half, pz - live.originZ));
         dz = rowZ - w.z;
@@ -11561,35 +11544,18 @@ export class Hud {
     return true;
   }
 
-  /** main.ts handlePick pre-empt: during a live wager round, clicks on the
-   * table's choice stones (guess odd/even) and held pebbles (hide 1..5) are
-   * the input. Returns true when a target consumed the click. */
-  gauntletWagerClick(x: number, y: number): boolean {
+  /** main.ts handlePick pre-empt: during a live echo duel, clicks on the
+   * table's rune stones are the input (the sim only counts them inside the
+   * answer window). Returns true when a stone consumed the click. */
+  gauntletEchoClick(x: number, y: number): boolean {
     const run = this.gauntletContestantRun();
-    const w = run?.wager;
-    if (!w || w.stage === 'done') return false;
+    const e = run?.echo;
+    if (!e || e.done) return false;
     const id = this.renderer.pickVenueTarget(x, y);
-    if (!id) return false;
-    if (id === 'wager:odd' && w.stage === 'guess') this.sim.gauntletWager('guess', 1);
-    else if (id === 'wager:even' && w.stage === 'guess') this.sim.gauntletWager('guess', 0);
-    else if (id.startsWith('wager:hold:') && w.stage === 'hold')
-      this.sim.gauntletWager('hold', Number(id.slice('wager:hold:'.length)));
-    else return false;
+    if (!id || !id.startsWith('echo:')) return false;
+    this.sim.gauntletEcho(Number(id.slice('echo:'.length)));
     triggerHaptic(10, loadHapticsEnabled());
     return true;
-  }
-
-  // Step the wager strip's local stake and send the re-bet (the sim clamps it
-  // authoritatively against both purses).
-  private gauntletWagerAdjust(delta: number): void {
-    const run = this.gauntletContestantRun();
-    const w = run?.wager;
-    if (!w || w.stage === 'done') return;
-    const cap = Math.max(1, Math.min(GAUNTLET.wager.maxWager, w.mine, w.theirs));
-    const next = Math.max(1, Math.min(cap, this.gauntletWagerStake + delta));
-    if (next === this.gauntletWagerStake) return;
-    this.gauntletWagerStake = next;
-    this.sim.gauntletWager('wager', next);
   }
 
   // Fire an on-beat pull: the beat index is derived from the estimated sim time and
@@ -11672,8 +11638,8 @@ export class Hud {
             return t('hudChrome.gauntlet.phaseTrialSigils');
           case 'pull':
             return t('hudChrome.gauntlet.phaseTrialPull');
-          case 'wager':
-            return t('hudChrome.gauntlet.phaseTrialWager');
+          case 'echo':
+            return t('hudChrome.gauntlet.phaseTrialEcho');
           case 'span':
             return t('hudChrome.gauntlet.phaseTrialSpan');
           case 'court':

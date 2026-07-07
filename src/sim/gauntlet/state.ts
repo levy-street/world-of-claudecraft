@@ -110,27 +110,19 @@ export interface GauntletPullState {
   wonBy: 0 | 1 | null;
 }
 
-// Trial 4: one duel per player against a seeded partner (trial_wager.ts).
-export interface GauntletWagerPair {
-  pid: number;
-  partnerName: string;
-  partnerSkill: number;
-  // The cosmetic partner NPC entity seated across the pair's mat (0 once
-  // dropped). Pure theater: the duel logic never reads it.
-  partnerEntityId: number;
-  mine: number;
-  theirs: number;
-  holder: boolean; // the player hides this round
-  stage: 'hold' | 'guess' | 'done';
-  held: number; // marbles hidden by whoever holds
-  wager: number;
-  roundEndsAt: number;
-  finished: boolean;
-  won: boolean;
+// Trial 4: the Keeper's Echo, one memory duel per player (trial_echo.ts).
+export interface GauntletEchoPlayer {
+  round: number; // 0-based current round
+  seq: number[]; // this round's flash sequence (stone indices)
+  showStartAt: number; // absolute; flashes run seq.length * stepS from here
+  inputEndsAt: number; // absolute answer deadline
+  progress: number; // matched steps this round
+  misses: number;
+  done: boolean;
 }
-export interface GauntletWagerState {
-  kind: 'wager';
-  pairs: Map<number, GauntletWagerPair>;
+export interface GauntletEchoState {
+  kind: 'echo';
+  players: Map<number, GauntletEchoPlayer>;
 }
 
 // Trial 5: the shared brittle-panel crossing (trial_span.ts).
@@ -166,7 +158,7 @@ export type GauntletTrialState =
   | GauntletSentinelState
   | GauntletSigilsState
   | GauntletPullState
-  | GauntletWagerState
+  | GauntletEchoState
   | GauntletSpanState
   | GauntletCourtState;
 

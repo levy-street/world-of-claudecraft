@@ -137,8 +137,8 @@ export function gauntletVenueColliders(): Collider[] {
   out.push(circle(P.x, P.z + P.pitHalfZ + 2.8, 1.0));
   out.push(circle(P.x, P.z + P.width / 2 + 1.6, 0.2));
 
-  // The wager courtyard's three walls (the east side is the open entrance).
-  const W = V.wager;
+  // The echo courtyard's three walls (the east side is the open entrance).
+  const W = V.echo;
   out.push(obb(W.x, W.z - W.size / 2, W.size / 2, 0.35));
   out.push(obb(W.x, W.z + W.size / 2, W.size / 2, 0.35));
   out.push(obb(W.x - W.size / 2, W.z, 0.35, W.size / 2));

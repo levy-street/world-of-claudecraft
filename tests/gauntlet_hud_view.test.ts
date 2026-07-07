@@ -23,7 +23,7 @@ function run(over: Partial<GauntletRunView> = {}): GauntletRunView {
     sentinel: { light: 'green', until: 105, fieldLength: 90 },
     sigils: null,
     pull: null,
-    wager: null,
+    echo: null,
     span: null,
     court: null,
     podium: null,
@@ -121,48 +121,40 @@ describe('gauntletHudModel', () => {
     expect(hidden.court).toBeNull();
   });
 
-  const wagerRun = (over: Partial<NonNullable<GauntletRunView['wager']>> = {}) =>
+  // An echo round: 4-step sequence flashing from t=100 (0.7s steps, so the
+  // watch phase ends at 102.8), answers accepted until t=112.
+  const echoRun = (over: Partial<NonNullable<GauntletRunView['echo']>> = {}) =>
     run({
       sentinel: null,
-      wager: {
-        mine: 10,
-        theirs: 10,
-        partnerName: 'Odessa Marshlight',
-        holder: true,
-        stage: 'hold',
-        roundEndsAt: 110,
+      echo: {
+        stones: 4,
+        round: 1,
+        rounds: 5,
+        seq: [0, 2, 1, 3],
+        showStartAt: 100,
+        stepS: 0.7,
+        inputEndsAt: 112,
+        progress: 0,
+        done: false,
         ...over,
       },
     });
 
-  it('shows the wager strip only during a live round', () => {
-    expect(gauntletHudModel({ run: run(), time: 0 }).wager).toBeNull();
-    expect(gauntletHudModel({ run: wagerRun({ stage: 'done' }), time: 0 }).wager).toBeNull();
-    expect(gauntletHudModel({ run: wagerRun(), time: 100 }).wager).not.toBeNull();
+  it('shows the echo strip only during a live duel', () => {
+    expect(gauntletHudModel({ run: run(), time: 0 }).echo).toBeNull();
+    expect(gauntletHudModel({ run: echoRun({ done: true }), time: 100 }).echo).toBeNull();
+    expect(gauntletHudModel({ run: echoRun(), time: 100 }).echo).not.toBeNull();
   });
 
-  it('clamps the local stake against maxWager and both purses', () => {
-    const m = gauntletHudModel({ run: wagerRun(), time: 100, wagerStake: 99 });
-    expect(m.wager?.stake).toBe(GAUNTLET.wager.maxWager);
-    expect(m.wager?.canInc).toBe(false);
-    expect(m.wager?.canDec).toBe(true);
-    const short = gauntletHudModel({
-      run: wagerRun({ theirs: 2 }),
-      time: 100,
-      wagerStake: 4,
-    });
-    expect(short.wager?.stake).toBe(2);
-    const floor = gauntletHudModel({ run: wagerRun(), time: 100, wagerStake: 0 });
-    expect(floor.wager?.stake).toBe(1);
-    expect(floor.wager?.canDec).toBe(false);
-    expect(floor.wager?.canInc).toBe(true);
-  });
-
-  it('derives the round countdown from the absolute deadline', () => {
-    const m = gauntletHudModel({ run: wagerRun({ roundEndsAt: 110 }), time: 101.5 });
-    expect(m.wager?.roundSeconds).toBeCloseTo(8.5, 6);
-    const expired = gauntletHudModel({ run: wagerRun({ roundEndsAt: 110 }), time: 120 });
-    expect(expired.wager?.roundSeconds).toBe(0);
+  it('reports the 1-based round and hides the clock while the stones flash', () => {
+    const watching = gauntletHudModel({ run: echoRun(), time: 101 });
+    expect(watching.echo?.round).toBe(2);
+    expect(watching.echo?.rounds).toBe(5);
+    expect(watching.echo?.answerSeconds).toBeNull();
+    const answering = gauntletHudModel({ run: echoRun(), time: 104 });
+    expect(answering.echo?.answerSeconds).toBeCloseTo(8, 6);
+    const expired = gauntletHudModel({ run: echoRun(), time: 120 });
+    expect(expired.echo?.answerSeconds).toBe(0);
   });
 
   const courtRun = (over: Partial<NonNullable<GauntletRunView['court']>> = {}) =>
@@ -199,20 +191,11 @@ describe('gauntletHudModel', () => {
     expect(gauntletHudModel({ run: courtRun(), time: 0 }).hint).toBe('court');
   });
 
-  it('splits the wager hint by whose turn it is', () => {
-    expect(gauntletHudModel({ run: wagerRun({ stage: 'hold', holder: true }), time: 0 }).hint).toBe(
-      'wagerHold',
-    );
-    expect(
-      gauntletHudModel({ run: wagerRun({ stage: 'guess', holder: false }), time: 0 }).hint,
-    ).toBe('wagerGuess');
-    // Off-turn: the partner acts, the viewer waits, no instruction shows.
-    expect(
-      gauntletHudModel({ run: wagerRun({ stage: 'hold', holder: false }), time: 0 }).hint,
-    ).toBeNull();
-    expect(
-      gauntletHudModel({ run: wagerRun({ stage: 'guess', holder: true }), time: 0 }).hint,
-    ).toBeNull();
+  it('splits the echo hint by phase: watch the flashes, then answer', () => {
+    expect(gauntletHudModel({ run: echoRun(), time: 101 }).hint).toBe('echoWatch');
+    expect(gauntletHudModel({ run: echoRun(), time: 104 }).hint).toBe('echoAnswer');
+    // A finished duel teaches nothing.
+    expect(gauntletHudModel({ run: echoRun({ done: true }), time: 104 }).hint).toBeNull();
   });
 
   it('shows no hint outside a live trial, when spectating, or when finished', () => {

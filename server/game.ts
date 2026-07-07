@@ -4624,11 +4624,10 @@ export class GameServer {
         sim.gauntletPull(beat, pid);
         break;
       }
-      case 'gauntlet_wager': {
-        if (msg.action !== 'hold' && msg.action !== 'guess' && msg.action !== 'wager') break;
-        const n = Number(msg.n);
-        if (!Number.isInteger(n) || n < 0 || n > 100) break;
-        sim.gauntletWager(msg.action, n, pid);
+      case 'gauntlet_echo': {
+        const stone = Number(msg.stone);
+        if (!Number.isInteger(stone) || stone < 0 || stone > 7) break;
+        sim.gauntletEcho(stone, pid);
         break;
       }
       case 'gauntlet_court': {

@@ -11,7 +11,7 @@
 // green and snaps back on red, easing over the telegraph time). Behind the
 // start line: the staging plaza with its ceremonial arch, the three-step
 // podium, and the spectators' deck. West of the field, the five sealed arenas
-// of the future trials (etching pavilion, rope trench, wager courtyard, the
+// of the future trials (etching pavilion, rope lane, echo courtyard, the
 // raised brittle span, the champions' ring), each barred until its trial
 // ships. Everything is procedural geometry + canvas textures except a handful
 // of CC0 GLB set pieces (banners, torches, pillars, arches), which are
@@ -672,42 +672,25 @@ interface PullRig {
   centerZ: number;
 }
 
-// Keeper's Wager table rig: an instanced marble pool split into the two purse
-// piles (driven by the viewer's own wire counts), the floating odd/even choice
-// stones (guess rounds), and the five held pebbles (hold rounds). The stones
-// and pebbles are the trial's click targets, raycast via pickTargets().
-interface WagerRig {
+// The Keeper's Echo table rig: four floating rune stones over the viewer's
+// own table row. During the watch phase each stone in the wire sequence
+// flashes in turn (emissive boost, key-diffed per step); during the answer
+// window all stones glow softly and matched progress dims the tail. The
+// stones are the trial's click targets, raycast via pickTargets().
+interface EchoRig {
   root: THREE.Group;
-  marbles: THREE.InstancedMesh;
-  oddStone: THREE.Group;
-  evenStone: THREE.Group;
-  pebbles: THREE.Mesh[];
+  stones: THREE.Group[];
+  stoneMats: THREE.MeshStandardMaterial[];
   pickList: { id: string; object: THREE.Object3D }[];
   baseZ: number; // the courtyard center row (instance-local)
 }
 
-// Rebuild the two marble piles from the viewer's purse counts: the player's
-// pile by their west mat, the partner's across the table. Event-driven (counts
-// change once per round), never per frame.
-const wagerScratchMatrix = new THREE.Matrix4();
-function layoutWagerMarbles(rig: WagerRig, mine: number, theirs: number): void {
-  const total = Math.min(rig.marbles.instanceMatrix.count, Math.max(0, mine) + Math.max(0, theirs));
-  let i = 0;
-  const place = (count: number, sideX: number) => {
-    for (let k = 0; k < count && i < total; k++, i++) {
-      wagerScratchMatrix.makeTranslation(
-        sideX + Math.floor(k / 5) * (sideX < 0 ? -0.26 : 0.26),
-        0.22,
-        -0.6 + (k % 5) * 0.3,
-      );
-      rig.marbles.setMatrixAt(i, wagerScratchMatrix);
-    }
-  };
-  place(Math.max(0, mine), -2.3);
-  place(Math.max(0, theirs), 2.3);
-  rig.marbles.count = i;
-  rig.marbles.instanceMatrix.needsUpdate = true;
-}
+// The echo stones' idle/flash emissive levels.
+const ECHO_IDLE = 0.25;
+const ECHO_FLASH = 2.4;
+// A flash lights the stone for this fraction of its step (the gap between
+// flashes is what makes a repeated stone readable).
+const ECHO_FLASH_DUTY = 0.72;
 
 // The drum's flash length at each beat, seconds.
 const DRUM_FLASH_S = 0.12;
@@ -973,7 +956,7 @@ function buildTrialArenas(
   spanRig: SpanRig;
   sigilRig: SigilRig;
   pullRig: PullRig;
-  wagerRig: WagerRig;
+  echoRig: EchoRig;
 } {
   const V = GAUNTLET_VENUE;
 
@@ -1066,11 +1049,11 @@ function buildTrialArenas(
     return { knot, rope, drum, drumSkinMat, maxOffset, centerX: x, centerZ: z };
   })();
 
-  // Trial 4, Keeper's Wager: a walled courtyard with two facing wager mats,
-  // plus the live table rig (marble piles, the floating choice stones, the
-  // held-pebble row) anchored to the viewer's own duel row.
-  const wagerRig: WagerRig = (() => {
-    const { x, z, size } = V.wager;
+  // Trial 4, the Keeper's Echo: a walled courtyard; the live rig is a low
+  // stone table with four floating rune stones, anchored to the viewer's own
+  // row. The stones flash the wire sequence and are the click targets.
+  const echoRig: EchoRig = (() => {
+    const { x, z, size } = V.echo;
     groundPlane(
       group,
       size,
@@ -1084,7 +1067,7 @@ function buildTrialArenas(
     box(group, size, 1.6, 0.7, x, 0.8, z - size / 2, wall);
     box(group, size, 1.6, 0.7, x, 0.8, z + size / 2, wall);
     box(group, 0.7, 1.6, size, x - size / 2, 0.8, z, wall);
-    const matA = box(
+    const mat = box(
       group,
       2.6,
       0.12,
@@ -1094,36 +1077,20 @@ function buildTrialArenas(
       z,
       surfaceMat({ color: PURPLE, roughness: 0.9 }),
     );
-    matA.rotation.y = Math.PI / 4;
-    const matB = box(
-      group,
-      2.6,
-      0.12,
-      2.6,
-      x + 3.2,
-      0.12,
-      z,
-      surfaceMat({ color: GOLD, roughness: 0.9 }),
-    );
-    matB.rotation.y = Math.PI / 4;
+    mat.rotation.y = Math.PI / 4;
     placeProp(group, 'bannerGreen', x, 3.2, z + size / 2 - 0.4, Math.PI, 2.2);
 
     // The live rig, all children local to a root the update loop re-anchors to
-    // the viewer's duel row when their trial opens.
+    // the viewer's row when their trial opens.
     const root = new THREE.Group();
     root.position.set(x, 0, z);
     group.add(root);
-    const marbleMat = surfaceMat({ color: GLASS_TINT, roughness: 0.25 });
-    const marbles = new THREE.InstancedMesh(
-      new THREE.SphereGeometry(0.09, 8, 6),
-      marbleMat,
-      GAUNTLET.wager.startingMarbles * 2,
-    );
-    marbles.count = 0;
-    root.add(marbles);
-    // Choice stones for a guess round: dark orbs floating over the table, one
-    // dot for odd, two for even (procedural emboss, no text mesh).
-    const stoneMatDark = surfaceMat({ color: 0x2a3040, roughness: 0.35 });
+    const table = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.9, 3.4), stoneMat(STONE));
+    table.position.set(0.6, 0.45, 0);
+    table.castShadow = true;
+    root.add(table);
+    // Four rune stones in a row across the table, one dot to four dots, each
+    // with its OWN material so a flash lights exactly one.
     const dotMat = new THREE.MeshStandardMaterial({
       color: 0xf3ead2,
       emissive: 0xf3ead2,
@@ -1131,38 +1098,32 @@ function buildTrialArenas(
       roughness: 0.4,
     });
     venueOwnedMats.push(dotMat);
-    const makeStone = (sx: number, dots: number): THREE.Group => {
+    const stones: THREE.Group[] = [];
+    const stoneMats: THREE.MeshStandardMaterial[] = [];
+    for (let k = 0; k < GAUNTLET.echo.stones; k++) {
+      const m = new THREE.MeshStandardMaterial({
+        color: 0x2a3040,
+        emissive: GLASS_TINT,
+        emissiveIntensity: ECHO_IDLE,
+        roughness: 0.35,
+      });
+      venueOwnedMats.push(m);
       const g2 = new THREE.Group();
-      g2.position.set(sx, 1.35, 0);
-      const orb = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 10), stoneMatDark);
+      g2.position.set(0.6, 1.35, -1.35 + k * 0.9);
+      const orb = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 10), m);
       g2.add(orb);
-      for (let d = 0; d < dots; d++) {
-        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), dotMat);
-        dot.position.set(-0.24, dots === 1 ? 0 : d === 0 ? 0.11 : -0.11, 0);
+      for (let d = 0; d <= k; d++) {
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 6), dotMat);
+        dot.position.set(-0.24, (d - k / 2) * 0.12, 0);
         g2.add(dot);
       }
       g2.visible = false;
       root.add(g2);
-      return g2;
-    };
-    const oddStone = makeStone(-0.9, 1);
-    const evenStone = makeStone(0.9, 2);
-    // The hold row: five pebbles lined on the viewer's edge of the table.
-    const pebbleMat = surfaceMat({ color: 0xcfc4a4, roughness: 0.8 });
-    const pebbles: THREE.Mesh[] = [];
-    for (let k = 0; k < 5; k++) {
-      const p = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 6), pebbleMat);
-      p.position.set(-2, 0.3, -1.2 + k * 0.6);
-      p.visible = false;
-      root.add(p);
-      pebbles.push(p);
+      stones.push(g2);
+      stoneMats.push(m);
     }
-    const pickList = [
-      { id: 'wager:odd', object: oddStone as THREE.Object3D },
-      { id: 'wager:even', object: evenStone as THREE.Object3D },
-      ...pebbles.map((p, k) => ({ id: `wager:hold:${k + 1}`, object: p as THREE.Object3D })),
-    ];
-    return { root, marbles, oddStone, evenStone, pebbles, pickList, baseZ: z };
+    const pickList = stones.map((s, k) => ({ id: `echo:${k}`, object: s as THREE.Object3D }));
+    return { root, stones, stoneMats, pickList, baseZ: z };
   })();
 
   // Trial 5, The Brittle Span: paired panels over a dark pit, at ground level
@@ -1285,7 +1246,7 @@ function buildTrialArenas(
     }
     placeProp(group, 'bannerYellow', x, 3.2, z0 - 2, 0, 2.2);
   }
-  return { spanRig, sigilRig, pullRig, wagerRig };
+  return { spanRig, sigilRig, pullRig, echoRig };
 }
 
 // Track venue-created dynamic materials for dispose (surfaceMat ones are
@@ -1313,7 +1274,7 @@ export interface GauntletVenueView {
    * freedraw stroke trail behind it; null hides the mote and clears the trail
    * (stroke end). */
   setSigilCursor(p: { u: number; v: number } | null): void;
-  /** The venue's live click targets (the wager stones/pebbles), for pickVenueTarget. */
+  /** The venue's live click targets (the echo rune stones), for pickVenueTarget. */
   pickTargets(): { id: string; object: THREE.Object3D }[];
   dispose(scene: THREE.Scene): void;
 }
@@ -1368,7 +1329,7 @@ export async function buildGauntletVenue(
   buildStaging(group);
   buildPodium(group, rig.lampMat);
   buildSpectatorDeck(group);
-  const { spanRig, sigilRig, pullRig, wagerRig } = buildTrialArenas(group, ox, oz);
+  const { spanRig, sigilRig, pullRig, echoRig } = buildTrialArenas(group, ox, oz);
   scene.add(group);
   // The venue never moves after build: freeze the whole subtree's matrices
   // (real per-frame CPU on thousands of prop nodes), then re-enable the
@@ -1381,7 +1342,7 @@ export async function buildGauntletVenue(
   pullRig.knot.matrixAutoUpdate = true;
   pullRig.rope.matrixAutoUpdate = true;
   pullRig.drum.matrixAutoUpdate = true;
-  wagerRig.root.matrixAutoUpdate = true;
+  echoRig.root.matrixAutoUpdate = true;
 
   let lastT = 0;
   let headYaw = 0;
@@ -1395,10 +1356,12 @@ export async function buildGauntletVenue(
   // when the trial ends, with zero writes on ordinary idle frames.
   let pullKnotX = 0;
   let pullLayoutDue = true;
-  // Wager rig state: writes are elided on the composed key; the rig anchors to
-  // the viewer's own duel row once per trial (players duel at spread mats).
-  let lastWagerKey = '';
-  let wagerAnchored = false;
+  // Echo rig state: show/anchor writes are elided on the composed round key,
+  // the per-flash emissive on the step key; the rig anchors to the viewer's
+  // own table row once per trial (players sit at spread mats).
+  let lastEchoKey = 'unset';
+  let lastEchoFlashKey = -2;
+  let echoAnchored = false;
   return {
     group,
     update(t: number, run: GauntletRunView | null, viewer?: { x: number; y: number; z: number }) {
@@ -1499,35 +1462,44 @@ export async function buildGauntletVenue(
         // Stay live while the trial runs or the knot is still easing home.
         pullLayoutDue = pull !== null || pullKnotX !== 0;
       }
-      // Keeper's Wager: the marble piles mirror the viewer's own purses, the
-      // choice stones float up on a guess round, the pebble row on a hold
-      // round. Everything is elided on one composed key.
-      const wager = mine?.wager ?? null;
-      const wagerKey = wager ? `${wager.stage}:${wager.mine}:${wager.theirs}` : '';
-      if (wagerKey !== lastWagerKey) {
-        lastWagerKey = wagerKey;
-        if (!wager) {
-          wagerAnchored = false;
-          wagerRig.marbles.count = 0;
-          wagerRig.oddStone.visible = false;
-          wagerRig.evenStone.visible = false;
-          for (const p of wagerRig.pebbles) p.visible = false;
+      // The Keeper's Echo: the stones show/anchor on one composed key, and the
+      // per-flash emissive writes are elided on a step key derived from the
+      // wire's absolute flash schedule (t here tracks sim time).
+      const echo = mine?.echo ?? null;
+      const echoKey = echo ? `${echo.round}:${echo.showStartAt}:${echo.done}` : '';
+      if (echoKey !== lastEchoKey) {
+        lastEchoKey = echoKey;
+        lastEchoFlashKey = -2;
+        if (!echo) {
+          echoAnchored = false;
+          for (const s of echoRig.stones) s.visible = false;
         } else {
           // Anchor once per trial: the sim seats the viewer at their own mat
           // row, so their position IS the row (clamped into the courtyard).
-          if (!wagerAnchored && viewer) {
-            wagerAnchored = true;
-            const half = GAUNTLET_VENUE.wager.size / 2 - 1.5;
+          if (!echoAnchored && viewer) {
+            echoAnchored = true;
+            const half = GAUNTLET_VENUE.echo.size / 2 - 1.5;
             const rowZ = Math.max(
-              wagerRig.baseZ - half,
-              Math.min(wagerRig.baseZ + half, viewer.z - oz),
+              echoRig.baseZ - half,
+              Math.min(echoRig.baseZ + half, viewer.z - oz),
             );
-            wagerRig.root.position.z = rowZ;
+            echoRig.root.position.z = rowZ;
           }
-          layoutWagerMarbles(wagerRig, wager.mine, wager.theirs);
-          wagerRig.oddStone.visible = wager.stage === 'guess';
-          wagerRig.evenStone.visible = wager.stage === 'guess';
-          for (const p of wagerRig.pebbles) p.visible = wager.stage === 'hold';
+          for (const s of echoRig.stones) s.visible = !echo.done;
+        }
+      }
+      if (echo && !echo.done) {
+        // Which stone burns right now: step k of the watch phase while inside
+        // its flash duty window, else none (idle glow). One int key.
+        const step = Math.floor((t - echo.showStartAt) / Math.max(0.01, echo.stepS));
+        const frac = (t - echo.showStartAt) / Math.max(0.01, echo.stepS) - step;
+        const flashing =
+          step >= 0 && step < echo.seq.length && frac < ECHO_FLASH_DUTY ? echo.seq[step] : -1;
+        if (flashing !== lastEchoFlashKey) {
+          lastEchoFlashKey = flashing;
+          for (let k = 0; k < echoRig.stoneMats.length; k++) {
+            echoRig.stoneMats[k].emissiveIntensity = k === flashing ? ECHO_FLASH : ECHO_IDLE;
+          }
         }
       }
       // Head: green = turned away (yaw PI), red = eyes on the field (yaw 0);
@@ -1547,7 +1519,7 @@ export async function buildGauntletVenue(
       return sigilRig.rect;
     },
     pickTargets() {
-      return wagerRig.pickList;
+      return echoRig.pickList;
     },
     setSigilCursor(p: { u: number; v: number } | null) {
       if (!p) {

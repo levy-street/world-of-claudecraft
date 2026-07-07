@@ -21,15 +21,14 @@ import type { GauntletPhase, GauntletRunView } from '../sim/types';
 
 /** Which one-line teaching hint the cluster shows (the painter resolves the
  * matching hudChrome.gauntlet.hint.* key; this core stays i18n-free). The
- * wager splits by whether the viewer ACTS this round: the holder hides on a
- * hold round, the guesser calls odd/even on a guess round; the off-turn
- * player gets no hint. */
+ * echo splits by phase: watch while the stones flash, answer once the input
+ * window opens. */
 export type GauntletHudHint =
   | 'sentinel'
   | 'sigils'
   | 'pull'
-  | 'wagerHold'
-  | 'wagerGuess'
+  | 'echoWatch'
+  | 'echoAnswer'
   | 'span'
   | 'court';
 
@@ -59,17 +58,16 @@ export interface GauntletHudModel {
   /** The sentinel light during the red-light/green-light trial, else null. */
   light: 'green' | 'red' | null;
   showLight: boolean;
-  /** The Keeper's Wager strip during a live wager round, else null. The duel
-   *  itself plays on the table (marbles, stones, pebbles); the strip carries
-   *  only the stake stepper and the round clock. The stake is a LOCAL UI value
-   *  (the wire never projects it; the server re-clamps every send), passed in
-   *  through the input and clamped here against the live purses. */
-  wager: {
-    stake: number;
-    canDec: boolean;
-    canInc: boolean;
-    /** Raw remaining round seconds (the painter ceils + formats). */
-    roundSeconds: number;
+  /** The Keeper's Echo strip during a live duel, else null. The duel itself
+   *  plays on the table (the flashing rune stones); the strip carries only
+   *  the round counter and the answer clock. */
+  echo: {
+    /** 1-based round for display, and the total to clear. */
+    round: number;
+    rounds: number;
+    /** Raw remaining answer seconds once the input window is open, else null
+     *  (the stones are still flashing; the painter hides the clock). */
+    answerSeconds: number | null;
   } | null;
   /** The Final Court role chip during the court trial, else null. The shove
    *  itself is a click on the rival in the world (with a ground-ring ready
@@ -86,31 +84,29 @@ export interface GauntletHudModel {
   podium: { first: string; second: string; third: string } | null;
   /** The per-trial teaching line (how THIS trial is played), or null when the
    *  viewer has nothing to act on: outside a live trial, spectating, already
-   *  finished, or waiting on the wager partner's turn. */
+   *  finished, or between echo rounds. */
   hint: GauntletHudHint | null;
 }
 
-/** The per-frame input: the viewer's run projection and the current sim time,
- * plus the hud-held local stake pick for the wager strip. */
+/** The per-frame input: the viewer's run projection and the current sim time. */
 export interface GauntletHudInput {
   run: GauntletRunView | null;
   time: number;
-  wagerStake?: number;
 }
 
 // The viewer's actionable teaching line, or null when there is nothing to act
 // on. Exactly one trial substate member is non-null during its trial, and the
-// pair-scoped members (sigils/pull/wager/court) are already null for
+// viewer-scoped members (sigils/pull/echo/court) are already null for
 // spectators; the run-wide ones (sentinel/span) are gated by the flags here.
-function hintFor(run: GauntletRunView): GauntletHudHint | null {
+function hintFor(run: GauntletRunView, time: number): GauntletHudHint | null {
   if (run.phase !== 'trial' || run.spectating || run.finished) return null;
   if (run.sentinel) return 'sentinel';
   if (run.sigils) return 'sigils';
   if (run.pull) return 'pull';
-  if (run.wager) {
-    if (run.wager.stage === 'hold' && run.wager.holder) return 'wagerHold';
-    if (run.wager.stage === 'guess' && !run.wager.holder) return 'wagerGuess';
-    return null;
+  if (run.echo) {
+    if (run.echo.done) return null;
+    const showEndsAt = run.echo.showStartAt + run.echo.seq.length * run.echo.stepS;
+    return time < showEndsAt ? 'echoWatch' : 'echoAnswer';
   }
   if (run.span) return 'span';
   if (run.court) return 'court';
@@ -133,7 +129,7 @@ const HIDDEN: GauntletHudModel = {
   prizePool: 0,
   light: null,
   showLight: false,
-  wager: null,
+  echo: null,
   court: null,
   spectating: false,
   finished: false,
@@ -164,8 +160,8 @@ export function gauntletPhaseWindowSeconds(run: GauntletRunView): number {
           return GAUNTLET.sigils.durationS;
         case 'pull':
           return GAUNTLET.pull.durationS;
-        case 'wager':
-          return GAUNTLET.wager.durationS;
+        case 'echo':
+          return GAUNTLET.echo.durationS;
         case 'span':
           return GAUNTLET.span.durationS;
         case 'court':
@@ -185,19 +181,14 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
   const remaining = Math.max(0, run.endsAt - time);
   const window = gauntletPhaseWindowSeconds(run);
   const vitalityFrac = clamp01(run.vitalityMax > 0 ? run.vitality / run.vitalityMax : 0);
-  const wager =
-    run.wager && run.wager.stage !== 'done'
+  const echo =
+    run.echo && !run.echo.done
       ? (() => {
-          const cap = Math.max(
-            1,
-            Math.min(GAUNTLET.wager.maxWager, run.wager.mine, run.wager.theirs),
-          );
-          const stake = Math.max(1, Math.min(cap, Math.floor(input.wagerStake ?? 1)));
+          const showEndsAt = run.echo.showStartAt + run.echo.seq.length * run.echo.stepS;
           return {
-            stake,
-            canDec: stake > 1,
-            canInc: stake < cap,
-            roundSeconds: Math.max(0, run.wager.roundEndsAt - time),
+            round: run.echo.round + 1,
+            rounds: run.echo.rounds,
+            answerSeconds: time >= showEndsAt ? Math.max(0, run.echo.inputEndsAt - time) : null,
           };
         })()
       : null;
@@ -218,11 +209,11 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
     prizePool: run.prizePool,
     light: run.sentinel ? run.sentinel.light : null,
     showLight: run.sentinel !== null,
-    wager,
+    echo,
     court,
     spectating: run.spectating,
     finished: run.finished,
     podium: run.podium,
-    hint: hintFor(run),
+    hint: hintFor(run, time),
   };
 }

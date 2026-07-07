@@ -2751,7 +2751,7 @@ export type GauntletPhase = 'lobby' | 'staging' | 'trial' | 'interlude' | 'podiu
 // out before the contestant resolved.
 export type GauntletDamageCause = 'caught' | 'trial' | 'timeout';
 
-export type GauntletTrialKind = 'sentinel' | 'sigils' | 'pull' | 'wager' | 'span' | 'court';
+export type GauntletTrialKind = 'sentinel' | 'sigils' | 'pull' | 'echo' | 'span' | 'court';
 
 // Trial 1, Sentinel's Crossing (red light / green light). Distances are yards in
 // instance-local coordinates (origin at the staging area), times are seconds.
@@ -2825,15 +2825,20 @@ export interface GauntletPullTuning {
   lossDamage: number; // vitality damage dealt to every loser (big chunk, not death)
 }
 
-// Trial 4, Keeper's Wager: a marble duel against a paired partner. Odd/even
-// rounds under a per-round clock; timeout forfeits the round's wager.
-export interface GauntletWagerTuning {
+// Trial 4, the Keeper's Echo: a memory duel against the Keeper's rune stones.
+// Each round the stones flash a seeded sequence; the player clicks them back
+// in the same order. Rounds grow one step at a time; a wrong stone or a
+// timeout costs vitality and deals a FRESH sequence for the same round;
+// clearing every round finishes the trial.
+export interface GauntletEchoTuning {
   durationS: number;
-  startingMarbles: number;
-  roundS: number; // per-round decision deadline
-  maxWager: number; // wager bounds per round (min is 1)
-  lossDamage: number; // vitality chunk when you hit zero marbles
-  damagePerMarbleShort: number; // timeout damage per marble of deficit
+  stones: number; // rune stones on the table (sequence values are 0..stones-1)
+  rounds: number; // rounds to clear the trial
+  baseLen: number; // round r's sequence length = baseLen + r
+  stepS: number; // seconds per flash during the watch phase
+  inputS: number; // answer window once the flashes end
+  missDamage: number; // vitality per wrong stone or timed-out round
+  damageMax: number; // end-of-trial damage at zero rounds cleared
 }
 
 // Trial 5, The Brittle Span: paired floor panels over the pit; one of each
@@ -2911,13 +2916,18 @@ export interface GauntletRunView {
     winThreshold: number;
     braceUntil: number;
   } | null;
-  wager: {
-    mine: number;
-    theirs: number;
-    partnerName: string;
-    holder: boolean; // the viewer hides the marbles this round
-    stage: 'hold' | 'guess' | 'done';
-    roundEndsAt: number;
+  echo: {
+    stones: number;
+    round: number; // 0-based current round
+    rounds: number; // total rounds to clear
+    // This round's flash sequence (stone indices); the client renders the
+    // flashes from the absolute schedule below, so quiet ticks delta-elide.
+    seq: number[];
+    showStartAt: number; // absolute; flashes run seq.length * stepS from here
+    stepS: number;
+    inputEndsAt: number; // absolute answer deadline
+    progress: number; // matched steps this round
+    done: boolean;
   } | null;
   span: {
     steps: number;
@@ -2960,7 +2970,7 @@ export interface GauntletDef {
   sentinel: GauntletSentinelTuning;
   sigils: GauntletSigilsTuning;
   pull: GauntletPullTuning;
-  wager: GauntletWagerTuning;
+  echo: GauntletEchoTuning;
   span: GauntletSpanTuning;
   court: GauntletCourtTuning;
 }

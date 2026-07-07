@@ -171,8 +171,8 @@ export const GAUNTLET_VENUE = {
     gripSpacing: 1.7, // spacing between grips along the rope
     knotTravel: 10, // rope translation at the win threshold (yards)
   },
-  // Trial 4, Keeper's Wager: a walled dueling courtyard.
-  wager: { x: -44, z: 78, size: 15 },
+  // Trial 4, the Keeper's Echo: a walled courtyard of rune-stone tables.
+  echo: { x: -44, z: 78, size: 15 },
   // Trial 5, The Brittle Span: a raised twin-track bridge over a dark pit.
   span: { x: -76, z: 44, length: 34, deckY: 5 },
   // Trial 6, The Final Court: the champions' ring.
@@ -201,9 +201,9 @@ export const GAUNTLET_VENUE = {
       pos: { x: -44, y: 6.5, z: 58 },
       lookAt: { x: -44, y: 1, z: 44 },
     },
-    // Over the wager table from behind the viewer's west mat: both marble
-    // piles, the choice stones, and the partner across the table in frame.
-    wager: {
+    // Over the echo table from behind the viewer's west mat: all four rune
+    // stones in frame.
+    echo: {
       pos: { x: -51.5, y: 4.6, z: 78 },
       lookAt: { x: -44, y: 1, z: 78 },
     },
@@ -241,7 +241,7 @@ export const GAUNTLET: GauntletDef = {
   targetSurvivorsPerTrial: [14, 8, 4, 2, 2, 1],
   npcSkillMin: 0.25,
   npcSkillMax: 0.95,
-  trials: ['sentinel', 'sigils', 'pull', 'wager', 'span', 'court'],
+  trials: ['sentinel', 'sigils', 'pull', 'echo', 'span', 'court'],
   sentinel: {
     // Playtest verdict (twice): the clock must BITE. 45s on a 90yd field
     // means roughly 25s of green time at the ~55 percent duty cycle, so a
@@ -306,15 +306,15 @@ export const GAUNTLET: GauntletDef = {
     winThreshold: 12,
     lossDamage: 38,
   },
-  wager: {
-    durationS: 120,
-    startingMarbles: 10,
-    roundS: 14,
-    maxWager: 5,
-    // Going broke stays a full elimination (the duel's whole stake); only the
-    // trial-cap deficit toll softened in the all-games damage pass.
-    lossDamage: 100,
-    damagePerMarbleShort: 5,
+  echo: {
+    durationS: 100,
+    stones: 4,
+    rounds: 5,
+    baseLen: 3, // sequences run 3..7 flashes across the five rounds
+    stepS: 0.7,
+    inputS: 10,
+    missDamage: 10,
+    damageMax: 26,
   },
   span: {
     durationS: 100,

@@ -8033,8 +8033,8 @@ export class Sim {
   gauntletPull(beat: number, pid?: number): void {
     gauntletMod.gauntletPull(this.ctx, pid, beat);
   }
-  gauntletWager(action: 'hold' | 'guess' | 'wager', n: number, pid?: number): void {
-    gauntletMod.gauntletWager(this.ctx, pid, action, n);
+  gauntletEcho(stone: number, pid?: number): void {
+    gauntletMod.gauntletEcho(this.ctx, pid, stone);
   }
   gauntletCourt(pid?: number): void {
     gauntletMod.gauntletCourt(this.ctx, pid);

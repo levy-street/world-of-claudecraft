@@ -20,8 +20,6 @@ const LIGHT_RED_CLASS = 'red';
 // Court role state classes (drives the attacker/defender chip color in CSS).
 const ATTACKER_CLASS = 'attacker';
 const DEFENDER_CLASS = 'defender';
-// A stepper at its rail: pointer-events off + dimmed via CSS.
-const DISABLED_CLASS = 'gh-disabled';
 // Bar-fill width precision, matching the cast bar (e.g. "62.5%").
 const PERCENT_FRACTION_DIGITS = 1;
 // Integer formatting for vitality / survivor counts and the whole-second countdown.
@@ -44,10 +42,8 @@ const K = {
   phaseStaging: 'hudChrome.gauntlet.phaseStaging',
   phaseInterlude: 'hudChrome.gauntlet.phaseInterlude',
   phasePodium: 'hudChrome.gauntlet.phasePodium',
-  stake: 'hudChrome.gauntlet.wagerStake',
-  stakeDown: 'hudChrome.gauntlet.stakeDown',
-  stakeUp: 'hudChrome.gauntlet.stakeUp',
-  wagerRound: 'hudChrome.gauntlet.wagerRound',
+  echoRound: 'hudChrome.gauntlet.echoRound',
+  echoSeconds: 'hudChrome.gauntlet.echoSeconds',
   roleAttacker: 'hudChrome.gauntlet.roleAttacker',
   roleDefender: 'hudChrome.gauntlet.roleDefender',
 } satisfies Record<string, TranslationKey>;
@@ -57,8 +53,8 @@ const HINT_KEYS = {
   sentinel: 'hudChrome.gauntlet.hint.sentinel',
   sigils: 'hudChrome.gauntlet.hint.sigils',
   pull: 'hudChrome.gauntlet.hint.pull',
-  wagerHold: 'hudChrome.gauntlet.hint.wagerHold',
-  wagerGuess: 'hudChrome.gauntlet.hint.wagerGuess',
+  echoWatch: 'hudChrome.gauntlet.hint.echoWatch',
+  echoAnswer: 'hudChrome.gauntlet.hint.echoAnswer',
   span: 'hudChrome.gauntlet.hint.span',
   court: 'hudChrome.gauntlet.hint.court',
 } satisfies Record<GauntletHudHint, TranslationKey>;
@@ -83,17 +79,12 @@ export interface GauntletHudElements {
   light: HTMLElement;
   /** The per-trial teaching line under the meta row. */
   hint: HTMLElement;
-  /** The Keeper's Wager strip (shown only during a live wager round). */
-  wagerStrip: HTMLElement;
-  /** The strip's stake label. */
-  wagerLabel: HTMLElement;
-  /** Lower/raise stake stepper buttons. */
-  wagerDec: HTMLElement;
-  wagerInc: HTMLElement;
-  /** The current stake readout chip. */
-  wagerStake: HTMLElement;
-  /** The round countdown chip. */
-  wagerRound: HTMLElement;
+  /** The Keeper's Echo strip (shown only during a live duel). */
+  echoStrip: HTMLElement;
+  /** The "Round N of M" chip. */
+  echoRound: HTMLElement;
+  /** The answer-window countdown chip (hidden while the stones flash). */
+  echoClock: HTMLElement;
   /** The Final Court sub-cluster (shown only during the court trial). */
   court: HTMLElement;
   /** The attacker/defender role chip (the shove itself is a click on the
@@ -101,24 +92,11 @@ export interface GauntletHudElements {
   courtRole: HTMLElement;
 }
 
-/** The Hud glue the interactive controls dispatch through. */
-export interface GauntletHudDeps {
-  /** Step the wager stake by +-1 (Hud clamps and sends the re-bet). */
-  onWagerAdjust(delta: number): void;
-}
-
 export class GauntletHudPainter {
   constructor(
     private readonly writers: PainterHostWriters,
     private readonly el: GauntletHudElements,
-    deps: GauntletHudDeps,
-  ) {
-    // One-time click wiring (the painter is constructed once). The buttons live
-    // inside the pointer-events:none cluster and opt back into pointer events via
-    // CSS; the dispatch is gated Hud-side (stake clamp).
-    this.el.wagerDec.addEventListener('click', () => deps.onWagerAdjust(-1));
-    this.el.wagerInc.addEventListener('click', () => deps.onWagerAdjust(1));
-  }
+  ) {}
 
   paint(model: GauntletHudModel): void {
     const w = this.writers;
@@ -155,29 +133,31 @@ export class GauntletHudPainter {
     w.setDisplay(this.el.hint, model.hint ? SHOWN_BLOCK : HIDDEN);
     if (model.hint) w.setText(this.el.hint, t(HINT_KEYS[model.hint]));
 
-    w.setDisplay(this.el.wagerStrip, model.wager ? SHOWN : HIDDEN);
-    if (model.wager) this.paintWager(model.wager);
+    w.setDisplay(this.el.echoStrip, model.echo ? SHOWN : HIDDEN);
+    if (model.echo) this.paintEcho(model.echo);
 
     w.setDisplay(this.el.court, model.court ? SHOWN : HIDDEN);
     if (model.court) this.paintCourt(model.court);
   }
 
-  private paintWager(wager: NonNullable<GauntletHudModel['wager']>): void {
+  private paintEcho(echo: NonNullable<GauntletHudModel['echo']>): void {
     const w = this.writers;
-    w.setText(this.el.wagerLabel, t(K.stake));
-    w.setText(this.el.wagerStake, formatNumber(wager.stake, INT));
     w.setText(
-      this.el.wagerRound,
-      t(K.wagerRound, { seconds: formatNumber(Math.ceil(wager.roundSeconds), INT) }),
+      this.el.echoRound,
+      t(K.echoRound, {
+        n: formatNumber(echo.round, INT),
+        total: formatNumber(echo.rounds, INT),
+      }),
     );
-    w.setAttr(this.el.wagerDec, 'aria-label', t(K.stakeDown));
-    w.setAttr(this.el.wagerInc, 'aria-label', t(K.stakeUp));
-    // Steppers at their rail: kept focusable, aria-disabled + a class that
-    // drops pointer events (like the shove button's cooldown treatment).
-    w.toggleClass(this.el.wagerDec, DISABLED_CLASS, !wager.canDec);
-    w.setAttr(this.el.wagerDec, 'aria-disabled', wager.canDec ? 'false' : 'true');
-    w.toggleClass(this.el.wagerInc, DISABLED_CLASS, !wager.canInc);
-    w.setAttr(this.el.wagerInc, 'aria-disabled', wager.canInc ? 'false' : 'true');
+    // The clock only runs while the answer window is open (the flashing
+    // stones are the watch phase's whole show).
+    w.setDisplay(this.el.echoClock, echo.answerSeconds !== null ? '' : HIDDEN);
+    if (echo.answerSeconds !== null) {
+      w.setText(
+        this.el.echoClock,
+        t(K.echoSeconds, { seconds: formatNumber(Math.ceil(echo.answerSeconds), INT) }),
+      );
+    }
   }
 
   private paintCourt(court: NonNullable<GauntletHudModel['court']>): void {

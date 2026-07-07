@@ -58,7 +58,7 @@ export const hudChromeStrings = {
     phaseTrial: 'The Crossing begins',
     phaseTrialSigils: 'The etching begins',
     phaseTrialPull: 'Take up the rope',
-    phaseTrialWager: "The Keeper's Wager begins",
+    phaseTrialEcho: "The Keeper's Echo begins",
     phaseTrialSpan: 'The Brittle Span awaits',
     phaseTrialCourt: 'The Final Court is drawn',
     phaseInterlude: 'Trial cleared',
@@ -77,25 +77,24 @@ export const hudChromeStrings = {
     placeSecond: '2nd',
     placeThird: '3rd',
     // Trial chrome remnants: the trials play out IN THE WORLD (the sigil slab,
-    // the rope and drum, the wager table, the rival shove), so only the court
-    // role chip, the shatter announcement, and the wager stake/round strip
-    // keep HUD text. {seconds} is a formatNumber value.
+    // the rope and drum, the echo stones, the rival shove), so only the court
+    // role chip, the shatter announcement, and the echo round strip keep HUD
+    // text. {n}/{total} are formatNumber counts, {seconds} a whole-second
+    // countdown.
     roleAttacker: 'Attacker',
     roleDefender: 'Defender',
     sigilsShattered: 'The pane shattered!',
-    wagerRound: 'Round: {seconds}s',
-    wagerStake: 'Stake',
-    stakeDown: 'Lower the stake',
-    stakeUp: 'Raise the stake',
+    echoRound: 'Round {n} of {total}',
+    echoSeconds: '{seconds}s',
     // The per-trial teaching line: one short sentence on how the live trial
     // is played, shown under the meta row only while the viewer can act
-    // (hidden for spectators, finishers, and the wager's off-turn player).
+    // (hidden for spectators and finishers).
     hint: {
       sentinel: 'Run on green. Freeze on red.',
       sigils: 'Hold the mouse and trace the etched line on the slab.',
       pull: 'Click, tap, or press Space on each drumbeat.',
-      wagerHold: 'Click a pebble to hide that many marbles.',
-      wagerGuess: 'Click a stone: one dot is odd, two dots is even.',
+      echoWatch: 'Watch the stones light up.',
+      echoAnswer: 'Click the stones in the same order.',
       span: 'Cross the glass. Each pair hides one brittle panel.',
       court: 'Click your rival when the ring flashes to shove them out.',
     },

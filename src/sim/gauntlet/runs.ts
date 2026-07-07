@@ -33,6 +33,7 @@ import {
 } from './contestants';
 import type { GauntletRun } from './state';
 import { gauntletCourtShove, startCourt, updateCourt } from './trial_court';
+import { gauntletEchoTap, startEcho, updateEcho } from './trial_echo';
 import { gauntletPullBeat, startPull, updatePull } from './trial_pull';
 import { startSentinel, updateSentinel } from './trial_sentinel';
 import {
@@ -43,7 +44,6 @@ import {
   updateSigils,
 } from './trial_sigils';
 import { startSpan, updateSpan } from './trial_span';
-import { dropWagerPartners, gauntletWagerAct, startWager, updateWager } from './trial_wager';
 import { aliveContestants, eliminateContestant, emitToRunPlayers } from './vitality';
 
 export function gauntletRunForPlayer(ctx: SimContext, pid: number): GauntletRun | null {
@@ -318,10 +318,10 @@ function holdStagedPlayers(ctx: SimContext, run: GauntletRun): void {
 }
 
 // The desk trials play at an apparatus, not on your feet: their input is the
-// slab stroke, the beat click, or the table click, so the player is seated at
+// slab stroke, the beat click, or the stone click, so the player is seated at
 // the station and held there (movement trials stay free).
 function isDeskTrial(kind: string | undefined): boolean {
-  return kind === 'sigils' || kind === 'pull' || kind === 'wager';
+  return kind === 'sigils' || kind === 'pull' || kind === 'echo';
 }
 
 function startTrial(ctx: SimContext, run: GauntletRun): void {
@@ -348,9 +348,9 @@ function startTrial(ctx: SimContext, run: GauntletRun): void {
       run.phaseEndsAt = ctx.time + GAUNTLET.pull.durationS;
       run.trial = startPull(ctx, run);
       break;
-    case 'wager':
-      run.phaseEndsAt = ctx.time + GAUNTLET.wager.durationS;
-      run.trial = startWager(ctx, run);
+    case 'echo':
+      run.phaseEndsAt = ctx.time + GAUNTLET.echo.durationS;
+      run.trial = startEcho(ctx, run);
       break;
     case 'span':
       run.phaseEndsAt = ctx.time + GAUNTLET.span.durationS;
@@ -388,8 +388,8 @@ function updateTrial(ctx: SimContext, run: GauntletRun): boolean {
       return updateSigils(ctx, run, DT);
     case 'pull':
       return updatePull(ctx, run, DT);
-    case 'wager':
-      return updateWager(ctx, run, DT);
+    case 'echo':
+      return updateEcho(ctx, run, DT);
     case 'span':
       return updateSpan(ctx, run, DT);
     case 'court':
@@ -427,17 +427,12 @@ export function gauntletPull(ctx: SimContext, pid: number | undefined, beat: num
   gauntletPullBeat(ctx, run, run.trial, r.meta.entityId, beat);
 }
 
-export function gauntletWager(
-  ctx: SimContext,
-  pid: number | undefined,
-  action: string,
-  n: number,
-): void {
+export function gauntletEcho(ctx: SimContext, pid: number | undefined, stone: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const run = liveTrialFor(ctx, r.meta.entityId);
-  if (!run || run.trial?.kind !== 'wager') return;
-  gauntletWagerAct(ctx, run, run.trial, r.meta.entityId, action, n);
+  if (!run || run.trial?.kind !== 'echo') return;
+  gauntletEchoTap(ctx, run, run.trial, r.meta.entityId, stone);
 }
 
 export function gauntletCourt(ctx: SimContext, pid: number | undefined): void {
@@ -501,9 +496,6 @@ function disposeRun(ctx: SimContext, run: GauntletRun): void {
     if (!c.player && c.entityId !== 0 && ctx.entities.has(c.entityId)) ctx.dropEntity(c.entityId);
   }
   if (run.watcherId !== null && ctx.entities.has(run.watcherId)) ctx.dropEntity(run.watcherId);
-  // A run disposed mid-wager-trial still has cosmetic partner entities seated
-  // at the mats (the watcherId cleanup is the precedent).
-  if (run.trial?.kind === 'wager') dropWagerPartners(ctx, run.trial);
   run.phase = 'done';
   const i = ctx.gauntletRuns.indexOf(run);
   if (i >= 0) ctx.gauntletRuns.splice(i, 1);
@@ -655,17 +647,20 @@ export function gauntletRunWire(ctx: SimContext, pid: number): GauntletRunView |
             braceUntil: trial.braceUntil,
           }
         : null,
-    wager: (() => {
-      if (trial?.kind !== 'wager') return null;
-      const pair = trial.pairs.get(pid);
-      if (!pair) return null;
+    echo: (() => {
+      if (trial?.kind !== 'echo') return null;
+      const ep = trial.players.get(pid);
+      if (!ep) return null;
       return {
-        mine: pair.mine,
-        theirs: pair.theirs,
-        partnerName: pair.partnerName,
-        holder: pair.holder,
-        stage: pair.stage,
-        roundEndsAt: pair.roundEndsAt,
+        stones: GAUNTLET.echo.stones,
+        round: ep.round,
+        rounds: GAUNTLET.echo.rounds,
+        seq: ep.seq,
+        showStartAt: ep.showStartAt,
+        stepS: GAUNTLET.echo.stepS,
+        inputEndsAt: ep.inputEndsAt,
+        progress: ep.progress,
+        done: ep.done,
       };
     })(),
     span: trial?.kind === 'span' ? { steps: GAUNTLET.span.steps, revealed: trial.revealed } : null,

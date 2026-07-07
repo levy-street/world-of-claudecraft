@@ -4689,29 +4689,13 @@
     background: linear-gradient(#4a86c8, #2a5a8a);
   }
 
-  /* ---------- gauntlet wager strip (trial 4) ---------- */
-  /* The stake stepper + round clock row inside the gauntlet cluster; the duel
-     itself plays out on the table (marbles, choice stones, pebbles). */
-  .gh-wager {
+  /* ---------- gauntlet echo strip (trial 4) ---------- */
+  /* The round counter + answer clock row inside the gauntlet cluster; the
+     duel itself plays out on the table (the flashing rune stones). */
+  .gh-echo {
     display: none;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    pointer-events: auto;
-  }
-  .gh-wager-label {
-    font: 700 12px / 18px var(--title-font);
-    letter-spacing: 1px;
-    color: var(--color-text-light);
-  }
-  .gh-wager-btn {
-    min-width: 34px;
-    min-height: 30px;
-    font-size: 16px;
-    line-height: 1;
-  }
-  .gh-wager-btn.gh-disabled {
-    pointer-events: none;
-    filter: grayscale(0.6) brightness(0.7);
   }
 }

@@ -1,5 +1,5 @@
 // Camera focus: glide the chase camera to an authored framing (an in-world
-// minigame surface: the sigil slab, the wager table, the tug trench) and hold
+// minigame surface: the sigil slab, the echo table, the rope lane) and hold
 // it there until released. A pure blend helper the renderer owns: the chase
 // path computes its candidate pose every frame exactly as before, and this
 // mixes it toward the focus pose by an eased 0..1 blend, so both the glide in

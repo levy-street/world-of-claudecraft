@@ -314,7 +314,7 @@ describe('gauntlet sentinel trial', () => {
     expect(sim.gauntletRunWire(pid)!.finished).toBe(true);
 
     // From here the player never plays again. Every later game punishes
-    // idleness on purpose (timeout damage, forfeited wagers, a duel loss), so
+    // idleness on purpose (timeout damage, missed echo rounds), so
     // the player is knocked out somewhere down the line and watches the NPC
     // field thin to a single champion.
     const tail = runToPodium(sim, 20 * 700);
@@ -518,7 +518,7 @@ describe('venue layout envelope', () => {
     };
     inApron(V.sigils.x, V.sigils.z, V.sigils.radius + 4);
     inApron(V.pull.x, V.pull.z, Math.max(V.pull.length, V.pull.width) / 2 + 4);
-    inApron(V.wager.x, V.wager.z, V.wager.size / 2 + 4);
+    inApron(V.echo.x, V.echo.z, V.echo.size / 2 + 4);
     inApron(V.span.x, V.span.z, V.span.length / 2 + 6);
     inApron(V.court.x, V.court.z, V.court.radius + 4);
     // The sentinel field itself (z 0..fieldLength plus the warden past the
@@ -726,15 +726,15 @@ describe('desk-trial station lock', () => {
     expect(e.pos.x).toBeLessThan(run.origin.x + V.x - V.gripStart - 5);
   });
 
-  it('wager holds the player at their mat', () => {
-    spliceTrial('wager');
+  it('echo holds the player at their mat', () => {
+    spliceTrial('echo');
     const sim = makeSim(23);
-    const pid = sim.addPlayer('warrior', 'Better');
+    const pid = sim.addPlayer('warrior', 'Listener');
     openAndJoin(sim, pid);
     advanceTo(sim, 'trial');
     const run = sim.gauntletRuns[0]!;
     const e = sim.entities.get(pid)!;
-    const V = GAUNTLET_VENUE.wager;
+    const V = GAUNTLET_VENUE.echo;
     expect(e.pos.x).toBeCloseTo(run.origin.x + V.x - 3.2, 4); // the west mat
     expect(e.pos.z).toBeCloseTo(run.origin.z + V.z, 4); // a lone pair centers
     expect(driftUnderForward(sim, pid)).toBeLessThan(0.05);
@@ -811,7 +811,7 @@ describe('venue physics: walk ON the platforms, never INSIDE the solids', () => 
   it('venue solids block movement; the open field stays clear', () => {
     const wz = GAUNTLET.sentinel.fieldLength + GAUNTLET_LAYOUT.watcherMargin + 4;
     expect(isBlocked(SEED, o.x, o.z + wz, 0.5)).toBe(true); // the Stone Warden
-    const W = GAUNTLET_VENUE.wager;
+    const W = GAUNTLET_VENUE.echo;
     expect(isBlocked(SEED, o.x + W.x, o.z + W.z + W.size / 2, 0.5)).toBe(true); // courtyard wall
     const P = GAUNTLET_VENUE.pull;
     expect(isBlocked(SEED, o.x + P.x, o.z + P.z + P.pitHalfZ + 2.8, 0.5)).toBe(true); // the drum

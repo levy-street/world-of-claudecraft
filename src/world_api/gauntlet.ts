@@ -25,9 +25,8 @@ export interface IWorldGauntlet {
   gauntletTrace(pts: number[]): void;
   // Pull: claim a beat index (derived client-side from the wire's anchor).
   gauntletPull(beat: number): void;
-  // Wager: 'hold' (hide n marbles), 'guess' (n = 1 odd / 0 even), 'wager'
-  // (stake n on the round).
-  gauntletWager(action: 'hold' | 'guess' | 'wager', n: number): void;
+  // Echo: tap a rune stone (0..stones-1) during the answer window.
+  gauntletEcho(stone: number): void;
   // Court: throw a shove (resolves in contact range, on cooldown).
   gauntletCourt(): void;
 }

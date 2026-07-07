@@ -3889,10 +3889,9 @@ export class Renderer {
   }
 
   /**
-   * Raycast the venues' live click targets (the wager table's choice stones
-   * and held pebbles) and return the nearest hit id, or null. Only visible
-   * targets count, so outside a wager round this is a handful of cheap
-   * bounding checks at most.
+   * Raycast the venues' live click targets (the echo table's rune stones)
+   * and return the nearest hit id, or null. Only visible targets count, so
+   * outside an echo duel this is a handful of cheap bounding checks at most.
    */
   pickVenueTarget(clientX: number, clientY: number): string | null {
     const ndc = this.tmpNdc.set(
@@ -5166,7 +5165,7 @@ export class Renderer {
     for (const castle of this.hodricsCastles.values()) castle.update(this.time);
     // The Gauntlet venue reacts to the viewer's own run: the Warden's gaze and
     // the signal pylons follow the sentinel light state (idle amber otherwise).
-    // The viewer's position anchors the wager table rig to their own duel row.
+    // The viewer's position anchors the echo table rig to their own row.
     for (const venue of this.gauntletVenues.values())
       venue.update(this.time, this.sim.gauntletRun, p.pos);
     worldStart = markWorldPhase('props', worldStart);
