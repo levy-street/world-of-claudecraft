@@ -311,7 +311,15 @@ export const pl_PL: EnTranslations = {
       "nameplates": "Nazwy",
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
-      "toggleHaptics": "Przełącz wibracje"
+      "toggleHaptics": "Przełącz wibracje",
+      "hotbarPage": "Umiejętności",
+      "hotbarPageAria": "Pokaż następny zestaw umiejętności",
+      "actionRing": "Działania bojowe",
+      "actionPageToggle": "Zmień stronę akcji",
+      "actionPageIndicator": "Str. {page}",
+      "targetCycle": "Zmień cel",
+      "targetCycleShort": "Cel",
+      "spellbookPageLabel": "Strona {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Użyj gałki ruchu, aby się poruszać, i przeciągaj ekran, aby się rozglądać. Zrób kilka kroków, by zacząć.",
@@ -418,7 +426,9 @@ export const pl_PL: EnTranslations = {
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
-      "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród"
+      "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
+      "mobileCameraJoystick": "Joystick aparatu",
+      "mobileLeftHanded": "Układ leworęczny"
     },
     "controller": {
       "title": "Kontroler",
@@ -997,6 +1007,7 @@ export const pl_PL: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Core Dev",
         "devs": "Dev",
         "mods": "Mod",
         "artists": "Grafik"

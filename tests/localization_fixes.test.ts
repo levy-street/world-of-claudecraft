@@ -6,6 +6,7 @@ import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i1
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES } from '../src/sim/data';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -63,6 +64,7 @@ const locales: Record<string, any> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,

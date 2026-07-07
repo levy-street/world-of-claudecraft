@@ -47,6 +47,7 @@ import {
   setInterfaceMode,
   useTouchInterface,
 } from './game/mobile_controls';
+import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
 import { createPerfMonitor } from './game/perf';
@@ -422,6 +423,7 @@ function syncBuildInfo(): void {
 
 function syncAppViewport(): void {
   syncAppViewportShared();
+  applyMobileHudLayout();
 }
 
 function preventMobileZoom(): void {
@@ -1107,16 +1109,21 @@ async function startGame(
     gameInputReady,
   }));
 
+  // The ring's attack toggle acquires the nearest attackable enemy when tapped
+  // with no live hostile target (the HUD falls back to plain castSlot(0) until
+  // this is wired); the Target button cycles targets via the Tab path below.
+  hud.onMobileAttackNearest = () => attackNearest();
+
   const mobileControls = new MobileControls(input, {
-    onAttackNearest: () => attackNearest(),
+    onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
-    onTarget: () => world.tabTarget(),
     onInteract: () => interactKey(),
     onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),
     onMenu: () => hud.toggleOptionsMenu(),
     onSocial: () => hud.toggleSocial(),
-    onDiscord: () => toggleDiscordPanel(true),
+    onDiscord: () => openDiscordEntry(),
+    onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onQuestLog: () => hud.toggleQuestLog(),
@@ -1310,6 +1317,12 @@ async function startGame(
     if (key === 'leftHandedTouch') {
       const v = settings.set('leftHandedTouch', !!value);
       document.body.classList.toggle('mobile-left-handed', v);
+      return;
+    }
+    if (key === 'mobileCameraJoystick') {
+      const v = settings.set('mobileCameraJoystick', !!value);
+      document.body.classList.toggle('mobile-camera-joystick-on', v);
+      mobileControls.setCameraJoystickEnabled(v);
       return;
     }
     if (key === 'touchInvertLook') {
@@ -1545,7 +1558,12 @@ async function startGame(
   // the options menu drives logout + key-capture + settings, all of which need
   // refs that only exist now (input/renderer) or are page-level (reload)
   hud.attachOptions({
-    logout: () => location.reload(),
+    logout: () => {
+      // Signal the server to leave immediately, skipping the linkdead grace, so
+      // the character is not held in-world after a deliberate logout.
+      online?.sendLogout();
+      location.reload();
+    },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
     onSettingChange: (key, value) => applySetting(key, value),
@@ -5443,6 +5461,11 @@ function flashWalletError(message: string): void {
 // Discord UI is on unless the native app build disables it.
 const DISCORD_BUILD_ENABLED =
   !NATIVE_APP && String(import.meta.env.VITE_DISCORD_DISABLED ?? '').trim() !== '1';
+// Community links for the mobile More tray. The invite mirrors the hardcoded
+// invite on the shells' community links and is the fallback when the server-fed
+// discordInviteUrl() is not known yet (logged out, offline).
+const DISCORD_INVITE_URL = 'https://discord.gg/GjhnUsBtw';
+const DONATE_URL = 'https://github.com/sponsors/levy-street';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
 
@@ -5714,17 +5737,26 @@ function updateDiscordCtaBanner(): void {
   }
 }
 
-// Show/hide the Discord entry in the mobile "More" tray. Mobile has no keyboard,
-// so the U-key panel toggle is unreachable there; this button is the touch path
-// into the same #discord-window (link / unlink / status). It is only meaningful
-// when Discord is available: the client build enables it, the server has it on,
-// and the player is logged in. Driven off the same status-change signal as the
-// panel, so it tracks login/logout and the server's enabled flag.
+// Show the Discord entry in the mobile "More" tray. Mobile has no keyboard, so
+// the U-key panel toggle is unreachable there; this button is the touch path to
+// Discord. Hidden only when the client build disables Discord entirely (native
+// app / VITE_DISCORD_DISABLED); what a tap opens is decided per-tap in
+// openDiscordEntry, so the entry works logged-out and offline too.
 function syncDiscordMobileEntry(): void {
   const btn = document.getElementById('mobile-discord');
   if (!btn) return;
-  const available = DISCORD_BUILD_ENABLED && discordUiEnabled() && !!api.token;
-  btn.hidden = !available;
+  btn.hidden = !DISCORD_BUILD_ENABLED;
+}
+
+// The More tray's Discord tap: the account panel (link / unlink / status) when
+// it is available (build on, server has Discord on, player logged in), else the
+// community invite in a new tab, mirroring the desktop shell's community link.
+function openDiscordEntry(): void {
+  if (DISCORD_BUILD_ENABLED && discordUiEnabled() && api.token) {
+    toggleDiscordPanel(true);
+    return;
+  }
+  window.open(discordInviteUrl() || DISCORD_INVITE_URL, '_blank', 'noopener,noreferrer');
 }
 
 function wireDiscordCtaBanner(): void {
@@ -5802,6 +5834,9 @@ onDiscordStatusChange(() => {
   syncDiscordMobileEntry();
   if (discordPanelOpen) renderDiscordPanel();
 });
+// Reveal the tray entry at boot: its visibility is a static build fact, not a
+// login-state fact (openDiscordEntry handles the logged-out invite fallback).
+syncDiscordMobileEntry();
 // The Discord panel toggles via the rebindable `discord` keybind action (default
 // U), dispatched through onUiKey above like every other interface window; the
 // build/token guard lives in toggleDiscordPanel.

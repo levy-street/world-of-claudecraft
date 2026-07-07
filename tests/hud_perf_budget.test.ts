@@ -214,6 +214,7 @@ const HOT_PAINTERS: ReadonlyArray<{
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'action_bar_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'auras_painter.ts', allow: { '.className': 3 }, reflowAllow: {} },
   {

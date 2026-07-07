@@ -17,9 +17,10 @@
 // offline, on the server, and in the headless RL env unchanged.
 
 import { recipeById } from '../content/recipes';
+import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type MaterialRarity, rollMaterialRarity } from './gathering';
-import type { ProfessionRecipeRecord } from './types';
+import type { ProfessionReagent, ProfessionRecipeRecord } from './types';
 import { gainCraftSkill, tierCapability, tierForSkill, tierProgressMultiplier } from './wheel';
 
 // One flat craft-skill point per successful common-tier craft (the free-floor
@@ -34,32 +35,68 @@ export interface CraftResult {
   itemId?: string;
   count?: number;
   quality?: MaterialRarity;
+  // #1145: true when at least one consumed reagent had a self-gathered signed
+  // instance (signer === the crafting player's own name) counted toward it,
+  // reducing that reagent's required quantity by one for this craft.
+  selfSignedBonusApplied?: boolean;
   // Present only when !ok: a stable reason code, not player-facing prose (the
   // caller renders/localizes the denial).
   reason?: 'unknown_recipe' | 'insufficient_materials';
 }
 
+// #1145 self-gathered crafting bonus: the chosen bonus is a REDUCED REQUIRED
+// QUANTITY (rather than an item-level/quality lift): one fewer unit of a
+// reagent per craft, for every reagent where the crafter holds at least one
+// signed instance stamped with their OWN name (a rare+ monster material they
+// harvested themselves; see professions/gathering.ts). Reasoning: this module
+// already resolves the materials check as a per-reagent "do I have count N"
+// predicate (hasRecipeMaterials below), so lowering that per-reagent N by one
+// composes directly with the existing check-then-consume flow with no new
+// side channel; an item-level/quality lift would instead have to reach into
+// the SAME rollMaterialRarity call gathering.ts's own comment already flags as
+// informational-only for now (this common-tier crafting.ts caller does not
+// re-roll per-reagent quality). Using someone ELSE's signed material (signer
+// set but not the crafter's own name) is NOT counted here: it behaves exactly
+// like a plain unsigned material, no bonus.
+
+/** Whether `meta` holds an inventory slot for `itemId` carrying a signed
+ *  instance stamped with `meta`'s OWN name (a self-gathered signed material). */
+function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
+  return meta.inventory.some((s) => s.itemId === itemId && s.instance?.signer === meta.name);
+}
+
+/** The quantity of `reagent.itemId` this craft actually requires from `pid`:
+ *  `reagent.count`, minus one (floored at 1, never fully waived, so a
+ *  signed instance is always consumed rather than retained forever) if
+ *  `pid` holds a self-signed instance of that material (#1145 bonus). */
+function requiredCountFor(meta: PlayerMeta | undefined, reagent: ProfessionReagent): number {
+  if (meta && hasSelfSignedInstance(meta, reagent.itemId)) return Math.max(1, reagent.count - 1);
+  return reagent.count;
+}
+
 /** Whether the given player currently holds every reagent a recipe requires,
- *  in the required quantities. Read-only: never mutates inventory. */
+ *  in the required quantities (after the #1145 self-signed bonus reduction,
+ *  if any). Read-only: never mutates inventory. */
 export function hasRecipeMaterials(
   ctx: SimContext,
   recipe: ProfessionRecipeRecord,
   pid: number,
 ): boolean {
-  return recipe.reagents.every((r) => ctx.countItem(r.itemId, pid) >= r.count);
+  const meta = ctx.players.get(pid);
+  return recipe.reagents.every((r) => ctx.countItem(r.itemId, pid) >= requiredCountFor(meta, r));
 }
 
 /** Pure resolution of one craft attempt against an already-resolved recipe
  *  record and player entity id (issue #1128 tiered mastery gating): denies
  *  (no side effect at all) if any reagent is short, partial consumption never
- *  happens. On success, consumes every reagent, rolls the output's quality off
- *  the player's current skill in the recipe's craft, grants the output item,
- *  and grants craft skill scaled by tier mastery: full at or above the
- *  player's tier capability (including always-full for the common tier,
- *  regardless of capability), reduced one tier below, zero two or more tiers
- *  below. Exported separately from `resolveCraft` so tests can exercise the
- *  tier curve against a synthetic recipe without needing higher-tier content
- *  in `content/recipes.ts`. */
+ *  happens. On success, consumes every reagent (at its #1145-adjusted required
+ *  quantity), rolls the output's quality off the player's current skill in the
+ *  recipe's craft, grants the output item, and grants craft skill scaled by
+ *  tier mastery: full at or above the player's tier capability (including
+ *  always-full for the common tier, regardless of capability), reduced one
+ *  tier below, zero two or more tiers below. Exported separately from
+ *  `resolveCraft` so tests can exercise the tier curve against a synthetic
+ *  recipe without needing higher-tier content in `content/recipes.ts`. */
 export function resolveCraftForRecipe(
   ctx: SimContext,
   pid: number,
@@ -68,10 +105,13 @@ export function resolveCraftForRecipe(
   if (!hasRecipeMaterials(ctx, recipe, pid)) {
     return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };
   }
-  for (const reagent of recipe.reagents) {
-    ctx.removeItem(reagent.itemId, reagent.count, pid);
-  }
   const meta = ctx.players.get(pid);
+  let selfSignedBonusApplied = false;
+  for (const reagent of recipe.reagents) {
+    const required = requiredCountFor(meta, reagent);
+    if (required < reagent.count) selfSignedBonusApplied = true;
+    if (required > 0) ctx.removeItem(reagent.itemId, required, pid);
+  }
   const skill = meta ? (meta.craftSkills[recipe.professionId] ?? 0) : 0;
   const quality = rollMaterialRarity(skill, ctx.rng);
   ctx.addItem(recipe.resultItemId, recipe.resultCount, pid);
@@ -87,6 +127,7 @@ export function resolveCraftForRecipe(
     itemId: recipe.resultItemId,
     count: recipe.resultCount,
     quality,
+    selfSignedBonusApplied,
   };
 }
 

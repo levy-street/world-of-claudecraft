@@ -2,6 +2,8 @@
 // (tests/electron_desktop_config.test.ts) type-checks its imports. Keep in sync
 // with the .cjs exports (same convention as shell_guards.d.cts).
 
+import type { UpdateChannel } from './update_guard.cjs';
+
 export type Distribution = 'website' | 'steam';
 
 export interface DesktopConfigInput {
@@ -21,6 +23,7 @@ export interface DesktopConfig {
   distribution: Distribution;
   updaterEnabled: boolean;
   crashSubmitUrl: string;
+  updateChannel: UpdateChannel;
   apiOrigin: string;
   loginOrigin: string;
 }

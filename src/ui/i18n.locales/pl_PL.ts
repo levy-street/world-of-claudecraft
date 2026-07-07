@@ -4667,6 +4667,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Autobieg',
   'hudChrome.mobile.haptics': 'Wibracje',
   'hudChrome.mobile.hapticsOff': 'Wibracje wył.',
+  'hudChrome.mobile.hotbarPage': 'Umiejętności',
+  'hudChrome.mobile.hotbarPageAria': 'Pokaż następny zestaw umiejętności',
   'hudChrome.mobile.jump': 'Skok',
   'hudChrome.mobile.leaderboard': 'Rankingi',
   'hudChrome.mobile.nameplates': 'Nazwy',
@@ -6087,6 +6089,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': 'Craft {name}',
   'hudChrome.crafting.title': 'Rzemiosło',
   'hudChrome.crafting.unknownRecipe': 'Ten przepis nie istnieje.',
+  'hudChrome.mobile.actionPageIndicator': 'Str. {page}',
+  'hudChrome.mobile.actionPageToggle': 'Zmień stronę akcji',
+  'hudChrome.mobile.actionRing': 'Działania bojowe',
+  'hudChrome.mobile.spellbookPageLabel': 'Strona {page}',
+  'hudChrome.mobile.targetCycle': 'Zmień cel',
+  'hudChrome.mobile.targetCycleShort': 'Cel',
+  'hudChrome.options.mobileCameraJoystick': 'Joystick aparatu',
+  'hudChrome.options.mobileLeftHanded': 'Układ leworęczny',
   // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Rzemiosło, które możesz nazwać własnym',
   'entities.quests.q_archetype_acceptance.text':

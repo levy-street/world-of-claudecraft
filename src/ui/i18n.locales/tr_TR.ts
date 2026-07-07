@@ -4642,6 +4642,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Otomatik Koşu',
   'hudChrome.mobile.haptics': 'Dokunsal Geri Bildirim',
   'hudChrome.mobile.hapticsOff': 'Dokunsal Kapalı',
+  'hudChrome.mobile.hotbarPage': 'Yetenekler',
+  'hudChrome.mobile.hotbarPageAria': 'Sonraki yetenek grubunu göster',
   'hudChrome.mobile.jump': 'Zıpla',
   'hudChrome.mobile.leaderboard': 'Sıralama',
   'hudChrome.mobile.nameplates': 'İsimler',
@@ -6050,6 +6052,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': '{name} zanaatı',
   'hudChrome.crafting.title': 'işçiliği',
   'hudChrome.crafting.unknownRecipe': 'O tarif mevcut değil.',
+  'hudChrome.mobile.actionPageIndicator': 'Sayfa {page}',
+  'hudChrome.mobile.actionPageToggle': 'İşlem sayfasını değiştir',
+  'hudChrome.mobile.actionRing': 'Savaş eylemleri',
+  'hudChrome.mobile.spellbookPageLabel': 'Sayfa {page}',
+  'hudChrome.mobile.targetCycle': 'Hedefi değiştir',
+  'hudChrome.mobile.targetCycleShort': 'Hedef',
+  'hudChrome.options.mobileCameraJoystick': "Kamera joystick'i",
+  'hudChrome.options.mobileLeftHanded': 'Solak düzen',
   // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Kendinize Ait Bir Zanaat',
   'entities.quests.q_archetype_acceptance.text':

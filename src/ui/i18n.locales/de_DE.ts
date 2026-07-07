@@ -4151,6 +4151,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Auto-Laufen',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik aus',
+  'hudChrome.mobile.hotbarPage': 'Fähigkeiten',
+  'hudChrome.mobile.hotbarPageAria': 'Nächste Fähigkeitengruppe anzeigen',
   'hudChrome.mobile.jump': 'Springen',
   'hudChrome.mobile.leaderboard': 'Rangliste',
   'hudChrome.mobile.nameplates': 'Namen',
@@ -6207,6 +6209,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': 'Basteln {name}',
   'hudChrome.crafting.title': 'Basteln',
   'hudChrome.crafting.unknownRecipe': 'Dieses Rezept existiert nicht.',
+  'hudChrome.mobile.actionPageIndicator': 'Seite {page}',
+  'hudChrome.mobile.actionPageToggle': 'Aktionsseite wechseln',
+  'hudChrome.mobile.actionRing': 'Kampfhandlungen',
+  'hudChrome.mobile.spellbookPageLabel': 'Seite {page}',
+  'hudChrome.mobile.targetCycle': 'Ziel tauschen',
+  'hudChrome.mobile.targetCycleShort': 'Ziel',
+  'hudChrome.options.mobileCameraJoystick': 'Kamera-Joystick',
+  'hudChrome.options.mobileLeftHanded': 'Linkshänder-Layout',
   // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Ein Handwerk, das Sie Ihr Eigen nennen können',
   'entities.quests.q_archetype_acceptance.text':

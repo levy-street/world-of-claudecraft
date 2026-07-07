@@ -311,7 +311,15 @@ export const ru_RU: EnTranslations = {
       "nameplates": "Имена",
       "haptics": "Вибрация",
       "hapticsOff": "Вибрация выкл.",
-      "toggleHaptics": "Вкл/выкл вибрацию"
+      "toggleHaptics": "Вкл/выкл вибрацию",
+      "hotbarPage": "Навыки",
+      "hotbarPageAria": "Показать следующий набор навыков",
+      "actionRing": "Боевые действия",
+      "actionPageToggle": "Переключить страницу действий",
+      "actionPageIndicator": "Стр. {page}",
+      "targetCycle": "Сменить цель",
+      "targetCycleShort": "Цель",
+      "spellbookPageLabel": "Страница {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -418,7 +426,9 @@ export const ru_RU: EnTranslations = {
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
-      "showDailyRewardsChest": "Показывать сундук ежедневных наград"
+      "showDailyRewardsChest": "Показывать сундук ежедневных наград",
+      "mobileCameraJoystick": "Джойстик камеры",
+      "mobileLeftHanded": "Раскладка для левшей"
     },
     "controller": {
       "title": "Геймпад",
@@ -997,6 +1007,7 @@ export const ru_RU: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Администратор",
+        "coredevs": "Core Dev",
         "devs": "Разработчик",
         "mods": "Модератор",
         "artists": "Художник"

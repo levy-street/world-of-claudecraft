@@ -25,8 +25,9 @@ renderer:
 | `water.ts` · `sky.ts` | per-zone water planes · HDRI sky dome + clouds |
 | `vfx.ts` | pooled `THREE.Points` spell/impact particles (Kenney atlas) |
 | `dungeon.ts` | instanced KayKit interiors from `sim/dungeon_layout.ts` |
+| `door_portal.ts` | dungeon-door / exit-portal bodies (stone arch + additive portal swirl) |
 | `post.ts` | post chain (see below) |
-| `gfx.ts`, `textures.ts`, `render_budget.ts`, `locomotion.ts`, `stealth.ts` | shared helpers (below) |
+| `gfx.ts`, `textures.ts`, `render_budget.ts`, `locomotion.ts`, `stealth.ts`, `shared_resource.ts` | shared helpers (below) |
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives

@@ -4166,6 +4166,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Course automatique',
   'hudChrome.mobile.haptics': 'Vibrations',
   'hudChrome.mobile.hapticsOff': 'Vibrations désactivées',
+  'hudChrome.mobile.hotbarPage': 'Techniques',
+  'hudChrome.mobile.hotbarPageAria': 'Afficher la série de techniques suivante',
   'hudChrome.mobile.jump': 'Sauter',
   'hudChrome.mobile.leaderboard': 'Classement',
   'hudChrome.mobile.nameplates': 'Noms',
@@ -6232,6 +6234,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': 'Artisanat {name}',
   'hudChrome.crafting.title': 'Artisanat',
   'hudChrome.crafting.unknownRecipe': "Cette recette n'existe pas.",
+  'hudChrome.mobile.actionPageIndicator': 'Page {page}',
+  'hudChrome.mobile.actionPageToggle': "Changer de page d'action",
+  'hudChrome.mobile.actionRing': 'Actions de combat',
+  'hudChrome.mobile.spellbookPageLabel': 'Page {page}',
+  'hudChrome.mobile.targetCycle': 'Échanger la cible',
+  'hudChrome.mobile.targetCycleShort': 'Cible',
+  'hudChrome.options.mobileCameraJoystick': 'Manette de caméra',
+  'hudChrome.options.mobileLeftHanded': 'Disposition pour gaucher',
   // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Un métier qui vous appartient',
   'entities.quests.q_archetype_acceptance.text':

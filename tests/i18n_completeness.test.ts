@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -52,6 +53,7 @@ const TABLES: Record<SupportedLanguage, unknown> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,

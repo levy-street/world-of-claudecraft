@@ -311,7 +311,15 @@ export const da_DK: EnTranslations = {
       "nameplates": "Navne",
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",
-      "toggleHaptics": "Slå haptik til/fra"
+      "toggleHaptics": "Slå haptik til/fra",
+      "hotbarPage": "Evner",
+      "hotbarPageAria": "Vis næste sæt evner",
+      "actionRing": "Kamphandlinger",
+      "actionPageToggle": "Skift handlingsside",
+      "actionPageIndicator": "Side {page}",
+      "targetCycle": "Byt mål",
+      "targetCycleShort": "Mål",
+      "spellbookPageLabel": "Side {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -418,7 +426,9 @@ export const da_DK: EnTranslations = {
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
-      "showDailyRewardsChest": "Vis kisten med daglige belønninger"
+      "showDailyRewardsChest": "Vis kisten med daglige belønninger",
+      "mobileCameraJoystick": "Kamera joystick",
+      "mobileLeftHanded": "Venstrehånds layout"
     },
     "controller": {
       "title": "Controller",
@@ -997,6 +1007,7 @@ export const da_DK: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Core Dev",
         "devs": "Udvikler",
         "mods": "Moderator",
         "artists": "Kunstner"

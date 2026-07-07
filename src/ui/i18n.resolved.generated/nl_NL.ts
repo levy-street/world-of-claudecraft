@@ -311,7 +311,15 @@ export const nl_NL: EnTranslations = {
       "nameplates": "Namen",
       "haptics": "Haptiek",
       "hapticsOff": "Haptiek uit",
-      "toggleHaptics": "Haptiek aan/uit"
+      "toggleHaptics": "Haptiek aan/uit",
+      "hotbarPage": "Vaardigheden",
+      "hotbarPageAria": "Toon de volgende set vaardigheden",
+      "actionRing": "Gevechtsacties",
+      "actionPageToggle": "Actiepagina wisselen",
+      "actionPageIndicator": "Pag. {page}",
+      "targetCycle": "Wissel van doel",
+      "targetCycleShort": "Doel",
+      "spellbookPageLabel": "Pagina {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Gebruik de bewegingsstick om te bewegen en sleep over het scherm om rond te kijken. Zet een paar stappen om te beginnen.",
@@ -418,7 +426,9 @@ export const nl_NL: EnTranslations = {
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
-      "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen"
+      "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
+      "mobileCameraJoystick": "Camerajoystick",
+      "mobileLeftHanded": "Linkshandige indeling"
     },
     "controller": {
       "title": "Controller",
@@ -997,6 +1007,7 @@ export const nl_NL: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Core Dev",
         "devs": "Dev",
         "mods": "Mod",
         "artists": "Artiest"

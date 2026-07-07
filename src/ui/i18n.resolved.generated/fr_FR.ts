@@ -311,7 +311,15 @@ export const fr_FR: EnTranslations = {
       "nameplates": "Noms",
       "haptics": "Vibrations",
       "hapticsOff": "Vibrations désactivées",
-      "toggleHaptics": "Activer/désactiver les vibrations"
+      "toggleHaptics": "Activer/désactiver les vibrations",
+      "hotbarPage": "Techniques",
+      "hotbarPageAria": "Afficher la série de techniques suivante",
+      "actionRing": "Actions de combat",
+      "actionPageToggle": "Changer de page d'action",
+      "actionPageIndicator": "Page {page}",
+      "targetCycle": "Échanger la cible",
+      "targetCycleShort": "Cible",
+      "spellbookPageLabel": "Page {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Utilise le joystick de déplacement pour te déplacer et fais glisser l'écran pour regarder autour de toi. Fais quelques pas pour commencer.",
@@ -418,7 +426,9 @@ export const fr_FR: EnTranslations = {
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
-      "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes"
+      "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
+      "mobileCameraJoystick": "Manette de caméra",
+      "mobileLeftHanded": "Disposition pour gaucher"
     },
     "controller": {
       "title": "Manette",
@@ -997,6 +1007,7 @@ export const fr_FR: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Core Dev",
         "devs": "Dév",
         "mods": "Modo",
         "artists": "Artiste"

@@ -250,6 +250,7 @@ function makeCtx() {
     // delveDetectMult stubbed above (C1/M2/C3) - deduped here.
     partyMembersForKey: vi.fn(() => []),
     addItem: vi.fn(),
+    addItemInstance: vi.fn(),
     // removeItem stubbed above (P1b inventory-hub helper) - deduped.
     spawnBossAdds: vi.fn(),
     tradeFor: vi.fn(() => null),

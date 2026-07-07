@@ -47,6 +47,7 @@ import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
+import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
 import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
@@ -88,6 +89,7 @@ import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
+import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
@@ -187,7 +189,6 @@ const SELECTION_RING_SPIN = 0.6; // rad/s — slow classic target-reticle rotati
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const GROUND_AIM_RETICLE_PULSE_HZ = 2;
 const SPARKLE_BOOST = 1.5;
-const PORTAL_BOOST = 2;
 // Third-person camera collision (see updateCamera). Prop colliders marked
 // camGhost are hidden by props.ts/foliage.ts instead; this path is for
 // non-hideable blockers such as large rocks and interior walls.
@@ -672,24 +673,6 @@ function isPersistentPortalObject(e: Entity): boolean {
   return (
     e.kind === 'object' && (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
   );
-}
-
-function markSharedGeometry<T extends THREE.BufferGeometry>(geometry: T): T {
-  geometry.userData.sharedRendererResource = true;
-  return geometry;
-}
-
-function markSharedMaterial<T extends THREE.Material>(material: T): T {
-  material.userData.sharedRendererResource = true;
-  return material;
-}
-
-function isSharedGeometry(geometry: THREE.BufferGeometry): boolean {
-  return geometry.userData.sharedRendererResource === true;
-}
-
-function isSharedMaterial(material: THREE.Material): boolean {
-  return material.userData.sharedRendererResource === true;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -3029,147 +3012,16 @@ export class Renderer {
   // -------------------------------------------------------------------------
 
   // Shared object-view resources: views must not own materials/textures, or
-  // interest churn leaks them (removeView only disposes per-view geometry).
-  private doorStoneMat: THREE.Material | null = null;
-  private doorArchGeo: THREE.BufferGeometry | null = null;
-  private doorKeystoneGeo: THREE.BufferGeometry | null = null;
-  private doorPlinthGeo: THREE.BufferGeometry | null = null;
-  private doorPortalGeo: THREE.BufferGeometry | null = null;
-  private doorNythraxisClickGeo: THREE.BufferGeometry | null = null;
-  private doorNythraxisClickMat: THREE.MeshBasicMaterial | null = null;
-  private doorEntrancePortalMat: THREE.MeshBasicMaterial | null = null;
-  private doorExitPortalMat: THREE.MeshBasicMaterial | null = null;
+  // interest churn leaks them (removeView only disposes per-view geometry). The
+  // dungeon door/portal resources moved to door_portal.ts (same shared tagging).
   private sparkleMat: THREE.SpriteMaterial | null = null;
-
-  private doorStoneMaterial(): THREE.Material {
-    this.doorStoneMat ??= markSharedMaterial(new THREE.MeshLambertMaterial({ color: 0x6a6a72 }));
-    return this.doorStoneMat;
-  }
-
-  private doorArchGeometry(): THREE.BufferGeometry {
-    if (!this.doorArchGeo) {
-      const outer = new THREE.Shape();
-      outer.moveTo(-2.1, 0);
-      outer.lineTo(-2.1, 3.1);
-      outer.quadraticCurveTo(-2.1, 4.85, 0, 5.05);
-      outer.quadraticCurveTo(2.1, 4.85, 2.1, 3.1);
-      outer.lineTo(2.1, 0);
-      outer.closePath();
-      const inner = new THREE.Path();
-      inner.moveTo(-1.3, -0.5);
-      inner.lineTo(-1.3, 2.9);
-      inner.quadraticCurveTo(-1.3, 4.05, 0, 4.22);
-      inner.quadraticCurveTo(1.3, 4.05, 1.3, 2.9);
-      inner.lineTo(1.3, -0.5);
-      inner.closePath();
-      outer.holes.push(inner);
-      const archGeo = new THREE.ExtrudeGeometry(outer, {
-        depth: 0.7,
-        bevelEnabled: true,
-        bevelThickness: 0.07,
-        bevelSize: 0.07,
-        bevelSegments: 1,
-      });
-      archGeo.translate(0, 0, -0.35);
-      this.doorArchGeo = markSharedGeometry(archGeo);
-    }
-    return this.doorArchGeo;
-  }
-
-  private doorKeystoneGeometry(): THREE.BufferGeometry {
-    this.doorKeystoneGeo ??= markSharedGeometry(new THREE.BoxGeometry(0.7, 1.0, 0.95));
-    return this.doorKeystoneGeo;
-  }
-
-  private doorPlinthGeometry(): THREE.BufferGeometry {
-    this.doorPlinthGeo ??= markSharedGeometry(new THREE.BoxGeometry(1.15, 0.7, 1.15));
-    return this.doorPlinthGeo;
-  }
-
-  private doorPortalGeometry(): THREE.BufferGeometry {
-    this.doorPortalGeo ??= markSharedGeometry(new THREE.CircleGeometry(1.55, 24));
-    return this.doorPortalGeo;
-  }
-
-  private doorNythraxisClickGeometry(): THREE.BufferGeometry {
-    this.doorNythraxisClickGeo ??= markSharedGeometry(new THREE.BoxGeometry(4.6, 4.2, 2.4));
-    return this.doorNythraxisClickGeo;
-  }
-
-  private doorNythraxisClickMaterial(): THREE.MeshBasicMaterial {
-    this.doorNythraxisClickMat ??= markSharedMaterial(
-      new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        opacity: 0.001,
-        depthWrite: false,
-      }),
-    );
-    return this.doorNythraxisClickMat;
-  }
-
-  private doorPortalMaterial(entering: boolean): THREE.MeshBasicMaterial {
-    const tint = entering ? 0x9a5df0 : 0x6ab8ff;
-    const existing = entering ? this.doorEntrancePortalMat : this.doorExitPortalMat;
-    if (existing) return existing;
-    const material = markSharedMaterial(
-      new THREE.MeshBasicMaterial({
-        color: tint,
-        transparent: true,
-        opacity: 0.55,
-        side: THREE.DoubleSide,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      }),
-    );
-    if (!this.lowGfx) material.color.multiplyScalar(PORTAL_BOOST);
-    if (entering) this.doorEntrancePortalMat = material;
-    else this.doorExitPortalMat = material;
-    return material;
-  }
-
-  private buildDoorBody(
-    entering: boolean,
-    dungeonId?: string | null,
-  ): { body: THREE.Group; portal?: THREE.Mesh } {
-    const body = new THREE.Group();
-    if (entering && dungeonId === 'nythraxis_crypt') {
-      const clickBox = new THREE.Mesh(
-        this.doorNythraxisClickGeometry(),
-        this.doorNythraxisClickMaterial(),
-      );
-      clickBox.position.y = 2.1;
-      body.add(clickBox);
-      return { body };
-    }
-
-    const stone = this.doorStoneMaterial();
-    const arch = new THREE.Mesh(this.doorArchGeometry(), stone);
-    arch.castShadow = true;
-    body.add(arch);
-    const keystone = new THREE.Mesh(this.doorKeystoneGeometry(), stone);
-    keystone.position.set(0, 4.75, 0);
-    keystone.castShadow = true;
-    body.add(keystone);
-    for (const sx of [-1.7, 1.7]) {
-      const plinth = new THREE.Mesh(this.doorPlinthGeometry(), stone);
-      plinth.position.set(sx, 0.35, 0);
-      plinth.castShadow = true;
-      body.add(plinth);
-    }
-    const portal = new THREE.Mesh(this.doorPortalGeometry(), this.doorPortalMaterial(entering));
-    portal.position.y = 2.15;
-    portal.scale.set(1, 1.35, 1);
-    body.add(portal);
-    return { body, portal };
-  }
 
   private buildDoorPrewarmGroup(): THREE.Group {
     const group = new THREE.Group();
-    const entrance = this.buildDoorBody(true).body;
+    const entrance = buildDoorBody(true, null, this.lowGfx).body;
     entrance.position.x = -3;
     group.add(entrance);
-    const exit = this.buildDoorBody(false).body;
+    const exit = buildDoorBody(false, null, this.lowGfx).body;
     exit.position.x = 3;
     group.add(exit);
     const p = this.sim.player;
@@ -3196,7 +3048,7 @@ export class Renderer {
       (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
     ) {
       const entering = e.templateId === 'dungeon_door';
-      const built = this.buildDoorBody(entering, e.dungeonId);
+      const built = buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;
       portal = built.portal;
       height = 4.6;

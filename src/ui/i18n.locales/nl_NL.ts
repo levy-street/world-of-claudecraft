@@ -4697,6 +4697,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Autoloop',
   'hudChrome.mobile.haptics': 'Haptiek',
   'hudChrome.mobile.hapticsOff': 'Haptiek uit',
+  'hudChrome.mobile.hotbarPage': 'Vaardigheden',
+  'hudChrome.mobile.hotbarPageAria': 'Toon de volgende set vaardigheden',
   'hudChrome.mobile.jump': 'Springen',
   'hudChrome.mobile.leaderboard': 'Ranglijst',
   'hudChrome.mobile.nameplates': 'Namen',
@@ -6134,6 +6136,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': 'Ambacht {name}',
   'hudChrome.crafting.title': 'Knutselen',
   'hudChrome.crafting.unknownRecipe': 'Dat recept bestaat niet.',
+  'hudChrome.mobile.actionPageIndicator': 'Pag. {page}',
+  'hudChrome.mobile.actionPageToggle': 'Actiepagina wisselen',
+  'hudChrome.mobile.actionRing': 'Gevechtsacties',
+  'hudChrome.mobile.spellbookPageLabel': 'Pagina {page}',
+  'hudChrome.mobile.targetCycle': 'Wissel van doel',
+  'hudChrome.mobile.targetCycleShort': 'Doel',
+  'hudChrome.options.mobileCameraJoystick': 'Camerajoystick',
+  'hudChrome.options.mobileLeftHanded': 'Linkshandige indeling',
   // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Een ambacht dat u het uwe kunt noemen',
   'entities.quests.q_archetype_acceptance.text':

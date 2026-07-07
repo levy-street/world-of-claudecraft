@@ -311,7 +311,15 @@ export const ko_KR: EnTranslations = {
       "nameplates": "이름표",
       "haptics": "진동",
       "hapticsOff": "진동 꺼짐",
-      "toggleHaptics": "진동 전환"
+      "toggleHaptics": "진동 전환",
+      "hotbarPage": "스킬",
+      "hotbarPageAria": "다음 스킬 세트 표시",
+      "actionRing": "전투 행동",
+      "actionPageToggle": "행동 페이지 전환",
+      "actionPageIndicator": "{page}페이지",
+      "targetCycle": "대상 전환",
+      "targetCycleShort": "대상",
+      "spellbookPageLabel": "페이지 {page}"
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -418,7 +426,9 @@ export const ko_KR: EnTranslations = {
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
-      "showDailyRewardsChest": "일일 보상 보물상자 표시"
+      "showDailyRewardsChest": "일일 보상 보물상자 표시",
+      "mobileCameraJoystick": "카메라 조이스틱",
+      "mobileLeftHanded": "왼손잡이 레이아웃"
     },
     "controller": {
       "title": "컨트롤러",
@@ -997,6 +1007,7 @@ export const ko_KR: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "관리자",
+        "coredevs": "Core Dev",
         "devs": "개발자",
         "mods": "운영자",
         "artists": "아티스트"

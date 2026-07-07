@@ -110,6 +110,7 @@ const LANGUAGE_ENDONYMS: Record<SupportedLanguage, string> = {
   ja_JP: '日本語',
   pt_BR: 'Português (Brasil)',
   ru_RU: 'Русский',
+  cs_CZ: 'Čeština',
   nl_NL: 'Nederlands',
   pl_PL: 'Polski',
   id_ID: 'Bahasa Indonesia',
@@ -311,32 +312,58 @@ export class OptionsWindow {
     switch (this.view) {
       case 'keybinds':
         this.renderKeybinds();
-        return;
+        break;
       case 'graphics':
         this.renderGraphics();
-        return;
+        break;
       case 'audio':
         this.renderAudio();
-        return;
+        break;
       case 'interface':
         this.renderInterface();
-        return;
+        break;
       case 'controller':
         this.renderController();
-        return;
+        break;
       case 'performance':
         this.renderPerformance();
-        return;
+        break;
       case 'bugreport':
         this.renderBugReport();
-        return;
+        break;
       default:
         this.renderMain();
     }
+    // Every panelTitle() sub-view carries a [data-back] control in its title
+    // bar; wire it once here so a new sub-view cannot forget it. The main menu
+    // renders none (this no-ops) and Performance wires its own back listener in
+    // buildTitle (it rerender()s internally, which would drop a listener added
+    // here).
+    el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());
+  }
+
+  // Return to the Game Menu root without closing the window. The title-bar back
+  // control and every footer Back button route here: on mobile especially,
+  // close-then-reopen (More, Menu, sub-panel again) was three taps for what this
+  // does in one. Focus moves to the menu's first entry because the control that
+  // had focus is destroyed by the re-render.
+  private goBack(): void {
+    audio.click();
+    this.view = 'main';
+    this.capturingKey = null;
+    this.keybindNote = '';
+    this.render();
+    this.deps.focusFirstInteractive(this.deps.root());
   }
 
   private panelTitle(title: string): string {
-    return `<div class="panel-title"><span id="options-title">${esc(title)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    // Sub-views get a back control at the inline start of the title bar; the
+    // main menu is the root, so it renders only the close button.
+    const back =
+      this.view === 'main'
+        ? ''
+        : `<button type="button" class="x-btn back-btn" data-back aria-label="${esc(t('hud.options.back'))}" title="${esc(t('hud.options.back'))}">${svgIcon('prev')}</button>`;
+    return `<div class="panel-title">${back}<span id="options-title">${esc(title)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
   }
 
   private renderMain(): void {
@@ -634,11 +661,7 @@ export class OptionsWindow {
     const back = document.createElement('button');
     back.className = 'btn';
     back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => {
-      audio.click();
-      this.view = 'main';
-      this.render();
-    });
+    back.addEventListener('click', () => this.goBack());
     el.append(reset, back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
   }
@@ -958,11 +981,7 @@ export class OptionsWindow {
     const back = document.createElement('button');
     back.className = 'btn';
     back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => {
-      audio.click();
-      this.view = 'main';
-      this.render();
-    });
+    back.addEventListener('click', () => this.goBack());
     el.appendChild(back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
   }
@@ -985,11 +1004,9 @@ export class OptionsWindow {
       setShowFps: (on) => hooks.onSettingChange('showFps', on),
       click: () => audio.click(),
       onClose: () => this.close(),
-      onBack: () => {
-        this.view = 'main';
-        this.render();
-      },
+      onBack: () => this.goBack(),
       closeIconHtml: svgIcon('close'),
+      backIconHtml: svgIcon('prev'),
     };
   }
 
@@ -1090,11 +1107,7 @@ export class OptionsWindow {
     back.className = 'btn';
     back.type = 'button';
     back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => {
-      audio.click();
-      this.view = 'main';
-      this.render();
-    });
+    back.addEventListener('click', () => this.goBack());
     actions.append(submit, back);
     body.appendChild(actions);
 
@@ -1417,12 +1430,7 @@ export class OptionsWindow {
     const back = document.createElement('button');
     back.className = 'btn';
     back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => {
-      audio.click();
-      this.view = 'main';
-      this.capturingKey = null;
-      this.render();
-    });
+    back.addEventListener('click', () => this.goBack());
     el.append(reset, back);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
   }

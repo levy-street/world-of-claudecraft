@@ -28,12 +28,37 @@ endpoint. The updater runs only for a PACKAGED WEBSITE build; there is deliberat
 no way to force it on in a Steam build. To try either channel unpacked, set
 `WOC_DISTRIBUTION=website|steam` on `npm run electron:dev`.
 
+Update tracks (prod/dev split): the publish channel is derived from the baked
+`apiOrigin` by one rule shared between build and runtime
+(`electron/update_guard.cjs`). A build baked with the production origin publishes
+and reads the `latest` channel (`latest-mac.yml`, `latest.yml`,
+`latest-linux*.yml`); a build baked with ANY other origin (dev, staging, a
+localhost smoke pack) publishes and reads the `dev` channel (`dev-mac.yml` and
+friends), which production installs never request. Three layers keep the tracks
+apart: the build throws if the production channel is requested for a
+non-production origin (`scripts/electron-builder-config.mjs`); every emitted feed
+file is stamped with the `wocApiOrigin` its artifact was baked with; and the
+running app refuses to download an update whose stamp differs from its own baked
+origin (loud `[updater] REFUSED` entry in `main.log`), so even a feed file
+renamed onto the wrong track cannot flip an install to another backend.
+`WOC_UPDATE_CHANNEL=dev` on a production-origin build is the one supported
+cross: it emits a production-origin artifact's feed files on the dev track to
+exercise the publish pipeline end to end (no install ever downloads such an
+artifact: dev-origin installs refuse its production origin stamp, which is the
+fail-safe direction). Never rename `dev*.yml` files to `latest*.yml` on the
+update host. Dev installs made BEFORE the track split read the `latest`
+channel like everything else did, so they will auto-update onto production
+builds; give dev testers a fresh post-split dev build rather than expecting
+their old installs to stay on dev.
+
 `npm run electron:pack` / `electron:pack:steam` are the fast local variants
 (`--dir`, host arch only, no installers). Release builds use the full arch matrix in
 `package.json` `build`: macOS universal (dmg + zip), Windows x64 + arm64 (nsis + zip),
 Linux x64 + arm64 (AppImage + deb). To smoke-test a packaged build against a local
 server: `VITE_DESKTOP_API_ORIGIN=http://localhost:8787 npm run electron:pack` (a
-BUILD-time value: baked into the bundle and stamped into the app).
+BUILD-time value: baked into the bundle and stamped into the app; such a build
+lands on the `dev` update channel automatically and cannot produce production
+feed files).
 
 Build each OS on its own runner (mac artifacts on macOS, Windows artifacts on Windows,
 Linux artifacts on Linux). Cross-building is not part of this runbook.
@@ -145,7 +170,20 @@ Fedora atomic desktops (Bazzite, Steam Deck) with no system install, just
    page links point at the new build (the static hrefs in `index.html` are the
    no-JS fallback; keep them on the same version). The page offers macOS (dmg)
    and Linux (AppImage); Windows stays "pending" until its installer is uploaded.
-2. Build on each OS runner with signing env present: `npm run electron:build`.
+2. Build on each OS runner with signing env present: `npm run electron:build`,
+   with `VITE_DESKTOP_API_ORIGIN` unset or set to the production origin. A
+   production release MUST emit `latest*.yml` feed files (`latest.yml` on
+   Windows, `latest-mac.yml`, `latest-linux*.yml`); if the build produced
+   `dev*.yml` instead, it was baked with a non-production origin: rebuild, do
+   not rename (renamed files still carry the `wocApiOrigin` stamp and every
+   production install will refuse them).
+   One-time cleanup with the first track-split release: audit the production
+   update host and delete any `latest*.yml` (and its artifacts) that this
+   release did not produce. Feed files published before the split carry no
+   `wocApiOrigin` stamp and the runtime guard accepts unstamped files for back
+   compat, so a leftover pre-split dev-baked `latest*.yml` is the one artifact
+   the guard cannot refuse; from this release on, every feed file on the host
+   is stamped and the acceptance window can later be tightened to stamped-only.
 3. Upload from `release/` to the update host directory (keep filenames exactly):
    - macOS: `world-of-claudecraft-<v>-mac-universal.dmg` (download page),
      `...-mac-universal.zip` + `.zip.blockmap` (updater), `latest-mac.yml`.
@@ -247,7 +285,8 @@ Rules that keep this working:
 
 1. Fresh install, launch: window appears, no Gatekeeper/SmartScreen block (signed
    builds), log file created, startup banner shows the right `version`,
-   `distribution`, and `updaterEnabled`.
+   `distribution`, `updaterEnabled`, and `updateChannel` (`latest` on a
+   production build, `dev` on anything else).
 2. GPU: log shows `[gpu] feature status` with hardware WebGL2 (no
    `software only`, no SwiftShader/llvmpipe renderer, no softwareRendering warning).
 3. Login both paths: email/password in-app, and Discord via the external browser +
@@ -257,8 +296,9 @@ Rules that keep this working:
    world (backgroundThrottling stays off).
 5. Website channel only: with a higher-version build on the feed, the update toast
    appears, "Restart now" applies it, and a player who quits instead gets it on next
-   launch. Steam channel: confirm the log says the updater is disabled and no
-   update network traffic occurs.
+   launch; after the restart the log's startup banner still shows the production
+   `apiOrigin` channel (`updateChannel: latest`). Steam channel: confirm the log
+   says the updater is disabled and no update network traffic occurs.
 6. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
    task-manager "end task" is classified as a benign `killed` exit and does not
    trigger recovery). The first two SEGVs each produce a log entry and a bounded

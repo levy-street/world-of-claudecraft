@@ -311,7 +311,15 @@ export const it_IT: EnTranslations = {
       "nameplates": "Nomi",
       "haptics": "Vibrazione",
       "hapticsOff": "Vibrazione disattivata",
-      "toggleHaptics": "Attiva/disattiva vibrazione"
+      "toggleHaptics": "Attiva/disattiva vibrazione",
+      "hotbarPage": "Abilità",
+      "hotbarPageAria": "Mostra la serie successiva di abilità",
+      "actionRing": "Azioni di combattimento",
+      "actionPageToggle": "Cambia pagina di azione",
+      "actionPageIndicator": "Pag. {page}",
+      "targetCycle": "Scambia bersaglio",
+      "targetCycleShort": "Bersaglio",
+      "spellbookPageLabel": "Pagina {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Usa il joystick di movimento per muoverti e trascina lo schermo per guardarti intorno. Fai qualche passo per iniziare.",
@@ -418,7 +426,9 @@ export const it_IT: EnTranslations = {
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
-      "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere"
+      "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
+      "mobileCameraJoystick": "Joystick della fotocamera",
+      "mobileLeftHanded": "Disposizione per mancini"
     },
     "controller": {
       "title": "Controller",
@@ -997,6 +1007,7 @@ export const it_IT: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Core Dev",
         "devs": "Dev",
         "mods": "Mod",
         "artists": "Artista"

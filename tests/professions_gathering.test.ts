@@ -86,6 +86,26 @@ describe('gathering profession proficiency (#1119)', () => {
     expect(meta2.gatheringProficiency).toEqual({ mining: 0, logging: 0, herbalism: 0 });
   });
 
+  it('a genuine pre-rename save (professions set, gatheringProficiency absent) loads via the legacy fallback', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.chat('/dev gather mining 6', pid);
+    sim.tick();
+
+    const state = (sim as any).serializeCharacter(pid);
+    // Simulate a save written before the gatheringProficiency rename: only the
+    // legacy `professions` key carries real data.
+    delete state.gatheringProficiency;
+    expect(state.professions).toEqual({ mining: 6, logging: 0, herbalism: 0 });
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const loadedPid = sim2.addPlayer('warrior', 'PreRename', { state });
+    const meta2 = (sim2 as any).players.get(loadedPid);
+    // Regression pin for the dead reassignments that dropped this fallback:
+    // must load the legacy data, not all-zero.
+    expect(meta2.gatheringProficiency).toEqual({ mining: 6, logging: 0, herbalism: 0 });
+  });
+
   it('normalizeGatheringProficiency defaults zero on undefined/partial/malformed input', () => {
     expect(normalizeGatheringProficiency(undefined)).toEqual(emptyGatheringProficiency());
     expect(normalizeGatheringProficiency({})).toEqual(emptyGatheringProficiency());

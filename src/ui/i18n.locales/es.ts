@@ -4121,6 +4121,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Carrera automática',
   'hudChrome.mobile.haptics': 'Vibración',
   'hudChrome.mobile.hapticsOff': 'Vibración desactivada',
+  'hudChrome.mobile.hotbarPage': 'Habilidades',
+  'hudChrome.mobile.hotbarPageAria': 'Mostrar el siguiente conjunto de habilidades',
   'hudChrome.mobile.jump': 'Saltar',
   'hudChrome.mobile.leaderboard': 'Clasificación',
   'hudChrome.mobile.nameplates': 'Nombres',
@@ -6184,6 +6186,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': 'Elaboración {name}',
   'hudChrome.crafting.title': 'Elaboración',
   'hudChrome.crafting.unknownRecipe': 'Esa receta no existe.',
+  'hudChrome.mobile.actionPageIndicator': 'Pág. {page}',
+  'hudChrome.mobile.actionPageToggle': 'Cambiar página de acción',
+  'hudChrome.mobile.actionRing': 'Acciones de combate',
+  'hudChrome.mobile.spellbookPageLabel': 'Página {page}',
+  'hudChrome.mobile.targetCycle': 'Cambiar objetivo',
+  'hudChrome.mobile.targetCycleShort': 'Objetivo',
+  'hudChrome.options.mobileCameraJoystick': 'Palanca de mando de la cámara',
+  'hudChrome.options.mobileLeftHanded': 'Diseño para zurdos',
   // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Un oficio que puedes llamar tuyo',
   'entities.quests.q_archetype_acceptance.text':

@@ -93,6 +93,15 @@ export interface SuspiciousEvidence {
   weight: number;
   detail: string;
   expiresAt: number;
+  // Recurrence history, present only on kinds where re-triggering carries
+  // information (decided entirely by the implementation): distinct episodes
+  // observed this session, when the first and latest happened (epoch ms), and
+  // the opening timestamps of the most recent episodes (bounded ring; the count
+  // and firstAt keep the totals the ring loses when it overflows).
+  occurrences?: number;
+  firstAt?: number;
+  lastAt?: number;
+  episodesAt?: number[];
 }
 
 export type SuspiciousPlayerState = 'SUSPICIOUS' | 'CONFIRMED';

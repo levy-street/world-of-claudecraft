@@ -2578,6 +2578,7 @@ export class Sim {
       partyMembersForKey: (key) => sim.partyMembersForKey(key),
       grantXp: (amount, meta, opts) => sim.grantXp(amount, meta, opts),
       addItem: (itemId, count, pid) => sim.addItem(itemId, count, pid),
+      addItemInstance: (itemId, instance, pid) => sim.addItemInstance(itemId, instance, pid),
       // L2's World Market escrow (marketList) also consumes removeItem; it is bound once
       // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
       spawnBossAdds: (boss, mobId, count) => sim.spawnBossAdds(boss, mobId, count),

@@ -294,3 +294,79 @@ describe('tiered mastery gating (#1128)', () => {
     expect(highMeta.craftSkills.cooking).toBe(101); // still the full floor point
   });
 });
+
+// #1145: signed materials + the self-gathered crafting bonus. The chosen bonus
+// (see professions/crafting.ts) is a reduced required quantity: one fewer unit
+// of a reagent the crafter holds a self-signed instance of.
+describe('self-gathered crafting bonus (#1145)', () => {
+  it('a self-signed instance reduces that reagent requirement by one and is consumed', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs bone_fragments x2, linen_scrap x1
+    // One self-signed bone_fragments (stamped with this player's own name) plus
+    // one plain bone_fragments: normally 2 would be required, the bonus drops it to 1.
+    sim.addItemInstance('bone_fragments', { signer: meta.name }, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(true);
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(result.selfSignedBonusApplied).toBe(true);
+    // The single signed copy (the only bone_fragments held) was consumed as
+    // part of satisfying the reduced (1-unit) requirement.
+    expect(sim.countItem('bone_fragments', pid)).toBe(0);
+    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
+  });
+
+  it('a material signed by a DIFFERENT player grants no bonus (same as unsigned)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!;
+    // Signed by someone else: does not count toward the crafter's own bonus.
+    sim.addItemInstance('bone_fragments', { signer: 'SomeoneElse' }, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    // Still short: only 1 of the required 2 bone_fragments (no bonus reduction).
+    expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(false);
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('insufficient_materials');
+    expect(result.selfSignedBonusApplied).toBeUndefined();
+  });
+
+  it('a self-signed instance never waives the last required unit (floored at 1, not 0)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_tough_jerky')!; // needs spider_leg x1
+    sim.addItemInstance('spider_leg', { signer: meta.name }, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    // count 1 minus the bonus would floor to 0; the fix floors at 1 instead so
+    // the signed instance is actually consumed, not retained for infinite crafts.
+    expect(result.selfSignedBonusApplied).toBe(false);
+    expect(sim.countItem('spider_leg', pid)).toBe(0);
+
+    // A second craft attempt fails: the signed instance was consumed, not retained.
+    const second = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(second.ok).toBe(false);
+  });
+
+  it('an unsigned (plain fungible) material grants no bonus', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!;
+    grantItem(sim, 'bone_fragments', 2, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(result.ok).toBe(true);
+    expect(result.selfSignedBonusApplied).toBe(false);
+    expect(sim.countItem('bone_fragments', pid)).toBe(0);
+  });
+});

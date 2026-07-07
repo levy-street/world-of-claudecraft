@@ -305,6 +305,12 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
   if (env.touch) out.push(slider(s, 'actionButtonScale', 'hud.options.buttonSize'));
   if (env.touch) out.push(slider(s, 'joystickDeadzone', 'hud.options.joystickDeadzone'));
   if (env.touch) out.push(boolToggle(s, 'touchInvertLook', 'hud.options.invertLook'));
+  // Camera joystick is hidden/off by default (swipe-look is primary); left-handed
+  // layout already has a Key Bindings row (leftHandedTouch), but is surfaced here
+  // too since it is squarely a touch/graphics-panel concern for touch players.
+  if (env.touch)
+    out.push(boolToggle(s, 'mobileCameraJoystick', 'hudChrome.options.mobileCameraJoystick'));
+  if (env.touch) out.push(boolToggle(s, 'leftHandedTouch', 'hudChrome.options.mobileLeftHanded'));
   return out;
 }
 

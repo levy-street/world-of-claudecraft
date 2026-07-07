@@ -311,7 +311,15 @@ export const vi_VN: EnTranslations = {
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
       "hapticsOff": "Tắt Phản Hồi Rung",
-      "toggleHaptics": "Bật/tắt phản hồi rung"
+      "toggleHaptics": "Bật/tắt phản hồi rung",
+      "hotbarPage": "Kỹ Năng",
+      "hotbarPageAria": "Hiện bộ kỹ năng tiếp theo",
+      "actionRing": "Hành động chiến đấu",
+      "actionPageToggle": "Chuyển trang hành động",
+      "actionPageIndicator": "Trang {page}",
+      "targetCycle": "Hoán đổi mục tiêu",
+      "targetCycleShort": "Mục tiêu",
+      "spellbookPageLabel": "Trang {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -418,7 +426,9 @@ export const vi_VN: EnTranslations = {
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
-      "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày"
+      "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
+      "mobileCameraJoystick": "Cần điều khiển máy ảnh",
+      "mobileLeftHanded": "Bố cục thuận tay trái"
     },
     "controller": {
       "title": "Tay Cầm",
@@ -997,6 +1007,7 @@ export const vi_VN: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Quản Trị Viên",
+        "coredevs": "Core Dev",
         "devs": "Lập Trình Viên",
         "mods": "Điều Hành Viên",
         "artists": "Họa Sĩ"

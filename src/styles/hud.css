@@ -1916,6 +1916,9 @@
     font-size: 11px;
     font-family: var(--ui-font);
     vertical-align: text-bottom;
+    /* dark digit on a gold fill: the tracker's inherited black text-shadow
+       only blurs it, so drop it inside the badge */
+    text-shadow: none;
   }
   #quest-tracker .qt-obj {
     color: var(--color-text-overlay);
@@ -2496,6 +2499,7 @@
   body.native-app .donate-cta,
   body.native-app .community-link.donate,
   body.native-app .social-link.donate,
+  body.native-app #mobile-donate,
   body.native-app #token-ca,
   body.native-app #nav-btn-download,
   body.native-app .cs-wallet,

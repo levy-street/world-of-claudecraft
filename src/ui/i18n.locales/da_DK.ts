@@ -4639,6 +4639,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Autoløb',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik fra',
+  'hudChrome.mobile.hotbarPage': 'Evner',
+  'hudChrome.mobile.hotbarPageAria': 'Vis næste sæt evner',
   'hudChrome.mobile.jump': 'Hop',
   'hudChrome.mobile.leaderboard': 'Rangliste',
   'hudChrome.mobile.nameplates': 'Navne',
@@ -6039,6 +6041,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': 'Håndværk {name}',
   'hudChrome.crafting.title': 'Håndværk',
   'hudChrome.crafting.unknownRecipe': 'Den opskrift findes ikke.',
+  'hudChrome.mobile.actionPageIndicator': 'Side {page}',
+  'hudChrome.mobile.actionPageToggle': 'Skift handlingsside',
+  'hudChrome.mobile.actionRing': 'Kamphandlinger',
+  'hudChrome.mobile.spellbookPageLabel': 'Side {page}',
+  'hudChrome.mobile.targetCycle': 'Byt mål',
+  'hudChrome.mobile.targetCycleShort': 'Mål',
+  'hudChrome.options.mobileCameraJoystick': 'Kamera joystick',
+  'hudChrome.options.mobileLeftHanded': 'Venstrehånds layout',
   // Release v0.22.0 professions quest locale fill.
   'entities.quests.q_archetype_acceptance.title': 'Et håndværk at kalde dit eget',
   'entities.quests.q_archetype_acceptance.text':

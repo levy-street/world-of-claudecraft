@@ -11,6 +11,7 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -25,6 +26,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -39,6 +41,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -53,6 +56,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -68,6 +72,7 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -82,6 +87,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -94,12 +100,21 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.critRating",
     "hudChrome.statInfo.names.hasteRating"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "zh_TW": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "ko_KR": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "ja_JP": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
   "pt_BR": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -112,9 +127,37 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.critRating",
     "hudChrome.statInfo.names.hasteRating"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "cs_CZ": [
+    "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.itemProc.attackSlow",
+    "hudChrome.itemProc.chainArc",
+    "hudChrome.itemProc.dot",
+    "hudChrome.itemProc.hot",
+    "hudChrome.itemProc.onHeal",
+    "hudChrome.itemProc.onMeleeHit",
+    "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.mobile.actionPageIndicator",
+    "hudChrome.mobile.actionPageToggle",
+    "hudChrome.mobile.actionRing",
+    "hudChrome.mobile.hotbarPage",
+    "hudChrome.mobile.hotbarPageAria",
+    "hudChrome.mobile.spellbookPageLabel",
+    "hudChrome.mobile.targetCycle",
+    "hudChrome.mobile.targetCycleShort",
+    "hudChrome.options.mobileCameraJoystick",
+    "hudChrome.options.mobileLeftHanded",
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
   "nl_NL": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -129,6 +172,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -143,6 +187,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -157,6 +202,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -171,6 +217,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -185,6 +232,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",
@@ -199,6 +247,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "entities.itemSets.necromancers.bonus4",
+    "hudChrome.discord.roleTag.coredevs",
     "hudChrome.itemProc.attackSlow",
     "hudChrome.itemProc.chainArc",
     "hudChrome.itemProc.dot",

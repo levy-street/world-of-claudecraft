@@ -41,6 +41,7 @@ import type {
   DelveRun,
   Entity,
   ErrorReason,
+  ItemInstancePayload,
   PlayerClass,
   QuestProgress,
   SetProc,
@@ -451,6 +452,11 @@ export interface SimContextCallbacks {
   // AI (spawnDelveCompanion/despawnDelveCompanion/maybeCompanionBark).
   partyMembersForKey(key: string): number[];
   addItem(itemId: string, count: number, pid?: number): void;
+  // #1145 signed materials: grants a single non-fungible item copy carrying an
+  // instance payload (signer/charges/rolled/boundTo, #1165), never merged into a
+  // plain fungible stack. Used by corpse harvest to stamp a rare+ monster
+  // material with the harvester's name.
+  addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
   spawnBossAdds(boss: Entity, mobId: string, count: number): void;
@@ -870,6 +876,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     // onDelveBossDefeated/delveDetectMult are bound above (C1/M2/C3); deduped here.
     partyMembersForKey: host.partyMembersForKey,
     addItem: host.addItem,
+    addItemInstance: host.addItemInstance,
     // removeItem passed through above (P1b inventory-hub helper) - deduped, not re-added.
     spawnBossAdds: host.spawnBossAdds,
     tradeFor: host.tradeFor,

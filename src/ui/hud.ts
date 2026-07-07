@@ -107,7 +107,7 @@ import {
   type PartyInfo,
 } from '../world_api';
 import { type AbilityScaling, abilityDamageBonus } from './ability_damage';
-import { ActionBarPainter } from './action_bar_painter';
+import { ActionBarPainter, type ActionBarSlotElements } from './action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarView,
@@ -163,6 +163,7 @@ import {
   shouldPlayMobVoiceSfxForEntity,
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
+import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
 import { formatMinimapCoords } from './coords';
 import { corpseHarvestView } from './corpse_harvest_view';
 import { renderCorpseHarvestPicker } from './corpse_harvest_window';
@@ -172,6 +173,7 @@ import { DailyRewardsWindow } from './daily_rewards_window';
 import { DelveMapPainter } from './delve_map_painter';
 import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
 import { markDialogRoot } from './dialog_root';
+import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { emoteIconUrl } from './emote_icons';
@@ -272,6 +274,13 @@ import {
   nextMinimapZoom,
 } from './minimap_zoom';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
+import {
+  clampMobilePage,
+  mobilePageCount,
+  nextMobilePage,
+  sourceSlotForMobileButton,
+} from './mobile_action_page_view';
+import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -327,6 +336,7 @@ import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
+import { bindTouchTap } from './touch_tap';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -755,6 +765,37 @@ export class Hud {
   // second/third bar is another descriptor, not a code fork.
   private actionBarView!: ActionBarView;
   private actionBarPainter!: ActionBarPainter;
+  // The mobile action ring: a SECOND createActionBarView instance over a 6-slot
+  // descriptor (slot 0 attack, slots 1-5 resolve through
+  // sourceSlotForMobileButton(mobileActionPage, i-1)). mobileActionPage is the
+  // only mutable state; cycling it never rebuilds the descriptor (the closures
+  // re-resolve), which is what keeps the view allocation-stable across page
+  // flips. Both fields stay undefined on desktop-only sessions where the ring DOM
+  // is absent (buildActionBar only builds them when #mobile-action-ring exists).
+  private mobileActionPage = 0;
+  private mobileActionRingView: ActionBarView | undefined;
+  private mobileActionRingPainter: MobileActionRingPainter | undefined;
+  // Consumables quick bar (touch): the auto-populated potion/elixir/food/drink
+  // row behind the chevron chip next to the top-left trio. consumableBarIds is
+  // the ONE reused array the pure core fills WHEN THE ROW OPENS and that stays
+  // FROZEN while it is open: slots must not shift under the player's thumb the
+  // frame a stack depletes (a depleted item stays in place, greyed at count 0,
+  // exactly like a desktop bar item shortcut). Reopening refreshes the list.
+  private consumableBarView: ActionBarView | undefined;
+  private consumableBarPainter: ActionBarPainter | undefined;
+  private consumableBarSlotBtns: HTMLButtonElement[] = [];
+  private readonly consumableBarIds: string[] = [];
+  private consumablesOpen = false;
+  /** Ring button refs so castSlot's used-flash can hit the ring too (the
+   *  desktop bar is display:none under body.mobile-touch). */
+  private mobileRingAttackBtn: HTMLButtonElement | null = null;
+  private mobileRingSlotBtns: HTMLButtonElement[] = [];
+  // Acquire-nearest fallback for the ring's attack toggle when the player has
+  // no live hostile target: wired by main.ts to the same nearest-attackable
+  // pick the touch layer uses (the HUD cannot resolve attackability itself,
+  // that helper lives behind the game-layer seam). Null until wired; the
+  // attack handler then falls back to the plain castSlot(0) toggle.
+  onMobileAttackNearest: (() => void) | null = null;
   private hotbarActions: HotbarAction[] = []; // index = barSlot-1
   private loadedSlotMapFromStorage = false;
   private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
@@ -1279,11 +1320,16 @@ export class Hud {
         }
       }
     });
-    document.getElementById('mobile-more-close')?.addEventListener('click', () => {
-      document.body.classList.remove('mobile-more-open');
-      document.getElementById('mobile-controls')?.classList.remove('expanded');
-      document.getElementById('mobile-more')?.classList.remove('active');
-    });
+    const moreClose = document.getElementById('mobile-more-close');
+    if (moreClose) {
+      // bindTouchTap so the close X works from a second finger too (a click
+      // never fires for a non-primary touch).
+      bindTouchTap(moreClose, () => {
+        document.body.classList.remove('mobile-more-open');
+        document.getElementById('mobile-controls')?.classList.remove('expanded');
+        document.getElementById('mobile-more')?.classList.remove('active');
+      });
+    }
     // Dismiss the shared #ctx-menu (right-click menus and the chat "+" channel
     // picker) on any pointerdown outside it. A pointerdown inside the menu is left
     // to the item's own click; a pointerdown on the opener is left to that opener's
@@ -3423,6 +3469,11 @@ export class Hud {
     abilityTooltip: (known) => this.abilityTooltip(known),
     barAbilityIds: () =>
       this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
+    // Index 0 = barSlot 1 (hotbarActions' own index = barSlot-1 convention), used
+    // to derive each row's mobile action-ring page (Phase 4). Non-ability slots
+    // (empty or an item) map to null, never mistaken for an ability id.
+    abilityIdByBarSlot: () =>
+      this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
     hasFreeSlot: () => this.firstEmptyHotbarIndex() !== -1,
     addToBar: (id) => this.addAbilityToHotbar(id),
     removeFromBar: (id) => this.removeAbilityFromHotbar(id),
@@ -4301,6 +4352,7 @@ export class Hud {
     this.dragAction = null;
     this.clearActionDropTargets();
     this.loadSlotMap();
+    this.mobileActionPage = clampMobilePage(this.mobileActionPage);
   }
 
   // Drop unlearned ability ids; place newly learned abilities in the first
@@ -4328,6 +4380,7 @@ export class Hud {
     this.hotbarActions = synced.actions;
     if (synced.changed) this.saveSlotMap();
     this.knownAbilityIdsAtLastSlotSync = new Set(knownAbilityIds);
+    this.mobileActionPage = clampMobilePage(this.mobileActionPage);
   }
 
   private actionForSlot(barSlot: number): HotbarAction {
@@ -4518,10 +4571,33 @@ export class Hud {
     }
   }
 
+  // Advance the mobile action ring to its next page. Mutates mobileActionPage
+  // ONLY: the ring descriptor's per-slot closures (built once in buildActionBar)
+  // resolve sourceSlotForMobileButton(mobileActionPage, i) fresh every tick, so no
+  // descriptor rebuild is needed and hidden-page cooldowns keep ticking (their
+  // state lives on hotbarActions + sim, not on the view). The next update() call
+  // repaints the ring from the new page.
+  private cycleMobileActionPage(): void {
+    this.mobileActionPage = nextMobilePage(this.mobileActionPage);
+  }
+
   private flashActionSlot(barSlot: number): void {
     const btn = this.abilityButtons[barSlot]?.btn;
-    if (!btn) return;
-    this.flashActionButton(btn);
+    if (btn) this.flashActionButton(btn);
+    // Mirror the used-flash onto the mobile ring (the desktop bar is
+    // display:none under body.mobile-touch, so without this a ring cast gave
+    // no visual acknowledgment at all). barSlot 0 is the attack toggle; the 5
+    // paged buttons show sourceSlotForMobileButton(page, i) for the CURRENT page.
+    if (barSlot === 0 && this.mobileRingAttackBtn) {
+      this.flashActionButton(this.mobileRingAttackBtn);
+      return;
+    }
+    for (let i = 0; i < this.mobileRingSlotBtns.length; i++) {
+      if (sourceSlotForMobileButton(this.mobileActionPage, i) === barSlot) {
+        this.flashActionButton(this.mobileRingSlotBtns[i]);
+        return;
+      }
+    }
   }
 
   private flashActionButton(btn: HTMLButtonElement): void {
@@ -4765,6 +4841,303 @@ export class Hud {
       },
       (iconKey) => this.actionBarIconBg(iconKey),
     );
+
+    this.buildMobileActionRing();
+    this.buildMobileConsumableBar();
+  }
+
+  // Build the mobile action ring: a SECOND createActionBarView instance over a
+  // 6-slot descriptor (slot 0 the fixed attack toggle, slots 1-5 the paged action
+  // buttons) plus a MobileActionRingPainter reusing ActionBarPainter for the
+  // per-slot writes. The static container/buttons live in index.html/play.html
+  // (#mobile-action-ring); on a build that omits them (neither game entry does,
+  // but this stays defensive like the #actionbar2-less template case above) the
+  // ring silently stays unbuilt and update() skips painting it.
+  private buildMobileActionRing(): void {
+    const attackBtn = document.getElementById('mobile-action-attack') as HTMLButtonElement | null;
+    const slotBtns = Array.from(
+      document.querySelectorAll<HTMLButtonElement>('.mobile-action-slot'),
+    ).sort((a, b) => Number(a.dataset.mobileIndex ?? 0) - Number(b.dataset.mobileIndex ?? 0));
+    const pageToggle = document.getElementById('mobile-action-page-toggle');
+    const pageIndicator = pageToggle?.querySelector<HTMLElement>('.mobile-action-page-indicator');
+    if (!attackBtn || slotBtns.length !== 5 || !pageToggle || !pageIndicator) return;
+    this.mobileRingAttackBtn = attackBtn;
+    this.mobileRingSlotBtns = slotBtns;
+
+    const ringButtons = [attackBtn, ...slotBtns];
+    const ringEls: ActionBarSlotElements[] = ringButtons.map((btn) => {
+      const label = document.createElement('span');
+      label.className = 'icon-label';
+      const countEl = document.createElement('span');
+      countEl.className = 'item-count';
+      const keybindEl = document.createElement('span');
+      keybindEl.className = 'keybind';
+      const cdOverlay = document.createElement('div');
+      cdOverlay.className = 'cd-overlay';
+      const cdText = document.createElement('div');
+      cdText.className = 'cdtext';
+      btn.append(label, countEl, keybindEl, cdOverlay, cdText);
+      return { btn, label, countEl, keybindEl, cdOverlay, cdText };
+    });
+
+    // Wire clicks: attack -> the classic toggle via castSlot(0) while the
+    // player is auto-attacking or holds a live hostile target, and the
+    // acquire-nearest fallback (the old Closest behavior, injected by main.ts
+    // as onMobileAttackNearest) otherwise, so a bare tap with nothing targeted
+    // picks the closest enemy and starts swinging instead of erroring. Slot
+    // buttons -> castSlot(the resolved source slot for the CURRENT page at
+    // click time, not a captured page). Mirrors the desktop action-btn click
+    // pattern exactly (peek-guard consume, audio.click, blur) so
+    // long-press-to-inspect on touch behaves the same way.
+    // bindTouchTap, not 'click': the browser only synthesizes click for the
+    // PRIMARY pointer, so click-bound ring buttons went dead the moment the
+    // other thumb held the joystick, which is how combat is actually played.
+    bindTouchTap(attackBtn, () => {
+      if (this.peekGuard.consume()) {
+        this.hideTooltip();
+        attackBtn.blur();
+        return;
+      }
+      audio.click();
+      const p = this.sim.player;
+      const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
+      const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
+      if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {
+        this.castSlot(0);
+      } else {
+        this.onMobileAttackNearest();
+      }
+      attackBtn.blur();
+    });
+    slotBtns.forEach((btn, i) => {
+      bindTouchTap(btn, () => {
+        if (this.peekGuard.consume()) {
+          this.hideTooltip();
+          btn.blur();
+          return;
+        }
+        audio.click();
+        this.castSlot(sourceSlotForMobileButton(this.mobileActionPage, i));
+        btn.blur();
+      });
+    });
+    bindTouchTap(pageToggle, () => {
+      if (this.peekGuard.consume()) {
+        this.hideTooltip();
+        (pageToggle as HTMLElement).blur();
+        return;
+      }
+      audio.click();
+      this.cycleMobileActionPage();
+      (pageToggle as HTMLElement).blur();
+    });
+
+    // Long-press-to-inspect: the same attachTooltip wiring the desktop bar
+    // buttons get. This is what ARMS the peek guard the tap handlers above
+    // consume; without it a long press showed nothing and the release CAST
+    // the ability (burning cooldowns while trying to read a spell). The slot
+    // closures resolve the CURRENT page fresh, exactly like the view's.
+    this.attachTooltip(
+      attackBtn,
+      () =>
+        `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div>`,
+    );
+    slotBtns.forEach((btn, i) => {
+      this.attachTooltip(btn, () => {
+        const slot = sourceSlotForMobileButton(this.mobileActionPage, i);
+        const known = this.abilityForSlot(slot);
+        if (known) return this.abilityTooltip(known);
+        const item = this.itemForSlot(slot);
+        if (item) {
+          const count = this.inventoryCount(item.id);
+          return (
+            this.itemTooltip(item) +
+            `<div class="tt-sub">${esc(
+              count > 0
+                ? t('abilityUi.actionBar.itemInBags', {
+                    count: formatNumber(count, { maximumFractionDigits: 0 }),
+                  })
+                : t('abilityUi.actionBar.itemNoneInBags'),
+            )}</div>`
+          );
+        }
+        return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}</div>`;
+      });
+    });
+
+    this.mobileActionRingView = createActionBarView(
+      {
+        slots: [
+          {
+            slotIndex: 0,
+            isAttack: true,
+            hasAction: () => false,
+            ability: () => null,
+            item: () => null,
+            keybindLabel: () => '',
+          },
+          ...Array.from({ length: 5 }, (_, i) => ({
+            slotIndex: i + 1,
+            isAttack: false,
+            hasAction: () =>
+              this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null,
+            ability: () => this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)),
+            item: () => this.itemForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)),
+            keybindLabel: () => '',
+          })),
+        ],
+      },
+      {
+        t,
+        abilityName: abilityDisplayName,
+        itemName: itemDisplayName,
+        slotLabel: (i) => formatAbilityNumber(i + 1),
+        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+      },
+    );
+    this.mobileActionRingPainter = new MobileActionRingPainter(
+      this.writerFacet,
+      {
+        bar: {
+          container: document.getElementById('mobile-action-ring') as HTMLElement,
+          slots: ringEls,
+        },
+        pageToggle: pageToggle as HTMLElement,
+        pageIndicator,
+      },
+      // The ring's primary attack slot shows the same crisp data-icon="attack"
+      // glyph as the (now-secondary) Target Closest button instead of the
+      // painted ability-icon background desktop's attack toggle uses: an empty
+      // background here leaves the inline SVG hydrateIcons() already inserted
+      // into #mobile-action-attack's markup visible underneath. Every other
+      // slot (abilities/items/empty) still resolves through actionBarIconBg
+      // exactly like desktop, so desktop's own attack toggle is untouched.
+      (iconKey) => (iconKey === ATTACK_ICON_KEY ? '' : this.actionBarIconBg(iconKey)),
+      t,
+    );
+  }
+
+  // Consumables quick bar: the chevron chip next to the top-left trio expands a
+  // row auto-populated from the carried consumables (consumable_bar_view.ts),
+  // painted by another instance of the shared bar family. Touch has no way to
+  // drag an item onto the hotbar, so unlike the ring's paged slots this bar
+  // needs no setup: tap the chip, tap the potion. Collapsed by default and
+  // session-only (no persisted state, no settings entry). Defensive against
+  // missing markup like the ring (an older cached template leaves it unbuilt).
+  private buildMobileConsumableBar(): void {
+    const toggle = document.getElementById('mobile-consumables-toggle');
+    const row = document.getElementById('mobile-consumables-row');
+    const slotBtns = Array.from(
+      document.querySelectorAll<HTMLButtonElement>('.mobile-consumable-slot'),
+    ).sort(
+      (a, b) => Number(a.dataset.consumableIndex ?? 0) - Number(b.dataset.consumableIndex ?? 0),
+    );
+    if (!toggle || !row || slotBtns.length !== CONSUMABLE_BAR_SLOTS) return;
+    this.consumableBarSlotBtns = slotBtns;
+
+    const slotEls: ActionBarSlotElements[] = slotBtns.map((btn) => {
+      const label = document.createElement('span');
+      label.className = 'icon-label';
+      const countEl = document.createElement('span');
+      countEl.className = 'item-count';
+      const keybindEl = document.createElement('span');
+      keybindEl.className = 'keybind';
+      const cdOverlay = document.createElement('div');
+      cdOverlay.className = 'cd-overlay';
+      const cdText = document.createElement('div');
+      cdText.className = 'cdtext';
+      btn.append(label, countEl, keybindEl, cdOverlay, cdText);
+      return { btn, label, countEl, keybindEl, cdOverlay, cdText };
+    });
+
+    // bindTouchTap, not 'click', for the same reason as the ring: the browser
+    // only synthesizes click for the PRIMARY pointer, so a click-bound button
+    // goes dead while the other thumb holds the joystick.
+    bindTouchTap(toggle, () => {
+      audio.click();
+      this.consumablesOpen = !this.consumablesOpen;
+      // Snapshot the consumable list at OPEN time; it stays frozen while open
+      // so slot positions are tap-stable (see the field comment). Counts and
+      // the potion-cooldown sweep still update live off the sim each frame.
+      if (this.consumablesOpen) {
+        consumableBarItems(this.sim.inventory, (id) => ITEMS[id], this.consumableBarIds);
+      }
+      document.body.classList.toggle('mobile-consumables-open', this.consumablesOpen);
+      toggle.setAttribute('aria-expanded', this.consumablesOpen ? 'true' : 'false');
+      (toggle as HTMLElement).blur();
+    });
+    slotBtns.forEach((btn, i) => {
+      bindTouchTap(btn, () => {
+        if (this.peekGuard.consume()) {
+          this.hideTooltip();
+          btn.blur();
+          return;
+        }
+        audio.click();
+        this.useConsumableSlot(i);
+        btn.blur();
+      });
+      // Long-press-to-inspect, arming the peek guard the tap handler consumes
+      // (same contract as the ring: a long press must never quaff).
+      this.attachTooltip(btn, () => {
+        const id = this.consumableBarIds[i];
+        const item = id ? (ITEMS[id] ?? null) : null;
+        if (!item) return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}</div>`;
+        const count = this.inventoryCount(item.id);
+        return (
+          this.itemTooltip(item) +
+          `<div class="tt-sub">${esc(
+            count > 0
+              ? t('abilityUi.actionBar.itemInBags', {
+                  count: formatNumber(count, { maximumFractionDigits: 0 }),
+                })
+              : t('abilityUi.actionBar.itemNoneInBags'),
+          )}</div>`
+        );
+      });
+    });
+
+    this.consumableBarView = createActionBarView(
+      {
+        slots: Array.from({ length: CONSUMABLE_BAR_SLOTS }, (_, i) => ({
+          slotIndex: i,
+          isAttack: false,
+          hasAction: () => this.consumableBarIds[i] !== undefined,
+          ability: () => null,
+          item: () => {
+            const id = this.consumableBarIds[i];
+            return id ? (ITEMS[id] ?? null) : null;
+          },
+          keybindLabel: () => '',
+        })),
+      },
+      {
+        t,
+        abilityName: abilityDisplayName,
+        itemName: itemDisplayName,
+        slotLabel: (i) => formatAbilityNumber(i + 1),
+        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+      },
+    );
+    this.consumableBarPainter = new ActionBarPainter(
+      this.writerFacet,
+      { container: row, slots: slotEls },
+      (iconKey) => this.actionBarIconBg(iconKey),
+    );
+  }
+
+  // Tap dispatch for a consumables-bar slot: the same seam as castSlot's item
+  // arm (IWorld.useItem, so offline runs the sim directly and online sends the
+  // authoritative 'use' command), minus the hotbar-eligibility gate: the bar's
+  // ids come pre-filtered from consumable_bar_view, which deliberately INCLUDES
+  // elixirs (usable from bags, just never hotbar-placeable).
+  private useConsumableSlot(i: number): void {
+    const id = this.consumableBarIds[i];
+    if (!id || this.tradeOpen) return;
+    this.sim.useItem(id);
+    if ($('#bags').style.display !== 'none') this.renderBags();
+    const btn = this.consumableBarSlotBtns[i];
+    if (btn) this.flashActionButton(btn);
   }
 
   // Resolve a core icon key to the slot label's background-image value. Kept on the
@@ -5570,6 +5943,44 @@ export class Hud {
     this.actionBarPainter.paint(
       this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
     );
+
+    // mobile action ring: the paged touch combat cluster, gated on the touch-mode
+    // signal so desktop skips the tick+paint entirely (both the view and painter
+    // stay undefined when the ring DOM never got built, e.g. an older cached
+    // template). Reuses the exact same world snapshot as the desktop bar.
+    if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
+      this.mobileActionRingPainter.paint(
+        this.mobileActionRingView.tick({
+          player: p,
+          target: target ?? null,
+          inventory: sim.inventory,
+        }),
+        this.mobileActionPage,
+        mobilePageCount(),
+      );
+    }
+
+    // consumables quick bar: tick+paint ONLY while the row is expanded on touch.
+    // The id list is NOT recomputed here: it was snapshotted when the row opened
+    // and stays frozen so slots never shift under the player's thumb; counts,
+    // usability, and the shared potion-cooldown sweep still derive live from the
+    // sim/inventory every tick. Skipping the closed bar entirely is safe for the
+    // same reason ring paging is: all of that state lives on the sim, not the
+    // view, so the row is correct the frame it opens.
+    if (
+      this.isMobileLayout() &&
+      this.consumablesOpen &&
+      this.consumableBarView &&
+      this.consumableBarPainter
+    ) {
+      this.consumableBarPainter.paint(
+        this.consumableBarView.tick({
+          player: p,
+          target: target ?? null,
+          inventory: sim.inventory,
+        }),
+      );
+    }
 
     // xp bar: pre-cap shows the level bar; post-cap fills toward the next virtual
     // level (Max-Level XP Overflow), with distinct prestige/gold styling. The
@@ -11489,22 +11900,6 @@ export class Hud {
     const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}`;
     if (sig === this.targetDiscordSig) return;
     this.targetDiscordSig = sig;
-    const roleTagLabel = (key: string | undefined): string => {
-      switch (key) {
-        case 'levyst':
-          return t('hudChrome.discord.roleTag.levyst');
-        case 'admin':
-          return t('hudChrome.discord.roleTag.admin');
-        case 'devs':
-          return t('hudChrome.discord.roleTag.devs');
-        case 'mods':
-          return t('hudChrome.discord.roleTag.mods');
-        case 'artists':
-          return t('hudChrome.discord.roleTag.artists');
-        default:
-          return '';
-      }
-    };
     const parts: string[] = [];
     const nameInner = target.discordAvatar
       ? `<img src="${esc(target.discordAvatar)}" referrerpolicy="no-referrer" alt="" draggable="false">${esc(target.discordName ?? '')}`
@@ -11512,7 +11907,7 @@ export class Hud {
     if (target.discordName || target.discordAvatar) {
       parts.push(`<span class="uf-dc-name">${nameInner}</span>`);
     }
-    const roleLabel = roleTagLabel(target.discordRole);
+    const roleLabel = discordRoleTagLabel(target.discordRole);
     if (roleLabel) {
       parts.push(
         `<span class="uf-dc-chip role" style="--role:${specialRoleColor(target.discordRole) ?? '#888'}">${esc(roleLabel)}</span>`,
@@ -11568,23 +11963,7 @@ export class Hud {
       memberDays !== null
         ? `<div class="inspect-holder-sub">${esc(t('hudChrome.discord.memberSince'))}: ${esc(t('hudChrome.discord.memberSinceDays', { days: formatNumber(memberDays, { maximumFractionDigits: 0 }) }))}</div>`
         : '';
-    const discordRoleLabel = (key: string | undefined): string => {
-      switch (key) {
-        case 'levyst':
-          return t('hudChrome.discord.roleTag.levyst');
-        case 'admin':
-          return t('hudChrome.discord.roleTag.admin');
-        case 'devs':
-          return t('hudChrome.discord.roleTag.devs');
-        case 'mods':
-          return t('hudChrome.discord.roleTag.mods');
-        case 'artists':
-          return t('hudChrome.discord.roleTag.artists');
-        default:
-          return '';
-      }
-    };
-    const roleLabel = discordRoleLabel(e.discordRole);
+    const roleLabel = discordRoleTagLabel(e.discordRole);
     const roleHtml = roleLabel
       ? `<div class="inspect-holder-sub inspect-discord-role">${esc(roleLabel)}</div>`
       : '';

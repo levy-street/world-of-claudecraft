@@ -191,6 +191,24 @@ export const COPIED_ALLOW_IDS = [
   'admin::id_ID::poi.thornpeak_heights.0',
   'admin::da_DK::location.type',
   'admin::da_DK::location.zone',
+  // Czech (cs_CZ, v0.23.0). Genuine cognates and borrowed terms: "online" is the
+  // standard Czech status word, "Paladin"/"Dungeon"/"Instance"/"Slot" are the
+  // established Czech gaming forms, "{count} h" is the Czech hour abbreviation,
+  // and the app title keeps the brand plus "Admin" (also the Czech word). The
+  // hub-town proper place-names stay verbatim like the cs game catalog keeps them.
+  'server::cs_CZ::who.statusOnline',
+  'admin::cs_CZ::app.title',
+  'admin::cs_CZ::moderation.badgeOnline',
+  'admin::cs_CZ::detail.lengthHours',
+  'admin::cs_CZ::class.paladin',
+  'admin::cs_CZ::poi.eastbrook_vale.0',
+  'admin::cs_CZ::poi.eastbrook_vale.4',
+  'admin::cs_CZ::poi.mirefen_marsh.0',
+  'admin::cs_CZ::poi.thornpeak_heights.0',
+  'admin::cs_CZ::poi.thornpeak_heights.5',
+  'admin::cs_CZ::location.kind.dungeon',
+  'admin::cs_CZ::location.instance',
+  'admin::cs_CZ::location.slot',
 ];
 
 export const V07_SLASH = [

@@ -426,3 +426,24 @@ function rollFocusTier(rng: Rng, bonus: number): HarvestTier {
   const shifted = Math.min(HARVEST_TIERS.length - 1, index + bonus);
   return HARVEST_TIERS[shifted];
 }
+
+// Signed materials (#1145): a corpse-harvested monster material rolls the same
+// MaterialRarity ladder a gathering node does (rollMaterialRarity, above), but a
+// corpse yield has no per-player proficiency counter to scale off (there is no
+// "skinning" gathering profession yet, unlike mining/logging/herbalism): it uses
+// a fixed baseline "power" input instead, tuned so a corpse harvest has a real
+// but modest chance (about 16%) of coming back rare-or-better. One rng.next()
+// draw per harvest that actually yields an item, same one-draw convention as
+// rollMaterialRarity itself.
+export const CORPSE_HARVEST_RARITY_BASELINE = 40;
+
+export function rollCorpseMaterialRarity(rng: Rng): MaterialRarity {
+  return rollMaterialRarity(CORPSE_HARVEST_RARITY_BASELINE, rng);
+}
+
+// The rarity floor at which a monster material is stamped with its gatherer's
+// name (#1145 acceptance criteria: "rare-or-better"). Below this tier the yield
+// stays a plain fungible stack, same as before this issue.
+export function isSignableMaterialRarity(rarity: MaterialRarity): boolean {
+  return rarity === 'rare' || rarity === 'epic' || rarity === 'legendary';
+}

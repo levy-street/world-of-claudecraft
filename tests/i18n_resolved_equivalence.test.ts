@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { assertDeterministic } from './helpers/i18n_determinism';
 
 // Byte-equivalence safety net for the i18n scaling refactor. Every
-// behavior-preserving change must leave the resolved 14-locale table
+// behavior-preserving change must leave the resolved locale table
 // byte-identical; this asserts the table's deterministic SHA-256 still matches
 // the committed baseline. The baseline changes ONLY in a change that
 // deliberately changes resolved output - a drift here is a bug, not a re-baseline.
@@ -30,7 +30,7 @@ describe('i18n resolved-table byte equivalence', () => {
     const match = out.match(/locales=(\d+) bytes=(\d+) sha256=([0-9a-f]{64})/);
     expect(match, `unexpected hash script output: ${out}`).toBeTruthy();
     const [, locales, , sha256] = match!;
-    expect(Number(locales)).toBe(21);
+    expect(Number(locales)).toBe(22);
 
     const baseline = readFileSync(baselinePath, 'utf8').trim();
     expect(sha256).toBe(baseline);

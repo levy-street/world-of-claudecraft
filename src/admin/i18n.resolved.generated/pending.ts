@@ -10,24 +10,105 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "es_ES": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "fr_FR": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "fr_CA": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "de_DE": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "zh_CN": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "zh_TW": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "ko_KR": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "ja_JP": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "pt_BR": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "ru_RU": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "cs_CZ": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "nl_NL": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "pl_PL": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "id_ID": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "tr_TR": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "sv_SE": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "vi_VN": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ],
+  "da_DK": [
+    "suspiciousPlayers.evidenceFirstSeen",
+    "suspiciousPlayers.evidenceLastSeen",
+    "suspiciousPlayers.evidenceOccurrences"
+  ]
 };
