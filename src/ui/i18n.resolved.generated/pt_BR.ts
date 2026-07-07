@@ -7975,12 +7975,14 @@ export const pt_BR: EnTranslations = {
       "crownforged": {
         "name": "Traje de Batalha Bonewrought",
         "bonus2": "Aumenta o poder de ataque em 40.",
-        "bonus3": "Aumenta a força em 15, o vigor em 15 e a velocidade de ataque e de lançamento em 15%."
+        "bonus3": "Aumenta a força em 15, o vigor em 15 e a velocidade de ataque e de lançamento em 15%.",
+        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Traje de Batalha Barrowlord",
         "bonus2": "Aumenta o poder de ataque em 40.",
-        "bonus3": "Aumenta a força em 15 e o vigor em 15."
+        "bonus3": "Aumenta a força em 15 e o vigor em 15.",
+        "bonus4": "Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 60 for 10 sec."
       },
       "greyjaw_stalker": {
         "name": "Equipamento do Espreitador de Greyjaw",
@@ -7990,22 +7992,25 @@ export const pt_BR: EnTranslations = {
         "name": "Vestes Mournweave",
         "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
         "bonus3": "Aumenta o intelecto em 10 e o vigor em 10.",
-        "bonus4": "Your spells have a chance to grant Clearcasting, making your next spell free."
+        "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
       "nighttalon": {
         "name": "Traje de Couro Direfang",
         "bonus2": "Aumenta o poder de ataque em 40.",
-        "bonus3": "Aumenta a agilidade em 15, a chance de crítico em 2% e a velocidade de ataque e de lançamento em 15%."
+        "bonus3": "Aumenta a agilidade em 15, a chance de crítico em 2% e a velocidade de ataque e de lançamento em 15%.",
+        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Vestes Wraithfire",
         "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
-        "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%."
+        "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Vestes Galecall",
         "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
-        "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%."
+        "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "vale_arcanist": {
         "name": "Vestes do Arcanista do Vale",
@@ -8014,7 +8019,8 @@ export const pt_BR: EnTranslations = {
       "wyrmshadow": {
         "name": "Traje Nightfang",
         "bonus2": "Aumenta o poder de ataque em 40.",
-        "bonus3": "Aumenta a agilidade em 15 e a chance de crítico em 2%."
+        "bonus3": "Aumenta a agilidade em 15 e a chance de crítico em 2%.",
+        "bonus4": "Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec."
       }
     }
   },

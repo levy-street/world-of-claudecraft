@@ -7975,12 +7975,14 @@ export const pl_PL: EnTranslations = {
       "crownforged": {
         "name": "Regalia Bonewrought",
         "bonus2": "Zwiększa siłę ataku o 40.",
-        "bonus3": "Zwiększa siłę o 15, wytrzymałość o 15 oraz szybkość ataku i rzucania zaklęć o 15%."
+        "bonus3": "Zwiększa siłę o 15, wytrzymałość o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
+        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Rynsztunek bojowy Barrowlorda",
         "bonus2": "Zwiększa siłę ataku o 40.",
-        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15."
+        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15.",
+        "bonus4": "Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 60 for 10 sec."
       },
       "greyjaw_stalker": {
         "name": "Rynsztunek tropiciela Szaroszczękiego",
@@ -7990,22 +7992,25 @@ export const pl_PL: EnTranslations = {
         "name": "Szaty Mournweave",
         "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
         "bonus3": "Zwiększa intelekt o 10 i wytrzymałość o 10.",
-        "bonus4": "Your spells have a chance to grant Clearcasting, making your next spell free."
+        "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
       "nighttalon": {
         "name": "Skóra Direfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
-        "bonus3": "Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%."
+        "bonus3": "Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%.",
+        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
-        "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%."
+        "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Szaty Galecall",
         "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
-        "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%."
+        "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "vale_arcanist": {
         "name": "Szaty Arkanisty z Doliny",
@@ -8014,7 +8019,8 @@ export const pl_PL: EnTranslations = {
       "wyrmshadow": {
         "name": "Szaty Nightfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
-        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%."
+        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%.",
+        "bonus4": "Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec."
       }
     }
   },

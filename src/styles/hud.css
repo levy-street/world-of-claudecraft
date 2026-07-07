@@ -971,6 +971,19 @@
   .buff.debuff[data-school="holy"] {
     border-color: var(--color-debuff-holy);
   }
+  /* The LOCAL player's own auras on the target strip (auras_view ownFirst):
+     larger and gold-glowed so the dots/hots YOU are maintaining read at a
+     glance among other casters'. A debuff keeps its school border tint (the
+     size and glow carry the prominence). Extra information only, never less,
+     so no graphics tier sheds it (gameplay-neutral-graphics invariant). */
+  .buff.own {
+    width: 34px;
+    height: 34px;
+    box-shadow: 0 0 5px var(--color-primary-dim);
+  }
+  .buff.own:not(.debuff) {
+    border-color: var(--color-primary);
+  }
   /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
   .buff.cancelable {
     cursor: context-menu;

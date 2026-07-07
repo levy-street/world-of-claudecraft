@@ -4871,33 +4871,45 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.crownforged.bonus3':
     '力量提高 15 點，耐力提高 15 點，攻擊速度和施法速度提高 15%。',
+  'entities.itemSets.crownforged.bonus4':
+    '你的武器致命一擊會使目標產生「骨刺」，每 2 秒流血 8 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.deathlord.name': '塚陵領主戰鬥護甲',
   'entities.itemSets.deathlord.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.deathlord.bonus3': '力量提高 15 點，耐力提高 15 點。',
+  'entities.itemSets.deathlord.bonus4':
+    '你的武器致命一擊有 50% 的機率觸發「墓塚之力」，使攻擊強度提高 60 點，持續 10 秒。',
   'entities.itemSets.greyjaw_stalker.name': '灰顎追獵者裝備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.necromancers.name': '哀織法衣',
   'entities.itemSets.necromancers.bonus2': '你不會被擊退（擊退抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 點，耐力提高 10 點。',
   'entities.itemSets.necromancers.bonus4':
-    '你的法術有機率觸發「清晰施法」，使你的下一個法術免費施放。',
+    '你的法術有 10% 的機率觸發「清晰施法」，使你的下一個法術免費施放。',
   'entities.itemSets.nighttalon.name': '厲牙皮甲',
   'entities.itemSets.nighttalon.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.nighttalon.bonus3':
     '敏捷提高 15 點，致命一擊機率提高 2%，攻擊速度和施法速度提高 15%。',
+  'entities.itemSets.nighttalon.bonus4':
+    '你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 6 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.soulflame.name': '怨焰法衣',
   'entities.itemSets.soulflame.bonus2': '你不會被擊退（擊退抗性 100%）。',
   'entities.itemSets.soulflame.bonus3':
     '智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。',
+  'entities.itemSets.soulflame.bonus4':
+    '你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。',
   'entities.itemSets.stormcallers.name': '喚風法衣',
   'entities.itemSets.stormcallers.bonus2': '你不會被擊退（擊退抗性 100%）。',
   'entities.itemSets.stormcallers.bonus3':
     '智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。',
+  'entities.itemSets.stormcallers.bonus4':
+    '你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。',
   'entities.itemSets.vale_arcanist.name': '谷地秘法師法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.wyrmshadow.name': '夜牙法衣',
   'entities.itemSets.wyrmshadow.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 點，致命一擊機率提高 2%。',
+  'entities.itemSets.wyrmshadow.bonus4':
+    '你的武器致命一擊有 50% 的機率觸發「獠牙疾襲」，使攻擊速度提高 25%，持續 8 秒。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時機率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成傷害的法術機率（{chance}%）：{effect}',

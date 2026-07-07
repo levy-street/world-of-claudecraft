@@ -5231,9 +5231,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus2': 'Сила атаки повышается на 40.',
   'entities.itemSets.crownforged.bonus3':
     'Сила повышается на 15, выносливость на 15, а скорость атаки и произнесения заклинаний на 15%.',
+  'entities.itemSets.crownforged.bonus4':
+    'Критические удары оружием оставляют в цели «Костяной осколок»: 8 ед. урона от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
   'entities.itemSets.deathlord.name': 'Боевой доспех Владыки Кургана',
   'entities.itemSets.deathlord.bonus2': 'Сила атаки повышается на 40.',
   'entities.itemSets.deathlord.bonus3': 'Сила повышается на 15, выносливость на 15.',
+  'entities.itemSets.deathlord.bonus4':
+    'Критические удары оружием с вероятностью 50% даруют «Могильную мощь», увеличивая силу атаки на 60 на 10 сек.',
   'entities.itemSets.greyjaw_stalker.name': 'Снаряжение ловчего Серой Челюсти',
   'entities.itemSets.greyjaw_stalker.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
@@ -5242,21 +5246,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вас невозможно отбросить (100% сопротивление отбрасыванию).',
   'entities.itemSets.necromancers.bonus3': 'Интеллект повышается на 10, выносливость на 10.',
   'entities.itemSets.necromancers.bonus4':
-    'Ваши заклинания могут даровать «Ясность», делая следующее заклинание бесплатным.',
+    'Ваши заклинания с вероятностью 10% даруют «Ясность», делая следующее заклинание бесплатным.',
   'entities.itemSets.nighttalon.name': 'Кожаный доспех Лютого Клыка',
   'entities.itemSets.nighttalon.bonus2': 'Сила атаки повышается на 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Ловкость повышается на 15, вероятность критического удара на 2%, а скорость атаки и произнесения заклинаний на 15%.',
+  'entities.itemSets.nighttalon.bonus4':
+    'Критические удары оружием наносят «Рваную рану»: цель теряет 6 ед. здоровья от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
   'entities.itemSets.soulflame.name': 'Одеяние Призрачного пламени',
   'entities.itemSets.soulflame.bonus2':
     'Вас невозможно отбросить (100% сопротивление отбрасыванию).',
   'entities.itemSets.soulflame.bonus3':
     'Интеллект повышается на 15, дух на 15, а скорость атаки и произнесения заклинаний на 15%.',
+  'entities.itemSets.soulflame.bonus4':
+    'Ваши заклинания с вероятностью 10% даруют «Пламя души», увеличивая силу заклинаний на 40 на 10 сек.',
   'entities.itemSets.stormcallers.name': 'Одеяние Зова Бури',
   'entities.itemSets.stormcallers.bonus2':
     'Вас невозможно отбросить (100% сопротивление отбрасыванию).',
   'entities.itemSets.stormcallers.bonus3':
     'Интеллект повышается на 15, дух на 15, а скорость атаки и произнесения заклинаний на 15%.',
+  'entities.itemSets.stormcallers.bonus4':
+    'Ваши заклинания с вероятностью 10% даруют «Пламя души», увеличивая силу заклинаний на 40 на 10 сек.',
   'entities.itemSets.vale_arcanist.name': 'Регалии арканиста Долины',
   'entities.itemSets.vale_arcanist.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
@@ -5264,6 +5274,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus2': 'Сила атаки повышается на 40.',
   'entities.itemSets.wyrmshadow.bonus3':
     'Ловкость повышается на 15, вероятность критического удара на 2%.',
+  'entities.itemSets.wyrmshadow.bonus4':
+    'Критические удары оружием с вероятностью 50% даруют «Клыкастый порыв», увеличивая скорость атаки на 25% на 8 сек.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Шанс от уронных заклинаний ({chance}%): {effect}',

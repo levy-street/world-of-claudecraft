@@ -232,6 +232,7 @@ const auraDeps: PartyRowAuraDeps = {
     iconId: (a) => a.id,
     auraName: (a) => a.name,
     formatStacks: (n) => String(n),
+    isOwn: () => false,
     durationUnits: () => ({ s: 's', m: 'm', h: 'h', d: 'd' }),
     auraEffectHtml: () => '',
   },

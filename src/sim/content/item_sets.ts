@@ -3,9 +3,11 @@
 // The sets are the epic armor families that drop from the Gravewyrm Sanctum
 // (tier 1) and the Nythraxis raid (tier 2), plus three leveling "haste kit"
 // families assembled from existing world-drop items. Wearing enough pieces of
-// a family grants stacking 2- and 3-piece bonuses, resolved in
+// a family grants stacking 2-, 3-, and 4-piece bonuses, resolved in
 // `recalcPlayerStats` (primary stats, attack power, crit, haste, knockback
-// resistance).
+// resistance). Every epic family's 4-piece tier is a proc (see SetProc):
+// weapon-crit-triggered for the plate and leather archetypes, spell-cast-
+// triggered for the caster archetypes, resolved by combat/set_procs.ts.
 //
 // Bonuses are keyed by archetype: the plate (Strength) families get attack
 // power then Strength/Stamina; the leather (Agility) families get attack power
@@ -49,6 +51,22 @@ export const SET_GREYJAW_STALKER = 'greyjaw_stalker'; // leather, marksman
 const STRENGTH_T1_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
   { pieces: 3, effect: { str: 15, sta: 15 }, text: 'Increases Strength by 15 and Stamina by 15.' },
+  {
+    pieces: 4,
+    effect: {
+      proc: {
+        id: 'set_gravemight',
+        name: 'Gravemight',
+        trigger: 'weaponCrit',
+        chance: 0.5,
+        aura: 'buff_ap',
+        value: 60,
+        duration: 10,
+        icd: 15,
+      },
+    },
+    text: 'Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 60 for 10 sec.',
+  },
 ];
 const AGILITY_T1_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
@@ -56,6 +74,23 @@ const AGILITY_T1_BONUSES: SetBonusTier[] = [
     pieces: 3,
     effect: { agi: 15, critRating: SET_CRIT_3PC_RATING },
     text: 'Increases Agility by 15 and critical strike chance by 2%.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      proc: {
+        id: 'set_fangrush',
+        name: 'Fangrush',
+        trigger: 'weaponCrit',
+        chance: 0.5,
+        // buff_haste value is a swing-interval divisor (1.25 = 25% faster swings)
+        aura: 'buff_haste',
+        value: 1.25,
+        duration: 8,
+        icd: 15,
+      },
+    },
+    text: 'Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec.',
   },
 ];
 const CASTER_T1_BONUSES: SetBonusTier[] = [
@@ -82,7 +117,7 @@ const CASTER_T1_BONUSES: SetBonusTier[] = [
         icd: 4,
       },
     },
-    text: 'Your spells have a chance to grant Clearcasting, making your next spell free.',
+    text: 'Your spells have a 10% chance to grant Clearcasting, making your next spell free.',
   },
 ];
 // Tier-2 3-piece tiers carry the tier-1 stats PLUS haste.
@@ -93,6 +128,29 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
     effect: { str: 15, sta: 15, hasteRating: SET_HASTE_3PC_RATING },
     text: 'Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.',
   },
+  {
+    pieces: 4,
+    effect: {
+      // Every weapon crit applies/stacks the bleed (no roll, no icd): with a
+      // sustained crit every 8 to 12s the bleed sits at 1 to 2 stacks, peaking
+      // at 3 (24 damage per 2s), roughly the 2-piece's flat 40 AP in
+      // sustained damage while rewarding crit stacking.
+      proc: {
+        id: 'set_bonesplinter',
+        name: 'Bonesplinter',
+        trigger: 'weaponCrit',
+        chance: 1,
+        applyTo: 'target',
+        aura: 'dot',
+        value: 8, // per tick, per stack
+        tickInterval: 2,
+        duration: 12,
+        maxStacks: 3,
+        school: 'physical',
+      },
+    },
+    text: 'Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+  },
 ];
 const AGILITY_T2_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
@@ -100,6 +158,28 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
     pieces: 3,
     effect: { agi: 15, critRating: SET_CRIT_3PC_RATING, hasteRating: SET_HASTE_3PC_RATING },
     text: 'Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      // Leather crits land more often (the 3-piece adds crit AND haste), so
+      // its bleed ticks lighter than the plate one: more applications, same
+      // sustained value, peaking at 18 damage per 2s at 3 stacks.
+      proc: {
+        id: 'set_ragged_gash',
+        name: 'Ragged Gash',
+        trigger: 'weaponCrit',
+        chance: 1,
+        applyTo: 'target',
+        aura: 'dot',
+        value: 6, // per tick, per stack
+        tickInterval: 2,
+        duration: 12,
+        maxStacks: 3,
+        school: 'physical',
+      },
+    },
+    text: 'Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const CASTER_T2_BONUSES: SetBonusTier[] = [
@@ -112,6 +192,22 @@ const CASTER_T2_BONUSES: SetBonusTier[] = [
     pieces: 3,
     effect: { int: 15, spi: 15, hasteRating: SET_HASTE_3PC_RATING },
     text: 'Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      proc: {
+        id: 'set_soulblaze',
+        name: 'Soulblaze',
+        trigger: 'spellCast',
+        chance: 0.1,
+        aura: 'buff_spellpower',
+        value: 40,
+        duration: 10,
+        icd: 20,
+      },
+    },
+    text: 'Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.',
   },
 ];
 // The leveling haste kits grant haste alone, and only at 3 pieces:

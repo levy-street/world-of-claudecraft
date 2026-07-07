@@ -7975,12 +7975,14 @@ export const cs_CZ: EnTranslations = {
       "crownforged": {
         "name": "Regálie z kosti",
         "bonus2": "Zvyšuje sílu útoku o 40.",
-        "bonus3": "Zvyšuje sílu o 15, výdrž o 15 a rychlost útoku i sesílání o 15 %."
+        "bonus3": "Zvyšuje sílu o 15, výdrž o 15 a rychlost útoku i sesílání o 15 %.",
+        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Bojová výbava mohylového pána",
         "bonus2": "Zvyšuje sílu útoku o 40.",
-        "bonus3": "Zvyšuje sílu o 15 a výdrž o 15."
+        "bonus3": "Zvyšuje sílu o 15 a výdrž o 15.",
+        "bonus4": "Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 60 for 10 sec."
       },
       "greyjaw_stalker": {
         "name": "Výbava stopaře Šedočelista",
@@ -7990,22 +7992,25 @@ export const cs_CZ: EnTranslations = {
         "name": "Oděv smutkotkaní",
         "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
         "bonus3": "Zvyšuje intelekt o 10 a výdrž o 10.",
-        "bonus4": "Your spells have a chance to grant Clearcasting, making your next spell free."
+        "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
       "nighttalon": {
         "name": "Kožešina děsivého tesáku",
         "bonus2": "Zvyšuje sílu útoku o 40.",
-        "bonus3": "Zvyšuje obratnost o 15, šanci na kritický zásah o 2 % a rychlost útoku i sesílání o 15 %."
+        "bonus3": "Zvyšuje obratnost o 15, šanci na kritický zásah o 2 % a rychlost útoku i sesílání o 15 %.",
+        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Regálie přízračného ohně",
         "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
-        "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %."
+        "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Roucha volání vichru",
         "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
-        "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %."
+        "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "vale_arcanist": {
         "name": "Regálie arkánisty z údolí",
@@ -8014,7 +8019,8 @@ export const cs_CZ: EnTranslations = {
       "wyrmshadow": {
         "name": "Roucha nočního tesáku",
         "bonus2": "Zvyšuje sílu útoku o 40.",
-        "bonus3": "Zvyšuje obratnost o 15 a šanci na kritický zásah o 2 %."
+        "bonus3": "Zvyšuje obratnost o 15 a šanci na kritický zásah o 2 %.",
+        "bonus4": "Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec."
       }
     }
   },

@@ -17,6 +17,10 @@ import {
 } from '../src/ui/auras_view';
 import { assertAllocationStable } from './util/alloc_probe';
 
+// The "local player" id the isOwn dep compares against (the real host compares
+// aura.sourceId to IWorld.playerId).
+const OWN_PLAYER_ID = 7;
+
 // Deterministic deps: the icon id mirrors the host (ability id, else `aura_<kind>`),
 // the name echoes the source name, the stack formatter is a plain String() (the real
 // host wraps formatNumber). No randomness/time, so same input -> same output.
@@ -25,6 +29,7 @@ function deps(): AurasDeps {
     iconId: (a) => (a.id.startsWith('aura_') ? `aura_${a.kind}` : a.id),
     auraName: (a) => `name:${a.name}`,
     formatStacks: (n) => String(n),
+    isOwn: (a) => a.sourceId === OWN_PLAYER_ID,
     durationUnits: () => ({ s: 's', m: 'm', h: 'h', d: 'd' }),
     auraEffectHtml: () => '',
   };
@@ -241,6 +246,42 @@ describe('createAurasView: derivation per mode', () => {
       return state.slots.slice(0, state.count).map((s) => ({ ...s }));
     };
     expect(build()).toEqual(build());
+  });
+});
+
+describe("ownFirst (the target strip): the local player's auras lead and mark own", () => {
+  it('sorts own auras first (group-stable) and flags them; others stay unflagged', () => {
+    const view = createAurasView('all', deps(), { ownFirst: true });
+    const state = view.tick(
+      entity([
+        aura({ id: 'mob_frenzy', kind: 'buff_haste', sourceId: 99 }),
+        aura({ id: 'my_dot', kind: 'dot', sourceId: OWN_PLAYER_ID }),
+        aura({ id: 'other_dot', kind: 'dot', sourceId: 42 }),
+        aura({ id: 'my_hot', kind: 'hot', sourceId: OWN_PLAYER_ID }),
+      ]),
+    );
+    expect(state.count).toBe(4);
+    const keys = state.slots.slice(0, 4).map((s) => s.key);
+    // own auras lead in their application order, then the rest in theirs
+    expect(keys).toEqual(['my_dot', 'my_hot', 'mob_frenzy', 'other_dot']);
+    expect(state.slots.slice(0, 4).map((s) => s.own)).toEqual([true, true, false, false]);
+  });
+
+  it('a missing or zero sourceId (an old server mirror) is never own', () => {
+    const view = createAurasView('all', deps(), { ownFirst: true });
+    const state = view.tick(
+      entity([
+        aura({ id: 'no_src', kind: 'dot' }),
+        aura({ id: 'zero_src', kind: 'dot', sourceId: 0 }),
+      ]),
+    );
+    expect(state.slots.slice(0, state.count).every((s) => !s.own)).toBe(true);
+  });
+
+  it("a non-ownFirst view never flags own even for the player's own auras", () => {
+    const view = createAurasView('all', deps());
+    const state = view.tick(entity([aura({ id: 'my_dot', kind: 'dot', sourceId: OWN_PLAYER_ID })]));
+    expect(state.slots[0].own).toBe(false);
   });
 });
 

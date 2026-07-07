@@ -10,7 +10,13 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -29,7 +35,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "es_ES": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -48,7 +60,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "fr_FR": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -67,7 +85,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "fr_CA": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -87,7 +111,13 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -106,7 +136,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "de_DE": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -141,7 +177,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.version"
   ],
   "pt_BR": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -164,7 +206,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.version"
   ],
   "cs_CZ": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -193,7 +241,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "nl_NL": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -212,7 +266,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "pl_PL": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -231,7 +291,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "id_ID": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -250,7 +316,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "tr_TR": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -269,7 +341,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "sv_SE": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -288,7 +366,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "vi_VN": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",
@@ -307,7 +391,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.names.hasteRating"
   ],
   "da_DK": [
+    "entities.itemSets.crownforged.bonus4",
+    "entities.itemSets.deathlord.bonus4",
     "entities.itemSets.necromancers.bonus4",
+    "entities.itemSets.nighttalon.bonus4",
+    "entities.itemSets.soulflame.bonus4",
+    "entities.itemSets.stormcallers.bonus4",
+    "entities.itemSets.wyrmshadow.bonus4",
     "hudChrome.bags.cannotDestroy",
     "hudChrome.bags.rightClickDestroy",
     "hudChrome.crafting.comboRequirementUnmet",

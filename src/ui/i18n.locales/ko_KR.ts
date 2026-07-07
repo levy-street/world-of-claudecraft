@@ -5135,33 +5135,45 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.crownforged.bonus3':
     '힘이 15, 체력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
+  'entities.itemSets.crownforged.bonus4':
+    '무기 치명타 적중 시 대상에게 "뼈 파편"을 남겨 12초 동안 2초마다 8의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다.',
   'entities.itemSets.deathlord.name': '고분군주의 전투장비',
   'entities.itemSets.deathlord.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.deathlord.bonus3': '힘이 15, 체력이 15만큼 증가합니다.',
+  'entities.itemSets.deathlord.bonus4':
+    '무기 치명타 적중 시 50% 확률로 "무덤의 위력"이 발동하여 전투력이 60만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.greyjaw_stalker.name': '그레이죠 추적자의 장비',
   'entities.itemSets.greyjaw_stalker.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.necromancers.name': '비탄직물 의복',
   'entities.itemSets.necromancers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
   'entities.itemSets.necromancers.bonus3': '지능이 10, 체력이 10만큼 증가합니다.',
   'entities.itemSets.necromancers.bonus4':
-    '주문 사용 시 일정 확률로 “선명한 시전”이 발동하여 다음 주문을 무료로 시전합니다.',
+    '주문 사용 시 10% 확률로 "선명한 시전"이 발동하여 다음 주문을 무료로 시전합니다.',
   'entities.itemSets.nighttalon.name': '흉포송곳니 가죽장비',
   'entities.itemSets.nighttalon.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.nighttalon.bonus3':
     '민첩이 15, 치명타 확률이 2% 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
+  'entities.itemSets.nighttalon.bonus4':
+    '무기 치명타 적중 시 "찢어진 상처"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다.',
   'entities.itemSets.soulflame.name': '망령불꽃 의복',
   'entities.itemSets.soulflame.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
   'entities.itemSets.soulflame.bonus3':
     '지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
+  'entities.itemSets.soulflame.bonus4':
+    '주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.stormcallers.name': '강풍부름 의복',
   'entities.itemSets.stormcallers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
   'entities.itemSets.stormcallers.bonus3':
     '지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
+  'entities.itemSets.stormcallers.bonus4':
+    '주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.vale_arcanist.name': '계곡 비전술사의 예복',
   'entities.itemSets.vale_arcanist.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.wyrmshadow.name': '밤송곳니 의복',
   'entities.itemSets.wyrmshadow.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
+  'entities.itemSets.wyrmshadow.bonus4':
+    '무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
