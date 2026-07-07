@@ -294,7 +294,7 @@ describe('gauntlet sentinel trial', () => {
     );
   }, 40000);
 
-  it('crossing the finish line wins the podium, culls the field to target, and records the run', () => {
+  it('a full six-trial run crowns one champion; an idle player falls along the way', () => {
     const sim = makeSim(5);
     const pid = sim.addPlayer('warrior', 'Champ');
     openAndJoin(sim, pid);
@@ -312,25 +312,30 @@ describe('gauntlet sentinel trial', () => {
     sim.tick();
     expect(sim.gauntletRunWire(pid)!.finished).toBe(true);
 
-    const tail = runToPodium(sim);
+    // From here the player never plays again. Every later game punishes
+    // idleness on purpose (timeout damage, forfeited wagers, a duel loss), so
+    // the player is knocked out somewhere down the line and watches the NPC
+    // field thin to a single champion.
+    const tail = runToPodium(sim, 20 * 700);
     expect(sim.gauntletRuns[0]!.phase).toBe('podium');
-
-    // NPC attrition: the field culls toward the trial target, plus the surviving player
     expect(aliveContestants(sim.gauntletRuns[0]!).length).toBe(
       GAUNTLET.targetSurvivorsPerTrial[GAUNTLET.trials.length - 1],
     );
-    // mid-trial fumbles were observed as knockout poofs
     expect(pick(tail, 'gauntletPoof').length).toBeGreaterThan(0);
 
+    // The idle player was eliminated mid-run and stayed as a spectator.
+    expect(run.playerStates.get(pid)?.spectating).toBe(true);
     const podium = pick(tail, 'gauntletPodium')[0]!;
-    expect(podium.won).toBe(true);
-    expect(podium.first).toBe('Champ');
-    expect(sim.meta(pid)!.gauntletStats).toEqual({
-      runs: 1,
-      wins: 1,
-      bestTrial: GAUNTLET.trials.length,
-    });
-  }, 40000);
+    expect(podium.won).toBe(false);
+    expect(podium.first).not.toBe('Champ');
+    expect(podium.first.length).toBeGreaterThan(0);
+    const stats = sim.meta(pid)!.gauntletStats;
+    expect(stats.runs).toBe(1);
+    expect(stats.wins).toBe(0);
+    // Cleared at least the Crossing, fell before the Final Court resolved.
+    expect(stats.bestTrial).toBeGreaterThanOrEqual(1);
+    expect(stats.bestTrial).toBeLessThan(GAUNTLET.trials.length);
+  }, 60000);
 });
 
 describe('gauntlet leave, disconnect, and forfeit', () => {
