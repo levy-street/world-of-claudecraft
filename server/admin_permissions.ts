@@ -7,6 +7,7 @@
 export const ADMIN_PERMISSIONS = [
   'analytics.read',
   'ops_usage.read',
+  'ops.perf',
   'accounts.read',
   'support.read',
   'moderation.read',

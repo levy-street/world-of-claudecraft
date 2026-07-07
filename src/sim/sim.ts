@@ -1005,7 +1005,8 @@ function freshCounters(): RewardCounters {
 export class Sim {
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world'>> & Pick<SimConfig, 'world'>;
+  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
+    Pick<SimConfig, 'world' | 'perfLap'>;
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -1112,6 +1113,7 @@ export class Sim {
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
+      perfLap: cfg.perfLap,
     };
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
@@ -2839,26 +2841,41 @@ export class Sim {
     // behavior, so every phase here is byte-identical (the parity gate proves it).
     this.time += DT;
     this.tickCount++;
+    // Optional per-phase timing hook (cfg.perfLap): the host attributes the elapsed
+    // time since its previous mark to the named phase. Undefined offline/headless, so
+    // this is a no-op there; it draws no rng and mutates nothing either way, keeping
+    // the tick deterministic. The server injects it for its on-demand tick profiler.
+    const lap = this.cfg.perfLap;
     this.updatePendingMobRespawns();
+    lap?.('respawns');
     this.updateWorldBosses();
+    lap?.('worldBosses');
     tickGroundAoEs(this.ctx);
+    lap?.('groundAoEs');
 
     runDespawnDecay(this.ctx);
+    lap?.('despawnDecay');
     // Step in-flight projectiles toward their live targets before this tick's casts and
     // swings, so a homing bolt resolves on a fixed, deterministic phase boundary.
     advancePendingProjectiles(this.ctx);
+    lap?.('projectiles');
 
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
       if (!p.dead) {
         this.updatePlayerMovement(p, meta);
+        lap?.('p.move');
         this.updateDoorTriggers(p);
+        lap?.('p.doors');
         this.updateCasting(p, meta);
+        lap?.('p.casting');
         this.updatePlayerAutoAttack(p, meta);
+        lap?.('p.autoAtk');
         updateRegen(this.ctx, p, meta);
         updateRested(p, meta);
         drainGatheringGrants(meta);
+        lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not
         // fight, cast, or regen. It CAN walk into a dungeon/raid door to re-enter its
@@ -2866,16 +2883,20 @@ export class Sim {
         // death model), or resurrect at its corpse / an overworld Spirit Healer.
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
+        lap?.('p.move');
       }
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
+      lap?.('p.auras');
     }
 
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
         this.updateMob(e);
+        lap?.('mob.update');
         updateAuras(this.ctx, e);
+        lap?.('mob.auras');
       } else if (e.kind === 'npc') {
         cleanseFriendlyNpcAuras(this.ctx, e);
       } else if (e.kind === 'object') {
@@ -2885,6 +2906,7 @@ export class Sim {
         }
       }
     }
+    lap?.('ent.misc');
 
     // one pass over the entities collects every player a mob is engaged
     // with, instead of one full scan per player
@@ -2914,21 +2936,32 @@ export class Sim {
       const p = this.entities.get(meta.entityId);
       if (p) p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
     }
+    lap?.('engaged');
 
     this.updateDuels();
+    lap?.('duels');
     this.updateArena();
+    lap?.('arena');
     this.updateTradesAndInvites();
+    lap?.('trades');
     this.updateLootRolls();
+    lap?.('lootRolls');
     this.updateInstances();
+    lap?.('instances');
     this.updateDelveRuns();
+    lap?.('delves');
     this.market.update();
+    lap?.('market');
     this.postOffice.update();
+    lap?.('postOffice');
     drainDelayedEvents(this.ctx);
+    lap?.('delayedEv');
 
     // movement re-bucketing: queries during the next tick and the server's
     // snapshot broadcast right after this one see fresh cells
     this.grid.refresh(this.entities.values());
     this.playerGrid.refresh(this.playerEntities());
+    lap?.('gridRefresh');
 
     const out = this.events;
     this.events = [];

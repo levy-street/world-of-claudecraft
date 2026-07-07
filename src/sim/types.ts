@@ -2225,6 +2225,12 @@ export interface SimConfig {
   // so callers that set this MUST also call setActiveWorldContent() with content
   // whose terrain-relevant fields are identical (see the sim.ts ctor invariant).
   world?: WorldContent;
+  // Optional per-phase timing hook: tick() calls this after each internal phase and
+  // the HOST owns the clock, attributing the elapsed time since its previous mark to
+  // `phase` (keeps wall-clock reads out of the sim, per the determinism guard). The
+  // server injects it to feed its tick profiler during an on-demand capture; undefined
+  // offline/headless, so the sim draws no wall clock in a deterministic scenario.
+  perfLap?: (phase: string) => void;
 }
 
 export function emptyMoveInput(): MoveInput {

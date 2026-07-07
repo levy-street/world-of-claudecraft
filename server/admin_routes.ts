@@ -25,6 +25,9 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/activity', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/perf/summary', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/perf/raw', permission: 'analytics.read' },
+  // Server tick-loop profiling capture: ops-sensitive, admin/superadmin only.
+  { method: 'GET', pattern: '/admin/api/perf/tick', permission: 'ops.perf' },
+  { method: 'POST', pattern: '/admin/api/perf/tick/capture', permission: 'ops.perf' },
   { method: 'GET', pattern: '/admin/api/characters', permission: 'accounts.read' },
 
   { method: 'GET', pattern: '/admin/api/accounts', permission: 'accounts.read' },
