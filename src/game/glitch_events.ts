@@ -54,6 +54,8 @@ const WORLD_OBSERVE_MS = 2000;
 const UI_SURFACE_THROTTLE_MS = 30_000;
 const XP_THROTTLE_MS = 15_000;
 const LOW_HEALTH_THROTTLE_MS = 60_000;
+const CHAT_RECEIVE_THROTTLE_MS = 10_000;
+const BARK_THROTTLE_MS = 15_000;
 
 export class GlitchBehaviorTracker {
   private readonly sendEvent: GlitchBehaviorEventSender;
@@ -66,6 +68,9 @@ export class GlitchBehaviorTracker {
   private lastLevel: number | null = null;
   private lastXpAt = Number.NEGATIVE_INFINITY;
   private lastLowHealthAt = Number.NEGATIVE_INFINITY;
+  private lastInCombat: boolean | null = null;
+  private lastBarkAt = Number.NEGATIVE_INFINITY;
+  private readonly lastChatReceiveAt = new Map<string, number>();
 
   constructor(opts: GlitchBehaviorTrackerOptions) {
     this.sendEvent = opts.sendEvent;
@@ -118,6 +123,14 @@ export class GlitchBehaviorTracker {
       this.lastLowHealthAt = now;
       this.track('combat', 'low_health', snapshot);
     }
+
+    const inCombat = Boolean(snapshot.in_combat);
+    if (this.lastInCombat === null) {
+      this.lastInCombat = inCombat;
+    } else if (inCombat !== this.lastInCombat) {
+      this.lastInCombat = inCombat;
+      this.track('combat', inCombat ? 'engage' : 'disengage', snapshot);
+    }
   }
 
   trackFirstInput(kind: string, world: IWorld): void {
@@ -140,6 +153,10 @@ export class GlitchBehaviorTracker {
 
   trackChat(actionKey: string, metadata: Metadata, world: IWorld): void {
     this.track('chat', actionKey, { ...worldMetadata(world), ...metadata });
+  }
+
+  trackEmote(emoteId: string, world: IWorld): void {
+    this.track('emote', 'perform', { ...worldMetadata(world), emote_id: normalizeKey(emoteId) });
   }
 
   trackTalkInteraction(input: GlitchTalkInteractionInput, world: IWorld): void {
@@ -174,6 +191,16 @@ export class GlitchBehaviorTracker {
         if (event.stepKey === 'progression' && event.actionKey === 'xp_gain') {
           if (now - this.lastXpAt < XP_THROTTLE_MS) continue;
           this.lastXpAt = now;
+        }
+        if (event.stepKey === 'chat' && event.actionKey === 'receive') {
+          const channel = String(event.metadata?.channel ?? 'say');
+          const last = this.lastChatReceiveAt.get(channel) ?? Number.NEGATIVE_INFINITY;
+          if (now - last < CHAT_RECEIVE_THROTTLE_MS) continue;
+          this.lastChatReceiveAt.set(channel, now);
+        }
+        if (event.stepKey === 'companion_dialogue' && event.actionKey === 'bark') {
+          if (now - this.lastBarkAt < BARK_THROTTLE_MS) continue;
+          this.lastBarkAt = now;
         }
         this.track(
           event.stepKey,
@@ -214,9 +241,17 @@ export function behaviorEventInputsFromSimEvent(
     case 'comboPoint':
     case 'castStop':
     case 'log':
-    case 'chat':
-    case 'companionBark':
       return [];
+    case 'chat':
+      return chatBehaviorEventInputs(ev, world);
+    case 'companionBark':
+      return [
+        {
+          stepKey: 'companion_dialogue',
+          actionKey: 'bark',
+          metadata: { bark_id: ev.barkId, companion_id: ev.companionId },
+        },
+      ];
     case 'xp':
       return [
         {
@@ -289,9 +324,7 @@ export function behaviorEventInputsFromSimEvent(
         },
       ];
     case 'death':
-      return ev.entityId === world.player.id
-        ? [{ stepKey: 'death', actionKey: 'player_dead' }]
-        : [];
+      return deathBehaviorEventInputs(ev, world);
     case 'playerDeath':
       return [{ stepKey: 'death', actionKey: 'player_dead' }];
     case 'respawn':
@@ -408,6 +441,28 @@ export function behaviorEventInputsFromSimEvent(
           metadata: { delve_id: ev.delveId, tier_id: ev.tierId },
         },
       ];
+    case 'delveObjectiveComplete':
+      return [
+        {
+          stepKey: 'delve',
+          actionKey: 'objective_complete',
+          metadata: { delve_id: ev.delveId, tier_id: ev.tierId },
+        },
+      ];
+    case 'craftResult':
+      return [
+        {
+          stepKey: 'crafting',
+          actionKey: ev.ok ? 'craft_success' : 'craft_fail',
+          metadata: {
+            recipe_id: ev.recipeId,
+            item_id: ev.itemId ?? null,
+            count: ev.count ?? null,
+            quality: ev.quality ?? null,
+            reason: ev.reason ?? null,
+          },
+        },
+      ];
     case 'delveFailed':
       return [
         {
@@ -491,6 +546,58 @@ export function behaviorEventInputsFromSimEvent(
       ];
   }
   return [];
+}
+
+export function deathBehaviorEventInputs(
+  ev: Extract<SimEvent, { type: 'death' }>,
+  world: IWorld,
+): GlitchBehaviorEventInput[] {
+  // The local player died: record what dealt the killing blow (kind + class/template,
+  // never a player name).
+  if (ev.entityId === world.player.id) {
+    return [
+      { stepKey: 'death', actionKey: 'player_dead', metadata: killerMetadata(ev.killerId, world) },
+    ];
+  }
+  // Only the local player's own kills are behavior; nearby mobs dying to each other
+  // or to other players are not this player's signal.
+  if (ev.killerId !== world.player.id) return [];
+  const victim = world.entities?.get(ev.entityId) ?? null;
+  if (victim?.kind === 'player') {
+    return [
+      {
+        stepKey: 'combat_pvp',
+        actionKey: 'killing_blow',
+        metadata: { victim_class: victim.templateId, victim_level: victim.level },
+      },
+    ];
+  }
+  return [
+    {
+      stepKey: 'combat',
+      actionKey: 'enemy_slain',
+      metadata: victim
+        ? { victim_kind: victim.kind, mob_template: victim.templateId, victim_level: victim.level }
+        : { victim_kind: 'unknown' },
+    },
+  ];
+}
+
+export function chatBehaviorEventInputs(
+  ev: Extract<SimEvent, { type: 'chat' }>,
+  world: IWorld,
+): GlitchBehaviorEventInput[] {
+  // The player's own outgoing messages are tracked at the send site (trackChat).
+  // Here we only record messages the player receives, by channel, never any text
+  // or sender identity.
+  if (ev.fromPid === world.player.id) return [];
+  return [{ stepKey: 'chat', actionKey: 'receive', metadata: { channel: ev.channel ?? 'say' } }];
+}
+
+function killerMetadata(killerId: number, world: IWorld): Metadata {
+  const killer = world.entities?.get(killerId) ?? null;
+  if (!killer) return {};
+  return { killer_kind: killer.kind, killer_template: killer.templateId };
 }
 
 export function questLifecycleEventInputs(

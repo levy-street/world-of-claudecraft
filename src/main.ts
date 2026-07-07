@@ -910,6 +910,7 @@ async function startGame(
       hud.attachBehavior({
         onTalkInteraction: (event) => glitchBehavior.trackTalkInteraction(event, world),
         onMerchantInteraction: (event) => glitchBehavior.trackMerchantInteraction(event, world),
+        onEmote: (emoteId) => glitchBehavior.trackEmote(emoteId, world),
       });
     }
     perf.setHud(hud);

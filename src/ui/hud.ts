@@ -380,6 +380,7 @@ export interface OptionsHooks {
 export interface BehaviorHooks {
   onTalkInteraction(event: HudTalkInteractionEvent): void;
   onMerchantInteraction(event: HudMerchantInteractionEvent): void;
+  onEmote?(emoteId: string): void;
 }
 
 export interface HudTalkInteractionEvent {
@@ -2733,6 +2734,7 @@ export class Hud {
     if (picked === 'edit') this.openEmoteEditor();
     else if (picked) {
       this.sim.playEmote(picked);
+      this.behaviorHooks?.onEmote?.(picked);
       audio.click();
     }
   }
@@ -2742,6 +2744,7 @@ export class Hud {
     if (choice === 'edit') this.openEmoteEditor();
     else {
       this.sim.playEmote(choice);
+      this.behaviorHooks?.onEmote?.(choice);
       audio.click();
     }
   }
