@@ -224,8 +224,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '法術強度',
   'hudChrome.statInfo.names.critRating': '暴擊等級',
   'hudChrome.statInfo.names.hasteRating': '急速等級',
-  'hudChrome.statInfo.desc.critRating': '來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。',
-  'hudChrome.statInfo.desc.hasteRating': '來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。',
+  'hudChrome.statInfo.desc.critRating':
+    '來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。',
+  'hudChrome.statInfo.desc.hasteRating':
+    '來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。',
   'hudChrome.statInfo.sources.header': '構成：',
@@ -4875,7 +4877,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.necromancers.name': '哀織法衣',
   'entities.itemSets.necromancers.bonus2': '你不會被擊退（擊退抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 點，耐力提高 10 點。',
-  'entities.itemSets.necromancers.bonus4': '你的法術有機率觸發「清晰施法」，使你的下一個法術免費施放。',
+  'entities.itemSets.necromancers.bonus4':
+    '你的法術有機率觸發「清晰施法」，使你的下一個法術免費施放。',
   'entities.itemSets.nighttalon.name': '厲牙皮甲',
   'entities.itemSets.nighttalon.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.nighttalon.bonus3':
@@ -4897,9 +4900,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemProc.onMeleeHit': '命中時機率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成傷害的法術機率（{chance}%）：{effect}',
   'hudChrome.itemProc.onHeal': '治療時機率（{chance}%）：{effect}',
-  'hudChrome.itemProc.chainArc': '以{school}{name}（{damage}）轟擊目標，並跳躍至{jumps}個附近敵人，造成遞減傷害',
+  'hudChrome.itemProc.chainArc':
+    '以{school}{name}（{damage}）轟擊目標，並跳躍至{jumps}個附近敵人，造成遞減傷害',
   'hudChrome.itemProc.attackSlow': '並使目標攻擊速度降低{pct}%，持續{duration}秒',
-  'hudChrome.itemProc.dot': '引發{name}，一種{school}持續傷害效果，在{duration}秒內造成{total}點傷害',
+  'hudChrome.itemProc.dot':
+    '引發{name}，一種{school}持續傷害效果，在{duration}秒內造成{total}點傷害',
   'hudChrome.itemProc.hot': '綻放{name}，一種持續治療效果，在{duration}秒內恢復{total}點生命',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',

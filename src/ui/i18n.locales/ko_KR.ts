@@ -232,8 +232,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '주문력',
   'hudChrome.statInfo.names.critRating': '치명타 등급',
   'hudChrome.statInfo.names.hasteRating': '가속 등급',
-  'hudChrome.statInfo.desc.critRating': '장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.',
-  'hudChrome.statInfo.desc.hasteRating': '장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.',
+  'hudChrome.statInfo.desc.critRating':
+    '장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.',
+  'hudChrome.statInfo.desc.hasteRating':
+    '장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.',
   'hudChrome.statInfo.desc.spellPower':
     '주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.',
   'hudChrome.statInfo.sources.header': '구성:',
@@ -5139,7 +5141,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.necromancers.name': '비탄직물 의복',
   'entities.itemSets.necromancers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
   'entities.itemSets.necromancers.bonus3': '지능이 10, 체력이 10만큼 증가합니다.',
-  'entities.itemSets.necromancers.bonus4': '주문 사용 시 일정 확률로 “선명한 시전”이 발동하여 다음 주문을 무료로 시전합니다.',
+  'entities.itemSets.necromancers.bonus4':
+    '주문 사용 시 일정 확률로 “선명한 시전”이 발동하여 다음 주문을 무료로 시전합니다.',
   'entities.itemSets.nighttalon.name': '흉포송곳니 가죽장비',
   'entities.itemSets.nighttalon.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.nighttalon.bonus3':
@@ -5161,9 +5164,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onHeal': '치유 시 확률 ({chance}%): {effect}',
-  'hudChrome.itemProc.chainArc': '{school} {name}({damage})으로 대상을 강타하고 주변의 적 {jumps}명에게 감소하는 피해로 도약합니다',
+  'hudChrome.itemProc.chainArc':
+    '{school} {name}({damage})으로 대상을 강타하고 주변의 적 {jumps}명에게 감소하는 피해로 도약합니다',
   'hudChrome.itemProc.attackSlow': '대상의 공격 속도를 {duration}초 동안 {pct}% 감소시킵니다',
-  'hudChrome.itemProc.dot': '{name}을 유발하여 {duration}초 동안 {total}의 {school} 지속 피해를 입힙니다',
+  'hudChrome.itemProc.dot':
+    '{name}을 유발하여 {duration}초 동안 {total}의 {school} 지속 피해를 입힙니다',
   'hudChrome.itemProc.hot': '{name}을 피워 {duration}초 동안 {total}의 생명력을 회복시킵니다',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.abilityScaling.bonus': '(+{value})',
