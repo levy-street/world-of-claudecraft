@@ -2,17 +2,23 @@
 // (POST /v1/sound-generation) from the catalog in scripts/sfx/sfx_prompts.mjs.
 //
 //   ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]
+//   node scripts/gen_sfx.mjs --conform-existing
 //
 // Output:
 //   public/audio/sfx/<key>.mp3            the audio (served at /audio/sfx/…)
 //   src/game/sfx_manifest.generated.ts    key -> public path + loop flag
 //
 // Idempotent: existing files are skipped unless --force. Offline-only; the key is
-// read from the environment / local .env and never committed.
+// read from the environment / local .env and never committed. Generated and
+// conformed files are post-processed through ffmpeg so the asset library stays on
+// the documented format/loudness/channel standard.
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
 import path from 'node:path';
 import { SFX } from './sfx/sfx_prompts.mjs';
+import { channelLabel, channelsForEntry, SFX_STANDARD } from './sfx/sfx_asset_standard.mjs';
+import { postProcessSfxFile } from './sfx/sfx_ffmpeg.mjs';
 
 const API = 'https://api.elevenlabs.io';
 const OUTPUT_FORMAT = 'mp3_44100_128';
@@ -21,7 +27,25 @@ const root = process.cwd();
 const sfxDir = path.join(root, 'public/audio/sfx');
 const manifestPath = path.join(root, 'src/game/sfx_manifest.generated.ts');
 
-const force = process.argv.includes('--force');
+const args = new Set(process.argv.slice(2));
+const force = args.has('--force');
+const conformExisting = args.has('--conform-existing');
+const help = args.has('--help') || args.has('-h');
+
+if (help) {
+  console.log([
+    'Usage:',
+    '  ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]',
+    '  node scripts/gen_sfx.mjs --conform-existing',
+    '',
+    'Options:',
+    '  --force             Regenerate clips that already exist.',
+    '  --conform-existing  Reprocess existing public/audio/sfx clips through ffmpeg',
+    '                      without calling ElevenLabs. Missing clips are generated',
+    '                      only when ELEVENLABS_API_KEY is available.',
+  ].join('\n'));
+  process.exit(0);
+}
 
 try {
   process.loadEnvFile();
@@ -29,7 +53,7 @@ try {
   /* no .env, rely on the ambient env */
 }
 const KEY = process.env.ELEVENLABS_API_KEY;
-if (!KEY) {
+if (!KEY && !conformExisting) {
   console.error('ELEVENLABS_API_KEY is not set (env or .env). Aborting.');
   process.exit(1);
 }
@@ -63,26 +87,53 @@ async function generate(entry, { retries = 4 } = {}) {
   }
 }
 
+async function postProcess(entry, inputPath, dest) {
+  const channels = channelsForEntry(entry);
+  return postProcessSfxFile(inputPath, dest, {
+    channels,
+    sampleRateHz: SFX_STANDARD.sampleRateHz,
+    bitrateKbps: SFX_STANDARD.generatedBitrateKbps,
+    peakDbfs: SFX_STANDARD.peakDbfs,
+  });
+}
+
 mkdirSync(sfxDir, { recursive: true });
 let made = 0;
+let conformed = 0;
 let skipped = 0;
 let seconds = 0;
 const failed = [];
 
 for (const entry of SFX) {
   const dest = path.join(sfxDir, `${entry.key}.mp3`);
-  if (entry.custom) {
-    skipped++;
-    continue;
-  } // custom recording, never regenerate via API
-  if (existsSync(dest) && !force) {
-    skipped++;
+  const channels = channelsForEntry(entry);
+  const detail = `${entry.duration}s${entry.loop ? ', loop' : ''}, ${channelLabel(channels)}`;
+
+  if (existsSync(dest) && conformExisting && !force) {
+    process.stdout.write(`sfx  ${entry.key} (${detail}) conform… `);
+    try {
+      await postProcess(entry, dest, dest);
+      conformed++;
+      console.log('ok');
+    } catch (err) {
+      console.log('FAILED');
+      console.error(`  ${err.message}`);
+      failed.push(entry.key);
+      process.exitCode = 1;
+    }
     continue;
   }
-  process.stdout.write(`sfx  ${entry.key} (${entry.duration}s${entry.loop ? ', loop' : ''})… `);
+
+  if (entry.custom) { skipped++; continue; }
+  if (existsSync(dest) && !force) { skipped++; continue; }
+  if (!KEY) { skipped++; continue; }
+
+  process.stdout.write(`sfx  ${entry.key} (${detail})… `);
+  const rawPath = path.join(sfxDir, `.${entry.key}.${process.pid}.${Date.now()}.raw.mp3`);
   try {
     const mp3 = await generate(entry);
-    writeFileSync(dest, mp3);
+    writeFileSync(rawPath, mp3);
+    await postProcess(entry, rawPath, dest);
     seconds += entry.duration;
     made++;
     console.log('ok');
@@ -93,6 +144,8 @@ for (const entry of SFX) {
     console.error(`  ${err.message}`);
     failed.push(entry.key);
     process.exitCode = 1;
+  } finally {
+    await rm(rawPath, { force: true });
   }
 }
 
@@ -124,9 +177,7 @@ writeFileSync(
 );
 
 console.log(
-  `\nDone: ${made} generated, ${skipped} skipped, ${Object.keys(sorted).length}/${SFX.length} clips on disk.`,
+  `\nDone: ${made} generated, ${conformed} conformed, ${skipped} skipped, ${Object.keys(sorted).length}/${SFX.length} clips on disk.`,
 );
-console.log(
-  `Billed ~${seconds.toFixed(1)} seconds of audio this run. Manifest: ${path.relative(root, manifestPath)}`,
-);
+console.log(`Billed ~${seconds.toFixed(1)} seconds of audio this run. Manifest: ${path.relative(root, manifestPath)}`);
 if (failed.length) console.log(`Failed (${failed.length}): ${failed.join(', ')}`);
