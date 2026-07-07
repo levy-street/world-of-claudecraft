@@ -34,6 +34,7 @@ import { handleAdminApi, parsePageParams } from './admin';
 import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
 import { permissionsForRoles } from './admin_permissions';
 import {
+  handleAldrinCancel,
   handleAldrinConfirm,
   handleAldrinQuote,
   handleAldrinStatus,
@@ -1503,6 +1504,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleAldrinConfirm(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/aldrin/cancel') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleAldrinCancel(req, res, accountId);
     }
     if (req.method === 'POST' && url === '/api/aldrin/stripe/webhook') {
       return handleAldrinStripeWebhook(req, res);

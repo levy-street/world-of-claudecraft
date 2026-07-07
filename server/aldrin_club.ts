@@ -3,14 +3,16 @@
 // of its inputs so it is unit-testable without a database or a network (mirrors
 // the wallet_link.ts / chat_filter.ts pure-core split this repo prefers).
 //
-// What lives here: the membership clock (active / extend), the 50/50 split math,
-// the payment-quote shape + expiry, the perk catalog, and the pure verdict for an
-// already-parsed on-chain payment. The IO shells consume it:
-//   - server/aldrin_solana.ts   parses a finalized tx into ParsedOnchainPayment
-//   - server/aldrin_buyback.ts  swaps + burns the SOL/USDC buyback split
-//   - server/aldrin_stripe.ts   verifies a webhook then grants membership
-//   - server/aldrin_club_db.ts  persists quotes + an immutable payment ledger
-//   - server/aldrin_club_http.ts wires req/res to all of the above
+// SPLIT ARCHITECTURE (#938): the money logic (FX pricing, the 50/50 treasury +
+// buy-and-burn split, on-chain payment verification, Stripe signature
+// verification) MOVED to the economy service. This module now owns only what the
+// game still owns: the membership clock (active / extend / heal), the perk
+// catalog, the method guards, and the local payment-quote shape the ledger
+// persists (the amounts on that quote are service-authoritative, mirrored, never
+// recomputed here). The IO shells consume it:
+//   - server/subscription_proxy.ts proxies pricing + verification to the service
+//   - server/aldrin_club_db.ts     persists quotes + an immutable payment ledger
+//   - server/aldrin_club_http.ts   wires req/res to the service + the local grant
 
 export type AldrinPayMethod = 'sol' | 'usdc' | 'woc' | 'stripe';
 
@@ -153,33 +155,13 @@ export function healMembership(
 }
 
 // ---------------------------------------------------------------------------
-// Split math. By default 50% of a payment is removed from $WOC supply and 50%
-// funds the treasury. For SOL/USDC the "burn" portion is routed to the buyback
-// vault (the keeper swaps it to $WOC and burns it later); for a $WOC payment the
-// "burn" portion is burned directly in the same transaction. Same arithmetic
-// either way, so a single helper covers all three rails. Integer base units only.
-// ---------------------------------------------------------------------------
-export interface AldrinSplit {
-  /** Base units bought-and-burned (SOL/USDC) or burned in-tx ($WOC). */
-  splitBase: bigint;
-  /** Base units credited to the treasury. */
-  treasuryBase: bigint;
-}
-
-export function splitAldrinAmount(priceBase: bigint, burnBps: number): AldrinSplit {
-  if (priceBase < 0n) return { splitBase: 0n, treasuryBase: 0n };
-  const bps = BigInt(Math.max(0, Math.min(10000, Math.trunc(burnBps))));
-  const splitBase = (priceBase * bps) / 10000n;
-  return { splitBase, treasuryBase: priceBase - splitBase };
-}
-
-// ---------------------------------------------------------------------------
 // Payment quote. A single-use intent the client pays against. It pins the exact
-// base amount (a live FX snapshot for SOL/$WOC), the payee addresses, and a memo
-// equal to the quoteId so the on-chain tx is bound to this quote and account.
-// Amounts are decimal strings so the quote round-trips through JSON/JSONB without
-// BigInt loss. The IO shell supplies quoteId (random) and the FX-derived
-// priceBase; this builder is pure.
+// base amount (a live FX snapshot for SOL/$WOC, computed by the economy service),
+// the payee address, and a memo (the service subscriptionId) so the on-chain tx
+// is bound to this quote and account. Amounts are decimal strings so the quote
+// round-trips through JSON/JSONB without BigInt loss. Every amount is
+// service-authoritative: the HTTP shell fills this shape from the service quote
+// and the game recomputes nothing.
 // ---------------------------------------------------------------------------
 export interface AldrinQuote {
   quoteId: string;
@@ -205,117 +187,9 @@ export interface AldrinQuote {
   expiresAt: string;
 }
 
-export interface BuildQuoteInput {
-  quoteId: string;
-  accountId: number;
-  method: AldrinPayMethod;
-  usdCents: number;
-  mint: string | null;
-  decimals: number;
-  /** FX-derived total to charge, in base units (the IO shell computes this). */
-  priceBase: bigint;
-  treasury: string | null;
-  buyback: string | null;
-  burnBps: number;
-  nowMs: number;
-  ttlSeconds: number;
-}
-
-export function buildQuote(input: BuildQuoteInput): AldrinQuote {
-  const { splitBase, treasuryBase } = splitAldrinAmount(input.priceBase, input.burnBps);
-  return {
-    quoteId: input.quoteId,
-    accountId: input.accountId,
-    method: input.method,
-    usdCents: input.usdCents,
-    mint: input.mint,
-    decimals: input.decimals,
-    priceBase: input.priceBase.toString(),
-    treasury: input.treasury,
-    buyback: input.buyback,
-    treasuryBase: treasuryBase.toString(),
-    splitBase: splitBase.toString(),
-    memo: input.quoteId,
-    expiresAt: new Date(input.nowMs + input.ttlSeconds * 1000).toISOString(),
-  };
-}
-
 export function quoteExpired(q: Pick<AldrinQuote, 'expiresAt'>, nowMs: number): boolean {
   const t = Date.parse(q.expiresAt);
   return !Number.isFinite(t) || t <= nowMs;
-}
-
-// ---------------------------------------------------------------------------
-// On-chain verdict. The Solana shell parses a finalized transaction into this
-// normalized summary; this function decides whether it satisfies the quote.
-// Splitting parse (IO) from judgement (pure) is what makes the accept/reject
-// rules exhaustively testable with hand-built fixtures.
-// ---------------------------------------------------------------------------
-export interface ParsedOnchainPayment {
-  finalized: boolean;
-  succeeded: boolean;
-  /** The asset mint is held under Token-2022 in this tx (reject SPL look-alikes). */
-  usesToken2022: boolean;
-  /** A memo instruction exactly equal to the quote memo is present. */
-  memoMatches: boolean;
-  /** Payer's net outflow of the asset (base units, positive). */
-  payerSpentBase: bigint;
-  /** Base units credited to the treasury payee. */
-  treasuryCreditedBase: bigint;
-  /** Base units credited to the buyback vault (SOL/USDC). */
-  buybackCreditedBase: bigint;
-  /** Base units burned by the payer in this tx ($WOC direct burn). */
-  burnedBase: bigint;
-}
-
-export type AldrinVerdict = { ok: true } | { ok: false; reason: string };
-
-const reject = (reason: string): AldrinVerdict => ({ ok: false, reason });
-
-/**
- * Decide whether a parsed on-chain payment satisfies the quote. Reasons are
- * stable machine codes the HTTP layer maps to a localized message (and a "retry"
- * hint for `not_finalized`). The handler still owns the tx-signature replay guard
- * (a UNIQUE column in the payment ledger).
- */
-export function verifyAldrinPayment(q: AldrinQuote, p: ParsedOnchainPayment): AldrinVerdict {
-  if (!isCryptoMethod(q.method)) return reject('not_onchain');
-  const priceBase = BigInt(q.priceBase);
-  const treasuryBase = BigInt(q.treasuryBase);
-  const splitBase = BigInt(q.splitBase);
-
-  if (priceBase <= 0n) return reject('bad_price');
-  if (!p.finalized) return reject('not_finalized');
-  if (!p.succeeded) return reject('tx_failed');
-  if (q.mint && p.usesToken2022) return reject('token_2022');
-  if (!p.memoMatches) return reject('memo_mismatch');
-  if (p.payerSpentBase < priceBase) return reject('underpaid');
-  if (treasuryBase > 0n && p.treasuryCreditedBase < treasuryBase) return reject('treasury_short');
-
-  if (q.method === 'woc') {
-    if (splitBase > 0n && p.burnedBase < splitBase) return reject('burn_missing');
-  } else {
-    // sol / usdc: the buyback split must land in the disclosed buyback vault.
-    if (splitBase > 0n && p.buybackCreditedBase < splitBase) return reject('buyback_short');
-  }
-  return { ok: true };
-}
-
-// ---------------------------------------------------------------------------
-// USD -> base-unit conversion for a quoted FX rate. `usdPerAsset` is the price of
-// one whole asset unit in USD (e.g. 150 for SOL, 1 for USDC, 0.0004 for $WOC).
-// Returns ceil(base units) so rounding never underprices the membership.
-// ---------------------------------------------------------------------------
-export function usdCentsToAssetBase(
-  usdCents: number,
-  usdPerAsset: number,
-  decimals: number,
-): bigint {
-  if (!Number.isFinite(usdCents) || usdCents <= 0) return 0n;
-  if (!Number.isFinite(usdPerAsset) || usdPerAsset <= 0) return 0n;
-  const wholeAssets = usdCents / 100 / usdPerAsset;
-  const base = Math.ceil(wholeAssets * 10 ** decimals);
-  return base > 0 ? BigInt(base) : 0n;
 }
 
 // Fail loud at import (server boot, and in the test suite) if a perk ever becomes
