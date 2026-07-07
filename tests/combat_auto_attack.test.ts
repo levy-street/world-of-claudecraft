@@ -16,6 +16,7 @@ import {
 } from '../src/sim/combat/auto_attack';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 
@@ -367,5 +368,47 @@ describe('startAutoAttack while casting (the aggro-before-damage bug)', () => {
     startAutoAttack(sim.ctx, p.id);
     expect(mob.aiState).not.toBe('idle');
     expect(p.inCombat).toBe(true);
+  });
+});
+
+// Pins RANGED_WEAPON_COEFF (0.6) at the DAMAGE level, not just profile selection:
+// a fixed-roll weapon (min == max) and a hand-set rangedPower make every landed
+// hit exact, so dropping the coefficient, or applying it to wands, changes the
+// number and fails here. Misses (amount 0) and crits (x2) are asserted around it.
+describe('rangedSwing damage: the 0.6 weapon coefficient is Auto Shot only', () => {
+  it('a hunter shot lands at 0.6 x weapon roll + the AP term', () => {
+    const { sim, p } = makeSim('hunter', 20);
+    const mob = spawnDummy(sim, p, 5, 8);
+    mob.stats = { ...mob.stats, armor: 0 }; // no armor mitigation: keeps the hit exact
+    p.rangedPower = 140; // AP term: (140 / 14) x speed 2 = 20
+    const events = capture(sim);
+    for (let i = 0; i < 60; i++) rangedSwing(sim.ctx, p, mob, { min: 100, max: 100, speed: 2 });
+    for (let i = 0; i < 400 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    const hits = events.filter(
+      (e) => e.type === 'damage' && e.ability === 'Auto Shot' && e.kind === 'hit',
+    );
+    expect(hits.length).toBeGreaterThan(10);
+    expect(hits.some((h) => !h.crit)).toBe(true);
+    // 0.6 x 100 + 20 = 80 (would be 120 with the coefficient dropped)
+    for (const h of hits) expect(h.amount).toBe(h.crit ? 160 : 80);
+  });
+
+  it('a wand bolt lands at the FULL weapon roll (no coefficient)', () => {
+    const { sim, p } = makeSim('mage', 20);
+    const mob = spawnDummy(sim, p, 5, 8);
+    p.rangedPower = 140; // same AP term as above, isolating the coefficient arm
+    const events = capture(sim);
+    for (let i = 0; i < 60; i++)
+      rangedSwing(sim.ctx, p, mob, { min: 100, max: 100, speed: 2, wand: true, school: 'arcane' });
+    for (let i = 0; i < 400 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    const hits = events.filter(
+      (e) => e.type === 'damage' && e.ability === 'Wand' && e.kind === 'hit',
+    );
+    expect(hits.length).toBeGreaterThan(10);
+    expect(hits.some((h) => !h.crit)).toBe(true);
+    // 100 + 20 = 120 (would be 80 if the 0.6 leaked onto wands)
+    for (const h of hits) expect(h.amount).toBe(h.crit ? 240 : 120);
   });
 });

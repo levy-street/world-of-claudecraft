@@ -27,8 +27,8 @@ function fakeCtx(rollResult: boolean, nearby: any[] = []) {
   return { ctx: ctx as any, calls, rolls: () => chanceRolls };
 }
 
-function ent(id: number, mainhandItemId: string | null): any {
-  return { id, dead: false, mainhandItemId, pos: { x: 0, y: 0, z: 0 } };
+function ent(id: number, mainhandItemId: string | null, level = 20): any {
+  return { id, dead: false, mainhandItemId, level, pos: { x: 0, y: 0, z: 0 } };
 }
 
 const fire = (ctx: any, wielder: any, target: any, trigger: WeaponProcTrigger) =>
@@ -61,6 +61,15 @@ describe('runWeaponProcs: determinism / parity safety', () => {
     const { ctx, rolls } = fakeCtx(true);
     fire(ctx, ent(1, 'kingsbane_last_oath'), ent(2, null), 'heal');
     expect(rolls()).toBe(0);
+  });
+
+  it('draws NO rng for an under-level wielder (an inert over-level weapon)', () => {
+    // recalcPlayerStats keeps an over-level mainhand worn but inert; its procs
+    // must be inert too, and the gate short-circuits before any rng draw.
+    const { ctx, rolls, calls } = fakeCtx(true);
+    fire(ctx, ent(1, 'kingsbane_last_oath', 10), ent(2, null), 'meleeHit');
+    expect(rolls()).toBe(0);
+    expect(calls.length).toBe(0);
   });
 });
 

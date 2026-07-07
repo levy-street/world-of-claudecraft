@@ -2641,7 +2641,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 180, str: 6, sta: 7 },
     sellValue: 3600,
     requiredClass: ['warrior', 'paladin'],
-    set: 'crownforged', // 3rd Crownforged piece, unlocks the set's 3-piece bonus
+    set: 'crownforged', // 3rd Bonewrought piece, unlocks the set's 3-piece bonus
   },
   nighttalon_grips: {
     id: 'nighttalon_grips',
@@ -2653,7 +2653,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 110, agi: 8, sta: 5 },
     sellValue: 3600,
     requiredClass: ['rogue', 'hunter', 'druid'],
-    set: 'nighttalon', // 3rd Nighttalon piece, unlocks the set's 3-piece bonus
+    set: 'nighttalon', // 3rd Direfang piece, unlocks the set's 3-piece bonus
   },
   soulflame_gloves: {
     id: 'soulflame_gloves',
@@ -2665,7 +2665,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 60, int: 8, sta: 5 },
     sellValue: 3600,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
-    set: 'soulflame', // 3rd Soulflame piece, unlocks the set's 3-piece bonus
+    set: 'soulflame', // 3rd Wraithfire piece, unlocks the set's 3-piece bonus
   },
   stormcallers_handguards: {
     id: 'stormcallers_handguards',
@@ -2677,7 +2677,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 130, int: 8, sta: 5 },
     sellValue: 3600,
     requiredClass: ['shaman'],
-    set: 'stormcallers', // 3rd Stormcaller's piece, unlocks the set's 3-piece bonus
+    set: 'stormcallers', // 3rd Galecall piece, unlocks the set's 3-piece bonus
   },
   // --- Thunzharr, the Waking Peak (world boss): epic BELTS, each family's fourth
   // piece (helm, shoulder, glove, belt), alongside the glove drops above. ---
@@ -2736,9 +2736,11 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'legendary',
     weapon: { min: 42, max: 68, speed: 3.2 },
-    // A druid caster/healer staff: agility (feral) makes no sense on it and hunters/
-    // rogues cannot equip it, so its 17 points sit in spirit (druid mana/healing),
-    // still exactly on the 44-pt legendary mainhand budget.
+    // A druid caster/healer staff by deliberate choice: its 17 points sit in
+    // spirit (druid mana/healing) rather than agility, accepting that feral
+    // wearers lose real value from the swap (bear-form AP scales on agility).
+    // Hunters/rogues cannot equip it. Still exactly on the 44-pt legendary
+    // mainhand budget.
     stats: { spi: 17, sta: 13, int: 14 },
     sellValue: 25000,
     requiredClass: ['druid'],

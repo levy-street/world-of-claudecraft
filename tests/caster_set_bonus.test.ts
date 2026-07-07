@@ -7,7 +7,7 @@ import { aggregateSetBonuses, SET_NECROMANCERS } from '../src/sim/content/item_s
 import { MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import { type Entity, type PlayerClass, SPELL_POWER_PER_INT } from '../src/sim/types';
 
 const counts = (m: Record<string, number>) => new Map(Object.entries(m));
 
@@ -33,11 +33,13 @@ describe('caster set 2-piece bonus', () => {
     const eq = { chest: 'necromancers_starshroud', feet: 'necromancers_soulsteps' };
     const withSet = statsFor('mage', 20, eq);
     expect(withSet.knockbackResistance).toBe(1);
-    // the same two items minus the set bonus would give exactly 20 less spell power
-    const gearOnlySp = withSet.spellPower - 20;
-    const naked = statsFor('mage', 20, {});
-    expect(withSet.spellPower).toBe(gearOnlySp + 20);
-    expect(withSet.spellPower).toBeGreaterThanOrEqual(naked.spellPower + 20);
+    // Neither piece carries flat spell power, so the wearer's spell power is
+    // exactly the int-derived term plus the 2-piece flat +20 (an integer, so it
+    // commutes with the rounding); a one-piece wearer has no flat term at all.
+    // Together these pin that recalcPlayerStats actually folds the set bonus.
+    expect(withSet.spellPower).toBe(Math.round(withSet.stats.int * SPELL_POWER_PER_INT) + 20);
+    const onePiece = statsFor('mage', 20, { chest: 'necromancers_starshroud' });
+    expect(onePiece.spellPower).toBe(Math.round(onePiece.stats.int * SPELL_POWER_PER_INT));
   });
 });
 

@@ -319,8 +319,10 @@ export function recalcPlayerStats(
       ? mainhand.weapon
       : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
-  // Render-only: the equipped mainhand item id drives the held weapon model on
-  // the client (mapped via ITEM_WEAPON_VARIANTS). Gated on the item actually being
+  // The equipped mainhand item id: drives the held weapon model on the client
+  // (mapped via ITEM_WEAPON_VARIANTS) AND legendary weapon procs in combat
+  // (combat/equip_procs.ts, which re-applies the level gate above so an inert
+  // over-level weapon's procs are inert too). Gated on the item actually being
   // a weapon, mirroring the e.weapon derivation above (so a non-weapon mainhand,
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =

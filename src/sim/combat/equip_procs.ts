@@ -14,6 +14,7 @@
 // hostilesInRadius); no DOM/Three/Math.random.
 
 import { ITEMS } from '../data';
+import { meetsLevelRequirement } from '../item_level_req';
 import type { SimContext } from '../sim_context';
 import type { Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
 
@@ -27,10 +28,16 @@ export function runWeaponProcs(
   trigger: WeaponProcTrigger,
 ): void {
   if (target.dead) return;
+  // Entity.mainhandItemId stays populated for a worn OVER-LEVEL weapon (so the
+  // model keeps rendering) while recalcPlayerStats treats that weapon as inert.
+  // Mirror the level gate here so an inert weapon's procs are inert too (the
+  // equip gate makes this unreachable today, but a restored save could carry
+  // one). All these guards short-circuit BEFORE any rng draw.
   const id = wielder.mainhandItemId;
   if (!id) return;
   const item = ITEMS[id];
   if (item?.kind !== 'weapon' || !item.weaponProcs) return;
+  if (!meetsLevelRequirement(wielder.level, item)) return;
   const procs = item.weaponProcs;
   for (const proc of procs) {
     if (proc.trigger !== trigger) continue;

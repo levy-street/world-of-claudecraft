@@ -459,6 +459,11 @@ export function castAbility(
       ability: ability.id,
       time: channelDuration,
     });
+    // A channel never reaches applyAbility (its ticks resolve in updateCasting),
+    // so 'spellCast' set procs (Clearcasting) roll HERE, once per channel start.
+    // Gated on setProcs inside applySetProcs, so proc-less players draw no rng.
+    if (p.kind === 'player' && ability.school !== 'physical')
+      ctx.applySetProcs(p, target ?? null, 'spellCast');
     return;
   }
 
@@ -705,7 +710,9 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     spendAbilityCost(p, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.runEffects(p, meta, target, res);
-    if (p.kind === 'player') ctx.applySetProcs(p, target, 'spellCast');
+    // 'spellCast' means SPELLS: a physical friendly ability never rolls.
+    if (p.kind === 'player' && ability.school !== 'physical')
+      ctx.applySetProcs(p, target, 'spellCast');
     return;
   }
 
@@ -752,11 +759,19 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       }
       ctx.runEffects(src, meta, tgt, res);
     });
+    // 'spellCast' set procs (Clearcasting) roll at CAST COMPLETION, matching the
+    // trigger name: the cast is done even though the bolt is still in flight (a
+    // resisted or fizzled bolt was still a cast). Physical projectile shots
+    // (hunter Aimed / Concussive) are not spells and never roll.
+    if (p.kind === 'player' && isSpell) ctx.applySetProcs(p, target, 'spellCast');
     return;
   }
 
   spendAbilityCost(p, res);
   armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
   ctx.runEffects(p, meta, target, res);
-  if (p.kind === 'player') ctx.applySetProcs(p, target, 'spellCast');
+  // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
+  // cloth-capable druid) and toggle-offs fall through here and must not roll.
+  if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)
+    ctx.applySetProcs(p, target, 'spellCast');
 }

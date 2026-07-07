@@ -2635,8 +2635,7 @@ export class Sim {
       hasLineOfSight: sim.hasLineOfSight.bind(sim),
       findChargePath: sim.findChargePath.bind(sim),
       runEffects: (p, meta, target, res) => runEffectsImpl(sim.ctx, p, meta, target, res),
-      applySetProcs: (source, target, trigger) =>
-        applySetProcsImpl(sim.ctx, source, target, trigger),
+      applySetProcs: sim.applySetProcs.bind(sim),
       // P1a pet-AI seam: the helper the moved updatePet/petRangedAttack/petPickTarget
       // reach back for. syncPetAspect STAYS on Sim (pet-management, P1b owns it eventually);
       // effectiveAttackPower (C4b binding above) + isHostileTo (C4a binding above) are
