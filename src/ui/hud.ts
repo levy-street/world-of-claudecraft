@@ -36,6 +36,7 @@ import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
+import { GAUNTLET } from '../sim/content/gauntlet';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -10377,7 +10378,7 @@ export class Hud {
         }
         case 'gauntletPhase': {
           this.gauntletClock.calibrate(ev.remainingS, performance.now());
-          const line = this.gauntletPhaseBanner(ev.phase);
+          const line = this.gauntletPhaseBanner(ev.phase, ev.trialIndex);
           if (line) this.showSubzone(line);
           break;
         }
@@ -11358,12 +11359,26 @@ export class Hud {
     return run ? this.gauntletClock.estimate(run, performance.now()) : 0;
   }
 
-  private gauntletPhaseBanner(phase: GauntletPhase): string {
+  private gauntletPhaseBanner(phase: GauntletPhase, trialIndex: number): string {
     switch (phase) {
       case 'staging':
         return t('hudChrome.gauntlet.phaseStaging');
       case 'trial':
-        return t('hudChrome.gauntlet.phaseTrial');
+        // One banner per game; the sentinel keeps the original key.
+        switch (GAUNTLET.trials[trialIndex]) {
+          case 'sigils':
+            return t('hudChrome.gauntlet.phaseTrialSigils');
+          case 'pull':
+            return t('hudChrome.gauntlet.phaseTrialPull');
+          case 'wager':
+            return t('hudChrome.gauntlet.phaseTrialWager');
+          case 'span':
+            return t('hudChrome.gauntlet.phaseTrialSpan');
+          case 'court':
+            return t('hudChrome.gauntlet.phaseTrialCourt');
+          default:
+            return t('hudChrome.gauntlet.phaseTrial');
+        }
       case 'interlude':
         return t('hudChrome.gauntlet.phaseInterlude');
       case 'podium':
