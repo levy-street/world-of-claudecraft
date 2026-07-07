@@ -347,7 +347,26 @@ export const en_XA: EnTranslations = {
     },
     "castBar": {
       "playerAria": "[Ýóúŕ Çášţ Ɓáŕ]",
-      "targetAria": "[Úñíţ Çášţ Ɓáŕ]"
+      "targetAria": "[Úñíţ Çášţ Ɓáŕ]",
+      "casting": "[Çášţíñĝ]",
+      "channeling": "[Çĥáññéļíñĝ]",
+      "complete": "[Çóɱþļéţé]",
+      "interrupted": "[Íñţéŕŕúþţéð]",
+      "failed": "[Ƒáíļéð]",
+      "interruptible": "[Íñţéŕŕúþţíƀļé]",
+      "cannotInterrupt": "[Çáññóţ íñţéŕŕúþţ]",
+      "danger": "[Ðáñĝéŕ]",
+      "pet": "[Þéţ]",
+      "secondsShort": "[{seconds}š]",
+      "labelWithCue": "[{cue}: {label}]",
+      "ariaStatus": "[{bar}: {status} {label}, {seconds} ŕéɱáíñíñĝ]",
+      "ariaOutcome": "[{bar}: {status} {label}]"
+    },
+    "petAction": {
+      "auto": "[ÁÚŢÓ]",
+      "cooldownTitle": "[{action}: {seconds} ŕéɱáíñíñĝ]",
+      "cooldownAutoAria": "[{action}: {seconds} ŕéɱáíñíñĝ, {auto}]",
+      "autoAria": "[{action}: {auto}]"
     },
     "leaderboard": {
       "close": "[Çļóšé]",

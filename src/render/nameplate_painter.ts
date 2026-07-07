@@ -19,7 +19,7 @@
 import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { type Entity, isQuestTurnInNpc } from '../sim/types';
+import { DEMON_HEAL_CAST_ID, type Entity, FISHING_CAST_ID, isQuestTurnInNpc } from '../sim/types';
 import {
   devTierBadgeDataUrl,
   devTierByIndex,
@@ -50,6 +50,23 @@ import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
 const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
+
+const nameplateCastDisplayName = (id: string): string => {
+  if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
+  if (id === DEMON_HEAL_CAST_ID) return t('abilityUi.cast.demonHeal');
+  if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
+  return ABILITIES[id] ? tEntity({ kind: 'ability', id, field: 'name' }) : id;
+};
+
+function castCueText(st: ReturnType<typeof castBarState>): string {
+  const cues: string[] = [];
+  if (st.source === 'pet') cues.push(t('hudChrome.castBar.pet'));
+  if (st.kind === 'channel') cues.push(t('hudChrome.castBar.channeling'));
+  if (st.important) cues.push(t('hudChrome.castBar.danger'));
+  if (st.interrupt === 'uninterruptible') cues.push(t('hudChrome.castBar.cannotInterrupt'));
+  else if (st.interrupt === 'interruptible') cues.push(t('hudChrome.castBar.interruptible'));
+  return cues.join(', ');
+}
 
 export interface NameplatePainterDeps {
   /** the per-entity view pool the renderer owns (keyed by entity id) */
@@ -457,12 +474,16 @@ export class NameplatePainter {
     }
     v.castBar.style.display = '';
     v.castBar.classList.toggle('channel', st.channel);
+    v.castBar.classList.toggle('cast-kind-cast', st.kind === 'cast');
+    v.castBar.classList.toggle('cast-kind-channel', st.kind === 'channel');
+    v.castBar.classList.toggle('cast-source-pet', st.source === 'pet');
+    v.castBar.classList.toggle('interruptible', st.interrupt === 'interruptible');
+    v.castBar.classList.toggle('uninterruptible', st.interrupt === 'uninterruptible');
+    v.castBar.classList.toggle('important', st.important);
     v.castFill.style.width = `${(st.fill * 100).toFixed(1)}%`;
     // cast_bar.ts keeps st.label as a stable id (DOM/i18n-free); localize here.
-    v.castLabel.textContent = st.fishing
-      ? t('abilityUi.cast.fishing')
-      : ABILITIES[st.label]
-        ? tEntity({ kind: 'ability', id: st.label, field: 'name' })
-        : st.label;
+    const label = nameplateCastDisplayName(st.label);
+    const cue = castCueText(st);
+    v.castLabel.textContent = cue ? t('hudChrome.castBar.labelWithCue', { cue, label }) : label;
   }
 }

@@ -329,6 +329,25 @@ export const hudChromeStrings = {
   castBar: {
     playerAria: 'Your Cast Bar',
     targetAria: 'Unit Cast Bar',
+    casting: 'Casting',
+    channeling: 'Channeling',
+    complete: 'Complete',
+    interrupted: 'Interrupted',
+    failed: 'Failed',
+    interruptible: 'Interruptible',
+    cannotInterrupt: 'Cannot interrupt',
+    danger: 'Danger',
+    pet: 'Pet',
+    secondsShort: '{seconds}s',
+    labelWithCue: '{cue}: {label}',
+    ariaStatus: '{bar}: {status} {label}, {seconds} remaining',
+    ariaOutcome: '{bar}: {status} {label}',
+  },
+  petAction: {
+    auto: 'AUTO',
+    cooldownTitle: '{action}: {seconds} remaining',
+    cooldownAutoAria: '{action}: {seconds} remaining, {auto}',
+    autoAria: '{action}: {auto}',
   },
   // Leaderboard window chrome: the close-control accessible label only. The board's
   // title / subtitle / column / loading / empty / retry strings live in the game.ts

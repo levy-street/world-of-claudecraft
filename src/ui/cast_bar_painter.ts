@@ -24,13 +24,35 @@
 // `.channel` CSS class, never a hex in TS; the percent precision and the consume
 // label keys are named constants; CONSUME_DURATION lives in the core, not here.
 
-import type { CastBarState, ConsumeBarState, ConsumeMode } from '../render/cast_bar';
+import type {
+  CastBarInterrupt,
+  CastBarKind,
+  CastBarSource,
+  CastBarState,
+  ConsumeBarState,
+  ConsumeMode,
+} from '../render/cast_bar';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
 
 // The channel class drives the draining (vs filling) fill color via CSS; a channel,
 // a fishing channel, and the eat/drink overlay all use it.
 const CHANNEL_CLASS = 'channel';
+const KIND_CLASSES: Record<CastBarKind | 'consume', string> = {
+  cast: 'cast-kind-cast',
+  channel: 'cast-kind-channel',
+  consume: 'cast-kind-consume',
+};
+type PaintKind = CastBarKind | 'consume' | 'none';
+const PET_SOURCE_CLASS = 'cast-source-pet';
+const INTERRUPTIBLE_CLASS = 'interruptible';
+const UNINTERRUPTIBLE_CLASS = 'uninterruptible';
+const IMPORTANT_CLASS = 'important';
+const OUTCOME_CLASSES: Record<CastBarOutcomeKind, string> = {
+  success: 'outcome-success',
+  interrupted: 'outcome-interrupted',
+  failed: 'outcome-failed',
+};
 // The display value when the bar is shown, and the hidden value.
 const SHOWN_DISPLAY = 'block';
 const HIDDEN_DISPLAY = 'none';
@@ -47,6 +69,13 @@ const CONSUME_LABEL_KEYS: Record<ConsumeMode, TranslationKey> = {
   drink: 'hud.core.drinking',
   eatdrink: 'hud.core.eatingDrinking',
 };
+
+export type CastBarOutcomeKind = 'success' | 'interrupted' | 'failed';
+
+export interface CastBarOutcomeState {
+  kind: CastBarOutcomeKind;
+  label: string;
+}
 
 /** The four DOM nodes one cast-bar instance paints into. */
 export interface CastBarElements {
@@ -66,6 +95,10 @@ export interface CastBarOptions {
    *  (castDisplayName); the target shows the raw id (the identity resolver),
    *  byte-faithful to its inline block. */
   resolveCastLabel: (state: CastBarState) => string;
+  /** Localized base accessible-name key for this bar instance. */
+  barLabelKey: TranslationKey;
+  /** Player bars can suppress enemy interrupt cues while target/nameplate bars show them. */
+  showInterruptCues?: boolean;
   /** Clear the inner fill/label/timer + channel class when the bar is hidden (the
    *  player's inline block did; the target only set display:none). */
   clearOnHide?: boolean;
@@ -80,9 +113,13 @@ export interface CastBarPaintInput {
   /** The player's eat/drink overlay from consumeBarState; the target OMITS it, so
    *  the target instance can never render eat/drink. */
   consume?: ConsumeBarState;
+  /** Short success/interrupted/failed presentation pulse after the live cast ends. */
+  outcome?: CastBarOutcomeState;
 }
 
 export class CastBarPainter {
+  private classSignature = '';
+
   constructor(
     private readonly writers: PainterHostWriters,
     private readonly el: CastBarElements,
@@ -91,25 +128,61 @@ export class CastBarPainter {
 
   paint(input: CastBarPaintInput): void {
     if (input.cast.visible) {
-      this.paintBar(
-        input.cast.channel,
-        input.cast.fill,
-        this.opts.resolveCastLabel(input.cast),
-        input.castRemaining,
+      const label = this.opts.resolveCastLabel(input.cast);
+      const cue = this.cueText(
+        input.cast.kind,
+        input.cast.source,
+        input.cast.interrupt,
+        input.cast.important,
       );
+      const status =
+        input.cast.kind === 'channel'
+          ? t('hudChrome.castBar.channeling')
+          : t('hudChrome.castBar.casting');
+      const timer = this.timerText(input.castRemaining);
+      this.paintBar({
+        channel: input.cast.channel,
+        kind: input.cast.kind,
+        source: input.cast.source,
+        interrupt: input.cast.interrupt,
+        important: input.cast.important,
+        fill: input.cast.fill,
+        label,
+        visibleLabel: this.withCue(label, cue),
+        timer,
+        status,
+        ariaLabel: this.statusAria(status, label, timer),
+      });
     } else if (input.consume?.visible) {
       // PLAYER-ONLY: the consume overlay uses the channel styling and the localized
       // eat/drink label resolved from the core's stable mode discriminator.
-      this.paintBar(
-        true,
-        input.consume.fill,
-        t(CONSUME_LABEL_KEYS[input.consume.mode]),
-        input.consume.remaining,
-      );
+      const label = t(CONSUME_LABEL_KEYS[input.consume.mode]);
+      const timer = this.timerText(input.consume.remaining);
+      this.paintBar({
+        channel: true,
+        kind: 'consume',
+        source: 'player',
+        interrupt: 'unknown',
+        important: false,
+        fill: input.consume.fill,
+        label,
+        visibleLabel: label,
+        timer,
+        status: label,
+        ariaLabel: this.statusAria(label, label, timer),
+      });
+    } else if (input.outcome) {
+      this.paintOutcome(input.outcome);
     } else {
       this.writers.setDisplay(this.el.bar, HIDDEN_DISPLAY);
       if (this.opts.clearOnHide) {
-        this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, false);
+        this.applyClasses({
+          channel: false,
+          kind: 'none',
+          source: 'unit',
+          interrupt: 'unknown',
+          important: false,
+        });
         this.writers.setWidth(this.el.fill, EMPTY_FILL);
         this.writers.setText(this.el.label, '');
         this.writers.setText(this.el.timer, '');
@@ -117,25 +190,144 @@ export class CastBarPainter {
     }
   }
 
-  // Show the bar with a fill/label/timer, in the exact write order of the inline
-  // blocks (display, channel, width, label, timer) so the elided-writer cache keys
-  // line up byte-for-byte and the skip-rate accounting is unchanged.
-  private paintBar(channel: boolean, fill: number, label: string, remaining: number): void {
+  // Show the bar with a fill/label/timer. Dynamic classes only rewrite when their
+  // signature changes; width/timer keep updating per tick through the elided writers.
+  private paintBar(model: {
+    channel: boolean;
+    kind: PaintKind;
+    source: CastBarSource;
+    interrupt: CastBarInterrupt;
+    important: boolean;
+    fill: number;
+    label: string;
+    visibleLabel: string;
+    timer: string;
+    status: string;
+    ariaLabel: string;
+  }): void {
     this.writers.setDisplay(this.el.bar, SHOWN_DISPLAY);
-    this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, channel);
-    this.writers.setWidth(this.el.fill, `${(fill * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`);
-    this.writers.setText(this.el.label, label);
-    this.writers.setText(this.el.timer, this.timerText(remaining));
+    this.applyClasses(model);
+    this.writers.setWidth(this.el.fill, `${(model.fill * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`);
+    this.writers.setText(this.el.label, model.visibleLabel);
+    this.writers.setText(this.el.timer, model.timer);
     // Report the progress value: the bar is role="progressbar" with static
     // aria-valuemin/max but never exposed a value. Numeric, so no i18n key and no
     // hardcoded literal; routes through the elided setAttr so an unchanged percent does not write.
-    this.writers.setAttr(this.el.bar, 'aria-valuenow', String(Math.round(fill * 100)));
+    this.writers.setAttr(this.el.bar, 'aria-valuenow', String(Math.round(model.fill * 100)));
+    this.writers.setAttr(this.el.bar, 'aria-label', model.ariaLabel);
+  }
+
+  private paintOutcome(outcome: CastBarOutcomeState): void {
+    const status = this.outcomeStatus(outcome.kind);
+    this.writers.setDisplay(this.el.bar, SHOWN_DISPLAY);
+    this.applyClasses({
+      channel: false,
+      kind: 'cast',
+      source: 'unit',
+      interrupt: 'unknown',
+      important: false,
+      outcome: outcome.kind,
+    });
+    this.writers.setWidth(this.el.fill, `${(100).toFixed(PERCENT_FRACTION_DIGITS)}%`);
+    this.writers.setText(this.el.label, this.withCue(outcome.label, status));
+    this.writers.setText(this.el.timer, '');
+    this.writers.setAttr(this.el.bar, 'aria-valuenow', '100');
+    this.writers.setAttr(
+      this.el.bar,
+      'aria-label',
+      t('hudChrome.castBar.ariaOutcome', {
+        bar: t(this.opts.barLabelKey),
+        status,
+        label: outcome.label,
+      }),
+    );
   }
 
   private timerText(remaining: number): string {
-    return formatNumber(Math.max(0, remaining), {
+    const seconds = formatNumber(Math.max(0, remaining), {
       minimumFractionDigits: TIMER_FRACTION_DIGITS,
       maximumFractionDigits: TIMER_FRACTION_DIGITS,
     });
+    return t('hudChrome.castBar.secondsShort', { seconds });
+  }
+
+  private statusAria(status: string, label: string, seconds: string): string {
+    return t('hudChrome.castBar.ariaStatus', {
+      bar: t(this.opts.barLabelKey),
+      status,
+      label,
+      seconds,
+    });
+  }
+
+  private cueText(
+    kind: CastBarKind,
+    source: CastBarSource,
+    interrupt: CastBarInterrupt,
+    important: boolean,
+  ): string {
+    const cues: string[] = [];
+    if (source === 'pet') cues.push(t('hudChrome.castBar.pet'));
+    if (kind === 'channel') cues.push(t('hudChrome.castBar.channeling'));
+    if (important) cues.push(t('hudChrome.castBar.danger'));
+    if (this.opts.showInterruptCues !== false && source !== 'pet') {
+      if (interrupt === 'uninterruptible') cues.push(t('hudChrome.castBar.cannotInterrupt'));
+      else if (interrupt === 'interruptible') cues.push(t('hudChrome.castBar.interruptible'));
+    }
+    return cues.join(', ');
+  }
+
+  private withCue(label: string, cue: string): string {
+    if (!cue) return label;
+    return t('hudChrome.castBar.labelWithCue', { cue, label });
+  }
+
+  private outcomeStatus(kind: CastBarOutcomeKind): string {
+    switch (kind) {
+      case 'success':
+        return t('hudChrome.castBar.complete');
+      case 'interrupted':
+        return t('hudChrome.castBar.interrupted');
+      case 'failed':
+        return t('hudChrome.castBar.failed');
+    }
+  }
+
+  private applyClasses(model: {
+    channel: boolean;
+    kind: PaintKind;
+    source: CastBarSource;
+    interrupt: CastBarInterrupt;
+    important: boolean;
+    outcome?: CastBarOutcomeKind;
+  }): void {
+    const sig = [
+      model.channel ? '1' : '0',
+      model.kind,
+      model.source,
+      model.interrupt,
+      model.important ? '1' : '0',
+      model.outcome ?? '',
+    ].join(':');
+    if (sig === this.classSignature) return;
+    this.classSignature = sig;
+    this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, model.channel);
+    this.writers.toggleClass(this.el.bar, KIND_CLASSES.cast, model.kind === 'cast');
+    this.writers.toggleClass(this.el.bar, KIND_CLASSES.channel, model.kind === 'channel');
+    this.writers.toggleClass(this.el.bar, KIND_CLASSES.consume, model.kind === 'consume');
+    this.writers.toggleClass(this.el.bar, PET_SOURCE_CLASS, model.source === 'pet');
+    this.writers.toggleClass(this.el.bar, INTERRUPTIBLE_CLASS, model.interrupt === 'interruptible');
+    this.writers.toggleClass(
+      this.el.bar,
+      UNINTERRUPTIBLE_CLASS,
+      model.interrupt === 'uninterruptible',
+    );
+    this.writers.toggleClass(this.el.bar, IMPORTANT_CLASS, model.important);
+    for (const [kind, className] of Object.entries(OUTCOME_CLASSES) as [
+      CastBarOutcomeKind,
+      string,
+    ][]) {
+      this.writers.toggleClass(this.el.bar, className, model.outcome === kind);
+    }
   }
 }

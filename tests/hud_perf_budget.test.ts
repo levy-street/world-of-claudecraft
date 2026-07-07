@@ -395,7 +395,10 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
       label: fakeEl(),
       timer: fakeEl(),
     };
-    const opts: CastBarOptions = { resolveCastLabel: (s) => s.label };
+    const opts: CastBarOptions = {
+      resolveCastLabel: (s) => s.label,
+      barLabelKey: 'hudChrome.castBar.playerAria',
+    };
     const painter = new CastBarPainter(facet, els, opts);
     const cast: CastBarState = {
       visible: true,
@@ -403,6 +406,10 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
       fill: 0.8,
       label: 'fireball',
       fishing: false,
+      kind: 'cast',
+      source: 'player',
+      interrupt: 'unknown',
+      important: false,
     };
     const input: CastBarPaintInput = { cast, castRemaining: 0.5 };
     harnesses.push({ name: 'cast_bar', drive: () => painter.paint(input) });

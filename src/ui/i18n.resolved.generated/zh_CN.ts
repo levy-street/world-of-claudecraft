@@ -347,7 +347,26 @@ export const zh_CN: EnTranslations = {
     },
     "castBar": {
       "playerAria": "你的施法条",
-      "targetAria": "目标施法条"
+      "targetAria": "目标施法条",
+      "casting": "施法中",
+      "channeling": "引导中",
+      "complete": "完成",
+      "interrupted": "已打断",
+      "failed": "失败",
+      "interruptible": "可打断",
+      "cannotInterrupt": "不可打断",
+      "danger": "危险",
+      "pet": "宠物",
+      "secondsShort": "{seconds}秒",
+      "labelWithCue": "{cue}：{label}",
+      "ariaStatus": "{bar}：{status}{label}，剩余 {seconds}",
+      "ariaOutcome": "{bar}：{status}{label}"
+    },
+    "petAction": {
+      "auto": "自动",
+      "cooldownTitle": "{action}：剩余 {seconds}",
+      "cooldownAutoAria": "{action}：剩余 {seconds}，{auto}",
+      "autoAria": "{action}：{auto}"
     },
     "leaderboard": {
       "close": "关闭",

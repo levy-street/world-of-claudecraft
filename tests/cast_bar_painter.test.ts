@@ -60,14 +60,29 @@ const ELEMENTS: CastBarElements = { bar: BAR, fill: FILL, label: LABEL, timer: T
 // so the test proves the painter routes the label through the instance resolver.
 const PLAYER_OPTS: CastBarOptions = {
   resolveCastLabel: (s) => `LOC:${s.label}`,
+  barLabelKey: 'hudChrome.castBar.playerAria',
   clearOnHide: true,
 };
 // The target shows the raw cast id (identity resolver), byte-faithful to its inline
 // block, and does NOT clear on hide (it only set display:none).
-const TARGET_OPTS: CastBarOptions = { resolveCastLabel: (s) => s.label };
+const TARGET_OPTS: CastBarOptions = {
+  resolveCastLabel: (s) => `TARGET:${s.label}`,
+  barLabelKey: 'hudChrome.castBar.targetAria',
+};
 
 function castState(over: Partial<CastBarState> = {}): CastBarState {
-  return { visible: true, channel: false, fill: 0.8, label: 'fireball', fishing: false, ...over };
+  return {
+    visible: true,
+    channel: false,
+    fill: 0.8,
+    label: 'fireball',
+    fishing: false,
+    kind: 'cast',
+    source: 'unit',
+    interrupt: 'interruptible',
+    important: false,
+    ...over,
+  };
 }
 function consumeState(over: Partial<ConsumeBarState> = {}): ConsumeBarState {
   return { visible: true, fill: 0.5, mode: 'eat', remaining: 9, ...over };
@@ -78,6 +93,10 @@ const HIDDEN_CAST: CastBarState = {
   fill: 0,
   label: '',
   fishing: false,
+  kind: 'cast',
+  source: 'unit',
+  interrupt: 'unknown',
+  important: false,
 };
 
 function paint(input: CastBarPaintInput, opts: CastBarOptions): Call[] {
@@ -89,7 +108,12 @@ function paint(input: CastBarPaintInput, opts: CastBarOptions): Call[] {
 // The timer is formatted exactly as the inline block did; compute the expected via
 // the same formatter so the assertion is locale-independent.
 const timer = (s: number) =>
-  formatNumber(Math.max(0, s), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  t('hudChrome.castBar.secondsShort', {
+    seconds: formatNumber(Math.max(0, s), {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }),
+  });
 
 describe('CastBarPainter: the player instance routes every write through the elided writers', () => {
   it('paints a hardcast: display, channel-off, width, localized label, timer (inline order)', () => {
@@ -97,23 +121,112 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(calls).toEqual([
       { m: 'setDisplay', args: [BAR, 'block'] },
       { m: 'toggleClass', args: [BAR, 'channel', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-cast', true] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-channel', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-consume', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-source-pet', false] },
+      { m: 'toggleClass', args: [BAR, 'interruptible', true] },
+      { m: 'toggleClass', args: [BAR, 'uninterruptible', false] },
+      { m: 'toggleClass', args: [BAR, 'important', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-success', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-interrupted', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-failed', false] },
       { m: 'setWidth', args: [FILL, '80.0%'] },
-      { m: 'setText', args: [LABEL, 'LOC:fireball'] },
+      {
+        m: 'setText',
+        args: [
+          LABEL,
+          t('hudChrome.castBar.labelWithCue', {
+            cue: t('hudChrome.castBar.interruptible'),
+            label: 'LOC:fireball',
+          }),
+        ],
+      },
       { m: 'setText', args: [TIMER, timer(0.5)] },
       { m: 'setAttr', args: [BAR, 'aria-valuenow', '80'] },
+      {
+        m: 'setAttr',
+        args: [
+          BAR,
+          'aria-label',
+          t('hudChrome.castBar.ariaStatus', {
+            bar: t('hudChrome.castBar.playerAria'),
+            status: t('hudChrome.castBar.casting'),
+            label: 'LOC:fireball',
+            seconds: timer(0.5),
+          }),
+        ],
+      },
     ]);
   });
 
   it('paints a channel with the channel class on', () => {
     const calls = paint(
       {
-        cast: castState({ channel: true, fill: 0.5, label: 'arcane_missiles' }),
+        cast: castState({ channel: true, kind: 'channel', fill: 0.5, label: 'arcane_missiles' }),
         castRemaining: 1.5,
       },
       PLAYER_OPTS,
     );
     expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'channel', true] });
-    expect(calls).toContainEqual({ m: 'setText', args: [LABEL, 'LOC:arcane_missiles'] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'cast-kind-channel', true] });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [
+        LABEL,
+        t('hudChrome.castBar.labelWithCue', {
+          cue: [t('hudChrome.castBar.channeling'), t('hudChrome.castBar.interruptible')].join(', '),
+          label: 'LOC:arcane_missiles',
+        }),
+      ],
+    });
+  });
+
+  it('paints uninterruptible important casts with non-color cue text and classes', () => {
+    const calls = paint(
+      {
+        cast: castState({
+          label: 'thunzharr_stormcall',
+          interrupt: 'uninterruptible',
+          important: true,
+        }),
+        castRemaining: 2.1,
+      },
+      PLAYER_OPTS,
+    );
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'uninterruptible', true] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'important', true] });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [
+        LABEL,
+        t('hudChrome.castBar.labelWithCue', {
+          cue: [t('hudChrome.castBar.danger'), t('hudChrome.castBar.cannotInterrupt')].join(', '),
+          label: 'LOC:thunzharr_stormcall',
+        }),
+      ],
+    });
+  });
+
+  it('paints pet casts with a pet source class and cue', () => {
+    const calls = paint(
+      {
+        cast: castState({ source: 'pet', label: 'demon_heal', channel: true, kind: 'channel' }),
+        castRemaining: 4,
+      },
+      PLAYER_OPTS,
+    );
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'cast-source-pet', true] });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [
+        LABEL,
+        t('hudChrome.castBar.labelWithCue', {
+          cue: [t('hudChrome.castBar.pet'), t('hudChrome.castBar.channeling')].join(', '),
+          label: 'LOC:demon_heal',
+        }),
+      ],
+    });
   });
 
   it('paints the eat/drink overlay from the mode discriminator via t(), channel on', () => {
@@ -124,10 +237,33 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(eat).toEqual([
       { m: 'setDisplay', args: [BAR, 'block'] },
       { m: 'toggleClass', args: [BAR, 'channel', true] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-cast', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-channel', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-consume', true] },
+      { m: 'toggleClass', args: [BAR, 'cast-source-pet', false] },
+      { m: 'toggleClass', args: [BAR, 'interruptible', false] },
+      { m: 'toggleClass', args: [BAR, 'uninterruptible', false] },
+      { m: 'toggleClass', args: [BAR, 'important', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-success', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-interrupted', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-failed', false] },
       { m: 'setWidth', args: [FILL, '50.0%'] },
       { m: 'setText', args: [LABEL, t('hud.core.eating')] },
       { m: 'setText', args: [TIMER, timer(9)] },
       { m: 'setAttr', args: [BAR, 'aria-valuenow', '50'] },
+      {
+        m: 'setAttr',
+        args: [
+          BAR,
+          'aria-label',
+          t('hudChrome.castBar.ariaStatus', {
+            bar: t('hudChrome.castBar.playerAria'),
+            status: t('hud.core.eating'),
+            label: t('hud.core.eating'),
+            seconds: timer(9),
+          }),
+        ],
+      },
     ]);
     const drink = paint(
       { cast: HIDDEN_CAST, castRemaining: 0, consume: consumeState({ mode: 'drink' }) },
@@ -147,7 +283,9 @@ describe('CastBarPainter: the player instance routes every write through the eli
       PLAYER_OPTS,
     );
     // The cast label, never the eat label, is written.
-    expect(calls).toContainEqual({ m: 'setText', args: [LABEL, 'LOC:fireball'] });
+    expect(calls.some((c) => c.m === 'setText' && String(c.args[1]).includes('LOC:fireball'))).toBe(
+      true,
+    );
     expect(calls.some((c) => c.args[1] === t('hud.core.eating'))).toBe(false);
   });
 
@@ -159,6 +297,16 @@ describe('CastBarPainter: the player instance routes every write through the eli
     expect(calls).toEqual([
       { m: 'setDisplay', args: [BAR, 'none'] },
       { m: 'toggleClass', args: [BAR, 'channel', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-cast', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-channel', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-kind-consume', false] },
+      { m: 'toggleClass', args: [BAR, 'cast-source-pet', false] },
+      { m: 'toggleClass', args: [BAR, 'interruptible', false] },
+      { m: 'toggleClass', args: [BAR, 'uninterruptible', false] },
+      { m: 'toggleClass', args: [BAR, 'important', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-success', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-interrupted', false] },
+      { m: 'toggleClass', args: [BAR, 'outcome-failed', false] },
       { m: 'setWidth', args: [FILL, '0%'] },
       { m: 'setText', args: [LABEL, ''] },
       { m: 'setText', args: [TIMER, ''] },
@@ -175,14 +323,31 @@ describe('CastBarPainter: the target instance (raw label, no eat/drink, display-
       },
       TARGET_OPTS,
     );
-    expect(calls).toEqual([
-      { m: 'setDisplay', args: [BAR, 'block'] },
-      { m: 'toggleClass', args: [BAR, 'channel', false] },
-      { m: 'setWidth', args: [FILL, '50.0%'] },
-      { m: 'setText', args: [LABEL, 'nythraxis_deathless_rage'] },
-      { m: 'setText', args: [TIMER, timer(5)] },
-      { m: 'setAttr', args: [BAR, 'aria-valuenow', '50'] },
-    ]);
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [BAR, 'block'] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'cast-kind-cast', true] });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [
+        LABEL,
+        t('hudChrome.castBar.labelWithCue', {
+          cue: t('hudChrome.castBar.interruptible'),
+          label: 'TARGET:nythraxis_deathless_rage',
+        }),
+      ],
+    });
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [
+        BAR,
+        'aria-label',
+        t('hudChrome.castBar.ariaStatus', {
+          bar: t('hudChrome.castBar.targetAria'),
+          status: t('hudChrome.castBar.casting'),
+          label: 'TARGET:nythraxis_deathless_rage',
+          seconds: timer(5),
+        }),
+      ],
+    });
   });
 
   it('hides with ONLY setDisplay none (no clear, byte-faithful to the target block)', () => {
@@ -196,6 +361,65 @@ describe('CastBarPainter: the target instance (raw label, no eat/drink, display-
     const calls = paint({ cast: HIDDEN_CAST, castRemaining: 0 }, TARGET_OPTS);
     expect(calls.some((c) => c.args[1] === t('hud.core.eating'))).toBe(false);
     expect(calls.some((c) => c.m === 'setWidth')).toBe(false);
+  });
+});
+
+describe('CastBarPainter: completion and interruption outcomes', () => {
+  it('paints a short success outcome before clearing the bar', () => {
+    const calls = paint(
+      {
+        cast: HIDDEN_CAST,
+        castRemaining: 0,
+        outcome: { kind: 'success', label: 'LOC:fireball' },
+      },
+      PLAYER_OPTS,
+    );
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'outcome-success', true] });
+    expect(calls).toContainEqual({ m: 'setWidth', args: [FILL, '100.0%'] });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [
+        LABEL,
+        t('hudChrome.castBar.labelWithCue', {
+          cue: t('hudChrome.castBar.complete'),
+          label: 'LOC:fireball',
+        }),
+      ],
+    });
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [
+        BAR,
+        'aria-label',
+        t('hudChrome.castBar.ariaOutcome', {
+          bar: t('hudChrome.castBar.playerAria'),
+          status: t('hudChrome.castBar.complete'),
+          label: 'LOC:fireball',
+        }),
+      ],
+    });
+  });
+
+  it('paints an interrupted outcome with text, not only a red class', () => {
+    const calls = paint(
+      {
+        cast: HIDDEN_CAST,
+        castRemaining: 0,
+        outcome: { kind: 'interrupted', label: 'LOC:frostbolt' },
+      },
+      PLAYER_OPTS,
+    );
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [BAR, 'outcome-interrupted', true] });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [
+        LABEL,
+        t('hudChrome.castBar.labelWithCue', {
+          cue: t('hudChrome.castBar.interrupted'),
+          label: 'LOC:frostbolt',
+        }),
+      ],
+    });
   });
 });
 

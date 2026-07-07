@@ -81,6 +81,29 @@
     --panel-edge: #08080d;
     --color-text-error: #ff8f85;
     --color-text-success: #7fdc4f;
+    --color-cast-normal-top: #ffe48a;
+    --color-cast-normal-mid: #c9941a;
+    --color-cast-normal-bottom: #9a6f12;
+    --color-cast-channel-top: #8ad4ff;
+    --color-cast-channel-mid: #1a74c9;
+    --color-cast-channel-bottom: #125a9a;
+    --color-cast-consume-top: #95f0dd;
+    --color-cast-consume-mid: #2b9f92;
+    --color-cast-consume-bottom: #17635f;
+    --color-cast-success-top: #f5fff1;
+    --color-cast-success-mid: #7fdc4f;
+    --color-cast-success-bottom: #2f7f34;
+    --color-cast-failure-top: #ffb0a9;
+    --color-cast-failure-mid: #d74336;
+    --color-cast-failure-bottom: #7a1711;
+    --color-cast-pet-top: #dfc0ff;
+    --color-cast-pet-mid: #8d5fe0;
+    --color-cast-pet-bottom: #4c2f8e;
+    --color-cast-uninterruptible-top: #d7dce8;
+    --color-cast-uninterruptible-mid: #7b8190;
+    --color-cast-uninterruptible-bottom: #3a3f4d;
+    --color-cast-danger-border: #b744ff;
+    --color-cast-danger-glow: rgba(183, 68, 255, 0.5);
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */

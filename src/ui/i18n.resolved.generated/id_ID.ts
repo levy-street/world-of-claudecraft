@@ -347,7 +347,26 @@ export const id_ID: EnTranslations = {
     },
     "castBar": {
       "playerAria": "Bilah Rapal Anda",
-      "targetAria": "Bilah Rapal Unit"
+      "targetAria": "Bilah Rapal Unit",
+      "casting": "Casting",
+      "channeling": "Channeling",
+      "complete": "Complete",
+      "interrupted": "Interrupted",
+      "failed": "Failed",
+      "interruptible": "Interruptible",
+      "cannotInterrupt": "Cannot interrupt",
+      "danger": "Danger",
+      "pet": "Pet",
+      "secondsShort": "{seconds}s",
+      "labelWithCue": "{cue}: {label}",
+      "ariaStatus": "{bar}: {status} {label}, {seconds} remaining",
+      "ariaOutcome": "{bar}: {status} {label}"
+    },
+    "petAction": {
+      "auto": "AUTO",
+      "cooldownTitle": "{action}: {seconds} remaining",
+      "cooldownAutoAria": "{action}: {seconds} remaining, {auto}",
+      "autoAria": "{action}: {auto}"
     },
     "leaderboard": {
       "close": "Tutup",

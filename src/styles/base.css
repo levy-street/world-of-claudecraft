@@ -692,6 +692,26 @@
     .np-castfill {
       background: Highlight !important;
     }
+    #castbar.important,
+    #tf-castbar.important,
+    .np-castbar.important {
+      border-color: Highlight !important;
+      box-shadow: none !important;
+    }
+    .pet-btn .auto-badge,
+    .pet-btn .action-label,
+    .pet-btn .cdtext {
+      color: ButtonText !important;
+      text-shadow: none !important;
+    }
+    .pet-btn .auto-badge {
+      border-color: ButtonText !important;
+      background: ButtonFace !important;
+    }
+    .pet-btn.cooldown::before {
+      background: CanvasText !important;
+      opacity: 0.35;
+    }
   }
 
   /* ---------- print reset ---------- */

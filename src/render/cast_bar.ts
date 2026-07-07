@@ -2,7 +2,18 @@
 // (and free of i18n: no t()/tEntity here) so the fill + label rules stay
 // unit-testable without a WebGL context. The renderer turns this into DOM and
 // resolves the visible text (fishing label vs. ability name) via i18n.
-import { CONSUME_DURATION, type Consuming, type Entity, FISHING_CAST_ID } from '../sim/types';
+import { ABILITIES, MOBS } from '../sim/data';
+import {
+  CONSUME_DURATION,
+  type Consuming,
+  DEMON_HEAL_CAST_ID,
+  type Entity,
+  FISHING_CAST_ID,
+} from '../sim/types';
+
+export type CastBarKind = 'cast' | 'channel';
+export type CastBarSource = 'unit' | 'player' | 'pet';
+export type CastBarInterrupt = 'unknown' | 'interruptible' | 'uninterruptible';
 
 export interface CastBarState {
   /** whether the bar should be shown at all this frame */
@@ -19,21 +30,65 @@ export interface CastBarState {
   label: string;
   /** the cast is the fishing channel → renderer shows the localized fishing label */
   fishing: boolean;
+  /** semantic kind for styling and non-color cues */
+  kind: CastBarKind;
+  /** source family for player, pet, and general unit presentation */
+  source: CastBarSource;
+  /** whether a known cast can be interrupted */
+  interrupt: CastBarInterrupt;
+  /** boss, big-cast, or special-mechanic cue */
+  important: boolean;
 }
 
-const HIDDEN: CastBarState = { visible: false, channel: false, fill: 0, label: '', fishing: false };
+const HIDDEN: CastBarState = {
+  visible: false,
+  channel: false,
+  fill: 0,
+  label: '',
+  fishing: false,
+  kind: 'cast',
+  source: 'unit',
+  interrupt: 'unknown',
+  important: false,
+};
+
+function castSource(e: Entity, castId: string): CastBarSource {
+  if (e.ownerId != null || castId === DEMON_HEAL_CAST_ID) return 'pet';
+  return e.kind === 'player' ? 'player' : 'unit';
+}
+
+function isImportantCast(e: Entity, castId: string): boolean {
+  const mob = e.kind === 'mob' ? MOBS[e.templateId] : undefined;
+  return mob?.bigCast?.castId === castId || mob?.boss === true || castId.startsWith('nythraxis_');
+}
+
+function interruptState(e: Entity, castId: string): CastBarInterrupt {
+  if (castId === FISHING_CAST_ID) return 'unknown';
+  const ability = ABILITIES[castId];
+  if (ability) return ability.uninterruptible ? 'uninterruptible' : 'interruptible';
+  const mob = e.kind === 'mob' ? MOBS[e.templateId] : undefined;
+  if (mob?.bigCast?.castId === castId || castId.startsWith('nythraxis_')) {
+    return 'uninterruptible';
+  }
+  return 'unknown';
+}
 
 export function castBarState(e: Entity): CastBarState {
   // corpses, doors/crates, and idle entities show nothing; guard the divide too
   if (e.dead || e.kind === 'object' || !e.castingAbility || e.castTotal <= 0) return HIDDEN;
+  const castId = e.castingAbility;
   const remaining = Math.max(0, Math.min(1, e.castRemaining / e.castTotal));
   const fill = e.channeling ? remaining : 1 - remaining;
   return {
     visible: true,
     channel: e.channeling,
     fill,
-    label: e.castingAbility,
-    fishing: e.castingAbility === FISHING_CAST_ID,
+    label: castId,
+    fishing: castId === FISHING_CAST_ID,
+    kind: e.channeling ? 'channel' : 'cast',
+    source: castSource(e, castId),
+    interrupt: interruptState(e, castId),
+    important: isImportantCast(e, castId),
   };
 }
 

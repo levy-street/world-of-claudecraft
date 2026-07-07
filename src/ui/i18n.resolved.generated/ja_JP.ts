@@ -347,7 +347,26 @@ export const ja_JP: EnTranslations = {
     },
     "castBar": {
       "playerAria": "あなたの詠唱バー",
-      "targetAria": "ターゲットの詠唱バー"
+      "targetAria": "ターゲットの詠唱バー",
+      "casting": "詠唱中",
+      "channeling": "チャネリング中",
+      "complete": "完了",
+      "interrupted": "中断",
+      "failed": "失敗",
+      "interruptible": "中断可能",
+      "cannotInterrupt": "中断不可",
+      "danger": "危険",
+      "pet": "ペット",
+      "secondsShort": "{seconds}秒",
+      "labelWithCue": "{cue}：{label}",
+      "ariaStatus": "{bar}：{status} {label}、残り {seconds}",
+      "ariaOutcome": "{bar}：{status} {label}"
+    },
+    "petAction": {
+      "auto": "自動",
+      "cooldownTitle": "{action}：残り {seconds}",
+      "cooldownAutoAria": "{action}：残り {seconds}、{auto}",
+      "autoAria": "{action}：{auto}"
     },
     "leaderboard": {
       "close": "閉じる",

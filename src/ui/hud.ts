@@ -98,6 +98,7 @@ import {
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
+  PET_GROWL_INTERVAL,
   type RiteIntensity,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
@@ -148,7 +149,11 @@ import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { CalendarWindow } from './calendar_window';
-import { CastBarPainter } from './cast_bar_painter';
+import {
+  type CastBarOutcomeKind,
+  type CastBarOutcomeState,
+  CastBarPainter,
+} from './cast_bar_painter';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { CharWindow } from './char_window';
 import {
@@ -312,6 +317,11 @@ import type { PartyRowAuraDeps } from './party_frame_row';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
+import {
+  formatPetCooldownShort,
+  petActionButtonLabels,
+  petCooldownProgress,
+} from './pet_action_feedback';
 import { PET_ACTION_ICONS } from './pet_action_icons';
 import {
   CARD_POSES,
@@ -825,6 +835,8 @@ export class Hud {
   private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
   private static readonly BAR_ABILITY_SLOTS = 22;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
+  private static readonly CAST_SUCCESS_FLASH_MS = 350;
+  private static readonly CAST_FAILURE_FLASH_MS = 600;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
   private abilityButtons: {
@@ -1218,6 +1230,11 @@ export class Hud {
   // entity ids with a sustained cast-loop SFX playing, so reconcileSfx can stop
   // loops for casters that left interest mid-channel (no castStop/death arrives).
   private castLoopIds = new Set<number>();
+  private castLabelsByEntity = new Map<number, string>();
+  private castOutcomesByEntity = new Map<
+    number,
+    { abilityId: string; kind: CastBarOutcomeKind; expiresAt: number }
+  >();
   private lastNythraxisCombatEventAt = 0;
   private lastResting = false;
   private lastZoneId = '';
@@ -3274,7 +3291,12 @@ export class Hud {
       label: this.castbarLabelEl,
       timer: this.castbarTimerEl,
     },
-    { resolveCastLabel: (s) => castDisplayName(s.label), clearOnHide: true },
+    {
+      resolveCastLabel: (s) => castDisplayName(s.label),
+      barLabelKey: 'hudChrome.castBar.playerAria',
+      showInterruptCues: false,
+      clearOnHide: true,
+    },
   );
   private readonly targetCastBarPainter = new CastBarPainter(
     this.writerFacet,
@@ -3284,7 +3306,10 @@ export class Hud {
       label: this.targetCastbarLabelEl,
       timer: this.targetCastbarTimerEl,
     },
-    { resolveCastLabel: (s) => s.label },
+    {
+      resolveCastLabel: (s) => castDisplayName(s.label),
+      barLabelKey: 'hudChrome.castBar.targetAria',
+    },
   );
   // The target frame is the SECOND instance of the unit_frame family: the same
   // painter + core as the player, over the target's element set. It supplies the
@@ -6046,6 +6071,52 @@ export class Hud {
     for (let i = 0; i < 20; i++) ticks.appendChild(document.createElement('i'));
   }
 
+  private castOutcomeDuration(kind: CastBarOutcomeKind): number {
+    return kind === 'success' ? Hud.CAST_SUCCESS_FLASH_MS : Hud.CAST_FAILURE_FLASH_MS;
+  }
+
+  private startCastOutcome(
+    entityId: number,
+    abilityId: string,
+    kind: CastBarOutcomeKind,
+    now: number,
+  ): void {
+    this.castOutcomesByEntity.set(entityId, {
+      abilityId,
+      kind,
+      expiresAt: now + this.castOutcomeDuration(kind),
+    });
+  }
+
+  private activeCastOutcome(entityId: number, now: number): CastBarOutcomeState | undefined {
+    const outcome = this.castOutcomesByEntity.get(entityId);
+    if (!outcome) return undefined;
+    if (now >= outcome.expiresAt) {
+      this.castOutcomesByEntity.delete(entityId);
+      return undefined;
+    }
+    return { kind: outcome.kind, label: castDisplayName(outcome.abilityId) };
+  }
+
+  private castOutcomeForEntity(
+    entity: Entity,
+    state: ReturnType<typeof castBarState>,
+    now: number,
+  ): CastBarOutcomeState | undefined {
+    if (state.visible) {
+      this.castLabelsByEntity.set(entity.id, state.label);
+      return undefined;
+    }
+    const abilityId = this.castLabelsByEntity.get(entity.id);
+    if (abilityId) {
+      this.castLabelsByEntity.delete(entity.id);
+      if (!entity.dead && !this.castOutcomesByEntity.has(entity.id)) {
+        this.startCastOutcome(entity.id, abilityId, 'success', now);
+      }
+    }
+    return this.activeCastOutcome(entity.id, now);
+  }
+
   private ownPet(): Entity | null {
     for (const e of this.sim.entities.values()) {
       if (e.kind === 'mob' && e.ownerId === this.sim.playerId) return e;
@@ -6076,10 +6147,16 @@ export class Hud {
       return;
     }
     const mode = pet.petMode ?? 'defensive';
-    const cd = Math.ceil(Math.max(0, pet.petTauntTimer));
+    const tauntRemaining = Math.max(0, pet.petTauntTimer);
+    const tauntCooldownText = formatPetCooldownShort(
+      tauntRemaining,
+      formatNumber,
+      t('hudChrome.unitFrame.durationUnitSeconds'),
+    );
+    const tauntCooldownProgress = petCooldownProgress(tauntRemaining, PET_GROWL_INTERVAL);
     const autoTaunt = pet.petAutoTaunt === true;
     const ownerClass = this.sim.cfg.playerClass;
-    const sig = `${pet.id}:${ownerClass}:${mode}:${cd}:${autoTaunt ? 'auto' : 'manual'}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}`;
+    const sig = `${pet.id}:${ownerClass}:${mode}:${tauntCooldownText ?? 'ready'}:${autoTaunt ? 'auto' : 'manual'}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}`;
     bar.style.display = 'flex';
     if (sig === this.lastPetBarSig) return;
     this.lastPetBarSig = sig;
@@ -6102,6 +6179,7 @@ export class Hud {
         active?: boolean;
         autocast?: boolean;
         cooldownText?: string;
+        cooldownProgress?: number;
         onContextMenu?: () => void;
         onTouchHold?: () => void;
       } = {},
@@ -6111,14 +6189,33 @@ export class Hud {
       if (opts.active) btn.classList.add('active');
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
-      btn.title = title;
-      btn.setAttribute('aria-label', title);
+      if (opts.cooldownProgress !== undefined) {
+        btn.style.setProperty('--pet-cooldown-progress', `${opts.cooldownProgress}%`);
+      }
+      const labels = petActionButtonLabels({
+        actionLabel: title,
+        cooldownText: opts.cooldownText,
+        autoBadge: opts.autocast ? t('hudChrome.petAction.auto') : undefined,
+        t,
+      });
+      btn.title = labels.title;
+      btn.setAttribute('aria-label', labels.ariaLabel);
       if (opts.active || opts.autocast) btn.setAttribute('aria-pressed', 'true');
       const icon = document.createElement('span');
       icon.className = 'icon-label';
       icon.style.backgroundImage = `url(${iconDataUrl('ability', iconId)})`;
       btn.appendChild(icon);
+      if (labels.autoBadge) {
+        const autoBadge = document.createElement('span');
+        autoBadge.className = 'auto-badge';
+        autoBadge.textContent = labels.autoBadge;
+        btn.appendChild(autoBadge);
+      }
       if (opts.cooldownText) {
+        const actionLabel = document.createElement('span');
+        actionLabel.className = 'action-label';
+        actionLabel.textContent = title;
+        btn.appendChild(actionLabel);
         const cdText = document.createElement('span');
         cdText.className = 'cdtext';
         cdText.textContent = opts.cooldownText;
@@ -6228,7 +6325,9 @@ export class Hud {
         btn.addEventListener('pointerup', (event) => finishTouchHold(event, false));
         btn.addEventListener('pointercancel', (event) => finishTouchHold(event, true));
       }
-      this.attachTooltip(btn, () => tooltip);
+      this.attachTooltip(btn, () =>
+        opts.cooldownText ? `${tooltip}<div class="tt-desc">${esc(labels.title)}</div>` : tooltip,
+      );
       parent.appendChild(btn);
     };
     addButton(
@@ -6246,7 +6345,8 @@ export class Hud {
       () => this.sim.petTaunt(),
       {
         autocast: autoTaunt,
-        cooldownText: cd > 0 ? `${cd}` : undefined,
+        cooldownText: tauntCooldownText,
+        cooldownProgress: tauntCooldownText ? tauntCooldownProgress : undefined,
         onContextMenu: () => {
           this.sim.setPetAutoTaunt(!autoTaunt);
           this.lastPetBarSig = '';
@@ -6680,9 +6780,11 @@ export class Hud {
       // target/boss cast bar (e.g. Nythraxis' Deathless Rage), shown under the name +
       // HP so the raid sees exactly when to channel the wardstones. The target
       // instance shows the raw cast id and never eats/drinks (no `consume`).
+      const targetCast = castBarState(target);
       this.targetCastBarPainter.paint({
-        cast: castBarState(target),
+        cast: targetCast,
         castRemaining: target.castRemaining,
+        outcome: this.castOutcomeForEntity(target, targetCast, now),
       });
     } else {
       // No target (or a world object): hide the frame. The painter also resets its
@@ -6706,10 +6808,12 @@ export class Hud {
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
     // the player-only eat/drink overlay (consumeBarState), and clears on hide.
+    const playerCast = castBarState(p);
     this.playerCastBarPainter.paint({
-      cast: castBarState(p),
+      cast: playerCast,
       castRemaining: p.castRemaining,
       consume: consumeBarState(p.eating, p.drinking),
+      outcome: this.castOutcomeForEntity(p, playerCast, now),
     });
 
     // swing timer: fills between melee/ranged auto-attack swings. swingTimer
@@ -9462,8 +9566,22 @@ export class Hud {
           this.log(t('hud.system.respawn'), '#7fdc4f');
           break;
         case 'castStart':
+          this.castLabelsByEntity.set(ev.entityId, ev.ability);
+          this.castOutcomesByEntity.delete(ev.entityId);
           break; // cast-loop SFX is spatial now (see playEventSfx)
         case 'castStop':
+          {
+            const abilityId = this.castLabelsByEntity.get(ev.entityId);
+            this.castLabelsByEntity.delete(ev.entityId);
+            if (abilityId) {
+              this.startCastOutcome(
+                ev.entityId,
+                abilityId,
+                ev.success ? 'success' : 'interrupted',
+                now,
+              );
+            }
+          }
           // Deferred "Auto-Attack on Ability Use" (timed casts): engage only when
           // the player's own cast COMPLETES, so the aggro happens as the damage
           // lands, never at cast start (the aggro-before-damage bug). An

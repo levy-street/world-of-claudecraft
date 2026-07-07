@@ -347,7 +347,26 @@ export const ko_KR: EnTranslations = {
     },
     "castBar": {
       "playerAria": "내 시전 막대",
-      "targetAria": "대상 시전 막대"
+      "targetAria": "대상 시전 막대",
+      "casting": "시전 중",
+      "channeling": "정신 집중 중",
+      "complete": "완료",
+      "interrupted": "차단됨",
+      "failed": "실패",
+      "interruptible": "차단 가능",
+      "cannotInterrupt": "차단 불가",
+      "danger": "위험",
+      "pet": "소환수",
+      "secondsShort": "{seconds}초",
+      "labelWithCue": "{cue}: {label}",
+      "ariaStatus": "{bar}: {status} {label}, {seconds} 남음",
+      "ariaOutcome": "{bar}: {status} {label}"
+    },
+    "petAction": {
+      "auto": "자동",
+      "cooldownTitle": "{action}: {seconds} 남음",
+      "cooldownAutoAria": "{action}: {seconds} 남음, {auto}",
+      "autoAria": "{action}: {auto}"
     },
     "leaderboard": {
       "close": "닫기",

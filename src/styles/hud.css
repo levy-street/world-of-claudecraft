@@ -108,6 +108,9 @@
     border-radius: 2px;
   }
   .np-castbar {
+    --castbar-fill-top: var(--color-cast-normal-top);
+    --castbar-fill-mid: var(--color-cast-normal-mid);
+    --castbar-fill-bottom: var(--color-cast-normal-bottom);
     position: relative;
     width: 78px;
     height: 8px;
@@ -119,12 +122,32 @@
   }
   .np-castfill {
     height: 100%;
-    background: linear-gradient(#ffe27a, #d99a18);
+    background: linear-gradient(
+      to bottom,
+      var(--castbar-fill-top),
+      var(--castbar-fill-mid) 60%,
+      var(--castbar-fill-bottom)
+    );
     border-radius: 1px;
     transition: width 0.05s linear;
   }
   .np-castbar.channel .np-castfill {
-    background: linear-gradient(#7ad0ff, #2f7fd6);
+    --castbar-fill-top: var(--color-cast-channel-top);
+    --castbar-fill-mid: var(--color-cast-channel-mid);
+    --castbar-fill-bottom: var(--color-cast-channel-bottom);
+  }
+  .np-castbar.cast-source-pet .np-castfill {
+    --castbar-fill-top: var(--color-cast-pet-top);
+    --castbar-fill-mid: var(--color-cast-pet-mid);
+    --castbar-fill-bottom: var(--color-cast-pet-bottom);
+  }
+  .np-castbar.uninterruptible .np-castfill {
+    --castbar-fill-top: var(--color-cast-uninterruptible-top);
+    --castbar-fill-mid: var(--color-cast-uninterruptible-mid);
+    --castbar-fill-bottom: var(--color-cast-uninterruptible-bottom);
+  }
+  .np-castbar.important {
+    border-color: var(--color-cast-danger-border);
   }
   .np-castlabel {
     position: absolute;
@@ -1035,6 +1058,14 @@
   }
 
   /* ---------- cast bar ---------- */
+  #castbar,
+  #tf-castbar {
+    --castbar-fill-top: var(--color-cast-normal-top);
+    --castbar-fill-mid: var(--color-cast-normal-mid);
+    --castbar-fill-bottom: var(--color-cast-normal-bottom);
+    --castbar-border-color: var(--border);
+    --castbar-outline-color: #000;
+  }
   #castbar {
     position: absolute;
     left: 50%;
@@ -1043,20 +1074,72 @@
     width: 300px;
     height: 24px;
     display: none;
-    border: 2px solid var(--border);
-    outline: 1px solid #000;
+    border: 2px solid var(--castbar-border-color);
+    outline: 1px solid var(--castbar-outline-color);
     border-radius: 4px;
     background: #100c08;
     overflow: hidden;
   }
-  #castbar .fill {
+  #castbar .fill,
+  #tf-castbar .fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(#ffe48a, #c9941a 60%, #9a6f12);
+    background: linear-gradient(
+      to bottom,
+      var(--castbar-fill-top),
+      var(--castbar-fill-mid) 60%,
+      var(--castbar-fill-bottom)
+    );
     box-shadow: inset 0 1px 0 #fff5;
   }
-  #castbar.channel .fill {
-    background: linear-gradient(#8ad4ff, #1a74c9 60%, #125a9a);
+  #castbar.channel,
+  #tf-castbar.channel {
+    --castbar-fill-top: var(--color-cast-channel-top);
+    --castbar-fill-mid: var(--color-cast-channel-mid);
+    --castbar-fill-bottom: var(--color-cast-channel-bottom);
+  }
+  #castbar.cast-kind-consume,
+  #tf-castbar.cast-kind-consume {
+    --castbar-fill-top: var(--color-cast-consume-top);
+    --castbar-fill-mid: var(--color-cast-consume-mid);
+    --castbar-fill-bottom: var(--color-cast-consume-bottom);
+  }
+  #castbar.cast-source-pet,
+  #tf-castbar.cast-source-pet {
+    --castbar-fill-top: var(--color-cast-pet-top);
+    --castbar-fill-mid: var(--color-cast-pet-mid);
+    --castbar-fill-bottom: var(--color-cast-pet-bottom);
+  }
+  #castbar.uninterruptible,
+  #tf-castbar.uninterruptible {
+    --castbar-fill-top: var(--color-cast-uninterruptible-top);
+    --castbar-fill-mid: var(--color-cast-uninterruptible-mid);
+    --castbar-fill-bottom: var(--color-cast-uninterruptible-bottom);
+  }
+  #castbar.important,
+  #tf-castbar.important {
+    --castbar-border-color: var(--color-cast-danger-border);
+    box-shadow:
+      0 0 0 1px #000,
+      0 0 12px var(--color-cast-danger-glow);
+    animation: castbar-danger-pulse 0.9s ease-in-out infinite alternate;
+  }
+  #castbar.outcome-success,
+  #tf-castbar.outcome-success {
+    --castbar-fill-top: var(--color-cast-success-top);
+    --castbar-fill-mid: var(--color-cast-success-mid);
+    --castbar-fill-bottom: var(--color-cast-success-bottom);
+    animation: castbar-complete-flash 0.35s ease-out both;
+  }
+  #castbar.outcome-interrupted,
+  #castbar.outcome-failed,
+  #tf-castbar.outcome-interrupted,
+  #tf-castbar.outcome-failed {
+    --castbar-fill-top: var(--color-cast-failure-top);
+    --castbar-fill-mid: var(--color-cast-failure-mid);
+    --castbar-fill-bottom: var(--color-cast-failure-bottom);
+    --castbar-border-color: var(--color-text-error);
+    animation: castbar-failed-shake 0.45s ease-out both;
   }
   #castbar .label {
     position: absolute;
@@ -1086,20 +1169,11 @@
     height: 22px;
     margin-top: 4px;
     display: none;
-    border: 2px solid var(--border);
-    outline: 1px solid #000;
+    border: 2px solid var(--castbar-border-color);
+    outline: 1px solid var(--castbar-outline-color);
     border-radius: 4px;
     background: #100606;
     overflow: hidden;
-  }
-  #tf-castbar .fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(#ff9a8f, #c93024 60%, #73110d);
-    box-shadow: inset 0 1px 0 #fff5;
-  }
-  #tf-castbar.channel .fill {
-    background: linear-gradient(#ff9a8f, #c93024 60%, #73110d);
   }
   #tf-castbar .label {
     position: absolute;
@@ -1120,6 +1194,47 @@
     color: #fff0d0;
     text-shadow: 1px 1px 2px #000;
     font-variant-numeric: tabular-nums;
+  }
+  @keyframes castbar-complete-flash {
+    from {
+      filter: brightness(1.45);
+    }
+    to {
+      filter: brightness(1);
+    }
+  }
+  @keyframes castbar-failed-shake {
+    0%,
+    100% {
+      filter: brightness(1);
+    }
+    40% {
+      filter: brightness(1.35);
+    }
+  }
+  @keyframes castbar-danger-pulse {
+    from {
+      box-shadow:
+        0 0 0 1px #000,
+        0 0 6px var(--color-cast-danger-glow);
+    }
+    to {
+      box-shadow:
+        0 0 0 1px #000,
+        0 0 14px var(--color-cast-danger-glow);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #castbar.important,
+    #tf-castbar.important,
+    #castbar.outcome-success,
+    #tf-castbar.outcome-success,
+    #castbar.outcome-interrupted,
+    #castbar.outcome-failed,
+    #tf-castbar.outcome-interrupted,
+    #tf-castbar.outcome-failed {
+      animation: none;
+    }
   }
   /* swing timer: sits just under the cast bar, steel-on-amber to read as melee */
   #swingbar {
@@ -1306,18 +1421,59 @@
       0 0 18px #ffd10033;
   }
   .pet-btn.cooldown {
-    filter: grayscale(0.8) brightness(0.65);
     cursor: default;
   }
-  .pet-btn.cooldown.autocast {
+  .pet-btn.cooldown .icon-label {
+    filter: grayscale(0.55) brightness(0.78);
+  }
+  .pet-btn.cooldown::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 4px;
+    background: conic-gradient(#000a var(--pet-cooldown-progress, 0%), transparent 0);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .pet-btn.cooldown.autocast .icon-label {
     filter: grayscale(0.45) brightness(0.78);
+  }
+  .pet-btn .auto-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 3;
+    padding: 0 2px;
+    border: 1px solid #000;
+    border-radius: 2px;
+    background: #101018e6;
+    color: #ffe77a;
+    font: 800 8px / 9px var(--body-font);
+    text-shadow: 1px 1px 1px #000;
+    pointer-events: none;
+  }
+  .pet-btn .action-label {
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    z-index: 3;
+    overflow: hidden;
+    color: #fff6c7;
+    font: 800 8px / 9px var(--body-font);
+    text-align: center;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px 1px #000;
+    white-space: nowrap;
+    pointer-events: none;
   }
   .pet-btn .cdtext {
     position: absolute;
-    inset: 0;
+    inset: 7px 0 10px;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 3;
     font-size: 13px;
     color: var(--gold);
     text-shadow: 1px 1px 2px #000;

@@ -347,7 +347,26 @@ export const fr_FR: EnTranslations = {
     },
     "castBar": {
       "playerAria": "Votre barre d'incantation",
-      "targetAria": "Barre d'incantation de la cible"
+      "targetAria": "Barre d'incantation de la cible",
+      "casting": "Casting",
+      "channeling": "Channeling",
+      "complete": "Complete",
+      "interrupted": "Interrupted",
+      "failed": "Failed",
+      "interruptible": "Interruptible",
+      "cannotInterrupt": "Cannot interrupt",
+      "danger": "Danger",
+      "pet": "Pet",
+      "secondsShort": "{seconds}s",
+      "labelWithCue": "{cue}: {label}",
+      "ariaStatus": "{bar}: {status} {label}, {seconds} remaining",
+      "ariaOutcome": "{bar}: {status} {label}"
+    },
+    "petAction": {
+      "auto": "AUTO",
+      "cooldownTitle": "{action}: {seconds} remaining",
+      "cooldownAutoAria": "{action}: {seconds} remaining, {auto}",
+      "autoAria": "{action}: {auto}"
     },
     "leaderboard": {
       "close": "Fermer",

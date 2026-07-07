@@ -347,7 +347,26 @@ export const ru_RU: EnTranslations = {
     },
     "castBar": {
       "playerAria": "Ваша полоса применения",
-      "targetAria": "Полоса применения цели"
+      "targetAria": "Полоса применения цели",
+      "casting": "Применение",
+      "channeling": "Поддержание",
+      "complete": "Завершено",
+      "interrupted": "Прервано",
+      "failed": "Не удалось",
+      "interruptible": "Можно прервать",
+      "cannotInterrupt": "Нельзя прервать",
+      "danger": "Опасно",
+      "pet": "Питомец",
+      "secondsShort": "{seconds}с",
+      "labelWithCue": "{cue}: {label}",
+      "ariaStatus": "{bar}: {status} {label}, осталось {seconds}",
+      "ariaOutcome": "{bar}: {status} {label}"
+    },
+    "petAction": {
+      "auto": "АВТО",
+      "cooldownTitle": "{action}: осталось {seconds}",
+      "cooldownAutoAria": "{action}: осталось {seconds}, {auto}",
+      "autoAria": "{action}: {auto}"
     },
     "leaderboard": {
       "close": "Закрыть",

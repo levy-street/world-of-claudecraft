@@ -38,6 +38,10 @@ describe('overhead cast bar', () => {
     // localizes it. So we assert the stable discriminator, not display text.
     expect(mid.label).toBe('fireball');
     expect(mid.fishing).toBe(false);
+    expect(mid.kind).toBe('cast');
+    expect(mid.source).toBe('unit');
+    expect(mid.interrupt).toBe('interruptible');
+    expect(mid.important).toBe(false);
   });
 
   it('drains a channel downward as it ticks', () => {
@@ -50,9 +54,60 @@ describe('overhead cast bar', () => {
       }),
     );
     expect(ch.channel).toBe(true);
+    expect(ch.kind).toBe('channel');
     expect(ch.fill).toBeCloseTo(0.5); // half the channel left → half-full, draining
     expect(ch.label).toBe('arcane_missiles');
     expect(ch.fishing).toBe(false);
+  });
+
+  it('marks boss and special mechanics as important and uninterruptible when inferred', () => {
+    const stormcall = castBarState(
+      caster({
+        templateId: 'thunzharr_waking_peak',
+        castingAbility: 'thunzharr_stormcall',
+        castRemaining: 2,
+        castTotal: 3.5,
+      }),
+    );
+    expect(stormcall.visible).toBe(true);
+    expect(stormcall.kind).toBe('cast');
+    expect(stormcall.interrupt).toBe('uninterruptible');
+    expect(stormcall.important).toBe(true);
+
+    const rage = castBarState(
+      caster({
+        templateId: 'nythraxis',
+        castingAbility: 'nythraxis_deathless_rage',
+        castRemaining: 5,
+        castTotal: 10,
+      }),
+    );
+    expect(rage.important).toBe(true);
+    expect(rage.interrupt).toBe('uninterruptible');
+  });
+
+  it('marks pet-owned casts and pet actions with the pet source', () => {
+    const petCast = castBarState(
+      caster({
+        ownerId: 1,
+        castingAbility: 'shadow_bolt',
+        castRemaining: 1,
+        castTotal: 2,
+      }),
+    );
+    expect(petCast.source).toBe('pet');
+
+    const petAction = castBarState(
+      caster({
+        kind: 'player',
+        castingAbility: 'demon_heal',
+        channeling: true,
+        castRemaining: 3,
+        castTotal: 5,
+      }),
+    );
+    expect(petAction.source).toBe('pet');
+    expect(petAction.kind).toBe('channel');
   });
 
   it('flags fishing and carries the raw id for known and unknown abilities', () => {

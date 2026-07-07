@@ -347,7 +347,26 @@ export const pl_PL: EnTranslations = {
     },
     "castBar": {
       "playerAria": "Twój pasek rzucania",
-      "targetAria": "Pasek rzucania jednostki"
+      "targetAria": "Pasek rzucania jednostki",
+      "casting": "Casting",
+      "channeling": "Channeling",
+      "complete": "Complete",
+      "interrupted": "Interrupted",
+      "failed": "Failed",
+      "interruptible": "Interruptible",
+      "cannotInterrupt": "Cannot interrupt",
+      "danger": "Danger",
+      "pet": "Pet",
+      "secondsShort": "{seconds}s",
+      "labelWithCue": "{cue}: {label}",
+      "ariaStatus": "{bar}: {status} {label}, {seconds} remaining",
+      "ariaOutcome": "{bar}: {status} {label}"
+    },
+    "petAction": {
+      "auto": "AUTO",
+      "cooldownTitle": "{action}: {seconds} remaining",
+      "cooldownAutoAria": "{action}: {seconds} remaining, {auto}",
+      "autoAria": "{action}: {auto}"
     },
     "leaderboard": {
       "close": "Zamknij",
