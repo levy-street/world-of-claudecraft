@@ -5611,4 +5611,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.kindCosmetic': '外觀',
   'hudChrome.claudium.kindSkin': '造型',
   'hudChrome.claudium.kindItem': '物品',
+  'hudChrome.claudium.discountLabel': '折扣',
+  'hudChrome.claudium.discountSummary': '按有效錨定價立減 {percent}%',
+  'hudChrome.claudium.discountBonus': '{base} 克勞迪姆 到 {credited} 克勞迪姆（+{bonus}）',
+  'hudChrome.claudium.wocIncentive': '使用 $WOC 付款 - 始終立減 15% 以上',
+  'hudChrome.claudium.wocPromoNote': '含限時促銷',
 };

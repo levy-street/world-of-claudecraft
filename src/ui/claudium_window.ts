@@ -13,6 +13,8 @@
 
 import {
   buildClaudiumView,
+  type ClaudiumDiscountInput,
+  type ClaudiumDiscountRow,
   type ClaudiumPriceInput,
   type ClaudiumSkuInput,
   type ClaudiumStoreItemInput,
@@ -31,6 +33,8 @@ export interface ClaudiumSnapshot {
   skus: readonly ClaudiumSkuInput[];
   price: ClaudiumPriceInput;
   storeItems: readonly ClaudiumStoreItemInput[];
+  /** The last purchase's service-computed discount, or null when there is none. */
+  discount?: ClaudiumDiscountInput | null;
 }
 
 /**
@@ -58,6 +62,7 @@ const EMPTY_SNAPSHOT: ClaudiumSnapshot = {
   skus: [],
   price: { usdPerClaudium: null, wocBaseUnitsPerClaudium: null },
   storeItems: [],
+  discount: null,
 };
 
 export class ClaudiumWindow {
@@ -198,7 +203,41 @@ export class ClaudiumWindow {
       wocNote +
       `<div class="cl-amount-label">${esc(t('hudChrome.claudium.amountLabel'))}</div>` +
       list +
+      this.discountHtml(view.discount) +
       `</section>`
+    );
+  }
+
+  /**
+   * The service-computed discount: "N% off" with the base-to-credited bonus, shown
+   * only when the service reported an actual discount (the view already null-guards
+   * discountBps > 0). For the $WOC rail floor (floorBps > 0) an always-on incentive
+   * line is appended, plus a promo note when promoBps > 0. Every number here is
+   * service-owned; the window only formats it. Plain arrows/words, never an em or en
+   * dash.
+   */
+  private discountHtml(discount: ClaudiumDiscountRow | null): string {
+    if (!discount) return '';
+    const percent = formatNumber(discount.percent, { maximumFractionDigits: 2 });
+    const summary = t('hudChrome.claudium.discountSummary', { percent });
+    const bonus = t('hudChrome.claudium.discountBonus', {
+      base: formatNumber(discount.baseClaudium, { maximumFractionDigits: 0 }),
+      credited: formatNumber(discount.claudiumCredited, { maximumFractionDigits: 0 }),
+      bonus: formatNumber(discount.bonusClaudium, { maximumFractionDigits: 0 }),
+    });
+    const incentive =
+      discount.floorBps > 0
+        ? `<p class="cl-discount-incentive" role="note">${esc(t('hudChrome.claudium.wocIncentive'))}` +
+          (discount.promoBps > 0 ? ` ${esc(t('hudChrome.claudium.wocPromoNote'))}` : '') +
+          `</p>`
+        : '';
+    return (
+      `<div class="cl-discount" role="status">` +
+      `<span class="cl-discount-label">${esc(t('hudChrome.claudium.discountLabel'))}</span>` +
+      `<span class="cl-discount-summary">${esc(summary)}</span>` +
+      `<span class="cl-discount-bonus">${esc(bonus)}</span>` +
+      incentive +
+      `</div>`
     );
   }
 

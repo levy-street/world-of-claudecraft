@@ -6048,4 +6048,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.kindCosmetic': 'Косметика',
   'hudChrome.claudium.kindSkin': 'Облик',
   'hudChrome.claudium.kindItem': 'Предмет',
+  'hudChrome.claudium.discountLabel': 'Скидка',
+  'hudChrome.claudium.discountSummary': 'Скидка {percent}% от эффективной привязочной цены',
+  'hudChrome.claudium.discountBonus': '{base} Клаудиум до {credited} Клаудиум (+{bonus})',
+  'hudChrome.claudium.wocIncentive': 'Оплата через $WOC - всегда скидка от 15%',
+  'hudChrome.claudium.wocPromoNote': 'Включает акцию с ограниченным сроком',
 };

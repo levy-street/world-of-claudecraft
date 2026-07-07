@@ -5931,4 +5931,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.kindCosmetic': 'コスメティック',
   'hudChrome.claudium.kindSkin': 'スキン',
   'hudChrome.claudium.kindItem': 'アイテム',
+  'hudChrome.claudium.discountLabel': '割引',
+  'hudChrome.claudium.discountSummary': '実効ペッグ価格から {percent}% 割引',
+  'hudChrome.claudium.discountBonus':
+    '{base} クラウディウム から {credited} クラウディウム（+{bonus}）',
+  'hudChrome.claudium.wocIncentive': '$WOC で支払う - 常に 15% 以上お得',
+  'hudChrome.claudium.wocPromoNote': '期間限定プロモーションを含む',
 };

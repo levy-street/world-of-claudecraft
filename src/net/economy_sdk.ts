@@ -48,6 +48,24 @@ export interface ClaudiumWocIntent {
   expiresAtMs: number;
 }
 
+/**
+ * The service-computed discount block that now rides on a purchase result. Every
+ * value is owned by the economy service; this client NEVER derives a percentage, a
+ * bonus, or a credited amount, it only carries these through for display. "X% off
+ * the effective peg price": the buyer pays the full amount and receives MORE
+ * Claudium (claudiumCredited >= baseClaudium). floorBps is the always-on $WOC floor
+ * (1500 for the woc rail, else 0); promoBps is the admin/limited-time part.
+ */
+export interface ClaudiumDiscount {
+  rail: 'stripe' | 'woc' | 'sol' | 'usdc';
+  baseClaudium: number;
+  discountBps: number;
+  claudiumCredited: number;
+  bonusClaudium: number;
+  breakdown: { floorBps: number; promoBps: number };
+  effectiveCentsPer100: number;
+}
+
 export interface ClaudiumPurchase {
   ok: boolean;
   purchaseId: string | null;
@@ -56,6 +74,8 @@ export interface ClaudiumPurchase {
   stripe: ClaudiumStripeIntent | null;
   woc: ClaudiumWocIntent | null;
   reason: string | null;
+  /** The service-computed discount, or null when the service omitted one. */
+  discount: ClaudiumDiscount | null;
 }
 
 export interface ClaudiumConfirm {
@@ -93,6 +113,7 @@ const OFF_PURCHASE: ClaudiumPurchase = {
   stripe: null,
   woc: null,
   reason: 'unavailable',
+  discount: null,
 };
 const OFF_CONFIRM: ClaudiumConfirm = { credited: false, balance: null, reason: 'unavailable' };
 const OFF_SPEND: ClaudiumSpend = {

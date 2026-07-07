@@ -5920,4 +5920,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.kindCosmetic': '치장',
   'hudChrome.claudium.kindSkin': '스킨',
   'hudChrome.claudium.kindItem': '아이템',
+  'hudChrome.claudium.discountLabel': '할인',
+  'hudChrome.claudium.discountSummary': '실효 페그 가격에서 {percent}% 할인',
+  'hudChrome.claudium.discountBonus': '{base} 클라우디움 에서 {credited} 클라우디움 (+{bonus})',
+  'hudChrome.claudium.wocIncentive': '$WOC 로 결제 - 항상 15% 이상 할인',
+  'hudChrome.claudium.wocPromoNote': '한정 기간 프로모션 포함',
 };

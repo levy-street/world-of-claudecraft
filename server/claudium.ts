@@ -123,6 +123,7 @@ export async function handleClaudiumApi(
         stripe: null,
         woc: null,
         reason: 'invalid_request',
+        discount: null,
       });
     }
     return json(

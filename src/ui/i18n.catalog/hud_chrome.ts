@@ -129,6 +129,15 @@ export const hudChromeStrings = {
     kindCosmetic: 'Cosmetic',
     kindSkin: 'Skin',
     kindItem: 'Item',
+    // The discount block shown in the buy panel when the service reports a discount.
+    discountLabel: 'Discount',
+    discountSummary: '{percent}% off the effective peg price',
+    // Plain arrow, never an em or en dash: base to credited, with the bonus in parens.
+    discountBonus: '{base} to {credited} Claudium (+{bonus})',
+    // Always-on $WOC floor incentive (a hyphen, never a dash).
+    wocIncentive: 'Pay with $WOC - always 15%+ off',
+    // Appended when a limited-time promo is folded into the $WOC discount.
+    wocPromoNote: 'Includes a limited-time promo',
     checkoutTitle: 'Complete purchase',
     checkoutClose: 'Close checkout',
     checkoutLoading: 'Loading checkout...',

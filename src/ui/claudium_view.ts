@@ -32,6 +32,24 @@ export interface ClaudiumStoreItemInput {
   costClaudium: number;
 }
 
+/**
+ * The service-computed discount block that rides on a Claudium purchase result. The
+ * view NEVER derives a percentage, a bonus, or a credited amount, it only carries
+ * these through and lets the consumer format them. "X% off the effective peg
+ * price": the buyer pays the full amount and receives MORE Claudium
+ * (claudiumCredited >= baseClaudium). floorBps is the always-on $WOC floor (1500 for
+ * the woc rail, else 0); promoBps is the admin/limited-time part.
+ */
+export interface ClaudiumDiscountInput {
+  rail: 'stripe' | 'woc' | 'sol' | 'usdc';
+  baseClaudium: number;
+  discountBps: number;
+  claudiumCredited: number;
+  bonusClaudium: number;
+  breakdown: { floorBps: number; promoBps: number };
+  effectiveCentsPer100: number;
+}
+
 /** The raw inputs, all sourced from the service via the SDK. */
 export interface ClaudiumViewInput {
   /** Integer Claudium balance, or null when the service is off. */
@@ -39,6 +57,8 @@ export interface ClaudiumViewInput {
   skus: readonly ClaudiumSkuInput[];
   price: ClaudiumPriceInput;
   storeItems: readonly ClaudiumStoreItemInput[];
+  /** The last purchase's service-computed discount, or null/absent when there is none. */
+  discount?: ClaudiumDiscountInput | null;
 }
 
 /** One buy-picker row: the money label and the Claudium credited, both from the service. */
@@ -64,6 +84,24 @@ export interface ClaudiumRailAvailability {
   woc: boolean;
 }
 
+/**
+ * The projected discount, present only when the service reported an actual discount
+ * (discountBps > 0). Every value is passed through verbatim from the service; the
+ * view derives nothing except percent = discountBps / 100 (a pure unit rescale of a
+ * service integer, the ONLY arithmetic here, never a price computation). floorBps > 0
+ * means the always-on $WOC floor applies; promoBps > 0 means a limited-time promo is
+ * folded in.
+ */
+export interface ClaudiumDiscountRow {
+  discountBps: number;
+  percent: number;
+  baseClaudium: number;
+  claudiumCredited: number;
+  bonusClaudium: number;
+  floorBps: number;
+  promoBps: number;
+}
+
 export interface ClaudiumView {
   /** True when the service is off (balance null): render the disabled/empty state. */
   disabled: boolean;
@@ -76,6 +114,29 @@ export interface ClaudiumView {
   /** True when neither rail can transact (nothing to buy or oracle down + no skus). */
   buyDisabled: boolean;
   storeRows: ClaudiumStoreRow[];
+  /** The service-computed discount to display, or null when there is none to show. */
+  discount: ClaudiumDiscountRow | null;
+}
+
+/**
+ * Project the service discount into a render row, pass-through only. Returns null
+ * (nothing to show) unless the service reported a real discount (discountBps > 0);
+ * a zero or missing discount shows no row. The one derivation is percent =
+ * discountBps / 100 (a unit rescale), never a price.
+ */
+function projectDiscount(
+  input: ClaudiumDiscountInput | null | undefined,
+): ClaudiumDiscountRow | null {
+  if (!input || input.discountBps <= 0) return null;
+  return {
+    discountBps: input.discountBps,
+    percent: input.discountBps / 100,
+    baseClaudium: input.baseClaudium,
+    claudiumCredited: input.claudiumCredited,
+    bonusClaudium: input.bonusClaudium,
+    floorBps: input.breakdown.floorBps,
+    promoBps: input.breakdown.promoBps,
+  };
 }
 
 /**
@@ -98,6 +159,7 @@ export function buildClaudiumView(input: ClaudiumViewInput): ClaudiumView {
       rails: { stripe: false, woc: false },
       buyDisabled: true,
       storeRows: [],
+      discount: null,
     };
   }
 
@@ -123,5 +185,6 @@ export function buildClaudiumView(input: ClaudiumViewInput): ClaudiumView {
     rails: { stripe, woc },
     buyDisabled: !stripe && !woc,
     storeRows,
+    discount: projectDiscount(input.discount),
   };
 }

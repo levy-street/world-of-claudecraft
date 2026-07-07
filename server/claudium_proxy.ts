@@ -66,6 +66,21 @@ export interface ClaudiumWocIntent {
   expiresAtMs: number;
 }
 
+/**
+ * The service-computed discount block on a purchase result. The game NEVER derives
+ * any of it; this proxy only passes through what the service returned (or null when
+ * the service omitted it). See the service SDK for the shape.
+ */
+export interface ClaudiumDiscount {
+  rail: 'stripe' | 'woc' | 'sol' | 'usdc';
+  baseClaudium: number;
+  discountBps: number;
+  claudiumCredited: number;
+  bonusClaudium: number;
+  breakdown: { floorBps: number; promoBps: number };
+  effectiveCentsPer100: number;
+}
+
 export interface ClaudiumPurchaseResult {
   ok: boolean;
   purchaseId: string | null;
@@ -74,6 +89,7 @@ export interface ClaudiumPurchaseResult {
   stripe: ClaudiumStripeIntent | null;
   woc: ClaudiumWocIntent | null;
   reason: string | null;
+  discount: ClaudiumDiscount | null;
 }
 
 export interface ClaudiumConfirmResult {
@@ -209,6 +225,38 @@ export async function claudiumSkus(): Promise<ClaudiumSkusResult> {
   return { skus };
 }
 
+/**
+ * Validate a discount block from the service, dropping it to null unless every
+ * field is a finite number of the expected type (defensive: the service owns these,
+ * the game only passes them through and never computes with them).
+ */
+function coerceDiscount(raw: unknown): ClaudiumDiscount | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const d = raw as Record<string, unknown>;
+  const b = d.breakdown as Record<string, unknown> | undefined;
+  const rail = d.rail;
+  if (rail !== 'stripe' && rail !== 'woc' && rail !== 'sol' && rail !== 'usdc') return null;
+  const nums = [
+    d.baseClaudium,
+    d.discountBps,
+    d.claudiumCredited,
+    d.bonusClaudium,
+    d.effectiveCentsPer100,
+    b?.floorBps,
+    b?.promoBps,
+  ];
+  if (!nums.every((n) => typeof n === 'number' && Number.isFinite(n))) return null;
+  return {
+    rail,
+    baseClaudium: d.baseClaudium as number,
+    discountBps: d.discountBps as number,
+    claudiumCredited: d.claudiumCredited as number,
+    bonusClaudium: d.bonusClaudium as number,
+    breakdown: { floorBps: b?.floorBps as number, promoBps: b?.promoBps as number },
+    effectiveCentsPer100: d.effectiveCentsPer100 as number,
+  };
+}
+
 /** POST purchase. Returns ok:false with a reason when the service is off. */
 export async function claudiumPurchase(input: {
   accountId: string;
@@ -223,6 +271,7 @@ export async function claudiumPurchase(input: {
     stripe?: ClaudiumStripeIntent;
     woc?: ClaudiumWocIntent;
     reason?: string;
+    discount?: unknown;
   }>({ method: 'POST', path: 'purchase', body: input });
   if (!data) {
     return {
@@ -233,6 +282,7 @@ export async function claudiumPurchase(input: {
       stripe: null,
       woc: null,
       reason: 'unavailable',
+      discount: null,
     };
   }
   return {
@@ -243,6 +293,7 @@ export async function claudiumPurchase(input: {
     stripe: data.stripe ?? null,
     woc: data.woc ?? null,
     reason: data.reason ?? null,
+    discount: coerceDiscount(data.discount),
   };
 }
 

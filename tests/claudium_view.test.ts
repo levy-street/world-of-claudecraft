@@ -104,6 +104,66 @@ describe('buildClaudiumView funded state (service on)', () => {
   });
 });
 
+describe('buildClaudiumView discount projection (display only, no pricing)', () => {
+  const wocDiscount = {
+    rail: 'woc' as const,
+    baseClaudium: 1000,
+    discountBps: 1500,
+    claudiumCredited: 1150,
+    bonusClaudium: 150,
+    breakdown: { floorBps: 1500, promoBps: 0 },
+    effectiveCentsPer100: 85,
+  };
+
+  it('projects a discount row when discountBps > 0, deriving only percent', () => {
+    const view = buildClaudiumView({ ...funded, discount: wocDiscount });
+    expect(view.discount).toEqual({
+      discountBps: 1500,
+      percent: 15,
+      baseClaudium: 1000,
+      claudiumCredited: 1150,
+      bonusClaudium: 150,
+      floorBps: 1500,
+      promoBps: 0,
+    });
+  });
+
+  it('carries the promo part of the breakdown through for the incentive note', () => {
+    const view = buildClaudiumView({
+      ...funded,
+      discount: { ...wocDiscount, discountBps: 2000, breakdown: { floorBps: 1500, promoBps: 500 } },
+    });
+    expect(view.discount?.percent).toBe(20);
+    expect(view.discount?.floorBps).toBe(1500);
+    expect(view.discount?.promoBps).toBe(500);
+  });
+
+  it('shows no discount row when discountBps is 0', () => {
+    const view = buildClaudiumView({
+      ...funded,
+      discount: { ...wocDiscount, discountBps: 0, bonusClaudium: 0, claudiumCredited: 1000 },
+    });
+    expect(view.discount).toBeNull();
+  });
+
+  it('shows no discount row when the service omitted a discount', () => {
+    const view = buildClaudiumView(funded);
+    expect(view.discount).toBeNull();
+  });
+
+  it('shows no discount row in the disabled (service-off) state', () => {
+    const view = buildClaudiumView({
+      balance: null,
+      skus: [],
+      price: { usdPerClaudium: null, wocBaseUnitsPerClaudium: null },
+      storeItems: [],
+      discount: wocDiscount,
+    });
+    expect(view.disabled).toBe(true);
+    expect(view.discount).toBeNull();
+  });
+});
+
 describe('buildClaudiumView is a pure projection', () => {
   it('returns identical structure for identical input (no hidden state)', () => {
     expect(buildClaudiumView(funded)).toEqual(buildClaudiumView(funded));
