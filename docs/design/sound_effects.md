@@ -3,8 +3,9 @@
 Generated spatial sound effects for World of ClaudeCraft, produced with the
 **ElevenLabs Sound Effects API** (`POST /v1/sound-generation`) and played through
 a new lightweight 3D Web Audio engine. This document is the human-readable
-catalog; the authoritative machine list (prompts, durations, loop flags) lives in
-`scripts/sfx/sfx_prompts.mjs` and is consumed by `scripts/gen_sfx.mjs`.
+catalog and the asset standard; the authoritative machine list (prompts,
+durations, loop flags, and stereo policy) lives in `scripts/sfx/sfx_prompts.mjs`
+and is consumed by `scripts/gen_sfx.mjs` and `scripts/check_sfx.mjs`.
 
 ## Goals
 - **Immersive world layer:** footsteps that change with surface (grass / dirt /
@@ -26,6 +27,50 @@ The existing procedural WebAudio blips in `src/game/audio.ts` (UI click, coin,
 level-up fanfare, quest accept/done, bag open/close, error, whisper, duel/arena
 stingers) are crisp, zero-weight, and non-positional — they stay. Generated assets
 are spent only on the immersive world/combat/creature layer below.
+
+---
+
+## Asset standard
+
+All committed files under `public/audio/sfx/` must pass
+`npm run sfx:check`. The generator and checker share the constants in
+`scripts/sfx/sfx_asset_standard.mjs` so the written contract and the executable
+contract stay aligned.
+
+| Rule | Standard | Reason |
+|---|---|---|
+| Container / codec | MP3 only, one audio stream | The runtime uses WebAudio `decodeAudioData`; MP3 is the broadest baseline for WebKit/iOS and Safari. Ogg Vorbis is intentionally out of scope. AAC in `.m4a` is a possible future efficiency pass, not this standard. |
+| Sample rate | 44.1kHz | Matches the ElevenLabs output profile and keeps all SFX uniform. |
+| Bitrate | Generator writes 128kbps CBR MP3; hand-authored clips must be <=192kbps | Short SFX do not benefit enough from 320kbps to justify the decoded-memory and download drift. |
+| Loudness | Peak-normalize to -6dBFS after channel conversion | Keeps generated and hand-authored clips at predictable relative levels with headroom for runtime gain/jitter. |
+| Channels | Mono by default; `stereo: true` in the catalog means stereo | Positional and one-shot sounds are panned/spatialized at runtime, so pre-rendered stereo width is wasted. Ambient beds may keep stereo width. |
+| Naming | `snake_case` key, filename exactly `<key>.mp3` | The filename, manifest key, and `scripts/sfx/sfx_prompts.mjs` key are the same identifier. |
+
+### Channel policy by playback path
+
+- `playAt(...)`: mono. This includes footsteps, movement, weapon swings,
+  impacts, creature voices, spell projectiles, spell impacts, heals, auras, and
+  sustained `cast_*` loops. They are positioned by the runtime, so stereo input is
+  decoded and retained but does not add useful spatial information.
+- `playUi(...)`: mono by default. UI SFX should use procedural `audio.ts` unless a
+  sampled clip is clearly needed; if a future sampled UI clip is added, keep it
+  mono unless a documented stereo exception is added to the catalog.
+- Ambience loops: stereo. Entries such as `amb_wind_vale`, `amb_water`, and
+  `amb_campfire` use `stereo: true` in `scripts/sfx/sfx_prompts.mjs` so the
+  pipeline preserves left/right width.
+
+### Naming convention
+
+Use lowercase snake_case in the form `category_subject_variant`:
+
+- `mob_<family>_aggro|attack|death`
+- `foot_<surface>`
+- `amb_*`
+- `cast_<school>`, `proj_<school>`, `impact_<school>`
+- `melee_*`, `combat_*`, `move_*`, `player_*`, `heal_*`, `buff_*`, `debuff_*`
+
+The check script treats a filename that does not equal a catalog key as a
+conformance error.
 
 ---
 
@@ -107,7 +152,7 @@ Keys map to `public/audio/sfx/<key>.mp3`; the manifest
 | `foot_grass` | 0.5 | single soft footstep on grass and leaves, light boot, close, dry |
 | `foot_dirt` | 0.5 | single footstep on wet mud and dirt, soft squelch, close |
 | `foot_stone` | 0.5 | single boot step on stone and gravel, gritty scrape, close |
-| `foot_wood` | 0.5 | single boot step on hollow wooden planks, dull creak, close |
+| `foot_wood` | 0.5 | single boot step on hollow wooden planks, dull creak |
 | `foot_snow` | 0.5 | single boot step crunching fresh snow, soft compression |
 | `foot_water` | 0.6 | single footstep wading in shallow water, splashy, close |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
@@ -198,30 +243,48 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `murloc`, `kobold`,
 | `demon` | a demon — sinister hissing snarl / shrieking demonic strike / agonized demonic death wail |
 
 ### Ambient loops
-| key | loop | spatial | prompt summary |
-|---|---|---|---|
-| `amb_wind_vale` | ✓ | global | gentle pleasant breeze through a green forest valley, soft wind and distant leaves |
-| `amb_wind_marsh` | ✓ | global | eerie damp marshland wind, low mournful breeze with distant frogs and insects |
-| `amb_wind_peaks` | ✓ | global | cold howling mountain wind across high rocky peaks, bleak and gusty |
-| `amb_birds` | ✓ | global | calm daytime forest ambience with gentle birdsong |
-| `amb_water` | ✓ | point | gentle lake water lapping at the shore, soft flowing ripples |
-| `amb_campfire` | ✓ | point | a crackling campfire, popping embers and flames |
-| `amb_forge` | ✓ | point | a blacksmith forge, roaring furnace with rhythmic hammer strikes on an anvil |
-| `amb_dungeon` | ✓ | global | a dark stone dungeon interior, dripping water echoes and a low ominous drone |
-| `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
-| `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
+| key | loop | spatial | channels | prompt summary |
+|---|---|---|---|---|
+| `amb_wind_vale` | ✓ | global | stereo | gentle pleasant breeze through a green forest valley, soft wind and distant leaves |
+| `amb_wind_marsh` | ✓ | global | stereo | eerie damp marshland wind, low mournful breeze with distant frogs and insects |
+| `amb_wind_peaks` | ✓ | global | stereo | cold howling mountain wind across high rocky peaks, bleak and gusty |
+| `amb_birds` | ✓ | global | stereo | calm daytime forest ambience with gentle birdsong |
+| `amb_water` | ✓ | point | stereo | gentle lake water lapping at the shore, soft flowing ripples |
+| `amb_campfire` | ✓ | point | stereo | a crackling campfire, popping embers and flames |
+| `amb_forge` | ✓ | point | stereo | a blacksmith forge, roaring furnace with rhythmic hammer strikes on an anvil |
+| `amb_dungeon` | ✓ | global | stereo | a dark stone dungeon interior, dripping water echoes and a low ominous drone |
+| `amb_rain` | ✓ | global | stereo | steady rainfall pattering with occasional distant thunder |
+| `amb_snow` | ✓ | global | stereo | a soft muffled snowy wind, quiet and cold |
 
 ---
 
-## Generation
-`ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]` — reads
+## Generation and conformance
+
+`ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]` reads
 `scripts/sfx/sfx_prompts.mjs`, calls `POST /v1/sound-generation` per clip
 (`duration_seconds`, `prompt_influence` 0.4, `loop` per entry,
-`output_format=mp3_44100_128`), writes `public/audio/sfx/<key>.mp3`, and emits
-`src/game/sfx_manifest.generated.ts` (key → `/audio/sfx/<key>.mp3`). Idempotent
-(skips existing; `--force` to regenerate). Offline-only; the key is never read at
-runtime. Served from `public/` via plain `/audio/sfx/...` paths (no media-manifest
-hashing), matching the voice-over assets.
+`output_format=mp3_44100_128`), writes a temporary raw MP3, and then invokes local
+`ffmpeg` before the final write to `public/audio/sfx/<key>.mp3`.
+
+The post-process step applies the catalog-driven channel count, resamples to
+44.1kHz, peak-normalizes the converted signal to -6dBFS, encodes MP3 at 128kbps,
+and strips metadata. Existing files are skipped unless `--force`; use
+`node scripts/gen_sfx.mjs --conform-existing` to reprocess already-committed files
+without calling ElevenLabs.
+
+`npm run sfx:check` scans `public/audio/sfx` with `ffprobe` and `ffmpeg
+volumedetect`. It exits non-zero and reports each file/rule violation for:
+
+- wrong container/codec or non-`.mp3` filename,
+- wrong sample rate,
+- stereo where mono is required or mono where `stereo: true` is required,
+- peak above -6dBFS (small codec tolerance allowed),
+- bitrate above the 192kbps ceiling,
+- filename/key mismatch with `scripts/sfx/sfx_prompts.mjs`.
+
+The check is an explicit `sfx:check` script rather than part of the default gate for
+now because it requires local `ffmpeg`/`ffprobe`. Add it to a CI/gate tier only on
+runners where those binaries are installed.
 
 ## Efficiency budget
 - One decoded `AudioBuffer` per clip, shared across all sources.
