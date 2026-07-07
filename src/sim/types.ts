@@ -2903,7 +2903,11 @@ export interface GauntletRunView {
   pull: {
     beatAnchor: number; // absolute sim time of beat 0; client derives the metronome
     beatPeriodS: number;
-    marker: number; // + toward the viewer's side winning
+    // ABSOLUTE marker, + = team 0 winning. Both teams stand ON the rope
+    // (team 0 grips the -x half), so the venue translates the rope by
+    // -marker/winThreshold * knotTravel and the sim drags the lines the same
+    // way; the meter is the physical rope, not a viewer-relative bar.
+    marker: number;
     winThreshold: number;
     braceUntil: number;
   } | null;

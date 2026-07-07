@@ -11,7 +11,6 @@
 
 import { GAUNTLET, GAUNTLET_VENUE } from '../content/gauntlet';
 import type { SimContext } from '../sim_context';
-import { placeContestantsAt, seatLivePlayersAt } from './contestants';
 import type { GauntletPullState, GauntletRun } from './state';
 import { aliveContestants, applyVitalityDamage, cullNpcsToward } from './vitality';
 
@@ -20,20 +19,51 @@ function pullDir(team: 0 | 1): 1 | -1 {
   return team === 0 ? 1 : -1;
 }
 
-// Where the i-th of n live players stands for the pull: the south rim of the
-// trench, spread along the rope, facing -z toward it and the beat drum
-// (runs.ts pins them there for the trial).
-function trenchRimSpot(i: number, n: number): { x: number; z: number; facing: number } {
-  const { x, z, width } = GAUNTLET_VENUE.pull;
-  return { x: x + (i - (n - 1) / 2) * 3, z: z + width / 2 + 4, facing: Math.PI };
+// The slot-th grip on a team's half of the rope, instance-local: team 0 lines
+// up on the -x half, team 1 on +x, single file with a small alternating
+// stagger so no two bodies overlap, everyone facing the pit and the enemy.
+function gripSpot(team: 0 | 1, slot: number): { x: number; z: number; facing: number } {
+  const V = GAUNTLET_VENUE.pull;
+  const dir = team === 0 ? -1 : 1;
+  return {
+    x: V.x + dir * (V.gripStart + slot * V.gripSpacing),
+    z: V.z + (slot % 2 === 0 ? -0.35 : 0.35),
+    facing: dir === -1 ? Math.PI / 2 : -Math.PI / 2,
+  };
+}
+
+// Seat EVERY contestant on the rope itself: this trial is played standing in
+// the line, not watching from a rim. Players take the grips nearest the pit
+// (runs.ts pins them there; the drag pass slides the pins), NPC teammates
+// fill in behind. Direct pos writes, no rng draws.
+function seatRopeLine(
+  ctx: SimContext,
+  run: GauntletRun,
+  teamOf: Map<number, 0 | 1>,
+): Map<number, { x: number; z: number }> {
+  const base = new Map<number, { x: number; z: number }>();
+  const slots: [number, number] = [0, 0];
+  const take = (entityId: number, team: 0 | 1) => {
+    const e = ctx.entities.get(entityId);
+    if (!e) return;
+    const s = gripSpot(team, slots[team]++);
+    e.pos = ctx.groundPos(run.origin.x + s.x, run.origin.z + s.z);
+    e.prevPos = { ...e.pos };
+    e.facing = s.facing;
+    ctx.rebucket(e);
+    base.set(entityId, { x: s.x, z: s.z });
+  };
+  for (const [pid, team] of teamOf) {
+    const ps = run.playerStates.get(pid);
+    if (!ps || ps.spectating) continue;
+    take(pid, team);
+  }
+  const npcs = aliveContestants(run).filter((c) => !c.player);
+  for (let i = 0; i < npcs.length; i++) take(npcs[i].entityId, (i % 2) as 0 | 1);
+  return base;
 }
 
 export function startPull(ctx: SimContext, run: GauntletRun): GauntletPullState {
-  // The NPC crowd fans along the banks below; the players watch the whole
-  // rope from the south rim.
-  placeContestantsAt(ctx, run, GAUNTLET_VENUE.pull.x, GAUNTLET_VENUE.pull.z + 12, 10);
-  seatLivePlayersAt(ctx, run, trenchRimSpot);
-
   // Team split: 2+ live players alternate 0, 1, 0, 1... in join (insertion)
   // order; a lone player is team 0 against an all-NPC team 1.
   const teamOf = new Map<number, 0 | 1>();
@@ -54,7 +84,7 @@ export function startPull(ctx: SimContext, run: GauntletRun): GauntletPullState 
     run.rng.range(GAUNTLET.pull.npcForceMin, GAUNTLET.pull.npcForceMax),
   ];
 
-  lineUpRopeNpcs(ctx, run);
+  const gripBase = seatRopeLine(ctx, run, teamOf);
 
   return {
     kind: 'pull',
@@ -65,31 +95,11 @@ export function startPull(ctx: SimContext, run: GauntletRun): GauntletPullState 
     claimed: new Map(),
     teamOf,
     npcForce,
+    gripBase,
+    kx: 0,
     resolved: false,
     wonBy: null,
   };
-}
-
-// Cosmetic only: fan the surviving NPC contestants along both banks of the
-// trench (team 0 on the -x bank, team 1 on the +x bank). Direct pos writes, no
-// rng draws, no gameplay effect.
-function lineUpRopeNpcs(ctx: SimContext, run: GauntletRun): void {
-  const V = GAUNTLET_VENUE.pull;
-  const cx = run.origin.x + V.x;
-  const cz = run.origin.z + V.z;
-  const npcs = aliveContestants(run).filter((c) => !c.player);
-  for (let i = 0; i < npcs.length; i++) {
-    const e = ctx.entities.get(npcs[i].entityId);
-    if (!e) continue;
-    const dir = i % 2 === 0 ? -1 : 1; // even -> team 0 bank, odd -> team 1 bank
-    const rank = Math.floor(i / 2);
-    const along = Math.min(2 + rank * 1.4, V.length / 2);
-    const lateral = ((rank % 3) - 1) * (V.width / 4);
-    e.pos = { x: cx + dir * along, y: 0, z: cz + lateral };
-    e.prevPos = { x: e.pos.x, y: e.pos.y, z: e.pos.z };
-    e.facing = dir === -1 ? Math.PI / 2 : -Math.PI / 2; // face across the rope
-    ctx.rebucket(e);
-  }
 }
 
 // A player claims beat index `beat` (derived client-side from beatAnchor +
@@ -153,10 +163,36 @@ export function updatePull(ctx: SimContext, run: GauntletRun, dt: number): boole
     heaveNpcBeat(run, trial);
   }
 
+  dragRopeLine(ctx, run, trial, dt);
+
   const winner = resolveWinner(ctx, run, trial);
   if (winner === null) return false;
   finishPull(ctx, run, trial, winner);
   return true;
+}
+
+// Slide the whole line with the rope. The eased drag tracks the marker
+// (+ marker = team 0 winning = the rope hauled toward team 0's side, -x), and
+// every grip translates with it, players via their station pin so the winning
+// team visibly steps back while the losers are dragged onto the pit. Purely
+// deterministic (fixed DT ease, no rng); the venue eases its rope mesh toward
+// the same target so hands stay on the rope.
+function dragRopeLine(ctx: SimContext, run: GauntletRun, trial: GauntletPullState, dt: number) {
+  const frac = Math.max(-1, Math.min(1, trial.marker / GAUNTLET.pull.winThreshold));
+  const target = -frac * GAUNTLET_VENUE.pull.knotTravel;
+  trial.kx += (target - trial.kx) * Math.min(1, dt * 8);
+  for (const [entityId, base] of trial.gripBase) {
+    const e = ctx.entities.get(entityId);
+    if (!e) continue;
+    const c = run.contestants.find((k) => k.entityId === entityId);
+    if (!c || c.eliminatedAtTrial !== null) continue;
+    const ps = run.playerStates.get(entityId);
+    if (ps?.spectating) continue;
+    const wx = run.origin.x + base.x + trial.kx;
+    if (ps?.heldAt) ps.heldAt.x = wx;
+    if (!c.player) e.prevPos = { ...e.pos };
+    e.pos.x = wx;
+  }
 }
 
 // A team missed the brace when a live (attached, non-spectating) player on it

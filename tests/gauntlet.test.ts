@@ -700,7 +700,7 @@ describe('desk-trial station lock', () => {
     expect(run.phase).toBe('trial'); // still mid-trial: the hold did the work
   });
 
-  it('pull seats the players on the trench rim, facing the rope, and holds them', () => {
+  it('pull puts the player ON the rope and drags the line with the marker', () => {
     spliceTrial('pull');
     const sim = makeSim(22);
     const pid = sim.addPlayer('warrior', 'Puller');
@@ -709,10 +709,20 @@ describe('desk-trial station lock', () => {
     const run = sim.gauntletRuns[0]!;
     const e = sim.entities.get(pid)!;
     const V = GAUNTLET_VENUE.pull;
-    expect(e.pos.x).toBeCloseTo(run.origin.x + V.x, 4); // a lone player centers
-    expect(e.pos.z).toBeCloseTo(run.origin.z + V.z + V.width / 2 + 4, 4);
-    expect(e.facing).toBeCloseTo(Math.PI, 4);
+    // A lone player is team 0: the first grip on the -x half of the rope,
+    // facing the pit and the enemy team.
+    expect(e.pos.x).toBeCloseTo(run.origin.x + V.x - V.gripStart, 4);
+    expect(e.pos.z).toBeCloseTo(run.origin.z + V.z - 0.35, 4);
+    expect(e.facing).toBeCloseTo(Math.PI / 2, 4);
+    // Held at the grip (the first NPC heave lands 2s in, after this window).
     expect(driftUnderForward(sim, pid)).toBeLessThan(0.05);
+    // The whole line slides with the rope: push the marker near the win
+    // threshold and the player's pinned grip is hauled toward -x with it.
+    const trial = run.trial;
+    if (trial?.kind !== 'pull') throw new Error('expected pull live');
+    trial.marker = GAUNTLET.pull.winThreshold - 1;
+    for (let i = 0; i < 15; i++) sim.tick();
+    expect(e.pos.x).toBeLessThan(run.origin.x + V.x - V.gripStart - 5);
   });
 
   it('wager holds the player at their mat', () => {

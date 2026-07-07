@@ -657,21 +657,17 @@ interface SigilRig {
   normal: THREE.Vector3;
 }
 
-// The Great Pull rig: the rope IS the meter. Two rope halves meet at a knot
-// whose offset from the painted center line mirrors the wire marker
-// (viewer-relative: positive = the viewer's side winning, mapped to +x), and
-// the beat drum on the trench rim pulses on the sim metronome (a steady glow
-// during the opening brace window).
+// The Great Pull rig: the rope IS the meter. Both teams stand ON the rope
+// (the sim seats and drags them), so the whole hand-height rope translates
+// with the ABSOLUTE wire marker (+ = team 0 winning = hauled toward -x), the
+// judge's knot marking its center, and the beat drum by the pit pulses on the
+// sim metronome (a steady glow during the opening brace window).
 interface PullRig {
   knot: THREE.Group;
-  ropeL: THREE.Mesh;
-  ropeR: THREE.Mesh;
+  rope: THREE.Mesh;
   drum: THREE.Group;
   drumSkinMat: THREE.MeshStandardMaterial;
-  maxOffset: number; // knot travel from center to a threshold stake
-  attachL: number; // rope anchor x at each post, instance-local
-  attachR: number;
-  ropeY: number;
+  maxOffset: number; // rope travel from center to a threshold stake
   centerX: number;
   centerZ: number;
 }
@@ -981,61 +977,72 @@ function buildTrialArenas(
   // with the etched lectern slab (the trial's input surface) at its center.
   const sigilRig = buildSigilPavilion(group, ox, oz);
 
-  // Trial 3, The Great Pull: a sunken trench; the rope over it is the live
-  // meter (two halves meeting at the marker knot) and the drum on the rim is
-  // the beat metronome.
+  // Trial 3, The Great Pull: a flat rope lane with a central mud pit. Both
+  // teams stand ON the rope (the sim seats and drags them), so the rope is a
+  // single hand-height line that translates with the marker, and the losing
+  // line ends up dragged onto the pit mouth.
   const pullRig: PullRig = (() => {
-    const { x, z, length, width } = V.pull;
-    box(group, length + 3, 0.5, width + 3, x, 0.25, z, stoneMat(SAND_EDGE));
-    box(group, length, 0.2, width, x, 0.42, z, surfaceMat({ color: PIT_DARK, roughness: 1 }));
-    const postMat = stoneMat(WOOD);
-    for (const side of [-1, 1]) {
-      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 4.6, 8), postMat);
-      post.position.set(x + side * (length / 2 + 1.2), 2.3, z);
-      post.castShadow = true;
-      group.add(post);
-    }
-    // The painted center line and the two threshold stakes the knot must reach.
+    const { x, z, length, width, ropeY, pitHalfX, pitHalfZ, knotTravel } = V.pull;
+    // The lane: a packed-sand strip under the whole line.
+    groundPlane(
+      group,
+      length + 14,
+      width + 4,
+      x,
+      0.02,
+      z,
+      surfaceMat({ color: 0xc7b58c, map: texWithRepeat(sandTex(), 5, 2), roughness: 0.95 }),
+    );
+    // The pit: a flush dark mouth with a low stone lip.
+    groundPlane(
+      group,
+      pitHalfX * 2,
+      pitHalfZ * 2,
+      x,
+      0.04,
+      z,
+      surfaceMat({ color: PIT_DARK, roughness: 1 }),
+    );
+    const lip = stoneMat(STONE_DARK);
+    box(group, pitHalfX * 2 + 0.5, 0.14, 0.25, x, 0.07, z - pitHalfZ, lip);
+    box(group, pitHalfX * 2 + 0.5, 0.14, 0.25, x, 0.07, z + pitHalfZ, lip);
+    box(group, 0.25, 0.14, pitHalfZ * 2, x - pitHalfX, 0.07, z, lip);
+    box(group, 0.25, 0.14, pitHalfZ * 2, x + pitHalfX, 0.07, z, lip);
+    // The painted center line under the rope, and the threshold stakes.
     const lineMat = surfaceMat({ color: 0xf6f1e4, roughness: 0.8 });
-    box(group, 0.3, 0.06, width + 3, x, 0.54, z, lineMat);
-    const maxOffset = length / 2 - 2;
+    box(group, 0.3, 0.06, width + 2, x, 0.05, z, lineMat);
+    const maxOffset = knotTravel;
     const stakeMat = surfaceMat({ color: RED_LIGHT, roughness: 0.6 });
     for (const side of [-1, 1]) {
       const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.13, 1.4, 6), stakeMat);
-      stake.position.set(x + side * maxOffset, 1.2, z + width / 2 + 0.9);
+      stake.position.set(x + side * maxOffset, 0.7, z + pitHalfZ + 1.4);
       stake.castShadow = true;
       group.add(stake);
     }
-    // The rope halves: unit-length cylinders laid along x, stretched per frame
-    // between their post anchor and the knot.
-    const ropeY = 3.6;
+    // The rope: one hand-height line the teams hold; it slides through the
+    // pit rather than stretching, translated per frame with the marker.
     const ropeMat = surfaceMat({ color: 0xa8895e, roughness: 1 });
-    const ropeGeo = new THREE.CylinderGeometry(0.14, 0.14, 1, 6);
-    const attachL = x - (length / 2 + 1.2);
-    const attachR = x + (length / 2 + 1.2);
-    const ropeL = new THREE.Mesh(ropeGeo, ropeMat);
-    ropeL.rotation.z = Math.PI / 2;
-    ropeL.position.set(x, ropeY, z);
-    group.add(ropeL);
-    const ropeR = new THREE.Mesh(ropeGeo, ropeMat);
-    ropeR.rotation.z = Math.PI / 2;
-    ropeR.position.set(x, ropeY, z);
-    group.add(ropeR);
-    // The knot: a wrapped coil with the judge's red streamer hanging under it.
+    const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, length, 6), ropeMat);
+    rope.rotation.z = Math.PI / 2;
+    rope.position.set(x, ropeY, z);
+    rope.castShadow = true;
+    group.add(rope);
+    // The knot: a wrapped coil with the judge's red streamer hanging under it,
+    // riding the rope's center.
     const knot = new THREE.Group();
     const coil = new THREE.Mesh(
-      new THREE.SphereGeometry(0.3, 10, 8),
+      new THREE.SphereGeometry(0.22, 10, 8),
       surfaceMat({ color: 0x8a6a42, roughness: 1 }),
     );
     knot.add(coil);
-    const streamer = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.7, 0.28), stakeMat);
-    streamer.position.y = -0.55;
+    const streamer = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.55, 0.28), stakeMat);
+    streamer.position.y = -0.42;
     knot.add(streamer);
     knot.position.set(x, ropeY, z);
     group.add(knot);
-    // The beat drum on the near rim: wooden shell, glowing skin.
+    // The beat drum south of the pit: wooden shell, glowing skin.
     const drum = new THREE.Group();
-    drum.position.set(x + 4, 0.5, z + width / 2 + 2.4);
+    drum.position.set(x, 0.5, z + pitHalfZ + 2.8);
     const shell = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.95, 1.1, 12), stoneMat(WOOD));
     shell.position.y = 0.55;
     shell.castShadow = true;
@@ -1052,19 +1059,7 @@ function buildTrialArenas(
     drum.add(skin);
     group.add(drum);
     placeProp(group, 'bannerRed', x, 3.2, z + width / 2 + 1.6, Math.PI, 2.2);
-    return {
-      knot,
-      ropeL,
-      ropeR,
-      drum,
-      drumSkinMat,
-      maxOffset,
-      attachL,
-      attachR,
-      ropeY,
-      centerX: x,
-      centerZ: z,
-    };
+    return { knot, rope, drum, drumSkinMat, maxOffset, centerX: x, centerZ: z };
   })();
 
   // Trial 4, Keeper's Wager: a walled courtyard with two facing wager mats,
@@ -1365,8 +1360,7 @@ export async function buildGauntletVenue(
   rig.headGroup.matrixAutoUpdate = true;
   sigilRig.mote.matrixAutoUpdate = true;
   pullRig.knot.matrixAutoUpdate = true;
-  pullRig.ropeL.matrixAutoUpdate = true;
-  pullRig.ropeR.matrixAutoUpdate = true;
+  pullRig.rope.matrixAutoUpdate = true;
   pullRig.drum.matrixAutoUpdate = true;
   wagerRig.root.matrixAutoUpdate = true;
 
@@ -1457,25 +1451,22 @@ export async function buildGauntletVenue(
           sigilRig.faceMat.emissiveIntensity = (crackKey / 24) * 0.9;
         }
       }
-      // The Great Pull: ease the knot toward the wire marker (viewer-relative,
-      // + = the viewer's side winning = +x) and stretch the rope halves to it;
-      // the drum pulses on the beat (steady glow through the brace window).
+      // The Great Pull: ease the whole rope toward the wire marker's
+      // translation (ABSOLUTE, + = team 0 winning = hauled toward -x; the sim
+      // drags the gripping lines toward the same target, so hands stay on the
+      // rope); the drum pulses on the beat (steady glow through the brace
+      // window).
       const pull = mine?.pull ?? null;
       if (pull || pullLayoutDue) {
         const frac = pull
           ? Math.max(-1, Math.min(1, pull.marker / Math.max(1, pull.winThreshold)))
           : 0;
-        const target = frac * pullRig.maxOffset;
+        const target = -frac * pullRig.maxOffset;
         pullKnotX += (target - pullKnotX) * Math.min(1, dt * 8);
         if (!pull && Math.abs(pullKnotX) < 0.01) pullKnotX = 0;
         const kx = pullRig.centerX + pullKnotX;
         pullRig.knot.position.x = kx;
-        const lLen = Math.max(0.1, kx - 0.25 - pullRig.attachL);
-        pullRig.ropeL.scale.y = lLen;
-        pullRig.ropeL.position.x = pullRig.attachL + lLen / 2;
-        const rLen = Math.max(0.1, pullRig.attachR - (kx + 0.25));
-        pullRig.ropeR.scale.y = rLen;
-        pullRig.ropeR.position.x = pullRig.attachR - rLen / 2;
+        pullRig.rope.position.x = kx;
         if (pull) {
           const brace = t < pull.braceUntil;
           const beatFrac = pull.beatPeriodS > 0 ? posMod(t - pull.beatAnchor, pull.beatPeriodS) : 1;

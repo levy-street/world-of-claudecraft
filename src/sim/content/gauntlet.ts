@@ -149,8 +149,23 @@ export const GAUNTLET_VENUE = {
       padFrac: 0.1, // outline inset within the square (was the 2D canvas frame pad)
     },
   },
-  // Trial 3, The Great Pull: a sunken rope trench.
-  pull: { x: -44, z: 44, length: 24, width: 9 },
+  // Trial 3, The Great Pull: a flat rope lane with a central mud pit. Both
+  // teams grip the rope single file (players take the grips nearest the pit,
+  // NPC teammates fill in behind), and the WHOLE line slides with the rope as
+  // the marker moves: sim placement and venue geometry share these numbers so
+  // hands stay on the rope.
+  pull: {
+    x: -44,
+    z: 44,
+    length: 24, // rope length (the lane runs along x)
+    width: 9, // lane dressing extent across the rope
+    ropeY: 1.05, // hand height
+    pitHalfX: 3, // the central pit the losing line is dragged toward
+    pitHalfZ: 2.2,
+    gripStart: 4.5, // first grip's distance from the rope center
+    gripSpacing: 1.7, // spacing between grips along the rope
+    knotTravel: 10, // rope translation at the win threshold (yards)
+  },
   // Trial 4, Keeper's Wager: a walled dueling courtyard.
   wager: { x: -44, z: 78, size: 15 },
   // Trial 5, The Brittle Span: a raised twin-track bridge over a dark pit.
@@ -175,11 +190,11 @@ export const GAUNTLET_VENUE = {
       pos: { x: -41.8, y: 4.3, z: 10 },
       lookAt: { x: -44, y: 1.2, z: 10 },
     },
-    // Side-on framing of the pull trench: the whole rope, the center line, and
-    // the beat drum on the near rim in one shot.
+    // Side-on framing of the rope lane: both gripping lines, the pit, the
+    // knot, and the beat drum in one shot (the rope is at hand height now).
     pull: {
-      pos: { x: -44, y: 7, z: 61 },
-      lookAt: { x: -44, y: 1.8, z: 44 },
+      pos: { x: -44, y: 6.5, z: 58 },
+      lookAt: { x: -44, y: 1, z: 44 },
     },
     // Over the wager table from behind the viewer's west mat: both marble
     // piles, the choice stones, and the partner across the table in frame.

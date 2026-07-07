@@ -100,6 +100,12 @@ export interface GauntletPullState {
   claimed: Map<number, number>; // pid -> highest beat index already consumed
   teamOf: Map<number, 0 | 1>; // pid -> team (solo runs put every player on 0)
   npcForce: [number, number]; // rolled per-beat NPC pull means per team
+  // Every gripping contestant's base spot on the rope line (entity id ->
+  // instance-local x/z); the whole line renders at base + the eased drag.
+  gripBase: Map<number, { x: number; z: number }>;
+  // The eased rope translation (instance-local yards, + toward team 0's side):
+  // the tick driver slides every grip (and the players' pins) by this.
+  kx: number;
   resolved: boolean;
   wonBy: 0 | 1 | null;
 }

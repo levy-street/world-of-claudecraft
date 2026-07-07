@@ -647,7 +647,10 @@ export function gauntletRunWire(ctx: SimContext, pid: number): GauntletRunView |
         ? {
             beatAnchor: trial.beatAnchor,
             beatPeriodS: GAUNTLET.pull.beatPeriodS,
-            marker: Math.round(trial.marker * (trial.teamOf.get(pid) === 1 ? -10 : 10)) / 10,
+            // ABSOLUTE marker (+ = team 0 winning): the teams stand on the
+            // rope now, so the venue maps the marker to a physical rope
+            // translation, never a viewer-relative meter.
+            marker: Math.round(trial.marker * 10) / 10,
             winThreshold: GAUNTLET.pull.winThreshold,
             braceUntil: trial.braceUntil,
           }
