@@ -21,7 +21,9 @@ import {
   resolveClickMoveAction,
   stepAngleToward,
 } from './game/click_move';
+import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
+import { initDesktopDownload } from './game/desktop_download';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
@@ -45,7 +47,6 @@ import {
   setInterfaceMode,
   useTouchInterface,
 } from './game/mobile_controls';
-import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
 import { createPerfMonitor } from './game/perf';
@@ -88,7 +89,8 @@ import {
 // the feature is enabled + used.
 import type { WalletOption } from './net/wallet';
 import { assetsReady } from './render/assets/preload';
-import { CharacterPreview } from './render/characters';
+import { CharacterPreview, type PreviewAppearance } from './render/characters';
+import { preloadMechAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
@@ -179,6 +181,7 @@ import {
   setStandingProvider,
 } from './ui/player_card_share';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
+import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
@@ -420,7 +423,6 @@ function syncBuildInfo(): void {
 
 function syncAppViewport(): void {
   syncAppViewportShared();
-  applyMobileHudLayout();
 }
 
 function preventMobileZoom(): void {
@@ -1041,6 +1043,9 @@ async function startGame(
           case 'bags':
             hud.toggleBags();
             break;
+          case 'crafting':
+            hud.toggleCrafting();
+            break;
           case 'char':
             hud.toggleChar();
             break;
@@ -1103,14 +1108,10 @@ async function startGame(
     gameInputReady,
   }));
 
-  // The ring's attack toggle acquires the nearest attackable enemy when tapped
-  // with no live hostile target (the HUD falls back to plain castSlot(0) until
-  // this is wired); the Target button cycles targets via the Tab path below.
-  hud.onMobileAttackNearest = () => attackNearest();
-
   const mobileControls = new MobileControls(input, {
-    onCycleTarget: () => world.tabTarget(),
+    onAttackNearest: () => attackNearest(),
     onJump: () => input.triggerTouchJump(),
+    onTarget: () => world.tabTarget(),
     onInteract: () => interactKey(),
     onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),
@@ -1143,9 +1144,15 @@ async function startGame(
   // movement/camera/jump are applied to Input directly by the manager.
   const inputMeter = new InputActivityMeter();
   installInputActivityTracking(inputMeter, window, () => performance.now());
+  installPageStateTracking(window, document);
   const APM_BEAT_MS = 10_000;
   window.setInterval(() => {
-    world.reportTelemetry('apm', { count: inputMeter.drainCount(), periodMs: APM_BEAT_MS });
+    world.reportTelemetry('apm', {
+      count: inputMeter.drainCount(),
+      periodMs: APM_BEAT_MS,
+      env: clientEnvBits(),
+      vis: pageStateBits(),
+    });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
   const canUseGameKeysNow = () => !hud.isModalOpen() && chatInput.style.display !== 'block';
@@ -1304,12 +1311,6 @@ async function startGame(
     if (key === 'leftHandedTouch') {
       const v = settings.set('leftHandedTouch', !!value);
       document.body.classList.toggle('mobile-left-handed', v);
-      return;
-    }
-    if (key === 'mobileCameraJoystick') {
-      const v = settings.set('mobileCameraJoystick', !!value);
-      document.body.classList.toggle('mobile-camera-joystick-on', v);
-      mobileControls.setCameraJoystickEnabled(v);
       return;
     }
     if (key === 'touchInvertLook') {
@@ -2821,12 +2822,16 @@ function updatePreviewContainer(panelId: string): void {
   characterPreview.setContainer(container);
 
   if (panelId === '#charselect-panel') {
-    // The selected roster row drives the showcase (class + that character's chroma).
-    const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
-    const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
-    const skin = Number(row?.dataset.skin ?? 0) || 0;
-    characterPreview.setSkin(skin);
-    characterPreview.setClass(cls);
+    // The selected roster row drives the showcase: its full real appearance
+    // (class or Combat Mech body + chroma + equipped mainhand), matching the world.
+    if (charselectSelected) {
+      characterPreview.setAppearance(charselectAppearance(charselectSelected));
+    } else {
+      const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
+      const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
+      characterPreview.setSkin(Number(row?.dataset.skin ?? 0) || 0);
+      characterPreview.setClass(cls);
+    }
     syncPreviewAfterPanelLayout();
     return;
   }
@@ -3848,6 +3853,10 @@ async function refreshCharacters(): Promise<void> {
   setCharselectPreviewName('');
   try {
     const chars = sortCharacters(await api.characters(), charSortMode);
+    // Warm the lazy Combat Mech cosmetic assets so selecting an event-skin
+    // character shows the mech body without a class-body flash (setAppearance
+    // falls back gracefully if this has not resolved yet).
+    if (chars.some((c) => c.skinCatalog === 'mech')) void preloadMechAssets();
     if (api.realm) $('#charselect-realm').textContent = api.realm;
     listEl.innerHTML = '';
     if (chars.length === 0) {
@@ -3924,8 +3933,7 @@ async function refreshCharacters(): Promise<void> {
 
         row.classList.add('sel');
         row.setAttribute('aria-selected', 'true');
-        renderClassDetails('charselect-class-details', c.class);
-        characterPreview?.setSkin(c.skin ?? 0);
+        renderClassDetails('charselect-class-details', c.class, charselectAppearance(c));
         charselectSelected = c;
         syncCharselectEnterButton();
         setCharselectPreviewName(c.name);
@@ -4091,6 +4099,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       clearInterval(poll);
       world.close();
       clearCardProviders();
+      hideReconnectOverlay();
       fatalOverlay(t('loading.enterTimeout'));
     }
   }, 50);
@@ -4099,8 +4108,14 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   world.onDisconnect = (reason) => {
     clearInterval(poll);
     clearCardProviders();
+    hideReconnectOverlay();
     fatalOverlay(userFacingApiError(reason));
   };
+  // an unexpected drop is not fatal: the server holds the character in-world
+  // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
+  // the world resumes; onDisconnect above fires if the retries run out
+  world.onConnectionLost = () => showReconnectOverlay();
+  world.onReconnected = () => hideReconnectOverlay();
 }
 
 // CLASS_DETAILS / SIGNATURE_ABILITIES live in a pure module so a Vitest guard
@@ -4108,19 +4123,40 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
 
 const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
-function renderClassDetails(panelId: string, className: PlayerClass): void {
+// The char-select roster row's real, in-world appearance for the 3D preview.
+function charselectAppearance(c: CharacterSummary): PreviewAppearance {
+  return {
+    cls: c.class,
+    skin: c.skin ?? 0,
+    skinCatalog: c.skinCatalog ?? 'class',
+    mainhandItemId: c.mainhandItemId ?? null,
+  };
+}
+
+function renderClassDetails(
+  panelId: string,
+  className: PlayerClass,
+  preview?: PreviewAppearance,
+): void {
   const panel = document.getElementById(panelId);
   if (!panel) return;
 
-  // Redundant render check
-  if (currentlyRenderedClass[panelId] === className) return;
-  currentlyRenderedClass[panelId] = className;
-
+  // Drive the 3D preview BEFORE the panel-redundancy early-return: two characters
+  // of the same class can still differ in gear, skin, or cosmetic body, so the
+  // preview must update even when the class details panel does not. A char-select
+  // caller passes the character's real appearance (setAppearance); the create and
+  // offline pickers pass none and rebuild the class body only when the class changes.
   if (characterPreview) {
-    characterPreview.setSkin(0);
-    characterPreview.setClass(className);
+    if (preview) characterPreview.setAppearance(preview);
+    else if (currentlyRenderedClass[panelId] !== className) {
+      characterPreview.setSkin(0);
+      characterPreview.setClass(className);
+    }
   }
 
+  // Redundant render check (class details panel content only)
+  if (currentlyRenderedClass[panelId] === className) return;
+  currentlyRenderedClass[panelId] = className;
   // Clear any active transitions for this panel to prevent stacked out-of-order renders
   if (
     activeClassDetailsTimeouts[panelId] !== undefined &&
@@ -7227,6 +7263,7 @@ function wireStartScreens(): void {
     void loadNews();
   });
   setupNavBtn(navBtnDownload, '#download-view');
+  initDesktopDownload();
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });
@@ -7638,6 +7675,8 @@ function wireStartScreens(): void {
       characterPreview = new CharacterPreview(container, canvas);
       if (initialPanelId) {
         updatePreviewContainer(initialPanelId);
+      } else if (charselectSelected) {
+        characterPreview.setAppearance(charselectAppearance(charselectSelected));
       } else {
         characterPreview.setSkin(0);
         characterPreview.setClass('warrior');

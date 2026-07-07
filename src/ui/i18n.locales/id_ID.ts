@@ -4710,8 +4710,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Lari Otomatis',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik Nonaktif',
-  'hudChrome.mobile.hotbarPage': 'Kemampuan',
-  'hudChrome.mobile.hotbarPageAria': 'Tampilkan rangkaian kemampuan berikutnya',
   'hudChrome.mobile.jump': 'Lompat',
   'hudChrome.mobile.leaderboard': 'Peringkat',
   'hudChrome.mobile.nameplates': 'Nama',
@@ -6032,4 +6030,119 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.not_enabled': 'Autentikasi dua-faktor belum diaktifkan.',
   'apiError.two_factor.setup_required': 'Mulai penyiapan autentikasi dua-faktor terlebih dahulu.',
   'apiError.validation.failed': 'Beberapa kolom tidak valid. Periksa formulir lalu coba lagi.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Unduh untuk Linux',
+  'download.linuxHint':
+    'AppImage: membuatnya dapat dieksekusi, lalu jalankan. Tidak perlu instalasi.',
+  'loading.reconnecting': 'Koneksi terputus. Menyambungkan kembali...',
+  'guide.nav.settings': 'Pengaturan & Kinerja',
+  'guide.settingsPage.advancedBody':
+    'Lanjutan dimulai dari tingkat High dan membuka empat pemetik tambahan, sehingga Anda dapat menggunakan bingkai di tempat yang benar-benar Anda sadari: Detail Medan, Kepadatan Dedaunan, Efek & Pencahayaan, dan Kualitas Bayangan. Seperti Kualitas Grafis, ini berlaku setelah memuat ulang.',
+  'guide.settingsPage.advancedHeading': 'Prasetel Lanjutan: campur sendiri',
+  'guide.settingsPage.advancedMixes':
+    'Dua campuran favorit: pertahankan Kualitas Bayangan pada High dan atur Efek & Pencahayaan ke Low untuk tampilan tajam dan bebas cahaya yang menyala, atau lakukan sebaliknya untuk menjaga mekarnya dan melembutkan bayangan.',
+  'guide.settingsPage.balancedTagline':
+    'Titik terbaik untuk sebagian besar mesin, dan saran default kami.',
+  'guide.settingsPage.balancedTitle': 'Seimbang',
+  'guide.settingsPage.balancedWhy':
+    'Medium menghadirkan bayangan nyata dan materi lengkap; High menambahkan oklusi dan mekar sekitar. Di bawah Ultra, jaring pengaman internal menyerap penurunan tiba-tiba dalam pertarungan yang sibuk, sehingga Balanced tetap mulus tanpa harus menjaga anak.',
+  'guide.settingsPage.colDoes': 'Apa fungsinya',
+  'guide.settingsPage.colImpact': 'FPS dampak',
+  'guide.settingsPage.colSetting': 'Pengaturan',
+  'guide.settingsPage.factDetectBody':
+    'Pada peluncuran pertama Anda, game membaca perangkat Anda dan memilih tingkatan yang masuk akal, dari Low di ponsel sederhana hingga Ultra di desktop yang kuat. Pilihan apa pun yang Anda buat sendiri selalu menang.',
+  'guide.settingsPage.factDetectTitle': 'Permainan ini menyetel dirinya sendiri terlebih dahulu',
+  'guide.settingsPage.factGovernorBody':
+    'Di setiap tingkatan di bawah Ultra, game secara diam-diam menipiskan rumput, efek, dan pencahayaan sesaat ketika pertarungan besar terjadi, lalu memulihkannya. Memilih Ultra menunjukkan bahwa Anda lebih suka menyimpan setiap detail.',
+  'guide.settingsPage.factGovernorTitle': 'Jaring pengaman bawaan',
+  'guide.settingsPage.factReloadBody':
+    'Kualitas Grafis dan Pemilih tingkat lanjut berlaku setelah memuat ulang, dan panel menawarkan tombol Muat Ulang Sekarang bila diperlukan. Setiap opsi lainnya berlaku saat Anda mengubahnya.',
+  'guide.settingsPage.factReloadTitle': 'Dua macam pilihan',
+  'guide.settingsPage.fairnessBody':
+    'Tidak ada pilihan di sini yang menukar keindahan dengan kekuasaan. Pengaturan Lower hanya menghilangkan polesan kosmetik, tidak pernah informasi yang Anda lawan: debuff, cast bar, kesehatan party, dan jumlah kerusakan Anda identik dari Low hingga Ultra. Bermain di mesin sederhana tidak pernah menjadi kendala.',
+  'guide.settingsPage.fairnessTitle': 'Adil berdasarkan desain',
+  'guide.settingsPage.fpsTagline': 'Untuk laptop lama, grafis terintegrasi, dan permainan baterai.',
+  'guide.settingsPage.fpsTitle': 'FPS terbaik',
+  'guide.settingsPage.fpsWhy':
+    'Kualitas Grafis adalah saklar utama, dan Kualitas Render adalah penggeser terkuat: pada 70%, dunia menggambar sekitar setengah piksel sementara antarmuka tetap sangat tajam.',
+  'guide.settingsPage.heading': 'Pengaturan & Kinerja',
+  'guide.settingsPage.howHeading': 'Bagaimana pilihan berperilaku',
+  'guide.settingsPage.impactHeavy': 'Berat',
+  'guide.settingsPage.impactLight': 'Lampu',
+  'guide.settingsPage.impactModerate': 'Sedang',
+  'guide.settingsPage.impactNone': 'Tidak ada',
+  'guide.settingsPage.intro':
+    'Jadikan game terlihat terbaik atau berjalan paling cepat. Tiga pemuatan siap pakai, ditambah fungsi sebenarnya dari setiap opsi grafis.',
+  'guide.settingsPage.loadoutsHeading': 'Tiga pemuatan siap pakai',
+  'guide.settingsPage.loadoutsIntro':
+    'Mulailah dari loadout yang terdengar seperti mesin Anda, lalu sesuaikan opsi satu per satu hingga dirasa tepat.',
+  'guide.settingsPage.mobileBody':
+    'Seluler mengelola lebih banyak hal untuk Anda: game memilih tingkatan, menjaga resolusi sedikit lebih rendah untuk melindungi baterai dan panas, dan mempertahankan tingkatan tertinggi hanya untuk desktop. Pemuatan di atas masih berlaku; ponsel cukup top out di High.',
+  'guide.settingsPage.mobileTitle': 'Di ponsel dan tablet',
+  'guide.settingsPage.recommended': 'Direkomendasikan',
+  'guide.settingsPage.rowBrightness':
+    'Eksposur pemandangan, lebih gelap atau lebih terang. Preferensi murni.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Betapa mewahnya antarmuka itu sendiri: kaca buram, cahaya, menu animasi. Otomatis cocok dengan browser Anda; dunia 3D tidak tersentuh.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Mekar, oklusi sekitar, dan berapa banyak obor dan mantra yang menghasilkan cahaya nyata. Penghematan terbesar di antara para pemilih Tingkat Lanjut.',
+  'guide.settingsPage.rowFieldOfView':
+    'Seberapa banyak bagian dunia yang dapat ditampilkan di layar, mulai dari zoom 55 hingga 100 derajat. Pilihan kenyamanan; pandangan yang lebih luas menarik sedikit lebih banyak.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Seberapa jauh dan lebatnya rumput yang tumbuh di sekitar karakter Anda.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Kaca buram kabur di balik jendela. Cantik, dan efek yang persis seperti yang dirasakan oleh browser yang lebih lemah; biarkan saja untuk tampilan klasik yang tajam.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Saklar utama. Setiap langkah mengubah resolusi, bayangan, material, dedaunan, dan efek pencahayaan secara bersamaan. Perbedaan terbesar yang dapat Anda buat.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Pembacaan FPS di layar, waktu frame, dan banyak lagi. Aktifkan saat Anda menyetel halaman ini, lalu sembunyikan lagi.',
+  'guide.settingsPage.rowReduceMotion':
+    'Menghapus animasi antarmuka sehingga jendela muncul seketika. Opsi aksesibilitas terlebih dahulu, dengan bonus kinerja kecil.',
+  'guide.settingsPage.rowRenderQuality':
+    'Menggambar dunia 3D pada resolusi internal yang lebih rendah dan meningkatkannya; antarmuka tetap tajam. Penggeser instan terkuat pada mesin yang lebih lemah dan layar resolusi tinggi.',
+  'guide.settingsPage.rowShadowQuality':
+    'Kerenyahan bayangan. Low mempertahankan bayangan tetapi memperhalus tepinya.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Tekstur tanah yang kaya dan tercampur versus tampilan medan yang lebih sederhana dan lebih cepat.',
+  'guide.settingsPage.rowWeather':
+    'Hujan dan salju sekitar. Hanya atmosfer saja, dan mematikannya akan menghemat sedikit saat terjadi badai.',
+  'guide.settingsPage.tableFoot':
+    'Mencari penggeser jarak imbang atau penutup FPS? Tidak ada yang perlu diburu: jarak pandang adalah bagian dari setiap tingkat kualitas, dan kecepatan bingkai mengikuti tampilan Anda.',
+  'guide.settingsPage.tableHeading': 'Setiap pilihan, jelaskan',
+  'guide.settingsPage.tagReload': 'setelah memuat ulang',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 hingga 70%',
+  'guide.settingsPage.value90to100': '90 hingga 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High di PC gaming, Medium di laptop',
+  'guide.settingsPage.valueOnOptional': 'Aktif (opsional)',
+  'guide.settingsPage.visualsTagline': 'Mode tangkapan layar untuk mesin desktop yang tangguh.',
+  'guide.settingsPage.visualsTitle': 'Visual Terbaik',
+  'guide.settingsPage.visualsWhy':
+    'Ultra ditampilkan pada resolusi tertinggi yang ditawarkan layar Anda dengan pencahayaan paling kaya. Ini juga menonaktifkan jaring pengaman, dan hanya untuk desktop: ponsel dan aplikasi berada pada posisi teratas di High.',
+  'guide.settingsPage.wherePath':
+    'Segala sesuatu di halaman ini ada di dalam game: tekan Esc dan lihat di Grafik, Antarmuka, dan Hamparan Kinerja.',
+  'guide.settingsPage.whyLabel': 'Mengapa ini berhasil:',
+  'hudChrome.crafting.close': 'Tutup kerajinan',
+  'hudChrome.crafting.craft': 'Keahlian',
+  'hudChrome.crafting.craftedToast': 'Dibuat: {name}',
+  'hudChrome.crafting.empty': 'Belum ada resep yang diketahui.',
+  'hudChrome.crafting.insufficientMaterials': 'Anda tidak memiliki bahan untuk itu.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Memerlukan:',
+  'hudChrome.crafting.resultAria': 'Kerajinan {name}',
+  'hudChrome.crafting.title': 'kerajinan',
+  'hudChrome.crafting.unknownRecipe': 'Resep itu tidak ada.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Sebuah Kerajinan untuk Disebut Milik Anda',
+  'entities.quests.q_archetype_acceptance.text':
+    'Setiap pengrajin di Eastbrook akhirnya memilih satu kerajinan yang bisa mereka jadikan milik mereka. Buktikan diri Anda dengan satu akta, {playerName}, dan nyatakan jalur Anda.',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Jalan Anda telah dipilih; berjalan dengan baik.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Serigala Hutan dibunuh',
+  'entities.quests.q_prof_make_amends.title': 'Membuat Perubahan',
+  'entities.quests.q_prof_make_amends.text':
+    'Untuk menyisihkan satu kerajinan untuk kerajinan lainnya, seorang pengrajin harus terlebih dahulu memperbaiki jalur yang belum dilalui, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Perubahan dilakukan; jalan baru terbuka untuk Anda.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Serigala Hutan dibunuh',
 };

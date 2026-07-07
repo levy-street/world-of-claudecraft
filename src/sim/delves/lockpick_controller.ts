@@ -368,7 +368,16 @@ function lockpickSucceed(ctx: SimContext, run: DelveRun, session: LockSession): 
   grantDelveRewards(ctx, run);
   grantLockpickBonus(ctx, run, session.lootTier);
   openDelveSurfaceExit(ctx, run);
-  ctx.emit({ type: 'delveChestLoot', chestId: session.chestId, items, pid: session.ownerId });
+  ctx.emit({
+    type: 'delveChestLoot',
+    chestId: session.chestId,
+    delveId: run.delveId,
+    tierId: run.tierId,
+    lootTier: session.lootTier,
+    bountiful: isCoffer,
+    items,
+    pid: session.ownerId,
+  });
   ctx.emit({
     type: 'lockpickEnd',
     sessionId: session.sessionId,

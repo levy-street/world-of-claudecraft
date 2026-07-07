@@ -678,8 +678,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Thân Thiện',
   'hudChrome.mobTooltip.hostile': 'Thù Địch',
   'hudChrome.mobTooltip.levelFamily': '{family} cấp {level}',
-  'hudChrome.mobile.hotbarPage': 'Kỹ Năng',
-  'hudChrome.mobile.hotbarPageAria': 'Hiện bộ kỹ năng tiếp theo',
   'hudChrome.options.aurasOnPlayerFrame': 'Hiệu Ứng Có Lợi Trên Khung Người Chơi',
   'hudChrome.options.playerFrameScale': 'Tỷ Lệ Khung Người Chơi',
   'hudChrome.options.showDailyRewardsChest': 'Hiện Rương Phần Thưởng Hằng Ngày',
@@ -5978,4 +5976,116 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.not_enabled': 'Xác thực hai yếu tố chưa được bật.',
   'apiError.two_factor.setup_required': 'Hãy bắt đầu thiết lập xác thực hai yếu tố trước.',
   'apiError.validation.failed': 'Một số trường không hợp lệ. Hãy kiểm tra biểu mẫu và thử lại.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Tải xuống cho Linux',
+  'download.linuxHint': 'AppImage: làm cho nó có thể thực thi được rồi chạy nó. Không cần cài đặt.',
+  'loading.reconnecting': 'Mất kết nối. Đang kết nối lại...',
+  'guide.nav.settings': 'Cài đặt & Hiệu suất',
+  'guide.settingsPage.advancedBody':
+    'Nâng cao bắt đầu từ cấp High và mở khóa bốn bộ chọn bổ sung, do đó bạn có thể sử dụng khung hình của mình ở nơi bạn thực sự chú ý đến chúng: Chi tiết địa hình, Mật độ tán lá, Hiệu ứng & Ánh sáng và Chất lượng bóng. Giống như Chất lượng đồ họa, chúng được áp dụng sau khi tải lại.',
+  'guide.settingsPage.advancedHeading': 'Cài đặt trước nâng cao: trộn của riêng bạn',
+  'guide.settingsPage.advancedMixes':
+    'Hai cách kết hợp yêu thích: giữ Chất lượng bóng ở High và đặt Hiệu ứng & Ánh sáng thành Low để có giao diện sắc nét, không có ánh sáng chạy nhẹ hoặc làm ngược lại để giữ độ nở và làm dịu bóng.',
+  'guide.settingsPage.balancedTagline':
+    'Điểm thú vị cho hầu hết các máy và lời khuyên mặc định của chúng tôi.',
+  'guide.settingsPage.balancedTitle': 'Cân bằng',
+  'guide.settingsPage.balancedWhy':
+    'Medium mang lại bóng thật và chất liệu đầy đủ; High thêm tính năng che phủ và nở hoa xung quanh. Dưới Ultra, lưới an toàn tích hợp có khả năng hấp thụ sự sụt giảm đột ngột trong các trận chiến bận rộn, vì vậy Balanced vẫn hoạt động trơn tru mà không cần trông trẻ.',
+  'guide.settingsPage.colDoes': 'Nó làm gì',
+  'guide.settingsPage.colImpact': 'FPS tác động',
+  'guide.settingsPage.colSetting': 'Cài đặt',
+  'guide.settingsPage.factDetectBody':
+    'Trong lần khởi chạy đầu tiên, trò chơi sẽ đọc thiết bị của bạn và chọn cấp độ hợp lý, từ Low trên điện thoại bình dân đến Ultra trên máy tính để bàn mạnh mẽ. Bất kỳ sự lựa chọn nào bạn đưa ra cho mình luôn luôn thắng.',
+  'guide.settingsPage.factDetectTitle': 'Trò chơi tự điều chỉnh trước tiên',
+  'guide.settingsPage.factGovernorBody':
+    'Ở mọi cấp độ dưới Ultra, trò chơi lặng lẽ tỉa bớt cỏ, hiệu ứng và ánh sáng trong giây lát khi một trận chiến lớn tăng vọt, sau đó khôi phục chúng. Việc chọn Ultra cho biết bạn muốn giữ mọi chi tiết hơn.',
+  'guide.settingsPage.factGovernorTitle': 'Một mạng lưới an toàn tích hợp',
+  'guide.settingsPage.factReloadBody':
+    'Chất lượng đồ họa và Bộ chọn nâng cao có hiệu lực sau khi tải lại và bảng điều khiển cung cấp nút Tải lại ngay khi cần. Mọi tùy chọn khác sẽ áp dụng ngay khi bạn thay đổi nó.',
+  'guide.settingsPage.factReloadTitle': 'Hai loại tùy chọn',
+  'guide.settingsPage.fairnessBody':
+    'Không có lựa chọn nào ở đây đánh đổi vẻ đẹp để lấy quyền lực. Lower cài đặt chỉ làm mất đi lớp sơn bóng mỹ phẩm, không bao giờ sử dụng thông tin bạn chiến đấu: debuff, thanh dùng phép, lượng máu của nhóm và số sát thương giống hệt nhau từ Low đến Ultra. Chơi trên một chiếc máy khiêm tốn không bao giờ là một điều bất lợi.',
+  'guide.settingsPage.fairnessTitle': 'Công bằng theo thiết kế',
+  'guide.settingsPage.fpsTagline': 'Dành cho máy tính xách tay cũ, đồ họa tích hợp và chơi pin.',
+  'guide.settingsPage.fpsTitle': 'Tốt nhất FPS',
+  'guide.settingsPage.fpsWhy':
+    'Chất lượng đồ họa là công tắc chính và Chất lượng kết xuất là thanh trượt mạnh nhất: ở mức 70%, thế giới thu được khoảng một nửa pixel trong khi giao diện vẫn sắc nét hoàn hảo.',
+  'guide.settingsPage.heading': 'Cài đặt & Hiệu suất',
+  'guide.settingsPage.howHeading': 'Cách các tùy chọn hoạt động',
+  'guide.settingsPage.impactHeavy': 'Nặng',
+  'guide.settingsPage.impactLight': 'Ánh sáng',
+  'guide.settingsPage.impactModerate': 'Vừa phải',
+  'guide.settingsPage.impactNone': 'Không có',
+  'guide.settingsPage.intro':
+    'Làm cho trò chơi trông đẹp nhất hoặc chạy nhanh nhất. Ba lần tải sẵn có cùng với những chức năng thực sự của mọi tùy chọn đồ họa.',
+  'guide.settingsPage.loadoutsHeading': 'Ba lần tải làm sẵn',
+  'guide.settingsPage.loadoutsIntro':
+    'Bắt đầu từ quá trình tải giống như máy của bạn, sau đó điều chỉnh từng tùy chọn một cho đến khi cảm thấy phù hợp.',
+  'guide.settingsPage.mobileBody':
+    'Thiết bị di động quản lý nhiều hơn cho bạn: trò chơi chọn cấp độ, giữ độ phân giải thấp hơn một chút để bảo vệ pin và nhiệt, đồng thời giữ cấp độ cao nhất chỉ dành cho máy tính để bàn. Các khoản tải ở trên vẫn được áp dụng; điện thoại chỉ cần đạt mức tối đa High.',
+  'guide.settingsPage.mobileTitle': 'Trên điện thoại và máy tính bảng',
+  'guide.settingsPage.recommended': 'Khuyến khích',
+  'guide.settingsPage.rowBrightness': 'Phơi sáng cảnh, tối hơn hoặc sáng hơn. Ưu tiên thuần túy.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Bản thân giao diện được cho phép lạ mắt đến mức nào: kính mờ, ánh sáng rực rỡ, menu hoạt hình. Tự động khớp với trình duyệt của bạn; thế giới 3D vẫn còn nguyên vẹn.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Sự nở hoa, sự tắc nghẽn xung quanh, và bao nhiêu ngọn đuốc và bùa chú phát ra ánh sáng thực sự. Khoản tiết kiệm lớn nhất trong số những người chọn Nâng cao.',
+  'guide.settingsPage.rowFieldOfView':
+    'Bao nhiêu thế giới vừa vặn trên màn hình, từ zoom 55 đến quét 100 độ. Một sự lựa chọn thoải mái; tầm nhìn rộng hơn thu hút nhiều hơn một chút.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Cỏ mọc bao xa và dày bao nhiêu xung quanh nhân vật của bạn.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Một tấm kính mờ mờ phía sau cửa sổ. Đẹp và chính xác là loại hiệu ứng mà trình duyệt yếu hơn cảm nhận được; bỏ nó đi để có cái nhìn sắc nét cổ điển.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Công tắc chính. Mỗi bước thay đổi độ phân giải, bóng, vật liệu, tán lá và hiệu ứng ánh sáng cùng nhau. Sự khác biệt lớn nhất mà bạn có thể tạo ra.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Thông tin hiển thị trên màn hình về FPS, thời gian kết xuất khung hình, v.v. Hãy bật nó lên trong khi bạn điều chỉnh trang này, sau đó ẩn nó lại.',
+  'guide.settingsPage.rowReduceMotion':
+    'Loại bỏ hình ảnh động của giao diện để cửa sổ xuất hiện ngay lập tức. Đầu tiên là một tùy chọn khả năng truy cập, với phần thưởng hiệu suất nhỏ.',
+  'guide.settingsPage.rowRenderQuality':
+    'Vẽ thế giới 3D ở độ phân giải bên trong thấp hơn và tăng tỷ lệ lên; giao diện vẫn sắc nét. Thanh trượt tức thời mạnh nhất trên các máy yếu hơn và màn hình độ phân giải cao.',
+  'guide.settingsPage.rowShadowQuality':
+    'Bóng sắc nét. Low giữ bóng nhưng làm mềm các cạnh của chúng.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Kết cấu mặt đất phong phú, pha trộn so với giao diện địa hình đơn giản hơn, nhanh hơn.',
+  'guide.settingsPage.rowWeather':
+    'Xung quanh mưa và tuyết. Chỉ có khí quyển và tắt nó sẽ tiết kiệm được một chút khi có bão.',
+  'guide.settingsPage.tableFoot':
+    'Bạn đang tìm kiếm thanh trượt khoảng cách vẽ hoặc giới hạn FPS? Không có gì để tìm kiếm: khoảng cách xem là một phần của từng bậc chất lượng và tốc độ khung hình sẽ tuân theo màn hình của bạn.',
+  'guide.settingsPage.tableHeading': 'Mọi lựa chọn, được giải thích',
+  'guide.settingsPage.tagReload': 'sau khi tải lại',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 đến 70%',
+  'guide.settingsPage.value90to100': '90 đến 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High trên PC chơi game, Medium trên máy tính xách tay',
+  'guide.settingsPage.valueOnOptional': 'Bật (tùy chọn)',
+  'guide.settingsPage.visualsTagline': 'Chế độ chụp màn hình cho máy tính để bàn mạnh mẽ.',
+  'guide.settingsPage.visualsTitle': 'Hình ảnh đẹp nhất',
+  'guide.settingsPage.visualsWhy':
+    'Ultra hiển thị ở độ phân giải cao nhất mà màn hình của bạn cung cấp với ánh sáng phong phú nhất. Nó cũng tắt mạng lưới an toàn và chỉ dành cho máy tính để bàn: điện thoại và ứng dụng có mức tối đa High.',
+  'guide.settingsPage.wherePath':
+    'Mọi thứ trên trang này đều tồn tại trong trò chơi: nhấn Esc và tìm trong Đồ họa, Giao diện và Lớp phủ hiệu suất.',
+  'guide.settingsPage.whyLabel': 'Tại sao nó hoạt động:',
+  'hudChrome.crafting.close': 'Đóng chế tạo',
+  'hudChrome.crafting.craft': 'thủ công',
+  'hudChrome.crafting.craftedToast': 'Đã chế tác: {name}',
+  'hudChrome.crafting.empty': 'Chưa có công thức nấu ăn nào được biết đến.',
+  'hudChrome.crafting.insufficientMaterials': 'Bạn không có tài liệu cho việc đó.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Yêu cầu:',
+  'hudChrome.crafting.resultAria': 'Thủ công {name}',
+  'hudChrome.crafting.title': 'Chế tạo',
+  'hudChrome.crafting.unknownRecipe': 'Công thức đó không tồn tại.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Một nghề để gọi riêng của bạn',
+  'entities.quests.q_archetype_acceptance.text':
+    'Mỗi nghệ nhân của Eastbrook cuối cùng đều định cư trên một nghề thủ công riêng của họ. Hãy chứng tỏ bản thân bằng một hành động duy nhất, {playerName}, và tuyên bố con đường của bạn.',
+  'entities.quests.q_archetype_acceptance.completion': 'Con đường của bạn đã được chọn; đi bộ tốt.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Sói rừng bị giết',
+  'entities.quests.q_prof_make_amends.title': 'Sửa đổi',
+  'entities.quests.q_prof_make_amends.text':
+    'Để dành một nghề cho một nghề khác, trước tiên một nghệ nhân phải sửa đổi con đường đã không đi, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Đã thực hiện sửa đổi; một con đường mới đang mở ra cho bạn.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Sói rừng bị giết',
 };

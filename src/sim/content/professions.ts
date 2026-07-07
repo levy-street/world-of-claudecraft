@@ -52,6 +52,16 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
 // proficiency record. Keep in sync with GATHERING_PROFESSIONS above.
 export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'logging', 'herbalism'];
 
+// Tool effect slotting (#1136): a slottable bonus layered on top of a base
+// gathering tool's tier (see ../professions/tools.ts). Each effect carries its
+// own starting durability, separate from the base tool's tier gating. Whether
+// a given use spends a charge is NOT a fixed per-effect chance: it is rolled
+// from the rarity-scaled consumption curve (#1139,
+// `../professions/tools.ts` `effectConsumptionChance`), comparing the tool's
+// own rarity against the rarity of what it is being used on, so the same
+// effect sips charges against a low-rarity target and spends them every use
+// against an equal-or-higher-rarity one. `kind` selects which harvest/craft
+// outcome field the bonus adjusts.
 // Corpse-harvest yield map (#1141): component tag -> the item id a profession
 // harvest of a tagged corpse yields (claim logic: src/sim/professions/gathering.ts,
 // command body: src/sim/interaction.ts harvestCorpse). Only tags with a concrete
@@ -72,10 +82,11 @@ export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
 // gathering tool's tier (see ../professions/tools.ts). Each effect carries its
-// own starting durability, separate from the base tool's tier gating, and a
-// per-use depletion chance: durability only drops on a losing roll, not on
-// every use, so the effect's lifespan is itself probabilistic. `kind` selects
-// which harvest/craft outcome field the bonus adjusts.
+// own starting durability, separate from the base tool's tier gating. Whether
+// a given use spends a charge is rolled from the rarity-scaled consumption
+// curve (#1139, ../professions/tools.ts effectConsumptionChance), not a fixed
+// per-effect chance. `kind` selects which harvest/craft outcome field the
+// bonus adjusts.
 export type ToolEffectId = 'gatherers_cache' | 'artisans_eye' | 'quickening_charm';
 
 export interface ToolEffectDef {
@@ -88,8 +99,6 @@ export interface ToolEffectDef {
   bonus: number;
   /** Charges the effect starts with when freshly slotted onto a tool. */
   startingDurability: number;
-  /** Chance per use that this effect's durability decrements by 1 (0 to 1). */
-  depletionChance: number;
 }
 
 export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
@@ -101,7 +110,6 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'quantity',
     bonus: 1,
     startingDurability: 20,
-    depletionChance: 0.5,
   },
   artisans_eye: {
     id: 'artisans_eye',
@@ -111,7 +119,6 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'quality',
     bonus: 1,
     startingDurability: 20,
-    depletionChance: 0.5,
   },
   quickening_charm: {
     id: 'quickening_charm',
@@ -121,7 +128,6 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
     kind: 'respawnSpeed',
     bonus: 1,
     startingDurability: 20,
-    depletionChance: 0.5,
   },
 };
 
@@ -200,3 +206,86 @@ export function oppositeCraft(craftId: string): CraftDef {
 export function craftById(craftId: string): CraftDef {
   return CRAFT_RING[indexOf(craftId)];
 }
+
+// P3 reconciliation stub (#1135): the crafted tier-4/5 base tools added for
+// this issue (see src/sim/content/items.ts: thorium_mining_pick,
+// arcanite_mining_pick, ashwood_axe, elderwood_axe, goldleaf_sickle,
+// sunpetal_sickle) are meant to be produced via a P3 recipe/crafting action
+// (#1127), NOT bought from a vendor. #1127 (the crafting action itself) has
+// not been implemented in any branch yet, so there is nowhere to register a
+// real, consumed recipe: adding one to a live recipe table would be dead data
+// nobody reads. Instead this is an INERT, documentation-only shape of what
+// each recipe SHOULD look like once #1127 lands. Nothing in the engine reads
+// `TOOL_RECIPE_STUBS` today: it is not merged into any content table by
+// data.ts, and no SimContext callback or effect references it.
+//
+// TODO(#1127): once the crafting action exists, move (not copy) this shape
+// into whatever the real recipe table turns out to be (ingredients + a craft
+// verb the player performs), wire `outputItemId` to the actual item grant,
+// and delete this stub in the same change.
+export interface ToolRecipeStub {
+  /** Item id this recipe would produce once #1127 can consume recipes. */
+  outputItemId: string;
+  /** Which craft on the CRAFT_RING would perform this (see #1125's ring). */
+  craftId: string;
+  /** Placeholder ingredient list: itemId plus quantity consumed per craft. */
+  ingredients: { itemId: string; qty: number }[];
+}
+
+// NOTE: several `ingredients[].itemId` values below (thorium_ore,
+// arcanite_bar, ashwood_log, elderwood_log, goldleaf_herb, sunpetal_herb) are
+// PLACEHOLDER ids: no matching ItemDef exists yet, because the monster
+// material / node-drop items they'd come from are their own future content
+// slice. That is fine ONLY because this table is inert and unread by the
+// engine; do not merge TOOL_RECIPE_STUBS into ITEMS or any live table until
+// those ingredient items are real and #1127 exists to consume the recipe.
+export const TOOL_RECIPE_STUBS: ToolRecipeStub[] = [
+  {
+    outputItemId: 'thorium_mining_pick',
+    craftId: 'engineering',
+    ingredients: [
+      { itemId: 'thorium_ore', qty: 4 },
+      { itemId: 'mithril_mining_pick', qty: 1 },
+    ],
+  },
+  {
+    outputItemId: 'arcanite_mining_pick',
+    craftId: 'engineering',
+    ingredients: [
+      { itemId: 'arcanite_bar', qty: 2 },
+      { itemId: 'thorium_mining_pick', qty: 1 },
+    ],
+  },
+  {
+    outputItemId: 'ashwood_axe',
+    craftId: 'engineering',
+    ingredients: [
+      { itemId: 'ashwood_log', qty: 4 },
+      { itemId: 'ironbark_axe', qty: 1 },
+    ],
+  },
+  {
+    outputItemId: 'elderwood_axe',
+    craftId: 'engineering',
+    ingredients: [
+      { itemId: 'elderwood_log', qty: 2 },
+      { itemId: 'ashwood_axe', qty: 1 },
+    ],
+  },
+  {
+    outputItemId: 'goldleaf_sickle',
+    craftId: 'engineering',
+    ingredients: [
+      { itemId: 'goldleaf_herb', qty: 4 },
+      { itemId: 'silverleaf_sickle', qty: 1 },
+    ],
+  },
+  {
+    outputItemId: 'sunpetal_sickle',
+    craftId: 'engineering',
+    ingredients: [
+      { itemId: 'sunpetal_herb', qty: 2 },
+      { itemId: 'goldleaf_sickle', qty: 1 },
+    ],
+  },
+];

@@ -311,15 +311,7 @@ export const fr_CA: EnTranslations = {
       "nameplates": "Noms",
       "haptics": "Vibrations",
       "hapticsOff": "Vibrations désactivées",
-      "toggleHaptics": "Activer/désactiver les vibrations",
-      "hotbarPage": "Techniques",
-      "hotbarPageAria": "Afficher la prochaine série de techniques",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
-      "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "toggleHaptics": "Activer/désactiver les vibrations"
     },
     "tutorial": {
       "moveBodyTouch": "Utilise le joystick de déplacement pour te déplacer et fais glisser l'écran pour regarder autour de toi. Fais quelques pas pour commencer.",
@@ -426,9 +418,7 @@ export const fr_CA: EnTranslations = {
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
-      "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes"
     },
     "controller": {
       "title": "Manette",
@@ -1060,6 +1050,18 @@ export const fr_CA: EnTranslations = {
         }
       }
     },
+    "crafting": {
+      "title": "Artisanat",
+      "close": "Fermer la fabrication",
+      "craft": "Artisanat",
+      "reagentsNeeded": "Nécessite$1",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Aucune recette connue pour l'instant.",
+      "resultAria": "Artisanat {name}",
+      "craftedToast": "Fabriqué$1 {name}",
+      "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
+      "unknownRecipe": "Cette recette n'existe pas."
+    },
     "devBadge": {
       "title": "Développeur",
       "tiers": {
@@ -1319,6 +1321,7 @@ export const fr_CA: EnTranslations = {
       "delves": "Plongées",
       "reference": "Référence",
       "controls": "Commandes",
+      "settings": "Paramètres et performances",
       "combat": "Combat",
       "talents": "Talents",
       "arena": "Arène et JcJ",
@@ -1486,6 +1489,66 @@ export const fr_CA: EnTranslations = {
       "mobileBody": "Les commandes tactiles apparaissent automatiquement sur téléphones et tablettes : un joystick de déplacement à gauche, un glissement n'importe où à droite pour regarder, et des boutons à l'écran pour vos capacités et vos menus.",
       "controllerHeading": "À la manette",
       "controllerBody": "Les manettes fonctionnent aussi, et leur prise en charge est activée par défaut. Le stick gauche déplace, le stick droit oriente la caméra, et les boutons de façade et de tranche couvrent vos capacités, le saut et les interactions. Ouvrez n'importe quelle fenêtre pour faire apparaître un pointeur à l'écran et naviguer dans les menus. Vous pouvez réassigner les boutons et régler la zone morte des sticks, la vitesse de la caméra, les vibrations et la visée inversée depuis les réglages de manette dans les options."
+    },
+    "settingsPage": {
+      "heading": "Paramètres et performances",
+      "intro": "Donnez au jeu son meilleur aspect ou exécutez-le le plus rapidement possible. Trois chargements prêts à l'emploi, plus ce que chaque option graphique fait réellement.",
+      "wherePath": "Tout sur cette page vit dans le jeu$1 appuyez sur Échap et regardez dans Graphiques, Interface et Superposition de performances.",
+      "fairnessTitle": "Juste par conception",
+      "fairnessBody": "Aucune option ici n’échange la beauté contre le pouvoir. Les paramètres de Lower ne donnent que du vernis cosmétique, jamais les informations avec lesquelles vous vous battez$1 vos débuffs, vos barres d'incantation, votre santé de groupe et vos nombres de dégâts sont identiques de Low à Ultra. Jouer sur une machine modeste n'est jamais un handicap.",
+      "loadoutsHeading": "Trois chargements prêts à l'emploi",
+      "loadoutsIntro": "Commencez par le chargement qui ressemble à votre machine, puis ajustez une option à la fois jusqu'à ce que vous vous sentiez bien.",
+      "recommended": "Recommandé",
+      "whyLabel": "Pourquoi ça marche$1",
+      "tagReload": "après rechargement",
+      "fpsTitle": "Meilleur FPS",
+      "fpsTagline": "Pour les ordinateurs portables plus anciens, les graphiques intégrés et le jeu sur batterie.",
+      "fpsWhy": "La qualité graphique est l'interrupteur principal et la qualité du rendu est le curseur le plus puissant$1 à 70 %, le monde dessine environ la moitié des pixels tandis que l'interface reste parfaitement nette.",
+      "balancedTitle": "Équilibré",
+      "balancedTagline": "Le point idéal pour la plupart des machines et nos conseils par défaut.",
+      "balancedWhy": "Medium apporte de vraies ombres et des matières pleines$1 High ajoute une occlusion et une floraison ambiantes. En dessous de Ultra, un filet de sécurité intégré absorbe les baisses soudaines lors des combats chargés, de sorte que Balanced reste fluide sans baby-sitting.",
+      "visualsTitle": "Meilleurs visuels",
+      "visualsTagline": "Mode capture d'écran pour les machines de bureau puissantes.",
+      "visualsWhy": "Ultra restitue à la résolution la plus élevée offerte par votre écran avec l'éclairage le plus riche. Il désactive également le filet de sécurité et est réservé aux ordinateurs de bureau$1 les téléphones et l'application atteignent leur limite de High.",
+      "value50to70": "50 à 70%",
+      "value90to100": "90 à 100%",
+      "value100": "100%",
+      "valueHighOrMedium": "High sur un PC de jeu, Medium sur un ordinateur portable",
+      "valueOnOptional": "Activé (facultatif)",
+      "howHeading": "Comment se comportent les options",
+      "factDetectTitle": "Le jeu s'ajuste d'abord",
+      "factDetectBody": "Lors de votre premier lancement, le jeu lit votre appareil et choisit un niveau raisonnable, de Low sur un téléphone modeste à Ultra sur un ordinateur de bureau puissant. Tout choix que vous faites vous-même est toujours gagnant.",
+      "factReloadTitle": "Deux types d'options",
+      "factReloadBody": "La qualité graphique et les sélecteurs avancés prennent effet après un rechargement, et le panneau propose un bouton Recharger maintenant en cas de besoin. Toutes les autres options s’appliquent au moment où vous la modifiez.",
+      "factGovernorTitle": "Un filet de sécurité intégré",
+      "factGovernorBody": "À chaque niveau inférieur à Ultra, le jeu éclaircit tranquillement l'herbe, les effets et l'éclairage pendant un moment lorsqu'un grand combat éclate, puis les restaure. Choisir Ultra indique que vous préférez conserver chaque détail.",
+      "advancedHeading": "Le préréglage Advanced$1 mixez le vôtre",
+      "advancedBody": "Advanced commence à partir du niveau High et débloque quatre sélecteurs supplémentaires, afin que vous puissiez passer vos images là où vous les remarquez réellement$1 détails du terrain, densité du feuillage, effets et éclairage et qualité des ombres. Comme la qualité graphique, ils s’appliquent après un rechargement.",
+      "advancedMixes": "Deux mélanges préférés$1 gardez la qualité des ombres sur High et réglez Effets et éclairage sur Low pour un look net et sans lueur qui laisse passer la lumière, ou faites l'inverse pour conserver la floraison et adoucir les ombres.",
+      "tableHeading": "Chaque option, expliquée",
+      "colSetting": "Paramètre",
+      "colDoes": "Ce que ça fait",
+      "colImpact": "Impact de FPS",
+      "impactNone": "Aucun",
+      "impactLight": "Lumière",
+      "impactModerate": "Modéré",
+      "impactHeavy": "Lourd",
+      "rowGraphicsQuality": "L'interrupteur principal. Chaque étape modifie ensemble la résolution, les ombres, les matériaux, le feuillage et les effets d'éclairage. La plus grande différence que vous puissiez faire.",
+      "rowRenderQuality": "Dessine le monde 3D avec une résolution interne inférieure et le met à l'échelle$1 l'interface reste nette. Le curseur instantané le plus puissant sur les machines les plus faibles et les écrans haute résolution.",
+      "rowFieldOfView": "Quelle partie du monde tient à l'écran, d'un zoom de 55 degrés à un balayage de 100 degrés. Un choix de confort$1 les vues plus larges attirent un peu plus.",
+      "rowBrightness": "Exposition de la scène, plus sombre ou plus claire. Pure préférence.",
+      "rowWeather": "Pluie et neige ambiantes. Ambiance uniquement, et l'éteindre permet d'économiser un peu lors des orages.",
+      "rowBrowserEffects": "À quel point l'interface elle-même peut être sophistiquée$1 flou de verre, lueur, menus animés. Correspond automatiquement à votre navigateur$1 le monde 3D est intact de toute façon.",
+      "rowTerrainDetail": "Textures de sol riches et mélangées par rapport à un aspect de terrain plus simple et plus rapide.",
+      "rowFoliageDensity": "Jusqu'où et quelle épaisseur l'herbe pousse autour de votre personnage.",
+      "rowEffectsQuality": "Bloom, occlusion ambiante et combien de torches et de sorts projettent une vraie lumière. La plus grosse économie parmi les préparateurs avancés.",
+      "rowShadowQuality": "La netteté des ombres. Low conserve les ombres mais adoucit leurs bords.",
+      "rowFrostedPanels": "Un flou de verre dépoli derrière les fenêtres. Joli, et exactement le genre d’effet ressenti par un navigateur plus faible$1 laissez-le de côté pour un look classique et net.",
+      "rowReduceMotion": "Supprime les animations de l'interface pour que les fenêtres apparaissent instantanément. Une option d’accessibilité d’abord, avec un petit bonus de performances.",
+      "rowPerfOverlay": "Une lecture à l'écran de FPS, du temps d'image, et plus encore. Activez-le pendant que vous réglez cette page, puis masquez-le à nouveau.",
+      "tableFoot": "Vous recherchez un curseur de distance de tirage ou un capuchon FPS$1 Il n'y a rien à rechercher$1 la distance de vue fait partie de chaque niveau de qualité et la cadence des images suit votre affichage.",
+      "mobileTitle": "Sur téléphones et tablettes",
+      "mobileBody": "Mobile gère davantage pour vous$1 le jeu choisit le niveau, maintient la résolution un peu plus basse pour protéger la batterie et la chaleur, et conserve les niveaux les plus élevés uniquement sur ordinateur. Les chargements ci-dessus s'appliquent toujours$1 les téléphones atteignent tout simplement High."
     },
     "combat": {
       "intro": "Le combat suit les règles familières des MMO classiques. Vous n'avez jamais besoin d'en étudier le moindre détail pour bien jouer, ce n'est que la forme que prennent les affrontements.",
@@ -2645,6 +2708,8 @@ export const fr_CA: EnTranslations = {
     "title": "Télécharger le lanceur de bureau",
     "desc": "Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.",
     "macCta": "Telecharger la version macOS",
+    "linuxCta": "Télécharger pour Linux",
+    "linuxHint": "AppImage$1 rendez-le exécutable, puis exécutez-le. Aucune installation nécessaire.",
     "windowsPending": "Version Windows a venir."
   },
   "comingSoon": {
@@ -3487,6 +3552,7 @@ export const fr_CA: EnTranslations = {
     "rendererFailed": "Impossible de démarrer le rendu: rechargez la page. {error}",
     "enterTimeout": "Impossible d'entrer dans le monde. La connexion a expiré. Le serveur de jeu fonctionne-t-il ?",
     "connectionLost": "La connexion au serveur a été perdue.",
+    "reconnecting": "Connexion perdue. Reconnexion...",
     "connectionRejected": "Le serveur a fermé la connexion."
   },
   "errors": {
@@ -7685,6 +7751,26 @@ export const fr_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Mogger tué"
+          }
+        }
+      },
+      "q_archetype_acceptance": {
+        "title": "Un métier qui vous appartient",
+        "text": "Chaque artisan d'Eastbrook finit par choisir un métier qui lui est propre. Prouvez-vous avec un seul acte, {playerName}, et déclarez votre chemin.",
+        "completion": "Votre chemin est choisi ; marchez bien.",
+        "objectives": {
+          "0": {
+            "label": "Loup des forêts tué"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Faire amende honorable",
+        "text": "Pour réserver un métier à un autre, un artisan doit d'abord réparer le chemin non parcouru, {playerName}.",
+        "completion": "Modifications apportées ; un nouveau chemin s'ouvre à vous.",
+        "objectives": {
+          "0": {
+            "label": "Loup des forêts tué"
           }
         }
       },

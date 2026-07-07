@@ -4166,8 +4166,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Course automatique',
   'hudChrome.mobile.haptics': 'Vibrations',
   'hudChrome.mobile.hapticsOff': 'Vibrations désactivées',
-  'hudChrome.mobile.hotbarPage': 'Techniques',
-  'hudChrome.mobile.hotbarPageAria': 'Afficher la série de techniques suivante',
   'hudChrome.mobile.jump': 'Sauter',
   'hudChrome.mobile.leaderboard': 'Classement',
   'hudChrome.mobile.nameplates': 'Noms',
@@ -6129,4 +6127,121 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Commencez d'abord la configuration de l'authentification à deux facteurs.",
   'apiError.validation.failed':
     'Certains champs sont invalides. Vérifiez le formulaire puis réessayez.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Télécharger pour Linux',
+  'download.linuxHint':
+    'AppImage$1 rendez-le exécutable, puis exécutez-le. Aucune installation nécessaire.',
+  'loading.reconnecting': 'Connexion perdue. Reconnexion...',
+  'guide.nav.settings': 'Paramètres et performances',
+  'guide.settingsPage.advancedBody':
+    'Advanced commence à partir du niveau High et débloque quatre sélecteurs supplémentaires, afin que vous puissiez passer vos images là où vous les remarquez réellement$1 détails du terrain, densité du feuillage, effets et éclairage et qualité des ombres. Comme la qualité graphique, ils s’appliquent après un rechargement.',
+  'guide.settingsPage.advancedHeading': 'Le préréglage Advanced$1 mixez le vôtre',
+  'guide.settingsPage.advancedMixes':
+    "Deux mélanges préférés$1 gardez la qualité des ombres sur High et réglez Effets et éclairage sur Low pour un look net et sans lueur qui laisse passer la lumière, ou faites l'inverse pour conserver la floraison et adoucir les ombres.",
+  'guide.settingsPage.balancedTagline':
+    'Le point idéal pour la plupart des machines et nos conseils par défaut.',
+  'guide.settingsPage.balancedTitle': 'Équilibré',
+  'guide.settingsPage.balancedWhy':
+    'Medium apporte de vraies ombres et des matières pleines$1 High ajoute une occlusion et une floraison ambiantes. En dessous de Ultra, un filet de sécurité intégré absorbe les baisses soudaines lors des combats chargés, de sorte que Balanced reste fluide sans baby-sitting.',
+  'guide.settingsPage.colDoes': 'Ce que ça fait',
+  'guide.settingsPage.colImpact': 'Impact de FPS',
+  'guide.settingsPage.colSetting': 'Paramètre',
+  'guide.settingsPage.factDetectBody':
+    'Lors de votre premier lancement, le jeu lit votre appareil et choisit un niveau raisonnable, de Low sur un téléphone modeste à Ultra sur un ordinateur de bureau puissant. Tout choix que vous faites vous-même est toujours gagnant.',
+  'guide.settingsPage.factDetectTitle': "Le jeu s'ajuste d'abord",
+  'guide.settingsPage.factGovernorBody':
+    "À chaque niveau inférieur à Ultra, le jeu éclaircit tranquillement l'herbe, les effets et l'éclairage pendant un moment lorsqu'un grand combat éclate, puis les restaure. Choisir Ultra indique que vous préférez conserver chaque détail.",
+  'guide.settingsPage.factGovernorTitle': 'Un filet de sécurité intégré',
+  'guide.settingsPage.factReloadBody':
+    'La qualité graphique et les sélecteurs avancés prennent effet après un rechargement, et le panneau propose un bouton Recharger maintenant en cas de besoin. Toutes les autres options s’appliquent au moment où vous la modifiez.',
+  'guide.settingsPage.factReloadTitle': "Deux types d'options",
+  'guide.settingsPage.fairnessBody':
+    "Aucune option ici n’échange la beauté contre le pouvoir. Les paramètres de Lower ne donnent que du vernis cosmétique, jamais les informations avec lesquelles vous vous battez$1 vos débuffs, vos barres d'incantation, votre santé de groupe et vos nombres de dégâts sont identiques de Low à Ultra. Jouer sur une machine modeste n'est jamais un handicap.",
+  'guide.settingsPage.fairnessTitle': 'Juste par conception',
+  'guide.settingsPage.fpsTagline':
+    'Pour les ordinateurs portables plus anciens, les graphiques intégrés et le jeu sur batterie.',
+  'guide.settingsPage.fpsTitle': 'Meilleur FPS',
+  'guide.settingsPage.fpsWhy':
+    "La qualité graphique est l'interrupteur principal et la qualité du rendu est le curseur le plus puissant$1 à 70 %, le monde dessine environ la moitié des pixels tandis que l'interface reste parfaitement nette.",
+  'guide.settingsPage.heading': 'Paramètres et performances',
+  'guide.settingsPage.howHeading': 'Comment se comportent les options',
+  'guide.settingsPage.impactHeavy': 'Lourd',
+  'guide.settingsPage.impactLight': 'Lumière',
+  'guide.settingsPage.impactModerate': 'Modéré',
+  'guide.settingsPage.impactNone': 'Aucun',
+  'guide.settingsPage.intro':
+    "Donnez au jeu son meilleur aspect ou exécutez-le le plus rapidement possible. Trois chargements prêts à l'emploi, plus ce que chaque option graphique fait réellement.",
+  'guide.settingsPage.loadoutsHeading': "Trois chargements prêts à l'emploi",
+  'guide.settingsPage.loadoutsIntro':
+    "Commencez par le chargement qui ressemble à votre machine, puis ajustez une option à la fois jusqu'à ce que vous vous sentiez bien.",
+  'guide.settingsPage.mobileBody':
+    "Mobile gère davantage pour vous$1 le jeu choisit le niveau, maintient la résolution un peu plus basse pour protéger la batterie et la chaleur, et conserve les niveaux les plus élevés uniquement sur ordinateur. Les chargements ci-dessus s'appliquent toujours$1 les téléphones atteignent tout simplement High.",
+  'guide.settingsPage.mobileTitle': 'Sur téléphones et tablettes',
+  'guide.settingsPage.recommended': 'Recommandé',
+  'guide.settingsPage.rowBrightness':
+    'Exposition de la scène, plus sombre ou plus claire. Pure préférence.',
+  'guide.settingsPage.rowBrowserEffects':
+    "À quel point l'interface elle-même peut être sophistiquée$1 flou de verre, lueur, menus animés. Correspond automatiquement à votre navigateur$1 le monde 3D est intact de toute façon.",
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloom, occlusion ambiante et combien de torches et de sorts projettent une vraie lumière. La plus grosse économie parmi les préparateurs avancés.',
+  'guide.settingsPage.rowFieldOfView':
+    "Quelle partie du monde tient à l'écran, d'un zoom de 55 degrés à un balayage de 100 degrés. Un choix de confort$1 les vues plus larges attirent un peu plus.",
+  'guide.settingsPage.rowFoliageDensity':
+    "Jusqu'où et quelle épaisseur l'herbe pousse autour de votre personnage.",
+  'guide.settingsPage.rowFrostedPanels':
+    'Un flou de verre dépoli derrière les fenêtres. Joli, et exactement le genre d’effet ressenti par un navigateur plus faible$1 laissez-le de côté pour un look classique et net.',
+  'guide.settingsPage.rowGraphicsQuality':
+    "L'interrupteur principal. Chaque étape modifie ensemble la résolution, les ombres, les matériaux, le feuillage et les effets d'éclairage. La plus grande différence que vous puissiez faire.",
+  'guide.settingsPage.rowPerfOverlay':
+    "Une lecture à l'écran de FPS, du temps d'image, et plus encore. Activez-le pendant que vous réglez cette page, puis masquez-le à nouveau.",
+  'guide.settingsPage.rowReduceMotion':
+    "Supprime les animations de l'interface pour que les fenêtres apparaissent instantanément. Une option d’accessibilité d’abord, avec un petit bonus de performances.",
+  'guide.settingsPage.rowRenderQuality':
+    "Dessine le monde 3D avec une résolution interne inférieure et le met à l'échelle$1 l'interface reste nette. Le curseur instantané le plus puissant sur les machines les plus faibles et les écrans haute résolution.",
+  'guide.settingsPage.rowShadowQuality':
+    'La netteté des ombres. Low conserve les ombres mais adoucit leurs bords.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Textures de sol riches et mélangées par rapport à un aspect de terrain plus simple et plus rapide.',
+  'guide.settingsPage.rowWeather':
+    "Pluie et neige ambiantes. Ambiance uniquement, et l'éteindre permet d'économiser un peu lors des orages.",
+  'guide.settingsPage.tableFoot':
+    "Vous recherchez un curseur de distance de tirage ou un capuchon FPS$1 Il n'y a rien à rechercher$1 la distance de vue fait partie de chaque niveau de qualité et la cadence des images suit votre affichage.",
+  'guide.settingsPage.tableHeading': 'Chaque option, expliquée',
+  'guide.settingsPage.tagReload': 'après rechargement',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 à 70%',
+  'guide.settingsPage.value90to100': '90 à 100%',
+  'guide.settingsPage.valueHighOrMedium':
+    'High sur un PC de jeu, Medium sur un ordinateur portable',
+  'guide.settingsPage.valueOnOptional': 'Activé (facultatif)',
+  'guide.settingsPage.visualsTagline':
+    "Mode capture d'écran pour les machines de bureau puissantes.",
+  'guide.settingsPage.visualsTitle': 'Meilleurs visuels',
+  'guide.settingsPage.visualsWhy':
+    "Ultra restitue à la résolution la plus élevée offerte par votre écran avec l'éclairage le plus riche. Il désactive également le filet de sécurité et est réservé aux ordinateurs de bureau$1 les téléphones et l'application atteignent leur limite de High.",
+  'guide.settingsPage.wherePath':
+    'Tout sur cette page vit dans le jeu$1 appuyez sur Échap et regardez dans Graphiques, Interface et Superposition de performances.',
+  'guide.settingsPage.whyLabel': 'Pourquoi ça marche$1',
+  'hudChrome.crafting.close': 'Fermer la fabrication',
+  'hudChrome.crafting.craft': 'Artisanat',
+  'hudChrome.crafting.craftedToast': 'Fabriqué$1 {name}',
+  'hudChrome.crafting.empty': "Aucune recette connue pour l'instant.",
+  'hudChrome.crafting.insufficientMaterials': "Vous n'avez pas le matériel pour cela.",
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Nécessite$1',
+  'hudChrome.crafting.resultAria': 'Artisanat {name}',
+  'hudChrome.crafting.title': 'Artisanat',
+  'hudChrome.crafting.unknownRecipe': "Cette recette n'existe pas.",
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Un métier qui vous appartient',
+  'entities.quests.q_archetype_acceptance.text':
+    "Chaque artisan d'Eastbrook finit par choisir un métier qui lui est propre. Prouvez-vous avec un seul acte, {playerName}, et déclarez votre chemin.",
+  'entities.quests.q_archetype_acceptance.completion': 'Votre chemin est choisi ; marchez bien.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Loup des forêts tué',
+  'entities.quests.q_prof_make_amends.title': 'Faire amende honorable',
+  'entities.quests.q_prof_make_amends.text':
+    "Pour réserver un métier à un autre, un artisan doit d'abord réparer le chemin non parcouru, {playerName}.",
+  'entities.quests.q_prof_make_amends.completion':
+    "Modifications apportées ; un nouveau chemin s'ouvre à vous.",
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Loup des forêts tué',
 };

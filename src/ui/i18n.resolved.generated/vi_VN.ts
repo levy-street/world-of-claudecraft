@@ -311,15 +311,7 @@ export const vi_VN: EnTranslations = {
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
       "hapticsOff": "Tắt Phản Hồi Rung",
-      "toggleHaptics": "Bật/tắt phản hồi rung",
-      "hotbarPage": "Kỹ Năng",
-      "hotbarPageAria": "Hiện bộ kỹ năng tiếp theo",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
-      "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "toggleHaptics": "Bật/tắt phản hồi rung"
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -426,9 +418,7 @@ export const vi_VN: EnTranslations = {
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
-      "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày"
     },
     "controller": {
       "title": "Tay Cầm",
@@ -1060,6 +1050,18 @@ export const vi_VN: EnTranslations = {
         }
       }
     },
+    "crafting": {
+      "title": "Chế tạo",
+      "close": "Đóng chế tạo",
+      "craft": "thủ công",
+      "reagentsNeeded": "Yêu cầu:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Chưa có công thức nấu ăn nào được biết đến.",
+      "resultAria": "Thủ công {name}",
+      "craftedToast": "Đã chế tác: {name}",
+      "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
+      "unknownRecipe": "Công thức đó không tồn tại."
+    },
     "devBadge": {
       "title": "Nhà phát triển",
       "tiers": {
@@ -1319,6 +1321,7 @@ export const vi_VN: EnTranslations = {
       "delves": "Hang Sâu",
       "reference": "Tra Cứu",
       "controls": "Điều Khiển",
+      "settings": "Cài đặt & Hiệu suất",
       "combat": "Chiến Đấu",
       "talents": "Tài Năng",
       "arena": "Đấu Trường & PvP",
@@ -1486,6 +1489,66 @@ export const vi_VN: EnTranslations = {
       "mobileBody": "Điều khiển cảm ứng tự động xuất hiện trên điện thoại và máy tính bảng: cần di chuyển ở bên trái, kéo bất cứ đâu ở bên phải để nhìn quanh, và các nút trên màn hình cho kỹ năng và menu của bạn.",
       "controllerHeading": "Trên tay cầm",
       "controllerBody": "Tay cầm cũng dùng được, và hỗ trợ tay cầm được bật sẵn theo mặc định. Cần trái để di chuyển, cần phải để chỉnh máy quay, còn các nút mặt và nút vai lo phần kỹ năng, nhảy và tương tác của bạn. Mở bất kỳ cửa sổ nào để hiện một con trỏ trên màn hình cho các menu. Bạn có thể đổi lại các nút và chỉnh vùng chết của cần, tốc độ máy quay, rung và đảo chiều nhìn trong phần cài đặt tay cầm ở mục tùy chọn."
+    },
+    "settingsPage": {
+      "heading": "Cài đặt & Hiệu suất",
+      "intro": "Làm cho trò chơi trông đẹp nhất hoặc chạy nhanh nhất. Ba lần tải sẵn có cùng với những chức năng thực sự của mọi tùy chọn đồ họa.",
+      "wherePath": "Mọi thứ trên trang này đều tồn tại trong trò chơi: nhấn Esc và tìm trong Đồ họa, Giao diện và Lớp phủ hiệu suất.",
+      "fairnessTitle": "Công bằng theo thiết kế",
+      "fairnessBody": "Không có lựa chọn nào ở đây đánh đổi vẻ đẹp để lấy quyền lực. Lower cài đặt chỉ làm mất đi lớp sơn bóng mỹ phẩm, không bao giờ sử dụng thông tin bạn chiến đấu: debuff, thanh dùng phép, lượng máu của nhóm và số sát thương giống hệt nhau từ Low đến Ultra. Chơi trên một chiếc máy khiêm tốn không bao giờ là một điều bất lợi.",
+      "loadoutsHeading": "Ba lần tải làm sẵn",
+      "loadoutsIntro": "Bắt đầu từ quá trình tải giống như máy của bạn, sau đó điều chỉnh từng tùy chọn một cho đến khi cảm thấy phù hợp.",
+      "recommended": "Khuyến khích",
+      "whyLabel": "Tại sao nó hoạt động:",
+      "tagReload": "sau khi tải lại",
+      "fpsTitle": "Tốt nhất FPS",
+      "fpsTagline": "Dành cho máy tính xách tay cũ, đồ họa tích hợp và chơi pin.",
+      "fpsWhy": "Chất lượng đồ họa là công tắc chính và Chất lượng kết xuất là thanh trượt mạnh nhất: ở mức 70%, thế giới thu được khoảng một nửa pixel trong khi giao diện vẫn sắc nét hoàn hảo.",
+      "balancedTitle": "Cân bằng",
+      "balancedTagline": "Điểm thú vị cho hầu hết các máy và lời khuyên mặc định của chúng tôi.",
+      "balancedWhy": "Medium mang lại bóng thật và chất liệu đầy đủ; High thêm tính năng che phủ và nở hoa xung quanh. Dưới Ultra, lưới an toàn tích hợp có khả năng hấp thụ sự sụt giảm đột ngột trong các trận chiến bận rộn, vì vậy Balanced vẫn hoạt động trơn tru mà không cần trông trẻ.",
+      "visualsTitle": "Hình ảnh đẹp nhất",
+      "visualsTagline": "Chế độ chụp màn hình cho máy tính để bàn mạnh mẽ.",
+      "visualsWhy": "Ultra hiển thị ở độ phân giải cao nhất mà màn hình của bạn cung cấp với ánh sáng phong phú nhất. Nó cũng tắt mạng lưới an toàn và chỉ dành cho máy tính để bàn: điện thoại và ứng dụng có mức tối đa High.",
+      "value50to70": "50 đến 70%",
+      "value90to100": "90 đến 100%",
+      "value100": "100%",
+      "valueHighOrMedium": "High trên PC chơi game, Medium trên máy tính xách tay",
+      "valueOnOptional": "Bật (tùy chọn)",
+      "howHeading": "Cách các tùy chọn hoạt động",
+      "factDetectTitle": "Trò chơi tự điều chỉnh trước tiên",
+      "factDetectBody": "Trong lần khởi chạy đầu tiên, trò chơi sẽ đọc thiết bị của bạn và chọn cấp độ hợp lý, từ Low trên điện thoại bình dân đến Ultra trên máy tính để bàn mạnh mẽ. Bất kỳ sự lựa chọn nào bạn đưa ra cho mình luôn luôn thắng.",
+      "factReloadTitle": "Hai loại tùy chọn",
+      "factReloadBody": "Chất lượng đồ họa và Bộ chọn nâng cao có hiệu lực sau khi tải lại và bảng điều khiển cung cấp nút Tải lại ngay khi cần. Mọi tùy chọn khác sẽ áp dụng ngay khi bạn thay đổi nó.",
+      "factGovernorTitle": "Một mạng lưới an toàn tích hợp",
+      "factGovernorBody": "Ở mọi cấp độ dưới Ultra, trò chơi lặng lẽ tỉa bớt cỏ, hiệu ứng và ánh sáng trong giây lát khi một trận chiến lớn tăng vọt, sau đó khôi phục chúng. Việc chọn Ultra cho biết bạn muốn giữ mọi chi tiết hơn.",
+      "advancedHeading": "Cài đặt trước nâng cao: trộn của riêng bạn",
+      "advancedBody": "Nâng cao bắt đầu từ cấp High và mở khóa bốn bộ chọn bổ sung, do đó bạn có thể sử dụng khung hình của mình ở nơi bạn thực sự chú ý đến chúng: Chi tiết địa hình, Mật độ tán lá, Hiệu ứng & Ánh sáng và Chất lượng bóng. Giống như Chất lượng đồ họa, chúng được áp dụng sau khi tải lại.",
+      "advancedMixes": "Hai cách kết hợp yêu thích: giữ Chất lượng bóng ở High và đặt Hiệu ứng & Ánh sáng thành Low để có giao diện sắc nét, không có ánh sáng chạy nhẹ hoặc làm ngược lại để giữ độ nở và làm dịu bóng.",
+      "tableHeading": "Mọi lựa chọn, được giải thích",
+      "colSetting": "Cài đặt",
+      "colDoes": "Nó làm gì",
+      "colImpact": "FPS tác động",
+      "impactNone": "Không có",
+      "impactLight": "Ánh sáng",
+      "impactModerate": "Vừa phải",
+      "impactHeavy": "Nặng",
+      "rowGraphicsQuality": "Công tắc chính. Mỗi bước thay đổi độ phân giải, bóng, vật liệu, tán lá và hiệu ứng ánh sáng cùng nhau. Sự khác biệt lớn nhất mà bạn có thể tạo ra.",
+      "rowRenderQuality": "Vẽ thế giới 3D ở độ phân giải bên trong thấp hơn và tăng tỷ lệ lên; giao diện vẫn sắc nét. Thanh trượt tức thời mạnh nhất trên các máy yếu hơn và màn hình độ phân giải cao.",
+      "rowFieldOfView": "Bao nhiêu thế giới vừa vặn trên màn hình, từ zoom 55 đến quét 100 độ. Một sự lựa chọn thoải mái; tầm nhìn rộng hơn thu hút nhiều hơn một chút.",
+      "rowBrightness": "Phơi sáng cảnh, tối hơn hoặc sáng hơn. Ưu tiên thuần túy.",
+      "rowWeather": "Xung quanh mưa và tuyết. Chỉ có khí quyển và tắt nó sẽ tiết kiệm được một chút khi có bão.",
+      "rowBrowserEffects": "Bản thân giao diện được cho phép lạ mắt đến mức nào: kính mờ, ánh sáng rực rỡ, menu hoạt hình. Tự động khớp với trình duyệt của bạn; thế giới 3D vẫn còn nguyên vẹn.",
+      "rowTerrainDetail": "Kết cấu mặt đất phong phú, pha trộn so với giao diện địa hình đơn giản hơn, nhanh hơn.",
+      "rowFoliageDensity": "Cỏ mọc bao xa và dày bao nhiêu xung quanh nhân vật của bạn.",
+      "rowEffectsQuality": "Sự nở hoa, sự tắc nghẽn xung quanh, và bao nhiêu ngọn đuốc và bùa chú phát ra ánh sáng thực sự. Khoản tiết kiệm lớn nhất trong số những người chọn Nâng cao.",
+      "rowShadowQuality": "Bóng sắc nét. Low giữ bóng nhưng làm mềm các cạnh của chúng.",
+      "rowFrostedPanels": "Một tấm kính mờ mờ phía sau cửa sổ. Đẹp và chính xác là loại hiệu ứng mà trình duyệt yếu hơn cảm nhận được; bỏ nó đi để có cái nhìn sắc nét cổ điển.",
+      "rowReduceMotion": "Loại bỏ hình ảnh động của giao diện để cửa sổ xuất hiện ngay lập tức. Đầu tiên là một tùy chọn khả năng truy cập, với phần thưởng hiệu suất nhỏ.",
+      "rowPerfOverlay": "Thông tin hiển thị trên màn hình về FPS, thời gian kết xuất khung hình, v.v. Hãy bật nó lên trong khi bạn điều chỉnh trang này, sau đó ẩn nó lại.",
+      "tableFoot": "Bạn đang tìm kiếm thanh trượt khoảng cách vẽ hoặc giới hạn FPS? Không có gì để tìm kiếm: khoảng cách xem là một phần của từng bậc chất lượng và tốc độ khung hình sẽ tuân theo màn hình của bạn.",
+      "mobileTitle": "Trên điện thoại và máy tính bảng",
+      "mobileBody": "Thiết bị di động quản lý nhiều hơn cho bạn: trò chơi chọn cấp độ, giữ độ phân giải thấp hơn một chút để bảo vệ pin và nhiệt, đồng thời giữ cấp độ cao nhất chỉ dành cho máy tính để bàn. Các khoản tải ở trên vẫn được áp dụng; điện thoại chỉ cần đạt mức tối đa High."
     },
     "combat": {
       "intro": "Chiến đấu tuân theo những quy tắc MMO cổ điển quen thuộc. Bạn không bao giờ cần nghiên cứu bất kỳ điều gì để chơi tốt, đây chỉ là hình dáng cách các trận đấu vận hành.",
@@ -2645,6 +2708,8 @@ export const vi_VN: EnTranslations = {
     "title": "Tải Trình Khởi Chạy Trên Máy Tính",
     "desc": "Tải trình khởi chạy độc lập để có hiệu năng tối ưu và chơi toàn màn hình.",
     "macCta": "Tải xuống cho macOS",
+    "linuxCta": "Tải xuống cho Linux",
+    "linuxHint": "AppImage: làm cho nó có thể thực thi được rồi chạy nó. Không cần cài đặt.",
     "windowsPending": "Bản dựng Windows đang chờ."
   },
   "comingSoon": {
@@ -3487,6 +3552,7 @@ export const vi_VN: EnTranslations = {
     "rendererFailed": "Không thể khởi động bộ kết xuất: thử tải lại. {error}",
     "enterTimeout": "Không thể vào thế giới. Kết nối đã quá thời gian. Máy chủ trò chơi có đang chạy không?",
     "connectionLost": "Đã mất kết nối tới máy chủ.",
+    "reconnecting": "Mất kết nối. Đang kết nối lại...",
     "connectionRejected": "Máy chủ đã đóng kết nối."
   },
   "errors": {
@@ -7685,6 +7751,26 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Mogger"
+          }
+        }
+      },
+      "q_archetype_acceptance": {
+        "title": "Một nghề để gọi riêng của bạn",
+        "text": "Mỗi nghệ nhân của Eastbrook cuối cùng đều định cư trên một nghề thủ công riêng của họ. Hãy chứng tỏ bản thân bằng một hành động duy nhất, {playerName}, và tuyên bố con đường của bạn.",
+        "completion": "Con đường của bạn đã được chọn; đi bộ tốt.",
+        "objectives": {
+          "0": {
+            "label": "Sói rừng bị giết"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Sửa đổi",
+        "text": "Để dành một nghề cho một nghề khác, trước tiên một nghệ nhân phải sửa đổi con đường đã không đi, {playerName}.",
+        "completion": "Đã thực hiện sửa đổi; một con đường mới đang mở ra cho bạn.",
+        "objectives": {
+          "0": {
+            "label": "Sói rừng bị giết"
           }
         }
       },

@@ -502,6 +502,8 @@ function characterListPayload(chars: CharacterRow[]): {
     forceRename: boolean;
     lastPlayed: string | null;
     playtimeSeconds: number;
+    skinCatalog: 'class' | 'mech';
+    mainhandItemId: string | null;
   }[];
 } {
   return {
@@ -516,6 +518,10 @@ function characterListPayload(chars: CharacterRow[]): {
       forceRename: c.force_rename,
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
+      // Real appearance for the char-select 3D preview (the client renders the
+      // Combat Mech cosmetic body and the equipped mainhand, matching the world).
+      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
+      mainhandItemId: c.state?.equipment?.mainhand ?? null,
     })),
   };
 }

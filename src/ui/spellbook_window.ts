@@ -50,9 +50,6 @@ export interface SpellbookWindowDeps {
   abilityTooltip(known: ResolvedAbility): string;
   /** Ability ids currently on the action bar. */
   barAbilityIds(): string[];
-  /** The hotbar's ability id per bar slot (index 0 = barSlot 1), used to derive
-   *  each row's mobile action-ring page (Phase 4, touch-only presentation). */
-  abilityIdByBarSlot(): (string | null)[];
   /** The action bar has at least one empty slot. */
   hasFreeSlot(): boolean;
   /** Place an ability on the first free slot; returns whether it changed. */
@@ -112,7 +109,6 @@ export class SpellbookWindow {
       abilities: cls.abilities,
       known: world.known,
       barAbilityIds: this.deps.barAbilityIds(),
-      abilityIdByBarSlot: this.deps.abilityIdByBarSlot(),
       hasFreeSlot: this.deps.hasFreeSlot(),
       hasFormBars: this.deps.hasFormBars(),
     });
@@ -233,19 +229,6 @@ export class SpellbookWindow {
       );
       toggle.setAttribute('aria-pressed', row.onBar ? 'true' : 'false');
       toggle.disabled = row.toggleDisabled;
-      // Touch-only page label (Phase 4): names which mobile action-ring page
-      // (Phase 1) this bar-assigned row's slot falls on, so a touch player who
-      // added it from the spellbook knows where to find it on the ring. Desktop
-      // rendering is untouched (row.mobilePage is still computed either way, but
-      // the label never appends without the touch gate).
-      if (row.mobilePage !== null && document.body.classList.contains('mobile-touch')) {
-        const pageLabel = document.createElement('span');
-        pageLabel.className = 'spell-mobile-page';
-        pageLabel.textContent = t('hudChrome.mobile.spellbookPageLabel', {
-          page: this.formatAbilityNumber(row.mobilePage + 1),
-        });
-        el.appendChild(pageLabel);
-      }
       toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
       toggle.addEventListener('click', (ev) => {
         ev.preventDefault();

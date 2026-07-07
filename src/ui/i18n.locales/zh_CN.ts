@@ -361,8 +361,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '显示物品等级',
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showDailyRewardsChest': '显示每日奖励宝箱',
-  'hudChrome.options.mobileCameraJoystick': '摄像机摇杆',
-  'hudChrome.options.mobileLeftHanded': '左手布局',
   'hudChrome.options.itemLevelLine': '物品等级 {level}',
   'hudChrome.options.itemScoreLine': '评分 {score}',
   'hudChrome.landing.highContrast': '高对比度',
@@ -520,6 +518,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'news.desc': '阅读最新补丁说明、游戏内事件和社区动态。',
   'download.title': '下载电脑版启动器',
   'download.macCta': '下载 macOS 版',
+  'download.linuxCta': '下载 Linux 版',
+  'download.linuxHint': 'AppImage 格式：赋予可执行权限后直接运行，无需安装。',
   'download.windowsPending': 'Windows 版本即将推出。',
   'download.desc': '获取独立启动器，以获得更优化的性能和全屏游戏体验。',
   'comingSoon.placeholder': '敬请期待...',
@@ -773,6 +773,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.rendererFailed': '无法启动渲染器：请尝试刷新。{error}',
   'loading.enterTimeout': '无法进入世界。连接已超时。游戏服务器是否正在运行？',
   'loading.connectionLost': '与服务器的连接已断开。',
+  'loading.reconnecting': '连接已断开。正在重新连接...',
   'loading.connectionRejected': '服务器关闭了连接。',
   'errors.nothingInteract': '附近没有可互动目标。',
   'errors.noEnemyNearby': '附近没有敌人。',
@@ -2897,6 +2898,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.completion':
     '莫格终于死了。东溪的田地更安全了，而你离开谷地时又多了一个值得传颂的故事。',
   'entities.quests.q_mogger.objectives.0.label': '击败莫格',
+  'entities.quests.q_archetype_acceptance.title': '属于你自己的技艺',
+  'entities.quests.q_archetype_acceptance.text':
+    '东溪的每一位匠人最终都会选定一门属于自己的技艺。用一件事证明自己吧，{playerName}，宣告你的道路。',
+  'entities.quests.q_archetype_acceptance.completion': '你的道路已经选定；愿你走得稳当。',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': '击败森林之狼',
+  'entities.quests.q_prof_make_amends.title': '弥补',
+  'entities.quests.q_prof_make_amends.text':
+    '若要放下一门技艺、转投另一门，匠人必须先为放弃的道路做出弥补，{playerName}。',
+  'entities.quests.q_prof_make_amends.completion': '弥补已经完成；一条新的道路已向你敞开。',
+  'entities.quests.q_prof_make_amends.objectives.0.label': '击败森林之狼',
   'entities.quests.q_drowned_choir.title': '溺亡唱诗班',
   'entities.quests.q_drowned_choir.text':
     '那些涉行者并非孤身行动。它们之中游走着溺亡信徒——随神殿一同沉没的邪教徒，至今仍披着腐烂的法衣，仍在岸边礁石上吟唱祷词。让其中八名永远噤声，再为我带回它们随身携带的六件祭品。我想知道它们打算献给女神什么。',
@@ -3340,18 +3351,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
   'hudChrome.meters.seconds': '{s}秒',
-  'hudChrome.mobile.actionPageToggle': '切换动作页',
-  'hudChrome.mobile.actionRing': '战斗动作',
   'hudChrome.mobile.autorun': '自动奔跑',
   'hudChrome.mobile.haptics': '震动反馈',
   'hudChrome.mobile.hapticsOff': '震动反馈：关',
-  'hudChrome.mobile.hotbarPage': '技能',
-  'hudChrome.mobile.hotbarPageAria': '显示下一组技能',
   'hudChrome.mobile.jump': '跳跃',
   'hudChrome.mobile.leaderboard': '排行榜',
   'hudChrome.mobile.nameplates': '姓名板',
-  'hudChrome.mobile.targetCycle': '切换目标',
-  'hudChrome.mobile.targetCycleShort': '目标',
   'hudChrome.mobile.toggleHaptics': '切换震动反馈',
   'hudChrome.rest.resting': '休息中',
   'hudChrome.swing.ready': '挥击',
@@ -3616,6 +3621,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.dungeons': '地下城与团队副本',
   'guide.nav.reference': '参考',
   'guide.nav.controls': '操作键',
+  'guide.nav.settings': '设置和性能',
   'guide.nav.combat': '战斗',
   'guide.nav.glossary': '术语表',
   'guide.nav.faq': '常见问题',
@@ -3747,6 +3753,86 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileHeading': '移动端操作',
   'guide.controls.mobileBody':
     '在手机和平板上会自动出现触控操作:左侧是移动摇杆,在右侧任意位置拖动即可环顾四周,屏幕上还有用于使用技能和打开菜单的按钮。',
+  'guide.settingsPage.heading': '设置和性能',
+  'guide.settingsPage.intro':
+    '把画面调到最美，或把帧数拉到最高。三套现成方案，外加每个图形选项的真实作用。',
+  'guide.settingsPage.wherePath': '本页的一切都在游戏里：按 Esc，到图形、界面和性能监视器中查看。',
+  'guide.settingsPage.fairnessTitle': '公平源自设计',
+  'guide.settingsPage.fairnessBody':
+    '这里没有任何选项会拿画面换战力。调低设置只会舍弃视觉上的修饰，绝不会砍掉你作战所需的信息：从“低”到“超高”，你的减益效果、施法条、队伍血量和伤害数字完全一致。用配置一般的机器游玩，绝不会吃亏。',
+  'guide.settingsPage.loadoutsHeading': '三套现成方案',
+  'guide.settingsPage.loadoutsIntro':
+    '先从最像你设备的那套方案开始，然后每次只调一个选项，直到感觉合适为止。',
+  'guide.settingsPage.recommended': '推荐',
+  'guide.settingsPage.whyLabel': '推荐理由：',
+  'guide.settingsPage.tagReload': '需重新加载',
+  'guide.settingsPage.fpsTitle': '帧数优先',
+  'guide.settingsPage.fpsTagline': '适合较老的笔记本、核显设备，以及用电池游玩的场合。',
+  'guide.settingsPage.fpsWhy':
+    '图形质量是总开关，渲染质量则是效果最猛的滑块：调到 70% 时，世界只需绘制大约一半的像素，而界面依旧清晰锐利。',
+  'guide.settingsPage.balancedTitle': '均衡',
+  'guide.settingsPage.balancedTagline': '大多数设备的最佳平衡点，也是我们的默认建议。',
+  'guide.settingsPage.balancedWhy':
+    '“中”档就有真实的阴影和完整的材质，“高”档再加上环境光遮蔽和泛光。只要低于“超高”，内置保护机制就会在激烈战斗掉帧时自动兜底，所以均衡方案不必时刻盯着，也能一直流畅。',
+  'guide.settingsPage.visualsTitle': '极致画质',
+  'guide.settingsPage.visualsTagline': '为高性能台式机准备的截图模式。',
+  'guide.settingsPage.visualsWhy':
+    '“超高”会以显示器支持的最高分辨率渲染，并启用最丰富的光照。它还会关闭内置保护机制，而且仅限桌面端：手机和应用端最高到“高”为止。',
+  'guide.settingsPage.value50to70': '50% 到 70%',
+  'guide.settingsPage.value90to100': '90% 到 100%',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.valueHighOrMedium': '游戏 PC 选“高”，笔记本选“中”',
+  'guide.settingsPage.valueOnOptional': '开启（可选）',
+  'guide.settingsPage.howHeading': '这些选项如何生效',
+  'guide.settingsPage.factDetectTitle': '游戏会先自动调校',
+  'guide.settingsPage.factDetectBody':
+    '首次启动时，游戏会检测你的设备并选好合适的档位：性能一般的手机是“低”，强力台式机则是“超高”。你自己做出的任何选择永远优先。',
+  'guide.settingsPage.factReloadTitle': '两类选项',
+  'guide.settingsPage.factReloadBody':
+    '图形质量和“高级”下的各个选项要在重新加载后才会生效，需要时面板会提供“立即重新加载”按钮。其余选项在你改动的那一刻立即生效。',
+  'guide.settingsPage.factGovernorTitle': '内置保护机制',
+  'guide.settingsPage.factGovernorBody':
+    '在“超高”以下的所有档位，大型战斗骤然吃紧时，游戏会悄悄暂时精简草地、特效和光照，随后再恢复原样。选择“超高”，就等于告诉游戏你宁可保留每一处细节。',
+  'guide.settingsPage.advancedHeading': '“高级”预设：自由搭配',
+  'guide.settingsPage.advancedBody':
+    '“高级”以“高”档位为起点，额外解锁四个独立选项，让你把帧数花在真正看得出差别的地方：地形细节、植被密度、特效和光照，以及阴影质量。这些选项和图形质量一样，重新加载后才会生效。',
+  'guide.settingsPage.advancedMixes':
+    '两套人气搭配：把阴影质量保持在“高”、特效和光照调到“低”，画面干净利落、没有泛光，跑起来也轻快；或者反过来，保留泛光，让阴影更柔和。',
+  'guide.settingsPage.tableHeading': '每个选项，逐一说明',
+  'guide.settingsPage.colSetting': '选项',
+  'guide.settingsPage.colDoes': '作用',
+  'guide.settingsPage.colImpact': 'FPS 影响',
+  'guide.settingsPage.impactNone': '无',
+  'guide.settingsPage.impactLight': '小',
+  'guide.settingsPage.impactModerate': '中等',
+  'guide.settingsPage.impactHeavy': '大',
+  'guide.settingsPage.rowGraphicsQuality':
+    '总开关。每调一档，分辨率、阴影、材质、植被和光照特效都会一起变化。这是单项改动里差别最大的一个。',
+  'guide.settingsPage.rowRenderQuality':
+    '以更低的内部分辨率绘制 3D 世界再放大呈现，界面保持锐利。对较弱的设备和高分辨率屏幕而言，这是见效最快、最猛的滑块。',
+  'guide.settingsPage.rowFieldOfView':
+    '决定屏幕能装下多大的世界：从拉近的 55 度到开阔的 100 度。纯属舒适度选择；视野越宽，绘制量略微增加。',
+  'guide.settingsPage.rowBrightness': '调整场景曝光，偏暗或偏亮，纯看个人喜好。',
+  'guide.settingsPage.rowWeather': '环境雨雪。纯氛围效果，关闭后在暴风雨天能省下一点性能。',
+  'guide.settingsPage.rowBrowserEffects':
+    '决定界面本身可以多华丽：玻璃模糊、辉光、菜单动画。“自动”会根据你的浏览器自行匹配；无论怎么选，3D 世界都不受影响。',
+  'guide.settingsPage.rowTerrainDetail':
+    '细腻混合的地表纹理，或更简洁、更省性能的地形外观，二选一。',
+  'guide.settingsPage.rowFoliageDensity': '决定角色周围的草地长多远、长多密。',
+  'guide.settingsPage.rowEffectsQuality':
+    '控制泛光、环境光遮蔽，以及有多少火把和法术能投射真实光照。在“高级”各选项中，这一项省下的性能最多。',
+  'guide.settingsPage.rowShadowQuality': '决定阴影的锐利程度。“低”仍保留阴影，只是边缘更柔和。',
+  'guide.settingsPage.rowFrostedPanels':
+    '在窗口背后加一层毛玻璃模糊。效果漂亮，但也正是性能较弱的浏览器最吃力的那类特效；想要经典的清爽外观就保持关闭。',
+  'guide.settingsPage.rowReduceMotion':
+    '移除界面动画，让窗口即刻显示。它首先是一项无障碍选项，顺带还有一点性能收益。',
+  'guide.settingsPage.rowPerfOverlay':
+    '在屏幕上实时显示 FPS、帧时间等数据。调校本页选项时先打开它，调完再隐藏。',
+  'guide.settingsPage.tableFoot':
+    '在找视距滑块或 FPS 上限？不用找了：可视距离已包含在各画质档位里，帧率则与你的显示器保持同步。',
+  'guide.settingsPage.mobileTitle': '手机与平板',
+  'guide.settingsPage.mobileBody':
+    '移动端会替你多打理一些：游戏自动选择档位，把分辨率稍微压低以兼顾电量和发热，最高的几个档位也仅在桌面端开放。上面的方案依然适用，只是手机最高到“高”为止。',
   'guide.combat.intro':
     '战斗遵循经典 MMO 中熟悉的规则。你完全不必钻研这些就能玩得很好,这里只是介绍一下战斗大致的运作方式。',
   'guide.combat.hitTitle': '并非每次攻击都能命中',
@@ -5414,6 +5500,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.crafting.title': '制作',
+  'hudChrome.crafting.close': '关闭制作',
+  'hudChrome.crafting.craft': '制作',
+  'hudChrome.crafting.reagentsNeeded': '需要:',
+  'hudChrome.crafting.empty': '尚无已知配方。',
+  'hudChrome.crafting.resultAria': '制作{name}',
+  'hudChrome.crafting.craftedToast': '已制作:{name}',
+  'hudChrome.crafting.insufficientMaterials': '你没有足够的材料。',
+  'hudChrome.crafting.unknownRecipe': '该配方不存在。',
   // apiError.* server error-code catalog (M16 non-Latin fill, Phase 22)
   'apiError.validation.failed': '部分字段无效。请检查表单后重试。',
   'apiError.json.malformed': '无法读取该请求。请重试。',
@@ -5616,4 +5711,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.sigil_of_flame': '恶魔猎手技巧。',
   'guide.abilityHook.eye_beam': '恶魔猎手技巧。',
   'guide.abilityHook.metamorphosis': '恶魔猎手技巧。',
+  // Release v0.22.0 locale fill.
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+
 };

@@ -17,6 +17,7 @@ import {
 } from '../content/professions';
 import type { Rng } from '../rng';
 import type { ItemDef, ItemUse } from '../types';
+import type { MaterialRarity } from './gathering';
 
 export interface GatherToolUse {
   type: 'gatherTool';
@@ -83,19 +84,38 @@ export interface ToolEffectSlot {
   effectId: ToolEffectId;
   /** Remaining charges. Reaches 0 when the effect is fully depleted. */
   durability: number;
+  /**
+   * Player id of whoever produced this effect via the production craft that
+   * made it (#1137). Additive and optional: undefined means either no
+   * identity was recorded, or the slot predates this field. Recharging
+   * (below) reads this only to decide the original-crafter discount; it
+   * never gates the base tool or the bonus itself.
+   */
+  craftedBy?: string;
   /** How this slot's effect fires. Defaults to 'always' (see slotEffect). */
   confirmMode: ToolEffectConfirmMode;
 }
 
 // Attaches an effect from the catalog to a tool, at its full starting
 // durability. Re-slotting (calling this again) always resets to full charges,
-// same as installing a fresh effect. `confirmMode` defaults to 'always' so a
-// caller that never touches the new config gets #1136's exact prior behavior.
+// same as installing a fresh effect. `craftedBy` (#1137) records the player
+// id of the production craft that made this effect, if known; omit it when no
+// identity is available (the slot is then never eligible for the
+// original-crafter recharge discount). `confirmMode` (#1138) defaults to
+// 'always' so a caller that never touches the new config gets #1136's exact
+// prior behavior. Keyword options (not positional) so a future third option
+// can't silently rebind an existing one.
 export function slotEffect(
   effectId: ToolEffectId,
-  confirmMode: ToolEffectConfirmMode = 'always',
+  options: { craftedBy?: string; confirmMode?: ToolEffectConfirmMode } = {},
 ): ToolEffectSlot {
-  return { effectId, durability: TOOL_EFFECTS[effectId].startingDurability, confirmMode };
+  const { craftedBy, confirmMode = 'always' } = options;
+  return {
+    effectId,
+    durability: TOOL_EFFECTS[effectId].startingDurability,
+    craftedBy,
+    confirmMode,
+  };
 }
 
 // The outcome shape a harvest/craft action produces. `quantity`/`quality` are
@@ -130,22 +150,141 @@ export function applyEffectBonus(
   }
 }
 
+// Rarity-scaled effect durability consumption curve (#1139). The standard
+// rarity ladder (MaterialRarity: common/uncommon/rare/epic/legendary, see
+// gathering.ts) orders both a tool's own rarity (ItemDef `quality`) and the
+// rarity of the target being worked (a harvested material's rolled rarity, a
+// node's rarity, or any future rarity-bearing target). This fixed order is
+// the only input to the consumption roll below.
+const RARITY_ORDER: readonly MaterialRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+
+function rarityTierIndex(rarity: MaterialRarity): number {
+  return RARITY_ORDER.indexOf(rarity);
+}
+
+// Chance floor: even a tool many tiers above its target still spends a charge
+// sometimes, so a high-end tool never becomes fully "free" against trash
+// targets.
+export const CONSUMPTION_CHANCE_FLOOR = 0.1;
+
+// Chance lost per tier of gap between the tool's rarity and the (lower)
+// target's rarity. Tuned to the issue's worked example for an epic tool:
+//   epic vs epic   (tierGap 0, tool NOT above target): 100% (1 - 0.4*0, but
+//                    clamped to 1 below since a non-positive gap always consumes)
+//   epic vs rare   (tierGap 1): 1 - 0.4*1 = 0.6  (60%)
+//   epic vs common (tierGap 3): 1 - 0.4*3 = -0.2, floored to 0.1 (10%)
+// A two-tier gap (e.g. epic vs uncommon) lands at 1 - 0.4*2 = 0.2 (20%),
+// interpolating smoothly between the worked example's anchor points.
+const CONSUMPTION_CHANCE_STEP = 0.4;
+
+// Pure: the chance a single use spends one durability charge, given the
+// tool's rarity and the rarity of what it is being used on. Against an
+// equal-or-higher-rarity target (tierGap <= 0) a charge is ALWAYS spent: the
+// curve only ever discounts consumption when the tool outclasses its target,
+// never the reverse. See the worked example above for the anchor values this
+// formula was tuned against.
+export function effectConsumptionChance(
+  toolRarity: MaterialRarity,
+  targetRarity: MaterialRarity,
+): number {
+  const tierGap = rarityTierIndex(toolRarity) - rarityTierIndex(targetRarity);
+  if (tierGap <= 0) return 1;
+  return Math.max(CONSUMPTION_CHANCE_FLOOR, 1 - CONSUMPTION_CHANCE_STEP * tierGap);
+}
+
 // Rolls whether this use depletes the slotted effect by one charge. Depletion
-// is PROBABILISTIC (per the effect's `depletionChance`), not a flat -1 per
-// use, so every decrement goes through `Rng.chance` (never Math.random): the
-// draw always happens (even at durability 0, where it is a no-op) so calling
-// this in a fixed order across a fixed rng seed always produces the same
-// depletion sequence, independent of an effect's remaining charges. Mutates
-// `slot.durability` in place and returns whether it decremented this call.
-export function depleteEffect(slot: ToolEffectSlot | undefined, rng: Rng): boolean {
+// is PROBABILISTIC (per `effectConsumptionChance(toolRarity, targetRarity)`),
+// not a flat -1 per use, so every decrement goes through `Rng.chance` (never
+// Math.random): the draw always happens (even at durability 0, where it is a
+// no-op) so calling this in a fixed order across a fixed rng seed always
+// produces the same depletion sequence, independent of an effect's remaining
+// charges. Mutates `slot.durability` in place and returns whether it
+// decremented this call.
+export function depleteEffect(
+  slot: ToolEffectSlot | undefined,
+  toolRarity: MaterialRarity,
+  targetRarity: MaterialRarity,
+  rng: Rng,
+): boolean {
   if (!slot) return false;
-  const def = TOOL_EFFECTS[slot.effectId];
-  const rolled = rng.chance(def.depletionChance);
+  const rolled = rng.chance(effectConsumptionChance(toolRarity, targetRarity));
   if (rolled && slot.durability > 0) {
     slot.durability -= 1;
     return true;
   }
   return false;
+}
+
+// Effect recharge (#1137). A depleted (or partially depleted) effect can be
+// restored to full durability by recharging it through the production craft
+// that made it, or through a generic Enchanter/Scribe. Recharging through the
+// effect's ORIGINAL crafter (the `craftedBy` recorded on the slot at
+// `slotEffect` time) is cheaper and faster than a generic recharge: this is
+// the whole point of recording `craftedBy` on the slot. Both costs are fixed
+// multiples of the same base cost, so the discount can never invert.
+export interface RechargeCost {
+  /** Crafting materials consumed by the recharge. */
+  materials: number;
+  /** Ticks (20 Hz) the recharge takes to complete. */
+  ticks: number;
+}
+
+// Base cost for a generic Enchanter/Scribe recharge, before the
+// original-crafter discount is considered.
+const RECHARGE_BASE_MATERIALS = 4;
+const RECHARGE_BASE_TICKS = 20 * 30; // 30 seconds
+
+// The original crafter pays half the materials and half the time of a
+// generic recharge. Kept as one named fraction so both halves of the
+// discount can never drift apart.
+const ORIGINAL_CRAFTER_DISCOUNT = 0.5;
+
+// True only when the slot recorded who crafted the effect AND that identity
+// matches the player attempting the recharge. A slot with no recorded
+// `craftedBy` (an effect slotted before #1137, or with no known crafter) is
+// never eligible for the discount, so it always costs the generic rate.
+export function isOriginalCrafter(slot: ToolEffectSlot, rechargerId: string): boolean {
+  return slot.craftedBy !== undefined && slot.craftedBy === rechargerId;
+}
+
+// Pure: the materials/time a recharge of this slot would cost `rechargerId`.
+// Strictly less for the original crafter than for anyone else (a generic
+// Enchanter/Scribe), on both dimensions.
+export function rechargeCost(slot: ToolEffectSlot, rechargerId: string): RechargeCost {
+  const discount = isOriginalCrafter(slot, rechargerId) ? ORIGINAL_CRAFTER_DISCOUNT : 1;
+  return {
+    materials: Math.ceil(RECHARGE_BASE_MATERIALS * discount),
+    ticks: Math.ceil(RECHARGE_BASE_TICKS * discount),
+  };
+}
+
+export interface RechargeResult {
+  /** False when `materialsProvided` did not cover the computed cost. */
+  success: boolean;
+  cost: RechargeCost;
+}
+
+// Attempts to recharge `slot` for `rechargerId`, consuming
+// `materialsProvided`. On success, durability is restored to the effect's
+// full starting value (same as a fresh `slotEffect`) so `applyEffectBonus`
+// resumes applying its bonus immediately; `craftedBy` is left untouched, so a
+// recharge never changes who the slot's original crafter is. On failure
+// (insufficient materials) the slot is not mutated at all. The caller is
+// responsible for actually deducting `cost.materials` from the recharger's
+// inventory and for gating `cost.ticks` as craft-time, same as any other
+// production craft; this module only computes the cost and applies the
+// durability restore.
+export function rechargeEffect(
+  slot: ToolEffectSlot,
+  rechargerId: string,
+  materialsProvided: number,
+): RechargeResult {
+  const cost = rechargeCost(slot, rechargerId);
+  if (materialsProvided < cost.materials) {
+    return { success: false, cost };
+  }
+  slot.durability = TOOL_EFFECTS[slot.effectId].startingDurability;
+  return { success: true, cost };
 }
 
 // The outcome of attempting to use a slotted effect for one harvest/craft
@@ -158,10 +297,11 @@ export interface ToolEffectUseResult {
   applied: boolean;
 }
 
-// The always/prompt-on-use confirmation gate (#1138). This is the ONE call
-// site a harvest/craft outcome path should use to apply a slotted effect: it
-// wraps `applyEffectBonus` + `depleteEffect` behind the slot's `confirmMode`,
-// so callers never need to hand-roll the gate.
+// The always/prompt-on-use confirmation gate (#1138), extended for the
+// rarity-scaled consumption curve (#1139). This is the ONE call site a
+// harvest/craft outcome path should use to apply a slotted effect: it wraps
+// `applyEffectBonus` + `depleteEffect` behind the slot's `confirmMode`, so
+// callers never need to hand-roll the gate.
 //
 // - `confirmMode: 'always'` (the default from `slotEffect`): behaves EXACTLY
 //   like #1136 before this issue existed. `confirmed` is ignored; the bonus
@@ -172,9 +312,16 @@ export interface ToolEffectUseResult {
 //   nothing happens at all. No charge is spent AND no bonus is applied: the
 //   base outcome passes through unchanged, and the base harvest/craft action
 //   itself is unaffected either way (this function never touches it).
+//
+// `toolRarity`/`targetRarity` feed straight into `depleteEffect`'s rarity-gap
+// consumption curve; `toolRarity` is the base tool's own `ItemDef.quality`,
+// `targetRarity` is the rarity of whatever is being worked (e.g. the
+// harvested material's `rollMaterialRarity` result).
 export function resolveToolEffectUse(
   slot: ToolEffectSlot | undefined,
   outcome: HarvestOutcome,
+  toolRarity: MaterialRarity,
+  targetRarity: MaterialRarity,
   rng: Rng,
   confirmed: boolean,
 ): ToolEffectUseResult {
@@ -183,19 +330,24 @@ export function resolveToolEffectUse(
     return { outcome, depleted: false, applied: false };
   }
   const bonused = applyEffectBonus(slot, outcome);
-  const depleted = depleteEffect(slot, rng);
+  const depleted = depleteEffect(slot, toolRarity, targetRarity, rng);
   return { outcome: bonused, depleted, applied: true };
 }
 
-// INTEGRATION NOTE (#1136, extended by #1138): the node-harvest outcome path
-// (#1121) and the recipe-crafting outcome path (#1127) are not present on
-// this branch (this branch is stacked directly on #1135, the crafted-tool-
-// tiers PR), so there is no live call site to wire `resolveToolEffectUse`
-// into yet. Once either lands, its outcome-producing function should: build
-// the base HarvestOutcome, then call `resolveToolEffectUse(slot, outcome,
-// rng, confirmed)` using the SAME `Rng` the caller already draws from (never
-// a fresh one) so the depletion roll (when it fires) takes its place in the
-// one shared draw order. `confirmed` should come from the player's client
-// request for a 'prompt' slot (see the tool/effect UI toggle); a caller with
-// no confirmation flow yet can pass `true` unconditionally, which is
-// equivalent to every slot behaving as 'always'.
+// INTEGRATION NOTE (#1136, extended by #1137 and #1138, consumption curve
+// added by #1139): the node-harvest outcome path (#1121) and the
+// recipe-crafting outcome path (#1127) are not present on this branch (this
+// branch is stacked directly on #1135, the crafted-tool-tiers PR), so there
+// is no live call site to wire `resolveToolEffectUse`/`rechargeEffect` into
+// yet. Once either lands, its outcome-producing function should: build the
+// base HarvestOutcome, then call `resolveToolEffectUse(slot, outcome,
+// toolRarity, targetRarity, rng, confirmed)` using the SAME `Rng` the caller
+// already draws from (never a fresh one) so the depletion roll (when it
+// fires) takes its place in the one shared draw order. `confirmed` should
+// come from the player's client request for a 'prompt' slot (see the
+// tool/effect UI toggle); a caller with no confirmation flow yet can pass
+// `true` unconditionally, which is equivalent to every slot behaving as
+// 'always'. `rechargeEffect` (#1137) has the same no-live-call-site status:
+// once a production/recharge UI action exists, it should deduct
+// `cost.materials` from the recharger's inventory and gate `cost.ticks` as
+// craft time before calling `rechargeEffect`.

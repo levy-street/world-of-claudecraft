@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -19,7 +20,7 @@ import { WS_BACKPRESSURE_LIMIT_BYTES } from '../server/ws_backpressure';
 
 // A fake socket whose unflushed buffer size and lifecycle we control. send()
 // records frames; terminate() flips readyState and fires the 'close' handler
-// the real WebSocketServer wires to game.leave().
+// the real WebSocketServer wires to game.socketClosed().
 function fakeWs(bufferedAmount: number) {
   const sent: string[] = [];
   const ws: any = {
@@ -49,15 +50,18 @@ describe('WebSocket send backpressure', () => {
     server = new GameServer();
   });
 
-  it('terminates a session whose outbound buffer has grown past the limit', () => {
+  it('terminates a saturated session into the linkdead grace, not a full logout', () => {
     const ws = fakeWs(WS_BACKPRESSURE_LIMIT_BYTES + 1);
     const session = join(server, ws, 1, 'Stuck');
 
     (server as any).broadcastSnapshots();
 
     expect(ws.terminated).toBe(true);
-    expect(session.left).toBe(true);
-    expect((server as any).clients.has(session.pid)).toBe(false);
+    // a stuck reader is a network-quality problem: the character is held
+    // in-world (linkdead) so the client can reconnect and resume
+    expect(session.left).toBe(false);
+    expect(session.linkdead).toBe(true);
+    expect((server as any).clients.has(session.pid)).toBe(true);
     // nothing was pushed onto the already-saturated buffer
     expect(ws.sent.length).toBe(0);
   });

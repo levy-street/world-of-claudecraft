@@ -4151,8 +4151,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Auto-Laufen',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik aus',
-  'hudChrome.mobile.hotbarPage': 'Fähigkeiten',
-  'hudChrome.mobile.hotbarPageAria': 'Nächste Fähigkeitengruppe anzeigen',
   'hudChrome.mobile.jump': 'Springen',
   'hudChrome.mobile.leaderboard': 'Rangliste',
   'hudChrome.mobile.nameplates': 'Namen',
@@ -6108,4 +6106,117 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Starte zuerst die Zwei-Faktor-Einrichtung.',
   'apiError.validation.failed':
     'Einige Felder sind ungültig. Prüfe das Formular und versuche es erneut.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Für Linux herunterladen',
+  'download.linuxHint':
+    'AppImage: Machen Sie es ausführbar und führen Sie es dann aus. Keine Installation erforderlich.',
+  'loading.reconnecting': 'Verbindung verloren. Verbindung wird wieder hergestellt...',
+  'guide.nav.settings': 'Einstellungen und Leistung',
+  'guide.settingsPage.advancedBody':
+    '„Advanced“ beginnt mit der High-Stufe und schaltet vier zusätzliche Auswahlmöglichkeiten frei, sodass Sie Ihre Frames dort platzieren können, wo Sie sie tatsächlich bemerken: Geländedetails, Laubdichte, Effekte und Beleuchtung sowie Schattenqualität. Sie gelten ebenso wie die Grafikqualität nach einem Neuladen.',
+  'guide.settingsPage.advancedHeading': 'Das Advanced-Preset: Mischen Sie Ihr eigenes',
+  'guide.settingsPage.advancedMixes':
+    'Zwei Lieblingsmischungen: Behalten Sie „Schattenqualität“ auf High bei und stellen Sie „Effekte und Beleuchtung“ auf Low ein, um einen klaren, schimmerfreien Look mit hellem Verlauf zu erzielen, oder machen Sie den umgekehrten Weg, um die Blüte beizubehalten und die Schatten weicher zu machen.',
+  'guide.settingsPage.balancedTagline':
+    'Der Sweet Spot für die meisten Maschinen und unser Standardratschlag.',
+  'guide.settingsPage.balancedTitle': 'Ausgewogen',
+  'guide.settingsPage.balancedWhy':
+    'Medium bringt echte Schatten und vollständige Materialien; High fügt Ambient Occlusion und Bloom hinzu. Unterhalb von Ultra fängt ein eingebautes Sicherheitsnetz plötzliche Einbrüche bei geschäftigen Kämpfen ab, sodass Balanced reibungslos bleibt, ohne dass man aufpassen muss.',
+  'guide.settingsPage.colDoes': 'Was es bewirkt',
+  'guide.settingsPage.colImpact': 'FPS Auswirkungen',
+  'guide.settingsPage.colSetting': 'Einstellung',
+  'guide.settingsPage.factDetectBody':
+    'Beim ersten Start erkennt das Spiel Ihr Gerät und wählt eine sinnvolle Stufe aus, von Low auf einem einfachen Telefon bis Ultra auf einem leistungsstarken Desktop. Jede Entscheidung, die Sie selbst treffen, gewinnt immer.',
+  'guide.settingsPage.factDetectTitle': 'Das Spiel stimmt sich zunächst selbst ab',
+  'guide.settingsPage.factGovernorBody':
+    'Auf jeder Stufe unter Ultra lichtet das Spiel still und leise Gras, Effekte und Beleuchtung für einen Moment, wenn ein großer Kampf zunimmt, und stellt sie dann wieder her. Wenn Sie Ultra wählen, bedeutet dies, dass Sie lieber jedes Detail behalten möchten.',
+  'guide.settingsPage.factGovernorTitle': 'Ein eingebautes Sicherheitsnetz',
+  'guide.settingsPage.factReloadBody':
+    'Die Auswahl „Grafikqualität“ und „Erweitert“ werden nach einem Neuladen wirksam und das Bedienfeld bietet bei Bedarf die Schaltfläche „Jetzt neu laden“. Jede andere Option gilt in dem Moment, in dem Sie sie ändern.',
+  'guide.settingsPage.factReloadTitle': 'Zwei Arten von Optionen',
+  'guide.settingsPage.fairnessBody':
+    'Hier gibt es keine Möglichkeit, Schönheit gegen Macht einzutauschen. Lower-Einstellungen verlieren nur kosmetischen Glanz, niemals Informationen, mit denen Sie kämpfen: Ihre Debuffs, Zauberbalken, Gruppengesundheit und Schadenszahlen sind von Low bis Ultra identisch. Das Spielen auf einem bescheidenen Automaten ist niemals ein Handicap.',
+  'guide.settingsPage.fairnessTitle': 'Fair durch Design',
+  'guide.settingsPage.fpsTagline': 'Für ältere Laptops, integrierte Grafik und Akkubetrieb.',
+  'guide.settingsPage.fpsTitle': 'Bestes FPS',
+  'guide.settingsPage.fpsWhy':
+    'Die Grafikqualität ist der Hauptschalter und die Renderqualität der stärkste Schieberegler: Bei 70 % zeichnet die Welt etwa die Hälfte der Pixel, während die Benutzeroberfläche perfekt scharf bleibt.',
+  'guide.settingsPage.heading': 'Einstellungen und Leistung',
+  'guide.settingsPage.howHeading': 'Wie sich die Optionen verhalten',
+  'guide.settingsPage.impactHeavy': 'Schwer',
+  'guide.settingsPage.impactLight': 'Licht',
+  'guide.settingsPage.impactModerate': 'Mäßig',
+  'guide.settingsPage.impactNone': 'Keiner',
+  'guide.settingsPage.intro':
+    'Sorgen Sie dafür, dass das Spiel optimal aussieht oder am schnellsten läuft. Drei vorgefertigte Loadouts, plus was jede Grafikoption wirklich kann.',
+  'guide.settingsPage.loadoutsHeading': 'Drei fertige Loadouts',
+  'guide.settingsPage.loadoutsIntro':
+    'Beginnen Sie mit der Ausstattung, die Ihrer Maschine ähnelt, und passen Sie dann eine Option nach der anderen an, bis sie sich richtig anfühlt.',
+  'guide.settingsPage.mobileBody':
+    'Mobile verwaltet mehr für Sie: Das Spiel wählt die Stufe aus, hält die Auflösung etwas niedriger, um den Akku und die Hitze zu schonen, und behält die höchsten Stufen nur für den Desktop bei. Die oben genannten Loadouts gelten weiterhin; Telefone sind bei High einfach leer.',
+  'guide.settingsPage.mobileTitle': 'Auf Handys und Tablets',
+  'guide.settingsPage.recommended': 'Empfohlen',
+  'guide.settingsPage.rowBrightness': 'Szenenbelichtung, dunkler oder heller. Reine Vorliebe.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Wie ausgefallen das Interface selbst sein darf: Glasunschärfe, Leuchten, animierte Menüs. Passt automatisch zu Ihrem Browser; Die 3D-Welt bleibt so oder so unberührt.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Blüte, Umgebungsokklusion und wie viele Fackeln und Zaubersprüche echtes Licht werfen. Die größte Ersparnis unter den Advanced Pickern.',
+  'guide.settingsPage.rowFieldOfView':
+    'Wie viel von der Welt passt auf den Bildschirm, von gezoomten 55 bis hin zu schwungvollen 100 Grad? Eine komfortable Wahl; breitere Ansichten ziehen etwas mehr an.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Wie weit und wie dicht das Gras um deinen Charakter herum wächst.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Ein verschwommenes Milchglas hinter den Fenstern. Hübsch und genau der Effekt, den ein schwächerer Browser empfindet. Lassen Sie es weg, um den klassischen, klaren Look zu erhalten.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Der Hauptschalter. Jeder Schritt ändert gemeinsam Auflösung, Schatten, Materialien, Blattwerk und Lichteffekte. Der größte einzelne Unterschied, den Sie machen können.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Eine Bildschirmanzeige von FPS, Frame-Time und mehr. Schalten Sie es ein, während Sie diese Seite optimieren, und blenden Sie es dann wieder aus.',
+  'guide.settingsPage.rowReduceMotion':
+    'Entfernt Schnittstellenanimationen, sodass Fenster sofort angezeigt werden. Zunächst eine Barrierefreiheitsoption mit einem kleinen Leistungsbonus.',
+  'guide.settingsPage.rowRenderQuality':
+    'Zeichnet die 3D-Welt mit einer niedrigeren internen Auflösung und skaliert sie; Die Schnittstelle bleibt scharf. Der stärkste Sofort-Slider auf schwächeren Maschinen und hochauflösenden Bildschirmen.',
+  'guide.settingsPage.rowShadowQuality':
+    'Schattenschärfe. Low behält die Schatten bei, mildert aber ihre Kanten.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Reichhaltige, gemischte Bodentexturen im Vergleich zu einem einfacheren, schnelleren Gelände-Look.',
+  'guide.settingsPage.rowWeather':
+    'Umgebungsregen und Schnee. Nur Atmosphäre, und das Ausschalten spart bei Gewittern ein wenig.',
+  'guide.settingsPage.tableFoot':
+    'Suchen Sie nach einem Schieberegler für die Zugentfernung oder einer FPS-Kappe? Es gibt nichts, wonach Sie suchen müssen: Der Betrachtungsabstand ist Teil jeder Qualitätsstufe und die Bildgeschwindigkeit folgt Ihrer Anzeige.',
+  'guide.settingsPage.tableHeading': 'Jede Option, erklärt',
+  'guide.settingsPage.tagReload': 'nach dem Neuladen',
+  'guide.settingsPage.value100': '100 %',
+  'guide.settingsPage.value50to70': '50 bis 70 %',
+  'guide.settingsPage.value90to100': '90 bis 100 %',
+  'guide.settingsPage.valueHighOrMedium': 'High auf einem Gaming-PC, Medium auf einem Laptop',
+  'guide.settingsPage.valueOnOptional': 'Ein (optional)',
+  'guide.settingsPage.visualsTagline': 'Screenshot-Modus für leistungsstarke Desktop-Rechner.',
+  'guide.settingsPage.visualsTitle': 'Beste Visuals',
+  'guide.settingsPage.visualsWhy':
+    'Ultra rendert mit der höchsten Auflösung, die Ihr Display bietet, mit der sattesten Beleuchtung. Es schaltet auch das Sicherheitsnetz aus und ist nur für den Desktop verfügbar: Telefone und die App sind ab High verfügbar.',
+  'guide.settingsPage.wherePath':
+    'Alles auf dieser Seite lebt im Spiel: Drücken Sie Esc und sehen Sie sich Grafik, Benutzeroberfläche und Leistungsüberlagerung an.',
+  'guide.settingsPage.whyLabel': 'Warum es funktioniert:',
+  'hudChrome.crafting.close': 'Enges Basteln',
+  'hudChrome.crafting.craft': 'Handwerk',
+  'hudChrome.crafting.craftedToast': 'Hergestellt: {name}',
+  'hudChrome.crafting.empty': 'Noch keine Rezepte bekannt.',
+  'hudChrome.crafting.insufficientMaterials': 'Dafür fehlen Ihnen die Materialien.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Erfordert:',
+  'hudChrome.crafting.resultAria': 'Basteln {name}',
+  'hudChrome.crafting.title': 'Basteln',
+  'hudChrome.crafting.unknownRecipe': 'Dieses Rezept existiert nicht.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Ein Handwerk, das Sie Ihr Eigen nennen können',
+  'entities.quests.q_archetype_acceptance.text':
+    'Jeder Kunsthandwerker aus Eastbrook entscheidet sich schließlich für ein Handwerk, das er sein Eigen nennen kann. Beweisen Sie sich mit einer einzigen Tat, {playerName}, und erklären Sie Ihren Weg.',
+  'entities.quests.q_archetype_acceptance.completion': 'Dein Weg ist gewählt; geh gut damit.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Waldwolf getötet',
+  'entities.quests.q_prof_make_amends.title': 'Wiedergutmachung leisten',
+  'entities.quests.q_prof_make_amends.text':
+    'Um ein Handwerk einem anderen zu überlassen, muss ein Handwerker zunächst den nicht gegangenen Weg wiedergutmachen, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Änderungen vorgenommen; ein neuer Weg steht dir offen.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Waldwolf getötet',
 };

@@ -43,7 +43,7 @@ import {
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
-import { groundHeight, waterLevel } from '../world';
+import { groundHeight, waterLevelAt } from '../world';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget, updateMobTarget } from './targeting';
 import { emitMobYell } from './yells';
@@ -696,7 +696,7 @@ export function blockedTowardSpawn(ctx: SimContext, e: Entity, dest: Vec3): bool
   const nz = e.pos.z + Math.cos(facing) * step;
   if (
     !ctx.mobCanSwim(MOBS[e.templateId]) &&
-    groundHeight(nx, nz, ctx.cfg.seed) < waterLevel() - SWIM_DEPTH
+    groundHeight(nx, nz, ctx.cfg.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH
   )
     return true;
   const resolved = ctx.resolveMovePoint(nx, nz, BODY_RADIUS, e);

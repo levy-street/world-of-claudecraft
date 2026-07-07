@@ -563,6 +563,10 @@ export interface MobTemplate {
   // Rare/miniboss controls.
   canSwim?: boolean;
   ccImmune?: boolean;
+  // Immune to movement-speed slow auras (kind 'slow'). Distinct from ccImmune, which
+  // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
+  // leaves snares landing so most elites can still be kited; a raid boss sets both.
+  slowImmune?: boolean;
   respawnMult?: number;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
@@ -1979,6 +1983,7 @@ export type SimEvent = { pid?: number } & (
   // delivers it to nearby players; anchorless logs broadcast server-wide
   | { type: 'log'; text: string; color?: string; entityId?: number }
   | { type: 'delveEntered'; delveId: string; tierId: string }
+  | { type: 'delveObjectiveComplete'; delveId: string; tierId: string }
   | { type: 'delveComplete'; delveId: string; tierId: string }
   | { type: 'delveFailed'; delveId: string; tierId: string }
   | { type: 'delveLoreUnlock'; loreId: string }
@@ -2024,7 +2029,15 @@ export type SimEvent = { pid?: number } & (
       lootTier?: LootTier;
     }
   | { type: 'lockpickBonus'; tier: LootTier; marks: number; copper: number }
-  | { type: 'delveChestLoot'; chestId: number; items: { itemId: string; count: number }[] }
+  | {
+      type: 'delveChestLoot';
+      chestId: number;
+      delveId: string;
+      tierId: string;
+      lootTier: LootTier;
+      bountiful: boolean;
+      items: { itemId: string; count: number }[];
+    }
   // Carries the shrine as `entityId` so the server's eventAnchor interest-scopes
   // the pulse to players near the apse instead of broadcasting it realm-wide
   // (the HUD closes the rite popup on the first pulse).
@@ -2043,6 +2056,19 @@ export type SimEvent = { pid?: number } & (
   // the server-rolled rank. Text-free on purpose — the client renders its own
   // localized copy, so no sim/server i18n matcher rule is needed.
   | { type: 'skinEvent'; rank: SkinRank; catalog?: SkinCatalog }
+  // Common-tier crafting outcome (#1127): mirrors CraftResult so the online
+  // client can reflect the local result of a craftItem command without
+  // deciding it itself. Text-free on purpose (see skinEvent above): the
+  // client renders its own localized copy off the structured fields.
+  | {
+      type: 'craftResult';
+      ok: boolean;
+      recipeId: string;
+      itemId?: string;
+      count?: number;
+      quality?: ItemDef['quality'];
+      reason?: 'unknown_recipe' | 'insufficient_materials';
+    }
 );
 
 export interface MoveInput {

@@ -44,10 +44,10 @@ export function scaledDefaultMobMeleeRange(scale: number): number {
   return MELEE_RANGE + Math.max(0, scale - 1) * 3;
 }
 
-// Thunzharr is rendered mountain-sized (scale 50 in zone3.ts) so he reads as a world
-// boss, but his melee reach must NOT follow that visual scale (a scale-50 body would
-// swing ~150yd and reach the whole raid, trivializing the Howling Gale anti-kite snare).
-// Pin his reach to a scale-5 body (~17yd): visual size and combat reach are decoupled.
+// Thunzharr is rendered oversized (scale 8 in zone3.ts) so he reads as a world boss, but
+// his melee reach must NOT follow that visual scale (a scale-8 body would swing far past
+// its model and reach kiters, trivializing the Howling Gale anti-kite snare). Pin his
+// reach to a scale-5 body (~17yd): visual size and combat reach are decoupled.
 const THUNZHARR_REACH_SCALE = 5;
 
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {

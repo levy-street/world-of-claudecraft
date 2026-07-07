@@ -441,6 +441,263 @@ describe('daily rewards', () => {
     expect(db.score).toBe(90);
   });
 
+  it('awards delve clear task points with level, tier, and online-time scaling', async () => {
+    const db = new FakeDailyRewardDb();
+    const service = new DailyRewardService(db);
+    resetDailyRewardPriceCacheForTests();
+    stubRewardConfig({
+      tasks: [
+        {
+          id: 'delve_clears',
+          type: 'delve_clear',
+          title: 'Clear delves',
+          description: 'Complete delves today.',
+          points: 15,
+          basePoints: 15,
+          sortOrder: 1,
+          active: true,
+          config: {
+            baseClearPoints: 15,
+            levelBaseline: 7,
+            pointsPerLevel: 1,
+            normalTierMultiplier: 1,
+            heroicTierMultiplier: 1.5,
+            lowChestPoints: 5,
+            mediumChestPoints: 10,
+            premiumChestPoints: 20,
+            bountifulChestMultiplier: 1.5,
+            minMultiplier: 1,
+            maxMultiplier: 3,
+            minutesPerMultiplier: 30,
+          },
+        },
+      ],
+    });
+    for (let minute = 0; minute < 60; minute += 1) {
+      await service.recordOnlineMinute(
+        1,
+        new Date(`2026-06-30T12:${String(minute).padStart(2, '0')}:00.000Z`),
+      );
+    }
+
+    await service.recordDelveClear(
+      1,
+      101,
+      'collapsed_reliquary',
+      'normal',
+      new Date('2026-06-30T13:00:00.000Z'),
+    );
+    await service.recordDelveClear(
+      1,
+      101,
+      'collapsed_reliquary',
+      'heroic',
+      new Date('2026-06-30T13:01:00.000Z'),
+    );
+    await service.recordDelveClear(
+      1,
+      101,
+      'drowned_litany',
+      'normal',
+      new Date('2026-06-30T13:02:00.000Z'),
+    );
+    await service.recordDelveClear(
+      1,
+      101,
+      'drowned_litany',
+      'heroic',
+      new Date('2026-06-30T13:03:00.000Z'),
+    );
+
+    const taskEvents = db.events.filter((event) => event.kind === 'task');
+    expect(taskEvents).toHaveLength(4);
+    expect(taskEvents[0]).toMatchObject({
+      points: 45,
+      key: 'task:delve_clears:delve:collapsed_reliquary:normal:character:101:2026-06-30T13:00:00.000Z',
+      meta: {
+        delveId: 'collapsed_reliquary',
+        tierId: 'normal',
+        onlineMinutes: 60,
+        multiplier: 3,
+        baseClearPoints: 15,
+        levelBonus: 0,
+        tierMultiplier: 1,
+        preOnlinePoints: 15,
+      },
+    });
+    expect(taskEvents[1]).toMatchObject({
+      points: 66,
+      meta: {
+        delveId: 'collapsed_reliquary',
+        tierId: 'heroic',
+        tierMultiplier: 1.5,
+        preOnlinePoints: 22,
+      },
+    });
+    expect(taskEvents[2]).toMatchObject({
+      points: 60,
+      meta: {
+        delveId: 'drowned_litany',
+        tierId: 'normal',
+        levelBonus: 5,
+        preOnlinePoints: 20,
+      },
+    });
+    expect(taskEvents[3]).toMatchObject({
+      points: 90,
+      meta: {
+        delveId: 'drowned_litany',
+        tierId: 'heroic',
+        tierMultiplier: 1.5,
+        preOnlinePoints: 30,
+      },
+    });
+    expect(db.score).toBe(261);
+  });
+
+  it('awards delve chest bonus points by chest tier with online-time scaling', async () => {
+    const db = new FakeDailyRewardDb();
+    const service = new DailyRewardService(db);
+    resetDailyRewardPriceCacheForTests();
+    stubRewardConfig({
+      tasks: [
+        {
+          id: 'delve_clears',
+          type: 'delve_clear',
+          title: 'Clear delves',
+          description: 'Complete delves today.',
+          points: 15,
+          basePoints: 15,
+          sortOrder: 1,
+          active: true,
+          config: {
+            lowChestPoints: 5,
+            mediumChestPoints: 10,
+            premiumChestPoints: 20,
+            bountifulChestMultiplier: 1.5,
+            minMultiplier: 1,
+            maxMultiplier: 3,
+            minutesPerMultiplier: 30,
+          },
+        },
+      ],
+    });
+    for (let minute = 0; minute < 30; minute += 1) {
+      await service.recordOnlineMinute(
+        1,
+        new Date(`2026-06-30T12:${String(minute).padStart(2, '0')}:00.000Z`),
+      );
+    }
+
+    await service.recordDelveChestOpen(
+      1,
+      101,
+      'collapsed_reliquary',
+      'normal',
+      'low',
+      false,
+      new Date('2026-06-30T13:00:00.000Z'),
+    );
+    await service.recordDelveChestOpen(
+      1,
+      101,
+      'collapsed_reliquary',
+      'normal',
+      'medium',
+      false,
+      new Date('2026-06-30T13:01:00.000Z'),
+    );
+    await service.recordDelveChestOpen(
+      1,
+      101,
+      'collapsed_reliquary',
+      'normal',
+      'premium',
+      true,
+      new Date('2026-06-30T13:02:00.000Z'),
+    );
+
+    const taskEvents = db.events.filter((event) => event.kind === 'task');
+    expect(taskEvents).toHaveLength(3);
+    expect(taskEvents[0]).toMatchObject({
+      points: 10,
+      meta: {
+        bonusType: 'delve_chest',
+        delveId: 'collapsed_reliquary',
+        tierId: 'normal',
+        chestTier: 'low',
+        bountiful: false,
+        onlineMinutes: 30,
+        multiplier: 2,
+        chestBasePoints: 5,
+        bountifulMultiplier: 1,
+        preOnlinePoints: 5,
+      },
+    });
+    expect(taskEvents[1]).toMatchObject({
+      points: 20,
+      meta: {
+        chestTier: 'medium',
+        chestBasePoints: 10,
+        preOnlinePoints: 10,
+      },
+    });
+    expect(taskEvents[2]).toMatchObject({
+      points: 60,
+      meta: {
+        chestTier: 'premium',
+        bountiful: true,
+        chestBasePoints: 20,
+        bountifulMultiplier: 1.5,
+        preOnlinePoints: 30,
+      },
+    });
+    expect(db.score).toBe(90);
+  });
+
+  it('does not award delve clear task points when locked or unconfigured', async () => {
+    const db = new FakeDailyRewardDb();
+    const service = new DailyRewardService(db);
+    resetDailyRewardPriceCacheForTests();
+    stubRewardConfig({
+      tasks: [
+        {
+          id: 'delve_clears',
+          type: 'delve_clear',
+          title: 'Clear delves',
+          description: 'Complete delves today.',
+          points: 15,
+          basePoints: 15,
+          sortOrder: 1,
+          active: true,
+          config: {},
+        },
+      ],
+    });
+
+    balanceMock.value = 0;
+    await service.recordDelveClear(
+      1,
+      101,
+      'collapsed_reliquary',
+      'normal',
+      new Date('2026-06-30T13:00:00.000Z'),
+    );
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+
+    balanceMock.value = 50;
+    resetDailyRewardPriceCacheForTests();
+    stubRewardConfig({ tasks: [] });
+    await service.recordDelveClear(
+      1,
+      101,
+      'collapsed_reliquary',
+      'normal',
+      new Date('2026-06-30T13:01:00.000Z'),
+    );
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+  });
+
   it('uses a non-linear top-heavy payout split that sums to all prizes', () => {
     const splits = dailyRewardPayoutSplits();
     expect(splits).toEqual([0.2, 0.15, 0.12, 0.1, 0.09, 0.08, 0.075, 0.07, 0.065, 0.05]);

@@ -388,8 +388,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': 'Показывать уровень предмета',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',
   'hudChrome.options.showDailyRewardsChest': 'Показывать сундук ежедневных наград',
-  'hudChrome.options.mobileCameraJoystick': 'Джойстик камеры',
-  'hudChrome.options.mobileLeftHanded': 'Раскладка для левшей',
   'hudChrome.options.itemLevelLine': 'Уровень предмета {level}',
   'hudChrome.options.itemScoreLine': 'Оценка {score}',
   'hudChrome.landing.highContrast': 'Высокая контрастность',
@@ -553,6 +551,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'news.desc': 'Читайте описание последних обновлений, информацию о событиях и новости сообщества.',
   'download.title': 'Скачать загрузчик для ПК',
   'download.macCta': 'Скачать для macOS',
+  'download.linuxCta': 'Скачать для Linux',
+  'download.linuxHint':
+    'Формат AppImage: сделайте файл исполняемым и запустите его, установка не требуется.',
   'download.windowsPending': 'Сборка для Windows готовится.',
   'download.desc':
     'Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.',
@@ -829,6 +830,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.enterTimeout':
     'Не удалось войти в мир. Время подключения истекло. Запущен ли игровой сервер?',
   'loading.connectionLost': 'Соединение с сервером потеряно.',
+  'loading.reconnecting': 'Соединение потеряно. Повторное подключение...',
   'loading.connectionRejected': 'Сервер закрыл соединение.',
   'errors.nothingInteract': 'Нет объекта для взаимодействия.',
   'errors.noEnemyNearby': 'Рядом нет врагов.',
@@ -3062,6 +3064,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.completion':
     'Моггер наконец мертв. Поля Истврука стали безопаснее, а вы покидаете долину с еще одной историей, достойной пересказа.',
   'entities.quests.q_mogger.objectives.0.label': 'Моггер убит',
+  'entities.quests.q_archetype_acceptance.title': 'Ремесло по душе',
+  'entities.quests.q_archetype_acceptance.text':
+    'Рано или поздно каждый ремесленник Иствуда выбирает одно ремесло своим призванием. Докажи себя одним делом, {playerName}, и объяви свой путь.',
+  'entities.quests.q_archetype_acceptance.completion': 'Твой путь избран; иди по нему с честью.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Лесной волк убит',
+  'entities.quests.q_prof_make_amends.title': 'Искупление',
+  'entities.quests.q_prof_make_amends.text':
+    'Чтобы оставить одно ремесло ради другого, ремесленник должен сперва искупить путь, которым не пошёл, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Искупление свершилось; перед тобой открыт новый путь.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Лесной волк убит',
   'entities.quests.q_drowned_choir.title': 'Утонувший хор',
   'entities.quests.q_drowned_choir.text':
     'Бродяги действуют не одни. Среди них ходят Утонувшие служители — культ, что затонул вместе с храмом, всё ещё в истлевших облачениях, всё ещё поющий молитву с прибрежных скал. Заставь умолкнуть восьмерых из них и принеси мне шесть подношений, что они несут. Хочу знать, что они задумали поднести своей богине.',
@@ -3529,18 +3542,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/с',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} сек.',
-  'hudChrome.mobile.actionPageToggle': 'Переключить страницу действий',
-  'hudChrome.mobile.actionRing': 'Боевые действия',
   'hudChrome.mobile.autorun': 'Автобег',
   'hudChrome.mobile.haptics': 'Вибрация',
   'hudChrome.mobile.hapticsOff': 'Вибрация выкл.',
-  'hudChrome.mobile.hotbarPage': 'Навыки',
-  'hudChrome.mobile.hotbarPageAria': 'Показать следующий набор навыков',
   'hudChrome.mobile.jump': 'Прыжок',
   'hudChrome.mobile.leaderboard': 'Рейтинг',
   'hudChrome.mobile.nameplates': 'Имена',
-  'hudChrome.mobile.targetCycle': 'Сменить цель',
-  'hudChrome.mobile.targetCycleShort': 'Цель',
   'hudChrome.mobile.toggleHaptics': 'Вкл/выкл вибрацию',
   'hudChrome.rest.resting': 'Отдых',
   'hudChrome.swing.ready': 'Замах',
@@ -3826,6 +3833,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.nav.dungeons': 'Подземелья и рейды',
   'guide.nav.reference': 'Справочник',
   'guide.nav.controls': 'Управление',
+  'guide.nav.settings': 'Настройки и производительность',
   'guide.nav.combat': 'Бой',
   'guide.nav.glossary': 'Глоссарий',
   'guide.nav.faq': 'ЧаВо',
@@ -3973,6 +3981,91 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.mobileHeading': 'На мобильных устройствах',
   'guide.controls.mobileBody':
     'На телефонах и планшетах сенсорное управление появляется автоматически: джойстик передвижения слева, перетаскивание в любой точке справа для обзора и экранные кнопки для способностей и меню.',
+  'guide.settingsPage.heading': 'Настройки и производительность',
+  'guide.settingsPage.intro':
+    'Настройте игру на максимум красоты или на максимум скорости. Три готовых набора настроек, а также объяснение, что на самом деле делает каждый графический параметр.',
+  'guide.settingsPage.wherePath':
+    'Все, о чем рассказывает эта страница, находится прямо в игре: нажмите Esc и загляните в разделы «Графика», «Интерфейс» и «Оверлей производительности».',
+  'guide.settingsPage.fairnessTitle': 'Честность по замыслу',
+  'guide.settingsPage.fairnessBody':
+    'Ни одна настройка здесь не разменивает красоту на игровое преимущество. Низкие уровни убирают только косметический лоск и никогда не отнимают информацию, которой вы сражаетесь: ваши дебаффы, полосы применения заклинаний, здоровье группы и цифры урона одинаковы что на уровне «Низкое», что на «Ультра». Скромная машина никогда не ставит вас в невыгодное положение.',
+  'guide.settingsPage.loadoutsHeading': 'Три готовых набора настроек',
+  'guide.settingsPage.loadoutsIntro':
+    'Начните с набора, который лучше всего описывает вашу машину, а затем меняйте по одной настройке за раз, пока результат вас не устроит.',
+  'guide.settingsPage.recommended': 'Рекомендуем',
+  'guide.settingsPage.whyLabel': 'Почему это работает:',
+  'guide.settingsPage.tagReload': 'после перезагрузки',
+  'guide.settingsPage.fpsTitle': 'Максимум FPS',
+  'guide.settingsPage.fpsTagline': 'Для старых ноутбуков, встроенной графики и игры от батареи.',
+  'guide.settingsPage.fpsWhy':
+    '«Качество графики» служит главным переключателем, а «Качество рендера» остается самым сильным ползунком: при 70% мир отрисовывается примерно вдвое меньшим числом пикселей, а интерфейс сохраняет идеальную четкость.',
+  'guide.settingsPage.balancedTitle': 'Баланс',
+  'guide.settingsPage.balancedTagline':
+    'Золотая середина для большинства машин и наш совет по умолчанию.',
+  'guide.settingsPage.balancedWhy':
+    '«Среднее» включает настоящие тени и полноценные материалы, а «Высокое» добавляет объемное затенение и блум. На уровнях ниже «Ультра» встроенная подстраховка сглаживает внезапные просадки в жарких боях, поэтому «Баланс» остается плавным без лишней возни.',
+  'guide.settingsPage.visualsTitle': 'Лучшая картинка',
+  'guide.settingsPage.visualsTagline': 'Режим скриншотов для мощных настольных машин.',
+  'guide.settingsPage.visualsWhy':
+    '«Ультра» отрисовывает игру в самом высоком разрешении вашего экрана и с самым богатым освещением. Этот уровень также отключает встроенную подстраховку и доступен только на настольных компьютерах: телефоны и приложение ограничены уровнем «Высокое».',
+  'guide.settingsPage.value50to70': 'От 50 до 70%',
+  'guide.settingsPage.value90to100': 'От 90 до 100%',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.valueHighOrMedium': '«Высокое» на игровом ПК, «Среднее» на ноутбуке',
+  'guide.settingsPage.valueOnOptional': 'Вкл. (по желанию)',
+  'guide.settingsPage.howHeading': 'Как ведут себя настройки',
+  'guide.settingsPage.factDetectTitle': 'Игра сначала настраивается сама',
+  'guide.settingsPage.factDetectBody':
+    'При первом запуске игра оценивает ваше устройство и подбирает разумный уровень: от уровня «Низкое» на скромном телефоне до «Ультра» на мощном настольном компьютере. Но любой ваш собственный выбор всегда важнее автоматики.',
+  'guide.settingsPage.factReloadTitle': 'Два типа настроек',
+  'guide.settingsPage.factReloadBody':
+    '«Качество графики» и параметры пресета «Расширенное» вступают в силу после перезагрузки, и при необходимости панель предложит кнопку «Перезагрузить сейчас». Все остальные настройки применяются в тот же момент, как вы их меняете.',
+  'guide.settingsPage.factGovernorTitle': 'Встроенная подстраховка',
+  'guide.settingsPage.factGovernorBody':
+    'На любом уровне ниже «Ультра» игра при резком скачке нагрузки в большом бою незаметно и ненадолго упрощает траву, эффекты и освещение, а затем возвращает их обратно. Выбирая «Ультра», вы сообщаете ей, что предпочитаете сохранить каждую деталь.',
+  'guide.settingsPage.advancedHeading': 'Пресет «Расширенное»: соберите свое сочетание',
+  'guide.settingsPage.advancedBody':
+    'Пресет «Расширенное» начинается с уровня «Высокое» и открывает четыре дополнительных параметра, чтобы вы тратили кадры там, где действительно замечаете разницу: «Детализация местности», «Плотность растительности», «Эффекты и освещение» и «Качество теней». Как и «Качество графики», они применяются после перезагрузки.',
+  'guide.settingsPage.advancedMixes':
+    'Два любимых сочетания: оставьте «Качество теней» на уровне «Высокое», а «Эффекты и освещение» поставьте на «Низкое», чтобы получить четкую картинку без свечения, которая почти не нагружает машину; или сделайте наоборот, чтобы сохранить блум и смягчить тени.',
+  'guide.settingsPage.tableHeading': 'Все настройки с пояснениями',
+  'guide.settingsPage.colSetting': 'Параметр',
+  'guide.settingsPage.colDoes': 'Что делает',
+  'guide.settingsPage.colImpact': 'Влияние на FPS',
+  'guide.settingsPage.impactNone': 'Нет',
+  'guide.settingsPage.impactLight': 'Слабое',
+  'guide.settingsPage.impactModerate': 'Умеренное',
+  'guide.settingsPage.impactHeavy': 'Сильное',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Главный переключатель. Каждая ступень одновременно меняет разрешение, тени, материалы, растительность и световые эффекты. Самая большая разница, которую можно получить одним действием.',
+  'guide.settingsPage.rowRenderQuality':
+    'Отрисовывает трехмерный мир в пониженном внутреннем разрешении и растягивает картинку; интерфейс остается четким. Самый действенный мгновенный ползунок на слабых машинах и экранах высокого разрешения.',
+  'guide.settingsPage.rowFieldOfView':
+    'Сколько мира помещается на экране: от приближенных 55 до размашистых 100 градусов. Вопрос удобства; широкий обзор нагружает отрисовку чуть сильнее.',
+  'guide.settingsPage.rowBrightness': 'Экспозиция сцены, темнее или светлее. Чистое дело вкуса.',
+  'guide.settingsPage.rowWeather':
+    'Фоновые дождь и снег. Только атмосфера; отключение немного экономит ресурсы в грозу.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Насколько нарядным разрешено быть самому интерфейсу: размытие в стиле стекла, свечение, анимированные меню. Режим «Авто» подстраивается под ваш браузер; трехмерный мир в любом случае не затрагивается.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Богатые, плавно смешанные текстуры земли либо более простой и быстрый вид местности.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Как далеко и как густо растет трава вокруг вашего персонажа.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Блум, объемное затенение и то, сколько факелов и заклинаний отбрасывают настоящий свет. Самая большая экономия среди параметров пресета «Расширенное».',
+  'guide.settingsPage.rowShadowQuality':
+    'Четкость теней. Уровень «Низкое» сохраняет тени, но смягчает их края.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Размытие в стиле матового стекла позади окон. Красиво, и именно такие эффекты первым чувствует слабый браузер; оставьте его выключенным ради классической четкой картинки.',
+  'guide.settingsPage.rowReduceMotion':
+    'Убирает анимацию интерфейса, и окна появляются мгновенно. В первую очередь это настройка специальных возможностей, но она дает и небольшой прирост производительности.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Экранная сводка с FPS, временем кадра и другими показателями. Включите ее, пока подбираете настройки с этой страницы, а затем снова скройте.',
+  'guide.settingsPage.tableFoot':
+    'Ищете ползунок дальности прорисовки или ограничитель FPS? Искать нечего: дальность обзора входит в каждый уровень качества, а темп кадров подстраивается под ваш экран.',
+  'guide.settingsPage.mobileTitle': 'На телефонах и планшетах',
+  'guide.settingsPage.mobileBody':
+    'На мобильных устройствах игра берет больше на себя: сама выбирает уровень, держит разрешение чуть ниже, чтобы беречь батарею и не перегревать устройство, и оставляет самые высокие уровни только настольным компьютерам. Наборы выше по-прежнему применимы, просто телефоны ограничены уровнем «Высокое».',
   'guide.combat.intro':
     'Бой подчиняется привычным правилам классических MMO. Чтобы хорошо играть, изучать их вовсе не обязательно, это лишь общее представление о том, как устроены сражения.',
   'guide.combat.hitTitle': 'Не каждый удар достигает цели',
@@ -5839,6 +5932,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}м',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.crafting.title': 'Крафт',
+  'hudChrome.crafting.close': 'Закрыть крафт',
+  'hudChrome.crafting.craft': 'Создать',
+  'hudChrome.crafting.reagentsNeeded': 'Требуется:',
+  'hudChrome.crafting.empty': 'Известных рецептов пока нет.',
+  'hudChrome.crafting.resultAria': 'Создать {name}',
+  'hudChrome.crafting.craftedToast': 'Создано: {name}',
+  'hudChrome.crafting.insufficientMaterials': 'У вас недостаточно материалов.',
+  'hudChrome.crafting.unknownRecipe': 'Такого рецепта не существует.',
   // apiError.* server error-code catalog (M16 non-Latin fill, Phase 22)
   'apiError.validation.failed':
     'Некоторые поля заполнены неверно. Проверьте форму и попробуйте снова.',
@@ -6054,4 +6156,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.sigil_of_flame': 'Охотник на демонов.',
   'guide.abilityHook.eye_beam': 'Охотник на демонов.',
   'guide.abilityHook.metamorphosis': 'Охотник на демонов.',
+  // Release v0.22.0 locale fill.
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+
 };

@@ -239,7 +239,16 @@ function openDrownedReliquary(
   grantRiteBonus(ctx, run, tier);
   openDelveSurfaceExit(ctx, run);
   for (const pid of members) {
-    ctx.emit({ type: 'delveChestLoot', chestId: st.reliquaryId, items: partyLoot[pid], pid });
+    ctx.emit({
+      type: 'delveChestLoot',
+      chestId: st.reliquaryId,
+      delveId: run.delveId,
+      tierId: run.tierId,
+      lootTier: tier,
+      bountiful: isCoffer,
+      items: partyLoot[pid],
+      pid,
+    });
   }
   emitPartyLog(ctx, run, 'The Drowned Reliquary opens.', '#8cf');
 }

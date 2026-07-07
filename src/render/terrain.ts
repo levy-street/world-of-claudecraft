@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
 import { fbm2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
-import { biomeAt, roadDistance, terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
+import { biomeAt, roadDistance, terrainHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
@@ -346,8 +346,9 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   // instead), rocky/ashen biomes get a darker wet-rock tint, everywhere else
   // keeps the classic sandy bank. Color and splat weight share one feathered
   // falloff so the shore blends out instead of cutting a razor-hard edge.
-  // waterLevel() (not the const) so the beach tracks a custom map's water.
-  const wl = waterLevel();
+  // waterLevelAt(x, z) (not the flat const) so the beach only tracks water inside
+  // a declared lake's footprint; a dry sunken feature elsewhere gets no shore tint.
+  const wl = waterLevelAt(x, z);
   const shore = clamp01((wl + 1.6 - h) / 1.6);
   if (biome === 'marsh') {
     cTmp.lerp(dirtDarkC, shore);

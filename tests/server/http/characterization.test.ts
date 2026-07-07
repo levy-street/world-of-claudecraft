@@ -41,6 +41,15 @@ const HEADER_CONTENT_LENGTH = 'content-length';
 // Far above any player-card byte cap, so the pre-auth 413 reject fires before the db.
 const OVERSIZE_CONTENT_LENGTH = '999999999';
 const DEV_COMMANDS_ENV = 'ALLOW_DEV_COMMANDS';
+const DISCORD_ENV_KEYS = [
+  'DISCORD_CLIENT_ID',
+  'DISCORD_CLIENT_SECRET',
+  'DISCORD_GUILD_ID',
+] as const;
+
+function clearDiscordConfigEnv(): void {
+  for (const key of DISCORD_ENV_KEYS) delete process.env[key];
+}
 
 async function loadDispatch(): Promise<Dispatch> {
   const main = await import('../../../server/main');
@@ -56,9 +65,17 @@ async function loadDispatch(): Promise<Dispatch> {
 
 let dispatch: Dispatch;
 let main: typeof import('../../../server/main');
+let savedDiscordEnv: Partial<Record<(typeof DISCORD_ENV_KEYS)[number], string | undefined>>;
 
 beforeAll(async () => {
+  savedDiscordEnv = {};
+  for (const key of DISCORD_ENV_KEYS) {
+    savedDiscordEnv[key] = process.env[key];
+  }
+  clearDiscordConfigEnv();
   main = await import('../../../server/main');
+  // server/db.ts loads .env during the main import, so clear again after import.
+  clearDiscordConfigEnv();
   // These goldens characterize the LEGACY handleApi ladder. The boot default
   // flipped to 'new', so pin the dispatch mode to 'legacy' EXPLICITLY here:
   // otherwise status_get and search_get_noauth_401 would capture the migrated
@@ -67,6 +84,14 @@ beforeAll(async () => {
   // legacy characterization it has always been, immune to the default flip.
   main.setApiDispatchModeForTests('legacy');
   dispatch = await loadDispatch();
+});
+
+afterAll(() => {
+  for (const key of DISCORD_ENV_KEYS) {
+    const value = savedDiscordEnv[key];
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
 });
 
 // One golden per case: 'written' on the first ever run (fixture absent -> written),
@@ -80,6 +105,14 @@ async function characterize(fixture: string, req: ReturnType<typeof makeReq>): P
   // The captured golden's content-type must match its route's classified class.
   const ctMismatch = goldenContentTypeMismatch(req.method ?? 'GET', req.url ?? '', fixturePath);
   expect(ctMismatch, ctMismatch ?? fixture).toBeNull();
+}
+
+async function characterizeDiscordUnconfigured(
+  fixture: string,
+  req: ReturnType<typeof makeReq>,
+): Promise<void> {
+  clearDiscordConfigEnv();
+  await characterize(fixture, req);
 }
 
 describe('main /api characterization: preflight + dispatcher fallthrough', () => {
@@ -237,7 +270,7 @@ describe('main /api characterization: wrong-method fallthrough (planned 405 base
 
 describe('main /api characterization: Discord contract paths (unconfigured / no auth)', () => {
   it('POST /api/auth/discord/start is 503 when Discord is unconfigured', async () => {
-    await characterize(
+    await characterizeDiscordUnconfigured(
       'discord_start_unconfigured_503',
       makeReq({ method: 'POST', url: '/api/auth/discord/start', body: {} }),
     );
@@ -258,7 +291,7 @@ describe('main /api characterization: Discord contract paths (unconfigured / no 
   });
 
   it('GET /api/auth/discord/callback unconfigured returns the 503 error bounce (no token)', async () => {
-    await characterize(
+    await characterizeDiscordUnconfigured(
       'discord_callback_error_bounce',
       makeReq({ method: 'GET', url: '/api/auth/discord/callback?code=x&state=y' }),
     );

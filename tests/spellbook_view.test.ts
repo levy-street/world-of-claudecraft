@@ -104,69 +104,6 @@ describe('buildSpellbookView: on-bar + toggle-disabled derivation', () => {
   });
 });
 
-describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
-  // abilityIdByBarSlot index 0 = barSlot 1 (hotbarActions' own index = barSlot-1
-  // convention). Build a slot array with KIT[0] parked on a given 1-indexed slot.
-  const slotsWith = (abilityId: string, barSlot: number): (string | null)[] => {
-    const slots: (string | null)[] = new Array(22).fill(null);
-    slots[barSlot - 1] = abilityId;
-    return slots;
-  };
-
-  it('assigns page 0 for a bar-assigned row on slots 1-5', () => {
-    for (const slot of [1, 2, 3, 4, 5]) {
-      const v = buildSpellbookView(
-        input({
-          known: [known('sim', KIT[0])],
-          barAbilityIds: [KIT[0]],
-          abilityIdByBarSlot: slotsWith(KIT[0], slot),
-        }),
-      );
-      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(0);
-    }
-  });
-
-  it('assigns page 1 for a bar-assigned row on slots 6-10', () => {
-    for (const slot of [6, 7, 8, 9, 10]) {
-      const v = buildSpellbookView(
-        input({
-          known: [known('sim', KIT[0])],
-          barAbilityIds: [KIT[0]],
-          abilityIdByBarSlot: slotsWith(KIT[0], slot),
-        }),
-      );
-      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(1);
-    }
-  });
-
-  it('assigns null for slot 11 (outside the ring pages)', () => {
-    const v = buildSpellbookView(
-      input({
-        known: [known('sim', KIT[0])],
-        barAbilityIds: [KIT[0]],
-        abilityIdByBarSlot: slotsWith(KIT[0], 11),
-      }),
-    );
-    expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
-  });
-
-  it('assigns null for a row that is off-bar even if abilityIdByBarSlot is provided', () => {
-    const v = buildSpellbookView(
-      input({
-        known: [known('sim', KIT[0])],
-        barAbilityIds: [],
-        abilityIdByBarSlot: new Array(22).fill(null),
-      }),
-    );
-    expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
-  });
-
-  it('assigns null when abilityIdByBarSlot is omitted (desktop / not-yet-wired callers)', () => {
-    const v = buildSpellbookView(input({ known: [known('sim', KIT[0])], barAbilityIds: [KIT[0]] }));
-    expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
-  });
-});
-
 describe('buildSpellbookView: ClientWorld-vs-Sim parity', () => {
   // The core passes the resolved ability OBJECT through to the painter (it needs it
   // for the tooltip/summary), so the parity guarantee is over the DERIVED decision

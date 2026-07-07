@@ -4639,8 +4639,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Autoløb',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik fra',
-  'hudChrome.mobile.hotbarPage': 'Evner',
-  'hudChrome.mobile.hotbarPageAria': 'Vis næste sæt evner',
   'hudChrome.mobile.jump': 'Hop',
   'hudChrome.mobile.leaderboard': 'Rangliste',
   'hudChrome.mobile.nameplates': 'Navne',
@@ -5940,4 +5938,117 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.not_enabled': 'To-faktor er ikke aktiveret.',
   'apiError.two_factor.setup_required': 'Start opsætning af to-faktor først.',
   'apiError.validation.failed': 'Nogle felter er ugyldige. Tjek formularen og prøv igen.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Download til Linux',
+  'download.linuxHint':
+    'AppImage: gør det eksekverbart, og kør det derefter. Ingen installation nødvendig.',
+  'loading.reconnecting': 'Forbindelse mistet. Genopretter forbindelse...',
+  'guide.nav.settings': 'Indstillinger og ydeevne',
+  'guide.settingsPage.advancedBody':
+    'Avanceret starter fra High-niveauet og låser op for fire ekstra vælgere, så du kan bruge dine rammer, hvor du rent faktisk bemærker dem: Terrændetaljer, Løvtæthed, Effekter og belysning og Skyggekvalitet. Ligesom grafikkvalitet gælder de efter en genindlæsning.',
+  'guide.settingsPage.advancedHeading': 'Den avancerede forudindstilling: bland din egen',
+  'guide.settingsPage.advancedMixes':
+    'To yndlingsblandinger: Hold Shadow Quality på High og indstil Effects & Lighting til Low for et sprødt, glødfrit look, der kører let, eller gør det omvendte for at bevare blomstringen og blødgøre skyggerne.',
+  'guide.settingsPage.balancedTagline':
+    'Det søde sted for de fleste maskiner og vores standardråd.',
+  'guide.settingsPage.balancedTitle': 'Balanceret',
+  'guide.settingsPage.balancedWhy':
+    'Medium bringer ægte skygger og fulde materialer; High tilføjer omgivende okklusion og blomstring. Under Ultra absorberer et indbygget sikkerhedsnet pludselige fald i travle kampe, så Balanced forbliver glat uden at passe baby.',
+  'guide.settingsPage.colDoes': 'Hvad den gør',
+  'guide.settingsPage.colImpact': 'FPS virkning',
+  'guide.settingsPage.colSetting': 'Indstilling',
+  'guide.settingsPage.factDetectBody':
+    'Ved din første lancering læser spillet din enhed og vælger et fornuftigt niveau, fra Low på en beskeden telefon til Ultra på et stærkt skrivebord. Ethvert valg, du selv træffer, vinder altid.',
+  'guide.settingsPage.factDetectTitle': 'Spillet tuner sig selv først',
+  'guide.settingsPage.factGovernorBody':
+    'På hvert niveau under Ultra tynder spillet stille og roligt græs, effekter og belysning et øjeblik, når en stor kamp spidser til, og genopretter dem derefter. Hvis du vælger Ultra, fortæller det, at du hellere vil beholde alle detaljer.',
+  'guide.settingsPage.factGovernorTitle': 'Et indbygget sikkerhedsnet',
+  'guide.settingsPage.factReloadBody':
+    'Grafikkvalitet og de avancerede vælgere træder i kraft efter en genindlæsning, og panelet tilbyder en Genindlæs nu-knap, når det er nødvendigt. Hver anden mulighed gælder i det øjeblik, du ændrer den.',
+  'guide.settingsPage.factReloadTitle': 'To slags muligheder',
+  'guide.settingsPage.fairnessBody':
+    'Ingen mulighed her bytter skønhed for magt. Lower indstillinger afgiver kun kosmetisk polering, aldrig information, du kæmper med: dine debuffs, cast bars, partysundhed og skadetal er identiske fra Low til Ultra. At spille på en beskeden maskine er aldrig et handicap.',
+  'guide.settingsPage.fairnessTitle': 'Fair af design',
+  'guide.settingsPage.fpsTagline': 'Til ældre bærbare computere, integreret grafik og batterispil.',
+  'guide.settingsPage.fpsTitle': 'Bedste FPS',
+  'guide.settingsPage.fpsWhy':
+    'Grafikkvalitet er hovedafbryderen, og gengivelseskvalitet er den stærkeste skyder: Med 70 % trækker verden omkring halvdelen af ​​pixels, mens grænsefladen forbliver perfekt skarp.',
+  'guide.settingsPage.heading': 'Indstillinger og ydeevne',
+  'guide.settingsPage.howHeading': 'Hvordan mulighederne opfører sig',
+  'guide.settingsPage.impactHeavy': 'Tung',
+  'guide.settingsPage.impactLight': 'Lys',
+  'guide.settingsPage.impactModerate': 'Moderat',
+  'guide.settingsPage.impactNone': 'Ingen',
+  'guide.settingsPage.intro':
+    'Få spillet til at se bedst ud, eller kør det hurtigste. Tre færdige loadouts, plus hvad enhver grafikfunktion virkelig gør.',
+  'guide.settingsPage.loadoutsHeading': 'Tre færdige loadouts',
+  'guide.settingsPage.loadoutsIntro':
+    'Start fra belastningen, der lyder som din maskine, og juster derefter én mulighed ad gangen, indtil den føles rigtig.',
+  'guide.settingsPage.mobileBody':
+    'Mobile klarer mere for dig: Spillet vælger niveauet, holder opløsningen et tryk lavere for at beskytte batteri og varme og beholder de højeste niveauer kun på skrivebordet. Ovenstående belastninger gælder stadig; telefoner fyldes blot ud ved High.',
+  'guide.settingsPage.mobileTitle': 'På telefoner og tablets',
+  'guide.settingsPage.recommended': 'Anbefales',
+  'guide.settingsPage.rowBrightness': 'Sceneeksponering, mørkere eller lysere. Ren præference.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Hvor fancy selve grænsefladen får lov at være: glassløring, glød, animerede menuer. Auto matcher din browser; 3D-verdenen er uberørt på begge måder.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Blomstring, omgivende okklusion, og hvor mange fakler og besværgelser, der kaster rigtigt lys. Den største enkeltbesparelse blandt de avancerede vælgere.',
+  'guide.settingsPage.rowFieldOfView':
+    'Hvor meget af verden passer på skærmen, fra zoomet 55 til fejende 100 grader. Et komfortvalg; bredere visninger trækker lidt mere.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Hvor langt og hvor tykt græsset vokser omkring din karakter.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Sløring af matteret glas bag vinduer. Smuk, og præcis den slags effekt en svagere browser føler; lad det være for det klassiske sprøde look.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Hovedafbryderen. Hvert trin ændrer opløsning, skygger, materialer, løv og lyseffekter sammen. Den største enkeltstående forskel, du kan gøre.',
+  'guide.settingsPage.rowPerfOverlay':
+    'En skærmudlæsning af FPS, billedtid og mere. Slå den til, mens du tuner denne side, og skjul den derefter igen.',
+  'guide.settingsPage.rowReduceMotion':
+    'Fjerner grænsefladeanimationer, så vinduer vises med det samme. Først en tilgængelighedsmulighed med en lille præstationsbonus.',
+  'guide.settingsPage.rowRenderQuality':
+    'Tegner 3D-verdenen med en lavere intern opløsning og skalerer den op; grænsefladen forbliver skarp. Den stærkeste øjeblikkelige skyder på svagere maskiner og højopløselige skærme.',
+  'guide.settingsPage.rowShadowQuality':
+    'Skygge sprødhed. Low bevarer skygger, men blødgør deres kanter.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Rige, blandede jordstrukturer kontra et enklere, hurtigere terrænlook.',
+  'guide.settingsPage.rowWeather':
+    'Omgivende regn og sne. Kun atmosfære, og at slukke for den sparer lidt under storme.',
+  'guide.settingsPage.tableFoot':
+    'Leder du efter en skyder til trækafstand eller en FPS kasket? Der er ikke noget at jage efter: Visningsafstand er en del af hvert kvalitetsniveau, og frame pacing følger din skærm.',
+  'guide.settingsPage.tableHeading': 'Hver mulighed, forklaret',
+  'guide.settingsPage.tagReload': 'efter genindlæsning',
+  'guide.settingsPage.value100': '100 %',
+  'guide.settingsPage.value50to70': '50 til 70 %',
+  'guide.settingsPage.value90to100': '90 til 100 %',
+  'guide.settingsPage.valueHighOrMedium': 'High på en gaming-pc, Medium på en bærbar computer',
+  'guide.settingsPage.valueOnOptional': 'Til (valgfrit)',
+  'guide.settingsPage.visualsTagline': 'Skærmbilledetilstand til kraftfulde stationære maskiner.',
+  'guide.settingsPage.visualsTitle': 'Bedste Visuals',
+  'guide.settingsPage.visualsWhy':
+    'Ultra gengiver med den højeste opløsning, din skærm tilbyder med den rigeste belysning. Det slukker også for sikkerhedsnettet, og det er kun til desktop: telefoner og appen topper ud ved High.',
+  'guide.settingsPage.wherePath':
+    'Alt på denne side lever i spillet: Tryk på Esc og kig i Grafik, Interface og Performance Overlay.',
+  'guide.settingsPage.whyLabel': 'Hvorfor virker det:',
+  'hudChrome.crafting.close': 'Tæt håndværk',
+  'hudChrome.crafting.craft': 'Håndværk',
+  'hudChrome.crafting.craftedToast': 'Udformet: {name}',
+  'hudChrome.crafting.empty': 'Ingen opskrifter kendt endnu.',
+  'hudChrome.crafting.insufficientMaterials': 'Det har du ikke materialerne til.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Kræver:',
+  'hudChrome.crafting.resultAria': 'Håndværk {name}',
+  'hudChrome.crafting.title': 'Håndværk',
+  'hudChrome.crafting.unknownRecipe': 'Den opskrift findes ikke.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Et håndværk at kalde dit eget',
+  'entities.quests.q_archetype_acceptance.text':
+    'Hver eneste håndværker fra Eastbrook sætter sig til sidst over på et håndværk, som de kalder deres eget. Bevis dig selv med en enkelt gerning, {playerName}, og erklær din vej.',
+  'entities.quests.q_archetype_acceptance.completion': 'Din vej er valgt; gå det godt.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Skovulv dræbt',
+  'entities.quests.q_prof_make_amends.title': 'Gøre bod',
+  'entities.quests.q_prof_make_amends.text':
+    'For at afsætte et håndværk til et andet, skal en håndværker først råde bod på stien, der ikke er gået, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Foretagne ændringer; en ny vej er åben for dig.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Skovulv dræbt',
 };

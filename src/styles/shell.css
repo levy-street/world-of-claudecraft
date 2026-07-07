@@ -1275,6 +1275,31 @@
     text-decoration: none;
   }
 
+  /* The visitor's own OS: a subtle ring so it reads as the primary choice
+     without demoting the other platforms (they stay one click away). */
+  .desktop-download-link.is-detected {
+    box-shadow: 0 0 0 2px rgba(255, 209, 0, 0.55);
+  }
+
+  .desktop-download-link.btn-primary.is-unavailable,
+  .desktop-download-link.btn-primary.is-unavailable:hover,
+  .desktop-download-link.btn-primary.is-unavailable:focus-visible {
+    background: linear-gradient(180deg, #3a3a3a 0%, #1b1b1b 100%);
+    border-color: rgba(180, 180, 180, 0.32);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+    color: #9f9f9f;
+    cursor: not-allowed;
+    opacity: 0.68;
+  }
+
+  .desktop-download-hint {
+    max-width: 420px;
+    margin: var(--spacing-xs) auto 0;
+    color: var(--color-primary-dim);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
   .desktop-download-status {
     display: inline-block;
     max-width: 420px;

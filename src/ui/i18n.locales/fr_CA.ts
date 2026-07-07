@@ -170,7 +170,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
     "La serrure est bloquée, impossible à crocheter : terminez l'excavation de nouveau pour une autre tentative.",
   'sim.lockpick.lockYields': 'La serrure cède! Butin {tier}.',
   // Mobile touch controls: the hotbar page-flip button and its accessible name.
-  'hudChrome.mobile.hotbarPageAria': 'Afficher la prochaine série de techniques',
   // Corpse-harvest focus picker (window title, confirm button, component labels).
   // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Cause {value} points de dégâts de {school} toutes les {interval} s',

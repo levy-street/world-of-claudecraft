@@ -28,6 +28,51 @@ export function waterLevel(): number {
   return world().content.waterLevel ?? WATER_LEVEL;
 }
 
+// A declared lake's footprint reaches this multiple past its authored radius
+// (the same soft-edge basin blend baseHeight uses below), so the render plane,
+// the walkable-depth floor, and the terrain basin itself all agree on where a
+// lake actually ends.
+export const LAKE_BLEND_RADIUS_MULT = 1.6;
+
+// True when (x,z) falls inside a declared lake's footprint (any zone's `lakes`
+// list). Terrain outside every declared water body is never "water", no
+// matter how far its height dips below waterLevel(): a content author's
+// sunken feature (crater, sinkhole, tunnel) stays dry and walkable as long as
+// it isn't inside one of these footprints.
+export function isInWaterBody(x: number, z: number): boolean {
+  for (const zone of world().content.zones) {
+    for (const lake of zone.lakes) {
+      const dSq = (x - lake.x) ** 2 + (z - lake.z) ** 2;
+      const rMax = lake.radius * LAKE_BLEND_RADIUS_MULT;
+      if (dSq < rMax * rMax) return true;
+    }
+  }
+  return false;
+}
+
+// The water surface height AT this location: waterLevel() inside a declared
+// lake's footprint, else -Infinity (there is no water surface here, so
+// nothing reads as flooded and no swim-depth floor applies). Callers that
+// need "is there water here at all" should prefer this over a flat global
+// constant.
+export function waterLevelAt(x: number, z: number): number {
+  return isInWaterBody(x, z) ? waterLevel() : -Infinity;
+}
+
+// Every declared lake across the active content's zones, in render/authoring
+// footprint (radius already includes the basin blend margin). Used to draw
+// water only where it is actually declared, instead of one flat plane across
+// an entire zone's footprint.
+export function waterBodies(): { x: number; z: number; radius: number }[] {
+  const out: { x: number; z: number; radius: number }[] = [];
+  for (const zone of world().content.zones) {
+    for (const lake of zone.lakes) {
+      out.push({ x: lake.x, z: lake.z, radius: lake.radius * LAKE_BLEND_RADIUS_MULT });
+    }
+  }
+  return out;
+}
+
 // Hill amplitude / base elevation / hub plateau height per biome.
 const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: number }> = {
   vale: { hill: 26, base: 0, hubHeight: 1.5 },
@@ -361,8 +406,12 @@ function baseHeight(x: number, z: number, seed: number): number {
   for (const zone of zones) {
     for (const lake of zone.lakes) {
       const dLake = Math.sqrt((x - lake.x) ** 2 + (z - lake.z) ** 2);
-      if (dLake < lake.radius * 1.6) {
-        const lakeBlend = smoothstep(lake.radius * 0.55, lake.radius * 1.6, dLake);
+      if (dLake < lake.radius * LAKE_BLEND_RADIUS_MULT) {
+        const lakeBlend = smoothstep(
+          lake.radius * 0.55,
+          lake.radius * LAKE_BLEND_RADIUS_MULT,
+          dLake,
+        );
         h = h * lakeBlend + (waterLevel() - 4) * (1 - lakeBlend);
       }
     }

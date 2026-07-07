@@ -346,9 +346,6 @@ class FakeElement extends EventTarget {
   style = { transform: '', left: '', top: '' };
   offsetWidth = 122;
   private captured = new Set<number>();
-  /** Selectors this element (or a simulated ancestor) matches, for closest();
-   *  drives touch_router.ts's isInteractiveHudElement checks in tests. */
-  matchedSelectors: string[] = [];
 
   constructor(
     private rect = { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 },
@@ -372,8 +369,8 @@ class FakeElement extends EventTarget {
     return this.captured.has(pointerId);
   }
 
-  closest(selector: string): FakeElement | null {
-    return this.matchedSelectors.includes(selector) ? this : null;
+  closest(): Element | null {
+    return null;
   }
 
   querySelector(): Element | null {
@@ -390,7 +387,6 @@ class FakeMediaQueryList extends EventTarget {
 const previousGlobals = {
   document: globalThis.document,
   window: globalThis.window,
-  navigator: globalThis.navigator,
 };
 
 afterEach(() => {
@@ -400,10 +396,6 @@ afterEach(() => {
   });
   Object.defineProperty(globalThis, 'window', {
     value: previousGlobals.window,
-    configurable: true,
-  });
-  Object.defineProperty(globalThis, 'navigator', {
-    value: previousGlobals.navigator,
     configurable: true,
   });
 });
@@ -484,8 +476,9 @@ function pointerEvent(
 function mobileCallbacks() {
   const noop = () => {};
   return {
-    onCycleTarget: noop,
+    onAttackNearest: noop,
     onJump: noop,
+    onTarget: noop,
     onInteract: noop,
     onAutorun: () => false,
     onChat: noop,
@@ -541,69 +534,6 @@ describe('MobileControls pointer lifecycle', () => {
     expect(lastMove).toBeNull();
   });
 
-  it('still owns the touch as movement when the finger lands on a joystick DESCENDANT (the stick)', () => {
-    const { moveZone } = installMobileControlDom();
-    let lastMove: TouchMoveInput | null = null;
-    const input = {
-      setTouchMove: (move: TouchMoveInput) => {
-        lastMove = move;
-      },
-      clearTouchMove: () => {},
-      setTouchLook: () => {},
-      setTouchLookVector: () => {},
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-
-    // The visible stick (#mobile-move-stick) is a child of the joystick base, so
-    // a thumb landing on it reports the stick as event.target, not the zone or
-    // the joystick element. The router must classify it via closest(), not identity.
-    const stickTarget = new FakeElement();
-    stickTarget.matchedSelectors = ['#mobile-move-joystick'];
-    const downEvent = pointerEvent('pointerdown', { pointerId: 5, clientX: 100, clientY: 50 });
-    Object.defineProperty(downEvent, 'target', { value: stickTarget });
-    moveZone.dispatchEvent(downEvent);
-    moveZone.dispatchEvent(
-      pointerEvent('pointermove', { pointerId: 5, clientX: 160, clientY: 50 }),
-    );
-
-    expect(lastMove).toEqual({ forward: false, back: false, strafeLeft: false, strafeRight: true });
-  });
-
-  it('never starts a movement-joystick drag while a mobile window/menu is open', () => {
-    const { moveZone } = installMobileControlDom();
-    let lastMove: TouchMoveInput | null = null;
-    let hapticCalls = 0;
-    const input = {
-      setTouchMove: (move: TouchMoveInput) => {
-        lastMove = move;
-      },
-      clearTouchMove: () => {},
-      setTouchLook: () => {},
-      setTouchLookVector: () => {},
-    } as unknown as Input;
-    const nav = {
-      vibrate: () => {
-        hapticCalls += 1;
-        return true;
-      },
-    };
-    Object.defineProperty(globalThis, 'navigator', { value: nav, configurable: true });
-
-    new MobileControls(input, mobileCallbacks()).start();
-    document.body.classList.add('mobile-window-open');
-
-    moveZone.dispatchEvent(
-      pointerEvent('pointerdown', { pointerId: 6, clientX: 100, clientY: 50 }),
-    );
-    moveZone.dispatchEvent(
-      pointerEvent('pointermove', { pointerId: 6, clientX: 160, clientY: 50 }),
-    );
-
-    expect(lastMove).toBeNull();
-    expect(hapticCalls).toBe(0);
-  });
-
   it('keeps updating camera look when the active pointer moves outside the joystick element', () => {
     const { cameraJoystick, windowTarget } = installMobileControlDom();
     let touchLookActive = false;
@@ -619,10 +549,7 @@ describe('MobileControls pointer lifecycle', () => {
       },
     } as unknown as Input;
 
-    const controls = new MobileControls(input, mobileCallbacks());
-    controls.start();
-    // The camera joystick is hidden/off by default; opt in for this test.
-    controls.setCameraJoystickEnabled(true);
+    new MobileControls(input, mobileCallbacks()).start();
 
     cameraJoystick.dispatchEvent(
       pointerEvent('pointerdown', { pointerId: 9, clientX: 50, clientY: 50 }),
@@ -638,53 +565,6 @@ describe('MobileControls pointer lifecycle', () => {
 
     expect(touchLookActive).toBe(false);
     expect(lastLook).toEqual({ x: 0, y: 0 });
-  });
-
-  it('camera joystick is hidden/off by default: onCameraDown no-ops until enabled', () => {
-    const { cameraJoystick } = installMobileControlDom();
-    let touchLookActive = false;
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => {
-        touchLookActive = active;
-      },
-      setTouchLookVector: () => {},
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-
-    cameraJoystick.dispatchEvent(
-      pointerEvent('pointerdown', { pointerId: 9, clientX: 50, clientY: 50 }),
-    );
-
-    expect(touchLookActive).toBe(false);
-    expect(cameraJoystick.classList.contains('active')).toBe(false);
-  });
-
-  it('a fresh camera-joystick press while a mobile window/menu is already open no-ops', () => {
-    const { cameraJoystick } = installMobileControlDom();
-    let touchLookActive = false;
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => {
-        touchLookActive = active;
-      },
-      setTouchLookVector: () => {},
-    } as unknown as Input;
-
-    const controls = new MobileControls(input, mobileCallbacks());
-    controls.start();
-    controls.setCameraJoystickEnabled(true);
-    document.body.classList.add('mobile-window-open');
-
-    cameraJoystick.dispatchEvent(
-      pointerEvent('pointerdown', { pointerId: 46, clientX: 50, clientY: 50 }),
-    );
-
-    expect(touchLookActive).toBe(false);
-    expect(cameraJoystick.classList.contains('active')).toBe(false);
   });
 
   it('fires the emote callback when the on-screen Emotes button is tapped', () => {
@@ -934,357 +814,5 @@ describe('MobileControls pointer lifecycle', () => {
     expect(deltas).toEqual([{ dx: 16, dy: 0 }]);
     expect(lookActive).toEqual([true, false]);
     expect(zooms.length).toBeGreaterThan(0);
-  });
-
-  it('blocks swipe-look from starting over interactive HUD chrome (a button/window)', () => {
-    const { canvas } = installMobileControlDom();
-    const deltas: Array<{ dx: number; dy: number }> = [];
-    const lookActive: boolean[] = [];
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => lookActive.push(active),
-      setTouchLookVector: () => {},
-      applyTouchLookDelta: (dx: number, dy: number) => deltas.push({ dx, dy }),
-      zoomBy: () => {},
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-
-    // A synthetic pointerdown target that reports as a mobile action-ring
-    // button ancestor (simulates a finger landing on HUD chrome over the canvas).
-    const buttonTarget = new FakeElement();
-    buttonTarget.matchedSelectors = ['.mobile-action-slot'];
-    const downEvent = pointerEvent('pointerdown', {
-      pointerId: 40,
-      pointerType: 'touch',
-      clientX: 100,
-      clientY: 100,
-    });
-    Object.defineProperty(downEvent, 'target', { value: buttonTarget });
-    canvas.dispatchEvent(downEvent);
-
-    const moveEvent = pointerEvent('pointermove', {
-      pointerId: 40,
-      pointerType: 'touch',
-      clientX: 140,
-      clientY: 140,
-    });
-    canvas.dispatchEvent(moveEvent);
-
-    expect(lookActive).toEqual([]);
-    expect(deltas).toEqual([]);
-  });
-
-  it('blocks swipe-look from starting while a mobile window/menu is open', () => {
-    const { canvas } = installMobileControlDom();
-    const lookActive: boolean[] = [];
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => lookActive.push(active),
-      setTouchLookVector: () => {},
-      applyTouchLookDelta: () => {},
-      zoomBy: () => {},
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-    document.body.classList.add('mobile-window-open');
-
-    canvas.dispatchEvent(
-      pointerEvent('pointerdown', {
-        pointerId: 41,
-        pointerType: 'touch',
-        clientX: 100,
-        clientY: 100,
-      }),
-    );
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 41,
-        pointerType: 'touch',
-        clientX: 140,
-        clientY: 140,
-      }),
-    );
-
-    expect(lookActive).toEqual([]);
-  });
-
-  it('ends an active swipe-look camera drag when a window opens mid-drag', () => {
-    const { canvas } = installMobileControlDom();
-    const lookActive: boolean[] = [];
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => lookActive.push(active),
-      setTouchLookVector: () => {},
-      applyTouchLookDelta: () => {},
-      zoomBy: () => {},
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-
-    canvas.dispatchEvent(
-      pointerEvent('pointerdown', {
-        pointerId: 42,
-        pointerType: 'touch',
-        clientX: 100,
-        clientY: 100,
-      }),
-    );
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 42,
-        pointerType: 'touch',
-        clientX: 130,
-        clientY: 100,
-      }),
-    );
-    expect(lookActive).toEqual([true]);
-
-    // A window opens mid-drag: the next move must end the drag.
-    document.body.classList.add('mobile-window-open');
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 42,
-        pointerType: 'touch',
-        clientX: 160,
-        clientY: 100,
-      }),
-    );
-
-    expect(lookActive).toEqual([true, false]);
-  });
-
-  it('ends an active camera-joystick drag when a window opens mid-drag', () => {
-    const { cameraJoystick } = installMobileControlDom();
-    const lookActive: boolean[] = [];
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => lookActive.push(active),
-      setTouchLookVector: () => {},
-    } as unknown as Input;
-
-    const controls = new MobileControls(input, mobileCallbacks());
-    controls.start();
-    controls.setCameraJoystickEnabled(true);
-
-    cameraJoystick.dispatchEvent(
-      pointerEvent('pointerdown', { pointerId: 43, clientX: 50, clientY: 50 }),
-    );
-    expect(lookActive).toEqual([true]);
-
-    document.body.classList.add('mobile-window-open');
-    cameraJoystick.dispatchEvent(
-      pointerEvent('pointermove', { pointerId: 43, clientX: 80, clientY: 50 }),
-    );
-
-    expect(lookActive).toEqual([true, false]);
-  });
-
-  it('ends an active pinch-zoom gesture when a window opens mid-gesture', () => {
-    const { canvas } = installMobileControlDom();
-    const zooms: number[] = [];
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: () => {},
-      setTouchLookVector: () => {},
-      applyTouchLookDelta: () => {},
-      zoomBy: (delta: number) => {
-        zooms.push(delta);
-      },
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-
-    canvas.dispatchEvent(
-      pointerEvent('pointerdown', {
-        pointerId: 50,
-        pointerType: 'touch',
-        clientX: 100,
-        clientY: 100,
-      }),
-    );
-    canvas.dispatchEvent(
-      pointerEvent('pointerdown', {
-        pointerId: 51,
-        pointerType: 'touch',
-        clientX: 200,
-        clientY: 100,
-      }),
-    );
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 50,
-        pointerType: 'touch',
-        clientX: 90,
-        clientY: 100,
-      }),
-    );
-    expect(zooms.length).toBe(1);
-
-    // A window opens mid-gesture: the next move must stop zooming.
-    document.body.classList.add('mobile-window-open');
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 51,
-        pointerType: 'touch',
-        clientX: 220,
-        clientY: 100,
-      }),
-    );
-
-    expect(zooms.length).toBe(1);
-
-    // The pinch state was released, so even a further move from the surviving
-    // pointer (post window-close) must not resume zooming on its own.
-    document.body.classList.remove('mobile-window-open');
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 51,
-        pointerType: 'touch',
-        clientX: 240,
-        clientY: 100,
-      }),
-    );
-    expect(zooms.length).toBe(1);
-  });
-
-  it('never starts tracking a fresh pinch while a mobile window/menu is open', () => {
-    const { canvas } = installMobileControlDom();
-    const zooms: number[] = [];
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: () => {},
-      setTouchLookVector: () => {},
-      applyTouchLookDelta: () => {},
-      zoomBy: (delta: number) => {
-        zooms.push(delta);
-      },
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-    document.body.classList.add('mobile-window-open');
-
-    canvas.dispatchEvent(
-      pointerEvent('pointerdown', {
-        pointerId: 52,
-        pointerType: 'touch',
-        clientX: 100,
-        clientY: 100,
-      }),
-    );
-    canvas.dispatchEvent(
-      pointerEvent('pointerdown', {
-        pointerId: 53,
-        pointerType: 'touch',
-        clientX: 200,
-        clientY: 100,
-      }),
-    );
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 52,
-        pointerType: 'touch',
-        clientX: 90,
-        clientY: 100,
-      }),
-    );
-
-    expect(zooms).toEqual([]);
-  });
-
-  it('never lets a button-owned pointer become a camera drag even if it drifts onto the canvas', () => {
-    const { canvas } = installMobileControlDom();
-    const lookActive: boolean[] = [];
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => lookActive.push(active),
-      setTouchLookVector: () => {},
-      applyTouchLookDelta: () => {},
-      zoomBy: () => {},
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-
-    // pointerdown lands on a button (recorded as combatButton in the ledger)
-    const buttonTarget = new FakeElement();
-    buttonTarget.matchedSelectors = ['.mobile-btn'];
-    const downEvent = pointerEvent('pointerdown', {
-      pointerId: 44,
-      pointerType: 'touch',
-      clientX: 10,
-      clientY: 10,
-    });
-    Object.defineProperty(downEvent, 'target', { value: buttonTarget });
-    canvas.dispatchEvent(downEvent);
-
-    // the same pointer then drifts far enough over the canvas to clear the
-    // swipe deadzone; it must still never start a camera drag.
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 44,
-        pointerType: 'touch',
-        clientX: 60,
-        clientY: 60,
-      }),
-    );
-
-    expect(lookActive).toEqual([]);
-  });
-
-  it('releaseAll on window blur clears every tracked touch owner', () => {
-    const { canvas, windowTarget } = installMobileControlDom();
-    const lookActive: boolean[] = [];
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => lookActive.push(active),
-      setTouchLookVector: () => {},
-      applyTouchLookDelta: () => {},
-      zoomBy: () => {},
-    } as unknown as Input;
-
-    new MobileControls(input, mobileCallbacks()).start();
-
-    canvas.dispatchEvent(
-      pointerEvent('pointerdown', {
-        pointerId: 45,
-        pointerType: 'touch',
-        clientX: 100,
-        clientY: 100,
-      }),
-    );
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 45,
-        pointerType: 'touch',
-        clientX: 130,
-        clientY: 100,
-      }),
-    );
-    expect(lookActive).toEqual([true]);
-
-    (windowTarget as unknown as EventTarget).dispatchEvent(new Event('blur'));
-
-    // Blur releases the active swipe-look drag (existing releaseSwipeLook
-    // behavior; releaseCamera also unconditionally clears touch-look, hence the
-    // second `false`) and clears the ledger so a stray late move for the same
-    // pointerId cannot resume owning anything.
-    expect(lookActive).toEqual([true, false, false]);
-    canvas.dispatchEvent(
-      pointerEvent('pointermove', {
-        pointerId: 45,
-        pointerType: 'touch',
-        clientX: 160,
-        clientY: 100,
-      }),
-    );
-    expect(lookActive).toEqual([true, false, false]);
   });
 });

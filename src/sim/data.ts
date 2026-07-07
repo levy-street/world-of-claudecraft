@@ -44,6 +44,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { COMMON_RECIPES as COMMON_RECIPES_CONTENT } from './content/recipes';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -220,6 +221,8 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
+
+export const COMMON_RECIPES = [...COMMON_RECIPES_CONTENT];
 
 export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS];
 

@@ -311,15 +311,7 @@ export const zh_TW: EnTranslations = {
       "nameplates": "名條",
       "haptics": "觸覺回饋",
       "hapticsOff": "觸覺回饋已關閉",
-      "toggleHaptics": "切換觸覺回饋",
-      "hotbarPage": "技能",
-      "hotbarPageAria": "顯示下一組技能",
-      "actionRing": "戰鬥動作",
-      "actionPageToggle": "切換動作頁",
-      "actionPageIndicator": "{page}",
-      "targetCycle": "切換目標",
-      "targetCycleShort": "目標",
-      "spellbookPageLabel": "Page {page}"
+      "toggleHaptics": "切換觸覺回饋"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -426,9 +418,7 @@ export const zh_TW: EnTranslations = {
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
-      "showDailyRewardsChest": "顯示每日獎勵寶箱",
-      "mobileCameraJoystick": "攝影機搖桿",
-      "mobileLeftHanded": "左手配置"
+      "showDailyRewardsChest": "顯示每日獎勵寶箱"
     },
     "controller": {
       "title": "手把",
@@ -1060,6 +1050,18 @@ export const zh_TW: EnTranslations = {
         }
       }
     },
+    "crafting": {
+      "title": "製作",
+      "close": "關閉製作",
+      "craft": "製作",
+      "reagentsNeeded": "需要:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "尚無已知配方。",
+      "resultAria": "製作{name}",
+      "craftedToast": "已製作:{name}",
+      "insufficientMaterials": "你沒有足夠的材料。",
+      "unknownRecipe": "該配方不存在。"
+    },
     "devBadge": {
       "title": "開發者",
       "tiers": {
@@ -1319,6 +1321,7 @@ export const zh_TW: EnTranslations = {
       "delves": "秘探",
       "reference": "參考資料",
       "controls": "操作按鍵",
+      "settings": "設定與效能",
       "combat": "戰鬥",
       "talents": "天賦",
       "arena": "競技場與PvP",
@@ -1486,6 +1489,66 @@ export const zh_TW: EnTranslations = {
       "mobileBody": "在手機與平板上會自動顯示觸控操作：左側為移動搖桿，在右側任意處拖曳即可環顧，並有螢幕上的按鈕供你使用技能與選單。",
       "controllerHeading": "使用手把時",
       "controllerBody": "手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟任何視窗都會喚出畫面上的指標，供你操作選單。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角。"
+    },
+    "settingsPage": {
+      "heading": "設定與效能",
+      "intro": "讓遊戲畫面美到極致，或跑得飛快。三套現成配置，加上每個圖形選項的真正作用。",
+      "wherePath": "本頁介紹的一切都在遊戲裡：按下 Esc，就能在「圖形」、「介面」與「效能監視器」中找到。",
+      "fairnessTitle": "天生公平",
+      "fairnessBody": "這裡沒有任何選項會用畫面換取優勢。調低設定只會捨去外觀上的修飾，絕不會犧牲作戰所需的資訊：你的減益效果、施法條、隊伍血量與傷害數字，從「低」到「超高」完全相同。用入門機器遊玩絕不吃虧。",
+      "loadoutsHeading": "三套現成配置",
+      "loadoutsIntro": "先從聽起來最像你機器的配置開始，再一次調整一個選項，直到感覺對了為止。",
+      "recommended": "推薦",
+      "whyLabel": "為什麼有效：",
+      "tagReload": "需重新載入",
+      "fpsTitle": "效能優先",
+      "fpsTagline": "適合較舊的筆電、內顯，以及使用電池遊玩的時候。",
+      "fpsWhy": "圖形品質是總開關，渲染品質則是效果最強的滑桿：調到 70% 時，世界只需繪製約一半的像素，介面卻依然完全清晰。",
+      "balancedTitle": "平衡",
+      "balancedTagline": "大多數機器的甜蜜點，也是我們的預設建議。",
+      "balancedWhy": "「中」就有真實陰影與完整材質，「高」再加上環境光遮蔽與光暈。只要低於「超高」，內建安全網就會在激烈戰鬥中吸收突然的效能下滑，因此「平衡」不必費心照顧也能保持順暢。",
+      "visualsTitle": "極致畫質",
+      "visualsTagline": "給高階桌機的截圖模式。",
+      "visualsWhy": "「超高」會以你螢幕支援的最高解析度繪製，並呈現最豐富的光照。它同時會關閉安全網，而且僅限桌機：手機與 App 版最高到「高」為止。",
+      "value50to70": "50% 到 70%",
+      "value90to100": "90% 到 100%",
+      "value100": "100%",
+      "valueHighOrMedium": "電競電腦用「高」，筆電用「中」",
+      "valueOnOptional": "開啟（可選）",
+      "howHeading": "選項的運作方式",
+      "factDetectTitle": "遊戲會先自我調校",
+      "factDetectBody": "首次啟動時，遊戲會偵測你的裝置並挑選合適的檔位：入門手機用「低」，高效能桌機用「超高」。而你親自做的選擇永遠優先。",
+      "factReloadTitle": "兩種類型的選項",
+      "factReloadBody": "圖形品質與進階選項需要重新載入後才會生效，必要時面板會出現「立即重新載入」按鈕。其他所有選項則是一改就生效。",
+      "factGovernorTitle": "內建安全網",
+      "factGovernorBody": "在「超高」以下的所有檔位，當大型戰鬥造成瞬間負載時，遊戲會悄悄暫時減少草叢、特效與光照，狀況過去後再恢復原狀。選擇「超高」則代表你寧可保留每一分細節。",
+      "advancedHeading": "「進階」預設：自由調配",
+      "advancedBody": "「進階」以「高」這一檔為起點，並解鎖四個額外選項，讓你把效能花在真正看得出差別的地方：地形細節、植被密度、特效與光照，以及陰影品質。它們和圖形品質一樣，需要重新載入後才會生效。",
+      "advancedMixes": "兩種人氣搭配：把陰影品質維持在「高」、特效與光照調成「低」，畫面清爽俐落、沒有光暈，跑起來也輕鬆；或者反過來，保留光暈，讓陰影柔和一些。",
+      "tableHeading": "每個選項，逐一解說",
+      "colSetting": "選項",
+      "colDoes": "作用",
+      "colImpact": "FPS 影響",
+      "impactNone": "無",
+      "impactLight": "輕微",
+      "impactModerate": "中等",
+      "impactHeavy": "顯著",
+      "rowGraphicsQuality": "總開關。每調一檔，解析度、陰影、材質、植被與光照特效都會一起改變。這是影響最大的單一選項。",
+      "rowRenderQuality": "以較低的內部解析度繪製 3D 世界再放大，介面維持清晰。在較弱的機器與高解析度螢幕上，是立即見效、威力最強的滑桿。",
+      "rowFieldOfView": "決定畫面能容納多少世界：從拉近的 55 度到開闊的 100 度。屬於舒適度選擇；視野越廣，繪製量會略微增加。",
+      "rowBrightness": "調整場景曝光的明暗，純屬個人喜好。",
+      "rowWeather": "環境雨雪效果。純屬氣氛營造，關閉後在暴風雨中還能省下一點效能。",
+      "rowBrowserEffects": "決定介面本身可以多華麗：玻璃模糊、光暈、選單動畫。「自動」會配合你的瀏覽器；無論怎麼選，3D 世界都不受影響。",
+      "rowTerrainDetail": "豐富細膩的混合地面材質，或是較簡單、跑得較快的地形外觀。",
+      "rowFoliageDensity": "角色周圍草叢生長的範圍與密度。",
+      "rowEffectsQuality": "光暈、環境光遮蔽，以及有多少火把和法術會投射真實光源。是進階選項中省效能最多的一項。",
+      "rowShadowQuality": "陰影的銳利程度。「低」仍保留陰影，只是邊緣較柔和。",
+      "rowFrostedPanels": "視窗背後的霧面玻璃模糊。很漂亮，但也正是較弱的瀏覽器最有感的那種效果；關閉它，就是經典的俐落外觀。",
+      "rowReduceMotion": "移除介面動畫，讓視窗立即出現。首先是無障礙選項，順帶帶來少許效能提升。",
+      "rowPerfOverlay": "在畫面上即時顯示 FPS、影格時間等數據。調整本頁設定時先開著，調完再關掉。",
+      "tableFoot": "想找繪製距離滑桿或 FPS 上限嗎？其實不必找：可視距離已內建在各品質檔位中，影格節奏則交由你的顯示器決定。",
+      "mobileTitle": "在手機與平板上",
+      "mobileBody": "行動裝置上，遊戲會替你打理更多：自動挑選檔位、將解析度稍微壓低以節省電力並抑制發熱，最高的幾個檔位則僅限桌機。上面的配置依然適用，只是手機最高到「高」為止。"
     },
     "combat": {
       "intro": "戰鬥遵循熟悉的經典MMO規則。你完全不需要研究這些就能玩得很好，這只是讓你了解戰鬥運作的大致樣貌。",
@@ -2645,6 +2708,8 @@ export const zh_TW: EnTranslations = {
     "title": "下載電腦版啟動器",
     "desc": "獲取獨立啟動器，以獲得更優化的效能和全螢幕遊戲體驗。",
     "macCta": "下載 macOS 版",
+    "linuxCta": "下載 Linux 版",
+    "linuxHint": "AppImage 格式：賦予可執行權限後直接執行，無需安裝。",
     "windowsPending": "Windows 版本即將推出。"
   },
   "comingSoon": {
@@ -3487,6 +3552,7 @@ export const zh_TW: EnTranslations = {
     "rendererFailed": "無法啟動渲染器：請嘗試重新整理。{error}",
     "enterTimeout": "無法進入世界。連線已逾時。遊戲伺服器是否正在執行？",
     "connectionLost": "與伺服器的連線已中斷。",
+    "reconnecting": "連線已中斷。正在重新連線...",
     "connectionRejected": "伺服器已關閉連線。"
   },
   "errors": {
@@ -7685,6 +7751,26 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "擊敗莫格"
+          }
+        }
+      },
+      "q_archetype_acceptance": {
+        "title": "屬於你自己的技藝",
+        "text": "東溪的每一位工匠最終都會選定一門屬於自己的技藝。用一件事證明自己吧，{playerName}，宣告你的道路。",
+        "completion": "你的道路已經選定；願你走得穩當。",
+        "objectives": {
+          "0": {
+            "label": "擊敗森林之狼"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "彌補",
+        "text": "若要放下一門技藝、轉投另一門，工匠必須先為放棄的道路做出彌補，{playerName}。",
+        "completion": "彌補已經完成；一條新的道路已向你敞開。",
+        "objectives": {
+          "0": {
+            "label": "擊敗森林之狼"
           }
         }
       },

@@ -14,7 +14,6 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 | `keybinds.ts` | `Keybinds` + `BIND_ACTIONS`: the classic remappable layout (pure, no DOM). |
 | `interactions.ts` | `handlePickedEntity`: the **only** file here that calls `IWorld`; routes a click-pick to target/loot/quest/enter-dungeon via injected `PickInteractionWorld`/`PickInteractionHud`. |
 | `mobile_controls.ts` | `MobileControls`: touch joysticks to `input.setTouchMove`/`setTouchLook`. |
-| `touch_router.ts` | Pure, DOM-free touch ownership router: `getTouchOwner`/`isInteractiveHudElement`/`isCameraDragAllowedAt` + a per-pointer `TouchOwnerLedger`, consumed by `mobile_controls.ts` to keep move/combat/camera/menu touches from fighting over the same finger. |
 | `audio.ts` | `GameAudio` (`audio` singleton): procedural SFX. |
 | `music.ts` | `MusicDirector` (`music` singleton): procedural zone/combat soundtrack. |
 | `sfx.ts` / `voice.ts` | `sfx` / `voice` singletons: play pre-rendered clips from `public/audio/` (spatial 3D SFX + NPC voice lines) via their `*_manifest.generated.ts`. |

@@ -39,6 +39,7 @@ export const shellStrings = {
       rendererFailed: 'Could not start the renderer: try reloading. {error}',
       enterTimeout: 'Could not enter world. The connection timed out. Is the game server running?',
       connectionLost: 'Connection to the server was lost.',
+      reconnecting: 'Connection lost. Reconnecting...',
       connectionRejected: 'The server closed the connection.',
     },
     errors: {

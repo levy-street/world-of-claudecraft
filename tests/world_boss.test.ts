@@ -452,7 +452,7 @@ describe('world boss anti-kite snare (Howling Gale)', () => {
     sim.tick();
   }
 
-  it('snares a ranged kiter it is chasing, cutting move speed to 20% (not kiteable)', () => {
+  it('snares a ranged kiter it is chasing, cutting move speed to 70% (not kiteable)', () => {
     const sim = makeSim();
     const kiter = sim.addPlayer('hunter', 'Kiter');
     const { boss } = spawnBossNow(sim);
@@ -463,9 +463,10 @@ describe('world boss anti-kite snare (Howling Gale)', () => {
     expect(boss.aiState).toBe('chase'); // the snare fired from the chase path
     const slow = p.auras.find((a) => a.kind === 'slow' && a.name === 'Howling Gale');
     expect(slow).toBeTruthy();
-    expect(slow?.value).toBe(0.2);
-    // Run speed (7) beats the boss's 5.8, but 20% speed (1.4yd/s) lets the boss close.
-    expect((sim as any).moveSpeedMult(p)).toBeCloseTo(0.2, 5);
+    expect(slow?.value).toBe(0.7);
+    // Run speed (7) beats the boss's 5.8, but a 30% snare (4.9yd/s) still lets the boss,
+    // at 5.8, slowly close the gap: the gentler snare denies a perma-kite without rooting.
+    expect((sim as any).moveSpeedMult(p)).toBeCloseTo(0.7, 5);
   });
 
   it('also fires from the attack state and only snares players inside the radius', () => {
@@ -509,6 +510,40 @@ describe('world boss anti-kite snare (Howling Gale)', () => {
   });
 });
 
+describe('world boss slow immunity', () => {
+  it('shrugs off a player-applied snare but still takes a self-applied (scripted) slow', () => {
+    const sim = makeSim();
+    const { boss } = spawnBossNow(sim);
+    const pid = sim.addPlayer('mage', 'Chiller');
+
+    // A Frostbolt/Hamstring-style snare from a player does not stick to the raid boss.
+    (sim as any).applyAura(boss, {
+      id: 'frostbolt_slow',
+      name: 'Frostbolt',
+      kind: 'slow',
+      remaining: 5,
+      duration: 5,
+      value: 0.4,
+      sourceId: pid,
+      school: 'frost',
+    });
+    expect(boss.auras.some((a: { kind: string }) => a.kind === 'slow')).toBe(false);
+
+    // But a self-sourced slow (a scripted mechanic on itself) is exempt from the immunity.
+    (sim as any).applyAura(boss, {
+      id: 'self_slow',
+      name: 'Rooted Stance',
+      kind: 'slow',
+      remaining: 5,
+      duration: 5,
+      value: 0.5,
+      sourceId: boss.id,
+      school: 'nature',
+    });
+    expect(boss.auras.some((a: { kind: string; id: string }) => a.id === 'self_slow')).toBe(true);
+  });
+});
+
 describe('world boss participant HP scaling', () => {
   // Put a player on the boss's hate table (a participant) at melee range.
   function engage(sim: Sim, boss: Entity, pid: number): Entity {
@@ -519,20 +554,20 @@ describe('world boss participant HP scaling', () => {
     return p;
   }
 
-  it('spawns at 40k HP and grows the pool hard per participant, capped at 2M', () => {
+  it('spawns at 40k HP and grows the pool gently per participant, capped at 1M', () => {
     const sim = makeSim();
     const { boss } = spawnBossNow(sim);
     expect(boss.maxHp).toBe(40_000);
     expect(boss.hp).toBe(40_000);
 
-    // Five participants: 40k + 40k * (5 - 1) = 200k.
+    // Five participants: 40k + 5k * (5 - 1) = 60k.
     for (let i = 0; i < 5; i++) engage(sim, boss, sim.addPlayer('warrior', `P${i}`));
     sim.tick();
-    expect(boss.maxHp).toBe(200_000);
+    expect(boss.maxHp).toBe(60_000);
 
-    // A big raid tops out at the 1M cap (reached around 25 participants) so it cannot
-    // be melted in a minute.
-    for (let i = 5; i < 60; i++) engage(sim, boss, sim.addPlayer('warrior', `Q${i}`));
+    // A very large raid still tops out at the 1M cap (40k + 5k * (n - 1) hits 1M at
+    // n = 193 participants) so it cannot grow without bound.
+    for (let i = 5; i < 220; i++) engage(sim, boss, sim.addPlayer('warrior', `Q${i}`));
     sim.tick();
     expect(boss.maxHp).toBe(1_000_000);
   });
@@ -542,22 +577,22 @@ describe('world boss participant HP scaling', () => {
     const { boss } = spawnBossNow(sim);
     for (let i = 0; i < 5; i++) engage(sim, boss, sim.addPlayer('warrior', `P${i}`));
     sim.tick();
-    expect(boss.maxHp).toBe(200_000);
+    expect(boss.maxHp).toBe(60_000);
     // The whole raid drops off the hate table: the boss keeps its enlarged pool.
     boss.threat.clear();
     sim.tick();
-    expect(boss.maxHp).toBe(200_000);
+    expect(boss.maxHp).toBe(60_000);
   });
 });
 
-describe('world boss is oversized and loud', () => {
-  it('is a towering, oversized world boss with combat reach decoupled from visual scale', () => {
+describe('world boss is imposing and loud', () => {
+  it('renders at a fixed visual scale while its melee reach stays pinned to a scale-5 body', () => {
     const sim = makeSim();
     const { boss } = spawnBossNow(sim);
-    // Rendered mountain-sized so he reads as a world boss on the skyline.
-    expect(boss.scale).toBe(50);
-    // But his melee reach is PINNED to a ~17yd body, not the ~150yd a scale-50 body
-    // would give: the Howling Gale snare, not a giant swing, is what makes him unkitable.
+    // A large, imposing world boss, but no longer mountain-sized.
+    expect(boss.scale).toBe(8);
+    // His melee reach is PINNED to a ~17yd (scale-5) body, not the wider reach a scale-8
+    // body would give: the Howling Gale snare, not a giant swing, is what makes him unkitable.
     const reach = combatProfileForMob(boss.templateId, boss.scale).meleeRange;
     expect(reach).toBe(scaledDefaultMobMeleeRange(5));
     expect(reach).toBeLessThan(scaledDefaultMobMeleeRange(boss.scale));

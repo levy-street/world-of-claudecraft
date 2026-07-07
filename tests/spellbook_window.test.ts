@@ -59,21 +59,6 @@ describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => 
   });
 });
 
-describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)', () => {
-  it('feeds abilityIdByBarSlot through to the pure view core', () => {
-    expect(code).toContain('abilityIdByBarSlot: this.deps.abilityIdByBarSlot()');
-  });
-
-  it('gates the page label on both a non-null mobilePage AND touch mode', () => {
-    expect(code).toContain('row.mobilePage !== null');
-    expect(code).toContain("document.body.classList.contains('mobile-touch')");
-  });
-
-  it('renders the label through t() with the localized page-label key', () => {
-    expect(code).toContain("t('hudChrome.mobile.spellbookPageLabel'");
-  });
-});
-
 describe('spellbook_window: no magic values (DOM painter)', () => {
   it('carries no literal hex or rgb color in TS (colors live in the stylesheet)', () => {
     const hex = code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];

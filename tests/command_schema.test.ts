@@ -23,8 +23,8 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; never trust stale prose).
-const EXPECTED_SEND_COUNT = 118;
-const EXPECTED_DISPATCH_COUNT = 127;
+const EXPECTED_SEND_COUNT = 119;
+const EXPECTED_DISPATCH_COUNT = 128;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

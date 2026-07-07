@@ -1547,16 +1547,8 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n-aria="hud.core.mobileControls"');
     expect(html).toContain('data-i18n="hud.core.mobileMove"');
     expect(html).toContain('data-i18n="hud.core.mobileCamera"');
-    // #mobile-target-cycle is the ring's Target swap helper (it replaced the
-    // Target Closest button when acquire-nearest moved onto the ring's own
-    // #mobile-action-attack toggle), so its copy lives at
-    // hudChrome.mobile.targetCycleShort.
-    expect(html).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
-    // The old bottom-centre Target button stays removed (the ring's Target
-    // swap is the one target-cycling helper); hud.core.mobileTarget stays in
-    // the catalog (the hudKeys existence list above) but no longer appears in
-    // the markup.
-    expect(html).not.toContain('data-i18n="hud.core.mobileTarget"');
+    expect(html).toContain('data-i18n="hud.core.mobileAttack"');
+    expect(html).toContain('data-i18n="hud.core.mobileTarget"');
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');

@@ -311,15 +311,7 @@ export const sv_SE: EnTranslations = {
       "nameplates": "Namn",
       "haptics": "Haptik",
       "hapticsOff": "Haptik av",
-      "toggleHaptics": "Växla haptik",
-      "hotbarPage": "Förmågor",
-      "hotbarPageAria": "Visa nästa uppsättning förmågor",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
-      "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "toggleHaptics": "Växla haptik"
     },
     "tutorial": {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
@@ -426,9 +418,7 @@ export const sv_SE: EnTranslations = {
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
-      "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "showDailyRewardsChest": "Visa kistan för dagliga belöningar"
     },
     "controller": {
       "title": "Handkontroll",
@@ -1060,6 +1050,18 @@ export const sv_SE: EnTranslations = {
         }
       }
     },
+    "crafting": {
+      "title": "Hantverk",
+      "close": "Nära hantverk",
+      "craft": "Hantverk",
+      "reagentsNeeded": "Kräver:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Inga recept kända än.",
+      "resultAria": "Hantverk {name}",
+      "craftedToast": "Tillverkad: {name}",
+      "insufficientMaterials": "Du har inte materialet för det.",
+      "unknownRecipe": "Det receptet finns inte."
+    },
     "devBadge": {
       "title": "Utvecklare",
       "tiers": {
@@ -1319,6 +1321,7 @@ export const sv_SE: EnTranslations = {
       "delves": "Delver",
       "reference": "Referens",
       "controls": "Kontroller",
+      "settings": "Inställningar och prestanda",
       "combat": "Strid",
       "talents": "Talanger",
       "arena": "Arena och PvP",
@@ -1486,6 +1489,66 @@ export const sv_SE: EnTranslations = {
       "mobileBody": "Pekkontroller visas automatiskt på telefoner och surfplattor: en rörelsespak till vänster, dra var som helst till höger för att titta, och knappar på skärmen för dina förmågor och menyer.",
       "controllerHeading": "På handkontroll",
       "controllerBody": "Handkontroller fungerar också, och stöd för handkontroll är på som standard. Vänsterspaken förflyttar dig, högerspaken styr kameran, och ansikts- och axelknapparna täcker dina förmågor, hopp och interaktion. Öppna valfritt fönster för att ta fram en pekare på skärmen för menyer. Du kan binda om knapparna och justera spakens dödzon, kamerahastighet, vibration och inverterat sikte i handkontrollsinställningarna under alternativ."
+    },
+    "settingsPage": {
+      "heading": "Inställningar och prestanda",
+      "intro": "Få spelet att se bäst ut eller kör det snabbaste. Tre färdiga laddningar, plus vad varje grafikalternativ verkligen gör.",
+      "wherePath": "Allt på den här sidan lever i spelet: tryck på Esc och titta i grafik, gränssnitt och prestandaöverlägg.",
+      "fairnessTitle": "Fair by design",
+      "fairnessBody": "Inget alternativ här byter skönhet mot makt. Lower inställningar släpper bara kosmetisk polering, aldrig information du slåss med: dina debuffs, cast bars, partyhälsa och skadenummer är identiska från Low till Ultra. Att spela på en blygsam maskin är aldrig ett handikapp.",
+      "loadoutsHeading": "Tre färdiga laddningar",
+      "loadoutsIntro": "Börja från laddningen som låter som din maskin, justera sedan ett alternativ i taget tills det känns rätt.",
+      "recommended": "Rekommenderad",
+      "whyLabel": "Varför det fungerar:",
+      "tagReload": "efter omladdning",
+      "fpsTitle": "Bästa FPS",
+      "fpsTagline": "För äldre bärbara datorer, integrerad grafik och batterispel.",
+      "fpsWhy": "Grafikkvalitet är huvudbrytaren och Render Quality är det starkaste reglaget: med 70 % drar världen ungefär hälften av pixlarna medan gränssnittet förblir perfekt skarpt.",
+      "balancedTitle": "Balanserad",
+      "balancedTagline": "Det bästa stället för de flesta maskiner och vårt standardråd.",
+      "balancedWhy": "Medium ger riktiga skuggor och fullmaterial; High lägger till omgivande ocklusion och blomning. Under Ultra absorberar ett inbyggt skyddsnät plötsliga dippar i hektiska slagsmål, så Balanced förblir smidig utan att vara barnvakt.",
+      "visualsTitle": "Bästa visuella",
+      "visualsTagline": "Skärmbildsläge för kraftfulla stationära datorer.",
+      "visualsWhy": "Ultra återger med den högsta upplösningen din skärm erbjuder med den rikaste belysningen. Det stänger också av skyddsnätet, och det är endast för skrivbordet: telefoner och appen toppas vid High.",
+      "value50to70": "50 till 70 %",
+      "value90to100": "90 till 100 %",
+      "value100": "100 %",
+      "valueHighOrMedium": "High på en speldator, Medium på en bärbar dator",
+      "valueOnOptional": "På (valfritt)",
+      "howHeading": "Hur alternativen beter sig",
+      "factDetectTitle": "Spelet ställer in sig själv först",
+      "factDetectBody": "Vid din första start läser spelet din enhet och väljer en vettig nivå, från Low på en blygsam telefon till Ultra på ett starkt skrivbord. Alla val du gör själv vinner alltid.",
+      "factReloadTitle": "Två sorters alternativ",
+      "factReloadBody": "Grafikkvalitet och de avancerade väljarna träder i kraft efter en omladdning, och panelen erbjuder en Ladda om nu-knapp när det behövs. Alla andra alternativ gäller i det ögonblick du ändrar det.",
+      "factGovernorTitle": "Ett inbyggt skyddsnät",
+      "factGovernorBody": "På varje nivå under Ultra tunnar spelet lugnt ut gräs, effekter och belysning för ett ögonblick när ett stort slagsmål spikar, och återställer dem sedan. Att välja Ultra säger att du hellre vill behålla varje detalj.",
+      "advancedHeading": "Den avancerade förinställningen: blanda din egen",
+      "advancedBody": "Avancerat börjar från nivån High och låser upp fyra extra väljare, så att du kan spendera dina ramar där du faktiskt lägger märke till dem: Terrängdetalj, Lövdensitet, Effekter & Ljus och Skuggkvalitet. Liksom Graphics Quality tillämpas de efter en omladdning.",
+      "advancedMixes": "Två favoritblandningar: behåll Shadow Quality på High och ställ in Effects & Lighting på Low för en skarp, glödfri look som blir ljus, eller gör tvärtom för att behålla blomningen och mjuka upp skuggorna.",
+      "tableHeading": "Varje alternativ, förklarat",
+      "colSetting": "Miljö",
+      "colDoes": "Vad den gör",
+      "colImpact": "FPS påverkan",
+      "impactNone": "Ingen",
+      "impactLight": "Ljus",
+      "impactModerate": "Måttlig",
+      "impactHeavy": "Tung",
+      "rowGraphicsQuality": "Huvudströmbrytaren. Varje steg ändrar upplösning, skuggor, material, bladverk och ljuseffekter tillsammans. Den största enskilda skillnaden du kan göra.",
+      "rowRenderQuality": "Ritar 3D-världen med en lägre intern upplösning och skalar upp den; gränssnittet förblir skarpt. Det starkaste direktreglaget på svagare maskiner och högupplösta skärmar.",
+      "rowFieldOfView": "Hur mycket av världen får plats på skärmen, från zoomade 55 till svepande 100 grader. Ett komfortval; bredare vyer drar något mer.",
+      "rowBrightness": "Scenexponering, mörkare eller ljusare. Ren preferens.",
+      "rowWeather": "Omgivande regn och snö. Endast atmosfär, och att stänga av den sparar lite under stormar.",
+      "rowBrowserEffects": "Hur fancy själva gränssnittet tillåts vara: glasoskärpa, glöd, animerade menyer. Auto matchar din webbläsare; 3D-världen är orörd hur som helst.",
+      "rowTerrainDetail": "Rika, blandade markstrukturer kontra en enklare, snabbare terränglook.",
+      "rowFoliageDensity": "Hur långt och hur tjockt gräset växer runt din karaktär.",
+      "rowEffectsQuality": "Blomning, omgivande ocklusion och hur många facklor och besvärjelser som kastar verkligt ljus. Den enskilt största besparingen bland de avancerade plockarna.",
+      "rowShadowQuality": "Skugga sprödhet. Low behåller skuggor men mjukar upp deras kanter.",
+      "rowFrostedPanels": "En suddig frostat glas bakom fönster. Vackert, och precis den typ av effekt en svagare webbläsare känner; lämna det för den klassiska skarpa looken.",
+      "rowReduceMotion": "Tar bort gränssnittsanimationer så att fönster visas direkt. Ett tillgänglighetsalternativ först, med en liten prestationsbonus.",
+      "rowPerfOverlay": "En avläsning på skärmen av FPS, bildtid och mer. Slå på den medan du ställer in den här sidan och dölj den sedan igen.",
+      "tableFoot": "Letar du efter ett skjutavståndsreglage eller en FPS-keps? Det finns inget att jaga efter: visningsavstånd är en del av varje kvalitetsnivå, och bildrutetempo följer din skärm.",
+      "mobileTitle": "På telefoner och surfplattor",
+      "mobileBody": "Mobilen hanterar mer åt dig: spelet väljer nivån, håller upplösningen en knapptryckning lägre för att skydda batteri och värme, och behåller de högsta nivåerna endast på skrivbordet. Belastningarna ovan gäller fortfarande; telefoner toppar helt enkelt vid High."
     },
     "combat": {
       "intro": "Strid följer välbekanta klassiska MMO-regler. Du behöver aldrig studera något av det för att spela bra, detta är bara formen för hur strider fungerar.",
@@ -2645,6 +2708,8 @@ export const sv_SE: EnTranslations = {
     "title": "Ladda ner skrivbordsstartaren",
     "desc": "Hämta den fristående startaren för optimerad prestanda och spel i helskärm.",
     "macCta": "Ladda ner för macOS",
+    "linuxCta": "Ladda ner för Linux",
+    "linuxHint": "AppImage: gör den körbar och kör den sedan. Ingen installation behövs.",
     "windowsPending": "Windows-bygge väntar."
   },
   "comingSoon": {
@@ -3487,6 +3552,7 @@ export const sv_SE: EnTranslations = {
     "rendererFailed": "Kunde inte starta renderaren: försök läsa om sidan. {error}",
     "enterTimeout": "Kunde inte gå in i världen. Anslutningen tog för lång tid. Körs spelservern?",
     "connectionLost": "Anslutningen till servern bröts.",
+    "reconnecting": "Anslutning förlorad. Återansluter...",
     "connectionRejected": "Servern stängde anslutningen."
   },
   "errors": {
@@ -7685,6 +7751,26 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Mogger dräpt"
+          }
+        }
+      },
+      "q_archetype_acceptance": {
+        "title": "Ett hantverk att kalla ditt eget",
+        "text": "Varje hantverkare i Eastbrook nöjer sig så småningom med ett hantverk att kalla sitt eget. Bevisa dig själv med en enda gärning, {playerName}, och förklara din väg.",
+        "completion": "Din väg är vald; gå det bra.",
+        "objectives": {
+          "0": {
+            "label": "Skogsvarg dödad"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Att göra gott",
+        "text": "För att avsätta ett hantverk åt ett annat måste en hantverkare först göra gott för vägen som inte gicks, {playerName}.",
+        "completion": "Gjorda ändringar; en ny väg är öppen för dig.",
+        "objectives": {
+          "0": {
+            "label": "Skogsvarg dödad"
           }
         }
       },

@@ -78,7 +78,7 @@ Postgres and serves the built client from `dist/`.
    `tests/command_schema.test.ts` (W0b).
 
 - **Delta-key registry.** The heavy self fields `selfWireJson` may omit are written
-  with `maybe(...)`; the 25 such keys plus their terse-key to IWorld-name mapping are
+  with `maybe(...)`; the 31 such keys plus their terse-key to IWorld-name mapping are
   pinned by `ALL_DELTA_KEYS` + `TERSE_TO_IWORLD` in `tests/snapshots.test.ts` (W0a),
   which guards the `selfWireJson` (encode) to `applySnapshot` (decode) round-trip. A
   new heavy self field lands in `selfWireJson` (here) and `applySnapshot` (`online.ts`)

@@ -752,5 +752,7 @@ describe('dailyRewardService singleton', () => {
     expect(typeof dailyRewardService.recordOnlineMinute).toBe('function');
     expect(typeof dailyRewardService.recordQuestCompletion).toBe('function');
     expect(typeof dailyRewardService.recordArenaResult).toBe('function');
+    expect(typeof dailyRewardService.recordDelveClear).toBe('function');
+    expect(typeof dailyRewardService.recordDelveChestOpen).toBe('function');
   });
 });

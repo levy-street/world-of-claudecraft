@@ -160,6 +160,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   talents: 'game.talents.title',
   leaderboard: 'game.leaderboard.title',
   calendar: 'hudChrome.calendar.keybindLabel',
+  crafting: 'hudChrome.crafting.title',
 };
 
 /**

@@ -37,7 +37,8 @@
 //   daily_rewards.ts    IWorldDailyRewards   daily WOC-holder rewards
 //   telemetry.ts        IWorldTelemetry      fire-and-forget metrics sink
 //   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (#1164; node
-//                                            harvest read + action landed in #1121)
+//                                            harvest read + action landed in #1121; recipe
+//                                            content + basic crafting action landed in #1127)
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -116,7 +117,7 @@ export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
-export type { PlayerProfessionsView } from './world_api/professions';
+export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
@@ -210,6 +211,7 @@ export const COMMAND_NAMES = [
   'buyback',
   'sell_all_junk',
   'harvest_node',
+  'craft_item',
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',

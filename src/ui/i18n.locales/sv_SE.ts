@@ -5891,8 +5891,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ju färre delar du väljer, desto högre kvalitetsnivå får var och en.',
   'hudChrome.corpseHarvest.harvestButton': 'Skörda',
   'hudChrome.corpseHarvest.title': 'Skörda',
-  'hudChrome.mobile.hotbarPage': 'Förmågor',
-  'hudChrome.mobile.hotbarPageAria': 'Visa nästa uppsättning förmågor',
   'errors.api.accountSessionLimit': 'För många karaktärer på detta konto är redan i världen.',
   'errors.api.crossSiteOrigin': 'Begäran blockerades av säkerhetsskäl.',
   'errors.api.unsupportedMediaType': 'Formatet på begäran stöds inte.',
@@ -5962,4 +5960,115 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.not_enabled': 'Tvåfaktorsautentisering är inte aktiverad.',
   'apiError.two_factor.setup_required': 'Starta konfigurationen av tvåfaktorsautentisering först.',
   'apiError.validation.failed': 'Vissa fält är ogiltiga. Kontrollera formuläret och försök igen.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Ladda ner för Linux',
+  'download.linuxHint': 'AppImage: gör den körbar och kör den sedan. Ingen installation behövs.',
+  'loading.reconnecting': 'Anslutning förlorad. Återansluter...',
+  'guide.nav.settings': 'Inställningar och prestanda',
+  'guide.settingsPage.advancedBody':
+    'Avancerat börjar från nivån High och låser upp fyra extra väljare, så att du kan spendera dina ramar där du faktiskt lägger märke till dem: Terrängdetalj, Lövdensitet, Effekter & Ljus och Skuggkvalitet. Liksom Graphics Quality tillämpas de efter en omladdning.',
+  'guide.settingsPage.advancedHeading': 'Den avancerade förinställningen: blanda din egen',
+  'guide.settingsPage.advancedMixes':
+    'Två favoritblandningar: behåll Shadow Quality på High och ställ in Effects & Lighting på Low för en skarp, glödfri look som blir ljus, eller gör tvärtom för att behålla blomningen och mjuka upp skuggorna.',
+  'guide.settingsPage.balancedTagline':
+    'Det bästa stället för de flesta maskiner och vårt standardråd.',
+  'guide.settingsPage.balancedTitle': 'Balanserad',
+  'guide.settingsPage.balancedWhy':
+    'Medium ger riktiga skuggor och fullmaterial; High lägger till omgivande ocklusion och blomning. Under Ultra absorberar ett inbyggt skyddsnät plötsliga dippar i hektiska slagsmål, så Balanced förblir smidig utan att vara barnvakt.',
+  'guide.settingsPage.colDoes': 'Vad den gör',
+  'guide.settingsPage.colImpact': 'FPS påverkan',
+  'guide.settingsPage.colSetting': 'Miljö',
+  'guide.settingsPage.factDetectBody':
+    'Vid din första start läser spelet din enhet och väljer en vettig nivå, från Low på en blygsam telefon till Ultra på ett starkt skrivbord. Alla val du gör själv vinner alltid.',
+  'guide.settingsPage.factDetectTitle': 'Spelet ställer in sig själv först',
+  'guide.settingsPage.factGovernorBody':
+    'På varje nivå under Ultra tunnar spelet lugnt ut gräs, effekter och belysning för ett ögonblick när ett stort slagsmål spikar, och återställer dem sedan. Att välja Ultra säger att du hellre vill behålla varje detalj.',
+  'guide.settingsPage.factGovernorTitle': 'Ett inbyggt skyddsnät',
+  'guide.settingsPage.factReloadBody':
+    'Grafikkvalitet och de avancerade väljarna träder i kraft efter en omladdning, och panelen erbjuder en Ladda om nu-knapp när det behövs. Alla andra alternativ gäller i det ögonblick du ändrar det.',
+  'guide.settingsPage.factReloadTitle': 'Två sorters alternativ',
+  'guide.settingsPage.fairnessBody':
+    'Inget alternativ här byter skönhet mot makt. Lower inställningar släpper bara kosmetisk polering, aldrig information du slåss med: dina debuffs, cast bars, partyhälsa och skadenummer är identiska från Low till Ultra. Att spela på en blygsam maskin är aldrig ett handikapp.',
+  'guide.settingsPage.fairnessTitle': 'Fair by design',
+  'guide.settingsPage.fpsTagline': 'För äldre bärbara datorer, integrerad grafik och batterispel.',
+  'guide.settingsPage.fpsTitle': 'Bästa FPS',
+  'guide.settingsPage.fpsWhy':
+    'Grafikkvalitet är huvudbrytaren och Render Quality är det starkaste reglaget: med 70 % drar världen ungefär hälften av pixlarna medan gränssnittet förblir perfekt skarpt.',
+  'guide.settingsPage.heading': 'Inställningar och prestanda',
+  'guide.settingsPage.howHeading': 'Hur alternativen beter sig',
+  'guide.settingsPage.impactHeavy': 'Tung',
+  'guide.settingsPage.impactLight': 'Ljus',
+  'guide.settingsPage.impactModerate': 'Måttlig',
+  'guide.settingsPage.impactNone': 'Ingen',
+  'guide.settingsPage.intro':
+    'Få spelet att se bäst ut eller kör det snabbaste. Tre färdiga laddningar, plus vad varje grafikalternativ verkligen gör.',
+  'guide.settingsPage.loadoutsHeading': 'Tre färdiga laddningar',
+  'guide.settingsPage.loadoutsIntro':
+    'Börja från laddningen som låter som din maskin, justera sedan ett alternativ i taget tills det känns rätt.',
+  'guide.settingsPage.mobileBody':
+    'Mobilen hanterar mer åt dig: spelet väljer nivån, håller upplösningen en knapptryckning lägre för att skydda batteri och värme, och behåller de högsta nivåerna endast på skrivbordet. Belastningarna ovan gäller fortfarande; telefoner toppar helt enkelt vid High.',
+  'guide.settingsPage.mobileTitle': 'På telefoner och surfplattor',
+  'guide.settingsPage.recommended': 'Rekommenderad',
+  'guide.settingsPage.rowBrightness': 'Scenexponering, mörkare eller ljusare. Ren preferens.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Hur fancy själva gränssnittet tillåts vara: glasoskärpa, glöd, animerade menyer. Auto matchar din webbläsare; 3D-världen är orörd hur som helst.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Blomning, omgivande ocklusion och hur många facklor och besvärjelser som kastar verkligt ljus. Den enskilt största besparingen bland de avancerade plockarna.',
+  'guide.settingsPage.rowFieldOfView':
+    'Hur mycket av världen får plats på skärmen, från zoomade 55 till svepande 100 grader. Ett komfortval; bredare vyer drar något mer.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Hur långt och hur tjockt gräset växer runt din karaktär.',
+  'guide.settingsPage.rowFrostedPanels':
+    'En suddig frostat glas bakom fönster. Vackert, och precis den typ av effekt en svagare webbläsare känner; lämna det för den klassiska skarpa looken.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Huvudströmbrytaren. Varje steg ändrar upplösning, skuggor, material, bladverk och ljuseffekter tillsammans. Den största enskilda skillnaden du kan göra.',
+  'guide.settingsPage.rowPerfOverlay':
+    'En avläsning på skärmen av FPS, bildtid och mer. Slå på den medan du ställer in den här sidan och dölj den sedan igen.',
+  'guide.settingsPage.rowReduceMotion':
+    'Tar bort gränssnittsanimationer så att fönster visas direkt. Ett tillgänglighetsalternativ först, med en liten prestationsbonus.',
+  'guide.settingsPage.rowRenderQuality':
+    'Ritar 3D-världen med en lägre intern upplösning och skalar upp den; gränssnittet förblir skarpt. Det starkaste direktreglaget på svagare maskiner och högupplösta skärmar.',
+  'guide.settingsPage.rowShadowQuality':
+    'Skugga sprödhet. Low behåller skuggor men mjukar upp deras kanter.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Rika, blandade markstrukturer kontra en enklare, snabbare terränglook.',
+  'guide.settingsPage.rowWeather':
+    'Omgivande regn och snö. Endast atmosfär, och att stänga av den sparar lite under stormar.',
+  'guide.settingsPage.tableFoot':
+    'Letar du efter ett skjutavståndsreglage eller en FPS-keps? Det finns inget att jaga efter: visningsavstånd är en del av varje kvalitetsnivå, och bildrutetempo följer din skärm.',
+  'guide.settingsPage.tableHeading': 'Varje alternativ, förklarat',
+  'guide.settingsPage.tagReload': 'efter omladdning',
+  'guide.settingsPage.value100': '100 %',
+  'guide.settingsPage.value50to70': '50 till 70 %',
+  'guide.settingsPage.value90to100': '90 till 100 %',
+  'guide.settingsPage.valueHighOrMedium': 'High på en speldator, Medium på en bärbar dator',
+  'guide.settingsPage.valueOnOptional': 'På (valfritt)',
+  'guide.settingsPage.visualsTagline': 'Skärmbildsläge för kraftfulla stationära datorer.',
+  'guide.settingsPage.visualsTitle': 'Bästa visuella',
+  'guide.settingsPage.visualsWhy':
+    'Ultra återger med den högsta upplösningen din skärm erbjuder med den rikaste belysningen. Det stänger också av skyddsnätet, och det är endast för skrivbordet: telefoner och appen toppas vid High.',
+  'guide.settingsPage.wherePath':
+    'Allt på den här sidan lever i spelet: tryck på Esc och titta i grafik, gränssnitt och prestandaöverlägg.',
+  'guide.settingsPage.whyLabel': 'Varför det fungerar:',
+  'hudChrome.crafting.close': 'Nära hantverk',
+  'hudChrome.crafting.craft': 'Hantverk',
+  'hudChrome.crafting.craftedToast': 'Tillverkad: {name}',
+  'hudChrome.crafting.empty': 'Inga recept kända än.',
+  'hudChrome.crafting.insufficientMaterials': 'Du har inte materialet för det.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Kräver:',
+  'hudChrome.crafting.resultAria': 'Hantverk {name}',
+  'hudChrome.crafting.title': 'Hantverk',
+  'hudChrome.crafting.unknownRecipe': 'Det receptet finns inte.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Ett hantverk att kalla ditt eget',
+  'entities.quests.q_archetype_acceptance.text':
+    'Varje hantverkare i Eastbrook nöjer sig så småningom med ett hantverk att kalla sitt eget. Bevisa dig själv med en enda gärning, {playerName}, och förklara din väg.',
+  'entities.quests.q_archetype_acceptance.completion': 'Din väg är vald; gå det bra.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Skogsvarg dödad',
+  'entities.quests.q_prof_make_amends.title': 'Att göra gott',
+  'entities.quests.q_prof_make_amends.text':
+    'För att avsätta ett hantverk åt ett annat måste en hantverkare först göra gott för vägen som inte gicks, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion': 'Gjorda ändringar; en ny väg är öppen för dig.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Skogsvarg dödad',
 };

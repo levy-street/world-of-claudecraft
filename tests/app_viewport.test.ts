@@ -4,7 +4,7 @@ import { syncAppViewport } from '../src/game/app_viewport';
 interface FakeWin {
   innerWidth: number;
   innerHeight: number;
-  visualViewport: { width: number; height: number; scale?: number } | undefined;
+  visualViewport: { width: number; height: number } | undefined;
   matchMedia: (query: string) => { matches: boolean };
   document: {
     body: { classList: { contains: (c: string) => boolean } };
@@ -15,7 +15,7 @@ interface FakeWin {
 function fakeWin(opts: {
   innerWidth: number;
   innerHeight: number;
-  visualViewport?: { width: number; height: number; scale?: number };
+  visualViewport?: { width: number; height: number };
   gameActive?: boolean;
   touch?: boolean;
 }): { win: FakeWin; props: Record<string, string> } {
@@ -71,18 +71,6 @@ describe('syncAppViewport', () => {
     syncAppViewport(win as unknown as Window);
     expect(props['--app-vw']).toBe('1194px');
     expect(props['--app-vh']).toBe('905px');
-  });
-
-  it('normalizes a stale scaled visual viewport after a landscape-to-portrait rotation', () => {
-    const { win, props } = fakeWin({
-      innerWidth: 844,
-      innerHeight: 1827,
-      visualViewport: { width: 844, height: 1827, scale: 390 / 844 },
-      touch: true,
-    });
-    syncAppViewport(win as unknown as Window);
-    expect(props['--app-vw']).toBe('390px');
-    expect(props['--app-vh']).toBe('844px');
   });
 
   it('rounds fractional visualViewport dimensions and floors at 1px', () => {

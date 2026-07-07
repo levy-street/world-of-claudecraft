@@ -2572,3 +2572,133 @@ a.guide-poi:hover {
     min-height: var(--g-touch);
   }
 }
+
+/* -------------------------------------------------- settings & performance */
+/* Loadout cards: a single-column stack of spec-sheet cards (three side by side
+   left an orphan hole in the article's narrow column). Each card carries a
+   role-palette accent rail (never color-only: the card title and tagline name
+   the intent); the recommended card is the gold one and wears a corner ribbon.
+   The gap stays large enough that the ribbon never crowds the card above. */
+.guide-loadouts {
+  display: grid;
+  gap: var(--g-lg);
+  margin-block-start: var(--g-lg);
+  grid-template-columns: 1fr;
+}
+.guide-loadout {
+  position: relative;
+  padding: var(--g-md);
+  background: var(--g-panel);
+  border: 1px solid var(--g-border-soft);
+  border-block-start: var(--g-bw-accent) solid var(--g-loadout-accent, var(--g-gold-dim));
+  border-radius: var(--g-radius-lg);
+}
+.guide-loadout-fps {
+  --g-loadout-accent: var(--g-role-dps);
+}
+.guide-loadout-balanced {
+  --g-loadout-accent: var(--g-gold);
+}
+.guide-loadout-visuals {
+  --g-loadout-accent: var(--g-rare);
+}
+.guide-loadout-rec {
+  border-color: var(--g-border);
+  box-shadow: var(--g-shadow-pop);
+}
+.guide-loadout-badge {
+  position: absolute;
+  inset-block-start: calc(-1 * var(--g-sm2));
+  inset-inline-end: var(--g-md);
+  padding: var(--g-pad-pill-y) var(--g-pad-pill-x);
+  border-radius: var(--g-radius-pill);
+  background: var(--g-gold);
+  color: var(--g-on-gold);
+  font-size: var(--g-text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.guide-loadout-h {
+  margin: 0;
+  font-family: var(--g-font-display);
+  font-size: var(--g-text-fluid-h2);
+  color: var(--g-text);
+}
+.guide-loadout-tagline {
+  margin: var(--g-2xs) 0 0;
+  color: var(--g-text-muted);
+  font-size: var(--g-text-sm);
+}
+.guide-loadout-rows {
+  list-style: none;
+  margin: var(--g-md) 0 0;
+  padding: 0;
+}
+.guide-loadout-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--g-md);
+  padding-block: var(--g-sm);
+  border-block-start: 1px solid var(--g-border-soft);
+}
+.guide-loadout-setting {
+  color: var(--g-text-dim);
+}
+.guide-loadout-value {
+  color: var(--g-text);
+  font-weight: 600;
+  text-align: end;
+}
+.guide-loadout-reload {
+  margin-inline-start: var(--g-xs2);
+  font-size: var(--g-text-2xs);
+}
+.guide-loadout-why {
+  margin: var(--g-md) 0 0;
+  padding-block-start: var(--g-sm);
+  border-block-start: 1px solid var(--g-border-soft);
+  color: var(--g-text-dim);
+  font-size: var(--g-text-sm);
+}
+.guide-loadout-why-h {
+  color: var(--g-gold-dim);
+  font-weight: 700;
+}
+
+/* Options table: reuses .guide-keytable; these style the name + impact columns.
+   Impact colors are always paired with their text label. The min-width keeps the
+   prose column readable on phones; the .guide-table-scroll wrapper supplies the
+   horizontal scroll instead of letting the columns crush. */
+.guide-set-table {
+  min-width: 560px;
+}
+.guide-set-name {
+  color: var(--g-text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.guide-set-name .guide-tags {
+  margin-block-start: var(--g-xs);
+}
+.guide-set-impact {
+  white-space: nowrap;
+}
+.guide-impact-none {
+  color: var(--g-text-muted);
+}
+.guide-impact-light {
+  color: var(--g-role-healer);
+}
+.guide-impact-moderate {
+  color: var(--g-gold-dim);
+}
+.guide-impact-heavy {
+  color: var(--g-role-dps);
+}
+.guide-set-foot {
+  margin-block-start: var(--g-sm);
+  color: var(--g-text-muted);
+  font-size: var(--g-text-sm);
+}

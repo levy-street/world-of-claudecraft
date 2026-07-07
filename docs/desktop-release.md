@@ -133,11 +133,18 @@ Reputation persists across releases signed with the same identity, so it fades.
 No artifact signing (electron-builder 26 has none built in; per-file signatures are
 not customary). Publish SHA256 checksums next to the artifacts:
 `shasum -a 256 release/*.AppImage release/*.deb > SHA256SUMS`. AppImage is the
-auto-updatable target; deb users update manually or via a future repo.
+auto-updatable target; deb users update manually or via a future repo. The
+website download page offers the AppImage (not the deb): it runs on immutable
+Fedora atomic desktops (Bazzite, Steam Deck) with no system install, just
+`chmod +x` and launch, which the deb cannot do there.
 
 ## Publishing a website update
 
-1. Bump `version` in `package.json` (the feed is version-ordered; see rollback).
+1. Bump `version` in `package.json` (the feed is version-ordered; see rollback),
+   and match `DESKTOP_VERSION` in `src/game/desktop_download.ts` so the download
+   page links point at the new build (the static hrefs in `index.html` are the
+   no-JS fallback; keep them on the same version). The page offers macOS (dmg)
+   and Linux (AppImage); Windows stays "pending" until its installer is uploaded.
 2. Build on each OS runner with signing env present: `npm run electron:build`.
 3. Upload from `release/` to the update host directory (keep filenames exactly):
    - macOS: `world-of-claudecraft-<v>-mac-universal.dmg` (download page),

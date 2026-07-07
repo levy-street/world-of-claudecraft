@@ -16,7 +16,7 @@ import {
   generateDecorations,
   roadDistance,
   terrainHeight,
-  waterLevel,
+  waterLevelAt,
   zoneBiomeAt,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -1173,7 +1173,7 @@ function generateDressing(seed: number): DressingSpot[] {
       }
       if (blocked) continue;
       if (roadDistance(x, z) < 4) continue;
-      if (terrainHeight(x, z, seed) < waterLevel() + 1.2) continue;
+      if (terrainHeight(x, z, seed) < waterLevelAt(x, z) + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
       const kind = dressKindFor(biome, hashAt(gx, gz, 44));
       const [sMin, sRange] = DRESS_SCALE[kind];
@@ -1497,7 +1497,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16)
           continue;
         const h = terrainHeight(x, z, seed);
-        if (h < waterLevel() + 1.6) continue;
+        if (h < waterLevelAt(x, z) + 1.6) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         let nearHub = false;

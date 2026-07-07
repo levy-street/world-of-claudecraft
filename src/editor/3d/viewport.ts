@@ -295,7 +295,10 @@ export class Editor3DViewport {
     }
     if (!this.renderer) return;
     this.renderer.rebuildTerrain();
-    this.renderer.rebuildWater();
+    // A full rebuild can follow a moved/added/removed lake marker (2D edit), so
+    // reconcile the water meshes from the current declared-lake list rather
+    // than just reseating the existing ones at the active level.
+    this.renderer.rebuildWaterBodies();
     this.renderer.placedAssets.reSeat();
     this.refreshSpawnRing();
     this.rebuildBlockers();

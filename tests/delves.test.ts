@@ -776,8 +776,8 @@ describe('delve reward chest + surface exit flow', () => {
   function killBoss(sim: ReturnType<typeof makeSim>, _run: ReturnType<typeof enterFinale>) {
     const boss = [...sim.entities.values()].find((e) => e.templateId === 'deacon_varric')!;
     (sim as any).dealDamage(sim.player, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
-    sim.tick();
-    return boss;
+    const events = sim.tick();
+    return { boss, events };
   }
 
   // Drive the lockpicking minigame to a flawless solve. Returns the chest id.
@@ -805,7 +805,7 @@ describe('delve reward chest + surface exit flow', () => {
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
     const run = enterFinale(sim);
     const playerPosBefore = { ...sim.player.pos };
-    killBoss(sim, run);
+    const { events } = killBoss(sim, run);
 
     // run.completed still false, chest not yet opened
     expect(run.completed).toBe(false);
@@ -818,6 +818,12 @@ describe('delve reward chest + surface exit flow', () => {
     const chestId = run.objectIds.find((id) => run.objectState[id]?.kind === 'locked_chest');
     expect(chestId).toBeDefined();
     expect(run.rewardChestId).not.toBeNull();
+    expect(events).toContainEqual({
+      type: 'delveObjectiveComplete',
+      delveId: 'collapsed_reliquary',
+      tierId: 'normal',
+      pid: sim.playerId,
+    });
     expect(run.objectState[chestId!].attemptAvailable).toBe(true);
     expect(run.objectState[chestId!].open).toBe(false);
   });
@@ -885,6 +891,7 @@ describe('delve reward chest + surface exit flow', () => {
 
     const marksBefore = sim.delveMarksFor(sim.playerId);
     const chestId = pickLockFlawless(sim, run, 1);
+    const events = sim.drainEvents();
 
     expect(run.completed).toBe(true);
     // base clear (+1 mark) + premium ante bonus (+2 marks)
@@ -892,6 +899,16 @@ describe('delve reward chest + surface exit flow', () => {
     expect(run.objectState[chestId].looted).toBe(true);
     expect(run.objectState[chestId].open).toBe(true);
     expect(run.objectState[chestId].lootedTier).toBe('premium');
+    expect(events).toContainEqual({
+      type: 'delveChestLoot',
+      chestId,
+      delveId: 'collapsed_reliquary',
+      tierId: 'normal',
+      lootTier: 'premium',
+      bountiful: false,
+      items: run.objectState[chestId].pendingLoot,
+      pid: sim.playerId,
+    });
     expect(run.lockpick).toBeNull();
     // surface exit spawned
     expect(run.surfaceExitId).not.toBeNull();

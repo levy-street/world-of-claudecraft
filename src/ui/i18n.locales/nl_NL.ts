@@ -4697,8 +4697,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Autoloop',
   'hudChrome.mobile.haptics': 'Haptiek',
   'hudChrome.mobile.hapticsOff': 'Haptiek uit',
-  'hudChrome.mobile.hotbarPage': 'Vaardigheden',
-  'hudChrome.mobile.hotbarPageAria': 'Toon de volgende set vaardigheden',
   'hudChrome.mobile.jump': 'Springen',
   'hudChrome.mobile.leaderboard': 'Ranglijst',
   'hudChrome.mobile.nameplates': 'Namen',
@@ -6035,4 +6033,117 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Stel eerst tweefactorauthenticatie in.',
   'apiError.validation.failed':
     'Sommige velden zijn ongeldig. Controleer het formulier en probeer het opnieuw.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Downloaden voor Linux',
+  'download.linuxHint':
+    'AppImage: maak het uitvoerbaar en voer het vervolgens uit. Geen installatie nodig.',
+  'loading.reconnecting': 'Verbinding verbroken. Opnieuw verbinding maken...',
+  'guide.nav.settings': 'Instellingen en prestaties',
+  'guide.settingsPage.advancedBody':
+    'Geavanceerd begint vanaf het niveau High en ontgrendelt vier extra keuzemogelijkheden, zodat u uw frames kunt besteden waar u ze daadwerkelijk opmerkt: terreindetail, bladdichtheid, effecten en belichting en schaduwkwaliteit. Net als Grafische kwaliteit zijn ze van toepassing na een herlaadbeurt.',
+  'guide.settingsPage.advancedHeading': 'De geavanceerde preset: mix je eigen preset',
+  'guide.settingsPage.advancedMixes':
+    'Twee favoriete mixen: houd Schaduwkwaliteit op High en stel Effecten en belichting in op Low voor een heldere, gloedvrije look die licht is, of doe het omgekeerde om de bloei te behouden en de schaduwen te verzachten.',
+  'guide.settingsPage.balancedTagline':
+    'De goede plek voor de meeste machines en ons standaardadvies.',
+  'guide.settingsPage.balancedTitle': 'Evenwichtig',
+  'guide.settingsPage.balancedWhy':
+    'Medium brengt echte schaduwen en volledige materialen; High voegt omgevingsocclusie en bloei toe. Onder Ultra absorbeert een ingebouwd veiligheidsnet plotselinge dipjes tijdens drukke gevechten, zodat Balanced soepel blijft zonder te babysitten.',
+  'guide.settingsPage.colDoes': 'Wat het doet',
+  'guide.settingsPage.colImpact': 'FPS impact',
+  'guide.settingsPage.colSetting': 'Instelling',
+  'guide.settingsPage.factDetectBody':
+    'Bij de eerste keer opstarten leest de game je apparaat en kiest een verstandig niveau, van Low op een bescheiden telefoon tot Ultra op een sterke desktop. Elke keuze die je zelf maakt, wint altijd.',
+  'guide.settingsPage.factDetectTitle': 'Het spel stemt zichzelf eerst af',
+  'guide.settingsPage.factGovernorBody':
+    'Op elk niveau onder Ultra verdunt het spel stilletjes het gras, de effecten en de verlichting voor een moment wanneer een groot gevecht een piek bereikt, en herstelt deze vervolgens. Als u Ultra kiest, geeft u aan dat u liever elk detail behoudt.',
+  'guide.settingsPage.factGovernorTitle': 'Een ingebouwd veiligheidsnet',
+  'guide.settingsPage.factReloadBody':
+    'Grafische kwaliteit en de geavanceerde keuzemogelijkheden worden van kracht na het herladen, en het paneel biedt indien nodig een knop Nu opnieuw laden. Elke andere optie is van toepassing op het moment dat u deze wijzigt.',
+  'guide.settingsPage.factReloadTitle': 'Twee soorten opties',
+  'guide.settingsPage.fairnessBody':
+    'Geen enkele optie hier ruilt schoonheid in voor macht. De instellingen van Lower geven alleen cosmetisch poetsmiddel af, nooit informatie waarmee je vecht: je debuffs, cast bars, party health en schadecijfers zijn identiek van Low tot Ultra. Spelen op een bescheiden machine is nooit een handicap.',
+  'guide.settingsPage.fairnessTitle': 'Eerlijk door ontwerp',
+  'guide.settingsPage.fpsTagline':
+    'Voor oudere laptops, geïntegreerde grafische kaart en batterijweergave.',
+  'guide.settingsPage.fpsTitle': 'Beste FPS',
+  'guide.settingsPage.fpsWhy':
+    'Grafische kwaliteit is de hoofdschakelaar en Renderkwaliteit is de sterkste schuifregelaar: met 70% tekent de wereld ongeveer de helft van de pixels terwijl de interface perfect scherp blijft.',
+  'guide.settingsPage.heading': 'Instellingen en prestaties',
+  'guide.settingsPage.howHeading': 'Hoe de opties zich gedragen',
+  'guide.settingsPage.impactHeavy': 'Zwaar',
+  'guide.settingsPage.impactLight': 'Licht',
+  'guide.settingsPage.impactModerate': 'Gematigd',
+  'guide.settingsPage.impactNone': 'Geen',
+  'guide.settingsPage.intro':
+    'Zorg ervoor dat het spel er op zijn best uitziet of het snelst werkt. Drie kant-en-klare configuraties, plus wat elke grafische optie werkelijk doet.',
+  'guide.settingsPage.loadoutsHeading': 'Drie kant-en-klare uitrustingen',
+  'guide.settingsPage.loadoutsIntro':
+    'Begin met de uitrusting die klinkt als jouw machine en pas vervolgens één optie tegelijk aan totdat het goed voelt.',
+  'guide.settingsPage.mobileBody':
+    'Mobiel beheert meer voor je: de game kiest het niveau, houdt de resolutie iets lager om de batterij en de hitte te beschermen, en houdt de hoogste niveaus alleen voor desktops. De bovenstaande uitrustingen zijn nog steeds van toepassing; telefoons eindigen gewoon op High.',
+  'guide.settingsPage.mobileTitle': 'Op telefoons en tablets',
+  'guide.settingsPage.recommended': 'Aanbevolen',
+  'guide.settingsPage.rowBrightness': 'Scènebelichting, donkerder of helderder. Puur voorkeur.',
+  'guide.settingsPage.rowBrowserEffects':
+    "Hoe mooi mag de interface zelf zijn: glasvervaging, gloed, geanimeerde menu's. Automatische match met uw browser; de 3D-wereld blijft hoe dan ook onaangeroerd.",
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloei, omgevingsocclusie en hoeveel fakkels en spreuken echt licht werpen. De grootste besparing onder de geavanceerde plukkers.',
+  'guide.settingsPage.rowFieldOfView':
+    'Hoeveel van de wereld past op het scherm, van een ingezoomde 55 tot een overweldigende 100 graden. Een comfortkeuze; bredere uitzichten trekken iets meer aan.',
+  'guide.settingsPage.rowFoliageDensity': 'Hoe ver en hoe dik het gras rond jouw karakter groeit.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Een matglazen waas achter ramen. Mooi, en precies het soort effect dat een zwakkere browser voelt; laat het uit voor de klassieke, frisse look.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'De hoofdschakelaar. Elke stap verandert samen de resolutie, schaduwen, materialen, bladeren en lichteffecten. Het grootste verschil dat je kunt maken.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Een uitlezing op het scherm van FPS, frametijd en meer. Schakel het in terwijl u deze pagina afstemt en verberg het vervolgens weer.',
+  'guide.settingsPage.rowReduceMotion':
+    'Verwijdert interface-animaties zodat vensters onmiddellijk verschijnen. Eerst een toegankelijkheidsoptie, met een kleine prestatiebonus.',
+  'guide.settingsPage.rowRenderQuality':
+    'Tekent de 3D-wereld met een lagere interne resolutie en schaalt deze op; de interface blijft scherp. De sterkste instant slider op zwakkere machines en schermen met hoge resolutie.',
+  'guide.settingsPage.rowShadowQuality':
+    'Schaduwscherpte. Low behoudt schaduwen maar verzacht de randen.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Rijke, gemengde grondtexturen versus een eenvoudiger, sneller terreinuiterlijk.',
+  'guide.settingsPage.rowWeather':
+    'Omgevingsregen en sneeuw. Alleen sfeer, en uitzetten scheelt een beetje bij storm.',
+  'guide.settingsPage.tableFoot':
+    'Op zoek naar een trekafstandsschuif of een FPS dop? Er is niets om naar te zoeken: de kijkafstand maakt deel uit van elk kwaliteitsniveau en de framestimulatie volgt uw weergave.',
+  'guide.settingsPage.tableHeading': 'Elke optie uitgelegd',
+  'guide.settingsPage.tagReload': 'na herladen',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 tot 70%',
+  'guide.settingsPage.value90to100': '90 tot 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High op een gaming-pc, Medium op een laptop',
+  'guide.settingsPage.valueOnOptional': 'Aan (optioneel)',
+  'guide.settingsPage.visualsTagline': 'Screenshotmodus voor krachtige desktopmachines.',
+  'guide.settingsPage.visualsTitle': 'Beste beelden',
+  'guide.settingsPage.visualsWhy':
+    'Ultra wordt weergegeven met de hoogste resolutie die uw scherm biedt, met de rijkste verlichting. Het schakelt ook het vangnet uit, en het is alleen voor desktops: telefoons en de app eindigen op High.',
+  'guide.settingsPage.wherePath':
+    'Alles op deze pagina leeft in het spel: druk op Esc en kijk in Graphics, Interface en Performance Overlay.',
+  'guide.settingsPage.whyLabel': 'Waarom het werkt:',
+  'hudChrome.crafting.close': 'Sluit het maken',
+  'hudChrome.crafting.craft': 'Ambacht',
+  'hudChrome.crafting.craftedToast': 'Gemaakt: {name}',
+  'hudChrome.crafting.empty': 'Nog geen recepten bekend.',
+  'hudChrome.crafting.insufficientMaterials': 'Daar heb je de materialen niet voor.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Vereist:',
+  'hudChrome.crafting.resultAria': 'Ambacht {name}',
+  'hudChrome.crafting.title': 'Knutselen',
+  'hudChrome.crafting.unknownRecipe': 'Dat recept bestaat niet.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Een ambacht dat u het uwe kunt noemen',
+  'entities.quests.q_archetype_acceptance.text':
+    'Elke ambachtsman van Eastbrook kiest uiteindelijk voor één ambacht dat hij zijn eigen ambacht noemt. Bewijs jezelf met één enkele daad, {playerName}, en geef je pad aan.',
+  'entities.quests.q_archetype_acceptance.completion': 'Jouw pad is gekozen; loop er goed mee.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Boswolf gedood',
+  'entities.quests.q_prof_make_amends.title': 'Het goedmaken',
+  'entities.quests.q_prof_make_amends.text':
+    'Om het ene vaartuig voor het andere opzij te zetten, moet een ambachtsman eerst het niet bewandelde pad goedmaken, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Wijzigingen aangebracht; er ligt een nieuw pad voor je open.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Boswolf gedood',
 };

@@ -4110,8 +4110,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Corrida automática',
   'hudChrome.mobile.haptics': 'Vibração',
   'hudChrome.mobile.hapticsOff': 'Vibração desligada',
-  'hudChrome.mobile.hotbarPage': 'Habilidades',
-  'hudChrome.mobile.hotbarPageAria': 'Mostrar o próximo conjunto de habilidades',
   'hudChrome.mobile.jump': 'Pular',
   'hudChrome.mobile.leaderboard': 'Classificação',
   'hudChrome.mobile.nameplates': 'Nomes',
@@ -6046,4 +6044,117 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Inicie a configuração da autenticação em duas etapas primeiro.',
   'apiError.validation.failed':
     'Alguns campos são inválidos. Verifique o formulário e tente novamente.',
+  // Release v0.22.0 locale fill.
+  'download.linuxCta': 'Baixar para Linux',
+  'download.linuxHint': 'AppImage: torne-o executável e execute-o. Não é necessária instalação.',
+  'loading.reconnecting': 'Conexão perdida. Reconectando...',
+  'guide.nav.settings': 'Configurações e desempenho',
+  'guide.settingsPage.advancedBody':
+    'Avançado começa no nível High e desbloqueia quatro seletores extras, para que você possa passar seus quadros onde realmente os percebe: detalhes do terreno, densidade da folhagem, efeitos e iluminação e qualidade da sombra. Assim como a qualidade gráfica, eles se aplicam após uma recarga.',
+  'guide.settingsPage.advancedHeading': 'A predefinição avançada: misture a sua própria',
+  'guide.settingsPage.advancedMixes':
+    'Duas mixagens favoritas: mantenha a qualidade da sombra em High e defina Efeitos e iluminação em Low para uma aparência nítida e sem brilho que flui com luz, ou faça o inverso para manter o brilho e suavizar as sombras.',
+  'guide.settingsPage.balancedTagline':
+    'O ponto ideal para a maioria das máquinas e nosso conselho padrão.',
+  'guide.settingsPage.balancedTitle': 'Equilibrado',
+  'guide.settingsPage.balancedWhy':
+    'Medium traz sombras reais e materiais completos; High adiciona oclusão e brilho de ambiente. Abaixo de Ultra, uma rede de segurança integrada absorve quedas repentinas em lutas intensas, de modo que o Equilibrado permanece tranquilo sem ser babá.',
+  'guide.settingsPage.colDoes': 'O que isso faz',
+  'guide.settingsPage.colImpact': 'Impacto de FPS',
+  'guide.settingsPage.colSetting': 'Contexto',
+  'guide.settingsPage.factDetectBody':
+    'Na primeira inicialização, o jogo lê seu dispositivo e escolhe um nível sensato, de Low em um telefone modesto a Ultra em um desktop robusto. Qualquer escolha que você fizer sempre vence.',
+  'guide.settingsPage.factDetectTitle': 'O jogo se ajusta primeiro',
+  'guide.settingsPage.factGovernorBody':
+    'Em cada nível abaixo de Ultra, o jogo reduz silenciosamente a grama, os efeitos e a iluminação por um momento quando uma grande luta aumenta e depois os restaura. Escolher Ultra indica que você prefere manter todos os detalhes.',
+  'guide.settingsPage.factGovernorTitle': 'Uma rede de segurança integrada',
+  'guide.settingsPage.factReloadBody':
+    'A qualidade gráfica e os seletores avançados entram em vigor após uma recarga, e o painel oferece um botão Recarregar agora quando necessário. Todas as outras opções se aplicam no momento em que você as altera.',
+  'guide.settingsPage.factReloadTitle': 'Dois tipos de opções',
+  'guide.settingsPage.fairnessBody':
+    'Nenhuma opção aqui troca beleza por poder. As configurações de Lower perdem apenas o polimento cosmético, nunca as informações com as quais você luta: seus debuffs, barras de elenco, saúde do grupo e números de dano são idênticos de Low a Ultra. Jogar em uma máquina modesta nunca é uma desvantagem.',
+  'guide.settingsPage.fairnessTitle': 'Justo por design',
+  'guide.settingsPage.fpsTagline': 'Para laptops mais antigos, gráficos integrados e bateria.',
+  'guide.settingsPage.fpsTitle': 'Melhor FPS',
+  'guide.settingsPage.fpsWhy':
+    'A qualidade gráfica é a chave mestra e a qualidade de renderização é o controle deslizante mais forte: em 70%, o mundo desenha cerca de metade dos pixels enquanto a interface permanece perfeitamente nítida.',
+  'guide.settingsPage.heading': 'Configurações e desempenho',
+  'guide.settingsPage.howHeading': 'Como as opções se comportam',
+  'guide.settingsPage.impactHeavy': 'Pesado',
+  'guide.settingsPage.impactLight': 'Luz',
+  'guide.settingsPage.impactModerate': 'Moderado',
+  'guide.settingsPage.impactNone': 'Nenhum',
+  'guide.settingsPage.intro':
+    'Faça com que o jogo tenha a melhor aparência ou rode mais rápido. Três loadouts prontos, além do que cada opção gráfica realmente faz.',
+  'guide.settingsPage.loadoutsHeading': 'Três loadouts prontos',
+  'guide.settingsPage.loadoutsIntro':
+    'Comece com o carregamento que se parece com a sua máquina e ajuste uma opção de cada vez até parecer certo.',
+  'guide.settingsPage.mobileBody':
+    'O celular gerencia mais para você: o jogo escolhe o nível, mantém a resolução um pouco mais baixa para proteger a bateria e o calor e mantém os níveis mais altos apenas para desktop. Os loadouts acima ainda se aplicam; os telefones simplesmente atingem o limite de High.',
+  'guide.settingsPage.mobileTitle': 'Em telefones e tablets',
+  'guide.settingsPage.recommended': 'Recomendado',
+  'guide.settingsPage.rowBrightness':
+    'Exposição da cena, mais escura ou mais clara. Preferência pura.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Quão sofisticada é a própria interface: desfoque de vidro, brilho, menus animados. Corresponde automaticamente ao seu navegador; o mundo 3D permanece intocado de qualquer maneira.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloom, oclusão ambiental e quantas tochas e feitiços lançam luz real. A maior economia entre os selecionadores avançados.',
+  'guide.settingsPage.rowFieldOfView':
+    'Quanto do mundo cabe na tela, de um zoom de 55 a 100 graus. Uma escolha de conforto; visualizações mais amplas atraem um pouco mais.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Quão longe e quão espessa a grama cresce ao redor do seu personagem.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Um borrão de vidro fosco atrás das janelas. Bonito e exatamente o tipo de efeito que um navegador mais fraco sente; deixe-o desligado para obter o visual clássico e nítido.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'O interruptor mestre. Cada etapa altera a resolução, sombras, materiais, folhagens e efeitos de iluminação juntos. A maior diferença que você pode fazer.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Uma leitura na tela de FPS, tempo de quadro e muito mais. Ative-o enquanto você ajusta esta página e oculte-o novamente.',
+  'guide.settingsPage.rowReduceMotion':
+    'Remove animações da interface para que as janelas apareçam instantaneamente. Uma opção de acessibilidade em primeiro lugar, com um pequeno bônus de desempenho.',
+  'guide.settingsPage.rowRenderQuality':
+    'Desenha o mundo 3D em uma resolução interna mais baixa e o amplia; a interface permanece nítida. O controle deslizante instantâneo mais forte em máquinas mais fracas e telas de alta resolução.',
+  'guide.settingsPage.rowShadowQuality':
+    'Crocância da sombra. Low mantém as sombras, mas suaviza suas bordas.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Texturas de solo ricas e combinadas versus uma aparência de terreno mais simples e rápida.',
+  'guide.settingsPage.rowWeather':
+    'Chuva ambiente e neve. Apenas atmosfera, e desligá-lo economiza um pouco durante as tempestades.',
+  'guide.settingsPage.tableFoot':
+    'Procurando um controle deslizante de distância de desenho ou um limite FPS? Não há nada para procurar: a distância de visualização faz parte de cada nível de qualidade e o ritmo dos quadros segue a sua exibição.',
+  'guide.settingsPage.tableHeading': 'Cada opção, explicada',
+  'guide.settingsPage.tagReload': 'depois de recarregar',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 a 70%',
+  'guide.settingsPage.value90to100': '90 a 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High em um PC para jogos, Medium em um laptop',
+  'guide.settingsPage.valueOnOptional': 'Ligado (opcional)',
+  'guide.settingsPage.visualsTagline': 'Modo de captura de tela para máquinas desktop poderosas.',
+  'guide.settingsPage.visualsTitle': 'Melhores recursos visuais',
+  'guide.settingsPage.visualsWhy':
+    'Ultra é renderizado na resolução mais alta que sua tela oferece com a iluminação mais rica. Ele também desativa a rede de segurança e é apenas para desktop: os telefones e o aplicativo atingem o limite de High.',
+  'guide.settingsPage.wherePath':
+    'Tudo nesta página está no jogo: pressione Esc e procure em Gráficos, Interface e Sobreposição de desempenho.',
+  'guide.settingsPage.whyLabel': 'Por que funciona:',
+  'hudChrome.crafting.close': 'Fechar elaboração',
+  'hudChrome.crafting.craft': 'Arte',
+  'hudChrome.crafting.craftedToast': 'Feito: {name}',
+  'hudChrome.crafting.empty': 'Nenhuma receita conhecida ainda.',
+  'hudChrome.crafting.insufficientMaterials': 'Você não tem os materiais para isso.',
+  'hudChrome.crafting.reagentLine': '{name}x{have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Requer:',
+  'hudChrome.crafting.resultAria': 'Artesanato {name}',
+  'hudChrome.crafting.title': 'Artesanato',
+  'hudChrome.crafting.unknownRecipe': 'Essa receita não existe.',
+  // Release v0.22.0 professions quest locale fill.
+  'entities.quests.q_archetype_acceptance.title': 'Um ofício para chamar de seu',
+  'entities.quests.q_archetype_acceptance.text':
+    'Cada artesão de Eastbrook eventualmente escolhe um ofício para chamar de seu. Prove seu valor com uma única ação, {playerName}, e declare seu caminho.',
+  'entities.quests.q_archetype_acceptance.completion': 'Seu caminho está escolhido; ande bem.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Lobo da Floresta morto',
+  'entities.quests.q_prof_make_amends.title': 'Fazendo as pazes',
+  'entities.quests.q_prof_make_amends.text':
+    'Para separar um ofício para outro, um artesão deve primeiro reparar o caminho não percorrido, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Reparações feitas; um novo caminho está aberto para você.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Lobo da Floresta morto',
 };

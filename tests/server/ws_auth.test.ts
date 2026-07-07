@@ -64,6 +64,7 @@ function setup() {
     clients: { size: 1 },
     handleMessage: vi.fn(),
     leave: vi.fn(async () => {}),
+    socketClosed: vi.fn(() => true),
   };
   const deps: WsAuthDeps = {
     game: game as unknown as WsAuthDeps['game'],
@@ -285,9 +286,23 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
     ws.emit('message', 'move-frame');
     expect(game.handleMessage).toHaveBeenCalledWith(session, 'move-frame');
 
-    // Disconnect routes through game.leave with the disconnect reason.
+    // A dropped socket routes through game.socketClosed (the linkdead grace),
+    // never a direct game.leave: the character is held in-world for a resume.
     ws.emit('close');
-    expect(game.leave).toHaveBeenCalledWith(session, 'disconnected');
+    expect(game.socketClosed).toHaveBeenCalledWith(session, ws);
+    expect(game.leave).not.toHaveBeenCalled();
+
+    // The pong handler clears the keepalive liveness flag, but only for the
+    // session's CURRENT socket (a stale pre-resume pong must not mask a
+    // black-holed replacement).
+    (session as { ws?: unknown; awaitingPong?: boolean }).ws = ws;
+    (session as { awaitingPong?: boolean }).awaitingPong = true;
+    ws.emit('pong');
+    expect((session as { awaitingPong?: boolean }).awaitingPong).toBe(false);
+    (session as { ws?: unknown }).ws = 'a-different-socket';
+    (session as { awaitingPong?: boolean }).awaitingPong = true;
+    ws.emit('pong');
+    expect((session as { awaitingPong?: boolean }).awaitingPong).toBe(true);
   });
 
   it('snapshots the staff roles into isAdmin + expanded adminPermissions, and rides the CAPI attribution', async () => {
@@ -337,16 +352,17 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
     );
   });
 
-  it('routes a post-join socket error through game.leave with the error reason', async () => {
+  it('routes a post-join socket error into the linkdead grace, not a teardown', async () => {
     const { ws, game, session, deps, req } = setup();
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
 
-    // The post-join 'error' handler tears the session down with the distinct
-    // 'connection error' reason (vs 'disconnected' on a clean close).
+    // The post-join 'error' handler holds the session linkdead like a clean
+    // close; the grace-expiry sweep in game.ts owns the eventual leave().
     expect(ws.listenerCount('error')).toBeGreaterThanOrEqual(1);
     ws.emit('error', new Error('connection reset'));
-    expect(game.leave).toHaveBeenCalledWith(session, 'connection error');
+    expect(game.socketClosed).toHaveBeenCalledWith(session, ws);
+    expect(game.leave).not.toHaveBeenCalled();
   });
 
   it('prefers the account-level chat mute over the chat-level mute in the join meta', async () => {

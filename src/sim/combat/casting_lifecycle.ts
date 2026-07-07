@@ -344,7 +344,13 @@ export function castAbility(
       if (eff.type === 'polymorph') {
         if (target.kind === 'mob') {
           const fam = MOBS[target.templateId]?.family;
-          if (fam === 'undead' || target.templateId === 'gorrak') {
+          // Undead/gorrak are lore-exempt; cc-immune mobs (raid bosses) reject it here so
+          // the cast never reaches the effect's sheep full-heal side effect.
+          if (
+            fam === 'undead' ||
+            target.templateId === 'gorrak' ||
+            MOBS[target.templateId]?.ccImmune
+          ) {
             ctx.error(p.id, 'This creature cannot be polymorphed.');
             return;
           }
