@@ -1,7 +1,8 @@
 <!-- scripts/: plain Node `.mjs` tooling (build, browser E2E, screenshot tours,
      multiplayer integration, admin utils). NOT TypeScript, NOT part of the
      vite/esbuild build. Root CLAUDE.md covers the repo + sim/server model;
-     don't repeat it here. Asset pipeline lives in scripts/assets/ (own file). -->
+     don't repeat it here. Asset pipeline lives in scripts/assets/ (own file).
+     Audio SFX standards live in docs/design/sound_effects.md. -->
 
 # scripts/
 
@@ -19,6 +20,10 @@ npm (see `package.json`); many more run directly.
   need the server started with `ALLOW_DEV_COMMANDS=1`, **dev only** (see root invariants).
 - **Admin utils** talk straight to Postgres via `DATABASE_URL` (call `process.loadEnvFile()`,
   so a local `.env` works); they do not need the server.
+- **Audio SFX tools** (`gen_sfx.mjs`, `check_sfx.mjs`, `sfx/sfx_ffmpeg.mjs`) are offline
+  maintainer-run scripts and require local `ffmpeg`/`ffprobe`. Generation also requires
+  `ELEVENLABS_API_KEY` unless only `--conform-existing` is used. Follow
+  `docs/design/sound_effects.md` for format, loudness, channel, bitrate, and naming rules.
 - Screenshot tours write PNGs into `tmp/` (gitignored). They typically god-mode the
   player so camp mobs don't kill the camera.
 
@@ -27,6 +32,7 @@ npm (see `package.json`); many more run directly.
 |---|---|---|
 | Build | `build_media_manifest.mjs` (`generate` to `manifest.generated.ts`, `emit` to `dist/media`), `build_sitemap.mjs` (`sitemap:build`) | none |
 | Asset (FBX to GLB) | `combine_fbx_to_glb.mjs` (+ `combine_fbx_to_glb_entry.js`): merge a rigged character's FBX files (a mesh FBX plus per-action animation-only FBXs, or one multi-take FBX) into one `.glb` with every clip. Parses FBX via headless three.js `FBXLoader`/`GLTFExporter` (so skinning and embedded textures work where Node CLI converters fail), grafts clips by bone name, then gltf-transform. Folder mode (`<dir> <out.glb>`) or explicit `--base`/`--anim`; `--strip-root`/`--rest-clip`/`--strip-armature` for game mobs; opt-in `--meshopt`/`--webp`. `--help` lists all flags. | local Chrome (`browser_path.mjs`) |
+| Audio SFX | `gen_sfx.mjs` (ElevenLabs generation + FFmpeg post-process), `check_sfx.mjs` (ffprobe/volumedetect conformance), `sfx/sfx_prompts.mjs` (catalog + stereo policy), `sfx/sfx_asset_standard.mjs` (shared constants) | `ffmpeg`/`ffprobe`; `ELEVENLABS_API_KEY` for generation |
 | Guide / wiki (`wiki/`) | `wiki/build_content.mjs` (bundles `src/sim` content into `src/guide/content.generated.ts`; `wiki:content`, in `pretest`/`build`), `wiki/render_model_stills.mjs` (+ `wiki/still_key.mjs`, `wiki/stills_render_entry.js`: headless-Chrome pre-render of the bestiary/class still WebPs into `public/guide-stills/`; `wiki:stills`, deliberately NOT in `build`. `tests/guide.test.ts` gates BOTH directions (every figure with a model has a committed WebP, AND no orphan WebP without a figure). Stills are deterministic per machine but NOT byte-identical across GPUs/drivers, so they are existence-gated, never diff-gated: re-render on the `--use-angle=swiftshader` path) | browser binary (stills only) |
 | Browser E2E (offline) | `smoke_browser.mjs`, `smoke_mage.mjs`, `smoke_rogue.mjs`, `check_directions.mjs` | dev |
 | MP E2E (browser) | `mp_browser.mjs`, `mp_combat_visibility.mjs`, `market_mp_e2e.mjs` | dev + server |
@@ -48,6 +54,8 @@ npm (see `package.json`); many more run directly.
   `process.exit(fail > 0 ? 1 : 0)`; browser scripts also collect `pageerror`/console-error.
 - Character names are letters-only (classic rule), scripts derive an `alpha` suffix
   from a base-36 timestamp so reruns don't collide.
+- Generated SFX must go through `gen_sfx.mjs` or `gen_sfx.mjs --conform-existing` and
+  pass `npm run sfx:check`; do not hand-edit MP3s around the checker.
 
 ## How to add one
 - **Browser E2E / tour:** copy `smoke_browser.mjs` / `visual_tour.mjs`; import
