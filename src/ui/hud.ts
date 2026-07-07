@@ -1354,12 +1354,17 @@ export class Hud {
     });
     this.initCompass();
     this.initMinimapZoom(mm);
-    this.releaseSpiritBtnEl.addEventListener('click', () => {
+    // bindTouchTap, not 'click': the browser only synthesizes click for the
+    // PRIMARY pointer, so on a phone these death-screen buttons went dead the
+    // moment another finger was down (a held movement joystick when the player
+    // died mid-run), stranding them on the death overlay (issue 1484). Matches
+    // every other touch-facing HUD button; desktop mouse/keyboard is preserved.
+    bindTouchTap(this.releaseSpiritBtnEl, () => {
       if (this.sim.arenaInfo?.match) return;
       this.sim.releaseSpirit();
     });
-    this.resurrectCorpseBtnEl.addEventListener('click', () => this.sim.resurrectAtCorpse());
-    this.resurrectHealerBtnEl.addEventListener('click', () => this.sim.resurrectAtSpiritHealer());
+    bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
+    bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
