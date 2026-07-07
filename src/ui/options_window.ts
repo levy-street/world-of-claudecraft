@@ -67,6 +67,7 @@ import {
   type OptionsSettingsSource,
   type SliderControl,
   type SliderFmt,
+  sliderCommitsOnRelease,
   sliderDispatchValue,
   type ToggleControl,
   toggleIsOn,
@@ -440,8 +441,8 @@ export class OptionsWindow {
     // screen reader announces the human-meaningful value (50%, 90 degrees) instead
     // of the raw stored number. The native range already exposes role=slider plus
     // aria-valuenow/min/max from value/min/max, so only valuetext needs setting.
-    const syncReadout = () => {
-      const text = fmt(hooks.settings.get(key));
+    const syncReadout = (displayValue = hooks.settings.get(key)) => {
+      const text = fmt(displayValue);
       val.textContent = text;
       slider.setAttribute('aria-valuetext', text);
     };
@@ -460,11 +461,33 @@ export class OptionsWindow {
       );
     };
     paintFill();
-    slider.addEventListener('input', () => {
-      hooks.onSettingChange(key, sliderDispatchValue(slider.value));
-      syncReadout();
-      paintFill();
-    });
+    if (sliderCommitsOnRelease(key)) {
+      // Buffered update pattern for uiScale: slider.value is the transient
+      // pending_scale that keeps the thumb/readout/fill moving during a drag,
+      // while hooks.settings remains the committed_scale that drives #ui zoom.
+      // Commit exactly when the interaction settles (pointerup) with a change
+      // fallback for keyboard/browser paths, avoiding resize feedback mid-drag.
+      let committedValue = slider.value;
+      const commitBufferedValue = () => {
+        if (slider.value === committedValue) return;
+        committedValue = slider.value;
+        hooks.onSettingChange(key, sliderDispatchValue(slider.value));
+        syncReadout();
+        paintFill();
+      };
+      slider.addEventListener('input', () => {
+        syncReadout(sliderDispatchValue(slider.value));
+        paintFill();
+      });
+      slider.addEventListener('pointerup', commitBufferedValue);
+      slider.addEventListener('change', commitBufferedValue);
+    } else {
+      slider.addEventListener('input', () => {
+        hooks.onSettingChange(key, sliderDispatchValue(slider.value));
+        syncReadout();
+        paintFill();
+      });
+    }
     row.append(name, slider, val);
     parent.appendChild(row);
   }

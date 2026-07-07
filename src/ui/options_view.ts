@@ -106,6 +106,13 @@ export type OptionsControl =
 /** A slider input dispatches the raw input value coerced to a Number. */
 export const sliderDispatchValue = (rawValue: string): number => Number(rawValue);
 
+/**
+ * Sliders that resize the coordinate space they live in must buffer drag input
+ * and commit on release/change, otherwise the moving pointer shifts under the
+ * thumb as the HUD resizes. Other sliders keep the existing live-input dispatch.
+ */
+export const sliderCommitsOnRelease = (key: string): boolean => key === 'uiScale';
+
 /** A numeric toggle flips between 0 and 1 off the current stored value. */
 export const toggleNextValue = (current: number): number => (current >= 0.5 ? 0 : 1);
 
