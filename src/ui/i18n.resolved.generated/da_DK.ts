@@ -395,6 +395,7 @@ export const da_DK: EnTranslations = {
     "options": {
       "clickMoveLeft": "Venstreklik",
       "clickMoveRight": "Højreklik",
+      "version": "v{version} ({build})",
       "browserEffects": "Browsereffekter",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Fuld",

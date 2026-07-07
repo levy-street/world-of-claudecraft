@@ -395,6 +395,7 @@ export const en_XA: EnTranslations = {
     "options": {
       "clickMoveLeft": "[Ļéƒţ Çļíçķ]",
       "clickMoveRight": "[Ŕíĝĥţ Çļíçķ]",
+      "version": "[ʋ{version} ({build})]",
       "browserEffects": "[Ɓŕóŵšéŕ Éƒƒéçţš]",
       "browserEffectsAuto": "[Áúţó]",
       "browserEffectsFull": "[Ƒúļļ]",

@@ -395,6 +395,7 @@ export const nl_NL: EnTranslations = {
     "options": {
       "clickMoveLeft": "Linkermuisklik",
       "clickMoveRight": "Rechtermuisklik",
+      "version": "v{version} ({build})",
       "browserEffects": "Browsereffecten",
       "browserEffectsAuto": "Automatisch",
       "browserEffectsFull": "Volledig",

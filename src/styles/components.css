@@ -4297,6 +4297,14 @@
     margin: 0;
     text-align: center;
   }
+  /* Running build, secondary text at the foot of the game menu (issue #1541).
+     Unobtrusive: muted, small, centered, and not competing with the buttons. */
+  .opt-version {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
   .kb-rows {
     display: flex;
     flex-direction: column;

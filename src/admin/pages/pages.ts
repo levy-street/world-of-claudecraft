@@ -8,6 +8,7 @@ import type { AdminPermission } from '../permissions';
 export type AdminPage =
   | 'overview'
   | 'usage'
+  | 'tick-perf'
   | 'accounts'
   | 'characters'
   | 'moderation'
@@ -43,7 +44,10 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     id: 'operations',
     labelKey: 'nav.operations',
     defaultPage: 'usage',
-    items: [{ id: 'usage', labelKey: 'nav.usage', permission: 'ops_usage.read' }],
+    items: [
+      { id: 'usage', labelKey: 'nav.usage', permission: 'ops_usage.read' },
+      { id: 'tick-perf', labelKey: 'nav.tickPerf', permission: 'ops.perf' },
+    ],
   },
   {
     id: 'players',

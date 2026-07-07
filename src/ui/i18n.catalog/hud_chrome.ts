@@ -381,6 +381,9 @@ export const hudChromeStrings = {
   options: {
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
+    // Running client version + build id, shown as small secondary text at the foot
+    // of the settings menu so players can confirm their build without closing it.
+    version: 'v{version} ({build})',
     // Adaptive browser-effects tier control (Graphics panel). Auto detects the
     // browser engine/version + device; the rest pin the CSS-effects tier.
     browserEffects: 'Browser Effects',

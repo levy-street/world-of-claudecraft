@@ -39,6 +39,7 @@ import {
   SETTING_RANGES,
 } from '../game/settings';
 import type { IWorld } from '../world_api';
+import { appVersionInfo } from './app_version';
 import type { ChatClock } from './chat_timestamp';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
@@ -391,6 +392,13 @@ export class OptionsWindow {
       list.appendChild(b);
     }
     el.appendChild(list);
+    // Running build, as small secondary text at the foot of the menu, so players can
+    // confirm their version without leaving the settings window (issue 1541).
+    const { version, build } = appVersionInfo();
+    const ver = document.createElement('div');
+    ver.className = 'opt-version';
+    ver.textContent = t('hudChrome.options.version', { version, build });
+    el.appendChild(ver);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
   }
 

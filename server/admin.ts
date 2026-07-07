@@ -613,7 +613,22 @@ export async function handleAdminApi(
       return await handleAntibotConfigSave(req, res, game, accountId);
     }
 
+    // Trigger an on-demand server tick-loop profiling capture. The detailed
+    // sub-phase timing runs only for the requested window, then freezes a result
+    // read back via GET /admin/api/perf/tick.
+    if (req.method === 'POST' && path === '/admin/api/perf/tick/capture') {
+      const body = await readBody(req);
+      const raw = body.durationMs;
+      const durationMs = typeof raw === 'number' && Number.isFinite(raw) ? raw : undefined;
+      return ok(res, game.startPerfCapture(durationMs));
+    }
+
     if (req.method !== 'GET') return fail(res, 405, 'method not allowed');
+
+    // Current capture status + the last frozen result.
+    if (path === '/admin/api/perf/tick') {
+      return ok(res, game.perfCaptureStatus());
+    }
 
     if (path === '/admin/api/blocked-ips') {
       return ok(res, { rows: await listBlockedIps() });
@@ -904,6 +919,8 @@ export type AdminRuntime = Pick<
   | 'disconnectByIp'
   | 'antibotConfigFields'
   | 'applyAntibotConfig'
+  | 'startPerfCapture'
+  | 'perfCaptureStatus'
 >;
 
 let runtime: AdminRuntime | null = null;
@@ -1256,6 +1273,23 @@ async function perfRawHandler(ctx: Ctx): Promise<void> {
     hasMore:
       rows.length >= Math.min(1000, Math.max(1, Math.floor(Number.isFinite(limit) ? limit : 100))),
   });
+}
+
+/** GET /admin/api/perf/tick: server tick-loop capture status + last frozen result. */
+async function perfTickHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, useAdminRuntime().perfCaptureStatus());
+}
+
+/**
+ * POST /admin/api/perf/tick/capture: start an on-demand tick-loop profiling capture.
+ * Mirrors the legacy handleAdminApi arm: a non-numeric/NaN durationMs falls back to
+ * the default; the window is clamped server-side in startPerfCapture.
+ */
+async function perfTickCaptureHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const raw = body.durationMs;
+  const durationMs = typeof raw === 'number' && Number.isFinite(raw) ? raw : undefined;
+  ok(ctx.res, useAdminRuntime().startPerfCapture(durationMs));
 }
 
 /** GET /admin/api/accounts: paged account search (search clamped to 64 chars). */
@@ -1727,6 +1761,22 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: perfRawHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/perf/tick',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: perfTickHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/perf/tick/capture',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: perfTickCaptureHandler,
   },
   {
     method: 'GET',

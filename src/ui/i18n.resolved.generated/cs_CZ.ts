@@ -395,6 +395,7 @@ export const cs_CZ: EnTranslations = {
     "options": {
       "clickMoveLeft": "Levé kliknutí",
       "clickMoveRight": "Pravé kliknutí",
+      "version": "v{version} ({build})",
       "browserEffects": "Efekty prohlížeče",
       "browserEffectsAuto": "Automaticky",
       "browserEffectsFull": "Plné",

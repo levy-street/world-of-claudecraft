@@ -124,6 +124,7 @@ import {
   validatePasswordChange,
 } from './ui/account_portal';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
+import { formatFooterVersion } from './ui/app_version';
 import {
   handleKeyboardActivation,
   syncInputAriaState,
@@ -409,10 +410,6 @@ function localizedSiteUrl(lang: SupportedLanguage): string {
 declare const __APP_VERSION__: string;
 declare const __APP_BUILD_ID__: string;
 declare const __APP_BUILD_DATE__: string;
-
-function formatFooterVersion(version: string): string {
-  return version.replace(/\.0$/, '');
-}
 
 function syncBuildInfo(): void {
   const el = document.getElementById('game-version');

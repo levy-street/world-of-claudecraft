@@ -26,6 +26,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -48,6 +49,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -70,6 +72,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -92,6 +95,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -115,6 +119,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -137,22 +142,27 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
     "hudChrome.statInfo.names.hasteRating"
   ],
   "zh_CN": [
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.options.version"
   ],
   "zh_TW": [
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.options.version"
   ],
   "ko_KR": [
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.options.version"
   ],
   "ja_JP": [
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.options.version"
   ],
   "pt_BR": [
     "entities.itemSets.crownforged.bonus4",
@@ -171,13 +181,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
     "hudChrome.statInfo.names.hasteRating"
   ],
   "ru_RU": [
-    "hudChrome.discord.roleTag.coredevs"
+    "hudChrome.discord.roleTag.coredevs",
+    "hudChrome.options.version"
   ],
   "cs_CZ": [
     "entities.itemSets.crownforged.bonus4",
@@ -206,6 +218,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.targetCycleShort",
     "hudChrome.options.mobileCameraJoystick",
     "hudChrome.options.mobileLeftHanded",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -228,6 +241,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -250,6 +264,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -272,6 +287,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -294,6 +310,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -316,6 +333,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -338,6 +356,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",
@@ -360,6 +379,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemProc.onHeal",
     "hudChrome.itemProc.onMeleeHit",
     "hudChrome.itemProc.onSpellDamage",
+    "hudChrome.options.version",
     "hudChrome.statInfo.desc.critRating",
     "hudChrome.statInfo.desc.hasteRating",
     "hudChrome.statInfo.names.critRating",

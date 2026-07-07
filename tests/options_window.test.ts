@@ -290,3 +290,21 @@ describe('options_window: uiScale slider commits on release (#1558)', () => {
     );
   });
 });
+
+describe('options_window: settings shows the running version (#1541)', () => {
+  it('renders the version + build id from the shared app_version source', () => {
+    // Reuse the single build source, not a re-declared __APP_* global.
+    expect(painter).toContain("import { appVersionInfo } from './app_version'");
+    expect(painter).toContain('appVersionInfo()');
+  });
+
+  it('paints the version as a t() label in the main menu (renderMain)', () => {
+    const renderMain = painter.slice(painter.indexOf('private renderMain(): void {'));
+    const body = renderMain.slice(0, renderMain.indexOf('\n  }\n'));
+    // The label is an i18n key with version+build passed as values (no concat).
+    expect(body).toContain("t('hudChrome.options.version', { version, build })");
+    // Rendered as the .opt-version secondary line appended after the button list.
+    expect(body).toContain("'opt-version'");
+    expect(body.indexOf("'opt-version'")).toBeGreaterThan(body.indexOf('el.appendChild(list)'));
+  });
+});
