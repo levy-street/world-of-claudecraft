@@ -71,6 +71,7 @@ function setup() {
     accountForToken: vi.fn(async () => 1 as number | null),
     moderationStatusForAccount: vi.fn(async () => modStatus()),
     getCharacter: vi.fn(async () => baseChar() as CharacterRow | null),
+    applyPendingCharacterGrants: vi.fn(async () => {}),
     chatMuteStatusForAccount: vi.fn(async () => ({
       mutedUntil: null as string | null,
       reason: '',
@@ -244,6 +245,37 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expectSendThenClose(ws, errorFrame('You are banned.'));
     expect(deps.getCharacter).not.toHaveBeenCalled();
+  });
+
+  it('11. applies pending character grants BEFORE loading the character (order is load-bearing)', async () => {
+    const { ws, deps, req } = setup();
+    // Grants must be stamped into the stored row before getCharacter reads it,
+    // so the bumped state is what enters the world. A reordering that loaded
+    // the character first would read pre-grant state and fail this test.
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    const grants = deps.applyPendingCharacterGrants as ReturnType<typeof vi.fn>;
+    const load = deps.getCharacter as ReturnType<typeof vi.fn>;
+    expect(grants).toHaveBeenCalledTimes(1);
+    expect(grants).toHaveBeenCalledWith(7);
+    expect(grants.mock.invocationCallOrder[0]).toBeLessThan(load.mock.invocationCallOrder[0]);
+  });
+
+  it('12. a failing grant application never blocks the join (best-effort by contract)', async () => {
+    const { ws, game, deps, req } = setup();
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    deps.applyPendingCharacterGrants = vi.fn(async () => {
+      throw new Error('grants db down');
+    });
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('grants db down'));
+    expect(errSpy).toHaveBeenCalledWith(
+      'applyPendingCharacterGrants failed:',
+      expect.any(Error),
+    );
+    errSpy.mockRestore();
   });
 });
 

@@ -59,6 +59,10 @@ export interface WsAuthDeps {
   accountForToken: (token: string) => Promise<number | null>;
   moderationStatusForAccount: (accountId: number) => Promise<AccountModerationStatus>;
   getCharacter: (accountId: number, characterId: number) => Promise<CharacterRow | null>;
+  // Applies any pending out-of-game character_grants (companion app, live event,
+  // admin tool) to the stored character BEFORE it loads into the sim, so the
+  // bumped state is what enters the world and never races the authoritative save.
+  applyPendingCharacterGrants: (characterId: number) => Promise<void>;
   chatMuteStatusForAccount: (accountId: number) => Promise<AccountChatMuteStatus>;
   // Staff identity (accounts.admin_roles): null means not staff. The expanded
   // permission set is snapshotted into the session at join (server/game.ts) and
@@ -99,6 +103,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     accountForToken,
     moderationStatusForAccount,
     getCharacter,
+    applyPendingCharacterGrants,
     chatMuteStatusForAccount,
     adminRolesForAccount,
     permissionsForRoles,
@@ -142,6 +147,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       rejectHandshake(ws, status.message);
       return;
     }
+    // Apply any out-of-game character grants before loading the character, so
+    // the bumped state is what enters the world. Best-effort: a failure here
+    // must not block the player from joining.
+    await applyPendingCharacterGrants(characterId).catch((err) =>
+      console.error('applyPendingCharacterGrants failed:', err),
+    );
     const character = await getCharacter(accountId, characterId);
     if (!character) {
       rejectHandshake(ws, WS_AUTH_ERROR.noSuchCharacter);
