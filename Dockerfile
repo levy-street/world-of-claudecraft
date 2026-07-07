@@ -1,7 +1,14 @@
 # World of Claudecraft game server — serves the built client, REST API and WebSocket
 # world on one port. Pair with a postgres service (see docker-compose.yml).
 
-FROM node:22-alpine AS build
+# Base image for BOTH stages, overridable at build time. An unpinned floating
+# tag means two builds of the same source can ship different node runtimes
+# (build drift, see the v0.22 CPU incident). Deploys should pin an exact
+# version or digest, for example:
+#   BASE_IMAGE=node:22.17.0-alpine
+#   BASE_IMAGE=node:22-alpine@sha256:<digest>
+ARG BASE_IMAGE=node:22-alpine
+FROM ${BASE_IMAGE} AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
@@ -23,7 +30,7 @@ ARG VITE_TURNSTILE_SITEKEY=""
 RUN VITE_TURNSTILE_SITEKEY="$VITE_TURNSTILE_SITEKEY" \
     npm run build && cp -a dist/media ./media-build && rm -rf dist/media && npm run build:server && npm run build:bot
 
-FROM node:22-alpine
+FROM ${BASE_IMAGE}
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/dist ./dist

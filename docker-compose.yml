@@ -27,6 +27,8 @@ services:
       args:
         # Build-time public client config inlined into the bundle (see .env.example).
         VITE_TURNSTILE_SITEKEY: ${VITE_TURNSTILE_SITEKEY:-}
+        # Pin the node base image for reproducible builds (see Dockerfile).
+        BASE_IMAGE: ${EASTBROOK_BASE_IMAGE:-node:22-alpine}
     container_name: eastbrook-game
     restart: unless-stopped
     depends_on:
@@ -35,6 +37,13 @@ services:
     environment:
       DATABASE_URL: postgres://eastbrook:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env. See .env.example.}@postgres:5432/eastbrook
       PORT: "8787"
+      # Runtime: the one-flag API dispatch rollback (legacy|new; empty means the
+      # default) and the 20 Hz tick perf trace (1 to enable). Compose passes only
+      # the vars listed in this block, so a value set in the host .env is silently
+      # dropped unless it appears here (this masked the API_DISPATCH=legacy test
+      # during the v0.22 CPU incident).
+      API_DISPATCH: ${API_DISPATCH:-}
+      PERF_TICK_LOG: ${PERF_TICK_LOG:-}
       # Target the game server 302-redirects /wiki to when hit directly (not via the
       # reverse proxy). Public origin in prod; localhost fallback for local dev.
       WIKI_URL: ${WIKI_URL:-http://localhost:8080/wiki/index.php/Main_Page}
