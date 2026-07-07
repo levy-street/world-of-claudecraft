@@ -198,8 +198,13 @@ const UI_PURE_CORES = [
   'src/ui/discord_widget_view.ts',
   'src/ui/desktop_update_view.ts',
   'src/ui/corpse_harvest_view.ts',
+<<<<<<< HEAD
   'src/ui/town_focus_view.ts',
   'src/ui/pet_action_icons.ts',
+  'src/ui/gauntlet_hud_view.ts',
+=======
+  'src/ui/gauntlet_hud_view.ts',
+>>>>>>> acfbd237d (test(ui): register the gauntlet view cores and matcher strings in the guards)
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));
