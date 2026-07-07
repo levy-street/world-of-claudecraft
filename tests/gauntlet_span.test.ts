@@ -124,6 +124,25 @@ describe('the brittle span layout', () => {
   });
 });
 
+describe('the brittle span start line', () => {
+  it('opens each player squarely in front of a panel column, one stride out', () => {
+    const sim = makeSim(505);
+    const pid = sim.addPlayer('warrior', 'Fronted');
+    openAndJoin(sim, pid);
+    advanceToSpan(sim);
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    const lx = e.pos.x - run.origin.x;
+    const lz = e.pos.z - run.origin.z;
+    // Just short of the first pair (never off beside the deck)...
+    expect(lz).toBeLessThan(spanZStart());
+    expect(lz).toBeGreaterThan(spanZStart() - 3);
+    // ...and dead in front of a panel column, facing the crossing.
+    expect(Math.abs(lx - spanSideCenterX(0))).toBeLessThan(0.01);
+    expect(e.facing).toBeCloseTo(0, 6);
+  });
+});
+
 describe('the brittle span player detection', () => {
   it('shatters on the brittle panel: fall damage, a reveal, and a respawn at the start', () => {
     const sim = makeSim(202);

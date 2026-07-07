@@ -38,16 +38,33 @@ import {
 const SPAN_RESPAWN_MARGIN = 2;
 // Yards past the far edge that a crosser who clears the span stands and stops.
 const SPAN_CROSSER_EXIT_MARGIN = 2;
+// Yards south of the first pair the players open on (one stride from the
+// glass, squarely in front of a panel column, never off beside the deck).
+const SPAN_START_MARGIN = 2;
 
 export function startSpan(ctx: SimContext, run: GauntletRun): GauntletSpanState {
   const t = GAUNTLET.span;
-  placeContestantsAt(
-    ctx,
-    run,
-    GAUNTLET_VENUE.span.x,
-    GAUNTLET_VENUE.span.z - GAUNTLET_VENUE.span.length / 2 - 6,
-    8,
-  );
+  // The NPC crowd gathers on the approach behind the start line...
+  placeContestantsAt(ctx, run, GAUNTLET_VENUE.span.x, spanZStart() - SPAN_START_MARGIN - 3, 4);
+  // ...and every live player is then set directly IN FRONT of a panel column
+  // (alternating left/right), one stride from the first pair, so the trial
+  // opens with the glass right at your feet. Fixed playerStates order, no rng.
+  let lane = 0;
+  for (const [pid, ps] of run.playerStates) {
+    if (ps.spectating) continue;
+    const c = run.contestants.find((q) => q.entityId === pid);
+    if (!c || c.eliminatedAtTrial !== null) continue;
+    const e = ctx.entities.get(pid);
+    if (!e) continue;
+    e.pos = ctx.groundPos(
+      run.origin.x + spanSideCenterX(lane % 2),
+      run.origin.z + spanZStart() - SPAN_START_MARGIN,
+    );
+    e.prevPos = { ...e.pos };
+    e.facing = 0; // squared up on the crossing (+z)
+    ctx.rebucket(e);
+    lane++;
+  }
   // A salted sub-stream so the layout is one fixed draw regardless of the
   // mid-trial draws around it.
   const layoutRng = new Rng((run.seed ^ 0x5eed5) >>> 0);

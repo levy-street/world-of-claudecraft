@@ -166,8 +166,8 @@ export const GAUNTLET_VENUE = {
   // square of half-extent etchHalf on the face, and the outline is inset by
   // padFrac within it (gauntlet_trace_core maps input through the same inset).
   sigils: {
-    x: -44,
-    z: 10,
+    x: -62,
+    z: 6,
     radius: 10,
     // The cosmetic lectern ring around the interactive one: the NPC field
     // mans these stations during the trial (one etcher per lectern, extras
@@ -190,8 +190,8 @@ export const GAUNTLET_VENUE = {
   // the marker moves: sim placement and venue geometry share these numbers so
   // hands stay on the rope.
   pull: {
-    x: -44,
-    z: 44,
+    x: -62,
+    z: 52,
     length: 24, // rope length (the lane runs along x)
     width: 9, // lane dressing extent across the rope
     ropeY: 1.05, // hand height
@@ -202,19 +202,24 @@ export const GAUNTLET_VENUE = {
     knotTravel: 10, // rope translation at the win threshold (yards)
   },
   // Trial 4, the Keeper's Echo: a walled courtyard of rune-stone tables.
-  echo: { x: -44, z: 78, size: 15 },
-  // Trial 5, The Brittle Span: a raised twin-track bridge over a dark pit.
-  span: { x: -76, z: 44, length: 34, deckY: 5 },
+  echo: { x: -62, z: 104, size: 15 },
+  // Trial 5, The Brittle Span: the twin-track glass crossing over a dark pit.
+  // `length` tracks steps * panelLength (GAUNTLET.span): the crossing itself.
+  span: { x: -105, z: 30, length: 56 },
   // Trial 6, The Final Court: the champions' ring.
-  court: { x: -76, z: 86, radius: 9 },
+  court: { x: -105, z: 95, radius: 9 },
   // Grandstands flank the sentinel field on both sides.
   standX: 27, // inner edge of each grandstand (mirrored at -standX)
   standZMin: 14,
   standZMax: 76,
-  // The venue ground apron: the flat dressed footprint around everything.
-  groundHalfWidth: 110,
-  groundZMin: -46,
-  groundZMax: 130,
+  // The venue ground apron: the flat dressed footprint around everything,
+  // wide enough that every arena sits clear of its neighbors (playtest: the
+  // packed first layout read as one overlapping jumble) and that the
+  // colosseum shell ring fits inside it. Bounded by the gauntlet band
+  // (x 8800..9600) and the 400yd slot pitch.
+  groundHalfWidth: 160,
+  groundZMin: -70,
+  groundZMax: 165,
   // Camera focus poses for the desk-style trials, instance-local (the hud glue
   // adds the run origin and hands the pose to renderer.setCameraFocus).
   // Authored clear of geometry: over the open pavilion, above head height, so
@@ -224,14 +229,14 @@ export const GAUNTLET_VENUE = {
   // screen-space circle overlay as its input).
   focus: {
     sigils: {
-      pos: { x: -41.8, y: 4.3, z: 10 },
-      lookAt: { x: -44, y: 1.2, z: 10 },
+      pos: { x: -59.8, y: 4.3, z: 6 },
+      lookAt: { x: -62, y: 1.2, z: 6 },
     },
     // Over the echo table from behind the viewer's west mat: all four rune
     // stones in frame.
     echo: {
-      pos: { x: -51.5, y: 4.6, z: 78 },
-      lookAt: { x: -44, y: 1, z: 78 },
+      pos: { x: -69.5, y: 4.6, z: 104 },
+      lookAt: { x: -62, y: 1, z: 104 },
     },
   },
 } as const;
@@ -351,9 +356,12 @@ export const GAUNTLET: GauntletDef = {
   span: {
     durationS: 100,
     steps: 14,
-    panelLength: 2.6,
-    panelWidth: 2.6,
-    panelGap: 1.2,
+    // Playtest: the 2.6yd panes read as stepping stones, not platforms. A
+    // 4yd pane is a real floor tile you stand on and survey from; the venue
+    // length (GAUNTLET_VENUE.span.length) tracks steps * panelLength.
+    panelLength: 4,
+    panelWidth: 4,
+    panelGap: 1.4,
     fallDamage: 17,
     npcAheadCount: 3,
     npcStepPeriodS: 1.6,
