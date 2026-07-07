@@ -120,6 +120,34 @@ export const GAUNTLET_LAYOUT = {
   podiumZ: -16, // the podium ceremony anchor, behind the staging area
 } as const;
 
+// The six trial arenas of the venue complex, one anchor per trials[] entry
+// (instance-local yards). Trial 1 plays on the sentinel field itself; the
+// other five are DRESSED but sealed until their trials ship (one per release
+// phase), and each future trial's gameplay lands AT its anchor so the map
+// and the mechanics never drift apart. The renderer builds the whole complex
+// from these (src/render/gauntlet_venue.ts); keep every position here, never
+// inline in render code.
+export const GAUNTLET_VENUE = {
+  // Trial 2, Sugarglass Sigils: a circular etching pavilion.
+  sigils: { x: -44, z: 10, radius: 10 },
+  // Trial 3, The Great Pull: a sunken rope trench.
+  pull: { x: -44, z: 44, length: 24, width: 9 },
+  // Trial 4, Keeper's Wager: a walled dueling courtyard.
+  wager: { x: -44, z: 78, size: 15 },
+  // Trial 5, The Brittle Span: a raised twin-track bridge over a dark pit.
+  span: { x: -76, z: 44, length: 34, deckY: 5 },
+  // Trial 6, The Final Court: the champions' ring.
+  court: { x: -76, z: 86, radius: 9 },
+  // Grandstands flank the sentinel field on both sides.
+  standX: 27, // inner edge of each grandstand (mirrored at -standX)
+  standZMin: 14,
+  standZMax: 76,
+  // The venue ground apron: the flat dressed footprint around everything.
+  groundHalfWidth: 110,
+  groundZMin: -46,
+  groundZMax: 130,
+} as const;
+
 export const GAUNTLET: GauntletDef = {
   fieldSize: 30,
   vitalityMax: 100,

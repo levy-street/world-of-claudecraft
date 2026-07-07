@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GAUNTLET, GAUNTLET_LAYOUT } from '../src/sim/content/gauntlet';
+import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE } from '../src/sim/content/gauntlet';
 import { isGauntletPos } from '../src/sim/data';
 import { nextGreenWindowS } from '../src/sim/gauntlet/trial_sentinel';
 import {
@@ -480,5 +480,36 @@ describe('lobby countdown calibration sample', () => {
       expect(ev.remainingS).toBeLessThan(GAUNTLET.lobbyFillS - 9);
       expect(ev.remainingS).toBeGreaterThan(GAUNTLET.lobbyFillS - 12);
     }
+  });
+});
+
+describe('venue layout envelope', () => {
+  it('keeps every venue anchor inside the ground apron and the slot envelope', () => {
+    const V = GAUNTLET_VENUE;
+    // The apron must stay inside the gauntlet band (no bleed into the
+    // battleground reserve at x 9600) and inside one slot's z pitch (400,
+    // data.ts GAUNTLET_SLOT_SPACING) so neighboring runs never see it.
+    expect(isGauntletPos(9000 - V.groundHalfWidth)).toBe(true);
+    expect(isGauntletPos(9000 + V.groundHalfWidth)).toBe(true);
+    expect(V.groundZMax - V.groundZMin).toBeLessThan(400);
+    const inApron = (x: number, z: number, pad: number) => {
+      expect(Math.abs(x) + pad).toBeLessThanOrEqual(V.groundHalfWidth);
+      expect(z - pad).toBeGreaterThanOrEqual(V.groundZMin);
+      expect(z + pad).toBeLessThanOrEqual(V.groundZMax);
+    };
+    inApron(V.sigils.x, V.sigils.z, V.sigils.radius + 4);
+    inApron(V.pull.x, V.pull.z, Math.max(V.pull.length, V.pull.width) / 2 + 4);
+    inApron(V.wager.x, V.wager.z, V.wager.size / 2 + 4);
+    inApron(V.span.x, V.span.z, V.span.length / 2 + 6);
+    inApron(V.court.x, V.court.z, V.court.radius + 4);
+    // The sentinel field itself (z 0..fieldLength plus the warden past the
+    // finish) and the shared stages all sit on the apron too.
+    inApron(0, GAUNTLET.sentinel.fieldLength + GAUNTLET_LAYOUT.watcherMargin + 4, 6);
+    inApron(0, GAUNTLET_LAYOUT.podiumZ - 8, 6);
+    inApron(GAUNTLET_LAYOUT.spectatorX + 4, GAUNTLET_LAYOUT.spectatorZ, 12);
+    // The grandstands flank the field without covering the spectator park spot.
+    expect(V.standX).toBeGreaterThan(GAUNTLET.sentinel.fieldHalfWidth + 4);
+    expect(GAUNTLET_LAYOUT.spectatorZ - 12).toBeGreaterThan(V.standZMin);
+    expect(GAUNTLET_LAYOUT.spectatorZ + 12).toBeLessThan(V.standZMax);
   });
 });

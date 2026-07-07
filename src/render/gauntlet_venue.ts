@@ -1,0 +1,851 @@
+// The Gauntlet venue renderer: builds the whole six-trial event complex at a
+// gauntlet instance slot (src/sim/data.ts gauntletOrigin). Every anchor comes
+// from src/sim/content/gauntlet.ts (GAUNTLET_LAYOUT + GAUNTLET_VENUE), so when
+// a later release phase ships a trial its gameplay lands exactly where the map
+// already is.
+//
+// LOOK: an ominous stone festival ground. A long sand crossing field walled by
+// grandstands and pennant strings, watched from the finish line by the Stone
+// Warden, a monolithic hooded effigy whose eyes and the paired signal pylons
+// burn green on a green light and red on a red light (the head turns away on
+// green and snaps back on red, easing over the telegraph time). Behind the
+// start line: the staging plaza with its ceremonial arch, the three-step
+// podium, and the spectators' deck. West of the field, the five sealed arenas
+// of the future trials (etching pavilion, rope trench, wager courtyard, the
+// raised brittle span, the champions' ring), each barred until its trial
+// ships. Everything is procedural geometry + canvas textures except a handful
+// of CC0 GLB set pieces (banners, torches, pillars, arches), which are
+// measured at build time and normalized to a target height so kit scale never
+// surprises us.
+//
+// The venue is STATIC dressing: built once per slot on approach (the hodrics
+// idiom, no teardown), with a tiny per-frame update for the light-reactive
+// bits. It reads the viewer's own run view (IWorld gauntletRun) only; when no
+// run is live the Warden idles and the lamps hold a low amber.
+
+import * as THREE from 'three';
+import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE } from '../sim/content/gauntlet';
+import type { GauntletRunView } from '../sim/types';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
+import { surfaceMat } from './gfx';
+
+// ---------------------------------------------------------------------------
+// GLB set pieces (all already-bundled CC0 kits; see CREDITS.md).
+// ---------------------------------------------------------------------------
+
+const VENUE_MODELS = {
+  torchLit: 'models/dungeon/torch_lit.glb',
+  pillar: 'models/dungeon/pillar_decorated.glb',
+  archGate: 'models/dungeon/arch_gate.glb',
+  bannerPurple: 'models/dungeon/banner_patterna_blue.glb',
+  bannerRed: 'models/dungeon/banner_patterna_red.glb',
+  bannerWhite: 'models/dungeon/banner_patterna_white.glb',
+  bannerGreen: 'models/dungeon/banner_patterna_green.glb',
+  bannerYellow: 'models/dungeon/banner_patterna_yellow.glb',
+} as const;
+
+type VenueModelKey = keyof typeof VENUE_MODELS;
+
+const modelCache = new Map<VenueModelKey, THREE.Object3D>();
+const modelHeight = new Map<VenueModelKey, number>();
+let assetsPromise: Promise<void> | null = null;
+
+export function ensureGauntletVenueAssets(): Promise<void> {
+  assetsPromise ??= Promise.all(
+    (Object.keys(VENUE_MODELS) as VenueModelKey[]).map((key) =>
+      loadGltf(VENUE_MODELS[key]).then((gltf) => {
+        modelCache.set(key, gltf.scene);
+        const box = new THREE.Box3().setFromObject(gltf.scene);
+        modelHeight.set(key, Math.max(0.001, box.max.y - box.min.y));
+      }),
+    ),
+  ).then(() => undefined);
+  return assetsPromise;
+}
+
+if (typeof window !== 'undefined') registerPreload(ensureGauntletVenueAssets());
+
+// Clone a cached set piece scaled so its bounding height equals targetH yards
+// (kit pieces ship at whatever scale their pack chose; measuring beats
+// guessing). Marked sharedGeometry so dispose() leaves the source alone.
+function placeProp(
+  group: THREE.Group,
+  key: VenueModelKey,
+  x: number,
+  y: number,
+  z: number,
+  rotY: number,
+  targetH: number,
+): THREE.Object3D {
+  const src = modelCache.get(key);
+  if (!src) throw new Error(`gauntlet venue asset not preloaded: ${key}`);
+  const obj = src.clone(true);
+  obj.userData.sharedGeometry = true;
+  obj.scale.setScalar(targetH / (modelHeight.get(key) ?? 1));
+  obj.position.set(x, y, z);
+  obj.rotation.y = rotY;
+  obj.traverse((o) => {
+    if ((o as THREE.Mesh).isMesh) {
+      o.castShadow = true;
+      o.receiveShadow = true;
+    }
+  });
+  group.add(obj);
+  return obj;
+}
+
+// ---------------------------------------------------------------------------
+// Palette: weathered stone and sand under event dressing in the recruiter's
+// purple and gold. Signal colors match the HUD light banners.
+// ---------------------------------------------------------------------------
+
+const STONE = 0x8d99ae;
+const STONE_DARK = 0x5c6470;
+const SAND_EDGE = 0xb9a67e;
+const WOOD = 0x8a6a48;
+const GOLD = 0xd9a53c;
+const SILVER = 0xc9d1dc;
+const BRONZE = 0xb0793a;
+const PURPLE = 0x9b59b6;
+const GREEN_LIGHT = 0x3fd98a;
+const RED_LIGHT = 0xe8344a;
+const IDLE_AMBER = 0xd9a53c;
+const PIT_DARK = 0x14161c;
+const GLASS_TINT = 0xbfe3ef;
+
+function stoneMat(color: number, opts: { map?: THREE.Texture } = {}) {
+  return surfaceMat({ color, map: opts.map, roughness: 0.9 });
+}
+
+// ---------------------------------------------------------------------------
+// Procedural canvas textures (module-local deterministic rnd, the textures.ts
+// convention: no Math.random).
+// ---------------------------------------------------------------------------
+
+let rndState = 0x9e3779b9;
+function rnd(): number {
+  rndState = (rndState + 0x6d2b79f5) | 0;
+  let t = Math.imul(rndState ^ (rndState >>> 15), 1 | rndState);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+const texCache = new Map<string, THREE.CanvasTexture>();
+
+function canvasTex(
+  key: string,
+  draw: (ctx: CanvasRenderingContext2D) => void,
+): THREE.CanvasTexture {
+  const cached = texCache.get(key);
+  if (cached) return cached;
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 256;
+  const ctx = c.getContext('2d')!;
+  draw(ctx);
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  texCache.set(key, tex);
+  return tex;
+}
+
+// Raked event sand: warm base, speckle, faint drag lines along z.
+function sandTex(): THREE.CanvasTexture {
+  return canvasTex('sand', (ctx) => {
+    ctx.fillStyle = '#d8c49a';
+    ctx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 900; i++) {
+      ctx.fillStyle = rnd() < 0.5 ? 'rgba(120,100,64,0.16)' : 'rgba(246,236,206,0.18)';
+      ctx.fillRect(rnd() * 256, rnd() * 256, 1.6, 1.6);
+    }
+    ctx.strokeStyle = 'rgba(120,100,64,0.10)';
+    for (let x = 8; x < 256; x += 16) {
+      ctx.beginPath();
+      ctx.moveTo(x + rnd() * 3, 0);
+      ctx.lineTo(x + rnd() * 3, 256);
+      ctx.stroke();
+    }
+  });
+}
+
+// Flagstone paving for the staging plaza and walkways.
+function paveTex(): THREE.CanvasTexture {
+  return canvasTex('pave', (ctx) => {
+    ctx.fillStyle = '#7d8798';
+    ctx.fillRect(0, 0, 256, 256);
+    const step = 42;
+    for (let row = 0; row < 7; row++) {
+      for (let col = 0; col < 7; col++) {
+        const off = row % 2 === 0 ? 0 : step / 2;
+        const g = 118 + Math.floor(rnd() * 26);
+        ctx.fillStyle = `rgb(${g},${g + 8},${g + 20})`;
+        ctx.fillRect(col * step + off + 2, row * step + 2, step - 4, step - 4);
+      }
+    }
+  });
+}
+
+// The sigil pavilion floor: a slate disc with pale etched arcs.
+function runeTex(): THREE.CanvasTexture {
+  return canvasTex('rune', (ctx) => {
+    ctx.fillStyle = '#2b3140';
+    ctx.fillRect(0, 0, 256, 256);
+    ctx.strokeStyle = 'rgba(168,222,238,0.55)';
+    ctx.lineWidth = 3;
+    for (let ring = 0; ring < 3; ring++) {
+      ctx.beginPath();
+      ctx.arc(128, 128, 40 + ring * 32, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    for (let i = 0; i < 14; i++) {
+      const a0 = rnd() * Math.PI * 2;
+      const r0 = 30 + rnd() * 80;
+      ctx.beginPath();
+      ctx.arc(128, 128, r0, a0, a0 + 0.5 + rnd());
+      ctx.stroke();
+    }
+  });
+}
+
+// Event cloth: purple field, gold trim bands, a pale diamond sigil.
+function clothTex(): THREE.CanvasTexture {
+  return canvasTex('cloth', (ctx) => {
+    ctx.fillStyle = '#7d4699';
+    ctx.fillRect(0, 0, 256, 256);
+    ctx.fillStyle = '#d9a53c';
+    ctx.fillRect(0, 0, 256, 18);
+    ctx.fillRect(0, 238, 256, 18);
+    ctx.fillStyle = '#e8d9f2';
+    ctx.beginPath();
+    ctx.moveTo(128, 78);
+    ctx.lineTo(178, 128);
+    ctx.lineTo(128, 178);
+    ctx.lineTo(78, 128);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#7d4699';
+    ctx.beginPath();
+    ctx.moveTo(128, 102);
+    ctx.lineTo(154, 128);
+    ctx.lineTo(128, 154);
+    ctx.lineTo(102, 128);
+    ctx.closePath();
+    ctx.fill();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Small builders. Everything is instance-local; the group carries the origin.
+// ---------------------------------------------------------------------------
+
+function box(
+  group: THREE.Group,
+  w: number,
+  h: number,
+  d: number,
+  x: number,
+  y: number,
+  z: number,
+  mat: THREE.Material,
+  rotY = 0,
+): THREE.Mesh {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  m.position.set(x, y, z);
+  m.rotation.y = rotY;
+  m.castShadow = true;
+  m.receiveShadow = true;
+  group.add(m);
+  return m;
+}
+
+function groundPlane(
+  group: THREE.Group,
+  w: number,
+  d: number,
+  x: number,
+  y: number,
+  z: number,
+  mat: THREE.Material,
+): THREE.Mesh {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), mat);
+  m.rotation.x = -Math.PI / 2;
+  m.position.set(x, y, z);
+  m.receiveShadow = true;
+  group.add(m);
+  return m;
+}
+
+// A freestanding event banner: a slim pole with a hanging cloth quad.
+function bannerPole(group: THREE.Group, x: number, z: number, rotY: number, mat: THREE.Material) {
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 6.4, 6), stoneMat(STONE_DARK));
+  pole.position.set(x, 3.2, z);
+  pole.castShadow = true;
+  group.add(pole);
+  const cloth = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 3.4), mat);
+  cloth.position.set(x, 4.4, z);
+  cloth.rotation.y = rotY;
+  group.add(cloth);
+}
+
+// A stone fire bowl on a fluted foot; the coal core glows via the lamp
+// material so braziers breathe with the signal light too.
+function brazier(group: THREE.Group, x: number, z: number, lampMat: THREE.MeshStandardMaterial) {
+  const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.72, 1.1, 8), stoneMat(STONE_DARK));
+  foot.position.set(x, 0.55, z);
+  foot.castShadow = true;
+  group.add(foot);
+  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.55, 0.6, 8), stoneMat(STONE));
+  bowl.position.set(x, 1.35, z);
+  bowl.castShadow = true;
+  group.add(bowl);
+  const coals = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 8), lampMat);
+  coals.scale.y = 0.5;
+  coals.position.set(x, 1.62, z);
+  group.add(coals);
+}
+
+interface PennantSpan {
+  x0: number;
+  x1: number;
+  y: number;
+  z: number;
+}
+
+// Instanced triangle pennants strung between posts (the hodrics idiom).
+function buildPennants(group: THREE.Group, spans: PennantSpan[]): THREE.InstancedMesh | null {
+  const flagsPerSpan = spans.map((s) => Math.floor(Math.abs(s.x1 - s.x0) / 2.1));
+  const total = flagsPerSpan.reduce((a, b) => a + b, 0);
+  if (total <= 0) return null;
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute([-0.5, 0, 0, 0.5, 0, 0, 0, -1.1, 0], 3),
+  );
+  geo.computeVertexNormals();
+  const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+  const inst = new THREE.InstancedMesh(geo, mat, total);
+  const m = new THREE.Matrix4();
+  const q = new THREE.Quaternion();
+  const one = new THREE.Vector3(1, 1, 1);
+  const color = new THREE.Color();
+  const palette = [PURPLE, GOLD, SILVER];
+  let i = 0;
+  for (let s = 0; s < spans.length; s++) {
+    const span = spans[s];
+    for (let k = 0; k < flagsPerSpan[s]; k++) {
+      const f = (k + 0.5) / flagsPerSpan[s];
+      const sag = Math.sin(f * Math.PI) * 0.6;
+      m.compose(new THREE.Vector3(span.x0 + (span.x1 - span.x0) * f, span.y - sag, span.z), q, one);
+      inst.setMatrixAt(i, m);
+      inst.setColorAt(i, color.setHex(palette[i % palette.length]));
+      i++;
+    }
+  }
+  inst.instanceMatrix.needsUpdate = true;
+  if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
+  group.add(inst);
+  return inst;
+}
+
+// The cached canvas textures are shared; consumers that need their own tiling
+// clone one (clones share the underlying image, so this is cheap).
+function texWithRepeat(tex: THREE.CanvasTexture, rx: number, ry: number): THREE.Texture {
+  const t = tex.clone();
+  t.repeat.set(rx, ry);
+  t.needsUpdate = true;
+  return t;
+}
+
+// ---------------------------------------------------------------------------
+// The stages of the venue.
+// ---------------------------------------------------------------------------
+
+// Stage 1, Sentinel's Crossing: the trial field, its lines, the grandstands,
+// the signal pylons, and the Stone Warden past the finish line.
+interface WardenRig {
+  headGroup: THREE.Group;
+  lampMat: THREE.MeshStandardMaterial;
+  eyeMat: THREE.MeshStandardMaterial;
+}
+
+function buildField(group: THREE.Group): WardenRig {
+  const L = GAUNTLET.sentinel.fieldLength;
+  const halfW = GAUNTLET.sentinel.fieldHalfWidth;
+  const V = GAUNTLET_VENUE;
+
+  // The field proper: a brighter raked strip with start and finish lines.
+  const field = texWithRepeat(sandTex(), 6, 14);
+  groundPlane(
+    group,
+    halfW * 2 + 6,
+    L + 12,
+    0,
+    0.03,
+    L / 2,
+    surfaceMat({ color: 0xe4d2a4, map: field, roughness: 0.95 }),
+  );
+  const lineMat = surfaceMat({ color: 0xf6f1e4, roughness: 0.8 });
+  box(group, halfW * 2 + 4, 0.06, 0.7, 0, 0.05, 0, lineMat);
+  box(group, halfW * 2 + 4, 0.06, 0.7, 0, 0.05, L, lineMat);
+
+  // Low kerb walls seat the field into the apron on both sides.
+  const kerbMat = stoneMat(SAND_EDGE);
+  box(group, 0.8, 0.5, L + 12, -(halfW + 3.4), 0.25, L / 2, kerbMat);
+  box(group, 0.8, 0.5, L + 12, halfW + 3.4, 0.25, L / 2, kerbMat);
+
+  // Grandstands: three stepped tiers behind each kerb, a back wall, banner
+  // posts, and pennant strings along the top. The east side splits into two
+  // segments around the spectators' terrace (knocked-out players park at
+  // GAUNTLET_LAYOUT.spectator*, and the terrace must be under their feet).
+  const standMat = stoneMat(STONE, { map: texWithRepeat(paveTex(), 1, 8) as THREE.CanvasTexture });
+  const spans: PennantSpan[] = [];
+  const deckZ0 = GAUNTLET_LAYOUT.spectatorZ - 12;
+  const deckZ1 = GAUNTLET_LAYOUT.spectatorZ + 12;
+  const segments: Array<[number, number, number]> = [
+    [-1, V.standZMin, V.standZMax],
+    [1, V.standZMin, deckZ0],
+    [1, deckZ1, V.standZMax],
+  ];
+  for (const [side, z0, z1] of segments) {
+    const len = z1 - z0;
+    const mid = (z0 + z1) / 2;
+    for (let tier = 0; tier < 3; tier++) {
+      box(
+        group,
+        3.4,
+        0.9 + tier * 0.9,
+        len,
+        side * (V.standX + 1.7 + tier * 3.4),
+        (0.9 + tier * 0.9) / 2,
+        mid,
+        standMat,
+      );
+    }
+    box(group, 1, 5.4, len, side * (V.standX + 11.4), 2.7, mid, stoneMat(STONE_DARK));
+    for (let z = z0 + 2; z <= z1 - 2; z += 15.5) {
+      placeProp(group, 'pillar', side * (V.standX + 10.6), 0, z, 0, 5.6);
+      placeProp(
+        group,
+        side < 0 ? 'bannerPurple' : 'bannerRed',
+        side * (V.standX + 10.9),
+        3.6,
+        Math.min(z + 7.7, z1 - 2),
+        side < 0 ? Math.PI / 2 : -Math.PI / 2,
+        2.4,
+      );
+    }
+    spans.push({ x0: side * (V.standX + 1), x1: side * (V.standX + 11), y: 6.6, z: z0 });
+    spans.push({ x0: side * (V.standX + 1), x1: side * (V.standX + 11), y: 6.6, z: z1 });
+  }
+  // A string across the start and the finish carries the festival into the field.
+  spans.push({ x0: -halfW - 2, x1: halfW + 2, y: 7.4, z: -2 });
+  spans.push({ x0: -halfW - 2, x1: halfW + 2, y: 7.4, z: L + 2 });
+  buildPennants(group, spans);
+
+  // Torches pace the kerbs.
+  for (let z = 6; z < L; z += 21) {
+    placeProp(group, 'torchLit', -(halfW + 2.6), 0, z, Math.PI / 2, 2.2);
+    placeProp(group, 'torchLit', halfW + 2.6, 0, z, -Math.PI / 2, 2.2);
+  }
+
+  // Dynamic-signal materials: OWN instances (never surfaceMat: its cache
+  // dedupes by options, and recoloring a shared material would repaint every
+  // consumer). Disposed with the venue.
+  const lampMat = new THREE.MeshStandardMaterial({
+    color: 0x2a2d36,
+    emissive: IDLE_AMBER,
+    emissiveIntensity: 0.7,
+    roughness: 0.4,
+  });
+  const eyeMat = new THREE.MeshStandardMaterial({
+    color: 0x11131a,
+    emissive: IDLE_AMBER,
+    emissiveIntensity: 1.4,
+    roughness: 0.25,
+  });
+
+  // Signal pylons flank the finish line.
+  for (const side of [-1, 1]) {
+    const px = side * (halfW - 2);
+    box(group, 1.6, 1.2, 1.6, px, 0.6, L + 3, stoneMat(STONE_DARK));
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.3, 7.4, 8), stoneMat(STONE));
+    post.position.set(px, 4.3, L + 3);
+    post.castShadow = true;
+    group.add(post);
+    const cage = new THREE.Mesh(new THREE.SphereGeometry(0.95, 12, 10), lampMat);
+    cage.position.set(px, 8.4, L + 3);
+    group.add(cage);
+  }
+
+  // The Stone Warden: pedestal, robed monolith, hooded head. The body faces
+  // the field forever; only the head turns. Eyes sit on the head's local +z
+  // face, and the whole warden group is yawed PI so +z looks back down the
+  // field toward the start line.
+  const wz = L + GAUNTLET_LAYOUT.watcherMargin + 4;
+  const warden = new THREE.Group();
+  warden.position.set(0, 0, wz);
+  warden.rotation.y = Math.PI;
+  const ped = new THREE.Mesh(new THREE.CylinderGeometry(4.6, 5.4, 1.6, 10), stoneMat(STONE_DARK));
+  ped.position.y = 0.8;
+  ped.castShadow = true;
+  ped.receiveShadow = true;
+  warden.add(ped);
+  const robe = new THREE.Mesh(new THREE.CylinderGeometry(1.9, 3.6, 8.4, 10), stoneMat(STONE));
+  robe.position.y = 5.8;
+  robe.castShadow = true;
+  warden.add(robe);
+  for (const side of [-1, 1]) {
+    const pauldron = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.4, 2.6), stoneMat(STONE_DARK));
+    pauldron.position.set(side * 2.1, 9.4, 0);
+    pauldron.rotation.z = side * -0.28;
+    pauldron.castShadow = true;
+    warden.add(pauldron);
+  }
+  const headGroup = new THREE.Group();
+  headGroup.position.y = 11.2;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(2.3, 2.7, 2.3), stoneMat(STONE));
+  head.castShadow = true;
+  headGroup.add(head);
+  const hood = new THREE.Mesh(new THREE.ConeGeometry(1.9, 2.6, 8), stoneMat(STONE_DARK));
+  hood.position.set(0, 1.6, -0.4);
+  hood.castShadow = true;
+  headGroup.add(hood);
+  for (const side of [-1, 1]) {
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.3, 10, 8), eyeMat);
+    eye.position.set(side * 0.55, 0.25, 1.18);
+    headGroup.add(eye);
+  }
+  warden.add(headGroup);
+  group.add(warden);
+
+  // Braziers ring the warden's pedestal.
+  brazier(group, -7, wz - 1, lampMat);
+  brazier(group, 7, wz - 1, lampMat);
+
+  return { headGroup, lampMat, eyeMat };
+}
+
+// Stage: the staging plaza and its ceremonial arch onto the field.
+function buildStaging(group: THREE.Group) {
+  groundPlane(
+    group,
+    GAUNTLET_LAYOUT.stagingHalfWidth * 2 + 8,
+    16,
+    0,
+    0.02,
+    GAUNTLET_LAYOUT.stagingZ,
+    surfaceMat({ color: 0xaab2c0, map: texWithRepeat(paveTex(), 6, 4), roughness: 0.9 }),
+  );
+  placeProp(group, 'archGate', 0, 0, -2.4, 0, 7.5);
+  const cloth = surfaceMat({ color: 0xffffff, map: clothTex(), roughness: 0.85 });
+  for (const side of [-1, 1]) {
+    bannerPole(
+      group,
+      side * (GAUNTLET_LAYOUT.stagingHalfWidth + 2.5),
+      GAUNTLET_LAYOUT.stagingZ - 4,
+      0,
+      cloth,
+    );
+    placeProp(group, 'torchLit', side * 5.2, 0, -2.2, side > 0 ? -Math.PI / 2 : Math.PI / 2, 2.2);
+  }
+}
+
+// Stage: the podium, three steps behind the plaza.
+function buildPodium(group: THREE.Group, lampMat: THREE.MeshStandardMaterial) {
+  const z = GAUNTLET_LAYOUT.podiumZ - 4;
+  const base = stoneMat(STONE_DARK);
+  box(group, 12, 0.5, 6, 0, 0.25, z, base);
+  box(group, 3.2, 1.5, 3.2, 0, 1.25, z, stoneMat(GOLD));
+  box(group, 3.2, 1.0, 3.2, -3.6, 1.0, z, stoneMat(SILVER));
+  box(group, 3.2, 0.7, 3.2, 3.6, 0.85, z, stoneMat(BRONZE));
+  const cloth = surfaceMat({ color: 0xffffff, map: clothTex(), roughness: 0.85 });
+  bannerPole(group, -5.4, z - 3.4, 0, cloth);
+  bannerPole(group, 5.4, z - 3.4, 0, cloth);
+  brazier(group, -5.4, z + 2.6, lampMat);
+  brazier(group, 5.4, z + 2.6, lampMat);
+}
+
+// Stage: the spectators' terrace, sunk into the gap in the east grandstand.
+// Knocked-out players park at (spectatorX, spectatorZ), so the boards sit
+// exactly under their feet and the rail faces the field they just left.
+function buildSpectatorDeck(group: THREE.Group) {
+  const x = GAUNTLET_LAYOUT.spectatorX + 4;
+  const z = GAUNTLET_LAYOUT.spectatorZ;
+  const wood = surfaceMat({ color: WOOD, roughness: 0.9 });
+  groundPlane(group, 16, 22, x, 0.04, z, wood);
+  const railMat = stoneMat(STONE_DARK);
+  const railX = x - 7.6;
+  for (let dz = -10; dz <= 10; dz += 2.5) {
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 1.2, 6), railMat);
+    post.position.set(railX, 0.6, z + dz);
+    group.add(post);
+  }
+  const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 21.5, 6), railMat);
+  rail.rotation.x = Math.PI / 2;
+  rail.position.set(railX, 1.2, z);
+  group.add(rail);
+  box(group, 1.2, 0.45, 8, x + 5, 0.55, z - 6, wood);
+  box(group, 1.2, 0.45, 8, x + 5, 0.55, z + 6, wood);
+  placeProp(group, 'torchLit', x, 0, z - 10.4, Math.PI, 2.2);
+  placeProp(group, 'torchLit', x, 0, z + 10.4, 0, 2.2);
+}
+
+// A sealed entry: crossed planks over a gap in a low enclosure, the "not yet
+// open" mark every future arena carries (no text needed).
+function sealedEntry(group: THREE.Group, x: number, z: number, rotY: number) {
+  const plank = surfaceMat({ color: WOOD, roughness: 0.95 });
+  const a = box(group, 3.6, 0.35, 0.16, x, 1.3, z, plank, rotY);
+  a.rotation.z = 0.5;
+  const b = box(group, 3.6, 0.35, 0.16, x, 1.3, z, plank, rotY);
+  b.rotation.z = -0.5;
+}
+
+// Stages 2 through 6: the five sealed future-trial arenas.
+function buildFutureArenas(group: THREE.Group) {
+  const V = GAUNTLET_VENUE;
+
+  // Trial 2, Sugarglass Sigils: a rune-floored pavilion ringed by pillars.
+  {
+    const { x, z, radius } = V.sigils;
+    const dais = new THREE.Mesh(
+      new THREE.CylinderGeometry(radius, radius + 0.6, 0.5, 24),
+      surfaceMat({ color: 0x39415a, map: runeTex(), roughness: 0.7 }),
+    );
+    dais.position.set(x, 0.25, z);
+    dais.receiveShadow = true;
+    group.add(dais);
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      placeProp(
+        group,
+        'pillar',
+        x + Math.sin(a) * (radius + 1.6),
+        0,
+        z + Math.cos(a) * (radius + 1.6),
+        a,
+        4.8,
+      );
+    }
+    placeProp(group, 'bannerWhite', x, 3.2, z - radius - 1.4, 0, 2.2);
+    sealedEntry(group, x + radius + 1.2, z, Math.PI / 2);
+  }
+
+  // Trial 3, The Great Pull: a sunken trench with the great rope over it.
+  {
+    const { x, z, length, width } = V.pull;
+    box(group, length + 3, 0.5, width + 3, x, 0.25, z, stoneMat(SAND_EDGE));
+    box(group, length, 0.2, width, x, 0.42, z, surfaceMat({ color: PIT_DARK, roughness: 1 }));
+    const postMat = stoneMat(WOOD);
+    for (const side of [-1, 1]) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 4.6, 8), postMat);
+      post.position.set(x + side * (length / 2 + 1.2), 2.3, z);
+      post.castShadow = true;
+      group.add(post);
+    }
+    const rope = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.14, 0.14, length + 2.4, 6),
+      surfaceMat({ color: 0xa8895e, roughness: 1 }),
+    );
+    rope.rotation.z = Math.PI / 2;
+    rope.position.set(x, 3.6, z);
+    group.add(rope);
+    placeProp(group, 'bannerRed', x, 3.2, z + width / 2 + 1.6, Math.PI, 2.2);
+    sealedEntry(group, x, z - width / 2 - 2, 0);
+  }
+
+  // Trial 4, Keeper's Wager: a walled courtyard with two facing wager mats.
+  {
+    const { x, z, size } = V.wager;
+    groundPlane(
+      group,
+      size,
+      size,
+      x,
+      0.02,
+      z,
+      surfaceMat({ color: 0x9aa2b2, map: texWithRepeat(paveTex(), 3, 3), roughness: 0.9 }),
+    );
+    const wall = stoneMat(STONE_DARK);
+    box(group, size, 1.6, 0.7, x, 0.8, z - size / 2, wall);
+    box(group, size, 1.6, 0.7, x, 0.8, z + size / 2, wall);
+    box(group, 0.7, 1.6, size, x - size / 2, 0.8, z, wall);
+    const matA = box(
+      group,
+      2.6,
+      0.12,
+      2.6,
+      x - 3.2,
+      0.12,
+      z,
+      surfaceMat({ color: PURPLE, roughness: 0.9 }),
+    );
+    matA.rotation.y = Math.PI / 4;
+    const matB = box(
+      group,
+      2.6,
+      0.12,
+      2.6,
+      x + 3.2,
+      0.12,
+      z,
+      surfaceMat({ color: GOLD, roughness: 0.9 }),
+    );
+    matB.rotation.y = Math.PI / 4;
+    placeProp(group, 'bannerGreen', x, 3.2, z + size / 2 - 0.4, Math.PI, 2.2);
+    sealedEntry(group, x + size / 2, z, Math.PI / 2);
+  }
+
+  // Trial 5, The Brittle Span: the raised twin-track glass bridge over a pit.
+  {
+    const { x, z, length, deckY } = V.span;
+    box(group, 16, 0.5, length + 10, x, 0.25, z, stoneMat(SAND_EDGE));
+    box(group, 13, 0.2, length + 7, x, 0.42, z, surfaceMat({ color: PIT_DARK, roughness: 1 }));
+    const frame = stoneMat(STONE_DARK);
+    for (const endZ of [z - length / 2, z + length / 2]) {
+      box(group, 10, deckY, 2.2, x, deckY / 2, endZ, frame);
+    }
+    for (const side of [-1, 1]) {
+      const beam = box(group, 0.5, 0.5, length, x + side * 4.6, deckY, z, frame);
+      beam.castShadow = true;
+      const inner = box(group, 0.5, 0.5, length, x + side * 0.6, deckY, z, frame);
+      inner.castShadow = true;
+    }
+    const glassMat = new THREE.MeshStandardMaterial({
+      color: GLASS_TINT,
+      transparent: true,
+      opacity: 0.35,
+      roughness: 0.15,
+      metalness: 0,
+    });
+    venueOwnedMats.push(glassMat);
+    const panelD = 3.4;
+    for (let i = 0; i < Math.floor(length / (panelD + 0.6)); i++) {
+      const pz = z - length / 2 + 2.4 + i * (panelD + 0.6);
+      for (const side of [-1, 1]) {
+        const panel = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.14, panelD), glassMat);
+        panel.position.set(x + side * 2.6, deckY + 0.32, pz);
+        group.add(panel);
+      }
+    }
+    placeProp(group, 'bannerWhite', x, 3.4, z - length / 2 - 3, 0, 2.4);
+    sealedEntry(group, x, z - length / 2 - 4.6, 0);
+  }
+
+  // Trial 6, The Final Court: the champions' ring.
+  {
+    const { x, z, radius } = V.court;
+    const ring = new THREE.Mesh(
+      new THREE.CylinderGeometry(radius, radius + 0.5, 0.4, 24),
+      surfaceMat({ color: 0xc7b58c, map: texWithRepeat(sandTex(), 3, 3), roughness: 0.95 }),
+    );
+    ring.position.set(x, 0.2, z);
+    ring.receiveShadow = true;
+    group.add(ring);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.35, 8, 28), stoneMat(STONE_DARK));
+    rim.rotation.x = Math.PI / 2;
+    rim.position.set(x, 0.45, z);
+    group.add(rim);
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+      placeProp(
+        group,
+        'torchLit',
+        x + Math.sin(a) * (radius + 1.8),
+        0,
+        z + Math.cos(a) * (radius + 1.8),
+        a + Math.PI,
+        2.4,
+      );
+    }
+    placeProp(group, 'bannerYellow', x, 3.2, z - radius - 1.6, 0, 2.2);
+    sealedEntry(group, x + radius + 1.4, z, Math.PI / 2);
+  }
+}
+
+// Track venue-created dynamic materials for dispose (surfaceMat ones are
+// cache-shared and must stay alive).
+let venueOwnedMats: THREE.Material[] = [];
+
+// ---------------------------------------------------------------------------
+// Public build + update + dispose
+// ---------------------------------------------------------------------------
+
+export interface GauntletVenueView {
+  group: THREE.Group;
+  update(t: number, run: GauntletRunView | null): void;
+  dispose(scene: THREE.Scene): void;
+}
+
+export async function buildGauntletVenue(
+  scene: THREE.Scene,
+  ox: number,
+  oz: number,
+): Promise<GauntletVenueView> {
+  await ensureGauntletVenueAssets();
+  const group = new THREE.Group();
+  group.position.set(ox, 0, oz);
+  venueOwnedMats = [];
+  const owned = venueOwnedMats;
+
+  // The one sand apron under everything (the far band has no terrain mesh).
+  const V = GAUNTLET_VENUE;
+  groundPlane(
+    group,
+    V.groundHalfWidth * 2,
+    V.groundZMax - V.groundZMin,
+    0,
+    0.01,
+    (V.groundZMin + V.groundZMax) / 2,
+    surfaceMat({ color: 0xcdbb90, map: texWithRepeat(sandTex(), 26, 20), roughness: 1 }),
+  );
+
+  const rig = buildField(group);
+  owned.push(rig.lampMat, rig.eyeMat);
+  buildStaging(group);
+  buildPodium(group, rig.lampMat);
+  buildSpectatorDeck(group);
+  buildFutureArenas(group);
+  scene.add(group);
+
+  let lastT = 0;
+  let headYaw = 0;
+  return {
+    group,
+    update(t: number, run: GauntletRunView | null) {
+      const dt = Math.min(0.1, Math.max(0, t - lastT));
+      lastT = t;
+      const mine = run && run.originX === ox && run.originZ === oz ? run : null;
+      const light = mine?.sentinel ? mine.sentinel.light : null;
+      // Head: green = turned away (yaw PI), red = eyes on the field (yaw 0);
+      // no live trial = a slow patrol sweep. The ease rate echoes the
+      // telegraph window so the turn reads as the warning it is.
+      const target = light === 'green' ? Math.PI : light === 'red' ? 0 : Math.sin(t * 0.35) * 0.7;
+      headYaw += (target - headYaw) * Math.min(1, dt * 5);
+      rig.headGroup.rotation.y = headYaw;
+      const hex = light === 'green' ? GREEN_LIGHT : light === 'red' ? RED_LIGHT : IDLE_AMBER;
+      rig.lampMat.emissive.setHex(hex);
+      rig.eyeMat.emissive.setHex(hex);
+      const boost = light === 'red' ? 2.6 : light === 'green' ? 1.8 : 1.4;
+      rig.eyeMat.emissiveIntensity = boost;
+      rig.lampMat.emissiveIntensity = light ? 1.6 : 0.7;
+    },
+    dispose(s: THREE.Scene) {
+      s.remove(group);
+      group.traverse((o) => {
+        if (o.userData.sharedGeometry) return;
+        let shared = false;
+        for (let p = o.parent; p; p = p.parent) {
+          if (p.userData.sharedGeometry) {
+            shared = true;
+            break;
+          }
+        }
+        if (!shared && (o as THREE.Mesh).isMesh) (o as THREE.Mesh).geometry.dispose();
+      });
+      for (const m of owned) m.dispose();
+    },
+  };
+}

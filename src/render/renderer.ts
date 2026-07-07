@@ -16,6 +16,8 @@ import {
   delveOrigin,
   delveSlotAt,
   dungeonAt,
+  GAUNTLET_SLOT_COUNT,
+  gauntletOrigin,
   HODRICS_SLOT_COUNT,
   hodricsOrigin,
   INSTANCE_SLOT_COUNT,
@@ -80,6 +82,7 @@ import {
   type FoliageView,
 } from './foliage';
 import { buildGatherNodes } from './gather_nodes';
+import { buildGauntletVenue, type GauntletVenueView } from './gauntlet_venue';
 import {
   GFX,
   type GfxBucketBands,
@@ -3818,6 +3821,11 @@ export class Renderer {
   // tracks in-flight builds so the approach gate does not re-schedule one.
   private hodricsCastles = new Map<number, HodricsCastleView>();
   private pendingHodricsSlots = new Set<number>();
+  // The Gauntlet venue: static dressing built once per slot on approach (the
+  // hodrics idiom minus the seed rebuilds), driven per frame for its
+  // light-reactive signal pieces.
+  private gauntletVenues = new Map<number, GauntletVenueView>();
+  private pendingGauntletSlots = new Set<number>();
 
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
@@ -3955,7 +3963,23 @@ export class Renderer {
         }
       }
     } else if (inGauntlet) {
-      // The Gauntlet uses an open exterior venue in a far instance band.
+      // Open-air venue, no interior copies: raise the event complex for the
+      // slot the player is approaching (once; kept for the session).
+      for (let i = 0; i < GAUNTLET_SLOT_COUNT; i++) {
+        if (this.gauntletVenues.has(i) || this.pendingGauntletSlots.has(i)) continue;
+        const o = gauntletOrigin(i);
+        if (Math.abs(px - o.x) >= 220 || Math.abs(pz - o.z) >= 220) continue;
+        this.pendingGauntletSlots.add(i);
+        void buildGauntletVenue(this.scene, o.x, o.z)
+          .then((view) => {
+            this.gauntletVenues.set(i, view);
+            this.pendingGauntletSlots.delete(i);
+          })
+          .catch((err) => {
+            this.pendingGauntletSlots.delete(i);
+            console.error('Failed to build the Gauntlet venue:', err);
+          });
+      }
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
@@ -5043,6 +5067,9 @@ export class Renderer {
     // the same tick origin), so this matches the sim's collision poses phase
     // for phase, the whole "what you see is what you collide with" contract.
     for (const castle of this.hodricsCastles.values()) castle.update(this.time);
+    // The Gauntlet venue reacts to the viewer's own run: the Warden's gaze and
+    // the signal pylons follow the sentinel light state (idle amber otherwise).
+    for (const venue of this.gauntletVenues.values()) venue.update(this.time, this.sim.gauntletRun);
     worldStart = markWorldPhase('props', worldStart);
     this.foliage.update(
       p.pos.x,
