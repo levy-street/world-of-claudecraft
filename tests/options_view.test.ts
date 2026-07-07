@@ -10,6 +10,7 @@ import {
   buildOptionsMenu,
   type OptionsControl,
   type OptionsSettingsSource,
+  sliderCommitsOnRelease,
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
@@ -55,6 +56,12 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
     expect(sliderDispatchValue('60')).toBe(60);
     // identical coercion regardless of formatting kind
     expect(sliderDispatchValue('1')).toBe(1);
+  });
+
+  it('only the global uiScale slider buffers drag input until release/change', () => {
+    expect(sliderCommitsOnRelease('uiScale')).toBe(true);
+    expect(sliderCommitsOnRelease('playerFrameScale')).toBe(false);
+    expect(sliderCommitsOnRelease('renderScale')).toBe(false);
   });
 
   it('settingToggle flips 0<->1 off the stored value and reads on at >=0.5', () => {

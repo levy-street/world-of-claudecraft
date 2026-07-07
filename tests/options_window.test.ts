@@ -104,6 +104,18 @@ describe('options_window: control-primitive dispatch wiring', () => {
     // enumerated choice: the chosen option value verbatim
     expect(painter).toContain('hooks.onSettingChange(key, option.value)');
   });
+  it('buffers the UI scale slider until pointer release/change', () => {
+    const slider = painter.slice(
+      painter.indexOf('private settingSlider'),
+      painter.indexOf('private settingToggle'),
+    );
+    expect(slider).toContain('sliderCommitsOnRelease(key)');
+    expect(slider).toContain('pending_scale');
+    expect(slider).toContain('committed_scale');
+    expect(slider).toContain("slider.addEventListener('pointerup', commitBufferedValue)");
+    expect(slider).toContain("slider.addEventListener('change', commitBufferedValue)");
+    expect(slider).toContain('syncReadout(sliderDispatchValue(slider.value))');
+  });
 });
 
 describe('options_window: changeLanguage hardening (PR #730)', () => {
