@@ -76,6 +76,15 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
 }
 
+// Fishing-dock plank-deck collider footprint, in the dock's local frame (the
+// deck runs from the shore toward the water along local -z; see props.ts). The
+// deck sections sit at local z -1.05/-3.18/-5.31 and the on-deck props span x
+// -0.6..1.45, so one OBB centered mid-run covers the walkable planks + props.
+const DECK_LOCAL_X = 0.1;
+const DECK_LOCAL_Z = -3.2;
+const DECK_HALF_WIDTH = 1.4;
+const DECK_HALF_DEPTH = 3.3;
+
 // ---------------------------------------------------------------------------
 // Collider sets
 // ---------------------------------------------------------------------------
@@ -128,7 +137,7 @@ function staticWorldColliders(seed: number): Collider[] {
     out.push({ type: 'circle', x, z, r: 5, cameraTopY: topY(seed, x, z, 5.2), camGhost: true });
   }
 
-  // dock huts
+  // dock huts + the plank deck they sit on
   for (const d of PROPS.docks) {
     const hut = rotY(d.hutLocal.x, d.hutLocal.z, d.rot);
     const x = d.x + hut.x,
@@ -141,6 +150,26 @@ function staticWorldColliders(seed: number): Collider[] {
       hd: d.hutLocal.hd,
       rot: d.rot,
       cameraTopY: topY(seed, x, z, 2.9),
+      camGhost: true,
+    });
+    // The plank deck (props.ts draws three dockPlatform sections stepping toward
+    // the water along local -z, plus the barrels/crates on top) had no collider,
+    // so the player walked straight through the pier and its props (issue 1500).
+    // Emit one OBB spanning the deck run in the dock's local frame, so the deck is
+    // solid like every other structure. Both docks (zone1 + zone2) share this
+    // geometry, so this fixes both. Footprint tracks the rendered plank + prop
+    // extents (sections at local z -1.05/-3.18/-5.31, props at x -0.6..1.45).
+    const deck = rotY(DECK_LOCAL_X, DECK_LOCAL_Z, d.rot);
+    const dx = d.x + deck.x,
+      dz = d.z + deck.z;
+    out.push({
+      type: 'obb',
+      x: dx,
+      z: dz,
+      hw: DECK_HALF_WIDTH,
+      hd: DECK_HALF_DEPTH,
+      rot: d.rot,
+      cameraTopY: topY(seed, dx, dz, 1.2),
       camGhost: true,
     });
   }
