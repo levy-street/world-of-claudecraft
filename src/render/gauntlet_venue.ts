@@ -652,6 +652,32 @@ interface SigilRig {
   normal: THREE.Vector3;
 }
 
+// The Great Pull rig: the rope IS the meter. Two rope halves meet at a knot
+// whose offset from the painted center line mirrors the wire marker
+// (viewer-relative: positive = the viewer's side winning, mapped to +x), and
+// the beat drum on the trench rim pulses on the sim metronome (a steady glow
+// during the opening brace window).
+interface PullRig {
+  knot: THREE.Group;
+  ropeL: THREE.Mesh;
+  ropeR: THREE.Mesh;
+  drum: THREE.Group;
+  drumSkinMat: THREE.MeshStandardMaterial;
+  maxOffset: number; // knot travel from center to a threshold stake
+  attachL: number; // rope anchor x at each post, instance-local
+  attachR: number;
+  ropeY: number;
+  centerX: number;
+  centerZ: number;
+}
+
+// The drum's flash length at each beat, seconds.
+const DRUM_FLASH_S = 0.12;
+
+// Positive modulo so the beat phase stays in [0, period) even if the render
+// clock briefly reads just before the beat anchor.
+const posMod = (a: number, b: number): number => ((a % b) + b) % b;
+
 // Outline tint granularity: the polyline is grouped into this many tube
 // segments, tinted gold as the traced fraction passes each one.
 const SIGIL_SEGMENTS = 24;
@@ -846,6 +872,7 @@ function buildTrialArenas(
 ): {
   spanRig: SpanRig;
   sigilRig: SigilRig;
+  pullRig: PullRig;
 } {
   const V = GAUNTLET_VENUE;
 
@@ -853,8 +880,10 @@ function buildTrialArenas(
   // with the etched lectern slab (the trial's input surface) at its center.
   const sigilRig = buildSigilPavilion(group, ox, oz);
 
-  // Trial 3, The Great Pull: a sunken trench with the great rope over it.
-  {
+  // Trial 3, The Great Pull: a sunken trench; the rope over it is the live
+  // meter (two halves meeting at the marker knot) and the drum on the rim is
+  // the beat metronome.
+  const pullRig: PullRig = (() => {
     const { x, z, length, width } = V.pull;
     box(group, length + 3, 0.5, width + 3, x, 0.25, z, stoneMat(SAND_EDGE));
     box(group, length, 0.2, width, x, 0.42, z, surfaceMat({ color: PIT_DARK, roughness: 1 }));
@@ -865,15 +894,77 @@ function buildTrialArenas(
       post.castShadow = true;
       group.add(post);
     }
-    const rope = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.14, 0.14, length + 2.4, 6),
-      surfaceMat({ color: 0xa8895e, roughness: 1 }),
+    // The painted center line and the two threshold stakes the knot must reach.
+    const lineMat = surfaceMat({ color: 0xf6f1e4, roughness: 0.8 });
+    box(group, 0.3, 0.06, width + 3, x, 0.54, z, lineMat);
+    const maxOffset = length / 2 - 2;
+    const stakeMat = surfaceMat({ color: RED_LIGHT, roughness: 0.6 });
+    for (const side of [-1, 1]) {
+      const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.13, 1.4, 6), stakeMat);
+      stake.position.set(x + side * maxOffset, 1.2, z + width / 2 + 0.9);
+      stake.castShadow = true;
+      group.add(stake);
+    }
+    // The rope halves: unit-length cylinders laid along x, stretched per frame
+    // between their post anchor and the knot.
+    const ropeY = 3.6;
+    const ropeMat = surfaceMat({ color: 0xa8895e, roughness: 1 });
+    const ropeGeo = new THREE.CylinderGeometry(0.14, 0.14, 1, 6);
+    const attachL = x - (length / 2 + 1.2);
+    const attachR = x + (length / 2 + 1.2);
+    const ropeL = new THREE.Mesh(ropeGeo, ropeMat);
+    ropeL.rotation.z = Math.PI / 2;
+    ropeL.position.set(x, ropeY, z);
+    group.add(ropeL);
+    const ropeR = new THREE.Mesh(ropeGeo, ropeMat);
+    ropeR.rotation.z = Math.PI / 2;
+    ropeR.position.set(x, ropeY, z);
+    group.add(ropeR);
+    // The knot: a wrapped coil with the judge's red streamer hanging under it.
+    const knot = new THREE.Group();
+    const coil = new THREE.Mesh(
+      new THREE.SphereGeometry(0.3, 10, 8),
+      surfaceMat({ color: 0x8a6a42, roughness: 1 }),
     );
-    rope.rotation.z = Math.PI / 2;
-    rope.position.set(x, 3.6, z);
-    group.add(rope);
+    knot.add(coil);
+    const streamer = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.7, 0.28), stakeMat);
+    streamer.position.y = -0.55;
+    knot.add(streamer);
+    knot.position.set(x, ropeY, z);
+    group.add(knot);
+    // The beat drum on the near rim: wooden shell, glowing skin.
+    const drum = new THREE.Group();
+    drum.position.set(x + 4, 0.5, z + width / 2 + 2.4);
+    const shell = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.95, 1.1, 12), stoneMat(WOOD));
+    shell.position.y = 0.55;
+    shell.castShadow = true;
+    drum.add(shell);
+    const drumSkinMat = new THREE.MeshStandardMaterial({
+      color: 0xe8dcc2,
+      emissive: GOLD,
+      emissiveIntensity: 0.35,
+      roughness: 0.7,
+    });
+    venueOwnedMats.push(drumSkinMat);
+    const skin = new THREE.Mesh(new THREE.CylinderGeometry(0.82, 0.82, 0.08, 12), drumSkinMat);
+    skin.position.y = 1.14;
+    drum.add(skin);
+    group.add(drum);
     placeProp(group, 'bannerRed', x, 3.2, z + width / 2 + 1.6, Math.PI, 2.2);
-  }
+    return {
+      knot,
+      ropeL,
+      ropeR,
+      drum,
+      drumSkinMat,
+      maxOffset,
+      attachL,
+      attachR,
+      ropeY,
+      centerX: x,
+      centerZ: z,
+    };
+  })();
 
   // Trial 4, Keeper's Wager: a walled courtyard with two facing wager mats.
   {
@@ -1021,7 +1112,7 @@ function buildTrialArenas(
     }
     placeProp(group, 'bannerYellow', x, 3.2, z0 - 2, 0, 2.2);
   }
-  return { spanRig, sigilRig };
+  return { spanRig, sigilRig, pullRig };
 }
 
 // Track venue-created dynamic materials for dispose (surfaceMat ones are
@@ -1094,15 +1185,20 @@ export async function buildGauntletVenue(
   buildStaging(group);
   buildPodium(group, rig.lampMat);
   buildSpectatorDeck(group);
-  const { spanRig, sigilRig } = buildTrialArenas(group, ox, oz);
+  const { spanRig, sigilRig, pullRig } = buildTrialArenas(group, ox, oz);
   scene.add(group);
   // The venue never moves after build: freeze the whole subtree's matrices
   // (real per-frame CPU on thousands of prop nodes), then re-enable the
-  // transform-animated children: the Warden's turning head and the sigil
-  // trace mote (repositioned per stroke sample).
+  // transform-animated children: the Warden's turning head, the sigil trace
+  // mote (repositioned per stroke sample), and the pull rig's live pieces
+  // (rope halves, marker knot, pulsing drum).
   freezeStaticMatrices(group);
   rig.headGroup.matrixAutoUpdate = true;
   sigilRig.mote.matrixAutoUpdate = true;
+  pullRig.knot.matrixAutoUpdate = true;
+  pullRig.ropeL.matrixAutoUpdate = true;
+  pullRig.ropeR.matrixAutoUpdate = true;
+  pullRig.drum.matrixAutoUpdate = true;
 
   let lastT = 0;
   let headYaw = 0;
@@ -1110,6 +1206,11 @@ export async function buildGauntletVenue(
   let lastSigilShapeKey = '';
   let lastSigilProgressKey = -1;
   let lastSigilCrackKey = -1;
+  // Pull rig state: the eased knot offset, plus a live flag so the rope lays
+  // out once at idle (build leaves the halves unstretched) and resets once
+  // when the trial ends, with zero writes on ordinary idle frames.
+  let pullKnotX = 0;
+  let pullLayoutDue = true;
   return {
     group,
     update(t: number, run: GauntletRunView | null) {
@@ -1171,6 +1272,38 @@ export async function buildGauntletVenue(
           lastSigilCrackKey = crackKey;
           sigilRig.faceMat.emissiveIntensity = (crackKey / 24) * 0.9;
         }
+      }
+      // The Great Pull: ease the knot toward the wire marker (viewer-relative,
+      // + = the viewer's side winning = +x) and stretch the rope halves to it;
+      // the drum pulses on the beat (steady glow through the brace window).
+      const pull = mine?.pull ?? null;
+      if (pull || pullLayoutDue) {
+        const frac = pull
+          ? Math.max(-1, Math.min(1, pull.marker / Math.max(1, pull.winThreshold)))
+          : 0;
+        const target = frac * pullRig.maxOffset;
+        pullKnotX += (target - pullKnotX) * Math.min(1, dt * 8);
+        if (!pull && Math.abs(pullKnotX) < 0.01) pullKnotX = 0;
+        const kx = pullRig.centerX + pullKnotX;
+        pullRig.knot.position.x = kx;
+        const lLen = Math.max(0.1, kx - 0.25 - pullRig.attachL);
+        pullRig.ropeL.scale.y = lLen;
+        pullRig.ropeL.position.x = pullRig.attachL + lLen / 2;
+        const rLen = Math.max(0.1, pullRig.attachR - (kx + 0.25));
+        pullRig.ropeR.scale.y = rLen;
+        pullRig.ropeR.position.x = pullRig.attachR - rLen / 2;
+        if (pull) {
+          const brace = t < pull.braceUntil;
+          const beatFrac = pull.beatPeriodS > 0 ? posMod(t - pull.beatAnchor, pull.beatPeriodS) : 1;
+          const flash = !brace && beatFrac < DRUM_FLASH_S;
+          pullRig.drum.scale.setScalar(flash ? 1.12 : 1);
+          pullRig.drumSkinMat.emissiveIntensity = brace ? 1.2 : flash ? 1.9 : 0.35;
+        } else {
+          pullRig.drum.scale.setScalar(1);
+          pullRig.drumSkinMat.emissiveIntensity = 0.35;
+        }
+        // Stay live while the trial runs or the knot is still easing home.
+        pullLayoutDue = pull !== null || pullKnotX !== 0;
       }
       // Head: green = turned away (yaw PI), red = eyes on the field (yaw 0);
       // no live trial = a slow patrol sweep. The ease rate echoes the

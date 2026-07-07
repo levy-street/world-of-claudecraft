@@ -213,8 +213,8 @@
 
     <!-- The Gauntlet HUD cluster: shown only while a run is live (painted by
          gauntlet_hud_painter from the gauntletRun wire view). Non-interactive chrome
-         (pointer-events:none in CSS) so it never blocks clicks; the pull/court
-         buttons opt back into pointer events. Kept in lockstep with index.html. -->
+         (pointer-events:none in CSS) so it never blocks clicks; the court
+         button opts back into pointer events. Kept in lockstep with index.html. -->
     <div id="gauntlet-hud" role="group" data-i18n-aria="hudChrome.gauntlet.title" aria-label="The Gauntlet">
       <div id="gauntlet-phase"></div>
       <div id="gauntlet-countdown"><div class="fill"></div><div class="timer"></div></div>
@@ -222,17 +222,6 @@
         <span id="gauntlet-survivors" class="gh-chip" role="status"></span>
         <span id="gauntlet-prize" class="gh-chip"></span>
         <span id="gauntlet-light" class="gh-light"></span>
-      </div>
-      <div id="gauntlet-pull" class="gh-pull">
-        <div id="gauntlet-pull-tug" class="gh-pull-tug" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-          <div class="gh-pull-center"></div>
-          <div class="gh-pull-knob"></div>
-        </div>
-        <div id="gauntlet-pull-beat" class="gh-pull-beat">
-          <div class="gh-pull-target"></div>
-          <div class="gh-pull-cursor"></div>
-        </div>
-        <button type="button" id="gauntlet-pull-btn" class="btn gh-pull-btn"></button>
       </div>
       <div id="gauntlet-court" class="gh-court">
         <span id="gauntlet-court-role" class="gh-court-role"></span>

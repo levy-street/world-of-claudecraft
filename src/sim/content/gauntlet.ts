@@ -175,6 +175,12 @@ export const GAUNTLET_VENUE = {
       pos: { x: -41.8, y: 4.3, z: 10 },
       lookAt: { x: -44, y: 1.2, z: 10 },
     },
+    // Side-on framing of the pull trench: the whole rope, the center line, and
+    // the beat drum on the near rim in one shot.
+    pull: {
+      pos: { x: -44, y: 7, z: 61 },
+      lookAt: { x: -44, y: 1.8, z: 44 },
+    },
   },
 } as const;
 

@@ -3785,17 +3785,12 @@ export class Hud {
       survivors: $('#gauntlet-survivors'),
       prize: $('#gauntlet-prize'),
       light: $('#gauntlet-light'),
-      pull: $('#gauntlet-pull'),
-      pullTug: $('#gauntlet-pull-tug'),
-      pullTugKnob: $('#gauntlet-pull-tug .gh-pull-knob'),
-      pullCursor: $('#gauntlet-pull-beat .gh-pull-cursor'),
-      pullBtn: $('#gauntlet-pull-btn'),
       court: $('#gauntlet-court'),
       courtRole: $('#gauntlet-court-role'),
       courtBtn: $('#gauntlet-court-btn'),
       courtCd: $('#gauntlet-court .gh-court-cd'),
     },
-    { onPull: () => this.gauntletPullNow(), onShove: () => this.gauntletShoveNow() },
+    { onShove: () => this.gauntletShoveNow() },
   );
   // The in-world sigils stage: while trial 2 is live for a live contestant,
   // updateGauntletHud registers the venue's lectern slab as the world-aim
@@ -3809,6 +3804,9 @@ export class Hud {
   private sigilsOrigin: { x: number; z: number } | null = null;
   private readonly sigilsTrace = new GauntletTraceBatcher();
   private sigilsLastCrack = 0;
+  // Which desk-style trial currently holds the authored camera focus pose
+  // (movement trials keep the chase cam and never appear here).
+  private gauntletFocusKey: keyof typeof GAUNTLET_VENUE.focus | null = null;
   // The wager panel: a window-style module that opens only while its trial is
   // live (driven each frame from updateGauntletHud).
   private readonly gauntletWager = new GauntletWagerWindow({
@@ -11403,6 +11401,8 @@ export class Hud {
       this.gauntletRecruit.update({ eventOpen: this.sim.gauntletOpen, run, time });
     // Trial input surfaces: the sigils stage lives in the world (the lectern
     // slab); the wager panel opens/closes itself off the live wire substate.
+    // The desk-style trials also hold an authored camera focus pose.
+    this.updateGauntletFocus();
     this.updateSigilsStage();
     this.gauntletWager.sync(run?.wager ? { ...run.wager, time } : null);
     // The pull/court Space shortcut is only meaningful during a run; bind it lazily.
@@ -11411,14 +11411,34 @@ export class Hud {
     else if (this.gauntletOverlay.shown) this.gauntletOverlay.hide();
   }
 
+  // The authored camera focus for the desk-style trials: glide in when one of
+  // them goes live for a LIVE contestant, release (glide back to the chase
+  // cam) when its view member goes null, the viewer spectates, or the run
+  // ends. Key-diffed so the renderer sees one set per transition.
+  private updateGauntletFocus(): void {
+    const live = this.gauntletContestantRun();
+    const key = live?.sigils ? ('sigils' as const) : live?.pull ? ('pull' as const) : null;
+    if (key === this.gauntletFocusKey) return;
+    this.gauntletFocusKey = key;
+    if (!key || !live) {
+      this.renderer.setCameraFocus(null);
+      return;
+    }
+    const f = GAUNTLET_VENUE.focus[key];
+    this.renderer.setCameraFocus({
+      pos: { x: f.pos.x + live.originX, y: f.pos.y, z: f.pos.z + live.originZ },
+      lookAt: { x: f.lookAt.x + live.originX, y: f.lookAt.y, z: f.lookAt.z + live.originZ },
+    });
+  }
+
   // The in-world sigils stage. While the trial is live for the viewer (a LIVE
   // contestant, not spectating), register the venue lectern's interaction rect
-  // as the world-aim surface and glide the camera to the authored pose; when
-  // the trial ends however it ends, release everything. The registration is
-  // once-per-trial (the surface field is the latch); the venue may still be
-  // streaming in on the first frames, so registration retries until the rect
-  // exists. Pending trace points flush here on the batch cadence too, so a
-  // held-still pointer mid-stroke still delivers its tail batch.
+  // as the world-aim surface; when the trial ends however it ends, release
+  // everything. The registration is once-per-trial (the surface field is the
+  // latch); the venue may still be streaming in on the first frames, so
+  // registration retries until the rect exists. Pending trace points flush
+  // here on the batch cadence too, so a held-still pointer mid-stroke still
+  // delivers its tail batch.
   private updateSigilsStage(): void {
     const live = this.gauntletContestantRun();
     const sigils = live?.sigils ?? null;
@@ -11442,11 +11462,6 @@ export class Hud {
       };
       this.sigilsSurface = surface;
       this.worldAim.set(surface);
-      const f = GAUNTLET_VENUE.focus.sigils;
-      this.renderer.setCameraFocus({
-        pos: { x: f.pos.x + live.originX, y: f.pos.y, z: f.pos.z + live.originZ },
-        lookAt: { x: f.lookAt.x + live.originX, y: f.lookAt.y, z: f.lookAt.z + live.originZ },
-      });
     }
     const pts = this.sigilsTrace.drain(false, performance.now());
     if (pts.length > 0) this.sim.gauntletTrace(pts);
@@ -11457,7 +11472,6 @@ export class Hud {
     if (!this.sigilsSurface) return;
     this.sigilsSurface = null;
     this.worldAim?.set(null);
-    this.renderer.setCameraFocus(null);
     if (this.sigilsOrigin)
       this.renderer.setGauntletSigilCursor(this.sigilsOrigin.x, this.sigilsOrigin.z, null);
     this.sigilsOrigin = null;
@@ -11489,6 +11503,16 @@ export class Hud {
   /** Wired by main.ts: the world-aim registry the sigils stage registers into. */
   attachWorldAim(aim: { set(surface: WorldAimSurface | null): void }): void {
     this.worldAim = aim;
+  }
+
+  /** main.ts handlePick pre-empt: during the pull trial a left click or tap
+   * ANYWHERE on the canvas IS the input (it claims the current beat; the drum
+   * in the venue is the metronome). Returns true when the click was consumed. */
+  gauntletPullClick(): boolean {
+    const run = this.gauntletContestantRun();
+    if (!run?.pull) return false;
+    this.gauntletPullNow();
+    return true;
   }
 
   // Fire an on-beat pull: the beat index is derived from the estimated sim time and

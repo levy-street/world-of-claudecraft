@@ -2175,6 +2175,10 @@ async function startGame(
   };
 
   function handlePick(x: number, y: number, button: number): void {
+    // The Great Pull: while the trial is live for a live contestant, a left
+    // click anywhere on the canvas claims the current beat (the venue's drum
+    // is the metronome), pre-empting picking entirely.
+    if (button === 0 && hud.gauntletPullClick()) return;
     if (hud.isGroundAimActive()) {
       if (button === 2) {
         hud.cancelGroundAim();

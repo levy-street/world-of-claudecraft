@@ -17,17 +17,12 @@ import type { PainterHostWriters } from './painter_host';
 // The green/red light-pill state classes (the fill color lives in CSS, never here).
 const LIGHT_GREEN_CLASS = 'green';
 const LIGHT_RED_CLASS = 'red';
-// Tug-of-war winning/losing state classes (colors live in CSS).
-const WINNING_CLASS = 'winning';
-const LOSING_CLASS = 'losing';
 // Court role state classes (drives the attacker/defender chip color in CSS).
 const ATTACKER_CLASS = 'attacker';
 const DEFENDER_CLASS = 'defender';
 // A shove button on cooldown: pointer-events off + dimmed via CSS.
 const DISABLED_CLASS = 'gh-disabled';
-// Custom properties the pull/court sub-clusters read for positioned overlays.
-const BEAT_VAR = '--gh-beat'; // metronome sweep cursor, 0..1
-const TUG_VAR = '--gh-tug'; // rope knob, 0..1 (0.5 = centered)
+// Custom property the court sub-cluster reads for its cooldown overlay.
 const CD_VAR = '--gh-cd'; // shove cooldown fill, 0..1
 // Fraction-digit precision for the positioned custom properties.
 const FRAC_DIGITS = 3;
@@ -53,8 +48,6 @@ const K = {
   phaseStaging: 'hudChrome.gauntlet.phaseStaging',
   phaseInterlude: 'hudChrome.gauntlet.phaseInterlude',
   phasePodium: 'hudChrome.gauntlet.phasePodium',
-  pull: 'hudChrome.gauntlet.pull',
-  pullRope: 'hudChrome.gauntlet.pullRope',
   shove: 'hudChrome.gauntlet.shove',
   roleAttacker: 'hudChrome.gauntlet.roleAttacker',
   roleDefender: 'hudChrome.gauntlet.roleDefender',
@@ -78,16 +71,6 @@ export interface GauntletHudElements {
   prize: HTMLElement;
   /** The sentinel light pill (green/red + Go/Stop text). */
   light: HTMLElement;
-  /** The Great Pull sub-cluster (shown only during the pull trial). */
-  pull: HTMLElement;
-  /** The tug-of-war rope track (role=progressbar; winning/losing class). */
-  pullTug: HTMLElement;
-  /** The rope knob, positioned across the track by the --gh-tug custom prop. */
-  pullTugKnob: HTMLElement;
-  /** The sweeping metronome cursor, positioned by the --gh-beat custom prop. */
-  pullCursor: HTMLElement;
-  /** The big on-beat PULL button. */
-  pullBtn: HTMLElement;
   /** The Final Court sub-cluster (shown only during the court trial). */
   court: HTMLElement;
   /** The attacker/defender role chip. */
@@ -98,10 +81,8 @@ export interface GauntletHudElements {
   courtCd: HTMLElement;
 }
 
-/** The Hud glue the interactive pull/court buttons dispatch through. */
+/** The Hud glue the interactive court button dispatches through. */
 export interface GauntletHudDeps {
-  /** Fire an on-beat pull (Hud derives the beat index from the live run + time). */
-  onPull(): void;
   /** Throw a shove (Hud gates it on the shove cooldown before sending). */
   onShove(): void;
 }
@@ -112,10 +93,9 @@ export class GauntletHudPainter {
     private readonly el: GauntletHudElements,
     deps: GauntletHudDeps,
   ) {
-    // One-time click wiring (the painter is constructed once). The buttons live
-    // inside the pointer-events:none cluster and opt back into pointer events via
-    // CSS; both dispatches are gated Hud-side (the shove against its cooldown).
-    this.el.pullBtn.addEventListener('click', () => deps.onPull());
+    // One-time click wiring (the painter is constructed once). The button lives
+    // inside the pointer-events:none cluster and opts back into pointer events via
+    // CSS; the dispatch is gated Hud-side against the shove cooldown.
     this.el.courtBtn.addEventListener('click', () => deps.onShove());
   }
 
@@ -151,25 +131,8 @@ export class GauntletHudPainter {
       w.setText(this.el.light, red ? t(K.stop) : t(K.go));
     }
 
-    w.setDisplay(this.el.pull, model.pull ? SHOWN : HIDDEN);
-    if (model.pull) this.paintPull(model.pull);
-
     w.setDisplay(this.el.court, model.court ? SHOWN : HIDDEN);
     if (model.court) this.paintCourt(model.court);
-  }
-
-  private paintPull(pull: NonNullable<GauntletHudModel['pull']>): void {
-    const w = this.writers;
-    // Rope knob: map the signed tug fraction (-1..1) onto 0..1 across the track.
-    const knob = 0.5 + pull.tugFrac * 0.5;
-    w.setStyleProp(this.el.pullTugKnob, TUG_VAR, knob.toFixed(FRAC_DIGITS));
-    w.setStyleProp(this.el.pullCursor, BEAT_VAR, pull.beatPhase.toFixed(FRAC_DIGITS));
-    w.toggleClass(this.el.pullTug, WINNING_CLASS, pull.winning);
-    w.toggleClass(this.el.pullTug, LOSING_CLASS, !pull.winning);
-    w.setAttr(this.el.pullTug, 'aria-valuenow', String(Math.round(knob * 100)));
-    w.setAttr(this.el.pullTug, 'aria-label', t(K.pullRope));
-    w.setText(this.el.pullBtn, t(K.pull));
-    w.setAttr(this.el.pullBtn, 'aria-label', t(K.pull));
   }
 
   private paintCourt(court: NonNullable<GauntletHudModel['court']>): void {

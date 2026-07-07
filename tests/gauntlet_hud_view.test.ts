@@ -112,57 +112,13 @@ describe('gauntletHudModel', () => {
     ).toBe(false);
   });
 
-  it('reports no pull/court meter outside those trials', () => {
+  it('reports no court prompt outside that trial', () => {
+    // The pull trial has no HUD sub-cluster at all: its meter is the venue's
+    // rope + drum, driven from the raw wire view, never from this model.
     const m = gauntletHudModel({ run: run(), time: 0 });
-    expect(m.pull).toBeNull();
     expect(m.court).toBeNull();
     const hidden = gauntletHudModel({ run: null, time: 0 });
-    expect(hidden.pull).toBeNull();
     expect(hidden.court).toBeNull();
-  });
-
-  const pullRun = (over: Partial<NonNullable<GauntletRunView['pull']>> = {}) =>
-    run({
-      sentinel: null,
-      pull: {
-        beatAnchor: 100,
-        beatPeriodS: 1.1,
-        marker: 6,
-        winThreshold: 12,
-        braceUntil: 0,
-        ...over,
-      },
-    });
-
-  it('maps the signed tug marker onto the -1..1 fraction and the winning flag', () => {
-    const m = gauntletHudModel({ run: pullRun({ marker: 6 }), time: 100 });
-    expect(m.pull?.tugFrac).toBeCloseTo(0.5, 6);
-    expect(m.pull?.winning).toBe(true);
-    const losing = gauntletHudModel({ run: pullRun({ marker: -6 }), time: 100 });
-    expect(losing.pull?.tugFrac).toBeCloseTo(-0.5, 6);
-    expect(losing.pull?.winning).toBe(false);
-  });
-
-  it('clamps the tug fraction to the -1..1 rails past the win threshold', () => {
-    expect(gauntletHudModel({ run: pullRun({ marker: 40 }), time: 100 }).pull?.tugFrac).toBe(1);
-    expect(gauntletHudModel({ run: pullRun({ marker: -40 }), time: 100 }).pull?.tugFrac).toBe(-1);
-  });
-
-  it('centers the beat sweep so the cursor crosses the middle target on the beat', () => {
-    // On the beat (time == anchor) the phase is 0.5 (the center target band); a
-    // quarter period on either side is symmetric about center (period 1.1, quarter
-    // 0.275). The trough sits at the 0/1 wrap edge, away from center.
-    expect(gauntletHudModel({ run: pullRun(), time: 100 }).pull?.beatPhase).toBeCloseTo(0.5, 6);
-    expect(gauntletHudModel({ run: pullRun(), time: 99.725 }).pull?.beatPhase).toBeCloseTo(0.25, 6);
-    expect(gauntletHudModel({ run: pullRun(), time: 100.275 }).pull?.beatPhase).toBeCloseTo(
-      0.75,
-      6,
-    );
-    // One full beat later it is back on center, and always stays in [0, 1).
-    const nextBeat = gauntletHudModel({ run: pullRun(), time: 101.1 }).pull?.beatPhase ?? -1;
-    expect(nextBeat).toBeCloseTo(0.5, 6);
-    expect(nextBeat).toBeGreaterThanOrEqual(0);
-    expect(nextBeat).toBeLessThan(1);
   });
 
   const courtRun = (over: Partial<NonNullable<GauntletRunView['court']>> = {}) =>
