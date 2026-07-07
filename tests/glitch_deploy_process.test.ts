@@ -47,12 +47,24 @@ describe('Glitch deploy process guardrails', () => {
   it('runs the Azure post-deploy handoff after the Glitch upload', () => {
     const deployScript = readFileSync(join(root, 'scripts/glitch_deploy.mjs'), 'utf8');
 
+    expect(deployScript).toContain('runAzurePreDeploySetup');
     expect(deployScript).toContain('runAzurePostDeployCheck');
     expect(deployScript).toContain('GLITCH_AZURE_POST_DEPLOY');
+    expect(deployScript).toContain('readLatestReadyAzureRevisionName');
+    expect(deployScript).toContain('restoreAzureFallbackRevision');
+    expect(deployScript).toContain('properties.latestReadyRevisionName');
+    expect(deployScript).toContain('ingress');
+    expect(deployScript).toContain('traffic');
+    expect(deployScript).toContain('--revision-weight');
+    expect(deployScript).toContain('set-mode');
+    expect(deployScript).toContain('multiple');
     expect(deployScript).toContain('--min-replicas');
     expect(deployScript).toContain('--max-replicas');
     expect(deployScript).toContain('already hosted by another game server process');
     expect(deployScript).toContain('activate');
+    expect(deployScript.indexOf('await runAzurePreDeploySetup()')).toBeLessThan(
+      deployScript.indexOf('await run(process.execPath, deployArgs, env)'),
+    );
     expect(deployScript.indexOf('await run(process.execPath, deployArgs, env)')).toBeLessThan(
       deployScript.indexOf('await runAzurePostDeployCheck()'),
     );
@@ -63,6 +75,8 @@ describe('Glitch deploy process guardrails', () => {
 
     expect(docs).toContain('--min-replicas 1');
     expect(docs).toContain('--max-replicas 1');
+    expect(docs).toContain('--mode multiple');
+    expect(docs).toContain('restores traffic to the last ready revision');
     expect(docs).toContain('REALM_SINGLETON_LOCK=1');
     expect(docs).toContain('Realm "Claudemoon" is already hosted');
     expect(docs).toContain('GLITCH_AZURE_POST_DEPLOY=0');

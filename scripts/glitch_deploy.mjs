@@ -65,6 +65,10 @@ if (nodeDeployment && !dryRun) {
   await runGlitchPreflight();
 }
 
+if (nodeDeployment && !dryRun && azurePostDeploy) {
+  await runAzurePreDeploySetup();
+}
+
 await ensureCli();
 
 if (!skipBuild && !nodeDeployment) {
@@ -131,6 +135,29 @@ async function runGlitchPreflight() {
     VITE_GLITCH_ENABLED: '1',
     VITE_GLITCH_TITLE_ID: TITLE_ID,
   });
+}
+
+async function runAzurePreDeploySetup() {
+  console.log('Preparing Azure Container App for Glitch revision traffic handoff...');
+  await runCapture('az', ['--version'], env);
+  await run(
+    'az',
+    [
+      'containerapp',
+      'revision',
+      'set-mode',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--mode',
+      'multiple',
+      '--output',
+      'none',
+    ],
+    env,
+  );
+  await enforceAzureSingleReplicaScale();
 }
 
 function readPackageVersion() {
@@ -242,32 +269,36 @@ async function runAzurePostDeployCheck() {
     'az',
     [
       'containerapp',
-      'update',
+      'revision',
+      'set-mode',
       '--name',
       azureContainerAppName,
       '--resource-group',
       azureResourceGroup,
-      '--min-replicas',
-      '1',
-      '--max-replicas',
-      '1',
+      '--mode',
+      'multiple',
       '--output',
       'none',
     ],
     env,
   );
+  await enforceAzureSingleReplicaScale();
 
   let singletonHandoffDone = false;
+  const fallbackRevision = await readLatestReadyAzureRevisionName();
   const latestRevision = await readLatestAzureRevisionName();
   const deadline = Date.now() + azurePostDeployTimeoutMs;
   while (Date.now() < deadline) {
     const revisions = await readAzureRevisions();
     const latest = revisions.find((revision) => revision.name === latestRevision);
     if (
+      latest?.active &&
       latest?.healthState === 'Healthy' &&
       latest.runningState !== 'Failed' &&
       Number(latest.replicas || 0) === 1
     ) {
+      await routeAzureTrafficToRevision(latestRevision);
+      await deactivateOlderAzureRevisions(revisions, latestRevision);
       console.log(`Azure post-deploy: ${latestRevision} is healthy with one replica.`);
       return;
     }
@@ -323,15 +354,106 @@ async function runAzurePostDeployCheck() {
 
   const finalRevisions = await readAzureRevisions();
   const latestLogs = await readAzureRevisionLogs(latestRevision).catch(() => '');
+  const fallbackMessage = await restoreAzureFallbackRevision(fallbackRevision, latestRevision);
   fail(
     [
       `Azure post-deploy: ${latestRevision} did not become healthy within ${azurePostDeployTimeoutMs}ms.`,
+      fallbackMessage,
       `Revision state: ${JSON.stringify(finalRevisions)}`,
       latestLogs ? `Log tail:\n${redact(latestLogs)}` : '',
     ]
       .filter(Boolean)
       .join('\n'),
   );
+}
+
+async function enforceAzureSingleReplicaScale() {
+  await run(
+    'az',
+    [
+      'containerapp',
+      'update',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--min-replicas',
+      '1',
+      '--max-replicas',
+      '1',
+      '--output',
+      'none',
+    ],
+    env,
+  );
+}
+
+async function routeAzureTrafficToRevision(revision) {
+  await run(
+    'az',
+    [
+      'containerapp',
+      'ingress',
+      'traffic',
+      'set',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--revision-weight',
+      `${revision}=100`,
+      '--output',
+      'none',
+    ],
+    env,
+  );
+}
+
+async function restoreAzureFallbackRevision(fallbackRevision, failedRevision) {
+  if (!fallbackRevision || fallbackRevision === failedRevision) return '';
+  console.log(`Azure post-deploy: restoring traffic to fallback revision ${fallbackRevision}.`);
+  try {
+    await run(
+      'az',
+      [
+        'containerapp',
+        'revision',
+        'activate',
+        '--name',
+        azureContainerAppName,
+        '--resource-group',
+        azureResourceGroup,
+        '--revision',
+        fallbackRevision,
+        '--output',
+        'none',
+      ],
+      env,
+    );
+    await routeAzureTrafficToRevision(fallbackRevision);
+    await run(
+      'az',
+      [
+        'containerapp',
+        'revision',
+        'deactivate',
+        '--name',
+        azureContainerAppName,
+        '--resource-group',
+        azureResourceGroup,
+        '--revision',
+        failedRevision,
+        '--output',
+        'none',
+      ],
+      env,
+    ).catch((error) => {
+      console.warn(redact(`Azure post-deploy: could not deactivate ${failedRevision}: ${error}`));
+    });
+    return `Restored traffic to fallback revision ${fallbackRevision}.`;
+  } catch (error) {
+    return redact(`Failed to restore fallback revision ${fallbackRevision}: ${error}`);
+  }
 }
 
 function revisionFailed(revision) {
@@ -359,6 +481,26 @@ async function deactivateOlderAzureRevisions(revisions, latestRevision) {
       env,
     );
   }
+}
+
+async function readLatestReadyAzureRevisionName() {
+  const result = await runCapture(
+    'az',
+    [
+      'containerapp',
+      'show',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--query',
+      'properties.latestReadyRevisionName',
+      '--output',
+      'tsv',
+    ],
+    env,
+  );
+  return result.stdout.trim();
 }
 
 async function readLatestAzureRevisionName() {

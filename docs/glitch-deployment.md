@@ -190,17 +190,26 @@ The script:
      `REALM_NAME`
    - verifies `GET /api/project-stats`
    - verifies `POST /api/site-presence` with the same JSON shape the live page sends
-4. Clones or updates the Glitch CLI deploy tool under the system temp directory.
-5. For `node`, zips the source tree without `node_modules`, `dist`, `.env`, docs, tests, or local agent folders.
-6. Uploads the archive with `entry=index.html`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
-7. Waits for the Glitch deployment job to complete.
-8. For `node`, runs an Azure Container App post-deploy check unless
+4. For `node`, prepares the Azure Container App unless
    `GLITCH_AZURE_POST_DEPLOY=0` is set:
+   - sets revision mode to `multiple`
    - enforces `--min-replicas 1 --max-replicas 1`
+5. Clones or updates the Glitch CLI deploy tool under the system temp directory.
+6. For `node`, zips the source tree without `node_modules`, `dist`, `.env`, docs, tests, or local agent folders.
+7. Uploads the archive with `entry=index.html`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
+8. Waits for the Glitch deployment job to complete.
+9. For `node`, runs an Azure Container App post-deploy check unless
+   `GLITCH_AZURE_POST_DEPLOY=0` is set:
+   - keeps revision mode at `multiple`
+   - enforces `--min-replicas 1 --max-replicas 1`
+   - records the last ready revision before checking the new revision
    - waits for the latest revision to become healthy with one replica
+   - pins traffic explicitly to the healthy latest revision
    - detects the realm singleton rollout error in Azure logs
    - deactivates active revisions and activates the latest revision fresh when
      Azure overlaps the old and new same-realm processes
+   - restores traffic to the last ready revision if the latest revision never
+     becomes healthy
 
 If the local predeploy check fails, fix that failure locally first. Do not upload
 another Glitch build until the check passes. When the check runs against Azure
@@ -217,6 +226,11 @@ the default Glitch Container App. The manual commands below are still useful for
 inspection or recovery:
 
 ```bash
+az containerapp revision set-mode \
+  --name world-of-claudecraft-node \
+  --resource-group openai-resource-group \
+  --mode multiple
+
 az containerapp update \
   --name world-of-claudecraft-node \
   --resource-group openai-resource-group \
@@ -227,6 +241,11 @@ az containerapp revision list \
   --name world-of-claudecraft-node \
   --resource-group openai-resource-group \
   --query "[].{name:name,healthState:properties.healthState,runningState:properties.runningState,replicas:properties.replicas}"
+
+az containerapp ingress traffic set \
+  --name world-of-claudecraft-node \
+  --resource-group openai-resource-group \
+  --revision-weight "<known-good-revision>=100"
 ```
 
 Useful overrides:
