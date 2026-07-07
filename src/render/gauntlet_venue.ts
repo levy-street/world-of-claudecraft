@@ -617,18 +617,16 @@ function buildSpectatorDeck(group: THREE.Group) {
   placeProp(group, 'torchLit', x, 0, z + 10.4, 0, 2.2);
 }
 
-// A sealed entry: crossed planks over a gap in a low enclosure, the "not yet
-// open" mark every future arena carries (no text needed).
-function sealedEntry(group: THREE.Group, x: number, z: number, rotY: number) {
-  const plank = surfaceMat({ color: WOOD, roughness: 0.95 });
-  const a = box(group, 3.6, 0.35, 0.16, x, 1.3, z, plank, rotY);
-  a.rotation.z = 0.5;
-  const b = box(group, 3.6, 0.35, 0.16, x, 1.3, z, plank, rotY);
-  b.rotation.z = -0.5;
+// Stages 2 through 6: the five trial arenas. The span returns a live rig (its
+// panels tint with the shared reveals); everything else is static dressing.
+interface SpanRig {
+  panels: { left: THREE.Mesh; right: THREE.Mesh }[];
+  unknownMat: THREE.Material;
+  safeMat: THREE.Material;
+  brittleMat: THREE.Material;
 }
 
-// Stages 2 through 6: the five sealed future-trial arenas.
-function buildFutureArenas(group: THREE.Group) {
+function buildTrialArenas(group: THREE.Group): SpanRig {
   const V = GAUNTLET_VENUE;
 
   // Trial 2, Sugarglass Sigils: a rune-floored pavilion ringed by pillars.
@@ -654,7 +652,6 @@ function buildFutureArenas(group: THREE.Group) {
       );
     }
     placeProp(group, 'bannerWhite', x, 3.2, z - radius - 1.4, 0, 2.2);
-    sealedEntry(group, x + radius + 1.2, z, Math.PI / 2);
   }
 
   // Trial 3, The Great Pull: a sunken trench with the great rope over it.
@@ -677,7 +674,6 @@ function buildFutureArenas(group: THREE.Group) {
     rope.position.set(x, 3.6, z);
     group.add(rope);
     placeProp(group, 'bannerRed', x, 3.2, z + width / 2 + 1.6, Math.PI, 2.2);
-    sealedEntry(group, x, z - width / 2 - 2, 0);
   }
 
   // Trial 4, Keeper's Wager: a walled courtyard with two facing wager mats.
@@ -719,74 +715,114 @@ function buildFutureArenas(group: THREE.Group) {
     );
     matB.rotation.y = Math.PI / 4;
     placeProp(group, 'bannerGreen', x, 3.2, z + size / 2 - 0.4, Math.PI, 2.2);
-    sealedEntry(group, x + size / 2, z, Math.PI / 2);
   }
 
-  // Trial 5, The Brittle Span: the raised twin-track glass bridge over a pit.
-  {
-    const { x, z, length, deckY } = V.span;
-    box(group, 16, 0.5, length + 10, x, 0.25, z, stoneMat(SAND_EDGE));
-    box(group, 13, 0.2, length + 7, x, 0.42, z, surfaceMat({ color: PIT_DARK, roughness: 1 }));
-    const frame = stoneMat(STONE_DARK);
-    for (const endZ of [z - length / 2, z + length / 2]) {
-      box(group, 10, deckY, 2.2, x, deckY / 2, endZ, frame);
-    }
-    for (const side of [-1, 1]) {
-      const beam = box(group, 0.5, 0.5, length, x + side * 4.6, deckY, z, frame);
-      beam.castShadow = true;
-      const inner = box(group, 0.5, 0.5, length, x + side * 0.6, deckY, z, frame);
-      inner.castShadow = true;
-    }
-    const glassMat = new THREE.MeshStandardMaterial({
+  // Trial 5, The Brittle Span: paired panels over a dark pit, at ground level
+  // and at EXACTLY the sim's panel rects (trial_span.ts step detection reads
+  // the same GAUNTLET.span numbers), so what shatters is what you stood on.
+  const spanRig: SpanRig = (() => {
+    const { x, z } = V.span;
+    const t = GAUNTLET.span;
+    const fieldLen = t.steps * t.panelLength;
+    const zStart = z - fieldLen / 2;
+    const sideX = t.panelGap / 2 + t.panelWidth / 2;
+    box(group, (sideX + t.panelWidth) * 2 + 4, 0.5, fieldLen + 8, x, 0.18, z, stoneMat(SAND_EDGE));
+    box(
+      group,
+      (sideX + t.panelWidth) * 2 + 1.5,
+      0.2,
+      fieldLen + 5,
+      x,
+      0.35,
+      z,
+      surfaceMat({ color: PIT_DARK, roughness: 1 }),
+    );
+    const unknownMat = new THREE.MeshStandardMaterial({
       color: GLASS_TINT,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.4,
       roughness: 0.15,
       metalness: 0,
     });
-    venueOwnedMats.push(glassMat);
-    const panelD = 3.4;
-    for (let i = 0; i < Math.floor(length / (panelD + 0.6)); i++) {
-      const pz = z - length / 2 + 2.4 + i * (panelD + 0.6);
-      for (const side of [-1, 1]) {
-        const panel = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.14, panelD), glassMat);
-        panel.position.set(x + side * 2.6, deckY + 0.32, pz);
-        group.add(panel);
-      }
+    const safeMat = new THREE.MeshStandardMaterial({
+      color: 0x9fe6c8,
+      transparent: true,
+      opacity: 0.85,
+      roughness: 0.35,
+      metalness: 0,
+    });
+    const brittleMat = new THREE.MeshStandardMaterial({
+      color: 0x232833,
+      transparent: true,
+      opacity: 0.55,
+      roughness: 0.9,
+      metalness: 0,
+    });
+    venueOwnedMats.push(unknownMat, safeMat, brittleMat);
+    const panels: { left: THREE.Mesh; right: THREE.Mesh }[] = [];
+    const geo = new THREE.BoxGeometry(t.panelWidth, 0.12, t.panelLength - 0.15);
+    for (let i = 0; i < t.steps; i++) {
+      const pz = zStart + (i + 0.5) * t.panelLength;
+      const left = new THREE.Mesh(geo, unknownMat);
+      left.position.set(x - sideX, 0.52, pz);
+      group.add(left);
+      const right = new THREE.Mesh(geo, unknownMat);
+      right.position.set(x + sideX, 0.52, pz);
+      group.add(right);
+      panels.push({ left, right });
     }
-    placeProp(group, 'bannerWhite', x, 3.4, z - length / 2 - 3, 0, 2.4);
-    sealedEntry(group, x, z - length / 2 - 4.6, 0);
-  }
+    placeProp(group, 'bannerWhite', x, 3.4, z - fieldLen / 2 - 3, 0, 2.4);
+    placeProp(group, 'torchLit', x - sideX - 2.4, 0, zStart - 1.5, Math.PI / 2, 2.2);
+    placeProp(group, 'torchLit', x + sideX + 2.4, 0, zStart - 1.5, -Math.PI / 2, 2.2);
+    return { panels, unknownMat, safeMat, brittleMat };
+  })();
 
-  // Trial 6, The Final Court: the champions' ring.
+  // Trial 6, The Final Court: the duel lane (trial_court.ts geometry: entry
+  // line at -courtLength/2, neck line, head zone at the far end), painted like
+  // the crossing field.
   {
-    const { x, z, radius } = V.court;
-    const ring = new THREE.Mesh(
-      new THREE.CylinderGeometry(radius, radius + 0.5, 0.4, 24),
-      surfaceMat({ color: 0xc7b58c, map: texWithRepeat(sandTex(), 3, 3), roughness: 0.95 }),
+    const { x, z } = V.court;
+    const c = GAUNTLET.court;
+    const z0 = z - c.courtLength / 2;
+    groundPlane(
+      group,
+      c.courtHalfWidth * 2 + 4,
+      c.courtLength + 6,
+      x,
+      0.03,
+      z,
+      surfaceMat({ color: 0xc7b58c, map: texWithRepeat(sandTex(), 3, 5), roughness: 0.95 }),
     );
-    ring.position.set(x, 0.2, z);
-    ring.receiveShadow = true;
-    group.add(ring);
-    const rim = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.35, 8, 28), stoneMat(STONE_DARK));
-    rim.rotation.x = Math.PI / 2;
-    rim.position.set(x, 0.45, z);
-    group.add(rim);
-    for (let i = 0; i < 4; i++) {
-      const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+    const lineMat = surfaceMat({ color: 0xf6f1e4, roughness: 0.8 });
+    for (const side of [-1, 1]) {
+      box(group, 0.35, 0.06, c.courtLength, x + side * c.courtHalfWidth, 0.06, z, lineMat);
+    }
+    box(group, c.courtHalfWidth * 2, 0.06, 0.35, x, 0.06, z0, lineMat);
+    box(group, c.courtHalfWidth * 2, 0.06, 0.35, x, 0.06, z0 + c.courtLength, lineMat);
+    // the neck: the attacker's movement penalty lifts past this line
+    box(group, c.courtHalfWidth * 2, 0.06, 0.2, x, 0.06, z0 + c.neckZ, lineMat);
+    const head = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.2, 2.4, 0.18, 20),
+      surfaceMat({ color: GOLD, roughness: 0.6 }),
+    );
+    head.position.set(x, 0.12, z0 + c.courtLength - 1.2);
+    head.receiveShadow = true;
+    group.add(head);
+    for (const side of [-1, 1]) {
+      placeProp(group, 'torchLit', x + side * (c.courtHalfWidth + 2), 0, z0 + 2, 0, 2.4);
       placeProp(
         group,
         'torchLit',
-        x + Math.sin(a) * (radius + 1.8),
+        x + side * (c.courtHalfWidth + 2),
         0,
-        z + Math.cos(a) * (radius + 1.8),
-        a + Math.PI,
+        z0 + c.courtLength - 2,
+        Math.PI,
         2.4,
       );
     }
-    placeProp(group, 'bannerYellow', x, 3.2, z - radius - 1.6, 0, 2.2);
-    sealedEntry(group, x + radius + 1.4, z, Math.PI / 2);
+    placeProp(group, 'bannerYellow', x, 3.2, z0 - 2, 0, 2.2);
   }
+  return spanRig;
 }
 
 // Track venue-created dynamic materials for dispose (surfaceMat ones are
@@ -851,7 +887,7 @@ export async function buildGauntletVenue(
   buildStaging(group);
   buildPodium(group, rig.lampMat);
   buildSpectatorDeck(group);
-  buildFutureArenas(group);
+  const spanRig = buildTrialArenas(group);
   scene.add(group);
   // The venue never moves after build: freeze the whole subtree's matrices
   // (real per-frame CPU on thousands of prop nodes), then re-enable the one
@@ -861,6 +897,7 @@ export async function buildGauntletVenue(
 
   let lastT = 0;
   let headYaw = 0;
+  let lastRevealKey = 'unset';
   return {
     group,
     update(t: number, run: GauntletRunView | null) {
@@ -868,6 +905,21 @@ export async function buildGauntletVenue(
       lastT = t;
       const mine = run && run.originX === ox && run.originZ === oz ? run : null;
       const light = mine?.sentinel ? mine.sentinel.light : null;
+      // Span panels tint with the shared reveals (unknown glass, proven-safe
+      // frosted, proven-brittle dark). Material swaps are elided on a key.
+      const revealKey = mine?.span ? mine.span.revealed.join(',') : '';
+      if (revealKey !== lastRevealKey) {
+        lastRevealKey = revealKey;
+        const revealed = mine?.span?.revealed ?? null;
+        for (let i = 0; i < spanRig.panels.length; i++) {
+          const r = revealed ? (revealed[i] ?? -1) : -1;
+          const pair = spanRig.panels[i];
+          pair.left.material =
+            r === -1 ? spanRig.unknownMat : r === 0 ? spanRig.safeMat : spanRig.brittleMat;
+          pair.right.material =
+            r === -1 ? spanRig.unknownMat : r === 1 ? spanRig.safeMat : spanRig.brittleMat;
+        }
+      }
       // Head: green = turned away (yaw PI), red = eyes on the field (yaw 0);
       // no live trial = a slow patrol sweep. The ease rate echoes the
       // telegraph window so the turn reads as the warning it is.
