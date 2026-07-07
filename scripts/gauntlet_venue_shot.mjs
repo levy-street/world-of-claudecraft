@@ -1,0 +1,134 @@
+// Visual walkthrough of the Gauntlet venue. Boots the offline game (instant
+// lobby: a join starts the run on the spot), joins at the recruiter, then
+// screenshots each stage of the complex: the staging plaza, the sentinel
+// field with the Stone Warden, the grandstands, the spectators' terrace, the
+// podium, and the sealed future-trial arenas. Screenshots land in tmp/.
+// Needs `npm run dev` already running (GAME_URL overrides the default URL).
+import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
+import { BROWSER_PATH } from './browser_path.mjs';
+
+const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '/?gfx=high';
+fs.mkdirSync('tmp', { recursive: true });
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const fails = [];
+const check = (cond, msg) => {
+  console.log(`${cond ? 'OK  ' : 'FAIL'}  ${msg}`);
+  if (!cond) fails.push(msg);
+};
+
+const browser = await puppeteer.launch({
+  executablePath: BROWSER_PATH,
+  headless: 'new',
+  args: [
+    '--window-size=1600,900',
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
+    '--no-sandbox',
+  ],
+  defaultViewport: { width: 1600, height: 900 },
+});
+const page = await browser.newPage();
+page.on('pageerror', (e) => fails.push('PAGEERROR: ' + e.message));
+page.on('console', (m) => {
+  if (m.type() === 'error') console.log('CONSOLE-ERR:', m.text());
+});
+
+await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
+await page.waitForSelector('#btn-offline', { timeout: 120000 });
+await sleep(500);
+await page.evaluate(() => document.querySelector('#btn-offline').click());
+await sleep(300);
+await page.evaluate(() => {
+  const card =
+    document.querySelector('#offline-select .mini-class[data-class="warrior"]') ||
+    document.querySelector('.class-card[data-class="warrior"]');
+  card?.click();
+});
+await sleep(150);
+await page.evaluate(() => {
+  const n = document.querySelector('#char-name');
+  if (n) n.value = 'Vero';
+});
+await page.evaluate(() => document.querySelector('#btn-start-offline')?.click());
+await page.waitForFunction(() => window.__game?.sim?.entities?.size > 5, {
+  timeout: 60000,
+  polling: 250,
+});
+await sleep(2000);
+await page.evaluate(() => document.querySelector('.tut-skip')?.click());
+await sleep(300);
+
+// Stand at the recruiter and join: instant lobby teleports us to staging.
+const joined = await page.evaluate(() => {
+  const g = window.__game;
+  const sim = g.sim;
+  const rec = [...sim.entities.values()].find((e) => e.templateId === 'gauntlet_recruiter');
+  if (!rec) return { ok: false, why: 'no recruiter' };
+  const me = sim.entities.get(g.world.playerId);
+  me.pos.x = rec.pos.x;
+  me.pos.z = rec.pos.z + 1;
+  me.prevPos = { ...me.pos };
+  g.world.gauntletJoin();
+  return { ok: true };
+});
+check(joined.ok, `joined the gauntlet (${joined.why ?? 'instant lobby'})`);
+
+// Wait for the run to reach staging and the venue to raise.
+await page.waitForFunction(
+  () => {
+    const run = window.__game?.world?.gauntletRun;
+    return run && run.phase !== 'lobby';
+  },
+  { timeout: 20000, polling: 250 },
+);
+await sleep(4500); // venue build is async on approach; give the GLBs room
+const run = await page.evaluate(() => window.__game.world.gauntletRun);
+check(run && run.phase, `run live, phase=${run?.phase}`);
+console.log('run view:', JSON.stringify(run));
+
+// Helper: put the player somewhere in the instance and face a heading, then
+// let a few frames render before the shot.
+async function shotAt(name, dx, dz, facing) {
+  await page.evaluate(
+    ({ dx, dz, facing }) => {
+      const g = window.__game;
+      const sim = g.sim;
+      const run = g.world.gauntletRun;
+      const me = sim.entities.get(g.world.playerId);
+      me.pos.x = run.originX + dx;
+      me.pos.z = run.originZ + dz;
+      me.prevPos = { ...me.pos };
+      me.facing = facing;
+    },
+    { dx, dz, facing },
+  );
+  await sleep(1200);
+  await page.screenshot({ path: `tmp/gauntlet_${name}.png` });
+  console.log(`shot: tmp/gauntlet_${name}.png`);
+}
+
+// The stages: staging plaza looking at the arch; the start line looking down
+// the field at the Warden; mid-field; the spectators' terrace; the podium;
+// and the two future-arena rows.
+await shotAt('staging_arch', 0, -14, 0);
+await shotAt('field_start', 0, 2, 0);
+await shotAt('field_warden', 0, 55, 0);
+await shotAt('spectator_terrace', 30, 40, -Math.PI / 2);
+await shotAt('podium', 0, -6, Math.PI);
+await shotAt('arenas_east_row', -20, 44, -Math.PI / 2);
+await shotAt('arenas_west_row', -58, 60, -Math.PI / 2);
+
+const venueBuilt = await page.evaluate(() => {
+  const r = window.__game.renderer;
+  return r && r.gauntletVenues ? r.gauntletVenues.size : -1;
+});
+check(venueBuilt !== 0, `venue built (slots=${venueBuilt})`);
+
+await browser.close();
+if (fails.length) {
+  console.error('\nFAILURES:');
+  for (const f of fails) console.error(' - ' + f);
+  process.exit(1);
+}
+console.log('\nAll venue shots captured.');

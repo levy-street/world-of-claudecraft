@@ -2775,6 +2775,19 @@ export interface GauntletSentinelTuning {
   momentumStopEps: number; // residual speed (yards/tick) below this snaps to a stop
   damageMax: number; // end-of-trial vitality damage at score 0 (scales down to ~0 at 1)
   finishBonusMax: number; // score bonus for finishing with the full clock remaining
+  // NPC contestant improv: green-light pace is skill-lerped between the speed
+  // bounds (yards/s; compare RUN_SPEED), then each light window rolls fresh
+  // hesitation, stop lag, a speed multiplier, and sometimes a mid-run stutter,
+  // so the field reads as a crowd of people rather than a conveyor belt.
+  npcSpeedMin: number; // green-light pace at skill 0
+  npcSpeedMax: number; // green-light pace at skill 1
+  npcSpeedJitter: number; // per-green speed multiplier drawn from [1-j, 1+j]
+  npcReactMinS: number; // seconds after a green flip before a bot starts moving
+  npcReactMaxS: number;
+  npcStopLagMaxS: number; // seconds a bot keeps sliding after a red flip (cosmetic)
+  npcHesitateChance: number; // chance per green window of a mid-run stutter
+  npcHesitateMinS: number; // stutter length bounds
+  npcHesitateMaxS: number;
 }
 
 // The viewer-scoped wire projection of a run (the `grun` self-wire key and the

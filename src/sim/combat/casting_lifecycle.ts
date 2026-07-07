@@ -254,6 +254,20 @@ export function castAbility(
     ctx.error(p.id, 'Legs only in the Gauntlet: abilities are barred.');
     return;
   }
+  // The Gauntlet event runs under the same law (and the same registered
+  // string): a live contestant may not cast from staging through the podium,
+  // so movement abilities can never cheat a red light or the staging hold.
+  // Knocked-out spectators are free again.
+  const gauntletRun = ctx.gauntletRuns.find((run) => run.playerStates.has(p.id));
+  if (
+    gauntletRun &&
+    gauntletRun.phase !== 'lobby' &&
+    gauntletRun.phase !== 'done' &&
+    !gauntletRun.playerStates.get(p.id)?.spectating
+  ) {
+    ctx.error(p.id, 'Legs only in the Gauntlet: abilities are barred.');
+    return;
+  }
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res || p.dead) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action

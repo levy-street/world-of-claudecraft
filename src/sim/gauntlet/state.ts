@@ -19,14 +19,32 @@ export interface GauntletContestant {
   // (a player's fate is decided by their own play, never by a roll).
   skill: number;
   eliminatedAtTrial: number | null;
-  // Sentinel-trial NPC script, planned when the trial opens: green-light
-  // advance speed (yards/s) and the red-flip index this NPC fumbles on (it
-  // overruns the grace window and poofs), or null for a scripted survivor.
-  script: { speed: number; fumbleOnFlip: number | null };
+  // Sentinel-trial NPC script. Planned when the trial opens: the green-light
+  // pace (yards/s, skill-lerped between the npcSpeed bounds) and the red-flip
+  // index this NPC fumbles on (it overruns the grace window and poofs), or
+  // null for a scripted survivor. The rest is per-light-window improv,
+  // replanned from run.rng whenever the light changes (planKey tracks the
+  // window): a start hesitation (goAt), a stop lag after red (stopAt), this
+  // green's speed multiplier, and an optional mid-run stutter (a pause is
+  // armed only while pauseUntil > pauseAt).
+  script: {
+    speed: number;
+    fumbleOnFlip: number | null;
+    planKey: number;
+    goAt: number;
+    stopAt: number;
+    mult: number;
+    pauseAt: number;
+    pauseUntil: number;
+  };
 }
 
 export interface GauntletPlayerState {
   savedPos: Vec3; // where to return the player when they leave the run
+  // Real hp when the run started: during trials every contestant's entity hp
+  // MIRRORS their event vitality (so nameplates and frames show the meter that
+  // matters); restored on elimination and on leaving the run.
+  savedHp: number;
   spectating: boolean; // knocked out, parked on the spectator platform
   // Momentum carried after input release (yards per tick). The slide counts as
   // movement for red-light detection, so stopping must be anticipated.

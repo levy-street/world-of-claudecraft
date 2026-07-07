@@ -119,6 +119,7 @@ import {
   ITEMS,
   isArenaPos,
   isDelvePos,
+  isGauntletPos,
   isHodricsPos,
   hodricsOrigin,
   MOBS,
@@ -1883,6 +1884,18 @@ export class Sim {
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
+     } else if (savedPos && isHodricsPos(savedPos.x)) {
+      // Saved mid-race at Hodric's Castle: rejoin where they queued from (the
+      // race instance is long gone); no return recorded falls back to the
+      // world start below.
+      const ret = savedState?.hcReturnPos;
+      savedPos = ret ? { x: ret.x, z: ret.z } : null;
+     } else if (savedPos && isGauntletPos(savedPos.x)) {
+      // Saved mid-run in the Gauntlet band: their run is long gone, and
+      // without this branch the generic dungeon fallback below would eject
+      // them to an unrelated dungeon door. Rejoin at the world start (the
+      // recruiter stands in town when the event is open).
+      savedPos = null;
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };

@@ -9,12 +9,7 @@
 // (run.rng, seeded at lobby creation exactly like fiesta's per-match stream);
 // an idle or active gauntlet never touches the shared sim rng.
 
-import {
-  GAUNTLET,
-  GAUNTLET_LAYOUT,
-  GAUNTLET_RECRUITER_NPC_ID,
-  GAUNTLET_WATCHER_NPC_ID,
-} from '../content/gauntlet';
+import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_RECRUITER_NPC_ID } from '../content/gauntlet';
 import {
   dungeonAt,
   GAUNTLET_SLOT_COUNT,
@@ -30,6 +25,7 @@ import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { DT, type GauntletRunView } from '../types';
 import {
+  idleScript,
   planSentinelScripts,
   rollNpcContestant,
   spawnNpcContestants,
@@ -54,12 +50,23 @@ function canJoinGauntlet(ctx: SimContext, pid: number): string | null {
   if (ctx.tradeFor(pid)) return 'You cannot enter the Gauntlet while trading.';
   if (ctx.duelFor(pid)) return 'You cannot enter the Gauntlet during a duel.';
   if (ctx.arenaMatches.has(pid)) return 'You cannot enter the Gauntlet during an arena match.';
+  // Cross-activity exclusion, the other half of which lives at each queue's
+  // own join gate (arenaQueueJoin / hcQueueJoin reject gauntlet members): a
+  // pending arena, fiesta, or castle-race queue would teleport-fight this run.
+  const queuedElsewhere =
+    ctx.arenaQueue1v1.includes(pid) ||
+    ctx.arenaQueue2v2.some((u) => u.pids.includes(pid)) ||
+    ctx.arenaQueueFiesta.some((u) => u.pids.includes(pid)) ||
+    ctx.hcQueue.some((u) => u.pid === pid) ||
+    ctx.hcMatches.has(pid);
+  if (queuedElsewhere) return 'You cannot enter the Gauntlet right now.';
+  // No recruiter standing = no join, full stop: the geo-gate must never
+  // silently pass while the event flag and the spawn are out of step.
   const recruiter =
     ctx.gauntletRecruiterId !== null ? ctx.entities.get(ctx.gauntletRecruiterId) : undefined;
-  if (recruiter) {
-    const d = Math.hypot(r.e.pos.x - recruiter.pos.x, r.e.pos.z - recruiter.pos.z);
-    if (d > GAUNTLET.joinRadius) return 'You must speak to the Herald to enter the Gauntlet.';
-  }
+  if (!recruiter) return 'The Gauntlet is not open right now.';
+  const d = Math.hypot(r.e.pos.x - recruiter.pos.x, r.e.pos.z - recruiter.pos.z);
+  if (d > GAUNTLET.joinRadius) return 'You must speak to the Herald to enter the Gauntlet.';
   return null;
 }
 
@@ -76,6 +83,12 @@ export function gauntletJoin(ctx: SimContext, pid?: number): void {
     return;
   }
   let run = ctx.gauntletRuns.find((g) => g.phase === 'lobby');
+  // maxRealPlayers is a hard cap at the door, not just the start-early
+  // trigger: a same-tick join burst must never overfill the roster.
+  if (run && run.contestants.filter((c) => c.player).length >= GAUNTLET.maxRealPlayers) {
+    ctx.error(id, 'The Gauntlet is full. Try again soon.');
+    return;
+  }
   if (!run) {
     const usedSlots = new Set(ctx.gauntletRuns.map((g) => g.slot));
     let slot = -1;
@@ -118,10 +131,11 @@ export function gauntletJoin(ctx: SimContext, pid?: number): void {
     vitality: GAUNTLET.vitalityMax,
     skill: 0,
     eliminatedAtTrial: null,
-    script: { speed: 0, fumbleOnFlip: null },
+    script: idleScript(),
   });
   run.playerStates.set(id, {
     savedPos: { ...r.e.pos },
+    savedHp: r.e.hp,
     spectating: false,
     momentumX: 0,
     momentumZ: 0,
@@ -168,6 +182,7 @@ function removePlayerFromRun(
   run.playerStates.delete(pid);
   const e = ctx.entities.get(pid);
   if (e && run.phase !== 'lobby') {
+    restorePlayerHp(ctx, pid, ps);
     if (restore) {
       e.pos = { ...ps.savedPos };
       e.prevPos = { ...e.pos };
@@ -221,16 +236,11 @@ function startRun(ctx: SimContext, run: GauntletRun): void {
   const backfill = Math.max(0, GAUNTLET.fieldSize - run.contestants.length);
   for (let i = 0; i < backfill; i++) run.contestants.push(rollNpcContestant(run));
   spawnNpcContestants(ctx, run, players.length);
-  const t = GAUNTLET.sentinel;
-  const watcherDef = NPCS[GAUNTLET_WATCHER_NPC_ID];
-  const watcher = createNpc(ctx.nextId++, watcherDef, {
-    x: run.origin.x,
-    y: 0,
-    z: run.origin.z + t.fieldLength + GAUNTLET_LAYOUT.watcherMargin,
-  });
-  watcher.facing = 0; // back to the field: green
-  ctx.addEntity(watcher);
-  run.watcherId = watcher.id;
+  // No watcher ENTITY: the venue's Stone Warden effigy is the watcher (its
+  // head and lamps follow the grun light state client-side), and a small NPC
+  // standing under a monument reads as a glitch. run.watcherId stays null.
+  run.phase = 'staging';
+  run.phaseEndsAt = ctx.time + GAUNTLET.stagingS;
   for (let i = 0; i < players.length; i++) {
     const e = ctx.entities.get(players[i].entityId);
     const meta = ctx.players.get(players[i].entityId);
@@ -244,10 +254,56 @@ function startRun(ctx: SimContext, run: GauntletRun): void {
     e.autoAttack = false;
     ctx.rebucket(e);
     meta.gauntletStats.runs++;
+    const ps = run.playerStates.get(players[i].entityId);
+    if (ps) {
+      // Pin everyone on their mark until the trial opens ("take your marks"
+      // is a hold, not a head start): the staging case below snaps held
+      // players back each tick, and startTrial releases the pin.
+      ps.heldAt = { ...e.pos };
+      ps.heldUntil = run.phaseEndsAt;
+      // Re-capture the real hp at the teleport (not at join: lobby players
+      // are still out in the world and their hp can move), then the per-tick
+      // mirror below takes the entity hp over for the run's duration.
+      ps.savedHp = e.hp;
+    }
   }
-  run.phase = 'staging';
-  run.phaseEndsAt = ctx.time + GAUNTLET.stagingS;
   emitPhase(ctx, run);
+}
+
+// Every contestant's entity hp mirrors their event vitality while the run is
+// live, so nameplates, target frames, and party frames all show the one meter
+// that matters in here. Runs in the end-of-tick block AFTER the regen pass,
+// so the mirror always wins the tick; the real hp is restored on elimination
+// and on leaving the run.
+function mirrorVitalityHp(ctx: SimContext, run: GauntletRun): void {
+  for (const c of run.contestants) {
+    if (c.eliminatedAtTrial !== null) continue;
+    const e = ctx.entities.get(c.entityId);
+    if (!e || e.dead) continue;
+    e.hp = Math.max(1, Math.round((e.maxHp * c.vitality) / GAUNTLET.vitalityMax));
+  }
+}
+
+// Put a player's real hp back (capped by hpMax in case gear changed mid-run).
+function restorePlayerHp(ctx: SimContext, pid: number, ps: { savedHp: number }): void {
+  const e = ctx.entities.get(pid);
+  if (e && !e.dead) e.hp = Math.max(1, Math.min(ps.savedHp, e.maxHp));
+}
+
+// The staging pin: players stand on their marks until the trial opens. This
+// runs in the end-of-tick system block, after the movement pass, so any
+// displacement this tick is snapped back before it is ever broadcast.
+function holdStagedPlayers(ctx: SimContext, run: GauntletRun): void {
+  for (const [pid, ps] of run.playerStates) {
+    if (!ps.heldAt || ps.spectating) continue;
+    const e = ctx.entities.get(pid);
+    if (!e) continue;
+    e.pos.x = ps.heldAt.x;
+    e.pos.y = ps.heldAt.y;
+    e.pos.z = ps.heldAt.z;
+    ps.momentumX = 0;
+    ps.momentumZ = 0;
+  }
 }
 
 function startTrial(ctx: SimContext, run: GauntletRun): void {
@@ -365,6 +421,7 @@ export function updateGauntletRuns(ctx: SimContext): void {
     } else {
       run.emptyFor = 0;
     }
+    if (run.phase !== 'lobby' && run.phase !== 'done') mirrorVitalityHp(ctx, run);
     switch (run.phase) {
       case 'lobby': {
         const players = run.contestants.filter((c) => c.player).length;
@@ -376,6 +433,7 @@ export function updateGauntletRuns(ctx: SimContext): void {
         break;
       }
       case 'staging':
+        holdStagedPlayers(ctx, run);
         if (ctx.time >= run.phaseEndsAt) startTrial(ctx, run);
         break;
       case 'trial': {

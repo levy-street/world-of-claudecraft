@@ -202,12 +202,12 @@ describe('gauntlet lobby and run setup', () => {
     expect(run.playerStates.size).toBe(2);
     expect(run.contestants.filter((c) => c.player).length).toBe(2);
 
-    // lobbyFillS elapses -> staging: NPC backfill to the full field, watcher spawned
+    // lobbyFillS elapses -> staging: NPC backfill to the full field. No watcher
+    // ENTITY spawns: the venue's Stone Warden effigy is the watcher visual.
     advanceTo(sim, 'staging');
     expect(sim.gauntletRuns[0]!.phase).toBe('staging');
     expect(run.contestants.length).toBe(GAUNTLET.fieldSize);
-    expect(run.watcherId).not.toBeNull();
-    expect(sim.entities.has(run.watcherId!)).toBe(true);
+    expect(run.watcherId).toBeNull();
     // both players teleported into the gauntlet band
     expect(isGauntletPos(sim.entities.get(a)!.pos.x)).toBe(true);
     expect(isGauntletPos(sim.entities.get(b)!.pos.x)).toBe(true);
@@ -511,5 +511,125 @@ describe('venue layout envelope', () => {
     expect(V.standX).toBeGreaterThan(GAUNTLET.sentinel.fieldHalfWidth + 4);
     expect(GAUNTLET_LAYOUT.spectatorZ - 12).toBeGreaterThan(V.standZMin);
     expect(GAUNTLET_LAYOUT.spectatorZ + 12).toBeLessThan(V.standZMax);
+  });
+});
+
+describe('run fairness guards', () => {
+  it('pins players on their staging mark: no head start onto the field', () => {
+    const sim = makeSim(11);
+    const pid = sim.addPlayer('warrior', 'Eager');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    const run = sim.gauntletRuns[0]!;
+    const mark = { ...sim.entities.get(pid)!.pos };
+    // Hold forward through the whole staging window.
+    while (run.phase === 'staging') {
+      sim.meta(pid)!.moveInput.forward = true;
+      sim.tick();
+    }
+    sim.meta(pid)!.moveInput.forward = false;
+    expect(run.phase).toBe('trial');
+    const e = sim.entities.get(pid)!;
+    expect(Math.abs(e.pos.z - mark.z)).toBeLessThan(1);
+    expect(run.playerStates.get(pid)!.bestZ).toBeLessThan(1);
+  });
+
+  it('bars ability casts from staging through the run (legs only)', () => {
+    const sim = makeSim(12);
+    const pid = sim.addPlayer('warrior', 'Caster');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    sim.castAbility('heroic_strike', pid);
+    expect(errorTexts(sim.tick())).toContain('Legs only in the Gauntlet: abilities are barred.');
+  });
+
+  it('mirrors event vitality onto entity hp during the run and restores it on leave', () => {
+    const sim = makeSim(13);
+    const pid = sim.addPlayer('warrior', 'Mirror');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    const realHp = run.playerStates.get(pid)!.savedHp;
+    const c = run.contestants.find((k) => k.entityId === pid)!;
+    c.vitality = 40;
+    sim.tick();
+    expect(e.hp).toBe(Math.max(1, Math.round((e.maxHp * 40) / GAUNTLET.vitalityMax)));
+    sim.gauntletLeave(pid);
+    expect(e.hp).toBe(Math.max(1, Math.min(realHp, e.maxHp)));
+  });
+});
+
+describe('NPC field pacing', () => {
+  it('bots cross at footrace pace with real spread between runners', () => {
+    const sim = makeSim(14);
+    const pid = sim.addPlayer('warrior', 'Watcher');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const snapshot = () =>
+      run.contestants
+        .filter((c) => !c.player && c.eliminatedAtTrial === null)
+        .map((c) => {
+          const e = sim.entities.get(c.entityId);
+          return e ? e.pos.z - run.origin.z : GAUNTLET.sentinel.fieldLength;
+        });
+    // Ten seconds in the pack is mid-flight: real footrace progress with a
+    // visible spread between the quick and the hesitant.
+    for (let i = 0; i < 20 * 10; i++) sim.tick();
+    const mid = snapshot();
+    expect(mid.length).toBeGreaterThan(0);
+    expect(Math.max(...mid)).toBeGreaterThan(15);
+    expect(Math.max(...mid) - Math.min(...mid)).toBeGreaterThan(6);
+    // By 45 seconds the leaders have effectively crossed the 90yd course
+    // (the old scripts took most of the 300s clock to shuffle over).
+    for (let i = 0; i < 20 * 35; i++) sim.tick();
+    if (run.phase === 'trial') {
+      expect(Math.max(...snapshot())).toBeGreaterThan(GAUNTLET.sentinel.fieldLength * 0.6);
+    } else {
+      // Even better: everyone resolved and the run moved on early.
+      expect(['interlude', 'podium']).toContain(run.phase);
+    }
+  });
+});
+
+describe('cross-activity exclusion and reconnect recovery', () => {
+  it('a gauntlet member cannot queue for the arena or the castle race, and vice versa', () => {
+    const sim = makeSim(15);
+    const pid = sim.addPlayer('warrior', 'Busy');
+    openAndJoin(sim, pid);
+    expect(sim.gauntletRuns[0]?.playerStates.has(pid)).toBe(true);
+    (sim as any).arenaQueueJoin(pid);
+    expect(errorTexts(sim.tick())).toContain('You are already in the Gauntlet.');
+    expect((sim as any).arenaQueue1v1).not.toContain(pid);
+    (sim as any).hcQueueJoin(pid);
+    expect(errorTexts(sim.tick())).toContain('You are already in the Gauntlet.');
+    // The reverse: a queued player is turned away at the recruiter.
+    const sim2 = makeSim(16);
+    const p2 = sim2.addPlayer('warrior', 'Queued');
+    sim2.tick();
+    (sim2 as any).arenaQueueJoin(p2);
+    sim2.tick();
+    const r = recruiter(sim2)!;
+    teleport(sim2, p2, r.pos.x, r.pos.z);
+    sim2.gauntletJoin(p2);
+    expect(errorTexts(sim2.tick())).toContain('You cannot enter the Gauntlet right now.');
+    expect(sim2.gauntletRuns.length).toBe(0);
+  });
+
+  it('a character saved mid-run in the band rejoins at the world start, not a dungeon door', () => {
+    // The normal log-out-during-the-event flow: the autosave persists a
+    // position inside the gauntlet band, then the character rejoins a world
+    // where that run no longer exists.
+    const sim = makeSim(17);
+    const pid = sim.addPlayer('warrior', 'Sleeper');
+    teleport(sim, pid, 9000, -1250);
+    const state = sim.serializeCharacter(pid)!;
+    const sim2 = makeSim(18);
+    const p2 = sim2.addPlayer('warrior', 'Sleeper', { state });
+    const e = sim2.entities.get(p2)!;
+    expect(isGauntletPos(e.pos.x)).toBe(false);
+    // Specifically NOT the generic instance fallback (the first dungeon door).
+    expect(e.pos.x).toBeLessThan(4000);
   });
 });

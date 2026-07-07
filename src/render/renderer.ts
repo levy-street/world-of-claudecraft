@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
+import { GAUNTLET_LAYOUT } from '../sim/content/gauntlet';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -3119,6 +3120,27 @@ export class Renderer {
         this.vfx.poof({ x: ev.x, y: gy + 0.5, z: ev.z });
         break;
       }
+      case 'gauntletPodium': {
+        // The run resolved: a firework volley over the podium steps (the
+        // ceremony anchor lives in the layout data; the run view carries the
+        // instance origin). Winners get a little camera kick on top.
+        const run = this.sim.gauntletRun;
+        if (!run) break;
+        const px = run.originX;
+        const pz = run.originZ + GAUNTLET_LAYOUT.podiumZ - 4;
+        const gy = groundHeight(px, pz, this.sim.cfg.seed);
+        const schools = ['holy', 'arcane', 'fire', 'holy', 'arcane'];
+        for (let i = 0; i < schools.length; i++) {
+          this.vfx.burst(
+            new THREE.Vector3(px - 6 + i * 3, gy + 7 + (i % 2) * 3, pz - 2 + (i % 3)),
+            schools[i],
+            26,
+            1.6,
+          );
+        }
+        if (ev.won) this.addShake(0.5);
+        break;
+      }
     }
   }
 
@@ -3811,6 +3833,7 @@ export class Renderer {
     | 'temple'
     | 'nythraxis'
     | 'delve'
+    | 'gauntlet'
     | 'yumiMaze'
     | 'underwater'
     | 'practice' = 'outdoor';
@@ -4064,6 +4087,8 @@ export class Renderer {
             ? 'temple'
             : inNythraxis
               ? 'nythraxis'
+              : inGauntlet
+                ? 'gauntlet'
                 : isHodricsPos(px)
                   ? 'outdoor'
                   : inside && !inGauntlet
@@ -4109,6 +4134,13 @@ export class Renderer {
         fog.color.setHex(this.valeCupSky.fogFor(this.practiceSkyVariant()));
         fog.near = 60;
         fog.far = 420;
+      } else if (desired === 'gauntlet') {
+        // A warm dust haze over the venue: far enough that the Stone Warden
+        // (~100yd from the start line) stays readable, close enough that the
+        // empty band beyond the backdrop dome never shows.
+        fog.color.setHex(0xd3b48c);
+        fog.near = 60;
+        fog.far = 290;
       } else if (desired === 'underwater') {
         fog.color.setHex(0x17506e);
         fog.near = 2;

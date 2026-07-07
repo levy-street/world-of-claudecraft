@@ -235,6 +235,11 @@ export function hcQueueJoin(ctx: SimContext, pid?: number): void {
     ctx.error(id, 'Leave the Coliseum before racing the Gauntlet.');
     return;
   }
+  // A Gauntlet event run (its lobby included) would teleport-fight a race pop.
+  if (ctx.gauntletRuns.some((run) => run.playerStates.has(id))) {
+    ctx.error(id, 'You are already in the Gauntlet.');
+    return;
+  }
   if (r.e.pos.x > DUNGEON_X_THRESHOLD) {
     ctx.error(id, 'You cannot queue from inside an instance.');
     return;

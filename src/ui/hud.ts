@@ -1168,6 +1168,7 @@ export class Hud {
   private targetCastbarLabelEl = this.targetCastbarEl.querySelector('.label') as HTMLElement;
   private targetCastbarTimerEl = this.targetCastbarEl.querySelector('.timer') as HTMLElement;
   private actionbarEl = $('#actionbar');
+  private actionbar2El = $('#actionbar2');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
   // XP + swing bar element refs cached once for their painters (the #xpbar /
@@ -7214,11 +7215,20 @@ export class Hud {
     // className swap on the player hot path). updateLowHealthVignette +
     // updateLowResource are player-only side effects with their own cores and stay
     // here, OUT of the shared family (target/party must not inherit them).
+    // A live Gauntlet contestant's frame shows the EVENT VITALITY meter in the
+    // health slot (the run's one health that matters; the sim also mirrors it
+    // onto entity hp so everyone else's nameplates agree). Class hp returns the
+    // moment they are knocked out or leave.
+    const gauntletRun = this.gauntletContestantRun();
     this.playerFramePainter.paint(
       unitFrameView({
         present: true,
-        hpFrac: p.hp / Math.max(1, p.maxHp),
-        hpText: `${p.hp} / ${p.maxHp}`,
+        hpFrac: gauntletRun
+          ? gauntletRun.vitality / Math.max(1, gauntletRun.vitalityMax)
+          : p.hp / Math.max(1, p.maxHp),
+        hpText: gauntletRun
+          ? `${gauntletRun.vitality} / ${gauntletRun.vitalityMax}`
+          : `${p.hp} / ${p.maxHp}`,
         resourceKind: p.resourceType,
         resFrac: p.resource / Math.max(1, p.maxResource),
         resText: `${Math.round(p.resource)} / ${p.maxResource}`,
@@ -11300,6 +11310,67 @@ export class Hud {
     this.renderFiestaRespawn(f);
     this.renderFiestaOffer(f);
     this.renderFiestaPending(f);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Gauntlet: the live HUD cluster + the recruiter dialog + knockout/podium
+  // overlay. The cluster/overlay/recruit modules own the logic; Hud only feeds them
+  // the wire view and the estimated sim time each frame and routes the SimEvents.
+  // -------------------------------------------------------------------------
+
+  private updateGauntletHud(): void {
+    const run = this.sim.gauntletRun;
+    const time = this.gauntletTimeNow();
+    this.gauntletHudPainter.paint(gauntletHudModel({ run, time }));
+    // Trials are legs-only (the sim rejects every cast; see casting_lifecycle):
+    // the ability rows hide so the bar cannot even suggest pressing one. The
+    // frame stack (player frame, xp bar) stays.
+    const legsOnly = this.gauntletContestantRun() !== null;
+    this.setDisplay(this.actionbarEl, legsOnly ? 'none' : '');
+    this.setDisplay(this.actionbar2El, legsOnly ? 'none' : '');
+    if (this.gauntletRecruit.isOpen)
+      this.gauntletRecruit.update({ eventOpen: this.sim.gauntletOpen, run, time });
+    if (run) this.gauntletOverlay.update(run.survivors);
+    else if (this.gauntletOverlay.shown) this.gauntletOverlay.hide();
+  }
+
+  // The viewer's run while they are a LIVE contestant (staging through podium,
+  // not a lobby wait, not knocked out to the spectator seats), else null. The
+  // legs-only hotbar hide and the vitality-for-health frame swap key off this.
+  private gauntletContestantRun(): import('../world_api').GauntletRunView | null {
+    const run = this.sim.gauntletRun;
+    if (!run || run.phase === 'lobby' || run.phase === 'done' || run.spectating) return null;
+    return run;
+  }
+
+  // Open the recruiter dialog (the gauntlet_recruiter interact branch).
+  openGauntletRecruit(): void {
+    this.gauntletRecruit.open({
+      eventOpen: this.sim.gauntletOpen,
+      run: this.sim.gauntletRun,
+      time: this.gauntletTimeNow(),
+    });
+  }
+
+  // The estimated absolute sim time for the active run's countdowns (0 when idle).
+  private gauntletTimeNow(): number {
+    const run = this.sim.gauntletRun;
+    return run ? this.gauntletClock.estimate(run, performance.now()) : 0;
+  }
+
+  private gauntletPhaseBanner(phase: GauntletPhase): string {
+    switch (phase) {
+      case 'staging':
+        return t('hudChrome.gauntlet.phaseStaging');
+      case 'trial':
+        return t('hudChrome.gauntlet.phaseTrial');
+      case 'interlude':
+        return t('hudChrome.gauntlet.phaseInterlude');
+      case 'podium':
+        return t('hudChrome.gauntlet.phasePodium');
+      default:
+        return '';
+    }
   }
 
   // "Augment pending" indicator: a banked offer waiting for the player's next

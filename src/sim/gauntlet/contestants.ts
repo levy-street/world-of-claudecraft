@@ -33,7 +33,21 @@ export function rollNpcContestant(run: GauntletRun): GauntletContestant {
     vitality: GAUNTLET.vitalityMax,
     skill: run.rng.range(GAUNTLET.npcSkillMin, GAUNTLET.npcSkillMax),
     eliminatedAtTrial: null,
-    script: { speed: 0, fumbleOnFlip: null },
+    script: idleScript(),
+  };
+}
+
+// A blank script (players carry one too; only NPCs ever plan into it).
+export function idleScript(): GauntletContestant['script'] {
+  return {
+    speed: 0,
+    fumbleOnFlip: null,
+    planKey: -1,
+    goAt: 0,
+    stopAt: 0,
+    mult: 1,
+    pauseAt: 0,
+    pauseUntil: 0,
   };
 }
 
@@ -72,9 +86,10 @@ export function stagingSpot(
 
 // Plan the sentinel trial for the NPC field: pick which NPCs survive (the
 // most skilled, with a seeded jitter so it never reads as a fixed sort) and
-// assign the rest a fumble flip; give survivors a green-light speed that
-// finishes comfortably inside the clock so the trial can end early once every
-// contestant has resolved.
+// assign the rest a fumble flip. Everyone runs at a real footrace pace
+// (skill-lerped between the npcSpeed bounds, in the same league as a player's
+// RUN_SPEED); the per-window improv in updateSentinelNpcs supplies the human
+// wobble on top.
 export function planSentinelScripts(run: GauntletRun): void {
   const t = GAUNTLET.sentinel;
   const npcs = aliveContestants(run).filter((c) => !c.player);
@@ -87,27 +102,46 @@ export function planSentinelScripts(run: GauntletRun): void {
     .map((r) => r.c);
   for (let i = 0; i < ranked.length; i++) {
     const c = ranked[i];
-    if (i < npcSurvivors) {
-      // Survivor: crosses the field in roughly 35..60% of the clock (better
-      // skill = faster), counting on green light being up about half the time.
-      const crossFrac = 0.6 - 0.25 * c.skill;
-      c.script = {
-        speed: t.fieldLength / (t.durationS * crossFrac * 0.5),
-        fumbleOnFlip: null,
-      };
-    } else {
-      // Fumbler: keeps moving through a red flip early in the trial and poofs.
-      c.script = {
-        speed: t.fieldLength / (t.durationS * 0.5 * 0.5),
-        fumbleOnFlip: run.rng.int(1, 6),
-      };
-    }
+    c.script = idleScript();
+    c.script.speed = t.npcSpeedMin + (t.npcSpeedMax - t.npcSpeedMin) * c.skill;
+    // Fumbler: keeps moving through a red flip early in the trial and poofs.
+    if (i >= npcSurvivors) c.script.fumbleOnFlip = run.rng.int(1, 6);
   }
 }
 
-// Per-tick cosmetic locomotion + scripted fumbles for the sentinel trial.
-// Survivor NPCs advance during green and freeze on red; fumblers overrun the
-// grace window on their scripted flip and are knocked out where they stand.
+// Roll this light window's improv for one NPC: a start hesitation and maybe a
+// mid-run stutter on green, a short stop lag on red. Every draw comes from
+// run.rng, and every alive NPC replans on the same tick (the flip tick, in
+// roster order), so the draw order stays deterministic.
+function replanNpcWindow(
+  run: GauntletRun,
+  c: GauntletContestant,
+  trial: GauntletSentinelState,
+  key: number,
+  now: number,
+): void {
+  const t = GAUNTLET.sentinel;
+  const s = c.script;
+  s.planKey = key;
+  if (trial.light === 'green') {
+    s.goAt = now + run.rng.range(t.npcReactMinS, t.npcReactMaxS);
+    s.mult = run.rng.range(1 - t.npcSpeedJitter, 1 + t.npcSpeedJitter);
+    if (run.rng.chance(t.npcHesitateChance)) {
+      s.pauseAt = now + run.rng.range(0.8, 2.2);
+      s.pauseUntil = s.pauseAt + run.rng.range(t.npcHesitateMinS, t.npcHesitateMaxS);
+    } else {
+      s.pauseAt = 0;
+      s.pauseUntil = 0;
+    }
+  } else {
+    s.stopAt = now + run.rng.range(0, t.npcStopLagMaxS);
+  }
+}
+
+// Per-tick locomotion + scripted fumbles for the sentinel trial. Survivor
+// NPCs sprint on green (late off the mark, sometimes stuttering mid-run,
+// braking a beat after red); fumblers overrun the grace window on their
+// scripted flip and are knocked out where they stand.
 export function updateSentinelNpcs(
   ctx: SimContext,
   run: GauntletRun,
@@ -115,12 +149,14 @@ export function updateSentinelNpcs(
   dt: number,
 ): void {
   const t = GAUNTLET.sentinel;
+  const key = trial.flipCount * 2 + (trial.light === 'red' ? 1 : 0);
   for (const c of run.contestants) {
     if (c.player || c.eliminatedAtTrial !== null) continue;
     const e = ctx.entities.get(c.entityId);
     if (!e) continue;
     const lz = e.pos.z - run.origin.z;
     if (lz >= t.fieldLength) continue; // crossed; safe, stands past the line
+    if (c.script.planKey !== key) replanNpcWindow(run, c, trial, key, ctx.time);
     const fumbling =
       trial.light === 'red' &&
       c.script.fumbleOnFlip !== null &&
@@ -128,9 +164,16 @@ export function updateSentinelNpcs(
     // A scripted fumbler dawdles short of the line until its flip arrives, so
     // it can never cross early and dodge its own script.
     const dawdling = c.script.fumbleOnFlip !== null && lz >= t.fieldLength * 0.9 && !fumbling;
-    if ((trial.light === 'green' || fumbling) && !dawdling) {
+    const s = c.script;
+    const pausing = s.pauseUntil > s.pauseAt && ctx.time >= s.pauseAt && ctx.time < s.pauseUntil;
+    const advancing = fumbling
+      ? true
+      : trial.light === 'green'
+        ? ctx.time >= s.goAt && !pausing
+        : ctx.time < s.stopAt; // brake lag; scripts, not detection, catch NPCs
+    if (advancing && !dawdling) {
       e.prevPos = { ...e.pos };
-      e.pos.z += c.script.speed * dt;
+      e.pos.z += s.speed * s.mult * dt;
       e.facing = 0; // faces the finish line while advancing
     }
     // The fumbler is caught once its overrun outlives the grace window.

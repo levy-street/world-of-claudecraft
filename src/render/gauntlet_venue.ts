@@ -29,6 +29,7 @@ import type { GauntletRunView } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { surfaceMat } from './gfx';
+import { freezeStaticMatrices } from './static_matrix';
 
 // ---------------------------------------------------------------------------
 // GLB set pieces (all already-bundled CC0 kits; see CREDITS.md).
@@ -348,6 +349,29 @@ function buildPennants(group: THREE.Group, spans: PennantSpan[]): THREE.Instance
   if (inst.instanceColor) inst.instanceColor.needsUpdate = true;
   group.add(inst);
   return inst;
+}
+
+// The backdrop sky: a vertical dusk gradient, deep violet down to an amber
+// horizon (the renderer's 'gauntlet' fog state hides the HDRI sky out here, so
+// this dome IS the sky).
+function duskTex(): THREE.CanvasTexture {
+  return canvasTex('dusk', (ctx) => {
+    const g = ctx.createLinearGradient(0, 0, 0, 256);
+    g.addColorStop(0, '#241d38');
+    g.addColorStop(0.45, '#553a5e');
+    g.addColorStop(0.78, '#a06a52');
+    g.addColorStop(1, '#dbA46a');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 256, 256);
+    // a scatter of early stars in the upper third
+    ctx.fillStyle = 'rgba(255,244,214,0.8)';
+    for (let i = 0; i < 90; i++) {
+      const y = rnd() * 90;
+      ctx.globalAlpha = 0.25 + rnd() * 0.6;
+      ctx.fillRect(rnd() * 256, y, 1.2, 1.2);
+    }
+    ctx.globalAlpha = 1;
+  });
 }
 
 // The cached canvas textures are shared; consumers that need their own tiling
@@ -802,6 +826,26 @@ export async function buildGauntletVenue(
     surfaceMat({ color: 0xcdbb90, map: texWithRepeat(sandTex(), 26, 20), roughness: 1 }),
   );
 
+  // The dusk dome and its wide understory disc: the venue's own sky and
+  // far-ground, so nothing past the apron ever reads as bare void. Both ignore
+  // scene fog (they ARE the horizon the fog fades into).
+  const domeMat = new THREE.MeshBasicMaterial({
+    map: duskTex(),
+    side: THREE.BackSide,
+    fog: false,
+    depthWrite: false,
+  });
+  owned.push(domeMat);
+  const dome = new THREE.Mesh(new THREE.CylinderGeometry(235, 235, 130, 36, 1, true), domeMat);
+  dome.position.set(0, 40, 42);
+  group.add(dome);
+  const understoryMat = new THREE.MeshBasicMaterial({ color: 0x8a744f, fog: false });
+  owned.push(understoryMat);
+  const understory = new THREE.Mesh(new THREE.CircleGeometry(235, 36), understoryMat);
+  understory.rotation.x = -Math.PI / 2;
+  understory.position.set(0, -0.05, 42);
+  group.add(understory);
+
   const rig = buildField(group);
   owned.push(rig.lampMat, rig.eyeMat);
   buildStaging(group);
@@ -809,6 +853,11 @@ export async function buildGauntletVenue(
   buildSpectatorDeck(group);
   buildFutureArenas(group);
   scene.add(group);
+  // The venue never moves after build: freeze the whole subtree's matrices
+  // (real per-frame CPU on thousands of prop nodes), then re-enable the one
+  // transform-animated child, the Warden's turning head.
+  freezeStaticMatrices(group);
+  rig.headGroup.matrixAutoUpdate = true;
 
   let lastT = 0;
   let headYaw = 0;

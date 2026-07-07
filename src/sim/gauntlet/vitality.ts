@@ -122,5 +122,9 @@ export function eliminateContestant(
     e.prevPos = { ...e.pos };
     ctx.rebucket(e);
   }
+  // Hand the entity hp back to the real world: the vitality mirror only
+  // tracks live contestants, and a spectator showing an empty bar reads as a
+  // corpse.
+  if (ps && e && !e.dead) e.hp = Math.max(1, Math.min(ps.savedHp, e.maxHp));
   ctx.emit({ type: 'gauntletEliminated', trialIndex: run.trialIndex, pid: c.entityId });
 }

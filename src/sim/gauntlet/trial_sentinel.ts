@@ -77,25 +77,20 @@ function updateLightMachine(
   trial: GauntletSentinelState,
   t: GauntletSentinelTuning,
 ): void {
-  const watcher = run.watcherId !== null ? ctx.entities.get(run.watcherId) : undefined;
-  // The turn animation IS the telegraph: the watcher's facing flips toward the
-  // field telegraphS before red starts, and the client lerps the turn.
-  if (watcher && trial.light === 'green' && ctx.time >= trial.flipAt - t.telegraphS) {
-    watcher.facing = Math.PI; // faces the field (contestants approach from -z)
-  }
+  // The Stone Warden is venue dressing, not an entity: the renderer turns the
+  // effigy's head off the grun light state (the ease over the telegraph time
+  // IS the turn animation), so the light machine here is pure state + events.
   if (ctx.time < trial.flipAt) return;
   if (trial.light === 'green') {
     trial.light = 'red';
     trial.flipCount++;
     trial.graceUntil = ctx.time + t.graceS;
     trial.flipAt = ctx.time + run.rng.range(t.redMinS, t.redMaxS);
-    if (watcher) watcher.facing = Math.PI;
   } else {
     trial.light = 'green';
     const draw = run.rng.range(t.greenMinS, t.greenMaxS);
     trial.greenWindowS = nextGreenWindowS(draw, trial.flipCount, t);
     trial.flipAt = ctx.time + trial.greenWindowS;
-    if (watcher) watcher.facing = 0; // turns its back to chant
   }
   emitToRunPlayers(ctx, run, (pid) => ({
     type: 'gauntletLight',

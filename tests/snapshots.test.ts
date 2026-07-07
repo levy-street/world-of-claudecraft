@@ -2665,6 +2665,63 @@ function dirtyEveryDeltaField(): {
     weaponSkinLoadout: {},
   };
 
+  // `gopen`/`grun`: The Gauntlet event flag + the viewer's run view. A real
+  // gauntlet join is mutually exclusive with the delve run above (the join gate
+  // refuses in-delve players), so seed the run pool the encoder reads directly
+  // with a minimal lobby-phase run holding the leader.
+  sim.gauntletEventOpen = true;
+  sim.gauntletRuns.push({
+    id: 1,
+    slot: 0,
+    seed: 1,
+    rng: new Rng(1),
+    origin: gauntletOrigin(0),
+    phase: 'lobby',
+    trialIndex: 0,
+    phaseEndsAt: 60,
+    prizePool: 10000,
+    contestants: [
+      {
+        entityId: lp,
+        player: true,
+        name: 'Alld',
+        vitality: 100,
+        skill: 0,
+        eliminatedAtTrial: null,
+        script: {
+          speed: 0,
+          fumbleOnFlip: null,
+          planKey: -1,
+          goAt: 0,
+          stopAt: 0,
+          mult: 1,
+          pauseAt: 0,
+          pauseUntil: 0,
+        },
+      },
+    ],
+    playerStates: new Map([
+      [
+        lp,
+        {
+          savedPos: { ...p.pos },
+          savedHp: p.hp,
+          spectating: false,
+          momentumX: 0,
+          momentumZ: 0,
+          heldAt: null,
+          heldUntil: 0,
+          finishedAt: null,
+          bestZ: 0,
+        },
+      ],
+    ]),
+    trial: null,
+    watcherId: null,
+    podium: null,
+    emptyFor: 0,
+  });
+
   // Player Entity fields.
   p.cooldowns.set('heroic_strike', 5);
   p.stats = { ...p.stats, str: 12345, pvpOffense: 0.17, pvpDefense: 0.13 };
