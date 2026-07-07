@@ -131,6 +131,9 @@ export function gauntletJoin(ctx: SimContext, pid?: number): void {
     bestZ: 0,
   });
   emitLobbyState(ctx, run);
+  // Single-player worlds skip the fill window: nobody else can ever join, so
+  // the run backfills with contestants and starts on the spot.
+  if (ctx.cfg.gauntletInstantLobby && run.phase === 'lobby') startRun(ctx, run);
 }
 
 // Leave the run at any point: lobby, mid-trial (a forfeit), spectating, or

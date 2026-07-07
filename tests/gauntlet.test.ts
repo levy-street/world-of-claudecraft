@@ -431,3 +431,28 @@ describe('gauntlet persistence', () => {
     expect(fresh.meta(rid)!.gauntletStats).toEqual({ runs: 2, wins: 1, bestTrial: 1 });
   });
 });
+
+describe('instant lobby (offline single-player)', () => {
+  it('gauntletInstantLobby skips the fill window: a join starts the run on the spot', () => {
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      noPlayer: true,
+      gauntletAlwaysOpen: true,
+      gauntletInstantLobby: true,
+    });
+    const pid = sim.addPlayer('warrior', 'Solo');
+    openAndJoin(sim, pid);
+    const run = sim.gauntletRuns[0];
+    expect(run.phase).toBe('staging');
+    expect(run.contestants.length).toBe(GAUNTLET.fieldSize);
+    expect(sim.gauntletRunWire(pid)?.phase).toBe('staging');
+  });
+
+  it('without the flag a lone joiner still waits in the lobby', () => {
+    const sim = makeSim(7);
+    const pid = sim.addPlayer('warrior', 'Waits');
+    openAndJoin(sim, pid);
+    expect(sim.gauntletRuns[0].phase).toBe('lobby');
+  });
+});

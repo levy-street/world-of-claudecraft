@@ -1471,6 +1471,7 @@ export class Sim {
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
       gauntletAlwaysOpen: cfg.gauntletAlwaysOpen ?? false,
+      gauntletInstantLobby: cfg.gauntletInstantLobby ?? false,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,

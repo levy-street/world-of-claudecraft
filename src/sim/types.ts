@@ -2934,6 +2934,11 @@ export interface SimConfig {
   // (the utcDay idiom). Headless/parity worlds keep the default: closed, so the
   // recruiter never spawns and existing golden traces are untouched.
   gauntletAlwaysOpen?: boolean;
+  // Skip the gauntlet lobby fill window: joining starts the run immediately with
+  // full NPC backfill. The offline client sets true (no other player can ever
+  // join a single-player world, so waiting is pure dead time); the server keeps
+  // the default false so online lobbies gather real players.
+  gauntletInstantLobby?: boolean;
   // Offline play-test: a custom world to run instead of the built-in one. The Sim
   // ctor reads spawns from here; render/terrain read it via the data.ts registry,
   // so callers that set this MUST also call setActiveWorldContent() with content
