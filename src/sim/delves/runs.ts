@@ -485,6 +485,10 @@ export function spawnDelveModule(ctx: SimContext, run: DelveRun): void {
   run.exitPortalOpen = false;
   run.rewardChestId = null;
   run.surfaceExitId = null;
+  // Discard any pending restless_graves spawns from the room just left. If they
+  // were allowed to fire after the module transition they would land in the new
+  // room's mob list and permanently block the exit-portal clear check.
+  run.restlessPending = [];
   clearDrownedLitanyBossState(run);
   clearDrownedLitanyRiteState(run);
   run.litanyBaptistry = undefined;

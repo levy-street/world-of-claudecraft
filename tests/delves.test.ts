@@ -695,6 +695,43 @@ describe('delve interactables and affixes', () => {
     expect(run.restlessPending.length).toBe(0);
   });
 
+  it('restless_graves pending spawn is discarded on module advance (no softlock in next room)', () => {
+    // Regression: spawnDelveModule did not clear restlessPending. A spawn queued
+    // in room N would fire after the player moved to room N+1, land in run.mobIds,
+    // and permanently block tryOpenDelveExitPortal from clearing room N+1.
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.affixes = ['restless_graves'];
+    // Collapse the current room to one controlled mob.
+    for (const id of [...run.mobIds]) (sim as any).dropEntity(id);
+    run.mobIds = [];
+    const origin = run.origin;
+    const trash = createMob(930001, MOBS.reliquary_ledger_wraith, 7, {
+      x: origin.x,
+      y: 0,
+      z: origin.z + 10,
+    });
+    (sim as any).addEntity(trash);
+    run.mobIds.push(trash.id);
+    // Kill the last mob: this queues a bonewalker in restlessPending (~3s delay).
+    (sim as any).dealDamage(sim.player, trash, trash.maxHp + 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+    expect(run.restlessPending.length).toBeGreaterThanOrEqual(1);
+    // Simulate the player advancing to the next module before the 3s timer fires.
+    run.exitPortalOpen = true;
+    (sim as any).advanceDelveModule(run);
+    // The pending list must be cleared on module transition so no stale bonewalker
+    // lands in the new room's mob list.
+    expect(run.restlessPending.length).toBe(0);
+    // Tick well past the original 3s delay: the bonewalker must not appear.
+    for (let i = 0; i < 20 * 4; i++) sim.tick();
+    const staleWalker = [...sim.entities.values()].find(
+      (e) => e.templateId === 'reliquary_bonewalker' && !e.dead,
+    );
+    expect(staleWalker).toBeUndefined();
+  });
+
   it('bad_air affix applies a periodic Bad Air DoT to the party (PRD §6.7)', () => {
     const sim = makeSim();
     enterReliquary(sim);
