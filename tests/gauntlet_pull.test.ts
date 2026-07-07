@@ -285,6 +285,29 @@ describe('gauntlet pull: determinism', () => {
   }, 40000);
 });
 
+describe('gauntlet pull: rope wire sync', () => {
+  it('ships the eased rope translation the players are dragged by', () => {
+    const sim = makeSim(109);
+    const pid = sim.addPlayer('warrior', 'Roped');
+    openAndJoin(sim, pid);
+    const run = advanceToTrial(sim);
+    keepNpcs(run, 0);
+    const trial = pullState(sim);
+    // Haul the marker near the threshold and let the drag ease for a moment:
+    // the wire's kx is the sim's own kx (0.05-quantized), the same value the
+    // player's pin x is offset by, so the venue rope can ride it 1:1.
+    trial.marker = GAUNTLET.pull.winThreshold - 1;
+    for (let i = 0; i < 10; i++) sim.tick();
+    const wire = sim.gauntletRunWire(pid);
+    expect(wire?.pull).not.toBeNull();
+    expect(trial.kx).not.toBeCloseTo(0, 1); // the drag really moved
+    expect(wire!.pull!.kx).toBeCloseTo(trial.kx, 1);
+    const e = sim.entities.get(pid)!;
+    const base = trial.gripBase.get(pid)!;
+    expect(e.pos.x).toBeCloseTo(run.origin.x + base.x + trial.kx, 4);
+  }, 20000);
+});
+
 describe('gauntlet pull: rope dressing', () => {
   it('lines the surviving NPC field along both banks of the trench', () => {
     const sim = makeSim(108);

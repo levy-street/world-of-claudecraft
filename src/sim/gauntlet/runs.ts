@@ -641,10 +641,13 @@ export function gauntletRunWire(ctx: SimContext, pid: number): GauntletRunView |
       const c = ps?.spectating ? undefined : trial.circles.get(pid);
       return {
         // ABSOLUTE marker (+ = team 0 winning): the teams stand on the
-        // rope now, so the venue maps the marker to a physical rope
-        // translation, never a viewer-relative meter.
+        // rope now, so the meter is the physical rope, never a
+        // viewer-relative bar.
         marker: Math.round(trial.marker * 10) / 10,
         winThreshold: GAUNTLET.pull.winThreshold,
+        // The eased translation the sim drags every grip (and pin) by: the
+        // venue renders the rope FROM this so hands never leave the rope.
+        kx: Math.round(trial.kx * 20) / 20,
         // The viewer's live circle rides whole (absolute spawnAt + the rolled
         // shrink), so it only changes when a circle resolves and quiet ticks
         // still delta-elide.

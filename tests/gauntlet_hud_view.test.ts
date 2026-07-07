@@ -183,7 +183,7 @@ describe('gauntletHudModel', () => {
     expect(gauntletHudModel({ run: sigils, time: 0 }).hint).toBe('sigils');
     const pull = run({
       sentinel: null,
-      pull: { marker: 0, winThreshold: 12, circle: null },
+      pull: { marker: 0, winThreshold: 12, kx: 0, circle: null },
     });
     expect(gauntletHudModel({ run: pull, time: 0 }).hint).toBe('pull');
     const span = run({ sentinel: null, span: { steps: 14, revealed: [] } });

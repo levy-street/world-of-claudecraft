@@ -668,7 +668,6 @@ interface PullRig {
   rope: THREE.Mesh;
   drum: THREE.Group;
   drumSkinMat: THREE.MeshStandardMaterial;
-  maxOffset: number; // rope travel from center to a threshold stake
   centerX: number;
   centerZ: number;
 }
@@ -1043,7 +1042,7 @@ function buildTrialArenas(
     drum.add(skin);
     group.add(drum);
     placeProp(group, 'bannerRed', x, 3.2, z + width / 2 + 1.6, Math.PI, 2.2);
-    return { knot, rope, drum, drumSkinMat, maxOffset, centerX: x, centerZ: z };
+    return { knot, rope, drum, drumSkinMat, centerX: x, centerZ: z };
   })();
 
   // Trial 4, the Keeper's Echo: a walled courtyard; the live rig is a low
@@ -1430,18 +1429,16 @@ export async function buildGauntletVenue(
           sigilRig.faceMat.emissiveIntensity = (crackKey / 24) * 0.9;
         }
       }
-      // The Great Pull: ease the whole rope toward the wire marker's
-      // translation (ABSOLUTE, + = team 0 winning = hauled toward -x; the sim
-      // drags the gripping lines toward the same target, so hands stay on the
-      // rope); the drum is dressing, thumping once as the viewer's circle
-      // spawns (the input itself is the screen-space circle overlay).
+      // The Great Pull: the rope rides the wire's `kx`, the SAME eased
+      // translation the sim drags the gripping lines (and the players' pins)
+      // by, so the rope and the pullers move as one body (a fast local ease
+      // only smooths the 0.05 wire quantization and the snapshot cadence).
+      // The drum is dressing, thumping once as the viewer's circle spawns
+      // (the input itself is the screen-space circle overlay).
       const pull = mine?.pull ?? null;
       if (pull || pullLayoutDue) {
-        const frac = pull
-          ? Math.max(-1, Math.min(1, pull.marker / Math.max(1, pull.winThreshold)))
-          : 0;
-        const target = -frac * pullRig.maxOffset;
-        pullKnotX += (target - pullKnotX) * Math.min(1, dt * 8);
+        const target = pull ? pull.kx : 0;
+        pullKnotX += (target - pullKnotX) * Math.min(1, dt * 12);
         if (!pull && Math.abs(pullKnotX) < 0.01) pullKnotX = 0;
         const kx = pullRig.centerX + pullKnotX;
         pullRig.knot.position.x = kx;

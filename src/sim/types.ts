@@ -2913,11 +2913,15 @@ export interface GauntletRunView {
   } | null;
   pull: {
     // ABSOLUTE marker, + = team 0 winning. Both teams stand ON the rope
-    // (team 0 grips the -x half), so the venue translates the rope by
-    // -marker/winThreshold * knotTravel and the sim drags the lines the same
-    // way; the meter is the physical rope, not a viewer-relative bar.
+    // (team 0 grips the -x half); the meter is the physical rope, not a
+    // viewer-relative bar.
     marker: number;
     winThreshold: number;
+    // The sim's eased rope translation (instance-local yards, + toward team
+    // 0's side), the SAME value the players' grips and pins are dragged by,
+    // so the venue rope and the pulling lines move as one body. Quantized to
+    // 0.05 so quiet ticks delta-elide.
+    kx: number;
     // The viewer's live shrinking circle (the trial's input), or null for
     // spectators. spawnAt is absolute; spawnAt + shrinkS fully determine the
     // size curve client-side (startSize at spawnAt, 0 at spawnAt + shrinkS).

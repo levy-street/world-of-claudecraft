@@ -22,7 +22,7 @@ const run = (over: Partial<GauntletRunView> = {}): GauntletRunView => ({
   originZ: 0,
   sentinel: null,
   sigils: null,
-  pull: { marker: 0, winThreshold: 12, circle: { ...CIRCLE } },
+  pull: { marker: 0, winThreshold: 12, kx: 0, circle: { ...CIRCLE } },
   echo: null,
   span: null,
   court: null,
@@ -34,7 +34,7 @@ describe('gauntletCircleModel', () => {
   it('hides outside a run, without the pull substate, or without a circle', () => {
     expect(gauntletCircleModel({ run: null, time: 100 }).visible).toBe(false);
     expect(gauntletCircleModel({ run: run({ pull: null }), time: 100 }).visible).toBe(false);
-    const noCircle = run({ pull: { marker: 0, winThreshold: 12, circle: null } });
+    const noCircle = run({ pull: { marker: 0, winThreshold: 12, kx: 0, circle: null } });
     expect(gauntletCircleModel({ run: noCircle, time: 100 }).visible).toBe(false);
     const hidden = gauntletCircleModel({ run: null, time: 100 });
     expect(hidden.id).toBe(-1);
