@@ -66,12 +66,6 @@ export interface GauntletHudElements {
   root: HTMLElement;
   /** The phase / "Trial N of M" caption. */
   phase: HTMLElement;
-  /** The vitality bar container (role=progressbar; aria-valuenow). */
-  vitalityBar: HTMLElement;
-  /** The vitality fill (width percent). */
-  vitalityFill: HTMLElement;
-  /** The vitality "value / max" readout. */
-  vitalityText: HTMLElement;
   /** The phase-countdown bar container (shown/hidden). */
   countdownBar: HTMLElement;
   /** The countdown fill (draining width percent). */
@@ -133,12 +127,6 @@ export class GauntletHudPainter {
     }
     w.setDisplay(this.el.root, SHOWN);
     w.setText(this.el.phase, this.phaseLabel(model));
-
-    const vitalityText = this.readout(model.vitalityValue, model.vitalityMax);
-    w.setWidth(this.el.vitalityFill, this.pct(model.vitalityFrac));
-    w.setText(this.el.vitalityText, vitalityText);
-    w.setAttr(this.el.vitalityBar, 'aria-valuenow', String(Math.round(model.vitalityFrac * 100)));
-    w.setAttr(this.el.vitalityBar, 'aria-label', `${t(K.vitality)} ${vitalityText}`);
 
     w.setDisplay(this.el.countdownBar, model.showCountdown ? SHOWN_BLOCK : HIDDEN);
     if (model.showCountdown) {

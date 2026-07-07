@@ -3778,9 +3778,6 @@ export class Hud {
     {
       root: $('#gauntlet-hud'),
       phase: $('#gauntlet-phase'),
-      vitalityBar: $('#gauntlet-vitality'),
-      vitalityFill: $('#gauntlet-vitality .fill'),
-      vitalityText: $('#gauntlet-vitality .gh-text'),
       countdownBar: $('#gauntlet-countdown'),
       countdownFill: $('#gauntlet-countdown .fill'),
       countdownTimer: $('#gauntlet-countdown .timer'),

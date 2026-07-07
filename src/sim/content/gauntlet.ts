@@ -171,9 +171,10 @@ export const GAUNTLET: GauntletDef = {
   npcSkillMax: 0.95,
   trials: ['sentinel', 'sigils', 'pull', 'wager', 'span', 'court'],
   sentinel: {
-    // Playtest verdict: the canon 5:00 has zero pressure on a 90yd field.
-    // 90s makes the shrinking green windows actually matter.
-    durationS: 90,
+    // Playtest verdict (twice): the clock must BITE. 45s on a 90yd field
+    // means roughly 25s of green time at the ~55 percent duty cycle, so a
+    // clean run needs near-constant motion and the shrinking windows matter.
+    durationS: 45,
     fieldLength: 90,
     fieldHalfWidth: 18,
     greenMinS: 3.0,
@@ -192,8 +193,8 @@ export const GAUNTLET: GauntletDef = {
     momentumStopEps: 0.02,
     damageMax: 45,
     finishBonusMax: 0.25,
-    npcSpeedMin: 4.4,
-    npcSpeedMax: 6.8,
+    npcSpeedMin: 5.2,
+    npcSpeedMax: 7.2,
     npcSpeedJitter: 0.18,
     npcReactMinS: 0.15,
     npcReactMaxS: 0.75,
@@ -205,12 +206,15 @@ export const GAUNTLET: GauntletDef = {
   sigils: {
     durationS: 90,
     outlinePoints: 96,
-    tolerance: 0.06, // shape-local units (the outline lives in a unit square)
-    speedCap: 0.05, // outline fraction per second: a clean trace takes ~25s
+    // Loosened after playtest: the first cut (0.06 tolerance, 0.05 cap) read
+    // as pixel-hunting. A forgiving band and a faster cap keep the danger in
+    // the thin sections rather than in hand jitter.
+    tolerance: 0.11, // shape-local units (the outline lives in a unit square)
+    speedCap: 0.09, // outline fraction per second: a clean trace takes ~12s
     crackMax: 100,
-    crackOffPath: 34,
-    crackOverSpeed: 26,
-    thinSectionMult: 2.2,
+    crackOffPath: 20,
+    crackOverSpeed: 16,
+    thinSectionMult: 1.6,
     shatterDamage: 18,
     damageMax: 40,
   },
