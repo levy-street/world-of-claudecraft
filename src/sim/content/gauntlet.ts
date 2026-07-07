@@ -228,12 +228,12 @@ export const GAUNTLET: GauntletDef = {
     telegraphS: 0.8,
     graceS: 0.35,
     redMoveEps: 0.06,
-    hardFailDamage: 22,
+    hardFailDamage: 14,
     stunS: 1.5,
     pushbackYards: 6,
     momentumDecay: 0.82,
     momentumStopEps: 0.02,
-    damageMax: 45,
+    damageMax: 30,
     finishBonusMax: 0.25,
     npcSpeedMin: 5.2,
     npcSpeedMax: 7.2,
@@ -248,17 +248,18 @@ export const GAUNTLET: GauntletDef = {
   sigils: {
     durationS: 90,
     outlinePoints: 96,
-    // Loosened after playtest: the first cut (0.06 tolerance, 0.05 cap) read
-    // as pixel-hunting. A forgiving band and a faster cap keep the danger in
-    // the thin sections rather than in hand jitter.
-    tolerance: 0.11, // shape-local units (the outline lives in a unit square)
+    // Loosened twice after playtests: the first cut (0.06 tolerance, 0.05
+    // cap) read as pixel-hunting, and the in-world slab (a projected surface,
+    // not a flat canvas) earns an even wider band and gentler crack rates so
+    // the danger stays in the thin sections rather than in hand jitter.
+    tolerance: 0.14, // shape-local units (the outline lives in a unit square)
     speedCap: 0.09, // outline fraction per second: a clean trace takes ~12s
     crackMax: 100,
-    crackOffPath: 20,
-    crackOverSpeed: 16,
-    thinSectionMult: 1.6,
-    shatterDamage: 18,
-    damageMax: 40,
+    crackOffPath: 12,
+    crackOverSpeed: 10,
+    thinSectionMult: 1.4,
+    shatterDamage: 12,
+    damageMax: 26,
   },
   pull: {
     durationS: 75,
@@ -272,15 +273,17 @@ export const GAUNTLET: GauntletDef = {
     npcForceMin: 0.7,
     npcForceMax: 1.05,
     winThreshold: 12,
-    lossDamage: 55,
+    lossDamage: 38,
   },
   wager: {
     durationS: 120,
     startingMarbles: 10,
     roundS: 14,
     maxWager: 5,
+    // Going broke stays a full elimination (the duel's whole stake); only the
+    // trial-cap deficit toll softened in the all-games damage pass.
     lossDamage: 100,
-    damagePerMarbleShort: 8,
+    damagePerMarbleShort: 5,
   },
   span: {
     durationS: 100,
@@ -288,10 +291,10 @@ export const GAUNTLET: GauntletDef = {
     panelLength: 2.6,
     panelWidth: 2.6,
     panelGap: 1.2,
-    fallDamage: 26,
+    fallDamage: 17,
     npcAheadCount: 3,
     npcStepPeriodS: 1.6,
-    damageMax: 45,
+    damageMax: 30,
   },
   court: {
     durationS: 90,
@@ -302,8 +305,8 @@ export const GAUNTLET: GauntletDef = {
     shoveCooldownS: 1.6,
     shoveRange: 2.6,
     shovePush: 4.5,
-    shoveDamage: 9,
-    outDamage: 30,
+    shoveDamage: 6,
+    outDamage: 20,
     roleSwapS: 20,
     rivalReactionS: 0.5,
   },

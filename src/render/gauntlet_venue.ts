@@ -642,6 +642,7 @@ interface SigilRig {
   tracedMat: THREE.Material;
   paleMat: THREE.Material;
   thinMat: THREE.Material;
+  activeMat: THREE.Material;
   outlineGroup: THREE.Group;
   segs: THREE.Mesh[];
   segThin: boolean[];
@@ -799,7 +800,17 @@ function buildSigilPavilion(group: THREE.Group, ox: number, oz: number): SigilRi
     emissiveIntensity: 0.6,
     roughness: 0.5,
   });
-  venueOwnedMats.push(faceMat, tracedMat, paleMat, thinMat);
+  // The FRONTIER segment: the sim scores the trace as an arc walked from the
+  // outline's start vertex, so this bright marker is what tells the player
+  // where the etching wants their finger NOW (it is the start cue at trial
+  // open and the direction cue as it crawls forward).
+  const activeMat = new THREE.MeshStandardMaterial({
+    color: 0xdff6ff,
+    emissive: 0xbfefff,
+    emissiveIntensity: 2.2,
+    roughness: 0.3,
+  });
+  venueOwnedMats.push(faceMat, tracedMat, paleMat, thinMat, activeMat);
   buildLectern(group, x, z, 0, faceMat);
 
   // A cosmetic lectern ring for the NPC field (plain glass, no etching).
@@ -849,6 +860,7 @@ function buildSigilPavilion(group: THREE.Group, ox: number, oz: number): SigilRi
     tracedMat,
     paleMat,
     thinMat,
+    activeMat,
     outlineGroup,
     segs: [],
     segThin: [],
@@ -894,7 +906,9 @@ function rebuildSigilOutline(rig: SigilRig, seed: number, shapeId: number): void
       pts.push(toLocal(o.xs[i], o.ys[i]));
       if (o.thin[i]) thin = true;
     }
-    const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 6, 0.02, 5, false);
+    // Radius sized so the visible line reads close to the sim's tolerance
+    // band rather than suggesting a hairline the scoring never demands.
+    const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 6, 0.035, 5, false);
     const mesh = new THREE.Mesh(geo, rig.paleMat);
     rig.outlineGroup.add(mesh);
     rig.segs.push(mesh);
@@ -1376,12 +1390,18 @@ export async function buildGauntletVenue(
         if (progressKey !== lastSigilProgressKey) {
           lastSigilProgressKey = progressKey;
           for (let i = 0; i < sigilRig.segs.length; i++) {
+            // Behind the frontier: traced gold. The frontier segment itself
+            // burns bright, telling the player where to trace NEXT (progress
+            // is an arc from the outline's start vertex, so without this the
+            // gold fill can begin nowhere near their finger).
             sigilRig.segs[i].material =
               i < progressKey
                 ? sigilRig.tracedMat
-                : sigilRig.segThin[i]
-                  ? sigilRig.thinMat
-                  : sigilRig.paleMat;
+                : i === progressKey
+                  ? sigilRig.activeMat
+                  : sigilRig.segThin[i]
+                    ? sigilRig.thinMat
+                    : sigilRig.paleMat;
           }
         }
         const crackFrac = sig.crackMax > 0 ? Math.min(1, Math.max(0, sig.crack / sig.crackMax)) : 0;
