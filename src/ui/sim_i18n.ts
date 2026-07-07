@@ -41,6 +41,7 @@ const baseEnTable = {
   'error.noLoadout': 'No such loadout.',
   'error.loadoutLevel': 'That loadout needs a higher level.',
   'error.cannotEquip': 'You cannot equip that.',
+  'error.uniqueEquipped': 'You can only equip one of those.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
   'error.fullHealth': 'You are already at full health.',

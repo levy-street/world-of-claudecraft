@@ -6354,8 +6354,8 @@ export const ru_RU: EnTranslations = {
       "sutils_gambit": {
         "name": "Гамбит Сутила"
       },
-      "oath_of_the_round_table": {
-        "name": "Клятва Круглого стола"
+      "king_arthurs_oath": {
+        "name": "Клятва короля Артура"
       },
       "zyzzs_deathless_signet": {
         "name": "Бессмертная печатка Зизза"

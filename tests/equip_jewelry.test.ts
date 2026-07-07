@@ -42,6 +42,13 @@ describe('resolveEquipSlot (pure)', () => {
       'ring1',
     );
   });
+
+  it('rings are unique-equipped: a worn copy blocks the resolver in either slot', () => {
+    expect(resolveEquipSlot(RING, { ring1: RING.id })).toBeNull();
+    expect(resolveEquipSlot(RING, { ring2: RING.id })).toBeNull();
+    // A DIFFERENT ring still resolves next to the worn one.
+    expect(resolveEquipSlot(RING, { ring1: 'nielas_coldlight_band' })).toBe('ring2');
+  });
 });
 
 describe('jewelry equip flow', () => {
@@ -80,6 +87,26 @@ describe('jewelry equip flow', () => {
     expect(sim.unequipItem('neck', pid)).toBe(true);
     expect(meta.equipment.neck).toBeUndefined();
     expect(sim.countItem('yumis_keepsake_locket', pid)).toBe(1);
+  });
+
+  it('refuses a second copy of a worn ring (unique-equipped)', () => {
+    const sim = makeSim();
+    const pid = addCapped(sim, 'warrior', 'Twinsies');
+    const meta = sim.players.get(pid) as any;
+    sim.addItem('seal_of_the_nine_oaths', 2, pid);
+    sim.drainEvents();
+
+    sim.equipItem('seal_of_the_nine_oaths', pid);
+    expect(meta.equipment.ring1).toBe('seal_of_the_nine_oaths');
+
+    sim.equipItem('seal_of_the_nine_oaths', pid);
+    expect(meta.equipment.ring2).toBeUndefined();
+    expect(sim.countItem('seal_of_the_nine_oaths', pid)).toBe(1); // second copy stays in bags
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (e) => e.type === 'error' && e.pid === pid && e.text === 'You can only equip one of those.',
+      ),
+    ).toBe(true);
   });
 
   it('folds jewelry stats through recalcPlayerStats', () => {

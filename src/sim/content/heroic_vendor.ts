@@ -52,9 +52,9 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 7, sta: 4 },
     sellValue: 4500,
   },
-  oath_of_the_round_table: {
-    id: 'oath_of_the_round_table',
-    name: 'Oath of the Round Table',
+  king_arthurs_oath: {
+    id: 'king_arthurs_oath',
+    name: "King Arthur's Oath",
     kind: 'armor',
     slot: 'ring',
     quality: 'epic',
@@ -128,7 +128,7 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   { itemId: 'seal_of_the_nine_oaths', marks: 12 },
   { itemId: 'nielas_coldlight_band', marks: 12 },
   { itemId: 'sutils_gambit', marks: 12 },
-  { itemId: 'oath_of_the_round_table', marks: 12 },
+  { itemId: 'king_arthurs_oath', marks: 12 },
   { itemId: 'zyzzs_deathless_signet', marks: 12 },
   { itemId: 'architects_cornerstone', marks: 12 },
   { itemId: 'yumis_keepsake_locket', marks: 16 },

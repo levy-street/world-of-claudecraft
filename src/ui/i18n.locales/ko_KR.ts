@@ -3177,7 +3177,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.seal_of_the_nine_oaths.name': '아홉 맹세의 인장',
   'entities.items.nielas_coldlight_band.name': '니엘라의 냉광 반지',
   'entities.items.sutils_gambit.name': '수틸의 도박',
-  'entities.items.oath_of_the_round_table.name': '원탁의 맹세',
+  'entities.items.king_arthurs_oath.name': '아서 왕의 맹세',
   'entities.items.zyzzs_deathless_signet.name': '지즈의 불멸의 인장',
   'entities.items.architects_cornerstone.name': '건축가의 초석',
   'entities.items.yumis_keepsake_locket.name': '유미의 추억 로켓',

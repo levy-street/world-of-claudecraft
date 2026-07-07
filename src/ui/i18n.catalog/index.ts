@@ -1030,7 +1030,7 @@ export const en = {
       seal_of_the_nine_oaths: { name: 'Seal of the Nine Oaths' },
       nielas_coldlight_band: { name: "Niela's Coldlight Band" },
       sutils_gambit: { name: "Sutil's Gambit" },
-      oath_of_the_round_table: { name: 'Oath of the Round Table' },
+      king_arthurs_oath: { name: "King Arthur's Oath" },
       zyzzs_deathless_signet: { name: "Zyzz's Deathless Signet" },
       architects_cornerstone: { name: "The Architect's Cornerstone" },
       swiftfang_talisman: { name: 'Swiftfang Talisman' },

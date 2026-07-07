@@ -76,9 +76,13 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
     ctx.error(meta.entityId, `You must be level ${requiredLevelFor(def)} to equip that.`);
     return;
   }
-  // Rings declare slot 'ring'; the resolver picks ring1/ring2 (empty-first).
+  // Rings declare slot 'ring'; the resolver picks ring1/ring2 (empty-first)
+  // and returns null for a unique-equipped duplicate of a worn ring.
   const slot = resolveEquipSlot(def, meta.equipment);
-  if (!slot) return;
+  if (!slot) {
+    if (def.slot === 'ring') ctx.error(meta.entityId, 'You can only equip one of those.');
+    return;
+  }
   const old = meta.equipment[slot];
   ctx.removeItem(itemId, 1, meta.entityId);
   if (old) addItemSilent(old, 1, meta);

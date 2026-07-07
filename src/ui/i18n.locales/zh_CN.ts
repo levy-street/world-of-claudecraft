@@ -3042,7 +3042,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.seal_of_the_nine_oaths.name': '九誓之印',
   'entities.items.nielas_coldlight_band.name': '妮拉的冷光指环',
   'entities.items.sutils_gambit.name': '苏蒂尔的赌局',
-  'entities.items.oath_of_the_round_table.name': '圆桌誓约',
+  'entities.items.king_arthurs_oath.name': '亚瑟王的誓言',
   'entities.items.zyzzs_deathless_signet.name': '兹兹的不朽印戒',
   'entities.items.architects_cornerstone.name': '建筑师的奠基石',
   'entities.items.yumis_keepsake_locket.name': '由美的纪念小盒',

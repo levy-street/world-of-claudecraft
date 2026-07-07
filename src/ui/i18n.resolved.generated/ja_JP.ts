@@ -6354,8 +6354,8 @@ export const ja_JP: EnTranslations = {
       "sutils_gambit": {
         "name": "スティルの賭け"
       },
-      "oath_of_the_round_table": {
-        "name": "円卓の誓い"
+      "king_arthurs_oath": {
+        "name": "アーサー王の誓い"
       },
       "zyzzs_deathless_signet": {
         "name": "ジズの不滅の印章"

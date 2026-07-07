@@ -6354,8 +6354,8 @@ export const ko_KR: EnTranslations = {
       "sutils_gambit": {
         "name": "수틸의 도박"
       },
-      "oath_of_the_round_table": {
-        "name": "원탁의 맹세"
+      "king_arthurs_oath": {
+        "name": "아서 왕의 맹세"
       },
       "zyzzs_deathless_signet": {
         "name": "지즈의 불멸의 인장"

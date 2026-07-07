@@ -5231,9 +5231,12 @@ export class Sim {
         this.equipItem(itemId, meta.entityId);
     } else {
       // resolveEquipSlot maps a ring item to its concrete ring1/ring2 key
-      // (empty-first), so auto-equip fills an open jewelry slot too.
+      // (empty-first), so auto-equip fills an open jewelry slot too. A null
+      // slot is a unique-equipped duplicate ring: skip silently (auto-equip
+      // is a convenience, the explicit equip path owns the error toast).
       const slot = resolveEquipSlot(def, meta.equipment);
-      const curId = slot ? meta.equipment[slot] : undefined;
+      if (!slot) return;
+      const curId = meta.equipment[slot];
       const cur = curId ? ITEMS[curId] : null;
       if (!cur || (def.stats?.armor ?? 0) > (cur.stats?.armor ?? 0))
         this.equipItem(itemId, meta.entityId);

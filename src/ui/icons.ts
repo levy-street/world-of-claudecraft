@@ -2634,7 +2634,7 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   seal_of_the_nine_oaths: r('fury', 'blood', ['coin', 'gem'], ['glow']),
   nielas_coldlight_band: r('arcane', 'arcanePink', ['coin', 'gem'], ['glow']),
   sutils_gambit: r('nature', 'leafGreen', ['coin', 'gem'], ['sparkle']),
-  oath_of_the_round_table: r('earth', 'earthBrown', ['coin', 'gem'], ['glow']),
+  king_arthurs_oath: r('earth', 'earthBrown', ['coin', 'gem'], ['glow']),
   zyzzs_deathless_signet: r('holy', 'holyGold', ['coin', 'sigil_rune'], ['glow']),
   architects_cornerstone: r('arcane', 'sky', ['coin', 'scroll'], ['glow']),
   swiftfang_talisman: r('storm', 'silverWhite', ['wing', 'gem'], ['motion']),

@@ -6354,8 +6354,8 @@ export const nl_NL: EnTranslations = {
       "sutils_gambit": {
         "name": "Sutil's Gambit"
       },
-      "oath_of_the_round_table": {
-        "name": "Oath of the Round Table"
+      "king_arthurs_oath": {
+        "name": "King Arthur's Oath"
       },
       "zyzzs_deathless_signet": {
         "name": "Zyzz's Deathless Signet"

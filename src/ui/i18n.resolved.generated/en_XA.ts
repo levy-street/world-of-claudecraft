@@ -6354,8 +6354,8 @@ export const en_XA: EnTranslations = {
       "sutils_gambit": {
         "name": "[Šúţíļ'š Ĝáɱƀíţ]"
       },
-      "oath_of_the_round_table": {
-        "name": "[Óáţĥ óƒ ţĥé Ŕóúñð Ţáƀļé]"
+      "king_arthurs_oath": {
+        "name": "[Ķíñĝ Áŕţĥúŕ'š Óáţĥ]"
       },
       "zyzzs_deathless_signet": {
         "name": "[Žýžž'š Ðéáţĥļéšš Šíĝñéţ]"

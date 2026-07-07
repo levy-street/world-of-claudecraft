@@ -6354,8 +6354,8 @@ export const zh_CN: EnTranslations = {
       "sutils_gambit": {
         "name": "苏蒂尔的赌局"
       },
-      "oath_of_the_round_table": {
-        "name": "圆桌誓约"
+      "king_arthurs_oath": {
+        "name": "亚瑟王的誓言"
       },
       "zyzzs_deathless_signet": {
         "name": "兹兹的不朽印戒"

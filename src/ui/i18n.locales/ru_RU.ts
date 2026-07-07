@@ -3212,7 +3212,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.seal_of_the_nine_oaths.name': 'Печать девяти клятв',
   'entities.items.nielas_coldlight_band.name': 'Кольцо холодного света Ниэлы',
   'entities.items.sutils_gambit.name': 'Гамбит Сутила',
-  'entities.items.oath_of_the_round_table.name': 'Клятва Круглого стола',
+  'entities.items.king_arthurs_oath.name': 'Клятва короля Артура',
   'entities.items.zyzzs_deathless_signet.name': 'Бессмертная печатка Зизза',
   'entities.items.architects_cornerstone.name': 'Краеугольный камень архитектора',
   'entities.items.yumis_keepsake_locket.name': 'Медальон-память Юми',

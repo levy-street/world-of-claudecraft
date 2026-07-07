@@ -3182,7 +3182,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.seal_of_the_nine_oaths.name': '九誓の印章',
   'entities.items.nielas_coldlight_band.name': 'ニエラの冷光の指輪',
   'entities.items.sutils_gambit.name': 'スティルの賭け',
-  'entities.items.oath_of_the_round_table.name': '円卓の誓い',
+  'entities.items.king_arthurs_oath.name': 'アーサー王の誓い',
   'entities.items.zyzzs_deathless_signet.name': 'ジズの不滅の印章',
   'entities.items.architects_cornerstone.name': 'アーキテクトの礎石',
   'entities.items.yumis_keepsake_locket.name': 'ユミの形見のロケット',

@@ -41,14 +41,18 @@ export function armorTypeForItem(item: ItemDef): ArmorType | null {
 
 // Resolve the concrete equipment key an item equips into. Rings declare the
 // slot KIND 'ring' and land in whichever ring slot is empty (ring1 first);
-// with both full the swap replaces ring1, the classic behavior. Every other
-// item names its equipment slot directly. Returns null for slotless items.
+// with both full the swap replaces ring1, the classic behavior. Rings are
+// UNIQUE-EQUIPPED: a second copy of a ring already worn in either slot never
+// equips (returns null; the equip command surfaces the classic error, the
+// auto-equip path skips silently). Every other item names its equipment slot
+// directly. Returns null for slotless items.
 export function resolveEquipSlot(
   item: ItemDef,
   equipment: Partial<Record<EquipSlot, string>>,
 ): EquipSlot | null {
   if (!item.slot) return null;
   if (item.slot !== 'ring') return item.slot;
+  if (equipment.ring1 === item.id || equipment.ring2 === item.id) return null;
   if (!equipment.ring1) return 'ring1';
   if (!equipment.ring2) return 'ring2';
   return 'ring1';
