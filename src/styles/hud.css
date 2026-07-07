@@ -4662,4 +4662,272 @@
     pointer-events: none;
     filter: drop-shadow(0 2px 14px #000a);
   }
+
+  /* ---------- gauntlet pull meter (trial 3) ---------- */
+  /* The tug-of-war meter + on-beat button. Inside the pointer-events:none cluster,
+     so the sub-cluster opts interaction back in. Live-positioned elements read
+     JS-written custom props (--gh-tug/--gh-beat) and carry no transition, so they
+     never lag the authoritative wire (timing here is actionable, not cosmetic). */
+  .gh-pull {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    pointer-events: auto;
+  }
+  .gh-pull-tug {
+    position: relative;
+    width: 100%;
+    height: 16px;
+    border: 2px solid var(--border);
+    outline: 1px solid #000;
+    border-radius: 8px;
+    background: #100c08;
+    overflow: hidden;
+  }
+  .gh-pull-center {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--color-text-muted);
+  }
+  .gh-pull-knob {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--gh-tug, 0.5) * 100%);
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border-radius: 50%;
+    border: 1px solid #000;
+    background: var(--color-text-light);
+    box-shadow: 0 0 6px #000a;
+  }
+  .gh-pull-tug.winning .gh-pull-knob {
+    background: var(--color-hp);
+  }
+  .gh-pull-tug.losing .gh-pull-knob {
+    background: var(--color-hostile);
+  }
+  .gh-pull-beat {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #0c0a07;
+    overflow: hidden;
+  }
+  .gh-pull-target {
+    position: absolute;
+    left: 40%;
+    width: 20%;
+    top: 0;
+    bottom: 0;
+    background: var(--color-primary-glow);
+    border-left: 1px solid var(--color-primary-dim);
+    border-right: 1px solid var(--color-primary-dim);
+  }
+  .gh-pull-cursor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--gh-beat, 0) * 100%);
+    width: 3px;
+    margin-left: -1.5px;
+    background: var(--color-primary);
+    box-shadow: 0 0 6px var(--color-primary-glow-heavy);
+  }
+  .gh-pull-btn {
+    width: 100%;
+    min-height: 46px;
+    margin: 2px 0 0;
+    font-size: 15px;
+  }
+
+  /* ---------- gauntlet court shove (trial 6) ---------- */
+  .gh-court {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    pointer-events: auto;
+  }
+  .gh-court-role {
+    font: 700 12px / 18px var(--title-font);
+    letter-spacing: 1px;
+    color: #fff;
+    border-radius: 9px;
+    padding: 2px 12px;
+    text-shadow: 1px 1px 2px #000;
+    border: 1px solid #000;
+    background: var(--color-text-muted);
+  }
+  .gh-court.attacker .gh-court-role {
+    background: linear-gradient(var(--color-hostile), #b62c22);
+  }
+  .gh-court.defender .gh-court-role {
+    background: linear-gradient(#4a86c8, #2a5a8a);
+  }
+  .gh-court-btn-wrap {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  .gh-court-btn {
+    min-height: 46px;
+    min-width: 120px;
+    margin: 0;
+  }
+  .gh-court-cd {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(var(--gh-cd, 0) * 100%);
+    background: #000a;
+    pointer-events: none;
+  }
+  .gh-court-btn.gh-disabled {
+    pointer-events: none;
+    filter: grayscale(0.6) brightness(0.7);
+  }
+
+  /* ---------- gauntlet sigils trace panel (trial 2) ---------- */
+  #gauntlet-sigils {
+    width: auto;
+    max-width: 92%;
+    padding: 0 10px 12px;
+    text-align: center;
+  }
+  #gauntlet-sigils .gs-hint {
+    padding: 8px 8px 6px;
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+  .gs-canvas {
+    display: block;
+    margin: 2px auto 8px;
+    width: min(260px, 78vw);
+    height: auto;
+    border: 2px solid var(--border);
+    outline: 1px solid #000;
+    border-radius: 6px;
+    background: #0b0906;
+    /* Own the drag gesture on touch so the page never scrolls mid-trace. */
+    touch-action: none;
+    cursor: crosshair;
+  }
+  .gs-meter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 6px;
+  }
+  .gs-meter-track {
+    position: relative;
+    flex: 1;
+    height: 9px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #100c08;
+    overflow: hidden;
+  }
+  .gs-meter-fill {
+    height: 100%;
+    width: 0%;
+  }
+  .gs-crack-fill {
+    background: linear-gradient(var(--color-hostile), #b62c22);
+  }
+  .gs-traced-fill {
+    background: linear-gradient(#ffe48a, #c9941a 60%, #9a6f12);
+  }
+  .gs-meter-val {
+    min-width: 34px;
+    text-align: right;
+    font-size: 11px;
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
+  }
+  .gs-live {
+    min-height: 14px;
+    font-size: 12px;
+    color: var(--color-hostile);
+  }
+
+  /* ---------- gauntlet wager panel (trial 4) ---------- */
+  #gauntlet-wager {
+    width: 280px;
+    max-width: 92%;
+    padding-bottom: 12px;
+    text-align: center;
+  }
+  #gauntlet-wager .gw-purses {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px 2px;
+    font-size: 13px;
+    color: var(--color-text-light);
+  }
+  #gauntlet-wager .gw-round {
+    padding: 2px 14px 6px;
+    font-size: 14px;
+    color: var(--color-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  #gauntlet-wager .gw-stake,
+  #gauntlet-wager .gw-hold,
+  #gauntlet-wager .gw-guess {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 14px 0;
+  }
+  #gauntlet-wager .gw-label {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  #gauntlet-wager .gw-digits {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  #gauntlet-wager .gw-digit {
+    min-width: 40px;
+    min-height: 40px;
+    margin: 0;
+    padding: 4px 8px;
+  }
+  #gauntlet-wager .gw-digit.gw-on {
+    border-color: var(--color-border-focus);
+    box-shadow:
+      inset 0 1px 0 #ffffff2a,
+      0 0 8px var(--color-primary-glow-heavy);
+    filter: brightness(1.2);
+  }
+  #gauntlet-wager .gw-guess-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  #gauntlet-wager .gw-guess-row .btn {
+    min-width: 84px;
+    min-height: 44px;
+    margin: 0;
+  }
+  #gauntlet-wager .gw-done {
+    padding: 8px 14px 0;
+    font-size: 14px;
+    color: var(--color-text-light);
+  }
 }

@@ -277,6 +277,13 @@ import {
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
 import { gossipMenuIsEmpty } from './gossip_menu';
+import { GauntletClock } from './gauntlet_clock';
+import { GauntletHudPainter } from './gauntlet_hud_painter';
+import { gauntletHudModel } from './gauntlet_hud_view';
+import { GauntletOverlay } from './gauntlet_overlay';
+import { GauntletRecruitWindow } from './gauntlet_recruit_window';
+import { GauntletSigilsWindow } from './gauntlet_sigils_window';
+import { GauntletWagerWindow } from './gauntlet_wager_window';
 import {
   type AimPoint,
   abilityAoeRadius,
@@ -3763,6 +3770,64 @@ export class Hud {
   private readonly minimapPainter = new MinimapPainter(this.writerFacet, classCss, (zoneId) =>
     zoneDisplayName(zoneId),
   );
+  // The Gauntlet HUD cluster painter (vitality / countdown / chips / light pill),
+  // driven per frame from the gauntletRun wire view via gauntletHudModel. All writes
+  // route through the shared elided-writer facet, like the other hot painters.
+  private readonly gauntletHudPainter = new GauntletHudPainter(
+    this.writerFacet,
+    {
+      root: $('#gauntlet-hud'),
+      phase: $('#gauntlet-phase'),
+      vitalityBar: $('#gauntlet-vitality'),
+      vitalityFill: $('#gauntlet-vitality .fill'),
+      vitalityText: $('#gauntlet-vitality .gh-text'),
+      countdownBar: $('#gauntlet-countdown'),
+      countdownFill: $('#gauntlet-countdown .fill'),
+      countdownTimer: $('#gauntlet-countdown .timer'),
+      survivors: $('#gauntlet-survivors'),
+      prize: $('#gauntlet-prize'),
+      light: $('#gauntlet-light'),
+      pull: $('#gauntlet-pull'),
+      pullTug: $('#gauntlet-pull-tug'),
+      pullTugKnob: $('#gauntlet-pull-tug .gh-pull-knob'),
+      pullCursor: $('#gauntlet-pull-beat .gh-pull-cursor'),
+      pullBtn: $('#gauntlet-pull-btn'),
+      court: $('#gauntlet-court'),
+      courtRole: $('#gauntlet-court-role'),
+      courtBtn: $('#gauntlet-court-btn'),
+      courtCd: $('#gauntlet-court .gh-court-cd'),
+    },
+    { onPull: () => this.gauntletPullNow(), onShove: () => this.gauntletShoveNow() },
+  );
+  // The sigils trace panel + the wager panel: window-style modules that open only
+  // while their trial is live (driven each frame from updateGauntletHud).
+  private readonly gauntletSigils = new GauntletSigilsWindow({
+    root: () => $('#gauntlet-sigils'),
+    onTrace: (pts) => this.sim.gauntletTrace(pts),
+    ...this.windowFocus('#gauntlet-sigils'),
+  });
+  private readonly gauntletWager = new GauntletWagerWindow({
+    root: () => $('#gauntlet-wager'),
+    onWager: (n) => this.sim.gauntletWager('wager', n),
+    onHold: (n) => this.sim.gauntletWager('hold', n),
+    onGuess: (odd) => this.sim.gauntletWager('guess', odd ? 1 : 0),
+    ...this.windowFocus('#gauntlet-wager'),
+  });
+  // Wall-clock estimator for the countdown (IWorld exposes no sim clock online); see
+  // gauntlet_clock.ts.
+  private readonly gauntletClock = new GauntletClock();
+  // The knockout / spectator / podium overlay; builds its own DOM lazily on show.
+  private readonly gauntletOverlay = new GauntletOverlay({
+    onLeave: () => this.sim.gauntletLeave(),
+  });
+  // The recruiter dialog (opened from the gauntlet_recruiter interact path).
+  private readonly gauntletRecruit = new GauntletRecruitWindow({
+    root: () => $('#gauntlet-recruit'),
+    closeOthers: () => this.closeOtherWindows('#gauntlet-recruit'),
+    ...this.windowFocus('#gauntlet-recruit'),
+    onJoin: () => this.sim.gauntletJoin(),
+    onLeave: () => this.sim.gauntletLeave(),
+  });
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),
     moneyHtml: (copper) => this.moneyHtml(copper),
@@ -11331,8 +11396,58 @@ export class Hud {
     this.setDisplay(this.actionbar2El, legsOnly ? 'none' : '');
     if (this.gauntletRecruit.isOpen)
       this.gauntletRecruit.update({ eventOpen: this.sim.gauntletOpen, run, time });
+    // Trial input panels: they open/close themselves off the live wire substate.
+    this.gauntletSigils.sync(run?.sigils ?? null);
+    this.gauntletWager.sync(run?.wager ? { ...run.wager, time } : null);
+    // The pull/court Space shortcut is only meaningful during a run; bind it lazily.
+    if (run) this.bindGauntletKeys();
     if (run) this.gauntletOverlay.update(run.survivors);
     else if (this.gauntletOverlay.shown) this.gauntletOverlay.hide();
+  }
+
+  // Fire an on-beat pull: the beat index is derived from the estimated sim time and
+  // the wire's beat anchor, exactly as the sim re-derives it. The server validates
+  // the claim against the live trial, so a stale send after a phase flip drops.
+  private gauntletPullNow(): void {
+    const run = this.sim.gauntletRun;
+    if (!run?.pull) return;
+    const time = this.gauntletTimeNow();
+    const beat = Math.round((time - run.pull.beatAnchor) / run.pull.beatPeriodS);
+    this.sim.gauntletPull(beat);
+    triggerHaptic(10, loadHapticsEnabled());
+  }
+
+  // Throw a shove, gated client-side on the shove cooldown so a spammed button (or
+  // the Space shortcut) does not flood the server with rejected sends.
+  private gauntletShoveNow(): void {
+    const run = this.sim.gauntletRun;
+    if (!run?.court) return;
+    if (this.gauntletTimeNow() < run.court.shoveReadyAt) return;
+    this.sim.gauntletCourt();
+    triggerHaptic(14, loadHapticsEnabled());
+  }
+
+  // Capture-phase Space handler for the pull/court trials: Space fires the pull or
+  // the shove and is swallowed so it never doubles as jump. When neither trial is
+  // live it does nothing, so jump is untouched everywhere else. Bound once (idempotent).
+  private gauntletKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+  private bindGauntletKeys(): void {
+    if (this.gauntletKeyHandler) return;
+    const handler = (e: KeyboardEvent): void => {
+      if (e.code !== 'Space' || e.repeat) return;
+      const run = this.sim.gauntletRun;
+      if (run?.pull) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.gauntletPullNow();
+      } else if (run?.court) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.gauntletShoveNow();
+      }
+    };
+    this.gauntletKeyHandler = handler;
+    window.addEventListener('keydown', handler, true); // capture: beats game input
   }
 
   // The viewer's run while they are a LIVE contestant (staging through podium,
@@ -15653,7 +15768,10 @@ export class Hud {
       this.optionsOpen ||
       this.emoteWheelOpen ||
       $('#emote-editor').style.display === 'block' ||
-      this.cardModalEl !== null
+      this.cardModalEl !== null ||
+      // The sigils trace is a pointer-drag minigame: suspend movement + game keys
+      // so WASD/abilities cannot fight the trace while the panel is up.
+      this.gauntletSigils.isOpen
     );
   }
 

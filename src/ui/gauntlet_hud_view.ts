@@ -45,6 +45,24 @@ export interface GauntletHudModel {
   /** The sentinel light during the red-light/green-light trial, else null. */
   light: 'green' | 'red' | null;
   showLight: boolean;
+  /** The Great Pull tug-of-war meter during the pull trial, else null. */
+  pull: {
+    /** Rope position, -1..1; positive means the viewer's side is winning. */
+    tugFrac: number;
+    /** The metronome sweep, 0..1 across the current beat period. */
+    beatPhase: number;
+    /** Convenience flag (tugFrac > 0) for the winning/losing color toggle. */
+    winning: boolean;
+  } | null;
+  /** The Final Court shove prompt during the court trial, else null. */
+  court: {
+    /** True while the viewer holds the attacker role this swap window. */
+    attacker: boolean;
+    /** The shove is off cooldown (time >= shoveReadyAt). */
+    shoveReady: boolean;
+    /** Remaining cooldown as a 0..1 fraction (0 when ready), for the fill. */
+    cooldownFrac: number;
+  } | null;
   /** The viewer was knocked out and is watching. */
   spectating: boolean;
   /** The viewer crossed the finish line this trial. */
@@ -75,12 +93,18 @@ const HIDDEN: GauntletHudModel = {
   prizePool: 0,
   light: null,
   showLight: false,
+  pull: null,
+  court: null,
   spectating: false,
   finished: false,
   podium: null,
 };
 
 const clamp01 = (n: number): number => (n < 0 ? 0 : n > 1 ? 1 : n);
+const clampSigned = (n: number): number => (n < -1 ? -1 : n > 1 ? 1 : n);
+// Positive modulo so a beat sweep stays in [0, period) even if the estimated sim
+// time briefly reads just before the beat anchor.
+const posMod = (a: number, b: number): number => ((a % b) + b) % b;
 
 // The nominal length (seconds) of the run's current phase, the denominator for the
 // cosmetic countdown-bar fill. Trial phases use the current trial's tuning duration.
@@ -97,9 +121,21 @@ export function gauntletPhaseWindowSeconds(run: GauntletRunView): number {
     case 'podium':
       return GAUNTLET.podiumS;
     case 'trial':
-      // Only 'sentinel' ships today; later trials switch on
-      // GAUNTLET.trials[run.trialIndex] and read their own tuning blocks.
-      return GAUNTLET.sentinel.durationS;
+      // Each game's own clock is the denominator.
+      switch (GAUNTLET.trials[run.trialIndex]) {
+        case 'sigils':
+          return GAUNTLET.sigils.durationS;
+        case 'pull':
+          return GAUNTLET.pull.durationS;
+        case 'wager':
+          return GAUNTLET.wager.durationS;
+        case 'span':
+          return GAUNTLET.span.durationS;
+        case 'court':
+          return GAUNTLET.court.durationS;
+        default:
+          return GAUNTLET.sentinel.durationS;
+      }
     default:
       return 0;
   }
@@ -112,6 +148,32 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
   const remaining = Math.max(0, run.endsAt - time);
   const window = gauntletPhaseWindowSeconds(run);
   const vitalityFrac = clamp01(run.vitalityMax > 0 ? run.vitality / run.vitalityMax : 0);
+  const pull = run.pull
+    ? {
+        tugFrac:
+          run.pull.winThreshold > 0 ? clampSigned(run.pull.marker / run.pull.winThreshold) : 0,
+        // Center the on-beat instant (phase 0.5): the sweeping cursor crosses the
+        // middle target band exactly on each beat, so "press on center" == "press on
+        // beat". Half a period is added before the modulo to shift the wrap edge off
+        // the beat and onto the between-beats trough.
+        beatPhase:
+          run.pull.beatPeriodS > 0
+            ? posMod(time - run.pull.beatAnchor + run.pull.beatPeriodS / 2, run.pull.beatPeriodS) /
+              run.pull.beatPeriodS
+            : 0,
+        winning: run.pull.marker > 0,
+      }
+    : null;
+  const court = run.court
+    ? {
+        attacker: run.court.attacker,
+        shoveReady: time >= run.court.shoveReadyAt,
+        cooldownFrac:
+          GAUNTLET.court.shoveCooldownS > 0
+            ? clamp01(Math.max(0, run.court.shoveReadyAt - time) / GAUNTLET.court.shoveCooldownS)
+            : 0,
+      }
+    : null;
   return {
     visible: true,
     phase: run.phase,
@@ -128,6 +190,8 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
     prizePool: run.prizePool,
     light: run.sentinel ? run.sentinel.light : null,
     showLight: run.sentinel !== null,
+    pull,
+    court,
     spectating: run.spectating,
     finished: run.finished,
     podium: run.podium,

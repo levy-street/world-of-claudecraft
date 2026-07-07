@@ -4584,4 +4584,25 @@
     min-height: 40px;
     box-sizing: border-box;
   }
+  /* Trial input controls: keep every tap target >= 44px on touch. */
+  body.mobile-touch .gh-pull-btn,
+  body.mobile-touch .gh-court-btn {
+    min-height: 48px;
+  }
+  body.mobile-touch .gh-court-btn {
+    min-width: 130px;
+  }
+  body.mobile-touch #gauntlet-wager {
+    width: min(320px, 92vw);
+  }
+  body.mobile-touch #gauntlet-wager .gw-digit {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  body.mobile-touch #gauntlet-wager .gw-guess-row .btn {
+    min-height: 48px;
+  }
+  body.mobile-touch #gauntlet-sigils .gs-canvas {
+    width: min(300px, 82vw);
+  }
 }
