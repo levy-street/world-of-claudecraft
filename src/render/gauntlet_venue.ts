@@ -618,6 +618,79 @@ function buildSpectatorDeck(group: THREE.Group) {
   placeProp(group, 'torchLit', x, 0, z + 10.4, 0, 2.2);
 }
 
+// The colosseum shell: a low-poly elliptical stadium wall around the whole
+// venue complex, built from the GAUNTLET_VENUE.colosseum numbers that
+// venue_physics also derives its wall colliders from. Deliberately cheap:
+// flat-shaded boxes and 6-sided pilasters, alternating parapet heights and a
+// dark inner arcade band for the silhouette, no shadow casting (the ring sits
+// far from every play surface), everything matrix-frozen after build.
+function buildColosseum(group: THREE.Group) {
+  const C = GAUNTLET_VENUE.colosseum;
+  const wallMat = stoneMat(STONE);
+  const tierMat = stoneMat(SAND_EDGE);
+  const darkMat = stoneMat(STONE_DARK);
+  const point = (a: number, inset: number) => ({
+    x: C.x + Math.sin(a) * (C.rx - inset),
+    z: C.z + Math.cos(a) * (C.rz - inset),
+  });
+  const add = (
+    geo: THREE.BoxGeometry,
+    x: number,
+    y: number,
+    z: number,
+    rotY: number,
+    mat: THREE.Material,
+  ) => {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(x, y, z);
+    m.rotation.y = rotY;
+    m.receiveShadow = true;
+    group.add(m);
+  };
+  // One shared 6-sided pilaster profile (geometry.dispose is idempotent, so
+  // the venue teardown's per-mesh sweep stays correct).
+  const pilasterGeo = new THREE.CylinderGeometry(0.6, 0.75, 14.6, 6);
+  for (let i = 0; i < C.segments; i++) {
+    const a0 = (i / C.segments) * Math.PI * 2;
+    const a1 = ((i + 1) / C.segments) * Math.PI * 2;
+    const p0 = point(a0, 0);
+    const p1 = point(a1, 0);
+    const mid = { x: (p0.x + p1.x) / 2, z: (p0.z + p1.z) / 2 };
+    const chord = Math.hypot(p1.x - p0.x, p1.z - p0.z);
+    // Yaw that lays the box's local x along the chord (three.js rotation.y
+    // maps local +x to (cos r, -sin r) in the xz plane).
+    const rot = Math.atan2(-(p1.z - p0.z), p1.x - p0.x);
+    // The main wall, parapet heights alternating for a worked silhouette.
+    const h = i % 2 === 0 ? 12.4 : 11.2;
+    add(new THREE.BoxGeometry(chord + 0.6, h, C.wallDepth), mid.x, h / 2, mid.z, rot, wallMat);
+    // The dark arcade band on the inner face (reads as the arch row).
+    const inw = Math.hypot(C.x - mid.x, C.z - mid.z);
+    const nx = (C.x - mid.x) / inw;
+    const nz = (C.z - mid.z) / inw;
+    const off = C.wallDepth / 2 + 0.06;
+    add(
+      new THREE.BoxGeometry(chord * 0.44, 6.8, 0.4),
+      mid.x + nx * off,
+      3.9,
+      mid.z + nz * off,
+      rot,
+      darkMat,
+    );
+    // The recessed upper tier ring.
+    const q0 = point(a0, 2.6);
+    const q1 = point(a1, 2.6);
+    const qm = { x: (q0.x + q1.x) / 2, z: (q0.z + q1.z) / 2 };
+    const qc = Math.hypot(q1.x - q0.x, q1.z - q0.z);
+    const qr = Math.atan2(-(q1.z - q0.z), q1.x - q0.x);
+    add(new THREE.BoxGeometry(qc + 0.4, 3.2, C.wallDepth * 0.75), qm.x, h + 1.4, qm.z, qr, tierMat);
+    // A pilaster at each segment seam.
+    const pil = new THREE.Mesh(pilasterGeo, darkMat);
+    pil.position.set(p0.x, 7.3, p0.z);
+    pil.receiveShadow = true;
+    group.add(pil);
+  }
+}
+
 // Stages 2 through 6: the five trial arenas. The span and the sigil pavilion
 // return live rigs (span panels tint with the shared reveals; the sigil slab
 // carries the etched outline the player traces); the rest is static dressing.
@@ -1332,6 +1405,7 @@ export async function buildGauntletVenue(
   buildStaging(group);
   buildPodium(group, rig.lampMat);
   buildSpectatorDeck(group);
+  buildColosseum(group);
   const { spanRig, sigilRig, pullRig, echoRig } = buildTrialArenas(group, ox, oz);
   scene.add(group);
   // The venue never moves after build: freeze the whole subtree's matrices

@@ -531,6 +531,25 @@ describe('venue layout envelope', () => {
     expect(V.standX).toBeGreaterThan(GAUNTLET.sentinel.fieldHalfWidth + 4);
     expect(GAUNTLET_LAYOUT.spectatorZ - 12).toBeGreaterThan(V.standZMin);
     expect(GAUNTLET_LAYOUT.spectatorZ + 12).toBeLessThan(V.standZMax);
+    // The colosseum shell ring fits inside the apron and encloses every arena
+    // anchor (so no trial pokes through the stadium wall).
+    const K = V.colosseum;
+    expect(Math.abs(K.x) + K.rx + K.wallDepth).toBeLessThanOrEqual(V.groundHalfWidth);
+    expect(K.z - K.rz - K.wallDepth).toBeGreaterThanOrEqual(V.groundZMin);
+    expect(K.z + K.rz + K.wallDepth).toBeLessThanOrEqual(V.groundZMax);
+    const insideRing = (x: number, z: number, pad: number) => {
+      const d = ((x - K.x) / (K.rx - pad)) ** 2 + ((z - K.z) / (K.rz - pad)) ** 2;
+      expect(d).toBeLessThan(1);
+    };
+    insideRing(V.sigils.x, V.sigils.z, V.sigils.radius + 2);
+    insideRing(V.pull.x, V.pull.z, Math.max(V.pull.length, V.pull.width) / 2 + 2);
+    insideRing(V.echo.x, V.echo.z, V.echo.size / 2 + 2);
+    insideRing(V.span.x, V.span.z, 8);
+    insideRing(V.span.x, V.span.z - V.span.length / 2, 4);
+    insideRing(V.span.x, V.span.z + V.span.length / 2, 4);
+    insideRing(V.court.x, V.court.z, V.court.radius + 2);
+    insideRing(0, GAUNTLET.sentinel.fieldLength + GAUNTLET_LAYOUT.watcherMargin + 4, 4);
+    insideRing(0, GAUNTLET_LAYOUT.podiumZ - 8, 4);
   });
 });
 
@@ -843,6 +862,11 @@ describe('venue physics: walk ON the platforms, never INSIDE the solids', () => 
     expect(isBlocked(SEED, o.x + S.x, o.z + S.z, 0.5)).toBe(true); // the lectern itself
     expect(isBlocked(SEED, o.x, o.z + 30, 0.5)).toBe(false); // mid-field, clear
     expect(isBlocked(SEED, o.x + S.x + 1.8, o.z + S.z, 0.5)).toBe(false); // the etcher's mark
+    // The colosseum shell is solid: its wall blocks at a segment seam point
+    // (the north pole of the ring ellipse), and the sand just inside is clear.
+    const K = GAUNTLET_VENUE.colosseum;
+    expect(isBlocked(SEED, o.x + K.x, o.z + K.z + K.rz, 0.5)).toBe(true);
+    expect(isBlocked(SEED, o.x + K.x, o.z + K.z + K.rz - 6, 0.5)).toBe(false);
   });
 
   it('a seated etcher stands ON the dais, not inside it', () => {

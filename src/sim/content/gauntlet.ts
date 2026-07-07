@@ -212,6 +212,12 @@ export const GAUNTLET_VENUE = {
   standX: 27, // inner edge of each grandstand (mirrored at -standX)
   standZMin: 14,
   standZMax: 76,
+  // The colosseum shell: a low-poly elliptical stadium wall enclosing the
+  // whole complex (yards, instance-local center + radii). The renderer builds
+  // the tiered ring from these numbers and venue_physics derives one wall
+  // collider per segment, so the shell is solid where it is visible. Radii
+  // sized to clear every arena and stay inside the ground apron.
+  colosseum: { x: -35, z: 45, rx: 118, rz: 108, segments: 30, wallDepth: 2.8 },
   // The venue ground apron: the flat dressed footprint around everything,
   // wide enough that every arena sits clear of its neighbors (playtest: the
   // packed first layout read as one overlapping jumble) and that the

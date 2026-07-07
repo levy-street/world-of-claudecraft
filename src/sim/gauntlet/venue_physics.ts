@@ -162,6 +162,24 @@ export function gauntletVenueColliders(): Collider[] {
   }
   out.push(circle(C.x, cz0 - 2, 0.2));
 
+  // The colosseum shell: one OBB per wall segment, the same chord layout the
+  // renderer builds its ring from (the pilasters and the recessed upper tier
+  // sit within the wall's footprint and need no colliders of their own).
+  const K = V.colosseum;
+  for (let i = 0; i < K.segments; i++) {
+    const a0 = (i / K.segments) * Math.PI * 2;
+    const a1 = ((i + 1) / K.segments) * Math.PI * 2;
+    const x0 = K.x + Math.sin(a0) * K.rx;
+    const z0 = K.z + Math.cos(a0) * K.rz;
+    const x1 = K.x + Math.sin(a1) * K.rx;
+    const z1 = K.z + Math.cos(a1) * K.rz;
+    // Yaw laying the OBB's local x along the chord (three.js rotation.y
+    // convention, matching the render mesh exactly).
+    const rot = Math.atan2(-(z1 - z0), x1 - x0);
+    const chord = Math.hypot(x1 - x0, z1 - z0);
+    out.push(obb((x0 + x1) / 2, (z0 + z1) / 2, chord / 2 + 0.3, K.wallDepth / 2, rot));
+  }
+
   cache = out;
   return out;
 }
