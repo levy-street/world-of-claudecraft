@@ -7973,7 +7973,7 @@ export const it_IT: EnTranslations = {
         "name": "Tenuta da battaglia Bonewrought",
         "bonus2": "Aumenta la potenza d'attacco di 40.",
         "bonus3": "Aumenta la forza di 15, la vigoria di 15 e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "Your weapon critical strikes have a 50% chance to shield you with Marrowguard, absorbing 150 damage for 10 sec."
+        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Tenuta da battaglia di Barrowlord",
@@ -7995,7 +7995,7 @@ export const it_IT: EnTranslations = {
         "name": "Tenuta di cuoio Direfang",
         "bonus2": "Aumenta la potenza d'attacco di 40.",
         "bonus3": "Aumenta l'agilità di 15, la probabilità di critico del 2% e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "Your weapon critical strikes have a 35% chance to grant Bared Fangs, making your next attack a critical strike."
+        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Paramenti Wraithfire",

@@ -7973,7 +7973,7 @@ export const de_DE: EnTranslations = {
         "name": "Bonewrought-Kriegstracht",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus3": "Erhöht Stärke um 15, Ausdauer um 15 sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Your weapon critical strikes have a 50% chance to shield you with Marrowguard, absorbing 150 damage for 10 sec."
+        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Barrowlord-Kriegstracht",
@@ -7995,7 +7995,7 @@ export const de_DE: EnTranslations = {
         "name": "Direfang-Pelz",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus3": "Erhöht Beweglichkeit um 15, kritische Trefferchance um 2% sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Your weapon critical strikes have a 35% chance to grant Bared Fangs, making your next attack a critical strike."
+        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire-Gewänder",

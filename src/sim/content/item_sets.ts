@@ -131,19 +131,25 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 4,
     effect: {
+      // Every weapon crit applies/stacks the bleed (no roll, no icd): with a
+      // sustained crit every 8 to 12s the bleed sits at 1 to 2 stacks, peaking
+      // at 3 (24 damage per 2s), roughly the 2-piece's flat 40 AP in
+      // sustained damage while rewarding crit stacking.
       proc: {
-        id: 'set_marrowguard',
-        name: 'Marrowguard',
+        id: 'set_bonesplinter',
+        name: 'Bonesplinter',
         trigger: 'weaponCrit',
-        chance: 0.5,
-        // absorb value is the shield pool consumed by incoming damage
-        aura: 'absorb',
-        value: 150,
-        duration: 10,
-        icd: 20,
+        chance: 1,
+        applyTo: 'target',
+        aura: 'dot',
+        value: 8, // per tick, per stack
+        tickInterval: 2,
+        duration: 12,
+        maxStacks: 3,
+        school: 'physical',
       },
     },
-    text: 'Your weapon critical strikes have a 50% chance to shield you with Marrowguard, absorbing 150 damage for 10 sec.',
+    text: 'Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const AGILITY_T2_BONUSES: SetBonusTier[] = [
@@ -156,17 +162,24 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 4,
     effect: {
+      // Leather crits land more often (the 3-piece adds crit AND haste), so
+      // its bleed ticks lighter than the plate one: more applications, same
+      // sustained value, peaking at 18 damage per 2s at 3 stacks.
       proc: {
-        id: 'set_bared_fangs',
-        name: 'Bared Fangs',
+        id: 'set_ragged_gash',
+        name: 'Ragged Gash',
         trigger: 'weaponCrit',
-        chance: 0.35,
-        aura: 'next_attack_crit',
-        duration: 10,
-        icd: 20,
+        chance: 1,
+        applyTo: 'target',
+        aura: 'dot',
+        value: 6, // per tick, per stack
+        tickInterval: 2,
+        duration: 12,
+        maxStacks: 3,
+        school: 'physical',
       },
     },
-    text: 'Your weapon critical strikes have a 35% chance to grant Bared Fangs, making your next attack a critical strike.',
+    text: 'Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const CASTER_T2_BONUSES: SetBonusTier[] = [

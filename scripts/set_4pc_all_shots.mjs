@@ -6,7 +6,9 @@
 //
 // Shots:
 //   set-4pc-barrowlord-ingame.png   warrior, 4 Barrowlord pieces -> Gravemight (4) line
-//   set-4pc-direfang-ingame.png     hunter, 4 Direfang pieces -> Bared Fangs (4) line
+//   set-4pc-direfang-ingame.png     hunter, 4 Direfang pieces -> Ragged Gash (4) line
+//   own-aura-target-strip.png       the target strip leading with the player's own
+//                                   (enlarged, gold-glowed) bleed among the mob's auras
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 
@@ -233,6 +235,60 @@ async function shotSlotTooltip(page, slot, file) {
   console.log('char opened:', await openChar(page));
   await shotSlotTooltip(page, 'gloves', 'set-4pc-direfang-ingame.png');
   await closeChar(page);
+  await page.close();
+}
+
+// ---- Shot 3: the target strip with the player's own bleed enlarged + first ----
+{
+  const page = await boot('warrior', 'Critgar');
+  await equip(page, [
+    'crownforged_gauntlets',
+    'crownforged_girdle',
+    'crownforged_dreadhelm',
+    'crownforged_warspaulders',
+  ]);
+  await wait(400);
+  // Spawn a tough wolf next to the player, target it, crit it (guaranteed) so the
+  // Bonesplinter bleed applies and the strip leads with the enlarged own aura.
+  const applied = await page.evaluate(() => {
+    const g = window.__game;
+    const sim = g.sim;
+    const p = sim.player;
+    p.gm = true;
+    p.critChance = 1;
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead);
+    if (!mob) return { ok: false };
+    mob.pos = { x: p.pos.x + 2, y: p.pos.y, z: p.pos.z };
+    mob.prevPos = { ...mob.pos };
+    mob.maxHp = 100000;
+    mob.hp = 100000;
+    sim.targetEntity(mob.id, p.id);
+    p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
+    for (let i = 0; i < 6; i++) sim.meleeSwing(p, mob, 0, null, {});
+    return { ok: true, bleed: mob.auras.some((a) => a.id === 'set_bonesplinter') };
+  });
+  console.log('own-aura scene ->', JSON.stringify(applied));
+  await wait(800); // let the HUD paint the strip
+  // The aura strip renders below the frame body, so extend the clip past the
+  // frame rect instead of shooting the (strip-less) element box.
+  const frameBox = await page.evaluate(() => {
+    const el = document.querySelector('#target-frame');
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { x: r.x, y: r.y, width: r.width, height: r.height };
+  });
+  if (frameBox) {
+    await page.screenshot({
+      path: `${OUT}/own-aura-target-strip.png`,
+      clip: {
+        x: Math.max(0, frameBox.x - 8),
+        y: Math.max(0, frameBox.y - 8),
+        width: frameBox.width + 16,
+        height: frameBox.height + 96, // room for the aura strip below the frame
+      },
+    });
+    console.log('wrote own-aura-target-strip.png (extended clip)');
+  }
   await page.close();
 }
 

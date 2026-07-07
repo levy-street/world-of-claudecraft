@@ -7973,7 +7973,7 @@ export const pl_PL: EnTranslations = {
         "name": "Regalia Bonewrought",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus3": "Zwiększa siłę o 15, wytrzymałość o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Your weapon critical strikes have a 50% chance to shield you with Marrowguard, absorbing 150 damage for 10 sec."
+        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Rynsztunek bojowy Barrowlorda",
@@ -7995,7 +7995,7 @@ export const pl_PL: EnTranslations = {
         "name": "Skóra Direfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus3": "Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Your weapon critical strikes have a 35% chance to grant Bared Fangs, making your next attack a critical strike."
+        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",

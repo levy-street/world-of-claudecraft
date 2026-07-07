@@ -7973,7 +7973,7 @@ export const tr_TR: EnTranslations = {
         "name": "Bonewrought Kıyafetleri",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus3": "Gücü 15, dayanıklılığı 15, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Your weapon critical strikes have a 50% chance to shield you with Marrowguard, absorbing 150 damage for 10 sec."
+        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Barrowlord Savaş Takımı",
@@ -7995,7 +7995,7 @@ export const tr_TR: EnTranslations = {
         "name": "Direfang Postu",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus3": "Çevikliği 15, kritik şansını %2, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Your weapon critical strikes have a 35% chance to grant Bared Fangs, making your next attack a critical strike."
+        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire Kıyafetleri",

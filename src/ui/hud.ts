@@ -3065,6 +3065,9 @@ export class Hud {
       // shared container is returned unrefreshed.
       durationUnits: () => this.auraDurationUnits,
       auraEffectHtml: () => '',
+      // The party rows' wire summaries carry no sourceId and the mini strips are
+      // not ownFirst views, so nothing here is ever "own".
+      isOwn: () => false,
     },
     painter: {
       resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
@@ -3117,6 +3120,10 @@ export class Hud {
       return u;
     },
     auraEffectHtml: (a) => this.auraEffectTooltipHtml(a),
+    // Own-aura check for the target strip's ownFirst prominence: a missing/zero
+    // sourceId (an old server's mirror) is never own, so the strip degrades to
+    // the un-prioritized layout instead of misattributing another caster's dot.
+    isOwn: (a) => a.sourceId !== undefined && a.sourceId !== 0 && a.sourceId === this.sim.playerId,
   };
   private readonly aurasPainterDeps: AurasPainterDeps = {
     resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
@@ -3132,7 +3139,13 @@ export class Hud {
   // target's buffs (the shield you just cast on an ally) alongside its debuffs, and
   // an enemy's buffs (a mob's frenzy) alongside the DoTs you keep on it. The element
   // keeps its historical #tf-debuffs id; only the view mode widened.
-  private readonly targetDebuffsView = createAurasView('all', this.aurasViewDeps);
+  // ownFirst: YOUR dots/hots on the target lead the strip and render larger (the
+  // painter's `own` class), so what you are maintaining reads at a glance among
+  // other casters' auras. Extra prominence only, never less information, so every
+  // graphics tier keeps it (gameplay-neutral-graphics invariant).
+  private readonly targetDebuffsView = createAurasView('all', this.aurasViewDeps, {
+    ownFirst: true,
+  });
   // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
   // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
   // the shared deps (no cancel: a debuff or another entity's aura is never cancelable).

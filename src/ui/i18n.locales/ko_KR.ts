@@ -5134,7 +5134,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus3':
     '힘이 15, 체력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.crownforged.bonus4':
-    '무기 치명타 적중 시 50% 확률로 "골수 수호"가 발동하여 피해를 150만큼 흡수합니다. 10초 동안 지속됩니다.',
+    '무기 치명타 적중 시 대상에게 "뼈 파편"을 남겨 12초 동안 2초마다 8의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다.',
   'entities.itemSets.deathlord.name': '고분군주의 전투장비',
   'entities.itemSets.deathlord.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.deathlord.bonus3': '힘이 15, 체력이 15만큼 증가합니다.',
@@ -5152,7 +5152,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus3':
     '민첩이 15, 치명타 확률이 2% 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.nighttalon.bonus4':
-    '무기 치명타 적중 시 35% 확률로 "드러낸 송곳니"가 발동하여 다음 공격이 반드시 치명타로 적중합니다.',
+    '무기 치명타 적중 시 "찢어진 상처"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다.',
   'entities.itemSets.soulflame.name': '망령불꽃 의복',
   'entities.itemSets.soulflame.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
   'entities.itemSets.soulflame.bonus3':

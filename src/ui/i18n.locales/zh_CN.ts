@@ -4869,7 +4869,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus3':
     '力量提高 15 点，耐力提高 15 点，攻击速度和施法速度提高 15%。',
   'entities.itemSets.crownforged.bonus4':
-    '你的武器致命一击有 50% 的几率为你套上“骨髓守护”，吸收 150 点伤害，持续 10 秒。',
+    '你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 8 点伤害，持续 12 秒。最多叠加 3 层。',
   'entities.itemSets.deathlord.name': '冢主战甲',
   'entities.itemSets.deathlord.bonus2': '攻击强度提高 40 点。',
   'entities.itemSets.deathlord.bonus3': '力量提高 15 点，耐力提高 15 点。',
@@ -4887,7 +4887,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus3':
     '敏捷提高 15 点，致命一击几率提高 2%，攻击速度和施法速度提高 15%。',
   'entities.itemSets.nighttalon.bonus4':
-    '你的武器致命一击有 35% 的几率触发“獠牙毕露”，使你的下一次攻击必定造成致命一击。',
+    '你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 6 点伤害，持续 12 秒。最多叠加 3 层。',
   'entities.itemSets.soulflame.name': '魂焰法衣',
   'entities.itemSets.soulflame.bonus2': '你不会被击退（击退抗性 100%）。',
   'entities.itemSets.soulflame.bonus3':

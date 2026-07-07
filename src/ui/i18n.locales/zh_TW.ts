@@ -4870,7 +4870,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus3':
     '力量提高 15 點，耐力提高 15 點，攻擊速度和施法速度提高 15%。',
   'entities.itemSets.crownforged.bonus4':
-    '你的武器致命一擊有 50% 的機率為你套上「骨髓守護」，吸收 150 點傷害，持續 10 秒。',
+    '你的武器致命一擊會使目標產生「骨刺」，每 2 秒流血 8 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.deathlord.name': '塚陵領主戰鬥護甲',
   'entities.itemSets.deathlord.bonus2': '攻擊強度提高 40 點。',
   'entities.itemSets.deathlord.bonus3': '力量提高 15 點，耐力提高 15 點。',
@@ -4888,7 +4888,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus3':
     '敏捷提高 15 點，致命一擊機率提高 2%，攻擊速度和施法速度提高 15%。',
   'entities.itemSets.nighttalon.bonus4':
-    '你的武器致命一擊有 35% 的機率觸發「獠牙畢露」，使你的下一次攻擊必定造成致命一擊。',
+    '你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 6 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.soulflame.name': '怨焰法衣',
   'entities.itemSets.soulflame.bonus2': '你不會被擊退（擊退抗性 100%）。',
   'entities.itemSets.soulflame.bonus3':

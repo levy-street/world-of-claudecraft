@@ -29,8 +29,8 @@ const EPIC_4PC: Array<{ setId: string; procId: string; trigger: SetProc['trigger
   { setId: SET_DEATHLORD, procId: 'set_gravemight', trigger: 'weaponCrit' },
   { setId: SET_WYRMSHADOW, procId: 'set_fangrush', trigger: 'weaponCrit' },
   { setId: SET_NECROMANCERS, procId: 'set_clearcasting', trigger: 'spellCast' },
-  { setId: SET_CROWNFORGED, procId: 'set_marrowguard', trigger: 'weaponCrit' },
-  { setId: SET_NIGHTTALON, procId: 'set_bared_fangs', trigger: 'weaponCrit' },
+  { setId: SET_CROWNFORGED, procId: 'set_bonesplinter', trigger: 'weaponCrit' },
+  { setId: SET_NIGHTTALON, procId: 'set_ragged_gash', trigger: 'weaponCrit' },
   { setId: SET_SOULFLAME, procId: 'set_soulblaze', trigger: 'spellCast' },
   { setId: SET_STORMCALLERS, procId: 'set_soulblaze', trigger: 'spellCast' },
 ];
@@ -88,14 +88,19 @@ describe('every epic family has a reachable 4-piece proc', () => {
     }
   });
 
-  it('every 4-piece tier text states the real proc chance', () => {
+  it('every chance-gated 4-piece tier text states the real proc chance', () => {
     for (const set of Object.values(ITEM_SETS)) {
       for (const tier of set.bonuses) {
         const proc = tier.effect.proc;
         if (!proc) continue;
-        expect(tier.text, `${set.id} ${proc.id}`).toContain(
-          `${Math.round(proc.chance * 100)}% chance`,
-        );
+        if (proc.chance >= 1) {
+          // guaranteed procs (the bleeds) describe an unconditional effect
+          expect(tier.text, `${set.id} ${proc.id}`).not.toContain('% chance');
+        } else {
+          expect(tier.text, `${set.id} ${proc.id}`).toContain(
+            `${Math.round(proc.chance * 100)}% chance`,
+          );
+        }
       }
     }
   });
@@ -117,21 +122,57 @@ describe('weaponCrit set procs from real swings', () => {
     expect(p.attackPower).toBe(apBefore + 60); // applyAura re-ran recalcPlayerStats
   });
 
-  it('a ranged (Auto Shot) crit in 4-piece Direfang grants Bared Fangs', () => {
+  it('a ranged (Auto Shot) crit in 4-piece Direfang bleeds the target with Ragged Gash', () => {
     const sim = new Sim({ seed: 32, playerClass: 'hunter', autoEquip: false }) as AnySim;
     const p = equipSet(sim, direfangEquipment);
     const mob = spawnTarget(sim, p);
     p.gm = true; // the shot aggroes the wolf; keep the harness alive
     p.critChance = 1;
-    for (let i = 0; i < 200 && !p.auras.some((a) => a.id === 'set_bared_fangs'); i++) {
+    for (let i = 0; i < 40 && !mob.auras.some((a) => a.id === 'set_ragged_gash'); i++) {
       rangedSwing(sim.ctx, p, mob, { min: 10, max: 14, speed: 2.4 });
       // the shot resolves on projectile arrival, inside the tick loop's drain
-      for (let t = 0; t < 20 && !p.auras.some((a) => a.id === 'set_bared_fangs'); t++) sim.tick();
+      for (let t = 0; t < 20 && !mob.auras.some((a) => a.id === 'set_ragged_gash'); t++) sim.tick();
       mob.hp = mob.maxHp; // undo the shots so the target never dies mid-harness
       mob.dead = false;
     }
-    const aura = p.auras.find((a) => a.id === 'set_bared_fangs');
-    expect(aura?.kind).toBe('next_attack_crit');
+    const aura = mob.auras.find((a) => a.id === 'set_ragged_gash');
+    expect(aura?.kind).toBe('dot');
+    expect(aura?.value).toBe(6);
+    expect(aura?.school).toBe('physical');
+    expect(aura?.sourceId).toBe(p.id);
+  });
+
+  it('the Bonesplinter bleed stacks to its cap, scales, refreshes, and ticks', () => {
+    const sim = new Sim({ seed: 35, playerClass: 'warrior', autoEquip: false }) as AnySim;
+    const p = equipSet(sim, {
+      gloves: 'crownforged_gauntlets',
+      waist: 'crownforged_girdle',
+      helmet: 'crownforged_dreadhelm',
+      shoulder: 'crownforged_warspaulders',
+    });
+    const mob = spawnTarget(sim, p);
+    p.gm = true;
+    p.critChance = 1; // every connected swing crits and applies a stack
+    const bleed = () => mob.auras.find((a) => a.id === 'set_bonesplinter');
+    let guard = 0;
+    while ((bleed()?.stacks ?? 0) < 3 && guard++ < 60) {
+      meleeSwing(sim.ctx, p, mob, 0, null, {});
+    }
+    let aura = bleed();
+    expect(aura?.stacks).toBe(3);
+    expect(aura?.value).toBe(24); // 8 per tick per stack
+    // a further application holds the cap and refreshes the duration
+    aura!.remaining = 1;
+    while ((bleed()?.remaining ?? 0) <= 1 && guard++ < 120) {
+      meleeSwing(sim.ctx, p, mob, 0, null, {});
+    }
+    aura = bleed();
+    expect(aura?.stacks).toBe(3);
+    expect(aura?.remaining).toBe(12);
+    // and the dot actually ticks the mob for the stacked amount
+    const hpBefore = mob.hp;
+    for (let t = 0; t < 20 * 3; t++) sim.tick(); // 3 seconds >= one 2s tick
+    expect(mob.hp).toBeLessThanOrEqual(hpBefore - 24);
   });
 
   it('a non-crit swing never rolls the weaponCrit proc (no rng draw past the swing)', () => {
