@@ -3028,8 +3028,8 @@ export class ClientWorld implements IWorld {
   gauntletTrace(pts: number[]): void {
     this.cmd({ cmd: 'gauntlet_trace', pts });
   }
-  gauntletPull(beat: number): void {
-    this.cmd({ cmd: 'gauntlet_pull', beat });
+  gauntletPullCircle(id: number): void {
+    this.cmd({ cmd: 'gauntlet_pull_circle', id });
   }
   gauntletEcho(stone: number): void {
     this.cmd({ cmd: 'gauntlet_echo', stone });

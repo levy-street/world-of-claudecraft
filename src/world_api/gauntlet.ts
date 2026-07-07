@@ -23,8 +23,9 @@ export interface IWorldGauntlet {
   // stale send after a knockout or phase flip drops silently).
   // Sigils: a batch of quantized shape-local trace points, [x0,y0,x1,y1,...].
   gauntletTrace(pts: number[]): void;
-  // Pull: claim a beat index (derived client-side from the wire's anchor).
-  gauntletPull(beat: number): void;
+  // Pull: click the viewer's live shrinking circle by id (graded sim-side by
+  // the size at receipt; a stale id after a resolve drops silently).
+  gauntletPullCircle(id: number): void;
   // Echo: tap a rune stone (0..stones-1) during the answer window.
   gauntletEcho(stone: number): void;
   // Court: throw a shove (resolves in contact range, on cooldown).

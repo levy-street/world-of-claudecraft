@@ -8030,8 +8030,8 @@ export class Sim {
   gauntletTrace(pts: number[], pid?: number): void {
     gauntletMod.gauntletTrace(this.ctx, pid, pts);
   }
-  gauntletPull(beat: number, pid?: number): void {
-    gauntletMod.gauntletPull(this.ctx, pid, beat);
+  gauntletPullCircle(id: number, pid?: number): void {
+    gauntletMod.gauntletPullCircle(this.ctx, pid, id);
   }
   gauntletEcho(stone: number, pid?: number): void {
     gauntletMod.gauntletEcho(this.ctx, pid, stone);

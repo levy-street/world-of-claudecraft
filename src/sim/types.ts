@@ -2808,18 +2808,24 @@ export interface GauntletSigilsTuning {
   damageMax: number; // end-of-trial damage at zero progress
 }
 
-// Trial 3, The Great Pull: team tug of war on a sim-defined beat. Pulls claim
-// a beat index inside the accept window; grade scales the team's force.
+// Trial 3, The Great Pull: team tug of war played on shrinking circles. Each
+// player faces one circle at a time: it spawns after a rolled gap, shrinks at
+// a rolled speed, and a click is graded sim-side by how close the size is to
+// the target when it arrives; a circle that shrinks to nothing unclicked is a
+// miss. Sizes are ABSTRACT UNITS the client renders as CSS px 1:1.
 export interface GauntletPullTuning {
   durationS: number; // soft cap; the marker usually decides earlier
-  beatPeriodS: number;
-  acceptWindowS: number; // full window around a beat inside which a pull counts
-  perfectWindowS: number; // tighter window for the perfect grade
-  pullForce: number; // marker yards per on-beat player pull
-  perfectMult: number; // perfect-grade force multiplier
-  braceWindowS: number; // the opening brace: land a pull inside this or eat the yank
-  openingYank: number; // marker jolt against a team that missed its brace
-  npcForceMin: number; // per-beat per-team NPC force draw bounds
+  leadInS: number; // pause after the trial opens before the first circle and NPC heave
+  circleSpawnMinS: number; // gap bounds between a circle resolving and the next spawn
+  circleSpawnMaxS: number;
+  circleShrinkMinS: number; // full-shrink duration bounds (the per-circle "random speed")
+  circleShrinkMaxS: number;
+  circleStartSize: number; // spawn size (abstract units, rendered as px 1:1)
+  circleTargetSize: number; // click as close to this size as possible
+  pullForceMax: number; // marker yards for a click at exactly the target size
+  gradePower: number; // exponent sharpening the force falloff with size error
+  npcHeavePeriodS: number; // cadence of the per-team NPC field heave
+  npcForceMin: number; // per-heave per-team NPC force draw bounds
   npcForceMax: number;
   winThreshold: number; // |marker| that decides the pull
   lossDamage: number; // vitality damage dealt to every loser (big chunk, not death)
@@ -2906,15 +2912,25 @@ export interface GauntletRunView {
     coveredMask: number;
   } | null;
   pull: {
-    beatAnchor: number; // absolute sim time of beat 0; client derives the metronome
-    beatPeriodS: number;
     // ABSOLUTE marker, + = team 0 winning. Both teams stand ON the rope
     // (team 0 grips the -x half), so the venue translates the rope by
     // -marker/winThreshold * knotTravel and the sim drags the lines the same
     // way; the meter is the physical rope, not a viewer-relative bar.
     marker: number;
     winThreshold: number;
-    braceUntil: number;
+    // The viewer's live shrinking circle (the trial's input), or null for
+    // spectators. spawnAt is absolute; spawnAt + shrinkS fully determine the
+    // size curve client-side (startSize at spawnAt, 0 at spawnAt + shrinkS).
+    // Sizes are abstract units the client renders as CSS px 1:1; the screen
+    // POSITION is client-chosen (cosmetic, never scored). The member only
+    // changes when a circle resolves, so quiet ticks delta-elide.
+    circle: {
+      id: number;
+      spawnAt: number;
+      shrinkS: number;
+      startSize: number;
+      targetSize: number;
+    } | null;
   } | null;
   echo: {
     stones: number;

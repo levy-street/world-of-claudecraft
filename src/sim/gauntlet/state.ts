@@ -96,16 +96,23 @@ export interface GauntletSigilsState {
   players: Map<number, GauntletSigilsPlayer>;
 }
 
-// Trial 3: one shared rope (trial_pull.ts). Player pulls claim beat indexes.
+// Trial 3: one shared rope (trial_pull.ts). Each player pulls by clicking
+// their live shrinking circle; the id is the replay guard.
+export interface GauntletPullCircle {
+  id: number; // unique within the trial; a click names the id it grades
+  spawnAt: number; // absolute; between circles this sits in the future
+  shrinkS: number; // rolled seconds from startSize down to 0 (the random speed)
+}
 export interface GauntletPullState {
   kind: 'pull';
-  beatAnchor: number; // absolute sim time of beat 0
   marker: number; // + = team 0 (the players' side) winning
-  braceUntil: number;
-  braced: Set<number>; // pids that landed the opening brace
-  claimed: Map<number, number>; // pid -> highest beat index already consumed
+  heaveAnchor: number; // absolute sim time of NPC heave index 0
   teamOf: Map<number, 0 | 1>; // pid -> team (solo runs put every player on 0)
-  npcForce: [number, number]; // rolled per-beat NPC pull means per team
+  npcForce: [number, number]; // rolled per-heave NPC pull means per team
+  // The per-player circle schedule: one live circle per pid, re-dealt from
+  // run.rng the moment the previous one resolves (click or expiry).
+  circles: Map<number, GauntletPullCircle>;
+  nextCircleId: number;
   // Every gripping contestant's base spot on the rope line (entity id ->
   // instance-local x/z); the whole line renders at base + the eased drag.
   gripBase: Map<number, { x: number; z: number }>;

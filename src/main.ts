@@ -2175,10 +2175,6 @@ async function startGame(
   };
 
   function handlePick(x: number, y: number, button: number): void {
-    // The Great Pull: while the trial is live for a live contestant, a left
-    // click anywhere on the canvas claims the current beat (the venue's drum
-    // is the metronome), pre-empting picking entirely.
-    if (button === 0 && hud.gauntletPullClick()) return;
     // The Keeper's Echo: clicks on the table's rune stones are the input;
     // anything off the stones falls through to the normal pick.
     if (button === 0 && hud.gauntletEchoClick(x, y)) return;

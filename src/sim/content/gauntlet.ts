@@ -324,13 +324,19 @@ export const GAUNTLET: GauntletDef = {
   },
   pull: {
     durationS: 75,
-    beatPeriodS: 1.1,
-    acceptWindowS: 0.36,
-    perfectWindowS: 0.14,
-    pullForce: 1.15,
-    perfectMult: 1.6,
-    braceWindowS: 2.2,
-    openingYank: 4.5,
+    leadInS: 2,
+    // A good player's cycle is spawn gap + the shrink down to the target
+    // (~0.6 of shrinkS), so clicks land roughly every 2s; pullForceMax is
+    // sized so clean timing out-pulls the NPC drift by a wide margin.
+    circleSpawnMinS: 0.4,
+    circleSpawnMaxS: 1.4,
+    circleShrinkMinS: 1.3,
+    circleShrinkMaxS: 2.8,
+    circleStartSize: 200,
+    circleTargetSize: 75,
+    pullForceMax: 2.2,
+    gradePower: 1.5,
+    npcHeavePeriodS: 1.1,
     npcForceMin: 0.7,
     npcForceMax: 1.05,
     winThreshold: 12,

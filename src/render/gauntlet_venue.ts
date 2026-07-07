@@ -660,8 +660,9 @@ interface SigilRig {
 // The Great Pull rig: the rope IS the meter. Both teams stand ON the rope
 // (the sim seats and drags them), so the whole hand-height rope translates
 // with the ABSOLUTE wire marker (+ = team 0 winning = hauled toward -x), the
-// judge's knot marking its center, and the beat drum by the pit pulses on the
-// sim metronome (a steady glow during the opening brace window).
+// judge's knot marking its center. The drum by the pit is dressing now (the
+// input is the screen-space shrinking circles): it thumps once as the
+// viewer's circle spawns.
 interface PullRig {
   knot: THREE.Group;
   rope: THREE.Mesh;
@@ -692,12 +693,8 @@ const ECHO_FLASH = 2.4;
 // flashes is what makes a repeated stone readable).
 const ECHO_FLASH_DUTY = 0.72;
 
-// The drum's flash length at each beat, seconds.
+// The drum's flash length as the viewer's circle spawns, seconds.
 const DRUM_FLASH_S = 0.12;
-
-// Positive modulo so the beat phase stays in [0, period) even if the render
-// clock briefly reads just before the beat anchor.
-const posMod = (a: number, b: number): number => ((a % b) + b) % b;
 
 // Outline tint granularity: the polyline is grouped into this many tube
 // segments, tinted gold per the wire's coveredMask bits (one bit per segment;
@@ -1436,8 +1433,8 @@ export async function buildGauntletVenue(
       // The Great Pull: ease the whole rope toward the wire marker's
       // translation (ABSOLUTE, + = team 0 winning = hauled toward -x; the sim
       // drags the gripping lines toward the same target, so hands stay on the
-      // rope); the drum pulses on the beat (steady glow through the brace
-      // window).
+      // rope); the drum is dressing, thumping once as the viewer's circle
+      // spawns (the input itself is the screen-space circle overlay).
       const pull = mine?.pull ?? null;
       if (pull || pullLayoutDue) {
         const frac = pull
@@ -1450,11 +1447,10 @@ export async function buildGauntletVenue(
         pullRig.knot.position.x = kx;
         pullRig.rope.position.x = kx;
         if (pull) {
-          const brace = t < pull.braceUntil;
-          const beatFrac = pull.beatPeriodS > 0 ? posMod(t - pull.beatAnchor, pull.beatPeriodS) : 1;
-          const flash = !brace && beatFrac < DRUM_FLASH_S;
+          const c = pull.circle;
+          const flash = c !== null && t >= c.spawnAt && t - c.spawnAt < DRUM_FLASH_S;
           pullRig.drum.scale.setScalar(flash ? 1.12 : 1);
-          pullRig.drumSkinMat.emissiveIntensity = brace ? 1.2 : flash ? 1.9 : 0.35;
+          pullRig.drumSkinMat.emissiveIntensity = flash ? 1.9 : 0.35;
         } else {
           pullRig.drum.scale.setScalar(1);
           pullRig.drumSkinMat.emissiveIntensity = 0.35;

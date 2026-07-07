@@ -11404,7 +11404,7 @@ export class Hud {
         this.renderer.spawnAoeRing(rival.pos.x, rival.pos.z, GAUNTLET.court.shoveRange, 'arcane');
     }
     this.gauntletShoveWasReady = shoveReady;
-    // The pull/court Space shortcut is only meaningful during a run; bind it lazily.
+    // The court Space shortcut is only meaningful during a run; bind it lazily.
     if (run) this.bindGauntletKeys();
     if (run) this.gauntletOverlay.update(run.survivors);
     else if (this.gauntletOverlay.shown) this.gauntletOverlay.hide();
@@ -11523,16 +11523,6 @@ export class Hud {
     this.worldAim = aim;
   }
 
-  /** main.ts handlePick pre-empt: during the pull trial a left click or tap
-   * ANYWHERE on the canvas IS the input (it claims the current beat; the drum
-   * in the venue is the metronome). Returns true when the click was consumed. */
-  gauntletPullClick(): boolean {
-    const run = this.gauntletContestantRun();
-    if (!run?.pull) return false;
-    this.gauntletPullNow();
-    return true;
-  }
-
   /** main.ts handlePick intercept: during the court trial, clicking the RIVAL
    * while the shove is ready IS the shove. A click during cooldown falls
    * through to normal targeting (the ground ring flash marks readiness). */
@@ -11558,18 +11548,6 @@ export class Hud {
     return true;
   }
 
-  // Fire an on-beat pull: the beat index is derived from the estimated sim time and
-  // the wire's beat anchor, exactly as the sim re-derives it. The server validates
-  // the claim against the live trial, so a stale send after a phase flip drops.
-  private gauntletPullNow(): void {
-    const run = this.sim.gauntletRun;
-    if (!run?.pull) return;
-    const time = this.gauntletTimeNow();
-    const beat = Math.round((time - run.pull.beatAnchor) / run.pull.beatPeriodS);
-    this.sim.gauntletPull(beat);
-    triggerHaptic(10, loadHapticsEnabled());
-  }
-
   // Throw a shove, gated client-side on the shove cooldown so a spammed button (or
   // the Space shortcut) does not flood the server with rejected sends.
   private gauntletShoveNow(): void {
@@ -11580,20 +11558,16 @@ export class Hud {
     triggerHaptic(14, loadHapticsEnabled());
   }
 
-  // Capture-phase Space handler for the pull/court trials: Space fires the pull or
-  // the shove and is swallowed so it never doubles as jump. When neither trial is
-  // live it does nothing, so jump is untouched everywhere else. Bound once (idempotent).
+  // Capture-phase Space handler for the court trial: Space fires the shove and
+  // is swallowed so it never doubles as jump. When the trial is not live it
+  // does nothing, so jump is untouched everywhere else. Bound once (idempotent).
   private gauntletKeyHandler: ((e: KeyboardEvent) => void) | null = null;
   private bindGauntletKeys(): void {
     if (this.gauntletKeyHandler) return;
     const handler = (e: KeyboardEvent): void => {
       if (e.code !== 'Space' || e.repeat) return;
       const run = this.sim.gauntletRun;
-      if (run?.pull) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        this.gauntletPullNow();
-      } else if (run?.court) {
+      if (run?.court) {
         e.preventDefault();
         e.stopImmediatePropagation();
         this.gauntletShoveNow();

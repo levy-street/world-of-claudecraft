@@ -1,9 +1,13 @@
-// Trial 3, The Great Pull: a team tug of war on a sim-defined beat. Two teams
-// share one rope; players heave by claiming beat indexes (gauntletPullBeat),
-// the surviving NPC field heaves for both sides on every beat, and the marker
-// decides the trial when it crosses winThreshold or the clock runs out. Every
-// draw is run.rng in a fixed order (per beat: team 0 then team 1), so the trial
-// never perturbs the shared world stream.
+// Trial 3, The Great Pull: a team tug of war played on shrinking circles.
+// Two teams share one rope; each player faces one circle at a time (spawned
+// after a rolled gap, shrinking at a rolled speed) and pulls by clicking it
+// (gauntletPullCircle): the closer the size is to the target when the click
+// arrives, the harder the pull, and a circle that shrinks to nothing unclicked
+// is a miss. The surviving NPC field heaves for both sides on a fixed cadence,
+// and the marker decides the trial when it crosses winThreshold or the clock
+// runs out. Every draw is run.rng in a fixed order (circle deals in
+// playerStates insertion order or at a click's arrival; NPC heaves team 0 then
+// team 1), so the trial never perturbs the shared world stream.
 //
 // Frozen contracts (do not edit here): GauntletPullTuning (types.ts, read as
 // GAUNTLET.pull), GauntletPullState (state.ts), the `pull` member of
@@ -77,8 +81,8 @@ export function startPull(ctx: SimContext, run: GauntletRun): GauntletPullState 
     for (const pid of livePids) teamOf.set(pid, 0);
   }
 
-  const beatAnchor = ctx.time + 2;
-  // The two per-team per-beat NPC pull means, drawn team 0 then team 1.
+  const heaveAnchor = ctx.time + GAUNTLET.pull.leadInS;
+  // The two per-team per-heave NPC pull means, drawn team 0 then team 1.
   const npcForce: [number, number] = [
     run.rng.range(GAUNTLET.pull.npcForceMin, GAUNTLET.pull.npcForceMax),
     run.rng.range(GAUNTLET.pull.npcForceMin, GAUNTLET.pull.npcForceMax),
@@ -86,51 +90,74 @@ export function startPull(ctx: SimContext, run: GauntletRun): GauntletPullState 
 
   const gripBase = seatRopeLine(ctx, run, teamOf);
 
-  return {
+  const trial: GauntletPullState = {
     kind: 'pull',
-    beatAnchor,
     marker: 0,
-    braceUntil: beatAnchor + GAUNTLET.pull.braceWindowS,
-    braced: new Set(),
-    claimed: new Map(),
+    heaveAnchor,
     teamOf,
     npcForce,
+    circles: new Map(),
+    nextCircleId: 0,
     gripBase,
     kx: 0,
     resolved: false,
     wonBy: null,
   };
+  // The opening circle deal, one per live player in playerStates insertion
+  // order (the fixed-order determinism contract), anchored past the lead-in
+  // so everyone has a beat to find the rope before the first circle appears.
+  for (const [pid, ps] of run.playerStates) {
+    if (ps.spectating || !teamOf.has(pid)) continue;
+    dealCircle(run, trial, pid, ctx.time + GAUNTLET.pull.leadInS);
+  }
+  return trial;
 }
 
-// A player claims beat index `beat` (derived client-side from beatAnchor +
-// beatPeriodS). The claim heaves the marker toward the puller's side when it
-// lands inside acceptWindowS/2 of the beat's true time, harder on a perfect
-// (perfectWindowS/2) hit. A claim landed before braceUntil also lands the
-// opening brace for that pid.
-export function gauntletPullBeat(
+// Deal the pid's next circle: a rolled gap after `at`, and a rolled
+// full-shrink duration (the circle's "random speed"). Two run.rng draws, so
+// call sites keep the fixed-order contract (playerStates iteration order in
+// the tick sweep; a click's arrival is its own well-defined moment).
+function dealCircle(run: GauntletRun, trial: GauntletPullState, pid: number, at: number): void {
+  const P = GAUNTLET.pull;
+  const gap = run.rng.range(P.circleSpawnMinS, P.circleSpawnMaxS);
+  const shrinkS = run.rng.range(P.circleShrinkMinS, P.circleShrinkMaxS);
+  trial.circles.set(pid, { id: trial.nextCircleId++, spawnAt: at + gap, shrinkS });
+}
+
+// The circle's abstract size at time t: startSize at spawnAt, shrinking
+// linearly to 0 at spawnAt + shrinkS (floored there; expiry is a miss).
+export function circleSizeAt(circle: { spawnAt: number; shrinkS: number }, t: number): number {
+  const P = GAUNTLET.pull;
+  return Math.max(
+    0,
+    P.circleStartSize - (P.circleStartSize / circle.shrinkS) * (t - circle.spawnAt),
+  );
+}
+
+// A player clicks their live circle `id`. Graded by the size at RECEIPT
+// (ctx.time, the honest authoritative clock; a client-reported size is never
+// trusted): force falls off with distance from the target size in both
+// directions, hitting zero at a full target-size of error. The circle is
+// consumed and the next one dealt on the spot; a stale id (already resolved)
+// or a not-yet-spawned circle drops silently.
+export function gauntletPullCircleClick(
   ctx: SimContext,
   run: GauntletRun,
   trial: GauntletPullState,
   pid: number,
-  beat: number,
+  id: number,
 ): void {
-  void run;
   if (trial.resolved) return;
   const team = trial.teamOf.get(pid);
   if (team === undefined) return; // not a tug contestant
-  if (beat < 0) return;
-  // claimed holds the highest beat this pid already consumed: reject replays and
-  // out-of-order (<=) claims.
-  const highest = trial.claimed.get(pid);
-  if (highest !== undefined && beat <= highest) return;
-  const beatTime = trial.beatAnchor + beat * GAUNTLET.pull.beatPeriodS;
-  const off = Math.abs(ctx.time - beatTime);
-  if (off > GAUNTLET.pull.acceptWindowS / 2) return;
-  const perfect = off <= GAUNTLET.pull.perfectWindowS / 2;
-  const force = GAUNTLET.pull.pullForce * (perfect ? GAUNTLET.pull.perfectMult : 1);
-  trial.marker += pullDir(team) * force;
-  trial.claimed.set(pid, beat);
-  if (ctx.time < trial.braceUntil) trial.braced.add(pid);
+  const c = trial.circles.get(pid);
+  if (!c || c.id !== id) return; // replay or a stale circle: consumed already
+  if (ctx.time < c.spawnAt) return; // not on screen yet
+  const P = GAUNTLET.pull;
+  const size = circleSizeAt(c, ctx.time);
+  const grade = Math.max(0, 1 - Math.abs(size - P.circleTargetSize) / P.circleTargetSize);
+  trial.marker += pullDir(team) * P.pullForceMax * grade ** P.gradePower;
+  dealCircle(run, trial, pid, ctx.time);
 }
 
 // One tick of the tug. Returns true once the marker (or the clock) has decided
@@ -142,25 +169,27 @@ export function updatePull(ctx: SimContext, run: GauntletRun, dt: number): boole
 
   const prevTime = ctx.time - dt;
 
-  // The opening brace resolves once, on the first tick to cross braceUntil: any
-  // team whose live players did not all land a pull in time eats the yank toward
-  // its opponent. A team with no live players (all-NPC, or empty) always braces.
-  if (prevTime < trial.braceUntil && ctx.time >= trial.braceUntil) {
-    for (const team of [0, 1] as const) {
-      if (teamMissedBrace(run, trial, team)) {
-        trial.marker += -pullDir(team) * GAUNTLET.pull.openingYank;
-      }
+  // Expire circles that shrank to nothing unclicked: a miss pulls nothing and
+  // the next circle is dealt on the spot. Fixed iteration order (playerStates
+  // insertion order); a knocked-out player's schedule is dropped without a
+  // draw, so an elimination never shifts the survivors' deals.
+  for (const [pid, ps] of run.playerStates) {
+    if (ps.spectating) {
+      trial.circles.delete(pid);
+      continue;
     }
+    const c = trial.circles.get(pid);
+    if (c && ctx.time >= c.spawnAt + c.shrinkS) dealCircle(run, trial, pid, ctx.time);
   }
 
-  // Every beat boundary since the last tick (a catch-up loop, so a slow tick
-  // resolves every crossed beat deterministically), each side heaves with its
-  // NPC field. Draw order is fixed: team 0 then team 1, per beat.
-  const period = GAUNTLET.pull.beatPeriodS;
-  const prevBeat = Math.floor((prevTime - trial.beatAnchor) / period);
-  const nowBeat = Math.floor((ctx.time - trial.beatAnchor) / period);
-  for (let b = Math.max(0, prevBeat + 1); b <= nowBeat; b++) {
-    heaveNpcBeat(run, trial);
+  // Every heave boundary since the last tick (a catch-up loop, so a slow tick
+  // resolves every crossed heave deterministically), each side heaves with its
+  // NPC field. Draw order is fixed: team 0 then team 1, per heave.
+  const period = GAUNTLET.pull.npcHeavePeriodS;
+  const prevHeave = Math.floor((prevTime - trial.heaveAnchor) / period);
+  const nowHeave = Math.floor((ctx.time - trial.heaveAnchor) / period);
+  for (let b = Math.max(0, prevHeave + 1); b <= nowHeave; b++) {
+    heaveNpcField(run, trial);
   }
 
   dragRopeLine(ctx, run, trial, dt);
@@ -195,26 +224,14 @@ function dragRopeLine(ctx: SimContext, run: GauntletRun, trial: GauntletPullStat
   }
 }
 
-// A team missed the brace when a live (attached, non-spectating) player on it
-// never landed a pull before braceUntil. Zero live players counts as braced.
-function teamMissedBrace(run: GauntletRun, trial: GauntletPullState, team: 0 | 1): boolean {
-  for (const [pid, t] of trial.teamOf) {
-    if (t !== team) continue;
-    const ps = run.playerStates.get(pid);
-    if (!ps || ps.spectating) continue; // left or knocked-out players do not count
-    if (!trial.braced.has(pid)) return true;
-  }
-  return false;
-}
-
-// One beat of NPC heave: npcForce[team] is each side's WHOLE per-beat NPC
+// One heave of NPC force: npcForce[team] is each side's WHOLE per-heave NPC
 // force (deliberately NOT scaled by the surviving field size: with a ~29-NPC
-// fresh field a per-NPC model swamps a player's 1.15..1.84 per beat and the
-// rope decides itself off the npcForce draw; playtest verdict was that the
-// PLAYER's timing must be what wins the pull), plus a small per-beat jitter
+// fresh field a per-NPC model swamps a player's graded clicks and the rope
+// decides itself off the npcForce draw; playtest verdict was that the
+// PLAYER's timing must be what wins the pull), plus a small per-heave jitter
 // (band derived from the npcForce spread). With no NPCs on the rope there is
 // no force and no draw.
-function heaveNpcBeat(run: GauntletRun, trial: GauntletPullState): void {
+function heaveNpcField(run: GauntletRun, trial: GauntletPullState): void {
   const npcCount = aliveContestants(run).filter((c) => !c.player).length;
   if (npcCount === 0) return;
   const jitterMag = (GAUNTLET.pull.npcForceMax - GAUNTLET.pull.npcForceMin) / 2;

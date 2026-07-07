@@ -34,7 +34,7 @@ import {
 import type { GauntletRun } from './state';
 import { gauntletCourtShove, startCourt, updateCourt } from './trial_court';
 import { gauntletEchoTap, startEcho, updateEcho } from './trial_echo';
-import { gauntletPullBeat, startPull, updatePull } from './trial_pull';
+import { gauntletPullCircleClick, startPull, updatePull } from './trial_pull';
 import { startSentinel, updateSentinel } from './trial_sentinel';
 import {
   gauntletTraceSigils,
@@ -320,8 +320,8 @@ function holdStagedPlayers(ctx: SimContext, run: GauntletRun): void {
 }
 
 // The desk trials play at an apparatus, not on your feet: their input is the
-// slab stroke, the beat click, or the stone click, so the player is seated at
-// the station and held there (movement trials stay free).
+// slab stroke, the circle click, or the stone click, so the player is seated
+// at the station and held there (movement trials stay free).
 function isDeskTrial(kind: string | undefined): boolean {
   return kind === 'sigils' || kind === 'pull' || kind === 'echo';
 }
@@ -421,12 +421,12 @@ export function gauntletTrace(ctx: SimContext, pid: number | undefined, pts: num
   gauntletTraceSigils(ctx, run, run.trial, r.meta.entityId, pts);
 }
 
-export function gauntletPull(ctx: SimContext, pid: number | undefined, beat: number): void {
+export function gauntletPullCircle(ctx: SimContext, pid: number | undefined, id: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const run = liveTrialFor(ctx, r.meta.entityId);
   if (!run || run.trial?.kind !== 'pull') return;
-  gauntletPullBeat(ctx, run, run.trial, r.meta.entityId, beat);
+  gauntletPullCircleClick(ctx, run, run.trial, r.meta.entityId, id);
 }
 
 export function gauntletEcho(ctx: SimContext, pid: number | undefined, stone: number): void {
@@ -636,19 +636,29 @@ export function gauntletRunWire(ctx: SimContext, pid: number): GauntletRunView |
         coveredMask: sigilCoveredMask(sp),
       };
     })(),
-    pull:
-      trial?.kind === 'pull'
-        ? {
-            beatAnchor: trial.beatAnchor,
-            beatPeriodS: GAUNTLET.pull.beatPeriodS,
-            // ABSOLUTE marker (+ = team 0 winning): the teams stand on the
-            // rope now, so the venue maps the marker to a physical rope
-            // translation, never a viewer-relative meter.
-            marker: Math.round(trial.marker * 10) / 10,
-            winThreshold: GAUNTLET.pull.winThreshold,
-            braceUntil: trial.braceUntil,
-          }
-        : null,
+    pull: (() => {
+      if (trial?.kind !== 'pull') return null;
+      const c = ps?.spectating ? undefined : trial.circles.get(pid);
+      return {
+        // ABSOLUTE marker (+ = team 0 winning): the teams stand on the
+        // rope now, so the venue maps the marker to a physical rope
+        // translation, never a viewer-relative meter.
+        marker: Math.round(trial.marker * 10) / 10,
+        winThreshold: GAUNTLET.pull.winThreshold,
+        // The viewer's live circle rides whole (absolute spawnAt + the rolled
+        // shrink), so it only changes when a circle resolves and quiet ticks
+        // still delta-elide.
+        circle: c
+          ? {
+              id: c.id,
+              spawnAt: c.spawnAt,
+              shrinkS: c.shrinkS,
+              startSize: GAUNTLET.pull.circleStartSize,
+              targetSize: GAUNTLET.pull.circleTargetSize,
+            }
+          : null,
+      };
+    })(),
     echo: (() => {
       if (trial?.kind !== 'echo') return null;
       const ep = trial.players.get(pid);

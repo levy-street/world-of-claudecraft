@@ -4618,10 +4618,10 @@ export class GameServer {
         sim.gauntletTrace(pts, pid);
         break;
       }
-      case 'gauntlet_pull': {
-        const beat = Number(msg.beat);
-        if (!Number.isInteger(beat) || beat < 0 || beat > 10000) break;
-        sim.gauntletPull(beat, pid);
+      case 'gauntlet_pull_circle': {
+        const id = Number(msg.id);
+        if (!Number.isInteger(id) || id < 0 || id > 100000) break;
+        sim.gauntletPullCircle(id, pid);
         break;
       }
       case 'gauntlet_echo': {

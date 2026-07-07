@@ -1,13 +1,14 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { GAUNTLET, GAUNTLET_VENUE } from '../src/sim/content/gauntlet';
 import type { GauntletPullState, GauntletRun } from '../src/sim/gauntlet/state';
+import { circleSizeAt } from '../src/sim/gauntlet/trial_pull';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 
 // --- local helpers (not shared; copied idioms from gauntlet.test.ts) ---
 
 // Solo tests use the instant lobby (a join starts the run at staging on the
-// spot); the two-player test needs the real lobby fill so both can join.
+// spot); the multiplayer tests need the real lobby fill so everyone can join.
 const makeSim = (seed = 42, instant = true) =>
   new Sim({
     seed,
@@ -52,34 +53,40 @@ function pullState(sim: Sim): GauntletPullState {
 
 // Test-only field control: shrink the surviving NPC rope by eliminating all but
 // the first `keep` NPC contestants (direct record edit, no side effects), so the
-// per-beat NPC heave (surviving-NPC-count scaled) is a known, small quantity.
+// per-heave NPC pull is a known, small quantity (zero with none kept).
 function keepNpcs(run: GauntletRun, keep: number) {
   const npcs = run.contestants.filter((c) => !c.player);
   for (let i = keep; i < npcs.length; i++) npcs[i].eliminatedAtTrial = run.trialIndex;
 }
 
-const beatTime = (trial: GauntletPullState, beat: number) =>
-  trial.beatAnchor + beat * GAUNTLET.pull.beatPeriodS;
-
 function tickToTime(sim: Sim, target: number, maxTicks = 20 * 120) {
   for (let i = 0; i < maxTicks && sim.time < target - 1e-6; i++) sim.tick();
 }
 
-// Beats land exactly on 20 Hz ticks (beatAnchor = start + 2s = start + 40 ticks;
-// beatPeriodS 1.1 = 22 ticks), so a spammer can land a perfect pull every beat:
-// pull the moment the clock enters the perfect window, then advance the beat.
-function spamPerfect(sim: Sim, pid: number, seconds = 60) {
-  const perfectHalf = GAUNTLET.pull.perfectWindowS / 2;
-  let nextBeat = 0;
+// Plant a live circle for pid whose size at the CURRENT sim time is exactly
+// `size` (a direct record edit, the keepNpcs idiom): from the size curve
+// size(t) = start - (start/shrinkS)(t - spawnAt), the spawnAt that yields the
+// wanted size now is t - shrinkS * (start - size) / start. Returns the id a
+// click must name.
+function plantCircle(sim: Sim, trial: GauntletPullState, pid: number, size: number, shrinkS = 2) {
+  const id = trial.nextCircleId++;
+  const start = GAUNTLET.pull.circleStartSize;
+  const spawnAt = sim.time - (shrinkS * (start - size)) / start;
+  trial.circles.set(pid, { id, spawnAt, shrinkS });
+  return id;
+}
+
+// A deterministic near-perfect policy: every tick, click the live circle the
+// first time its size dips to the target or below (one tick past the crossing,
+// so the grade is high but not perfect). Sends land between ticks, exactly like
+// the server's dispatch.
+function clickWhenSmall(sim: Sim, pid: number, seconds = 60) {
   for (let i = 0; i < 20 * seconds; i++) {
     const trial = sim.gauntletRuns[0]?.trial;
     if (!trial || trial.kind !== 'pull' || trial.resolved) break;
-    const bt = beatTime(trial, nextBeat);
-    if (Math.abs(sim.time - bt) <= perfectHalf) {
-      sim.gauntletPull(nextBeat, pid);
-      nextBeat++;
-    } else if (sim.time > bt + perfectHalf) {
-      nextBeat++;
+    const c = trial.circles.get(pid);
+    if (c && sim.time >= c.spawnAt && circleSizeAt(c, sim.time) <= GAUNTLET.pull.circleTargetSize) {
+      sim.gauntletPullCircle(c.id, pid);
     }
     sim.tick();
   }
@@ -103,130 +110,166 @@ afterAll(() => {
   );
 });
 
-describe('gauntlet pull: beat claims', () => {
-  it('an on-beat pull heaves the marker to the puller side; a beat cannot be claimed twice', () => {
+describe('gauntlet pull: circle clicks', () => {
+  it('a click at exactly the target size pulls at full force; the consumed id cannot be replayed', () => {
     const sim = makeSim(101);
     const pid = sim.addPlayer('warrior', 'Heaver');
     openAndJoin(sim, pid);
     const run = advanceToTrial(sim);
     const trial = pullState(sim);
     keepNpcs(run, 0); // no NPC heave: the marker moves only from the player pull
-    expect(trial.teamOf.get(pid)).toBe(0); // solo player is team 0 (heaves positive)
+    expect(trial.teamOf.get(pid)).toBe(0); // solo player is team 0 (pulls positive)
 
-    tickToTime(sim, beatTime(trial, 0)); // land exactly on beat 0 (a perfect hit)
+    const id = plantCircle(sim, trial, pid, GAUNTLET.pull.circleTargetSize);
     const before = trial.marker;
-    sim.gauntletPull(0, pid);
-    const perfect = GAUNTLET.pull.pullForce * GAUNTLET.pull.perfectMult;
-    expect(trial.marker).toBeCloseTo(before + perfect, 6);
-    expect(trial.marker).toBeGreaterThan(before); // moved toward team 0 (positive)
+    sim.gauntletPullCircle(id, pid);
+    expect(trial.marker).toBeCloseTo(before + GAUNTLET.pull.pullForceMax, 6);
+
+    // The click consumed the circle and dealt the next one on the spot.
+    const next = trial.circles.get(pid)!;
+    expect(next.id).toBeGreaterThan(id);
 
     const afterFirst = trial.marker;
-    sim.gauntletPull(0, pid); // same beat again: rejected, marker unchanged
+    sim.gauntletPullCircle(id, pid); // stale id: rejected, marker unchanged
     expect(trial.marker).toBe(afterFirst);
-    expect(trial.claimed.get(pid)).toBe(0);
+    expect(trial.circles.get(pid)!.id).toBe(next.id); // and nothing was consumed
   }, 20000);
 
-  it('a pull outside the accept window is rejected and leaves the marker untouched', () => {
+  it('force falls off with size error in both directions and hits zero at a full target of error', () => {
     const sim = makeSim(102);
-    const pid = sim.addPlayer('warrior', 'Mistimed');
-    openAndJoin(sim, pid);
-    const run = advanceToTrial(sim);
-    keepNpcs(run, 0);
-    const trial = pullState(sim);
-
-    // Sit between beats: beat 0's true time is half a period behind (off well
-    // past acceptWindowS/2), and still comfortably before braceUntil.
-    tickToTime(sim, beatTime(trial, 0) + GAUNTLET.pull.beatPeriodS / 2);
-    const before = trial.marker;
-    sim.gauntletPull(0, pid); // stale beat: off > acceptWindowS/2 -> rejected
-    expect(trial.marker).toBe(before);
-    sim.gauntletPull(5, pid); // a future beat whose time has not arrived -> rejected
-    expect(trial.marker).toBe(before);
-    expect(trial.claimed.has(pid)).toBe(false);
-  }, 20000);
-
-  it('a perfect pull grants more force than a loose (in-window, off-beat) pull', () => {
-    const sim = makeSim(103);
     const pid = sim.addPlayer('warrior', 'Timing');
     openAndJoin(sim, pid);
     const run = advanceToTrial(sim);
     keepNpcs(run, 0);
     const trial = pullState(sim);
+    const P = GAUNTLET.pull;
 
-    // Perfect: land exactly on beat 0.
-    tickToTime(sim, beatTime(trial, 0));
-    const p0 = trial.marker;
-    sim.gauntletPull(0, pid);
-    const perfectDelta = trial.marker - p0;
+    const deltaFor = (size: number): number => {
+      const id = plantCircle(sim, trial, pid, size);
+      const before = trial.marker;
+      sim.gauntletPullCircle(id, pid);
+      return trial.marker - before;
+    };
 
-    // Loose: 0.10s before beat 1 (inside acceptWindowS/2 0.18, outside
-    // perfectWindowS/2 0.07).
-    tickToTime(sim, beatTime(trial, 1) - 0.1);
-    const l0 = trial.marker;
-    sim.gauntletPull(1, pid);
-    const looseDelta = trial.marker - l0;
+    // Same |error| grades the same on both sides of the target.
+    const late = deltaFor(P.circleTargetSize - 15); // too small
+    const early = deltaFor(P.circleTargetSize + 15); // too large
+    expect(late).toBeCloseTo(early, 6);
+    expect(late).toBeCloseTo(P.pullForceMax * (1 - 15 / P.circleTargetSize) ** P.gradePower, 6);
+    expect(late).toBeGreaterThan(0);
+    expect(late).toBeLessThan(P.pullForceMax);
 
-    expect(perfectDelta).toBeCloseTo(GAUNTLET.pull.pullForce * GAUNTLET.pull.perfectMult, 6);
-    expect(looseDelta).toBeCloseTo(GAUNTLET.pull.pullForce, 6);
-    expect(perfectDelta).toBeGreaterThan(looseDelta);
+    // A bigger error pulls less.
+    const worse = deltaFor(P.circleTargetSize + 40);
+    expect(worse).toBeLessThan(late);
+
+    // A full target-size of error (or more) pulls nothing.
+    expect(deltaFor(P.circleTargetSize * 2)).toBe(0);
+    expect(deltaFor(0)).toBe(0);
+  }, 20000);
+
+  it('a click before the circle spawns, or naming a stale id, drops without consuming', () => {
+    const sim = makeSim(103);
+    const pid = sim.addPlayer('warrior', 'Eager');
+    openAndJoin(sim, pid);
+    const run = advanceToTrial(sim);
+    keepNpcs(run, 0);
+    const trial = pullState(sim);
+
+    // A circle still in its spawn gap: visible to nobody, clickable by nobody.
+    const id = trial.nextCircleId++;
+    trial.circles.set(pid, { id, spawnAt: sim.time + 1, shrinkS: 2 });
+    const before = trial.marker;
+    sim.gauntletPullCircle(id, pid);
+    expect(trial.marker).toBe(before);
+    expect(trial.circles.get(pid)!.id).toBe(id); // not consumed
+
+    sim.gauntletPullCircle(id + 5, pid); // a made-up id
+    expect(trial.marker).toBe(before);
+    expect(trial.circles.get(pid)!.id).toBe(id);
   }, 20000);
 });
 
-describe('gauntlet pull: opening brace', () => {
-  it('a team that misses the opening brace eats the yank toward its opponent', () => {
+describe('gauntlet pull: expiry', () => {
+  it('an unclicked circle expires as a miss (zero pull) and the next one is dealt', () => {
     const sim = makeSim(104);
-    const pid = sim.addPlayer('warrior', 'Slow');
+    const pid = sim.addPlayer('warrior', 'Idle');
     openAndJoin(sim, pid);
     const run = advanceToTrial(sim);
-    keepNpcs(run, 0); // no NPC heave: only the yank can move the marker
+    keepNpcs(run, 0); // only a click could move the marker, and none comes
     const trial = pullState(sim);
-    expect(trial.marker).toBe(0);
 
-    // Never pull, so the lone team-0 player never braces; team 1 has no players
-    // (braced). Tick just past braceUntil and the yank lands against team 0.
-    tickToTime(sim, trial.braceUntil + 0.2);
-    expect(trial.marker).toBeCloseTo(-GAUNTLET.pull.openingYank, 6); // toward team 1
-    expect(trial.braced.has(pid)).toBe(false);
+    const first = trial.circles.get(pid)!;
+    tickToTime(sim, first.spawnAt + first.shrinkS + 0.1);
+    const next = trial.circles.get(pid)!;
+    expect(next.id).toBeGreaterThan(first.id); // respawned
+    expect(next.spawnAt).toBeGreaterThan(sim.time - 0.2); // dealt at the expiry sweep
+    expect(trial.marker).toBe(0); // a miss pulls nothing
   }, 20000);
+});
+
+describe('gauntlet pull: teamwork', () => {
+  it('teammates SUM their graded pulls; an opponent pull subtracts', () => {
+    const sim = makeSim(105, false); // real lobby so all three can join
+    const a = sim.addPlayer('warrior', 'First');
+    const b = sim.addPlayer('warrior', 'Second');
+    const c = sim.addPlayer('warrior', 'Third');
+    openAndJoin(sim, a, b, c);
+    const run = advanceToTrial(sim);
+    const trial = pullState(sim);
+    keepNpcs(run, 0);
+    // Join order alternates teams: a and c share team 0, b is team 1.
+    expect(trial.teamOf.get(a)).toBe(0);
+    expect(trial.teamOf.get(b)).toBe(1);
+    expect(trial.teamOf.get(c)).toBe(0);
+
+    const perfect = GAUNTLET.pull.circleTargetSize;
+    sim.gauntletPullCircle(plantCircle(sim, trial, a, perfect), a);
+    sim.gauntletPullCircle(plantCircle(sim, trial, c, perfect), c);
+    expect(trial.marker).toBeCloseTo(2 * GAUNTLET.pull.pullForceMax, 6); // the sum
+
+    sim.gauntletPullCircle(plantCircle(sim, trial, b, perfect), b);
+    expect(trial.marker).toBeCloseTo(GAUNTLET.pull.pullForceMax, 6); // pulled back
+  }, 40000);
 });
 
 describe('gauntlet pull: resolution', () => {
-  it('a beat-perfect spammer drags the marker to its side and wins; the idle team eats lossDamage', () => {
-    const sim = makeSim(105, false); // real lobby so two players can both join
-    const spammer = sim.addPlayer('warrior', 'Heaver');
+  it('a clean clicker drags the marker to a win; the idle team eats lossDamage', () => {
+    const sim = makeSim(106, false); // real lobby so two players can both join
+    const clicker = sim.addPlayer('warrior', 'Heaver');
     const idler = sim.addPlayer('warrior', 'Slacker');
-    openAndJoin(sim, spammer, idler);
+    openAndJoin(sim, clicker, idler);
     const run = advanceToTrial(sim);
     const trial = pullState(sim); // hold the ref: run.trial is nulled at resolution
-    expect(trial.teamOf.get(spammer)).toBe(0);
+    expect(trial.teamOf.get(clicker)).toBe(0);
     expect(trial.teamOf.get(idler)).toBe(1);
     keepNpcs(run, 2); // a little real NPC opposition, small enough that play decides
 
-    spamPerfect(sim, spammer, 60);
+    clickWhenSmall(sim, clicker, 60);
 
     expect(trial.resolved).toBe(true);
-    expect(trial.wonBy).toBe(0); // the spammer's side
-    const sc = run.contestants.find((c) => c.entityId === spammer)!;
-    const ic = run.contestants.find((c) => c.entityId === idler)!;
-    expect(sc.vitality).toBe(GAUNTLET.vitalityMax); // winner: no loss
+    expect(trial.wonBy).toBe(0); // the clicker's side
+    const cc = run.contestants.find((k) => k.entityId === clicker)!;
+    const ic = run.contestants.find((k) => k.entityId === idler)!;
+    expect(cc.vitality).toBe(GAUNTLET.vitalityMax); // winner: no loss
     expect(ic.vitality).toBe(GAUNTLET.vitalityMax - GAUNTLET.pull.lossDamage); // loser: the chunk
-    // lossDamage (55) is not a kill, so neither player was knocked out.
-    expect(run.playerStates.get(spammer)!.spectating).toBe(false);
+    // lossDamage is not a kill, so neither player was knocked out.
+    expect(run.playerStates.get(clicker)!.spectating).toBe(false);
     expect(run.playerStates.get(idler)!.spectating).toBe(false);
-    expect(run.playerStates.get(spammer)!.finishedAt).not.toBeNull();
+    expect(run.playerStates.get(clicker)!.finishedAt).not.toBeNull();
   }, 40000);
 });
 
 describe('gauntlet pull: determinism', () => {
-  it('two same-seed runs with identical scripted pulls reach identical marker and vitality', () => {
+  it('two same-seed runs with identical scripted clicks reach identical marker and vitality', () => {
     const scenario = () => {
-      const sim = makeSim(106);
+      const sim = makeSim(107);
       const pid = sim.addPlayer('warrior', 'Twin');
       openAndJoin(sim, pid);
       const run = advanceToTrial(sim);
       const trial = pullState(sim);
-      keepNpcs(run, 2); // keep NPCs so the per-beat jitter draws are exercised
-      spamPerfect(sim, pid, 40);
+      keepNpcs(run, 2); // keep NPCs so the per-heave jitter draws are exercised
+      clickWhenSmall(sim, pid, 40);
       return {
         marker: trial.marker,
         wonBy: trial.wonBy,
@@ -244,7 +287,7 @@ describe('gauntlet pull: determinism', () => {
 
 describe('gauntlet pull: rope dressing', () => {
   it('lines the surviving NPC field along both banks of the trench', () => {
-    const sim = makeSim(107);
+    const sim = makeSim(108);
     const pid = sim.addPlayer('warrior', 'Onlooker');
     openAndJoin(sim, pid);
     const run = advanceToTrial(sim);
