@@ -83,7 +83,7 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
     }
   }
   if (owner.dead) {
-    ctx.dropEntity(companion.id);
+    ctx.despawnDelveCompanion(run);
     return;
   }
   if (owner.inCombat) ctx.maybeCompanionBark(run, owner.id, 'combat_start');

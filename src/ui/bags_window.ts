@@ -472,7 +472,7 @@ export class BagsWindow {
           return;
         }
         // Otherwise right-click destroys the item, reusing the quest-item destroy
-        // prompt (confirm + quantity). noDiscard items stay protected (#1501).
+        // prompt (confirm + quantity). noDiscard items stay protected (issue 1501).
         const destroy = bagDestroyAction(item, this.bagMode());
         if (destroy === 'none') return;
         ev.preventDefault();
@@ -500,7 +500,7 @@ export class BagsWindow {
         const mode = this.bagMode();
         const key = bagTooltipHintKey(item, mode);
         const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
-        // Advertise the right-click destroy affordance (#1501) only when the item is
+        // Advertise the right-click destroy affordance (issue 1501) only when the item is
         // actually destroyable here, so junk items are discoverable without a menu.
         const destroy =
           bagDestroyAction(item, mode) === 'discard'
