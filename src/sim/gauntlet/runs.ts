@@ -9,14 +9,32 @@
 // (run.rng, seeded at lobby creation exactly like fiesta's per-match stream);
 // an idle or active gauntlet never touches the shared sim rng.
 
-import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_RECRUITER_NPC_ID, GAUNTLET_WATCHER_NPC_ID } from '../content/gauntlet';
-import { dungeonAt, gauntletOrigin, GAUNTLET_SLOT_COUNT, isArenaPos, isDelvePos, isGauntletPos, NPCS } from '../data';
+import {
+  GAUNTLET,
+  GAUNTLET_LAYOUT,
+  GAUNTLET_RECRUITER_NPC_ID,
+  GAUNTLET_WATCHER_NPC_ID,
+} from '../content/gauntlet';
+import {
+  dungeonAt,
+  GAUNTLET_SLOT_COUNT,
+  gauntletOrigin,
+  isArenaPos,
+  isDelvePos,
+  isGauntletPos,
+  NPCS,
+} from '../data';
 import { createNpc } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { DT, type GauntletRunView } from '../types';
-import { planSentinelScripts, rollNpcContestant, spawnNpcContestants, stagingSpot } from './contestants';
+import {
+  planSentinelScripts,
+  rollNpcContestant,
+  spawnNpcContestants,
+  stagingSpot,
+} from './contestants';
 import type { GauntletRun } from './state';
 import { startSentinel, updateSentinel } from './trial_sentinel';
 import { aliveContestants, eliminateContestant, emitToRunPlayers } from './vitality';
@@ -36,7 +54,8 @@ function canJoinGauntlet(ctx: SimContext, pid: number): string | null {
   if (ctx.tradeFor(pid)) return 'You cannot enter the Gauntlet while trading.';
   if (ctx.duelFor(pid)) return 'You cannot enter the Gauntlet during a duel.';
   if (ctx.arenaMatches.has(pid)) return 'You cannot enter the Gauntlet during an arena match.';
-  const recruiter = ctx.gauntletRecruiterId !== null ? ctx.entities.get(ctx.gauntletRecruiterId) : undefined;
+  const recruiter =
+    ctx.gauntletRecruiterId !== null ? ctx.entities.get(ctx.gauntletRecruiterId) : undefined;
   if (recruiter) {
     const d = Math.hypot(r.e.pos.x - recruiter.pos.x, r.e.pos.z - recruiter.pos.z);
     if (d > GAUNTLET.joinRadius) return 'You must speak to the Herald to enter the Gauntlet.';
@@ -127,7 +146,12 @@ export function gauntletLeave(ctx: SimContext, pid?: number): void {
 // Detach a player from the run. `restore` teleports them back to their saved
 // position (false when they are already elsewhere: died and released, or some
 // other system teleported them out of the band).
-function removePlayerFromRun(ctx: SimContext, run: GauntletRun, pid: number, restore: boolean): void {
+function removePlayerFromRun(
+  ctx: SimContext,
+  run: GauntletRun,
+  pid: number,
+  restore: boolean,
+): void {
   const ps = run.playerStates.get(pid);
   if (!ps) return;
   const c = run.contestants.find((k) => k.entityId === pid);

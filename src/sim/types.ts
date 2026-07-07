@@ -2675,7 +2675,14 @@ export type SimEvent = { pid?: number } & (
       cause: GauntletDamageCause;
       vitality: number;
     }
-  | { type: 'gauntletPoof'; entityId: number; name: string; x: number; z: number; survivors: number }
+  | {
+      type: 'gauntletPoof';
+      entityId: number;
+      name: string;
+      x: number;
+      z: number;
+      survivors: number;
+    }
   | { type: 'gauntletEliminated'; trialIndex: number }
   | { type: 'gauntletPodium'; first: string; second: string; third: string; won: boolean }
 );

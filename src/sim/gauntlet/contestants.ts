@@ -122,7 +122,9 @@ export function updateSentinelNpcs(
     const lz = e.pos.z - run.origin.z;
     if (lz >= t.fieldLength) continue; // crossed; safe, stands past the line
     const fumbling =
-      trial.light === 'red' && c.script.fumbleOnFlip !== null && c.script.fumbleOnFlip <= trial.flipCount;
+      trial.light === 'red' &&
+      c.script.fumbleOnFlip !== null &&
+      c.script.fumbleOnFlip <= trial.flipCount;
     // A scripted fumbler dawdles short of the line until its flip arrives, so
     // it can never cross early and dodge its own script.
     const dawdling = c.script.fumbleOnFlip !== null && lz >= t.fieldLength * 0.9 && !fumbling;

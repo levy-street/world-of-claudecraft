@@ -14,8 +14,8 @@
 import { GAUNTLET } from '../content/gauntlet';
 import type { SimContext } from '../sim_context';
 import type { GauntletSentinelTuning } from '../types';
-import type { GauntletRun, GauntletSentinelState } from './state';
 import { updateSentinelNpcs } from './contestants';
+import type { GauntletRun, GauntletSentinelState } from './state';
 import {
   aliveContestants,
   applyVitalityDamage,
@@ -166,12 +166,7 @@ function updatePlayers(
 
     // The catch: on red, past grace, still on the field, any displacement
     // beyond the epsilon (input movement or momentum slide alike) convicts.
-    if (
-      trial.light === 'red' &&
-      ctx.time >= trial.graceUntil &&
-      ps.finishedAt === null &&
-      lz > 0
-    ) {
+    if (trial.light === 'red' && ctx.time >= trial.graceUntil && ps.finishedAt === null && lz > 0) {
       const disp = Math.hypot(e.pos.x - e.prevPos.x, e.pos.z - e.prevPos.z);
       if (disp > t.redMoveEps) {
         const fell = applyVitalityDamage(ctx, run, c, t.hardFailDamage, 'caught');
