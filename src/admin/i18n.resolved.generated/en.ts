@@ -286,6 +286,8 @@ export const en: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Chat unmuted",
   "moderationHistory.actionForceRename": "Forced rename",
   "moderationHistory.actionNote": "Note",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Other action",
   "characters.sortHint": "click a column to sort",
   "characters.empty": "no characters yet",

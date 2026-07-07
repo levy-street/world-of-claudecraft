@@ -286,6 +286,8 @@ export const ja_JP: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "チャットのミュートを解除する",
   "moderationHistory.actionForceRename": "強制的な名前変更",
   "moderationHistory.actionNote": "注記",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "その他のアクション",
   "characters.sortHint": "列をクリックして並べ替え",
   "characters.empty": "まだキャラクターがいません",

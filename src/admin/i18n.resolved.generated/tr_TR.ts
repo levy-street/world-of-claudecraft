@@ -286,6 +286,8 @@ export const tr_TR: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Sohbetin sesi açıldı",
   "moderationHistory.actionForceRename": "Zorunlu yeniden adlandırma",
   "moderationHistory.actionNote": "Not",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Diğer eylem",
   "characters.sortHint": "sıralamak için bir sütuna tıklayın",
   "characters.empty": "henüz karakter yok",

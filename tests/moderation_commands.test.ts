@@ -111,6 +111,37 @@ describe('moderation chat commands', () => {
     });
   });
 
+  it('parses freeze and unfreeze with the quoted-name grammar', () => {
+    expect(parseModerationChatCommand('/freeze "Mira Sun" wall clipping')).toEqual({
+      kind: 'freeze',
+      name: 'Mira Sun',
+      reason: 'wall clipping',
+    });
+    expect(parseModerationChatCommand('  /FrEeZe   "Mira Sun"  ')).toEqual({
+      kind: 'freeze',
+      name: 'Mira Sun',
+      reason: 'No reason specified',
+    });
+    expect(parseModerationChatCommand('/unfreeze "Mira Sun"')).toEqual({
+      kind: 'unfreeze',
+      name: 'Mira Sun',
+      reason: 'No reason specified',
+    });
+    // Unquoted targets stay null so the service replies with the quoting notice.
+    expect(parseModerationChatCommand('/freeze Mira')).toEqual({
+      kind: 'freeze',
+      name: null,
+      reason: 'No reason specified',
+    });
+    expect(parseModerationChatCommand('/unfreeze')).toEqual({
+      kind: 'unfreeze',
+      name: null,
+      reason: 'No reason specified',
+    });
+    expect(parseModerationChatCommand('/freezer "Mira Sun"')).toBeNull();
+    expect(parseModerationChatCommand('/unfreezer "Mira Sun"')).toBeNull();
+  });
+
   it('parses quoted and legacy unquoted spectate targets', () => {
     expect(parseModerationChatCommand('/spectate Mira')).toEqual({
       kind: 'spectate',

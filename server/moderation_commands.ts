@@ -10,6 +10,8 @@ export type ModerationChatCommand =
   | { kind: 'mute'; name: string | null; minutes: number | null; reason: string }
   | { kind: 'ban'; name: string | null; reason: string }
   | { kind: 'suspend'; name: string | null; minutes: number | null; reason: string }
+  | { kind: 'freeze'; name: string | null; reason: string }
+  | { kind: 'unfreeze'; name: string | null; reason: string }
   | { kind: 'spectate'; name: string | null }
   | { kind: 'unspectate' };
 
@@ -89,6 +91,14 @@ export function parseModerationChatCommand(text: string): ModerationChatCommand 
   const suspend = /^\/suspend(?:\s+([\s\S]*))?$/i.exec(trimmed);
   if (suspend) {
     return { kind: 'suspend', ...parseNamedTimed(suspend[1] ?? '') };
+  }
+  const freeze = /^\/freeze(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (freeze) {
+    return { kind: 'freeze', ...parseNamed(freeze[1] ?? '') };
+  }
+  const unfreeze = /^\/unfreeze(?:\s+([\s\S]*))?$/i.exec(trimmed);
+  if (unfreeze) {
+    return { kind: 'unfreeze', ...parseNamed(unfreeze[1] ?? '') };
   }
   const spectate = /^\/spectate(?:\s+([\s\S]*))?$/i.exec(trimmed);
   if (spectate) {

@@ -286,6 +286,8 @@ export const nl_NL: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Chat niet gedempt",
   "moderationHistory.actionForceRename": "Gedwongen hernoemen",
   "moderationHistory.actionNote": "Opmerking",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Andere actie",
   "characters.sortHint": "klik op een kolom om te sorteren",
   "characters.empty": "nog geen personages",

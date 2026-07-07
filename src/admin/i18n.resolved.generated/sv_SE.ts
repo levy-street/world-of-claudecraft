@@ -286,6 +286,8 @@ export const sv_SE: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Chatten har avaktiverats",
   "moderationHistory.actionForceRename": "Tvingat byta namn",
   "moderationHistory.actionNote": "Notera",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Annan åtgärd",
   "characters.sortHint": "klicka på en kolumn för att sortera",
   "characters.empty": "inga figurer ännu",

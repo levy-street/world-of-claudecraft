@@ -18,13 +18,20 @@
     if (action === 'chat_unmute') return t('moderationHistory.actionChatUnmute');
     if (action === 'force_rename') return t('moderationHistory.actionForceRename');
     if (action === 'note') return t('moderationHistory.actionNote');
+    if (action === 'freeze') return t('moderationHistory.actionFreeze');
+    if (action === 'unfreeze') return t('moderationHistory.actionUnfreeze');
     return t('moderationHistory.actionUnknown');
   }
 
   function actionVariant(action: string): BadgeVariant {
     if (action === 'ban') return 'bad';
-    if (action === 'suspend' || action === 'chat_mute') return 'warn';
-    if (action === 'unban' || action === 'unsuspend' || action === 'chat_unmute') {
+    if (action === 'suspend' || action === 'chat_mute' || action === 'freeze') return 'warn';
+    if (
+      action === 'unban' ||
+      action === 'unsuspend' ||
+      action === 'chat_unmute' ||
+      action === 'unfreeze'
+    ) {
       return 'success';
     }
     return 'neutral';

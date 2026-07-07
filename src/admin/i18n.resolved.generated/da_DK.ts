@@ -286,6 +286,8 @@ export const da_DK: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Chat slået til",
   "moderationHistory.actionForceRename": "Tvunget omdøbning",
   "moderationHistory.actionNote": "Note",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Anden handling",
   "characters.sortHint": "klik på en kolonne for at sortere",
   "characters.empty": "ingen figurer endnu",

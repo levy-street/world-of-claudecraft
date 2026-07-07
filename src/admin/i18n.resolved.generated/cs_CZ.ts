@@ -286,6 +286,8 @@ export const cs_CZ: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Umlčení chatu zrušeno",
   "moderationHistory.actionForceRename": "Vynuceno přejmenování",
   "moderationHistory.actionNote": "Poznámka",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Jiná akce",
   "characters.sortHint": "klikni na sloupec pro řazení",
   "characters.empty": "zatím žádné postavy",

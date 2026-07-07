@@ -286,6 +286,8 @@ export const it_IT: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Chatta riattivata",
   "moderationHistory.actionForceRename": "Rinomina forzata",
   "moderationHistory.actionNote": "Nota",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Altra azione",
   "characters.sortHint": "clicca una colonna per ordinare",
   "characters.empty": "ancora nessun personaggio",
