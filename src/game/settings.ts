@@ -246,6 +246,10 @@ export const BOOL_SETTINGS = {
   // applied in main.ts. Purely a display preference; the slots stay reachable via
   // their keybinds either way, so the row being hidden never disables those abilities.
   showSecondaryActionBar: { def: false },
+  // off by default: keep action bars editable unless players opt into locking
+  // the slots against accidental drag, drop, or clear gestures. Ability and item
+  // use from clicks, keybinds, and controllers stays unchanged.
+  lockActionBars: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },

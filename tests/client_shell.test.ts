@@ -1908,6 +1908,35 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('body.mobile-touch #actionbar.many-spells');
   });
 
+  it('locks action-bar edit gestures without gating normal slot use', () => {
+    expect(hudTs).toContain("settings.get('lockActionBars')");
+    expect(hudTs).toContain('setActionBarsLocked(locked: boolean): void');
+    expect(hudTs).toContain('btn.draggable = !locked;');
+    expect(hudTs).toContain('btn.draggable = !this.actionBarsLocked();');
+    expect(hudTs).toMatch(/const clearSlot = \(\) => \{\s*if \(this\.actionBarsLocked\(\)\) return;/);
+    expect(hudTs).toMatch(
+      /btn\.addEventListener\('dragstart', \(e\) => \{\s*if \(this\.actionBarsLocked\(\)\) \{\s*e\.preventDefault\(\);\s*return;/,
+    );
+    expect(hudTs).toMatch(
+      /btn\.addEventListener\('dragover', \(e\) => \{\s*if \(this\.actionBarsLocked\(\)\) return;/,
+    );
+    expect(hudTs).toMatch(
+      /btn\.addEventListener\('drop', \(e\) => \{[\s\S]*?if \(this\.actionBarsLocked\(\)\) \{[\s\S]*?this\.dragAction = null;[\s\S]*?return;/,
+    );
+    expect(hudTs).toMatch(
+      /btn\.addEventListener\('contextmenu', \(e\) => \{[\s\S]*?if \(this\.actionBarsLocked\(\)\) return;[\s\S]*?clearHotbarSlot/,
+    );
+    expect(hudTs).toMatch(
+      /btn\.addEventListener\('pointerdown', \(e\) => \{\s*if \(this\.actionBarsLocked\(\)\) return;/,
+    );
+    expect(hudTs).toMatch(
+      /if \(\s*!this\.actionBarsLocked\(\) &&\s*targetIndex !== null &&\s*targetIndex !== drag\.sourceIndex\s*\)/,
+    );
+    const castSlotBody = hudTs.match(/castSlot\(barSlot: number\): void \{([\s\S]*?)\n  \}/)?.[1] ?? '';
+    expect(castSlotBody).not.toContain('lockActionBars');
+    expect(castSlotBody).not.toContain('actionBarsLocked');
+  });
+
   it('seeds druid form bars with the form kit, and only clones normal for rogue stealth', () => {
     expect(hudTs).toContain('if (this.isFormKitBar()) {');
     expect(hudTs).toContain('if (this.seedFormBarIfNeeded(parsed)) return;');

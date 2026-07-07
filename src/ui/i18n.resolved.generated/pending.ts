@@ -18,7 +18,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "es_ES": [
     "entities.items.chunk_of_ore.name",
@@ -29,7 +30,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "fr_FR": [
     "entities.items.chunk_of_ore.name",
@@ -40,7 +42,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "fr_CA": [
     "entities.items.chunk_of_ore.name",
@@ -51,7 +54,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "en_CA": [],
   "it_IT": [
@@ -63,7 +67,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "de_DE": [
     "entities.items.chunk_of_ore.name",
@@ -74,7 +79,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "zh_CN": [
     "hudChrome.itemHeroicTag"
@@ -97,7 +103,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "ru_RU": [
     "hudChrome.itemHeroicTag"
@@ -111,7 +118,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "nl_NL": [
     "entities.items.chunk_of_ore.name",
@@ -122,7 +130,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "pl_PL": [
     "entities.items.chunk_of_ore.name",
@@ -133,7 +142,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "id_ID": [
     "entities.items.chunk_of_ore.name",
@@ -144,7 +154,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "tr_TR": [
     "entities.items.chunk_of_ore.name",
@@ -155,7 +166,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "sv_SE": [
     "entities.items.chunk_of_ore.name",
@@ -166,7 +178,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "vi_VN": [
     "entities.items.chunk_of_ore.name",
@@ -177,7 +190,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ],
   "da_DK": [
     "entities.items.chunk_of_ore.name",
@@ -188,6 +202,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag",
     "hudChrome.itemSoulbound",
     "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
+    "hudChrome.mailbox.parcelQtyIncreaseAria",
+    "hudChrome.options.lockActionBars"
   ]
 };

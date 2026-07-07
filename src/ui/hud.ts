@@ -4937,6 +4937,21 @@ export class Hud {
     return this.hotbarActions[barSlot - 1] ?? null;
   }
 
+  private actionBarsLocked(): boolean {
+    return this.optionsHooks?.settings.get('lockActionBars') ?? false;
+  }
+
+  setActionBarsLocked(locked: boolean): void {
+    for (let slot = 1; slot <= Hud.BAR_ABILITY_SLOTS; slot++) {
+      const btn = this.abilityButtons[slot]?.btn;
+      if (btn) btn.draggable = !locked;
+    }
+    if (!locked) return;
+    this.dragAction = null;
+    this.clearMobileHotbarDrag();
+    this.clearActionDropTargets();
+  }
+
   abilityForSlot(barSlot: number): ResolvedAbility | null {
     // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
     const action = this.actionForSlot(barSlot);
@@ -5365,8 +5380,9 @@ export class Hud {
       if (slot >= 1) {
         // drag an action onto another slot to place or swap it;
         // slot 0 (Attack) stays fixed
-        btn.draggable = true;
+        btn.draggable = !this.actionBarsLocked();
         const clearSlot = () => {
+          if (this.actionBarsLocked()) return;
           this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
           this.saveSlotMap();
           btn.classList.add('empty');
@@ -5385,6 +5401,10 @@ export class Hud {
           clearSlot();
         });
         btn.addEventListener('dragstart', (e) => {
+          if (this.actionBarsLocked()) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(slot);
           if (!action) {
             e.preventDefault();
@@ -5396,6 +5416,7 @@ export class Hud {
           this.hideTooltip();
         });
         btn.addEventListener('dragover', (e) => {
+          if (this.actionBarsLocked()) return;
           const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
           if (!dragged) return;
           if (this.dragAction?.sourceIndex === slot - 1) return;
@@ -5409,6 +5430,11 @@ export class Hud {
         btn.addEventListener('drop', (e) => {
           e.preventDefault();
           btn.classList.remove('drop-target');
+          if (this.actionBarsLocked()) {
+            this.dragAction = null;
+            this.clearActionDropTargets();
+            return;
+          }
           const dragged = this.dragAction ?? {
             action: this.readDraggedAction(e.dataTransfer),
             sourceIndex: null,
@@ -5441,6 +5467,7 @@ export class Hud {
         // right-click clears the slot so a full bar can make room for new spells
         btn.addEventListener('contextmenu', (e) => {
           e.preventDefault();
+          if (this.actionBarsLocked()) return;
           if (this.hotbarActions[slot - 1] === null) return;
           this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
           this.saveSlotMap();
@@ -5839,6 +5866,7 @@ export class Hud {
 
   private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
     btn.addEventListener('pointerdown', (e) => {
+      if (this.actionBarsLocked()) return;
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
       // Any populated slot (ability or item) can be picked up and swapped by
       // touch, matching desktop drag-and-drop which does not special-case
@@ -5856,6 +5884,10 @@ export class Hud {
         timer: window.setTimeout(() => {
           const current = this.mobileHotbarDrag;
           if (!current || current.pointerId !== e.pointerId) return;
+          if (this.actionBarsLocked()) {
+            this.clearMobileHotbarDrag();
+            return;
+          }
           current.active = true;
           current.targetIndex = sourceIndex;
           this.suppressNextActionClick = true;
@@ -5877,6 +5909,10 @@ export class Hud {
     btn.addEventListener('pointermove', (e) => {
       const drag = this.mobileHotbarDrag;
       if (!drag || drag.pointerId !== e.pointerId) return;
+      if (this.actionBarsLocked()) {
+        this.clearMobileHotbarDrag();
+        return;
+      }
       const moved = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
       if (!drag.active && moved > 9) {
         this.clearMobileHotbarDrag();
@@ -5901,8 +5937,16 @@ export class Hud {
       if (wasActive) {
         e.preventDefault();
         this.suppressNextActionClick = true;
-        const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
-        if (resolvedTarget !== null) {
+        if (
+          !this.actionBarsLocked() &&
+          targetIndex !== null &&
+          targetIndex !== drag.sourceIndex
+        ) {
+          const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
+          if (resolvedTarget === null) {
+            this.clearMobileHotbarDrag();
+            return;
+          }
           this.hotbarActions = swapHotbarSlots(
             this.hotbarActions,
             drag.sourceIndex,
@@ -5931,6 +5975,7 @@ export class Hud {
   // position's underlying bar slot depends on the current paged page.
   private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
     btn.addEventListener('pointerdown', (e) => {
+      if (this.actionBarsLocked()) return;
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
       const sourceSlot = sourceSlotForMobileButton(this.mobileActionPage, ringIndex);
       if (!this.actionForSlot(sourceSlot)) return;
@@ -5946,6 +5991,10 @@ export class Hud {
         timer: window.setTimeout(() => {
           const current = this.mobileHotbarDrag;
           if (!current || current.pointerId !== e.pointerId) return;
+          if (this.actionBarsLocked()) {
+            this.clearMobileHotbarDrag();
+            return;
+          }
           current.active = true;
           current.targetIndex = sourceIndex;
           document.body.classList.add('mobile-hotbar-dragging');
@@ -5965,6 +6014,10 @@ export class Hud {
     btn.addEventListener('pointermove', (e) => {
       const drag = this.mobileHotbarDrag;
       if (!drag || drag.pointerId !== e.pointerId) return;
+      if (this.actionBarsLocked()) {
+        this.clearMobileHotbarDrag();
+        return;
+      }
       const moved = Math.hypot(e.clientX - drag.startX, e.clientY - drag.startY);
       if (!drag.active && moved > 9) {
         this.clearMobileHotbarDrag();
@@ -5992,8 +6045,16 @@ export class Hud {
       if (wasActive) {
         e.preventDefault();
         this.suppressNextActionClick = true;
-        const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
-        if (resolvedTarget !== null) {
+        if (
+          !this.actionBarsLocked() &&
+          targetIndex !== null &&
+          targetIndex !== drag.sourceIndex
+        ) {
+          const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
+          if (resolvedTarget === null) {
+            this.clearMobileHotbarDrag();
+            return;
+          }
           this.hotbarActions = swapHotbarSlots(
             this.hotbarActions,
             drag.sourceIndex,

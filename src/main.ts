@@ -1465,6 +1465,10 @@ async function startGame(
       );
       return;
     }
+    if (key === 'lockActionBars') {
+      hud.setActionBarsLocked(settings.set('lockActionBars', !!value));
+      return;
+    }
     if (key === 'showDailyRewardsChest') {
       hud.setDailyRewardsChestButtonVisible(settings.set('showDailyRewardsChest', !!value));
       return;

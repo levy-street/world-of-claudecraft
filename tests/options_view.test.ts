@@ -284,6 +284,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'aurasOnPlayerFrame',
       'showItemLevel',
       'showSecondaryActionBar',
+      'lockActionBars',
       'showDailyRewardsChest',
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });

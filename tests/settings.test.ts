@@ -67,6 +67,8 @@ describe('Settings', () => {
     expect(s.get('mouseCamera')).toBe(false);
     // walk-by autoloot is opt-in: auto-grabbing loot by walking past can feel jarring.
     expect(s.get('walkByAutoloot')).toBe(false);
+    // action bar editing stays unlocked unless the player opts into the safety lock.
+    expect(s.get('lockActionBars')).toBe(false);
     // both unit frames ship at their stock size; the scale sliders are opt-in tuning.
     expect(s.get('playerFrameScale')).toBe(1);
     expect(s.get('targetFrameScale')).toBe(1);
@@ -146,8 +148,10 @@ describe('Settings', () => {
   it('persists boolean settings across instances', () => {
     const a = new Settings();
     a.set('mouseCamera', true);
+    a.set('lockActionBars', true);
     const b = new Settings();
     expect(b.get('mouseCamera')).toBe(true);
+    expect(b.get('lockActionBars')).toBe(true);
   });
 
   it('defaults left-handed touch off and persists it across instances', () => {
