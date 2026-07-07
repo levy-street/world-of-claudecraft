@@ -1085,6 +1085,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'glacier_melt',
       'healing_potion',
       'mana_potion',
+      'simple_fishing_pole',
       'highwatch_breastplate',
       'peakwool_robe',
       'stalkerhide_jerkin',

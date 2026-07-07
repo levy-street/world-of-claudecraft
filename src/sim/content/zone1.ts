@@ -555,6 +555,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'minor_mana_potion',
       'linen_pouch',
       'travelers_knapsack',
+      'simple_fishing_pole',
       'copper_mining_pick',
       'iron_mining_pick',
       'mithril_mining_pick',

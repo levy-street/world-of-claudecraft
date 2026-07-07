@@ -21,6 +21,7 @@ import {
   WORLD_MIN_X,
   WORLD_MIN_Z,
   ZONES,
+  zoneAt,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
@@ -121,6 +122,25 @@ describe('content referential integrity', () => {
       }
     }
     expect(problems).toEqual([]);
+  });
+
+  it('stocks simple fishing poles at a general vendor in every zone', () => {
+    const generalPoleVendors = [
+      'trader_wilkes',
+      'provisioner_hale',
+      'quartermaster_bree',
+    ] as const;
+
+    for (const vendorId of generalPoleVendors) {
+      expect(NPCS[vendorId]?.vendorItems ?? [], vendorId).toContain('simple_fishing_pole');
+    }
+
+    const coveredZones = new Set(
+      generalPoleVendors.map((vendorId) => zoneAt(NPCS[vendorId].pos.z).id),
+    );
+
+    expect([...coveredZones].sort()).toEqual(ZONES.map((zone) => zone.id).sort());
+    expect(NPCS.fisherman_brandt.vendorItems).toEqual(['simple_fishing_pole']);
   });
 
   it('zones tile the world strip and content sits inside its zone band', () => {

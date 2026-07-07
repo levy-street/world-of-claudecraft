@@ -646,6 +646,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'silvermist_cordial',
       'lesser_healing_potion',
       'lesser_mana_potion',
+      'simple_fishing_pole',
       'bogiron_mace',
       'fenreed_staff',
       'mirefen_skinner',
