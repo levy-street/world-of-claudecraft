@@ -3784,6 +3784,7 @@ export class Hud {
       survivors: $('#gauntlet-survivors'),
       prize: $('#gauntlet-prize'),
       light: $('#gauntlet-light'),
+      hint: $('#gauntlet-hint'),
       wagerStrip: $('#gauntlet-wager-strip'),
       wagerLabel: $('#gauntlet-wager-strip .gh-wager-label'),
       wagerDec: $('#gauntlet-wager-dec'),

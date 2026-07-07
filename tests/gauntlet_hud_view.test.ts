@@ -181,6 +181,49 @@ describe('gauntletHudModel', () => {
       false,
     );
   });
+
+  it('picks the teaching hint from the live trial substate', () => {
+    expect(gauntletHudModel({ run: run(), time: 0 }).hint).toBe('sentinel');
+    const sigils = run({
+      sentinel: null,
+      sigils: { shapeSeed: 1, shapeId: 0, crack: 0, crackMax: 100, progress: 0, coveredMask: 0 },
+    });
+    expect(gauntletHudModel({ run: sigils, time: 0 }).hint).toBe('sigils');
+    const pull = run({
+      sentinel: null,
+      pull: { beatAnchor: 0, beatPeriodS: 1.1, marker: 0, winThreshold: 12, braceUntil: 2 },
+    });
+    expect(gauntletHudModel({ run: pull, time: 0 }).hint).toBe('pull');
+    const span = run({ sentinel: null, span: { steps: 14, revealed: [] } });
+    expect(gauntletHudModel({ run: span, time: 0 }).hint).toBe('span');
+    expect(gauntletHudModel({ run: courtRun(), time: 0 }).hint).toBe('court');
+  });
+
+  it('splits the wager hint by whose turn it is', () => {
+    expect(gauntletHudModel({ run: wagerRun({ stage: 'hold', holder: true }), time: 0 }).hint).toBe(
+      'wagerHold',
+    );
+    expect(
+      gauntletHudModel({ run: wagerRun({ stage: 'guess', holder: false }), time: 0 }).hint,
+    ).toBe('wagerGuess');
+    // Off-turn: the partner acts, the viewer waits, no instruction shows.
+    expect(
+      gauntletHudModel({ run: wagerRun({ stage: 'hold', holder: false }), time: 0 }).hint,
+    ).toBeNull();
+    expect(
+      gauntletHudModel({ run: wagerRun({ stage: 'guess', holder: true }), time: 0 }).hint,
+    ).toBeNull();
+  });
+
+  it('shows no hint outside a live trial, when spectating, or when finished', () => {
+    expect(gauntletHudModel({ run: run({ phase: 'staging' }), time: 0 }).hint).toBeNull();
+    expect(
+      gauntletHudModel({ run: run({ phase: 'interlude', sentinel: null }), time: 0 }).hint,
+    ).toBeNull();
+    expect(gauntletHudModel({ run: run({ spectating: true }), time: 0 }).hint).toBeNull();
+    expect(gauntletHudModel({ run: run({ finished: true }), time: 0 }).hint).toBeNull();
+    expect(gauntletHudModel({ run: null, time: 0 }).hint).toBeNull();
+  });
 });
 
 describe('GauntletClock calibration', () => {

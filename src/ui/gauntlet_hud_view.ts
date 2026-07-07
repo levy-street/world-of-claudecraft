@@ -19,6 +19,20 @@
 import { GAUNTLET } from '../sim/content/gauntlet';
 import type { GauntletPhase, GauntletRunView } from '../sim/types';
 
+/** Which one-line teaching hint the cluster shows (the painter resolves the
+ * matching hudChrome.gauntlet.hint.* key; this core stays i18n-free). The
+ * wager splits by whether the viewer ACTS this round: the holder hides on a
+ * hold round, the guesser calls odd/even on a guess round; the off-turn
+ * player gets no hint. */
+export type GauntletHudHint =
+  | 'sentinel'
+  | 'sigils'
+  | 'pull'
+  | 'wagerHold'
+  | 'wagerGuess'
+  | 'span'
+  | 'court';
+
 /** The flat render model the gauntlet HUD painter consumes. */
 export interface GauntletHudModel {
   /** Whether the cluster shows at all (a run is live). */
@@ -70,6 +84,10 @@ export interface GauntletHudModel {
   finished: boolean;
   /** Podium standings once the run resolves (proper nouns, not translated). */
   podium: { first: string; second: string; third: string } | null;
+  /** The per-trial teaching line (how THIS trial is played), or null when the
+   *  viewer has nothing to act on: outside a live trial, spectating, already
+   *  finished, or waiting on the wager partner's turn. */
+  hint: GauntletHudHint | null;
 }
 
 /** The per-frame input: the viewer's run projection and the current sim time,
@@ -78,6 +96,25 @@ export interface GauntletHudInput {
   run: GauntletRunView | null;
   time: number;
   wagerStake?: number;
+}
+
+// The viewer's actionable teaching line, or null when there is nothing to act
+// on. Exactly one trial substate member is non-null during its trial, and the
+// pair-scoped members (sigils/pull/wager/court) are already null for
+// spectators; the run-wide ones (sentinel/span) are gated by the flags here.
+function hintFor(run: GauntletRunView): GauntletHudHint | null {
+  if (run.phase !== 'trial' || run.spectating || run.finished) return null;
+  if (run.sentinel) return 'sentinel';
+  if (run.sigils) return 'sigils';
+  if (run.pull) return 'pull';
+  if (run.wager) {
+    if (run.wager.stage === 'hold' && run.wager.holder) return 'wagerHold';
+    if (run.wager.stage === 'guess' && !run.wager.holder) return 'wagerGuess';
+    return null;
+  }
+  if (run.span) return 'span';
+  if (run.court) return 'court';
+  return null;
 }
 
 const HIDDEN: GauntletHudModel = {
@@ -101,6 +138,7 @@ const HIDDEN: GauntletHudModel = {
   spectating: false,
   finished: false,
   podium: null,
+  hint: null,
 };
 
 const clamp01 = (n: number): number => (n < 0 ? 0 : n > 1 ? 1 : n);
@@ -185,5 +223,6 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
     spectating: run.spectating,
     finished: run.finished,
     podium: run.podium,
+    hint: hintFor(run),
   };
 }

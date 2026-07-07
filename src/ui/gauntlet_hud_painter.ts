@@ -10,7 +10,7 @@
 // color is the LIGHT_*_CLASS toggle (never a hex in TS), the percent precision and
 // the i18n keys are named constants.
 
-import type { GauntletHudModel } from './gauntlet_hud_view';
+import type { GauntletHudHint, GauntletHudModel } from './gauntlet_hud_view';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
 
@@ -52,6 +52,17 @@ const K = {
   roleDefender: 'hudChrome.gauntlet.roleDefender',
 } satisfies Record<string, TranslationKey>;
 
+// The per-trial teaching line, keyed by the model's hint discriminator.
+const HINT_KEYS = {
+  sentinel: 'hudChrome.gauntlet.hint.sentinel',
+  sigils: 'hudChrome.gauntlet.hint.sigils',
+  pull: 'hudChrome.gauntlet.hint.pull',
+  wagerHold: 'hudChrome.gauntlet.hint.wagerHold',
+  wagerGuess: 'hudChrome.gauntlet.hint.wagerGuess',
+  span: 'hudChrome.gauntlet.hint.span',
+  court: 'hudChrome.gauntlet.hint.court',
+} satisfies Record<GauntletHudHint, TranslationKey>;
+
 /** The DOM nodes one gauntlet HUD instance paints into. */
 export interface GauntletHudElements {
   /** The cluster container (#gauntlet-hud): shown while a run is live. */
@@ -70,6 +81,8 @@ export interface GauntletHudElements {
   prize: HTMLElement;
   /** The sentinel light pill (green/red + Go/Stop text). */
   light: HTMLElement;
+  /** The per-trial teaching line under the meta row. */
+  hint: HTMLElement;
   /** The Keeper's Wager strip (shown only during a live wager round). */
   wagerStrip: HTMLElement;
   /** The strip's stake label. */
@@ -138,6 +151,9 @@ export class GauntletHudPainter {
       w.toggleClass(this.el.light, LIGHT_GREEN_CLASS, !red);
       w.setText(this.el.light, red ? t(K.stop) : t(K.go));
     }
+
+    w.setDisplay(this.el.hint, model.hint ? SHOWN_BLOCK : HIDDEN);
+    if (model.hint) w.setText(this.el.hint, t(HINT_KEYS[model.hint]));
 
     w.setDisplay(this.el.wagerStrip, model.wager ? SHOWN : HIDDEN);
     if (model.wager) this.paintWager(model.wager);

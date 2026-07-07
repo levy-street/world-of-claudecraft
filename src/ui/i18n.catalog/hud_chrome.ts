@@ -87,6 +87,18 @@ export const hudChromeStrings = {
     wagerStake: 'Stake',
     stakeDown: 'Lower the stake',
     stakeUp: 'Raise the stake',
+    // The per-trial teaching line: one short sentence on how the live trial
+    // is played, shown under the meta row only while the viewer can act
+    // (hidden for spectators, finishers, and the wager's off-turn player).
+    hint: {
+      sentinel: 'Run on green. Freeze on red.',
+      sigils: 'Hold the mouse and trace the etched line on the slab.',
+      pull: 'Click, tap, or press Space on each drumbeat.',
+      wagerHold: 'Click a pebble to hide that many marbles.',
+      wagerGuess: 'Click a stone: one dot is odd, two dots is even.',
+      span: 'Cross the glass. Each pair hides one brittle panel.',
+      court: 'Click your rival when the ring flashes to shove them out.',
+    },
   },
   // Hodric's Castle Gauntlet: the Herald's race window, the in-race HUD strip
   // and board, banners, and log lines.
