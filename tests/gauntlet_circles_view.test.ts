@@ -82,11 +82,19 @@ describe('gauntletCircleModel', () => {
     expect(gauntletCircleModel({ run: run(), time: 101.41 }).near).toBe(false);
   });
 
-  it('quantizes the size to whole px so unchanged frames elide', () => {
+  it('quantizes the size to quarter px: a continuous glide that still elides', () => {
+    // Quarter-px grid (float-safe: four times the size is a whole number).
     const a = gauntletCircleModel({ run: run(), time: 100.501 }).sizePx;
-    const b = gauntletCircleModel({ run: run(), time: 100.503 }).sizePx;
-    expect(Number.isInteger(a)).toBe(true);
-    expect(a).toBe(b); // 0.2 units apart, same rounded px
+    expect(Number.isInteger(a * 4)).toBe(true);
+    // The shrink is 100 units/s, so two frames 1ms apart land on the same
+    // quarter-px step and the write elides.
+    const b = gauntletCircleModel({ run: run(), time: 100.5 }).sizePx;
+    const c = gauntletCircleModel({ run: run(), time: 100.501 }).sizePx;
+    expect(c).toBe(b);
+    // A whole-px older quantum would have hidden this real movement: quarter
+    // px keeps a 60fps step (1.67 units) visibly gliding.
+    const d = gauntletCircleModel({ run: run(), time: 100.5045 }).sizePx;
+    expect(d).toBeLessThan(b);
   });
 
   it('returns the one reused container (allocation-light per-frame core)', () => {

@@ -7264,6 +7264,7 @@ export class Hud {
     }
     this.meters.update();
     this.lockpickWindow.repaintIfChanged();
+    this.updateGauntletCircles();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
     this.reconcileLootRollStatus(now);
@@ -11398,12 +11399,19 @@ export class Hud {
   // the wire view and the estimated sim time each frame and routes the SimEvents.
   // -------------------------------------------------------------------------
 
+  // The Great Pull's screen-space circle, on the EVERY-FRAME tier (never a
+  // cadence band): the shrinking size is the trial's actionable input, so it
+  // must glide at frame rate; a 4Hz repaint reads as the circle snapping down
+  // in steps. The elided writers keep an unchanged frame free.
+  private updateGauntletCircles(): void {
+    const run = this.sim.gauntletRun;
+    this.gauntletCirclesPainter.paint(gauntletCircleModel({ run, time: this.gauntletTimeNow() }));
+  }
+
   private updateGauntletHud(): void {
     const run = this.sim.gauntletRun;
     const time = this.gauntletTimeNow();
     this.gauntletHudPainter.paint(gauntletHudModel({ run, time }));
-    // The Great Pull's screen-space circle rides the same wire view + clock.
-    this.gauntletCirclesPainter.paint(gauntletCircleModel({ run, time }));
     // Trials are legs-only (the sim rejects every cast; see casting_lifecycle):
     // the ability rows hide so the bar cannot even suggest pressing one. The
     // frame stack (player frame, xp bar) stays.

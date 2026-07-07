@@ -20,8 +20,9 @@ export interface GauntletCircleModel {
   visible: boolean;
   /** The circle id a click must name (IWorld gauntletPullCircle); -1 hidden. */
   id: number;
-  /** Current outer-ring diameter, whole CSS px (quantized so the per-frame
-   *  size write elides on unchanged frames). */
+  /** Current outer-ring diameter in CSS px, quarter-px quantized: fine enough
+   *  that a 60fps shrink reads as one continuous glide, coarse enough that an
+   *  unchanged frame still elides its write. */
   sizePx: number;
   /** The fixed target-indicator diameter, whole CSS px. */
   targetPx: number;
@@ -69,7 +70,7 @@ export function gauntletCircleModel(input: GauntletCircleInput): GauntletCircleM
   if (size <= 0) return hidden(); // expired client-side; the sim re-deals
   MODEL.visible = true;
   MODEL.id = circle.id;
-  MODEL.sizePx = Math.max(1, Math.round(size));
+  MODEL.sizePx = Math.max(1, Math.round(size * 4) / 4);
   MODEL.targetPx = Math.round(circle.targetSize);
   MODEL.near = Math.abs(size - circle.targetSize) <= circle.targetSize * GAUNTLET_CIRCLE_NEAR_FRAC;
   MODEL.fraction = Math.min(1, Math.max(0, (time - circle.spawnAt) / circle.shrinkS));
