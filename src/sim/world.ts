@@ -516,11 +516,20 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // crest as the inter-zone ridges: a coarse peak/saddle layer plus a finer
   // crag layer, same conservative combined variance so the climb-limit
   // invariant still holds along the whole rim.
-  const rimCrest =
-    1 +
-    (fbm2(x * 0.025, z * 0.025, seed + 29, 3) - 0.5) * 0.35 * mountainDetail +
-    (fbm2(x * 0.09, z * 0.09, seed + 37, 2) - 0.5) * 0.15 * mountainDetail;
-  mountainAdd += rim * 55 * rimCrest;
+  // rimCrest is only ever consumed as `rim * 55 * rimCrest`, so where rim is 0
+  // (the entire open world, everything more than 30yd inside the boundary) it
+  // adds exactly 0. Skip its two fbm2 layers there: groundHeight is the hottest
+  // sim function (player/mob/pet movement, gravity, deep-water and charge checks)
+  // and this was paying 5 noise2 evaluations per ground sample for nothing. This
+  // is a pure early-out, never an approximation: any positive rim still pays the
+  // full crest, so returned heights stay bit-identical (tests/terrain_walls.test.ts).
+  if (rim > 0) {
+    const rimCrest =
+      1 +
+      (fbm2(x * 0.025, z * 0.025, seed + 29, 3) - 0.5) * 0.35 * mountainDetail +
+      (fbm2(x * 0.09, z * 0.09, seed + 37, 2) - 0.5) * 0.15 * mountainDetail;
+    mountainAdd += rim * 55 * rimCrest;
+  }
   // Terrace the combined mountain rise into stair-stepped bands (flat treads
   // + steep risers) instead of one smooth ramp, so slopes read as a stacked
   // rocky mountainside rather than a uniform incline. This does not reduce

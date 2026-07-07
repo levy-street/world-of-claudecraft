@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { CAMPS, NPCS, ROADS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import * as rng from '../src/sim/rng';
 import {
   PITCH,
   PITCH_CENTER,
@@ -224,6 +225,55 @@ describe('impassable terrain walls', () => {
           CLIMB_LIMIT,
         );
       }
+    }
+  });
+});
+
+// The rim-crest noise (two fbm2 layers) is only ever consumed as rim * 55 * crest,
+// so where rim is 0 (the entire open world) it contributes exactly nothing. The
+// height function early-outs that work when rim === 0. This must stay a PURE
+// early-out (bit-identical), not an approximation, since groundHeight is shared by
+// the sim, the server, and the renderer and any drift would fork the world.
+describe('rim-crest early-out (issue 1620)', () => {
+  // Interior samples with rim === 0 (open world), and boundary samples where the
+  // rim wall rises (rim > 0): +X edge, south edge (minZ), north edge (maxZ). Both
+  // sets are pinned to their pre-change outputs; the early-out must not move them.
+  const RIM_ZERO: [number, number, number][] = [
+    [0, 100, 0.44542967472922235],
+    [0, 0, 1.5],
+    [120, 200, 3.757897204555065],
+    [-140, 300, -6.453833730142541],
+  ];
+  const RIM_POSITIVE: [number, number, number][] = [
+    [165, 100, 40.836764683877306],
+    [0, -165, 38.295170748071776],
+    [0, 885, 37.198901254787515],
+    [160, -40, 16.37517884232531],
+    [178, 100, 58.015307256852566],
+    [0, -178, 46.49842115412116],
+  ];
+
+  it('returns bit-identical heights for rim === 0 and rim > 0 samples', () => {
+    for (const [x, z, h] of [...RIM_ZERO, ...RIM_POSITIVE]) {
+      expect(groundHeight(x, z, WORLD_SEED), `groundHeight(${x}, ${z})`).toBe(h);
+    }
+  });
+
+  it('skips the two rim-crest fbm2 evaluations only where rim === 0', () => {
+    // (0, 300) and (165, 300) share the same z (identical ridge / crater / plateau
+    // cost) so the ONLY fbm2 difference between them is the rim-crest pair, which
+    // runs at the +X-edge sample (rim > 0) but not the interior one (rim === 0).
+    const spy = vi.spyOn(rng, 'fbm2');
+    try {
+      spy.mockClear();
+      groundHeight(0, 300, WORLD_SEED); // interior, rim === 0
+      const interior = spy.mock.calls.length;
+      spy.mockClear();
+      groundHeight(165, 300, WORLD_SEED); // +X edge, rim > 0
+      const boundary = spy.mock.calls.length;
+      expect(boundary - interior).toBe(2);
+    } finally {
+      spy.mockRestore();
     }
   });
 });
