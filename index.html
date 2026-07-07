@@ -285,6 +285,18 @@
       </div>
     </div>
 
+    <!-- The Great Pull's shrinking-circle input overlay (trial 3): one pooled
+         circle, positioned per spawn and shrunk per frame by
+         gauntlet_circles_painter from the viewer's wire schedule. The layer is
+         pointer-transparent; only the ring takes the tap. Game input like the
+         canvas, so it stays out of the accessibility tree. -->
+    <div id="gauntlet-circles" aria-hidden="true">
+      <div id="gauntlet-circle">
+        <div class="gc-ring"></div>
+        <div class="gc-target"></div>
+      </div>
+    </div>
+
     <div id="minimap-wrap">
       <div id="zone-label" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>
       <div id="minimap-disc">

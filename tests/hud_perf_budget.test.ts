@@ -225,6 +225,7 @@ const HOT_PAINTERS: ReadonlyArray<{
     reflowAllow: {},
   },
   { file: 'gauntlet_hud_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'gauntlet_circles_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'auras_painter.ts', allow: { '.className': 3 }, reflowAllow: {} },
   {
     file: 'fct_painter.ts',

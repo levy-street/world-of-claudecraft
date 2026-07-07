@@ -219,17 +219,13 @@ export const GAUNTLET_VENUE = {
   // adds the run origin and hands the pose to renderer.setCameraFocus).
   // Authored clear of geometry: over the open pavilion, above head height, so
   // holding the pose without camera collision is safe. Movement trials
-  // (sentinel, span, court) keep the chase cam and have no pose here.
+  // (sentinel, span, court) keep the chase cam and have no pose here; the
+  // pull also keeps the chase cam (locked third person on the rope, with the
+  // screen-space circle overlay as its input).
   focus: {
     sigils: {
       pos: { x: -41.8, y: 4.3, z: 10 },
       lookAt: { x: -44, y: 1.2, z: 10 },
-    },
-    // Side-on framing of the rope lane: both gripping lines, the pit, the
-    // knot, and the beat drum in one shot (the rope is at hand height now).
-    pull: {
-      pos: { x: -44, y: 6.5, z: 58 },
-      lookAt: { x: -44, y: 1, z: 44 },
     },
     // Over the echo table from behind the viewer's west mat: all four rune
     // stones in frame.

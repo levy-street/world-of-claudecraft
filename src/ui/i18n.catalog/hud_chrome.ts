@@ -92,7 +92,7 @@ export const hudChromeStrings = {
     hint: {
       sentinel: 'Run on green. Freeze on red.',
       sigils: 'Hold the mouse and trace the etched line on the slab.',
-      pull: 'Click, tap, or press Space on each drumbeat.',
+      pull: 'Click each circle just as it shrinks to the inner ring.',
       echoWatch: 'Watch the stones light up.',
       echoAnswer: 'Click the stones in the same order.',
       span: 'Cross the glass. Each pair hides one brittle panel.',
