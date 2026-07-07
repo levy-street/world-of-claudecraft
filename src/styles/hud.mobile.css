@@ -4602,7 +4602,4 @@
   body.mobile-touch #gauntlet-wager .gw-guess-row .btn {
     min-height: 48px;
   }
-  body.mobile-touch #gauntlet-sigils .gs-canvas {
-    width: min(300px, 82vw);
-  }
 }

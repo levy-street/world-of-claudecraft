@@ -16,6 +16,7 @@ import {
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
+import type { WorldAimSurface } from '../game/world_aim';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
@@ -36,7 +37,7 @@ import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
-import { GAUNTLET } from '../sim/content/gauntlet';
+import { GAUNTLET, GAUNTLET_VENUE } from '../sim/content/gauntlet';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -282,7 +283,7 @@ import { GauntletHudPainter } from './gauntlet_hud_painter';
 import { gauntletHudModel } from './gauntlet_hud_view';
 import { GauntletOverlay } from './gauntlet_overlay';
 import { GauntletRecruitWindow } from './gauntlet_recruit_window';
-import { GauntletSigilsWindow } from './gauntlet_sigils_window';
+import { GauntletTraceBatcher, shapeLocalFromFraction } from './gauntlet_trace_core';
 import { GauntletWagerWindow } from './gauntlet_wager_window';
 import {
   type AimPoint,
@@ -3796,13 +3797,20 @@ export class Hud {
     },
     { onPull: () => this.gauntletPullNow(), onShove: () => this.gauntletShoveNow() },
   );
-  // The sigils trace panel + the wager panel: window-style modules that open only
-  // while their trial is live (driven each frame from updateGauntletHud).
-  private readonly gauntletSigils = new GauntletSigilsWindow({
-    root: () => $('#gauntlet-sigils'),
-    onTrace: (pts) => this.sim.gauntletTrace(pts),
-    ...this.windowFocus('#gauntlet-sigils'),
-  });
+  // The in-world sigils stage: while trial 2 is live for a live contestant,
+  // updateGauntletHud registers the venue's lectern slab as the world-aim
+  // surface (main.ts routes claimed pointer strokes back through onPoint),
+  // holds the authored camera focus pose, and streams the traced shape-local
+  // points to the sim through the trace batcher. All state below is released
+  // the moment the trial's view member goes null, the viewer spectates, or the
+  // run ends (releaseSigilsStage).
+  private worldAim: { set(surface: WorldAimSurface | null): void } | null = null;
+  private sigilsSurface: WorldAimSurface | null = null;
+  private sigilsOrigin: { x: number; z: number } | null = null;
+  private readonly sigilsTrace = new GauntletTraceBatcher();
+  private sigilsLastCrack = 0;
+  // The wager panel: a window-style module that opens only while its trial is
+  // live (driven each frame from updateGauntletHud).
   private readonly gauntletWager = new GauntletWagerWindow({
     root: () => $('#gauntlet-wager'),
     onWager: (n) => this.sim.gauntletWager('wager', n),
@@ -11393,13 +11401,94 @@ export class Hud {
     this.setDisplay(this.actionbar2El, legsOnly ? 'none' : '');
     if (this.gauntletRecruit.isOpen)
       this.gauntletRecruit.update({ eventOpen: this.sim.gauntletOpen, run, time });
-    // Trial input panels: they open/close themselves off the live wire substate.
-    this.gauntletSigils.sync(run?.sigils ?? null);
+    // Trial input surfaces: the sigils stage lives in the world (the lectern
+    // slab); the wager panel opens/closes itself off the live wire substate.
+    this.updateSigilsStage();
     this.gauntletWager.sync(run?.wager ? { ...run.wager, time } : null);
     // The pull/court Space shortcut is only meaningful during a run; bind it lazily.
     if (run) this.bindGauntletKeys();
     if (run) this.gauntletOverlay.update(run.survivors);
     else if (this.gauntletOverlay.shown) this.gauntletOverlay.hide();
+  }
+
+  // The in-world sigils stage. While the trial is live for the viewer (a LIVE
+  // contestant, not spectating), register the venue lectern's interaction rect
+  // as the world-aim surface and glide the camera to the authored pose; when
+  // the trial ends however it ends, release everything. The registration is
+  // once-per-trial (the surface field is the latch); the venue may still be
+  // streaming in on the first frames, so registration retries until the rect
+  // exists. Pending trace points flush here on the batch cadence too, so a
+  // held-still pointer mid-stroke still delivers its tail batch.
+  private updateSigilsStage(): void {
+    const live = this.gauntletContestantRun();
+    const sigils = live?.sigils ?? null;
+    if (!live || !sigils || !this.worldAim) {
+      this.releaseSigilsStage();
+      return;
+    }
+    // Crack only ever DROPS on a fresh pane after a shatter: announce it on the
+    // polite combat live region (the deleted 2D panel's .gs-live equivalent).
+    if (sigils.crack < this.sigilsLastCrack)
+      this.combatAnnouncer.push(t('hudChrome.gauntlet.sigilsShattered'), performance.now());
+    this.sigilsLastCrack = sigils.crack;
+    if (!this.sigilsSurface) {
+      const rect = this.renderer.gauntletSigilSlabRect(live.originX, live.originZ);
+      if (!rect) return; // venue still streaming in; retry next frame
+      this.sigilsOrigin = { x: live.originX, z: live.originZ };
+      this.sigilsTrace.reset();
+      const surface: WorldAimSurface = {
+        rect,
+        onPoint: (u, v, phase) => this.onSigilPoint(u, v, phase),
+      };
+      this.sigilsSurface = surface;
+      this.worldAim.set(surface);
+      const f = GAUNTLET_VENUE.focus.sigils;
+      this.renderer.setCameraFocus({
+        pos: { x: f.pos.x + live.originX, y: f.pos.y, z: f.pos.z + live.originZ },
+        lookAt: { x: f.lookAt.x + live.originX, y: f.lookAt.y, z: f.lookAt.z + live.originZ },
+      });
+    }
+    const pts = this.sigilsTrace.drain(false, performance.now());
+    if (pts.length > 0) this.sim.gauntletTrace(pts);
+  }
+
+  private releaseSigilsStage(): void {
+    this.sigilsLastCrack = 0;
+    if (!this.sigilsSurface) return;
+    this.sigilsSurface = null;
+    this.worldAim?.set(null);
+    this.renderer.setCameraFocus(null);
+    if (this.sigilsOrigin)
+      this.renderer.setGauntletSigilCursor(this.sigilsOrigin.x, this.sigilsOrigin.z, null);
+    this.sigilsOrigin = null;
+    this.sigilsTrace.reset();
+  }
+
+  // A claimed stroke event on the slab, in rect-local 0..1 face coordinates
+  // (u = down-slope = the shape's y axis; v = across = the shape's x axis).
+  // Points quantize through the shared trace core exactly as the old canvas
+  // panel did; the venue's cursor mote follows the raw face point.
+  private onSigilPoint(u: number, v: number, phase: 'down' | 'move' | 'up'): void {
+    if (!this.sigilsSurface || !this.sigilsOrigin) return;
+    const now = performance.now();
+    if (phase === 'up') {
+      this.renderer.setGauntletSigilCursor(this.sigilsOrigin.x, this.sigilsOrigin.z, null);
+    } else {
+      this.sigilsTrace.sample(
+        shapeLocalFromFraction(v),
+        shapeLocalFromFraction(u),
+        now,
+        phase === 'move',
+      );
+      this.renderer.setGauntletSigilCursor(this.sigilsOrigin.x, this.sigilsOrigin.z, { u, v });
+    }
+    const pts = this.sigilsTrace.drain(phase === 'up', now);
+    if (pts.length > 0) this.sim.gauntletTrace(pts);
+  }
+
+  /** Wired by main.ts: the world-aim registry the sigils stage registers into. */
+  attachWorldAim(aim: { set(surface: WorldAimSurface | null): void }): void {
+    this.worldAim = aim;
   }
 
   // Fire an on-beat pull: the beat index is derived from the estimated sim time and
@@ -15765,10 +15854,7 @@ export class Hud {
       this.optionsOpen ||
       this.emoteWheelOpen ||
       $('#emote-editor').style.display === 'block' ||
-      this.cardModalEl !== null ||
-      // The sigils trace is a pointer-drag minigame: suspend movement + game keys
-      // so WASD/abilities cannot fight the trace while the panel is up.
-      this.gauntletSigils.isOpen
+      this.cardModalEl !== null
     );
   }
 

@@ -38,6 +38,14 @@ await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 120000 });
 await page.waitForSelector('#btn-offline', { timeout: 120000 });
 await sleep(500);
 await page.evaluate(() => document.querySelector('#btn-offline').click());
+// Wait for the offline class picker to actually render (a fixed sleep flakes
+// on a cold Vite cache / slow machine), then pick the class.
+await page.waitForFunction(
+  () =>
+    document.querySelector('#offline-select .mini-class[data-class="warrior"]') ||
+    document.querySelector('.class-card[data-class="warrior"]'),
+  { timeout: 30000, polling: 100 },
+);
 await sleep(300);
 await page.evaluate(() => {
   const card =
@@ -45,14 +53,14 @@ await page.evaluate(() => {
     document.querySelector('.class-card[data-class="warrior"]');
   card?.click();
 });
-await sleep(150);
+await sleep(300);
 await page.evaluate(() => {
   const n = document.querySelector('#char-name');
   if (n) n.value = 'Vero';
 });
 await page.evaluate(() => document.querySelector('#btn-start-offline')?.click());
 await page.waitForFunction(() => window.__game?.sim?.entities?.size > 5, {
-  timeout: 60000,
+  timeout: 120000,
   polling: 250,
 });
 await sleep(2000);
@@ -124,6 +132,91 @@ const venueBuilt = await page.evaluate(() => {
   return r && r.gauntletVenues ? r.gauntletVenues.size : -1;
 });
 check(venueBuilt !== 0, `venue built (slots=${venueBuilt})`);
+
+// --- Trial 2, the in-world sigil slab: drive the run to the sigils trial and
+// prove a synthesized pointer trace across the slab's screen projection
+// registers progress on the wire view. The player crosses trial 1 by
+// teleporting down the field during a green light (a teleport is one tick of
+// displacement, legal while green); retried each green until the sim marks
+// the crossing finished.
+const crossed = await (async () => {
+  const deadline = Date.now() + 90000;
+  while (Date.now() < deadline) {
+    const state = await page.evaluate(() => {
+      const run = window.__game.world.gauntletRun;
+      if (!run) return { done: false, gone: true };
+      if (run.trialIndex > 0 || run.finished) return { done: true };
+      if (run.phase === 'trial' && run.sentinel && run.sentinel.light === 'green') {
+        const g = window.__game;
+        const me = g.sim.entities.get(g.world.playerId);
+        me.pos.z = run.originZ + run.sentinel.fieldLength + 4;
+        me.prevPos = { ...me.pos };
+      }
+      return { done: false };
+    });
+    if (state.gone) return false;
+    if (state.done) return true;
+    await sleep(300);
+  }
+  return false;
+})();
+check(crossed, 'crossed the sentinel field (trial 1 resolved for the viewer)');
+
+// Wait out the interlude until the sigils trial is live for the viewer.
+await page.waitForFunction(
+  () => {
+    const run = window.__game.world.gauntletRun;
+    return !!run?.sigils && !run.spectating;
+  },
+  { timeout: 120000, polling: 250 },
+);
+await sleep(2000); // camera focus glide + outline tube build
+await page.screenshot({ path: 'tmp/gauntlet_sigil_slab.png' });
+console.log('shot: tmp/gauntlet_sigil_slab.png');
+
+// The etched outline's screen projection, via the same shared shape module the
+// sim scores against (Vite serves the TS in dev, so the page can import it).
+const tracePath = await page.evaluate(async () => {
+  const g = window.__game;
+  const run = g.world.gauntletRun;
+  if (!run?.sigils) return null;
+  const { sigilOutline } = await import('/src/sim/gauntlet/sigil_shapes.ts');
+  const { GAUNTLET, GAUNTLET_VENUE } = await import('/src/sim/content/gauntlet.ts');
+  const rect = g.renderer.gauntletSigilSlabRect(run.originX, run.originZ);
+  if (!rect) return null;
+  const o = sigilOutline(run.sigils.shapeSeed, run.sigils.shapeId, GAUNTLET.sigils.outlinePoints);
+  const pad = GAUNTLET_VENUE.sigils.slab.padFrac;
+  const inner = 1 - 2 * pad;
+  const pts = [];
+  for (let i = 0; i < o.xs.length; i += 2) {
+    // Shape-local -> face fraction -> rect-local [-1,1] -> world -> screen.
+    const lu = (pad + o.ys[i] * inner) * 2 - 1;
+    const lv = (pad + o.xs[i] * inner) * 2 - 1;
+    const s = g.renderer.worldToScreen(
+      rect.center.x + rect.u.x * lu + rect.v.x * lv,
+      rect.center.y + rect.u.y * lu + rect.v.y * lv,
+      rect.center.z + rect.u.z * lu + rect.v.z * lv,
+    );
+    if (!s.behind) pts.push({ x: s.x, y: s.y });
+  }
+  return pts;
+});
+check(tracePath && tracePath.length > 20, `slab outline projects (${tracePath?.length} points)`);
+
+if (tracePath && tracePath.length > 20) {
+  await page.mouse.move(tracePath[0].x, tracePath[0].y);
+  await page.mouse.down();
+  for (const p of tracePath) {
+    await page.mouse.move(p.x, p.y);
+    await sleep(35);
+  }
+  await page.mouse.up();
+  await sleep(600); // let the tail batch flush and the sim tick
+  const prog = await page.evaluate(() => window.__game.world.gauntletRun?.sigils?.progress ?? -1);
+  check(prog > 0, `in-world trace registered progress (${prog})`);
+  await page.screenshot({ path: 'tmp/gauntlet_sigil_traced.png' });
+  console.log('shot: tmp/gauntlet_sigil_traced.png');
+}
 
 await browser.close();
 if (fails.length) {

@@ -128,8 +128,27 @@ export const GAUNTLET_LAYOUT = {
 // from these (src/render/gauntlet_venue.ts); keep every position here, never
 // inline in render code.
 export const GAUNTLET_VENUE = {
-  // Trial 2, Sugarglass Sigils: a circular etching pavilion.
-  sigils: { x: -44, z: 10, radius: 10 },
+  // Trial 2, Sugarglass Sigils: a circular etching pavilion. The slab block is
+  // the etched lectern at the pavilion center (the trial's input surface):
+  // sized/tilted here so the venue mesh, the world-aim interaction rect, and
+  // the trace input mapping share one source of truth. The face tilts toward
+  // +x (the approach from the crossing field); the etching is a centered
+  // square of half-extent etchHalf on the face, and the outline is inset by
+  // padFrac within it (gauntlet_trace_core maps input through the same inset).
+  sigils: {
+    x: -44,
+    z: 10,
+    radius: 10,
+    slab: {
+      faceAcross: 2.2, // face width, the etching's x axis (yards)
+      faceSlope: 1.6, // face run up the tilt, the etching's y axis
+      thick: 0.12,
+      tiltRad: Math.PI / 6, // 30 deg toward the approach side (+x)
+      centerY: 1.15, // slab center height (instance-local)
+      etchHalf: 0.7, // interaction square half-extent on the face
+      padFrac: 0.1, // outline inset within the square (was the 2D canvas frame pad)
+    },
+  },
   // Trial 3, The Great Pull: a sunken rope trench.
   pull: { x: -44, z: 44, length: 24, width: 9 },
   // Trial 4, Keeper's Wager: a walled dueling courtyard.
@@ -146,6 +165,17 @@ export const GAUNTLET_VENUE = {
   groundHalfWidth: 110,
   groundZMin: -46,
   groundZMax: 130,
+  // Camera focus poses for the desk-style trials, instance-local (the hud glue
+  // adds the run origin and hands the pose to renderer.setCameraFocus).
+  // Authored clear of geometry: over the open pavilion, above head height, so
+  // holding the pose without camera collision is safe. Movement trials
+  // (sentinel, span, court) keep the chase cam and have no pose here.
+  focus: {
+    sigils: {
+      pos: { x: -41.8, y: 4.3, z: 10 },
+      lookAt: { x: -44, y: 1.2, z: 10 },
+    },
+  },
 } as const;
 
 export const GAUNTLET: GauntletDef = {

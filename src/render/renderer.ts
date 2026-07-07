@@ -3861,6 +3861,33 @@ export class Renderer {
   private gauntletVenues = new Map<number, GauntletVenueView>();
   private pendingGauntletSlots = new Set<number>();
 
+  // The venue for a run's instance origin (the run view carries originX/Z), or
+  // null while that slot's venue is still streaming in.
+  private gauntletVenueAt(ox: number, oz: number): GauntletVenueView | null {
+    for (const [slot, view] of this.gauntletVenues) {
+      const o = gauntletOrigin(slot);
+      if (o.x === ox && o.z === oz) return view;
+    }
+    return null;
+  }
+
+  /** The sigil lectern's interaction rect (world space) for a run origin, if built. */
+  gauntletSigilSlabRect(
+    ox: number,
+    oz: number,
+  ): {
+    center: { x: number; y: number; z: number };
+    u: { x: number; y: number; z: number };
+    v: { x: number; y: number; z: number };
+  } | null {
+    return this.gauntletVenueAt(ox, oz)?.sigilSlabRect() ?? null;
+  }
+
+  /** Place (or hide, null) the sigil trace cursor mote at a rect-local point. */
+  setGauntletSigilCursor(ox: number, oz: number, p: { u: number; v: number } | null): void {
+    this.gauntletVenueAt(ox, oz)?.setSigilCursor(p);
+  }
+
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
     void this.dungeons.buildInterior(interior, ox, oz).catch((err) => {

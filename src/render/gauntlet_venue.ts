@@ -25,6 +25,7 @@
 
 import * as THREE from 'three';
 import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE } from '../sim/content/gauntlet';
+import { sigilOutline } from '../sim/gauntlet/sigil_shapes';
 import type { GauntletRunView } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -617,8 +618,9 @@ function buildSpectatorDeck(group: THREE.Group) {
   placeProp(group, 'torchLit', x, 0, z + 10.4, 0, 2.2);
 }
 
-// Stages 2 through 6: the five trial arenas. The span returns a live rig (its
-// panels tint with the shared reveals); everything else is static dressing.
+// Stages 2 through 6: the five trial arenas. The span and the sigil pavilion
+// return live rigs (span panels tint with the shared reveals; the sigil slab
+// carries the etched outline the player traces); the rest is static dressing.
 interface SpanRig {
   panels: { left: THREE.Mesh; right: THREE.Mesh }[];
   unknownMat: THREE.Material;
@@ -626,33 +628,230 @@ interface SpanRig {
   brittleMat: THREE.Material;
 }
 
-function buildTrialArenas(group: THREE.Group): SpanRig {
+// The etched lectern slab: the sigils trial's input surface. World-space rect
+// (center + HALF-extent u/v vectors of the interaction square on the face),
+// the outline tube segments rebuilt per shape, the crack-tinted face material,
+// and the cursor mote fed from the hud's stroke glue.
+interface SigilRig {
+  rect: {
+    center: { x: number; y: number; z: number };
+    u: { x: number; y: number; z: number };
+    v: { x: number; y: number; z: number };
+  };
+  faceMat: THREE.MeshStandardMaterial;
+  tracedMat: THREE.Material;
+  paleMat: THREE.Material;
+  thinMat: THREE.Material;
+  outlineGroup: THREE.Group;
+  segs: THREE.Mesh[];
+  segThin: boolean[];
+  mote: THREE.Mesh;
+  faceCenter: THREE.Vector3; // instance-local face center
+  uDir: THREE.Vector3; // unit, down-slope (the etching's y axis)
+  vDir: THREE.Vector3; // unit, across the face (the etching's x axis)
+  normal: THREE.Vector3;
+}
+
+// Outline tint granularity: the polyline is grouped into this many tube
+// segments, tinted gold as the traced fraction passes each one.
+const SIGIL_SEGMENTS = 24;
+
+// One lectern: a stone stand on the dais with the angled sugarglass slab.
+// Returns the slab mesh (the interactive one carries the crack-tinted face
+// material; the cosmetic ring copies share a cached material).
+function buildLectern(
+  parent: THREE.Group,
+  x: number,
+  z: number,
+  yaw: number,
+  faceMat: THREE.Material,
+): THREE.Mesh {
+  const s = GAUNTLET_VENUE.sigils.slab;
+  const g = new THREE.Group();
+  g.position.set(x, 0, z);
+  g.rotation.y = yaw;
+  parent.add(g);
+  // The stand tucks slightly up-slope and stays under the tilted face plane
+  // so it never pokes through the etching.
+  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.42, 0.9), stoneMat(STONE_DARK));
+  stand.position.set(-0.1, 0.5 + 0.21, 0);
+  stand.castShadow = true;
+  g.add(stand);
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(s.faceSlope, s.thick, s.faceAcross), faceMat);
+  slab.position.set(0, s.centerY, 0);
+  slab.rotation.z = -s.tiltRad; // face normal tilts toward local +x (the approach)
+  slab.castShadow = true;
+  g.add(slab);
+  return slab;
+}
+
+function buildSigilPavilion(group: THREE.Group, ox: number, oz: number): SigilRig {
+  const { x, z, radius, slab } = GAUNTLET_VENUE.sigils;
+  const dais = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius, radius + 0.6, 0.5, 24),
+    surfaceMat({ color: 0x39415a, map: runeTex(), roughness: 0.7 }),
+  );
+  dais.position.set(x, 0.25, z);
+  dais.receiveShadow = true;
+  group.add(dais);
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    placeProp(
+      group,
+      'pillar',
+      x + Math.sin(a) * (radius + 1.6),
+      0,
+      z + Math.cos(a) * (radius + 1.6),
+      a,
+      4.8,
+    );
+  }
+  placeProp(group, 'bannerWhite', x, 3.2, z - radius - 1.4, 0, 2.2);
+
+  // The interactive lectern at the pavilion center. Its face material is
+  // venue-owned: the crack tint recolors it, and surfaceMat's cache would
+  // repaint every consumer of a shared entry.
+  const faceMat = new THREE.MeshStandardMaterial({
+    color: 0x232b3d,
+    roughness: 0.25,
+    metalness: 0.05,
+    emissive: RED_LIGHT,
+    emissiveIntensity: 0,
+  });
+  const tracedMat = new THREE.MeshStandardMaterial({
+    color: 0x4a3a12,
+    emissive: GOLD,
+    emissiveIntensity: 1.5,
+    roughness: 0.4,
+  });
+  const paleMat = new THREE.MeshStandardMaterial({
+    color: 0xd8d3c4,
+    emissive: 0xf0ead0,
+    emissiveIntensity: 0.35,
+    roughness: 0.5,
+  });
+  const thinMat = new THREE.MeshStandardMaterial({
+    color: 0x5a2e28,
+    emissive: 0xff6b5e,
+    emissiveIntensity: 0.6,
+    roughness: 0.5,
+  });
+  venueOwnedMats.push(faceMat, tracedMat, paleMat, thinMat);
+  buildLectern(group, x, z, 0, faceMat);
+
+  // A cosmetic lectern ring for the NPC field (plain glass, no etching).
+  const cosmeticFace = surfaceMat({ color: 0x2b3450, roughness: 0.3 });
+  for (const a of [0.9, 2.4, 3.9, 5.4]) {
+    buildLectern(
+      group,
+      x + Math.sin(a) * 6.5,
+      z + Math.cos(a) * 6.5,
+      a + Math.PI / 2,
+      cosmeticFace,
+    );
+  }
+
+  // Face axes (instance-local; the venue group is unrotated, so world = local
+  // + origin). The face normal tilts toward +x; uDir runs down-slope toward
+  // the approaching player (the etching's y axis, top of the shape up-slope);
+  // vDir is the player's RIGHT across the face (the etching's x axis).
+  const tilt = slab.tiltRad;
+  const normal = new THREE.Vector3(Math.sin(tilt), Math.cos(tilt), 0);
+  const uDir = new THREE.Vector3(Math.cos(tilt), -Math.sin(tilt), 0);
+  const vDir = new THREE.Vector3(0, 0, -1);
+  const faceCenter = new THREE.Vector3(
+    x + normal.x * (slab.thick / 2),
+    slab.centerY + normal.y * (slab.thick / 2),
+    z + normal.z * (slab.thick / 2),
+  );
+  const rect = {
+    center: { x: faceCenter.x + ox, y: faceCenter.y, z: faceCenter.z + oz },
+    u: { x: uDir.x * slab.etchHalf, y: uDir.y * slab.etchHalf, z: uDir.z * slab.etchHalf },
+    v: { x: vDir.x * slab.etchHalf, y: vDir.y * slab.etchHalf, z: vDir.z * slab.etchHalf },
+  };
+
+  const outlineGroup = new THREE.Group();
+  group.add(outlineGroup);
+  const mote = new THREE.Mesh(
+    new THREE.SphereGeometry(0.045, 8, 6),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 2 }),
+  );
+  venueOwnedMats.push(mote.material as THREE.Material);
+  mote.visible = false;
+  group.add(mote);
+
+  return {
+    rect,
+    faceMat,
+    tracedMat,
+    paleMat,
+    thinMat,
+    outlineGroup,
+    segs: [],
+    segThin: [],
+    mote,
+    faceCenter,
+    uDir,
+    vDir,
+    normal,
+  };
+}
+
+function clearSigilOutline(rig: SigilRig): void {
+  for (const m of rig.segs) {
+    rig.outlineGroup.remove(m);
+    m.geometry.dispose();
+  }
+  rig.segs.length = 0;
+  rig.segThin.length = 0;
+}
+
+// Rebuild the etched outline for a fresh shape (seed/id change): ~24 tube
+// segments along the shared deterministic sigilOutline polyline, mapped onto
+// the slab face through the SAME pad inset the trace input uses. Event-driven
+// (shape changes on shatter/advance), never per frame.
+function rebuildSigilOutline(rig: SigilRig, seed: number, shapeId: number): void {
+  clearSigilOutline(rig);
+  const slab = GAUNTLET_VENUE.sigils.slab;
+  const o = sigilOutline(seed, shapeId, GAUNTLET.sigils.outlinePoints);
+  const n = o.xs.length;
+  const per = Math.max(1, Math.floor(n / SIGIL_SEGMENTS));
+  const inner = 1 - 2 * slab.padFrac;
+  const toLocal = (sx: number, sy: number): THREE.Vector3 =>
+    new THREE.Vector3()
+      .copy(rig.faceCenter)
+      .addScaledVector(rig.uDir, ((slab.padFrac + sy * inner) * 2 - 1) * slab.etchHalf)
+      .addScaledVector(rig.vDir, ((slab.padFrac + sx * inner) * 2 - 1) * slab.etchHalf)
+      .addScaledVector(rig.normal, 0.02);
+  for (let s = 0; s < SIGIL_SEGMENTS; s++) {
+    const pts: THREE.Vector3[] = [];
+    let thin = false;
+    for (let k = 0; k <= per; k++) {
+      const i = (s * per + k) % n;
+      pts.push(toLocal(o.xs[i], o.ys[i]));
+      if (o.thin[i]) thin = true;
+    }
+    const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 6, 0.02, 5, false);
+    const mesh = new THREE.Mesh(geo, rig.paleMat);
+    rig.outlineGroup.add(mesh);
+    rig.segs.push(mesh);
+    rig.segThin.push(thin);
+  }
+}
+
+function buildTrialArenas(
+  group: THREE.Group,
+  ox: number,
+  oz: number,
+): {
+  spanRig: SpanRig;
+  sigilRig: SigilRig;
+} {
   const V = GAUNTLET_VENUE;
 
-  // Trial 2, Sugarglass Sigils: a rune-floored pavilion ringed by pillars.
-  {
-    const { x, z, radius } = V.sigils;
-    const dais = new THREE.Mesh(
-      new THREE.CylinderGeometry(radius, radius + 0.6, 0.5, 24),
-      surfaceMat({ color: 0x39415a, map: runeTex(), roughness: 0.7 }),
-    );
-    dais.position.set(x, 0.25, z);
-    dais.receiveShadow = true;
-    group.add(dais);
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2;
-      placeProp(
-        group,
-        'pillar',
-        x + Math.sin(a) * (radius + 1.6),
-        0,
-        z + Math.cos(a) * (radius + 1.6),
-        a,
-        4.8,
-      );
-    }
-    placeProp(group, 'bannerWhite', x, 3.2, z - radius - 1.4, 0, 2.2);
-  }
+  // Trial 2, Sugarglass Sigils: a rune-floored pavilion ringed by pillars,
+  // with the etched lectern slab (the trial's input surface) at its center.
+  const sigilRig = buildSigilPavilion(group, ox, oz);
 
   // Trial 3, The Great Pull: a sunken trench with the great rope over it.
   {
@@ -822,7 +1021,7 @@ function buildTrialArenas(group: THREE.Group): SpanRig {
     }
     placeProp(group, 'bannerYellow', x, 3.2, z0 - 2, 0, 2.2);
   }
-  return spanRig;
+  return { spanRig, sigilRig };
 }
 
 // Track venue-created dynamic materials for dispose (surfaceMat ones are
@@ -836,6 +1035,14 @@ let venueOwnedMats: THREE.Material[] = [];
 export interface GauntletVenueView {
   group: THREE.Group;
   update(t: number, run: GauntletRunView | null): void;
+  /** The sigil slab's interaction rect, WORLD space (center + half-extent u/v). */
+  sigilSlabRect(): {
+    center: { x: number; y: number; z: number };
+    u: { x: number; y: number; z: number };
+    v: { x: number; y: number; z: number };
+  };
+  /** Place (or hide, null) the trace cursor mote at a rect-local 0..1 point. */
+  setSigilCursor(p: { u: number; v: number } | null): void;
   dispose(scene: THREE.Scene): void;
 }
 
@@ -887,17 +1094,22 @@ export async function buildGauntletVenue(
   buildStaging(group);
   buildPodium(group, rig.lampMat);
   buildSpectatorDeck(group);
-  const spanRig = buildTrialArenas(group);
+  const { spanRig, sigilRig } = buildTrialArenas(group, ox, oz);
   scene.add(group);
   // The venue never moves after build: freeze the whole subtree's matrices
-  // (real per-frame CPU on thousands of prop nodes), then re-enable the one
-  // transform-animated child, the Warden's turning head.
+  // (real per-frame CPU on thousands of prop nodes), then re-enable the
+  // transform-animated children: the Warden's turning head and the sigil
+  // trace mote (repositioned per stroke sample).
   freezeStaticMatrices(group);
   rig.headGroup.matrixAutoUpdate = true;
+  sigilRig.mote.matrixAutoUpdate = true;
 
   let lastT = 0;
   let headYaw = 0;
   let lastRevealKey = 'unset';
+  let lastSigilShapeKey = '';
+  let lastSigilProgressKey = -1;
+  let lastSigilCrackKey = -1;
   return {
     group,
     update(t: number, run: GauntletRunView | null) {
@@ -920,6 +1132,46 @@ export async function buildGauntletVenue(
             r === -1 ? spanRig.unknownMat : r === 1 ? spanRig.safeMat : spanRig.brittleMat;
         }
       }
+      // The sigil slab: rebuild the etched outline on a fresh shape, tint the
+      // traced segments gold as progress passes them, and lerp the face toward
+      // red with the crack. Every write is elided on a quantized key.
+      const sig = mine?.sigils ?? null;
+      const shapeKey = sig ? `${sig.shapeSeed}:${sig.shapeId}` : '';
+      if (shapeKey !== lastSigilShapeKey) {
+        lastSigilShapeKey = shapeKey;
+        lastSigilProgressKey = -1;
+        lastSigilCrackKey = -1;
+        if (sig) {
+          rebuildSigilOutline(sigilRig, sig.shapeSeed, sig.shapeId);
+        } else {
+          clearSigilOutline(sigilRig);
+          sigilRig.mote.visible = false;
+          sigilRig.faceMat.emissiveIntensity = 0;
+        }
+      }
+      if (sig) {
+        const progressKey = Math.min(
+          SIGIL_SEGMENTS,
+          Math.max(0, Math.floor(sig.progress * SIGIL_SEGMENTS)),
+        );
+        if (progressKey !== lastSigilProgressKey) {
+          lastSigilProgressKey = progressKey;
+          for (let i = 0; i < sigilRig.segs.length; i++) {
+            sigilRig.segs[i].material =
+              i < progressKey
+                ? sigilRig.tracedMat
+                : sigilRig.segThin[i]
+                  ? sigilRig.thinMat
+                  : sigilRig.paleMat;
+          }
+        }
+        const crackFrac = sig.crackMax > 0 ? Math.min(1, Math.max(0, sig.crack / sig.crackMax)) : 0;
+        const crackKey = Math.round(crackFrac * 24);
+        if (crackKey !== lastSigilCrackKey) {
+          lastSigilCrackKey = crackKey;
+          sigilRig.faceMat.emissiveIntensity = (crackKey / 24) * 0.9;
+        }
+      }
       // Head: green = turned away (yaw PI), red = eyes on the field (yaw 0);
       // no live trial = a slow patrol sweep. The ease rate echoes the
       // telegraph window so the turn reads as the warning it is.
@@ -932,6 +1184,22 @@ export async function buildGauntletVenue(
       const boost = light === 'red' ? 2.6 : light === 'green' ? 1.8 : 1.4;
       rig.eyeMat.emissiveIntensity = boost;
       rig.lampMat.emissiveIntensity = light ? 1.6 : 0.7;
+    },
+    sigilSlabRect() {
+      return sigilRig.rect;
+    },
+    setSigilCursor(p: { u: number; v: number } | null) {
+      if (!p) {
+        sigilRig.mote.visible = false;
+        return;
+      }
+      const half = GAUNTLET_VENUE.sigils.slab.etchHalf;
+      sigilRig.mote.position
+        .copy(sigilRig.faceCenter)
+        .addScaledVector(sigilRig.uDir, (p.u * 2 - 1) * half)
+        .addScaledVector(sigilRig.vDir, (p.v * 2 - 1) * half)
+        .addScaledVector(sigilRig.normal, 0.05);
+      sigilRig.mote.visible = true;
     },
     dispose(s: THREE.Scene) {
       s.remove(group);
