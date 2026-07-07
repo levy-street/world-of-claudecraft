@@ -51,6 +51,7 @@ import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
+import { CameraFocus, type CameraFocusPose } from './camera_focus';
 import { characterSoulRendActive } from './character_effects';
 import {
   type AnimState,
@@ -821,6 +822,12 @@ export class Renderer {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // In-world minigame camera focus (the Gauntlet slab/table/trench framings).
+  private cameraFocus = new CameraFocus();
+  /** Glide the camera to an authored framing; null releases the chase cam. */
+  setCameraFocus(pose: CameraFocusPose | null): void {
+    this.cameraFocus.set(pose);
+  }
   // Map-editor 3D mode: when set, the camera uses this free-cam pose instead of
   // chasing the player (updateCamera honors it and returns early). Editor-only;
   // always null in the shipped game.
@@ -856,6 +863,10 @@ export class Renderer {
   private sloppyCandidates: SloppyPickCandidate[] = [];
   private tmpV2 = new THREE.Vector3();
   private tmpV3 = new THREE.Vector3();
+  // Scratch for rectPoint: it runs at pointer-move rate during a world-aim
+  // stroke (the Gauntlet sigil slab), so no per-call allocation.
+  private tmpNdc = new THREE.Vector2();
+  private tmpPlane = new THREE.Plane();
   // Manual frustum cull for characters. Their skinned meshes keep
   // frustumCulled=false (a skinned mesh's bind-pose bounds don't follow the
   // animated pose, so Three's own cull pops visible rigs out), which means an
@@ -5660,6 +5671,10 @@ export class Renderer {
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);
+    // Minigame focus: mix the chase pose toward the authored framing (and back
+    // out on release), after collision so the glide starts from what the
+    // player actually saw. Focus poses are authored clear of geometry.
+    this.cameraFocus.apply(this.camera.position, this.cameraLookAt, dt);
     this.camera.lookAt(this.cameraLookAt);
     this.camera.updateMatrixWorld();
 
@@ -5761,6 +5776,49 @@ export class Renderer {
     const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeY);
     const hit = new THREE.Vector3();
     return this.raycaster.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
+  }
+
+  // In-world minigame surfaces (the Gauntlet sigil slab): where a screen point
+  // meets an authored world-space rectangle, in the rect's local 0..1 face
+  // coordinates. u/v are HALF-extent vectors from the center to the face edges.
+  // A hit just off the face (5% forgiveness) still resolves, clamped, so a
+  // stroke survives a wobbly finger at the rim; further out returns null.
+  rectPoint(
+    clientX: number,
+    clientY: number,
+    rect: {
+      center: { x: number; y: number; z: number };
+      u: { x: number; y: number; z: number };
+      v: { x: number; y: number; z: number };
+    },
+  ): { u: number; v: number } | null {
+    const ndc = this.tmpNdc.set(
+      (clientX / window.innerWidth) * 2 - 1,
+      -(clientY / window.innerHeight) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const { center, u, v } = rect;
+    const normal = this.tmpV
+      .set(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x)
+      .normalize();
+    this.tmpPlane.setFromNormalAndCoplanarPoint(
+      normal,
+      this.tmpV2.set(center.x, center.y, center.z),
+    );
+    const hit = this.tmpV3;
+    if (!this.raycaster.ray.intersectPlane(this.tmpPlane, hit)) return null;
+    const dx = hit.x - center.x;
+    const dy = hit.y - center.y;
+    const dz = hit.z - center.z;
+    const lu = (dx * u.x + dy * u.y + dz * u.z) / (u.x * u.x + u.y * u.y + u.z * u.z);
+    const lv = (dx * v.x + dy * v.y + dz * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z);
+    const u01 = lu * 0.5 + 0.5;
+    const v01 = lv * 0.5 + 0.5;
+    if (u01 < -0.05 || u01 > 1.05 || v01 < -0.05 || v01 > 1.05) return null;
+    return {
+      u: Math.min(1, Math.max(0, u01)),
+      v: Math.min(1, Math.max(0, v01)),
+    };
   }
 
   pick(clientX: number, clientY: number): number | null {

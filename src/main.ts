@@ -75,6 +75,7 @@ import {
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { WorldAim } from './game/world_aim';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -2155,6 +2156,23 @@ async function startGame(
     );
   }
 
+  // World-aim glue: while a trial registers an in-world surface (the Gauntlet
+  // sigil slab), a left press that lands on it claims the whole stroke; the
+  // rect-local 0..1 points stream to the surface. A press off the surface
+  // falls through to the normal click path. Movement holds still during a
+  // stroke via the per-frame suspendMovement driver (isWorldPointerStroking),
+  // which also releases it automatically if the trial ends mid-stroke.
+  const worldAim = new WorldAim();
+  input.worldPointerHook = (phase, x, y) => {
+    const surf = worldAim.surface();
+    if (!surf) return false;
+    const local = renderer.rectPoint(x, y, surf.rect);
+    if (phase === 'down' && !local) return false; // pressed off the surface: normal click
+    if (local) surf.onPoint(local.u, local.v, phase);
+    else if (phase === 'up') surf.onPoint(0, 0, 'up');
+    return true;
+  };
+
   function handlePick(x: number, y: number, button: number): void {
     if (hud.isGroundAimActive()) {
       if (button === 2) {
@@ -2652,7 +2670,11 @@ async function startGame(
     // character behind it (other windows stay non-modal, as before); the
     // first-spawn intro cinematic holds movement the same way until it lands
     input.setSuspendMovement(
-      !gameInputReady || hud.isModalOpen() || cameraPromptOpen() || intro !== null,
+      !gameInputReady ||
+        hud.isModalOpen() ||
+        cameraPromptOpen() ||
+        intro !== null ||
+        input.isWorldPointerStroking(),
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
