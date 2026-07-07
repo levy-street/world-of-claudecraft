@@ -171,17 +171,9 @@ describe('gauntletHudModel', () => {
       court: { attacker: true, swapAt: 200, shoveReadyAt: 110, neckZ: 14, rivalId: 5, ...over },
     });
 
-  it('gates the shove on the cooldown and reports the remaining fraction', () => {
-    const cd = GAUNTLET.court.shoveCooldownS;
-    const cooling = gauntletHudModel({ run: courtRun(), time: 110 - cd / 2 });
-    expect(cooling.court?.shoveReady).toBe(false);
-    expect(cooling.court?.cooldownFrac).toBeCloseTo(0.5, 6);
-    const ready = gauntletHudModel({ run: courtRun(), time: 110 });
-    expect(ready.court?.shoveReady).toBe(true);
-    expect(ready.court?.cooldownFrac).toBe(0);
-  });
-
   it('carries the attacker/defender court role through', () => {
+    // The shove itself is a world click on the rival (the ready cue reads the
+    // raw view's shoveReadyAt), so the role is the model's whole court block.
     expect(gauntletHudModel({ run: courtRun({ attacker: true }), time: 0 }).court?.attacker).toBe(
       true,
     );

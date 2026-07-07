@@ -3792,13 +3792,8 @@ export class Hud {
       wagerRound: $('#gauntlet-wager-round'),
       court: $('#gauntlet-court'),
       courtRole: $('#gauntlet-court-role'),
-      courtBtn: $('#gauntlet-court-btn'),
-      courtCd: $('#gauntlet-court .gh-court-cd'),
     },
-    {
-      onWagerAdjust: (delta) => this.gauntletWagerAdjust(delta),
-      onShove: () => this.gauntletShoveNow(),
-    },
+    { onWagerAdjust: (delta) => this.gauntletWagerAdjust(delta) },
   );
   // The in-world sigils stage: while trial 2 is live for a live contestant,
   // updateGauntletHud registers the venue's lectern slab as the world-aim
@@ -3819,6 +3814,8 @@ export class Hud {
   // re-clamps every send). Reset to 1 whenever a fresh wager trial opens.
   private gauntletWagerStake = 1;
   private gauntletWagerWasLive = false;
+  // Edge detector for the court trial's shove-ready ring flash on the rival.
+  private gauntletShoveWasReady = false;
   // Wall-clock estimator for the countdown (IWorld exposes no sim clock online); see
   // gauntlet_clock.ts.
   private readonly gauntletClock = new GauntletClock();
@@ -11412,6 +11409,17 @@ export class Hud {
     // table); the desk-style trials also hold an authored camera focus pose.
     this.updateGauntletFocus();
     this.updateSigilsStage();
+    // Final Court: the moment the shove comes off cooldown, flash a ground
+    // ring at the rival sized to the shove range; clicking them IS the shove
+    // (the SHOVE button is gone), so the cue lives in the world too.
+    const court = this.gauntletContestantRun()?.court ?? null;
+    const shoveReady = !!court && time >= court.shoveReadyAt;
+    if (shoveReady && !this.gauntletShoveWasReady && court) {
+      const rival = this.sim.entities.get(court.rivalId);
+      if (rival)
+        this.renderer.spawnAoeRing(rival.pos.x, rival.pos.z, GAUNTLET.court.shoveRange, 'arcane');
+    }
+    this.gauntletShoveWasReady = shoveReady;
     // The pull/court Space shortcut is only meaningful during a run; bind it lazily.
     if (run) this.bindGauntletKeys();
     if (run) this.gauntletOverlay.update(run.survivors);
@@ -11538,6 +11546,17 @@ export class Hud {
     const run = this.gauntletContestantRun();
     if (!run?.pull) return false;
     this.gauntletPullNow();
+    return true;
+  }
+
+  /** main.ts handlePick intercept: during the court trial, clicking the RIVAL
+   * while the shove is ready IS the shove. A click during cooldown falls
+   * through to normal targeting (the ground ring flash marks readiness). */
+  gauntletCourtClick(id: number): boolean {
+    const run = this.gauntletContestantRun();
+    if (!run?.court || id !== run.court.rivalId) return false;
+    if (this.gauntletTimeNow() < run.court.shoveReadyAt) return false;
+    this.gauntletShoveNow();
     return true;
   }
 

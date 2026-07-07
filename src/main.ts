@@ -2193,6 +2193,10 @@ async function startGame(
       }
     }
     const id = renderer.pick(x, y);
+    // The Final Court: clicking the rival while the shove is ready IS the
+    // shove (the ring flash marks readiness); on cooldown the click falls
+    // through and just targets them.
+    if (button === 0 && id !== null && hud.gauntletCourtClick(id)) return;
     // OSRS-style click feedback (its own toggle): a brief ground marker, gold for a
     // neutral click and red on a hostile. Both reference games only mark a real action,
     // so the marker stamps where a click actually does something: the click-to-move

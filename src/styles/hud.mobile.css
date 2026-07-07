@@ -4585,12 +4585,6 @@
     box-sizing: border-box;
   }
   /* Trial input controls: keep every tap target >= 44px on touch. */
-  body.mobile-touch .gh-court-btn {
-    min-height: 48px;
-  }
-  body.mobile-touch .gh-court-btn {
-    min-width: 130px;
-  }
   body.mobile-touch .gh-wager-btn {
     min-width: 44px;
     min-height: 44px;

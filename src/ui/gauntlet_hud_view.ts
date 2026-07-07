@@ -57,14 +57,12 @@ export interface GauntletHudModel {
     /** Raw remaining round seconds (the painter ceils + formats). */
     roundSeconds: number;
   } | null;
-  /** The Final Court shove prompt during the court trial, else null. */
+  /** The Final Court role chip during the court trial, else null. The shove
+   *  itself is a click on the rival in the world (with a ground-ring ready
+   *  cue), so the model carries only the role. */
   court: {
     /** True while the viewer holds the attacker role this swap window. */
     attacker: boolean;
-    /** The shove is off cooldown (time >= shoveReadyAt). */
-    shoveReady: boolean;
-    /** Remaining cooldown as a 0..1 fraction (0 when ready), for the fill. */
-    cooldownFrac: number;
   } | null;
   /** The viewer was knocked out and is watching. */
   spectating: boolean;
@@ -165,16 +163,7 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
           };
         })()
       : null;
-  const court = run.court
-    ? {
-        attacker: run.court.attacker,
-        shoveReady: time >= run.court.shoveReadyAt,
-        cooldownFrac:
-          GAUNTLET.court.shoveCooldownS > 0
-            ? clamp01(Math.max(0, run.court.shoveReadyAt - time) / GAUNTLET.court.shoveCooldownS)
-            : 0,
-      }
-    : null;
+  const court = run.court ? { attacker: run.court.attacker } : null;
   return {
     visible: true,
     phase: run.phase,

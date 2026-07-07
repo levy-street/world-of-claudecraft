@@ -76,32 +76,17 @@ export const hudChromeStrings = {
     placeFirst: '1st',
     placeSecond: '2nd',
     placeThird: '3rd',
-    // Trial input surfaces (trials 2/3/4/6): the sigils trace panel, the pull
-    // meter, the wager panel, and the court shove prompt. {count}/{seconds} are
-    // formatNumber values; {name} is an esc()'d contestant name.
-    pull: 'Pull',
-    pullRope: 'Rope',
-    shove: 'Shove',
+    // Trial chrome remnants: the trials play out IN THE WORLD (the sigil slab,
+    // the rope and drum, the wager table, the rival shove), so only the court
+    // role chip, the shatter announcement, and the wager stake/round strip
+    // keep HUD text. {seconds} is a formatNumber value.
     roleAttacker: 'Attacker',
     roleDefender: 'Defender',
-    sigilsTitle: 'Trace the Sigil',
-    sigilsHint: 'Trace the etched line. Do not let it crack.',
-    cracks: 'Cracks',
-    traced: 'Traced',
     sigilsShattered: 'The pane shattered!',
-    wagerTitle: "Keeper's Wager",
-    wagerYours: 'Yours: {count}',
-    wagerPartner: '{name}: {count}',
     wagerRound: 'Round: {seconds}s',
     wagerStake: 'Stake',
     stakeDown: 'Lower the stake',
     stakeUp: 'Raise the stake',
-    wagerHide: 'Hide your marbles',
-    wagerGuess: 'Odd or even?',
-    odd: 'Odd',
-    even: 'Even',
-    wagerWon: 'You won the duel.',
-    wagerLost: 'You lost the duel.',
   },
   // Hodric's Castle Gauntlet: the Herald's race window, the in-race HUD strip
   // and board, banners, and log lines.

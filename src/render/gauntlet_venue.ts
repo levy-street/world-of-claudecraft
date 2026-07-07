@@ -1243,6 +1243,8 @@ export async function buildGauntletVenue(
   scene: THREE.Scene,
   ox: number,
   oz: number,
+  // World-space shatter poof hook (the renderer binds its pooled vfx).
+  onPoof?: (x: number, y: number, z: number) => void,
 ): Promise<GauntletVenueView> {
   await ensureGauntletVenueAssets();
   const group = new THREE.Group();
@@ -1306,6 +1308,7 @@ export async function buildGauntletVenue(
   let lastT = 0;
   let headYaw = 0;
   let lastRevealKey = 'unset';
+  let lastRevealed: number[] = [];
   let lastSigilShapeKey = '';
   let lastSigilProgressKey = -1;
   let lastSigilCrackKey = -1;
@@ -1326,19 +1329,27 @@ export async function buildGauntletVenue(
       const mine = run && run.originX === ox && run.originZ === oz ? run : null;
       const light = mine?.sentinel ? mine.sentinel.light : null;
       // Span panels tint with the shared reveals (unknown glass, proven-safe
-      // frosted, proven-brittle dark). Material swaps are elided on a key.
+      // frosted, proven-brittle dark). Material swaps are elided on a key; a
+      // pair OBSERVED flipping from unknown to revealed pops a shatter poof on
+      // its brittle side (never on the venue's first sync mid-run).
       const revealKey = mine?.span ? mine.span.revealed.join(',') : '';
       if (revealKey !== lastRevealKey) {
+        const observedBefore = lastRevealKey !== 'unset' && lastRevealKey !== '';
         lastRevealKey = revealKey;
         const revealed = mine?.span?.revealed ?? null;
         for (let i = 0; i < spanRig.panels.length; i++) {
           const r = revealed ? (revealed[i] ?? -1) : -1;
           const pair = spanRig.panels[i];
+          if (observedBefore && r !== -1 && (lastRevealed[i] ?? -1) === -1 && onPoof) {
+            const brittle = r === 0 ? pair.right : pair.left;
+            onPoof(ox + brittle.position.x, brittle.position.y, oz + brittle.position.z);
+          }
           pair.left.material =
             r === -1 ? spanRig.unknownMat : r === 0 ? spanRig.safeMat : spanRig.brittleMat;
           pair.right.material =
             r === -1 ? spanRig.unknownMat : r === 1 ? spanRig.safeMat : spanRig.brittleMat;
         }
+        lastRevealed = revealed ? [...revealed] : [];
       }
       // The sigil slab: rebuild the etched outline on a fresh shape, tint the
       // traced segments gold as progress passes them, and lerp the face toward

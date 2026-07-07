@@ -20,12 +20,8 @@ const LIGHT_RED_CLASS = 'red';
 // Court role state classes (drives the attacker/defender chip color in CSS).
 const ATTACKER_CLASS = 'attacker';
 const DEFENDER_CLASS = 'defender';
-// A shove button on cooldown: pointer-events off + dimmed via CSS.
+// A stepper at its rail: pointer-events off + dimmed via CSS.
 const DISABLED_CLASS = 'gh-disabled';
-// Custom property the court sub-cluster reads for its cooldown overlay.
-const CD_VAR = '--gh-cd'; // shove cooldown fill, 0..1
-// Fraction-digit precision for the positioned custom properties.
-const FRAC_DIGITS = 3;
 // Bar-fill width precision, matching the cast bar (e.g. "62.5%").
 const PERCENT_FRACTION_DIGITS = 1;
 // Integer formatting for vitality / survivor counts and the whole-second countdown.
@@ -52,7 +48,6 @@ const K = {
   stakeDown: 'hudChrome.gauntlet.stakeDown',
   stakeUp: 'hudChrome.gauntlet.stakeUp',
   wagerRound: 'hudChrome.gauntlet.wagerRound',
-  shove: 'hudChrome.gauntlet.shove',
   roleAttacker: 'hudChrome.gauntlet.roleAttacker',
   roleDefender: 'hudChrome.gauntlet.roleDefender',
 } satisfies Record<string, TranslationKey>;
@@ -88,20 +83,15 @@ export interface GauntletHudElements {
   wagerRound: HTMLElement;
   /** The Final Court sub-cluster (shown only during the court trial). */
   court: HTMLElement;
-  /** The attacker/defender role chip. */
+  /** The attacker/defender role chip (the shove itself is a click on the
+   *  rival in the world; there is no button). */
   courtRole: HTMLElement;
-  /** The SHOVE button. */
-  courtBtn: HTMLElement;
-  /** The shove-cooldown fill, sized by the --gh-cd custom prop. */
-  courtCd: HTMLElement;
 }
 
 /** The Hud glue the interactive controls dispatch through. */
 export interface GauntletHudDeps {
   /** Step the wager stake by +-1 (Hud clamps and sends the re-bet). */
   onWagerAdjust(delta: number): void;
-  /** Throw a shove (Hud gates it on the shove cooldown before sending). */
-  onShove(): void;
 }
 
 export class GauntletHudPainter {
@@ -112,10 +102,9 @@ export class GauntletHudPainter {
   ) {
     // One-time click wiring (the painter is constructed once). The buttons live
     // inside the pointer-events:none cluster and opt back into pointer events via
-    // CSS; each dispatch is gated Hud-side (stake clamp, shove cooldown).
+    // CSS; the dispatch is gated Hud-side (stake clamp).
     this.el.wagerDec.addEventListener('click', () => deps.onWagerAdjust(-1));
     this.el.wagerInc.addEventListener('click', () => deps.onWagerAdjust(1));
-    this.el.courtBtn.addEventListener('click', () => deps.onShove());
   }
 
   paint(model: GauntletHudModel): void {
@@ -180,14 +169,6 @@ export class GauntletHudPainter {
     w.setText(this.el.courtRole, court.attacker ? t(K.roleAttacker) : t(K.roleDefender));
     w.toggleClass(this.el.court, ATTACKER_CLASS, court.attacker);
     w.toggleClass(this.el.court, DEFENDER_CLASS, !court.attacker);
-    w.setText(this.el.courtBtn, t(K.shove));
-    w.setAttr(this.el.courtBtn, 'aria-label', t(K.shove));
-    // Kept focusable but non-actionable during cooldown: aria-disabled + a class
-    // that drops pointer events (a real `disabled` would fight the elided writers
-    // and drop the button from the a11y tree mid-trial).
-    w.toggleClass(this.el.courtBtn, DISABLED_CLASS, !court.shoveReady);
-    w.setAttr(this.el.courtBtn, 'aria-disabled', court.shoveReady ? 'false' : 'true');
-    w.setStyleProp(this.el.courtCd, CD_VAR, court.cooldownFrac.toFixed(FRAC_DIGITS));
   }
 
   private phaseLabel(model: GauntletHudModel): string {

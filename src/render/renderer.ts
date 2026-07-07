@@ -4058,7 +4058,7 @@ export class Renderer {
         const o = gauntletOrigin(i);
         if (Math.abs(px - o.x) >= 220 || Math.abs(pz - o.z) >= 220) continue;
         this.pendingGauntletSlots.add(i);
-        void buildGauntletVenue(this.scene, o.x, o.z)
+        void buildGauntletVenue(this.scene, o.x, o.z, (x, y, z) => this.vfx.poof({ x, y, z }))
           .then((view) => {
             this.gauntletVenues.set(i, view);
             this.pendingGauntletSlots.delete(i);

@@ -4663,13 +4663,14 @@
     filter: drop-shadow(0 2px 14px #000a);
   }
 
-  /* ---------- gauntlet court shove (trial 6) ---------- */
+  /* ---------- gauntlet court role chip (trial 6) ---------- */
+  /* The shove is a click on the rival in the world; the chip only names the
+     viewer's current role. */
   .gh-court {
     display: none;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    pointer-events: auto;
   }
   .gh-court-role {
     font: 700 12px / 18px var(--title-font);
@@ -4686,30 +4687,6 @@
   }
   .gh-court.defender .gh-court-role {
     background: linear-gradient(#4a86c8, #2a5a8a);
-  }
-  .gh-court-btn-wrap {
-    position: relative;
-    display: inline-block;
-    overflow: hidden;
-    border-radius: 4px;
-  }
-  .gh-court-btn {
-    min-height: 46px;
-    min-width: 120px;
-    margin: 0;
-  }
-  .gh-court-cd {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: calc(var(--gh-cd, 0) * 100%);
-    background: #000a;
-    pointer-events: none;
-  }
-  .gh-court-btn.gh-disabled {
-    pointer-events: none;
-    filter: grayscale(0.6) brightness(0.7);
   }
 
   /* ---------- gauntlet wager strip (trial 4) ---------- */
