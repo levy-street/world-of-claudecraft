@@ -249,6 +249,11 @@ import {
   parseUntrackedQuests,
   serializeUntrackedQuests,
 } from './map_quest_list_view';
+import {
+  mapCanvasPointFromEvent,
+  readMapCanvasRenderedBox,
+  syncMapCanvasSize,
+} from './map_canvas_size';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import {
@@ -1463,13 +1468,13 @@ export class Hud {
     });
     mapCanvas.addEventListener('pointermove', (ev) => {
       if (!this.mapDrag || !this.mapView) return;
-      const rect = mapCanvas.getBoundingClientRect();
+      const box = readMapCanvasRenderedBox(mapCanvas);
       // "grab the paper" pan: the world point under the cursor stays under it.
       // toMap draws +X to the left and +Z up (mx = (maxX-x)/span, my = (maxZ-z)/
       // span), so a cursor delta of (dx, dy) px shifts the centre by (+dx, +dy)
       // world units on each axis.
-      const wppx = this.mapView.spanX / rect.width;
-      const wppy = this.mapView.spanZ / rect.height;
+      const wppx = this.mapView.spanX / box.contentWidth;
+      const wppy = this.mapView.spanZ / box.contentHeight;
       this.mapCenter = {
         x: this.mapDrag.cx + (ev.clientX - this.mapDrag.px) * wppx,
         z: this.mapDrag.cz + (ev.clientY - this.mapDrag.py) * wppy,
@@ -1503,13 +1508,11 @@ export class Hud {
         hideMapAreaTip();
         return;
       }
-      const rect = mapCanvas.getBoundingClientRect();
-      const cx = ((ev.clientX - rect.left) * mapCanvas.width) / rect.width;
-      const cy = ((ev.clientY - rect.top) * mapCanvas.height) / rect.height;
-      const glyph = npcMarkerAt(this.mapNpcMarkers, cx, cy);
+      const point = mapCanvasPointFromEvent(mapCanvas, ev);
+      const glyph = npcMarkerAt(this.mapNpcMarkers, point.x, point.y);
       const html = glyph
         ? this.questGiverTooltipHtml(glyph)
-        : this.questAreaTooltipHtml(questAreaObjectivesAt(this.mapQuestAreas, cx, cy));
+        : this.questAreaTooltipHtml(questAreaObjectivesAt(this.mapQuestAreas, point.x, point.y));
       if (!html) {
         hideMapAreaTip();
         return;
@@ -6771,8 +6774,8 @@ export class Hud {
   // map_window_painter; the pure geometry lives in map_window_view.ts.
   private updateMapWindow(): void {
     const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
+    const S = syncMapCanvasSize(canvas);
     const ctx = require2dContext(canvas);
-    const S = canvas.width;
     const p = this.sim.player;
     const summaryEl = $('#map-summary');
 

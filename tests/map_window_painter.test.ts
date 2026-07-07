@@ -87,4 +87,22 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     // Hud keeps the bg cache + prewarm and passes the cached canvas in each redraw.
     expect(hud).toContain('bg: this.mapZoneBg(zone)');
   });
+
+  it('syncs the canvas backing store before either world-map branch paints', () => {
+    expect(hud).toContain("from './map_canvas_size'");
+    expect(hud).toContain('const S = syncMapCanvasSize(canvas);');
+    expect(hud.indexOf('const S = syncMapCanvasSize(canvas);')).toBeLessThan(
+      hud.indexOf("if (mapWindowMode(this.sim) === 'delve')"),
+    );
+    expect(hud.indexOf('const S = syncMapCanvasSize(canvas);')).toBeLessThan(
+      hud.indexOf('this.mapPainter.paintOverworld(ctx, this.sim, {'),
+    );
+  });
+
+  it('routes map hover and drag through shared rendered-canvas coordinate helpers', () => {
+    expect(hud).toContain('mapCanvasPointFromEvent(mapCanvas, ev)');
+    expect(hud).toContain('const box = readMapCanvasRenderedBox(mapCanvas);');
+    expect(hud).toContain('const wppx = this.mapView.spanX / box.contentWidth;');
+    expect(hud).not.toContain('const rect = mapCanvas.getBoundingClientRect();');
+  });
 });

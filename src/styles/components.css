@@ -3446,6 +3446,17 @@
   /* map */
   #map-window {
     --window-pad: 14px;
+    --map-canvas-border: 2px;
+    --map-canvas-frame: calc(
+      var(--window-pad) + var(--window-pad) + var(--map-canvas-border) + var(--map-canvas-border)
+    );
+    --map-canvas-max: min(
+      560px,
+      calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 16px - var(--map-canvas-frame)),
+      calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale, 1) - 24px - var(--map-canvas-frame))
+    );
+    box-sizing: border-box;
+    overflow: hidden;
   }
   /* zoom controls, matching the micro-menu button look */
   #map-zoom {
@@ -4150,7 +4161,10 @@
     align-items: center;
   }
   #map-canvas {
-    border: 2px solid var(--border);
+    display: block;
+    width: var(--map-canvas-max);
+    height: var(--map-canvas-max);
+    border: var(--map-canvas-border) solid var(--border);
     outline: 1px solid #000;
     border-radius: 4px;
     touch-action: none;
