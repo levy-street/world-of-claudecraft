@@ -71,9 +71,10 @@ describe('ERR_KEYS server-code coverage', () => {
     // prepareProvisionQuote + the quote route
     'invalid_realm_name', 'realm_name_not_allowed', 'realm_name_taken', 'realm_cap_reached',
     'stake_below_minimum', 'supply_unavailable', 'invalid_amount', 'link a wallet first',
-    // confirmProvisionQuote + verifyStakeLock
+    // confirmProvisionQuote + verifyStakeLock (local + service-backed paths)
     'quote_not_found', 'not_your_quote', 'quote_expired', 'stake_already_recorded',
     'tx_not_finalized', 'tx_failed', 'token_2022', 'wrong_vault_amount', 'wrong_payer',
+    'stake_service_unavailable',
     // decommission + release
     'not_realm_owner', 'realm_not_found', 'realm_not_active', 'realm_not_decommissioning',
     'timelock_not_elapsed', 'stake_not_released_onchain',

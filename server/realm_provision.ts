@@ -16,6 +16,7 @@ import { offensiveName } from './auth';
 import { isUniqueViolation } from './http_util';
 import { resolveRealm, type RealmType } from './realm';
 import { REALM_ESCROW_PROGRAM_ID, realmStakePda, realmVaultAddress } from './realm_escrow';
+import { realmStakeConfirm, realmStakeQuote, realmStakeServiceConfigured } from './realm_stake_proxy';
 import {
   activateRealm,
   addRealmRole,
@@ -69,11 +70,96 @@ function fail(status: number, error: string): { ok: false; status: number; error
 
 export type StakeVerdict = { ok: true; amountBase: bigint } | { ok: false; reason: string };
 
+// Map the economy service's confirm/quote reason onto the stable wire codes the
+// realm routes already emit (server/realm_operator.ts ERR_KEYS + the founding UI),
+// so consuming the service does not change what the client renders.
+function mapServiceReason(reason: string | undefined): string {
+  switch (reason) {
+    case 'not_finalized':
+      return 'tx_not_finalized';
+    case 'wrong_amount':
+      return 'wrong_vault_amount';
+    case 'memo_mismatch':
+      // The deposit did not land in the agreed stake PDA (wrong destination).
+      return 'wrong_vault_amount';
+    case 'quote_expired':
+      return 'quote_expired';
+    case 'already_staked':
+      return 'stake_already_recorded';
+    case 'rail_disabled':
+    case 'missing_handle':
+    case 'bad_handle':
+    case 'handle_mismatch':
+      return 'stake_service_unavailable';
+    default:
+      return reason ?? 'tx_not_finalized';
+  }
+}
+
 // Verify that `lockSig` is a finalized lock of exactly `expectedAmount` $WOC by
-// `stakerWallet` into the escrow vault for `realmId`. Pure verification against
-// the chain (no DB writes): mirrors the marketplace verifier (finalized, not
-// Token-2022, exact on-chain deltas, payer-bound).
+// `stakerWallet` into the escrow vault for `realmId`.
+//
+// When the economy service is configured (WOC_ECONOMY_URL + secret), the on-chain
+// verification is delegated to it: the game quotes the stake with the escrow
+// handle it derives (the realm stake PDA), so the service re-derives the SAME PDA
+// and rejects a mismatch, then confirms the finalized deposit against exactly that
+// destination. The game does no on-chain math on this path; it reads the service
+// verdict. When the service is NOT configured the game falls back to its own local
+// verify below (graceful degradation, so it boots and runs service-off).
 export async function verifyStakeLock(args: {
+  lockSig: string;
+  realmId: number;
+  stakerWallet: string;
+  mint: string;
+  expectedAmount: bigint;
+}): Promise<StakeVerdict> {
+  if (realmStakeServiceConfigured()) {
+    return verifyStakeLockViaService(args);
+  }
+  return verifyStakeLockLocal(args);
+}
+
+// The service-backed verify path. The stake PDA the game derives is the escrow
+// handle the service re-derives and verifies the deposit against: one destination,
+// no divergence. Registers the handle via the quote (idempotent per realmId), then
+// confirms the finalized signature. A null (transport failure / service off after
+// the config check) surfaces as a retryable stake_service_unavailable rather than
+// silently accepting.
+async function verifyStakeLockViaService(args: {
+  lockSig: string;
+  realmId: number;
+  stakerWallet: string;
+  mint: string;
+  expectedAmount: bigint;
+}): Promise<StakeVerdict> {
+  const realmId = String(args.realmId);
+  const escrow = {
+    jobIdNum: realmId,
+    handle: realmStakePda(args.realmId).toBase58(),
+  };
+  const quote = await realmStakeQuote({
+    ownerAccountId: 0, // the game binds the stake to its own realm quote; the service id is unused here
+    owner: args.stakerWallet,
+    realmId,
+    amountBase: args.expectedAmount.toString(),
+    escrow,
+  });
+  if (quote === null) return { ok: false, reason: 'stake_service_unavailable' };
+  if (quote.reason) return { ok: false, reason: mapServiceReason(quote.reason) };
+
+  const confirm = await realmStakeConfirm({ realmId, signature: args.lockSig });
+  if (confirm === null) return { ok: false, reason: 'stake_service_unavailable' };
+  if (!confirm.staked) return { ok: false, reason: mapServiceReason(confirm.reason) };
+  // The service verified the finalized deposit of exactly this amount into the
+  // agreed stake PDA. The game trusts that verdict (no re-inspection of the chain).
+  return { ok: true, amountBase: args.expectedAmount };
+}
+
+// The local, self-hosted verify (used only when the economy service is not
+// configured): pure verification against the chain (no DB writes), mirroring the
+// marketplace verifier (finalized, not Token-2022, exact on-chain deltas,
+// payer-bound). This is the fallback the service supersedes.
+async function verifyStakeLockLocal(args: {
   lockSig: string;
   realmId: number;
   stakerWallet: string;

@@ -97,6 +97,9 @@ export const ERR_KEYS = {
   token_2022: 'realmOp.err.token_2022',
   wrong_vault_amount: 'realmOp.err.wrong_vault_amount',
   wrong_payer: 'realmOp.err.wrong_payer',
+  // Emitted when the economy service (the on-chain stake verifier) is configured
+  // but transiently unreachable/rejecting; retryable, like tx_not_finalized.
+  stake_service_unavailable: 'realmOp.err.stake_service_unavailable',
   not_realm_owner: 'realmOp.err.not_realm_owner',
   realm_not_found: 'realmOp.err.realm_not_found',
   realm_not_active: 'realmOp.err.realm_not_active',

@@ -145,6 +145,7 @@ export const en_CA: EnTranslations = {
       "token_2022": "This $WOC mint is not supported for staking.",
       "wrong_vault_amount": "The locked amount does not match your quote.",
       "wrong_payer": "The stake must be signed by your linked wallet.",
+      "stake_service_unavailable": "Staking is temporarily unavailable. Try confirming again in a moment.",
       "not_realm_owner": "You do not operate that realm.",
       "realm_not_found": "That realm no longer exists.",
       "realm_not_active": "That realm is not active.",
