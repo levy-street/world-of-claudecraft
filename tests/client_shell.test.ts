@@ -592,18 +592,21 @@ describe('client HTML shell', () => {
     expect(hudTs).not.toContain("pip.classList.toggle('on'");
   });
 
-  it('reconciles every #bags display show-site to flex and every read-guard to !== none', () => {
+  it('reconciles every #bags display show-site to flex and every read-guard to computed visibility', () => {
     // #bags is a flex-column layout (components.css flex-direction: column). Every show-site
-    // must set display = 'flex' (a 'block' drops the column), and every render read-guard must
-    // test !== 'none' (an === 'block' guard never fired when bags was opened via the common
-    // flex path). No '#bags' 'block' display write or read survives, in either the $('#bags')
-    // or the cached-var (drag drop-target) form.
+    // must set display = 'flex' (a 'block' drops the column), and every open/closed
+    // read-guard must use computed visibility. A fresh #bags starts hidden through the
+    // .window stylesheet, so inline display checks misread the first toggle as open.
+    // No '#bags' 'block' display write or inline open/closed read survives, in either
+    // the $('#bags') or the cached-var (drag drop-target) form.
     expect(hudTs).not.toContain("#bags').style.display = 'block'");
     expect(hudTs).not.toContain("#bags').style.display === 'block'");
+    expect(hudTs).not.toContain("#bags').style.display !== 'none'");
     expect(hudTs).not.toContain("bags.style.display = 'block'");
     expect(hudTs).not.toContain("bags.style.display !== 'block'");
     expect(hudTs).toContain("$('#bags').style.display = 'flex';");
-    expect(hudTs).toContain("$('#bags').style.display !== 'none'");
+    expect(hudTs).toContain('this.isWindowVisible($(\'#bags\'))');
+    expect(hudTs).toContain('if (this.isWindowVisible(el)) {');
     expect(hudTs).toContain("bags.style.display !== 'flex'");
   });
 
@@ -2001,7 +2004,7 @@ describe('client HTML shell', () => {
       "if (this.vendorOpen && document.body.classList.contains('mobile-touch')) this.closeVendor();",
     );
     expect(hudTs).toMatch(
-      /const closeMobileBags =\s*document\.body\.classList\.contains\('mobile-touch'\) &&\s*\$\('#bags'\)\.style\.display !== 'none';/,
+      /const closeMobileBags =\s*document\.body\.classList\.contains\('mobile-touch'\) &&\s*this\.isWindowVisible\(\$\('#bags'\)\);/,
     );
   });
 

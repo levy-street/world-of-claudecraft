@@ -144,7 +144,6 @@ import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
-import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { CalendarWindow } from './calendar_window';
@@ -1350,7 +1349,7 @@ export class Hud {
     // re-render the bag footer (and re-composite an open player card) when the
     // connected wallet's $WOC balance changes
     onWalletUiChange(() => {
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      if (this.isWindowVisible($('#bags'))) this.renderBags();
       this.recomposeOpenCard?.();
     });
     $('#pf-name').textContent = sim.player.name;
@@ -3580,7 +3579,7 @@ export class Hud {
       if (open) {
         this.renderBags();
         $('#bags').style.display = 'flex';
-      } else if ($('#bags').style.display !== 'none') {
+      } else if (this.isWindowVisible($('#bags'))) {
         this.renderBags();
       }
     },
@@ -3601,7 +3600,7 @@ export class Hud {
       if (open) {
         this.renderBags();
         $('#bags').style.display = 'flex';
-      } else if ($('#bags').style.display !== 'none') {
+      } else if (this.isWindowVisible($('#bags'))) {
         this.renderBags();
       }
     },
@@ -4541,7 +4540,7 @@ export class Hud {
     this.targetFrameMover?.relocalize();
     this.playerFrameMover?.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
-    if ($('#bags').style.display !== 'none') this.renderBags();
+    if (this.isWindowVisible($('#bags'))) this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
     if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
@@ -5224,7 +5223,7 @@ export class Hud {
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
       this.sim.useItem(action.id);
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      if (this.isWindowVisible($('#bags'))) this.renderBags();
       this.flashActionSlot(barSlot);
     }
   }
@@ -5776,7 +5775,7 @@ export class Hud {
     const id = this.consumableBarIds[i];
     if (!id || this.tradeOpen) return;
     this.sim.useItem(id);
-    if ($('#bags').style.display !== 'none') this.renderBags();
+    if (this.isWindowVisible($('#bags'))) this.renderBags();
     const btn = this.consumableBarSlotBtns[i];
     if (btn) this.flashActionButton(btn);
   }
@@ -8654,7 +8653,7 @@ export class Hud {
           )
             audio.coin();
           else audio.lootItem();
-          if ($('#bags').style.display !== 'none') this.renderBags();
+          if (this.isWindowVisible($('#bags'))) this.renderBags();
           break;
         }
         case 'craftResult': {
@@ -8693,7 +8692,7 @@ export class Hud {
           break;
         }
         case 'vendor': {
-          if ($('#bags').style.display !== 'none') this.renderBags();
+          if (this.isWindowVisible($('#bags'))) this.renderBags();
           if (this.openVendorNpcId !== null) this.renderVendor();
           // A Heroic Marks purchase rides the same 'vendor' event; refresh the
           // shop so the balance and per-offer affordability update after a buy.
@@ -8939,7 +8938,7 @@ export class Hud {
           break;
         }
         case 'tradeDone':
-          if ($('#bags').style.display !== 'none') this.renderBags();
+          if (this.isWindowVisible($('#bags'))) this.renderBags();
           audio.coin();
           break;
         case 'heal2': {
@@ -11241,7 +11240,7 @@ export class Hud {
     );
     const buyAndRefresh = (buy: () => void) => {
       buy();
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      if (this.isWindowVisible($('#bags'))) this.renderBags();
       this.renderVendor();
     };
     renderVendorWindow(
@@ -11303,7 +11302,7 @@ export class Hud {
 
   closeVendor(): void {
     const closeMobileBags =
-      document.body.classList.contains('mobile-touch') && $('#bags').style.display !== 'none';
+      document.body.classList.contains('mobile-touch') && this.isWindowVisible($('#bags'));
     $('#vendor-window').style.display = 'none';
     this.openVendorNpcId = null;
     document.body.classList.remove('vendor-open'); // bags (if still open) re-centres
@@ -11320,7 +11319,7 @@ export class Hud {
       bags.style.display = 'none';
       bags.inert = false;
       this.cancelPetFeed();
-    } else if ($('#bags').style.display !== 'none') {
+    } else if (this.isWindowVisible($('#bags'))) {
       this.renderBags();
     }
   }
@@ -11421,7 +11420,7 @@ export class Hud {
         onCraft: (recipeId) => {
           this.sim.craftItem(recipeId);
           this.renderCrafting();
-          if ($('#bags').style.display !== 'none') this.renderBags();
+          if (this.isWindowVisible($('#bags'))) this.renderBags();
         },
         onClose: () => this.closeCrafting(),
       },
@@ -11485,7 +11484,7 @@ export class Hud {
 
   private onBankClosed(): void {
     const closeMobileBags =
-      document.body.classList.contains('mobile-touch') && $('#bags').style.display !== 'none';
+      document.body.classList.contains('mobile-touch') && this.isWindowVisible($('#bags'));
     document.body.classList.remove('bank-open'); // bags (if still open) re-centres
     if (closeMobileBags) {
       // Mirror closeVendor's teardown backstop: a discard/sell/deposit prompt may hold
@@ -11498,7 +11497,7 @@ export class Hud {
       bags.style.display = 'none';
       bags.inert = false;
       this.cancelPetFeed();
-    } else if ($('#bags').style.display !== 'none') {
+    } else if (this.isWindowVisible($('#bags'))) {
       this.renderBags();
     }
   }
@@ -11564,7 +11563,7 @@ export class Hud {
 
   toggleBags(): void {
     const el = $('#bags');
-    if (bagsWindowShown(el.style.display)) {
+    if (this.isWindowVisible(el)) {
       // Close through the painter so focus returns to the opener (WCAG 2.4.3); close()
       // owns the hide + tooltip + pet-feed teardown, so keep only the audio cue here.
       // Only a genuinely shown window closes here: on a cold load the inline display
@@ -11592,7 +11591,7 @@ export class Hud {
   // Called when an authoritative inventory delta lands (online snapshots
   // carry inventory separately from the event frames that normally redraw).
   onInventoryChanged(): void {
-    if ($('#bags').style.display !== 'none') this.renderBags();
+    if (this.isWindowVisible($('#bags'))) this.renderBags();
     if (this.openVendorNpcId !== null) this.renderVendor();
     this.renderCharIfOpen();
   }
@@ -12153,14 +12152,14 @@ export class Hud {
         this.showBanner(t('skinEvent.unlocked'));
         audio.levelUp();
         this.closeSkinEvent();
-        if ($('#bags').style.display !== 'none') this.renderBags();
+        if (this.isWindowVisible($('#bags'))) this.renderBags();
         return;
       }
       this.sim.claimEventSkin(this.skinEventSelected);
       this.showBanner(t('skinEvent.unlocked'));
       audio.levelUp();
       this.closeSkinEvent();
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      if (this.isWindowVisible($('#bags'))) this.renderBags();
     });
 
     // Show, mount the shared 3D preview into the right column, focus the choice.
@@ -13950,7 +13949,7 @@ export class Hud {
         this.tradeWasOpen = false;
         this.stagedTrade = { items: [], copper: 0 };
         this.lastTradeSig = '';
-        if ($('#bags').style.display !== 'none') this.renderBags();
+        if (this.isWindowVisible($('#bags'))) this.renderBags();
       }
       return;
     }
