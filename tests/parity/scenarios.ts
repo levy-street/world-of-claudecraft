@@ -2939,7 +2939,7 @@ function c3AuraRunner(): Scenario {
       p.inCombat = false;
       p.combatTimer = 99;
       p.fiveSecondRule = 99;
-      p.hp = Math.max(1, p.maxHp - 600);
+      p.hp = Math.max(1, p.maxHp - 6000);
       p.resource = Math.max(0, p.maxResource - 300);
       p.eating = { itemId: 'parity_food', kind: 'food', hpPer2s: 90, manaPer2s: 0, remaining: 6 };
       p.drinking = {

@@ -615,7 +615,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "5429d563",
+      "state": "a3ca2db7",
       "events": "c0073169",
       "rng": {
         "draws": 0,
@@ -693,11 +693,11 @@
           "drinking": {
             "itemId": "spring_water",
             "kind": "drink",
-            "manaPer2s": 8,
+            "manaPer2s": 20,
             "remaining": 18
           },
           "eating": {
-            "hpPer2s": 7,
+            "hpPer2s": 10,
             "itemId": "baked_bread",
             "kind": "food",
             "remaining": 18
@@ -750,7 +750,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "198a3bf8",
+      "state": "928441bc",
       "events": "c9b07f5e",
       "rng": {
         "draws": 0,
@@ -824,11 +824,11 @@
           "drinking": {
             "itemId": "spring_water",
             "kind": "drink",
-            "manaPer2s": 8,
+            "manaPer2s": 20,
             "remaining": 18
           },
           "eating": {
-            "hpPer2s": 7,
+            "hpPer2s": 10,
             "itemId": "baked_bread",
             "kind": "food",
             "remaining": 18
@@ -881,7 +881,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "924a4f48",
+      "state": "166e9490",
       "events": "d79812c3",
       "rng": {
         "draws": 0,
@@ -967,11 +967,11 @@
           "drinking": {
             "itemId": "spring_water",
             "kind": "drink",
-            "manaPer2s": 8,
+            "manaPer2s": 20,
             "remaining": 18
           },
           "eating": {
-            "hpPer2s": 7,
+            "hpPer2s": 10,
             "itemId": "baked_bread",
             "kind": "food",
             "remaining": 18
@@ -1024,7 +1024,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "cf9390ee",
+      "state": "3fe63ab6",
       "events": "d1fd54a6",
       "rng": {
         "draws": 0,
@@ -1114,11 +1114,11 @@
           "drinking": {
             "itemId": "spring_water",
             "kind": "drink",
-            "manaPer2s": 8,
+            "manaPer2s": 20,
             "remaining": 18
           },
           "eating": {
-            "hpPer2s": 7,
+            "hpPer2s": 10,
             "itemId": "baked_bread",
             "kind": "food",
             "remaining": 18
@@ -1171,7 +1171,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "ae1ba633",
+      "state": "e11cb04b",
       "events": "23e16a50",
       "rng": {
         "draws": 0,
@@ -1267,11 +1267,11 @@
           "drinking": {
             "itemId": "spring_water",
             "kind": "drink",
-            "manaPer2s": 8,
+            "manaPer2s": 20,
             "remaining": 18
           },
           "eating": {
-            "hpPer2s": 7,
+            "hpPer2s": 10,
             "itemId": "baked_bread",
             "kind": "food",
             "remaining": 18
@@ -1324,7 +1324,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "6660055c",
+      "state": "68405dd4",
       "events": "4fe3c73e",
       "rng": {
         "draws": 0,
@@ -1420,11 +1420,11 @@
           "drinking": {
             "itemId": "spring_water",
             "kind": "drink",
-            "manaPer2s": 8,
+            "manaPer2s": 20,
             "remaining": 18
           },
           "eating": {
-            "hpPer2s": 7,
+            "hpPer2s": 10,
             "itemId": "baked_bread",
             "kind": "food",
             "remaining": 18
@@ -1477,7 +1477,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "1e94f64c",
+      "state": "86ae0984",
       "events": "5c2ca31d",
       "rng": {
         "draws": 0,
@@ -1577,11 +1577,11 @@
           "drinking": {
             "itemId": "spring_water",
             "kind": "drink",
-            "manaPer2s": 8,
+            "manaPer2s": 20,
             "remaining": 18
           },
           "eating": {
-            "hpPer2s": 7,
+            "hpPer2s": 10,
             "itemId": "baked_bread",
             "kind": "food",
             "remaining": 18
@@ -1634,7 +1634,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "1e94f64c",
+      "state": "86ae0984",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1734,11 +1734,11 @@
           "drinking": {
             "itemId": "spring_water",
             "kind": "drink",
-            "manaPer2s": 8,
+            "manaPer2s": 20,
             "remaining": 18
           },
           "eating": {
-            "hpPer2s": 7,
+            "hpPer2s": 10,
             "itemId": "baked_bread",
             "kind": "food",
             "remaining": 18

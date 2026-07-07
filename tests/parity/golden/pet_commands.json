@@ -289,7 +289,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 408,
-      "state": "26543354",
+      "state": "cbe988ef",
       "events": "97340448",
       "rng": {
         "draws": 0,
@@ -409,7 +409,7 @@
               "sourceId": 405,
               "tickInterval": 1,
               "tickTimer": 1,
-              "value": 13
+              "value": 18
             }
           ],
           "combatTimer": 99,
@@ -457,8 +457,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 408,
-      "state": "bc4627d2",
-      "events": "d70fb9f2",
+      "state": "07eae244",
+      "events": "6886701d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -468,8 +468,8 @@
       "tick": 40,
       "time": 2,
       "nextId": 408,
-      "state": "9701463c",
-      "events": "1a2734ed",
+      "state": "ba6c50c4",
+      "events": "7170c368",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -479,7 +479,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "015413c7",
+      "state": "c4e76fa3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -600,7 +600,7 @@
               "sourceId": 405,
               "tickInterval": 1,
               "tickTimer": 1,
-              "value": 13
+              "value": 18
             }
           ],
           "comboUntil": -1,
@@ -609,7 +609,7 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 127,
+          "hp": 137,
           "id": 407,
           "inCombat": true,
           "kind": "mob",

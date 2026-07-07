@@ -75,7 +75,7 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
-  if (!p.inCombat && p.hp < p.maxHp && !p.eating) {
+  if (!p.inCombat && p.hp < p.maxHp) {
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
   }

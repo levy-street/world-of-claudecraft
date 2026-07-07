@@ -9,6 +9,11 @@ const ROG: PlayerClass[] = ['rogue', 'hunter'];
 // ---------------------------------------------------------------------------
 // Items
 // ---------------------------------------------------------------------------
+// Balance target for #1608: food/drink stack with natural regen; food/drink are
+// downtime throughput over 18s; potions are instant shared-cooldown emergency
+// recovery. Potion tiers target roughly 30 to 45% of representative
+// durable/high-mana class pools at their bracket caps, with lower fractions on
+// heavily buffed tanks.
 
 export const BASE_ITEMS: Record<string, ItemDef> = {
   // --- starting gear ---
@@ -438,7 +443,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Cottage Loaf',
     kind: 'food',
     quality: 'common',
-    foodHp: 61,
+    foodHp: 90,
     sellValue: 6,
     buyValue: 25,
   },
@@ -447,7 +452,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Cold Well Water',
     kind: 'drink',
     quality: 'common',
-    drinkMana: 76,
+    drinkMana: 180,
     sellValue: 6,
     buyValue: 25,
   },
@@ -683,7 +688,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Raw Mirror Trout',
     kind: 'food',
     quality: 'common',
-    foodHp: 61,
+    foodHp: 90,
     sellValue: 3,
   },
   tangled_weed: {
@@ -700,7 +705,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Raw River Perch',
     kind: 'food',
     quality: 'common',
-    foodHp: 45,
+    foodHp: 90,
     sellValue: 2,
   },
   raw_marsh_pike: {
@@ -708,7 +713,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Raw Marsh Pike',
     kind: 'food',
     quality: 'common',
-    foodHp: 90,
+    foodHp: 270,
     sellValue: 6,
   },
   raw_bog_eel: {
@@ -716,7 +721,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Raw Bog Eel',
     kind: 'food',
     quality: 'common',
-    foodHp: 90,
+    foodHp: 270,
     sellValue: 6,
   },
   raw_frostgill_trout: {
@@ -724,7 +729,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Raw Frostgill Trout',
     kind: 'food',
     quality: 'common',
-    foodHp: 117,
+    foodHp: 540,
     sellValue: 10,
   },
   raw_stonescale_carp: {
@@ -732,7 +737,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Raw Slatefin Carp',
     kind: 'food',
     quality: 'common',
-    foodHp: 117,
+    foodHp: 540,
     sellValue: 10,
   },
   soggy_boot: {
@@ -748,7 +753,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Glimmerfin Koi',
     kind: 'food',
     quality: 'uncommon',
-    foodHp: 117,
+    foodHp: 540,
     sellValue: 75,
   },
   roasted_boar: {
@@ -756,7 +761,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Spitted Boar Haunch',
     kind: 'food',
     quality: 'common',
-    foodHp: 117,
+    foodHp: 270,
     sellValue: 12,
     buyValue: 100,
   },
@@ -776,7 +781,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Minor Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 120,
+    potionMana: 180,
     sellValue: 8,
     buyValue: 40,
   },
@@ -799,7 +804,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Lesser Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 150,
+    potionHp: 180,
     sellValue: 16,
     buyValue: 85,
   },
@@ -808,7 +813,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Lesser Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 200,
+    potionMana: 360,
     sellValue: 16,
     buyValue: 85,
   },
@@ -817,7 +822,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 280,
+    potionHp: 360,
     sellValue: 32,
     buyValue: 170,
   },
@@ -826,7 +831,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 360,
+    potionMana: 585,
     sellValue: 32,
     buyValue: 170,
   },
@@ -835,7 +840,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Conjured Rainwater',
     kind: 'drink',
     quality: 'common',
-    drinkMana: 76,
+    drinkMana: 180,
     sellValue: 0,
   },
   conjured_water2: {
@@ -843,7 +848,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Conjured Wellwater',
     kind: 'drink',
     quality: 'common',
-    drinkMana: 288,
+    drinkMana: 540,
     sellValue: 0,
   },
   conjured_water3: {
@@ -851,7 +856,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Conjured Clearwater',
     kind: 'drink',
     quality: 'common',
-    drinkMana: 672,
+    drinkMana: 1080,
     sellValue: 0,
   },
   // --- conjured food (mage Conjure Food ranks; foodHp tiers pair with the
@@ -861,7 +866,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Conjured Oatcake',
     kind: 'food',
     quality: 'common',
-    foodHp: 61,
+    foodHp: 90,
     sellValue: 0,
   },
   conjured_bread2: {
@@ -869,7 +874,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Conjured Black Loaf',
     kind: 'food',
     quality: 'common',
-    foodHp: 243,
+    foodHp: 270,
     sellValue: 0,
   },
   conjured_bread3: {
@@ -877,7 +882,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Conjured Honeycake',
     kind: 'food',
     quality: 'common',
-    foodHp: 552,
+    foodHp: 540,
     sellValue: 0,
   },
   // --- Smith Haldren's stock (common/white, levels 3-7) ---
@@ -1250,7 +1255,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Brightwood Venison',
     kind: 'food',
     quality: 'common',
-    foodHp: 92,
+    foodHp: 90,
     sellValue: 4,
     buyValue: 35,
   },
@@ -1294,7 +1299,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Salted Jerky',
     kind: 'food',
     quality: 'common',
-    foodHp: 61,
+    foodHp: 90,
     sellValue: 2,
     buyValue: 25,
   },
