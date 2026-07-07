@@ -142,6 +142,17 @@ const NPC_IDS = [
   'gauntlet_recruiter', // Maro Half-Mask, the Herald of the Gauntlet (town square)
   'gauntlet_watcher', // The Stone Warden (the sentinel-trial watcher, instance-local)
   'gauntlet_contestant', // NPC backfill contestants (per-run rolled names override this)
+  // The per-class contestant kits (same shared text as the base id; the
+  // nameplate shows each contestant's rolled proper-noun name instead).
+  'gauntlet_contestant_warrior',
+  'gauntlet_contestant_paladin',
+  'gauntlet_contestant_hunter',
+  'gauntlet_contestant_rogue',
+  'gauntlet_contestant_priest',
+  'gauntlet_contestant_mage',
+  'gauntlet_contestant_warlock',
+  'gauntlet_contestant_shaman',
+  'gauntlet_contestant_druid',
    'hodrics_herald', // Herald Osric, the Gauntlet race desk (Eastbrook edge)
 ] as const;
 

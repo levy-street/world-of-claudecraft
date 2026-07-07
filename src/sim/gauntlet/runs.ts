@@ -141,6 +141,8 @@ export function gauntletJoin(ctx: SimContext, pid?: number): void {
     name: r.e.name,
     vitality: GAUNTLET.vitalityMax,
     skill: 0,
+    cls: 'warrior', // unused for players: they wear their own entity
+    skin: 0,
     eliminatedAtTrial: null,
     script: idleScript(),
   });

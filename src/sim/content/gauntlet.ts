@@ -4,11 +4,32 @@
 // Trials land one per release phase; `trials` below is the currently shipped
 // sequence and grows as later trials are implemented.
 
-import type { GauntletDef, NpcDef } from '../types';
+import type { GauntletDef, NpcDef, PlayerClass } from '../types';
 
 export const GAUNTLET_RECRUITER_NPC_ID = 'gauntlet_recruiter';
 export const GAUNTLET_WATCHER_NPC_ID = 'gauntlet_watcher';
 export const GAUNTLET_CONTESTANT_NPC_ID = 'gauntlet_contestant';
+
+// The contestant field wears real adventurer kits (the Hodric's Castle bot
+// idiom): each NPC contestant rolls one of the nine classes and a skin, so
+// the roster reads as a crowd of varied challengers rather than identical
+// villagers. One dynamic NPC def per class (appended to GAUNTLET_NPCS below);
+// the renderer maps each id to the matching class model.
+export const GAUNTLET_CONTESTANT_CLASSES: readonly PlayerClass[] = [
+  'warrior',
+  'paladin',
+  'hunter',
+  'rogue',
+  'priest',
+  'mage',
+  'warlock',
+  'shaman',
+  'druid',
+];
+
+export function gauntletContestantNpcId(cls: PlayerClass): string {
+  return `${GAUNTLET_CONTESTANT_NPC_ID}_${cls}`;
+}
 
 // All three are `dynamic`: registered in NPCS (so the online client can resolve
 // their defs) but never surface-placed at world init. The gauntlet module spawns
@@ -55,6 +76,15 @@ export const GAUNTLET_NPCS: Record<string, NpcDef> = {
     greeting: 'Eyes forward. The Warden is watching.',
   },
 };
+
+// One class-kitted contestant def per class, sharing the base def's text (the
+// nameplate shows each contestant's rolled proper-noun name, never this).
+for (const cls of GAUNTLET_CONTESTANT_CLASSES) {
+  GAUNTLET_NPCS[gauntletContestantNpcId(cls)] = {
+    ...GAUNTLET_NPCS[GAUNTLET_CONTESTANT_NPC_ID],
+    id: gauntletContestantNpcId(cls),
+  };
+}
 
 // Contestant display names are `first + ' ' + last`, rolled from the per-run
 // stream. Proper nouns: like player character names they are not translated.

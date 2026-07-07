@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE } from '../src/sim/content/gauntlet';
+import { SKIN_COUNTS } from '../src/sim/content/skins';
 import { gauntletOrigin, isGauntletPos } from '../src/sim/data';
 import { nextGreenWindowS } from '../src/sim/gauntlet/trial_sentinel';
 import {
@@ -784,6 +785,29 @@ describe('desk-trial station lock', () => {
     // Walk BACKWARD off the etcher's mark: forward runs straight into the
     // lectern collider, which would stop the walk at the stand.
     expect(driftUnderForward(sim, pid, true)).toBeGreaterThan(1);
+  });
+});
+
+describe('contestant variety', () => {
+  it('the NPC field wears rolled adventurer kits with proper-noun names', () => {
+    const sim = makeSim(31);
+    const pid = sim.addPlayer('warrior', 'Watcher');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    const run = sim.gauntletRuns[0]!;
+    const kits = new Set<string>();
+    for (const c of run.contestants) {
+      if (c.player) continue;
+      const e = sim.entities.get(c.entityId)!;
+      expect(e.templateId).toBe(`gauntlet_contestant_${c.cls}`);
+      expect(e.name).toBe(c.name); // the rolled proper noun rides the entity
+      expect(e.skin).toBe(c.skin);
+      expect(c.skin).toBeGreaterThanOrEqual(0);
+      expect(c.skin).toBeLessThan(SKIN_COUNTS[c.cls]);
+      kits.add(e.templateId);
+    }
+    // a 29-strong field over nine classes is never a monoculture
+    expect(kits.size).toBeGreaterThan(3);
   });
 });
 

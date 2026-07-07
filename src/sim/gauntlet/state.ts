@@ -5,7 +5,7 @@
 // the modules as a live SimContext view, per the seam rules.
 
 import type { Rng } from '../rng';
-import type { GauntletPhase, Vec3 } from '../types';
+import type { GauntletPhase, PlayerClass, Vec3 } from '../types';
 
 // One roster entry per contestant, players and NPCs alike. Players additionally
 // get a GauntletPlayerState entry in run.playerStates (keyed by pid, which in
@@ -18,6 +18,12 @@ export interface GauntletContestant {
   // Seeded 0..1 talent roll driving the NPC performance scripts; 0 for players
   // (a player's fate is decided by their own play, never by a roll).
   skill: number;
+  // Cosmetic adventurer kit for an NPC contestant (the Hodric's bot idiom):
+  // the rolled class picks the entity's per-class NPC def and the skin its
+  // appearance index. Players carry their real class entity; these two are
+  // ignored for them.
+  cls: PlayerClass;
+  skin: number;
   eliminatedAtTrial: number | null;
   // Sentinel-trial NPC script. Planned when the trial opens: the green-light
   // pace (yards/s, skill-lerped between the npcSpeed bounds) and the red-flip

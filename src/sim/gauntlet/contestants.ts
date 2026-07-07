@@ -10,11 +10,14 @@
 
 import {
   GAUNTLET,
+  GAUNTLET_CONTESTANT_CLASSES,
   GAUNTLET_CONTESTANT_FIRST_NAMES,
   GAUNTLET_CONTESTANT_LAST_NAMES,
   GAUNTLET_CONTESTANT_NPC_ID,
   GAUNTLET_LAYOUT,
+  gauntletContestantNpcId,
 } from '../content/gauntlet';
+import { SKIN_COUNTS } from '../content/skins';
 import { NPCS } from '../data';
 import { createNpc } from '../entity';
 import type { SimContext } from '../sim_context';
@@ -22,16 +25,21 @@ import type { GauntletContestant, GauntletRun, GauntletSentinelState } from './s
 import { aliveContestants, applyVitalityDamage } from './vitality';
 
 // Roll one NPC contestant record (no entity yet; spawnContestants creates
-// those when the run starts).
+// those when the run starts). The adventurer kit rolls last: name, skill,
+// class, skin, all from the per-run stream in a fixed order.
 export function rollNpcContestant(run: GauntletRun): GauntletContestant {
   const first = run.rng.pick([...GAUNTLET_CONTESTANT_FIRST_NAMES]);
   const last = run.rng.pick([...GAUNTLET_CONTESTANT_LAST_NAMES]);
+  const skill = run.rng.range(GAUNTLET.npcSkillMin, GAUNTLET.npcSkillMax);
+  const cls = run.rng.pick([...GAUNTLET_CONTESTANT_CLASSES]);
   return {
     entityId: 0, // assigned at spawn
     player: false,
     name: `${first} ${last}`,
     vitality: GAUNTLET.vitalityMax,
-    skill: run.rng.range(GAUNTLET.npcSkillMin, GAUNTLET.npcSkillMax),
+    skill,
+    cls,
+    skin: run.rng.int(0, SKIN_COUNTS[cls] - 1),
     eliminatedAtTrial: null,
     script: idleScript(),
   };
@@ -55,14 +63,16 @@ export function idleScript(): GauntletContestant['script'] {
 // behind the players (who take the front line-up spots when the run driver
 // teleports them in).
 export function spawnNpcContestants(ctx: SimContext, run: GauntletRun, startIndex: number): void {
-  const def = NPCS[GAUNTLET_CONTESTANT_NPC_ID];
   const npcs = run.contestants.filter((c) => !c.player);
   const total = run.contestants.length;
   for (let i = 0; i < npcs.length; i++) {
     const c = npcs[i];
     const pos = stagingSpot(run, startIndex + i, total);
+    // The rolled class picks the kit def; the rolled skin its appearance.
+    const def = NPCS[gauntletContestantNpcId(c.cls)] ?? NPCS[GAUNTLET_CONTESTANT_NPC_ID];
     const e = createNpc(ctx.nextId++, def, pos);
     e.name = c.name;
+    e.skin = c.skin;
     c.entityId = e.id;
     ctx.addEntity(e);
   }

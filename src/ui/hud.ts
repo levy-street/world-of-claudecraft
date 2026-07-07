@@ -37,7 +37,7 @@ import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
-import { GAUNTLET, GAUNTLET_VENUE } from '../sim/content/gauntlet';
+import { GAUNTLET, GAUNTLET_CONTESTANT_NPC_ID, GAUNTLET_VENUE } from '../sim/content/gauntlet';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -16126,7 +16126,12 @@ function dungeonDisplayNameFromSource(name: string): string {
 function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'mob')
     return entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
-  if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
+  // Gauntlet contestants carry rolled proper-noun names (like player names,
+  // never translated); every other NPC shows its localized template name.
+  if (entity.kind === 'npc')
+    return entity.templateId.startsWith(GAUNTLET_CONTESTANT_NPC_ID)
+      ? entity.name
+      : npcDisplayName(entity.templateId);
   return entity.name;
 }
 
