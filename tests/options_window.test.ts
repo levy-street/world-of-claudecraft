@@ -91,8 +91,13 @@ describe('options_window: control-primitive dispatch wiring', () => {
   });
 
   it('fires the exact same setting write per control kind as the inline original', () => {
-    // slider: the raw input value coerced via the pure dispatch fn
-    expect(painter).toContain('hooks.onSettingChange(key, sliderDispatchValue(slider.value))');
+    // slider: the raw input value is still coerced via the pure dispatch fn
+    expect(painter).toContain('const currentSliderValue = () => sliderDispatchValue(slider.value)');
+    // normal sliders live-apply on input
+    expect(painter).toContain('hooks.onSettingChange(key, currentSliderValue())');
+    // deferred sliders commit on release/blur
+    expect(painter).toContain("slider.addEventListener('change', commitValue)");
+    expect(painter).toContain("slider.addEventListener('blur', commitValue)");
     // numeric toggle: flip off the stored value, no pre-set
     expect(painter).toContain(
       'hooks.onSettingChange(key, toggleNextValue(hooks.settings.get(key)))',

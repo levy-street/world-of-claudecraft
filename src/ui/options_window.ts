@@ -416,7 +416,8 @@ export class OptionsWindow {
     }
   }
 
-  // A labelled slider bound to a numeric setting; live-applies via the hook.
+  // A labelled slider bound to a numeric setting; most live-apply via the hook.
+  // Sliders marked commitOnChange preview locally, then write on release/blur.
   private settingSlider(parent: HTMLElement, c: SliderControl, hooks: OptionsHooks): void {
     const key = c.key as NumericSettingKey;
     const label = t(c.labelKey);
@@ -440,8 +441,9 @@ export class OptionsWindow {
     // screen reader announces the human-meaningful value (50%, 90 degrees) instead
     // of the raw stored number. The native range already exposes role=slider plus
     // aria-valuenow/min/max from value/min/max, so only valuetext needs setting.
+    const currentSliderValue = () => sliderDispatchValue(slider.value);
     const syncReadout = () => {
-      const text = fmt(hooks.settings.get(key));
+      const text = fmt(currentSliderValue());
       val.textContent = text;
       slider.setAttribute('aria-valuetext', text);
     };
@@ -460,11 +462,30 @@ export class OptionsWindow {
       );
     };
     paintFill();
+    let lastCommittedValue = hooks.settings.get(key);
+    const commitValue = () => {
+      const next = currentSliderValue();
+      if (next === lastCommittedValue) return;
+      lastCommittedValue = next;
+      hooks.onSettingChange(key, next);
+      syncReadout();
+      paintFill();
+    };
     slider.addEventListener('input', () => {
-      hooks.onSettingChange(key, sliderDispatchValue(slider.value));
+      if (c.commitOnChange) {
+        syncReadout();
+        paintFill();
+        return;
+      }
+      hooks.onSettingChange(key, currentSliderValue());
+      lastCommittedValue = currentSliderValue();
       syncReadout();
       paintFill();
     });
+    if (c.commitOnChange) {
+      slider.addEventListener('change', commitValue);
+      slider.addEventListener('blur', commitValue);
+    }
     row.append(name, slider, val);
     parent.appendChild(row);
   }

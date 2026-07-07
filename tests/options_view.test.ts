@@ -256,6 +256,18 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
   });
+
+  it('defers only the global UI scale slider until commit', () => {
+    const controls = buildInterfaceControls(makeSource());
+    const uiScale = find(controls, 'uiScale');
+    const hudOpacity = find(controls, 'hudOpacity');
+    const tooltipScale = find(controls, 'tooltipScale');
+    expect(uiScale).toMatchObject({ control: 'slider', commitOnChange: true });
+    expect(hudOpacity).toMatchObject({ control: 'slider' });
+    expect(tooltipScale).toMatchObject({ control: 'slider' });
+    if (hudOpacity?.control === 'slider') expect(hudOpacity.commitOnChange).toBeUndefined();
+    if (tooltipScale?.control === 'slider') expect(tooltipScale.commitOnChange).toBeUndefined();
+  });
 });
 
 // ---------------------------------------------------------------------------

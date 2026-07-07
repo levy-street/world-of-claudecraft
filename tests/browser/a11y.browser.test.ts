@@ -12,6 +12,13 @@
 // by this painter-mount harness; their pixels get no faked per-marker aria.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  BOOL_SETTINGS,
+  type BoolSettingKey,
+  type GameSettings,
+  type NumericSettingKey,
+  SETTING_RANGES,
+} from '../../src/game/settings';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
 import { ArenaWindow } from '../../src/ui/arena_window';
@@ -267,6 +274,76 @@ describe('axe: options menu', () => {
     return { root, win };
   }
 
+  function sliderHarness(): {
+    calls: { key: keyof GameSettings; value: GameSettings[keyof GameSettings] }[];
+    root: HTMLElement;
+    win: OptionsWindow;
+    hooks: {
+      settings: {
+        get: (key: NumericSettingKey | BoolSettingKey) => number | boolean;
+        set: (key: NumericSettingKey, value: number) => number;
+        all: () => Partial<GameSettings>;
+        reset: () => void;
+      };
+      onSettingChange: (key: keyof GameSettings, value: GameSettings[keyof GameSettings]) => void;
+    };
+  } {
+    const root = host('options-menu');
+    root.style.display = 'none';
+    const values = new Map<NumericSettingKey, number>();
+    const calls: { key: keyof GameSettings; value: GameSettings[keyof GameSettings] }[] = [];
+    const hooks = {
+      settings: {
+        get: (key: NumericSettingKey | BoolSettingKey) => {
+          if (key in BOOL_SETTINGS) return BOOL_SETTINGS[key as BoolSettingKey].def;
+          return (
+            values.get(key as NumericSettingKey) ?? SETTING_RANGES[key as NumericSettingKey].def
+          );
+        },
+        set: (key: NumericSettingKey, value: number) => {
+          values.set(key, value);
+          return value;
+        },
+        all: () => ({}),
+        reset: () => undefined,
+      },
+      onSettingChange: (key: keyof GameSettings, value: GameSettings[keyof GameSettings]) => {
+        calls.push({ key, value });
+        if (typeof value === 'number') values.set(key as NumericSettingKey, value);
+      },
+    };
+    const win = new OptionsWindow(
+      stubDeps({
+        root: () => root,
+        world: () =>
+          ({
+            realm: 'Claudemoon',
+            player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
+          }) as never,
+        options: () =>
+          ({
+            logout: () => undefined,
+            captureKey: () => undefined,
+            ...hooks,
+            perfOverlay: { setPlacement: () => undefined },
+            theme: {
+              get: () => ({ preset: 'classic', custom: {} }),
+              setPreset: () => undefined,
+              setCustom: () => undefined,
+              resetCustom: () => undefined,
+            },
+            changeLanguage: async () => true,
+          }) as never,
+        bugReport: () => null,
+        captureFocus: () => null,
+        buildDropdown: () => document.createElement('button'),
+        setDropdownValue: () => undefined,
+        focusFirstInteractive: () => undefined,
+      }),
+    );
+    return { calls, hooks, root, win };
+  }
+
   it('main menu is clean (dialog role, labelled title that resolves)', async () => {
     const { root, win } = optionsWindow();
     win.toggle();
@@ -292,6 +369,73 @@ describe('axe: options menu', () => {
     expect(root.getAttribute('aria-label')).toBe(t('hudChrome.perf.title'));
     expect(root.getAttribute('aria-labelledby')).toBeNull();
     await expectClean(root);
+  });
+
+  it('defers only UI Scale writes until release while keeping slider preview live', () => {
+    const { calls, hooks, root, win } = sliderHarness();
+    const settingSlider = (
+      win as unknown as {
+        settingSlider(parent: HTMLElement, c: unknown, hooks: unknown): void;
+      }
+    ).settingSlider.bind(win);
+    settingSlider(
+      root,
+      {
+        control: 'slider',
+        key: 'uiScale',
+        labelKey: 'hudChrome.options.uiScale',
+        min: SETTING_RANGES.uiScale.min,
+        max: SETTING_RANGES.uiScale.max,
+        step: 0.05,
+        value: SETTING_RANGES.uiScale.def,
+        fmt: 'percent',
+        commitOnChange: true,
+      },
+      hooks,
+    );
+    settingSlider(
+      root,
+      {
+        control: 'slider',
+        key: 'hudOpacity',
+        labelKey: 'hud.options.hudOpacity',
+        min: SETTING_RANGES.hudOpacity.min,
+        max: SETTING_RANGES.hudOpacity.max,
+        step: 0.05,
+        value: SETTING_RANGES.hudOpacity.def,
+        fmt: 'percent',
+      },
+      hooks,
+    );
+
+    const sliders = Array.from(root.querySelectorAll<HTMLInputElement>('input[type="range"]'));
+    const uiScale = sliders.find(
+      (input) => input.getAttribute('aria-label') === t('hudChrome.options.uiScale'),
+    );
+    const hudOpacity = sliders.find(
+      (input) => input.getAttribute('aria-label') === t('hud.options.hudOpacity'),
+    );
+    expect(uiScale, 'ui scale slider present').toBeTruthy();
+    expect(hudOpacity, 'hud opacity slider present').toBeTruthy();
+    if (!uiScale || !hudOpacity) throw new Error('expected test sliders to render');
+
+    uiScale.value = '1.25';
+    uiScale.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(calls).toEqual([]);
+    expect(uiScale.nextElementSibling?.textContent).toBe('125%');
+    expect(uiScale.style.getPropertyValue('--range-fill')).toBe('72.72727272727273%');
+
+    uiScale.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(calls).toEqual([{ key: 'uiScale', value: 1.25 }]);
+
+    uiScale.value = '1.3';
+    uiScale.dispatchEvent(new Event('input', { bubbles: true }));
+    uiScale.dispatchEvent(new FocusEvent('blur', { bubbles: false }));
+    expect(calls.at(-1)).toEqual({ key: 'uiScale', value: 1.3 });
+
+    hudOpacity.value = '0.75';
+    hudOpacity.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(calls.at(-1)).toEqual({ key: 'hudOpacity', value: 0.75 });
   });
 });
 

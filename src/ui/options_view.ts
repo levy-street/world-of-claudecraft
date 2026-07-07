@@ -40,6 +40,8 @@ export interface SliderControl {
   /** Current value at build time; the painter re-reads the live value on input. */
   value: number;
   fmt: SliderFmt;
+  /** When true, preview input updates locally and the setting writes on change/blur. */
+  commitOnChange?: boolean;
 }
 
 export interface ToggleControl {
@@ -144,9 +146,20 @@ const slider = (
   labelKey: TranslationKey,
   fmt: SliderFmt = 'percent',
   step = 0.05,
+  commitOnChange?: boolean,
 ): SliderControl => {
   const r = s.range(key);
-  return { control: 'slider', key, labelKey, min: r.min, max: r.max, step, value: s.num(key), fmt };
+  return {
+    control: 'slider',
+    key,
+    labelKey,
+    min: r.min,
+    max: r.max,
+    step,
+    value: s.num(key),
+    fmt,
+    commitOnChange,
+  };
 };
 
 const toggle = (
@@ -351,7 +364,7 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
 
 export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
-    slider(s, 'uiScale', 'hudChrome.options.uiScale'),
+    slider(s, 'uiScale', 'hudChrome.options.uiScale', 'percent', 0.05, true),
     slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
     slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
