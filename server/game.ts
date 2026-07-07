@@ -4607,6 +4607,34 @@ export class GameServer {
         sim.gauntletLeave(pid);
         break;
       }
+      // Trial inputs: shape-validate the payloads here (bounded sizes, finite
+      // numbers); the sim validates the GAME state (live trial, live
+      // contestant, speed caps) and silently drops stale sends.
+      case 'gauntlet_trace': {
+        if (!Array.isArray(msg.pts) || msg.pts.length === 0 || msg.pts.length > 64) break;
+        if (msg.pts.length % 2 !== 0) break;
+        const pts = msg.pts.map(Number);
+        if (pts.some((v: number) => !Number.isFinite(v) || v < -0.5 || v > 1.5)) break;
+        sim.gauntletTrace(pts, pid);
+        break;
+      }
+      case 'gauntlet_pull': {
+        const beat = Number(msg.beat);
+        if (!Number.isInteger(beat) || beat < 0 || beat > 10000) break;
+        sim.gauntletPull(beat, pid);
+        break;
+      }
+      case 'gauntlet_wager': {
+        if (msg.action !== 'hold' && msg.action !== 'guess' && msg.action !== 'wager') break;
+        const n = Number(msg.n);
+        if (!Number.isInteger(n) || n < 0 || n > 100) break;
+        sim.gauntletWager(msg.action, n, pid);
+        break;
+      }
+      case 'gauntlet_court': {
+        sim.gauntletCourt(pid);
+        break;
+      }
       case 'delve_buy': {
         if (typeof msg.delveId !== 'string' || typeof msg.itemId !== 'string') break;
         const e = sim.entities.get(pid);

@@ -68,6 +68,38 @@ export function spawnNpcContestants(ctx: SimContext, run: GauntletRun, startInde
   }
 }
 
+// Teleport every attached PLAYER (and reposition every surviving NPC
+// contestant) into a line-up centered on an instance-local arena anchor.
+// Every trial module calls this at its start so the field arrives together;
+// spectators stay parked on the terrace.
+export function placeContestantsAt(
+  ctx: SimContext,
+  run: GauntletRun,
+  anchorX: number,
+  anchorZ: number,
+  halfWidth: number,
+): void {
+  const alive = aliveContestants(run);
+  for (let i = 0; i < alive.length; i++) {
+    const c = alive[i];
+    if (c.player && run.playerStates.get(c.entityId)?.spectating) continue;
+    const e = ctx.entities.get(c.entityId);
+    if (!e) continue;
+    const perRow = Math.max(1, Math.ceil(alive.length / 3));
+    const row = Math.floor(i / perRow);
+    const col = i % perRow;
+    const spread = (halfWidth * 2) / Math.max(1, perRow - 1 || 1);
+    e.pos = {
+      x: run.origin.x + anchorX - halfWidth + (perRow === 1 ? 0 : col * spread),
+      y: 0,
+      z: run.origin.z + anchorZ - row * 2,
+    };
+    e.prevPos = { ...e.pos };
+    e.facing = 0;
+    ctx.rebucket(e);
+  }
+}
+
 // A deterministic line-up spot on the staging area for the i-th of n
 // contestants: rows of even lateral spread south of the start line.
 export function stagingSpot(

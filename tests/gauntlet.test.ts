@@ -287,8 +287,10 @@ describe('gauntlet sentinel trial', () => {
     expect(podium).toBeTruthy();
     expect(podium.won).toBe(false);
     // the fallen player no longer counts toward the survivor target (12 - 1)
+    // With the fallen player spectating, the NPC field thins trial by trial
+    // down to the final target: one champion.
     expect(aliveContestants(sim.gauntletRuns[0]!).length).toBe(
-      GAUNTLET.targetSurvivorsPerTrial[0] - 1,
+      GAUNTLET.targetSurvivorsPerTrial[GAUNTLET.trials.length - 1],
     );
   }, 40000);
 
@@ -300,7 +302,12 @@ describe('gauntlet sentinel trial', () => {
     const run = sim.gauntletRuns[0]!;
 
     // cross during a green light (a direct pos set re-syncs prevPos, so no red-light displacement)
-    for (let i = 0; i < 400 && run.trial?.light !== 'green'; i++) sim.tick();
+    for (
+      let i = 0;
+      i < 400 && !(run.trial?.kind === 'sentinel' && run.trial.light === 'green');
+      i++
+    )
+      sim.tick();
     teleport(sim, pid, run.origin.x, run.origin.z + GAUNTLET.sentinel.fieldLength + 1);
     sim.tick();
     expect(sim.gauntletRunWire(pid)!.finished).toBe(true);
@@ -309,14 +316,20 @@ describe('gauntlet sentinel trial', () => {
     expect(sim.gauntletRuns[0]!.phase).toBe('podium');
 
     // NPC attrition: the field culls toward the trial target, plus the surviving player
-    expect(aliveContestants(sim.gauntletRuns[0]!).length).toBe(GAUNTLET.targetSurvivorsPerTrial[0]);
+    expect(aliveContestants(sim.gauntletRuns[0]!).length).toBe(
+      GAUNTLET.targetSurvivorsPerTrial[GAUNTLET.trials.length - 1],
+    );
     // mid-trial fumbles were observed as knockout poofs
     expect(pick(tail, 'gauntletPoof').length).toBeGreaterThan(0);
 
     const podium = pick(tail, 'gauntletPodium')[0]!;
     expect(podium.won).toBe(true);
     expect(podium.first).toBe('Champ');
-    expect(sim.meta(pid)!.gauntletStats).toEqual({ runs: 1, wins: 1, bestTrial: 1 });
+    expect(sim.meta(pid)!.gauntletStats).toEqual({
+      runs: 1,
+      wins: 1,
+      bestTrial: GAUNTLET.trials.length,
+    });
   }, 40000);
 });
 

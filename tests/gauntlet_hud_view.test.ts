@@ -21,6 +21,11 @@ function run(over: Partial<GauntletRunView> = {}): GauntletRunView {
     originX: 9000,
     originZ: -1250,
     sentinel: { light: 'green', until: 105, fieldLength: 90 },
+    sigils: null,
+    pull: null,
+    wager: null,
+    span: null,
+    court: null,
     podium: null,
     ...over,
   };

@@ -19,4 +19,15 @@ export interface IWorldGauntlet {
   // radius); leave the lobby, forfeit a live run, or exit the spectator seats.
   gauntletJoin(): void;
   gauntletLeave(): void;
+  // Trial inputs, all validated sim-side against the viewer's LIVE trial (a
+  // stale send after a knockout or phase flip drops silently).
+  // Sigils: a batch of quantized shape-local trace points, [x0,y0,x1,y1,...].
+  gauntletTrace(pts: number[]): void;
+  // Pull: claim a beat index (derived client-side from the wire's anchor).
+  gauntletPull(beat: number): void;
+  // Wager: 'hold' (hide n marbles), 'guess' (n = 1 odd / 0 even), 'wager'
+  // (stake n on the round).
+  gauntletWager(action: 'hold' | 'guess' | 'wager', n: number): void;
+  // Court: throw a shove (resolves in contact range, on cooldown).
+  gauntletCourt(): void;
 }

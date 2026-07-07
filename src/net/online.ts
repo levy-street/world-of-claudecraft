@@ -3023,6 +3023,20 @@ export class ClientWorld implements IWorld {
   gauntletLeave(): void {
     this.cmd({ cmd: 'gauntlet_leave' });
   }
+  // Trial inputs. The sigils trace batches ~24 quantized points per send (a
+  // few hundred bytes, far under the WS frame cap); the rest are tiny.
+  gauntletTrace(pts: number[]): void {
+    this.cmd({ cmd: 'gauntlet_trace', pts });
+  }
+  gauntletPull(beat: number): void {
+    this.cmd({ cmd: 'gauntlet_pull', beat });
+  }
+  gauntletWager(action: 'hold' | 'guess' | 'wager', n: number): void {
+    this.cmd({ cmd: 'gauntlet_wager', action, n });
+  }
+  gauntletCourt(): void {
+    this.cmd({ cmd: 'gauntlet_court' });
+  }
   // Mirror the authoritative craftResult event into lastCraftResult (#1127).
   // The event still flows to the HUD (drainEvents) for a toast/log line.
   private applyCraftResultEvent(ev: SimEvent): void {

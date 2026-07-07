@@ -8027,6 +8027,18 @@ export class Sim {
   gauntletLeave(pid?: number): void {
     gauntletMod.gauntletLeave(this.ctx, pid);
   }
+  gauntletTrace(pts: number[], pid?: number): void {
+    gauntletMod.gauntletTrace(this.ctx, pid, pts);
+  }
+  gauntletPull(beat: number, pid?: number): void {
+    gauntletMod.gauntletPull(this.ctx, pid, beat);
+  }
+  gauntletWager(action: 'hold' | 'guess' | 'wager', n: number, pid?: number): void {
+    gauntletMod.gauntletWager(this.ctx, pid, action, n);
+  }
+  gauntletCourt(pid?: number): void {
+    gauntletMod.gauntletCourt(this.ctx, pid);
+  }
 
   gauntletRunWire(pid: number): GauntletRunView | null {
     return gauntletMod.gauntletRunWire(this.ctx, pid);

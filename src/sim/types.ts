@@ -2751,7 +2751,7 @@ export type GauntletPhase = 'lobby' | 'staging' | 'trial' | 'interlude' | 'podiu
 // out before the contestant resolved.
 export type GauntletDamageCause = 'caught' | 'trial' | 'timeout';
 
-export type GauntletTrialKind = 'sentinel';
+export type GauntletTrialKind = 'sentinel' | 'sigils' | 'pull' | 'wager' | 'span' | 'court';
 
 // Trial 1, Sentinel's Crossing (red light / green light). Distances are yards in
 // instance-local coordinates (origin at the staging area), times are seconds.
@@ -2790,6 +2790,81 @@ export interface GauntletSentinelTuning {
   npcHesitateMaxS: number;
 }
 
+// Trial 2, Sugarglass Sigils: trace a seeded etched outline without cracking
+// it. The sim owns scoring: the client streams quantized trace points and the
+// server accrues crack for off-path distance and over-speed progress.
+export interface GauntletSigilsTuning {
+  durationS: number;
+  outlinePoints: number; // polyline resolution a shape is sampled at
+  tolerance: number; // max shape-local distance from the outline before crack accrues
+  speedCap: number; // max outline-fraction progress per second (teleport-jumps buy nothing)
+  crackMax: number; // the crack meter
+  crackOffPath: number; // crack per second while tracing outside the tolerance
+  crackOverSpeed: number; // crack per second while over the speed cap
+  thinSectionMult: number; // crack multiplier on a shape's marked thin segments
+  shatterDamage: number; // vitality chunk on a shatter (a fresh shape follows)
+  damageMax: number; // end-of-trial damage at zero progress
+}
+
+// Trial 3, The Great Pull: team tug of war on a sim-defined beat. Pulls claim
+// a beat index inside the accept window; grade scales the team's force.
+export interface GauntletPullTuning {
+  durationS: number; // soft cap; the marker usually decides earlier
+  beatPeriodS: number;
+  acceptWindowS: number; // full window around a beat inside which a pull counts
+  perfectWindowS: number; // tighter window for the perfect grade
+  pullForce: number; // marker yards per on-beat player pull
+  perfectMult: number; // perfect-grade force multiplier
+  braceWindowS: number; // the opening brace: land a pull inside this or eat the yank
+  openingYank: number; // marker jolt against a team that missed its brace
+  npcForceMin: number; // per-beat per-team NPC force draw bounds
+  npcForceMax: number;
+  winThreshold: number; // |marker| that decides the pull
+  lossDamage: number; // vitality damage dealt to every loser (big chunk, not death)
+}
+
+// Trial 4, Keeper's Wager: a marble duel against a paired partner. Odd/even
+// rounds under a per-round clock; timeout forfeits the round's wager.
+export interface GauntletWagerTuning {
+  durationS: number;
+  startingMarbles: number;
+  roundS: number; // per-round decision deadline
+  maxWager: number; // wager bounds per round (min is 1)
+  lossDamage: number; // vitality chunk when you hit zero marbles
+  damagePerMarbleShort: number; // timeout damage per marble of deficit
+}
+
+// Trial 5, The Brittle Span: paired floor panels over the pit; one of each
+// pair is brittle. Steps are position-detected; reveals are shared knowledge.
+export interface GauntletSpanTuning {
+  durationS: number;
+  steps: number; // panel pairs
+  panelLength: number; // yards along the crossing axis
+  panelWidth: number; // per-panel width
+  panelGap: number; // lateral gap between the pair
+  fallDamage: number; // brittle-panel chunk; respawn at the span start
+  npcAheadCount: number; // seeded crossers that go first and reveal early panels
+  npcStepPeriodS: number; // cadence of the crossers
+  damageMax: number; // end-of-trial damage at zero progress
+}
+
+// Trial 6, The Final Court: the closing duel. Attacker reaches the head zone,
+// defender pushes them out; roles swap on a timer; damage goes to vitality.
+export interface GauntletCourtTuning {
+  durationS: number;
+  courtLength: number; // yards, entry line to the head zone
+  courtHalfWidth: number;
+  neckZ: number; // past this the attacker's movement penalty lifts
+  preNeckSpeedMult: number; // attacker speed multiplier before the neck (one-foot rule)
+  shoveCooldownS: number;
+  shoveRange: number;
+  shovePush: number; // yards of knockback per landed shove
+  shoveDamage: number; // vitality per landed shove
+  outDamage: number; // vitality chunk for being pushed out of bounds
+  roleSwapS: number; // attacker/defender swap timer
+  rivalReactionS: number; // NPC rival decision latency
+}
+
 // The viewer-scoped wire projection of a run (the `grun` self-wire key and the
 // IWorldGauntlet.gauntletRun member; the facet re-exports it). Deadlines are
 // ABSOLUTE sim-time (`endsAt`, `until`): the client derives countdowns from
@@ -2810,6 +2885,44 @@ export interface GauntletRunView {
   originX: number; // instance origin, so presentation can derive field-local coords
   originZ: number;
   sentinel: { light: 'green' | 'red'; until: number; fieldLength: number } | null;
+  // The viewer's own per-trial substate, one member per trial kind (only the
+  // active trial's member is non-null). Values are quantized at the wire
+  // projection so quiet ticks still delta-elide.
+  sigils: {
+    shapeSeed: number;
+    shapeId: number;
+    crack: number;
+    crackMax: number;
+    progress: number; // 0..1 outline fraction
+  } | null;
+  pull: {
+    beatAnchor: number; // absolute sim time of beat 0; client derives the metronome
+    beatPeriodS: number;
+    marker: number; // + toward the viewer's side winning
+    winThreshold: number;
+    braceUntil: number;
+  } | null;
+  wager: {
+    mine: number;
+    theirs: number;
+    partnerName: string;
+    holder: boolean; // the viewer hides the marbles this round
+    stage: 'hold' | 'guess' | 'done';
+    roundEndsAt: number;
+  } | null;
+  span: {
+    steps: number;
+    // Per step: -1 unknown, else the KNOWN SAFE side (0 = left, 1 = right).
+    // Reveals are shared: every crosser's fate teaches the whole field.
+    revealed: number[];
+  } | null;
+  court: {
+    attacker: boolean;
+    swapAt: number;
+    shoveReadyAt: number;
+    neckZ: number;
+    rivalId: number; // entity id of the rival (another player or the NPC)
+  } | null;
   podium: { first: string; second: string; third: string } | null;
 }
 
@@ -2836,6 +2949,11 @@ export interface GauntletDef {
   npcSkillMax: number;
   trials: GauntletTrialKind[];
   sentinel: GauntletSentinelTuning;
+  sigils: GauntletSigilsTuning;
+  pull: GauntletPullTuning;
+  wager: GauntletWagerTuning;
+  span: GauntletSpanTuning;
+  court: GauntletCourtTuning;
 }
 
 export interface MoveInput {

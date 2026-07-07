@@ -32,7 +32,12 @@ import {
   stagingSpot,
 } from './contestants';
 import type { GauntletRun } from './state';
+import { gauntletCourtShove, startCourt, updateCourt } from './trial_court';
+import { gauntletPullBeat, startPull, updatePull } from './trial_pull';
 import { startSentinel, updateSentinel } from './trial_sentinel';
+import { gauntletTraceSigils, startSigils, updateSigils } from './trial_sigils';
+import { startSpan, updateSpan } from './trial_span';
+import { gauntletWagerAct, startWager, updateWager } from './trial_wager';
 import { aliveContestants, eliminateContestant, emitToRunPlayers } from './vitality';
 
 export function gauntletRunForPlayer(ctx: SimContext, pid: number): GauntletRun | null {
@@ -315,13 +320,105 @@ function startTrial(ctx: SimContext, run: GauntletRun): void {
     ps.momentumZ = 0;
     ps.heldAt = null;
   }
-  if (kind === 'sentinel') {
-    planSentinelScripts(run);
-    run.phase = 'trial';
-    run.phaseEndsAt = ctx.time + GAUNTLET.sentinel.durationS;
-    run.trial = startSentinel(ctx, run);
+  run.phase = 'trial';
+  switch (kind) {
+    case 'sentinel':
+      planSentinelScripts(run);
+      run.phaseEndsAt = ctx.time + GAUNTLET.sentinel.durationS;
+      run.trial = startSentinel(ctx, run);
+      break;
+    case 'sigils':
+      run.phaseEndsAt = ctx.time + GAUNTLET.sigils.durationS;
+      run.trial = startSigils(ctx, run);
+      break;
+    case 'pull':
+      run.phaseEndsAt = ctx.time + GAUNTLET.pull.durationS;
+      run.trial = startPull(ctx, run);
+      break;
+    case 'wager':
+      run.phaseEndsAt = ctx.time + GAUNTLET.wager.durationS;
+      run.trial = startWager(ctx, run);
+      break;
+    case 'span':
+      run.phaseEndsAt = ctx.time + GAUNTLET.span.durationS;
+      run.trial = startSpan(ctx, run);
+      break;
+    case 'court':
+      run.phaseEndsAt = ctx.time + GAUNTLET.court.durationS;
+      run.trial = startCourt(ctx, run);
+      break;
   }
   emitPhase(ctx, run);
+}
+
+// One tick of whatever trial is live; true = resolved (the module has dealt
+// its end-of-trial damage and culled the NPC field toward its target).
+function updateTrial(ctx: SimContext, run: GauntletRun): boolean {
+  switch (run.trial?.kind) {
+    case 'sentinel':
+      return updateSentinel(ctx, run, DT);
+    case 'sigils':
+      return updateSigils(ctx, run, DT);
+    case 'pull':
+      return updatePull(ctx, run, DT);
+    case 'wager':
+      return updateWager(ctx, run, DT);
+    case 'span':
+      return updateSpan(ctx, run, DT);
+    case 'court':
+      return updateCourt(ctx, run, DT);
+    default:
+      return true;
+  }
+}
+
+// Trial-input command routers (the IWorld actions land here): each validates
+// that the sender is a LIVE contestant in the matching live trial, then hands
+// the input to the owning module. Silent drops on mismatch: stale packets
+// after a knockout or a phase flip are normal, not errors.
+function liveTrialFor(ctx: SimContext, pid: number): GauntletRun | null {
+  const run = gauntletRunForPlayer(ctx, pid);
+  if (!run || run.phase !== 'trial' || !run.trial) return null;
+  const ps = run.playerStates.get(pid);
+  if (!ps || ps.spectating) return null;
+  return run;
+}
+
+export function gauntletTrace(ctx: SimContext, pid: number | undefined, pts: number[]): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const run = liveTrialFor(ctx, r.meta.entityId);
+  if (!run || run.trial?.kind !== 'sigils') return;
+  gauntletTraceSigils(ctx, run, run.trial, r.meta.entityId, pts);
+}
+
+export function gauntletPull(ctx: SimContext, pid: number | undefined, beat: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const run = liveTrialFor(ctx, r.meta.entityId);
+  if (!run || run.trial?.kind !== 'pull') return;
+  gauntletPullBeat(ctx, run, run.trial, r.meta.entityId, beat);
+}
+
+export function gauntletWager(
+  ctx: SimContext,
+  pid: number | undefined,
+  action: string,
+  n: number,
+): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const run = liveTrialFor(ctx, r.meta.entityId);
+  if (!run || run.trial?.kind !== 'wager') return;
+  gauntletWagerAct(ctx, run, run.trial, r.meta.entityId, action, n);
+}
+
+export function gauntletCourt(ctx: SimContext, pid: number | undefined): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const run = liveTrialFor(ctx, r.meta.entityId);
+  if (!run || run.trial?.kind !== 'court') return;
+  gauntletCourtShove(ctx, run, run.trial, r.meta.entityId);
 }
 
 // Rank the field for the podium: live players by finish time then progress,
@@ -437,7 +534,7 @@ export function updateGauntletRuns(ctx: SimContext): void {
         if (ctx.time >= run.phaseEndsAt) startTrial(ctx, run);
         break;
       case 'trial': {
-        const done = updateSentinel(ctx, run, DT);
+        const done = updateTrial(ctx, run);
         if (done) {
           run.trial = null;
           if (run.trialIndex + 1 >= GAUNTLET.trials.length) {
@@ -495,6 +592,57 @@ export function gauntletRunWire(ctx: SimContext, pid: number): GauntletRunView |
       trial && trial.kind === 'sentinel'
         ? { light: trial.light, until: trial.flipAt, fieldLength: GAUNTLET.sentinel.fieldLength }
         : null,
+    // Per-trial viewer substates. Continuous values are QUANTIZED here so the
+    // serialized view only changes on meaningful movement and the wire delta
+    // still elides quiet ticks.
+    sigils: (() => {
+      if (trial?.kind !== 'sigils') return null;
+      const sp = trial.players.get(pid);
+      if (!sp) return null;
+      return {
+        shapeSeed: sp.shapeSeed,
+        shapeId: sp.shapeId,
+        crack: Math.round(sp.crack),
+        crackMax: GAUNTLET.sigils.crackMax,
+        progress: Math.round(sp.progress * 100) / 100,
+      };
+    })(),
+    pull:
+      trial?.kind === 'pull'
+        ? {
+            beatAnchor: trial.beatAnchor,
+            beatPeriodS: GAUNTLET.pull.beatPeriodS,
+            marker: Math.round(trial.marker * (trial.teamOf.get(pid) === 1 ? -10 : 10)) / 10,
+            winThreshold: GAUNTLET.pull.winThreshold,
+            braceUntil: trial.braceUntil,
+          }
+        : null,
+    wager: (() => {
+      if (trial?.kind !== 'wager') return null;
+      const pair = trial.pairs.get(pid);
+      if (!pair) return null;
+      return {
+        mine: pair.mine,
+        theirs: pair.theirs,
+        partnerName: pair.partnerName,
+        holder: pair.holder,
+        stage: pair.stage,
+        roundEndsAt: pair.roundEndsAt,
+      };
+    })(),
+    span: trial?.kind === 'span' ? { steps: GAUNTLET.span.steps, revealed: trial.revealed } : null,
+    court: (() => {
+      if (trial?.kind !== 'court') return null;
+      const duel = trial.duels.get(pid);
+      if (!duel) return null;
+      return {
+        attacker: duel.attacker,
+        swapAt: duel.swapAt,
+        shoveReadyAt: duel.shoveReadyAt,
+        neckZ: GAUNTLET.court.neckZ,
+        rivalId: duel.rivalId,
+      };
+    })(),
     podium: run.podium
       ? { first: run.podium.first, second: run.podium.second, third: run.podium.third }
       : null,

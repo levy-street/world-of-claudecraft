@@ -75,6 +75,26 @@ export function applyVitalityDamage(
   return true;
 }
 
+// End-of-trial NPC attrition: thin the surviving NPC field toward the trial's
+// targetSurvivorsPerTrial entry (players are never culled by targets). The
+// least skilled fall first, with a seeded jitter so the order never reads as a
+// fixed sort. Every trial module calls this as it resolves.
+export function cullNpcsToward(ctx: SimContext, run: GauntletRun): void {
+  const target = GAUNTLET.targetSurvivorsPerTrial[run.trialIndex] ?? 0;
+  const alive = aliveContestants(run);
+  const alivePlayers = alive.filter((c) => c.player).length;
+  const npcs = alive.filter((c) => !c.player);
+  const keep = Math.max(0, target - alivePlayers);
+  if (npcs.length <= keep) return;
+  const ranked = npcs
+    .map((c) => ({ c, rank: c.skill + run.rng.range(-0.15, 0.15) }))
+    .sort((a, b) => a.rank - b.rank)
+    .map((r) => r.c);
+  for (let i = 0; i < ranked.length - keep; i++) {
+    applyVitalityDamage(ctx, run, ranked[i], ranked[i].vitality, 'trial');
+  }
+}
+
 // Knock a contestant out. `parkPlayer` (default true) moves a fallen player to
 // the spectator platform; the forfeit paths (leave command, disconnect, died
 // or teleported out of the band by some other system) pass false because the

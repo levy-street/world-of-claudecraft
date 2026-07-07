@@ -162,14 +162,18 @@ export const GAUNTLET: GauntletDef = {
   // growth per knockout, in copper, shown on the HUD counter.
   prizeBase: 10000,
   prizePerElimination: 2500,
-  // After the sentinel trial the NPC field is culled toward 12 survivors. One
-  // entry per trials[i]; later trials append their targets here.
-  targetSurvivorsPerTrial: [12],
+  // NPC attrition schedule, one entry per trials[i]: after that trial the NPC
+  // field is culled toward this many survivors (players are never culled by
+  // targets; they live and die by their own vitality). The final court always
+  // crowns exactly one.
+  targetSurvivorsPerTrial: [14, 8, 4, 2, 2, 1],
   npcSkillMin: 0.25,
   npcSkillMax: 0.95,
-  trials: ['sentinel'],
+  trials: ['sentinel', 'sigils', 'pull', 'wager', 'span', 'court'],
   sentinel: {
-    durationS: 300,
+    // Playtest verdict: the canon 5:00 has zero pressure on a 90yd field.
+    // 90s makes the shrinking green windows actually matter.
+    durationS: 90,
     fieldLength: 90,
     fieldHalfWidth: 18,
     greenMinS: 3.0,
@@ -197,5 +201,64 @@ export const GAUNTLET: GauntletDef = {
     npcHesitateChance: 0.3,
     npcHesitateMinS: 0.3,
     npcHesitateMaxS: 0.9,
+  },
+  sigils: {
+    durationS: 90,
+    outlinePoints: 96,
+    tolerance: 0.06, // shape-local units (the outline lives in a unit square)
+    speedCap: 0.05, // outline fraction per second: a clean trace takes ~25s
+    crackMax: 100,
+    crackOffPath: 34,
+    crackOverSpeed: 26,
+    thinSectionMult: 2.2,
+    shatterDamage: 18,
+    damageMax: 40,
+  },
+  pull: {
+    durationS: 75,
+    beatPeriodS: 1.1,
+    acceptWindowS: 0.36,
+    perfectWindowS: 0.14,
+    pullForce: 1.15,
+    perfectMult: 1.6,
+    braceWindowS: 2.2,
+    openingYank: 4.5,
+    npcForceMin: 0.7,
+    npcForceMax: 1.05,
+    winThreshold: 12,
+    lossDamage: 55,
+  },
+  wager: {
+    durationS: 120,
+    startingMarbles: 10,
+    roundS: 14,
+    maxWager: 5,
+    lossDamage: 100,
+    damagePerMarbleShort: 8,
+  },
+  span: {
+    durationS: 100,
+    steps: 14,
+    panelLength: 2.6,
+    panelWidth: 2.6,
+    panelGap: 1.2,
+    fallDamage: 26,
+    npcAheadCount: 3,
+    npcStepPeriodS: 1.6,
+    damageMax: 45,
+  },
+  court: {
+    durationS: 90,
+    courtLength: 26,
+    courtHalfWidth: 7,
+    neckZ: 14,
+    preNeckSpeedMult: 0.55,
+    shoveCooldownS: 1.6,
+    shoveRange: 2.6,
+    shovePush: 4.5,
+    shoveDamage: 9,
+    outDamage: 30,
+    roleSwapS: 20,
+    rivalReactionS: 0.5,
   },
 };
