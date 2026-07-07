@@ -181,6 +181,12 @@ export const GAUNTLET_VENUE = {
       pos: { x: -44, y: 7, z: 61 },
       lookAt: { x: -44, y: 1.8, z: 44 },
     },
+    // Over the wager table from behind the viewer's west mat: both marble
+    // piles, the choice stones, and the partner across the table in frame.
+    wager: {
+      pos: { x: -51.5, y: 4.6, z: 78 },
+      lookAt: { x: -44, y: 1, z: 78 },
+    },
   },
 } as const;
 

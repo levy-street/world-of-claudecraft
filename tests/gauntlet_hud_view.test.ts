@@ -121,6 +121,50 @@ describe('gauntletHudModel', () => {
     expect(hidden.court).toBeNull();
   });
 
+  const wagerRun = (over: Partial<NonNullable<GauntletRunView['wager']>> = {}) =>
+    run({
+      sentinel: null,
+      wager: {
+        mine: 10,
+        theirs: 10,
+        partnerName: 'Odessa Marshlight',
+        holder: true,
+        stage: 'hold',
+        roundEndsAt: 110,
+        ...over,
+      },
+    });
+
+  it('shows the wager strip only during a live round', () => {
+    expect(gauntletHudModel({ run: run(), time: 0 }).wager).toBeNull();
+    expect(gauntletHudModel({ run: wagerRun({ stage: 'done' }), time: 0 }).wager).toBeNull();
+    expect(gauntletHudModel({ run: wagerRun(), time: 100 }).wager).not.toBeNull();
+  });
+
+  it('clamps the local stake against maxWager and both purses', () => {
+    const m = gauntletHudModel({ run: wagerRun(), time: 100, wagerStake: 99 });
+    expect(m.wager?.stake).toBe(GAUNTLET.wager.maxWager);
+    expect(m.wager?.canInc).toBe(false);
+    expect(m.wager?.canDec).toBe(true);
+    const short = gauntletHudModel({
+      run: wagerRun({ theirs: 2 }),
+      time: 100,
+      wagerStake: 4,
+    });
+    expect(short.wager?.stake).toBe(2);
+    const floor = gauntletHudModel({ run: wagerRun(), time: 100, wagerStake: 0 });
+    expect(floor.wager?.stake).toBe(1);
+    expect(floor.wager?.canDec).toBe(false);
+    expect(floor.wager?.canInc).toBe(true);
+  });
+
+  it('derives the round countdown from the absolute deadline', () => {
+    const m = gauntletHudModel({ run: wagerRun({ roundEndsAt: 110 }), time: 101.5 });
+    expect(m.wager?.roundSeconds).toBeCloseTo(8.5, 6);
+    const expired = gauntletHudModel({ run: wagerRun({ roundEndsAt: 110 }), time: 120 });
+    expect(expired.wager?.roundSeconds).toBe(0);
+  });
+
   const courtRun = (over: Partial<NonNullable<GauntletRunView['court']>> = {}) =>
     run({
       sentinel: null,

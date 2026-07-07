@@ -48,6 +48,10 @@ const K = {
   phaseStaging: 'hudChrome.gauntlet.phaseStaging',
   phaseInterlude: 'hudChrome.gauntlet.phaseInterlude',
   phasePodium: 'hudChrome.gauntlet.phasePodium',
+  stake: 'hudChrome.gauntlet.wagerStake',
+  stakeDown: 'hudChrome.gauntlet.stakeDown',
+  stakeUp: 'hudChrome.gauntlet.stakeUp',
+  wagerRound: 'hudChrome.gauntlet.wagerRound',
   shove: 'hudChrome.gauntlet.shove',
   roleAttacker: 'hudChrome.gauntlet.roleAttacker',
   roleDefender: 'hudChrome.gauntlet.roleDefender',
@@ -71,6 +75,17 @@ export interface GauntletHudElements {
   prize: HTMLElement;
   /** The sentinel light pill (green/red + Go/Stop text). */
   light: HTMLElement;
+  /** The Keeper's Wager strip (shown only during a live wager round). */
+  wagerStrip: HTMLElement;
+  /** The strip's stake label. */
+  wagerLabel: HTMLElement;
+  /** Lower/raise stake stepper buttons. */
+  wagerDec: HTMLElement;
+  wagerInc: HTMLElement;
+  /** The current stake readout chip. */
+  wagerStake: HTMLElement;
+  /** The round countdown chip. */
+  wagerRound: HTMLElement;
   /** The Final Court sub-cluster (shown only during the court trial). */
   court: HTMLElement;
   /** The attacker/defender role chip. */
@@ -81,8 +96,10 @@ export interface GauntletHudElements {
   courtCd: HTMLElement;
 }
 
-/** The Hud glue the interactive court button dispatches through. */
+/** The Hud glue the interactive controls dispatch through. */
 export interface GauntletHudDeps {
+  /** Step the wager stake by +-1 (Hud clamps and sends the re-bet). */
+  onWagerAdjust(delta: number): void;
   /** Throw a shove (Hud gates it on the shove cooldown before sending). */
   onShove(): void;
 }
@@ -93,9 +110,11 @@ export class GauntletHudPainter {
     private readonly el: GauntletHudElements,
     deps: GauntletHudDeps,
   ) {
-    // One-time click wiring (the painter is constructed once). The button lives
-    // inside the pointer-events:none cluster and opts back into pointer events via
-    // CSS; the dispatch is gated Hud-side against the shove cooldown.
+    // One-time click wiring (the painter is constructed once). The buttons live
+    // inside the pointer-events:none cluster and opt back into pointer events via
+    // CSS; each dispatch is gated Hud-side (stake clamp, shove cooldown).
+    this.el.wagerDec.addEventListener('click', () => deps.onWagerAdjust(-1));
+    this.el.wagerInc.addEventListener('click', () => deps.onWagerAdjust(1));
     this.el.courtBtn.addEventListener('click', () => deps.onShove());
   }
 
@@ -131,8 +150,29 @@ export class GauntletHudPainter {
       w.setText(this.el.light, red ? t(K.stop) : t(K.go));
     }
 
+    w.setDisplay(this.el.wagerStrip, model.wager ? SHOWN : HIDDEN);
+    if (model.wager) this.paintWager(model.wager);
+
     w.setDisplay(this.el.court, model.court ? SHOWN : HIDDEN);
     if (model.court) this.paintCourt(model.court);
+  }
+
+  private paintWager(wager: NonNullable<GauntletHudModel['wager']>): void {
+    const w = this.writers;
+    w.setText(this.el.wagerLabel, t(K.stake));
+    w.setText(this.el.wagerStake, formatNumber(wager.stake, INT));
+    w.setText(
+      this.el.wagerRound,
+      t(K.wagerRound, { seconds: formatNumber(Math.ceil(wager.roundSeconds), INT) }),
+    );
+    w.setAttr(this.el.wagerDec, 'aria-label', t(K.stakeDown));
+    w.setAttr(this.el.wagerInc, 'aria-label', t(K.stakeUp));
+    // Steppers at their rail: kept focusable, aria-disabled + a class that
+    // drops pointer events (like the shove button's cooldown treatment).
+    w.toggleClass(this.el.wagerDec, DISABLED_CLASS, !wager.canDec);
+    w.setAttr(this.el.wagerDec, 'aria-disabled', wager.canDec ? 'false' : 'true');
+    w.toggleClass(this.el.wagerInc, DISABLED_CLASS, !wager.canInc);
+    w.setAttr(this.el.wagerInc, 'aria-disabled', wager.canInc ? 'false' : 'true');
   }
 
   private paintCourt(court: NonNullable<GauntletHudModel['court']>): void {

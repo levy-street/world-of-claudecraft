@@ -101,6 +101,9 @@ export interface GauntletWagerPair {
   pid: number;
   partnerName: string;
   partnerSkill: number;
+  // The cosmetic partner NPC entity seated across the pair's mat (0 once
+  // dropped). Pure theater: the duel logic never reads it.
+  partnerEntityId: number;
   mine: number;
   theirs: number;
   holder: boolean; // the player hides this round

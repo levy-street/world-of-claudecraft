@@ -285,6 +285,81 @@ describe('gauntlet wager: resolution', () => {
   });
 });
 
+describe('gauntlet wager: the cosmetic partner entity', () => {
+  it('seats a named partner entity across the mat while the duel runs', () => {
+    const { sim, pid } = reachWager(11);
+    const pair = wagerTrial(sim).pairs.get(pid)!;
+    expect(pair.partnerEntityId).not.toBe(0);
+    const partner = sim.entities.get(pair.partnerEntityId)!;
+    expect(partner).toBeTruthy();
+    expect(partner.name).toBe(pair.partnerName);
+    // seated across the pair's mats: the player west, the partner east
+    const player = sim.entities.get(pid)!;
+    expect(partner.pos.x - player.pos.x).toBeCloseTo(6.4, 3);
+    expect(partner.pos.z).toBeCloseTo(player.pos.z, 3);
+  });
+
+  it('despawns the partner when the pair finishes', () => {
+    const { sim, pid } = reachWager(12);
+    const pair = wagerTrial(sim).pairs.get(pid)!;
+    const partnerId = pair.partnerEntityId;
+    expect(sim.entities.has(partnerId)).toBe(true);
+    // empty the partner's purse with a correct guess
+    pair.holder = false;
+    pair.stage = 'guess';
+    pair.held = 3; // odd
+    pair.mine = 18;
+    pair.theirs = 2;
+    sim.gauntletWager('wager', 2, pid);
+    sim.gauntletWager('guess', 1, pid);
+    expect(pair.finished).toBe(true);
+    expect(pair.partnerEntityId).toBe(0);
+    expect(sim.entities.has(partnerId)).toBe(false);
+  });
+
+  it('despawns every partner when the trial cap resolves the field', () => {
+    const { sim, pid } = reachWager(13);
+    const run = sim.gauntletRuns[0]!;
+    const pair = wagerTrial(sim).pairs.get(pid)!;
+    const partnerId = pair.partnerEntityId;
+    pair.roundEndsAt = sim.time + 9999;
+    run.phaseEndsAt = sim.time - 1; // trial clock expired
+
+    sim.tick();
+
+    expect(sim.entities.has(partnerId)).toBe(false);
+  });
+
+  it('despawns the partner when the player leaves mid-trial', () => {
+    const { sim, pid } = reachWager(14);
+    const pair = wagerTrial(sim).pairs.get(pid)!;
+    const partnerId = pair.partnerEntityId;
+
+    sim.gauntletLeave(pid);
+    sim.tick(); // the run driver sweeps the orphaned pair
+
+    expect(sim.entities.has(partnerId)).toBe(false);
+  });
+
+  it('despawns the partner when the run disposes mid-trial', () => {
+    const { sim, pid } = reachWager(15);
+    const run = sim.gauntletRuns[0]!;
+    const pair = wagerTrial(sim).pairs.get(pid)!;
+    const partnerId = pair.partnerEntityId;
+    // strand the player outside the band: the sweep detaches them, and the
+    // now-empty run times out and disposes with the trial state still live
+    const e = sim.entities.get(pid)!;
+    e.pos.x = 100;
+    e.prevPos = { ...e.pos };
+    (sim as any).rebucket(e);
+    for (let i = 0; i < 20 * (GAUNTLET.emptyTimeoutS + 2) && sim.gauntletRuns.length > 0; i++)
+      sim.tick();
+
+    expect(sim.gauntletRuns.length).toBe(0);
+    expect(sim.entities.has(partnerId)).toBe(false);
+  });
+});
+
 describe('gauntlet wager: determinism', () => {
   it('two same-seed runs with identical scripted inputs are byte-identical', () => {
     const scenario = () => {

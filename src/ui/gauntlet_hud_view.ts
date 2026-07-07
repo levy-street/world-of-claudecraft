@@ -45,6 +45,18 @@ export interface GauntletHudModel {
   /** The sentinel light during the red-light/green-light trial, else null. */
   light: 'green' | 'red' | null;
   showLight: boolean;
+  /** The Keeper's Wager strip during a live wager round, else null. The duel
+   *  itself plays on the table (marbles, stones, pebbles); the strip carries
+   *  only the stake stepper and the round clock. The stake is a LOCAL UI value
+   *  (the wire never projects it; the server re-clamps every send), passed in
+   *  through the input and clamped here against the live purses. */
+  wager: {
+    stake: number;
+    canDec: boolean;
+    canInc: boolean;
+    /** Raw remaining round seconds (the painter ceils + formats). */
+    roundSeconds: number;
+  } | null;
   /** The Final Court shove prompt during the court trial, else null. */
   court: {
     /** True while the viewer holds the attacker role this swap window. */
@@ -62,10 +74,12 @@ export interface GauntletHudModel {
   podium: { first: string; second: string; third: string } | null;
 }
 
-/** The per-frame input: the viewer's run projection and the current sim time. */
+/** The per-frame input: the viewer's run projection and the current sim time,
+ * plus the hud-held local stake pick for the wager strip. */
 export interface GauntletHudInput {
   run: GauntletRunView | null;
   time: number;
+  wagerStake?: number;
 }
 
 const HIDDEN: GauntletHudModel = {
@@ -84,6 +98,7 @@ const HIDDEN: GauntletHudModel = {
   prizePool: 0,
   light: null,
   showLight: false,
+  wager: null,
   court: null,
   spectating: false,
   finished: false,
@@ -134,6 +149,22 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
   const remaining = Math.max(0, run.endsAt - time);
   const window = gauntletPhaseWindowSeconds(run);
   const vitalityFrac = clamp01(run.vitalityMax > 0 ? run.vitality / run.vitalityMax : 0);
+  const wager =
+    run.wager && run.wager.stage !== 'done'
+      ? (() => {
+          const cap = Math.max(
+            1,
+            Math.min(GAUNTLET.wager.maxWager, run.wager.mine, run.wager.theirs),
+          );
+          const stake = Math.max(1, Math.min(cap, Math.floor(input.wagerStake ?? 1)));
+          return {
+            stake,
+            canDec: stake > 1,
+            canInc: stake < cap,
+            roundSeconds: Math.max(0, run.wager.roundEndsAt - time),
+          };
+        })()
+      : null;
   const court = run.court
     ? {
         attacker: run.court.attacker,
@@ -160,6 +191,7 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
     prizePool: run.prizePool,
     light: run.sentinel ? run.sentinel.light : null,
     showLight: run.sentinel !== null,
+    wager,
     court,
     spectating: run.spectating,
     finished: run.finished,

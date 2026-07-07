@@ -671,6 +671,43 @@ interface PullRig {
   centerZ: number;
 }
 
+// Keeper's Wager table rig: an instanced marble pool split into the two purse
+// piles (driven by the viewer's own wire counts), the floating odd/even choice
+// stones (guess rounds), and the five held pebbles (hold rounds). The stones
+// and pebbles are the trial's click targets, raycast via pickTargets().
+interface WagerRig {
+  root: THREE.Group;
+  marbles: THREE.InstancedMesh;
+  oddStone: THREE.Group;
+  evenStone: THREE.Group;
+  pebbles: THREE.Mesh[];
+  pickList: { id: string; object: THREE.Object3D }[];
+  baseZ: number; // the courtyard center row (instance-local)
+}
+
+// Rebuild the two marble piles from the viewer's purse counts: the player's
+// pile by their west mat, the partner's across the table. Event-driven (counts
+// change once per round), never per frame.
+const wagerScratchMatrix = new THREE.Matrix4();
+function layoutWagerMarbles(rig: WagerRig, mine: number, theirs: number): void {
+  const total = Math.min(rig.marbles.instanceMatrix.count, Math.max(0, mine) + Math.max(0, theirs));
+  let i = 0;
+  const place = (count: number, sideX: number) => {
+    for (let k = 0; k < count && i < total; k++, i++) {
+      wagerScratchMatrix.makeTranslation(
+        sideX + Math.floor(k / 5) * (sideX < 0 ? -0.26 : 0.26),
+        0.22,
+        -0.6 + (k % 5) * 0.3,
+      );
+      rig.marbles.setMatrixAt(i, wagerScratchMatrix);
+    }
+  };
+  place(Math.max(0, mine), -2.3);
+  place(Math.max(0, theirs), 2.3);
+  rig.marbles.count = i;
+  rig.marbles.instanceMatrix.needsUpdate = true;
+}
+
 // The drum's flash length at each beat, seconds.
 const DRUM_FLASH_S = 0.12;
 
@@ -873,6 +910,7 @@ function buildTrialArenas(
   spanRig: SpanRig;
   sigilRig: SigilRig;
   pullRig: PullRig;
+  wagerRig: WagerRig;
 } {
   const V = GAUNTLET_VENUE;
 
@@ -966,8 +1004,10 @@ function buildTrialArenas(
     };
   })();
 
-  // Trial 4, Keeper's Wager: a walled courtyard with two facing wager mats.
-  {
+  // Trial 4, Keeper's Wager: a walled courtyard with two facing wager mats,
+  // plus the live table rig (marble piles, the floating choice stones, the
+  // held-pebble row) anchored to the viewer's own duel row.
+  const wagerRig: WagerRig = (() => {
     const { x, z, size } = V.wager;
     groundPlane(
       group,
@@ -1005,7 +1045,63 @@ function buildTrialArenas(
     );
     matB.rotation.y = Math.PI / 4;
     placeProp(group, 'bannerGreen', x, 3.2, z + size / 2 - 0.4, Math.PI, 2.2);
-  }
+
+    // The live rig, all children local to a root the update loop re-anchors to
+    // the viewer's duel row when their trial opens.
+    const root = new THREE.Group();
+    root.position.set(x, 0, z);
+    group.add(root);
+    const marbleMat = surfaceMat({ color: GLASS_TINT, roughness: 0.25 });
+    const marbles = new THREE.InstancedMesh(
+      new THREE.SphereGeometry(0.09, 8, 6),
+      marbleMat,
+      GAUNTLET.wager.startingMarbles * 2,
+    );
+    marbles.count = 0;
+    root.add(marbles);
+    // Choice stones for a guess round: dark orbs floating over the table, one
+    // dot for odd, two for even (procedural emboss, no text mesh).
+    const stoneMatDark = surfaceMat({ color: 0x2a3040, roughness: 0.35 });
+    const dotMat = new THREE.MeshStandardMaterial({
+      color: 0xf3ead2,
+      emissive: 0xf3ead2,
+      emissiveIntensity: 0.9,
+      roughness: 0.4,
+    });
+    venueOwnedMats.push(dotMat);
+    const makeStone = (sx: number, dots: number): THREE.Group => {
+      const g2 = new THREE.Group();
+      g2.position.set(sx, 1.35, 0);
+      const orb = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 10), stoneMatDark);
+      g2.add(orb);
+      for (let d = 0; d < dots; d++) {
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), dotMat);
+        dot.position.set(-0.24, dots === 1 ? 0 : d === 0 ? 0.11 : -0.11, 0);
+        g2.add(dot);
+      }
+      g2.visible = false;
+      root.add(g2);
+      return g2;
+    };
+    const oddStone = makeStone(-0.9, 1);
+    const evenStone = makeStone(0.9, 2);
+    // The hold row: five pebbles lined on the viewer's edge of the table.
+    const pebbleMat = surfaceMat({ color: 0xcfc4a4, roughness: 0.8 });
+    const pebbles: THREE.Mesh[] = [];
+    for (let k = 0; k < 5; k++) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 6), pebbleMat);
+      p.position.set(-2, 0.3, -1.2 + k * 0.6);
+      p.visible = false;
+      root.add(p);
+      pebbles.push(p);
+    }
+    const pickList = [
+      { id: 'wager:odd', object: oddStone as THREE.Object3D },
+      { id: 'wager:even', object: evenStone as THREE.Object3D },
+      ...pebbles.map((p, k) => ({ id: `wager:hold:${k + 1}`, object: p as THREE.Object3D })),
+    ];
+    return { root, marbles, oddStone, evenStone, pebbles, pickList, baseZ: z };
+  })();
 
   // Trial 5, The Brittle Span: paired panels over a dark pit, at ground level
   // and at EXACTLY the sim's panel rects (trial_span.ts step detection reads
@@ -1112,7 +1208,7 @@ function buildTrialArenas(
     }
     placeProp(group, 'bannerYellow', x, 3.2, z0 - 2, 0, 2.2);
   }
-  return { spanRig, sigilRig, pullRig };
+  return { spanRig, sigilRig, pullRig, wagerRig };
 }
 
 // Track venue-created dynamic materials for dispose (surfaceMat ones are
@@ -1125,7 +1221,11 @@ let venueOwnedMats: THREE.Material[] = [];
 
 export interface GauntletVenueView {
   group: THREE.Group;
-  update(t: number, run: GauntletRunView | null): void;
+  update(
+    t: number,
+    run: GauntletRunView | null,
+    viewer?: { x: number; y: number; z: number },
+  ): void;
   /** The sigil slab's interaction rect, WORLD space (center + half-extent u/v). */
   sigilSlabRect(): {
     center: { x: number; y: number; z: number };
@@ -1134,6 +1234,8 @@ export interface GauntletVenueView {
   };
   /** Place (or hide, null) the trace cursor mote at a rect-local 0..1 point. */
   setSigilCursor(p: { u: number; v: number } | null): void;
+  /** The venue's live click targets (the wager stones/pebbles), for pickVenueTarget. */
+  pickTargets(): { id: string; object: THREE.Object3D }[];
   dispose(scene: THREE.Scene): void;
 }
 
@@ -1185,7 +1287,7 @@ export async function buildGauntletVenue(
   buildStaging(group);
   buildPodium(group, rig.lampMat);
   buildSpectatorDeck(group);
-  const { spanRig, sigilRig, pullRig } = buildTrialArenas(group, ox, oz);
+  const { spanRig, sigilRig, pullRig, wagerRig } = buildTrialArenas(group, ox, oz);
   scene.add(group);
   // The venue never moves after build: freeze the whole subtree's matrices
   // (real per-frame CPU on thousands of prop nodes), then re-enable the
@@ -1199,6 +1301,7 @@ export async function buildGauntletVenue(
   pullRig.ropeL.matrixAutoUpdate = true;
   pullRig.ropeR.matrixAutoUpdate = true;
   pullRig.drum.matrixAutoUpdate = true;
+  wagerRig.root.matrixAutoUpdate = true;
 
   let lastT = 0;
   let headYaw = 0;
@@ -1211,9 +1314,13 @@ export async function buildGauntletVenue(
   // when the trial ends, with zero writes on ordinary idle frames.
   let pullKnotX = 0;
   let pullLayoutDue = true;
+  // Wager rig state: writes are elided on the composed key; the rig anchors to
+  // the viewer's own duel row once per trial (players duel at spread mats).
+  let lastWagerKey = '';
+  let wagerAnchored = false;
   return {
     group,
-    update(t: number, run: GauntletRunView | null) {
+    update(t: number, run: GauntletRunView | null, viewer?: { x: number; y: number; z: number }) {
       const dt = Math.min(0.1, Math.max(0, t - lastT));
       lastT = t;
       const mine = run && run.originX === ox && run.originZ === oz ? run : null;
@@ -1305,6 +1412,37 @@ export async function buildGauntletVenue(
         // Stay live while the trial runs or the knot is still easing home.
         pullLayoutDue = pull !== null || pullKnotX !== 0;
       }
+      // Keeper's Wager: the marble piles mirror the viewer's own purses, the
+      // choice stones float up on a guess round, the pebble row on a hold
+      // round. Everything is elided on one composed key.
+      const wager = mine?.wager ?? null;
+      const wagerKey = wager ? `${wager.stage}:${wager.mine}:${wager.theirs}` : '';
+      if (wagerKey !== lastWagerKey) {
+        lastWagerKey = wagerKey;
+        if (!wager) {
+          wagerAnchored = false;
+          wagerRig.marbles.count = 0;
+          wagerRig.oddStone.visible = false;
+          wagerRig.evenStone.visible = false;
+          for (const p of wagerRig.pebbles) p.visible = false;
+        } else {
+          // Anchor once per trial: the sim seats the viewer at their own mat
+          // row, so their position IS the row (clamped into the courtyard).
+          if (!wagerAnchored && viewer) {
+            wagerAnchored = true;
+            const half = GAUNTLET_VENUE.wager.size / 2 - 1.5;
+            const rowZ = Math.max(
+              wagerRig.baseZ - half,
+              Math.min(wagerRig.baseZ + half, viewer.z - oz),
+            );
+            wagerRig.root.position.z = rowZ;
+          }
+          layoutWagerMarbles(wagerRig, wager.mine, wager.theirs);
+          wagerRig.oddStone.visible = wager.stage === 'guess';
+          wagerRig.evenStone.visible = wager.stage === 'guess';
+          for (const p of wagerRig.pebbles) p.visible = wager.stage === 'hold';
+        }
+      }
       // Head: green = turned away (yaw PI), red = eyes on the field (yaw 0);
       // no live trial = a slow patrol sweep. The ease rate echoes the
       // telegraph window so the turn reads as the warning it is.
@@ -1320,6 +1458,9 @@ export async function buildGauntletVenue(
     },
     sigilSlabRect() {
       return sigilRig.rect;
+    },
+    pickTargets() {
+      return wagerRig.pickList;
     },
     setSigilCursor(p: { u: number; v: number } | null) {
       if (!p) {

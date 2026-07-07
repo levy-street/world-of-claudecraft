@@ -3888,6 +3888,33 @@ export class Renderer {
     this.gauntletVenueAt(ox, oz)?.setSigilCursor(p);
   }
 
+  /**
+   * Raycast the venues' live click targets (the wager table's choice stones
+   * and held pebbles) and return the nearest hit id, or null. Only visible
+   * targets count, so outside a wager round this is a handful of cheap
+   * bounding checks at most.
+   */
+  pickVenueTarget(clientX: number, clientY: number): string | null {
+    const ndc = this.tmpNdc.set(
+      (clientX / this.viewport.width) * 2 - 1,
+      -(clientY / this.viewport.height) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    let bestId: string | null = null;
+    let bestDist = Number.POSITIVE_INFINITY;
+    for (const venue of this.gauntletVenues.values()) {
+      for (const target of venue.pickTargets()) {
+        if (!target.object.visible) continue;
+        const hits = this.raycaster.intersectObject(target.object, true);
+        if (hits.length > 0 && hits[0].distance < bestDist) {
+          bestDist = hits[0].distance;
+          bestId = target.id;
+        }
+      }
+    }
+    return bestId;
+  }
+
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
     void this.dungeons.buildInterior(interior, ox, oz).catch((err) => {
@@ -5139,7 +5166,9 @@ export class Renderer {
     for (const castle of this.hodricsCastles.values()) castle.update(this.time);
     // The Gauntlet venue reacts to the viewer's own run: the Warden's gaze and
     // the signal pylons follow the sentinel light state (idle amber otherwise).
-    for (const venue of this.gauntletVenues.values()) venue.update(this.time, this.sim.gauntletRun);
+    // The viewer's position anchors the wager table rig to their own duel row.
+    for (const venue of this.gauntletVenues.values())
+      venue.update(this.time, this.sim.gauntletRun, p.pos);
     worldStart = markWorldPhase('props', worldStart);
     this.foliage.update(
       p.pos.x,

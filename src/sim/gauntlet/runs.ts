@@ -37,7 +37,7 @@ import { gauntletPullBeat, startPull, updatePull } from './trial_pull';
 import { startSentinel, updateSentinel } from './trial_sentinel';
 import { gauntletTraceSigils, startSigils, updateSigils } from './trial_sigils';
 import { startSpan, updateSpan } from './trial_span';
-import { gauntletWagerAct, startWager, updateWager } from './trial_wager';
+import { dropWagerPartners, gauntletWagerAct, startWager, updateWager } from './trial_wager';
 import { aliveContestants, eliminateContestant, emitToRunPlayers } from './vitality';
 
 export function gauntletRunForPlayer(ctx: SimContext, pid: number): GauntletRun | null {
@@ -474,6 +474,9 @@ function disposeRun(ctx: SimContext, run: GauntletRun): void {
     if (!c.player && c.entityId !== 0 && ctx.entities.has(c.entityId)) ctx.dropEntity(c.entityId);
   }
   if (run.watcherId !== null && ctx.entities.has(run.watcherId)) ctx.dropEntity(run.watcherId);
+  // A run disposed mid-wager-trial still has cosmetic partner entities seated
+  // at the mats (the watcherId cleanup is the precedent).
+  if (run.trial?.kind === 'wager') dropWagerPartners(ctx, run.trial);
   run.phase = 'done';
   const i = ctx.gauntletRuns.indexOf(run);
   if (i >= 0) ctx.gauntletRuns.splice(i, 1);

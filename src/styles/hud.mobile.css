@@ -4591,14 +4591,8 @@
   body.mobile-touch .gh-court-btn {
     min-width: 130px;
   }
-  body.mobile-touch #gauntlet-wager {
-    width: min(320px, 92vw);
-  }
-  body.mobile-touch #gauntlet-wager .gw-digit {
+  body.mobile-touch .gh-wager-btn {
     min-width: 44px;
     min-height: 44px;
-  }
-  body.mobile-touch #gauntlet-wager .gw-guess-row .btn {
-    min-height: 48px;
   }
 }

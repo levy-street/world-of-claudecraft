@@ -4712,72 +4712,29 @@
     filter: grayscale(0.6) brightness(0.7);
   }
 
-  /* ---------- gauntlet wager panel (trial 4) ---------- */
-  #gauntlet-wager {
-    width: 280px;
-    max-width: 92%;
-    padding-bottom: 12px;
-    text-align: center;
-  }
-  #gauntlet-wager .gw-purses {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 10px 14px 2px;
-    font-size: 13px;
-    color: var(--color-text-light);
-  }
-  #gauntlet-wager .gw-round {
-    padding: 2px 14px 6px;
-    font-size: 14px;
-    color: var(--color-primary);
-    font-variant-numeric: tabular-nums;
-  }
-  #gauntlet-wager .gw-stake,
-  #gauntlet-wager .gw-hold,
-  #gauntlet-wager .gw-guess {
-    display: flex;
-    flex-direction: column;
+  /* ---------- gauntlet wager strip (trial 4) ---------- */
+  /* The stake stepper + round clock row inside the gauntlet cluster; the duel
+     itself plays out on the table (marbles, choice stones, pebbles). */
+  .gh-wager {
+    display: none;
     align-items: center;
-    gap: 4px;
-    padding: 4px 14px 0;
-  }
-  #gauntlet-wager .gw-label {
-    font-size: 12px;
-    color: var(--color-text-muted);
-  }
-  #gauntlet-wager .gw-digits {
-    display: flex;
     justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
+    gap: 8px;
+    pointer-events: auto;
   }
-  #gauntlet-wager .gw-digit {
-    min-width: 40px;
-    min-height: 40px;
-    margin: 0;
-    padding: 4px 8px;
-  }
-  #gauntlet-wager .gw-digit.gw-on {
-    border-color: var(--color-border-focus);
-    box-shadow:
-      inset 0 1px 0 #ffffff2a,
-      0 0 8px var(--color-primary-glow-heavy);
-    filter: brightness(1.2);
-  }
-  #gauntlet-wager .gw-guess-row {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  #gauntlet-wager .gw-guess-row .btn {
-    min-width: 84px;
-    min-height: 44px;
-    margin: 0;
-  }
-  #gauntlet-wager .gw-done {
-    padding: 8px 14px 0;
-    font-size: 14px;
+  .gh-wager-label {
+    font: 700 12px / 18px var(--title-font);
+    letter-spacing: 1px;
     color: var(--color-text-light);
+  }
+  .gh-wager-btn {
+    min-width: 34px;
+    min-height: 30px;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .gh-wager-btn.gh-disabled {
+    pointer-events: none;
+    filter: grayscale(0.6) brightness(0.7);
   }
 }

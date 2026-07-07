@@ -213,8 +213,8 @@
 
     <!-- The Gauntlet HUD cluster: shown only while a run is live (painted by
          gauntlet_hud_painter from the gauntletRun wire view). Non-interactive chrome
-         (pointer-events:none in CSS) so it never blocks clicks; the court
-         button opts back into pointer events. Kept in lockstep with index.html. -->
+         (pointer-events:none in CSS) so it never blocks clicks; the wager and
+         court buttons opt back into pointer events. Kept in lockstep with index.html. -->
     <div id="gauntlet-hud" role="group" data-i18n-aria="hudChrome.gauntlet.title" aria-label="The Gauntlet">
       <div id="gauntlet-phase"></div>
       <div id="gauntlet-countdown"><div class="fill"></div><div class="timer"></div></div>
@@ -222,6 +222,13 @@
         <span id="gauntlet-survivors" class="gh-chip" role="status"></span>
         <span id="gauntlet-prize" class="gh-chip"></span>
         <span id="gauntlet-light" class="gh-light"></span>
+      </div>
+      <div id="gauntlet-wager-strip" class="gh-wager">
+        <span class="gh-wager-label"></span>
+        <button type="button" id="gauntlet-wager-dec" class="btn gh-wager-btn">-</button>
+        <span id="gauntlet-wager-stake" class="gh-chip"></span>
+        <button type="button" id="gauntlet-wager-inc" class="btn gh-wager-btn">+</button>
+        <span id="gauntlet-wager-round" class="gh-chip"></span>
       </div>
       <div id="gauntlet-court" class="gh-court">
         <span id="gauntlet-court-role" class="gh-court-role"></span>
@@ -361,7 +368,6 @@
     <div id="talents-window" class="window panel"></div>
     <div id="quest-log-window" class="window panel"></div>
     <div id="gauntlet-recruit" class="window panel"></div>
-    <div id="gauntlet-wager" class="window panel gauntlet-trial-panel"></div>
     <div id="crafting-window" class="window panel"></div>
     <div id="town-focus-window" class="window panel"></div>
     <div id="map-window" class="window panel">

@@ -13,12 +13,39 @@ import {
   GAUNTLET,
   GAUNTLET_CONTESTANT_FIRST_NAMES,
   GAUNTLET_CONTESTANT_LAST_NAMES,
+  GAUNTLET_CONTESTANT_NPC_ID,
   GAUNTLET_VENUE,
 } from '../content/gauntlet';
+import { NPCS } from '../data';
+import { createNpc } from '../entity';
 import type { SimContext } from '../sim_context';
 import { placeContestantsAt } from './contestants';
 import type { GauntletRun, GauntletWagerPair, GauntletWagerState } from './state';
 import { applyVitalityDamage, cullNpcsToward } from './vitality';
+
+// The two facing mats sit this far either side of the courtyard center; pairs
+// beyond the first spread along z so every player duels at their own mats.
+const MAT_OFFSET_X = 3.2;
+const PAIR_SPACING_MAX = 5;
+
+// The z row (instance-local) for pair k of n, centered on the courtyard.
+function pairRowZ(k: number, n: number): number {
+  const spacing = n > 1 ? Math.min(PAIR_SPACING_MAX, (GAUNTLET_VENUE.wager.size - 3) / (n - 1)) : 0;
+  return GAUNTLET_VENUE.wager.z + (k - (n - 1) / 2) * spacing;
+}
+
+// Drop a pair's cosmetic partner entity (idempotent; every exit path funnels
+// here: the pair finishing, the trial cap, the player leaving, run disposal).
+function dropPartner(ctx: SimContext, pair: GauntletWagerPair): void {
+  if (pair.partnerEntityId !== 0 && ctx.entities.has(pair.partnerEntityId))
+    ctx.dropEntity(pair.partnerEntityId);
+  pair.partnerEntityId = 0;
+}
+
+/** Drop every pair's partner entity (trial resolution and run disposal). */
+export function dropWagerPartners(ctx: SimContext, trial: GauntletWagerState): void {
+  for (const pair of trial.pairs.values()) dropPartner(ctx, pair);
+}
 
 // The stakes never exceed either purse and never drop below 1. Re-applied each
 // round (marble counts shrink) and whenever the player sets a new bet.
@@ -50,6 +77,7 @@ function finishPair(ctx: SimContext, run: GauntletRun, pair: GauntletWagerPair):
   pair.finished = true;
   pair.stage = 'done';
   pair.won = pair.theirs === 0 && pair.mine > 0;
+  dropPartner(ctx, pair);
   if (pair.won) {
     const ps = run.playerStates.get(pair.pid);
     if (ps && ps.finishedAt === null) ps.finishedAt = ctx.time;
@@ -97,14 +125,21 @@ function resolveRound(
 export function startWager(ctx: SimContext, run: GauntletRun): GauntletWagerState {
   placeContestantsAt(ctx, run, GAUNTLET_VENUE.wager.x, GAUNTLET_VENUE.wager.z, 6);
   const pairs = new Map<number, GauntletWagerPair>();
-  for (const [pid, ps] of run.playerStates) {
-    if (ps.spectating) continue;
+  // Pre-filter so pair count is known for mat placement. The rng draw order is
+  // unchanged: draws happen per pair, in playerStates iteration order, exactly
+  // as before (the filter draws nothing).
+  const eligible = [...run.playerStates.keys()].filter(
+    (pid) => !run.playerStates.get(pid)?.spectating,
+  );
+  for (let k = 0; k < eligible.length; k++) {
+    const pid = eligible[k];
     const first = run.rng.pick([...GAUNTLET_CONTESTANT_FIRST_NAMES]);
     const last = run.rng.pick([...GAUNTLET_CONTESTANT_LAST_NAMES]);
     const pair: GauntletWagerPair = {
       pid,
       partnerName: `${first} ${last}`,
       partnerSkill: run.rng.range(GAUNTLET.npcSkillMin, GAUNTLET.npcSkillMax),
+      partnerEntityId: 0,
       mine: GAUNTLET.wager.startingMarbles,
       theirs: GAUNTLET.wager.startingMarbles,
       holder: run.rng.chance(0.5),
@@ -117,6 +152,30 @@ export function startWager(ctx: SimContext, run: GauntletRun): GauntletWagerStat
     };
     beginRound(ctx, run, pair);
     pairs.set(pid, pair);
+    // Seat the duel at its own mats: the player on the west mat, a cosmetic
+    // partner entity on the east one, facing each other. The spawn draws no
+    // run.rng (parity: the name/skill/holder draws above are the whole stream).
+    const rowZ = pairRowZ(k, eligible.length);
+    const player = ctx.entities.get(pid);
+    if (player) {
+      player.pos = {
+        x: run.origin.x + GAUNTLET_VENUE.wager.x - MAT_OFFSET_X,
+        y: 0,
+        z: run.origin.z + rowZ,
+      };
+      player.prevPos = { ...player.pos };
+      player.facing = Math.PI / 2; // faces +x, across the table
+      ctx.rebucket(player);
+    }
+    const partner = createNpc(ctx.nextId++, NPCS[GAUNTLET_CONTESTANT_NPC_ID], {
+      x: run.origin.x + GAUNTLET_VENUE.wager.x + MAT_OFFSET_X,
+      y: 0,
+      z: run.origin.z + rowZ,
+    });
+    partner.name = pair.partnerName;
+    partner.facing = -Math.PI / 2; // faces the player
+    ctx.addEntity(partner);
+    pair.partnerEntityId = partner.id;
   }
   return { kind: 'wager', pairs };
 }
@@ -175,6 +234,7 @@ function resolveCap(ctx: SimContext, run: GauntletRun, trial: GauntletWagerState
     if (pair.finished) continue;
     pair.stage = 'done';
     pair.finished = true;
+    dropPartner(ctx, pair);
     if (pair.mine < pair.theirs) {
       const deficit = pair.theirs - pair.mine;
       const c = run.contestants.find((k) => k.entityId === pair.pid);
@@ -191,6 +251,14 @@ export function updateWager(ctx: SimContext, run: GauntletRun, dt: number): bool
   if (!trial || trial.kind !== 'wager') return true;
 
   for (const pair of trial.pairs.values()) {
+    // A player who left the run mid-duel (forfeit, disconnect) orphans their
+    // pair: retire it and clear its partner from the table.
+    if (!pair.finished && !run.playerStates.has(pair.pid)) {
+      pair.finished = true;
+      pair.stage = 'done';
+      dropPartner(ctx, pair);
+      continue;
+    }
     if (!pair.finished && ctx.time >= pair.roundEndsAt) forfeitRound(ctx, run, pair);
   }
 
@@ -204,6 +272,9 @@ export function updateWager(ctx: SimContext, run: GauntletRun, dt: number): bool
   }
   if (allDone || capHit) {
     if (capHit) resolveCap(ctx, run, trial);
+    // Belt and braces: the driver discards the trial state on resolution, so
+    // no partner entity may outlive this return.
+    dropWagerPartners(ctx, trial);
     cullNpcsToward(ctx, run);
     return true;
   }
