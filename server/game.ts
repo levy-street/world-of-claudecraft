@@ -1061,6 +1061,7 @@ export interface PerfCaptureStatus {
 
 export class GameServer {
   sim: Sim;
+  gauntletWindowOpen = process.env.GAUNTLET_EVENT === '1';
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
@@ -1649,6 +1650,7 @@ export class GameServer {
           // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
           // works without the sim reading the wall clock itself (determinism invariant).
           this.sim.utcDay = new Date().toISOString().slice(0, 10);
+          this.sim.gauntletEventOpen = this.gauntletWindowOpen;
           this.bcastGridNs = 0n;
           this.bcastSelfNs = 0n;
           this.bcSerializeNs = 0n;
@@ -4582,6 +4584,14 @@ export class GameServer {
         sim.delveRiteChoose(msg.intensity, pid);
         break;
       }
+      case 'gauntlet_join': {
+        sim.gauntletJoin(pid);
+        break;
+      }
+      case 'gauntlet_leave': {
+        sim.gauntletLeave(pid);
+        break;
+      }
       case 'delve_buy': {
         if (typeof msg.delveId !== 'string' || typeof msg.itemId !== 'string') break;
         const e = sim.entities.get(pid);
@@ -4964,6 +4974,8 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    maybe('gopen', this.sim.gauntletEventOpen);
+    maybe('grun', this.sim.gauntletRunWire(anchorSession.pid));
     // Book of Deeds: the Renown total and the selected title id, cheap
     // scalars diffed per tick (grants land from sim sites that never mark
     // this session dirty, and the title echo must not wait on the heavy gate).

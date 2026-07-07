@@ -3118,6 +3118,7 @@ async function startOffline(
     playerName: name,
     devCommands: import.meta.env.DEV,
     valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
+    gauntletAlwaysOpen: true,
     world,
   });
   sim.setPlayerSkin(sim.playerId, skin);
