@@ -34,6 +34,11 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
   are the exception:** they play pre-rendered clips under `public/audio/` (spatial
   effects + NPC voice) keyed off their `*_manifest.generated.ts`; a missing clip is
   a silent no-op (the dialogue/combat text stays the source of truth).
+- **Sampled SFX asset standards live in `docs/design/sound_effects.md`.** Runtime
+  code assumes `public/audio/sfx` already passed `npm run sfx:check`: MP3, 44.1kHz,
+  -6dBFS peak, mono by default, stereo only for catalog entries marked `stereo:true`.
+  Fix malformed clips in `scripts/gen_sfx.mjs` / `scripts/check_sfx.mjs`, not with
+  runtime compensation in `sfx.ts`.
 - **`AudioContext` needs a user gesture**: `audio.init()`/`music.init()`/`sfx.init()`
   are called from `enterWorld` in `main.ts`, not at module load. `setVolume` is safe
   before init. (`voice.ts` uses a plain `Audio` element, so it has no gated init.)
@@ -58,13 +63,11 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 Extract non-trivial input/camera/perf math into a pure, unit-tested module (the
 `click_move`/`pointer_pick`/`perf_doctor` pattern), not into `input.ts`.
 
-- **A new keybind/action:** add one entry to `BIND_ACTIONS` in `keybinds.ts`
-  (`kind: 'held'` for movement polled in `readMoveInput`, else `'edge'`). For an
-  edge action, extend `InputCallbacks.onUiKey`'s union and add a `case` in
-  `Input.dispatchEdge`, then wire it where `new Input(...)` is constructed in
-  `main.ts`. Action-bar slots (`slot0..11`) already route to `onAbility`.
-- **A new SFX:** add a method to `GameAudio` composed from the private `tone()`
+- **A new procedural SFX:** add a method to `GameAudio` composed from the private `tone()`
   /`noise()` primitives; call it from `main.ts`/HUD via the `audio` singleton.
+- **A new sampled spatial SFX:** add an entry to `scripts/sfx/sfx_prompts.mjs`, keep it
+  mono unless it is an ambience bed that needs `stereo:true`, run `npm run sfx:gen` or
+  `node scripts/gen_sfx.mjs --conform-existing`, then run `npm run sfx:check`.
 - **A new music cue/zone:** add a `MusicZone`, a `composeX()` theme, register it
   in the `buildMusicThemes()` map (music.ts), and drive it from
   `music.update(zone, inCombat)`.
