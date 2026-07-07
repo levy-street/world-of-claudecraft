@@ -19,6 +19,7 @@
 //     str/sta, a mage cloth piece stays int/spi). itemScore() is the realized
 //     power (stats + armor + weapon dps) for at-a-glance comparison.
 
+import { HEROIC_BOSS_LOOT, HEROIC_LOOT_SOURCE_LEVEL } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { DUNGEONS, MOBS, QUESTS } from './data';
 import type { ItemDef, ItemSlot, Stats } from './types';
@@ -175,6 +176,15 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // bosses), so the stock reads that source level: the epic pieces land at item
   // level 26 (20 + the epic bump) and get budget-enforced like any drop.
   for (const offer of HEROIC_VENDOR_STOCK) bump(offer.itemId, HEROIC_VENDOR_SOURCE_LEVEL, false);
+  // Heroic boss drops: level-20 content one tier up (the heroic bump), so the
+  // epic pieces read item level 31 (25 + the epic bump). Flat across the five
+  // bosses BY DESIGN (raid=false even for Nythraxis): the heroic set is one
+  // shared tier, per the drop-table spec.
+  for (const entries of Object.values(HEROIC_BOSS_LOOT)) {
+    for (const entry of entries) {
+      if (entry.itemId) bump(entry.itemId, HEROIC_LOOT_SOURCE_LEVEL, false);
+    }
+  }
   return idx;
 }
 

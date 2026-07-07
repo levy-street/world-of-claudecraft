@@ -360,7 +360,9 @@ export const ko_KR: EnTranslations = {
       "hoursMinutes": "{h}시간 {m}분",
       "minutes": "{m}분",
       "lessThanMinute": "1분 미만",
-      "lockedToast": "{raid}에 잠겨 있습니다. {time} 후 해제됩니다."
+      "lockedToast": "{raid}에 잠겨 있습니다. {time} 후 해제됩니다.",
+      "heroicName": "영웅: {name}",
+      "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다."
     },
     "compass": {
       "N": "북",
@@ -6344,6 +6346,54 @@ export const ko_KR: EnTranslations = {
       },
       "heroic_mark": {
         "name": "영웅의 징표"
+      },
+      "morthens_cryptforged_hauberk": {
+        "name": "모르텐의 묘지주조 사슬갑옷"
+      },
+      "shadowpulse_handwraps": {
+        "name": "어둠파동 손싸개"
+      },
+      "bonechill_striders": {
+        "name": "뼈서리 장화"
+      },
+      "mistcallers_fang": {
+        "name": "안개소환사의 송곳니"
+      },
+      "tidebound_spaulders": {
+        "name": "조수결속 어깨보호구"
+      },
+      "sash_of_the_sunken_court": {
+        "name": "가라앉은 궁정의 장식띠"
+      },
+      "lunar_tide_greatstaff": {
+        "name": "달조수 대지팡이"
+      },
+      "tidewoven_trousers": {
+        "name": "조수직조 바지"
+      },
+      "choirmothers_casque": {
+        "name": "성가대어머니의 투구"
+      },
+      "gravewyrm_cleaver": {
+        "name": "무덤용 대검"
+      },
+      "shroud_of_the_gravewyrm": {
+        "name": "무덤용의 장막"
+      },
+      "sanctum_prowlers_grips": {
+        "name": "성소 잠행자의 장갑"
+      },
+      "scepter_of_the_deathless_court": {
+        "name": "불사 궁정의 홀"
+      },
+      "deathless_warguard_legmail": {
+        "name": "불사 전쟁수호 다리갑옷"
+      },
+      "soulrend_diadem": {
+        "name": "영혼분열 왕관"
+      },
+      "scourgehide_carapace": {
+        "name": "재앙가죽 갑각"
       },
       "seal_of_the_nine_oaths": {
         "name": "아홉 맹세의 인장"

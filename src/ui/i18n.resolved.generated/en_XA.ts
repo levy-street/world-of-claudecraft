@@ -360,7 +360,9 @@ export const en_XA: EnTranslations = {
       "hoursMinutes": "[{h}ĥ {m}ɱ]",
       "minutes": "[{m}ɱ]",
       "lessThanMinute": "[<1ɱ]",
-      "lockedToast": "[Ýóú áŕé ļóçķéð ţó {raid}. Úñļóçķš íñ {time}.]"
+      "lockedToast": "[Ýóú áŕé ļóçķéð ţó {raid}. Úñļóçķš íñ {time}.]",
+      "heroicName": "[Ĥéŕóíç {name}]",
+      "heroicLocked": "[Ýóú áŕé ļóçķéð ţó Ĥéŕóíç {name}.]"
     },
     "compass": {
       "N": "[Ñ]",
@@ -6344,6 +6346,54 @@ export const en_XA: EnTranslations = {
       },
       "heroic_mark": {
         "name": "[Ĥéŕóíç Ɱáŕķ]"
+      },
+      "morthens_cryptforged_hauberk": {
+        "name": "[Ɱóŕţĥéñ'š Çŕýþţƒóŕĝéð Ĥáúƀéŕķ]"
+      },
+      "shadowpulse_handwraps": {
+        "name": "[Šĥáðóŵþúļšé Ĥáñðŵŕáþš]"
+      },
+      "bonechill_striders": {
+        "name": "[Ɓóñéçĥíļļ Šţŕíðéŕš]"
+      },
+      "mistcallers_fang": {
+        "name": "[Ɱíšţçáļļéŕ'š Ƒáñĝ]"
+      },
+      "tidebound_spaulders": {
+        "name": "[Ţíðéƀóúñð Šþáúļðéŕš]"
+      },
+      "sash_of_the_sunken_court": {
+        "name": "[Šášĥ óƒ ţĥé Šúñķéñ Çóúŕţ]"
+      },
+      "lunar_tide_greatstaff": {
+        "name": "[Ļúñáŕ Ţíðé Ĝŕéáţšţáƒƒ]"
+      },
+      "tidewoven_trousers": {
+        "name": "[Ţíðéŵóʋéñ Ţŕóúšéŕš]"
+      },
+      "choirmothers_casque": {
+        "name": "[Çĥóíŕɱóţĥéŕ'š Çášɋúé]"
+      },
+      "gravewyrm_cleaver": {
+        "name": "[Ĝŕáʋéŵýŕɱ Çļéáʋéŕ]"
+      },
+      "shroud_of_the_gravewyrm": {
+        "name": "[Šĥŕóúð óƒ ţĥé Ĝŕáʋéŵýŕɱ]"
+      },
+      "sanctum_prowlers_grips": {
+        "name": "[Šáñçţúɱ Þŕóŵļéŕ'š Ĝŕíþš]"
+      },
+      "scepter_of_the_deathless_court": {
+        "name": "[Šçéþţéŕ óƒ ţĥé Ðéáţĥļéšš Çóúŕţ]"
+      },
+      "deathless_warguard_legmail": {
+        "name": "[Ðéáţĥļéšš Ŵáŕĝúáŕð Ļéĝɱáíļ]"
+      },
+      "soulrend_diadem": {
+        "name": "[Šóúļŕéñð Ðíáðéɱ]"
+      },
+      "scourgehide_carapace": {
+        "name": "[Šçóúŕĝéĥíðé Çáŕáþáçé]"
       },
       "seal_of_the_nine_oaths": {
         "name": "[Šéáļ óƒ ţĥé Ñíñé Óáţĥš]"

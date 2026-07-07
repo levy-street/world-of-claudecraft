@@ -29,6 +29,7 @@ import { isStunned } from '../combat/cc';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import { createMob, createNpc } from '../entity';
 import { applyHeroicMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
+import { heroicLockoutId } from '../instances/dungeons';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { clearThreat, threatEntries } from '../threat';
@@ -500,8 +501,13 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
   // lockout seam (the authoritative server uses its realm-local 3 AM daily reset, so a
   // realm's raids share one boundary; offline/headless fall back to a flat 24h day).
   const until = ctx.raidResetMs(ctx.lockoutNowMs());
+  // Difficulty-scoped: a heroic kill locks the :heroic key only, so the raid
+  // can still run the normal difficulty the same day (and vice versa).
+  const lockId = isHeroicNythraxis(ctx, boss)
+    ? heroicLockoutId('nythraxis_boss_arena')
+    : 'nythraxis_boss_arena';
   for (const meta of nythraxisRoomMetas(ctx, boss)) {
-    meta.raidLockouts.set('nythraxis_boss_arena', until);
+    meta.raidLockouts.set(lockId, until);
   }
 }
 

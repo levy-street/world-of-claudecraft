@@ -360,7 +360,9 @@ export const zh_TW: EnTranslations = {
       "hoursMinutes": "{h}小時{m}分",
       "minutes": "{m}分",
       "lessThanMinute": "<1分",
-      "lockedToast": "你已鎖定到{raid}。{time}後解鎖。"
+      "lockedToast": "你已鎖定到{raid}。{time}後解鎖。",
+      "heroicName": "英雄難度:{name}",
+      "heroicLocked": "你已被鎖定至英雄難度的{name}。"
     },
     "compass": {
       "N": "北",
@@ -6344,6 +6346,54 @@ export const zh_TW: EnTranslations = {
       },
       "heroic_mark": {
         "name": "英雄徽記"
+      },
+      "morthens_cryptforged_hauberk": {
+        "name": "莫爾森的墓鑄鎖甲"
+      },
+      "shadowpulse_handwraps": {
+        "name": "暗影脈衝裹手"
+      },
+      "bonechill_striders": {
+        "name": "骨寒行者之靴"
+      },
+      "mistcallers_fang": {
+        "name": "喚霧者之牙"
+      },
+      "tidebound_spaulders": {
+        "name": "縛潮護肩"
+      },
+      "sash_of_the_sunken_court": {
+        "name": "沉沒王庭腰帶"
+      },
+      "lunar_tide_greatstaff": {
+        "name": "月潮巨杖"
+      },
+      "tidewoven_trousers": {
+        "name": "織潮長褲"
+      },
+      "choirmothers_casque": {
+        "name": "唱詩聖母的頭盔"
+      },
+      "gravewyrm_cleaver": {
+        "name": "墓龍劈斬刀"
+      },
+      "shroud_of_the_gravewyrm": {
+        "name": "墓龍裹布"
+      },
+      "sanctum_prowlers_grips": {
+        "name": "聖殿潛行者的手套"
+      },
+      "scepter_of_the_deathless_court": {
+        "name": "不死王庭權杖"
+      },
+      "deathless_warguard_legmail": {
+        "name": "不死戰衛腿甲"
+      },
+      "soulrend_diadem": {
+        "name": "裂魂冠冕"
+      },
+      "scourgehide_carapace": {
+        "name": "災禍之皮甲殼"
       },
       "seal_of_the_nine_oaths": {
         "name": "九誓之印"

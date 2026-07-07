@@ -48,6 +48,12 @@ export function instanceOriginOf(inst: InstanceSlot): { x: number; z: number } {
   return instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
 }
 
+// Difficulty-scoped lockout key: heroic clears lock beside the normal key, so
+// the two difficulties never consume each other's daily lockout.
+export function heroicLockoutId(dungeonId: string): string {
+  return `${dungeonId}:heroic`;
+}
+
 // Walking into a dungeon door teleports you through it (no click needed).
 // Party members who walk in land in the same instance via instanceKeyFor.
 export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
@@ -101,10 +107,6 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
     ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
     return;
   }
-  if (dungeonId === 'nythraxis_boss_arena' && isRaidLocked(ctx, r.meta, dungeonId)) {
-    ctx.error(r.meta.entityId, 'You are locked to Nythraxis Raid Arena.');
-    return;
-  }
   if (dungeonId === 'nythraxis_boss_arena') {
     const engaged = ctx.instances.find(
       (i) => i.dungeonId === dungeonId && i.partyKey === instanceKeyFor(ctx, r.meta.entityId),
@@ -122,7 +124,31 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   // group's live instance instead of stranding the player in a fresh parallel
   // claim. The selected difficulty applies only when claiming a new instance.
   let inst = ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === key);
+  // Nythraxis keeps its at-the-door lockout (even a live claim is barred after
+  // the kill), now scoped to the difficulty actually being entered: the live
+  // claim's when one exists, else the current selection. Normal and heroic
+  // never consume each other's lockout.
+  if (dungeonId === 'nythraxis_boss_arena') {
+    const doorDifficulty = inst?.difficulty ?? difficulty;
+    const lockId = doorDifficulty === 'heroic' ? heroicLockoutId(dungeonId) : dungeonId;
+    if (isRaidLocked(ctx, r.meta, lockId)) {
+      ctx.error(
+        r.meta.entityId,
+        doorDifficulty === 'heroic'
+          ? `You are locked to Heroic ${dungeon.name}.`
+          : 'You are locked to Nythraxis Raid Arena.',
+      );
+      return;
+    }
+  }
   if (!inst) {
+    // Heroic five-mans lock on the KILL, not the door: a locked player can
+    // still corpse-run back into a live claim, but cannot claim a fresh
+    // heroic run until the daily reset. Normal claims are never gated.
+    if (difficulty === 'heroic' && isRaidLocked(ctx, r.meta, heroicLockoutId(dungeonId))) {
+      ctx.error(r.meta.entityId, `You are locked to Heroic ${dungeon.name}.`);
+      return;
+    }
     inst = ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === null);
     if (!inst) {
       ctx.error(r.meta.entityId, `All instances of ${dungeon.name} are busy. Try again soon.`);
@@ -323,8 +349,14 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning || mob.templateId !== tuning.finalBossId) return;
   const loot = mob.loot ?? { copper: 0, items: [] };
+  // Every participant is locked to this heroic instance until the daily reset
+  // (the same realm-local boundary the Nythraxis raid uses). Granted on the
+  // KILL, independent of the marks daily gate below, and scoped to the
+  // :heroic key so the normal difficulty is never consumed.
+  const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
   let awarded = false;
   for (const meta of recipients) {
+    meta.raidLockouts.set(heroicLockoutId(inst.dungeonId), lockedUntil);
     // `utcDay` comes from the host, never the wall clock (determinism). Both
     // hosts stamp it (server/game.ts, main.ts); with an empty day the set
     // simply never resets, the same semantics as delveDaily.

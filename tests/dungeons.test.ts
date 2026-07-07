@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import {
@@ -544,6 +545,167 @@ describe('dungeons: heroic marks', () => {
         (s) => s.itemId === HEROIC_MARK_ITEM_ID,
       ),
     ).toBe(false);
+  });
+});
+
+describe('dungeons: heroic boss drops', () => {
+  function killFinalBoss(sim: AnySim, dungeonId: string, bossId: string): AnyEntity {
+    const pid = sim.addPlayer('warrior', 'Slayer');
+    sim.setDungeonDifficulty('heroic', pid);
+    enterDungeon(sim.ctx, dungeonId, pid);
+    const inst = claimedDungeon(sim, dungeonId, 'heroic');
+    const boss = mobInInstance(sim, inst, bossId);
+    (sim as any).dealDamage(
+      sim.entities.get(pid),
+      boss,
+      boss.hp + 1000,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    return boss;
+  }
+
+  it('a heroic final-boss corpse carries exactly one epic from that boss table', () => {
+    // Sweep several seeds so the single rollGroup lands on different entries;
+    // every kill drops exactly one, always from the boss's own heroic table.
+    const table = HEROIC_BOSS_LOOT.morthen.map((e) => e.itemId);
+    const dropped = new Set<string>();
+    for (let seed = 1; seed <= 8; seed++) {
+      const sim = makeSim(seed);
+      const boss = killFinalBoss(sim, 'hollow_crypt', 'morthen');
+      const epics = ((boss.loot?.items ?? []) as any[]).filter((s) => table.includes(s.itemId));
+      expect(epics.length, `seed ${seed}`).toBe(1);
+      dropped.add(epics[0].itemId);
+    }
+    expect(dropped.size).toBeGreaterThan(1); // the group actually varies
+  });
+
+  it('normal final bosses and heroic trash never drop the heroic epics', () => {
+    const normal = makeSim(3);
+    const nPid = normal.addPlayer('warrior', 'Norm');
+    enterDungeon(normal.ctx, 'hollow_crypt', nPid);
+    const nBoss = mobInInstance(
+      normal,
+      claimedDungeon(normal, 'hollow_crypt', 'normal'),
+      'morthen',
+    );
+    (normal as any).dealDamage(
+      normal.entities.get(nPid),
+      nBoss,
+      nBoss.hp + 1000,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    const heroicIds = new Set(
+      Object.values(HEROIC_BOSS_LOOT)
+        .flat()
+        .map((e) => e.itemId),
+    );
+    expect(((nBoss.loot?.items ?? []) as any[]).some((s) => heroicIds.has(s.itemId))).toBe(false);
+  });
+
+  it('the heroic Nythraxis raid boss drops from its own heroic table', () => {
+    const table = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak.map((e) => e.itemId);
+    const dropped = new Set<string>();
+    for (let seed = 1; seed <= 8; seed++) {
+      const sim = makeSim(seed);
+      const tank = sim.addPlayer('warrior', 'Tank');
+      sim.players.get(tank)!.questsDone.add('q_nythraxis_bound_guardian');
+      for (let i = 0; i < 4; i++) {
+        const p = sim.addPlayer('mage', `D${i}`);
+        sim.partyInvite(p, tank);
+        sim.partyAccept(p);
+      }
+      sim.convertPartyToRaid(tank);
+      sim.setDungeonDifficulty('heroic', tank);
+      sim.enterDungeon('nythraxis_boss_arena', tank);
+      const inst = claimedDungeon(sim, 'nythraxis_boss_arena', 'heroic');
+      const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
+      (sim as any).dealDamage(
+        sim.entities.get(tank),
+        boss,
+        boss.hp + 1000,
+        false,
+        'physical',
+        null,
+        'hit',
+      );
+      const epics = ((boss.loot?.items ?? []) as any[]).filter((s) => table.includes(s.itemId));
+      expect(epics.length, `seed ${seed}`).toBe(1);
+      dropped.add(epics[0].itemId);
+    }
+    expect(dropped.size).toBeGreaterThan(1);
+  });
+});
+
+describe('dungeons: heroic daily lockouts', () => {
+  function heroicClear(sim: AnySim, pid: number, dungeonId: string, bossId: string): void {
+    sim.setDungeonDifficulty('heroic', pid);
+    enterDungeon(sim.ctx, dungeonId, pid);
+    const inst = claimedDungeon(sim, dungeonId, 'heroic');
+    const boss = mobInInstance(sim, inst, bossId);
+    (sim as any).dealDamage(
+      sim.entities.get(pid),
+      boss,
+      boss.hp + 1000,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    // Leave and wait out the empty-instance reset so a re-entry must re-claim.
+    leaveDungeon(sim.ctx, pid);
+    teleport(sim, sim.entities.get(pid) as AnyEntity, 0, 0);
+    for (let i = 0; i < 20 * 301 && inst.partyKey !== null; i++) sim.tick();
+  }
+
+  it('a heroic clear locks the heroic claim for the day but not the normal run', () => {
+    const sim = makeSim(5);
+    const pid = sim.addPlayer('warrior', 'Raider');
+    heroicClear(sim, pid, 'hollow_crypt', 'morthen');
+
+    // Heroic re-entry is refused with the heroic-locked message.
+    sim.setDungeonDifficulty('heroic', pid);
+    sim.drainEvents();
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    expect(claimedDungeon(sim, 'hollow_crypt', 'heroic')).toBeUndefined();
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (e) => e.type === 'error' && e.text === 'You are locked to Heroic The Hollow Crypt.',
+      ),
+    ).toBe(true);
+
+    // The same day, the NORMAL run is still available (independent lockout key).
+    sim.setDungeonDifficulty('normal', pid);
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    expect(claimedDungeon(sim, 'hollow_crypt', 'normal')).toBeTruthy();
+  });
+
+  it('the heroic lockout key is difficulty-scoped and clears at the reset boundary', () => {
+    let now = 1_000_000;
+    const sim = new Sim({
+      seed: 5,
+      playerClass: 'warrior',
+      noPlayer: true,
+      lockoutNowMs: () => now,
+      raidResetMs: () => now + 24 * 3600 * 1000,
+    }) as AnySim;
+    const pid = sim.addPlayer('warrior', 'Raider');
+    heroicClear(sim, pid, 'hollow_crypt', 'morthen');
+
+    const meta = sim.players.get(pid)!;
+    expect(meta.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
+    expect(meta.raidLockouts.has('hollow_crypt')).toBe(false); // never the normal key
+
+    // Past the reset boundary, the heroic claim is available again.
+    now += 24 * 3600 * 1000 + 1;
+    sim.setDungeonDifficulty('heroic', pid);
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    expect(claimedDungeon(sim, 'hollow_crypt', 'heroic')).toBeTruthy();
   });
 });
 

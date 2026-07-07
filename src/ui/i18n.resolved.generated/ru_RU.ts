@@ -360,7 +360,9 @@ export const ru_RU: EnTranslations = {
       "hoursMinutes": "{h}ч {m}м",
       "minutes": "{m}м",
       "lessThanMinute": "<1м",
-      "lockedToast": "Вы привязаны к {raid}. Разблокировка через {time}."
+      "lockedToast": "Вы привязаны к {raid}. Разблокировка через {time}.",
+      "heroicName": "Героический режим: {name}",
+      "heroicLocked": "Вы закреплены за героическим подземельем: {name}."
     },
     "compass": {
       "N": "С",
@@ -6344,6 +6346,54 @@ export const ru_RU: EnTranslations = {
       },
       "heroic_mark": {
         "name": "Героический знак"
+      },
+      "morthens_cryptforged_hauberk": {
+        "name": "Кольчуга Мортена из гробничной стали"
+      },
+      "shadowpulse_handwraps": {
+        "name": "Обмотки теневого пульса"
+      },
+      "bonechill_striders": {
+        "name": "Сапоги костяного холода"
+      },
+      "mistcallers_fang": {
+        "name": "Клык призывателя туманов"
+      },
+      "tidebound_spaulders": {
+        "name": "Наплечники скованных приливов"
+      },
+      "sash_of_the_sunken_court": {
+        "name": "Кушак затонувшего двора"
+      },
+      "lunar_tide_greatstaff": {
+        "name": "Великий посох лунного прилива"
+      },
+      "tidewoven_trousers": {
+        "name": "Штаны приливного плетения"
+      },
+      "choirmothers_casque": {
+        "name": "Шлем матери хора"
+      },
+      "gravewyrm_cleaver": {
+        "name": "Тесак могильного змея"
+      },
+      "shroud_of_the_gravewyrm": {
+        "name": "Саван могильного змея"
+      },
+      "sanctum_prowlers_grips": {
+        "name": "Перчатки святилищного охотника"
+      },
+      "scepter_of_the_deathless_court": {
+        "name": "Скипетр бессмертного двора"
+      },
+      "deathless_warguard_legmail": {
+        "name": "Ножные латы бессмертного стража"
+      },
+      "soulrend_diadem": {
+        "name": "Диадема разрыва души"
+      },
+      "scourgehide_carapace": {
+        "name": "Панцирь бичевой шкуры"
       },
       "seal_of_the_nine_oaths": {
         "name": "Печать девяти клятв"

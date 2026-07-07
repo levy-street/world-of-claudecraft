@@ -2409,6 +2409,44 @@ describe('Nythraxis raid encounter', () => {
     expect(tank.pos.x).toBeGreaterThan(3000); // lockout lifted, re-entry allowed
   });
 
+  it('a heroic kill locks the :heroic key only; the normal raid stays open that day', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const reset = nextRaidResetMs(now);
+    const sim = makeWorld(
+      () => now,
+      (nowMs) => nextRaidResetMs(nowMs),
+    );
+    const tankPid = sim.addPlayer('warrior', 'Tank');
+    attune(sim, tankPid);
+    formRaid(sim, tankPid);
+    sim.setDungeonDifficulty('heroic', tankPid);
+    sim.enterDungeon('nythraxis_boss_arena', tankPid);
+    const tank = sim.entities.get(tankPid)!;
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    engage(boss, tank);
+    killMob(sim, boss, tank);
+
+    const meta = sim.players.get(tankPid)!;
+    // The kill locked the difficulty-scoped key, never the plain raid key: the
+    // two difficulties never consume each other's daily lockout.
+    expect(meta.raidLockouts.get('nythraxis_boss_arena:heroic')).toBe(reset);
+    expect(meta.raidLockouts.has('nythraxis_boss_arena')).toBe(false);
+
+    // Leave and wait out the empty-instance reset so the heroic claim frees
+    // (the live-claim-wins rule otherwise rejoins the locked heroic instance).
+    sim.leaveDungeon(tankPid);
+    for (let i = 0; i < 20 * 301; i++) sim.tick();
+
+    // Heroic re-entry is still barred by the daily lockout...
+    sim.setDungeonDifficulty('heroic', tankPid);
+    sim.enterDungeon('nythraxis_boss_arena', tankPid);
+    expect(tank.pos.x).toBeLessThan(3000);
+    // ...but the NORMAL raid is open the same day (independent lockout key).
+    sim.setDungeonDifficulty('normal', tankPid);
+    sim.enterDungeon('nythraxis_boss_arena', tankPid);
+    expect(tank.pos.x).toBeGreaterThan(3000);
+  });
+
   it('falls back to a flat 24h lockout when the host injects no reset boundary (offline/headless)', () => {
     // The offline browser and the headless RL env omit raidResetMs, so a kill locks for
     // a plain 24h day rather than a realm-local 3 AM reset (the server's behavior).

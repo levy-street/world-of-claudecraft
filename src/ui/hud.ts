@@ -5822,9 +5822,14 @@ export class Hud {
       // name) or null for an ordinary dungeon/raid id.
       raidName: (id) => {
         const bossId = worldBossIdFromLockout(id);
-        return bossId !== null
-          ? tEntity({ kind: 'mob', id: bossId, field: 'name' })
-          : dungeonDisplayName(id);
+        if (bossId !== null) return tEntity({ kind: 'mob', id: bossId, field: 'name' });
+        // Heroic daily lockouts ride difficulty-scoped ids (<dungeon>:heroic).
+        if (id.endsWith(':heroic')) {
+          return t('hudChrome.raidLockout.heroicName', {
+            name: dungeonDisplayName(id.slice(0, -':heroic'.length)),
+          });
+        }
+        return dungeonDisplayName(id);
       },
       duration: (ms) => this.formatLockoutDuration(ms),
     };
@@ -8222,6 +8227,23 @@ export class Hud {
           time: this.formatLockoutDuration(lock.msRemaining),
         });
       }
+    }
+    // Heroic daily lockout (any heroic instance): resolve the dungeon name and
+    // enrich with the live countdown when the mirrored lockout is present.
+    const heroicLock = /^You are locked to Heroic (.+)\.$/.exec(text);
+    if (heroicLock) {
+      const base = DUNGEON_LIST.find((d) => d.name === heroicLock[1]);
+      const name = base ? dungeonDisplayName(base.id) : heroicLock[1];
+      const lock = base
+        ? this.sim.raidLockouts().find((l) => l.id === `${base.id}:heroic`)
+        : undefined;
+      if (lock) {
+        return t('hudChrome.raidLockout.lockedToast', {
+          raid: t('hudChrome.raidLockout.heroicName', { name }),
+          time: this.formatLockoutDuration(lock.msRemaining),
+        });
+      }
+      return t('hudChrome.raidLockout.heroicLocked', { name });
     }
     const exact: Record<string, TranslationKey> = {
       'You are stunned!': 'hud.errors.stunned',

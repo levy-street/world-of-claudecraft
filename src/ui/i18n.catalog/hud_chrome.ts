@@ -310,6 +310,11 @@ export const hudChromeStrings = {
     // Entry-denied toast, enriched client-side with the live unlock countdown
     // ({raid} = the localized raid name, {time} = the formatted countdown).
     lockedToast: 'You are locked to {raid}. Unlocks in {time}.',
+    // Display name for a heroic-difficulty lockout row ({name} = dungeon name).
+    heroicName: 'Heroic {name}',
+    // Entry-denied toast for a heroic daily lockout when no live countdown is
+    // mirrored yet ({name} = dungeon name).
+    heroicLocked: 'You are locked to Heroic {name}.',
   },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in

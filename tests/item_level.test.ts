@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { ITEMS } from '../src/sim/data';
 import {
   expectedStatBudget,
@@ -217,6 +218,23 @@ describe('item level: raid tier', () => {
     if (raidBudget === undefined || dungeonBudget === undefined)
       throw new Error('raid and dungeon helmets should have stat budgets');
     expect(raidBudget).toBeGreaterThan(dungeonBudget);
+  });
+});
+
+describe('item level: heroic boss drops read item level 31 and are budget-exact', () => {
+  it('every heroic drop is an epic at item level 31 with its exact stat budget', () => {
+    const ids = Object.values(HEROIC_BOSS_LOOT)
+      .flat()
+      .flatMap((e) => (e.itemId ? [e.itemId] : []));
+    expect(ids.length).toBeGreaterThanOrEqual(16); // the authored heroic set
+    for (const id of ids) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(item.quality, id).toBe('epic');
+      expect(itemSourceLevel(id), `${id} source`).toBe(25);
+      expect(itemLevel(item), `${id} ilvl`).toBe(31);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+    }
   });
 });
 

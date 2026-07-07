@@ -23,6 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
@@ -182,6 +183,37 @@ export function rollLoot(
     if (entry.copper)
       copper += ctx.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
     if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
+  }
+  // Heroic-only drops: when the mob's claimed instance is heroic and it has a
+  // heroic drop table (the final bosses), roll those entries into the SAME
+  // corpse item list so party need/greed applies unchanged. These rng draws
+  // happen ONLY for a heroic claim, so the normal loot trace and the parity
+  // goldens are byte-identical. rollGroup names never overlap the base
+  // table's, so sharing `rolledGroups` is safe.
+  const heroicEntries = HEROIC_BOSS_LOOT[mob.templateId];
+  if (heroicEntries) {
+    const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+    if (inst?.difficulty === 'heroic') {
+      for (const entry of heroicEntries) {
+        if (entry.rollGroup) {
+          if (rolledGroups.has(entry.rollGroup)) continue;
+          rolledGroups.add(entry.rollGroup);
+          const group = heroicEntries.filter((l) => l.rollGroup === entry.rollGroup);
+          const roll = ctx.rng.next();
+          let cumulative = 0;
+          for (const g of group) {
+            cumulative += g.chance;
+            if (roll < cumulative) {
+              if (g.itemId) items.push({ itemId: g.itemId, count: 1 });
+              break;
+            }
+          }
+          continue;
+        }
+        if (!ctx.rng.chance(entry.chance)) continue;
+        if (entry.itemId) items.push({ itemId: entry.itemId, count: 1 });
+      }
+    }
   }
   if (copper > 0 || items.length > 0) {
     mob.loot = { copper, items };
