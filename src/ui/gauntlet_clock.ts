@@ -9,8 +9,12 @@
 // bar/timer animate on both hosts.
 //
 // It re-anchors when the phase / trial / deadline changes, so latency at a phase
-// flip costs at most a small one-time skew, never accumulating drift. If IWorld ever
-// exposes a real sim clock, pass that straight into the model and drop this.
+// flip costs at most a small one-time skew, never accumulating drift. A viewer
+// whose view FIRST appears mid-phase (a late lobby joiner, a mid-run reconnect)
+// would otherwise count down from the full window: the sim's `gauntletPhase`
+// events carry a point-in-time `remainingS` sample, fed in via calibrate(), which
+// snaps the anchor onto the true remaining time. If IWorld ever exposes a real
+// sim clock, pass that straight into the model and drop this.
 
 import type { GauntletRunView } from '../sim/types';
 import { gauntletPhaseWindowSeconds } from './gauntlet_hud_view';
@@ -19,6 +23,14 @@ export class GauntletClock {
   private key = '';
   private anchorWallMs = 0;
   private windowS = 0;
+  private calRemainingS: number | null = null;
+  private calWallMs = 0;
+
+  /** Feed a sim-emitted remaining-seconds sample (the gauntletPhase event). */
+  calibrate(remainingS: number, wallNowMs: number): void {
+    this.calRemainingS = remainingS;
+    this.calWallMs = wallNowMs;
+  }
 
   /** Estimated absolute sim time; (run.endsAt - result) is the seconds remaining. */
   estimate(run: GauntletRunView, wallNowMs: number): number {
@@ -27,6 +39,14 @@ export class GauntletClock {
       this.key = key;
       this.anchorWallMs = wallNowMs;
       this.windowS = gauntletPhaseWindowSeconds(run);
+    }
+    if (this.calRemainingS !== null) {
+      // Re-place the anchor so (window - elapsed) equals the sampled remaining
+      // as of the sample's wall time. Clamped into the window so a stale or
+      // out-of-range sample can never push the countdown negative or past full.
+      const rem = Math.min(this.windowS, Math.max(0, this.calRemainingS));
+      this.anchorWallMs = this.calWallMs - (this.windowS - rem) * 1000;
+      this.calRemainingS = null;
     }
     const elapsed = (wallNowMs - this.anchorWallMs) / 1000;
     const remaining = Math.max(0, this.windowS - elapsed);

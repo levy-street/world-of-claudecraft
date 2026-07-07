@@ -190,22 +190,26 @@ export function gauntletOnPlayerRemoved(ctx: SimContext, pid: number): void {
 }
 
 function emitLobbyState(ctx: SimContext, run: GauntletRun): void {
+  const remainingS = Math.max(0, run.phaseEndsAt - ctx.time);
   emitToRunPlayers(ctx, run, (pid) => ({
     type: 'gauntletPhase',
     phase: 'lobby',
     trialIndex: 0,
     survivors: run.contestants.length,
+    remainingS,
     pid,
   }));
 }
 
 function emitPhase(ctx: SimContext, run: GauntletRun): void {
   const survivors = aliveContestants(run).length;
+  const remainingS = Math.max(0, run.phaseEndsAt - ctx.time);
   emitToRunPlayers(ctx, run, (pid) => ({
     type: 'gauntletPhase',
     phase: run.phase,
     trialIndex: run.trialIndex,
     survivors,
+    remainingS,
     pid,
   }));
 }

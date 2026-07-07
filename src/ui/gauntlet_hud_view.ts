@@ -96,11 +96,10 @@ export function gauntletPhaseWindowSeconds(run: GauntletRunView): number {
       return GAUNTLET.interludeS;
     case 'podium':
       return GAUNTLET.podiumS;
-    case 'trial': {
-      const kind = GAUNTLET.trials[run.trialIndex];
-      // Only 'sentinel' ships today; later trials append their own tuning blocks.
-      return kind === 'sentinel' ? GAUNTLET.sentinel.durationS : GAUNTLET.sentinel.durationS;
-    }
+    case 'trial':
+      // Only 'sentinel' ships today; later trials switch on
+      // GAUNTLET.trials[run.trialIndex] and read their own tuning blocks.
+      return GAUNTLET.sentinel.durationS;
     default:
       return 0;
   }

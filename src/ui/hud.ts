@@ -10323,6 +10323,54 @@ export class Hud {
           }
           break;
         }
+        case 'gauntletLight': {
+          if (ev.light === 'green') {
+            this.showBanner(t('hudChrome.gauntlet.greenLight'));
+            audio.gauntletChant(Math.max(0, ev.until - this.gauntletTimeNow()));
+          } else {
+            this.showBanner(t('hudChrome.gauntlet.redLight'));
+            audio.gauntletRedStinger();
+          }
+          break;
+        }
+        case 'gauntletDamage': {
+          this.combatLog(
+            t('hudChrome.gauntlet.vitalityLost', {
+              amount: formatNumber(ev.amount, { maximumFractionDigits: 0 }),
+            }),
+            '#ff7a6a',
+          );
+          this.renderer.addShake(0.14);
+          break;
+        }
+        case 'gauntletPoof': {
+          audio.gauntletPoof();
+          this.fiestaWordPop(
+            t('hudChrome.gauntlet.contestantOut', { name: ev.name }),
+            '#c98bff',
+            1,
+          );
+          break;
+        }
+        case 'gauntletEliminated': {
+          this.gauntletOverlay.showEliminated(this.sim.gauntletRun?.survivors ?? 0);
+          this.fiestaWordPop(t('hudChrome.gauntlet.eliminated'), '#ff5a4a', 3);
+          break;
+        }
+        case 'gauntletPodium': {
+          this.gauntletOverlay.showPodium(
+            { first: ev.first, second: ev.second, third: ev.third },
+            ev.won,
+          );
+          if (ev.won) audio.gauntletFanfare();
+          break;
+        }
+        case 'gauntletPhase': {
+          this.gauntletClock.calibrate(ev.remainingS, performance.now());
+          const line = this.gauntletPhaseBanner(ev.phase);
+          if (line) this.showSubzone(line);
+          break;
+        }
         case 'lockpickOffer':
           this.openLockpickAnte(ev.objectId, ev.bountiful);
           break;

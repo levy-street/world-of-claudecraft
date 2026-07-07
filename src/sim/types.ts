@@ -2697,14 +2697,24 @@ export type SimEvent = { pid?: number } & (
   // client renders its own localized copy off the structured fields, so no
   // sim/server i18n matcher rules are needed.
   // `gauntletPhase`: the run advanced to a new phase (lobby fill, staging, a
-  // trial opening, interlude, podium). `gauntletLight`: the watcher flipped
+  // trial opening, interlude, podium), or the lobby roster changed. `remainingS`
+  // is the seconds left in the phase AT EMIT TIME: a point-in-time sample the
+  // client clock estimator calibrates against (a late lobby joiner would
+  // otherwise count down from the full window; see ui/gauntlet_clock.ts).
+  // `gauntletLight`: the watcher flipped
   // (trial 1); `until` is the absolute sim-time the current light holds.
   // `gauntletDamage`: your own vitality took a hit (`vitality` = your new value).
   // `gauntletPoof`: a contestant was knocked out at (x, z) (drives the knockout
   // VFX/SFX and the survivor counter). `gauntletEliminated`: YOU were knocked
   // out (the client shows the eliminated overlay + spectator chrome).
   // `gauntletPodium`: the run resolved; `won` is whether you took first.
-  | { type: 'gauntletPhase'; phase: GauntletPhase; trialIndex: number; survivors: number }
+  | {
+      type: 'gauntletPhase';
+      phase: GauntletPhase;
+      trialIndex: number;
+      survivors: number;
+      remainingS: number;
+    }
   | { type: 'gauntletLight'; light: 'green' | 'red'; until: number }
   | {
       type: 'gauntletDamage';

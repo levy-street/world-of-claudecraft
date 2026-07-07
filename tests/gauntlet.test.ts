@@ -456,3 +456,29 @@ describe('instant lobby (offline single-player)', () => {
     expect(sim.gauntletRuns[0].phase).toBe('lobby');
   });
 });
+
+describe('lobby countdown calibration sample', () => {
+  it('gauntletPhase events carry the true seconds remaining in the phase', () => {
+    const sim = makeSim();
+    const a = sim.addPlayer('warrior', 'First');
+    const b = sim.addPlayer('warrior', 'Late');
+    openAndJoin(sim, a);
+    let evs = sim.tick();
+    const atOpen = pick(evs, 'gauntletPhase');
+    expect(atOpen.length).toBeGreaterThan(0);
+    for (const ev of atOpen) expect(ev.remainingS).toBeCloseTo(GAUNTLET.lobbyFillS, 1);
+    // Ten seconds later a second player joins: their sample reflects the
+    // already-elapsed fill window, not the full one.
+    for (let i = 0; i < 20 * 10; i++) sim.tick();
+    const r = recruiter(sim)!;
+    teleport(sim, b, r.pos.x, r.pos.z);
+    sim.gauntletJoin(b);
+    evs = sim.tick();
+    const lateSamples = pick(evs, 'gauntletPhase');
+    expect(lateSamples.length).toBeGreaterThan(0);
+    for (const ev of lateSamples) {
+      expect(ev.remainingS).toBeLessThan(GAUNTLET.lobbyFillS - 9);
+      expect(ev.remainingS).toBeGreaterThan(GAUNTLET.lobbyFillS - 12);
+    }
+  });
+});

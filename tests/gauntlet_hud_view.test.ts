@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { GAUNTLET } from '../src/sim/content/gauntlet';
 import type { GauntletPhase, GauntletRunView } from '../src/sim/types';
+import { GauntletClock } from '../src/ui/gauntlet_clock';
 import { type GauntletHudInput, gauntletHudModel } from '../src/ui/gauntlet_hud_view';
 
 // A fully-populated run view; individual tests override the fields they exercise.
@@ -104,5 +105,52 @@ describe('gauntletHudModel', () => {
     expect(
       gauntletHudModel({ run: run({ phase: 'done', sentinel: null }), time: 0 }).showCountdown,
     ).toBe(false);
+  });
+});
+
+describe('GauntletClock calibration', () => {
+  const lobby = (over: Partial<GauntletRunView> = {}) =>
+    run({ phase: 'lobby', endsAt: 60, sentinel: null, ...over });
+
+  it('counts down from the full window when anchored at a phase start', () => {
+    const clock = new GauntletClock();
+    const t0 = clock.estimate(lobby(), 10_000);
+    expect(lobby().endsAt - t0).toBeCloseTo(GAUNTLET.lobbyFillS, 6);
+    const t5 = clock.estimate(lobby(), 15_000);
+    expect(lobby().endsAt - t5).toBeCloseTo(GAUNTLET.lobbyFillS - 5, 6);
+  });
+
+  it('snaps onto the true remaining time when a sim sample calibrates it', () => {
+    // A late joiner anchors mid-phase (would read the full window)...
+    const clock = new GauntletClock();
+    clock.estimate(lobby(), 10_000);
+    // ...then the join's gauntletPhase event says only 20s actually remain.
+    clock.calibrate(20, 10_000);
+    const t = clock.estimate(lobby(), 10_000);
+    expect(lobby().endsAt - t).toBeCloseTo(20, 6);
+    // and it keeps ticking down from the calibrated point, not the full window.
+    const t4 = clock.estimate(lobby(), 14_000);
+    expect(lobby().endsAt - t4).toBeCloseTo(16, 6);
+  });
+
+  it('clamps an out-of-range sample into the phase window', () => {
+    const clock = new GauntletClock();
+    clock.estimate(lobby(), 10_000);
+    clock.calibrate(9999, 10_000);
+    const t = clock.estimate(lobby(), 10_000);
+    expect(lobby().endsAt - t).toBeCloseTo(GAUNTLET.lobbyFillS, 6);
+    clock.calibrate(-5, 10_000);
+    const t2 = clock.estimate(lobby(), 10_000);
+    expect(lobby().endsAt - t2).toBeCloseTo(0, 6);
+  });
+
+  it('a phase flip re-anchors and discards nothing it should keep', () => {
+    const clock = new GauntletClock();
+    clock.calibrate(20, 10_000);
+    clock.estimate(lobby(), 10_000);
+    // Flip to staging: new key, fresh anchor at the full staging window.
+    const staging = run({ phase: 'staging', endsAt: 200, sentinel: null });
+    const t = clock.estimate(staging, 30_000);
+    expect(staging.endsAt - t).toBeCloseTo(GAUNTLET.stagingS, 6);
   });
 });
