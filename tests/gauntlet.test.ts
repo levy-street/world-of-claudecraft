@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE } from '../src/sim/content/gauntlet';
 import { isGauntletPos } from '../src/sim/data';
 import { nextGreenWindowS } from '../src/sim/gauntlet/trial_sentinel';
@@ -649,5 +649,127 @@ describe('cross-activity exclusion and reconnect recovery', () => {
     expect(isGauntletPos(e.pos.x)).toBe(false);
     // Specifically NOT the generic instance fallback (the first dungeon door).
     expect(e.pos.x).toBeLessThan(4000);
+  });
+});
+
+describe('desk-trial station lock', () => {
+  // Splice the trial list per test (the per-trial suite pattern) and restore
+  // even on failure, so the shipped list is never left modified.
+  const savedTrials = [...GAUNTLET.trials];
+  const savedTargets = [...GAUNTLET.targetSurvivorsPerTrial];
+  afterEach(() => {
+    GAUNTLET.trials.splice(0, GAUNTLET.trials.length, ...savedTrials);
+    GAUNTLET.targetSurvivorsPerTrial.splice(
+      0,
+      GAUNTLET.targetSurvivorsPerTrial.length,
+      ...savedTargets,
+    );
+  });
+  function spliceTrial(kind: (typeof GAUNTLET.trials)[number]) {
+    GAUNTLET.trials.splice(0, GAUNTLET.trials.length, kind);
+    GAUNTLET.targetSurvivorsPerTrial.splice(0, GAUNTLET.targetSurvivorsPerTrial.length, 12);
+  }
+  // Hold a movement key for a second of ticks and report the total drift.
+  function driftUnderForward(sim: Sim, pid: number, back = false): number {
+    const e = sim.entities.get(pid)!;
+    const from = { x: e.pos.x, z: e.pos.z };
+    for (let i = 0; i < 20; i++) {
+      const mi = sim.meta(pid)!.moveInput;
+      if (back) mi.back = true;
+      else mi.forward = true;
+      sim.tick();
+      mi.forward = false;
+      mi.back = false;
+    }
+    return Math.hypot(e.pos.x - from.x, e.pos.z - from.z);
+  }
+
+  it('sigils seats the player at the lectern, facing the slab, and holds them there', () => {
+    spliceTrial('sigils');
+    const sim = makeSim(21);
+    const pid = sim.addPlayer('warrior', 'Etcher');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    const V = GAUNTLET_VENUE.sigils;
+    expect(e.pos.x).toBeCloseTo(run.origin.x + V.x + 1.8, 4);
+    expect(e.pos.z).toBeCloseTo(run.origin.z + V.z, 4);
+    expect(e.facing).toBeCloseTo(-Math.PI / 2, 4);
+    expect(driftUnderForward(sim, pid)).toBeLessThan(0.05);
+    expect(run.phase).toBe('trial'); // still mid-trial: the hold did the work
+  });
+
+  it('pull seats the players on the trench rim, facing the rope, and holds them', () => {
+    spliceTrial('pull');
+    const sim = makeSim(22);
+    const pid = sim.addPlayer('warrior', 'Puller');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    const V = GAUNTLET_VENUE.pull;
+    expect(e.pos.x).toBeCloseTo(run.origin.x + V.x, 4); // a lone player centers
+    expect(e.pos.z).toBeCloseTo(run.origin.z + V.z + V.width / 2 + 4, 4);
+    expect(e.facing).toBeCloseTo(Math.PI, 4);
+    expect(driftUnderForward(sim, pid)).toBeLessThan(0.05);
+  });
+
+  it('wager holds the player at their mat', () => {
+    spliceTrial('wager');
+    const sim = makeSim(23);
+    const pid = sim.addPlayer('warrior', 'Better');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    const V = GAUNTLET_VENUE.wager;
+    expect(e.pos.x).toBeCloseTo(run.origin.x + V.x - 3.2, 4); // the west mat
+    expect(e.pos.z).toBeCloseTo(run.origin.z + V.z, 4); // a lone pair centers
+    expect(driftUnderForward(sim, pid)).toBeLessThan(0.05);
+  });
+
+  it('movement trials stay free: the span never pins', () => {
+    spliceTrial('span');
+    const sim = makeSim(24);
+    const pid = sim.addPlayer('warrior', 'Walker');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    // Walk AWAY from the panels (no fall in play): real displacement expected.
+    expect(driftUnderForward(sim, pid, true)).toBeGreaterThan(1);
+  });
+
+  it('a knocked-out player spectates unpinned', () => {
+    spliceTrial('sigils');
+    const sim = makeSim(25);
+    const pid = sim.addPlayer('warrior', 'Doomed');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const c = run.contestants.find((k) => k.entityId === pid)!;
+    c.vitality = GAUNTLET.sigils.shatterDamage; // the next shatter eliminates
+    for (let i = 0; i < 20 * 20 && c.eliminatedAtTrial === null; i++) {
+      sim.gauntletTrace([0.5, 0.5, 0.5, 0.5], pid); // far off the etched line
+      sim.tick();
+    }
+    const ps = run.playerStates.get(pid)!;
+    expect(ps.spectating).toBe(true);
+    expect(ps.heldAt).toBeNull();
+    // Parked on the terrace and free to walk it.
+    expect(driftUnderForward(sim, pid)).toBeGreaterThan(1);
+  });
+
+  it('the pin releases when the trial resolves', () => {
+    spliceTrial('sigils');
+    const sim = makeSim(26);
+    const pid = sim.addPlayer('warrior', 'Freed');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    if (run.trial?.kind !== 'sigils') throw new Error('expected sigils live');
+    run.trial.players.get(pid)!.done = true; // finish instantly
+    sim.tick(); // the trial resolves; a single-trial run goes to the podium
+    expect(run.phase).toBe('podium');
+    expect(driftUnderForward(sim, pid)).toBeGreaterThan(1);
   });
 });

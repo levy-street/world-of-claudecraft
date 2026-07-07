@@ -317,6 +317,13 @@ function holdStagedPlayers(ctx: SimContext, run: GauntletRun): void {
   }
 }
 
+// The desk trials play at an apparatus, not on your feet: their input is the
+// slab stroke, the beat click, or the table click, so the player is seated at
+// the station and held there (movement trials stay free).
+function isDeskTrial(kind: string | undefined): boolean {
+  return kind === 'sigils' || kind === 'pull' || kind === 'wager';
+}
+
 function startTrial(ctx: SimContext, run: GauntletRun): void {
   const kind = GAUNTLET.trials[run.trialIndex];
   for (const ps of run.playerStates.values()) {
@@ -353,6 +360,20 @@ function startTrial(ctx: SimContext, run: GauntletRun): void {
       run.phaseEndsAt = ctx.time + GAUNTLET.court.durationS;
       run.trial = startCourt(ctx, run);
       break;
+  }
+  // Desk trials seat and hold you at your station: pin every live player
+  // exactly where the trial module just seated them. The trial arm of the
+  // driver re-pins each tick; the pin releases at the next startTrial (top of
+  // this function) and on knockout (eliminateContestant clears heldAt before
+  // parking the spectator).
+  if (isDeskTrial(kind)) {
+    for (const [pid, ps] of run.playerStates) {
+      if (ps.spectating) continue;
+      const e = ctx.entities.get(pid);
+      if (!e) continue;
+      ps.heldAt = { ...e.pos };
+      ps.heldUntil = run.phaseEndsAt;
+    }
   }
   emitPhase(ctx, run);
 }
@@ -543,6 +564,10 @@ export function updateGauntletRuns(ctx: SimContext): void {
         if (ctx.time >= run.phaseEndsAt) startTrial(ctx, run);
         break;
       case 'trial': {
+        // The desk-trial station pin: same snap-back as staging, gated to the
+        // seated kinds (sentinel/span/court are movement trials and stay
+        // free; the sentinel manages its own catch-stun holds).
+        if (isDeskTrial(run.trial?.kind)) holdStagedPlayers(ctx, run);
         const done = updateTrial(ctx, run);
         if (done) {
           run.trial = null;

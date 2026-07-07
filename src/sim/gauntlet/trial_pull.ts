@@ -11,7 +11,7 @@
 
 import { GAUNTLET, GAUNTLET_VENUE } from '../content/gauntlet';
 import type { SimContext } from '../sim_context';
-import { placeContestantsAt } from './contestants';
+import { placeContestantsAt, seatLivePlayersAt } from './contestants';
 import type { GauntletPullState, GauntletRun } from './state';
 import { aliveContestants, applyVitalityDamage, cullNpcsToward } from './vitality';
 
@@ -20,8 +20,19 @@ function pullDir(team: 0 | 1): 1 | -1 {
   return team === 0 ? 1 : -1;
 }
 
+// Where the i-th of n live players stands for the pull: the south rim of the
+// trench, spread along the rope, facing -z toward it and the beat drum
+// (runs.ts pins them there for the trial).
+function trenchRimSpot(i: number, n: number): { x: number; z: number; facing: number } {
+  const { x, z, width } = GAUNTLET_VENUE.pull;
+  return { x: x + (i - (n - 1) / 2) * 3, z: z + width / 2 + 4, facing: Math.PI };
+}
+
 export function startPull(ctx: SimContext, run: GauntletRun): GauntletPullState {
+  // The NPC crowd fans along the banks below; the players watch the whole
+  // rope from the south rim.
   placeContestantsAt(ctx, run, GAUNTLET_VENUE.pull.x, GAUNTLET_VENUE.pull.z + 12, 10);
+  seatLivePlayersAt(ctx, run, trenchRimSpot);
 
   // Team split: 2+ live players alternate 0, 1, 0, 1... in join (insertion)
   // order; a lone player is team 0 against an all-NPC team 1.

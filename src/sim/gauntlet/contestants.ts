@@ -100,6 +100,34 @@ export function placeContestantsAt(
   }
 }
 
+// Seat every live, non-spectating player at a per-index station spot (the
+// desk-trial seating: the trial module authors the spots, runs.ts pins the
+// players there for the trial). NPC crowd placement stays with
+// placeContestantsAt; iteration is playerStates insertion order, and no rng
+// is drawn. spot(i, n) returns instance-local x/z plus the facing to hold.
+export function seatLivePlayersAt(
+  ctx: SimContext,
+  run: GauntletRun,
+  spot: (i: number, n: number) => { x: number; z: number; facing: number },
+): void {
+  const live: number[] = [];
+  for (const [pid, ps] of run.playerStates) {
+    if (ps.spectating) continue;
+    const c = run.contestants.find((k) => k.entityId === pid);
+    if (!c || c.eliminatedAtTrial !== null) continue;
+    live.push(pid);
+  }
+  for (let i = 0; i < live.length; i++) {
+    const e = ctx.entities.get(live[i]);
+    if (!e) continue;
+    const s = spot(i, live.length);
+    e.pos = { x: run.origin.x + s.x, y: 0, z: run.origin.z + s.z };
+    e.prevPos = { ...e.pos };
+    e.facing = s.facing;
+    ctx.rebucket(e);
+  }
+}
+
 // A deterministic line-up spot on the staging area for the i-th of n
 // contestants: rows of even lateral spread south of the start line.
 export function stagingSpot(

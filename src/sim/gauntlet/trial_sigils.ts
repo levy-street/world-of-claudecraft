@@ -12,7 +12,7 @@
 
 import { GAUNTLET, GAUNTLET_VENUE } from '../content/gauntlet';
 import type { SimContext } from '../sim_context';
-import { placeContestantsAt } from './contestants';
+import { placeContestantsAt, seatLivePlayersAt } from './contestants';
 import { type SigilOutline, sigilOutline } from './sigil_shapes';
 import type {
   GauntletContestant,
@@ -37,8 +37,24 @@ const FAR_OFF_MULT_AT = 2;
 // tints its outline segments from these bits).
 export const SIGIL_MASK_BITS = 24;
 
+// Where the i-th live player stands for the etching. There is ONE interactive
+// lectern: the first player takes the etcher's mark dead ahead of the slab
+// face (facing -x, the slab tilts toward +x); any extra players (online runs)
+// park in a small arc around it and share the slab view (the v1 answer to the
+// one-lectern design gap).
+function lecternSpot(i: number): { x: number; z: number; facing: number } {
+  const { x, z } = GAUNTLET_VENUE.sigils;
+  const ang = i === 0 ? 0 : (i % 2 === 1 ? 1 : -1) * 0.55 * Math.ceil(i / 2);
+  const px = x + 1.8 * Math.cos(ang);
+  const pz = z + 1.8 * Math.sin(ang);
+  return { x: px, z: pz, facing: Math.atan2(x - px, z - pz) };
+}
+
 export function startSigils(ctx: SimContext, run: GauntletRun): GauntletSigilsState {
+  // The NPC crowd gathers off the dais; the players are then seated AT the
+  // lectern (and runs.ts pins them there for the trial).
   placeContestantsAt(ctx, run, GAUNTLET_VENUE.sigils.x, GAUNTLET_VENUE.sigils.z + 14, 10);
+  seatLivePlayersAt(ctx, run, (i) => lecternSpot(i));
   const players = new Map<number, GauntletSigilsPlayer>();
   for (const [pid, ps] of run.playerStates) {
     if (ps.spectating) continue;
