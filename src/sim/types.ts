@@ -2655,7 +2655,121 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
     }
+  // The Gauntlet survival event. All personal (pid-scoped: each event is emitted
+  // once per run participant) and text-free on purpose (see skinEvent above): the
+  // client renders its own localized copy off the structured fields, so no
+  // sim/server i18n matcher rules are needed.
+  // `gauntletPhase`: the run advanced to a new phase (lobby fill, staging, a
+  // trial opening, interlude, podium). `gauntletLight`: the watcher flipped
+  // (trial 1); `until` is the absolute sim-time the current light holds.
+  // `gauntletDamage`: your own vitality took a hit (`vitality` = your new value).
+  // `gauntletPoof`: a contestant was knocked out at (x, z) (drives the knockout
+  // VFX/SFX and the survivor counter). `gauntletEliminated`: YOU were knocked
+  // out (the client shows the eliminated overlay + spectator chrome).
+  // `gauntletPodium`: the run resolved; `won` is whether you took first.
+  | { type: 'gauntletPhase'; phase: GauntletPhase; trialIndex: number; survivors: number }
+  | { type: 'gauntletLight'; light: 'green' | 'red'; until: number }
+  | {
+      type: 'gauntletDamage';
+      amount: number;
+      cause: GauntletDamageCause;
+      vitality: number;
+    }
+  | { type: 'gauntletPoof'; entityId: number; name: string; x: number; z: number; survivors: number }
+  | { type: 'gauntletEliminated'; trialIndex: number }
+  | { type: 'gauntletPodium'; first: string; second: string; third: string; won: boolean }
 );
+
+// ---------------------------------------------------------------------------
+// The Gauntlet, a time-limited survival event: a lobby of players plus an NPC
+// contestant field runs a fixed sequence of trials inside an instanced slot in
+// the gauntlet band (see data.ts gauntletOrigin). Trials deal vitality damage
+// scaled by performance; zero vitality knocks a contestant out. Run state lives
+// in src/sim/gauntlet/state.ts; EVERY numeric knob lives in the tuning blocks
+// below, authored in content/gauntlet.ts (data-as-code, no magic numbers in
+// module logic).
+// ---------------------------------------------------------------------------
+
+export type GauntletPhase = 'lobby' | 'staging' | 'trial' | 'interlude' | 'podium' | 'done';
+
+// What dealt a vitality hit. 'caught' = a trial hard fail (moved on red light);
+// 'trial' = the end-of-trial performance score; 'timeout' = the trial clock ran
+// out before the contestant resolved.
+export type GauntletDamageCause = 'caught' | 'trial' | 'timeout';
+
+export type GauntletTrialKind = 'sentinel';
+
+// Trial 1, Sentinel's Crossing (red light / green light). Distances are yards in
+// instance-local coordinates (origin at the staging area), times are seconds.
+export interface GauntletSentinelTuning {
+  durationS: number; // trial time limit
+  fieldLength: number; // start line (z=0) to finish line (z=fieldLength)
+  fieldHalfWidth: number; // |x| beyond this is out of bounds (treated as caught-still)
+  greenMinS: number; // green-light window drawn from [greenMinS, greenMaxS]
+  greenMaxS: number;
+  redMinS: number; // red-light window drawn from [redMinS, redMaxS]
+  redMaxS: number;
+  accelPerCycle: number; // green window multiplier per completed cycle (< 1 accelerates)
+  greenFloorS: number; // green window never shrinks below this
+  telegraphS: number; // watcher turn animation lead time before red starts
+  graceS: number; // motion forgiveness after red starts (reaction budget)
+  redMoveEps: number; // per-tick displacement (yards) beyond this while red = caught
+  hardFailDamage: number; // vitality chunk when caught moving
+  stunS: number; // root applied on a catch
+  pushbackYards: number; // set back toward the start line on a catch
+  momentumDecay: number; // residual per-tick velocity multiplier after input release
+  momentumStopEps: number; // residual speed (yards/tick) below this snaps to a stop
+  damageMax: number; // end-of-trial vitality damage at score 0 (scales down to ~0 at 1)
+  finishBonusMax: number; // score bonus for finishing with the full clock remaining
+}
+
+// The viewer-scoped wire projection of a run (the `grun` self-wire key and the
+// IWorldGauntlet.gauntletRun member; the facet re-exports it). Deadlines are
+// ABSOLUTE sim-time (`endsAt`, `until`): the client derives countdowns from
+// world.time, so the serialized view only changes on real state changes and
+// the wire delta-elides it on quiet ticks.
+export interface GauntletRunView {
+  phase: GauntletPhase;
+  trialIndex: number;
+  trialCount: number;
+  endsAt: number; // current phase deadline (absolute sim time)
+  survivors: number;
+  total: number;
+  prizePool: number; // theater in v1 (copper)
+  vitality: number; // the viewer's own vitality
+  vitalityMax: number;
+  spectating: boolean;
+  finished: boolean; // the viewer resolved the current trial (crossed the line)
+  originX: number; // instance origin, so presentation can derive field-local coords
+  originZ: number;
+  sentinel: { light: 'green' | 'red'; until: number; fieldLength: number } | null;
+  podium: { first: string; second: string; third: string } | null;
+}
+
+// The whole event, one record: run pacing, the contestant field, and one tuning
+// block per trial. `trials` is the ordered sequence a run plays; later phases
+// append kinds to GauntletTrialKind and blocks here.
+export interface GauntletDef {
+  fieldSize: number; // total contestants per run, players + NPC backfill
+  vitalityMax: number; // the normalized event vitality pool (same for everyone)
+  lobbyFillS: number; // how long a lobby waits for more players before starting
+  maxRealPlayers: number; // lobby starts early when this many have joined
+  joinRadius: number; // yards from the recruiter within which gauntletJoin works
+  emptyTimeoutS: number; // a run with no player attached disposes after this
+  stagingS: number; // seconds contestants stand on the staging area before trial 1
+  interludeS: number; // between-trials beat (survivor count / next-trial teaser)
+  podiumS: number; // podium ceremony length before the run disposes
+  prizeBase: number; // theater only in v1: the advertised pool baseline (copper)
+  prizePerElimination: number; // theater: pool growth per knockout
+  // NPC attrition targets: after trials[i] resolves, the field is culled toward
+  // targetSurvivorsPerTrial[i] survivors (players are never culled by targets;
+  // they live and die by their own vitality).
+  targetSurvivorsPerTrial: number[];
+  npcSkillMin: number; // seeded per-contestant skill range (0..1)
+  npcSkillMax: number;
+  trials: GauntletTrialKind[];
+  sentinel: GauntletSentinelTuning;
+}
 
 export interface MoveInput {
   forward: boolean;
@@ -2770,6 +2884,12 @@ export interface SimConfig {
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
   raidResetMs?: (nowMs: number) => number;
+  // The Gauntlet event window's initial state. The offline client sets true (the
+  // event is always joinable offline); the server leaves the default false and
+  // feeds sim.gauntletEventOpen each loop pass from its world_state/env window
+  // (the utcDay idiom). Headless/parity worlds keep the default: closed, so the
+  // recruiter never spawns and existing golden traces are untouched.
+  gauntletAlwaysOpen?: boolean;
   // Offline play-test: a custom world to run instead of the built-in one. The Sim
   // ctor reads spawns from here; render/terrain read it via the data.ts registry,
   // so callers that set this MUST also call setActiveWorldContent() with content

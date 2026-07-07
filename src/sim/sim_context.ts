@@ -15,6 +15,7 @@
 import type { TalentModifiers } from './content/talents';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
+import type { GauntletRun } from './gauntlet/state';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { PendingProjectile } from './projectile_travel';
@@ -143,6 +144,17 @@ export interface SimContextPrimitives {
   // P1b's nextId dedupes with I1's declaration above.)
   readonly delveRuns: DelveRun[];
   readonly delvePetStash: Map<number, PetState>;
+  // The Gauntlet event (gauntlet/runs.ts). `gauntletRuns` is a dynamic pool
+  // (a run is pushed when a lobby opens and spliced on dispose; the ARRAY
+  // identity stays Sim-owned, mutated in place, so read-only view).
+  // `gauntletEventOpen` is the host-fed window flag (the utcDay idiom: the
+  // server feeds it each loop pass, offline inits it from cfg, headless leaves
+  // the default closed). The recruiter entity id and the run-id counter are
+  // read-write primitives the module assigns.
+  readonly gauntletRuns: GauntletRun[];
+  readonly gauntletEventOpen: boolean;
+  gauntletRecruiterId: number | null;
+  nextGauntletRunId: number;
   // Host-supplied UTC day string ('' = unknown) gating the delve daily reset.
   readonly utcDay: string;
   // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
@@ -883,6 +895,24 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get delvePetStash() {
       return host.delvePetStash;
+    },
+    get gauntletRuns() {
+      return host.gauntletRuns;
+    },
+    get gauntletEventOpen() {
+      return host.gauntletEventOpen;
+    },
+    get gauntletRecruiterId() {
+      return host.gauntletRecruiterId;
+    },
+    set gauntletRecruiterId(v) {
+      host.gauntletRecruiterId = v;
+    },
+    get nextGauntletRunId() {
+      return host.nextGauntletRunId;
+    },
+    set nextGauntletRunId(v) {
+      host.nextGauntletRunId = v;
     },
     get utcDay() {
       return host.utcDay;

@@ -138,6 +138,8 @@ import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
+import * as gauntletMod from './gauntlet/runs';
+import type { GauntletRun } from './gauntlet/state';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -414,6 +416,7 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
   FISHING_CAST_TIME,
+  type GauntletRunView,
   GCD,
   type HonorArenaDailyState,
   type InvSlot,
@@ -1054,6 +1057,10 @@ export interface PlayerMeta {
   // first persistence await. Session-only: reward and lockout snapshots ignore
   // the departing player so no post-save mutation is discarded on removal.
   leaving?: boolean;
+  // The Gauntlet event stats (persisted in CharacterState). `runs` counts runs
+  // actually started (lobby withdrawals do not count), `wins` podium firsts,
+  // `bestTrial` the most trials ever cleared in one run (trials.length = won).
+  gauntletStats: { runs: number; wins: number; bestTrial: number };
   // World-boss loot lockouts live in `raidLockouts` (keyed worldboss:<mobId>), so the
   // eligibility gate and the rendered raid-lockout countdown are one value. See
   // world_boss.ts (markWorldBossLooted / isWorldBossLootEligible).
@@ -1201,6 +1208,8 @@ export interface CharacterState {
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
   heroicDaily?: { date: string; marked: string[] };
+  // The Gauntlet event stats (JSONB; optional so older saves load as zeroes).
+  gauntletStats?: { runs: number; wins: number; bestTrial: number };
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
@@ -1377,6 +1386,15 @@ export class Sim {
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
+  // The Gauntlet event (gauntlet/runs.ts): the live run pool (a run is pushed
+  // when a lobby opens and spliced on dispose), the recruiter's live entity id,
+  // and the run-id counter. `gauntletEventOpen` is the host-fed window flag:
+  // the server sets it each loop pass from its event window (the utcDay idiom);
+  // offline inits it from cfg.gauntletAlwaysOpen; headless keeps it closed.
+  gauntletRuns: GauntletRun[] = [];
+  gauntletRecruiterId: number | null = null;
+  nextGauntletRunId = 1;
+  gauntletEventOpen: boolean;
   // Real-world UTC day ('YYYY-MM-DD') for the delve daily reset (FR-5.1). The sim
   // core must stay deterministic, so it never reads the wall clock itself: the host
   // (server/offline client) sets this each tick from `new Date()`. Empty string =
@@ -1432,11 +1450,13 @@ export class Sim {
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
+      gauntletAlwaysOpen: cfg.gauntletAlwaysOpen ?? false,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
       perfLap: cfg.perfLap,
     };
+    this.gauntletEventOpen = this.cfg.gauntletAlwaysOpen;
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -1945,6 +1965,7 @@ export class Sim {
       deedStats: freshDeedStats(),
       activeTitle: null,
       renown: 0,
+      gauntletStats: { runs: 0, wins: 0, bestTrial: 0 },
     };
     // A fresh character sets out provisioned (class-defined starter rations);
     // a saved character loads its own bags from savedState below.
@@ -2060,6 +2081,13 @@ export class Sim {
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
       meta.townFocus = { ...(s.townFocus ?? {}) };
       if (s.delveLoreUnlocked) for (const id of s.delveLoreUnlocked) meta.delveLoreUnlocked.add(id);
+      if (s.gauntletStats) {
+        meta.gauntletStats = {
+          runs: s.gauntletStats.runs ?? 0,
+          wins: s.gauntletStats.wins ?? 0,
+          bestTrial: s.gauntletStats.bestTrial ?? 0,
+        };
+      }
       if (s.delveDaily) {
         meta.delveDaily = {
           date: s.delveDaily.date,
@@ -2286,6 +2314,11 @@ export class Sim {
     const meta = this.players.get(pid);
     if (!meta) return;
     meta.leaving = true;
+    // A Gauntlet participant leaving the world detaches from the run while
+    // their entity and roster are still live. This must happen before the
+    // persistence await in the server leave path, so the run cannot progress
+    // against a disconnecting contestant.
+    gauntletMod.gauntletOnPlayerRemoved(this.ctx, pid);
     // Dungeon Finder teardown FIRST, while the leaver's party/roster still resolves
     // (drops their queue unit, fails their proposal, closes their listing, withdraws
     // their application). It runs HERE, not in removePlayer, because the server calls
@@ -2488,6 +2521,7 @@ export class Sim {
         markClears: meta.delveDaily.markClears,
       },
       heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
+      gauntletStats: { ...meta.gauntletStats },
       mailWelcomed: meta.mailWelcomed,
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
@@ -3129,6 +3163,27 @@ export class Sim {
       },
       get delvePetStash() {
         return sim.delvePetStash;
+      },
+      // The Gauntlet event live views (gauntlet/runs.ts): the run pool array
+      // identity stays Sim-owned (mutated in place); the recruiter id and the
+      // run-id counter are read-write primitives the module assigns.
+      get gauntletRuns() {
+        return sim.gauntletRuns;
+      },
+      get gauntletEventOpen() {
+        return sim.gauntletEventOpen;
+      },
+      get gauntletRecruiterId() {
+        return sim.gauntletRecruiterId;
+      },
+      set gauntletRecruiterId(v) {
+        sim.gauntletRecruiterId = v;
+      },
+      get nextGauntletRunId() {
+        return sim.nextGauntletRunId;
+      },
+      set nextGauntletRunId(v) {
+        sim.nextGauntletRunId = v;
       },
       get utcDay() {
         return sim.utcDay;
@@ -3883,6 +3938,8 @@ export class Sim {
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
+    this.updateGauntletRuns();
+    lap?.('gauntlet');
     // The Vale Cup phase draws ZERO shared rng (pure ball physics + timers +
     // tick-staggered bots), so appending it here cannot fork the draw order.
     this.updateValeCup();
@@ -7835,6 +7892,35 @@ export class Sim {
 
   private updateDelveRuns(): void {
     runsMod.updateDelveRuns(this.ctx);
+  }
+
+  // --- The Gauntlet event (gauntlet/runs.ts): thin delegates + the IWorld
+  // --- surface. Run state lives on `this.gauntletRuns`; the module reaches it
+  // --- through the seam.
+  private updateGauntletRuns(): void {
+    gauntletMod.updateGauntletRuns(this.ctx);
+  }
+
+  gauntletJoin(pid?: number): void {
+    gauntletMod.gauntletJoin(this.ctx, pid);
+  }
+
+  gauntletLeave(pid?: number): void {
+    gauntletMod.gauntletLeave(this.ctx, pid);
+  }
+
+  gauntletRunWire(pid: number): GauntletRunView | null {
+    return gauntletMod.gauntletRunWire(this.ctx, pid);
+  }
+
+  // IWorldGauntlet data members (offline Sim side; ClientWorld mirrors the
+  // `grun` self-wire key and the recruiter's presence online).
+  get gauntletRun(): GauntletRunView | null {
+    return this.gauntletRunWire(this.primaryId);
+  }
+
+  get gauntletOpen(): boolean {
+    return this.gauntletEventOpen;
   }
 
   private ejectToDelveDoor(pid: number, delve: DelveDef): void {

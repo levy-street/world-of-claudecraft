@@ -37,6 +37,7 @@ import {
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+import { GAUNTLET_NPCS } from './content/gauntlet';
 import {
   type GraveyardDef,
   OVERWORLD_GRAVEYARDS,
@@ -205,6 +206,9 @@ export const NPCS: Record<string, NpcDef> = {
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
   [SPIRIT_HEALER_NPC_ID]: SPIRIT_HEALER,
+  // The Gauntlet event NPCs (all dynamic: the recruiter spawns only while the
+  // event window is open; the watcher/contestants spawn per run in the band).
+  ...GAUNTLET_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -554,6 +558,31 @@ export function yumiMazeOriginAt(z: number): { x: number; z: number; slot: numbe
   }
   const o = yumiMazeOrigin(best);
   return { x: o.x, z: o.z, slot: best };
+}
+
+// ---------------------------------------------------------------------------
+// The Gauntlet, the survival-event band after the Protect Yumi maze. Like the other
+// far-off bands: x beyond DUNGEON_X_THRESHOLD means flat ground
+// (world.groundHeight), and the band has NO static colliders (an open field;
+// colliders.ts never classifies it as a delve, arena, or maze interior).
+// Slots stack along z. Its bounds leave the Protect Yumi band (8000 to 12000)
+// and the Vale Cup practice pitches (x = 30000) disjoint.
+// ---------------------------------------------------------------------------
+
+export const GAUNTLET_X = 12400; // gauntlet instances share this x; slots stack along z
+export const GAUNTLET_BAND_X_MIN = 12000;
+export const GAUNTLET_BAND_X_MAX = 20000;
+export const GAUNTLET_SLOT_COUNT = 8; // concurrent runs the world can host
+const GAUNTLET_Z0 = -1250;
+// Covers the sentinel field (~90 long) + staging/spectator dressing with wide margin.
+const GAUNTLET_SLOT_SPACING = 400;
+
+export function gauntletOrigin(slot: number): { x: number; z: number } {
+  return { x: GAUNTLET_X, z: GAUNTLET_Z0 + slot * GAUNTLET_SLOT_SPACING };
+}
+
+export function isGauntletPos(x: number): boolean {
+  return x >= GAUNTLET_BAND_X_MIN && x < GAUNTLET_BAND_X_MAX;
 }
 
 export const DELVES: Record<string, DelveDef> = {
