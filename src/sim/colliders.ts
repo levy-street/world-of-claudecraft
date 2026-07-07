@@ -5,11 +5,13 @@ import {
   delveAt,
   delveModuleLocal,
   dungeonAt,
+  gauntletOriginAt,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isGauntletPos,
   isHodricsPos,
   isYumiMazePos,
   yumiMazeOriginAt,
@@ -24,6 +26,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { gauntletVenueColliders } from './gauntlet/venue_physics';
 import { hodricsCollidersAt } from './hodrics_course';
 import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
@@ -464,6 +467,13 @@ export function resolvePosition(
     const hc = hodricsCollidersAt(z);
     const local = resolveAgainst(hc.colliders, x - hc.ox, z - hc.oz, r, ignoreFences);
     return { x: local.x + hc.ox, z: local.z + hc.oz };
+  }
+  if (isGauntletPos(x)) {
+    // The Gauntlet venue's solids (stands, warden, lecterns, walls, props),
+    // derived from the same anchors the renderer builds from.
+    const o = gauntletOriginAt(z);
+    const local = resolveAgainst(gauntletVenueColliders(), x - o.x, z - o.z, r, ignoreFences);
+    return { x: local.x + o.x, z: local.z + o.z };
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);

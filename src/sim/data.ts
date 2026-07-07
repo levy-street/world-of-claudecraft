@@ -591,6 +591,13 @@ export function gauntletOrigin(slot: number): { x: number; z: number } {
   return { x: GAUNTLET_X, z: GAUNTLET_Z0 + slot * GAUNTLET_SLOT_SPACING };
 }
 
+/** The nearest slot origin to a band z (the arenaOriginAt idiom): venue
+ * physics resolves platform heights and colliders instance-locally. */
+export function gauntletOriginAt(z: number): { x: number; z: number } {
+  const slot = Math.round((z - GAUNTLET_Z0) / GAUNTLET_SLOT_SPACING);
+  return gauntletOrigin(Math.max(0, Math.min(GAUNTLET_SLOT_COUNT - 1, slot)));
+}
+
 export function isGauntletPos(x: number): boolean {
   return x >= GAUNTLET_BAND_X_MIN && x < GAUNTLET_BAND_X_MAX;
 }

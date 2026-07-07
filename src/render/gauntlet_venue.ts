@@ -1222,6 +1222,21 @@ function buildTrialArenas(
     placeProp(group, 'bannerWhite', x, 3.4, z - fieldLen / 2 - 3, 0, 2.4);
     placeProp(group, 'torchLit', x - sideX - 2.4, 0, zStart - 1.5, Math.PI / 2, 2.2);
     placeProp(group, 'torchLit', x + sideX + 2.4, 0, zStart - 1.5, -Math.PI / 2, 2.2);
+    // Walk-on ramps at both crossing ends: the sim's ground skirt raises a
+    // mover onto the deck over the same run, so what you climb is what you
+    // see (venue_physics shares these numbers).
+    const rampMat = stoneMat(SAND_EDGE);
+    for (const side of [-1, 1]) {
+      const ramp = new THREE.Mesh(
+        new THREE.BoxGeometry(sideX * 2 + t.panelWidth + 0.8, 0.08, 1.08),
+        rampMat,
+      );
+      ramp.position.set(x, 0.29, z + side * (fieldLen / 2 + 0.45));
+      ramp.rotation.x = side * 0.57;
+      ramp.castShadow = true;
+      ramp.receiveShadow = true;
+      group.add(ramp);
+    }
     return { panels, unknownMat, safeMat, brittleMat };
   })();
 

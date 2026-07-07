@@ -89,11 +89,10 @@ export function placeContestantsAt(
     const row = Math.floor(i / perRow);
     const col = i % perRow;
     const spread = (halfWidth * 2) / Math.max(1, perRow - 1 || 1);
-    e.pos = {
-      x: run.origin.x + anchorX - halfWidth + (perRow === 1 ? 0 : col * spread),
-      y: 0,
-      z: run.origin.z + anchorZ - row * 2,
-    };
+    e.pos = ctx.groundPos(
+      run.origin.x + anchorX - halfWidth + (perRow === 1 ? 0 : col * spread),
+      run.origin.z + anchorZ - row * 2,
+    );
     e.prevPos = { ...e.pos };
     e.facing = 0;
     ctx.rebucket(e);
@@ -121,7 +120,9 @@ export function seatLivePlayersAt(
     const e = ctx.entities.get(live[i]);
     if (!e) continue;
     const s = spot(i, live.length);
-    e.pos = { x: run.origin.x + s.x, y: 0, z: run.origin.z + s.z };
+    // groundPos, not y 0: a station can sit on a walk-on platform (the
+    // etching dais carries real height).
+    e.pos = ctx.groundPos(run.origin.x + s.x, run.origin.z + s.z);
     e.prevPos = { ...e.pos };
     e.facing = s.facing;
     ctx.rebucket(e);

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { isBlocked } from '../src/sim/colliders';
 import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE } from '../src/sim/content/gauntlet';
-import { isGauntletPos } from '../src/sim/data';
+import { gauntletOrigin, isGauntletPos } from '../src/sim/data';
 import { nextGreenWindowS } from '../src/sim/gauntlet/trial_sentinel';
 import {
   aliveContestants,
@@ -780,6 +781,58 @@ describe('desk-trial station lock', () => {
     run.trial.players.get(pid)!.done = true; // finish instantly
     sim.tick(); // the trial resolves; a single-trial run goes to the podium
     expect(run.phase).toBe('podium');
-    expect(driftUnderForward(sim, pid)).toBeGreaterThan(1);
+    // Walk BACKWARD off the etcher's mark: forward runs straight into the
+    // lectern collider, which would stop the walk at the stand.
+    expect(driftUnderForward(sim, pid, true)).toBeGreaterThan(1);
+  });
+});
+
+describe('venue physics: walk ON the platforms, never INSIDE the solids', () => {
+  const SEED = 42;
+  const o = gauntletOrigin(0);
+
+  it('the etching dais and the span deck carry real ground height', () => {
+    const S = GAUNTLET_VENUE.sigils;
+    expect(groundHeight(o.x + S.x, o.z + S.z, SEED)).toBeCloseTo(0.5, 6);
+    // the rim is a walkable bevel, not a sheer step
+    expect(groundHeight(o.x + S.x + S.radius + 0.3, o.z + S.z, SEED)).toBeCloseTo(0.25, 6);
+    expect(groundHeight(o.x + S.x + S.radius + 1, o.z + S.z, SEED)).toBe(0);
+    const V = GAUNTLET_VENUE.span;
+    expect(groundHeight(o.x + V.x, o.z + V.z, SEED)).toBeCloseTo(0.58, 6);
+    // the crossing ends ramp down to the sand over the same run the venue
+    // draws its ramp meshes
+    const halfLen = (GAUNTLET.span.steps * GAUNTLET.span.panelLength) / 2;
+    const onRamp = groundHeight(o.x + V.x, o.z + V.z + halfLen + 0.45, SEED);
+    expect(onRamp).toBeGreaterThan(0.2);
+    expect(onRamp).toBeLessThan(0.58);
+    expect(groundHeight(o.x + V.x, o.z + V.z + halfLen + 2, SEED)).toBe(0);
+  });
+
+  it('venue solids block movement; the open field stays clear', () => {
+    const wz = GAUNTLET.sentinel.fieldLength + GAUNTLET_LAYOUT.watcherMargin + 4;
+    expect(isBlocked(SEED, o.x, o.z + wz, 0.5)).toBe(true); // the Stone Warden
+    const W = GAUNTLET_VENUE.wager;
+    expect(isBlocked(SEED, o.x + W.x, o.z + W.z + W.size / 2, 0.5)).toBe(true); // courtyard wall
+    const P = GAUNTLET_VENUE.pull;
+    expect(isBlocked(SEED, o.x + P.x, o.z + P.z + P.pitHalfZ + 2.8, 0.5)).toBe(true); // the drum
+    const S = GAUNTLET_VENUE.sigils;
+    expect(isBlocked(SEED, o.x + S.x, o.z + S.z, 0.5)).toBe(true); // the lectern itself
+    expect(isBlocked(SEED, o.x, o.z + 30, 0.5)).toBe(false); // mid-field, clear
+    expect(isBlocked(SEED, o.x + S.x + 1.8, o.z + S.z, 0.5)).toBe(false); // the etcher's mark
+  });
+
+  it('a seated etcher stands ON the dais, not inside it', () => {
+    GAUNTLET.trials.splice(0, GAUNTLET.trials.length, 'sigils');
+    GAUNTLET.targetSurvivorsPerTrial.splice(0, GAUNTLET.targetSurvivorsPerTrial.length, 12);
+    try {
+      const sim = makeSim(27);
+      const pid = sim.addPlayer('warrior', 'Grounded');
+      openAndJoin(sim, pid);
+      advanceTo(sim, 'trial');
+      expect(sim.entities.get(pid)!.pos.y).toBeCloseTo(0.5, 6);
+    } finally {
+      GAUNTLET.trials.splice(0, GAUNTLET.trials.length, 'sentinel');
+      GAUNTLET.targetSurvivorsPerTrial.splice(0, GAUNTLET.targetSurvivorsPerTrial.length, 14);
+    }
   });
 });

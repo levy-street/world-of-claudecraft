@@ -1,11 +1,14 @@
 import {
   DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
+  gauntletOriginAt,
   getActiveWorldContent,
+  isGauntletPos,
   isHodricsPos,
   WORLD_MAX_X,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import { gauntletVenueLocalGround } from './gauntlet/venue_physics';
 import { hodricsGroundWorld } from './hodrics_course';
 import { fbm2, hash2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent } from './types';
@@ -467,6 +470,12 @@ function dockSurfaceHeight(x: number, z: number, seed: number): number {
 export function groundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) {
     if (isHodricsPos(x)) return hodricsGroundWorld(x, z);
+    // The gauntlet band floor is flat, but the venue's walk-on platforms (the
+    // etching dais, the span deck) carry real height so you stand ON them.
+    if (isGauntletPos(x)) {
+      const o = gauntletOriginAt(z);
+      return DUNGEON_FLOOR_Y + gauntletVenueLocalGround(x - o.x, z - o.z);
+    }
     return DUNGEON_FLOOR_Y;
   }
   // Raised walkable props live in groundHeight, NOT terrainHeight, so the
