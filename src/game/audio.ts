@@ -251,6 +251,39 @@ export class GameAudio {
     this.play(UI_CUES.fiestaWords[index]);
   }
 
+  gauntletChant(seconds: number): void {
+    const total = Math.min(8, Math.max(0.5, seconds));
+    const motif = [523, 587, 659, 587, 523, 659, 784, 659];
+    const count = Math.max(6, Math.round(total * 4));
+    for (let i = 0; i < count; i++) {
+      this.cueTone(motif[i % motif.length], 0.12, 0.13, 'triangle', (i * total) / count);
+    }
+  }
+
+  gauntletRedStinger(): void {
+    this.cueTone(440, 0.18, 0.2, 'square');
+    this.cueTone(622, 0.22, 0.18, 'sawtooth', 0.04);
+    this.cueNoise(0.12, 1600, 0.1, 0.7, 'bandpass');
+  }
+
+  gauntletPoof(): void {
+    this.cueNoise(0.22, 1200, 0.14, 0.7, 'bandpass');
+    this.cueTone(520, 0.18, 0.1, 'sine', 0, 240);
+  }
+
+  gauntletBeat(strong: boolean): void {
+    this.cueTone(strong ? 1200 : 900, 0.05, strong ? 0.14 : 0.09, 'square');
+  }
+
+  gauntletShatter(): void {
+    this.cueNoise(0.3, 6000, 0.16, 0.6, 'highpass');
+    this.cueTone(2100, 0.18, 0.1, 'triangle', 0, 900);
+  }
+
+  gauntletFanfare(): void {
+    [523, 659, 784, 1046].forEach((f, i) => this.cueTone(f, 0.4, 0.18, 'triangle', i * 0.12));
+  }
+
   fiestaScorePing(mine: boolean): void {
     this.play(mine ? UI_CUES.fiestaScoreMine : UI_CUES.fiestaScoreOther);
   }

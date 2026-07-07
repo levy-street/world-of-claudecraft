@@ -21,6 +21,7 @@ import {
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isGauntletPos,
   isYumiMazePos,
   MOBS,
   NPCS,
@@ -3104,6 +3105,11 @@ export class Renderer {
         }
         break;
       }
+      case 'gauntletPoof': {
+        const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
+        this.vfx.poof({ x: ev.x, y: gy + 0.5, z: ev.z });
+        break;
+      }
     }
   }
 
@@ -3908,6 +3914,7 @@ export class Renderer {
     // non-zero pitch origin (the real Sowfield match is {0,0}).
     const po = this.sim.cupInfo?.match?.origin;
     const inPractice = !!po && (po.x !== 0 || po.z !== 0);
+    const inGauntlet = inside && isGauntletPos(px);
     if (inPractice) {
       const idx = this.practiceSkyVariant();
       this.valeCupSky.setVariant(idx);
@@ -3934,6 +3941,8 @@ export class Renderer {
           this.yumiMazeViews.set(i, view);
         }
       }
+    } else if (inGauntlet) {
+      // The Gauntlet uses an open exterior venue in a far instance band.
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
@@ -3966,7 +3975,9 @@ export class Renderer {
     const inDelve = inside && isDelvePos(px);
     const inYumiMaze = inside && isYumiMazePos(px);
     const interior =
-      inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
+      inside && !inDelve && !inYumiMaze && !inGauntlet && !isArenaPos(px)
+        ? dungeonAt(px)?.interior
+        : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     const desired = inPractice
@@ -3979,7 +3990,7 @@ export class Renderer {
             ? 'temple'
             : inNythraxis
               ? 'nythraxis'
-              : inside
+              : inside && !inGauntlet
                 ? 'dungeon'
                 : camY < waterLevelAt(px, pz) - 0.05
                   ? 'underwater'
