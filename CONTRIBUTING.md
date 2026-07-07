@@ -56,6 +56,8 @@ That's enough to play the offline world and work on most things. To run the full
 online stack:
 
 ```bash
+cp .env.example .env
+# edit .env and set POSTGRES_PASSWORD (DATABASE_URL should use the same password)
 npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
 npm run server       # build and run the authoritative game server on :8787
 npm run dev          # in another terminal; the client proxies to the server
