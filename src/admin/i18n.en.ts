@@ -87,6 +87,9 @@ export const en = {
   'suspiciousPlayers.snapshotUnavailable': 'Observation time unavailable',
   'suspiciousPlayers.evidenceList': 'Evidence for {name}',
   'suspiciousPlayers.evidenceWeight': 'weight {value}',
+  'suspiciousPlayers.evidenceOccurrences': 'seen x{count}',
+  'suspiciousPlayers.evidenceFirstSeen': 'first {when}',
+  'suspiciousPlayers.evidenceLastSeen': 'latest {when}',
   'calibration.description':
     'Raw value distributions observed by the bot detector, for threshold calibration. Held in memory only: counts reset when the server restarts.',
   'calibration.downloadJson': 'Download JSON',

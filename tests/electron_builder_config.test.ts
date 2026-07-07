@@ -1,7 +1,14 @@
+import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   azureSignOptionsFromEnv,
   desktopBuilderConfig,
+  isChannelFeedFile,
+  stampChannelFeedFiles,
+  stampFeedFile,
 } from '../scripts/electron-builder-config.mjs';
 
 // A miniature of package.json's "build" block: just the keys the channel
@@ -16,13 +23,98 @@ const base = {
   linux: { target: [{ target: 'AppImage', arch: ['x64', 'arm64'] }] },
 };
 
+const prodOrigin = 'https://worldofclaudecraft.com';
+
 describe('desktopBuilderConfig', () => {
   it('stamps the website channel into extraMetadata and keeps the publish feed', () => {
-    const config = desktopBuilderConfig({ base, distribution: 'website' });
-    expect(config.extraMetadata.wocDesktop).toEqual({ distribution: 'website' });
-    expect(config.publish).toEqual(base.publish);
+    const config = desktopBuilderConfig({ base, distribution: 'website', apiOrigin: prodOrigin });
+    expect(config.extraMetadata.wocDesktop).toEqual({
+      distribution: 'website',
+      apiOrigin: prodOrigin,
+    });
+    expect(config.publish).toEqual({ ...base.publish, channel: 'latest' });
     expect(config.appId).toBe(base.appId);
     expect(config.mac.hardenedRuntime).toBe(true);
+  });
+
+  it('routes the production origin to the latest update channel', () => {
+    const config = desktopBuilderConfig({ base, distribution: 'website', apiOrigin: prodOrigin });
+    expect(config.publish?.channel).toBe('latest');
+  });
+
+  it('routes every non-production origin to the dev update channel (issue 1537)', () => {
+    for (const apiOrigin of [
+      'https://dev.worldofclaudecraft.com',
+      'http://localhost:8787',
+      undefined,
+    ]) {
+      const config = desktopBuilderConfig({ base, distribution: 'website', apiOrigin });
+      expect(config.publish?.channel).toBe('dev');
+    }
+  });
+
+  it('refuses to emit production feed files for a non-production origin', () => {
+    expect(() =>
+      desktopBuilderConfig({
+        base,
+        distribution: 'website',
+        apiOrigin: 'http://localhost:8787',
+        updateChannel: 'latest',
+      }),
+    ).toThrow(/refusing to emit production update-feed files/);
+    expect(() =>
+      desktopBuilderConfig({ base, distribution: 'website', updateChannel: 'latest' }),
+    ).toThrow(/refusing to emit production update-feed files/);
+  });
+
+  it('allows staging a production-origin artifact on the dev track, but no other override', () => {
+    const staged = desktopBuilderConfig({
+      base,
+      distribution: 'website',
+      apiOrigin: prodOrigin,
+      updateChannel: 'dev',
+    });
+    expect(staged.publish?.channel).toBe('dev');
+    expect(() =>
+      desktopBuilderConfig({
+        base,
+        distribution: 'website',
+        apiOrigin: prodOrigin,
+        updateChannel: 'beta',
+      }),
+    ).toThrow(/unknown desktop update channel/);
+  });
+
+  it('treats a set-but-empty WOC_UPDATE_CHANNEL as unset and derives from the origin', () => {
+    const prod = desktopBuilderConfig({
+      base,
+      distribution: 'website',
+      apiOrigin: prodOrigin,
+      updateChannel: '',
+    });
+    expect(prod.publish?.channel).toBe('latest');
+    const dev = desktopBuilderConfig({
+      base,
+      distribution: 'website',
+      apiOrigin: 'http://localhost:8787',
+      updateChannel: '',
+    });
+    expect(dev.publish?.channel).toBe('dev');
+  });
+
+  it('rejects an unparseable non-empty origin at build time (would strand the install)', () => {
+    // A schemeless origin derives the dev channel at build time but normalizes
+    // to production in the runtime guard, refusing every stamped update on its
+    // own track forever; that mistake must die here.
+    for (const apiOrigin of ['localhost:8787', 'worldofclaudecraft.com', 'not a url']) {
+      expect(() => desktopBuilderConfig({ base, distribution: 'website', apiOrigin })).toThrow(
+        /parseable http\(s\) VITE_DESKTOP_API_ORIGIN/,
+      );
+    }
+    // Steam builds publish nothing, so the same origin does not throw there.
+    expect(
+      desktopBuilderConfig({ base, distribution: 'steam', apiOrigin: 'localhost:8787' }).publish,
+    ).toBeNull();
   });
 
   it('never mutates the base config object', () => {
@@ -36,6 +128,14 @@ describe('desktopBuilderConfig', () => {
     const config = desktopBuilderConfig({ base, distribution: 'steam' });
     expect(config.extraMetadata.wocDesktop).toEqual({ distribution: 'steam' });
     expect(config.publish).toBeNull();
+    // The update-track split never touches Steam: publish stays nulled and a
+    // dev origin does not trip the production-channel guard.
+    const devSteam = desktopBuilderConfig({
+      base,
+      distribution: 'steam',
+      apiOrigin: 'http://localhost:8787',
+    });
+    expect(devSteam.publish).toBeNull();
     expect(config.directories.output).toBe('release-steam');
     expect(config.mac.target).toEqual([{ target: 'dir', arch: ['universal'] }]);
     expect(config.win.target).toEqual([{ target: 'dir', arch: ['x64'] }]);
@@ -97,6 +197,120 @@ describe('desktopBuilderConfig', () => {
     expect(() => desktopBuilderConfig({ base, distribution: 'beta' })).toThrow(
       /unknown desktop distribution/,
     );
+  });
+});
+
+describe('isChannelFeedFile', () => {
+  it('matches only the channel feed files electron-builder emits', () => {
+    expect(isChannelFeedFile('latest-mac.yml', 'latest')).toBe(true);
+    expect(isChannelFeedFile('latest.yml', 'latest')).toBe(true);
+    expect(isChannelFeedFile('latest-linux.yml', 'latest')).toBe(true);
+    expect(isChannelFeedFile('latest-linux-arm64.yml', 'latest')).toBe(true);
+    expect(isChannelFeedFile('dev-mac.yml', 'dev')).toBe(true);
+    expect(isChannelFeedFile('dev.yml', 'dev')).toBe(true);
+  });
+
+  it('never matches the other channel, non-feed ymls, or garbage', () => {
+    expect(isChannelFeedFile('dev-mac.yml', 'latest')).toBe(false);
+    expect(isChannelFeedFile('latest-mac.yml', 'dev')).toBe(false);
+    expect(isChannelFeedFile('builder-debug.yml', 'latest')).toBe(false);
+    expect(isChannelFeedFile('latest-mac.yml.bak', 'latest')).toBe(false);
+    expect(isChannelFeedFile('latest-mac.json', 'latest')).toBe(false);
+    expect(isChannelFeedFile('latest-mac.yml', '')).toBe(false);
+    expect(isChannelFeedFile('latest-mac.yml', 'beta')).toBe(false);
+    expect(isChannelFeedFile(undefined, 'latest')).toBe(false);
+  });
+});
+
+describe('stampFeedFile', () => {
+  const yml = 'version: 0.23.0\nfiles:\n  - url: woc.zip\npath: woc.zip\n';
+
+  it('appends the baked origin as a yml key the updater can read back', () => {
+    const stamped = stampFeedFile(yml, 'https://worldofclaudecraft.com');
+    expect(stamped).toBe(
+      'version: 0.23.0\nfiles:\n  - url: woc.zip\npath: woc.zip\n' +
+        'wocApiOrigin: "https://worldofclaudecraft.com"\n',
+    );
+  });
+
+  it('replaces an existing stamp instead of stacking (idempotent re-stamp)', () => {
+    const once = stampFeedFile(yml, 'http://localhost:8787');
+    const twice = stampFeedFile(once, 'https://worldofclaudecraft.com');
+    expect(twice.match(/wocApiOrigin/g)).toHaveLength(1);
+    expect(twice).toContain('wocApiOrigin: "https://worldofclaudecraft.com"');
+    expect(twice).not.toContain('localhost');
+  });
+
+  it('requires the origin: a stamp-less production feed must not be emitted silently', () => {
+    expect(() => stampFeedFile(yml, '')).toThrow(/apiOrigin/);
+  });
+
+  it('round-trips through the real electron-updater feed parser onto UpdateInfo', () => {
+    // Guards the load-bearing vendor assumption: parseUpdateInfo is a raw yaml
+    // load with no key whitelist, so the stamp reaches the update-available
+    // handler. If a future electron-updater upgrade starts stripping unknown
+    // keys, the runtime guard silently degrades to accept-everything and THIS
+    // test is the only signal.
+    const require = createRequire(import.meta.url);
+    const { parseUpdateInfo } = require('electron-updater/out/providers/Provider.js');
+    const info = parseUpdateInfo(
+      stampFeedFile(yml, 'https://worldofclaudecraft.com'),
+      'latest-mac.yml',
+      'https://updates.example.com/desktop/latest-mac.yml',
+    );
+    expect(info.wocApiOrigin).toBe('https://worldofclaudecraft.com');
+    expect(info.version).toBe('0.23.0');
+    expect(info.path).toBe('woc.zip');
+  });
+});
+
+describe('stampChannelFeedFiles (the electron-build.mjs stamping orchestration)', () => {
+  const fsOps = { existsSync, readdirSync, readFileSync, writeFileSync };
+  const seed = (dir: string, names: string[]) => {
+    for (const name of names) writeFileSync(join(dir, name), 'version: 0.23.0\n');
+  };
+
+  it('stamps exactly the channel feed files in the output dir, nothing else', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'woc-feed-'));
+    seed(dir, ['latest-mac.yml', 'latest.yml', 'dev-mac.yml', 'builder-debug.yml']);
+    const stamped = stampChannelFeedFiles({
+      outDir: dir,
+      channel: 'latest',
+      apiOrigin: 'https://worldofclaudecraft.com',
+      fs: fsOps,
+      joinPath: join,
+    });
+    expect([...stamped].sort()).toEqual(['latest-mac.yml', 'latest.yml']);
+    expect(readFileSync(join(dir, 'latest-mac.yml'), 'utf8')).toContain(
+      'wocApiOrigin: "https://worldofclaudecraft.com"',
+    );
+    expect(readFileSync(join(dir, 'latest.yml'), 'utf8')).toContain('wocApiOrigin');
+    expect(readFileSync(join(dir, 'dev-mac.yml'), 'utf8')).not.toContain('wocApiOrigin');
+    expect(readFileSync(join(dir, 'builder-debug.yml'), 'utf8')).not.toContain('wocApiOrigin');
+  });
+
+  it('is a no-op without a channel or an output dir (steam and pack builds)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'woc-feed-'));
+    seed(dir, ['latest-mac.yml']);
+    expect(
+      stampChannelFeedFiles({
+        outDir: dir,
+        channel: undefined,
+        apiOrigin: 'https://worldofclaudecraft.com',
+        fs: fsOps,
+        joinPath: join,
+      }),
+    ).toEqual([]);
+    expect(readFileSync(join(dir, 'latest-mac.yml'), 'utf8')).not.toContain('wocApiOrigin');
+    expect(
+      stampChannelFeedFiles({
+        outDir: join(dir, 'does-not-exist'),
+        channel: 'latest',
+        apiOrigin: 'https://worldofclaudecraft.com',
+        fs: fsOps,
+        joinPath: join,
+      }),
+    ).toEqual([]);
   });
 });
 

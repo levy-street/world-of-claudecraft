@@ -2464,6 +2464,13 @@ export class GameServer {
     const msg = rawMsg as ClientMessage;
     const sim = this.sim;
     const pid = session.pid;
+    // Deliberate logout: the client wants a clean leave, not a linkdead grace.
+    // Calling leave() immediately sets session.left = true, so the subsequent
+    // WebSocket close event (from the page reload) is a no-op in socketClosed().
+    if (msg.t === 'logout') {
+      void this.leave(session, 'logout');
+      return;
+    }
     if (msg.t === 'input') {
       if (session.spectating) return;
       const meta = sim.meta(pid);

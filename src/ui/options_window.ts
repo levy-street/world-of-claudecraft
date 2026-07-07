@@ -110,6 +110,7 @@ const LANGUAGE_ENDONYMS: Record<SupportedLanguage, string> = {
   ja_JP: '日本語',
   pt_BR: 'Português (Brasil)',
   ru_RU: 'Русский',
+  cs_CZ: 'Čeština',
   nl_NL: 'Nederlands',
   pl_PL: 'Polski',
   id_ID: 'Bahasa Indonesia',

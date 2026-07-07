@@ -23,6 +23,7 @@ import {
   tEntity,
 } from '../src/ui/entity_i18n';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -75,6 +76,7 @@ const locales: Record<string, typeof en> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,
@@ -639,6 +641,7 @@ describe('i18n Localization Key Coverage', () => {
       'ja_JP',
       'pt_BR',
       'ru_RU',
+      'cs_CZ',
       'nl_NL',
       'pl_PL',
       'id_ID',
@@ -1516,23 +1519,7 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should expose all supported hreflang alternates in index.html', () => {
     const html = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf8');
-    const expectedHreflang = [
-      'en',
-      'es',
-      'es-ES',
-      'fr-FR',
-      'fr-CA',
-      'en-CA',
-      'it-IT',
-      'de-DE',
-      'zh-CN',
-      'zh-TW',
-      'ko-KR',
-      'ja-JP',
-      'pt-BR',
-      'ru-RU',
-      'x-default',
-    ];
+    const expectedHreflang = [...supportedLanguages.map((lang) => languageTag(lang)), 'x-default'];
     for (const hreflang of expectedHreflang) {
       expect(html, `missing hreflang ${hreflang}`).toContain(`hreflang="${hreflang}"`);
     }

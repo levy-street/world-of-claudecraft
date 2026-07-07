@@ -20,25 +20,30 @@
 // PERMANENT invariant and survives the sparse relax, so this guard stays.
 
 import { describe, expect, it } from 'vitest';
-import { en } from '../src/ui/i18n.catalog';
 import type { TranslationKey } from '../src/ui/i18n.catalog';
+import { en } from '../src/ui/i18n.catalog';
+import { cs_CZ } from '../src/ui/i18n.locales/cs_CZ';
+import { de_DE } from '../src/ui/i18n.locales/de_DE';
+import { en_CA } from '../src/ui/i18n.locales/en_CA';
 import { es } from '../src/ui/i18n.locales/es';
 import { es_ES } from '../src/ui/i18n.locales/es_ES';
-import { fr_FR } from '../src/ui/i18n.locales/fr_FR';
 import { fr_CA } from '../src/ui/i18n.locales/fr_CA';
-import { en_CA } from '../src/ui/i18n.locales/en_CA';
+import { fr_FR } from '../src/ui/i18n.locales/fr_FR';
 import { it_IT } from '../src/ui/i18n.locales/it_IT';
-import { de_DE } from '../src/ui/i18n.locales/de_DE';
-import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
-import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
-import { ko_KR } from '../src/ui/i18n.locales/ko_KR';
 import { ja_JP } from '../src/ui/i18n.locales/ja_JP';
+import { ko_KR } from '../src/ui/i18n.locales/ko_KR';
 import { pt_BR } from '../src/ui/i18n.locales/pt_BR';
 import { ru_RU } from '../src/ui/i18n.locales/ru_RU';
+import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
+import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
 
 // Recurse into plain objects only (arrays/non-objects are leaves) - the same
 // object-vs-leaf rule scripts/i18n_flatten.mjs and the build's deepMerge use.
-function flatten(node: unknown, prefix = '', out: Record<string, unknown> = {}): Record<string, unknown> {
+function flatten(
+  node: unknown,
+  prefix = '',
+  out: Record<string, unknown> = {},
+): Record<string, unknown> {
   for (const key of Object.keys(node as Record<string, unknown>)) {
     const value = (node as Record<string, unknown>)[key];
     const path = prefix ? `${prefix}.${key}` : key;
@@ -56,12 +61,26 @@ const enLeaves = new Set(Object.keys(flatten(en)));
 // The guard predicate: dotted keys present in the overlay that are NOT real `en`
 // leaves. An empty result means every key is a member of Leaves(en).
 function keysNotInEnLeaves(overlay: Record<string, unknown>): string[] {
-  return Object.keys(overlay).filter((k) => !enLeaves.has(k)).sort();
+  return Object.keys(overlay)
+    .filter((k) => !enLeaves.has(k))
+    .sort();
 }
 
 const overlays: Record<string, Partial<Record<TranslationKey, string>>> = {
-  es, es_ES, fr_FR, fr_CA, en_CA, it_IT, de_DE,
-  zh_CN, zh_TW, ko_KR, ja_JP, pt_BR, ru_RU,
+  es,
+  es_ES,
+  fr_FR,
+  fr_CA,
+  en_CA,
+  it_IT,
+  de_DE,
+  zh_CN,
+  zh_TW,
+  ko_KR,
+  ja_JP,
+  pt_BR,
+  ru_RU,
+  cs_CZ,
 };
 
 describe('flat overlay keys are members of Leaves(en)', () => {

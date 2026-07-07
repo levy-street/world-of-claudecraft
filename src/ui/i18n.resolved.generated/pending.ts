@@ -54,7 +54,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "es_ES": [
     "abilityUi.resources.fury",
@@ -101,7 +102,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_FR": [
     "abilityUi.resources.fury",
@@ -148,7 +150,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_CA": [
     "abilityUi.resources.fury",
@@ -195,7 +198,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "en_CA": [],
   "it_IT": [
@@ -243,7 +247,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "de_DE": [
     "abilityUi.resources.fury",
@@ -290,7 +295,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "zh_CN": [
     "classDetails.resources.fury",
@@ -298,7 +304,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "zh_TW": [
     "classDetails.resources.fury",
@@ -306,7 +313,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "ko_KR": [
     "classDetails.resources.fury",
@@ -314,7 +322,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "ja_JP": [
     "classDetails.resources.fury",
@@ -322,7 +331,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "pt_BR": [
     "abilityUi.resources.fury",
@@ -369,7 +379,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "ru_RU": [
     "classDetails.resources.fury",
@@ -377,7 +388,56 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.felblade.name",
     "guide.abilityHook.felblade",
     "guide.resourceName.fury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
+  ],
+  "cs_CZ": [
+    "abilityUi.resources.fury",
+    "classDetails.lore.demon_hunter",
+    "classDetails.resources.fury",
+    "classDetails.roles.demon_hunter",
+    "classes.demon_hunter",
+    "classes.demon_hunterAria",
+    "entities.abilities.blade_dance.description",
+    "entities.abilities.blade_dance.name",
+    "entities.abilities.blur.description",
+    "entities.abilities.blur.name",
+    "entities.abilities.chaos_strike.description",
+    "entities.abilities.chaos_strike.name",
+    "entities.abilities.demon_bite.description",
+    "entities.abilities.demon_bite.name",
+    "entities.abilities.eye_beam.description",
+    "entities.abilities.eye_beam.name",
+    "entities.abilities.fel_rush.description",
+    "entities.abilities.fel_rush.name",
+    "entities.abilities.felblade.description",
+    "entities.abilities.felblade.name",
+    "entities.abilities.immolation_aura.description",
+    "entities.abilities.immolation_aura.name",
+    "entities.abilities.metamorphosis.description",
+    "entities.abilities.metamorphosis.name",
+    "entities.abilities.sigil_of_flame.description",
+    "entities.abilities.sigil_of_flame.name",
+    "entities.abilities.throw_glaive.description",
+    "entities.abilities.throw_glaive.name",
+    "entities.abilities.vengeful_retreat.description",
+    "entities.abilities.vengeful_retreat.name",
+    "guide.abilityHook.blade_dance",
+    "guide.abilityHook.blur",
+    "guide.abilityHook.chaos_strike",
+    "guide.abilityHook.demon_bite",
+    "guide.abilityHook.eye_beam",
+    "guide.abilityHook.fel_rush",
+    "guide.abilityHook.felblade",
+    "guide.abilityHook.immolation_aura",
+    "guide.abilityHook.metamorphosis",
+    "guide.abilityHook.sigil_of_flame",
+    "guide.abilityHook.throw_glaive",
+    "guide.abilityHook.vengeful_retreat",
+    "guide.resourceName.fury",
+    "hud.errors.notEnoughFury",
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "nl_NL": [
     "abilityUi.resources.fury",
@@ -424,7 +484,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "pl_PL": [
     "abilityUi.resources.fury",
@@ -471,7 +532,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "id_ID": [
     "abilityUi.resources.fury",
@@ -518,7 +580,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "tr_TR": [
     "abilityUi.resources.fury",
@@ -565,7 +628,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "sv_SE": [
     "abilityUi.resources.fury",
@@ -612,7 +676,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "vi_VN": [
     "abilityUi.resources.fury",
@@ -659,7 +724,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "da_DK": [
     "abilityUi.resources.fury",
@@ -706,6 +772,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.vengeful_retreat",
     "guide.resourceName.fury",
     "hud.errors.notEnoughFury",
-    "hudChrome.auraEffect.lifesteal"
+    "hudChrome.auraEffect.lifesteal",
+    "hudChrome.discord.roleTag.coredevs"
   ]
 };

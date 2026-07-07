@@ -1122,6 +1122,7 @@ export const hudChromeStrings = {
     roleTag: {
       levyst: 'Levy St',
       admin: 'Admin',
+      coredevs: 'Core Dev',
       devs: 'Dev',
       mods: 'Mod',
       artists: 'Artist',

@@ -5,26 +5,25 @@ export interface SuspiciousSessionsExportFile {
   contents: string;
 }
 
+// The raw /admin/api/suspicious-players payload, verbatim, plus capture metadata.
+// Schema 1 redacted names, IPs, and evidence details; the 2026-07-05 triage
+// concluded that shape could not support false-positive analysis (several
+// strategies share one evidence kind, so triage keys on `detail`; `state`
+// separates reported sessions). Operator-only artifact behind admin auth: treat
+// downloads as sensitive and keep them out of public trackers.
 export function buildSuspiciousSessionsExport(
   data: SuspiciousPlayersData,
   capturedAt: Date = new Date(),
 ): SuspiciousSessionsExportFile {
   const capturedAtIso = capturedAt.toISOString();
   const payload = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     capturedAt: capturedAtIso,
     sessionCount: data.players.length,
-    sessions: data.players.map((player) => ({
-      accountId: player.ref.accountId,
-      characterId: player.ref.characterId,
-      observedAt: player.snapshot?.capturedAt ?? null,
-      score: player.score,
-      evidence: player.evidence.map((evidence) => ({
-        kind: evidence.kind,
-        weight: evidence.weight,
-        expiresAt: Number.isFinite(evidence.expiresAt) ? evidence.expiresAt : null,
-      })),
-    })),
+    // Nested under `data` so analysis scripts written against a saved raw
+    // response (`.data.players`) read a downloaded file unchanged. An Infinity
+    // expiresAt (session-scoped evidence) serializes to null via JSON.
+    data: { players: data.players },
   };
   return {
     filename: `bot-detector-suspicious-sessions-${capturedAtIso.replace(/[:.]/g, '-')}.json`,

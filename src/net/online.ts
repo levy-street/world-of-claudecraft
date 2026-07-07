@@ -1137,12 +1137,27 @@ export class ClientWorld implements IWorld {
     this.reconnectTimer = window.setTimeout(() => this.openSocket(), delayMs);
   }
 
-  close(): void {
+  private endSession(): void {
     this.sessionEnded = true;
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
+  }
+
+  close(): void {
+    this.endSession();
     this.ws.onclose = null;
     this.ws.close();
+  }
+
+  // Signal a deliberate logout to the server so it skips linkdead grace and
+  // calls leave() immediately. Must be called before a page reload so the
+  // character is properly removed from the world instead of being held
+  // in-world for the 5-minute linkdead window.
+  sendLogout(): void {
+    this.endSession();
+    if (this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ t: 'logout' }));
+    }
   }
 
   get player(): Entity {
@@ -1346,9 +1361,7 @@ export class ClientWorld implements IWorld {
       }
       // any other server rejection (kick, moderation, takeover, failed auth)
       // ends the session for good: no auto-reconnect
-      this.sessionEnded = true;
-      clearInterval(this.sendTimer);
-      if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
+      this.endSession();
       this.onDisconnect?.(msg.error ?? 'rejected by server');
       return;
     }

@@ -195,6 +195,7 @@ describe('resolveDesktopConfig', () => {
       distribution: 'website',
       updaterEnabled: true,
       crashSubmitUrl: '',
+      updateChannel: 'latest',
       ...defaultOrigins,
     });
   });
@@ -205,6 +206,7 @@ describe('resolveDesktopConfig', () => {
       distribution: 'steam',
       updaterEnabled: false,
       crashSubmitUrl: '',
+      updateChannel: 'latest',
       ...defaultOrigins,
     });
   });
@@ -215,7 +217,35 @@ describe('resolveDesktopConfig', () => {
       distribution: 'website',
       updaterEnabled: false,
       crashSubmitUrl: '',
+      updateChannel: 'latest',
       ...defaultOrigins,
     });
+  });
+
+  it('derives the update channel from the baked origin: non-production reads the dev feed', () => {
+    const dev = resolveDesktopConfig({
+      packagedMetadata: {
+        wocDesktop: { distribution: 'website', apiOrigin: 'https://dev.worldofclaudecraft.com' },
+      },
+      isPackaged: true,
+    });
+    expect(dev.updateChannel).toBe('dev');
+    expect(dev.updaterEnabled).toBe(true);
+    const smoke = resolveDesktopConfig({
+      packagedMetadata: {
+        wocDesktop: { distribution: 'website', apiOrigin: 'http://localhost:8787' },
+      },
+      isPackaged: true,
+    });
+    expect(smoke.updateChannel).toBe('dev');
+    // No env hatch: a packaged build's channel follows its baked origin only.
+    const forced = resolveDesktopConfig({
+      packagedMetadata: {
+        wocDesktop: { distribution: 'website', apiOrigin: 'https://dev.worldofclaudecraft.com' },
+      },
+      env: { VITE_DESKTOP_API_ORIGIN: 'https://worldofclaudecraft.com' },
+      isPackaged: true,
+    });
+    expect(forced.updateChannel).toBe('dev');
   });
 });

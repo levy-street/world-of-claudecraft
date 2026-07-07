@@ -390,3 +390,45 @@ describe('reconnect policy (client-side conflict tolerance)', () => {
     expect(plan).toEqual({ action: 'reject', error: RECONNECT_CONFLICT_ERROR });
   });
 });
+
+describe('deliberate logout skips linkdead grace', () => {
+  it("a t:'logout' message leaves the session immediately, not linkdead", async () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Quitter', 'warrior', null));
+
+    server.handleMessage(session, JSON.stringify({ t: 'logout' }));
+
+    // session.left is set synchronously so socketClosed (page-unload close)
+    // cannot enter linkdead grace
+    expect(session.left).toBe(true);
+    expect(session.linkdead).toBe(false);
+
+    // the subsequent WebSocket close from the page reload is now a no-op
+    expect(server.socketClosed(session, ws)).toBe(false);
+    expect(session.linkdead).toBe(false);
+
+    // character is gone, not held in-world
+    await vi.waitFor(() => {
+      expect((server as any).sessionByCharacterId(101)).toBeNull();
+    });
+    expect(server.clients.size).toBe(0);
+    expect(server.sim.entities.has(session.pid)).toBe(false);
+  });
+
+  it('allows a fresh join on the same character after a t:logout', async () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Loggedout', 'warrior', null));
+    server.handleMessage(session, JSON.stringify({ t: 'logout' }));
+
+    await vi.waitFor(() => {
+      expect((server as any).sessionByCharacterId(101)).toBeNull();
+    });
+
+    // no "character already in world" after a deliberate logout
+    const fresh = expectJoined(server.join(fakeWs(), 11, 101, 'Loggedout', 'warrior', null));
+    expect(fresh.characterId).toBe(101);
+    expect(fresh.left).toBe(false);
+  });
+});

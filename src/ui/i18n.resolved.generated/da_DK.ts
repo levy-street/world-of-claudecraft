@@ -985,6 +985,7 @@ export const da_DK: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Core Dev",
         "devs": "Udvikler",
         "mods": "Moderator",
         "artists": "Kunstner"

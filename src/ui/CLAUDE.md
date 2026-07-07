@@ -200,7 +200,7 @@ The locale data is split; touch the right file (full model + locked-terms glossa
   `shell`/`hud`/`hud_chrome`/`abilities`/`quests`/`items`/`game`/`merge` + an `index.ts`
   barrel) that drives `TranslationKey = Leaves<typeof en, 6>`, the dotted-path type every
   `t()` uses. Add a new English string in the matching domain module.
-- **`i18n.locales/<lang>.ts`** are the 20 non-English flat sparse overlays
+- **`i18n.locales/<lang>.ts`** are the 21 non-English flat sparse overlays
   (`Partial<Record<TranslationKey,string>>`), the ONLY files a translator edits. An omitted
   key is English-filled by the build and marked `pending`.
 - **`i18n.resolved.generated/`** is the generated dense table the runtime imports (committed,
@@ -208,8 +208,8 @@ The locale data is split; touch the right file (full model + locked-terms glossa
   counts-only `i18n.status.summary.json` is committed).
 - **`i18n.ts`** is the thin runtime: `t()`/`tOptional`/`tPlural`, `hasTranslation`, the
   formatters, language get/set. The locale set derives from `SUPPORTED_LANGUAGES` in the
-  generated `loaders.ts` (21 = en + 20). **Lazy locale flip:** only `en`/`en_XA`/`pending`/
-  `loaders` are eager; the 20 non-en slices load on demand via `await ensureLocaleLoaded(lang)`.
+  generated `loaders.ts` (22 = en + 21). **Lazy locale flip:** only `en`/`en_XA`/`pending`/
+  `loaders` are eager; the 21 non-en slices load on demand via `await ensureLocaleLoaded(lang)`.
   `setLanguage` is synchronous and does NOT load; `main.ts` awaits `ensureLocaleLoaded` before
   localized paint and each picker switch.
 
@@ -226,7 +226,7 @@ feature branch is expected and fine at the PR-tier gate.
 
 **Contributor workflow (add a player-visible string): add ENGLISH ONLY.**
 1. Add the key to `en` (the matching `i18n.catalog/<domain>.ts` module) and render it through
-   `t()`. **Never edit the 20 `i18n.locales/<lang>.ts` overlays, and never put English / a
+   `t()`. **Never edit the 21 `i18n.locales/<lang>.ts` overlays, and never put English / a
    `// TODO` / a placeholder into one.** Leave the key omitted; the build English-fills it and
    marks it `pending` (the maintainer batch-fills every locale at release).
 2. If the string originates in `src/sim/` or `server/` (which stay language-agnostic), register

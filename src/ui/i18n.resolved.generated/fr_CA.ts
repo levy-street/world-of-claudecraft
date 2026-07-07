@@ -985,6 +985,7 @@ export const fr_CA: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Core Dev",
         "devs": "Dév",
         "mods": "Modo",
         "artists": "Artiste"

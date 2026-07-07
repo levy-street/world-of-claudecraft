@@ -985,6 +985,7 @@ export const zh_CN: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "管理员",
+        "coredevs": "Core Dev",
         "devs": "开发者",
         "mods": "管理员",
         "artists": "画师"
