@@ -139,6 +139,9 @@ const NPC_IDS = [
   'chronicler_saul', // Book of Deeds Chronicler (Eastbrook, zone 1)
   'chronicler_osric_fenn', // Book of Deeds Chronicler (Fenbridge, zone 2)
   'chronicler_edda_hartwell', // Book of Deeds Chronicler (Highwatch, zone 3)
+  'gauntlet_recruiter', // Maro Half-Mask, the Herald of the Gauntlet (town square)
+  'gauntlet_watcher', // The Stone Warden (the sentinel-trial watcher, instance-local)
+  'gauntlet_contestant', // NPC backfill contestants (per-run rolled names override this)
 ] as const;
 
 const QUEST_IDS = [

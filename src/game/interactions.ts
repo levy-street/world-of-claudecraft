@@ -22,6 +22,7 @@ export interface PickInteractionHud {
   openLoot(mobId: number, screenX: number, screenY: number): void;
   openQuestDialog(npcId: number): void;
   openDelveBoard(npcId: number): void;
+  openGauntletRecruit(): void;
   openMailbox(): void;
   showError(text: string): void;
   closeContextMenu(): void;
@@ -157,6 +158,7 @@ export function handlePickedEntity(
           hud.showError(tSim('error.cantWhileDead'));
         } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
+        else if (e.templateId === 'gauntlet_recruiter') hud.openGauntletRecruit();
         else hud.openQuestDialog(id);
       } else hud.showError(t('questUi.errors.tooFar'));
     } else if (
@@ -192,6 +194,7 @@ export function handlePickedEntity(
       if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
         if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
+        else if (e.templateId === 'gauntlet_recruiter') hud.openGauntletRecruit();
         else hud.openQuestDialog(id);
       }
     }
