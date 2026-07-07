@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { GAUNTLET } from '../src/sim/content/gauntlet';
 import type { GauntletPhase, GauntletRunView } from '../src/sim/types';
 import { GauntletClock } from '../src/ui/gauntlet_clock';
-import { type GauntletHudInput, gauntletHudModel } from '../src/ui/gauntlet_hud_view';
+import {
+  type GauntletHudInput,
+  gauntletHudModel,
+  TUTORIAL_LEAD_S,
+} from '../src/ui/gauntlet_hud_view';
 
 // A fully-populated run view; individual tests override the fields they exercise.
 function run(over: Partial<GauntletRunView> = {}): GauntletRunView {
@@ -196,6 +200,37 @@ describe('gauntletHudModel', () => {
     expect(gauntletHudModel({ run: echoRun(), time: 104 }).hint).toBe('echoAnswer');
     // A finished duel teaches nothing.
     expect(gauntletHudModel({ run: echoRun({ done: true }), time: 104 }).hint).toBeNull();
+  });
+
+  it('opens the tutorial banner for the last seconds of staging and interlude', () => {
+    // GAUNTLET.trials: sentinel, sigils, pull, echo, span, court.
+    const staging = run({ phase: 'staging', trialIndex: 0, endsAt: 100, sentinel: null });
+    // Early in the window: no banner yet.
+    expect(gauntletHudModel({ run: staging, time: 100 - TUTORIAL_LEAD_S - 1 }).tutorial).toBeNull();
+    // Inside the lead window: the upcoming (first) trial's teaching line.
+    expect(gauntletHudModel({ run: staging, time: 100 - TUTORIAL_LEAD_S + 1 }).tutorial).toBe(
+      'sentinel',
+    );
+    // An interlude teaches the NEXT trial (trialIndex is the one just played).
+    const interlude = run({ phase: 'interlude', trialIndex: 1, endsAt: 100, sentinel: null });
+    expect(gauntletHudModel({ run: interlude, time: 97 }).tutorial).toBe('pull');
+    // The echo teaches its watch phase.
+    const beforeEcho = run({ phase: 'interlude', trialIndex: 2, endsAt: 100, sentinel: null });
+    expect(gauntletHudModel({ run: beforeEcho, time: 97 }).tutorial).toBe('echoWatch');
+  });
+
+  it('shows no tutorial during a trial, for spectators, or past the last trial', () => {
+    expect(gauntletHudModel({ run: run(), time: 0 }).tutorial).toBeNull(); // live trial
+    const spectator = run({ phase: 'staging', endsAt: 100, sentinel: null, spectating: true });
+    expect(gauntletHudModel({ run: spectator, time: 97 }).tutorial).toBeNull();
+    const lastDone = run({
+      phase: 'interlude',
+      trialIndex: GAUNTLET.trials.length - 1,
+      endsAt: 100,
+      sentinel: null,
+    });
+    expect(gauntletHudModel({ run: lastDone, time: 97 }).tutorial).toBeNull();
+    expect(gauntletHudModel({ run: null, time: 0 }).tutorial).toBeNull();
   });
 
   it('shows no hint outside a live trial, when spectating, or when finished', () => {

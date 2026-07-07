@@ -17,7 +17,7 @@
 // desync the visible countdown.
 
 import { GAUNTLET } from '../sim/content/gauntlet';
-import type { GauntletPhase, GauntletRunView } from '../sim/types';
+import type { GauntletPhase, GauntletRunView, GauntletTrialKind } from '../sim/types';
 
 /** Which one-line teaching hint the cluster shows (the painter resolves the
  * matching hudChrome.gauntlet.hint.* key; this core stays i18n-free). The
@@ -31,6 +31,10 @@ export type GauntletHudHint =
   | 'echoAnswer'
   | 'span'
   | 'court';
+
+/** How long before a trial opens its tutorial banner shows (the big centered
+ * teaching line for the UPCOMING trial, during staging and each interlude). */
+export const TUTORIAL_LEAD_S = 5;
 
 /** The flat render model the gauntlet HUD painter consumes. */
 export interface GauntletHudModel {
@@ -86,12 +90,34 @@ export interface GauntletHudModel {
    *  viewer has nothing to act on: outside a live trial, spectating, already
    *  finished, or between echo rounds. */
   hint: GauntletHudHint | null;
+  /** The pre-trial tutorial banner: the UPCOMING trial's teaching line, shown
+   *  for the last TUTORIAL_LEAD_S seconds of staging and every interlude (the
+   *  painter renders it big and centered), or null. Spectators see none. */
+  tutorial: GauntletHudHint | null;
 }
 
 /** The per-frame input: the viewer's run projection and the current sim time. */
 export interface GauntletHudInput {
   run: GauntletRunView | null;
   time: number;
+}
+
+// The teaching line for a trial KIND (the echo teaches its watch phase: by
+// the time the answer window opens the in-trial hint has taken over).
+function hintForKind(kind: GauntletTrialKind): GauntletHudHint {
+  return kind === 'echo' ? 'echoWatch' : kind;
+}
+
+// The pre-trial tutorial: the UPCOMING trial's teaching line, live for the
+// last TUTORIAL_LEAD_S seconds of staging (trial 1) and every interlude (the
+// next trial). Spectators are just watching, so they get none.
+function tutorialFor(run: GauntletRunView, time: number): GauntletHudHint | null {
+  if (run.spectating) return null;
+  if (run.phase !== 'staging' && run.phase !== 'interlude') return null;
+  if (run.endsAt - time > TUTORIAL_LEAD_S) return null;
+  const idx = run.phase === 'staging' ? run.trialIndex : run.trialIndex + 1;
+  const kind = GAUNTLET.trials[idx];
+  return kind ? hintForKind(kind) : null;
 }
 
 // The viewer's actionable teaching line, or null when there is nothing to act
@@ -135,6 +161,7 @@ const HIDDEN: GauntletHudModel = {
   finished: false,
   podium: null,
   hint: null,
+  tutorial: null,
 };
 
 const clamp01 = (n: number): number => (n < 0 ? 0 : n > 1 ? 1 : n);
@@ -215,5 +242,6 @@ export function gauntletHudModel(input: GauntletHudInput): GauntletHudModel {
     finished: run.finished,
     podium: run.podium,
     hint: hintFor(run, time),
+    tutorial: tutorialFor(run, time),
   };
 }

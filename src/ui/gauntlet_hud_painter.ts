@@ -79,6 +79,9 @@ export interface GauntletHudElements {
   light: HTMLElement;
   /** The per-trial teaching line under the meta row. */
   hint: HTMLElement;
+  /** The big centered pre-trial tutorial banner (the UPCOMING trial's
+   *  teaching line during the last seconds of staging/interlude). */
+  tutorial: HTMLElement;
   /** The Keeper's Echo strip (shown only during a live duel). */
   echoStrip: HTMLElement;
   /** The "Round N of M" chip. */
@@ -132,6 +135,11 @@ export class GauntletHudPainter {
 
     w.setDisplay(this.el.hint, model.hint ? SHOWN_BLOCK : HIDDEN);
     if (model.hint) w.setText(this.el.hint, t(HINT_KEYS[model.hint]));
+
+    // The pre-trial tutorial banner reuses the same teaching lines, rendered
+    // big and centered while the countdown runs out.
+    w.setDisplay(this.el.tutorial, model.tutorial ? SHOWN_BLOCK : HIDDEN);
+    if (model.tutorial) w.setText(this.el.tutorial, t(HINT_KEYS[model.tutorial]));
 
     w.setDisplay(this.el.echoStrip, model.echo ? SHOWN : HIDDEN);
     if (model.echo) this.paintEcho(model.echo);
