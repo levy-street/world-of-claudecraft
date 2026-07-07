@@ -793,6 +793,8 @@ export const fr_CA: EnTranslations = {
       "masterOption": "Maître du butin : {name}"
     },
     "bags": {
+      "cannotDestroy": "This item cannot be destroyed.",
+      "rightClickDestroy": "Right-click to destroy",
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
       "filterWeapon": "Armes",

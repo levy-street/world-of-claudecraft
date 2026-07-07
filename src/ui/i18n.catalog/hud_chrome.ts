@@ -912,6 +912,12 @@ export const hudChromeStrings = {
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
   bags: {
+    // Right-click destroy affordance: rejected when the item is flagged noDiscard
+    // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
+    cannotDestroy: 'This item cannot be destroyed.',
+    // Tooltip sub-line advertising the right-click destroy affordance, shown only
+    // for a destroyable item so junk is removable without hunting for a menu.
+    rightClickDestroy: 'Right-click to destroy',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',

@@ -793,6 +793,8 @@ export const it_IT: EnTranslations = {
       "masterOption": "Distributore del Bottino: {name}"
     },
     "bags": {
+      "cannotDestroy": "This item cannot be destroyed.",
+      "rightClickDestroy": "Right-click to destroy",
       "filterGroupAria": "Filtra le borse per categoria",
       "filterAll": "Tutti",
       "filterWeapon": "Armi",

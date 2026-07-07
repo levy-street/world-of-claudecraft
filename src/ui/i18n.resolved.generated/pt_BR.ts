@@ -793,6 +793,8 @@ export const pt_BR: EnTranslations = {
       "masterOption": "Saqueador Mestre: {name}"
     },
     "bags": {
+      "cannotDestroy": "This item cannot be destroyed.",
+      "rightClickDestroy": "Right-click to destroy",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
       "filterWeapon": "Armas",

@@ -3,6 +3,7 @@ import type { InvSlot, ItemDef } from '../src/sim/types';
 import { DEFAULT_BAG_FILTER, type ItemLookup } from '../src/ui/bag_filter';
 import {
   type BagMode,
+  bagDestroyAction,
   bagItemAction,
   bagQualityKey,
   bagShiftLinks,
@@ -32,6 +33,7 @@ const ITEMS: Record<string, ItemDef> = {
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
+  soulbound: { kind: 'quest', name: 'Soulbound Key', quality: 'epic', noDiscard: true } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
 
@@ -61,6 +63,33 @@ describe('bagsWindowShown', () => {
     // shown value ever changes. Assert a non-'flex' non-hidden value still closes.
     expect(bagsWindowShown('flex')).toBe(true);
     expect(bagsWindowShown('block')).toBe(true);
+  });
+});
+
+describe('bagDestroyAction', () => {
+  it('destroys any regular item outside a transactional mode', () => {
+    expect(bagDestroyAction(ITEMS.sword, NO_MODE)).toBe('discard');
+    expect(bagDestroyAction(ITEMS.potion, NO_MODE)).toBe('discard');
+    // quest items are destroyable too (they already are via left-click), unless noDiscard.
+    expect(bagDestroyAction(ITEMS.questItem, NO_MODE)).toBe('discard');
+  });
+
+  it('protects a noDiscard item with feedback, never destroying it', () => {
+    expect(bagDestroyAction(ITEMS.soulbound, NO_MODE)).toBe('discardBlocked');
+  });
+
+  it('is inert in every transactional mode (their own click/contextmenu owns the slot)', () => {
+    for (const mode of [
+      'tradeOpen',
+      'mailAttach',
+      'marketSell',
+      'vendorOpen',
+      'petFeed',
+    ] as const) {
+      expect(bagDestroyAction(ITEMS.sword, { ...NO_MODE, [mode]: true })).toBe('none');
+      // even a normally-blocked item is 'none' (not 'discardBlocked') in these modes.
+      expect(bagDestroyAction(ITEMS.soulbound, { ...NO_MODE, [mode]: true })).toBe('none');
+    }
   });
 });
 

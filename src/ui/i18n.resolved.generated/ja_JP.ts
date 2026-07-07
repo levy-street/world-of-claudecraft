@@ -793,6 +793,8 @@ export const ja_JP: EnTranslations = {
       "masterOption": "分配担当：{name}"
     },
     "bags": {
+      "cannotDestroy": "このアイテムは破壊できません。",
+      "rightClickDestroy": "右クリックで破壊",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",

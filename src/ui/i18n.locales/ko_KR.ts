@@ -3728,6 +3728,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.collapseHint': '퀘스트 추적기 접기',
   'hudChrome.questTracker.expandHint': '퀘스트 추적기 펼치기',
   // Modular bag filtering controls (hudChrome.bags.*).
+  'hudChrome.bags.cannotDestroy': '이 아이템은 파괴할 수 없습니다.',
+  'hudChrome.bags.rightClickDestroy': '마우스 오른쪽 버튼으로 파괴',
   'hudChrome.bags.filterGroupAria': '가방을 분류별로 필터링',
   'hudChrome.bags.filterAll': '전체',
   'hudChrome.bags.filterWeapon': '무기',

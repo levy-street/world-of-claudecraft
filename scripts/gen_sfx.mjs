@@ -26,7 +26,7 @@ const force = process.argv.includes('--force');
 try {
   process.loadEnvFile();
 } catch {
-  /* no .env — rely on the ambient env */
+  /* no .env, rely on the ambient env */
 }
 const KEY = process.env.ELEVENLABS_API_KEY;
 if (!KEY) {
@@ -88,7 +88,7 @@ for (const entry of SFX) {
     console.log('ok');
     await sleep(200);
   } catch (err) {
-    // One bad clip shouldn't abort the whole run — record it and continue.
+    // One bad clip shouldn't abort the whole run: record it and continue.
     console.log('FAILED');
     console.error(`  ${err.message}`);
     failed.push(entry.key);

@@ -793,6 +793,8 @@ export const ru_RU: EnTranslations = {
       "masterOption": "Мастер добычи: {name}"
     },
     "bags": {
+      "cannotDestroy": "Этот предмет нельзя уничтожить.",
+      "rightClickDestroy": "Правый клик, чтобы уничтожить",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",

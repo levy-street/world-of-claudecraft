@@ -793,6 +793,8 @@ export const zh_TW: EnTranslations = {
       "masterOption": "分配者：{name}"
     },
     "bags": {
+      "cannotDestroy": "此物品無法銷毀。",
+      "rightClickDestroy": "右鍵單擊以銷毀",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",

@@ -793,6 +793,8 @@ export const tr_TR: EnTranslations = {
       "masterOption": "Ganimet Yöneticisi: {name}"
     },
     "bags": {
+      "cannotDestroy": "This item cannot be destroyed.",
+      "rightClickDestroy": "Right-click to destroy",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",

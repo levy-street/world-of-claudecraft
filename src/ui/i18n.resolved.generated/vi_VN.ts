@@ -793,6 +793,8 @@ export const vi_VN: EnTranslations = {
       "masterOption": "Người Chia Chiến Lợi Phẩm: {name}"
     },
     "bags": {
+      "cannotDestroy": "This item cannot be destroyed.",
+      "rightClickDestroy": "Right-click to destroy",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",
