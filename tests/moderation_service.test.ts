@@ -33,6 +33,7 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
 
   const kicked: Session[] = [];
   const killed: number[] = [];
+  const frozen: { target: Session; frozen: boolean }[] = [];
   const muted: { accountId: number; untilISO: string; reason: string }[] = [];
   const disconnected: { accountId: number; reason: string }[] = [];
   const notices: { session: Session; text: string }[] = [];
@@ -55,6 +56,7 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
     muteLive: (accountId, untilISO, reason) => muted.push({ accountId, untilISO, reason }),
     disconnect: (accountId, reason) => disconnected.push({ accountId, reason }),
     killEntity: (entityId) => killed.push(entityId),
+    setFrozen: (target, isFrozen) => frozen.push({ target, frozen: isFrozen }),
     enterSpectate: (moderator, target) => spectated.push({ moderator, target }),
     exitSpectate: (moderator) => unspectated.push(moderator),
   };
@@ -64,6 +66,7 @@ function setup(opts: { actor: Session; sessions?: Session[] }) {
     service,
     kicked,
     killed,
+    frozen,
     muted,
     disconnected,
     notices,
@@ -111,6 +114,69 @@ describe('ModerationService', () => {
       'Kicked Player2.',
       'Killed Player2.',
     ]);
+  });
+
+  it('audits freeze and unfreeze before applying the live flag', async () => {
+    const actor = admin(1, 11);
+    const target = player(2, 22);
+    const context = setup({ actor, sessions: [target] });
+
+    expect(context.service.handleChatCommand(actor, '/freeze "Player2" wall clipping')).toBe(true);
+    // The audit write is awaited, so nothing is applied synchronously.
+    expect(context.frozen).toEqual([]);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(context.recordAction).toHaveBeenCalledWith({
+      action: 'freeze',
+      accountId: 22,
+      adminAccountId: 11,
+      reason: 'wall clipping',
+    });
+    expect(context.frozen).toEqual([{ target, frozen: true }]);
+
+    expect(context.service.handleChatCommand(actor, '/unfreeze "Player2"')).toBe(true);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(context.recordAction).toHaveBeenCalledWith({
+      action: 'unfreeze',
+      accountId: 22,
+      adminAccountId: 11,
+      reason: 'No reason specified',
+    });
+    expect(context.frozen).toEqual([
+      { target, frozen: true },
+      { target, frozen: false },
+    ]);
+    expect(context.systemNotices.map((notice) => notice.text)).toEqual([
+      'Froze Player2.',
+      'Unfroze Player2.',
+    ]);
+  });
+
+  it('does not apply freeze when the audit write fails or the target is protected', async () => {
+    const actor = admin(1, 11);
+    const target = player(2, 22);
+    const otherAdmin = admin(3, 33);
+    const context = setup({ actor, sessions: [target, otherAdmin] });
+    context.recordAction.mockRejectedValueOnce(new Error('db down'));
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    context.service.handleChatCommand(actor, '/freeze "Player2" wall clipping');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(context.frozen).toEqual([]);
+    expect(context.systemNotices).toEqual([]);
+    consoleError.mockRestore();
+
+    context.service.handleChatCommand(actor, `/freeze "${otherAdmin.name}" nope`);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(context.frozen).toEqual([]);
+    expect(context.notices.map((notice) => notice.text)).toContain(
+      "You can't moderate that player.",
+    );
   });
 
   it('does not apply kick when the audit write fails', async () => {

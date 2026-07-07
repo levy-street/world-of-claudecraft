@@ -1876,6 +1876,11 @@ const RULES: Rule[] = [
       }),
   },
   { re: /^Banned (.+)\.$/, build: (m) => tServer('moderation.banConfirm', { name: m[1] }) },
+  { re: /^Froze (.+)\.$/, build: (m) => tServer('moderation.freezeConfirm', { name: m[1] }) },
+  {
+    re: /^Unfroze (.+)\.$/,
+    build: (m) => tServer('moderation.unfreezeConfirm', { name: m[1] }),
+  },
   {
     re: /^No online player named '(.+)'\.$/,
     build: (m) => tServer('moderation.spectateNotOnline', { name: m[1] }),

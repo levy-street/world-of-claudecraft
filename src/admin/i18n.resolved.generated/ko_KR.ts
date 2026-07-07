@@ -286,6 +286,8 @@ export const ko_KR: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "채팅이 음소거 해제되었습니다.",
   "moderationHistory.actionForceRename": "강제 이름 바꾸기",
   "moderationHistory.actionNote": "메모",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "기타 조치",
   "characters.sortHint": "정렬하려면 열을 클릭하세요",
   "characters.empty": "아직 캐릭터 없음",

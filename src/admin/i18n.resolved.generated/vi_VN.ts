@@ -286,6 +286,8 @@ export const vi_VN: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Đã bật tiếng trò chuyện",
   "moderationHistory.actionForceRename": "Buộc đổi tên",
   "moderationHistory.actionNote": "Ghi chú",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Hành động khác",
   "characters.sortHint": "nhấp vào một cột để sắp xếp",
   "characters.empty": "chưa có nhân vật nào",

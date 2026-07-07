@@ -286,6 +286,8 @@ export const id_ID: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Obrolan dibunyikan",
   "moderationHistory.actionForceRename": "Ganti nama secara paksa",
   "moderationHistory.actionNote": "Catatan",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Tindakan lainnya",
   "characters.sortHint": "klik sebuah kolom untuk mengurutkan",
   "characters.empty": "belum ada karakter",

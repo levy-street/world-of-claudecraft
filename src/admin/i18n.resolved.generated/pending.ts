@@ -11,6 +11,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -39,6 +41,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "es_ES": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -67,6 +71,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "fr_FR": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -95,6 +101,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "fr_CA": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -124,6 +132,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -152,6 +162,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "de_DE": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -180,6 +192,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "zh_CN": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -208,6 +222,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "zh_TW": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -236,6 +252,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "ko_KR": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -264,6 +282,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "ja_JP": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -292,6 +312,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "pt_BR": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -320,6 +342,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "ru_RU": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -348,6 +372,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "cs_CZ": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -376,6 +402,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "nl_NL": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -404,6 +432,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "pl_PL": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -432,6 +462,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "id_ID": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -460,6 +492,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "tr_TR": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -488,6 +522,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "sv_SE": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -516,6 +552,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "vi_VN": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",
@@ -544,6 +582,8 @@ export const pending: Record<string, readonly string[]> = {
     "tickPerf.title"
   ],
   "da_DK": [
+    "moderationHistory.actionFreeze",
+    "moderationHistory.actionUnfreeze",
     "nav.tickPerf",
     "suspiciousPlayers.evidenceFirstSeen",
     "suspiciousPlayers.evidenceLastSeen",

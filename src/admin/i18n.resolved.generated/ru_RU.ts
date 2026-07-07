@@ -286,6 +286,8 @@ export const ru_RU: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "Чат без звука",
   "moderationHistory.actionForceRename": "Принудительное переименование",
   "moderationHistory.actionNote": "Примечание",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "Другое действие",
   "characters.sortHint": "нажмите на столбец для сортировки",
   "characters.empty": "персонажей пока нет",

@@ -286,6 +286,8 @@ export const en_XA: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "[Çĥáţ úñɱúţéð]",
   "moderationHistory.actionForceRename": "[Ƒóŕçéð ŕéñáɱé]",
   "moderationHistory.actionNote": "[Ñóţé]",
+  "moderationHistory.actionFreeze": "[Ƒŕóžéñ]",
+  "moderationHistory.actionUnfreeze": "[Úñƒŕóžéñ]",
   "moderationHistory.actionUnknown": "[Óţĥéŕ áçţíóñ]",
   "characters.sortHint": "[çļíçķ á çóļúɱñ ţó šóŕţ]",
   "characters.empty": "[ñó çĥáŕáçţéŕš ýéţ]",

@@ -22,13 +22,14 @@ export interface ModerationHost<TSession extends ModerationSession> {
   muteLive(accountId: number, untilISO: string, reason: string): void;
   disconnect(accountId: number, reason: string): void;
   killEntity(entityId: number): void;
+  setFrozen(target: TSession, frozen: boolean): void;
   enterSpectate(moderator: TSession, target: TSession): void;
   exitSpectate(moderator: TSession): void;
 }
 
 export interface ModerationAudit {
   recordAction(input: {
-    action: 'kick' | 'kill';
+    action: 'kick' | 'kill' | 'freeze' | 'unfreeze';
     accountId: number;
     adminAccountId: number;
     reason: string;
@@ -115,6 +116,12 @@ export class ModerationService<TSession extends ModerationSession> {
       case 'suspend':
         this.suspend(actor, command.name, command.minutes, command.reason);
         break;
+      case 'freeze':
+        this.setFrozen(actor, command.name, true, command.reason);
+        break;
+      case 'unfreeze':
+        this.setFrozen(actor, command.name, false, command.reason);
+        break;
       case 'spectate':
         this.spectate(actor, command.name);
         break;
@@ -157,6 +164,26 @@ export class ModerationService<TSession extends ModerationSession> {
         this.host.systemNotice(actor, `Killed ${target.name}.`);
       })
       .catch((err) => logger.error({ err }, 'failed to audit in-game kill'));
+  }
+
+  // Freeze holds a player in place without disconnecting them (session-scoped;
+  // the host flag clears when the session ends). Audited like kick/kill: the
+  // live effect applies only after the audit row lands.
+  private setFrozen(actor: TSession, name: string | null, frozen: boolean, reason: string): void {
+    const target = this.resolveNamedTarget(actor, name);
+    if (!target) return;
+    void this.audit
+      .recordAction({
+        action: frozen ? 'freeze' : 'unfreeze',
+        accountId: target.accountId,
+        adminAccountId: actor.accountId,
+        reason,
+      })
+      .then(() => {
+        this.host.setFrozen(target, frozen);
+        this.host.systemNotice(actor, frozen ? `Froze ${target.name}.` : `Unfroze ${target.name}.`);
+      })
+      .catch((err) => logger.error({ err }, 'failed to audit in-game freeze'));
   }
 
   private mute(actor: TSession, name: string | null, minutes: number | null, reason: string): void {

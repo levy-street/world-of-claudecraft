@@ -231,6 +231,55 @@ describe('in-game moderation actions', () => {
     });
   });
 
+  it('drops a frozen session move frames and restores movement on unfreeze', async () => {
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 70, 170, 'Freezer', 'warrior', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const target = joined(server.join(targetWs, 80, 180, 'Runner', 'rogue', null));
+    const meta = server.sim.meta(target.pid);
+    if (!meta) throw new Error('target meta missing');
+
+    server.handleMessage(target, JSON.stringify({ t: 'input', mi: { f: 1 }, facing: 1.25 }));
+    expect(meta.moveInput.forward).toBe(true);
+
+    command(server, moderator, '/freeze "Runner" wall clipping');
+    await vi.waitFor(() => expect(target.frozen).toBe(true));
+    expect(moderation.recordInGameAction).toHaveBeenCalledWith({
+      action: 'freeze',
+      accountId: 80,
+      adminAccountId: 70,
+      reason: 'wall clipping',
+    });
+    // The key held at freeze time is zeroed, not left drifting.
+    expect(meta.moveInput.forward).toBe(false);
+    // A new move frame is dropped while frozen; facing still applies (mouselook).
+    server.handleMessage(target, JSON.stringify({ t: 'input', mi: { f: 1 }, facing: -0.5 }));
+    expect(meta.moveInput.forward).toBe(false);
+    expect(server.sim.entities.get(target.pid)?.facing).toBe(-0.5);
+    expect(eventTexts(moderatorWs)).toContain('Froze Runner.');
+    expect(eventTexts(targetWs)).toContain('You have been frozen by a moderator.');
+    expect(targetWs.close).not.toHaveBeenCalled();
+
+    command(server, moderator, '/unfreeze "Runner"');
+    await vi.waitFor(() => expect(target.frozen).toBe(false));
+    expect(moderation.recordInGameAction).toHaveBeenCalledWith({
+      action: 'unfreeze',
+      accountId: 80,
+      adminAccountId: 70,
+      reason: 'No reason specified',
+    });
+    server.handleMessage(target, JSON.stringify({ t: 'input', mi: { f: 1 } }));
+    expect(meta.moveInput.forward).toBe(true);
+    expect(eventTexts(moderatorWs)).toContain('Unfroze Runner.');
+    expect(eventTexts(targetWs)).toContain('You can move again.');
+  });
+
   it('rejects old selected-target syntax and protected named targets', async () => {
     const server = new GameServer();
     const playerWs = fakeWs();

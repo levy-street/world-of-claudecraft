@@ -286,6 +286,8 @@ export const zh_TW: AdminTranslations = {
   "moderationHistory.actionChatUnmute": "聊天取消靜音",
   "moderationHistory.actionForceRename": "強制重命名",
   "moderationHistory.actionNote": "筆記",
+  "moderationHistory.actionFreeze": "Frozen",
+  "moderationHistory.actionUnfreeze": "Unfrozen",
   "moderationHistory.actionUnknown": "其他動作",
   "characters.sortHint": "點擊欄位以排序",
   "characters.empty": "尚無角色",

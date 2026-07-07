@@ -468,6 +468,12 @@ export interface ClientSession {
   clientSeed: string;
   // Behavioral bot-detection state. Ephemeral — reset on every join.
   botTrackingContext: BotTrackingContext;
+  // Held in place by a moderator (/freeze). Session-scoped like spectating:
+  // it dies with the session, so a fresh join arrives unfrozen, while a fast
+  // reconnect inside the linkdead grace window resumes the SAME session and
+  // stays frozen (no freeze-evasion by quick relog). Enforced in the 'input'
+  // handler; never sent to or decided by the client.
+  frozen: boolean;
   spectating: {
     characterId: number;
     name: string;
@@ -975,9 +981,25 @@ export class GameServer {
         if (!target || target.dead) return;
         this.sim.dealDamage(null, target, target.maxHp + 1, false, 'physical', null, 'hit', true);
       },
+      setFrozen: (target, frozen) => this.setSessionFrozen(target, frozen),
       enterSpectate: (moderator, target) => this.enterSpectate(moderator, target),
       exitSpectate: (moderator) => this.exitSpectate(moderator),
     };
+  }
+
+  // Flip a session's moderator-freeze flag. Zeroing the held move input matters:
+  // enforcement in the 'input' handler only sees NEW frames, so without this a
+  // key already held at freeze time would keep the character drifting. The
+  // target is told explicitly so the stop does not read as a client hang.
+  private setSessionFrozen(target: ClientSession, frozen: boolean): void {
+    target.frozen = frozen;
+    if (frozen) {
+      const meta = this.sim.meta(target.pid);
+      if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+      this.sendChatNotice(target, 'You have been frozen by a moderator.');
+    } else {
+      this.sendChatNotice(target, 'You can move again.');
+    }
   }
 
   private enterSpectate(moderator: ClientSession, target: ClientSession): void {
@@ -1747,6 +1769,7 @@ export class GameServer {
       adminPermissions: new Set(meta.adminPermissions ?? []),
       clientSeed: meta.clientSeed ?? '',
       botTrackingContext,
+      frozen: false,
       spectating: null,
     };
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
@@ -2617,7 +2640,14 @@ export class GameServer {
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
       const frame = parseMoveInputFrame(msg);
-      Object.assign(meta.moveInput, frame.moveInput);
+      // A moderator-frozen session's movement intent is dropped server-side
+      // (held keys are zeroed rather than left drifting); facing below still
+      // applies so a frozen player can look around.
+      if (session.frozen) {
+        Object.assign(meta.moveInput, emptyMoveInput());
+      } else {
+        Object.assign(meta.moveInput, frame.moveInput);
+      }
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         session.lastInputSeq = Math.max(session.lastInputSeq, Math.floor(msg.seq));
