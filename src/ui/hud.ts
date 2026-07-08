@@ -74,6 +74,7 @@ import type { ResolvedAbility } from '../sim/sim';
 import type {
   AbilityDef,
   CalendarResultCode,
+  DelveCompanionRole,
   EquipSlot,
   InvSlot,
   ItemSlot,
@@ -95,6 +96,7 @@ import {
   FISHING_CAST_ID,
   type ItemDef,
   isQuestTurnInNpc,
+  INTERACT_RANGE,
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
@@ -1143,6 +1145,7 @@ export class Hud {
   private openDelveBoardNpcId: number | null = null;
   private lastDelveTrackerSig = '';
   private selectedDelveTier: 'normal' | 'heroic' = 'normal';
+  private selectedDelveCompanionRole: DelveCompanionRole = 'healer';
   private delveBoardTab: 'delve' | 'shop' = 'delve';
   private delveTrap: FocusTrapHandle | null = null;
   private lockpickTrap: FocusTrapHandle | null = null;
@@ -7244,6 +7247,7 @@ export class Hud {
       this.delveTrap = this.focusManager.open({ root: () => $('#delve-board') });
     this.openDelveBoardNpcId = npcId;
     this.selectedDelveTier = 'normal';
+    this.selectedDelveCompanionRole = 'healer';
     this.delveBoardTab = 'delve';
     this.closeOtherWindows('#delve-board');
     $('#delve-board').style.display = 'block';
@@ -7310,12 +7314,21 @@ export class Hud {
           return `<button type="button" class="delve-tier-btn${selected}" data-tier-pick="${esc(tierId)}" aria-pressed="${this.selectedDelveTier === tierId}">${esc(label)}</button>`;
         })
         .join('');
+      const roleRow = (['healer', 'tank', 'damage'] as const)
+        .map((role) => {
+          const label = t(`delveUi.companionRole.${role}` as TranslationKey);
+          const selected = this.selectedDelveCompanionRole === role ? ' selected' : '';
+          return `<button type="button" class="delve-role-btn${selected}" data-companion-role-pick="${esc(role)}" aria-pressed="${this.selectedDelveCompanionRole === role}">${esc(label)}</button>`;
+        })
+        .join('');
       body =
         `<div class="delve-board-greeting">${esc(t(delve.id === 'drowned_litany' ? 'delveUi.npc.halvenMarsh.greeting' : 'delveUi.npc.halven.greeting', { playerName: this.sim.player.name }))}</div>` +
         `<div class="delve-tier-row">${tierRow}</div>` +
         `<div class="delve-companion-row"><div class="delve-companion-label">${esc(t('delveUi.board.companion.pick'))}</div>` +
         `<div class="delve-companion-name">${esc(companionName)} <span class="quest-muted">(${esc(companionRankLabel)})</span></div>` +
         `<div class="delve-companion-boon quest-muted">${esc(t('delveUi.board.companion.boon'))}</div>` +
+        `<div class="delve-companion-role-label">${esc(t('delveUi.board.companion.roleLabel'))}</div>` +
+        `<div class="delve-role-row">${roleRow}</div>` +
         `${companionAction}</div>` +
         `<button type="button" class="btn delve-enter-btn" data-delve-enter aria-label="${esc(t('delveUi.board.enterAria', { delve: delveName, tier: this.selectedDelveTier === 'heroic' ? tierHeroic : tierNormal }))}"${canEnter ? '' : ' disabled'}>${esc(t('delveUi.board.enter'))}</button>`;
     }
@@ -7344,6 +7357,13 @@ export class Hud {
           this.renderDelveBoard(true);
         });
       });
+      el.querySelectorAll('[data-companion-role-pick]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          this.selectedDelveCompanionRole = (btn as HTMLElement).dataset
+            .companionRolePick as DelveCompanionRole;
+          this.renderDelveBoard(true);
+        });
+      });
       el.querySelector('[data-companion-upgrade]')?.addEventListener('click', (ev) => {
         const btn = ev.currentTarget as HTMLElement;
         const id = btn.dataset.companionUpgrade;
@@ -7353,7 +7373,7 @@ export class Hud {
       });
       el.querySelector('[data-delve-enter]')?.addEventListener('click', () => {
         const tierId = this.selectedDelveTier;
-        this.sim.enterDelve(delve.id, tierId);
+        this.sim.enterDelve(delve.id, tierId, this.selectedDelveCompanionRole);
         // enterDelve queues delveEntered for the next sim tick; kick interior
         // prebuild now so the first rendered frame is not a fog void.
         this.renderer.handleEvent({ type: 'delveEntered', delveId: delve.id, tierId });
@@ -7630,6 +7650,41 @@ export class Hud {
     return t(`delveUi.affix.${affixId}` as TranslationKey);
   }
 
+  private delveCompanionRoleLabel(role: DelveCompanionRole | string | null | undefined): string {
+    const normalized: DelveCompanionRole =
+      role === 'tank' || role === 'damage' || role === 'healer' ? role : 'healer';
+    return t(`delveUi.companionRole.${normalized}` as TranslationKey);
+  }
+
+  private nearbyDelveShortcutPrompt(): string {
+    const p = this.sim.player;
+    if (p.dead) return '';
+    let bestTemplate = '';
+    let bestD = INTERACT_RANGE + 1;
+    for (const e of this.sim.entities.values()) {
+      if (e.kind !== 'object') continue;
+      const activeShortcut =
+        e.templateId === 'delve_mining_cracked_wall' ||
+        e.templateId === 'delve_herbalism_toxic_growth';
+      if (!activeShortcut) continue;
+      const d = dist2d(p.pos, e.pos);
+      if (d < bestD) {
+        bestD = d;
+        bestTemplate = e.templateId;
+      }
+    }
+    if (!bestTemplate) return '';
+    const skill = this.sim.gatheringProficiency;
+    if (bestTemplate === 'delve_mining_cracked_wall') {
+      return (skill.mining ?? 0) > 0
+        ? t('delveUi.shortcut.miningReady')
+        : t('delveUi.shortcut.miningFallback');
+    }
+    return (skill.herbalism ?? 0) > 0
+      ? t('delveUi.shortcut.herbalismReady')
+      : t('delveUi.shortcut.herbalismFallback');
+  }
+
   private updateDelveTracker(): void {
     const el = $('#delve-tracker');
     const run = this.sim.delveRun;
@@ -7648,6 +7703,8 @@ export class Hud {
     // interest-scoped to the apse, so a party member elsewhere in the delve
     // relies on this wire-state check instead.
     if (run.rite && run.rite.phase !== 'choose') this.closeRitePanel(false);
+    const companionRole = this.sim.companionState?.role ?? run.companionRole;
+    const shortcutPrompt = this.nearbyDelveShortcutPrompt();
     const sig = JSON.stringify([
       run.delveId,
       run.tierId,
@@ -7659,6 +7716,8 @@ export class Hud {
       run.completed,
       run.exitPortalOpen,
       run.rite,
+      companionRole,
+      shortcutPrompt,
       this.sim.delveMarks,
     ]);
     if (sig === this.lastDelveTrackerSig) return;
@@ -7674,6 +7733,9 @@ export class Hud {
       total: formatNumber(run.moduleCount, { maximumFractionDigits: 0 }),
     });
     const objectiveLine = this.delveObjectiveLine(run);
+    const companionRoleLine = t('delveUi.tracker.companionRole', {
+      role: this.delveCompanionRoleLabel(companionRole),
+    });
     const complete =
       run.objective.complete || run.completed
         ? ` <span class="quest-complete">(${esc(t('delveUi.tracker.complete'))})</span>`
@@ -7713,13 +7775,18 @@ export class Hud {
         exitHint = `<div class="dt-obj dt-hint">${esc(t('delveUi.tracker.exitHintLocked'))}</div>`;
       }
     }
+    const shortcutHint = shortcutPrompt
+      ? `<div class="dt-obj dt-hint dt-shortcut">-> ${esc(shortcutPrompt)}</div>`
+      : '';
     el.innerHTML =
       `<div class="dt-header">${esc(t('delveUi.tracker.title'))}</div>` +
       `<div class="dt-title">${esc(delveName)} <span class="dt-tier">${esc(tierLabel)}</span>${complete}</div>` +
       `<div class="dt-obj">- ${esc(moduleLine)}${modName ? `: ${esc(modName)}` : ''}</div>` +
+      `<div class="dt-obj">- ${esc(companionRoleLine)}</div>` +
       `<div class="dt-obj${run.objective.complete ? ' done' : ''}">- ${esc(t('delveUi.tracker.objective'))}: ${esc(objectiveLine)}</div>` +
       riteHint +
       exitHint +
+      shortcutHint +
       `<div class="dt-obj">- ${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
       affixHtml;
     el.querySelectorAll('.dt-affix-icon').forEach((icon) => {

@@ -92,6 +92,123 @@ function killPlayer(sim: Sim) {
   );
 }
 
+function spawnReliquaryShortcutModule(
+  sim: Sim,
+  moduleId: 'reliquary_bell_niche' | 'reliquary_saintless_hall',
+) {
+  enterReliquary(sim);
+  const run = sim.delveRunForPlayer(sim.playerId)!;
+  run.modules = [moduleId, 'reliquary_finale'];
+  run.moduleIndex = 0;
+  (sim as any).spawnDelveModule(run);
+  return run;
+}
+
+function findEntityByTemplate(sim: Sim, templateId: string) {
+  return [...sim.entities.values()].find((e) => e.templateId === templateId);
+}
+
+describe('delve profession shortcuts', () => {
+  it('Mining opens the cracked-wall shortcut immediately when proficient', () => {
+    const sim = makeSim();
+    const meta = (sim as any).players.get(sim.playerId);
+    meta.gatheringProficiency.mining = 1;
+    const run = spawnReliquaryShortcutModule(sim, 'reliquary_bell_niche');
+    const wall = findEntityByTemplate(sim, 'delve_mining_cracked_wall')!;
+    expect(wall).toBeDefined();
+    teleport(sim, wall.pos.x, wall.pos.z);
+
+    sim.delveInteract(wall.id);
+
+    expect(run.objectState[wall.id].open).toBe(true);
+    expect(run.objectState[wall.id].triggered).toBe(true);
+  });
+
+  it('Mining shortcut has a slower non-profession fallback', () => {
+    const sim = makeSim();
+    const run = spawnReliquaryShortcutModule(sim, 'reliquary_bell_niche');
+    const wall = findEntityByTemplate(sim, 'delve_mining_cracked_wall')!;
+    expect(wall).toBeDefined();
+    teleport(sim, wall.pos.x, wall.pos.z);
+
+    sim.delveInteract(wall.id);
+    expect(run.objectState[wall.id].open).toBe(false);
+    sim.delveInteract(wall.id);
+    expect(run.objectState[wall.id].open).toBe(false);
+    sim.delveInteract(wall.id);
+
+    expect(run.objectState[wall.id].open).toBe(true);
+    expect(run.objectState[wall.id].triggered).toBe(true);
+  });
+
+  it('Herbalism cleanses the toxic-growth shortcut immediately when proficient', () => {
+    const sim = makeSim();
+    const meta = (sim as any).players.get(sim.playerId);
+    meta.gatheringProficiency.herbalism = 1;
+    const run = spawnReliquaryShortcutModule(sim, 'reliquary_saintless_hall');
+    const growth = findEntityByTemplate(sim, 'delve_herbalism_toxic_growth')!;
+    expect(growth).toBeDefined();
+    teleport(sim, growth.pos.x, growth.pos.z);
+
+    sim.delveInteract(growth.id);
+
+    expect(run.objectState[growth.id].open).toBe(true);
+    expect(run.objectState[growth.id].triggered).toBe(true);
+  });
+
+  it('Herbalism shortcut has a slower non-profession fallback', () => {
+    const sim = makeSim();
+    const run = spawnReliquaryShortcutModule(sim, 'reliquary_saintless_hall');
+    const growth = findEntityByTemplate(sim, 'delve_herbalism_toxic_growth')!;
+    expect(growth).toBeDefined();
+    teleport(sim, growth.pos.x, growth.pos.z);
+
+    sim.delveInteract(growth.id);
+    expect(run.objectState[growth.id].open).toBe(false);
+    sim.delveInteract(growth.id);
+    expect(run.objectState[growth.id].open).toBe(false);
+    sim.delveInteract(growth.id);
+
+    expect(run.objectState[growth.id].open).toBe(true);
+    expect(run.objectState[growth.id].triggered).toBe(true);
+  });
+
+  it('shortcut interactions are denied while dead or out of range', () => {
+    const sim = makeSim();
+    const meta = (sim as any).players.get(sim.playerId);
+    meta.gatheringProficiency.mining = 1;
+    const run = spawnReliquaryShortcutModule(sim, 'reliquary_bell_niche');
+    const wall = findEntityByTemplate(sim, 'delve_mining_cracked_wall')!;
+    expect(wall).toBeDefined();
+
+    teleport(sim, wall.pos.x + 20, wall.pos.z);
+    sim.delveInteract(wall.id);
+    expect(run.objectState[wall.id].open).toBe(false);
+
+    teleport(sim, wall.pos.x, wall.pos.z);
+    sim.player.dead = true;
+    sim.player.hp = 0;
+    sim.delveInteract(wall.id);
+    expect(run.objectState[wall.id].open).toBe(false);
+  });
+
+  it('the current module exit can open without using a profession shortcut', () => {
+    const sim = makeSim();
+    const run = spawnReliquaryShortcutModule(sim, 'reliquary_bell_niche');
+    const wall = findEntityByTemplate(sim, 'delve_mining_cracked_wall')!;
+    expect(wall).toBeDefined();
+    for (const id of [...run.mobIds]) {
+      sim.entities.delete(id);
+    }
+    run.mobIds = [];
+
+    sim.tick();
+
+    expect(run.objectState[wall.id].open).toBe(false);
+    expect(run.exitPortalOpen).toBe(true);
+  });
+});
+
 describe('delve spatial band', () => {
   it('DELVE_X_MIN is past the arena band', () => {
     expect(DELVE_X_MIN).toBeGreaterThan(ARENA_X);

@@ -3385,6 +3385,12 @@ export const id_ID: EnTranslations = {
       "graveSilent": "Kuburan itu sunyi untuk sekarang.",
       "doorLocked": "Pintu itu terkunci.",
       "strikeWall": "Pukul dinding untuk menerobos.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Tidak terjadi apa-apa.",
       "unknownCompanion": "Pendamping tak dikenal.",
       "companionMaxRank": "Pendamping ini sudah ditingkatkan sepenuhnya.",
@@ -3508,6 +3514,7 @@ export const id_ID: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Tingkat {rank}",
         "boon": "Menyembuhkan party di antara pertarungan. Peringkat 3 menghidupkan kembali sekutu yang tumbang sekali per penjelajahan.",
+        "roleLabel": "Companion role",
         "upgrade": "Tingkatkan ke Tingkat {rank} ({marks} Tanda)",
         "upgradeAria": "Tingkatkan {name} ke tingkat {rank} seharga {marks} Tanda Delve",
         "maxRank": "Telah ditingkatkan penuh"
@@ -3528,6 +3535,7 @@ export const id_ID: EnTranslations = {
       "objective": "Sasaran",
       "module": "Modul {current} dari {total}",
       "affix": "Afiks",
+      "companionRole": "Companion role: {role}",
       "complete": "Selesai",
       "marks": "Tanda Delve: {count}",
       "exitHintOpen": "Masuki lorong batu nisan (utara)",
@@ -3536,6 +3544,17 @@ export const id_ID: EnTranslations = {
       "ritePlayback": "Perhatikan altar-altar itu: hafalkan urutan menyalanya",
       "riteInput": "Tekan F di setiap altar sesuai urutan menyalanya ({current}/{total})",
       "riteOpen": "Relikuari terbuka: tekan F padanya untuk mengambil jarahanmu"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Bunuh {boss}",
@@ -3597,7 +3616,9 @@ export const id_ID: EnTranslations = {
       "sluice_valve": "Katup Pintu Air",
       "grave_tablet": "Prasasti Kubur",
       "corpse_candle": "Lilin Mayat",
-      "bell_rope": "Tali Lonceng"
+      "bell_rope": "Tali Lonceng",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

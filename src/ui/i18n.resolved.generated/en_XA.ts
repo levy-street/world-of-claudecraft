@@ -3385,6 +3385,12 @@ export const en_XA: EnTranslations = {
       "graveSilent": "[Ţĥé ĝŕáʋé íš šíļéñţ ƒóŕ ñóŵ.]",
       "doorLocked": "[Ţĥé ðóóŕ íš ļóçķéð.]",
       "strikeWall": "[Šţŕíķé ţĥé ŵáļļ ţó ƀŕéáķ ţĥŕóúĝĥ.]",
+      "miningShortcut": "[Ɱíñíñĝ ƒíñðš ţĥé ƒáúļţ. Ţĥé çŕáçķéð ŵáļļ óþéñš.]",
+      "miningShortcutFallback": "[Ýóú çĥíþ áţ ţĥé çŕáçķéð ŵáļļ. Ɱíñíñĝ ŵóúļð óþéñ íţ ƒášţéŕ.]",
+      "miningShortcutFallbackComplete": "[Ţĥé çŕáçķéð ŵáļļ ĝíʋéš ŵáý áƒţéŕ šţéáðý ƀļóŵš.]",
+      "herbalismShortcut": "[Ĥéŕƀáļíšɱ ŵíţĥéŕš ţĥé ţóẋíç ĝŕóŵţĥ ƀéƒóŕé íţ šþŕéáðš.]",
+      "herbalismShortcutFallback": "[Ýóú ƀéáţ ƀáçķ ţĥé ţóẋíç ĝŕóŵţĥ. Ĥéŕƀáļíšɱ ŵóúļð çļéáñšé íţ ƒášţéŕ.]",
+      "herbalismShortcutFallbackComplete": "[Ţĥé ţóẋíç ĝŕóŵţĥ çóļļáþšéš áƒţéŕ šţéáðý çļéáŕíñĝ.]",
       "nothingHappens": "[Ñóţĥíñĝ ĥáþþéñš.]",
       "unknownCompanion": "[Úñķñóŵñ çóɱþáñíóñ.]",
       "companionMaxRank": "[Ţĥíš çóɱþáñíóñ íš áļŕéáðý ƒúļļý úþĝŕáðéð.]",
@@ -3508,6 +3514,7 @@ export const en_XA: EnTranslations = {
         "edda": "[Éððá Ŕééðĥáñð]",
         "rank": "[Ŕáñķ {rank}]",
         "boon": "[Ĥéáļš ţĥé þáŕţý ƀéţŵééñ ƒíĝĥţš. Ŕáñķ 3 ŕéʋíʋéš á ƒáļļéñ áļļý óñçé þéŕ ŕúñ.]",
+        "roleLabel": "[Çóɱþáñíóñ ŕóļé]",
         "upgrade": "[Úþĝŕáðé ţó Ŕáñķ {rank} ({marks} Ɱáŕķš)]",
         "upgradeAria": "[Úþĝŕáðé {name} ţó ŕáñķ {rank} ƒóŕ {marks} Ðéļʋé Ɱáŕķš]",
         "maxRank": "[Ƒúļļý úþĝŕáðéð]"
@@ -3528,6 +3535,7 @@ export const en_XA: EnTranslations = {
       "objective": "[Óƀĵéçţíʋé]",
       "module": "[Ɱóðúļé {current} óƒ {total}]",
       "affix": "[Áƒƒíẋéš]",
+      "companionRole": "[Çóɱþáñíóñ ŕóļé: {role}]",
       "complete": "[Çóɱþļéţé]",
       "marks": "[Ðéļʋé Ɱáŕķš: {count}]",
       "exitHintOpen": "[Ŵáļķ íñţó ţĥé ţóɱƀšţóñé þáššáĝé (ñóŕţĥ)]",
@@ -3536,6 +3544,17 @@ export const en_XA: EnTranslations = {
       "ritePlayback": "[Ŵáţçĥ ţĥé šĥŕíñéš: ɱéɱóŕížé ţĥé óŕðéŕ ţĥéý ļíĝĥţ úþ]",
       "riteInput": "[Þŕéšš Ƒ áţ éáçĥ šĥŕíñé íñ ţĥé óŕðéŕ ţĥéý ļíţ ({current}/{total})]",
       "riteOpen": "[Ţĥé ŕéļíɋúáŕý íš óþéñ: þŕéšš Ƒ óñ íţ ţó çļáíɱ ýóúŕ šþóíļš]"
+    },
+    "companionRole": {
+      "healer": "[Ĥéáļéŕ]",
+      "tank": "[Ţáñķ]",
+      "damage": "[Ðáɱáĝé]"
+    },
+    "shortcut": {
+      "miningReady": "[Ɱíñíñĝ: óþéñ ţĥé çŕáçķéð ŵáļļ]",
+      "miningFallback": "[Šĥóŕţçúţ: çĥíþ ţĥŕóúĝĥ ţĥé çŕáçķéð ŵáļļ]",
+      "herbalismReady": "[Ĥéŕƀáļíšɱ: çļéáñšé ţĥé ţóẋíç ĝŕóŵţĥ]",
+      "herbalismFallback": "[Šĥóŕţçúţ: çļéáŕ ţĥé ţóẋíç ĝŕóŵţĥ]"
     },
     "objective": {
       "kill_boss": "[Šļáý {boss}]",
@@ -3597,7 +3616,9 @@ export const en_XA: EnTranslations = {
       "sluice_valve": "[Šļúíçé Ʋáļʋé]",
       "grave_tablet": "[Ĝŕáʋé Ţáƀļéţ]",
       "corpse_candle": "[Çóŕþšé-Çáñðļé]",
-      "bell_rope": "[Ɓéļļ Ŕóþé]"
+      "bell_rope": "[Ɓéļļ Ŕóþé]",
+      "mining_cracked_wall": "[Çŕáçķéð Ŵáļļ]",
+      "herbalism_toxic_growth": "[Ţóẋíç Ĝŕóŵţĥ]"
     },
     "companion": {
       "barkLine": "[{name}: {line}]",

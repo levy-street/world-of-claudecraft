@@ -45,6 +45,7 @@ import {
   delveModuleEntry as delveLayoutEntry,
 } from '../delve_layout';
 import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
+import type { GatheringProfessionId } from '../content/professions';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
@@ -55,8 +56,10 @@ import type { SimContext } from '../sim_context';
 import {
   DELVE_COMPANION_MAX_RANK,
   DELVE_PLATE_RADIUS,
+  type DelveCompanionRole,
   type DelveDef,
   type DelveModuleDef,
+  type DelveObjectState,
   type DelveRun,
   DT,
   dist2d,
@@ -66,6 +69,7 @@ import {
   type RiteIntensity,
   type Vec3,
 } from '../types';
+import { normalizeDelveCompanionRole } from './companion';
 import {
   clearDrownedLitanyBossState,
   initDrownedLitanyBossState,
@@ -102,6 +106,37 @@ const DELVE_BLACKWATER_PCT_NORMAL = 0.04;
 const DELVE_BLACKWATER_PCT_HEROIC = 0.08;
 const DELVE_RAISE_DEAD_CHANNEL = 5;
 const DELVE_EXIT_PORTAL_RADIUS = 3.5;
+
+interface DelveProfessionShortcutDef {
+  professionId: GatheringProfessionId;
+  fallbackSteps: number;
+  openedTemplateId: string;
+  openedName: string;
+  professionText: string;
+  fallbackText: string;
+  fallbackCompleteText: string;
+}
+
+const DELVE_PROFESSION_SHORTCUTS: Partial<Record<string, DelveProfessionShortcutDef>> = {
+  mining_cracked_wall: {
+    professionId: 'mining',
+    fallbackSteps: 3,
+    openedTemplateId: 'delve_mining_cracked_wall_open',
+    openedName: 'Opened Cracked Wall',
+    professionText: 'Mining finds the fault. The cracked wall opens.',
+    fallbackText: 'You chip at the cracked wall. Mining would open it faster.',
+    fallbackCompleteText: 'The cracked wall gives way after steady blows.',
+  },
+  herbalism_toxic_growth: {
+    professionId: 'herbalism',
+    fallbackSteps: 3,
+    openedTemplateId: 'delve_herbalism_toxic_growth_cleansed',
+    openedName: 'Cleansed Growth',
+    professionText: 'Herbalism withers the toxic growth before it spreads.',
+    fallbackText: 'You beat back the toxic growth. Herbalism would cleanse it faster.',
+    fallbackCompleteText: 'The toxic growth collapses after steady clearing.',
+  },
+};
 export const DELVE_MODULE_NAMES: Record<string, string> = {
   reliquary_sunken_ossuary: 'The Sunken Ossuary',
   reliquary_bell_niche: 'The Bell Niche',
@@ -235,7 +270,8 @@ export function clampDelveDoors(
     )
       solidR = DELVE_CHEST_SOLID_R;
     else if (state.kind === 'cracked_grave') solidR = DELVE_GRAVE_SOLID_R;
-    else if (state.kind === 'destructible_wall') solidR = obj.hp > 0 ? DELVE_WALL_SOLID_R : 0;
+    else if (state.kind === 'destructible_wall' || state.kind === 'mining_cracked_wall')
+      solidR = obj.hp > 0 ? DELVE_WALL_SOLID_R : 0;
     if (solidR <= 0) continue;
     const dx = x - obj.pos.x,
       dz = z - obj.pos.z;
@@ -338,7 +374,17 @@ export function canEnterDelve(ctx: SimContext, pid: number): string | null {
   return null;
 }
 
-export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid?: number): void {
+export function enterDelve(
+  ctx: SimContext,
+  delveId: string,
+  tierId: string,
+  pidOrRole?: number | DelveCompanionRole,
+  companionRoleArg?: DelveCompanionRole,
+): void {
+  const pid = typeof pidOrRole === 'number' ? pidOrRole : undefined;
+  const companionRole = normalizeDelveCompanionRole(
+    typeof pidOrRole === 'string' ? pidOrRole : companionRoleArg,
+  );
   const r = ctx.resolve(pid);
   const delve = DELVES[delveId];
   if (!r || !delve) return;
@@ -396,7 +442,8 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   p.autoAttack = false;
   run.emptyFor = 0;
   if (key.startsWith('solo:') && delve.autoCompanionId && !run.companion) {
-    ctx.spawnDelveCompanion(run, r.meta.entityId, delve.autoCompanionId);
+    run.companionRole = companionRole;
+    ctx.spawnDelveCompanion(run, r.meta.entityId, delve.autoCompanionId, companionRole);
   }
   ctx.emit({ type: 'log', text: delve.enterText, color: '#b9f', pid: r.meta.entityId });
   ctx.emit({ type: 'delveEntered', delveId, tierId, pid: r.meta.entityId });
@@ -449,6 +496,7 @@ export function claimDelveRun(
   run.emptyFor = 0;
   run.deathsThisRun = {};
   run.objectState = {};
+  run.companionRole = 'healer';
   run.raiseDeadChannel = null;
   run.restlessPending = [];
   run.badAirTimer = 0;
@@ -565,6 +613,7 @@ export function freeDelveRun(ctx: SimContext, run: DelveRun): void {
   run.emptyFor = 0;
   run.deathsThisRun = {};
   run.objectState = {};
+  run.companionRole = 'healer';
   run.raiseDeadChannel = null;
   run.restlessPending = [];
   run.badAirTimer = 0;
@@ -850,6 +899,8 @@ export function createDelveObject(ctx: SimContext, run: DelveRun, kind: string, 
     locked_door: 'Locked Door',
     cracked_grave: 'Cracked Grave',
     destructible_wall: 'Cracked Wall',
+    mining_cracked_wall: 'Cracked Wall',
+    herbalism_toxic_growth: 'Toxic Growth',
     module_exit: 'Sealed Passage',
     reward_chest: 'Reliquary Chest',
     locked_chest: 'Warded Reliquary Chest',
@@ -860,14 +911,29 @@ export function createDelveObject(ctx: SimContext, run: DelveRun, kind: string, 
     rite_shrine_skull: 'Skull Shrine',
     surface_exit: 'Ascend to the Surface',
   };
-  const maxHp = kind === 'destructible_wall' ? 80 : 1;
+  const maxHp =
+    kind === 'destructible_wall'
+      ? 80
+      : kind === 'mining_cracked_wall'
+        ? 60
+        : kind === 'herbalism_toxic_growth'
+          ? 40
+          : 1;
   const obj = createGroundObject(ctx.nextId++, '', names[kind] ?? kind, pos);
   obj.templateId = `delve_${kind}`;
   obj.maxHp = maxHp;
   obj.hp = maxHp;
-  obj.lootable = kind === 'cracked_grave' || kind === 'destructible_wall' || kind === 'module_exit';
+  obj.lootable =
+    kind === 'cracked_grave' ||
+    kind === 'destructible_wall' ||
+    kind === 'mining_cracked_wall' ||
+    kind === 'herbalism_toxic_growth' ||
+    kind === 'module_exit';
   const startOpen =
-    kind !== 'locked_door' && kind !== 'locked_chest' && kind !== 'drowned_reliquary';
+    kind !== 'locked_door' &&
+    kind !== 'locked_chest' &&
+    kind !== 'drowned_reliquary' &&
+    !DELVE_PROFESSION_SHORTCUTS[kind];
   run.objectState[obj.id] = {
     kind,
     triggered: false,
@@ -875,6 +941,7 @@ export function createDelveObject(ctx: SimContext, run: DelveRun, kind: string, 
     maxHp,
     linkIds: [],
     open: startOpen,
+    ...(DELVE_PROFESSION_SHORTCUTS[kind] ? { shortcutProgress: 0 } : {}),
   };
   run.objectIds.push(obj.id);
   ctx.addEntity(obj);
@@ -1258,11 +1325,69 @@ export function startDelveRaiseDeadChannel(
   return true;
 }
 
+function completeDelveProfessionShortcut(
+  ctx: SimContext,
+  obj: Entity,
+  state: DelveObjectState,
+  shortcut: DelveProfessionShortcutDef,
+  pid: number,
+  text: string,
+): void {
+  state.open = true;
+  state.triggered = true;
+  state.hp = 0;
+  state.shortcutProgress = shortcut.fallbackSteps;
+  obj.hp = 0;
+  obj.templateId = shortcut.openedTemplateId;
+  obj.name = shortcut.openedName;
+  ctx.emit({ type: 'log', text, color: '#8f8', pid });
+}
+
+function interactDelveProfessionShortcut(
+  ctx: SimContext,
+  obj: Entity,
+  state: DelveObjectState,
+  meta: PlayerMeta,
+): boolean {
+  const shortcut = DELVE_PROFESSION_SHORTCUTS[state.kind];
+  if (!shortcut || state.open) return false;
+  const skill = meta.gatheringProficiency[shortcut.professionId] ?? 0;
+  if (skill > 0) {
+    completeDelveProfessionShortcut(
+      ctx,
+      obj,
+      state,
+      shortcut,
+      meta.entityId,
+      shortcut.professionText,
+    );
+    return true;
+  }
+  state.shortcutProgress = Math.min(shortcut.fallbackSteps, (state.shortcutProgress ?? 0) + 1);
+  if (state.shortcutProgress >= shortcut.fallbackSteps) {
+    completeDelveProfessionShortcut(
+      ctx,
+      obj,
+      state,
+      shortcut,
+      meta.entityId,
+      shortcut.fallbackCompleteText,
+    );
+    return true;
+  }
+  ctx.emit({ type: 'log', text: shortcut.fallbackText, color: '#cc9', pid: meta.entityId });
+  return true;
+}
+
 // ----- interact + reward delivery --------------------------------------------
 
 export function delveInteract(ctx: SimContext, objectId: number, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
+  if (r.e.dead) {
+    ctx.error(r.meta.entityId, "You can't do that while dead.");
+    return;
+  }
   let run = delveRunForPlayer(ctx, r.meta.entityId);
   if (!run) {
     run = ctx.delveRuns.find((d) => d.partyKey !== null && d.objectIds.includes(objectId)) ?? null;
@@ -1310,6 +1435,7 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
     ctx.error(r.meta.entityId, 'Strike the wall to break through.');
     return;
   }
+  if (interactDelveProfessionShortcut(ctx, obj, state, r.meta)) return;
   if (state.kind === 'bell_rope') {
     // Deliberate pull, the one litany puzzle that is an F-interact rather than
     // a walk-on trigger. An already-pulled rope falls through to the generic
@@ -1599,6 +1725,7 @@ export function delveCompanionWire(ctx: SimContext, pid: number): DelveCompanion
   return {
     companionId: run.companion.companionId,
     entityId: e.id,
+    role: run.companion.role,
     rank: ctx.players.get(pid)?.companionUpgrades[run.companion.companionId] ?? 1,
     hp: e.hp,
     maxHp: e.maxHp,
@@ -1630,6 +1757,7 @@ export function delveRunWire(ctx: SimContext, pid: number): object | null {
     modules: run.modules,
     objective: run.objective,
     affixes: run.affixes,
+    companionRole: run.companion?.role ?? run.companionRole,
     completed: run.completed,
     exitPortalOpen: run.exitPortalOpen,
     bountiful: run.bountiful,

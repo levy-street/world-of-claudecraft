@@ -16,6 +16,11 @@ function teleport(sim: Sim, x: number, z: number) {
   p.prevPos = { ...p.pos };
 }
 
+function activeCompanion(sim: Sim) {
+  const run = sim.delveRunForPlayer(sim.playerId)!;
+  return sim.entities.get(run.companion!.entityId)!;
+}
+
 describe('delve companions', () => {
   it('solo enter spawns Acolyte Tessa', () => {
     const sim = makeSim();
@@ -24,7 +29,95 @@ describe('delve companions', () => {
     sim.enterDelve('collapsed_reliquary', 'normal');
     const run = sim.delveRunForPlayer(sim.playerId)!;
     expect(run.companion?.companionId).toBe('companion_tessa');
+    expect(run.companion?.role).toBe('healer');
     expect(sim.companionState?.companionId).toBe('companion_tessa');
+    expect(sim.companionState?.role).toBe('healer');
+  });
+
+  it('role selection is active-run only and keeps the purchased companion rank', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    const meta = (sim as any).players.get(sim.playerId);
+    meta.companionUpgrades.companion_tessa = 3;
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal', 'damage');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    expect(run.companion?.role).toBe('damage');
+    expect(sim.companionState?.role).toBe('damage');
+    expect(sim.companionState?.rank).toBe(3);
+
+    sim.leaveDelve();
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    expect(sim.delveRunForPlayer(sim.playerId)!.companion?.role).toBe('healer');
+    expect(sim.companionState?.rank).toBe(3);
+  });
+
+  it('tank role gains durability and taunts the active enemy', () => {
+    const healerSim = makeSim();
+    healerSim.setPlayerLevel(12);
+    teleport(healerSim, 0, 0);
+    healerSim.enterDelve('collapsed_reliquary', 'normal');
+    const healer = activeCompanion(healerSim);
+
+    const sim = makeSim();
+    sim.setPlayerLevel(12);
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal', 'tank');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['reliquary_sunken_ossuary'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const tank = activeCompanion(sim);
+    expect(run.companion?.role).toBe('tank');
+    expect(tank.maxHp).toBeGreaterThan(healer.maxHp);
+    expect(tank.stats.armor).toBeGreaterThan(healer.stats.armor);
+
+    const mob = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.hostile && e.templateId !== tank.templateId,
+    )!;
+    expect(mob).toBeDefined();
+    sim.player.targetId = mob.id;
+    mob.threat.set(sim.playerId, 40);
+    mob.aggroTargetId = sim.playerId;
+    mob.aiState = 'attack';
+    tank.pos = { ...mob.pos };
+    tank.prevPos = { ...tank.pos };
+    tank.swingTimer = 999;
+    (tank as any).companionTauntTimer = 0;
+
+    updateDelveCompanion((sim as any).ctx, tank);
+
+    expect(mob.forcedTargetId).toBe(tank.id);
+    expect(mob.aggroTargetId).toBe(tank.id);
+    expect(mob.threat.get(tank.id)).toBeGreaterThanOrEqual(mob.threat.get(sim.playerId)!);
+  });
+
+  it('damage role deals harder hits than healer and does not pulse-heal', () => {
+    const healerSim = makeSim();
+    healerSim.setPlayerLevel(12);
+    teleport(healerSim, 0, 0);
+    healerSim.enterDelve('collapsed_reliquary', 'normal');
+    const healer = activeCompanion(healerSim);
+
+    const sim = makeSim();
+    sim.setPlayerLevel(12);
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal', 'damage');
+    const damage = activeCompanion(sim);
+    expect(sim.delveRunForPlayer(sim.playerId)!.companion?.role).toBe('damage');
+    expect(damage.weapon.max).toBeGreaterThan(healer.weapon.max);
+
+    for (const [id, e] of [...sim.entities]) {
+      if (e.kind === 'mob' && e.hostile) sim.entities.delete(id);
+    }
+    sim.player.hp = Math.max(1, Math.round(sim.player.maxHp * 0.5));
+    const before = sim.player.hp;
+    damage.pos = { ...sim.player.pos };
+    damage.prevPos = { ...damage.pos };
+    damage.wanderTimer = 0;
+    updateDelveCompanion((sim as any).ctx, damage);
+    expect(sim.player.hp).toBe(before);
   });
 
   it('companion level scales with purchased rank (50/75/100% of owner level)', () => {

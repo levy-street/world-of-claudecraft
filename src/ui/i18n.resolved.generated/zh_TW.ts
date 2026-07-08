@@ -3385,6 +3385,12 @@ export const zh_TW: EnTranslations = {
       "graveSilent": "墳墓暫時靜默了。",
       "doorLocked": "門被鎖住了。",
       "strikeWall": "攻擊牆面以破牆而過。",
+      "miningShortcut": "採礦找到了裂縫。裂牆打開了。",
+      "miningShortcutFallback": "你鑿擊裂牆。採礦能更快打開它。",
+      "miningShortcutFallbackComplete": "持續敲打後，裂牆終於坍開。",
+      "herbalismShortcut": "草藥學讓毒性蔓生迅速枯萎。",
+      "herbalismShortcutFallback": "你清退毒性蔓生。草藥學能更快淨化它。",
+      "herbalismShortcutFallbackComplete": "持續清理後，毒性蔓生塌落。",
       "nothingHappens": "沒有任何事發生。",
       "unknownCompanion": "未知的同伴。",
       "companionMaxRank": "這名同伴已完全升級。",
@@ -3508,6 +3514,7 @@ export const zh_TW: EnTranslations = {
         "edda": "艾達·蘆手",
         "rank": "第 {rank} 階",
         "boon": "在戰鬥間隙治療隊伍。3級時每次秘探可復活一名倒下的隊友一次。",
+        "roleLabel": "同伴職責",
         "upgrade": "升級到 {rank} 級（{marks} 印記）",
         "upgradeAria": "用 {marks} 枚秘探印記將 {name} 升級到 {rank} 級",
         "maxRank": "已滿級"
@@ -3528,6 +3535,7 @@ export const zh_TW: EnTranslations = {
       "objective": "目標",
       "module": "第 {current} 區，共 {total} 區",
       "affix": "詞綴",
+      "companionRole": "同伴職責：{role}",
       "complete": "完成",
       "marks": "秘探印記：{count}",
       "exitHintOpen": "走進墓碑通道（北方）",
@@ -3536,6 +3544,17 @@ export const zh_TW: EnTranslations = {
       "ritePlayback": "注視神龕：記住它們亮起的順序",
       "riteInput": "按亮起的順序在每座神龕前按 F（{current}/{total}）",
       "riteOpen": "聖物匣已開啟：在它面前按 F 領取戰利品"
+    },
+    "companionRole": {
+      "healer": "治療",
+      "tank": "坦克",
+      "damage": "傷害"
+    },
+    "shortcut": {
+      "miningReady": "採礦：打開裂牆",
+      "miningFallback": "捷徑：鑿穿裂牆",
+      "herbalismReady": "草藥學：淨化毒性蔓生",
+      "herbalismFallback": "捷徑：清理毒性蔓生"
     },
     "objective": {
       "kill_boss": "擊殺 {boss}",
@@ -3597,7 +3616,9 @@ export const zh_TW: EnTranslations = {
       "sluice_valve": "水閘閥門",
       "grave_tablet": "墓碑石板",
       "corpse_candle": "屍燭",
-      "bell_rope": "鐘繩"
+      "bell_rope": "鐘繩",
+      "mining_cracked_wall": "裂牆",
+      "herbalism_toxic_growth": "毒性蔓生"
     },
     "companion": {
       "barkLine": "{name}：{line}",

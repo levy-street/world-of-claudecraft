@@ -3385,6 +3385,12 @@ export const ko_KR: EnTranslations = {
       "graveSilent": "무덤은 당분간 조용합니다.",
       "doorLocked": "문이 잠겨 있습니다.",
       "strikeWall": "벽을 쳐서 뚫고 나가세요.",
+      "miningShortcut": "채광으로 약한 지점을 찾았습니다. 갈라진 벽이 열립니다.",
+      "miningShortcutFallback": "갈라진 벽을 깎아냅니다. 채광이 있으면 더 빨리 열 수 있습니다.",
+      "miningShortcutFallbackComplete": "꾸준히 두드린 끝에 갈라진 벽이 무너집니다.",
+      "herbalismShortcut": "약초채집으로 독성 증식을 빠르게 시들게 합니다.",
+      "herbalismShortcutFallback": "독성 증식을 밀어냅니다. 약초채집이 있으면 더 빨리 정화할 수 있습니다.",
+      "herbalismShortcutFallbackComplete": "꾸준히 치운 끝에 독성 증식이 무너집니다.",
       "nothingHappens": "아무 일도 일어나지 않습니다.",
       "unknownCompanion": "알 수 없는 동료입니다.",
       "companionMaxRank": "이 동료는 이미 최대로 강화되었습니다.",
@@ -3508,6 +3514,7 @@ export const ko_KR: EnTranslations = {
         "edda": "에다 리드핸드",
         "rank": "{rank}등급",
         "boon": "전투 사이에 파티를 치유합니다. 3랭크에서는 탐굴마다 한 번 쓰러진 아군을 부활시킵니다.",
+        "roleLabel": "동료 역할",
         "upgrade": "{rank}랭크로 강화 (증표 {marks}개)",
         "upgradeAria": "탐굴 증표 {marks}개로 {name}을(를) {rank}랭크로 강화",
         "maxRank": "최대 강화"
@@ -3528,6 +3535,7 @@ export const ko_KR: EnTranslations = {
       "objective": "목표",
       "module": "구역 {current}/{total}",
       "affix": "고난 요소",
+      "companionRole": "동료 역할: {role}",
       "complete": "완료",
       "marks": "탐굴 증표: {count}",
       "exitHintOpen": "묘비 통로로 걸어 들어가세요 (북쪽)",
@@ -3536,6 +3544,17 @@ export const ko_KR: EnTranslations = {
       "ritePlayback": "제단을 지켜보세요: 빛나는 순서를 기억하세요",
       "riteInput": "빛난 순서대로 각 제단에서 F를 누르세요 ({current}/{total})",
       "riteOpen": "성물함이 열렸습니다: F를 눌러 전리품을 획득하세요"
+    },
+    "companionRole": {
+      "healer": "치유",
+      "tank": "방어",
+      "damage": "공격"
+    },
+    "shortcut": {
+      "miningReady": "채광: 갈라진 벽 열기",
+      "miningFallback": "지름길: 갈라진 벽 깎기",
+      "herbalismReady": "약초채집: 독성 증식 정화",
+      "herbalismFallback": "지름길: 독성 증식 치우기"
     },
     "objective": {
       "kill_boss": "{boss} 처치",
@@ -3597,7 +3616,9 @@ export const ko_KR: EnTranslations = {
       "sluice_valve": "수문 밸브",
       "grave_tablet": "무덤 석판",
       "corpse_candle": "시체양초",
-      "bell_rope": "종 밧줄"
+      "bell_rope": "종 밧줄",
+      "mining_cracked_wall": "갈라진 벽",
+      "herbalism_toxic_growth": "독성 증식"
     },
     "companion": {
       "barkLine": "{name}: {line}",

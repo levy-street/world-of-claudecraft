@@ -213,8 +213,9 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   // run.companionReviveUsed, so the once-per-run revive boon is unaffected.
   const delve = DELVES[run.delveId];
   if (run.partyKey?.startsWith('solo:') && delve?.autoCompanionId) {
+    const role = run.companion?.role ?? run.companionRole;
     if (run.companion) ctx.despawnDelveCompanion(run);
-    ctx.spawnDelveCompanion(run, pid, delve.autoCompanionId);
+    ctx.spawnDelveCompanion(run, pid, delve.autoCompanionId, role);
   }
   ctx.emit({ type: 'respawn', pid });
 }

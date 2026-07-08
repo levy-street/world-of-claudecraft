@@ -3385,6 +3385,12 @@ export const cs_CZ: EnTranslations = {
       "graveSilent": "Hrob je prozatím tichý.",
       "doorLocked": "Dveře jsou zamčené.",
       "strikeWall": "Udeř do zdi a proraz ji.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Nic se nestane.",
       "unknownCompanion": "Neznámý společník.",
       "companionMaxRank": "Tento společník je už plně vylepšený.",
@@ -3508,6 +3514,7 @@ export const cs_CZ: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Hodnost {rank}",
         "boon": "Léčí skupinu mezi boji. Na 3. hodnosti jednou za průchod oživí padlého spojence.",
+        "roleLabel": "Companion role",
         "upgrade": "Vylepšit na hodnost {rank} ({marks} známek)",
         "upgradeAria": "Vylepšit {name} na hodnost {rank} za {marks} známek výprav",
         "maxRank": "Plně vylepšeno"
@@ -3528,6 +3535,7 @@ export const cs_CZ: EnTranslations = {
       "objective": "Cíl",
       "module": "Modul {current} z {total}",
       "affix": "Afiksy",
+      "companionRole": "Companion role: {role}",
       "complete": "Dokončeno",
       "marks": "Známky výprav: {count}",
       "exitHintOpen": "Vejdi do náhrobního průchodu (sever)",
@@ -3536,6 +3544,17 @@ export const cs_CZ: EnTranslations = {
       "ritePlayback": "Sleduj svatyně: zapamatuj si pořadí, v jakém se rozsvítí",
       "riteInput": "Stiskni F u každé svatyně v pořadí, v jakém se rozsvítily ({current}/{total})",
       "riteOpen": "Relikviář je otevřený: stiskni na něm F a vyzvedni kořist"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Zabij {boss}",
@@ -3597,7 +3616,9 @@ export const cs_CZ: EnTranslations = {
       "sluice_valve": "Stavidlový ventil",
       "grave_tablet": "Hrobová deska",
       "corpse_candle": "Mrtvolná svíce",
-      "bell_rope": "Zvonové lano"
+      "bell_rope": "Zvonové lano",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

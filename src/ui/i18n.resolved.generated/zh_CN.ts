@@ -3385,6 +3385,12 @@ export const zh_CN: EnTranslations = {
       "graveSilent": "坟墓暂时归于沉寂。",
       "doorLocked": "门被锁住了。",
       "strikeWall": "击打墙壁将其凿穿。",
+      "miningShortcut": "采矿找到了裂缝。裂墙打开了。",
+      "miningShortcutFallback": "你凿击裂墙。采矿能更快打开它。",
+      "miningShortcutFallbackComplete": "持续敲打后，裂墙终于坍开。",
+      "herbalismShortcut": "草药学让毒性蔓生迅速枯萎。",
+      "herbalismShortcutFallback": "你清退毒性蔓生。草药学能更快净化它。",
+      "herbalismShortcutFallbackComplete": "持续清理后，毒性蔓生塌落。",
       "nothingHappens": "什么也没有发生。",
       "unknownCompanion": "未知的同伴。",
       "companionMaxRank": "这名同伴已经完全升级。",
@@ -3508,6 +3514,7 @@ export const zh_CN: EnTranslations = {
         "edda": "艾达·芦手",
         "rank": "等级 {rank}",
         "boon": "在战斗间隙治疗队伍。3级时每次探秘可复活一名倒下的队友一次。",
+        "roleLabel": "同伴职责",
         "upgrade": "升级到 {rank} 级（{marks} 印记）",
         "upgradeAria": "用 {marks} 枚探秘印记将{name}升级到 {rank} 级",
         "maxRank": "已满级"
@@ -3528,6 +3535,7 @@ export const zh_CN: EnTranslations = {
       "objective": "目标",
       "module": "第 {current} / {total} 区",
       "affix": "词缀",
+      "companionRole": "同伴职责：{role}",
       "complete": "已完成",
       "marks": "探秘印记：{count}",
       "exitHintOpen": "走进墓碑通道（北面）",
@@ -3536,6 +3544,17 @@ export const zh_CN: EnTranslations = {
       "ritePlayback": "注视神龛：记住它们亮起的顺序",
       "riteInput": "按亮起的顺序在每座神龛前按 F（{current}/{total}）",
       "riteOpen": "圣物匣已开启：在它面前按 F 领取战利品"
+    },
+    "companionRole": {
+      "healer": "治疗",
+      "tank": "坦克",
+      "damage": "伤害"
+    },
+    "shortcut": {
+      "miningReady": "采矿：打开裂墙",
+      "miningFallback": "捷径：凿穿裂墙",
+      "herbalismReady": "草药学：净化毒性蔓生",
+      "herbalismFallback": "捷径：清理毒性蔓生"
     },
     "objective": {
       "kill_boss": "击杀{boss}",
@@ -3597,7 +3616,9 @@ export const zh_CN: EnTranslations = {
       "sluice_valve": "水闸阀门",
       "grave_tablet": "墓碑石板",
       "corpse_candle": "尸烛",
-      "bell_rope": "钟绳"
+      "bell_rope": "钟绳",
+      "mining_cracked_wall": "裂墙",
+      "herbalism_toxic_growth": "毒性蔓生"
     },
     "companion": {
       "barkLine": "{name}：{line}",

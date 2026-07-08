@@ -626,6 +626,68 @@ function buildDestructibleWall(entityId: number): { group: THREE.Group; height: 
   return { group, height: 6.5 };
 }
 
+function buildOpenedWall(entityId: number): { group: THREE.Group; height: number } {
+  const group = new THREE.Group();
+  const stone = stoneMat(0x5f5a55);
+  const dark = stoneMat(0x2f2b28);
+  const base = new THREE.Mesh(new THREE.BoxGeometry(5.8, 0.18, 1.2), dark);
+  base.position.y = 0.09;
+  base.receiveShadow = true;
+  group.add(base);
+  for (let i = 0; i < 9; i++) {
+    const x = -2.4 + i * 0.6;
+    const w = 0.35 + ((entityId + i * 3) % 4) * 0.08;
+    const h = 0.22 + ((entityId + i * 5) % 5) * 0.05;
+    const z = ((entityId + i * 7) % 5) * 0.18 - 0.36;
+    const chunk = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.45), stone);
+    chunk.position.set(x, h / 2 + 0.12, z);
+    chunk.rotation.y = ((entityId + i) % 6) * 0.25;
+    chunk.castShadow = true;
+    chunk.receiveShadow = true;
+    group.add(chunk);
+  }
+  return { group, height: 1.1 };
+}
+
+function buildToxicGrowth(
+  cleansed: boolean,
+  entityId: number,
+): { group: THREE.Group; height: number } {
+  const group = new THREE.Group();
+  group.rotation.y = ((entityId * 19) % 8) * 0.2;
+  const pad = stoneMat(cleansed ? 0x57534d : 0x253824);
+  const stalk = surfaceMat({
+    color: cleansed ? 0x8f8778 : 0x6ebf54,
+    emissive: cleansed ? 0x000000 : 0x254018,
+    emissiveIntensity: cleansed ? 0 : 0.35,
+    roughness: 0.7,
+  });
+  const bloom = surfaceMat({
+    color: cleansed ? 0xb4ad9c : 0x8a52ba,
+    emissive: cleansed ? 0x000000 : 0x321455,
+    emissiveIntensity: cleansed ? 0 : 0.45,
+    roughness: 0.55,
+  });
+  const root = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.2, 0.16, 10), pad);
+  root.position.y = 0.08;
+  root.receiveShadow = true;
+  group.add(root);
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2;
+    const radius = 0.25 + (i % 3) * 0.18;
+    const height = cleansed ? 0.35 : 0.65 + (i % 2) * 0.16;
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.08, height, 6), stalk);
+    stem.position.set(Math.cos(angle) * radius, 0.16 + height / 2, Math.sin(angle) * radius);
+    stem.rotation.z = Math.sin(angle) * 0.18;
+    group.add(stem);
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.14 + (i % 2) * 0.04, 8, 6), bloom);
+    cap.position.set(stem.position.x, 0.2 + height, stem.position.z);
+    cap.scale.y = 0.6;
+    group.add(cap);
+  }
+  return { group, height: cleansed ? 0.8 : 1.25 };
+}
+
 // ---------------------------------------------------------------------------
 // Fallback crate (for unknown delve_* ids)
 // ---------------------------------------------------------------------------
@@ -935,7 +997,14 @@ export function buildDelveInteractable(
     case 'delve_surface_exit':
       return buildSurfaceExit();
     case 'delve_destructible_wall':
+    case 'delve_mining_cracked_wall':
       return buildDestructibleWall(entityId);
+    case 'delve_mining_cracked_wall_open':
+      return buildOpenedWall(entityId);
+    case 'delve_herbalism_toxic_growth':
+      return buildToxicGrowth(false, entityId);
+    case 'delve_herbalism_toxic_growth_cleansed':
+      return buildToxicGrowth(true, entityId);
     case 'delve_sluice_valve':
     case 'delve_sluice_valve_open':
       return buildPressurePlate(templateId.endsWith('_open'), entityId);

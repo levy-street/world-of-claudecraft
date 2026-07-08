@@ -3385,6 +3385,12 @@ export const vi_VN: EnTranslations = {
       "graveSilent": "Nấm mồ lặng yên lúc này.",
       "doorLocked": "Cánh cửa đã bị khóa.",
       "strikeWall": "Đập vào bức tường để phá xuyên qua.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Không có gì xảy ra.",
       "unknownCompanion": "Đồng đội không xác định.",
       "companionMaxRank": "Đồng đội này đã được nâng cấp tối đa.",
@@ -3508,6 +3514,7 @@ export const vi_VN: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Cấp {rank}",
         "boon": "Chữa lành cho tổ đội giữa các trận đánh. Bậc 3 hồi sinh một đồng minh ngã xuống một lần mỗi lượt chạy.",
+        "roleLabel": "Companion role",
         "upgrade": "Nâng lên Cấp {rank} ({marks} Huy Hiệu)",
         "upgradeAria": "Nâng {name} lên cấp {rank} với giá {marks} Huy Hiệu Hang Sâu",
         "maxRank": "Đã nâng cấp tối đa"
@@ -3528,6 +3535,7 @@ export const vi_VN: EnTranslations = {
       "objective": "Mục Tiêu",
       "module": "Khu {current} trên {total}",
       "affix": "Đặc Tính",
+      "companionRole": "Companion role: {role}",
       "complete": "Hoàn Thành",
       "marks": "Huy Hiệu Hang Sâu: {count}",
       "exitHintOpen": "Bước vào lối đi bia mộ (hướng bắc)",
@@ -3536,6 +3544,17 @@ export const vi_VN: EnTranslations = {
       "ritePlayback": "Quan sát các miếu thờ: ghi nhớ thứ tự chúng sáng lên",
       "riteInput": "Nhấn F tại từng miếu thờ theo thứ tự chúng đã sáng ({current}/{total})",
       "riteOpen": "Hộp thánh tích đã mở: nhấn F vào nó để nhận chiến lợi phẩm"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Hạ gục {boss}",
@@ -3597,7 +3616,9 @@ export const vi_VN: EnTranslations = {
       "sluice_valve": "Van Cống",
       "grave_tablet": "Phiến Đá Mộ",
       "corpse_candle": "Nến Tử Thi",
-      "bell_rope": "Dây Chuông"
+      "bell_rope": "Dây Chuông",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

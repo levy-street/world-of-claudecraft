@@ -15,9 +15,11 @@
 // emit (no aura). `src/sim`-pure: no DOM/Three/Math.random.
 
 import type { SimContext } from '../sim_context';
+import { addThreat } from '../threat';
 import {
   DELVE_COMPANION_HEAL_INTERVAL,
   DELVE_COMPANION_MAX_RANK,
+  type DelveCompanionRole,
   DT,
   dist2d,
   type Entity,
@@ -33,6 +35,71 @@ const DELVE_COMPANION_FOLLOW = 4;
 // noise by level 9. Tuned (combat spec) so L7 Normal is sustainable, L7 Heroic is not
 // savable by Tessa alone, and L9 Heroic is sustainable from rank 2.
 const DELVE_COMPANION_HEAL_PCT = [0, 0.06, 0.08, 0.1];
+const DELVE_COMPANION_TAUNT_RANGE = 8;
+
+interface DelveCompanionRoleProfile {
+  healthMult: number;
+  armorMult: number;
+  damageMult: number;
+  threatMultiplier: number;
+  healMultiplier: number;
+  taunt: boolean;
+  tauntInterval: number;
+}
+
+const DELVE_COMPANION_ROLE_PROFILES: Record<DelveCompanionRole, DelveCompanionRoleProfile> = {
+  healer: {
+    healthMult: 1,
+    armorMult: 1,
+    damageMult: 1,
+    threatMultiplier: 1,
+    healMultiplier: 1,
+    taunt: false,
+    tauntInterval: 0,
+  },
+  tank: {
+    healthMult: 1.35,
+    armorMult: 1.4,
+    damageMult: 0.85,
+    threatMultiplier: 1.5,
+    healMultiplier: 0.5,
+    taunt: true,
+    tauntInterval: 8,
+  },
+  damage: {
+    healthMult: 0.9,
+    armorMult: 0.85,
+    damageMult: 1.45,
+    threatMultiplier: 0.85,
+    healMultiplier: 0,
+    taunt: false,
+    tauntInterval: 0,
+  },
+};
+
+export function normalizeDelveCompanionRole(
+  role: DelveCompanionRole | string | null | undefined,
+): DelveCompanionRole {
+  return role === 'tank' || role === 'damage' || role === 'healer' ? role : 'healer';
+}
+
+export function applyDelveCompanionRoleStats(
+  companion: Entity,
+  role: DelveCompanionRole | string | null | undefined,
+): DelveCompanionRole {
+  const normalized = normalizeDelveCompanionRole(role);
+  const profile = DELVE_COMPANION_ROLE_PROFILES[normalized];
+  companion.maxHp = Math.max(1, Math.round(companion.maxHp * profile.healthMult));
+  companion.hp = companion.maxHp;
+  companion.stats.armor = Math.max(0, Math.round(companion.stats.armor * profile.armorMult));
+  companion.weapon = {
+    ...companion.weapon,
+    min: Math.max(1, Math.round(companion.weapon.min * profile.damageMult)),
+    max: Math.max(1, Math.round(companion.weapon.max * profile.damageMult)),
+  };
+  companion.companionTauntTimer = profile.taunt ? 0 : undefined;
+  return normalized;
+}
 
 export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
   const owner = companion.ownerId !== null ? ctx.entities.get(companion.ownerId) : null;
@@ -89,6 +156,8 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
   if (owner.inCombat) ctx.maybeCompanionBark(run, owner.id, 'combat_start');
   if (owner.hp / Math.max(1, owner.maxHp) < 0.3) ctx.maybeCompanionBark(run, owner.id, 'low_hp');
 
+  const role = normalizeDelveCompanionRole(run.companion.role);
+  const profile = DELVE_COMPANION_ROLE_PROFILES[role];
   companion.swingTimer = (companion.swingTimer ?? 0) - DT;
   let combatTarget: Entity | null = null;
   if (owner.targetId !== null) {
@@ -114,6 +183,16 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
   }
   if (combatTarget) {
     companion.inCombat = true;
+    if (profile.taunt && combatTarget.kind === 'mob') {
+      companion.companionTauntTimer = Math.max(0, (companion.companionTauntTimer ?? 0) - DT);
+      if (
+        companion.companionTauntTimer <= 0 &&
+        dist2d(companion.pos, combatTarget.pos) <= DELVE_COMPANION_TAUNT_RANGE
+      ) {
+        ctx.applyTaunt(companion, combatTarget);
+        companion.companionTauntTimer = profile.tauntInterval;
+      }
+    }
     const reach = MELEE_RANGE * 0.9;
     const cd = dist2d(companion.pos, combatTarget.pos);
     if (cd > reach) {
@@ -129,7 +208,15 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
       companion.facing = steadyAngleTo(companion.pos, combatTarget.pos, companion.facing);
       companion.swingTimer = (companion.swingTimer ?? 0) - DT;
       if (companion.swingTimer <= 0) {
+        const threatBefore =
+          combatTarget.kind === 'mob' ? (combatTarget.threat.get(companion.id) ?? 0) : 0;
         ctx.mobSwing(companion, combatTarget);
+        if (combatTarget.kind === 'mob' && profile.threatMultiplier > 1) {
+          const threatAfter = combatTarget.threat.get(companion.id) ?? 0;
+          const delta = threatAfter - threatBefore;
+          if (delta > 0)
+            addThreat(combatTarget, companion.id, delta * (profile.threatMultiplier - 1));
+        }
         companion.swingTimer = companion.weapon.speed * ctx.swingIntervalMult(companion);
       }
     }
@@ -162,16 +249,21 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
       const pct =
         DELVE_COMPANION_HEAL_PCT[Math.min(rank, DELVE_COMPANION_MAX_RANK)] ??
         DELVE_COMPANION_HEAL_PCT[1];
-      const healed = Math.min(target.maxHp - target.hp, Math.round(target.maxHp * pct));
-      target.hp += healed;
-      ctx.emit({ type: 'heal', targetId: target.id, amount: healed });
-      ctx.emit({
-        type: 'spellfx',
-        sourceId: companion.id,
-        targetId: target.id,
-        school: 'holy',
-        fx: 'tick',
-      });
+      const healed = Math.min(
+        target.maxHp - target.hp,
+        Math.round(target.maxHp * pct * profile.healMultiplier),
+      );
+      if (healed > 0) {
+        target.hp += healed;
+        ctx.emit({ type: 'heal', targetId: target.id, amount: healed });
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: companion.id,
+          targetId: target.id,
+          school: 'holy',
+          fx: 'tick',
+        });
+      }
     }
   }
   if (combatTarget) return;

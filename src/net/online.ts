@@ -33,6 +33,7 @@ import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
   type DungeonDifficulty,
+  type DelveCompanionRole,
   type Entity,
   type EquipSlot,
   emptyMoveInput,
@@ -2514,8 +2515,8 @@ export class ClientWorld implements IWorld {
   // buy + lockpick lifecycle + chest collect. delveShopOffers is a pure client read
   // from the delveClears mirror (no command). lockpickState rides no snapshot field;
   // the private applyLockpickEvent below rebuilds it from the lockpick* events. ---
-  enterDelve(delveId: string, tierId: string): void {
-    this.cmd({ cmd: 'enter_delve', delveId, tierId });
+  enterDelve(delveId: string, tierId: string, companionRole?: DelveCompanionRole): void {
+    this.cmd({ cmd: 'enter_delve', delveId, tierId, companionRole });
   }
   leaveDelve(): void {
     this.cmd({ cmd: 'leave_delve' });

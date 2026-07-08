@@ -3322,7 +3322,9 @@ export class Renderer {
         // pulled (unlike the flush walk-on plates above).
         e.templateId !== 'delve_bell_rope_pulled' &&
         e.templateId !== 'delve_locked_door' &&
-        e.templateId !== 'delve_destructible_wall'
+        e.templateId !== 'delve_destructible_wall' &&
+        e.templateId !== 'delve_mining_cracked_wall_open' &&
+        e.templateId !== 'delve_herbalism_toxic_growth_cleansed'
       ) {
         if (!this.sparkleMat) {
           this.sparkleMat = new THREE.SpriteMaterial({

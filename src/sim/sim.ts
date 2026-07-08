@@ -361,6 +361,7 @@ import {
   type CrowdControlDrCategory,
   cloneInvSlot,
   DELVE_COMPANION_HEAL_INTERVAL,
+  type DelveCompanionRole,
   type DelveDef,
   type DelveModuleDef,
   type DelveRun,
@@ -1481,6 +1482,7 @@ export class Sim {
           emptyFor: 0,
           deathsThisRun: {},
           objectState: {},
+          companionRole: 'healer',
           raiseDeadChannel: null,
           restlessPending: [],
           badAirTimer: 0,
@@ -2926,8 +2928,8 @@ export class Sim {
       despawnPet: (pet) => petCommands.despawnPet(sim.ctx, pet),
       despawnPersistentPet: (pet) => sim.despawnPersistentPet(pet),
       isPetClass,
-      spawnDelveCompanion: (run, pid, companionId) =>
-        sim.spawnDelveCompanion(run, pid, companionId),
+      spawnDelveCompanion: (run, pid, companionId, role) =>
+        sim.spawnDelveCompanion(run, pid, companionId, role),
       despawnDelveCompanion: (run) => sim.despawnDelveCompanion(run),
       maybeCompanionBark: (run, pid, barkId) => sim.maybeCompanionBark(run, pid, barkId),
       abandonLockpick: (run) => lockpickMod.abandonLockpick(sim.ctx, run),
@@ -6754,8 +6756,13 @@ export class Sim {
     return runsMod.canEnterDelve(this.ctx, pid);
   }
 
-  enterDelve(delveId: string, tierId: string, pid?: number): void {
-    runsMod.enterDelve(this.ctx, delveId, tierId, pid);
+  enterDelve(
+    delveId: string,
+    tierId: string,
+    pidOrRole?: number | DelveCompanionRole,
+    companionRole?: DelveCompanionRole,
+  ): void {
+    runsMod.enterDelve(this.ctx, delveId, tierId, pidOrRole, companionRole);
   }
 
   leaveDelve(pid?: number): void {
@@ -6904,7 +6911,12 @@ export class Sim {
     );
   }
 
-  private spawnDelveCompanion(run: DelveRun, pid: number, companionId: string): void {
+  private spawnDelveCompanion(
+    run: DelveRun,
+    pid: number,
+    companionId: string,
+    role?: DelveCompanionRole,
+  ): void {
     const def = DELVE_COMPANIONS[companionId];
     const owner = this.entities.get(pid);
     const template = def ? MOBS[def.mobTemplateId] : null;
@@ -6925,8 +6937,10 @@ export class Sim {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.wanderTimer = DELVE_COMPANION_HEAL_INTERVAL;
+    const companionRole = companionMod.applyDelveCompanionRoleStats(mob, role ?? def.role);
     this.addEntity(mob);
-    run.companion = { companionId, entityId: mob.id };
+    run.companionRole = companionRole;
+    run.companion = { companionId, entityId: mob.id, role: companionRole };
     this.maybeCompanionBark(run, pid, 'run_start');
   }
 

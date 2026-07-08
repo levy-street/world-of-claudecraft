@@ -3385,6 +3385,12 @@ export const fr_FR: EnTranslations = {
       "graveSilent": "La tombe est silencieuse pour l'instant.",
       "doorLocked": "La porte est verrouillée.",
       "strikeWall": "Frappez le mur pour percer une ouverture.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Rien ne se produit.",
       "unknownCompanion": "Compagnon inconnu.",
       "companionMaxRank": "Ce compagnon est déjà entièrement amélioré.",
@@ -3508,6 +3514,7 @@ export const fr_FR: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Rang {rank}",
         "boon": "Soigne le groupe entre les combats. Le rang 3 ressuscite un allié tombé une fois par plongée.",
+        "roleLabel": "Companion role",
         "upgrade": "Améliorer au rang {rank} ({marks} Marques)",
         "upgradeAria": "Améliorer {name} au rang {rank} pour {marks} Marques de plongée",
         "maxRank": "Entièrement amélioré"
@@ -3528,6 +3535,7 @@ export const fr_FR: EnTranslations = {
       "objective": "Objectif",
       "module": "Module {current} sur {total}",
       "affix": "Affixes",
+      "companionRole": "Companion role: {role}",
       "complete": "Terminé",
       "marks": "Marques de plongée : {count}",
       "exitHintOpen": "Avancez dans le passage en pierre tombale (nord)",
@@ -3536,6 +3544,17 @@ export const fr_FR: EnTranslations = {
       "ritePlayback": "Observez les autels : mémorisez l'ordre dans lequel ils s'illuminent",
       "riteInput": "Appuyez sur F à chaque autel, dans l'ordre où ils se sont illuminés ({current}/{total})",
       "riteOpen": "Le reliquaire est ouvert : appuyez sur F dessus pour réclamer votre butin"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Tuer {boss}",
@@ -3597,7 +3616,9 @@ export const fr_FR: EnTranslations = {
       "sluice_valve": "Valve d'écluse",
       "grave_tablet": "Tablette funéraire",
       "corpse_candle": "Chandelle des morts",
-      "bell_rope": "Corde de cloche"
+      "bell_rope": "Corde de cloche",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name} : {line}",

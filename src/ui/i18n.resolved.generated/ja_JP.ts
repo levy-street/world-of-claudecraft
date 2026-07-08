@@ -3385,6 +3385,12 @@ export const ja_JP: EnTranslations = {
       "graveSilent": "墓は今のところ静まっている。",
       "doorLocked": "扉には錠がかかっている。",
       "strikeWall": "壁を叩いて打ち破れ。",
+      "miningShortcut": "採掘で弱点を見つけた。ひび割れた壁が開いた。",
+      "miningShortcutFallback": "ひび割れた壁を削っている。採掘ならもっと早く開けられる。",
+      "miningShortcutFallbackComplete": "地道に叩き続け、ひび割れた壁が崩れた。",
+      "herbalismShortcut": "薬草学で毒の茂みを素早く枯らした。",
+      "herbalismShortcutFallback": "毒の茂みを押し戻している。薬草学ならもっと早く浄化できる。",
+      "herbalismShortcutFallbackComplete": "地道に取り除き、毒の茂みが崩れ落ちた。",
       "nothingHappens": "何も起こらない。",
       "unknownCompanion": "不明な仲間だ。",
       "companionMaxRank": "この仲間はすでに完全に強化されている。",
@@ -3508,6 +3514,7 @@ export const ja_JP: EnTranslations = {
         "edda": "エッダ・リードハンド",
         "rank": "ランク{rank}",
         "boon": "戦闘の合間にパーティを回復する。ランク3ではデルヴごとに一度、倒れた仲間を蘇生する。",
+        "roleLabel": "相棒の役割",
         "upgrade": "ランク{rank}に強化（刻印{marks}個）",
         "upgradeAria": "デルヴの刻印{marks}個で{name}をランク{rank}に強化",
         "maxRank": "最大ランク"
@@ -3528,6 +3535,7 @@ export const ja_JP: EnTranslations = {
       "objective": "目標",
       "module": "モジュール {current}/{total}",
       "affix": "アフィックス",
+      "companionRole": "相棒の役割：{role}",
       "complete": "完了",
       "marks": "デルヴの刻印: {count}",
       "exitHintOpen": "墓石の通路へ歩み入れ(北)",
@@ -3536,6 +3544,17 @@ export const ja_JP: EnTranslations = {
       "ritePlayback": "祠を見よ：光る順番を覚えること",
       "riteInput": "光った順に各祠の前でFを押す（{current}/{total}）",
       "riteOpen": "聖遺物匣が開いた：Fで戦利品を受け取る"
+    },
+    "companionRole": {
+      "healer": "ヒーラー",
+      "tank": "タンク",
+      "damage": "ダメージ"
+    },
+    "shortcut": {
+      "miningReady": "採掘：ひび割れた壁を開く",
+      "miningFallback": "近道：ひび割れた壁を削る",
+      "herbalismReady": "薬草学：毒の茂みを浄化",
+      "herbalismFallback": "近道：毒の茂みを取り除く"
     },
     "objective": {
       "kill_boss": "{boss}を討て",
@@ -3597,7 +3616,9 @@ export const ja_JP: EnTranslations = {
       "sluice_valve": "水門弁",
       "grave_tablet": "墓碑板",
       "corpse_candle": "死体蝋燭",
-      "bell_rope": "鐘の縄"
+      "bell_rope": "鐘の縄",
+      "mining_cracked_wall": "ひび割れた壁",
+      "herbalism_toxic_growth": "毒の茂み"
     },
     "companion": {
       "barkLine": "{name}: {line}",

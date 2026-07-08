@@ -3385,6 +3385,12 @@ export const it_IT: EnTranslations = {
       "graveSilent": "La tomba è silenziosa per ora.",
       "doorLocked": "La porta è chiusa a chiave.",
       "strikeWall": "Colpisci il muro per sfondarlo.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Non succede nulla.",
       "unknownCompanion": "Compagno sconosciuto.",
       "companionMaxRank": "Questo compagno è già completamente potenziato.",
@@ -3508,6 +3514,7 @@ export const it_IT: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Grado {rank}",
         "boon": "Cura il gruppo tra uno scontro e l'altro. Il grado 3 rianima un alleato caduto una volta per incursione.",
+        "roleLabel": "Companion role",
         "upgrade": "Potenzia al grado {rank} ({marks} Sigilli)",
         "upgradeAria": "Potenzia {name} al grado {rank} per {marks} Sigilli d'Incursione",
         "maxRank": "Completamente potenziato"
@@ -3528,6 +3535,7 @@ export const it_IT: EnTranslations = {
       "objective": "Obiettivo",
       "module": "Modulo {current} di {total}",
       "affix": "Affissi",
+      "companionRole": "Companion role: {role}",
       "complete": "Completata",
       "marks": "Sigilli d'Incursione: {count}",
       "exitHintOpen": "Entra nel passaggio della lapide (a nord)",
@@ -3536,6 +3544,17 @@ export const it_IT: EnTranslations = {
       "ritePlayback": "Osserva i santuari: memorizza l'ordine in cui si illuminano",
       "riteInput": "Premi F a ogni santuario nell'ordine in cui si sono illuminati ({current}/{total})",
       "riteOpen": "Il reliquiario è aperto: premi F su di esso per reclamare il bottino"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Uccidi {boss}",
@@ -3597,7 +3616,9 @@ export const it_IT: EnTranslations = {
       "sluice_valve": "Valvola della Chiusa",
       "grave_tablet": "Tavoletta Sepolcrale",
       "corpse_candle": "Candela Cadaverica",
-      "bell_rope": "Corda della Campana"
+      "bell_rope": "Corda della Campana",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

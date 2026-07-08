@@ -1995,6 +1995,9 @@
   #delve-tracker .dt-obj.done {
     color: var(--color-text-success);
   }
+  #delve-tracker .dt-shortcut {
+    color: #9fe0a4;
+  }
   #delve-tracker .dt-affix-row {
     pointer-events: auto;
     margin: 4px 0 0 8px;

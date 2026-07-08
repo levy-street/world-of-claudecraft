@@ -3385,6 +3385,12 @@ export const en_CA: EnTranslations = {
       "graveSilent": "The grave is silent for now.",
       "doorLocked": "The door is locked.",
       "strikeWall": "Strike the wall to break through.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Nothing happens.",
       "unknownCompanion": "Unknown companion.",
       "companionMaxRank": "This companion is already fully upgraded.",
@@ -3508,6 +3514,7 @@ export const en_CA: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Rank {rank}",
         "boon": "Heals the party between fights. Rank 3 revives a fallen ally once per run.",
+        "roleLabel": "Companion role",
         "upgrade": "Upgrade to Rank {rank} ({marks} Marks)",
         "upgradeAria": "Upgrade {name} to rank {rank} for {marks} Delve Marks",
         "maxRank": "Fully upgraded"
@@ -3528,6 +3535,7 @@ export const en_CA: EnTranslations = {
       "objective": "Objective",
       "module": "Module {current} of {total}",
       "affix": "Affixes",
+      "companionRole": "Companion role: {role}",
       "complete": "Complete",
       "marks": "Delve Marks: {count}",
       "exitHintOpen": "Walk into the tombstone passage (north)",
@@ -3536,6 +3544,17 @@ export const en_CA: EnTranslations = {
       "ritePlayback": "Watch the shrines: memorize the order they light up",
       "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
       "riteOpen": "The reliquary is open: press F on it to claim your spoils"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Slay {boss}",
@@ -3597,7 +3616,9 @@ export const en_CA: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "bell_rope": "Bell Rope"
+      "bell_rope": "Bell Rope",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

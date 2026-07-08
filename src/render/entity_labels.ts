@@ -65,6 +65,18 @@ export function objectDisplayName(entity: Entity): string {
     return t('delveUi.object.bell_rope');
   }
   if (
+    entity.templateId === 'delve_mining_cracked_wall' ||
+    entity.templateId === 'delve_mining_cracked_wall_open'
+  ) {
+    return t('delveUi.object.mining_cracked_wall');
+  }
+  if (
+    entity.templateId === 'delve_herbalism_toxic_growth' ||
+    entity.templateId === 'delve_herbalism_toxic_growth_cleansed'
+  ) {
+    return t('delveUi.object.herbalism_toxic_growth');
+  }
+  if (
     (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&
     entity.dungeonId
   ) {

@@ -1,5 +1,5 @@
 import type { Ante, LootTier, PickAction, VisibleCell } from '../sim/lockpick';
-import type { DelveObjectiveState, RiteIntensity } from '../sim/types';
+import type { DelveCompanionRole, DelveObjectiveState, RiteIntensity } from '../sim/types';
 
 /** Drowned Reliquary Rite progress, surfaced so the HUD can guide the player:
  * choose = the reliquary is up and waits for a difficulty pick, playback = the
@@ -23,6 +23,7 @@ export interface DelveRunInfo {
   modules: string[];
   objective: DelveObjectiveState;
   affixes: string[];
+  companionRole: DelveCompanionRole;
   completed: boolean;
   exitPortalOpen: boolean;
   /** §7.6: this run rolled Bountiful: the reward chest is a purple Coffer that
@@ -56,6 +57,7 @@ export interface LockpickView {
 export interface DelveCompanionInfo {
   companionId: string;
   entityId: number;
+  role: DelveCompanionRole;
   rank: number;
   hp: number;
   maxHp: number;
@@ -80,7 +82,7 @@ export interface DelveShopOfferView {
 }
 
 export interface IWorldDelves {
-  enterDelve(delveId: string, tierId: string): void;
+  enterDelve(delveId: string, tierId: string, companionRole?: DelveCompanionRole): void;
   leaveDelve(): void;
   delveInteract(objectId: number): void;
   companionUpgrade(companionId: string): void;

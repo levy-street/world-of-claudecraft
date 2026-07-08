@@ -3385,6 +3385,12 @@ export const tr_TR: EnTranslations = {
       "graveSilent": "Mezar şimdilik sessiz.",
       "doorLocked": "Kapı kilitli.",
       "strikeWall": "Geçmek için duvara vur.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Bir şey olmaz.",
       "unknownCompanion": "Bilinmeyen yoldaş.",
       "companionMaxRank": "Bu yoldaş zaten tamamen yükseltilmiş.",
@@ -3508,6 +3514,7 @@ export const tr_TR: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Rütbe {rank}",
         "boon": "Dövüşler arasında grubu iyileştirir. 3. seviye, koşu başına bir kez düşmüş bir müttefiki diriltir.",
+        "roleLabel": "Companion role",
         "upgrade": "Rütbe {rank}'e yükselt ({marks} Nişan)",
         "upgradeAria": "{name} adlı yoldaşı {marks} Mağara Nişanı karşılığında rütbe {rank}'e yükselt",
         "maxRank": "Tamamen geliştirildi"
@@ -3528,6 +3535,7 @@ export const tr_TR: EnTranslations = {
       "objective": "Hedef",
       "module": "Bölüm {current} / {total}",
       "affix": "Ekler",
+      "companionRole": "Companion role: {role}",
       "complete": "Tamamlandı",
       "marks": "Mağara Nişanları: {count}",
       "exitHintOpen": "Mezar taşı geçidine yürü (kuzey)",
@@ -3536,6 +3544,17 @@ export const tr_TR: EnTranslations = {
       "ritePlayback": "Sunakları izle: yanma sırasını ezberle",
       "riteInput": "Her sunakta, yandıkları sırayla F'ye bas ({current}/{total})",
       "riteOpen": "Emanetlik açık: ganimetini almak için üzerinde F'ye bas"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "{boss} adlı düşmanı öldür",
@@ -3597,7 +3616,9 @@ export const tr_TR: EnTranslations = {
       "sluice_valve": "Savak Vanası",
       "grave_tablet": "Mezar Kitabesi",
       "corpse_candle": "Ceset Mumu",
-      "bell_rope": "Çan İpi"
+      "bell_rope": "Çan İpi",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

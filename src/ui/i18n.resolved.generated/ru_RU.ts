@@ -3385,6 +3385,12 @@ export const ru_RU: EnTranslations = {
       "graveSilent": "Могила пока безмолвна.",
       "doorLocked": "Дверь заперта.",
       "strikeWall": "Ударьте по стене, чтобы пробить её.",
+      "miningShortcut": "Горное дело находит слабое место. Треснувшая стена открывается.",
+      "miningShortcutFallback": "Вы отбиваете куски треснувшей стены. Горное дело открыло бы ее быстрее.",
+      "miningShortcutFallbackComplete": "После упорных ударов треснувшая стена поддается.",
+      "herbalismShortcut": "Травничество быстро иссушает ядовитую поросль.",
+      "herbalismShortcutFallback": "Вы оттесняете ядовитую поросль. Травничество очистило бы ее быстрее.",
+      "herbalismShortcutFallbackComplete": "После упорной расчистки ядовитая поросль осыпается.",
       "nothingHappens": "Ничего не происходит.",
       "unknownCompanion": "Неизвестный спутник.",
       "companionMaxRank": "Этот спутник уже улучшен до предела.",
@@ -3508,6 +3514,7 @@ export const ru_RU: EnTranslations = {
         "edda": "Эдда Тростниковая Рука",
         "rank": "Ранг {rank}",
         "boon": "Лечит группу между боями. На 3 ранге один раз за вылазку поднимает павшего союзника.",
+        "roleLabel": "Роль спутника",
         "upgrade": "Улучшить до ранга {rank} ({marks} меток)",
         "upgradeAria": "Улучшить {name} до ранга {rank} за {marks} Меток Вылазок",
         "maxRank": "Полностью улучшено"
@@ -3528,6 +3535,7 @@ export const ru_RU: EnTranslations = {
       "objective": "Задача",
       "module": "Секция {current} из {total}",
       "affix": "Аффиксы",
+      "companionRole": "Роль спутника: {role}",
       "complete": "Завершено",
       "marks": "Метки Вылазок: {count}",
       "exitHintOpen": "Войдите в надгробный проход (север)",
@@ -3536,6 +3544,17 @@ export const ru_RU: EnTranslations = {
       "ritePlayback": "Следите за святилищами: запомните порядок, в котором они загораются",
       "riteInput": "Нажимайте F у каждого святилища в порядке их загорания ({current}/{total})",
       "riteOpen": "Реликварий открыт: нажмите F рядом с ним, чтобы забрать добычу"
+    },
+    "companionRole": {
+      "healer": "Лекарь",
+      "tank": "Защитник",
+      "damage": "Урон"
+    },
+    "shortcut": {
+      "miningReady": "Горное дело: открыть треснувшую стену",
+      "miningFallback": "Короткий путь: пробить треснувшую стену",
+      "herbalismReady": "Травничество: очистить ядовитую поросль",
+      "herbalismFallback": "Короткий путь: убрать ядовитую поросль"
     },
     "objective": {
       "kill_boss": "Убейте: {boss}",
@@ -3597,7 +3616,9 @@ export const ru_RU: EnTranslations = {
       "sluice_valve": "Шлюзовой Клапан",
       "grave_tablet": "Могильная Табличка",
       "corpse_candle": "Трупная Свеча",
-      "bell_rope": "Колокольная Верёвка"
+      "bell_rope": "Колокольная Верёвка",
+      "mining_cracked_wall": "Треснувшая стена",
+      "herbalism_toxic_growth": "Ядовитая поросль"
     },
     "companion": {
       "barkLine": "{name}: {line}",

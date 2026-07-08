@@ -3385,6 +3385,12 @@ export const de_DE: EnTranslations = {
       "graveSilent": "Das Grab ist vorerst still.",
       "doorLocked": "Die Tür ist verschlossen.",
       "strikeWall": "Schlage gegen die Wand, um durchzubrechen.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Nichts geschieht.",
       "unknownCompanion": "Unbekannter Gefährte.",
       "companionMaxRank": "Dieser Gefährte ist bereits vollständig verbessert.",
@@ -3508,6 +3514,7 @@ export const de_DE: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Rang {rank}",
         "boon": "Heilt die Gruppe zwischen den Kämpfen. Rang 3 belebt einen gefallenen Verbündeten einmal pro Lauf wieder.",
+        "roleLabel": "Companion role",
         "upgrade": "Auf Rang {rank} verbessern ({marks} Marken)",
         "upgradeAria": "{name} für {marks} Tiefgang-Marken auf Rang {rank} verbessern",
         "maxRank": "Vollständig verbessert"
@@ -3528,6 +3535,7 @@ export const de_DE: EnTranslations = {
       "objective": "Ziel",
       "module": "Modul {current} von {total}",
       "affix": "Affixe",
+      "companionRole": "Companion role: {role}",
       "complete": "Abgeschlossen",
       "marks": "Tiefgang-Marken: {count}",
       "exitHintOpen": "Geh in den Grabstein-Durchgang (Norden)",
@@ -3536,6 +3544,17 @@ export const de_DE: EnTranslations = {
       "ritePlayback": "Beobachte die Schreine: Präge dir die Reihenfolge ein, in der sie aufleuchten",
       "riteInput": "Drücke F an jedem Schrein in der Reihenfolge, in der sie aufgeleuchtet sind ({current}/{total})",
       "riteOpen": "Das Reliquiar ist offen: Drücke F daran, um deine Beute zu beanspruchen"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "{boss} erschlagen",
@@ -3597,7 +3616,9 @@ export const de_DE: EnTranslations = {
       "sluice_valve": "Schleusenventil",
       "grave_tablet": "Grabtafel",
       "corpse_candle": "Leichenkerze",
-      "bell_rope": "Glockenseil"
+      "bell_rope": "Glockenseil",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

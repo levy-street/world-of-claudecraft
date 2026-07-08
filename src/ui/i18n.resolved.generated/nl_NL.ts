@@ -3385,6 +3385,12 @@ export const nl_NL: EnTranslations = {
       "graveSilent": "Het graf is voorlopig stil.",
       "doorLocked": "De deur is op slot.",
       "strikeWall": "Sla op de muur om erdoorheen te breken.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Er gebeurt niets.",
       "unknownCompanion": "Onbekende metgezel.",
       "companionMaxRank": "Deze metgezel is al volledig verbeterd.",
@@ -3508,6 +3514,7 @@ export const nl_NL: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Rang {rank}",
         "boon": "Geneest de groep tussen gevechten. Rang 3 doet eenmaal per tocht een gevallen bondgenoot herleven.",
+        "roleLabel": "Companion role",
         "upgrade": "Waardeer op naar Rang {rank} ({marks} Tekens)",
         "upgradeAria": "Waardeer {name} op naar rang {rank} voor {marks} Delve-Tekens",
         "maxRank": "Volledig opgewaardeerd"
@@ -3528,6 +3535,7 @@ export const nl_NL: EnTranslations = {
       "objective": "Doel",
       "module": "Module {current} van {total}",
       "affix": "Affixen",
+      "companionRole": "Companion role: {role}",
       "complete": "Voltooid",
       "marks": "Delve-Tekens: {count}",
       "exitHintOpen": "Loop de grafsteendoorgang in (noord)",
@@ -3536,6 +3544,17 @@ export const nl_NL: EnTranslations = {
       "ritePlayback": "Kijk naar de schrijnen: onthoud de volgorde waarin ze oplichten",
       "riteInput": "Druk op F bij elk schrijn in de volgorde waarin ze oplichtten ({current}/{total})",
       "riteOpen": "Het reliekschrijn is open: druk op F om je buit op te eisen"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Versla {boss}",
@@ -3597,7 +3616,9 @@ export const nl_NL: EnTranslations = {
       "sluice_valve": "Sluisklep",
       "grave_tablet": "Graftablet",
       "corpse_candle": "Lijkkaars",
-      "bell_rope": "Klokkentouw"
+      "bell_rope": "Klokkentouw",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

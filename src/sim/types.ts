@@ -1842,6 +1842,7 @@ export interface Entity {
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
+  companionTauntTimer?: number; // delve tank role taunt cooldown
   petAutoTaunt?: boolean; // right-click autocast toggle for controlled pet Growl
   petManualTauntPending?: boolean; // manual Growl command waiting until the pet reaches range
   petPath: Vec3[]; // controlled pet heel route around obstacles; consumed front-to-back (like chargePath)
@@ -2947,9 +2948,12 @@ export interface DelveObjectiveState {
   complete: boolean;
 }
 
+export type DelveCompanionRole = 'healer' | 'tank' | 'damage';
+
 export interface DelveCompanionState {
   companionId: string;
   entityId: number;
+  role: DelveCompanionRole;
 }
 
 export interface DelveRun {
@@ -2965,6 +2969,7 @@ export interface DelveRun {
   mobIds: number[];
   objectIds: number[];
   objective: DelveObjectiveState;
+  companionRole: DelveCompanionRole;
   companion?: DelveCompanionState;
   completed: boolean;
   emptyFor: number;
@@ -3020,7 +3025,7 @@ export interface DelveDailyState {
 export interface DelveCompanionDef {
   id: string;
   name: string;
-  role: 'healer' | 'tank' | 'scout' | 'dps';
+  role: DelveCompanionRole;
   mobTemplateId: string;
 }
 
@@ -3038,6 +3043,7 @@ export interface DelveObjectState {
   maxHp: number;
   linkIds: number[];
   open: boolean;
+  shortcutProgress?: number;
   // Lockpick chest gating (kind === 'locked_chest'). attemptAvailable is granted
   // when the chest spawns (boss defeated) and consumed on a SUCCESS or FAILED
   // attempt, a FAILED chest can only be retried by re-clearing the delve.

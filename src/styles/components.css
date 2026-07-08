@@ -94,6 +94,31 @@
     line-height: 1.4;
     margin-bottom: 6px;
   }
+  #delve-board .delve-companion-role-label {
+    font-size: 11px;
+    color: #c9b27a;
+    margin: 6px 0 4px;
+  }
+  #delve-board .delve-role-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  #delve-board .delve-role-btn {
+    min-height: 32px;
+    font-size: 12px;
+    background: #1a1410;
+    border: 1px solid #463a1c;
+    border-radius: 3px;
+    color: #c9b27a;
+    cursor: pointer;
+  }
+  #delve-board .delve-role-btn.selected {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: #2a2010;
+  }
   #delve-board .delve-companion-max {
     min-height: 40px;
     display: flex;

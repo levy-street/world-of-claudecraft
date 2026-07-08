@@ -3385,6 +3385,12 @@ export const es_ES: EnTranslations = {
       "graveSilent": "La tumba guarda silencio por ahora.",
       "doorLocked": "La puerta está cerrada con llave.",
       "strikeWall": "Golpea el muro para abrirte paso.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "No pasa nada.",
       "unknownCompanion": "Compañero desconocido.",
       "companionMaxRank": "Este compañero ya está completamente mejorado.",
@@ -3508,6 +3514,7 @@ export const es_ES: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Rango {rank}",
         "boon": "Cura al grupo entre combates. El rango 3 revive a un aliado caído una vez por incursión.",
+        "roleLabel": "Companion role",
         "upgrade": "Mejorar al rango {rank} ({marks} Marcas)",
         "upgradeAria": "Mejorar a {name} al rango {rank} por {marks} Marcas de Expedición",
         "maxRank": "Mejorado al máximo"
@@ -3528,6 +3535,7 @@ export const es_ES: EnTranslations = {
       "objective": "Objetivo",
       "module": "Módulo {current} de {total}",
       "affix": "Afijos",
+      "companionRole": "Companion role: {role}",
       "complete": "Completada",
       "marks": "Marcas de Profundidad: {count}",
       "exitHintOpen": "Entra al pasaje de lápida (norte)",
@@ -3536,6 +3544,17 @@ export const es_ES: EnTranslations = {
       "ritePlayback": "Observa los santuarios: memoriza el orden en que se iluminan",
       "riteInput": "Pulsa F en cada santuario en el orden en que se iluminaron ({current}/{total})",
       "riteOpen": "El relicario está abierto: pulsa F sobre él para reclamar tu botín"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Da muerte a {boss}",
@@ -3597,7 +3616,9 @@ export const es_ES: EnTranslations = {
       "sluice_valve": "Válvula de esclusa",
       "grave_tablet": "Tablilla sepulcral",
       "corpse_candle": "Vela de difunto",
-      "bell_rope": "Cuerda de campana"
+      "bell_rope": "Cuerda de campana",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

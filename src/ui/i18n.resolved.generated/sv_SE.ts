@@ -3385,6 +3385,12 @@ export const sv_SE: EnTranslations = {
       "graveSilent": "Graven är tyst för stunden.",
       "doorLocked": "Dörren är låst.",
       "strikeWall": "Slå på väggen för att bryta igenom.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Ingenting händer.",
       "unknownCompanion": "Okänd följeslagare.",
       "companionMaxRank": "Den här följeslagaren är redan fullt uppgraderad.",
@@ -3508,6 +3514,7 @@ export const sv_SE: EnTranslations = {
         "edda": "Edda Reedhand",
         "rank": "Rang {rank}",
         "boon": "Läker gruppen mellan strider. Rang 3 återupplivar en fallen allierad en gång per runda.",
+        "roleLabel": "Companion role",
         "upgrade": "Uppgradera till rang {rank} ({marks} Märken)",
         "upgradeAria": "Uppgradera {name} till rang {rank} för {marks} Delve-märken",
         "maxRank": "Fullt uppgraderad"
@@ -3528,6 +3535,7 @@ export const sv_SE: EnTranslations = {
       "objective": "Mål",
       "module": "Modul {current} av {total}",
       "affix": "Affixer",
+      "companionRole": "Companion role: {role}",
       "complete": "Slutförd",
       "marks": "Delve-märken: {count}",
       "exitHintOpen": "Gå in i gravstenspassagen (norrut)",
@@ -3536,6 +3544,17 @@ export const sv_SE: EnTranslations = {
       "ritePlayback": "Se på helgedomarna: memorera ordningen de tänds i",
       "riteInput": "Tryck på F vid varje helgedom i den ordning de tändes ({current}/{total})",
       "riteOpen": "Relikvariet är öppet: tryck på F på det för att hämta ditt byte"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Dräp {boss}",
@@ -3597,7 +3616,9 @@ export const sv_SE: EnTranslations = {
       "sluice_valve": "Slussventil",
       "grave_tablet": "Gravtavla",
       "corpse_candle": "Likljus",
-      "bell_rope": "Klockrep"
+      "bell_rope": "Klockrep",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

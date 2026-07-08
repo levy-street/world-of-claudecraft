@@ -69,7 +69,7 @@ export const COLLAPSED_RELIQUARY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'reliquary_bell_niche',
     length: 110,
     spawnSets: [BELL_NICHE_SPAWNS],
-    interactableSlots: [],
+    interactableSlots: [{ x: -10, z: 42, variants: ['mining_cracked_wall'] }],
   },
   reliquary_saintless_hall: {
     id: 'reliquary_saintless_hall',
@@ -77,7 +77,7 @@ export const COLLAPSED_RELIQUARY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'reliquary_saintless_hall',
     length: 110,
     spawnSets: [SAINTLESS_HALL_SPAWNS],
-    interactableSlots: [],
+    interactableSlots: [{ x: 10, z: 44, variants: ['herbalism_toxic_growth'] }],
   },
   reliquary_finale: {
     id: 'reliquary_finale',

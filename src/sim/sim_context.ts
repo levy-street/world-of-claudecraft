@@ -39,6 +39,7 @@ import type {
   AbilityDef,
   Aura,
   CrowdControlDrCategory,
+  DelveCompanionRole,
   DelveRun,
   DungeonDifficulty,
   Entity,
@@ -513,7 +514,12 @@ export interface SimContextCallbacks {
   restorePet(owner: Entity, state: PetState): void;
   despawnPersistentPet(pet: Entity): void;
   isPetClass(cls: PlayerClass): boolean;
-  spawnDelveCompanion(run: DelveRun, pid: number, companionId: string): void;
+  spawnDelveCompanion(
+    run: DelveRun,
+    pid: number,
+    companionId: string,
+    role?: DelveCompanionRole,
+  ): void;
   despawnDelveCompanion(run: DelveRun): void;
   maybeCompanionBark(run: DelveRun, pid: number, barkId: string): void;
   abandonLockpick(run: DelveRun): void;

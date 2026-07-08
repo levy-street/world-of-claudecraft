@@ -23,6 +23,7 @@ import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
   DT,
+  type DelveCompanionRole,
   dist2d,
   type Entity,
   EQUIP_SLOTS,
@@ -3691,7 +3692,13 @@ export class GameServer {
         const delve = DELVES[msg.delveId];
         if (!e || !delve || e.dead) break;
         if (Math.hypot(e.pos.x - delve.doorPos.x, e.pos.z - delve.doorPos.z) > 12) break;
-        sim.enterDelve(msg.delveId, msg.tierId, pid);
+        const companionRole: DelveCompanionRole | undefined =
+          msg.companionRole === 'tank' ||
+          msg.companionRole === 'damage' ||
+          msg.companionRole === 'healer'
+            ? msg.companionRole
+            : undefined;
+        sim.enterDelve(msg.delveId, msg.tierId, pid, companionRole);
         this.resyncDelves(session);
         break;
       }

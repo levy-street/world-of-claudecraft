@@ -1760,7 +1760,7 @@ describe('delve self-state mirrors over the wire', () => {
     session = joinServer(server, fc, 1, 'Delver');
   });
 
-  function enterDelveOnServer(): void {
+  function enterDelveOnServer(companionRole?: 'healer' | 'tank' | 'damage'): void {
     const sim = server.sim;
     sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
     const door = DELVES.collapsed_reliquary.doorPos;
@@ -1769,7 +1769,7 @@ describe('delve self-state mirrors over the wire', () => {
     p.pos.z = door.z;
     p.pos.y = terrainHeight(door.x, door.z, sim.cfg.seed);
     p.prevPos = { ...p.pos };
-    sim.enterDelve('collapsed_reliquary', 'normal', session.pid);
+    sim.enterDelve('collapsed_reliquary', 'normal', session.pid, companionRole);
   }
 
   it('geo-gates companion_upgrade and enter_delve to the board NPC door', () => {
@@ -1814,15 +1814,17 @@ describe('delve self-state mirrors over the wire', () => {
   });
 
   it('sends drun + dcompanion on entering a delve and the client mirrors them', () => {
-    enterDelveOnServer();
+    enterDelveOnServer('tank');
     broadcast(server);
     const snap = lastSnap(fc.sent);
     expect(snap.self).toHaveProperty('drun');
     expect(snap.self).toHaveProperty('dcompanion');
+    expect(snap.self.dcompanion.role).toBe('tank');
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.delveRun).not.toBeNull();
     expect(client.companionState?.companionId).toBe('companion_tessa');
+    expect(client.companionState?.role).toBe('tank');
   });
 
   it('mirrors delveMarks + delveClears + delveDaily to the client when they change', () => {

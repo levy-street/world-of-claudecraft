@@ -5744,6 +5744,30 @@ const RULES: Rule[] = [
   { re: /^The grave is silent for now\.$/, build: () => t('sim.delve.graveSilent') },
   { re: /^The door is locked\.$/, build: () => t('sim.delve.doorLocked') },
   { re: /^Strike the wall to break through\.$/, build: () => t('sim.delve.strikeWall') },
+  {
+    re: /^Mining finds the fault\. The cracked wall opens\.$/,
+    build: () => t('sim.delve.miningShortcut'),
+  },
+  {
+    re: /^You chip at the cracked wall\. Mining would open it faster\.$/,
+    build: () => t('sim.delve.miningShortcutFallback'),
+  },
+  {
+    re: /^The cracked wall gives way after steady blows\.$/,
+    build: () => t('sim.delve.miningShortcutFallbackComplete'),
+  },
+  {
+    re: /^Herbalism withers the toxic growth before it spreads\.$/,
+    build: () => t('sim.delve.herbalismShortcut'),
+  },
+  {
+    re: /^You beat back the toxic growth\. Herbalism would cleanse it faster\.$/,
+    build: () => t('sim.delve.herbalismShortcutFallback'),
+  },
+  {
+    re: /^The toxic growth collapses after steady clearing\.$/,
+    build: () => t('sim.delve.herbalismShortcutFallbackComplete'),
+  },
   { re: /^Nothing happens\.$/, build: () => t('sim.delve.nothingHappens') },
   { re: /^Unknown companion\.$/, build: () => t('sim.delve.unknownCompanion') },
   {

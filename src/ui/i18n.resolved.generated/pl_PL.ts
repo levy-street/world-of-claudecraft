@@ -3385,6 +3385,12 @@ export const pl_PL: EnTranslations = {
       "graveSilent": "Grób na razie milczy.",
       "doorLocked": "Drzwi są zamknięte na klucz.",
       "strikeWall": "Uderz w ścianę, aby się przebić.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Nic się nie dzieje.",
       "unknownCompanion": "Nieznany towarzysz.",
       "companionMaxRank": "Ten towarzysz jest już w pełni ulepszony.",
@@ -3508,6 +3514,7 @@ export const pl_PL: EnTranslations = {
         "edda": "Edda Trzcinoręka",
         "rank": "Ranga {rank}",
         "boon": "Leczy drużynę między walkami. Ranga 3 wskrzesza poległego sojusznika raz na wyprawę.",
+        "roleLabel": "Companion role",
         "upgrade": "Ulepsz do rangi {rank} ({marks} Znaków)",
         "upgradeAria": "Ulepsz {name} do rangi {rank} za {marks} Znaków Wypraw",
         "maxRank": "W pełni ulepszony"
@@ -3528,6 +3535,7 @@ export const pl_PL: EnTranslations = {
       "objective": "Cel",
       "module": "Moduł {current} z {total}",
       "affix": "Afiksy",
+      "companionRole": "Companion role: {role}",
       "complete": "Ukończono",
       "marks": "Znaki Wypraw: {count}",
       "exitHintOpen": "Wejdź w nagrobne przejście (północ)",
@@ -3536,6 +3544,17 @@ export const pl_PL: EnTranslations = {
       "ritePlayback": "Obserwuj kapliczki: zapamiętaj kolejność, w jakiej się rozświetlają",
       "riteInput": "Naciśnij F przy każdej kapliczce w kolejności, w jakiej się rozświetliły ({current}/{total})",
       "riteOpen": "Relikwiarz jest otwarty: naciśnij przy nim F, aby odebrać łupy"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Zgładź {boss}",
@@ -3597,7 +3616,9 @@ export const pl_PL: EnTranslations = {
       "sluice_valve": "Zawór Śluzy",
       "grave_tablet": "Nagrobna Tablica",
       "corpse_candle": "Trupia Świeca",
-      "bell_rope": "Sznur Dzwonu"
+      "bell_rope": "Sznur Dzwonu",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

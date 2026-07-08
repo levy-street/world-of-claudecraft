@@ -3385,6 +3385,12 @@ export const da_DK: EnTranslations = {
       "graveSilent": "Graven er tavs for nu.",
       "doorLocked": "Døren er låst.",
       "strikeWall": "Slå på væggen for at bryde igennem.",
+      "miningShortcut": "Mining finds the fault. The cracked wall opens.",
+      "miningShortcutFallback": "You chip at the cracked wall. Mining would open it faster.",
+      "miningShortcutFallbackComplete": "The cracked wall gives way after steady blows.",
+      "herbalismShortcut": "Herbalism withers the toxic growth before it spreads.",
+      "herbalismShortcutFallback": "You beat back the toxic growth. Herbalism would cleanse it faster.",
+      "herbalismShortcutFallbackComplete": "The toxic growth collapses after steady clearing.",
       "nothingHappens": "Der sker ingenting.",
       "unknownCompanion": "Ukendt ledsager.",
       "companionMaxRank": "Denne ledsager er allerede fuldt opgraderet.",
@@ -3508,6 +3514,7 @@ export const da_DK: EnTranslations = {
         "edda": "Edda Sivhånd",
         "rank": "Rang {rank}",
         "boon": "Helbreder gruppen mellem kampe. Rang 3 genopliver en falden allieret én gang pr. tur.",
+        "roleLabel": "Companion role",
         "upgrade": "Opgrader til Rang {rank} ({marks} Mærker)",
         "upgradeAria": "Opgrader {name} til rang {rank} for {marks} Delve-Mærker",
         "maxRank": "Fuldt opgraderet"
@@ -3528,6 +3535,7 @@ export const da_DK: EnTranslations = {
       "objective": "Mål",
       "module": "Modul {current} af {total}",
       "affix": "Affikser",
+      "companionRole": "Companion role: {role}",
       "complete": "Fuldført",
       "marks": "Delve-Mærker: {count}",
       "exitHintOpen": "Gå ind i gravstenspassagen (nord)",
@@ -3536,6 +3544,17 @@ export const da_DK: EnTranslations = {
       "ritePlayback": "Hold øje med skrinene: husk den rækkefølge, de lyser op i",
       "riteInput": "Tryk på F ved hvert skrin i den rækkefølge, de lyste op ({current}/{total})",
       "riteOpen": "Relikvariet er åbent: tryk på F på det for at kræve dit bytte"
+    },
+    "companionRole": {
+      "healer": "Healer",
+      "tank": "Tank",
+      "damage": "Damage"
+    },
+    "shortcut": {
+      "miningReady": "Mining: open the cracked wall",
+      "miningFallback": "Shortcut: chip through the cracked wall",
+      "herbalismReady": "Herbalism: cleanse the toxic growth",
+      "herbalismFallback": "Shortcut: clear the toxic growth"
     },
     "objective": {
       "kill_boss": "Dræb {boss}",
@@ -3597,7 +3616,9 @@ export const da_DK: EnTranslations = {
       "sluice_valve": "Sluseventil",
       "grave_tablet": "Gravtavle",
       "corpse_candle": "Ligkerte",
-      "bell_rope": "Klokkereb"
+      "bell_rope": "Klokkereb",
+      "mining_cracked_wall": "Cracked Wall",
+      "herbalism_toxic_growth": "Toxic Growth"
     },
     "companion": {
       "barkLine": "{name}: {line}",

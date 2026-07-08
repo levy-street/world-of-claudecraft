@@ -121,7 +121,11 @@ export function nameplatePlanInto(
     e.templateId === 'delve_corpse_candle' ||
     e.templateId === 'delve_corpse_candle_lit' ||
     e.templateId === 'delve_bell_rope' ||
-    e.templateId === 'delve_bell_rope_pulled';
+    e.templateId === 'delve_bell_rope_pulled' ||
+    e.templateId === 'delve_mining_cracked_wall' ||
+    e.templateId === 'delve_mining_cracked_wall_open' ||
+    e.templateId === 'delve_herbalism_toxic_growth' ||
+    e.templateId === 'delve_herbalism_toxic_growth_cleansed';
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
