@@ -575,6 +575,13 @@ export class BagsWindow {
         row.addEventListener('dragend', () => {
           this.deps.setDragAction(null);
           this.deps.clearActionDropTargets();
+          // A drag that ends over another bag item is rejected (bag rows are not
+          // drop targets), so no drop handler clears the tooltip and no fresh
+          // mouseenter fires on the item under the now-stationary cursor: the
+          // dragged item's tooltip is left pinned (mousemove only repositions it).
+          // Clear it so the next hover resolves the item actually under the cursor
+          // (issue 1626, the bags twin of the hotbar fix 1485).
+          this.deps.hideTooltip();
         });
       }
       this.deps.attachTooltip(row, () => {
