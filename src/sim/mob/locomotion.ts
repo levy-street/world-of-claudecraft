@@ -457,6 +457,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
     if (mob.castingAbility === bigCast.castId) {
       mob.castRemaining = Math.max(0, mob.castRemaining - DT);
       if (mob.castRemaining <= 0) {
+        ctx.emit({ type: 'castStop', entityId: mob.id, success: true });
         mob.castingAbility = null;
         mob.castTotal = 0;
         mob.castRemaining = 0;
@@ -489,8 +490,59 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.castRemaining = bigCast.castTime;
         mob.castTargetId = null;
         mob.channeling = false;
+        ctx.emit({
+          type: 'castStart',
+          entityId: mob.id,
+          ability: bigCast.castId,
+          time: bigCast.castTime,
+        });
         if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
       }
+    }
+  }
+  // Marked-ground AoE: emit a readable warning now, then schedule one deterministic
+  // GroundAoE pulse at that exact world point after `delay`. Players who move out
+  // before the pulse are no longer inside the marked radius and avoid the hit.
+  const groundTelegraph = MOBS[mob.templateId]?.groundTelegraph;
+  if (groundTelegraph) {
+    mob.groundTelegraphTimer -= DT;
+    if (mob.groundTelegraphTimer <= 0) {
+      mob.groundTelegraphTimer = groundTelegraph.every + groundTelegraph.delay;
+      const target =
+        mob.aggroTargetId !== null ? (ctx.entities.get(mob.aggroTargetId) ?? null) : null;
+      const center = target && !target.dead ? target.pos : mob.pos;
+      const pos = ctx.groundPos(center.x, center.z);
+      const school = groundTelegraph.school ?? 'shadow';
+      ctx.emit({
+        type: 'spellfxAt',
+        x: pos.x,
+        z: pos.z,
+        school,
+        fx: 'nova',
+        radius: groundTelegraph.radius,
+      });
+      if (groundTelegraph.warning) {
+        ctx.emit({
+          type: 'log',
+          text: groundTelegraph.warning,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
+      }
+      const mult = mob.mechanicDamageMult ?? 1;
+      ctx.groundAoEs.push({
+        sourceId: mob.id,
+        pos,
+        radius: groundTelegraph.radius,
+        min: groundTelegraph.min * mult,
+        max: groundTelegraph.max * mult,
+        remaining: groundTelegraph.delay + DT,
+        interval: groundTelegraph.delay,
+        tickTimer: groundTelegraph.delay,
+        school,
+        ability: groundTelegraph.name,
+        targetPlayers: true,
+      });
     }
   }
   // Stoneskin: a periodic self-absorb barrier. Telegraphed via createMob, which
@@ -642,6 +694,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
+  mob.groundTelegraphTimer = MOBS[mob.templateId]?.groundTelegraph?.every ?? 0;
   // A mid-flight bigCast dies with the pull: clear the bar, reseed the cadence,
   // and let the next pull bark its engage line again.
   const bigCastDef = MOBS[mob.templateId]?.bigCast;

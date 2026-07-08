@@ -18,6 +18,18 @@ function spawnOlen(sim: Sim): Entity {
   return mob;
 }
 
+function spawnSexton(sim: Sim): Entity {
+  const mob = createMob((sim as any).nextId++, MOBS.sexton_marrow, 9, {
+    x: 0,
+    y: 0,
+    z: 0,
+  });
+  mob.hostile = true;
+  mob.hp = mob.maxHp;
+  (sim as any).addEntity(mob);
+  return mob;
+}
+
 // Place a player's entity at a position (pos.y matched to the mob's so dist2d is
 // the planar distance) and give it enough HP to survive a cleave splash.
 function placePlayer(sim: Sim, pid: number, x: number, z: number): Entity {
@@ -38,13 +50,23 @@ describe('mob cleave', () => {
     });
   });
 
+  it('Sexton Marrow is seeded with a readable tank-facing cleave', () => {
+    expect(MOBS.sexton_marrow.cleave).toEqual({
+      radius: 8,
+      mult: 0.55,
+      name: 'Bone Saw',
+      angle: Math.PI / 3,
+    });
+  });
+
   it('a landed swing splashes onto a second player near the primary target', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const main = sim.addPlayer('warrior', 'Tank');
     const near = sim.addPlayer('warrior', 'Cleaved');
     const olen = spawnOlen(sim);
-    const mainE = placePlayer(sim, main, 1, 0); // primary target, in melee
-    const nearE = placePlayer(sim, near, 1, 4); // 4yd from primary, within radius 8
+    const mainE = placePlayer(sim, main, 0, 2); // primary target, in melee
+    const nearE = placePlayer(sim, near, 1, 4); // in front, within radius 8
+    olen.facing = 0;
 
     const events: SimEvent[] = [];
     const origEmit = (sim as any).emit.bind(sim);
@@ -72,8 +94,9 @@ describe('mob cleave', () => {
     const main = sim.addPlayer('warrior', 'Tank');
     const far = sim.addPlayer('warrior', 'Safe');
     const olen = spawnOlen(sim);
-    const mainE = placePlayer(sim, main, 1, 0);
-    const farE = placePlayer(sim, far, 1, 40); // well beyond radius 8
+    const mainE = placePlayer(sim, main, 0, 2);
+    const farE = placePlayer(sim, far, 0, 40); // well beyond radius 8
+    olen.facing = 0;
 
     const events: SimEvent[] = [];
     const origEmit = (sim as any).emit.bind(sim);
@@ -87,6 +110,38 @@ describe('mob cleave', () => {
       (e) => e.targetId === farE.id && e.amount > 0,
     );
     expect(splash).toBeUndefined();
+  });
+
+  it('uses mob facing so a tank-facing cleave does not hit players behind the boss', () => {
+    const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+    const main = sim.addPlayer('warrior', 'Tank');
+    const front = sim.addPlayer('warrior', 'Front');
+    const behind = sim.addPlayer('warrior', 'Behind');
+    const sexton = spawnSexton(sim);
+    const mainE = placePlayer(sim, main, 0, 2);
+    const frontE = placePlayer(sim, front, 1, 3);
+    const behindE = placePlayer(sim, behind, 0, -2);
+    sexton.facing = 0;
+
+    const events: SimEvent[] = [];
+    const origEmit = (sim as any).emit.bind(sim);
+    (sim as any).emit = (ev: SimEvent) => {
+      events.push(ev);
+      return origEmit(ev);
+    };
+
+    for (let i = 0; i < 50; i++) {
+      events.length = 0;
+      (sim as any).mobSwing(sexton, mainE);
+      const dmg = events.filter((e) => e.type === 'damage') as any[];
+      const frontHit = dmg.find((e) => e.targetId === frontE.id && e.ability === 'Bone Saw');
+      if (frontHit) {
+        const behindHit = dmg.find((e) => e.targetId === behindE.id && e.ability === 'Bone Saw');
+        expect(behindHit).toBeUndefined();
+        return;
+      }
+    }
+    throw new Error('expected Sexton Marrow to cleave a player in front within 50 swings');
   });
 
   it('a non-cleaving mob does not splash', () => {

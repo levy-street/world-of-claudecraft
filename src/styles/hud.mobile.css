@@ -1762,6 +1762,10 @@
   body.mobile-touch #party-frames .party-frame .pf-badge {
     font-size: 9px;
   }
+  body.mobile-touch #party-frames .party-frame .pfm-role {
+    font-size: 8px;
+    padding: 0 2px;
+  }
   body.mobile-touch #party-frames .party-frame .bar {
     height: 5px;
     margin-top: 1px;

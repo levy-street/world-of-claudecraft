@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import {
@@ -16,8 +17,9 @@ import {
   updateDoorTriggers,
   updateInstances,
 } from '../src/sim/instances/dungeons';
-import { Sim } from '../src/sim/sim';
+import { Sim, type ResolvedAbility } from '../src/sim/sim';
 import {
+  type AbilityDef,
   type Entity,
   type MobTemplate,
   NYTHRAXIS_ADD_ID,
@@ -61,6 +63,61 @@ function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
     .find((e: AnyEntity | undefined) => e?.templateId === templateId);
   if (!mob) throw new Error(`missing ${templateId} in ${inst.dungeonId}`);
   return mob as AnyEntity;
+}
+
+function tickFor(sim: AnySim, ticks: number): any[] {
+  const events: any[] = [];
+  for (let i = 0; i < ticks; i++) events.push(...(sim.tick() as any[]));
+  return events;
+}
+
+function interruptRes(lockout = 4): ResolvedAbility {
+  const def: AbilityDef = {
+    id: 'test_interrupt',
+    name: 'Test Interrupt',
+    class: 'rogue',
+    learnLevel: 1,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [{ type: 'interrupt', lockout }],
+    description: '',
+  };
+  return {
+    def,
+    rank: 1,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    effects: def.effects,
+    threatFlat: 0,
+    threatMult: 1,
+  };
+}
+
+function morthenHarness(seed = 777): { sim: AnySim; pid: number; player: AnyEntity; boss: AnyEntity } {
+  const sim = makeSim(seed);
+  const pid = sim.addPlayer('warrior', 'Tank');
+  enterDungeon(sim.ctx, 'hollow_crypt', pid);
+  const inst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+  const boss = mobInInstance(sim, inst, 'morthen') as AnyEntity;
+  const player = sim.entities.get(pid) as AnyEntity;
+  player.maxHp = 1_000_000;
+  player.hp = 1_000_000;
+  teleport(sim, player, boss.pos.x, boss.pos.z + 1);
+  boss.aiState = 'attack';
+  boss.aggroTargetId = player.id;
+  boss.inCombat = true;
+  boss.leashAnchor = { ...boss.pos };
+  boss.threat.set(player.id, 100);
+  boss.swingTimer = 999;
+  boss.pulseTimer = 999;
+  boss.bigCastTimer = 999;
+  boss.groundTelegraphTimer = 999;
+  return { sim, pid, player, boss };
 }
 
 // Recompute the heroic spawn stats from the RAW base template and the tuning
@@ -433,6 +490,98 @@ describe('dungeons: heroic difficulty', () => {
     expect(sim.dungeonDifficulty(third)).toBe('normal');
     // The setter keeps their own preference.
     expect(sim.dungeonDifficulty(leader)).toBe('heroic');
+  });
+});
+
+describe('Hollow Crypt encounter readability mechanics', () => {
+  it('Morthen starts a visible Grave Rite cast and deals damage if uninterrupted', () => {
+    const { sim, pid, boss } = morthenHarness();
+    boss.bigCastTimer = 0;
+
+    const start = tickFor(sim, 1);
+    expect(start).toContainEqual(
+      expect.objectContaining({
+        type: 'castStart',
+        entityId: boss.id,
+        ability: 'Grave Rite',
+        time: 2,
+      }),
+    );
+    expect(boss.castingAbility).toBe('Grave Rite');
+
+    const finish = tickFor(sim, 20 * 3);
+    expect(finish).toContainEqual(
+      expect.objectContaining({
+        type: 'castStop',
+        entityId: boss.id,
+        success: true,
+      }),
+    );
+    expect(
+      finish.some((e) => e.type === 'damage' && e.ability === 'Grave Rite' && e.targetId === pid),
+    ).toBe(true);
+  });
+
+  it('an interrupt effect stops Morthen cast and prevents the Grave Rite damage', () => {
+    const { sim, pid, player, boss } = morthenHarness();
+    boss.bigCastTimer = 0;
+    tickFor(sim, 1);
+    expect(boss.castingAbility).toBe('Grave Rite');
+
+    runEffects(sim.ctx, player, sim.players.get(pid)!, boss, interruptRes(4));
+
+    expect(boss.castingAbility).toBeNull();
+    expect(boss.auras).toContainEqual(
+      expect.objectContaining({ kind: 'lockout', school: 'shadow', remaining: 4, duration: 4 }),
+    );
+    const events = tickFor(sim, 20 * 3);
+    expect(
+      events.some((e) => e.type === 'damage' && e.ability === 'Grave Rite' && e.targetId === pid),
+    ).toBe(false);
+  });
+
+  it('Morthen warns before his marked-ground damage lands', () => {
+    const { sim, pid, boss } = morthenHarness();
+    boss.groundTelegraphTimer = 0;
+
+    const warning = tickFor(sim, 1);
+    expect(warning).toContainEqual(
+      expect.objectContaining({ type: 'log', text: 'Move out of the marked ground.' }),
+    );
+    expect(
+      warning.some(
+        (e) => e.type === 'spellfxAt' && e.fx === 'nova' && e.radius === 4 && e.school === 'shadow',
+      ),
+    ).toBe(true);
+    expect(
+      warning.some(
+        (e) => e.type === 'damage' && e.ability === 'Grave Eruption' && e.targetId === pid,
+      ),
+    ).toBe(false);
+
+    const impact = tickFor(sim, 20 * 2);
+    expect(
+      impact.some(
+        (e) => e.type === 'damage' && e.ability === 'Grave Eruption' && e.targetId === pid,
+      ),
+    ).toBe(true);
+  });
+
+  it('players who move out of Morthen marked ground avoid the impact damage', () => {
+    const { sim, pid, player, boss } = morthenHarness(778);
+    boss.groundTelegraphTimer = 0;
+
+    const warning = tickFor(sim, 1);
+    const mark = warning.find((e) => e.type === 'spellfxAt' && e.radius === 4);
+    expect(mark).toBeTruthy();
+    teleport(sim, player, mark.x + 8, mark.z);
+
+    const impact = tickFor(sim, 20 * 2);
+    expect(
+      impact.some(
+        (e) => e.type === 'damage' && e.ability === 'Grave Eruption' && e.targetId === pid,
+      ),
+    ).toBe(false);
   });
 });
 

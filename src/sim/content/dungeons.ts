@@ -93,6 +93,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.2,
     color: 0x839192,
+    cleave: { radius: 8, mult: 0.55, name: 'Bone Saw', angle: Math.PI / 3 },
   },
   morthen: {
     id: 'morthen',
@@ -111,6 +112,26 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 16,
     aoePulse: { min: 12, max: 18, radius: 12, every: 10, name: 'Shadow Pulse' },
+    bigCast: {
+      castId: 'Grave Rite',
+      name: 'Grave Rite',
+      castTime: 2,
+      every: 12,
+      radius: 12,
+      min: 22,
+      max: 30,
+      school: 'shadow',
+    },
+    groundTelegraph: {
+      radius: 4,
+      every: 9,
+      delay: 1.25,
+      min: 18,
+      max: 26,
+      name: 'Grave Eruption',
+      school: 'shadow',
+      warning: 'Move out of the marked ground.',
+    },
     loot: [
       { copper: 2500, chance: 1 },
       { itemId: 'cryptbone_greaves', chance: 0.34, rollGroup: 'morthen_guaranteed_uncommon' },
@@ -588,6 +609,11 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     interior: 'crypt',
     suggestedPlayers: 5,
     enterText: 'You descend into the Hollow Crypt...',
+    mechanicTips: [
+      'Face Sexton Marrow away from allies.',
+      "Interrupt Morthen's cast.",
+      'Move out of the marked ground.',
+    ],
     leaveText: 'You climb back into daylight.',
   },
   sunken_bastion: {

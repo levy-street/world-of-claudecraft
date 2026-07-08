@@ -351,6 +351,7 @@ export interface SimContextCallbacks {
   // Invite a player to the actor's party by pid (delegates to the PartyMachine);
   // used by the chat "/invite <name>" command in social/chat.ts.
   partyInvite(targetPid: number, pid?: number): void;
+  setPartyRole(role: import('../world_api').PartyRole, pid?: number): void;
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
@@ -896,6 +897,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
     partyInvite: host.partyInvite,
+    setPartyRole: host.setPartyRole,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
     onMobKilledForQuests: host.onMobKilledForQuests,

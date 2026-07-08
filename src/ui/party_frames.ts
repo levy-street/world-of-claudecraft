@@ -30,7 +30,7 @@ export function selectPartyFrameMembers(
  * filtered / mapped arrays) is ever called. It encodes exactly the inputs the frames
  * render from: per member the pid, group, hp/maxHp, resource, dead,
  * in-combat, the out-of-range flag (computed inline, identically to the selector),
- * level, and the aura strip (id + kind + sap flag per aura, in order), plus the
+ * level, role, and the aura strip (id + kind + sap flag per aura, in order), plus the
  * leader, raid flag, and the player's own group. The player is skipped (the
  * frames never show the local player), matching the selector's `pid !== playerId`.
  *
@@ -55,7 +55,7 @@ export function partyFrameSignature(
       continue;
     }
     const oor = !m.dead && Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd;
-    sig += `${m.pid}:${m.group}:${m.hp}/${m.mhp}:${m.res}:${m.dead}:${m.inCombat}:${oor ? 1 : 0}:${m.level}:`;
+    sig += `${m.pid}:${m.group}:${m.hp}/${m.mhp}:${m.res}:${m.dead}:${m.inCombat}:${oor ? 1 : 0}:${m.level}:${m.role ?? ''}:`;
     // The aura strip, appended inline (no intermediate array): a joined/left aura,
     // a kind flip, or a sap-sign flip changes the string and repaints the row.
     if (m.auras) {

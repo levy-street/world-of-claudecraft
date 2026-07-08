@@ -6,6 +6,8 @@ import type {
   ResourceType,
 } from '../sim/types';
 
+export type PartyRole = 'tank' | 'healer' | 'damage';
+
 /** A compact aura summary for a party row's mini icon strip: the ability/aura id
  *  (drives the icon and the tooltip name), its kind (the fallback icon and the
  *  debuff classification), and neg=1 when the aura's value saps (a negative
@@ -33,6 +35,7 @@ export interface PartyMemberInfo {
   dead: number;
   inCombat: number;
   group: 1 | 2;
+  role?: PartyRole;
   /** Optional (an older server snapshot without it decodes as "no auras"). */
   auras?: PartyMemberAura[];
 }
@@ -48,6 +51,7 @@ export interface IWorldParty {
   // social systems
   partyInfo: PartyInfo | null;
   partyInvite(targetPid: number): void;
+  setPartyRole(role: PartyRole): void;
   partyAccept(): void;
   partyDecline(): void;
   partyLeave(): void;

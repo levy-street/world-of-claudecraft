@@ -15,7 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
-import { ABILITIES, isDelvePos } from '../data';
+import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
@@ -271,20 +271,23 @@ export function runEffects(
         if (!target || target.castingAbility === null || target.castingAbility === FISHING_CAST_ID)
           break;
         if (p.kind === 'player' && target.kind === 'player' && !ctx.isHostileTo(p, target)) break;
-        // Resolve per-player when possible (rank/mods), but fall back to the
-        // global ability table so a non-player caster (a mob whose cast is an
-        // ability id) is interruptible too; scripted pseudo-casts resolve to
-        // nothing and are immune by design.
+        // Resolve per-player when possible (rank/mods), fall back to the global
+        // ability table for ability-backed mob casts, and finally recognize the
+        // mob's configured boss hardcast. Other scripted pseudo-casts stay immune.
         const interruptedDef =
           ctx.resolvedAbility(target.castingAbility, target.id)?.def ??
           ABILITIES[target.castingAbility];
+        const scriptedBigCast =
+          target.kind === 'mob' && MOBS[target.templateId]?.bigCast?.castId === target.castingAbility
+            ? MOBS[target.templateId]?.bigCast
+            : undefined;
+        const school = interruptedDef?.school ?? scriptedBigCast?.school ?? 'nature';
         if (
-          !interruptedDef ||
-          interruptedDef.school === 'physical' ||
-          interruptedDef.uninterruptible
+          (!interruptedDef && !scriptedBigCast) ||
+          school === 'physical' ||
+          interruptedDef?.uninterruptible
         )
           break;
-        const school = interruptedDef.school;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
         if (remaining === null) break;

@@ -4160,6 +4160,7 @@ export class GameServer {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
+                role: party.roles.get(mPid),
                 // The mini aura strip under the member's party row (mirrors
                 // Sim.partyInfo): first N in aura order, id + kind + sap flag
                 // only, no countdown, so this payload changes only when the

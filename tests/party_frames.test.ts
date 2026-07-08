@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { partyFrameSignature, selectPartyFrameMembers } from '../src/ui/party_frames';
 import type { PartyInfo, PartyMemberInfo } from '../src/world_api';
 
-const member = (pid: number, group: 1 | 2, x = 0, z = 0): PartyMemberInfo => ({
+const member = (
+  pid: number,
+  group: 1 | 2,
+  x = 0,
+  z = 0,
+  role?: PartyMemberInfo['role'],
+): PartyMemberInfo => ({
   pid,
   name: `Raid${pid}`,
   cls: 'priest',
@@ -17,6 +23,7 @@ const member = (pid: number, group: 1 | 2, x = 0, z = 0): PartyMemberInfo => ({
   dead: 0,
   inCombat: 0,
   group,
+  ...(role ? { role } : {}),
 });
 
 describe('party frame member selection', () => {
@@ -167,6 +174,18 @@ describe('party frame signature (the per-frame short-circuit)', () => {
         pos,
       ),
     ).toBe(base);
+  });
+
+  it('changes when a rendered party role label changes', () => {
+    const pos = { x: 0, z: 0 };
+    const base = partyFrameSignature(info(), 1, pos);
+    const withRole = partyFrameSignature(
+      info({ members: [member(1, 1), member(2, 1, 10, 0, 'tank'), member(3, 1, 20, 0)] }),
+      1,
+      pos,
+    );
+
+    expect(withRole).not.toBe(base);
   });
 });
 

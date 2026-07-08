@@ -92,6 +92,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     pulseTimer: 0,
     stompTimer: 0,
     bigCastTimer: 0,
+    groundTelegraphTimer: 0,
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
@@ -512,6 +513,8 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
   // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.
   if (template.bigCast) e.bigCastTimer = template.bigCast.every;
+  // Telegraph the first marked-ground AoE the same way: one full interval after engage.
+  if (template.groundTelegraph) e.groundTelegraphTimer = template.groundTelegraph.every;
   // Telegraph the first Rally the same way: one full interval after engage.
   if (template.rally) e.rallyTimer = template.rally.every;
   // Telegraph the first War Cadence the same way: one full interval after engage.

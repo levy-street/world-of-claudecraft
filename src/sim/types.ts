@@ -797,7 +797,7 @@ export interface MobTemplate {
     radius: number;
     min: number;
     max: number;
-    school?: string;
+    school?: Aura['school'];
     yell?: string;
   };
   // Boss bark lines, broadcast as 'yell'-channel chat to every player within
@@ -938,9 +938,22 @@ export interface MobTemplate {
   // are extra battle cries it bellows every `every`s while in combat (cycled in order,
   // no rng). Chat-channel text, so it ships English under the boss-yell precedent.
   battleYells?: { lines: string[]; every: number; range: number };
-  // Melee mechanic: each landed swing also splashes onto other players near the
-  // primary target for `mult` of the (pre-armor) hit. A classic-style cleave arc.
-  cleave?: { radius: number; mult: number; name?: string };
+  // Melee mechanic: each landed swing also splashes onto other players in a
+  // forward cone from the mob for `mult` of the (pre-armor) hit.
+  cleave?: { radius: number; mult: number; name?: string; angle?: number };
+  // Boss mechanic: deterministic warning marker, then a single delayed ground AoE
+  // pulse at the marked point. The point is chosen from the current target's
+  // server position, and moving out before `delay` avoids the hit.
+  groundTelegraph?: {
+    radius: number;
+    every: number;
+    delay: number;
+    min: number;
+    max: number;
+    name: string;
+    school?: Aura['school'];
+    warning?: string;
+  };
   // On-hit debuff: a chance per landed melee swing to inflict a stacking-refresh
   // damage-over-time poison on the struck target (spiders, serpents, scorpions).
   venom?: {
@@ -1577,6 +1590,7 @@ export interface DungeonDef {
   interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis'; // renderer + collider interior builder key
   suggestedPlayers: number;
   enterText: string;
+  mechanicTips?: string[];
   leaveText: string;
 }
 
@@ -1849,6 +1863,7 @@ export interface Entity {
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
   bigCastTimer: number; // boss telegraphed-hardcast (bigCast) cadence countdown
+  groundTelegraphTimer: number; // boss warning-then-ground-impact cadence countdown
   yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown

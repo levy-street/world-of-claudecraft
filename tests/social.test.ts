@@ -467,6 +467,30 @@ describe('parties', () => {
     expect(info.z).toBeCloseTo(-23, 3);
   });
 
+  it('lets party members self-select non-gating role labels through /role', () => {
+    const { sim, a, b } = makeDuo();
+
+    sim.chat('/role tank', a);
+    sim.chat('/role damage', b);
+
+    expect(mustPartyMember(sim, a).role).toBe('tank');
+    expect(mustPartyMember(sim, b).role).toBe('damage');
+    expect(sim.partyOf(a)?.members).toEqual([a, b]);
+  });
+
+  it('clears a member role when they leave and keeps the role off a later rejoin', () => {
+    const { sim, a, b } = makeDuo();
+    sim.chat('/role healer', b);
+    expect(mustPartyMember(sim, b).role).toBe('healer');
+
+    sim.partyLeave(b);
+    expect(sim.partyOf(b)).toBeNull();
+
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    expect(mustPartyMember(sim, b).role).toBeUndefined();
+  });
+
   it('converts a party to a two-group raid with a ten player cap', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Leader');

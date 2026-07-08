@@ -592,6 +592,7 @@ export interface Party {
   members: number[]; // pids
   raid: boolean;
   raidGroups: Map<number, 1 | 2>; // pid -> raid subgroup
+  roles: Map<number, import('../world_api').PartyRole>; // pid -> optional declared role
   lootStrategies: LootStrategies;
   lootTurn: number; // round-robin common-item cursor; advances once per awarded item
   dungeonDifficulty?: DungeonDifficulty;
@@ -2784,6 +2785,7 @@ export class Sim {
       removeFungibleItem: sim.removeFungibleItem.bind(sim),
       partyOf: sim.partyOf.bind(sim),
       partyInvite: (targetPid: number, pid?: number) => sim.party.partyInvite(targetPid, pid),
+      setPartyRole: (role, pid) => sim.party.setPartyRole(role, pid),
       removeFromParty: (pid: number, verb: string) => sim.party.removeFromParty(pid, verb),
       // dropPartyMarkers flips to the T1 marker store (targeting); lazy arrow since
       // sim.targeting is built after ctx. The T1 selectors consume isHostileTo/
@@ -3668,7 +3670,15 @@ export class Sim {
       school: effect.school,
       fx: 'tick',
     });
-    for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
+    const targets = effect.targetPlayers
+      ? [...this.players.values()]
+          .map((meta) => this.entities.get(meta.entityId))
+          .filter(
+            (target): target is Entity =>
+              !!target && !target.dead && dist2d(target.pos, effect.pos) <= effect.radius,
+          )
+      : this.hostilesInRadius(source, effect.pos, effect.radius);
+    for (const target of targets) {
       if (!this.hasLineOfSight(source, target)) continue;
       const dmg = Math.round(this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0));
       this.dealDamage(
@@ -5720,6 +5730,10 @@ export class Sim {
     this.party.partyInvite(targetPid, pid);
   }
 
+  setPartyRole(role: import('../world_api').PartyRole, pid?: number): void {
+    this.party.setPartyRole(role, pid);
+  }
+
   partyAccept(pid?: number): void {
     this.party.partyAccept(pid);
   }
@@ -6566,6 +6580,7 @@ export class Sim {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
+                role: party.roles.get(mPid),
                 // The mini aura strip under the member's party row: first N in
                 // aura order (buffs and debuffs alike), id + kind + sap flag
                 // only, no countdown (see PartyMemberAura in world_api/party.ts).

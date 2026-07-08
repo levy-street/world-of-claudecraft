@@ -22,7 +22,17 @@
 import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
-import { type Aura, armorReduction, dist2d, type Entity, type MobTemplate } from '../types';
+import {
+  angleTo,
+  type Aura,
+  armorReduction,
+  dist2d,
+  type Entity,
+  type MobTemplate,
+  normAngle,
+} from '../types';
+
+const DEFAULT_CLEAVE_HALF_ANGLE = Math.PI / 3;
 
 // A "Devour Magic"-strippable beneficial enhancement: a positive buff_* stat
 // buff, a heal-over-time, an absorb shield, or a weapon imbue. Stances, forms,
@@ -94,15 +104,17 @@ export function runMobSwingAffixes(
       school: rampage.school ?? 'physical',
     });
   }
-  // Cleave: the swing splashes onto other players standing near the primary
-  // target, each taking the hit reduced by their own armor. Hostile mobs only,
+  // Cleave: the swing splashes onto other players standing in the mob's forward
+  // cone, each taking the hit reduced by their own armor. Hostile mobs only,
   // so a friendly pet swinging through mobSwing never cleaves its owner's party.
   const cleave = MOBS[mob.templateId]?.cleave;
   if (cleave && mob.hostile && !mob.dead) {
     for (const meta of ctx.players.values()) {
       const pe = ctx.entities.get(meta.entityId);
       if (!pe || pe.dead || pe.id === target.id) continue;
-      if (dist2d(pe.pos, target.pos) > cleave.radius) continue;
+      if (dist2d(pe.pos, mob.pos) > cleave.radius) continue;
+      const facingDiff = Math.abs(normAngle(angleTo(mob.pos, pe.pos) - mob.facing));
+      if (facingDiff > (cleave.angle ?? DEFAULT_CLEAVE_HALF_ANGLE)) continue;
       let sd = rawDmg * cleave.mult;
       sd *= 1 - armorReduction(ctx.effectiveArmor(pe), mob.level);
       ctx.dealDamage(

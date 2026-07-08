@@ -20,6 +20,7 @@ import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
+import type { PartyRole } from '../../world_api';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
 // from sim.ts with the only code that reads them; do NOT inline new numbers.
@@ -164,6 +165,7 @@ export class PartyMachine {
         members: [invite.fromPid],
         raid: false,
         raidGroups: new Map([[invite.fromPid, 1]]),
+        roles: new Map(),
         lootStrategies: { ...DEFAULT_PARTY_LOOT_STRATEGIES },
         lootTurn: 0,
         ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
@@ -374,6 +376,23 @@ export class PartyMachine {
     }
   }
 
+  setPartyRole(role: PartyRole, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party) {
+      this.ctx.error(r.meta.entityId, 'You are not in a party.');
+      return;
+    }
+    party.roles.set(r.meta.entityId, role);
+    this.ctx.emit({
+      type: 'log',
+      text: `Party role set to ${role}.`,
+      color: '#aaf',
+      pid: r.meta.entityId,
+    });
+  }
+
   private nextRaidGroupFor(party: Party): 1 | 2 {
     const g1 = party.members.filter((mPid) => (party.raidGroups.get(mPid) ?? 1) === 1).length;
     return g1 < RAID_GROUP_MAX ? 1 : 2;
@@ -397,6 +416,7 @@ export class PartyMachine {
     const meta = this.ctx.players.get(pid);
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
+    party.roles.delete(pid);
     this.partyByPid.delete(pid);
     for (const mPid of [...party.members, pid]) {
       this.ctx.emit({

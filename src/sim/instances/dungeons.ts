@@ -178,6 +178,9 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   // Spirit Healer inside an instance).
   if (p.ghost) resurrectOnInstanceReentry(ctx, r.meta, p, p.pos);
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
+  for (const tip of dungeon.mechanicTips ?? []) {
+    ctx.emit({ type: 'log', text: tip, color: '#ff9933', pid: r.meta.entityId });
+  }
 }
 
 function canEnterNythraxisRaid(meta: PlayerMeta): boolean {

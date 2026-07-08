@@ -38,6 +38,7 @@ import {
   type PartyRowDeps,
 } from './party_frame_row';
 import type { PartyFrameMember } from './party_frames';
+import { roleLabel } from './talent_i18n';
 import { unitFrameView } from './unit_frame';
 
 // The class-color custom property the frame's name reads (`color: var(--cls)`); a
@@ -63,6 +64,11 @@ const ARIA_FALSE = 'false';
 // forced-colors (where the combat box-shadow is dropped).
 const BADGE_SHOWN = '';
 const BADGE_HIDDEN = 'none';
+
+function partyRoleLabel(m: PartyFrameMember): string {
+  if (!m.role) return '';
+  return roleLabel(m.role === 'damage' ? 'dps' : m.role);
+}
 
 /** What the pool needs from the Hud: the class-color resolver and the row actions. */
 export interface PartyFramesPainterDeps {
@@ -300,6 +306,7 @@ export class PartyFramesPainter {
       // above; the group label needs the same treatment, from the live slot + last raid
       // flag, since a language switch does not flip partyFrameSignature).
       this.writers.setText(row.group, this.groupLabel(row.slot.member, this.lastRaid));
+      this.writers.setText(row.role, partyRoleLabel(row.slot.member));
     }
     for (const row of this.free) row.relocalize();
     if (this.leaveBtn) this.writers.setText(this.leaveBtn, this.deps.leaveLabel());
@@ -365,6 +372,7 @@ export class PartyFramesPainter {
     // both per-frame text routed through the elided writer (no raw write on the hot path);
     // each is cached, so a steady-state tick re-writes neither.
     this.writers.setText(row.leadStar, leader === m.pid ? PARTY_LEADER_GLYPH : '');
+    this.writers.setText(row.role, partyRoleLabel(m));
     this.writers.setText(row.group, this.groupLabel(m, raid));
     // The dead / combat / out-of-range badge icons: persistent, only display toggles
     // (the non-color cue that stays distinguishable under forced-colors).

@@ -49,6 +49,9 @@ export type GroundAoE = {
   ability: string;
   // Spell Power added per tick, snapshotted at cast time (caster ground AoEs).
   spBonus?: number;
+  // Encounter telegraphs from mobs can target player bodies directly; player-cast
+  // ground effects keep the default hostile lookup.
+  targetPlayers?: boolean;
 };
 
 // A SimEvent scheduled to fire at a future sim time, optionally gated by a live-

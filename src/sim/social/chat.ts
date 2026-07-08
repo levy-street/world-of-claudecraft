@@ -141,6 +141,25 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  const rolem = /^\/role(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (rolem) {
+    const roleArg = (rolem[1] ?? '').toLowerCase();
+    const role =
+      roleArg === 'tank'
+        ? 'tank'
+        : roleArg === 'healer'
+          ? 'healer'
+          : roleArg === 'damage' || roleArg === 'dps'
+            ? 'damage'
+            : null;
+    if (!role) {
+      ctx.error(r.meta.entityId, 'Role usage: /role tank, /role healer, or /role damage.');
+      return null;
+    }
+    ctx.setPartyRole(role, r.meta.entityId);
+    return null;
+  }
+
   if (ctx.devCommands) {
     // null means "handled, nothing to broadcast": returning it here is what
     // keeps a dev command from falling through to the unknown-command error.

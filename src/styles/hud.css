@@ -3919,6 +3919,18 @@
     gap: 4px;
     flex-shrink: 0;
   }
+  .party-frame .pfm-role {
+    border: 1px solid var(--gold-dim);
+    border-radius: 3px;
+    color: var(--color-text-light);
+    font-size: 9px;
+    line-height: 1.1;
+    letter-spacing: 0;
+    padding: 0 3px;
+  }
+  .party-frame .pfm-role:empty {
+    display: none;
+  }
   .party-frame .pfm-name .lead {
     color: var(--gold);
     font-size: 10px;

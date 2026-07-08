@@ -82,6 +82,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
+  mob.groundTelegraphTimer = MOBS[mob.templateId]?.groundTelegraph?.every ?? 0;
   // A mid-flight bigCast dies with the pull: clear the bar, reseed the cadence,
   // and let the next pull bark its engage line again.
   const bigCastDef = MOBS[mob.templateId]?.bigCast;

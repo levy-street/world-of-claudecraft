@@ -70,6 +70,7 @@ export interface PartyRow {
   // writer) and the visually-hidden raid-group span (the pool writes the localized
   // "Group n"); both are per-frame text the pool drives, the spans built once here.
   leadStar: HTMLElement;
+  role: HTMLElement;
   group: HTMLElement;
   relocalize: () => void;
   /** Repaint the member's mini aura strip (its own keyed AurasPainter pool per row).
@@ -171,6 +172,8 @@ export function createPartyRow(
   const combatBadge = buildBadge(doc, 'combat', svgIcon('arena'));
   const oorBadge = buildBadge(doc, 'oor', '');
   oorBadge.textContent = OUT_OF_RANGE_GLYPH;
+  const role = doc.createElement('span');
+  role.className = 'pfm-role';
   // Re-localize the three badge tooltips (called once now, and again by the pool on a
   // language switch, since the keyed pool reuses the row DOM and never rebuilds it).
   const relocalize = () => {
@@ -193,7 +196,7 @@ export function createPartyRow(
   const leadNum = doc.createElement('span');
   leadNum.className = 'lead-num';
   lead.append(leadStar, leadNum);
-  meta.append(deadBadge, combatBadge, oorBadge, lead);
+  meta.append(deadBadge, combatBadge, oorBadge, role, lead);
 
   // The raid-group cue (e.g. "Group 1"), visually hidden but kept in the accessible name
   // so a screen reader conveys which raid group a member sits in. Empty outside raid; the
@@ -278,6 +281,7 @@ export function createPartyRow(
     relocalize,
     badges: { dead: deadBadge, combat: combatBadge, oor: oorBadge },
     leadStar,
+    role,
     group,
     paintAuras,
   };

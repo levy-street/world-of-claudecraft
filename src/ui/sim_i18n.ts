@@ -186,7 +186,14 @@ const baseEnTable = {
   'log.dungeonDifficultyNormal': 'Dungeon difficulty set to Normal.',
   'log.dungeonDifficultyIsHeroic': 'Dungeon difficulty: Heroic. Use /dungeon normal to change it.',
   'log.dungeonDifficultyIsNormal': 'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
+  'log.partyRoleTank': 'Party role set to tank.',
+  'log.partyRoleHealer': 'Party role set to healer.',
+  'log.partyRoleDamage': 'Party role set to damage.',
+  'log.hollowTipFaceSexton': 'Face Sexton Marrow away from allies.',
+  'log.hollowTipInterruptMorthen': "Interrupt Morthen's cast.",
+  'log.hollowTipMarkedGround': 'Move out of the marked ground.',
   'error.heroicMarksNeeded': 'You need {marks} Heroic Marks to buy {name}.',
+  'error.roleUsage': 'Role usage: /role tank, /role healer, or /role damage.',
   'error.channelUsage': 'Usage: /{action} <channel>. Channels: {list}.',
   'error.generalAlwaysOn': 'The General channel is always on - just use /general.',
   'error.noSuchChannel': "There is no channel named '{name}'. Channels: {list}.",
@@ -212,6 +219,9 @@ const baseEnTable = {
   'mechanic.bellShock': 'Bell Shock',
   'mechanic.eggSacBurst': 'Egg-Sac Burst',
   'mechanic.tollingBell': 'Tolling Bell',
+  'mechanic.boneSaw': 'Bone Saw',
+  'mechanic.graveRite': 'Grave Rite',
+  'mechanic.graveEruption': 'Grave Eruption',
   'log.nhaliaTollsBells': '{name} tolls the bells!',
   'aura.drownedCanticle': 'Drowned Canticle',
   'mechanic.tectonicHeave': 'Tectonic Heave',
@@ -4112,7 +4122,7 @@ function locMob(name: string): string {
 }
 function locAbility(name: string): string {
   const id = abilityNameToId.get(name);
-  return id ? tEntity({ kind: 'ability', id, field: 'name' }) : name;
+  return id ? tEntity({ kind: 'ability', id, field: 'name' }) : (localizeSimAuraName(name) ?? name);
 }
 function locDelve(name: string): string {
   const id = delveNameToId.get(name);
@@ -4166,6 +4176,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Sump Stomp': 'mechanic.sumpStomp',
   'Bell Shock': 'mechanic.bellShock',
   'Egg-Sac Burst': 'mechanic.eggSacBurst',
+  'Bone Saw': 'mechanic.boneSaw',
+  'Grave Rite': 'mechanic.graveRite',
+  'Grave Eruption': 'mechanic.graveEruption',
   'Drowned Canticle': 'aura.drownedCanticle',
   'Tectonic Heave': 'mechanic.tectonicHeave',
   'Seismic Stomp': 'mechanic.seismicStomp',
@@ -5337,6 +5350,17 @@ const RULES: Rule[] = [
   {
     re: /^The Crypt Keystone turns cold as the seal breaks\.$/,
     build: () => tQuestExtra('ritualBreaks'),
+  },
+  {
+    re: /^Party role set to (.+)\.$/,
+    build: (m) =>
+      m[1] === 'tank'
+        ? tSim('log.partyRoleTank')
+        : m[1] === 'healer'
+          ? tSim('log.partyRoleHealer')
+          : m[1] === 'damage'
+            ? tSim('log.partyRoleDamage')
+            : `Party role set to ${m[1]}.`,
   },
   { re: /^The crypt entrance is sealed to you\.$/, build: () => tQuestExtra('cryptSealed') },
   {
