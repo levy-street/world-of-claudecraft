@@ -6297,6 +6297,51 @@ export const zh_CN: EnTranslations = {
       "sunpetal_sickle": {
         "name": "阳瓣镰刀"
       },
+      "copper_ore": {
+        "name": "铜矿石"
+      },
+      "tin_ore": {
+        "name": "锡矿石"
+      },
+      "iron_ore": {
+        "name": "铁矿石"
+      },
+      "copper_bar": {
+        "name": "铜锭"
+      },
+      "iron_bar": {
+        "name": "铁锭"
+      },
+      "thorium_bar": {
+        "name": "钍锭"
+      },
+      "silverleaf_herb": {
+        "name": "银叶草"
+      },
+      "briarthorn_herb": {
+        "name": "刺藤草"
+      },
+      "rough_hide": {
+        "name": "粗糙兽皮"
+      },
+      "thick_hide": {
+        "name": "坚韧兽皮"
+      },
+      "silk_gland": {
+        "name": "丝腺"
+      },
+      "venom_sac": {
+        "name": "毒囊"
+      },
+      "beast_fang": {
+        "name": "野兽尖牙"
+      },
+      "beast_claw": {
+        "name": "野兽利爪"
+      },
+      "boar_tusk": {
+        "name": "野猪獠牙"
+      },
       "thorium_ore": {
         "name": "瑟银矿石"
       },

@@ -5,7 +5,7 @@ import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, QuestProgress } from '../src/sim/types';
 
 // End-to-end: a slain mob's corpse can be harvested for profession components
 // exactly once, first-come. This is the deliberate OPPOSITE of a world gathering
@@ -19,6 +19,8 @@ type SimInternals = {
   entities: Map<number, Entity>;
   players: Map<number, PlayerMeta>;
 };
+
+const HIDE_MATERIAL_ITEM = 'rough_hide';
 
 function setup(seed = 11) {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
@@ -110,11 +112,26 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     const { sim, mob, a, b } = setup();
     sim.harvestCorpse(mob.id, undefined, a);
     sim.harvestCorpse(mob.id, undefined, b);
-    // forest_wolf's componentTags (#1140) include 'hide', mapped to boar_hide.
+    // forest_wolf's componentTags (#1140) include 'hide', mapped to a material.
     // #1142's focus-harvest tier roll can grant more than one per tier, so the
     // winner gets AT LEAST one, never the loser.
-    expect(sim.countItem('boar_hide', a)).toBeGreaterThanOrEqual(1);
-    expect(sim.countItem('boar_hide', b)).toBe(0);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, b)).toBe(0);
+    expect(sim.countItem('boar_hide', a)).toBe(0);
+  });
+
+  it('profession harvesting a hide material does not advance the boar hide quest', () => {
+    const { sim, internals, mob, a } = setup();
+    const meta = internals.players.get(a)!;
+    const progress: QuestProgress = { questId: 'q_boars', counts: [0], state: 'active' };
+    meta.questLog.set('q_boars', progress);
+
+    sim.harvestCorpse(mob.id, ['hide'], a);
+
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('boar_hide', a)).toBe(0);
+    expect(progress.counts[0]).toBe(0);
+    expect(progress.state).toBe('active');
   });
 
   it('denies harvest against a mob with no profession component tags', () => {
@@ -153,7 +170,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
       true,
     );
     expect(mob.harvestClaimedBy).toBeNull();
-    expect(sim.countItem('boar_hide', a)).toBe(0);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBe(0);
     // The corpse stays unclaimed: a living player can still win it.
     sim.harvestCorpse(mob.id, undefined, b);
     expect(mob.harvestClaimedBy).toBe(b);
@@ -167,12 +184,12 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     const ev = sim.drainEvents();
     expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     expect(mob.harvestClaimedBy).toBeNull();
-    expect(sim.countItem('boar_hide', a)).toBe(0);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBe(0);
     // The unconsumed claim is still winnable by a player with bag room.
     sim.harvestCorpse(mob.id, undefined, b);
     expect(mob.harvestClaimedBy).toBe(b);
     // #1142's focus-harvest tier roll can grant more than one per component.
-    expect(sim.countItem('boar_hide', b)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, b)).toBeGreaterThanOrEqual(1);
   });
 
   it('a slot-full inventory with a nearly-full yield stack is refused, never taken over capacity', () => {
@@ -186,8 +203,11 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
-    // Convert one gear slot into a boar_hide stack with room for exactly 1.
-    m.inventory[0] = { itemId: 'boar_hide', count: stackSizeOf(ITEMS.boar_hide) - 1 };
+    // Convert one gear slot into a hide-material stack with room for exactly 1.
+    m.inventory[0] = {
+      itemId: HIDE_MATERIAL_ITEM,
+      count: stackSizeOf(ITEMS[HIDE_MATERIAL_ITEM]) - 1,
+    };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
@@ -195,38 +215,35 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     expect(mob.harvestClaimedBy).toBeNull();
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
-    expect(sim.countItem('boar_hide', a)).toBe(stackSizeOf(ITEMS.boar_hide) - 1);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBe(
+      stackSizeOf(ITEMS[HIDE_MATERIAL_ITEM]) - 1,
+    );
     // The unconsumed claim is still winnable by a player with room.
     sim.harvestCorpse(mob.id, ['hide'], b);
     expect(mob.harvestClaimedBy).toBe(b);
-    expect(sim.countItem('boar_hide', b)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, b)).toBeGreaterThanOrEqual(1);
   });
 
-  it('a tagged corpse with no mapped item consumes the claim and yields nothing', () => {
-    // fen_troll's tags (claw, tusk) map to no harvest item yet: the documented
-    // deferred-design path (single-use claimed, zero yield, zero emits; the
-    // silent success is flagged upstream as an open design call, so this pin
-    // locks the CURRENT behavior and reds intentionally if that call lands).
+  it('newly mapped claw and tusk tags grant profession materials', () => {
     const { sim, internals, a, b } = setup();
     const template = MOBS.fen_troll;
     expect(template.componentTags).toEqual(['claw', 'tusk']);
-    for (const tag of template.componentTags!) {
-      expect(HARVEST_COMPONENT_ITEMS[tag]).toBeUndefined();
-    }
-    const noYieldMob = createMob(7777, template, template.maxLevel, { x: 0, y: 0, z: 0 });
-    noYieldMob.dead = true;
-    noYieldMob.corpseTimer = 9999;
-    noYieldMob.respawnTimer = 9999;
-    internals.entities.set(noYieldMob.id, noYieldMob);
-    const before = internals.players.get(a)!.inventory.length;
+    expect(HARVEST_COMPONENT_ITEMS.claw).toBe('beast_claw');
+    expect(HARVEST_COMPONENT_ITEMS.tusk).toBe('boar_tusk');
+    const componentMob = createMob(7777, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    componentMob.dead = true;
+    componentMob.corpseTimer = 9999;
+    componentMob.respawnTimer = 9999;
+    internals.entities.set(componentMob.id, componentMob);
     sim.drainEvents();
-    sim.harvestCorpse(noYieldMob.id, undefined, a);
-    expect(sim.drainEvents()).toEqual([]);
-    expect(noYieldMob.harvestClaimedBy).toBe(a);
-    expect(internals.players.get(a)!.inventory.length).toBe(before);
-    // The zero-yield claim is still single-use for everyone else.
-    sim.harvestCorpse(noYieldMob.id, undefined, b);
-    expect(noYieldMob.harvestClaimedBy).toBe(a);
+    sim.harvestCorpse(componentMob.id, undefined, a);
+    expect(componentMob.harvestClaimedBy).toBe(a);
+    expect(sim.countItem('beast_claw', a) + sim.countItem('boar_tusk', a)).toBeGreaterThanOrEqual(
+      1,
+    );
+    // The profession-material claim is still single-use for everyone else.
+    sim.harvestCorpse(componentMob.id, undefined, b);
+    expect(componentMob.harvestClaimedBy).toBe(a);
   });
 
   it('clears the claim on respawn, so the next corpse is harvestable again', () => {
@@ -261,23 +278,23 @@ describe('signed materials (#1145)', () => {
     const { sim, internals, a, mob } = setup(5);
     sim.harvestCorpse(mob.id, ['hide'], a);
     const meta = internals.players.get(a)!;
-    const slot = meta.inventory.find((s) => s.itemId === 'boar_hide');
+    const slot = meta.inventory.find((s) => s.itemId === HIDE_MATERIAL_ITEM);
     expect(slot).toBeDefined();
     expect(slot?.instance?.signer).toBe('Alpha');
     // A signed instance is always its own single-count slot (addItemInstance),
     // regardless of the tier the focus-harvest roll landed on.
-    expect(sim.countItem('boar_hide', a)).toBe(1);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBe(1);
   });
 
   it('a below-rare harvest grants a plain, unsigned fungible stack at its tier quantity (seed 2)', () => {
     const { sim, internals, a, mob } = setup(2);
     sim.harvestCorpse(mob.id, ['hide'], a);
     const meta = internals.players.get(a)!;
-    const slot = meta.inventory.find((s) => s.itemId === 'boar_hide');
+    const slot = meta.inventory.find((s) => s.itemId === HIDE_MATERIAL_ITEM);
     expect(slot).toBeDefined();
     expect(slot?.instance).toBeUndefined();
     // This seed's focus-tier roll lands above the poor floor, so the fungible
     // grant is more than a single unit (harvestTierQuantity(tier), #1142).
-    expect(sim.countItem('boar_hide', a)).toBe(2);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBe(2);
   });
 });

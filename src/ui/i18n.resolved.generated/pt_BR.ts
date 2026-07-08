@@ -6297,6 +6297,51 @@ export const pt_BR: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Foice Pétala Solar"
       },
+      "copper_ore": {
+        "name": "Copper Ore"
+      },
+      "tin_ore": {
+        "name": "Tin Ore"
+      },
+      "iron_ore": {
+        "name": "Iron Ore"
+      },
+      "copper_bar": {
+        "name": "Copper Bar"
+      },
+      "iron_bar": {
+        "name": "Iron Bar"
+      },
+      "thorium_bar": {
+        "name": "Thorium Bar"
+      },
+      "silverleaf_herb": {
+        "name": "Silverleaf Herb"
+      },
+      "briarthorn_herb": {
+        "name": "Briarthorn Herb"
+      },
+      "rough_hide": {
+        "name": "Rough Hide"
+      },
+      "thick_hide": {
+        "name": "Sturdy Hide"
+      },
+      "silk_gland": {
+        "name": "Silk Gland"
+      },
+      "venom_sac": {
+        "name": "Venom Sac"
+      },
+      "beast_fang": {
+        "name": "Beast Fang"
+      },
+      "beast_claw": {
+        "name": "Beast Claw"
+      },
+      "boar_tusk": {
+        "name": "Boar Tusk"
+      },
       "thorium_ore": {
         "name": "Minério de Tório"
       },

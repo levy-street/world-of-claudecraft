@@ -69,13 +69,13 @@ describe('TOOL_RECIPES (#1135 de-stub): tier 4/5 tool recipes', () => {
     entity.pos.x = CRAFTING_HUB_POS.x;
     entity.pos.z = CRAFTING_HUB_POS.z;
     entity.prevPos = { ...entity.pos };
-    grantItem(sim, 'thorium_ore', 4, pid);
+    grantItem(sim, 'thorium_bar', 2, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
-    expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    expect(sim.countItem('thorium_bar', pid)).toBe(0);
     expect(sim.countItem('mithril_mining_pick', pid)).toBe(0);
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
   });
@@ -86,14 +86,14 @@ describe('resolveCraft (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_tough_jerky')!;
-    grantItem(sim, 'spider_leg', 1, pid);
+    grantItem(sim, 'boar_tusk', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
     expect(result.itemId).toBe('tough_jerky');
     expect(result.count).toBe(1);
-    expect(sim.countItem('spider_leg', pid)).toBe(0);
+    expect(sim.countItem('boar_tusk', pid)).toBe(0);
     expect(sim.countItem('tough_jerky', pid)).toBe(1);
   });
 
@@ -101,14 +101,14 @@ describe('resolveCraft (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    grantItem(sim, 'bone_fragments', 2, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'copper_bar', 2, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
-    expect(sim.countItem('bone_fragments', pid)).toBe(0);
-    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('copper_bar', pid)).toBe(0);
+    expect(sim.countItem('ashwood_log', pid)).toBe(0);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
   });
 
@@ -116,17 +116,17 @@ describe('resolveCraft (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    // One bone_fragments short of the required 2.
-    grantItem(sim, 'bone_fragments', 1, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    // One copper_bar short of the required 2.
+    grantItem(sim, 'copper_bar', 1, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('insufficient_materials');
     // Partial consumption never happens: both reagents untouched.
-    expect(sim.countItem('bone_fragments', pid)).toBe(1);
-    expect(sim.countItem('linen_scrap', pid)).toBe(1);
+    expect(sim.countItem('copper_bar', pid)).toBe(1);
+    expect(sim.countItem('ashwood_log', pid)).toBe(1);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(0);
   });
 
@@ -134,15 +134,15 @@ describe('resolveCraft (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    // Held bone_fragments (reagents[0]) in full, short on linen_scrap (reagents[1]).
-    grantItem(sim, 'bone_fragments', 2, pid);
+    // Held copper_bar (reagents[0]) in full, short on ashwood_log (reagents[1]).
+    grantItem(sim, 'copper_bar', 2, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('insufficient_materials');
-    expect(sim.countItem('bone_fragments', pid)).toBe(2);
-    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('copper_bar', pid)).toBe(2);
+    expect(sim.countItem('ashwood_log', pid)).toBe(0);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(0);
   });
 
@@ -159,17 +159,17 @@ describe('resolveCraft (#1127)', () => {
     const pid = sim.playerId;
     const recipe = recipeById('recipe_tough_jerky')!;
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(false);
-    grantItem(sim, 'spider_leg', 1, pid);
+    grantItem(sim, 'boar_tusk', 1, pid);
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(true);
     // Read-only: no reagent was consumed by the check itself.
-    expect(sim.countItem('spider_leg', pid)).toBe(1);
+    expect(sim.countItem('boar_tusk', pid)).toBe(1);
   });
 
   it('grants a flat point of craft skill for the crafted recipe only', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_tough_jerky')!;
-    grantItem(sim, 'spider_leg', 2, pid);
+    grantItem(sim, 'boar_tusk', 2, pid);
     const meta = (sim as any).players.get(pid);
 
     resolveCraft((sim as any).ctx, pid, recipe.id);
@@ -184,7 +184,7 @@ describe('resolveCraft (#1127)', () => {
     const runOnce = () => {
       const sim = makeSim(7);
       const pid = sim.playerId;
-      grantItem(sim, 'spider_leg', 1, pid);
+      grantItem(sim, 'boar_tusk', 1, pid);
       const recipe = recipeById('recipe_tough_jerky')!;
       const drawsBefore = (sim as any).rng.draws ?? 0;
       const result = resolveCraft((sim as any).ctx, pid, recipe.id);
@@ -223,7 +223,7 @@ describe('resolveCraft (#1127)', () => {
     expect(denied.ok).toBe(false);
     expect(draws).toBe(0);
 
-    grantItem(sim, 'spider_leg', 1, pid);
+    grantItem(sim, 'boar_tusk', 1, pid);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     rng.setObserver(null);
 
@@ -238,7 +238,7 @@ describe('craftItem command (#1127)', () => {
   it('resolves server-side via Sim.craftItem, stashing the result on lastCraftResult', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    grantItem(sim, 'spider_leg', 1, pid);
+    grantItem(sim, 'boar_tusk', 1, pid);
     sim.craftItem('recipe_tough_jerky', pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     expect(sim.lastCraftResult?.itemId).toBe('tough_jerky');
@@ -271,21 +271,21 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
-    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs bone_fragments x2, linen_scrap x1
-    // One self-signed bone_fragments (stamped with this player's own name) plus
-    // one plain bone_fragments: normally 2 would be required, the bonus drops it to 1.
-    sim.addItemInstance('bone_fragments', { signer: meta.name }, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs copper_bar x2, ashwood_log x1
+    // One self-signed copper_bar is enough after the bonus drops the
+    // two-unit requirement to one.
+    sim.addItemInstance('copper_bar', { signer: meta.name }, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(true);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
     expect(result.selfSignedBonusApplied).toBe(true);
-    // The single signed copy (the only bone_fragments held) was consumed as
+    // The single signed copy (the only copper_bar held) was consumed as
     // part of satisfying the reduced (1-unit) requirement.
-    expect(sim.countItem('bone_fragments', pid)).toBe(0);
-    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('copper_bar', pid)).toBe(0);
+    expect(sim.countItem('ashwood_log', pid)).toBe(0);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
   });
 
@@ -294,10 +294,10 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
     // Signed by someone else: does not count toward the crafter's own bonus.
-    sim.addItemInstance('bone_fragments', { signer: 'SomeoneElse' }, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    sim.addItemInstance('copper_bar', { signer: 'SomeoneElse' }, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
-    // Still short: only 1 of the required 2 bone_fragments (no bonus reduction).
+    // Still short: only 1 of the required 2 copper_bar (no bonus reduction).
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(false);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     expect(result.ok).toBe(false);
@@ -309,26 +309,26 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    grantItem(sim, 'bone_fragments', 2, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'copper_bar', 2, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     expect(result.ok).toBe(true);
     expect(result.selfSignedBonusApplied).toBe(false);
-    expect(sim.countItem('bone_fragments', pid)).toBe(0);
+    expect(sim.countItem('copper_bar', pid)).toBe(0);
   });
 });
 
 describe('tiered mastery gating (#1128)', () => {
   // A synthetic tier-1 recipe (skillReq 25, one bucket above common) reusing an
-  // existing harvested reagent, so these tests can drive the tier curve without
+  // existing profession material, so these tests can drive the tier curve without
   // needing higher-tier content in content/recipes.ts (that is a later issue).
   const tier1Recipe: ProfessionRecipeRecord = {
     id: 'test_tier1_recipe',
     professionId: 'weaponcrafting',
     resultItemId: 'eastbrook_arming_sword',
     resultCount: 1,
-    reagents: [{ itemId: 'bone_fragments', count: 1 }],
+    reagents: [{ itemId: 'copper_bar', count: 1 }],
     skillReq: 25,
     trivialAt: 50,
     itemLevelBudget: 10,
@@ -343,7 +343,7 @@ describe('tiered mastery gating (#1128)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     setSkill(sim, pid, 'weaponcrafting', 25); // tier-1 capability
-    grantItem(sim, 'bone_fragments', 1, pid);
+    grantItem(sim, 'copper_bar', 1, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, tier1Recipe);
 
@@ -356,7 +356,7 @@ describe('tiered mastery gating (#1128)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     setSkill(sim, pid, 'weaponcrafting', 50); // tier-2 capability, recipe is tier-1
-    grantItem(sim, 'bone_fragments', 1, pid);
+    grantItem(sim, 'copper_bar', 1, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, tier1Recipe);
 
@@ -375,7 +375,7 @@ describe('tiered mastery gating (#1128)', () => {
     // "uncapped-to-rare" (tier 2) ceiling that would otherwise also clamp a tier-3 raw skill.
     sim.acceptArchetypeQuest('weaponcrafting');
     setSkill(sim, pid, 'weaponcrafting', 75); // tier-3 capability, recipe is tier-1
-    grantItem(sim, 'bone_fragments', 1, pid);
+    grantItem(sim, 'copper_bar', 1, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, tier1Recipe);
 
@@ -387,7 +387,7 @@ describe('tiered mastery gating (#1128)', () => {
   it('common-tier crafting always grants its full floor, regardless of capability', () => {
     const lowCapSim = makeSim();
     const lowPid = lowCapSim.playerId;
-    grantItem(lowCapSim, 'spider_leg', 1, lowPid);
+    grantItem(lowCapSim, 'boar_tusk', 1, lowPid);
     const commonRecipe = recipeById('recipe_tough_jerky')!;
     expect(commonRecipe.skillReq).toBe(0);
 
@@ -398,7 +398,7 @@ describe('tiered mastery gating (#1128)', () => {
     const highCapSim = makeSim();
     const highPid = highCapSim.playerId;
     setSkill(highCapSim, highPid, 'cooking', 100); // high tier capability
-    grantItem(highCapSim, 'spider_leg', 1, highPid);
+    grantItem(highCapSim, 'boar_tusk', 1, highPid);
 
     resolveCraftForRecipe((highCapSim as any).ctx, highPid, commonRecipe);
     const highMeta = (highCapSim as any).players.get(highPid);
@@ -436,8 +436,8 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     const pid = sim.playerId;
     setSkill(sim, pid, 'armorcrafting', 25);
     setSkill(sim, pid, 'weaponcrafting', 25);
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'iron_bar', 4, pid);
+    grantItem(sim, 'thick_hide', 2, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
 
@@ -452,16 +452,16 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     setSkill(sim, pid, 'armorcrafting', 100); // craftA very high
     setSkill(sim, pid, 'weaponcrafting', 0); // craftB missing entirely
     setSkill(sim, pid, 'cooking', 100); // unrelated craft, also very high
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'iron_bar', 4, pid);
+    grantItem(sim, 'thick_hide', 2, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
 
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('combo_requirement_unmet');
     // Denied with no side effect: reagents untouched, no item granted.
-    expect(sim.countItem('bone_fragments', pid)).toBe(4);
-    expect(sim.countItem('linen_scrap', pid)).toBe(2);
+    expect(sim.countItem('iron_bar', pid)).toBe(4);
+    expect(sim.countItem('thick_hide', pid)).toBe(2);
     expect(sim.countItem(comboRecipe.resultItemId, pid)).toBe(0);
   });
 
@@ -471,8 +471,8 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     // No skill at all in either required craft; sky-high skill in a third,
     // unrelated craft never substitutes for either half of the pair.
     setSkill(sim, pid, 'cooking', 200);
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'iron_bar', 4, pid);
+    grantItem(sim, 'thick_hide', 2, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
 
@@ -485,8 +485,8 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     const pid = sim.playerId;
     setSkill(sim, pid, 'armorcrafting', 25); // meets minTier 1
     setSkill(sim, pid, 'weaponcrafting', 24); // one point short of tier 1
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'iron_bar', 4, pid);
+    grantItem(sim, 'thick_hide', 2, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
 
@@ -498,8 +498,8 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     setSkill(sim, pid, 'armorcrafting', 25);
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'iron_bar', 4, pid);
+    grantItem(sim, 'thick_hide', 2, pid);
 
     sim.craftItem(comboRecipe.id, pid);
 
@@ -516,21 +516,21 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
-    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs bone_fragments x2, linen_scrap x1
-    // One self-signed bone_fragments (stamped with this player's own name) plus
-    // one plain bone_fragments: normally 2 would be required, the bonus drops it to 1.
-    sim.addItemInstance('bone_fragments', { signer: meta.name }, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs copper_bar x2, ashwood_log x1
+    // One self-signed copper_bar is enough after the bonus drops the
+    // two-unit requirement to one.
+    sim.addItemInstance('copper_bar', { signer: meta.name }, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(true);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
     expect(result.selfSignedBonusApplied).toBe(true);
-    // The single signed copy (the only bone_fragments held) was consumed as
+    // The single signed copy (the only copper_bar held) was consumed as
     // part of satisfying the reduced (1-unit) requirement.
-    expect(sim.countItem('bone_fragments', pid)).toBe(0);
-    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('copper_bar', pid)).toBe(0);
+    expect(sim.countItem('ashwood_log', pid)).toBe(0);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
   });
 
@@ -539,10 +539,10 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
     // Signed by someone else: does not count toward the crafter's own bonus.
-    sim.addItemInstance('bone_fragments', { signer: 'SomeoneElse' }, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    sim.addItemInstance('copper_bar', { signer: 'SomeoneElse' }, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
-    // Still short: only 1 of the required 2 bone_fragments (no bonus reduction).
+    // Still short: only 1 of the required 2 copper_bar (no bonus reduction).
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(false);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     expect(result.ok).toBe(false);
@@ -554,8 +554,8 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
-    const recipe = recipeById('recipe_tough_jerky')!; // needs spider_leg x1
-    sim.addItemInstance('spider_leg', { signer: meta.name }, pid);
+    const recipe = recipeById('recipe_tough_jerky')!; // needs boar_tusk x1
+    sim.addItemInstance('boar_tusk', { signer: meta.name }, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
@@ -563,7 +563,7 @@ describe('self-gathered crafting bonus (#1145)', () => {
     // count 1 minus the bonus would floor to 0; the fix floors at 1 instead so
     // the signed instance is actually consumed, not retained for infinite crafts.
     expect(result.selfSignedBonusApplied).toBe(false);
-    expect(sim.countItem('spider_leg', pid)).toBe(0);
+    expect(sim.countItem('boar_tusk', pid)).toBe(0);
 
     // A second craft attempt fails: the signed instance was consumed, not retained.
     const second = resolveCraft((sim as any).ctx, pid, recipe.id);
@@ -574,12 +574,12 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    grantItem(sim, 'bone_fragments', 2, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'copper_bar', 2, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     expect(result.ok).toBe(true);
     expect(result.selfSignedBonusApplied).toBe(false);
-    expect(sim.countItem('bone_fragments', pid)).toBe(0);
+    expect(sim.countItem('copper_bar', pid)).toBe(0);
   });
 });

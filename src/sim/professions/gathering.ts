@@ -2,12 +2,11 @@
 // SimContext seam. The backing counters live on PlayerMeta (sim.ts); this
 // module holds the pure functions. Each gathering profession is an
 // independent, additive counter: granting one never touches another (no
-// shared/conserved pool). No world nodes exist yet (see issue #1119), so the
-// only producer today is the ALLOW_DEV_COMMANDS `/dev gather` chat cheat
-// (src/sim/social/chat.ts), which QUEUES a grant here; the queue is drained
-// once per player during the normal 20 Hz tick loop (sim.ts `tick()`, next to
-// `updateRested`), so a grant only ever takes effect on the deterministic tick
-// path, never out of band.
+// shared/conserved pool). World node harvests and the ALLOW_DEV_COMMANDS
+// `/dev gather` chat cheat both QUEUE grants here; the queue is drained once
+// per player during the normal 20 Hz tick loop (sim.ts `tick()`, next to
+// `updateRested`), so proficiency changes only ever take effect on the
+// deterministic tick path, never out of band.
 
 import { GATHER_NODES } from '../content/gather_nodes';
 import {
@@ -56,25 +55,28 @@ function neededNodeQuestItem(
 
 export type GatheringProficiency = Record<GatheringProfessionId, number>;
 
-// Per-node harvest tuning (#1121). Each node type grants one fixed material item
-// and one point of the matching gathering profession's proficiency; no rng draw,
-// so the outcome is fully deterministic given the same sequence of harvests (the
-// item's RARITY roll is explicitly out of scope, see issue #1122). The items
-// reused below are existing generic junk entries (src/sim/content/items.ts): a
-// placeholder grant that avoids expanding the positional per-locale item-name
-// arrays in src/ui/i18n.catalog/items.ts for this issue; dedicated ore/wood/herb
-// items are future content work.
-export const NODE_HARVEST_TABLE: Record<
-  GatherNodeType,
-  { professionId: GatheringProfessionId; itemId: string; respawnSeconds: number }
-> = {
-  ore: { professionId: 'mining', itemId: 'bone_fragments', respawnSeconds: 120 },
-  wood: { professionId: 'logging', itemId: 'linen_scrap', respawnSeconds: 120 },
-  herb: { professionId: 'herbalism', itemId: 'spider_leg', respawnSeconds: 120 },
+export interface NodeHarvestEntry {
+  professionId: GatheringProfessionId;
+  itemId: string;
+  respawnSeconds: number;
+}
+
+// Per-node harvest tuning (#1121). Each node type has a safe fallback material
+// and matching gathering profession; specific node content can override the
+// material tier with `materialItemId`.
+export const NODE_HARVEST_TABLE: Record<GatherNodeType, NodeHarvestEntry> = {
+  ore: { professionId: 'mining', itemId: 'copper_ore', respawnSeconds: 120 },
+  wood: { professionId: 'logging', itemId: 'ashwood_log', respawnSeconds: 120 },
+  herb: { professionId: 'herbalism', itemId: 'silverleaf_herb', respawnSeconds: 120 },
 };
 
 export function gatherNodeById(nodeId: string): GatherNodeDef | undefined {
   return GATHER_NODES.find((n) => n.id === nodeId);
+}
+
+export function nodeHarvestEntryFor(node: GatherNodeDef): NodeHarvestEntry {
+  const fallback = NODE_HARVEST_TABLE[node.type];
+  return node.materialItemId ? { ...fallback, itemId: node.materialItemId } : fallback;
 }
 
 // Material rarity roll (#1122): the standard item rarity ladder (ItemDef['quality'],
@@ -86,6 +88,19 @@ export type MaterialRarity = Exclude<NonNullable<ItemDef['quality']>, 'poor'>;
 // Proficiency is clamped to this ceiling before weighting: proficiency gains
 // beyond this point buy no further rarity odds (the ladder is already maxed out).
 export const MATERIAL_RARITY_MAX_PROFICIENCY = 100;
+
+export function materialRarityQuantity(rarity: MaterialRarity): number {
+  switch (rarity) {
+    case 'common':
+      return 1;
+    case 'uncommon':
+    case 'rare':
+      return 2;
+    case 'epic':
+    case 'legendary':
+      return 3;
+  }
+}
 
 // Weight formula: at clamped proficiency p in [0, MATERIAL_RARITY_MAX_PROFICIENCY],
 // each non-common tier's weight is p * its fixed share below, and common's weight is
@@ -153,14 +168,13 @@ export function isNodeHarvestableBy(meta: PlayerMeta, nodeId: string, now: numbe
 export interface HarvestResolution {
   granted: boolean;
   itemId?: string;
+  quantity?: number;
   professionId?: GatheringProfessionId;
   // The rolled material rarity (#1122), scaled by the player's proficiency in the
-  // node's matching profession at the moment of harvest. Informational for now:
-  // NODE_HARVEST_TABLE still grants one fixed placeholder item id regardless of
-  // rarity (dedicated per-rarity ore/wood/herb items are future content work, same
-  // as the NODE_HARVEST_TABLE comment above), so this does not yet change what
-  // gets granted; it settles the roll contract callers (loot text, future content)
-  // build against.
+  // node's matching profession at the moment of harvest. The stackable node
+  // material stays the same item id in this slice; rarity changes quantity so
+  // higher skill has a player-visible effect without introducing per-stack
+  // quality metadata yet.
   rarity?: MaterialRarity;
 }
 
@@ -178,11 +192,18 @@ export function resolveHarvest(
   rng: Rng,
 ): HarvestResolution {
   if (!isNodeHarvestableBy(meta, node.id, now)) return { granted: false };
-  const entry = NODE_HARVEST_TABLE[node.type];
+  const entry = nodeHarvestEntryFor(node);
   meta.nodeHarvestReadyAt[node.id] = now + entry.respawnSeconds;
   const rarity = rollMaterialRarity(meta.gatheringProficiency[entry.professionId], rng);
+  const quantity = materialRarityQuantity(rarity);
   queueGatheringGrant(meta, entry.professionId, 1);
-  return { granted: true, itemId: entry.itemId, professionId: entry.professionId, rarity };
+  return {
+    granted: true,
+    itemId: entry.itemId,
+    quantity,
+    professionId: entry.professionId,
+    rarity,
+  };
 }
 
 // Command entry point (behind the SimContext seam): resolves one player's
@@ -216,8 +237,8 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
     return;
   }
-  const entry = NODE_HARVEST_TABLE[node.type];
-  if (!ctx.canAddItem(entry.itemId, 1, meta.entityId)) {
+  const entry = nodeHarvestEntryFor(node);
+  if (!ctx.canAddItem(entry.itemId, materialRarityQuantity('legendary'), meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
   }
@@ -230,7 +251,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
     return;
   }
-  ctx.addItem(result.itemId!, 1, meta.entityId);
+  ctx.addItem(result.itemId!, result.quantity ?? 1, meta.entityId);
   // Resolved against the timer/bags gates above, before the timer-consuming
   // resolveHarvest call, so a full-bags quest item never eats the node's
   // per-player respawn timer on its own.

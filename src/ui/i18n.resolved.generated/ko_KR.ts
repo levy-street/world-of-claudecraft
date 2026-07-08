@@ -6297,6 +6297,51 @@ export const ko_KR: EnTranslations = {
       "sunpetal_sickle": {
         "name": "태양꽃잎 낫"
       },
+      "copper_ore": {
+        "name": "구리 광석"
+      },
+      "tin_ore": {
+        "name": "주석 광석"
+      },
+      "iron_ore": {
+        "name": "철 광석"
+      },
+      "copper_bar": {
+        "name": "구리 주괴"
+      },
+      "iron_bar": {
+        "name": "철 주괴"
+      },
+      "thorium_bar": {
+        "name": "토륨 주괴"
+      },
+      "silverleaf_herb": {
+        "name": "은잎 약초"
+      },
+      "briarthorn_herb": {
+        "name": "가시덩굴 약초"
+      },
+      "rough_hide": {
+        "name": "거친 가죽"
+      },
+      "thick_hide": {
+        "name": "질긴 가죽"
+      },
+      "silk_gland": {
+        "name": "비단샘"
+      },
+      "venom_sac": {
+        "name": "독주머니"
+      },
+      "beast_fang": {
+        "name": "야수 송곳니"
+      },
+      "beast_claw": {
+        "name": "야수 발톱"
+      },
+      "boar_tusk": {
+        "name": "멧돼지 엄니"
+      },
       "thorium_ore": {
         "name": "토륨 광석"
       },

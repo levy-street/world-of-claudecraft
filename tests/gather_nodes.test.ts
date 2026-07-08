@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { NODE_COLOR, NODE_GEOMETRY_KEYS } from '../src/render/gather_nodes_lookup';
-import { GATHER_NODE_TYPES, GATHER_NODES, ZONES } from '../src/sim/data';
+import { GATHER_NODE_TYPES, GATHER_NODES, ITEMS, ZONES } from '../src/sim/data';
+
+const NODE_PLACEHOLDER_ITEMS = new Set(['bone_fragments', 'linen_scrap', 'spider_leg']);
+const PROFESSION_MATERIALS_BY_NODE_TYPE = {
+  ore: new Set(['copper_ore', 'tin_ore', 'iron_ore', 'thorium_ore']),
+  wood: new Set(['ashwood_log', 'elderwood_log']),
+  herb: new Set(['silverleaf_herb', 'briarthorn_herb', 'goldleaf_herb', 'sunpetal_herb']),
+};
 
 describe('gather node content', () => {
   const zonesById = new Map(ZONES.map((z) => [z.id, z]));
@@ -36,6 +43,25 @@ describe('gather node content', () => {
     for (const type of usedTypes) {
       expect(NODE_GEOMETRY_KEYS).toContain(type);
       expect(NODE_COLOR[type]).toBeDefined();
+    }
+  });
+
+  it('every explicit node output exists and is a profession material', () => {
+    for (const node of GATHER_NODES) {
+      expect(node.materialItemId).toBeDefined();
+      expect(ITEMS[node.materialItemId!]).toBeDefined();
+      expect(NODE_PLACEHOLDER_ITEMS.has(node.materialItemId!)).toBe(false);
+      expect(PROFESSION_MATERIALS_BY_NODE_TYPE[node.type].has(node.materialItemId!)).toBe(true);
+    }
+  });
+
+  it('starter, marsh, and mountain zones all have ore, wood, and herb coverage', () => {
+    const requiredZones = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'];
+    for (const zoneId of requiredZones) {
+      for (const type of GATHER_NODE_TYPES) {
+        const count = GATHER_NODES.filter((n) => n.zoneId === zoneId && n.type === type).length;
+        expect(count).toBeGreaterThanOrEqual(3);
+      }
     }
   });
 });

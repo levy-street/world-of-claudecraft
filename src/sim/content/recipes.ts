@@ -12,12 +12,10 @@
 // no skillReq admission gate anywhere: crafting.ts reads skillReq only for
 // skill-gain scaling, and itemLevelBudget feeds the #1301 gold sink.
 //
-// Inputs are existing harvested-material item ids from the gathering content
-// (src/sim/professions/gathering.ts NODE_HARVEST_TABLE): bone_fragments
-// (mining), linen_scrap (logging), spider_leg (herbalism). Outputs reuse
-// existing low-tier BASE_ITEMS entries (src/sim/content/items.ts) rather than
-// introducing new item ids, to avoid expanding the positional item-name arrays
-// in src/ui/i18n.catalog/items.ts for this issue.
+// Inputs are profession material item ids from world nodes and profession
+// corpse harvests: ores, logs, herbs, hides, glands, tusks, claws, and bars.
+// Outputs reuse existing low-tier BASE_ITEMS entries where possible, while
+// bar recipes produce intermediate material items consumed by later recipes.
 //
 // COMBO_RECIPES (issue #1132): tier-1 recipes exclusive to one specific
 // adjacent pair on the CRAFT_RING (src/sim/content/professions.ts
@@ -26,10 +24,7 @@
 // craft if either is unmet, regardless of skill in any other craft. Pairs
 // used here were confirmed via adjacentCrafts: armorcrafting is adjacent to
 // weaponcrafting (both Material pole), and alchemy is adjacent to
-// engineering (both Experimental pole). Reagents reuse the same harvested
-// materials as the common tier; outputs reuse existing BASE_ITEMS entries
-// (boundstone_helm, gravewyrm_gauntlets, elixir_of_the_bear) for the same
-// i18n reason as above.
+// engineering (both Experimental pole).
 
 import type { ProfessionRecipeRecord } from '../professions/types';
 
@@ -40,8 +35,8 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'eastbrook_arming_sword',
     resultCount: 1,
     reagents: [
-      { itemId: 'bone_fragments', count: 2 },
-      { itemId: 'linen_scrap', count: 1 },
+      { itemId: 'copper_bar', count: 2 },
+      { itemId: 'ashwood_log', count: 1 },
     ],
     skillReq: 0,
     trivialAt: 25,
@@ -52,7 +47,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'armorcrafting',
     resultItemId: 'eastbrook_chain_vest',
     resultCount: 1,
-    reagents: [{ itemId: 'bone_fragments', count: 3 }],
+    reagents: [{ itemId: 'copper_bar', count: 3 }],
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 10,
@@ -62,7 +57,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'tailoring',
     resultItemId: 'eastbrook_wool_trousers',
     resultCount: 1,
-    reagents: [{ itemId: 'linen_scrap', count: 3 }],
+    reagents: [{ itemId: 'silk_gland', count: 3 }],
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 8,
@@ -73,8 +68,8 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'tanned_leather_jerkin',
     resultCount: 1,
     reagents: [
-      { itemId: 'spider_leg', count: 2 },
-      { itemId: 'bone_fragments', count: 1 },
+      { itemId: 'rough_hide', count: 2 },
+      { itemId: 'beast_fang', count: 1 },
     ],
     skillReq: 0,
     trivialAt: 25,
@@ -85,7 +80,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'cooking',
     resultItemId: 'tough_jerky',
     resultCount: 1,
-    reagents: [{ itemId: 'spider_leg', count: 1 }],
+    reagents: [{ itemId: 'boar_tusk', count: 1 }],
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 1,
@@ -96,12 +91,42 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'minor_healing_potion',
     resultCount: 1,
     reagents: [
-      { itemId: 'linen_scrap', count: 1 },
-      { itemId: 'spider_leg', count: 1 },
+      { itemId: 'silverleaf_herb', count: 1 },
+      { itemId: 'briarthorn_herb', count: 1 },
     ],
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 1,
+  },
+  {
+    id: 'recipe_copper_bar',
+    professionId: 'weaponcrafting',
+    resultItemId: 'copper_bar',
+    resultCount: 1,
+    reagents: [{ itemId: 'copper_ore', count: 2 }],
+    skillReq: 0,
+    trivialAt: 25,
+    itemLevelBudget: 1,
+  },
+  {
+    id: 'recipe_iron_bar',
+    professionId: 'weaponcrafting',
+    resultItemId: 'iron_bar',
+    resultCount: 1,
+    reagents: [{ itemId: 'iron_ore', count: 2 }],
+    skillReq: 0,
+    trivialAt: 25,
+    itemLevelBudget: 2,
+  },
+  {
+    id: 'recipe_thorium_bar',
+    professionId: 'engineering',
+    resultItemId: 'thorium_bar',
+    resultCount: 1,
+    reagents: [{ itemId: 'thorium_ore', count: 2 }],
+    skillReq: 0,
+    trivialAt: 25,
+    itemLevelBudget: 3,
   },
 ];
 
@@ -129,7 +154,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'thorium_mining_pick',
     resultCount: 1,
     reagents: [
-      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'thorium_bar', count: 2 },
       { itemId: 'mithril_mining_pick', count: 1 },
     ],
     skillReq: 75,
@@ -220,8 +245,8 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'boundstone_helm',
     resultCount: 1,
     reagents: [
-      { itemId: 'bone_fragments', count: 4 },
-      { itemId: 'linen_scrap', count: 2 },
+      { itemId: 'iron_bar', count: 4 },
+      { itemId: 'thick_hide', count: 2 },
     ],
     skillReq: 25,
     trivialAt: 50,
@@ -234,8 +259,8 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'gravewyrm_gauntlets',
     resultCount: 1,
     reagents: [
-      { itemId: 'bone_fragments', count: 3 },
-      { itemId: 'linen_scrap', count: 3 },
+      { itemId: 'iron_bar', count: 3 },
+      { itemId: 'elderwood_log', count: 3 },
     ],
     skillReq: 25,
     trivialAt: 50,
@@ -248,8 +273,8 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'elixir_of_the_bear',
     resultCount: 1,
     reagents: [
-      { itemId: 'linen_scrap', count: 2 },
-      { itemId: 'spider_leg', count: 2 },
+      { itemId: 'venom_sac', count: 1 },
+      { itemId: 'goldleaf_herb', count: 2 },
     ],
     skillReq: 25,
     trivialAt: 50,

@@ -6297,6 +6297,51 @@ export const ja_JP: EnTranslations = {
       "sunpetal_sickle": {
         "name": "陽花弁の鎌"
       },
+      "copper_ore": {
+        "name": "銅鉱石"
+      },
+      "tin_ore": {
+        "name": "錫鉱石"
+      },
+      "iron_ore": {
+        "name": "鉄鉱石"
+      },
+      "copper_bar": {
+        "name": "銅の延べ棒"
+      },
+      "iron_bar": {
+        "name": "鉄の延べ棒"
+      },
+      "thorium_bar": {
+        "name": "トリウムの延べ棒"
+      },
+      "silverleaf_herb": {
+        "name": "銀葉草"
+      },
+      "briarthorn_herb": {
+        "name": "茨棘草"
+      },
+      "rough_hide": {
+        "name": "粗い獣皮"
+      },
+      "thick_hide": {
+        "name": "丈夫な獣皮"
+      },
+      "silk_gland": {
+        "name": "絹糸腺"
+      },
+      "venom_sac": {
+        "name": "毒袋"
+      },
+      "beast_fang": {
+        "name": "獣の牙"
+      },
+      "beast_claw": {
+        "name": "獣の爪"
+      },
+      "boar_tusk": {
+        "name": "猪の牙"
+      },
       "thorium_ore": {
         "name": "トリウム鉱石"
       },

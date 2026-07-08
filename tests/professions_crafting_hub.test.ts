@@ -102,7 +102,7 @@ describe('resolveCraft gates station-bound recipes on hub presence + level (#129
     const pid = sim.playerId;
     sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL - 1);
     placeAtHub(sim, pid);
-    grantItem(sim, 'thorium_ore', 4, pid);
+    grantItem(sim, 'thorium_bar', 2, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipeId);
@@ -110,7 +110,7 @@ describe('resolveCraft gates station-bound recipes on hub presence + level (#129
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('not_at_hub');
     // no side effect: reagents untouched on denial
-    expect(sim.countItem('thorium_ore', pid)).toBe(4);
+    expect(sim.countItem('thorium_bar', pid)).toBe(2);
   });
 
   it('denies with not_at_hub when the player is high enough level but far from the hub', () => {
@@ -118,7 +118,7 @@ describe('resolveCraft gates station-bound recipes on hub presence + level (#129
     const pid = sim.playerId;
     sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
     placeFarFromHub(sim, pid);
-    grantItem(sim, 'thorium_ore', 4, pid);
+    grantItem(sim, 'thorium_bar', 2, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipeId);
@@ -132,13 +132,13 @@ describe('resolveCraft gates station-bound recipes on hub presence + level (#129
     const pid = sim.playerId;
     sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
     placeAtHub(sim, pid);
-    grantItem(sim, 'thorium_ore', 4, pid);
+    grantItem(sim, 'thorium_bar', 2, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipeId);
 
     expect(result.ok).toBe(true);
-    expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    expect(sim.countItem('thorium_bar', pid)).toBe(0);
   });
 
   it('never gates a common-tier recipe on hub presence', () => {
@@ -146,8 +146,8 @@ describe('resolveCraft gates station-bound recipes on hub presence + level (#129
     const pid = sim.playerId;
     sim.setPlayerLevel(1);
     placeFarFromHub(sim, pid);
-    grantItem(sim, 'bone_fragments', 2, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'copper_bar', 2, pid);
+    grantItem(sim, 'ashwood_log', 1, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, 'recipe_eastbrook_arming_sword');
 

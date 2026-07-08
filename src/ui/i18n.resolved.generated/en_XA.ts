@@ -6297,6 +6297,51 @@ export const en_XA: EnTranslations = {
       "sunpetal_sickle": {
         "name": "[Šúñþéţáļ Šíçķļé]"
       },
+      "copper_ore": {
+        "name": "[Çóþþéŕ Óŕé]"
+      },
+      "tin_ore": {
+        "name": "[Ţíñ Óŕé]"
+      },
+      "iron_ore": {
+        "name": "[Íŕóñ Óŕé]"
+      },
+      "copper_bar": {
+        "name": "[Çóþþéŕ Ɓáŕ]"
+      },
+      "iron_bar": {
+        "name": "[Íŕóñ Ɓáŕ]"
+      },
+      "thorium_bar": {
+        "name": "[Ţĥóŕíúɱ Ɓáŕ]"
+      },
+      "silverleaf_herb": {
+        "name": "[Šíļʋéŕļéáƒ Ĥéŕƀ]"
+      },
+      "briarthorn_herb": {
+        "name": "[Ɓŕíáŕţĥóŕñ Ĥéŕƀ]"
+      },
+      "rough_hide": {
+        "name": "[Ŕóúĝĥ Ĥíðé]"
+      },
+      "thick_hide": {
+        "name": "[Šţúŕðý Ĥíðé]"
+      },
+      "silk_gland": {
+        "name": "[Šíļķ Ĝļáñð]"
+      },
+      "venom_sac": {
+        "name": "[Ʋéñóɱ Šáç]"
+      },
+      "beast_fang": {
+        "name": "[Ɓéášţ Ƒáñĝ]"
+      },
+      "beast_claw": {
+        "name": "[Ɓéášţ Çļáŵ]"
+      },
+      "boar_tusk": {
+        "name": "[Ɓóáŕ Ţúšķ]"
+      },
       "thorium_ore": {
         "name": "[Ţĥóŕíúɱ Óŕé]"
       },

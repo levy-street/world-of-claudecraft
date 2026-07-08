@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
-import { GATHER_NODES } from '../src/sim/data';
-import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { GATHER_NODES, ITEMS } from '../src/sim/data';
+import {
+  materialRarityQuantity,
+  nodeHarvestEntryFor,
+} from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -41,15 +44,30 @@ function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
 }
 
 const NODE_ID = GATHER_NODES[0].id;
+const NODE_PLACEHOLDER_ITEMS = new Set(['bone_fragments', 'linen_scrap', 'spider_leg']);
+const PROFESSION_MATERIALS_BY_NODE_TYPE = {
+  ore: new Set(['copper_ore', 'tin_ore', 'iron_ore', 'thorium_ore']),
+  wood: new Set(['ashwood_log', 'elderwood_log']),
+  herb: new Set(['silverleaf_herb', 'briarthorn_herb', 'goldleaf_herb', 'sunpetal_herb']),
+};
 
 describe('gather node harvest (#1121)', () => {
+  it('every live node resolves to a profession material, never the old placeholder junk', () => {
+    for (const node of GATHER_NODES) {
+      const entry = nodeHarvestEntryFor(node);
+      expect(NODE_PLACEHOLDER_ITEMS.has(entry.itemId)).toBe(false);
+      expect(ITEMS[entry.itemId]).toBeDefined();
+      expect(PROFESSION_MATERIALS_BY_NODE_TYPE[node.type].has(entry.itemId)).toBe(true);
+    }
+  });
+
   it('a player near a node receives the material item on harvest', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Miner');
     teleportOntoNode(sim, pid, NODE_ID);
 
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const entry = nodeHarvestEntryFor(node);
 
     const before = sim.countItem(entry.itemId, pid);
     sim.harvestNode(NODE_ID, pid);
@@ -67,7 +85,7 @@ describe('gather node harvest (#1121)', () => {
     p.prevPos = { ...p.pos };
 
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const entry = nodeHarvestEntryFor(node);
     const before = sim.countItem(entry.itemId, pid);
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
@@ -82,7 +100,7 @@ describe('gather node harvest (#1121)', () => {
     teleportOntoNode(sim, pidB, NODE_ID);
 
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const entry = nodeHarvestEntryFor(node);
 
     // Player A harvests first.
     sim.harvestNode(NODE_ID, pidA);
@@ -108,17 +126,18 @@ describe('gather node harvest (#1121)', () => {
     const pid = sim.addPlayer('warrior', 'Repeat');
     teleportOntoNode(sim, pid, NODE_ID);
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const entry = nodeHarvestEntryFor(node);
 
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(1);
+    const afterFirst = sim.countItem(entry.itemId, pid);
+    expect(afterFirst).toBe(1);
 
     // Immediately harvesting again is denied: this player's own timer has not
     // elapsed yet.
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(1);
+    expect(sim.countItem(entry.itemId, pid)).toBe(afterFirst);
 
     // Fast-forward past the node's respawn window by advancing the sim clock
     // directly (sim.time, not wall-clock) rather than looping thousands of
@@ -129,7 +148,7 @@ describe('gather node harvest (#1121)', () => {
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(true);
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
-    expect(sim.countItem(entry.itemId, pid)).toBe(2);
+    expect(sim.countItem(entry.itemId, pid)).toBeGreaterThan(afterFirst);
   });
 
   it('determinism: the same seed and same sequence of harvests yields the same result', () => {
@@ -145,7 +164,7 @@ describe('gather node harvest (#1121)', () => {
       sim.harvestNode(NODE_ID, pid);
       sim.tick();
       const node = mustNode(NODE_ID);
-      const entry = NODE_HARVEST_TABLE[node.type];
+      const entry = nodeHarvestEntryFor(node);
       // Advance to just short of the respawn window and record readiness,
       // then past it, so both edges of the timer are part of the observable.
       sim.time += entry.respawnSeconds - 1;
@@ -180,7 +199,7 @@ describe('gather node harvest (#1121)', () => {
     const pid = sim.addPlayer('warrior', 'Skiller');
     teleportOntoNode(sim, pid, NODE_ID);
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const entry = nodeHarvestEntryFor(node);
 
     const before = sim
       .professionsStateFor(pid)
@@ -204,7 +223,7 @@ describe('gather node harvest (#1121)', () => {
     p.dead = true;
 
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const entry = nodeHarvestEntryFor(node);
     const before = sim.countItem(entry.itemId, pid);
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
@@ -217,7 +236,7 @@ describe('gather node harvest (#1121)', () => {
     const pid = sim.addPlayer('warrior', 'FullBags');
     teleportOntoNode(sim, pid, NODE_ID);
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const entry = nodeHarvestEntryFor(node);
 
     // Fill every bag slot with non-stacking instanced junk so canAddItem
     // denies regardless of the harvested item's own stack state (an
@@ -228,7 +247,7 @@ describe('gather node harvest (#1121)', () => {
     for (let i = 0; i < capacity; i++) {
       meta.inventory.push({ itemId: 'bone_fragments', count: 1, instance: { boundTo: pid } });
     }
-    expect(sim.canAddItem(entry.itemId, 1, pid)).toBe(false);
+    expect(sim.canAddItem(entry.itemId, materialRarityQuantity('legendary'), pid)).toBe(false);
 
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
@@ -242,7 +261,7 @@ describe('gather node harvest (#1121)', () => {
     teleportOntoNode(sim, pid, NODE_ID);
     teleportOntoNode(sim, fullBagsPid, NODE_ID);
     const node = mustNode(NODE_ID);
-    const entry = NODE_HARVEST_TABLE[node.type];
+    const entry = nodeHarvestEntryFor(node);
 
     // Stuff the second player's bags up front so the bags-full branch below
     // stays reachable while their own per-player node timer is still fresh
@@ -256,7 +275,9 @@ describe('gather node harvest (#1121)', () => {
         instance: { boundTo: fullBagsPid },
       });
     }
-    expect(sim.canAddItem(entry.itemId, 1, fullBagsPid)).toBe(false);
+    expect(sim.canAddItem(entry.itemId, materialRarityQuantity('legendary'), fullBagsPid)).toBe(
+      false,
+    );
 
     // The rarity roll (#1122) pulls from the SHARED sim rng, so a draw on a
     // denial would advance the whole sim's stream and desync every downstream

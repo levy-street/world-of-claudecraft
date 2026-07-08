@@ -6297,6 +6297,51 @@ export const ru_RU: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Солнцелепестковый серп"
       },
+      "copper_ore": {
+        "name": "Медная руда"
+      },
+      "tin_ore": {
+        "name": "Оловянная руда"
+      },
+      "iron_ore": {
+        "name": "Железная руда"
+      },
+      "copper_bar": {
+        "name": "Медный слиток"
+      },
+      "iron_bar": {
+        "name": "Железный слиток"
+      },
+      "thorium_bar": {
+        "name": "Ториевый слиток"
+      },
+      "silverleaf_herb": {
+        "name": "Трава серебролист"
+      },
+      "briarthorn_herb": {
+        "name": "Трава колючелист"
+      },
+      "rough_hide": {
+        "name": "Грубая шкура"
+      },
+      "thick_hide": {
+        "name": "Прочная шкура"
+      },
+      "silk_gland": {
+        "name": "Шёлковая железа"
+      },
+      "venom_sac": {
+        "name": "Ядовитый мешочек"
+      },
+      "beast_fang": {
+        "name": "Клык зверя"
+      },
+      "beast_claw": {
+        "name": "Коготь зверя"
+      },
+      "boar_tusk": {
+        "name": "Кабаний клык"
+      },
       "thorium_ore": {
         "name": "Ториевая руда"
       },

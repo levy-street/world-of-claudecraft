@@ -106,6 +106,7 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     cfg: { seed: 42, playerClass: 'warrior' },
     playerId: 1,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
+    nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
 
@@ -147,8 +148,9 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     const markers = buildMarkers(makeWorld('sim'));
     const kinds = markers.map((m) => m.kind);
     // ally (friend), ally (guild), npc('!'), npc('•'), portal, object-loot, mob(aggro),
-    // mob, mob-loot, party-disc (pid 5), party-arrow (pid 16), player. The stranger
-    // (id 4) and the party member (id 5) produce NO entity-loop marker; id 14 is culled.
+    // mob, mob-loot, party-disc (pid 5), party-arrow (pid 16), gather-node, player.
+    // The stranger (id 4) and the party member (id 5) produce NO entity-loop marker;
+    // id 14 is culled.
     expect(kinds).toEqual([
       'ally',
       'ally',
@@ -161,6 +163,7 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       'mob-loot',
       'party-disc',
       'party-arrow',
+      'gather-node',
       'player',
     ]);
     const allies = markers.filter((m) => m.kind === 'ally') as Extract<

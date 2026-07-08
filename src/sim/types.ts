@@ -1538,14 +1538,15 @@ export interface GroundObjectDef {
   positions: { x: number; z: number }[];
 }
 
-// Gatherable world nodes (ore/wood/herb). Permanent, unowned fixtures: this
-// issue is content plus visibility only, no harvest logic (see G3).
+// Gatherable world nodes (ore/wood/herb). Permanent, unowned fixtures with
+// per-node material output resolved by the server-side harvest path.
 export type GatherNodeType = 'ore' | 'wood' | 'herb';
 
 export interface GatherNodeDef {
   id: string;
   zoneId: string;
   type: GatherNodeType;
+  materialItemId?: string;
   pos: { x: number; z: number };
 }
 

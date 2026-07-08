@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
+  materialRarityQuantity,
   MATERIAL_RARITY_MAX_PROFICIENCY,
   type MaterialRarity,
   resolveHarvest,
@@ -69,7 +70,16 @@ describe('material rarity roll (#1122)', () => {
     // The same rng then serves the granted path with exactly one draw.
     const granted = resolveHarvest(meta, node, 1000, rng);
     expect(granted.granted).toBe(true);
+    expect(granted.quantity).toBe(materialRarityQuantity(granted.rarity!));
     expect(draws).toBe(1);
+  });
+
+  it('rarity changes the granted material quantity in player-visible steps', () => {
+    expect(materialRarityQuantity('common')).toBe(1);
+    expect(materialRarityQuantity('uncommon')).toBe(2);
+    expect(materialRarityQuantity('rare')).toBe(2);
+    expect(materialRarityQuantity('epic')).toBe(3);
+    expect(materialRarityQuantity('legendary')).toBe(3);
   });
 
   it('the proficiency ceiling is pinned to 100', () => {
