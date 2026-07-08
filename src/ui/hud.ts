@@ -181,6 +181,8 @@ import { renderCraftingWindow } from './crafting_window';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { DelveMapPainter } from './delve_map_painter';
 import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
+import type { DexSwapConfig, DexSwapQuote } from './dex_swap_view';
+import { DexSwapWindow } from './dex_swap_window';
 import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
@@ -432,6 +434,27 @@ export interface GamepadBindingsHooks {
 export interface ReportHooks {
   submit(targetPid: number, reason: string, details: string): Promise<void>;
   submitByName?(targetName: string, reason: string, details: string): Promise<void>;
+}
+
+/**
+ * main.ts glue for the in-game "Buy $WOC" DEX swap flow (the net<->ui wiring
+ * layer owns the /api/dexswap fetches and the wallet module). Attached only
+ * when the server reports the feature enabled, so the launcher and window are
+ * invisible while the flag is off.
+ */
+export interface DexSwapHooks {
+  /** True when the feature is enabled AND a wallet is linked (launcher gate). */
+  available(): boolean;
+  /** The /api/dexswap/config payload. */
+  config(): DexSwapConfig | null;
+  /** The connected wallet address the swap transaction binds to, or null. */
+  walletAddress(): string | null;
+  fetchQuote(inputMint: string, amount: string, slippageBps: number): Promise<DexSwapQuote>;
+  buildSwap(quote: DexSwapQuote, userPublicKey: string): Promise<string>;
+  signAndSend(txBase64: string): Promise<string>;
+  isWalletFeatureUnsupported(err: unknown): boolean;
+  /** Refresh the wallet $WOC balance (fresh read) after a swap is sent. */
+  onSwapSent(): void;
 }
 
 export interface BugReportPayload {
@@ -870,6 +893,10 @@ export class Hud {
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
+  // The Buy $WOC window + its main.ts glue; both stay null until main.ts
+  // attaches them (only when the server-side feature flag is on).
+  private dexSwapHooks: DexSwapHooks | null = null;
+  private dexSwapWindow: DexSwapWindow | null = null;
   // Soft swear terms from the server (online only), masked in chat when the
   // player's "Filter Profanity" setting is on. Fed by main.ts from ClientWorld.
   private profanityWords: string[] = [];
@@ -2158,6 +2185,10 @@ export class Hud {
       case 'daily-rewards-window':
         this.dailyRewardsWindow.close();
         break;
+      case 'dexswap-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.dexSwapWindow?.close();
+        break;
       case 'emote-editor':
         this.closeEmoteEditor();
         break;
@@ -3362,6 +3393,8 @@ export class Hud {
     root: () => $('#bags'),
     world: () => this.sim,
     wocBalanceHtml: () => this.wocBalanceHtml(),
+    dexSwapLauncherHtml: () => this.dexSwapLauncherHtml(),
+    openDexSwap: () => this.toggleDexSwap(),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     cancelPetFeed: () => this.cancelPetFeed(),
@@ -3766,6 +3799,14 @@ export class Hud {
       ? t('wallet.balanceAria', { balance })
       : t('wallet.balancePreviewAria', { balance });
     return `<span class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</span>`;
+  }
+
+  // The Buy $WOC launcher, rendered next to the bag-footer wallet balance.
+  // Empty (feature invisible) unless main.ts attached the hooks (server flag
+  // on) AND a wallet is linked; the bags window wires the click to toggleDexSwap.
+  private dexSwapLauncherHtml(): string {
+    if (!walletUiEnabled() || !this.dexSwapHooks?.available()) return '';
+    return `<button type="button" class="dexswap-open-btn" data-dexswap-open aria-label="${esc(t('hudChrome.dexSwap.launcherAria'))}">${esc(t('hudChrome.dexSwap.launcher'))}</button>`;
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
@@ -13577,6 +13618,34 @@ export class Hud {
 
   attachOptions(hooks: OptionsHooks): void {
     this.optionsHooks = hooks;
+  }
+
+  /** Wire the Buy $WOC flow (called by main.ts only when the feature is enabled). */
+  attachDexSwap(hooks: DexSwapHooks): void {
+    this.dexSwapHooks = hooks;
+    this.dexSwapWindow = new DexSwapWindow({
+      root: () => $('#dexswap-window'),
+      closeOthers: () => this.closeOtherWindows('#dexswap-window'),
+      ...this.windowFocus('#dexswap-window'),
+      onVisibilityChange: () => this.syncAnyWindowOpenState(),
+      config: () => hooks.config(),
+      walletAddress: () => hooks.walletAddress(),
+      fetchQuote: (inputMint, amount, slippageBps) =>
+        hooks.fetchQuote(inputMint, amount, slippageBps),
+      buildSwap: (quote, userPublicKey) => hooks.buildSwap(quote, userPublicKey),
+      signAndSend: (txBase64) => hooks.signAndSend(txBase64),
+      isWalletFeatureUnsupported: (err) => hooks.isWalletFeatureUnsupported(err),
+      onSwapSent: () => hooks.onSwapSent(),
+      now: () => Date.now(),
+    });
+    // The bag footer may already be painted without the launcher; repaint it.
+    if ($('#bags').style.display !== 'none') this.renderBags();
+  }
+
+  /** Toggle the Buy $WOC window (the bag-footer launcher's action). */
+  toggleDexSwap(): void {
+    if (!this.dexSwapHooks?.available()) return;
+    this.dexSwapWindow?.toggle();
   }
 
   attachReporting(hooks: ReportHooks): void {

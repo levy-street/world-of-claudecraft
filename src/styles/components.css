@@ -7471,4 +7471,123 @@
       animation: none;
     }
   }
+  /* ---------- dexswap ---------- */
+  /* The Buy $WOC window (dex_swap_window.ts) + the bag-footer launcher. Brand
+     purple echoes the .woc-coin chip; text colors come from tokens. Buttons and
+     the amount input keep a 40px min height (the mobile touch-target floor;
+     the 16px input font floor is the global pointer-coarse rule in index.html). */
+  #dexswap-window {
+    width: 380px;
+  }
+  .dexswap-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .dexswap-note {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .dexswap-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dexswap-amount-label {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .dexswap-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .dexswap-input-row input {
+    flex: 1;
+    min-width: 0;
+    min-height: 40px;
+  }
+  .dexswap-input-row select {
+    min-height: 40px;
+    min-width: 88px;
+  }
+  .dexswap-slippage {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .dexswap-quote-btn,
+  .dexswap-buy-btn,
+  .dexswap-again-btn {
+    min-height: 40px;
+  }
+  .dexswap-quote {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .dexswap-line {
+    font-size: 12px;
+  }
+  .dexswap-receive {
+    font-weight: 600;
+    color: var(--color-text-success);
+  }
+  .dexswap-status,
+  .dexswap-notice {
+    font-size: 12px;
+    color: var(--gold-dim);
+  }
+  .dexswap-error {
+    font-size: 12px;
+    color: var(--color-text-error);
+  }
+  .dexswap-stale {
+    font-size: 11px;
+    color: var(--color-text-error);
+  }
+  .dexswap-sent {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .dexswap-sent-title {
+    font-weight: 700;
+    color: var(--color-text-success);
+  }
+  .dexswap-sig {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-text-muted);
+  }
+  .dexswap-explorer {
+    font-size: 12px;
+    color: var(--gold-dim);
+    text-decoration: underline;
+    min-height: 24px;
+    align-self: flex-start;
+  }
+  .dexswap-open-btn {
+    min-height: 24px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #c9a3ff;
+    background: rgba(107, 63, 160, 0.25);
+    border: 1px solid #6b3fa0;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .dexswap-open-btn:hover {
+    background: rgba(107, 63, 160, 0.45);
+  }
+  body.mobile-touch .dexswap-open-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  body.mobile-touch #dexswap-window {
+    z-index: 95;
+  }
 }
