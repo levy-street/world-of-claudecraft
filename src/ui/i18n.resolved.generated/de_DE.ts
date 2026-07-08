@@ -2751,6 +2751,7 @@ export const de_DE: EnTranslations = {
     "haveAccountPrompt": "Schon ein Konto?",
     "characters": "Charaktere:",
     "createCharacter": "Charakter erstellen",
+    "currentCharacter": "Your Current Character",
     "characterName": "Charaktername",
     "characterNamePlaceholder": "Charaktername",
     "enterWorld": "Welt betreten",

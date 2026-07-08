@@ -2751,6 +2751,7 @@ export const da_DK: EnTranslations = {
     "haveAccountPrompt": "Har du allerede en konto?",
     "characters": "Karakterer:",
     "createCharacter": "Opret karakter",
+    "currentCharacter": "Your Current Character",
     "characterName": "Karakternavn",
     "characterNamePlaceholder": "Karakternavn",
     "enterWorld": "Træd ind i verden",

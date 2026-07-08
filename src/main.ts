@@ -2894,7 +2894,6 @@ interface GlitchCharselectState {
   behavior: GlitchBehaviorTracker;
   existing: CharacterSummary;
   userName: string;
-  nameEditTracked: boolean;
 }
 
 let glitchCharselectState: GlitchCharselectState | null = null;
@@ -3033,11 +3032,12 @@ function refreshOnlineSkins(cls: PlayerClass): void {
 function currentGlitchChosenCharacter(): GlitchChosenCharacter | null {
   const clsEl = document.querySelector('#charcreate-panel .mini-class.sel') as HTMLElement | null;
   if (!clsEl?.dataset.class) return null;
+  const lockedGlitchName = glitchCharselectState?.existing.name;
   const nameInput = $('#new-char-name') as HTMLInputElement;
   return {
     class: clsEl.dataset.class as PlayerClass,
     skin: selectedSkin('#online-skin-row', onlineSkin),
-    name: nameInput.value.trim(),
+    name: (lockedGlitchName ?? nameInput.value).trim(),
   };
 }
 
@@ -3085,6 +3085,14 @@ function setCharcreateSelection(cls: PlayerClass, skin: number): void {
   setOnlineSkinPicker(cls, skin);
 }
 
+function syncGlitchCharacterPreview(existing: CharacterSummary): void {
+  const previewContainer = $('#charcreate-preview-container');
+  characterPreview?.setContainer(previewContainer);
+  characterPreview?.setClass(existing.class);
+  characterPreview?.setSkin(clampSkinForClass(existing.class, existing.skin ?? 0));
+  syncPreviewAfterPanelLayout();
+}
+
 function showGlitchCharacterGate(
   session: GlitchSession,
   behavior: GlitchBehaviorTracker,
@@ -3096,7 +3104,6 @@ function showGlitchCharacterGate(
     behavior,
     existing,
     userName: login.username || session.userName,
-    nameEditTracked: false,
   };
   document.body.classList.add('glitch-mode');
   const startScreen = document.getElementById('start-screen');
@@ -3106,19 +3113,34 @@ function showGlitchCharacterGate(
     userEl.hidden = false;
     userEl.textContent = glitchCharselectState.userName;
   }
+  const titleLabel = document.querySelector(
+    '#charcreate-panel .auth-title [data-i18n]',
+  ) as HTMLElement | null;
+  if (titleLabel) {
+    const titleKey: TranslationKey = login.characterCreated
+      ? 'auth.createCharacter'
+      : 'auth.currentCharacter';
+    titleLabel.dataset.i18n = titleKey;
+    titleLabel.textContent = t(titleKey);
+  }
   const createBtn = $('#btn-create-char') as HTMLButtonElement;
   createBtn.setAttribute('data-i18n', 'auth.enterWorld');
   createBtn.textContent = t('auth.enterWorld');
   const nameInput = $('#new-char-name') as HTMLInputElement;
   nameInput.value = existing.name;
+  nameInput.readOnly = true;
+  nameInput.tabIndex = -1;
+  nameInput.setAttribute('aria-hidden', 'true');
   nameInput.classList.remove('user-invalid-fallback');
   nameInput.removeAttribute('aria-invalid');
   $('#charselect-error').textContent = '';
   show('#charcreate-panel');
   setCharcreateSelection(existing.class, existing.skin ?? 0);
+  syncGlitchCharacterPreview(existing);
+  void assetsReady().then(() => syncGlitchCharacterPreview(existing));
   hideLoadingScreen();
   trackGlitchCharAction(GLITCH_CHAR_ACTION.open);
-  nameInput.focus();
+  createBtn.focus();
 }
 
 function setGlitchCharacterBlock(reason: GlitchCharselectAction['reason']): void {
@@ -7595,13 +7617,6 @@ function wireStartScreens(): void {
           input.classList.remove('user-invalid-fallback');
           input.removeAttribute('aria-invalid');
         }
-      }
-      if (input.id === 'new-char-name' && glitchCharselectState?.nameEditTracked === false) {
-        glitchCharselectState.nameEditTracked = true;
-        trackGlitchCharAction(GLITCH_CHAR_ACTION.editName, {
-          name_length: input.value.trim().length,
-          valid_name: validateCharacterName(input.value),
-        });
       }
     });
   });

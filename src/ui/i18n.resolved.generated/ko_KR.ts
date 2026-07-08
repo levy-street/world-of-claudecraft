@@ -2751,6 +2751,7 @@ export const ko_KR: EnTranslations = {
     "haveAccountPrompt": "이미 계정이 있으신가요?",
     "characters": "캐릭터 목록:",
     "createCharacter": "캐릭터 생성",
+    "currentCharacter": "현재 캐릭터",
     "characterName": "캐릭터 이름",
     "characterNamePlaceholder": "캐릭터 이름",
     "enterWorld": "세계 입장",

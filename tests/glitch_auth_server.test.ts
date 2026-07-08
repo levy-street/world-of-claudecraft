@@ -88,6 +88,7 @@ describe('server Glitch auth bridge', () => {
 
     expect(result.username).toBe('Dev_Player42#west');
     expect(result.realm).toBe('Claudemoon');
+    expect(result.characterCreated).toBe(true);
     expect(result.character).toMatchObject({
       id: 55,
       name: 'Dev_Player42 wes',
@@ -130,6 +131,7 @@ describe('server Glitch auth bridge', () => {
     );
 
     expect(result.character).toMatchObject({ id: 77, class: 'hunter', online: true });
+    expect(result.characterCreated).toBe(false);
     expect(d.createAccount).not.toHaveBeenCalled();
     expect(d.createCharacterCapped).not.toHaveBeenCalled();
   });

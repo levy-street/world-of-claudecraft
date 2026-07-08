@@ -30,16 +30,24 @@ const skipBuild = env.GLITCH_DEPLOY_SKIP_BUILD === '1';
 const azurePostDeploy = env.GLITCH_AZURE_POST_DEPLOY !== '0';
 const azureContainerAppName = env.GLITCH_AZURE_CONTAINERAPP_NAME || 'world-of-claudecraft-node';
 const azureResourceGroup = env.GLITCH_AZURE_RESOURCE_GROUP || 'openai-resource-group';
-const azurePostDeployTimeoutMs = readPositiveMs('GLITCH_AZURE_POST_DEPLOY_TIMEOUT_MS', 180_000);
+const azurePostDeployTimeoutMs = readPositiveMs('GLITCH_AZURE_POST_DEPLOY_TIMEOUT_MS', 600_000);
 const azureSingletonHandoffTimeoutMs = readPositiveMs(
   'GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS',
   90_000,
 );
+const azureSingletonLockClearMs = readPositiveMs('GLITCH_AZURE_SINGLETON_LOCK_CLEAR_MS', 60_000);
 const azureRestoreTimeoutMs = readPositiveMs('GLITCH_AZURE_RESTORE_TIMEOUT_MS', 120_000);
 const azurePublicOrigin = env.GLITCH_AZURE_PUBLIC_ORIGIN || env.PUBLIC_ORIGIN || gameApiOrigin;
 const azurePublicHealthPath = env.GLITCH_AZURE_PUBLIC_HEALTH_PATH || '/api/project-stats';
 const azurePublicHealthTimeoutMs = readPositiveMs('GLITCH_AZURE_HEALTHCHECK_TIMEOUT_MS', 15_000);
 const azurePublicHealthContains = env.GLITCH_AZURE_HEALTHCHECK_CONTAINS || '';
+const azureRevisionFailureGraceMs = readPositiveMs(
+  'GLITCH_AZURE_REVISION_FAILURE_GRACE_MS',
+  75_000,
+);
+const azureRevisionProgressLogMs = readPositiveMs('GLITCH_AZURE_REVISION_PROGRESS_LOG_MS', 30_000);
+const useCliBuildWait =
+  env.GLITCH_DEPLOY_CLI_WAIT === '1' || !(nodeDeployment && azurePostDeploy);
 const preflightScript = path.join(ROOT, 'scripts/glitch_predeploy_check.mjs');
 
 if (!deployToken) {
@@ -74,9 +82,8 @@ if (nodeDeployment && !dryRun) {
   await runGlitchPreflight();
 }
 
-if (nodeDeployment && !dryRun && azurePostDeploy) {
-  await runAzurePreDeploySetup();
-}
+const azurePreDeployState =
+  nodeDeployment && !dryRun && azurePostDeploy ? await runAzurePreDeploySetup() : null;
 
 await ensureCli();
 
@@ -107,8 +114,8 @@ const deployArgs = [
   deploymentType,
   '--build-type',
   env.GLITCH_BUILD_TYPE || 'production',
-  '--wait',
 ];
+if (useCliBuildWait) deployArgs.push('--wait');
 for (const [key, value] of customVariables(env)) {
   deployArgs.push('--var', `${key}=${value}`);
 }
@@ -124,7 +131,7 @@ try {
 }
 
 if (nodeDeployment && !dryRun && azurePostDeploy) {
-  await runAzurePostDeployCheck();
+  await runAzurePostDeployCheck(azurePreDeployState);
 }
 
 async function ensureCli() {
@@ -151,6 +158,14 @@ async function runAzurePreDeploySetup() {
   await runCapture('az', ['--version'], env);
   await setAzureRevisionModeMultiple();
   await enforceAzureSingleReplicaScale();
+  const revisions = await readAzureRevisions();
+  const traffic = await readAzureTraffic();
+  const fallbackRevision = await selectAzureFallbackRevision(revisions, traffic);
+  const latestRevision = await readLatestAzureRevisionName();
+  if (fallbackRevision) {
+    await routeAzureTrafficToRevision(fallbackRevision);
+  }
+  return { fallbackRevision, latestRevision };
 }
 
 function readPackageVersion() {
@@ -255,7 +270,7 @@ function customVariables(sourceEnv) {
   return vars;
 }
 
-async function runAzurePostDeployCheck() {
+async function runAzurePostDeployCheck(preDeployState = null) {
   console.log('Running Azure Container App post-deploy health check...');
   await runCapture('az', ['--version'], env);
   await setAzureRevisionModeMultiple();
@@ -263,16 +278,19 @@ async function runAzurePostDeployCheck() {
 
   const initialRevisions = await readAzureRevisions();
   const initialTraffic = await readAzureTraffic();
-  const fallbackRevision = await selectAzureFallbackRevision(initialRevisions, initialTraffic);
-  const latestRevision = await readLatestAzureRevisionName();
+  const fallbackRevision =
+    preDeployState?.fallbackRevision ||
+    (await selectAzureFallbackRevision(initialRevisions, initialTraffic));
   if (fallbackRevision) {
     console.log(`Azure post-deploy: fallback revision is ${fallbackRevision}.`);
+    await routeAzureTrafficToRevision(fallbackRevision);
   } else {
     console.warn(
       'Azure post-deploy: no healthy fallback revision found; refusing destructive singleton recovery unless one appears.',
     );
   }
 
+  const latestRevision = await waitForAzurePostDeployLatestRevision(preDeployState?.latestRevision);
   if (latestRevision === fallbackRevision) {
     try {
       await routeAzureTrafficToRevision(latestRevision);
@@ -285,11 +303,25 @@ async function runAzurePostDeployCheck() {
   }
 
   let singletonHandoffDone = false;
+  let lastRevisionStateKey = '';
+  let lastRevisionStateLogAt = 0;
+  const latestRevisionFirstSeenAt = Date.now();
   const deadline = Date.now() + azurePostDeployTimeoutMs;
   while (Date.now() < deadline) {
     const revisions = await readAzureRevisions();
     const latest = revisions.find((revision) => revision.name === latestRevision);
-    if (isHealthySingleReplicaRevision(latest)) {
+    const state = classifyAzureRevisionState(latest, Date.now() - latestRevisionFirstSeenAt);
+    const stateKey = azureRevisionStateKey(latest);
+    if (
+      stateKey !== lastRevisionStateKey ||
+      Date.now() - lastRevisionStateLogAt >= azureRevisionProgressLogMs
+    ) {
+      console.log(`Azure post-deploy: ${latestRevision} is ${state.status}: ${state.reason}.`);
+      lastRevisionStateKey = stateKey;
+      lastRevisionStateLogAt = Date.now();
+    }
+
+    if (state.status === 'healthy') {
       try {
         await promoteAzureRevision(latestRevision, fallbackRevision);
       } catch (error) {
@@ -298,9 +330,11 @@ async function runAzurePostDeployCheck() {
       return;
     }
 
-    if (!singletonHandoffDone && latest && revisionFailed(latest)) {
-      const logs = await readAzureRevisionLogs(latestRevision);
-      if (logs.includes('already hosted by another game server process')) {
+    if (latest && state.status === 'terminal') {
+      const logs = await readAzureRevisionLogs(latestRevision).catch((error) =>
+        redact(`Could not read Azure logs for ${latestRevision}: ${error}`),
+      );
+      if (!singletonHandoffDone && logs.includes('already hosted by another game server process')) {
         singletonHandoffDone = true;
         try {
           await tryAzureSingletonHandoff(latestRevision, fallbackRevision);
@@ -321,9 +355,20 @@ async function runAzurePostDeployCheck() {
           );
         }
       }
+      const fallbackMessage = await restoreAzureFallbackRevision(fallbackRevision, latestRevision);
+      fail(
+        [
+          `Azure post-deploy: ${latestRevision} reached a terminal Azure state before becoming healthy.`,
+          `Terminal state: ${state.reason}.`,
+          fallbackMessage,
+          logs ? `Log tail:\n${redact(logs)}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      );
     }
 
-    await sleep(10_000);
+    await sleepRemaining(deadline, 10_000);
   }
 
   const finalRevisions = await readAzureRevisions();
@@ -342,6 +387,8 @@ async function runAzurePostDeployCheck() {
 }
 
 async function setAzureRevisionModeMultiple() {
+  const mode = await readAzureRevisionMode();
+  if (/^multiple$/i.test(mode)) return;
   await run(
     'az',
     [
@@ -362,6 +409,8 @@ async function setAzureRevisionModeMultiple() {
 }
 
 async function enforceAzureSingleReplicaScale() {
+  const scale = await readAzureScale();
+  if (Number(scale.minReplicas) === 1 && Number(scale.maxReplicas) === 1) return;
   await run(
     'az',
     [
@@ -380,6 +429,46 @@ async function enforceAzureSingleReplicaScale() {
     ],
     env,
   );
+}
+
+async function readAzureRevisionMode() {
+  const result = await runCapture(
+    'az',
+    [
+      'containerapp',
+      'show',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--query',
+      'properties.configuration.activeRevisionsMode',
+      '--output',
+      'tsv',
+    ],
+    env,
+  );
+  return result.stdout.trim();
+}
+
+async function readAzureScale() {
+  const result = await runCapture(
+    'az',
+    [
+      'containerapp',
+      'show',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--query',
+      'properties.template.scale',
+      '--output',
+      'json',
+    ],
+    env,
+  );
+  return JSON.parse(result.stdout || '{}');
 }
 
 async function promoteAzureRevision(latestRevision, fallbackRevision) {
@@ -403,6 +492,29 @@ async function promoteAzureRevision(latestRevision, fallbackRevision) {
         .join('\n'),
     );
   }
+}
+
+async function waitForAzurePostDeployLatestRevision(previousRevision) {
+  if (!previousRevision) return readLatestAzureRevisionName();
+  const deadline = Date.now() + azurePostDeployTimeoutMs;
+  let lastRevision = previousRevision;
+  while (Date.now() < deadline) {
+    const currentRevision = await readLatestAzureRevisionName();
+    if (currentRevision && currentRevision !== previousRevision) {
+      console.log(
+        `Azure post-deploy: detected new revision ${currentRevision} after ${previousRevision}.`,
+      );
+      return currentRevision;
+    }
+    if (currentRevision !== lastRevision) {
+      console.log(`Azure post-deploy: latest revision is still ${currentRevision}.`);
+      lastRevision = currentRevision;
+    }
+    await sleepRemaining(deadline, 10_000);
+  }
+  throw new Error(
+    `Azure post-deploy: no new Azure revision appeared after ${previousRevision} within ${azurePostDeployTimeoutMs}ms.`,
+  );
 }
 
 async function routeAzureTrafficToRevision(revision) {
@@ -463,12 +575,8 @@ async function restoreAzureFallbackRevision(fallbackRevision, failedRevision) {
   if (fallbackRevision === failedRevision) return '';
   console.log(`Azure post-deploy: restoring traffic to fallback revision ${fallbackRevision}.`);
   try {
-    if (failedRevision) {
-      await deactivateAzureRevision(failedRevision).catch((error) => {
-        console.warn(redact(`Azure post-deploy: could not deactivate ${failedRevision}: ${error}`));
-      });
-    }
-    await activateAzureRevision(fallbackRevision);
+    await stopAzureRevisionsForSingleton(fallbackRevision);
+    await activateAzureRevisionIfNeeded(fallbackRevision);
     await waitForAzureRevisionHealthy(fallbackRevision, azureRestoreTimeoutMs);
     await routeAzureTrafficToRevision(fallbackRevision);
     await probeAzurePublicHealth(fallbackRevision);
@@ -478,10 +586,6 @@ async function restoreAzureFallbackRevision(fallbackRevision, failedRevision) {
   }
 }
 
-function revisionFailed(revision) {
-  return /failed|unhealthy/i.test(`${revision.healthState} ${revision.runningState}`);
-}
-
 function isHealthySingleReplicaRevision(revision) {
   return (
     revision?.active &&
@@ -489,6 +593,90 @@ function isHealthySingleReplicaRevision(revision) {
     revision.runningState !== 'Failed' &&
     Number(revision.replicas || 0) === 1
   );
+}
+
+function classifyAzureRevisionState(revision, observedMs) {
+  if (!revision) {
+    return {
+      status: 'pending',
+      reason: 'revision is not visible in Azure revision list yet',
+    };
+  }
+
+  if (isHealthySingleReplicaRevision(revision)) {
+    return {
+      status: 'healthy',
+      reason: 'active, Healthy, and running one replica',
+    };
+  }
+
+  const healthState = String(revision.healthState || 'Unknown');
+  const runningState = String(revision.runningState || 'Unknown');
+  const replicas = Number(revision.replicas || 0);
+  const stateText = `${healthState} ${runningState}`;
+  const summary = `active=${Boolean(revision.active)}, health=${healthState}, running=${runningState}, replicas=${replicas}`;
+
+  if (/failed/i.test(runningState)) {
+    return {
+      status: 'terminal',
+      reason: summary,
+    };
+  }
+
+  if (isAzureTransitionalRunningState(runningState)) {
+    return {
+      status: 'pending',
+      reason: `${summary}; waiting because Azure is still activating the revision`,
+    };
+  }
+
+  if (!revision.active && /stopped/i.test(runningState)) {
+    if (observedMs < azureRevisionFailureGraceMs) {
+      return {
+        status: 'pending',
+        reason: `${summary}; waiting within ${azureRevisionFailureGraceMs}ms failure grace`,
+      };
+    }
+    return {
+      status: 'terminal',
+      reason: `${summary}; inactive stopped revision exceeded ${azureRevisionFailureGraceMs}ms failure grace`,
+    };
+  }
+
+  if (/unhealthy/i.test(stateText)) {
+    if (observedMs < azureRevisionFailureGraceMs) {
+      return {
+        status: 'pending',
+        reason: `${summary}; waiting within ${azureRevisionFailureGraceMs}ms failure grace`,
+      };
+    }
+    return {
+      status: 'terminal',
+      reason: `${summary}; unhealthy revision exceeded ${azureRevisionFailureGraceMs}ms failure grace`,
+    };
+  }
+
+  return {
+    status: 'pending',
+    reason: summary,
+  };
+}
+
+function isAzureTransitionalRunningState(runningState) {
+  return /activating|deploying|initializing|pending|processing|provisioning|starting/i.test(
+    runningState,
+  );
+}
+
+function azureRevisionStateKey(revision) {
+  if (!revision) return 'missing';
+  return [
+    revision.name,
+    revision.active ? 'active' : 'inactive',
+    revision.healthState || 'unknown-health',
+    revision.runningState || 'unknown-running',
+    Number(revision.replicas || 0),
+  ].join('|');
 }
 
 async function tryAzureSingletonHandoff(latestRevision, fallbackRevision) {
@@ -501,15 +689,13 @@ async function tryAzureSingletonHandoff(latestRevision, fallbackRevision) {
   console.log(
     `Azure post-deploy: ${latestRevision} hit the realm singleton during rollout; attempting bounded handoff with fallback ${fallbackRevision}.`,
   );
-  const revisions = await readAzureRevisions();
-  await deactivateOlderAzureRevisions(revisions, latestRevision);
-  await deactivateAzureRevision(latestRevision).catch((error) => {
-    console.warn(redact(`Azure post-deploy: could not deactivate ${latestRevision}: ${error}`));
-  });
-  await sleep(20_000);
-  await activateAzureRevision(latestRevision);
-  await waitForAzureRevisionHealthy(latestRevision, azureSingletonHandoffTimeoutMs);
-  await promoteAzureRevision(latestRevision, fallbackRevision);
+  await stopAzureRevisionsForSingleton(latestRevision);
+  await setAzureRevisionModeMultiple();
+  await enforceAzureSingleReplicaScale();
+  const targetRevision = await readLatestAzureRevisionName();
+  await activateAzureRevisionIfNeeded(targetRevision);
+  await waitForAzureRevisionHealthy(targetRevision, azureSingletonHandoffTimeoutMs);
+  await promoteAzureRevision(targetRevision, fallbackRevision);
 }
 
 async function deactivateOlderAzureRevisions(revisions, latestRevision) {
@@ -517,6 +703,29 @@ async function deactivateOlderAzureRevisions(revisions, latestRevision) {
     if (!revision.active || revision.name === latestRevision) continue;
     await deactivateAzureRevision(revision.name);
   }
+}
+
+async function stopAzureRevisionsForSingleton(targetRevision) {
+  const revisions = await readAzureRevisions();
+  const activeRevisions = revisions.filter((revision) => revision.active);
+  if (activeRevisions.length > 0) {
+    console.log(
+      `Azure post-deploy: stopping ${activeRevisions.length} active revision(s) before starting ${targetRevision}.`,
+    );
+  }
+  for (const revision of activeRevisions) {
+    await deactivateAzureRevision(revision.name).catch((error) => {
+      console.warn(redact(`Azure post-deploy: could not deactivate ${revision.name}: ${error}`));
+    });
+  }
+  await sleep(azureSingletonLockClearMs);
+}
+
+async function activateAzureRevisionIfNeeded(revision) {
+  await activateAzureRevision(revision).catch((error) => {
+    if (String(error).includes('RevisionAlreadyInRequestedState')) return;
+    throw error;
+  });
 }
 
 async function activateAzureRevision(revision) {
@@ -561,11 +770,18 @@ async function deactivateAzureRevision(revision) {
 
 async function waitForAzureRevisionHealthy(revisionName, timeoutMs) {
   const deadline = Date.now() + timeoutMs;
+  const startedAt = Date.now();
   let lastRevision = null;
   while (Date.now() < deadline) {
     const revisions = await readAzureRevisions();
     lastRevision = revisions.find((revision) => revision.name === revisionName) || null;
-    if (isHealthySingleReplicaRevision(lastRevision)) return lastRevision;
+    const state = classifyAzureRevisionState(lastRevision, Date.now() - startedAt);
+    if (state.status === 'healthy') return lastRevision;
+    if (state.status === 'terminal') {
+      throw new Error(
+        `Azure post-deploy: ${revisionName} reached a terminal state while waiting for health: ${state.reason}.`,
+      );
+    }
     await sleepRemaining(deadline, 10_000);
   }
   throw new Error(

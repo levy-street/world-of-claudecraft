@@ -10,32 +10,38 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "es_ES": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "fr_FR": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "fr_CA": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "en_CA": [],
   "it_IT": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "de_DE": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
@@ -45,42 +51,50 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "ru_RU": [],
   "nl_NL": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "pl_PL": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "id_ID": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "tr_TR": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "sv_SE": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "vi_VN": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"
   ],
   "da_DK": [
+    "auth.currentCharacter",
     "glitchReroll.cancel",
     "glitchReroll.confirm",
     "glitchReroll.title"

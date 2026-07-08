@@ -56,6 +56,7 @@ export interface GlitchLoginResult {
   token: string;
   username: string;
   realm: string;
+  characterCreated: boolean;
   character: GlitchLoginCharacter;
 }
 
@@ -205,7 +206,8 @@ export async function completeGlitchLogin(
   }
 
   await deps.touchLogin(accountId, meta);
-  const character = await resolveGlitchCharacter(accountId, displayName, installId, input, deps);
+  const resolved = await resolveGlitchCharacter(accountId, displayName, installId, input, deps);
+  const character = resolved.character;
   const token = newToken();
   await deps.saveToken(token, accountId);
 
@@ -213,6 +215,7 @@ export async function completeGlitchLogin(
     token,
     username: accountUsername,
     realm: deps.realm,
+    characterCreated: resolved.created,
     character: {
       id: character.id,
       name: character.name,
@@ -274,11 +277,11 @@ async function resolveGlitchCharacter(
   installId: string,
   input: { requestedClass?: unknown },
   deps: GlitchLoginDeps,
-): Promise<GlitchCharacterRow> {
+): Promise<{ character: GlitchCharacterRow; created: boolean }> {
   const existing = (await deps.listCharacters(accountId)).find(
     (character) => !character.force_rename,
   );
-  if (existing) return existing;
+  if (existing) return { character: existing, created: false };
 
   const cls = resolveGlitchClass(input.requestedClass, deps.config.defaultClass);
   for (const name of glitchCharacterNameCandidates(displayName, installId)) {
@@ -291,7 +294,7 @@ async function resolveGlitchCharacter(
         deps.initialCharacterState(cls, name, 0),
       );
       if (!created) throw new GlitchLoginError(400, 'character limit reached');
-      return created;
+      return { character: created, created: true };
     } catch (err) {
       if (!isUniqueViolation(err)) throw err;
     }

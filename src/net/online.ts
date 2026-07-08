@@ -111,6 +111,7 @@ export interface GlitchLoginResult {
   token: string;
   username: string;
   realm: string;
+  characterCreated: boolean;
   character: CharacterSummary;
 }
 
@@ -402,6 +403,7 @@ export class Api {
       token: this.token ?? '',
       username: this.username ?? '',
       realm: typeof data.realm === 'string' ? data.realm : '',
+      characterCreated: data.characterCreated === true,
       character: normalizeCharacterSummary(data.character),
     };
   }

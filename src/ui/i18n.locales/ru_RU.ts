@@ -595,6 +595,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'auth.changeRealm': 'Сменить игровой мир',
   'auth.characters': 'Персонажи:',
   'auth.createCharacter': 'Создать персонажа',
+  'auth.currentCharacter': 'Ваш текущий персонаж',
   'auth.characterName': 'Имя персонажа',
   'auth.characterNamePlaceholder': 'Имя персонажа',
   'auth.enterWorld': 'Войти в мир',

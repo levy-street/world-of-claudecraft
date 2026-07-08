@@ -559,6 +559,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'auth.changeRealm': '切換世界',
   'auth.characters': '角色列表：',
   'auth.createCharacter': '建立角色',
+  'auth.currentCharacter': '你目前的角色',
   'auth.characterName': '角色名稱',
   'auth.characterNamePlaceholder': '輸入角色名稱',
   'auth.enterWorld': '進入世界',

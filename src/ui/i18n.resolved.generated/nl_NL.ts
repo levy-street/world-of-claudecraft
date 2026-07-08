@@ -2751,6 +2751,7 @@ export const nl_NL: EnTranslations = {
     "haveAccountPrompt": "Heb je al een account?",
     "characters": "Personages:",
     "createCharacter": "Personage aanmaken",
+    "currentCharacter": "Your Current Character",
     "characterName": "Personagenaam",
     "characterNamePlaceholder": "Personagenaam",
     "enterWorld": "Wereld betreden",

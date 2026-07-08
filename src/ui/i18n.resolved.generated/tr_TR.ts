@@ -2751,6 +2751,7 @@ export const tr_TR: EnTranslations = {
     "haveAccountPrompt": "Zaten bir hesabın var mı?",
     "characters": "Karakterler:",
     "createCharacter": "Karakter Oluştur",
+    "currentCharacter": "Your Current Character",
     "characterName": "Karakter Adı",
     "characterNamePlaceholder": "Karakter adı",
     "enterWorld": "Dünyaya Gir",

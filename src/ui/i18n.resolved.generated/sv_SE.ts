@@ -2751,6 +2751,7 @@ export const sv_SE: EnTranslations = {
     "haveAccountPrompt": "Har du redan ett konto?",
     "characters": "Karaktärer:",
     "createCharacter": "Skapa karaktär",
+    "currentCharacter": "Your Current Character",
     "characterName": "Karaktärsnamn",
     "characterNamePlaceholder": "Karaktärsnamn",
     "enterWorld": "Träd in i världen",

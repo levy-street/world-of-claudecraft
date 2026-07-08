@@ -2751,6 +2751,7 @@ export const ja_JP: EnTranslations = {
     "haveAccountPrompt": "アカウントをお持ちですか？",
     "characters": "キャラクター数：",
     "createCharacter": "キャラクター作成",
+    "currentCharacter": "現在のキャラクター",
     "characterName": "キャラクター名",
     "characterNamePlaceholder": "キャラクター名",
     "enterWorld": "世界に入る",

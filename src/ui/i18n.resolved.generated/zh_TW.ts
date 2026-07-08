@@ -2751,6 +2751,7 @@ export const zh_TW: EnTranslations = {
     "haveAccountPrompt": "已有帳號？",
     "characters": "角色列表：",
     "createCharacter": "建立角色",
+    "currentCharacter": "你目前的角色",
     "characterName": "角色名稱",
     "characterNamePlaceholder": "輸入角色名稱",
     "enterWorld": "進入世界",

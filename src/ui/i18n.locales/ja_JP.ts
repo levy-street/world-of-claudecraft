@@ -584,6 +584,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'auth.changeRealm': 'ワールド変更',
   'auth.characters': 'キャラクター数：',
   'auth.createCharacter': 'キャラクター作成',
+  'auth.currentCharacter': '現在のキャラクター',
   'auth.characterName': 'キャラクター名',
   'auth.characterNamePlaceholder': 'キャラクター名',
   'auth.enterWorld': '世界に入る',

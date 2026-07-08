@@ -584,6 +584,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'auth.changeRealm': '월드 변경',
   'auth.characters': '캐릭터 목록:',
   'auth.createCharacter': '캐릭터 생성',
+  'auth.currentCharacter': '현재 캐릭터',
   'auth.characterName': '캐릭터 이름',
   'auth.characterNamePlaceholder': '캐릭터 이름',
   'auth.enterWorld': '세계 입장',

@@ -558,6 +558,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'auth.changeRealm': '切换服务器',
   'auth.characters': '角色列表：',
   'auth.createCharacter': '创建角色',
+  'auth.currentCharacter': '你当前的角色',
   'auth.characterName': '角色名称',
   'auth.characterNamePlaceholder': '输入角色名称',
   'auth.enterWorld': '进入世界',

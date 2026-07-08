@@ -49,9 +49,14 @@ describe('Glitch deploy process guardrails', () => {
 
     expect(deployScript).toContain('runAzurePreDeploySetup');
     expect(deployScript).toContain('runAzurePostDeployCheck');
+    expect(deployScript).toContain('GLITCH_DEPLOY_CLI_WAIT');
+    expect(deployScript).toContain('waitForAzurePostDeployLatestRevision');
+    expect(deployScript).toContain("if (useCliBuildWait) deployArgs.push('--wait')");
     expect(deployScript).toContain('GLITCH_AZURE_POST_DEPLOY');
     expect(deployScript).toContain('readAzureTraffic');
     expect(deployScript).toContain('selectAzureFallbackRevision');
+    expect(deployScript).toContain('readAzureRevisionMode');
+    expect(deployScript).toContain('readAzureScale');
     expect(deployScript).toContain('readLatestReadyAzureRevisionName');
     expect(deployScript).toContain('restoreAzureFallbackRevision');
     expect(deployScript).toContain('properties.latestReadyRevisionName');
@@ -70,7 +75,7 @@ describe('Glitch deploy process guardrails', () => {
       deployScript.indexOf('await run(process.execPath, deployArgs, env)'),
     );
     expect(deployScript.indexOf('await run(process.execPath, deployArgs, env)')).toBeLessThan(
-      deployScript.indexOf('await runAzurePostDeployCheck()'),
+      deployScript.indexOf('await runAzurePostDeployCheck(azurePreDeployState)'),
     );
   });
 
@@ -81,18 +86,31 @@ describe('Glitch deploy process guardrails', () => {
     expect(deployScript).toContain('assertAzureTrafficPinnedToRevision');
     expect(deployScript).toContain('probeAzurePublicHealth');
     expect(deployScript).toContain('GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS');
+    expect(deployScript).toContain('GLITCH_AZURE_SINGLETON_LOCK_CLEAR_MS');
     expect(deployScript).toContain('GLITCH_AZURE_RESTORE_TIMEOUT_MS');
     expect(deployScript).toContain('GLITCH_AZURE_HEALTHCHECK_TIMEOUT_MS');
     expect(deployScript).toContain('GLITCH_AZURE_PUBLIC_HEALTH_PATH');
+    expect(deployScript).toContain('GLITCH_AZURE_REVISION_FAILURE_GRACE_MS');
+    expect(deployScript).toContain('GLITCH_AZURE_REVISION_PROGRESS_LOG_MS');
+    expect(deployScript).toContain('classifyAzureRevisionState');
+    expect(deployScript).toContain('isAzureTransitionalRunningState');
+    expect(deployScript).toContain('activating|deploying|initializing');
+    expect(deployScript).toContain('detected new revision');
+    expect(deployScript).toContain('reached a terminal Azure state');
+    expect(deployScript).toContain('stopAzureRevisionsForSingleton');
+    expect(deployScript).toContain('stopping ${activeRevisions.length} active revision(s)');
     expect(deployScript).toContain(
       'refusing realm singleton handoff because no fallback revision is known',
     );
     expect(deployScript.indexOf('await routeAzureTrafficToRevision(latestRevision)')).toBeLessThan(
       deployScript.indexOf('await deactivateOlderAzureRevisions(revisions, latestRevision)'),
     );
-    expect(deployScript.indexOf('await activateAzureRevision(fallbackRevision)')).toBeLessThan(
-      deployScript.indexOf('await routeAzureTrafficToRevision(fallbackRevision)'),
+    const restoreFallbackBody = deployScript.slice(
+      deployScript.indexOf('async function restoreAzureFallbackRevision'),
     );
+    expect(
+      restoreFallbackBody.indexOf('await activateAzureRevision(fallbackRevision)'),
+    ).toBeLessThan(restoreFallbackBody.indexOf('await routeAzureTrafficToRevision(fallbackRevision)'));
   });
 
   it('documents the Azure single-replica invariant for the MMO realm', () => {

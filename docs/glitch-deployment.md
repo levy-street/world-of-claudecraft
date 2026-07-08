@@ -192,25 +192,38 @@ The script:
    - verifies `POST /api/site-presence` with the same JSON shape the live page sends
 4. For `node`, prepares the Azure Container App unless
    `GLITCH_AZURE_POST_DEPLOY=0` is set:
-   - sets revision mode to `multiple`
-   - enforces `--min-replicas 1 --max-replicas 1`
+   - verifies revision mode is `multiple`, updating only when needed
+   - verifies `--min-replicas 1 --max-replicas 1`, updating only when needed
 5. Clones or updates the Glitch CLI deploy tool under the system temp directory.
 6. For `node`, zips the source tree without `node_modules`, `dist`, `.env`, docs, tests, or local agent folders.
 7. Uploads the archive with `entry=index.html`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
-8. Waits for the Glitch deployment job to complete.
+8. For `node`, skips the generic Glitch CLI `--wait` loop by default and lets
+   the Azure post-deploy checker own rollout. Set `GLITCH_DEPLOY_CLI_WAIT=1`
+   only for non-Azure debugging.
 9. For `node`, runs an Azure Container App post-deploy check unless
    `GLITCH_AZURE_POST_DEPLOY=0` is set:
-   - keeps revision mode at `multiple`
-   - enforces `--min-replicas 1 --max-replicas 1`
+   - keeps revision mode at `multiple`, updating only when needed
+   - keeps `--min-replicas 1 --max-replicas 1`, updating only when needed
+   - pins traffic back to the known-good fallback revision while the new
+     revision is still starting
+   - waits until Azure reports a new latest revision after the upload
    - reads all revisions, including inactive failed revisions
    - records the current known-good fallback from active traffic first, then
      falls back to Azure's last ready revision
+   - classifies Azure revision states as pending, healthy, or terminal instead
+     of treating every `Unhealthy` report as a failed deploy
+   - keeps waiting through transient activation states such as `Activating`,
+     `Provisioning`, or `Starting`
    - waits for the latest revision to become healthy with one replica
+   - fails fast with log tail and fallback restore when Azure reaches a terminal
+     state such as `Failed` or an inactive stopped revision past the grace window
    - pins traffic explicitly to the healthy latest revision
    - verifies that Azure reports 100 percent traffic on that revision
    - probes the public health route after routing traffic
    - detects the realm singleton rollout error in Azure logs
-   - attempts a bounded singleton handoff only when a fallback revision is known
+   - attempts a bounded singleton handoff only when a fallback revision is known:
+     stop every active revision, wait for the database singleton lock to clear,
+     start exactly one revision, then pin traffic to that revision
    - restores traffic to the current known-good revision and verifies public
      health if the latest revision never becomes healthy or fails public probing
 
@@ -229,13 +242,26 @@ the default Glitch Container App.
 
 The deploy script does not treat Azure's latest revision as live until three
 checks agree: the revision is healthy, Azure traffic is pinned to it, and the
-public health route responds. In the normal path, older revisions are not
-deactivated until after those checks pass. If the new revision trips the realm
-singleton lock, the script can briefly deactivate the known-good revision to
-release the realm lock, but only when it already has a fallback revision to
-restore and only for the bounded
-`GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS` window. Failed fallback restoration
-is reported as a deployment failure instead of being hidden.
+public health route responds. For Node deploys, the script intentionally skips
+the Glitch CLI `--wait` loop because that generic wait can leave Azure traffic
+pointing at an unverified latest revision while the MMO singleton is still
+warming up. Instead, the script uploads the build, waits for Azure's latest
+revision name to change, keeps traffic on the known-good fallback revision, and
+then handles promotion itself. In the normal path, older revisions are not
+deactivated until after those checks pass. It also does not treat
+`Unhealthy + Activating` as a final failure, because Azure can report that while
+the container image is still starting, health probes are warming up, or the
+runtime is still binding its port. If Azure reports a real terminal failure, the
+script restores the fallback revision and includes the revision state plus log
+tail in the failure message.
+
+If the new revision trips the realm singleton lock, the script can briefly
+deactivate every active revision to release the realm lock, but only when it
+already has a fallback revision to restore. It waits for
+`GLITCH_AZURE_SINGLETON_LOCK_CLEAR_MS`, starts exactly one revision, and only
+then uses the bounded `GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS` health window.
+Failed fallback restoration is reported as a deployment failure instead of being
+hidden.
 
 The manual commands below are still useful for inspection or recovery:
 
@@ -275,11 +301,16 @@ GLITCH_AZURE_CONTAINERAPP_NAME=world-of-claudecraft-node npm run deploy:glitch
 GLITCH_AZURE_RESOURCE_GROUP=openai-resource-group npm run deploy:glitch
 GLITCH_AZURE_PUBLIC_ORIGIN=https://worldofclaudecraft.com npm run deploy:glitch
 GLITCH_AZURE_PUBLIC_HEALTH_PATH=/api/project-stats npm run deploy:glitch
+GLITCH_AZURE_POST_DEPLOY_TIMEOUT_MS=600000 npm run deploy:glitch
 GLITCH_AZURE_HEALTHCHECK_TIMEOUT_MS=15000 npm run deploy:glitch
 GLITCH_AZURE_HEALTHCHECK_CONTAINS=Claudemoon npm run deploy:glitch
+GLITCH_AZURE_REVISION_FAILURE_GRACE_MS=75000 npm run deploy:glitch
+GLITCH_AZURE_REVISION_PROGRESS_LOG_MS=30000 npm run deploy:glitch
+GLITCH_AZURE_SINGLETON_LOCK_CLEAR_MS=60000 npm run deploy:glitch
 GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS=90000 npm run deploy:glitch
 GLITCH_AZURE_RESTORE_TIMEOUT_MS=120000 npm run deploy:glitch
 GLITCH_AZURE_POST_DEPLOY=0 npm run deploy:glitch  # skip Azure health handoff only for non-Azure experiments
+GLITCH_DEPLOY_CLI_WAIT=1 npm run deploy:glitch  # debug only; Azure node deploys skip generic CLI wait by default
 GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
 GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch  # static iframe/wasm only; node preflight still builds
 GLITCH_BUILD_TYPE=playtest npm run deploy:glitch

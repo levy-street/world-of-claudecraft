@@ -2751,6 +2751,7 @@ export const id_ID: EnTranslations = {
     "haveAccountPrompt": "Sudah punya akun?",
     "characters": "Karakter:",
     "createCharacter": "Buat Karakter",
+    "currentCharacter": "Your Current Character",
     "characterName": "Nama Karakter",
     "characterNamePlaceholder": "Nama karakter",
     "enterWorld": "Masuki Dunia",

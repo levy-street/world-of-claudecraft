@@ -2751,6 +2751,7 @@ export const vi_VN: EnTranslations = {
     "haveAccountPrompt": "Đã có tài khoản?",
     "characters": "Nhân vật:",
     "createCharacter": "Tạo Nhân Vật",
+    "currentCharacter": "Your Current Character",
     "characterName": "Tên Nhân Vật",
     "characterNamePlaceholder": "Tên nhân vật",
     "enterWorld": "Vào Thế Giới",
