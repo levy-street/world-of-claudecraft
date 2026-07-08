@@ -50,6 +50,16 @@ export class TickProfiler {
     this.cur.set(phase, (this.cur.get(phase) ?? 0) + ms);
   }
 
+  // Drop every recorded sample and the in-progress scratch, starting a fresh
+  // window. Used by an on-demand capture so the profile reflects only the ticks
+  // inside the capture window, not whatever the always-on loop accumulated before.
+  reset(): void {
+    for (const ring of this.rings.values()) ring.fill(0);
+    this.head = 0;
+    this.count = 0;
+    this.cur.clear();
+  }
+
   // Close out the current tick: push each phase's accumulated ms into its ring,
   // recording `totalMs` for the whole loop body, then reset the scratch state.
   commit(totalMs: number): void {

@@ -127,9 +127,18 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
       player: { pos: { x: number } };
       delveRun: unknown;
     };
-    w.player.pos.x = 100000; // a delve-band x
-    w.delveRun = { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 100000, z: 0 } };
+    // A real delve-band x: the band is CAPPED east by the Protect Yumi maze
+    // band (YUMI_BAND_X_MIN = 8000), so the old open-ended 100000 probe now
+    // classifies as the maze.
+    w.player.pos.x = 5000;
+    w.delveRun = { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 5000, z: 0 } };
     expect(minimapMode(w as unknown as IWorld)).toBe('delve');
+  });
+
+  it('returns yumiMaze anywhere in the Protect Yumi band, run or not', () => {
+    const w = makeWorld('client') as unknown as { player: { pos: { x: number } } };
+    w.player.pos.x = 8400;
+    expect(minimapMode(w as unknown as IWorld)).toBe('yumiMaze');
   });
 });
 

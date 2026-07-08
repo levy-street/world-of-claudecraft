@@ -514,3 +514,31 @@ export interface RoleChangeRow {
 export interface StaffHistoryData {
   rows: RoleChangeRow[];
 }
+
+// Server tick-loop profiling (GET /admin/api/perf/tick, POST .../capture). Mirrors
+// server/game.ts PerfCaptureResult/PerfCaptureStatus and the TickProfiler shape.
+export interface PerfPhaseStats {
+  mean: number;
+  p50: number;
+  p95: number;
+  p99: number;
+  max: number;
+}
+
+export interface PerfCaptureResult {
+  capturedAt: number; // epoch ms the window closed
+  durationMs: number;
+  online: number;
+  simEntities: number;
+  profile: {
+    samples: number;
+    windowTicks: number;
+    phases: Record<string, PerfPhaseStats>;
+  };
+}
+
+export interface PerfCaptureStatus {
+  capturing: boolean;
+  endsAt: number | null; // epoch ms the in-flight capture closes
+  last: PerfCaptureResult | null;
+}

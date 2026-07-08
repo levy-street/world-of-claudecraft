@@ -18,8 +18,11 @@
 //     power while keeping their own stat identity (a warrior plate piece stays
 //     str/sta, a mage cloth piece stays int/spi). itemScore() is the realized
 //     power (stats + armor + weapon dps) for at-a-glance comparison.
+
+import { HEROIC_BOSS_LOOT, HEROIC_LOOT_SOURCE_LEVEL } from './content/heroic_loot';
+import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { DUNGEONS, MOBS, QUESTS } from './data';
-import type { EquipSlot, ItemDef, Stats } from './types';
+import type { ItemDef, ItemSlot, Stats } from './types';
 
 // The five primary attributes an item can carry (armor is handled separately: it
 // is an armor-class/slot property, not part of the comparable stat budget).
@@ -64,7 +67,7 @@ export const RAID_MIN_PLAYERS = 10;
 // Slot weight for the stat budget: chest and main-hand carry the most, the smaller
 // slots less. Matches the slot weighting already described for armor in items.ts
 // (head ~1.0, shoulder ~0.75, gloves ~0.65, waist ~0.55) applied to stat points.
-export const SLOT_STAT_MULT: Record<EquipSlot, number> = {
+export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
   mainhand: 1.0,
   chest: 1.0,
   legs: 0.9,
@@ -73,10 +76,21 @@ export const SLOT_STAT_MULT: Record<EquipSlot, number> = {
   waist: 0.7,
   gloves: 0.7,
   feet: 0.65,
+  // Jewelry: small slots with no armor contribution. Items declare 'ring'
+  // (never a concrete ring1/ring2 key); the concrete keys carry the same
+  // weight so budget math is stable whichever form a caller passes.
+  neck: 0.65,
+  ring: 0.6,
+  ring1: 0.6,
+  ring2: 0.6,
 };
 
 // Primary-stat points granted per item level at full (rare-mult x chest-mult = 1).
 export const STAT_PER_ILVL = 0.7;
+
+// The source level the Heroic Quartermaster's stock reads as (heroic dungeons
+// are level-20 content); see buildSourceIndex.
+export const HEROIC_VENDOR_SOURCE_LEVEL = 20;
 
 // itemScore weights: how many armor points and how much weapon DPS count as one
 // primary-stat point, so a single comparable number can span gear types.
@@ -157,6 +171,20 @@ function buildSourceIndex(): Map<string, ItemSource> {
     for (const itemId of Object.values(quest.itemRewards))
       bump(itemId, source?.level, source?.raid ?? false);
   }
+  // Heroic Quartermaster stock: the marks-vendor jewelry never drops from a mob,
+  // but it IS level-20 heroic content (Heroic Marks only come from heroic final
+  // bosses), so the stock reads that source level: the epic pieces land at item
+  // level 26 (20 + the epic bump) and get budget-enforced like any drop.
+  for (const offer of HEROIC_VENDOR_STOCK) bump(offer.itemId, HEROIC_VENDOR_SOURCE_LEVEL, false);
+  // Heroic boss drops: level-20 content one tier up (the heroic bump), so the
+  // epic pieces read item level 31 (25 + the epic bump). Flat across the five
+  // bosses BY DESIGN (raid=false even for Nythraxis): the heroic set is one
+  // shared tier, per the drop-table spec.
+  for (const entries of Object.values(HEROIC_BOSS_LOOT)) {
+    for (const entry of entries) {
+      if (entry.itemId) bump(entry.itemId, HEROIC_LOOT_SOURCE_LEVEL, false);
+    }
+  }
   return idx;
 }
 
@@ -200,7 +228,7 @@ export function itemLevel(item: ItemDef): number | undefined {
 export function primaryStatBudget(
   level: number,
   quality: ItemDef['quality'],
-  slot: EquipSlot | undefined,
+  slot: ItemSlot | undefined,
 ): number {
   if (!slot) return 0;
   const q = QUALITY_STAT_MULT[quality ?? 'common'] ?? 0;

@@ -2,11 +2,11 @@
 // the two versus two Fiesta augment mode, and the ladder. Concepts only, no ratings math,
 // augment numbers, or matchmaking internals.
 
-import { t } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
+import { t } from '../../ui/i18n';
 import { hrefFor } from '../routes';
-import { pageHeader, section, callout, related, loreBeat } from './ui';
 import type { GuidePage } from './types';
+import { callout, loreBeat, pageHeader, related, section } from './ui';
 
 // The three escalating Fiesta augment waves, as title + body beat cards.
 const WAVES = [
@@ -25,9 +25,12 @@ export const arena: GuidePage = {
         ${section('guide.arenaPage.duelsHeading', `<p>${esc(t('guide.arenaPage.duelsBody'))}</p>`)}
         ${section('guide.arenaPage.coliseumHeading', `<p>${esc(t('guide.arenaPage.coliseumBody'))}</p>`)}
         ${section('guide.arenaPage.fiestaHeading', `<p>${esc(t('guide.arenaPage.fiestaBody'))}</p>${callout(esc(t('guide.arenaPage.augmentsNote')), { variant: 'note' })}`)}
-        ${section('guide.arenaPage.wavesTitle',
-          `<p>${esc(t('guide.arenaPage.wavesBody'))}</p><div class="guide-beat-grid">${waves}</div>`)}
+        ${section(
+          'guide.arenaPage.wavesTitle',
+          `<p>${esc(t('guide.arenaPage.wavesBody'))}</p><div class="guide-beat-grid">${waves}</div>`,
+        )}
         ${section('guide.arenaPage.powerupsTitle', `<p>${esc(t('guide.arenaPage.powerupsBody'))}</p>`)}
+        ${section('guide.arenaPage.yumiHeading', `<p>${esc(t('guide.arenaPage.yumiBody'))}</p>`)}
         ${section('guide.arenaPage.ladderHeading', `<p>${esc(t('guide.arenaPage.ladderBody'))}</p>`)}
         ${related([
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },

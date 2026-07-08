@@ -1178,3 +1178,33 @@ describe('dev bot: a whisperable test dummy', () => {
     expect([...off.players.values()].some((m) => m.name === 'NOPE')).toBe(false);
   });
 });
+
+describe('/sit and /stand pose', () => {
+  it('/sit seats the player, moving clears it, and /stand stands back up', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Sitter');
+    teleport(sim, a, 0, -40);
+    const e = sim.entities.get(a)!;
+    sim.chat('/sit', a);
+    expect(e.sitting).toBe(true);
+    // Standing back up in place.
+    sim.chat('/stand', a);
+    expect(e.sitting).toBe(false);
+    // Sitting clears the instant you move (the movement path calls standUp).
+    sim.chat('/sit', a);
+    expect(e.sitting).toBe(true);
+    const meta = sim.players.get(a)!;
+    meta.moveInput = { ...meta.moveInput, forward: true };
+    sim.tick();
+    expect(e.sitting).toBe(false);
+  });
+
+  it('a dead player cannot sit', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Ghost');
+    const e = sim.entities.get(a)!;
+    e.dead = true;
+    sim.chat('/sit', a);
+    expect(e.sitting).toBe(false);
+  });
+});

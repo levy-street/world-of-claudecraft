@@ -27,10 +27,10 @@ export interface CraftResultView {
   itemId?: string;
   count?: number;
   quality?: MaterialRarity;
-  reason?: 'unknown_recipe' | 'insufficient_materials';
+  reason?: 'unknown_recipe' | 'insufficient_materials' | 'combo_requirement_unmet';
 }
 
-// The professions read-surface facet (#1164, extended by #1127, #1129). `Sim`
+// The professions read-surface facet (#1164, extended by #1121/#1127/#1129). `Sim`
 // (src/sim/sim.ts `professionsState`/`professionsStateFor`) and `ClientWorld`
 // (src/net/online.ts, mirrored from the `prof` wire delta) both implement
 // this; see src/sim/professions/CLAUDE.md for the settled wire/persistence
@@ -65,6 +65,14 @@ export interface IWorldProfessions {
   // requirement itself (scales with archetypeSwitchCount; see archetype.ts).
   archetypeAmendsProgress: number;
   archetypeAmendsRequired: number;
+  // The title granted by the CURRENTLY-ACTIVE archetype (#1130, re-scoped per the
+  // comment on the live issue): the craft id whose named title the player has
+  // earned, or null before the acceptance quest has ever been completed (no
+  // "Jack of All Trades" fallback under the #1129 active-archetype model, since a
+  // character has at most one active archetype at a time). An identifier, not
+  // localized text, per the string-free IWorld seam: the ten title names live in
+  // src/ui/i18n.catalog/hud_chrome.ts (`archetypeTitle.<craftId>`).
+  archetypeTitle: string | null;
   // Stub entry point for the zone-1 acceptance quest's completion: sets the
   // chosen craft as the active archetype (first time only). See archetype.ts.
   acceptArchetypeQuest(craftId: string): void;

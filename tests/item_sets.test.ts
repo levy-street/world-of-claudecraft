@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
+  SET_CRIT_3PC_RATING,
   SET_CROWNFORGED,
   SET_DEATHLORD,
   SET_NECROMANCERS,
-  SET_NIGHTTALON,
   SET_SOULFLAME,
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
@@ -39,10 +39,14 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       int: 0,
       spi: 0,
       ap: 0,
+      sp: 0,
       crit: 0,
+      critRating: 0,
       haste: 0,
+      hasteRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
+      procs: [],
     });
   });
 
@@ -62,7 +66,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     const three = aggregateSetBonuses(counts({ [SET_WYRMSHADOW]: 3 }));
     expect(three.ap).toBe(40);
     expect(three.agi).toBe(15);
-    expect(three.crit).toBeCloseTo(0.02);
+    expect(three.critRating).toBe(SET_CRIT_3PC_RATING);
   });
 
   it('caster sets: 2pc grants knockback resistance, 3pc grants tier stats', () => {
@@ -113,12 +117,14 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     }
   });
 
-  it('every set definition lists ascending tiers ending at 3 pieces', () => {
+  it('every set definition lists ascending tiers ending at its authored cap', () => {
     for (const set of Object.values(ITEM_SETS)) {
       const pieces = set.bonuses.map((b) => b.pieces);
-      // raid/dungeon families carry 2- and 3-piece tiers; the leveling haste
-      // kits deliberately carry the single 3-piece tier
-      expect([pieces.join(','), set.id]).toEqual([pieces.length === 1 ? '3' : '2,3', set.id]);
+      // every epic (raid/dungeon) family carries 2-, 3-, and 4-piece tiers (the
+      // 4-piece is a proc); the leveling haste kits deliberately carry the
+      // single 3-piece tier.
+      const expected = pieces.length === 1 ? '3' : '2,3,4';
+      expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });
 });
@@ -133,7 +139,7 @@ describe('item set tooltip model', () => {
       },
     });
     expect(model?.totalPieces).toBe(4);
-    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 3]);
+    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 3, 4]);
   });
 
   it('hides bonus tiers that cannot be reached by the currently authored set pieces', () => {

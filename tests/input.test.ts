@@ -58,6 +58,8 @@ function makeInput() {
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onAbility: vi.fn(),
+    onAbilityDown: vi.fn(),
+    onAbilityUp: vi.fn(),
     onUiKey: vi.fn(),
     onEmoteWheel: vi.fn(),
     onClickPick: vi.fn(),
@@ -788,11 +790,11 @@ describe('Input modifier combos', () => {
   it('fires the bare action-bar slot, but not when a modifier is held', () => {
     const { windowListeners, cb } = makeInput();
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false }); // slot0 = Attack
-    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
-    cb.onAbility.mockClear();
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
+    cb.onAbilityDown.mockClear();
     // Shift+1 is a distinct, unbound chord — it must NOT fire bare slot 0.
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
-    expect(cb.onAbility).not.toHaveBeenCalled();
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
   });
 
   it('dispatches a slot bound to Shift+1 only on the Shift chord', () => {
@@ -801,11 +803,11 @@ describe('Input modifier combos', () => {
     expect(kb.bind('slot5', 0, 'Shift+Digit1')).toBe(true);
     const { windowListeners, cb } = makeInput();
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, shiftKey: true });
-    expect(cb.onAbility).toHaveBeenLastCalledWith(5);
-    cb.onAbility.mockClear();
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(5);
+    cb.onAbilityDown.mockClear();
     // bare 1 still drives its own slot, unaffected by the modified binding
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false });
-    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
   });
 
   it('keeps movement working while a modifier is held (Shift+W still walks)', () => {
@@ -817,7 +819,7 @@ describe('Input modifier combos', () => {
   it('ignores a lone modifier keypress', () => {
     const { input, cb, windowListeners } = makeInput();
     windowListeners.get('keydown')!({ code: 'ShiftLeft', repeat: false });
-    expect(cb.onAbility).not.toHaveBeenCalled();
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
     expect(cb.onUiKey).not.toHaveBeenCalled();
     expect(input.readMoveInput().forward).toBe(false);
   });
@@ -846,7 +848,7 @@ describe('Input modifier combos', () => {
       preventDefault: vi.fn(),
     });
     expect(cb.onEmoteWheel).toHaveBeenLastCalledWith(true); // held fired
-    expect(cb.onAbility).toHaveBeenLastCalledWith(3); // edge chord fired
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3); // edge chord fired
   });
 
   it('folds Cmd/Meta into the chord, so Cmd+1 does not fire bare slot 0', () => {
@@ -856,11 +858,11 @@ describe('Input modifier combos', () => {
     expect(kb.bind('slot7', 0, 'Meta+Digit1')).toBe(true);
     const { windowListeners, cb } = makeInput();
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, metaKey: true });
-    expect(cb.onAbility).toHaveBeenLastCalledWith(7);
-    cb.onAbility.mockClear();
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(7);
+    cb.onAbilityDown.mockClear();
     // bare 1 still drives slot 0, unaffected by the Cmd binding
     windowListeners.get('keydown')!({ code: 'Digit1', repeat: false });
-    expect(cb.onAbility).toHaveBeenLastCalledWith(0);
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(0);
   });
 });
 
@@ -889,12 +891,22 @@ describe('Input touch invert-look', () => {
   it('also inverts the swipe-look delta path', () => {
     const { input } = makeInput();
     const base = input.camPitch;
-    input.applyTouchLookDelta(0, 100);
+    input.applyTouchLookDelta(0, 20);
     const normal = input.camPitch - base;
 
     input.setTouchInvertLook(true);
     input.camPitch = base;
-    input.applyTouchLookDelta(0, 100);
+    input.applyTouchLookDelta(0, 20);
     expect(input.camPitch - base).toBeCloseTo(-normal);
+  });
+
+  it('scales the swipe-drag yaw noticeably above raw look sensitivity', () => {
+    const { input } = makeInput();
+    const baseYaw = input.camYaw;
+    input.applyTouchLookDelta(100, 0);
+    const dragYawDelta = Math.abs(input.camYaw - baseYaw);
+    const rawYawDelta = 100 * 0.0045; // BASE_LOOK_SENS, mirrored here since it is not exported
+
+    expect(dragYawDelta).toBeGreaterThan(rawYawDelta * 1.5);
   });
 });

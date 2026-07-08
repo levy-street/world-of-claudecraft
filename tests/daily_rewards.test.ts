@@ -441,6 +441,118 @@ describe('daily rewards', () => {
     expect(db.score).toBe(90);
   });
 
+  it('records nothing for Protect Yumi results (yumi3/yumi5 excluded from the arena task)', async () => {
+    const db = new FakeDailyRewardDb();
+    const service = new DailyRewardService(db);
+    resetDailyRewardPriceCacheForTests();
+    stubRewardConfig({
+      tasks: [
+        {
+          id: 'arena_results',
+          type: 'arena_result',
+          title: 'Arena wins and losses',
+          description: 'Win or complete arena matches today.',
+          points: 20,
+          basePoints: 20,
+          sortOrder: 1,
+          active: true,
+          config: { winBasePoints: 20, lossBasePoints: 10 },
+        },
+      ],
+    });
+
+    for (const format of ['yumi3', 'yumi5']) {
+      for (const won of [true, false]) {
+        const awarded = await service.recordArenaResult(1, {
+          won,
+          format,
+          ratingBefore: 1500,
+          ratingAfter: 1500,
+          completedAt: new Date('2026-06-30T13:00:00.000Z'),
+        });
+        expect(awarded).toBe(0);
+      }
+    }
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+    expect(db.score).toBe(0);
+    // The ranked path still records, so the exclusion is the format, not a stub.
+    await service.recordArenaResult(1, {
+      won: true,
+      format: '2v2',
+      ratingBefore: 1500,
+      ratingAfter: 1516,
+      completedAt: new Date('2026-06-30T13:02:00.000Z'),
+    });
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(1);
+  });
+
+  it('awards Vale Cup task points for ranked wins only', async () => {
+    const db = new FakeDailyRewardDb();
+    const service = new DailyRewardService(db);
+    resetDailyRewardPriceCacheForTests();
+    stubRewardConfig({
+      tasks: [
+        {
+          id: 'vale_cup_ranked_wins',
+          type: 'vale_cup_result',
+          title: 'Win ranked Vale Cup matches',
+          description: 'Win ranked football matches today.',
+          points: 25,
+          basePoints: 25,
+          sortOrder: 1,
+          active: true,
+          config: {
+            winBasePoints: 25,
+            lossBasePoints: 10,
+            minMultiplier: 1,
+            maxMultiplier: 3,
+            minutesPerMultiplier: 30,
+          },
+        },
+      ],
+    });
+    for (let minute = 0; minute < 60; minute += 1) {
+      await service.recordOnlineMinute(
+        1,
+        new Date(`2026-06-30T12:${String(minute).padStart(2, '0')}:00.000Z`),
+      );
+    }
+
+    await service.recordValeCupResult(1, {
+      won: false,
+      bracket: 1,
+      matchId: 41,
+      completedAt: new Date('2026-06-30T13:00:00.000Z'),
+    });
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+    expect(db.score).toBe(0);
+
+    await service.recordValeCupResult(1, {
+      won: true,
+      bracket: 1,
+      matchId: 42,
+      completedAt: new Date('2026-06-30T13:01:00.000Z'),
+    });
+
+    const taskEvents = db.events.filter((event) => event.kind === 'task');
+    expect(taskEvents).toHaveLength(1);
+    expect(taskEvents[0]).toMatchObject({
+      points: 75,
+      key: 'task:vale_cup_ranked_wins:vale_cup:42:win',
+      meta: {
+        taskId: 'vale_cup_ranked_wins',
+        taskType: 'vale_cup_result',
+        bracket: 1,
+        matchId: 42,
+        won: true,
+        onlineMinutes: 60,
+        multiplier: 3,
+        basePoints: 25,
+      },
+    });
+    expect(db.score).toBe(75);
+  });
+
   it('awards delve clear task points with level, tier, and online-time scaling', async () => {
     const db = new FakeDailyRewardDb();
     const service = new DailyRewardService(db);

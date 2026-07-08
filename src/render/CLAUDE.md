@@ -28,6 +28,7 @@ renderer:
 | `door_portal.ts` | dungeon-door / exit-portal bodies (stone arch + additive portal swirl) |
 | `post.ts` | post chain (see below) |
 | `gfx.ts`, `textures.ts`, `render_budget.ts`, `locomotion.ts`, `stealth.ts`, `shared_resource.ts` | shared helpers (below) |
+| `self_motion.ts` · `facing_smooth.ts` | pure, Node-tested display-only self layers: bounded intent-driven pose extrapolation online (runs `sim/player_motion.ts`; never touches world state, see `src/net/CLAUDE.md`) · rate-limited self yaw |
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives

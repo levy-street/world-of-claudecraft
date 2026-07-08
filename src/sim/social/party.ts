@@ -157,6 +157,7 @@ export class PartyMachine {
     if (!leaderMeta) return;
     let party = this.partyOf(invite.fromPid);
     if (!party) {
+      const dungeonDifficulty = leaderMeta.dungeonDifficulty;
       party = {
         id: this.nextPartyId++,
         leader: invite.fromPid,
@@ -165,6 +166,7 @@ export class PartyMachine {
         raidGroups: new Map([[invite.fromPid, 1]]),
         lootStrategies: { ...DEFAULT_PARTY_LOOT_STRATEGIES },
         lootTurn: 0,
+        ...(dungeonDifficulty ? { dungeonDifficulty } : {}),
       };
       this.parties.set(party.id, party);
       this.partyByPid.set(invite.fromPid, party.id);

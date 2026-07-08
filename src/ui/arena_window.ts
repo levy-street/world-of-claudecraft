@@ -288,7 +288,12 @@ export class ArenaWindow {
       );
     }
     const btnCls = action.queueDisabled ? 'btn disabled' : 'btn';
-    const queueLabel = bracket === 'fiesta' ? t('fiesta.enterQueue') : t('hud.arena.enterQueue');
+    const queueLabel =
+      bracket === 'fiesta'
+        ? t('fiesta.enterQueue')
+        : bracket === 'yumi3' || bracket === 'yumi5'
+          ? t('yumi.enterQueue')
+          : t('hud.arena.enterQueue');
     return (
       `<button class="${btnCls}" data-act="queue"${action.queueDisabled ? ' disabled' : ''}>${esc(queueLabel)}</button>` +
       `<div class="arena-note">${esc(t('hud.arena.queueNote'))}</div>`
@@ -331,6 +336,9 @@ export class ArenaWindow {
   }
 
   private bracketLabel(fmt: ArenaFormat): string {
-    return fmt === 'fiesta' ? t('fiesta.bracket') : fmt;
+    if (fmt === 'fiesta') return t('fiesta.bracket');
+    if (fmt === 'yumi3') return t('yumi.bracket3');
+    if (fmt === 'yumi5') return t('yumi.bracket5');
+    return fmt;
   }
 }

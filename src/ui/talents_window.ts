@@ -40,6 +40,7 @@ import type { PainterHostPresentation } from './painter_host';
 import { rovingTarget } from './roving_index';
 import { roleLabel, tTalent } from './talent_i18n';
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
+import { talentTreeFitScale } from './talent_tree_fit';
 import { buildTalentsView, type TalentsView, type TalentTreeVM } from './talents_view';
 import { svgIcon } from './ui_icons';
 
@@ -136,8 +137,8 @@ export class TalentsWindow {
   open(): void {
     this.returnFocus = this.deps.captureFocus();
     this.deps.setStage(cloneAllocation(this.deps.currentAllocation()));
-    this.render();
     this.deps.root().style.display = 'block';
+    this.render();
   }
 
   /** Close the window: hide, drop the tooltip, discard the buffer, restore focus. */
@@ -361,6 +362,44 @@ export class TalentsWindow {
       });
       host.appendChild(div);
     }
+    this.fitTreeToMobileViewport(host, treeVM.width, treeVM.height);
+  }
+
+  // Char/talents mobile landscape redo (issue 1577 follow-up): the tree is a
+  // fixed pixel grid (host.style.width/height above), so on a mobile-touch
+  // landscape phone we scale the whole grid down to whatever room #tal-body
+  // actually has, via the pure talentTreeFitScale, so a full tree reads in one
+  // view instead of needing an internal scroll to see it. Desktop is untouched
+  // (early-return keeps host at its native, unscaled size there).
+  private fitTreeToMobileViewport(host: HTMLElement, width: number, height: number): void {
+    if (!document.body.classList.contains('mobile-touch')) return;
+    const body = host.parentElement;
+    if (!body) return;
+    // #tal-body sizes to its OWN content (it is not a flex child with a capped
+    // height), so its bounding rect grows with the tree instead of reporting
+    // the room actually left in the viewport. The scrollable box on mobile is
+    // the whole #talents-window (inset:0 in hud.mobile.css), so measure the
+    // remaining space below tal-body's own top, clipped to the visible window.
+    const win = this.deps.root();
+    const winRect = win.getBoundingClientRect();
+    const bodyTop = body.getBoundingClientRect().top;
+    const availableWidth = body.clientWidth || winRect.width;
+    const availableHeight = Math.min(winRect.bottom, window.innerHeight) - bodyTop;
+    if (availableWidth <= 0 || availableHeight <= 0) return;
+    const scale = talentTreeFitScale(width, height, availableWidth, availableHeight);
+    host.style.transformOrigin = 'top left';
+    host.style.transform = scale < 1 ? `scale(${scale})` : '';
+    // .tal-tree's base rule is `margin: 6px auto` (desktop centers it); auto
+    // horizontal centering measures the tree's UNSCALED width, so left it alone
+    // it would push the shrunk tree off to the right. Pin both margins
+    // explicitly and collapse the now-empty right/bottom margin box back to
+    // the scaled visual size, so the window doesn't reserve the tree's full
+    // unscaled footprint and force a scrollbar anyway (transform never changes
+    // the layout box it applies to).
+    host.style.marginLeft = scale < 1 ? '0' : '';
+    host.style.marginTop = scale < 1 ? '0' : '';
+    host.style.marginRight = scale < 1 ? `${-(width * (1 - scale))}px` : '';
+    host.style.marginBottom = scale < 1 ? `${-(height * (1 - scale))}px` : '';
   }
 
   private setSpec(stage: TalentAllocation, specId: string): void {

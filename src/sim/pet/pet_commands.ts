@@ -85,7 +85,19 @@ export function applyNonPlayerStatAura(
   direction: 1 | -1,
 ): void {
   if (target.kind === 'player') return;
-  const hpDelta = nonPlayerAuraHp(aura) * direction;
+  let hpDelta = nonPlayerAuraHp(aura) * direction;
+  // Percent stamina raid buffs (Power Word: Fortitude via buff_sta_pct, Mark of the
+  // Wild via buff_stats_pct) on a controlled pet scale its HP pool by the percent.
+  // Value is integer percent POINTS; derived symmetrically so an apply/remove cycle
+  // restores the original pool exactly. (buff_allstats_pct is Resurrection Sickness'
+  // signed-fraction drain, a player-only aura, so it never reaches this pet path.)
+  if (aura.kind === 'buff_sta_pct' || aura.kind === 'buff_stats_pct') {
+    const pct = aura.value / 100;
+    hpDelta =
+      direction === 1
+        ? Math.round(target.maxHp * pct)
+        : -Math.round((target.maxHp / (1 + pct)) * pct);
+  }
   if (hpDelta === 0) return;
   const hpFrac = target.maxHp > 0 ? target.hp / target.maxHp : 1;
   target.maxHp = Math.max(1, target.maxHp + hpDelta);

@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import { terrainHeight, terrainSteepnessAt, waterLevelAt } from '../sim/world';
 import { GFX } from './gfx';
 
@@ -171,6 +172,7 @@ export function buildCritters(seed: number): CritterField {
     if (Math.abs(x) > WORLD_MAX_X - EDGE) return false;
     if (z < WORLD_MIN_Z + EDGE || z > WORLD_MAX_Z - EDGE) return false;
     if (x > DUNGEON_X_THRESHOLD - 24) return false;
+    if (isInSowfieldShell(x, z)) return false; // no wildlife on the football pitch
     if (terrainSteepnessAt(x, z, seed) > MAX_WALK_SLOPE) return false;
     return terrainHeight(x, z, seed) > waterLevelAt(x, z) + 0.8;
   };

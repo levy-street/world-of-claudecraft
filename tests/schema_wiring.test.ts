@@ -111,6 +111,36 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('password_set');
   });
 
+  it('applies the bank-system tables (character_leases, bank_ledger) idempotently', async () => {
+    // Bank system tables: the per-character load lease and the append-only
+    // bank op ledger both live inline in the core SCHEMA string. Pin them by name so
+    // they can never regress to defined-but-unwired (the DISCORD_SCHEMA lesson), and
+    // boot twice to pin that a re-boot re-applies the same additive statements.
+    await ensureSchema();
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS character_leases');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS character_leases_holder');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS bank_ledger');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_character');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_created');
+    // Additive-only style within the two new blocks: inside the ONE core-SCHEMA
+    // query call, slice from each CREATE TABLE to the next CREATE TABLE (or the end
+    // of that call for the last table) and assert nothing destructive or
+    // non-idempotent. Slicing the joined call log instead would run past the core
+    // schema into later boot SQL that legitimately contains destructive keywords.
+    for (const table of ['character_leases', 'bank_ledger']) {
+      const coreCall = h.calls.find((c) => c.includes(`CREATE TABLE IF NOT EXISTS ${table}`));
+      expect(coreCall).toBeDefined();
+      const start = (coreCall as string).indexOf(`CREATE TABLE IF NOT EXISTS ${table}`);
+      const rest = (coreCall as string).slice(start + 1);
+      const end = rest.indexOf('CREATE TABLE');
+      const ddl = rest.slice(0, end === -1 ? undefined : end);
+      expect(ddl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+      expect(ddl).not.toMatch(/ADD COLUMN (?!IF NOT EXISTS)/i);
+    }
+  });
+
   it('applies the tier-2 rate-limit schema under the advisory lock', async () => {
     // The multi-realm tier-2 backstop depends on the rate_limits table being
     // created at boot (RATELIMIT_SCHEMA in server/ratelimit_db.ts). Pin that it is

@@ -1,4 +1,4 @@
-import type { ItemDef, InvSlot } from '../sim/types';
+import type { InvSlot, ItemDef } from '../sim/types';
 
 // Pure, DOM-free core for the modular bag filtering system. The HUD is a thin
 // consumer: it owns the controls and the DOM, and calls applyBagFilter() to turn
@@ -6,11 +6,18 @@ import type { ItemDef, InvSlot } from '../sim/types';
 // host-agnostic lets tests drive it directly (tests/bag_filter.test.ts) without a
 // browser, mirroring unit_portrait.ts / xp_bar.ts.
 
-export const BAG_CATEGORIES = ['all', 'weapon', 'armor', 'consumable', 'material', 'quest'] as const;
+export const BAG_CATEGORIES = [
+  'all',
+  'weapon',
+  'armor',
+  'consumable',
+  'material',
+  'quest',
+] as const;
 export const BAG_SORTS = ['recent', 'quality', 'name'] as const;
 
-export type BagCategory = typeof BAG_CATEGORIES[number];
-export type BagSort = typeof BAG_SORTS[number];
+export type BagCategory = (typeof BAG_CATEGORIES)[number];
+export type BagSort = (typeof BAG_SORTS)[number];
 
 export interface BagFilterState {
   category: BagCategory;
@@ -20,11 +27,21 @@ export interface BagFilterState {
 
 export const DEFAULT_BAG_FILTER: BagFilterState = { category: 'all', sort: 'recent', search: '' };
 
+// True when the filter is showing everything (no category, no search), the only
+// view where free-slot squares are meaningful (a narrowed view shows matches only;
+// sort never affects it, a re-ordered full view still shows everything). Shared by
+// the bags grid (bags_view) and the bank window, like matchesCategory/qualityRank.
+export function bagFilterIsDefault(filter: BagFilterState): boolean {
+  return filter.category === 'all' && filter.search.trim() === '';
+}
+
 // Look up an item definition by id. Injected so the pure core never imports the
 // live ITEMS table (and tests can supply a synthetic one).
 export type ItemLookup = (itemId: string) => ItemDef | undefined;
 
-function matchesCategory(item: ItemDef, category: BagCategory): boolean {
+// Shared with the bank filter (bank_filter.ts): the bank reuses the same category
+// predicate so a "material"/"weapon"/... chip means the same thing in both windows.
+export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
   switch (category) {
     case 'all':
       return true;
@@ -33,7 +50,12 @@ function matchesCategory(item: ItemDef, category: BagCategory): boolean {
     case 'armor':
       return item.kind === 'armor';
     case 'consumable':
-      return item.kind === 'food' || item.kind === 'drink' || item.kind === 'potion' || item.kind === 'elixir';
+      return (
+        item.kind === 'food' ||
+        item.kind === 'drink' ||
+        item.kind === 'potion' ||
+        item.kind === 'elixir'
+      );
     case 'material':
       return item.kind === 'junk' || item.kind === 'tool';
     case 'quest':
@@ -52,14 +74,19 @@ const QUALITY_RANK: Record<string, number> = {
   poor: 5,
 };
 
-function qualityRank(item: ItemDef): number {
+// Shared with the bank filter (bank_filter.ts) so both windows sort quality identically.
+export function qualityRank(item: ItemDef): number {
   return QUALITY_RANK[item.quality ?? 'common'] ?? QUALITY_RANK.common;
 }
 
 // Filter, then sort. Returns a new array; never mutates the input. Sorts are
 // stable (Array.prototype.sort is spec-stable), so ties preserve insertion order
 // and the 'recent' sort is simply the unsorted filtered list.
-export function applyBagFilter(slots: readonly InvSlot[], lookup: ItemLookup, state: BagFilterState): InvSlot[] {
+export function applyBagFilter(
+  slots: readonly InvSlot[],
+  lookup: ItemLookup,
+  state: BagFilterState,
+): InvSlot[] {
   const query = state.search.trim().toLowerCase();
   const filtered = slots.filter((slot) => {
     const item = lookup(slot.itemId);

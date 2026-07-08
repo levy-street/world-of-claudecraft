@@ -29,9 +29,12 @@ import type { Entity, LootSlot } from './types';
 export const WORLD_BOSS_INTERVAL_SECONDS = 1 * 3600;
 
 // How long a slain world boss's lootable corpse lingers before it is removed. Much
-// longer than a normal corpse so every contributor has time to walk over and loot
-// their personal drops; the scheduler drops the entity once this elapses.
-export const WORLD_BOSS_CORPSE_SECONDS = 300;
+// longer than a normal corpse (and than the raid needs to clear trash) so every
+// contributor has time to walk over and loot their personal drops, INCLUDING those
+// who died to the boss and have to run back from the graveyard and resurrect first
+// (a ghost cannot loot). Well inside the spawn cadence, so corpse windows never
+// overlap. The scheduler drops the entity once this elapses.
+export const WORLD_BOSS_CORPSE_SECONDS = 900;
 
 export interface WorldBossDef {
   // MobTemplate id (must have `worldBoss: true`).
@@ -123,6 +126,34 @@ export function worldBossContributors(ctx: SimContext, mob: Entity): PlayerMeta[
   return out.sort((a, b) => a.entityId - b.entityId);
 }
 
+// The LOOT roster for a slain world boss: everyone eligible for a personal drop. This
+// is the permanent damager set (`mob.bossDamagers`, every player who hit the boss since
+// it was pulled, never pruned) UNIONED with whoever still remains on the live hate table
+// at death (a healer who threat-built but never dealt damage; pet threat credited to the
+// owner). Deduped, resolved to live PlayerMeta, sorted by entityId so downstream rng
+// draws stay in a fixed order. Unlike worldBossContributors (the hate-table-only view the
+// HP scaler uses), this SURVIVES a contributor dying or dropping off threat: the whole
+// point is that a raider who died to the boss still gets their loot. Read BEFORE
+// handleDeath clears the boss's threat (the damager set survives that clear regardless).
+export function worldBossLootContributors(ctx: SimContext, mob: Entity): PlayerMeta[] {
+  const seen = new Set<number>();
+  const out: PlayerMeta[] = [];
+  const add = (pid: number) => {
+    if (seen.has(pid)) return;
+    seen.add(pid);
+    const meta = ctx.players.get(pid);
+    if (meta) out.push(meta);
+  };
+  // Permanent damagers (already owner-resolved player ids), then anyone still on the
+  // hate table (pets credit their owner, exactly as worldBossContributors resolves).
+  for (const pid of mob.bossDamagers) add(pid);
+  for (const attackerId of mob.threat.keys()) {
+    const attacker = ctx.entities.get(attackerId);
+    add(attacker && attacker.ownerId !== null ? attacker.ownerId : attackerId);
+  }
+  return out.sort((a, b) => a.entityId - b.entityId);
+}
+
 // Retail-style participant HP scaling, driven each tick by the scheduler while the
 // boss is alive. The target pool is `base + perPlayer * (participants - 1)` clamped
 // to `max`, where participants is the deduped player count on the hate table. It only
@@ -166,13 +197,13 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
   if (!template) return;
   const items: LootSlot[] = mob.loot?.items ?? [];
   const copper = mob.loot?.copper ?? 0;
-  // contributors arrive sorted by entityId (worldBossContributors); iterate in that
-  // fixed order so the rng draw order is deterministic for the parity gate.
-  // Eligibility is checked here, but the daily lockout is consumed only when the
-  // player actually LOOTS a personal slot (lootCorpse in interaction.ts): a
-  // contributor who dies or never reaches the corpse inside the loot window keeps
-  // their daily and can try again at the next spawn. Corpse windows (300s) never
-  // overlap the 3h cadence, so at most one corpse is ever lootable at a time.
+  // contributors arrive sorted by entityId (worldBossLootContributors); iterate in
+  // that fixed order so the rng draw order is deterministic for the parity gate.
+  // Eligibility is checked here, but the lockout is consumed only when the player
+  // actually LOOTS a personal slot (lootCorpse in interaction.ts): a contributor who
+  // dies or never reaches the corpse inside the loot window keeps their lockout and
+  // can try again at the next spawn. The corpse window (WORLD_BOSS_CORPSE_SECONDS)
+  // never overlaps the spawn cadence, so at most one corpse is ever lootable at a time.
   for (const meta of contributors) {
     if (!isWorldBossLootEligible(meta, mob.templateId, ctx.lockoutNowMs())) continue;
     const rolledGroups = new Set<string>();

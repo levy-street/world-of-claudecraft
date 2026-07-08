@@ -26,6 +26,7 @@ export const MODERATION_ACTIONS = [
   'chat_unmute',
   'note',
   'force_rename',
+  'reset_password',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -564,6 +565,23 @@ export async function recordInGameAction(input: {
   const reason = cleanText(input.reason, ACTION_REASON_MAX);
   if (!reason) throw new Error('moderation reason is required');
   await recordModerationAction(pool, input.action, {
+    accountId: input.accountId,
+    adminAccountId: input.adminAccountId,
+    reason,
+  });
+}
+
+// Audit-only record for an admin-initiated password reset. The credential write
+// itself is owned by the caller (server/admin.ts via updatePasswordHash); like
+// recordInGameAction this only appends the moderation-history row.
+export async function recordPasswordReset(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  await recordModerationAction(pool, 'reset_password', {
     accountId: input.accountId,
     adminAccountId: input.adminAccountId,
     reason,

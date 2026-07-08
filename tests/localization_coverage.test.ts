@@ -333,6 +333,7 @@ describe('i18n Localization Key Coverage', () => {
     ability: 'Fireball',
     action: 'Open Chat',
     amount: 42,
+    answered: 6,
     base: 14,
     rested: 18,
     buyer: 'Mira',
@@ -476,7 +477,7 @@ describe('i18n Localization Key Coverage', () => {
         kind: 'ability',
         id: entry.id,
         field: entry.field as 'name' | 'description',
-        values: { damage: '11-14' },
+        values: { damage: '11-14', overTime: '57', buff: '35', duration: '12' },
       };
     }
     throw new Error(`Unexpected entity kind: ${entry.kind}`);
@@ -827,6 +828,10 @@ describe('i18n Localization Key Coverage', () => {
         expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.key);
         expect(rendered, `${lang}.${entry.key}`).not.toContain('$d');
         expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\{damage\}/);
+        // The other tooltip placeholders ($o over-time, $b buff value, $t
+        // duration) must interpolate in every locale exactly like $d.
+        expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\$[obt]\b/);
+        expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\{(overTime|buff|duration)\}/);
         if (
           lang !== 'en' &&
           lang !== 'en_CA' &&
@@ -844,6 +849,20 @@ describe('i18n Localization Key Coverage', () => {
           entry.source.includes('$d')
         ) {
           expect(rendered, `${lang}.${entry.key}`).toContain('11-14');
+        }
+        if (
+          entry.kind === 'ability' &&
+          entry.field === 'description' &&
+          entry.source.includes('$o')
+        ) {
+          expect(rendered, `${lang}.${entry.key}`).toContain('57');
+        }
+        if (
+          entry.kind === 'ability' &&
+          entry.field === 'description' &&
+          entry.source.includes('$b')
+        ) {
+          expect(rendered, `${lang}.${entry.key}`).toContain('35');
         }
       }
       expect(entityTranslationFallbackLog(), `${lang} fallback log`).toHaveLength(0);
@@ -892,9 +911,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    // 7 raid/dungeon families with name+bonus2+bonus3, plus 3 leveling haste
-    // kits carrying a single 3-piece tier (name+bonus3 only)
-    expect(itemSetEntries).toHaveLength(7 * 3 + 3 * 2);
+    // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
+    // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
+    // single 3-piece tier (name+bonus3 only).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1534,8 +1554,16 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n-aria="hud.core.mobileControls"');
     expect(html).toContain('data-i18n="hud.core.mobileMove"');
     expect(html).toContain('data-i18n="hud.core.mobileCamera"');
-    expect(html).toContain('data-i18n="hud.core.mobileAttack"');
-    expect(html).toContain('data-i18n="hud.core.mobileTarget"');
+    // #mobile-target-cycle is the ring's Target swap helper (it replaced the
+    // Target Closest button when acquire-nearest moved onto the ring's own
+    // #mobile-action-attack toggle), so its copy lives at
+    // hudChrome.mobile.targetCycleShort.
+    expect(html).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
+    // The old bottom-centre Target button stays removed (the ring's Target
+    // swap is the one target-cycling helper); hud.core.mobileTarget stays in
+    // the catalog (the hudKeys existence list above) but no longer appears in
+    // the markup.
+    expect(html).not.toContain('data-i18n="hud.core.mobileTarget"');
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');

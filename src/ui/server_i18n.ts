@@ -1531,6 +1531,11 @@ const dungeonNameToId = new Map<string, string>();
 for (const [id, d] of Object.entries(DUNGEONS)) dungeonNameToId.set(d.name, id);
 export function localizeZone(name: string): string {
   if (name === 'Unknown') return tServer('who.zoneUnknown');
+  // The Sowfield: a presence zone name with no ZoneDef/DungeonDef record
+  // (server presenceOf reports the stadium footprint); localized via the
+  // zone 1 poi label it shares (index pinned by tests/vale_cup_layout.test.ts).
+  if (name === 'The Sowfield')
+    return tEntity({ kind: 'zonePoi', zoneId: 'eastbrook_vale', poiIndex: 10, field: 'label' });
   const zid = zoneNameToId.get(name);
   if (zid) return tEntity({ kind: 'zone', id: zid, field: 'name' });
   const did = dungeonNameToId.get(name);

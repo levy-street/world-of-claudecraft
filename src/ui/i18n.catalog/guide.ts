@@ -29,6 +29,7 @@ export const guideStrings = {
     bestiary: 'Bestiary',
     models: '3D Models',
     gear: 'Gear & Items',
+    professions: 'Professions',
     economy: 'Economy & Trade',
     social: 'Social & Groups',
     stats: 'Character & Stats',
@@ -43,6 +44,7 @@ export const guideStrings = {
     combat: 'Combat',
     talents: 'Talents',
     arena: 'Arena & PvP',
+    valeCup: 'Vale Cup',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
     faq: 'FAQ',
@@ -954,12 +956,55 @@ export const guideStrings = {
       'The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.',
 
     // The grab-in-the-ring power-ups, named as playful flavor.
+    yumiHeading: 'Protect Yumi',
+    yumiBody:
+      'Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.',
     powerupsTitle: 'Power-ups in the ring',
     powerupsBody:
       'Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.',
     ladderHeading: 'Climbing the ladder',
     ladderBody:
       'Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm.',
+  },
+
+  // The Vale Cup boarball minigame page (docs/prd/vale-cup.md). Spoiler-safe:
+  // lore, how to play, nations, roles; no kick powers, timers, or matchmaker
+  // internals. Nation/role NAMES render from the shared hudChrome.vcup.* keys.
+  valeCupPage: {
+    heading: 'The Vale Cup',
+    intro:
+      'Boarball at the Sowfield: pick a banner, pick a role, and kick a stuffed boar hide past a keeper for the Copper Pail. No blood, no loot, just the roar of the stands.',
+    loreHeading: 'Boarball and the harvest truce',
+    loreOldSow:
+      "Long before the dead woke, Eastbrook's farmhands played boarball on the stubble fields after harvest: two mobs, one boar's hide stuffed with straw, and two wagon gates dragged to either end of the green. The first ball, the Old Sow, hangs bronzed above the tavern hearth.",
+    loreTruce:
+      'When the Ashen Coliseum began sanctioning war games, Marshal Redbrook answered with something gentler: a standing harvest truce on the old green. The wagon gates became goalposts, the green got walls, stands, and a name, the Sowfield, and the prize was always the same dented milk pail the winners drank from: the Copper Pail.',
+    howHeading: 'How to play',
+    howQueue:
+      'Queue from anywhere through the Vale Cup window, or talk to Groundskeeper Bram at the Sowfield gate. Pick a bracket from one-a-side up to five-a-side, a banner nation, and a sport role; queue solo or bring your party.',
+    howMatch:
+      'On kickoff your class kit is swapped for a sport kit and restored exactly afterward. Kicks aim at the ground reticle, the ball banks off the boards, and dribbling is just running with the ball. Score more goals than the other side before full time; a draw goes to golden goal.',
+    howTruce:
+      'Nobody bleeds at the Sowfield: tackles tumble, nothing hurts, and pets sit the match out.',
+    spectateBody:
+      'One match plays at a time at the stadium, and anyone can walk up and watch from the stands.',
+    nationsHeading: 'The eight banner nations',
+    nationsBody:
+      'Every team plays under a banner. The captain picks the nation, and if both sides fly the same one, the away side plays the inverted palette.',
+    nationVale: 'Green and gold, flying the wheat sheaf: the home side, farmhands to the bone.',
+    nationMirefen: 'Teal and grey under the heron: patient, long-legged, never hurried.',
+    nationThornpeak: 'Ice blue and white under the mountain peak: sure-footed and stubborn.',
+    nationColiseum: 'Red and black with crossed swords: they play like it is still a war game.',
+    nationChoir: 'Pale blue and silver under the bell: eerie, precise, and very quiet.',
+    nationOgre: 'Orange and umber behind the fist: shoulder-first and proud of it.',
+    nationMoon: 'Violet and silver under the crescent: night players, light on their feet.',
+    nationCopperdig: 'Copper and brown with the pickaxe: diggers who never stop running.',
+    rolesHeading: 'Sport roles',
+    rolesBody:
+      'Your role decides the kit you carry onto the pitch. Everyone kicks; the rest is temperament.',
+    rewardsHeading: 'Truce rules',
+    rewardsBody:
+      'Truce rules mean no experience and no loot: a decided match counts toward your record and the winners board, and daily-reward points come with it. Deserting a match benches your slot, and the Groundskeeper remembers.',
   },
 
   // "Things I Wish I Knew" beginner page.
@@ -1104,6 +1149,66 @@ export const guideStrings = {
       'Set your active look from the appearance row on your character screen, and switch freely among everything you have unlocked.',
   },
 
+  professions: {
+    intro:
+      'Beyond combat and quests, the world rewards you for working the land and the forge: gathering raw materials, turning them into gear at the crafting stations of ten different trades, and settling into an identity as one of the ten archetypes those trades represent.',
+
+    // Gathering professions overview.
+    gatherTitle: 'Gathering: Mining, Logging, and Herbalism',
+    gatherIntro:
+      'Three gathering trades let you pull raw materials straight out of the world: Mining strikes ore and stone from veins, Logging fells timber from stands of trees, and Herbalism collects herbs and plants growing wild. Each is tracked separately, so working one never slows your progress in another.',
+
+    gatherWhatTitle: 'Resource nodes',
+    gatherWhatBody:
+      'Ore veins, wood stands, and herb patches are placed out in the zones as visible, unowned fixtures. Walk up to one and interact with it to harvest whatever it holds. Once you have harvested a node, it needs time to recover before you personally can harvest it again, though it never blocks anyone else: another player can harvest the very same node in the meantime.',
+
+    gatherProficiencyTitle: 'Proficiency and material quality',
+    gatherProficiencyBody:
+      'Every successful harvest builds your proficiency in that gathering trade. A higher proficiency shifts what you pull out of a node toward rarer grades of material, from common on up, though the rarest grades stay rare even at high proficiency. More practice never hurts your odds, it only ever improves them.',
+
+    gatherToolsTitle: 'Tools of the trade',
+    gatherToolsBody:
+      'Vendors sell basic tools for each gathering trade, and better ones can be crafted, so working a resource node is meant to feel more capable as you gear up for it rather than staying static. Higher-tier tools are the intended way to unlock access to richer nodes and to work them more efficiently over a long session.',
+
+    // The ten crafts overview.
+    craftTitle: 'The ten crafts',
+    craftIntro:
+      "Ten crafting trades turn gathered materials into finished gear and goods: Armorcrafting, Weaponcrafting, and Jewelcrafting shape raw matter into wearable gear; Alchemy and Engineering are driven by trial and error; Cooking, Inscription, and Enchanting each touch other crafts' output; Tailoring and Leatherworking work from exact patterns. Together they form a wheel, with each craft sitting next to two neighbors and opposite one other.",
+
+    craftRingTitle: 'A wheel of specialties',
+    craftRingBody:
+      'The ten crafts are arranged in a fixed ring, and where a craft sits on that ring matters: crafts next to each other on the wheel share more in common with each other than crafts on opposite sides do. Committing to one craft is meant to feel like joining a family of related trades, not picking an isolated skill.',
+
+    craftRecipesTitle: 'Recipes and reagents',
+    craftRecipesBody:
+      'Every craft has its own recipes, each calling for specific reagents you gather or buy. The most basic recipes in each craft ask for nothing but common materials and are craftable from the very start, so you can begin working a trade the moment you pick it up rather than waiting to unlock it.',
+
+    craftMasteryTitle: 'Skill and mastery',
+    craftMasteryBody:
+      'Crafting successfully builds skill in that trade, and richer recipes are gated behind higher skill: the basic recipes are open to everyone, while progressively more advanced ones ask for progressively more mastery to attempt. Growing your skill in a craft is the path from simple starter goods to its more ambitious recipes.',
+
+    craftComboTitle: 'Combination recipes',
+    craftComboBody:
+      "Beyond a single craft's own recipe list, the wheel also supports combination recipes that call on two neighboring crafts at once, rewarding a character (or a pair of trading partners) who has invested in adjacent trades on the ring rather than one in isolation.",
+
+    // Archetypes overview.
+    archetypeTitle: 'The ten archetypes',
+    archetypeIntro:
+      'Each of the ten crafts also stands for an archetype, a broader identity you can adopt beyond just working that trade. Your active archetype is a single choice at a time, not a checklist: you carry one, and can change which one later if you choose to.',
+
+    archetypeChooseTitle: 'Choosing your archetype',
+    archetypeChooseBody:
+      'You declare your first archetype through an early, zone one story quest that formally accepts you into that identity. Until you complete that quest, you have not yet chosen an archetype at all.',
+
+    archetypeSwitchTitle: 'Changing your mind',
+    archetypeSwitchBody:
+      'Having declared an archetype once does not lock you into it forever. Changing to a different archetype means first completing a repeatable "make amends" quest for your old one, and each time you switch, the amends expected of you the next time grow a little steeper, so switching stays meaningful rather than costless.',
+
+    archetypeIdentityTitle: 'What your archetype means',
+    archetypeIdentityBody:
+      'Your active archetype is a statement about who your character is in the world, recognized in how others and the world address you. The exact rewards and recognition that come with it are still being finalized; check back as the system fills in.',
+  },
+
   economy: {
     intro:
       'Coin oils the whole world: it buys your gear, supplies, and travel kit, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.',
@@ -1122,6 +1227,15 @@ export const guideStrings = {
     marksTitle: 'A second currency: Delve Marks',
     marksBody:
       'Coin is not the only thing you bank. Delves pay out Delve Marks, a separate currency you spend only at the delve keeper, on companion upgrades and gear you will not find elsewhere. They never mix with your coin.',
+
+    // The personal bank: The Gilded Strongbox branches, deposits, and growing the vault.
+    bankTitle: 'The bank',
+    bankBody:
+      'Every hub town keeps a branch of The Gilded Strongbox, the banking house of the realm. Speak to the bursar there to open your vault, a private store of room beyond your bags that your character keeps for life. Whatever you leave with them waits safely, whichever branch you visit next.',
+    bankHow:
+      'With the vault open, click an item in your bags to deposit it and click it in the vault to take it back. The vault holds goods only, never coin, and quest items stay with you. When your bags fill up mid-journey, one button sweeps all your crafting materials in at once.',
+    bankSlots:
+      'A fresh vault starts small and grows with you. The bursar sells further slots for coin at ever-steeper prices, and playing online earns bonus room on top, for things like a verified email, linked accounts, and friends you bring into the game.',
 
     // Buying and selling at a vendor.
     buyingTitle: 'Buying and selling',

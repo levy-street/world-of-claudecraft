@@ -1,8 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { DISCORD_SCHEMA } from './discord_db';
@@ -238,6 +240,30 @@ ALTER TABLE play_sessions ADD COLUMN IF NOT EXISTS user_agent TEXT;
 CREATE INDEX IF NOT EXISTS play_sessions_account ON play_sessions(account_id);
 CREATE INDEX IF NOT EXISTS play_sessions_started ON play_sessions(started_at);
 CREATE INDEX IF NOT EXISTS play_sessions_ip_started ON play_sessions(ip_address, started_at DESC);
+-- Per-character load lease: at most one process may have a character loaded
+-- in-world at a time, the guard against a cross-process double-load dupe. The
+-- row IS the lease; holder names one process boot; crash recovery is
+-- expiry-based (heartbeats ride the autosave loop, and an expired lease is
+-- reclaimable by the next process that loads the character). No realm DEFAULT
+-- here on purpose: the realm ... DEFAULT '<realm>' pattern the older tables use
+-- is last-boot-wins across realm processes sharing one database, so this table
+-- demands an explicit realm value on every insert. realm is informational for
+-- ops only; the lease key is character_id alone (character ids are globally
+-- unique, characters.id SERIAL in the one shared DB). nonce is a per-join fence:
+-- every acquire stamps a fresh one, and a release matches on it, so a late
+-- fire-and-forget release (a grace-expiry sweep's, a takeover's) whose nonce a
+-- newer acquire has already overwritten becomes a no-op instead of eating the
+-- live session's re-acquired row.
+CREATE TABLE IF NOT EXISTS character_leases (
+  character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  realm TEXT NOT NULL,
+  holder TEXT NOT NULL,
+  nonce TEXT NOT NULL,
+  acquired_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  heartbeat_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ NOT NULL
+);
+CREATE INDEX IF NOT EXISTS character_leases_holder ON character_leases(holder);
 CREATE TABLE IF NOT EXISTS admin_online_samples (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
@@ -597,6 +623,30 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- Append-only audit ledger, one row per SUCCESSFUL bank op, written fire-and-forget
+-- off the game loop; rows are never updated or deleted by the server. The container
+-- discriminator is guild-bank readiness: v1 writes only 'personal' with a NULL
+-- container_id, while the future guild bank writes 'guild' plus the guild id into
+-- this SAME table. realm carries no DEFAULT deliberately: the interpolated-default
+-- pattern is last-boot-wins across realm processes, so every insert passes realm
+-- explicitly.
+CREATE TABLE IF NOT EXISTS bank_ledger (
+  id BIGSERIAL PRIMARY KEY,
+  realm TEXT NOT NULL,
+  character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  op TEXT NOT NULL,
+  item_id TEXT,
+  count INT,
+  instance JSONB,
+  copper_delta BIGINT NOT NULL DEFAULT 0,
+  purchased_slots_after INT NOT NULL,
+  container TEXT NOT NULL DEFAULT 'personal',
+  container_id BIGINT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS bank_ledger_character ON bank_ledger(character_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS bank_ledger_created ON bank_ledger(created_at);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -1550,6 +1600,43 @@ export async function referralCountForAccount(accountId: number): Promise<number
     [accountId],
   );
   return res.rows[0]?.n ?? 0;
+}
+
+// The account facts that drive the bank bonus-slot registry (server/bank_entitlements.ts),
+// read in ONE round trip because this runs at every fresh join. Cross-table reads are
+// fine from here (discord_links DDL lives in server/discord_db.ts, wallet_links + referrals
+// above): the query is the natural home for the join. A missing account returns all-false/0
+// (the FROM accounts row is absent, so res.rows[0] is undefined and the fallback applies).
+//   - emailVerified: the RESOLVED criterion, email_verified_at IS NOT NULL, never email-present.
+//   - discordLinked / walletLinked: a link ROW is the whole proof. NEVER a balance, holder tier,
+//     or any chain state (the $WOC PRDs pin cosmetic-only; a wallet's contents are out of scope).
+//   - qualifiedReferrals: referrals this account referred whose referee owns ANY character at
+//     level >= 10 (the denormalized characters.level; deliberately realm-agnostic, referrals are
+//     account-global; the characters_account index covers the probe). Counted RAW; the cap is
+//     registry data applied in computeBankBonus.
+export async function bankBonusFactsForAccount(accountId: number): Promise<BankBonusFacts> {
+  const res = await pool.query(
+    `SELECT
+       (a.email_verified_at IS NOT NULL) AS email_verified,
+       EXISTS(SELECT 1 FROM discord_links dl WHERE dl.account_id = $1) AS discord_linked,
+       EXISTS(SELECT 1 FROM wallet_links wl WHERE wl.account_id = $1) AS wallet_linked,
+       (SELECT count(*)::int FROM referrals r
+          WHERE r.referrer_account_id = $1
+            AND EXISTS(
+              SELECT 1 FROM characters c
+              WHERE c.account_id = r.referee_account_id AND c.level >= 10
+            )) AS qualified_referrals
+     FROM accounts a
+     WHERE a.id = $1`,
+    [accountId],
+  );
+  const row = res.rows[0];
+  return {
+    emailVerified: !!row?.email_verified,
+    discordLinked: !!row?.discord_linked,
+    walletLinked: !!row?.wallet_linked,
+    qualifiedReferrals: row?.qualified_referrals ?? 0,
+  };
 }
 
 // This account's published-card slug, if any (one slug per card; an account can
@@ -2506,6 +2593,102 @@ export async function closeOrphanSessions(): Promise<number> {
 }
 
 // ---------------------------------------------------------------------------
+// Character load leases: the cross-process double-load dupe guard. At most one
+// process may hold a character in-world at a time. A row in character_leases IS
+// the lease; it self-releases via expiry after a crash, so no client checkout
+// or advisory lock is pinned for the session's whole length (that would starve
+// the pool this shares with HTTP). heartbeats ride the 30s autosave loop.
+// ---------------------------------------------------------------------------
+
+// Lease lifetime with no heartbeat before an expired lease is reclaimable. Set
+// to three missed 30s autosave heartbeats so a brief GC pause or an autosave
+// that runs long never lets a peer steal a live character; only a genuine crash
+// (or a clean shutdown that deletes the lease) frees it early.
+export const LEASE_TTL_SECONDS = 90;
+
+// One value per process boot: realm name plus a per-boot UUID. Realm alone must
+// NOT identify the holder, because two processes accidentally started on the
+// SAME realm name is exactly the double-load accident this table guards; if they
+// shared a holder the second would treat the first's lease as its own and load
+// the character anyway. The UUID keeps every boot distinct.
+export const PROCESS_LEASE_HOLDER = `${REALM}#${randomUUID()}`;
+
+// Claim (or renew) the lease for one character. Returns true when this process
+// now holds it, false when a live lease belongs to another holder (fail closed:
+// the caller must refuse the join). The ON CONFLICT UPDATE fires only when the
+// existing lease has expired (crash reclaim) OR is already ours (a linkdead
+// resume on the same process re-extends its own lease instead of refusing
+// itself). A live foreign lease matches neither arm, so rowCount stays 0. Every
+// acquire stamps a fresh nonce (the caller passes a per-join value): a later
+// releaseCharacterLease matches on that nonce, so an older join's stale release
+// cannot delete the row this acquire re-stamped.
+export async function acquireCharacterLease(
+  characterId: number,
+  nonce: string,
+  holder = PROCESS_LEASE_HOLDER,
+): Promise<boolean> {
+  const res = await pool.query(
+    `INSERT INTO character_leases (character_id, realm, holder, nonce, acquired_at, heartbeat_at, expires_at)
+     VALUES ($1, $2, $3, $4, now(), now(), now() + make_interval(secs => $5))
+     ON CONFLICT (character_id) DO UPDATE
+       SET realm = EXCLUDED.realm,
+           holder = EXCLUDED.holder,
+           nonce = EXCLUDED.nonce,
+           acquired_at = now(),
+           heartbeat_at = now(),
+           expires_at = EXCLUDED.expires_at
+       WHERE character_leases.expires_at < now() OR character_leases.holder = EXCLUDED.holder`,
+    [characterId, REALM, holder, nonce, LEASE_TTL_SECONDS],
+  );
+  return (res.rowCount ?? 0) > 0;
+}
+
+// Drop the lease for one character on a clean leave. Guarded on holder so this
+// never deletes a lease that another process has already reclaimed (e.g. after
+// our own lease expired and a peer took over). When a nonce is given it is also
+// matched, the fence that makes a stale release a no-op: if a newer acquire has
+// re-stamped the row with a different nonce (a reconnect that raced this leave),
+// the DELETE finds nothing and the live session keeps its lease. The no-nonce
+// arm is for callers that created a session without one (direct game.join in
+// tests); it deletes on holder alone as before.
+export async function releaseCharacterLease(
+  characterId: number,
+  nonce?: string,
+  holder = PROCESS_LEASE_HOLDER,
+): Promise<void> {
+  if (nonce === undefined) {
+    await pool.query('DELETE FROM character_leases WHERE character_id = $1 AND holder = $2', [
+      characterId,
+      holder,
+    ]);
+    return;
+  }
+  await pool.query(
+    'DELETE FROM character_leases WHERE character_id = $1 AND holder = $2 AND nonce = $3',
+    [characterId, holder, nonce],
+  );
+}
+
+// Extend every lease this process holds in one statement, called from the
+// autosave loop. A lease already reclaimed by another holder is not matched, so
+// this can never steal one back.
+export async function heartbeatCharacterLeases(holder = PROCESS_LEASE_HOLDER): Promise<void> {
+  await pool.query(
+    `UPDATE character_leases
+        SET heartbeat_at = now(),
+            expires_at = now() + make_interval(secs => $2)
+      WHERE holder = $1`,
+    [holder, LEASE_TTL_SECONDS],
+  );
+}
+
+// Shutdown sweep: drop every lease this process holds so a clean restart never
+// waits out the TTL before its characters can reload.
+export async function releaseAllCharacterLeases(holder = PROCESS_LEASE_HOLDER): Promise<void> {
+  await pool.query('DELETE FROM character_leases WHERE holder = $1', [holder]);
+}
+
+// ---------------------------------------------------------------------------
 // Chat logs: one row per sent say/party message, written in batches by the
 // ChatLogger in game.ts. Name is denormalized so logs survive character
 // deletion (the FK goes NULL but the row keeps its meaning for moderation).
@@ -2534,4 +2717,49 @@ export async function pruneChatLogs(retentionDays: number): Promise<number> {
     [String(Math.floor(retentionDays))],
   );
   return res.rowCount ?? 0;
+}
+
+// ---------------------------------------------------------------------------
+// Bank ledger: one append-only row per SUCCESSFUL bank op, written fire-and-forget
+// off the game loop by server/bank_ledger.ts. See the bank_ledger DDL block in
+// SCHEMA above; realm is passed explicitly (the table carries no DEFAULT), and
+// container is always 'personal' with a NULL container_id until the guild bank
+// lands. `instance` is the item's per-instance payload (or null for a plain
+// fungible stack / a buy_slots row), serialized the same way as characters.state.
+// ---------------------------------------------------------------------------
+
+export interface BankLedgerRow {
+  realm: string;
+  characterId: number;
+  accountId: number;
+  op: 'deposit' | 'withdraw' | 'buy_slots';
+  itemId: string | null;
+  count: number | null;
+  instance: unknown;
+  copperDelta: number;
+  purchasedSlotsAfter: number;
+  container: 'personal';
+  containerId: null;
+}
+
+export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO bank_ledger
+       (realm, character_id, account_id, op, item_id, count, instance,
+        copper_delta, purchased_slots_after, container, container_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+    [
+      row.realm,
+      row.characterId,
+      row.accountId,
+      row.op,
+      row.itemId,
+      row.count,
+      row.instance == null ? null : JSON.stringify(row.instance),
+      row.copperDelta,
+      row.purchasedSlotsAfter,
+      row.container,
+      row.containerId,
+    ],
+  );
 }

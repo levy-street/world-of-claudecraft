@@ -50,8 +50,10 @@ describe('desktopDownloadUrl', () => {
     );
   });
 
-  it('returns null for Linux while the AppImage is held back', () => {
-    expect(desktopDownloadUrl('linux')).toBeNull();
+  it('builds the Linux x86_64 AppImage URL (electron-builder x64 arch token)', () => {
+    expect(desktopDownloadUrl('linux')).toBe(
+      `https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-${DESKTOP_VERSION}-linux-x86_64.AppImage`,
+    );
   });
 
   it('returns null for platforms with no published artifact', () => {

@@ -135,6 +135,11 @@ export const BOOL_SETTINGS = {
   // the right and the camera joystick on the left, for left-thumb-dominant
   // players. CSS-only swap gated on body.mobile-left-handed; ignored on desktop.
   leftHandedTouch: { def: false },
+  // off by default: shows the fixed camera joystick on touch (hidden otherwise,
+  // reserving no layout space and consuming no touches). Swipe-look on open
+  // gameplay space is the primary camera path; this is an opt-in alternative for
+  // players who prefer a dedicated stick. Gated on body.mobile-camera-joystick-on.
+  mobileCameraJoystick: { def: false },
   // on by default: mask configured swear words in chat with ****. Purely a
   // local display choice; the server sends raw text and each client decides.
   // (Slurs are blocked server-side regardless and never reach here.)

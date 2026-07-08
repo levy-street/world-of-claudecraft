@@ -308,10 +308,19 @@ export const zh_CN: EnTranslations = {
       "autorun": "自动奔跑",
       "jump": "跳跃",
       "leaderboard": "排行榜",
+      "dailyRewards": "奖励",
       "nameplates": "姓名板",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
-      "toggleHaptics": "切换震动反馈"
+      "toggleHaptics": "切换震动反馈",
+      "hotbarPage": "技能",
+      "hotbarPageAria": "显示下一组技能",
+      "actionRing": "战斗动作",
+      "actionPageToggle": "切换动作页",
+      "actionPageIndicator": "第{page}页",
+      "targetCycle": "切换目标",
+      "targetCycleShort": "目标",
+      "spellbookPageLabel": "页{page}"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -360,7 +369,9 @@ export const zh_CN: EnTranslations = {
       "hoursMinutes": "{h}小时{m}分",
       "minutes": "{m}分",
       "lessThanMinute": "<1分",
-      "lockedToast": "你已锁定到{raid}。{time}后解锁。"
+      "lockedToast": "你已锁定到{raid}。{time}后解锁。",
+      "heroicName": "英雄难度：{name}",
+      "heroicLocked": "你已被锁定至英雄难度的{name}。"
     },
     "compass": {
       "N": "北",
@@ -382,11 +393,149 @@ export const zh_CN: EnTranslations = {
       "emoteWheel": "表情轮盘",
       "targetFriendly": "选中最近友方",
       "targetFriendlyNext": "切换友方目标",
-      "discord": "Discord"
+      "discord": "Discord",
+      "valecup": "溪谷杯"
+    },
+    "vcup": {
+      "title": "溪谷杯",
+      "shootPower": "力度",
+      "close": "关闭溪谷杯窗口",
+      "offlineNote": "赛程簿已合上。溪谷杯目前不可用。",
+      "recordLine": "你的战绩：{wins} 胜，{losses} 负，{draws} 平。",
+      "bracketsAria": "比赛赛级",
+      "bracketLabel": "{n}对{n}",
+      "waitingCount": "{count} 人等待中",
+      "nationsHeading": "旗帜国度",
+      "nation": {
+        "vale": "东溪谷",
+        "mirefen": "泥沼",
+        "thornpeak": "荆峰",
+        "coliseum": "灰烬斗技场",
+        "choir": "苍白唱诗班",
+        "ogre": "食人魔氏族",
+        "moon": "苍白之月",
+        "copperdig": "铜矿坑"
+      },
+      "awayNote": "若双方举同一面旗帜，客队将使用反转配色。",
+      "rolesHeading": "运动位置",
+      "role": {
+        "allrounder": {
+          "name": "全能型",
+          "desc": "样样都会：踢球、长传，还有一记正当的肩撞。"
+        },
+        "striker": {
+          "name": "前锋",
+          "desc": "为大脚开球和灵巧侧身而生。"
+        },
+        "sweeper": {
+          "name": "清道夫",
+          "desc": "把持球者撞开，再把球大脚解围。"
+        },
+        "keeper": {
+          "name": "守门员",
+          "desc": "用抓球、扑救和长踢守住球门区。"
+        }
+      },
+      "queue": "加入队列",
+      "leaveQueue": "离开队列",
+      "queueNote": "随时随地排队；哨声会召唤你前往母猪场。",
+      "queuedStatus": "已排入 {bracket}：第 {position} 位，共 {count} 人。",
+      "blockNation": "请先选择一个旗帜国度。",
+      "blockPartySize": "这个赛级需要更小的队伍。",
+      "blockNotLeader": "只有队长才能为队伍排队。",
+      "inMatchNote": "你的队伍正在场上。继续比赛！",
+      "deserterNote": "场地管理员记着呢。{seconds} 秒后才能再次排队。",
+      "liveHeading": "母猪场现况",
+      "liveAria": "溪谷杯：{nationA} {scoreA}，{nationB} {scoreB}",
+      "walkUp": "走到母猪场，从看台上观赛。",
+      "noLive": "球场很安静。目前没有比赛。",
+      "boardHeading": "优胜者榜",
+      "boardEmpty": "尚无优胜记录。铜奶桶还在等待。",
+      "boardWins": "{count} 胜",
+      "enterAsGuild": "以 {guild} 的旗号参赛",
+      "guildRecordLine": "你的公会战绩：{wins} 胜，{losses} 负。",
+      "guildBoardHeading": "公会旗帜榜",
+      "guildBoardEmpty": "还没有公会上场。扬起你的旗帜吧！",
+      "guildBoardWl": "{wins} 胜，{losses} 负",
+      "practice": "与机器人练习赛",
+      "practiceNote": "立即在母猪场开始一场完整的机器人比赛。",
+      "practicingNow": "正在练习（{count}）：",
+      "clock": "{minutes}:{seconds}",
+      "indicatorQueued": "溪谷杯队列：{bracket}，第 {position} 位，共 {count} 人",
+      "indicatorLive": "溪谷杯",
+      "indicatorOpen": "打开溪谷杯窗口",
+      "phaseCountdown": "{seconds} 秒后开球",
+      "phaseGoal": "进球！",
+      "phaseGolden": "金球制",
+      "phaseOver": "全场结束",
+      "bannerFound": "溪谷杯开赛：{nationA} 对阵 {nationB}！",
+      "bannerCountdown": "{seconds} 秒后开球...",
+      "bannerKickoff": "开球！",
+      "bannerGoal": "进球！{nation} 破门！",
+      "bannerSave": "{name} 扑救成功！",
+      "bannerGolden": "金球制：下一球定胜负！",
+      "bannerEnd": "全场结束：{nationA} {scoreA}，{nationB} {scoreB}",
+      "bannerWin": "母猪场的胜利！",
+      "bannerDraw": "母猪场的比赛以平局收场。",
+      "bannerLoss": "在母猪场落败。",
+      "logQueued": "你加入了 {bracket} 溪谷杯队列（第 {position} 位）。",
+      "logUnqueued": "你离开了溪谷杯队列。",
+      "logFound": "你的溪谷杯比赛已就绪：{nationA} 对阵 {nationB}。",
+      "logRoster": "你方：{allies}。对方：{enemies}。",
+      "logGoal": "{name} 为 {nation} 破门！{nationA} {scoreA}，{nationB} {scoreB}。",
+      "logSave": "{name} 完成扑救！",
+      "logWin": "你赢下了母猪场的这一战。",
+      "logDraw": "母猪场的这一战以平局告终。",
+      "logLoss": "你输掉了母猪场的这一战。",
+      "gossipOpen": "赛程簿",
+      "gossipOpenAria": "打开溪谷杯窗口",
+      "mobileLabel": "杯赛",
+      "briefing": {
+        "subtitle": "赛前简报",
+        "vs": "对",
+        "rulesHeading": "玩法",
+        "rule1": "把球踢或传进对方球门即可得分。",
+        "rule2": "先进 5 球者胜，或全场结束时进球最多者胜。",
+        "rule3": "全场打平则进入金球赛：下一个进球者获胜。",
+        "rule4": "铲球只会把人撞倒，没有人会受伤，丰收休战为证。",
+        "rule5": "任何人都可以走上前，在看台上为你助威。",
+        "kitHeading": "你的技能",
+        "kitNote": "比赛期间，这些动作将取代你的职业技能。",
+        "rosterHeading": "出场名单",
+        "you": "你",
+        "bot": "电脑",
+        "ready": "我准备好了",
+        "readyDone": "已准备",
+        "readyAria": "准备开球",
+        "waiting": "正在等待对方准备……",
+        "whistle": "开球哨将在 {seconds} 秒后吹响。",
+        "readyCount": "已准备 {ready}/{total}"
+      },
+      "bet": {
+        "title": "本场投注",
+        "aria": "溪谷杯比赛投注",
+        "closesIn": "{seconds} 秒后停止投注",
+        "closed": "投注已截止",
+        "prize": "奖池 {amount}",
+        "splitAria": "两队投注池占比",
+        "expand": "查看并下注",
+        "collapse": "收起投注",
+        "oddsLabel": "赔率",
+        "back": "押注 {team}",
+        "form": "{wins}胜-{losses}负",
+        "mine": "你的投注：{amount} 押 {team}",
+        "none": "你还没有在本场比赛下注。",
+        "record": "投注战绩：{wins}胜-{losses}负，{sign}{net}",
+        "wonBanner": "你赢了这注！",
+        "wonLog": "你的溪谷杯投注赢了：返还 {amount}。",
+        "lostLog": "你的溪谷杯投注输了：{amount}。",
+        "refundLog": "投注作废，已退还你的 {amount} 本金。"
+      }
     },
     "options": {
       "clickMoveLeft": "左键",
       "clickMoveRight": "右键",
+      "version": "v{version}（{build}）",
       "browserEffects": "浏览器特效",
       "browserEffectsAuto": "自动",
       "browserEffectsFull": "完整",
@@ -418,7 +567,9 @@ export const zh_CN: EnTranslations = {
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
-      "showDailyRewardsChest": "显示每日奖励宝箱"
+      "showDailyRewardsChest": "显示每日奖励宝箱",
+      "mobileCameraJoystick": "摄像机摇杆",
+      "mobileLeftHanded": "左手布局"
     },
     "controller": {
       "title": "手柄",
@@ -469,7 +620,9 @@ export const zh_CN: EnTranslations = {
         "fps01Low": "0.1% 低帧",
         "ping": "延迟",
         "jitter": "抖动",
+        "predLead": "预测提前量",
         "snapshot": "快照频率",
+        "serverTick": "服务器刻率",
         "connection": "连接",
         "drawCalls": "绘制调用",
         "triangles": "三角面",
@@ -512,7 +665,9 @@ export const zh_CN: EnTranslations = {
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
-        "spellPower": "法术强度"
+        "spellPower": "法术强度",
+        "critRating": "暴击等级",
+        "hasteRating": "急速等级"
       },
       "desc": {
         "str": "提高你的攻击强度，使你的武器攻击造成更高的伤害。",
@@ -525,7 +680,9 @@ export const zh_CN: EnTranslations = {
         "spellPower": "提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。",
         "dps": "你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。",
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
-        "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。"
+        "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
+        "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
+        "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。"
       },
       "effects": {
         "attackPower": "+{value} 攻击强度",
@@ -565,6 +722,15 @@ export const zh_CN: EnTranslations = {
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
+    },
+    "itemProc": {
+      "onMeleeHit": "命中时几率（{chance}%）：{effect}",
+      "onSpellDamage": "造成伤害的法术几率（{chance}%）：{effect}",
+      "onHeal": "治疗时几率（{chance}%）：{effect}",
+      "chainArc": "以{school}{name}（{damage}）轰击目标，并跳跃至{jumps}个附近敌人，造成递减伤害",
+      "attackSlow": "并使目标攻击速度降低{pct}%，持续{duration}秒",
+      "dot": "引发{name}，一种{school}持续伤害效果，在{duration}秒内造成{total}点伤害",
+      "hot": "绽放{name}，一种持续治疗效果，在{duration}秒内恢复{total}点生命"
     },
     "questShare": {
       "notShareable": "该任务无法分享。",
@@ -753,6 +919,15 @@ export const zh_CN: EnTranslations = {
         "tusk": "獠牙"
       }
     },
+    "townFocus": {
+      "title": "城镇专注",
+      "hint": "专注点会在每种材料的基础产出上叠加加成。未专注的材料保持基础产出不变。",
+      "budgetLabel": "剩余点数：{remaining} / {budget}",
+      "saveButton": "保存专注",
+      "notInTownHint": "你必须在城镇中才能设置专注。",
+      "increaseAria": "增加对{component}的专注",
+      "decreaseAria": "减少对{component}的专注"
+    },
     "party": {
       "promoteLeader": "提升为队长",
       "inviteUsage": "邀请谁？用法：/invite <名称>。"
@@ -768,7 +943,13 @@ export const zh_CN: EnTranslations = {
       "leaderOption": "分配者：队长（你）",
       "masterOption": "分配者：{name}"
     },
+    "dungeonDifficulty": {
+      "setHeroic": "设置地下城难度：英雄",
+      "setNormal": "设置地下城难度：普通"
+    },
     "bags": {
+      "cannotDestroy": "该物品无法销毁。",
+      "rightClickDestroy": "右键单击以销毁",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -833,10 +1014,19 @@ export const zh_CN: EnTranslations = {
         "allStats": "所有属性降低 {value}"
       },
       "allStatsPctReduce": "所有属性降低 {pct}%",
+      "increasePct": {
+        "ap": "攻击强度提高 {pct}%",
+        "armor": "护甲提高 {pct}%",
+        "int": "智力提高 {pct}%",
+        "sta": "耐力提高 {pct}%",
+        "allStats": "所有属性提高 {pct}%"
+      },
       "dodge": "躲闪几率提高 {pct}%",
       "dodgeReduce": "躲闪几率降低 {pct}%",
       "armorFlat": "护甲降低 {value}",
       "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
+      "armorPct": "护甲降低 {pct}%",
+      "armorPctStacks": "护甲降低 {pct}%（{stacks} 层）",
       "mortalWound": "受到的治疗降低 {pct}%",
       "vulnerability": "受到的伤害提高 {pct}%",
       "physVuln": "受到的物理伤害提高 {pct}%",
@@ -985,7 +1175,7 @@ export const zh_CN: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "管理员",
-        "coredevs": "Core Dev",
+        "coredevs": "核心开发者",
         "devs": "开发者",
         "mods": "管理员",
         "artists": "画师"
@@ -1050,18 +1240,6 @@ export const zh_CN: EnTranslations = {
           "hint": "向社区寻求帮助"
         }
       }
-    },
-    "crafting": {
-      "title": "制作",
-      "close": "关闭制作",
-      "craft": "制作",
-      "reagentsNeeded": "需要:",
-      "reagentLine": "{name}: {have}/{required}",
-      "empty": "尚无已知配方。",
-      "resultAria": "制作{name}",
-      "craftedToast": "已制作:{name}",
-      "insufficientMaterials": "你没有足够的材料。",
-      "unknownRecipe": "该配方不存在。"
     },
     "devBadge": {
       "title": "开发者",
@@ -1139,6 +1317,50 @@ export const zh_CN: EnTranslations = {
         "takeParcelsFirst": "请先取出包裹再丢弃信件。"
       }
     },
+    "bank": {
+      "title": "银行",
+      "subtitle": "镀金保险箱",
+      "close": "关闭银行",
+      "capacity": "{used}/{total}",
+      "capacityAria": "银行格已用：{used}/{total}",
+      "empty": "你的银行是空的。",
+      "tooFar": "你必须站在银行家旁才能查看银行。",
+      "buySlots": "购买 {count} 个格子",
+      "buySlotsMaxed": "已完全扩展",
+      "buyConfirm": "花费 {price} 购买 {count} 个额外的银行格子吗？",
+      "buyConfirmAccept": "购买",
+      "withdrawHint": "点击取出",
+      "withdrawPartialHint": "Shift+点击取出部分数量",
+      "depositHint": "点击存入",
+      "depositPartialHint": "Shift+点击存入部分数量",
+      "cannotDeposit": "无法存入银行",
+      "depositQuantityTitle": "存入 {item}",
+      "depositQuantityInput": "要存入的数量",
+      "depositQuantityConfirm": "存入",
+      "withdrawQuantityTitle": "取出 {item}",
+      "withdrawQuantityInput": "要取出的数量",
+      "withdrawQuantityConfirm": "取出",
+      "filterGroupAria": "按类别筛选银行",
+      "sortAria": "排序银行物品",
+      "searchAria": "按名称搜索银行物品",
+      "depositAll": "存入所有材料",
+      "depositAllDone": "已存入材料：{count}。",
+      "depositAllFull": "已存入材料：{count}。银行已满。",
+      "depositAllNone": "银行已满：未存入任何物品。",
+      "bonusTitle": "奖励格子",
+      "bonusEarned": "+{count}",
+      "bonusStatusEarned": "+{count}",
+      "bonusSourceEmail": "已验证邮箱",
+      "bonusSourceDiscord": "已绑定 Discord",
+      "bonusSourceWallet": "已绑定钱包",
+      "bonusSourceReferral": "已推荐的好友",
+      "bonusAdvertEmail": "验证邮箱可获得 2 个格子。",
+      "bonusAdvertDiscord": "绑定 Discord 可获得 2 个格子。",
+      "bonusAdvertWallet": "绑定钱包可获得 2 个格子。",
+      "bonusReferralProgress": "{count}/{cap}",
+      "bonusReferralExplainer": "邀请好友：当好友升到 10 级，你们各获得 2 个格子，最多 5 位好友。",
+      "bonusSectionAria": "奖励银行格子及获取方式"
+    },
     "calendar": {
       "title": "活动日历",
       "close": "关闭日历",
@@ -1206,6 +1428,33 @@ export const zh_CN: EnTranslations = {
       "mining": "采矿",
       "logging": "伐木",
       "herbalism": "草药学"
+    },
+    "archetypeTitle": {
+      "label": "称号",
+      "none": "无",
+      "armorcrafting": "锻甲师",
+      "weaponcrafting": "武器匠",
+      "jewelcrafting": "珠宝匠",
+      "alchemy": "炼金师",
+      "engineering": "工程师",
+      "cooking": "厨师",
+      "inscription": "铭文师",
+      "enchanting": "附魔师",
+      "tailoring": "裁缝",
+      "leatherworking": "制皮师"
+    },
+    "crafting": {
+      "title": "制作",
+      "close": "关闭制作",
+      "craft": "制作",
+      "reagentsNeeded": "需要:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "尚无已知配方。",
+      "resultAria": "制作{name}",
+      "craftedToast": "已制作:{name}",
+      "insufficientMaterials": "你没有足够的材料。",
+      "unknownRecipe": "该配方不存在。",
+      "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。"
     }
   },
   "apiError": {
@@ -1312,6 +1561,7 @@ export const zh_CN: EnTranslations = {
       "bestiary": "生物图鉴",
       "models": "3D 模型",
       "gear": "装备与物品",
+      "professions": "专业",
       "economy": "经济与交易",
       "social": "社交与组队",
       "stats": "角色与属性",
@@ -1326,6 +1576,7 @@ export const zh_CN: EnTranslations = {
       "combat": "战斗",
       "talents": "天赋",
       "arena": "竞技场与 PvP",
+      "valeCup": "溪谷杯",
       "glossary": "术语表",
       "wishIKnew": "我希望早点知道的事",
       "faq": "常见问题",
@@ -1989,10 +2240,38 @@ export const zh_CN: EnTranslations = {
       "waveGoldBody": "中段一波：双刃组合，你的构筑在此开始成型、绽放光彩。",
       "wavePrismaticTitle": "棱彩",
       "wavePrismaticBody": "最后一波：足以定义构筑、炸裂屏幕的爆发，意在以最酣畅淋漓的方式让你直呼离谱。",
+      "yumiHeading": "守护Yumi",
+      "yumiBody": "Protect Yumi是一种在迷宫中进行的团队目标模式：每队守护自己的猫咪使魔，同时猎杀对方的。两只猫咪会不时闪现到迷宫的新角落，战斗在防守、追猎与寻回之间不断摇摆。可选择3对3或5对5排队；阵亡只会让你短暂离场。",
       "powerupsTitle": "竞技场中的强化道具",
       "powerupsBody": "激战正酣时，发光的能量球还会落入竞技场，谁先抢到便归谁。它们刻意夸张到极致，且只持续片刻：极速恶魔让你瞬间快得令人目眩，巨像将你膨胀成步履蹒跚的庞然大物，月靴带来低重力的弹跳腾跃，狂战士则让你猛然涌起一股暴怒。",
       "ladderHeading": "攀登天梯",
       "ladderBody": "排名对战会长期追踪你的排名。查看排行榜，看看你身处何处，以及谁占据着这片位面的榜首。"
+    },
+    "valeCupPage": {
+      "heading": "溪谷杯",
+      "intro": "母猪场上的野猪球：选一面旗帜、选一个位置，把塞满稻草的野猪皮球踢过守门员，去争夺铜奶桶。不流血，无战利品，只有看台的欢呼。",
+      "loreHeading": "野猪球与丰收休战",
+      "loreOldSow": "早在亡者苏醒之前，东溪的农工们就在收割后的麦茬地上玩野猪球：两群人，一张塞满稻草的野猪皮，和拖到绿地两端的两扇货车门。第一颗球，“老母猪”，如今镀铜挂在酒馆壁炉上方。",
+      "loreTruce": "当灰烬斗技场开始批准战争竞技时，红溪元帅以更温和的方式回应：在老绿地上立下长期的丰收休战。货车门变成了球门，绿地有了围墙、看台和一个名字：母猪场。而奖品始终是优胜者们共饮的那只瘪了的奶桶：铜奶桶。",
+      "howHeading": "怎么玩",
+      "howQueue": "通过溪谷杯窗口随处排队，或到母猪场大门找场地管理员布拉姆。选择从一对一到五对五的赛级、一面旗帜国度和一个运动位置；可以单排，也可以带上队伍。",
+      "howMatch": "开球时你的职业技能会被换成运动技能，赛后原样恢复。踢球以地面准星瞄准，球会在挡板上反弹，带球就是推着球跑。在全场结束前比对方进更多球；平局进入金球制。",
+      "howTruce": "母猪场上无人流血：铲抢只会让人翻滚，什么都不会造成伤害，宠物也会场外休息。",
+      "spectateBody": "球场同一时间只进行一场比赛，任何人都可以走到看台观赛。",
+      "nationsHeading": "八个旗帜国度",
+      "nationsBody": "每支队伍都在一面旗帜下比赛。队长选择国度；若双方举同一面旗，客队使用反转配色。",
+      "nationVale": "绿与金，扬着麦捆旗：主场球队，骨子里都是农工。",
+      "nationMirefen": "青与灰，苍鹭旗下：耐心、腿长、从不着急。",
+      "nationThornpeak": "冰蓝与白，山峰旗下：步伐稳健、性子倔强。",
+      "nationColiseum": "红与黑，交叉双剑：他们踢起球来仍像在打仗。",
+      "nationChoir": "淡蓝与银，铃铛旗下：诡异、精准、非常安静。",
+      "nationOgre": "橙与棕，铁拳当先：肩膀开路，并引以为豪。",
+      "nationMoon": "紫与银，弯月旗下：夜行的球员，脚步轻盈。",
+      "nationCopperdig": "铜与褐，别着镐头：跑不停歇的矿工。",
+      "rolesHeading": "运动位置",
+      "rolesBody": "你的位置决定你带上球场的技能。人人都会踢球；其余看性情。",
+      "rewardsHeading": "休战规矩",
+      "rewardsBody": "休战规矩意味着没有经验也没有战利品：一场分出胜负的比赛会计入你的战绩和优胜者榜，并附带每日奖励点数。中途弃赛会让你的位置空缺，而场地管理员记着呢。"
     },
     "wishPage": {
       "heading": "我希望早点知道的事",
@@ -2078,6 +2357,35 @@ export const zh_CN: EnTranslations = {
       "cosmeticsCache": "其中少数来自一个神秘的外观宝箱，那是一份封缄的奖励，开启时会随机滚出三种品质等级中的一种，并授予与之匹配的外观。它纯粹为了好看：里面没有任何东西能让你变强，只会让你更赏心悦目。",
       "cosmeticsApply": "在角色界面的外观一栏设置你当前的造型，并在已解锁的所有外观之间自由切换。"
     },
+    "professions": {
+      "intro": "除了战斗和任务之外，这个世界还会奖励你耕耘土地与锻造：采集原材料，在十种不同行业的制作站中将其打造成装备，并在这些行业所代表的十种命途之一中确立自己的身份。",
+      "gatherTitle": "采集：采矿、伐木与草药学",
+      "gatherIntro": "三种采集行业让你从世界中直接获取原材料：采矿从矿脉中开采矿石与石料，伐木从林地中砍伐木材，草药学采集野生生长的草药与植物。三者分别计算进度，从事其中一项不会拖慢你在另一项上的进展。",
+      "gatherWhatTitle": "资源节点",
+      "gatherWhatBody": "矿脉、林地与药草丛作为可见、无主的地物分布在各个区域中。走近并与之互动即可采集其中的资源。采集过一个节点后，它需要一段时间才能恢复供你本人再次采集，但这从不会阻挡其他玩家：其他人可以在此期间采集同一个节点。",
+      "gatherProficiencyTitle": "熟练度与材料品质",
+      "gatherProficiencyBody": "每次成功采集都会提升你在该采集行业的熟练度。更高的熟练度会让你从节点中获得更稀有品级材料的几率提高，从普通往上依次递增，不过最稀有的品级即便在高熟练度下依然稀少。多加练习永远不会降低你的几率，只会不断提升它。",
+      "gatherToolsTitle": "行业工具",
+      "gatherToolsBody": "商人出售各采集行业的基础工具，更好的工具则可以被制作出来，因此为节点采集做准备应当让人感觉自己在不断变强，而不是原地踏步。更高级的工具是解锁更丰富节点、并在长时间游玩中更高效采集的既定途径。",
+      "craftTitle": "十大制作行业",
+      "craftIntro": "十种制作行业将采集到的材料转化为成品装备与物品：制甲、制械与珠宝加工将原材料塑形为可穿戴装备；炼金术与工程学依靠反复试验；烹饪、铭文与附魔各自作用于其他行业的产出；裁缝与制皮则依照精确的图样进行。它们共同构成一个轮环，每种行业都与两个邻居相邻，并与另一种行业相对。",
+      "craftRingTitle": "专精之轮",
+      "craftRingBody": "十种行业排列在一个固定的轮环上，行业在轮环上的位置很重要：相邻的行业彼此之间的共通之处比处于对面的行业更多。专注于一种行业应当让人感觉像是加入了一个相关行业组成的家族，而不是选择了一项孤立的技能。",
+      "craftRecipesTitle": "配方与材料",
+      "craftRecipesBody": "每种行业都有自己的配方，各自需要你采集或购买的特定材料。每种行业中最基础的配方只需要普通材料即可制作，从一开始就可以上手，因此你拿起一门行业后即可立刻开始制作，而无需等待解锁。",
+      "craftMasteryTitle": "技能与精通",
+      "craftMasteryBody": "成功制作会提升你在该行业的技能，而更丰富的配方需要更高的技能才能解锁：基础配方对所有人开放，而越进阶的配方则需要越高的精通程度才能尝试。提升你在某行业的技能，是从简单的入门物品通往其更具野心的配方的必经之路。",
+      "craftComboTitle": "组合配方",
+      "craftComboBody": "除了单一行业自身的配方列表之外，这个轮环还支持需要同时调用两个相邻行业的组合配方，用以奖励那些（或是一对交易伙伴）投入了轮环上相邻行业的角色，而非只专精孤立的一项。",
+      "archetypeTitle": "十大命途",
+      "archetypeIntro": "十种行业各自也代表一种命途，一种超越单纯从事该行业本身的更广阔身份。你的当前命途一次只能有一个，而非一份清单：你只承载一个命途，但如果愿意，之后可以更改。",
+      "archetypeChooseTitle": "选择你的命途",
+      "archetypeChooseBody": "你需要通过第一区域中一个正式接纳你进入该身份的早期剧情任务，来宣告你的第一个命途。在完成该任务之前，你尚未选择任何命途。",
+      "archetypeSwitchTitle": "回心转意",
+      "archetypeSwitchBody": "一旦宣告过一种命途，并不意味着你会永远被束缚其中。改换成另一种命途，需要先为你的旧命途完成一个可重复的赎罪任务，而且每次转换后，下一次所需的赎罪都会略微加重，因此转换命途始终有意义，而不是毫无代价。",
+      "archetypeIdentityTitle": "你的命途意味着什么",
+      "archetypeIdentityBody": "你当前的命途，是关于你的角色在这个世界中是谁的一种宣告，会体现在他人与世界如何称呼你之中。它所附带的具体奖励与认可仍在完善之中；请随着系统的完善持续关注。"
+    },
     "economy": {
       "intro": "钱币让整个世界运转：它能购买你的装备、补给与旅行用具，还能在玩家之间易手。这一切只需游玩便能逐渐到手，所以不妨把本页看作一张地图，标明你的钱从何而来、又向何处去。",
       "coinTitle": "金币、银币与铜币",
@@ -2086,6 +2394,10 @@ export const zh_CN: EnTranslations = {
       "vendorsBody": "城镇与哨站里星罗棋布地分布着商人，各有各的营生。补给商贩备有食物与饮品，武器匠与护甲匠经营装备，军需官则备有实用的旅行用具。走到其中一位面前，便能看到他们出售的东西。",
       "marksTitle": "第二种货币：探秘印记",
       "marksBody": "你存下的不只有钱币。探秘会产出探秘印记，这是一种独立的货币，只能在探秘看守人处花费，用于同伴升级和别处找不到的装备。它们绝不会与你的钱币混在一起。",
+      "bankTitle": "银行",
+      "bankBody": "每座主城都设有镀金保险箱的分号，它是这片大陆的银行商号。与那里的司库交谈即可打开你的保险库：一处背包之外的私人储物空间，伴随角色终身。无论你下次造访哪家分号，寄存的物品都会安然等候。",
+      "bankHow": "保险库打开后，点击背包中的物品即可存入，点击保险库中的物品即可取回。保险库只存放物品，不存放钱币，任务物品也会留在你身上。旅途中背包装满时，还有一个按钮可将全部制造材料一键存入。",
+      "bankSlots": "新开的保险库空间不大，但会随你一同成长。司库出售更多格位，价格逐级走高；在线游玩还能获得额外空间，例如验证邮箱、关联账号，以及引荐好友加入游戏。",
       "buyingTitle": "买入与卖出",
       "buyingBody": "站到商人身旁即可打开他的窗口。只要付得起钱，你就能买下他所贩售的任何东西，也能把背包里的大部分物品卖掉换取钱币。若你不小心卖错了东西，商人会保留你近期售出的物品，让你可以买回。",
       "junkTitle": "清理废品",
@@ -3161,6 +3473,10 @@ export const zh_CN: EnTranslations = {
     },
     "closeAria": "关闭"
   },
+  "heroicShop": {
+    "balance": "英雄徽记: {count}",
+    "buyAria": "用{marks}枚英雄徽记购买{item}"
+  },
   "delveUi": {
     "board": {
       "title": "探秘面板",
@@ -3355,6 +3671,45 @@ export const zh_CN: EnTranslations = {
     },
     "chest": {
       "flavor": "亡者交出了他们尚能割舍之物。"
+    }
+  },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "加入Protect Yumi！",
+    "queue": {
+      "join": "你加入了Protect Yumi队列。守好你的使魔……",
+      "leave": "你离开了Protect Yumi队列。",
+      "teamLeave": "你的队伍离开了Protect Yumi队列。"
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3最多允许三人小队。",
+      "partyTooBig5": "Protect Yumi 5v5最多允许五人小队。"
+    },
+    "log": {
+      "start": "Protect Yumi！保卫你的使魔，猎杀敌方的使魔。"
+    },
+    "hud": {
+      "title": "守护YUMI",
+      "getReady": "做好准备……",
+      "teleportIn": "Yumi将在{s}秒后传送",
+      "suddenDeath": "骤死战",
+      "yourYumi": "我方Yumi",
+      "enemyYumi": "敌方Yumi",
+      "aria": "我方Yumi生命值{mine}/{max}，敌方Yumi生命值{theirs}。",
+      "collapse": "折叠Protect Yumi血条",
+      "expand": "展开Protect Yumi血条"
+    },
+    "respawn": {
+      "title": "倒下了！"
+    },
+    "banner": {
+      "sudden": "骤死战！Yumi不再传送！",
+      "teleport": "Yumi传送了！"
+    },
+    "end": {
+      "win": "胜利！Yumi安全了！",
+      "loss": "战败！你的Yumi倒下了。"
     }
   },
   "fiesta": {
@@ -4458,12 +4813,14 @@ export const zh_CN: EnTranslations = {
     "slots": {
       "mainhand": "主手",
       "helmet": "头部",
+      "neck": "颈部",
       "shoulder": "肩部",
       "chest": "胸部",
       "waist": "腰部",
       "legs": "腿部",
       "gloves": "手部",
-      "feet": "脚部"
+      "feet": "脚部",
+      "ring": "手指"
     },
     "quality": {
       "poor": "粗糙",
@@ -4662,30 +5019,71 @@ export const zh_CN: EnTranslations = {
       "needAria": "需求 {item}",
       "greedAria": "贪婪 {item}",
       "passAria": "放弃 {item}",
-      "everyonePassed": "所有人都放弃了 {item}。"
+      "everyonePassed": "所有人都放弃了 {item}。",
+      "rolled": "{answered}/{total} 已投骰"
     }
   },
   "entities": {
     "abilities": {
+      "sport_kick": {
+        "name": "踢球",
+        "description": "沿地面把球踢向瞄准点。"
+      },
+      "sport_shoot": {
+        "name": "射门",
+        "description": "按住蓄力，松手射门。力量过大球会飞高。"
+      },
+      "sport_pass": {
+        "name": "传球",
+        "description": "把球稳稳地传给你选定的队友，提前送到他的跑动路线上。"
+      },
+      "sport_boot": {
+        "name": "大脚开球",
+        "description": "朝瞄准点来一记高远长传。观众最爱这一脚。"
+      },
+      "sport_hoof": {
+        "name": "大脚解围",
+        "description": "把球又低又狠地轰向前场。"
+      },
+      "sport_punt": {
+        "name": "守门员长踢",
+        "description": "守门员的一记开球，又高又远。"
+      },
+      "sport_feint": {
+        "name": "假动作",
+        "description": "朝瞄准点快速侧身突进。"
+      },
+      "sport_dive": {
+        "name": "鱼跃扑救",
+        "description": "朝瞄准点飞身扑出。横传球会被你牢牢抱住。"
+      },
+      "sport_shoulder": {
+        "name": "肩撞",
+        "description": "一记符合丰收休战规矩的肩撞，把对手撞得摔离球。"
+      },
+      "sport_second_wind": {
+        "name": "重振旗鼓",
+        "description": "找回状态：移动速度提高50%，持续4秒。"
+      },
       "flamestrike": {
         "name": "烈焰风暴",
         "description": "在目标区域召唤一次烈焰爆发，对爆炸范围内的敌人造成 {damage} 点火焰伤害。"
       },
       "rain_of_fire": {
         "name": "烈火之雨",
-        "description": "在目标区域降下烈火之雨，灼烧敌人，造成 {damage} 点火焰伤害。"
+        "description": "在目标区域降下烈火之雨，持续 4 秒，每秒灼烧敌人并造成 {damage} 点火焰伤害。"
       },
       "volley": {
         "name": "乱射",
-        "description": "向目标区域射出箭雨，对其中的敌人造成 {damage} 点伤害。"
+        "description": "向目标区域射出箭雨，持续 3 秒，每 0.5 秒对其中的敌人造成 {damage} 点伤害。"
       },
       "hurricane": {
         "name": "飓风",
-        "description": "在目标区域召唤飓风，重击敌人，造成 {damage} 点自然伤害。"
+        "description": "在目标区域召唤飓风，持续 6 秒，每秒重击敌人并造成 {damage} 点自然伤害。"
       },
       "earthquake": {
         "name": "地震",
-        "description": "撼动目标区域，重击敌人，造成 {damage} 点自然伤害。"
+        "description": "撼动目标区域，持续 6 秒，每 1.5 秒重击敌人并造成 {damage} 点自然伤害。"
       },
       "heroic_strike": {
         "name": "劫掠打击",
@@ -4693,15 +5091,15 @@ export const zh_CN: EnTranslations = {
       },
       "battle_shout": {
         "name": "铁血怒吼",
-        "description": "使你的攻击强度提高 20，持续 2 分钟。"
+        "description": "使你的攻击强度提高 {buff}，持续 2 分钟。"
       },
       "commanding_shout": {
         "name": "鼓舞呐喊",
-        "description": "使你的耐力提高 6，持续 2 分钟。"
+        "description": "使你的耐力提高 {buff}，持续 2 分钟。"
       },
       "demoralizing_shout": {
         "name": "恐怖嚎叫",
-        "description": "发出可怕的怒吼，使附近所有敌人的攻击强度降低 30，持续 30 秒。"
+        "description": "发出可怕的怒吼，使附近所有敌人的攻击强度降低 {buff}，持续 30 秒。"
       },
       "charge": {
         "name": "突进",
@@ -4709,7 +5107,7 @@ export const zh_CN: EnTranslations = {
       },
       "rend": {
         "name": "深创",
-        "description": "撕裂目标，使其在 9 秒内流血并受到 {damage} 点伤害。"
+        "description": "撕裂目标，使其流血，在 {duration} 秒内受到 {damage} 点伤害。"
       },
       "thunder_clap": {
         "name": "震地一击",
@@ -4717,7 +5115,7 @@ export const zh_CN: EnTranslations = {
       },
       "hamstring": {
         "name": "致跛斩",
-        "description": "重创敌人，造成 5 点伤害，并使其移动速度降低 50%，持续 15 秒。"
+        "description": "重创敌人，造成 {damage} 点伤害，并使其移动速度降低 50%，持续 15 秒。"
       },
       "bloodrage": {
         "name": "血之代价",
@@ -4725,7 +5123,7 @@ export const zh_CN: EnTranslations = {
       },
       "overpower": {
         "name": "血手",
-        "description": "立即攻击，造成武器伤害 +5。只能在目标躲闪后使用。无法被躲闪。"
+        "description": "立即攻击，造成武器伤害加 {damage}。只能在目标躲闪后使用。无法被躲闪。"
       },
       "execute": {
         "name": "早赴黄泉",
@@ -4745,7 +5143,7 @@ export const zh_CN: EnTranslations = {
       },
       "sunder_armor": {
         "name": "削甲",
-        "description": "撕裂目标的护甲，每次使其降低 {damage}。最多叠加 5 次。产生大量威胁值。"
+        "description": "撕裂目标的护甲，每次使其降低 2%。最多叠加 5 次（叠满时降低 10%）。产生大量威胁值。"
       },
       "taunt": {
         "name": "挑衅",
@@ -4757,11 +5155,11 @@ export const zh_CN: EnTranslations = {
       },
       "frost_armor": {
         "name": "白霜护罩",
-        "description": "以寒霜包裹自身，使护甲提高 30，持续 30 分钟。"
+        "description": "以寒霜包裹自身，使护甲提高 {buff}，持续 30 分钟。"
       },
       "arcane_intellect": {
         "name": "以太睿智",
-        "description": "使智力提高 2，持续 30 分钟。"
+        "description": "使智力提高 {buff}，持续 30 分钟。"
       },
       "frostbolt": {
         "name": "凛霜之矛",
@@ -4785,7 +5183,7 @@ export const zh_CN: EnTranslations = {
       },
       "polymorph": {
         "name": "蛊惑",
-        "description": "将敌人变成蟾蜍，最多持续 15 秒。蟾蜍会四处游荡并快速恢复。任何伤害都会打破效果。仅限野兽和人型生物。"
+        "description": "将敌人变成蟾蜍，最多持续 {duration} 秒。蟾蜍会四处游荡并快速恢复。任何伤害都会打破效果。仅限野兽和人型生物。"
       },
       "frost_nova": {
         "name": "冰缚",
@@ -4805,7 +5203,7 @@ export const zh_CN: EnTranslations = {
       },
       "ice_barrier": {
         "name": "霜帷",
-        "description": "以冰霜护盾保护你，吸收 130 点伤害，持续 60 秒。"
+        "description": "以冰霜护盾保护你，吸收 {damage} 点伤害，持续 60 秒。"
       },
       "sinister_strike": {
         "name": "邪恶斩击",
@@ -4813,7 +5211,7 @@ export const zh_CN: EnTranslations = {
       },
       "eviscerate": {
         "name": "长眠",
-        "description": "终结技，根据连击点数造成伤害。"
+        "description": "终结技，造成 {damage}。"
       },
       "backstab": {
         "name": "卑劣突刺",
@@ -4821,7 +5219,7 @@ export const zh_CN: EnTranslations = {
       },
       "gouge": {
         "name": "戳眼",
-        "description": "攻击目标，使其瘫痪 4 秒。任何伤害都会打破效果。奖励 1 个连击点。"
+        "description": "攻击目标，造成 {damage} 点伤害，并使其瘫痪 4 秒。任何伤害都会打破效果。奖励 1 个连击点。"
       },
       "evasion": {
         "name": "鬼步",
@@ -4853,11 +5251,11 @@ export const zh_CN: EnTranslations = {
       },
       "garrote": {
         "name": "绞喉线",
-        "description": "勒住敌人的喉咙，立即造成伤害，并使其流血，在 18 秒内受到 {damage} 点伤害。必须处于潜行状态。奖励 1 个连击点。"
+        "description": "勒住敌人的喉咙，立即造成 {damage} 点伤害，并使其流血，在 18 秒内受到 {overTime} 点伤害。必须处于潜行状态。奖励 1 个连击点。"
       },
       "cheap_shot": {
         "name": "击腹拳",
-        "description": "攻击目标，使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。"
+        "description": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。"
       },
       "sap": {
         "name": "闷棍",
@@ -4865,11 +5263,11 @@ export const zh_CN: EnTranslations = {
       },
       "crippling_poison": {
         "name": "沉铅毒液",
-        "description": "以沉铅毒液攻击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。"
+        "description": "以沉铅毒液打击目标，造成 {damage} 点自然伤害，并使其移动速度降低 50%，持续 12 秒。"
       },
       "expose_armor": {
         "name": "护甲突破",
-        "description": "终结技，使目标护甲值降低。消耗的连击点越多，削减得越深。"
+        "description": "终结技，暴露目标，使其护甲降低 {damage}，持续 30 秒。"
       },
       "rupture": {
         "name": "血流不止",
@@ -4893,7 +5291,7 @@ export const zh_CN: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "誓约烙印",
-        "description": "使你充满神圣能量，持续 30 秒，使每次近战挥击造成 4 点额外神圣伤害。可用裁决释放。"
+        "description": "使你充满神圣能量，持续 30 秒，使每次近战挥击造成 {damage} 点额外神圣伤害。可用裁决释放。"
       },
       "holy_light": {
         "name": "愈疗之光",
@@ -4901,7 +5299,7 @@ export const zh_CN: EnTranslations = {
       },
       "devotion_aura": {
         "name": "坚定光环",
-        "description": "使你的护甲提高 40，持续 30 分钟。"
+        "description": "使你的护甲提高 {buff}，持续 30 分钟。"
       },
       "judgement": {
         "name": "裁决",
@@ -4909,19 +5307,19 @@ export const zh_CN: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "钢铁誓约",
-        "description": "为一个友方目标施加祝福，使攻击强度提高 15，持续 5 分钟。"
+        "description": "为一个友方目标施加祝福，使攻击强度提高 {buff}，持续 5 分钟。"
       },
       "divine_protection": {
         "name": "信仰守护",
-        "description": "一道守护结界吸收 50 点伤害，持续 10 秒。"
+        "description": "一道守护结界吸收 {damage} 点伤害，持续 10 秒。"
       },
       "hammer_of_justice": {
         "name": "碎裂法槌",
-        "description": "使目标昏迷 3 秒。"
+        "description": "使目标昏迷 {duration} 秒。"
       },
       "lay_on_hands": {
         "name": "临终圣礼",
-        "description": "巨大的治疗涌流：恢复 250 点生命值。10 分钟冷却时间。"
+        "description": "巨大的治疗涌流：恢复 {damage} 点生命值。10 分钟冷却时间。"
       },
       "flash_of_light": {
         "name": "圣光愈合",
@@ -4933,7 +5331,7 @@ export const zh_CN: EnTranslations = {
       },
       "consecration": {
         "name": "神圣领域",
-        "description": "奉献你脚下的土地，灼烧附近敌人，造成 {damage} 点神圣伤害。"
+        "description": "奉献你脚下的土地，持续 10 秒，每 2 秒灼烧附近敌人并造成 {damage} 点神圣伤害。"
       },
       "righteous_fury": {
         "name": "炽燃誓约",
@@ -4953,11 +5351,11 @@ export const zh_CN: EnTranslations = {
       },
       "raptor_strike": {
         "name": "剖膛一击",
-        "description": "一次强力近战攻击，使伤害提高 5。在你的下一次挥击时触发。"
+        "description": "一次强力近战攻击，使伤害提高 {damage}。在你的下一次挥击时触发。"
       },
       "aspect_of_the_hawk": {
         "name": "鹞鹰之姿",
-        "description": "化为鹞鹰之姿，使攻击强度提高 20，持续 30 分钟。"
+        "description": "化为鹞鹰之姿，使攻击强度提高 {buff}，持续 30 分钟。"
       },
       "serpent_sting": {
         "name": "毒液倒刺",
@@ -4969,15 +5367,15 @@ export const zh_CN: EnTranslations = {
       },
       "concussive_shot": {
         "name": "震颤射击",
-        "description": "使目标眩晕迟缓，移动速度降低 50%，持续 4 秒。"
+        "description": "使目标眩晕迟缓，造成 {damage} 点伤害，并使移动速度降低 50%，持续 4 秒。"
       },
       "mongoose_bite": {
         "name": "反噬獠牙",
-        "description": "在目标躲闪后反击，造成武器伤害加 12。无法被躲闪。"
+        "description": "在目标躲闪后反击，造成武器伤害加 {damage}。无法被躲闪。"
       },
       "wing_clip": {
         "name": "束缚斩",
-        "description": "造成伤口，使敌人移动速度降低 40%，持续 10 秒。"
+        "description": "造成伤口，造成 {damage} 点伤害，并使敌人移动速度降低 40%，持续 10 秒。"
       },
       "aspect_of_the_monkey": {
         "name": "松貂之姿",
@@ -5005,7 +5403,7 @@ export const zh_CN: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "坚毅连祷",
-        "description": "使目标的耐力提高 3，持续 30 分钟。"
+        "description": "使目标的耐力提高 {buff}，持续 30 分钟。"
       },
       "shadow_word_pain": {
         "name": "腐朽挽歌",
@@ -5013,7 +5411,7 @@ export const zh_CN: EnTranslations = {
       },
       "power_word_shield": {
         "name": "守护圣咏",
-        "description": "保护目标，吸收 48 点伤害，持续 30 秒。"
+        "description": "保护目标，吸收 {damage} 点伤害，持续 30 秒。"
       },
       "renew": {
         "name": "萦绕恩泽",
@@ -5041,7 +5439,7 @@ export const zh_CN: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "缚石武器",
-        "description": "以大地之怒灌注你的武器：每次挥击额外造成 5 点伤害，持续 5 分钟。"
+        "description": "以大地之怒灌注你的武器：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。"
       },
       "healing_wave": {
         "name": "治愈之水",
@@ -5053,15 +5451,15 @@ export const zh_CN: EnTranslations = {
       },
       "lightning_shield": {
         "name": "雷霆护罩",
-        "description": "以爆裂闪电环绕自身：近战攻击者会受到 13 点自然伤害。"
+        "description": "以爆裂闪电环绕自身：近战攻击者会受到 {buff} 点自然伤害，最多 3 次充能且每 5 秒最多触发一次。"
       },
       "flame_shock": {
         "name": "余烬震击",
-        "description": "用火焰灼烧目标，造成 25 点伤害，并在 12 秒内额外造成 {damage}。"
+        "description": "用火焰灼烧目标，造成 {damage} 点伤害，并在 12 秒内额外造成 {overTime}。"
       },
       "flametongue_weapon": {
         "name": "焰烙武器",
-        "description": "用元素之火灌注你的武器：每次挥击额外造成 8 点火焰伤害，持续 5 分钟。"
+        "description": "用元素之火灌注你的武器：每次挥击额外造成 {damage} 点火焰伤害，持续 5 分钟。"
       },
       "frost_shock": {
         "name": "凛霜震击",
@@ -5069,7 +5467,7 @@ export const zh_CN: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "缚霜武器",
-        "description": "为你的武器附上刺骨寒霜：每次挥击额外造成 8 点伤害，持续 5 分钟。"
+        "description": "为你的武器附上刺骨寒霜：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。"
       },
       "ghost_wolf": {
         "name": "影狼",
@@ -5085,11 +5483,11 @@ export const zh_CN: EnTranslations = {
       },
       "demon_skin": {
         "name": "邪魔硬皮",
-        "description": "恶魔皮肤使你的护甲提高 30，持续 30 分钟。"
+        "description": "恶魔皮肤使你的护甲提高 {buff}，持续 30 分钟。"
       },
       "immolate": {
         "name": "燃烧契约",
-        "description": "灼烧敌人，造成 11 点火焰伤害，并在 15 秒内额外造成 {damage}。"
+        "description": "灼烧敌人，造成 {damage} 点火焰伤害，并在 15 秒内额外造成 {overTime}。"
       },
       "corruption": {
         "name": "黑腐术",
@@ -5097,7 +5495,7 @@ export const zh_CN: EnTranslations = {
       },
       "life_tap": {
         "name": "苛酷交易",
-        "description": "将 30 点生命值转化为 30 点法力值。"
+        "description": "将 {damage} 点生命值转化为 {damage} 点法力值。"
       },
       "curse_of_agony": {
         "name": "苦楚妖术",
@@ -5129,7 +5527,7 @@ export const zh_CN: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "野性守护",
-        "description": "为一个友方目标施加野性守护，使护甲提高 25，持续 30 分钟。"
+        "description": "为一个友方目标施加野性守护，使护甲提高 {buff}，持续 30 分钟。"
       },
       "moonfire": {
         "name": "月光风暴",
@@ -5141,7 +5539,7 @@ export const zh_CN: EnTranslations = {
       },
       "thorns": {
         "name": "荆棘守护",
-        "description": "目标身上长出荆棘：近战攻击者受到 3 点自然伤害。"
+        "description": "目标身上长出荆棘：近战攻击者受到 {buff} 点自然伤害。"
       },
       "entangling_roots": {
         "name": "缠握根须",
@@ -5149,7 +5547,7 @@ export const zh_CN: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形态",
-        "description": "变形为熊：护甲 +65%，攻击强度 +15，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
+        "description": "变形为熊：护甲 +90%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
       },
       "maul": {
         "name": "碎骨击",
@@ -5169,7 +5567,7 @@ export const zh_CN: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "血噬",
-        "description": "终结技，根据连击点数造成伤害。仅限狼形态。"
+        "description": "终结技，造成 {damage}。仅限狼形态。"
       },
       "swipe": {
         "name": "横扫利爪",
@@ -5201,7 +5599,7 @@ export const zh_CN: EnTranslations = {
       },
       "faerie_fire": {
         "name": "巫光",
-        "description": "使目标的护甲降低 35，持续 40 秒。"
+        "description": "使目标的护甲降低 35，持续 30 秒。"
       },
       "hibernate": {
         "name": "沉眠",
@@ -5225,7 +5623,7 @@ export const zh_CN: EnTranslations = {
       },
       "rip": {
         "name": "割裂",
-        "description": "终结技，在 12 秒内造成流血伤害。消耗连击点。仅限狼形态。"
+        "description": "终结技，在 12 秒内造成 {damage} 点流血伤害。消耗连击点。仅限狼形态。"
       },
       "demon_bite": {
         "name": "恶魔猎手",
@@ -5281,11 +5679,11 @@ export const zh_CN: EnTranslations = {
       },
       "bloodthirst": {
         "name": "放血",
-        "description": "在鲜血狂怒中立即攻击，造成 {damage} 点伤害。（狂怒专精标志技能）"
+        "description": "在鲜血狂怒中立即攻击，造成 60% 武器伤害加 {damage}。（狂怒专精标志技能）"
       },
       "shield_slam": {
         "name": "碎盾击",
-        "description": "用盾牌猛击目标，造成 {damage} 点伤害并产生巨量威胁。（防护专精标志技能）"
+        "description": "用盾牌猛击目标，造成 50% 武器伤害加 {damage} 并产生巨量威胁。（防护专精标志技能）"
       },
       "whirlwind": {
         "name": "利刃回旋",
@@ -5936,6 +6334,24 @@ export const zh_CN: EnTranslations = {
       "sunpetal_sickle": {
         "name": "阳瓣镰刀"
       },
+      "thorium_ore": {
+        "name": "瑟银矿石"
+      },
+      "arcanite_bar": {
+        "name": "秘银锭"
+      },
+      "ashwood_log": {
+        "name": "灰木原木"
+      },
+      "elderwood_log": {
+        "name": "古老接骨木原木"
+      },
+      "goldleaf_herb": {
+        "name": "金叶草"
+      },
+      "sunpetal_herb": {
+        "name": "阳瓣草"
+      },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"
       },
@@ -6401,6 +6817,132 @@ export const zh_CN: EnTranslations = {
       "event_skin_token": {
         "name": "神秘外观宝箱"
       },
+      "heroic_mark": {
+        "name": "英雄徽记"
+      },
+      "morthens_cryptforged_hauberk": {
+        "name": "莫尔森的墓铸锁甲"
+      },
+      "shadowpulse_handwraps": {
+        "name": "暗影脉冲裹手"
+      },
+      "bonechill_striders": {
+        "name": "骨寒行者之靴"
+      },
+      "mistcallers_fang": {
+        "name": "唤雾者之牙"
+      },
+      "tidebound_spaulders": {
+        "name": "缚潮护肩"
+      },
+      "sash_of_the_sunken_court": {
+        "name": "沉没王庭腰带"
+      },
+      "lunar_tide_greatstaff": {
+        "name": "月潮巨杖"
+      },
+      "tidewoven_trousers": {
+        "name": "织潮长裤"
+      },
+      "choirmothers_casque": {
+        "name": "唱诗圣母的头盔"
+      },
+      "gravewyrm_cleaver": {
+        "name": "墓龙劈斩刀"
+      },
+      "shroud_of_the_gravewyrm": {
+        "name": "墓龙裹布"
+      },
+      "sanctum_prowlers_grips": {
+        "name": "圣殿潜行者的手套"
+      },
+      "scepter_of_the_deathless_court": {
+        "name": "不死王庭权杖"
+      },
+      "deathless_warguard_legmail": {
+        "name": "不死战卫腿甲"
+      },
+      "soulrend_diadem": {
+        "name": "裂魂冠冕"
+      },
+      "scourgehide_carapace": {
+        "name": "灾祸之皮甲壳"
+      },
+      "cryptplate_helm": {
+        "name": "墓板头盔"
+      },
+      "shadowpulse_slippers": {
+        "name": "暗影脉冲便鞋"
+      },
+      "bonechill_cord": {
+        "name": "骨寒腰绳"
+      },
+      "mistforged_pauldrons": {
+        "name": "雾铸肩铠"
+      },
+      "tideguard_faceguard": {
+        "name": "守潮面甲"
+      },
+      "sunken_court_mantle": {
+        "name": "沉没王庭披肩"
+      },
+      "lunar_choir_leggings": {
+        "name": "月唱护腿"
+      },
+      "choir_blessed_spaulders": {
+        "name": "唱诗祝福肩铠"
+      },
+      "tideworn_warboots": {
+        "name": "潮蚀战靴"
+      },
+      "gravewyrm_claws": {
+        "name": "墓龙护爪"
+      },
+      "gravescale_girdle": {
+        "name": "墓鳞腰带"
+      },
+      "wyrmchoir_handwraps": {
+        "name": "龙唱裹手"
+      },
+      "deathless_greatblade": {
+        "name": "不死巨刃"
+      },
+      "soulforged_warplate": {
+        "name": "铸魂战甲"
+      },
+      "stormcallers_focus": {
+        "name": "唤雷之核"
+      },
+      "seal_of_the_nine_oaths": {
+        "name": "九誓之印"
+      },
+      "nielas_coldlight_band": {
+        "name": "妮拉的冷光指环"
+      },
+      "sutils_gambit": {
+        "name": "苏蒂尔的赌局"
+      },
+      "oath_of_the_round_table": {
+        "name": "圆桌誓约"
+      },
+      "zyzzs_deathless_signet": {
+        "name": "兹兹的不朽印戒"
+      },
+      "architects_cornerstone": {
+        "name": "建筑师的奠基石"
+      },
+      "swiftfang_talisman": {
+        "name": "迅牙护符"
+      },
+      "yumis_keepsake_locket": {
+        "name": "由美的纪念小盒"
+      },
+      "zense_meridian": {
+        "name": "泽恩斯子午坠"
+      },
+      "medallion_of_endless_profit": {
+        "name": "无尽利润勋章"
+      },
       "deathless_heartwood": {
         "name": "不朽王冠之心木"
       },
@@ -6508,6 +7050,9 @@ export const zh_CN: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "森林狼"
       },
@@ -6567,6 +7112,9 @@ export const zh_CN: EnTranslations = {
       },
       "deacon_voss": {
         "name": "执事沃斯"
+      },
+      "training_dummy": {
+        "name": "训练假人"
       },
       "ridge_stalker": {
         "name": "山脊潜猎者"
@@ -6729,6 +7277,9 @@ export const zh_CN: EnTranslations = {
       },
       "tolling_bell": {
         "name": "鸣钟"
+      },
+      "vale_cup_ball": {
+        "name": "野猪皮球"
       },
       "thunzharr_waking_peak": {
         "name": "桑扎尔，觉醒之峰"
@@ -6936,6 +7487,11 @@ export const zh_CN: EnTranslations = {
         "title": "护甲大师",
         "greeting": "炉火正旺，砂轮正转。能砍的东西，我都卖。"
       },
+      "heroic_quartermaster": {
+        "name": "军需官维克斯",
+        "title": "英雄军需官",
+        "greeting": "英雄深渊的凭证能换来高崖望最上等的戒指和吊坠。把你的徽记拿给我看。"
+      },
       "loremaster_caddis": {
         "name": "凯迪斯博学者",
         "title": "博学者",
@@ -6945,6 +7501,21 @@ export const zh_CN: EnTranslations = {
         "name": "拍卖师沃斯",
         "title": "世界市场守护者",
         "greeting": "世界市场在此亦可使用，{className}。从王国各地的冒险者手中购买，或出售你自己的货物。"
+      },
+      "bursar_fernando": {
+        "name": "司库费尔南多",
+        "title": "镀金保险箱",
+        "greeting": "欢迎来到镀金保险箱。你的财物在我们的锁后安然无恙。"
+      },
+      "bursar_petra_vell": {
+        "name": "司库佩特拉·维尔",
+        "title": "镀金保险箱",
+        "greeting": "镀金保险箱账目清晰，金库更是一尘不染。想让我们为你存放些什么？"
+      },
+      "bursar_aldous_crane": {
+        "name": "司库奥尔多斯·克莱恩",
+        "title": "镀金保险箱",
+        "greeting": "每一只木箱、每一个钱柜、每一件饰物，交给镀金保险箱都万无一失。"
       },
       "brother_aldric_raid": {
         "name": "奥德里克修士",
@@ -6965,6 +7536,11 @@ export const zh_CN: EnTranslations = {
         "name": "灵魂医者",
         "title": "亡者的守护者",
         "greeting": "安息吧，灵魂。我可以让你重返躯体，但归途会让你变得虚弱。"
+      },
+      "groundskeeper_bram": {
+        "name": "场地管理员布拉姆",
+        "title": "母猪场看守",
+        "greeting": "休战约定在母猪场依然有效，{className}：只许用脚和肩膀。想为铜奶桶一战吗？"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -7873,6 +8449,9 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "明木林地"
+          },
+          "10": {
+            "label": "母猪场"
           }
         }
       },
@@ -8017,12 +8596,14 @@ export const zh_CN: EnTranslations = {
       "crownforged": {
         "name": "骨铸战装",
         "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "力量提高 15 点，耐力提高 15 点，攻击速度和施法速度提高 15%。"
+        "bonus3": "力量提高 15 点，耐力提高 15 点，攻击速度和施法速度提高 15%。",
+        "bonus4": "你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 8 点伤害，持续 12 秒。最多叠加 3 层。"
       },
       "deathlord": {
         "name": "冢主战甲",
         "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "力量提高 15 点，耐力提高 15 点。"
+        "bonus3": "力量提高 15 点，耐力提高 15 点。",
+        "bonus4": "你的武器致命一击有 50% 的几率触发“墓冢之力”，使攻击强度提高 60 点，持续 10 秒。"
       },
       "greyjaw_stalker": {
         "name": "灰颚追猎者装备",
@@ -8031,22 +8612,26 @@ export const zh_CN: EnTranslations = {
       "necromancers": {
         "name": "哀织法衣",
         "bonus2": "你不会被击退（击退抗性 100%）。",
-        "bonus3": "智力提高 10 点，耐力提高 10 点。"
+        "bonus3": "智力提高 10 点，耐力提高 10 点。",
+        "bonus4": "你的法术有 10% 的几率触发“清晰施法”，使你的下一个法术免费施放。"
       },
       "nighttalon": {
         "name": "恐牙皮甲",
         "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%，攻击速度和施法速度提高 15%。"
+        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%，攻击速度和施法速度提高 15%。",
+        "bonus4": "你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 6 点伤害，持续 12 秒。最多叠加 3 层。"
       },
       "soulflame": {
         "name": "魂焰法衣",
         "bonus2": "你不会被击退（击退抗性 100%）。",
-        "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。"
+        "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
+        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
       },
       "stormcallers": {
         "name": "唤风法衣",
         "bonus2": "你不会被击退（击退抗性 100%）。",
-        "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。"
+        "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
+        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
       },
       "vale_arcanist": {
         "name": "谷地秘法师法衣",
@@ -8055,7 +8640,8 @@ export const zh_CN: EnTranslations = {
       "wyrmshadow": {
         "name": "夜牙法衣",
         "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。"
+        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。",
+        "bonus4": "你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 25%，持续 8 秒。"
       }
     }
   },

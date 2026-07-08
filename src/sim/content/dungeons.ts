@@ -465,7 +465,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     elite: true,
     boss: true,
     ccImmune: true,
-    hpBase: 51239 / 2.3,
+    // 60k on normal (createMob applies the 2.3x elite factor); heroic scales
+    // this via the nythraxis_boss_arena healthMultiplier.
+    hpBase: 60000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 54,
     dmgPerLevel: 11.4,

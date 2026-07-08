@@ -9,7 +9,7 @@ import {
   RIGHTEOUS_FURY_THREAT_MULT,
 } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
-import { dist2d } from '../src/sim/types';
+import { dist2d, SUNDER_ARMOR_PCT_PER_STACK } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 function makeSim(cls: Parameters<typeof simClass>[0] = 'warrior', seed = 42) {
@@ -425,7 +425,10 @@ describe('sunder armor', () => {
       applications = aura?.stacks ?? 0;
     }
     expect(applications).toBeGreaterThanOrEqual(2);
-    expect((sim as any).effectiveArmor(wolf)).toBe(armorBefore - 25 * applications);
+    // Sunder is now a PERCENT armor reduction: 2% of base armor per stack.
+    expect((sim as any).effectiveArmor(wolf)).toBe(
+      armorBefore * (1 - SUNDER_ARMOR_PCT_PER_STACK * applications),
+    );
     // 100 flat threat per landed sunder (no stance up) + auto-attack noise is
     // excluded because auto-attack never started
     expect(wolf.threat.get(sim.playerId)).toBeGreaterThanOrEqual(100 * applications);
@@ -580,27 +583,33 @@ describe('hunter pets', () => {
     const druid = sim.entities.get(druidId)!;
     teleport(sim, druid, pet.pos.x + 5, pet.pos.z);
     druid.resource = druid.maxResource;
-    const armorBefore = (sim as any).effectiveArmor(pet);
+    const maxHpBefore = pet.maxHp;
 
+    // Mark of the Wild is now a percent all-attributes raid buff; on a pet its
+    // Stamina share scales the HP pool (pets derive no armor/AP from attributes).
     sim.targetEntity(pet.id, druidId);
     sim.castAbility('mark_of_the_wild', druidId);
     expect(pet.auras.some((a) => a.id === 'mark_of_the_wild')).toBe(true);
-    expect((sim as any).effectiveArmor(pet)).toBeGreaterThan(armorBefore);
+    expect(pet.maxHp).toBeGreaterThan(maxHpBefore);
 
     const priestId = sim.addPlayer('priest', 'Priest');
     const priest = sim.entities.get(priestId)!;
     teleport(sim, priest, pet.pos.x + 6, pet.pos.z);
     priest.resource = priest.maxResource;
-    const maxHpBefore = pet.maxHp;
+    const maxHpAfterMotW = pet.maxHp;
     sim.targetEntity(pet.id, priestId);
     sim.castAbility('power_word_fortitude', priestId);
-    expect(pet.maxHp).toBeGreaterThan(maxHpBefore);
+    expect(pet.maxHp).toBeGreaterThan(maxHpAfterMotW);
 
     const paladinId = sim.addPlayer('paladin', 'Paladin');
     const paladin = sim.entities.get(paladinId)!;
     sim.setPlayerLevel(4, paladinId);
     teleport(sim, paladin, pet.pos.x + 7, pet.pos.z);
     paladin.resource = paladin.maxResource;
+    // Blessing of Might is now a percent attack-power raid buff. Give the pet a base
+    // AP so the percent has something to scale (tamed pets otherwise deal template
+    // damage with 0 attack power, leaving a percent buff inert).
+    pet.attackPower = 50;
     const attackPowerBefore = (sim as any).effectiveAttackPower(pet);
     sim.targetEntity(pet.id, paladinId);
     sim.castAbility('blessing_of_might', paladinId);

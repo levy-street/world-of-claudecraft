@@ -97,6 +97,37 @@ export function archetypeStateFor(ctx: SimContext, pid: number): ArchetypeState 
   return meta ? { ...meta.archetype } : emptyArchetypeState();
 }
 
+// Issue #1130 (re-scoped per the comment on the live issue, superseding its stale
+// two-crafts-at-rare title/body): a player's CURRENTLY-ACTIVE archetype grants the
+// named title for that craft. There is no "Jack of All Trades" fallback under this
+// model, since a character always has at most one active archetype at a time; the
+// natural analog of the old "below rare grants no title" rule is the pre-acceptance
+// state (activeArchetype === null), which grants no title at all.
+//
+// `getArchetypeTitle` returns the TITLE'S IDENTIFIER, which is simply the active
+// craft id itself: the ten named titles are a strict one-to-one mapping onto the
+// ten crafts on the ring (see content/professions.ts CRAFT_RING), so the craft id
+// already uniquely identifies which title is granted. Keeping this an identifier
+// (never localized English prose) matches the "IWorld is a string-free seam" rule
+// (src/CLAUDE.md): the actual title WORDS are English-source, localized-at-client
+// data, defined per craft id in src/ui/i18n.catalog/hud_chrome.ts under
+// `archetypeTitle.<craftId>` (see that file for the ten title names chosen).
+
+/** The granted title's identifier for a given active archetype: the craft id
+ *  itself when one is set and valid, or null before the acceptance quest (or for
+ *  a malformed/unknown craft id, which should never happen for real state). */
+export function getArchetypeTitle(activeArchetype: string | null): string | null {
+  if (activeArchetype === null) return null;
+  return isCraftId(activeArchetype) ? activeArchetype : null;
+}
+
+/** Read surface: the granted title identifier for a player's CURRENT active
+ *  archetype. Backs the IWorld `archetypeTitle` read (professions facet). Updates
+ *  immediately when switchArchetype changes the active archetype. */
+export function archetypeTitleFor(ctx: SimContext, pid: number): string | null {
+  return getArchetypeTitle(archetypeStateFor(ctx, pid).activeArchetype);
+}
+
 // TODO(#1129/#1203): this module only tracks WHICH craft is the active archetype,
 // not the empowerment ceiling that makes it matter. Per #1129's revised acceptance
 // criteria, the reachable ceiling for a craft is

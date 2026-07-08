@@ -214,7 +214,16 @@ const HOT_PAINTERS: ReadonlyArray<{
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'action_bar_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
+  // yumi builds its whole strip + respawn overlay once in ensureEls (14 class
+  // assignments + the two role attributes + the toggle's type); every
+  // per-frame write is facet-routed.
+  {
+    file: 'yumi_match_painter.ts',
+    allow: { '.className': 14, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
   { file: 'auras_painter.ts', allow: { '.className': 3 }, reflowAllow: {} },
   {
     file: 'fct_painter.ts',
@@ -552,6 +561,7 @@ function aurasDeps(): AurasDeps {
     iconId: (a) => a.id,
     auraName: (a) => a.name,
     formatStacks: (n) => String(n),
+    isOwn: () => false,
     durationUnits: () => ({ s: 's', m: 'm', h: 'h', d: 'd' }),
     auraEffectHtml: () => '',
   };

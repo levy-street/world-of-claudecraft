@@ -52,6 +52,9 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const cleanDesc = (s) =>
   String(s || '')
     .replace(/\$d/g, 'X')
+    .replace(/\$o/g, 'X')
+    .replace(/\$b/g, 'X')
+    .replace(/\$t/g, 'X')
     .replace(/\$N/g, 'you')
     .replace(/\$C/g, 'your class')
     .replace(/\$s\d?/g, 'X');

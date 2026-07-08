@@ -14,6 +14,7 @@ vi.mock('pg', () => ({
 
 import {
   backfillAccountEmailIfEmpty,
+  bankBonusFactsForAccount,
   createAccount,
   createCharacterCapped,
   deleteCharacter,
@@ -357,6 +358,84 @@ describe('account cosmetics', () => {
     expect(params[1]).toEqual({
       completedQuestIds: ['q_aldrics_fallen_star'],
       mechChromaIds: ['onyx_gold'],
+    });
+  });
+});
+
+describe('bankBonusFactsForAccount', () => {
+  // The bank bonus-slot facts read at every fresh join. One round trip, fully
+  // parameterized, with the RESOLVED criteria (verified email, level-10 referee), and
+  // NEVER a balance/holder/chain read for the wallet fact.
+  it('reads all four facts in one parameterized query carrying the load-bearing predicates', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          email_verified: true,
+          discord_linked: false,
+          wallet_linked: true,
+          qualified_referrals: 3,
+        },
+      ],
+    } as any);
+
+    const facts = await bankBonusFactsForAccount(7);
+
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    // Bound to $1, never string-interpolated (an id spliced into the SQL would be an
+    // injection vector and would fail this pair of assertions).
+    expect(params).toEqual([7]);
+    expect(sql).toContain('$1');
+    expect(sql).not.toMatch(/id\s*=\s*7/);
+    // The verified-email criterion (never email-present) and the level-10 referee gate.
+    expect(sql).toMatch(/email_verified_at IS NOT NULL/i);
+    expect(sql).toMatch(/level\s*>=\s*10/);
+    // A link ROW is the whole proof for Discord/wallet; a referral row feeds the count.
+    expect(sql).toMatch(/discord_links/);
+    expect(sql).toMatch(/wallet_links/);
+    expect(sql).toMatch(/referrals/);
+    // The referral DIRECTION: count referrals this account MADE (referrer = $1) whose
+    // REFEREE owns the level-10 character. A swap would count referrals RECEIVED and
+    // grant the wrong bonus to every referrer while passing every other assertion.
+    expect(sql).toMatch(/referrer_account_id\s*=\s*\$1/);
+    expect(sql).toMatch(/c\.account_id\s*=\s*r\.referee_account_id/);
+    // Invariant: never a balance/holder-tier/chain read for the wallet fact.
+    expect(sql).not.toMatch(/balance|holder|pubkey|chain/i);
+    // Rows map straight onto the facts object.
+    expect(facts).toEqual({
+      emailVerified: true,
+      discordLinked: false,
+      walletLinked: true,
+      qualifiedReferrals: 3,
+    });
+  });
+
+  it('returns all-false/0 for a missing account (no row)', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [] } as any);
+    await expect(bankBonusFactsForAccount(999)).resolves.toEqual({
+      emailVerified: false,
+      discordLinked: false,
+      walletLinked: false,
+      qualifiedReferrals: 0,
+    });
+  });
+
+  it('coerces db booleans and guards a null referral count into 0', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [
+        {
+          email_verified: false,
+          discord_linked: true,
+          wallet_linked: false,
+          qualified_referrals: null,
+        },
+      ],
+    } as any);
+    await expect(bankBonusFactsForAccount(7)).resolves.toEqual({
+      emailVerified: false,
+      discordLinked: true,
+      walletLinked: false,
+      qualifiedReferrals: 0,
     });
   });
 });

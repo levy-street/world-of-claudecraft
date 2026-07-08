@@ -61,6 +61,32 @@ describe('Shuddering Stomp boss mechanic', () => {
     expect(sim.player.hp).toBeLessThan(5000);
   });
 
+  it('mechanicDamageMult scales the slam at the fire site (heroic-instance plumbing)', () => {
+    // Two identical seed-42 runs where the ONLY difference is a doubled
+    // mechanicDamageMult on the boss: the slam's rng draw is identical (the
+    // multiply happens after the draw), so the landed damage must double
+    // within one point of rounding.
+    const slamDamage = (mult?: number): number => {
+      const sim = makeSim();
+      const mob = engagedStomper(sim);
+      if (mult !== undefined) mob.mechanicDamageMult = mult;
+      sim.player.maxHp = 5000;
+      sim.player.hp = 5000;
+      mob.stompTimer = 0.001;
+      (sim as any).updateMob(mob);
+      const hit = (sim.drainEvents() as any[]).find(
+        (e) => e.type === 'damage' && e.ability === MOBS.korgath_the_bound.stomp!.name,
+      );
+      if (!hit) throw new Error('the slam never landed');
+      return hit.amount as number;
+    };
+
+    const base = slamDamage();
+    const doubled = slamDamage(2);
+    expect(base).toBeGreaterThan(0);
+    expect(Math.abs(doubled - base * 2)).toBeLessThanOrEqual(1);
+  });
+
   it('stuns only players inside the stomp radius', () => {
     const sim = makeSim();
     const mob = engagedStomper(sim); // boss meleeing player one, on top of them

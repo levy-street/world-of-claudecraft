@@ -23,7 +23,11 @@ const manifestPath = path.join(root, 'src/game/sfx_manifest.generated.ts');
 
 const force = process.argv.includes('--force');
 
-try { process.loadEnvFile(); } catch { /* no .env — rely on the ambient env */ }
+try {
+  process.loadEnvFile();
+} catch {
+  /* no .env, rely on the ambient env */
+}
 const KEY = process.env.ELEVENLABS_API_KEY;
 if (!KEY) {
   console.error('ELEVENLABS_API_KEY is not set (env or .env). Aborting.');
@@ -67,7 +71,14 @@ const failed = [];
 
 for (const entry of SFX) {
   const dest = path.join(sfxDir, `${entry.key}.mp3`);
-  if (existsSync(dest) && !force) { skipped++; continue; }
+  if (entry.custom) {
+    skipped++;
+    continue;
+  } // custom recording, never regenerate via API
+  if (existsSync(dest) && !force) {
+    skipped++;
+    continue;
+  }
   process.stdout.write(`sfx  ${entry.key} (${entry.duration}s${entry.loop ? ', loop' : ''})… `);
   try {
     const mp3 = await generate(entry);
@@ -77,7 +88,7 @@ for (const entry of SFX) {
     console.log('ok');
     await sleep(200);
   } catch (err) {
-    // One bad clip shouldn't abort the whole run — record it and continue.
+    // One bad clip shouldn't abort the whole run: record it and continue.
     console.log('FAILED');
     console.error(`  ${err.message}`);
     failed.push(entry.key);
@@ -94,7 +105,11 @@ for (const entry of SFX) {
     entries[entry.key] = { url: `/audio/sfx/${entry.key}.mp3`, loop: !!entry.loop };
   }
 }
-const sorted = Object.fromEntries(Object.keys(entries).sort().map((k) => [k, entries[k]]));
+const sorted = Object.fromEntries(
+  Object.keys(entries)
+    .sort()
+    .map((k) => [k, entries[k]]),
+);
 mkdirSync(path.dirname(manifestPath), { recursive: true });
 writeFileSync(
   manifestPath,
@@ -108,6 +123,10 @@ writeFileSync(
   ].join('\n'),
 );
 
-console.log(`\nDone: ${made} generated, ${skipped} skipped, ${Object.keys(sorted).length}/${SFX.length} clips on disk.`);
-console.log(`Billed ~${seconds.toFixed(1)} seconds of audio this run. Manifest: ${path.relative(root, manifestPath)}`);
+console.log(
+  `\nDone: ${made} generated, ${skipped} skipped, ${Object.keys(sorted).length}/${SFX.length} clips on disk.`,
+);
+console.log(
+  `Billed ~${seconds.toFixed(1)} seconds of audio this run. Manifest: ${path.relative(root, manifestPath)}`,
+);
 if (failed.length) console.log(`Failed (${failed.length}): ${failed.join(', ')}`);

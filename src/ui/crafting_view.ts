@@ -10,6 +10,7 @@
 //
 // DOM-free and i18n-free so tests/crafting_view.test.ts can drive it directly.
 
+import { tierCapability } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef } from '../sim/types';
 
 export interface RecipeDefLike {
@@ -19,6 +20,14 @@ export interface RecipeDefLike {
   resultCount: number;
   reagents: readonly { itemId: string; count: number }[];
   skillReq: number;
+  // Combo-recipe gate (#1132): present only on a recipe exclusive to one
+  // specific adjacent craft pair. See src/sim/professions/types.ts for the
+  // authoritative shape and src/sim/professions/crafting.ts for resolution.
+  comboRequirement?: {
+    craftA: string;
+    craftB: string;
+    minTier: number;
+  };
 }
 
 export interface CraftingReagentRow {
@@ -37,7 +46,9 @@ export interface CraftingRecipeRow {
   result?: ItemDef;
   resultCount: number;
   reagents: CraftingReagentRow[];
-  /** True only when every reagent row is satisfied: the "Craft" action is enabled. */
+  /** True only when every reagent row is satisfied AND (for a combo recipe) the
+   *  player's tier capability meets comboRequirement in both named crafts: the
+   *  "Craft" action is enabled. */
   craftable: boolean;
 }
 
@@ -53,13 +64,16 @@ function countInInventory(inventory: readonly InvSlot[], itemId: string): number
 
 /**
  * Build the structured crafting view from raw inputs: the recipe content list,
- * the local player's inventory, and the item table (for display name/icon/
- * quality). Read-only: never mutates any of its inputs.
+ * the local player's inventory, the item table (for display name/icon/
+ * quality), and the local player's flat craft skills (for the combo-recipe
+ * gate, #1132; defaults to empty so existing common-tier-only callers, e.g.
+ * tests, need not pass it). Read-only: never mutates any of its inputs.
  */
 export function buildCraftingView(
   recipes: readonly RecipeDefLike[],
   inventory: readonly InvSlot[],
   items: Record<string, ItemDef>,
+  craftSkills: Readonly<Record<string, number>> = {},
 ): CraftingView {
   const rows: CraftingRecipeRow[] = recipes.map((recipe) => {
     const reagentRows: CraftingReagentRow[] = recipe.reagents.map((reagent) => {
@@ -72,6 +86,11 @@ export function buildCraftingView(
         satisfied: have >= reagent.count,
       };
     });
+    const combo = recipe.comboRequirement;
+    const comboUnmet = combo
+      ? tierCapability(craftSkills, combo.craftA) < combo.minTier ||
+        tierCapability(craftSkills, combo.craftB) < combo.minTier
+      : false;
     return {
       recipeId: recipe.id,
       professionId: recipe.professionId,
@@ -79,7 +98,7 @@ export function buildCraftingView(
       result: items[recipe.resultItemId],
       resultCount: recipe.resultCount,
       reagents: reagentRows,
-      craftable: reagentRows.every((r) => r.satisfied),
+      craftable: reagentRows.every((r) => r.satisfied) && !comboUnmet,
     };
   });
   return { recipes: rows };

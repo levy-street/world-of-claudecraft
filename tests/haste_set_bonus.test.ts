@@ -12,6 +12,7 @@ import {
   SET_DEATHLORD,
   SET_GREYJAW_STALKER,
   SET_HASTE_3PC,
+  SET_HASTE_3PC_RATING,
   SET_NIGHTTALON,
   SET_VALE_ARCANIST,
 } from '../src/sim/content/item_sets';
@@ -70,7 +71,7 @@ describe('haste kit definitions (leveling sets in the ITEM_SETS framework)', () 
       const set = ITEM_SETS[setId];
       expect(set.bonuses.length).toBe(1);
       expect(set.bonuses[0].pieces).toBe(3);
-      expect(set.bonuses[0].effect.haste).toBe(SET_HASTE_3PC);
+      expect(set.bonuses[0].effect.hasteRating).toBe(SET_HASTE_3PC_RATING);
     }
   });
 
@@ -92,21 +93,21 @@ describe('haste kit definitions (leveling sets in the ITEM_SETS framework)', () 
 describe('aggregated haste (pure resolver)', () => {
   it('a haste kit grants haste only at the full 3 pieces', () => {
     const two = aggregateSetBonuses(new Map([[SET_VALE_ARCANIST, 2]]));
-    expect(two.haste).toBe(0);
+    expect(two.hasteRating).toBe(0);
     const three = aggregateSetBonuses(new Map([[SET_VALE_ARCANIST, 3]]));
-    expect(three.haste).toBe(SET_HASTE_3PC);
+    expect(three.hasteRating).toBe(SET_HASTE_3PC_RATING);
   });
 
   it('every tier-2 3-piece bonus includes haste; tier-1 bonuses do not', () => {
     const t2 = ['crownforged', 'nighttalon', 'soulflame', 'stormcallers'];
     for (const setId of t2) {
-      expect(aggregateSetBonuses(new Map([[setId, 3]])).haste, `${setId} 3pc haste`).toBe(
-        SET_HASTE_3PC,
+      expect(aggregateSetBonuses(new Map([[setId, 3]])).hasteRating, `${setId} 3pc haste`).toBe(
+        SET_HASTE_3PC_RATING,
       );
-      expect(aggregateSetBonuses(new Map([[setId, 2]])).haste, `${setId} 2pc haste`).toBe(0);
+      expect(aggregateSetBonuses(new Map([[setId, 2]])).hasteRating, `${setId} 2pc haste`).toBe(0);
     }
     for (const setId of ['deathlord', 'wyrmshadow', 'necromancers']) {
-      expect(aggregateSetBonuses(new Map([[setId, 3]])).haste, `${setId} 3pc haste`).toBe(0);
+      expect(aggregateSetBonuses(new Map([[setId, 3]])).hasteRating, `${setId} 3pc haste`).toBe(0);
     }
   });
 });

@@ -18,6 +18,7 @@ import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 // consumed, so this object carries only `en`.
 
 const MOB_IDS = [
+  'yumi_cat',
   'forest_wolf',
   'old_greyjaw',
   'wild_boar',
@@ -38,6 +39,7 @@ const MOB_IDS = [
   'gravecaller_summoner',
   'gravecaller_mender',
   'deacon_voss',
+  'training_dummy',
   'ridge_stalker',
   'deeprock_kobold',
   'thornpeak_ogre',
@@ -94,6 +96,7 @@ const MOB_IDS = [
   'sister_nhalia_drowned_canticle',
   'edda_reedhand',
   'tolling_bell',
+  'vale_cup_ball',
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
@@ -118,12 +121,17 @@ const NPC_IDS = [
   'scout_maren_highwatch',
   'quartermaster_bree',
   'armorer_hode',
+  'heroic_quartermaster', // Heroic Marks vendor (Highwatch, zone 3)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
+  'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
+  'bursar_petra_vell', // Gilded Strongbox banker (Fenbridge, zone 2)
+  'bursar_aldous_crane', // Gilded Strongbox banker (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
+  'groundskeeper_bram', // Vale Cup queue master at the Sowfield gate (docs/prd/vale-cup.md)
 ] as const;
 
 const QUEST_IDS = [

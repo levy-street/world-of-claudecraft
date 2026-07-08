@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { COMMON_RECIPES, recipeById } from '../src/sim/content/recipes';
+import {
+  COMBO_RECIPES,
+  COMMON_RECIPES,
+  recipeById,
+  TOOL_RECIPES,
+} from '../src/sim/content/recipes';
 import {
   hasRecipeMaterials,
+  meetsComboRequirement,
   resolveCraft,
   resolveCraftForRecipe,
 } from '../src/sim/professions/crafting';
@@ -30,6 +36,39 @@ describe('recipe content (#1127)', () => {
   it('recipeById resolves a known id and returns undefined for an unknown one', () => {
     expect(recipeById(COMMON_RECIPES[0].id)?.id).toBe(COMMON_RECIPES[0].id);
     expect(recipeById('not_a_real_recipe')).toBeUndefined();
+  });
+});
+
+describe('TOOL_RECIPES (#1135 de-stub): tier 4/5 tool recipes', () => {
+  it('defines the six crafted base tools, each requiring skill', () => {
+    expect(TOOL_RECIPES.length).toBe(6);
+    for (const recipe of TOOL_RECIPES) {
+      expect(recipe.skillReq).toBeGreaterThan(0); // unlike common-tier, these gate on skill
+      expect(recipe.reagents.length).toBeGreaterThan(0);
+      expect(recipe.resultCount).toBeGreaterThan(0);
+      expect(recipe.professionId).toBe('engineering');
+    }
+  });
+
+  it('recipeById resolves tool recipes alongside common ones', () => {
+    for (const recipe of TOOL_RECIPES) {
+      expect(recipeById(recipe.id)?.id).toBe(recipe.id);
+    }
+  });
+
+  it('resolveCraft produces a tool from its recipe reagents', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_thorium_mining_pick')!;
+    grantItem(sim, 'thorium_ore', 4, pid);
+    grantItem(sim, 'mithril_mining_pick', 1, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    expect(sim.countItem('mithril_mining_pick', pid)).toBe(0);
+    expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
   });
 });
 
@@ -197,10 +236,13 @@ describe('craftItem command (#1127)', () => {
     expect(sim.countItem('tough_jerky', pid)).toBe(1);
   });
 
-  it('the IWorld recipeList read surface exposes the common-tier recipe content', () => {
+  it('the IWorld recipeList read surface exposes every recipe, common, tool, and combo alike (#1132 review)', () => {
     const sim = makeSim();
-    expect(sim.recipeList.length).toBe(COMMON_RECIPES.length);
-    expect(sim.recipeList.map((r) => r.id).sort()).toEqual(COMMON_RECIPES.map((r) => r.id).sort());
+    const allIds = [...COMMON_RECIPES, ...TOOL_RECIPES, ...COMBO_RECIPES].map((r) => r.id).sort();
+    expect(sim.recipeList.length).toBe(
+      COMMON_RECIPES.length + TOOL_RECIPES.length + COMBO_RECIPES.length,
+    );
+    expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });
 
   it('denies a craft with an error event and leaves lastCraftResult reflecting the denial', () => {
@@ -209,6 +251,62 @@ describe('craftItem command (#1127)', () => {
     sim.craftItem('recipe_tough_jerky', pid);
     expect(sim.lastCraftResult?.ok).toBe(false);
     expect(sim.lastCraftResult?.reason).toBe('insufficient_materials');
+  });
+});
+
+// #1145: signed materials + the self-gathered crafting bonus. The chosen bonus
+// (see professions/crafting.ts) is a reduced required quantity: one fewer unit
+// of a reagent the crafter holds a self-signed instance of.
+describe('self-gathered crafting bonus (#1145)', () => {
+  it('a self-signed instance reduces that reagent requirement by one and is consumed', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs bone_fragments x2, linen_scrap x1
+    // One self-signed bone_fragments (stamped with this player's own name) plus
+    // one plain bone_fragments: normally 2 would be required, the bonus drops it to 1.
+    sim.addItemInstance('bone_fragments', { signer: meta.name }, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(true);
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(result.selfSignedBonusApplied).toBe(true);
+    // The single signed copy (the only bone_fragments held) was consumed as
+    // part of satisfying the reduced (1-unit) requirement.
+    expect(sim.countItem('bone_fragments', pid)).toBe(0);
+    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
+  });
+
+  it('a material signed by a DIFFERENT player grants no bonus (same as unsigned)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!;
+    // Signed by someone else: does not count toward the crafter's own bonus.
+    sim.addItemInstance('bone_fragments', { signer: 'SomeoneElse' }, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    // Still short: only 1 of the required 2 bone_fragments (no bonus reduction).
+    expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(false);
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('insufficient_materials');
+    expect(result.selfSignedBonusApplied).toBeUndefined();
+  });
+
+  it('an unsigned (plain fungible) material grants no bonus', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!;
+    grantItem(sim, 'bone_fragments', 2, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(result.ok).toBe(true);
+    expect(result.selfSignedBonusApplied).toBe(false);
+    expect(sim.countItem('bone_fragments', pid)).toBe(0);
   });
 });
 
@@ -292,5 +390,183 @@ describe('tiered mastery gating (#1128)', () => {
     resolveCraftForRecipe((highCapSim as any).ctx, highPid, commonRecipe);
     const highMeta = (highCapSim as any).players.get(highPid);
     expect(highMeta.craftSkills.cooking).toBe(101); // still the full floor point
+  });
+});
+
+describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
+  // recipe_ironbound_warplate_helm requires BOTH armorcrafting and
+  // weaponcrafting at tier 1 (skill >= 25): confirmed adjacent via
+  // src/sim/content/professions.ts adjacentCrafts('armorcrafting').
+  const comboRecipe = COMBO_RECIPES.find((r) => r.id === 'recipe_ironbound_warplate_helm')!;
+
+  function setSkill(sim: Sim, pid: number, craftId: string, value: number) {
+    const meta = (sim as any).players.get(pid);
+    meta.craftSkills[craftId] = value;
+  }
+
+  it('every combo recipe carries a comboRequirement naming two crafts and a minTier', () => {
+    expect(COMBO_RECIPES.length).toBeGreaterThanOrEqual(2);
+    for (const recipe of COMBO_RECIPES) {
+      expect(recipe.comboRequirement).toBeDefined();
+      expect(recipe.comboRequirement!.craftA).not.toBe(recipe.comboRequirement!.craftB);
+      expect(recipe.comboRequirement!.minTier).toBeGreaterThan(0);
+    }
+  });
+
+  it('meetsComboRequirement is true with no comboRequirement on the recipe', () => {
+    const commonRecipe = recipeById('recipe_tough_jerky')!;
+    expect(meetsComboRequirement({}, commonRecipe)).toBe(true);
+  });
+
+  it('a player with both required crafts at or above minTier CAN craft the combo recipe', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    setSkill(sim, pid, 'armorcrafting', 25);
+    setSkill(sim, pid, 'weaponcrafting', 25);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
+
+    expect(result.ok).toBe(true);
+    expect(result.itemId).toBe(comboRecipe.resultItemId);
+    expect(sim.countItem(comboRecipe.resultItemId, pid)).toBe(1);
+  });
+
+  it('missing craftB denies the craft even with craftA and an unrelated craft very high', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    setSkill(sim, pid, 'armorcrafting', 100); // craftA very high
+    setSkill(sim, pid, 'weaponcrafting', 0); // craftB missing entirely
+    setSkill(sim, pid, 'cooking', 100); // unrelated craft, also very high
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('combo_requirement_unmet');
+    // Denied with no side effect: reagents untouched, no item granted.
+    expect(sim.countItem('bone_fragments', pid)).toBe(4);
+    expect(sim.countItem('linen_scrap', pid)).toBe(2);
+    expect(sim.countItem(comboRecipe.resultItemId, pid)).toBe(0);
+  });
+
+  it('a player whose only high skill is an unrelated craft cannot craft the combo recipe', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // No skill at all in either required craft; sky-high skill in a third,
+    // unrelated craft never substitutes for either half of the pair.
+    setSkill(sim, pid, 'cooking', 200);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('combo_requirement_unmet');
+  });
+
+  it('one craft below minTier still denies even though the other meets it', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    setSkill(sim, pid, 'armorcrafting', 25); // meets minTier 1
+    setSkill(sim, pid, 'weaponcrafting', 24); // one point short of tier 1
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('combo_requirement_unmet');
+  });
+
+  it('craftItem via the Sim command surface denies a combo recipe missing craftB', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    setSkill(sim, pid, 'armorcrafting', 25);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'linen_scrap', 2, pid);
+
+    sim.craftItem(comboRecipe.id, pid);
+
+    expect(sim.lastCraftResult?.ok).toBe(false);
+    expect(sim.lastCraftResult?.reason).toBe('combo_requirement_unmet');
+  });
+});
+
+// #1145: signed materials + the self-gathered crafting bonus. The chosen bonus
+// (see professions/crafting.ts) is a reduced required quantity: one fewer unit
+// of a reagent the crafter holds a self-signed instance of.
+describe('self-gathered crafting bonus (#1145)', () => {
+  it('a self-signed instance reduces that reagent requirement by one and is consumed', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs bone_fragments x2, linen_scrap x1
+    // One self-signed bone_fragments (stamped with this player's own name) plus
+    // one plain bone_fragments: normally 2 would be required, the bonus drops it to 1.
+    sim.addItemInstance('bone_fragments', { signer: meta.name }, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(true);
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(result.selfSignedBonusApplied).toBe(true);
+    // The single signed copy (the only bone_fragments held) was consumed as
+    // part of satisfying the reduced (1-unit) requirement.
+    expect(sim.countItem('bone_fragments', pid)).toBe(0);
+    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
+  });
+
+  it('a material signed by a DIFFERENT player grants no bonus (same as unsigned)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!;
+    // Signed by someone else: does not count toward the crafter's own bonus.
+    sim.addItemInstance('bone_fragments', { signer: 'SomeoneElse' }, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    // Still short: only 1 of the required 2 bone_fragments (no bonus reduction).
+    expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(false);
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('insufficient_materials');
+    expect(result.selfSignedBonusApplied).toBeUndefined();
+  });
+
+  it('a self-signed instance never waives the last required unit (floored at 1, not 0)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_tough_jerky')!; // needs spider_leg x1
+    sim.addItemInstance('spider_leg', { signer: meta.name }, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    // count 1 minus the bonus would floor to 0; the fix floors at 1 instead so
+    // the signed instance is actually consumed, not retained for infinite crafts.
+    expect(result.selfSignedBonusApplied).toBe(false);
+    expect(sim.countItem('spider_leg', pid)).toBe(0);
+
+    // A second craft attempt fails: the signed instance was consumed, not retained.
+    const second = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(second.ok).toBe(false);
+  });
+
+  it('an unsigned (plain fungible) material grants no bonus', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!;
+    grantItem(sim, 'bone_fragments', 2, pid);
+    grantItem(sim, 'linen_scrap', 1, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+    expect(result.ok).toBe(true);
+    expect(result.selfSignedBonusApplied).toBe(false);
+    expect(sim.countItem('bone_fragments', pid)).toBe(0);
   });
 });

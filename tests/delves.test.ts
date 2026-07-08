@@ -27,8 +27,8 @@ import {
 } from '../src/sim/delve_litany_layout';
 import { isLitanyPuzzleKind, LITANY_PUZZLE_KINDS } from '../src/sim/delves/drowned_litany_rooms';
 import { rollDelveAffixes } from '../src/sim/delves/runs';
-
 import { createMob } from '../src/sim/entity';
+import { polygonContainsPoint } from '../src/sim/geometry2d';
 import { solveLockActions } from '../src/sim/lockpick';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Rng } from '../src/sim/rng';
@@ -1777,7 +1777,7 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     const sim = makeSim('warrior');
     enterLitany(sim);
     enterModule(sim, 'litany_apse');
-    const hz = hazardWorld(sim, 'litany_apse', 0); // shallow: rx 24, rz 17, r 24
+    const hz = hazardWorld(sim, 'litany_apse', 0); // shallow: rx 22, rz 17, r 22
     const p = sim.player;
     const hitsAt = (dx: number, dz: number) => {
       p.pos.x = hz.x + dx;
@@ -1925,6 +1925,65 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     expect(countBlackwaterHits(sim, 25)).toBeGreaterThan(0);
   });
 
+  it('the apse outer walkway ring has a dry flank path (no Blackwater on the ring)', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim, 'heroic');
+    enterModule(sim, 'litany_apse');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const zBase = delveModuleZOffset(run.modules, run.moduleIndex);
+    // Clear the room so only the hazard could deal damage during the window.
+    for (const id of [...run.mobIds]) (sim as any).dropEntity(id);
+    const p = sim.player;
+    const ringHits = (localX: number, localZ: number) => {
+      p.pos.x = run.origin.x + localX;
+      p.pos.z = run.origin.z + zBase + localZ;
+      p.prevPos = { ...p.pos };
+      return countBlackwaterHits(sim, 45);
+    };
+    // The outer walkway ring reaches |x| ~= 23.8 at z 48 to 91 (the authored
+    // safe path). One yard in from the wall on the east and west flanks at
+    // z=56 must be dry: the shallow moat must not pinch the ring.
+    expect(ringHits(22.8, 56)).toBe(0);
+    expect(ringHits(-22.8, 56)).toBe(0);
+    // Control: the central moat is still lethal (the fix must not neuter it).
+    expect(ringHits(18, 56)).toBeGreaterThan(0);
+  });
+
+  it('the trash modules keep a dry wall-hugging walkway (shallow pools do not drown the ring)', () => {
+    // The same class of bug as the apse moat: a shallow Blackwater pool authored
+    // so its rim reaches the outer walkable-ring wall band drowns ground that
+    // reads as clean walkway, dealing invisible damage. Each probe below is a
+    // point ~1-2yd inside the side wall on the flank the pool overshot; it must
+    // be dry. A same-module control confirms the pool still damages further in.
+    const cases: Array<{
+      moduleId: string;
+      dry: [number, number];
+      wet: [number, number];
+    }> = [
+      { moduleId: 'litany_sluice', dry: [13, 29], wet: [7, 33] },
+      { moduleId: 'litany_baptistry', dry: [17, 18], wet: [12, 24] },
+      { moduleId: 'litany_ledger', dry: [19, 18], wet: [9, 24] },
+      { moduleId: 'litany_choir_loft', dry: [-18, 17], wet: [-12, 22] },
+    ];
+    for (const c of cases) {
+      const sim = makeSim('warrior');
+      enterLitany(sim, 'heroic');
+      enterModule(sim, c.moduleId);
+      const run = sim.delveRunForPlayer(sim.playerId)!;
+      const zBase = delveModuleZOffset(run.modules, run.moduleIndex);
+      for (const id of [...run.mobIds]) (sim as any).dropEntity(id);
+      const p = sim.player;
+      const hitsAt = (localX: number, localZ: number) => {
+        p.pos.x = run.origin.x + localX;
+        p.pos.z = run.origin.z + zBase + localZ;
+        p.prevPos = { ...p.pos };
+        return countBlackwaterHits(sim, 45);
+      };
+      expect(hitsAt(...c.dry), `${c.moduleId} wall-hug walkway must be dry`).toBe(0);
+      expect(hitsAt(...c.wet), `${c.moduleId} interior pool must still damage`).toBeGreaterThan(0);
+    }
+  });
+
   it('pins the deep (2.0x) and shallow (0.35x) tier multipliers on the 4% Normal base', () => {
     const pulse = (localX: number, localZ: number) => {
       const sim = makeSim('warrior');
@@ -2064,6 +2123,56 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
       expect(run.exitPortalOpen, `after puzzle ${i + 1}/${puzzles.length}`).toBe(
         i === puzzles.length - 1,
       );
+    }
+  });
+
+  it('the north-passage exit spawns on findable, walkable, hazard-clear ground in every trash module', () => {
+    // Findability guard for the progression object (the module_exit "Sealed
+    // Passage" the player walks into to advance): in every non-finale Drowned
+    // Litany module it must be spawned, sit on the walkable polygon, be clear of
+    // the shell/interior colliders (reachable, not walled off), and not sit under
+    // a Blackwater hazard (a submerged or blocked exit reads as "no way forward").
+    for (const moduleId of DELVES.drowned_litany.modules) {
+      const sim = makeSim('warrior');
+      enterLitany(sim);
+      const run = sim.delveRunForPlayer(sim.playerId)!;
+      // Two-module run so this module is NOT the finale (the finale has a boss,
+      // not a north-passage exit).
+      run.modules = [moduleId, 'litany_apse'];
+      run.moduleIndex = 0;
+      (sim as any).spawnDelveModule(run);
+      const zBase = delveModuleZOffset(run.modules, 0);
+      const exitId = run.objectIds.find((id) => run.objectState[id]?.kind === 'module_exit');
+      expect(exitId, `${moduleId} spawns a module_exit`).toBeDefined();
+      const exit = sim.entities.get(exitId!)!;
+      const localX = exit.pos.x - run.origin.x;
+      const localZ = exit.pos.z - run.origin.z - zBase;
+      // On the authored walkable polygon (not off the mapped floor).
+      const poly = litanyModuleGeometry(moduleId as any)!.walkable[0].points;
+      expect(
+        polygonContainsPoint(poly, localX, localZ),
+        `${moduleId} exit (${localX.toFixed(1)},${localZ.toFixed(1)}) is inside the walkable polygon`,
+      ).toBe(true);
+      // Reachable: the exit body is not inside a movement collider (wall/pillar/
+      // island). The exit portal radius is generous, so require the centre clear.
+      expect(
+        plateBlocked(moduleId, localX, localZ),
+        `${moduleId} exit is walled off by a collider`,
+      ).toBe(false);
+      // Not under a Blackwater pool: a player standing on the exit takes no damage.
+      const p = sim.player;
+      for (const id of [...run.mobIds]) (sim as any).dropEntity(id);
+      p.pos.x = exit.pos.x;
+      p.pos.z = exit.pos.z;
+      p.prevPos = { ...p.pos };
+      let blackwaterHits = 0;
+      for (let i = 0; i < 45; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Blackwater')
+            blackwaterHits++;
+        }
+      }
+      expect(blackwaterHits, `${moduleId} exit sits under a Blackwater hazard`).toBe(0);
     }
   });
 
@@ -2683,6 +2792,68 @@ describe('The Drowned Litany (Phase 6 boss mechanics)', () => {
       (e) => e.templateId === 'choir_thrall' && !e.dead,
     );
     expect(thralls.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('a player death clears in-flight bells and Blackwater marks so an in-delve respawn is not insta-killed', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    const boss = nhalia(sim);
+    boss.inCombat = true;
+
+    // Force a bell volley: bells are now in flight.
+    run.nhaliaBoss!.bellVolleyTimer = 0.001;
+    (sim as any).updateDelveRuns();
+    expect(run.nhaliaBoss!.bells.length).toBeGreaterThan(0);
+    const bellIds = run.nhaliaBoss!.bells.map((b) => b.entityId);
+
+    // Force a Blackwater mark: a puddle is now persisted at the player's position.
+    run.nhaliaBoss!.markTimer = 0.001;
+    (sim as any).updateDelveRuns();
+    expect(run.nhaliaBoss!.marks.length).toBeGreaterThanOrEqual(1);
+
+    // Kill the player and respawn in-delve (first death: 50% HP at the module entry).
+    killPlayer(sim);
+    expect(sim.player.dead).toBe(true);
+    sim.releaseSpirit();
+    expect(sim.player.dead).toBe(false);
+
+    // The bell/mark lethal effects must not outlive the death: they are cleared
+    // at respawn, so the entity ids are gone and the collections are empty.
+    expect(run.nhaliaBoss!.bells).toEqual([]);
+    expect(run.nhaliaBoss!.marks).toEqual([]);
+    for (const id of bellIds) expect(sim.entities.has(id)).toBe(false);
+
+    // The respawned player takes no further bell/mark damage: the loop is broken.
+    const hpAfterRespawn = sim.player.hp;
+    for (let i = 0; i < 20; i++) (sim as any).updateDelveRuns();
+    expect(sim.player.hp).toBe(hpAfterRespawn);
+
+    // The encounter itself is not re-armed by the death (unlike an evade reset):
+    // Cantor phases / Final Bell progress and the volley timer are untouched.
+    expect(run.nhaliaBoss!.bellVolleyTimer).toBeGreaterThan(0);
+  });
+
+  it('a player death clearing bells does not perturb the shared rng draw order', () => {
+    const runOnce = (seed: number) => {
+      const sim = makeSim('warrior', seed);
+      const run = enterLitanyApse(sim);
+      const boss = nhalia(sim);
+      boss.inCombat = true;
+      run.nhaliaBoss!.bellVolleyTimer = 0.001;
+      (sim as any).updateDelveRuns();
+      killPlayer(sim);
+      sim.releaseSpirit();
+      // A few more volleys/marks after the respawn to exercise further rng draws.
+      for (let i = 0; i < 20 * 15; i++) (sim as any).updateDelveRuns();
+      return {
+        firedCantorPhases: run.nhaliaBoss!.firedCantorPhases,
+        finalBellFired: run.nhaliaBoss!.finalBellFired,
+        bells: run.nhaliaBoss!.bells.length,
+        marks: run.nhaliaBoss!.marks.length,
+        bellVolleyTimer: Math.round(run.nhaliaBoss!.bellVolleyTimer * 1000),
+      };
+    };
+    expect(runOnce(42)).toEqual(runOnce(42));
   });
 });
 

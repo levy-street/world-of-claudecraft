@@ -39,6 +39,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: 80, z: 80, label: 'Fallen Chapel' },
     { x: -5, z: -52, label: 'Reliquary Hill' },
     { x: 40, z: 140, label: 'Brightwood Glade' },
+    { x: -11, z: -112, label: 'The Sowfield' },
   ],
   welcome: 'Find Marshal Redbrook in town — he has work for you.',
   welcomeQuestId: 'q_wolves',
@@ -642,6 +643,34 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     color: 0xa04000,
     questIds: ['q_mine'],
     greeting: "Whole dig's crawling with those dirt-caked vermin!",
+  },
+  bursar_fernando: {
+    id: 'bursar_fernando',
+    name: 'Bursar Fernando',
+    title: 'The Gilded Strongbox',
+    // east side of the square, facing the approach toward the well and Merchant
+    pos: { x: 13, z: 8 },
+    facing: -Math.PI / 2,
+    color: 0xc9a227,
+    questIds: [],
+    banker: true,
+    greeting: 'Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.',
+  },
+  groundskeeper_bram: {
+    id: 'groundskeeper_bram',
+    name: 'Groundskeeper Bram',
+    title: 'Keeper of the Sowfield',
+    // At the Sowfield's north gate with the book of fixtures (vale_cup_layout
+    // BRAM_POS). dynamic: the generic surface-placement loop skips him; the
+    // Vale Cup module spawns him at world init under a RESERVED entity id so
+    // adding him never shifts the ctor id sequence (parity goldens pin nextId).
+    pos: { x: -6, z: -82 },
+    facing: Math.PI,
+    color: 0x3f7d34,
+    questIds: [],
+    dynamic: true,
+    greeting:
+      'The truce holds at the Sowfield, $C: boots and shoulders only. Care to play for the Copper Pail?',
   },
 };
 

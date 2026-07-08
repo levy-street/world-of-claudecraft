@@ -102,6 +102,9 @@ For off-box safety, sync the directory to S3 occasionally:
 
 - **Secrets**: the Postgres password is generated at first boot into
   `/opt/eastbrook/.env` (mode 600, gitignored). Nothing else to manage.
+- **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
+  environment) replays the append-only `bank_ledger` against live character bank state
+  and exits non-zero on any discrepancy. Run it after an economy incident or a restore.
 - **Username bans**: set `USERNAME_BANLIST_FILE=/opt/eastbrook/username-banlist.txt`
   to load blocked username terms from a private newline- or comma-separated
   file. `USERNAME_BANLIST` can also provide a comma-separated inline list.

@@ -32,6 +32,7 @@ const STYLE_MODULES = [
   '../src/styles/layout.css',
   '../src/styles/hud.css',
   '../src/styles/components.css',
+  '../src/styles/hud.mobile.css',
 ];
 
 // Strip CSS/HTML comments so they can't bleed into a rule's selector text (the flat
@@ -137,5 +138,52 @@ describe.each(HTML_ENTRIES)('mobile window positioning (%s)', (entry) => {
       'these left-pinned mobile-touch windows do not reset the centering transform, ' +
         `so translateX(-50%) shifts them off the left edge:\n${offenders.join('\n')}`,
     ).toEqual([]);
+  });
+});
+
+// Phase 4: the modal backdrop (#mobile-window-backdrop). A static element in
+// both HTML entries, hidden by default / on desktop, shown as a full-screen dim
+// layer only under body.mobile-touch.mobile-window-open.
+describe.each(HTML_ENTRIES)('mobile window backdrop (%s)', (entry) => {
+  const html = readFileSync(fileURLToPath(new URL(entry, import.meta.url)), 'utf8');
+  const source = loadHtml(entry);
+  const rules = cssRules(source);
+
+  it('ships a static #mobile-window-backdrop element with aria-hidden', () => {
+    expect(html).toMatch(/<div id="mobile-window-backdrop" aria-hidden="true"><\/div>/);
+  });
+
+  it('is hidden by default (no body.mobile-touch requirement)', () => {
+    const hidden = rules.find((r) => r.selector === '#mobile-window-backdrop');
+    expect(
+      hidden,
+      'a bare #mobile-window-backdrop { display: none } rule should exist',
+    ).toBeDefined();
+    expect(value(hidden!.body, 'display')).toBe('none');
+  });
+
+  it('shows as a full-screen layer only under body.mobile-touch.mobile-window-open', () => {
+    const shown = rules.find(
+      (r) => r.selector === 'body.mobile-touch.mobile-window-open #mobile-window-backdrop',
+    );
+    expect(shown, 'the mobile-window-open show rule should exist').toBeDefined();
+    expect(value(shown!.body, 'display')).toBe('block');
+    expect(value(shown!.body, 'pointer-events')).toBe('auto');
+    // Never gated on a bare body.mobile-window-open (desktop can also carry that
+    // class); the selector must require body.mobile-touch too.
+    const desktopOnly = rules.find(
+      (r) => r.selector === 'body.mobile-window-open #mobile-window-backdrop',
+    );
+    expect(desktopOnly, 'the backdrop must not show without body.mobile-touch').toBeUndefined();
+  });
+
+  it('sits above the base HUD chrome but below an open .window (z-index 85 < 90)', () => {
+    const shown = rules.find(
+      (r) => r.selector === 'body.mobile-touch.mobile-window-open #mobile-window-backdrop',
+    );
+    const z = Number(value(shown!.body, 'z-index'));
+    const uiOpenRule = rules.find((r) => r.selector === 'body.mobile-touch.mobile-window-open #ui');
+    const uiOpenZ = Number(value(uiOpenRule!.body, 'z-index'));
+    expect(z).toBeLessThan(uiOpenZ);
   });
 });

@@ -33,8 +33,9 @@ mobile portrait *and* landscape before calling UI work done.
   - Every visible `input`/`select`/`textarea` is **>=16px** font, or iOS Safari auto-zooms the
     page on focus (it ignores the viewport `user-scalable=no`/`maximum-scale`, so font-size is
     the only reliable fix). Enforced centrally by a `@media (pointer: coarse) { input, textarea,
-    select { font-size: 16px !important } }` floor in `index.html` (mirrored in `admin.html`);
-    the `!important` is what wins. Don't set a per-control mobile font below 16px. Regression
+    select { font-size: 16px !important } }` floor in `src/styles/base.css` (both game entries;
+    the admin bundle carries its own mirror in `src/admin/styles/`); the `!important` is what
+    wins. Don't set a per-control mobile font below 16px. Regression
     check: `node scripts/mobile_input_zoom_check.mjs` (needs `npm run dev`).
   - Every tappable target stays **>=40x40px** on mobile touch (the preferred floor); 24x24px
     (WCAG 2.2 SC 2.5.8) is the absolute minimum, used only where 40x40 is genuinely infeasible.
@@ -310,6 +311,14 @@ directly, with a thin DOM/canvas consumer. Follow this shape for reusable/testab
 - **vendor_view.ts** / **vendor_window.ts**: the merchant window, the first migrated out of
   `hud.ts` by the recipe above (pure view decides sellable + buyback rows with prices; thin
   consumer paints `#vendor-window` from injected `deps`).
+- **bank_view.ts** / **bank_window.ts** (+ **bank_filter.ts**): the Gilded Strongbox bank
+  window. The DOM-free core builds the cell model, buy-slots pricing, and the
+  deposit-all-materials plan (`planDepositAllMaterials` simulates whole-stack sends without
+  mutating the world; summary via `depositAllSummaryKey`); the painter is a thin non-modal
+  companion of the bags cluster (the Hud docks them side by side via `body.bank-open`,
+  mobile-paired 50/50) with non-trapping focus capture/return. `bank_filter.ts` is the
+  locale-aware search/category/sort that preserves live `slotIndex` values verbatim, so a
+  filtered row still names the exact wire argument for deposit/withdraw.
 - **player_context_menu.ts**: pure `chatPlayerContextActions()` (whisper/invite/friend/ignore/
   report) for the right-click-player menu.
 - **auth_utils.ts**: login/char-select form helpers (password toggle, ARIA validity sync,
