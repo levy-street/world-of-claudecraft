@@ -200,6 +200,8 @@ export const ko_KR: EnTranslations = {
       "minReceived": "최소 수령량: {amount} $WOC",
       "buyButton": "$WOC 구매",
       "quoteStale": "견적이 만료되었습니다. 구매 전에 새 견적을 받으세요.",
+      "feeLine": "{percent}% 플랫폼 수수료 포함",
+      "cooldown": "요청이 너무 많습니다. {seconds}초 후에 다시 시도할 수 있습니다.",
       "requoted": "견적이 만료되어 새 견적을 가져왔습니다. 내용을 확인한 뒤 다시 구매를 누르세요.",
       "signing": "지갑에서 트랜잭션을 승인하세요...",
       "sentTitle": "스왑 전송됨",
@@ -1572,6 +1574,7 @@ export const ko_KR: EnTranslations = {
       "invalid_public_key": "먼저 Solana 지갑을 연결하세요.",
       "quote_tampered": "해당 견적이 이 스왑과 일치하지 않습니다. 새 견적을 요청하세요.",
       "no_route": "현재 해당 수량에 사용할 수 있는 거래 경로가 없습니다.",
+      "rate_limited": "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
       "upstream_error": "스왑 서비스를 이용할 수 없습니다. 나중에 다시 시도하세요."
     }
   },

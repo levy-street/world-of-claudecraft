@@ -200,6 +200,8 @@ export const ja_JP: EnTranslations = {
       "minReceived": "最低受取額：{amount} $WOC",
       "buyButton": "$WOCを購入",
       "quoteStale": "見積もりの有効期限が切れました。購入前に新しい見積もりを取得してください。",
+      "feeLine": "{percent}%のプラットフォーム手数料を含みます",
+      "cooldown": "リクエストが多すぎます。あと{seconds}秒で再試行できます。",
       "requoted": "見積もりの有効期限が切れたため、新しい見積もりを取得しました。内容を確認して、もう一度購入を押してください。",
       "signing": "ウォレットでトランザクションを承認してください...",
       "sentTitle": "スワップを送信しました",
@@ -1572,6 +1574,7 @@ export const ja_JP: EnTranslations = {
       "invalid_public_key": "まずSolanaウォレットを接続してください。",
       "quote_tampered": "その見積もりはこのスワップと一致しません。新しい見積もりを取得してください。",
       "no_route": "現在その数量で利用できる取引ルートがありません。",
+      "rate_limited": "リクエストが多すぎます。しばらく待ってからもう一度お試しください。",
       "upstream_error": "スワップサービスは利用できません。後でもう一度お試しください。"
     }
   },

@@ -231,3 +231,184 @@ describe('dex swap view: quote model derivation', () => {
     expect(model?.payAmount).toBe('1.5');
   });
 });
+
+// ---------------------------------------------------------------------------
+// Rework additions: fee-line derivation, the rate-limit cooldown state, and
+// the re-quote debouncer (driven with vitest fake timers).
+// ---------------------------------------------------------------------------
+
+import { afterEach, beforeEach, vi } from 'vitest';
+import {
+  clearElapsedCooldown,
+  cooldownRemainingMs,
+  cooldownRemainingSeconds,
+  createDebouncer,
+  ERR_RATE_LIMITED,
+  feePercentText,
+  isCoolingDown,
+  REQUOTE_DEBOUNCE_MS,
+  rateLimited,
+} from '../src/ui/dex_swap_view';
+
+const QUOTE_FIXTURE: DexSwapQuote = {
+  inputMint: SOL,
+  inAmount: '1000000000',
+  outputMint: WOC,
+  outAmount: '52340000000',
+  otherAmountThreshold: '51816600000',
+  priceImpactPct: '0.0012',
+  slippageBps: 100,
+};
+
+describe('dex swap view: fee-line derivation', () => {
+  it('renders the exact percent for a bps fee (25 -> 0.25, 100 -> 1)', () => {
+    expect(feePercentText(25)).toBe('0.25');
+    expect(feePercentText(100)).toBe('1');
+    expect(feePercentText(1)).toBe('0.01');
+    expect(feePercentText(150)).toBe('1.5');
+    expect(feePercentText(10_000)).toBe('100');
+  });
+
+  it('returns null (no line) for zero, negative, fractional, or absurd fees', () => {
+    expect(feePercentText(0)).toBeNull();
+    expect(feePercentText(-25)).toBeNull();
+    expect(feePercentText(2.5)).toBeNull();
+    expect(feePercentText(10_001)).toBeNull();
+    expect(feePercentText(Number.NaN)).toBeNull();
+  });
+
+  it('carries the quote-level feeBps on the state via quoteReceived', () => {
+    const quoting = beginQuote(createDexSwapState());
+    const quoted = quoteReceived(quoting, quoting.seq, QUOTE_FIXTURE, 1_000, 25);
+    expect(quoted.quoteFeeBps).toBe(25);
+    // Default (fee-less service answer) is 0: no fee line.
+    const quoting2 = beginQuote(quoted);
+    const quoted2 = quoteReceived(quoting2, quoting2.seq, QUOTE_FIXTURE, 2_000);
+    expect(quoted2.quoteFeeBps).toBe(0);
+  });
+});
+
+describe('dex swap view: rate-limit cooldown', () => {
+  it('a 429 during quoting enters the cooldown error state with the anchor set', () => {
+    const quoting = beginQuote(createDexSwapState());
+    const state = rateLimited(quoting, quoting.seq, 5_400, 10_000);
+    expect(state.phase).toBe('error');
+    expect(state.errorCode).toBe(ERR_RATE_LIMITED);
+    expect(state.cooldownUntilMs).toBe(15_400);
+    expect(isCoolingDown(state, 10_000)).toBe(true);
+    expect(cooldownRemainingMs(state, 10_000)).toBe(5_400);
+    expect(cooldownRemainingSeconds(state, 10_000)).toBe(6);
+  });
+
+  it('a 429 during signing enters the same cooldown state', () => {
+    const quoting = beginQuote(createDexSwapState());
+    const quoted = quoteReceived(quoting, quoting.seq, QUOTE_FIXTURE, 1_000);
+    const attempt = beginSign(quoted, 1_500);
+    expect(attempt.ok).toBe(true);
+    if (!attempt.ok) return;
+    const state = rateLimited(attempt.state, attempt.state.seq, 2_000, 1_600);
+    expect(state.phase).toBe('error');
+    expect(state.errorCode).toBe(ERR_RATE_LIMITED);
+    expect(state.cooldownUntilMs).toBe(3_600);
+  });
+
+  it('a stale seq or a settled phase ignores a late 429', () => {
+    const quoting = beginQuote(createDexSwapState());
+    const quoted = quoteReceived(quoting, quoting.seq, QUOTE_FIXTURE, 1_000);
+    expect(rateLimited(quoted, quoted.seq, 1_000, 2_000)).toBe(quoted); // not quoting/signing
+    const quoting2 = beginQuote(quoted);
+    expect(rateLimited(quoting2, quoting2.seq - 1, 1_000, 2_000)).toBe(quoting2); // stale seq
+  });
+
+  it('counts down against the injected clock and unlocks exactly at the boundary', () => {
+    const quoting = beginQuote(createDexSwapState());
+    const state = rateLimited(quoting, quoting.seq, 3_000, 0);
+    expect(isCoolingDown(state, 2_999)).toBe(true);
+    expect(cooldownRemainingSeconds(state, 2_100)).toBe(1);
+    expect(isCoolingDown(state, 3_000)).toBe(false);
+    expect(cooldownRemainingMs(state, 9_999)).toBe(0);
+  });
+
+  it('clearElapsedCooldown resets to idle only after expiry (and bumps the seq)', () => {
+    const quoting = beginQuote(createDexSwapState());
+    const state = rateLimited(quoting, quoting.seq, 3_000, 0);
+    expect(clearElapsedCooldown(state, 1_000)).toBe(state); // still cooling: unchanged
+    const cleared = clearElapsedCooldown(state, 3_001);
+    expect(cleared.phase).toBe('idle');
+    expect(cleared.cooldownUntilMs).toBeNull();
+    expect(cleared.seq).toBe(state.seq + 1); // in-flight completions stay dead
+  });
+
+  it('a nonsensical retryAfterMs falls back to a 60s cooldown, never zero', () => {
+    for (const bad of [0, -5, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const quoting = beginQuote(createDexSwapState());
+      const state = rateLimited(quoting, quoting.seq, bad, 1_000);
+      expect(state.cooldownUntilMs).toBe(61_000);
+    }
+  });
+
+  it('beginQuote clears a previous cooldown anchor', () => {
+    const quoting = beginQuote(createDexSwapState());
+    const limited = rateLimited(quoting, quoting.seq, 3_000, 0);
+    const again = beginQuote(limited);
+    expect(again.cooldownUntilMs).toBeNull();
+  });
+});
+
+describe('dex swap view: re-quote debouncer (fake timers)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('fires once, REQUOTE_DEBOUNCE_MS after the LAST touch (typing coalesces)', () => {
+    const debouncer = createDebouncer(REQUOTE_DEBOUNCE_MS);
+    let fired = 0;
+    const fn = () => {
+      fired += 1;
+    };
+    debouncer.touch(fn);
+    vi.advanceTimersByTime(REQUOTE_DEBOUNCE_MS - 1);
+    expect(fired).toBe(0);
+    debouncer.touch(fn); // keystroke re-arms the window
+    vi.advanceTimersByTime(REQUOTE_DEBOUNCE_MS - 1);
+    expect(fired).toBe(0);
+    vi.advanceTimersByTime(1);
+    expect(fired).toBe(1);
+    // Quiet afterwards: no second fire.
+    vi.advanceTimersByTime(REQUOTE_DEBOUNCE_MS * 5);
+    expect(fired).toBe(1);
+  });
+
+  it('ten rapid touches cost exactly one run (the quote budget is preserved)', () => {
+    const debouncer = createDebouncer(REQUOTE_DEBOUNCE_MS);
+    let fired = 0;
+    for (let i = 0; i < 10; i++) {
+      debouncer.touch(() => {
+        fired += 1;
+      });
+      vi.advanceTimersByTime(50);
+    }
+    vi.advanceTimersByTime(REQUOTE_DEBOUNCE_MS);
+    expect(fired).toBe(1);
+  });
+
+  it('cancel drops the pending run', () => {
+    const debouncer = createDebouncer(REQUOTE_DEBOUNCE_MS);
+    let fired = 0;
+    debouncer.touch(() => {
+      fired += 1;
+    });
+    debouncer.cancel();
+    vi.advanceTimersByTime(REQUOTE_DEBOUNCE_MS * 2);
+    expect(fired).toBe(0);
+    // A fresh touch after cancel still works.
+    debouncer.touch(() => {
+      fired += 1;
+    });
+    vi.advanceTimersByTime(REQUOTE_DEBOUNCE_MS);
+    expect(fired).toBe(1);
+  });
+});

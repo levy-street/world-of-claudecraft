@@ -449,7 +449,11 @@ export interface DexSwapHooks {
   config(): DexSwapConfig | null;
   /** The connected wallet address the swap transaction binds to, or null. */
   walletAddress(): string | null;
-  fetchQuote(inputMint: string, amount: string, slippageBps: number): Promise<DexSwapQuote>;
+  fetchQuote(
+    inputMint: string,
+    amount: string,
+    slippageBps: number,
+  ): Promise<{ quote: DexSwapQuote; feeBps: number }>;
   buildSwap(quote: DexSwapQuote, userPublicKey: string): Promise<string>;
   signAndSend(txBase64: string): Promise<string>;
   isWalletFeatureUnsupported(err: unknown): boolean;

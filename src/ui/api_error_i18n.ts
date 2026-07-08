@@ -116,6 +116,7 @@ export const API_ERROR_KEYS = {
   'dex_swap.invalid_public_key': 'apiError.dex_swap.invalid_public_key',
   'dex_swap.quote_tampered': 'apiError.dex_swap.quote_tampered',
   'dex_swap.no_route': 'apiError.dex_swap.no_route',
+  'dex_swap.rate_limited': 'apiError.dex_swap.rate_limited',
   'dex_swap.upstream_error': 'apiError.dex_swap.upstream_error',
 } satisfies Record<string, TranslationKey>;
 

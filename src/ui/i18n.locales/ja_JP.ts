@@ -6041,6 +6041,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.dex_swap.quote_tampered':
     'その見積もりはこのスワップと一致しません。新しい見積もりを取得してください。',
   'apiError.dex_swap.no_route': '現在その数量で利用できる取引ルートがありません。',
+  'apiError.dex_swap.rate_limited': 'リクエストが多すぎます。しばらく待ってからもう一度お試しください。',
   'apiError.dex_swap.upstream_error':
     'スワップサービスは利用できません。後でもう一度お試しください。',
   // The in-game Buy $WOC window (M16 non-Latin fill)
@@ -6063,6 +6064,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dexSwap.buyButton': '$WOCを購入',
   'hudChrome.dexSwap.quoteStale':
     '見積もりの有効期限が切れました。購入前に新しい見積もりを取得してください。',
+  'hudChrome.dexSwap.feeLine': '{percent}%のプラットフォーム手数料を含みます',
+  'hudChrome.dexSwap.cooldown': 'リクエストが多すぎます。あと{seconds}秒で再試行できます。',
   'hudChrome.dexSwap.requoted':
     '見積もりの有効期限が切れたため、新しい見積もりを取得しました。内容を確認して、もう一度購入を押してください。',
   'hudChrome.dexSwap.signing': 'ウォレットでトランザクションを承認してください...',

@@ -17,15 +17,24 @@ import {
   beginSign,
   buildQuoteModel,
   canSign,
+  clearElapsedCooldown,
+  cooldownRemainingSeconds,
+  createDebouncer,
   createDexSwapState,
+  type Debouncer,
   type DexSwapConfig,
   type DexSwapInputToken,
   type DexSwapQuote,
   type DexSwapState,
+  ERR_RATE_LIMITED,
   effectiveSlippageBps,
+  feePercentText,
+  isCoolingDown,
   parseAmountToBaseUnits,
   quoteFailed,
   quoteReceived,
+  REQUOTE_DEBOUNCE_MS,
+  rateLimited,
   resetDexSwap,
   signFailed,
   signSent,
@@ -57,8 +66,15 @@ export interface DexSwapWindowDeps {
   config(): DexSwapConfig | null;
   /** The connected/linked wallet address the swap binds to, or null. */
   walletAddress(): string | null;
-  /** GET /api/dexswap/quote; rejects with a coded error the localizer maps. */
-  fetchQuote(inputMint: string, amount: string, slippageBps: number): Promise<DexSwapQuote>;
+  /**
+   * GET /api/dexswap/quote; resolves the quote plus the platform fee (bps) it
+   * was built with; rejects with a coded error the localizer maps.
+   */
+  fetchQuote(
+    inputMint: string,
+    amount: string,
+    slippageBps: number,
+  ): Promise<{ quote: DexSwapQuote; feeBps: number }>;
   /** POST /api/dexswap/swap; resolves the base64 swap transaction. */
   buildSwap(quote: DexSwapQuote, userPublicKey: string): Promise<string>;
   /** Wallet Standard signAndSendTransaction; resolves the base58 signature. */
@@ -78,6 +94,10 @@ export class DexSwapWindow {
   private lastApiError: unknown = null;
   private notice: string | null = null;
   private staleTimer: number | null = null;
+  private cooldownTimer: number | null = null;
+  // Typing in the amount field re-quotes at most once per quiet period, so a
+  // fast typist never burns the per-player quote budget.
+  private readonly requoteDebounce: Debouncer = createDebouncer(REQUOTE_DEBOUNCE_MS);
 
   constructor(private readonly deps: DexSwapWindowDeps) {}
 
@@ -113,6 +133,8 @@ export class DexSwapWindow {
       return;
     }
     this.clearStaleTimer();
+    this.clearCooldownTimer();
+    this.requoteDebounce.cancel();
     root.style.display = 'none';
     this.state = resetDexSwap(this.state);
     this.deps.restoreFocus(this.openerFocus);
@@ -164,6 +186,14 @@ export class DexSwapWindow {
       e.preventDefault();
       void this.quote();
     });
+    // Editing the amount while a quote is on screen re-quotes automatically,
+    // debounced to the trailing edge so typing costs one request, not many.
+    amount?.addEventListener('input', () => {
+      this.requoteDebounce.touch(() => {
+        if (!this.isOpen || this.state.phase !== 'quoted') return;
+        void this.quote();
+      });
+    });
     root
       .querySelector<HTMLSelectElement>('[data-dexswap-token]')
       ?.addEventListener('change', (e) => {
@@ -186,6 +216,7 @@ export class DexSwapWindow {
   private async quote(): Promise<void> {
     const config = this.deps.config();
     if (!config || this.state.phase === 'quoting' || this.state.phase === 'signing') return;
+    if (isCoolingDown(this.state, this.deps.now())) return;
     const token = this.selectedToken(config);
     const input = this.deps.root().querySelector<HTMLInputElement>('[data-dexswap-amount]');
     const baseUnits = parseAmountToBaseUnits(input?.value ?? '', token.decimals);
@@ -199,20 +230,25 @@ export class DexSwapWindow {
     const seq = this.state.seq;
     this.paint();
     try {
-      const quote = await this.deps.fetchQuote(
+      const { quote, feeBps } = await this.deps.fetchQuote(
         token.mint,
         baseUnits,
         effectiveSlippageBps(config.maxSlippageBps),
       );
-      this.state = quoteReceived(this.state, seq, quote, this.deps.now());
+      this.state = quoteReceived(this.state, seq, quote, this.deps.now(), feeBps);
     } catch (err) {
       this.lastApiError = err;
-      this.state = quoteFailed(this.state, seq, ERR_API);
+      const retryAfterMs = this.rateLimitRetryMs(err);
+      this.state =
+        retryAfterMs !== null
+          ? rateLimited(this.state, seq, retryAfterMs, this.deps.now())
+          : quoteFailed(this.state, seq, ERR_API);
     }
     this.paint();
   }
 
   private async buy(): Promise<void> {
+    if (isCoolingDown(this.state, this.deps.now())) return;
     const attempt = beginSign(this.state, this.deps.now());
     if (!attempt.ok) {
       // Stale quotes are never signed: transparently fetch a fresh one and ask
@@ -240,12 +276,17 @@ export class DexSwapWindow {
       this.deps.onSwapSent();
     } catch (err) {
       this.lastApiError = err;
-      const tag = this.deps.isWalletFeatureUnsupported(err)
-        ? ERR_WALLET_FEATURE
-        : this.isCodedError(err)
-          ? ERR_API
-          : ERR_SIGN_FAILED;
-      this.state = signFailed(this.state, seq, tag);
+      const retryAfterMs = this.rateLimitRetryMs(err);
+      if (retryAfterMs !== null) {
+        this.state = rateLimited(this.state, seq, retryAfterMs, this.deps.now());
+      } else {
+        const tag = this.deps.isWalletFeatureUnsupported(err)
+          ? ERR_WALLET_FEATURE
+          : this.isCodedError(err)
+            ? ERR_API
+            : ERR_SIGN_FAILED;
+        this.state = signFailed(this.state, seq, tag);
+      }
       this.paint();
     }
   }
@@ -257,6 +298,15 @@ export class DexSwapWindow {
       typeof (err as { code?: unknown }).code === 'string' &&
       (err as { code: string }).code.length > 0
     );
+  }
+
+  /** retryAfterMs for a coded dex_swap.rate_limited failure, else null. */
+  private rateLimitRetryMs(err: unknown): number | null {
+    if (!err || typeof err !== 'object') return null;
+    const coded = err as { code?: unknown; params?: { retryAfterMs?: unknown } };
+    if (coded.code !== 'dex_swap.rate_limited') return null;
+    const ms = coded.params?.retryAfterMs;
+    return typeof ms === 'number' && ms > 0 ? ms : 60_000;
   }
 
   // -------------------------------------------------------------------------
@@ -276,6 +326,8 @@ export class DexSwapWindow {
 
   private errorMessage(): string {
     switch (this.state.errorCode) {
+      case ERR_RATE_LIMITED:
+        return userFacingApiError(this.lastApiError);
       case ERR_WALLET_FEATURE:
         return t('hudChrome.dexSwap.errWalletFeature');
       case ERR_NO_WALLET:
@@ -297,9 +349,12 @@ export class DexSwapWindow {
     const config = this.deps.config();
     if (!panel || !config) return;
     this.clearStaleTimer();
+    this.clearCooldownTimer();
+    const cooling = isCoolingDown(this.state, this.deps.now());
     const quoteBtn = this.deps.root().querySelector<HTMLButtonElement>('[data-dexswap-quote]');
     if (quoteBtn) {
-      quoteBtn.disabled = this.state.phase === 'quoting' || this.state.phase === 'signing';
+      quoteBtn.disabled =
+        this.state.phase === 'quoting' || this.state.phase === 'signing' || cooling;
     }
 
     const noticeHtml = this.notice
@@ -324,12 +379,20 @@ export class DexSwapWindow {
           model.priceImpactPct !== null
             ? `<div class="dexswap-line">${esc(t('hudChrome.dexSwap.priceImpact', { percent: model.priceImpactPct }))}</div>`
             : '';
+        // Fee disclosure BEFORE signing: the fee the quote was built with
+        // (falling back to the config's), omitted entirely at zero fee.
+        const feePercent = feePercentText(this.state.quoteFeeBps || (config.feeBps ?? 0));
+        const feeLine =
+          feePercent !== null
+            ? `<div class="dexswap-line dexswap-fee">${esc(t('hudChrome.dexSwap.feeLine', { percent: feePercent }))}</div>`
+            : '';
         panel.innerHTML =
           `${noticeHtml}<div class="dexswap-quote">` +
           `<div class="dexswap-line">${esc(t('hudChrome.dexSwap.payLine', { amount: model.payAmount, symbol: model.paySymbol }))}</div>` +
           `<div class="dexswap-line dexswap-receive">${esc(t('hudChrome.dexSwap.receiveLine', { amount: model.receiveAmount }))}</div>` +
           impact +
           `<div class="dexswap-line">${esc(t('hudChrome.dexSwap.minReceived', { amount: model.minReceived }))}</div>` +
+          feeLine +
           `<button type="button" class="btn dexswap-buy-btn" data-dexswap-buy>${esc(t('hudChrome.dexSwap.buyButton'))}</button>` +
           `<div class="dexswap-stale" data-dexswap-stale hidden>${esc(t('hudChrome.dexSwap.quoteStale'))}</div>` +
           `</div>`;
@@ -363,8 +426,55 @@ export class DexSwapWindow {
         return;
       }
       case 'error':
+        if (this.state.errorCode === ERR_RATE_LIMITED && cooling) {
+          this.paintCooldown();
+          return;
+        }
         panel.innerHTML = `<div class="dexswap-error" role="alert">${esc(this.errorMessage())}</div>`;
         return;
+    }
+  }
+
+  // Rate-limit cooldown: a localized countdown that keeps quote/buy disabled
+  // until retryAfterMs elapses, then re-enables by clearing the elapsed state.
+  private paintCooldown(): void {
+    const panel = this.panel();
+    if (!panel) return;
+    const seconds = cooldownRemainingSeconds(this.state, this.deps.now());
+    panel.innerHTML =
+      `<div class="dexswap-error dexswap-cooldown" role="alert" data-dexswap-cooldown>` +
+      `${esc(t('hudChrome.dexSwap.cooldown', { seconds: formatNumber(seconds, { maximumFractionDigits: 0 }) }))}</div>`;
+    this.armCooldownTimer();
+  }
+
+  private armCooldownTimer(): void {
+    this.clearCooldownTimer();
+    this.cooldownTimer = window.setInterval(() => {
+      if (!this.isOpen || this.state.errorCode !== ERR_RATE_LIMITED) {
+        this.clearCooldownTimer();
+        return;
+      }
+      const nowMs = this.deps.now();
+      if (isCoolingDown(this.state, nowMs)) {
+        const hint = this.panel()?.querySelector<HTMLElement>('[data-dexswap-cooldown]');
+        if (hint) {
+          const seconds = cooldownRemainingSeconds(this.state, nowMs);
+          hint.textContent = t('hudChrome.dexSwap.cooldown', {
+            seconds: formatNumber(seconds, { maximumFractionDigits: 0 }),
+          });
+        }
+        return;
+      }
+      // Cooldown elapsed: back to idle, actions re-enabled.
+      this.state = clearElapsedCooldown(this.state, nowMs);
+      this.paint();
+    }, 1000);
+  }
+
+  private clearCooldownTimer(): void {
+    if (this.cooldownTimer !== null) {
+      window.clearInterval(this.cooldownTimer);
+      this.cooldownTimer = null;
     }
   }
 

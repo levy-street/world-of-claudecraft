@@ -6029,6 +6029,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.dex_swap.quote_tampered':
     '해당 견적이 이 스왑과 일치하지 않습니다. 새 견적을 요청하세요.',
   'apiError.dex_swap.no_route': '현재 해당 수량에 사용할 수 있는 거래 경로가 없습니다.',
+  'apiError.dex_swap.rate_limited': '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
   'apiError.dex_swap.upstream_error': '스왑 서비스를 이용할 수 없습니다. 나중에 다시 시도하세요.',
   // The in-game Buy $WOC window (M16 non-Latin fill)
   'hudChrome.dexSwap.title': '$WOC 구매',
@@ -6049,6 +6050,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dexSwap.minReceived': '최소 수령량: {amount} $WOC',
   'hudChrome.dexSwap.buyButton': '$WOC 구매',
   'hudChrome.dexSwap.quoteStale': '견적이 만료되었습니다. 구매 전에 새 견적을 받으세요.',
+  'hudChrome.dexSwap.feeLine': '{percent}% 플랫폼 수수료 포함',
+  'hudChrome.dexSwap.cooldown': '요청이 너무 많습니다. {seconds}초 후에 다시 시도할 수 있습니다.',
   'hudChrome.dexSwap.requoted':
     '견적이 만료되어 새 견적을 가져왔습니다. 내용을 확인한 뒤 다시 구매를 누르세요.',
   'hudChrome.dexSwap.signing': '지갑에서 트랜잭션을 승인하세요...',

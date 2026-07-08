@@ -200,6 +200,8 @@ export const zh_CN: EnTranslations = {
       "minReceived": "最少获得：{amount} $WOC",
       "buyButton": "购买 $WOC",
       "quoteStale": "报价已过期。购买前请重新获取报价。",
+      "feeLine": "包含 {percent}% 平台手续费",
+      "cooldown": "请求过于频繁。{seconds}秒后可重试。",
       "requoted": "该报价已过期，已为你获取新报价。请确认后再次点击购买。",
       "signing": "请在钱包中批准该交易...",
       "sentTitle": "兑换已发送",
@@ -1572,6 +1574,7 @@ export const zh_CN: EnTranslations = {
       "invalid_public_key": "请先连接 Solana 钱包。",
       "quote_tampered": "该报价与本次兑换不符，请重新获取报价。",
       "no_route": "目前没有适用于该数量的交易路径。",
+      "rate_limited": "请求过于频繁。请稍候再试。",
       "upstream_error": "兑换服务暂不可用，请稍后再试。"
     }
   },

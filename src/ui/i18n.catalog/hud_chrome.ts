@@ -66,6 +66,8 @@ export const hudChromeStrings = {
     minReceived: 'Minimum received: {amount} $WOC',
     buyButton: 'Buy $WOC',
     quoteStale: 'The quote expired. Get a fresh quote before buying.',
+    feeLine: 'Includes a {percent}% platform fee',
+    cooldown: 'Too many requests. You can try again in {seconds}s.',
     requoted: 'That quote expired, so a fresh one was fetched. Review it and press Buy again.',
     signing: 'Approve the transaction in your wallet...',
     sentTitle: 'Swap sent',

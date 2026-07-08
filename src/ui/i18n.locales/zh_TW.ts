@@ -5718,6 +5718,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.dex_swap.invalid_public_key': '請先連接 Solana 錢包。',
   'apiError.dex_swap.quote_tampered': '該報價與本次兌換不符，請重新取得報價。',
   'apiError.dex_swap.no_route': '目前沒有適用於該數量的交易路徑。',
+  'apiError.dex_swap.rate_limited': '請求過於頻繁。請稍候再試。',
   'apiError.dex_swap.upstream_error': '兌換服務暫時無法使用，請稍後再試。',
   // The in-game Buy $WOC window (M16 non-Latin fill)
   'hudChrome.dexSwap.title': '購買 $WOC',
@@ -5738,6 +5739,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dexSwap.minReceived': '最少獲得：{amount} $WOC',
   'hudChrome.dexSwap.buyButton': '購買 $WOC',
   'hudChrome.dexSwap.quoteStale': '報價已過期。購買前請重新取得報價。',
+  'hudChrome.dexSwap.feeLine': '包含 {percent}% 平台手續費',
+  'hudChrome.dexSwap.cooldown': '請求過於頻繁。{seconds}秒後可重試。',
   'hudChrome.dexSwap.requoted': '該報價已過期，已為你取得新報價。請確認後再次點擊購買。',
   'hudChrome.dexSwap.signing': '請在錢包中核准該交易...',
   'hudChrome.dexSwap.sentTitle': '兌換已送出',

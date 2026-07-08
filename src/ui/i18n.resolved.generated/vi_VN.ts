@@ -200,6 +200,8 @@ export const vi_VN: EnTranslations = {
       "minReceived": "Minimum received: {amount} $WOC",
       "buyButton": "Buy $WOC",
       "quoteStale": "The quote expired. Get a fresh quote before buying.",
+      "feeLine": "Includes a {percent}% platform fee",
+      "cooldown": "Too many requests. You can try again in {seconds}s.",
       "requoted": "That quote expired, so a fresh one was fetched. Review it and press Buy again.",
       "signing": "Approve the transaction in your wallet...",
       "sentTitle": "Swap sent",
@@ -1572,6 +1574,7 @@ export const vi_VN: EnTranslations = {
       "invalid_public_key": "Connect a Solana wallet first.",
       "quote_tampered": "That quote does not match this swap. Request a new quote.",
       "no_route": "No trading route is available for that amount right now.",
+      "rate_limited": "Too many requests. Please wait a moment and try again.",
       "upstream_error": "The swap service is unavailable. Please try again."
     }
   },

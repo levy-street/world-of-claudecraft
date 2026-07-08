@@ -178,6 +178,7 @@ export const apiErrorStrings = {
     invalid_public_key: 'Connect a Solana wallet first.',
     quote_tampered: 'That quote does not match this swap. Request a new quote.',
     no_route: 'No trading route is available for that amount right now.',
+    rate_limited: 'Too many requests. Please wait a moment and try again.',
     upstream_error: 'The swap service is unavailable. Please try again.',
   },
 };

@@ -142,7 +142,7 @@ import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
-import type { DexSwapConfig } from './ui/dex_swap_view';
+import type { DexSwapConfig, DexSwapQuote } from './ui/dex_swap_view';
 import {
   type DiscordAccountStatus,
   type DiscordPresenceState,
@@ -6407,7 +6407,15 @@ class DexSwapApiError extends Error {
 }
 
 async function dexSwapRequest<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, init);
+  // Quote and swap are authenticated (the server forwards the account id to
+  // the economy service as its per-player rate-limit key).
+  const res = await fetch(path, {
+    ...init,
+    headers: {
+      ...(init?.headers as Record<string, string> | undefined),
+      ...(api.token ? { Authorization: `Bearer ${api.token}` } : {}),
+    },
+  });
   const body = (await res.json().catch(() => null)) as Record<string, unknown> | null;
   if (!res.ok) {
     const code = body && typeof body.code === 'string' ? body.code : '';
@@ -6449,14 +6457,18 @@ function wireDexSwap(hud: Hud): void {
       // The swap binds to the CONNECTED wallet (it is the one that signs); a
       // linked-but-disconnected wallet surfaces the localized connect-first state.
       walletAddress: () => walletMod?.currentWallet().address ?? null,
-      fetchQuote: (inputMint, amount, slippageBps) =>
-        dexSwapRequest(
+      fetchQuote: async (inputMint, amount, slippageBps) => {
+        // The proxy relays the service's { quoteResponse, feeBps, feeApplied }
+        // shape; the window renders the fee line from feeBps before signing.
+        const body = await dexSwapRequest<{ quoteResponse: DexSwapQuote; feeBps?: number }>(
           `/api/dexswap/quote?${new URLSearchParams({
             inputMint,
             amount,
             slippageBps: String(slippageBps),
           }).toString()}`,
-        ),
+        );
+        return { quote: body.quoteResponse, feeBps: body.feeBps ?? 0 };
+      },
       buildSwap: async (quote, userPublicKey) => {
         const { swapTransaction } = await dexSwapRequest<{ swapTransaction: string }>(
           '/api/dexswap/swap',

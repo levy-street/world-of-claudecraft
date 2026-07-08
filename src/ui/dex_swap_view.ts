@@ -23,6 +23,9 @@ export interface DexSwapConfig {
   wocDecimals: number;
   inputs: DexSwapInputToken[];
   maxSlippageBps: number;
+  /** Platform fee in basis points (0 = none); disclosed before signing. */
+  feeBps?: number;
+  feeApplied?: boolean;
 }
 
 /** The slice of a Jupiter quoteResponse the view derives its display from. */
@@ -63,16 +66,29 @@ export interface DexSwapState {
   quote: DexSwapQuote | null;
   /** Injected-clock timestamp of when the live quote arrived (staleness anchor). */
   quotedAtMs: number | null;
+  /** The fee (bps) the live quote was built with, for the disclosure line. */
+  quoteFeeBps: number;
   /** The confirmed transaction signature (phase 'sent'). */
   signature: string | null;
   /** A stable error code the window maps to a localized message (phase 'error'). */
   errorCode: string | null;
+  /** Injected-clock timestamp until which quote/buy actions stay locked (429). */
+  cooldownUntilMs: number | null;
   /** Monotonic request guard: completions must match to apply. */
   seq: number;
 }
 
 export function createDexSwapState(): DexSwapState {
-  return { phase: 'idle', quote: null, quotedAtMs: null, signature: null, errorCode: null, seq: 0 };
+  return {
+    phase: 'idle',
+    quote: null,
+    quotedAtMs: null,
+    quoteFeeBps: 0,
+    signature: null,
+    errorCode: null,
+    cooldownUntilMs: null,
+    seq: 0,
+  };
 }
 
 /** Start a quote request; the returned seq must ride with its completion. */
@@ -81,8 +97,10 @@ export function beginQuote(state: DexSwapState): DexSwapState {
     phase: 'quoting',
     quote: null,
     quotedAtMs: null,
+    quoteFeeBps: 0,
     signature: null,
     errorCode: null,
+    cooldownUntilMs: null,
     seq: state.seq + 1,
   };
 }
@@ -93,9 +111,10 @@ export function quoteReceived(
   seq: number,
   quote: DexSwapQuote,
   nowMs: number,
+  feeBps = 0,
 ): DexSwapState {
   if (state.seq !== seq || state.phase !== 'quoting') return state;
-  return { ...state, phase: 'quoted', quote, quotedAtMs: nowMs };
+  return { ...state, phase: 'quoted', quote, quotedAtMs: nowMs, quoteFeeBps: feeBps };
 }
 
 /** Apply a quote failure; a stale seq is a no-op. */
@@ -147,6 +166,121 @@ export function signFailed(state: DexSwapState, seq: number, errorCode: string):
 /** Back to idle (keeps the seq so in-flight completions stay dead). */
 export function resetDexSwap(state: DexSwapState): DexSwapState {
   return { ...createDexSwapState(), seq: state.seq + 1 };
+}
+
+// ---------------------------------------------------------------------------
+// Rate-limit cooldown. A 429 from quote or swap carries retryAfterMs; the
+// window locks the quote/buy actions until the injected clock passes
+// cooldownUntilMs, rendering the remaining seconds.
+// ---------------------------------------------------------------------------
+
+/** The stable error tag a rate-limit failure sets (localized as a cooldown). */
+export const ERR_RATE_LIMITED = 'rate_limited';
+
+/**
+ * Apply a rate-limit refusal from either an in-flight quote or an in-flight
+ * swap build; a stale seq (or a phase that moved on) is a no-op. Enters the
+ * error phase with the cooldown anchor so the paint can count it down.
+ */
+export function rateLimited(
+  state: DexSwapState,
+  seq: number,
+  retryAfterMs: number,
+  nowMs: number,
+): DexSwapState {
+  if (state.seq !== seq || (state.phase !== 'quoting' && state.phase !== 'signing')) return state;
+  const waitMs = Number.isFinite(retryAfterMs) && retryAfterMs > 0 ? retryAfterMs : 60_000;
+  return {
+    ...state,
+    phase: 'error',
+    quote: null,
+    quotedAtMs: null,
+    errorCode: ERR_RATE_LIMITED,
+    cooldownUntilMs: nowMs + waitMs,
+  };
+}
+
+/** Milliseconds of cooldown left (0 when none or already elapsed). */
+export function cooldownRemainingMs(state: DexSwapState, nowMs: number): number {
+  if (state.cooldownUntilMs === null) return 0;
+  return Math.max(0, state.cooldownUntilMs - nowMs);
+}
+
+/** Whole seconds of cooldown left, for the countdown line (at least 1 while live). */
+export function cooldownRemainingSeconds(state: DexSwapState, nowMs: number): number {
+  return Math.ceil(cooldownRemainingMs(state, nowMs) / 1000);
+}
+
+/** True while quote/buy actions must stay disabled. */
+export function isCoolingDown(state: DexSwapState, nowMs: number): boolean {
+  return cooldownRemainingMs(state, nowMs) > 0;
+}
+
+/** Clear an elapsed cooldown (back to idle); a live cooldown is kept as-is. */
+export function clearElapsedCooldown(state: DexSwapState, nowMs: number): DexSwapState {
+  if (state.cooldownUntilMs === null || isCoolingDown(state, nowMs)) return state;
+  return resetDexSwap(state);
+}
+
+// ---------------------------------------------------------------------------
+// Fee disclosure. The platform fee (basis points, capped server-side at 1%) is
+// rendered as an exact percent string before signing; 0 renders nothing.
+// ---------------------------------------------------------------------------
+
+/**
+ * The fee's exact percent string for the disclosure line ('25' bps -> '0.25'),
+ * or null when no fee applies (the line is omitted). Integer math over a
+ * bounded range; no float drift is possible below 10000 bps.
+ */
+export function feePercentText(feeBps: number): string | null {
+  if (!Number.isInteger(feeBps) || feeBps <= 0 || feeBps > 10_000) return null;
+  const whole = Math.floor(feeBps / 100);
+  const frac = feeBps % 100;
+  if (frac === 0) return String(whole);
+  return `${whole}.${String(frac).padStart(2, '0').replace(/0+$/, '')}`;
+}
+
+// ---------------------------------------------------------------------------
+// Re-quote debouncing. Typing in the amount field must not burn the per-player
+// quote budget: the trailing-edge debouncer fires once, DEBOUNCE_MS after the
+// last keystroke. Timer functions are injectable so tests drive a fake clock.
+// ---------------------------------------------------------------------------
+
+/** Milliseconds of typing quiet before an automatic re-quote fires. */
+export const REQUOTE_DEBOUNCE_MS = 400;
+
+export interface Debouncer {
+  /** (Re)arm the debouncer: `fn` runs once, delayMs after the LAST touch. */
+  touch(fn: () => void): void;
+  /** Drop any pending run. */
+  cancel(): void;
+}
+
+type ScheduleFn = (fn: () => void, delayMs: number) => unknown;
+type ClearFn = (handle: unknown) => void;
+
+/** A trailing-edge debouncer with injectable timers (tests use fake ones). */
+export function createDebouncer(
+  delayMs: number,
+  schedule: ScheduleFn = (fn, ms) => setTimeout(fn, ms),
+  clear: ClearFn = (handle) => clearTimeout(handle as Parameters<typeof clearTimeout>[0]),
+): Debouncer {
+  let pending: unknown = null;
+  return {
+    touch(fn: () => void): void {
+      if (pending !== null) clear(pending);
+      pending = schedule(() => {
+        pending = null;
+        fn();
+      }, delayMs);
+    },
+    cancel(): void {
+      if (pending !== null) {
+        clear(pending);
+        pending = null;
+      }
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------

@@ -6155,6 +6155,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.dex_swap.quote_tampered':
     'Эта котировка не соответствует данному обмену. Запросите новую котировку.',
   'apiError.dex_swap.no_route': 'Для этого количества сейчас нет доступного торгового маршрута.',
+  'apiError.dex_swap.rate_limited': 'Слишком много запросов. Подождите немного и попробуйте снова.',
   'apiError.dex_swap.upstream_error': 'Сервис обмена недоступен. Повторите попытку позже.',
   // The in-game Buy $WOC window (M16 non-Latin fill)
   'hudChrome.dexSwap.title': 'Купить $WOC',
@@ -6176,6 +6177,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dexSwap.buyButton': 'Купить $WOC',
   'hudChrome.dexSwap.quoteStale':
     'Срок действия котировки истек. Получите новую котировку перед покупкой.',
+  'hudChrome.dexSwap.feeLine': 'Включает платформенную комиссию {percent}%',
+  'hudChrome.dexSwap.cooldown': 'Слишком много запросов. Повторите попытку через {seconds} с.',
   'hudChrome.dexSwap.requoted':
     'Срок действия котировки истек, поэтому получена новая. Проверьте ее и нажмите «Купить» еще раз.',
   'hudChrome.dexSwap.signing': 'Подтвердите транзакцию в кошельке...',
