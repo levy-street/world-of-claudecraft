@@ -893,6 +893,18 @@ export async function glitchAccountForInstall(
   return res.rows[0] ?? null;
 }
 
+export async function glitchAccountForAccount(
+  accountId: number,
+): Promise<GlitchAccountLinkRow | null> {
+  const res = await pool.query(
+    `SELECT title_id, install_id, account_id, glitch_user_name
+       FROM glitch_accounts
+      WHERE account_id = $1`,
+    [accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
 export async function linkGlitchAccount(
   titleId: string,
   installId: string,
@@ -1987,6 +1999,43 @@ export async function deleteCharacter(accountId: number, characterId: number): P
     [characterId, accountId, REALM],
   );
   return (res.rowCount ?? 0) > 0;
+}
+
+export async function rerollCharacter(
+  accountId: number,
+  characterId: number,
+  cls: PlayerClass,
+  state: CharacterState,
+): Promise<CharacterRow | null> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const existing = await client.query(
+      'SELECT name FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3 FOR UPDATE',
+      [characterId, accountId, REALM],
+    );
+    const name = existing.rows[0]?.name;
+    if (typeof name !== 'string') {
+      await client.query('ROLLBACK');
+      return null;
+    }
+    await client.query('DELETE FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3', [
+      characterId,
+      accountId,
+      REALM,
+    ]);
+    const created = await client.query(
+      'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
+      [accountId, name, cls, REALM, JSON.stringify(state)],
+    );
+    await client.query('COMMIT');
+    return created.rows[0] ?? null;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 // How many characters this account has on each realm, deliberately NOT

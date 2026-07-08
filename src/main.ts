@@ -3276,9 +3276,12 @@ async function runGlitchCharacterAction(
         await api.deleteCharacter(state.existing.id, state.existing.name);
         character = { ...created, online: false };
       } else {
-        await api.deleteCharacter(state.existing.id, state.existing.name);
-        const created = await api.createCharacter(chosen.name, chosen.class, chosen.skin);
-        character = { ...created, online: false };
+        const rerolled = await api.glitchRerollCharacter(
+          state.existing.id,
+          chosen.class,
+          chosen.skin,
+        );
+        character = { ...rerolled, online: false };
       }
       trackGlitchCharAction(GLITCH_CHAR_ACTION.create, {
         class_key: character.class,

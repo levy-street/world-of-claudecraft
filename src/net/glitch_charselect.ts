@@ -98,9 +98,10 @@ export function glitchCharselectAction(input: {
   // passes the public character-name regex still explains the real blocker.
   if (existing.forceRename && !nameChanged) return block('rename_required');
   // Existing Glitch characters may have been provisioned from platform display
-  // names that are not valid public character names. Let an unchanged legacy name
-  // enter, but require a valid name for any create, re-roll, or forced rename.
-  if ((nameChanged || classChanged || skinChanged || existing.forceRename) && !nameValid) {
+  // names that are not valid public character names. Let an unchanged Glitch-owned
+  // name carry through entry and class or appearance re-rolls; only a requested
+  // name change has to satisfy the public character-name validator.
+  if ((nameChanged || existing.forceRename) && !nameValid) {
     return block('name_invalid');
   }
 

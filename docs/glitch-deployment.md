@@ -222,8 +222,10 @@ The script:
    - probes the public health route after routing traffic
    - detects the realm singleton rollout error in Azure logs
    - attempts a bounded singleton handoff only when a fallback revision is known:
-     stop every active revision, wait for the database singleton lock to clear,
-     start exactly one revision, then pin traffic to that revision
+     scale the app to zero minimum replicas, stop every active revision, terminate
+     the Postgres realm advisory lock holder for `REALM_NAME`, copy the uploaded
+     revision into a fresh singleton revision with `az containerapp revision copy`,
+     wait for that copied revision to become healthy, then pin traffic to it
    - restores traffic to the current known-good revision and verifies public
      health if the latest revision never becomes healthy or fails public probing
 
@@ -255,11 +257,20 @@ runtime is still binding its port. If Azure reports a real terminal failure, the
 script restores the fallback revision and includes the revision state plus log
 tail in the failure message.
 
-If the new revision trips the realm singleton lock, the script can briefly
-deactivate every active revision to release the realm lock, but only when it
-already has a fallback revision to restore. It waits for
-`GLITCH_AZURE_SINGLETON_LOCK_CLEAR_MS`, starts exactly one revision, and only
-then uses the bounded `GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS` health window.
+If the new revision trips the realm singleton lock, the script can briefly take
+the singleton offline, but only when it already has a fallback revision to
+restore. The recovery path intentionally does not reactivate or restart the
+failed latest revision in place. It first sets the Container App to
+`--min-replicas 0 --max-replicas 1`, deactivates every active revision, and uses
+the production `DATABASE_URL` to find and terminate the exact Postgres advisory
+lock holder for `REALM_NAME`. It then creates a clean replacement with
+`az containerapp revision copy --from-revision <uploaded-revision>
+--min-replicas 1 --max-replicas 1`, waits for the copied revision to become
+healthy inside `GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS`, pins traffic to the
+copied revision, and verifies the public health route. This is the path that
+prevents Azure from waking the old fallback revision and reacquiring the realm
+lock during the handoff.
+
 Failed fallback restoration is reported as a deployment failure instead of being
 hidden.
 
@@ -292,6 +303,14 @@ az containerapp ingress traffic set \
   --name world-of-claudecraft-node \
   --resource-group openai-resource-group \
   --revision-weight "<known-good-revision>=100"
+
+az containerapp revision copy \
+  --name world-of-claudecraft-node \
+  --resource-group openai-resource-group \
+  --from-revision "<uploaded-revision>" \
+  --min-replicas 1 \
+  --max-replicas 1 \
+  --set-env-vars WOC_DEPLOY_ROLLOUT_ID="$(date +%s)"
 ```
 
 Useful overrides:

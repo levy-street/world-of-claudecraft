@@ -49,9 +49,8 @@ describe('glitchCharselectAction', () => {
     });
   });
 
-  it('blocks on an invalid name when the chosen character would be created or renamed', () => {
+  it('blocks on an invalid name when the Glitch name changes', () => {
     expect(act({}, { name: 'x' }, false).reason).toBe('name_invalid');
-    expect(act({}, { class: 'mage' }, false).reason).toBe('name_invalid');
   });
 
   it('allows an unchanged legacy Glitch name to enter even when it fails public name validation', () => {
@@ -59,6 +58,19 @@ describe('glitchCharselectAction', () => {
       kind: 'enter',
       needsConfirm: false,
       takeover: false,
+      reason: null,
+    });
+  });
+
+  it('allows an unchanged numeric Glitch name to re-roll class or appearance', () => {
+    expect(act({ name: 'Glitch400' }, { name: 'Glitch400', class: 'mage' }, false)).toMatchObject({
+      kind: 'reroll',
+      reason: null,
+    });
+    expect(
+      act({ name: 'Glitch400', skin: 0 }, { name: 'Glitch400', skin: 2 }, false),
+    ).toMatchObject({
+      kind: 'reroll',
       reason: null,
     });
   });

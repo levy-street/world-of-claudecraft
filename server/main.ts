@@ -68,6 +68,7 @@ import {
   getAccountsCount,
   getCharacter,
   getCharacterById,
+  glitchAccountForAccount,
   glitchAccountForInstall,
   guildNameForCharacter,
   isAdminAccount,
@@ -85,6 +86,7 @@ import {
   reclaimDeactivatedName,
   referralCountForAccount,
   renameCharacter,
+  rerollCharacter,
   revokeCompanionToken,
   saveToken,
   scopeAllowsMutation,
@@ -1008,17 +1010,6 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }
       if (req.method === 'POST') {
         const body = await readBody(req);
-        const name = normalizeCharName(body.name);
-        if (name === null)
-          return json(res, 400, {
-            error: 'invalid character name (2-16 letters)',
-            code: 'character.name_invalid',
-          });
-        if (offensiveName(name))
-          return json(res, 400, {
-            error: 'character name is not allowed',
-            code: 'character.name_not_allowed',
-          });
         const validClasses = [
           'warrior',
           'paladin',
@@ -1030,6 +1021,68 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           'warlock',
           'druid',
         ];
+        if (body.glitchRerollCharacterId !== undefined) {
+          if (!validClasses.includes(body.class))
+            return json(res, 400, { error: 'invalid class', code: 'character.invalid_class' });
+          const characterId =
+            typeof body.glitchRerollCharacterId === 'number' &&
+            Number.isSafeInteger(body.glitchRerollCharacterId) &&
+            body.glitchRerollCharacterId > 0
+              ? body.glitchRerollCharacterId
+              : null;
+          if (characterId === null || !(await glitchAccountForAccount(accountId))) {
+            return json(res, 404, { error: 'not found', code: 'character.not_found' });
+          }
+          const character = await getCharacter(accountId, characterId);
+          if (!character)
+            return json(res, 404, { error: 'not found', code: 'character.not_found' });
+          if (character.force_rename)
+            return json(res, 403, {
+              error: 'character rename is not permitted',
+              code: 'character.rename_not_permitted',
+            });
+          if ([...liveGame().clients.values()].some((s) => s.characterId === characterId)) {
+            return json(res, 400, {
+              error: 'character is currently online',
+              code: 'character.online',
+            });
+          }
+          const skin = Math.max(
+            0,
+            Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
+          );
+          const c = await rerollCharacter(
+            accountId,
+            characterId,
+            body.class,
+            initialCharacterState(body.class, character.name, skin),
+          );
+          return json(
+            res,
+            c ? 200 : 404,
+            c
+              ? {
+                  id: c.id,
+                  name: c.name,
+                  class: c.class,
+                  level: c.level,
+                  skin: c.state?.skin ?? skin,
+                  forceRename: c.force_rename,
+                }
+              : { error: 'not found', code: 'character.not_found' },
+          );
+        }
+        const name = normalizeCharName(body.name);
+        if (name === null)
+          return json(res, 400, {
+            error: 'invalid character name (2-16 letters)',
+            code: 'character.name_invalid',
+          });
+        if (offensiveName(name))
+          return json(res, 400, {
+            error: 'character name is not allowed',
+            code: 'character.name_not_allowed',
+          });
         if (!validClasses.includes(body.class))
           return json(res, 400, { error: 'invalid class', code: 'character.invalid_class' });
         const skin = Math.max(

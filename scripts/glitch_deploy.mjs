@@ -30,6 +30,7 @@ const skipBuild = env.GLITCH_DEPLOY_SKIP_BUILD === '1';
 const azurePostDeploy = env.GLITCH_AZURE_POST_DEPLOY !== '0';
 const azureContainerAppName = env.GLITCH_AZURE_CONTAINERAPP_NAME || 'world-of-claudecraft-node';
 const azureResourceGroup = env.GLITCH_AZURE_RESOURCE_GROUP || 'openai-resource-group';
+const azureRealmName = env.REALM_NAME || 'Claudemoon';
 const azurePostDeployTimeoutMs = readPositiveMs('GLITCH_AZURE_POST_DEPLOY_TIMEOUT_MS', 600_000);
 const azureSingletonHandoffTimeoutMs = readPositiveMs(
   'GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS',
@@ -46,9 +47,9 @@ const azureRevisionFailureGraceMs = readPositiveMs(
   75_000,
 );
 const azureRevisionProgressLogMs = readPositiveMs('GLITCH_AZURE_REVISION_PROGRESS_LOG_MS', 30_000);
-const useCliBuildWait =
-  env.GLITCH_DEPLOY_CLI_WAIT === '1' || !(nodeDeployment && azurePostDeploy);
+const useCliBuildWait = env.GLITCH_DEPLOY_CLI_WAIT === '1' || !(nodeDeployment && azurePostDeploy);
 const preflightScript = path.join(ROOT, 'scripts/glitch_predeploy_check.mjs');
+const realmLockNamespace = 0x57_4f_43;
 
 if (!deployToken) {
   fail('Set GLITCH_TITLE_TOKEN to a deploy-scoped Glitch token before deploying.');
@@ -411,6 +412,10 @@ async function setAzureRevisionModeMultiple() {
 async function enforceAzureSingleReplicaScale() {
   const scale = await readAzureScale();
   if (Number(scale.minReplicas) === 1 && Number(scale.maxReplicas) === 1) return;
+  await setAzureSingleReplicaScale(1, 1);
+}
+
+async function setAzureSingleReplicaScale(minReplicas, maxReplicas) {
   await run(
     'az',
     [
@@ -421,9 +426,9 @@ async function enforceAzureSingleReplicaScale() {
       '--resource-group',
       azureResourceGroup,
       '--min-replicas',
-      '1',
+      String(minReplicas),
       '--max-replicas',
-      '1',
+      String(maxReplicas),
       '--output',
       'none',
     ],
@@ -689,11 +694,10 @@ async function tryAzureSingletonHandoff(latestRevision, fallbackRevision) {
   console.log(
     `Azure post-deploy: ${latestRevision} hit the realm singleton during rollout; attempting bounded handoff with fallback ${fallbackRevision}.`,
   );
-  await stopAzureRevisionsForSingleton(latestRevision);
+  await stopAzureRevisionsForSingleton(latestRevision, { scaleToZero: true });
+  await terminateRealmSingletonLockHolders();
   await setAzureRevisionModeMultiple();
-  await enforceAzureSingleReplicaScale();
-  const targetRevision = await readLatestAzureRevisionName();
-  await activateAzureRevisionIfNeeded(targetRevision);
+  const targetRevision = await copyAzureRevisionForSingleton(latestRevision);
   await waitForAzureRevisionHealthy(targetRevision, azureSingletonHandoffTimeoutMs);
   await promoteAzureRevision(targetRevision, fallbackRevision);
 }
@@ -705,9 +709,11 @@ async function deactivateOlderAzureRevisions(revisions, latestRevision) {
   }
 }
 
-async function stopAzureRevisionsForSingleton(targetRevision) {
-  const revisions = await readAzureRevisions();
-  const activeRevisions = revisions.filter((revision) => revision.active);
+async function stopAzureRevisionsForSingleton(targetRevision, options = {}) {
+  if (options.scaleToZero) {
+    await setAzureSingleReplicaScale(0, 1);
+  }
+  let activeRevisions = (await readAzureRevisions()).filter((revision) => revision.active);
   if (activeRevisions.length > 0) {
     console.log(
       `Azure post-deploy: stopping ${activeRevisions.length} active revision(s) before starting ${targetRevision}.`,
@@ -718,7 +724,25 @@ async function stopAzureRevisionsForSingleton(targetRevision) {
       console.warn(redact(`Azure post-deploy: could not deactivate ${revision.name}: ${error}`));
     });
   }
-  await sleep(azureSingletonLockClearMs);
+  const deadline = Date.now() + azureSingletonLockClearMs;
+  while (Date.now() < deadline) {
+    activeRevisions = (await readAzureRevisions()).filter((revision) => revision.active);
+    if (activeRevisions.length === 0) return;
+    for (const revision of activeRevisions) {
+      await deactivateAzureRevision(revision.name).catch((error) => {
+        console.warn(redact(`Azure post-deploy: could not deactivate ${revision.name}: ${error}`));
+      });
+    }
+    await sleepRemaining(deadline, 10_000);
+  }
+  const stillActive = (await readAzureRevisions()).filter((revision) => revision.active);
+  if (stillActive.length > 0) {
+    throw new Error(
+      `Azure post-deploy: active revisions did not stop before singleton handoff: ${stillActive
+        .map((revision) => revision.name)
+        .join(', ')}`,
+    );
+  }
 }
 
 async function activateAzureRevisionIfNeeded(revision) {
@@ -726,6 +750,88 @@ async function activateAzureRevisionIfNeeded(revision) {
     if (String(error).includes('RevisionAlreadyInRequestedState')) return;
     throw error;
   });
+}
+
+async function copyAzureRevisionForSingleton(sourceRevision) {
+  await run(
+    'az',
+    [
+      'containerapp',
+      'revision',
+      'copy',
+      '--name',
+      azureContainerAppName,
+      '--resource-group',
+      azureResourceGroup,
+      '--from-revision',
+      sourceRevision,
+      '--min-replicas',
+      '1',
+      '--max-replicas',
+      '1',
+      '--set-env-vars',
+      `WOC_DEPLOY_ROLLOUT_ID=${Date.now()}`,
+      '--output',
+      'none',
+    ],
+    env,
+  );
+  const copiedRevision = await readLatestAzureRevisionName();
+  console.log(
+    `Azure post-deploy: copied ${sourceRevision} to fresh singleton revision ${copiedRevision}.`,
+  );
+  return copiedRevision;
+}
+
+async function terminateRealmSingletonLockHolders() {
+  if (!env.DATABASE_URL) {
+    throw new Error('Azure post-deploy: DATABASE_URL is required to clear realm singleton locks.');
+  }
+  const pg = await import('pg');
+  const Client = pg.Client || pg.default?.Client;
+  if (!Client) {
+    throw new Error('Azure post-deploy: could not load pg Client for realm lock cleanup.');
+  }
+  const client = new Client({ connectionString: env.DATABASE_URL });
+  const [namespace, realmKey] = realmAdvisoryLockKeys(azureRealmName);
+  const realmKeyUnsigned = realmKey >>> 0;
+  await client.connect();
+  try {
+    const locks = await client.query(
+      `SELECT pid
+         FROM pg_locks
+        WHERE locktype = 'advisory'
+          AND classid::bigint = $1
+          AND objid::bigint IN ($2, $3)`,
+      [namespace, realmKey, realmKeyUnsigned],
+    );
+    console.log(`Azure post-deploy: realm singleton lock holders: ${locks.rowCount}.`);
+    for (const row of locks.rows) {
+      const pid = Number(row.pid);
+      if (!Number.isSafeInteger(pid) || pid <= 0) continue;
+      const killed = await client.query('SELECT pg_terminate_backend($1) AS killed', [pid]);
+      console.log(
+        `Azure post-deploy: terminated realm singleton lock holder ${pid}: ${
+          killed.rows[0]?.killed === true
+        }.`,
+      );
+    }
+  } finally {
+    await client.end().catch(() => {});
+  }
+}
+
+function realmAdvisoryLockKeys(realm) {
+  return [realmLockNamespace, fnv1a32(realm.trim().toLowerCase())];
+}
+
+function fnv1a32(input) {
+  let hash = 0x811c_9dc5;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 0x0100_0193);
+  }
+  return hash | 0;
 }
 
 async function activateAzureRevision(revision) {

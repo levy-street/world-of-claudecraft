@@ -98,6 +98,12 @@ describe('Glitch deploy process guardrails', () => {
     expect(deployScript).toContain('detected new revision');
     expect(deployScript).toContain('reached a terminal Azure state');
     expect(deployScript).toContain('stopAzureRevisionsForSingleton');
+    expect(deployScript).toContain('terminateRealmSingletonLockHolders');
+    expect(deployScript).toContain('copyAzureRevisionForSingleton');
+    expect(deployScript).toContain('setAzureSingleReplicaScale(0, 1)');
+    expect(deployScript).toContain('pg_terminate_backend');
+    expect(deployScript).toContain('revision');
+    expect(deployScript).toContain('copy');
     expect(deployScript).toContain('stopping ${activeRevisions.length} active revision(s)');
     expect(deployScript).toContain(
       'refusing realm singleton handoff because no fallback revision is known',
@@ -109,8 +115,10 @@ describe('Glitch deploy process guardrails', () => {
       deployScript.indexOf('async function restoreAzureFallbackRevision'),
     );
     expect(
-      restoreFallbackBody.indexOf('await activateAzureRevision(fallbackRevision)'),
-    ).toBeLessThan(restoreFallbackBody.indexOf('await routeAzureTrafficToRevision(fallbackRevision)'));
+      restoreFallbackBody.indexOf('await activateAzureRevisionIfNeeded(fallbackRevision)'),
+    ).toBeLessThan(
+      restoreFallbackBody.indexOf('await routeAzureTrafficToRevision(fallbackRevision)'),
+    );
   });
 
   it('documents the Azure single-replica invariant for the MMO realm', () => {
@@ -124,6 +132,8 @@ describe('Glitch deploy process guardrails', () => {
     expect(docs).toContain('GLITCH_AZURE_PUBLIC_HEALTH_PATH');
     expect(docs).toContain('REALM_SINGLETON_LOCK=1');
     expect(docs).toContain('Realm "Claudemoon" is already hosted');
+    expect(docs).toContain('Postgres realm advisory lock holder');
+    expect(docs).toContain('az containerapp revision copy');
     expect(docs).toContain('GLITCH_AZURE_POST_DEPLOY=0');
   });
 });

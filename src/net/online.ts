@@ -541,6 +541,19 @@ export class Api {
     return normalizeCharacterSummary(data);
   }
 
+  async glitchRerollCharacter(
+    characterId: number,
+    cls: PlayerClass,
+    skin = 0,
+  ): Promise<CharacterSummary> {
+    const data = await this.post('/api/characters', {
+      glitchRerollCharacterId: characterId,
+      class: cls,
+      skin,
+    });
+    return normalizeCharacterSummary(data);
+  }
+
   async renameCharacter(characterId: number, name: string): Promise<CharacterSummary> {
     const data = await this.post(`/api/characters/${characterId}/rename`, { name });
     return normalizeCharacterSummary(data);
