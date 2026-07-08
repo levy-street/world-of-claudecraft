@@ -781,13 +781,15 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: null,
   },
   // The $WOC DEX swap proxy family (v0.23.0, server/dex_swap.ts): buy $WOC in
-  // game via the Jupiter Swap API, fail-closed behind WOC_DEX_SWAP_ENABLED
-  // (every endpoint answers 404 dex_swap.disabled when off). REGISTRY-ONLY:
-  // born on the RouteDef pipeline with no legacy handleApi arm, so the rows are
-  // flagged `unreachable` (the legacy-source scan must not expect them; see the
-  // dexSwapRegistryOnly known deviation). Public like /api/woc/balance: quotes
-  // read public market data, and the swap build returns an unsigned transaction
-  // only the caller's own wallet can execute.
+  // game via the ECONOMY SERVICE's Jupiter engine (the game server is a thin
+  // forwarder carrying the internal secret + the authenticated player id),
+  // fail-closed behind WOC_DEX_SWAP_ENABLED (every endpoint answers 404
+  // dex_swap.disabled when off or when the service connection is unset).
+  // REGISTRY-ONLY: born on the RouteDef pipeline with no legacy handleApi arm,
+  // so the rows are flagged `unreachable` (the legacy-source scan must not
+  // expect them; see the dexSwapRegistryOnly known deviation). Config is a
+  // public read (boot-time launcher visibility); quote and swap require a
+  // bearer session whose account id keys the service's per-player rate limits.
   {
     dispatcher: DISPATCH.mainApi,
     method: 'GET',
@@ -805,7 +807,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     path: '/api/dexswap/quote',
     handler: 'dex_swap.ts RouteDef: quoteHandler',
     contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.public,
+    authScope: AUTH_SCOPE.bearer,
     limiter: null,
     requireOwnedExpected: null,
     unreachable: true,
@@ -816,7 +818,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     path: '/api/dexswap/swap',
     handler: 'dex_swap.ts RouteDef: swapHandler',
     contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.public,
+    authScope: AUTH_SCOPE.bearer,
     limiter: null,
     requireOwnedExpected: null,
     unreachable: true,

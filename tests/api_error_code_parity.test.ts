@@ -84,6 +84,7 @@ const KNOWN_CODES = [
   'dex_swap.invalid_public_key',
   'dex_swap.invalid_slippage',
   'dex_swap.no_route',
+  'dex_swap.rate_limited',
   'dex_swap.quote_tampered',
   'dex_swap.upstream_error',
   'email.invalid',

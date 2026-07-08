@@ -1,346 +1,282 @@
-// Buy $WOC off the DEX in game: the server-side Jupiter Swap API proxy.
+// Buy $WOC off the DEX in game: the THIN authenticated proxy to the economy
+// service (woc-daily-rewards-service), which owns the entire Jupiter
+// integration (mint pinning, amount/slippage validation, the platform-fee
+// policy, and per-player rate limits) behind its /v1/dexswap routes. This
+// module deliberately contains ZERO Jupiter/crypto logic: no upstream URL, no
+// mint allowlist, no fee math. Single source of truth = the service.
 //
-// Non-custodial by construction: this module never signs, never holds keys or
-// funds, and never broadcasts. It validates the client's swap inputs, PINS the
-// output mint to WOC_MINT server-side (the client cannot choose what it buys),
-// and forwards to the Jupiter Swap API (quote + swap-transaction build). The
-// player's own wallet signs and sends the returned transaction via the Wallet
-// Standard SolanaSignAndSendTransaction feature (src/net/wallet.ts).
+// Non-custodial by construction: neither layer signs, holds keys or funds, or
+// broadcasts. The service returns an unsigned transaction the player's own
+// wallet signs and sends via the Wallet Standard (src/net/wallet.ts).
 //
-// Fail-closed: every endpoint refuses with a stable 404 code unless
-// WOC_DEX_SWAP_ENABLED=1 is set in the server environment. No platform fee is
-// taken (Jupiter platformFeeBps is deliberately NOT set; adding a treasury fee
-// is a money-policy decision left to the maintainers).
+// Fail-closed twice over: every endpoint refuses with a stable 404 code unless
+// this server's OWN WOC_DEX_SWAP_ENABLED=1 is set AND the service connection
+// (ECONOMY_SERVICE_URL + WOC_ECONOMY_INTERNAL_SECRET) is configured; the
+// service keeps its own independent flag, so both layers default OFF.
 //
-// The upstream fetch is an INJECTED dependency (configureDexSwapRuntime) so the
-// tests drive a fake Jupiter with zero network. Upstream non-200s propagate as
-// a typed dex_swap.upstream_error carrying the upstream status + error string,
-// never swallowed. $WOC's on-chain decimals are read once via the same
-// SOLANA_RPC_URL config server/woc_balance.ts uses (getTokenSupply) and cached
-// in-module for the client's display math.
+// Auth: quote and swap require a bearer session (the per-player rate limits
+// key on it); the authenticated account id is forwarded as x-woc-player-id,
+// used by the service ONLY for rate limiting. Config stays a public read (the
+// client fetches it at boot, before login, to decide launcher visibility).
+//
+// The service fetch is an INJECTED dependency (configureDexSwapRuntime) so the
+// tests drive a fake economy service with zero network. Service error codes
+// map onto this server's stable dex_swap.* codes (the client localizes them
+// code-first); unknown codes and transport failures surface as
+// dex_swap.upstream_error, never swallowed.
 
+import type { ErrorCode } from './http/error_codes';
 import { HttpError } from './http/errors';
+import { type RequireAccountDeps, requireAccount } from './http/middleware/require_account';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
-import { isSolanaAddress } from './wallet_link';
 
-// The two payment tokens a player may swap INTO $WOC. Wrapped SOL (Jupiter
-// unwraps via wrapAndUnwrapSol) and mainnet USDC. Server-side allowlist: any
-// other input mint is rejected before an upstream call is made.
-export const SOL_MINT = 'So11111111111111111111111111111111111111112';
-export const USDC_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
-export const DEX_SWAP_INPUTS = [
-  { mint: SOL_MINT, symbol: 'SOL', decimals: 9 },
-  { mint: USDC_MINT, symbol: 'USDC', decimals: 6 },
-] as const;
-
-// Slippage ceiling fallback (basis points) when DEX_SWAP_MAX_SLIPPAGE_BPS is
-// unset, and the amount digit bound (a 20-digit base-unit amount already
-// exceeds any real supply; longer strings are rejected before BigInt work).
-export const DEFAULT_MAX_SLIPPAGE_BPS = 500;
-export const MAX_AMOUNT_DIGITS = 20;
 // Upstream error strings are truncated to this length before they ride the
-// typed error params (enough to diagnose, bounded so a hostile upstream body
-// cannot bloat the response).
+// typed error params (enough to diagnose, bounded so a hostile body cannot
+// bloat the response).
 export const UPSTREAM_ERROR_MAX_CHARS = 300;
-// Jupiter's stable no-route error code (quote has no path to $WOC, e.g. an
-// unpooled mint or an amount too large for the pool). Surfaced as its own
-// typed code so the client renders a real "no liquidity" state.
-const JUPITER_NO_ROUTE_CODE = 'COULD_NOT_FIND_ANY_ROUTE';
 
 // ---------------------------------------------------------------------------
-// Env config. All reads are lazy (per request) so the flag and bounds can be
-// flipped without module-reload ceremony and the tests can drive both states.
-// The mint + RPC URL mirror server/woc_balance.ts exactly (same names, same
-// local-dev VITE_ fallback, same defaults): woc_balance stays the sanctioned
-// Solana RPC touchpoint and this module reuses its configuration.
+// Env config. All reads are lazy (per request) so the flag and service target
+// can be flipped without module-reload ceremony and the tests drive both
+// states. The secret name matches the service's front door exactly.
 // ---------------------------------------------------------------------------
 
 function dexSwapEnabled(): boolean {
   return (process.env.WOC_DEX_SWAP_ENABLED ?? '').trim() === '1';
 }
 
-function wocMint(): string {
-  return (
-    process.env.WOC_MINT ??
-    process.env.VITE_WOC_MINT ??
-    '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
-  ).trim();
-}
-
-function solanaRpcUrl(): string {
-  return (
-    process.env.SOLANA_RPC_URL ??
-    process.env.VITE_SOLANA_RPC_URL ??
-    'https://api.mainnet-beta.solana.com'
-  ).trim();
-}
-
-function jupiterBaseUrl(): string {
-  const raw = (process.env.JUPITER_BASE_URL ?? 'https://lite-api.jup.ag').trim();
+function economyServiceUrl(): string | null {
+  const raw = (process.env.ECONOMY_SERVICE_URL ?? '').trim();
+  if (!raw) return null;
   return raw.endsWith('/') ? raw.slice(0, -1) : raw;
 }
 
-function jupiterApiKey(): string | null {
-  const raw = (process.env.JUPITER_API_KEY ?? '').trim();
+function economySecret(): string | null {
+  const raw = (process.env.WOC_ECONOMY_INTERNAL_SECRET ?? '').trim();
   return raw ? raw : null;
 }
 
-export function maxSlippageBps(): number {
-  const raw = Number((process.env.DEX_SWAP_MAX_SLIPPAGE_BPS ?? '').trim());
-  return Number.isInteger(raw) && raw > 0 ? raw : DEFAULT_MAX_SLIPPAGE_BPS;
-}
-
 // ---------------------------------------------------------------------------
-// Injected upstream fetch. registry.ts spreads the static `routes` array, so
-// the runtime is swappable after load: tests install a fake Jupiter + fake RPC
-// via configureDexSwapRuntime and reset with resetDexSwapRuntimeForTests. The
-// default binds the global fetch (bound lazily so a test-installed global
-// fetch stub would also be honored).
+// Injected runtime: the service fetch (tests: a fake economy service) and the
+// auth deps (tests: an injected token lookup so no Postgres is touched).
+// registry.ts spreads the static `routes` array, so the runtime is swappable
+// after load.
 // ---------------------------------------------------------------------------
 
 export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 
 interface DexSwapRuntime {
   fetchImpl: FetchLike;
+  authDeps: Omit<RequireAccountDeps, 'scope'>;
 }
 
 const DEFAULT_RUNTIME: DexSwapRuntime = {
   fetchImpl: (url, init) => fetch(url, init),
+  authDeps: {},
 };
 
 let runtime: DexSwapRuntime = DEFAULT_RUNTIME;
-let cachedWocDecimals: number | null = null;
 
-/** Install an upstream fetch implementation (tests: a fake Jupiter + fake RPC). */
+/** Install a service fetch / auth deps (tests: fake service, fake tokens). */
 export function configureDexSwapRuntime(overrides: Partial<DexSwapRuntime>): void {
   runtime = { ...runtime, ...overrides };
 }
 
-/** Restore the real fetch runtime and drop the cached $WOC decimals (test-only). */
+/** Restore the real fetch + auth runtime (test-only). */
 export function resetDexSwapRuntimeForTests(): void {
   runtime = DEFAULT_RUNTIME;
-  cachedWocDecimals = null;
 }
 
 // ---------------------------------------------------------------------------
-// Typed failures. Every reject is a stable HttpError code the client localizes
-// (apiError.dex_swap.*); the server emits the CODE, never English prose.
+// Gates. Fail-closed: flag off OR an unconfigured service connection is the
+// same stable 404 (the feature does not exist), with a dev-channel warning for
+// the misconfigured-but-enabled case so ops can tell the two apart.
 // ---------------------------------------------------------------------------
 
-function disabledError(): HttpError {
-  return new HttpError(404, 'dex_swap.disabled');
-}
+let misconfigWarned = false;
 
-function upstreamError(status: number, errorText: string): HttpError {
-  return new HttpError(502, 'dex_swap.upstream_error', {
-    upstreamStatus: status,
-    upstreamError: errorText.slice(0, UPSTREAM_ERROR_MAX_CHARS),
-  });
-}
-
-/** Fail-closed feature gate: every dexswap endpoint 404s unless the flag is 1. */
 const dexSwapGate: Middleware = async (_ctx, next) => {
-  if (!dexSwapEnabled()) throw disabledError();
+  if (!dexSwapEnabled()) throw new HttpError(404, 'dex_swap.disabled');
+  if (economyServiceUrl() === null || economySecret() === null) {
+    if (!misconfigWarned) {
+      misconfigWarned = true;
+      console.warn(
+        '[dexswap] WOC_DEX_SWAP_ENABLED=1 but ECONOMY_SERVICE_URL / ' +
+          'WOC_ECONOMY_INTERNAL_SECRET is unset; refusing (fail-closed)',
+      );
+    }
+    throw new HttpError(404, 'dex_swap.disabled');
+  }
   await next();
 };
 
-// ---------------------------------------------------------------------------
-// Input validation helpers (pure).
-// ---------------------------------------------------------------------------
-
-function allowedInputMint(mint: unknown): mint is string {
-  return typeof mint === 'string' && DEX_SWAP_INPUTS.some((input) => input.mint === mint);
-}
-
-/**
- * A positive integer base-unit amount, as the canonical digit string. Rejects
- * signs, decimals, exponents, leading zeros, zero itself, and anything longer
- * than MAX_AMOUNT_DIGITS, so the value forwarded upstream is exactly what a
- * u64-ish token amount can be. String in, string out: no float ever touches it.
- */
-export function parseAmountParam(raw: unknown): string | null {
-  if (typeof raw !== 'string') return null;
-  const trimmed = raw.trim();
-  if (!/^[1-9]\d*$/.test(trimmed) || trimmed.length > MAX_AMOUNT_DIGITS) return null;
-  return trimmed;
-}
-
-/** An integer slippage in 1..maxSlippageBps(), or null. */
-export function parseSlippageParam(raw: unknown): number | null {
-  if (typeof raw !== 'string') return null;
-  const trimmed = raw.trim();
-  if (!/^\d{1,6}$/.test(trimmed)) return null;
-  const value = Number(trimmed);
-  return value >= 1 && value <= maxSlippageBps() ? value : null;
-}
-
-/** The single string value of a query param ('' and arrays reject downstream). */
-function queryParam(ctx: Ctx, key: string): unknown {
-  const value = ctx.query[key];
-  return Array.isArray(value) ? value[0] : value;
-}
+/** Bearer auth for quote/swap; the auth deps are injectable for tests. */
+const dexSwapAuth: Middleware = async (ctx, next) => {
+  await requireAccount({ scope: 'read', ...runtime.authDeps })(ctx, next);
+};
 
 // ---------------------------------------------------------------------------
-// Upstream calls.
+// Service error mapping. The service emits stable codes (packages/sdk
+// dexswap.ts in the service repo); each maps onto this server's registered
+// dex_swap.* code so the client localizes it code-first. rate_limited carries
+// retryAfterMs through for the UI cooldown; upstream_error carries the bounded
+// upstream status + text through unchanged.
 // ---------------------------------------------------------------------------
 
-function jupiterHeaders(extra?: Record<string, string>): Record<string, string> {
-  const headers: Record<string, string> = { Accept: 'application/json', ...(extra ?? {}) };
-  const key = jupiterApiKey();
-  if (key) headers['x-api-key'] = key;
-  return headers;
+const SERVICE_ERROR_MAP: Record<string, { status: number; code: ErrorCode }> = {
+  disabled: { status: 404, code: 'dex_swap.disabled' },
+  input_not_allowed: { status: 400, code: 'dex_swap.input_not_allowed' },
+  invalid_amount: { status: 400, code: 'dex_swap.invalid_amount' },
+  invalid_slippage: { status: 400, code: 'dex_swap.invalid_slippage' },
+  quote_tampered: { status: 400, code: 'dex_swap.quote_tampered' },
+  invalid_public_key: { status: 400, code: 'dex_swap.invalid_public_key' },
+  no_route: { status: 400, code: 'dex_swap.no_route' },
+};
+
+function truncated(text: unknown): string {
+  return String(text ?? '').slice(0, UPSTREAM_ERROR_MAX_CHARS);
 }
 
-/**
- * Map a Jupiter non-200 to the typed failure: the stable no-route code becomes
- * dex_swap.no_route (a real player-facing "no liquidity" state), anything else
- * propagates as dex_swap.upstream_error with the upstream status + error text.
- */
-function jupiterFailure(status: number, bodyText: string): HttpError {
-  let errorText = bodyText;
-  try {
-    const parsed = JSON.parse(bodyText) as { error?: unknown; errorCode?: unknown };
-    if (parsed && typeof parsed === 'object') {
-      if (parsed.errorCode === JUPITER_NO_ROUTE_CODE) {
-        return new HttpError(400, 'dex_swap.no_route');
-      }
-      if (typeof parsed.error === 'string' && parsed.error) errorText = parsed.error;
-    }
-  } catch {
-    // Not JSON: keep the raw body text as the upstream error string.
+/** Map a non-2xx service answer onto the stable dex_swap.* HttpError. */
+function serviceFailure(status: number, body: Record<string, unknown> | null): HttpError {
+  const code = body && typeof body.error === 'string' ? body.error : '';
+  if (code === 'rate_limited') {
+    const retryAfterMs =
+      typeof body?.retryAfterMs === 'number' && body.retryAfterMs > 0
+        ? Math.ceil(body.retryAfterMs)
+        : 60_000;
+    return new HttpError(429, 'dex_swap.rate_limited', { retryAfterMs });
   }
-  return upstreamError(status, errorText);
-}
-
-/**
- * $WOC's on-chain decimals via getTokenSupply(WOC_MINT), read once and cached.
- * Uses the injected fetch against the same SOLANA_RPC_URL woc_balance.ts reads,
- * so the RPC endpoint (and any key in it) stays server-side. A failed read is a
- * typed upstream error: the config endpoint does not answer with made-up math.
- */
-async function wocDecimals(): Promise<number> {
-  if (cachedWocDecimals !== null) return cachedWocDecimals;
-  const res = await runtime.fetchImpl(solanaRpcUrl(), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'getTokenSupply',
-      params: [wocMint()],
-    }),
+  if (code === 'upstream_error') {
+    const upstreamStatus = typeof body?.upstreamStatus === 'number' ? body.upstreamStatus : status;
+    return new HttpError(502, 'dex_swap.upstream_error', {
+      upstreamStatus,
+      upstreamError: truncated(body?.upstreamError),
+    });
+  }
+  const mapped = SERVICE_ERROR_MAP[code];
+  if (mapped) return new HttpError(mapped.status, mapped.code);
+  // An unknown service code (or an unparseable body): surfaced, never swallowed.
+  return new HttpError(502, 'dex_swap.upstream_error', {
+    upstreamStatus: status,
+    upstreamError: truncated(code || 'unrecognized economy service answer'),
   });
-  if (!res.ok) throw upstreamError(res.status, await res.text());
-  const data = (await res.json()) as { result?: { value?: { decimals?: unknown } } };
-  const decimals = data?.result?.value?.decimals;
-  if (typeof decimals !== 'number' || !Number.isInteger(decimals) || decimals < 0 || decimals > 255)
-    throw upstreamError(res.status, 'getTokenSupply returned no decimals');
-  cachedWocDecimals = decimals;
-  return decimals;
+}
+
+/**
+ * Forward one call to the economy service with the internal secret (+ the
+ * player id when the route is authenticated) and return the parsed 2xx body.
+ * A transport failure or a non-2xx answer throws the mapped typed error.
+ */
+async function forwardToService(
+  path: string,
+  init: { method: 'GET' | 'POST'; playerId?: string; body?: string },
+): Promise<unknown> {
+  const base = economyServiceUrl();
+  const secret = economySecret();
+  if (base === null || secret === null) throw new HttpError(404, 'dex_swap.disabled');
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'x-woc-economy-secret': secret,
+  };
+  if (init.playerId !== undefined) headers['x-woc-player-id'] = init.playerId;
+  if (init.body !== undefined) headers['Content-Type'] = 'application/json';
+  let res: Response;
+  try {
+    res = await runtime.fetchImpl(`${base}${path}`, {
+      method: init.method,
+      headers,
+      body: init.body,
+    });
+  } catch (err) {
+    console.warn('[dexswap] economy service unreachable', err);
+    throw new HttpError(502, 'dex_swap.upstream_error', {
+      upstreamStatus: 0,
+      upstreamError: 'economy service unreachable',
+    });
+  }
+  const body = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+  if (!res.ok) throw serviceFailure(res.status, body);
+  if (body === null) {
+    throw new HttpError(502, 'dex_swap.upstream_error', {
+      upstreamStatus: res.status,
+      upstreamError: 'economy service returned no JSON body',
+    });
+  }
+  return body;
+}
+
+/** The authenticated account id as the service's rate-limit key. */
+function playerIdFor(ctx: Ctx): string {
+  const accountId = ctx.account?.accountId;
+  // The auth middleware runs before every handler that calls this; a missing
+  // account here is a wiring bug, surfaced as a 401 rather than an anon key.
+  if (typeof accountId !== 'number') throw new HttpError(401, 'auth.token_missing');
+  return String(accountId);
+}
+
+/** The single string value of a query param (arrays reject at the service). */
+function queryParam(ctx: Ctx, key: string): string {
+  const value = ctx.query[key];
+  return String(Array.isArray(value) ? (value[0] ?? '') : (value ?? ''));
 }
 
 // ---------------------------------------------------------------------------
-// Handlers.
+// Handlers: parse the wire, forward, relay. No validation beyond shape: the
+// service owns the rules, so the two layers can never disagree.
 // ---------------------------------------------------------------------------
 
 /**
- * GET /api/dexswap/config: everything the client UI needs to render the buy
- * window (the pinned output mint + its decimals, the input allowlist with
- * decimals for display math, and the slippage ceiling). Reached only when the
- * gate passed, so enabled is true by construction.
+ * GET /api/dexswap/config: the service's config payload verbatim (pinned mint,
+ * decimals, input allowlist, slippage ceiling, feeBps + feeApplied for the
+ * fee-disclosure line). Public read: fetched at boot to gate the launcher.
  */
 async function configHandler(ctx: Ctx): Promise<void> {
-  const decimals = await wocDecimals();
-  return json(ctx.res, 200, {
-    enabled: true,
-    wocMint: wocMint(),
-    wocDecimals: decimals,
-    inputs: DEX_SWAP_INPUTS,
-    maxSlippageBps: maxSlippageBps(),
-  });
+  const body = await forwardToService('/v1/dexswap/config', { method: 'GET' });
+  return json(ctx.res, 200, body);
 }
 
 /**
- * GET /api/dexswap/quote?inputMint&amount&slippageBps: validate against the
- * allowlist + bounds, then proxy Jupiter's quote with outputMint pinned to
- * WOC_MINT and swapMode=ExactIn, both set HERE so the client cannot choose
- * them. Returns Jupiter's quoteResponse verbatim (the client derives price
- * impact + minimum received from it and posts it back to /swap).
+ * GET /api/dexswap/quote?inputMint&amount&slippageBps: forwarded with the
+ * authenticated player id; returns { quoteResponse, feeBps, feeApplied }.
  */
 async function quoteHandler(ctx: Ctx): Promise<void> {
-  const inputMint = queryParam(ctx, 'inputMint');
-  if (!allowedInputMint(inputMint)) throw new HttpError(400, 'dex_swap.input_not_allowed');
-  const amount = parseAmountParam(queryParam(ctx, 'amount'));
-  if (amount === null) throw new HttpError(400, 'dex_swap.invalid_amount');
-  const slippageBps = parseSlippageParam(queryParam(ctx, 'slippageBps'));
-  if (slippageBps === null) throw new HttpError(400, 'dex_swap.invalid_slippage');
-
-  const params = new URLSearchParams({
-    inputMint,
-    outputMint: wocMint(),
-    amount,
-    slippageBps: String(slippageBps),
-    swapMode: 'ExactIn',
+  const search = new URLSearchParams({
+    inputMint: queryParam(ctx, 'inputMint'),
+    amount: queryParam(ctx, 'amount'),
+    slippageBps: queryParam(ctx, 'slippageBps'),
   });
-  const res = await runtime.fetchImpl(`${jupiterBaseUrl()}/swap/v1/quote?${params.toString()}`, {
+  const body = await forwardToService(`/v1/dexswap/quote?${search.toString()}`, {
     method: 'GET',
-    headers: jupiterHeaders(),
+    playerId: playerIdFor(ctx),
   });
-  if (!res.ok) throw jupiterFailure(res.status, await res.text());
-  const quoteResponse: unknown = await res.json();
-  return json(ctx.res, 200, quoteResponse);
+  return json(ctx.res, 200, body);
 }
 
 /**
- * POST /api/dexswap/swap { quoteResponse, userPublicKey }: re-validate the
- * quote's mints (the allowlisted input AND the pinned $WOC output; a tampered
- * outputMint is rejected with a typed error, so this proxy can never be used
- * to build a swap into another token), check the pubkey shape, then proxy
- * Jupiter's swap-transaction build. wrapAndUnwrapSol keeps native SOL usable
- * without a manual wSOL account; dynamicComputeUnitLimit right-sizes the CU
- * budget. Returns { swapTransaction } (a base64 serialized transaction) for the
- * WALLET to sign and send: no key or signature ever exists server-side.
+ * POST /api/dexswap/swap { quoteResponse, userPublicKey }: forwarded verbatim
+ * (the service re-validates the mints and pins the output); returns
+ * { swapTransaction } for the WALLET to sign and send.
  */
 async function swapHandler(ctx: Ctx): Promise<void> {
-  const body = await readBody(ctx.req);
-  const quoteResponse = body.quoteResponse as Record<string, unknown> | undefined;
-  if (!quoteResponse || typeof quoteResponse !== 'object' || Array.isArray(quoteResponse)) {
-    throw new HttpError(400, 'dex_swap.quote_tampered');
-  }
-  if (!allowedInputMint(quoteResponse.inputMint)) {
-    throw new HttpError(400, 'dex_swap.input_not_allowed');
-  }
-  if (quoteResponse.outputMint !== wocMint()) {
-    throw new HttpError(400, 'dex_swap.quote_tampered');
-  }
-  const userPublicKey = body.userPublicKey;
-  if (!isSolanaAddress(userPublicKey)) throw new HttpError(400, 'dex_swap.invalid_public_key');
-
-  const res = await runtime.fetchImpl(`${jupiterBaseUrl()}/swap/v1/swap`, {
+  const clientBody = await readBody(ctx.req);
+  const body = await forwardToService('/v1/dexswap/swap', {
     method: 'POST',
-    headers: jupiterHeaders({ 'Content-Type': 'application/json' }),
+    playerId: playerIdFor(ctx),
     body: JSON.stringify({
-      quoteResponse,
-      userPublicKey,
-      wrapAndUnwrapSol: true,
-      dynamicComputeUnitLimit: true,
+      quoteResponse: clientBody.quoteResponse,
+      userPublicKey: clientBody.userPublicKey,
     }),
   });
-  if (!res.ok) throw jupiterFailure(res.status, await res.text());
-  const data = (await res.json()) as { swapTransaction?: unknown };
-  if (typeof data?.swapTransaction !== 'string' || !data.swapTransaction) {
-    throw upstreamError(res.status, 'swap build returned no transaction');
-  }
-  return json(ctx.res, 200, { swapTransaction: data.swapTransaction });
+  return json(ctx.res, 200, body);
 }
 
 // ---------------------------------------------------------------------------
-// The route table. All three are gate-first (fail-closed 404 when the flag is
-// off). Public like GET /api/woc/balance: quotes read public market data, the
-// swap build binds only to the caller's own pubkey and returns an unsigned
-// transaction only that pubkey's wallet can execute; the server keeps no
-// custody and no account linkage is required to buy.
+// The route table. All three gate-first (fail-closed 404 when the flag is off
+// or the service connection is unconfigured). Config is a public read (boot
+// visibility check); quote and swap require a bearer session, whose account id
+// keys the service's per-player rate limits.
 // ---------------------------------------------------------------------------
 
 export const routes: RouteDef[] = [
@@ -355,14 +291,14 @@ export const routes: RouteDef[] = [
     method: 'GET',
     path: '/api/dexswap/quote',
     surface: 'api',
-    middleware: [dexSwapGate],
+    middleware: [dexSwapGate, dexSwapAuth],
     handler: quoteHandler,
   },
   {
     method: 'POST',
     path: '/api/dexswap/swap',
     surface: 'api',
-    middleware: [dexSwapGate],
+    middleware: [dexSwapGate, dexSwapAuth],
     handler: swapHandler,
   },
 ];

@@ -193,8 +193,11 @@ export const ERROR_CODES = deepFreeze({
   'dex_swap.quote_tampered': { params: [] },
   // Jupiter found no route to $WOC for that amount (no/thin pool liquidity).
   'dex_swap.no_route': { params: [] },
-  // Jupiter or the Solana RPC answered non-200; the bounded upstream status +
-  // error string ride the params, never swallowed.
+  // The economy service's per-player (or global) rate limit refused the call;
+  // retryAfterMs says exactly when the bucket has a token again (UI cooldown).
+  'dex_swap.rate_limited': { params: ['retryAfterMs'] },
+  // The economy service, Jupiter, or the Solana RPC answered non-200; the
+  // bounded upstream status + error string ride the params, never swallowed.
   'dex_swap.upstream_error': { params: ['upstreamStatus', 'upstreamError'] },
 } as const);
 
