@@ -40,8 +40,6 @@ import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
-import { SpriteVisual } from './sprites/sprite_visual';
-import { SPRITE_DEFS } from './sprites/sprite_manifest';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
@@ -92,6 +90,10 @@ import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
+import { spriteLighting } from './sprites/sprite_lighting';
+import { SPRITE_DEFS } from './sprites/sprite_manifest';
+import { updateSpriteShadow } from './sprites/sprite_shadow';
+import { SpriteVisual } from './sprites/sprite_visual';
 import { freezeStaticMatrices } from './static_matrix';
 import { shouldRenderStealthGhost } from './stealth';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
@@ -3300,13 +3302,7 @@ export class Renderer {
         // it to the pool (which self-sizes to demand) instead of disposing it.
         // Use sprite visual if a sprite def exists for this key; otherwise use 3D.
         if (SPRITE_DEFS[visualKey]) {
-          visual = new SpriteVisual(
-            visualKey,
-            e.color,
-            e.skin ?? 0,
-            e.mainhandItemId,
-            null,
-          );
+          visual = new SpriteVisual(visualKey, e.color, e.skin ?? 0, e.mainhandItemId, null);
         } else {
           visual = createCharacterVisual(e);
         }
@@ -4415,6 +4411,17 @@ export class Renderer {
         else if (d2 > ENTITY_SHADOW_RANGE_SQ) animate = ((this.frameIdx + e.id) & 1) === 0;
       }
       active.update(dt, st, animate);
+      // Sprite shadow blob — updates terrain-relative position and slope fade
+      if (active instanceof SpriteVisual && active.shadowBlob) {
+        updateSpriteShadow(
+          active.shadowBlob,
+          active.root,
+          active.height,
+          e.scale,
+          this.camera.position.y,
+          !visuallyDead,
+        );
+      }
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -4631,6 +4638,16 @@ export class Renderer {
     worldStart = markWorldPhase('vfx', worldStart);
 
     this.updateCamera(selfPos, dt);
+    spriteLighting.update(
+      dt,
+      this.camera,
+      this.hemi,
+      this.sun,
+      this.scene.fog as THREE.Fog,
+      this.fogState === 'outdoor' ? zoneBiomeAt(selfPos.z) : null,
+      this.fireLights,
+      this.effectivePointLights,
+    );
     worldStart = markWorldPhase('camera', worldStart);
     // Fully-fogged terrain chunks / tree buckets are dropped before the
     // frustum; camera-ghost props hide against the current eye-to-camera ray.

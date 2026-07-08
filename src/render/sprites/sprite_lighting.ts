@@ -4,7 +4,7 @@
 // color modulation — no per-pixel shadows, no normal mapping — preserving
 // the pixel-art aesthetic while grounding sprites in the 3D world.
 import * as THREE from 'three';
-import { sharedUniforms, SUN_DIR } from '../gfx';
+import { SUN_DIR, sharedUniforms } from '../gfx';
 
 // ---------------------------------------------------------------------------
 // Biome environment tints — very subtle color shifts per biome.
@@ -12,18 +12,18 @@ import { sharedUniforms, SUN_DIR } from '../gfx';
 // ---------------------------------------------------------------------------
 
 const BIOME_TINTS: Record<string, THREE.Vector3> = {
-  vale: new THREE.Vector3(1.0, 1.0, 1.0),           // neutral
-  marsh: new THREE.Vector3(0.92, 1.0, 0.88),        // slight green
-  peaks: new THREE.Vector3(0.95, 0.97, 1.02),       // slight cold
-  beach: new THREE.Vector3(1.02, 1.0, 0.96),        // slight warm
-  desert: new THREE.Vector3(1.04, 0.98, 0.90),      // warm sandy
-  volcano: new THREE.Vector3(0.95, 0.88, 0.82),     // warm dark
-  cave: new THREE.Vector3(0.85, 0.88, 0.92),        // cool dark
-  dungeon: new THREE.Vector3(0.78, 0.80, 0.88),     // cold dark
-  temple: new THREE.Vector3(0.82, 0.88, 0.92),      // cool mystical
-  underwater: new THREE.Vector3(0.70, 0.85, 0.95),  // deep blue
-  nythraxis: new THREE.Vector3(0.75, 0.72, 0.85),   // void purple
-  delve: new THREE.Vector3(0.80, 0.82, 0.88),       // dark stone
+  vale: new THREE.Vector3(1.0, 1.0, 1.0), // neutral
+  marsh: new THREE.Vector3(0.92, 1.0, 0.88), // slight green
+  peaks: new THREE.Vector3(0.95, 0.97, 1.02), // slight cold
+  beach: new THREE.Vector3(1.02, 1.0, 0.96), // slight warm
+  desert: new THREE.Vector3(1.04, 0.98, 0.9), // warm sandy
+  volcano: new THREE.Vector3(0.95, 0.88, 0.82), // warm dark
+  cave: new THREE.Vector3(0.85, 0.88, 0.92), // cool dark
+  dungeon: new THREE.Vector3(0.78, 0.8, 0.88), // cold dark
+  temple: new THREE.Vector3(0.82, 0.88, 0.92), // cool mystical
+  underwater: new THREE.Vector3(0.7, 0.85, 0.95), // deep blue
+  nythraxis: new THREE.Vector3(0.75, 0.72, 0.85), // void purple
+  delve: new THREE.Vector3(0.8, 0.82, 0.88), // dark stone
 };
 
 // ---------------------------------------------------------------------------

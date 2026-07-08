@@ -189,7 +189,9 @@ export function createSpriteMaterial(
     depthWrite: true,
   });
   if (tintColor && tintStrength) {
-    (mat.uniforms.color.value as THREE.Color).copy(new THREE.Color(0xffffff).lerp(tintColor, tintStrength));
+    (mat.uniforms.color.value as THREE.Color).copy(
+      new THREE.Color(0xffffff).lerp(tintColor, tintStrength),
+    );
   }
   return mat;
 }

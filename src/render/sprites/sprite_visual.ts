@@ -9,9 +9,15 @@ import { desiredBaseState } from '../characters/anim_state';
 import { GFX } from '../gfx';
 import type { SpriteAtlas, SpriteMeta, WeaponSlotMeta } from './atlas';
 import { getCachedAtlas, getCachedMeta } from './atlas';
-import { SPRITE_DEFS, WEAPON_OFFSETS, type SpriteDef, weaponSpriteForItem } from './sprite_manifest';
 import { newSpriteLocoState, spriteAnimSpeedScale, updateSpriteLoco } from './sprite_locomotion';
+import {
+  SPRITE_DEFS,
+  type SpriteDef,
+  WEAPON_OFFSETS,
+  weaponSpriteForItem,
+} from './sprite_manifest';
 import { createSpriteMaterial } from './sprite_shader';
+import { createSpriteShadow, disposeSpriteShadow, type SpriteShadow } from './sprite_shadow';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -95,6 +101,7 @@ export class SpriteVisual {
   private weaponMesh: THREE.Mesh | null = null;
   private weaponMaterial: THREE.ShaderMaterial | null = null;
   private shadowProxy: THREE.Mesh | null = null;
+  shadowBlob: SpriteShadow | null = null;
   private farMesh: THREE.Mesh | null = null;
 
   // Atlas / metadata
@@ -191,12 +198,12 @@ export class SpriteVisual {
         this.weaponMesh = new THREE.Mesh(quadGeo(), this.weaponMaterial);
         const off = this.weaponMeta;
         if (off) {
-          this.weaponMesh.scale.set(
-            def.height * off.scale,
-            def.height * off.scale,
-            1,
+          this.weaponMesh.scale.set(def.height * off.scale, def.height * off.scale, 1);
+          this.weaponMesh.position.set(
+            off.offsetX,
+            def.height * off.offsetY + def.height / 2 + (def.hover ?? 0),
+            0.01,
           );
-          this.weaponMesh.position.set(off.offsetX, def.height * off.offsetY + def.height / 2 + (def.hover ?? 0), 0.01);
         }
         this.root.add(this.weaponMesh);
       }
@@ -209,6 +216,8 @@ export class SpriteVisual {
       this.shadowProxy.position.y = 0.01;
       this.shadowProxy.visible = false;
       this.root.add(this.shadowProxy);
+      // Visual shadow blob — gradient circle anchored to terrain
+      this.shadowBlob = createSpriteShadow(this.root);
     }
 
     // Click proxy — invisible cylinder for raycasting
@@ -270,9 +279,11 @@ export class SpriteVisual {
     // Ratio ~0.36 matches the original 0.95/2.6 knight calibration.
     if (s.swimming && !s.dead) {
       const swimLift = this.spriteDef.height * 0.36;
-      this.bodyMesh.position.y = this.spriteDef.height / 2
-        + (this.spriteDef.hover ?? 0)
-        + swimLift + Math.sin(performance.now() / 500) * 0.08;
+      this.bodyMesh.position.y =
+        this.spriteDef.height / 2 +
+        (this.spriteDef.hover ?? 0) +
+        swimLift +
+        Math.sin(performance.now() / 500) * 0.08;
     } else {
       this.bodyMesh.position.y = this.spriteDef.height / 2 + (this.spriteDef.hover ?? 0);
     }
@@ -411,7 +422,9 @@ export class SpriteVisual {
           );
           this.weaponMesh.position.set(
             newOffset.offsetX,
-            this.spriteDef.height * newOffset.offsetY + this.spriteDef.height / 2 + (this.spriteDef.hover ?? 0),
+            this.spriteDef.height * newOffset.offsetY +
+              this.spriteDef.height / 2 +
+              (this.spriteDef.hover ?? 0),
             0.01,
           );
         }
@@ -441,6 +454,7 @@ export class SpriteVisual {
 
   dispose(): void {
     this.disposed = true;
+    if (this.shadowBlob) disposeSpriteShadow(this.shadowBlob, this.root);
     this.root.removeFromParent();
     // Don't dispose shared geometry/materials — they're caches
   }
