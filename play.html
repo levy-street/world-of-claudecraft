@@ -526,27 +526,27 @@
             <div class="server-select" id="server-select" data-mode="online">
               <button type="button" class="server-select-trigger" id="server-select-trigger"
                 aria-haspopup="listbox" aria-expanded="false" aria-controls="server-select-menu"
-                data-i18n-aria="mode.serverAria" aria-label="Select realm: Online or Offline">
+                data-i18n-aria="mode.serverAria" aria-label="Select server mode: Server Online or Server Offline">
                 <span class="server-dot" data-mode="online" aria-hidden="true"></span>
                 <span class="server-select-text">
-                  <span class="server-select-value" id="server-select-value" data-i18n="mode.serverOnline">Online</span>
+                  <span class="server-select-value" id="server-select-value" data-i18n="mode.serverOnline">Server Online</span>
                   <span class="server-select-sub" id="server-select-sub">
                     <span class="server-realm-line" data-mode="online">
-                      <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
+                      <span class="server-stat-line"><b class="stats-value js-stat-accounts">...</b> <span data-i18n="stats.accountsCreated">Total players</span></span>
                     </span>
-                    <span class="server-sub-offline" data-mode="offline" data-i18n="mode.serverOfflineSub" hidden>Instant local world</span>
+                    <span class="server-sub-offline" data-mode="offline" data-i18n="mode.serverOfflineSub" hidden>Local offline world</span>
                   </span>
                 </span>
                 <svg class="server-select-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </button>
-              <ul class="server-select-menu" id="server-select-menu" role="listbox" data-i18n-aria="mode.serverAria" aria-label="Select realm: Online or Offline" hidden>
+              <ul class="server-select-menu" id="server-select-menu" role="listbox" data-i18n-aria="mode.serverAria" aria-label="Select server mode: Server Online or Server Offline" hidden>
                 <li class="server-select-option is-selected" id="server-opt-online" role="option" data-mode="online" tabindex="-1" aria-selected="true">
                   <span class="server-dot" data-mode="online" aria-hidden="true"></span>
                   <span class="server-opt-text">
-                    <span class="server-opt-name" data-i18n="mode.serverOnline">Online</span>
-                    <span class="server-opt-desc" data-i18n="mode.onlineDesc">Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.</span>
+                    <span class="server-opt-name" data-i18n="mode.serverOnline">Server Online</span>
+                    <span class="server-opt-desc" data-i18n="mode.onlineDesc">Play on the live server. Your characters are saved online.</span>
                     <span class="server-opt-stats">
-                      <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
+                      <span class="server-stat-line"><b class="stats-value js-stat-accounts">...</b> <span data-i18n="stats.accountsCreated">Total players</span></span>
                     </span>
                   </span>
                   <svg class="server-opt-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -554,8 +554,8 @@
                 <li class="server-select-option" id="server-opt-offline" role="option" data-mode="offline" tabindex="-1" aria-selected="false">
                   <span class="server-dot" data-mode="offline" aria-hidden="true"></span>
                   <span class="server-opt-text">
-                    <span class="server-opt-name" data-i18n="mode.serverOffline">Offline</span>
-                    <span class="server-opt-desc" data-i18n="mode.offlineDesc">Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.</span>
+                    <span class="server-opt-name" data-i18n="mode.serverOffline">Server Offline</span>
+                    <span class="server-opt-desc" data-i18n="mode.offlineDesc">Play a local offline world in your browser. Nothing is saved.</span>
                   </span>
                   <svg class="server-opt-check" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </li>

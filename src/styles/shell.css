@@ -2040,7 +2040,7 @@
     line-height: 1;
     color: var(--color-text-light);
   }
-  .server-stat-line span {
+  .server-stat-line > span {
     font-family: var(--font-ui);
     line-height: 1;
   }
