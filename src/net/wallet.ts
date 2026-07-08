@@ -4,19 +4,25 @@
 //
 // Lives in src/net/ and is never imported by src/sim/: the deterministic core
 // stays free of network/wallet dependencies.
+
+import { isSolanaChain } from '@solana/wallet-standard-chains';
+import {
+  SolanaSignAndSendTransaction,
+  type SolanaSignAndSendTransactionFeature,
+  SolanaSignMessage,
+  type SolanaSignMessageFeature,
+} from '@solana/wallet-standard-features';
 import { getWallets, type Wallets } from '@wallet-standard/app';
 import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
 import {
   StandardConnect,
-  StandardDisconnect,
-  StandardEvents,
   type StandardConnectFeature,
+  StandardDisconnect,
   type StandardDisconnectFeature,
+  StandardEvents,
   type StandardEventsChangeProperties,
   type StandardEventsFeature,
 } from '@wallet-standard/features';
-import { isSolanaChain } from '@solana/wallet-standard-chains';
-import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
 import bs58 from 'bs58';
 
 export interface WalletState {
@@ -32,16 +38,35 @@ export interface WalletOption {
 }
 
 type CompatibleWallet = Wallet & StandardConnectFeature & SolanaSignMessageFeature;
-type WalletPicker = (wallets: readonly WalletOption[], selectedId: string | null) => Promise<string | null>;
+type WalletPicker = (
+  wallets: readonly WalletOption[],
+  selectedId: string | null,
+) => Promise<string | null>;
 type ConnectApi = StandardConnectFeature[typeof StandardConnect];
 type DisconnectApi = StandardDisconnectFeature[typeof StandardDisconnect];
 type EventsApi = StandardEventsFeature[typeof StandardEvents];
 type SignMessageApi = SolanaSignMessageFeature[typeof SolanaSignMessage];
+type SignAndSendApi = SolanaSignAndSendTransactionFeature[typeof SolanaSignAndSendTransaction];
+
+// Solana mainnet chain identifier (Wallet Standard CAIP-2-style id). The DEX
+// swap flow is mainnet-only: Jupiter routes mainnet liquidity.
+const SOLANA_MAINNET_CHAIN = 'solana:mainnet';
 
 class WalletSelectionCancelled extends Error {
   constructor() {
     super('wallet selection cancelled');
     this.name = 'WalletSelectionCancelled';
+  }
+}
+
+// The connected wallet (or its selected account) does not implement the
+// SolanaSignAndSendTransaction feature. A typed error so the UI can map it to a
+// localized "your wallet cannot send transactions" state instead of showing a
+// raw diagnostic (the message itself stays English, dev-channel only).
+class WalletFeatureUnsupported extends Error {
+  constructor() {
+    super('wallet does not support signing and sending transactions');
+    this.name = 'WalletFeatureUnsupported';
   }
 }
 
@@ -108,15 +133,27 @@ function connectFeature(wallet: CompatibleWallet): ConnectApi {
 }
 
 function disconnectFeature(wallet: Wallet): DisconnectApi | null {
-  return hasDisconnectFeature(wallet) ? wallet.features[StandardDisconnect] as DisconnectApi : null;
+  return hasDisconnectFeature(wallet)
+    ? (wallet.features[StandardDisconnect] as DisconnectApi)
+    : null;
 }
 
 function eventsFeature(wallet: Wallet): EventsApi | null {
-  return hasEventsFeature(wallet) ? wallet.features[StandardEvents] as EventsApi : null;
+  return hasEventsFeature(wallet) ? (wallet.features[StandardEvents] as EventsApi) : null;
 }
 
 function signMessageFeature(wallet: CompatibleWallet): SignMessageApi {
   return wallet.features[SolanaSignMessage] as SignMessageApi;
+}
+
+function signAndSendFeature(wallet: Wallet): SignAndSendApi | null {
+  return SolanaSignAndSendTransaction in wallet.features
+    ? (wallet.features[SolanaSignAndSendTransaction] as SignAndSendApi)
+    : null;
+}
+
+function accountSupportsSignAndSend(account: WalletAccount): boolean {
+  return account.features.includes(SolanaSignAndSendTransaction);
 }
 
 function accountSupportsSolanaSignMessage(account: WalletAccount): boolean {
@@ -124,7 +161,10 @@ function accountSupportsSolanaSignMessage(account: WalletAccount): boolean {
 }
 
 function walletSupportsSolana(wallet: Wallet): boolean {
-  return wallet.chains.some(isSolanaChain) || wallet.accounts.some((account) => account.chains.some(isSolanaChain));
+  return (
+    wallet.chains.some(isSolanaChain) ||
+    wallet.accounts.some((account) => account.chains.some(isSolanaChain))
+  );
 }
 
 function isCompatibleWallet(wallet: Wallet): wallet is CompatibleWallet {
@@ -136,7 +176,10 @@ function compatibleWallets(): CompatibleWallet[] {
   return registry?.get().filter(isCompatibleWallet) ?? [];
 }
 
-function chooseAccount(wallet: CompatibleWallet, accounts: readonly WalletAccount[] = wallet.accounts): WalletAccount | null {
+function chooseAccount(
+  wallet: CompatibleWallet,
+  accounts: readonly WalletAccount[] = wallet.accounts,
+): WalletAccount | null {
   return accounts.find(accountSupportsSolanaSignMessage) ?? null;
 }
 
@@ -156,7 +199,11 @@ function setPickerOpen(open: boolean): void {
   for (const cb of modalListeners) cb(open);
 }
 
-function setSelected(wallet: CompatibleWallet | null, account: WalletAccount | null, persist: boolean): void {
+function setSelected(
+  wallet: CompatibleWallet | null,
+  account: WalletAccount | null,
+  persist: boolean,
+): void {
   const previousAddress = selectedAccount?.address ?? null;
   selectedWallet = wallet;
   selectedAccount = account;
@@ -201,8 +248,11 @@ function findWallet(id: string): CompatibleWallet | null {
 function selectAuthorizedWallet(): boolean {
   const storedName = readStoredWalletName();
   const wallets = compatibleWallets();
-  const storedWallet = storedName ? wallets.find((wallet) => wallet.name === storedName) ?? null : null;
-  const walletWithAccount = storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
+  const storedWallet = storedName
+    ? (wallets.find((wallet) => wallet.name === storedName) ?? null)
+    : null;
+  const walletWithAccount =
+    storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
   if (!walletWithAccount) return false;
   const account = chooseAccount(walletWithAccount);
   attachSelectedWalletEvents(walletWithAccount);
@@ -225,7 +275,8 @@ function trySilentReconnect(): void {
     return;
   }
   selectedWallet = wallet;
-  connectFeature(wallet).connect({ silent: true })
+  connectFeature(wallet)
+    .connect({ silent: true })
     .then((result) => {
       if (selectedWallet !== wallet) return;
       setSelected(wallet, chooseAccount(wallet, result.accounts), true);
@@ -239,7 +290,10 @@ function attachRegistryEvents(): void {
   if (!registry || registryOff || registryUnregisterOff) return;
   registryOff = registry.on('register', (...wallets) => {
     const currentId = selectedWallet ? walletId(selectedWallet) : null;
-    if (currentId && wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))) {
+    if (
+      currentId &&
+      wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))
+    ) {
       trySilentReconnect();
     } else if (!selectedAccount) {
       selectAuthorizedWallet();
@@ -355,8 +409,50 @@ export async function signMessageBase58(message: string): Promise<string> {
   const messageBytes = new TextEncoder().encode(message);
   const results = await signMessageFeature(wallet).signMessage({ account, message: messageBytes });
   const result = results[0];
-  if (!result || !(result.signature instanceof Uint8Array)) throw new Error('wallet returned an invalid signature');
-  if (!bytesEqual(result.signedMessage, messageBytes)) throw new Error('wallet modified the message before signing');
+  if (!result || !(result.signature instanceof Uint8Array))
+    throw new Error('wallet returned an invalid signature');
+  if (!bytesEqual(result.signedMessage, messageBytes))
+    throw new Error('wallet modified the message before signing');
+  return bs58.encode(result.signature);
+}
+
+/** True when the thrown value is the typed missing-feature error (UI maps it to a localized state). */
+export function isWalletFeatureUnsupported(err: unknown): boolean {
+  return err instanceof WalletFeatureUnsupported;
+}
+
+/** Decode a base64 string to raw bytes (browser-native, no Buffer dependency). */
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+/**
+ * Ask the connected wallet to sign AND send a serialized transaction (base64,
+ * e.g. the Jupiter /swap build) on Solana mainnet, returning the transaction
+ * signature base58-encoded (the same encoding signMessageBase58 uses). The
+ * WALLET broadcasts: no key, signature, or send path exists in the app. Throws
+ * the typed WalletFeatureUnsupported (see isWalletFeatureUnsupported) when the
+ * connected wallet or its selected account lacks the
+ * SolanaSignAndSendTransaction feature, so the UI can render a localized state.
+ */
+export async function signAndSendTransactionBase64(txBase64: string): Promise<string> {
+  const wallet = selectedWallet;
+  const account = selectedAccount;
+  if (!wallet || !account) throw new Error('connect a wallet first');
+  const feature = signAndSendFeature(wallet);
+  if (!feature || !accountSupportsSignAndSend(account)) throw new WalletFeatureUnsupported();
+  const results = await feature.signAndSendTransaction({
+    account,
+    transaction: base64ToBytes(txBase64),
+    chain: SOLANA_MAINNET_CHAIN,
+  });
+  const result = results[0];
+  if (!result || !(result.signature instanceof Uint8Array) || result.signature.length === 0) {
+    throw new Error('wallet returned an invalid transaction signature');
+  }
   return bs58.encode(result.signature);
 }
 
