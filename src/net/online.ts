@@ -87,6 +87,112 @@ import {
 import { isTransientReconnectRejection } from './reconnect_policy';
 
 // ---------------------------------------------------------------------------
+// HTTP long-poll transport: fallback when WebSocket is blocked
+// ---------------------------------------------------------------------------
+
+class HTTPTransport {
+  readyState = 0; // CONNECTING
+  private pollAbort: AbortController | null = null;
+  private closed = false;
+
+  constructor(
+    private readonly base: string,
+    private readonly token: string,
+    private readonly characterId: number,
+    private readonly clientSeed: string,
+    private readonly onMessage: (raw: string) => void,
+    private readonly onOpen: () => void,
+    private readonly onClose: () => void,
+  ) {
+    void this.connect();
+  }
+
+  private async connect(): Promise<void> {
+    try {
+      const url = `${this.base}/api/transport/connect`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: this.token,
+          character: this.characterId,
+          clientSeed: this.clientSeed,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.sessionId) {
+        this.readyState = 3; // CLOSED
+        this.onClose();
+        return;
+      }
+      this.readyState = 1; // OPEN
+      this.sessionId = data.sessionId;
+      this.onOpen();
+      this.poll();
+    } catch {
+      this.readyState = 3;
+      this.onClose();
+    }
+  }
+
+  private sessionId = '';
+
+  private async poll(): Promise<void> {
+    while (!this.closed && this.readyState === 1) {
+      this.pollAbort = new AbortController();
+      try {
+        const url = `${this.base}/api/transport/poll?sessionId=${encodeURIComponent(this.sessionId)}`;
+        const res = await fetch(url, { signal: this.pollAbort.signal });
+        const data = await res.json();
+        if (data.closed || this.closed) {
+          this.readyState = 3;
+          this.onClose();
+          return;
+        }
+        if (Array.isArray(data.messages)) {
+          for (const msg of data.messages) {
+            this.onMessage(msg);
+          }
+        }
+      } catch (e: unknown) {
+        if (this.closed) return;
+        if ((e as Error)?.name === 'AbortError') continue;
+        // Network error: wait before retrying
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+    }
+  }
+
+  send(payload: string): void {
+    if (this.readyState !== 1 || this.closed || !this.sessionId) return;
+    const url = `${this.base}/api/transport/send`;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: this.sessionId, payload }),
+    }).catch(() => {
+      /* best-effort: server will close the session on timeout */
+    });
+  }
+
+  close(): void {
+    if (this.closed) return;
+    this.closed = true;
+    this.readyState = 3;
+    this.pollAbort?.abort();
+    // Best-effort server-side cleanup
+    if (this.sessionId) {
+      const url = `${this.base}/api/transport/close`;
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: this.sessionId }),
+      }).catch(() => {});
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // REST
 // ---------------------------------------------------------------------------
 
@@ -1055,6 +1161,7 @@ export class ClientWorld implements IWorld {
 
   // assigned by openSocket() from the ctor, and reassigned on every reconnect
   private ws!: WebSocket;
+  private httpTransport: HTTPTransport | null = null;
   private readonly token: string;
   private readonly base: string;
   private readonly clientSeed: string;
@@ -1098,6 +1205,34 @@ export class ClientWorld implements IWorld {
     const wsUrl = this.base
       ? `${this.base.replace(/^http/, 'ws')}/ws`
       : buildWebSocketUrl(location.protocol, location.host);
+
+    // Try WebSocket first; fall back to HTTP long-poll if blocked
+    try {
+      const testWs = new WebSocket(wsUrl);
+      testWs.onopen = () => {
+        // WebSocket works — use it
+        testWs.close();
+        this.startWsTransport(wsUrl);
+      };
+      testWs.onerror = () => {
+        // WebSocket blocked — fall back to HTTP transport
+        testWs.close();
+        this.startHttpTransport();
+      };
+      // Timeout: if WS doesn't open within 3s, assume blocked
+      setTimeout(() => {
+        if (testWs.readyState === WebSocket.CONNECTING) {
+          testWs.close();
+          this.startHttpTransport();
+        }
+      }, 3000);
+    } catch {
+      this.startHttpTransport();
+    }
+  }
+
+  private startWsTransport(wsUrl: string): void {
+    this.httpTransport = null;
     this.ws = new WebSocket(wsUrl);
     this.ws.onopen = () => {
       this.ws.send(
@@ -1106,6 +1241,23 @@ export class ClientWorld implements IWorld {
     };
     this.ws.onmessage = (ev) => this.onMessage(String(ev.data));
     this.ws.onclose = () => this.socketClosed();
+  }
+
+  private startHttpTransport(): void {
+    this.httpTransport = new HTTPTransport(
+      this.base || `${location.protocol}//${location.host}`,
+      this.token,
+      this.characterId,
+      this.clientSeed,
+      (raw) => this.onMessage(raw),
+      () => {
+        // HTTP transport open: send auth message
+        this.httpTransport?.send(
+          JSON.stringify(buildWebSocketAuthMessage(this.token, this.characterId, this.clientSeed)),
+        );
+      },
+      () => this.socketClosed(),
+    );
   }
 
   // A dropped socket schedules a reconnect with exponential backoff: the
@@ -1137,8 +1289,13 @@ export class ClientWorld implements IWorld {
     this.sessionEnded = true;
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
-    this.ws.onclose = null;
-    this.ws.close();
+    if (this.httpTransport) {
+      this.httpTransport.close();
+      this.httpTransport = null;
+    } else {
+      this.ws.onclose = null;
+      this.ws.close();
+    }
   }
 
   get player(): Entity {
@@ -1197,11 +1354,7 @@ export class ClientWorld implements IWorld {
   }
 
   private sendInput(now = performance.now(), changedOnly = false): boolean {
-    if (
-      typeof this.spectating === 'string' ||
-      !this.connected ||
-      this.ws.readyState !== WebSocket.OPEN
-    ) {
+    if (typeof this.spectating === 'string' || !this.connected || !this.isTransportOpen()) {
       return false;
     }
     const sig = this.inputSignature();
@@ -1224,7 +1377,7 @@ export class ClientWorld implements IWorld {
       },
     };
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
-    this.ws.send(JSON.stringify(msg));
+    this.sendRaw(JSON.stringify(msg));
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
     this.pendingInputSeqSentAt.set(this.inputSeq, now);
@@ -1237,13 +1390,26 @@ export class ClientWorld implements IWorld {
     return true;
   }
 
+  private isTransportOpen(): boolean {
+    if (this.httpTransport) return this.httpTransport.readyState === 1;
+    return this.ws.readyState === WebSocket.OPEN;
+  }
+
+  private sendRaw(payload: string): void {
+    if (this.httpTransport) {
+      this.httpTransport.send(payload);
+    } else {
+      this.ws.send(payload);
+    }
+  }
+
   private canSendCommand(): boolean {
-    return this.connected && this.ws.readyState === WebSocket.OPEN;
+    return this.connected && this.isTransportOpen();
   }
 
   private rawCmd(payload: Record<string, unknown>): void {
     if (!this.canSendCommand()) return;
-    this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
+    this.sendRaw(JSON.stringify({ t: 'cmd', ...payload }));
   }
 
   // Typed IWorld command send (W0b): `cmd` must be a ClientCommand, i.e. a token

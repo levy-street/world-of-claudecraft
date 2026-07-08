@@ -40,6 +40,8 @@ import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
+import { SpriteVisual } from './sprites/sprite_visual';
+import { SPRITE_DEFS } from './sprites/sprite_manifest';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
@@ -470,16 +472,19 @@ function selfSnapshotAlpha(alpha: number, lead: number): number {
   return Math.min(1.25, alpha + Math.max(0, lead));
 }
 
+/** Any visual type — CharacterVisual (3D rigged) or SpriteVisual (2D billboard). */
+export type AnyVisual = CharacterVisual | SpriteVisual;
+
 export interface EntityView {
   group: THREE.Group;
-  /** rigged glTF visual for characters; null for object views (doors/crates) */
-  visual: CharacterVisual | null;
+  /** rigged glTF visual or sprite visual for characters; null for object views */
+  visual: AnyVisual | null;
   visualKey: string | null;
   visualPoolKey: string | null;
-  sheepVisual: CharacterVisual | null; // polymorph form, built lazily
-  bearVisual: CharacterVisual | null; // druid bear form, built lazily
-  catVisual: CharacterVisual | null; // druid cat form, built lazily
-  travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
+  sheepVisual: AnyVisual | null; // polymorph form, built lazily
+  bearVisual: AnyVisual | null; // druid bear form, built lazily
+  catVisual: AnyVisual | null; // druid cat form, built lazily
+  travelVisual: AnyVisual | null; // druid travel form (chicken-cow), built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
@@ -950,7 +955,8 @@ export class Renderer {
   private renderDiagnosticsLastTextures = 0;
   private appliedBudgetLevels: RenderBudgetState['levels'] | null = null;
   private lastQualityChange: Omit<RendererQualityChangeStats, 'ageMs'> | null = null;
-  private visualPool = new Map<string, CharacterVisual[]>();
+  private visualPool = new Map<string, AnyVisual[]>();
+  private spriteVisualPool = new Map<string, SpriteVisual[]>();
   private objectPool = new Map<string, PooledObjectView[]>();
 
   constructor(
@@ -2136,7 +2142,7 @@ export class Renderer {
     return null;
   }
 
-  private takePooledVisual(key: string): CharacterVisual | null {
+  private takePooledVisual(key: string): AnyVisual | null {
     const pool = this.visualPool.get(key);
     const visual = pool?.pop() ?? null;
     if (!visual) return null;
@@ -2150,7 +2156,7 @@ export class Renderer {
     return visual;
   }
 
-  private storePooledVisual(key: string, visual: CharacterVisual): void {
+  private storePooledVisual(key: string, visual: AnyVisual): void {
     visual.root.removeFromParent();
     visual.root.visible = false;
     visual.root.position.set(0, 0, 0);
@@ -2216,8 +2222,12 @@ export class Renderer {
       if (!template) return;
       for (let i = 0; i < copies; i++) {
         const entity = this.prewarmEntity('mob', template.id, template.color, template.scale);
-        builtModels.add(visualKeyFor(entity));
-        const visual = createCharacterVisual(entity);
+        const modelKey = visualKeyFor(entity);
+        builtModels.add(modelKey);
+        const visual = SPRITE_DEFS[modelKey]
+          ? new SpriteVisual(modelKey, entity.color, 0, null, null)
+          : createCharacterVisual(entity);
+        if (!visual) continue; // deferred asset not loaded yet, skip prewarm
         const poolKey = this.visualPoolKeyFor(entity);
         if (poolKey) this.storePooledVisual(poolKey, visual);
         visual.root.visible = true;
@@ -2264,7 +2274,10 @@ export class Renderer {
       const modelKey = visualKeyFor(entity);
       if (builtModels.has(modelKey)) continue;
       builtModels.add(modelKey);
-      const visual = createCharacterVisual(entity);
+      const visual = SPRITE_DEFS[modelKey]
+        ? new SpriteVisual(modelKey, entity.color, entity.skin ?? 0, null, null)
+        : createCharacterVisual(entity);
+      if (!visual) continue; // deferred asset not loaded yet, skip prewarm
       const poolKey = this.visualPoolKeyFor(entity);
       if (poolKey) this.storePooledVisual(poolKey, visual);
       visual.root.visible = true;
@@ -2292,7 +2305,11 @@ export class Renderer {
         if (performance.now() >= deadline) return { group, visualCount: idx };
         const color = CLASSES[cls]?.color ?? 0xffffff;
         const entity = this.prewarmEntity('player', cls, color, 1, skin, -11_000 - idx);
-        const visual = createCharacterVisual(entity);
+        const visualKey = `player_${cls}`;
+        const visual = SPRITE_DEFS[visualKey]
+          ? new SpriteVisual(visualKey, color, skin, null, null)
+          : createCharacterVisual(entity);
+        if (!visual) continue;
         visual.root.visible = true;
         place(visual.root);
       }
@@ -3181,7 +3198,7 @@ export class Renderer {
   private createView(e: Entity): void {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
-    let visual: CharacterVisual | null = null;
+    let visual: AnyVisual | null = null;
     let body: THREE.Group | null = null; // object views build meshes into this
     let height = 1.2;
     let sparkle: THREE.Sprite | undefined;
@@ -3280,18 +3297,26 @@ export class Renderer {
       visual = visualPoolKey ? this.takePooledVisual(visualPoolKey) : null;
       if (!visual) {
         // Pool MISS: build a fresh visual but KEEP its pool key so removeView returns
-        // it to the pool (which self-sizes to demand) instead of disposing it. Disposing
-        // a skinned visual frees its Skeleton's bone-matrix DataTexture; re-creating it
-        // when the entity streams back re-uploads that texture - the open-world
-        // "asset-upload" travel hitch. Before, only the few prewarm-seeded copies were
-        // ever recycled, so every mob past that count churned. Key is per-template, so
-        // the pool stays bounded by the peak simultaneous count.
-        visual = createCharacterVisual(e);
+        // it to the pool (which self-sizes to demand) instead of disposing it.
+        // Use sprite visual if a sprite def exists for this key; otherwise use 3D.
+        if (SPRITE_DEFS[visualKey]) {
+          visual = new SpriteVisual(
+            visualKey,
+            e.color,
+            e.skin ?? 0,
+            e.mainhandItemId,
+            null,
+          );
+        } else {
+          visual = createCharacterVisual(e);
+        }
       }
       // entity scale is applied to the whole group below, so it can update live
       // (Fiesta size buffs) and also scale lazily-built form visuals for free.
-      group.add(visual.root);
-      height = visual.height;
+      if (visual) {
+        group.add(visual.root);
+        height = visual.height;
+      }
     }
 
     let clickTarget: THREE.Object3D;
@@ -3516,7 +3541,7 @@ export class Renderer {
   }
 
   /** The visual the player currently sees (form swaps hide the base rig). */
-  private activeVisual(v: EntityView): CharacterVisual | null {
+  private activeVisual(v: EntityView): AnyVisual | null {
     if (v.sheepVisual?.root.visible) return v.sheepVisual;
     if (v.bearVisual?.root.visible) return v.bearVisual;
     if (v.catVisual?.root.visible) return v.catVisual;
@@ -3534,9 +3559,17 @@ export class Renderer {
       );
       return;
     }
-    const next = createCharacterVisual(e);
+    // Create the new visual — sprite if a sprite def exists, otherwise 3D
+    let next: AnyVisual | null;
+    if (SPRITE_DEFS[nextKey]) {
+      next = new SpriteVisual(nextKey, e.color, e.skin ?? 0, e.mainhandItemId, null);
+    } else {
+      next = createCharacterVisual(e);
+    }
+    if (!next) return; // deferred asset not loaded yet, keep old visual, retry next frame
     next.setShadow(v.shadowOn);
     next.setFar(v.isFar);
+    next.setWeapon(e.mainhandItemId);
     next.root.visible = v.visual.root.visible;
     const oldClickTarget = v.clickTarget;
     const idx = this.clickTargets.indexOf(oldClickTarget);
@@ -4233,20 +4266,28 @@ export class Renderer {
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       if (polyed && !v.sheepVisual) {
-        v.sheepVisual = createCharacterVisual(e, 'form_sheep');
-        v.group.add(v.sheepVisual.root); // group.scale already carries e.scale
+        v.sheepVisual = SPRITE_DEFS['form_sheep']
+          ? new SpriteVisual('form_sheep', e.color, 0, null, null)
+          : createCharacterVisual(e, 'form_sheep');
+        if (v.sheepVisual) v.group.add(v.sheepVisual.root); // group.scale already carries e.scale
       }
       if (bear && !v.bearVisual) {
-        v.bearVisual = createCharacterVisual(e, 'form_bear');
-        v.group.add(v.bearVisual.root);
+        v.bearVisual = SPRITE_DEFS['form_bear']
+          ? new SpriteVisual('form_bear', e.color, 0, null, null)
+          : createCharacterVisual(e, 'form_bear');
+        if (v.bearVisual) v.group.add(v.bearVisual.root);
       }
       if (cat && !v.catVisual) {
-        v.catVisual = createCharacterVisual(e, 'form_cat');
-        v.group.add(v.catVisual.root);
+        v.catVisual = SPRITE_DEFS['form_cat']
+          ? new SpriteVisual('form_cat', e.color, 0, null, null)
+          : createCharacterVisual(e, 'form_cat');
+        if (v.catVisual) v.group.add(v.catVisual.root);
       }
       if (travel && !v.travelVisual) {
-        v.travelVisual = createCharacterVisual(e, 'form_travel');
-        v.group.add(v.travelVisual.root);
+        v.travelVisual = SPRITE_DEFS['form_travel']
+          ? new SpriteVisual('form_travel', e.color, 0, null, null)
+          : createCharacterVisual(e, 'form_travel');
+        if (v.travelVisual) v.group.add(v.travelVisual.root);
       }
       if (v.sheepVisual) v.sheepVisual.root.visible = polyed;
       if (v.bearVisual) v.bearVisual.root.visible = bear;
@@ -4273,6 +4314,17 @@ export class Renderer {
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
+
+      // True billboard for sprites: rotate the active visual's root so the flat
+      // quad faces the camera.  root.rotation.y = camYaw − facing means the
+      // root's world rotation = camYaw.  The sprite's bodyMesh stays at
+      // rotation.y = 0 (no counter-rotation) so its world rotation = camYaw —
+      // always front-on to the viewer regardless of entity heading.
+      if (active instanceof SpriteVisual) {
+        const dx = this.camera.position.x - x;
+        const dz = this.camera.position.z - z;
+        active.root.rotation.y = Math.atan2(dx, dz) - facing;
+      }
 
       // animation state machine inputs, derived from render-space motion with
       // hysteresis so a one-frame speed dip can't reset the walk clip.
@@ -5061,7 +5113,11 @@ export class Renderer {
     const px = selfPos.x;
     const py = selfPos.y;
     const pz = selfPos.z;
-    const eyeY = py + 2.0;
+    // Dynamic eye height: track the player visual's actual height so the camera
+    // aims at chest level for both tall (2.6u knight) and short (1.0u fox) forms.
+    const pv = this.views.get(p.id);
+    const viewH = pv?.height ?? 2.6;
+    const eyeY = py + viewH * 0.6;
     let cx = px - Math.sin(this.camYaw) * Math.cos(this.camPitch) * this.camDist;
     let cy = eyeY + Math.sin(this.camPitch) * this.camDist;
     let cz = pz - Math.cos(this.camYaw) * Math.cos(this.camPitch) * this.camDist;

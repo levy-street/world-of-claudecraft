@@ -10,12 +10,15 @@ export { CharacterPreview } from './preview';
 export type { PreviewAppearance } from './preview_appearance';
 export type { AnimState } from './visual';
 export { CharacterVisual } from './visual';
+export { lazyLoadVisual } from './assets';
 
-/** Build the visual for an entity (or an explicit shapeshift/polymorph form key). */
+/** Build the visual for an entity (or an explicit shapeshift/polymorph form key).
+ *  Returns null when a deferred asset hasn't loaded yet — the renderer should
+ *  skip the entity and retry next frame. */
 export function createCharacterVisual(
   e: Entity,
   formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel',
-): CharacterVisual {
+): CharacterVisual | null {
   // forms (sheep/bear/cat/travel) are their own models — skins and held weapons
   // only apply to the base body
   const key = formKey ?? visualKeyFor(e);
@@ -26,11 +29,16 @@ export function createCharacterVisual(
     !formKey && key === 'player_mech' && e.kind === 'player'
       ? mechHeldWeaponOverride(e.templateId as PlayerClass)
       : null;
-  return new CharacterVisual(
-    key,
-    e.color,
-    formKey ? 0 : (e.skin ?? 0),
-    formKey ? null : e.mainhandItemId,
-    weaponOverride,
-  );
+  try {
+    return new CharacterVisual(
+      key,
+      e.color,
+      formKey ? 0 : (e.skin ?? 0),
+      formKey ? null : e.mainhandItemId,
+      weaponOverride,
+    );
+  } catch {
+    // prepareVisual returned null (deferred asset not loaded) or other error
+    return null;
+  }
 }

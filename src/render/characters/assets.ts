@@ -16,6 +16,7 @@ import { addRimGlow, GFX } from '../gfx';
 import {
   type AttachDef,
   characterPreloadUrls,
+  isVisualDeferred,
   itemWeaponModelUrl,
   SKIN_EMISSIVE,
   SKINS,
@@ -395,11 +396,63 @@ export function mechAssetsReady(): boolean {
   );
 }
 
-function resolvedGltf(url: string): GLTF {
+function resolvedGltf(url: string): GLTF | null {
   const resolvedUrl = assetUrl(url);
   const g = gltfByUrl.get(resolvedUrl);
-  if (!g) throw new Error(`character asset not preloaded: ${resolvedUrl}`);
+  if (!g) {
+    // Check if this is a deferred asset that can be lazy-loaded
+    // Find the visual key for this URL
+    for (const [key, def] of Object.entries(VISUALS)) {
+      if (assetUrl(def.url) === resolvedUrl && isVisualDeferred(key)) {
+        lazyLoadVisual(key);
+        return null;
+      }
+    }
+    throw new Error(`character asset not preloaded: ${resolvedUrl}`);
+  }
   return g;
+}
+
+// In-flight lazy loads to avoid duplicate fetches
+const lazyLoadsInProgress = new Map<string, Promise<void>>();
+
+/**
+ * Lazy-load a deferred visual's GLB on demand. Returns a promise that resolves
+ * once the asset is cached (so the caller can re-read prepareVisual).
+ * No-op for non-deferred or already-loaded visuals.
+ */
+export function lazyLoadVisual(key: string): Promise<void> | null {
+  const def = VISUALS[key];
+  if (!def || !isVisualDeferred(key)) return null;
+  const resolvedUrl = assetUrl(def.url);
+  if (gltfByUrl.has(resolvedUrl)) return null; // already loaded
+  const inflight = lazyLoadsInProgress.get(resolvedUrl);
+  if (inflight) return inflight;
+  const job = loadGltf(def.url)
+    .then((g) => {
+      gltfByUrl.set(resolvedUrl, g);
+      // Also load anim URLs if any
+      for (const animUrl of def.animUrls ?? []) {
+        const resolvedAnimUrl = assetUrl(animUrl);
+        if (!gltfByUrl.has(resolvedAnimUrl)) {
+          loadGltf(animUrl).then((ag) => gltfByUrl.set(resolvedAnimUrl, ag)).catch(() => {});
+        }
+      }
+      // Also load attach URLs
+      for (const a of def.attach ?? []) {
+        const resolvedAttachUrl = assetUrl(a.url);
+        if (!gltfByUrl.has(resolvedAttachUrl)) {
+          loadGltf(a.url).then((ag) => gltfByUrl.set(resolvedAttachUrl, ag)).catch(() => {});
+        }
+      }
+      lazyLoadsInProgress.delete(resolvedUrl);
+    })
+    .catch((err) => {
+      console.warn(`lazy load failed for ${key}:`, err);
+      lazyLoadsInProgress.delete(resolvedUrl);
+    });
+  lazyLoadsInProgress.set(resolvedUrl, job);
+  return job;
 }
 
 // ---------------------------------------------------------------------------
@@ -711,17 +764,21 @@ export interface PreparedVisual {
 
 const prepared = new Map<string, PreparedVisual>();
 
-export function prepareVisual(key: string): PreparedVisual {
+export function prepareVisual(key: string): PreparedVisual | null {
   const hit = prepared.get(key);
   if (hit) return hit;
   const def = VISUALS[key];
   if (!def) throw new Error(`unknown visual key: ${key}`);
   const gltf = resolvedGltf(def.url);
+  if (!gltf) return null; // deferred asset not loaded yet
 
   const clips = new Map<string, THREE.AnimationClip>();
   for (const clip of gltf.animations) clips.set(clip.name, clip);
   for (const url of def.animUrls ?? []) {
-    for (const clip of resolvedGltf(url).animations) clips.set(clip.name, clip);
+    const animGltf = resolvedGltf(url);
+    if (animGltf) {
+      for (const clip of animGltf.animations) clips.set(clip.name, clip);
+    }
   }
 
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh.
