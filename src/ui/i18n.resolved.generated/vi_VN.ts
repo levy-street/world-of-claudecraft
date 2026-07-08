@@ -3648,6 +3648,11 @@ export const vi_VN: EnTranslations = {
     "cancel": "Hủy",
     "confirm": "Xóa Vĩnh Viễn"
   },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "Chỉ Số Khởi Đầu",

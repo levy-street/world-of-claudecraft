@@ -3648,6 +3648,11 @@ export const sv_SE: EnTranslations = {
     "cancel": "Avbryt",
     "confirm": "Radera permanent"
   },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "Startvärden",

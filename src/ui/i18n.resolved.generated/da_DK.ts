@@ -3648,6 +3648,11 @@ export const da_DK: EnTranslations = {
     "cancel": "Annuller",
     "confirm": "Slet Permanent"
   },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "Startværdier",

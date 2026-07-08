@@ -84,6 +84,13 @@ import {
   sortCharacters,
 } from './net/char_sort';
 import { charselectPrimaryAction } from './net/charselect_action';
+import {
+  GLITCH_CHAR_ACTION,
+  GLITCH_CHAR_STEP_KEY,
+  type GlitchCharselectAction,
+  type GlitchChosenCharacter,
+  glitchCharselectAction,
+} from './net/glitch_charselect';
 import { createNativeAttestationProof } from './net/native_attestation';
 import {
   Api,
@@ -2837,23 +2844,22 @@ async function startGlitchAuthenticatedGame(session: GlitchSession): Promise<voi
     level: login.character.level,
   });
   startGlitchInstallHeartbeat({ session });
-  if (login.character.online) {
-    glitchBehavior.track('glitch_auth', 'takeover_existing_character');
-    await api.takeoverCharacter(login.character.id);
-  }
-  await enterWorld({ ...login.character, online: false }, undefined, { glitchBehavior });
+  showGlitchCharacterGate(session, glitchBehavior, login);
 }
 
 async function maybeStartGlitchLaunch(): Promise<boolean> {
   if (!GLITCH_CONFIG.enabled || !parseGlitchLaunchInstallId(location.search)) return false;
-  enterLoadingState(t('loading.connectingRealm'));
+  showLoadingScreen(t('loading.connectingRealm'));
   try {
     const session = await bootstrapGlitchSession({
       config: GLITCH_CONFIG,
       storage: window.localStorage,
       search: location.search,
     });
-    if (!session?.launchedByGlitch) return false;
+    if (!session?.launchedByGlitch) {
+      hideLoadingScreen();
+      return false;
+    }
     await startGlitchAuthenticatedGame(session);
     return true;
   } catch (err) {
@@ -2883,6 +2889,17 @@ let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
+interface GlitchCharselectState {
+  session: GlitchSession;
+  behavior: GlitchBehaviorTracker;
+  existing: CharacterSummary;
+  userName: string;
+  nameEditTracked: boolean;
+}
+
+let glitchCharselectState: GlitchCharselectState | null = null;
+let pendingGlitchReroll: { chosen: GlitchChosenCharacter; action: GlitchCharselectAction } | null =
+  null;
 
 function releaseStartScreenPreview(): void {
   if (!characterPreview) return;
@@ -2987,14 +3004,282 @@ function refreshOfflineSkins(cls: PlayerClass): void {
   });
 }
 
-/** Reset to the default skin and (re)render the online creation picker for a class. */
-function refreshOnlineSkins(cls: PlayerClass): void {
-  onlineSkin = 0;
-  characterPreview?.setSkin(0);
-  renderSkinPicker('#online-skin-row', cls, 0, (i) => {
+function clampSkinForClass(cls: PlayerClass, skin: number): number {
+  const count = skinCount(`player_${cls}`);
+  if (count <= 0) return 0;
+  return Math.max(0, Math.min(count - 1, Math.floor(skin)));
+}
+
+function setOnlineSkinPicker(cls: PlayerClass, skin: number): void {
+  const nextSkin = clampSkinForClass(cls, skin);
+  onlineSkin = nextSkin;
+  characterPreview?.setSkin(nextSkin);
+  renderSkinPicker('#online-skin-row', cls, nextSkin, (i) => {
     onlineSkin = i;
     characterPreview?.setSkin(i);
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.selectAppearance, {
+      class_key: cls,
+      skin: i,
+      changed: glitchCharselectState ? i !== glitchCharselectState.existing.skin : false,
+    });
   });
+}
+
+/** Reset to the default skin and (re)render the online creation picker for a class. */
+function refreshOnlineSkins(cls: PlayerClass): void {
+  setOnlineSkinPicker(cls, 0);
+}
+
+function currentGlitchChosenCharacter(): GlitchChosenCharacter | null {
+  const clsEl = document.querySelector('#charcreate-panel .mini-class.sel') as HTMLElement | null;
+  if (!clsEl?.dataset.class) return null;
+  const nameInput = $('#new-char-name') as HTMLInputElement;
+  return {
+    class: clsEl.dataset.class as PlayerClass,
+    skin: selectedSkin('#online-skin-row', onlineSkin),
+    name: nameInput.value.trim(),
+  };
+}
+
+function glitchCharMetadata(
+  chosen: GlitchChosenCharacter | null = currentGlitchChosenCharacter(),
+  extra: Record<string, string | number | boolean | null> = {},
+): Record<string, string | number | boolean | null> {
+  const state = glitchCharselectState;
+  return {
+    existing_class: state?.existing.class ?? null,
+    existing_level: state?.existing.level ?? null,
+    existing_skin: state?.existing.skin ?? null,
+    existing_online: state?.existing.online ?? null,
+    force_rename: state?.existing.forceRename ?? null,
+    chosen_class: chosen?.class ?? null,
+    chosen_skin: chosen?.skin ?? null,
+    name_changed: state && chosen ? chosen.name.trim() !== state.existing.name.trim() : null,
+    class_changed: state && chosen ? chosen.class !== state.existing.class : null,
+    skin_changed: state && chosen ? chosen.skin !== state.existing.skin : null,
+    ...extra,
+  };
+}
+
+function trackGlitchCharAction(
+  actionKey: (typeof GLITCH_CHAR_ACTION)[keyof typeof GLITCH_CHAR_ACTION],
+  metadata: Record<string, string | number | boolean | null> = {},
+): void {
+  const state = glitchCharselectState;
+  if (!state) return;
+  state.behavior.track(
+    GLITCH_CHAR_STEP_KEY,
+    actionKey,
+    glitchCharMetadata(currentGlitchChosenCharacter(), metadata),
+  );
+}
+
+function setCharcreateSelection(cls: PlayerClass, skin: number): void {
+  document.querySelectorAll('#charcreate-panel .mini-class').forEach((el) => {
+    const selected = (el as HTMLElement).dataset.class === cls;
+    el.classList.toggle('sel', selected);
+    el.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+  renderClassDetails('charcreate-class-details', cls);
+  characterPreview?.setClass(cls);
+  setOnlineSkinPicker(cls, skin);
+}
+
+function showGlitchCharacterGate(
+  session: GlitchSession,
+  behavior: GlitchBehaviorTracker,
+  login: Awaited<ReturnType<Api['glitchLogin']>>,
+): void {
+  const existing = { ...login.character };
+  glitchCharselectState = {
+    session,
+    behavior,
+    existing,
+    userName: login.username || session.userName,
+    nameEditTracked: false,
+  };
+  document.body.classList.add('glitch-mode');
+  const startScreen = document.getElementById('start-screen');
+  if (startScreen) startScreen.style.display = '';
+  const userEl = document.getElementById('glitch-user');
+  if (userEl) {
+    userEl.hidden = false;
+    userEl.textContent = glitchCharselectState.userName;
+  }
+  const createBtn = $('#btn-create-char') as HTMLButtonElement;
+  createBtn.setAttribute('data-i18n', 'auth.enterWorld');
+  createBtn.textContent = t('auth.enterWorld');
+  const nameInput = $('#new-char-name') as HTMLInputElement;
+  nameInput.value = existing.name;
+  nameInput.classList.remove('user-invalid-fallback');
+  nameInput.removeAttribute('aria-invalid');
+  $('#charselect-error').textContent = '';
+  show('#charcreate-panel');
+  setCharcreateSelection(existing.class, existing.skin ?? 0);
+  hideLoadingScreen();
+  trackGlitchCharAction(GLITCH_CHAR_ACTION.open);
+  nameInput.focus();
+}
+
+function setGlitchCharacterBlock(reason: GlitchCharselectAction['reason']): void {
+  const errorEl = $('#charselect-error');
+  const nameInput = $('#new-char-name') as HTMLInputElement;
+  switch (reason) {
+    case 'name_required':
+      errorEl.textContent = t('errors.characterNameRequired');
+      nameInput.classList.add('user-invalid-fallback');
+      nameInput.setAttribute('aria-invalid', 'true');
+      nameInput.focus();
+      return;
+    case 'name_invalid':
+      errorEl.textContent = t('errors.characterNameInvalid');
+      nameInput.classList.add('user-invalid-fallback');
+      nameInput.setAttribute('aria-invalid', 'true');
+      nameInput.focus();
+      return;
+    case 'rename_required':
+      errorEl.textContent = t('errors.api.renameBeforeEntering');
+      nameInput.focus();
+      return;
+    default:
+      errorEl.textContent = t('errors.pickClass');
+  }
+}
+
+function openGlitchRerollDialog(
+  chosen: GlitchChosenCharacter,
+  action: GlitchCharselectAction,
+): void {
+  const state = glitchCharselectState;
+  if (!state) return;
+  pendingGlitchReroll = { chosen, action };
+  const modal = $('#glitch-reroll-modal');
+  const body = $('#glitch-reroll-body');
+  body.textContent = t('deleteCharacter.body', { name: state.existing.name });
+  modal.removeAttribute('hidden');
+  trackGlitchCharAction(GLITCH_CHAR_ACTION.rerollConfirmShown, {
+    action_kind: action.kind,
+  });
+  ($('#btn-glitch-reroll-cancel') as HTMLButtonElement).focus();
+}
+
+function closeGlitchRerollDialog(trackCancel = false): void {
+  if (trackCancel && pendingGlitchReroll) {
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.rerollConfirmCancel, {
+      action_kind: pendingGlitchReroll.action.kind,
+    });
+  }
+  pendingGlitchReroll = null;
+  $('#glitch-reroll-modal').setAttribute('hidden', '');
+}
+
+async function submitGlitchCharacter(button: HTMLButtonElement): Promise<void> {
+  const state = glitchCharselectState;
+  const chosen = currentGlitchChosenCharacter();
+  if (!state || !chosen) {
+    $('#charselect-error').textContent = t('errors.pickClass');
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.error, { reason: 'class_missing' });
+    return;
+  }
+
+  const action = glitchCharselectAction({
+    existing: state.existing,
+    chosen,
+    nameValid: validateCharacterName(chosen.name),
+  });
+  trackGlitchCharAction(GLITCH_CHAR_ACTION.submit, {
+    action_kind: action.kind,
+    blocked_reason: action.reason,
+    needs_confirm: action.needsConfirm,
+    takeover: action.takeover,
+  });
+
+  if (action.kind === 'blocked') {
+    setGlitchCharacterBlock(action.reason);
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.error, {
+      reason: action.reason ?? 'blocked',
+      action_kind: action.kind,
+    });
+    return;
+  }
+  if (action.needsConfirm) {
+    openGlitchRerollDialog(chosen, action);
+    return;
+  }
+  await runGlitchCharacterAction(button, chosen, action);
+}
+
+async function runGlitchCharacterAction(
+  button: HTMLButtonElement,
+  chosen: GlitchChosenCharacter,
+  action: GlitchCharselectAction,
+): Promise<void> {
+  const state = glitchCharselectState;
+  if (!state || action.kind === 'blocked') return;
+  closeGlitchRerollDialog(false);
+  const primaryButton = $('#btn-create-char') as HTMLButtonElement;
+  const previousPrimaryText = primaryButton.textContent ?? t('auth.enterWorld');
+  const previousButtonText = button.textContent ?? previousPrimaryText;
+  primaryButton.disabled = true;
+  primaryButton.textContent = t('loading.enteringWorld');
+  button.disabled = true;
+  button.textContent = t('loading.enteringWorld');
+  $('#charselect-error').textContent = '';
+
+  try {
+    if (action.takeover) {
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.takeover, {
+        action_kind: action.kind,
+      });
+      await api.takeoverCharacter(state.existing.id);
+    }
+
+    let character: CharacterSummary = { ...state.existing, online: false };
+    if (action.kind === 'rename') {
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.rename);
+      const renamed = await api.renameCharacter(state.existing.id, chosen.name);
+      character = {
+        ...state.existing,
+        name: renamed.name,
+        forceRename: false,
+        online: false,
+      };
+    } else if (action.kind === 'reroll') {
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.reroll, {
+        confirmed: action.needsConfirm,
+      });
+      const nameChanged = chosen.name.trim() !== state.existing.name.trim();
+      if (nameChanged) {
+        const created = await api.createCharacter(chosen.name, chosen.class, chosen.skin);
+        await api.deleteCharacter(state.existing.id, state.existing.name);
+        character = { ...created, online: false };
+      } else {
+        await api.deleteCharacter(state.existing.id, state.existing.name);
+        const created = await api.createCharacter(chosen.name, chosen.class, chosen.skin);
+        character = { ...created, online: false };
+      }
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.create, {
+        class_key: character.class,
+        skin: character.skin,
+      });
+    } else {
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.enter);
+    }
+
+    glitchCharselectState = { ...state, existing: character };
+    await enterWorld(character, primaryButton, { glitchBehavior: state.behavior });
+    glitchCharselectState = null;
+  } catch (err) {
+    primaryButton.disabled = false;
+    primaryButton.textContent = previousPrimaryText;
+    button.disabled = false;
+    button.textContent = previousButtonText;
+    $('#charselect-error').textContent = userFacingApiError(err);
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.error, {
+      reason: 'request_failed',
+      action_kind: action.kind,
+    });
+  }
 }
 
 function updatePreviewContainer(panelId: string): void {
@@ -6460,6 +6745,7 @@ function stopLandingTrailer(): void {
 }
 
 let landingTrailerWired = false;
+let startScreensWired = false;
 function applyLandingBackdrop(highContrast: boolean): void {
   const backdrop = document.getElementById('start-screen-backdrop');
   const video = document.getElementById('bg-home') as HTMLVideoElement | null;
@@ -6521,6 +6807,8 @@ function applyLandingBackdrop(highContrast: boolean): void {
 }
 
 function wireStartScreens(): void {
+  if (startScreensWired) return;
+  startScreensWired = true;
   // Initial page translation and stats load. Lazy locale flip: a stored non-en locale is now
   // a real chunk fetch, and the homepage IS the first paint (there is no loading screen to sit
   // behind), so we localize-then-reveal to prevent an English flash + text swap. The start
@@ -7147,6 +7435,12 @@ function wireStartScreens(): void {
   // character creation
   document.querySelectorAll('#charcreate-panel .mini-class').forEach((el) => {
     const handleMiniClassSelect = () => {
+      const cls = (el as HTMLElement).dataset.class as PlayerClass;
+      const previousSelected = document.querySelector(
+        '#charcreate-panel .mini-class.sel',
+      ) as HTMLElement | null;
+      const previousClass = previousSelected?.dataset.class as PlayerClass | undefined;
+      const skin = previousClass === cls ? selectedSkin('#online-skin-row', onlineSkin) : 0;
       if (hoverTimeouts['charcreate-class-details'] !== null) {
         window.clearTimeout(hoverTimeouts['charcreate-class-details']);
         hoverTimeouts['charcreate-class-details'] = null;
@@ -7166,9 +7460,14 @@ function wireStartScreens(): void {
       el.classList.add('sel');
       el.setAttribute('aria-pressed', 'true');
 
-      const cls = (el as HTMLElement).dataset.class as PlayerClass;
       renderClassDetails('charcreate-class-details', cls);
-      refreshOnlineSkins(cls);
+      characterPreview?.setClass(cls);
+      setOnlineSkinPicker(cls, skin);
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.selectClass, {
+        class_key: cls,
+        previous_class: previousClass ?? null,
+        changed: previousClass !== cls,
+      });
     };
     el.addEventListener('click', handleMiniClassSelect);
     el.addEventListener('keydown', (e) =>
@@ -7297,10 +7596,22 @@ function wireStartScreens(): void {
           input.removeAttribute('aria-invalid');
         }
       }
+      if (input.id === 'new-char-name' && glitchCharselectState?.nameEditTracked === false) {
+        glitchCharselectState.nameEditTracked = true;
+        trackGlitchCharAction(GLITCH_CHAR_ACTION.editName, {
+          name_length: input.value.trim().length,
+          valid_name: validateCharacterName(input.value),
+        });
+      }
     });
   });
 
-  $('#btn-create-char').addEventListener('click', async () => {
+  $('#btn-create-char').addEventListener('click', async (event) => {
+    const btn = event.currentTarget as HTMLButtonElement;
+    if (glitchCharselectState) {
+      await submitGlitchCharacter(btn);
+      return;
+    }
     const name = newCharNameInput.value.trim();
     const clsEl = document.querySelector('#charcreate-panel .mini-class.sel') as HTMLElement | null;
     loginError('');
@@ -7393,6 +7704,29 @@ function wireStartScreens(): void {
         normalizeDeleteConfirmation(deleteConfirmInput.value) !==
         normalizeDeleteConfirmation(target.name);
     }
+  });
+
+  const glitchRerollModal = $('#glitch-reroll-modal');
+  const glitchRerollCancel = $('#btn-glitch-reroll-cancel') as HTMLButtonElement;
+  const glitchRerollConfirm = $('#btn-glitch-reroll-confirm') as HTMLButtonElement;
+  glitchRerollCancel.addEventListener('click', () => closeGlitchRerollDialog(true));
+  glitchRerollModal.addEventListener('click', (e) => {
+    if (e.target === glitchRerollModal) closeGlitchRerollDialog(true);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (glitchRerollModal.hasAttribute('hidden')) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeGlitchRerollDialog(true);
+    }
+  });
+  glitchRerollConfirm.addEventListener('click', async () => {
+    const pending = pendingGlitchReroll;
+    if (!pending) return;
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.rerollConfirmAccept, {
+      action_kind: pending.action.kind,
+    });
+    await runGlitchCharacterAction(glitchRerollConfirm, pending.chosen, pending.action);
   });
 
   const setupNavBtn = (
@@ -7838,13 +8172,15 @@ function wireStartScreens(): void {
 
   // Initialize 3D character preview once assets are ready
   assetsReady().then(() => {
-    const activePanelId = ['#charselect-panel', '#offline-select'].find(
+    const activePanelId = ['#charselect-panel', '#charcreate-panel', '#offline-select'].find(
       (id) => !$(id).hasAttribute('hidden'),
     );
     const containerId =
-      activePanelId === '#offline-select'
-        ? '#offline-preview-container'
-        : '#online-preview-container';
+      activePanelId === '#charcreate-panel'
+        ? '#charcreate-preview-container'
+        : activePanelId === '#offline-select'
+          ? '#offline-preview-container'
+          : '#online-preview-container';
     const container = $(containerId);
     const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
     if (container && canvas) {
@@ -7862,6 +8198,11 @@ function wireStartScreens(): void {
         const selEl = document.querySelector(selSelector) as HTMLElement | null;
         const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
         characterPreview.setClass(cls);
+        if (activePanelId === '#charcreate-panel') {
+          characterPreview.setSkin(selectedSkin('#online-skin-row', onlineSkin));
+        } else if (activePanelId === '#offline-select') {
+          characterPreview.setSkin(selectedSkin('#offline-skin-row', offlineSkin));
+        }
       }
     }
     decorateClassChips();
@@ -7929,6 +8270,7 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
 
 async function bootInitialFlow(): Promise<void> {
   startSitePresence('home');
+  if (GLITCH_CONFIG.enabled && parseGlitchLaunchInstallId(location.search)) wireStartScreens();
   if (await maybeStartGlitchLaunch()) return;
 
   // Editor play-test handoff: if the map editor stored a custom world and sent us

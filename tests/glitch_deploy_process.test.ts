@@ -50,9 +50,12 @@ describe('Glitch deploy process guardrails', () => {
     expect(deployScript).toContain('runAzurePreDeploySetup');
     expect(deployScript).toContain('runAzurePostDeployCheck');
     expect(deployScript).toContain('GLITCH_AZURE_POST_DEPLOY');
+    expect(deployScript).toContain('readAzureTraffic');
+    expect(deployScript).toContain('selectAzureFallbackRevision');
     expect(deployScript).toContain('readLatestReadyAzureRevisionName');
     expect(deployScript).toContain('restoreAzureFallbackRevision');
     expect(deployScript).toContain('properties.latestReadyRevisionName');
+    expect(deployScript).toContain('properties.configuration.ingress.traffic');
     expect(deployScript).toContain('ingress');
     expect(deployScript).toContain('traffic');
     expect(deployScript).toContain('--revision-weight');
@@ -62,11 +65,33 @@ describe('Glitch deploy process guardrails', () => {
     expect(deployScript).toContain('--max-replicas');
     expect(deployScript).toContain('already hosted by another game server process');
     expect(deployScript).toContain('activate');
+    expect(deployScript).toContain('--all');
     expect(deployScript.indexOf('await runAzurePreDeploySetup()')).toBeLessThan(
       deployScript.indexOf('await run(process.execPath, deployArgs, env)'),
     );
     expect(deployScript.indexOf('await run(process.execPath, deployArgs, env)')).toBeLessThan(
       deployScript.indexOf('await runAzurePostDeployCheck()'),
+    );
+  });
+
+  it('keeps Azure promotion and fallback recovery no-damage by default', () => {
+    const deployScript = readFileSync(join(root, 'scripts/glitch_deploy.mjs'), 'utf8');
+
+    expect(deployScript).toContain('promoteAzureRevision');
+    expect(deployScript).toContain('assertAzureTrafficPinnedToRevision');
+    expect(deployScript).toContain('probeAzurePublicHealth');
+    expect(deployScript).toContain('GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS');
+    expect(deployScript).toContain('GLITCH_AZURE_RESTORE_TIMEOUT_MS');
+    expect(deployScript).toContain('GLITCH_AZURE_HEALTHCHECK_TIMEOUT_MS');
+    expect(deployScript).toContain('GLITCH_AZURE_PUBLIC_HEALTH_PATH');
+    expect(deployScript).toContain(
+      'refusing realm singleton handoff because no fallback revision is known',
+    );
+    expect(deployScript.indexOf('await routeAzureTrafficToRevision(latestRevision)')).toBeLessThan(
+      deployScript.indexOf('await deactivateOlderAzureRevisions(revisions, latestRevision)'),
+    );
+    expect(deployScript.indexOf('await activateAzureRevision(fallbackRevision)')).toBeLessThan(
+      deployScript.indexOf('await routeAzureTrafficToRevision(fallbackRevision)'),
     );
   });
 
@@ -76,7 +101,9 @@ describe('Glitch deploy process guardrails', () => {
     expect(docs).toContain('--min-replicas 1');
     expect(docs).toContain('--max-replicas 1');
     expect(docs).toContain('--mode multiple');
-    expect(docs).toContain('restores traffic to the last ready revision');
+    expect(docs).toContain('restores traffic to the current known-good revision');
+    expect(docs).toContain('GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS');
+    expect(docs).toContain('GLITCH_AZURE_PUBLIC_HEALTH_PATH');
     expect(docs).toContain('REALM_SINGLETON_LOCK=1');
     expect(docs).toContain('Realm "Claudemoon" is already hosted');
     expect(docs).toContain('GLITCH_AZURE_POST_DEPLOY=0');

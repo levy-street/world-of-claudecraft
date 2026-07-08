@@ -3648,6 +3648,11 @@ export const zh_CN: EnTranslations = {
     "cancel": "取消",
     "confirm": "永久删除"
   },
+  "glitchReroll": {
+    "title": "重新开始？",
+    "cancel": "保留角色",
+    "confirm": "重新开始"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "初始属性",

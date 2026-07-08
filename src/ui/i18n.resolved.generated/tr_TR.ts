@@ -3648,6 +3648,11 @@ export const tr_TR: EnTranslations = {
     "cancel": "İptal",
     "confirm": "Kalıcı Olarak Sil"
   },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "Başlangıç Nitelikleri",

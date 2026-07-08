@@ -9,24 +9,80 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "es_ES": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "fr_FR": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "fr_CA": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "de_DE": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "pl_PL": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "id_ID": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "tr_TR": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "sv_SE": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "vi_VN": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
+  "da_DK": [
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ]
 };

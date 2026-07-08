@@ -3648,6 +3648,11 @@ export const ja_JP: EnTranslations = {
     "cancel": "キャンセル",
     "confirm": "完全に削除"
   },
+  "glitchReroll": {
+    "title": "最初からやり直しますか？",
+    "cancel": "キャラクターを保持",
+    "confirm": "最初からやり直す"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "開始ステータス",

@@ -6999,4 +6999,33 @@
   #desktop-update-toast .desktop-update-restart {
     border-color: var(--color-primary);
   }
+
+  /* Glitch pre-game character screen. When a Glitch-authenticated player boots, the
+     game reuses the #charcreate-panel as a single-character create/customize screen
+     (name, class, appearance) and sets body.glitch-mode. Strip everything a Glitch
+     player has no account for: the top menu bar and its Donate button, the site
+     footer, the $WOC wallet row, the GitHub developer link, and the panel's Back
+     button (there is no login to return to). There is no multi-character roster
+     here, so nothing to hide there. Applies at every viewport (unlike the desktop
+     header-pin rules), so it lives at the layer top level, not inside a media query. */
+  body.glitch-mode
+  :is(
+    .homepage-header,
+    .homepage-footer,
+    .official-site-copy,
+    .cs-wallet,
+    .cs-wallet-hidden-note,
+    #cs-github-group,
+    #btn-charcreate-back
+  ) {
+    display: none !important;
+  }
+  /* The header is gone (not pinned), so drop the strip its height reserved. */
+  body.glitch-mode:not(.mobile-touch) #charcreate-panel.cs-wow {
+    border-top: 0;
+  }
+  /* The Glitch username sits beside the "Create Character" title in gold. */
+  body.glitch-mode #glitch-user {
+    display: inline;
+  }
 }

@@ -3648,6 +3648,11 @@ export const de_DE: EnTranslations = {
     "cancel": "Abbrechen",
     "confirm": "Dauerhaft löschen"
   },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "Startwerte",

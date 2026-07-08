@@ -3648,6 +3648,11 @@ export const id_ID: EnTranslations = {
     "cancel": "Batal",
     "confirm": "Hapus Permanen"
   },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "Statistik Awal",

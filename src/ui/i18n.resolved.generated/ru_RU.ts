@@ -3648,6 +3648,11 @@ export const ru_RU: EnTranslations = {
     "cancel": "Отмена",
     "confirm": "Удалить навсегда"
   },
+  "glitchReroll": {
+    "title": "Начать заново?",
+    "cancel": "Оставить персонажа",
+    "confirm": "Начать заново"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "Начальные характеристики",

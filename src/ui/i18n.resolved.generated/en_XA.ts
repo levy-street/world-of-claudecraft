@@ -3648,6 +3648,11 @@ export const en_XA: EnTranslations = {
     "cancel": "[Çáñçéļ]",
     "confirm": "[Ðéļéţé Þéŕɱáñéñţļý]"
   },
+  "glitchReroll": {
+    "title": "[Šţáŕţ Óʋéŕ?]",
+    "cancel": "[Ķééþ Çĥáŕáçţéŕ]",
+    "confirm": "[Šţáŕţ Óʋéŕ]"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "[Šţáŕţíñĝ Šţáţš]",

@@ -3648,6 +3648,11 @@ export const ko_KR: EnTranslations = {
     "cancel": "취소",
     "confirm": "영구 삭제"
   },
+  "glitchReroll": {
+    "title": "다시 시작할까요?",
+    "cancel": "캐릭터 유지",
+    "confirm": "다시 시작"
+  },
   "classDetails": {
     "sections": {
       "startingStats": "시작 능력치",

@@ -202,14 +202,17 @@ The script:
    `GLITCH_AZURE_POST_DEPLOY=0` is set:
    - keeps revision mode at `multiple`
    - enforces `--min-replicas 1 --max-replicas 1`
-   - records the last ready revision before checking the new revision
+   - reads all revisions, including inactive failed revisions
+   - records the current known-good fallback from active traffic first, then
+     falls back to Azure's last ready revision
    - waits for the latest revision to become healthy with one replica
    - pins traffic explicitly to the healthy latest revision
+   - verifies that Azure reports 100 percent traffic on that revision
+   - probes the public health route after routing traffic
    - detects the realm singleton rollout error in Azure logs
-   - deactivates active revisions and activates the latest revision fresh when
-     Azure overlaps the old and new same-realm processes
-   - restores traffic to the last ready revision if the latest revision never
-     becomes healthy
+   - attempts a bounded singleton handoff only when a fallback revision is known
+   - restores traffic to the current known-good revision and verifies public
+     health if the latest revision never becomes healthy or fails public probing
 
 If the local predeploy check fails, fix that failure locally first. Do not upload
 another Glitch build until the check passes. When the check runs against Azure
@@ -222,8 +225,19 @@ from hosting `Claudemoon` at the same time. If Azure tries to roll or scale to a
 second replica, the new process exits with `Realm "Claudemoon" is already hosted
 by another game server process` and the revision fails activation. After a node
 deploy, `npm run deploy:glitch` handles this post-deploy check automatically for
-the default Glitch Container App. The manual commands below are still useful for
-inspection or recovery:
+the default Glitch Container App.
+
+The deploy script does not treat Azure's latest revision as live until three
+checks agree: the revision is healthy, Azure traffic is pinned to it, and the
+public health route responds. In the normal path, older revisions are not
+deactivated until after those checks pass. If the new revision trips the realm
+singleton lock, the script can briefly deactivate the known-good revision to
+release the realm lock, but only when it already has a fallback revision to
+restore and only for the bounded
+`GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS` window. Failed fallback restoration
+is reported as a deployment failure instead of being hidden.
+
+The manual commands below are still useful for inspection or recovery:
 
 ```bash
 az containerapp revision set-mode \
@@ -240,7 +254,13 @@ az containerapp update \
 az containerapp revision list \
   --name world-of-claudecraft-node \
   --resource-group openai-resource-group \
+  --all \
   --query "[].{name:name,healthState:properties.healthState,runningState:properties.runningState,replicas:properties.replicas}"
+
+az containerapp show \
+  --name world-of-claudecraft-node \
+  --resource-group openai-resource-group \
+  --query "properties.configuration.ingress.traffic"
 
 az containerapp ingress traffic set \
   --name world-of-claudecraft-node \
@@ -253,6 +273,12 @@ Useful overrides:
 ```bash
 GLITCH_AZURE_CONTAINERAPP_NAME=world-of-claudecraft-node npm run deploy:glitch
 GLITCH_AZURE_RESOURCE_GROUP=openai-resource-group npm run deploy:glitch
+GLITCH_AZURE_PUBLIC_ORIGIN=https://worldofclaudecraft.com npm run deploy:glitch
+GLITCH_AZURE_PUBLIC_HEALTH_PATH=/api/project-stats npm run deploy:glitch
+GLITCH_AZURE_HEALTHCHECK_TIMEOUT_MS=15000 npm run deploy:glitch
+GLITCH_AZURE_HEALTHCHECK_CONTAINS=Claudemoon npm run deploy:glitch
+GLITCH_AZURE_SINGLETON_HANDOFF_TIMEOUT_MS=90000 npm run deploy:glitch
+GLITCH_AZURE_RESTORE_TIMEOUT_MS=120000 npm run deploy:glitch
 GLITCH_AZURE_POST_DEPLOY=0 npm run deploy:glitch  # skip Azure health handoff only for non-Azure experiments
 GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
 GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch  # static iframe/wasm only; node preflight still builds

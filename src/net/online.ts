@@ -534,12 +534,14 @@ export class Api {
     return data.characters;
   }
 
-  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin });
+  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<CharacterSummary> {
+    const data = await this.post('/api/characters', { name, class: cls, skin });
+    return normalizeCharacterSummary(data);
   }
 
-  async renameCharacter(characterId: number, name: string): Promise<void> {
-    await this.post(`/api/characters/${characterId}/rename`, { name });
+  async renameCharacter(characterId: number, name: string): Promise<CharacterSummary> {
+    const data = await this.post(`/api/characters/${characterId}/rename`, { name });
+    return normalizeCharacterSummary(data);
   }
 
   async deleteCharacter(characterId: number, name: string): Promise<void> {
