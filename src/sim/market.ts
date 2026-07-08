@@ -510,19 +510,21 @@ export class Market {
   // boot so content edits take effect. secondsLeft survives the time reset.
   serializeMarket(): MarketSave {
     return {
-      listings: this.marketListings
-        .filter((l) => !l.house)
-        .map((l) => ({
-          id: l.id,
-          sellerKey: l.sellerKey,
-          sellerName: l.sellerName,
-          itemId: l.itemId,
-          count: l.count,
-          price: l.price,
-          secondsLeft: Number.isFinite(l.expiresAt)
-            ? Math.max(0, Math.round(l.expiresAt - this.ctx.time))
-            : MARKET_LISTING_DURATION,
-        })),
+      listings: this.marketListings.flatMap((l) =>
+        !l.house
+          ? [{
+              id: l.id,
+              sellerKey: l.sellerKey,
+              sellerName: l.sellerName,
+              itemId: l.itemId,
+              count: l.count,
+              price: l.price,
+              secondsLeft: Number.isFinite(l.expiresAt)
+                ? Math.max(0, Math.round(l.expiresAt - this.ctx.time))
+                : MARKET_LISTING_DURATION,
+            }]
+          : [],
+      ),
       collections: [...this.marketCollections.entries()].map(([key, c]) => ({
         key,
         copper: c.copper,
@@ -567,9 +569,11 @@ export class Market {
         // Keep returned/expired-listing items even when their id is unknown, for
         // the same reason as listings above: a content edit must not silently
         // empty a player's pending pickups. The id stays dormant until corrected.
-        items: (c.items ?? [])
-          .filter((s) => s && typeof s.itemId === 'string')
-          .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) })),
+        items: (c.items ?? []).flatMap((s) =>
+          s && typeof s.itemId === 'string'
+            ? [{ itemId: s.itemId, count: Math.max(1, s.count | 0) }]
+            : [],
+        ),
       });
     }
     const maxId = this.marketListings.reduce((m, l) => Math.max(m, l.id + 1), 1);

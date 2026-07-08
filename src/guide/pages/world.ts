@@ -28,9 +28,9 @@ const bandLabel = (z: GuideZoneInfo): string =>
 // Which creature families live in a zone: any family with a creature whose level band
 // overlaps the zone's. Drives the spoiler-safe "who you will meet" cross-links.
 function residentFamilies(z: GuideZoneInfo): string[] {
-  return GUIDE_FAMILIES.filter((fam) =>
-    fam.creatures.some((c) => c.min <= z.max && c.max >= z.min),
-  ).map((fam) => fam.family);
+  return GUIDE_FAMILIES.flatMap((fam) =>
+    fam.creatures.some((c) => c.min <= z.max && c.max >= z.min) ? [fam.family] : [],
+  );
 }
 
 function mapHtml(): string {

@@ -174,7 +174,7 @@ export function migrationBagsFor(usedSlots: number): string[] {
   let remaining = usedSlots - BACKPACK_SLOTS;
   if (remaining <= 0) return [];
   const tierMax = (tier: number): number =>
-    Math.max(...MIGRATION_BAGS.filter((b) => b.tier <= tier).map((b) => b.slots));
+    Math.max(...MIGRATION_BAGS.flatMap((b) => b.tier <= tier ? [b.slots] : []));
   const topTier = MIGRATION_BAGS[MIGRATION_BAGS.length - 1].tier;
   let tier = 0;
   while (tier < topTier && tierMax(tier) * BAG_SOCKETS < remaining) tier++;

@@ -592,9 +592,11 @@ export class PostOffice {
       if (!m || typeof m.recipientKey !== 'string') continue;
       // Keep letters whose attached item id is no longer in ITEMS (a content
       // edit): dormant, recoverable data, exactly like market listings.
-      const items = (m.items ?? [])
-        .filter((s) => s && typeof s.itemId === 'string')
-        .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) }));
+      const items = (m.items ?? []).flatMap((s) =>
+        s && typeof s.itemId === 'string'
+          ? [{ itemId: s.itemId, count: Math.max(1, s.count | 0) }]
+          : [],
+      );
       const deliverIn = Number.isFinite(m.deliverIn) ? Math.max(0, m.deliverIn) : 0;
       this.mail.push({
         id: m.id,

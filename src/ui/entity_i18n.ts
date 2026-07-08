@@ -656,13 +656,13 @@ export function missingEntityTranslationsForGroups(
   completedGroups: readonly EntityTranslationGroup[],
 ): MissingEntityTranslation[] {
   const groupSet = new Set(completedGroups);
-  return entityTranslationManifest()
-    .filter((manifestEntry) => groupSet.has(manifestEntry.group))
-    .map((manifestEntry) => ({
-      ...manifestEntry,
-      missingLocales: supportedLanguages.filter((lang) => !hasTranslation(manifestEntry.key, lang)),
-    }))
-    .filter((manifestEntry) => manifestEntry.missingLocales.length > 0);
+  return entityTranslationManifest().flatMap((manifestEntry) => {
+    if (!groupSet.has(manifestEntry.group)) return [];
+    const missingLocales = supportedLanguages.filter((lang) => !hasTranslation(manifestEntry.key, lang));
+    return missingLocales.length > 0
+      ? [{ ...manifestEntry, missingLocales }]
+      : [];
+  });
 }
 
 export function assertEntityTranslationsReady(

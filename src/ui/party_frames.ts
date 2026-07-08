@@ -10,17 +10,13 @@ export function selectPartyFrameMembers(
   playerPos: { x: number; z: number },
   rangeYd = PARTY_FRAME_RANGE_YD,
 ): PartyFrameMember[] {
-  return info.members
-    .map((member, index) => ({ member, index }))
-    .sort((a, b) =>
-      info.raid ? a.member.group - b.member.group || a.index - b.index : a.index - b.index,
-    )
-    .map(({ member }) => member)
-    .filter((m) => m.pid !== playerId)
-    .map((m) => ({
-      ...m,
-      oor: !m.dead && Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd,
-    }));
+  const sorted = [...info.members];
+  if (info.raid) sorted.sort((a, b) => a.group - b.group);
+  return sorted.flatMap((m) =>
+    m.pid !== playerId
+      ? [{ ...m, oor: !m.dead && Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd }]
+      : [],
+  );
 }
 
 /**

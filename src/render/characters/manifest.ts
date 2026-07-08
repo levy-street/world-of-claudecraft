@@ -81,6 +81,11 @@ export interface VisualDef {
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
   lazyPreload?: boolean;
+  /** Defer GLB preload to on-demand: the asset is fetched when an entity with
+   *  this visual first enters view, not at boot. Reduces initial load on
+   *  constrained devices (fewer GLBs parsed at startup). The entity is invisible
+   *  for one frame while the GLB loads, then appears normally. */
+  defer?: boolean;
   /** Post-load orientation fixups for weapon/prop nodes baked INTO a creature
    *  GLB at the wrong angle (some KayKit handslot weapons ship without the grip
    *  flip the standalone weapon files carry). Node name as authored in the GLB;
@@ -549,6 +554,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: animal(['Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+    defer: true,
   },
   // smaller silhouette of the same rig for ground critters (hares, badgers);
   // no dedicated rabbit/mustelid asset ships, so this is the closest small beast.
@@ -558,6 +564,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: animal(['Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+    defer: true,
   },
   mob_stag: {
     url: `${CREATURES}/stag.glb`,
@@ -565,6 +572,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: animal(['Attack_Headbutt', 'Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+    defer: true,
   },
   // Deepfen Spearjaw (The Drowned Litany): unused Quaternius raptor rig, a
   // toothy quadruped that reads far more like a swamp predator than the
@@ -590,6 +598,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: SPIDER,
     tint: 'entity',
     tintStrength: 0.35,
+    defer: true,
   },
   mob_murloc: {
     url: `${CREATURES}/frog.glb`,
@@ -627,6 +636,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.4,
+    defer: true,
   },
   mob_dragonkin: {
     url: `${CREATURES}/dragonevolved.glb`,
@@ -637,6 +647,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.2,
+    defer: true,
   },
   // Bog Thrall (The Drowned Litany): unused floating ghost rig, a stronger
   // fit for an undead swarm add than the generic skel_minion skeleton
@@ -651,6 +662,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // this delve read bone-pale per the marsh palette brief in the asset plan.
     tint: 'entity',
     tintStrength: 0.6,
+    defer: true,
   },
   // Tolling Bell (The Drowned Litany): Meshy-generated, not a KayKit/Quaternius
   // reuse: a rolling bell has no obvious existing-asset stand-in
@@ -663,6 +675,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: TOLLING_BELL,
     tint: 'entity',
     tintStrength: 0.15,
+    defer: true,
   },
   // warlock demon pets (emberkin/gloomshade) — one biped rig, the entity colour and
   // the mob template's scale tell the little orange emberkin from the bulky gloomshade
@@ -672,6 +685,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: BIPED14,
     tint: 'entity',
     tintStrength: 0.5,
+    defer: true,
   },
   mob_demon_flying: {
     url: `${CREATURES}/demon.glb`,
@@ -680,6 +694,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.25,
+    defer: true,
   },
   mob_demonalt: {
     url: `${CREATURES}/demonalt.glb`,
@@ -687,6 +702,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: BIPED14,
     tint: 'entity',
     tintStrength: 0.35,
+    defer: true,
   },
 
   // -- delve-specific variants (same rigs, colour-differentiated via mob.color) -
@@ -697,6 +713,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     tint: 'entity',
     tintStrength: 0.55,
+    defer: true,
   },
   delve_skel_ringer: {
     // Funeral Ringer: skeleton rogue rig, cloth-brown tint at mid strength
@@ -706,6 +723,7 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/skeleton_axe.glb`, bone: 'handslot.r' }],
     tint: 'entity',
     tintStrength: 0.45,
+    defer: true,
   },
   delve_mob_acolyte: {
     // Gravecall Acolyte: hooded mage with hat + staff, deep dark-brown saturation
@@ -716,6 +734,7 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     tint: 'entity',
     tintStrength: 0.6,
+    defer: true,
   },
   delve_skel_effigy: {
     // Saintless Effigy: armoured skeleton, high stone-pale wash, reads as carved stone
@@ -728,6 +747,7 @@ export const VISUALS: Record<string, VisualDef> = {
     ],
     tint: 'entity',
     tintStrength: 0.65,
+    defer: true,
   },
   delve_skel_varric: {
     // Deacon Varric: boss mage rig with Taunt flourish on pull
@@ -737,6 +757,7 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
     tint: 'entity',
     tintStrength: 0.35,
+    defer: true,
   },
 
   // -- undead (KayKit skeletons, shared 41-joint rig) ------------------------
@@ -783,6 +804,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: skeletonClips(['2H_Melee_Attack_Chop']),
     tint: 'entity',
     tintStrength: 0.25,
+    defer: true,
   },
   skel_golem: {
     url: `${ENEMIES}/skeleton_golem.glb`,
@@ -793,6 +815,7 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
     tint: 'entity',
     tintStrength: 0.25,
+    defer: true,
   },
 
   // -- humanoid mobs (KayKit adventurers) ------------------------------------
@@ -837,6 +860,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop']),
     show: ['Knight_Helmet', 'Knight_Cape'],
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    defer: true,
   },
   npc_mage: {
     url: `${PLAYERS}/mage.glb`,
@@ -846,6 +870,7 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     tint: 0xc9b98a,
     tintStrength: 0.3, // brown-robed brothers of the chapel
+    defer: true,
   },
   // Brother Aldric keeps his pre-v0.7 model (the old chars/mage.glb, restored as
   // mage_classic.glb with the staff built into the mesh). Aldric-only — every
@@ -857,6 +882,7 @@ export const VISUALS: Record<string, VisualDef> = {
     show: ['2H_Staff'],
     tint: 0xc9b98a,
     tintStrength: 0.3,
+    defer: true,
   },
   npc_smith: {
     url: `${PLAYERS}/barbarian.glb`,
@@ -864,6 +890,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['1H_Melee_Attack_Chop']),
     show: [],
     attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
+    defer: true,
   },
   npc_scout: {
     url: `${PLAYERS}/rogue.glb`,
@@ -871,6 +898,7 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Ranged_Shoot']),
     show: ['Rogue_Cape'],
     attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
+    defer: true,
   },
   npc_villager: {
     url: `${PLAYERS}/rogue.glb`,
@@ -879,6 +907,7 @@ export const VISUALS: Record<string, VisualDef> = {
     show: [],
     tint: 'entity',
     tintStrength: 0.35,
+    defer: true,
   },
   npc_villager_robed: {
     url: `${PLAYERS}/mage.glb`,
@@ -887,6 +916,7 @@ export const VISUALS: Record<string, VisualDef> = {
     show: [],
     tint: 'entity',
     tintStrength: 0.35,
+    defer: true,
   },
   // Brother Halven, the Reliquary Keeper: a devout male guardian tending the crypt
   // door. Uses the KayKit paladin, one of the newer full-pack adventurer models
@@ -896,6 +926,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/paladin.glb`,
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
+    defer: true,
   },
   // Edda Reedhand (The Drowned Litany companion NPC, healer): the druid player
   // rig, staff in hand, backpack authored on the model (a traveling marsh
@@ -907,6 +938,7 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+    defer: true,
   },
   // Reedbound Acolyte (The Drowned Litany trash mob): Stone Cantor model from
   // the Raid 02 asset batch. The earlier Meshy mesh (reedbound_acolyte.glb) was
@@ -925,6 +957,7 @@ export const VISUALS: Record<string, VisualDef> = {
     attackTimeScale: 1.7,
     tint: 'entity',
     tintStrength: 0.2,
+    defer: true,
   },
   // Spider Egg-Sac (Sinkhole Baptistry finale trigger, The Drowned Litany):
   // Meshy-generated static prop, no rig/clips (it never moves; it dies to a
@@ -941,6 +974,7 @@ export const VISUALS: Record<string, VisualDef> = {
       attack: ['Idle'],
       death: 'Idle',
     },
+    defer: true,
   },
 };
 
@@ -1076,11 +1110,11 @@ export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride |
   return { attach: classDef.attach, weaponSlots: classDef.weaponSlots };
 }
 
-/** Every glb the manifest can reference (for preloading). */
+/** Every glb the manifest can reference (for preloading). Skips lazyPreload AND defer. */
 export function manifestUrls(): string[] {
   const urls = new Set<string>();
   for (const def of Object.values(VISUALS)) {
-    if (def.lazyPreload) continue; // fetched on demand, not at boot
+    if (def.lazyPreload || def.defer) continue; // fetched on demand, not at boot
     urls.add(def.url);
     for (const url of def.animUrls ?? []) urls.add(url);
     for (const a of def.attach ?? []) urls.add(a.url);
@@ -1088,6 +1122,24 @@ export function manifestUrls(): string[] {
   // Equipped-weapon models a player may swap to at runtime (any nearby player's
   // gear), so they are resolved-and-ready when setWeapon attaches them.
   for (const url of itemWeaponModelUrls()) urls.add(url);
+  return [...urls];
+}
+
+/** Check if a visual key is deferred (not preloaded at boot). */
+export function isVisualDeferred(key: string): boolean {
+  const def = VISUALS[key];
+  return !!(def?.defer || def?.lazyPreload);
+}
+
+/** GLB URLs for deferred visuals — loaded on demand when an entity first enters view. */
+export function deferredManifestUrls(): string[] {
+  const urls = new Set<string>();
+  for (const def of Object.values(VISUALS)) {
+    if (!def.defer) continue;
+    urls.add(def.url);
+    for (const url of def.animUrls ?? []) urls.add(url);
+    for (const a of def.attach ?? []) urls.add(a.url);
+  }
   return [...urls];
 }
 

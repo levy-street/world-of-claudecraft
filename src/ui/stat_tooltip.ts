@@ -367,9 +367,11 @@ function gearTotal(gear: GearStatSource[], key: keyof Stats | 'spellPower'): num
 /** Per-buff source lines for the auras whose kind feeds `key`, each with its
  *  resolved name so the tooltip can read "Mark of the Wild: +12". */
 function buffLines(buffs: BuffStatSource[], kinds: AuraKind[]): StatSource[] {
-  return buffs
-    .filter((b) => kinds.includes(b.kind) && b.value !== 0)
-    .map((b) => ({ kind: 'buff' as const, value: b.value, name: b.name }));
+  return buffs.flatMap((b) =>
+    kinds.includes(b.kind) && b.value !== 0
+      ? [{ kind: 'buff' as const, value: b.value, name: b.name }]
+      : [],
+  );
 }
 
 /** Build the upstream "what feeds this stat" lines so they sum to `final`. The

@@ -4054,7 +4054,7 @@ export class Hud {
 
   // The known abilities that make up a form's default bar, in class/learn order.
   private formKitAbilityIds(form: HotbarForm): string[] {
-    return this.sim.known.map((k) => k.def.id).filter((id) => this.shouldAutoPlaceOnForm(id, form));
+    return this.sim.known.flatMap((k) => this.shouldAutoPlaceOnForm(k.def.id, form) ? [k.def.id] : []);
   }
 
   // True for the druid form bars that own a dedicated kit (bear/cat). Rogue
@@ -8975,17 +8975,16 @@ export class Hud {
         (st === 'ready' && isQuestTurnInNpc(QUESTS[q], npc.templateId))
       );
     });
-    const discussionQuests = [...this.sim.questLog.values()]
-      .filter((qp) => qp.state === 'active' && npc.questIds.includes(qp.questId))
-      .filter((qp) =>
-        QUESTS[qp.questId].objectives.some(
-          (objective, objectiveIndex) =>
-            objective.type === 'interact' &&
-            objective.targetNpcId === npc.templateId &&
-            qp.counts[objectiveIndex] < objective.count,
-        ),
-      )
-      .map((qp) => qp.questId);
+    const discussionQuests = [...this.sim.questLog.values()].flatMap((qp) => {
+      if (qp.state !== 'active' || !npc.questIds.includes(qp.questId)) return [];
+      const hasIncompleteInteraction = QUESTS[qp.questId].objectives.some(
+        (objective, objectiveIndex) =>
+          objective.type === 'interact' &&
+          objective.targetNpcId === npc.templateId &&
+          qp.counts[objectiveIndex] < objective.count,
+      );
+      return hasIncompleteInteraction ? [qp.questId] : [];
+    });
     markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
     const npcName = def ? npcDisplayName(npc.templateId) : mobDisplayName(npc.templateId);
     const npcTitle = def ? npcDisplayTitle(def.id) : '';
@@ -9505,7 +9504,7 @@ export class Hud {
     });
     for (const p of pickEls) p.addEventListener('change', syncRoll);
     rollBtn.addEventListener('click', () => {
-      const pids = pickEls.filter((p) => p.checked).map((p) => Number(p.value));
+      const pids = pickEls.flatMap((p) => p.checked ? [Number(p.value)] : []);
       if (pids.length > 0) this.assignMasterLoot(rollId, pids);
     });
     root.appendChild(row);
@@ -10866,9 +10865,9 @@ export class Hud {
     const sim = this.sim;
     const vlevel = virtualLevel(sim.lifetimeXp);
     const unlocked = new Set(sim.unlockedMilestones);
-    const badges = MILESTONES.filter((m) => unlocked.has(m.id))
-      .map((m) => `<span class="ms-badge ms-${m.kind}">${this.milestoneName(m.id)}</span>`)
-      .join('');
+    const badges = MILESTONES.flatMap((m) =>
+      unlocked.has(m.id) ? [`<span class="ms-badge ms-${m.kind}">${this.milestoneName(m.id)}</span>`] : [],
+    ).join('');
     let html = `<div class="cp-title">${t('game.progression.heading')}</div>`;
     html += `<div class="char-stats cp-stats">
       <span>${t('game.progression.totalXp')}: <b>${formatXp(sim.lifetimeXp)}</b></span>

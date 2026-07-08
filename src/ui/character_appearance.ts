@@ -21,15 +21,14 @@ export function characterAppearanceOptions(
     label: skin + 1,
     skin,
   }));
-  const mechOptions = MECH_CHROMAS
-    .map((chroma, skin) => ({ chroma, skin }))
-    .filter(({ chroma }) => unlockedMechs.has(chroma.id))
-    .map(({ chroma, skin }, index) => ({
-      kind: 'mech' as const,
-      label: classCount + index + 1,
-      skin,
-      chromaId: chroma.id,
-    }));
+  const mechOptions = MECH_CHROMAS.flatMap((chroma, skin) =>
+    unlockedMechs.has(chroma.id) ? [{ chroma, skin }] : [],
+  ).flatMap(({ chroma, skin }, index) => [{
+    kind: 'mech' as const,
+    label: classCount + index + 1,
+    skin,
+    chromaId: chroma.id,
+  }]);
 
   return [...classOptions, ...mechOptions];
 }

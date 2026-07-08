@@ -64,11 +64,11 @@ export function systemEventIdsOn(iso: string, events: SystemEventDef[] = SYSTEM_
   const d = new Date(`${iso}T00:00:00Z`);
   const weekday = d.getUTCDay();
   const dayOfMonth = d.getUTCDate();
-  return events
-    .filter((e) =>
-      e.rule.kind === 'weekly' ? e.rule.weekday === weekday : e.rule.day === dayOfMonth,
-    )
-    .map((e) => e.id);
+  return events.flatMap((e) =>
+    (e.rule.kind === 'weekly' ? e.rule.weekday === weekday : e.rule.day === dayOfMonth)
+      ? [e.id]
+      : [],
+  );
 }
 
 export function buildCalendarMonth(input: {

@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
+import { SPRITE_DEFS } from '../sprites/sprite_manifest';
+import { getCachedAtlas } from '../sprites/atlas';
 import { VISUALS } from './manifest';
 import { CharacterVisual } from './visual';
 
@@ -111,6 +113,12 @@ export function visualPortraitDataUrl(visualKey: string, skin = 0): string | nul
   if (cached) return cached;
   if (!assetsAreReady) return null;
 
+  // Sprite-based portrait: render the idle frame from the sprite atlas
+  const spriteDef = SPRITE_DEFS[visualKey];
+  if (spriteDef) {
+    return spritePortraitDataUrl(visualKey, spriteDef, skin);
+  }
+
   let visual: CharacterVisual | null = null;
   try {
     ensureRig();
@@ -165,6 +173,78 @@ export function visualPortraitDataUrl(visualKey: string, skin = 0): string | nul
       mount!.remove(visual.root);
       visual.dispose();
     }
+  }
+}
+
+/**
+ * Render a sprite-based portrait: extract the idle frame 0 from the sprite
+ * atlas and render it onto a quad in the offscreen scene.
+ */
+function spritePortraitDataUrl(
+  visualKey: string,
+  spriteDef: { bodyPng: string; height: number },
+  _skin: number,
+): string | null {
+  const key = `sprite:${visualKey}:${_skin}`;
+  const cached = cache.get(key);
+  if (cached) return cached;
+
+  const atlas = getCachedAtlas(`sprites/bodies/${spriteDef.bodyPng}`);
+  if (!atlas) return null;
+
+  try {
+    ensureRig();
+
+    // Get idle frame 0 UV
+    const idleFrames = atlas.getFrames('idle');
+    if (idleFrames.length === 0) return null;
+    const uv = idleFrames[0];
+
+    // Create a quad with the idle frame texture
+    const geo = new THREE.PlaneGeometry(spriteDef.height * 0.6, spriteDef.height);
+    const mat = new THREE.MeshBasicMaterial({
+      map: atlas.texture,
+      transparent: true,
+      alphaTest: 0.1,
+      side: THREE.DoubleSide,
+    });
+
+    // Set UV to show only the idle frame 0 region
+    const uvs = geo.getAttribute('uv');
+    const u0 = uv.u;
+    const v0 = uv.v;
+    const u1 = uv.u + uv.w;
+    const v1 = uv.v + uv.h;
+    // PlaneGeometry UVs: bottom-left (0), bottom-right (1), top-left (2), top-right (3)
+    // But we need to map the frame region. Since the atlas is a horizontal strip,
+    // we scale UVs to point at the correct frame.
+    const uArr = uvs.array as Float32Array;
+    uArr[0] = u0; uArr[1] = v0; // bottom-left
+    uArr[2] = u1; uArr[3] = v0; // bottom-right
+    uArr[4] = u0; uArr[5] = v1; // top-left
+    uArr[6] = u1; uArr[7] = v1; // top-right
+    uvs.needsUpdate = true;
+
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.y = spriteDef.height / 2;
+    mount!.add(mesh);
+
+    // Frame the sprite to fill the portrait
+    camera!.position.set(0, spriteDef.height / 2, spriteDef.height * 1.2);
+    camera!.lookAt(0, spriteDef.height / 2, 0);
+
+    renderer!.render(scene!, camera!);
+    const url = renderer!.domElement.toDataURL('image/png');
+    cache.set(key, url);
+
+    mount!.remove(mesh);
+    geo.dispose();
+    mat.dispose();
+
+    return url;
+  } catch (err) {
+    if (import.meta.env?.DEV) console.warn(`[portrait] sprite failed for ${key}`, err);
+    return null;
   }
 }
 

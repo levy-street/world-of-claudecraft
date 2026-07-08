@@ -343,14 +343,12 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     ctx.error(meta.entityId, 'There is no merchant nearby.');
     return;
   }
-  const junk = meta.inventory
-    .filter((s) => {
-      const def = ITEMS[s.itemId];
-      return (
-        !!def && def.quality === 'poor' && def.kind !== 'quest' && !def.noVendorSell && s.count > 0
-      );
-    })
-    .map((s) => ({ itemId: s.itemId, count: s.count }));
+  const junk = meta.inventory.flatMap((s) => {
+    const def = ITEMS[s.itemId];
+    return (
+      !!def && def.quality === 'poor' && def.kind !== 'quest' && !def.noVendorSell && s.count > 0
+    ) ? [{ itemId: s.itemId, count: s.count }] : [];
+  });
   if (junk.length === 0) return; // nothing gray to sell; the vendor UI keeps the button disabled here
   let total = 0;
   let soldCount = 0;

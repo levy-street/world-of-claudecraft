@@ -105,9 +105,9 @@ export function assetTimingSnapshot(): AssetTimingSnapshot {
   return {
     preload: { tasks: preloadTasks, waitMs: round(preloadWaitMs), complete: preloadComplete },
     byType,
-    files: samples
-      .filter((s) => !s.failed)
-      .map((s) => ({ type: s.type, url: s.url, ms: round(s.ms), bytes: s.bytes })),
+    files: samples.flatMap((s) =>
+      !s.failed ? [{ type: s.type, url: s.url, ms: round(s.ms), bytes: s.bytes }] : [],
+    ),
   };
 }
 

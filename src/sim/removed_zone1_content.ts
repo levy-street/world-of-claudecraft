@@ -57,12 +57,14 @@ export function sanitizeRemovedZone1Content(state: CharacterState): {
   state: CharacterState;
   changed: boolean;
 } {
-  const questLog = state.questLog
-    .filter((quest) => !REMOVED_QUESTS.has(quest.questId))
-    .map((quest) => ({ questId: quest.questId, counts: [...quest.counts], state: quest.state }));
+  const questLog = state.questLog.flatMap((quest) =>
+    REMOVED_QUESTS.has(quest.questId)
+      ? []
+      : [{ questId: quest.questId, counts: [...quest.counts], state: quest.state }],
+  );
   const questsDone = state.questsDone.filter((questId) => !REMOVED_QUESTS.has(questId));
-  const inventory = state.inventory.filter(keepItem).map((slot) => ({ ...slot }));
-  const vendorBuyback = state.vendorBuyback?.filter(keepItem).map((slot) => ({ ...slot }));
+  const inventory = state.inventory.flatMap((slot) => keepItem(slot) ? [{ ...slot }] : []);
+  const vendorBuyback = state.vendorBuyback?.flatMap((slot) => keepItem(slot) ? [{ ...slot }] : []);
 
   const changed =
     questLog.length !== state.questLog.length ||

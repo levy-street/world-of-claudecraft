@@ -1,5 +1,15 @@
-import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
+
+/** Transport abstraction: WebSocket or HTTP long-poll. */
+export interface GameTransport {
+  readyState: number;
+  bufferedAmount: number;
+  send(payload: string): void;
+  close(): void;
+  terminate(): void;
+  /** WS ping; no-op for HTTP transport (no keepalive needed). */
+  ping(): void;
+}
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
@@ -347,7 +357,7 @@ const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community pos
 const ADMIN_LOCATION_POI_RADIUS = 32;
 
 export interface ClientSession {
-  ws: WebSocket;
+  ws: GameTransport;
   accountId: number;
   accountCosmetics: AccountCosmetics;
   characterId: number;
@@ -1191,29 +1201,28 @@ export class GameServer {
   // points are monotonic, so this also nudges the Discord status tier over time.
   private async grantPlaytimePoints(): Promise<void> {
     const windowSecs = PLAYTIME_GRANT_MS / 1000;
-    for (const session of this.clients.values()) {
-      if (this.sim.time - session.lastInputAt > windowSecs) continue; // idle: skip
+    const eligible = [...this.clients.values()].filter((session) => {
+      if (this.sim.time - session.lastInputAt > windowSecs) return false;
       const last = this.lastPlaytimeGrantAt.get(session.accountId);
-      if (last !== undefined && this.sim.time - last < windowSecs) continue;
+      if (last !== undefined && this.sim.time - last < windowSecs) return false;
       this.lastPlaytimeGrantAt.set(session.accountId, this.sim.time);
-      try {
-        await grantRewardPoints(pool, session.accountId, PLAYTIME_POINTS, 'playtime');
-      } catch (err) {
-        console.error('playtime reward grant failed:', err);
-      }
-    }
+      return true;
+    });
+    await Promise.allSettled(eligible.map((session) =>
+      grantRewardPoints(pool, session.accountId, PLAYTIME_POINTS, 'playtime')
+        .catch((err) => console.error('playtime reward grant failed:', err)),
+    ));
   }
 
   private async recordDailyRewardActivity(): Promise<void> {
     const activeSeconds = await dailyRewardService.activeSeconds();
-    for (const session of this.clients.values()) {
-      if (this.sim.time - session.lastInputAt > activeSeconds) continue;
-      try {
-        await dailyRewardService.recordOnlineMinute(session.accountId);
-      } catch (err) {
-        console.error('daily reward activity record failed:', err);
-      }
-    }
+    const eligible = [...this.clients.values()].filter(
+      (session) => this.sim.time - session.lastInputAt <= activeSeconds,
+    );
+    await Promise.allSettled(eligible.map((session) =>
+      dailyRewardService.recordOnlineMinute(session.accountId)
+        .catch((err) => console.error('daily reward activity record failed:', err)),
+    ));
   }
 
   // Refresh one player's linked-Discord flair (status tier + PFP + nickname +
@@ -1545,7 +1554,7 @@ export class GameServer {
   }
 
   join(
-    ws: WebSocket,
+    ws: GameTransport,
     accountId: number,
     characterId: number,
     name: string,
@@ -1731,7 +1740,7 @@ export class GameServer {
   // presence announce fires (friends never saw them leave).
   private resumeSession(
     session: ClientSession,
-    ws: WebSocket,
+    ws: GameTransport,
     cls: import('../src/sim/types').PlayerClass,
     meta: Parameters<GameServer['join']>[7] = {},
   ): ClientSession {
@@ -1784,7 +1793,7 @@ export class GameServer {
   // sim and stays online for friends, analytics, and the play session row.
   // Returns true when grace began (false: the session was already torn down,
   // already linkdead, or the event came from a stale pre-resume socket).
-  socketClosed(session: ClientSession, ws: WebSocket): boolean {
+  socketClosed(session: ClientSession, ws: GameTransport): boolean {
     // A late close/error from a socket that a resume already replaced must
     // not tear down the live session riding the new socket.
     if (session.ws !== ws) return false;
@@ -2034,12 +2043,12 @@ export class GameServer {
   // Close every open play_sessions row; called on graceful shutdown so the
   // sessions of currently-online players keep their real duration.
   async endAllPlaySessions(): Promise<void> {
-    for (const session of this.clients.values()) {
-      if (session.dbSessionId === null) continue;
-      await closePlaySession(session.dbSessionId).catch((err) =>
+    const sessions = [...this.clients.values()].filter((s) => s.dbSessionId !== null);
+    await Promise.allSettled(sessions.map((session) =>
+      closePlaySession(session.dbSessionId!).catch((err) =>
         console.error('failed to close play session:', err),
-      );
-    }
+      ),
+    ));
   }
 
   // -------------------------------------------------------------------------
@@ -4404,7 +4413,7 @@ export class GameServer {
 
   private sendRaw(session: ClientSession, payload: string): void {
     if (session.ws.readyState !== 1) return;
-    // A client that has stopped draining its socket lets ws.bufferedAmount grow
+    // A client that has stopped draining its socket lets bufferedAmount grow
     // without bound (send() never blocks); left unchecked one stuck reader OOMs
     // the process and starves everyone. Terminate the offender instead. close()
     // would try to flush the already-huge buffer, so destroy the socket: the

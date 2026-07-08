@@ -220,9 +220,11 @@ export function voiceMembersForChannel(
   featuredChannelId: string,
   nameOf: (userId: string) => string,
 ): VoiceMemberOut[] {
-  return states
-    .filter((s) => s.channelId === featuredChannelId)
-    .map((s) => ({ id: s.userId, name: nameOf(s.userId), speaking: false, selfMute: s.selfMute }));
+  return states.flatMap((s) =>
+    s.channelId === featuredChannelId
+      ? [{ id: s.userId, name: nameOf(s.userId), speaking: false, selfMute: s.selfMute }]
+      : [],
+  );
 }
 
 // ── In-game "!" community relay (LFG / trade / recruit / event / help) ─────────

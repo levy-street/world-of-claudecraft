@@ -175,9 +175,10 @@ export function cleanEscalationConfig(input: {
 }): EscalationConfig {
   const warnings = Number(input.warningsBeforeMute);
   const ladderRaw = Array.isArray(input.muteLadderSeconds) ? input.muteLadderSeconds : [];
-  const ladder = ladderRaw
-    .map((n) => Math.floor(Number(n)))
-    .filter((n) => Number.isFinite(n) && n > 0);
+  const ladder = ladderRaw.flatMap((n) => {
+    const v = Math.floor(Number(n));
+    return Number.isFinite(v) && v > 0 ? [v] : [];
+  });
   return {
     warningsBeforeMute: Number.isFinite(warnings) && warnings >= 0 ? Math.floor(warnings) : DEFAULT_ESCALATION.warningsBeforeMute,
     muteLadderSeconds: ladder.length > 0 ? ladder : [...DEFAULT_ESCALATION.muteLadderSeconds],

@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
+import { SPRITE_DEFS } from '../sprites/sprite_manifest';
+import { SpriteVisual } from '../sprites/sprite_visual';
 import { mechAssetsReady, preloadMechAssets } from './assets';
 import type { WeaponLayoutOverride } from './manifest';
 import {
@@ -34,6 +36,7 @@ export class CharacterPreview {
   private camera: THREE.PerspectiveCamera;
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
+  private currentSpriteVisual: SpriteVisual | null = null;
   private currentSkin = 0;
   // Identity of the appearance last requested via setAppearance, so an async mech
   // re-apply can bail out if a newer selection superseded it.
@@ -152,8 +155,33 @@ export class CharacterPreview {
     // Clean up current visual if it exists
     if (this.currentVisual) {
       this.characterGroup.remove(this.currentVisual.root);
-      // CharacterVisual dispose only releases mixer listeners
+      this.currentVisual.dispose();
       this.currentVisual = null;
+    }
+    // Also clean up any sprite visual
+    if (this.currentSpriteVisual) {
+      this.characterGroup.remove(this.currentSpriteVisual.root);
+      this.currentSpriteVisual.dispose();
+      this.currentSpriteVisual = null;
+    }
+
+    // Use sprite visual if a sprite def exists for this key
+    const spriteDef = SPRITE_DEFS[visualKey];
+    if (spriteDef) {
+      try {
+        this.currentSpriteVisual = new SpriteVisual(
+          visualKey,
+          0xffffff,
+          this.currentSkin,
+          weaponItemId,
+          weaponOverride,
+        );
+        this.characterGroup.add(this.currentSpriteVisual.root);
+        this.characterGroup.rotation.y = 0;
+      } catch (err) {
+        console.error(`Failed to load sprite preview for ${visualKey}:`, err);
+      }
+      return;
     }
 
     try {
@@ -167,7 +195,7 @@ export class CharacterPreview {
       this.characterGroup.add(this.currentVisual.root);
 
       // Reset rotation on a class swap so every new character greets the player
-      // FACE-ON (the classic character-screen pose); dragging still spins freely.
+      // FACE-ON (the classic character-screen pose); dragging still spins freely).
       this.characterGroup.rotation.y = 0;
     } catch (err) {
       console.error(`Failed to load preview character visual for ${visualKey}:`, err);
@@ -182,6 +210,7 @@ export class CharacterPreview {
     this.appearanceSig = null;
     this.currentSkin = skinIndex;
     this.currentVisual?.setSkin(skinIndex);
+    this.currentSpriteVisual?.setSkin(skinIndex);
   }
 
   /** Dynamically shift the canvas to a new container */
@@ -287,6 +316,9 @@ export class CharacterPreview {
     if (this.currentVisual) {
       this.currentVisual.update(dt, PREVIEW_ANIM_STATE, true);
     }
+    if (this.currentSpriteVisual) {
+      this.currentSpriteVisual.update(dt, PREVIEW_ANIM_STATE, true);
+    }
 
     this.renderer.render(this.scene, this.camera);
   };
@@ -378,6 +410,11 @@ export class CharacterPreview {
       this.characterGroup.remove(this.currentVisual.root);
       this.currentVisual.dispose();
       this.currentVisual = null;
+    }
+    if (this.currentSpriteVisual) {
+      this.characterGroup.remove(this.currentSpriteVisual.root);
+      this.currentSpriteVisual.dispose();
+      this.currentSpriteVisual = null;
     }
 
     this.unregisterContext?.();

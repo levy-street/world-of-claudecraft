@@ -212,20 +212,21 @@ function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
     : Array.isArray(value.manifestEntries)
       ? value.manifestEntries
       : [];
-  out.entries = entries
-    .slice(0, 24)
-    .filter(isRecord)
-    .map((entry) => ({
-      id: textIn(entry.id, 80),
-      category: textIn(entry.category, 24),
-      required: Boolean(entry.required),
-      status: textIn(entry.status, 16),
-      elapsedMs: nullableNumberIn(entry.elapsedMs, 0, 60_000),
-      remainingMsAfter: nullableNumberIn(entry.remainingMsAfter, 0, 60_000),
-      programDelta: nullableNumberIn(entry.programDelta, -10_000, 10_000),
-      textureDelta: nullableNumberIn(entry.textureDelta, -10_000, 10_000),
-      detail: textIn(entry.detail, 160),
-    }));
+  out.entries = entries.slice(0, 24).flatMap((entry) =>
+    isRecord(entry)
+      ? [{
+          id: textIn(entry.id, 80),
+          category: textIn(entry.category, 24),
+          required: Boolean(entry.required),
+          status: textIn(entry.status, 16),
+          elapsedMs: nullableNumberIn(entry.elapsedMs, 0, 60_000),
+          remainingMsAfter: nullableNumberIn(entry.remainingMsAfter, 0, 60_000),
+          programDelta: nullableNumberIn(entry.programDelta, -10_000, 10_000),
+          textureDelta: nullableNumberIn(entry.textureDelta, -10_000, 10_000),
+          detail: textIn(entry.detail, 160),
+        }]
+      : [],
+  );
   return out;
 }
 

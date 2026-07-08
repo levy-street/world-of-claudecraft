@@ -1326,10 +1326,11 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
       // Every plate/valve/tablet/candle/rope in the room gates the exit (see
       // tryOpenDelveExitPortal); hint at the specific blocker instead of the
       // generic sealed line so a cleared-room player knows what to look for.
-      const untriggeredKinds = run.objectIds
-        .filter((id) => isDelvePuzzleKind(run.objectState[id]?.kind))
-        .filter((id) => !run.objectState[id]?.triggered)
-        .map((id) => run.objectState[id].kind);
+      const untriggeredKinds = run.objectIds.flatMap((id) => {
+        const kind = run.objectState[id]?.kind;
+        if (!kind || !isDelvePuzzleKind(kind) || run.objectState[id]?.triggered) return [];
+        return [kind];
+      });
       let text = 'The passage is sealed.';
       if (spiderSacsBlocking) text = 'You should try to destroy the spider sacs.';
       else if (untriggeredKinds.includes('bell_rope'))
