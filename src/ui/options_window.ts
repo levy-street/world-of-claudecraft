@@ -29,14 +29,22 @@ import {
   type Keybinds,
   keyLabel,
 } from '../game/keybinds';
-import { isNativeAppShell, useTouchInterface } from '../game/mobile_controls';
+import {
+  isNativeAppShell,
+  loadHapticsEnabled,
+  saveHapticsEnabled,
+  useTouchInterface,
+} from '../game/mobile_controls';
 import { music } from '../game/music';
 import {
+  BOOL_SETTINGS,
   type BoolSettingKey,
   type GameSettings,
   type NumericSettingKey,
   normalizeClickMoveButton,
   SETTING_RANGES,
+  TOUCH_BOOL_KEYS,
+  TOUCH_NUMERIC_KEYS,
 } from '../game/settings';
 import type { IWorld } from '../world_api';
 import type { ChatClock } from './chat_timestamp';
@@ -61,6 +69,7 @@ import {
   buildGraphicsControls,
   buildInterfaceControls,
   buildOptionsMenu,
+  buildTouchControls,
   type ChoiceControl,
   type OptionsControl,
   type OptionsPanelId,
@@ -209,6 +218,9 @@ export interface OptionsWindowDeps {
   resetChatWindow(): void;
   /** Reset the movable player + target unit frames to their stock spots. */
   resetUnitFrames(): void;
+  /** Open the mobile cluster binding editor (Customize Controls). Optional so
+   *  hosts without the touch cluster keep working. */
+  openClusterEditor?(): void;
   /** Chat-timestamp state (Hud owns it; the chat renderer reads the same fields). */
   getChatTimestamps(): boolean;
   setChatTimestamps(on: boolean): void;
@@ -324,6 +336,9 @@ export class OptionsWindow {
       case 'controller':
         this.renderController();
         return;
+      case 'touch':
+        this.renderTouch();
+        return;
       case 'performance':
         this.renderPerformance();
         return;
@@ -383,6 +398,11 @@ export class OptionsWindow {
     if (fmt === 'degrees')
       return (v) => `${formatNumber(Math.round(v), { maximumFractionDigits: 0 })}°`;
     if (fmt === 'oneDecimal') return (v) => formatNumber(v, { maximumFractionDigits: 1 });
+    if (fmt === 'milliseconds')
+      return (v) =>
+        t('hudChrome.options.millisecondsValue', {
+          value: formatNumber(Math.round(v), { maximumFractionDigits: 0 }),
+        });
     return (v) => formatNumber(v, { style: 'percent', maximumFractionDigits: 0 });
   }
 
@@ -689,6 +709,87 @@ export class OptionsWindow {
       this.applyControls(body, buildAudioControls(this.settingsSource(hooks)), hooks, () =>
         this.renderAudio(),
       );
+    this.settingsViewFooter();
+  }
+
+  // -------------------------------------------------------------------------
+  // Touch Controls -- the consolidated touch panel: the shared setting rows
+  // from buildTouchControls, plus three bespoke rows (haptics lives in its own
+  // localStorage key shared with the More-tray toggle; Customize Controls opens
+  // the HUD's binding editor; the reset button restores ONLY the touch keys,
+  // narrower than the global Settings.reset()).
+  // -------------------------------------------------------------------------
+
+  private renderTouch(): void {
+    const hooks = this.deps.options();
+    const body = this.settingsViewShell(t('hudChrome.options.touchControls'));
+    if (hooks) {
+      const controls = buildTouchControls(this.settingsSource(hooks), {
+        touch: useTouchInterface(),
+        nativeShell: isNativeAppShell(),
+      });
+      this.applyControls(body, controls, hooks, () => this.renderTouch());
+
+      // Haptics: not a GameSettings entry (its own woc_haptics_on key, shared
+      // with the More-tray toggle); the optional hook syncs live MobileControls.
+      const row = document.createElement('div');
+      row.className = 'set-row';
+      const name = document.createElement('span');
+      name.className = 'set-name';
+      name.textContent = t('hudChrome.mobile.haptics');
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'btn set-toggle';
+      const sync = () => {
+        const on = loadHapticsEnabled();
+        toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
+        toggle.classList.toggle('off', !on);
+        toggle.setAttribute('aria-pressed', String(on));
+        toggle.setAttribute('aria-label', t('hudChrome.mobile.haptics'));
+      };
+      sync();
+      toggle.addEventListener('click', () => {
+        audio.click();
+        const next = !loadHapticsEnabled();
+        if (hooks.setHaptics) hooks.setHaptics(next);
+        else saveHapticsEnabled(next);
+        sync();
+      });
+      row.append(name, toggle);
+      body.appendChild(row);
+    }
+
+    const el = this.deps.root();
+    // Customize Controls (the cluster binding editor) + the touch-only reset.
+    // Cluster button bindings keep their own reset inside the editor.
+    const customize = document.createElement('button');
+    customize.type = 'button';
+    customize.className = 'btn';
+    customize.textContent = t('hudChrome.mobile.customizeTitle');
+    customize.addEventListener('click', () => {
+      audio.click();
+      this.close();
+      this.deps.openClusterEditor?.();
+    });
+    const reset = document.createElement('button');
+    reset.type = 'button';
+    reset.className = 'btn';
+    reset.textContent = t('hudChrome.options.touchReset');
+    reset.addEventListener('click', () => {
+      audio.click();
+      const h = this.deps.options();
+      if (!h) return;
+      for (const key of TOUCH_NUMERIC_KEYS) h.onSettingChange(key, SETTING_RANGES[key].def);
+      for (const key of TOUCH_BOOL_KEYS) h.onSettingChange(key, BOOL_SETTINGS[key].def);
+      if (h.setHaptics) h.setHaptics(true);
+      else saveHapticsEnabled(true);
+      this.deps.log(t('hudChrome.options.touchResetDone'));
+      this.renderTouch();
+    });
+    const actions = document.createElement('div');
+    actions.className = 'set-row';
+    actions.append(customize, reset);
+    el.appendChild(actions);
     this.settingsViewFooter();
   }
 

@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { Keybinds } from '../game/keybinds';
+import { HAPTIC_TAP, loadHapticsEnabled, triggerHaptic } from '../game/mobile_controls';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
@@ -116,6 +117,7 @@ import {
   EMPTY_ICON_KEY,
   ITEM_ICON_PREFIX,
 } from './action_bar_view';
+import { aimRangeFor, isAimEligibleAbility } from './aim_assist_core';
 import { ArenaWindow } from './arena_window';
 import {
   abilityStartsAutoAttack,
@@ -273,6 +275,20 @@ import {
 } from './minimap_zoom';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { MovableFrame } from './movable_frame';
+import {
+  CLUSTER_ROLES,
+  type ClusterMap,
+  type ClusterOverrides,
+  type ClusterRole,
+  type ClusterSourceSlot,
+  clusterMapEquals,
+  deriveClusterMap,
+  emptyClusterMap,
+  OVERRIDABLE_CLUSTER_ROLES,
+  type OverridableClusterRole,
+  parseClusterOverrides,
+  resolveMobileCoreKit,
+} from './mobile_cluster_view';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
 import type { PartyRowAuraDeps } from './party_frame_row';
@@ -367,6 +383,10 @@ export interface OptionsHooks {
   // bag footer and player card reflect on-chain token changes. No-op when the wallet
   // feature is off or no wallet is connected/linked.
   refreshWocBalance(): void;
+  /** Set the touch haptics preference (its own woc_haptics_on key, not a
+   *  GameSettings entry) AND sync the live MobileControls + More-tray toggle.
+   *  Optional: hosts without touch controls omit it. */
+  setHaptics?(on: boolean): void;
   perfOverlay: PerfOverlayHooks;
   // UI theming seam — main.ts owns the ThemeStore + live CSS-variable apply.
   theme: ThemeHooks;
@@ -738,6 +758,10 @@ export class Hud {
   private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
   private static readonly BAR_ABILITY_SLOTS = 22;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
+  // Touch long-press threshold for the cluster binding editor -- shorter than
+  // TOOLTIP_PEEK_MS (950ms) since the editor supersedes the touch tooltip peek
+  // on cluster buttons.
+  private static readonly CLUSTER_EDITOR_HOLD_MS = 650;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
   private abilityButtons: {
@@ -754,6 +778,51 @@ export class Hud {
   // second/third bar is another descriptor, not a code fork.
   private actionBarView!: ActionBarView;
   private actionBarPainter!: ActionBarPainter;
+  // The mobile RoV-style action cluster: the SAME core+painter family bound to a
+  // second descriptor whose six slots (attack / skill1-3 / ultimate / potion)
+  // remap onto existing bar slots via clusterMap (see mobile_cluster_view.ts).
+  // Ticked+painted only while body.mobile-touch is active; the map re-derives
+  // only when the bar array identity or the known-ability count changes.
+  private clusterView!: ActionBarView;
+  private clusterPainter!: ActionBarPainter;
+  private clusterMap: ClusterMap = emptyClusterMap();
+  private clusterMapSource: HotbarAction[] | null = null;
+  private clusterMapKnownCount = -1;
+  private clusterMapForm: HotbarForm | null = null;
+  private clusterKitLabelEl: HTMLElement | null = null;
+  private lastClusterKitLabel = '';
+  private clusterButtonEls = new Map<ClusterRole, HTMLButtonElement>();
+  // The binding editor (Customize Controls): #cluster-editor is a managed
+  // .window.panel like the emote editor; clusterEditorRole is the slot tab.
+  private clusterEditorEl: HTMLElement | null = null;
+  private clusterEditorRole: OverridableClusterRole = 'attack';
+  // The editor opens mid-press (long-hold); if the window lands under the
+  // finger, the release click must not select an ability. Clicks within this
+  // window of opening are ignored by the item grid.
+  private clusterEditorOpenedAt = 0;
+  // Combo-point pips over the cluster (rogue / cat druid): elided by value.
+  private clusterComboEl: HTMLElement | null = null;
+  private clusterComboPips: HTMLElement[] = [];
+  private lastClusterCombo = -1;
+  /** Optional glue main.ts installs: attackNearest runs the same
+   *  target-nearest-then-attack path as the mobile Attack button; targetCycle is
+   *  the cluster's small target button (the Tab-target dispatch). */
+  mobileClusterHooks: { attackNearest(): void; targetCycle(): void } | null = null;
+  /** Smart-cast seam (M7B), installed by main.ts: the world steering the skill
+   *  smart-cast needs, so the HUD never touches a concrete world.
+   *  `ensureSmartTarget` keeps a valid current target or acquires the smart one
+   *  (targetPriority); `faceCurrentTarget` turns the player toward it on cast. */
+  aimHooks: {
+    ensureSmartTarget(): boolean;
+    faceCurrentTarget(): void;
+  } | null = null;
+  // Live skill press showing the range ring (null when idle). One at a time.
+  private aimGesture: {
+    role: ClusterRole;
+    slot: number;
+    pointerId: number;
+    range: number;
+  } | null = null;
   private hotbarActions: HotbarAction[] = []; // index = barSlot-1
   private loadedSlotMapFromStorage = false;
   private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
@@ -1203,6 +1272,7 @@ export class Hud {
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.loadSlotMap();
     this.buildActionBar();
+    this.buildMobileCluster();
     this.refreshKeybindLabels();
     this.buildXpTicks();
     document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());
@@ -2000,6 +2070,9 @@ export class Hud {
         break;
       case 'emote-editor':
         this.closeEmoteEditor();
+        break;
+      case 'cluster-editor':
+        this.closeClusterEditor();
         break;
       default:
         el.style.display = 'none';
@@ -3365,6 +3438,7 @@ export class Hud {
     log: (message) => this.log(message, '#ffd100'),
     resetChatWindow: () => this.resetChatWindow(),
     resetUnitFrames: () => this.resetUnitFrames(),
+    openClusterEditor: () => this.openClusterEditor(this.clusterEditorRole),
     getChatTimestamps: () => this.chatTimestamps,
     setChatTimestamps: (on) => {
       this.chatTimestamps = on;
@@ -4721,6 +4795,700 @@ export class Hud {
     return `url(${iconDataUrl('ability', iconKey.slice(ABILITY_ICON_PREFIX.length))})`;
   }
 
+  // Build the mobile action cluster (#mobile-cluster): six thumb buttons -- the
+  // big Attack, skill1..3, ultimate, potion -- bound to a SECOND action-bar
+  // view+painter instance (the "second bar is another descriptor" seam). Each
+  // button dispatches through castSlot on its mapped bar slot, so casting, GCD,
+  // resource gating, server validation, and the used-flash all reuse the main-bar
+  // path unchanged; the Attack button prefers the target-nearest hook main.ts
+  // installs (mobileClusterHooks), falling back to the slot-0 auto-attack toggle.
+  private buildMobileCluster(): void {
+    const root = document.getElementById('mobile-cluster');
+    if (!root) return;
+    // The class gates the CSS that hides the legacy scroll hotbar on touch, so an
+    // entry without the cluster container keeps its old bar untouched.
+    document.body.classList.add('mobile-cluster');
+    const clusterButtons: {
+      btn: HTMLButtonElement;
+      label: HTMLSpanElement;
+      countEl: HTMLSpanElement;
+      keybindEl: HTMLSpanElement;
+      cdOverlay: HTMLDivElement;
+      cdText: HTMLDivElement;
+    }[] = [];
+    for (const role of CLUSTER_ROLES) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `action-btn empty mcl-btn mcl-${role}`;
+      const label = document.createElement('span');
+      label.className = 'icon-label';
+      const countEl = document.createElement('span');
+      countEl.className = 'item-count';
+      const kb = document.createElement('span');
+      kb.className = 'keybind';
+      const cdOverlay = document.createElement('div');
+      cdOverlay.className = 'cd-overlay';
+      const cdText = document.createElement('div');
+      cdText.className = 'cdtext';
+      btn.append(label, countEl, kb, cdOverlay, cdText);
+      btn.addEventListener('click', () => {
+        // A click that ends a long-press tooltip peek inspects, not casts (the
+        // same TouchPeekGuard contract as the main bar's slot buttons).
+        if (this.peekGuard.consume()) {
+          this.hideTooltip();
+          btn.blur();
+          return;
+        }
+        audio.click();
+        triggerHaptic(HAPTIC_TAP, loadHapticsEnabled());
+        if (role === 'attack') {
+          this.castClusterAttack();
+        } else {
+          const slot = this.clusterMap[role];
+          if (slot !== null) this.castSlot(slot);
+        }
+        this.flashActionButton(btn);
+        btn.blur();
+      });
+      this.clusterButtonEls.set(role, btn);
+      // Touch long-press opens the binding editor on this slot (overridable
+      // roles only); the trailing click is consumed via the shared peek guard.
+      // Hover/focus tooltips (below) stay for desktop testing.
+      if ((OVERRIDABLE_CLUSTER_ROLES as readonly string[]).includes(role)) {
+        const editorRole = role as OverridableClusterRole;
+        let holdTimer: number | null = null;
+        let downX = 0;
+        let downY = 0;
+        const cancelHold = () => {
+          if (holdTimer !== null) window.clearTimeout(holdTimer);
+          holdTimer = null;
+        };
+        btn.addEventListener('pointerdown', (e) => {
+          if (e.pointerType === 'mouse') return;
+          // When aim assist arms this press (an eligible skill + the setting on),
+          // holding aims the skill instead of opening the binding editor.
+          if (this.aimArmsPress(role)) return;
+          cancelHold();
+          downX = e.clientX;
+          downY = e.clientY;
+          // Hold threshold: the player-tunable Options > Touch Controls value,
+          // read live at press time (static fallback until hooks attach).
+          const holdMs =
+            this.optionsHooks?.settings.get('clusterHoldMs') ?? Hud.CLUSTER_EDITOR_HOLD_MS;
+          holdTimer = window.setTimeout(() => {
+            holdTimer = null;
+            // Mark the press as a peek so the release click inspects, not casts.
+            this.peekGuard.tooltipShown('touch');
+            triggerHaptic(HAPTIC_TAP, loadHapticsEnabled());
+            this.openClusterEditor(editorRole);
+          }, holdMs);
+        });
+        btn.addEventListener('pointermove', (e) => {
+          if (holdTimer !== null && Math.hypot(e.clientX - downX, e.clientY - downY) > 12) {
+            cancelHold();
+          }
+        });
+        btn.addEventListener('pointerup', cancelHold);
+        btn.addEventListener('pointercancel', cancelHold);
+        btn.addEventListener('pointerleave', cancelHold);
+      }
+      // RoV-style aim assist (M7B): hold an eligible skill button to show its
+      // range ring, drag to aim (the reticle snaps to the best enemy in range),
+      // release to cast. A plain tap still quick-casts on the smart target. Only
+      // skill/form roles can hold an offensive ability; attack + potion never do.
+      if (role !== 'attack' && role !== 'potion') this.attachAimGesture(btn, role);
+      // Hover (desktop testing) / focus tooltip, built from the same
+      // ability/item tooltip renderers as the main bar. Touch long-press is the
+      // binding editor above, so this variant deliberately skips the touch path.
+      this.attachHoverTooltip(btn, () => {
+        // The attack role shows the classic Attack tooltip only while it is the
+        // auto-attack toggle; a curated basic-attack ability (druid forms:
+        // Wrath / Maul / Claw) shows its real ability tooltip instead.
+        if (role === 'attack' && this.clusterMap.attack === 0) {
+          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div>`;
+        }
+        const slot = this.clusterSlotFor(role);
+        if (slot === null) return '';
+        const known = this.abilityForSlot(slot);
+        if (known) return this.abilityTooltip(known);
+        const item = this.itemForSlot(slot);
+        if (item) {
+          const count = this.inventoryCount(item.id);
+          return (
+            this.itemTooltip(item) +
+            `<div class="tt-sub">${esc(
+              count > 0
+                ? t('abilityUi.actionBar.itemInBags', {
+                    count: formatNumber(count, { maximumFractionDigits: 0 }),
+                  })
+                : t('abilityUi.actionBar.itemNoneInBags'),
+            )}</div>`
+          );
+        }
+        return '';
+      });
+      root.appendChild(btn);
+      clusterButtons.push({ btn, label, countEl, keybindEl: kb, cdOverlay, cdText });
+    }
+    // The attack slot's paint identity is DYNAMIC: while the mapping pins it to
+    // barSlot 0 it paints as the classic Attack toggle (isAttack), but a curated
+    // basic-attack ability (druid forms) paints as that ability -- icon, cooldown
+    // sweep, resource dimming and all. A getter keeps the descriptor's isAttack
+    // current without rebuilding the view on form changes.
+    const attackIsToggle = () => this.clusterMap.attack === 0;
+    this.clusterView = createActionBarView(
+      {
+        slots: CLUSTER_ROLES.map((role, i) => ({
+          slotIndex: i,
+          get isAttack() {
+            return role === 'attack' && attackIsToggle();
+          },
+          hasAction: () => this.clusterSlotFor(role) !== null,
+          ability: () => {
+            const slot = this.clusterSlotFor(role);
+            return slot === null ? null : this.abilityForSlot(slot);
+          },
+          item: () => {
+            const slot = this.clusterSlotFor(role);
+            return slot === null ? null : this.itemForSlot(slot);
+          },
+          keybindLabel: () => {
+            const slot = this.clusterSlotFor(role);
+            return slot === null ? '' : this.keybinds.primaryLabel(`slot${slot}`);
+          },
+        })),
+      },
+      {
+        t,
+        abilityName: abilityDisplayName,
+        itemName: itemDisplayName,
+        slotLabel: (i) => formatAbilityNumber(i + 1),
+        formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+      },
+    );
+    this.clusterPainter = new ActionBarPainter(
+      this.writerFacet,
+      { container: root, slots: clusterButtons },
+      (iconKey) => this.actionBarIconBg(iconKey),
+    );
+
+    // The small target/cycle button: a plain callback control (not an action-bar
+    // slot, so it is not painter-driven) dispatching the same Tab-target path as
+    // the keyboard and the mobile combat row's Target button.
+    const targetBtn = document.createElement('button');
+    targetBtn.type = 'button';
+    targetBtn.className = 'mobile-btn mcl-target-btn';
+    targetBtn.title = t('hud.keybinds.actions.target');
+    targetBtn.setAttribute('aria-label', t('hud.keybinds.actions.target'));
+    targetBtn.innerHTML = svgIcon('target');
+    targetBtn.addEventListener('click', () => {
+      audio.click();
+      triggerHaptic(HAPTIC_TAP, loadHapticsEnabled());
+      this.mobileClusterHooks?.targetCycle();
+      targetBtn.blur();
+    });
+    root.appendChild(targetBtn);
+
+    // A subtle class/build caption under the cluster (e.g. "Druid · Bear Form"),
+    // refreshed by refreshClusterMap whenever the class kit or form changes.
+    const kitLabel = document.createElement('div');
+    kitLabel.className = 'mcl-kit-label';
+    kitLabel.setAttribute('aria-hidden', 'true');
+    root.appendChild(kitLabel);
+    this.clusterKitLabelEl = kitLabel;
+
+    // Combo-point pips above the big Attack button (rogue / cat druid). Hidden
+    // (display gated by the .on-count classes) for classes without combo points.
+    const combo = document.createElement('div');
+    combo.className = 'mcl-combo';
+    combo.setAttribute('aria-hidden', 'true');
+    this.clusterComboPips = [];
+    for (let p = 0; p < 5; p++) {
+      const pip = document.createElement('span');
+      pip.className = 'mcl-combo-pip';
+      combo.appendChild(pip);
+      this.clusterComboPips.push(pip);
+    }
+    root.appendChild(combo);
+    this.clusterComboEl = combo;
+  }
+
+  // Hover/focus-only tooltip (no touch long-press path): the cluster buttons
+  // reserve touch long-press for the binding editor, so they cannot use the full
+  // attachTooltip. Mirrors its mouse/focus handlers over the same #tooltip node.
+  private attachHoverTooltip(el: HTMLElement, html: () => string): void {
+    const mobile = () => document.body.classList.contains('mobile-touch');
+    const show = (x: number, y: number) => {
+      const content = html();
+      if (content === '') return;
+      this.tooltipEl.innerHTML = content;
+      this.tooltipEl.style.display = 'block';
+      const z = getUiScale();
+      const tw = this.tooltipEl.offsetWidth,
+        th = this.tooltipEl.offsetHeight;
+      this.tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, x / z + 14))}px`;
+      this.tooltipEl.style.top = `${Math.max(8, y / z - th - 10)}px`;
+    };
+    el.addEventListener('mouseenter', () => {
+      if (mobile()) return;
+      const rect = el.getBoundingClientRect();
+      show(rect.right, rect.top + rect.height / 2);
+    });
+    el.addEventListener('mouseleave', () => {
+      this.tooltipEl.style.display = 'none';
+    });
+    el.addEventListener('focusin', () => {
+      const rect = el.getBoundingClientRect();
+      show(rect.right, rect.top + rect.height / 2);
+    });
+    el.addEventListener('focusout', () => {
+      this.tooltipEl.style.display = 'none';
+    });
+  }
+
+  /** Cluster role -> mapped bar slot; attack is always a number (0 = the fixed
+   *  auto-attack toggle, >0 = a curated basic-attack ability's bar slot). */
+  private clusterSlotFor(role: ClusterRole): number | null {
+    return this.clusterMap[role];
+  }
+
+  /** True when the player's current target is something auto-attackable (the
+   *  same gate castSlot's attack-on-ability QoL uses). */
+  private hasClusterAttackTarget(): boolean {
+    const tid = this.sim.player.targetId;
+    const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
+    return hasAutoAttackTarget(target);
+  }
+
+  // The big Attack button. With a curated basic-attack ability mapped (druid
+  // forms: Wrath / Maul / Claw) it acquires a target if needed (the same
+  // target-nearest path as the mobile Attack button) and casts the ability;
+  // otherwise it falls back to the classic attack-nearest / auto-attack toggle.
+  private castClusterAttack(): void {
+    const slot = this.clusterMap.attack;
+    if (slot !== 0) {
+      if (!this.hasClusterAttackTarget()) this.mobileClusterHooks?.attackNearest();
+      if (this.hasClusterAttackTarget()) this.castSlot(slot);
+      return;
+    }
+    if (this.mobileClusterHooks) this.mobileClusterHooks.attackNearest();
+    else this.castSlot(0);
+  }
+
+  // --- Skill smart-cast + range preview (M7B) --------------------------------
+  // Combat here is target-based (tap an enemy to select it, then cast), so this
+  // is NOT free aiming. Pressing an eligible offensive skill previews its range
+  // as a ground ring; releasing casts on your current target, or auto-acquires
+  // the best nearby enemy if you have none (honoring targetPriority), facing it.
+  // Releasing with your finger slid off the button cancels. Eligibility + the
+  // ring radius come from the pure aim_assist_core module; casting always routes
+  // through castSlot, so GCD, cost, server validation, and the used-flash are
+  // shared with every other cast path.
+
+  /** Distance (px) past the button edge at which a release reads as a cancel. */
+  private static readonly AIM_CANCEL_MARGIN_PX = 28;
+
+  /** True when a press on this role should show the range ring + smart-cast:
+   *  touch context, the setting on, and an eligible offensive ability mapped. */
+  private aimArmsPress(role: ClusterRole): boolean {
+    if (role === 'attack' || role === 'potion') return false;
+    if (!document.body.classList.contains('mobile-touch')) return false;
+    if (!(this.optionsHooks?.settings.get('aimAssist') ?? true)) return false;
+    if (!this.aimHooks) return false;
+    return this.aimAbilityForRole(role) !== null;
+  }
+
+  /** The eligible ability behind a role, with its ring radius, or null. */
+  private aimAbilityForRole(role: ClusterRole): { slot: number; range: number } | null {
+    const slot = this.clusterSlotFor(role);
+    if (slot === null || slot === 0) return null;
+    const resolved = this.abilityForSlot(slot);
+    if (!resolved || !isAimEligibleAbility(resolved.def)) return null;
+    return { slot, range: aimRangeFor(resolved.def) };
+  }
+
+  private showAimRing(g: NonNullable<Hud['aimGesture']>): void {
+    const p = this.sim.player;
+    this.renderer.setAimIndicator({ centerX: p.pos.x, centerZ: p.pos.z, radius: g.range });
+  }
+
+  private attachAimGesture(btn: HTMLButtonElement, role: ClusterRole): void {
+    btn.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') return; // touch-only
+      if (!this.aimArmsPress(role)) return; // let the normal click cast handle it
+      const info = this.aimAbilityForRole(role);
+      if (!info) return;
+      // Own this press: clear any stale peek, and mark it a peek on release so the
+      // synthetic click that follows does not double-cast.
+      this.peekGuard.press();
+      this.aimGesture = { role, slot: info.slot, pointerId: e.pointerId, range: info.range };
+      try {
+        btn.setPointerCapture(e.pointerId);
+      } catch {
+        // older webviews without pointer capture still get up/cancel on the button
+      }
+      triggerHaptic(HAPTIC_TAP, loadHapticsEnabled());
+      this.showAimRing(this.aimGesture); // preview the range while held
+    });
+    // Keep the ring centered on the player if they move (other thumb) during the hold.
+    btn.addEventListener('pointermove', (e) => {
+      const g = this.aimGesture;
+      if (!g || e.pointerId !== g.pointerId) return;
+      this.showAimRing(g);
+    });
+    const finish = (e: PointerEvent, cancel: boolean) => {
+      const g = this.aimGesture;
+      if (!g || e.pointerId !== g.pointerId) return;
+      this.aimGesture = null;
+      this.renderer.setAimIndicator(null);
+      try {
+        btn.releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore: capture may already be gone
+      }
+      // Swallow the trailing synthetic click (we cast here, on release).
+      this.peekGuard.tooltipShown('touch');
+      // Released with the finger slid off the button: abort without casting.
+      const releasedOff = cancel || this.aimReleasedOffButton(btn, e);
+      if (!releasedOff) this.smartCast(g.slot);
+      btn.blur();
+    };
+    btn.addEventListener('pointerup', (e) => finish(e, false));
+    btn.addEventListener('pointercancel', (e) => finish(e, true));
+    // Safety net: if the browser drops the pointer stream without a normal up /
+    // cancel (backgrounded tab, webview quirk), tear the gesture down so the ring
+    // cannot linger. Fires after our own releasePointerCapture too, a no-op then.
+    btn.addEventListener('lostpointercapture', (e) => finish(e, true));
+  }
+
+  /** True when a release landed clear of the button (a deliberate cancel). */
+  private aimReleasedOffButton(btn: HTMLButtonElement, e: PointerEvent): boolean {
+    const r = btn.getBoundingClientRect();
+    const m = Hud.AIM_CANCEL_MARGIN_PX;
+    return (
+      e.clientX < r.left - m ||
+      e.clientX > r.right + m ||
+      e.clientY < r.top - m ||
+      e.clientY > r.bottom + m
+    );
+  }
+
+  /** Cast a skill on the current target, acquiring + facing the smart target when
+   *  none is selected. Shared by the release path (no separate quick/aim modes). */
+  private smartCast(slot: number): void {
+    if (this.sim.player.dead) return; // no casting while dead (avoids a dead round-trip)
+    if (this.aimHooks) {
+      this.aimHooks.ensureSmartTarget();
+      this.aimHooks.faceCurrentTarget();
+    }
+    this.castSlot(slot);
+  }
+
+  // Re-derive the cluster mapping, but only when the bar changed: every bar
+  // mutation path reassigns this.hotbarActions (functional updates), learning an
+  // ability grows sim.known, and shapeshifting swaps activeHotbarForm, so (array
+  // identity, known count, form) is a complete and allocation-free staleness key
+  // for the per-frame call. The form is also what makes the DRUID cluster
+  // form-aware: resolveMobileCoreKit picks the bear/cat/caster kit to match the bar.
+  private refreshClusterMap(): void {
+    const knownCount = this.sim.known.length;
+    if (
+      this.clusterMapSource === this.hotbarActions &&
+      this.clusterMapKnownCount === knownCount &&
+      this.clusterMapForm === this.activeHotbarForm
+    )
+      return;
+    this.clusterMapSource = this.hotbarActions;
+    this.clusterMapKnownCount = knownCount;
+    this.clusterMapForm = this.activeHotbarForm;
+    const source: ClusterSourceSlot[] = [];
+    for (let i = 0; i < this.hotbarActions.length; i++) {
+      const action = this.hotbarActions[i];
+      if (action === null) continue;
+      const barSlot = i + 1;
+      if (action.type === 'ability') {
+        const resolved = this.abilityForSlot(barSlot);
+        source.push({
+          barSlot,
+          kind: resolved !== null ? 'ability' : 'other',
+          abilityId: resolved !== null ? resolved.def.id : undefined,
+        });
+      } else {
+        const item = this.itemForSlot(barSlot);
+        source.push({ barSlot, kind: item?.kind === 'potion' ? 'potion' : 'other' });
+      }
+    }
+    const next = deriveClusterMap(
+      source,
+      resolveMobileCoreKit(this.sim.cfg.playerClass, this.activeHotbarForm),
+      this.loadClusterOverrides(),
+    );
+    if (!clusterMapEquals(this.clusterMap, next)) this.clusterMap = next;
+    this.refreshClusterKitLabel();
+    this.refreshClusterFormHighlight();
+  }
+
+  // ---- Cluster customization (per character+class+form, localStorage) --------
+  // The curated kits are the defaults; a player's saved bindings win per role
+  // when that ability is learned and on the bar. No editor UI yet (Milestone 6):
+  // setClusterBinding / resetClusterBindings are the stable API the editor will
+  // call, and they already validate eligibility and persist.
+
+  private clusterOverridesKey(form: HotbarForm = this.activeHotbarForm): string {
+    return `woc_cluster_${this.sim.cfg.playerClass}_${this.sim.player.name}_${form}`;
+  }
+
+  private loadClusterOverrides(): ClusterOverrides | null {
+    try {
+      const raw = localStorage.getItem(this.clusterOverridesKey());
+      return raw === null ? null : parseClusterOverrides(JSON.parse(raw));
+    } catch {
+      return null;
+    }
+  }
+
+  /** Bind (or clear, with null) one cluster button for the CURRENT form. Only
+   *  learned, non-shapeshift abilities are eligible; returns whether it took. */
+  setClusterBinding(role: OverridableClusterRole, abilityId: string | null): boolean {
+    if (abilityId !== null) {
+      const eligible =
+        this.sim.known.some((k) => k.def.id === abilityId) && !Hud.FORM_TOGGLE_IDS.has(abilityId);
+      if (!eligible) return false;
+    }
+    const overrides: ClusterOverrides = this.loadClusterOverrides() ?? {};
+    if (abilityId === null) delete overrides[role];
+    else overrides[role] = abilityId;
+    try {
+      if (Object.keys(overrides).length === 0) {
+        localStorage.removeItem(this.clusterOverridesKey());
+      } else {
+        localStorage.setItem(this.clusterOverridesKey(), JSON.stringify(overrides));
+      }
+    } catch {
+      /* storage unavailable */
+    }
+    this.invalidateClusterMap();
+    return true;
+  }
+
+  /** Reset to Class Defaults: drop every saved cluster binding for this
+   *  character (all forms), falling back to the curated kits. */
+  resetClusterBindings(): void {
+    const forms: HotbarForm[] = ['normal', 'bear', 'cat', 'stealth'];
+    for (const form of forms) {
+      try {
+        localStorage.removeItem(this.clusterOverridesKey(form));
+      } catch {
+        /* storage unavailable */
+      }
+    }
+    this.invalidateClusterMap();
+  }
+
+  private invalidateClusterMap(): void {
+    this.clusterMapSource = null;
+  }
+
+  // The subtle class/build caption (e.g. "Druid · Bear Form"): localized class
+  // name, plus the form toggle's ability name while shapeshifted. Cheap string
+  // diff so the DOM write only fires when the label actually changes.
+  private refreshClusterKitLabel(): void {
+    if (this.clusterKitLabelEl === null) return;
+    const cls = classDisplayName(this.sim.cfg.playerClass);
+    const formToggleId =
+      this.activeHotbarForm === 'bear'
+        ? 'bear_form'
+        : this.activeHotbarForm === 'cat'
+          ? 'cat_form'
+          : null;
+    const formDef = formToggleId !== null ? ABILITIES[formToggleId] : undefined;
+    const label = formDef ? `${cls} · ${abilityDisplayName(formDef)}` : cls;
+    if (label === this.lastClusterKitLabel) return;
+    this.lastClusterKitLabel = label;
+    this.clusterKitLabelEl.textContent = label;
+  }
+
+  // Highlight the shapeshift button matching the ACTIVE form (gold ring via
+  // .active-form). Runs on map refresh only, not per frame.
+  private refreshClusterFormHighlight(): void {
+    const activeId =
+      this.activeHotbarForm === 'bear'
+        ? 'bear_form'
+        : this.activeHotbarForm === 'cat'
+          ? 'cat_form'
+          : null;
+    for (const role of ['form1', 'form2', 'form3'] as const) {
+      const btn = this.clusterButtonEls.get(role);
+      if (!btn) continue;
+      const slot = this.clusterMap[role];
+      const id = slot !== null && slot > 0 ? (this.abilityForSlot(slot)?.def.id ?? null) : null;
+      btn.classList.toggle('active-form', activeId !== null && id === activeId);
+    }
+  }
+
+  // ---- Cluster binding editor (Customize Controls) --------------------------
+  // A managed .window.panel (like the emote editor): long-press a cluster
+  // button or More > Customize opens it; Esc / the X close it. Selecting an
+  // ability routes through setClusterBinding (eligibility + persistence), the
+  // cluster re-derives immediately, and a banner confirms the change.
+
+  toggleClusterEditor(): void {
+    const el = this.clusterEditorElement();
+    if (el === null) return;
+    if (el.style.display === 'block') this.closeClusterEditor();
+    else this.openClusterEditor(this.clusterEditorRole);
+  }
+
+  openClusterEditor(role: OverridableClusterRole = 'attack'): void {
+    const el = this.clusterEditorElement();
+    if (el === null) return;
+    this.clusterEditorRole = role;
+    this.closeOtherWindows('#cluster-editor');
+    this.refreshClusterMap();
+    this.renderClusterEditor();
+    el.style.display = 'block';
+    this.clusterEditorOpenedAt = performance.now();
+    this.syncAnyWindowOpenState();
+  }
+
+  closeClusterEditor(): void {
+    const el = this.clusterEditorElement();
+    if (el === null) return;
+    el.style.display = 'none';
+    this.hideTooltip();
+    this.syncAnyWindowOpenState();
+  }
+
+  private clusterEditorElement(): HTMLElement | null {
+    if (this.clusterEditorEl === null) {
+      this.clusterEditorEl = document.getElementById('cluster-editor');
+    }
+    return this.clusterEditorEl;
+  }
+
+  private clusterSlotDisplayName(role: OverridableClusterRole): string {
+    if (role === 'attack') return t('hudChrome.mobile.customizeSlotAttack');
+    if (role === 'utility') return t('hudChrome.mobile.customizeSlotUtility');
+    const n = role === 'skill1' ? 1 : role === 'skill2' ? 2 : 3;
+    return t('hudChrome.mobile.customizeSlotSkill', {
+      n: formatNumber(n, { maximumFractionDigits: 0 }),
+    });
+  }
+
+  /** The ability id currently mapped onto a cluster role, or null (attack 0 =
+   *  the plain auto-attack toggle, or an unmapped role). */
+  private clusterRoleAbilityId(role: OverridableClusterRole): string | null {
+    const slot = this.clusterMap[role];
+    if (slot === null || slot === 0) return null;
+    return this.abilityForSlot(slot)?.def.id ?? null;
+  }
+
+  private renderClusterEditor(): void {
+    const el = this.clusterEditorElement();
+    if (el === null) return;
+    const role = this.clusterEditorRole;
+    const overrides = this.loadClusterOverrides();
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.mobile.customizeTitle'))}</span><span class="x-btn" data-close>${svgIcon('close')}</span></div>`;
+
+    // Slot tabs: the five overridable roles, current binding icon + slot name.
+    const tabs = document.createElement('div');
+    tabs.className = 'cluster-editor-slots';
+    for (const r of OVERRIDABLE_CLUSTER_ROLES) {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'cluster-editor-slot';
+      tab.classList.toggle('selected', r === role);
+      const icon = document.createElement('span');
+      icon.className = 'cluster-editor-slot-icon';
+      const currentId = this.clusterRoleAbilityId(r);
+      icon.style.backgroundImage =
+        currentId !== null
+          ? `url(${iconDataUrl('ability', currentId)})`
+          : `url(${iconDataUrl('ability', 'attack')})`;
+      const label = document.createElement('span');
+      label.className = 'cluster-editor-slot-label';
+      label.textContent = this.clusterSlotDisplayName(r);
+      tab.append(icon, label);
+      tab.addEventListener('click', () => {
+        audio.click();
+        this.clusterEditorRole = r;
+        this.renderClusterEditor();
+      });
+      tabs.appendChild(tab);
+    }
+
+    // Status line: overridden or class default for the selected slot.
+    const status = document.createElement('div');
+    status.className = 'cluster-editor-status';
+    status.textContent =
+      overrides?.[role] !== undefined
+        ? this.clusterSlotDisplayName(role)
+        : t('hudChrome.mobile.customizeDefault');
+
+    // Eligible abilities: learned, minus the shapeshift toggles (the form
+    // column owns those). The current binding is highlighted.
+    const grid = document.createElement('div');
+    grid.className = 'cluster-editor-grid';
+    const currentId = this.clusterRoleAbilityId(role);
+    for (const known of this.sim.known) {
+      const id = known.def.id;
+      if (Hud.FORM_TOGGLE_IDS.has(id)) continue;
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'cluster-editor-item';
+      item.classList.toggle('current', id === currentId);
+      const icon = document.createElement('span');
+      icon.className = 'cluster-editor-item-icon';
+      icon.style.backgroundImage = `url(${iconDataUrl('ability', id)})`;
+      const name = document.createElement('span');
+      name.textContent = abilityDisplayName(known.def);
+      item.append(icon, name);
+      item.addEventListener('click', () => {
+        // Swallow the release-click of the long-press that opened the editor.
+        if (performance.now() - this.clusterEditorOpenedAt < 350) return;
+        audio.click();
+        if (!this.setClusterBinding(role, id)) return;
+        this.refreshClusterMap();
+        this.showBanner(
+          t('hudChrome.mobile.customizeUpdated', { slot: this.clusterSlotDisplayName(role) }),
+        );
+        this.renderClusterEditor();
+      });
+      grid.appendChild(item);
+    }
+
+    // Footer: per-slot reset + full reset to class defaults.
+    const footer = document.createElement('div');
+    footer.className = 'cluster-editor-footer';
+    const resetSlot = document.createElement('button');
+    resetSlot.className = 'btn';
+    resetSlot.textContent = t('hudChrome.mobile.customizeResetSlot');
+    resetSlot.disabled = overrides?.[role] === undefined;
+    resetSlot.addEventListener('click', () => {
+      audio.click();
+      this.setClusterBinding(role, null);
+      this.refreshClusterMap();
+      this.showBanner(
+        t('hudChrome.mobile.customizeUpdated', { slot: this.clusterSlotDisplayName(role) }),
+      );
+      this.renderClusterEditor();
+    });
+    const resetAll = document.createElement('button');
+    resetAll.className = 'btn';
+    resetAll.textContent = t('hudChrome.mobile.customizeResetAll');
+    resetAll.addEventListener('click', () => {
+      audio.click();
+      this.resetClusterBindings();
+      this.refreshClusterMap();
+      this.showBanner(t('hudChrome.mobile.customizeAllReset'));
+      this.renderClusterEditor();
+    });
+    footer.append(resetSlot, resetAll);
+
+    el.append(tabs, status, grid, footer);
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeClusterEditor());
+  }
+
   private clearActionDropTargets(): void {
     // Both action rows (#actionbar and #actionbar2) hold .action-btn slots.
     document.querySelectorAll('.action-btn.drop-target').forEach((el) => {
@@ -5512,6 +6280,28 @@ export class Hud {
     this.actionBarPainter.paint(
       this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
     );
+    // mobile action cluster: the second view+painter pair over the same tick
+    // contract, gated on the touch interface being live (its nodes are
+    // display:none otherwise, so desktop frames skip the whole derive+paint).
+    // The painter-existence guard covers hosts whose DOM lacks #mobile-cluster
+    // (jsdom fixtures, older shells): buildMobileCluster returned early there.
+    if (this.clusterPainter && document.body.classList.contains('mobile-touch')) {
+      this.refreshClusterMap();
+      this.clusterPainter.paint(
+        this.clusterView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
+      );
+      // Combo-point pips (rogue / cat druid): value-diffed so a steady count
+      // costs no DOM writes.
+      const combo =
+        this.sim.cfg.playerClass === 'rogue' || this.activeHotbarForm === 'cat' ? p.comboPoints : 0;
+      if (combo !== this.lastClusterCombo) {
+        this.lastClusterCombo = combo;
+        if (this.clusterComboEl) this.toggleClass(this.clusterComboEl, 'visible', combo > 0);
+        this.clusterComboPips.forEach((pip, i) => {
+          this.toggleClass(pip as HTMLElement, 'on', i < combo);
+        });
+      }
+    }
 
     // xp bar: pre-cap shows the level bar; post-cap fills toward the next virtual
     // level (Max-Level XP Overflow), with distinct prestige/gold styling. The
@@ -12198,6 +12988,7 @@ export class Hud {
       this.optionsOpen ||
       this.emoteWheelOpen ||
       $('#emote-editor').style.display === 'block' ||
+      this.clusterEditorElement()?.style.display === 'block' ||
       this.cardModalEl !== null
     );
   }

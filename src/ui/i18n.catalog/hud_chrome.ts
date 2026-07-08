@@ -229,6 +229,18 @@ export const hudChromeStrings = {
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
     toggleHaptics: 'Toggle haptics',
+    // Cluster binding editor (Customize Controls): long-press a cluster button
+    // or More > Customize. Slot names mirror the RoV-style roles.
+    customize: 'Customize',
+    customizeTitle: 'Customize Controls',
+    customizeSlotAttack: 'Basic Attack',
+    customizeSlotSkill: 'Skill {n}',
+    customizeSlotUtility: 'Utility',
+    customizeDefault: 'Class default',
+    customizeResetSlot: 'Reset this slot',
+    customizeResetAll: 'Reset all to Class Defaults',
+    customizeUpdated: '{slot} updated.',
+    customizeAllReset: 'Controls reset to class defaults.',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -364,6 +376,25 @@ export const hudChromeStrings = {
     interfaceModeTouch: 'Touch',
     interfaceModeNote:
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
+    // Touch Controls panel (Options > Touch Controls): the consolidated home
+    // for the touch-interface settings, the binding-editor launcher, and the
+    // touch-only reset.
+    touchControls: 'Touch Controls',
+    clusterHold: 'Edit Hold Delay',
+    clusterHoldNote:
+      'How long to hold an on-screen action button before its binding editor opens. Raise it if you trigger the editor while spamming skills.',
+    targetPriority: 'Attack Target Priority',
+    targetPriorityNearest: 'Nearest',
+    targetPriorityLowestHp: 'Lowest Health',
+    targetPriorityCurrent: 'Current First',
+    targetPriorityNote:
+      'What the Attack button targets when you have no valid target: the nearest enemy, the lowest-health enemy in range, or keep your current target while it stays valid.',
+    aimAssist: 'Smart Skill Cast',
+    aimAssistNote:
+      'Press an offensive skill to cast on your target, or the best nearby enemy if you have none, turning to face it. Hold the button to preview the skill range; release with your finger off the button to cancel.',
+    millisecondsValue: '{value} ms',
+    touchReset: 'Reset Touch Controls',
+    touchResetDone: 'Touch controls restored to defaults.',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
     // Toggle for the OSRS-style click-feedback marker: entity targets and

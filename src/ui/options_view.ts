@@ -27,7 +27,7 @@ import type { TranslationKey } from './i18n.catalog';
 // choice an enumerated set.
 
 /** How a slider's readout is formatted; the painter maps this to a formatter. */
-export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal';
+export type SliderFmt = 'percent' | 'degrees' | 'oneDecimal' | 'milliseconds';
 
 export interface SliderControl {
   control: 'slider';
@@ -197,6 +197,7 @@ const lowHighOptions: ChoiceOption[] = [
 export type OptionsPanelId =
   | 'keybinds'
   | 'controller'
+  | 'touch'
   | 'graphics'
   | 'interface'
   | 'audio'
@@ -219,6 +220,7 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
   const entries: OptionsMenuEntry[] = [
     { labelKey: 'hud.options.keyBindings', action: { kind: 'goto', view: 'keybinds' } },
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
+    { labelKey: 'hudChrome.options.touchControls', action: { kind: 'goto', view: 'touch' } },
     { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
     { labelKey: 'hud.options.interface', action: { kind: 'goto', view: 'interface' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
@@ -341,6 +343,56 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
     slider(s, 'gamepadCameraSpeed', 'hudChrome.controller.cameraSpeed', 'oneDecimal'),
     slider(s, 'gamepadVibration', 'hudChrome.controller.vibration'),
   ];
+}
+
+// ---------------------------------------------------------------------------
+// Touch Controls panel -- the consolidated home for every touch-interface
+// setting (Interface Mode, layout, scales, deadzone, look, long-press delay,
+// smart-target priority). Several rows are shared with Graphics / Key Bindings
+// (same setting keys, live-read on render, so the duplication cannot drift).
+// The bespoke haptics toggle, the Customize Controls launcher, and the
+// touch-reset button are painter rows in options_window.ts.
+// ---------------------------------------------------------------------------
+
+export function buildTouchControls(s: OptionsSettingsSource, env: OptionsEnv): OptionsControl[] {
+  const out: OptionsControl[] = [];
+  // Desktop vs on-screen touch controls. Hidden in the native shell (forces touch).
+  if (!env.nativeShell) {
+    out.push(
+      choice(
+        s,
+        'interfaceMode',
+        'hudChrome.options.interfaceMode',
+        [
+          { value: 0, labelKey: 'hudChrome.options.interfaceModeAuto' },
+          { value: 1, labelKey: 'hudChrome.options.interfaceModeDesktop' },
+          { value: 2, labelKey: 'hudChrome.options.interfaceModeTouch' },
+        ],
+        true,
+      ),
+    );
+    out.push(note('hudChrome.options.interfaceModeNote'));
+  }
+  out.push(boolToggle(s, 'leftHandedTouch', 'hud.options.leftHandedTouch'));
+  out.push(slider(s, 'actionButtonScale', 'hud.options.buttonSize'));
+  out.push(slider(s, 'joystickScale', 'hud.options.joystickSize'));
+  out.push(slider(s, 'joystickDeadzone', 'hud.options.joystickDeadzone'));
+  out.push(slider(s, 'touchLookSpeed', 'hud.options.touchLookSpeed'));
+  out.push(slider(s, 'touchOpacity', 'hud.options.touchOpacity'));
+  out.push(boolToggle(s, 'touchInvertLook', 'hud.options.invertLook'));
+  out.push(slider(s, 'clusterHoldMs', 'hudChrome.options.clusterHold', 'milliseconds', 50));
+  out.push(note('hudChrome.options.clusterHoldNote'));
+  out.push(
+    choice(s, 'targetPriority', 'hudChrome.options.targetPriority', [
+      { value: 0, labelKey: 'hudChrome.options.targetPriorityNearest' },
+      { value: 1, labelKey: 'hudChrome.options.targetPriorityLowestHp' },
+      { value: 2, labelKey: 'hudChrome.options.targetPriorityCurrent' },
+    ]),
+  );
+  out.push(note('hudChrome.options.targetPriorityNote'));
+  out.push(boolToggle(s, 'aimAssist', 'hudChrome.options.aimAssist'));
+  out.push(note('hudChrome.options.aimAssistNote'));
+  return out;
 }
 
 // ---------------------------------------------------------------------------

@@ -114,6 +114,9 @@ export interface MobileControlCallbacks {
   onLeaderboard(): void;
   /** Toggle world nameplates; returns the new on/off state to sync the button glow. */
   onNameplates(): boolean;
+  /** Open the mobile cluster binding editor (Customize Controls). Optional so
+   *  older shells / test fixtures without the button keep working. */
+  onCustomizeControls?(): void;
   /** Toggle background music; returns whether music is now enabled. */
   onMusic(): boolean;
   /** Double-tap the camera joystick: snap the camera back behind the character. */
@@ -269,6 +272,16 @@ export class MobileControls {
     this.moveDeadzone = deadzone;
   }
 
+  /** Set the haptics preference from outside (the Options > Touch Controls
+   *  toggle): persists the shared woc_haptics_on key, updates this instance,
+   *  and re-syncs the More-tray button so both toggles agree. */
+  setHapticsEnabled(on: boolean): void {
+    this.hapticsOn = on;
+    saveHapticsEnabled(on);
+    const button = document.getElementById('mobile-haptics');
+    if (button) this.syncHapticsButton(button);
+  }
+
   /** Re-evaluate touch-interface activation after the player changes the
    *  Interface Mode setting (main.ts calls setInterfaceMode first). Safe before start(). */
   refreshInterfaceMode(): void {
@@ -400,6 +413,7 @@ export class MobileControls {
       musicBtn?.classList.toggle('mm-muted', !on);
     });
     this.bindHapticsToggle('mobile-haptics');
+    this.bindButton('mobile-customize', () => this.callbacks.onCustomizeControls?.());
     this.bindButton('mobile-more', () => {
       const open = !document.body.classList.contains('mobile-more-open');
       this.root?.classList.toggle('expanded', open);

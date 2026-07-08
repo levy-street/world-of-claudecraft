@@ -4,6 +4,8 @@ import {
   normalizeClickMoveButton,
   SETTING_RANGES,
   Settings,
+  TOUCH_BOOL_KEYS,
+  TOUCH_NUMERIC_KEYS,
 } from '../src/game/settings';
 
 function installStorage(): void {
@@ -221,6 +223,67 @@ describe('Settings', () => {
     const snap = s.all();
     snap.cameraSpeed = 99;
     expect(s.get('cameraSpeed')).not.toBe(99);
+  });
+});
+
+describe('Touch Controls settings pack', () => {
+  it('starts at the documented touch defaults', () => {
+    const s = new Settings();
+    expect(s.get('interfaceMode')).toBe(0); // Auto
+    expect(s.get('clusterHoldMs')).toBe(650); // matches the former fixed hold
+    expect(s.get('targetPriority')).toBe(0); // nearest (the classic behavior)
+    expect(s.get('joystickScale')).toBe(1);
+    expect(s.get('actionButtonScale')).toBe(1);
+    expect(s.get('leftHandedTouch')).toBe(false);
+    expect(s.get('touchInvertLook')).toBe(false);
+  });
+
+  it('clamps and persists the hold delay across sessions', () => {
+    const a = new Settings();
+    expect(a.set('clusterHoldMs', 99999)).toBe(SETTING_RANGES.clusterHoldMs.max);
+    expect(a.set('clusterHoldMs', 1)).toBe(SETTING_RANGES.clusterHoldMs.min);
+    a.set('clusterHoldMs', 800);
+    expect(new Settings().get('clusterHoldMs')).toBe(800);
+  });
+
+  it('clamps and persists the target priority across sessions', () => {
+    const a = new Settings();
+    expect(a.set('targetPriority', 7)).toBe(SETTING_RANGES.targetPriority.max);
+    expect(a.set('targetPriority', -3)).toBe(SETTING_RANGES.targetPriority.min);
+    a.set('targetPriority', 2);
+    expect(new Settings().get('targetPriority')).toBe(2);
+    expect(new Settings().get('targetPriority')).toBe(2); // stable re-read
+  });
+
+  it('the touch reset key lists cover exactly the Touch Controls panel settings', () => {
+    // The panel's "Reset Touch Controls" restores these (and only these); a key
+    // added to the panel must be added here, and vice versa.
+    expect(TOUCH_NUMERIC_KEYS).toEqual([
+      'interfaceMode',
+      'touchLookSpeed',
+      'touchOpacity',
+      'joystickScale',
+      'actionButtonScale',
+      'joystickDeadzone',
+      'clusterHoldMs',
+      'targetPriority',
+    ]);
+    expect(TOUCH_BOOL_KEYS).toEqual(['leftHandedTouch', 'touchInvertLook', 'aimAssist']);
+    // every listed key exists with a real default to restore
+    const s = new Settings();
+    for (const key of TOUCH_NUMERIC_KEYS) {
+      expect(s.get(key)).toBe(SETTING_RANGES[key].def);
+    }
+  });
+
+  it('touch overrides persist independently of unrelated settings writes', () => {
+    const a = new Settings();
+    a.set('leftHandedTouch', true);
+    a.set('targetPriority', 1);
+    a.set('cameraSpeed', 1.1); // unrelated write must not clobber the touch keys
+    const b = new Settings();
+    expect(b.get('leftHandedTouch')).toBe(true);
+    expect(b.get('targetPriority')).toBe(1);
   });
 });
 

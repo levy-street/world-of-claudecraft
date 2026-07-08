@@ -8,6 +8,7 @@ import {
   buildGraphicsControls,
   buildInterfaceControls,
   buildOptionsMenu,
+  buildTouchControls,
   type OptionsControl,
   type OptionsSettingsSource,
   sliderDispatchValue,
@@ -259,6 +260,67 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
 });
 
 // ---------------------------------------------------------------------------
+// Touch Controls panel: the consolidated touch settings surface.
+// ---------------------------------------------------------------------------
+describe('options_view: touch controls dispatch matrix', () => {
+  it('lists the touch rows in order, with the interface-mode picker on top', () => {
+    const controls = buildTouchControls(makeSource(), { touch: true, nativeShell: false });
+    expect(keysOf(controls)).toEqual([
+      'interfaceMode',
+      'note:hudChrome.options.interfaceModeNote',
+      'leftHandedTouch',
+      'actionButtonScale',
+      'joystickScale',
+      'joystickDeadzone',
+      'touchLookSpeed',
+      'touchOpacity',
+      'touchInvertLook',
+      'clusterHoldMs',
+      'note:hudChrome.options.clusterHoldNote',
+      'targetPriority',
+      'note:hudChrome.options.targetPriorityNote',
+      'aimAssist',
+      'note:hudChrome.options.aimAssistNote',
+    ]);
+  });
+
+  it('hides the interface-mode picker in the native shell (it forces touch)', () => {
+    const controls = buildTouchControls(makeSource(), { touch: true, nativeShell: true });
+    expect(find(controls, 'interfaceMode')).toBeUndefined();
+    expect(find(controls, 'leftHandedTouch')).toBeDefined();
+  });
+
+  it('interface mode re-renders and carries Auto/Desktop/Touch; target priority does not', () => {
+    const controls = buildTouchControls(makeSource({ interfaceMode: 2 }), {
+      touch: true,
+      nativeShell: false,
+    });
+    const mode = find(controls, 'interfaceMode');
+    expect(mode).toMatchObject({ control: 'choice', current: 2, rerender: true });
+    if (mode?.control === 'choice') expect(mode.options.map((o) => o.value)).toEqual([0, 1, 2]);
+    const prio = find(controls, 'targetPriority');
+    expect(prio).toMatchObject({ control: 'choice', rerender: false });
+    if (prio?.control === 'choice') expect(prio.options.map((o) => o.value)).toEqual([0, 1, 2]);
+  });
+
+  it('the hold-delay slider carries the true range, a 50ms step and the ms format', () => {
+    const controls = buildTouchControls(makeSource({ clusterHoldMs: 800 }), {
+      touch: true,
+      nativeShell: false,
+    });
+    const hold = find(controls, 'clusterHoldMs');
+    expect(hold).toMatchObject({
+      control: 'slider',
+      value: 800,
+      step: 50,
+      fmt: 'milliseconds',
+      min: SETTING_RANGES.clusterHoldMs.min,
+      max: SETTING_RANGES.clusterHoldMs.max,
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Main menu routing (cluster 5)
 // ---------------------------------------------------------------------------
 describe('options_view: main menu routing', () => {
@@ -267,6 +329,7 @@ describe('options_view: main menu routing', () => {
     expect(offline.map((e) => e.labelKey)).toEqual([
       'hud.options.keyBindings',
       'hudChrome.controller.title',
+      'hudChrome.options.touchControls',
       'hud.options.graphics',
       'hud.options.interface',
       'hud.options.audio',
@@ -276,6 +339,9 @@ describe('options_view: main menu routing', () => {
     ]);
     expect(offline.at(-2)?.action).toEqual({ kind: 'logout' });
     expect(offline.at(-1)?.action).toEqual({ kind: 'close' });
+    // the Touch Controls row routes to the dedicated touch sub-view
+    const touchRow = offline.find((e) => e.labelKey === 'hudChrome.options.touchControls');
+    expect(touchRow?.action).toEqual({ kind: 'goto', view: 'touch' });
     // exactly one interface entry (no duplicates), routing to the interface view
     const interfaceRows = offline.filter((e) => e.labelKey === 'hud.options.interface');
     expect(interfaceRows).toHaveLength(1);

@@ -159,6 +159,8 @@ const UI_PURE_CORES = [
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
   'src/ui/action_bar_view.ts',
+  'src/ui/mobile_cluster_view.ts',
+  'src/ui/aim_assist_core.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',

@@ -106,6 +106,7 @@ import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
+  angleTo,
   DT,
   dist2d,
   INTERACT_RANGE,
@@ -1127,6 +1128,7 @@ async function startGame(
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
+    onCustomizeControls: () => hud.toggleClusterEditor(),
     onMusic: () => {
       music.setEnabled(!music.enabled);
       return music.enabled;
@@ -1134,6 +1136,43 @@ async function startGame(
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
   });
   mobileControls.start();
+  // The mobile action cluster's big Attack button runs the same
+  // target-nearest-then-attack path as the mobile Attack button (hud.ts falls
+  // back to the slot-0 auto-attack toggle when this hook is absent), and its
+  // small target button cycles targets exactly like Tab / the combat-row Target.
+  hud.mobileClusterHooks = {
+    attackNearest: () => attackNearest(),
+    targetCycle: () => world.tabTarget(),
+  };
+  // Skill smart-cast (M7B): the world steering the HUD's skill press needs. This
+  // game is target-based (no ground casting), so there is no aiming: we keep a
+  // valid current target or acquire the smart one (targetPriority), then face it.
+  hud.aimHooks = {
+    // Keep an already-selected, still-attackable target; otherwise acquire the
+    // smart target. Returns whether a target exists afterward.
+    ensureSmartTarget: () => {
+      const p = world.player;
+      const activePvpOpponents = activePvpOpponentIds(world);
+      const current = p.targetId !== null ? world.entities.get(p.targetId) : null;
+      if (current && isAttackableEntity(current, world.playerId, activePvpOpponents)) return true;
+      const id = smartTargetId();
+      if (id !== null) {
+        world.targetEntity(id);
+        return true;
+      }
+      return false;
+    },
+    // Turn the PLAYER toward the current target for the cast (a one-shot consumed
+    // by the next tick's movementFacing, offline and online). Does NOT touch
+    // input.camYaw: face the player, not the camera, so the view stays put.
+    faceCurrentTarget: () => {
+      const p = world.player;
+      if (p.targetId === null) return;
+      const target = world.entities.get(p.targetId);
+      if (!target) return;
+      pendingAimFacing = angleTo(p.pos, target.pos);
+    },
+  };
   // reflect the current music state on the touch toggle (it may already be off
   // from a prior session, persisted in localStorage)
   document.getElementById('mobile-music')?.classList.toggle('mm-muted', !music.enabled);
@@ -1566,6 +1605,10 @@ async function startGame(
     },
     changeLanguage: (lang, onStatus) => changeLanguage(lang, onStatus),
     refreshWocBalance: () => refreshWocBalanceOnDemand(),
+    // Options > Touch Controls haptics toggle: persists the shared
+    // woc_haptics_on key AND keeps the live MobileControls (and its More-tray
+    // button) in sync, so the two toggles can never disagree.
+    setHaptics: (on) => mobileControls.setHapticsEnabled(on),
     perfOverlay: {
       get: () => perfConfig.get(),
       patch: (p) => {
@@ -1695,24 +1738,49 @@ async function startGame(
     hud.showError(t('errors.nothingInteract'));
   }
 
-  function attackNearest(): void {
+  // Smart-target selection, shared by the mobile Attack button and the skill aim
+  // assist (M7B). Honors Options > Touch Controls targetPriority: 0 nearest
+  // (classic), 1 lowest health in range, 2 keep the current target while it
+  // stays attackable. Returns the chosen entity id, or null when nothing valid
+  // is in range. Pure selection: it does NOT change the target or auto-attack.
+  function smartTargetId(): number | null {
     const p = world.player;
     const activePvpOpponents = activePvpOpponentIds(world);
+    const priority = Math.round(settings.get('targetPriority'));
+    if (priority === 2 && p.targetId !== null) {
+      const current = world.entities.get(p.targetId);
+      if (
+        current &&
+        isAttackableEntity(current, world.playerId, activePvpOpponents) &&
+        dist2d(p.pos, current.pos) < 40
+      ) {
+        return p.targetId;
+      }
+    }
     let best: number | null = null;
-    let bestD = 40;
+    let bestScore = Number.POSITIVE_INFINITY;
     for (const e of world.entities.values()) {
       if (!isAttackableEntity(e, world.playerId, activePvpOpponents)) continue;
       const d = dist2d(p.pos, e.pos);
-      if (d < bestD) {
+      if (d >= 40) continue;
+      // Lowest-health mode scores by hp (distance breaks ties); classic scores
+      // by distance alone.
+      const score = priority === 1 ? e.hp + d / 1000 : d;
+      if (score < bestScore) {
         best = e.id;
-        bestD = d;
+        bestScore = score;
       }
     }
+    return best;
+  }
+
+  function attackNearest(): void {
+    const best = smartTargetId();
     if (best === null) {
       hud.showError(t('errors.noEnemyNearby'));
       return;
     }
-    world.targetEntity(best);
+    if (best !== world.player.targetId) world.targetEntity(best);
     world.startAutoAttack();
   }
 
@@ -2004,6 +2072,11 @@ async function startGame(
   // the release frame would drop the one-shot when release lands on a zero-tick
   // frame. Held here until consumed, then cleared.
   let pendingReleaseFacing: number | null = null;
+  // Auto-face one-shot for the skill aim assist (M7B): the HUD sets this on an
+  // aimed cast so the player turns toward the target/aim on the next tick. Fed
+  // into movementFacing like the release latch, and cleared once consumed. Works
+  // for both the offline sim and the online stream (both read movementFacing).
+  let pendingAimFacing: number | null = null;
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
@@ -2274,7 +2347,7 @@ async function startGame(
     // A ghost (dead && ghost) is not movement-frozen and keeps its facing; only a
     // corpse-bound dead player (dead && !ghost) loses it.
     const movementFacing = !movementFrozen()
-      ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
+      ? (renderFacing ?? controllerFacing ?? pendingAimFacing ?? pendingReleaseFacing)
       : null;
 
     if (offlineSim) {
@@ -2305,6 +2378,7 @@ async function startGame(
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
         pendingReleaseFacing = null;
+        pendingAimFacing = null; // the aim auto-face is a one-shot too
         acc -= DT;
       }
       const pp = offlineSim.player;
@@ -2355,6 +2429,7 @@ async function startGame(
     // Online streams facing every frame, so the latched release yaw is consumed
     // here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
+    pendingAimFacing = null; // the aim auto-face is a one-shot too
     if (net.flushInput()) perf.markInputSent(performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     for (const sample of echoSamples) {
