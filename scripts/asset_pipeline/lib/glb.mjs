@@ -15,7 +15,6 @@ import { getBounds, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import {
   dedup,
-  meshopt,
   prune,
   resample,
   textureCompress,
@@ -383,12 +382,10 @@ export async function normalizeWeapon(
   const cz = (min[2] + max[2]) / 2;
   applyToAllMeshes(doc, mat4Translate(-cx, targetMinY - min[1], -cz));
 
-  await doc.transform(
-    prune(),
-    dedup(),
-    ...(await textureTransforms(maxTex ?? 512)),
-    meshopt({ encoder: MeshoptEncoder, level: 'high' }),
-  );
+  // Plain WebP encoding, no meshopt: these assets are tiny, and skipping meshopt
+  // keeps them animation-friendly and readable everywhere without the meshopt
+  // decoder — matching the rigged/animated lane (CombatMech.glb style).
+  await doc.transform(prune(), dedup(), ...(await textureTransforms(maxTex ?? 512)));
   await saveGlb(doc, outPath);
   return {
     scale: +s.toFixed(4),
@@ -416,12 +413,8 @@ export async function normalizeProp(inPath, outPath, { height, rotateY = 0, maxT
   const cx = (min[0] + max[0]) / 2;
   const cz = (min[2] + max[2]) / 2;
   applyToAllMeshes(doc, mat4Translate(-cx, -min[1], -cz));
-  await doc.transform(
-    prune(),
-    dedup(),
-    ...(await textureTransforms(maxTex ?? 512)),
-    meshopt({ encoder: MeshoptEncoder, level: 'high' }),
-  );
+  // Plain WebP encoding, no meshopt (matches the weapon + animated lanes).
+  await doc.transform(prune(), dedup(), ...(await textureTransforms(maxTex ?? 512)));
   await saveGlb(doc, outPath);
   return { scale: +s.toFixed(4), height };
 }

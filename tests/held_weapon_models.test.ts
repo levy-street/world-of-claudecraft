@@ -46,10 +46,12 @@ describe('held weapon models', () => {
       'staff',
       'hammer',
       'axe',
+      'mace',
       'halberd',
       'spear',
       'scythe',
       'wand',
+      'bow',
     ];
     for (const key of new Set(Object.values(ITEM_WEAPON_VARIANTS))) {
       const ok = TYPES.some((t) => key.includes(t));

@@ -27,7 +27,7 @@ export const WEAPON_FAMILIES = {
   },
   dagger: {
     grip: 'VAR_DAGGER',
-    tokens: ['dagger'],
+    tokens: ['dagger', 'knife'],
     gripFrac: 0.19,
     height: 1.28,
     maxHeight: 1.4,
@@ -36,9 +36,33 @@ export const WEAPON_FAMILIES = {
   },
   axe: {
     grip: 'VAR_AXE',
-    tokens: ['axe', 'hammer'],
+    tokens: ['axe'],
     gripFrac: 0.26,
     height: 1.45,
+    maxHeight: 1.5,
+    lift: 0.04,
+    heavyEndUp: true,
+  },
+  // Hammers were formerly folded into the axe family (so "gen a hammer" produced
+  // an axe-shaped model); split out with their own VAR_HAMMER grip so the prompt
+  // reads "fantasy hammer" and generation actually yields one. Same top-heavy
+  // physical profile as an axe (identical grip numbers), just a distinct type.
+  hammer: {
+    grip: 'VAR_HAMMER',
+    tokens: ['hammer', 'maul', 'warhammer'],
+    gripFrac: 0.26,
+    height: 1.45,
+    maxHeight: 1.5,
+    lift: 0.04,
+    heavyEndUp: true,
+  },
+  // One-handed bludgeon: a heavy head on a shaft (mace/flail/morningstar). Carries
+  // its mass at the top like the axe/hammer, so it is generated head-up.
+  mace: {
+    grip: 'VAR_MACE',
+    tokens: ['mace', 'flail', 'morningstar', 'cudgel'],
+    gripFrac: 0.26,
+    height: 1.4,
     maxHeight: 1.5,
     lift: 0.04,
     heavyEndUp: true,
@@ -68,6 +92,44 @@ export const WEAPON_FAMILIES = {
     height: 2.5,
     maxHeight: 2.5,
     lift: 0.18,
+    heavyEndUp: false,
+  },
+  // Caster tome, held roughly mid-body in one hand; small, so the origin sits
+  // near the middle. A book has no blade/head, so its generation orientation is
+  // set explicitly in prompts.mjs; fine-tune the in-hand pose per weapon via the
+  // viewer's GRIP FIT (WEAPON_GRIP_OVERRIDES).
+  book: {
+    grip: 'VAR_BOOK',
+    tokens: ['book', 'tome', 'grimoire', 'codex'],
+    gripFrac: 0.5,
+    height: 1.0,
+    maxHeight: 1.2,
+    lift: 0.04,
+    heavyEndUp: false,
+  },
+  // Two-handed ranged; generated tip-up like a blade, then rotated to point
+  // forward in-hand via a per-weapon GRIP FIT override.
+  crossbow: {
+    grip: 'VAR_CROSSBOW',
+    tokens: ['crossbow', 'xbow'],
+    gripFrac: 0.28,
+    height: 1.4,
+    maxHeight: 1.6,
+    lift: 0.04,
+    heavyEndUp: false,
+  },
+  // Two-handed ranged bow (longbow/shortbow/recurve): gripped at the CENTER, so
+  // the origin sits mid-height. Generated as a vertical bow, then angled to the
+  // archer's in-hand pose via a per-weapon GRIP FIT override (like the crossbow).
+  // Declared AFTER crossbow so a "*crossbow" key matches crossbow first ("bow" is
+  // a substring of "crossbow").
+  bow: {
+    grip: 'VAR_BOW',
+    tokens: ['bow', 'longbow', 'shortbow', 'recurve'],
+    gripFrac: 0.5,
+    height: 1.8,
+    maxHeight: 2.0,
+    lift: 0.04,
     heavyEndUp: false,
   },
 };

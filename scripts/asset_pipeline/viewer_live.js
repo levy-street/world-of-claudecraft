@@ -9,7 +9,13 @@
 //
 // Exposes window.LiveViewer.{open(asset, ui), close()} for the page's grid
 // script to drive on detail open/close.
-import { GLTFLoader, MeshoptDecoder, OrbitControls, THREE } from '/three.bundle.js';
+import {
+  GLTFLoader,
+  MeshoptDecoder,
+  OrbitControls,
+  THREE,
+  TransformControls,
+} from '/three.bundle.js';
 
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 const texLoader = new THREE.TextureLoader();
@@ -21,9 +27,14 @@ const FAMILY_GRIPS = {
   sword: { lift: 0.04, maxHeight: 2.0 },
   dagger: { lift: 0.04, maxHeight: 1.4 },
   axe: { lift: 0.04, maxHeight: 1.5 },
+  hammer: { lift: 0.04, maxHeight: 1.5 },
+  mace: { lift: 0.04, maxHeight: 1.5 },
   staff: { lift: 0.18, maxHeight: 2.4 },
   wand: { lift: 0.04, maxHeight: 1.2 },
   polearm: { lift: 0.18, maxHeight: 2.5 },
+  book: { lift: 0.04, maxHeight: 1.2 },
+  crossbow: { lift: 0.04, maxHeight: 1.6 },
+  bow: { lift: 0.04, maxHeight: 2.0 },
 };
 
 function loadGlb(url) {
@@ -173,6 +184,7 @@ let session = null;
 function teardown() {
   if (!session) return;
   cancelAnimationFrame(session.raf);
+  session.gizmo?.dispose();
   session.controls.dispose();
   for (const root of session.roots) {
     session.scene.remove(root);
@@ -200,6 +212,11 @@ window.LiveViewer = {
       gripSaveBtn,
       gripResetBtn,
       gripStatusEl,
+      gizmoMoveBtn,
+      gizmoRotBtn,
+      updateBtn,
+      exportBtn,
+      exportStatusEl,
     } = ui;
     const setStatus = (t) => {
       if (statusEl) statusEl.textContent = t;
@@ -366,7 +383,11 @@ window.LiveViewer = {
       // for it; job/preview weapons tune live but have no key to save under.
       const gripState = overrideToState(asset.registration?.gripOverride);
       const isVariantWeapon = String(asset.registration?.gripFamily ?? '').startsWith('VAR_');
-      const gripKey = asset.category === 'weapons' && isVariantWeapon ? asset.name : null;
+      // The key a grip override saves under: an applied variant weapon uses its
+      // asset name; a Generated-tab weapon that has since been --applied carries
+      // that same key on `weaponKey`, so its grip is saveable from that entry too.
+      const weaponKey = asset.category === 'weapons' ? asset.name : (asset.weaponKey ?? null);
+      const gripKey = isVariantWeapon && weaponKey ? weaponKey : null;
       let heldWeapon = null; // { scene, grip, clampScale }
       const syncGripInputs = () => {
         if (!gripInputs) return;
@@ -420,6 +441,13 @@ window.LiveViewer = {
               body: JSON.stringify({ key: gripKey, override: stateToOverride(gripState) }),
             });
             const data = await resp.json();
+            if (resp.ok) {
+              // Persist into the in-memory asset so closing + reopening the viewer
+              // (without a page reload) re-seeds the sliders from what was just
+              // saved, instead of reverting to the pre-save override.
+              asset.registration = asset.registration || {};
+              asset.registration.gripOverride = stateToOverride(gripState);
+            }
             if (gripStatusEl) {
               gripStatusEl.textContent = resp.ok
                 ? (data.actions?.[0] ?? 'saved')
@@ -432,18 +460,89 @@ window.LiveViewer = {
           }
         };
       }
+      // --- Transform gizmo -------------------------------------------------
+      // Drag the weapon anchor directly (3 move axes + 3 rotate axes), kept in
+      // sync with the numeric GRIP FIT fields: it edits the SAME override state
+      // applyGrip() consumes, so dragging and typing are interchangeable. Only
+      // meaningful once a weapon is held on a character (that's what the grip
+      // tunes), so the buttons no-op until then.
+      const BASE_FLIP = new THREE.Quaternion(0, 1, 0, 0);
+      const _gq = new THREE.Quaternion();
+      const _ge = new THREE.Euler();
+      const round4 = (n) => Number(n.toFixed(4));
+      const gizmo = new TransformControls(camera, renderer.domElement);
+      gizmo.setSpace('local');
+      gizmo.setSize(0.9);
+      gizmo.enabled = false;
+      gizmo.visible = false;
+      scene.add(gizmo);
+      session.gizmo = gizmo;
+      let gizmoMode = null; // null | 'translate' | 'rotate'
+      gizmo.addEventListener('dragging-changed', (e) => {
+        controls.enabled = !e.value; // don't let orbit fight the drag
+      });
+      // Reverse applyGrip(): position minus the family lift, quaternion minus the
+      // 180-degree base flip -> write straight back into gripState + the inputs.
+      const syncGizmoToGrip = () => {
+        if (!heldWeapon) return;
+        const w = heldWeapon.scene;
+        gripState.mx = round4(w.position.x);
+        gripState.my = round4(w.position.y - heldWeapon.grip.lift);
+        gripState.mz = round4(w.position.z);
+        _gq.copy(BASE_FLIP).multiply(w.quaternion);
+        _ge.setFromQuaternion(_gq, 'XYZ');
+        gripState.rx = round4(_ge.x / DEG2RAD);
+        gripState.ry = round4(_ge.y / DEG2RAD);
+        gripState.rz = round4(_ge.z / DEG2RAD);
+        syncGripInputs();
+        if (gripStatusEl) gripStatusEl.textContent = 'moved (not saved)';
+      };
+      gizmo.addEventListener('objectChange', syncGizmoToGrip);
+      const paintGizmoButtons = () => {
+        if (gizmoMoveBtn)
+          gizmoMoveBtn.style.outline = gizmoMode === 'translate' ? '2px solid #ffcf4a' : '';
+        if (gizmoRotBtn)
+          gizmoRotBtn.style.outline = gizmoMode === 'rotate' ? '2px solid #ffcf4a' : '';
+      };
+      const reattachGizmo = () => {
+        if (gizmoMode && heldWeapon) {
+          gizmo.attach(heldWeapon.scene);
+          gizmo.setMode(gizmoMode);
+          gizmo.enabled = true;
+          gizmo.visible = true;
+        } else {
+          gizmo.detach();
+          gizmo.enabled = false;
+          gizmo.visible = false;
+        }
+      };
+      const setGizmoMode = (mode) => {
+        if (!heldWeapon) {
+          setStatus('pick "held by" a character first, then drag the gizmo');
+          return;
+        }
+        gizmoMode = gizmoMode === mode ? null : mode;
+        reattachGizmo();
+        paintGizmoButtons();
+      };
+      if (gizmoMoveBtn) gizmoMoveBtn.onclick = () => setGizmoMode('translate');
+      if (gizmoRotBtn) gizmoRotBtn.onclick = () => setGizmoMode('rotate');
+
       const clearHolder = () => {
         if (!holder) return;
         scene.remove(holder.root);
         disposeObject(holder.root);
         session.roots = session.roots.filter((r) => r !== holder.root);
-        session.mixers = session.mixers.filter((m) => m !== holder.mixer);
+        session.mixers = session.mixers.filter(
+          (m) => m !== holder.mixer && m !== holder.weaponMixer,
+        );
         holder = null;
       };
       const setHeldBy = async (repoGlb) => {
         clearHolder();
         heldWeapon = null;
         if (gripBar) gripBar.classList.remove('on');
+        reattachGizmo(); // nothing held -> detach + hide the gizmo
         if (!repoGlb) {
           obj.visible = true;
           active = session.mixers.length
@@ -467,13 +566,28 @@ window.LiveViewer = {
         const mixer = new THREE.AnimationMixer(root);
         session.mixers.push(mixer);
         holder = { root, mixer };
+        // Keep the weapon's OWN animation running while it's held (e.g. the
+        // legendary sword's ring spin / shard bob). Static weapons ship no clips
+        // so this is a no-op for them; a weapon that carries an idle clip now
+        // plays it in-hand, composed on top of the character's clip and the grip
+        // transform (which only touch the weapon root, not its animated child
+        // nodes). Tracked on `holder` so clearHolder() disposes it on change.
+        const heldClips = wg.animations ?? [];
+        if (heldClips.length) {
+          const weaponMixer = new THREE.AnimationMixer(wg.scene);
+          const idle = heldClips.find((c) => /idle/i.test(c.name)) ?? heldClips[0];
+          weaponMixer.clipAction(idle).reset().play();
+          session.mixers.push(weaponMixer);
+          holder.weaponMixer = weaponMixer;
+        }
         active = { mixer, clips: cg.animations ?? [] };
-        setClipOptions(active.clips, /attack|chop|slash/i);
+        setClipOptions(active.clips); // default to idle (setClipOptions' built-in preference)
         frameOn([root]);
         if (attached && gripBar) {
           syncGripInputs();
           gripBar.classList.add('on');
         }
+        reattachGizmo(); // re-point the gizmo at the newly attached weapon
         setStatus(
           attached
             ? `held via handslot.r - ${active.clips.length} animations`
@@ -489,14 +603,68 @@ window.LiveViewer = {
           );
           heldBySelect.innerHTML = opts.join('');
           heldBySelect.onchange = () => setHeldBy(heldBySelect.value || null);
-          // Weapons open EQUIPPED by default: the knight holding it, playing
-          // its attack clip, so grip and scale are reviewable at a glance.
+          // Weapons open EQUIPPED by default: the knight holding it in an idle
+          // pose, so the grip and scale are reviewable at a glance.
           const knight = (charOptions ?? []).find((c) => c.label === 'knight');
           if (knight) {
             heldBySelect.value = knight.repoGlb;
             await setHeldBy(knight.repoGlb);
           }
         }
+      }
+
+      // --- Model workflow: Update Model (step 5) + Compress & Export (step 6)
+      const postAction = async (path, payload) => {
+        const resp = await fetch(path, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        return resp.json();
+      };
+      const setExportStatus = (t) => {
+        if (exportStatusEl) exportStatusEl.textContent = t;
+      };
+      const isModel = Boolean(asset.repoGlb && asset.repoGlb.endsWith('.glb'));
+      if (updateBtn) {
+        updateBtn.style.display = isModel ? '' : 'none';
+        updateBtn.onclick = async () => {
+          setExportStatus('choose a .glb in the file picker...');
+          try {
+            const r = await postAction('/api/model/update', { repoGlb: asset.repoGlb });
+            if (r.ok) {
+              setExportStatus(`updated from ${r.picked.split('/').pop()} - reloading`);
+              window.LiveViewer.open(asset, ui); // reload with the swapped-in model
+            } else {
+              setExportStatus(
+                r.error === 'canceled' ? 'update canceled' : `update failed: ${r.error}`,
+              );
+            }
+          } catch (e) {
+            setExportStatus(`update failed: ${String(e.message ?? e).slice(0, 80)}`);
+          }
+        };
+      }
+      if (exportBtn) {
+        exportBtn.style.display = isModel ? '' : 'none';
+        exportBtn.onclick = async () => {
+          setExportStatus('compressing + exporting...');
+          try {
+            const r = await postAction('/api/model/export', {
+              repoGlb: asset.repoGlb,
+              name: asset.name,
+            });
+            setExportStatus(
+              r.ok
+                ? `exported ${(r.sizeAfter / 1024).toFixed(0)}K .glb${
+                    r.usdzPath ? ' + .usdz (textured Mac preview)' : ''
+                  } -> ${r.exportPath}`
+                : `export failed: ${r.error}`,
+            );
+          } catch (e) {
+            setExportStatus(`export failed: ${String(e.message ?? e).slice(0, 80)}`);
+          }
+        };
       }
     } catch (err) {
       setStatus(`failed to load: ${String(err.message ?? err).slice(0, 120)}`);

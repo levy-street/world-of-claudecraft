@@ -3,5 +3,6 @@
 // real GLBs with orbit controls and meshopt-compressed geometry.
 export * as THREE from 'three';
 export { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+export { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 export { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';

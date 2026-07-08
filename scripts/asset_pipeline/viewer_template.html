@@ -38,7 +38,7 @@
   /* Detail overlay */
   .overlay { position: fixed; inset: 0; background: rgba(8, 10, 14, 0.82); display: none; z-index: 10; }
   .overlay.open { display: flex; align-items: center; justify-content: center; padding: 24px; }
-  .detail { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; width: min(1100px, 96vw); max-height: 92vh; display: flex; overflow: hidden; }
+  .detail { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; width: min(1100px, 96vw); max-height: 92vh; display: flex; overflow: hidden; position: relative; }
   .viewpane { width: 46%; min-width: 320px; background: #10131a; display: flex; flex-direction: column; border-right: 1px solid var(--line); }
   .viewpane .big { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 340px; position: relative; }
   .viewpane .big img { max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -48,6 +48,9 @@
   .livebar select { background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 5px; padding: 3px 6px; font-size: 12px; max-width: 200px; }
   .livebar label { display: flex; gap: 4px; align-items: center; cursor: pointer; color: var(--text); }
   .livebar .status { margin-left: auto; color: var(--dim); }
+  .livebar button { background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 5px; padding: 3px 9px; font-size: 12px; cursor: pointer; }
+  .livebar button:hover { border-color: var(--gold); color: var(--gold); }
+  .livebar button:disabled { opacity: 0.4; cursor: default; }
   .gripbar { display: none; gap: 8px 6px; align-items: center; padding: 6px 10px; background: var(--panel2); border-top: 1px solid var(--line); font-size: 11px; color: var(--dim); flex-wrap: wrap; }
   .gripbar.on { display: flex; }
   .gripbar .glabel { color: var(--gold); text-transform: uppercase; letter-spacing: 0.6px; font-size: 10px; }
@@ -74,13 +77,20 @@
   .pill.green { color: var(--green); } .pill.amber { color: var(--amber); }
   .pill.blue { color: var(--blue); } .pill.red { color: var(--red); }
   .mono { font-family: ui-monospace, monospace; font-size: 11.5px; }
-  .closebtn { position: absolute; top: 14px; right: 18px; background: none; border: 1px solid var(--line); color: var(--dim); border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
-  .closebtn:hover { color: var(--text); border-color: var(--gold); }
+  .closebtn { position: absolute; top: 12px; right: 14px; z-index: 4; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; background: var(--panel2); border: 1px solid var(--line); color: var(--text); border-radius: 6px; cursor: pointer; font-size: 22px; line-height: 1; }
+  .closebtn:hover { color: #fff; background: var(--red); border-color: var(--red); }
+  .delbtn { position: absolute; bottom: 14px; right: 18px; z-index: 3; background: var(--panel); border: 1px solid #7a2b2b; color: #e0736f; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 13px; }
+  .delbtn:hover { color: #fff; background: #7a2b2b; border-color: #a33; }
+  .createbtn { position: absolute; top: 14px; right: 20px; z-index: 6; background: var(--gold); color: #14171d; border: 1px solid var(--gold); border-radius: 7px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .createbtn:hover { filter: brightness(1.08); }
+  /* When an asset detail is open, drop the floating +Create FAB so it does not sit on top of the relocated Delete button. */
+  #overlay.open ~ .wz-fab { display: none; }
   .navhint { color: var(--dim); font-size: 11px; margin-top: 14px; }
 </style>
 </head>
 <body>
 <header>
+  <button type="button" id="headercreate" class="createbtn" title="Create a new asset">+ Create asset</button>
   <h1>World of ClaudeCraft: Asset Library</h1>
   <div class="sub" id="subtitle"></div>
   <div class="controls">
@@ -107,7 +117,8 @@
 
 <div class="overlay" id="overlay">
   <div class="detail" role="dialog" aria-modal="true" aria-label="Asset detail">
-    <button type="button" class="closebtn" id="closebtn">Esc</button>
+    <button type="button" class="closebtn" id="closebtn" title="Close (Esc)" aria-label="Close">×</button>
+    <button type="button" class="delbtn" id="delasset" style="display:none" title="Permanently delete this generated asset and free its name">Delete</button>
     <div class="viewpane">
       <div class="big">
         <canvas id="live" style="display:none"></canvas>
@@ -122,6 +133,11 @@
         </span>
         <label><input type="checkbox" id="ctxtoggle" /> vs player</label>
         <span class="status" id="livestatus"></span>
+        <span class="glabel">model</span>
+        <button type="button" id="revealfinder" title="reveal this file in Finder so you can drag it straight into Blender">Reveal in Finder</button>
+        <button type="button" id="updatemodel" title="replace this model with a newer .glb from disk (stays uncompressed)">Update Model&hellip;</button>
+        <button type="button" id="compressexport" title="compress to game format and export to ~/Documents/WOC Assets">Compress &amp; Export</button>
+        <span class="status" id="exportstatus"></span>
       </div>
       <div class="gripbar" id="gripbar">
         <span class="glabel">grip fit</span>
@@ -132,6 +148,9 @@
         <label>y<input type="number" id="gry" step="5" aria-label="grip rotate y degrees" /></label>
         <label>z<input type="number" id="grz" step="5" aria-label="grip rotate z degrees" /></label>
         <label>scale<input type="number" id="gscale" step="0.05" aria-label="grip scale" /></label>
+        <span class="glabel">gizmo</span>
+        <button type="button" id="gizmove" title="drag to move the anchor (X/Y/Z)">Move</button>
+        <button type="button" id="gizrot" title="drag to rotate the anchor (X/Y/Z)">Rotate</button>
         <button type="button" id="gripsave">Save</button>
         <button type="button" id="gripreset">Reset</button>
         <span class="gstatus" id="gripstatus"></span>
@@ -152,7 +171,28 @@ const kb = (n) => n >= 1048576 ? (n / 1048576).toFixed(2) + ' MB' : (n / 1024).t
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-const state = { search: '', cat: 'all', status: 'all', sort: 'name', open: -1, filtered: [] };
+// Filters persist across reloads (survives a page refresh AND the reload after a
+// delete) via localStorage, so the library reopens on the same category/search/
+// sort you left it on.
+const FILTER_KEY = 'woc_asset_lib_filters';
+function loadFilters() {
+  try { return JSON.parse(localStorage.getItem(FILTER_KEY)) || {}; } catch { return {}; }
+}
+function saveFilters() {
+  try {
+    localStorage.setItem(FILTER_KEY, JSON.stringify(
+      { search: state.search, cat: state.cat, status: state.status, sort: state.sort }));
+  } catch { /* private mode / quota: filters just won't persist */ }
+}
+const _f = loadFilters();
+const state = {
+  search: typeof _f.search === 'string' ? _f.search : '',
+  cat: typeof _f.cat === 'string' ? _f.cat : 'all',
+  status: typeof _f.status === 'string' ? _f.status : 'all',
+  sort: typeof _f.sort === 'string' ? _f.sort : 'name',
+  open: -1,
+  filtered: [],
+};
 
 // A public/ asset URL that resolves in both modes: /repo/public/* when served,
 // ../../../public/* relative to the emitted index.html when opened as a file.
@@ -308,6 +348,9 @@ function openDetail(i) {
   state.open = i;
   const a = state.filtered[i];
   if (!a) return;
+  // Delete is offered ONLY for generated/imported assets (server marks them
+  // deletable); base/shipped assets have no button.
+  document.getElementById('delasset').style.display = a.registration?.deletable ? '' : 'none';
   const big = document.getElementById('bigimg');
   const strip = document.getElementById('strip');
   const canvas = document.getElementById('live');
@@ -359,6 +402,11 @@ function openDetail(i) {
       gripSaveBtn: document.getElementById('gripsave'),
       gripResetBtn: document.getElementById('gripreset'),
       gripStatusEl: document.getElementById('gripstatus'),
+      gizmoMoveBtn: document.getElementById('gizmove'),
+      gizmoRotBtn: document.getElementById('gizrot'),
+      updateBtn: document.getElementById('updatemodel'),
+      exportBtn: document.getElementById('compressexport'),
+      exportStatusEl: document.getElementById('exportstatus'),
     });
   } else {
     if (window.LiveViewer) window.LiveViewer.close();
@@ -378,19 +426,35 @@ function closeDetail() {
 // Wiring
 document.getElementById('subtitle').textContent =
   assets.length + ' assets · generated ' + DATA.generatedAt.replace('T', ' ').slice(0, 19) + ' UTC';
+// Header "Create asset" button: mirrors the floating +Create FAB (both open the
+// wizard via openNew). The wizard only exists when served live, so hide the
+// button in static-file mode where there is no backend to run a generation.
+(() => {
+  const hc = document.getElementById('headercreate');
+  if (!hc) return;
+  if (window.__LIVE__) hc.addEventListener('click', () => { if (window.WizardUI) window.WizardUI.openNew(); });
+  else hc.style.display = 'none';
+})();
 const chipBox = document.getElementById('catChips');
+// Reflect the restored filters into the controls before first render. Drop a
+// stored category that no longer exists so the grid never renders empty-and-stuck.
+if (!categories().includes(state.cat)) state.cat = 'all';
+document.getElementById('search').value = state.search;
+document.getElementById('status').value = state.status;
+document.getElementById('sort').value = state.sort;
 chipBox.innerHTML = categories().map((c) =>
-  '<span class="chip' + (c === 'all' ? ' on' : '') + '" data-cat="' + esc(c) + '">' + esc(c) + '</span>').join('');
+  '<span class="chip' + (c === state.cat ? ' on' : '') + '" data-cat="' + esc(c) + '">' + esc(c) + '</span>').join('');
 chipBox.addEventListener('click', (e) => {
   const chip = e.target.closest('.chip');
   if (!chip) return;
   state.cat = chip.dataset.cat;
   for (const x of chipBox.querySelectorAll('.chip')) x.classList.toggle('on', x === chip);
+  saveFilters();
   renderGrid();
 });
-document.getElementById('search').addEventListener('input', (e) => { state.search = e.target.value; renderGrid(); });
-document.getElementById('status').addEventListener('change', (e) => { state.status = e.target.value; renderGrid(); });
-document.getElementById('sort').addEventListener('change', (e) => { state.sort = e.target.value; renderGrid(); });
+document.getElementById('search').addEventListener('input', (e) => { state.search = e.target.value; saveFilters(); renderGrid(); });
+document.getElementById('status').addEventListener('change', (e) => { state.status = e.target.value; saveFilters(); renderGrid(); });
+document.getElementById('sort').addEventListener('change', (e) => { state.sort = e.target.value; saveFilters(); renderGrid(); });
 document.getElementById('grid').addEventListener('click', (e) => {
   const card = e.target.closest('.card');
   if (card) openDetail(Number(card.dataset.i));
@@ -400,6 +464,54 @@ document.getElementById('grid').addEventListener('keydown', (e) => {
   if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openDetail(Number(card.dataset.i)); }
 });
 document.getElementById('closebtn').addEventListener('click', closeDetail);
+document.getElementById('delasset').addEventListener('click', async () => {
+  const a = state.filtered[state.open];
+  if (!a || !a.registration?.deletable) return;
+  const key = a.weaponKey || a.name.replace(/^[^:]+:\s*/, '');
+  if (!confirm('Permanently delete "' + a.name + '" and all its files (model, icon, generation job)?'
+    + '\n\nThis cannot be undone. The name will be freed so you can re-generate with it later.')) return;
+  try {
+    const resp = await fetch('/api/asset/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, jobId: a.job?.id || a.registration?.jobId || null }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) { alert('Delete failed: ' + (data.error || resp.status)); return; }
+    location.reload(); // re-inventory without the deleted asset; persisted filter holds the view
+  } catch (err) {
+    alert('Delete failed: ' + (err.message || err));
+  }
+});
+// "Reveal in Finder": open the OS file browser at this asset's file (the weapon
+// .glb, or a skin's texture atlas) so it can be dragged straight into Blender.
+// Server-only: it hits the /api route, and the livebar hosting the button is
+// shown exclusively in --serve mode, so the fetch always has a backend.
+document.getElementById('revealfinder').addEventListener('click', async () => {
+  const a = state.filtered[state.open];
+  const btn = document.getElementById('revealfinder');
+  if (!a) return;
+  const path = a.repoAtlas || a.repoGlb;
+  const flash = (msg) => { btn.textContent = msg; setTimeout(() => { btn.textContent = 'Reveal in Finder'; }, 1600); };
+  if (!path) { flash('No file on disk'); return; }
+  btn.disabled = true;
+  try {
+    const resp = await fetch('/api/asset/reveal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    const ok = resp.ok && data.ok;
+    if (!ok) console.warn('reveal failed:', data.error || resp.status);
+    flash(ok ? 'Revealed' : 'Reveal failed');
+  } catch (err) {
+    console.warn('reveal failed:', err);
+    flash('Reveal failed');
+  } finally {
+    btn.disabled = false;
+  }
+});
 document.getElementById('overlay').addEventListener('click', (e) => {
   if (e.target === document.getElementById('overlay')) closeDetail();
 });

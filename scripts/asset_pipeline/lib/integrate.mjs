@@ -210,6 +210,53 @@ export function saveGripOverride({ key, override }) {
   return [action];
 }
 
+/** PURE inverse of registerWeapon's registry edits. Given the three registry
+ *  sources, strip `key` from KAYKIT_WEAPON_ACCESSORY and WEAPON_GRIP_OVERRIDES and
+ *  drop any ITEM_WEAPON_VARIANTS rows whose VALUE is `key` (so no item is left
+ *  pointing at a deleted model). Returns the (possibly unchanged) sources plus the
+ *  human action lines. Idempotent: absent entries are no-ops. The value is never
+ *  interpolated free text (key is snake_case-validated), so there is no injection
+ *  surface. Gated by asset_pipeline.test.ts. */
+export function removeWeaponFromSources({ accessory, grip, variants }, key) {
+  if (!/^[a-z0-9_]+$/.test(key)) throw new Error(`weapon key must be snake_case: ${key}`);
+  const actions = [];
+
+  // KAYKIT_WEAPON_ACCESSORY: `  <key>: 'VAR_XXX',`
+  const accessoryOut = accessory.replace(
+    new RegExp(`^[^\\S\\n]*${key}:\\s*'[^']*',?[^\\S\\n]*\\n?`, 'm'),
+    '',
+  );
+  if (accessoryOut !== accessory) actions.push(`unregistered ${key} from KAYKIT_WEAPON_ACCESSORY`);
+
+  // WEAPON_GRIP_OVERRIDES: reuse the identity-override path (empty body removes).
+  const { src: gripOut, action: gripAction } = upsertGripOverride(grip, key, {});
+  if (gripOut !== grip) actions.push(gripAction);
+
+  // ITEM_WEAPON_VARIANTS: every `  <itemId>: '<key>',` row mapping to this model.
+  const variantsOut = variants.replace(
+    new RegExp(`^[^\\S\\n]*[a-z0-9_]+:\\s*'${key}',?[^\\S\\n]*\\n?`, 'gm'),
+    '',
+  );
+  if (variantsOut !== variants) actions.push(`removed ITEM_WEAPON_VARIANTS rows mapping to ${key}`);
+
+  return { accessory: accessoryOut, grip: gripOut, variants: variantsOut, actions };
+}
+
+/** Persist removeWeaponFromSources against the real registry files, writing only
+ *  the files that change. The caller removes the GLB/icon/job dir. */
+export function removeWeapon({ key }) {
+  const before = {
+    accessory: read(FILES.accessory),
+    grip: read(FILES.grip),
+    variants: read(FILES.variants),
+  };
+  const out = removeWeaponFromSources(before, key);
+  if (out.accessory !== before.accessory) write(FILES.accessory, out.accessory);
+  if (out.grip !== before.grip) write(FILES.grip, out.grip);
+  if (out.variants !== before.variants) write(FILES.variants, out.variants);
+  return out.actions;
+}
+
 // ---------------------------------------------------------------------------
 // Class-skin registration (--apply capable; gated by tests/skin_event.test.ts)
 // ---------------------------------------------------------------------------

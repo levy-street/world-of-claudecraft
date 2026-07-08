@@ -32,9 +32,16 @@ const LAYOUT_QUADRUPED =
 
 export function conceptPrompt({ kind, description, family, rigType }) {
   if (kind === 'weapon') {
-    const orient = family?.heavyEndUp
-      ? 'held upright, head at the top, handle at the bottom'
-      : 'held upright, blade or tip pointing up, grip at the bottom';
+    const orient =
+      family?.name === 'book'
+        ? 'a closed leather-bound tome standing upright on its lower edge, cover facing the viewer, spine vertical'
+        : family?.name === 'crossbow'
+          ? 'held upright, bow limbs and bolt at the top, stock and grip at the bottom'
+          : family?.name === 'bow'
+            ? 'a vertical archery bow, curved limbs pointing up and down, the bowstring taut and facing the viewer, grip at the center'
+            : family?.heavyEndUp
+              ? 'held upright, head at the top, handle at the bottom'
+              : 'held upright, blade or tip pointing up, grip at the bottom';
     return `${description}, fantasy ${family?.name ?? 'weapon'}, ${orient}, ${STYLE_CORE}, ${LAYOUT_OBJECT}`;
   }
   if (kind === 'prop') {

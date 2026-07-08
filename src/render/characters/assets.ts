@@ -109,6 +109,23 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   purple_axe: 'VAR_AXE',
   purple_staff: 'VAR_STAFF',
   purple_wand: 'VAR_WAND',
+  wrought_iron_longsword: 'VAR_SWORD',
+  notched_woodaxe: 'VAR_AXE',
+  iron_field_hammer: 'VAR_AXE',
+  peeled_birch_wand: 'VAR_WAND',
+  simple_farmhand_crossbow: 'VAR_CROSSBOW',
+  guildmark_arming_sword: 'VAR_SWORD',
+  skyrender_the_firmament_s_wound: 'VAR_AXE',
+  cosmarch_spire_of_the_endless_void: 'VAR_STAFF',
+  emberwish_mote_of_the_dying_sun: 'VAR_WAND',
+  meteorlatch_the_sky_s_last_judgment: 'VAR_CROSSBOW',
+  starfall_judgment_of_the_heavens: 'VAR_MACE',
+  ice_fang: 'VAR_SWORD',
+  glaciersplit: 'VAR_AXE',
+  rimecrusher: 'VAR_MACE',
+  frostbite: 'VAR_DAGGER',
+  hoarfrost_vigil: 'VAR_STAFF',
+  shard_of_everwinter: 'VAR_WAND',
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach
@@ -124,8 +141,13 @@ const VARIANT_GRIPS: Record<string, VariantGrip> = {
   VAR_DAGGER: { lift: 0.04, maxHeight: 1.4 },
   VAR_STAFF: { lift: 0.18, maxHeight: 2.4 },
   VAR_AXE: { lift: 0.04, maxHeight: 1.5 },
+  VAR_HAMMER: { lift: 0.04, maxHeight: 1.5 },
+  VAR_MACE: { lift: 0.04, maxHeight: 1.5 },
   VAR_POLEARM: { lift: 0.18, maxHeight: 2.5 },
   VAR_WAND: { lift: 0.04, maxHeight: 1.2 },
+  VAR_BOOK: { lift: 0.04, maxHeight: 1.2 },
+  VAR_CROSSBOW: { lift: 0.04, maxHeight: 1.6 },
+  VAR_BOW: { lift: 0.04, maxHeight: 2.0 },
 };
 
 const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
