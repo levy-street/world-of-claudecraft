@@ -250,10 +250,10 @@ export function topbarRoutes(): GuideRoute[] {
 
 /** Sidebar entries grouped by section, preserving declaration order. */
 export function groupedRoutes(): { group: GuideGroup; routes: GuideRoute[] }[] {
-  return GUIDE_GROUP_ORDER.map((group) => ({
-    group,
-    routes: GUIDE_ROUTES.filter((r) => r.group === group),
-  })).filter((g) => g.routes.length > 0);
+  return GUIDE_GROUP_ORDER.flatMap((group) => {
+    const routes = GUIDE_ROUTES.filter((r) => r.group === group);
+    return routes.length > 0 ? [{ group, routes }] : [];
+  });
 }
 
 /** Absolute href for a route sub-path. */

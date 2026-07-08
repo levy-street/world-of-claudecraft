@@ -276,16 +276,13 @@ export class Meters {
       : t('hud.meters.segmentSummary', { label: encounterLabel, duration: fmtDuration(enc.duration) });
 
     const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
-    const rows = [...enc.tallies.values()]
-      .map((t) => ({
-        t,
-        value: this.tab === 'dmg' ? t.dmg
-          : this.tab === 'heal' ? t.heal
-          : liveThreat ? liveThreat.get(t.pid) ?? 0
-          : (enc.mainMobId !== null ? t.dmgByMob.get(enc.mainMobId) ?? 0 : 0),
-      }))
-      .filter((r) => r.value > 0)
-      .sort((a, b) => b.value - a.value);
+    const rows = [...enc.tallies.values()].flatMap((t) => {
+      const value = this.tab === 'dmg' ? t.dmg
+        : this.tab === 'heal' ? t.heal
+        : liveThreat ? liveThreat.get(t.pid) ?? 0
+        : (enc.mainMobId !== null ? t.dmgByMob.get(enc.mainMobId) ?? 0 : 0);
+      return value > 0 ? [{ t, value }] : [];
+    }).sort((a, b) => b.value - a.value);
 
     const top = rows[0]?.value ?? 1;
     this.rowsEl.innerHTML = '';

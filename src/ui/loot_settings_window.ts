@@ -34,15 +34,15 @@ function leaderBody(model: LootSettingsModel): string {
   const methodOpts = [
     opt('group', t('hudChrome.lootSettings.groupLoot'), selected === 'group'),
     opt('0', t('hudChrome.lootSettings.leaderOption'), selected === '0'),
-    ...model.memberOptions
-      .filter((m) => m.pid !== 0)
-      .map((m) =>
-        opt(
-          String(m.pid),
-          t('hudChrome.lootSettings.masterOption', { name: m.name }),
-          selected === String(m.pid),
-        ),
-      ),
+    ...model.memberOptions.flatMap((m) =>
+      m.pid !== 0
+        ? [opt(
+            String(m.pid),
+            t('hudChrome.lootSettings.masterOption', { name: m.name }),
+            selected === String(m.pid),
+          )]
+        : [],
+    ),
   ].join('');
   const thrOpts = THRESHOLDS.map(
     (thr) =>

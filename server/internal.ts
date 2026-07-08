@@ -212,18 +212,21 @@ async function handleDiscordInternal(
     const body = await readBody(req).catch(() => ({}) as Record<string, unknown>);
     const members = Array.isArray(body.members) ? body.members.slice(0, 1000) : [];
     let updated = 0;
-    for (const m of members) {
+    type MemberMeta = { id: string; name: string | null; joinedAtMs: number | null; roleKey: string | null };
+    const parsed: MemberMeta[] = members.flatMap((m: unknown): MemberMeta[] => {
       const o = m && typeof m === 'object' ? (m as Record<string, unknown>) : {};
       const id = typeof o.discord_user_id === 'string' ? o.discord_user_id.slice(0, 32) : '';
-      if (!id) continue;
+      if (!id) return [];
       const name = typeof o.name === 'string' ? o.name.slice(0, 64) : null;
       const joinedAtMs =
         typeof o.joinedAtMs === 'number' && Number.isFinite(o.joinedAtMs) ? o.joinedAtMs : null;
-      // Only accept a known special-role key; anything else clears the role.
       const roleKey = typeof o.role === 'string' && specialRoleByKey(o.role) ? o.role : null;
-      await setDiscordMemberMeta(pool, id, name, joinedAtMs, roleKey);
-      updated++;
-    }
+      return [{ id, name, joinedAtMs, roleKey }];
+    });
+    const results = await Promise.all(parsed.map((m: MemberMeta) =>
+      setDiscordMemberMeta(pool, m.id, m.name, m.joinedAtMs, m.roleKey),
+    ));
+    updated = results.length;
     return ok(res, { updated });
   }
 
@@ -510,18 +513,21 @@ export const routes: RouteDef[] = [
       const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
       const members = Array.isArray(body.members) ? body.members.slice(0, 1000) : [];
       let updated = 0;
-      for (const m of members) {
+      type MemberMeta = { id: string; name: string | null; joinedAtMs: number | null; roleKey: string | null };
+      const parsed: MemberMeta[] = members.flatMap((m: unknown): MemberMeta[] => {
         const o = m && typeof m === 'object' ? (m as Record<string, unknown>) : {};
         const id = typeof o.discord_user_id === 'string' ? o.discord_user_id.slice(0, 32) : '';
-        if (!id) continue;
+        if (!id) return [];
         const name = typeof o.name === 'string' ? o.name.slice(0, 64) : null;
         const joinedAtMs =
           typeof o.joinedAtMs === 'number' && Number.isFinite(o.joinedAtMs) ? o.joinedAtMs : null;
-        // Only accept a known special-role key; anything else clears the role.
         const roleKey = typeof o.role === 'string' && specialRoleByKey(o.role) ? o.role : null;
-        await setDiscordMemberMeta(pool, id, name, joinedAtMs, roleKey);
-        updated++;
-      }
+        return [{ id, name, joinedAtMs, roleKey }];
+      });
+      const results = await Promise.all(parsed.map((m: MemberMeta) =>
+        setDiscordMemberMeta(pool, m.id, m.name, m.joinedAtMs, m.roleKey),
+      ));
+      updated = results.length;
       return ok(ctx.res, { updated });
     },
   },

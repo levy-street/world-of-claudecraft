@@ -503,12 +503,10 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     return;
   }
   if (!ctx.pendingLootRolls.delete(roll.id)) return;
-  const entries = roll.candidates
-    .map((pid) => ({
-      pid,
-      result: roll.choices.get(pid) ?? { choice: 'pass' as const, roll: null },
-    }))
-    .filter((entry) => entry.result.choice !== 'pass');
+  const entries = roll.candidates.flatMap((pid) => {
+    const result = roll.choices.get(pid) ?? { choice: 'pass' as const, roll: null };
+    return result.choice !== 'pass' ? [{ pid, result }] : [];
+  });
   const needers = entries.filter((entry) => entry.result.choice === 'need');
   const contenders =
     needers.length > 0 ? needers : entries.filter((entry) => entry.result.choice === 'greed');

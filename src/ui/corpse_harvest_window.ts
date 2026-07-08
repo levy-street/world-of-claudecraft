@@ -71,8 +71,7 @@ export function renderCorpseHarvestPicker(
   btn.disabled = view.harvestDisabled;
   btn.addEventListener('click', () => {
     const chosen = [...list.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')]
-      .filter((c) => c.checked)
-      .map((c) => c.value);
+      .flatMap((c) => c.checked ? [c.value] : []);
     deps.onHarvest(chosen);
   });
   section.appendChild(btn);

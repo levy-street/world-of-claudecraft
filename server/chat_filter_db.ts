@@ -54,9 +54,9 @@ function envSeedHardWords(): string[] {
 }
 
 async function insertSeedWords(client: PoolClient, words: string[], tier: WordTier): Promise<void> {
-  const unique = Array.from(
-    new Set(words.map((w) => normalizeWord(w)).filter((w) => w.length > 0)),
-  );
+  const unique = [
+    ...new Set(words.flatMap((w) => { const n = normalizeWord(w); return n.length > 0 ? [n] : []; })),
+  ];
   for (const word of unique) {
     await client.query(
       `INSERT INTO chat_filter_words (word, tier) VALUES ($1, $2) ON CONFLICT (tier, word) DO NOTHING`,

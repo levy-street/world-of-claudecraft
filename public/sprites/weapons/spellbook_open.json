@@ -1,0 +1,38 @@
+{
+  "height": 0.5,
+  "frameWidth": 32,
+  "frameHeight": 32,
+  "animations": {
+    "idle": {
+      "row": 0,
+      "frames": 4,
+      "fps": 4
+    },
+    "walk": {
+      "row": 0,
+      "frames": 4,
+      "fps": 4
+    },
+    "attack": {
+      "row": 0,
+      "frames": 5,
+      "fps": 12
+    },
+    "cast": {
+      "row": 0,
+      "frames": 5,
+      "fps": 10
+    },
+    "death": {
+      "row": 0,
+      "frames": 4,
+      "fps": 6
+    }
+  },
+  "weaponSlot": {
+    "bone": "handslot.r",
+    "offsetX": 0.3,
+    "offsetY": -0.1,
+    "scale": 0.5
+  }
+}

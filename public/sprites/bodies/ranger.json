@@ -1,0 +1,33 @@
+{
+  "height": 2.6,
+  "hover": 0,
+  "frameWidth": 0,
+  "frameHeight": 0,
+  "animations": {
+    "idle": {
+      "row": 0,
+      "frames": 1,
+      "fps": 1
+    },
+    "walk": {
+      "row": 0,
+      "frames": 1,
+      "fps": 1
+    },
+    "attack": {
+      "row": 0,
+      "frames": 1,
+      "fps": 1
+    },
+    "cast": {
+      "row": 0,
+      "frames": 1,
+      "fps": 1
+    },
+    "death": {
+      "row": 0,
+      "frames": 1,
+      "fps": 1
+    }
+  }
+}

@@ -37,8 +37,10 @@ export function itemSetTooltipModel(args: {
     setId: set.id,
     equippedPieces: args.equippedPieces,
     totalPieces: reachablePieces,
-    bonusTiers: set.bonuses
-      .filter((tier) => tier.pieces <= reachablePieces)
-      .map((tier) => ({ pieces: tier.pieces, active: args.equippedPieces >= tier.pieces })),
+    bonusTiers: set.bonuses.flatMap((tier) =>
+      tier.pieces <= reachablePieces
+        ? [{ pieces: tier.pieces, active: args.equippedPieces >= tier.pieces }]
+        : [],
+    ),
   };
 }

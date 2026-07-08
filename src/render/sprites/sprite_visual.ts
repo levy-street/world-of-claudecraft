@@ -11,6 +11,7 @@ import type { SpriteAtlas, SpriteMeta, WeaponSlotMeta } from './atlas';
 import { getCachedAtlas, getCachedMeta } from './atlas';
 import { SPRITE_DEFS, WEAPON_OFFSETS, type SpriteDef, weaponSpriteForItem } from './sprite_manifest';
 import { newSpriteLocoState, spriteAnimSpeedScale, updateSpriteLoco } from './sprite_locomotion';
+import { createSpriteMaterial } from './sprite_shader';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -90,9 +91,9 @@ export class SpriteVisual {
 
   // Three.js objects
   private bodyMesh: THREE.Mesh;
-  private bodyMaterial: THREE.MeshBasicMaterial;
+  private bodyMaterial: THREE.ShaderMaterial;
   private weaponMesh: THREE.Mesh | null = null;
-  private weaponMaterial: THREE.MeshBasicMaterial | null = null;
+  private weaponMaterial: THREE.ShaderMaterial | null = null;
   private shadowProxy: THREE.Mesh | null = null;
   private farMesh: THREE.Mesh | null = null;
 
@@ -164,13 +165,7 @@ export class SpriteVisual {
     this.bodyMeta = bodyMeta;
 
     // Body mesh — unit quad, scaled to height
-    this.bodyMaterial = new THREE.MeshBasicMaterial({
-      map: bodyAtlas.texture,
-      transparent: true,
-      alphaTest: 0.1,
-      side: THREE.DoubleSide,
-      depthWrite: true,
-    });
+    this.bodyMaterial = createSpriteMaterial(bodyAtlas.texture);
     // Apply tint if defined
     if (def.tint !== undefined) {
       this.tintStrength = def.tintStrength ?? 0.4;
@@ -192,13 +187,7 @@ export class SpriteVisual {
       if (wAtlas && wMeta) {
         this.weaponAtlas = wAtlas;
         this.weaponMeta = wMeta.weaponSlot ?? WEAPON_OFFSETS[def.weaponPng] ?? null;
-        this.weaponMaterial = new THREE.MeshBasicMaterial({
-          map: wAtlas.texture,
-          transparent: true,
-          alphaTest: 0.1,
-          side: THREE.DoubleSide,
-          depthWrite: true,
-        });
+        this.weaponMaterial = createSpriteMaterial(wAtlas.texture);
         this.weaponMesh = new THREE.Mesh(quadGeo(), this.weaponMaterial);
         const off = this.weaponMeta;
         if (off) {
@@ -408,10 +397,9 @@ export class SpriteVisual {
       const newMeta = getCachedMeta(weaponUrl);
 
       if (newAtlas && newMeta) {
-        // Swap the weapon material's texture
+        // Swap the weapon material's texture (ShaderMaterial stores map in uniforms)
         if (this.weaponMaterial) {
-          this.weaponMaterial.map = newAtlas.texture;
-          this.weaponMaterial.needsUpdate = true;
+          (this.weaponMaterial.uniforms.map.value as THREE.Texture) = newAtlas.texture;
         }
         // Update weapon offset from new metadata
         const newOffset = newMeta.weaponSlot ?? WEAPON_OFFSETS[spriteName] ?? null;
@@ -512,22 +500,20 @@ export class SpriteVisual {
     const uv = this.bodyAtlas.getFrame(anim, frame);
     if (!uv) return;
 
-    // Update UV on body material via offset/center
-    this.bodyMaterial.map = this.bodyAtlas.texture;
-    this.bodyMaterial.map!.offset.set(uv.u, 1 - uv.v - uv.h);
-    this.bodyMaterial.map!.repeat.set(uv.w, uv.h);
-    this.bodyMaterial.map!.needsUpdate = true;
-    this.bodyMaterial.needsUpdate = true;
+    // Update UV on body material via offset/center (ShaderMaterial texture lives in uniforms)
+    const bodyMap = this.bodyMaterial.uniforms.map.value as THREE.Texture;
+    bodyMap.offset.set(uv.u, 1 - uv.v - uv.h);
+    bodyMap.repeat.set(uv.w, uv.h);
+    bodyMap.needsUpdate = true;
 
     // Sync weapon overlay frame
-    if (this.weaponMesh && this.weaponAtlas) {
+    if (this.weaponMesh && this.weaponAtlas && this.weaponMaterial) {
       const wuv = this.weaponAtlas.getFrame(anim, frame);
       if (wuv) {
-        this.weaponMaterial!.map = this.weaponAtlas.texture;
-        this.weaponMaterial!.map!.offset.set(wuv.u, 1 - wuv.v - wuv.h);
-        this.weaponMaterial!.map!.repeat.set(wuv.w, wuv.h);
-        this.weaponMaterial!.map!.needsUpdate = true;
-        this.weaponMaterial!.needsUpdate = true;
+        const weaponMap = this.weaponMaterial.uniforms.map.value as THREE.Texture;
+        weaponMap.offset.set(wuv.u, 1 - wuv.v - wuv.h);
+        weaponMap.repeat.set(wuv.w, wuv.h);
+        weaponMap.needsUpdate = true;
       }
     }
   }
@@ -536,8 +522,7 @@ export class SpriteVisual {
     // Brief white flash for hit-react on sprites — re-apply tint blend on
     // restore instead of snapshotting the raw color, so tint property changes
     // during the flash window aren't lost.
-    const mat = this.bodyMaterial;
-    mat.color.set(0xffffff);
+    (this.bodyMaterial.uniforms.color.value as THREE.Color).set(0xffffff);
     setTimeout(() => {
       if (!this.disposed) this.applyTint();
     }, 80);
@@ -558,18 +543,18 @@ export class SpriteVisual {
   private applyEffectMaterial(): void {
     if (this.ghosted) {
       this.bodyMaterial.transparent = true;
-      this.bodyMaterial.opacity = GHOST_OPACITY;
+      this.bodyMaterial.uniforms.opacity.value = GHOST_OPACITY;
       this.bodyMaterial.depthWrite = false;
       this.bodyMaterial.needsUpdate = true;
     } else if (this.soulRend) {
       this.bodyMaterial.transparent = true;
-      this.bodyMaterial.opacity = SOUL_REND_OPACITY;
+      this.bodyMaterial.uniforms.opacity.value = SOUL_REND_OPACITY;
       this.bodyMaterial.depthWrite = false;
-      this.bodyMaterial.color.copy(SOUL_REND_TINT);
+      (this.bodyMaterial.uniforms.color.value as THREE.Color).copy(SOUL_REND_TINT);
       this.bodyMaterial.needsUpdate = true;
     } else {
       this.bodyMaterial.transparent = true;
-      this.bodyMaterial.opacity = 1;
+      this.bodyMaterial.uniforms.opacity.value = 1;
       this.bodyMaterial.depthWrite = true;
       this.applyTint();
       this.bodyMaterial.needsUpdate = true;
@@ -578,12 +563,13 @@ export class SpriteVisual {
 
   /** Apply tint color blended with white at tintStrength. */
   private applyTint(): void {
+    const colorUniform = this.bodyMaterial.uniforms.color.value as THREE.Color;
     if (!this.tintColor) {
-      this.bodyMaterial.color.set(0xffffff);
+      colorUniform.set(0xffffff);
       return;
     }
     // Blend tint toward white: tintStrength=0 → white (no tint), 1 → full tint
     const white = new THREE.Color(0xffffff);
-    this.bodyMaterial.color.copy(white).lerp(this.tintColor, this.tintStrength);
+    colorUniform.copy(white).lerp(this.tintColor, this.tintStrength);
   }
 }

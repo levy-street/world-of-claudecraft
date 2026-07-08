@@ -361,12 +361,10 @@ export interface PerfMetricGroupView {
 /** The metric chips bucketed by category, in group + registry order. A group with
  *  no metrics is omitted (none today, but keeps the consumer defensive). */
 export function perfMetricGroups(): PerfMetricGroupView[] {
-  return PERF_METRIC_GROUPS
-    .map((group) => ({
-      group,
-      chips: METRIC_REGISTRY.filter((d) => d.group === group.id).map((d) => ({ key: d.key, labelKey: d.labelKey })),
-    }))
-    .filter((g) => g.chips.length > 0);
+  return PERF_METRIC_GROUPS.flatMap((group) => {
+    const chips = METRIC_REGISTRY.filter((d) => d.group === group.id).map((d) => ({ key: d.key, labelKey: d.labelKey }));
+    return chips.length > 0 ? [{ group, chips }] : [];
+  });
 }
 
 /** The factory-default per-metric visibility map (FPS + frame time + ping on). */

@@ -134,7 +134,7 @@ export function createMinimapMarkers(): MinimapMarkers {
       // ONCE per call (as the inline site did), NOT off the hot path.
       const social = world.socialInfo;
       const friendNames = social
-        ? new Set(social.friends.filter((f) => f.online).map((f) => f.name))
+        ? new Set(social.friends.flatMap((f) => f.online ? [f.name] : []))
         : null;
       const guildNames = social?.guild ? new Set(social.guild.members.map((m) => m.name)) : null;
       const partyPids = world.partyInfo ? new Set(world.partyInfo.members.map((m) => m.pid)) : null;

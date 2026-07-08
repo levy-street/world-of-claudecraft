@@ -115,17 +115,18 @@ function appendQuery(url: string, params: Record<string, string>): string {
 // clients (device flow only) are allowed.
 export async function seedOAuthClients(): Promise<void> {
   const raw = process.env.OAUTH_CLIENTS ?? '';
-  for (const entry of raw.split(';')) {
+  const entries = raw.split(';').flatMap((entry) => {
     const seg = entry.trim();
-    if (!seg) continue;
+    if (!seg) return [];
     const [id, name, uris] = seg.split('|').map((s) => (s ?? '').trim());
-    if (!id) continue;
+    if (!id) return [];
     const redirects = (uris ?? '')
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
-    await upsertOAuthClient(pool, id, name || id, redirects);
-  }
+    return [{ id, name: name || id, redirects }];
+  });
+  await Promise.all(entries.map((e) => upsertOAuthClient(pool, e.id, e.name, e.redirects)));
 }
 
 // ── Bearer (full web session) for the approval POSTs ───────────────────────

@@ -75,7 +75,8 @@
     "voices:lines": "node scripts/gen_npc_lines.mjs",
     "sfx:gen": "node scripts/gen_sfx.mjs",
     "wiki:seed": "node scripts/mediawiki/build_seed.mjs",
-    "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts"
+    "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@capacitor/live-updates": "^0.5.0",

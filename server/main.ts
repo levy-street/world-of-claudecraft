@@ -3,6 +3,12 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
 import {
+  handleTransportClose,
+  handleTransportConnect,
+  handleTransportPoll,
+  handleTransportSend,
+} from './http_transport';
+import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
   paginateDevLeaderboard,
@@ -443,17 +449,19 @@ async function refreshReleases(): Promise<ReleaseEntry[]> {
     );
     if (!res.ok) throw new Error(`github releases ${res.status}`);
     const raw = await res.json();
-    const entries: ReleaseEntry[] = (Array.isArray(raw) ? raw : [])
-      .filter((r) => r && !r.draft) // skip unpublished drafts
-      .map((r) => ({
-        id: Number(r.id),
-        tag: String(r.tag_name ?? ''),
-        name: String(r.name || r.tag_name || ''),
-        body: String(r.body ?? '').slice(0, RELEASE_BODY_MAX),
-        url: String(r.html_url ?? ''),
-        prerelease: Boolean(r.prerelease),
-        publishedAt: String(r.published_at ?? r.created_at ?? ''),
-      }));
+    const entries: ReleaseEntry[] = (Array.isArray(raw) ? raw : []).flatMap((r) =>
+      r && !r.draft
+        ? [{
+            id: Number(r.id),
+            tag: String(r.tag_name ?? ''),
+            name: String(r.name || r.tag_name || ''),
+            body: String(r.body ?? '').slice(0, RELEASE_BODY_MAX),
+            url: String(r.html_url ?? ''),
+            prerelease: Boolean(r.prerelease),
+            publishedAt: String(r.published_at ?? r.created_at ?? ''),
+          }]
+        : [],
+    );
     releasesCache = { at: Date.now(), entries };
     recordUsageCacheEvent('github.releases', 'store');
     setUsageCacheSize('github.releases', entries.length, RELEASES_SIZE);
@@ -2158,6 +2166,37 @@ export function routeHttpRequest(req: http.IncomingMessage, res: http.ServerResp
   } else if (url.startsWith('/admin/api/')) void adminApiEntry(req, res);
   else if (url.startsWith('/api/')) void apiEntry(req, res);
   else if (url.startsWith('/oauth/')) void oauthApiEntry(req, res);
+  // HTTP long-poll transport: fallback for environments where WebSocket is blocked.
+  // Handled directly (no RouteDef registration) to keep the transport self-contained.
+  else if (req.method === 'POST' && path === '/api/transport/connect') {
+    void handleTransportConnect(req, res, {
+      game: liveGame(),
+      accountForToken,
+      moderationStatusForAccount,
+      getCharacter,
+      chatMuteStatusForAccount,
+      adminRolesForAccount,
+      permissionsForRoles,
+      loadAccountCosmetics,
+      requestMetadata: (r) => requestMetadata(r),
+      isConnectionRefused,
+      maxWsPerIpHard: activeConfig().maxWsPerIpHard,
+    });
+  } else if (req.method === 'GET' && path === '/api/transport/poll') {
+    const sessionId = new URL(req.url ?? '', 'http://localhost').searchParams.get('sessionId') ?? '';
+    handleTransportPoll(req, res, sessionId);
+  } else if (req.method === 'POST' && path === '/api/transport/send') {
+    void handleTransportSend(req, res, liveGame());
+  } else if (req.method === 'POST' && path === '/api/transport/close') {
+    let body: any;
+    try {
+      body = await readBody(req);
+    } catch {
+      return json(res, 400, { error: 'invalid body' });
+    }
+    const sessionId = typeof body.sessionId === 'string' ? body.sessionId : '';
+    handleTransportClose(req, res, liveGame(), sessionId);
+  }
   else if (req.method === 'GET' && url.startsWith('/p/')) void handleCardRoutes(req, res);
   else if (req.method === 'GET' && path.startsWith('/avatar/')) void handleAvatar(req, res);
   else if (req.method === 'GET' && path.startsWith('/c/')) void handleProfilePage(req, res);

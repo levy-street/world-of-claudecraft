@@ -109,11 +109,12 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
   }
 
   // Weapons and held props: load each, bind to its hand bone, copy any grip reference.
-  for (const att of spec.attach ?? []) {
-    const bone = findBone(model, att.bone);
-    if (!bone) continue; // manifest/bone mismatch, ship without the prop
-    const propGltf = await loadGltf(att.url);
-    const prop = cloneSkinned(propGltf.scene);
+  const attachments = (spec.attach ?? []).filter((att) => findBone(model, att.bone));
+  const gltfs = await Promise.all(attachments.map((att) => loadGltf(att.url)));
+  for (let i = 0; i < attachments.length; i++) {
+    const att = attachments[i];
+    const bone = findBone(model, att.bone)!;
+    const prop = cloneSkinned(gltfs[i].scene);
     if (att.gripRef) {
       const grip = findBone(model, att.gripRef);
       if (grip) {

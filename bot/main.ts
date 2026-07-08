@@ -73,17 +73,18 @@ async function main(): Promise<void> {
   // the bot lacks permission this logs and the missing rungs are simply skipped.
   const ensureTierRoles = async (): Promise<void> => {
     const existing = new Set((await discord.guildRoles(cfg.guildId)).map((r) => r.name));
-    const missing = allTierRoleNames()
-      .map((name, i) => ({ name, index: i + 1 }))
-      .filter((r) => !existing.has(r.name));
-    for (const { name, index } of missing) {
+    const missing = allTierRoleNames().flatMap((name, i) => {
+      const r = { name, index: i + 1 };
+      return existing.has(r.name) ? [] : [r];
+    });
+    await Promise.all(missing.map(async ({ name, index }) => {
       try {
         await discord.createGuildRole(cfg.guildId, name, tierRoleColor(index));
         console.log(`[bot] created status-tier role ${name}`);
       } catch (e) {
         console.error(`[bot] could not create role ${name} (need MANAGE_ROLES):`, e);
       }
-    }
+    }));
     if (missing.length) await refreshTierRoles();
   };
 
@@ -203,15 +204,15 @@ async function main(): Promise<void> {
     // Only update the cached role set when the Discord API call actually
     // succeeds, so a failed add/remove is retried on the next sync (not masked
     // by a cache that wrongly claims success).
-    for (const roleId of toAdd) {
+    await Promise.all(toAdd.map(async (roleId) => {
       try {
         await discord.addMemberRole(cfg.guildId, userId, roleId);
         memberRoles.set(userId, [...(memberRoles.get(userId) ?? []), roleId]);
       } catch (e) {
         console.error(e);
       }
-    }
-    for (const roleId of toRemove) {
+    }));
+    await Promise.all(toRemove.map(async (roleId) => {
       try {
         await discord.removeMemberRole(cfg.guildId, userId, roleId);
         memberRoles.set(
@@ -221,7 +222,7 @@ async function main(): Promise<void> {
       } catch (e) {
         console.error(e);
       }
-    }
+    }));
     // Attach the in-game level + class icon to the member's Discord nickname
     // (built from the stable Discord handle so re-syncs don't compound).
     if (cfg.syncNicknames && flex.character) {

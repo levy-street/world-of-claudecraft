@@ -685,10 +685,9 @@ export class DailyRewardService {
     const tasks = await this.db.tasksForType(day, 'quest_completion');
     if (tasks.length === 0) return 0;
     const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
-    let awardedPoints = 0;
-    for (const task of tasks) {
+    const results = await Promise.all(tasks.map(async (task) => {
       const { points, multiplier } = questCompletionPoints(task, onlineMinutes);
-      if (points <= 0) continue;
+      if (points <= 0) return 0;
       const priorCompletions = await this.db.questTaskCompletionCount(
         day,
         accountId,
@@ -714,9 +713,9 @@ export class DailyRewardService {
           repeatIndex: priorCompletions,
         },
       );
-      if (recorded) awardedPoints += awarded;
-    }
-    return awardedPoints;
+      return recorded ? awarded : 0;
+    }));
+    return results.reduce((a, b) => a + b, 0);
   }
 
   async recordArenaResult(
@@ -738,14 +737,13 @@ export class DailyRewardService {
     const tasks = await this.db.tasksForType(day, 'arena_result');
     if (tasks.length === 0) return 0;
     const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
-    let awardedPoints = 0;
-    for (const task of tasks) {
+    const results = await Promise.all(tasks.map(async (task) => {
       const taskConfig = task.config ?? {};
       const basePoints = result.won
         ? numberConfig(taskConfig, 'winBasePoints', task.basePoints ?? task.points)
         : numberConfig(taskConfig, 'lossBasePoints', 10);
       const { points, multiplier } = onlineMultiplierPoints(basePoints, taskConfig, onlineMinutes);
-      if (points <= 0) continue;
+      if (points <= 0) return 0;
       const recorded = await this.db.addPoints(
         day,
         accountId,
@@ -764,9 +762,9 @@ export class DailyRewardService {
           ratingAfter: result.ratingAfter,
         },
       );
-      if (recorded) awardedPoints += points;
-    }
-    return awardedPoints;
+      return recorded ? points : 0;
+    }));
+    return results.reduce((a, b) => a + b, 0);
   }
 
   async recordDelveClear(
@@ -785,10 +783,9 @@ export class DailyRewardService {
     const tasks = await this.db.tasksForType(day, 'delve_clear');
     if (tasks.length === 0) return 0;
     const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
-    let awardedPoints = 0;
-    for (const task of tasks) {
+    const results = await Promise.all(tasks.map(async (task) => {
       const clearPoints = delveClearPoints(task, delveId, tierId, onlineMinutes);
-      if (!clearPoints || clearPoints.points <= 0) continue;
+      if (!clearPoints || clearPoints.points <= 0) return 0;
       const recorded = await this.db.addPoints(
         day,
         accountId,
@@ -809,9 +806,9 @@ export class DailyRewardService {
           preOnlinePoints: clearPoints.preOnlinePoints,
         },
       );
-      if (recorded) awardedPoints += clearPoints.points;
-    }
-    return awardedPoints;
+      return recorded ? clearPoints.points : 0;
+    }));
+    return results.reduce((a, b) => a + b, 0);
   }
 
   async recordDelveChestOpen(
@@ -832,10 +829,9 @@ export class DailyRewardService {
     const tasks = await this.db.tasksForType(day, 'delve_clear');
     if (tasks.length === 0) return 0;
     const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
-    let awardedPoints = 0;
-    for (const task of tasks) {
+    const results = await Promise.all(tasks.map(async (task) => {
       const chestPoints = delveChestOpenPoints(task, chestTier, bountiful, onlineMinutes);
-      if (!chestPoints || chestPoints.points <= 0) continue;
+      if (!chestPoints || chestPoints.points <= 0) return 0;
       const recorded = await this.db.addPoints(
         day,
         accountId,
@@ -858,9 +854,9 @@ export class DailyRewardService {
           preOnlinePoints: chestPoints.preOnlinePoints,
         },
       );
-      if (recorded) awardedPoints += chestPoints.points;
-    }
-    return awardedPoints;
+      return recorded ? chestPoints.points : 0;
+    }));
+    return results.reduce((a, b) => a + b, 0);
   }
 
   async history(limit = 30): Promise<DailyRewardHistory> {

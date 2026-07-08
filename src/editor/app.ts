@@ -1500,12 +1500,12 @@ export class EditorApp {
     const cz = (b.minZ + b.maxZ) / 2;
     const inBox = (x: number, z: number): boolean =>
       x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ;
-    const placements = this.map.placements
-      .filter((p) => inBox(p.x, p.z))
-      .map((p) => ({ ...p, x: p.x - cx, z: p.z - cz }));
-    const edits = this.map.terrainEdits
-      .filter((e) => inBox(e.x, e.z))
-      .map((e) => ({ ...e, x: e.x - cx, z: e.z - cz }));
+    const placements = this.map.placements.flatMap((p) =>
+      inBox(p.x, p.z) ? [{ ...p, x: p.x - cx, z: p.z - cz }] : [],
+    );
+    const edits = this.map.terrainEdits.flatMap((e) =>
+      inBox(e.x, e.z) ? [{ ...e, x: e.x - cx, z: e.z - cz }] : [],
+    );
     this.clipboard = { placements, edits };
     this.toasts.success(
       t('editor.region.copied', { assets: placements.length, edits: edits.length }),
@@ -1608,7 +1608,7 @@ export class EditorApp {
         ? null
         : (assetById(this.assets.selectedAssetId ?? '')?.category ?? 'foliage');
     const pool = category
-      ? ASSET_CATALOG.filter((a) => a.category === category).map((a) => a.id)
+      ? ASSET_CATALOG.flatMap((a) => a.category === category ? [a.id] : [])
       : this.placeAssetId
         ? [this.placeAssetId]
         : [];

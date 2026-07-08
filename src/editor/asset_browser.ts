@@ -227,11 +227,9 @@ export class AssetBrowser {
         sha256: a.sha256,
       }));
     }
-    return ASSET_CATALOG.filter((a) => a.category === this.category).map((a) => ({
-      id: a.id,
-      label: a.label,
-      category: a.category,
-    }));
+    return ASSET_CATALOG.flatMap((a) =>
+      a.category === this.category ? [{ id: a.id, label: a.label, category: a.category }] : [],
+    );
   }
 
   private renderGrid(): void {
