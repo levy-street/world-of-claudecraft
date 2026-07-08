@@ -3739,6 +3739,66 @@ function inventoryVendor(): Scenario {
   };
 }
 
+// Personal bank: the per-character deposit box. A player stands at a
+// bursar and moves a stack in and out through the pooled deposit/withdraw commands,
+// then buys a slot expansion. Exercises every state transition the bank owns:
+//  - bankDeposit partial (a fraction of a fungible stack leaves the bags);
+//  - bankDeposit whole (the rest of the stack, merging into the bank slot);
+//  - bankWithdraw partial then whole (the mirror, gated by bag capacity);
+//  - bankBuySlots (copper - table price, purchasedSlots + 6).
+// The bank draws NO rng (it is pure pooled-list math), so the draw-order digest must
+// stay byte-identical; its behavior is pinned entirely through PlayerMeta (copper +
+// inventory + bank) and the emitted event stream. Modeled on market_round_trip.
+function bankRoundTrip(): Scenario {
+  return {
+    name: 'bank_round_trip',
+    coverage: [
+      'bankDeposit partial: a fraction of a fungible stack moves bags -> bank',
+      'bankDeposit whole: the remaining stack merges into the bank slot',
+      'bankWithdraw partial then whole: bank -> bags, gated by bag capacity',
+      'bankBuySlots: meta.copper - BANK_EXPANSION_PRICES[0] + purchasedSlots + 6',
+      'banker-proximity gate (nearBanker) satisfied by standing at a bursar',
+    ],
+    build: () => new Sim({ seed: 1024, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.addPlayer('warrior', 'Vaultkeeper');
+      const meta = sim.players.get(pid) as any;
+      // Stand at a bursar so the nearBanker gate passes (dist2d check, matching x/z
+      // is enough). bankerIds is the Sim anchor list seeded by the ctor.
+      const banker = sim.entities.get(sim.bankerIds[0]) as AnyEntity;
+      teleport(sim, sim.entities.get(pid) as AnyEntity, banker.pos.x, banker.pos.z);
+      sim.addItem('wolf_fang', 5, pid);
+      meta.copper = 1000;
+      rec.notes.pid = pid;
+      rec.snapshot('bank-setup');
+
+      // 1) deposit a partial count: 2 of the 5-stack leaves the bags for the bank.
+      const depIdx = meta.inventory.findIndex((s: any) => s.itemId === 'wolf_fang');
+      sim.bankDeposit(depIdx, 2, pid);
+      rec.snapshot('deposited-partial');
+
+      // 2) deposit the whole remaining stack (3): merges into the bank's wolf_fang slot.
+      const depIdx2 = meta.inventory.findIndex((s: any) => s.itemId === 'wolf_fang');
+      sim.bankDeposit(depIdx2, undefined, pid);
+      rec.snapshot('deposited-whole');
+
+      // 3) withdraw a partial count (1) back into the bags.
+      sim.bankWithdraw(0, 1, pid);
+      rec.snapshot('withdrew-partial');
+
+      // 4) withdraw the whole remaining bank stack (4) back into the bags.
+      sim.bankWithdraw(0, undefined, pid);
+      rec.snapshot('withdrew-whole');
+
+      // 5) buy the first slot expansion: copper - 500, purchasedSlots 0 -> 6.
+      sim.bankBuySlots(pid);
+      rec.snapshot('bought-slots');
+      rec.tick(2);
+    },
+  };
+}
+
 // XP / prestige (G1b): the residual XP-shaping surface C1 left on Sim. Parks a
 // warrior inside an inn footprint to accrue rested XP (updateRested + isResting),
 // spends it on a kill-flagged award (the grantXp rested double-up), dings the
@@ -3966,6 +4026,7 @@ export const SCENARIOS: Scenario[] = [
   c5AutoAttack(),
   marketRoundTrip(),
   inventoryVendor(),
+  bankRoundTrip(),
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),

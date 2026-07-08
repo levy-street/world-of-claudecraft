@@ -22,7 +22,7 @@ function placeFarApart(sim: Sim, a: number, b: number) {
   sim.entities.get(b)!.pos.z = 1000;
 }
 
-describe('/invite — global party invite by name', () => {
+describe('/invite: global party invite by name', () => {
   it('invites a player across the whole world (no proximity required)', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');

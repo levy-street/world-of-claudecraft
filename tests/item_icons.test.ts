@@ -12,7 +12,8 @@ import { ITEM_IMAGE_IDS, itemImageUrl } from '../src/ui/icons';
 //   A) every id in ITEM_IMAGE_IDS resolves to a committed, VALID .webp;
 //   B) only .webp art (+ mapping.json) is committed under public/ui/items;
 //   C) every committed .webp is a WIRED item id;
-//   D) every wired id is a real ITEMS entry whose kind is not armor/weapon (resource scope).
+//   D) every wired id is a real ITEMS entry that is not a weapon (weapons ship rendered
+//      model thumbnails via WEAPON_ICON_DIR; everything else, armor included, lives here).
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(repoRoot, 'public');
 const itemsDir = path.join(publicDir, 'ui/items');
@@ -82,14 +83,16 @@ describe('item webp icons', () => {
     expect(orphans, 'remove dead-weight art or wire the id into ITEM_IMAGE_IDS').toEqual([]);
   });
 
-  it('D) every wired id is a real, non-equipment item', () => {
+  it('D) every wired id is a real, non-weapon item', () => {
     const bad: string[] = [];
     for (const id of ITEM_IMAGE_IDS) {
       const def = (ITEMS as Record<string, { kind?: string }>)[id];
       if (!def) bad.push(`${id} (no such item)`);
-      else if (def.kind === 'armor' || def.kind === 'weapon')
-        bad.push(`${id} (equipment: ${def.kind})`);
+      else if (def.kind === 'weapon') bad.push(`${id} (weapon: has its own rendered-JPG pipeline)`);
     }
-    expect(bad, 'ITEM_IMAGE_IDS is for real resource/consumable items only').toEqual([]);
+    expect(
+      bad,
+      'ITEM_IMAGE_IDS covers real items only; weapons use WEAPON_ICON_DIR thumbnails instead',
+    ).toEqual([]);
   });
 });

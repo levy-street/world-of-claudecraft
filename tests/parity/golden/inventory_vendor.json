@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
+      "nextId": 405,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "c7b4e4ca",
+      "nextId": 406,
+      "state": "90be7591",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -45,6 +45,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -53,6 +54,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 1000,
@@ -60,18 +62,26 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -86,7 +96,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -129,9 +139,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "ed32ef46",
-      "events": "531aebc5",
+      "nextId": 406,
+      "state": "62ea07f5",
+      "events": "096ab7a3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -140,6 +150,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -148,6 +159,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -155,15 +167,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 5,
+              "count": 10,
               "itemId": "baked_bread"
             },
             {
@@ -176,11 +189,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -195,7 +209,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -238,9 +252,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "fc76ad9e",
-      "events": "a6017c57",
+      "nextId": 406,
+      "state": "5d1e9605",
+      "events": "3484c3f2",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -249,6 +263,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -257,6 +272,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -264,16 +280,17 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 5,
+              "count": 10,
               "itemId": "baked_bread"
             },
             {
@@ -290,11 +307,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -309,7 +327,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 120,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -352,9 +370,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "9d027a1e",
-      "events": "6eca1d53",
+      "nextId": 406,
+      "state": "2872c0a9",
+      "events": "38928174",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -363,6 +381,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -371,6 +390,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -378,16 +398,17 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 5,
+              "count": 10,
               "itemId": "baked_bread"
             },
             {
@@ -404,11 +425,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -423,7 +445,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 110,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -466,9 +488,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "de6ea41c",
-      "events": "695c81aa",
+      "nextId": 406,
+      "state": "748f913f",
+      "events": "e99be2dd",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -477,6 +499,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -485,6 +508,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -492,15 +516,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 5,
+              "count": 10,
               "itemId": "baked_bread"
             },
             {
@@ -521,11 +546,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -540,7 +566,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -583,9 +609,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "285d6aab",
-      "events": "1df0a44d",
+      "nextId": 406,
+      "state": "60fde2cb",
+      "events": "c0073169",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -594,6 +620,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -602,6 +629,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -609,15 +637,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 4,
+              "count": 9,
               "itemId": "baked_bread"
             },
             {
@@ -638,11 +667,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -669,7 +699,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -713,9 +743,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "8f191b36",
-      "events": "fdae55a8",
+      "nextId": 406,
+      "state": "37d08402",
+      "events": "c9b07f5e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -724,6 +754,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -732,6 +763,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -739,15 +771,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 4,
+              "count": 9,
               "itemId": "baked_bread"
             },
             {
@@ -764,11 +797,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -795,7 +829,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -839,9 +873,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "69ffca85",
-      "events": "4b948de8",
+      "nextId": 406,
+      "state": "c1f97512",
+      "events": "d79812c3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -850,6 +884,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -858,6 +893,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -865,15 +901,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 4,
+              "count": 9,
               "itemId": "baked_bread"
             },
             {
@@ -890,11 +927,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -909,7 +947,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 405,
               "value": 12
             }
           ],
@@ -933,7 +971,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -977,9 +1015,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "a1511157",
-      "events": "3efe81a4",
+      "nextId": 406,
+      "state": "45411d7c",
+      "events": "d1fd54a6",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -988,6 +1026,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -996,6 +1035,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 710,
@@ -1003,15 +1043,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 4,
+              "count": 9,
               "itemId": "baked_bread"
             },
             {
@@ -1032,11 +1073,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
-          "worldBossDaily": {}
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -1051,7 +1093,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 405,
               "value": 12
             }
           ],
@@ -1075,7 +1117,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1119,9 +1161,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "43631fa6",
-      "events": "fc57ebc8",
+      "nextId": 406,
+      "state": "e42467f5",
+      "events": "23e16a50",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1130,6 +1172,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1138,6 +1181,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 714,
@@ -1145,15 +1189,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 4,
+              "count": 9,
               "itemId": "baked_bread"
             },
             {
@@ -1174,17 +1219,18 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "townFocus": {},
           "vendorBuyback": [
             {
               "count": 1,
               "itemId": "wolf_fang"
             }
-          ],
-          "worldBossDaily": {}
+          ]
         }
       ],
       "entities": [
@@ -1199,7 +1245,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 405,
               "value": 12
             }
           ],
@@ -1223,7 +1269,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1267,9 +1313,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "991c0e51",
-      "events": "7c2d5847",
+      "nextId": 406,
+      "state": "fb156884",
+      "events": "4fe3c73e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1278,6 +1324,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1286,6 +1333,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 724,
@@ -1293,15 +1341,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 4,
+              "count": 9,
               "itemId": "baked_bread"
             },
             {
@@ -1318,10 +1367,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "townFocus": {},
           "vendorBuyback": [
             {
               "count": 1,
@@ -1331,8 +1382,7 @@
               "count": 2,
               "itemId": "wolf_fang"
             }
-          ],
-          "worldBossDaily": {}
+          ]
         }
       ],
       "entities": [
@@ -1347,7 +1397,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 405,
               "value": 12
             }
           ],
@@ -1371,7 +1421,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1415,9 +1465,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "81a9e61b",
-      "events": "daa824d5",
+      "nextId": 406,
+      "state": "8deeac0c",
+      "events": "5c2ca31d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1426,6 +1476,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1434,6 +1485,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 720,
@@ -1441,15 +1493,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 4,
+              "count": 9,
               "itemId": "baked_bread"
             },
             {
@@ -1470,10 +1523,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "townFocus": {},
           "vendorBuyback": [
             {
               "count": 1,
@@ -1483,8 +1538,7 @@
               "count": 1,
               "itemId": "wolf_fang"
             }
-          ],
-          "worldBossDaily": {}
+          ]
         }
       ],
       "entities": [
@@ -1499,7 +1553,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 405,
               "value": 12
             }
           ],
@@ -1523,7 +1577,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1567,8 +1621,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "81a9e61b",
+      "nextId": 406,
+      "state": "8deeac0c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1578,6 +1632,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "bags": [
@@ -1586,6 +1641,7 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 720,
@@ -1593,15 +1649,16 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
-              "count": 4,
+              "count": 9,
               "itemId": "baked_bread"
             },
             {
@@ -1622,10 +1679,12 @@
             }
           ],
           "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "townFocus": {},
           "vendorBuyback": [
             {
               "count": 1,
@@ -1635,8 +1694,7 @@
               "count": 1,
               "itemId": "wolf_fang"
             }
-          ],
-          "worldBossDaily": {}
+          ]
         }
       ],
       "entities": [
@@ -1651,7 +1709,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 400,
+              "sourceId": 405,
               "value": 12
             }
           ],
@@ -1675,7 +1733,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

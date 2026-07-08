@@ -3,6 +3,7 @@ import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
+import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import {
   DELVES,
   DUNGEON_X_THRESHOLD,
@@ -27,17 +28,25 @@ import {
   EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
+  isDungeonDifficulty,
   MAX_LEVEL,
   PARTY_MEMBER_AURA_CAP,
   RUN_SPEED,
   type SimEvent,
+  type SportRole,
+  type VcBracket,
+  type VcNationId,
 } from '../src/sim/types';
-import { type CommandName, isOverheadEmoteId } from '../src/world_api';
+import { isAtSowfield } from '../src/sim/vale_cup_layout';
+import { type BankBonusSource, type CommandName, isOverheadEmoteId } from '../src/world_api';
 import { recordOnlineSample } from './admin_db';
 import { offensiveName } from './auth';
+import { recordBankOp } from './bank_ledger';
 import type {
   BotDetector,
   BotTrackingContext,
+  ConfigApplyResult,
+  ConfigField,
   SessionRuntimeSnapshot,
   SuspiciousPlayer,
 } from './bot_detector/contract';
@@ -53,12 +62,14 @@ import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from '.
 import {
   closePlaySession,
   grantAccountMechChroma,
+  heartbeatCharacterLeases,
   insertChatLogs,
   loadMailState,
   loadMarketState,
   markAccountQuestComplete,
   openPlaySession,
   pool,
+  releaseCharacterLease,
   revokeAccountMechChroma,
   saveCharacterAndMarketState,
   saveCharacterState,
@@ -76,14 +87,20 @@ import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
+import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { trackReachedLevel5 } from './meta_capi';
 import {
   forceCharacterRename,
   moderateAccount,
   muteAccountChat,
   recordInGameAction,
 } from './moderation_db';
-import { type ModerationHost, ModerationService } from './moderation_service';
+import {
+  canAttemptModerationCommands,
+  type ModerationHost,
+  ModerationService,
+} from './moderation_service';
 import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -92,6 +109,7 @@ import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './s
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { TickProfiler } from './tick_profiler';
+import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -116,6 +134,11 @@ const FULL_RATE_RADIUS_SQ = 55 * 55;
 const HALF_RATE_RADIUS_SQ = 80 * 80;
 const HALF_RATE_DIVISOR = 2;
 const QUARTER_RATE_DIVISOR = 4;
+// How often the achieved tick rate rides the snapshot head. The meter's 3s
+// sliding window moves slowly and the client holds the last value across
+// omissions, so ~2 Hz keeps the overlay live without paying the scalar on
+// every 20 Hz head. In sim seconds (the head already carries sim.time).
+const TICK_HZ_HEAD_INTERVAL_S = 0.5;
 // cached wire fragments of despawned entities are swept once a minute
 const WIRE_CACHE_SWEEP_TICKS = 1200;
 const EVENT_RADIUS = 90;
@@ -139,6 +162,8 @@ const WHO_RESULT_LIMIT = 50;
 // between an account's characters, so the old allowance of a second online
 // character (self-trade by dual-boxing) is no longer needed. GMs are exempt.
 const MAX_ACTIVE_SESSIONS_PER_ACCOUNT = 1;
+// WS protocol-level ping cadence; see the keepalive interval in start().
+const WS_KEEPALIVE_PING_MS = 30_000;
 const RESTART_COUNTDOWN_TOTAL_SECONDS = 600;
 const RESTART_COUNTDOWN_STEPS = [
   { atSeconds: 0, text: 'Server restart in 10 minutes.' },
@@ -149,15 +174,59 @@ const RESTART_COUNTDOWN_STEPS = [
   { atSeconds: 590, text: 'Server restart in 10 seconds.' },
   { atSeconds: 600, text: 'Server restarting now.' },
 ] as const;
-const ANTIBOT_ENFORCE = process.env.ANTIBOT_ENFORCE === '1';
 // Clients stream movement intent every 50ms. If that stream goes silent while
 // the last packet held a key down, stop applying it instead of turning/running
 // forever. 750ms leaves room for normal jitter and short browser stalls.
 const STALE_INPUT_SECONDS = 0.75;
 // Exponential moving average weight for the per-tick duration stat.
 const TICK_EMA_ALPHA = 0.05;
+// On-demand server tick-loop capture window bounds (ms), clamped in startPerfCapture.
+// The default when the admin caller sends none. Max 30s stays inside the profiler's
+// 1200-tick (60s) ring.
+const PERF_CAPTURE_MIN_MS = 3_000;
+const PERF_CAPTURE_MAX_MS = 30_000;
+const PERF_CAPTURE_DEFAULT_MS = 10_000;
+// sim.tick() internal phase names (already `sim.`-prefixed): must match the
+// lap?.(...) call sites in src/sim/sim.ts tick(). Fed by the injected cfg.perfLap
+// probe while a detailed capture is active (an admin capture or PERF_TICK_LOG=1).
+// TickProfiler.add() silently ignores an unregistered phase, so a name drift would
+// drop that timing without a trace: tests/server/tick_perf_capture.test.ts pins the
+// sim's emitted phase set against this list, exported for that guard.
+export const SIM_LAP_PHASES = [
+  'respawns',
+  'worldBosses',
+  'groundAoEs',
+  'despawnDecay',
+  'projectiles',
+  'p.move',
+  'p.doors',
+  'p.casting',
+  'p.autoAtk',
+  'p.regen',
+  'p.auras',
+  'mob.update',
+  'mob.auras',
+  'ent.misc',
+  'engaged',
+  'duels',
+  'arena',
+  'trades',
+  'lootRolls',
+  'instances',
+  'delves',
+  'valecup',
+  'market',
+  'postOffice',
+  'delayedEv',
+  'gridRefresh',
+].map((n) => `sim.${n}`);
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
+// Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
+// queue sizes, so 2 Hz keeps the window/indicator live without re-serializing
+// the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
+const VC_WIRE_HZ = 2;
+const VC_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * VC_WIRE_HZ)));
 
 type ClientMessage = Record<string, unknown> & {
   ability?: string;
@@ -166,6 +235,7 @@ type ClientMessage = Record<string, unknown> & {
   ante?: number;
   augment?: string;
   bar?: unknown;
+  bracket?: number;
   catalog?: string;
   choice?: 'need' | 'greed' | 'pass';
   chroma?: string;
@@ -174,6 +244,7 @@ type ClientMessage = Record<string, unknown> & {
   count?: number;
   copper?: number;
   delveId?: string;
+  difficulty?: unknown;
   dungeon?: string;
   emote?: unknown;
   enabled?: boolean;
@@ -191,12 +262,15 @@ type ClientMessage = Record<string, unknown> & {
   mode?: string;
   n?: string;
   name?: string;
+  nation?: string;
+  node?: string;
   npc?: number;
   objectId?: number;
   price?: number;
   q?: string;
   quest?: string;
   r?: string;
+  role?: string;
   rollId?: number;
   seq?: number;
   sid?: string;
@@ -251,6 +325,23 @@ function isPickAction(value: unknown): value is PickAction {
   return typeof value === 'string' && LOCKPICK_ACTIONS.has(value as PickAction);
 }
 
+// Vale Cup wire validation (anti-cheat: every field type-checked against the
+// known token sets before the sim is touched, the LOCKPICK_ACTIONS pattern).
+const VC_NATION_SET: ReadonlySet<string> = new Set(VC_NATION_IDS);
+const SPORT_ROLE_SET: ReadonlySet<string> = new Set(SPORT_ROLES);
+
+function isVcNationId(value: unknown): value is VcNationId {
+  return typeof value === 'string' && VC_NATION_SET.has(value);
+}
+
+function isSportRole(value: unknown): value is SportRole {
+  return typeof value === 'string' && SPORT_ROLE_SET.has(value);
+}
+
+function isVcBracket(value: unknown): value is VcBracket {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 5;
+}
+
 // Heavy, rarely-changing self fields (inventory, equipment, stats, talents,
 // quests, milestones, cosmetics) are re-serialized into a snapshot only when a
 // command or sim event that can change them lands for that session, or on a
@@ -270,7 +361,9 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'buy',
   'sell',
   'buyback',
+  'vcup_bet', // debits copper: refresh the self snapshot so the purse updates
   'loot',
+  'harvestCorpse',
   'pickup',
   'interact',
   'accept',
@@ -294,12 +387,16 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'mail_take',
   'mail_delete',
   'mail_read',
+  'bank_deposit',
+  'bank_withdraw',
+  'bank_buy_slots',
   'pet_feed',
   'dev_give',
   'dev_level',
 ]);
 const HEAVY_SELF_EVENTS = new Set<string>([
   'loot',
+  'vcupBetSettled', // credits copper to the bettor: refresh their purse
   'mailArrived',
   'mailResult',
   'levelup',
@@ -347,6 +444,15 @@ export interface ClientSession {
   joinedAt: number;
   dbSessionId: number | null; // play_sessions row, set once the insert lands
   left: boolean; // set in leave(); guards against the open-session insert landing after disconnect
+  // linkdead grace: true while the socket has dropped but the character is
+  // held in-world awaiting a reconnect. graceUntil is the epoch-ms deadline
+  // at which the held session is fully torn down via leave().
+  linkdead: boolean;
+  graceUntil: number;
+  // true while a keepalive ping is outstanding; the pong handler (attached
+  // next to the close/error handlers in ws_auth.ts) clears it. Still set at
+  // the next sweep means the socket is black-holed: terminate into the grace.
+  awaitingPong: boolean;
   chatTokens: number;
   chatLastRefill: number;
   chatLastRateError: number;
@@ -378,6 +484,8 @@ export interface ClientSession {
   lastSent: Record<string, string>;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
+  // Vale Cup readout, same idea at its own cadence (VC_WIRE_HZ)
+  lastVcupWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -397,9 +505,22 @@ export interface ClientSession {
   socialTrackedIds?: number[];
   // IP address at join time (from requestMetadata); used for per-IP session counting.
   ip: string;
+  userAgent: string;
+  fbp: string;
+  fbc: string;
+  sourceUrl: string;
   isAdmin: boolean;
+  // Expanded admin permissions, snapshotted at join like isAdmin (a role change
+  // applies at the next login). Gates the in-game moderation commands.
+  adminPermissions: ReadonlySet<string>;
   // Seed the client sends at auth; signs its challenge answers.
   clientSeed: string;
+  // Per-join fence for this session's DB load lease (server/db.ts
+  // character_leases). leave() releases with it so a stale release from an
+  // earlier join cannot delete a lease a reconnect has since re-acquired.
+  // undefined for sessions created without the lease path (direct game.join in
+  // tests); a resume keeps the original session's nonce.
+  leaseNonce: string | undefined;
   // Behavioral bot-detection state. Ephemeral — reset on every join.
   botTrackingContext: BotTrackingContext;
   spectating: {
@@ -510,6 +631,11 @@ interface WireAura {
   // client badge prefers this over stacks (auras_view). A pure cosmetic count, not actionable
   // information a graphics preset could hide, so it rides the wire unconditionally when present.
   charges?: number;
+  // The caster's entity id, so the client's target strip can lead with and enlarge the
+  // viewer's OWN dots/hots (auras_view ownFirst). A shared per-entity value (never
+  // per-viewer), so the per-entity dyn cache keeps eliding; an old client ignores it and
+  // an old server's omission decodes to 0, which matches no player id.
+  src?: number;
 }
 
 interface WhoRosterRow {
@@ -633,6 +759,9 @@ function dynamicFields(e: Entity): Record<string, unknown> {
         // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
         // buff icon can badge the count online exactly as offline; undefined for every other aura.
         ...(a.charges !== undefined ? { charges: a.charges } : {}),
+        // The caster's entity id, for the client's own-aura prominence on the target strip
+        // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
+        ...(a.sourceId ? { src: a.sourceId } : {}),
       }),
     );
   }
@@ -672,6 +801,11 @@ function isUpdateDue(
   viewer: Entity,
   sentAtTick: number,
 ): boolean {
+  // The one Vale Cup ball is watched by the whole Sowfield: a far keeper sits
+  // past the 55yd full-rate tier and the stands past 80yd, where a ~25 yd/s
+  // ball turns visibly steppy at half/quarter rate. One entity at full rate
+  // costs one lite record per tick, so it is always due.
+  if (e.templateId === VALE_CUP_BALL_TEMPLATE_ID) return true;
   if (d2 <= FULL_RATE_RADIUS_SQ) return true;
   if (viewer.targetId === e.id || e.aggroTargetId === viewer.id) return true;
   const divisor = d2 <= HALF_RATE_RADIUS_SQ ? HALF_RATE_DIVISOR : QUARTER_RATE_DIVISOR;
@@ -717,6 +851,25 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// A frozen server tick-loop profile captured over one on-demand window, plus the
+// context needed to read it: when it was taken, how long the window was, and the
+// crowd it was taken under. The admin dashboard renders this.
+export interface PerfCaptureResult {
+  capturedAt: number; // epoch ms the window closed
+  durationMs: number; // the (clamped) capture window length
+  online: number; // live sessions at capture close
+  simEntities: number; // sim entity count at capture close
+  profile: ReturnType<TickProfiler['profile']>;
+}
+
+// The /admin/api/perf/tick status envelope: whether a capture is currently running
+// (with when it ends, so the UI can show a countdown), plus the last frozen result.
+export interface PerfCaptureStatus {
+  capturing: boolean;
+  endsAt: number | null; // epoch ms the in-flight capture closes, or null
+  last: PerfCaptureResult | null;
+}
+
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
@@ -735,6 +888,7 @@ export class GameServer {
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
   private holderTierInterval: NodeJS.Timeout | null = null;
+  private keepaliveInterval: NodeJS.Timeout | null = null;
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
@@ -758,6 +912,14 @@ export class GameServer {
   private readonly startedAt = Date.now();
   private peakOnline = 0;
   private tickMsAvg = 0;
+  // Achieved sim ticks per wall-clock second. The cost metrics above go blind
+  // when the dt clamp discards wall time under saturation; this is the number
+  // that actually sags. Rides the snapshot head (throttled) + perfProfile().
+  private readonly tickRateMeter = new TickRateMeter();
+  private tickHz: number | null = null;
+  // sim.time (seconds) of the last head that carried tickHz; throttles the
+  // scalar to TICK_HZ_HEAD_INTERVAL_S so it does not ride every 20 Hz head.
+  private lastTickHzHeadTime: number | null = null;
   // Rolling per-phase loop timing, localizes a stutter to a phase. Always-on
   // (the hot path allocates nothing); read via perfProfile() for admin/ops.
   private readonly tickProfiler = new TickProfiler([
@@ -769,11 +931,27 @@ export class GameServer {
     'bcastGrid',
     'bcastSelf',
     'social',
+    // sim.tick() internal phases, fed by the injected cfg.perfLap probe below.
+    // Populated only while the detailed capture is active (an on-demand admin
+    // capture or PERF_TICK_LOG=1); zero otherwise.
+    ...SIM_LAP_PHASES,
   ]);
-  // Per-loop scratch for broadcast sub-phase timing (ns), summed across clients.
-  // Only measured when PERF_TICK_LOG=1, the per-client hrtime reads would
-  // otherwise add needless work (and BigInt churn) to the hot path.
-  private readonly profileBroadcastPhases = process.env.PERF_TICK_LOG === '1';
+  // Detailed-timing switch. When true, the per-client broadcast sub-phase timing
+  // (bcastGrid/bcastSelf/visits) AND the sim.tick() perfLap sub-phases are measured;
+  // when false those hrtime reads are skipped so the steady-state loop pays nothing.
+  // Seeded from PERF_TICK_LOG for the CLI/local path, and flipped on for the duration
+  // of an admin-triggered capture (startPerfCapture) via the /admin/api/perf/tick route.
+  private perfDetailActive = process.env.PERF_TICK_LOG === '1';
+  // The host-side mark the injected sim perfLap probe diffs against; refreshed just
+  // before each sim.tick() call while a detailed capture is active.
+  private simLapMark = 0n;
+  // On-demand capture state (admin-triggered). While `perfCaptureEndsAtTick` is set,
+  // the loop is accumulating a fresh detailed window; when the loop reaches that tick
+  // it freezes `lastPerfCapture`. Only the single latest result is kept, in memory.
+  private perfCaptureEndsAtTick: number | null = null;
+  private perfCaptureEndsAtMs = 0;
+  private perfCaptureDurationMs = 0;
+  private lastPerfCapture: PerfCaptureResult | null = null;
   private bcastGridNs = 0n;
   private bcastSelfNs = 0n;
   // Crowd diagnostics (PERF_TICK_LOG only): the interest scan is O(viewers x
@@ -795,10 +973,24 @@ export class GameServer {
       playerClass: 'warrior',
       noPlayer: true,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
+      // Thunzharr is up as soon as the realm boots; subsequent rises keep the
+      // normal interval cadence (see src/sim/world_boss.ts).
+      worldBossAtBoot: true,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
       raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
+      // Per-phase timing inside sim.tick(). The clock stays host-side (sim purity);
+      // `simLapMark` is refreshed right before each sim.tick() call in the loop. The
+      // probe is always passed but early-returns unless a detailed capture is active,
+      // so the steady-state loop pays only a branch per phase.
+      perfLap: (phase) => {
+        if (!this.perfDetailActive) return;
+        const t = process.hrtime.bigint();
+        this.tickProfiler.add(`sim.${phase}`, Number(t - this.simLapMark) / 1e6);
+        this.simLapMark = t;
+      },
+      valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
     });
     this.social = new SocialService(this.socialDb, this.socialTransport());
     this.moderation = new ModerationService(this.moderationHost(), {
@@ -814,6 +1006,14 @@ export class GameServer {
   // Called by main.ts before join() for the hard-reject check.
   countIpSessions(ip: string): number {
     return this.ipSessionCounts.get(ip) ?? 0;
+  }
+
+  // True when this process already holds a live session for the character. Read
+  // by the WS auth handshake (server/ws_auth.ts): when game.join refuses after
+  // the per-character load lease was taken, this decides whether a live session
+  // owns that lease (keep it) or the lease is an orphan to release.
+  hasSessionForCharacter(characterId: number): boolean {
+    return this.sessionsByCharacterId.has(characterId);
   }
 
   // -------------------------------------------------------------------------
@@ -895,6 +1095,7 @@ export class GameServer {
 
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
@@ -918,6 +1119,7 @@ export class GameServer {
     moderator.spectating = null;
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
@@ -951,7 +1153,13 @@ export class GameServer {
     if (e.dead) status = 'dead';
     else if (instanceZone != null) status = 'dungeon';
     else if (e.inCombat) status = 'combat';
-    return { zone: instanceZone ?? zoneAt(pos.z).name, status, x: pos.x, z: pos.z };
+    // The Sowfield is overworld ground (no instance band, no status change),
+    // but the stadium is the presence players expect on match days: fighters
+    // and walk-up spectators inside the footprint report the venue, not the
+    // vale. English at the source like the dungeon/delve names above; the
+    // client re-localizes the label (src/ui/server_i18n.ts localizeZone).
+    const zone = instanceZone ?? (isAtSowfield(pos.x, pos.z) ? 'The Sowfield' : zoneAt(pos.z).name);
+    return { zone, status, x: pos.x, z: pos.z };
   }
 
   private socialTransport(): SocialTransport {
@@ -1055,9 +1263,11 @@ export class GameServer {
             this.tickProfiler.add(phase, Number(t - mark) / 1e6);
             mark = t;
           };
+          let ticksRun = 0;
           while (acc >= DT) {
             this.clearStaleInputs();
             lap('stale');
+            if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
             lap('tick');
             this.routeEvents(events);
@@ -1065,8 +1275,16 @@ export class GameServer {
             lap('events');
             this.runAntibotTick();
             lap('antibot');
+            ticksRun++;
             acc -= DT;
           }
+          this.expireLinkdeadSessions();
+          // Anchor the achieved-rate meter to the wall clock (hrtime), never to
+          // callback counts: late timer fires and the dt clamp are exactly the
+          // losses it exists to expose.
+          const nowMs = hrtimeToMs(now);
+          this.tickRateMeter.record(nowMs, ticksRun);
+          this.tickHz = this.tickRateMeter.rate(nowMs);
           this.broadcastSnapshots();
           lap('broadcast');
           this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
@@ -1080,17 +1298,12 @@ export class GameServer {
           const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
           this.tickProfiler.commit(tickMs);
           this.maybeLogTickPerf(tickMs);
+          this.finalizePerfCaptureIfDue();
           this.tickMsAvg =
             this.tickMsAvg === 0
               ? tickMs
               : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
-          this.saveTimer += dt;
-          if (this.saveTimer >= AUTOSAVE_SECONDS) {
-            this.saveTimer = 0;
-            void this.saveAll('autosave');
-            void this.saveMarket();
-            void this.saveMail();
-          }
+          this.flushPeriodicSaves(dt);
         },
         (err) => console.error('[tick] guarded tick body threw, skipping this tick:', err),
       );
@@ -1108,6 +1321,59 @@ export class GameServer {
     this.dailyRewardActivityInterval = setInterval(() => {
       void this.recordDailyRewardActivity();
     }, DAILY_REWARD_ACTIVITY_MS);
+    this.keepaliveInterval = setInterval(() => {
+      this.pingLiveSessions();
+    }, WS_KEEPALIVE_PING_MS);
+  }
+
+  // The periodic persistence flush, advanced by the loop each tick. Every
+  // AUTOSAVE_SECONDS it kicks off the character/market/mail saves and, riding the
+  // same cadence, heartbeats this process's character load leases so an online
+  // character's lease never lapses under a peer. Extracted from the interval body
+  // so it can be unit-tested directly (the loop calls it one line). Every write is
+  // fire-and-forget: a slow or failed save must not stall the 20 Hz loop.
+  private flushPeriodicSaves(dt: number): void {
+    this.saveTimer += dt;
+    if (this.saveTimer >= AUTOSAVE_SECONDS) {
+      this.saveTimer = 0;
+      void this.saveAll('autosave');
+      void this.saveMarket();
+      void this.saveMail();
+      void heartbeatCharacterLeases().catch((err) => console.error('lease heartbeat failed:', err));
+    }
+  }
+
+  // Protocol-level WS liveness sweep, every WS_KEEPALIVE_PING_MS. Two jobs:
+  // the pings keep NAT/proxy idle timers from silently dropping a quiet
+  // connection (an AFK player's client sends no input frames, the classic
+  // "kicked while AFK" report), and a peer that missed a whole ping interval
+  // (no pong; browsers answer automatically) is a black-holed socket (no
+  // FIN/RST ever arrives, e.g. a mobile WiFi-to-cellular handoff), so it is
+  // terminated into the linkdead grace. Without the pong check, a re-auth for
+  // the same character keeps hitting 'character already in world' until TCP
+  // gives up on the dead socket, which can take minutes; with it, the
+  // client's reconnect backoff resumes within a ping interval or two (the
+  // client tolerates that rejection mid-reconnect, src/net/reconnect_policy.ts).
+  pingLiveSessions(): void {
+    for (const session of this.clients.values()) {
+      if (session.linkdead || session.ws.readyState !== 1) continue;
+      if (session.awaitingPong) {
+        const ws = session.ws;
+        try {
+          ws.terminate();
+        } catch {
+          /* socket already torn down */
+        }
+        this.socketClosed(session, ws);
+        continue;
+      }
+      session.awaitingPong = true;
+      try {
+        session.ws.ping();
+      } catch {
+        /* socket torn down mid-iteration */
+      }
+    }
   }
 
   stop(): void {
@@ -1115,6 +1381,7 @@ export class GameServer {
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
     if (this.dailyRewardActivityInterval) clearInterval(this.dailyRewardActivityInterval);
+    if (this.keepaliveInterval) clearInterval(this.keepaliveInterval);
   }
 
   // Grant playtime reward points to each online account that has been ACTIVE (gave
@@ -1295,10 +1562,13 @@ export class GameServer {
   private runAntibotTick(): void {
     const now = Date.now();
     for (const session of this.clients.values()) {
+      // Enforcement gating lives in the detector's own runtime config (which
+      // defaults to the ANTIBOT_ENFORCE env var and is operator-tunable live),
+      // so the host-side kill-switch parameter is always granted here.
       const action = this.botDetector.handleTick(
         session.botTrackingContext,
         now,
-        ANTIBOT_ENFORCE,
+        true,
         this.captureBotDetectionSnapshot(session, now),
       );
       if (action === 'kick') {
@@ -1437,6 +1707,19 @@ export class GameServer {
       .catch((err) => console.error('failed to save account mech chroma:', err));
   }
 
+  /**
+   * Grant a mech-chroma cosmetic to an account by id (a Discord swag claim, whose
+   * points/claim are already resolved durably server-side). Best-effort live update:
+   * persist the grant, then push the refreshed cosmetics to any online session on the
+   * account. The live push is a no-op when the account is offline. Injected into the
+   * ported Discord swag route via configureDiscordRuntime (server/discord.ts).
+   */
+  grantMechChromaToAccount(accountId: number, chromaId: string): void {
+    void grantAccountMechChroma(accountId, chromaId)
+      .then((cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics))
+      .catch((err) => console.error('failed to grant swag mech chroma:', err));
+  }
+
   private unequipAccountMechChroma(session: ClientSession, chromaId: string): void {
     const skin = mechChromaSkinIndex(chromaId);
     const itemId = mechChromaItemId(chromaId);
@@ -1472,23 +1755,54 @@ export class GameServer {
         accountCosmetics?: AccountCosmetics;
         chatStrikes?: number;
         isAdmin?: boolean;
+        adminPermissions?: readonly string[];
         clientSeed?: string;
+        fbp?: string | null;
+        fbc?: string | null;
+        sourceUrl?: string | null;
+        leaseNonce?: string;
+        // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
+        // the character state via addPlayer. Absent on a resume and for callers that
+        // pass no meta (tests, the bot-detector overlay), which keep the saved value.
+        bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
       } = {},
   ): ClientSession | { error: string } {
-    if (this.sessionsByCharacterId.has(characterId)) return { error: 'character already in world' };
     // Anti-bot: cap simultaneous online characters per account. Accounts can
     // still own up to 10 characters; this only limits live sessions. GMs are
-    // exempt for supervision.
-    if (!isGm) {
-      let activeForAccount = 0;
-      for (const s of this.clients.values()) {
-        if (s.accountId === accountId) activeForAccount++;
-      }
-      if (activeForAccount >= MAX_ACTIVE_SESSIONS_PER_ACCOUNT) {
-        return { error: 'too many characters on this account are already in the world' };
-      }
+    // exempt for supervision. Linkdead sessions are special-cased (planJoin):
+    // the same character resumes its held session, and a different character
+    // on the account displaces them instead of being blocked by them.
+    const sameCharacter = this.sessionsByCharacterId.get(characterId) ?? null;
+    let liveOtherSessions = 0;
+    const linkdeadOthers: ClientSession[] = [];
+    for (const s of this.clients.values()) {
+      if (s.accountId !== accountId || s === sameCharacter) continue;
+      if (s.linkdead) linkdeadOthers.push(s);
+      else liveOtherSessions++;
     }
-    const pid = this.sim.addPlayer(cls, name, { state: state ?? undefined, characterId });
+    const plan = planJoin({
+      accountId,
+      isGm,
+      sameCharacter,
+      liveOtherSessions,
+      maxPerAccount: MAX_ACTIVE_SESSIONS_PER_ACCOUNT,
+    });
+    if (plan.action === 'reject') return { error: plan.error };
+    if (plan.action === 'resume' && sameCharacter) {
+      return this.resumeSession(sameCharacter, ws, cls, meta);
+    }
+    // Logging in on a different character ends the account's linkdead grace
+    // now instead of at the end of its window: the player has moved on, so
+    // the held character logs out. leave() removes it from `clients`
+    // synchronously, so the new session's slot accounting stays correct.
+    for (const s of linkdeadOthers) {
+      void this.leave(s, 'replaced by a new character login');
+    }
+    const pid = this.sim.addPlayer(cls, name, {
+      state: state ?? undefined,
+      characterId,
+      bankBonus: meta.bankBonus,
+    });
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
       // created without state, so the first join levels them up)
@@ -1518,6 +1832,9 @@ export class GameServer {
       joinedAt: Date.now(),
       dbSessionId: null,
       left: false,
+      linkdead: false,
+      graceUntil: 0,
+      awaitingPong: false,
       chatTokens: CHAT_RATE_BURST,
       chatLastRefill: Date.now() / 1000,
       chatLastRateError: 0,
@@ -1535,12 +1852,23 @@ export class GameServer {
       lastInputAt: this.sim.time,
       lastSent: {},
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
+      lastVcupWireTick: -VC_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
       ip: sessionIp,
+      userAgent: meta.userAgent ?? '',
+      fbp: meta.fbp ?? '',
+      fbc: meta.fbc ?? '',
+      sourceUrl: meta.sourceUrl ?? '',
       isAdmin: meta.isAdmin ?? false,
+      // Permissions come only from the explicit set main.ts computes from the
+      // account's roles; no is_admin fallback (fail closed, matching
+      // staff_db.effectiveAdminRoles). A staff member with zero permissions has
+      // no in-game moderation commands.
+      adminPermissions: new Set(meta.adminPermissions ?? []),
       clientSeed: meta.clientSeed ?? '',
+      leaseNonce: meta.leaseNonce,
       botTrackingContext,
       spectating: null,
     };
@@ -1604,6 +1932,106 @@ export class GameServer {
     return session;
   }
 
+  // Rebind a linkdead session to a fresh socket. The character never left the
+  // world, so this only swaps the transport, refreshes the per-login account
+  // metadata, and resets the per-connection wire/input state so the new client
+  // receives a full snapshot (its input sequence also restarts at 1). The play
+  // session row stays open (the player was online the whole time) and no
+  // presence announce fires (friends never saw them leave).
+  private resumeSession(
+    session: ClientSession,
+    ws: WebSocket,
+    cls: import('../src/sim/types').PlayerClass,
+    meta: Parameters<GameServer['join']>[7] = {},
+  ): ClientSession {
+    session.ws = ws;
+    session.linkdead = false;
+    session.graceUntil = 0;
+    session.awaitingPong = false;
+    const sessionIp = meta.ip ?? '';
+    if (sessionIp !== session.ip) {
+      this.releaseIpSession(session.ip);
+      session.ip = sessionIp;
+      this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
+    }
+    session.userAgent = meta.userAgent ?? '';
+    session.clientSeed = meta.clientSeed ?? '';
+    // per-login account state, freshly loaded by the auth path like any join
+    session.chatMutedUntil = meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null;
+    session.chatMuteReason = meta.reason ?? '';
+    session.chatStrikes = meta.chatStrikes ?? session.chatStrikes;
+    session.isAdmin = meta.isAdmin ?? false;
+    session.adminPermissions = new Set(meta.adminPermissions ?? []);
+    session.lastInputSeq = 0;
+    session.lastInputAt = this.sim.time;
+    session.lastSent = {};
+    session.sentEnts = new Map();
+    session.selfHeavyDirty = true;
+    session.lastWireRev = -1;
+    session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    this.send(session, {
+      t: 'hello',
+      pid: session.pid,
+      seed: this.sim.cfg.seed,
+      name: session.name,
+      cls,
+      realm: REALM,
+      softWords: this.chatFilter.softWords(),
+      chatMutedUntil: session.chatMutedUntil ?? null,
+    });
+    // No self "entered the world" notice here: on a seamless reconnect the
+    // player never saw themselves leave (and friends never got a presence
+    // flap), so the fresh join notice would read as a glitch.
+    void this.sendSocialSnapshot(session.characterId);
+    return session;
+  }
+
+  // Entry point for a dropped socket (the ws 'close'/'error' handlers in
+  // main.ts, plus the backpressure terminate). Instead of logging the
+  // character out, hold the session linkdead for LINKDEAD_GRACE_MS so an
+  // accidental disconnect can resume seamlessly; the character stays in the
+  // sim and stays online for friends, analytics, and the play session row.
+  // Returns true when grace began (false: the session was already torn down,
+  // already linkdead, or the event came from a stale pre-resume socket).
+  socketClosed(session: ClientSession, ws: WebSocket): boolean {
+    // A late close/error from a socket that a resume already replaced must
+    // not tear down the live session riding the new socket.
+    if (session.ws !== ws) return false;
+    if (session.left || session.linkdead || !this.clients.has(session.pid)) return false;
+    if (session.spectating) this.exitSpectate(session, false);
+    session.linkdead = true;
+    session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
+    // Stop any held movement now; the sim keeps ticking this entity (it can
+    // still be attacked, healed, or die while linkdead, like any player).
+    const meta = this.sim.meta(session.pid);
+    if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+    // Safety flush so a process crash during the grace window loses nothing.
+    void this.saveCharacter(session, { withMarket: true }).catch((err) =>
+      console.error(`linkdead save failed for ${session.name}:`, err),
+    );
+    return true;
+  }
+
+  // Tick-driven teardown of linkdead sessions whose grace window ran out.
+  private expireLinkdeadSessions(): void {
+    if (this.clients.size === 0) return;
+    const now = Date.now();
+    for (const session of this.clients.values()) {
+      if (!session.linkdead || now < session.graceUntil) continue;
+      console.log(
+        `- ${session.name} left (linkdead grace expired), ${this.clients.size - 1} online`,
+      );
+      void this.leave(session, 'linkdead grace expired');
+    }
+  }
+
+  private releaseIpSession(ip: string): void {
+    if (!ip) return;
+    const prev = this.ipSessionCounts.get(ip) ?? 1;
+    if (prev <= 1) this.ipSessionCounts.delete(ip);
+    else this.ipSessionCounts.set(ip, prev - 1);
+  }
+
   // Load the player's block list, send their friends/ignore/guild panel, and
   // let friends + guildmates know they've come online.
   private async initSocial(session: ClientSession): Promise<void> {
@@ -1647,11 +2075,7 @@ export class GameServer {
     session.left = true;
     this.clients.delete(session.pid);
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
-    if (session.ip) {
-      const prev = this.ipSessionCounts.get(session.ip) ?? 1;
-      if (prev <= 1) this.ipSessionCounts.delete(session.ip);
-      else this.ipSessionCounts.set(session.ip, prev - 1);
-    }
+    this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
     this.devTierPids.delete(session.pid);
     this.social.forget(session.characterId);
@@ -1664,8 +2088,30 @@ export class GameServer {
         console.error('failed to close play session:', err),
       );
     }
+    // Deserting a live Vale Cup match resolves BEFORE the leave save so the
+    // benched slot and the counted loss are in the state serializeCharacter
+    // persists (idempotent: removePlayer runs it again harmlessly below).
+    this.sim.vcupResolveDesertion(session.pid);
     await this.saveCharacterOnLeave(session);
     this.sessionsByCharacterId.delete(session.characterId);
+    // Release the per-character load lease so a fresh login (here or on another
+    // process) can reload the character without waiting out the TTL. Order
+    // matters: only after saveCharacterOnLeave has awaited above, so the lease
+    // outlives the atomic leave-flush. Awaiting it (unlike the fire-and-forget
+    // closePlaySession) makes the sequential takeover path prompt: takeOverCharacter
+    // awaits leave(), so this DELETE lands before the client's rejoin re-acquires.
+    // The grace-expiry sweep instead calls leave() fire-and-forget, so a reconnect
+    // CAN interleave; the NONCE fence covers that, the reconnect's acquire re-stamps
+    // the row with a new nonce and this DELETE, carrying the session's own (now
+    // stale) nonce, matches nothing, so it never eats the live session's re-acquired
+    // lease. The fence only sees fresh acquires, so planJoin refuses to RESUME a
+    // session whose left flag is already set (the resume arm never re-acquires);
+    // the refused client retries into the fresh-acquire arm once this teardown
+    // finishes. The holder guard keeps a cross-process reclaim untouched; an
+    // unreleased lease self-expires after a crash.
+    await releaseCharacterLease(session.characterId, session.leaseNonce).catch((err) =>
+      console.error('lease release failed:', err),
+    );
     this.sim.removePlayer(session.pid);
     // Departures are no longer broadcast to the realm — the leaving player has
     // already disconnected, so there is no one to show their own notice to.
@@ -1846,12 +2292,60 @@ export class GameServer {
   }
 
   // Rolling per-phase loop timing for the admin/ops perf view + load harness.
-  perfProfile(): { online: number; simEntities: number } & ReturnType<TickProfiler['profile']> {
+  perfProfile(): { online: number; simEntities: number; tickHz: number | null } & ReturnType<
+    TickProfiler['profile']
+  > {
     return {
       online: this.clients.size,
       simEntities: this.sim.entities.size,
+      tickHz: this.tickHz == null ? null : round2(this.tickHz),
       ...this.tickProfiler.profile(),
     };
+  }
+
+  // Start an on-demand detailed capture (admin-triggered). Clears the profiler so the
+  // window is clean, flips the detailed sub-phase timing on, and schedules the close
+  // `durationMs` (clamped) out in sim ticks. A second call while one is running just
+  // restarts the window. Returns the resulting status for the caller to echo back.
+  startPerfCapture(durationMs = PERF_CAPTURE_DEFAULT_MS): PerfCaptureStatus {
+    const clamped = Math.round(
+      Math.min(PERF_CAPTURE_MAX_MS, Math.max(PERF_CAPTURE_MIN_MS, durationMs)),
+    );
+    const ticks = Math.max(1, Math.round(clamped / (DT * 1000)));
+    this.tickProfiler.reset();
+    this.perfDetailActive = true;
+    this.perfCaptureDurationMs = clamped;
+    this.perfCaptureEndsAtTick = this.sim.tickCount + ticks;
+    this.perfCaptureEndsAtMs = Date.now() + clamped;
+    return this.perfCaptureStatus();
+  }
+
+  // The current capture status: whether one is in flight (with its close time for a UI
+  // countdown) and the last frozen result. Read by GET /admin/api/perf/tick.
+  perfCaptureStatus(): PerfCaptureStatus {
+    const capturing = this.perfCaptureEndsAtTick !== null;
+    return {
+      capturing,
+      endsAt: capturing ? this.perfCaptureEndsAtMs : null,
+      last: this.lastPerfCapture,
+    };
+  }
+
+  // Close an in-flight capture once the loop reaches its end tick: freeze the profile
+  // and revert the detailed-timing switch to its baseline (env, so PERF_TICK_LOG keeps
+  // working). Called once per loop body, right after commit.
+  private finalizePerfCaptureIfDue(): void {
+    if (this.perfCaptureEndsAtTick === null) return;
+    if (this.sim.tickCount < this.perfCaptureEndsAtTick) return;
+    this.lastPerfCapture = {
+      capturedAt: Date.now(),
+      durationMs: this.perfCaptureDurationMs,
+      online: this.clients.size,
+      simEntities: this.sim.entities.size,
+      profile: this.tickProfiler.profile(),
+    };
+    this.perfCaptureEndsAtTick = null;
+    this.perfDetailActive = process.env.PERF_TICK_LOG === '1';
   }
 
   // Optional stutter trace (PERF_TICK_LOG=1): log a per-phase p95/max breakdown
@@ -1867,14 +2361,33 @@ export class GameServer {
     const p = this.tickProfiler.profile().phases;
     const fmt = (n: string) => `${n}=${p[n].p95}/${p[n].max}`;
     console.log(
-      `[perf] online=${this.clients.size} ents=${this.sim.entities.size} tickMs=${round2(tickMs)}${overBudget ? ' OVER' : ''}` +
+      `[perf] online=${this.clients.size} ents=${this.sim.entities.size} tickHz=${this.tickHz == null ? 'n/a' : round2(this.tickHz)} tickMs=${round2(tickMs)}${overBudget ? ' OVER' : ''}` +
         ` | p95/max ${['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'].map(fmt).join(' ')}` +
         ` | visits=${this.bcVisits} serializes=${this.bcSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)}`,
     );
+    // The sim.tick() internal breakdown, mean-sorted so the phase that actually eats
+    // the average (not just a spike) leads. Populated only while detailed timing is on.
+    const simPhases = SIM_LAP_PHASES.filter((n) => p[n] && p[n].mean > 0).sort(
+      (a, b) => p[b].mean - p[a].mean,
+    );
+    if (simPhases.length > 0) {
+      const fmtMean = (n: string) => `${n.slice(4)}=${p[n].mean}/${p[n].p95}/${p[n].max}`;
+      console.log(`[perf.sim] mean/p95/max ${simPhases.slice(0, 14).map(fmtMean).join(' ')}`);
+    }
   }
 
   suspiciousPlayers(): SuspiciousPlayer[] {
     return this.botDetector.listSuspiciousPlayers();
+  }
+
+  antibotConfigFields(): ConfigField[] {
+    return this.botDetector.describeConfig();
+  }
+
+  // Validates and applies live (invalid entries are skipped and reported; the
+  // admin save path rejects on any error and re-applies its previous document).
+  applyAntibotConfig(overrides: Record<string, unknown>): ConfigApplyResult {
+    return this.botDetector.applyConfig(overrides);
   }
 
   detectionCalibration(): DetectionCalibrationSnapshot {
@@ -2239,6 +2752,13 @@ export class GameServer {
     const msg = rawMsg as ClientMessage;
     const sim = this.sim;
     const pid = session.pid;
+    // Deliberate logout: the client wants a clean leave, not a linkdead grace.
+    // Calling leave() immediately sets session.left = true, so the subsequent
+    // WebSocket close event (from the page reload) is a no-op in socketClosed().
+    if (msg.t === 'logout') {
+      void this.leave(session, 'logout');
+      return;
+    }
     if (msg.t === 'input') {
       if (session.spectating) return;
       const meta = sim.meta(pid);
@@ -2271,7 +2791,8 @@ export class GameServer {
     if (session.spectating) {
       if (msg.cmd !== 'chat' || typeof msg.text !== 'string') return;
       const text = msg.text.trim();
-      if (session.isAdmin && this.moderation.handleChatCommand(session, text)) return;
+      if (canAttemptModerationCommands(session) && this.moderation.handleChatCommand(session, text))
+        return;
       if (this.isSpectateLocalChat(session, text)) {
         this.sendChatNotice(session, 'Local chat is unavailable while spectating.');
         return;
@@ -2347,6 +2868,23 @@ export class GameServer {
         break;
       case 'autoloot':
         if (typeof msg.id === 'number') sim.autoLoot(msg.id, pid);
+        break;
+      case 'harvestCorpse':
+        if (typeof msg.id === 'number') {
+          const components = Array.isArray(msg.components)
+            ? msg.components.filter((c): c is string => typeof c === 'string')
+            : undefined;
+          sim.harvestCorpse(msg.id, components, pid);
+        }
+        break;
+      case 'set_town_focus':
+        if (msg.allocation && typeof msg.allocation === 'object') {
+          const allocation: Record<string, number> = {};
+          for (const [k, v] of Object.entries(msg.allocation as Record<string, unknown>)) {
+            if (typeof v === 'number') allocation[k] = v;
+          }
+          sim.setTownFocus(allocation, pid);
+        }
         break;
       case 'lootRoll':
         if (
@@ -2427,6 +2965,12 @@ export class GameServer {
       case 'buyback':
         if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
         break;
+      case 'harvest_node':
+        if (typeof msg.node === 'string') sim.harvestNode(msg.node, pid);
+        break;
+      case 'craft_item':
+        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
+        break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
@@ -2485,7 +3029,11 @@ export class GameServer {
       case 'chat': {
         if (typeof msg.text !== 'string') break;
         const text = msg.text.trim();
-        if (session.isAdmin && this.moderation.handleChatCommand(session, text)) break;
+        if (
+          canAttemptModerationCommands(session) &&
+          this.moderation.handleChatCommand(session, text)
+        )
+          break;
         if (this.isChatMuted(session)) break;
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
@@ -2766,7 +3314,16 @@ export class GameServer {
         break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
-        const fmt = msg.format === '2v2' ? '2v2' : msg.format === 'fiesta' ? 'fiesta' : '1v1';
+        const fmt =
+          msg.format === '2v2'
+            ? '2v2'
+            : msg.format === 'fiesta'
+              ? 'fiesta'
+              : msg.format === 'yumi3'
+                ? 'yumi3'
+                : msg.format === 'yumi5'
+                  ? 'yumi5'
+                  : '1v1';
         sim.arenaQueueJoin(pid, fmt);
         break;
       }
@@ -2778,6 +3335,41 @@ export class GameServer {
           sim.arenaAugmentPick(msg.augment, pid);
         break;
       }
+
+      // The Vale Cup (boarball queue at the Sowfield, docs/prd/vale-cup.md).
+      // Deliberately NOT in HEAVY_SELF_CMDS: queueing mutates no heavy self
+      // field (queue state rides the throttled 'vcup' delta key + the pid-
+      // scoped vcup* events), and the kickoff kit swap happens at match start
+      // inside the sim tick, where the wireRev bump already forces the heavy
+      // refresh for that session.
+      case 'vcup_queue':
+        if (isVcBracket(msg.bracket) && isVcNationId(msg.nation) && isSportRole(msg.role))
+          sim.vcupQueueJoin(msg.bracket, msg.nation, msg.role, msg.guild === true, pid);
+        break;
+      case 'vcup_leave':
+        sim.vcupQueueLeave(pid);
+        break;
+      case 'vcup_role':
+        if (isSportRole(msg.role)) sim.vcupSetRole(msg.role, pid);
+        break;
+      case 'vcup_ready':
+        sim.vcupReady(pid);
+        break;
+      case 'vcup_practice':
+        // Private instanced practice bout vs bots (parallel to the real match).
+        if (isVcBracket(msg.bracket)) sim.vcupPracticeStart(msg.bracket, pid);
+        break;
+      case 'vcup_bet':
+        // Server-authoritative: the Sim re-validates the window, proximity, side,
+        // and balance, and debits copper. Amount clamped to a sane integer here.
+        if (
+          (msg.side === 'A' || msg.side === 'B') &&
+          typeof msg.amount === 'number' &&
+          Number.isFinite(msg.amount)
+        ) {
+          sim.vcupBet(msg.side, Math.floor(msg.amount), pid);
+        }
+        break;
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)
       case 'prestige':
@@ -2948,6 +3540,36 @@ export class GameServer {
       case 'mail_read':
         if (typeof msg.id === 'number') sim.mailMarkRead(msg.id, pid);
         break;
+      // Bank: the per-character deposit box. `slot` is a container index (the
+      // castAbilityBySlot wire idiom); `count` is optional (omit = whole stack).
+      // The Sim owns every gameplay rule (banker proximity, capacity, quest-bind,
+      // alive-state, exact-copper cost + purchase cap); `bonusSlots` is never
+      // client-supplied. bank_buy_slots is an economy action bounded by the
+      // blanket per-frame message limiter plus the Sim's escalating-price cap.
+      // The bank_ledger write is OBSERVATIONAL and fire-and-forget: the sim methods
+      // return void and emit no success event, so recordBankOp derives success by
+      // diffing the bankInfoFor snapshot before and after each call. It is never
+      // awaited and never a gameplay dependency; a refused/no-op call diffs empty.
+      case 'bank_deposit':
+        if (typeof msg.slot === 'number') {
+          const before = sim.bankInfoFor(pid);
+          sim.bankDeposit(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
+          recordBankOp('deposit', session, before, sim.bankInfoFor(pid));
+        }
+        break;
+      case 'bank_withdraw':
+        if (typeof msg.slot === 'number') {
+          const before = sim.bankInfoFor(pid);
+          sim.bankWithdraw(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
+          recordBankOp('withdraw', session, before, sim.bankInfoFor(pid));
+        }
+        break;
+      case 'bank_buy_slots': {
+        const before = sim.bankInfoFor(pid);
+        sim.bankBuySlots(pid);
+        recordBankOp('buy_slots', session, before, sim.bankInfoFor(pid));
+        break;
+      }
       // dev/ops commands, only when ALLOW_DEV_COMMANDS=1 (never in production)
       case 'dev_level': {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.level === 'number') {
@@ -3028,6 +3650,16 @@ export class GameServer {
             )
           : null;
         if (exit) sim.leaveDungeon(pid);
+        break;
+      }
+      case 'set_dungeon_difficulty': {
+        if (isDungeonDifficulty(msg.difficulty)) sim.setDungeonDifficulty(msg.difficulty, pid);
+        break;
+      }
+      case 'heroic_buy': {
+        // Range, stock, balance, and bag space all re-validate in the sim
+        // handler (instances/heroic_vendor.ts); the client only sends intent.
+        if (typeof msg.itemId === 'string') sim.buyHeroicVendorItem(msg.itemId, pid);
         break;
       }
       case 'enter_delve': {
@@ -3129,12 +3761,32 @@ export class GameServer {
   private broadcastSnapshots(): void {
     if (this.clients.size === 0) return;
     const tick = this.sim.tickCount;
-    const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}`;
+    // tickHz rides the head at ~2 Hz, not on every snapshot: it is omitted while
+    // the meter warms up (first ~1s, so a fresh server never shows a bogus
+    // reading), and between-emissions the client holds the last value. A warmed
+    // meter reports a positive rate: a window with zero committed ticks cannot
+    // coexist with a firing broadcast (acc accrues every callback), and a fully
+    // stalled loop sends nothing. Old clients and warm-up read alike as absent.
+    let tickHzJson = '';
+    if (this.tickHz != null) {
+      const now = this.sim.time;
+      if (
+        this.lastTickHzHeadTime == null ||
+        now - this.lastTickHzHeadTime >= TICK_HZ_HEAD_INTERVAL_S
+      ) {
+        tickHzJson = `,"tickHz":${round2(this.tickHz)}`;
+        this.lastTickHzHeadTime = now;
+      }
+    }
+    const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     // Guard each session: a throw while building one player's snapshot must not
     // starve every other session of its snapshot this tick (server/CLAUDE.md).
     forEachGuarded(
       this.clients.values(),
       (session) => {
+        // no transport while linkdead; the resume path resets sentEnts/lastSent
+        // so the fresh socket starts from a full snapshot anyway
+        if (session.linkdead) return;
         const p = this.sim.entities.get(session.pid);
         const meta = this.sim.meta(session.pid);
         if (!p || !meta) return;
@@ -3158,13 +3810,13 @@ export class GameServer {
         const ents: string[] = [];
         const keep: number[] = [];
         const present = new Set<number>();
-        const gridStart = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
+        const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         this.sim.grid.forEachInRadius(
           anchorEntity.pos.x,
           anchorEntity.pos.z,
           INTEREST_QUERY_RADIUS,
           (e, d2) => {
-            if (this.profileBroadcastPhases) this.bcVisits++;
+            if (this.perfDetailActive) this.bcVisits++;
             if (e.id === anchorEntity.id) return;
             if (!this.canObserveEntity(anchorEntity, e, d2)) return;
             const known = session.sentEnts.get(e.id);
@@ -3217,10 +3869,10 @@ export class GameServer {
         for (const id of session.sentEnts.keys()) {
           if (!present.has(id)) session.sentEnts.delete(id);
         }
-        const selfStart = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
-        if (this.profileBroadcastPhases) this.bcastGridNs += selfStart - gridStart;
+        const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
+        if (this.perfDetailActive) this.bcastGridNs += selfStart - gridStart;
         const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
-        if (this.profileBroadcastPhases) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
+        if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
         this.sendRaw(session, `${head},"self":${selfJson},"ents":[${ents.join(',')}]${keepJson}}`);
       },
@@ -3264,7 +3916,7 @@ export class GameServer {
     }
     if (cache.tick === this.sim.tickCount) return cache;
     cache.tick = this.sim.tickCount;
-    const t0 = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
+    const t0 = this.perfDetailActive ? process.hrtime.bigint() : 0n;
     const idJson = JSON.stringify(identityFields(e));
     const dynJson = JSON.stringify(dynamicFields(e));
     let changed = false;
@@ -3282,7 +3934,7 @@ export class GameServer {
       cache.fullJson = `{"id":${e.id},${idJson.slice(1, -1)},${dynJson.slice(1, -1)}}`;
       cache.liteJson = `{"id":${e.id},${dynJson.slice(1, -1)}}`;
     }
-    if (this.profileBroadcastPhases) {
+    if (this.perfDetailActive) {
       this.bcSerializeNs += process.hrtime.bigint() - t0;
       this.bcSerializes++;
     }
@@ -3323,10 +3975,13 @@ export class GameServer {
       sh: p.spellHaste,
       crit: p.critChance,
       dodge: p.dodgeChance,
+      crat: p.critRating,
+      hrat: p.hasteRating,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
+      ddiff: this.sim.dungeonDifficulty(anchorSession.pid),
     });
     const json = JSON.stringify(self);
     // heavy, rarely-changing fields ride along only when their serialized
@@ -3370,33 +4025,50 @@ export class GameServer {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
     }
+    // Vale Cup readout at its own UI cadence (VC_WIRE_HZ): CupInfo carries
+    // whole-second clocks and queue sizes, so re-evaluating every tick would
+    // re-serialize the rosters 20 times per wire-visible change. Instant
+    // queue/match transitions ride the pid-scoped vcup* events instead.
+    if (this.sim.tickCount - session.lastVcupWireTick >= VC_WIRE_INTERVAL_TICKS) {
+      session.lastVcupWireTick = this.sim.tickCount;
+      maybe('vcup', this.sim.cupInfoFor(anchorSession.pid));
+    }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
     maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
+    // bank info is null unless the player is standing at a banker, so it only
+    // rides the wire for players actually browsing their deposit box (the mail
+    // pattern). Not heavy-gated: it appears from proximity, not this session's
+    // own dirty-marking commands.
+    maybe('bank', this.sim.bankInfoFor(anchorSession.pid));
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).
     maybe('lroll', this.sim.activeLootRolls(anchorSession.pid));
+    // group-visible choices on those rolls (who has answered need/greed/pass),
+    // so every party member's roll frame shows the live vote strip and stays up
+    // after they answer. Per-tick for the same reason as lroll.
+    maybe('lrollg', this.sim.lootRollGroupStatus(anchorSession.pid));
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
     maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
     maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));
-    // Gathering profession proficiency (Mining/Logging/Herbalism), a small
     // per-player read, so kept per-tick like the other small maps above. Wire
     // key `prof` and IWorld member `professionsState` are the settled names
-    // for the professions facet (#1164, src/sim/professions/CLAUDE.md).
+    // for the professions facet (#1164, src/sim/professions/CLAUDE.md). `gprof`
+    // mirrors the raw per-craft proficiency map for the `gatheringProficiency`
+    // IWorld data member (#1119), independent of the `professionsState` view.
     maybe('prof', this.sim.professionsStateFor(anchorSession.pid));
-    // stats + weapon stay per-tick: recalcPlayerStats re-derives them on every
-    // stat-affecting aura gain/loss (Bear/Cat Form, shouts, debuffs, elixir
-    // wear-off, a buff cast on you by someone else), none of which mark this
-    // session dirty, gating them would lag the character sheet mid-fight. Both
-    // are tiny (a handful of numbers), so the per-tick diff is negligible.
-    maybe('stats', p.stats);
-    maybe('weapon', p.weapon);
+    maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
+    // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
+    // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
+    // shape used by the `/dev gather` chat cheat and existing consumers. Wire
+    // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
+    maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety
@@ -3426,6 +4098,13 @@ export class GameServer {
         loadouts: meta.loadouts,
         activeLoadout: meta.activeLoadout,
       });
+      // Vale Cup sport-kit flag ({ role } | null): while set, the client's
+      // action bar rebuilds the role kit instead of the class kit. Rides the
+      // wireRev-gated block because the sim bumps wireRev on BOTH the kickoff
+      // swap and the restore, so maybe() serializes each flip, including the
+      // restore's EXPLICIT null (delta omission means "unchanged" and would
+      // strand the client on the sport kit).
+      maybe('sport', meta.sportRole ? { role: meta.sportRole } : null);
     }
     return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
   }
@@ -3517,6 +4196,21 @@ export class GameServer {
   private detectActivity(events: SimEvent[]): void {
     const now = Date.now();
     for (const ev of events) {
+      if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (s) {
+          void trackReachedLevel5(
+            s.characterId,
+            {
+              clientIp: s.ip,
+              clientUserAgent: s.userAgent,
+              fbp: s.fbp,
+              fbc: s.fbc,
+            },
+            s.sourceUrl,
+          );
+        }
+      }
       if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (!s) continue;
@@ -3602,6 +4296,80 @@ export class GameServer {
             ratingDelta: ev.ratingAfter - ev.ratingBefore,
           },
           `arena:${s.accountId}:${ev.ratingAfter}`,
+          now,
+        );
+      } else if (ev.type === 'delveObjectiveComplete' && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        void dailyRewardService
+          .recordDelveClear(s.accountId, s.characterId, ev.delveId, ev.tierId)
+          .then((points) => {
+            if (points > 0) this.sendDailyRewardPointsGained(s, points);
+          })
+          .catch((err) => console.error('daily reward delve task failed:', err));
+      } else if (ev.type === 'delveChestLoot' && ev.pid !== undefined) {
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        void dailyRewardService
+          .recordDelveChestOpen(
+            s.accountId,
+            s.characterId,
+            ev.delveId,
+            ev.tierId,
+            ev.lootTier,
+            ev.bountiful,
+          )
+          .then((points) => {
+            if (points > 0) this.sendDailyRewardPointsGained(s, points);
+          })
+          .catch((err) => console.error('daily reward delve chest task failed:', err));
+      } else if (ev.type === 'vcupResult' && !ev.draw && ev.pid !== undefined) {
+        // A decided Vale Cup bout. The match record survives through the
+        // 'over' aftermath, so the rated gate reads from it: bot-backfilled
+        // and practice matches are unrated in the sim and earn no credit.
+        // Bots have no session, so this.clients.get filters them naturally.
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        const match = this.sim.vcupMatchOf(ev.pid);
+        if (!match || !match.rated) continue;
+        if (!ev.won) continue;
+        void dailyRewardService
+          .recordValeCupResult(s.accountId, {
+            won: true,
+            bracket: match.bracket,
+            matchId: match.id,
+          })
+          .then((points) => {
+            if (points > 0) this.sendDailyRewardPointsGained(s, points);
+          })
+          .catch((err) => console.error('daily reward vale cup task failed:', err));
+        // One card per decided match: every winner's vcupResult lands on the
+        // same tick and the match-id dedupe key collapses them, so the first
+        // one enumerates the whole winning side (linked teammates get tagged
+        // on the one card, the duel [winner, loser] convention).
+        const winnerPids = match.teamA.includes(ev.pid) ? match.teamA : match.teamB;
+        const accountIds = [s.accountId];
+        const names = [s.name];
+        for (const pid of winnerPids) {
+          if (pid === ev.pid) continue;
+          const ally = this.clients.get(pid);
+          if (!ally) continue;
+          accountIds.push(ally.accountId);
+          names.push(ally.name);
+        }
+        enqueueActivity(
+          {
+            kind: 'vale_cup',
+            accountIds,
+            names,
+            realm: REALM,
+            profileUrl: this.profileUrlFor(s.name),
+            bracket: match.bracket,
+            scoreA: match.scoreA,
+            scoreB: match.scoreB,
+            winnerNation: match.teamA.includes(ev.pid) ? match.nationA : match.nationB,
+          },
+          `vale_cup:${match.id}`,
           now,
         );
       }
@@ -4117,12 +4885,17 @@ export class GameServer {
     // 'close' handler funnels into the idempotent leave() for normal cleanup.
     if (isBackpressureExceeded(session.ws.bufferedAmount)) {
       if (!session.left) {
+        const ws = session.ws;
         try {
-          session.ws.terminate();
+          ws.terminate();
         } catch {
           /* socket already torn down */
         }
-        void this.leave(session, 'backpressure');
+        // a stuck reader is a network-quality problem, exactly what the
+        // linkdead grace exists for: hold the character and let the client
+        // reconnect on a fresh socket (terminate's own close event is a
+        // no-op after this; socketClosed is idempotent per socket)
+        this.socketClosed(session, ws);
       }
       return;
     }

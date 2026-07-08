@@ -1,9 +1,14 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { azureSignOptionsFromEnv, desktopBuilderConfig } from './electron-builder-config.mjs';
+import {
+  azureSignOptionsFromEnv,
+  desktopBuilderConfig,
+  isChannelFeedFile,
+  stampChannelFeedFiles,
+} from './electron-builder-config.mjs';
 import { buildElectronVendor } from './electron-vendor.mjs';
 
 // Usage: node scripts/electron-build.mjs [pack|build] [website|steam]
@@ -33,9 +38,10 @@ const defaultOrigin = 'https://worldofclaudecraft.com';
 // the wocDesktop stamp below (so the packaged main process always agrees with
 // what the bundle was baked with); loginOrigin is stamped for the main process
 // only. A packaged build ignores VITE_DESKTOP_* from runtime env;
-// electron/desktop_config.cjs reads the stamp instead.
-const apiOrigin = process.env.VITE_DESKTOP_API_ORIGIN ?? defaultOrigin;
-const loginOrigin = process.env.VITE_DESKTOP_LOGIN_ORIGIN ?? apiOrigin;
+// electron/desktop_config.cjs reads the stamp instead. Set-but-empty env vars
+// (CI matrices) mean "unset", hence || rather than ??.
+const apiOrigin = process.env.VITE_DESKTOP_API_ORIGIN || defaultOrigin;
+const loginOrigin = process.env.VITE_DESKTOP_LOGIN_ORIGIN || apiOrigin;
 const env = {
   ...process.env,
   VITE_DESKTOP_APP: '1',
@@ -95,10 +101,31 @@ const config = desktopBuilderConfig({
   loginOrigin,
   crashSubmitUrl: process.env.WOC_CRASH_SUBMIT_URL ?? '',
   azureSign: process.platform === 'win32' ? azureSignOptionsFromEnv(process.env) : null,
+  // The update track defaults from apiOrigin (production origin publishes the
+  // 'latest' feed, anything else 'dev'); WOC_UPDATE_CHANNEL=dev stages a
+  // production-origin artifact on the dev track for update-pipeline testing.
+  // The one dangerous combination, 'latest' with a non-production origin,
+  // makes desktopBuilderConfig throw before anything is built. Set-but-empty
+  // means "unset" (derive from the origin), hence || rather than ??.
+  updateChannel: process.env.WOC_UPDATE_CHANNEL || null,
 });
 const configDir = mkdtempSync(path.join(tmpdir(), 'woc-eb-'));
 const configPath = path.join(configDir, 'electron-builder.json');
 writeFileSync(configPath, JSON.stringify(config, null, 2));
+
+// Feed files accumulate across local builds sharing one output dir, and a
+// stale one from a differently-baked earlier build would be re-stamped below
+// with THIS build's origin, misdescribing the artifact it points at. Remove
+// both channels' feed files up front; electron-builder regenerates the
+// current channel's set.
+const outDir = path.join(root, config.directories?.output ?? 'release');
+if (config.publish?.channel && existsSync(outDir)) {
+  for (const name of readdirSync(outDir)) {
+    if (!isChannelFeedFile(name, 'latest') && !isChannelFeedFile(name, 'dev')) continue;
+    rmSync(path.join(outDir, name));
+    console.log(`[electron-build] removed stale feed file ${name}`);
+  }
+}
 
 // --publish never: artifact upload is a deliberate, documented manual step
 // (docs/desktop-release.md); without this, electron-builder auto-publishes on
@@ -114,3 +141,25 @@ run(electronBuilderCommand, [
 // The derived config holds no secrets, but do not litter the tmpdir on the
 // success path (run() exits the process on failure, skipping this).
 rmSync(configDir, { recursive: true, force: true });
+
+// Stamp every emitted update-feed file with the baked API origin so the
+// running app can refuse a cross-track artifact (electron/update_guard.cjs).
+// Steam builds publish nothing and pack builds emit no feed files, so this is
+// a no-op there.
+const feedChannel = config.publish?.channel;
+if (feedChannel) {
+  const stamped = stampChannelFeedFiles({
+    outDir,
+    channel: feedChannel,
+    apiOrigin,
+    fs: { existsSync, readdirSync, readFileSync, writeFileSync },
+    joinPath: path.join,
+  });
+  for (const name of stamped) console.log(`[electron-build] stamped wocApiOrigin into ${name}`);
+  if (mode === 'build' && stamped.length === 0) {
+    console.warn(
+      `[electron-build] no ${feedChannel}*.yml feed files found in ${outDir}; ` +
+        'nothing stamped (expected for target sets with no updatable artifact)',
+    );
+  }
+}

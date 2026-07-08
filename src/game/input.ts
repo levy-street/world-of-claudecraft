@@ -14,6 +14,11 @@ import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_
 const BASE_LOOK_SENS = 0.0045;
 const TOUCH_LOOK_YAW_RATE = 3.2;
 const TOUCH_LOOK_PITCH_RATE = 2.2;
+// One-finger swipe-drag on the open canvas (mobile_controls.ts onSwipeLookMove)
+// felt sluggish next to the joystick look path: a full-screen-width swipe barely
+// turned the camera. This multiplier only scales that drag path, not mouselook
+// or the camera joystick, so desktop and the joystick are unaffected.
+const TOUCH_DRAG_SENS_MULT = 2.2;
 const TOUCH_JUMP_LATCH_MS = 220;
 // A keyboard jump press is latched the same way a touch tap is: a fast spacebar
 // tap can be pressed and released entirely between two 20Hz input samples (or
@@ -39,6 +44,10 @@ export interface InputCallbacks {
   onTargetFriendly(): void;
   onCycleFriendly(): void;
   onAbility(slot: number): void;
+  // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
+  // shoot) and release to fire. A tap is a down immediately followed by an up.
+  onAbilityDown(slot: number): void;
+  onAbilityUp(slot: number): void;
   onUiKey(
     key:
       | 'interact'
@@ -54,9 +63,11 @@ export interface InputCallbacks {
       | 'meters'
       | 'social'
       | 'arena'
+      | 'valecup'
       | 'leaderboard'
       | 'calendar'
-      | 'discord',
+      | 'discord'
+      | 'crafting',
   ): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
@@ -153,6 +164,9 @@ export class Input {
   private controllerMoveInput: MoveInput | null = null;
   private controllerFacing: number | null = null;
   private emoteWheelHeldCodes = new Set<string>();
+  // Physical key code -> action-bar slot currently held down, so key UP (or a
+  // blur) releases the matching slot (drives the hold-to-charge shoot).
+  private heldSlotCodes = new Map<string, number>();
   // mouse-look sensitivity, in radians per pixel of drag; the old fixed value
   // was BASE_LOOK_SENS — setCameraSpeed scales it from the settings menu
   private lookSensitivity = BASE_LOOK_SENS;
@@ -357,17 +371,24 @@ export class Input {
   setSuspendMovement(on: boolean): void {
     if (this.suspendMovement === on) return;
     this.suspendMovement = on;
-    if (on) {
-      const hadEmoteWheel = this.emoteWheelHeldCodes.size > 0;
-      const hadHeldInput = this.keys.size > 0 || hadEmoteWheel || this.keyJumpUntil > 0;
-      this.keys.clear();
-      this.keyJumpUntil = 0;
-      if (hadEmoteWheel) {
-        this.emoteWheelHeldCodes.clear();
-        this.cb.onEmoteWheel(false);
-      }
-      if (hadHeldInput) this.noteIntent('move');
-    }
+    if (!on) return;
+    // The held-open emote wheel itself counts as a modal (hud.isModalOpen()),
+    // so when its keys are down this suspension almost always IS the wheel. The
+    // stale-input clear below must not run then: it would close the wheel one
+    // frame after the bound key opened it, and drop still-held movement keys
+    // mid-emote. Nothing held is actually stale in that state, because onKeyUp
+    // is never modal-gated and releaseCapture handles focus loss. (Rare corner:
+    // the hud can close the wheel while the key is still physically down, e.g.
+    // Escape or clicking a slice mid-hold; a menu suspension inside that window
+    // also skips the clear, which just restores the pre-clear behavior of held
+    // movement resuming when the menu closes.)
+    if (this.emoteWheelHeldCodes.size > 0) return;
+    const hadHeldInput = this.keys.size > 0 || this.keyJumpUntil > 0;
+    this.keys.clear();
+    this.keyJumpUntil = 0;
+    // Suspending input drops any charging Vale Cup sport move (held Shoot etc.).
+    this.releaseHeldSlots();
+    if (hadHeldInput) this.noteIntent('move');
   }
 
   captureNextKey(cb: (code: string | null) => void): void {
@@ -440,10 +461,11 @@ export class Input {
   }
 
   applyTouchLookDelta(dx: number, dy: number): void {
-    this.camYaw -= dx * this.lookSensitivity;
+    const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT;
+    this.camYaw -= dx * dragSens;
     this.camPitch = Math.min(
       1.35,
-      Math.max(-0.4, this.camPitch + this.touchPitchSign * dy * this.lookSensitivity),
+      Math.max(-0.4, this.camPitch + this.touchPitchSign * dy * dragSens),
     );
     if (dx !== 0 || dy !== 0) this.noteIntent('look');
   }
@@ -517,7 +539,7 @@ export class Input {
 
   setControllerMoveInput(input: unknown, facing?: unknown): void {
     this.controllerMoveInput = sanitizeMoveInput(input);
-    if (arguments.length > 1) this.controllerFacing = sanitizeMoveFacing(facing);
+    if (facing !== undefined) this.controllerFacing = sanitizeMoveFacing(facing);
   }
 
   setControllerFacing(facing: unknown): void {
@@ -612,6 +634,7 @@ export class Input {
       this.emoteWheelHeldCodes.clear();
       this.cb.onEmoteWheel(false);
     }
+    if (reason !== 'pointerlock') this.releaseHeldSlots();
     this.updateCursor();
     if (hadInput) this.noteIntent('move');
   }
@@ -696,7 +719,17 @@ export class Input {
       this.noteIntent('move');
     }
     const edge = combo ? this.keybinds.edgeActionForCombo(combo) : null;
-    if (edge !== null) this.dispatchEdge(edge);
+    if (edge !== null) {
+      if (edge.startsWith('slot')) {
+        // Slot keys use DOWN/UP so a slot can hold to charge; the HUD decides
+        // whether a slot charges (shoot) or fires immediately (tap = down+up).
+        const slot = Number(edge.slice(4));
+        this.heldSlotCodes.set(e.code, slot);
+        this.cb.onAbilityDown(slot);
+      } else {
+        this.dispatchEdge(edge);
+      }
+    }
   }
 
   private onKeyUp(e: KeyboardEvent): void {
@@ -705,6 +738,20 @@ export class Input {
       this.cb.onEmoteWheel(false);
       e.preventDefault();
     }
+    const slot = this.heldSlotCodes.get(e.code);
+    if (slot !== undefined) {
+      this.heldSlotCodes.delete(e.code);
+      this.cb.onAbilityUp(slot);
+    }
+  }
+
+  // Release every held slot (fire onAbilityUp), e.g. on blur/menu, so a charge in
+  // progress cannot stick.
+  private releaseHeldSlots(): void {
+    if (this.heldSlotCodes.size === 0) return;
+    const slots = [...this.heldSlotCodes.values()];
+    this.heldSlotCodes.clear();
+    for (const slot of slots) this.cb.onAbilityUp(slot);
   }
 
   private dispatchEdge(action: string): void {
@@ -732,6 +779,9 @@ export class Input {
       case 'bags':
         this.cb.onUiKey('bags');
         return;
+      case 'crafting':
+        this.cb.onUiKey('crafting');
+        return;
       case 'char':
         this.cb.onUiKey('char');
         return;
@@ -758,6 +808,9 @@ export class Input {
         return;
       case 'arena':
         this.cb.onUiKey('arena');
+        return;
+      case 'valecup':
+        this.cb.onUiKey('valecup');
         return;
       case 'leaderboard':
         this.cb.onUiKey('leaderboard');

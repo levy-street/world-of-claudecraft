@@ -120,3 +120,11 @@ fix before handoff), **SHOULD-FIX** (correctness or contract risk, or a missing 
 category X" for every invariant you checked and found clean, so coverage is auditable. If a gate
 could not be made green without changing behavior, say so loudly: that means a relocation was not
 a clean move.
+
+## Delivering your report
+
+The review only counts once the report is DELIVERED. End with the complete report as your final
+message, never a status line or a promise to report later. If a SendMessage tool is available
+(it is injected when you run as a background teammate), ALSO send the full report (never a
+one-line summary) to `main` as your FINAL action; going idle without sending it is a failed
+review that costs the orchestrator a nudge round-trip.

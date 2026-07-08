@@ -45,6 +45,8 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'attackspeed',
   'debuff_ap',
   'sunder',
+  'corrode',
+  'faerie_fire',
   'mortal_wound',
   'silence',
   'disarm',
@@ -124,6 +126,11 @@ export interface AuraInput {
   // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
   // and unlike stacks it shows even at 1 so the player sees the shield about to drop.
   charges?: number;
+  // The caster's entity id, for the "own aura" prominence on the target strip. Present on
+  // the offline Sim aura and mirrored over the wire (terse `src`); an old server omits it
+  // and the mirror decodes 0, which matches no player id, so the strip degrades to the
+  // un-prioritized layout instead of misattributing.
+  sourceId?: number;
 }
 
 /** The entity fields the core reads: just its aura list. */
@@ -154,6 +161,10 @@ export interface AurasDeps {
    *  in-game language switch still lands on the next tick. The host should return a
    *  REUSED object (allocation-light contract), never a fresh literal per call. */
   durationUnits(): DurationUnits;
+  /** Whether the LOCAL player cast this aura (host: `a.sourceId === world.playerId`).
+   *  Drives the own-aura prominence (bigger icon, sorted first) on an ownFirst view;
+   *  a missing/zero sourceId (an old server's mirror) is never "own". */
+  isOwn(aura: AuraInput): boolean;
 }
 
 /** One aura's derived state. All fields are mutated IN PLACE each tick; the object
@@ -171,6 +182,12 @@ export interface AuraSlotState {
   iconKey: string;
   /** Whether this aura reads as a debuff (drives the `debuff` class, not a color). */
   isDebuff: boolean;
+  /** The debuff's magic school ('' for a buff), driving the WoW-style per-school
+   *  border tint (data-school on the node; the stylesheet maps it to a token).
+   *  PARITY: the wire sends `school` sparsely (server/game.ts omits 'physical');
+   *  the decode default and this fallback are both 'physical', so a debuff tints
+   *  identically under a Sim-shaped and a ClientWorld-mirror aura. */
+  school: string;
   /** The remaining-duration label, or '' when effectively permanent. */
   durationText: string;
   /** The stack-count label, or '' when the aura does not stack past 1. */
@@ -185,6 +202,9 @@ export interface AuraSlotState {
   /** The one-line effect-summary HTML for the tooltip (or '' when none), read live by the
    *  pooled closure. */
   effectHtml: string;
+  /** Whether the LOCAL player cast this aura (ownFirst views only, false elsewhere):
+   *  drives the `own` class (bigger icon) and the own-first slot order. */
+  own: boolean;
 }
 
 /** The whole strip's derived state: the reused slot pool plus the active count. Both
@@ -223,12 +243,14 @@ function makeSlotState(): AuraSlotState {
     key: '',
     iconKey: '',
     isDebuff: false,
+    school: '',
     durationText: '',
     stacksText: '',
     name: '',
     remaining: 0,
     cancelable: false,
     effectHtml: '',
+    own: false,
   };
 }
 
@@ -238,10 +260,21 @@ function makeSlotState(): AuraSlotState {
  * tick() mutates it in place and returns the SAME { slots, count } container every
  * call. Each createAurasView yields an INDEPENDENT view: the buff bar and
  * the target debuffs never share a pool.
+ *
+ * opts.ownFirst (the target strip): the LOCAL player's own auras (deps.isOwn, the
+ * dots/hots you are maintaining) fill the leading slots and carry `own: true`, so
+ * the painter renders yours first and bigger. Implemented as two passes over the
+ * SAME aura list (own, then the rest): no sort, no per-frame allocation, and the
+ * relative order within each group stays the sim-application order.
  */
-export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
+export function createAurasView(
+  mode: AuraMode,
+  deps: AurasDeps,
+  opts?: { ownFirst?: boolean },
+): AurasView {
   const slots: AuraSlotState[] = [];
   const state: AurasState = { slots, count: 0 };
+  const ownFirst = opts?.ownFirst === true;
 
   return {
     tick(entity: AurasEntityInput): AurasState {
@@ -249,16 +282,17 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
       // Frame-constant, so read once per tick instead of per aura (it still re-reads each frame,
       // so an in-game language switch lands on the next tick).
       const units = deps.durationUnits();
-      for (const a of entity.auras) {
+      const fill = (a: AuraInput, own: boolean): void => {
         const debuff = isAuraDebuff(a);
-        if (mode === 'debuffs' && !debuff) continue;
-        if (mode === 'buffs' && debuff) continue;
+        if (mode === 'debuffs' && !debuff) return;
+        if (mode === 'buffs' && debuff) return;
         // Grow the pool only when this frame needs a slot it has never held before.
         if (count >= slots.length) slots.push(makeSlotState());
         const slot = slots[count];
         slot.key = a.id;
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
+        slot.school = debuff ? (a.school ?? 'physical') : '';
         slot.durationText =
           TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)
             ? ''
@@ -278,7 +312,14 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
         // (mode 'debuffs') is read-only, so nothing there is cancelable.
         slot.cancelable = mode === 'buffs' && !debuff;
         slot.effectHtml = deps.auraEffectHtml(a);
+        slot.own = own;
         count++;
+      };
+      if (ownFirst) {
+        for (const a of entity.auras) if (deps.isOwn(a)) fill(a, true);
+        for (const a of entity.auras) if (!deps.isOwn(a)) fill(a, false);
+      } else {
+        for (const a of entity.auras) fill(a, false);
       }
       state.count = count;
       return state;

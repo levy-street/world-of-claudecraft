@@ -113,6 +113,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.gear.intro',
   },
   {
+    id: 'professions',
+    sub: 'professions',
+    navKey: 'guide.nav.professions',
+    group: 'compendium',
+    descKey: 'guide.professions.intro',
+  },
+  {
     id: 'economy',
     sub: 'economy',
     navKey: 'guide.nav.economy',
@@ -148,11 +155,25 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.arenaPage.intro',
   },
   {
+    id: 'vale-cup',
+    sub: 'vale-cup',
+    navKey: 'guide.nav.valeCup',
+    group: 'compendium',
+    descKey: 'guide.valeCupPage.intro',
+  },
+  {
     id: 'controls',
     sub: 'reference/controls',
     navKey: 'guide.nav.controls',
     group: 'reference',
     descKey: 'guide.controls.intro',
+  },
+  {
+    id: 'settings',
+    sub: 'reference/settings',
+    navKey: 'guide.nav.settings',
+    group: 'reference',
+    descKey: 'guide.settingsPage.intro',
   },
   {
     id: 'combat',

@@ -16,6 +16,14 @@ import {
 } from './discord_db';
 import { drainRelay } from './discord_relay';
 import type { GameServer } from './game';
+import {
+  DEPLOY_SECRET_ENV,
+  DEPLOY_SECRET_HEADER,
+  DISCORD_SECRET_ENV,
+  DISCORD_SECRET_HEADER,
+  requireInternalSecret,
+} from './http/middleware/require_internal_secret';
+import type { RouteDef, RouteMeta } from './http/types';
 import { json, readBody } from './http_util';
 
 function ok(res: http.ServerResponse, data: unknown): void {
@@ -241,3 +249,280 @@ function sanitizeVoiceMember(m: unknown): {
     selfMute: o.selfMute === true,
   };
 }
+
+// ── Route table ────────────────────────────
+// All 11 handleInternalApi endpoints as RouteDefs for the shared dispatcher:
+// the deploy-gated restart-countdown plus the 10 Discord-bot-gated routes
+// (including the two daily-rewards-winners routes added after the original
+// count of 9). PARITY-FIRST: each thin handler REPRODUCES its frozen
+// legacy branch above byte-for-byte (same imported data cores, same clamps and
+// truncations, same ok()/fail() envelope bodies), and the secret gates move to
+// the requireInternalSecret middleware, which writes the SAME legacy bodies
+// (feature-off 404 'unknown endpoint', mismatch 401 'not authenticated'). The
+// legacy handleInternalApi ladder stays intact as the flag-off rollback path
+// (and as the dispatcher's delegate for unknown paths, wrong methods, and
+// HEAD, which therefore keep the legacy 404 'unknown endpoint' behavior: the
+// wrong-method restart-countdown stays 404, never the table router's 405).
+//
+// The separate /internal/daily-rewards/* ops family (handleDailyRewardInternalApi,
+// server/daily_rewards.ts) was never part of this ladder and stays entirely on
+// the delegate, unchanged.
+//
+// The one divergence is an UNEXPECTED handler/DB throw
+// (internalBodyValidationRemap, tests/server/http/known_deviations.ts): the
+// legacy ladder has NO outer catch (a throw becomes an unhandled rejection in
+// main.ts's fire-and-forget arm and the request hangs), while the new path's
+// withErrors serializes it through the admin-shape serializer as 500
+// { success: false, data: null, error: 'internal.error' }. The internal
+// envelope IS the admin { success, data, error } shape, so the routes carry
+// meta.envelope 'admin' (EnvelopeKind is a frozen server/http/types.ts contract
+// with no separate 'internal' member; serializeAdmin already emits this exact shape).
+
+// The game-loop side effect the restart-countdown handler needs, injected at
+// boot by main.ts (configureInternalRuntime(game)) so this module never
+// imports the live GameServer instance.
+export type InternalRuntime = Pick<GameServer, 'startRestartCountdown'>;
+
+let internalRuntime: InternalRuntime | null = null;
+
+export function configureInternalRuntime(runtime: InternalRuntime): void {
+  internalRuntime = runtime;
+}
+
+/** Clear the injected runtime so a unit test can install its own fake. */
+export function resetInternalRuntimeForTests(): void {
+  internalRuntime = null;
+}
+
+/** The injected runtime, or a loud failure if a request somehow beat boot wiring. */
+function useInternalRuntime(): InternalRuntime {
+  if (internalRuntime === null) {
+    throw new Error('internal runtime is not configured; call configureInternalRuntime');
+  }
+  return internalRuntime;
+}
+
+const INTERNAL_META: RouteMeta = { envelope: 'admin' };
+
+// One gate instance per (header, env var) pair, shared across the routes that
+// carry it, mirroring the two legacy gate blocks exactly.
+const deployGate = requireInternalSecret({
+  header: DEPLOY_SECRET_HEADER,
+  envVar: DEPLOY_SECRET_ENV,
+});
+const discordGate = requireInternalSecret({
+  header: DISCORD_SECRET_HEADER,
+  envVar: DISCORD_SECRET_ENV,
+});
+
+export const routes: RouteDef[] = [
+  {
+    method: 'POST',
+    path: '/internal/restart-countdown',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [deployGate],
+    handler: async (ctx) => {
+      const status = useInternalRuntime().startRestartCountdown();
+      if (!status.started) {
+        return fail(ctx.res, 409, 'restart countdown already active', status);
+      }
+      return ok(ctx.res, status);
+    },
+  },
+  {
+    method: 'GET',
+    path: '/internal/discord/flex',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const discordUserId = ctx.url.searchParams.get('discord_user_id') ?? '';
+      const accountId = await accountForDiscord(pool, discordUserId);
+      if (accountId === null) return ok(ctx.res, { linked: false });
+      return ok(ctx.res, { linked: true, ...(await discordFlexForAccount(accountId)) });
+    },
+  },
+  {
+    method: 'GET',
+    path: '/internal/discord/roles',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const discordUserId = ctx.url.searchParams.get('discord_user_id') ?? '';
+      const accountId = await accountForDiscord(pool, discordUserId);
+      if (accountId === null) return ok(ctx.res, { linked: false, statusTier: 0, points: 0 });
+      const reward = await loadRewardState(pool, accountId);
+      return ok(ctx.res, {
+        linked: true,
+        statusTier: discordStatusIndexForPoints(reward.lifetimePoints),
+        points: reward.points,
+        lifetimePoints: reward.lifetimePoints,
+      });
+    },
+  },
+  {
+    method: 'POST',
+    path: '/internal/discord/presence',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
+      const onlineCount = clampInt(body.onlineCount, 0, 1_000_000);
+      const memberTotal = clampInt(body.memberTotal, 0, 100_000_000);
+      const voiceChannelName =
+        typeof body.voiceChannelName === 'string' ? body.voiceChannelName.slice(0, 80) : null;
+      const voice = Array.isArray(body.voice)
+        ? body.voice.slice(0, 50).map((m: unknown) => sanitizeVoiceMember(m))
+        : [];
+      setDiscordPresenceCache({ onlineCount, memberTotal, voiceChannelName, voice });
+      return ok(ctx.res, { received: true });
+    },
+  },
+  {
+    method: 'POST',
+    path: '/internal/discord/grant',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
+      const discordUserId = typeof body.discord_user_id === 'string' ? body.discord_user_id : '';
+      const reason = typeof body.reason === 'string' ? body.reason.slice(0, 64) : '';
+      const points = clampInt(body.points, -100_000, 100_000);
+      const dedupeKey = typeof body.dedupeKey === 'string' ? body.dedupeKey.slice(0, 128) : null;
+      if (!reason || points === 0) {
+        return fail(ctx.res, 400, 'reason and non-zero points required');
+      }
+      const accountId = await accountForDiscord(pool, discordUserId);
+      if (accountId === null) return fail(ctx.res, 404, 'discord id not linked');
+      const state = await grantRewardPoints(pool, accountId, points, reason, dedupeKey);
+      return ok(ctx.res, {
+        points: state.points,
+        lifetimePoints: state.lifetimePoints,
+        statusTier: discordStatusIndexForPoints(state.lifetimePoints),
+      });
+    },
+  },
+  {
+    method: 'POST',
+    path: '/internal/discord/member',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
+      const discordUserId = typeof body.discord_user_id === 'string' ? body.discord_user_id : '';
+      const guildMember = body.guildMember === true;
+      const accountId = await accountForDiscord(pool, discordUserId);
+      if (accountId === null) return fail(ctx.res, 404, 'discord id not linked');
+      await setDiscordGuildMember(pool, accountId, guildMember);
+      if (guildMember) {
+        const g = DISCORD_REWARD_GRANTS.guildMember;
+        await grantRewardPoints(pool, accountId, g.points, g.reason, `${g.reason}:${accountId}`);
+      }
+      return ok(ctx.res, { updated: true });
+    },
+  },
+  {
+    method: 'GET',
+    path: '/internal/discord/relay',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const items = drainRelay();
+      const enriched = await Promise.all(
+        items.map(async (it) => {
+          const link = await discordForAccount(pool, it.accountId);
+          return {
+            ...it,
+            discordUserId: link?.discord_user_id ?? null,
+            discordUsername: link?.discord_username ?? null,
+            discordAvatar: link?.discord_avatar ?? null,
+          };
+        }),
+      );
+      return ok(ctx.res, { items: enriched });
+    },
+  },
+  {
+    method: 'GET',
+    path: '/internal/discord/activity',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const items = drainActivity();
+      const out: unknown[] = [];
+      for (const it of items) {
+        const participants = await Promise.all(
+          it.accountIds.map(async (accountId, i) => {
+            const link = await discordForAccount(pool, accountId);
+            return {
+              name: it.names[i] ?? '',
+              discordUserId: link?.discord_user_id ?? null,
+              discordAvatar: link?.discord_avatar ?? null,
+            };
+          }),
+        );
+        if (!participants.some((p) => p.discordUserId)) continue; // nobody linked
+        const { accountIds: _a, names: _n, ...rest } = it;
+        out.push({ ...rest, participants });
+      }
+      return ok(ctx.res, { items: out });
+    },
+  },
+  {
+    method: 'GET',
+    path: '/internal/discord/daily-rewards-winners',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const limit = clampInt(Number(ctx.url.searchParams.get('limit')) || 1, 1, 5);
+      return ok(ctx.res, await dailyRewardService.discordWinnerAnnouncements(limit));
+    },
+  },
+  {
+    method: 'POST',
+    path: '/internal/discord/daily-rewards-winners/mark',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const result = await dailyRewardService.markDiscordWinnersAnnounced(
+        await readBody(ctx.req).catch(() => ({})),
+      );
+      if ('error' in result) return fail(ctx.res, result.status, result.error);
+      return ok(ctx.res, result);
+    },
+  },
+  {
+    method: 'POST',
+    path: '/internal/discord/members-meta',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => {
+      const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
+      const members = Array.isArray(body.members) ? body.members.slice(0, 1000) : [];
+      let updated = 0;
+      for (const m of members) {
+        const o = m && typeof m === 'object' ? (m as Record<string, unknown>) : {};
+        const id = typeof o.discord_user_id === 'string' ? o.discord_user_id.slice(0, 32) : '';
+        if (!id) continue;
+        const name = typeof o.name === 'string' ? o.name.slice(0, 64) : null;
+        const joinedAtMs =
+          typeof o.joinedAtMs === 'number' && Number.isFinite(o.joinedAtMs) ? o.joinedAtMs : null;
+        // Only accept a known special-role key; anything else clears the role.
+        const roleKey = typeof o.role === 'string' && specialRoleByKey(o.role) ? o.role : null;
+        await setDiscordMemberMeta(pool, id, name, joinedAtMs, roleKey);
+        updated++;
+      }
+      return ok(ctx.res, { updated });
+    },
+  },
+];

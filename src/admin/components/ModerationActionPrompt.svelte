@@ -8,6 +8,7 @@
     reasonRequired = true,
     reasonPlaceholder = t('detail.notePlaceholder'),
     showExpiry = false,
+    showPassword = false,
     danger = false,
     onConfirm,
     onCancel,
@@ -17,13 +18,19 @@
     reasonRequired?: boolean;
     reasonPlaceholder?: string;
     showExpiry?: boolean;
+    showPassword?: boolean;
     danger?: boolean;
-    onConfirm: (values: { reason: string; expiry: string }) => void | Promise<void>;
+    onConfirm: (values: {
+      reason: string;
+      expiry: string;
+      password: string;
+    }) => void | Promise<void>;
     onCancel: () => void;
   } = $props();
 
   let reason = $state('');
   let expiry = $state('');
+  let password = $state('');
   let submitting = $state(false);
   let reasonInput: HTMLInputElement;
 
@@ -34,7 +41,7 @@
     if (submitting) return;
     submitting = true;
     try {
-      await onConfirm({ reason: reason.trim(), expiry });
+      await onConfirm({ reason: reason.trim(), expiry, password });
     } finally {
       submitting = false;
     }
@@ -66,6 +73,19 @@
       <label>
         <span>{t('dialog.until')}</span>
         <input type="datetime-local" bind:value={expiry} required />
+      </label>
+    {/if}
+    {#if showPassword}
+      <label>
+        <span>{t('dialog.newPassword')}</span>
+        <input
+          type="password"
+          bind:value={password}
+          autocomplete="new-password"
+          minlength="6"
+          maxlength="128"
+          required
+        />
       </label>
     {/if}
   </div>

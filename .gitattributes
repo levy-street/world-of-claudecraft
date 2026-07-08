@@ -5,3 +5,7 @@
 # them from language statistics. Display hygiene only - not removal, not gitignore.
 src/ui/i18n.resolved.generated/** linguist-generated
 src/admin/i18n.resolved.generated/** linguist-generated
+
+# Windows batch scripts keep their CRLF endings: exempt from text conversion so an
+# LF-normalized checkout (core.autocrlf=input) neither flags nor rewrites them.
+*.bat -text

@@ -39,6 +39,7 @@ export const shellStrings = {
       rendererFailed: 'Could not start the renderer: try reloading. {error}',
       enterTimeout: 'Could not enter world. The connection timed out. Is the game server running?',
       connectionLost: 'Connection to the server was lost.',
+      reconnecting: 'Connection lost. Reconnecting...',
       connectionRejected: 'The server closed the connection.',
     },
     errors: {
@@ -72,9 +73,12 @@ export const shellStrings = {
         webLoginOnly: 'Logins are only allowed from the game client.',
         accountSuspended: 'This account is suspended until {date}.',
         alreadyInWorld: 'Character is already in world.',
+        accountSessionLimit: 'Too many characters on this account are already in the world.',
         takenOver: 'Your character was taken over by another session.',
         renameBeforeEntering: 'This character must be renamed before entering the world.',
         renameNotPermitted: 'Renaming this character is not allowed.',
+        unsupportedMediaType: 'Unsupported request format.',
+        crossSiteOrigin: 'Request blocked for security reasons.',
       },
     },
     // Desktop (Electron) shell surfaces: the auto-update toast rendered by the

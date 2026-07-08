@@ -349,6 +349,15 @@ export default defineConfig({
     },
   },
   test: {
+    // server/db.ts (and every module importing it) requires DATABASE_URL at module
+    // load. Locally db.ts fills it from .env; a CI checkout has no .env, so default
+    // a dummy here to keep the suite runnable in plain Node. Unit tests never open
+    // a connection (the pg Pool connects only on first query, and db-touching tests
+    // use FakeDb/mocks), and a real DATABASE_URL from the shell still wins.
+    env: {
+      DATABASE_URL:
+        process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
+    },
     // Two kinds of exclusion, kept together:
     // - .codex/.venv are local-only worktree/venv pollution a clean CI checkout never has;
     //   excluding them keeps the local gate mirroring CI (otherwise stale .codex worktree
@@ -356,12 +365,17 @@ export default defineConfig({
     // - the opt-in browser suite (vitest.browser.config.ts, npm run test:browser) must NOT
     //   leak into a bare `vitest run`: excluding its files keeps the default Node run from
     //   importing the Playwright provider or launching a browser. Cross-engine CI is P17b.
+    // - tmp/ is gitignored scratch (screenshot tours, the new:endpoint golden test's emitted
+    //   *.test.ts under a temp root); excluding it keeps a crashed golden run's orphan emitted
+    //   test out of a bare `vitest run`. The golden test runs its emitted test through a child
+    //   vitest with an explicit --config override so this exclude does not block it.
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
       '**/.claude/**',
       '**/.codex/**',
       '**/.venv/**',
+      'tmp/**',
       'tests/browser/**',
       '**/*.browser.test.ts',
     ],

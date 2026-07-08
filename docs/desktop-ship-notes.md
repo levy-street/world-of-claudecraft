@@ -67,17 +67,26 @@ node_modules in the asar, all seven fuses set.
 
 1. At build time, electron-builder bakes `resources/app-update.yml` into the
    app (from `build.publish`: generic provider, feed URL
-   `https://updates.worldofclaudecraft.com/desktop`).
+   `https://updates.worldofclaudecraft.com/desktop`), and the publish channel
+   is derived from the baked API origin (`electron/update_guard.cjs`): the
+   production origin emits the `latest` feed files, any other origin (dev,
+   staging, localhost smoke packs) emits `dev` ones, and each emitted feed
+   file is stamped with the `wocApiOrigin` its artifact was baked with.
 2. At runtime, `electron/updater.cjs` initializes ONLY when the build is
    packaged AND stamped `website`. It checks the feed 15 seconds after launch
-   and every 4 hours: it GETs the platform's `latest*.yml`, compares the
-   version there against the running `app.getVersion()`, and only ever moves
-   FORWARD (no downgrades).
-3. If newer, it downloads in the background (delta via blockmap when the host
-   supports HTTP range requests, full download otherwise), verifies the SHA512
-   from the yml, then emits `update-downloaded`. The player sees a toast:
-   "Restart now" calls `quitAndInstall`; ignoring it still installs on next
-   quit (`autoInstallOnAppQuit`). Failed checks (offline, host down) only log.
+   and every 4 hours: it GETs the yml of the channel derived from its OWN
+   baked origin (production installs: `latest*.yml`; anything else:
+   `dev*.yml`), compares the version there against the running
+   `app.getVersion()`, and only ever moves FORWARD (no downgrades).
+3. If newer AND the feed file's `wocApiOrigin` stamp matches the install's own
+   baked origin (a missing stamp, from a pre-split feed file, is accepted; a
+   mismatch is REFUSED with a loud `main.log` entry, so a wrong-track artifact
+   can never flip an install to another backend), it downloads in the
+   background (delta via blockmap when the host supports HTTP range requests,
+   full download otherwise), verifies the SHA512 from the yml, then emits
+   `update-downloaded`. The player sees a toast: "Restart now" calls
+   `quitAndInstall`; ignoring it still installs on next quit
+   (`autoInstallOnAppQuit`). Failed checks (offline, host down) only log.
 4. Staged rollout: hand-edit `stagingPercentage: N` into the uploaded yml; each
    install hashes a persistent per-machine ID against N. Rollback: you MUST
    publish a higher version; machines that took a bad build will not downgrade.

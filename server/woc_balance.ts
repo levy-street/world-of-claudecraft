@@ -11,8 +11,8 @@
 // code references them, so nothing secret is inlined at build time.
 import type http from 'node:http';
 import { holderTierIndexForBalance } from '../src/sim/holder_tier';
+import { logger } from './http/logger';
 import { json } from './http_util';
-import { isSolanaAddress } from './wallet_link';
 import {
   providerUsageSnapshot,
   recordUsageCacheEvent,
@@ -21,9 +21,18 @@ import {
   setUsageCacheSize,
   type UsageCacheSnapshot,
 } from './provider_usage';
+import { isSolanaAddress } from './wallet_link';
 
-const WOC_MINT = (process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth').trim();
-const SOLANA_RPC_URL = (process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com').trim();
+const WOC_MINT = (
+  process.env.WOC_MINT ??
+  process.env.VITE_WOC_MINT ??
+  '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
+).trim();
+const SOLANA_RPC_URL = (
+  process.env.SOLANA_RPC_URL ??
+  process.env.VITE_SOLANA_RPC_URL ??
+  'https://api.mainnet-beta.solana.com'
+).trim();
 // How long a per-wallet balance is reused before the next RPC. This is the
 // freshness floor for the in-world holder-tier badge (the broadcast path reads
 // through this cache); the player's own card/bag bypass it with `fresh=1` on
@@ -32,7 +41,10 @@ const SOLANA_RPC_URL = (process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RP
 export const CACHE_TTL_MS = 2 * 60 * 1000;
 export const WOC_BALANCE_CACHE_MAX_ENTRIES = 1024;
 
-interface CacheEntry { balance: number; at: number; }
+interface CacheEntry {
+  balance: number;
+  at: number;
+}
 const cache = new Map<string, CacheEntry>();
 setUsageCacheSize('woc.balance', cache.size, WOC_BALANCE_CACHE_MAX_ENTRIES);
 
@@ -62,7 +74,7 @@ interface RpcTokenAccountsResponse {
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
-  return value && typeof value === 'object' ? value as Record<string, unknown> : null;
+  return value && typeof value === 'object' ? (value as Record<string, unknown>) : null;
 }
 
 function parseDecimalAmount(value: string): number | null {
@@ -74,14 +86,14 @@ function parseDecimalAmount(value: string): number | null {
 
 function decimalStringFromRawAmount(rawAmount: string, decimals: number): string | null {
   const raw = rawAmount.trim();
-  if (!/^\d+$/.test(raw) || !Number.isInteger(decimals) || decimals < 0 || decimals > 255) return null;
+  if (!/^\d+$/.test(raw) || !Number.isInteger(decimals) || decimals < 0 || decimals > 255)
+    return null;
   const digits = raw.replace(/^0+/, '') || '0';
   if (decimals === 0) return digits;
 
   const integerDigits = digits.length > decimals ? digits.slice(0, -decimals) : '0';
-  const fractionalDigits = digits.length > decimals
-    ? digits.slice(-decimals)
-    : digits.padStart(decimals, '0');
+  const fractionalDigits =
+    digits.length > decimals ? digits.slice(-decimals) : digits.padStart(decimals, '0');
   const trimmedFraction = fractionalDigits.replace(/0+$/, '');
   return trimmedFraction ? `${integerDigits}.${trimmedFraction}` : integerDigits;
 }
@@ -128,7 +140,9 @@ export function resetWocBalanceCacheForTests(): void {
 }
 
 export function wocBalanceCacheStats(): UsageCacheSnapshot {
-  const stats = providerUsageSnapshot().caches.find((cacheStats) => cacheStats.key === 'woc.balance');
+  const stats = providerUsageSnapshot().caches.find(
+    (cacheStats) => cacheStats.key === 'woc.balance',
+  );
   if (!stats) throw new Error('missing woc balance cache stats');
   return stats;
 }
@@ -171,7 +185,7 @@ export async function fetchWocBalance(pubkey: string): Promise<number | null> {
     return total;
   } catch (err) {
     recordUsageMetric('woc.balance.rpc.failure');
-    console.error('[woc] balance read failed for', pubkey, err);
+    logger.error({ pubkey, err }, 'woc balance read failed');
     return null;
   }
 }
@@ -212,7 +226,9 @@ export async function cachedWocBalance(pubkey: string, fresh = false): Promise<n
  * (cached) balance; {0, 0} when the wallet has never been read successfully. This
  * backs the `ht`/`hb` holder-tier identity payload the server broadcasts.
  */
-export async function holderInfoForPubkey(pubkey: string): Promise<{ tier: number; balance: number }> {
+export async function holderInfoForPubkey(
+  pubkey: string,
+): Promise<{ tier: number; balance: number }> {
   const balance = await cachedWocBalance(pubkey);
   if (balance === null) return { tier: 0, balance: 0 };
   return { tier: holderTierIndexForBalance(balance), balance };
@@ -241,7 +257,11 @@ export function parseWocBalanceQuery(rawUrl: string): { owner: string; fresh: bo
  * the per-wallet TTL (used when the player opens a balance surface so a token
  * change shows up) — still behind the route's IP rate-limit.
  */
-export async function handleWocBalance(res: http.ServerResponse, owner: string, fresh = false): Promise<void> {
+export async function handleWocBalance(
+  res: http.ServerResponse,
+  owner: string,
+  fresh = false,
+): Promise<void> {
   recordUsageMetric('woc.balance.api');
   if (!isSolanaAddress(owner)) return json(res, 400, { error: 'invalid Solana wallet address' });
   const balance = await cachedWocBalance(owner, fresh);

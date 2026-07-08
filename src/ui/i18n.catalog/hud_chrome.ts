@@ -225,10 +225,45 @@ export const hudChromeStrings = {
     autorun: 'Autorun',
     jump: 'Jump',
     leaderboard: 'Ranks',
+    dailyRewards: 'Rewards',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
     toggleHaptics: 'Toggle haptics',
+    // The v0.22.0 base's touch-hotbar paging button ("Skills", #mobile-hotbar-page):
+    // superseded by the paged action ring below, whose page toggle owns ability
+    // paging on touch. The keys stay (already filled in all 20 locales) per the
+    // hud.core.mobileTarget precedent for retired-but-translated chrome keys.
+    hotbarPage: 'Skills',
+    hotbarPageAria: 'Show next set of skills',
+    // Paged mobile action ring (Phase 1 of the mobile combat HUD rework): the
+    // ring container's accessible name, the page-cycle toggle's accessible name,
+    // and the page indicator text painted on the toggle. The per-button
+    // aria labels reuse abilityUi.actionBar.slotAria/emptySlotAria/attackName via
+    // the shared action_bar_view core, so no per-slot key lives here.
+    actionRing: 'Combat actions',
+    actionPageToggle: 'Switch action page',
+    // The bare page number ("1"/"2", painted big and gold over the swap-arrows
+    // glyph) rather than "Page 1 of 2": the toggle button already carries the
+    // full "Switch action page" accessible name via actionPageToggle above, so
+    // the indicator span only needs to be legible at a glance, not restate the
+    // count in words. "{page}" is token-only, so it is exempt from the M16
+    // non-Latin-fill requirement.
+    actionPageIndicator: '{page}',
+    // Target swap (#mobile-target-cycle, replacing the old Target Closest
+    // button): a crosshair-icon secondary button that cycles the hostile
+    // target via the Tab-target path (acquire-nearest now lives on the ring's
+    // attack toggle itself), kept visually distinct from the ring's primary
+    // attack toggle. targetCycle is the accessible name/title;
+    // targetCycleShort is the tiny on-button caption (space is tight at the
+    // button's 44-60px width, so it stays one word).
+    targetCycle: 'Swap target',
+    targetCycleShort: 'Target',
+    // Phase 4: a small touch-only label on each bar-assigned spellbook row,
+    // naming which mobile action-ring page (Phase 1) the ability's bar slot
+    // falls on. "Page {page}" is not wordy (one word plus a token), so it is
+    // exempt from the M16 non-Latin-fill requirement.
+    spellbookPageLabel: 'Page {page}',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -310,6 +345,11 @@ export const hudChromeStrings = {
     // Entry-denied toast, enriched client-side with the live unlock countdown
     // ({raid} = the localized raid name, {time} = the formatted countdown).
     lockedToast: 'You are locked to {raid}. Unlocks in {time}.',
+    // Display name for a heroic-difficulty lockout row ({name} = dungeon name).
+    heroicName: 'Heroic {name}',
+    // Entry-denied toast for a heroic daily lockout when no live countdown is
+    // mirrored yet ({name} = dungeon name).
+    heroicLocked: 'You are locked to Heroic {name}.',
   },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in
@@ -341,12 +381,182 @@ export const hudChromeStrings = {
     targetFriendlyNext: 'Cycle Friendly Target',
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
+    valecup: 'Vale Cup',
+  },
+  // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
+  // the persistent indicator button, the in-match score strip, and the event
+  // banners / log lines. Nation names are SHORT proper names; sport ability
+  // names/descriptions localize through the entity catalog
+  // (i18n.catalog/abilities.ts), not here.
+  vcup: {
+    title: 'The Vale Cup',
+    // Label on the hold-to-charge shoot power meter (short, uppercased in CSS).
+    shootPower: 'POWER',
+    close: 'Close the Vale Cup window',
+    offlineNote: 'The fixture book is closed. The Vale Cup is not available right now.',
+    recordLine: 'Your record: {wins} wins, {losses} losses, {draws} draws.',
+    bracketsAria: 'Match bracket',
+    // "3v3" style tab label; {n} is the team size.
+    bracketLabel: '{n}v{n}',
+    waitingCount: '{count} waiting',
+    nationsHeading: 'Banner nation',
+    nation: {
+      vale: 'Eastbrook Vale',
+      mirefen: 'The Mirefen',
+      thornpeak: 'Thornpeak',
+      coliseum: 'The Ashen Coliseum',
+      choir: 'The Pale Choir',
+      ogre: 'The Ogre Clans',
+      moon: 'The Pale Moon',
+      copperdig: 'The Copper Dig',
+    },
+    awayNote: 'If both sides fly the same banner, the away side plays the inverted palette.',
+    rolesHeading: 'Sport role',
+    role: {
+      allrounder: {
+        name: 'All-Rounder',
+        desc: 'A bit of everything: kick, boot, and a fair shoulder.',
+      },
+      striker: {
+        name: 'Striker',
+        desc: 'Lives for the long boot and the quick sidestep.',
+      },
+      sweeper: {
+        name: 'Sweeper',
+        desc: 'Bumps runners off the ball and hoofs it clear.',
+      },
+      keeper: {
+        name: 'Keeper',
+        desc: 'Guards the goal box with grip, dive, and punt.',
+      },
+    },
+    queue: 'Join the Queue',
+    leaveQueue: 'Leave the Queue',
+    queueNote: 'Queue from anywhere; the whistle calls you to the Sowfield.',
+    queuedStatus: 'Queued for {bracket}: position {position} of {count}.',
+    blockNation: 'Pick a banner nation first.',
+    blockPartySize: 'That bracket needs a smaller party.',
+    blockNotLeader: 'Only the party leader can queue the team.',
+    inMatchNote: 'Your team is on the pitch. Play on!',
+    deserterNote: 'The Groundskeeper remembers. You may queue again in {seconds} sec.',
+    liveHeading: 'Now at the Sowfield',
+    liveAria: 'Vale Cup: {nationA} {scoreA}, {nationB} {scoreB}',
+    walkUp: 'Walk up to the Sowfield to watch from the stands.',
+    noLive: 'The pitch is quiet. No match is being played.',
+    boardHeading: 'Winners board',
+    boardEmpty: 'No winners recorded yet. The Copper Pail waits.',
+    boardWins: '{count} wins',
+    // Guild banner entry + guild leaderboard.
+    enterAsGuild: 'Enter under the banner of {guild}',
+    guildRecordLine: 'Your guild record: {wins} wins, {losses} losses.',
+    guildBoardHeading: 'Guild banners',
+    guildBoardEmpty: 'No guild has taken the field yet. Fly your banner!',
+    guildBoardWl: '{wins} W, {losses} L',
+    practice: 'Practice vs. Bots',
+    practiceNote: 'Starts a private bot match on your own practice pitch right away.',
+    // Region indicator: players currently off in a private practice instance.
+    practicingNow: 'Practicing now ({count}):',
+    // mm:ss; {seconds} is pre-padded to two digits.
+    clock: '{minutes}:{seconds}',
+    // Persistent indicator button states.
+    indicatorQueued: 'Vale Cup queue: {bracket}, position {position} of {count}',
+    indicatorLive: 'Vale Cup',
+    indicatorOpen: 'Open the Vale Cup window',
+    // In-match strip phase line.
+    phaseCountdown: 'Kickoff in {seconds}',
+    phaseGoal: 'GOAL!',
+    phaseGolden: 'GOLDEN GOAL',
+    phaseOver: 'FULL TIME',
+    // Event banners (match theatre; also seen by walk-up spectators).
+    bannerFound: 'The Vale Cup calls: {nationA} vs {nationB}!',
+    bannerCountdown: 'Kickoff in {seconds}...',
+    bannerKickoff: 'KICKOFF!',
+    bannerGoal: 'GOAL! {nation} scores!',
+    bannerSave: '{name} SAVES!',
+    bannerGolden: 'GOLDEN GOAL: next score wins!',
+    bannerEnd: 'Full time: {nationA} {scoreA}, {nationB} {scoreB}',
+    bannerWin: 'Victory at the Sowfield!',
+    bannerDraw: 'A draw at the Sowfield.',
+    bannerLoss: 'Defeat at the Sowfield.',
+    // Chat-log lines.
+    logQueued: 'You join the Vale Cup queue for {bracket} (position {position}).',
+    logUnqueued: 'You leave the Vale Cup queue.',
+    logFound: 'Your Vale Cup match is ready: {nationA} vs {nationB}.',
+    logRoster: 'Your side: {allies}. Their side: {enemies}.',
+    logGoal: '{name} scores for {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
+    logSave: '{name} makes the save!',
+    logWin: 'You win the bout at the Sowfield.',
+    logDraw: 'The bout at the Sowfield ends in a draw.',
+    logLoss: 'You lose the bout at the Sowfield.',
+    // Groundskeeper Bram's gossip-menu entry.
+    gossipOpen: 'The book of fixtures',
+    gossipOpenAria: 'Open the Vale Cup window',
+    mobileLabel: 'Cup',
+    // Pre-match briefing overlay (the full-screen rules-and-kit card before kickoff).
+    briefing: {
+      subtitle: 'Pre-match briefing',
+      // The small "vs" glyph between the two banners in the header.
+      vs: 'vs',
+      rulesHeading: 'How to play',
+      rule1: 'Kick or pass the ball into the enemy goal to score.',
+      rule2: 'First to 5 goals wins, or the most goals when full time blows.',
+      rule3: 'A level match at full time goes to golden goal: the next score wins.',
+      rule4: 'Tackles only tumble you over. Nobody gets hurt under the harvest truce.',
+      rule5: 'Anyone can walk up and cheer you on from the stands.',
+      kitHeading: 'Your kit',
+      kitNote: 'These moves replace your class abilities for the match.',
+      rosterHeading: 'The team sheet',
+      // Row tags on the team sheet.
+      you: 'You',
+      bot: 'Bot',
+      // Ready button: its label, its readied-state label, and its accessible name.
+      ready: "I'm ready",
+      readyDone: 'Ready',
+      readyAria: 'Ready up for kickoff',
+      // Shown once you have readied and the match waits on the other fighters.
+      waiting: 'Waiting for the other side to ready up...',
+      // Live auto-ready countdown ({seconds} whole seconds) and the ready tally.
+      whistle: 'The whistle blows in {seconds}s.',
+      readyCount: '{ready} of {total} ready',
+    },
+    // Spectator parimutuel betting (the walk-up banner + card at the Sowfield).
+    bet: {
+      title: 'Match Bets',
+      aria: 'Vale Cup match betting',
+      // Live wager countdown / closed state.
+      closesIn: 'Bets close in {seconds}s',
+      closed: 'Betting closed',
+      // The prize pool (total copper wagered) shown between the two shares.
+      prize: 'Pool {amount}',
+      splitAria: 'Share of the betting pool on each team',
+      // The expand / collapse toggle for the full card.
+      expand: 'View bets and wager',
+      collapse: 'Hide bets',
+      oddsLabel: 'Pays',
+      // Stake button group heading; {team} is a nation name.
+      back: 'Back {team}',
+      // A fighter's lifetime form on the card.
+      form: '{wins}W-{losses}L',
+      // My current wager ({amount} money, {team} nation name), or none yet.
+      mine: 'Your bet: {amount} on {team}',
+      none: 'You have no bet on this match yet.',
+      // My lifetime betting record; {sign} is + or -, {net} the absolute money.
+      record: 'Betting record: {wins}W-{losses}L, {sign}{net}',
+      // Settlement toasts ({amount} money credited back).
+      wonBanner: 'Your bet won!',
+      wonLog: 'Your Vale Cup bet won: {amount} returned.',
+      lostLog: 'Your Vale Cup bet lost: {amount}.',
+      refundLog: 'Bets voided, your {amount} stake was returned.',
+    },
   },
   // Click-to-move mouse-button toggle labels (Key Bindings panel). The button id
   // 0/2 maps to these at the HUD render boundary.
   options: {
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
+    // Running client version + build id, shown as small secondary text at the foot
+    // of the settings menu so players can confirm their build without closing it.
+    version: 'v{version} ({build})',
     // Adaptive browser-effects tier control (Graphics panel). Auto detects the
     // browser engine/version + device; the rest pin the CSS-effects tier.
     browserEffects: 'Browser Effects',
@@ -410,6 +620,14 @@ export const hudChromeStrings = {
     // by default). The abilities bound to its slots stay castable via their keybinds.
     showSecondaryActionBar: 'Show Secondary Action Bar',
     showDailyRewardsChest: 'Show Daily Rewards Chest',
+    // Touch-only Graphics panel toggles (mobile combat HUD rework, phase 2).
+    // Camera joystick: hidden and off by default, swipe-look on open gameplay
+    // space is the primary camera path; this opts into the dedicated stick.
+    mobileCameraJoystick: 'Camera joystick',
+    // Mirrors the touch layout (movement joystick right, camera joystick left)
+    // for left-thumb-dominant players; the same setting as the Key Bindings
+    // panel's leftHandedTouch row, surfaced again here alongside the joystick.
+    mobileLeftHanded: 'Left-handed layout',
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
@@ -471,7 +689,9 @@ export const hudChromeStrings = {
       fps01Low: '0.1% Low',
       ping: 'Ping',
       jitter: 'Jitter',
+      predLead: 'Prediction Lead',
       snapshot: 'Snapshot Rate',
+      serverTick: 'Server Tick Rate',
       connection: 'Connection',
       drawCalls: 'Draw Calls',
       triangles: 'Triangles',
@@ -531,6 +751,8 @@ export const hudChromeStrings = {
     // item-stats catalog.
     names: {
       spellPower: 'Spell Power',
+      critRating: 'Crit Rating',
+      hasteRating: 'Haste Rating',
     },
     desc: {
       str: 'Increases your attack power, so your weapon strikes land harder.',
@@ -546,6 +768,10 @@ export const hudChromeStrings = {
       dps: "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
       critChance: 'Your chance for an attack to strike critically, dealing double damage.',
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
+      critRating:
+        'Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.',
+      hasteRating:
+        'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {
@@ -597,6 +823,19 @@ export const hudChromeStrings = {
   itemSet: {
     header: '{name} ({have}/{total})',
     bonusLine: '({pieces}) {bonus}',
+  },
+  // Legendary weapon "chance on action" procs, rendered in the item tooltip from
+  // the ItemDef.weaponProcs data (see src/ui/weapon_proc_view.ts). One trigger
+  // line wraps the joined effect fragments below it.
+  itemProc: {
+    onMeleeHit: 'Chance on hit ({chance}%): {effect}',
+    onSpellDamage: 'Chance on your damaging spells ({chance}%): {effect}',
+    onHeal: 'Chance on your heals ({chance}%): {effect}',
+    chainArc:
+      'blasts the target with a {school} {name} ({damage}) that leaps to {jumps} nearby foes for decaying damage',
+    attackSlow: 'and slows the target attack speed by {pct}% for {duration} sec',
+    dot: 'festers {name}, a {school} damage-over-time dealing {total} over {duration} sec',
+    hot: 'blooms {name}, a heal-over-time restoring {total} over {duration} sec',
   },
   // Quest-link sharing: the chat-link affordance and its sim-emitted notices
   // (re-localized through the hud-local localizeErrorText/localizeSystemText arms).
@@ -803,6 +1042,39 @@ export const hudChromeStrings = {
     summaryMaster: 'Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.',
     summaryGroup: 'Loot Settings: Group Loot.',
   },
+  // Per-corpse focus picker (#1142): the checkbox list of tagged components on a
+  // harvestable corpse, shown alongside loot. Concentrating on fewer checked
+  // components yields a higher tier per component than spreading across all of
+  // them (professions/gathering.ts resolveCorpseFocusHarvest).
+  corpseHarvest: {
+    title: 'Harvest',
+    harvestButton: 'Harvest',
+    concentrateHint: 'Fewer chosen components yield a higher tier each.',
+    alreadyHarvested: 'This corpse has already been harvested.',
+    componentAria: 'Harvest {component}',
+    components: {
+      hide: 'Hide',
+      fang: 'Fang',
+      silk: 'Silk',
+      venomSac: 'Venom Sac',
+      gills: 'Gills',
+      claw: 'Claw',
+      horn: 'Horn',
+      tusk: 'Tusk',
+    },
+  },
+  // #1143: persistent town focus allocation panel. Reuses the corpseHarvest
+  // component-name map above for consistency; only town-focus-specific copy
+  // lives here.
+  townFocus: {
+    title: 'Town Focus',
+    hint: "Focus points add a bonus on top of every component's baseline yield. Unfocused components stay at baseline.",
+    budgetLabel: 'Points remaining: {remaining} / {budget}',
+    saveButton: 'Save Focus',
+    notInTownHint: 'You must be in town to set your focus.',
+    increaseAria: 'Increase focus on {component}',
+    decreaseAria: 'Decrease focus on {component}',
+  },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only
   // hud_chrome domain so an English-only PR compiles; the new-leader announcement
@@ -824,9 +1096,23 @@ export const hudChromeStrings = {
     leaderOption: 'Master Looter: Leader (You)',
     masterOption: 'Master Looter: {name}',
   },
+  // Self-portrait context menu: the dungeon-difficulty toggle (classic
+  // portrait-menu placement). The labels are ACTION labels (what clicking
+  // does); shown only to solo players and party leaders, since the sim
+  // rejects the change from anyone else.
+  dungeonDifficulty: {
+    setHeroic: 'Set Dungeon Difficulty: Heroic',
+    setNormal: 'Set Dungeon Difficulty: Normal',
+  },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
   bags: {
+    // Right-click destroy affordance: rejected when the item is flagged noDiscard
+    // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
+    cannotDestroy: 'This item cannot be destroyed.',
+    // Tooltip sub-line advertising the right-click destroy affordance, shown only
+    // for a destroyable item so junk is removable without hunting for a menu.
+    rightClickDestroy: 'Right-click to destroy',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -905,10 +1191,22 @@ export const hudChromeStrings = {
       allStats: 'Reduces all attributes by {value}',
     },
     allStatsPctReduce: 'Reduces all attributes by {pct}%',
+    // Percent raid buffs (Arcane Intellect, Mark of the Wild, Fortitude, Battle Shout,
+    // Blessing of Might, Devotion Aura).
+    increasePct: {
+      ap: 'Increases attack power by {pct}%',
+      armor: 'Increases armor by {pct}%',
+      int: 'Increases Intellect by {pct}%',
+      sta: 'Increases Stamina by {pct}%',
+      allStats: 'Increases all attributes by {pct}%',
+    },
     dodge: 'Increases dodge chance by {pct}%',
     dodgeReduce: 'Reduces dodge chance by {pct}%',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
+    // Sunder Armor / Faerie Fire: percent armor reductions (Sunder stacks).
+    armorPct: 'Reduces armor by {pct}%',
+    armorPctStacks: 'Reduces armor by {pct}% ({stacks} stacks)',
     mortalWound: 'Reduces healing received by {pct}%',
     vulnerability: 'Increases damage taken by {pct}%',
     physVuln: 'Increases physical damage taken by {pct}%',
@@ -1100,6 +1398,7 @@ export const hudChromeStrings = {
     roleTag: {
       levyst: 'Levy St',
       admin: 'Admin',
+      coredevs: 'Core Dev',
       devs: 'Dev',
       mods: 'Mod',
       artists: 'Artist',
@@ -1240,6 +1539,62 @@ export const hudChromeStrings = {
       takeParcelsFirst: 'Take the parcels out before discarding the letter.',
     },
   },
+  // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
+  // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial
+  // amount; the footer buys 6-slot expansion blocks. The withdraw-quantity and
+  // buy-confirm prompts reuse the generic vendor cancel key (itemUi.vendor.sellQuantityCancel).
+  bank: {
+    title: 'Bank',
+    subtitle: 'The Gilded Strongbox',
+    close: 'Close bank',
+    capacity: '{used}/{total}',
+    capacityAria: 'Bank slots used: {used} of {total}',
+    empty: 'Your bank is empty.',
+    tooFar: 'You must be at a banker to view your bank.',
+    buySlots: 'Buy {count} slots',
+    buySlotsMaxed: 'Fully expanded',
+    buyConfirm: 'Purchase {count} additional bank slots for {price}?',
+    buyConfirmAccept: 'Purchase',
+    withdrawHint: 'Click to withdraw',
+    withdrawPartialHint: 'Shift-click to withdraw a partial amount',
+    depositHint: 'Click to deposit',
+    depositPartialHint: 'Shift-click to deposit a partial amount',
+    cannotDeposit: 'Cannot be banked',
+    depositQuantityTitle: 'Deposit {item}',
+    depositQuantityInput: 'Quantity to deposit',
+    depositQuantityConfirm: 'Deposit',
+    withdrawQuantityTitle: 'Withdraw {item}',
+    withdrawQuantityInput: 'Quantity to withdraw',
+    withdrawQuantityConfirm: 'Withdraw',
+    // Search / category / sort toolbar. The category chip and sort option
+    // labels reuse the generic hudChrome.bags.* strings; only these bank-named aria
+    // labels are distinct from the bags wording.
+    filterGroupAria: 'Filter bank by category',
+    sortAria: 'Sort bank items',
+    searchAria: 'Search bank items by name',
+    // Deposit-all-materials button + its transient summary line. {count} is
+    // the number of material stacks moved.
+    depositAll: 'Deposit all materials',
+    depositAllDone: 'Materials deposited: {count}.',
+    depositAllFull: 'Materials deposited: {count}. Bank now full.',
+    depositAllNone: 'Bank full: nothing deposited.',
+    // Bonus-slot breakdown footer (online only): a header total plus one row
+    // per account source, advertising what linking earns. {count} is a slot count.
+    bonusTitle: 'Bonus slots',
+    bonusEarned: '+{count}',
+    bonusStatusEarned: '+{count}',
+    bonusSourceEmail: 'Verified email',
+    bonusSourceDiscord: 'Discord linked',
+    bonusSourceWallet: 'Wallet linked',
+    bonusSourceReferral: 'Referred friends',
+    bonusAdvertEmail: 'Verify your email to earn 2 slots.',
+    bonusAdvertDiscord: 'Link your Discord to earn 2 slots.',
+    bonusAdvertWallet: 'Link a wallet to earn 2 slots.',
+    bonusReferralProgress: '{count}/{cap}',
+    bonusReferralExplainer:
+      'Invite a friend: when they reach level 10 you each earn 2 slots, up to 5 friends.',
+    bonusSectionAria: 'Bonus bank slots and how to earn more',
+  },
   // The event calendar window: recurring system events plus the guild lane
   // (booked by officers and the Guild Master, mirrored via socialInfo).
   calendar: {
@@ -1306,5 +1661,48 @@ export const hudChromeStrings = {
   social: {
     lastSeen: 'Last seen: {when}',
     lastSeenNever: 'never',
+  },
+  // Gathering proficiency section on the character sheet (#1124). Profession
+  // display names mirror src/sim/content/professions.ts (GatheringProfessionId).
+  gathering: {
+    title: 'Gathering',
+    mining: 'Mining',
+    logging: 'Logging',
+    herbalism: 'Herbalism',
+  },
+  // Archetype title (#1130): the named title granted by a character's currently
+  // active craft archetype (see src/sim/professions/archetype.ts). `none` is shown
+  // before the zone-1 acceptance quest has ever been completed (no "Jack of All
+  // Trades" fallback, just untitled). The ten per-craft names are keyed by the
+  // same craft id as CRAFT_RING (src/sim/content/professions.ts); keep both in sync.
+  archetypeTitle: {
+    label: 'Title',
+    none: 'None',
+    armorcrafting: 'Armorer',
+    weaponcrafting: 'Weaponsmith',
+    jewelcrafting: 'Jeweler',
+    alchemy: 'Alchemist',
+    engineering: 'Tinkerer',
+    cooking: 'Chef',
+    inscription: 'Scribe',
+    enchanting: 'Enchanter',
+    tailoring: 'Tailor',
+    leatherworking: 'Leathercrafter',
+  },
+  // Crafting window (#1127): the minimal common-tier crafting action, one row
+  // per known recipe, a Craft button enabled only when every reagent is held.
+  crafting: {
+    title: 'Crafting',
+    close: 'Close crafting',
+    craft: 'Craft',
+    reagentsNeeded: 'Requires:',
+    reagentLine: '{name} x{have}/{required}',
+    empty: 'No recipes known yet.',
+    resultAria: 'Craft {name}',
+    craftedToast: 'Crafted: {name}',
+    insufficientMaterials: 'You do not have the materials for that.',
+    unknownRecipe: 'That recipe does not exist.',
+    comboRequirementUnmet:
+      'You do not have both required crafts at the required tier for that recipe.',
   },
 };

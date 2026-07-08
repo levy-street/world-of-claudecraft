@@ -26,6 +26,7 @@ describe('server-sent message localization', () => {
     'Usage: /suspend "<name>" <minutes> [reason]',
     'Usage: /spectate <name>',
     "No online player named 'Zephyr'.",
+    "You don't have permission to do that.",
     'You are not spectating anyone.',
     'Now spectating Zephyr.',
     'Stopped spectating.',

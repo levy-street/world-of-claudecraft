@@ -527,8 +527,8 @@ describe('upload lane guards', () => {
 
   it('assetUploadRateLimited caps per account on its own bucket', () => {
     for (let i = 0; i < ASSET_UPLOAD_MAX_PER_MINUTE; i++) {
-      expect(assetUploadRateLimited(fakeReq(), 42)).toBe(false);
+      expect(assetUploadRateLimited(fakeReq(), 42).allowed).toBe(true);
     }
-    expect(assetUploadRateLimited(fakeReq(), 42)).toBe(true);
+    expect(assetUploadRateLimited(fakeReq(), 42).allowed).toBe(false);
   });
 });

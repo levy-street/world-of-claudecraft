@@ -34,10 +34,12 @@ vi.mock('../../src/admin/api', () => ({
 
 import { t } from '../../src/admin/i18n';
 import BlockedIps from '../../src/admin/pages/BlockedIps.svelte';
+import { grantPermissions } from './_grant';
 
 beforeEach(() => {
   apiPost.mockReset();
   apiPost.mockResolvedValue({});
+  grantPermissions();
   vi.spyOn(window, 'confirm').mockReturnValue(true);
 });
 
@@ -54,5 +56,15 @@ describe('BlockedIps', () => {
     await screen.findByText('203.0.113.7');
     await fireEvent.click(screen.getByText(t('blockedIps.remove')));
     expect(apiPost).toHaveBeenCalledWith('/admin/api/blocked-ips/delete', { ip: '203.0.113.7' });
+  });
+
+  it('hides the add form and actions without ipblocks.manage', async () => {
+    grantPermissions(['moderation.read']);
+    render(BlockedIps);
+
+    await screen.findByText('203.0.113.7');
+    expect(screen.queryByText(t('blockedIps.addTitle'))).not.toBeInTheDocument();
+    expect(screen.queryByText(t('blockedIps.remove'))).not.toBeInTheDocument();
+    expect(screen.queryByText(t('detail.colActions'))).not.toBeInTheDocument();
   });
 });

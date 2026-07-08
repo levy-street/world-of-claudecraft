@@ -919,6 +919,8 @@ describe('trading', () => {
     sim.meta(a)!.copper = 100;
     sim.meta(b)!.copper = 50;
     sim.addItem('baked_bread', 1, b);
+    const breadA = sim.countItem('baked_bread', a);
+    const breadB = sim.countItem('baked_bread', b);
 
     sim.tradeRequest(b, a);
     sim.tradeAccept(b);
@@ -931,8 +933,8 @@ describe('trading', () => {
     expect(sim.tradeFor(a)).toBe(null);
     expect(sim.countItem('wolf_fang', a)).toBe(1);
     expect(sim.countItem('wolf_fang', b)).toBe(2);
-    expect(sim.countItem('baked_bread', a)).toBe(1);
-    expect(sim.countItem('baked_bread', b)).toBe(0);
+    expect(sim.countItem('baked_bread', a)).toBe(breadA + 1);
+    expect(sim.countItem('baked_bread', b)).toBe(breadB - 1);
     expect(sim.meta(a)?.copper).toBe(100 - 30 + 10);
     expect(sim.meta(b)?.copper).toBe(50 - 10 + 30);
   });
@@ -1174,7 +1176,7 @@ describe('the new dungeons', () => {
     sim.leaveDungeon(a);
     expect(dist2d(ea.pos, { x: 45, y: 0, z: 515 })).toBeLessThan(10);
 
-    teleport(sim, a, 0, 876);
+    teleport(sim, a, 0, 858);
     sim.enterDungeon('gravewyrm_sanctum', a);
     expect(ea.pos.x).toBeGreaterThan(2000); // index-2 band
     const slot2 = sim.instanceSlotAt(ea.pos)!;
@@ -1183,7 +1185,7 @@ describe('the new dungeons', () => {
     expect(korzul).toBeTruthy();
     expect(korzul.level).toBe(20);
     sim.leaveDungeon(a);
-    expect(dist2d(ea.pos, { x: 0, y: 0, z: 880 })).toBeLessThan(10);
+    expect(dist2d(ea.pos, { x: 0, y: 0, z: 858 })).toBeLessThan(10);
   });
 
   it('Velkhar summons add waves at hp thresholds and Korgath enrages below 30%', () => {
@@ -1222,5 +1224,68 @@ describe('the new dungeons', () => {
     korgath.hp = Math.floor(korgath.maxHp * 0.25);
     sim.tick();
     expect(korgath.enraged).toBe(true);
+  });
+});
+
+describe('dungeon difficulty slash command', () => {
+  it('lets a leader switch normal and heroic without using dev commands', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Lead');
+    const member = sim.addPlayer('mage', 'Mage');
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+
+    sim.drainEvents();
+    sim.chat('/dungeon heroic', member);
+    expect(sim.dungeonDifficulty(leader)).toBe('normal');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (e) => e.type === 'error' && e.pid === member && e.text === 'You are not the party leader.',
+      ),
+    ).toBe(true);
+
+    sim.chat('/dungeon heroic', leader);
+    expect(sim.dungeonDifficulty(member)).toBe('heroic');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (e) =>
+          e.type === 'error' && e.pid === leader && e.text === 'Dungeon difficulty set to Heroic.',
+      ),
+    ).toBe(true);
+
+    sim.chat('/dungeon normal', leader);
+    expect(sim.dungeonDifficulty(member)).toBe('normal');
+  });
+
+  it('routes the /instances and /dungeons aliases, case-insensitively', () => {
+    const sim = makeWorld();
+    const p = sim.addPlayer('warrior', 'Solo');
+
+    sim.chat('/instances heroic', p);
+    expect(sim.dungeonDifficulty(p)).toBe('heroic');
+    sim.chat('/dungeons normal', p);
+    expect(sim.dungeonDifficulty(p)).toBe('normal');
+    sim.chat('/DUNGEON HEROIC', p);
+    expect(sim.dungeonDifficulty(p)).toBe('heroic');
+  });
+
+  it('the /dungeon readout reports the current selection and how to change it', () => {
+    const sim = makeWorld();
+    const p = sim.addPlayer('warrior', 'Solo');
+
+    sim.drainEvents();
+    sim.chat('/dungeon', p);
+    let texts = (sim.drainEvents() as any[])
+      .filter((e) => e.type === 'error' && e.pid === p)
+      .map((e) => e.text);
+    expect(texts).toContain('Dungeon difficulty: Normal. Use /dungeon heroic to change it.');
+
+    sim.chat('/dungeon heroic', p);
+    sim.drainEvents();
+    sim.chat('/dungeon', p);
+    texts = (sim.drainEvents() as any[])
+      .filter((e) => e.type === 'error' && e.pid === p)
+      .map((e) => e.text);
+    expect(texts).toContain('Dungeon difficulty: Heroic. Use /dungeon normal to change it.');
   });
 });

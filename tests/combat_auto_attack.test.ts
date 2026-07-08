@@ -16,6 +16,7 @@ import {
 } from '../src/sim/combat/auto_attack';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 
@@ -185,7 +186,7 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     p.swingTimer = 0;
     const events = capture(sim);
     updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(p.swingTimer).toBeGreaterThan(0); // reset to ranged.speed * swingIntervalMult (at fire time)
+    expect(p.swingTimer).toBeGreaterThan(0); // reset to the weapon's speed * swingIntervalMult (at fire time)
     landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
   });
@@ -209,6 +210,58 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     p.swingTimer = 1;
     updatePlayerAutoAttack(sim.ctx, p, meta);
     expect(p.swingTimer).toBeLessThan(1); // the decrement runs before the !autoAttack bail
+  });
+});
+
+describe('auto_attack Auto Shot scales off the equipped weapon (ranged DPS)', () => {
+  // A hunter has no separate ranged slot, so Auto Shot fires with the equipped
+  // weapon: its cadence follows the weapon's speed (not the class ranged speed),
+  // and its damage follows the weapon's damage range (its DPS), on top of the
+  // agility-driven ranged attack power.
+  it('arms the cadence from the equipped weapon speed, not the class ranged speed', () => {
+    const { sim, p, meta } = makeSim('hunter', 20);
+    spawnDummy(sim, p, 20, 20); // beyond the 8yd dead zone, within 35
+    // A deliberately slow bow, distinct from the class ranged speed (2.3).
+    p.weapon = { min: 40, max: 60, speed: 4 };
+    p.rangedHaste = 0;
+    p.autoAttack = true;
+    p.swingTimer = 0;
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(p.swingTimer).toBeCloseTo(4 * sim.swingIntervalMult(p));
+    // and NOT the old class-fixed 2.3 cadence
+    expect(p.swingTimer).not.toBeCloseTo(2.3 * sim.swingIntervalMult(p));
+  });
+
+  it('a heavier-hitting weapon yields a bigger Auto Shot than a weak one', () => {
+    const shoot = (weaponMin: number, weaponMax: number): number => {
+      const { sim, p, meta } = makeSim('hunter', 20, 3);
+      const mob = spawnDummy(sim, p, 1, 20); // far below level -> floored miss chance
+      mob.armor = 0; // isolate the weapon-damage signal from armor mitigation
+      p.critChance = 0; // no crit variance
+      p.weapon = { min: weaponMin, max: weaponMax, speed: 2 };
+      p.autoAttack = true;
+      const events = capture(sim);
+      let best = 0;
+      // fire several shots so at least one lands past the floored miss chance
+      for (let s = 0; s < 12; s++) {
+        p.swingTimer = 0;
+        updatePlayerAutoAttack(sim.ctx, p, meta);
+        landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+      }
+      for (const e of events) {
+        if (e.type === 'damage' && e.ability === 'Auto Shot' && e.kind === 'hit') {
+          best = Math.max(best, e.amount ?? 0);
+        }
+      }
+      return best;
+    };
+    const weak = shoot(2, 4);
+    const strong = shoot(300, 320);
+    expect(weak).toBeGreaterThan(0);
+    // The heavy weapon hits far harder. (Both shots share the same agility-driven
+    // ranged AP floor, and only part of the weapon roll carries to a shot, so the
+    // ratio is well below the raw weapon-damage ratio, but still large.)
+    expect(strong).toBeGreaterThan(weak * 3);
   });
 });
 
@@ -315,5 +368,83 @@ describe('startAutoAttack while casting (the aggro-before-damage bug)', () => {
     startAutoAttack(sim.ctx, p.id);
     expect(mob.aiState).not.toBe('idle');
     expect(p.inCombat).toBe(true);
+  });
+});
+
+// Pins RANGED_WEAPON_COEFF (0.6) at the DAMAGE level, not just profile selection:
+// a fixed-roll weapon (min == max) and a hand-set rangedPower make every landed
+// hit exact, so dropping the coefficient, or applying it to wands, changes the
+// number and fails here. Misses (amount 0) and crits (x2) are asserted around it.
+describe('rangedSwing damage: the 0.6 weapon coefficient is Auto Shot only', () => {
+  it('a hunter shot lands at 0.6 x weapon roll + the AP term', () => {
+    const { sim, p } = makeSim('hunter', 20);
+    const mob = spawnDummy(sim, p, 5, 8);
+    mob.stats = { ...mob.stats, armor: 0 }; // no armor mitigation: keeps the hit exact
+    p.rangedPower = 140; // AP term: (140 / 14) x speed 2 = 20
+    const events = capture(sim);
+    for (let i = 0; i < 60; i++) rangedSwing(sim.ctx, p, mob, { min: 100, max: 100, speed: 2 });
+    for (let i = 0; i < 400 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    const hits = events.filter(
+      (e) => e.type === 'damage' && e.ability === 'Auto Shot' && e.kind === 'hit',
+    );
+    expect(hits.length).toBeGreaterThan(10);
+    expect(hits.some((h) => !h.crit)).toBe(true);
+    // 0.6 x 100 + 20 = 80 (would be 120 with the coefficient dropped)
+    for (const h of hits) expect(h.amount).toBe(h.crit ? 160 : 80);
+  });
+
+  it('a wand bolt lands at the FULL weapon roll (no coefficient)', () => {
+    const { sim, p } = makeSim('mage', 20);
+    const mob = spawnDummy(sim, p, 5, 8);
+    p.rangedPower = 140; // same AP term as above, isolating the coefficient arm
+    const events = capture(sim);
+    for (let i = 0; i < 60; i++)
+      rangedSwing(sim.ctx, p, mob, { min: 100, max: 100, speed: 2, wand: true, school: 'arcane' });
+    for (let i = 0; i < 400 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    const hits = events.filter(
+      (e) => e.type === 'damage' && e.ability === 'Wand' && e.kind === 'hit',
+    );
+    expect(hits.length).toBeGreaterThan(10);
+    expect(hits.some((h) => !h.crit)).toBe(true);
+    // 100 + 20 = 120 (would be 80 if the 0.6 leaked onto wands)
+    for (const h of hits) expect(h.amount).toBe(h.crit ? 240 : 120);
+  });
+});
+
+// A hunter's Auto Shot strikes with the equipped mainhand, so an on-hit weapon proc
+// (Thronebane's Chain Arc, trigger 'weaponHit') must fire from a ranged shot too, not
+// just a melee swing. A caster's wand bolt does NOT swing the mainhand, so it never
+// rolls the mainhand's proc.
+describe('rangedSwing fires weaponHit procs (Thronebane on a hunter Auto Shot)', () => {
+  const chainArcs = (events: Ev[]) =>
+    events.filter((e) => e.type === 'damage' && e.ability === 'Chain Arc' && e.school === 'nature');
+
+  it('a hunter wielding Thronebane procs Chain Arc off Auto Shot', () => {
+    const { sim, p } = makeSim('hunter', 20);
+    const mob = spawnDummy(sim, p, 1, 20); // far below level -> floored miss chance
+    mob.stats = { ...mob.stats, armor: 0 };
+    p.mainhandItemId = 'kingsbane_last_oath'; // Thronebane: 10% weaponHit Chain Arc
+    p.critChance = 0;
+    const events = capture(sim);
+    for (let i = 0; i < 200; i++) rangedSwing(sim.ctx, p, mob, { min: 50, max: 50, speed: 2.8 });
+    for (let i = 0; i < 800 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    // over ~200 landed shots at a 10% proc, the seeded run lands multiple arcs
+    expect(chainArcs(events).length).toBeGreaterThan(0);
+    expect(chainArcs(events)[0].amount).toBe(42); // Chain Arc primary damage
+  });
+
+  it('a wand caster wielding Thronebane never rolls the mainhand proc off a bolt', () => {
+    const { sim, p } = makeSim('mage', 20);
+    const mob = spawnDummy(sim, p, 1, 15);
+    p.mainhandItemId = 'kingsbane_last_oath';
+    const events = capture(sim);
+    for (let i = 0; i < 200; i++)
+      rangedSwing(sim.ctx, p, mob, { min: 50, max: 50, speed: 1.8, wand: true, school: 'arcane' });
+    for (let i = 0; i < 800 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    expect(chainArcs(events).length).toBe(0);
   });
 });

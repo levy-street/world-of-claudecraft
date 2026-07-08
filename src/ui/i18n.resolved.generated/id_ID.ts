@@ -308,10 +308,19 @@ export const id_ID: EnTranslations = {
       "autorun": "Lari Otomatis",
       "jump": "Lompat",
       "leaderboard": "Peringkat",
+      "dailyRewards": "Hadiah",
       "nameplates": "Nama",
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",
-      "toggleHaptics": "Alihkan haptik"
+      "toggleHaptics": "Alihkan haptik",
+      "hotbarPage": "Kemampuan",
+      "hotbarPageAria": "Tampilkan rangkaian kemampuan berikutnya",
+      "actionRing": "Aksi tempur",
+      "actionPageToggle": "Ganti halaman tindakan",
+      "actionPageIndicator": "Hal. {page}",
+      "targetCycle": "Tukar sasaran",
+      "targetCycleShort": "Target",
+      "spellbookPageLabel": "Halaman {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
@@ -360,7 +369,9 @@ export const id_ID: EnTranslations = {
       "hoursMinutes": "{h}j {m}mnt",
       "minutes": "{m}mnt",
       "lessThanMinute": "<1mnt",
-      "lockedToast": "Anda terkunci pada {raid}. Terbuka dalam {time}."
+      "lockedToast": "Anda terkunci pada {raid}. Terbuka dalam {time}.",
+      "heroicName": "{name} Heroik",
+      "heroicLocked": "Anda terkunci pada {name} Heroik."
     },
     "compass": {
       "N": "U",
@@ -382,11 +393,149 @@ export const id_ID: EnTranslations = {
       "emoteWheel": "Roda Emote",
       "targetFriendly": "Bidik Sekutu Terdekat",
       "targetFriendlyNext": "Putar Bidikan Sekutu",
-      "discord": "Discord"
+      "discord": "Discord",
+      "valecup": "Piala Lembah"
+    },
+    "vcup": {
+      "title": "Piala Lembah",
+      "shootPower": "TENAGA",
+      "close": "Tutup jendela Piala Lembah",
+      "offlineNote": "Buku jadwal sedang tutup. Piala Lembah tidak tersedia saat ini.",
+      "recordLine": "Rekormu: {wins} menang, {losses} kalah, {draws} imbang.",
+      "bracketsAria": "Format pertandingan",
+      "bracketLabel": "{n}v{n}",
+      "waitingCount": "{count} menunggu",
+      "nationsHeading": "Negeri panji",
+      "nation": {
+        "vale": "Lembah Eastbrook",
+        "mirefen": "Mirefen",
+        "thornpeak": "Thornpeak",
+        "coliseum": "Koloseum Abu",
+        "choir": "Paduan Suara Pucat",
+        "ogre": "Klan Ogre",
+        "moon": "Bulan Pucat",
+        "copperdig": "Galian Tembaga"
+      },
+      "awayNote": "Jika kedua tim mengibarkan panji yang sama, tim tandang memakai palet warna terbalik.",
+      "rolesHeading": "Peran olahraga",
+      "role": {
+        "allrounder": {
+          "name": "Serba Bisa",
+          "desc": "Serba bisa: tendang, sepak jauh, dan benturan bahu yang adil."
+        },
+        "striker": {
+          "name": "Penyerang",
+          "desc": "Hidup untuk tendangan jauh dan gerak elak cepat."
+        },
+        "sweeper": {
+          "name": "Penyapu",
+          "desc": "Membenturkan pelari menjauh dari bola dan menyapunya jauh-jauh."
+        },
+        "keeper": {
+          "name": "Kiper",
+          "desc": "Menjaga kotak gawang dengan tangkapan, terjunan, dan sepakan jauh."
+        }
+      },
+      "queue": "Masuk Antrean",
+      "leaveQueue": "Keluar dari Antrean",
+      "queueNote": "Mengantrelah dari mana saja; peluit akan memanggilmu ke Sowfield.",
+      "queuedStatus": "Mengantre untuk {bracket}: posisi {position} dari {count}.",
+      "blockNation": "Pilih negeri panji dulu.",
+      "blockPartySize": "Format itu membutuhkan party yang lebih kecil.",
+      "blockNotLeader": "Hanya pemimpin party yang bisa mengantrekan tim.",
+      "inMatchNote": "Timmu sedang di lapangan. Teruskan permainan!",
+      "deserterNote": "Sang Penjaga Lapangan mengingatnya. Kamu boleh mengantre lagi dalam {seconds} detik.",
+      "liveHeading": "Kini di Sowfield",
+      "liveAria": "Piala Lembah: {nationA} {scoreA}, {nationB} {scoreB}",
+      "walkUp": "Datanglah ke Sowfield untuk menonton dari tribun.",
+      "noLive": "Lapangan sunyi. Tak ada pertandingan yang berlangsung.",
+      "boardHeading": "Papan pemenang",
+      "boardEmpty": "Belum ada pemenang tercatat. Ember Tembaga menanti.",
+      "boardWins": "{count} kemenangan",
+      "enterAsGuild": "Masuk di bawah panji {guild}",
+      "guildRecordLine": "Rekor guild-mu: {wins} menang, {losses} kalah.",
+      "guildBoardHeading": "Panji guild",
+      "guildBoardEmpty": "Belum ada guild yang turun ke lapangan. Kibarkan panjimu!",
+      "guildBoardWl": "{wins} M, {losses} K",
+      "practice": "Latihan vs. Bot",
+      "practiceNote": "Langsung memulai pertandingan bot pribadi di lapangan latihanmu sendiri.",
+      "practicingNow": "Sedang berlatih ({count}):",
+      "clock": "{minutes}.{seconds}",
+      "indicatorQueued": "Antrean Piala Lembah: {bracket}, posisi {position} dari {count}",
+      "indicatorLive": "Piala Lembah",
+      "indicatorOpen": "Buka jendela Piala Lembah",
+      "phaseCountdown": "Sepak mula dalam {seconds}",
+      "phaseGoal": "GOL!",
+      "phaseGolden": "GOL EMAS",
+      "phaseOver": "PELUIT PANJANG",
+      "bannerFound": "Piala Lembah memanggil: {nationA} vs {nationB}!",
+      "bannerCountdown": "Sepak mula dalam {seconds}...",
+      "bannerKickoff": "SEPAK MULA!",
+      "bannerGoal": "GOL! {nation} mencetak gol!",
+      "bannerSave": "{name} MENEPIS!",
+      "bannerGolden": "GOL EMAS: gol berikutnya menang!",
+      "bannerEnd": "Peluit panjang: {nationA} {scoreA}, {nationB} {scoreB}",
+      "bannerWin": "Kemenangan di Sowfield!",
+      "bannerDraw": "Imbang di Sowfield.",
+      "bannerLoss": "Kekalahan di Sowfield.",
+      "logQueued": "Kamu masuk antrean Piala Lembah untuk {bracket} (posisi {position}).",
+      "logUnqueued": "Kamu keluar dari antrean Piala Lembah.",
+      "logFound": "Pertandingan Piala Lembah-mu sudah siap: {nationA} vs {nationB}.",
+      "logRoster": "Timmu: {allies}. Tim lawan: {enemies}.",
+      "logGoal": "{name} mencetak gol untuk {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
+      "logSave": "{name} melakukan penyelamatan!",
+      "logWin": "Kamu memenangkan laga di Sowfield.",
+      "logDraw": "Laga di Sowfield berakhir imbang.",
+      "logLoss": "Kamu kalah dalam laga di Sowfield.",
+      "gossipOpen": "Buku jadwal pertandingan",
+      "gossipOpenAria": "Buka jendela Piala Lembah",
+      "mobileLabel": "Piala",
+      "briefing": {
+        "subtitle": "Pengarahan prapertandingan",
+        "vs": "vs",
+        "rulesHeading": "Cara bermain",
+        "rule1": "Tendang atau umpan bola ke gawang lawan untuk mencetak gol.",
+        "rule2": "Yang pertama mencetak 5 gol menang, atau yang golnya terbanyak saat peluit panjang berbunyi.",
+        "rule3": "Skor imbang saat peluit panjang berlanjut ke gol emas: gol berikutnya menang.",
+        "rule4": "Tekel hanya membuatmu terjungkal. Tak ada yang terluka di bawah gencatan panen.",
+        "rule5": "Siapa pun bisa datang dan menyemangatimu dari tribun.",
+        "kitHeading": "Perangkatmu",
+        "kitNote": "Gerakan-gerakan ini menggantikan kemampuan kelasmu selama pertandingan.",
+        "rosterHeading": "Susunan pemain",
+        "you": "Kamu",
+        "bot": "Bot",
+        "ready": "Aku siap",
+        "readyDone": "Siap",
+        "readyAria": "Nyatakan siap untuk sepak mula",
+        "waiting": "Menunggu tim lawan menyatakan siap...",
+        "whistle": "Peluit berbunyi dalam {seconds} dtk.",
+        "readyCount": "{ready} dari {total} siap"
+      },
+      "bet": {
+        "title": "Taruhan Pertandingan",
+        "aria": "Taruhan pertandingan Piala Lembah",
+        "closesIn": "Taruhan ditutup dalam {seconds} dtk",
+        "closed": "Taruhan ditutup",
+        "prize": "Pundi {amount}",
+        "splitAria": "Porsi pundi taruhan pada tiap tim",
+        "expand": "Lihat taruhan dan pasang",
+        "collapse": "Sembunyikan taruhan",
+        "oddsLabel": "Bayaran",
+        "back": "Dukung {team}",
+        "form": "{wins}M-{losses}K",
+        "mine": "Taruhanmu: {amount} pada {team}",
+        "none": "Kamu belum bertaruh di pertandingan ini.",
+        "record": "Rekor taruhan: {wins}M-{losses}K, {sign}{net}",
+        "wonBanner": "Taruhanmu menang!",
+        "wonLog": "Taruhan Piala Lembah-mu menang: {amount} dikembalikan.",
+        "lostLog": "Taruhan Piala Lembah-mu kalah: {amount}.",
+        "refundLog": "Taruhan dibatalkan, uang taruhanmu sebesar {amount} dikembalikan."
+      }
     },
     "options": {
       "clickMoveLeft": "Klik Kiri",
       "clickMoveRight": "Klik Kanan",
+      "version": "v{version} ({build})",
       "browserEffects": "Efek Peramban",
       "browserEffectsAuto": "Otomatis",
       "browserEffectsFull": "Penuh",
@@ -418,7 +567,9 @@ export const id_ID: EnTranslations = {
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
-      "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian"
+      "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
+      "mobileCameraJoystick": "Joystick kamera",
+      "mobileLeftHanded": "Tata letak kidal"
     },
     "controller": {
       "title": "Kontroler",
@@ -469,7 +620,9 @@ export const id_ID: EnTranslations = {
         "fps01Low": "0,1% Terendah",
         "ping": "Ping",
         "jitter": "Jitter",
+        "predLead": "Jarak Prediksi",
         "snapshot": "Laju Snapshot",
+        "serverTick": "Laju Tick Server",
         "connection": "Koneksi",
         "drawCalls": "Panggilan Gambar",
         "triangles": "Segitiga",
@@ -512,7 +665,9 @@ export const id_ID: EnTranslations = {
     "statInfo": {
       "fromYour": "Dari {value} {stat} Anda:",
       "names": {
-        "spellPower": "Kekuatan Mantra"
+        "spellPower": "Kekuatan Mantra",
+        "critRating": "Rating Kritis",
+        "hasteRating": "Rating Kecepatan"
       },
       "desc": {
         "str": "Meningkatkan daya serang Anda, sehingga serangan senjata Anda menghantam lebih keras.",
@@ -525,7 +680,9 @@ export const id_ID: EnTranslations = {
         "spellPower": "Meningkatkan kerusakan mantra dan kekuatan penyembuhanmu. Setiap poin Kecerdasan memberi sedikit Kekuatan Mantra, di atas apa pun dari perlengkapan atau buff.",
         "dps": "Perkiraan kerusakan senjata Anda per detik, menggabungkan kerusakan dan kecepatan senjata dengan daya serang Anda.",
         "critChance": "Peluang serangan Anda menghantam secara kritis, memberikan kerusakan ganda.",
-        "dodge": "Peluang Anda untuk sepenuhnya menghindari serangan jarak dekat, tanpa menerima kerusakan."
+        "dodge": "Peluang Anda untuk sepenuhnya menghindari serangan jarak dekat, tanpa menerima kerusakan.",
+        "critRating": "Rating kritis dari perlengkapan dan bonus set Anda, menaikkan peluang serangan kritis Anda. Sekitar 10 rating memberi 1% kritis.",
+        "hasteRating": "Rating kecepatan dari perlengkapan dan bonus set Anda, mempercepat serangan dan rapalan mantra Anda. Sekitar 10 rating memberi 1% kecepatan."
       },
       "effects": {
         "attackPower": "+{value} Daya Serang",
@@ -565,6 +722,15 @@ export const id_ID: EnTranslations = {
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
+    },
+    "itemProc": {
+      "onMeleeHit": "Peluang saat memukul ({chance}%): {effect}",
+      "onSpellDamage": "Peluang saat mantra kerusakanmu ({chance}%): {effect}",
+      "onHeal": "Peluang saat penyembuhanmu ({chance}%): {effect}",
+      "chainArc": "menghantam target dengan {name} {school} ({damage}) yang melompat ke {jumps} musuh terdekat dengan kerusakan yang kian melemah",
+      "attackSlow": "dan memperlambat kecepatan serangan target sebesar {pct}% selama {duration} dtk",
+      "dot": "menjangkitkan {name}, kerusakan berkala {school} yang memberikan {total} selama {duration} dtk",
+      "hot": "memekarkan {name}, penyembuhan berkala yang memulihkan {total} selama {duration} dtk"
     },
     "questShare": {
       "notShareable": "Misi ini tidak dapat dibagikan.",
@@ -736,6 +902,32 @@ export const id_ID: EnTranslations = {
       "summaryMaster": "Pengaturan Jarahan: Jarahan Utama, Penjarah Utama {name}, ambang {threshold}.",
       "summaryGroup": "Pengaturan Jarahan: Jarahan Kelompok."
     },
+    "corpseHarvest": {
+      "title": "Panen",
+      "harvestButton": "Panen",
+      "concentrateHint": "Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.",
+      "alreadyHarvested": "Bangkai ini sudah dipanen.",
+      "componentAria": "Panen {component}",
+      "components": {
+        "hide": "Kulit",
+        "fang": "Taring",
+        "silk": "Sutra",
+        "venomSac": "Kantung Bisa",
+        "gills": "Insang",
+        "claw": "Cakar",
+        "horn": "Tanduk",
+        "tusk": "Gading"
+      }
+    },
+    "townFocus": {
+      "title": "Fokus Kota",
+      "hint": "Poin fokus menambahkan bonus di atas hasil dasar setiap komponen. Komponen tanpa fokus tetap pada hasil dasar.",
+      "budgetLabel": "Sisa poin: {remaining} / {budget}",
+      "saveButton": "Simpan Fokus",
+      "notInTownHint": "Kamu harus berada di kota untuk mengatur fokusmu.",
+      "increaseAria": "Tambah fokus pada {component}",
+      "decreaseAria": "Kurangi fokus pada {component}"
+    },
     "party": {
       "promoteLeader": "Angkat jadi Pemimpin",
       "inviteUsage": "Mengundang siapa? Penggunaan: /invite <name>."
@@ -751,7 +943,13 @@ export const id_ID: EnTranslations = {
       "leaderOption": "Penjarah Utama: Pemimpin (Anda)",
       "masterOption": "Penjarah Utama: {name}"
     },
+    "dungeonDifficulty": {
+      "setHeroic": "Atur Kesulitan Dungeon: Heroik",
+      "setNormal": "Atur Kesulitan Dungeon: Normal"
+    },
     "bags": {
+      "cannotDestroy": "Item ini tidak dapat dihancurkan.",
+      "rightClickDestroy": "Klik kanan untuk menghancurkan",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -815,10 +1013,19 @@ export const id_ID: EnTranslations = {
         "allStats": "Reduce todos los atributos en {value}"
       },
       "allStatsPctReduce": "Mengurangi semua atribut sebesar {pct}%",
+      "increasePct": {
+        "ap": "Increases attack power by {pct}%",
+        "armor": "Increases armor by {pct}%",
+        "int": "Increases Intellect by {pct}%",
+        "sta": "Increases Stamina by {pct}%",
+        "allStats": "Increases all attributes by {pct}%"
+      },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
+      "armorPct": "Reduces armor by {pct}%",
+      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -967,6 +1174,7 @@ export const id_ID: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Dev Inti",
         "devs": "Pengembang",
         "mods": "Moderator",
         "artists": "Seniman"
@@ -1108,6 +1316,50 @@ export const id_ID: EnTranslations = {
         "takeParcelsFirst": "Keluarkan bingkisannya dulu sebelum membuang surat itu."
       }
     },
+    "bank": {
+      "title": "Bank",
+      "subtitle": "Brankas Bersepuh Emas",
+      "close": "Tutup bank",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Slot bank terpakai: {used} dari {total}",
+      "empty": "Bankmu kosong.",
+      "tooFar": "Kamu harus berada di dekat bankir untuk melihat bankmu.",
+      "buySlots": "Beli {count} slot",
+      "buySlotsMaxed": "Sudah diperluas penuh",
+      "buyConfirm": "Beli {count} slot bank tambahan seharga {price}?",
+      "buyConfirmAccept": "Beli",
+      "withdrawHint": "Klik untuk menarik",
+      "withdrawPartialHint": "Shift-klik untuk menarik sebagian",
+      "depositHint": "Klik untuk menyetor",
+      "depositPartialHint": "Shift-klik untuk menyetor sebagian",
+      "cannotDeposit": "Tidak dapat disimpan di bank",
+      "depositQuantityTitle": "Setor {item}",
+      "depositQuantityInput": "Jumlah yang disetor",
+      "depositQuantityConfirm": "Setor",
+      "withdrawQuantityTitle": "Tarik {item}",
+      "withdrawQuantityInput": "Jumlah yang ditarik",
+      "withdrawQuantityConfirm": "Tarik",
+      "filterGroupAria": "Saring bank menurut kategori",
+      "sortAria": "Urutkan barang bank",
+      "searchAria": "Cari barang bank menurut nama",
+      "depositAll": "Setor semua bahan",
+      "depositAllDone": "Bahan disetor: {count}.",
+      "depositAllFull": "Bahan disetor: {count}. Bank kini penuh.",
+      "depositAllNone": "Bank penuh: tidak ada yang disetor.",
+      "bonusTitle": "Slot bonus",
+      "bonusEarned": "+{count}",
+      "bonusStatusEarned": "+{count}",
+      "bonusSourceEmail": "Email terverifikasi",
+      "bonusSourceDiscord": "Discord tertaut",
+      "bonusSourceWallet": "Dompet tertaut",
+      "bonusSourceReferral": "Teman yang dirujuk",
+      "bonusAdvertEmail": "Verifikasi emailmu untuk mendapat 2 slot.",
+      "bonusAdvertDiscord": "Tautkan Discord-mu untuk mendapat 2 slot.",
+      "bonusAdvertWallet": "Tautkan dompet untuk mendapat 2 slot.",
+      "bonusReferralProgress": "{count}/{cap}",
+      "bonusReferralExplainer": "Undang seorang teman: saat ia mencapai level 10, kalian masing-masing mendapat 2 slot, hingga 5 teman.",
+      "bonusSectionAria": "Slot bank bonus dan cara mendapat lebih banyak"
+    },
     "calendar": {
       "title": "Kalender Acara",
       "close": "Tutup kalender",
@@ -1169,6 +1421,128 @@ export const id_ID: EnTranslations = {
     "social": {
       "lastSeen": "Terakhir terlihat: {when}",
       "lastSeenNever": "tidak pernah"
+    },
+    "gathering": {
+      "title": "Pengumpulan",
+      "mining": "Penambangan",
+      "logging": "Penebangan",
+      "herbalism": "Herbalisme"
+    },
+    "archetypeTitle": {
+      "label": "Gelar",
+      "none": "Tidak Ada",
+      "armorcrafting": "Pandai Zirah",
+      "weaponcrafting": "Pandai Senjata",
+      "jewelcrafting": "Perajin Permata",
+      "alchemy": "Alkemis",
+      "engineering": "Insinyur",
+      "cooking": "Koki",
+      "inscription": "Juru Tulis",
+      "enchanting": "Pemantra",
+      "tailoring": "Penjahit",
+      "leatherworking": "Perajin Kulit"
+    },
+    "crafting": {
+      "title": "kerajinan",
+      "close": "Tutup kerajinan",
+      "craft": "Keahlian",
+      "reagentsNeeded": "Memerlukan:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Belum ada resep yang diketahui.",
+      "resultAria": "Kerajinan {name}",
+      "craftedToast": "Dibuat: {name}",
+      "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
+      "unknownRecipe": "Resep itu tidak ada.",
+      "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu."
+    }
+  },
+  "apiError": {
+    "validation": {
+      "failed": "Beberapa kolom tidak valid. Periksa formulir lalu coba lagi."
+    },
+    "json": {
+      "malformed": "Permintaan itu tidak dapat dibaca. Silakan coba lagi."
+    },
+    "body": {
+      "too_large": "Permintaan itu terlalu besar. Coba lagi dengan data yang lebih sedikit.",
+      "unsupported_media_type": "Format permintaan tidak didukung."
+    },
+    "db": {
+      "conflict": "Perubahan itu berbenturan dengan pembaruan lain. Silakan coba lagi."
+    },
+    "rate_limit": {
+      "exceeded": "Terlalu banyak permintaan. Coba lagi dalam {seconds}."
+    },
+    "internal": {
+      "error": "Terjadi kesalahan di pihak kami. Silakan coba lagi."
+    },
+    "auth": {
+      "token_missing": "Anda harus masuk untuk melakukan itu.",
+      "token_invalid": "Sesi Anda telah kedaluwarsa. Silakan masuk lagi.",
+      "forbidden": "Anda tidak memiliki izin untuk melakukan itu.",
+      "invalid_credentials": "Nama pengguna atau kata sandi salah.",
+      "required": "Belum terautentikasi.",
+      "web_login_only": "Masuk hanya diperbolehkan dari klien permainan.",
+      "too_many_attempts": "Terlalu banyak percobaan. Tunggu semenit lalu coba lagi.",
+      "too_many_failed_attempts": "Terlalu banyak percobaan gagal. Tunggu beberapa menit lalu coba lagi.",
+      "current_password_incorrect": "Kata sandi Anda saat ini salah.",
+      "password_incorrect": "Kata sandi Anda salah.",
+      "verification_failed": "Verifikasi gagal. Silakan coba lagi."
+    },
+    "account": {
+      "username_invalid": "Nama pengguna harus 3-24 karakter dan menggunakan huruf, angka, atau garis bawah.",
+      "username_not_allowed": "Nama pengguna itu tidak diperbolehkan.",
+      "username_taken": "Nama pengguna itu sudah dipakai.",
+      "username_mismatch": "Nama pengguna itu tidak cocok dengan akun Anda.",
+      "password_too_short": "Kata sandi harus minimal 6 karakter.",
+      "password_too_long": "Kata sandi baru harus maksimal 128 karakter.",
+      "characters_online": "Keluarkan semua karakter Anda sebelum menonaktifkan akun.",
+      "deactivated": "Akun ini telah dinonaktifkan. Hubungi admin untuk memulihkannya.",
+      "not_found": "Akun tidak ditemukan."
+    },
+    "character": {
+      "name_invalid": "Nama karakter tidak valid. Gunakan 2-16 huruf.",
+      "name_not_allowed": "Nama karakter itu tidak diperbolehkan.",
+      "invalid_class": "Kelas tidak valid.",
+      "limit_reached": "Batas karakter telah tercapai.",
+      "name_taken": "Nama itu sudah dipakai.",
+      "not_found": "Karakter tidak ditemukan.",
+      "online": "Karakter sedang daring.",
+      "rename_not_permitted": "Mengganti nama karakter ini tidak diperbolehkan.",
+      "delete_confirm": "Ketik nama karakter untuk mengonfirmasi penghapusan.",
+      "already_in_world": "Karakter sudah berada di dalam dunia.",
+      "taken_over": "Karakter Anda telah diambil alih oleh sesi lain.",
+      "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia."
+    },
+    "moderation": {
+      "suspended_until": "Akun ini ditangguhkan hingga {date}.",
+      "suspended": "Akun ini ditangguhkan.",
+      "banned": "Akun ini telah diblokir.",
+      "force_rename": "Seorang moderator mengharuskan salah satu karakter Anda diganti namanya."
+    },
+    "email": {
+      "invalid": "Masukkan alamat email yang valid.",
+      "unchanged": "Itu sudah menjadi alamat email Anda."
+    },
+    "two_factor": {
+      "code_invalid": "Kode itu tidak valid, coba lagi.",
+      "setup_required": "Mulai penyiapan autentikasi dua-faktor terlebih dahulu.",
+      "already_enabled": "Autentikasi dua-faktor sudah diaktifkan.",
+      "not_enabled": "Autentikasi dua-faktor belum diaktifkan."
+    },
+    "origin": {
+      "cross_site": "Permintaan diblokir karena alasan keamanan."
+    },
+    "discord": {
+      "not_configured": "Integrasi Discord tidak tersedia saat ini.",
+      "expired": "Proses masuk Discord itu telah kedaluwarsa. Silakan masuk dengan Discord lagi.",
+      "already_linked": "Akun Discord itu sudah tertaut ke akun lain.",
+      "password_required": "Atur kata sandi sebelum memutus tautan akun Discord Anda.",
+      "unknown_swag": "Hadiah itu tidak tersedia.",
+      "link_required": "Tautkan akun Discord Anda terlebih dahulu.",
+      "swag_claimed": "Anda sudah mengklaim hadiah ini.",
+      "swag_tier": "Capai peringkat yang lebih tinggi untuk mengklaim ini.",
+      "swag_points": "Poin tidak cukup."
     }
   },
   "guide": {
@@ -1186,6 +1560,7 @@ export const id_ID: EnTranslations = {
       "bestiary": "Bestiari",
       "models": "Model 3D",
       "gear": "Perlengkapan & Barang",
+      "professions": "Profesi",
       "economy": "Ekonomi & Perdagangan",
       "social": "Sosial & Kelompok",
       "stats": "Karakter & Statistik",
@@ -1196,9 +1571,11 @@ export const id_ID: EnTranslations = {
       "delves": "Delve",
       "reference": "Rujukan",
       "controls": "Kontrol",
+      "settings": "Pengaturan & Kinerja",
       "combat": "Pertarungan",
       "talents": "Talent",
       "arena": "Arena & PvP",
+      "valeCup": "Piala Lembah",
       "glossary": "Glosarium",
       "wishIKnew": "Hal yang Andai Kuketahui",
       "faq": "FAQ",
@@ -1363,6 +1740,66 @@ export const id_ID: EnTranslations = {
       "mobileBody": "Kontrol sentuh muncul secara otomatis di ponsel dan tablet: tuas gerak di sebelah kiri, seret di mana saja di sebelah kanan untuk melihat sekeliling, dan tombol di layar untuk kemampuan serta menu kamu.",
       "controllerHeading": "Di kontroler",
       "controllerBody": "Gamepad juga berfungsi, dan dukungan kontroler aktif secara bawaan. Tuas kiri untuk bergerak, tuas kanan untuk mengarahkan kamera, dan tombol muka serta bahu menangani kemampuanmu, melompat, dan berinteraksi. Buka jendela mana pun untuk memunculkan penunjuk di layar bagi menu. Kamu bisa memetakan ulang tombol dan menyetel deadzone tuas, kecepatan kamera, getaran, serta arah pandang terbalik dari pengaturan kontroler di opsi."
+    },
+    "settingsPage": {
+      "heading": "Pengaturan & Kinerja",
+      "intro": "Jadikan game terlihat terbaik atau berjalan paling cepat. Tiga pemuatan siap pakai, ditambah fungsi sebenarnya dari setiap opsi grafis.",
+      "wherePath": "Segala sesuatu di halaman ini ada di dalam game: tekan Esc dan lihat di Grafik, Antarmuka, dan Hamparan Kinerja.",
+      "fairnessTitle": "Adil berdasarkan desain",
+      "fairnessBody": "Tidak ada pilihan di sini yang menukar keindahan dengan kekuasaan. Pengaturan Lower hanya menghilangkan polesan kosmetik, tidak pernah informasi yang Anda lawan: debuff, cast bar, kesehatan party, dan jumlah kerusakan Anda identik dari Low hingga Ultra. Bermain di mesin sederhana tidak pernah menjadi kendala.",
+      "loadoutsHeading": "Tiga pemuatan siap pakai",
+      "loadoutsIntro": "Mulailah dari loadout yang terdengar seperti mesin Anda, lalu sesuaikan opsi satu per satu hingga dirasa tepat.",
+      "recommended": "Direkomendasikan",
+      "whyLabel": "Mengapa ini berhasil:",
+      "tagReload": "setelah memuat ulang",
+      "fpsTitle": "FPS terbaik",
+      "fpsTagline": "Untuk laptop lama, grafis terintegrasi, dan permainan baterai.",
+      "fpsWhy": "Kualitas Grafis adalah saklar utama, dan Kualitas Render adalah penggeser terkuat: pada 70%, dunia menggambar sekitar setengah piksel sementara antarmuka tetap sangat tajam.",
+      "balancedTitle": "Seimbang",
+      "balancedTagline": "Titik terbaik untuk sebagian besar mesin, dan saran default kami.",
+      "balancedWhy": "Medium menghadirkan bayangan nyata dan materi lengkap; High menambahkan oklusi dan mekar sekitar. Di bawah Ultra, jaring pengaman internal menyerap penurunan tiba-tiba dalam pertarungan yang sibuk, sehingga Balanced tetap mulus tanpa harus menjaga anak.",
+      "visualsTitle": "Visual Terbaik",
+      "visualsTagline": "Mode tangkapan layar untuk mesin desktop yang tangguh.",
+      "visualsWhy": "Ultra ditampilkan pada resolusi tertinggi yang ditawarkan layar Anda dengan pencahayaan paling kaya. Ini juga menonaktifkan jaring pengaman, dan hanya untuk desktop: ponsel dan aplikasi berada pada posisi teratas di High.",
+      "value50to70": "50 hingga 70%",
+      "value90to100": "90 hingga 100%",
+      "value100": "100%",
+      "valueHighOrMedium": "High di PC gaming, Medium di laptop",
+      "valueOnOptional": "Aktif (opsional)",
+      "howHeading": "Bagaimana pilihan berperilaku",
+      "factDetectTitle": "Permainan ini menyetel dirinya sendiri terlebih dahulu",
+      "factDetectBody": "Pada peluncuran pertama Anda, game membaca perangkat Anda dan memilih tingkatan yang masuk akal, dari Low di ponsel sederhana hingga Ultra di desktop yang kuat. Pilihan apa pun yang Anda buat sendiri selalu menang.",
+      "factReloadTitle": "Dua macam pilihan",
+      "factReloadBody": "Kualitas Grafis dan Pemilih tingkat lanjut berlaku setelah memuat ulang, dan panel menawarkan tombol Muat Ulang Sekarang bila diperlukan. Setiap opsi lainnya berlaku saat Anda mengubahnya.",
+      "factGovernorTitle": "Jaring pengaman bawaan",
+      "factGovernorBody": "Di setiap tingkatan di bawah Ultra, game secara diam-diam menipiskan rumput, efek, dan pencahayaan sesaat ketika pertarungan besar terjadi, lalu memulihkannya. Memilih Ultra menunjukkan bahwa Anda lebih suka menyimpan setiap detail.",
+      "advancedHeading": "Prasetel Lanjutan: campur sendiri",
+      "advancedBody": "Lanjutan dimulai dari tingkat High dan membuka empat pemetik tambahan, sehingga Anda dapat menggunakan bingkai di tempat yang benar-benar Anda sadari: Detail Medan, Kepadatan Dedaunan, Efek & Pencahayaan, dan Kualitas Bayangan. Seperti Kualitas Grafis, ini berlaku setelah memuat ulang.",
+      "advancedMixes": "Dua campuran favorit: pertahankan Kualitas Bayangan pada High dan atur Efek & Pencahayaan ke Low untuk tampilan tajam dan bebas cahaya yang menyala, atau lakukan sebaliknya untuk menjaga mekarnya dan melembutkan bayangan.",
+      "tableHeading": "Setiap pilihan, jelaskan",
+      "colSetting": "Pengaturan",
+      "colDoes": "Apa fungsinya",
+      "colImpact": "FPS dampak",
+      "impactNone": "Tidak ada",
+      "impactLight": "Lampu",
+      "impactModerate": "Sedang",
+      "impactHeavy": "Berat",
+      "rowGraphicsQuality": "Saklar utama. Setiap langkah mengubah resolusi, bayangan, material, dedaunan, dan efek pencahayaan secara bersamaan. Perbedaan terbesar yang dapat Anda buat.",
+      "rowRenderQuality": "Menggambar dunia 3D pada resolusi internal yang lebih rendah dan meningkatkannya; antarmuka tetap tajam. Penggeser instan terkuat pada mesin yang lebih lemah dan layar resolusi tinggi.",
+      "rowFieldOfView": "Seberapa banyak bagian dunia yang dapat ditampilkan di layar, mulai dari zoom 55 hingga 100 derajat. Pilihan kenyamanan; pandangan yang lebih luas menarik sedikit lebih banyak.",
+      "rowBrightness": "Eksposur pemandangan, lebih gelap atau lebih terang. Preferensi murni.",
+      "rowWeather": "Hujan dan salju sekitar. Hanya atmosfer saja, dan mematikannya akan menghemat sedikit saat terjadi badai.",
+      "rowBrowserEffects": "Betapa mewahnya antarmuka itu sendiri: kaca buram, cahaya, menu animasi. Otomatis cocok dengan browser Anda; dunia 3D tidak tersentuh.",
+      "rowTerrainDetail": "Tekstur tanah yang kaya dan tercampur versus tampilan medan yang lebih sederhana dan lebih cepat.",
+      "rowFoliageDensity": "Seberapa jauh dan lebatnya rumput yang tumbuh di sekitar karakter Anda.",
+      "rowEffectsQuality": "Mekar, oklusi sekitar, dan berapa banyak obor dan mantra yang menghasilkan cahaya nyata. Penghematan terbesar di antara para pemilih Tingkat Lanjut.",
+      "rowShadowQuality": "Kerenyahan bayangan. Low mempertahankan bayangan tetapi memperhalus tepinya.",
+      "rowFrostedPanels": "Kaca buram kabur di balik jendela. Cantik, dan efek yang persis seperti yang dirasakan oleh browser yang lebih lemah; biarkan saja untuk tampilan klasik yang tajam.",
+      "rowReduceMotion": "Menghapus animasi antarmuka sehingga jendela muncul seketika. Opsi aksesibilitas terlebih dahulu, dengan bonus kinerja kecil.",
+      "rowPerfOverlay": "Pembacaan FPS di layar, waktu frame, dan banyak lagi. Aktifkan saat Anda menyetel halaman ini, lalu sembunyikan lagi.",
+      "tableFoot": "Mencari penggeser jarak imbang atau penutup FPS? Tidak ada yang perlu diburu: jarak pandang adalah bagian dari setiap tingkat kualitas, dan kecepatan bingkai mengikuti tampilan Anda.",
+      "mobileTitle": "Di ponsel dan tablet",
+      "mobileBody": "Seluler mengelola lebih banyak hal untuk Anda: game memilih tingkatan, menjaga resolusi sedikit lebih rendah untuk melindungi baterai dan panas, dan mempertahankan tingkatan tertinggi hanya untuk desktop. Pemuatan di atas masih berlaku; ponsel cukup top out di High."
     },
     "combat": {
       "intro": "Pertarungan mengikuti aturan MMO klasik yang familier. Kamu tak perlu mempelajari semuanya untuk bermain baik, ini sekadar gambaran cara kerja pertarungan.",
@@ -1789,10 +2226,38 @@ export const id_ID: EnTranslations = {
       "waveGoldBody": "Gelombang tengah: kombo bermata dua tempat rakitanmu mulai terbentuk dan berpadu.",
       "wavePrismaticTitle": "Prismatik",
       "wavePrismaticBody": "Gelombang terakhir: lonjakan penentu-rakitan yang melelehkan layar, dirancang terasa konyol dengan cara terbaik.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Penguat di dalam arena",
       "powerupsBody": "Bola bercahaya juga jatuh ke arena di tengah pertarungan, bebas bagi siapa pun yang meraihnya lebih dulu. Sengaja dibuat berlebihan dan hanya bertahan sebentar: Speed Demon untuk laju membutakan sekejap, Colossus untuk membengkak menjadi raksasa lamban, Moon Boots untuk lompatan memantul gravitasi rendah, dan Berserker untuk lonjakan amarah mendadak.",
       "ladderHeading": "Menaiki tangga peringkat",
       "ladderBody": "Permainan berperingkat melacak kedudukanmu dari waktu ke waktu. Lihat papan peringkat untuk mengetahui posisimu dan siapa yang memuncaki realm."
+    },
+    "valeCupPage": {
+      "heading": "Piala Lembah",
+      "intro": "Bola babi hutan di Sowfield: pilih panji, pilih peran, dan tendang kulit babi hutan berisi jerami melewati kiper demi Ember Tembaga. Tanpa darah, tanpa jarahan, hanya gemuruh tribun.",
+      "loreHeading": "Bola babi hutan dan gencatan panen",
+      "loreOldSow": "Jauh sebelum orang mati terbangun, buruh tani Eastbrook bermain bola babi hutan di ladang jerami usai panen: dua gerombolan, satu kulit babi hutan berisi jerami, dan dua gerbang pedati yang diseret ke kedua ujung lapangan hijau. Bola pertama, Si Induk Tua, digantung berlapis perunggu di atas perapian kedai.",
+      "loreTruce": "Ketika Koloseum Abu mulai merestui permainan perang, Marsekal Redbrook menjawab dengan sesuatu yang lebih lembut: gencatan panen tetap di lapangan hijau tua itu. Gerbang pedati menjadi tiang gawang, lapangan hijau itu mendapat tembok, tribun, dan sebuah nama, Sowfield, dan hadiahnya selalu sama, ember susu penyok yang dipakai minum para pemenang: Ember Tembaga.",
+      "howHeading": "Cara bermain",
+      "howQueue": "Masuk antrean dari mana saja lewat jendela Piala Lembah, atau bicaralah dengan Penjaga Lapangan Bram di gerbang Sowfield. Pilih format dari satu lawan satu hingga lima lawan lima, sebuah negeri panji, dan peran olahraga; masuk antrean sendirian atau bawa party-mu.",
+      "howMatch": "Saat sepak mula, perangkat kelasmu ditukar dengan perangkat olahraga dan dikembalikan persis seperti semula setelahnya. Tendangan mengarah ke retikel di tanah, bola memantul dari papan pembatas, dan menggiring bola hanyalah berlari bersama bola. Cetak gol lebih banyak dari lawan sebelum waktu habis; hasil imbang berlanjut ke gol emas.",
+      "howTruce": "Tak ada yang berdarah di Sowfield: tekel hanya membuat terjungkal, tak ada yang terluka, dan peliharaan menunggu di luar lapangan.",
+      "spectateBody": "Satu pertandingan berlangsung pada satu waktu di stadion, dan siapa pun bisa datang menonton dari tribun.",
+      "nationsHeading": "Delapan negeri panji",
+      "nationsBody": "Setiap tim bermain di bawah sebuah panji. Kapten memilih negerinya, dan jika kedua tim mengibarkan panji yang sama, tim tandang memakai palet warna terbalik.",
+      "nationVale": "Hijau dan emas, mengibarkan berkas gandum: tim tuan rumah, buruh tani sejati.",
+      "nationMirefen": "Toska dan kelabu di bawah burung bangau: sabar, berkaki panjang, tak pernah terburu-buru.",
+      "nationThornpeak": "Biru es dan putih di bawah puncak gunung: berpijak mantap dan keras kepala.",
+      "nationColiseum": "Merah dan hitam dengan pedang bersilang: mereka bermain seakan ini masih permainan perang.",
+      "nationChoir": "Biru pucat dan perak di bawah lonceng: menyeramkan, presisi, dan sangat pendiam.",
+      "nationOgre": "Jingga dan cokelat tua di balik kepalan: bahu duluan, dan bangga akan itu.",
+      "nationMoon": "Ungu dan perak di bawah bulan sabit: pemain malam, ringan langkahnya.",
+      "nationCopperdig": "Tembaga dan cokelat dengan beliung: para penggali yang tak pernah berhenti berlari.",
+      "rolesHeading": "Peran olahraga",
+      "rolesBody": "Peranmu menentukan perangkat yang kau bawa ke lapangan. Semua orang menendang; sisanya soal watak.",
+      "rewardsHeading": "Aturan gencatan",
+      "rewardsBody": "Aturan gencatan berarti tanpa pengalaman dan tanpa jarahan: pertandingan yang tuntas dihitung ke dalam rekormu dan papan pemenang, dan poin hadiah harian ikut serta. Meninggalkan pertandingan membekukan slotmu, dan Sang Penjaga Lapangan mengingatnya."
     },
     "wishPage": {
       "heading": "Hal-hal yang andai kuketahui dulu",
@@ -1878,6 +2343,35 @@ export const id_ID: EnTranslations = {
       "cosmeticsCache": "Beberapa di antaranya berasal dari peti kosmetik misterius, sebuah hadiah tersegel yang mengundi satu dari tiga tingkat kualitas saat kamu membukanya dan menganugerahkan penampilan yang sesuai. Ini murni untuk penampilan: tak ada di dalamnya yang membuatmu lebih kuat, hanya lebih elok dipandang.",
       "cosmeticsApply": "Atur penampilan aktifmu dari baris penampilan di layar karaktermu, dan berganti dengan bebas di antara semua yang telah kamu buka."
     },
+    "professions": {
+      "intro": "Di luar pertempuran dan misi, dunia mengganjarmu karena menggarap tanah dan tempaan: mengumpulkan bahan mentah, mengolahnya menjadi perlengkapan di stasiun kriya sepuluh kerajinan berbeda, dan menetap dalam identitas sebagai salah satu dari sepuluh arketipe yang diwakili kerajinan-kerajinan itu.",
+      "gatherTitle": "Pengumpulan: Penambangan, Penebangan, dan Herbalisme",
+      "gatherIntro": "Tiga profesi pengumpulan memungkinkanmu menarik bahan mentah langsung dari dunia: Penambangan memahat bijih dan batu dari urat tambang, Penebangan merobohkan kayu dari rumpun pohon, dan Herbalisme memetik herba serta tanaman liar. Masing-masing dicatat terpisah, jadi menekuni satu tak pernah memperlambat kemajuanmu di yang lain.",
+      "gatherWhatTitle": "Simpul sumber daya",
+      "gatherWhatBody": "Urat bijih, rumpun kayu, dan petak herba ditempatkan di zona-zona sebagai objek yang terlihat dan tak bertuan. Dekati satu dan berinteraksilah untuk memanen isinya. Setelah kamu memanen sebuah simpul, simpul itu butuh waktu untuk pulih sebelum kamu pribadi bisa memanennya lagi, tapi itu tak pernah menghalangi orang lain: pemain lain bisa memanen simpul yang sama sementara itu.",
+      "gatherProficiencyTitle": "Kecakapan dan mutu bahan",
+      "gatherProficiencyBody": "Setiap panen yang berhasil menumbuhkan kecakapanmu di profesi pengumpulan itu. Kecakapan yang lebih tinggi menggeser hasil yang kamu tarik dari sebuah simpul ke mutu bahan yang lebih langka, dari yang umum ke atas, meski mutu paling langka tetap langka bahkan pada kecakapan tinggi. Lebih banyak latihan tak pernah merugikan peluangmu, hanya memperbaikinya.",
+      "gatherToolsTitle": "Perkakas kerja",
+      "gatherToolsBody": "Pedagang menjual perkakas dasar untuk tiap profesi pengumpulan, dan yang lebih baik bisa dibuat, jadi menggarap simpul sumber daya dimaksudkan terasa makin cakap seiring perlengkapanmu membaik, bukan diam di tempat. Perkakas tingkat lebih tinggi adalah jalan yang dimaksudkan untuk membuka simpul yang lebih kaya dan menggarapnya lebih efisien sepanjang sesi yang panjang.",
+      "craftTitle": "Sepuluh kerajinan",
+      "craftIntro": "Sepuluh kerajinan mengubah bahan yang terkumpul menjadi perlengkapan dan barang jadi: Penempaan Zirah, Penempaan Senjata, dan Kriya Permata membentuk bahan mentah menjadi perlengkapan yang bisa dikenakan; Alkimia dan Rekayasa berjalan lewat coba-coba; Memasak, Inskripsi, dan Pemantraan masing-masing menyentuh hasil kerajinan lain; Menjahit dan Pengolahan Kulit bekerja dari pola yang persis. Bersama-sama semuanya membentuk sebuah roda, dengan tiap kerajinan duduk di samping dua tetangga dan berseberangan dengan satu kerajinan lain.",
+      "craftRingTitle": "Roda spesialisasi",
+      "craftRingBody": "Sepuluh kerajinan tersusun dalam lingkaran tetap, dan posisi sebuah kerajinan di lingkaran itu penting: kerajinan yang bersebelahan di roda punya lebih banyak kesamaan satu sama lain dibanding kerajinan di sisi berlawanan. Berkomitmen pada satu kerajinan dimaksudkan terasa seperti bergabung dengan keluarga kerajinan serumpun, bukan memilih keterampilan yang terpencil.",
+      "craftRecipesTitle": "Resep dan reagen",
+      "craftRecipesBody": "Setiap kerajinan punya resepnya sendiri, masing-masing membutuhkan reagen tertentu yang kamu kumpulkan atau beli. Resep paling dasar di tiap kerajinan hanya meminta bahan umum dan bisa dibuat sejak awal, jadi kamu bisa mulai menekuni sebuah kerajinan begitu mengambilnya, tanpa menunggu untuk membukanya.",
+      "craftMasteryTitle": "Keahlian dan penguasaan",
+      "craftMasteryBody": "Berhasil membuat barang menumbuhkan keahlianmu di kerajinan itu, dan resep yang lebih kaya terkunci di balik keahlian yang lebih tinggi: resep dasar terbuka untuk semua orang, sementara resep yang makin maju menuntut penguasaan yang makin tinggi untuk dicoba. Menumbuhkan keahlian dalam sebuah kerajinan adalah jalan dari barang pemula sederhana menuju resep-resepnya yang lebih ambisius.",
+      "craftComboTitle": "Resep kombinasi",
+      "craftComboBody": "Di luar daftar resep tiap kerajinan, roda ini juga mendukung resep kombinasi yang memakai dua kerajinan bertetangga sekaligus, mengganjar karakter (atau sepasang mitra dagang) yang menekuni kerajinan bersebelahan di lingkaran alih-alih satu kerajinan secara terpisah.",
+      "archetypeTitle": "Sepuluh arketipe",
+      "archetypeIntro": "Masing-masing dari sepuluh kerajinan juga mewakili sebuah arketipe, identitas yang lebih luas yang bisa kamu sandang di luar sekadar menekuni kerajinannya. Arketipe aktifmu adalah satu pilihan pada satu waktu, bukan daftar centang: kamu menyandang satu, dan bisa menggantinya kelak jika mau.",
+      "archetypeChooseTitle": "Memilih arketipemu",
+      "archetypeChooseBody": "Kamu menyatakan arketipe pertamamu melalui misi cerita awal di zona satu yang secara resmi menerimamu ke dalam identitas itu. Sebelum misi itu selesai, kamu sama sekali belum memilih arketipe.",
+      "archetypeSwitchTitle": "Berubah pikiran",
+      "archetypeSwitchBody": "Menyatakan sebuah arketipe sekali tidak mengikatmu selamanya. Berpindah ke arketipe lain berarti lebih dulu menyelesaikan misi \"menebus kesalahan\" yang dapat diulang untuk arketipe lamamu, dan setiap kali kamu berpindah, tebusan yang diminta berikutnya sedikit lebih berat, sehingga berpindah tetap bermakna, bukan tanpa harga.",
+      "archetypeIdentityTitle": "Makna arketipemu",
+      "archetypeIdentityBody": "Arketipe aktifmu adalah pernyataan tentang siapa karaktermu di dunia, terlihat dari cara orang lain dan dunia menyapamu. Hadiah dan pengakuan pastinya masih dirampungkan; tengok kembali seiring sistem ini dilengkapi."
+    },
     "economy": {
       "intro": "Koin melumasi seluruh dunia: ia membeli perlengkapanmu, persediaan, dan perlengkapan perjalanan, serta berpindah tangan antarpemain. Kamu mengumpulkan semua ini hanya dengan bermain, jadi anggaplah halaman ini sebagai peta dari mana uangmu datang dan ke mana ia pergi.",
       "coinTitle": "Emas, perak, dan tembaga",
@@ -1886,6 +2380,10 @@ export const id_ID: EnTranslations = {
       "vendorsBody": "Kota dan pos terdepan bertaburan pedagang, masing-masing dengan dagangannya sendiri. Penyedia perbekalan menjual makanan dan minuman, pandai senjata dan pembuat zirah menjajakan perlengkapan, dan seorang juru bekal menyimpan perlengkapan perjalanan yang praktis. Hampirilah salah satunya untuk melihat apa yang mereka jual.",
       "marksTitle": "Mata uang kedua: Tanda Delve",
       "marksBody": "Koin bukan satu-satunya yang kamu simpan. Delve membayar Tanda Delve, mata uang terpisah yang hanya kamu belanjakan di penjaga delve, untuk peningkatan pendamping dan perlengkapan yang tak akan kamu temukan di tempat lain. Tanda ini tak pernah bercampur dengan koinmu.",
+      "bankTitle": "Bank",
+      "bankBody": "Setiap kota pusat memiliki cabang Brankas Bersepuh Emas, rumah perbankan realm ini. Bicaralah dengan bendahara di sana untuk membuka lemari besimu, ruang simpanan pribadi di luar tasmu yang dimiliki karaktermu seumur hidup. Apa pun yang kamu titipkan pada mereka menunggu dengan aman, di cabang mana pun yang kamu kunjungi berikutnya.",
+      "bankHow": "Saat lemari besi terbuka, klik sebuah barang di tasmu untuk menyetorkannya dan klik barang itu di lemari besi untuk mengambilnya kembali. Lemari besi hanya menampung barang, tidak pernah koin, dan barang misi tetap bersamamu. Saat tasmu penuh di tengah perjalanan, satu tombol menyapu semua bahan kerajinanmu masuk sekaligus.",
+      "bankSlots": "Lemari besi yang baru mulai dari ukuran kecil dan tumbuh bersamamu. Bendahara menjual slot tambahan dengan koin pada harga yang kian menanjak, dan bermain online memberi ruang bonus di atasnya, untuk hal-hal seperti email terverifikasi, akun tertaut, dan teman yang kamu ajak masuk ke dalam permainan.",
       "buyingTitle": "Membeli dan menjual",
       "buyingBody": "Berdirilah di dekat seorang pedagang untuk membuka jendelanya. Kamu bisa membeli apa pun yang mereka jual jika kamu mampu, dan menjual sebagian besar isi tasmu untuk koin. Jika kamu menjual sesuatu secara tidak sengaja, penjaja akan menyimpan penjualan terakhirmu agar kamu bisa membelinya kembali.",
       "junkTitle": "Membereskan barang rongsokan",
@@ -2507,7 +3005,11 @@ export const id_ID: EnTranslations = {
   },
   "download": {
     "title": "Unduh Peluncur Desktop",
-    "desc": "Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh."
+    "desc": "Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh.",
+    "macCta": "Unduh untuk macOS",
+    "linuxCta": "Unduh untuk Linux",
+    "linuxHint": "AppImage: membuatnya dapat dieksekusi, lalu jalankan. Tidak perlu instalasi.",
+    "windowsPending": "Build Windows tertunda."
   },
   "comingSoon": {
     "placeholder": "Segera Hadir...",
@@ -2955,6 +3457,10 @@ export const id_ID: EnTranslations = {
     },
     "closeAria": "Tutup"
   },
+  "heroicShop": {
+    "balance": "Tanda Heroik: {count}",
+    "buyAria": "Beli {item} seharga {marks} Tanda Heroik"
+  },
   "delveUi": {
     "board": {
       "title": "Papan Delve",
@@ -3149,6 +3655,45 @@ export const id_ID: EnTranslations = {
     },
     "chest": {
       "flavor": "Para mati telah menyerahkan apa yang bisa mereka relakan."
+    }
+  },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "Join Protect Yumi!",
+    "queue": {
+      "join": "You join the Protect Yumi queue. Guard your familiar…",
+      "leave": "You leave the Protect Yumi queue.",
+      "teamLeave": "Your team leaves the Protect Yumi queue."
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
+      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+    },
+    "log": {
+      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+    },
+    "hud": {
+      "title": "PROTECT YUMI",
+      "getReady": "Get ready…",
+      "teleportIn": "Yumis move in {s}",
+      "suddenDeath": "SUDDEN DEATH",
+      "yourYumi": "Your Yumi",
+      "enemyYumi": "Enemy Yumi",
+      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
+      "collapse": "Collapse the Protect Yumi bars",
+      "expand": "Expand the Protect Yumi bars"
+    },
+    "respawn": {
+      "title": "DOWNED!"
+    },
+    "banner": {
+      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
+      "teleport": "The Yumis teleport!"
+    },
+    "end": {
+      "win": "VICTORY! Yumi is safe!",
+      "loss": "DEFEAT! Your Yumi has fallen."
     }
   },
   "fiesta": {
@@ -3347,6 +3892,7 @@ export const id_ID: EnTranslations = {
     "rendererFailed": "Tidak bisa memulai perender: coba muat ulang. {error}",
     "enterTimeout": "Tidak bisa masuk dunia. Koneksi kehabisan waktu. Apakah server gim berjalan?",
     "connectionLost": "Koneksi ke server terputus.",
+    "reconnecting": "Koneksi terputus. Menyambungkan kembali...",
     "connectionRejected": "Server menutup koneksi."
   },
   "errors": {
@@ -3379,9 +3925,12 @@ export const id_ID: EnTranslations = {
       "webLoginOnly": "Masuk hanya diperbolehkan dari klien permainan.",
       "accountSuspended": "Akun ini ditangguhkan hingga {date}.",
       "alreadyInWorld": "Karakter sudah berada di dalam dunia.",
+      "accountSessionLimit": "Terlalu banyak karakter dari akun ini yang sudah berada di dalam dunia.",
       "takenOver": "Karakter Anda telah diambil alih oleh sesi lain.",
       "renameBeforeEntering": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
-      "renameNotPermitted": "Mengganti nama karakter ini tidak diperbolehkan."
+      "renameNotPermitted": "Mengganti nama karakter ini tidak diperbolehkan.",
+      "unsupportedMediaType": "Format permintaan tidak didukung.",
+      "crossSiteOrigin": "Permintaan diblokir karena alasan keamanan."
     }
   },
   "desktop": {
@@ -4243,12 +4792,14 @@ export const id_ID: EnTranslations = {
     "slots": {
       "mainhand": "Tangan Utama",
       "helmet": "Helm",
+      "neck": "Leher",
       "shoulder": "Bahu",
       "chest": "Dada",
       "waist": "Pinggang",
       "legs": "Tungkai",
       "gloves": "Sarung Tangan",
-      "feet": "Kaki"
+      "feet": "Kaki",
+      "ring": "Jari"
     },
     "quality": {
       "poor": "Buruk",
@@ -4447,30 +4998,71 @@ export const id_ID: EnTranslations = {
       "needAria": "Butuh untuk {item}",
       "greedAria": "Tamak untuk {item}",
       "passAria": "Lewati {item}",
-      "everyonePassed": "Semua orang melewatkan {item}."
+      "everyonePassed": "Semua orang melewatkan {item}.",
+      "rolled": "{answered}/{total} rolled"
     }
   },
   "entities": {
     "abilities": {
+      "sport_kick": {
+        "name": "Tendang",
+        "description": "Tendang bola menyusur tanah ke arah titik bidik."
+      },
+      "sport_shoot": {
+        "name": "Tembak",
+        "description": "Tahan untuk mengumpulkan tenaga, lepaskan untuk menembak ke gawang. Tenaga berlebih membuat bola melambung lewat."
+      },
+      "sport_pass": {
+        "name": "Umpan",
+        "description": "Gulirkan umpan mantap ke rekan setim yang kau bidik, mendahului arah larinya."
+      },
+      "sport_boot": {
+        "name": "Tendangan Jauh",
+        "description": "Tendangan lambung jauh ke arah titik bidik. Penonton menyukainya."
+      },
+      "sport_hoof": {
+        "name": "Sapu Jauh",
+        "description": "Hantam bola rendah dan keras ke depan lapangan."
+      },
+      "sport_punt": {
+        "name": "Sepakan Jauh",
+        "description": "Tendangan lambung kiper, tinggi dan jauh."
+      },
+      "sport_feint": {
+        "name": "Tipuan",
+        "description": "Gerakan mengelak cepat ke arah titik bidik."
+      },
+      "sport_dive": {
+        "name": "Terjun",
+        "description": "Lemparkan dirimu ke arah titik bidik. Bola yang melintas akan menempel padamu."
+      },
+      "sport_shoulder": {
+        "name": "Benturan Bahu",
+        "description": "Benturan bahu yang adil ala gencatan panen. Membuat lawan terjungkal menjauh dari bola."
+      },
+      "sport_second_wind": {
+        "name": "Kaki Segar",
+        "description": "Temukan kembali tenagamu: bergerak 50% lebih cepat selama 4 detik."
+      },
       "flamestrike": {
         "name": "Hantaman Api",
         "description": "Memanggil ledakan api di area sasaran, memberikan {damage} kerusakan Api kepada musuh yang terkena ledakan."
       },
       "rain_of_fire": {
         "name": "Hujan Api",
-        "description": "Menurunkan hujan api di area sasaran, membakar musuh sebesar {damage} kerusakan Api."
+        "description": "Menurunkan hujan api di area sasaran selama 4 detik, membakar musuh sebesar {damage} kerusakan Api setiap detik."
       },
       "volley": {
         "name": "Hujan Panah",
-        "description": "Menghujani area sasaran dengan panah, memberi {damage} kerusakan kepada musuh di dalamnya."
+        "description": "Menghujani area sasaran dengan panah selama 3 detik, memberi {damage} kerusakan setiap 0.5 detik kepada musuh di dalamnya."
       },
       "hurricane": {
         "name": "Badai",
-        "description": "Mendatangkan badai di area sasaran, menghantam musuh sebesar {damage} kerusakan Alam."
+        "description": "Mendatangkan badai di area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap detik."
       },
       "earthquake": {
         "name": "Gempa Bumi",
-        "description": "Mengguncang area sasaran, menghantam musuh sebesar {damage} kerusakan Alam."
+        "description": "Mengguncang area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap 1.5 detik."
       },
       "heroic_strike": {
         "name": "Serangan Perampas",
@@ -4478,15 +5070,15 @@ export const id_ID: EnTranslations = {
       },
       "battle_shout": {
         "name": "Raungan Besi",
-        "description": "Meningkatkan daya serangmu sebesar 20 selama 2 menit."
+        "description": "Meningkatkan daya serangmu sebesar {buff} selama 2 menit."
       },
       "commanding_shout": {
         "name": "Seruan Penguat",
-        "description": "Meningkatkan Staminamu sebesar 6 selama 2 menit."
+        "description": "Meningkatkan Staminamu sebesar {buff} selama 2 menit."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar 30 selama 30 detik."
+        "description": "Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar {buff} selama 30 detik."
       },
       "charge": {
         "name": "Serbuan",
@@ -4494,7 +5086,7 @@ export const id_ID: EnTranslations = {
       },
       "rend": {
         "name": "Sayatan Dalam",
-        "description": "Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama 9 detik."
+        "description": "Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama {duration} detik."
       },
       "thunder_clap": {
         "name": "Pukulan Gempa",
@@ -4502,7 +5094,7 @@ export const id_ID: EnTranslations = {
       },
       "hamstring": {
         "name": "Sayatan Pincang",
-        "description": "Melukai musuh sebesar 5 kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik."
+        "description": "Melukai musuh sebesar {damage} kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik."
       },
       "bloodrage": {
         "name": "Tumbal Darah",
@@ -4510,7 +5102,7 @@ export const id_ID: EnTranslations = {
       },
       "overpower": {
         "name": "Redhand",
-        "description": "Serangan seketika sebesar kerusakan senjata +5. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan."
+        "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan."
       },
       "execute": {
         "name": "Ajal Dini",
@@ -4530,7 +5122,7 @@ export const id_ID: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Robek Zirah",
-        "description": "Membelah zirah target, menguranginya sebesar {damage} per penerapan. Bertumpuk hingga 5 kali. Menghasilkan ancaman dalam jumlah tinggi."
+        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
       },
       "taunt": {
         "name": "Hasutan",
@@ -4542,11 +5134,11 @@ export const id_ID: EnTranslations = {
       },
       "frost_armor": {
         "name": "Mantel Embun Beku",
-        "description": "Menyelubungimu dengan embun beku, meningkatkan zirah sebesar 30 selama 30 menit."
+        "description": "Menyelubungimu dengan embun beku, meningkatkan zirah sebesar {buff} selama 30 menit."
       },
       "arcane_intellect": {
         "name": "Wawasan Aether",
-        "description": "Meningkatkan Kecerdasan sebesar 2 selama 30 menit."
+        "description": "Meningkatkan Kecerdasan sebesar {buff} selama 30 menit."
       },
       "frostbolt": {
         "name": "Rimelance",
@@ -4570,7 +5162,7 @@ export const id_ID: EnTranslations = {
       },
       "polymorph": {
         "name": "Guna-guna",
-        "description": "Mengubah musuh menjadi katak hingga 15 detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid."
+        "description": "Mengubah musuh menjadi katak hingga {duration} detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid."
       },
       "frost_nova": {
         "name": "Icebind",
@@ -4590,7 +5182,7 @@ export const id_ID: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Selubung Beku",
-        "description": "Melindungimu dengan es, menyerap 130 kerusakan selama 60 detik."
+        "description": "Melindungimu dengan es, menyerap {damage} kerusakan selama 60 detik."
       },
       "sinister_strike": {
         "name": "Tebasan Keji",
@@ -4598,7 +5190,7 @@ export const id_ID: EnTranslations = {
       },
       "eviscerate": {
         "name": "Tidur Abadi",
-        "description": "Gerakan penutup yang menimbulkan kerusakan per poin kombo."
+        "description": "Gerakan penutup yang menyebabkan {damage}."
       },
       "backstab": {
         "name": "Tusukan Pengecut",
@@ -4606,7 +5198,7 @@ export const id_ID: EnTranslations = {
       },
       "gouge": {
         "name": "Colok Mata",
-        "description": "Menyerang target, melumpuhkannya selama 4 detik. Kerusakan apa pun mematahkan efeknya. Memberi 1 poin kombo."
+        "description": "Menyerang target sebesar {damage} kerusakan, melumpuhkannya selama 4 detik. Kerusakan apa pun mematahkan efeknya. Memberi 1 poin kombo."
       },
       "evasion": {
         "name": "Ghostfoot",
@@ -4638,11 +5230,11 @@ export const id_ID: EnTranslations = {
       },
       "garrote": {
         "name": "Kawat Leher",
-        "description": "Menjerat musuh, menimbulkan kerusakan sekarang dan membuatnya berdarah sebesar {damage} selama 18 detik. Harus dalam siluman. Memberi 1 poin kombo."
+        "description": "Menjerat musuh, menimbulkan {damage} kerusakan sekarang dan membuatnya berdarah sebesar {overTime} selama 18 detik. Harus dalam siluman. Memberi 1 poin kombo."
       },
       "cheap_shot": {
         "name": "Pukulan Ulu Hati",
-        "description": "Menyerang target, menyetrumnya selama 4 detik. Harus dalam siluman. Memberi 2 poin kombo."
+        "description": "Menyerang target sebesar {damage} kerusakan, menyetrumnya selama 4 detik. Harus dalam siluman. Memberi 2 poin kombo."
       },
       "sap": {
         "name": "Bius",
@@ -4650,11 +5242,11 @@ export const id_ID: EnTranslations = {
       },
       "crippling_poison": {
         "name": "Bisa Timah",
-        "description": "Menyerang target dengan bisa timah, menimbulkan {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik."
+        "description": "Menyerang target dengan bisa timah, memberi {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik."
       },
       "expose_armor": {
         "name": "Tembus Zirah",
-        "description": "Gerakan penutup yang menyingkap target, mengurangi zirahnya. Semakin banyak poin kombo yang dihabiskan, semakin dalam sayatannya."
+        "description": "Gerakan penutup yang menyingkap target, mengurangi zirahnya sebesar {damage} selama 30 detik."
       },
       "rupture": {
         "name": "Kehabisan Darah",
@@ -4678,7 +5270,7 @@ export const id_ID: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Oathbrand",
-        "description": "Memenuhi dirimu dengan kekuatan Suci selama 30 detik, membuat setiap ayunan jarak dekatmu memberikan 4 kerusakan Suci tambahan. Lepaskan dengan Vonis."
+        "description": "Memenuhi dirimu dengan kekuatan Suci selama 30 detik, membuat setiap ayunan jarak dekatmu memberikan {damage} kerusakan Suci tambahan. Lepaskan dengan Vonis."
       },
       "holy_light": {
         "name": "Cahaya Pemulih",
@@ -4686,7 +5278,7 @@ export const id_ID: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Aura Teguh",
-        "description": "Meningkatkan zirahmu sebesar 40 selama 30 menit."
+        "description": "Meningkatkan zirahmu sebesar {buff} selama 30 menit."
       },
       "judgement": {
         "name": "Vonis",
@@ -4694,19 +5286,19 @@ export const id_ID: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Sumpah Besi",
-        "description": "Menempatkan sebuah Berkah pada target sekutu, meningkatkan daya serang sebesar 15 selama 5 menit."
+        "description": "Menempatkan sebuah Berkah pada target sekutu, meningkatkan daya serang sebesar {buff} selama 5 menit."
       },
       "divine_protection": {
         "name": "Tameng Iman",
-        "description": "Perisai pelindung menyerap 50 kerusakan selama 10 detik."
+        "description": "Perisai suci menyerap {damage} kerusakan selama 10 detik."
       },
       "hammer_of_justice": {
         "name": "Palu Pembelah",
-        "description": "Membuat target terpana selama 3 detik."
+        "description": "Membuat target terpana selama {duration} detik."
       },
       "lay_on_hands": {
         "name": "Ritus Terakhir",
-        "description": "Lonjakan penyembuhan masif: memulihkan 250 kesehatan. Jeda 10 menit."
+        "description": "Lonjakan penyembuhan masif: memulihkan {damage} kesehatan. Jeda 10 menit."
       },
       "flash_of_light": {
         "name": "Lightmend",
@@ -4718,7 +5310,7 @@ export const id_ID: EnTranslations = {
       },
       "consecration": {
         "name": "Tanah Suci",
-        "description": "Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci."
+        "description": "Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci setiap 2 detik selama 10 detik."
       },
       "righteous_fury": {
         "name": "Sumpah Membara",
@@ -4738,11 +5330,11 @@ export const id_ID: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Serangan Cabik Perut",
-        "description": "Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar 5. Aktif pada ayunan berikutnya."
+        "description": "Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar {damage}. Aktif pada ayunan berikutnya."
       },
       "aspect_of_the_hawk": {
         "name": "Wujud Elang Penyambar",
-        "description": "Mengambil wujud elang penyambar, meningkatkan daya serang sebesar 20 selama 30 menit."
+        "description": "Mengambil wujud elang penyambar, meningkatkan daya serang sebesar {buff} selama 30 menit."
       },
       "serpent_sting": {
         "name": "Duri Bisa",
@@ -4754,15 +5346,15 @@ export const id_ID: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Tembakan Pengguncang",
-        "description": "Membuat target linglung, memperlambat gerakan sebesar 50% selama 4 detik."
+        "description": "Membuat target linglung sebesar {damage} kerusakan, memperlambat gerakan sebesar 50% selama 4 detik."
       },
       "mongoose_bite": {
         "name": "Counterfang",
-        "description": "Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah 12. Tidak dapat dielakkan."
+        "description": "Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan."
       },
       "wing_clip": {
         "name": "Tebasan Pembelenggu",
-        "description": "Menimbulkan luka yang memperlambat musuh sebesar 40% selama 10 detik."
+        "description": "Menimbulkan luka sebesar {damage} kerusakan, memperlambat musuh sebesar 40% selama 10 detik."
       },
       "aspect_of_the_monkey": {
         "name": "Wujud Musang",
@@ -4790,7 +5382,7 @@ export const id_ID: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Litani Ketabahan",
-        "description": "Meningkatkan Stamina target sebesar 3 selama 30 menit."
+        "description": "Meningkatkan Stamina target sebesar {buff} selama 30 menit."
       },
       "shadow_word_pain": {
         "name": "Ratapan Pembusukan",
@@ -4798,7 +5390,7 @@ export const id_ID: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Mazmur Penangkal",
-        "description": "Melindungi target, menyerap 48 kerusakan selama 30 detik."
+        "description": "Melindungi target, menyerap {damage} kerusakan selama 30 detik."
       },
       "renew": {
         "name": "Rahmat Berlanjut",
@@ -4826,7 +5418,7 @@ export const id_ID: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
-        "description": "Mengisi senjatamu dengan amukan batu: setiap ayunan memberikan 5 kerusakan tambahan selama 5 menit."
+        "description": "Mengisi senjatamu dengan amukan batu: setiap ayunan memberikan {damage} kerusakan tambahan selama 5 menit."
       },
       "healing_wave": {
         "name": "Air Pemulih",
@@ -4838,15 +5430,15 @@ export const id_ID: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Tameng Guntur",
-        "description": "Menyelubungimu dengan petir yang menggelegar: penyerang jarak dekat menerima 13 kerusakan Alam."
+        "description": "Menyelubungimu dengan petir yang menggelegar: penyerang jarak dekat menerima {buff} kerusakan Alam, hingga 3 muatan dan paling sering sekali setiap 5 detik."
       },
       "flame_shock": {
         "name": "Sentakan Bara",
-        "description": "Membakar target dengan api sebesar 25 kerusakan ditambah {damage} selama 12 detik."
+        "description": "Membakar target dengan api sebesar {damage} kerusakan ditambah {overTime} selama 12 detik."
       },
       "flametongue_weapon": {
         "name": "Senjata Pyrebrand",
-        "description": "Mengisi senjatamu dengan api elemental: setiap ayunan memberi 8 kerusakan Api tambahan selama 5 menit."
+        "description": "Mengisi senjatamu dengan api elemental: setiap ayunan memberi {damage} kerusakan Api tambahan selama 5 menit."
       },
       "frost_shock": {
         "name": "Sentakan Beku",
@@ -4854,7 +5446,7 @@ export const id_ID: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Senjata Rimebound",
-        "description": "Mengisi senjatamu dengan embun beku yang menggigit: setiap ayunan memberi 8 kerusakan tambahan selama 5 menit."
+        "description": "Mengisi senjatamu dengan embun beku yang menggigit: setiap ayunan memberi {damage} kerusakan tambahan selama 5 menit."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -4870,11 +5462,11 @@ export const id_ID: EnTranslations = {
       },
       "demon_skin": {
         "name": "Fiendhide",
-        "description": "Kulit iblis meningkatkan zirahmu sebesar 30 selama 30 menit."
+        "description": "Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit."
       },
       "immolate": {
         "name": "Pakta Membara",
-        "description": "Membakar musuh sebesar 11 kerusakan Api dan tambahan {damage} selama 15 detik."
+        "description": "Membakar musuh sebesar {damage} kerusakan Api dan tambahan {overTime} selama 15 detik."
       },
       "corruption": {
         "name": "Blackrot",
@@ -4882,7 +5474,7 @@ export const id_ID: EnTranslations = {
       },
       "life_tap": {
         "name": "Tawar Getir",
-        "description": "Mengubah 30 kesehatan menjadi 30 mana."
+        "description": "Mengubah {damage} kesehatan menjadi {damage} mana."
       },
       "curse_of_agony": {
         "name": "Tenung Derita",
@@ -4914,7 +5506,7 @@ export const id_ID: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Wildward",
-        "description": "Menempatkan Wildward pada target sekutu, meningkatkan zirah sebesar 25 selama 30 menit."
+        "description": "Menempatkan Wildward pada target sekutu, meningkatkan zirah sebesar {buff} selama 30 menit."
       },
       "moonfire": {
         "name": "Badai Rembulan",
@@ -4926,7 +5518,7 @@ export const id_ID: EnTranslations = {
       },
       "thorns": {
         "name": "Briarguard",
-        "description": "Duri bertunas dari target: penyerang jarak dekat menerima 3 kerusakan Alam."
+        "description": "Duri bertunas dari target: penyerang jarak dekat menerima {buff} kerusakan Alam."
       },
       "entangling_roots": {
         "name": "Akar Cengkeram",
@@ -4934,7 +5526,7 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +65%, daya serang +15, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +90%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Bonecrush",
@@ -4954,7 +5546,7 @@ export const id_ID: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Gorebite",
-        "description": "Gerakan penutup yang menimbulkan kerusakan per poin kombo. Hanya dalam Wujud Serigala."
+        "description": "Gerakan penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -4986,7 +5578,7 @@ export const id_ID: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Mengurangi zirah target sebesar 35 selama 40 detik."
+        "description": "Mengurangi zirah target sebesar 35 selama 30 detik."
       },
       "hibernate": {
         "name": "Lelap",
@@ -5010,7 +5602,7 @@ export const id_ID: EnTranslations = {
       },
       "rip": {
         "name": "Robekan",
-        "description": "Gerakan penutup yang menyebabkan kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala."
+        "description": "Gerakan penutup yang menyebabkan {damage} kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala."
       },
       "mortal_strike": {
         "name": "Serangan Pelukai",
@@ -5018,11 +5610,11 @@ export const id_ID: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Pertumpahan Darah",
-        "description": "Seketika menyerang dalam amukan darah untuk {damage}. (Penanda Fury)"
+        "description": "Seketika menyerang dalam amukan darah untuk 60% kerusakan senjata ditambah {damage}. (Penanda Fury)"
       },
       "shield_slam": {
         "name": "Shieldcrack",
-        "description": "Menghantam target dengan perisaimu sebesar {damage} dan ancaman besar. (Ciri khas Perlindungan)"
+        "description": "Menghantam target dengan perisaimu sebesar 50% kerusakan senjata ditambah {damage} dan ancaman besar. (Ciri khas Perlindungan)"
       },
       "whirlwind": {
         "name": "Pusaran Berpisau",
@@ -5655,6 +6247,42 @@ export const id_ID: EnTranslations = {
       "silverleaf_sickle": {
         "name": "Sabit Daun Perak"
       },
+      "thorium_mining_pick": {
+        "name": "Beliung Tambang Thorium"
+      },
+      "arcanite_mining_pick": {
+        "name": "Beliung Tambang Arcanite"
+      },
+      "ashwood_axe": {
+        "name": "Kapak Kayu Abu"
+      },
+      "elderwood_axe": {
+        "name": "Kapak Kayu Tua"
+      },
+      "goldleaf_sickle": {
+        "name": "Sabit Daun Emas"
+      },
+      "sunpetal_sickle": {
+        "name": "Sabit Kelopak Matahari"
+      },
+      "thorium_ore": {
+        "name": "Bijih Torium"
+      },
+      "arcanite_bar": {
+        "name": "Batangan Arkanit"
+      },
+      "ashwood_log": {
+        "name": "Kayu Gelondongan Abu"
+      },
+      "elderwood_log": {
+        "name": "Kayu Gelondongan Tua Elder"
+      },
+      "goldleaf_herb": {
+        "name": "Herba Daun Emas"
+      },
+      "sunpetal_herb": {
+        "name": "Herba Kelopak Matahari"
+      },
       "bristleback_maul": {
         "name": "Palu Gallowglass"
       },
@@ -6120,6 +6748,132 @@ export const id_ID: EnTranslations = {
       "event_skin_token": {
         "name": "Peti Kosmetik Misterius"
       },
+      "heroic_mark": {
+        "name": "Tanda Heroik"
+      },
+      "morthens_cryptforged_hauberk": {
+        "name": "Baju Zirah Tempaan Kripta Morthen"
+      },
+      "shadowpulse_handwraps": {
+        "name": "Pembalut Tangan Denyut Bayangan"
+      },
+      "bonechill_striders": {
+        "name": "Bot Langkah Dingin Tulang"
+      },
+      "mistcallers_fang": {
+        "name": "Taring Pemanggil Kabut"
+      },
+      "tidebound_spaulders": {
+        "name": "Pelindung Bahu Ikatan Pasang"
+      },
+      "sash_of_the_sunken_court": {
+        "name": "Selempang Istana Karam"
+      },
+      "lunar_tide_greatstaff": {
+        "name": "Tongkat Agung Pasang Rembulan"
+      },
+      "tidewoven_trousers": {
+        "name": "Celana Tenunan Pasang"
+      },
+      "choirmothers_casque": {
+        "name": "Ketopong Ibu Paduan Suara"
+      },
+      "gravewyrm_cleaver": {
+        "name": "Kapak Pembelah Wyrm Kubur"
+      },
+      "shroud_of_the_gravewyrm": {
+        "name": "Kafan Sang Wyrm Kubur"
+      },
+      "sanctum_prowlers_grips": {
+        "name": "Sarung Tangan Pengendap Sanktum"
+      },
+      "scepter_of_the_deathless_court": {
+        "name": "Tongkat Kebesaran Istana Nirmaut"
+      },
+      "deathless_warguard_legmail": {
+        "name": "Zirah Kaki Garda Perang Nirmaut"
+      },
+      "soulrend_diadem": {
+        "name": "Diadem Pengoyak Jiwa"
+      },
+      "scourgehide_carapace": {
+        "name": "Karapas Kulit Sampar"
+      },
+      "cryptplate_helm": {
+        "name": "Helm Lempeng Kripta"
+      },
+      "shadowpulse_slippers": {
+        "name": "Selop Denyut Bayangan"
+      },
+      "bonechill_cord": {
+        "name": "Tali Pinggang Dingin Tulang"
+      },
+      "mistforged_pauldrons": {
+        "name": "Bahu Tempaan Kabut"
+      },
+      "tideguard_faceguard": {
+        "name": "Pelindung Wajah Penjaga Pasang"
+      },
+      "sunken_court_mantle": {
+        "name": "Mantel Istana Karam"
+      },
+      "lunar_choir_leggings": {
+        "name": "Celana Paduan Suara Rembulan"
+      },
+      "choir_blessed_spaulders": {
+        "name": "Pelindung Bahu Berkah Paduan Suara"
+      },
+      "tideworn_warboots": {
+        "name": "Bot Perang Kikisan Pasang"
+      },
+      "gravewyrm_claws": {
+        "name": "Cakar Wyrm Kubur"
+      },
+      "gravescale_girdle": {
+        "name": "Sabuk Sisik Kubur"
+      },
+      "wyrmchoir_handwraps": {
+        "name": "Pembalut Tangan Paduan Suara Wyrm"
+      },
+      "deathless_greatblade": {
+        "name": "Bilah Agung Nirmaut"
+      },
+      "soulforged_warplate": {
+        "name": "Zirah Perang Tempaan Jiwa"
+      },
+      "stormcallers_focus": {
+        "name": "Fokus Pemanggil Badai"
+      },
+      "seal_of_the_nine_oaths": {
+        "name": "Segel Sembilan Sumpah"
+      },
+      "nielas_coldlight_band": {
+        "name": "Cincin Cahaya Dingin Niela"
+      },
+      "sutils_gambit": {
+        "name": "Gambit Sutil"
+      },
+      "oath_of_the_round_table": {
+        "name": "Sumpah Meja Bundar"
+      },
+      "zyzzs_deathless_signet": {
+        "name": "Cincin Stempel Nirmaut Zyzz"
+      },
+      "architects_cornerstone": {
+        "name": "Batu Penjuru Sang Arsitek"
+      },
+      "swiftfang_talisman": {
+        "name": "Talisman Taring Gesit"
+      },
+      "yumis_keepsake_locket": {
+        "name": "Liontin Kenangan Yumi"
+      },
+      "zense_meridian": {
+        "name": "Meridian Zense"
+      },
+      "medallion_of_endless_profit": {
+        "name": "Medali Laba Tanpa Akhir"
+      },
       "deathless_heartwood": {
         "name": "Inti Kayu Mahkota Baka"
       },
@@ -6227,6 +6981,9 @@ export const id_ID: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "Serigala Hutan"
       },
@@ -6286,6 +7043,9 @@ export const id_ID: EnTranslations = {
       },
       "deacon_voss": {
         "name": "Diaken Voss"
+      },
+      "training_dummy": {
+        "name": "Training Dummy"
       },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"
@@ -6448,6 +7208,9 @@ export const id_ID: EnTranslations = {
       },
       "tolling_bell": {
         "name": "Lonceng Berdentang"
+      },
+      "vale_cup_ball": {
+        "name": "Bola Babi Hutan"
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Puncak yang Terjaga"
@@ -6655,6 +7418,11 @@ export const id_ID: EnTranslations = {
         "title": "Ahli Penempa Zirah",
         "greeting": "Tungku menyala dan batu asah berputar. Kalau bisa menebas, aku menjualnya."
       },
+      "heroic_quartermaster": {
+        "name": "Kepala Perbekalan Vex",
+        "title": "Kepala Perbekalan Heroik",
+        "greeting": "Bukti dari kedalaman heroik dapat membeli cincin dan liontin terbaik di Highwatch. Tunjukkan tanda-tandamu."
+      },
       "loremaster_caddis": {
         "name": "Ahli Sejarah Caddis",
         "title": "Ahli Sejarah",
@@ -6664,6 +7432,21 @@ export const id_ID: EnTranslations = {
         "name": "Pelelang Voss",
         "title": "Penjaga World Market",
         "greeting": "World Market juga buka di sini, {className}. Belilah dari setiap petualang di alam ini, atau gelarlah daganganmu sendiri."
+      },
+      "bursar_fernando": {
+        "name": "Bendahara Fernando",
+        "title": "Brankas Bersepuh Emas",
+        "greeting": "Selamat datang di Brankas Bersepuh Emas. Barang-barangmu tersimpan aman di balik kunci-kunci kami."
+      },
+      "bursar_petra_vell": {
+        "name": "Bendahara Petra Vell",
+        "title": "Brankas Bersepuh Emas",
+        "greeting": "Brankas Bersepuh Emas menjaga buku kas yang bersih dan lemari besi yang lebih bersih lagi. Apa yang hendak kami simpankan untukmu?"
+      },
+      "bursar_aldous_crane": {
+        "name": "Bendahara Aldous Crane",
+        "title": "Brankas Bersepuh Emas",
+        "greeting": "Setiap peti, kotak harta, dan pernak-pernik aman bersama Brankas Bersepuh Emas."
       },
       "brother_aldric_raid": {
         "name": "Bruder Aldric",
@@ -6684,6 +7467,11 @@ export const id_ID: EnTranslations = {
         "name": "Sang Penjaga Pucat",
         "title": "Penjaga Para Mati",
         "greeting": "Beristirahatlah, arwah. Aku bisa mengembalikanmu ke tubuhmu, tapi penyeberangan kembali akan membuatmu lemah."
+      },
+      "groundskeeper_bram": {
+        "name": "Penjaga Lapangan Bram",
+        "title": "Penjaga Sowfield",
+        "greeting": "Gencatan tetap berlaku di Sowfield, {className}: hanya tendangan dan benturan bahu. Mau bermain memperebutkan Ember Tembaga?"
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7474,6 +8262,26 @@ export const id_ID: EnTranslations = {
           }
         }
       },
+      "q_archetype_acceptance": {
+        "title": "Sebuah Kerajinan untuk Disebut Milik Anda",
+        "text": "Setiap pengrajin di Eastbrook akhirnya memilih satu kerajinan yang bisa mereka jadikan milik mereka. Buktikan diri Anda dengan satu akta, {playerName}, dan nyatakan jalur Anda.",
+        "completion": "Jalan Anda telah dipilih; berjalan dengan baik.",
+        "objectives": {
+          "0": {
+            "label": "Serigala Hutan dibunuh"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Membuat Perubahan",
+        "text": "Untuk menyisihkan satu kerajinan untuk kerajinan lainnya, seorang pengrajin harus terlebih dahulu memperbaiki jalur yang belum dilalui, {playerName}.",
+        "completion": "Perubahan dilakukan; jalan baru terbuka untuk Anda.",
+        "objectives": {
+          "0": {
+            "label": "Serigala Hutan dibunuh"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Paduan Suara Tenggelam",
         "text": "Para pengarung tak bergerak sendiri. Di antara mereka berjalan para Pemuja Tenggelam, sekte yang karam bersama kuil, masih dalam busana lapuk, masih menyanyikan doa dari batu karang tepi pantai. Bungkam delapan dari mereka, dan bawakan padaku enam persembahan yang mereka bawa. Aku ingin tahu apa yang hendak mereka berikan pada dewi mereka.",
@@ -7572,6 +8380,9 @@ export const id_ID: EnTranslations = {
           },
           "9": {
             "label": "Tanah Lapang Brightwood"
+          },
+          "10": {
+            "label": "Sowfield"
           }
         }
       },
@@ -7716,12 +8527,14 @@ export const id_ID: EnTranslations = {
       "crownforged": {
         "name": "Regalia Bonewrought",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
-        "bonus3": "Meningkatkan kekuatan sebesar 15, stamina sebesar 15, serta kecepatan serangan dan rapal sebesar 15%."
+        "bonus3": "Meningkatkan kekuatan sebesar 15, stamina sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
+        "bonus4": "Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
       },
       "deathlord": {
         "name": "Perlengkapan Tempur Barrowlord",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
-        "bonus3": "Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15."
+        "bonus3": "Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15.",
+        "bonus4": "Serangan kritis senjatamu memiliki peluang 50% memberikan Kuasa Kubur, meningkatkan daya serang sebesar 60 selama 10 detik."
       },
       "greyjaw_stalker": {
         "name": "Perlengkapan Penguntit Greyjaw",
@@ -7730,22 +8543,26 @@ export const id_ID: EnTranslations = {
       "necromancers": {
         "name": "Jubah Mournweave",
         "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
-        "bonus3": "Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10."
+        "bonus3": "Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10.",
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Rapal Jernih, menjadikan mantra berikutmu tanpa biaya."
       },
       "nighttalon": {
         "name": "Perlengkapan Kulit Direfang",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
-        "bonus3": "Meningkatkan kelincahan sebesar 15, peluang kritis sebesar 2%, serta kecepatan serangan dan rapal sebesar 15%."
+        "bonus3": "Meningkatkan kelincahan sebesar 15, peluang kritis sebesar 2%, serta kecepatan serangan dan rapal sebesar 15%.",
+        "bonus4": "Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
-        "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%."
+        "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
       },
       "stormcallers": {
         "name": "Jubah Galecall",
         "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
-        "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%."
+        "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
       },
       "vale_arcanist": {
         "name": "Perlengkapan Arkanis Lembah",
@@ -7754,7 +8571,8 @@ export const id_ID: EnTranslations = {
       "wyrmshadow": {
         "name": "Jubah Nightfang",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
-        "bonus3": "Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%."
+        "bonus3": "Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%.",
+        "bonus4": "Serangan kritis senjatamu memiliki peluang 50% memberikan Sergap Taring, meningkatkan kecepatan serangan sebesar 25% selama 8 detik."
       }
     }
   },

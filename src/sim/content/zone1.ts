@@ -39,6 +39,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: 80, z: 80, label: 'Fallen Chapel' },
     { x: -5, z: -52, label: 'Reliquary Hill' },
     { x: 40, z: 140, label: 'Brightwood Glade' },
+    { x: -11, z: -112, label: 'The Sowfield' },
   ],
   welcome: 'Find Marshal Redbrook in town — he has work for you.',
   welcomeQuestId: 'q_wolves',
@@ -94,7 +95,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     minLevel: 1,
     maxLevel: 2,
     family: 'beast',
-    hpBase: 28,
+    hpBase: 40,
     hpPerLevel: 14,
     dmgBase: 3,
     dmgPerLevel: 1.6,
@@ -111,6 +112,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     scale: 0.9,
     color: 0x7f8c8d,
     packFrenzy: { radius: 12, hasteMult: 1.3, duration: 8 },
+    componentTags: ['hide', 'fang'],
   },
   old_greyjaw: {
     id: 'old_greyjaw',
@@ -138,6 +140,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.25,
     color: 0x566061,
+    componentTags: ['hide', 'fang', 'claw'],
   },
   wild_boar: {
     id: 'wild_boar',
@@ -145,7 +148,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     minLevel: 2,
     maxLevel: 3,
     family: 'beast',
-    hpBase: 34,
+    hpBase: 38,
     hpPerLevel: 16,
     dmgBase: 4,
     dmgPerLevel: 1.8,
@@ -163,6 +166,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.85,
     color: 0x935116,
+    componentTags: ['hide', 'tusk'],
   },
   webwood_spider: {
     id: 'webwood_spider',
@@ -170,7 +174,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     minLevel: 2,
     maxLevel: 4,
     family: 'spider',
-    hpBase: 30,
+    hpBase: 36,
     hpPerLevel: 15,
     dmgBase: 4,
     dmgPerLevel: 1.7,
@@ -194,6 +198,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.9,
     color: 0x4a235a,
+    componentTags: ['venomSac', 'silk'],
   },
   mogger: {
     id: 'mogger',
@@ -275,6 +280,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.8,
     color: 0x52be80,
+    componentTags: ['gills', 'hide'],
     // Mudfin Hex: the skulker's oracle-chant briefly turns a foe into a critter.
     // Low chance and it breaks the instant the victim takes damage (the murloc's
     // own next bite ends it), so it's a brief flavor incap — but a murloc pack
@@ -521,7 +527,15 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: 4, z: 6 },
     facing: Math.PI,
     color: 0xb7950b,
-    questIds: ['q_wolves', 'q_greyjaw', 'q_bandits', 'q_ringleader', 'q_mogger'],
+    questIds: [
+      'q_wolves',
+      'q_greyjaw',
+      'q_bandits',
+      'q_ringleader',
+      'q_mogger',
+      'q_archetype_acceptance',
+      'q_prof_make_amends',
+    ],
     greeting: 'Keep your blade close, $C. The Vale is not what it was.',
   },
   trader_wilkes: {
@@ -629,6 +643,34 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     color: 0xa04000,
     questIds: ['q_mine'],
     greeting: "Whole dig's crawling with those dirt-caked vermin!",
+  },
+  bursar_fernando: {
+    id: 'bursar_fernando',
+    name: 'Bursar Fernando',
+    title: 'The Gilded Strongbox',
+    // east side of the square, facing the approach toward the well and Merchant
+    pos: { x: 13, z: 8 },
+    facing: -Math.PI / 2,
+    color: 0xc9a227,
+    questIds: [],
+    banker: true,
+    greeting: 'Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.',
+  },
+  groundskeeper_bram: {
+    id: 'groundskeeper_bram',
+    name: 'Groundskeeper Bram',
+    title: 'Keeper of the Sowfield',
+    // At the Sowfield's north gate with the book of fixtures (vale_cup_layout
+    // BRAM_POS). dynamic: the generic surface-placement loop skips him; the
+    // Vale Cup module spawns him at world init under a RESERVED entity id so
+    // adding him never shifts the ctor id sequence (parity goldens pin nextId).
+    pos: { x: -6, z: -82 },
+    facing: Math.PI,
+    color: 0x3f7d34,
+    questIds: [],
+    dynamic: true,
+    greeting:
+      'The truce holds at the Sowfield, $C: boots and shoulders only. Care to play for the Copper Pail?',
   },
 };
 
@@ -943,6 +985,51 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     minLevel: 6,
     suggestedPlayers: 3,
   },
+  // STUB, professions active-archetype (issue #1129, superseded scope): a
+  // placeholder zone-1 acceptance lore quest, and a placeholder repeatable
+  // "make amends" quest. Both stand in for real quest giver/turn-in NPC
+  // placement and dialogue authoring (out of scope for this change, see
+  // src/sim/professions/archetype.ts): they reuse marshal_redbrook as giver/
+  // turn-in and a trivial existing-mob objective purely so the QuestDef is
+  // valid content, NOT because that mob/NPC has any lore tie to professions.
+  // The actual archetype-switching STATE MACHINE (acceptArchetypeQuest /
+  // advanceAmendsProgress / switchArchetype) is fully implemented in
+  // archetype.ts and does not depend on these quests actually being
+  // completable in play; a follow-up wires real content + the turn-in hook.
+  q_archetype_acceptance: {
+    id: 'q_archetype_acceptance',
+    name: 'A Craft to Call Your Own',
+    giverNpcId: 'marshal_redbrook',
+    turnInNpcId: 'marshal_redbrook',
+    text: 'Every artisan of Eastbrook eventually settles on one craft to call their own. Prove yourself with a single deed, $N, and declare your path.',
+    completionText: 'Your path is chosen; walk it well.',
+    objectives: [
+      { type: 'kill', targetMobId: 'forest_wolf', count: 1, label: 'Forest Wolf slain' },
+    ],
+    xpReward: 100,
+    copperReward: 0,
+    itemRewards: {},
+    // Not wired to acceptArchetypeQuest yet: retired keeps it out of the live
+    // accept flow (computeQuestState -> 'unavailable') until that hook lands.
+    retired: true,
+  },
+  q_prof_make_amends: {
+    id: 'q_prof_make_amends',
+    name: 'Making Amends',
+    giverNpcId: 'marshal_redbrook',
+    turnInNpcId: 'marshal_redbrook',
+    text: 'To set aside one craft for another, an artisan must first make amends for the path not walked, $N.',
+    completionText: 'Amends made; a new path is open to you.',
+    objectives: [
+      { type: 'kill', targetMobId: 'forest_wolf', count: 2, label: 'Forest Wolf slain' },
+    ],
+    xpReward: 50,
+    copperReward: 0,
+    itemRewards: {},
+    // Not wired to switchArchetype yet: retired keeps it out of the live
+    // accept flow (computeQuestState -> 'unavailable') until that hook lands.
+    retired: true,
+  },
 };
 
 export const ZONE1_QUEST_ORDER = [
@@ -964,6 +1051,8 @@ export const ZONE1_QUEST_ORDER = [
   'q_hollow',
   'q_gravecallers_trail',
   'q_mogger',
+  'q_archetype_acceptance',
+  'q_prof_make_amends',
 ];
 
 // ---------------------------------------------------------------------------

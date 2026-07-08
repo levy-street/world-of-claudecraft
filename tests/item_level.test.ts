@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { ITEMS } from '../src/sim/data';
 import {
   expectedStatBudget,
@@ -220,6 +221,23 @@ describe('item level: raid tier', () => {
   });
 });
 
+describe('item level: heroic boss drops read item level 31 and are budget-exact', () => {
+  it('every heroic drop is an epic at item level 31 with its exact stat budget', () => {
+    const ids = Object.values(HEROIC_BOSS_LOOT)
+      .flat()
+      .flatMap((e) => (e.itemId ? [e.itemId] : []));
+    expect(ids.length).toBeGreaterThanOrEqual(16); // the authored heroic set
+    for (const id of ids) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(item.quality, id).toBe('epic');
+      expect(itemSourceLevel(id), `${id} source`).toBe(25);
+      expect(itemLevel(item), `${id} ilvl`).toBe(31);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+    }
+  });
+});
+
 describe('item level: every level-20 item is balanced to budget', () => {
   it('all level-20 gear carries exactly its item-level stat budget', () => {
     const offBudget: string[] = [];
@@ -267,5 +285,36 @@ describe('item level: purity and determinism', () => {
     resetItemLevelCache();
     const after = CHEST_TRIO.map((id) => [itemSourceLevel(id), itemLevel(ITEMS[id])]);
     expect(after).toEqual(before);
+  });
+});
+
+describe('heroic set: class coverage', () => {
+  it('every class can use a broad slot spread of heroic epics', () => {
+    const ALL_CLASSES = [
+      'warrior',
+      'paladin',
+      'shaman',
+      'rogue',
+      'hunter',
+      'druid',
+      'mage',
+      'priest',
+      'warlock',
+    ] as const;
+    const ids = Object.values(HEROIC_BOSS_LOOT)
+      .flat()
+      .flatMap((e) => (e.itemId ? [e.itemId] : []));
+    for (const cls of ALL_CLASSES) {
+      const slots = new Set<string>();
+      for (const id of ids) {
+        const it: any = ITEMS[id];
+        const rc: string[] | undefined = it.requiredClass;
+        if (!rc || rc.includes(cls)) slots.add(it.slot);
+      }
+      // Every class reaches at least five of the eight droppable slots.
+      expect(slots.size, `${cls}: ${[...slots].sort().join(',')}`).toBeGreaterThanOrEqual(5);
+      // Every class has at least one usable weapon.
+      expect(slots.has('mainhand'), `${cls} has a weapon`).toBe(true);
+    }
   });
 });

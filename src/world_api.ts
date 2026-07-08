@@ -9,8 +9,9 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 23 domain facets (each IWorld member assigned exactly once; 159
-// total). One interface per file under ./world_api/; aux types travel with their
+// FACET MAP: the domain facets (each IWorld member assigned exactly once; the
+// authoritative member COUNT lives in the pinned gates below, not this prose).
+// One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
 //   entity_roster.ts    IWorldEntityRoster   cfg/entities/player/moveInput/realm reads
@@ -35,18 +36,25 @@
 //   delves.ts           IWorldDelves         delve runs, lockpick, companion
 //   daily_rewards.ts    IWorldDailyRewards   daily WOC-holder rewards
 //   telemetry.ts        IWorldTelemetry      fire-and-forget metrics sink
-//   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (stub, #1164)
+//   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (#1164; node
+//                                            harvest read + action landed in #1121; recipe
+//                                            content + basic crafting action landed in #1127)
+//   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
+//                                            deposit/withdraw/buy-slots)
+//   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //
-// THREE GATES pin this seam (run before any facet edit):
+// THREE GATES pin this seam (run before any facet edit; the literal counts are
+// pinned THERE and re-stale here, so this prose stays count-free):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
-//                                          ALL_DELTA_KEYS (25) + TERSE_TO_IWORLD mapping.
+//                                          ALL_DELTA_KEYS + TERSE_TO_IWORLD mapping.
 //   tests/command_schema.test.ts   (W0b)  COMMAND_NAMES universe; ClientWorld send-set
-//                                          subset-of dispatch-set; DISPATCH_ONLY (7).
-//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (159) present + same-kind on
+//                                          subset-of dispatch-set; DISPATCH_ONLY.
+//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS present + same-kind on
 //                                          Sim + ClientWorld; aggregate == disjoint
-//                                          union of the 22 facets.
+//                                          union of the facets.
 // ---------------------------------------------------------------------------
 
+import type { IWorldBank } from './world_api/bank';
 import type { IWorldChat } from './world_api/chat';
 import type { IWorldCombat } from './world_api/combat';
 import type { IWorldCosmetics } from './world_api/cosmetics';
@@ -70,6 +78,7 @@ import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
+import type { IWorldValeCup } from './world_api/vale_cup';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 export type {
@@ -80,6 +89,7 @@ export type {
 export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from './sim/types';
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
+export type { BankBonusSource, BankInfo } from './world_api/bank';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
@@ -113,7 +123,7 @@ export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
-export type { PlayerProfessionsView } from './world_api/professions';
+export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
@@ -130,6 +140,17 @@ export type {
   SocialInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type {
+  CupInfo,
+  VcBetInfo,
+  VcBetRecord,
+  VcBoardEntry,
+  VcLiveMatch,
+  VcMatchInfo,
+  VcPhase,
+  VcRosterPlayer,
+  VcStanding,
+} from './world_api/vale_cup';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the
@@ -157,7 +178,9 @@ export interface IWorld
     IWorldDelves,
     IWorldDailyRewards,
     IWorldTelemetry,
-    IWorldProfessions {}
+    IWorldProfessions,
+    IWorldBank,
+    IWorldValeCup {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -191,6 +214,7 @@ export const COMMAND_NAMES = [
   'stopattack',
   'interact',
   'loot',
+  'harvestCorpse',
   'lootRoll',
   'pickup',
   'accept',
@@ -205,6 +229,8 @@ export const COMMAND_NAMES = [
   'sell',
   'buyback',
   'sell_all_junk',
+  'harvest_node',
+  'craft_item',
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
@@ -303,6 +329,18 @@ export const COMMAND_NAMES = [
   'autoloot',
   'resurrect_corpse',
   'resurrect_healer',
+  'bank_deposit',
+  'bank_withdraw',
+  'bank_buy_slots',
+  'set_town_focus',
+  'set_dungeon_difficulty',
+  'heroic_buy',
+  'vcup_queue',
+  'vcup_leave',
+  'vcup_role',
+  'vcup_ready',
+  'vcup_bet',
+  'vcup_practice',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -366,7 +404,9 @@ export type WorldFacet =
   | 'IWorldDungeons'
   | 'IWorldDelves'
   | 'IWorldDailyRewards'
-  | 'IWorldTelemetry';
+  | 'IWorldTelemetry'
+  | 'IWorldBank'
+  | 'IWorldValeCup';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -487,6 +527,8 @@ export const COMMAND_FACETS = {
   // (untagged; on the DISPATCH_ONLY_COMMANDS allowlist), NOT IWorldDungeons.
   enter_dungeon: 'IWorldDungeons',
   leave_dungeon: 'IWorldDungeons',
+  set_dungeon_difficulty: 'IWorldDungeons',
+  heroic_buy: 'IWorldDungeons',
   // IWorldDelves: delve enter/leave + interact + companion upgrade + Marks-vendor buy
   // + lockpick lifecycle + chest collect. Note the wire-name skew: delveBuyShopItem
   // sends `delve_buy`, so the tag is keyed on the WIRE string `delve_buy`. The reads
@@ -503,4 +545,17 @@ export const COMMAND_FACETS = {
   lockpick_abort: 'IWorldDelves',
   collect_delve_chest_loot: 'IWorldDelves',
   delve_rite_choose: 'IWorldDelves',
+  // IWorldBank: the per-character deposit box (snake_case wire strings, by design).
+  // bankInfo is a proximity-gated snapshot read (no send, untagged).
+  bank_deposit: 'IWorldBank',
+  bank_withdraw: 'IWorldBank',
+  bank_buy_slots: 'IWorldBank',
+  // IWorldValeCup: the Vale Cup boarball queue. cupInfo is a snapshot read (no
+  // send); vcup_practice starts a private instanced practice bout (online + off).
+  vcup_queue: 'IWorldValeCup',
+  vcup_leave: 'IWorldValeCup',
+  vcup_role: 'IWorldValeCup',
+  vcup_ready: 'IWorldValeCup',
+  vcup_bet: 'IWorldValeCup',
+  vcup_practice: 'IWorldValeCup',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

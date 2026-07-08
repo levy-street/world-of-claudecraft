@@ -19,6 +19,7 @@ describe('/bags command', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Aleph');
     sim.players.get(pid)!.copper = 0;
+    sim.players.get(pid)!.inventory.length = 0; // shed the starter rations
 
     expect(sim.chat('/bags', pid)).toBeNull();
     expect(lastReadout(sim, pid)).toBe('Your bags are empty. Purse: 0c.');
@@ -28,6 +29,7 @@ describe('/bags command', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Aleph');
     sim.players.get(pid)!.copper = 12 * 10000 + 4 * 100 + 5; // 12g 4s 5c
+    sim.players.get(pid)!.inventory.length = 0; // shed the starter rations
 
     // Added out of quality order to prove the readout sorts them.
     sim.addItem('wolf_fang', 5, pid); // poor
@@ -46,6 +48,7 @@ describe('/bags command', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Aleph');
     sim.players.get(pid)!.copper = 0;
+    sim.players.get(pid)!.inventory.length = 0; // shed the starter rations
 
     expect(sim.chat('/inv', pid)).toBeNull();
     expect(lastReadout(sim, pid)).toBe('Your bags are empty. Purse: 0c.');

@@ -1,6 +1,6 @@
 // W0c: the IWorld structural-parity gate.
 //
-// `IWorld` (src/world_api.ts, 167 members) is the ONE seam render/ui depend
+// `IWorld` (src/world_api.ts, 203 members) is the ONE seam render/ui depend
 // on. `tsc` already proves both the offline `Sim` and the online `ClientWorld` satisfy
 // it structurally, but the interface is erased at build: there is NO runtime member
 // list, so nothing catches a present-but-throws stub or a kind flip (method vs read).
@@ -9,7 +9,7 @@
 // IWORLD_MEMBERS below is the hand-maintained member list, the W0c analog of the
 // append-only CALLBACK_KEYS in tests/sim_context.test.ts. It is APPEND-ONLY WITH THE
 // INTERFACE: whenever a future slice adds (or removes/renames) a member on `IWorld`,
-// it lands the matching edit here in the SAME commit. The count pins (167 / 42 / 125)
+// it lands the matching edit here in the SAME commit. The count pins (203 / 53 / 150)
 // plus the sorted-name `toEqual` snapshots (modeled on the anti-loosening exclude-set
 // pin in tests/parity/harness.test.ts:131-162) are what force that: a dropped or
 // renamed member reddens deliberately, never silently.
@@ -34,8 +34,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import { OVERHEAD_EMOTE_IDS, type PlayerClass } from '../src/sim/types';
-// The 22 facet interfaces the W1 split produced (src/world_api/<facet>.ts). Imported
-// type-only to pin each facet's runtime member array to its interface key-set below.
+// The 25 facet interfaces the W1 split produced (src/world_api/<facet>.ts), plus the
+// bank facet added in the bank-system feature. Imported type-only to pin each facet's
+// runtime member array to its interface key-set below.
+import type { IWorldBank } from '../src/world_api/bank';
 import type { IWorldChat } from '../src/world_api/chat';
 // The overhead-emote runtime surface the chat facet derives locally (see the
 // exhaustiveness guard at the bottom of this file): the seam imports sim/ for TYPES
@@ -44,6 +46,7 @@ import type { IWorldChat } from '../src/world_api/chat';
 import { isOverheadEmoteId, OVERHEAD_EMOTES } from '../src/world_api/chat';
 import type { IWorldCombat } from '../src/world_api/combat';
 import type { IWorldCosmetics } from '../src/world_api/cosmetics';
+import type { IWorldDailyRewards } from '../src/world_api/daily_rewards';
 import type { IWorldDelves } from '../src/world_api/delves';
 import type { IWorldDuelArena } from '../src/world_api/duel_arena';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
@@ -63,6 +66,7 @@ import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
+import type { IWorldValeCup } from '../src/world_api/vale_cup';
 
 type IWorldMemberKind = 'method' | 'data';
 
@@ -71,8 +75,8 @@ interface IWorldMember {
   readonly kind: IWorldMemberKind;
 }
 
-// The 167 members of `interface IWorld`, in interface order (world_api.ts).
-// Partition: 42 `data` + 125 `method` (read-returning + command-void + async).
+// The 203 members of `interface IWorld`, in interface order (world_api.ts).
+// Partition: 53 `data` + 150 `method` (read-returning + command-void + async).
 // biome-ignore lint/suspicious/noExportsInTest: IWORLD_MEMBERS is the W0c pinned structural-parity contract (the authoritative IWorld member list)
 export const IWORLD_MEMBERS = [
   // --- core world / player roster + economy reads (data) ---
@@ -94,14 +98,15 @@ export const IWORLD_MEMBERS = [
   { name: 'unlockedMilestones', kind: 'data' },
   { name: 'restedXp', kind: 'data' },
   { name: 'craftSkills', kind: 'data' },
+  { name: 'gatheringProficiency', kind: 'data' },
   { name: 'known', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'castAbility', kind: 'method' },
-  { name: 'castAbilityBySlot', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
+  { name: 'castAbilityBySlot', kind: 'method' },
   { name: 'cancelAura', kind: 'method' },
   { name: 'targetEntity', kind: 'method' },
   { name: 'tabTarget', kind: 'method' },
@@ -112,9 +117,13 @@ export const IWORLD_MEMBERS = [
   { name: 'interact', kind: 'method' },
   { name: 'lootCorpse', kind: 'method' },
   { name: 'autoLoot', kind: 'method' },
+  { name: 'harvestCorpse', kind: 'method' },
   { name: 'submitLootRoll', kind: 'method' },
   { name: 'activeLootRolls', kind: 'method' }, // read-returning (2/6)
+  { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
+  { name: 'townFocus', kind: 'data' },
+  { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
   { name: 'reportTelemetry', kind: 'method' },
@@ -152,6 +161,7 @@ export const IWORLD_MEMBERS = [
   { name: 'tradeInfo', kind: 'data' },
   { name: 'duelInfo', kind: 'data' },
   { name: 'arenaInfo', kind: 'data' },
+  { name: 'cupInfo', kind: 'data' },
   { name: 'marketInfo', kind: 'data' },
   // --- party / raid commands + marker read ---
   { name: 'partyInvite', kind: 'method' },
@@ -199,6 +209,13 @@ export const IWORLD_MEMBERS = [
   { name: 'arenaQueueJoin', kind: 'method' },
   { name: 'arenaQueueLeave', kind: 'method' },
   { name: 'arenaAugmentPick', kind: 'method' },
+  // --- the Vale Cup boarball minigame (IWorldValeCup) ---
+  { name: 'vcupQueueJoin', kind: 'method' },
+  { name: 'vcupQueueLeave', kind: 'method' },
+  { name: 'vcupSetRole', kind: 'method' },
+  { name: 'vcupReady', kind: 'method' },
+  { name: 'vcupBet', kind: 'method' },
+  { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
   { name: 'marketList', kind: 'method' },
@@ -212,6 +229,11 @@ export const IWORLD_MEMBERS = [
   { name: 'mailTake', kind: 'method' },
   { name: 'mailDelete', kind: 'method' },
   { name: 'mailMarkRead', kind: 'method' },
+  // --- personal bank: proximity-gated contents read + deposit/withdraw/buy commands ---
+  { name: 'bankInfo', kind: 'data' },
+  { name: 'bankDeposit', kind: 'method' },
+  { name: 'bankWithdraw', kind: 'method' },
+  { name: 'bankBuySlots', kind: 'method' },
   // --- dungeons + delves commands and reads ---
   { name: 'enterDungeon', kind: 'method' },
   { name: 'leaveDungeon', kind: 'method' },
@@ -233,11 +255,32 @@ export const IWORLD_MEMBERS = [
   { name: 'companionUpgrades', kind: 'data' },
   { name: 'delveDaily', kind: 'data' },
   { name: 'professionsState', kind: 'data' },
+  { name: 'nodeHarvestableByMe', kind: 'method' }, // read-returning
+  { name: 'harvestNode', kind: 'method' },
+  { name: 'recipeList', kind: 'data' },
+  { name: 'lastCraftResult', kind: 'data' },
+  { name: 'craftItem', kind: 'method' },
+  { name: 'activeArchetype', kind: 'data' },
+  { name: 'archetypeSwitchCount', kind: 'data' },
+  { name: 'archetypeAmendsProgress', kind: 'data' },
+  { name: 'archetypeAmendsRequired', kind: 'data' },
+  { name: 'archetypeTitle', kind: 'data' },
+  { name: 'acceptArchetypeQuest', kind: 'method' },
+  { name: 'advanceAmendsProgress', kind: 'method' },
+  { name: 'switchArchetype', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
+  { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
+  { name: 'setDungeonDifficulty', kind: 'method' },
+  { name: 'buyHeroicVendorItem', kind: 'method' },
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
   { name: 'devLeaderboard', kind: 'method' }, // async
   { name: 'prestige', kind: 'method' },
+  // --- daily WOC-holder rewards (IWorldDailyRewards; all async) ---
+  { name: 'dailyRewards', kind: 'method' },
+  { name: 'dailyRewardLeaderboard', kind: 'method' },
+  { name: 'spinDailyReward', kind: 'method' },
+  { name: 'dailyRewardHistory', kind: 'method' },
   // --- talents & specializations (reads + commands) ---
   { name: 'talents', kind: 'data' },
   { name: 'talentSpec', kind: 'data' },
@@ -296,7 +339,7 @@ function withDomStubs<T>(fn: () => T): T {
 }
 
 // A real ClientWorld whose FIELD INITIALIZERS have run (a raw
-// `Object.create(ClientWorld.prototype)` bareClient would be missing all 37 data
+// `Object.create(ClientWorld.prototype)` bareClient would be missing all data
 // props). Pass a non-empty `base` so the ctor builds a `ws://localhost/ws` URL instead
 // of touching `location`; `.close()` clears the stubbed input timer.
 function makeClientWorld(): ClientWorld {
@@ -352,11 +395,10 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(167);
-    expect(DATA_MEMBERS.length).toBe(42);
-    expect(METHOD_MEMBERS.length).toBe(125);
+    expect(IWORLD_MEMBERS.length).toBe(203);
+    expect(DATA_MEMBERS.length).toBe(53);
+    expect(METHOD_MEMBERS.length).toBe(150);
   });
-
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
     expect(new Set(names).size).toBe(names.length);
@@ -364,16 +406,23 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 167', () => {
+  it('the full sorted member set is exactly the pinned 203', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'acceptArchetypeQuest',
       'acceptLinkedQuest',
       'acceptQuest',
       'accountCosmetics',
+      'activeArchetype',
       'activeLoadout',
       'activeLootRolls',
+      'advanceAmendsProgress',
       'applyTalents',
+      'archetypeAmendsProgress',
+      'archetypeAmendsRequired',
+      'archetypeSwitchCount',
+      'archetypeTitle',
       'arenaAugmentPick',
       'arenaInfo',
       'arenaQueueJoin',
@@ -382,9 +431,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'autoLoot',
       'bagCapacity',
       'bags',
+      'bankBuySlots',
+      'bankDeposit',
+      'bankInfo',
+      'bankWithdraw',
       'blockAdd',
       'blockRemove',
       'buyBackItem',
+      'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
       'castAbility',
@@ -402,7 +456,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'convertPartyToRaid',
       'convertRaidToParty',
       'copper',
+      'craftItem',
       'craftSkills',
+      'cupInfo',
+      'dailyRewardHistory',
+      'dailyRewardLeaderboard',
+      'dailyRewards',
       'deleteLoadout',
       'delveBuyShopItem',
       'delveDaily',
@@ -417,6 +476,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'duelDecline',
       'duelInfo',
       'duelRequest',
+      'dungeonDifficulty',
       'enterDelve',
       'enterDungeon',
       'entities',
@@ -427,6 +487,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
+      'gatheringProficiency',
       'guildAccept',
       'guildCreate',
       'guildDecline',
@@ -440,10 +501,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildLeave',
       'guildPromote',
       'guildTransfer',
+      'harvestCorpse',
+      'harvestNode',
       'healPet',
       'interact',
       'inventory',
       'known',
+      'lastCraftResult',
       'leaderboard',
       'leaveDelve',
       'leaveDungeon',
@@ -454,6 +518,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'lockpickEngage',
       'lockpickState',
       'lootCorpse',
+      'lootRollGroupStatus',
       'mailDelete',
       'mailInfo',
       'mailMarkRead',
@@ -469,6 +534,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketSearch',
       'moveInput',
       'moveRaidMember',
+      'nodeHarvestableByMe',
       'partyAccept',
       'partyDecline',
       'partyInfo',
@@ -490,6 +556,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questsDone',
       'raidLockouts',
       'realm',
+      'recipeList',
       'releaseSpirit',
       'renamePet',
       'reportTelemetry',
@@ -502,15 +569,19 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'searchCharacters',
       'sellAllJunk',
       'sellItem',
+      'setDungeonDifficulty',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoTaunt',
       'setPetMode',
       'setSpec',
+      'setTownFocus',
       'socialInfo',
+      'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
       'submitLootRoll',
+      'switchArchetype',
       'switchLoadout',
       'tabTarget',
       'talentPoints',
@@ -519,6 +590,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talents',
       'targetEntity',
       'targetNearestFriendly',
+      'townFocus',
       'tradeAccept',
       'tradeCancel',
       'tradeConfirm',
@@ -531,31 +603,46 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unequipMechChroma',
       'unlockedMilestones',
       'useItem',
+      'vcupBet',
+      'vcupPracticeStart',
+      'vcupQueueJoin',
+      'vcupQueueLeave',
+      'vcupReady',
+      'vcupSetRole',
       'vendorBuyback',
       'xp',
     ]);
   });
 
-  it('the sorted data-kind set is exactly the pinned 42', () => {
+  it('the sorted data-kind set is exactly the pinned 53', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountCosmetics',
+      'activeArchetype',
       'activeLoadout',
+      'archetypeAmendsProgress',
+      'archetypeAmendsRequired',
+      'archetypeSwitchCount',
+      'archetypeTitle',
       'arenaInfo',
       'bagCapacity',
       'bags',
+      'bankInfo',
       'cfg',
       'companionState',
       'companionUpgrades',
       'copper',
       'craftSkills',
+      'cupInfo',
       'delveDaily',
       'delveMarks',
       'delveRun',
       'duelInfo',
       'entities',
       'equipment',
+      'gatheringProficiency',
       'inventory',
       'known',
+      'lastCraftResult',
       'lifetimeXp',
       'loadouts',
       'lockpickState',
@@ -571,11 +658,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questLog',
       'questsDone',
       'realm',
+      'recipeList',
       'restedXp',
       'socialInfo',
       'talentRole',
       'talentSpec',
       'talents',
+      'townFocus',
       'tradeInfo',
       'unlockedMilestones',
       'vendorBuyback',
@@ -583,22 +672,28 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 122', () => {
+  it('the sorted method-kind set is exactly the pinned 150', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'acceptArchetypeQuest',
       'acceptLinkedQuest',
       'acceptQuest',
       'activeLootRolls',
+      'advanceAmendsProgress',
       'applyTalents',
       'arenaAugmentPick',
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
       'autoLoot',
+      'bankBuySlots',
+      'bankDeposit',
+      'bankWithdraw',
       'blockAdd',
       'blockRemove',
       'buyBackItem',
+      'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
       'castAbility',
@@ -612,6 +707,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'companionUpgrade',
       'convertPartyToRaid',
       'convertRaidToParty',
+      'craftItem',
+      'dailyRewardHistory',
+      'dailyRewardLeaderboard',
+      'dailyRewards',
       'deleteLoadout',
       'delveBuyShopItem',
       'delveInteract',
@@ -622,6 +721,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'duelAccept',
       'duelDecline',
       'duelRequest',
+      'dungeonDifficulty',
       'enterDelve',
       'enterDungeon',
       'equipBag',
@@ -643,6 +743,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildLeave',
       'guildPromote',
       'guildTransfer',
+      'harvestCorpse',
+      'harvestNode',
       'healPet',
       'interact',
       'leaderboard',
@@ -652,6 +754,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'lockpickAction',
       'lockpickEngage',
       'lootCorpse',
+      'lootRollGroupStatus',
       'mailDelete',
       'mailMarkRead',
       'mailSend',
@@ -663,6 +766,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketSearch',
       'moveRaidMember',
+      'nodeHarvestableByMe',
       'partyAccept',
       'partyDecline',
       'partyInvite',
@@ -687,14 +791,18 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'searchCharacters',
       'sellAllJunk',
       'sellItem',
+      'setDungeonDifficulty',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoTaunt',
       'setPetMode',
       'setSpec',
+      'setTownFocus',
+      'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
       'submitLootRoll',
+      'switchArchetype',
       'switchLoadout',
       'tabTarget',
       'talentPoints',
@@ -710,6 +818,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unequipItem',
       'unequipMechChroma',
       'useItem',
+      'vcupBet',
+      'vcupPracticeStart',
+      'vcupQueueJoin',
+      'vcupQueueLeave',
+      'vcupReady',
+      'vcupSetRole',
     ]);
   });
 });
@@ -745,17 +859,18 @@ describe('membership, not equality: world extras do not fail the gate', () => {
   });
 });
 
-// --- W1: aggregate == disjoint union of the 22 facet member sets --------------------
-// After the facet split (W1), `interface IWorld extends` 22 domain facet interfaces
-// (src/world_api/<facet>.ts; the 21 owner-backed facets plus IWorldTelemetry). This
-// block proves the split dropped nothing and duplicated nothing:
+// --- W1: aggregate == disjoint union of the 25 facet member sets --------------------
+// After the facet split (W1), `interface IWorld extends` 25 domain facet interfaces
+// (src/world_api/<facet>.ts; the owner-backed facets plus IWorldTelemetry and the
+// bank-system's IWorldBank). This block proves the split dropped nothing and
+// duplicated nothing:
 //   (1) each facet's runtime name array is pinned to its interface key-set via
 //       `satisfies readonly (keyof IWorldX)[]` (rejects a FOREIGN name at compile time);
 //   (2) a type-level AssertNever<Exclude<keyof IWorldX, array[number]>> per facet rejects
 //       a MISSING name (if the array omits a key, Exclude<> is a non-never union and tsc
 //       fails) -- (1)+(2) together make each array EXACTLY its facet key-set;
-//   (3) the 22 arrays are pairwise DISJOINT (a member filed in two facets reddens);
-//   (4) their union, sorted, equals the pinned 167-name IWORLD_MEMBERS set (a member
+//   (3) the 25 arrays are pairwise DISJOINT (a member filed in two facets reddens);
+//   (4) their union, sorted, equals the pinned 203-name IWORLD_MEMBERS set (a member
 //       dropped from the split reddens).
 // This is the rigorous form, NOT the tautological `keyof IWorld === keyof (A & B & ...)`
 // (IWorld extends them, so that self-equality proves nothing): it asserts against the
@@ -781,8 +896,8 @@ type _ExhaustEntityRoster = AssertNever<
 const FACET_COMBAT = [
   'known',
   'castAbility',
-  'castAbilityBySlot',
   'castAbilityAt',
+  'castAbilityBySlot',
   'cancelAura',
   'startAutoAttack',
   'stopAutoAttack',
@@ -805,8 +920,11 @@ type _ExhaustTargeting = AssertNever<
 const FACET_INTERACTION = [
   'interact',
   'lootCorpse',
-  'autoLoot',
+  'harvestCorpse',
   'pickUpObject',
+  'townFocus',
+  'setTownFocus',
+  'autoLoot',
 ] as const satisfies readonly (keyof IWorldInteraction)[];
 type _ExhaustInteraction = AssertNever<
   Exclude<keyof IWorldInteraction, (typeof FACET_INTERACTION)[number]>
@@ -815,6 +933,7 @@ type _ExhaustInteraction = AssertNever<
 const FACET_LOOT = [
   'submitLootRoll',
   'activeLootRolls',
+  'lootRollGroupStatus',
 ] as const satisfies readonly (keyof IWorldLoot)[];
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
@@ -868,6 +987,7 @@ const FACET_PROGRESSION_XP = [
   'unlockedMilestones',
   'restedXp',
   'craftSkills',
+  'gatheringProficiency',
   'leaderboard',
   'guildLeaderboard',
   'devLeaderboard',
@@ -996,10 +1116,21 @@ const FACET_MAIL = [
 ] as const satisfies readonly (keyof IWorldMail)[];
 type _ExhaustMail = AssertNever<Exclude<keyof IWorldMail, (typeof FACET_MAIL)[number]>>;
 
+const FACET_BANK = [
+  'bankInfo',
+  'bankDeposit',
+  'bankWithdraw',
+  'bankBuySlots',
+] as const satisfies readonly (keyof IWorldBank)[];
+type _ExhaustBank = AssertNever<Exclude<keyof IWorldBank, (typeof FACET_BANK)[number]>>;
+
 const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
+  'dungeonDifficulty',
+  'setDungeonDifficulty',
+  'buyHeroicVendorItem',
 ] as const satisfies readonly (keyof IWorldDungeons)[];
 type _ExhaustDungeons = AssertNever<Exclude<keyof IWorldDungeons, (typeof FACET_DUNGEONS)[number]>>;
 
@@ -1024,19 +1155,53 @@ const FACET_DELVES = [
 ] as const satisfies readonly (keyof IWorldDelves)[];
 type _ExhaustDelves = AssertNever<Exclude<keyof IWorldDelves, (typeof FACET_DELVES)[number]>>;
 
+const FACET_DAILY_REWARDS = [
+  'dailyRewards',
+  'dailyRewardLeaderboard',
+  'spinDailyReward',
+  'dailyRewardHistory',
+] as const satisfies readonly (keyof IWorldDailyRewards)[];
+type _ExhaustDailyRewards = AssertNever<
+  Exclude<keyof IWorldDailyRewards, (typeof FACET_DAILY_REWARDS)[number]>
+>;
+
 const FACET_TELEMETRY = ['reportTelemetry'] as const satisfies readonly (keyof IWorldTelemetry)[];
 type _ExhaustTelemetry = AssertNever<
   Exclude<keyof IWorldTelemetry, (typeof FACET_TELEMETRY)[number]>
 >;
 
+const FACET_VALE_CUP = [
+  'cupInfo',
+  'vcupQueueJoin',
+  'vcupQueueLeave',
+  'vcupSetRole',
+  'vcupReady',
+  'vcupBet',
+  'vcupPracticeStart',
+] as const satisfies readonly (keyof IWorldValeCup)[];
+type _ExhaustValeCup = AssertNever<Exclude<keyof IWorldValeCup, (typeof FACET_VALE_CUP)[number]>>;
+
 const FACET_PROFESSIONS = [
   'professionsState',
+  'nodeHarvestableByMe',
+  'harvestNode',
+  'recipeList',
+  'lastCraftResult',
+  'craftItem',
+  'activeArchetype',
+  'archetypeSwitchCount',
+  'archetypeAmendsProgress',
+  'archetypeAmendsRequired',
+  'archetypeTitle',
+  'acceptArchetypeQuest',
+  'advanceAmendsProgress',
+  'switchArchetype',
 ] as const satisfies readonly (keyof IWorldProfessions)[];
 type _ExhaustProfessions = AssertNever<
   Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
 >;
 
-// The 21-facet partition, keyed by facet for legible failure messages.
+// The 25-facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
   combat: FACET_COMBAT,
@@ -1056,15 +1221,18 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   socialGraph: FACET_SOCIAL_GRAPH,
   market: FACET_MARKET,
   mail: FACET_MAIL,
+  bank: FACET_BANK,
   dungeons: FACET_DUNGEONS,
   delves: FACET_DELVES,
+  dailyRewards: FACET_DAILY_REWARDS,
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
+  valeCup: FACET_VALE_CUP,
 };
 
-describe('W1: aggregate IWorld member set equals the disjoint union of the 22 facets', () => {
-  it('pins the facet count at 22', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(22);
+describe('W1: aggregate IWorld member set equals the disjoint union of the 25 facets', () => {
+  it('pins the facet count at 25', () => {
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(25);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1074,7 +1242,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 22 fa
     }
   });
 
-  it('the 22 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the 25 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -1090,10 +1258,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 22 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 22 facets equals the pinned 167-member IWORLD_MEMBERS set', () => {
+  it('the union of the 25 facets equals the pinned 203-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(167);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(167);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(203);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(203);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

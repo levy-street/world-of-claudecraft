@@ -11,6 +11,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_CA: Partial<Record<TranslationKey, string>> = {
+  'download.macCta': 'Telecharger la version macOS',
+  'download.windowsPending': 'Version Windows a venir.',
   // Stat tooltips inherit the fr_FR base: none of these strings has a genuine
   // Quebec-specific form, so per the divergence-only policy fr_CA carries no
   // hudChrome.statInfo.* overrides.
@@ -167,6 +169,9 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.lockJammed':
     "La serrure est bloquée, impossible à crocheter : terminez l'excavation de nouveau pour une autre tentative.",
   'sim.lockpick.lockYields': 'La serrure cède! Butin {tier}.',
+  // Mobile touch controls: the hotbar page-flip button and its accessible name.
+  'hudChrome.mobile.hotbarPageAria': 'Afficher la prochaine série de techniques',
+  // Corpse-harvest focus picker (window title, confirm button, component labels).
   // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Cause {value} points de dégâts de {school} toutes les {interval} s',
   'hudChrome.auraEffect.hot': 'Redonne {value} points de vie toutes les {interval} s',

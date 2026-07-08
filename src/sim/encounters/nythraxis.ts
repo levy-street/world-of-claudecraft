@@ -28,6 +28,8 @@
 import { isStunned } from '../combat/cc';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import { createMob, createNpc } from '../entity';
+import { applyHeroicMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
+import { heroicLockoutId } from '../instances/dungeons';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { clearThreat, threatEntries } from '../threat';
@@ -69,11 +71,35 @@ const NYTHRAXIS_GRAVEBREAKER_RANGE = 11;
 const NYTHRAXIS_GRAVEBREAKER_HALF_ARC = Math.PI / 3;
 const NYTHRAXIS_OPENER_SECOND_YELL_DELAY = 4;
 const NYTHRAXIS_DIALOGUE_LINE_SECONDS = 2.6;
-const NYTHRAXIS_RAISE_FALLEN_EVERY = 45;
+// Raise Fallen add-wave cadence, both difficulties (heroic scales the ADDS,
+// not the cadence). Was 45s; tightened to 30s so the waves stay pressure the
+// raid must answer all fight.
+const NYTHRAXIS_RAISE_FALLEN_EVERY = 30;
 const NYTHRAXIS_PHASE_TWO_HP = 0.7;
 const NYTHRAXIS_SOUL_REND_EVERY = 30;
 const NYTHRAXIS_SOUL_REND_DURATION = 8;
 const NYTHRAXIS_SOUL_REND_STACK_RANGE = 5;
+// Soul Rend mark counts. Heroic doubles the marked players (6 of the raid must
+// collapse onto the stack point inside 8s); the extra rng picks draw ONLY on a
+// heroic claim, so the normal trace and the parity golden are unchanged.
+const NYTHRAXIS_SOUL_REND_MARKS = 3;
+const NYTHRAXIS_SOUL_REND_MARKS_HEROIC = 6;
+// Heroic non-compliance punishers. Soul Rend deals maxHp x mult / stacked, so
+// on heroic an unstacked mark takes 150% of max hp (a guaranteed kill through
+// any topped-off health bar) and even a pair splitting takes 75% each.
+// Deathless Rage on a FAILED wardstone channel hits for 115% of max hp on
+// heroic (a raid wipe) versus 82% on normal. Both are percentage math with no
+// rng, so the normal trace and parity golden are unchanged.
+const NYTHRAXIS_SOUL_REND_HEROIC_MULT = 1.5;
+const NYTHRAXIS_DEATHLESS_PCT = 0.82;
+const NYTHRAXIS_DEATHLESS_PCT_HEROIC = 1.15;
+
+// Whether this boss's claimed instance is heroic (the arena instance is found
+// the same way the add spawns find it: by mobIds membership).
+function isHeroicNythraxis(ctx: SimContext, boss: Entity): boolean {
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+  return inst?.difficulty === 'heroic';
+}
 const NYTHRAXIS_DEATHLESS_EVERY = 45;
 const NYTHRAXIS_DEATHLESS_CAST = 10;
 const NYTHRAXIS_DEATHLESS_CHANNEL = 5;
@@ -475,8 +501,13 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
   // lockout seam (the authoritative server uses its realm-local 3 AM daily reset, so a
   // realm's raids share one boundary; offline/headless fall back to a flat 24h day).
   const until = ctx.raidResetMs(ctx.lockoutNowMs());
+  // Difficulty-scoped: a heroic kill locks the :heroic key only, so the raid
+  // can still run the normal difficulty the same day (and vice versa).
+  const lockId = isHeroicNythraxis(ctx, boss)
+    ? heroicLockoutId('nythraxis_boss_arena')
+    : 'nythraxis_boss_arena';
   for (const meta of nythraxisRoomMetas(ctx, boss)) {
-    meta.raidLockouts.set('nythraxis_boss_arena', until);
+    meta.raidLockouts.set(lockId, until);
   }
 }
 
@@ -547,10 +578,20 @@ export function spawnNythraxisAdds(ctx: SimContext, boss: Entity): void {
     ctx.groundPos(boss.spawnPos.x + 12, back),
   ];
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+  // Add waves inherit the claimed instance's difficulty exactly like
+  // claimInstance spawns (the heroic transform is a no-op for normal; no rng
+  // is drawn here, so the parity full-pull golden is unaffected).
+  const difficulty = inst?.difficulty ?? 'normal';
+  const spawnTemplate = mobTemplateForDungeonDifficulty(
+    template,
+    inst?.dungeonId ?? '',
+    difficulty,
+  );
   const victimId = boss.aggroTargetId ?? threatEntries(boss, 1)[0]?.[0] ?? null;
   const victim = victimId !== null ? ctx.entities.get(victimId) : null;
   for (const pos of spawnPoints) {
-    const add = createMob(ctx.nextId++, template, template.maxLevel, pos);
+    const add = createMob(ctx.nextId++, spawnTemplate, spawnTemplate.maxLevel, pos);
+    applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty);
     add.spawnPos = { ...boss.spawnPos };
     add.tappedById = boss.tappedById;
     ctx.addEntity(add);
@@ -712,8 +753,11 @@ export function castNythraxisSoulRend(
     st.soulRendTimer = 3;
     return;
   }
+  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+  const markCount =
+    inst?.difficulty === 'heroic' ? NYTHRAXIS_SOUL_REND_MARKS_HEROIC : NYTHRAXIS_SOUL_REND_MARKS;
   const picked: Entity[] = [];
-  while (picked.length < 3 && candidates.length > 0) {
+  while (picked.length < markCount && candidates.length > 0) {
     const idx = ctx.rng.int(0, candidates.length - 1);
     picked.push(candidates.splice(idx, 1)[0]);
   }
@@ -755,12 +799,22 @@ export function updateNythraxisSoulRend(
   const marked = st.soulRendMarks
     .map((m) => ctx.entities.get(m.playerId))
     .filter((e): e is Entity => !!e && e.kind === 'player' && !e.dead);
+  const rendMult = isHeroicNythraxis(ctx, boss) ? NYTHRAXIS_SOUL_REND_HEROIC_MULT : 1;
   for (const p of marked) {
     const stacked = marked.filter(
       (other) => dist2d(other.pos, p.pos) <= NYTHRAXIS_SOUL_REND_STACK_RANGE,
     ).length;
     const share = Math.max(1, stacked);
-    ctx.dealDamage(boss, p, Math.ceil(p.maxHp / share), false, 'shadow', 'Soul Rend', 'hit', true);
+    ctx.dealDamage(
+      boss,
+      p,
+      Math.ceil((p.maxHp * rendMult) / share),
+      false,
+      'shadow',
+      'Soul Rend',
+      'hit',
+      true,
+    );
     p.auras = p.auras.filter((a) => a.id !== 'nythraxis_soul_rend');
     ctx.emit({
       type: 'spellfx',
@@ -854,11 +908,14 @@ export function updateNythraxisDeathlessRage(
     school: 'shadow',
     fx: 'nova',
   });
+  const ragePct = isHeroicNythraxis(ctx, boss)
+    ? NYTHRAXIS_DEATHLESS_PCT_HEROIC
+    : NYTHRAXIS_DEATHLESS_PCT;
   for (const p of playersInNythraxisRoom(ctx, boss)) {
     ctx.dealDamage(
       boss,
       p,
-      Math.ceil(p.maxHp * 0.82),
+      Math.ceil(p.maxHp * ragePct),
       false,
       'shadow',
       'Deathless Rage',

@@ -87,6 +87,14 @@
     top: 50%;
     transform: translateY(-50%);
   }
+  /* A sub-view's back control: the same square .x-btn chrome, but kept in the
+     header's normal flex flow so it sits at the inline start (top left) before
+     the title, instead of the .x-btn absolute pin to the inline end. */
+  .window > .panel-title > .x-btn.back-btn {
+    position: static;
+    transform: none;
+    flex: none;
+  }
   /* Resizable windows (class stamped by src/ui/window_resize.ts): a diagonal grip
      drawn as an extra background layer on the window itself, so it stays pinned to
      the visual bottom-right corner while the content scrolls (an element or

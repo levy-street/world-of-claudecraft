@@ -4,6 +4,9 @@ import {
   emptyCraftSkills,
   gainCraftSkill,
   normalizeCraftSkills,
+  tierCapability,
+  tierForSkill,
+  tierProgressMultiplier,
 } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
 
@@ -72,6 +75,46 @@ describe('flat per-craft skill tracking (#1126)', () => {
     const skills = normalizeCraftSkills({ enchanting: -3, tailoring: Number.NaN });
     expect(skills.enchanting).toBe(0);
     expect(skills.tailoring).toBe(0);
+  });
+});
+
+describe('tier capability mapping and progress curve (#1128)', () => {
+  it('buckets flat skill into a tier index every 25 points', () => {
+    expect(tierForSkill(0)).toBe(0);
+    expect(tierForSkill(24)).toBe(0);
+    expect(tierForSkill(25)).toBe(1);
+    expect(tierForSkill(49)).toBe(1);
+    expect(tierForSkill(50)).toBe(2);
+    expect(tierForSkill(-5)).toBe(0);
+  });
+
+  it('tierCapability reads the tier bucket for one craft, independent of the rest', () => {
+    const skills = emptyCraftSkills();
+    gainCraftSkill(skills, 'cooking', 60);
+    expect(tierCapability(skills, 'cooking')).toBe(2);
+    expect(tierCapability(skills, 'alchemy')).toBe(0);
+  });
+
+  it('common tier (recipeTier 0) is always full, regardless of capability', () => {
+    expect(tierProgressMultiplier(0, 0)).toBe(1);
+    expect(tierProgressMultiplier(5, 0)).toBe(1);
+  });
+
+  it('at or above capability is full progress', () => {
+    expect(tierProgressMultiplier(1, 1)).toBe(1);
+    expect(tierProgressMultiplier(1, 2)).toBe(1);
+  });
+
+  it('exactly one tier below capability is reduced but non-zero', () => {
+    const belowOne = tierProgressMultiplier(2, 1);
+    expect(belowOne).toBeGreaterThan(0);
+    expect(belowOne).toBeLessThan(1);
+    expect(tierProgressMultiplier(3, 2)).toBe(belowOne);
+  });
+
+  it('two or more tiers below capability is zero', () => {
+    expect(tierProgressMultiplier(3, 1)).toBe(0);
+    expect(tierProgressMultiplier(4, 1)).toBe(0);
   });
 });
 

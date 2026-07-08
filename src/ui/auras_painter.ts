@@ -38,6 +38,13 @@ const DEBUFF_CLASS = 'debuff';
 // stylesheet draws the affordance (context-menu cursor + hover border); the class is
 // toggled per frame so a recycled node never keeps a stale affordance.
 const CANCELABLE_CLASS = 'cancelable';
+// Marks the LOCAL player's own aura on an ownFirst view (the target strip): the
+// stylesheet renders it larger so your dots/hots read at a glance among other
+// casters'. Toggled per frame so a recycled node never keeps stale prominence.
+const OWN_CLASS = 'own';
+// Carries the debuff's magic school so the stylesheet tints the border per school
+// (WoW-style poison/magic/curse reads); '' on a buff, so no school selector matches.
+const SCHOOL_ATTR = 'data-school';
 const DUR_CLASS = 'dur';
 const STACKS_CLASS = 'stacks';
 const BACKGROUND_IMAGE_PROP = 'background-image';
@@ -204,7 +211,9 @@ export class AurasPainter {
       // The buff/debuff distinction is a structural class (not an inline color); the
       // stylesheet renders it as a border the icon meaning does not depend on.
       this.writers.toggleClass(rec.el, DEBUFF_CLASS, s.isDebuff);
+      this.writers.setAttr(rec.el, SCHOOL_ATTR, s.school);
       this.writers.toggleClass(rec.el, CANCELABLE_CLASS, rec.cancelable);
+      this.writers.toggleClass(rec.el, OWN_CLASS, s.own);
       this.writers.setText(rec.dur, s.durationText);
       const hasStacks = s.stacksText !== '';
       this.writers.setDisplay(rec.stacks, hasStacks ? STACKS_SHOWN : STACKS_HIDDEN);

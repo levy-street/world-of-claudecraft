@@ -38,7 +38,6 @@ import { scheduleProjectile } from '../projectile_travel';
 import type { SimContext } from '../sim_context';
 import {
   type Aura,
-  angleTo,
   DT,
   dist2d,
   type Entity,
@@ -46,6 +45,7 @@ import {
   PET_GROWL_INTERVAL,
   PET_TELEPORT_DISTANCE,
   RUN_SPEED,
+  steadyAngleTo,
 } from '../types';
 
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
@@ -107,7 +107,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
         ctx.moveToward(pet, target.pos, pet.moveSpeed * ctx.moveSpeedMult(pet));
       pet.swingTimer = Math.max(0, pet.swingTimer - DT);
     } else {
-      pet.facing = angleTo(pet.pos, target.pos);
+      pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
       if (
         target.kind === 'mob' &&
         !ranged &&
@@ -248,20 +248,29 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   const ownerIdle = !ownerMeta || ctx.tickCount - ownerMeta.lastActiveTick > PET_OWNER_IDLE_TICKS;
   let best: Entity | null = null;
   let bestD = pet.petMode === 'aggressive' ? PET_AGGRESSIVE_RANGE : PET_ASSIST_RANGE;
-  for (const m of ctx.entities.values()) {
-    if (m.id === pet.id || m.dead || !ctx.isHostileTo(pet, m)) continue;
+  // Scan the spatial grid within PET_ASSIST_RANGE instead of the whole entity roster:
+  // a target-less pet ran this O(all-entities) scan every idle tick (20Hz), a top CPU
+  // frame at scale. PET_ASSIST_RANGE (50) is a safe superset in BOTH modes: bestD only
+  // decreases from at most 50 and selection is strict `<`, so no winner can lie beyond
+  // 50yd (aggressive-mode 18..50 extras the wider query surfaces are re-rejected by the
+  // `aggressive` d <= 18 predicate). The grid holds every kind (mobs, players, pets),
+  // so PvP players are still candidates. Body is verbatim (the pet.id skip stays: the
+  // grid visits the pet itself at distance 0). We keep the inner dist2d rather than the
+  // callback's squared d2 to avoid a units mismatch silently changing the radius.
+  ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_ASSIST_RANGE, (m) => {
+    if (m.id === pet.id || m.dead || !ctx.isHostileTo(pet, m)) return;
     const engagingUs =
       m.kind === 'mob' && (m.aggroTargetId === owner.id || m.aggroTargetId === pet.id);
     const ownerOffense =
       owner.targetId === m.id && (owner.autoAttack || (m.kind === 'mob' && m.threat.has(owner.id)));
     const aggressive =
       pet.petMode === 'aggressive' && !ownerIdle && dist2d(pet.pos, m.pos) <= PET_AGGRESSIVE_RANGE;
-    if (!engagingUs && !ownerOffense && !aggressive) continue;
+    if (!engagingUs && !ownerOffense && !aggressive) return;
     const d = dist2d(pet.pos, m.pos);
     if (d < bestD) {
       best = m;
       bestD = d;
     }
-  }
+  });
   return best;
 }

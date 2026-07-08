@@ -30,6 +30,12 @@ vi.mock('../server/db', () => ({
     grantAccountMechChroma(...(args as [number, string])),
   revokeAccountMechChroma: (...args: unknown[]) =>
     revokeAccountMechChroma(...(args as [number, string])),
+  // Character load leases: leave() releases and the autosave loop heartbeats, so
+  // these must exist on the mock or those paths throw on the undefined export.
+  acquireCharacterLease: vi.fn(async () => true),
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
 import { saveCharacterAndMarketState, saveCharacterState } from '../server/db';
@@ -166,6 +172,35 @@ describe('GameServer sessions', () => {
     expect(session.accountCosmetics.mechChromaIds).toContain(MECH_CHROMAS[choice].id);
     expect(server.sim.countItem('alien_armor_plate', session.pid)).toBe(0);
     expect(server.sim.entities.get(session.pid)?.skinCatalog).toBe('mech');
+  });
+
+  it('grantMechChromaToAccount persists the swag grant and pushes it to the live session', async () => {
+    // The Discord swag-claim hook (configureDiscordRuntime wires the route's
+    // grantCosmetic to this method): persist by account id, then best-effort push the
+    // refreshed cosmetics onto any online session of that account.
+    grantAccountMechChroma.mockClear();
+    const server = new GameServer();
+    const session = expectJoined(server.join(fakeWs(), 11, 101, 'Swaggrant', 'mage', null));
+    expect(session.accountCosmetics.mechChromaIds).not.toContain('amber_crimson');
+
+    server.grantMechChromaToAccount(11, 'amber_crimson');
+    // The grant chain is fire-and-forget (void promise); flush the microtask queue.
+    await new Promise((resolve) => setImmediate(resolve));
+
+    expect(grantAccountMechChroma).toHaveBeenCalledWith(11, 'amber_crimson');
+    expect(session.accountCosmetics.mechChromaIds).toContain('amber_crimson');
+  });
+
+  it('grantMechChromaToAccount still persists when the account has no live session (offline no-op push)', async () => {
+    grantAccountMechChroma.mockClear();
+    const server = new GameServer();
+
+    server.grantMechChromaToAccount(42, 'amber_crimson');
+    await new Promise((resolve) => setImmediate(resolve));
+
+    // The durable grant runs regardless; with no online session the live push is a
+    // no-op and nothing throws.
+    expect(grantAccountMechChroma).toHaveBeenCalledWith(42, 'amber_crimson');
   });
 
   it('equips a live mech appearance only when the account owns the chroma', () => {

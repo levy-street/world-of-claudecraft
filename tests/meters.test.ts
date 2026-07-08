@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import type { SimEvent } from '../src/sim/types';
 import { MeterData } from '../src/ui/meters';
 import type { IWorld } from '../src/world_api';
-import type { SimEvent } from '../src/sim/types';
 
 // minimal IWorld stand-in: entity map + player + party
 function fakeWorld(): IWorld {
@@ -9,16 +9,36 @@ function fakeWorld(): IWorld {
   entities.set(1, { id: 1, kind: 'player', name: 'Hero', templateId: 'warrior' });
   entities.set(2, { id: 2, kind: 'player', name: 'Pal', templateId: 'priest' });
   entities.set(50, { id: 50, kind: 'mob', name: 'Wolf', maxHp: 60, dead: false, aggroTargetId: 1 });
-  entities.set(51, { id: 51, kind: 'mob', name: 'Gorrak', maxHp: 400, dead: false, aggroTargetId: 1 });
+  entities.set(51, {
+    id: 51,
+    kind: 'mob',
+    name: 'Gorrak',
+    maxHp: 400,
+    dead: false,
+    aggroTargetId: 1,
+  });
   return {
     entities,
     player: entities.get(1),
-    partyInfo: { leader: 1, raid: false, members: [{ pid: 2, name: 'Pal', cls: 'priest', group: 1 }] },
+    partyInfo: {
+      leader: 1,
+      raid: false,
+      members: [{ pid: 2, name: 'Pal', cls: 'priest', group: 1 }],
+    },
   } as unknown as IWorld;
 }
 
 const dmg = (sourceId: number, targetId: number, amount: number): SimEvent =>
-  ({ type: 'damage', sourceId, targetId, amount, crit: false, school: 'physical', ability: null, kind: 'hit' }) as SimEvent;
+  ({
+    type: 'damage',
+    sourceId,
+    targetId,
+    amount,
+    crit: false,
+    school: 'physical',
+    ability: null,
+    kind: 'hit',
+  }) as SimEvent;
 const heal = (sourceId: number, targetId: number, amount: number): SimEvent =>
   ({ type: 'heal2', sourceId, targetId, amount, crit: false, ability: 'Heal' }) as SimEvent;
 
@@ -62,6 +82,38 @@ describe('combat meters', () => {
     expect(m.allTime.tallies.get(1)!.dmg).toBe(17);
   });
 
+  it('measures DPS against a training dummy and retains the segment after combat ends', () => {
+    const w = fakeWorld();
+    // a training dummy never holds aggro on a party member (aggroTargetId stays null),
+    // so it never keeps the encounter artificially open.
+    (w.entities as Map<number, any>).set(70, {
+      id: 70,
+      kind: 'mob',
+      name: 'Training Dummy',
+      maxHp: 999999,
+      dead: false,
+      aggroTargetId: null,
+    });
+    const party = new Set([1]);
+    const m = new MeterData(0);
+    // 1000 damage across a 10s window of attacking -> 100 DPS.
+    m.onEvent(dmg(1, 70, 400), w, party, 1000);
+    m.onEvent(dmg(1, 70, 600), w, party, 11_000);
+    m.update(w, party, 11_000);
+    expect(m.current!.tallies.get(1)!.dmg).toBe(1000);
+    expect(m.current!.label).toBe('Training Dummy');
+    // No other mob is engaged (the dummy itself never aggros), so once the inactivity
+    // window (ENCOUNTER_END_SECONDS = 5s) elapses the segment closes, landing in history
+    // with its measured duration so the meter retains the finished fight's DPS.
+    (w.entities.get(50) as any).aggroTargetId = null;
+    (w.entities.get(51) as any).aggroTargetId = null;
+    m.update(w, party, 11_000 + 5000 + 1);
+    expect(m.current).toBeNull();
+    expect(m.history.length).toBe(1);
+    expect(m.history[0].tallies.get(1)!.dmg).toBe(1000);
+    expect(m.history[0].duration).toBe(10); // 1000 dmg / 10s = 100 DPS, retained
+  });
+
   it('damage taken by a party member keeps the encounter alive but adds no damage row', () => {
     const w = fakeWorld();
     const party = new Set([1, 2]);
@@ -74,7 +126,13 @@ describe('combat meters', () => {
   it('can tally controlled pet damage when the HUD includes the pet in the party set', () => {
     const w = fakeWorld();
     const party = new Set([1, 2, 3]);
-    (w.entities as Map<number, any>).set(3, { id: 3, kind: 'mob', name: 'Wolf Pet', templateId: 'forest_wolf', ownerId: 1 });
+    (w.entities as Map<number, any>).set(3, {
+      id: 3,
+      kind: 'mob',
+      name: 'Wolf Pet',
+      templateId: 'forest_wolf',
+      ownerId: 1,
+    });
     const m = new MeterData(0);
     m.onEvent(dmg(3, 50, 18), w, party, 1000);
     expect(m.current).not.toBeNull();

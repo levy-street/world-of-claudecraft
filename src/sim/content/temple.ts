@@ -57,6 +57,7 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.05,
     color: 0x8fb6c4,
+    componentTags: ['gills', 'hide'],
   },
   drowned_votary: {
     id: 'drowned_votary',
@@ -103,6 +104,7 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.2,
     color: 0xbcd2e6,
+    componentTags: ['hide', 'claw', 'horn'],
   },
 };
 

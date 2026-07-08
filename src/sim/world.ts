@@ -1,6 +1,7 @@
 import { DUNGEON_FLOOR_Y, DUNGEON_X_THRESHOLD, getActiveWorldContent, WORLD_MAX_X } from './data';
 import { fbm2, hash2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent } from './types';
+import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 
 // Terrain is a pure function of (x, z, seed) for a given active world content:
 // both the sim (ground clamping) and the renderer (mesh) sample the same
@@ -26,6 +27,51 @@ export const WATER_LEVEL = -4.5;
 // the built-in constant. Cheap (identity-cached content lookup), safe in hot paths.
 export function waterLevel(): number {
   return world().content.waterLevel ?? WATER_LEVEL;
+}
+
+// A declared lake's footprint reaches this multiple past its authored radius
+// (the same soft-edge basin blend baseHeight uses below), so the render plane,
+// the walkable-depth floor, and the terrain basin itself all agree on where a
+// lake actually ends.
+export const LAKE_BLEND_RADIUS_MULT = 1.6;
+
+// True when (x,z) falls inside a declared lake's footprint (any zone's `lakes`
+// list). Terrain outside every declared water body is never "water", no
+// matter how far its height dips below waterLevel(): a content author's
+// sunken feature (crater, sinkhole, tunnel) stays dry and walkable as long as
+// it isn't inside one of these footprints.
+export function isInWaterBody(x: number, z: number): boolean {
+  for (const zone of world().content.zones) {
+    for (const lake of zone.lakes) {
+      const dSq = (x - lake.x) ** 2 + (z - lake.z) ** 2;
+      const rMax = lake.radius * LAKE_BLEND_RADIUS_MULT;
+      if (dSq < rMax * rMax) return true;
+    }
+  }
+  return false;
+}
+
+// The water surface height AT this location: waterLevel() inside a declared
+// lake's footprint, else -Infinity (there is no water surface here, so
+// nothing reads as flooded and no swim-depth floor applies). Callers that
+// need "is there water here at all" should prefer this over a flat global
+// constant.
+export function waterLevelAt(x: number, z: number): number {
+  return isInWaterBody(x, z) ? waterLevel() : -Infinity;
+}
+
+// Every declared lake across the active content's zones, in render/authoring
+// footprint (radius already includes the basin blend margin). Used to draw
+// water only where it is actually declared, instead of one flat plane across
+// an entire zone's footprint.
+export function waterBodies(): { x: number; z: number; radius: number }[] {
+  const out: { x: number; z: number; radius: number }[] = [];
+  for (const zone of world().content.zones) {
+    for (const lake of zone.lakes) {
+      out.push({ x: lake.x, z: lake.z, radius: lake.radius * LAKE_BLEND_RADIUS_MULT });
+    }
+  }
+  return out;
 }
 
 // Hill amplitude / base elevation / hub plateau height per biome.
@@ -77,6 +123,59 @@ const RIDGE_HEIGHT = 40;
 const RIDGE_SIGMA = 10; // gaussian width of the wall
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
+
+// Terracing turns the smooth ridge/rim rise into stair-stepped bands (flat
+// tread then a steep riser) instead of one uniform ramp, so mountainsides
+// read as a stacked rocky slope. TERRACE_STEP is the height of one band;
+// TERRACE_TREAD is the fraction of each band that stays flat before the
+// riser rises through the rest. Purely a reshaping of the already-computed
+// mountain rise (see terraceStep below): it cannot lower the overall climb
+// gate below the smooth original at the points tests/terrain_walls.test.ts
+// samples, since every riser is at least as steep as the ramp it replaces.
+// The three terrace parameters are exported only so tests/terrace_step.test.ts
+// can pin the production values as literals.
+export const TERRACE_STEP = 6;
+export const TERRACE_TREAD = 0.6;
+// Fraction of the smooth rise kept as a linear talus apron under the first
+// band. Without it, any rise below TERRACE_TREAD * TERRACE_STEP terraces to
+// exactly 0 and the foot of every wall becomes a dead-flat plain, erasing
+// placed landmarks that lean on that rise (the Mirefen impact site sits
+// against a 3.1yd wall base; tests/impact_site.test.ts pins it).
+export const TERRACE_APRON = 0.5;
+
+// Past the playable rim, the crest noise and terracing fade back to the
+// original smooth berm plateau. The overshoot space is never rendered (the
+// terrain mesh covers exactly the world rectangle) and never reachable in
+// play (the rim is impassable), but the sim relies on it as a flat staging
+// ground: dev teleports, the /follow and chat tests, parity scenarios, and
+// bot tooling all park entities out there (some as close as ~20yd past the
+// edge), and jagged terraced crags would strand them behind risers steeper
+// than the climb limit (tests/follow.test.ts walks a follower at z = -1000).
+// Full mountain character is kept through OUTSIDE_FADE_START yd beyond the
+// edge (so every in-world sample stays bit-identical and edge-vertex normal
+// sampling never crosses the fade); by OUTSIDE_FADE_END the rise is the
+// smooth berm again (tests/terrain_walls.test.ts pins the flat plateau).
+// NOTE: the transition band itself (START..END yd out) is a crag-to-berm
+// cliff, steeper than the climb limit in places; "flat staging ground" only
+// holds PAST OUTSIDE_FADE_END. Anything staged in the overshoot must sit at
+// least OUTSIDE_FADE_END + a couple yd out (existing users are all >= ~20yd).
+const OUTSIDE_FADE_START = 2;
+const OUTSIDE_FADE_END = 10;
+
+// Quantizes a non-negative rise into `step`-height bands: flat for the first
+// `tread` fraction of each band, then a smoothed climb through the rest. The
+// first band keeps a linear apron floor (`apron` fraction of the smooth rise,
+// capped at `step * apron`) so wall feet stay sloped; the floor can never
+// reach past band 0 because every higher band already sits at >= step.
+// Continuous and monotonic in v; terraceStep(0) === 0 exactly, so callers can
+// add this in unconditionally. Exported for its unit test only.
+export function terraceStep(v: number, step: number, tread: number, apron: number): number {
+  if (v <= 0) return 0;
+  const band = Math.floor(v / step);
+  const frac = v / step - band;
+  const riser = frac < tread ? 0 : smoothstep(tread, 1, frac);
+  return Math.max((band + riser) * step, Math.min(v, step) * apron);
+}
 
 export const MIREFEN_IMPACT_CRATER = {
   x: 149.5,
@@ -214,6 +313,25 @@ function applyEditLayer(x: number, z: number, h0: number): number {
   return h;
 }
 
+// The Sowfield boarball ground (docs/prd/vale-cup.md): the southern Eastbrook
+// basin leveled into a crisp rectangular plateau with a smoothstep apron ring.
+// Blend weight of the flatten at (x, z): 1 inside the rectangle, easing to 0
+// over SOWFIELD_FLAT.falloff yards outside it. Height stamps are circles-only,
+// so like MIREFEN_IMPACT_CRATER this is a bespoke hand-authored arm; it applies
+// for ANY active content (the crater's accepted custom-map leak). The apron's
+// influence ends at z = SOWFIELD_FLAT.zMin - falloff (-149), north of the world
+// rim's z = -150 onset, so the rim wall is untouched by construction
+// (tests/terrain_walls.test.ts sweeps that band).
+export function sowfieldFlattenWeight(x: number, z: number): number {
+  const f = SOWFIELD_FLAT;
+  const dx = Math.max(0, f.xMin - x, x - f.xMax);
+  const dz = Math.max(0, f.zMin - z, z - f.zMax);
+  if (dx === 0 && dz === 0) return 1;
+  const d = Math.sqrt(dx * dx + dz * dz);
+  if (d >= f.falloff) return 0;
+  return 1 - smoothstep(0, 1, d / f.falloff);
+}
+
 export function mirefenImpactCraterOffset(x: number, z: number): number {
   const dx = x - MIREFEN_IMPACT_CRATER.x;
   const dz = z - MIREFEN_IMPACT_CRATER.z;
@@ -308,8 +426,12 @@ function baseHeight(x: number, z: number, seed: number): number {
   for (const zone of zones) {
     for (const lake of zone.lakes) {
       const dLake = Math.sqrt((x - lake.x) ** 2 + (z - lake.z) ** 2);
-      if (dLake < lake.radius * 1.6) {
-        const lakeBlend = smoothstep(lake.radius * 0.55, lake.radius * 1.6, dLake);
+      if (dLake < lake.radius * LAKE_BLEND_RADIUS_MULT) {
+        const lakeBlend = smoothstep(
+          lake.radius * 0.55,
+          lake.radius * LAKE_BLEND_RADIUS_MULT,
+          dLake,
+        );
         h = h * lakeBlend + (waterLevel() - 4) * (1 - lakeBlend);
       }
     }
@@ -320,7 +442,13 @@ function baseHeight(x: number, z: number, seed: number): number {
 // Ground height including instanced dungeon floors (flat, far off-world).
 export function groundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
-  return terrainHeight(x, z, seed);
+  // The Vale Cup grandstands are walkable: the ground steps up in seated tiers so
+  // players can climb the bleachers (the boss-dais pattern, raised WALKABLE ground
+  // is the heightfield). This lives in groundHeight, NOT terrainHeight, so the
+  // render's flat terrain baseline (and the wooden deck/post geometry it seats on
+  // that baseline) is unchanged; the ramp just raises where the player stands, up
+  // onto the decks. Zero outside the stand footprints, so the pitch stays flat.
+  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
@@ -339,16 +467,38 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     }
   }
 
+  // How far outside the playable rectangle this sample is (0 everywhere
+  // in-world), and the resulting fade on all mountain character (crest noise
+  // + terracing); see OUTSIDE_FADE_START above.
+  const beyond = Math.max(0, w.minZ - z, z - w.maxZ, Math.abs(x) - WORLD_MAX_X);
+  const mountainDetail = 1 - smoothstep(OUTSIDE_FADE_START, OUTSIDE_FADE_END, beyond);
+
+  // The Sowfield plateau (Vale Cup). Runs between the camp flatten and the
+  // ridge/rim walls: a LEVEL pull toward the pitch height, so it must land
+  // before the additive walls; its influence never reaches the rim band (see
+  // sowfieldFlattenWeight), so the rim still wins everywhere it exists.
+  const sow = sowfieldFlattenWeight(x, z);
+  if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
+
   // Mountain ridge walls between zones, pierced by the road pass
+  let mountainAdd = 0;
   for (const ridge of w.ridges) {
     const dz = Math.abs(z - ridge.z);
     if (dz < RIDGE_SIGMA * 3) {
       const profile = Math.exp(-(dz * dz) / (2 * RIDGE_SIGMA * RIDGE_SIGMA));
       const pass = smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
-      // jagged crest so the wall reads as mountains, not a berm (variance kept
-      // tight so the lowest saddle still beats the climb limit)
-      const crest = 1 + (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4;
-      h += RIDGE_HEIGHT * crest * profile * pass;
+      // jagged crest so the wall reads as mountains, not a berm: a coarse layer
+      // for peak/saddle shape plus a finer layer for crag/shoulder detail.
+      // Combined variance kept tight so the lowest saddle still beats the
+      // climb limit (tests/terrain_walls.test.ts).
+      // (each noise term is scaled by mountainDetail separately: multiplying
+      // by an exact 1 keeps in-world samples bit-identical, where regrouping
+      // the sum would drift them by ULPs and desync the parity goldens)
+      const crest =
+        1 +
+        (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4 * mountainDetail +
+        (fbm2(x * 0.11, ridge.z * 0.11, seed + 23, 2) - 0.5) * 0.14 * mountainDetail;
+      mountainAdd += RIDGE_HEIGHT * crest * profile * pass;
     }
   }
 
@@ -361,7 +511,31 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const rimS = smoothstep(w.minZ + 30, w.minZ + 6, z);
   const rimN = smoothstep(w.maxZ - 30, w.maxZ - 6, z);
   const rim = Math.max(rimX, rimS, rimN);
-  h += rim * 55;
+  // The rim wall used to be a perfectly smooth berm (no noise at all), which
+  // read as artificial from a distance. Give it the same two-layer jagged
+  // crest as the inter-zone ridges: a coarse peak/saddle layer plus a finer
+  // crag layer, same conservative combined variance so the climb-limit
+  // invariant still holds along the whole rim.
+  const rimCrest =
+    1 +
+    (fbm2(x * 0.025, z * 0.025, seed + 29, 3) - 0.5) * 0.35 * mountainDetail +
+    (fbm2(x * 0.09, z * 0.09, seed + 37, 2) - 0.5) * 0.15 * mountainDetail;
+  mountainAdd += rim * 55 * rimCrest;
+  // Terrace the combined mountain rise into stair-stepped bands (flat treads
+  // + steep risers) instead of one smooth ramp, so slopes read as a stacked
+  // rocky mountainside rather than a uniform incline. This does not reduce
+  // impassability: a straight crossing still meets a riser steeper than the
+  // smooth original everywhere the smooth original was already steep enough
+  // (tests/terrain_walls.test.ts checks the max steepness along a crossing,
+  // which a stepped riser only increases). terraceStep(0) === 0, so terrain
+  // away from any ridge/rim (mountainAdd == 0) is completely unaffected. The
+  // terracing, like the crest noise, fades out past the rim (mountainDetail)
+  // so the unreachable overshoot plateau stays the flat staging ground it was
+  // before the mountains got their craggy pass. (Blended as two products, not
+  // lerp(a, b, t): at mountainDetail 1 / 0 the products are exactly
+  // terraced + 0 / 0 + mountainAdd, keeping in-world samples bit-identical.)
+  const terraced = terraceStep(mountainAdd, TERRACE_STEP, TERRACE_TREAD, TERRACE_APRON);
+  h += terraced * mountainDetail + mountainAdd * (1 - mountainDetail);
   h += mirefenImpactCraterOffset(x, z);
   h = applyEditLayer(x, z, h);
   return h;
@@ -441,6 +615,52 @@ export function terrainDownhill(
   return { x: -hx / mag, z: -hz / mag };
 }
 
+// Ring samples for the wall standoff below. 8 covers the body circle evenly
+// without being a hot-loop cost (the caller only runs it for grounded overworld
+// players).
+const WALL_STANDOFF_SAMPLES = 8;
+
+// Push a body of `radius` out of terrain steeper than `maxSlope` so the
+// character model does not sink into a cliff face. Movement collision samples
+// only the center point (the climb gate blocks the center from CLIMBING a wall,
+// but nothing keeps the body's WIDTH clear of one), so standing at or strafing
+// along the foot of a near-vertical wall buries the model's near side. This
+// samples the heightfield on a ring at the body radius; any direction rising
+// faster than a climbable slope is a wall within reach, and the center is nudged
+// directly away from it, toward the lower walkable side. Pure and deterministic;
+// returns the input unchanged on open or merely-sloped ground (no ring sample
+// exceeds a climbable rise there), so it is a near-no-op away from the walls.
+export function terrainWallStandoff(
+  x: number,
+  z: number,
+  seed: number,
+  radius: number,
+  maxSlope: number,
+): { x: number; z: number } {
+  const h0 = groundHeight(x, z, seed);
+  const wallRise = radius * maxSlope; // the most a climbable slope rises over `radius`
+  let pushX = 0;
+  let pushZ = 0;
+  for (let k = 0; k < WALL_STANDOFF_SAMPLES; k++) {
+    const a = (k / WALL_STANDOFF_SAMPLES) * Math.PI * 2;
+    const sx = Math.sin(a);
+    const sz = Math.cos(a);
+    const rise = groundHeight(x + sx * radius, z + sz * radius, seed) - h0;
+    if (rise > wallRise) {
+      // horizontal setback that would make this direction merely climbable,
+      // capped at the body radius (a face closer than `radius` reads as a huge
+      // rise; one exactly at `radius` contributes nothing)
+      const setback = Math.min((rise - wallRise) / maxSlope, radius);
+      pushX -= sx * setback;
+      pushZ -= sz * setback;
+    }
+  }
+  if (pushX === 0 && pushZ === 0) return { x, z };
+  const mag = Math.hypot(pushX, pushZ);
+  const scale = Math.min(mag, radius) / mag; // total nudge never exceeds one body radius
+  return { x: x + pushX * scale, z: z + pushZ * scale };
+}
+
 // Distance from (x,z) to the nearest road polyline segment.
 export function roadDistance(x: number, z: number): number {
   let best = Infinity;
@@ -493,6 +713,17 @@ export function zoneBiomeAt(z: number): BiomeId {
   return zones[zones.length - 1].biome;
 }
 
+// Scatter props (trees, boulders) are anchored to terrainHeight at their exact
+// (x, z). On a near-vertical rim/ridge wall a prop juts out of the face and
+// reads as floating, and (via colliders.ts) a large rock or trunk there is also
+// an invisible collider on the cliff. Reject any candidate whose local terrain
+// is steeper than this: it matches PLAYER_MAX_CLIMB_SLOPE (the impassable-wall
+// gate), so only genuine walls are cleared and rolling interior hills keep
+// their props. Grass and ground dressing already refuse cliffs the same way
+// (foliage.ts tooSteep / GRASS_MAX_SLOPE); this brings the big props in line.
+// Pinned as a literal by tests/fixes.test.ts.
+export const DECORATION_MAX_SLOPE = 1.5;
+
 export function generateDecorations(seed: number): Decoration[] {
   const w = world();
   const out: Decoration[] = [];
@@ -533,6 +764,9 @@ export function generateDecorations(seed: number): Decoration[] {
       const x = gx + ox,
         z = gz + oz;
       if (isExcludedDecoration(x, z)) continue;
+      // The Sowfield stadium footprint grows no trees or rocks (hash-based
+      // placement, so skipping here shifts no other decoration or rng draw).
+      if (isInSowfieldShell(x, z)) continue;
       let inHub = false;
       for (const zone of w.content.zones) {
         const dx = x - zone.hub.x,
@@ -555,6 +789,11 @@ export function generateDecorations(seed: number): Decoration[] {
         }
       }
       if (inCamp) continue;
+      // no scatter on cliff faces: a prop anchored to the surface here floats
+      // off the wall (and large ones would be phantom colliders). Checked last,
+      // after the cheaper gates, so the four-sample steepness only runs for
+      // candidates that survive everything else.
+      if (terrainSteepness(x, z, seed) > DECORATION_MAX_SLOPE) continue;
       out.push({
         kind,
         x,

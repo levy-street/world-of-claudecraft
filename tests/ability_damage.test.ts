@@ -3,8 +3,10 @@ import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   abilityScalingPower,
   channelTickBonus,
+  directHealBonus,
   directHitBonus,
   dotTickBonus,
+  hotTickBonus,
 } from '../src/sim/spell_scaling';
 import { MAX_LEVEL } from '../src/sim/types';
 import { type AbilityScaling, abilityDamageBonus } from '../src/ui/ability_damage';
@@ -78,11 +80,41 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     expect(abilityDamageBonus(ev, eff, SC)).toBe(Math.round(SC.attackPower / 14));
   });
 
-  it('returns 0 for a heal (heals do not scale in this PR)', () => {
+  it('a direct heal folds Spell Power at the cast-time coefficient (combat directHealBonus)', () => {
     const heal = abilitiesKnownAt('priest', MAX_LEVEL).find((k) =>
       k.effects.some((e) => e.type === 'heal'),
     )!;
     const eff = heal.effects.find((e) => e.type === 'heal')!;
-    expect(abilityDamageBonus(heal, eff, SC)).toBe(0);
+    expect(abilityDamageBonus(heal, eff, SC)).toBe(directHealBonus(SC.spellPower, heal.castTime));
+    expect(abilityDamageBonus(heal, eff, SC)).toBeGreaterThan(0);
+  });
+
+  it('a pure HoT folds Spell Power across all its ticks; a hybrid HoT rider does not', () => {
+    const rejuv = known('druid', 'rejuvenation');
+    const hot = rejuv.effects.find((e) => e.type === 'hot')!;
+    if (hot.type !== 'hot') throw new Error('expected hot');
+    const ticks = hot.duration / hot.interval;
+    expect(abilityDamageBonus(rejuv, hot, SC)).toBe(
+      hotTickBonus(SC.spellPower, hot.duration, hot.interval) * ticks,
+    );
+    // Regrowth's HoT rides a direct heal: combat suppresses the rider (the
+    // direct part already took the coefficient), so the tooltip must too.
+    const regrowth = known('druid', 'regrowth');
+    const rider = regrowth.effects.find((e) => e.type === 'hot')!;
+    expect(abilityDamageBonus(regrowth, rider, SC)).toBe(0);
+  });
+
+  it('a ground AoE pulse folds the AoE-penalised direct coefficient (combat spBonus)', () => {
+    const cons = known('paladin', 'consecration');
+    const eff = cons.effects.find((e) => e.type === 'groundAoE')!;
+    expect(abilityDamageBonus(cons, eff, SC)).toBe(
+      directHitBonus(SC.spellPower, cons.def, cons.castTime, true),
+    );
+  });
+
+  it('a channelled AoE (Rain of Fire) uses the per-tick CHANNEL coefficient, not the cast one', () => {
+    const rof = known('warlock', 'rain_of_fire');
+    const eff = rof.effects.find((e) => e.type === 'aoeDamage')!;
+    expect(abilityDamageBonus(rof, eff, SC)).toBe(channelTickBonus(SC.spellPower, rof.def));
   });
 });

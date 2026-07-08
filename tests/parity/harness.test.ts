@@ -158,6 +158,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
   it('META_EXCLUDE membership is exactly the pinned set', () => {
     expect([...META_EXCLUDE].sort()).toEqual([
       'away',
+      'bankBonusSources',
       'characterId',
       'fiestaMods',
       'fiestaSpecial',

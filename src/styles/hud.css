@@ -879,11 +879,13 @@
     max-width: 320px;
     pointer-events: auto;
   }
-  /* Debuffs sit in their own row beneath the buff row (classic layout). */
+  /* Debuffs sit in their own row well beneath the buff row (classic layout),
+     level with the minimap's lower edge (the mail badge), so a wrapping wall of
+     raid buffs and their duration labels never crowds the debuff row. */
   #debuff-bar {
     position: absolute;
     right: 196px;
-    top: 50px;
+    top: 172px;
     display: flex;
     flex-direction: row-reverse;
     flex-wrap: wrap;
@@ -945,8 +947,42 @@
     background-position: center;
     background-repeat: no-repeat;
   }
+  /* A debuff reads as harmful at a glance: a thicker border (border-box, so no
+     layout shift) tinted by magic school, WoW-style (physical keeps the base red). */
   .buff.debuff {
     border-color: var(--color-debuff);
+    border-width: 2px;
+  }
+  .buff.debuff[data-school="fire"] {
+    border-color: var(--color-debuff-fire);
+  }
+  .buff.debuff[data-school="frost"] {
+    border-color: var(--color-debuff-frost);
+  }
+  .buff.debuff[data-school="arcane"] {
+    border-color: var(--color-debuff-arcane);
+  }
+  .buff.debuff[data-school="shadow"] {
+    border-color: var(--color-debuff-shadow);
+  }
+  .buff.debuff[data-school="nature"] {
+    border-color: var(--color-debuff-nature);
+  }
+  .buff.debuff[data-school="holy"] {
+    border-color: var(--color-debuff-holy);
+  }
+  /* The LOCAL player's own auras on the target strip (auras_view ownFirst):
+     larger and gold-glowed so the dots/hots YOU are maintaining read at a
+     glance among other casters'. A debuff keeps its school border tint (the
+     size and glow carry the prominence). Extra information only, never less,
+     so no graphics tier sheds it (gameplay-neutral-graphics invariant). */
+  .buff.own {
+    width: 34px;
+    height: 34px;
+    box-shadow: 0 0 5px var(--color-primary-dim);
+  }
+  .buff.own:not(.debuff) {
+    border-color: var(--color-primary);
   }
   /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
   .buff.cancelable {
@@ -1893,6 +1929,9 @@
     font-size: 11px;
     font-family: var(--ui-font);
     vertical-align: text-bottom;
+    /* dark digit on a gold fill: the tracker's inherited black text-shadow
+       only blurs it, so drop it inside the badge */
+    text-shadow: none;
   }
   #quest-tracker .qt-obj {
     color: var(--color-text-overlay);
@@ -2473,6 +2512,7 @@
   body.native-app .donate-cta,
   body.native-app .community-link.donate,
   body.native-app .social-link.donate,
+  body.native-app #mobile-donate,
   body.native-app #token-ca,
   body.native-app #nav-btn-download,
   body.native-app .cs-wallet,
@@ -4133,10 +4173,13 @@
 
   /* ---------- Ravenpost envelope indicator ---------- */
   /* Sits on the minimap disc rim (the raid-lockout button pattern): an envelope
-     glyph with an unread count, visible only while letters wait. */
+     glyph with an unread count, visible only while letters wait. Anchored to the
+     bottom-RIGHT corner because the raid-lockout badge owns bottom-left; each rim
+     satellite must claim its own corner or they stack (guarded by
+     tests/minimap_rim_badges.test.ts). */
   #mail-indicator {
     position: absolute;
-    left: 4px;
+    right: 4px;
     bottom: 4px;
     z-index: 3;
     display: inline-flex;

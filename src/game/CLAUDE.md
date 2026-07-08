@@ -14,11 +14,13 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 | `keybinds.ts` | `Keybinds` + `BIND_ACTIONS`: the classic remappable layout (pure, no DOM). |
 | `interactions.ts` | `handlePickedEntity`: the **only** file here that calls `IWorld`; routes a click-pick to target/loot/quest/enter-dungeon via injected `PickInteractionWorld`/`PickInteractionHud`. |
 | `mobile_controls.ts` | `MobileControls`: touch joysticks to `input.setTouchMove`/`setTouchLook`. |
+| `touch_router.ts` | Pure, DOM-free touch ownership router: `getTouchOwner`/`isInteractiveHudElement`/`isCameraDragAllowedAt` + a per-pointer `TouchOwnerLedger`, consumed by `mobile_controls.ts` to keep move/combat/camera/menu touches from fighting over the same finger. |
 | `audio.ts` | `GameAudio` (`audio` singleton): procedural SFX. |
 | `music.ts` | `MusicDirector` (`music` singleton): procedural zone/combat soundtrack. |
 | `sfx.ts` / `voice.ts` | `sfx` / `voice` singletons: play pre-rendered clips from `public/audio/` (spatial 3D SFX + NPC voice lines) via their `*_manifest.generated.ts`. |
 | `settings.ts` | `Settings`: persisted Esc-menu options. |
 | `click_move.ts` / `pointer_pick.ts` / `camera_follow.ts` | pure, DOM-free input/camera math extracted from the render loop so they unit-test in isolation |
+| `keyboard_turn_facing.ts` / `self_alpha_lead.ts` | pure online-feel math: local TURN_SPEED integration for keyboard turns, streamed as the authoritative wire facing (mouselook-style; `main.ts` zeroes the turn flags while it owns the channel); the echo-driven adaptive self render lead |
 | `perf_doctor.ts` | pure perf-snapshot analyzer producing `PerfSuggestion[]` (no DOM); `perf_reporter.ts` is the telemetry reporter; `perf.ts` is the overlay/trace harness |
 | `cursors.ts` | hover-cursor PNGs |
 

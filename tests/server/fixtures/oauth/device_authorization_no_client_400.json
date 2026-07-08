@@ -1,0 +1,15 @@
+{
+  "body": "{\"error\":\"invalid_client\",\"error_description\":\"unknown client\"}",
+  "headers": {
+    "cache-control": "no-store",
+    "content-length": 63,
+    "content-type": "application/json",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "same-origin",
+    "permissions-policy": "accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), local-fonts=(), magnetometer=(), microphone=(), midi=(), payment=(), serial=(), usb=(), xr-spatial-tracking=()",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY"
+  },
+  "status": 400
+}

@@ -14,6 +14,7 @@
 // and formats values through formatNumber; this core stays locale-free so the
 // same row/severity logic is unit-testable without a renderer or a locale loaded.
 
+import { TICK_RATE } from '../sim/types';
 import type { TranslationKey } from './i18n';
 
 // ---------------------------------------------------------------------------
@@ -21,10 +22,26 @@ import type { TranslationKey } from './i18n';
 // ---------------------------------------------------------------------------
 
 export type PerfMetricKey =
-  | 'fps' | 'frameTime' | 'fps1Low' | 'fps01Low'
-  | 'ping' | 'jitter' | 'snapshot' | 'connection'
-  | 'drawCalls' | 'triangles' | 'geometries' | 'textures' | 'programs' | 'renderScale' | 'gpu'
-  | 'memory' | 'hitches' | 'entities'
+  | 'fps'
+  | 'frameTime'
+  | 'fps1Low'
+  | 'fps01Low'
+  | 'ping'
+  | 'jitter'
+  | 'snapshot'
+  | 'serverTick'
+  | 'connection'
+  | 'predLead'
+  | 'drawCalls'
+  | 'triangles'
+  | 'geometries'
+  | 'textures'
+  | 'programs'
+  | 'renderScale'
+  | 'gpu'
+  | 'memory'
+  | 'hitches'
+  | 'entities'
   | 'apm';
 
 /** A throttled, raw snapshot of every measurable signal. Fields are nullable so
@@ -42,7 +59,11 @@ export interface MetricsSample {
   connected: boolean;
   pingMs: number | null;
   jitterMs: number | null;
+  /** Latency hidden by the self-motion extrapolation; null when inactive. */
+  predLeadMs: number | null;
   snapshotHz: number | null;
+  /** Server-measured achieved sim tick rate (Hz); null offline or unreported. */
+  serverTickHz: number | null;
   connectionType: string | null;
   // renderer
   drawCalls: number | null;
@@ -72,7 +93,7 @@ export type PerfValue =
   | { kind: 'int'; v: number }
   | { kind: 'compact'; v: number }
   | { kind: 'percent'; v: number } // 0..1
-  | { kind: 'hz'; v: number }
+  | { kind: 'hz'; v: number; digits?: number }
   | { kind: 'memPair'; usedMb: number; limitMb: number | null }
   | { kind: 'text'; text: string };
 
@@ -107,11 +128,11 @@ export interface PerfOverlayViewConfig {
 // Frame-time meter (pure rolling statistics)
 // ---------------------------------------------------------------------------
 
-const DEFAULT_RING = 300;       // ~5s at 60fps — enough for stable 1%/0.1% lows
+const DEFAULT_RING = 300; // ~5s at 60fps, enough for stable 1%/0.1% lows
 const DEFAULT_REPAINT_MS = 250; // ~4 Hz text repaint, matching the legacy readout
 const DEFAULT_GRAPH_POINTS = 90;
-const HITCH_MS = 50;            // a frame slower than this counts as a hitch
-const EMA_ALPHA = 0.1;          // FPS smoothing — readable, not flickery
+const HITCH_MS = 50; // a frame slower than this counts as a hitch
+const EMA_ALPHA = 0.1; // FPS smoothing, readable, not flickery
 
 export class FrameMeter {
   private ema: number;
@@ -159,7 +180,9 @@ export class FrameMeter {
    *  pct=1 → the 99th-percentile (worst 1%) frame. Null until enough samples. */
   lowFps(pct: number): number | null {
     if (this.filled < 20) return null;
-    const sorted = this.orderedSamples().slice().sort((a, b) => a - b);
+    const sorted = this.orderedSamples()
+      .slice()
+      .sort((a, b) => a - b);
     const q = 1 - pct / 100;
     const i = Math.min(sorted.length - 1, Math.max(0, Math.round(q * (sorted.length - 1))));
     const worstMs = sorted[i];
@@ -221,104 +244,189 @@ interface MetricDef {
 export const METRIC_REGISTRY: readonly MetricDef[] = [
   // --- Frame & timing ---
   {
-    key: 'fps', labelKey: 'hudChrome.perf.labels.fps', group: 'frame', defaultOn: true,
+    key: 'fps',
+    labelKey: 'hudChrome.perf.labels.fps',
+    group: 'frame',
+    defaultOn: true,
     read: (s) => ({ kind: 'fps', v: s.fps }),
     severity: (s) => higherBetter(s.fps, 55, 30),
   },
   {
-    key: 'frameTime', labelKey: 'hudChrome.perf.labels.frameTime', group: 'frame', defaultOn: true,
+    key: 'frameTime',
+    labelKey: 'hudChrome.perf.labels.frameTime',
+    group: 'frame',
+    defaultOn: true,
     read: (s) => ({ kind: 'ms', v: s.frameTimeMs, digits: 1 }),
     severity: (s) => lowerBetter(s.frameTimeMs, 18, 33),
   },
   {
-    key: 'fps1Low', labelKey: 'hudChrome.perf.labels.fps1Low', group: 'frame', defaultOn: false,
+    key: 'fps1Low',
+    labelKey: 'hudChrome.perf.labels.fps1Low',
+    group: 'frame',
+    defaultOn: false,
     read: (s) => (s.fps1Low == null ? null : { kind: 'fps', v: s.fps1Low }),
     severity: (s) => (s.fps1Low == null ? NONE : higherBetter(s.fps1Low, 50, 25)),
   },
   {
-    key: 'fps01Low', labelKey: 'hudChrome.perf.labels.fps01Low', group: 'frame', defaultOn: false,
+    key: 'fps01Low',
+    labelKey: 'hudChrome.perf.labels.fps01Low',
+    group: 'frame',
+    defaultOn: false,
     read: (s) => (s.fps01Low == null ? null : { kind: 'fps', v: s.fps01Low }),
     severity: (s) => (s.fps01Low == null ? NONE : higherBetter(s.fps01Low, 45, 20)),
   },
   {
-    key: 'hitches', labelKey: 'hudChrome.perf.labels.hitches', group: 'frame', defaultOn: false,
+    key: 'hitches',
+    labelKey: 'hudChrome.perf.labels.hitches',
+    group: 'frame',
+    defaultOn: false,
     read: (s) => (s.hitches == null ? null : { kind: 'int', v: s.hitches }),
     severity: (s) => (s.hitches == null ? NONE : lowerBetter(s.hitches, 0, 2)),
   },
   // --- Network (online client only) ---
   {
-    key: 'ping', labelKey: 'hudChrome.perf.labels.ping', group: 'network', defaultOn: true,
+    key: 'ping',
+    labelKey: 'hudChrome.perf.labels.ping',
+    group: 'network',
+    defaultOn: true,
     read: (s) => (s.online && s.pingMs != null ? { kind: 'ms', v: s.pingMs, digits: 0 } : null),
     severity: (s) => (s.online && s.pingMs != null ? lowerBetter(s.pingMs, 60, 120) : NONE),
   },
   {
-    key: 'jitter', labelKey: 'hudChrome.perf.labels.jitter', group: 'network', defaultOn: false,
+    key: 'jitter',
+    labelKey: 'hudChrome.perf.labels.jitter',
+    group: 'network',
+    defaultOn: false,
     read: (s) => (s.online && s.jitterMs != null ? { kind: 'ms', v: s.jitterMs, digits: 0 } : null),
     severity: (s) => (s.online && s.jitterMs != null ? lowerBetter(s.jitterMs, 8, 20) : NONE),
   },
   {
-    key: 'snapshot', labelKey: 'hudChrome.perf.labels.snapshot', group: 'network', defaultOn: false,
+    key: 'predLead',
+    labelKey: 'hudChrome.perf.labels.predLead',
+    group: 'network',
+    defaultOn: false,
+    read: (s) =>
+      s.online && s.predLeadMs != null ? { kind: 'ms', v: s.predLeadMs, digits: 0 } : null,
+    severity: () => NONE,
+  },
+  {
+    key: 'snapshot',
+    labelKey: 'hudChrome.perf.labels.snapshot',
+    group: 'network',
+    defaultOn: false,
     read: (s) => (s.online && s.snapshotHz != null ? { kind: 'hz', v: s.snapshotHz } : null),
     severity: () => NONE,
   },
   {
-    key: 'connection', labelKey: 'hudChrome.perf.labels.connection', group: 'network', defaultOn: false,
+    // One decimal: the interesting signal is a sag from 20.0, which integer
+    // rounding would hide until the loop is already badly degraded.
+    key: 'serverTick',
+    labelKey: 'hudChrome.perf.labels.serverTick',
+    group: 'network',
+    defaultOn: false,
+    read: (s) =>
+      s.online && s.serverTickHz != null ? { kind: 'hz', v: s.serverTickHz, digits: 1 } : null,
+    // Sag thresholds derive from the nominal rate (never a hardcoded 20):
+    // within half a tick of nominal is healthy, a >25% sag is the bad tier.
+    severity: (s) =>
+      s.online && s.serverTickHz != null
+        ? higherBetter(s.serverTickHz, TICK_RATE - 0.5, TICK_RATE * 0.75)
+        : NONE,
+  },
+  {
+    key: 'connection',
+    labelKey: 'hudChrome.perf.labels.connection',
+    group: 'network',
+    defaultOn: false,
     read: (s) => (s.connectionType ? { kind: 'text', text: s.connectionType.toUpperCase() } : null),
     severity: () => NONE,
   },
   // --- Renderer ---
   {
-    key: 'drawCalls', labelKey: 'hudChrome.perf.labels.drawCalls', group: 'renderer', defaultOn: false,
+    key: 'drawCalls',
+    labelKey: 'hudChrome.perf.labels.drawCalls',
+    group: 'renderer',
+    defaultOn: false,
     read: (s) => (s.drawCalls == null ? null : { kind: 'int', v: s.drawCalls }),
     severity: () => NONE,
   },
   {
-    key: 'triangles', labelKey: 'hudChrome.perf.labels.triangles', group: 'renderer', defaultOn: false,
+    key: 'triangles',
+    labelKey: 'hudChrome.perf.labels.triangles',
+    group: 'renderer',
+    defaultOn: false,
     read: (s) => (s.triangles == null ? null : { kind: 'compact', v: s.triangles }),
     severity: () => NONE,
   },
   {
-    key: 'geometries', labelKey: 'hudChrome.perf.labels.geometries', group: 'renderer', defaultOn: false,
+    key: 'geometries',
+    labelKey: 'hudChrome.perf.labels.geometries',
+    group: 'renderer',
+    defaultOn: false,
     read: (s) => (s.geometries == null ? null : { kind: 'int', v: s.geometries }),
     severity: () => NONE,
   },
   {
-    key: 'textures', labelKey: 'hudChrome.perf.labels.textures', group: 'renderer', defaultOn: false,
+    key: 'textures',
+    labelKey: 'hudChrome.perf.labels.textures',
+    group: 'renderer',
+    defaultOn: false,
     read: (s) => (s.textures == null ? null : { kind: 'int', v: s.textures }),
     severity: () => NONE,
   },
   {
-    key: 'programs', labelKey: 'hudChrome.perf.labels.programs', group: 'renderer', defaultOn: false,
+    key: 'programs',
+    labelKey: 'hudChrome.perf.labels.programs',
+    group: 'renderer',
+    defaultOn: false,
     read: (s) => (s.programs == null ? null : { kind: 'int', v: s.programs }),
     severity: () => NONE,
   },
   {
-    key: 'renderScale', labelKey: 'hudChrome.perf.labels.renderScale', group: 'renderer', defaultOn: false,
+    key: 'renderScale',
+    labelKey: 'hudChrome.perf.labels.renderScale',
+    group: 'renderer',
+    defaultOn: false,
     read: (s) => (s.renderScale == null ? null : { kind: 'percent', v: s.renderScale }),
     severity: () => NONE,
   },
   {
-    key: 'gpu', labelKey: 'hudChrome.perf.labels.gpu', group: 'renderer', defaultOn: false,
+    key: 'gpu',
+    labelKey: 'hudChrome.perf.labels.gpu',
+    group: 'renderer',
+    defaultOn: false,
     read: (s) => (s.gpu ? { kind: 'text', text: s.gpu } : null),
     severity: () => NONE,
   },
   // --- System ---
   {
-    key: 'memory', labelKey: 'hudChrome.perf.labels.memory', group: 'system', defaultOn: false,
-    read: (s) => (s.memoryUsedMb == null ? null : { kind: 'memPair', usedMb: s.memoryUsedMb, limitMb: s.memoryLimitMb }),
+    key: 'memory',
+    labelKey: 'hudChrome.perf.labels.memory',
+    group: 'system',
+    defaultOn: false,
+    read: (s) =>
+      s.memoryUsedMb == null
+        ? null
+        : { kind: 'memPair', usedMb: s.memoryUsedMb, limitMb: s.memoryLimitMb },
     severity: (s) => {
       if (s.memoryUsedMb == null || s.memoryLimitMb == null || s.memoryLimitMb <= 0) return NONE;
       return lowerBetter(s.memoryUsedMb / s.memoryLimitMb, 0.6, 0.85);
     },
   },
   {
-    key: 'entities', labelKey: 'hudChrome.perf.labels.entities', group: 'system', defaultOn: false,
+    key: 'entities',
+    labelKey: 'hudChrome.perf.labels.entities',
+    group: 'system',
+    defaultOn: false,
     read: (s) => (s.entities == null ? null : { kind: 'int', v: s.entities }),
     severity: () => NONE,
   },
   // --- Input / session ---
   {
-    key: 'apm', labelKey: 'hudChrome.perf.labels.apm', group: 'input', defaultOn: false,
+    key: 'apm',
+    labelKey: 'hudChrome.perf.labels.apm',
+    group: 'input',
+    defaultOn: false,
     read: (s) => ({ kind: 'int', v: s.apm }),
     severity: () => NONE,
   },
@@ -361,12 +469,13 @@ export interface PerfMetricGroupView {
 /** The metric chips bucketed by category, in group + registry order. A group with
  *  no metrics is omitted (none today, but keeps the consumer defensive). */
 export function perfMetricGroups(): PerfMetricGroupView[] {
-  return PERF_METRIC_GROUPS
-    .map((group) => ({
-      group,
-      chips: METRIC_REGISTRY.filter((d) => d.group === group.id).map((d) => ({ key: d.key, labelKey: d.labelKey })),
-    }))
-    .filter((g) => g.chips.length > 0);
+  return PERF_METRIC_GROUPS.map((group) => ({
+    group,
+    chips: METRIC_REGISTRY.filter((d) => d.group === group.id).map((d) => ({
+      key: d.key,
+      labelKey: d.labelKey,
+    })),
+  })).filter((g) => g.chips.length > 0);
 }
 
 /** The factory-default per-metric visibility map (FPS + frame time + ping on). */
@@ -377,7 +486,9 @@ export function defaultMetricsMap(): Record<PerfMetricKey, boolean> {
 }
 
 /** Convenience presets the "Quick Presets" buttons apply to the metric map. */
-export function metricsPreset(kind: 'minimal' | 'standard' | 'everything'): Record<PerfMetricKey, boolean> {
+export function metricsPreset(
+  kind: 'minimal' | 'standard' | 'everything',
+): Record<PerfMetricKey, boolean> {
   if (kind === 'everything') {
     const out = {} as Record<PerfMetricKey, boolean>;
     for (const def of METRIC_REGISTRY) out[def.key] = true;
@@ -395,7 +506,10 @@ export function metricsPreset(kind: 'minimal' | 'standard' | 'everything'): Reco
 // View builder
 // ---------------------------------------------------------------------------
 
-export function buildPerfOverlayView(sample: MetricsSample, cfg: PerfOverlayViewConfig): PerfOverlayView {
+export function buildPerfOverlayView(
+  sample: MetricsSample,
+  cfg: PerfOverlayViewConfig,
+): PerfOverlayView {
   const rows: PerfOverlayRow[] = [];
   for (const def of METRIC_REGISTRY) {
     if (!cfg.metrics[def.key]) continue;
@@ -413,9 +527,10 @@ export function buildPerfOverlayView(sample: MetricsSample, cfg: PerfOverlayView
   if (sample.backgrounded) badges.push('backgrounded');
   if (sample.online && !sample.connected) badges.push('offline');
 
-  const graph: PerfOverlayGraph | null = cfg.graph && sample.frameSamples.length > 1
-    ? { samples: sample.frameSamples, targetMs: 1000 / 60 }
-    : null;
+  const graph: PerfOverlayGraph | null =
+    cfg.graph && sample.frameSamples.length > 1
+      ? { samples: sample.frameSamples, targetMs: 1000 / 60 }
+      : null;
 
   return { rows, badges, graph };
 }
@@ -456,7 +571,10 @@ export const DEFAULT_PERF_FG = PERF_COLOR_THEMES[0].fg;
 export const DEFAULT_PERF_BG = PERF_COLOR_THEMES[0].bg;
 
 /** Parse a #rrggbb hex into [r, g, b]; returns `fallback` for any non-matching string. */
-export function hexToRgb(hex: string, fallback: readonly [number, number, number]): [number, number, number] {
+export function hexToRgb(
+  hex: string,
+  fallback: readonly [number, number, number],
+): [number, number, number] {
   const m = HEX_RGB_RE.exec(hex);
   if (!m) return [fallback[0], fallback[1], fallback[2]];
   return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
@@ -464,12 +582,22 @@ export function hexToRgb(hex: string, fallback: readonly [number, number, number
 
 /** The canonical fallbacks for a config color that fails to parse: the accent
  *  default for line/text colors, the panel default for backgrounds. */
-export const DEFAULT_PERF_FG_RGB: readonly [number, number, number] = hexToRgb(DEFAULT_PERF_FG, [255, 215, 106]);
-export const DEFAULT_PERF_BG_RGB: readonly [number, number, number] = hexToRgb(DEFAULT_PERF_BG, [8, 8, 13]);
+export const DEFAULT_PERF_FG_RGB: readonly [number, number, number] = hexToRgb(
+  DEFAULT_PERF_FG,
+  [255, 215, 106],
+);
+export const DEFAULT_PERF_BG_RGB: readonly [number, number, number] = hexToRgb(
+  DEFAULT_PERF_BG,
+  [8, 8, 13],
+);
 
 /** Build an `rgba(...)` string from a #rrggbb hex + alpha (0..1), parsed through
  *  hexToRgb with the caller's context fallback. */
-export function rgbaFromHex(hex: string, alpha: number, fallback: readonly [number, number, number]): string {
+export function rgbaFromHex(
+  hex: string,
+  alpha: number,
+  fallback: readonly [number, number, number],
+): string {
   const [r, g, b] = hexToRgb(hex, fallback);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
@@ -489,7 +617,13 @@ function clamp01(v: number): number {
 /** Map a normalized position (0..1, top-left origin) to a clamped pixel offset
  *  that always keeps the whole overlay on screen, accounting for its size. */
 export function overlayPixelPosition(
-  posX: number, posY: number, vw: number, vh: number, ow: number, oh: number, margin = PERF_OVERLAY_MARGIN,
+  posX: number,
+  posY: number,
+  vw: number,
+  vh: number,
+  ow: number,
+  oh: number,
+  margin = PERF_OVERLAY_MARGIN,
 ): { left: number; top: number } {
   const availX = Math.max(0, vw - ow - margin * 2);
   const availY = Math.max(0, vh - oh - margin * 2);
@@ -501,7 +635,13 @@ export function overlayPixelPosition(
 
 /** Inverse of overlayPixelPosition: a dropped pixel offset → normalized 0..1. */
 export function overlayFractionFromPixel(
-  left: number, top: number, vw: number, vh: number, ow: number, oh: number, margin = PERF_OVERLAY_MARGIN,
+  left: number,
+  top: number,
+  vw: number,
+  vh: number,
+  ow: number,
+  oh: number,
+  margin = PERF_OVERLAY_MARGIN,
 ): { x: number; y: number } {
   const availX = Math.max(1, vw - ow - margin * 2);
   const availY = Math.max(1, vh - oh - margin * 2);

@@ -18,6 +18,7 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
+import type { GatheringProfessionId } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -25,7 +26,8 @@ import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { formatNumber, t } from './i18n';
+import { buildGatheringProficiencyRows } from './gathering_view';
+import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
@@ -39,6 +41,31 @@ import { svgIcon } from './ui_icons';
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
+
+// The ten craft-archetype title keys (issue 1130), one per craft id on the ring (see
+// src/sim/content/professions.ts CRAFT_RING and src/sim/professions/archetype.ts
+// getArchetypeTitle: the title identifier IS the craft id). Every player-visible
+// string is a t() key, so this is a literal id-to-key table, never a built string.
+const ARCHETYPE_TITLE_KEYS: Record<string, TranslationKey> = {
+  armorcrafting: 'hudChrome.archetypeTitle.armorcrafting',
+  weaponcrafting: 'hudChrome.archetypeTitle.weaponcrafting',
+  jewelcrafting: 'hudChrome.archetypeTitle.jewelcrafting',
+  alchemy: 'hudChrome.archetypeTitle.alchemy',
+  engineering: 'hudChrome.archetypeTitle.engineering',
+  cooking: 'hudChrome.archetypeTitle.cooking',
+  inscription: 'hudChrome.archetypeTitle.inscription',
+  enchanting: 'hudChrome.archetypeTitle.enchanting',
+  tailoring: 'hudChrome.archetypeTitle.tailoring',
+  leatherworking: 'hudChrome.archetypeTitle.leatherworking',
+};
+
+/** Localized text for the granted archetype title, or the "no title yet" copy
+ *  when the player has not completed the zone-1 acceptance quest (or the id is
+ *  somehow unrecognized). Exported for the view-model test. */
+export function archetypeTitleText(craftId: string | null): string {
+  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
+  return t(key ?? 'hudChrome.archetypeTitle.none');
+}
 
 // The ten character-sheet stat cells, primaries down the left column and derived
 // stats down the right (the CSS grid wraps two per row). The HUD builds each cell
@@ -56,6 +83,8 @@ const STAT_GRID: readonly StatId[] = [
   'spi',
   'dodge',
   'spellPower',
+  'critRating',
+  'hasteRating',
 ];
 
 /**
@@ -91,6 +120,16 @@ export interface CharWindowDeps extends PainterHostPresentation {
   openPlayerCard(): void;
   openPrestige(): void;
 }
+
+// Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
+const GATHERING_PROFESSION_LABEL_KEY: Record<
+  GatheringProfessionId,
+  'hudChrome.gathering.mining' | 'hudChrome.gathering.logging' | 'hudChrome.gathering.herbalism'
+> = {
+  mining: 'hudChrome.gathering.mining',
+  logging: 'hudChrome.gathering.logging',
+  herbalism: 'hudChrome.gathering.herbalism',
+};
 
 const SHARE_GLYPH =
   '<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>';
@@ -136,7 +175,8 @@ export class CharWindow {
     const level = formatNumber(p.level, { maximumFractionDigits: 0 });
     // WCAG 2.2 AA: name the focus-trapped root via the character title span.
     markDialogRoot(el, { labelledBy: 'char-title' });
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    const archetypeTitle = archetypeTitleText(world.archetypeTitle);
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -148,6 +188,7 @@ export class CharWindow {
     html += `<div class="char-stats">${STAT_GRID.map((stat) => this.deps.statCellHtml(stat)).join('')}</div>`;
     html += this.deps.talentSummaryHtml();
     html += this.deps.progressionHtml(p.level);
+    html += this.gatheringHtml(world);
     html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -175,6 +216,20 @@ export class CharWindow {
     this.deps.renderPreview();
     this.deps.renderSkinPicker();
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+  }
+
+  // The "Gathering" section (issue 1124): one row per gathering profession, showing
+  // the viewer's own proficiency points (IWorldProfessions#professionsState).
+  // Data comes from the pure gathering_view.ts core; this painter only formats it.
+  private gatheringHtml(world: IWorld): string {
+    const rows = buildGatheringProficiencyRows(world);
+    const items = rows
+      .map(
+        (r) =>
+          `<span>${esc(t(GATHERING_PROFESSION_LABEL_KEY[r.professionId]))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`,
+      )
+      .join('');
+    return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
   }
 
   private buildSlotRow(cell: PaperdollSlot): HTMLElement {

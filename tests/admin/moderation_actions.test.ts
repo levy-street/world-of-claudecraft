@@ -6,6 +6,7 @@ import {
   chatMuteHours,
   forceRename,
   liftChatMute,
+  resetPassword,
   suspendCustom,
   suspendHours,
   unbanAccount,
@@ -87,6 +88,30 @@ describe('moderation_actions', () => {
       reason: 'spoke to player, watching for repeat behavior',
     });
     expect(built.pending.danger).toBeUndefined();
+  });
+
+  it('requires a note and an in-bounds password for a password reset', () => {
+    expect(resetPassword(42, 'newpass123', '')).toEqual({ errorKey: 'alert.noteRequired' });
+    expect(resetPassword(42, 'abc', 'lost account')).toEqual({
+      errorKey: 'alert.passwordLength',
+    });
+    expect(resetPassword(42, 'x'.repeat(129), 'lost account')).toEqual({
+      errorKey: 'alert.passwordLength',
+    });
+  });
+
+  it('marks password reset as danger and never renders the password in a row', () => {
+    const built = resetPassword(42, 'newpass123', 'owner verified over email');
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.endpoint).toBe('/admin/api/accounts/42/reset-password');
+    expect(built.pending.body).toEqual({
+      password: 'newpass123',
+      reason: 'owner verified over email',
+    });
+    expect(built.pending.danger).toBe(true);
+    for (const row of built.pending.rows) {
+      expect(row.value).not.toContain('newpass123');
+    }
   });
 
   it('force-rename posts to the character endpoint', () => {

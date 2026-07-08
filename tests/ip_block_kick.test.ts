@@ -9,6 +9,13 @@ vi.mock('../server/db', () => ({
   insertChatLogs: vi.fn(async () => {}),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  // Character load leases: the kick path funnels through leave(), which
+  // releases the lease, so these must exist on the mock or that path throws
+  // on the undefined export.
+  acquireCharacterLease: vi.fn(async () => true),
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 vi.mock('../server/ip_block_db', () => ({
   loadActiveBlockedIps: vi.fn(async () => [{ ip: '1.2.3.4', expiresAtMs: null }]),

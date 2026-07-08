@@ -156,6 +156,7 @@ export const BIND_ACTIONS: BindAction[] = [
   { id: 'questlog', label: 'Quest Log', category: 'Interface', kind: 'edge', defaults: ['KeyL'] },
   { id: 'map', label: 'World Map', category: 'Interface', kind: 'edge', defaults: ['KeyM'] },
   { id: 'bags', label: 'Bags', category: 'Interface', kind: 'edge', defaults: ['KeyB'] },
+  { id: 'crafting', label: 'Crafting', category: 'Interface', kind: 'edge', defaults: ['KeyT'] },
   {
     id: 'nameplates',
     label: 'Toggle Nameplates',
@@ -178,6 +179,13 @@ export const BIND_ACTIONS: BindAction[] = [
     category: 'Interface',
     kind: 'edge',
     defaults: ['KeyG'],
+  },
+  {
+    id: 'valecup',
+    label: 'Vale Cup',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['KeyY'],
   },
   {
     id: 'leaderboard',

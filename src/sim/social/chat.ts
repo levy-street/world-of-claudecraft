@@ -89,7 +89,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/afk [message]" / "/dnd [message]" — set a presence status. Repeating
+  // "/afk [message]" / "/dnd [message]": set a presence status. Repeating
   // the same command with no message toggles it off. While away, anyone who
   // whispers you gets an auto-reply; /dnd also withholds the whisper itself.
   const awaym = /^\/(afk|dnd)(?:\s+([\s\S]+))?$/i.exec(raw);
@@ -123,7 +123,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // Any other chat means you're back — clear a lingering away status.
+  // Any other chat means you're back: clear a lingering away status.
   if (r.meta.away) {
     r.meta.away = null;
     ctx.emit({
@@ -153,7 +153,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/talents" (aliases "/talent", "/spec") — self-only readout of the
+  // "/talents" (aliases "/talent", "/spec"): self-only readout of the
   // player's specialization and how their talent points are spent. Returns
   // null (unlogged); no server interceptor, so it works online for free.
   if (/^\/(?:talents|talent|spec)(?:\s|$)/i.test(raw)) {
@@ -169,7 +169,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/roll", "/roll N", "/roll M-N" — a classic random roll for loot disputes
+  // "/roll", "/roll N", "/roll M-N": a classic random roll for loot disputes
   // and social play. Rolled through the deterministic sim RNG so it is
   // server-authoritative (clients can't fake a result) and identical offline.
   const rollm = /^\/roll(?:\s+(\d+)(?:\s*-\s*(\d+))?)?\s*$/i.exec(raw);
@@ -224,7 +224,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/r message" — reply to the last player who whispered us. Rewrite it to
+  // "/r message": reply to the last player who whispered us. Rewrite it to
   // the "/w <name> message" form so delivery, the echo, and case-matching
   // all stay in the single whisper handler below.
   const rm = /^\/r(?:eply)?\s+([\s\S]+)$/i.exec(raw);
@@ -238,7 +238,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     line = `/w ${replyTo} ${rm[1]}`;
   }
 
-  // "/inspect name" — self-only readout of another online player's level,
+  // "/inspect name": self-only readout of another online player's level,
   // class, and health. The first cross-player readout; a classic-style Inspect.
   const im = /^\/(?:inspect|ins|examine)(?:\s+([\s\S]+))?$/i.exec(raw);
   if (im) {
@@ -277,10 +277,10 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/invite name" — invite a player to your party by name, regardless of
+  // "/invite name": invite a player to your party by name, regardless of
   // distance (party invites have no proximity check, unlike trade/duel). Name
   // resolution mirrors /inspect (exact, then unambiguous case-insensitive); all
-  // party validation is delegated to partyInvite. (No "/inv" alias — that is
+  // party validation is delegated to partyInvite. (No "/inv" alias: that is
   // /inventory.)
   const invm = /^\/invite(?:\s+([\s\S]+))?$/i.exec(raw);
   if (invm) {
@@ -408,7 +408,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/played" — report how long this character has been in the world this
+  // "/played": report how long this character has been in the world this
   // session. Self-only informational line, like /who's reply.
   if (/^\/played(?:\s|$)/i.test(raw)) {
     const secs = Math.max(0, Math.floor(ctx.time - r.meta.joinedAt));
@@ -520,8 +520,22 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     ctx.error(r.meta.entityId, graveyardReadout(r.e));
     return null;
   }
+  const dungeonDifficulty = /^\/(?:dungeons|dungeon|instances)\s+(normal|heroic)$/i.exec(raw);
+  if (dungeonDifficulty) {
+    ctx.setDungeonDifficulty(
+      dungeonDifficulty[1].toLowerCase() as 'normal' | 'heroic',
+      r.meta.entityId,
+    );
+    return null;
+  }
   if (/^\/(?:dungeons|dungeon|instances)(?:\s|$)/i.test(raw)) {
     ctx.error(r.meta.entityId, readouts.dungeonsReadout());
+    ctx.error(
+      r.meta.entityId,
+      ctx.dungeonDifficulty(r.meta.entityId) === 'heroic'
+        ? 'Dungeon difficulty: Heroic. Use /dungeon normal to change it.'
+        : 'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
+    );
     return null;
   }
   if (/^\/(?:consider|con|difficulty)(?:\s|$)/i.test(raw)) {
@@ -593,7 +607,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/w name message" — private whisper to an online player. Match against
+  // "/w name message": private whisper to an online player. Match against
   // `line` so a "/r" reply (rewritten to the /w form above) flows through the
   // same longest-online-name resolver.
   const wm = /^\/(?:w|whisper|t|tell)\s+([\s\S]+)$/i.exec(line);
@@ -698,7 +712,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return { channel: 'party', message: clean };
   }
 
-  // "/g message" — world-wide general channel (no pid = broadcast to all)
+  // "/g message": world-wide general channel (no pid = broadcast to all)
   if (/^\/g(eneral)?\s/i.test(raw)) {
     const clean = raw.replace(/^\/g(eneral)?\s+/i, '').trim();
     if (!clean) return null;
@@ -712,7 +726,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return { channel: 'general', message: clean };
   }
 
-  // "/join <channel>" / "/leave <channel>" — opt-in global channels
+  // "/join <channel>" / "/leave <channel>": opt-in global channels
   const jm = /^\/(join|leave)\b\s*(\S*)\s*$/i.exec(raw);
   if (jm) {
     handleChannelMembership(
@@ -724,7 +738,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/world message" / "/lfg message" — talk in an opt-in channel; only
+  // "/world message" / "/lfg message": talk in an opt-in channel; only
   // players who have /join-ed it hear the message (the sender included)
   const cm = /^\/(world|lfg)\s+([\s\S]+)$/i.exec(raw);
   if (cm) {
@@ -754,7 +768,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return { channel, message: clean };
   }
 
-  // "/me <action>" — freeform third-person action text, e.g.
+  // "/me <action>": freeform third-person action text, e.g.
   // "/me ponders the void" → "Aleph ponders the void". Emotes never become
   // the player's sticky chat channel, so this returns null on success.
   const meMatch = /^\/(?:me|emote|e)\s+([\s\S]+)$/i.exec(raw);
@@ -764,7 +778,22 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
-  // "/wave", "/dance [name]" — predefined social emotes. An optional name
+  // "/sit", "/stand": a real seated POSE (rest on a bench, or up in the Vale
+  // Cup grandstands, which are walkable tiers). Sitting clears the moment you
+  // move, cast, or take a hit (those paths call standUp), so /stand is only for
+  // standing back up in place. Rides the existing `sitting` wire bit, so it works
+  // the same online and offline; no chat text, so nothing to localize.
+  const poseMatch = /^\/(sit|stand)\s*$/i.exec(raw);
+  if (poseMatch) {
+    if (poseMatch[1].toLowerCase() === 'sit') {
+      if (!r.e.dead) r.e.sitting = true;
+    } else {
+      ctx.standUp(r.e);
+    }
+    return null;
+  }
+
+  // "/wave", "/dance [name]": predefined social emotes. An optional name
   // targets an online player (in range or not); unknown names fall back to
   // the untargeted form, matching the classic-MMO convention.
   const emMatch = /^\/([a-z]+)(?:\s+(\S+))?\s*$/i.exec(raw);
@@ -783,7 +812,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     }
   }
 
-  // bare text and "/s" are local say; "/y" carries further — both are
+  // bare text and "/s" are local say; "/y" carries further: both are
   // delivered per-player by range and carry the speaker for chat bubbles
   let channel: 'say' | 'yell' = 'say';
   let clean = raw;
@@ -829,7 +858,7 @@ export function chatAllowed(ctx: SimContext, pid: number): boolean {
   return true;
 }
 
-// Dev chat cheats — only when Sim.devCommands is enabled (offline local play
+// Dev chat cheats: only when Sim.devCommands is enabled (offline local play
 // or online server with ALLOW_DEV_COMMANDS=1). Returns null when handled
 // (no channel message), or undefined when not a dev command.
 export function handleDevChat(
@@ -1048,7 +1077,7 @@ export function helpLines(): string[] {
 export function inspectReadout(target: PlayerMeta, e: Entity): string {
   const cls = CLASSES[target.cls]?.name ?? target.cls;
   const hp = e.hp <= 0 ? 'dead' : `${Math.round(Math.max(0, Math.min(1, e.hp / e.maxHp)) * 100)}%`;
-  return `${target.name}: Level ${e.level} ${cls} — HP ${hp}.`;
+  return `${target.name}: Level ${e.level} ${cls}: HP ${hp}.`;
 }
 
 // Handles /join and /leave for the opt-in global channels.

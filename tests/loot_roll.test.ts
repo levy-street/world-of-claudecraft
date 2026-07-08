@@ -5,6 +5,7 @@ import {
   activeLootRolls,
   awardSharedLootItem,
   distributeLootCopper,
+  lootRollGroupStatus,
   lootSlotVisibleTo,
   partyLootCandidatesForMob,
   pruneCorpseLoot,
@@ -200,6 +201,80 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     expect(returned?.openToAll).toBe(true);
     // The roll is closed and no longer offered to anyone.
     expect(activeLootRolls(sim.ctx, a)).toHaveLength(0);
+  });
+});
+
+describe('loot_roll: group roll status + resolution broadcast (module entry)', () => {
+  function openRoll() {
+    const fixture = partyOfThree();
+    const { sim, a, b, c } = fixture;
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+    return { ...fixture, rollId: lootRollEvent(sim).rollId };
+  }
+
+  it('shows every candidate undecided when the roll opens, to every party member', () => {
+    const { sim, a, b, c } = openRoll();
+    for (const viewer of [a, b, c]) {
+      const status = lootRollGroupStatus(sim.ctx, viewer);
+      expect(status).toHaveLength(1);
+      expect(status[0].itemId).toBe('greyjaw_hide_boots');
+      expect(status[0].entries).toEqual([
+        { pid: a, name: 'Aaa', choice: null },
+        { pid: b, name: 'Bbb', choice: null },
+        { pid: c, name: 'Ccc', choice: null },
+      ]);
+    }
+  });
+
+  it('reveals each choice as it lands, including for a player who already answered, and never the roll number', () => {
+    const { sim, a, b, c, rollId } = openRoll();
+    submitLootRoll(sim.ctx, rollId, 'need', a);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    // a has answered (no longer prompted) but still watches the group status.
+    expect(activeLootRolls(sim.ctx, a)).toHaveLength(0);
+    for (const viewer of [a, b, c]) {
+      const entries = lootRollGroupStatus(sim.ctx, viewer)[0].entries;
+      expect(entries.map((e) => e.choice)).toEqual(['need', null, 'pass']);
+      // Choice only: the d100 result must not leak before resolution.
+      for (const entry of entries) expect(entry).not.toHaveProperty('roll');
+    }
+  });
+
+  it('broadcasts every need/greed roll to the whole party at resolution, then the winner line', () => {
+    const { sim, a, b, c, rollId } = openRoll();
+    submitLootRoll(sim.ctx, rollId, 'greed', b);
+    submitLootRoll(sim.ctx, rollId, 'need', a);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    const lootTexts = (pid: number) =>
+      sim.events
+        .filter((e): e is Extract<SimEvent, { type: 'loot' }> => e.type === 'loot' && e.pid === pid)
+        .map((e) => e.text);
+    for (const viewer of [a, b, c]) {
+      const texts = lootTexts(viewer);
+      const needLine = texts.find((t) => t.startsWith('Need Roll - '));
+      const greedLine = texts.find((t) => t.startsWith('Greed Roll - '));
+      expect(needLine).toMatch(/^Need Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Aaa$/);
+      expect(greedLine).toMatch(/^Greed Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Bbb$/);
+      // Winner line still closes the roll, after the per-roller reveals.
+      const winLine = texts.find((t) => t.includes(' wins '));
+      expect(winLine).toMatch(/^Aaa wins \[\[i:greyjaw_hide_boots\]\] \(\d+\)$/);
+      expect(texts.indexOf(needLine as string)).toBeLessThan(texts.indexOf(winLine as string));
+    }
+    // The passer has no roll to reveal.
+    expect(lootTexts(a).some((t) => t.includes('by Ccc'))).toBe(false);
+    // Resolved roll leaves the group status.
+    expect(lootRollGroupStatus(sim.ctx, a)).toHaveLength(0);
+  });
+
+  it('hides a curate-phase master roll from the group status', () => {
+    const { sim, a, rollId } = openRoll();
+    const roll = (sim as any).pendingLootRolls.get(rollId);
+    roll.masterLooter = a;
+    expect(lootRollGroupStatus(sim.ctx, a)).toHaveLength(0);
   });
 });
 

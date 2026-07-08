@@ -32,6 +32,27 @@ permissions:
 # superset (its `npm test` runs every PR-tier check plus the release-only ones).
 
 jobs:
+  release-version-gate:
+    name: Release version gate
+    if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify release version surfaces
+        run: npm run release:check
+
   # Biome formatter + linter, adopted as a forward ratchet: only files actually
   # changed by this push/PR are checked (`--changed`), so the large existing tree
   # is never retroactively reformatted, while every new diff must pass format+lint.
@@ -99,6 +120,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # This job's checks also run locally as `npm run gate` (scripts/gate.mjs);
+      # keep that script's step list in sync when adding or removing a step here.
       - name: Generate i18n artifacts
         run: npm run i18n:gen
 
@@ -155,6 +178,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # This job's checks also run locally as `npm run gate` (scripts/gate.mjs);
+      # keep that script's step list in sync when adding or removing a step here.
       - name: Generate i18n artifacts
         run: npm run i18n:gen
 

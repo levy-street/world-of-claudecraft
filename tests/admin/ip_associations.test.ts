@@ -79,6 +79,7 @@ vi.mock('../../src/admin/account_modal', () => ({
 import { fmtDate } from '../../src/admin/format';
 import { t } from '../../src/admin/i18n';
 import IpAssociations from '../../src/admin/pages/IpAssociations.svelte';
+import { grantPermissions } from './_grant';
 
 beforeEach(() => {
   currentData = data;
@@ -86,6 +87,7 @@ beforeEach(() => {
   apiPost.mockReset();
   apiPost.mockResolvedValue({});
   accountModalOpen.mockReset();
+  grantPermissions();
 });
 
 describe('IP associations', () => {

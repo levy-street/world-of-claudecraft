@@ -1,4 +1,5 @@
 import { formatDuration } from './duration';
+import { logger } from './http/logger';
 import { parseModerationChatCommand } from './moderation_commands';
 
 export interface ModerationSession {
@@ -6,6 +7,10 @@ export interface ModerationSession {
   accountId: number;
   characterId: number;
   isAdmin: boolean;
+  // Expanded admin permission set, snapshotted at WS join (like isAdmin). The
+  // commands this service handles require 'moderation.act' or
+  // 'moderation.spectate' (see requiredCommandPermission).
+  adminPermissions: ReadonlySet<string>;
   name: string;
 }
 
@@ -51,6 +56,23 @@ export interface ModerationAudit {
 const BAN_MESSAGE = 'This account has been banned.';
 const SUSPEND_MESSAGE = 'This account is suspended.';
 const RENAME_MESSAGE = 'A moderator requires one of your characters to be renamed.';
+const NO_PERMISSION_MESSAGE = "You don't have permission to do that.";
+
+type ModerationCommandKind = NonNullable<ReturnType<typeof parseModerationChatCommand>>['kind'];
+
+function requiredCommandPermission(kind: ModerationCommandKind): string {
+  return kind === 'spectate' || kind === 'unspectate' ? 'moderation.spectate' : 'moderation.act';
+}
+
+// Dispatch-site gate: whether this session may even attempt a moderation chat
+// command. A session with neither permission falls through to ordinary chat,
+// exactly like a non-staff player (its "/kick x" broadcasts as plain text).
+export function canAttemptModerationCommands(session: ModerationSession): boolean {
+  return (
+    session.adminPermissions.has('moderation.act') ||
+    session.adminPermissions.has('moderation.spectate')
+  );
+}
 
 export class ModerationService<TSession extends ModerationSession> {
   constructor(
@@ -63,10 +85,17 @@ export class ModerationService<TSession extends ModerationSession> {
   handleChatCommand(actor: TSession, text: string): boolean {
     const command = parseModerationChatCommand(text);
     if (!command) return false;
-    // Defense in depth: the live caller already gates on isAdmin, but moderation is
-    // a sensitive API, so refuse non-admins here too. Swallow (return true) rather
-    // than let a rejected "/kick ..." leak into ordinary chat.
+    // Defense in depth: the live caller already gates on the moderation
+    // permissions, but moderation is a sensitive API, so refuse non-staff here
+    // too. Swallow (return true) rather than let a rejected "/kick ..." leak
+    // into ordinary chat.
     if (!actor.isAdmin) return true;
+    // Staff without the command's permission (e.g. a spectate-only role trying
+    // /ban) get an explicit refusal instead of a silent swallow.
+    if (!actor.adminPermissions.has(requiredCommandPermission(command.kind))) {
+      this.host.notice(actor, NO_PERMISSION_MESSAGE);
+      return true;
+    }
     switch (command.kind) {
       case 'kick':
         this.kick(actor, command.name, command.reason);
@@ -110,7 +139,7 @@ export class ModerationService<TSession extends ModerationSession> {
         this.host.kick(target);
         this.host.systemNotice(actor, `Kicked ${target.name}.`);
       })
-      .catch((err) => console.error('failed to audit in-game kick:', err));
+      .catch((err) => logger.error({ err }, 'failed to audit in-game kick'));
   }
 
   private killTarget(actor: TSession, name: string | null, reason: string): void {
@@ -127,7 +156,7 @@ export class ModerationService<TSession extends ModerationSession> {
         this.host.killEntity(target.pid);
         this.host.systemNotice(actor, `Killed ${target.name}.`);
       })
-      .catch((err) => console.error('failed to audit in-game kill:', err));
+      .catch((err) => logger.error({ err }, 'failed to audit in-game kill'));
   }
 
   private mute(actor: TSession, name: string | null, minutes: number | null, reason: string): void {
@@ -144,7 +173,7 @@ export class ModerationService<TSession extends ModerationSession> {
         this.host.muteLive(target.accountId, expiresAt, reason);
         this.host.systemNotice(actor, `Muted ${target.name} for ${formatDuration(minutes * 60)}.`);
       })
-      .catch((err) => console.error('failed to mute in-game:', err));
+      .catch((err) => logger.error({ err }, 'failed to mute in-game'));
   }
 
   private ban(actor: TSession, name: string | null, reason: string): void {
@@ -156,7 +185,7 @@ export class ModerationService<TSession extends ModerationSession> {
         this.host.disconnect(target.accountId, BAN_MESSAGE);
         this.host.systemNotice(actor, `Banned ${target.name}.`);
       })
-      .catch((err) => console.error('failed to ban in-game:', err));
+      .catch((err) => logger.error({ err }, 'failed to ban in-game'));
   }
 
   private suspend(
@@ -181,7 +210,7 @@ export class ModerationService<TSession extends ModerationSession> {
           `Suspended ${target.name} for ${formatDuration(minutes * 60)}.`,
         );
       })
-      .catch((err) => console.error('failed to suspend in-game:', err));
+      .catch((err) => logger.error({ err }, 'failed to suspend in-game'));
   }
 
   private forceRename(actor: TSession, name: string | null, reason: string): void {
@@ -197,7 +226,7 @@ export class ModerationService<TSession extends ModerationSession> {
         this.host.disconnect(target.accountId, RENAME_MESSAGE);
         this.host.systemNotice(actor, `Required ${target.name} to rename.`);
       })
-      .catch((err) => console.error('failed to force-rename in-game:', err));
+      .catch((err) => logger.error({ err }, 'failed to force-rename in-game'));
   }
 
   private spectate(actor: TSession, name: string | null): void {

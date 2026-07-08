@@ -32,7 +32,7 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
 - **Delta invariant:** the server OMITS heavy/unchanged fields (`cds`, `inv`,
   `equip`, `qlog`, `qdone`, `tal`, `stats`, `party`…). Guard every one with
   `if (s.X !== undefined)` and keep the prior value otherwise; do NOT default a
-  missing field to empty, that wipes local state. The full delta-key set (the 25
+  missing field to empty, that wipes local state. The full delta-key set (the 35
   `maybe(...)` keys the encoder may omit) and the terse-key to IWorld-name mapping are
   pinned by `ALL_DELTA_KEYS` + `TERSE_TO_IWORLD` in `tests/snapshots.test.ts` (W0a).
 - **Lite vs full:** identity fields (`k`, `tid`, `nm`…) ride only in "full" records
@@ -80,8 +80,27 @@ failure, kept as stable English that `main.ts` re-localizes.
   stays English by design (the "diagnostic errors stay English" rule).
 
 ## Never
-- Never mutate game state authoritatively here or "predict" an outcome. The only
-  sanctioned optimism is the trivial local UI nudges already present
-  (`targetEntity` setting `targetId`; `pendingQuestCommands`); keep that scope.
+- Never mutate game state authoritatively here or "predict" an OUTCOME: no
+  client-side anticipation of combat, casts, resources, loot, aggro, or anything
+  else the server resolves. The only sanctioned optimism inside `net/` is the
+  trivial local UI nudges already present (`targetEntity` setting `targetId`;
+  `pendingQuestCommands`); keep that scope.
+- **Display-layer locomotion anticipation is the one sanctioned prediction**, and
+  it lives OUTSIDE `net/` (`src/render/self_motion.ts`): a visual-only pose for
+  the LOCAL player that is (a) bounded by measured latency with a hard cap,
+  (b) always blending toward the authoritative server pose, (c) never written
+  into `ClientWorld` mirrored state or any `IWorld` read that logic consumes
+  (targeting, range checks, quest triggers, and interest all use authoritative
+  positions), and (d) never affects what is sent to the server. Widening any of
+  those four constraints is a maintainer decision, see
+  `docs/online-movement-latency.md`.
+- **The heading is NOT predicted, it is client-authoritative input.** The facing
+  channel (`input.facing`, applied outright by the server, corpse-guard only)
+  has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`
+  streams keyboard turns on the SAME channel (with the turn flags zeroed on the
+  wire, except the engage-edge frame that still fires the server's manual-turn
+  behaviors) so the server never integrates a turn a round trip late. That is
+  real input, not anticipation: constraint (d) above does not apply to it, and
+  its authority stays exactly what mouselook already had.
 - Never read `Math.random`/timing into *gameplay*; `performance.now` here is for
   render interpolation only (`lastSnapAt`, per-entity `netInterval`), not logic.

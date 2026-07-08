@@ -122,6 +122,7 @@ describe('npcs', () => {
             questIds: ['q1', 42, 'q2'],
             vendorItems: ['bread', null],
             market: true,
+            banker: true,
             greeting: 'Hello',
             __proto__pollution: 'junk',
           },
@@ -143,6 +144,7 @@ describe('npcs', () => {
       questIds: ['q1', 'q2'],
       vendorItems: ['bread'],
       market: true,
+      banker: true,
       greeting: 'Hello',
     });
   });
@@ -157,6 +159,7 @@ describe('npcs', () => {
     expect(npc?.name).toBe('Villager');
     expect(npc?.questIds).toEqual([]);
     expect(npc?.market).toBeUndefined();
+    expect(npc?.banker).toBeUndefined();
     expect(npc?.dynamic).toBeUndefined();
   });
 });

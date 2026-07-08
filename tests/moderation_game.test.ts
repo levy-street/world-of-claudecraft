@@ -27,12 +27,22 @@ vi.mock('../server/db', () => ({
     completedQuestIds: [],
     mechChromaIds: [],
   })),
+  // Character load leases: leave() releases and the autosave loop heartbeats, so
+  // these must exist on the mock or those paths throw on the undefined export.
+  acquireCharacterLease: vi.fn(async () => true),
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
 vi.mock('../server/moderation_db', () => moderation);
 
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
+
+// In-game moderation now requires explicit permissions at join (no is_admin ->
+// all-permissions fallback). These operators exercise both act and spectate.
+const MOD_PERMS = ['moderation.act', 'moderation.spectate'] as const;
 
 type FakeWs = {
   readyState: number;
@@ -111,6 +121,7 @@ describe('in-game moderation actions', () => {
     const moderator = joined(
       kickServer.join(moderatorWs, 1, 101, 'Moderator', 'warrior', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     const target = joined(kickServer.join(targetWs, 2, 102, 'Trouble Maker', 'rogue', null));
@@ -133,6 +144,7 @@ describe('in-game moderation actions', () => {
     const killer = joined(
       killServer.join(killerWs, 3, 103, 'Killer', 'mage', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     const victim = joined(killServer.join(victimWs, 4, 104, 'Victim', 'priest', null));
@@ -156,6 +168,7 @@ describe('in-game moderation actions', () => {
     const moderator = joined(
       server.join(moderatorWs, 10, 110, 'Moderator', 'warrior', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     const target = joined(server.join(targetWs, 20, 120, 'Target', 'rogue', null));
@@ -188,6 +201,7 @@ describe('in-game moderation actions', () => {
     const banModerator = joined(
       banServer.join(banModeratorWs, 50, 150, 'BanMod', 'warrior', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     joined(banServer.join(banTargetWs, 60, 160, 'Repeat', 'rogue', null));
@@ -209,6 +223,7 @@ describe('in-game moderation actions', () => {
     const renameModerator = joined(
       renameServer.join(renameModeratorWs, 30, 130, 'RenameMod', 'warrior', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     joined(renameServer.join(renameTargetWs, 40, 140, 'Badname', 'rogue', null));
@@ -228,7 +243,10 @@ describe('in-game moderation actions', () => {
     const adminWs = fakeWs();
     const player = joined(server.join(playerWs, 1, 101, 'Player', 'warrior', null));
     const admin = joined(
-      server.join(adminWs, 2, 102, 'Admin', 'mage', null, false, { isAdmin: true }),
+      server.join(adminWs, 2, 102, 'Admin', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
     );
     command(server, player, '/kick "Admin" forbidden');
     expect(adminWs.close).not.toHaveBeenCalled();
@@ -245,6 +263,7 @@ describe('in-game moderation actions', () => {
     joined(
       server.join(otherAdminWs, 3, 103, 'Otheradmin', 'priest', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     command(server, admin, '/kick "Otheradmin" forbidden');
@@ -264,6 +283,7 @@ describe('moderator spectate integration', () => {
     const moderator = joined(
       server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     const suspect = joined(server.join(suspectWs, 2, 102, 'Suspect', 'rogue', null));
@@ -344,6 +364,7 @@ describe('moderator spectate integration', () => {
     const moderator = joined(
       server.join(fakeWs(), 1, 101, 'Watcher', 'mage', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     joined(server.join(fakeWs(), 2, 102, 'First', 'rogue', null));
@@ -367,6 +388,7 @@ describe('moderator spectate integration', () => {
     const moderator = joined(
       server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     const suspect = joined(server.join(fakeWs(), 2, 102, 'Goneplayer', 'rogue', null));
@@ -407,6 +429,7 @@ describe('moderator spectate integration', () => {
     const moderator = joined(
       server.join(fakeWs(), 1, 101, 'Petwatcher', 'hunter', state, false, {
         isAdmin: true,
+        adminPermissions: MOD_PERMS,
       }),
     );
     joined(server.join(fakeWs(), 2, 102, 'Pettarget', 'warrior', null));

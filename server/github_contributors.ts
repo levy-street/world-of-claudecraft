@@ -24,10 +24,27 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import type { DevLeaderboardEntry } from '../src/world_api';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 
-const GITHUB_REPO = process.env.GITHUB_REPO ?? 'levy-street/world-of-claudecraft';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? '';
+const DEFAULT_GITHUB_REPO = 'levy-street/world-of-claudecraft';
 const GITHUB_API_HOST = 'api.github.com';
-const PULLS_URL = `https://${GITHUB_API_HOST}/repos/${GITHUB_REPO}/pulls`;
+
+// The repo slug + optional token, INJECTED at boot (server/main.ts wires these from
+// the one validated boot Config via configureGithubContributorsRuntime, matching the
+// configure<Domain>Runtime convention) rather than read from process.env at module
+// load. That removes this module's duplicate of main.ts's GITHUB_REPO/GITHUB_TOKEN
+// reads and keeps a bare import inert. The defaults point at the public repo with no
+// token, identical to an unset env, so the pure parsers and any pre-boot read behave
+// exactly as before.
+interface GithubContributorsRuntime {
+  readonly githubRepo: string;
+  readonly githubToken: string;
+}
+let runtime: GithubContributorsRuntime = { githubRepo: DEFAULT_GITHUB_REPO, githubToken: '' };
+
+/** Inject the repo slug + optional token. Called once at boot from server/main.ts. */
+export function configureGithubContributorsRuntime(rt: GithubContributorsRuntime): void {
+  runtime = { githubRepo: rt.githubRepo || DEFAULT_GITHUB_REPO, githubToken: rt.githubToken };
+}
+
 const CONTRIBUTORS_TTL_MS = 30 * 60_000; // 30 min; merged-PR counts change slowly
 const CONTRIBUTORS_PER_PAGE = 100;
 const CONTRIBUTORS_MAX_PAGES = 30; // 3000 closed PRs cap; well past the repo's current history
@@ -140,7 +157,7 @@ function githubHeaders(): Record<string, string> {
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
     'User-Agent': 'world-of-claudecraft-server',
-    ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
+    ...(runtime.githubToken ? { Authorization: `Bearer ${runtime.githubToken}` } : {}),
   };
 }
 
@@ -150,8 +167,9 @@ function githubHeaders(): Record<string, string> {
 async function fetchAllContributors(): Promise<ContributorStat[]> {
   recordUsageMetric('github.contributors.fetch');
   const logins: string[] = [];
+  const pullsUrl = `https://${GITHUB_API_HOST}/repos/${runtime.githubRepo}/pulls`;
   let url: string | null =
-    `${PULLS_URL}?state=closed&per_page=${CONTRIBUTORS_PER_PAGE}&sort=created&direction=desc`;
+    `${pullsUrl}?state=closed&per_page=${CONTRIBUTORS_PER_PAGE}&sort=created&direction=desc`;
   for (let page = 0; page < CONTRIBUTORS_MAX_PAGES && url; page++) {
     const res: Response = await fetch(url, {
       headers: githubHeaders(),

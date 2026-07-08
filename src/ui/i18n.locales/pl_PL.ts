@@ -2,6 +2,366 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.sport_boot.description':
+    'Długie, wysokie wykopnięcie w stronę punktu celowania. Trybuny to uwielbiają.',
+  'entities.abilities.sport_boot.name': 'Potężny Wykop',
+  'entities.abilities.sport_dive.description':
+    'Rzucasz się w stronę punktu celowania. Dośrodkowana piłka przywiera do ciebie.',
+  'entities.abilities.sport_dive.name': 'Rzut do piłki',
+  'entities.abilities.sport_feint.description': 'Szybki zwód i zryw w stronę punktu celowania.',
+  'entities.abilities.sport_feint.name': 'Zwód',
+  'entities.abilities.sport_hoof.description': 'Huknij piłkę nisko i mocno w głąb boiska.',
+  'entities.abilities.sport_hoof.name': 'Na Pałę',
+  'entities.abilities.sport_kick.description': 'Zagraj piłkę po ziemi w stronę punktu celowania.',
+  'entities.abilities.sport_kick.name': 'Kopnięcie',
+  'entities.abilities.sport_pass.description':
+    'Mocne podanie po ziemi do wskazanego towarzysza, wyprzedzające jego bieg.',
+  'entities.abilities.sport_pass.name': 'Podanie',
+  'entities.abilities.sport_punt.description': 'Bramkarskie wybicie, wysoko i daleko.',
+  'entities.abilities.sport_punt.name': 'Dalekie Wybicie',
+  'entities.abilities.sport_second_wind.description':
+    'Łapiesz oddech: poruszasz się o 50% szybciej przez 4 s.',
+  'entities.abilities.sport_second_wind.name': 'Świeże Nogi',
+  'entities.abilities.sport_shoot.description':
+    'Przytrzymaj, aby nabrać mocy, i puść, aby strzelić na bramkę. Zbyt mocny strzał poszybuje nad poprzeczką.',
+  'entities.abilities.sport_shoot.name': 'Strzał',
+  'entities.abilities.sport_shoulder.description':
+    'Uczciwe natarcie barkiem w duchu żniwnego rozejmu. Posyła rywala na ziemię, z dala od piłki.',
+  'entities.abilities.sport_shoulder.name': 'Bark',
+  'entities.npcs.groundskeeper_bram.greeting':
+    'Na Maciorowym Błoniu obowiązuje rozejm, {className}: tylko kopniaki i barki. Zagrasz o Miedziany Skopek?',
+  'entities.npcs.groundskeeper_bram.name': 'Opiekun Murawy Bram',
+  'entities.npcs.groundskeeper_bram.title': 'Opiekun Maciorowego Błonia',
+  'entities.zones.eastbrook_vale.pois.10.label': 'Maciorowe Błonie',
+  'guide.nav.professions': 'Profesje',
+  'guide.nav.valeCup': 'Puchar Doliny',
+  'guide.professions.archetypeChooseBody':
+    'Swój pierwszy archetyp deklarujesz podczas wczesnego zadania fabularnego w pierwszej strefie, które formalnie przyjmuje cię do tej tożsamości. Dopóki nie ukończysz tego zadania, nie masz jeszcze wybranego żadnego archetypu.',
+  'guide.professions.archetypeChooseTitle': 'Wybór archetypu',
+  'guide.professions.archetypeIdentityBody':
+    'Aktywny archetyp to deklaracja, kim twoja postać jest w świecie, widoczna w tym, jak zwracają się do ciebie inni i sam świat. Dokładne nagrody i wyróżnienia z nim związane wciąż są dopracowywane; zaglądaj tu, w miarę jak system się rozrasta.',
+  'guide.professions.archetypeIdentityTitle': 'Co oznacza twój archetyp',
+  'guide.professions.archetypeIntro':
+    'Każde z dziesięciu rzemiosł reprezentuje też archetyp, szerszą tożsamość, którą możesz przyjąć ponad samo uprawianie fachu. Aktywny archetyp to pojedynczy wybór, nie lista do odhaczenia: nosisz jeden i możesz go później zmienić, jeśli zechcesz.',
+  'guide.professions.archetypeSwitchBody':
+    'Raz zadeklarowany archetyp nie wiąże cię na zawsze. Zmiana na inny archetyp wymaga najpierw ukończenia powtarzalnego zadania "zadośćuczynienia" wobec starego, a z każdą kolejną zmianą oczekiwane zadośćuczynienie robi się nieco surowsze, dzięki czemu zmiana pozostaje znacząca, a nie darmowa.',
+  'guide.professions.archetypeSwitchTitle': 'Zmiana zdania',
+  'guide.professions.archetypeTitle': 'Dziesięć archetypów',
+  'guide.professions.craftComboBody':
+    'Poza listą przepisów pojedynczego rzemiosła koło wspiera też przepisy łączone, które wymagają dwóch sąsiadujących rzemiosł naraz, nagradzając postać (lub parę partnerów handlowych), która zainwestowała w sąsiednie fachy na kręgu, a nie w jeden w izolacji.',
+  'guide.professions.craftComboTitle': 'Przepisy łączone',
+  'guide.professions.craftIntro':
+    'Dziesięć rzemiosł przetwarza zebrane materiały w gotowy ekwipunek i towary: Płatnerstwo, Zbrojmistrzostwo i Jubilerstwo nadają surowej materii kształt noszonego ekwipunku; Alchemia i Inżynieria opierają się na próbach i błędach; Gotowanie, Inskrypcja i Zaklinanie sięgają po wytwory innych rzemiosł; Krawiectwo i Garbarstwo pracują według dokładnych wzorów. Razem tworzą koło, w którym każde rzemiosło sąsiaduje z dwoma innymi i leży naprzeciw jednego.',
+  'guide.professions.craftMasteryBody':
+    'Udane wytwarzanie buduje umiejętność w danym fachu, a bogatsze przepisy zamknięte są za wyższą umiejętnością: podstawowe przepisy są dostępne dla każdego, natomiast coraz bardziej zaawansowane wymagają coraz większej biegłości. Rozwijanie umiejętności w rzemiośle to droga od prostych wyrobów na start do jego najambitniejszych przepisów.',
+  'guide.professions.craftMasteryTitle': 'Umiejętność i biegłość',
+  'guide.professions.craftRecipesBody':
+    'Każde rzemiosło ma własne przepisy, a każdy z nich wymaga konkretnych składników, które zbierasz lub kupujesz. Najprostsze przepisy w każdym rzemiośle potrzebują wyłącznie pospolitych materiałów i są dostępne od samego początku, więc możesz zacząć pracę w fachu od chwili, gdy go podejmiesz, zamiast czekać na odblokowanie.',
+  'guide.professions.craftRecipesTitle': 'Przepisy i składniki',
+  'guide.professions.craftRingBody':
+    'Dziesięć rzemiosł ułożonych jest w stały krąg, a miejsce rzemiosła na tym kręgu ma znaczenie: rzemiosła sąsiadujące ze sobą na kole mają ze sobą więcej wspólnego niż te po przeciwnych stronach. Oddanie się jednemu rzemiosłu ma przypominać dołączenie do rodziny pokrewnych fachów, a nie wybór odosobnionej umiejętności.',
+  'guide.professions.craftRingTitle': 'Koło specjalności',
+  'guide.professions.craftTitle': 'Dziesięć rzemiosł',
+  'guide.professions.gatherIntro':
+    'Trzy fachy zbierackie pozwalają czerpać surowce prosto ze świata: Górnictwo wydobywa rudę i kamień z żył, Wyrąb pozyskuje drewno z kęp drzew, a Zielarstwo zbiera dziko rosnące zioła i rośliny. Każdy z nich liczony jest osobno, więc praca w jednym nigdy nie spowalnia postępów w innym.',
+  'guide.professions.gatherProficiencyBody':
+    'Każdy udany zbiór buduje twoją wprawę w danym fachu zbierackim. Wyższa wprawa przesuwa to, co pozyskujesz z węzła, ku rzadszym gatunkom materiału, od pospolitych wzwyż, choć najrzadsze gatunki pozostają rzadkie nawet przy wysokiej wprawie. Praktyka nigdy nie psuje twoich szans, zawsze je tylko poprawia.',
+  'guide.professions.gatherProficiencyTitle': 'Wprawa i jakość materiałów',
+  'guide.professions.gatherTitle': 'Zbieractwo: Górnictwo, Wyrąb i Zielarstwo',
+  'guide.professions.gatherToolsBody':
+    'Sprzedawcy oferują podstawowe narzędzia dla każdego fachu zbierackiego, a lepsze można wytworzyć, więc praca przy węźle zasobów ma stawać się sprawniejsza wraz z lepszym wyposażeniem, a nie stać w miejscu. Narzędzia wyższego stopnia to zamierzona droga do bogatszych węzłów i wydajniejszej pracy podczas długiej sesji.',
+  'guide.professions.gatherToolsTitle': 'Narzędzia fachu',
+  'guide.professions.gatherWhatBody':
+    'Żyły rudy, kępy drzew i kępki ziół rozmieszczone są w strefach jako widoczne, niczyje obiekty. Podejdź do jednego z nich i użyj go, aby zebrać, co skrywa. Po zbiorze węzeł potrzebuje czasu, by się odnowić, zanim ty osobiście zbierzesz z niego ponownie, ale nigdy nie blokuje innych: inny gracz może w tym czasie zebrać z tego samego węzła.',
+  'guide.professions.gatherWhatTitle': 'Węzły zasobów',
+  'guide.professions.intro':
+    'Poza walką i zadaniami świat nagradza pracę na roli i przy kuźni: zbieranie surowców, przekuwanie ich w ekwipunek przy stanowiskach dziesięciu różnych rzemiosł i wrastanie w tożsamość jednego z dziesięciu archetypów, które te fachy reprezentują.',
+  'guide.valeCupPage.heading': 'Puchar Doliny',
+  'guide.valeCupPage.howHeading': 'Jak grać',
+  'guide.valeCupPage.howMatch':
+    'Przy pierwszym gwizdku twój zestaw klasowy zostaje podmieniony na sportowy, a po meczu wraca dokładnie taki, jaki był. Kopnięcia celują w celownik na ziemi, piłka odbija się od band, a drybling to po prostu bieg z piłką. Zdobądź więcej goli niż przeciwnik przed końcem meczu; remis rozstrzyga złoty gol.',
+  'guide.valeCupPage.howQueue':
+    'Do kolejki dołączysz z dowolnego miejsca przez okno Pucharu Doliny albo rozmawiając z Opiekunem Murawy Bramem przy bramie Maciorowego Błonia. Wybierz format od jeden na jednego do pięciu na pięciu, sztandar nacji i rolę sportową; stawaj w kolejce solo albo z drużyną.',
+  'guide.valeCupPage.howTruce':
+    'Na Maciorowym Błoniu nikt nie krwawi: wślizgi tylko przewracają, nic nie boli, a zwierzęta oglądają mecz z boku.',
+  'guide.valeCupPage.intro':
+    'Dzicza piłka na Maciorowym Błoniu: wybierz sztandar, wybierz rolę i kopnij wypchaną dziczą skórę za plecy bramkarza, by zdobyć Miedziany Skopek. Bez krwi, bez łupów, tylko ryk trybun.',
+  'guide.valeCupPage.loreHeading': 'Dzicza piłka i żniwny rozejm',
+  'guide.valeCupPage.loreOldSow':
+    'Na długo zanim zbudzili się umarli, parobkowie z Eastbrook grali w dziczą piłkę na ścierniskach po żniwach: dwie gromady, jedna dzicza skóra wypchana słomą i dwie wozowe bramy zaciągnięte na oba końce błonia. Pierwsza piłka, Stara Maciora, wisi odlana w brązie nad kominkiem tawerny.',
+  'guide.valeCupPage.loreTruce':
+    'Gdy Popielne Koloseum zaczęło urządzać wojenne igrzyska, Marszałek Redbrook odpowiedział czymś łagodniejszym: stałym żniwnym rozejmem na starym błoniu. Wozowe bramy stały się słupkami, błonie zyskało mury, trybuny i nazwę, Maciorowe Błonie, a nagrodą zawsze był ten sam wgnieciony skopek na mleko, z którego pili zwycięzcy: Miedziany Skopek.',
+  'guide.valeCupPage.nationChoir':
+    'Bladobłękitni i srebrni pod dzwonem: niesamowici, precyzyjni i bardzo cisi.',
+  'guide.valeCupPage.nationColiseum':
+    'Czerwień i czerń ze skrzyżowanymi mieczami: grają, jakby to wciąż były wojenne igrzyska.',
+  'guide.valeCupPage.nationCopperdig':
+    'Miedź i brąz z kilofem: kopacze, którzy nigdy nie przestają biegać.',
+  'guide.valeCupPage.nationMirefen':
+    'Morska zieleń i szarość pod czaplą: cierpliwi, długonodzy, nigdy się nie spieszą.',
+  'guide.valeCupPage.nationMoon':
+    'Fiolet i srebro pod półksiężycem: nocni gracze, lekcy na nogach.',
+  'guide.valeCupPage.nationOgre':
+    'Pomarańcz i umbra za pięścią: grają barkiem naprzód i są z tego dumni.',
+  'guide.valeCupPage.nationThornpeak':
+    'Lodowy błękit i biel pod górskim szczytem: pewni kroku i uparci.',
+  'guide.valeCupPage.nationVale':
+    'Zieleń i złoto pod snopem pszenicy: gospodarze, parobkowie z krwi i kości.',
+  'guide.valeCupPage.nationsBody':
+    'Każda drużyna gra pod sztandarem. Kapitan wybiera nację, a jeśli obie strony niosą ten sam sztandar, goście grają w odwróconych barwach.',
+  'guide.valeCupPage.nationsHeading': 'Osiem nacji pod sztandarami',
+  'guide.valeCupPage.rewardsBody':
+    'Zasady rozejmu oznaczają brak doświadczenia i łupów: rozstrzygnięty mecz liczy się do twojego bilansu i tablicy zwycięzców, a wraz z nim przychodzą punkty nagród dziennych. Dezercja z meczu odsyła cię na ławkę, a Opiekun Murawy pamięta.',
+  'guide.valeCupPage.rewardsHeading': 'Zasady rozejmu',
+  'guide.valeCupPage.rolesBody':
+    'Rola decyduje o zestawie, z którym wychodzisz na boisko. Kopie każdy; reszta to kwestia temperamentu.',
+  'guide.valeCupPage.rolesHeading': 'Role sportowe',
+  'guide.valeCupPage.spectateBody':
+    'Na stadionie toczy się jeden mecz naraz i każdy może podejść i oglądać go z trybun.',
+  'hudChrome.keybinds.valecup': 'Puchar Doliny',
+  'hudChrome.mobile.dailyRewards': 'Nagrody',
+  'hudChrome.perf.labels.predLead': 'Wyprzedzenie predykcji',
+  'hudChrome.townFocus.budgetLabel': 'Pozostałe punkty: {remaining} / {budget}',
+  'hudChrome.townFocus.decreaseAria': 'Zmniejsz priorytet: {component}',
+  'hudChrome.townFocus.hint':
+    'Punkty priorytetu dodają premię ponad bazowy uzysk każdego elementu. Elementy bez priorytetu pozostają na poziomie bazowym.',
+  'hudChrome.townFocus.increaseAria': 'Zwiększ priorytet: {component}',
+  'hudChrome.townFocus.notInTownHint': 'Musisz być w mieście, aby ustawić priorytety.',
+  'hudChrome.townFocus.saveButton': 'Zapisz priorytety',
+  'hudChrome.townFocus.title': 'Priorytety miasta',
+  'hudChrome.vcup.awayNote':
+    'Jeśli obie strony niosą ten sam sztandar, goście grają w odwróconych barwach.',
+  'hudChrome.vcup.bannerCountdown': 'Pierwszy gwizdek za {seconds}...',
+  'hudChrome.vcup.bannerDraw': 'Remis na Maciorowym Błoniu.',
+  'hudChrome.vcup.bannerEnd': 'Koniec meczu: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.bannerFound': 'Puchar Doliny wzywa: {nationA} kontra {nationB}!',
+  'hudChrome.vcup.bannerGoal': 'GOL! {nation} zdobywa bramkę!',
+  'hudChrome.vcup.bannerGolden': 'ZŁOTY GOL: następna bramka wygrywa!',
+  'hudChrome.vcup.bannerKickoff': 'ROZPOCZĘCIE!',
+  'hudChrome.vcup.bannerLoss': 'Porażka na Maciorowym Błoniu.',
+  'hudChrome.vcup.bannerSave': '{name} BRONI!',
+  'hudChrome.vcup.bannerWin': 'Zwycięstwo na Maciorowym Błoniu!',
+  'hudChrome.vcup.bet.aria': 'Zakłady na mecz Pucharu Doliny',
+  'hudChrome.vcup.bet.back': 'Postaw na {team}',
+  'hudChrome.vcup.bet.closed': 'Zakłady zamknięte',
+  'hudChrome.vcup.bet.closesIn': 'Zakłady zamykają się za {seconds} s',
+  'hudChrome.vcup.bet.collapse': 'Ukryj zakłady',
+  'hudChrome.vcup.bet.expand': 'Zobacz zakłady i obstaw',
+  'hudChrome.vcup.bet.form': '{wins}Z-{losses}P',
+  'hudChrome.vcup.bet.lostLog': 'Twój zakład w Pucharze Doliny przegrał: {amount}.',
+  'hudChrome.vcup.bet.mine': 'Twój zakład: {amount} na {team}',
+  'hudChrome.vcup.bet.none': 'Nie masz jeszcze zakładu na ten mecz.',
+  'hudChrome.vcup.bet.oddsLabel': 'Kurs',
+  'hudChrome.vcup.bet.prize': 'Pula {amount}',
+  'hudChrome.vcup.bet.record': 'Bilans zakładów: {wins}Z-{losses}P, {sign}{net}',
+  'hudChrome.vcup.bet.refundLog': 'Zakłady unieważnione, twoja stawka {amount} została zwrócona.',
+  'hudChrome.vcup.bet.splitAria': 'Udział puli zakładów na każdą z drużyn',
+  'hudChrome.vcup.bet.title': 'Zakłady meczowe',
+  'hudChrome.vcup.bet.wonBanner': 'Twój zakład wygrał!',
+  'hudChrome.vcup.bet.wonLog': 'Twój zakład w Pucharze Doliny wygrał: zwrócono {amount}.',
+  'hudChrome.vcup.blockNation': 'Najpierw wybierz sztandar nacji.',
+  'hudChrome.vcup.blockNotLeader': 'Tylko przywódca drużyny może zapisać zespół do kolejki.',
+  'hudChrome.vcup.blockPartySize': 'Ten format wymaga mniejszej drużyny.',
+  'hudChrome.vcup.boardEmpty': 'Nie zapisano jeszcze zwycięzców. Miedziany Skopek czeka.',
+  'hudChrome.vcup.boardHeading': 'Tablica zwycięzców',
+  'hudChrome.vcup.boardWins': 'zwycięstwa: {count}',
+  'hudChrome.vcup.bracketLabel': '{n} na {n}',
+  'hudChrome.vcup.bracketsAria': 'Format meczu',
+  'hudChrome.vcup.briefing.bot': 'Bot',
+  'hudChrome.vcup.briefing.kitHeading': 'Twój zestaw',
+  'hudChrome.vcup.briefing.kitNote':
+    'Te zagrania zastępują twoje umiejętności klasowe na czas meczu.',
+  'hudChrome.vcup.briefing.ready': 'Zgłaszam gotowość',
+  'hudChrome.vcup.briefing.readyAria': 'Zgłoś gotowość do rozpoczęcia',
+  'hudChrome.vcup.briefing.readyCount': 'Gotowych: {ready} z {total}',
+  'hudChrome.vcup.briefing.readyDone': 'Gotowość',
+  'hudChrome.vcup.briefing.rosterHeading': 'Skład drużyn',
+  'hudChrome.vcup.briefing.rule1': 'Kopnij lub podaj piłkę do bramki przeciwnika, aby zdobyć gola.',
+  'hudChrome.vcup.briefing.rule2':
+    'Wygrywa strona, która pierwsza zdobędzie 5 goli, albo ta z większą liczbą goli po końcowym gwizdku.',
+  'hudChrome.vcup.briefing.rule3':
+    'Remis po końcowym gwizdku przechodzi w złotego gola: następna bramka wygrywa.',
+  'hudChrome.vcup.briefing.rule4':
+    'Wślizgi tylko cię przewracają. Podczas żniwnego rozejmu nikomu nie dzieje się krzywda.',
+  'hudChrome.vcup.briefing.rule5': 'Każdy może podejść i kibicować ci z trybun.',
+  'hudChrome.vcup.briefing.rulesHeading': 'Jak grać',
+  'hudChrome.vcup.briefing.subtitle': 'Odprawa przedmeczowa',
+  'hudChrome.vcup.briefing.vs': 'kontra',
+  'hudChrome.vcup.briefing.waiting': 'Oczekiwanie, aż druga strona zgłosi gotowość...',
+  'hudChrome.vcup.briefing.whistle': 'Gwizdek za {seconds} s.',
+  'hudChrome.vcup.briefing.you': 'Ty',
+  'hudChrome.vcup.clock': '{minutes}:{seconds}',
+  'hudChrome.vcup.close': 'Zamknij okno Pucharu Doliny',
+  'hudChrome.vcup.deserterNote': 'Opiekun Murawy pamięta. Do kolejki wrócisz za {seconds} s.',
+  'hudChrome.vcup.enterAsGuild': 'Wystąp pod sztandarem gildii {guild}',
+  'hudChrome.vcup.gossipOpen': 'Księga rozgrywek',
+  'hudChrome.vcup.gossipOpenAria': 'Otwórz okno Pucharu Doliny',
+  'hudChrome.vcup.guildBoardEmpty':
+    'Żadna gildia nie wyszła jeszcze na boisko. Wznieś swój sztandar!',
+  'hudChrome.vcup.guildBoardHeading': 'Sztandary gildii',
+  'hudChrome.vcup.guildBoardWl': '{wins} Z, {losses} P',
+  'hudChrome.vcup.guildRecordLine': 'Bilans twojej gildii: zwycięstwa {wins}, porażki {losses}.',
+  'hudChrome.vcup.inMatchNote': 'Twoja drużyna jest na boisku. Graj dalej!',
+  'hudChrome.vcup.indicatorLive': 'Puchar Doliny',
+  'hudChrome.vcup.indicatorOpen': 'Otwórz okno Pucharu Doliny',
+  'hudChrome.vcup.indicatorQueued':
+    'Kolejka Pucharu Doliny: {bracket}, miejsce {position} z {count}',
+  'hudChrome.vcup.leaveQueue': 'Opuść kolejkę',
+  'hudChrome.vcup.liveAria': 'Puchar Doliny: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.liveHeading': 'Teraz na Maciorowym Błoniu',
+  'hudChrome.vcup.logDraw': 'Starcie na Maciorowym Błoniu kończy się remisem.',
+  'hudChrome.vcup.logFound': 'Twój mecz Pucharu Doliny jest gotowy: {nationA} kontra {nationB}.',
+  'hudChrome.vcup.logGoal':
+    '{name} zdobywa gola dla {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
+  'hudChrome.vcup.logLoss': 'Przegrywasz starcie na Maciorowym Błoniu.',
+  'hudChrome.vcup.logQueued':
+    'Dołączasz do kolejki Pucharu Doliny w formacie {bracket} (miejsce {position}).',
+  'hudChrome.vcup.logRoster': 'Twoja strona: {allies}. Ich strona: {enemies}.',
+  'hudChrome.vcup.logSave': '{name} broni!',
+  'hudChrome.vcup.logUnqueued': 'Opuszczasz kolejkę Pucharu Doliny.',
+  'hudChrome.vcup.logWin': 'Wygrywasz starcie na Maciorowym Błoniu.',
+  'hudChrome.vcup.mobileLabel': 'Puchar',
+  'hudChrome.vcup.nation.choir': 'Blady Chór',
+  'hudChrome.vcup.nation.coliseum': 'Popielne Koloseum',
+  'hudChrome.vcup.nation.copperdig': 'Miedziane Wykopalisko',
+  'hudChrome.vcup.nation.mirefen': 'Mokrzaw',
+  'hudChrome.vcup.nation.moon': 'Blady Księżyc',
+  'hudChrome.vcup.nation.ogre': 'Klany Ogrów',
+  'hudChrome.vcup.nation.thornpeak': 'Ciernisty Szczyt',
+  'hudChrome.vcup.nation.vale': 'Dolina Wschodniego Strumienia',
+  'hudChrome.vcup.nationsHeading': 'Sztandar nacji',
+  'hudChrome.vcup.noLive': 'Na boisku cisza. Żaden mecz się nie toczy.',
+  'hudChrome.vcup.offlineNote':
+    'Księga rozgrywek jest zamknięta. Puchar Doliny jest teraz niedostępny.',
+  'hudChrome.vcup.phaseCountdown': 'Rozpoczęcie za {seconds}',
+  'hudChrome.vcup.phaseGoal': 'GOL!',
+  'hudChrome.vcup.phaseGolden': 'ZŁOTY GOL',
+  'hudChrome.vcup.phaseOver': 'KONIEC MECZU',
+  'hudChrome.vcup.practice': 'Trening z botami',
+  'hudChrome.vcup.practiceNote':
+    'Od razu rozpoczyna prywatny mecz z botami na twoim własnym boisku treningowym.',
+  'hudChrome.vcup.practicingNow': 'Trenują teraz ({count}):',
+  'hudChrome.vcup.queue': 'Dołącz do kolejki',
+  'hudChrome.vcup.queueNote':
+    'Do kolejki dołączysz z dowolnego miejsca; gwizdek wezwie cię na Maciorowe Błonie.',
+  'hudChrome.vcup.queuedStatus': 'W kolejce do {bracket}: miejsce {position} z {count}.',
+  'hudChrome.vcup.recordLine': 'Twój bilans: zwycięstwa {wins}, porażki {losses}, remisy {draws}.',
+  'hudChrome.vcup.role.allrounder.desc': 'Wszystkiego po trochu: kopnięcie, wykop i uczciwy bark.',
+  'hudChrome.vcup.role.allrounder.name': 'Wszechstronny',
+  'hudChrome.vcup.role.keeper.desc': 'Strzeże pola bramkowego chwytem, rzutem i wybiciem.',
+  'hudChrome.vcup.role.keeper.name': 'Bramkarz',
+  'hudChrome.vcup.role.striker.desc': 'Żyje dla dalekiego wykopu i szybkiego zwodu.',
+  'hudChrome.vcup.role.striker.name': 'Napastnik',
+  'hudChrome.vcup.role.sweeper.desc': 'Odpycha biegnących od piłki i wybija ją daleko.',
+  'hudChrome.vcup.role.sweeper.name': 'Libero',
+  'hudChrome.vcup.rolesHeading': 'Rola sportowa',
+  'hudChrome.vcup.shootPower': 'MOC',
+  'hudChrome.vcup.title': 'Puchar Doliny',
+  'hudChrome.vcup.waitingCount': 'Oczekuje: {count}',
+  'hudChrome.vcup.walkUp': 'Podejdź na Maciorowe Błonie, aby oglądać z trybun.',
+  'hudChrome.archetypeTitle.label': 'Tytuł',
+  'hudChrome.archetypeTitle.none': 'Brak',
+  'hudChrome.archetypeTitle.armorcrafting': 'Płatnerz',
+  'hudChrome.archetypeTitle.weaponcrafting': 'Zbrojmistrz',
+  'hudChrome.archetypeTitle.jewelcrafting': 'Jubiler',
+  'hudChrome.archetypeTitle.alchemy': 'Alchemik',
+  'hudChrome.archetypeTitle.engineering': 'Inżynier',
+  'hudChrome.archetypeTitle.cooking': 'Kucharz',
+  'hudChrome.archetypeTitle.inscription': 'Skryba',
+  'hudChrome.archetypeTitle.enchanting': 'Zaklinacz',
+  'hudChrome.archetypeTitle.tailoring': 'Krawiec',
+  'hudChrome.archetypeTitle.leatherworking': 'Garbarz',
+  'entities.itemSets.crownforged.bonus4':
+    'Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.',
+  'entities.itemSets.deathlord.bonus4':
+    'Twoje krytyczne trafienia bronią mają 50% szansy na udzielenie Grobowej Potęgi, zwiększającej moc ataku o 60 na 10 s.',
+  'entities.itemSets.necromancers.bonus4':
+    'Twoje zaklęcia mają 10% szansy na udzielenie Jasności Umysłu, dzięki czemu następne zaklęcie jest darmowe.',
+  'entities.itemSets.nighttalon.bonus4':
+    'Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 6 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.',
+  'entities.itemSets.soulflame.bonus4':
+    'Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s.',
+  'entities.itemSets.stormcallers.bonus4':
+    'Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s.',
+  'entities.itemSets.wyrmshadow.bonus4':
+    'Twoje krytyczne trafienia bronią mają 50% szansy na udzielenie Pędu Kłów, zwiększającego szybkość ataku o 25% na 8 s.',
+  'entities.items.architects_cornerstone.name': 'Kamień węgielny Architekta',
+  'entities.items.bonechill_cord.name': 'Sznur kościstego mrozu',
+  'entities.items.bonechill_striders.name': 'Wędrowce kościstego mrozu',
+  'entities.items.choir_blessed_spaulders.name': 'Naramienniki błogosławione przez chór',
+  'entities.items.choirmothers_casque.name': 'Hełm matki chóru',
+  'entities.items.cryptplate_helm.name': 'Hełm z kryptowej płyty',
+  'entities.items.deathless_greatblade.name': 'Nieśmiertelne wielkie ostrze',
+  'entities.items.deathless_warguard_legmail.name': 'Nieśmiertelne nogawice wojennej straży',
+  'entities.items.gravescale_girdle.name': 'Pas z grobowej łuski',
+  'entities.items.gravewyrm_claws.name': 'Szpony grobowego żmija',
+  'entities.items.gravewyrm_cleaver.name': 'Tasak grobowego żmija',
+  'entities.items.heroic_mark.name': 'Znak heroiczny',
+  'entities.items.lunar_choir_leggings.name': 'Nogawice księżycowego chóru',
+  'entities.items.lunar_tide_greatstaff.name': 'Wielki kostur księżycowego przypływu',
+  'entities.items.medallion_of_endless_profit.name': 'Medalion niekończącego się zysku',
+  'entities.items.mistcallers_fang.name': 'Kieł przyzywacza mgły',
+  'entities.items.mistforged_pauldrons.name': 'Naramienniki kute we mgle',
+  'entities.items.morthens_cryptforged_hauberk.name': 'Kryptokuta kolczuga Morthena',
+  'entities.items.nielas_coldlight_band.name': 'Obrączka zimnego światła Nieli',
+  'entities.items.oath_of_the_round_table.name': 'Przysięga Okrągłego Stołu',
+  'entities.items.sanctum_prowlers_grips.name': 'Rękawice skradacza sanktuarium',
+  'entities.items.sash_of_the_sunken_court.name': 'Szarfa zatopionego dworu',
+  'entities.items.scepter_of_the_deathless_court.name': 'Berło nieśmiertelnego dworu',
+  'entities.items.scourgehide_carapace.name': 'Pancerz ze skóry plagi',
+  'entities.items.seal_of_the_nine_oaths.name': 'Pieczęć dziewięciu przysiąg',
+  'entities.items.shadowpulse_handwraps.name': 'Owijki cienistego pulsu',
+  'entities.items.shadowpulse_slippers.name': 'Trzewiki cienistego pulsu',
+  'entities.items.shroud_of_the_gravewyrm.name': 'Całun grobowego żmija',
+  'entities.items.soulforged_warplate.name': 'Bojowa zbroja kuta z duszy',
+  'entities.items.soulrend_diadem.name': 'Diadem rozdarcia dusz',
+  'entities.items.stormcallers_focus.name': 'Ognisko przyzywacza burz',
+  'entities.items.sunken_court_mantle.name': 'Peleryna zatopionego dworu',
+  'entities.items.sutils_gambit.name': 'Gambit Sutila',
+  'entities.items.swiftfang_talisman.name': 'Talizman rączego kła',
+  'entities.items.tidebound_spaulders.name': 'Naramienniki spętane przypływem',
+  'entities.items.tideguard_faceguard.name': 'Osłona twarzy straży przypływu',
+  'entities.items.tideworn_warboots.name': 'Bojowe buty starte przypływem',
+  'entities.items.tidewoven_trousers.name': 'Spodnie tkane przypływem',
+  'entities.items.wyrmchoir_handwraps.name': 'Owijki żmijowego chóru',
+  'entities.items.yumis_keepsake_locket.name': 'Pamiątkowy medalionik Yumi',
+  'entities.items.zense_meridian.name': 'Meridian Zense',
+  'entities.items.zyzzs_deathless_signet.name': 'Nieśmiertelny sygnet Zyzza',
+  'entities.npcs.heroic_quartermaster.greeting':
+    'Dowód z heroicznych głębin kupi najlepsze pierścienie i wisiory w Wysokiej Straży. Pokaż mi swoje znaki.',
+  'entities.npcs.heroic_quartermaster.name': 'Kwatermistrz Vex',
+  'entities.npcs.heroic_quartermaster.title': 'Heroiczny kwatermistrz',
+  'heroicShop.balance': 'Znaki heroiczne: {count}',
+  'heroicShop.buyAria': 'Kup {item} za {marks} Znaków heroicznych',
+  'hudChrome.bags.cannotDestroy': 'Tego przedmiotu nie można zniszczyć.',
+  'hudChrome.bags.rightClickDestroy': 'Kliknij prawym, aby zniszczyć',
+  'hudChrome.crafting.comboRequirementUnmet':
+    'Nie masz obu wymaganych rzemiosł na wymaganym poziomie dla tego przepisu.',
+  'hudChrome.discord.roleTag.coredevs': 'Główny deweloper',
+  'hudChrome.dungeonDifficulty.setHeroic': 'Ustaw trudność podziemia: Heroiczna',
+  'hudChrome.dungeonDifficulty.setNormal': 'Ustaw trudność podziemia: Normalna',
+  'hudChrome.itemProc.attackSlow': 'i spowalnia szybkość ataku celu o {pct}% na {duration} s',
+  'hudChrome.itemProc.chainArc':
+    'razi cel czarem {school} {name} ({damage}), który przeskakuje na {jumps} pobliskich wrogów, zadając malejące obrażenia',
+  'hudChrome.itemProc.dot':
+    'wywołuje {name}, obrażenia od {school} w czasie zadające łącznie {total} przez {duration} s',
+  'hudChrome.itemProc.hot':
+    'rozkwita {name}, leczenie w czasie przywracające {total} przez {duration} s',
+  'hudChrome.itemProc.onHeal': 'Szansa przy leczeniu ({chance}%): {effect}',
+  'hudChrome.itemProc.onMeleeHit': 'Szansa przy trafieniu ({chance}%): {effect}',
+  'hudChrome.itemProc.onSpellDamage':
+    'Szansa przy zaklęciach zadających obrażenia ({chance}%): {effect}',
+  'hudChrome.options.version': 'v{version} ({build})',
+  'hudChrome.raidLockout.heroicLocked': 'Jesteś przypisany do heroicznego {name}.',
+  'hudChrome.raidLockout.heroicName': 'Heroiczny {name}',
+  'hudChrome.statInfo.desc.critRating':
+    'Ocena krytyczna z twojego ekwipunku i bonusów zestawów, zwiększająca szansę na trafienie krytyczne. Około 10 oceny daje 1% trafienia krytycznego.',
+  'hudChrome.statInfo.desc.hasteRating':
+    'Ocena pośpiechu z twojego ekwipunku i bonusów zestawów, przyspieszająca twoje ataki i rzucanie zaklęć. Około 10 oceny daje 1% pośpiechu.',
+  'hudChrome.statInfo.names.critRating': 'Ocena krytyczna',
+  'hudChrome.statInfo.names.hasteRating': 'Ocena pośpiechu',
+  'itemUi.slots.neck': 'Szyja',
+  'itemUi.slots.ring': 'Palec',
   'auth.email': 'E-mail',
   'auth.emailError': 'Wprowadź prawidłowy adres e-mail.',
   'auth.emailPlaceholder': 'ty@example.com',
@@ -519,6 +879,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': 'Zbudzony Burzowiec',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Budzący się Szczyt',
   'entities.mobs.tolling_bell.name': 'Bijący Dzwon',
+  'entities.mobs.vale_cup_ball.name': 'Dziczy Balon',
   'entities.npcs.brother_halven_marsh.greeting':
     'Trop powiódł na północ. Kolejny relikwiarz, kolejny obrzęd. Wybierz poziom trudności, a ja potrzymam linę, aż wrócisz.',
   'entities.npcs.brother_halven_marsh.name': 'Brat Halven',
@@ -1121,6 +1482,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'download.desc':
     'Pobierz samodzielny launcher dla zoptymalizowanej wydajności i gry na pełnym ekranie.',
   'download.title': 'Pobierz launcher na komputer',
+  'download.macCta': 'Pobierz dla macOS',
+  'download.windowsPending': 'Build Windows w przygotowaniu.',
   'entities.abilities.adrenaline_rush.description':
     'Twoja krew wrze, natychmiast przywracając 60 energii.',
   'entities.abilities.adrenaline_rush.name': 'Przyspieszona krew',
@@ -1133,7 +1496,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_explosion.description':
     'Wybuch arkanicznej energii uderza wszystkich pobliskich wrogów, zadając {damage} obrażeń arkanicznych.',
   'entities.abilities.arcane_explosion.name': 'Wybuch eteru',
-  'entities.abilities.arcane_intellect.description': 'Zwiększa intelekt o 2 na 30 min.',
+  'entities.abilities.arcane_intellect.description': 'Zwiększa intelekt o {buff} na 30 min.',
   'entities.abilities.arcane_intellect.name': 'Wgląd eteru',
   'entities.abilities.arcane_missiles.description':
     'Wystrzeliwuje eteryczne strzały we wroga, zadając {damage} obrażeń arkanicznych co sekundę przez 3 sek.',
@@ -1145,7 +1508,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przyjmij postać rumaka, zwiększając prędkość ruchu o 30% na 30 min.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Postać rumaka',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Przyjmij postać błotniaka, zwiększając moc ataku o 20 na 30 min.',
+    'Przyjmij postać błotniaka, zwiększając moc ataku o {buff} na 30 min.',
   'entities.abilities.aspect_of_the_hawk.name': 'Postać błotniaka',
   'entities.abilities.aspect_of_the_monkey.description':
     'Przyjmij postać kuny, zwiększając szansę na unik o 8% na 30 min.',
@@ -1158,19 +1521,19 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Dębowa skóra',
   'entities.abilities.bash.description': 'Ogłusza cel na 2 sek. Tylko w postaci Bruina.',
   'entities.abilities.bash.name': 'Wstrząśnienie',
-  'entities.abilities.battle_shout.description': 'Zwiększa twoją moc ataku o 20 na 2 min.',
+  'entities.abilities.battle_shout.description': 'Zwiększa twoją moc ataku o {buff} na 2 min.',
   'entities.abilities.battle_shout.name': 'Żelazny ryk',
   'entities.abilities.bear_charge.description':
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina.',
   'entities.abilities.bear_charge.name': 'Szarża Bruina',
   'entities.abilities.bear_form.description':
-    'Zmień postać w niedźwiedzia: pancerz +65%, moc ataku +15, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego.',
+    'Zmień postać w niedźwiedzia: pancerz +90%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego.',
   'entities.abilities.bear_form.name': 'Postać Bruina',
   'entities.abilities.berserker_rage.description':
     'Wpadnij w kipiącą furię, generując 20 wściekłości. (Talent wojownika)',
   'entities.abilities.berserker_rage.name': 'Kipiąca furia',
   'entities.abilities.blessing_of_might.description':
-    'Nakłada błogosławieństwo na przyjazny cel, zwiększając moc ataku o 15 na 5 min.',
+    'Nakłada błogosławieństwo na przyjazny cel, zwiększając moc ataku o {buff} na 5 min.',
   'entities.abilities.blessing_of_might.name': 'Przysięga żelaza',
   'entities.abilities.blind.description':
     'Oślepia cel, sprawiając, że błądzi zdezorientowany przez 8 sek. Jakiekolwiek obrażenia przerywają efekt.',
@@ -1178,7 +1541,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Generuje 10 wściekłości kosztem zdrowia.',
   'entities.abilities.bloodrage.name': 'Krwawa danina',
   'entities.abilities.bloodthirst.description':
-    'Natychmiast atakuj w krwawym szale, zadając {damage}. (Sygnatura furii)',
+    'Natychmiast atakuj w krwawym szale, zadając 60% obrażeń broni plus {damage}. (Sygnatura furii)',
   'entities.abilities.bloodthirst.name': 'Upust krwi',
   'entities.abilities.cat_form.description':
     'Zmień postać w wilka: moc ataku rośnie z twoim poziomem, twoje ataki zużywają energię i punkty kombinacji, a generujesz 29% mniej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego.',
@@ -1187,7 +1550,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów.',
   'entities.abilities.charge.name': 'Natarcie',
   'entities.abilities.cheap_shot.description':
-    'Uderz cel, ogłuszając go na 4 sek. Wymaga skradania się. Przyznaje 2 punkty kombinacji.',
+    'Uderz cel, zadając {damage} obrażeń i ogłuszając go na 4 sek. Wymaga skradania się. Przyznaje 2 punkty kombinacji.',
   'entities.abilities.cheap_shot.name': 'Cios w brzuch',
   'entities.abilities.claw.description':
     'Rozdrap wroga, zadając obrażenia broni plus {damage}. Przyznaje 1 punkt kombinacji. Tylko w postaci wilka.',
@@ -1195,10 +1558,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description':
     'Zamaszyste uderzenie, które trafia wszystkich wrogów przed tobą, zadając {damage} obrażeń.',
   'entities.abilities.cleave.name': 'Kosiący łuk',
-  'entities.abilities.commanding_shout.description': 'Zwiększa twoją kondycję o 6 na 2 min.',
+  'entities.abilities.commanding_shout.description': 'Zwiększa twoją kondycję o {buff} na 2 min.',
   'entities.abilities.commanding_shout.name': 'Krzepiący okrzyk',
   'entities.abilities.concussive_shot.description':
-    'Oszałamia cel, spowalniając ruch o 50% na 4 sek.',
+    'Oszałamia cel, zadając {damage} obrażeń i spowalniając ruch o 50% na 4 sek.',
   'entities.abilities.concussive_shot.name': 'Wstrząsający strzał',
   'entities.abilities.conjure_food.description':
     'Przywołuje 2 porcje chleba, które po zjedzeniu przywracają zdrowie. Wyższe rangi przywołują pożywniejsze jadło.',
@@ -1207,13 +1570,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przywołuje 2 butelki wody, które po wypiciu przywracają manę. Wyższe rangi przywołują czystszą wodę.',
   'entities.abilities.conjure_water.name': 'Przywołanie wody',
   'entities.abilities.consecration.description':
-    'Poświęca ziemię pod tobą, parząc pobliskich wrogów, zadając {damage} obrażeń świętych.',
+    'Poświęca ziemię pod tobą, parząc pobliskich wrogów i zadając {damage} obrażeń od Świętości co 2 sek. przez 10 sek.',
   'entities.abilities.consecration.name': 'Święta ziemia',
   'entities.abilities.corruption.description':
     'Skaża cel, zadając {damage} obrażeń cienia przez 18 sek.',
   'entities.abilities.corruption.name': 'Czarna zgnilizna',
   'entities.abilities.crippling_poison.description':
-    'Uderza cel ołowianym jadem, zadając {damage} obrażeń natury i spowalniając jego prędkość ruchu o 50% na 12 sek.',
+    'Uderza cel ołowianym jadem, zadając {damage} obrażeń od Natury i spowalniając jego prędkość ruchu o 50% na 12 sek.',
   'entities.abilities.crippling_poison.name': 'Ołowiany jad',
   'entities.abilities.curse_of_agony.description':
     'Przeklina cel agonią: {damage} obrażeń od cienia w ciągu 24 sek.',
@@ -1228,20 +1591,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę.',
   'entities.abilities.defensive_stance.name': 'Czujna postawa',
   'entities.abilities.demon_skin.description':
-    'Demoniczna skóra zwiększa twój pancerz o 30 na 30 min.',
+    'Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min.',
   'entities.abilities.demon_skin.name': 'Skóra plugawca',
   'entities.abilities.demoralizing_roar.description':
     'Demoralizuje pobliskich wrogów, zmniejszając ich moc ataku o 20 na 20 sek. Tylko w postaci Bruina.',
   'entities.abilities.demoralizing_roar.name': 'Tchórzliwy ryk',
   'entities.abilities.demoralizing_shout.description':
-    'Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o 30 na 30 sek.',
+    'Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o {buff} na 30 sek.',
   'entities.abilities.demoralizing_shout.name': 'Złowieszcze wycie',
-  'entities.abilities.devotion_aura.description': 'Zwiększa twój pancerz o 40 na 30 min.',
+  'entities.abilities.devotion_aura.description': 'Zwiększa twój pancerz o {buff} na 30 min.',
   'entities.abilities.devotion_aura.name': 'Aura niezłomności',
   'entities.abilities.dismiss_pet.description': 'Odsyła twoje zwierzę z powrotem na łono dziczy.',
   'entities.abilities.dismiss_pet.name': 'Uwolnij towarzysza',
   'entities.abilities.divine_protection.description':
-    'Ochronna osłona pochłania 50 obrażeń przez 10 sek.',
+    'Ochronna osłona pochłania {damage} obrażeń przez 10 sek.',
   'entities.abilities.divine_protection.name': 'Osłona wiary',
   'entities.abilities.drain_life.description':
     'Wysysa życie celu, przekazując ci {damage} zdrowia co sekundę przez 5 sek.',
@@ -1256,8 +1619,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Chwytające korzenie',
   'entities.abilities.evasion.description': 'Zwiększa twoją szansę na unik o 50% na 15 sek.',
   'entities.abilities.evasion.name': 'Upiorny krok',
-  'entities.abilities.eviscerate.description':
-    'Ruch kończący, który zadaje obrażenia za każdy punkt kombinacji.',
+  'entities.abilities.eviscerate.description': 'Ruch kończący, który zadaje {damage}.',
   'entities.abilities.eviscerate.name': 'Wieczny sen',
   'entities.abilities.execute.description':
     'Próba dobicia rannego przeciwnika, zadająca {damage} obrażeń. Użyteczne tylko na wrogach poniżej 20% zdrowia.',
@@ -1266,15 +1628,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wygania niegodziwca świętym gniewem, zadając {damage} obrażeń od światłości.',
   'entities.abilities.exorcism.name': 'Rytuał wygnania',
   'entities.abilities.expose_armor.description':
-    'Ruch kończący, który odsłania cel, zmniejszając jego pancerz. Więcej wydanych punktów kombinacji pogłębia cięcie.',
+    'Ruch kończący, który odsłania cel, zmniejszając jego pancerz o {damage} na 30 sek.',
   'entities.abilities.expose_armor.name': 'Wyłom w pancerzu',
-  'entities.abilities.faerie_fire.description': 'Zmniejsza pancerz celu o 35 na 40 sek.',
+  'entities.abilities.faerie_fire.description': 'Zmniejsza pancerz celu o 35 na 30 sek.',
   'entities.abilities.faerie_fire.name': 'Wiedźmie światło',
   'entities.abilities.fear.description':
     'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez nawet 8 sek. Każde obrażenie przerywa efekt.',
   'entities.abilities.fear.name': 'Trwoga',
   'entities.abilities.ferocious_bite.description':
-    'Ruch kończący, który zadaje obrażenia za każdy punkt kombinacji. Tylko w postaci wilka.',
+    'Ruch kończący, który zadaje {damage}. Tylko w postaci wilka.',
   'entities.abilities.ferocious_bite.name': 'Krwawe ukąszenie',
   'entities.abilities.fire_blast.description':
     'Razi wroga, zadając {damage} obrażeń od ognia. Natychmiastowe.',
@@ -1284,24 +1646,24 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.name': 'Żarowy pocisk',
   'entities.abilities.rain_of_fire.name': 'Deszcz ognia',
   'entities.abilities.rain_of_fire.description':
-    'Sprowadza deszcz ognia na wybrany obszar, paląc wrogów i zadając {damage} obrażeń od ognia.',
+    'Sprowadza deszcz ognia na wybrany obszar przez 4 sek., paląc wrogów i zadając {damage} obrażeń od ognia co sekundę.',
   'entities.abilities.volley.name': 'Salwa',
   'entities.abilities.volley.description':
-    'Zasypuje wybrany obszar strzałami, zadając {damage} obrażeń wrogom w jego obrębie.',
+    'Zasypuje wybrany obszar strzałami przez 3 sek., zadając {damage} obrażeń co 0.5 sek. wrogom w jego obrębie.',
   'entities.abilities.hurricane.name': 'Huragan',
   'entities.abilities.hurricane.description':
-    'Sprowadza huragan na wybrany obszar, smagając wrogów i zadając {damage} obrażeń od sił natury.',
+    'Sprowadza huragan na wybrany obszar przez 6 sek., smagając wrogów i zadając {damage} obrażeń od sił natury co sekundę.',
   'entities.abilities.earthquake.name': 'Trzęsienie ziemi',
   'entities.abilities.earthquake.description':
-    'Wstrząsa wybranym obszarem, smagając wrogów i zadając {damage} obrażeń od sił natury.',
+    'Wstrząsa wybranym obszarem przez 6 sek., smagając wrogów i zadając {damage} obrażeń od sił natury co 1.5 sek.',
   'entities.abilities.flamestrike.name': 'Ognista nawała',
   'entities.abilities.flamestrike.description':
     'Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia wrogom w zasięgu eksplozji.',
   'entities.abilities.flame_shock.description':
-    'Spala cel ogniem, zadając 25 obrażeń oraz {damage} w ciągu 12 sek.',
+    'Spala cel ogniem, zadając {damage} obrażeń oraz {overTime} w ciągu 12 sek.',
   'entities.abilities.flame_shock.name': 'Żarowy wstrząs',
   'entities.abilities.flametongue_weapon.description':
-    'Przepaja twój oręż żywiołem ognia: każde uderzenie zadaje 8 dodatkowych obrażeń od ognia przez 5 min.',
+    'Przepaja twój oręż żywiołem ognia: każde uderzenie zadaje {damage} dodatkowych obrażeń od ognia przez 5 min.',
   'entities.abilities.flametongue_weapon.name': 'Oręż żarowego piętna',
   'entities.abilities.flash_heal.description':
     'Szybka modlitwa, która leczy sprzymierzony cel o {damage}.',
@@ -1310,7 +1672,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Szybki, oszczędny rozbłysk światła, który leczy sprzymierzony cel o {damage}.',
   'entities.abilities.flash_of_light.name': 'Świetliste ukojenie',
   'entities.abilities.frost_armor.description':
-    'Otacza cię szronem, zwiększając pancerz o 30 na 30 min.',
+    'Otacza cię szronem, zwiększając pancerz o {buff} na 30 min.',
   'entities.abilities.frost_armor.name': 'Płaszcz szronu',
   'entities.abilities.frost_nova.description':
     'Zamraża wszystkich pobliskich wrogów w miejscu na nawet 8 sek, zadając {damage} obrażeń od mrozu.',
@@ -1322,24 +1684,24 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wystrzeliwuje pocisk mrozu, zadając {damage} obrażeń od mrozu i spowalniając ruch o 40%.',
   'entities.abilities.frostbolt.name': 'Szronowa lanca',
   'entities.abilities.frostbrand_weapon.description':
-    'Przepaja twój oręż kąsającym mrozem: każde uderzenie zadaje 8 dodatkowych obrażeń przez 5 min.',
+    'Przepaja twój oręż kąsającym mrozem: każde uderzenie zadaje {damage} dodatkowych obrażeń przez 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Oręż szronowych okowów',
   'entities.abilities.garrote.description':
-    'Dusi wroga garotą, zadając obrażenia natychmiast oraz powodując krwawienie za {damage} w ciągu 18 sek. Wymaga skradania. Przyznaje 1 punkt kombinacji.',
+    'Dusi wroga garotą, zadając {damage} obrażeń natychmiast oraz powodując krwawienie za {overTime} w ciągu 18 sek. Wymaga skradania. Przyznaje 1 punkt kombinacji.',
   'entities.abilities.garrote.name': 'Drut na gardło',
   'entities.abilities.ghost_wolf.description':
     'Przemienia cię w Shadewolfa, zwiększając prędkość ruchu o 40% na 10 min.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.gouge.description':
-    'Uderza w cel, obezwładniając go na 4 sek. Każde obrażenie przerywa efekt. Przyznaje 1 punkt kombinacji.',
+    'Uderza w cel, zadając {damage} obrażeń i obezwładniając go na 4 sek. Każde obrażenie przerywa efekt. Przyznaje 1 punkt kombinacji.',
   'entities.abilities.gouge.name': 'Cios w oko',
   'entities.abilities.growl.description':
     'Warczy na cel: twoje zagrożenie wzrasta do poziomu jego najbardziej znienawidzonego wroga, a cel zostaje zmuszony do atakowania cię przez 3 sek. Tylko w postaci Bruina.',
   'entities.abilities.growl.name': 'Groźba',
-  'entities.abilities.hammer_of_justice.description': 'Ogłusza cel na 3 sek.',
+  'entities.abilities.hammer_of_justice.description': 'Ogłusza cel na {duration} sek.',
   'entities.abilities.hammer_of_justice.name': 'Druzgocący młot',
   'entities.abilities.hamstring.description':
-    'Okalecza wroga, zadając 5 obrażeń i spowalniając jego ruch o 50% na 15 sek.',
+    'Okalecza wroga, zadając {damage} obrażeń i spowalniając jego ruch o 50% na 15 sek.',
   'entities.abilities.hamstring.name': 'Kulawiące cięcie',
   'entities.abilities.heal.description':
     'Powolna, lecz potężna modlitwa, która leczy sprzymierzony cel o {damage}.',
@@ -1357,10 +1719,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_light.description': 'Leczy sprzymierzony cel o {damage}.',
   'entities.abilities.holy_light.name': 'Kojące Światło',
   'entities.abilities.ice_barrier.description':
-    'Osłania cię lodem, pochłaniając 130 obrażeń przez 60 sek.',
+    'Osłania cię lodem, pochłaniając {damage} obrażeń przez 60 sek.',
   'entities.abilities.ice_barrier.name': 'Lodowa zasłona',
   'entities.abilities.immolate.description':
-    'Pali wroga, zadając 11 obrażeń od ognia oraz dodatkowe {damage} w ciągu 15 sek.',
+    'Pali wroga, zadając {damage} obrażeń od ognia oraz dodatkowe {overTime} w ciągu 15 sek.',
   'entities.abilities.immolate.name': 'Płonący pakt',
   'entities.abilities.insect_swarm.description':
     'Wroga oblepia rój owadów, zadając {damage} obrażeń od natury w ciągu 12 sek.',
@@ -1375,20 +1737,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ruch kończący, który ogłusza cel. Trwa o 1 sek dłużej za każdy punkt kombinacji.',
   'entities.abilities.kidney_shot.name': 'Cios poniżej pasa',
   'entities.abilities.lay_on_hands.description':
-    'Potężny przypływ uzdrowienia: przywraca 250 zdrowia. 10 min czasu odnowienia.',
+    'Potężny przypływ uzdrowienia: przywraca {damage} zdrowia. 10 min czasu odnowienia.',
   'entities.abilities.lay_on_hands.name': 'Ostatnie namaszczenie',
   'entities.abilities.lesser_heal.description': 'Leczy sprzymierzony cel o {damage}.',
   'entities.abilities.lesser_heal.name': 'Szeptana modlitwa',
-  'entities.abilities.life_tap.description': 'Zamienia 30 zdrowia na 30 many.',
+  'entities.abilities.life_tap.description': 'Zamienia {damage} zdrowia na {damage} many.',
   'entities.abilities.life_tap.name': 'Trudny targ',
   'entities.abilities.lightning_bolt.description':
     'Ciska piorunem, zadając {damage} obrażeń od natury.',
   'entities.abilities.lightning_bolt.name': 'Łukowy pocisk',
   'entities.abilities.lightning_shield.description':
-    'Otacza cię trzaskająca błyskawica: napastnicy w zwarciu otrzymują 13 obrażeń od natury.',
+    'Otacza cię trzaskająca błyskawica: napastnicy w zwarciu otrzymują {buff} obrażeń od natury, do 3 ładunków i najwyżej raz na 5 sek.',
   'entities.abilities.lightning_shield.name': 'Osłona gromu',
   'entities.abilities.mark_of_the_wild.description':
-    'Nakłada Dziką osłonę na sprzymierzony cel, zwiększając pancerz o 25 na 30 min.',
+    'Nakłada Dziką osłonę na sprzymierzony cel, zwiększając pancerz o {buff} na 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Dzika osłona',
   'entities.abilities.maul.description':
     'Miażdżący atak, który zwiększa obrażenia w zwarciu o {damage} i powoduje wysokie zagrożenie. Aktywuje się przy następnym uderzeniu. Tylko w postaci Bruina.',
@@ -1400,7 +1762,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek.',
   'entities.abilities.mind_flay.name': 'Litania niedoli',
   'entities.abilities.mongoose_bite.description':
-    'Kontratak po uniku celu, zadający obrażenia broni plus 12. Nie można uniknąć.',
+    'Kontratak po uniku celu, zadający obrażenia broni plus {damage}. Nie można uniknąć.',
   'entities.abilities.mongoose_bite.name': 'Odwetowy kieł',
   'entities.abilities.moonfire.description':
     'Spala wroga księżycowym ogniem, zadając {damage} obrażeń arkanicznych oraz obrażenia w czasie.',
@@ -1409,19 +1771,19 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Bezlitosne uderzenie zadające obrażenia broni plus {damage}. (Sygnatura Oręża)',
   'entities.abilities.mortal_strike.name': 'Okaleczające uderzenie',
   'entities.abilities.overpower.description':
-    'Natychmiastowy atak za obrażenia broni +5. Użyteczne tylko po uniku celu. Nie można uniknąć.',
+    'Natychmiastowy atak za obrażenia broni plus {damage}. Użyteczne tylko po uniku celu. Nie można uniknąć.',
   'entities.abilities.overpower.name': 'Krwawa ręka',
   'entities.abilities.polymorph.description':
-    'Przemienia wroga w ropuchę na nawet 15 sek. Ropucha błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy.',
+    'Przemienia wroga w ropuchę na nawet {duration} sek. Ropucha błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy.',
   'entities.abilities.polymorph.name': 'Zauroczenie',
   'entities.abilities.pounce.description':
     'Otwarcie ze skradania, które ogłusza cel na 2 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci wilka.',
   'entities.abilities.pounce.name': 'Skradający cios',
   'entities.abilities.power_word_fortitude.description':
-    'Zwiększa wytrzymałość celu o 3 na 30 min.',
+    'Zwiększa wytrzymałość celu o {buff} na 30 min.',
   'entities.abilities.power_word_fortitude.name': 'Litania hartu',
   'entities.abilities.power_word_shield.description':
-    'Osłania cel, pochłaniając 48 obrażeń przez 30 sek.',
+    'Osłania cel, pochłaniając {damage} obrażeń przez 30 sek.',
   'entities.abilities.power_word_shield.name': 'Psalm ochrony',
   'entities.abilities.prowl.description':
     'Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce.',
@@ -1435,7 +1797,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rapid_fire.description': 'Zwiększa twoją prędkość ataku o 40% na 15 sek.',
   'entities.abilities.rapid_fire.name': 'Gorączkowy ostrzał',
   'entities.abilities.raptor_strike.description':
-    'Potężny atak w zwarciu, który zwiększa obrażenia o 5. Aktywuje się przy następnym uderzeniu.',
+    'Potężny atak w zwarciu, który zwiększa obrażenia o {damage}. Aktywuje się przy następnym uderzeniu.',
   'entities.abilities.raptor_strike.name': 'Patroszące uderzenie',
   'entities.abilities.regrowth.description':
     'Leczy sprzymierzony cel o {damage} oraz dodatkową ilość w ciągu 21 sek.',
@@ -1443,7 +1805,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description': 'Leczy cel o {damage} w ciągu 12 sek.',
   'entities.abilities.rejuvenation.name': 'Dziki rozkwit',
   'entities.abilities.rend.description':
-    'Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu 9 sek.',
+    'Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu {duration} sek.',
   'entities.abilities.rend.name': 'Głęboka rana',
   'entities.abilities.renew.description': 'Leczy cel o {damage} w ciągu 15 sek.',
   'entities.abilities.renew.name': 'Trwająca łaska',
@@ -1457,10 +1819,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zwiększa zagrożenie generowane przez twoje obrażenia od Świętości o 60% na 30 min. Filar paladyna-obrońcy.',
   'entities.abilities.righteous_fury.name': 'Płonąca przysięga',
   'entities.abilities.rip.description':
-    'Cios kończący zadający obrażenia od Krwawienia w ciągu 12 sek. Zużywa punkty kombinacji. Tylko w Postaci wilka.',
+    'Cios kończący zadający {damage} obrażeń od Krwawienia w ciągu 12 sek. Zużywa punkty kombinacji. Tylko w Postaci wilka.',
   'entities.abilities.rip.name': 'Rozszarpanie',
   'entities.abilities.rockbiter_weapon.description':
-    'Nasyca twoją broń furią kamienia: każde uderzenie zadaje 5 dodatkowych obrażeń przez 5 min.',
+    'Nasyca twoją broń furią kamienia: każde uderzenie zadaje {damage} dodatkowych obrażeń przez 5 min.',
   'entities.abilities.rockbiter_weapon.name': 'Oręż kamiennych okowów',
   'entities.abilities.rupture.description':
     'Cios kończący, który rani cel, powodując krwawienie zadające {damage} w ciągu 16 sek.',
@@ -1472,7 +1834,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Osmala wroga, zadając {damage} obrażeń od Ognia. Szybkie do rzucenia.',
   'entities.abilities.scorch.name': 'Poparzenie',
   'entities.abilities.seal_of_righteousness.description':
-    'Napełnia cię mocą Świętości na 30 sek., sprawiając, że każde twoje uderzenie wręcz zadaje 4 dodatkowe obrażenia od Świętości. Uwolnij ją Verdictem.',
+    'Napełnia cię mocą Świętości na 30 sek., sprawiając, że każde twoje uderzenie wręcz zadaje {damage} dodatkowych obrażeń od Świętości. Uwolnij ją Verdictem.',
   'entities.abilities.seal_of_righteousness.name': 'Piętno przysięgi',
   'entities.abilities.searing_pain.description':
     'Przypieka wroga dręczącym ogniem, zadając {damage} obrażeń od Ognia. Szybkie do rzucenia.',
@@ -1490,7 +1852,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiast razi cel palącym cieniem, zadając {damage} obrażeń od Cienia.',
   'entities.abilities.shadowburn.name': 'Ogień zmierzchu',
   'entities.abilities.shield_slam.description':
-    'Uderza cel tarczą, zadając {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)',
+    'Uderza cel tarczą, zadając 50% obrażeń broni plus {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)',
   'entities.abilities.shield_slam.name': 'Trzask tarczy',
   'entities.abilities.sinister_strike.description':
     'Natychmiastowe uderzenie zadające obrażenia broni plus {damage}. Przyznaje 1 punkt kombinacji.',
@@ -1535,8 +1897,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_voidwalker.description':
     "Przywołuje Gloomshade'a pod komendę Czarnoksiężnika. Gloomshade to wytrzymały demon, który prowokuje twoich wrogów i pochłania razy. Przywołanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz.",
   'entities.abilities.summon_voidwalker.name': "Przywołanie Gloomshade'a",
-  'entities.abilities.sunder_armor.description':
-    'Strzaskuje pancerz celu, zmniejszając go o {damage} za każde nałożenie. Kumuluje się do 5 razy. Generuje wysokie zagrożenie.',
   'entities.abilities.sunder_armor.name': 'Rozdarcie pancerza',
   'entities.abilities.swipe.description':
     'Zamach uderzający pobliskich wrogów za {damage} obrażeń. Wzbudza dodatkowe zagrożenie. Tylko w postaci Bruina.',
@@ -1548,7 +1908,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Prowokuje cel: twoje zagrożenie wzrasta do poziomu jego najbardziej znienawidzonego wroga, a cel jest zmuszony atakować cię przez 3 sek.',
   'entities.abilities.taunt.name': 'Podjudzenie',
   'entities.abilities.thorns.description':
-    'Z celu wyrastają ciernie: atakujący wręcz otrzymują 3 obrażeń od Natury.',
+    'Z celu wyrastają ciernie: atakujący wręcz otrzymują {buff} obrażeń od Natury.',
   'entities.abilities.thorns.name': 'Cierniowa straż',
   'entities.abilities.thunder_clap.description':
     'Razi pobliskich wrogów za {damage} obrażeń i spowalnia ich ataki o 10% na 10 sek.',
@@ -1565,7 +1925,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.whirlwind.description':
     'Wirujesz w śmiercionośnym łuku, uderzając wszystkich pobliskich wrogów za {damage}. (Talent Furii)',
   'entities.abilities.whirlwind.name': 'Wir ostrzy',
-  'entities.abilities.wing_clip.description': 'Zadaje ranę, która spowalnia wroga o 40% na 10 sek.',
+  'entities.abilities.wing_clip.description':
+    'Zadaje ranę, zadając {damage} obrażeń i spowalniając wroga o 40% na 10 sek.',
   'entities.abilities.wing_clip.name': 'Pętające cięcie',
   'entities.abilities.wrath.description':
     'Ciska pocisk energii natury, zadając {damage} obrażeń od Natury.',
@@ -1792,6 +2153,18 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Sierp do Zbioru',
   'entities.items.bronze_sickle.name': 'Brązowy Sierp',
   'entities.items.silverleaf_sickle.name': 'Sierp Srebrnolistny',
+  'entities.items.thorium_mining_pick.name': 'Torowy Kilof Górniczy',
+  'entities.items.arcanite_mining_pick.name': 'Arkanitowy Kilof Górniczy',
+  'entities.items.ashwood_axe.name': 'Siekiera z Jesionu',
+  'entities.items.elderwood_axe.name': 'Siekiera ze Starodrzewu',
+  'entities.items.goldleaf_sickle.name': 'Sierp Złotolistny',
+  'entities.items.sunpetal_sickle.name': 'Sierp Słonecznopłatkowy',
+  'entities.items.thorium_ore.name': 'Ruda Toru',
+  'entities.items.arcanite_bar.name': 'Sztabka Arkanitu',
+  'entities.items.ashwood_log.name': 'Kłoda Jesionu Popiołowego',
+  'entities.items.elderwood_log.name': 'Kłoda Starego Bzu',
+  'entities.items.goldleaf_herb.name': 'Ziele Złotolistne',
+  'entities.items.sunpetal_herb.name': 'Ziele Słonecznego Płatka',
   'entities.items.moongate_rubbing.name': 'Odbitka ochronnego znaku',
   'entities.items.moonpale_scale.name': 'Księżycowoblada łuska',
   'entities.items.moonscale_saber.name': 'Szabla z księżycowej łuski',
@@ -4613,6 +4986,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Resetuj układ przycisków',
   'hudChrome.controller.title': 'Kontroler',
   'hudChrome.controller.vibration': 'Wibracje',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Z tego truchła już wszystko zebrano.',
+  'hudChrome.corpseHarvest.componentAria': 'Zbierz: {component}',
+  'hudChrome.corpseHarvest.components.claw': 'Pazur',
+  'hudChrome.corpseHarvest.components.fang': 'Kieł',
+  'hudChrome.corpseHarvest.components.gills': 'Skrzela',
+  'hudChrome.corpseHarvest.components.hide': 'Skóra',
+  'hudChrome.corpseHarvest.components.horn': 'Róg',
+  'hudChrome.corpseHarvest.components.silk': 'Jedwab',
+  'hudChrome.corpseHarvest.components.tusk': 'Cios',
+  'hudChrome.corpseHarvest.components.venomSac': 'Worek jadowy',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Im mniej części wybierzesz, tym wyższa jakość każdej z nich.',
+  'hudChrome.corpseHarvest.harvestButton': 'Zbierz',
+  'hudChrome.corpseHarvest.title': 'Zbieranie',
   'hudChrome.emoteEditor.done': 'Gotowe',
   'hudChrome.emoteEditor.title': 'Emotki',
   'hudChrome.emoteWheel.edit': 'Edytuj',
@@ -4645,6 +5032,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Autobieg',
   'hudChrome.mobile.haptics': 'Wibracje',
   'hudChrome.mobile.hapticsOff': 'Wibracje wył.',
+  'hudChrome.mobile.hotbarPage': 'Umiejętności',
+  'hudChrome.mobile.hotbarPageAria': 'Pokaż następny zestaw umiejętności',
   'hudChrome.mobile.jump': 'Skok',
   'hudChrome.mobile.leaderboard': 'Rankingi',
   'hudChrome.mobile.nameplates': 'Nazwy',
@@ -4713,6 +5102,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.labels.programs': 'Shadery',
   'hudChrome.perf.labels.renderScale': 'Skala renderowania',
   'hudChrome.perf.labels.snapshot': 'Częstotliwość migawek',
+  'hudChrome.perf.labels.serverTick': 'Częstotliwość tików serwera',
   'hudChrome.perf.labels.textures': 'Tekstury',
   'hudChrome.perf.labels.triangles': 'Trójkąty',
   'hudChrome.perf.opacity': 'Krycie tła',
@@ -5555,7 +5945,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wszystkie instancje lokacji {name} są zajęte. Spróbuj ponownie za chwilę.',
   'worldContent.dungeonPartyWarning':
     'Lokacja {name} jest przeznaczona dla pełnej drużyny liczącej {count}. Zachowaj ostrożność.',
-  // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Zadaje {value} obrażeń od {school} co {interval} s',
   'hudChrome.auraEffect.hot': 'Przywraca {value} zdrowia co {interval} s',
   'hudChrome.auraEffect.absorb': 'Pochłania {value} obrażeń',
@@ -5872,7 +6261,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Nie teraz',
   'hudChrome.nativeUpdate.title': 'Dostępna aktualizacja',
   'hudChrome.nativeUpdate.update': 'Aktualizuj',
-  // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'Krucza Poczta',
   'entities.letters.ravenpost_welcome.subject': 'Kruki latają teraz dla ciebie',
   'entities.letters.ravenpost_welcome.body':
@@ -5889,4 +6277,261 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'To, czego dokonałeś w mroku',
   'entities.letters.letter_q_hollow.body':
     'Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric',
+  'hudChrome.gathering.herbalism': 'Zielarstwo',
+  'hudChrome.gathering.logging': 'Wyrąb',
+  'hudChrome.gathering.mining': 'Górnictwo',
+  'hudChrome.gathering.title': 'Zbieractwo',
+  'errors.api.accountSessionLimit': 'Zbyt wiele postaci na tym koncie jest już w świecie.',
+  'errors.api.crossSiteOrigin': 'Żądanie zablokowane ze względów bezpieczeństwa.',
+  'errors.api.unsupportedMediaType': 'Nieobsługiwany format żądania.',
+  'apiError.account.characters_online': 'Wyloguj wszystkie swoje postacie przed dezaktywacją.',
+  'apiError.account.deactivated':
+    'To konto zostało dezaktywowane. Skontaktuj się z administratorem, aby je przywrócić.',
+  'apiError.account.not_found': 'Nie znaleziono konta.',
+  'apiError.account.password_too_long': 'Nowe hasło może mieć maksymalnie 128 znaków.',
+  'apiError.account.password_too_short': 'Hasło musi mieć co najmniej 6 znaków.',
+  'apiError.account.username_invalid':
+    'Nazwa użytkownika musi mieć od 3 do 24 znaków i zawierać litery, cyfry lub podkreślenie.',
+  'apiError.account.username_mismatch': 'Ta nazwa użytkownika nie pasuje do Twojego konta.',
+  'apiError.account.username_not_allowed': 'Ta nazwa użytkownika jest niedozwolona.',
+  'apiError.account.username_taken': 'Ta nazwa użytkownika jest już zajęta.',
+  'apiError.auth.current_password_incorrect': 'Twoje obecne hasło jest nieprawidłowe.',
+  'apiError.auth.forbidden': 'Nie masz uprawnień, aby to zrobić.',
+  'apiError.auth.invalid_credentials': 'Nieprawidłowa nazwa użytkownika lub hasło.',
+  'apiError.auth.password_incorrect': 'Twoje hasło jest nieprawidłowe.',
+  'apiError.auth.required': 'Brak uwierzytelnienia.',
+  'apiError.auth.token_invalid': 'Twoja sesja wygasła. Zaloguj się ponownie.',
+  'apiError.auth.token_missing': 'Musisz być zalogowany, aby to zrobić.',
+  'apiError.auth.too_many_attempts': 'Zbyt wiele prób. Odczekaj minutę i spróbuj ponownie.',
+  'apiError.auth.too_many_failed_attempts':
+    'Zbyt wiele nieudanych prób. Odczekaj kilka minut i spróbuj ponownie.',
+  'apiError.auth.verification_failed': 'Weryfikacja nie powiodła się. Spróbuj ponownie.',
+  'apiError.auth.web_login_only': 'Logowanie jest dozwolone tylko z klienta gry.',
+  'apiError.body.too_large':
+    'To żądanie jest zbyt duże. Spróbuj ponownie z mniejszą ilością danych.',
+  'apiError.body.unsupported_media_type': 'Nieobsługiwany format żądania.',
+  'apiError.character.already_in_world': 'Postać jest już w świecie.',
+  'apiError.character.delete_confirm': 'Wpisz imię postaci, aby potwierdzić usunięcie.',
+  'apiError.character.invalid_class': 'Nieprawidłowa klasa.',
+  'apiError.character.limit_reached': 'Osiągnięto limit postaci.',
+  'apiError.character.name_invalid': 'Nieprawidłowe imię postaci. Użyj od 2 do 16 liter.',
+  'apiError.character.name_not_allowed': 'To imię postaci jest niedozwolone.',
+  'apiError.character.name_taken': 'To imię jest już zajęte.',
+  'apiError.character.not_found': 'Nie znaleziono postaci.',
+  'apiError.character.online': 'Postać jest obecnie online.',
+  'apiError.character.rename_not_permitted': 'Zmiana imienia tej postaci jest niedozwolona.',
+  'apiError.character.rename_required': 'Tę postać trzeba przemianować przed wejściem do świata.',
+  'apiError.character.taken_over': 'Twoją postać przejęła inna sesja.',
+  'apiError.db.conflict': 'Ta zmiana koliduje z inną aktualizacją. Spróbuj ponownie.',
+  'apiError.discord.already_linked': 'To konto Discord jest już połączone z innym kontem.',
+  'apiError.discord.expired':
+    'Logowanie przez Discord wygasło. Zaloguj się ponownie przez Discord.',
+  'apiError.discord.link_required': 'Najpierw połącz swoje konto Discord.',
+  'apiError.discord.not_configured': 'Integracja z Discord jest obecnie niedostępna.',
+  'apiError.discord.password_required': 'Ustaw hasło przed odłączeniem swojego konta Discord.',
+  'apiError.discord.swag_claimed': 'Już odebrałeś tę nagrodę.',
+  'apiError.discord.swag_points': 'Za mało punktów.',
+  'apiError.discord.swag_tier': 'Osiągnij wyższą rangę, aby to odebrać.',
+  'apiError.discord.unknown_swag': 'Ta nagroda jest niedostępna.',
+  'apiError.email.invalid': 'Podaj prawidłowy adres e-mail.',
+  'apiError.email.unchanged': 'To jest już Twój adres e-mail.',
+  'apiError.internal.error': 'Coś poszło nie tak po naszej stronie. Spróbuj ponownie.',
+  'apiError.json.malformed': 'Nie udało się odczytać żądania. Spróbuj ponownie.',
+  'apiError.moderation.banned': 'To konto zostało zbanowane.',
+  'apiError.moderation.force_rename': 'Moderator wymaga zmiany imienia jednej z Twoich postaci.',
+  'apiError.moderation.suspended': 'To konto jest zawieszone.',
+  'apiError.moderation.suspended_until': 'To konto jest zawieszone do {date}.',
+  'apiError.origin.cross_site': 'Żądanie zablokowane ze względów bezpieczeństwa.',
+  'apiError.rate_limit.exceeded': 'Zbyt wiele żądań. Spróbuj ponownie za {seconds}.',
+  'apiError.two_factor.already_enabled': 'Uwierzytelnianie dwuskładnikowe jest już włączone.',
+  'apiError.two_factor.code_invalid': 'Ten kod jest nieprawidłowy, spróbuj ponownie.',
+  'apiError.two_factor.not_enabled': 'Uwierzytelnianie dwuskładnikowe nie jest włączone.',
+  'apiError.two_factor.setup_required':
+    'Najpierw rozpocznij konfigurację uwierzytelniania dwuskładnikowego.',
+  'apiError.validation.failed':
+    'Niektóre pola są nieprawidłowe. Sprawdź formularz i spróbuj ponownie.',
+  'download.linuxCta': 'Pobierz dla Linuksa',
+  'download.linuxHint':
+    'AppImage: uczyń go wykonywalnym, a następnie uruchom. Nie wymaga instalacji.',
+  'loading.reconnecting': 'Połączenie utracone. Ponowne łączenie...',
+  'guide.nav.settings': 'Ustawienia i wydajność',
+  'guide.settingsPage.advancedBody':
+    'Zaawansowany zaczyna się od poziomu High i odblokowuje cztery dodatkowe selektory, dzięki czemu możesz spędzać klatki tam, gdzie je faktycznie zauważasz: szczegóły terenu, gęstość listowia, efekty i oświetlenie oraz jakość cieni. Podobnie jak jakość grafiki, obowiązują one po przeładowaniu.',
+  'guide.settingsPage.advancedHeading': 'Zaawansowane ustawienie wstępne: miksuj własne',
+  'guide.settingsPage.advancedMixes':
+    'Dwie ulubione kombinacje: ustaw Jakość cienia na High i ustaw Efekty i oświetlenie na Low, aby uzyskać wyraźny, pozbawiony blasku wygląd, ale działając lekko, lub wykonaj odwrotną operację, aby zachować rozkwit i zmiękczyć cienie.',
+  'guide.settingsPage.balancedTagline':
+    'Najlepszy sposób na większość maszyn i nasza domyślna rada.',
+  'guide.settingsPage.balancedTitle': 'Zrównoważony',
+  'guide.settingsPage.balancedWhy':
+    'Medium przynosi prawdziwe cienie i pełne materiały; High dodaje okluzję otoczenia i rozkwit. Poniżej Ultra wbudowana siatka zabezpieczająca pochłania nagłe spadki podczas intensywnych walk, więc Balanced działa płynnie bez konieczności opieki nad dziećmi.',
+  'guide.settingsPage.colDoes': 'Co to robi',
+  'guide.settingsPage.colImpact': 'wpływ FPS',
+  'guide.settingsPage.colSetting': 'Ustawienie',
+  'guide.settingsPage.factDetectBody':
+    'Przy pierwszym uruchomieniu gra odczytuje Twoje urządzenie i wybiera rozsądny poziom, od Low na skromnym telefonie do Ultra na mocnym komputerze stacjonarnym. Każdy wybór, którego sam dokonasz, zawsze wygrywa.',
+  'guide.settingsPage.factDetectTitle': 'Gra najpierw sama się dostraja',
+  'guide.settingsPage.factGovernorBody':
+    'Na każdym poziomie poniżej Ultra gra po cichu przerzedza trawę, efekty i oświetlenie na chwilę, gdy nasili się wielka walka, a następnie je przywraca. Wybranie Ultra mówi, że wolisz zachować każdy szczegół.',
+  'guide.settingsPage.factGovernorTitle': 'Wbudowana siatka zabezpieczająca',
+  'guide.settingsPage.factReloadBody':
+    'Jakość grafiki i selektory Zaawansowane zaczynają działać po ponownym załadowaniu, a w razie potrzeby na panelu znajduje się przycisk Odśwież teraz. Każda inna opcja ma zastosowanie w momencie jej zmiany.',
+  'guide.settingsPage.factReloadTitle': 'Dwa rodzaje opcji',
+  'guide.settingsPage.fairnessBody':
+    'Żadna opcja nie zastąpi piękna w zamian za moc. Ustawienia Lower usuwają tylko kosmetyczne poprawki, nigdy informacje, z którymi walczysz: twoje debuffy, rzucane paski, zdrowie drużyny i liczby obrażeń są identyczne od Low do Ultra. Gra na skromnej maszynie nigdy nie jest utrudnieniem.',
+  'guide.settingsPage.fairnessTitle': 'Uczciwe według projektu',
+  'guide.settingsPage.fpsTagline':
+    'Do starszych laptopów, zintegrowanej grafiki i odtwarzania na baterii.',
+  'guide.settingsPage.fpsTitle': 'Najlepszy FPS',
+  'guide.settingsPage.fpsWhy':
+    'Jakość grafiki to główny przełącznik, a Jakość renderowania to najsilniejszy suwak: przy ustawieniu 70% świat rysuje mniej więcej połowę pikseli, podczas gdy interfejs pozostaje idealnie ostry.',
+  'guide.settingsPage.heading': 'Ustawienia i wydajność',
+  'guide.settingsPage.howHeading': 'Jak zachowują się opcje',
+  'guide.settingsPage.impactHeavy': 'Ciężki',
+  'guide.settingsPage.impactLight': 'Światło',
+  'guide.settingsPage.impactModerate': 'Umiarkowany',
+  'guide.settingsPage.impactNone': 'Nic',
+  'guide.settingsPage.intro':
+    'Spraw, aby gra wyglądała najlepiej lub działała najszybciej. Trzy gotowe zestawy wyposażenia plus to, co naprawdę robi każda opcja graficzna.',
+  'guide.settingsPage.loadoutsHeading': 'Trzy gotowe zestawy wyposażenia',
+  'guide.settingsPage.loadoutsIntro':
+    'Zacznij od wyposażenia, które brzmi jak Twoja maszyna, a następnie dostosowuj jedną opcję na raz, aż poczujesz, że jest właściwa.',
+  'guide.settingsPage.mobileBody':
+    'Urządzenia mobilne zarządzają za Ciebie więcej: gra wybiera poziom, utrzymuje rozdzielczość nieco niższą, aby chronić baterię i ciepło, a najwyższe poziomy utrzymuje tylko na komputerach stacjonarnych. Powyższe wyposażenie nadal obowiązuje; telefony po prostu osiągają szczyt w High.',
+  'guide.settingsPage.mobileTitle': 'Na telefonach i tabletach',
+  'guide.settingsPage.recommended': 'Zalecony',
+  'guide.settingsPage.rowBrightness':
+    'Ekspozycja sceny, ciemniejsza lub jaśniejsza. Czysta preferencja.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Jak fantazyjny może być sam interfejs: rozmycie szkła, poświata, animowane menu. Automatycznie dopasowuje się do Twojej przeglądarki; tak czy inaczej świat 3D pozostaje nietknięty.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Bloom, okluzja otoczenia oraz ilość pochodni i zaklęć rzucających prawdziwe światło. Największa pojedyncza oszczędność wśród zaawansowanych zbieraczy.',
+  'guide.settingsPage.rowFieldOfView':
+    'Jaka część świata mieści się na ekranie, od powiększenia 55 do 100 stopni. Komfortowy wybór; szersze widoki rysują nieco więcej.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Jak daleko i jak gęsta trawa rośnie wokół twojej postaci.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Rozmazana plama za oknami. Ładne i dokładnie takie, jakie daje słabsza przeglądarka; zostaw to, aby uzyskać klasyczny, wyrazisty wygląd.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Główny wyłącznik. Każdy krok zmienia rozdzielczość, cienie, materiały, listowie i efekty świetlne. Największa pojedyncza różnica, jaką możesz zrobić.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Odczyt na ekranie FPS, czasu trwania klatki i innych informacji. Włącz tę opcję podczas dostrajania tej strony, a następnie ukryj ją ponownie.',
+  'guide.settingsPage.rowReduceMotion':
+    'Usuwa animacje interfejsu, dzięki czemu okna pojawiają się natychmiast. Najpierw opcja dostępności, z niewielką premią za wydajność.',
+  'guide.settingsPage.rowRenderQuality':
+    'Rysuje świat 3D w niższej rozdzielczości wewnętrznej i skaluje go w górę; interfejs pozostaje ostry. Najsilniejszy błyskawiczny suwak na słabszych maszynach i ekranach o wysokiej rozdzielczości.',
+  'guide.settingsPage.rowShadowQuality':
+    'Wyrazistość cieni. Low utrzymuje cienie, ale zmiękcza ich krawędzie.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Bogate, mieszane tekstury podłoża w porównaniu z prostszym, szybszym wyglądem terenu.',
+  'guide.settingsPage.rowWeather':
+    'Deszcz i śnieg w otoczeniu. Tylko atmosfera, a wyłączenie jej trochę oszczędza podczas burz.',
+  'guide.settingsPage.tableFoot':
+    'Szukasz suwaka odległości rysowania lub ograniczenia FPS? Nie ma na co polować: odległość oglądania jest częścią każdego poziomu jakości, a tempo klatek dostosowuje się do wyświetlacza.',
+  'guide.settingsPage.tableHeading': 'Każda opcja wyjaśniona',
+  'guide.settingsPage.tagReload': 'po ponownym załadowaniu',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 do 70%',
+  'guide.settingsPage.value90to100': '90 do 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High na komputerze do gier, Medium na laptopie',
+  'guide.settingsPage.valueOnOptional': 'Włączone (opcjonalnie)',
+  'guide.settingsPage.visualsTagline': 'Tryb zrzutu ekranu dla wydajnych komputerów stacjonarnych.',
+  'guide.settingsPage.visualsTitle': 'Najlepsze efekty wizualne',
+  'guide.settingsPage.visualsWhy':
+    'Ultra renderuje w najwyższej rozdzielczości, jaką oferuje Twój wyświetlacz, z najbogatszym oświetleniem. Wyłącza także siatkę zabezpieczającą i działa tylko na komputerze stacjonarnym: telefony i aplikacja są dostępne o godzinie High.',
+  'guide.settingsPage.wherePath':
+    'Wszystko na tej stronie jest obecne w grze: naciśnij Esc i zajrzyj do opcji Grafika, Interfejs i Nakładka wydajności.',
+  'guide.settingsPage.whyLabel': 'Dlaczego to działa:',
+  'hudChrome.crafting.close': 'Zamknij rzemiosło',
+  'hudChrome.crafting.craft': 'Rzemiosło',
+  'hudChrome.crafting.craftedToast': 'Wykonane: {name}',
+  'hudChrome.crafting.empty': 'Nie są jeszcze znane żadne przepisy.',
+  'hudChrome.crafting.insufficientMaterials': 'Nie masz na to materiałów.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Wymaga:',
+  'hudChrome.crafting.resultAria': 'Craft {name}',
+  'hudChrome.crafting.title': 'Rzemiosło',
+  'hudChrome.crafting.unknownRecipe': 'Ten przepis nie istnieje.',
+  'hudChrome.mobile.actionPageIndicator': 'Str. {page}',
+  'hudChrome.mobile.actionPageToggle': 'Zmień stronę akcji',
+  'hudChrome.mobile.actionRing': 'Działania bojowe',
+  'hudChrome.mobile.spellbookPageLabel': 'Strona {page}',
+  'hudChrome.mobile.targetCycle': 'Zmień cel',
+  'hudChrome.mobile.targetCycleShort': 'Cel',
+  'hudChrome.options.mobileCameraJoystick': 'Joystick aparatu',
+  'hudChrome.options.mobileLeftHanded': 'Układ leworęczny',
+  'entities.quests.q_archetype_acceptance.title': 'Rzemiosło, które możesz nazwać własnym',
+  'entities.quests.q_archetype_acceptance.text':
+    'Każdy rzemieślnik z Eastbrook ostatecznie decyduje się na jedno rzemiosło, które nazywa swoim własnym. Wykaż się jednym czynem, {playerName}, i zadeklaruj swoją ścieżkę.',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Twoja ścieżka została wybrana; chodź dobrze.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Leśny Wilk zabity',
+  'entities.quests.q_prof_make_amends.title': 'Zadośćuczynienie',
+  'entities.quests.q_prof_make_amends.text':
+    'Aby odłożyć jeden statek na drugi, rzemieślnik musi najpierw zadośćuczynić za ścieżkę, którą nie przeszedł, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Poprawki dokonane; otwiera się przed tobą nowa droga.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Leśny Wilk zabity',
+  'entities.npcs.bursar_aldous_crane.greeting':
+    'Każda skrzynia, kufer i błyskotka są bezpieczne w Złoconej Szkatule.',
+  'entities.npcs.bursar_aldous_crane.name': 'Skarbnik Aldous Crane',
+  'entities.npcs.bursar_aldous_crane.title': 'Złocona Szkatuła',
+  'entities.npcs.bursar_fernando.greeting':
+    'Witaj w Złoconej Szkatule. Twoje dobra spoczywają bezpiecznie za naszymi zamkami.',
+  'entities.npcs.bursar_fernando.name': 'Skarbnik Fernando',
+  'entities.npcs.bursar_fernando.title': 'Złocona Szkatuła',
+  'entities.npcs.bursar_petra_vell.greeting':
+    'Złocona Szkatuła prowadzi czyste księgi i jeszcze czystsze skarbce. Co mamy dla ciebie przechować?',
+  'entities.npcs.bursar_petra_vell.name': 'Skarbniczka Petra Vell',
+  'entities.npcs.bursar_petra_vell.title': 'Złocona Szkatuła',
+  'guide.economy.bankBody':
+    'W każdym głównym mieście działa oddział Złoconej Szkatuły, domu bankowego królestwa. Porozmawiaj z tamtejszym skarbnikiem, aby otworzyć swój skarbiec, prywatny schowek poza torbami, który twoja postać zachowuje na całe życie. Cokolwiek tam zostawisz, czeka bezpiecznie, niezależnie od tego, który oddział odwiedzisz następnym razem.',
+  'guide.economy.bankHow':
+    'Przy otwartym skarbcu kliknij przedmiot w torbach, aby go zdeponować, i kliknij go w skarbcu, aby zabrać z powrotem. Skarbiec przechowuje wyłącznie dobra, nigdy monety, a przedmioty zadań zostają przy tobie. Gdy torby zapełnią ci się w połowie drogi, jeden przycisk zgarnia do środka wszystkie materiały rzemieślnicze naraz.',
+  'guide.economy.bankSlots':
+    'Świeży skarbiec zaczyna skromnie i rośnie razem z tobą. Skarbnik sprzedaje kolejne miejsca za monety po coraz wyższych cenach, a granie online przynosi na dodatek premiowe miejsca, na przykład za zweryfikowany e-mail, połączone konta i przyjaciół, których przyprowadzisz do gry.',
+  'guide.economy.bankTitle': 'Bank',
+  'hudChrome.bank.bonusAdvertDiscord': 'Połącz swój Discord, aby zdobyć 2 miejsca.',
+  'hudChrome.bank.bonusAdvertEmail': 'Zweryfikuj swój e-mail, aby zdobyć 2 miejsca.',
+  'hudChrome.bank.bonusAdvertWallet': 'Połącz portfel, aby zdobyć 2 miejsca.',
+  'hudChrome.bank.bonusEarned': '+{count}',
+  'hudChrome.bank.bonusReferralExplainer':
+    'Zaproś przyjaciela: gdy osiągnie 10. poziom, oboje zdobywacie po 2 miejsca, maksymalnie za 5 przyjaciół.',
+  'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
+  'hudChrome.bank.bonusSectionAria': 'Premiowe miejsca w banku i jak zdobyć ich więcej',
+  'hudChrome.bank.bonusSourceDiscord': 'Połączony Discord',
+  'hudChrome.bank.bonusSourceEmail': 'Zweryfikowany e-mail',
+  'hudChrome.bank.bonusSourceReferral': 'Zaproszeni przyjaciele',
+  'hudChrome.bank.bonusSourceWallet': 'Połączony portfel',
+  'hudChrome.bank.bonusStatusEarned': '+{count}',
+  'hudChrome.bank.bonusTitle': 'Miejsca premiowe',
+  'hudChrome.bank.buyConfirm': 'Kupić {count} dodatkowych miejsc w banku za {price}?',
+  'hudChrome.bank.buyConfirmAccept': 'Kup',
+  'hudChrome.bank.buySlots': 'Kup {count} miejsc',
+  'hudChrome.bank.buySlotsMaxed': 'W pełni rozszerzony',
+  'hudChrome.bank.cannotDeposit': 'Nie można zdeponować',
+  'hudChrome.bank.capacity': '{used}/{total}',
+  'hudChrome.bank.capacityAria': 'Zajęte miejsca w banku: {used} z {total}',
+  'hudChrome.bank.close': 'Zamknij bank',
+  'hudChrome.bank.depositAll': 'Zdeponuj wszystkie materiały',
+  'hudChrome.bank.depositAllDone': 'Zdeponowane materiały: {count}.',
+  'hudChrome.bank.depositAllFull': 'Zdeponowane materiały: {count}. Bank jest teraz pełny.',
+  'hudChrome.bank.depositAllNone': 'Bank pełny: niczego nie zdeponowano.',
+  'hudChrome.bank.depositHint': 'Kliknij, aby zdeponować',
+  'hudChrome.bank.depositPartialHint': 'Kliknij z Shiftem, aby zdeponować część',
+  'hudChrome.bank.depositQuantityConfirm': 'Zdeponuj',
+  'hudChrome.bank.depositQuantityInput': 'Liczba do zdeponowania',
+  'hudChrome.bank.depositQuantityTitle': 'Zdeponuj: {item}',
+  'hudChrome.bank.empty': 'Twój bank jest pusty.',
+  'hudChrome.bank.filterGroupAria': 'Filtruj bank według kategorii',
+  'hudChrome.bank.searchAria': 'Szukaj przedmiotów w banku po nazwie',
+  'hudChrome.bank.sortAria': 'Sortuj przedmioty w banku',
+  'hudChrome.bank.subtitle': 'Złocona Szkatuła',
+  'hudChrome.bank.title': 'Bank',
+  'hudChrome.bank.tooFar': 'Musisz być przy bankierze, aby zajrzeć do swojego banku.',
+  'hudChrome.bank.withdrawHint': 'Kliknij, aby wyjąć',
+  'hudChrome.bank.withdrawPartialHint': 'Kliknij z Shiftem, aby wyjąć część',
+  'hudChrome.bank.withdrawQuantityConfirm': 'Wyjmij',
+  'hudChrome.bank.withdrawQuantityInput': 'Liczba do wyjęcia',
+  'hudChrome.bank.withdrawQuantityTitle': 'Wyjmij: {item}',
 };

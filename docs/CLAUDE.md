@@ -29,6 +29,9 @@ expansion: story arc, zones, dungeons, XP math, ids); `design/spell-ranks.md` is
 classic-era ability-rank reference for sim ability content. **TRAP:**
 `design/icon-system.md` proposes a multi-file `src/ui/icons/` module, but the shipped
 code is the flat `src/ui/icons.ts`, so re-verify against code.
+`prd/frontier-pvp-honor.md` (Frostreach Frontier PvP zone, honor, $WOC stakes layer)
+pairs with `prd/FRONTIER_PHASE1_HANDOFF.md`, a slice-by-slice implementation handoff
+whose slices are specced but NOT yet implemented; read the handoff before starting one.
 
 ## screenshots/
 JPG/PNG assets embedded by the repo-root `README.md` (title screen, zones, dungeons, UI).

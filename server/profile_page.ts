@@ -17,6 +17,7 @@ import {
   lifetimeXpRankForCharacter,
   listCharacterNamesForSitemap,
 } from './db';
+import { logger } from './http/logger';
 import { publicReadRateLimited } from './ratelimit';
 import { publicOriginFromRequest, REALM } from './realm';
 
@@ -55,7 +56,7 @@ export async function handleProfilePage(
   res: http.ServerResponse,
 ): Promise<void> {
   try {
-    if (publicReadRateLimited(req)) {
+    if (!publicReadRateLimited(req).allowed) {
       res.writeHead(429, { 'Content-Type': 'text/plain' });
       res.end('rate limited');
       return;
@@ -99,7 +100,7 @@ export async function handleProfilePage(
     });
     res.end(profileHtml(sheet, origin));
   } catch (err) {
-    console.error('profile page error:', err);
+    logger.error({ err }, 'profile page error');
     res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end('internal error');
   }
@@ -242,7 +243,7 @@ export async function handleAvatar(
     });
     res.end(png);
   } catch (err) {
-    console.error('avatar error:', err);
+    logger.error({ err }, 'avatar error');
     res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end('internal error');
   }
@@ -275,7 +276,7 @@ ${urls}
     });
     res.end(xml);
   } catch (err) {
-    console.error('character sitemap error:', err);
+    logger.error({ err }, 'character sitemap error');
     res.writeHead(500, { 'Content-Type': 'text/plain' });
     res.end('internal error');
   }

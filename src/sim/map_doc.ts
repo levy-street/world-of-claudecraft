@@ -311,6 +311,7 @@ function sanitizeNpc(v: unknown): NpcDef | null {
   };
   if (Array.isArray(n.vendorItems)) npc.vendorItems = strArray(n.vendorItems);
   if (n.market === true) npc.market = true;
+  if (n.banker === true) npc.banker = true;
   if (n.dynamic === true) npc.dynamic = true;
   return npc;
 }

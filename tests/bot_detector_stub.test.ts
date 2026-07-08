@@ -44,6 +44,8 @@ describe('bot-detector stub (open-source no-op)', () => {
     expect(detector.handleTick(ctx, Date.now(), true, snapshot)).toBe('none');
     expect(detector.listSuspiciousPlayers()).toEqual([]);
     expect(detector.listCalibrationHistograms()).toEqual([]);
+    expect(detector.describeConfig()).toEqual([]);
+    expect(detector.applyConfig({ anything: 1 })).toEqual({ errors: [] });
 
     detector.releaseTrackingContext(ctx);
   });

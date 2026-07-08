@@ -2,7 +2,10 @@ import * as THREE from 'three';
 
 // Procedurally generated canvas textures — no external assets.
 
-function makeCanvas(size: number, draw: (ctx: CanvasRenderingContext2D, size: number) => void): THREE.CanvasTexture {
+function makeCanvas(
+  size: number,
+  draw: (ctx: CanvasRenderingContext2D, size: number) => void,
+): THREE.CanvasTexture {
   const c = document.createElement('canvas');
   c.width = size;
   c.height = size;
@@ -29,7 +32,8 @@ export function groundDetailTexture(): THREE.CanvasTexture {
     for (let i = 0; i < 5000; i++) {
       const v = 150 + Math.floor(rnd() * 105);
       ctx.fillStyle = `rgba(${v},${v},${v},0.35)`;
-      const x = rnd() * s, y = rnd() * s;
+      const x = rnd() * s,
+        y = rnd() * s;
       const r = 1 + rnd() * 2.5;
       ctx.fillRect(x, y, r, r);
     }
@@ -37,7 +41,8 @@ export function groundDetailTexture(): THREE.CanvasTexture {
     for (let i = 0; i < 1400; i++) {
       const v = 120 + Math.floor(rnd() * 100);
       ctx.strokeStyle = `rgba(${v},${v},${v},0.30)`;
-      const x = rnd() * s, y = rnd() * s;
+      const x = rnd() * s,
+        y = rnd() * s;
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(x + (rnd() - 0.5) * 3, y - 2 - rnd() * 4);
@@ -72,7 +77,9 @@ export function foliageTexture(detail = false): THREE.CanvasTexture {
       // shadowed cavities first so leaves overlap them; kept small so the
       // canopy UVs can't smear them into long diagonal streaks
       for (let i = 0; i < 110; i++) {
-        const x = rnd() * s, y = rnd() * s, r = 3 + rnd() * 7;
+        const x = rnd() * s,
+          y = rnd() * s,
+          r = 3 + rnd() * 7;
         ctx.fillStyle = `rgba(${10 + rnd() * 12},${28 + rnd() * 16},${14 + rnd() * 10},0.5)`;
         ctx.beginPath();
         ctx.ellipse(x, y, r, r * 0.75, rnd() * Math.PI, 0, Math.PI * 2);
@@ -83,7 +90,8 @@ export function foliageTexture(detail = false): THREE.CanvasTexture {
     for (let i = 0; i < leaves; i++) {
       const g = detail ? 60 + Math.floor(rnd() * 75) : 70 + Math.floor(rnd() * 60);
       ctx.fillStyle = `rgba(${30 + rnd() * 30},${g},${30 + rnd() * 18},${detail ? 0.6 : 0.5})`;
-      const x = rnd() * s, y = rnd() * s;
+      const x = rnd() * s,
+        y = rnd() * s;
       ctx.beginPath();
       ctx.ellipse(x, y, 1 + rnd() * 3, 3 + rnd() * 5, rnd() * Math.PI, 0, Math.PI * 2);
       ctx.fill();
@@ -91,7 +99,8 @@ export function foliageTexture(detail = false): THREE.CanvasTexture {
     if (detail) {
       // sun-catching highlight leaves — warm olive, not lime
       for (let i = 0; i < 200; i++) {
-        const x = rnd() * s, y = rnd() * s;
+        const x = rnd() * s,
+          y = rnd() * s;
         ctx.fillStyle = `rgba(${95 + rnd() * 40},${145 + rnd() * 40},${70 + rnd() * 28},0.45)`;
         ctx.beginPath();
         ctx.ellipse(x, y, 1 + rnd() * 2, 2.5 + rnd() * 4, rnd() * Math.PI, 0, Math.PI * 2);
@@ -177,7 +186,10 @@ export function stoneTexture(): THREE.CanvasTexture {
     ctx.fillStyle = '#8d8d85';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 28; i++) {
-      const x = rnd() * s, y = rnd() * s, w = 14 + rnd() * 26, h = 10 + rnd() * 16;
+      const x = rnd() * s,
+        y = rnd() * s,
+        w = 14 + rnd() * 26,
+        h = 10 + rnd() * 16;
       const v = 115 + Math.floor(rnd() * 50);
       ctx.fillStyle = `rgb(${v},${v},${v - 6})`;
       ctx.fillRect(x, y, w, h);
@@ -192,7 +204,9 @@ export function waterNormalish(): THREE.CanvasTexture {
     ctx.fillStyle = '#7f7fff';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 300; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 6 + rnd() * 22;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 6 + rnd() * 22;
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
       g.addColorStop(0, `rgba(${100 + rnd() * 80},${100 + rnd() * 80},255,0.25)`);
       g.addColorStop(1, 'rgba(127,127,255,0)');
@@ -213,7 +227,7 @@ export function cloudTexture(puffs = 14, spread = 0.5): THREE.CanvasTexture {
     for (let i = 0; i < puffs; i++) {
       const x = s * (0.5 - spread / 2) + rnd() * s * spread;
       const y = s * 0.35 + rnd() * s * 0.3;
-      const r = s * 0.10 + rnd() * s * 0.14;
+      const r = s * 0.1 + rnd() * s * 0.14;
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
       g.addColorStop(0, 'rgba(255,255,255,0.55)');
       g.addColorStop(1, 'rgba(255,255,255,0)');
@@ -232,7 +246,9 @@ export function macroNoiseTexture(): THREE.CanvasTexture {
     ctx.fillStyle = '#808080';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 160; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 18 + rnd() * 46;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 18 + rnd() * 46;
       const v = 40 + rnd() * 175;
       drawWrapped(ctx, s, (ox, oy) => {
         const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
@@ -314,7 +330,10 @@ export interface GroundSplat {
   sand: SurfaceMaps;
 }
 
-function makeRawCanvas(size: number, draw: (ctx: CanvasRenderingContext2D, size: number) => void): HTMLCanvasElement {
+function makeRawCanvas(
+  size: number,
+  draw: (ctx: CanvasRenderingContext2D, size: number) => void,
+): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = size;
   c.height = size;
@@ -324,14 +343,21 @@ function makeRawCanvas(size: number, draw: (ctx: CanvasRenderingContext2D, size:
 }
 
 // Draws fn at the 9 wrap offsets so blobs crossing an edge tile seamlessly.
-function drawWrapped(ctx: CanvasRenderingContext2D, size: number, fn: (ox: number, oy: number) => void): void {
+function drawWrapped(
+  ctx: CanvasRenderingContext2D,
+  size: number,
+  fn: (ox: number, oy: number) => void,
+): void {
   for (const ox of [-size, 0, size]) {
     for (const oy of [-size, 0, size]) fn(ox, oy);
   }
 }
 
 // Sobel-ish height->tangent-space normal conversion with wrap sampling.
-export function heightToNormal(heightCanvas: HTMLCanvasElement, strength = 2.0): THREE.CanvasTexture {
+export function heightToNormal(
+  heightCanvas: HTMLCanvasElement,
+  strength = 2.0,
+): THREE.CanvasTexture {
   const s = heightCanvas.width;
   const src = heightCanvas.getContext('2d')!.getImageData(0, 0, s, s).data;
   const out = document.createElement('canvas');
@@ -397,7 +423,14 @@ export function barkMaps(): SurfaceMaps {
 // crypt walls don't read as a uniform wallpaper grid.
 export function stoneMaps(): SurfaceMaps {
   const S = 256;
-  interface Block { x: number; y: number; w: number; h: number; v: number; warm: number }
+  interface Block {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    v: number;
+    warm: number;
+  }
   const blocks: Block[] = [];
   let y = 0;
   let row = 0;
@@ -418,7 +451,8 @@ export function stoneMaps(): SurfaceMaps {
     ctx.fillStyle = '#6f6f67';
     ctx.fillRect(0, 0, s, s);
     for (const b of blocks) {
-      for (const ox of [0, s]) { // blocks only overhang in x; rows tile exactly
+      for (const ox of [0, s]) {
+        // blocks only overhang in x; rows tile exactly
         const v = b.v;
         ctx.fillStyle = `rgb(${v + b.warm},${v},${v - 8})`;
         ctx.fillRect(b.x + ox, b.y + 1, b.w - 2, b.h - 2);
@@ -444,8 +478,14 @@ export function stoneMaps(): SurfaceMaps {
       for (const ox of [0, s]) {
         const v = 130 + (b.v - 100) * 1.5;
         const g = ctx.createLinearGradient(0, b.y, 0, b.y + b.h);
-        g.addColorStop(0, `rgb(${Math.min(255, v + 24)},${Math.min(255, v + 24)},${Math.min(255, v + 24)})`);
-        g.addColorStop(1, `rgb(${Math.max(0, v - 22)},${Math.max(0, v - 22)},${Math.max(0, v - 22)})`);
+        g.addColorStop(
+          0,
+          `rgb(${Math.min(255, v + 24)},${Math.min(255, v + 24)},${Math.min(255, v + 24)})`,
+        );
+        g.addColorStop(
+          1,
+          `rgb(${Math.max(0, v - 22)},${Math.max(0, v - 22)},${Math.max(0, v - 22)})`,
+        );
         ctx.fillStyle = g;
         ctx.fillRect(b.x + ox + 2, b.y + 2, b.w - 5, b.h - 4);
       }
@@ -495,7 +535,9 @@ export function wallMaps(): SurfaceMaps {
     ctx.fillStyle = '#6e6e6e';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 320; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 3 + rnd() * 9;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 3 + rnd() * 9;
       const v = 85 + rnd() * 70;
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
       g.addColorStop(0, `rgba(${v},${v},${v},0.5)`);
@@ -555,7 +597,9 @@ export function groundSplatMaps(): GroundSplat {
     ctx.fillStyle = '#7e8a64';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 900; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 4 + rnd() * 9;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 4 + rnd() * 9;
       const v = 90 + rnd() * 105;
       drawWrapped(ctx, s, (ox, oy) => {
         ctx.fillStyle = `rgba(${v - 18},${v},${v - 40},0.30)`;
@@ -566,7 +610,8 @@ export function groundSplatMaps(): GroundSplat {
     }
     // blades
     for (let i = 0; i < 3200; i++) {
-      const x = rnd() * s, y = rnd() * s;
+      const x = rnd() * s,
+        y = rnd() * s;
       const v = 75 + rnd() * 125;
       ctx.strokeStyle = `rgba(${v - 25},${v},${v - 45},0.55)`;
       ctx.lineWidth = 1 + rnd() * 0.8;
@@ -580,7 +625,9 @@ export function groundSplatMaps(): GroundSplat {
     ctx.fillStyle = '#787878';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 700; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 4 + rnd() * 10;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 4 + rnd() * 10;
       const v = 80 + rnd() * 110;
       drawWrapped(ctx, s, (ox, oy) => {
         const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
@@ -598,7 +645,9 @@ export function groundSplatMaps(): GroundSplat {
     ctx.fillStyle = '#8a7a60';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 800; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 1.5 + rnd() * 4;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 1.5 + rnd() * 4;
       const v = 95 + rnd() * 85;
       drawWrapped(ctx, s, (ox, oy) => {
         ctx.fillStyle = `rgba(${v},${v - 12},${v - 32},0.5)`;
@@ -609,7 +658,8 @@ export function groundSplatMaps(): GroundSplat {
     }
     for (let i = 0; i < 40; i++) {
       // dry cracks
-      let x = rnd() * s, y = rnd() * s;
+      let x = rnd() * s,
+        y = rnd() * s;
       ctx.strokeStyle = 'rgba(50,40,28,0.45)';
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -626,7 +676,9 @@ export function groundSplatMaps(): GroundSplat {
     ctx.fillStyle = '#6e6e6e';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 600; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 1.5 + rnd() * 4.5;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 1.5 + rnd() * 4.5;
       const v = 110 + rnd() * 120;
       drawWrapped(ctx, s, (ox, oy) => {
         const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
@@ -645,7 +697,9 @@ export function groundSplatMaps(): GroundSplat {
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 90; i++) {
       // fractured plates
-      const x = rnd() * s, y = rnd() * s, r = 10 + rnd() * 24;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 10 + rnd() * 24;
       const v = 105 + rnd() * 55;
       drawWrapped(ctx, s, (ox, oy) => {
         ctx.fillStyle = `rgba(${v},${v},${v - 5},0.55)`;
@@ -654,7 +708,8 @@ export function groundSplatMaps(): GroundSplat {
         for (let k = 0; k <= n; k++) {
           const a = (k / n) * Math.PI * 2;
           const rr = r * (0.7 + rnd() * 0.5);
-          const px = x + ox + Math.cos(a) * rr, py = y + oy + Math.sin(a) * rr;
+          const px = x + ox + Math.cos(a) * rr,
+            py = y + oy + Math.sin(a) * rr;
           if (k === 0) ctx.moveTo(px, py);
           else ctx.lineTo(px, py);
         }
@@ -664,12 +719,28 @@ export function groundSplatMaps(): GroundSplat {
         ctx.stroke();
       });
     }
+    // finer secondary fracture pass: smaller, higher-contrast cracks layered
+    // on top so the rock reads as striated stone rather than one flat tone.
+    for (let i = 0; i < 140; i++) {
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 3 + rnd() * 8;
+      const v = 90 + rnd() * 70;
+      drawWrapped(ctx, s, (ox, oy) => {
+        ctx.fillStyle = `rgba(${v},${v},${v - 8},0.4)`;
+        ctx.beginPath();
+        ctx.arc(x + ox, y + oy, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
   });
   const rockHeight = makeRawCanvas(256, (ctx, s) => {
     ctx.fillStyle = '#505050';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 90; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 10 + rnd() * 24;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 10 + rnd() * 24;
       const v = 120 + rnd() * 110;
       drawWrapped(ctx, s, (ox, oy) => {
         ctx.fillStyle = `rgba(${v},${v},${v},0.8)`;
@@ -678,7 +749,8 @@ export function groundSplatMaps(): GroundSplat {
         for (let k = 0; k <= n; k++) {
           const a = (k / n) * Math.PI * 2;
           const rr = r * (0.7 + rnd() * 0.5);
-          const px = x + ox + Math.cos(a) * rr, py = y + oy + Math.sin(a) * rr;
+          const px = x + ox + Math.cos(a) * rr,
+            py = y + oy + Math.sin(a) * rr;
           if (k === 0) ctx.moveTo(px, py);
           else ctx.lineTo(px, py);
         }
@@ -744,7 +816,9 @@ export function canvasMaps(): SurfaceMaps {
     }
     // weather stains
     for (let i = 0; i < 26; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 6 + rnd() * 16;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 6 + rnd() * 16;
       drawWrapped(ctx, s, (ox, oy) => {
         const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
         g.addColorStop(0, 'rgba(120,100,64,0.16)');
@@ -827,7 +901,9 @@ export function waterNormalMaps(): [THREE.CanvasTexture, THREE.CanvasTexture] {
       ctx.fillStyle = '#808080';
       ctx.fillRect(0, 0, s, s);
       for (let i = 0; i < count; i++) {
-        const x = rnd() * s, y = rnd() * s, r = rMin + rnd() * (rMax - rMin);
+        const x = rnd() * s,
+          y = rnd() * s,
+          r = rMin + rnd() * (rMax - rMin);
         const v = 70 + rnd() * 140;
         drawWrapped(ctx, s, (ox, oy) => {
           const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
@@ -851,12 +927,14 @@ export function foliageCardTexture(): THREE.CanvasTexture {
   c.width = c.height = 128;
   const ctx = c.getContext('2d')!;
   ctx.clearRect(0, 0, 128, 128);
-  const cx = 64, cy = 64;
+  const cx = 64,
+    cy = 64;
   for (let i = 0; i < 240; i++) {
     // leaves cluster densely at the centre, thin toward the rim
     const a = rnd() * Math.PI * 2;
     const d = Math.pow(rnd(), 0.6) * 56;
-    const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
+    const x = cx + Math.cos(a) * d,
+      y = cy + Math.sin(a) * d;
     const fade = 1 - d / 64;
     const g = 80 + rnd() * 80;
     ctx.fillStyle = `rgba(${30 + rnd() * 35},${g},${28 + rnd() * 25},${(0.5 + rnd() * 0.5) * fade})`;
@@ -887,7 +965,9 @@ function drawPlaster(ctx: CanvasRenderingContext2D, s: number): void {
   // soft daub patches — uneven hand-finished render, strong enough contrast
   // to survive mips at 10-15m
   for (let i = 0; i < 80; i++) {
-    const x = rnd() * s, y = rnd() * s, r = 5 + rnd() * 15;
+    const x = rnd() * s,
+      y = rnd() * s,
+      r = 5 + rnd() * 15;
     const v = 168 + rnd() * 70;
     drawWrapped(ctx, s, (ox, oy) => {
       const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
@@ -908,7 +988,8 @@ function drawPlaster(ctx: CanvasRenderingContext2D, s: number): void {
   ctx.strokeStyle = 'rgba(110,94,66,0.5)';
   ctx.lineWidth = 1;
   for (let i = 0; i < 4; i++) {
-    let cx = rnd() * s, cy = rnd() * s;
+    let cx = rnd() * s,
+      cy = rnd() * s;
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     for (let kk = 0; kk < 5; kk++) {
@@ -932,7 +1013,9 @@ export function plasterMaps(): SurfaceMaps {
     ctx.fillStyle = '#787878';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 320; i++) {
-      const x = rnd() * s, y = rnd() * s, r = 3 + rnd() * 11;
+      const x = rnd() * s,
+        y = rnd() * s,
+        r = 3 + rnd() * 11;
       const v = 70 + rnd() * 100;
       drawWrapped(ctx, s, (ox, oy) => {
         const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
@@ -1022,7 +1105,9 @@ function drawThatch(ctx: CanvasRenderingContext2D, s: number): void {
     ctx.fillRect(0, y + 13, s, 3);
   }
   for (let i = 0; i < 900; i++) {
-    const x = rnd() * s, y = rnd() * s, len = 6 + rnd() * 12;
+    const x = rnd() * s,
+      y = rnd() * s,
+      len = 6 + rnd() * 12;
     const v = 140 + rnd() * 80;
     ctx.strokeStyle = `rgba(${v},${Math.floor(v * 0.78)},${Math.floor(v * 0.36)},0.5)`;
     ctx.lineWidth = 1 + rnd() * 0.6;
@@ -1070,7 +1155,9 @@ function drawAwningStripes(ctx: CanvasRenderingContext2D, s: number): void {
     ctx.fillRect(0, yy, s, 1.5);
   }
   for (let i = 0; i < 18; i++) {
-    const x = rnd() * s, y = rnd() * s, r = 5 + rnd() * 12;
+    const x = rnd() * s,
+      y = rnd() * s,
+      r = 5 + rnd() * 12;
     drawWrapped(ctx, s, (ox, oy) => {
       const g = ctx.createRadialGradient(x + ox, y + oy, 0, x + ox, y + oy, r);
       g.addColorStop(0, 'rgba(110,92,58,0.14)');
@@ -1123,8 +1210,10 @@ export function sparkleTexture(): THREE.CanvasTexture {
   ctx.strokeStyle = 'rgba(255,255,220,0.9)';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(32, 6); ctx.lineTo(32, 58);
-  ctx.moveTo(6, 32); ctx.lineTo(58, 32);
+  ctx.moveTo(32, 6);
+  ctx.lineTo(32, 58);
+  ctx.moveTo(6, 32);
+  ctx.lineTo(58, 32);
   ctx.stroke();
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;

@@ -1,11 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
 import {
-  buildDefaultFormBar, classHasFormBars, clearHotbarSlot, hotbarActionsEqual, parseHotbarActions,
-  placeAbilityOnSlot, placeItemOnSlot, shouldSeedFormBar, syncHotbarActions,
+  buildDefaultFormBar,
+  classHasFormBars,
+  clearHotbarSlot,
+  hotbarActionsEqual,
+  parseHotbarActions,
+  placeAbilityOnSlot,
+  placeItemOnSlot,
+  resolveMobileHotbarDrop,
+  shouldSeedFormBar,
+  syncHotbarActions,
 } from '../src/ui/hotbar';
 
-const abilityIds = new Set(['fireball', 'frost_armor', 'arcane_intellect', 'polymorph', 'shared_id']);
+const abilityIds = new Set([
+  'fireball',
+  'frost_armor',
+  'arcane_intellect',
+  'polymorph',
+  'shared_id',
+]);
 const itemIds = new Set(['baked_bread', 'spring_water', 'shared_id']);
 const abilityExists = (id: string) => abilityIds.has(id);
 const itemExists = (id: string) => itemIds.has(id);
@@ -30,7 +44,10 @@ describe('hotbar action parsing', () => {
 
   it('keeps item and ability actions distinct even when ids overlap', () => {
     const actions = parseHotbarActions(
-      [{ type: 'ability', id: 'shared_id' }, { type: 'item', id: 'shared_id' }],
+      [
+        { type: 'ability', id: 'shared_id' },
+        { type: 'item', id: 'shared_id' },
+      ],
       2,
       abilityExists,
       itemExists,
@@ -144,13 +161,21 @@ describe('hotbar action placement', () => {
 
 describe('hotbar slot clearing', () => {
   it('clears an occupied slot', () => {
-    const slotMap = [{ type: 'ability' as const, id: 'fireball' }, { type: 'ability' as const, id: 'frostbolt' }, null];
+    const slotMap = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'ability' as const, id: 'frostbolt' },
+      null,
+    ];
 
     expect(clearHotbarSlot(slotMap, 1)).toEqual([{ type: 'ability', id: 'fireball' }, null, null]);
   });
 
   it('leaves an empty slot stable', () => {
-    const slotMap = [{ type: 'ability' as const, id: 'fireball' }, null, { type: 'ability' as const, id: 'blink' }];
+    const slotMap = [
+      { type: 'ability' as const, id: 'fireball' },
+      null,
+      { type: 'ability' as const, id: 'blink' },
+    ];
 
     expect(clearHotbarSlot(slotMap, 1)).toEqual([
       { type: 'ability', id: 'fireball' },
@@ -160,15 +185,27 @@ describe('hotbar slot clearing', () => {
   });
 
   it('does not mutate the input array', () => {
-    const slotMap = [{ type: 'ability' as const, id: 'fireball' }, { type: 'ability' as const, id: 'frostbolt' }, null];
+    const slotMap = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'ability' as const, id: 'frostbolt' },
+      null,
+    ];
 
     clearHotbarSlot(slotMap, 1);
 
-    expect(slotMap).toEqual([{ type: 'ability', id: 'fireball' }, { type: 'ability', id: 'frostbolt' }, null]);
+    expect(slotMap).toEqual([
+      { type: 'ability', id: 'fireball' },
+      { type: 'ability', id: 'frostbolt' },
+      null,
+    ]);
   });
 
   it('ignores out-of-range slots', () => {
-    const slotMap = [{ type: 'ability' as const, id: 'fireball' }, { type: 'ability' as const, id: 'frostbolt' }, null];
+    const slotMap = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'ability' as const, id: 'frostbolt' },
+      null,
+    ];
 
     expect(clearHotbarSlot(slotMap, -1)).toEqual(slotMap);
     expect(clearHotbarSlot(slotMap, 3)).toEqual(slotMap);
@@ -217,8 +254,16 @@ describe('default form bar', () => {
 
 describe('hotbar actions equality', () => {
   it('treats slot-by-slot identical layouts as equal', () => {
-    const a = [{ type: 'ability' as const, id: 'maul' }, null, { type: 'item' as const, id: 'baked_bread' }];
-    const b = [{ type: 'ability' as const, id: 'maul' }, null, { type: 'item' as const, id: 'baked_bread' }];
+    const a = [
+      { type: 'ability' as const, id: 'maul' },
+      null,
+      { type: 'item' as const, id: 'baked_bread' },
+    ];
+    const b = [
+      { type: 'ability' as const, id: 'maul' },
+      null,
+      { type: 'item' as const, id: 'baked_bread' },
+    ];
 
     expect(hotbarActionsEqual(a, b)).toBe(true);
   });
@@ -228,7 +273,12 @@ describe('hotbar actions equality', () => {
 
     expect(hotbarActionsEqual(base, [{ type: 'ability' as const, id: 'growl' }, null])).toBe(false);
     expect(hotbarActionsEqual(base, [{ type: 'item' as const, id: 'maul' }, null])).toBe(false);
-    expect(hotbarActionsEqual(base, [{ type: 'ability' as const, id: 'maul' }, { type: 'ability' as const, id: 'growl' }])).toBe(false);
+    expect(
+      hotbarActionsEqual(base, [
+        { type: 'ability' as const, id: 'maul' },
+        { type: 'ability' as const, id: 'growl' },
+      ]),
+    ).toBe(false);
     expect(hotbarActionsEqual(base, [{ type: 'ability' as const, id: 'maul' }])).toBe(false);
     expect(hotbarActionsEqual([null, null], [null, null])).toBe(true);
   });
@@ -246,7 +296,16 @@ describe('classes with per-form action bars', () => {
       expect(classHasFormBars(id)).toBe(id === 'druid');
     }
     // the form-bar-only "Reset bar" button must never leak onto these
-    for (const id of ['warrior', 'mage', 'rogue', 'priest', 'hunter', 'paladin', 'shaman', 'warlock']) {
+    for (const id of [
+      'warrior',
+      'mage',
+      'rogue',
+      'priest',
+      'hunter',
+      'paladin',
+      'shaman',
+      'warlock',
+    ]) {
       expect(classHasFormBars(id)).toBe(false);
     }
   });
@@ -277,15 +336,27 @@ describe('form bar seeding decision', () => {
 
 describe('hotbar slot sync', () => {
   it('preserves a missing already-known ability as a cleared slot', () => {
-    const slots = [{ type: 'ability' as const, id: 'fireball' }, null, { type: 'ability' as const, id: 'blink' }];
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      null,
+      { type: 'ability' as const, id: 'blink' },
+    ];
 
-    expect(syncHotbarActions(slots, ['fireball', 'frostbolt', 'blink'], new Set()).actions).toEqual(slots);
+    expect(syncHotbarActions(slots, ['fireball', 'frostbolt', 'blink'], new Set()).actions).toEqual(
+      slots,
+    );
   });
 
   it('places a newly learned ability into the first empty slot', () => {
-    const slots = [{ type: 'ability' as const, id: 'fireball' }, null, { type: 'ability' as const, id: 'blink' }];
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      null,
+      { type: 'ability' as const, id: 'blink' },
+    ];
 
-    expect(syncHotbarActions(slots, ['fireball', 'frostbolt', 'blink'], new Set(['frostbolt'])).actions).toEqual([
+    expect(
+      syncHotbarActions(slots, ['fireball', 'frostbolt', 'blink'], new Set(['frostbolt'])).actions,
+    ).toEqual([
       { type: 'ability', id: 'fireball' },
       { type: 'ability', id: 'frostbolt' },
       { type: 'ability', id: 'blink' },
@@ -304,5 +375,19 @@ describe('hotbar slot sync', () => {
       null,
       { type: 'ability', id: 'blink' },
     ]);
+  });
+});
+
+describe('mobile touch drag drop resolution', () => {
+  it('resolves the target slot when it differs from the source', () => {
+    expect(resolveMobileHotbarDrop(2, 5)).toBe(5);
+  });
+
+  it('cancels when the pointer released outside any slot', () => {
+    expect(resolveMobileHotbarDrop(2, null)).toBeNull();
+  });
+
+  it('cancels when the pointer released back on the source slot', () => {
+    expect(resolveMobileHotbarDrop(2, 2)).toBeNull();
   });
 });

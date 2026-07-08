@@ -1256,6 +1256,65 @@
     margin-top: var(--spacing-xs);
   }
 
+  .desktop-download-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
+  }
+
+  .desktop-download-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    min-width: 190px;
+    margin: 0;
+    padding: 8px 18px;
+    text-decoration: none;
+  }
+
+  /* The visitor's own OS: a subtle ring so it reads as the primary choice
+     without demoting the other platforms (they stay one click away). */
+  .desktop-download-link.is-detected {
+    box-shadow: 0 0 0 2px rgba(255, 209, 0, 0.55);
+  }
+
+  .desktop-download-link.btn-primary.is-unavailable,
+  .desktop-download-link.btn-primary.is-unavailable:hover,
+  .desktop-download-link.btn-primary.is-unavailable:focus-visible {
+    background: linear-gradient(180deg, #3a3a3a 0%, #1b1b1b 100%);
+    border-color: rgba(180, 180, 180, 0.32);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.55);
+    color: #9f9f9f;
+    cursor: not-allowed;
+    opacity: 0.68;
+  }
+
+  .desktop-download-hint {
+    max-width: 420px;
+    margin: var(--spacing-xs) auto 0;
+    color: var(--color-primary-dim);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .desktop-download-status {
+    display: inline-block;
+    max-width: 420px;
+    padding: 6px var(--spacing-sm);
+    background: rgba(0, 0, 0, 0.38);
+    border: 1px solid rgba(255, 209, 0, 0.22);
+    border-radius: var(--radius-sm);
+    color: var(--color-primary-dim);
+    font-family: var(--font-heading);
+    font-size: 10.5px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    box-shadow: inset 0 0 8px #000;
+  }
+
   /* "Browse the Wiki" launcher: reuses the .btn skin but renders as an anchor. */
   .wiki-cta {
     display: inline-block;
@@ -2506,7 +2565,7 @@
   }
 
   /* WoW-style full-screen character screens (the offline panel plus the two
-     online panels carry the cs-wow class). Desktop only: below 900px the
+     online panels carry the cs-wow class). Desktop only: below 861px the
      classic card layout above stays, and the ONLINE panels additionally keep
      their card layout on touch bodies (the body.mobile-touch blocks below own
      that styling), hence the body:not(.mobile-touch) prefix on their arms.
@@ -2518,8 +2577,12 @@
      name floats top-center, and the actions sit in the corners. On the
      roster (#charselect-panel) the character list docks right instead, WoW
      style, and the summary docks left. All the ids / buttons / rows stay
-     untouched, so the main.ts wiring is unchanged. */
-  @media (min-width: 900px) {
+     untouched, so the main.ts wiring is unchanged.
+     Intentionally starts before the shared 900px card foundation: this
+     takeover restates the sizing and inner grids required throughout the
+     861px to 899px range.
+     */
+  @media (min-width: 861px) {
     #offline-select.cs-wow,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {
       position: fixed;
@@ -2542,9 +2605,23 @@
     }
     /* The online panels' card layout is a grid, and grid-placement on an
        absolutely-positioned child would anchor it to its grid AREA rather
-       than the full-screen panel: flatten to a block. */
-    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {
+       than the full-screen panel: flatten. The create panel stays a block
+       (everything in it docks against the panel). The roster panel is a
+       column flexbox instead: the account bar sits IN FLOW at the top and
+       the stage (.cs-body) takes the rest, so when the wallet / developer
+       cards wrap the bar onto extra lines the docked columns shift down
+       with it. (The bar used to be absolute over hardcoded 150px column
+       offsets, which let a wrapped bar cover the top of the roster.) */
+    body:not(.mobile-touch) #charcreate-panel.cs-wow {
       display: block;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow {
+      --cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));
+      --cs-roster-width: clamp(340px, 28vw, 440px);
+      --cs-details-width: var(--cs-roster-width);
+      --cs-dock-bottom: clamp(18px, 6.5vh, 96px);
+      display: flex;
+      flex-direction: column;
     }
     #offline-select.cs-wow .charselect-layout,
     #offline-select.cs-wow .charselect-col-left,
@@ -2562,8 +2639,18 @@
         .skin-picker,
         .cs-form-actions
       ),
-    body:not(.mobile-touch) #charselect-panel.cs-wow :is(.cs-body, .cs-detail-col) {
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-detail-col {
       display: contents;
+    }
+    /* The roster's stage region below the account bar: the 3D preview and
+       the two docked columns anchor to THIS box rather than the viewport,
+       so none of them can slide under the bar whatever height it wraps to.
+       Overrides the card layout's display: contents. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-body {
+      display: block;
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
     }
     #offline-select.cs-wow .auth-title,
     body:not(.mobile-touch) #charcreate-panel.cs-wow .auth-title {
@@ -2591,6 +2678,31 @@
       border: none;
       border-radius: 0;
       z-index: 1;
+    }
+    /* The selected character's name, centred over the top of the 3D stage so it
+       is unmistakable which character you are about to play. Truncates rather
+       than wrapping; non-interactive so it never blocks the turntable. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #charselect-preview-name {
+      display: block;
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      max-width: min(56%, 420px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+      font-family: var(--title-font);
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-shadow:
+        0 2px 8px #000,
+        0 0 14px rgba(0, 0, 0, 0.55);
+      pointer-events: none;
     }
     /* Name entry floats just under the title. */
     #offline-select.cs-wow .auth-label {
@@ -2805,16 +2917,15 @@
       border-top: 58px solid transparent;
     }
 
-    /* The roster: the account chrome (realm / sort / wallet) stays a top bar,
-       the character list docks right (WoW style) with its actions at its
-       foot, and the selected character's summary docks left. display:flex is
-       restated because the card layout below unwraps .cs-head / .cs-head-row
-       with display:contents. */
+    /* The roster: the account chrome (realm / sort / wallet) is an in-flow
+       top bar (first flex row of the panel column; it grows when its cards
+       wrap and pushes the stage down), the character list docks right (WoW
+       style) with its actions at its foot, and the selected character's
+       summary docks left. display:flex is restated because the card layout
+       below unwraps .cs-head / .cs-head-row with display:contents. The
+       z-index keeps the bar's dropdown menus over the stage columns. */
     body:not(.mobile-touch) #charselect-panel.cs-wow .cs-head {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      flex: 0 0 auto;
       z-index: 3;
       display: flex;
       flex-direction: row;
@@ -2872,21 +2983,22 @@
       max-width: 300px;
       font-size: 10px;
     }
-    /* Between 900px and 1400px the two cards plus the realm/sort controls
-       would wrap the account bar to a second line and collide with the
-       docked columns below: drop the captions (every action keeps its
-       title/aria text) so the bar stays one line. */
-    @media (max-width: 1399px) {
+    /* Below 1800px the two cards (verified wallet + linked developer) plus
+       the realm/sort controls no longer fit the account bar on one line
+       with their helper captions, so the bar wraps tall and eats stage
+       height: drop the captions (every action keeps its title/aria text)
+       so the wrapped cards stay short. */
+    @media (max-width: 1799px) {
       body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-help {
         display: none;
       }
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow .cs-list-col {
       position: absolute;
-      right: 26px;
-      top: 150px;
-      bottom: 96px;
-      width: 340px;
+      right: var(--cs-stage-gutter);
+      top: 18px;
+      bottom: var(--cs-dock-bottom);
+      width: var(--cs-roster-width);
       /* The card layout gives the column height:100%; the dock stretches via
          top/bottom instead. */
       height: auto;
@@ -2907,19 +3019,127 @@
     body:not(.mobile-touch) #charselect-panel.cs-wow .cs-list-actions {
       margin-top: auto;
       flex-shrink: 0;
+      /* Enter World is a full-width hero row; Back + New Character wrap below. */
+      flex-wrap: wrap;
+    }
+    /* The docked roster carries a single Enter World button acting on the
+       selected character, so the per-row Enter World / Take Over buttons drop
+       out here (Delete stays per-row: it targets one specific character). */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .enter-world-btn,
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .take-over-btn {
+      display: none;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter {
+      display: block;
+      flex: 1 1 100%;
+      min-height: 44px;
+      font-family: var(--title-font);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      /* Filled-gold CTA, matching the Donate button (.donate-cta): this is the
+         hero action of the screen, so it reads as a primary call to action
+         rather than the darker .btn-primary gradient. */
+      background: #f0c34d;
+      color: #2a1c05;
+      border: 1px solid var(--gold-dim);
+      outline: none;
+      text-shadow: none;
+      box-shadow:
+        0 2px 10px rgba(255, 209, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter:hover:not(:disabled),
+    body:not(.mobile-touch) #charselect-panel.cs-wow #btn-charselect-enter:focus-visible {
+      filter: brightness(1.08);
+      background: #ffd86b;
+      box-shadow:
+        0 0 14px rgba(255, 209, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      transform: translateY(-1px);
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel {
       position: absolute;
-      left: 26px;
-      top: 150px;
-      bottom: 96px;
-      width: 340px;
+      left: var(--cs-stage-gutter);
+      top: 18px;
+      bottom: var(--cs-dock-bottom);
+      width: var(--cs-details-width);
       overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;
       background: #0d0d16d9;
       border: 1px solid var(--color-border-default);
       border-radius: var(--radius-md);
       padding: 14px;
       z-index: 2;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent);
+      border: 0;
+      border-radius: 999px;
+    }
+    body:not(.mobile-touch)
+      #charselect-panel.cs-wow
+      .class-details-panel::-webkit-scrollbar-thumb:hover {
+      background: color-mix(in srgb, var(--scrollbar-thumb) 68%, transparent);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      column-gap: 12px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {
+      overflow-wrap: anywhere;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions {
+      display: grid;
+      grid-template-columns: minmax(112px, 1fr);
+      gap: 6px;
+      align-items: stretch;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions .btn {
+      width: 100%;
+      white-space: nowrap;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(18px, 2vh, 28px);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-spells-section {
+      grid-column: 1;
+      padding-top: clamp(6px, 1vh, 12px);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row {
+      display: grid;
+      grid-template-columns: clamp(76px, 5vw, 92px) minmax(0, 1fr);
+      align-items: baseline;
+      gap: 12px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      text-transform: none;
+      line-height: 1.45;
+      white-space: normal;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge-resource::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 7px currentColor;
+      vertical-align: 1px;
     }
 
     /* The class summary's base type is sized for the small pre-game card
@@ -2927,35 +3147,35 @@
        whole details sheet up one step in every cs-wow panel. */
     #offline-select.cs-wow .class-details-panel,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-panel {
-      font-size: 13px;
+      font-size: clamp(13px, 0.72vw, 15px);
     }
     #offline-select.cs-wow .class-details-name,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-name {
-      font-size: 24px;
+      font-size: clamp(24px, 1.35vw, 30px);
     }
     #offline-select.cs-wow .class-details-role,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-role {
-      font-size: 13px;
+      font-size: clamp(13px, 0.7vw, 15px);
     }
     #offline-select.cs-wow .class-details-lore,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-lore {
-      font-size: 14px;
+      font-size: clamp(14px, 0.78vw, 16px);
       line-height: 1.55;
     }
     #offline-select.cs-wow .details-section-title,
     body:not(.mobile-touch)
       :is(#charselect-panel, #charcreate-panel).cs-wow
       .details-section-title {
-      font-size: 14px;
+      font-size: clamp(14px, 0.75vw, 16px);
     }
     #offline-select.cs-wow .details-stat-bar-row,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-bar-row {
-      font-size: 13px;
+      font-size: clamp(13px, 0.7vw, 15px);
       margin-bottom: 8px;
     }
     #offline-select.cs-wow .details-stat-label,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-label {
-      width: 76px;
+      width: clamp(76px, 5vw, 92px);
     }
     #offline-select.cs-wow .details-stat-val,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-val {
@@ -2963,7 +3183,7 @@
     }
     #offline-select.cs-wow .details-gear-row,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-gear-row {
-      font-size: 13px;
+      font-size: clamp(13px, 0.7vw, 15px);
     }
     #offline-select.cs-wow .badge,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .badge {
@@ -2971,14 +3191,14 @@
     }
     #offline-select.cs-wow .details-spell-item,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-spell-item {
-      font-size: 13px;
+      font-size: clamp(13px, 0.68vw, 15px);
     }
     #offline-select.cs-wow .details-spell-text strong,
     body:not(.mobile-touch)
       :is(#charselect-panel, #charcreate-panel).cs-wow
       .details-spell-text
       strong {
-      font-size: 13px;
+      font-size: clamp(13px, 0.68vw, 15px);
     }
     #offline-select.cs-wow .details-spell-icon-img,
     body:not(.mobile-touch)
@@ -3226,6 +3446,57 @@
   }
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-switch {
     margin-top: 8px;
+  }
+
+  /* Issue uiux-overlap: the block above only tightened the login/realm panels for
+     the native-app wrapper. A plain mobile-touch WEB session hit the same
+     landscape overflow (the panel's own overflow-y:auto from the earlier
+     "pre-game chrome compaction" rule masked it as a scroll instead of fixing
+     it), so extend the same two-column compaction to every mobile-touch session
+     and to the two panels the native-app block did not cover
+     (discord-choice-panel, offline-select). */
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel,
+  body.mobile-touch[data-start-panel="discord-choice-panel"] #discord-choice-panel,
+  body.mobile-touch[data-start-panel="realm-panel"] #realm-panel,
+  body.mobile-touch[data-start-panel="offline-select"] #offline-select {
+    width: min(680px, calc(100vw - 72px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    max-width: none;
+    max-height: calc(var(--app-vh) - 40px);
+    padding: 14px 20px;
+    overflow-y: auto;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 18px;
+    align-items: end;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-discord,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #auth-or-divider,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #cf-turnstile-container,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #login-error,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-actions,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-switch {
+    grid-column: 1 / -1;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title {
+    margin-bottom: 4px;
+    font-size: 20px;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-field {
+    margin-bottom: 8px;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-actions-row {
+    margin-top: 2px;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-switch {
+    margin-top: 6px;
+  }
+  body.mobile-touch[data-start-panel="discord-choice-panel"] #discord-choice-panel .auth-title,
+  body.mobile-touch[data-start-panel="offline-select"] #offline-select .auth-title {
+    margin-bottom: 4px;
+    font-size: 20px;
   }
 
   .password-wrapper {
@@ -3958,6 +4229,13 @@
     padding: 0;
   }
 
+  /* The shared Enter World CTA belongs only to the desktop docked roster; every
+     other layout (mobile, narrow non-touch) drives entry from the per-row
+     buttons, so hide it by default and let the docked layout reveal it. */
+  #btn-charselect-enter {
+    display: none;
+  }
+
   .fatal-overlay {
     position: absolute;
     inset: 0;
@@ -4366,6 +4644,14 @@
     display: block;
     width: 100% !important;
     height: 100% !important;
+  }
+
+  /* The selected-character name plate over the 3D stage. Belongs to the desktop
+     docked layout (the only one with a full 3D turntable); mobile shows the name
+     on each roster card already, so it stays hidden by default and the docked
+     layout reveals it. */
+  .cs-preview-name {
+    display: none;
   }
 
   .char-input-group {
@@ -5079,6 +5365,13 @@
     display: flex;
     align-items: center;
     gap: 14px;
+    /* Reflow on a narrow row (a small desktop window, not just mobile-touch):
+       when the info column would be crushed below its min-width beside the
+       fixed-width action buttons, the buttons wrap to their own line below
+       instead, so the name + "Level N Class" line keeps the full width. Reacts
+       to the actual row width, so it holds at every screen size. */
+    flex-wrap: wrap;
+    row-gap: 8px;
     padding: 10px 12px;
     border: 1px solid rgba(78, 61, 29, 0.3);
     border-radius: var(--radius-sm);
@@ -5099,7 +5392,11 @@
   /* name stacked over level/class, vertically centered with the portrait */
   #char-list .char-row .char-id {
     flex: 1 1 auto;
-    min-width: 0;
+    /* A real minimum (not 0) so the column cannot be squeezed narrower than the
+       name + level line: once it would go below this, the action buttons wrap
+       below (flex-wrap on the row) rather than crushing the text into
+       "Level" / "20" / "Shaman". */
+    min-width: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -5110,9 +5407,15 @@
   }
   #char-list .char-row .char-sub {
     flex: 0 0 auto;
+    /* Keep "Level 20 Shaman" on ONE line; the row reflow above guarantees the
+       column is wide enough to hold it. */
+    white-space: nowrap;
   }
   #char-list .char-row .char-actions {
     flex: 0 0 auto;
+    /* Right-align the buttons whether they sit inline (wide row) or wrap to
+       their own line below (narrow row). */
+    margin-left: auto;
   }
   .char-list-message {
     list-style: none;
@@ -5348,6 +5651,64 @@
     }
   }
 
+  /* ---------- Mobile pre-game chrome compaction (login/charselect/charcreate) ----------
+     On a mobile-touch web session (not just the native-app wrapper, which already had this
+     treatment landscape-only), the marketing lockup (logo + "official website" tagline) and
+     the page footer (language/graphics pickers, legal links) sit above and below every
+     auth/character panel regardless of orientation, forcing a scroll past them to reach the
+     login fields, character roster, or Back/New Character buttons. Once a real auth/character
+     panel is the active start panel, shrink the logo, drop the tagline, and hide the footer so
+     the primary action never requires scrolling on a phone screen. The mode-select landing
+     panel keeps the full marketing chrome untouched. */
+  /* !important: the hud-mobile layer (hud.mobile.css) is declared AFTER this shell
+     layer (see src/styles/index.css's @layer order), so its unconditional
+     `body.mobile-touch #title-logo` width rule would otherwise win over this one
+     regardless of selector specificity. !important is the one thing that still
+     lets an earlier layer beat a later one. */
+  body.mobile-touch[data-start-panel="login-panel"] .official-site-copy,
+  body.mobile-touch[data-start-panel="discord-choice-panel"] .official-site-copy,
+  body.mobile-touch[data-start-panel="realm-panel"] .official-site-copy,
+  body.mobile-touch[data-start-panel="charselect-panel"] .official-site-copy,
+  body.mobile-touch[data-start-panel="charcreate-panel"] .official-site-copy,
+  body.mobile-touch[data-start-panel="offline-select"] .official-site-copy {
+    display: none !important;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #title-logo,
+  body.mobile-touch[data-start-panel="discord-choice-panel"] #title-logo,
+  body.mobile-touch[data-start-panel="realm-panel"] #title-logo,
+  body.mobile-touch[data-start-panel="charselect-panel"] #title-logo,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #title-logo,
+  body.mobile-touch[data-start-panel="offline-select"] #title-logo {
+    width: min(140px, 26vw) !important;
+    margin-bottom: 2px !important;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="discord-choice-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="realm-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="offline-select"] #hero-view {
+    gap: 8px !important;
+    justify-content: flex-start !important;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="discord-choice-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="realm-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="charcreate-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="offline-select"] #homepage-views-container {
+    padding-top: max(8px, env(safe-area-inset-top)) !important;
+    padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  }
+  body.mobile-touch[data-start-panel="login-panel"] .homepage-footer,
+  body.mobile-touch[data-start-panel="discord-choice-panel"] .homepage-footer,
+  body.mobile-touch[data-start-panel="realm-panel"] .homepage-footer,
+  body.mobile-touch[data-start-panel="charselect-panel"] .homepage-footer,
+  body.mobile-touch[data-start-panel="charcreate-panel"] .homepage-footer,
+  body.mobile-touch[data-start-panel="offline-select"] .homepage-footer {
+    display: none !important;
+  }
+
   /* ---------- Online character-select: showcase claims the header band ----------
      Now that the panel is wide, raise the right-hand showcase so its top edge
      lines up with the realm/wallet header row instead of starting below the
@@ -5480,6 +5841,8 @@
     width: 100%;
   }
 
+  /* The floating hamburger above reserves zero flow height, so the container and
+     #hero-view below get the FULL viewport height, not height-minus-header. */
   @media (orientation: landscape) {
     body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
     body.mobile-touch[data-start-panel="charcreate-panel"] #homepage-views-container {
@@ -5488,7 +5851,7 @@
     }
     body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
     body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view {
-      min-height: calc(var(--app-vh) - 86px);
+      min-height: var(--app-vh);
       justify-content: flex-start;
     }
     body.mobile-touch #charselect-panel,
@@ -5497,7 +5860,9 @@
         1040px,
         calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right))
       );
-      height: min(560px, calc(var(--app-vh) - 96px));
+      /* No header flow-height to subtract anymore (it floats out of flow above),
+         just this container's own top/bottom padding. */
+      height: min(560px, calc(var(--app-vh) - 20px));
       min-height: 0;
       max-height: none;
       display: flex;
@@ -5786,6 +6151,122 @@
       height: 150px;
       min-height: 150px;
     }
+
+    /* The login/realm/Discord-choice/offline-select auth panels have no fixed
+       landscape height of their own (unlike the charselect/charcreate panels
+       above), so on a short landscape phone viewport they can grow taller than
+       the viewport. html/body run overflow:hidden for the game shell, so an
+       overflowing panel here would be CLIPPED, not scrollable, hiding fields a
+       player needs (see the login-panel below its own bottom edge). Give these
+       panels a landscape height ceiling and their own internal scroll so every
+       field stays reachable instead of clipped. */
+    body.mobile-touch #login-panel,
+    body.mobile-touch #discord-choice-panel,
+    body.mobile-touch #realm-panel {
+      max-height: calc(var(--app-vh) - 24px);
+      overflow-y: auto;
+    }
+
+    /* offline-select is #offline-select.cs-wow, a 9-class roster that overflowed
+       even the internal-scroll fallback above (the scroll container clipped
+       the last classes and the action buttons off entirely). Give it the same
+       two-column charselect-panel/charcreate-panel treatment instead of just
+       capping it: a compact left column (name, class grid, actions) beside a
+       right column (preview + details), so the whole primary flow fits with
+       no scroll at all. Only the supplementary class-details blurb keeps its
+       own internal scroll, matching the charselect-panel precedent above. */
+    body.mobile-touch #offline-select {
+      width: min(
+        1040px,
+        calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right))
+      );
+      height: calc(var(--app-vh) - 90px);
+      max-height: calc(var(--app-vh) - 90px);
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 14px;
+    }
+    body.mobile-touch #offline-select .auth-title {
+      font-size: 15px;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    body.mobile-touch #offline-select .charselect-layout {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.85fr) minmax(260px, 1.15fr);
+      gap: 10px;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    body.mobile-touch #offline-select .charselect-col-left,
+    body.mobile-touch #offline-select .charselect-col-right {
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    body.mobile-touch #offline-select .char-create {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      gap: 3px;
+    }
+    body.mobile-touch #offline-select .auth-label {
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+    body.mobile-touch #offline-select .char-input-group {
+      margin: 0;
+      max-width: none;
+    }
+    body.mobile-touch #offline-select .char-input-group input {
+      min-height: 30px;
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+    body.mobile-touch #offline-select .mini-class-row {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+    }
+    body.mobile-touch #offline-select .mini-class {
+      min-height: 24px;
+      padding: 2px 4px;
+      font-size: 9.5px;
+      gap: 5px;
+    }
+    body.mobile-touch #offline-select .mini-class-portrait {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+    }
+    body.mobile-touch #offline-select .skin-row {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 3px;
+      margin-top: 3px;
+    }
+    body.mobile-touch #offline-select .auth-actions {
+      margin-top: auto;
+      padding-top: 4px;
+      gap: 6px;
+    }
+    body.mobile-touch #offline-select .auth-actions .btn {
+      min-height: 30px;
+      padding: 5px 8px;
+      font-size: 11.5px;
+    }
+    body.mobile-touch #offline-select .char-preview-container {
+      height: 100px;
+      min-height: 0;
+      flex-shrink: 0;
+    }
+    body.mobile-touch #offline-select .class-details-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      margin-top: 6px;
+    }
   }
 
   body.mobile-touch .mobile-menu-toggle {
@@ -5827,6 +6308,39 @@
   }
   body.mobile-touch .homepage-header.menu-open .header-menu-container {
     display: flex;
+  }
+  /* Charselect/charcreate are the tightest-on-height mobile screens: the header
+     collapses to JUST the hamburger toggle and is taken OUT of flow entirely
+     (fixed, floating over the corner, shrunk to fit only the toggle) rather than
+     shrunk-but-present, so it reserves zero layout height. The full viewport
+     height below goes to the roster, class details, and creation form. */
+  body.mobile-touch[data-start-panel="charselect-panel"] .homepage-header,
+  body.mobile-touch[data-start-panel="charcreate-panel"] .homepage-header {
+    position: fixed;
+    inset: 0 0 auto auto;
+    width: auto;
+    justify-content: flex-end;
+    padding: max(var(--spacing-xs), env(safe-area-inset-top))
+      max(var(--spacing-xs), env(safe-area-inset-right)) 0 0;
+    background: none;
+    box-shadow: none;
+    z-index: 130;
+  }
+  body.mobile-touch[data-start-panel="charselect-panel"] .homepage-header .header-logo-container,
+  body.mobile-touch[data-start-panel="charcreate-panel"] .homepage-header .header-logo-container {
+    display: none;
+  }
+  /* The dropdown menu the floating hamburger opens must not shrink to the
+     now-content-width header's box: anchor it under the toggle at a fixed,
+     comfortable width instead of stretching edge-to-edge off a full-width
+     parent that no longer exists here. */
+  body.mobile-touch[data-start-panel="charselect-panel"] .header-menu-container,
+  body.mobile-touch[data-start-panel="charcreate-panel"] .header-menu-container {
+    left: auto;
+    right: 0;
+    width: min(300px, calc(100vw - 24px));
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
   }
   body.mobile-touch .homepage-nav {
     width: 100%;

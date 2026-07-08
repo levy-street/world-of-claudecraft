@@ -46,7 +46,9 @@ export type StatId =
   | 'spellPower'
   | 'dps'
   | 'critChance'
-  | 'dodge';
+  | 'dodge'
+  | 'critRating'
+  | 'hasteRating';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -140,6 +142,10 @@ export interface StatTooltipInput {
   critChance: number;
   /** entity.dodgeChance, 0..1. */
   dodgeChance: number;
+  /** entity.critRating, the accumulated crit rating from gear + set bonuses. */
+  critRating: number;
+  /** entity.hasteRating, the accumulated haste rating from gear + set bonuses. */
+  hasteRating: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
   /** Equipped items contributing stats, for the gear source line (HUD maps from
@@ -320,6 +326,16 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       baseChanceNote = true;
       break;
     }
+    case 'critRating': {
+      isPrimary = false;
+      statValue = input.critRating;
+      break;
+    }
+    case 'hasteRating': {
+      isPrimary = false;
+      statValue = input.hasteRating;
+      break;
+    }
   }
 
   return {
@@ -462,6 +478,11 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     // The dps cell is an estimate the panel computes from weapon + AP; it has no
     // clean per-source attribution, so it shows none (just its approximate note).
     case 'dps':
+      return sources;
+    // Rating stats come straight off gear/set bonuses; the value plus its
+    // description carries the meaning, so no per-source breakdown line.
+    case 'critRating':
+    case 'hasteRating':
       return sources;
   }
 }

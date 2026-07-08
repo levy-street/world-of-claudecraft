@@ -2,6 +2,368 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.sport_boot.description':
+    'Tendangan lambung jauh ke arah titik bidik. Penonton menyukainya.',
+  'entities.abilities.sport_boot.name': 'Tendangan Jauh',
+  'entities.abilities.sport_dive.description':
+    'Lemparkan dirimu ke arah titik bidik. Bola yang melintas akan menempel padamu.',
+  'entities.abilities.sport_dive.name': 'Terjun',
+  'entities.abilities.sport_feint.description': 'Gerakan mengelak cepat ke arah titik bidik.',
+  'entities.abilities.sport_feint.name': 'Tipuan',
+  'entities.abilities.sport_hoof.description': 'Hantam bola rendah dan keras ke depan lapangan.',
+  'entities.abilities.sport_hoof.name': 'Sapu Jauh',
+  'entities.abilities.sport_kick.description': 'Tendang bola menyusur tanah ke arah titik bidik.',
+  'entities.abilities.sport_kick.name': 'Tendang',
+  'entities.abilities.sport_pass.description':
+    'Gulirkan umpan mantap ke rekan setim yang kau bidik, mendahului arah larinya.',
+  'entities.abilities.sport_pass.name': 'Umpan',
+  'entities.abilities.sport_punt.description': 'Tendangan lambung kiper, tinggi dan jauh.',
+  'entities.abilities.sport_punt.name': 'Sepakan Jauh',
+  'entities.abilities.sport_second_wind.description':
+    'Temukan kembali tenagamu: bergerak 50% lebih cepat selama 4 detik.',
+  'entities.abilities.sport_second_wind.name': 'Kaki Segar',
+  'entities.abilities.sport_shoot.description':
+    'Tahan untuk mengumpulkan tenaga, lepaskan untuk menembak ke gawang. Tenaga berlebih membuat bola melambung lewat.',
+  'entities.abilities.sport_shoot.name': 'Tembak',
+  'entities.abilities.sport_shoulder.description':
+    'Benturan bahu yang adil ala gencatan panen. Membuat lawan terjungkal menjauh dari bola.',
+  'entities.abilities.sport_shoulder.name': 'Benturan Bahu',
+  'entities.npcs.groundskeeper_bram.greeting':
+    'Gencatan tetap berlaku di Sowfield, {className}: hanya tendangan dan benturan bahu. Mau bermain memperebutkan Ember Tembaga?',
+  'entities.npcs.groundskeeper_bram.name': 'Penjaga Lapangan Bram',
+  'entities.npcs.groundskeeper_bram.title': 'Penjaga Sowfield',
+  'entities.zones.eastbrook_vale.pois.10.label': 'Sowfield',
+  'guide.nav.professions': 'Profesi',
+  'guide.nav.valeCup': 'Piala Lembah',
+  'guide.professions.archetypeChooseBody':
+    'Kamu menyatakan arketipe pertamamu melalui misi cerita awal di zona satu yang secara resmi menerimamu ke dalam identitas itu. Sebelum misi itu selesai, kamu sama sekali belum memilih arketipe.',
+  'guide.professions.archetypeChooseTitle': 'Memilih arketipemu',
+  'guide.professions.archetypeIdentityBody':
+    'Arketipe aktifmu adalah pernyataan tentang siapa karaktermu di dunia, terlihat dari cara orang lain dan dunia menyapamu. Hadiah dan pengakuan pastinya masih dirampungkan; tengok kembali seiring sistem ini dilengkapi.',
+  'guide.professions.archetypeIdentityTitle': 'Makna arketipemu',
+  'guide.professions.archetypeIntro':
+    'Masing-masing dari sepuluh kerajinan juga mewakili sebuah arketipe, identitas yang lebih luas yang bisa kamu sandang di luar sekadar menekuni kerajinannya. Arketipe aktifmu adalah satu pilihan pada satu waktu, bukan daftar centang: kamu menyandang satu, dan bisa menggantinya kelak jika mau.',
+  'guide.professions.archetypeSwitchBody':
+    'Menyatakan sebuah arketipe sekali tidak mengikatmu selamanya. Berpindah ke arketipe lain berarti lebih dulu menyelesaikan misi "menebus kesalahan" yang dapat diulang untuk arketipe lamamu, dan setiap kali kamu berpindah, tebusan yang diminta berikutnya sedikit lebih berat, sehingga berpindah tetap bermakna, bukan tanpa harga.',
+  'guide.professions.archetypeSwitchTitle': 'Berubah pikiran',
+  'guide.professions.archetypeTitle': 'Sepuluh arketipe',
+  'guide.professions.craftComboBody':
+    'Di luar daftar resep tiap kerajinan, roda ini juga mendukung resep kombinasi yang memakai dua kerajinan bertetangga sekaligus, mengganjar karakter (atau sepasang mitra dagang) yang menekuni kerajinan bersebelahan di lingkaran alih-alih satu kerajinan secara terpisah.',
+  'guide.professions.craftComboTitle': 'Resep kombinasi',
+  'guide.professions.craftIntro':
+    'Sepuluh kerajinan mengubah bahan yang terkumpul menjadi perlengkapan dan barang jadi: Penempaan Zirah, Penempaan Senjata, dan Kriya Permata membentuk bahan mentah menjadi perlengkapan yang bisa dikenakan; Alkimia dan Rekayasa berjalan lewat coba-coba; Memasak, Inskripsi, dan Pemantraan masing-masing menyentuh hasil kerajinan lain; Menjahit dan Pengolahan Kulit bekerja dari pola yang persis. Bersama-sama semuanya membentuk sebuah roda, dengan tiap kerajinan duduk di samping dua tetangga dan berseberangan dengan satu kerajinan lain.',
+  'guide.professions.craftMasteryBody':
+    'Berhasil membuat barang menumbuhkan keahlianmu di kerajinan itu, dan resep yang lebih kaya terkunci di balik keahlian yang lebih tinggi: resep dasar terbuka untuk semua orang, sementara resep yang makin maju menuntut penguasaan yang makin tinggi untuk dicoba. Menumbuhkan keahlian dalam sebuah kerajinan adalah jalan dari barang pemula sederhana menuju resep-resepnya yang lebih ambisius.',
+  'guide.professions.craftMasteryTitle': 'Keahlian dan penguasaan',
+  'guide.professions.craftRecipesBody':
+    'Setiap kerajinan punya resepnya sendiri, masing-masing membutuhkan reagen tertentu yang kamu kumpulkan atau beli. Resep paling dasar di tiap kerajinan hanya meminta bahan umum dan bisa dibuat sejak awal, jadi kamu bisa mulai menekuni sebuah kerajinan begitu mengambilnya, tanpa menunggu untuk membukanya.',
+  'guide.professions.craftRecipesTitle': 'Resep dan reagen',
+  'guide.professions.craftRingBody':
+    'Sepuluh kerajinan tersusun dalam lingkaran tetap, dan posisi sebuah kerajinan di lingkaran itu penting: kerajinan yang bersebelahan di roda punya lebih banyak kesamaan satu sama lain dibanding kerajinan di sisi berlawanan. Berkomitmen pada satu kerajinan dimaksudkan terasa seperti bergabung dengan keluarga kerajinan serumpun, bukan memilih keterampilan yang terpencil.',
+  'guide.professions.craftRingTitle': 'Roda spesialisasi',
+  'guide.professions.craftTitle': 'Sepuluh kerajinan',
+  'guide.professions.gatherIntro':
+    'Tiga profesi pengumpulan memungkinkanmu menarik bahan mentah langsung dari dunia: Penambangan memahat bijih dan batu dari urat tambang, Penebangan merobohkan kayu dari rumpun pohon, dan Herbalisme memetik herba serta tanaman liar. Masing-masing dicatat terpisah, jadi menekuni satu tak pernah memperlambat kemajuanmu di yang lain.',
+  'guide.professions.gatherProficiencyBody':
+    'Setiap panen yang berhasil menumbuhkan kecakapanmu di profesi pengumpulan itu. Kecakapan yang lebih tinggi menggeser hasil yang kamu tarik dari sebuah simpul ke mutu bahan yang lebih langka, dari yang umum ke atas, meski mutu paling langka tetap langka bahkan pada kecakapan tinggi. Lebih banyak latihan tak pernah merugikan peluangmu, hanya memperbaikinya.',
+  'guide.professions.gatherProficiencyTitle': 'Kecakapan dan mutu bahan',
+  'guide.professions.gatherTitle': 'Pengumpulan: Penambangan, Penebangan, dan Herbalisme',
+  'guide.professions.gatherToolsBody':
+    'Pedagang menjual perkakas dasar untuk tiap profesi pengumpulan, dan yang lebih baik bisa dibuat, jadi menggarap simpul sumber daya dimaksudkan terasa makin cakap seiring perlengkapanmu membaik, bukan diam di tempat. Perkakas tingkat lebih tinggi adalah jalan yang dimaksudkan untuk membuka simpul yang lebih kaya dan menggarapnya lebih efisien sepanjang sesi yang panjang.',
+  'guide.professions.gatherToolsTitle': 'Perkakas kerja',
+  'guide.professions.gatherWhatBody':
+    'Urat bijih, rumpun kayu, dan petak herba ditempatkan di zona-zona sebagai objek yang terlihat dan tak bertuan. Dekati satu dan berinteraksilah untuk memanen isinya. Setelah kamu memanen sebuah simpul, simpul itu butuh waktu untuk pulih sebelum kamu pribadi bisa memanennya lagi, tapi itu tak pernah menghalangi orang lain: pemain lain bisa memanen simpul yang sama sementara itu.',
+  'guide.professions.gatherWhatTitle': 'Simpul sumber daya',
+  'guide.professions.intro':
+    'Di luar pertempuran dan misi, dunia mengganjarmu karena menggarap tanah dan tempaan: mengumpulkan bahan mentah, mengolahnya menjadi perlengkapan di stasiun kriya sepuluh kerajinan berbeda, dan menetap dalam identitas sebagai salah satu dari sepuluh arketipe yang diwakili kerajinan-kerajinan itu.',
+  'guide.valeCupPage.heading': 'Piala Lembah',
+  'guide.valeCupPage.howHeading': 'Cara bermain',
+  'guide.valeCupPage.howMatch':
+    'Saat sepak mula, perangkat kelasmu ditukar dengan perangkat olahraga dan dikembalikan persis seperti semula setelahnya. Tendangan mengarah ke retikel di tanah, bola memantul dari papan pembatas, dan menggiring bola hanyalah berlari bersama bola. Cetak gol lebih banyak dari lawan sebelum waktu habis; hasil imbang berlanjut ke gol emas.',
+  'guide.valeCupPage.howQueue':
+    'Masuk antrean dari mana saja lewat jendela Piala Lembah, atau bicaralah dengan Penjaga Lapangan Bram di gerbang Sowfield. Pilih format dari satu lawan satu hingga lima lawan lima, sebuah negeri panji, dan peran olahraga; masuk antrean sendirian atau bawa party-mu.',
+  'guide.valeCupPage.howTruce':
+    'Tak ada yang berdarah di Sowfield: tekel hanya membuat terjungkal, tak ada yang terluka, dan peliharaan menunggu di luar lapangan.',
+  'guide.valeCupPage.intro':
+    'Bola babi hutan di Sowfield: pilih panji, pilih peran, dan tendang kulit babi hutan berisi jerami melewati kiper demi Ember Tembaga. Tanpa darah, tanpa jarahan, hanya gemuruh tribun.',
+  'guide.valeCupPage.loreHeading': 'Bola babi hutan dan gencatan panen',
+  'guide.valeCupPage.loreOldSow':
+    'Jauh sebelum orang mati terbangun, buruh tani Eastbrook bermain bola babi hutan di ladang jerami usai panen: dua gerombolan, satu kulit babi hutan berisi jerami, dan dua gerbang pedati yang diseret ke kedua ujung lapangan hijau. Bola pertama, Si Induk Tua, digantung berlapis perunggu di atas perapian kedai.',
+  'guide.valeCupPage.loreTruce':
+    'Ketika Koloseum Abu mulai merestui permainan perang, Marsekal Redbrook menjawab dengan sesuatu yang lebih lembut: gencatan panen tetap di lapangan hijau tua itu. Gerbang pedati menjadi tiang gawang, lapangan hijau itu mendapat tembok, tribun, dan sebuah nama, Sowfield, dan hadiahnya selalu sama, ember susu penyok yang dipakai minum para pemenang: Ember Tembaga.',
+  'guide.valeCupPage.nationChoir':
+    'Biru pucat dan perak di bawah lonceng: menyeramkan, presisi, dan sangat pendiam.',
+  'guide.valeCupPage.nationColiseum':
+    'Merah dan hitam dengan pedang bersilang: mereka bermain seakan ini masih permainan perang.',
+  'guide.valeCupPage.nationCopperdig':
+    'Tembaga dan cokelat dengan beliung: para penggali yang tak pernah berhenti berlari.',
+  'guide.valeCupPage.nationMirefen':
+    'Toska dan kelabu di bawah burung bangau: sabar, berkaki panjang, tak pernah terburu-buru.',
+  'guide.valeCupPage.nationMoon':
+    'Ungu dan perak di bawah bulan sabit: pemain malam, ringan langkahnya.',
+  'guide.valeCupPage.nationOgre':
+    'Jingga dan cokelat tua di balik kepalan: bahu duluan, dan bangga akan itu.',
+  'guide.valeCupPage.nationThornpeak':
+    'Biru es dan putih di bawah puncak gunung: berpijak mantap dan keras kepala.',
+  'guide.valeCupPage.nationVale':
+    'Hijau dan emas, mengibarkan berkas gandum: tim tuan rumah, buruh tani sejati.',
+  'guide.valeCupPage.nationsBody':
+    'Setiap tim bermain di bawah sebuah panji. Kapten memilih negerinya, dan jika kedua tim mengibarkan panji yang sama, tim tandang memakai palet warna terbalik.',
+  'guide.valeCupPage.nationsHeading': 'Delapan negeri panji',
+  'guide.valeCupPage.rewardsBody':
+    'Aturan gencatan berarti tanpa pengalaman dan tanpa jarahan: pertandingan yang tuntas dihitung ke dalam rekormu dan papan pemenang, dan poin hadiah harian ikut serta. Meninggalkan pertandingan membekukan slotmu, dan Sang Penjaga Lapangan mengingatnya.',
+  'guide.valeCupPage.rewardsHeading': 'Aturan gencatan',
+  'guide.valeCupPage.rolesBody':
+    'Peranmu menentukan perangkat yang kau bawa ke lapangan. Semua orang menendang; sisanya soal watak.',
+  'guide.valeCupPage.rolesHeading': 'Peran olahraga',
+  'guide.valeCupPage.spectateBody':
+    'Satu pertandingan berlangsung pada satu waktu di stadion, dan siapa pun bisa datang menonton dari tribun.',
+  'hudChrome.keybinds.valecup': 'Piala Lembah',
+  'hudChrome.mobile.dailyRewards': 'Hadiah',
+  'hudChrome.perf.labels.predLead': 'Jarak Prediksi',
+  'hudChrome.townFocus.budgetLabel': 'Sisa poin: {remaining} / {budget}',
+  'hudChrome.townFocus.decreaseAria': 'Kurangi fokus pada {component}',
+  'hudChrome.townFocus.hint':
+    'Poin fokus menambahkan bonus di atas hasil dasar setiap komponen. Komponen tanpa fokus tetap pada hasil dasar.',
+  'hudChrome.townFocus.increaseAria': 'Tambah fokus pada {component}',
+  'hudChrome.townFocus.notInTownHint': 'Kamu harus berada di kota untuk mengatur fokusmu.',
+  'hudChrome.townFocus.saveButton': 'Simpan Fokus',
+  'hudChrome.townFocus.title': 'Fokus Kota',
+  'hudChrome.vcup.awayNote':
+    'Jika kedua tim mengibarkan panji yang sama, tim tandang memakai palet warna terbalik.',
+  'hudChrome.vcup.bannerCountdown': 'Sepak mula dalam {seconds}...',
+  'hudChrome.vcup.bannerDraw': 'Imbang di Sowfield.',
+  'hudChrome.vcup.bannerEnd': 'Peluit panjang: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.bannerFound': 'Piala Lembah memanggil: {nationA} vs {nationB}!',
+  'hudChrome.vcup.bannerGoal': 'GOL! {nation} mencetak gol!',
+  'hudChrome.vcup.bannerGolden': 'GOL EMAS: gol berikutnya menang!',
+  'hudChrome.vcup.bannerKickoff': 'SEPAK MULA!',
+  'hudChrome.vcup.bannerLoss': 'Kekalahan di Sowfield.',
+  'hudChrome.vcup.bannerSave': '{name} MENEPIS!',
+  'hudChrome.vcup.bannerWin': 'Kemenangan di Sowfield!',
+  'hudChrome.vcup.bet.aria': 'Taruhan pertandingan Piala Lembah',
+  'hudChrome.vcup.bet.back': 'Dukung {team}',
+  'hudChrome.vcup.bet.closed': 'Taruhan ditutup',
+  'hudChrome.vcup.bet.closesIn': 'Taruhan ditutup dalam {seconds} dtk',
+  'hudChrome.vcup.bet.collapse': 'Sembunyikan taruhan',
+  'hudChrome.vcup.bet.expand': 'Lihat taruhan dan pasang',
+  'hudChrome.vcup.bet.form': '{wins}M-{losses}K',
+  'hudChrome.vcup.bet.lostLog': 'Taruhan Piala Lembah-mu kalah: {amount}.',
+  'hudChrome.vcup.bet.mine': 'Taruhanmu: {amount} pada {team}',
+  'hudChrome.vcup.bet.none': 'Kamu belum bertaruh di pertandingan ini.',
+  'hudChrome.vcup.bet.oddsLabel': 'Bayaran',
+  'hudChrome.vcup.bet.prize': 'Pundi {amount}',
+  'hudChrome.vcup.bet.record': 'Rekor taruhan: {wins}M-{losses}K, {sign}{net}',
+  'hudChrome.vcup.bet.refundLog':
+    'Taruhan dibatalkan, uang taruhanmu sebesar {amount} dikembalikan.',
+  'hudChrome.vcup.bet.splitAria': 'Porsi pundi taruhan pada tiap tim',
+  'hudChrome.vcup.bet.title': 'Taruhan Pertandingan',
+  'hudChrome.vcup.bet.wonBanner': 'Taruhanmu menang!',
+  'hudChrome.vcup.bet.wonLog': 'Taruhan Piala Lembah-mu menang: {amount} dikembalikan.',
+  'hudChrome.vcup.blockNation': 'Pilih negeri panji dulu.',
+  'hudChrome.vcup.blockNotLeader': 'Hanya pemimpin party yang bisa mengantrekan tim.',
+  'hudChrome.vcup.blockPartySize': 'Format itu membutuhkan party yang lebih kecil.',
+  'hudChrome.vcup.boardEmpty': 'Belum ada pemenang tercatat. Ember Tembaga menanti.',
+  'hudChrome.vcup.boardHeading': 'Papan pemenang',
+  'hudChrome.vcup.boardWins': '{count} kemenangan',
+  'hudChrome.vcup.bracketLabel': '{n}v{n}',
+  'hudChrome.vcup.bracketsAria': 'Format pertandingan',
+  'hudChrome.vcup.briefing.bot': 'Bot',
+  'hudChrome.vcup.briefing.kitHeading': 'Perangkatmu',
+  'hudChrome.vcup.briefing.kitNote':
+    'Gerakan-gerakan ini menggantikan kemampuan kelasmu selama pertandingan.',
+  'hudChrome.vcup.briefing.ready': 'Aku siap',
+  'hudChrome.vcup.briefing.readyAria': 'Nyatakan siap untuk sepak mula',
+  'hudChrome.vcup.briefing.readyCount': '{ready} dari {total} siap',
+  'hudChrome.vcup.briefing.readyDone': 'Siap',
+  'hudChrome.vcup.briefing.rosterHeading': 'Susunan pemain',
+  'hudChrome.vcup.briefing.rule1': 'Tendang atau umpan bola ke gawang lawan untuk mencetak gol.',
+  'hudChrome.vcup.briefing.rule2':
+    'Yang pertama mencetak 5 gol menang, atau yang golnya terbanyak saat peluit panjang berbunyi.',
+  'hudChrome.vcup.briefing.rule3':
+    'Skor imbang saat peluit panjang berlanjut ke gol emas: gol berikutnya menang.',
+  'hudChrome.vcup.briefing.rule4':
+    'Tekel hanya membuatmu terjungkal. Tak ada yang terluka di bawah gencatan panen.',
+  'hudChrome.vcup.briefing.rule5': 'Siapa pun bisa datang dan menyemangatimu dari tribun.',
+  'hudChrome.vcup.briefing.rulesHeading': 'Cara bermain',
+  'hudChrome.vcup.briefing.subtitle': 'Pengarahan prapertandingan',
+  'hudChrome.vcup.briefing.vs': 'vs',
+  'hudChrome.vcup.briefing.waiting': 'Menunggu tim lawan menyatakan siap...',
+  'hudChrome.vcup.briefing.whistle': 'Peluit berbunyi dalam {seconds} dtk.',
+  'hudChrome.vcup.briefing.you': 'Kamu',
+  'hudChrome.vcup.clock': '{minutes}.{seconds}',
+  'hudChrome.vcup.close': 'Tutup jendela Piala Lembah',
+  'hudChrome.vcup.deserterNote':
+    'Sang Penjaga Lapangan mengingatnya. Kamu boleh mengantre lagi dalam {seconds} detik.',
+  'hudChrome.vcup.enterAsGuild': 'Masuk di bawah panji {guild}',
+  'hudChrome.vcup.gossipOpen': 'Buku jadwal pertandingan',
+  'hudChrome.vcup.gossipOpenAria': 'Buka jendela Piala Lembah',
+  'hudChrome.vcup.guildBoardEmpty': 'Belum ada guild yang turun ke lapangan. Kibarkan panjimu!',
+  'hudChrome.vcup.guildBoardHeading': 'Panji guild',
+  'hudChrome.vcup.guildBoardWl': '{wins} M, {losses} K',
+  'hudChrome.vcup.guildRecordLine': 'Rekor guild-mu: {wins} menang, {losses} kalah.',
+  'hudChrome.vcup.inMatchNote': 'Timmu sedang di lapangan. Teruskan permainan!',
+  'hudChrome.vcup.indicatorLive': 'Piala Lembah',
+  'hudChrome.vcup.indicatorOpen': 'Buka jendela Piala Lembah',
+  'hudChrome.vcup.indicatorQueued':
+    'Antrean Piala Lembah: {bracket}, posisi {position} dari {count}',
+  'hudChrome.vcup.leaveQueue': 'Keluar dari Antrean',
+  'hudChrome.vcup.liveAria': 'Piala Lembah: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.liveHeading': 'Kini di Sowfield',
+  'hudChrome.vcup.logDraw': 'Laga di Sowfield berakhir imbang.',
+  'hudChrome.vcup.logFound': 'Pertandingan Piala Lembah-mu sudah siap: {nationA} vs {nationB}.',
+  'hudChrome.vcup.logGoal':
+    '{name} mencetak gol untuk {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
+  'hudChrome.vcup.logLoss': 'Kamu kalah dalam laga di Sowfield.',
+  'hudChrome.vcup.logQueued':
+    'Kamu masuk antrean Piala Lembah untuk {bracket} (posisi {position}).',
+  'hudChrome.vcup.logRoster': 'Timmu: {allies}. Tim lawan: {enemies}.',
+  'hudChrome.vcup.logSave': '{name} melakukan penyelamatan!',
+  'hudChrome.vcup.logUnqueued': 'Kamu keluar dari antrean Piala Lembah.',
+  'hudChrome.vcup.logWin': 'Kamu memenangkan laga di Sowfield.',
+  'hudChrome.vcup.mobileLabel': 'Piala',
+  'hudChrome.vcup.nation.choir': 'Paduan Suara Pucat',
+  'hudChrome.vcup.nation.coliseum': 'Koloseum Abu',
+  'hudChrome.vcup.nation.copperdig': 'Galian Tembaga',
+  'hudChrome.vcup.nation.mirefen': 'Mirefen',
+  'hudChrome.vcup.nation.moon': 'Bulan Pucat',
+  'hudChrome.vcup.nation.ogre': 'Klan Ogre',
+  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
+  'hudChrome.vcup.nation.vale': 'Lembah Eastbrook',
+  'hudChrome.vcup.nationsHeading': 'Negeri panji',
+  'hudChrome.vcup.noLive': 'Lapangan sunyi. Tak ada pertandingan yang berlangsung.',
+  'hudChrome.vcup.offlineNote': 'Buku jadwal sedang tutup. Piala Lembah tidak tersedia saat ini.',
+  'hudChrome.vcup.phaseCountdown': 'Sepak mula dalam {seconds}',
+  'hudChrome.vcup.phaseGoal': 'GOL!',
+  'hudChrome.vcup.phaseGolden': 'GOL EMAS',
+  'hudChrome.vcup.phaseOver': 'PELUIT PANJANG',
+  'hudChrome.vcup.practice': 'Latihan vs. Bot',
+  'hudChrome.vcup.practiceNote':
+    'Langsung memulai pertandingan bot pribadi di lapangan latihanmu sendiri.',
+  'hudChrome.vcup.practicingNow': 'Sedang berlatih ({count}):',
+  'hudChrome.vcup.queue': 'Masuk Antrean',
+  'hudChrome.vcup.queueNote': 'Mengantrelah dari mana saja; peluit akan memanggilmu ke Sowfield.',
+  'hudChrome.vcup.queuedStatus': 'Mengantre untuk {bracket}: posisi {position} dari {count}.',
+  'hudChrome.vcup.recordLine': 'Rekormu: {wins} menang, {losses} kalah, {draws} imbang.',
+  'hudChrome.vcup.role.allrounder.desc':
+    'Serba bisa: tendang, sepak jauh, dan benturan bahu yang adil.',
+  'hudChrome.vcup.role.allrounder.name': 'Serba Bisa',
+  'hudChrome.vcup.role.keeper.desc':
+    'Menjaga kotak gawang dengan tangkapan, terjunan, dan sepakan jauh.',
+  'hudChrome.vcup.role.keeper.name': 'Kiper',
+  'hudChrome.vcup.role.striker.desc': 'Hidup untuk tendangan jauh dan gerak elak cepat.',
+  'hudChrome.vcup.role.striker.name': 'Penyerang',
+  'hudChrome.vcup.role.sweeper.desc':
+    'Membenturkan pelari menjauh dari bola dan menyapunya jauh-jauh.',
+  'hudChrome.vcup.role.sweeper.name': 'Penyapu',
+  'hudChrome.vcup.rolesHeading': 'Peran olahraga',
+  'hudChrome.vcup.shootPower': 'TENAGA',
+  'hudChrome.vcup.title': 'Piala Lembah',
+  'hudChrome.vcup.waitingCount': '{count} menunggu',
+  'hudChrome.vcup.walkUp': 'Datanglah ke Sowfield untuk menonton dari tribun.',
+  'hudChrome.archetypeTitle.label': 'Gelar',
+  'hudChrome.archetypeTitle.none': 'Tidak Ada',
+  'hudChrome.archetypeTitle.armorcrafting': 'Pandai Zirah',
+  'hudChrome.archetypeTitle.weaponcrafting': 'Pandai Senjata',
+  'hudChrome.archetypeTitle.jewelcrafting': 'Perajin Permata',
+  'hudChrome.archetypeTitle.alchemy': 'Alkemis',
+  'hudChrome.archetypeTitle.engineering': 'Insinyur',
+  'hudChrome.archetypeTitle.cooking': 'Koki',
+  'hudChrome.archetypeTitle.inscription': 'Juru Tulis',
+  'hudChrome.archetypeTitle.enchanting': 'Pemantra',
+  'hudChrome.archetypeTitle.tailoring': 'Penjahit',
+  'hudChrome.archetypeTitle.leatherworking': 'Perajin Kulit',
+  'entities.itemSets.crownforged.bonus4':
+    'Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.',
+  'entities.itemSets.deathlord.bonus4':
+    'Serangan kritis senjatamu memiliki peluang 50% memberikan Kuasa Kubur, meningkatkan daya serang sebesar 60 selama 10 detik.',
+  'entities.itemSets.necromancers.bonus4':
+    'Mantramu memiliki peluang 10% memberikan Rapal Jernih, menjadikan mantra berikutmu tanpa biaya.',
+  'entities.itemSets.nighttalon.bonus4':
+    'Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.',
+  'entities.itemSets.soulflame.bonus4':
+    'Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.',
+  'entities.itemSets.stormcallers.bonus4':
+    'Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.',
+  'entities.itemSets.wyrmshadow.bonus4':
+    'Serangan kritis senjatamu memiliki peluang 50% memberikan Sergap Taring, meningkatkan kecepatan serangan sebesar 25% selama 8 detik.',
+  'entities.items.architects_cornerstone.name': 'Batu Penjuru Sang Arsitek',
+  'entities.items.bonechill_cord.name': 'Tali Pinggang Dingin Tulang',
+  'entities.items.bonechill_striders.name': 'Bot Langkah Dingin Tulang',
+  'entities.items.choir_blessed_spaulders.name': 'Pelindung Bahu Berkah Paduan Suara',
+  'entities.items.choirmothers_casque.name': 'Ketopong Ibu Paduan Suara',
+  'entities.items.cryptplate_helm.name': 'Helm Lempeng Kripta',
+  'entities.items.deathless_greatblade.name': 'Bilah Agung Nirmaut',
+  'entities.items.deathless_warguard_legmail.name': 'Zirah Kaki Garda Perang Nirmaut',
+  'entities.items.gravescale_girdle.name': 'Sabuk Sisik Kubur',
+  'entities.items.gravewyrm_claws.name': 'Cakar Wyrm Kubur',
+  'entities.items.gravewyrm_cleaver.name': 'Kapak Pembelah Wyrm Kubur',
+  'entities.items.heroic_mark.name': 'Tanda Heroik',
+  'entities.items.lunar_choir_leggings.name': 'Celana Paduan Suara Rembulan',
+  'entities.items.lunar_tide_greatstaff.name': 'Tongkat Agung Pasang Rembulan',
+  'entities.items.medallion_of_endless_profit.name': 'Medali Laba Tanpa Akhir',
+  'entities.items.mistcallers_fang.name': 'Taring Pemanggil Kabut',
+  'entities.items.mistforged_pauldrons.name': 'Bahu Tempaan Kabut',
+  'entities.items.morthens_cryptforged_hauberk.name': 'Baju Zirah Tempaan Kripta Morthen',
+  'entities.items.nielas_coldlight_band.name': 'Cincin Cahaya Dingin Niela',
+  'entities.items.oath_of_the_round_table.name': 'Sumpah Meja Bundar',
+  'entities.items.sanctum_prowlers_grips.name': 'Sarung Tangan Pengendap Sanktum',
+  'entities.items.sash_of_the_sunken_court.name': 'Selempang Istana Karam',
+  'entities.items.scepter_of_the_deathless_court.name': 'Tongkat Kebesaran Istana Nirmaut',
+  'entities.items.scourgehide_carapace.name': 'Karapas Kulit Sampar',
+  'entities.items.seal_of_the_nine_oaths.name': 'Segel Sembilan Sumpah',
+  'entities.items.shadowpulse_handwraps.name': 'Pembalut Tangan Denyut Bayangan',
+  'entities.items.shadowpulse_slippers.name': 'Selop Denyut Bayangan',
+  'entities.items.shroud_of_the_gravewyrm.name': 'Kafan Sang Wyrm Kubur',
+  'entities.items.soulforged_warplate.name': 'Zirah Perang Tempaan Jiwa',
+  'entities.items.soulrend_diadem.name': 'Diadem Pengoyak Jiwa',
+  'entities.items.stormcallers_focus.name': 'Fokus Pemanggil Badai',
+  'entities.items.sunken_court_mantle.name': 'Mantel Istana Karam',
+  'entities.items.sutils_gambit.name': 'Gambit Sutil',
+  'entities.items.swiftfang_talisman.name': 'Talisman Taring Gesit',
+  'entities.items.tidebound_spaulders.name': 'Pelindung Bahu Ikatan Pasang',
+  'entities.items.tideguard_faceguard.name': 'Pelindung Wajah Penjaga Pasang',
+  'entities.items.tideworn_warboots.name': 'Bot Perang Kikisan Pasang',
+  'entities.items.tidewoven_trousers.name': 'Celana Tenunan Pasang',
+  'entities.items.wyrmchoir_handwraps.name': 'Pembalut Tangan Paduan Suara Wyrm',
+  'entities.items.yumis_keepsake_locket.name': 'Liontin Kenangan Yumi',
+  'entities.items.zense_meridian.name': 'Meridian Zense',
+  'entities.items.zyzzs_deathless_signet.name': 'Cincin Stempel Nirmaut Zyzz',
+  'entities.npcs.heroic_quartermaster.greeting':
+    'Bukti dari kedalaman heroik dapat membeli cincin dan liontin terbaik di Highwatch. Tunjukkan tanda-tandamu.',
+  'entities.npcs.heroic_quartermaster.name': 'Kepala Perbekalan Vex',
+  'entities.npcs.heroic_quartermaster.title': 'Kepala Perbekalan Heroik',
+  'heroicShop.balance': 'Tanda Heroik: {count}',
+  'heroicShop.buyAria': 'Beli {item} seharga {marks} Tanda Heroik',
+  'hudChrome.bags.cannotDestroy': 'Item ini tidak dapat dihancurkan.',
+  'hudChrome.bags.rightClickDestroy': 'Klik kanan untuk menghancurkan',
+  'hudChrome.crafting.comboRequirementUnmet':
+    'Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.',
+  'hudChrome.discord.roleTag.coredevs': 'Dev Inti',
+  'hudChrome.dungeonDifficulty.setHeroic': 'Atur Kesulitan Dungeon: Heroik',
+  'hudChrome.dungeonDifficulty.setNormal': 'Atur Kesulitan Dungeon: Normal',
+  'hudChrome.itemProc.attackSlow':
+    'dan memperlambat kecepatan serangan target sebesar {pct}% selama {duration} dtk',
+  'hudChrome.itemProc.chainArc':
+    'menghantam target dengan {name} {school} ({damage}) yang melompat ke {jumps} musuh terdekat dengan kerusakan yang kian melemah',
+  'hudChrome.itemProc.dot':
+    'menjangkitkan {name}, kerusakan berkala {school} yang memberikan {total} selama {duration} dtk',
+  'hudChrome.itemProc.hot':
+    'memekarkan {name}, penyembuhan berkala yang memulihkan {total} selama {duration} dtk',
+  'hudChrome.itemProc.onHeal': 'Peluang saat penyembuhanmu ({chance}%): {effect}',
+  'hudChrome.itemProc.onMeleeHit': 'Peluang saat memukul ({chance}%): {effect}',
+  'hudChrome.itemProc.onSpellDamage': 'Peluang saat mantra kerusakanmu ({chance}%): {effect}',
+  'hudChrome.options.version': 'v{version} ({build})',
+  'hudChrome.raidLockout.heroicLocked': 'Anda terkunci pada {name} Heroik.',
+  'hudChrome.raidLockout.heroicName': '{name} Heroik',
+  'hudChrome.statInfo.desc.critRating':
+    'Rating kritis dari perlengkapan dan bonus set Anda, menaikkan peluang serangan kritis Anda. Sekitar 10 rating memberi 1% kritis.',
+  'hudChrome.statInfo.desc.hasteRating':
+    'Rating kecepatan dari perlengkapan dan bonus set Anda, mempercepat serangan dan rapalan mantra Anda. Sekitar 10 rating memberi 1% kecepatan.',
+  'hudChrome.statInfo.names.critRating': 'Rating Kritis',
+  'hudChrome.statInfo.names.hasteRating': 'Rating Kecepatan',
+  'itemUi.slots.neck': 'Leher',
+  'itemUi.slots.ring': 'Jari',
   'auth.email': 'Email',
   'auth.emailError': 'Silakan masukkan alamat email yang valid.',
   'auth.emailPlaceholder': 'kamu@contoh.com',
@@ -521,6 +883,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': 'Anak Badai Terjaga',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, Puncak yang Terjaga',
   'entities.mobs.tolling_bell.name': 'Lonceng Berdentang',
+  'entities.mobs.vale_cup_ball.name': 'Bola Babi Hutan',
   'entities.npcs.brother_halven_marsh.greeting':
     'Jejak itu menuntun ke utara. Relikuari lain, ritus lain. Pilih tingkat kesulitanmu, dan aku akan memegangi talinya sampai kau kembali.',
   'entities.npcs.brother_halven_marsh.name': 'Bruder Halven',
@@ -600,6 +963,20 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.result.removed': 'Acara itu telah dihapus dari kalender.',
   'hudChrome.calendar.title': 'Kalender Acara',
   'hudChrome.calendar.titlePlaceholder': 'Judul acara',
+  'hudChrome.corpseHarvest.alreadyHarvested': 'Bangkai ini sudah dipanen.',
+  'hudChrome.corpseHarvest.componentAria': 'Panen {component}',
+  'hudChrome.corpseHarvest.components.claw': 'Cakar',
+  'hudChrome.corpseHarvest.components.fang': 'Taring',
+  'hudChrome.corpseHarvest.components.gills': 'Insang',
+  'hudChrome.corpseHarvest.components.hide': 'Kulit',
+  'hudChrome.corpseHarvest.components.horn': 'Tanduk',
+  'hudChrome.corpseHarvest.components.silk': 'Sutra',
+  'hudChrome.corpseHarvest.components.tusk': 'Gading',
+  'hudChrome.corpseHarvest.components.venomSac': 'Kantung Bisa',
+  'hudChrome.corpseHarvest.concentrateHint':
+    'Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.',
+  'hudChrome.corpseHarvest.harvestButton': 'Panen',
+  'hudChrome.corpseHarvest.title': 'Panen',
   'hudChrome.dailyRewards.disclaimer':
     'Harga WOC dapat bergerak cepat. Kami menyarankan untuk menyimpan lebih dari batas minimum $20 USD agar gejolak harga yang wajar tidak mengunci aksesmu. Ini bukan nasihat keuangan.',
   'hudChrome.dailyRewards.hideChestConfirmBody':
@@ -1140,6 +1517,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh.',
   'download.title': 'Unduh Peluncur Desktop',
+  'download.macCta': 'Unduh untuk macOS',
+  'download.windowsPending': 'Build Windows tertunda.',
   'entities.abilities.adrenaline_rush.description':
     'Darahmu mendidih, seketika memulihkan 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Darah Terpacu',
@@ -1153,7 +1532,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Ledakan energi Arkana menghantam semua musuh terdekat untuk {damage} kerusakan Arkana.',
   'entities.abilities.arcane_explosion.name': 'Aetherburst',
   'entities.abilities.arcane_intellect.description':
-    'Meningkatkan Kecerdasan sebesar 2 selama 30 menit.',
+    'Meningkatkan Kecerdasan sebesar {buff} selama 30 menit.',
   'entities.abilities.arcane_intellect.name': 'Wawasan Aether',
   'entities.abilities.arcane_missiles.description':
     'Melontarkan Panah Aether ke arah musuh, menimbulkan {damage} kerusakan Arkana setiap detik selama 3 detik.',
@@ -1165,7 +1544,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengambil wujud kuda pacu, meningkatkan kecepatan gerak sebesar 30% selama 30 menit.',
   'entities.abilities.aspect_of_the_cheetah.name': 'Wujud Kuda Pacu',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Mengambil wujud elang penyambar, meningkatkan daya serang sebesar 20 selama 30 menit.',
+    'Mengambil wujud elang penyambar, meningkatkan daya serang sebesar {buff} selama 30 menit.',
   'entities.abilities.aspect_of_the_hawk.name': 'Wujud Elang Penyambar',
   'entities.abilities.aspect_of_the_monkey.description':
     'Mengambil wujud musang, meningkatkan peluang menghindarmu sebesar 8% selama 30 menit.',
@@ -1180,19 +1559,19 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyetrum target selama 2 detik. Hanya dalam Wujud Bruin.',
   'entities.abilities.bash.name': 'Guncangan',
   'entities.abilities.battle_shout.description':
-    'Meningkatkan daya serangmu sebesar 20 selama 2 menit.',
+    'Meningkatkan daya serangmu sebesar {buff} selama 2 menit.',
   'entities.abilities.battle_shout.name': 'Raungan Besi',
   'entities.abilities.bear_charge.description':
     'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard. Hanya dalam Wujud Bruin.',
   'entities.abilities.bear_charge.name': 'Terjangan Bruin',
   'entities.abilities.bear_form.description':
-    'Berubah wujud menjadi beruang: zirah +65%, daya serang +15, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal.',
+    'Berubah wujud menjadi beruang: zirah +90%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal.',
   'entities.abilities.bear_form.name': 'Wujud Bruin',
   'entities.abilities.berserker_rage.description':
     'Memasuki amukan mendidih, menghasilkan 20 amarah. (Talenta Prajurit)',
   'entities.abilities.berserker_rage.name': 'Amukan Mendidih',
   'entities.abilities.blessing_of_might.description':
-    'Menempatkan sebuah Berkah pada target sekutu, meningkatkan daya serang sebesar 15 selama 5 menit.',
+    'Menempatkan sebuah Berkah pada target sekutu, meningkatkan daya serang sebesar {buff} selama 5 menit.',
   'entities.abilities.blessing_of_might.name': 'Sumpah Besi',
   'entities.abilities.blind.description':
     'Membutakan target, membuatnya mengembara linglung selama 8 detik. Kerusakan apa pun mematahkan efeknya.',
@@ -1200,7 +1579,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodrage.description': 'Menghasilkan 10 amarah dengan mengorbankan nyawa.',
   'entities.abilities.bloodrage.name': 'Tumbal Darah',
   'entities.abilities.bloodthirst.description':
-    'Seketika menyerang dalam amukan darah untuk {damage}. (Penanda Fury)',
+    'Seketika menyerang dalam amukan darah untuk 60% kerusakan senjata ditambah {damage}. (Penanda Fury)',
   'entities.abilities.bloodthirst.name': 'Pertumpahan Darah',
   'entities.abilities.cat_form.description':
     'Berubah wujud menjadi serigala: daya serang naik seiring levelmu, seranganmu memakai energi dan poin kombo, dan kau menghasilkan 29% lebih sedikit ancaman. Rapal lagi untuk kembali ke wujud perapal.',
@@ -1209,7 +1588,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard.',
   'entities.abilities.charge.name': 'Serbuan',
   'entities.abilities.cheap_shot.description':
-    'Menyerang target, menyetrumnya selama 4 detik. Harus dalam siluman. Memberi 2 poin kombo.',
+    'Menyerang target sebesar {damage} kerusakan, menyetrumnya selama 4 detik. Harus dalam siluman. Memberi 2 poin kombo.',
   'entities.abilities.cheap_shot.name': 'Pukulan Ulu Hati',
   'entities.abilities.claw.description':
     'Mencakar musuh untuk kerusakan senjata plus {damage}. Memberi 1 poin kombo. Hanya dalam Wujud Serigala.',
@@ -1218,10 +1597,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Sabetan menyapu yang menghantam semua musuh di hadapanmu untuk {damage} kerusakan.',
   'entities.abilities.cleave.name': 'Busur Penuai',
   'entities.abilities.commanding_shout.description':
-    'Meningkatkan Staminamu sebesar 6 selama 2 menit.',
+    'Meningkatkan Staminamu sebesar {buff} selama 2 menit.',
   'entities.abilities.commanding_shout.name': 'Seruan Penguat',
   'entities.abilities.concussive_shot.description':
-    'Membuat target linglung, memperlambat gerakan sebesar 50% selama 4 detik.',
+    'Membuat target linglung sebesar {damage} kerusakan, memperlambat gerakan sebesar 50% selama 4 detik.',
   'entities.abilities.concussive_shot.name': 'Tembakan Pengguncang',
   'entities.abilities.conjure_food.description':
     'Menciptakan 2 porsi roti, memulihkan nyawa saat disantap. Tingkat lebih tinggi menciptakan hidangan yang lebih mengenyangkan.',
@@ -1230,13 +1609,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menciptakan 2 botol air, memulihkan mana saat diminum. Tingkat lebih tinggi menciptakan air yang lebih murni.',
   'entities.abilities.conjure_water.name': 'Waterbind',
   'entities.abilities.consecration.description':
-    'Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci.',
+    'Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci setiap 2 detik selama 10 detik.',
   'entities.abilities.consecration.name': 'Tanah Suci',
   'entities.abilities.corruption.description':
     'Mencemari target, menimbulkan {damage} kerusakan Bayangan selama 18 detik.',
   'entities.abilities.corruption.name': 'Blackrot',
   'entities.abilities.crippling_poison.description':
-    'Menyerang target dengan bisa timah, menimbulkan {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik.',
+    'Menyerang target dengan bisa timah, memberi {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik.',
   'entities.abilities.crippling_poison.name': 'Bisa Timah',
   'entities.abilities.curse_of_agony.description':
     'Mengutuk target dengan penderitaan: {damage} kerusakan Bayangan selama 24 detik.',
@@ -1251,21 +1630,21 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kuda-kuda tempur bertahan: kamu menghasilkan 30% lebih banyak ancaman tetapi memberi dan menerima 10% lebih sedikit kerusakan. Rapal lagi untuk meninggalkan kuda-kuda ini.',
   'entities.abilities.defensive_stance.name': 'Kuda-kuda Waspada',
   'entities.abilities.demon_skin.description':
-    'Kulit iblis meningkatkan zirahmu sebesar 30 selama 30 menit.',
+    'Kulit iblis meningkatkan zirahmu sebesar {buff} selama 30 menit.',
   'entities.abilities.demon_skin.name': 'Fiendhide',
   'entities.abilities.demoralizing_roar.description':
     'Melemahkan semangat musuh di sekitar, mengurangi kekuatan serang mereka sebesar 20 selama 20 detik. Hanya dalam Wujud Bruin.',
   'entities.abilities.demoralizing_roar.name': 'Auman Pengecut',
   'entities.abilities.demoralizing_shout.description':
-    'Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar 30 selama 30 detik.',
+    'Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar {buff} selama 30 detik.',
   'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.devotion_aura.description':
-    'Meningkatkan zirahmu sebesar 40 selama 30 menit.',
+    'Meningkatkan zirahmu sebesar {buff} selama 30 menit.',
   'entities.abilities.devotion_aura.name': 'Aura Teguh',
   'entities.abilities.dismiss_pet.description': 'Melepaskan peliharaanmu kembali ke alam liar.',
   'entities.abilities.dismiss_pet.name': 'Lepaskan Pendamping',
   'entities.abilities.divine_protection.description':
-    'Perisai pelindung menyerap 50 kerusakan selama 10 detik.',
+    'Perisai suci menyerap {damage} kerusakan selama 10 detik.',
   'entities.abilities.divine_protection.name': 'Tameng Iman',
   'entities.abilities.drain_life.description':
     'Menyedot nyawa target, memindahkan {damage} kesehatan kepadamu setiap detik selama 5 detik.',
@@ -1282,8 +1661,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.evasion.description':
     'Meningkatkan peluang mengelakmu sebesar 50% selama 15 detik.',
   'entities.abilities.evasion.name': 'Ghostfoot',
-  'entities.abilities.eviscerate.description':
-    'Gerakan penutup yang menimbulkan kerusakan per poin kombo.',
+  'entities.abilities.eviscerate.description': 'Gerakan penutup yang menyebabkan {damage}.',
   'entities.abilities.eviscerate.name': 'Tidur Abadi',
   'entities.abilities.execute.description':
     'Berupaya menghabisi musuh yang terluka, menimbulkan {damage} kerusakan. Hanya dapat digunakan pada musuh di bawah 20% kesehatan.',
@@ -1292,16 +1670,16 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengusir yang jahat dengan murka Suci, menimbulkan {damage} kerusakan Suci.',
   'entities.abilities.exorcism.name': 'Ritus Pengusiran',
   'entities.abilities.expose_armor.description':
-    'Gerakan penutup yang menyingkap target, mengurangi zirahnya. Semakin banyak poin kombo yang dihabiskan, semakin dalam sayatannya.',
+    'Gerakan penutup yang menyingkap target, mengurangi zirahnya sebesar {damage} selama 30 detik.',
   'entities.abilities.expose_armor.name': 'Tembus Zirah',
   'entities.abilities.faerie_fire.description':
-    'Mengurangi zirah target sebesar 35 selama 40 detik.',
+    'Mengurangi zirah target sebesar 35 selama 30 detik.',
   'entities.abilities.faerie_fire.name': 'Witchlight',
   'entities.abilities.fear.description':
     'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 8 detik. Kerusakan apa pun mematahkan efeknya.',
   'entities.abilities.fear.name': 'Cekaman',
   'entities.abilities.ferocious_bite.description':
-    'Gerakan penutup yang menimbulkan kerusakan per poin kombo. Hanya dalam Wujud Serigala.',
+    'Gerakan penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.',
   'entities.abilities.ferocious_bite.name': 'Gorebite',
   'entities.abilities.fire_blast.description':
     'Meledakkan musuh sebesar {damage} kerusakan Api. Seketika.',
@@ -1311,24 +1689,24 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.name': 'Cinderbolt',
   'entities.abilities.rain_of_fire.name': 'Hujan Api',
   'entities.abilities.rain_of_fire.description':
-    'Menurunkan hujan api di area sasaran, membakar musuh sebesar {damage} kerusakan Api.',
+    'Menurunkan hujan api di area sasaran selama 4 detik, membakar musuh sebesar {damage} kerusakan Api setiap detik.',
   'entities.abilities.volley.name': 'Hujan Panah',
   'entities.abilities.volley.description':
-    'Menghujani area sasaran dengan panah, memberi {damage} kerusakan kepada musuh di dalamnya.',
+    'Menghujani area sasaran dengan panah selama 3 detik, memberi {damage} kerusakan setiap 0.5 detik kepada musuh di dalamnya.',
   'entities.abilities.hurricane.name': 'Badai',
   'entities.abilities.hurricane.description':
-    'Mendatangkan badai di area sasaran, menghantam musuh sebesar {damage} kerusakan Alam.',
+    'Mendatangkan badai di area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap detik.',
   'entities.abilities.earthquake.name': 'Gempa Bumi',
   'entities.abilities.earthquake.description':
-    'Mengguncang area sasaran, menghantam musuh sebesar {damage} kerusakan Alam.',
+    'Mengguncang area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap 1.5 detik.',
   'entities.abilities.flamestrike.name': 'Hantaman Api',
   'entities.abilities.flamestrike.description':
     'Memanggil ledakan api di area sasaran, memberikan {damage} kerusakan Api kepada musuh yang terkena ledakan.',
   'entities.abilities.flame_shock.description':
-    'Membakar target dengan api sebesar 25 kerusakan ditambah {damage} selama 12 detik.',
+    'Membakar target dengan api sebesar {damage} kerusakan ditambah {overTime} selama 12 detik.',
   'entities.abilities.flame_shock.name': 'Sentakan Bara',
   'entities.abilities.flametongue_weapon.description':
-    'Mengisi senjatamu dengan api elemental: setiap ayunan memberi 8 kerusakan Api tambahan selama 5 menit.',
+    'Mengisi senjatamu dengan api elemental: setiap ayunan memberi {damage} kerusakan Api tambahan selama 5 menit.',
   'entities.abilities.flametongue_weapon.name': 'Senjata Pyrebrand',
   'entities.abilities.flash_heal.description':
     'Doa cepat yang menyembuhkan target sekutu sebesar {damage}.',
@@ -1337,7 +1715,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Semburan Cahaya yang cepat dan efisien yang menyembuhkan target sekutu sebesar {damage}.',
   'entities.abilities.flash_of_light.name': 'Lightmend',
   'entities.abilities.frost_armor.description':
-    'Menyelubungimu dengan embun beku, meningkatkan zirah sebesar 30 selama 30 menit.',
+    'Menyelubungimu dengan embun beku, meningkatkan zirah sebesar {buff} selama 30 menit.',
   'entities.abilities.frost_armor.name': 'Mantel Embun Beku',
   'entities.abilities.frost_nova.description':
     'Membekukan semua musuh di sekitar di tempatnya hingga 8 detik, memberi {damage} kerusakan Beku.',
@@ -1349,24 +1727,25 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melepaskan panah embun beku, menimbulkan {damage} kerusakan Beku dan memperlambat gerakan sebesar 40%.',
   'entities.abilities.frostbolt.name': 'Rimelance',
   'entities.abilities.frostbrand_weapon.description':
-    'Mengisi senjatamu dengan embun beku yang menggigit: setiap ayunan memberi 8 kerusakan tambahan selama 5 menit.',
+    'Mengisi senjatamu dengan embun beku yang menggigit: setiap ayunan memberi {damage} kerusakan tambahan selama 5 menit.',
   'entities.abilities.frostbrand_weapon.name': 'Senjata Rimebound',
   'entities.abilities.garrote.description':
-    'Menjerat musuh, menimbulkan kerusakan sekarang dan membuatnya berdarah sebesar {damage} selama 18 detik. Harus dalam siluman. Memberi 1 poin kombo.',
+    'Menjerat musuh, menimbulkan {damage} kerusakan sekarang dan membuatnya berdarah sebesar {overTime} selama 18 detik. Harus dalam siluman. Memberi 1 poin kombo.',
   'entities.abilities.garrote.name': 'Kawat Leher',
   'entities.abilities.ghost_wolf.description':
     'Mengubahmu menjadi Shadewolf, meningkatkan kecepatan gerak sebesar 40% selama 10 menit.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.gouge.description':
-    'Menyerang target, melumpuhkannya selama 4 detik. Kerusakan apa pun mematahkan efeknya. Memberi 1 poin kombo.',
+    'Menyerang target sebesar {damage} kerusakan, melumpuhkannya selama 4 detik. Kerusakan apa pun mematahkan efeknya. Memberi 1 poin kombo.',
   'entities.abilities.gouge.name': 'Colok Mata',
   'entities.abilities.growl.description':
     'Menggeram pada target: ancamanmu naik menyamai musuh yang paling dibencinya dan ia terdorong untuk menyerangmu selama 3 detik. Hanya dalam Wujud Bruin.',
   'entities.abilities.growl.name': 'Gertakan',
-  'entities.abilities.hammer_of_justice.description': 'Membuat target terpana selama 3 detik.',
+  'entities.abilities.hammer_of_justice.description':
+    'Membuat target terpana selama {duration} detik.',
   'entities.abilities.hammer_of_justice.name': 'Palu Pembelah',
   'entities.abilities.hamstring.description':
-    'Melukai musuh sebesar 5 kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik.',
+    'Melukai musuh sebesar {damage} kerusakan, memperlambat gerakannya sebesar 50% selama 15 detik.',
   'entities.abilities.hamstring.name': 'Sayatan Pincang',
   'entities.abilities.heal.description':
     'Doa yang lambat namun ampuh yang menyembuhkan target sekutu sebesar {damage}.',
@@ -1384,10 +1763,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_light.description': 'Menyembuhkan target sekutu sebesar {damage}.',
   'entities.abilities.holy_light.name': 'Cahaya Pemulih',
   'entities.abilities.ice_barrier.description':
-    'Melindungimu dengan es, menyerap 130 kerusakan selama 60 detik.',
+    'Melindungimu dengan es, menyerap {damage} kerusakan selama 60 detik.',
   'entities.abilities.ice_barrier.name': 'Selubung Beku',
   'entities.abilities.immolate.description':
-    'Membakar musuh sebesar 11 kerusakan Api dan tambahan {damage} selama 15 detik.',
+    'Membakar musuh sebesar {damage} kerusakan Api dan tambahan {overTime} selama 15 detik.',
   'entities.abilities.immolate.name': 'Pakta Membara',
   'entities.abilities.insect_swarm.description':
     'Musuh dikerumuni serangga, menerima {damage} kerusakan Alam selama 12 detik.',
@@ -1402,20 +1781,20 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Gerakan penutup yang membuat target terpana. Bertahan 1 detik lebih lama per poin kombo.',
   'entities.abilities.kidney_shot.name': 'Pukulan Curang',
   'entities.abilities.lay_on_hands.description':
-    'Lonjakan penyembuhan masif: memulihkan 250 kesehatan. Jeda 10 menit.',
+    'Lonjakan penyembuhan masif: memulihkan {damage} kesehatan. Jeda 10 menit.',
   'entities.abilities.lay_on_hands.name': 'Ritus Terakhir',
   'entities.abilities.lesser_heal.description': 'Menyembuhkan target sekutu sebesar {damage}.',
   'entities.abilities.lesser_heal.name': 'Doa Berbisik',
-  'entities.abilities.life_tap.description': 'Mengubah 30 kesehatan menjadi 30 mana.',
+  'entities.abilities.life_tap.description': 'Mengubah {damage} kesehatan menjadi {damage} mana.',
   'entities.abilities.life_tap.name': 'Tawar Getir',
   'entities.abilities.lightning_bolt.description':
     'Melontarkan sambaran petir sebesar {damage} kerusakan Alam.',
   'entities.abilities.lightning_bolt.name': 'Sambaran Busur',
   'entities.abilities.lightning_shield.description':
-    'Menyelubungimu dengan petir yang menggelegar: penyerang jarak dekat menerima 13 kerusakan Alam.',
+    'Menyelubungimu dengan petir yang menggelegar: penyerang jarak dekat menerima {buff} kerusakan Alam, hingga 3 muatan dan paling sering sekali setiap 5 detik.',
   'entities.abilities.lightning_shield.name': 'Tameng Guntur',
   'entities.abilities.mark_of_the_wild.description':
-    'Menempatkan Wildward pada target sekutu, meningkatkan zirah sebesar 25 selama 30 menit.',
+    'Menempatkan Wildward pada target sekutu, meningkatkan zirah sebesar {buff} selama 30 menit.',
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.maul.description':
     'Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman tinggi. Aktif pada ayunan berikutnya. Hanya dalam Wujud Bruin.',
@@ -1427,7 +1806,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik.',
   'entities.abilities.mind_flay.name': 'Litani Nestapa',
   'entities.abilities.mongoose_bite.description':
-    'Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah 12. Tidak dapat dielakkan.',
+    'Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan.',
   'entities.abilities.mongoose_bite.name': 'Counterfang',
   'entities.abilities.moonfire.description':
     'Membakar musuh dengan api bulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu.',
@@ -1436,19 +1815,19 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan ganas yang menimbulkan kerusakan senjata ditambah {damage}. (Ciri khas Arms)',
   'entities.abilities.mortal_strike.name': 'Serangan Pelukai',
   'entities.abilities.overpower.description':
-    'Serangan seketika sebesar kerusakan senjata +5. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan.',
+    'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Hanya dapat digunakan setelah target mengelak. Tidak dapat dielakkan.',
   'entities.abilities.overpower.name': 'Redhand',
   'entities.abilities.polymorph.description':
-    'Mengubah musuh menjadi katak hingga 15 detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid.',
+    'Mengubah musuh menjadi katak hingga {duration} detik. Katak itu berkeliaran dan menyembuh dengan cepat. Kerusakan apa pun mematahkan efeknya. Hanya hewan buas dan makhluk humanoid.',
   'entities.abilities.polymorph.name': 'Guna-guna',
   'entities.abilities.pounce.description':
     'Pembuka siluman yang membuat target terpana selama 2 detik. Memberi 1 poin kombo. Hanya dalam Wujud Serigala.',
   'entities.abilities.pounce.name': 'Slinkstrike',
   'entities.abilities.power_word_fortitude.description':
-    'Meningkatkan Stamina target sebesar 3 selama 30 menit.',
+    'Meningkatkan Stamina target sebesar {buff} selama 30 menit.',
   'entities.abilities.power_word_fortitude.name': 'Litani Ketabahan',
   'entities.abilities.power_word_shield.description':
-    'Melindungi target, menyerap 48 kerusakan selama 30 detik.',
+    'Melindungi target, menyerap {damage} kerusakan selama 30 detik.',
   'entities.abilities.power_word_shield.name': 'Mazmur Penangkal',
   'entities.abilities.prowl.description':
     'Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran.',
@@ -1463,7 +1842,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan kecepatan serangmu sebesar 40% selama 15 detik.',
   'entities.abilities.rapid_fire.name': 'Tarikan Menggebu',
   'entities.abilities.raptor_strike.description':
-    'Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar 5. Aktif pada ayunan berikutnya.',
+    'Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar {damage}. Aktif pada ayunan berikutnya.',
   'entities.abilities.raptor_strike.name': 'Serangan Cabik Perut',
   'entities.abilities.regrowth.description':
     'Menyembuhkan target sekutu sebesar {damage} dan jumlah tambahan selama 21 detik.',
@@ -1472,7 +1851,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyembuhkan target sebesar {damage} selama 12 detik.',
   'entities.abilities.rejuvenation.name': 'Wildbloom',
   'entities.abilities.rend.description':
-    'Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama 9 detik.',
+    'Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama {duration} detik.',
   'entities.abilities.rend.name': 'Sayatan Dalam',
   'entities.abilities.renew.description': 'Menyembuhkan target sebesar {damage} selama 15 detik.',
   'entities.abilities.renew.name': 'Rahmat Berlanjut',
@@ -1486,10 +1865,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan ancaman yang dihasilkan oleh kerusakan Suci-mu sebesar 60% selama 30 menit. Landasan utama paladin penahan serangan.',
   'entities.abilities.righteous_fury.name': 'Sumpah Membara',
   'entities.abilities.rip.description':
-    'Gerakan penutup yang menyebabkan kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala.',
+    'Gerakan penutup yang menyebabkan {damage} kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala.',
   'entities.abilities.rip.name': 'Robekan',
   'entities.abilities.rockbiter_weapon.description':
-    'Mengisi senjatamu dengan amukan batu: setiap ayunan memberikan 5 kerusakan tambahan selama 5 menit.',
+    'Mengisi senjatamu dengan amukan batu: setiap ayunan memberikan {damage} kerusakan tambahan selama 5 menit.',
   'entities.abilities.rockbiter_weapon.name': 'Senjata Stonebound',
   'entities.abilities.rupture.description':
     'Gerakan penutup yang melukai target, membuatnya berdarah sebesar {damage} selama 16 detik.',
@@ -1501,7 +1880,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghanguskan musuh sebesar {damage} kerusakan Api. Cepat dirapal.',
   'entities.abilities.scorch.name': 'Lepuh',
   'entities.abilities.seal_of_righteousness.description':
-    'Memenuhi dirimu dengan kekuatan Suci selama 30 detik, membuat setiap ayunan jarak dekatmu memberikan 4 kerusakan Suci tambahan. Lepaskan dengan Vonis.',
+    'Memenuhi dirimu dengan kekuatan Suci selama 30 detik, membuat setiap ayunan jarak dekatmu memberikan {damage} kerusakan Suci tambahan. Lepaskan dengan Vonis.',
   'entities.abilities.seal_of_righteousness.name': 'Oathbrand',
   'entities.abilities.searing_pain.description':
     'Membakar musuh dengan api menyiksa sebesar {damage} kerusakan Api. Cepat dirapal.',
@@ -1519,7 +1898,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Seketika menghantam target dengan bayangan membara sebesar {damage} kerusakan Bayangan.',
   'entities.abilities.shadowburn.name': 'Api Senja',
   'entities.abilities.shield_slam.description':
-    'Menghantam target dengan perisaimu sebesar {damage} dan ancaman besar. (Ciri khas Perlindungan)',
+    'Menghantam target dengan perisaimu sebesar 50% kerusakan senjata ditambah {damage} dan ancaman besar. (Ciri khas Perlindungan)',
   'entities.abilities.shield_slam.name': 'Shieldcrack',
   'entities.abilities.sinister_strike.description':
     'Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin kombo.',
@@ -1565,8 +1944,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_voidwalker.description':
     'Memanggil Gloomshade di bawah perintah Penyihir Iblis. Gloomshade adalah iblis kokoh yang memprovokasi musuhmu dan menyerap hantaman. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu.',
   'entities.abilities.summon_voidwalker.name': 'Panggil Gloomshade',
-  'entities.abilities.sunder_armor.description':
-    'Membelah zirah target, menguranginya sebesar {damage} per penerapan. Bertumpuk hingga 5 kali. Menghasilkan ancaman dalam jumlah tinggi.',
   'entities.abilities.sunder_armor.name': 'Robek Zirah',
   'entities.abilities.swipe.description':
     'Menyabet musuh di sekitar sebesar {damage} kerusakan. Menyebabkan ancaman ekstra. Hanya dalam Wujud Bruin.',
@@ -1578,7 +1955,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memprovokasi target: ancamanmu naik menyamai musuhnya yang paling dibenci dan ia terpaksa menyerangmu selama 3 detik.',
   'entities.abilities.taunt.name': 'Hasutan',
   'entities.abilities.thorns.description':
-    'Duri bertunas dari target: penyerang jarak dekat menerima 3 kerusakan Alam.',
+    'Duri bertunas dari target: penyerang jarak dekat menerima {buff} kerusakan Alam.',
   'entities.abilities.thorns.name': 'Briarguard',
   'entities.abilities.thunder_clap.description':
     'Menghantam musuh di sekitar sebesar {damage} kerusakan dan memperlambat serangan mereka sebesar 10% selama 10 detik.',
@@ -1596,7 +1973,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Berputar dalam busur mematikan, menyerang semua musuh di sekitar sebesar {damage}. (Talenta Murka)',
   'entities.abilities.whirlwind.name': 'Pusaran Berpisau',
   'entities.abilities.wing_clip.description':
-    'Menimbulkan luka yang memperlambat musuh sebesar 40% selama 10 detik.',
+    'Menimbulkan luka sebesar {damage} kerusakan, memperlambat musuh sebesar 40% selama 10 detik.',
   'entities.abilities.wing_clip.name': 'Tebasan Pembelenggu',
   'entities.abilities.wrath.description':
     'Melontarkan panah energi alam sebesar {damage} kerusakan Alam.',
@@ -1823,6 +2200,18 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.gathering_sickle.name': 'Sabit Panen',
   'entities.items.bronze_sickle.name': 'Sabit Perunggu',
   'entities.items.silverleaf_sickle.name': 'Sabit Daun Perak',
+  'entities.items.thorium_mining_pick.name': 'Beliung Tambang Thorium',
+  'entities.items.arcanite_mining_pick.name': 'Beliung Tambang Arcanite',
+  'entities.items.ashwood_axe.name': 'Kapak Kayu Abu',
+  'entities.items.elderwood_axe.name': 'Kapak Kayu Tua',
+  'entities.items.goldleaf_sickle.name': 'Sabit Daun Emas',
+  'entities.items.sunpetal_sickle.name': 'Sabit Kelopak Matahari',
+  'entities.items.thorium_ore.name': 'Bijih Torium',
+  'entities.items.arcanite_bar.name': 'Batangan Arkanit',
+  'entities.items.ashwood_log.name': 'Kayu Gelondongan Abu',
+  'entities.items.elderwood_log.name': 'Kayu Gelondongan Tua Elder',
+  'entities.items.goldleaf_herb.name': 'Herba Daun Emas',
+  'entities.items.sunpetal_herb.name': 'Herba Kelopak Matahari',
   'entities.items.moongate_rubbing.name': 'Gosokan Penangkal',
   'entities.items.moonpale_scale.name': 'Sisik Pucat Bulan',
   'entities.items.moonscale_saber.name': 'Sabel Sisik Bulan',
@@ -4688,6 +5077,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.autorun': 'Lari Otomatis',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik Nonaktif',
+  'hudChrome.mobile.hotbarPage': 'Kemampuan',
+  'hudChrome.mobile.hotbarPageAria': 'Tampilkan rangkaian kemampuan berikutnya',
   'hudChrome.mobile.jump': 'Lompat',
   'hudChrome.mobile.leaderboard': 'Peringkat',
   'hudChrome.mobile.nameplates': 'Nama',
@@ -4756,6 +5147,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.labels.programs': 'Shader',
   'hudChrome.perf.labels.renderScale': 'Skala Render',
   'hudChrome.perf.labels.snapshot': 'Laju Snapshot',
+  'hudChrome.perf.labels.serverTick': 'Laju Tick Server',
   'hudChrome.perf.labels.textures': 'Tekstur',
   'hudChrome.perf.labels.triangles': 'Segitiga',
   'hudChrome.perf.opacity': 'Keburaman Latar',
@@ -5598,7 +5990,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Semua instansi {name} sedang sibuk. Coba lagi sebentar lagi.',
   'worldContent.dungeonPartyWarning':
     '{name} ditujukan untuk satu party penuh berisi {count}. Berhati-hatilah.',
-  // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Memberikan {value} kerusakan {school} setiap {interval} dtk',
   'hudChrome.auraEffect.hot': 'Memulihkan {value} kesehatan setiap {interval} dtk',
   'hudChrome.auraEffect.absorb': 'Menyerap {value} kerusakan',
@@ -5917,7 +6308,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jangan sekarang',
   'hudChrome.nativeUpdate.title': 'Pembaruan Tersedia',
   'hudChrome.nativeUpdate.update': 'Perbarui',
-  // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'Pos Gagak',
   'entities.letters.ravenpost_welcome.subject': 'Kini para gagak terbang untukmu',
   'entities.letters.ravenpost_welcome.body':
@@ -5934,4 +6324,261 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Apa yang kaulakukan dalam gelap',
   'entities.letters.letter_q_hollow.body':
     'Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric',
+  'hudChrome.gathering.herbalism': 'Herbalisme',
+  'hudChrome.gathering.logging': 'Penebangan',
+  'hudChrome.gathering.mining': 'Penambangan',
+  'hudChrome.gathering.title': 'Pengumpulan',
+  'errors.api.accountSessionLimit':
+    'Terlalu banyak karakter dari akun ini yang sudah berada di dalam dunia.',
+  'errors.api.crossSiteOrigin': 'Permintaan diblokir karena alasan keamanan.',
+  'errors.api.unsupportedMediaType': 'Format permintaan tidak didukung.',
+  'apiError.account.characters_online': 'Keluarkan semua karakter Anda sebelum menonaktifkan akun.',
+  'apiError.account.deactivated':
+    'Akun ini telah dinonaktifkan. Hubungi admin untuk memulihkannya.',
+  'apiError.account.not_found': 'Akun tidak ditemukan.',
+  'apiError.account.password_too_long': 'Kata sandi baru harus maksimal 128 karakter.',
+  'apiError.account.password_too_short': 'Kata sandi harus minimal 6 karakter.',
+  'apiError.account.username_invalid':
+    'Nama pengguna harus 3-24 karakter dan menggunakan huruf, angka, atau garis bawah.',
+  'apiError.account.username_mismatch': 'Nama pengguna itu tidak cocok dengan akun Anda.',
+  'apiError.account.username_not_allowed': 'Nama pengguna itu tidak diperbolehkan.',
+  'apiError.account.username_taken': 'Nama pengguna itu sudah dipakai.',
+  'apiError.auth.current_password_incorrect': 'Kata sandi Anda saat ini salah.',
+  'apiError.auth.forbidden': 'Anda tidak memiliki izin untuk melakukan itu.',
+  'apiError.auth.invalid_credentials': 'Nama pengguna atau kata sandi salah.',
+  'apiError.auth.password_incorrect': 'Kata sandi Anda salah.',
+  'apiError.auth.required': 'Belum terautentikasi.',
+  'apiError.auth.token_invalid': 'Sesi Anda telah kedaluwarsa. Silakan masuk lagi.',
+  'apiError.auth.token_missing': 'Anda harus masuk untuk melakukan itu.',
+  'apiError.auth.too_many_attempts': 'Terlalu banyak percobaan. Tunggu semenit lalu coba lagi.',
+  'apiError.auth.too_many_failed_attempts':
+    'Terlalu banyak percobaan gagal. Tunggu beberapa menit lalu coba lagi.',
+  'apiError.auth.verification_failed': 'Verifikasi gagal. Silakan coba lagi.',
+  'apiError.auth.web_login_only': 'Masuk hanya diperbolehkan dari klien permainan.',
+  'apiError.body.too_large':
+    'Permintaan itu terlalu besar. Coba lagi dengan data yang lebih sedikit.',
+  'apiError.body.unsupported_media_type': 'Format permintaan tidak didukung.',
+  'apiError.character.already_in_world': 'Karakter sudah berada di dalam dunia.',
+  'apiError.character.delete_confirm': 'Ketik nama karakter untuk mengonfirmasi penghapusan.',
+  'apiError.character.invalid_class': 'Kelas tidak valid.',
+  'apiError.character.limit_reached': 'Batas karakter telah tercapai.',
+  'apiError.character.name_invalid': 'Nama karakter tidak valid. Gunakan 2-16 huruf.',
+  'apiError.character.name_not_allowed': 'Nama karakter itu tidak diperbolehkan.',
+  'apiError.character.name_taken': 'Nama itu sudah dipakai.',
+  'apiError.character.not_found': 'Karakter tidak ditemukan.',
+  'apiError.character.online': 'Karakter sedang daring.',
+  'apiError.character.rename_not_permitted': 'Mengganti nama karakter ini tidak diperbolehkan.',
+  'apiError.character.rename_required':
+    'Karakter ini harus diganti namanya sebelum memasuki dunia.',
+  'apiError.character.taken_over': 'Karakter Anda telah diambil alih oleh sesi lain.',
+  'apiError.db.conflict': 'Perubahan itu berbenturan dengan pembaruan lain. Silakan coba lagi.',
+  'apiError.discord.already_linked': 'Akun Discord itu sudah tertaut ke akun lain.',
+  'apiError.discord.expired':
+    'Proses masuk Discord itu telah kedaluwarsa. Silakan masuk dengan Discord lagi.',
+  'apiError.discord.link_required': 'Tautkan akun Discord Anda terlebih dahulu.',
+  'apiError.discord.not_configured': 'Integrasi Discord tidak tersedia saat ini.',
+  'apiError.discord.password_required': 'Atur kata sandi sebelum memutus tautan akun Discord Anda.',
+  'apiError.discord.swag_claimed': 'Anda sudah mengklaim hadiah ini.',
+  'apiError.discord.swag_points': 'Poin tidak cukup.',
+  'apiError.discord.swag_tier': 'Capai peringkat yang lebih tinggi untuk mengklaim ini.',
+  'apiError.discord.unknown_swag': 'Hadiah itu tidak tersedia.',
+  'apiError.email.invalid': 'Masukkan alamat email yang valid.',
+  'apiError.email.unchanged': 'Itu sudah menjadi alamat email Anda.',
+  'apiError.internal.error': 'Terjadi kesalahan di pihak kami. Silakan coba lagi.',
+  'apiError.json.malformed': 'Permintaan itu tidak dapat dibaca. Silakan coba lagi.',
+  'apiError.moderation.banned': 'Akun ini telah diblokir.',
+  'apiError.moderation.force_rename':
+    'Seorang moderator mengharuskan salah satu karakter Anda diganti namanya.',
+  'apiError.moderation.suspended': 'Akun ini ditangguhkan.',
+  'apiError.moderation.suspended_until': 'Akun ini ditangguhkan hingga {date}.',
+  'apiError.origin.cross_site': 'Permintaan diblokir karena alasan keamanan.',
+  'apiError.rate_limit.exceeded': 'Terlalu banyak permintaan. Coba lagi dalam {seconds}.',
+  'apiError.two_factor.already_enabled': 'Autentikasi dua-faktor sudah diaktifkan.',
+  'apiError.two_factor.code_invalid': 'Kode itu tidak valid, coba lagi.',
+  'apiError.two_factor.not_enabled': 'Autentikasi dua-faktor belum diaktifkan.',
+  'apiError.two_factor.setup_required': 'Mulai penyiapan autentikasi dua-faktor terlebih dahulu.',
+  'apiError.validation.failed': 'Beberapa kolom tidak valid. Periksa formulir lalu coba lagi.',
+  'download.linuxCta': 'Unduh untuk Linux',
+  'download.linuxHint':
+    'AppImage: membuatnya dapat dieksekusi, lalu jalankan. Tidak perlu instalasi.',
+  'loading.reconnecting': 'Koneksi terputus. Menyambungkan kembali...',
+  'guide.nav.settings': 'Pengaturan & Kinerja',
+  'guide.settingsPage.advancedBody':
+    'Lanjutan dimulai dari tingkat High dan membuka empat pemetik tambahan, sehingga Anda dapat menggunakan bingkai di tempat yang benar-benar Anda sadari: Detail Medan, Kepadatan Dedaunan, Efek & Pencahayaan, dan Kualitas Bayangan. Seperti Kualitas Grafis, ini berlaku setelah memuat ulang.',
+  'guide.settingsPage.advancedHeading': 'Prasetel Lanjutan: campur sendiri',
+  'guide.settingsPage.advancedMixes':
+    'Dua campuran favorit: pertahankan Kualitas Bayangan pada High dan atur Efek & Pencahayaan ke Low untuk tampilan tajam dan bebas cahaya yang menyala, atau lakukan sebaliknya untuk menjaga mekarnya dan melembutkan bayangan.',
+  'guide.settingsPage.balancedTagline':
+    'Titik terbaik untuk sebagian besar mesin, dan saran default kami.',
+  'guide.settingsPage.balancedTitle': 'Seimbang',
+  'guide.settingsPage.balancedWhy':
+    'Medium menghadirkan bayangan nyata dan materi lengkap; High menambahkan oklusi dan mekar sekitar. Di bawah Ultra, jaring pengaman internal menyerap penurunan tiba-tiba dalam pertarungan yang sibuk, sehingga Balanced tetap mulus tanpa harus menjaga anak.',
+  'guide.settingsPage.colDoes': 'Apa fungsinya',
+  'guide.settingsPage.colImpact': 'FPS dampak',
+  'guide.settingsPage.colSetting': 'Pengaturan',
+  'guide.settingsPage.factDetectBody':
+    'Pada peluncuran pertama Anda, game membaca perangkat Anda dan memilih tingkatan yang masuk akal, dari Low di ponsel sederhana hingga Ultra di desktop yang kuat. Pilihan apa pun yang Anda buat sendiri selalu menang.',
+  'guide.settingsPage.factDetectTitle': 'Permainan ini menyetel dirinya sendiri terlebih dahulu',
+  'guide.settingsPage.factGovernorBody':
+    'Di setiap tingkatan di bawah Ultra, game secara diam-diam menipiskan rumput, efek, dan pencahayaan sesaat ketika pertarungan besar terjadi, lalu memulihkannya. Memilih Ultra menunjukkan bahwa Anda lebih suka menyimpan setiap detail.',
+  'guide.settingsPage.factGovernorTitle': 'Jaring pengaman bawaan',
+  'guide.settingsPage.factReloadBody':
+    'Kualitas Grafis dan Pemilih tingkat lanjut berlaku setelah memuat ulang, dan panel menawarkan tombol Muat Ulang Sekarang bila diperlukan. Setiap opsi lainnya berlaku saat Anda mengubahnya.',
+  'guide.settingsPage.factReloadTitle': 'Dua macam pilihan',
+  'guide.settingsPage.fairnessBody':
+    'Tidak ada pilihan di sini yang menukar keindahan dengan kekuasaan. Pengaturan Lower hanya menghilangkan polesan kosmetik, tidak pernah informasi yang Anda lawan: debuff, cast bar, kesehatan party, dan jumlah kerusakan Anda identik dari Low hingga Ultra. Bermain di mesin sederhana tidak pernah menjadi kendala.',
+  'guide.settingsPage.fairnessTitle': 'Adil berdasarkan desain',
+  'guide.settingsPage.fpsTagline': 'Untuk laptop lama, grafis terintegrasi, dan permainan baterai.',
+  'guide.settingsPage.fpsTitle': 'FPS terbaik',
+  'guide.settingsPage.fpsWhy':
+    'Kualitas Grafis adalah saklar utama, dan Kualitas Render adalah penggeser terkuat: pada 70%, dunia menggambar sekitar setengah piksel sementara antarmuka tetap sangat tajam.',
+  'guide.settingsPage.heading': 'Pengaturan & Kinerja',
+  'guide.settingsPage.howHeading': 'Bagaimana pilihan berperilaku',
+  'guide.settingsPage.impactHeavy': 'Berat',
+  'guide.settingsPage.impactLight': 'Lampu',
+  'guide.settingsPage.impactModerate': 'Sedang',
+  'guide.settingsPage.impactNone': 'Tidak ada',
+  'guide.settingsPage.intro':
+    'Jadikan game terlihat terbaik atau berjalan paling cepat. Tiga pemuatan siap pakai, ditambah fungsi sebenarnya dari setiap opsi grafis.',
+  'guide.settingsPage.loadoutsHeading': 'Tiga pemuatan siap pakai',
+  'guide.settingsPage.loadoutsIntro':
+    'Mulailah dari loadout yang terdengar seperti mesin Anda, lalu sesuaikan opsi satu per satu hingga dirasa tepat.',
+  'guide.settingsPage.mobileBody':
+    'Seluler mengelola lebih banyak hal untuk Anda: game memilih tingkatan, menjaga resolusi sedikit lebih rendah untuk melindungi baterai dan panas, dan mempertahankan tingkatan tertinggi hanya untuk desktop. Pemuatan di atas masih berlaku; ponsel cukup top out di High.',
+  'guide.settingsPage.mobileTitle': 'Di ponsel dan tablet',
+  'guide.settingsPage.recommended': 'Direkomendasikan',
+  'guide.settingsPage.rowBrightness':
+    'Eksposur pemandangan, lebih gelap atau lebih terang. Preferensi murni.',
+  'guide.settingsPage.rowBrowserEffects':
+    'Betapa mewahnya antarmuka itu sendiri: kaca buram, cahaya, menu animasi. Otomatis cocok dengan browser Anda; dunia 3D tidak tersentuh.',
+  'guide.settingsPage.rowEffectsQuality':
+    'Mekar, oklusi sekitar, dan berapa banyak obor dan mantra yang menghasilkan cahaya nyata. Penghematan terbesar di antara para pemilih Tingkat Lanjut.',
+  'guide.settingsPage.rowFieldOfView':
+    'Seberapa banyak bagian dunia yang dapat ditampilkan di layar, mulai dari zoom 55 hingga 100 derajat. Pilihan kenyamanan; pandangan yang lebih luas menarik sedikit lebih banyak.',
+  'guide.settingsPage.rowFoliageDensity':
+    'Seberapa jauh dan lebatnya rumput yang tumbuh di sekitar karakter Anda.',
+  'guide.settingsPage.rowFrostedPanels':
+    'Kaca buram kabur di balik jendela. Cantik, dan efek yang persis seperti yang dirasakan oleh browser yang lebih lemah; biarkan saja untuk tampilan klasik yang tajam.',
+  'guide.settingsPage.rowGraphicsQuality':
+    'Saklar utama. Setiap langkah mengubah resolusi, bayangan, material, dedaunan, dan efek pencahayaan secara bersamaan. Perbedaan terbesar yang dapat Anda buat.',
+  'guide.settingsPage.rowPerfOverlay':
+    'Pembacaan FPS di layar, waktu frame, dan banyak lagi. Aktifkan saat Anda menyetel halaman ini, lalu sembunyikan lagi.',
+  'guide.settingsPage.rowReduceMotion':
+    'Menghapus animasi antarmuka sehingga jendela muncul seketika. Opsi aksesibilitas terlebih dahulu, dengan bonus kinerja kecil.',
+  'guide.settingsPage.rowRenderQuality':
+    'Menggambar dunia 3D pada resolusi internal yang lebih rendah dan meningkatkannya; antarmuka tetap tajam. Penggeser instan terkuat pada mesin yang lebih lemah dan layar resolusi tinggi.',
+  'guide.settingsPage.rowShadowQuality':
+    'Kerenyahan bayangan. Low mempertahankan bayangan tetapi memperhalus tepinya.',
+  'guide.settingsPage.rowTerrainDetail':
+    'Tekstur tanah yang kaya dan tercampur versus tampilan medan yang lebih sederhana dan lebih cepat.',
+  'guide.settingsPage.rowWeather':
+    'Hujan dan salju sekitar. Hanya atmosfer saja, dan mematikannya akan menghemat sedikit saat terjadi badai.',
+  'guide.settingsPage.tableFoot':
+    'Mencari penggeser jarak imbang atau penutup FPS? Tidak ada yang perlu diburu: jarak pandang adalah bagian dari setiap tingkat kualitas, dan kecepatan bingkai mengikuti tampilan Anda.',
+  'guide.settingsPage.tableHeading': 'Setiap pilihan, jelaskan',
+  'guide.settingsPage.tagReload': 'setelah memuat ulang',
+  'guide.settingsPage.value100': '100%',
+  'guide.settingsPage.value50to70': '50 hingga 70%',
+  'guide.settingsPage.value90to100': '90 hingga 100%',
+  'guide.settingsPage.valueHighOrMedium': 'High di PC gaming, Medium di laptop',
+  'guide.settingsPage.valueOnOptional': 'Aktif (opsional)',
+  'guide.settingsPage.visualsTagline': 'Mode tangkapan layar untuk mesin desktop yang tangguh.',
+  'guide.settingsPage.visualsTitle': 'Visual Terbaik',
+  'guide.settingsPage.visualsWhy':
+    'Ultra ditampilkan pada resolusi tertinggi yang ditawarkan layar Anda dengan pencahayaan paling kaya. Ini juga menonaktifkan jaring pengaman, dan hanya untuk desktop: ponsel dan aplikasi berada pada posisi teratas di High.',
+  'guide.settingsPage.wherePath':
+    'Segala sesuatu di halaman ini ada di dalam game: tekan Esc dan lihat di Grafik, Antarmuka, dan Hamparan Kinerja.',
+  'guide.settingsPage.whyLabel': 'Mengapa ini berhasil:',
+  'hudChrome.crafting.close': 'Tutup kerajinan',
+  'hudChrome.crafting.craft': 'Keahlian',
+  'hudChrome.crafting.craftedToast': 'Dibuat: {name}',
+  'hudChrome.crafting.empty': 'Belum ada resep yang diketahui.',
+  'hudChrome.crafting.insufficientMaterials': 'Anda tidak memiliki bahan untuk itu.',
+  'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
+  'hudChrome.crafting.reagentsNeeded': 'Memerlukan:',
+  'hudChrome.crafting.resultAria': 'Kerajinan {name}',
+  'hudChrome.crafting.title': 'kerajinan',
+  'hudChrome.crafting.unknownRecipe': 'Resep itu tidak ada.',
+  'hudChrome.mobile.actionPageIndicator': 'Hal. {page}',
+  'hudChrome.mobile.actionPageToggle': 'Ganti halaman tindakan',
+  'hudChrome.mobile.actionRing': 'Aksi tempur',
+  'hudChrome.mobile.spellbookPageLabel': 'Halaman {page}',
+  'hudChrome.mobile.targetCycle': 'Tukar sasaran',
+  'hudChrome.mobile.targetCycleShort': 'Target',
+  'hudChrome.options.mobileCameraJoystick': 'Joystick kamera',
+  'hudChrome.options.mobileLeftHanded': 'Tata letak kidal',
+  'entities.quests.q_archetype_acceptance.title': 'Sebuah Kerajinan untuk Disebut Milik Anda',
+  'entities.quests.q_archetype_acceptance.text':
+    'Setiap pengrajin di Eastbrook akhirnya memilih satu kerajinan yang bisa mereka jadikan milik mereka. Buktikan diri Anda dengan satu akta, {playerName}, dan nyatakan jalur Anda.',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Jalan Anda telah dipilih; berjalan dengan baik.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Serigala Hutan dibunuh',
+  'entities.quests.q_prof_make_amends.title': 'Membuat Perubahan',
+  'entities.quests.q_prof_make_amends.text':
+    'Untuk menyisihkan satu kerajinan untuk kerajinan lainnya, seorang pengrajin harus terlebih dahulu memperbaiki jalur yang belum dilalui, {playerName}.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Perubahan dilakukan; jalan baru terbuka untuk Anda.',
+  'entities.quests.q_prof_make_amends.objectives.0.label': 'Serigala Hutan dibunuh',
+  'entities.npcs.bursar_aldous_crane.name': 'Bendahara Aldous Crane',
+  'entities.npcs.bursar_aldous_crane.title': 'Brankas Bersepuh Emas',
+  'entities.npcs.bursar_aldous_crane.greeting':
+    'Setiap peti, kotak harta, dan pernak-pernik aman bersama Brankas Bersepuh Emas.',
+  'entities.npcs.bursar_fernando.name': 'Bendahara Fernando',
+  'entities.npcs.bursar_fernando.title': 'Brankas Bersepuh Emas',
+  'entities.npcs.bursar_fernando.greeting':
+    'Selamat datang di Brankas Bersepuh Emas. Barang-barangmu tersimpan aman di balik kunci-kunci kami.',
+  'entities.npcs.bursar_petra_vell.name': 'Bendahara Petra Vell',
+  'entities.npcs.bursar_petra_vell.title': 'Brankas Bersepuh Emas',
+  'entities.npcs.bursar_petra_vell.greeting':
+    'Brankas Bersepuh Emas menjaga buku kas yang bersih dan lemari besi yang lebih bersih lagi. Apa yang hendak kami simpankan untukmu?',
+  'guide.economy.bankTitle': 'Bank',
+  'guide.economy.bankBody':
+    'Setiap kota pusat memiliki cabang Brankas Bersepuh Emas, rumah perbankan realm ini. Bicaralah dengan bendahara di sana untuk membuka lemari besimu, ruang simpanan pribadi di luar tasmu yang dimiliki karaktermu seumur hidup. Apa pun yang kamu titipkan pada mereka menunggu dengan aman, di cabang mana pun yang kamu kunjungi berikutnya.',
+  'guide.economy.bankHow':
+    'Saat lemari besi terbuka, klik sebuah barang di tasmu untuk menyetorkannya dan klik barang itu di lemari besi untuk mengambilnya kembali. Lemari besi hanya menampung barang, tidak pernah koin, dan barang misi tetap bersamamu. Saat tasmu penuh di tengah perjalanan, satu tombol menyapu semua bahan kerajinanmu masuk sekaligus.',
+  'guide.economy.bankSlots':
+    'Lemari besi yang baru mulai dari ukuran kecil dan tumbuh bersamamu. Bendahara menjual slot tambahan dengan koin pada harga yang kian menanjak, dan bermain online memberi ruang bonus di atasnya, untuk hal-hal seperti email terverifikasi, akun tertaut, dan teman yang kamu ajak masuk ke dalam permainan.',
+  'hudChrome.bank.title': 'Bank',
+  'hudChrome.bank.subtitle': 'Brankas Bersepuh Emas',
+  'hudChrome.bank.close': 'Tutup bank',
+  'hudChrome.bank.tooFar': 'Kamu harus berada di dekat bankir untuk melihat bankmu.',
+  'hudChrome.bank.empty': 'Bankmu kosong.',
+  'hudChrome.bank.capacity': '{used}/{total}',
+  'hudChrome.bank.capacityAria': 'Slot bank terpakai: {used} dari {total}',
+  'hudChrome.bank.filterGroupAria': 'Saring bank menurut kategori',
+  'hudChrome.bank.searchAria': 'Cari barang bank menurut nama',
+  'hudChrome.bank.sortAria': 'Urutkan barang bank',
+  'hudChrome.bank.depositHint': 'Klik untuk menyetor',
+  'hudChrome.bank.depositPartialHint': 'Shift-klik untuk menyetor sebagian',
+  'hudChrome.bank.withdrawHint': 'Klik untuk menarik',
+  'hudChrome.bank.withdrawPartialHint': 'Shift-klik untuk menarik sebagian',
+  'hudChrome.bank.cannotDeposit': 'Tidak dapat disimpan di bank',
+  'hudChrome.bank.depositQuantityTitle': 'Setor {item}',
+  'hudChrome.bank.depositQuantityInput': 'Jumlah yang disetor',
+  'hudChrome.bank.depositQuantityConfirm': 'Setor',
+  'hudChrome.bank.withdrawQuantityTitle': 'Tarik {item}',
+  'hudChrome.bank.withdrawQuantityInput': 'Jumlah yang ditarik',
+  'hudChrome.bank.withdrawQuantityConfirm': 'Tarik',
+  'hudChrome.bank.depositAll': 'Setor semua bahan',
+  'hudChrome.bank.depositAllDone': 'Bahan disetor: {count}.',
+  'hudChrome.bank.depositAllFull': 'Bahan disetor: {count}. Bank kini penuh.',
+  'hudChrome.bank.depositAllNone': 'Bank penuh: tidak ada yang disetor.',
+  'hudChrome.bank.buySlots': 'Beli {count} slot',
+  'hudChrome.bank.buySlotsMaxed': 'Sudah diperluas penuh',
+  'hudChrome.bank.buyConfirm': 'Beli {count} slot bank tambahan seharga {price}?',
+  'hudChrome.bank.buyConfirmAccept': 'Beli',
+  'hudChrome.bank.bonusTitle': 'Slot bonus',
+  'hudChrome.bank.bonusSectionAria': 'Slot bank bonus dan cara mendapat lebih banyak',
+  'hudChrome.bank.bonusEarned': '+{count}',
+  'hudChrome.bank.bonusStatusEarned': '+{count}',
+  'hudChrome.bank.bonusSourceEmail': 'Email terverifikasi',
+  'hudChrome.bank.bonusSourceDiscord': 'Discord tertaut',
+  'hudChrome.bank.bonusSourceWallet': 'Dompet tertaut',
+  'hudChrome.bank.bonusSourceReferral': 'Teman yang dirujuk',
+  'hudChrome.bank.bonusAdvertEmail': 'Verifikasi emailmu untuk mendapat 2 slot.',
+  'hudChrome.bank.bonusAdvertDiscord': 'Tautkan Discord-mu untuk mendapat 2 slot.',
+  'hudChrome.bank.bonusAdvertWallet': 'Tautkan dompet untuk mendapat 2 slot.',
+  'hudChrome.bank.bonusReferralExplainer':
+    'Undang seorang teman: saat ia mencapai level 10, kalian masing-masing mendapat 2 slot, hingga 5 teman.',
+  'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
 };

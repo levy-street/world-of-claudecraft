@@ -45,16 +45,31 @@ async function parseEnvelope<T>(res: Response): Promise<T> {
   return body.data;
 }
 
-export async function apiLogin(username: string, password: string): Promise<string> {
+export interface AdminSession {
+  username: string;
+  roles: string[];
+  permissions: string[];
+}
+
+export async function apiLogin(username: string, password: string): Promise<AdminSession> {
   const res = await fetch('/admin/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
-  const data = await parseEnvelope<{ token: string; username: string }>(res);
+  const data = await parseEnvelope<{ token: string } & AdminSession>(res);
   localStorage.setItem(TOKEN_KEY, data.token);
   localStorage.setItem(NAME_KEY, data.username);
-  return data.username;
+  // Tolerate a pre-permissions server during a deploy window: missing arrays
+  // degrade to zero permissions (the no-access screen) instead of a crash.
+  return { username: data.username, roles: data.roles ?? [], permissions: data.permissions ?? [] };
+}
+
+// Boot-time hydration of the operator's identity: permissions are never
+// persisted client-side, they are re-fetched each load so a role change
+// applies on the next reload (and immediately server-side regardless).
+export async function apiMe(): Promise<AdminSession> {
+  return apiGet<AdminSession>('/admin/api/me');
 }
 
 export async function apiGet<T>(path: string): Promise<T> {

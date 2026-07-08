@@ -37,7 +37,7 @@ import {
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// The authoritative ordered locale set both build scripts emit (LOCALES). en + 20.
+// The authoritative ordered locale set both build scripts emit (LOCALES). en + 21.
 const ALL_LOCALES = [
   'en',
   'es',
@@ -53,6 +53,7 @@ const ALL_LOCALES = [
   'ja_JP',
   'pt_BR',
   'ru_RU',
+  'cs_CZ',
   'nl_NL',
   'pl_PL',
   'id_ID',

@@ -14,5 +14,7 @@ export function createBotDetector(): BotDetector {
     handleTick: () => 'none',
     listSuspiciousPlayers: () => [],
     listCalibrationHistograms: () => [],
+    describeConfig: () => [],
+    applyConfig: () => ({ errors: [] }),
   };
 }
