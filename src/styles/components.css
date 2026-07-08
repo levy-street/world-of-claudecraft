@@ -2493,6 +2493,71 @@
     min-height: 48px;
     word-break: break-all;
   }
+  /* Shared themed native <select>: dark panel, gold accent, custom caret, so a
+     native dropdown stops rendering as OS chrome inside the HUD. Keeps real
+     <select> keyboard/type-ahead semantics (unlike the fully custom .ui-dd
+     widget). Other HUD selects (report reason, etc.) can adopt this class. */
+  .hud-select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 26px 6px 8px;
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    font-family: var(--ui-font);
+    font-size: 12px;
+    cursor: var(--cursor-point);
+    /* Caret drawn from two gradients tinted by the theme-aware --gold accent (a
+       data-URI fill cannot read a CSS var), so it stays readable on the dark
+       presets AND on the light Parchment panel where --gold darkens to a
+       contrasting accent. */
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--gold) 50%),
+      linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+    background-position:
+      right 13px center,
+      right 8px center;
+    background-size:
+      5px 5px,
+      5px 5px;
+    background-repeat: no-repeat, no-repeat;
+  }
+  /* Keep the tappable control at the mobile 40px floor (base.css only bumps the
+     select font to 16px; appearance:none leaves height to padding + line box). */
+  @media (pointer: coarse) {
+    .hud-select {
+      min-height: 40px;
+    }
+  }
+  .hud-select:hover {
+    border-color: var(--color-border-focus);
+  }
+  .hud-select:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+    border-color: var(--color-border-focus);
+  }
+  .hud-select:disabled {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+  }
+  .hud-select option {
+    background: var(--color-bg-dark);
+    color: var(--color-text-light);
+  }
+  /* High-contrast: appearance:none + a background-image caret both vanish under
+     forced-colors, so restore the native control + a system border there. */
+  @media (forced-colors: active) {
+    .hud-select {
+      appearance: auto;
+      -webkit-appearance: auto;
+      background-image: none;
+      border: 1px solid ButtonBorder;
+    }
+  }
   /* shared in-app dropdown (replaces native <select>, loadouts, report reason) */
   .ui-dd {
     position: relative;
