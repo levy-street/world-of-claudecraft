@@ -1339,6 +1339,100 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
   });
 
+  it('ships the RoV-style mobile action cluster in both entries and hides the touch hotbar', () => {
+    // The cluster container ships in BOTH game entries; hud.ts builds the six
+    // role buttons (attack / skill1..3 / ultimate / potion) into it and paints
+    // them through the action-bar view/painter family (mobile_cluster_view.ts).
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('<div id="mobile-cluster"');
+    }
+    expect(hudTs).toContain('private buildMobileCluster(): void {');
+    expect(hudTs).toContain("document.body.classList.add('mobile-cluster');");
+    expect(hudTs).toContain('this.clusterPainter = new ActionBarPainter(');
+    // The big Attack button runs the same target-nearest path as the mobile
+    // Attack button, and the small cluster target button cycles targets via the
+    // same Tab-target dispatch; both hooks installed by main.ts.
+    expect(mainTs).toContain('attackNearest: () => attackNearest(),');
+    expect(mainTs).toContain('targetCycle: () => world.tabTarget(),');
+    // The legacy scrolling hotbar row is replaced only when the cluster exists
+    // (body.mobile-cluster), and unmapped roles disappear via the empty kind.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-cluster #actionbar-row {\n    display: none;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-cluster .action-btn.empty {\n    display: none;',
+    );
+    // Thumb sizing keeps the >=40x40 touch-target floor (potion is the smallest).
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-cluster .mcl-attack {\n    width: 78px;\n    height: 78px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-cluster .mcl-potion {\n    width: 46px;\n    height: 46px;',
+    );
+    // Cluster taps buzz through the shared haptics helpers (respecting the
+    // player's haptics toggle) and honor the long-press tooltip peek contract.
+    expect(hudTs).toContain('triggerHaptic(HAPTIC_TAP, loadHapticsEnabled());');
+    expect(hudTs).toContain(
+      "import { HAPTIC_TAP, loadHapticsEnabled, triggerHaptic } from '../game/mobile_controls';",
+    );
+    // Curated, FORM-AWARE MobileCoreKits drive the mapping for EVERY class
+    // (bar-order is the fallback): druids re-derive per bear/cat/caster form,
+    // and per-player localStorage overrides win per role.
+    expect(hudTs).toContain('resolveMobileCoreKit(this.sim.cfg.playerClass, this.activeHotbarForm)');
+    expect(hudTs).toContain('this.clusterMapForm === this.activeHotbarForm');
+    expect(hudTs).toContain('this.loadClusterOverrides()');
+    expect(hudTs).toContain('setClusterBinding(role: OverridableClusterRole');
+    expect(hudTs).toContain('resetClusterBindings(): void {');
+    // The subtle class/build caption near the cluster.
+    expect(hudTs).toContain("kitLabel.className = 'mcl-kit-label';");
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-cluster .mcl-kit-label {');
+    // The left-handed toggle mirrors the whole arc to the left edge, and the
+    // buttons opt out of double-tap zoom for snappy casting.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-cluster {\n    right: auto;',
+    );
+    expect(hudMobileCss).toContain('touch-action: manipulation;');
+    // No ultimate button (ultimates are not coded upstream yet): the outer-arc
+    // button is the heal/defensive utility, plus a small target-cycle button.
+    expect(hudMobileCss).not.toContain('.mcl-ultimate');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-cluster .mcl-utility {\n    width: 60px;\n    height: 60px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-cluster .mcl-target-btn {\n    position: absolute;\n    width: 42px;\n    height: 42px;',
+    );
+    // Shapeshift toggles get their own small column (the touch UI's only
+    // shapeshift affordance now that the scroll hotbar is replaced).
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-cluster .mcl-form1,');
+    // The minimap keeps its top-right mobile anchor (upstream rule, unchanged).
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #minimap-wrap {\n    right: max(8px, env(safe-area-inset-right));\n    top: max(8px, env(safe-area-inset-top));',
+    );
+  });
+
+  it('ships the cluster binding editor (Customize Controls) in both entries', () => {
+    // The editor window + the More-tray Customize button exist in BOTH entries.
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('<div id="cluster-editor" class="window panel"></div>');
+      expect(entry).toContain('id="mobile-customize"');
+    }
+    // Long-press on an overridable cluster button opens the editor; the trailing
+    // click is consumed via the shared touch peek guard.
+    expect(hudTs).toContain('CLUSTER_EDITOR_HOLD_MS');
+    expect(hudTs).toContain('openClusterEditor(role: OverridableClusterRole');
+    expect(hudTs).toContain('private renderClusterEditor(): void {');
+    expect(hudTs).toContain("case 'cluster-editor':");
+    // More > Customize routes through the mobile controls callback.
+    expect(mainTs).toContain('onCustomizeControls: () => hud.toggleClusterEditor(),');
+    // Editor styling + the secondary polish hooks: combo pips and the active
+    // shapeshift highlight.
+    expect(hudMobileCss).toContain('#cluster-editor {');
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-cluster .mcl-combo {');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-cluster .action-btn.active-form {',
+    );
+  });
+
   it('keeps the mobile spell bar in a scrollable row between the joysticks', () => {
     expect(hudMobileCss).toContain('width: min(30vw, 132px);');
     expect(hudMobileCss).toContain('min-width: 112px;');

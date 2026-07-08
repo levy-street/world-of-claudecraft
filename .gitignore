@@ -78,6 +78,12 @@ pr-assets-2fa
 
 .vite/
 
+# Vite transpiles the config to a transient .timestamp-*.mjs next to it while
+# loading; it is normally unlinked immediately but can be orphaned by a crash.
+# Never commit it (it also trips the release malware gate as an unknown .mjs).
+vite.config.ts.timestamp-*.mjs
+vite.config.*.timestamp-*.mjs
+
 # Discord app credentials + bot token, never commit it
 discord_bot_info.txt
 

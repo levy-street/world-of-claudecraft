@@ -9,24 +9,62 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "es_ES": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "fr_FR": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "fr_CA": [
+    "hudChrome.options.millisecondsValue"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "de_DE": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "zh_CN": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "zh_TW": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "ko_KR": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "ja_JP": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "pt_BR": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "ru_RU": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "nl_NL": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "pl_PL": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "id_ID": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "tr_TR": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "sv_SE": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "vi_VN": [
+    "hudChrome.options.millisecondsValue"
+  ],
+  "da_DK": [
+    "hudChrome.options.millisecondsValue"
+  ]
 };

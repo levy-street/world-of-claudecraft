@@ -245,6 +245,184 @@
     color: #c8b888;
     text-shadow: 1px 1px 2px #000;
   }
+  /* ---------- RoV-style action cluster (#mobile-cluster) ----------
+     Six thumb buttons hud.ts builds and paints through the action-bar
+     view/painter family (src/ui/mobile_cluster_view.ts): the big Attack anchors
+     the bottom-right corner above the camera joystick, skill1..3 arc around it,
+     the ultimate sits on the outer arc, the potion at the arc's tail. Roles with
+     no mapping render the bar's 'empty' kind and are hidden outright. The legacy
+     scrolling hotbar row is replaced on touch, gated on body.mobile-cluster
+     (added by hud.ts only once the cluster buttons exist) so an entry without
+     the container keeps its old bar. */
+  body.mobile-touch.mobile-cluster #actionbar-row {
+    display: none;
+  }
+  body.mobile-touch #mobile-cluster {
+    position: absolute;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: calc(170px + env(safe-area-inset-bottom));
+    width: 284px;
+    height: 200px;
+    pointer-events: none;
+    z-index: 26;
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: right bottom;
+  }
+  body.mobile-touch #mobile-cluster .action-btn {
+    position: absolute;
+    pointer-events: auto;
+    border-radius: 50%;
+    touch-action: manipulation;
+    box-shadow:
+      0 3px 14px #000a,
+      inset 0 1px 0 #ffffff14;
+  }
+  /* Pressed feedback mirrors .mobile-btn:active (no scale: press feedback only,
+     hover/focus never transforms). */
+  body.mobile-touch #mobile-cluster .action-btn:active {
+    border-color: var(--gold);
+    filter: brightness(1.18);
+  }
+  body.mobile-touch #mobile-cluster .action-btn .cdtext {
+    font-size: 15px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+  }
+  body.mobile-touch #mobile-cluster .action-btn .item-count {
+    font-size: 11px;
+  }
+  body.mobile-touch #mobile-cluster .action-btn.empty {
+    display: none;
+  }
+  body.mobile-touch #mobile-cluster .action-btn .icon-label,
+  body.mobile-touch #mobile-cluster .action-btn .cd-overlay {
+    border-radius: 50%;
+  }
+  /* No keyboard on the touch interface; the mapped 1..9 keybinds still fire. */
+  body.mobile-touch #mobile-cluster .action-btn .keybind {
+    display: none;
+  }
+  body.mobile-touch #mobile-cluster .mcl-attack {
+    width: 78px;
+    height: 78px;
+    right: 0;
+    bottom: 0;
+    border-color: #8b4e2c;
+  }
+  body.mobile-touch #mobile-cluster .mcl-skill1 {
+    width: 54px;
+    height: 54px;
+    right: 94px;
+    bottom: 0;
+  }
+  body.mobile-touch #mobile-cluster .mcl-skill2 {
+    width: 54px;
+    height: 54px;
+    right: 80px;
+    bottom: 68px;
+  }
+  body.mobile-touch #mobile-cluster .mcl-skill3 {
+    width: 54px;
+    height: 54px;
+    right: 10px;
+    bottom: 98px;
+  }
+  /* The heal / defensive / buff button on the outer arc. (Deliberately no
+     ultimate button: ultimates are not coded upstream yet.) */
+  body.mobile-touch #mobile-cluster .mcl-utility {
+    width: 60px;
+    height: 60px;
+    right: 152px;
+    bottom: 56px;
+    border-color: #3f6b3a;
+  }
+  body.mobile-touch #mobile-cluster .mcl-potion {
+    width: 46px;
+    height: 46px;
+    right: 164px;
+    bottom: 0;
+  }
+  /* The small target/cycle button between skill2 and skill3 on the outer arc:
+     a plain glyph control, not an action-bar slot. */
+  body.mobile-touch #mobile-cluster .mcl-target-btn {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    right: 104px;
+    bottom: 132px;
+    padding: 0;
+    border-radius: 50%;
+    pointer-events: auto;
+    touch-action: manipulation;
+  }
+  body.mobile-touch #mobile-cluster .mcl-target-btn .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  /* Shapeshift toggles (druid bear/cat/travel): a small column on the cluster's
+     inner edge -- the touch UI's only shapeshift affordance now that the scroll
+     hotbar is replaced. Classes without form toggles render these empty (hidden). */
+  body.mobile-touch #mobile-cluster .mcl-form1,
+  body.mobile-touch #mobile-cluster .mcl-form2,
+  body.mobile-touch #mobile-cluster .mcl-form3 {
+    width: 44px;
+    height: 44px;
+    right: 240px;
+    border-color: #4a5a7a;
+  }
+  body.mobile-touch #mobile-cluster .mcl-form1 {
+    bottom: 4px;
+  }
+  body.mobile-touch #mobile-cluster .mcl-form2 {
+    bottom: 56px;
+  }
+  body.mobile-touch #mobile-cluster .mcl-form3 {
+    bottom: 108px;
+  }
+  /* Active shapeshift highlight: the form button matching the current form. */
+  body.mobile-touch #mobile-cluster .action-btn.active-form {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 10px 2px #e3c66a66,
+      0 3px 14px #000a,
+      inset 0 1px 0 #ffffff14;
+  }
+  /* Combo-point pips (rogue / cat druid) above the big Attack button. */
+  body.mobile-touch #mobile-cluster .mcl-combo {
+    position: absolute;
+    right: 6px;
+    bottom: 84px;
+    display: none;
+    gap: 3px;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-cluster .mcl-combo.visible {
+    display: flex;
+  }
+  body.mobile-touch #mobile-cluster .mcl-combo-pip {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1px solid #7a2e2e;
+    background: #2a0f0fd0;
+  }
+  body.mobile-touch #mobile-cluster .mcl-combo-pip.on {
+    background: radial-gradient(circle at 35% 30%, #ff8a5a, #c33 70%);
+    border-color: #ffb37a;
+    box-shadow: 0 0 6px #ff6a3aa0;
+  }
+  /* The subtle class/build caption under the cluster ("Druid · Bear Form"). */
+  body.mobile-touch #mobile-cluster .mcl-kit-label {
+    position: absolute;
+    right: 0;
+    bottom: -16px;
+    font-size: 9px;
+    font-family: var(--ui-font);
+    color: #bfb28a;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+    white-space: nowrap;
+  }
   body.mobile-touch #mobile-combat-controls {
     position: absolute;
     left: 50%;
@@ -896,6 +1074,150 @@
   body.mobile-touch.mobile-left-handed #meters-window {
     left: auto;
     right: calc(max(18px, env(safe-area-inset-right)) + 132px);
+  }
+  /* Left-handed action cluster: the movement stick moved to the right thumb, so
+     the whole arc mirrors to the LEFT edge (same offsets, right -> left). */
+  body.mobile-touch.mobile-left-handed #mobile-cluster {
+    right: auto;
+    left: max(16px, env(safe-area-inset-left));
+    transform-origin: left bottom;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-attack {
+    right: auto;
+    left: 0;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-skill1 {
+    right: auto;
+    left: 94px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-skill2 {
+    right: auto;
+    left: 80px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-skill3 {
+    right: auto;
+    left: 10px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-utility {
+    right: auto;
+    left: 152px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-potion {
+    right: auto;
+    left: 164px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-target-btn {
+    right: auto;
+    left: 104px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-form1,
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-form2,
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-form3 {
+    right: auto;
+    left: 240px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-kit-label {
+    right: auto;
+    left: 0;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-cluster .mcl-combo {
+    right: auto;
+    left: 6px;
+  }
+  /* ---------- Cluster binding editor (#cluster-editor, Customize Controls) ----
+     A managed .window.panel like the emote editor. Not gated on body.mobile-touch:
+     the window only OPENS from the touch UI, but must render correctly whenever
+     it is open (e.g. desktop testing with Interface Mode: Touch). */
+  #cluster-editor {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(520px, calc(100vw - 24px));
+    max-height: min(480px, calc(100vh - 24px));
+    padding: 10px;
+    z-index: 120;
+    overflow: hidden;
+  }
+  #cluster-editor .cluster-editor-slots {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0 6px;
+    flex-wrap: wrap;
+  }
+  #cluster-editor .cluster-editor-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 64px;
+    min-height: 44px;
+    padding: 5px 7px;
+    border: 1px solid #4a3d1d;
+    border-radius: 7px;
+    background: #14141fd8;
+    color: #d8cfae;
+    font-size: 10px;
+    cursor: var(--cursor-point);
+  }
+  #cluster-editor .cluster-editor-slot.selected {
+    border-color: var(--gold);
+    color: #fff;
+    box-shadow: 0 0 8px #e3c66a55;
+  }
+  #cluster-editor .cluster-editor-slot-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    background-size: cover;
+    border: 1px solid #00000088;
+  }
+  #cluster-editor .cluster-editor-status {
+    font-size: 11px;
+    color: #bfb28a;
+    margin: 0 0 6px;
+  }
+  #cluster-editor .cluster-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 6px;
+    overflow-y: auto;
+    max-height: min(240px, calc(100vh - 220px));
+    padding-right: 2px;
+  }
+  #cluster-editor .cluster-editor-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 4px 8px;
+    border: 1px solid #3a3325;
+    border-radius: 7px;
+    background: #101018d8;
+    color: #d8cfae;
+    font-size: 11px;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  #cluster-editor .cluster-editor-item.current {
+    border-color: var(--gold);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px #e3c66a55;
+  }
+  #cluster-editor .cluster-editor-item-icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border-radius: 5px;
+    background-size: cover;
+    border: 1px solid #00000088;
+  }
+  #cluster-editor .cluster-editor-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 8px;
   }
   body.mobile-touch #banner {
     top: 18%;
@@ -1804,6 +2126,10 @@
     }
     body.mobile-touch #mobile-camera-joystick {
       right: max(20px, env(safe-area-inset-right));
+    }
+    body.mobile-touch #mobile-cluster {
+      bottom: calc(140px + env(safe-area-inset-bottom));
+      transform: scale(calc(var(--btn-scale, 1) * 0.88));
     }
     body.mobile-touch .mobile-joystick::before {
       inset: 23px;

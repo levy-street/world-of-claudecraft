@@ -33,6 +33,7 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { AimIndicator, type AimIndicatorState } from './aim_indicator';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { SpatialAudioSink, Surface } from './audio_sink';
@@ -733,6 +734,8 @@ export class Renderer {
   private selRingX = Number.NaN;
   private selRingZ = Number.NaN;
   private selRingScale = Number.NaN;
+  // Skill aim-assist range ring + reticle (M7B). Set/hidden via setAimIndicator.
+  private aimIndicator: AimIndicator;
   // Dev-only Tab-target cone overlay (enabled via ?targetcone=1 in main.ts).
   // Null until enabled; once built it is re-draped over the terrain in front of
   // the local player every frame. See target_cone_debug.ts.
@@ -1323,6 +1326,13 @@ export class Renderer {
     setRenderCategory(this.selectionRing, 'ui3d');
     this.selectionRing.visible = false;
     this.scene.add(this.selectionRing);
+
+    // Skill aim-assist indicator (M7B): a range ring + reticle shown only while
+    // the local player is aiming a skill via the mobile hold-drag gesture. Draped
+    // over the terrain each frame like the selection ring; hidden until armed.
+    this.aimIndicator = new AimIndicator((x, z) => groundHeight(x, z, this.sim.cfg.seed));
+    setRenderCategory(this.aimIndicator.group, 'ui3d');
+    this.scene.add(this.aimIndicator.group);
 
     // click-feedback marker pool: a small fixed set of ring+X groups reused
     // round-robin, so rapid clicking never allocates. Geometry is shared; each
@@ -4464,6 +4474,7 @@ export class Renderer {
     this.updateClickMarkers(dt);
     this.updateAoeRings(dt);
     this.updateGroundAimReticle(dt);
+    this.aimIndicator.update(this.time);
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.
     if (this.targetCone) {
@@ -5316,6 +5327,13 @@ export class Renderer {
       slot.crossMat.color.multiplyScalar(SELECTION_RING_BOOST);
     }
     slot.group.visible = true;
+  }
+
+  // Arm (state) or hide (null) the skill aim-assist range ring + reticle. Called
+  // from the HUD while the local player holds/drags a mobile skill button. Pure
+  // presentation; it never reads or writes sim state.
+  setAimIndicator(state: AimIndicatorState | null): void {
+    this.aimIndicator.set(state);
   }
 
   // Advance every live click marker by dt and apply the ring/X fade+scale curves.

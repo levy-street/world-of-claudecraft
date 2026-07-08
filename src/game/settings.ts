@@ -77,6 +77,14 @@ export const SETTING_RANGES = {
   // movement. Higher values resist accidental drift on a jittery thumb; lower
   // values make the stick more responsive. Default matches the old fixed 0.22.
   joystickDeadzone: { min: 0.1, max: 0.4, def: 0.22 },
+  // touch-only: how long (ms) a cluster button must be held before the binding
+  // editor (Customize Controls) opens. Lower = quicker to edit; higher resists
+  // accidental opens while spamming skills. Read live by the HUD at press time.
+  clusterHoldMs: { min: 400, max: 1200, def: 650 },
+  // Smart-target priority for the Attack button's target acquisition:
+  // 0 = nearest enemy, 1 = lowest health in range, 2 = keep the current target
+  // while it stays attackable. Read by attackNearest in main.ts.
+  targetPriority: { min: 0, max: 2, def: 0 },
 
   // --- Gamepad / controller pack. Applied to the GamepadManager in main.ts. ---
   // How far an analog stick must travel before it registers, killing resting
@@ -171,6 +179,13 @@ export const BOOL_SETTINGS = {
   // vacated top spot) so incoming debuffs keep one glanceable classic corner.
   // Desktop only; the mobile layout keeps its own aura placement.
   aurasOnPlayerFrame: { def: false },
+  // on by default: smart skill cast on touch. Pressing an offensive skill button
+  // casts on the current target, or auto-acquires the best nearby enemy (honoring
+  // targetPriority) and faces it; holding the button previews the skill range as
+  // a ground ring, and releasing off the button cancels. Combat is target-based
+  // (no ground casting), so this is a targeting/QoL aid, not free aiming. Read
+  // live by the HUD at press time; desktop is unaffected.
+  aimAssist: { def: true },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players
@@ -256,6 +271,26 @@ export const BOOL_SETTINGS = {
 
 export type NumericSettingKey = keyof typeof SETTING_RANGES;
 export type BoolSettingKey = keyof typeof BOOL_SETTINGS;
+
+// The touch-interface settings owned by Options > Touch Controls; its "Reset
+// Touch Controls" button restores exactly these to their defaults (the global
+// Settings.reset() is broader). Kept here so the panel and its tests share one
+// authoritative list.
+export const TOUCH_NUMERIC_KEYS = [
+  'interfaceMode',
+  'touchLookSpeed',
+  'touchOpacity',
+  'joystickScale',
+  'actionButtonScale',
+  'joystickDeadzone',
+  'clusterHoldMs',
+  'targetPriority',
+] as const satisfies readonly NumericSettingKey[];
+export const TOUCH_BOOL_KEYS = [
+  'leftHandedTouch',
+  'touchInvertLook',
+  'aimAssist',
+] as const satisfies readonly BoolSettingKey[];
 export type GameSettings = { [K in NumericSettingKey]: number } & {
   [K in BoolSettingKey]: boolean;
 };

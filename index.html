@@ -398,6 +398,7 @@
     <div id="arena-status"></div>
     <div id="options-menu" class="window panel"></div>
     <div id="emote-editor" class="window panel"></div>
+    <div id="cluster-editor" class="window panel"></div>
     <div id="social-window" class="window panel"></div>
     <div id="report-window" class="window panel"></div>
     <div id="side-buttons">
@@ -1271,6 +1272,10 @@
       <div id="mobile-camera-stick" class="mobile-stick"></div>
       <div class="mobile-joy-label" data-i18n="hud.core.mobileCamera">Camera</div>
     </div>
+    <!-- RoV-style action cluster: hud.ts builds the six thumb buttons (attack,
+         skill1..3, ultimate, potion) into this container and paints them through
+         the action-bar view/painter family; see src/ui/mobile_cluster_view.ts. -->
+    <div id="mobile-cluster" data-i18n-aria="hud.core.mobileControls" aria-label="Mobile controls" role="group"></div>
     <div id="mobile-combat-controls">
       <button class="mobile-btn" type="button" id="mobile-attack-nearest" data-i18n-title="hud.keybinds.actions.attack" data-i18n-aria="hud.keybinds.actions.attack" title="Attack" aria-label="Attack" data-icon="attack"><span class="mobile-label" data-i18n="hud.core.mobileAttack">Attack</span></button>
       <button class="mobile-btn" type="button" id="mobile-autorun" data-i18n-title="hud.keybinds.actions.autorun" data-i18n-aria="hud.keybinds.actions.autorun" title="Toggle autorun" aria-label="Toggle autorun" data-icon="autorun"><span class="mobile-label" data-i18n="hudChrome.mobile.autorun">Autorun</span></button>
@@ -1301,6 +1306,7 @@
           <button type="button" class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>
           <button type="button" class="mobile-btn" id="mobile-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Toggle music" data-icon="music"><span class="mobile-label" data-i18n="hud.options.music">Music</span></button>
           <button type="button" class="mobile-btn" id="mobile-haptics" data-i18n-title="hudChrome.mobile.toggleHaptics" data-i18n-aria="hudChrome.mobile.toggleHaptics" title="Toggle haptic feedback" aria-label="Toggle haptic feedback" aria-pressed="true" data-icon="vibrate"><span class="mobile-label" data-i18n="hudChrome.mobile.haptics">Haptics</span></button>
+          <button type="button" class="mobile-btn" id="mobile-customize" data-i18n-title="hudChrome.mobile.customizeTitle" data-i18n-aria="hudChrome.mobile.customizeTitle" title="Customize Controls" aria-label="Customize Controls" data-icon="interact"><span class="mobile-label" data-i18n="hudChrome.mobile.customize">Customize</span></button>
         </div>
       </div>
   </section>
