@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { terrainHeight } from '../../sim/world';
-import { spriteLightingUniforms } from './sprite_shader';
+import { spriteLightingUniforms } from './sprite_lighting';
 
 // ---------------------------------------------------------------------------
 // Sprite shadow blob — small dark ellipse on the ground beneath each sprite
