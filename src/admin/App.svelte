@@ -22,6 +22,7 @@
   import Accounts from './pages/Accounts.svelte';
   import Characters from './pages/Characters.svelte';
   import Usage from './pages/Usage.svelte';
+  import TickPerf from './pages/TickPerf.svelte';
   import Moderation from './pages/Moderation.svelte';
   import SuspiciousPlayers from './pages/SuspiciousPlayers.svelte';
   import DetectionCalibration from './pages/DetectionCalibration.svelte';
@@ -44,6 +45,7 @@
     accounts: Accounts,
     characters: Characters,
     usage: Usage,
+    'tick-perf': TickPerf,
     moderation: Moderation,
     'suspicious-players': SuspiciousPlayers,
     'detection-calibration': DetectionCalibration,

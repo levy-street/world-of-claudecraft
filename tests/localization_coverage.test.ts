@@ -23,6 +23,7 @@ import {
   tEntity,
 } from '../src/ui/entity_i18n';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -75,6 +76,7 @@ const locales: Record<string, typeof en> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,
@@ -331,6 +333,7 @@ describe('i18n Localization Key Coverage', () => {
     ability: 'Fireball',
     action: 'Open Chat',
     amount: 42,
+    answered: 6,
     base: 14,
     rested: 18,
     buyer: 'Mira',
@@ -474,7 +477,7 @@ describe('i18n Localization Key Coverage', () => {
         kind: 'ability',
         id: entry.id,
         field: entry.field as 'name' | 'description',
-        values: { damage: '11-14' },
+        values: { damage: '11-14', overTime: '57', buff: '35', duration: '12' },
       };
     }
     throw new Error(`Unexpected entity kind: ${entry.kind}`);
@@ -639,6 +642,7 @@ describe('i18n Localization Key Coverage', () => {
       'ja_JP',
       'pt_BR',
       'ru_RU',
+      'cs_CZ',
       'nl_NL',
       'pl_PL',
       'id_ID',
@@ -824,6 +828,10 @@ describe('i18n Localization Key Coverage', () => {
         expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.key);
         expect(rendered, `${lang}.${entry.key}`).not.toContain('$d');
         expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\{damage\}/);
+        // The other tooltip placeholders ($o over-time, $b buff value, $t
+        // duration) must interpolate in every locale exactly like $d.
+        expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\$[obt]\b/);
+        expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\{(overTime|buff|duration)\}/);
         if (
           lang !== 'en' &&
           lang !== 'en_CA' &&
@@ -841,6 +849,20 @@ describe('i18n Localization Key Coverage', () => {
           entry.source.includes('$d')
         ) {
           expect(rendered, `${lang}.${entry.key}`).toContain('11-14');
+        }
+        if (
+          entry.kind === 'ability' &&
+          entry.field === 'description' &&
+          entry.source.includes('$o')
+        ) {
+          expect(rendered, `${lang}.${entry.key}`).toContain('57');
+        }
+        if (
+          entry.kind === 'ability' &&
+          entry.field === 'description' &&
+          entry.source.includes('$b')
+        ) {
+          expect(rendered, `${lang}.${entry.key}`).toContain('35');
         }
       }
       expect(entityTranslationFallbackLog(), `${lang} fallback log`).toHaveLength(0);
@@ -889,9 +911,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    // 7 raid/dungeon families with name+bonus2+bonus3, plus 3 leveling haste
-    // kits carrying a single 3-piece tier (name+bonus3 only)
-    expect(itemSetEntries).toHaveLength(7 * 3 + 3 * 2);
+    // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
+    // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
+    // single 3-piece tier (name+bonus3 only).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1516,23 +1539,7 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should expose all supported hreflang alternates in index.html', () => {
     const html = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf8');
-    const expectedHreflang = [
-      'en',
-      'es',
-      'es-ES',
-      'fr-FR',
-      'fr-CA',
-      'en-CA',
-      'it-IT',
-      'de-DE',
-      'zh-CN',
-      'zh-TW',
-      'ko-KR',
-      'ja-JP',
-      'pt-BR',
-      'ru-RU',
-      'x-default',
-    ];
+    const expectedHreflang = [...supportedLanguages.map((lang) => languageTag(lang)), 'x-default'];
     for (const hreflang of expectedHreflang) {
       expect(html, `missing hreflang ${hreflang}`).toContain(`hreflang="${hreflang}"`);
     }

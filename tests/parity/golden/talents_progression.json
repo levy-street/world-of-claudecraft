@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "74bced36",
+      "nextId": 406,
+      "state": "d150c678",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -27,6 +27,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -36,18 +37,20 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -59,7 +62,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -74,7 +78,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -117,9 +121,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "f16c6f5e",
-      "events": "2856c170",
+      "nextId": 406,
+      "state": "7492f33c",
+      "events": "092ab679",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -128,6 +132,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -137,18 +142,20 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -165,7 +172,8 @@
               "war_cruelty": 2
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -180,7 +188,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 812,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -223,9 +231,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "b43fffe5",
-      "events": "40479820",
+      "nextId": 406,
+      "state": "e1085771",
+      "events": "cc9019b1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -234,6 +242,7 @@
       "players": [
         {
           "activeLoadout": -1,
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -243,18 +252,20 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -268,7 +279,8 @@
             "choices": {},
             "ranks": {},
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -283,7 +295,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 812,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -326,9 +338,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "cfc4da8e",
-      "events": "a7d95be1",
+      "nextId": 406,
+      "state": "f6e81012",
+      "events": "60bbc56d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -336,6 +348,7 @@
       "label": "second-build",
       "players": [
         {
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -345,18 +358,20 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -389,7 +404,8 @@
               "war_cruelty": 3
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -404,7 +420,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 812,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -447,9 +463,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "3cb50ba7",
-      "events": "980c682a",
+      "nextId": 406,
+      "state": "3df67489",
+      "events": "033d2d51",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -457,6 +473,7 @@
       "label": "switch-loadout",
       "players": [
         {
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -466,18 +483,20 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -510,7 +529,8 @@
               "arms_imp_overpower": 2
             },
             "spec": "arms"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -525,7 +545,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 812,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -568,9 +588,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "6d482d79",
-      "events": "2856c170",
+      "nextId": 406,
+      "state": "cb1764cf",
+      "events": "092ab679",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -578,6 +598,7 @@
       "label": "set-spec",
       "players": [
         {
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -587,18 +608,20 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -629,7 +652,8 @@
             "choices": {},
             "ranks": {},
             "spec": "fury"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -644,7 +668,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 812,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -687,8 +711,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "6d482d79",
+      "nextId": 406,
+      "state": "cb1764cf",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -697,6 +721,7 @@
       "label": "final",
       "players": [
         {
+          "archetype": {},
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
@@ -706,18 +731,20 @@
             null,
             null
           ],
+          "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 405,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "heroicDaily": {},
           "inventory": [
             {
               "count": 5,
@@ -748,7 +775,8 @@
             "choices": {},
             "ranks": {},
             "spec": "fury"
-          }
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -763,7 +791,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 812,
-          "id": 400,
+          "id": 405,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

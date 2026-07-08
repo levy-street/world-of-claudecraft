@@ -112,6 +112,17 @@ describe('hoverCursorKind', () => {
     expect(hoverCursorKind(opponent, 1, new Set(), new Set([5]))).toBe('friendly');
   });
 
+  it('treats a non-hostile mob in the opponent set as attackable (enemy Yumi cat)', () => {
+    // The cats carry hostile=false (team hostility lives in the sim rule);
+    // the enemy cat's id rides the opponent set instead.
+    const enemyCat = stubEntity({ id: 900, kind: 'mob', hostile: false });
+    const ownCat = stubEntity({ id: 901, kind: 'mob', hostile: false });
+    expect(isAttackableEntity(enemyCat, 1, new Set([900]))).toBe(true);
+    expect(hoverCursorKind(enemyCat, 1, new Set(), new Set([900]))).toBe('attack');
+    expect(isAttackableEntity(ownCat, 1, new Set([900]))).toBe(false);
+    expect(hoverCursorKind(ownCat, 1, new Set(), new Set([900]))).toBe('default');
+  });
+
   it('returns default for empty pick', () => {
     expect(hoverCursorKind(undefined, 1, new Set())).toBe('default');
   });
@@ -135,9 +146,11 @@ describe('activePvpOpponentIds', () => {
           '1v1': { rating: 1500, wins: 0, losses: 0 },
           '2v2': { rating: 1500, wins: 0, losses: 0 },
           fiesta: { rating: 1500, wins: 0, losses: 0 },
+          yumi3: { rating: 1500, wins: 0, losses: 0 },
+          yumi5: { rating: 1500, wins: 0, losses: 0 },
         },
         ladder: [],
-        ladders: { '1v1': [], '2v2': [], fiesta: [] },
+        ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
           oppPid: 3,
           oppName: 'Arena Rival',
@@ -157,6 +170,74 @@ describe('activePvpOpponentIds', () => {
     expect([...ids].sort()).toEqual([2, 3, 4]);
   });
 
+  it('includes the ENEMY Yumi cat entity id, never the own cat', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const yumiView = (entityId: number) => ({
+      entityId,
+      hp: 5000,
+      maxHp: 5000,
+      x: 8400,
+      z: -1250,
+      alive: true,
+    });
+    const base = {
+      queued: false,
+      queueSize: 0,
+      rating: 1500,
+      wins: 0,
+      losses: 0,
+      format: 'yumi3' as const,
+      standings: {
+        '1v1': { rating: 1500, wins: 0, losses: 0 },
+        '2v2': { rating: 1500, wins: 0, losses: 0 },
+        fiesta: { rating: 1500, wins: 0, losses: 0 },
+        yumi3: { rating: 1500, wins: 0, losses: 0 },
+        yumi5: { rating: 1500, wins: 0, losses: 0 },
+      },
+      ladder: [],
+      ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
+    };
+    const matchBase = {
+      oppPid: 3,
+      oppName: 'Rivals',
+      oppClass: 'warrior' as const,
+      oppLevel: 1,
+      state: 'active' as const,
+      format: 'yumi3' as const,
+      allies: [],
+      enemies: [{ pid: 3, name: 'Rival', cls: 'warrior' as const, level: 1 }],
+    };
+    const yumi = (team: 'A' | 'B') => ({
+      team,
+      size: 3 as const,
+      phase: 'active' as const,
+      matchElapsed: 10,
+      teleportIn: 50,
+      suddenDeathIn: 590,
+      damageTakenMult: 1,
+      down: false,
+      respawnIn: 0,
+      yumiA: yumiView(900),
+      yumiB: yumiView(901),
+      teamA: [],
+      teamB: [],
+    });
+    const idsA = activePvpOpponentIds({
+      playerId: 1,
+      player,
+      arenaInfo: { ...base, match: { ...matchBase, yumi: yumi('A') } },
+    });
+    expect(idsA.has(901)).toBe(true); // team A attacks cat B
+    expect(idsA.has(900)).toBe(false);
+    const idsB = activePvpOpponentIds({
+      playerId: 1,
+      player,
+      arenaInfo: { ...base, match: { ...matchBase, yumi: yumi('B') } },
+    });
+    expect(idsB.has(900)).toBe(true); // team B attacks cat A
+    expect(idsB.has(901)).toBe(false);
+  });
+
   it('ignores inactive pvp states', () => {
     const player = stubEntity({ id: 1, kind: 'player' });
     const ids = activePvpOpponentIds({
@@ -174,9 +255,11 @@ describe('activePvpOpponentIds', () => {
           '1v1': { rating: 1500, wins: 0, losses: 0 },
           '2v2': { rating: 1500, wins: 0, losses: 0 },
           fiesta: { rating: 1500, wins: 0, losses: 0 },
+          yumi3: { rating: 1500, wins: 0, losses: 0 },
+          yumi5: { rating: 1500, wins: 0, losses: 0 },
         },
         ladder: [],
-        ladders: { '1v1': [], '2v2': [], fiesta: [] },
+        ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
         match: {
           oppPid: 3,
           oppName: 'Arena Rival',

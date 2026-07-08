@@ -27,7 +27,7 @@ import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { buildGatheringProficiencyRows } from './gathering_view';
-import { formatNumber, t } from './i18n';
+import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
@@ -41,6 +41,31 @@ import { svgIcon } from './ui_icons';
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
+
+// The ten craft-archetype title keys (issue 1130), one per craft id on the ring (see
+// src/sim/content/professions.ts CRAFT_RING and src/sim/professions/archetype.ts
+// getArchetypeTitle: the title identifier IS the craft id). Every player-visible
+// string is a t() key, so this is a literal id-to-key table, never a built string.
+const ARCHETYPE_TITLE_KEYS: Record<string, TranslationKey> = {
+  armorcrafting: 'hudChrome.archetypeTitle.armorcrafting',
+  weaponcrafting: 'hudChrome.archetypeTitle.weaponcrafting',
+  jewelcrafting: 'hudChrome.archetypeTitle.jewelcrafting',
+  alchemy: 'hudChrome.archetypeTitle.alchemy',
+  engineering: 'hudChrome.archetypeTitle.engineering',
+  cooking: 'hudChrome.archetypeTitle.cooking',
+  inscription: 'hudChrome.archetypeTitle.inscription',
+  enchanting: 'hudChrome.archetypeTitle.enchanting',
+  tailoring: 'hudChrome.archetypeTitle.tailoring',
+  leatherworking: 'hudChrome.archetypeTitle.leatherworking',
+};
+
+/** Localized text for the granted archetype title, or the "no title yet" copy
+ *  when the player has not completed the zone-1 acceptance quest (or the id is
+ *  somehow unrecognized). Exported for the view-model test. */
+export function archetypeTitleText(craftId: string | null): string {
+  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
+  return t(key ?? 'hudChrome.archetypeTitle.none');
+}
 
 // The ten character-sheet stat cells, primaries down the left column and derived
 // stats down the right (the CSS grid wraps two per row). The HUD builds each cell
@@ -58,6 +83,8 @@ const STAT_GRID: readonly StatId[] = [
   'spi',
   'dodge',
   'spellPower',
+  'critRating',
+  'hasteRating',
 ];
 
 /**
@@ -148,7 +175,8 @@ export class CharWindow {
     const level = formatNumber(p.level, { maximumFractionDigits: 0 });
     // WCAG 2.2 AA: name the focus-trapped root via the character title span.
     markDialogRoot(el, { labelledBy: 'char-title' });
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    const archetypeTitle = archetypeTitleText(world.archetypeTitle);
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">

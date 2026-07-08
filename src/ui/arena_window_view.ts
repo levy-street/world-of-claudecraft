@@ -21,8 +21,13 @@ import { CLASSES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, ArenaInfo, ArenaStanding, PartyInfo } from '../world_api';
 
-/** The three brackets, in display order. */
-const ARENA_BRACKETS: readonly ArenaFormat[] = ['1v1', '2v2', 'fiesta'];
+/** The five brackets, in display order. */
+const ARENA_BRACKETS: readonly ArenaFormat[] = ['1v1', '2v2', 'fiesta', 'yumi3', 'yumi5'];
+
+/** Premade-party cap per team bracket (1v1 is partyless). */
+function bracketTeamCap(fmt: ArenaFormat): number {
+  return fmt === 'yumi5' ? 5 : fmt === 'yumi3' ? 3 : fmt === '2v2' || fmt === 'fiesta' ? 2 : 1;
+}
 
 /** One all-time ladder entry as the HUD caches it (server-fetched, online only). */
 export interface ArenaAllTimeEntry {
@@ -138,7 +143,8 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
   const ladderRows = a.ladders[bracket];
   const partySize = party?.members.length ?? 1;
   const isLeader = !party || party.leader === myPid;
-  const isTeamBracket = bracket === '2v2' || bracket === 'fiesta';
+  const teamCap = bracketTeamCap(bracket);
+  const isTeamBracket = teamCap > 1;
 
   const ladder: ArenaLadderRow[] = ladderRows.map((r, i) => ({
     rank: i + 1,
@@ -159,7 +165,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
 
   let partySection: ArenaPartySection = { kind: 'none' };
   if (isTeamBracket && !inMatch && !a.queued) {
-    if (party && partySize === 2) {
+    if (party && partySize >= 2 && partySize <= teamCap) {
       partySection = {
         kind: 'members',
         members: party.members.map((m) => ({
@@ -170,7 +176,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
           level: m.level,
         })),
       };
-    } else if (party && partySize > 2) {
+    } else if (party && partySize > teamCap) {
       partySection = { kind: 'warn' };
     }
   }
@@ -182,8 +188,9 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     action = { kind: 'queued', queueSize: a.queueSize };
   } else {
     let queueDisabled = false;
-    if (isTeamBracket && party && partySize === 2 && !isLeader) queueDisabled = true;
-    else if (isTeamBracket && party && partySize > 2) queueDisabled = true;
+    if (isTeamBracket && party && partySize >= 2 && partySize <= teamCap && !isLeader)
+      queueDisabled = true;
+    else if (isTeamBracket && party && partySize > teamCap) queueDisabled = true;
     else if (bracket === '1v1' && party && partySize > 1) queueDisabled = true;
     action = { kind: 'idle', queueDisabled };
   }

@@ -29,15 +29,23 @@ export interface PaperdollView {
 }
 
 // Two columns flanking the model, like the classic character sheet: the left
-// column holds head/shoulder/chest plus the weapon (we have no neck/back/wrist
-// slots to fill it); the right column holds the hands/waist/legs/feet quartet.
+// column holds head/neck/shoulder/chest plus the weapon; the right column holds
+// the hands/waist/legs/feet quartet with the two ring slots at the bottom.
 export const PAPERDOLL_LEFT_SLOTS: readonly EquipSlot[] = [
   'helmet',
+  'neck',
   'shoulder',
   'chest',
   'mainhand',
 ];
-export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = ['gloves', 'waist', 'legs', 'feet'];
+export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
+  'gloves',
+  'waist',
+  'legs',
+  'feet',
+  'ring1',
+  'ring2',
+];
 
 /**
  * Build the paperdoll view from the player's equipment and the item table. A

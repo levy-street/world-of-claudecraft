@@ -46,6 +46,8 @@ import {
   verifyPassword,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
+import { computeBankBonus } from './bank_entitlements';
+import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { characterSheet, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
@@ -54,6 +56,8 @@ import {
   accountAndScopeForToken,
   accountById,
   accountForToken,
+  acquireCharacterLease,
+  bankBonusFactsForAccount,
   type CharacterRow,
   characterCountsByRealm,
   chatMuteStatusForAccount,
@@ -82,6 +86,8 @@ import {
   pruneClientPerfReports,
   reclaimDeactivatedName,
   referralCountForAccount,
+  releaseAllCharacterLeases,
+  releaseCharacterLease,
   renameCharacter,
   revokeCompanionToken,
   saveToken,
@@ -502,6 +508,8 @@ function characterListPayload(chars: CharacterRow[]): {
     forceRename: boolean;
     lastPlayed: string | null;
     playtimeSeconds: number;
+    skinCatalog: 'class' | 'mech';
+    mainhandItemId: string | null;
   }[];
 } {
   return {
@@ -516,6 +524,10 @@ function characterListPayload(chars: CharacterRow[]): {
       forceRename: c.force_rename,
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
+      // Real appearance for the char-select 3D preview (the client renders the
+      // Combat Mech cosmetic body and the equipped mainhand, matching the world).
+      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
+      mainhandItemId: c.state?.equipment?.mainhand ?? null,
     })),
   };
 }
@@ -2318,6 +2330,9 @@ export async function startServer(): Promise<http.Server> {
     bufferHandshakeMessages,
     requestMetadata,
     maxWsPerIpHard: config.maxWsPerIpHard,
+    acquireCharacterLease,
+    releaseCharacterLease,
+    bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
   });
   wsAuth.attachUpgrade(server, wss);
 
@@ -2339,6 +2354,22 @@ export async function startServer(): Promise<http.Server> {
     await game.saveMarket();
     await game.saveMail();
     await game.endAllPlaySessions();
+    // Drain any bank_ledger writes still queued on the FIFO tail BEFORE the lease
+    // sweep: once the leases drop, a replacement process can load the same character
+    // and write new ledger rows, and rows still queued here would flush after them
+    // with higher insertion ids, inverting the id order the offline audit replays by
+    // (false negative_net / purchased_regression alarms). A clean restart loses no
+    // audit rows this way (a crash still can; the audit tolerates that as a
+    // transient mismatch). Rejections log inside the writer, so the drain never
+    // throws.
+    await bankLedgerIdle();
+    // Drop every character load lease this process holds so a clean restart can
+    // reload its characters immediately instead of waiting out the lease TTL.
+    // Runs before pool.end(); a failure here must not abort the shutdown, so log
+    // and continue to close the pool.
+    await releaseAllCharacterLeases().catch((err) =>
+      console.error('lease release-all failed:', err),
+    );
     await game.chatLog.stop();
     await pool.end();
     process.exit(0);

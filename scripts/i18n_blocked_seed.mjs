@@ -191,6 +191,52 @@ export const COPIED_ALLOW_IDS = [
   'admin::id_ID::poi.thornpeak_heights.0',
   'admin::da_DK::location.type',
   'admin::da_DK::location.zone',
+  // Czech (cs_CZ, v0.23.0). Genuine cognates and borrowed terms: "online" is the
+  // standard Czech status word, "Paladin"/"Dungeon"/"Instance"/"Slot" are the
+  // established Czech gaming forms, "{count} h" is the Czech hour abbreviation,
+  // and the app title keeps the brand plus "Admin" (also the Czech word). The
+  // hub-town proper place-names stay verbatim like the cs game catalog keeps them.
+  'server::cs_CZ::who.statusOnline',
+  'admin::cs_CZ::app.title',
+  'admin::cs_CZ::moderation.badgeOnline',
+  'admin::cs_CZ::detail.lengthHours',
+  'admin::cs_CZ::class.paladin',
+  'admin::cs_CZ::poi.eastbrook_vale.0',
+  'admin::cs_CZ::poi.eastbrook_vale.4',
+  'admin::cs_CZ::poi.mirefen_marsh.0',
+  'admin::cs_CZ::poi.thornpeak_heights.0',
+  'admin::cs_CZ::poi.thornpeak_heights.5',
+  'admin::cs_CZ::location.kind.dungeon',
+  'admin::cs_CZ::location.instance',
+  'admin::cs_CZ::location.slot',
+  // Tick-profiler unit formats: "ms" (SI millisecond) and "{seconds}s" (the
+  // universal seconds abbreviation) render byte-identically in these locales,
+  // the same cognate case as detail.lengthHours ("{count} h").
+  'admin::cs_CZ::tickPerf.ms',
+  'admin::da_DK::tickPerf.durationSeconds',
+  'admin::da_DK::tickPerf.ms',
+  'admin::de_DE::tickPerf.durationSeconds',
+  'admin::de_DE::tickPerf.ms',
+  'admin::es::tickPerf.durationSeconds',
+  'admin::es::tickPerf.ms',
+  'admin::es_ES::tickPerf.durationSeconds',
+  'admin::es_ES::tickPerf.ms',
+  'admin::fr_CA::tickPerf.durationSeconds',
+  'admin::fr_CA::tickPerf.ms',
+  'admin::fr_FR::tickPerf.durationSeconds',
+  'admin::fr_FR::tickPerf.ms',
+  'admin::it_IT::tickPerf.durationSeconds',
+  'admin::it_IT::tickPerf.ms',
+  'admin::nl_NL::tickPerf.durationSeconds',
+  'admin::nl_NL::tickPerf.ms',
+  'admin::pl_PL::tickPerf.durationSeconds',
+  'admin::pl_PL::tickPerf.ms',
+  'admin::pt_BR::tickPerf.durationSeconds',
+  'admin::pt_BR::tickPerf.ms',
+  'admin::sv_SE::tickPerf.durationSeconds',
+  'admin::sv_SE::tickPerf.ms',
+  'admin::tr_TR::tickPerf.ms',
+  'admin::vi_VN::tickPerf.ms',
 ];
 
 export const V07_SLASH = [

@@ -1,5 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import type * as http from 'node:http';
+import { DELVES } from '../src/sim/data';
+import type { LootTier } from '../src/sim/lockpick';
 import type {
   DailyRewardHistory,
   DailyRewardLeaderboardEntry,
@@ -467,13 +469,93 @@ function onlineMultiplierPoints(
   return { points: Math.max(0, Math.floor(basePoints * multiplier)), multiplier };
 }
 
+function delveClearPoints(
+  task: { points: number; basePoints: number; config: Record<string, unknown> },
+  delveId: string,
+  tierId: string,
+  onlineMinutes: number,
+): {
+  points: number;
+  multiplier: number;
+  baseClearPoints: number;
+  levelBonus: number;
+  tierMultiplier: number;
+  preOnlinePoints: number;
+} | null {
+  const delve = DELVES[delveId];
+  if (!delve?.tiers.some((tier) => tier.id === tierId)) return null;
+  const taskConfig = task.config ?? {};
+  const baseClearPoints = numberConfig(
+    taskConfig,
+    'baseClearPoints',
+    task.basePoints ?? task.points,
+  );
+  const levelBaseline = numberConfig(taskConfig, 'levelBaseline', 7);
+  const pointsPerLevel = numberConfig(taskConfig, 'pointsPerLevel', 1);
+  const normalTierMultiplier = numberConfig(taskConfig, 'normalTierMultiplier', 1);
+  const heroicTierMultiplier = numberConfig(taskConfig, 'heroicTierMultiplier', 1.5);
+  const tierMultiplier = tierId === 'heroic' ? heroicTierMultiplier : normalTierMultiplier;
+  const levelBonus = Math.max(0, delve.minLevel - levelBaseline) * pointsPerLevel;
+  const preOnlinePoints = Math.max(0, Math.floor((baseClearPoints + levelBonus) * tierMultiplier));
+  const { points, multiplier } = onlineMultiplierPoints(preOnlinePoints, taskConfig, onlineMinutes);
+  return {
+    points,
+    multiplier,
+    baseClearPoints,
+    levelBonus,
+    tierMultiplier,
+    preOnlinePoints,
+  };
+}
+
+function delveChestOpenPoints(
+  task: { config: Record<string, unknown> },
+  chestTier: LootTier,
+  bountiful: boolean,
+  onlineMinutes: number,
+): {
+  points: number;
+  multiplier: number;
+  chestBasePoints: number;
+  chestTier: LootTier;
+  bountifulMultiplier: number;
+  preOnlinePoints: number;
+} | null {
+  const taskConfig = task.config ?? {};
+  const chestBasePoints =
+    chestTier === 'premium'
+      ? numberConfig(taskConfig, 'premiumChestPoints', 20)
+      : chestTier === 'medium'
+        ? numberConfig(taskConfig, 'mediumChestPoints', 10)
+        : chestTier === 'low'
+          ? numberConfig(taskConfig, 'lowChestPoints', 5)
+          : null;
+  if (chestBasePoints === null) return null;
+  const bountifulMultiplier = bountiful
+    ? numberConfig(taskConfig, 'bountifulChestMultiplier', 1.5)
+    : 1;
+  const preOnlinePoints = Math.max(0, Math.floor(chestBasePoints * bountifulMultiplier));
+  const { points, multiplier } = onlineMultiplierPoints(preOnlinePoints, taskConfig, onlineMinutes);
+  return {
+    points,
+    multiplier,
+    chestBasePoints,
+    chestTier,
+    bountifulMultiplier,
+    preOnlinePoints,
+  };
+}
+
 function currentTaskMultiplier(
   task: { type: string; points: number; basePoints: number; config: Record<string, unknown> },
   onlineMinutes: number,
 ): number | null {
   if (task.type === 'quest_completion')
     return questCompletionPoints(task, onlineMinutes).multiplier;
-  if (task.type === 'arena_result')
+  if (task.type === 'arena_result' || task.type === 'vale_cup_result')
+    return onlineMultiplierPoints(task.basePoints ?? task.points, task.config ?? {}, onlineMinutes)
+      .multiplier;
+  if (task.type === 'delve_clear')
     return onlineMultiplierPoints(task.basePoints ?? task.points, task.config ?? {}, onlineMinutes)
       .multiplier;
   return null;
@@ -647,6 +729,10 @@ export class DailyRewardService {
       completedAt?: Date;
     },
   ): Promise<number> {
+    // Protect Yumi (yumi3/yumi5) is an unranked objective mode: its bouts do
+    // not count toward the arena daily-reward task (maintainer decision;
+    // fiesta keeps its historical counting behavior).
+    if (result.format === 'yumi3' || result.format === 'yumi5') return 0;
     const completedAt = result.completedAt ?? new Date();
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
@@ -680,6 +766,152 @@ export class DailyRewardService {
           basePoints,
           ratingBefore: result.ratingBefore,
           ratingAfter: result.ratingAfter,
+        },
+      );
+      if (recorded) awardedPoints += points;
+    }
+    return awardedPoints;
+  }
+
+  async recordDelveClear(
+    accountId: number,
+    characterId: number | null,
+    delveId: string,
+    tierId: string,
+    completedAt: Date = new Date(),
+  ): Promise<number> {
+    if (!DELVES[delveId]) return 0;
+    const { day, config } = await dailyRewardClock(completedAt);
+    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+    await this.db.seedTasks(day, config.tasks);
+    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!eligibility.eligible) return 0;
+    const tasks = await this.db.tasksForType(day, 'delve_clear');
+    if (tasks.length === 0) return 0;
+    const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
+    for (const task of tasks) {
+      const clearPoints = delveClearPoints(task, delveId, tierId, onlineMinutes);
+      if (!clearPoints || clearPoints.points <= 0) continue;
+      const recorded = await this.db.addPoints(
+        day,
+        accountId,
+        'task',
+        clearPoints.points,
+        `task:${task.taskId}:delve:${delveId}:${tierId}:character:${characterId ?? 'account'}:${completedAt.toISOString()}`,
+        {
+          taskId: task.taskId,
+          taskType: task.type,
+          delveId,
+          tierId,
+          characterId,
+          onlineMinutes,
+          multiplier: clearPoints.multiplier,
+          baseClearPoints: clearPoints.baseClearPoints,
+          levelBonus: clearPoints.levelBonus,
+          tierMultiplier: clearPoints.tierMultiplier,
+          preOnlinePoints: clearPoints.preOnlinePoints,
+        },
+      );
+      if (recorded) awardedPoints += clearPoints.points;
+    }
+    return awardedPoints;
+  }
+
+  async recordDelveChestOpen(
+    accountId: number,
+    characterId: number | null,
+    delveId: string,
+    tierId: string,
+    chestTier: LootTier,
+    bountiful: boolean,
+    openedAt: Date = new Date(),
+  ): Promise<number> {
+    if (!DELVES[delveId]) return 0;
+    const { day, config } = await dailyRewardClock(openedAt);
+    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+    await this.db.seedTasks(day, config.tasks);
+    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!eligibility.eligible) return 0;
+    const tasks = await this.db.tasksForType(day, 'delve_clear');
+    if (tasks.length === 0) return 0;
+    const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
+    for (const task of tasks) {
+      const chestPoints = delveChestOpenPoints(task, chestTier, bountiful, onlineMinutes);
+      if (!chestPoints || chestPoints.points <= 0) continue;
+      const recorded = await this.db.addPoints(
+        day,
+        accountId,
+        'task',
+        chestPoints.points,
+        `task:${task.taskId}:delve_chest:${delveId}:${tierId}:${chestTier}:${bountiful ? 'bountiful' : 'standard'}:character:${characterId ?? 'account'}:${openedAt.toISOString()}`,
+        {
+          taskId: task.taskId,
+          taskType: task.type,
+          bonusType: 'delve_chest',
+          delveId,
+          tierId,
+          characterId,
+          chestTier: chestPoints.chestTier,
+          bountiful,
+          onlineMinutes,
+          multiplier: chestPoints.multiplier,
+          chestBasePoints: chestPoints.chestBasePoints,
+          bountifulMultiplier: chestPoints.bountifulMultiplier,
+          preOnlinePoints: chestPoints.preOnlinePoints,
+        },
+      );
+      if (recorded) awardedPoints += chestPoints.points;
+    }
+    return awardedPoints;
+  }
+
+  // Vale Cup daily task: ranked wins only. The game loop gates this to rated
+  // matches (the sim marks bot-backfilled and practice matches unrated); this
+  // method also no-ops losses so the task cannot award participation points.
+  // The match id keys the dedupe row, so one match yields at most one grant per
+  // account.
+  async recordValeCupResult(
+    accountId: number,
+    result: {
+      won: boolean;
+      bracket: number;
+      matchId: number;
+      completedAt?: Date;
+    },
+  ): Promise<number> {
+    if (!result.won) return 0;
+    const completedAt = result.completedAt ?? new Date();
+    const { day, config } = await dailyRewardClock(completedAt);
+    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+    await this.db.seedTasks(day, config.tasks);
+    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!eligibility.eligible) return 0;
+    const tasks = await this.db.tasksForType(day, 'vale_cup_result');
+    if (tasks.length === 0) return 0;
+    const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
+    for (const task of tasks) {
+      const taskConfig = task.config ?? {};
+      const basePoints = numberConfig(taskConfig, 'winBasePoints', task.basePoints ?? task.points);
+      const { points, multiplier } = onlineMultiplierPoints(basePoints, taskConfig, onlineMinutes);
+      if (points <= 0) continue;
+      const recorded = await this.db.addPoints(
+        day,
+        accountId,
+        'task',
+        points,
+        `task:${task.taskId}:vale_cup:${result.matchId}:win`,
+        {
+          taskId: task.taskId,
+          taskType: task.type,
+          bracket: result.bracket,
+          matchId: result.matchId,
+          won: true,
+          onlineMinutes,
+          multiplier,
+          basePoints,
         },
       );
       if (recorded) awardedPoints += points;

@@ -67,6 +67,12 @@ describe('registry', () => {
     expect(discord?.category).toBe('Interface');
     expect(discord?.kind).toBe('edge');
     expect(discord?.defaults).toEqual(['KeyU']);
+    // The Vale Cup window is a rebindable Interface toggle (default T; J and
+    // G are taken by targetFriendlyNext and the arena on this branch).
+    const valecup = BIND_ACTIONS.find((a) => a.id === 'valecup');
+    expect(valecup?.category).toBe('Interface');
+    expect(valecup?.kind).toBe('edge');
+    expect(valecup?.defaults).toEqual(['KeyY']);
   });
 });
 
@@ -94,6 +100,8 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
     expect(kb.actionForCode('KeyU')).toBe('discord');
+    expect(kb.actionForCode('KeyT')).toBe('crafting');
+    expect(kb.actionForCode('KeyY')).toBe('valecup');
     expect(kb.actionForCode('KeyZ')).toBe(null);
   });
 
@@ -233,7 +241,7 @@ describe('persistence', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('Enter')).toBe('chat');
     expect(kb.actionForCode('Equal')).toBe('slot11');
-    expect(kb.actionForCode('KeyY')).toBe(null);
+    expect(kb.actionForCode('KeyZ')).toBe(null);
   });
 
   it('drops a retained default that a stored binding already claimed', () => {

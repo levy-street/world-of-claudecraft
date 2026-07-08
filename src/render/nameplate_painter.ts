@@ -26,28 +26,16 @@ import {
   devTierDisplayName,
   devTierNameOutlineColor,
 } from '../ui/dev_tier';
+import { discordRoleTagLabel } from '../ui/discord_role_tag';
 import { tEntity } from '../ui/entity_i18n';
 import {
   holderTierBadgeDataUrl,
   holderTierByIndex,
   holderTierDisplayName,
 } from '../ui/holder_tier';
-import { formatNumber, type TranslationKey, t } from '../ui/i18n';
+import { formatNumber, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
-
-// Staff/special Discord role -> localized nameplate tag label key.
-const DISCORD_ROLE_TAG_KEYS: Record<string, TranslationKey> = {
-  levyst: 'hudChrome.discord.roleTag.levyst',
-  admin: 'hudChrome.discord.roleTag.admin',
-  devs: 'hudChrome.discord.roleTag.devs',
-  mods: 'hudChrome.discord.roleTag.mods',
-  artists: 'hudChrome.discord.roleTag.artists',
-};
-function discordRoleTag(key: string | undefined): string {
-  const tk = key ? DISCORD_ROLE_TAG_KEYS[key] : undefined;
-  return tk ? t(tk) : '';
-}
 
 import { castBarState } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
@@ -210,7 +198,7 @@ export class NameplatePainter {
         // Staff/special Discord role: tint the name + prefix a tag.
         const roleKey = suppressSelf ? undefined : e.discordRole;
         const roleColor = specialRoleColor(roleKey);
-        const roleTag = discordRoleTag(roleKey);
+        const roleTag = discordRoleTagLabel(roleKey);
         const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
         // Significant-contributor outline: a glowing outline drawn on top of the
         // existing name color (Discord staff or default) for a high dev tier, so

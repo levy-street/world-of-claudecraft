@@ -30,7 +30,7 @@
 // Markers carry the identity (the party class id) the painter resolves
 // to a color, never the resolved color.
 
-import { GATHER_NODES, isDelvePos, QUESTS, zoneAt } from '../sim/data';
+import { GATHER_NODES, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { isQuestTurnInNpc } from '../sim/types';
 import type { IWorld } from '../world_api';
 
@@ -43,8 +43,10 @@ const PARTY_DISC_MAX_RADIUS = 6;
 const PARTY_DISC_RADIUS_RANGE = 3;
 
 /** Which minimap surface a world renders: the delve schematic (owned by
- *  delve_map_painter) or the overworld minimap (this core). */
-export type MinimapMode = 'delve' | 'overworld';
+ *  delve_map_painter), the Protect Yumi maze (the overworld marker set over a
+ *  cached maze-wall background, minimap_painter.paintYumiMaze), or the
+ *  overworld minimap (this core). */
+export type MinimapMode = 'delve' | 'yumiMaze' | 'overworld';
 
 /** The NPC quest glyph: turn-in ready ('?') wins over available ('!'), else neutral. */
 export type NpcGlyph = '?' | '!' | '•';
@@ -106,6 +108,7 @@ export interface MinimapMarkers {
  *  band and a run is active (matches the inline guard); overworld otherwise. The delve
  *  branch is delve_map_painter's; the overworld branch is this core's. */
 export function minimapMode(world: IWorld): MinimapMode {
+  if (isYumiMazePos(world.player.pos.x)) return 'yumiMaze';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
 

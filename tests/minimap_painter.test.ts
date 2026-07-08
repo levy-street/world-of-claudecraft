@@ -53,10 +53,11 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
     // Cadence teeth that survive a call-site MOVE (the textual getComputedStyle count
     // alone would not catch relocating the resolve into the per-marker loop, since the
     // string lives only at the definition site). The per-marker loop lives in
-    // drawMarkers; assert resolveColors() is called exactly once (in paintOverworld) and
-    // is never referenced inside the drawMarkers body. A runtime getComputedStyle spy is
-    // deferred to the browser suite.
-    expect(code.match(/this\.resolveColors\(\)/g) ?? []).toHaveLength(1);
+    // drawMarkers; assert resolveColors() is called exactly once per entry point
+    // (paintOverworld + the Protect Yumi paintYumiMaze) and is never referenced inside
+    // the drawMarkers body. A runtime getComputedStyle spy is deferred to the browser
+    // suite.
+    expect(code.match(/this\.resolveColors\(\)/g) ?? []).toHaveLength(2);
     const drawMarkersBody = code.slice(code.indexOf('private drawMarkers('));
     expect(drawMarkersBody.length).toBeGreaterThan(0);
     expect(drawMarkersBody).not.toContain('resolveColors');

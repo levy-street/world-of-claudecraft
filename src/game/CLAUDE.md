@@ -20,6 +20,7 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 | `sfx.ts` / `voice.ts` | `sfx` / `voice` singletons: play pre-rendered clips from `public/audio/` (spatial 3D SFX + NPC voice lines) via their `*_manifest.generated.ts`. |
 | `settings.ts` | `Settings`: persisted Esc-menu options. |
 | `click_move.ts` / `pointer_pick.ts` / `camera_follow.ts` | pure, DOM-free input/camera math extracted from the render loop so they unit-test in isolation |
+| `keyboard_turn_facing.ts` / `self_alpha_lead.ts` | pure online-feel math: local TURN_SPEED integration for keyboard turns, streamed as the authoritative wire facing (mouselook-style; `main.ts` zeroes the turn flags while it owns the channel); the echo-driven adaptive self render lead |
 | `perf_doctor.ts` | pure perf-snapshot analyzer producing `PerfSuggestion[]` (no DOM); `perf_reporter.ts` is the telemetry reporter; `perf.ts` is the overlay/trace harness |
 | `cursors.ts` | hover-cursor PNGs |
 

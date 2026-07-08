@@ -20,27 +20,25 @@ import {
   type TalentAllocation,
   talentPointsAtLevel,
 } from '../sim/content/talents';
-import {
-  abilitiesKnownAt,
-  CLASSES,
-  COMMON_RECIPES,
-  NPCS,
-  resolveDelveShopOffers,
-} from '../sim/data';
+import { resolveSportKit } from '../sim/content/vale_cup';
+import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import { getArchetypeTitle } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
+  type DungeonDifficulty,
   type Entity,
   type EquipSlot,
   emptyMoveInput,
   type InvSlot,
   type LootRollChoice,
+  type LootRollGroupStatus,
   type LootRollPrompt,
   type MasterLootThreshold,
   type MoveInput,
@@ -49,13 +47,18 @@ import {
   type QuestState,
   type RiteIntensity,
   type SimEvent,
+  type SportRole,
+  type VcBracket,
+  type VcNationId,
 } from '../sim/types';
 import {
   type AccountCosmetics,
   type ArenaInfo,
+  type BankInfo,
   type CharacterSearchResult,
   type ClientCommand,
   type CraftResultView,
+  type CupInfo,
   type DailyRewardHistory,
   type DailyRewardLeaderboardPage,
   type DailyRewardSpinResult,
@@ -100,6 +103,11 @@ export interface CharacterSummary {
   forceRename: boolean;
   lastPlayed?: string | null;
   playtimeSeconds?: number;
+  // Real, in-world appearance so the char-select preview matches the game. Both
+  // optional for back-compat with an older server that omits them: absent
+  // skinCatalog defaults to the class rig, absent mainhand shows no weapon.
+  skinCatalog?: 'class' | 'mech';
+  mainhandItemId?: string | null;
 }
 
 function stringList(value: unknown): string[] {
@@ -801,7 +809,11 @@ function blankEntity(id: number): Entity {
     meleeHaste: 0,
     rangedHaste: 0,
     spellHaste: 0,
+    setProcs: [],
+    procReadyAt: undefined as unknown as Record<string, number>,
     critChance: 0.05,
+    critRating: 0,
+    hasteRating: 0,
     dodgeChance: 0.05,
     moveSpeed: 7,
     hostile: false,
@@ -855,6 +867,7 @@ function blankEntity(id: number): Entity {
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
+    bossDamagers: new Set(),
     forcedTargetId: null,
     forcedTargetTimer: 0,
     ownerId: null,
@@ -941,6 +954,7 @@ export class ClientWorld implements IWorld {
   // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
   // field (pet state lives on the owned-mob entity wire). ---
   partyInfo: PartyInfo | null = null;
+  private selectedDungeonDifficulty: DungeonDifficulty = 'normal';
   // --- IWorldTrade: active trade-window state, mirrored from the snapshot self
   // (`s.trade`, delta-omitted). ---
   tradeInfo: TradeInfo | null = null;
@@ -949,6 +963,16 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
+  // self (`s.vcup`, delta-omitted: a missing key keeps the prior mirror, an
+  // explicit null clears it, same as `s.arena`). ---
+  cupInfo: CupInfo | null = null;
+  // My live sport role, mirrored from the wireRev-gated heavy self field
+  // `s.sport` ({ role } | null, delta-omitted). NON-IWorld mirror: while set,
+  // the per-snapshot known rebuild resolves the role kit via the ONE shared
+  // resolveSportKit instead of the class/level/talent derivation, so the
+  // ONLINE action bar shows the sport kit (docs/prd/vale-cup.md wire trap).
+  sportRole: SportRole | null = null;
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
@@ -959,6 +983,10 @@ export class ClientWorld implements IWorld {
   // snapshot self (`s.mail` / `s.mailU`, delta-omitted). ---
   mailInfo: MailInfo | null = null;
   mailUnread = 0;
+  // --- IWorldBank: personal-bank contents view, mirrored from the snapshot self
+  // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
+  // server), so it only rides the wire while the player stands at a bursar. ---
+  bankInfo: BankInfo | null = null;
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -975,6 +1003,10 @@ export class ClientWorld implements IWorld {
   // all-zero default until the wheel/mass-conservation follow-up wires a self-snap
   // field the way `dmarks`/`dcomp` do for delveMarks/companionUpgrades above.
   craftSkills: Record<string, number> = emptyCraftSkills();
+  // Gathering profession proficiency (Mining/Logging/Herbalism, #1119), mirrored
+  // from the `gprof` self-wire delta below (the real read surface; see
+  // professionsState below for crafting/secondary professions).
+  gatheringProficiency: Record<string, number> = {};
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
@@ -984,6 +1016,8 @@ export class ClientWorld implements IWorld {
   // Crafting/secondary professions still contribute nothing until later
   // issues (#1120/#1125/#1126/#1140) land.
   professionsState: PlayerProfessionsView = { skills: [] };
+  // #1143: persistent town focus allocation, mirrored from the self-wire `tfocus`.
+  townFocus: Record<string, number> = {};
   // Stub for #1121: per-node respawn state is server-authoritative and not yet
   // wired onto the snapshot (see src/sim/professions/CLAUDE.md), so the client
   // cannot know another player's, or even its own, real per-node timer yet.
@@ -994,22 +1028,47 @@ export class ClientWorld implements IWorld {
   nodeHarvestableByMe(_nodeId: string): boolean {
     return true;
   }
-  // Static content read (#1127): the common-tier recipe list ships with the
-  // client bundle like every other content table, so this needs no wire
-  // round-trip. See src/world_api/professions.ts.
-  recipeList: readonly RecipeDef[] = COMMON_RECIPES;
+  // Static content read (#1127, extended #1132): the full recipe list (common
+  // tier plus combo recipes) ships with the client bundle like every other
+  // content table, so this needs no wire round-trip. See src/world_api/professions.ts.
+  recipeList: readonly RecipeDef[] = ALL_RECIPES;
   // Craft-result surface (#1127), mirrored from the server's `craftResult`
   // event (applyEvent below). Null until this session's first craft attempt.
   lastCraftResult: CraftResultView | null = null;
+  // Active-archetype identity (#1129, superseded scope). Same not-yet-wired-on-the-
+  // wire status as craftSkills/gatheringProficiency above: this change lands the
+  // sim-side state machine + persistence only, so online play sees the all-unset
+  // default (no archetype, switchCount 0) until a follow-up wires a self-snap field
+  // and the corresponding `cmd` dispatch cases in server/game.ts the way
+  // craft_item/harvest_node do for recipeList/nodeHarvestableByMe.
+  activeArchetype: string | null = null;
+  archetypeSwitchCount = 0;
+  archetypeAmendsProgress = 0;
+  archetypeAmendsRequired = 0;
+  acceptArchetypeQuest(_craftId: string): void {}
+  advanceAmendsProgress(): void {}
+  switchArchetype(_craftId: string): void {}
+  // Title granted by the active archetype (#1130): derived, not a stored mirror
+  // field, so it stays correct the moment a future wire-up starts pushing
+  // `activeArchetype` snapshot updates (until then it tracks the stub default
+  // above, i.e. always null). See src/sim/professions/archetype.ts.
+  get archetypeTitle(): string | null {
+    return getArchetypeTitle(this.activeArchetype);
+  }
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
+  // group-visible choices on the open rolls (the vote strip), mirrored from the self-wire
+  private lootRollGroup: LootRollGroupStatus[] = [];
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
   private socialDirty = false;
   // snapshot interpolation
   lastSnapAt = 0;
   snapInterval = 50; // ms, adapts to measured cadence
+  // server-measured achieved sim tick rate (Hz), mirrored from the snap head;
+  // null until the server's meter warms up (perf overlay hides the row)
+  serverTickHz: number | null = null;
   // entity id -> performance.now() when it first went missing from a snapshot;
   // used for the despawn grace window (anti-flicker), cleared once it returns
   private missingSince = new Map<number, number>();
@@ -1114,12 +1173,27 @@ export class ClientWorld implements IWorld {
     this.reconnectTimer = window.setTimeout(() => this.openSocket(), delayMs);
   }
 
-  close(): void {
+  private endSession(): void {
     this.sessionEnded = true;
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
+  }
+
+  close(): void {
+    this.endSession();
     this.ws.onclose = null;
     this.ws.close();
+  }
+
+  // Signal a deliberate logout to the server so it skips linkdead grace and
+  // calls leave() immediately. Must be called before a page reload so the
+  // character is properly removed from the world instead of being held
+  // in-world for the 5-minute linkdead window.
+  sendLogout(): void {
+    this.endSession();
+    if (this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ t: 'logout' }));
+    }
   }
 
   get player(): Entity {
@@ -1323,9 +1397,7 @@ export class ClientWorld implements IWorld {
       }
       // any other server rejection (kick, moderation, takeover, failed auth)
       // ends the session for good: no auto-reconnect
-      this.sessionEnded = true;
-      clearInterval(this.sendTimer);
-      if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
+      this.endSession();
       this.onDisconnect?.(msg.error ?? 'rejected by server');
       return;
     }
@@ -1416,6 +1488,11 @@ export class ClientWorld implements IWorld {
       if (gap > 5 && gap < 500) this.snapInterval = this.snapInterval * 0.9 + gap * 0.1;
     }
     this.lastSnapAt = now;
+    // Achieved server sim tick rate, measured server-side (snapshot ARRIVAL
+    // cadence undercounts sag: catch-up runs several sim ticks per broadcast).
+    if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
+      this.serverTickHz = snap.tickHz;
+    }
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -1480,9 +1557,16 @@ export class ClientWorld implements IWorld {
       // the global snapshot clock the camera follow uses.
       const prevUpdatedAt = e.netUpdatedAt;
       const prevInterval = e.netInterval;
+      // LOCKSTEP with remoteEntityAlpha (src/render/net_interp_core.ts, which
+      // net/ cannot import): unknown-cadence entities interpolate on a fixed
+      // 120 ms fallback interval capped at 1, so the re-anchor lands exactly
+      // on the pose the renderer drew instead of the global snapshot clock.
       const entAlpha =
-        w.id !== this.playerId && prevUpdatedAt !== undefined && prevInterval !== undefined
-          ? Math.min(1.25, (now - prevUpdatedAt) / Math.max(20, prevInterval))
+        w.id !== this.playerId && prevUpdatedAt !== undefined
+          ? Math.min(
+              prevInterval === undefined ? 1 : 1.25,
+              (now - prevUpdatedAt) / Math.max(20, prevInterval ?? 120),
+            )
           : contAlpha;
       const entFacingAlpha = Math.min(1, entAlpha);
       // per-entity update clock: distant entities are sent below snapshot
@@ -1517,7 +1601,12 @@ export class ClientWorld implements IWorld {
           y: e.prevPos.y + (e.pos.y - e.prevPos.y) * entAlpha,
           z: e.prevPos.z + (e.pos.z - e.prevPos.z) * entAlpha,
         };
-        e.prevFacing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * entFacingAlpha;
+        // wrapAngle keeps the stored basis bounded: converging toward a facing
+        // that keeps crossing the +-PI seam otherwise grows prevFacing by 2*PI
+        // per revolution, unbounded over a long session.
+        e.prevFacing = wrapAngle(
+          e.prevFacing + wrapAngle(e.facing - e.prevFacing) * entFacingAlpha,
+        );
       }
       e.pos.x = w.x;
       e.pos.y = w.y;
@@ -1596,6 +1685,9 @@ export class ClientWorld implements IWorld {
           // sends it only when defined (server/game.ts), so an ordinary aura or an old server
           // decodes to undefined and the badge falls back to the stacks path, exactly as before.
           rec.charges = a.charges;
+          // The caster's entity id, for the target strip's own-aura prominence
+          // (auras_view ownFirst). An old server omits it; 0 matches no player id.
+          rec.sourceId = a.src ?? 0;
         }
       } else {
         e.auras = wireAuras.map((a: any) => ({
@@ -1608,7 +1700,7 @@ export class ClientWorld implements IWorld {
           value2: a.value2,
           value3: a.value3,
           tickInterval: a.tickInterval,
-          sourceId: 0,
+          sourceId: a.src ?? 0,
           school: a.school ?? 'physical',
           stacks: a.stacks,
           charges: a.charges,
@@ -1681,6 +1773,11 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
+      // Crit/haste RATING are informational paper-doll stats (combat values ride
+      // crit/sh above); sent always like the other self stats so the online
+      // character sheet shows them instead of the blankEntity 0. Server-recomputed.
+      e.critRating = s.crat ?? 0;
+      e.hasteRating = s.hrat ?? 0;
       e.weapon = s.weapon ?? e.weapon;
       e.eating = s.eat
         ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }
@@ -1725,6 +1822,7 @@ export class ClientWorld implements IWorld {
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
+      if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
       // the prior mirror); the known rebuild below is display-only (re-renders what
@@ -1740,11 +1838,20 @@ export class ClientWorld implements IWorld {
       }
       if (!this.talents) this.talents = emptyAllocation();
       const talents = this.talents;
-      this.known = abilitiesKnownAt(
-        this.cfg.playerClass,
-        e.level,
-        computeTalentModifiers(this.cfg.playerClass, talents),
-      );
+      // IWorldValeCup sport-kit swap (the wire trap, docs/prd/vale-cup.md): a
+      // server-side meta.known swap is invisible to this derived rebuild, so
+      // the server flags the live role via the wireRev-gated heavy `sport`
+      // field. While the mirrored role is set, known is the role kit from the
+      // shared resolver (identical to the Sim's swap); otherwise the normal
+      // class/level/talent derivation below applies.
+      if (s.sport !== undefined) this.sportRole = s.sport ? (s.sport.role ?? null) : null;
+      this.known = this.sportRole
+        ? resolveSportKit(this.sportRole)
+        : abilitiesKnownAt(
+            this.cfg.playerClass,
+            e.level,
+            computeTalentModifiers(this.cfg.playerClass, talents),
+          );
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -1756,16 +1863,24 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.vcup !== undefined) this.cupInfo = s.vcup;
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
+      // `bank` is delta-omitted when unchanged (an omitted key means unchanged, NOT
+      // "no bank"); away from a banker the server encodes it as null. Never default
+      // to null/empty on omission, that would wipe an open bank window's mirror.
+      if (s.bank !== undefined) this.bankInfo = s.bank;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
+      if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
       if (s.dmarks !== undefined) this.delveMarks = s.dmarks ?? 0;
       if (s.dcomp !== undefined) this.companionUpgrades = s.dcomp ?? {};
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
+      if (s.tfocus !== undefined) this.townFocus = s.tfocus ?? {};
+      if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
@@ -1938,12 +2053,18 @@ export class ClientWorld implements IWorld {
   harvestCorpse(id: number, components?: string[]): void {
     this.cmd({ cmd: 'harvestCorpse', id, components });
   }
+  setTownFocus(allocation: Record<string, number>): void {
+    this.cmd({ cmd: 'set_town_focus', allocation });
+  }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
     this.cmd({ cmd: 'lootRoll', rollId, choice });
   }
   activeLootRolls(): LootRollPrompt[] {
     return this.lootRollPrompts;
+  }
+  lootRollGroupStatus(): LootRollGroupStatus[] {
+    return this.lootRollGroup;
   }
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });
@@ -2182,6 +2303,34 @@ export class ClientWorld implements IWorld {
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
   }
+  // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
+  // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---
+  vcupQueueJoin(
+    bracket: VcBracket,
+    nation: VcNationId,
+    role: SportRole,
+    enterAsGuild: boolean,
+  ): void {
+    this.cmd({ cmd: 'vcup_queue', bracket, nation, role, guild: enterAsGuild });
+  }
+  vcupQueueLeave(): void {
+    this.cmd({ cmd: 'vcup_leave' });
+  }
+  vcupSetRole(role: SportRole): void {
+    this.cmd({ cmd: 'vcup_role', role });
+  }
+  vcupReady(): void {
+    this.cmd({ cmd: 'vcup_ready' });
+  }
+  vcupBet(side: 'A' | 'B', amount: number): void {
+    this.cmd({ cmd: 'vcup_bet', side, amount });
+  }
+  // Private practice bout against bots: the server seats it on an instanced pitch
+  // copy far from the Sowfield, so it runs in parallel with the real match and
+  // every other practice. Same command online and off.
+  vcupPracticeStart(bracket: VcBracket): void {
+    this.cmd({ cmd: 'vcup_practice', bracket });
+  }
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the
   // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---
@@ -2291,6 +2440,20 @@ export class ClientWorld implements IWorld {
   mailMarkRead(mailId: number): void {
     this.cmd({ cmd: 'mail_read', id: mailId });
   }
+  // --- IWorldBank: personal-bank deposit/withdraw/buy-slots (snake_case wire
+  // strings). bankInfo is a snapshot read (the mirror field above); the server
+  // re-validates banker proximity, capacity, and quest-item rules on every send. The
+  // slotIndex rides as `slot` and the optional partial count as `count`, matching the
+  // castAbilityBySlot/discard wire idiom. ---
+  bankDeposit(slotIndex: number, count?: number): void {
+    this.cmd({ cmd: 'bank_deposit', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  }
+  bankWithdraw(slotIndex: number, count?: number): void {
+    this.cmd({ cmd: 'bank_withdraw', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  }
+  bankBuySlots(): void {
+    this.cmd({ cmd: 'bank_buy_slots' });
+  }
   // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
   // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live
   // countdown locally so it ticks without traffic. enter_crypt/leave_crypt are legacy
@@ -2301,6 +2464,16 @@ export class ClientWorld implements IWorld {
   }
   leaveDungeon(): void {
     this.cmd({ cmd: 'leave_dungeon' });
+  }
+  dungeonDifficulty(): DungeonDifficulty {
+    return this.selectedDungeonDifficulty ?? 'normal';
+  }
+  setDungeonDifficulty(difficulty: DungeonDifficulty): void {
+    this.selectedDungeonDifficulty = difficulty;
+    this.cmd({ cmd: 'set_dungeon_difficulty', difficulty });
+  }
+  buyHeroicVendorItem(itemId: string): void {
+    this.cmd({ cmd: 'heroic_buy', itemId });
   }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.

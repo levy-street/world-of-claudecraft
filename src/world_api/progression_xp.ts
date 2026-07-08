@@ -58,6 +58,11 @@ export interface IWorldProgressionXp {
   // (see src/sim/content/professions.ts and src/sim/professions/wheel.ts). No
   // conserved-mass economy yet, so this is a plain read of the persisted counters.
   craftSkills: Record<string, number>;
+  // Gathering profession proficiency (Mining/Logging/Herbalism), keyed by
+  // profession id. Independent, additive counters: gaining one never changes
+  // another. Minimal read stub for issue #1119; reconcile with issue #1164
+  // (a broader professions facet) once that lands.
+  gatheringProficiency: Record<string, number>;
   // Post-cap progression: the realm-scoped lifetime-XP leaderboard, and the
   // opt-in cosmetic prestige action. Paged server-side (a realm can hold far
   // more than one page of max-level players); page is 0-based.

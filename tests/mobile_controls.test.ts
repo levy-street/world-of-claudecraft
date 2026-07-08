@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { Input, TouchMoveInput } from '../src/game/input';
 import {
   CHAT_LONG_PRESS_MS,
-  clampJoystickOrigin,
   HAPTICS_STORE_KEY,
   interfaceModeFromSetting,
   isChatLongPress,
@@ -219,33 +218,11 @@ describe('mapLookVector', () => {
   });
 });
 
-describe('clampJoystickOrigin', () => {
-  const bounds = { left: 0, top: 0, right: 400, bottom: 600 };
-  const radius = 61;
-
-  it('keeps an interior touch exactly where the thumb landed', () => {
-    expect(clampJoystickOrigin(200, 300, radius, bounds)).toEqual({ x: 200, y: 300 });
-  });
-
-  it('pushes a corner touch inward so the whole circle stays on-screen', () => {
-    expect(clampJoystickOrigin(5, 595, radius, bounds)).toEqual({
-      x: radius,
-      y: bounds.bottom - radius,
-    });
-  });
-
-  it('clamps against the far edges too', () => {
-    expect(clampJoystickOrigin(900, -50, radius, bounds)).toEqual({
-      x: bounds.right - radius,
-      y: radius,
-    });
-  });
-
-  it('falls back to the axis midpoint when the zone is smaller than the joystick', () => {
-    const tight = { left: 0, top: 0, right: 80, bottom: 600 };
-    expect(clampJoystickOrigin(10, 300, radius, tight)).toEqual({ x: 40, y: 300 });
-  });
-});
+// (clampJoystickOrigin was removed: clamping the floating origin into the
+// 132px capture zone, which cannot contain the 140/128px wheel, pinned the
+// origin away from the thumb and made every off-center touchdown instantly
+// walk the character: the issue #1229 drift. The origin is now the raw touch
+// point; the integration tests below pin the new contract.)
 
 describe('pinchZoomDelta', () => {
   it('returns zero when the pinch distance is unchanged', () => {
@@ -416,6 +393,7 @@ function installMobileControlDom(): {
   jumpButton: FakeElement;
   emoteButton: FakeElement;
   discordButton: FakeElement;
+  donateButton: FakeElement;
   windowTarget: EventTarget;
 } {
   const elements = new Map<string, FakeElement>([
@@ -435,6 +413,7 @@ function installMobileControlDom(): {
     ['mobile-jump', new FakeElement()],
     ['mobile-emote', new FakeElement()],
     ['mobile-discord', new FakeElement()],
+    ['mobile-donate', new FakeElement()],
   ]);
   const body = new FakeElement();
   const documentTarget = new EventTarget();
@@ -463,6 +442,7 @@ function installMobileControlDom(): {
     jumpButton: elements.get('mobile-jump')!,
     emoteButton: elements.get('mobile-emote')!,
     discordButton: elements.get('mobile-discord')!,
+    donateButton: elements.get('mobile-donate')!,
     windowTarget,
   };
 }
@@ -492,8 +472,10 @@ function mobileCallbacks() {
     onMenu: noop,
     onSocial: noop,
     onDiscord: noop,
+    onDonate: noop,
     onEmotes: noop,
     onArena: noop,
+    onValeCup: noop,
     onQuestLog: noop,
     onCharacter: noop,
     onBags: noop,
@@ -501,6 +483,7 @@ function mobileCallbacks() {
     onTalents: noop,
     onMap: noop,
     onLeaderboard: noop,
+    onDailyRewards: noop,
     onNameplates: () => false,
     onMusic: () => true,
     onRecenterCamera: noop,
@@ -602,6 +585,99 @@ describe('MobileControls pointer lifecycle', () => {
 
     expect(lastMove).toBeNull();
     expect(hapticCalls).toBe(0);
+  });
+
+  it('touchdown alone never produces movement intent: the origin IS the touch point', () => {
+    const { moveZone } = installMobileControlDom();
+    let lastMove: TouchMoveInput | null = null;
+    const input = {
+      setTouchMove: (move: TouchMoveInput) => {
+        lastMove = move;
+      },
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    // Deep in the zone's bottom-left corner, far from the wheel's home centre:
+    // the shipped v0.22.0 clampJoystickOrigin pinned the origin into the
+    // capture zone here (which cannot contain the wheel), reading an instant
+    // back+strafe-left before any drag: the issue #1229 drift.
+    moveZone.dispatchEvent(pointerEvent('pointerdown', { pointerId: 7, clientX: 8, clientY: 232 }));
+
+    expect(lastMove).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+  });
+
+  it('captures touches on the wheel itself (its arc overhangs the capture zone)', () => {
+    const { moveJoystick } = installMobileControlDom();
+    let lastMove: TouchMoveInput | null = null;
+    const input = {
+      setTouchMove: (move: TouchMoveInput) => {
+        lastMove = move;
+      },
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    // The 140/128px wheel overhangs the fixed 132px zone; a touch on the
+    // overhang targets the wheel, not the zone, and used to be a dead sliver
+    // (the wheel had pointer-events: auto but no listeners).
+    moveJoystick.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 8, clientX: 140, clientY: 60 }),
+    );
+    moveJoystick.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 8, clientX: 200, clientY: 60 }),
+    );
+
+    expect(lastMove).toEqual({ forward: false, back: false, strafeLeft: false, strafeRight: true });
+  });
+
+  it('a window opening mid-drag releases the joystick instead of walking blind', () => {
+    const { moveZone } = installMobileControlDom();
+    let lastMove: TouchMoveInput | null = null;
+    let clearCount = 0;
+    const input = {
+      setTouchMove: (move: TouchMoveInput) => {
+        lastMove = move;
+      },
+      clearTouchMove: () => {
+        clearCount += 1;
+        lastMove = null;
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 9, clientX: 100, clientY: 50 }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 9, clientX: 160, clientY: 50 }),
+    );
+    expect(lastMove).toEqual({ forward: false, back: false, strafeLeft: false, strafeRight: true });
+
+    // A bag/map/quest window opens under the held thumb: the joystick is now
+    // beneath the full-screen backdrop, so the next move must end the drag
+    // (the same abort camera swipe-look already had), not keep walking.
+    document.body.classList.add('mobile-window-open');
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 9, clientX: 170, clientY: 50 }),
+    );
+
+    expect(clearCount).toBe(1);
+    expect(lastMove).toBeNull();
   });
 
   it('keeps updating camera look when the active pointer moves outside the joystick element', () => {
@@ -731,6 +807,29 @@ describe('MobileControls pointer lifecycle', () => {
     discordButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
 
     expect(discord).toBe(1);
+  });
+
+  it('fires the Donate callback when the on-screen Donate button is tapped', () => {
+    const { donateButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let donate = 0;
+    const callbacks = {
+      ...mobileCallbacks(),
+      onDonate: () => {
+        donate += 1;
+      },
+    };
+    new MobileControls(input, callbacks).start();
+
+    donateButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(donate).toBe(1);
   });
 
   it('closes the open More modal when tapping outside it', () => {

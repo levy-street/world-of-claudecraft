@@ -37,7 +37,11 @@ const CONTROL_IDS = [
   'mobile-interact',
   'mobile-jump',
   'mobile-chat',
+  'mobile-social',
   'mobile-more',
+  // The consumables quick bar's always-visible chevron chip; the row it
+  // expands is display:none by default, so its slots are not measurable here.
+  'mobile-consumables-toggle',
 ];
 const NEIGHBOR_IDS = ['minimap-wrap', 'side-buttons'];
 const TOUCH_FLOOR = 40;
@@ -111,6 +115,10 @@ const CIRCLE_IDS = new Set([
   'mobile-target-cycle',
   'mobile-interact',
   'mobile-action-page-toggle',
+  // Jump/Autorun are true circles too, nested around the joystick's hollow
+  // the same way Target/Use nest in the ring's (mirrored for the left thumb).
+  'mobile-autorun',
+  'mobile-jump',
   'slot-0',
   'slot-1',
   'slot-2',
@@ -331,7 +339,9 @@ try {
   // 1.3 max, what applySetting writes for joystickScale / actionButtonScale):
   // at max the grown joystick must not slide under the cluster; at min the
   // cluster's floored offset must keep every button clear of the FIXED
-  // #mobile-move-zone capture area, or a movement thumb would trigger Jump.
+  // #mobile-move-zone capture area, or a movement thumb would trigger Autorun
+  // (Jump moved to the ring's bottom-right, so Autorun is the one satellite
+  // still seated by the joystick).
   for (const joyScale of ['0.7', '1.3']) {
     await page.evaluate((v) => {
       const c = document.getElementById('mobile-controls');
@@ -341,7 +351,7 @@ try {
     await sleep(300);
     const ext = await collectRects(page);
     if (ext.moveZone) {
-      for (const id of ['mobile-jump', 'mobile-autorun']) {
+      for (const id of ['mobile-autorun']) {
         const r = ext.controls[id];
         if (r && edgeGap(r, ext.moveZone) < 0) {
           fail(`joy-scale ${joyScale}: #${id} overlaps the move capture zone`);
@@ -358,9 +368,18 @@ try {
     return r ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null;
   });
   if (joy) {
-    for (const id of ['mobile-jump', 'mobile-autorun']) {
+    // Circle math on both sides: the joystick pad and the satellites are true
+    // circles (border-radius: 50%), and Autorun's 45deg diagonal seat sits
+    // corner-to-corner with the pad, so bounding boxes overlap by design
+    // while the circles keep a positive gap (same rationale as CIRCLE_IDS).
+    const joyCircle = circleOf({ ...joy, w: joy.right - joy.left, h: joy.bottom - joy.top });
+    for (const id of ['mobile-autorun']) {
       const r = sc.controls[id];
-      if (r && edgeGap(r, joy) < 0) fail(`joy-scale 1.3: joystick overlaps #${id}`);
+      if (!r) continue;
+      const c = circleOf(r);
+      if (Math.hypot(c.x - joyCircle.x, c.y - joyCircle.y) - c.r - joyCircle.r < 0) {
+        fail(`joy-scale 1.3: joystick overlaps #${id}`);
+      }
     }
   }
   await page.evaluate(() => {

@@ -74,6 +74,15 @@ const DEV_COMMANDS_ENV = 'ALLOW_DEV_COMMANDS';
 // pre-auth 413 fires before any db read.
 const HEADER_CONTENT_LENGTH = 'content-length';
 const OVERSIZE_CONTENT_LENGTH = '999999999';
+const DISCORD_ENV_KEYS = [
+  'DISCORD_CLIENT_ID',
+  'DISCORD_CLIENT_SECRET',
+  'DISCORD_GUILD_ID',
+] as const;
+
+function clearDiscordConfigEnv(): void {
+  for (const key of DISCORD_ENV_KEYS) delete process.env[key];
+}
 // A CORS Origin the server reflects: a genuine member of the native-app allowlist,
 // which maybeCors reflects regardless of the REALMS env (REALM_ORIGINS is empty in
 // tests). Read from the source set so a change to the allowlist keeps the test honest.
@@ -293,6 +302,7 @@ let oldDispatch: Dispatch;
 let newDispatch: Dispatch;
 let report: ParityReport;
 let savedDevCommands: string | undefined;
+let savedDiscordEnv: Partial<Record<(typeof DISCORD_ENV_KEYS)[number], string | undefined>>;
 
 // Capture one fixture request through BOTH modes, each preceded by a full limiter
 // reset, and return the two normalized responses for a focused named assertion.
@@ -334,10 +344,17 @@ beforeAll(async () => {
   // Force the /api/perf dev gate off so GET /api/perf is a deterministic 404.
   savedDevCommands = process.env[DEV_COMMANDS_ENV];
   process.env[DEV_COMMANDS_ENV] = '0';
+  savedDiscordEnv = {};
+  for (const key of DISCORD_ENV_KEYS) {
+    savedDiscordEnv[key] = process.env[key];
+  }
+  clearDiscordConfigEnv();
   // Pin the GitHub releases proxy deterministic (unreachable GitHub -> empty feed).
   vi.stubGlobal('fetch', () => Promise.reject(new Error('network disabled for parity harness')));
 
   const main = (await import('../../../server/main')) as MainModule;
+  // server/db.ts loads .env during the main import, so clear again after import.
+  clearDiscordConfigEnv();
   oldDispatch = makeModedDispatch(main, 'legacy');
   newDispatch = makeModedDispatch(main, 'new');
 
@@ -351,6 +368,11 @@ afterAll(async () => {
   vi.unstubAllGlobals();
   if (savedDevCommands === undefined) delete process.env[DEV_COMMANDS_ENV];
   else process.env[DEV_COMMANDS_ENV] = savedDevCommands;
+  for (const key of DISCORD_ENV_KEYS) {
+    const value = savedDiscordEnv[key];
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
 });
 
 describe('/api dispatch parity (legacy flag vs new flag)', () => {

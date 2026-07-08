@@ -2,9 +2,49 @@
 import type { TalentLocaleText } from './talent_i18n';
 
 export const TALENT_NEW: Record<
-  'da_DK' | 'id_ID' | 'nl_NL' | 'pl_PL' | 'sv_SE' | 'tr_TR' | 'vi_VN',
+  'cs_CZ' | 'da_DK' | 'id_ID' | 'nl_NL' | 'pl_PL' | 'sv_SE' | 'tr_TR' | 'vi_VN',
   TalentLocaleText
 > = {
+  cs_CZ: {
+    statLabels: {
+      str: 'Síla',
+      agi: 'Obratnost',
+      sta: 'Výdrž',
+      int: 'Intelekt',
+      spi: 'Duch',
+      armor: 'brnění',
+      ap: 'útočnou sílu',
+      crit: 'šanci na kritický zásah',
+      dodge: 'šanci na vyhnutí',
+      apPct: 'útočnou sílu',
+      staPct: 'Výdrž',
+      armorPct: 'brnění',
+      maxHpPct: 'maximální zdraví',
+      meleeDmgPct: 'poškození schopností na blízko',
+      spellDmgPct: 'poškození kouzly',
+      healPct: 'účinnost léčení',
+      threatPct: 'vytvořenou hrozbu',
+      damage: 'poškození',
+      cost: 'cenu',
+      cooldown: 'dobu obnovy',
+      castTime: 'dobu sesílání',
+    },
+    roleLabels: { tank: 'tankování', healer: 'léčení', dps: 'poškození' },
+    perRank: ' za stupeň',
+    noEffect: 'Poskytuje bonus specializace.',
+    chooseOne: (name) => 'Vyber jednu možnost pro ' + name + '.',
+    specDescription: (className, role, abilityName) =>
+      'Specializace pro ' +
+      className +
+      ' zaměřená na ' +
+      role +
+      '. Hlavní schopnost: ' +
+      abilityName +
+      '.',
+    grant: (abilityName) => 'Poskytuje ' + abilityName + '.',
+    increase: (target, amount, perRank) => 'Zvyšuje ' + target + ' o ' + amount + perRank + '.',
+    reduce: (target, amount, perRank) => 'Snižuje ' + target + ' o ' + amount + perRank + '.',
+  },
   da_DK: {
     statLabels: {
       str: 'Styrke',

@@ -308,18 +308,19 @@ export const pl_PL: EnTranslations = {
       "autorun": "Autobieg",
       "jump": "Skok",
       "leaderboard": "Rankingi",
+      "dailyRewards": "Nagrody",
       "nameplates": "Nazwy",
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
       "toggleHaptics": "Przełącz wibracje",
       "hotbarPage": "Umiejętności",
       "hotbarPageAria": "Pokaż następny zestaw umiejętności",
-      "actionRing": "Combat actions",
-      "actionPageToggle": "Switch action page",
-      "actionPageIndicator": "{page}",
-      "targetCycle": "Swap target",
-      "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "actionRing": "Działania bojowe",
+      "actionPageToggle": "Zmień stronę akcji",
+      "actionPageIndicator": "Str. {page}",
+      "targetCycle": "Zmień cel",
+      "targetCycleShort": "Cel",
+      "spellbookPageLabel": "Strona {page}"
     },
     "tutorial": {
       "moveBodyTouch": "Użyj gałki ruchu, aby się poruszać, i przeciągaj ekran, aby się rozglądać. Zrób kilka kroków, by zacząć.",
@@ -368,7 +369,9 @@ export const pl_PL: EnTranslations = {
       "hoursMinutes": "{h}h {m}m",
       "minutes": "{m}m",
       "lessThanMinute": "<1m",
-      "lockedToast": "Jesteś przypisany do rajdu {raid}. Odblokowanie za {time}."
+      "lockedToast": "Jesteś przypisany do rajdu {raid}. Odblokowanie za {time}.",
+      "heroicName": "Heroiczny {name}",
+      "heroicLocked": "Jesteś przypisany do heroicznego {name}."
     },
     "compass": {
       "N": "Pn",
@@ -390,11 +393,149 @@ export const pl_PL: EnTranslations = {
       "emoteWheel": "Koło emotek",
       "targetFriendly": "Obierz najbliższego sojusznika",
       "targetFriendlyNext": "Przełączaj przyjazny cel",
-      "discord": "Discord"
+      "discord": "Discord",
+      "valecup": "Puchar Doliny"
+    },
+    "vcup": {
+      "title": "Puchar Doliny",
+      "shootPower": "MOC",
+      "close": "Zamknij okno Pucharu Doliny",
+      "offlineNote": "Księga rozgrywek jest zamknięta. Puchar Doliny jest teraz niedostępny.",
+      "recordLine": "Twój bilans: zwycięstwa {wins}, porażki {losses}, remisy {draws}.",
+      "bracketsAria": "Format meczu",
+      "bracketLabel": "{n} na {n}",
+      "waitingCount": "Oczekuje: {count}",
+      "nationsHeading": "Sztandar nacji",
+      "nation": {
+        "vale": "Dolina Wschodniego Strumienia",
+        "mirefen": "Mokrzaw",
+        "thornpeak": "Ciernisty Szczyt",
+        "coliseum": "Popielne Koloseum",
+        "choir": "Blady Chór",
+        "ogre": "Klany Ogrów",
+        "moon": "Blady Księżyc",
+        "copperdig": "Miedziane Wykopalisko"
+      },
+      "awayNote": "Jeśli obie strony niosą ten sam sztandar, goście grają w odwróconych barwach.",
+      "rolesHeading": "Rola sportowa",
+      "role": {
+        "allrounder": {
+          "name": "Wszechstronny",
+          "desc": "Wszystkiego po trochu: kopnięcie, wykop i uczciwy bark."
+        },
+        "striker": {
+          "name": "Napastnik",
+          "desc": "Żyje dla dalekiego wykopu i szybkiego zwodu."
+        },
+        "sweeper": {
+          "name": "Libero",
+          "desc": "Odpycha biegnących od piłki i wybija ją daleko."
+        },
+        "keeper": {
+          "name": "Bramkarz",
+          "desc": "Strzeże pola bramkowego chwytem, rzutem i wybiciem."
+        }
+      },
+      "queue": "Dołącz do kolejki",
+      "leaveQueue": "Opuść kolejkę",
+      "queueNote": "Do kolejki dołączysz z dowolnego miejsca; gwizdek wezwie cię na Maciorowe Błonie.",
+      "queuedStatus": "W kolejce do {bracket}: miejsce {position} z {count}.",
+      "blockNation": "Najpierw wybierz sztandar nacji.",
+      "blockPartySize": "Ten format wymaga mniejszej drużyny.",
+      "blockNotLeader": "Tylko przywódca drużyny może zapisać zespół do kolejki.",
+      "inMatchNote": "Twoja drużyna jest na boisku. Graj dalej!",
+      "deserterNote": "Opiekun Murawy pamięta. Do kolejki wrócisz za {seconds} s.",
+      "liveHeading": "Teraz na Maciorowym Błoniu",
+      "liveAria": "Puchar Doliny: {nationA} {scoreA}, {nationB} {scoreB}",
+      "walkUp": "Podejdź na Maciorowe Błonie, aby oglądać z trybun.",
+      "noLive": "Na boisku cisza. Żaden mecz się nie toczy.",
+      "boardHeading": "Tablica zwycięzców",
+      "boardEmpty": "Nie zapisano jeszcze zwycięzców. Miedziany Skopek czeka.",
+      "boardWins": "zwycięstwa: {count}",
+      "enterAsGuild": "Wystąp pod sztandarem gildii {guild}",
+      "guildRecordLine": "Bilans twojej gildii: zwycięstwa {wins}, porażki {losses}.",
+      "guildBoardHeading": "Sztandary gildii",
+      "guildBoardEmpty": "Żadna gildia nie wyszła jeszcze na boisko. Wznieś swój sztandar!",
+      "guildBoardWl": "{wins} Z, {losses} P",
+      "practice": "Trening z botami",
+      "practiceNote": "Od razu rozpoczyna prywatny mecz z botami na twoim własnym boisku treningowym.",
+      "practicingNow": "Trenują teraz ({count}):",
+      "clock": "{minutes}:{seconds}",
+      "indicatorQueued": "Kolejka Pucharu Doliny: {bracket}, miejsce {position} z {count}",
+      "indicatorLive": "Puchar Doliny",
+      "indicatorOpen": "Otwórz okno Pucharu Doliny",
+      "phaseCountdown": "Rozpoczęcie za {seconds}",
+      "phaseGoal": "GOL!",
+      "phaseGolden": "ZŁOTY GOL",
+      "phaseOver": "KONIEC MECZU",
+      "bannerFound": "Puchar Doliny wzywa: {nationA} kontra {nationB}!",
+      "bannerCountdown": "Pierwszy gwizdek za {seconds}...",
+      "bannerKickoff": "ROZPOCZĘCIE!",
+      "bannerGoal": "GOL! {nation} zdobywa bramkę!",
+      "bannerSave": "{name} BRONI!",
+      "bannerGolden": "ZŁOTY GOL: następna bramka wygrywa!",
+      "bannerEnd": "Koniec meczu: {nationA} {scoreA}, {nationB} {scoreB}",
+      "bannerWin": "Zwycięstwo na Maciorowym Błoniu!",
+      "bannerDraw": "Remis na Maciorowym Błoniu.",
+      "bannerLoss": "Porażka na Maciorowym Błoniu.",
+      "logQueued": "Dołączasz do kolejki Pucharu Doliny w formacie {bracket} (miejsce {position}).",
+      "logUnqueued": "Opuszczasz kolejkę Pucharu Doliny.",
+      "logFound": "Twój mecz Pucharu Doliny jest gotowy: {nationA} kontra {nationB}.",
+      "logRoster": "Twoja strona: {allies}. Ich strona: {enemies}.",
+      "logGoal": "{name} zdobywa gola dla {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
+      "logSave": "{name} broni!",
+      "logWin": "Wygrywasz starcie na Maciorowym Błoniu.",
+      "logDraw": "Starcie na Maciorowym Błoniu kończy się remisem.",
+      "logLoss": "Przegrywasz starcie na Maciorowym Błoniu.",
+      "gossipOpen": "Księga rozgrywek",
+      "gossipOpenAria": "Otwórz okno Pucharu Doliny",
+      "mobileLabel": "Puchar",
+      "briefing": {
+        "subtitle": "Odprawa przedmeczowa",
+        "vs": "kontra",
+        "rulesHeading": "Jak grać",
+        "rule1": "Kopnij lub podaj piłkę do bramki przeciwnika, aby zdobyć gola.",
+        "rule2": "Wygrywa strona, która pierwsza zdobędzie 5 goli, albo ta z większą liczbą goli po końcowym gwizdku.",
+        "rule3": "Remis po końcowym gwizdku przechodzi w złotego gola: następna bramka wygrywa.",
+        "rule4": "Wślizgi tylko cię przewracają. Podczas żniwnego rozejmu nikomu nie dzieje się krzywda.",
+        "rule5": "Każdy może podejść i kibicować ci z trybun.",
+        "kitHeading": "Twój zestaw",
+        "kitNote": "Te zagrania zastępują twoje umiejętności klasowe na czas meczu.",
+        "rosterHeading": "Skład drużyn",
+        "you": "Ty",
+        "bot": "Bot",
+        "ready": "Zgłaszam gotowość",
+        "readyDone": "Gotowość",
+        "readyAria": "Zgłoś gotowość do rozpoczęcia",
+        "waiting": "Oczekiwanie, aż druga strona zgłosi gotowość...",
+        "whistle": "Gwizdek za {seconds} s.",
+        "readyCount": "Gotowych: {ready} z {total}"
+      },
+      "bet": {
+        "title": "Zakłady meczowe",
+        "aria": "Zakłady na mecz Pucharu Doliny",
+        "closesIn": "Zakłady zamykają się za {seconds} s",
+        "closed": "Zakłady zamknięte",
+        "prize": "Pula {amount}",
+        "splitAria": "Udział puli zakładów na każdą z drużyn",
+        "expand": "Zobacz zakłady i obstaw",
+        "collapse": "Ukryj zakłady",
+        "oddsLabel": "Kurs",
+        "back": "Postaw na {team}",
+        "form": "{wins}Z-{losses}P",
+        "mine": "Twój zakład: {amount} na {team}",
+        "none": "Nie masz jeszcze zakładu na ten mecz.",
+        "record": "Bilans zakładów: {wins}Z-{losses}P, {sign}{net}",
+        "wonBanner": "Twój zakład wygrał!",
+        "wonLog": "Twój zakład w Pucharze Doliny wygrał: zwrócono {amount}.",
+        "lostLog": "Twój zakład w Pucharze Doliny przegrał: {amount}.",
+        "refundLog": "Zakłady unieważnione, twoja stawka {amount} została zwrócona."
+      }
     },
     "options": {
       "clickMoveLeft": "Lewy przycisk",
       "clickMoveRight": "Prawy przycisk",
+      "version": "v{version} ({build})",
       "browserEffects": "Efekty przeglądarki",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Pełne",
@@ -427,8 +568,8 @@ export const pl_PL: EnTranslations = {
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
-      "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileCameraJoystick": "Joystick aparatu",
+      "mobileLeftHanded": "Układ leworęczny"
     },
     "controller": {
       "title": "Kontroler",
@@ -479,7 +620,9 @@ export const pl_PL: EnTranslations = {
         "fps01Low": "Min. 0,1%",
         "ping": "Ping",
         "jitter": "Drżenie",
+        "predLead": "Wyprzedzenie predykcji",
         "snapshot": "Częstotliwość migawek",
+        "serverTick": "Częstotliwość tików serwera",
         "connection": "Połączenie",
         "drawCalls": "Wywołania rysowania",
         "triangles": "Trójkąty",
@@ -522,7 +665,9 @@ export const pl_PL: EnTranslations = {
     "statInfo": {
       "fromYour": "Z twoich {value} pkt. cechy {stat}:",
       "names": {
-        "spellPower": "Moc zaklęć"
+        "spellPower": "Moc zaklęć",
+        "critRating": "Ocena krytyczna",
+        "hasteRating": "Ocena pośpiechu"
       },
       "desc": {
         "str": "Zwiększa twoją moc ataku, więc twoje ciosy bronią są mocniejsze.",
@@ -535,7 +680,9 @@ export const pl_PL: EnTranslations = {
         "spellPower": "Zwiększa obrażenia twoich zaklęć i siłę leczenia. Każdy punkt Intelektu zapewnia odrobinę Mocy zaklęć, dodatkowo do tej z ekwipunku lub wzmocnień.",
         "dps": "Twoje szacowane obrażenia bronią na sekundę, łączące obrażenia i szybkość twojej broni z mocą ataku.",
         "critChance": "Twoja szansa na zadanie ataku krytycznego, zadającego podwójne obrażenia.",
-        "dodge": "Twoja szansa na całkowite uniknięcie nadchodzącego ataku wręcz, bez otrzymania obrażeń."
+        "dodge": "Twoja szansa na całkowite uniknięcie nadchodzącego ataku wręcz, bez otrzymania obrażeń.",
+        "critRating": "Ocena krytyczna z twojego ekwipunku i bonusów zestawów, zwiększająca szansę na trafienie krytyczne. Około 10 oceny daje 1% trafienia krytycznego.",
+        "hasteRating": "Ocena pośpiechu z twojego ekwipunku i bonusów zestawów, przyspieszająca twoje ataki i rzucanie zaklęć. Około 10 oceny daje 1% pośpiechu."
       },
       "effects": {
         "attackPower": "+{value} mocy ataku",
@@ -575,6 +722,15 @@ export const pl_PL: EnTranslations = {
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
+    },
+    "itemProc": {
+      "onMeleeHit": "Szansa przy trafieniu ({chance}%): {effect}",
+      "onSpellDamage": "Szansa przy zaklęciach zadających obrażenia ({chance}%): {effect}",
+      "onHeal": "Szansa przy leczeniu ({chance}%): {effect}",
+      "chainArc": "razi cel czarem {school} {name} ({damage}), który przeskakuje na {jumps} pobliskich wrogów, zadając malejące obrażenia",
+      "attackSlow": "i spowalnia szybkość ataku celu o {pct}% na {duration} s",
+      "dot": "wywołuje {name}, obrażenia od {school} w czasie zadające łącznie {total} przez {duration} s",
+      "hot": "rozkwita {name}, leczenie w czasie przywracające {total} przez {duration} s"
     },
     "questShare": {
       "notShareable": "Tego zadania nie można udostępnić.",
@@ -763,6 +919,15 @@ export const pl_PL: EnTranslations = {
         "tusk": "Cios"
       }
     },
+    "townFocus": {
+      "title": "Priorytety miasta",
+      "hint": "Punkty priorytetu dodają premię ponad bazowy uzysk każdego elementu. Elementy bez priorytetu pozostają na poziomie bazowym.",
+      "budgetLabel": "Pozostałe punkty: {remaining} / {budget}",
+      "saveButton": "Zapisz priorytety",
+      "notInTownHint": "Musisz być w mieście, aby ustawić priorytety.",
+      "increaseAria": "Zwiększ priorytet: {component}",
+      "decreaseAria": "Zmniejsz priorytet: {component}"
+    },
     "party": {
       "promoteLeader": "Mianuj przywódcą",
       "inviteUsage": "Kogo zaprosić? Użycie: /invite <imię>."
@@ -778,7 +943,13 @@ export const pl_PL: EnTranslations = {
       "leaderOption": "Główny zbieracz: Przywódca (Ty)",
       "masterOption": "Główny zbieracz: {name}"
     },
+    "dungeonDifficulty": {
+      "setHeroic": "Ustaw trudność podziemia: Heroiczna",
+      "setNormal": "Ustaw trudność podziemia: Normalna"
+    },
     "bags": {
+      "cannotDestroy": "Tego przedmiotu nie można zniszczyć.",
+      "rightClickDestroy": "Kliknij prawym, aby zniszczyć",
       "filterGroupAria": "Filtruj torby według kategorii",
       "filterAll": "Wszystko",
       "filterWeapon": "Bronie",
@@ -842,10 +1013,19 @@ export const pl_PL: EnTranslations = {
         "allStats": "Verringert alle Attribute um {value}"
       },
       "allStatsPctReduce": "Zmniejsza wszystkie atrybuty o {pct}%",
+      "increasePct": {
+        "ap": "Increases attack power by {pct}%",
+        "armor": "Increases armor by {pct}%",
+        "int": "Increases Intellect by {pct}%",
+        "sta": "Increases Stamina by {pct}%",
+        "allStats": "Increases all attributes by {pct}%"
+      },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
+      "armorPct": "Reduces armor by {pct}%",
+      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -994,6 +1174,7 @@ export const pl_PL: EnTranslations = {
       "roleTag": {
         "levyst": "Levy St",
         "admin": "Admin",
+        "coredevs": "Główny deweloper",
         "devs": "Dev",
         "mods": "Mod",
         "artists": "Grafik"
@@ -1058,18 +1239,6 @@ export const pl_PL: EnTranslations = {
           "hint": "Poproś społeczność o pomoc"
         }
       }
-    },
-    "crafting": {
-      "title": "Crafting",
-      "close": "Close crafting",
-      "craft": "Craft",
-      "reagentsNeeded": "Requires:",
-      "reagentLine": "{name} x{have}/{required}",
-      "empty": "No recipes known yet.",
-      "resultAria": "Craft {name}",
-      "craftedToast": "Crafted: {name}",
-      "insufficientMaterials": "You do not have the materials for that.",
-      "unknownRecipe": "That recipe does not exist."
     },
     "devBadge": {
       "title": "Deweloper",
@@ -1147,6 +1316,50 @@ export const pl_PL: EnTranslations = {
         "takeParcelsFirst": "Wyjmij paczki, zanim wyrzucisz list."
       }
     },
+    "bank": {
+      "title": "Bank",
+      "subtitle": "Złocona Szkatuła",
+      "close": "Zamknij bank",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Zajęte miejsca w banku: {used} z {total}",
+      "empty": "Twój bank jest pusty.",
+      "tooFar": "Musisz być przy bankierze, aby zajrzeć do swojego banku.",
+      "buySlots": "Kup {count} miejsc",
+      "buySlotsMaxed": "W pełni rozszerzony",
+      "buyConfirm": "Kupić {count} dodatkowych miejsc w banku za {price}?",
+      "buyConfirmAccept": "Kup",
+      "withdrawHint": "Kliknij, aby wyjąć",
+      "withdrawPartialHint": "Kliknij z Shiftem, aby wyjąć część",
+      "depositHint": "Kliknij, aby zdeponować",
+      "depositPartialHint": "Kliknij z Shiftem, aby zdeponować część",
+      "cannotDeposit": "Nie można zdeponować",
+      "depositQuantityTitle": "Zdeponuj: {item}",
+      "depositQuantityInput": "Liczba do zdeponowania",
+      "depositQuantityConfirm": "Zdeponuj",
+      "withdrawQuantityTitle": "Wyjmij: {item}",
+      "withdrawQuantityInput": "Liczba do wyjęcia",
+      "withdrawQuantityConfirm": "Wyjmij",
+      "filterGroupAria": "Filtruj bank według kategorii",
+      "sortAria": "Sortuj przedmioty w banku",
+      "searchAria": "Szukaj przedmiotów w banku po nazwie",
+      "depositAll": "Zdeponuj wszystkie materiały",
+      "depositAllDone": "Zdeponowane materiały: {count}.",
+      "depositAllFull": "Zdeponowane materiały: {count}. Bank jest teraz pełny.",
+      "depositAllNone": "Bank pełny: niczego nie zdeponowano.",
+      "bonusTitle": "Miejsca premiowe",
+      "bonusEarned": "+{count}",
+      "bonusStatusEarned": "+{count}",
+      "bonusSourceEmail": "Zweryfikowany e-mail",
+      "bonusSourceDiscord": "Połączony Discord",
+      "bonusSourceWallet": "Połączony portfel",
+      "bonusSourceReferral": "Zaproszeni przyjaciele",
+      "bonusAdvertEmail": "Zweryfikuj swój e-mail, aby zdobyć 2 miejsca.",
+      "bonusAdvertDiscord": "Połącz swój Discord, aby zdobyć 2 miejsca.",
+      "bonusAdvertWallet": "Połącz portfel, aby zdobyć 2 miejsca.",
+      "bonusReferralProgress": "{count}/{cap}",
+      "bonusReferralExplainer": "Zaproś przyjaciela: gdy osiągnie 10. poziom, oboje zdobywacie po 2 miejsca, maksymalnie za 5 przyjaciół.",
+      "bonusSectionAria": "Premiowe miejsca w banku i jak zdobyć ich więcej"
+    },
     "calendar": {
       "title": "Kalendarz wydarzeń",
       "close": "Zamknij kalendarz",
@@ -1214,6 +1427,33 @@ export const pl_PL: EnTranslations = {
       "mining": "Górnictwo",
       "logging": "Wyrąb",
       "herbalism": "Zielarstwo"
+    },
+    "archetypeTitle": {
+      "label": "Tytuł",
+      "none": "Brak",
+      "armorcrafting": "Płatnerz",
+      "weaponcrafting": "Zbrojmistrz",
+      "jewelcrafting": "Jubiler",
+      "alchemy": "Alchemik",
+      "engineering": "Inżynier",
+      "cooking": "Kucharz",
+      "inscription": "Skryba",
+      "enchanting": "Zaklinacz",
+      "tailoring": "Krawiec",
+      "leatherworking": "Garbarz"
+    },
+    "crafting": {
+      "title": "Rzemiosło",
+      "close": "Zamknij rzemiosło",
+      "craft": "Rzemiosło",
+      "reagentsNeeded": "Wymaga:",
+      "reagentLine": "{name}: {have}/{required}",
+      "empty": "Nie są jeszcze znane żadne przepisy.",
+      "resultAria": "Craft {name}",
+      "craftedToast": "Wykonane: {name}",
+      "insufficientMaterials": "Nie masz na to materiałów.",
+      "unknownRecipe": "Ten przepis nie istnieje.",
+      "comboRequirementUnmet": "Nie masz obu wymaganych rzemiosł na wymaganym poziomie dla tego przepisu."
     }
   },
   "apiError": {
@@ -1320,6 +1560,7 @@ export const pl_PL: EnTranslations = {
       "bestiary": "Bestiariusz",
       "models": "Modele 3D",
       "gear": "Ekwipunek i przedmioty",
+      "professions": "Profesje",
       "economy": "Ekonomia i handel",
       "social": "Społeczność i grupy",
       "stats": "Postać i statystyki",
@@ -1330,9 +1571,11 @@ export const pl_PL: EnTranslations = {
       "delves": "Wyprawy",
       "reference": "Odniesienie",
       "controls": "Sterowanie",
+      "settings": "Ustawienia i wydajność",
       "combat": "Walka",
       "talents": "Talenty",
       "arena": "Arena i PvP",
+      "valeCup": "Puchar Doliny",
       "glossary": "Słowniczek",
       "wishIKnew": "Czego żałuję, że nie wiedziałem",
       "faq": "FAQ",
@@ -1497,6 +1740,66 @@ export const pl_PL: EnTranslations = {
       "mobileBody": "Sterowanie dotykowe pojawia się automatycznie na telefonach i tabletach: gałka ruchu po lewej, przeciągnij gdziekolwiek po prawej, aby się rozglądać, oraz przyciski ekranowe dla twoich umiejętności i menu.",
       "controllerHeading": "Na kontrolerze",
       "controllerBody": "Pady również działają, a obsługa kontrolera jest domyślnie włączona. Lewa gałka odpowiada za ruch, prawa steruje kamerą, a przyciski akcji i bumpery obsługują twoje umiejętności, skakanie i interakcję. Otwórz dowolne okno, aby przywołać ekranowy wskaźnik do menu. W ustawieniach kontrolera w opcjach możesz zmienić przypisania przycisków oraz dostosować martwą strefę gałek, szybkość kamery, wibracje i odwrócone patrzenie."
+    },
+    "settingsPage": {
+      "heading": "Ustawienia i wydajność",
+      "intro": "Spraw, aby gra wyglądała najlepiej lub działała najszybciej. Trzy gotowe zestawy wyposażenia plus to, co naprawdę robi każda opcja graficzna.",
+      "wherePath": "Wszystko na tej stronie jest obecne w grze: naciśnij Esc i zajrzyj do opcji Grafika, Interfejs i Nakładka wydajności.",
+      "fairnessTitle": "Uczciwe według projektu",
+      "fairnessBody": "Żadna opcja nie zastąpi piękna w zamian za moc. Ustawienia Lower usuwają tylko kosmetyczne poprawki, nigdy informacje, z którymi walczysz: twoje debuffy, rzucane paski, zdrowie drużyny i liczby obrażeń są identyczne od Low do Ultra. Gra na skromnej maszynie nigdy nie jest utrudnieniem.",
+      "loadoutsHeading": "Trzy gotowe zestawy wyposażenia",
+      "loadoutsIntro": "Zacznij od wyposażenia, które brzmi jak Twoja maszyna, a następnie dostosowuj jedną opcję na raz, aż poczujesz, że jest właściwa.",
+      "recommended": "Zalecony",
+      "whyLabel": "Dlaczego to działa:",
+      "tagReload": "po ponownym załadowaniu",
+      "fpsTitle": "Najlepszy FPS",
+      "fpsTagline": "Do starszych laptopów, zintegrowanej grafiki i odtwarzania na baterii.",
+      "fpsWhy": "Jakość grafiki to główny przełącznik, a Jakość renderowania to najsilniejszy suwak: przy ustawieniu 70% świat rysuje mniej więcej połowę pikseli, podczas gdy interfejs pozostaje idealnie ostry.",
+      "balancedTitle": "Zrównoważony",
+      "balancedTagline": "Najlepszy sposób na większość maszyn i nasza domyślna rada.",
+      "balancedWhy": "Medium przynosi prawdziwe cienie i pełne materiały; High dodaje okluzję otoczenia i rozkwit. Poniżej Ultra wbudowana siatka zabezpieczająca pochłania nagłe spadki podczas intensywnych walk, więc Balanced działa płynnie bez konieczności opieki nad dziećmi.",
+      "visualsTitle": "Najlepsze efekty wizualne",
+      "visualsTagline": "Tryb zrzutu ekranu dla wydajnych komputerów stacjonarnych.",
+      "visualsWhy": "Ultra renderuje w najwyższej rozdzielczości, jaką oferuje Twój wyświetlacz, z najbogatszym oświetleniem. Wyłącza także siatkę zabezpieczającą i działa tylko na komputerze stacjonarnym: telefony i aplikacja są dostępne o godzinie High.",
+      "value50to70": "50 do 70%",
+      "value90to100": "90 do 100%",
+      "value100": "100%",
+      "valueHighOrMedium": "High na komputerze do gier, Medium na laptopie",
+      "valueOnOptional": "Włączone (opcjonalnie)",
+      "howHeading": "Jak zachowują się opcje",
+      "factDetectTitle": "Gra najpierw sama się dostraja",
+      "factDetectBody": "Przy pierwszym uruchomieniu gra odczytuje Twoje urządzenie i wybiera rozsądny poziom, od Low na skromnym telefonie do Ultra na mocnym komputerze stacjonarnym. Każdy wybór, którego sam dokonasz, zawsze wygrywa.",
+      "factReloadTitle": "Dwa rodzaje opcji",
+      "factReloadBody": "Jakość grafiki i selektory Zaawansowane zaczynają działać po ponownym załadowaniu, a w razie potrzeby na panelu znajduje się przycisk Odśwież teraz. Każda inna opcja ma zastosowanie w momencie jej zmiany.",
+      "factGovernorTitle": "Wbudowana siatka zabezpieczająca",
+      "factGovernorBody": "Na każdym poziomie poniżej Ultra gra po cichu przerzedza trawę, efekty i oświetlenie na chwilę, gdy nasili się wielka walka, a następnie je przywraca. Wybranie Ultra mówi, że wolisz zachować każdy szczegół.",
+      "advancedHeading": "Zaawansowane ustawienie wstępne: miksuj własne",
+      "advancedBody": "Zaawansowany zaczyna się od poziomu High i odblokowuje cztery dodatkowe selektory, dzięki czemu możesz spędzać klatki tam, gdzie je faktycznie zauważasz: szczegóły terenu, gęstość listowia, efekty i oświetlenie oraz jakość cieni. Podobnie jak jakość grafiki, obowiązują one po przeładowaniu.",
+      "advancedMixes": "Dwie ulubione kombinacje: ustaw Jakość cienia na High i ustaw Efekty i oświetlenie na Low, aby uzyskać wyraźny, pozbawiony blasku wygląd, ale działając lekko, lub wykonaj odwrotną operację, aby zachować rozkwit i zmiękczyć cienie.",
+      "tableHeading": "Każda opcja wyjaśniona",
+      "colSetting": "Ustawienie",
+      "colDoes": "Co to robi",
+      "colImpact": "wpływ FPS",
+      "impactNone": "Nic",
+      "impactLight": "Światło",
+      "impactModerate": "Umiarkowany",
+      "impactHeavy": "Ciężki",
+      "rowGraphicsQuality": "Główny wyłącznik. Każdy krok zmienia rozdzielczość, cienie, materiały, listowie i efekty świetlne. Największa pojedyncza różnica, jaką możesz zrobić.",
+      "rowRenderQuality": "Rysuje świat 3D w niższej rozdzielczości wewnętrznej i skaluje go w górę; interfejs pozostaje ostry. Najsilniejszy błyskawiczny suwak na słabszych maszynach i ekranach o wysokiej rozdzielczości.",
+      "rowFieldOfView": "Jaka część świata mieści się na ekranie, od powiększenia 55 do 100 stopni. Komfortowy wybór; szersze widoki rysują nieco więcej.",
+      "rowBrightness": "Ekspozycja sceny, ciemniejsza lub jaśniejsza. Czysta preferencja.",
+      "rowWeather": "Deszcz i śnieg w otoczeniu. Tylko atmosfera, a wyłączenie jej trochę oszczędza podczas burz.",
+      "rowBrowserEffects": "Jak fantazyjny może być sam interfejs: rozmycie szkła, poświata, animowane menu. Automatycznie dopasowuje się do Twojej przeglądarki; tak czy inaczej świat 3D pozostaje nietknięty.",
+      "rowTerrainDetail": "Bogate, mieszane tekstury podłoża w porównaniu z prostszym, szybszym wyglądem terenu.",
+      "rowFoliageDensity": "Jak daleko i jak gęsta trawa rośnie wokół twojej postaci.",
+      "rowEffectsQuality": "Bloom, okluzja otoczenia oraz ilość pochodni i zaklęć rzucających prawdziwe światło. Największa pojedyncza oszczędność wśród zaawansowanych zbieraczy.",
+      "rowShadowQuality": "Wyrazistość cieni. Low utrzymuje cienie, ale zmiękcza ich krawędzie.",
+      "rowFrostedPanels": "Rozmazana plama za oknami. Ładne i dokładnie takie, jakie daje słabsza przeglądarka; zostaw to, aby uzyskać klasyczny, wyrazisty wygląd.",
+      "rowReduceMotion": "Usuwa animacje interfejsu, dzięki czemu okna pojawiają się natychmiast. Najpierw opcja dostępności, z niewielką premią za wydajność.",
+      "rowPerfOverlay": "Odczyt na ekranie FPS, czasu trwania klatki i innych informacji. Włącz tę opcję podczas dostrajania tej strony, a następnie ukryj ją ponownie.",
+      "tableFoot": "Szukasz suwaka odległości rysowania lub ograniczenia FPS? Nie ma na co polować: odległość oglądania jest częścią każdego poziomu jakości, a tempo klatek dostosowuje się do wyświetlacza.",
+      "mobileTitle": "Na telefonach i tabletach",
+      "mobileBody": "Urządzenia mobilne zarządzają za Ciebie więcej: gra wybiera poziom, utrzymuje rozdzielczość nieco niższą, aby chronić baterię i ciepło, a najwyższe poziomy utrzymuje tylko na komputerach stacjonarnych. Powyższe wyposażenie nadal obowiązuje; telefony po prostu osiągają szczyt w High."
     },
     "combat": {
       "intro": "Walka rządzi się znajomymi zasadami klasycznych MMO. Nigdy nie musisz tego zgłębiać, by dobrze grać, to tylko zarys tego, jak działają starcia.",
@@ -1923,10 +2226,38 @@ export const pl_PL: EnTranslations = {
       "waveGoldBody": "Środkowa fala: obosieczne kombinacje, w których twój build zaczyna nabierać kształtu i rozbrzmiewać.",
       "wavePrismaticTitle": "Pryzmatyczny",
       "wavePrismaticBody": "Ostatnia fala: definiujące build, rozsadzające ekran skoki mocy, które mają wydawać się absurdalne w najlepszym tego słowa znaczeniu.",
+      "yumiHeading": "Protect Yumi",
+      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
       "powerupsTitle": "Wzmocnienia na ringu",
       "powerupsBody": "Na arenę w trakcie walki spadają też świecące kule, dostępne dla tego, kto pierwszy do nich dotrze. Są celowo przesadne i działają tylko przez chwilę: Demon Prędkości dla mgnienia oślepiającego tempa, Kolos, by rozrosnąć się w ociężałego giganta, Księżycowe Buty dla skocznego susu w niskiej grawitacji oraz Berserker dla nagłego przypływu furii.",
       "ladderHeading": "Wspinaczka po drabinie rankingowej",
       "ladderBody": "Rozgrywka rankingowa śledzi twoją pozycję w czasie. Sprawdź ranking, by zobaczyć, gdzie jesteś i kto dzierży szczyt królestwa."
+    },
+    "valeCupPage": {
+      "heading": "Puchar Doliny",
+      "intro": "Dzicza piłka na Maciorowym Błoniu: wybierz sztandar, wybierz rolę i kopnij wypchaną dziczą skórę za plecy bramkarza, by zdobyć Miedziany Skopek. Bez krwi, bez łupów, tylko ryk trybun.",
+      "loreHeading": "Dzicza piłka i żniwny rozejm",
+      "loreOldSow": "Na długo zanim zbudzili się umarli, parobkowie z Eastbrook grali w dziczą piłkę na ścierniskach po żniwach: dwie gromady, jedna dzicza skóra wypchana słomą i dwie wozowe bramy zaciągnięte na oba końce błonia. Pierwsza piłka, Stara Maciora, wisi odlana w brązie nad kominkiem tawerny.",
+      "loreTruce": "Gdy Popielne Koloseum zaczęło urządzać wojenne igrzyska, Marszałek Redbrook odpowiedział czymś łagodniejszym: stałym żniwnym rozejmem na starym błoniu. Wozowe bramy stały się słupkami, błonie zyskało mury, trybuny i nazwę, Maciorowe Błonie, a nagrodą zawsze był ten sam wgnieciony skopek na mleko, z którego pili zwycięzcy: Miedziany Skopek.",
+      "howHeading": "Jak grać",
+      "howQueue": "Do kolejki dołączysz z dowolnego miejsca przez okno Pucharu Doliny albo rozmawiając z Opiekunem Murawy Bramem przy bramie Maciorowego Błonia. Wybierz format od jeden na jednego do pięciu na pięciu, sztandar nacji i rolę sportową; stawaj w kolejce solo albo z drużyną.",
+      "howMatch": "Przy pierwszym gwizdku twój zestaw klasowy zostaje podmieniony na sportowy, a po meczu wraca dokładnie taki, jaki był. Kopnięcia celują w celownik na ziemi, piłka odbija się od band, a drybling to po prostu bieg z piłką. Zdobądź więcej goli niż przeciwnik przed końcem meczu; remis rozstrzyga złoty gol.",
+      "howTruce": "Na Maciorowym Błoniu nikt nie krwawi: wślizgi tylko przewracają, nic nie boli, a zwierzęta oglądają mecz z boku.",
+      "spectateBody": "Na stadionie toczy się jeden mecz naraz i każdy może podejść i oglądać go z trybun.",
+      "nationsHeading": "Osiem nacji pod sztandarami",
+      "nationsBody": "Każda drużyna gra pod sztandarem. Kapitan wybiera nację, a jeśli obie strony niosą ten sam sztandar, goście grają w odwróconych barwach.",
+      "nationVale": "Zieleń i złoto pod snopem pszenicy: gospodarze, parobkowie z krwi i kości.",
+      "nationMirefen": "Morska zieleń i szarość pod czaplą: cierpliwi, długonodzy, nigdy się nie spieszą.",
+      "nationThornpeak": "Lodowy błękit i biel pod górskim szczytem: pewni kroku i uparci.",
+      "nationColiseum": "Czerwień i czerń ze skrzyżowanymi mieczami: grają, jakby to wciąż były wojenne igrzyska.",
+      "nationChoir": "Bladobłękitni i srebrni pod dzwonem: niesamowici, precyzyjni i bardzo cisi.",
+      "nationOgre": "Pomarańcz i umbra za pięścią: grają barkiem naprzód i są z tego dumni.",
+      "nationMoon": "Fiolet i srebro pod półksiężycem: nocni gracze, lekcy na nogach.",
+      "nationCopperdig": "Miedź i brąz z kilofem: kopacze, którzy nigdy nie przestają biegać.",
+      "rolesHeading": "Role sportowe",
+      "rolesBody": "Rola decyduje o zestawie, z którym wychodzisz na boisko. Kopie każdy; reszta to kwestia temperamentu.",
+      "rewardsHeading": "Zasady rozejmu",
+      "rewardsBody": "Zasady rozejmu oznaczają brak doświadczenia i łupów: rozstrzygnięty mecz liczy się do twojego bilansu i tablicy zwycięzców, a wraz z nim przychodzą punkty nagród dziennych. Dezercja z meczu odsyła cię na ławkę, a Opiekun Murawy pamięta."
     },
     "wishPage": {
       "heading": "Rzeczy, które chciałbym wiedzieć wcześniej",
@@ -2012,6 +2343,35 @@ export const pl_PL: EnTranslations = {
       "cosmeticsCache": "Kilka z nich pochodzi z tajemniczej kosmetycznej skrytki, zapieczętowanej nagrody, która przy otwarciu losuje jeden z trzech stopni jakości i przyznaje pasujący do niego wygląd. To czysto dla efektu wizualnego: nic w jej wnętrzu nie czyni cię silniejszym, jedynie piękniejszym dla oka.",
       "cosmeticsApply": "Ustaw aktywny wygląd w wierszu wyglądu na ekranie postaci i swobodnie przełączaj się między wszystkim, co odblokowałeś."
     },
+    "professions": {
+      "intro": "Poza walką i zadaniami świat nagradza pracę na roli i przy kuźni: zbieranie surowców, przekuwanie ich w ekwipunek przy stanowiskach dziesięciu różnych rzemiosł i wrastanie w tożsamość jednego z dziesięciu archetypów, które te fachy reprezentują.",
+      "gatherTitle": "Zbieractwo: Górnictwo, Wyrąb i Zielarstwo",
+      "gatherIntro": "Trzy fachy zbierackie pozwalają czerpać surowce prosto ze świata: Górnictwo wydobywa rudę i kamień z żył, Wyrąb pozyskuje drewno z kęp drzew, a Zielarstwo zbiera dziko rosnące zioła i rośliny. Każdy z nich liczony jest osobno, więc praca w jednym nigdy nie spowalnia postępów w innym.",
+      "gatherWhatTitle": "Węzły zasobów",
+      "gatherWhatBody": "Żyły rudy, kępy drzew i kępki ziół rozmieszczone są w strefach jako widoczne, niczyje obiekty. Podejdź do jednego z nich i użyj go, aby zebrać, co skrywa. Po zbiorze węzeł potrzebuje czasu, by się odnowić, zanim ty osobiście zbierzesz z niego ponownie, ale nigdy nie blokuje innych: inny gracz może w tym czasie zebrać z tego samego węzła.",
+      "gatherProficiencyTitle": "Wprawa i jakość materiałów",
+      "gatherProficiencyBody": "Każdy udany zbiór buduje twoją wprawę w danym fachu zbierackim. Wyższa wprawa przesuwa to, co pozyskujesz z węzła, ku rzadszym gatunkom materiału, od pospolitych wzwyż, choć najrzadsze gatunki pozostają rzadkie nawet przy wysokiej wprawie. Praktyka nigdy nie psuje twoich szans, zawsze je tylko poprawia.",
+      "gatherToolsTitle": "Narzędzia fachu",
+      "gatherToolsBody": "Sprzedawcy oferują podstawowe narzędzia dla każdego fachu zbierackiego, a lepsze można wytworzyć, więc praca przy węźle zasobów ma stawać się sprawniejsza wraz z lepszym wyposażeniem, a nie stać w miejscu. Narzędzia wyższego stopnia to zamierzona droga do bogatszych węzłów i wydajniejszej pracy podczas długiej sesji.",
+      "craftTitle": "Dziesięć rzemiosł",
+      "craftIntro": "Dziesięć rzemiosł przetwarza zebrane materiały w gotowy ekwipunek i towary: Płatnerstwo, Zbrojmistrzostwo i Jubilerstwo nadają surowej materii kształt noszonego ekwipunku; Alchemia i Inżynieria opierają się na próbach i błędach; Gotowanie, Inskrypcja i Zaklinanie sięgają po wytwory innych rzemiosł; Krawiectwo i Garbarstwo pracują według dokładnych wzorów. Razem tworzą koło, w którym każde rzemiosło sąsiaduje z dwoma innymi i leży naprzeciw jednego.",
+      "craftRingTitle": "Koło specjalności",
+      "craftRingBody": "Dziesięć rzemiosł ułożonych jest w stały krąg, a miejsce rzemiosła na tym kręgu ma znaczenie: rzemiosła sąsiadujące ze sobą na kole mają ze sobą więcej wspólnego niż te po przeciwnych stronach. Oddanie się jednemu rzemiosłu ma przypominać dołączenie do rodziny pokrewnych fachów, a nie wybór odosobnionej umiejętności.",
+      "craftRecipesTitle": "Przepisy i składniki",
+      "craftRecipesBody": "Każde rzemiosło ma własne przepisy, a każdy z nich wymaga konkretnych składników, które zbierasz lub kupujesz. Najprostsze przepisy w każdym rzemiośle potrzebują wyłącznie pospolitych materiałów i są dostępne od samego początku, więc możesz zacząć pracę w fachu od chwili, gdy go podejmiesz, zamiast czekać na odblokowanie.",
+      "craftMasteryTitle": "Umiejętność i biegłość",
+      "craftMasteryBody": "Udane wytwarzanie buduje umiejętność w danym fachu, a bogatsze przepisy zamknięte są za wyższą umiejętnością: podstawowe przepisy są dostępne dla każdego, natomiast coraz bardziej zaawansowane wymagają coraz większej biegłości. Rozwijanie umiejętności w rzemiośle to droga od prostych wyrobów na start do jego najambitniejszych przepisów.",
+      "craftComboTitle": "Przepisy łączone",
+      "craftComboBody": "Poza listą przepisów pojedynczego rzemiosła koło wspiera też przepisy łączone, które wymagają dwóch sąsiadujących rzemiosł naraz, nagradzając postać (lub parę partnerów handlowych), która zainwestowała w sąsiednie fachy na kręgu, a nie w jeden w izolacji.",
+      "archetypeTitle": "Dziesięć archetypów",
+      "archetypeIntro": "Każde z dziesięciu rzemiosł reprezentuje też archetyp, szerszą tożsamość, którą możesz przyjąć ponad samo uprawianie fachu. Aktywny archetyp to pojedynczy wybór, nie lista do odhaczenia: nosisz jeden i możesz go później zmienić, jeśli zechcesz.",
+      "archetypeChooseTitle": "Wybór archetypu",
+      "archetypeChooseBody": "Swój pierwszy archetyp deklarujesz podczas wczesnego zadania fabularnego w pierwszej strefie, które formalnie przyjmuje cię do tej tożsamości. Dopóki nie ukończysz tego zadania, nie masz jeszcze wybranego żadnego archetypu.",
+      "archetypeSwitchTitle": "Zmiana zdania",
+      "archetypeSwitchBody": "Raz zadeklarowany archetyp nie wiąże cię na zawsze. Zmiana na inny archetyp wymaga najpierw ukończenia powtarzalnego zadania \"zadośćuczynienia\" wobec starego, a z każdą kolejną zmianą oczekiwane zadośćuczynienie robi się nieco surowsze, dzięki czemu zmiana pozostaje znacząca, a nie darmowa.",
+      "archetypeIdentityTitle": "Co oznacza twój archetyp",
+      "archetypeIdentityBody": "Aktywny archetyp to deklaracja, kim twoja postać jest w świecie, widoczna w tym, jak zwracają się do ciebie inni i sam świat. Dokładne nagrody i wyróżnienia z nim związane wciąż są dopracowywane; zaglądaj tu, w miarę jak system się rozrasta."
+    },
     "economy": {
       "intro": "Monety napędzają cały świat: kupują twoje wyposażenie, zaopatrzenie i ekwipunek podróżny oraz przechodzą z rąk do rąk między graczami. Zbierasz to wszystko po prostu grając, więc traktuj tę stronę jako mapę tego, skąd pochodzą i dokąd trafiają twoje pieniądze.",
       "coinTitle": "Złoto, srebro i miedź",
@@ -2020,6 +2380,10 @@ export const pl_PL: EnTranslations = {
       "vendorsBody": "Miasta i posterunki są usiane kupcami, każdy z własnym fachem. Zaopatrzeniowcy mają jedzenie i napoje, płatnerze i zbrojmistrze noszą wyposażenie, a kwatermistrz trzyma praktyczny ekwipunek podróżny. Podejdź do jednego z nich, aby zobaczyć, co sprzedaje.",
       "marksTitle": "Druga waluta: Znaki Wypraw",
       "marksBody": "Monety to nie jedyne, co odkładasz. Wyprawy wypłacają Znaki Wypraw, osobną walutę, którą wydajesz wyłącznie u opiekuna wypraw, na ulepszenia towarzyszki i ekwipunek, którego nie znajdziesz gdzie indziej. Nigdy nie mieszają się z twoimi monetami.",
+      "bankTitle": "Bank",
+      "bankBody": "W każdym głównym mieście działa oddział Złoconej Szkatuły, domu bankowego królestwa. Porozmawiaj z tamtejszym skarbnikiem, aby otworzyć swój skarbiec, prywatny schowek poza torbami, który twoja postać zachowuje na całe życie. Cokolwiek tam zostawisz, czeka bezpiecznie, niezależnie od tego, który oddział odwiedzisz następnym razem.",
+      "bankHow": "Przy otwartym skarbcu kliknij przedmiot w torbach, aby go zdeponować, i kliknij go w skarbcu, aby zabrać z powrotem. Skarbiec przechowuje wyłącznie dobra, nigdy monety, a przedmioty zadań zostają przy tobie. Gdy torby zapełnią ci się w połowie drogi, jeden przycisk zgarnia do środka wszystkie materiały rzemieślnicze naraz.",
+      "bankSlots": "Świeży skarbiec zaczyna skromnie i rośnie razem z tobą. Skarbnik sprzedaje kolejne miejsca za monety po coraz wyższych cenach, a granie online przynosi na dodatek premiowe miejsca, na przykład za zweryfikowany e-mail, połączone konta i przyjaciół, których przyprowadzisz do gry.",
       "buyingTitle": "Kupowanie i sprzedawanie",
       "buyingBody": "Stań przy kupcu, aby otworzyć jego okno. Możesz kupić wszystko, co ma na składzie, jeśli cię na to stać, i sprzedać większość tego, co masz w torbach, za monety. Jeśli sprzedasz coś przez pomyłkę, sprzedawca zachowa twoje niedawne sprzedaże, abyś mógł je odkupić.",
       "junkTitle": "Pozbywanie się rupieci",
@@ -2643,6 +3007,8 @@ export const pl_PL: EnTranslations = {
     "title": "Pobierz launcher na komputer",
     "desc": "Pobierz samodzielny launcher dla zoptymalizowanej wydajności i gry na pełnym ekranie.",
     "macCta": "Pobierz dla macOS",
+    "linuxCta": "Pobierz dla Linuksa",
+    "linuxHint": "AppImage: uczyń go wykonywalnym, a następnie uruchom. Nie wymaga instalacji.",
     "windowsPending": "Build Windows w przygotowaniu."
   },
   "comingSoon": {
@@ -3091,6 +3457,10 @@ export const pl_PL: EnTranslations = {
     },
     "closeAria": "Zamknij"
   },
+  "heroicShop": {
+    "balance": "Znaki heroiczne: {count}",
+    "buyAria": "Kup {item} za {marks} Znaków heroicznych"
+  },
   "delveUi": {
     "board": {
       "title": "Tablica Wypraw",
@@ -3285,6 +3655,45 @@ export const pl_PL: EnTranslations = {
     },
     "chest": {
       "flavor": "Umarli oddali to, bez czego mogą się obejść."
+    }
+  },
+  "yumi": {
+    "bracket3": "Yumi 3v3",
+    "bracket5": "Yumi 5v5",
+    "enterQueue": "Join Protect Yumi!",
+    "queue": {
+      "join": "You join the Protect Yumi queue. Guard your familiar…",
+      "leave": "You leave the Protect Yumi queue.",
+      "teamLeave": "Your team leaves the Protect Yumi queue."
+    },
+    "error": {
+      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
+      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+    },
+    "log": {
+      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+    },
+    "hud": {
+      "title": "PROTECT YUMI",
+      "getReady": "Get ready…",
+      "teleportIn": "Yumis move in {s}",
+      "suddenDeath": "SUDDEN DEATH",
+      "yourYumi": "Your Yumi",
+      "enemyYumi": "Enemy Yumi",
+      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
+      "collapse": "Collapse the Protect Yumi bars",
+      "expand": "Expand the Protect Yumi bars"
+    },
+    "respawn": {
+      "title": "DOWNED!"
+    },
+    "banner": {
+      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
+      "teleport": "The Yumis teleport!"
+    },
+    "end": {
+      "win": "VICTORY! Yumi is safe!",
+      "loss": "DEFEAT! Your Yumi has fallen."
     }
   },
   "fiesta": {
@@ -3483,7 +3892,7 @@ export const pl_PL: EnTranslations = {
     "rendererFailed": "Nie udało się uruchomić renderera: spróbuj odświeżyć. {error}",
     "enterTimeout": "Nie udało się wejść do świata. Upłynął limit czasu połączenia. Czy serwer gry jest uruchomiony?",
     "connectionLost": "Połączenie z serwerem zostało utracone.",
-    "reconnecting": "Connection lost. Reconnecting...",
+    "reconnecting": "Połączenie utracone. Ponowne łączenie...",
     "connectionRejected": "Serwer zamknął połączenie."
   },
   "errors": {
@@ -4383,12 +4792,14 @@ export const pl_PL: EnTranslations = {
     "slots": {
       "mainhand": "Główna ręka",
       "helmet": "Hełm",
+      "neck": "Szyja",
       "shoulder": "Barki",
       "chest": "Tułów",
       "waist": "Pas",
       "legs": "Nogi",
       "gloves": "Rękawice",
-      "feet": "Stopy"
+      "feet": "Stopy",
+      "ring": "Palec"
     },
     "quality": {
       "poor": "Nędzny",
@@ -4587,30 +4998,71 @@ export const pl_PL: EnTranslations = {
       "needAria": "Potrzeba na {item}",
       "greedAria": "Chciwość na {item}",
       "passAria": "Pasuj na {item}",
-      "everyonePassed": "Wszyscy spasowali na {item}."
+      "everyonePassed": "Wszyscy spasowali na {item}.",
+      "rolled": "{answered}/{total} rolled"
     }
   },
   "entities": {
     "abilities": {
+      "sport_kick": {
+        "name": "Kopnięcie",
+        "description": "Zagraj piłkę po ziemi w stronę punktu celowania."
+      },
+      "sport_shoot": {
+        "name": "Strzał",
+        "description": "Przytrzymaj, aby nabrać mocy, i puść, aby strzelić na bramkę. Zbyt mocny strzał poszybuje nad poprzeczką."
+      },
+      "sport_pass": {
+        "name": "Podanie",
+        "description": "Mocne podanie po ziemi do wskazanego towarzysza, wyprzedzające jego bieg."
+      },
+      "sport_boot": {
+        "name": "Potężny Wykop",
+        "description": "Długie, wysokie wykopnięcie w stronę punktu celowania. Trybuny to uwielbiają."
+      },
+      "sport_hoof": {
+        "name": "Na Pałę",
+        "description": "Huknij piłkę nisko i mocno w głąb boiska."
+      },
+      "sport_punt": {
+        "name": "Dalekie Wybicie",
+        "description": "Bramkarskie wybicie, wysoko i daleko."
+      },
+      "sport_feint": {
+        "name": "Zwód",
+        "description": "Szybki zwód i zryw w stronę punktu celowania."
+      },
+      "sport_dive": {
+        "name": "Rzut do piłki",
+        "description": "Rzucasz się w stronę punktu celowania. Dośrodkowana piłka przywiera do ciebie."
+      },
+      "sport_shoulder": {
+        "name": "Bark",
+        "description": "Uczciwe natarcie barkiem w duchu żniwnego rozejmu. Posyła rywala na ziemię, z dala od piłki."
+      },
+      "sport_second_wind": {
+        "name": "Świeże Nogi",
+        "description": "Łapiesz oddech: poruszasz się o 50% szybciej przez 4 s."
+      },
       "flamestrike": {
         "name": "Ognista nawała",
         "description": "Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia wrogom w zasięgu eksplozji."
       },
       "rain_of_fire": {
         "name": "Deszcz ognia",
-        "description": "Sprowadza deszcz ognia na wybrany obszar, paląc wrogów i zadając {damage} obrażeń od ognia."
+        "description": "Sprowadza deszcz ognia na wybrany obszar przez 4 sek., paląc wrogów i zadając {damage} obrażeń od ognia co sekundę."
       },
       "volley": {
         "name": "Salwa",
-        "description": "Zasypuje wybrany obszar strzałami, zadając {damage} obrażeń wrogom w jego obrębie."
+        "description": "Zasypuje wybrany obszar strzałami przez 3 sek., zadając {damage} obrażeń co 0.5 sek. wrogom w jego obrębie."
       },
       "hurricane": {
         "name": "Huragan",
-        "description": "Sprowadza huragan na wybrany obszar, smagając wrogów i zadając {damage} obrażeń od sił natury."
+        "description": "Sprowadza huragan na wybrany obszar przez 6 sek., smagając wrogów i zadając {damage} obrażeń od sił natury co sekundę."
       },
       "earthquake": {
         "name": "Trzęsienie ziemi",
-        "description": "Wstrząsa wybranym obszarem, smagając wrogów i zadając {damage} obrażeń od sił natury."
+        "description": "Wstrząsa wybranym obszarem przez 6 sek., smagając wrogów i zadając {damage} obrażeń od sił natury co 1.5 sek."
       },
       "heroic_strike": {
         "name": "Cios łupieżcy",
@@ -4618,15 +5070,15 @@ export const pl_PL: EnTranslations = {
       },
       "battle_shout": {
         "name": "Żelazny ryk",
-        "description": "Zwiększa twoją moc ataku o 20 na 2 min."
+        "description": "Zwiększa twoją moc ataku o {buff} na 2 min."
       },
       "commanding_shout": {
         "name": "Krzepiący okrzyk",
-        "description": "Zwiększa twoją kondycję o 6 na 2 min."
+        "description": "Zwiększa twoją kondycję o {buff} na 2 min."
       },
       "demoralizing_shout": {
         "name": "Złowieszcze wycie",
-        "description": "Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o 30 na 30 sek."
+        "description": "Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o {buff} na 30 sek."
       },
       "charge": {
         "name": "Natarcie",
@@ -4634,7 +5086,7 @@ export const pl_PL: EnTranslations = {
       },
       "rend": {
         "name": "Głęboka rana",
-        "description": "Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu 9 sek."
+        "description": "Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu {duration} sek."
       },
       "thunder_clap": {
         "name": "Trzęsący cios",
@@ -4642,7 +5094,7 @@ export const pl_PL: EnTranslations = {
       },
       "hamstring": {
         "name": "Kulawiące cięcie",
-        "description": "Okalecza wroga, zadając 5 obrażeń i spowalniając jego ruch o 50% na 15 sek."
+        "description": "Okalecza wroga, zadając {damage} obrażeń i spowalniając jego ruch o 50% na 15 sek."
       },
       "bloodrage": {
         "name": "Krwawa danina",
@@ -4650,7 +5102,7 @@ export const pl_PL: EnTranslations = {
       },
       "overpower": {
         "name": "Krwawa ręka",
-        "description": "Natychmiastowy atak za obrażenia broni +5. Użyteczne tylko po uniku celu. Nie można uniknąć."
+        "description": "Natychmiastowy atak za obrażenia broni plus {damage}. Użyteczne tylko po uniku celu. Nie można uniknąć."
       },
       "execute": {
         "name": "Przedwczesny grób",
@@ -4670,7 +5122,7 @@ export const pl_PL: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rozdarcie pancerza",
-        "description": "Strzaskuje pancerz celu, zmniejszając go o {damage} za każde nałożenie. Kumuluje się do 5 razy. Generuje wysokie zagrożenie."
+        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
       },
       "taunt": {
         "name": "Podjudzenie",
@@ -4682,11 +5134,11 @@ export const pl_PL: EnTranslations = {
       },
       "frost_armor": {
         "name": "Płaszcz szronu",
-        "description": "Otacza cię szronem, zwiększając pancerz o 30 na 30 min."
+        "description": "Otacza cię szronem, zwiększając pancerz o {buff} na 30 min."
       },
       "arcane_intellect": {
         "name": "Wgląd eteru",
-        "description": "Zwiększa intelekt o 2 na 30 min."
+        "description": "Zwiększa intelekt o {buff} na 30 min."
       },
       "frostbolt": {
         "name": "Szronowa lanca",
@@ -4710,7 +5162,7 @@ export const pl_PL: EnTranslations = {
       },
       "polymorph": {
         "name": "Zauroczenie",
-        "description": "Przemienia wroga w ropuchę na nawet 15 sek. Ropucha błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy."
+        "description": "Przemienia wroga w ropuchę na nawet {duration} sek. Ropucha błąka się i szybko się leczy. Każde obrażenie przerywa efekt. Tylko bestie i humanoidy."
       },
       "frost_nova": {
         "name": "Lodowe okowy",
@@ -4730,7 +5182,7 @@ export const pl_PL: EnTranslations = {
       },
       "ice_barrier": {
         "name": "Lodowa zasłona",
-        "description": "Osłania cię lodem, pochłaniając 130 obrażeń przez 60 sek."
+        "description": "Osłania cię lodem, pochłaniając {damage} obrażeń przez 60 sek."
       },
       "sinister_strike": {
         "name": "Nikczemne cięcie",
@@ -4738,7 +5190,7 @@ export const pl_PL: EnTranslations = {
       },
       "eviscerate": {
         "name": "Wieczny sen",
-        "description": "Ruch kończący, który zadaje obrażenia za każdy punkt kombinacji."
+        "description": "Ruch kończący, który zadaje {damage}."
       },
       "backstab": {
         "name": "Tchórzliwe pchnięcie",
@@ -4746,7 +5198,7 @@ export const pl_PL: EnTranslations = {
       },
       "gouge": {
         "name": "Cios w oko",
-        "description": "Uderza w cel, obezwładniając go na 4 sek. Każde obrażenie przerywa efekt. Przyznaje 1 punkt kombinacji."
+        "description": "Uderza w cel, zadając {damage} obrażeń i obezwładniając go na 4 sek. Każde obrażenie przerywa efekt. Przyznaje 1 punkt kombinacji."
       },
       "evasion": {
         "name": "Upiorny krok",
@@ -4778,11 +5230,11 @@ export const pl_PL: EnTranslations = {
       },
       "garrote": {
         "name": "Drut na gardło",
-        "description": "Dusi wroga garotą, zadając obrażenia natychmiast oraz powodując krwawienie za {damage} w ciągu 18 sek. Wymaga skradania. Przyznaje 1 punkt kombinacji."
+        "description": "Dusi wroga garotą, zadając {damage} obrażeń natychmiast oraz powodując krwawienie za {overTime} w ciągu 18 sek. Wymaga skradania. Przyznaje 1 punkt kombinacji."
       },
       "cheap_shot": {
         "name": "Cios w brzuch",
-        "description": "Uderz cel, ogłuszając go na 4 sek. Wymaga skradania się. Przyznaje 2 punkty kombinacji."
+        "description": "Uderz cel, zadając {damage} obrażeń i ogłuszając go na 4 sek. Wymaga skradania się. Przyznaje 2 punkty kombinacji."
       },
       "sap": {
         "name": "Ogłuszenie",
@@ -4790,11 +5242,11 @@ export const pl_PL: EnTranslations = {
       },
       "crippling_poison": {
         "name": "Ołowiany jad",
-        "description": "Uderza cel ołowianym jadem, zadając {damage} obrażeń natury i spowalniając jego prędkość ruchu o 50% na 12 sek."
+        "description": "Uderza cel ołowianym jadem, zadając {damage} obrażeń od Natury i spowalniając jego prędkość ruchu o 50% na 12 sek."
       },
       "expose_armor": {
         "name": "Wyłom w pancerzu",
-        "description": "Ruch kończący, który odsłania cel, zmniejszając jego pancerz. Więcej wydanych punktów kombinacji pogłębia cięcie."
+        "description": "Ruch kończący, który odsłania cel, zmniejszając jego pancerz o {damage} na 30 sek."
       },
       "rupture": {
         "name": "Wykrwawienie",
@@ -4818,7 +5270,7 @@ export const pl_PL: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Piętno przysięgi",
-        "description": "Napełnia cię mocą Świętości na 30 sek., sprawiając, że każde twoje uderzenie wręcz zadaje 4 dodatkowe obrażenia od Świętości. Uwolnij ją Verdictem."
+        "description": "Napełnia cię mocą Świętości na 30 sek., sprawiając, że każde twoje uderzenie wręcz zadaje {damage} dodatkowych obrażeń od Świętości. Uwolnij ją Verdictem."
       },
       "holy_light": {
         "name": "Kojące Światło",
@@ -4826,7 +5278,7 @@ export const pl_PL: EnTranslations = {
       },
       "devotion_aura": {
         "name": "Aura niezłomności",
-        "description": "Zwiększa twój pancerz o 40 na 30 min."
+        "description": "Zwiększa twój pancerz o {buff} na 30 min."
       },
       "judgement": {
         "name": "Verdict",
@@ -4834,19 +5286,19 @@ export const pl_PL: EnTranslations = {
       },
       "blessing_of_might": {
         "name": "Przysięga żelaza",
-        "description": "Nakłada błogosławieństwo na przyjazny cel, zwiększając moc ataku o 15 na 5 min."
+        "description": "Nakłada błogosławieństwo na przyjazny cel, zwiększając moc ataku o {buff} na 5 min."
       },
       "divine_protection": {
         "name": "Osłona wiary",
-        "description": "Ochronna osłona pochłania 50 obrażeń przez 10 sek."
+        "description": "Ochronna osłona pochłania {damage} obrażeń przez 10 sek."
       },
       "hammer_of_justice": {
         "name": "Druzgocący młot",
-        "description": "Ogłusza cel na 3 sek."
+        "description": "Ogłusza cel na {duration} sek."
       },
       "lay_on_hands": {
         "name": "Ostatnie namaszczenie",
-        "description": "Potężny przypływ uzdrowienia: przywraca 250 zdrowia. 10 min czasu odnowienia."
+        "description": "Potężny przypływ uzdrowienia: przywraca {damage} zdrowia. 10 min czasu odnowienia."
       },
       "flash_of_light": {
         "name": "Świetliste ukojenie",
@@ -4858,7 +5310,7 @@ export const pl_PL: EnTranslations = {
       },
       "consecration": {
         "name": "Święta ziemia",
-        "description": "Poświęca ziemię pod tobą, parząc pobliskich wrogów, zadając {damage} obrażeń świętych."
+        "description": "Poświęca ziemię pod tobą, parząc pobliskich wrogów i zadając {damage} obrażeń od Świętości co 2 sek. przez 10 sek."
       },
       "righteous_fury": {
         "name": "Płonąca przysięga",
@@ -4878,11 +5330,11 @@ export const pl_PL: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Patroszące uderzenie",
-        "description": "Potężny atak w zwarciu, który zwiększa obrażenia o 5. Aktywuje się przy następnym uderzeniu."
+        "description": "Potężny atak w zwarciu, który zwiększa obrażenia o {damage}. Aktywuje się przy następnym uderzeniu."
       },
       "aspect_of_the_hawk": {
         "name": "Postać błotniaka",
-        "description": "Przyjmij postać błotniaka, zwiększając moc ataku o 20 na 30 min."
+        "description": "Przyjmij postać błotniaka, zwiększając moc ataku o {buff} na 30 min."
       },
       "serpent_sting": {
         "name": "Jadowity kolec",
@@ -4894,15 +5346,15 @@ export const pl_PL: EnTranslations = {
       },
       "concussive_shot": {
         "name": "Wstrząsający strzał",
-        "description": "Oszałamia cel, spowalniając ruch o 50% na 4 sek."
+        "description": "Oszałamia cel, zadając {damage} obrażeń i spowalniając ruch o 50% na 4 sek."
       },
       "mongoose_bite": {
         "name": "Odwetowy kieł",
-        "description": "Kontratak po uniku celu, zadający obrażenia broni plus 12. Nie można uniknąć."
+        "description": "Kontratak po uniku celu, zadający obrażenia broni plus {damage}. Nie można uniknąć."
       },
       "wing_clip": {
         "name": "Pętające cięcie",
-        "description": "Zadaje ranę, która spowalnia wroga o 40% na 10 sek."
+        "description": "Zadaje ranę, zadając {damage} obrażeń i spowalniając wroga o 40% na 10 sek."
       },
       "aspect_of_the_monkey": {
         "name": "Postać kuny",
@@ -4930,7 +5382,7 @@ export const pl_PL: EnTranslations = {
       },
       "power_word_fortitude": {
         "name": "Litania hartu",
-        "description": "Zwiększa wytrzymałość celu o 3 na 30 min."
+        "description": "Zwiększa wytrzymałość celu o {buff} na 30 min."
       },
       "shadow_word_pain": {
         "name": "Pieśń rozkładu",
@@ -4938,7 +5390,7 @@ export const pl_PL: EnTranslations = {
       },
       "power_word_shield": {
         "name": "Psalm ochrony",
-        "description": "Osłania cel, pochłaniając 48 obrażeń przez 30 sek."
+        "description": "Osłania cel, pochłaniając {damage} obrażeń przez 30 sek."
       },
       "renew": {
         "name": "Trwająca łaska",
@@ -4966,7 +5418,7 @@ export const pl_PL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Oręż kamiennych okowów",
-        "description": "Nasyca twoją broń furią kamienia: każde uderzenie zadaje 5 dodatkowych obrażeń przez 5 min."
+        "description": "Nasyca twoją broń furią kamienia: każde uderzenie zadaje {damage} dodatkowych obrażeń przez 5 min."
       },
       "healing_wave": {
         "name": "Kojące wody",
@@ -4978,15 +5430,15 @@ export const pl_PL: EnTranslations = {
       },
       "lightning_shield": {
         "name": "Osłona gromu",
-        "description": "Otacza cię trzaskająca błyskawica: napastnicy w zwarciu otrzymują 13 obrażeń od natury."
+        "description": "Otacza cię trzaskająca błyskawica: napastnicy w zwarciu otrzymują {buff} obrażeń od natury, do 3 ładunków i najwyżej raz na 5 sek."
       },
       "flame_shock": {
         "name": "Żarowy wstrząs",
-        "description": "Spala cel ogniem, zadając 25 obrażeń oraz {damage} w ciągu 12 sek."
+        "description": "Spala cel ogniem, zadając {damage} obrażeń oraz {overTime} w ciągu 12 sek."
       },
       "flametongue_weapon": {
         "name": "Oręż żarowego piętna",
-        "description": "Przepaja twój oręż żywiołem ognia: każde uderzenie zadaje 8 dodatkowych obrażeń od ognia przez 5 min."
+        "description": "Przepaja twój oręż żywiołem ognia: każde uderzenie zadaje {damage} dodatkowych obrażeń od ognia przez 5 min."
       },
       "frost_shock": {
         "name": "Szronowy wstrząs",
@@ -4994,7 +5446,7 @@ export const pl_PL: EnTranslations = {
       },
       "frostbrand_weapon": {
         "name": "Oręż szronowych okowów",
-        "description": "Przepaja twój oręż kąsającym mrozem: każde uderzenie zadaje 8 dodatkowych obrażeń przez 5 min."
+        "description": "Przepaja twój oręż kąsającym mrozem: każde uderzenie zadaje {damage} dodatkowych obrażeń przez 5 min."
       },
       "ghost_wolf": {
         "name": "Shadewolf",
@@ -5010,11 +5462,11 @@ export const pl_PL: EnTranslations = {
       },
       "demon_skin": {
         "name": "Skóra plugawca",
-        "description": "Demoniczna skóra zwiększa twój pancerz o 30 na 30 min."
+        "description": "Demoniczna skóra zwiększa twój pancerz o {buff} na 30 min."
       },
       "immolate": {
         "name": "Płonący pakt",
-        "description": "Pali wroga, zadając 11 obrażeń od ognia oraz dodatkowe {damage} w ciągu 15 sek."
+        "description": "Pali wroga, zadając {damage} obrażeń od ognia oraz dodatkowe {overTime} w ciągu 15 sek."
       },
       "corruption": {
         "name": "Czarna zgnilizna",
@@ -5022,7 +5474,7 @@ export const pl_PL: EnTranslations = {
       },
       "life_tap": {
         "name": "Trudny targ",
-        "description": "Zamienia 30 zdrowia na 30 many."
+        "description": "Zamienia {damage} zdrowia na {damage} many."
       },
       "curse_of_agony": {
         "name": "Urok udręki",
@@ -5054,7 +5506,7 @@ export const pl_PL: EnTranslations = {
       },
       "mark_of_the_wild": {
         "name": "Dzika osłona",
-        "description": "Nakłada Dziką osłonę na sprzymierzony cel, zwiększając pancerz o 25 na 30 min."
+        "description": "Nakłada Dziką osłonę na sprzymierzony cel, zwiększając pancerz o {buff} na 30 min."
       },
       "moonfire": {
         "name": "Księżycowa nawałnica",
@@ -5066,7 +5518,7 @@ export const pl_PL: EnTranslations = {
       },
       "thorns": {
         "name": "Cierniowa straż",
-        "description": "Z celu wyrastają ciernie: atakujący wręcz otrzymują 3 obrażeń od Natury."
+        "description": "Z celu wyrastają ciernie: atakujący wręcz otrzymują {buff} obrażeń od Natury."
       },
       "entangling_roots": {
         "name": "Chwytające korzenie",
@@ -5074,7 +5526,7 @@ export const pl_PL: EnTranslations = {
       },
       "bear_form": {
         "name": "Postać Bruina",
-        "description": "Zmień postać w niedźwiedzia: pancerz +65%, moc ataku +15, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
+        "description": "Zmień postać w niedźwiedzia: pancerz +90%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego."
       },
       "maul": {
         "name": "Kruszenie kości",
@@ -5094,7 +5546,7 @@ export const pl_PL: EnTranslations = {
       },
       "ferocious_bite": {
         "name": "Krwawe ukąszenie",
-        "description": "Ruch kończący, który zadaje obrażenia za każdy punkt kombinacji. Tylko w postaci wilka."
+        "description": "Ruch kończący, który zadaje {damage}. Tylko w postaci wilka."
       },
       "swipe": {
         "name": "Zamaszyste pazury",
@@ -5126,7 +5578,7 @@ export const pl_PL: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Wiedźmie światło",
-        "description": "Zmniejsza pancerz celu o 35 na 40 sek."
+        "description": "Zmniejsza pancerz celu o 35 na 30 sek."
       },
       "hibernate": {
         "name": "Uśpienie",
@@ -5150,7 +5602,7 @@ export const pl_PL: EnTranslations = {
       },
       "rip": {
         "name": "Rozszarpanie",
-        "description": "Cios kończący zadający obrażenia od Krwawienia w ciągu 12 sek. Zużywa punkty kombinacji. Tylko w Postaci wilka."
+        "description": "Cios kończący zadający {damage} obrażeń od Krwawienia w ciągu 12 sek. Zużywa punkty kombinacji. Tylko w Postaci wilka."
       },
       "mortal_strike": {
         "name": "Okaleczające uderzenie",
@@ -5158,11 +5610,11 @@ export const pl_PL: EnTranslations = {
       },
       "bloodthirst": {
         "name": "Upust krwi",
-        "description": "Natychmiast atakuj w krwawym szale, zadając {damage}. (Sygnatura furii)"
+        "description": "Natychmiast atakuj w krwawym szale, zadając 60% obrażeń broni plus {damage}. (Sygnatura furii)"
       },
       "shield_slam": {
         "name": "Trzask tarczy",
-        "description": "Uderza cel tarczą, zadając {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)"
+        "description": "Uderza cel tarczą, zadając 50% obrażeń broni plus {damage} i wzbudzając ogromne zagrożenie. (Znak rozpoznawczy Ochrony)"
       },
       "whirlwind": {
         "name": "Wir ostrzy",
@@ -5813,6 +6265,24 @@ export const pl_PL: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Sierp Słonecznopłatkowy"
       },
+      "thorium_ore": {
+        "name": "Ruda Toru"
+      },
+      "arcanite_bar": {
+        "name": "Sztabka Arkanitu"
+      },
+      "ashwood_log": {
+        "name": "Kłoda Jesionu Popiołowego"
+      },
+      "elderwood_log": {
+        "name": "Kłoda Starego Bzu"
+      },
+      "goldleaf_herb": {
+        "name": "Ziele Złotolistne"
+      },
+      "sunpetal_herb": {
+        "name": "Ziele Słonecznego Płatka"
+      },
       "bristleback_maul": {
         "name": "Młot Gallowglass"
       },
@@ -6278,6 +6748,132 @@ export const pl_PL: EnTranslations = {
       "event_skin_token": {
         "name": "Tajemnicza skrytka kosmetyczna"
       },
+      "heroic_mark": {
+        "name": "Znak heroiczny"
+      },
+      "morthens_cryptforged_hauberk": {
+        "name": "Kryptokuta kolczuga Morthena"
+      },
+      "shadowpulse_handwraps": {
+        "name": "Owijki cienistego pulsu"
+      },
+      "bonechill_striders": {
+        "name": "Wędrowce kościstego mrozu"
+      },
+      "mistcallers_fang": {
+        "name": "Kieł przyzywacza mgły"
+      },
+      "tidebound_spaulders": {
+        "name": "Naramienniki spętane przypływem"
+      },
+      "sash_of_the_sunken_court": {
+        "name": "Szarfa zatopionego dworu"
+      },
+      "lunar_tide_greatstaff": {
+        "name": "Wielki kostur księżycowego przypływu"
+      },
+      "tidewoven_trousers": {
+        "name": "Spodnie tkane przypływem"
+      },
+      "choirmothers_casque": {
+        "name": "Hełm matki chóru"
+      },
+      "gravewyrm_cleaver": {
+        "name": "Tasak grobowego żmija"
+      },
+      "shroud_of_the_gravewyrm": {
+        "name": "Całun grobowego żmija"
+      },
+      "sanctum_prowlers_grips": {
+        "name": "Rękawice skradacza sanktuarium"
+      },
+      "scepter_of_the_deathless_court": {
+        "name": "Berło nieśmiertelnego dworu"
+      },
+      "deathless_warguard_legmail": {
+        "name": "Nieśmiertelne nogawice wojennej straży"
+      },
+      "soulrend_diadem": {
+        "name": "Diadem rozdarcia dusz"
+      },
+      "scourgehide_carapace": {
+        "name": "Pancerz ze skóry plagi"
+      },
+      "cryptplate_helm": {
+        "name": "Hełm z kryptowej płyty"
+      },
+      "shadowpulse_slippers": {
+        "name": "Trzewiki cienistego pulsu"
+      },
+      "bonechill_cord": {
+        "name": "Sznur kościstego mrozu"
+      },
+      "mistforged_pauldrons": {
+        "name": "Naramienniki kute we mgle"
+      },
+      "tideguard_faceguard": {
+        "name": "Osłona twarzy straży przypływu"
+      },
+      "sunken_court_mantle": {
+        "name": "Peleryna zatopionego dworu"
+      },
+      "lunar_choir_leggings": {
+        "name": "Nogawice księżycowego chóru"
+      },
+      "choir_blessed_spaulders": {
+        "name": "Naramienniki błogosławione przez chór"
+      },
+      "tideworn_warboots": {
+        "name": "Bojowe buty starte przypływem"
+      },
+      "gravewyrm_claws": {
+        "name": "Szpony grobowego żmija"
+      },
+      "gravescale_girdle": {
+        "name": "Pas z grobowej łuski"
+      },
+      "wyrmchoir_handwraps": {
+        "name": "Owijki żmijowego chóru"
+      },
+      "deathless_greatblade": {
+        "name": "Nieśmiertelne wielkie ostrze"
+      },
+      "soulforged_warplate": {
+        "name": "Bojowa zbroja kuta z duszy"
+      },
+      "stormcallers_focus": {
+        "name": "Ognisko przyzywacza burz"
+      },
+      "seal_of_the_nine_oaths": {
+        "name": "Pieczęć dziewięciu przysiąg"
+      },
+      "nielas_coldlight_band": {
+        "name": "Obrączka zimnego światła Nieli"
+      },
+      "sutils_gambit": {
+        "name": "Gambit Sutila"
+      },
+      "oath_of_the_round_table": {
+        "name": "Przysięga Okrągłego Stołu"
+      },
+      "zyzzs_deathless_signet": {
+        "name": "Nieśmiertelny sygnet Zyzza"
+      },
+      "architects_cornerstone": {
+        "name": "Kamień węgielny Architekta"
+      },
+      "swiftfang_talisman": {
+        "name": "Talizman rączego kła"
+      },
+      "yumis_keepsake_locket": {
+        "name": "Pamiątkowy medalionik Yumi"
+      },
+      "zense_meridian": {
+        "name": "Meridian Zense"
+      },
+      "medallion_of_endless_profit": {
+        "name": "Medalion niekończącego się zysku"
+      },
       "deathless_heartwood": {
         "name": "Twardziel Nieśmiertelnej Korony"
       },
@@ -6385,6 +6981,9 @@ export const pl_PL: EnTranslations = {
       }
     },
     "mobs": {
+      "yumi_cat": {
+        "name": "Yumi"
+      },
       "forest_wolf": {
         "name": "Leśny Wilk"
       },
@@ -6444,6 +7043,9 @@ export const pl_PL: EnTranslations = {
       },
       "deacon_voss": {
         "name": "Diakon Voss"
+      },
+      "training_dummy": {
+        "name": "Training Dummy"
       },
       "ridge_stalker": {
         "name": "Grzbietowy Tropiciel"
@@ -6606,6 +7208,9 @@ export const pl_PL: EnTranslations = {
       },
       "tolling_bell": {
         "name": "Bijący Dzwon"
+      },
+      "vale_cup_ball": {
+        "name": "Dziczy Balon"
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Budzący się Szczyt"
@@ -6813,6 +7418,11 @@ export const pl_PL: EnTranslations = {
         "title": "Mistrz Płatnerski",
         "greeting": "Kuźnia rozgrzana, a kamień szlifierski się obraca. Jeśli to tnie, to ja to sprzedaję."
       },
+      "heroic_quartermaster": {
+        "name": "Kwatermistrz Vex",
+        "title": "Heroiczny kwatermistrz",
+        "greeting": "Dowód z heroicznych głębin kupi najlepsze pierścienie i wisiory w Wysokiej Straży. Pokaż mi swoje znaki."
+      },
       "loremaster_caddis": {
         "name": "Mistrz Wiedzy Caddis",
         "title": "Mistrz Wiedzy",
@@ -6822,6 +7432,21 @@ export const pl_PL: EnTranslations = {
         "name": "Aukcjoner Voss",
         "title": "Strażnik Rynku Świata",
         "greeting": "Rynek Świata jest otwarty także tutaj, {className}. Kupuj od każdego poszukiwacza przygód w królestwie albo wystaw własne towary."
+      },
+      "bursar_fernando": {
+        "name": "Skarbnik Fernando",
+        "title": "Złocona Szkatuła",
+        "greeting": "Witaj w Złoconej Szkatule. Twoje dobra spoczywają bezpiecznie za naszymi zamkami."
+      },
+      "bursar_petra_vell": {
+        "name": "Skarbniczka Petra Vell",
+        "title": "Złocona Szkatuła",
+        "greeting": "Złocona Szkatuła prowadzi czyste księgi i jeszcze czystsze skarbce. Co mamy dla ciebie przechować?"
+      },
+      "bursar_aldous_crane": {
+        "name": "Skarbnik Aldous Crane",
+        "title": "Złocona Szkatuła",
+        "greeting": "Każda skrzynia, kufer i błyskotka są bezpieczne w Złoconej Szkatule."
       },
       "brother_aldric_raid": {
         "name": "Brat Aldric",
@@ -6842,6 +7467,11 @@ export const pl_PL: EnTranslations = {
         "name": "Blady Strażnik",
         "title": "Opiekun Umarłych",
         "greeting": "Spocznij, duchu. Mogę zwrócić cię twojemu ciału, lecz powrotna przeprawa pozostawia słabość."
+      },
+      "groundskeeper_bram": {
+        "name": "Opiekun Murawy Bram",
+        "title": "Opiekun Maciorowego Błonia",
+        "greeting": "Na Maciorowym Błoniu obowiązuje rozejm, {className}: tylko kopniaki i barki. Zagrasz o Miedziany Skopek?"
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7632,6 +8262,26 @@ export const pl_PL: EnTranslations = {
           }
         }
       },
+      "q_archetype_acceptance": {
+        "title": "Rzemiosło, które możesz nazwać własnym",
+        "text": "Każdy rzemieślnik z Eastbrook ostatecznie decyduje się na jedno rzemiosło, które nazywa swoim własnym. Wykaż się jednym czynem, {playerName}, i zadeklaruj swoją ścieżkę.",
+        "completion": "Twoja ścieżka została wybrana; chodź dobrze.",
+        "objectives": {
+          "0": {
+            "label": "Leśny Wilk zabity"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Zadośćuczynienie",
+        "text": "Aby odłożyć jeden statek na drugi, rzemieślnik musi najpierw zadośćuczynić za ścieżkę, którą nie przeszedł, {playerName}.",
+        "completion": "Poprawki dokonane; otwiera się przed tobą nowa droga.",
+        "objectives": {
+          "0": {
+            "label": "Leśny Wilk zabity"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Utopiony chór",
         "text": "Brodzący nie działają sami. Wśród nich kroczą Utopieni Wyznawcy — kult, który zatonął wraz ze świątynią, wciąż w zbutwiałych szatach, wciąż śpiewający modlitwę z nadbrzeżnych skał. Ucisz ośmiu z nich i przynieś mi sześć ofiar, które noszą. Chcę wiedzieć, co zamierzają złożyć swojej bogini.",
@@ -7730,6 +8380,9 @@ export const pl_PL: EnTranslations = {
           },
           "9": {
             "label": "Polana Jasnoboru"
+          },
+          "10": {
+            "label": "Maciorowe Błonie"
           }
         }
       },
@@ -7874,12 +8527,14 @@ export const pl_PL: EnTranslations = {
       "crownforged": {
         "name": "Regalia Bonewrought",
         "bonus2": "Zwiększa siłę ataku o 40.",
-        "bonus3": "Zwiększa siłę o 15, wytrzymałość o 15 oraz szybkość ataku i rzucania zaklęć o 15%."
+        "bonus3": "Zwiększa siłę o 15, wytrzymałość o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
+        "bonus4": "Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy."
       },
       "deathlord": {
         "name": "Rynsztunek bojowy Barrowlorda",
         "bonus2": "Zwiększa siłę ataku o 40.",
-        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15."
+        "bonus3": "Zwiększa siłę o 15 i wytrzymałość o 15.",
+        "bonus4": "Twoje krytyczne trafienia bronią mają 50% szansy na udzielenie Grobowej Potęgi, zwiększającej moc ataku o 60 na 10 s."
       },
       "greyjaw_stalker": {
         "name": "Rynsztunek tropiciela Szaroszczękiego",
@@ -7888,22 +8543,26 @@ export const pl_PL: EnTranslations = {
       "necromancers": {
         "name": "Szaty Mournweave",
         "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
-        "bonus3": "Zwiększa intelekt o 10 i wytrzymałość o 10."
+        "bonus3": "Zwiększa intelekt o 10 i wytrzymałość o 10.",
+        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Jasności Umysłu, dzięki czemu następne zaklęcie jest darmowe."
       },
       "nighttalon": {
         "name": "Skóra Direfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
-        "bonus3": "Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%."
+        "bonus3": "Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%.",
+        "bonus4": "Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 6 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
-        "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%."
+        "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
+        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
       },
       "stormcallers": {
         "name": "Szaty Galecall",
         "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
-        "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%."
+        "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
+        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
       },
       "vale_arcanist": {
         "name": "Szaty Arkanisty z Doliny",
@@ -7912,7 +8571,8 @@ export const pl_PL: EnTranslations = {
       "wyrmshadow": {
         "name": "Szaty Nightfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
-        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%."
+        "bonus3": "Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%.",
+        "bonus4": "Twoje krytyczne trafienia bronią mają 50% szansy na udzielenie Pędu Kłów, zwiększającego szybkość ataku o 25% na 8 s."
       }
     }
   },

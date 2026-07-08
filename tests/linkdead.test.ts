@@ -14,8 +14,15 @@ vi.mock('../server/db', () => ({
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  // Character load leases: leave() releases and the autosave loop heartbeats, so
+  // these must exist on the mock or those paths throw on the undefined export.
+  acquireCharacterLease: vi.fn(async () => true),
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import { releaseCharacterLease } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { LINKDEAD_GRACE_MS, planJoin } from '../server/linkdead';
 import {
@@ -53,20 +60,41 @@ describe('planJoin (pure decision core)', () => {
   const base = { accountId: 7, isGm: false, liveOtherSessions: 0, maxPerAccount: 1 };
 
   it('resumes the same character when its held session is linkdead and same-account', () => {
-    expect(planJoin({ ...base, sameCharacter: { accountId: 7, linkdead: true } })).toEqual({
+    expect(
+      planJoin({ ...base, sameCharacter: { accountId: 7, linkdead: true, left: false } }),
+    ).toEqual({
       action: 'resume',
     });
   });
 
   it('rejects the same character while its session socket is still live', () => {
-    expect(planJoin({ ...base, sameCharacter: { accountId: 7, linkdead: false } })).toEqual({
+    expect(
+      planJoin({ ...base, sameCharacter: { accountId: 7, linkdead: false, left: false } }),
+    ).toEqual({
+      action: 'reject',
+      error: 'character already in world',
+    });
+  });
+
+  it('never resumes a session already mid-teardown (left), even linkdead same-account', () => {
+    // A fire-and-forget leave() (grace expiry, logout) has set left=true and is
+    // parked on its save await: its sim entity and lease row are about to be
+    // destroyed, so a resume would hand the client a zombie session whose lease
+    // release the nonce fence cannot see (the resume arm never re-acquires).
+    // Reject with the transient conflict error instead; the client's reconnect
+    // policy retries it, and the retry lands on the fresh-acquire arm.
+    expect(
+      planJoin({ ...base, sameCharacter: { accountId: 7, linkdead: true, left: true } }),
+    ).toEqual({
       action: 'reject',
       error: 'character already in world',
     });
   });
 
   it('rejects a linkdead session owned by a different account (takeover stays explicit)', () => {
-    expect(planJoin({ ...base, sameCharacter: { accountId: 8, linkdead: true } })).toEqual({
+    expect(
+      planJoin({ ...base, sameCharacter: { accountId: 8, linkdead: true, left: false } }),
+    ).toEqual({
       action: 'reject',
       error: 'character already in world',
     });
@@ -383,10 +411,65 @@ describe('reconnect policy (client-side conflict tolerance)', () => {
     const plan = planJoin({
       accountId: 7,
       isGm: false,
-      sameCharacter: { accountId: 7, linkdead: false },
+      sameCharacter: { accountId: 7, linkdead: false, left: false },
       liveOtherSessions: 0,
       maxPerAccount: 1,
     });
     expect(plan).toEqual({ action: 'reject', error: RECONNECT_CONFLICT_ERROR });
+  });
+});
+
+describe('deliberate logout skips linkdead grace', () => {
+  it("a t:'logout' message leaves the session immediately, not linkdead", async () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(
+      server.join(ws, 11, 101, 'Quitter', 'warrior', null, false, { leaseNonce: 'nonce-logout' }),
+    );
+    const release = vi.mocked(releaseCharacterLease);
+    release.mockClear();
+
+    server.handleMessage(session, JSON.stringify({ t: 'logout' }));
+
+    // session.left is set synchronously so socketClosed (page-unload close)
+    // cannot enter linkdead grace
+    expect(session.left).toBe(true);
+    expect(session.linkdead).toBe(false);
+
+    // the subsequent WebSocket close from the page reload is now a no-op
+    expect(server.socketClosed(session, ws)).toBe(false);
+    expect(session.linkdead).toBe(false);
+
+    // character is gone, not held in-world
+    await vi.waitFor(() => {
+      expect((server as any).sessionByCharacterId(101)).toBeNull();
+    });
+    expect(server.clients.size).toBe(0);
+    expect(server.sim.entities.has(session.pid)).toBe(false);
+
+    // The logout funnels through leave(), which releases the character load
+    // lease with the session's OWN nonce (the fence). Without this, every
+    // deliberate logout would leak its lease row and lock the character out of
+    // other realm processes for the full TTL.
+    await vi.waitFor(() => {
+      expect(release).toHaveBeenCalledTimes(1);
+    });
+    expect(release).toHaveBeenCalledWith(101, 'nonce-logout');
+  });
+
+  it('allows a fresh join on the same character after a t:logout', async () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Loggedout', 'warrior', null));
+    server.handleMessage(session, JSON.stringify({ t: 'logout' }));
+
+    await vi.waitFor(() => {
+      expect((server as any).sessionByCharacterId(101)).toBeNull();
+    });
+
+    // no "character already in world" after a deliberate logout
+    const fresh = expectJoined(server.join(fakeWs(), 11, 101, 'Loggedout', 'warrior', null));
+    expect(fresh.characterId).toBe(101);
+    expect(fresh.left).toBe(false);
   });
 });

@@ -17,6 +17,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { en as adminEn } from '../src/admin/i18n.en';
+import { cs_CZ } from '../src/admin/i18n.locales/cs_CZ';
 import { de_DE } from '../src/admin/i18n.locales/de_DE';
 import { en_CA } from '../src/admin/i18n.locales/en_CA';
 import { es } from '../src/admin/i18n.locales/es';
@@ -155,6 +156,7 @@ describe('admin overlay keys are members of the admin en base', () => {
     ja_JP,
     pt_BR,
     ru_RU,
+    cs_CZ,
   };
   for (const [lang, overlay] of Object.entries(overlays)) {
     it(`${lang}: has no key outside the admin en base`, () => {

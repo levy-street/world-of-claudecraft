@@ -47,7 +47,7 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 - **The Ashen Coliseum**, a ranked PvP arena with 1v1 and 2v2 ladders plus a 2v2 Fiesta mode (augment pickups, a shrinking ring, first to fifteen takedowns).
 - **Real multiplayer**: parties, trading, duels, tap rights, party-split XP, whispers, away status, and a server that owns every combat roll.
 - **Procedural everything**: timber-framed towns, rigged creature families, painted spell icons drawn on canvas, WebAudio sound, biome weather, and real-time shadows. No 3D model files for the world.
-- **Localized into 21 locales** through a deterministic, sim-emits-keys pipeline.
+- **Localized into 22 locales** through a deterministic, sim-emits-keys pipeline.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
 - **Web3-native**: link a Solana wallet to show your $WOC balance and a cosmetic holder badge, fully optional and non-custodial.
 
@@ -131,7 +131,7 @@ Open http://localhost:5173, choose **Play Online**, create an account, create a 
 What persists and how the server stays in charge:
 
 - **Accounts**: scrypt-hashed passwords and 7-day bearer tokens (`auth_tokens`).
-- **Characters**: up to 10 per account; level, gear, bags, quests, talents, position, and money persist as JSONB in Postgres, saved every 30 seconds, on logout, and on server shutdown. Names are globally unique, letters only, classic style.
+- **Characters**: up to 10 per account; level, gear, bags, bank vault, quests, talents, position, and money persist as JSONB in Postgres, saved every 30 seconds, on logout, and on server shutdown. Names are globally unique, letters only, classic style.
 - **The server is authoritative**: clients stream movement intent and commands at 20 Hz; the server runs the one shared `Sim` and returns interest-scoped snapshots (~120 yd) plus per-player events. Every combat roll, loot drop, quest credit, and vendor transaction resolves server-side. The client is a renderer.
 
 ## Train an agent (headless RL)
@@ -229,6 +229,7 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 - **Eating and drinking**: sit to restore over 18 seconds, broken by damage or standing, and yes, you can eat and drink at once.
 - **Vendors** that buy food and water and sell honest white gear, with coin shown in gold, silver, and copper.
+- **A personal bank** (the Gilded Strongbox): bursars in each hub town keep a vault per character, from 24 slots up to 96 with coin-bought expansions, plus bonus slots earned online for a verified email, linked accounts, and referrals.
 - **Mob AI**: wander, proximity aggro by level difference, social pulls, chase, leash and reset, corpse loot, and respawns, with a rare spawn (Old Greyjaw) on a long timer.
 - **Fishing** spots with their own loot tables and rare catches.
 - **Cosmetic skins** rolled at uncommon, rare, and epic rarity, purely for looks.
@@ -310,7 +311,7 @@ For the server commands see [Develop online](#develop-online-with-hot-reload) ab
 
 ## Localization
 
-Every player-visible string resolves through `t()`, and the game ships in **21 locales** (English, two Spanish, two French, English Canada, Italian, German, Simplified and Traditional Chinese, Korean, Japanese, Brazilian Portuguese, Russian, Dutch, Polish, Indonesian, Turkish, Swedish, Vietnamese, and Danish). The sim and server stay language-agnostic: they emit stable keys or English that the client re-localizes at the boundary, which keeps determinism intact. Contributors add English only; the maintainer batch-fills the other locales before each release. The workflow is documented in `docs/i18n-scaling/translation-workflow.md`.
+Every player-visible string resolves through `t()`, and the game ships in **22 locales** (English, two Spanish, two French, English Canada, Italian, German, Simplified and Traditional Chinese, Korean, Japanese, Brazilian Portuguese, Russian, Czech, Dutch, Polish, Indonesian, Turkish, Swedish, Vietnamese, and Danish). The sim and server stay language-agnostic: they emit stable keys or English that the client re-localizes at the boundary, which keeps determinism intact. Contributors add English only; the maintainer batch-fills the other locales before each release. The workflow is documented in `docs/i18n-scaling/translation-workflow.md`.
 
 ## Contributing
 

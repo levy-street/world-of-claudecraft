@@ -106,6 +106,13 @@ export interface SuspiciousEvidence {
   weight: number;
   detail: string;
   expiresAt: number;
+  // Recurrence history, present only on kinds where re-triggering carries
+  // information: distinct episodes this session, first and latest (epoch ms),
+  // and the opening timestamps of the most recent episodes (bounded ring).
+  occurrences?: number;
+  firstAt?: number;
+  lastAt?: number;
+  episodesAt?: number[];
 }
 
 export interface SuspiciousPlayer {
@@ -115,6 +122,8 @@ export interface SuspiciousPlayer {
     name: string;
     ip: string;
   };
+  // CONFIRMED = an automated moderator report went out for this session.
+  state: 'SUSPICIOUS' | 'CONFIRMED';
   snapshot: {
     capturedAt: number;
   } | null;
@@ -504,4 +513,32 @@ export interface RoleChangeRow {
 
 export interface StaffHistoryData {
   rows: RoleChangeRow[];
+}
+
+// Server tick-loop profiling (GET /admin/api/perf/tick, POST .../capture). Mirrors
+// server/game.ts PerfCaptureResult/PerfCaptureStatus and the TickProfiler shape.
+export interface PerfPhaseStats {
+  mean: number;
+  p50: number;
+  p95: number;
+  p99: number;
+  max: number;
+}
+
+export interface PerfCaptureResult {
+  capturedAt: number; // epoch ms the window closed
+  durationMs: number;
+  online: number;
+  simEntities: number;
+  profile: {
+    samples: number;
+    windowTicks: number;
+    phases: Record<string, PerfPhaseStats>;
+  };
+}
+
+export interface PerfCaptureStatus {
+  capturing: boolean;
+  endsAt: number | null; // epoch ms the in-flight capture closes
+  last: PerfCaptureResult | null;
 }

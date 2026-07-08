@@ -46,8 +46,18 @@ import {
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
+import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
+import { rangedShotProfile } from './ranged_shot';
 import { applyThornsReaction } from './thorns_charge';
+
+// Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
+// dedicated ranged-weapon slot, so the mainhand doubles as the "bow"; a full melee
+// weapon's damage on ranged would push a fully geared hunter's white DPS well past
+// the melee classes (measured ~+30%), so only part of it carries to the shot. The
+// agility-driven ranged attack-power term is unaffected, and wands (the caster
+// sidearm, fixed class damage) are exempt.
+const RANGED_WEAPON_COEFF = 0.6;
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -116,9 +126,13 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
     ctx.breakGhostWolf(p);
-    rangedSwing(ctx, p, t, ranged);
-    // Ranged haste (item-set bonus) shortens the auto-shot interval.
-    p.swingTimer = (ranged.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
+    // Hunters shoot with their equipped weapon (damage range + speed), casters
+    // with their fixed class wand; the shot then fires at that resolved profile.
+    const shot = rangedShotProfile(ranged, p.weapon);
+    rangedSwing(ctx, p, t, { ...ranged, min: shot.min, max: shot.max, speed: shot.speed });
+    // The weapon's speed sets the cadence; ranged haste (item-set bonus) then
+    // shortens the auto-shot interval.
+    p.swingTimer = (shot.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
     return;
   }
   if (d > MELEE_RANGE) return;
@@ -192,7 +206,13 @@ export function rangedSwing(
       ctx.enterCombat(atk, tgt);
       return;
     }
-    let dmg = ctx.rng.range(ranged.min, ranged.max) + (atk.rangedPower / 14) * ranged.speed;
+    // Only part of a melee weapon's roll carries to a hunter's Auto Shot (see
+    // RANGED_WEAPON_COEFF); a wand deals its full fixed damage. The ranged AP term
+    // (agility) is unaffected either way.
+    const weaponRoll = ctx.rng.range(ranged.min, ranged.max);
+    let dmg =
+      (ranged.wand ? weaponRoll : weaponRoll * RANGED_WEAPON_COEFF) +
+      (atk.rangedPower / 14) * ranged.speed;
     // ranged white hits suffer the same higher-level crit suppression as melee
     const critChance = Math.max(0.005, atk.critChance - Math.max(0, tgt.level - atk.level) * 0.002);
     const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, atk) ? 1 : critChance);
@@ -200,6 +220,14 @@ export function rangedSwing(
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
     ctx.dealDamage(atk, tgt, Math.max(1, Math.round(dmg)), crit, school, label, 'hit');
+    // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
+    // inside applySetProcs, so proc-less players draw no rng.
+    if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
+    // Legendary on-hit weapon procs (e.g. Thronebane's Chain Arc) fire on a hunter's
+    // Auto Shot too, since it strikes with the equipped mainhand. Wand bolts do not
+    // swing the mainhand, so casters never roll it. No-op (no rng draw) unless the
+    // shooter wields a proc weapon with a weaponHit proc.
+    if (!ranged.wand) runWeaponProcs(ctx, atk, tgt, 'weaponHit');
   });
 }
 
@@ -285,6 +313,10 @@ export function meleeSwing(
     false,
     { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
   );
+  // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
+  // the weaponStrike ability path, which resolves through this shell). Gated on
+  // setProcs inside applySetProcs, so proc-less players draw no rng.
+  if (crit && attacker.kind === 'player') ctx.applySetProcs(attacker, target, 'weaponCrit');
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
@@ -306,5 +338,8 @@ export function meleeSwing(
       );
     }
   }
+  // Legendary on-hit weapon procs (e.g. Thronebane's Chain Arc). No-op (no rng
+  // draw) unless the attacker wields a proc weapon with a weaponHit proc.
+  runWeaponProcs(ctx, attacker, target, 'weaponHit');
   return true;
 }

@@ -92,6 +92,7 @@ const INTERACTIVE_HUD_SELECTORS = [
   '.action-btn',
   '.mobile-action-slot',
   '#mobile-action-ring',
+  '#mobile-consumables',
   '.window',
   '.panel',
   '#minimap-wrap',

@@ -63,6 +63,50 @@ export interface FiestaMatchInfo {
   powerups: FiestaPowerupView[];
 }
 
+// One live Yumi cat as the renderer/HUD sees it. BOTH cats are always present
+// on YumiMatchInfo (graphics-fairness invariant: enemy objective HP is
+// actionable info, never hidden or delayed by any tier).
+export interface YumiView {
+  entityId: number;
+  hp: number;
+  maxHp: number;
+  // world coordinates (beacon anchor + map marker even outside interest range)
+  x: number;
+  z: number;
+  alive: boolean;
+}
+
+// One combatant's line on the Protect Yumi scoreboard.
+export interface YumiScoreboardPlayer {
+  pid: number;
+  name: string;
+  cls: PlayerClass;
+  kills: number;
+  deaths: number;
+  down: boolean; // currently benched, awaiting respawn
+  me: boolean;
+}
+
+// Live Protect Yumi state for the local player, polled by the HUD each frame.
+// Offline the Sim builds it per frame; online ClientWorld folds the 1/s
+// yumiStatus heartbeat + teleport events into its mirrored copy (the arena
+// wire field alone is rate-limited and the enemy cat can leave interest range).
+export interface YumiMatchInfo {
+  team: 'A' | 'B'; // my team (A = blue, B = red)
+  size: 3 | 5;
+  phase: 'countdown' | 'active' | 'sudden' | 'over';
+  matchElapsed: number; // whole seconds since GO (0 during countdown)
+  teleportIn: number; // whole seconds until the next simultaneous teleport (0 once frozen)
+  suddenDeathIn: number; // whole seconds until sudden death (0 once latched)
+  damageTakenMult: number; // current cat damage-taken multiplier (1 before sudden death)
+  down: boolean; // am I currently benched
+  respawnIn: number; // whole seconds until I revive (0 if alive)
+  yumiA: YumiView;
+  yumiB: YumiView;
+  teamA: YumiScoreboardPlayer[];
+  teamB: YumiScoreboardPlayer[];
+}
+
 export interface ArenaInfo {
   // Backwards-compatible view of the currently selected/queued/matched bracket.
   rating: number;
@@ -85,6 +129,8 @@ export interface ArenaInfo {
     returnIn?: number; // whole seconds left in the post-bout aftermath ('over')
     // present only for the 2v2 Fiesta party mode
     fiesta?: FiestaMatchInfo;
+    // present only for the Protect Yumi brackets (yumi3/yumi5)
+    yumi?: YumiMatchInfo;
   } | null;
   // Backwards-compatible live ladder for the currently selected bracket.
   ladder: ArenaLadderEntry[];

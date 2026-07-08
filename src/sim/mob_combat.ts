@@ -10,13 +10,18 @@ export type MobCombatProfile = {
   movingRangeBonus: number;
 };
 
+// Every melee mob fights hit-and-run: it swings from effective reach while
+// continuing to close to desiredRange (80% of reach), so it tracks a moving
+// target fluidly instead of stopping at max reach to trade blows. The chase
+// speed stays 1 (pursuit is about swinging mid-step, not a speed buff) and the
+// stationary walk-past fix is preserved via movingRangeBonus.
 export const DEFAULT_MOB_COMBAT_PROFILE: MobCombatProfile = {
   meleeRange: MELEE_RANGE,
   desiredRange: MELEE_RANGE * 0.8,
   chaseSpeedMult: 1,
   canLeash: true,
-  swingWhilePursuing: false,
-  immediateSwingOnEnterRange: false,
+  swingWhilePursuing: true,
+  immediateSwingOnEnterRange: true,
   movingRangeBonus: 1,
 };
 
@@ -44,10 +49,10 @@ export function scaledDefaultMobMeleeRange(scale: number): number {
   return MELEE_RANGE + Math.max(0, scale - 1) * 3;
 }
 
-// Thunzharr is rendered mountain-sized (scale 50 in zone3.ts) so he reads as a world
-// boss, but his melee reach must NOT follow that visual scale (a scale-50 body would
-// swing ~150yd and reach the whole raid, trivializing the Howling Gale anti-kite snare).
-// Pin his reach to a scale-5 body (~17yd): visual size and combat reach are decoupled.
+// Thunzharr is rendered oversized (scale 8 in zone3.ts) so he reads as a world boss, but
+// his melee reach must NOT follow that visual scale (a scale-8 body would swing far past
+// its model and reach kiters, trivializing the Howling Gale anti-kite snare). Pin his
+// reach to a scale-5 body (~17yd): visual size and combat reach are decoupled.
 const THUNZHARR_REACH_SCALE = 5;
 
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {
@@ -57,10 +62,12 @@ export function combatProfileForMob(templateId: string, scale: number): MobComba
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,
       meleeRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE),
+      desiredRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE) * 0.8,
     };
   return {
     ...DEFAULT_MOB_COMBAT_PROFILE,
     meleeRange: scaledDefaultMobMeleeRange(scale),
+    desiredRange: scaledDefaultMobMeleeRange(scale) * 0.8,
   };
 }
 

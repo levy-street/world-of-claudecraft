@@ -288,6 +288,16 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
   });
+
+  it('marks only uiScale as commit-on-release; the other comfort sliders stay live (#1558)', () => {
+    const controls = buildInterfaceControls(makeSource());
+    // uiScale rescales the whole UI (window included), so it must apply on release.
+    expect(find(controls, 'uiScale')).toMatchObject({ control: 'slider', commitOnChange: true });
+    // Sibling sliders keep their live preview (no commitOnChange flag).
+    expect(find(controls, 'playerFrameScale')).not.toHaveProperty('commitOnChange');
+    expect(find(controls, 'tooltipScale')).not.toHaveProperty('commitOnChange');
+    expect(find(controls, 'fctScale')).not.toHaveProperty('commitOnChange');
+  });
 });
 
 // ---------------------------------------------------------------------------

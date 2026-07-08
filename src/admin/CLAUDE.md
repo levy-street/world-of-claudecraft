@@ -28,7 +28,7 @@ type-checked by `npm run check:admin` (svelte-check over `tsconfig.admin.json`).
 ## i18n: operators are users, so all rendered text routes through `t()`
 Admin has its OWN sparse-overlay catalog, independent of the game. Author English in
 `i18n.en.ts` (flat dotted keys) and render via `{t('key')}` / `placeholder={t('key')}`;
-**never edit the 20 `i18n.locales/<lang>.ts` overlays** (the maintainer fills them at
+**never edit the 21 `i18n.locales/<lang>.ts` overlays** (the maintainer fills them at
 release). Regenerate the dense `i18n.resolved.generated/` dir with `npm run i18n:admin`
 after any key change; the release-tier gate (`I18N_RELEASE_TIER=1`) hard-fails on a
 `pending` admin row. Server error bodies reverse-map via `localizeAdminError`;

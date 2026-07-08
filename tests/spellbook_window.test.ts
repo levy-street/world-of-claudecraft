@@ -88,12 +88,11 @@ describe('spellbook_window: no magic values (DOM painter)', () => {
 });
 
 describe('spellbook_window: hud.update() refresh call site', () => {
-  it("refreshes the open spellbook's +/- toggles from hud.update() while displayed", () => {
+  it('drives the open spellbook from hud.update() through tickOpen while displayed', () => {
     // Pin the hud.ts call site so a refactor cannot silently stop the open
-    // spellbook's hotbar toggles from tracking action-bar changes.
-    expect(hud).toContain(
-      'if (this.spellbookWindow.isOpen) this.spellbookWindow.refreshHotbarControls();',
-    );
+    // spellbook from tracking action-bar AND talent changes. tickOpen re-renders
+    // on a resolved-numbers change, else falls back to the cheap toggle refresh.
+    expect(hud).toContain('if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();');
   });
 
   it('keeps the in-place refresh updating the aria-pressed + disabled state per toggle', () => {
@@ -112,5 +111,44 @@ describe('spellbook_window: hud.update() refresh call site', () => {
     // appendRow seeds), not rewritten unconditionally. Only `disabled` stays per-frame
     // (it depends on hasFree). A revert to unconditional writes drops this guard.
     expect(code).toContain("(btn.getAttribute('aria-pressed') === 'true') !== onBar");
+  });
+});
+
+describe('spellbook_window: tooltip/summary reflect talent changes (tooltip parity)', () => {
+  it('re-renders the open window only when a resolved ability number changed', () => {
+    // tickOpen compares a content signature (id/rank/cost/cast/cooldown) of
+    // world.known, not its array identity: the online mirror rebuilds that array
+    // every snapshot, so reference equality would rebuild the DOM every frame. A
+    // real change (e.g. a talent dropping Wicked Slash cost 45 -> 40) rebuilds the
+    // row summaries; an unchanged frame falls back to the cheap toggle refresh.
+    expect(code).toContain('tickOpen()');
+    expect(code).toContain(
+      'SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig',
+    );
+    expect(code).toContain('this.lastKnownSig = SpellbookWindow.knownSig(world.known)');
+    // the signature carries the numbers a row summary paints, so a cost/cooldown
+    // change flips it (a bare id:rank would miss a same-rank talent cost cut).
+    expect(code).toMatch(/knownSig[\s\S]*k\.def\.id.*k\.rank.*k\.cost.*k\.castTime.*k\.cooldown/);
+  });
+
+  it('preserves scroll position and keyboard focus across the talent-driven rebuild', () => {
+    // render() rebuilds the list via innerHTML and the window root is the scroll
+    // container, so the rebuild must restore scrollTop and refocus the row/toggle
+    // the user was on (by ability id), or a talent change would jump the list to
+    // the top and drop focus (a WCAG focus-loss regression).
+    expect(code).toContain('rerenderPreservingView()');
+    expect(code).toContain('const scrollTop = root.scrollTop');
+    expect(code).toContain('root.scrollTop = scrollTop');
+    expect(code).toContain('el.dataset.abilityId = row.abilityId');
+    expect(code).toContain('(root.querySelector(refocus) as HTMLElement | null)?.focus()');
+  });
+
+  it('resolves each row tooltip LIVE at hover, not the render-time capture', () => {
+    // A talent allocated while the spellbook is open reassigns world.known with a
+    // new cost/damage; the hover tooltip must reflect it even before the next
+    // tickOpen rebuild lands, so it resolves the ability fresh by id.
+    expect(code).toContain(
+      'this.deps.world().known.find((k) => k.def.id === known.def.id) ?? known',
+    );
   });
 });

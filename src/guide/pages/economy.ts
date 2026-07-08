@@ -36,6 +36,13 @@ export const economy: GuidePage = {
           <p>${esc(t('guide.economy.marketPricing'))}</p>
         </section>
 
+        <section class="guide-block">
+          <h2>${esc(t('guide.economy.bankTitle'))}</h2>
+          <p>${esc(t('guide.economy.bankBody'))}</p>
+          <p>${esc(t('guide.economy.bankHow'))}</p>
+          <p>${esc(t('guide.economy.bankSlots'))}</p>
+        </section>
+
         ${related([
           { href: hrefFor('gear'), key: 'guide.nav.gear' },
           { href: hrefFor('delves'), key: 'guide.nav.delves' },

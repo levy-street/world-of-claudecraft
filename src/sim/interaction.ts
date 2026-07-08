@@ -38,13 +38,17 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
+import { applyFocusBonus, applyFocusTierBonus, type FocusAllocation } from './professions/focus';
 import {
   effectiveFocusComponents,
   HARVEST_COMPONENT_ITEMS,
+  type HarvestTier,
   harvestTierQuantity,
   isHarvestableCorpse,
+  isSignableMaterialRarity,
   resolveCorpseFocusHarvest,
   resolveCorpseHarvest,
+  rollCorpseMaterialRarity,
 } from './professions/gathering';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
@@ -237,28 +241,65 @@ export function harvestCorpse(
   // the corpse unclaimed for the next harvester. The gate runs on the
   // deterministic pre-roll focus set so a refused command draws NO rng, and it
   // reserves the MAXIMUM the tier roll can add per component
-  // (harvestTierQuantity of the top tier, fit cumulatively): a gate on less
+  // (harvestTierQuantity of the top tier, focus-boosted by the player's
+  // persistent town focus per component, fit cumulatively): a gate on less
   // could pass on a nearly-full stack and let the uncapped addItem spill past
   // capacity.
-  const maxTierQty = harvestTierQuantity('legendary');
   const wanted: InvSlot[] = [];
   for (const component of effectiveFocusComponents(componentTags ?? [], components ?? [])) {
     const wantedItemId = HARVEST_COMPONENT_ITEMS[component];
     if (!wantedItemId) continue;
+    const maxQty = focusedHarvestQuantity('legendary', component, meta.townFocus);
     const existing = wanted.find((w) => w.itemId === wantedItemId);
-    if (existing) existing.count += maxTierQty;
-    else wanted.push({ itemId: wantedItemId, count: maxTierQty });
+    if (existing) existing.count += maxQty;
+    else wanted.push({ itemId: wantedItemId, count: maxQty });
   }
   if (wanted.length > 0 && !fitsAll(meta.inventory, bagCapacity(meta.bags), wanted)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
   }
   mob.harvestClaimedBy = claim.claimedBy;
+  // #1145: a rare-or-better monster material is stamped with the harvester's
+  // name (a non-fungible instance slot); anything below that rarity stays a
+  // plain fungible grant, same as before this issue. One rarity roll per
+  // yielded component, same one-draw-per-yield convention as
+  // resolveCorpseFocusHarvest's own tier roll.
   const yields = resolveCorpseFocusHarvest(componentTags ?? [], components ?? [], ctx.rng);
   for (const y of yields) {
     const itemId = HARVEST_COMPONENT_ITEMS[y.component];
-    if (itemId) ctx.addItem(itemId, harvestTierQuantity(y.tier), meta.entityId);
+    if (!itemId) continue;
+    // #1143: the player's persistent town focus adds a bonus on top of the
+    // #1142 roll for a focused component; an unfocused component's tier is
+    // exactly the roll above, untouched.
+    const tier = applyFocusTierBonus(y.tier, y.component, meta.townFocus);
+    // #1145: a rare-or-better monster material is stamped with the harvester's
+    // name (a non-fungible instance slot); anything below that rarity stays a
+    // plain fungible grant at the (focus-adjusted) tier's yield quantity, same
+    // as before this issue. One rarity roll per yielded component, independent
+    // of the component's tier roll/bonus above.
+    const rarity = rollCorpseMaterialRarity(ctx.rng);
+    if (isSignableMaterialRarity(rarity)) {
+      ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId);
+    } else {
+      // #1143: the same per-point yield bonus applied to the tier's base
+      // quantity, on top of the tier shift above, so focus below the
+      // 5-point tier-shift threshold still does something.
+      ctx.addItem(itemId, focusedHarvestQuantity(tier, y.component, meta.townFocus), meta.entityId);
+    }
   }
+}
+
+/**
+ * `harvestTierQuantity(tier)` with the player's persistent town focus (#1143)
+ * yield bonus applied on top, rounded to the nearest whole item. Never
+ * negative and never below the tier's unfocused quantity.
+ */
+function focusedHarvestQuantity(
+  tier: HarvestTier,
+  component: string,
+  focus: FocusAllocation,
+): number {
+  return Math.round(applyFocusBonus(harvestTierQuantity(tier), component, focus));
 }
 
 export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void {
@@ -363,6 +404,10 @@ export function interact(ctx: SimContext, pid?: number): void {
         pickUpObject(ctx, target.id, p.id);
         return;
       }
+      if (target.kind === 'npc' && ctx.bankerIds.includes(target.id)) {
+        ctx.emit({ type: 'bank', pid: p.id });
+        return;
+      }
       if (ctx.isQuestInteractionEntity(target)) {
         ctx.talkToNpc(target.id, p.id);
         return;
@@ -412,6 +457,10 @@ export function interact(ctx: SimContext, pid?: number): void {
     }
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;
     pickUpObject(ctx, obj.id, p.id);
+    return;
+  }
+  if (questEntity && ctx.bankerIds.includes(questEntity.id)) {
+    ctx.emit({ type: 'bank', pid: p.id });
     return;
   }
   if (questEntity) ctx.talkToNpc(questEntity.id, p.id);

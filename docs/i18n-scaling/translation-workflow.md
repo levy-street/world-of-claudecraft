@@ -4,7 +4,7 @@ Contributors add **English strings only**; the maintainer fills every locale
 before release. This is the canonical roles reference; the root `CLAUDE.md` and
 `src/ui/CLAUDE.md` i18n sections point here.
 
-The reason for the split is practical: translating all 20 non-English locales on
+The reason for the split is practical: translating all 21 non-English locales on
 every PR would drain the token budget of contributors on smaller Claude Code
 plans and bloat each diff with machine translations the maintainer re-does at
 release anyway. The sparse-overlay model plus the two-tier release gate make an
@@ -14,7 +14,7 @@ English-only PR correct and safe, so that is the contract.
 
 | Role | Does | Does NOT |
 |---|---|---|
-| **Contributor** (incl. small-plan Claude Code agents) | Add the key to `en` (a `src/ui/i18n.catalog/<domain>.ts` module, or `src/admin/i18n.en.ts` for the admin app); render it via `t()`. For text emitted from `src/sim/` or `server/`, register the matcher RULE in `src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts` in the same change. Regenerate and commit the generated artifacts. | Touch the 20 `i18n.locales/<lang>.ts` overlays. Write any non-English translation. Put English copy, a placeholder, or `// TODO` into an overlay as a stand-in translation. Hand-edit `*.resolved.generated*` or `i18n.status.json`. |
+| **Contributor** (incl. small-plan Claude Code agents) | Add the key to `en` (a `src/ui/i18n.catalog/<domain>.ts` module, or `src/admin/i18n.en.ts` for the admin app); render it via `t()`. For text emitted from `src/sim/` or `server/`, register the matcher RULE in `src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts` in the same change. Regenerate and commit the generated artifacts. | Touch the 21 `i18n.locales/<lang>.ts` overlays. Write any non-English translation. Put English copy, a placeholder, or `// TODO` into an overlay as a stand-in translation. Hand-edit `*.resolved.generated*` or `i18n.status.json`. |
 | **Maintainer** (Fernando) | Fill all non-English overlays before release via `npm run i18n:worklist`; regenerate; update the SHA baseline; ship from a `release/**` branch. | n/a |
 
 Translating your own locale is **permitted but never required** of a contributor.
@@ -40,18 +40,18 @@ edit the `i18n.locales/<lang>.ts` overlays and never fake a translation in one.
    - `index.html` / `admin.html` static text uses `data-i18n` / `data-i18n-title` /
      `data-i18n-aria` attributes pointing at a key; the boot localizer fills them.
 2. **`src/sim/` emit.** sim stays language-agnostic. Emit stable English, then in
-   `src/ui/sim_i18n.ts` add the English to `baseEnTable` + all 21 `BASE_DICT` blocks
+   `src/ui/sim_i18n.ts` add the English to `baseEnTable` + all 22 `BASE_DICT` blocks
    and an `EXACT`/`RULES` matcher so `localizeSimText` re-renders it. `BASE_DICT` is
-   `Record<SupportedLanguage, ...>` so `tsc` forces all 21 locales; fill dialects
-   inline as **es_ES = es, fr_CA = fr_FR, en_CA = English**. The 7 newest locales
-   (nl_NL, pl_PL, id_ID, tr_TR, sv_SE, vi_VN, da_DK) are spread in via
+   `Record<SupportedLanguage, ...>` so `tsc` forces all 22 locales; fill dialects
+   inline as **es_ES = es, fr_CA = fr_FR, en_CA = English**. The 8 newest locales
+   (cs_CZ, nl_NL, pl_PL, id_ID, tr_TR, sv_SE, vi_VN, da_DK) are spread in via
    `...BASE_NEW`/`...PET_NEW` from the generated `sim_i18n.newlocales.ts` (regenerated
    by the new-locale fill pipeline), so a new key must be English-filled in those
    blocks too or `tsc` red-fails on the missing locale. Broad `(.+)` RULES go
    LAST (after every more-specific form); the catch-all `unleashes` rule is the last
    entry by design.
 3. **`server/` emit.** Same idea in `src/ui/server_i18n.ts`: add the English to the
-   inline `DICT` (all 21 locales, same dialect rule) + an `EXACT`/`RULES` matcher so
+   inline `DICT` (all 22 locales, same dialect rule) + an `EXACT`/`RULES` matcher so
    `localizeServerText` re-renders it. Numbers/durations spliced into a server
    message localize via a helper (see `localizeServerDuration`, which re-renders
    `formatDuration`'s `N second/minute/hour/day` output through `tServer`).
@@ -100,7 +100,7 @@ not whether that translation still matches the current English, so a row that wa
 already translated stays `translated` (never `pending`) even after you reword its
 English. Both gates pass: the PR tier never required translations, and the
 release-tier empty-`pending` assertion only catches MISSING rows, not stale ones. The
-20 overlays keep rendering a translation of the OLD wording, which for a prose reword
+21 overlays keep rendering a translation of the OLD wording, which for a prose reword
 can now state a different fact than the English (a death mechanic, a creature trait, a
 keybind), so non-English readers are shown something simply wrong with nothing red.
 

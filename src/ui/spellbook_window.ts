@@ -69,8 +69,22 @@ export interface SpellbookWindowDeps {
 
 export class SpellbookWindow {
   private openerFocus: HTMLElement | null = null;
+  // Signature of the resolved abilities the last render painted (id/rank/cost/
+  // cast/cooldown). Talent allocation while the window is open reassigns
+  // world.known with new numbers; comparing this per frame lets tickOpen rebuild
+  // the row summaries so their cost/cast/cooldown never go stale (tooltip parity).
+  private lastKnownSig = '';
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
+
+  // Cheap content signature of the fields a row summary displays. Reference
+  // equality on world.known will not do: the online mirror rebuilds that array
+  // every snapshot, so only the VALUES tell us a talent actually changed a number.
+  private static knownSig(known: readonly ResolvedAbility[]): string {
+    let sig = '';
+    for (const k of known) sig += `${k.def.id}:${k.rank}:${k.cost}:${k.castTime}:${k.cooldown}|`;
+    return sig;
+  }
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
@@ -102,9 +116,47 @@ export class SpellbookWindow {
     this.openerFocus = null;
   }
 
+  // Per-frame entry while the window is open. Rebuilds the whole list only when a
+  // resolved ability's numbers changed (a talent allocation reassigns world.known),
+  // so row summaries reflect current cost/cast/cooldown; otherwise it just does the
+  // cheap in-place +/- toggle refresh. Hover tooltips resolve live regardless (see
+  // appendRow), so this covers the always-visible row text, not the tooltip.
+  tickOpen(): void {
+    if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {
+      this.rerenderPreservingView();
+      return;
+    }
+    this.refreshHotbarControls();
+  }
+
+  // render() rebuilds the list via innerHTML, and the window root is the scroll
+  // container, so a mid-session rebuild would jump the scroll to top and drop the
+  // keyboard user's focus. Preserve both across the talent-driven rebuild: capture
+  // scrollTop and the focused element's identity (a row or its +/- toggle, keyed by
+  // ability id; or the close/reset control), then restore after the render.
+  private rerenderPreservingView(): void {
+    const root = this.deps.root();
+    const scrollTop = root.scrollTop;
+    const active = document.activeElement as HTMLElement | null;
+    let refocus: string | null = null;
+    if (active && root.contains(active)) {
+      const id = active.dataset.abilityId;
+      if (id && active.classList.contains('spell-hotbar-toggle'))
+        refocus = `.spell-hotbar-toggle[data-ability-id="${id}"]`;
+      else if (id && active.classList.contains('spell-row'))
+        refocus = `.spell-row[data-ability-id="${id}"]`;
+      else if (active.hasAttribute('data-reset-bar')) refocus = '[data-reset-bar]';
+      else if (active.hasAttribute('data-close')) refocus = '[data-close]';
+    }
+    this.render();
+    root.scrollTop = scrollTop;
+    if (refocus) (root.querySelector(refocus) as HTMLElement | null)?.focus();
+  }
+
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
+    this.lastKnownSig = SpellbookWindow.knownSig(world.known);
     const classId = world.cfg.playerClass;
     const cls = CLASSES[classId];
     const view = buildSpellbookView({
@@ -199,6 +251,9 @@ export class SpellbookWindow {
     el.className = `spell-row${known ? '' : ' locked'}`;
     el.tabIndex = 0;
     el.setAttribute('role', 'listitem');
+    // Ability id on the row so a talent-driven rerenderPreservingView() can restore
+    // scroll focus to the same row after it rebuilds the list.
+    el.dataset.abilityId = row.abilityId;
     const locked = !known;
     const summary = known ? this.deps.abilitySummary(known) : '';
     const name = this.abilityName(def);
@@ -271,7 +326,14 @@ export class SpellbookWindow {
         this.deps.setDragAction(null);
         this.deps.clearActionDropTargets();
       });
-      this.deps.attachTooltip(el, () => this.deps.abilityTooltip(known));
+      // Resolve the ability LIVE at hover time, not the object captured at render:
+      // a talent allocated while the spellbook is open reassigns world.known with a
+      // new cost/damage, and this row's tooltip must reflect it even before the next
+      // tickOpen rebuild lands.
+      this.deps.attachTooltip(el, () => {
+        const live = this.deps.world().known.find((k) => k.def.id === known.def.id) ?? known;
+        return this.deps.abilityTooltip(live);
+      });
     } else {
       this.deps.attachTooltip(
         el,

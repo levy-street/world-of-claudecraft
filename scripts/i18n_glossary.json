@@ -23,20 +23,23 @@
     },
     "abilityNames": {
       "note": "Ability proper names. Keep the established localized form; do not invent a new rendering for an ability already named elsewhere.",
-      "keyPatterns": [
-        "entities.abilities.*.name"
-      ]
+      "keyPatterns": ["entities.abilities.*.name"]
     },
     "zoneNames": {
       "note": "Zone proper nouns. Use the established localized name; the Latin root (e.g. Eastbrook, Mirefen, Thornpeak) is usually retained.",
-      "keyPatterns": [
-        "entities.zones.*.name"
-      ]
+      "keyPatterns": ["entities.zones.*.name"]
     },
     "dungeonNames": {
       "note": "Dungeon proper nouns. Use the established localized name; keep it identical wherever the dungeon is referenced.",
+      "keyPatterns": ["entities.dungeons.*.name"]
+    },
+    "bankHouse": {
+      "note": "The bank house proper name 'The Gilded Strongbox' and the 'Bank' window label. Reuse the established localized form already coined for the Bursar NPC titles (entities.npcs.bursar_*.title); keep it identical wherever the bank is named. The bank concept renders as zh_CN 银行, zh_TW 銀行, ja 銀行, ko 은행, ru банк.",
       "keyPatterns": [
-        "entities.dungeons.*.name"
+        "hudChrome.bank.title",
+        "hudChrome.bank.subtitle",
+        "guide.economy.bankTitle",
+        "guide.economy.bankBody"
       ]
     }
   }

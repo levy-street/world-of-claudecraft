@@ -181,6 +181,13 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyG'],
   },
   {
+    id: 'valecup',
+    label: 'Vale Cup',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['KeyY'],
+  },
+  {
     id: 'leaderboard',
     label: 'Leaderboard',
     category: 'Interface',

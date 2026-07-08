@@ -157,6 +157,17 @@ const animal = (attack: string[]): ClipMap => ({
   death: 'Death',
 });
 
+// Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
+// animal() core plus the donor's Sit/Fall clips so player wolf forms sit and
+// jump properly, and a Walk swim base (a paddling gait at the gentle clip
+// pitch beats the steep no-clip procedural prone on a quadruped).
+const WOLF_BAKED: ClipMap = {
+  ...animal(['Attack']),
+  sitIdle: 'Sit',
+  swim: 'Walk',
+  jump: 'Fall',
+};
+
 // Custom wild boar rig (wild_boar.glb)
 const WILD_BOAR: ClipMap = {
   idle: 'Idle1',
@@ -351,6 +362,11 @@ export const SKINS: Record<string, (string | null)[]> = {
   // Combat Mech chromas — every index is a real full-model texture (no null
   // default; the embedded base texture is not one of the rewards).
   player_mech: MECH_CHROMAS.map(mechChromaUrl),
+  // Bursar Fernando (the Eastbrook banker easter egg): the rogue palette with
+  // the skin swatch repainted light brown and the hair/brow swatch black, in
+  // the real Fernando's likeness. Index 0 is the real texture (mech precedent):
+  // NPCs always resolve skin 0, so the embedded default is deliberately unused.
+  npc_fernando: [`${SKINS_DIR}/rogue/fernando.png`],
 };
 
 // Emissive (glow) maps keyed exactly like SKINS, applied to .emissiveMap when a
@@ -511,10 +527,13 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0x5a4030,
     tintStrength: 0.55,
   },
+  // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
+  // the ghost material on top). Same custom baked wolf as the world wolves;
+  // the tawny tint keeps the druid form readable against grey pack wolves.
   form_cat: {
-    url: `${CREATURES}/wolf.glb`,
+    url: `${CREATURES}/wolf_basic.glb`,
     height: 1.6,
-    clips: animal(['Attack']),
+    clips: WOLF_BAKED,
     tint: 0xd08b45,
     tintStrength: 0.35,
   },
@@ -528,11 +547,24 @@ export const VISUALS: Record<string, VisualDef> = {
 
   // -- mob families --------------------------------------------------------
   mob_wolf: {
-    url: `${CREATURES}/wolf.glb`,
+    // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton
+    // (same pipeline as greyjaw), clips renamed to the animal() names at bake
+    // time. Baked basecolor texture; keeps a light entity tint so this doubles
+    // as the beast-family fallback and each beast keeps its own colour.
+    url: `${CREATURES}/wolf_basic.glb`,
     height: 1.6,
-    clips: animal(['Attack']),
+    clips: WOLF_BAKED,
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  greyjaw: {
+    // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton;
+    // clips renamed to the animal() names at bake time. Baked texture, no tint.
+    // Old Greyjaw's model: 2.2 at scale 1 (his template scale 1.25 makes the
+    // rare ~2.75 in-world vs the 1.6 pack wolf).
+    url: `${CREATURES}/greyjaw.glb`,
+    height: 2.2,
+    clips: WOLF_BAKED,
   },
   mob_boar: {
     url: `${CREATURES}/wild_boar.glb`,
@@ -558,6 +590,25 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: animal(['Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  // Yumi, the Protect Yumi objective cat familiar (Meshy rig, scale baked by
+  // scripts/_bake_meshy_scale.mjs, meshopt + 1024 webp). The GLB ships ONE
+  // clip, the block: mapped as the HIT reaction so she blocks when struck
+  // (playHit rides every landed damage event). No idle/walk clips on
+  // purpose: the objective never moves on its own, and baseAction falls back
+  // to the authored rest pose when a slot's clip is absent. Painted texture,
+  // so no entity tint.
+  mob_yumi_cat: {
+    url: `${CREATURES}/yumi_cat.glb`,
+    height: HUMANOID_H * 1.2, // the objective reads over player heads
+    clips: {
+      idle: 'None',
+      walk: 'None',
+      run: 'None',
+      attack: [],
+      death: 'None',
+      hit: ['Armature|Block5|baselayer'],
+    },
   },
   mob_stag: {
     url: `${CREATURES}/stag.glb`,
@@ -888,6 +939,15 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // Bursar Fernando: the villager body with the likeness atlas (SKINS above)
+  // carrying black shoulder-length hair and light brown skin. No entity tint:
+  // the gold NpcDef color would wash the repaint back toward the villager look.
+  npc_fernando: {
+    url: `${PLAYERS}/rogue.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop']),
+    show: [],
+  },
   // Brother Halven, the Reliquary Keeper: a devout male guardian tending the crypt
   // door. Uses the KayKit paladin, one of the newer full-pack adventurer models
   // (unused elsewhere), for a sturdier, holier silhouette than the old hooded
@@ -950,6 +1010,9 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Protect Yumi objective cat: the dedicated Meshy familiar
+  // (docs/prd/protect-yumi-assets.md item 1, delivered).
+  yumi_cat: 'mob_yumi_cat',
   emberkin: 'mob_demon',
   gloomshade: 'mob_demon',
   duskborn: 'mob_demon',
@@ -959,6 +1022,9 @@ const MOB_KEYS: Record<string, string> = {
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',
   bog_bloat: 'mob_murloc',
+  // Old Greyjaw: the named rare wolf gets his own custom model (the pack
+  // wolves keep the light mob_wolf)
+  old_greyjaw: 'greyjaw',
   // The Drowned Litany (Mirefen Marsh): give marsh enemies the right silhouette
   // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
   mirefen_widowling: 'mob_spider',
@@ -1026,6 +1092,7 @@ const FAMILY_KEYS: Record<string, string> = {
 };
 
 const NPC_KEYS: Record<string, string> = {
+  bursar_fernando: 'npc_fernando',
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',

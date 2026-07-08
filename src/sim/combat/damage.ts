@@ -28,6 +28,7 @@ import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../ent
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { vcupBothSeated } from '../social/vale_cup';
 import { addThreat, clearThreat } from '../threat';
 import type { Entity } from '../types';
 import {
@@ -44,7 +45,7 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
-import { WORLD_BOSS_CORPSE_SECONDS, worldBossContributors } from '../world_boss';
+import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -146,6 +147,17 @@ export function dealDamage(
     if (bonus > 0) amount = Math.round(amount * (1 + bonus));
   }
 
+  const sourcePlayer = ctx.pvpController(source);
+
+  // The Vale Cup: nobody bleeds at the Sowfield. Any damage between two seated
+  // cup fighters is floored to 0 BEFORE absorb shields soak it, belt and
+  // braces: the sport kit has no damage abilities, but a stray consumable,
+  // proc, or reflect must neither hurt a fighter nor eat their shield.
+  if (amount > 0 && sourcePlayer && target.kind === 'player') {
+    const cupMatch = ctx.vcup.match;
+    if (cupMatch && vcupBothSeated(cupMatch, sourcePlayer.id, target.id)) amount = 0;
+  }
+
   // absorb shields soak damage first
   if (amount > 0) {
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
@@ -160,8 +172,6 @@ export function dealDamage(
       }
     }
   }
-
-  const sourcePlayer = ctx.pvpController(source);
 
   // duels end at 1 hp — nobody dies
   const duel = target.kind === 'player' ? ctx.duels.get(target.id) : undefined;
@@ -231,11 +241,38 @@ export function dealDamage(
     }
   }
 
+  // Protect Yumi downs bench the victim on a flat respawn timer, like Fiesta:
+  // never the permanent ranked elimination below. MUST stay above that arm.
+  if (
+    match?.yumi &&
+    match.state === 'active' &&
+    sourcePlayer &&
+    ctx.isArenaCrossTeam(match, sourcePlayer.id, target.id)
+  ) {
+    if (target.hp - amount <= 0) {
+      amount = Math.max(0, target.hp);
+      target.hp = 0;
+      ctx.emit({
+        type: 'damage',
+        sourceId: source?.id ?? -1,
+        targetId: target.id,
+        amount,
+        crit,
+        school,
+        ability,
+        kind,
+      });
+      ctx.yumiPlayerDown(match, target, sourcePlayer.id);
+      return;
+    }
+  }
+
   // Ranked arena eliminations use normal death state so clients and combat
   // logic see a real 0 HP defeat. The return timer revives everyone after.
   if (
     match &&
     !match.fiesta &&
+    !match.yumi &&
     match.state === 'active' &&
     sourcePlayer &&
     ctx.isArenaCrossTeam(match, sourcePlayer.id, target.id)
@@ -260,6 +297,17 @@ export function dealDamage(
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
       }
+      return;
+    }
+  }
+
+  // A Protect Yumi cat: the yumi module owns the clamp, the sudden-death
+  // taken-multiplier, tiebreak bookkeeping, and win detection. Amps and
+  // absorb shields already resolved above, so a shielded cat soaks first.
+  if (target.kind === 'mob') {
+    const ymatch = ctx.yumiCatMatches.get(target.id);
+    if (ymatch) {
+      ctx.yumiCatDamaged(ymatch, source, target, amount, crit, school, ability, kind);
       return;
     }
   }
@@ -330,6 +378,16 @@ export function dealDamage(
     else if (source.ownerId !== null) target.tappedById = source.ownerId;
   }
 
+  // World-boss loot roster: every player (or pet owner) who lands a hit on a world
+  // boss becomes a permanent loot contributor. Unlike the hate table above, this set
+  // is NEVER pruned when they die, release their spirit, or drop off threat, so a
+  // raider who died to the boss still gets their personal drop. Read at death by
+  // worldBossLootContributors. Only world-boss templates ever populate it.
+  if (source && amount > 0 && MOBS[target.templateId]?.worldBoss) {
+    const contributorId = source.kind === 'player' ? source.id : source.ownerId;
+    if (contributorId !== null) target.bossDamagers.add(contributorId);
+  }
+
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
@@ -383,6 +441,10 @@ export function dealDamage(
     const fmatch = target.kind === 'player' ? ctx.arenaMatches.get(target.id) : undefined;
     if (fmatch?.fiesta && fmatch.state === 'active' && !ctx.arenaIsDown(fmatch, target.id)) {
       ctx.fiestaDown(fmatch, target, null);
+    } else if (fmatch?.yumi && fmatch.state === 'active' && !ctx.arenaIsDown(fmatch, target.id)) {
+      // Same non-takedown bottom-out safety for Protect Yumi: bench, never
+      // the permanent death + graveyard flow.
+      ctx.yumiPlayerDown(fmatch, target, null);
     } else {
       handleDeath(ctx, target, source);
     }
@@ -560,7 +622,14 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
-    e.respawnTimer = ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    e.respawnTimer =
+      template?.respawnSeconds ??
+      ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    // A fixed respawn also caps corpse decay so the mob returns on schedule whether
+    // or not its loot was looted (training dummy: 10s).
+    if (template?.respawnSeconds !== undefined) {
+      e.corpseTimer = Math.min(e.corpseTimer, template.respawnSeconds);
+    }
     // World bosses: snapshot the contributor set from the hate table BEFORE it is
     // cleared below, keep a long lootable-corpse window so every contributor can
     // loot, and never auto-respawn in place: the world-boss scheduler is the sole
@@ -568,7 +637,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // collapse with the boss: leaving them alive would harass looters for the
     // whole window, and a slain add's in-place respawn timer would revive it
     // mid-window (only fires for worldBoss templates, so no parity rng change).
-    const worldBossContribs = template?.worldBoss ? worldBossContributors(ctx, e) : null;
+    const worldBossContribs = template?.worldBoss ? worldBossLootContributors(ctx, e) : null;
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;
@@ -635,6 +704,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       // World bosses use PERSONAL loot for every contributor (rolled below from the
       // hate-table snapshot), not the tapper/party shared-corpse roll.
       if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible);
+      // A heroic final boss additionally carries one personal Heroic Mark per
+      // eligible participant (no-op outside a heroic instance; draws no rng).
+      ctx.awardHeroicMarks(e, eligible);
     }
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
     // damaged the boss, so it rolls outside the credited-player block above.

@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
@@ -6,8 +8,10 @@ import {
   type ClipMap,
   manifestUrls,
   manifestUrlsForGraphics,
+  SKINS,
   VISUALS,
   visibleAttachmentsForGraphics,
+  visualKeyFor,
 } from '../src/render/characters/manifest';
 
 function expectedClipNames(clips: ClipMap): string[] {
@@ -44,6 +48,20 @@ async function glbAnimationNames(path: string): Promise<Set<string>> {
 }
 
 describe('character visual manifest', () => {
+  it('keeps Bursar Fernando in his likeness atlas (the Eastbrook banker easter egg)', () => {
+    // The maintainer-approved easter egg: black shoulder-length hair and light
+    // brown skin ride a repainted rogue palette resolved at skin index 0 (NPCs
+    // always resolve skin 0; the mech precedent for a real index-0 texture).
+    // The def must stay TINT-FREE: an entity tint would wash the repaint back
+    // toward the gold villager look. Do not "clean up" any of the three.
+    const key = visualKeyFor({ kind: 'npc', templateId: 'bursar_fernando' } as never);
+    expect(key).toBe('npc_fernando');
+    expect(VISUALS.npc_fernando.tint).toBeUndefined();
+    const atlas = SKINS.npc_fernando?.[0];
+    expect(atlas).toBe('textures/skins/rogue/fernando.png');
+    expect(existsSync(fileURLToPath(new URL(`../public/${atlas}`, import.meta.url)))).toBe(true);
+  });
+
   it('uses the custom boar death clip without relying on a speed override', () => {
     expect(VISUALS.mob_boar.clips.death).toBe('Dying');
     expect(VISUALS.mob_boar.deathTimeScale).toBeUndefined();
@@ -67,6 +85,21 @@ describe('character visual manifest', () => {
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
     ).toEqual([]);
+  });
+
+  it('points the baked wolf visuals (form_cat, mob_wolf, greyjaw) at clips in their GLBs', async () => {
+    const byUrl = new Map<string, Set<string>>();
+    for (const key of ['form_cat', 'mob_wolf', 'greyjaw'] as const) {
+      const visual = VISUALS[key];
+      const animationNames =
+        byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
+      byUrl.set(visual.url, animationNames);
+
+      expect(animationNames.size).toBeGreaterThan(0);
+      expect(
+        [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+      ).toEqual([]);
+    }
   });
 
   it('keeps held weapons and props available on low graphics', () => {

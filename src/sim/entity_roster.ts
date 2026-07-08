@@ -20,7 +20,8 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { dungeonAt, zoneAt } from './data';
+import { DELVES, dungeonAt, zoneAt } from './data';
+import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
 import { aurasSurvivingDeath } from './resurrection';
 import type { SimContext } from './sim_context';
@@ -178,6 +179,10 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   p.pos = entry;
   p.prevPos = { ...entry };
   rebucketEntity(ctx, p);
+  // The Drowned Litany finale: in-flight Tolling Bells and Blackwater Mark
+  // puddles must not outlive the death, or the respawned player can be hit
+  // (or insta-killed) by an effect that was already active before they died.
+  clearDrownedLitanyBellsAndMarks(ctx, run);
   p.facing = 0;
   // The Keeper's Toll persists through a delve death too (see resurrection.ts); every
   // other aura clears on respawn.
@@ -194,6 +199,19 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   p.targetId = null;
   p.combatTimer = 99;
   p.inCombat = false;
+  // The owner-dead arm of updateDelveCompanion despawns the auto-companion (and
+  // clears run.companion) while the player is dead. Re-spawn her here so she is
+  // back at the player's side promptly on release, same as a fresh delve entry.
+  // Despawn any stale reference first (belt and suspenders: a caller that
+  // releases without an intervening tick, e.g. a direct test/parity drive,
+  // still has a live run.companion at this point) so the guard on
+  // spawnDelveCompanion never no-ops. This draws no rng and does not touch
+  // run.companionReviveUsed, so the once-per-run revive boon is unaffected.
+  const delve = DELVES[run.delveId];
+  if (run.partyKey?.startsWith('solo:') && delve?.autoCompanionId) {
+    if (run.companion) ctx.despawnDelveCompanion(run);
+    ctx.spawnDelveCompanion(run, pid, delve.autoCompanionId);
+  }
   ctx.emit({ type: 'respawn', pid });
 }
 

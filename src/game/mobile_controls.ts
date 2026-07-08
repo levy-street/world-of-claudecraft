@@ -1,4 +1,5 @@
 import { t } from '../ui/i18n';
+import { bindTouchTap } from '../ui/touch_tap';
 import type { Input, TouchMoveInput } from './input';
 import { type ChromeFadeHandle, startChromeFade } from './mobile_chrome_fade';
 import type { TouchOwner, TouchRouterTarget } from './touch_router';
@@ -112,10 +113,14 @@ export interface MobileControlCallbacks {
   onChat(): void;
   onMenu(): void;
   onSocial(): void;
-  /** Open the Discord account panel (link / unlink / status). */
+  /** Open the Discord entry (account panel when available, else the community invite). */
   onDiscord(): void;
+  /** Open the project donation page (external link). */
+  onDonate(): void;
   onEmotes(): void;
   onArena(): void;
+  /** Open the Vale Cup window (queue/roster board for the boarball minigame). */
+  onValeCup(): void;
   onQuestLog(): void;
   onCharacter(): void;
   onBags(): void;
@@ -123,6 +128,8 @@ export interface MobileControlCallbacks {
   onTalents(): void;
   onMap(): void;
   onLeaderboard(): void;
+  /** Open the Daily Rewards chest, folded into the More tray on mobile. */
+  onDailyRewards(): void;
   /** Toggle world nameplates; returns the new on/off state to sync the button glow. */
   onNameplates(): boolean;
   /** Toggle background music; returns whether music is now enabled. */
@@ -192,31 +199,16 @@ export function isNativeAppShell(): boolean {
   return cap?.isNativePlatform?.() === true;
 }
 
-export interface OriginBounds {
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-}
-
 /**
- * Clamp a floating joystick's spawn centre so the whole circle (given `radius`)
- * stays inside `bounds`. If the zone is narrower/shorter than the joystick on an
- * axis, the centre falls back to the midpoint of that axis.
+ * The floating wheel spawns EXACTLY under the thumb, never clamped: the input
+ * origin must equal the touch point or the touchdown itself produces movement
+ * intent. The shipped v0.22.0 clamp (clampJoystickOrigin) pinned the origin
+ * into the 132px capture zone, which cannot contain the 140/128px wheel, so
+ * every off-center touchdown instantly walked the character in an unintended
+ * direction: the issue #1229 drift class that release testing hit. The wheel
+ * VISUAL may overhang the zone or the screen edge; that is standard
+ * floating-stick behavior and costs nothing (it is repositioned per touch).
  */
-export function clampJoystickOrigin(
-  px: number,
-  py: number,
-  radius: number,
-  bounds: OriginBounds,
-): { x: number; y: number } {
-  const clamp = (v: number, lo: number, hi: number) =>
-    hi < lo ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, v));
-  return {
-    x: clamp(px, bounds.left + radius, bounds.right - radius),
-    y: clamp(py, bounds.top + radius, bounds.bottom - radius),
-  };
-}
 
 export function mapJoystickVector(x: number, y: number, deadzone = DEADZONE): TouchMoveInput {
   const mag = Math.hypot(x, y);
@@ -254,7 +246,11 @@ export class MobileControls {
 
   private moveOriginX = 0;
   private moveOriginY = 0;
+  /** Rendered (transform-scaled) wheel radius: the input throw distance. */
   private moveRadius = 1;
+  /** Layout (pre-transform) wheel radius: what style.left/top and the stick's
+   *  translate use; the --joy-scale transform scales those visually. */
+  private moveStickRadius = 1;
 
   // two-finger pinch-to-zoom on the game view (phones have no scroll wheel)
   private pinchPointers = new Map<number, { x: number; y: number }>();
@@ -330,15 +326,20 @@ export class MobileControls {
     });
 
     // The move joystick floats: the pointer lifecycle lives on the lower-left
-    // capture zone (so a thumb can land anywhere), while the joystick element is
-    // just the visual that JS repositions under the touch. Fall back to the
-    // joystick element itself if the zone is absent (e.g. an older shell).
-    const moveSurface = this.moveZone ?? this.moveJoystick;
-    moveSurface.addEventListener('pointerdown', (e) => this.onMoveDown(e));
-    moveSurface.addEventListener('pointermove', (e) => this.onMoveMove(e));
-    moveSurface.addEventListener('pointerup', (e) => this.onMoveEnd(e));
-    moveSurface.addEventListener('pointercancel', (e) => this.onMoveEnd(e));
-    moveSurface.addEventListener('lostpointercapture', (e) => this.onMoveEnd(e));
+    // capture zone (so a thumb can land anywhere) AND on the visible wheel
+    // itself: the 140/128px wheel overhangs the fixed 132px zone, so without
+    // its own listeners the wheel's outer arc was a dead sliver that swallowed
+    // touches (the wheel masks the canvas but nothing handled the event). A
+    // touch hits exactly one of the two (the wheel is on top where they
+    // overlap), and onMoveDown's single-pointer guard makes double-binding safe.
+    for (const moveSurface of [this.moveZone, this.moveJoystick]) {
+      if (!moveSurface) continue;
+      moveSurface.addEventListener('pointerdown', (e) => this.onMoveDown(e));
+      moveSurface.addEventListener('pointermove', (e) => this.onMoveMove(e));
+      moveSurface.addEventListener('pointerup', (e) => this.onMoveEnd(e));
+      moveSurface.addEventListener('pointercancel', (e) => this.onMoveEnd(e));
+      moveSurface.addEventListener('lostpointercapture', (e) => this.onMoveEnd(e));
+    }
 
     this.cameraJoystick.addEventListener('pointerdown', (e) => this.onCameraDown(e));
     this.cameraJoystick.addEventListener('pointermove', (e) => this.onCameraMove(e));
@@ -373,13 +374,17 @@ export class MobileControls {
       }
     });
 
-    this.autorunButton?.addEventListener('click', (e) => {
-      if (!this.active) return;
-      e.preventDefault();
-      triggerHaptic(HAPTIC_TAP, this.hapticsOn);
-      const on = this.callbacks.onAutorun();
-      this.autorunButton?.classList.toggle('active', on);
-    });
+    if (this.autorunButton) {
+      // bindTouchTap, not 'click': a click never fires for a non-primary
+      // touch, and Autorun is tapped mid-steer by definition.
+      bindTouchTap(this.autorunButton, (e) => {
+        if (!this.active) return;
+        e.preventDefault();
+        triggerHaptic(HAPTIC_TAP, this.hapticsOn);
+        const on = this.callbacks.onAutorun();
+        this.autorunButton?.classList.toggle('active', on);
+      });
+    }
 
     this.canvas?.addEventListener('pointerdown', (e) => {
       this.onPinchDown(e);
@@ -420,8 +425,10 @@ export class MobileControls {
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
     this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
+    this.bindButton('mobile-donate', () => this.callbacks.onDonate());
     this.bindButton('mobile-emote', () => this.callbacks.onEmotes());
     this.bindButton('mobile-arena', () => this.callbacks.onArena());
+    this.bindButton('mobile-valecup', () => this.callbacks.onValeCup());
     this.bindButton('mobile-quest', () => this.callbacks.onQuestLog());
     this.bindButton('mobile-char', () => this.callbacks.onCharacter());
     this.bindButton('mobile-bags', () => this.callbacks.onBags());
@@ -429,6 +436,7 @@ export class MobileControls {
     this.bindButton('mobile-talents', () => this.callbacks.onTalents());
     this.bindButton('mobile-map', () => this.callbacks.onMap());
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
+    this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
     const nameplatesBtn = document.getElementById('mobile-nameplates');
     this.bindButton('mobile-nameplates', () => {
       const on = this.callbacks.onNameplates();
@@ -450,10 +458,10 @@ export class MobileControls {
         const modal = document.getElementById('mobile-extra-controls');
         if (modal) {
           modal.style.left = '50%';
-          modal.style.top = 'max(14px, env(safe-area-inset-top))';
+          modal.style.top = '50%';
           modal.style.right = 'auto';
           modal.style.bottom = 'auto';
-          modal.style.transform = 'translateX(-50%)';
+          modal.style.transform = 'translate(-50%, -50%)';
           delete modal.dataset.windowMoved;
         }
       }
@@ -466,13 +474,18 @@ export class MobileControls {
     if (!active) {
       this.root?.classList.remove('expanded');
       this.autorunButton?.classList.remove('active');
-      document.body.classList.remove('mobile-more-open', 'mobile-chat-open', 'mobile-chatlog-peek');
+      document.body.classList.remove(
+        'mobile-more-open',
+        'mobile-chat-open',
+        'mobile-chatlog-peek',
+        'mobile-chat-reply',
+      );
       this.releaseMove();
       this.releaseCamera();
       this.releasePinch();
       this.touchOwners.releaseAll();
     } else {
-      document.body.classList.remove('mobile-chat-open');
+      document.body.classList.remove('mobile-chat-open', 'mobile-chat-reply');
     }
   }
 
@@ -507,7 +520,10 @@ export class MobileControls {
       });
       return;
     }
-    button.addEventListener('click', run);
+    // bindTouchTap, not a bare 'click': the browser only synthesizes click
+    // for the PRIMARY pointer, so a click-bound button is dead while the
+    // other thumb holds the joystick (see src/ui/touch_tap.ts).
+    bindTouchTap(button, run);
   }
 
   private closeMoreModal(): void {
@@ -522,7 +538,7 @@ export class MobileControls {
     const button = document.getElementById(id);
     if (!button) return;
     this.syncHapticsButton(button);
-    button.addEventListener('click', (e) => {
+    bindTouchTap(button, (e) => {
       if (!this.active) return;
       e.preventDefault();
       this.hapticsOn = !this.hapticsOn;
@@ -571,7 +587,7 @@ export class MobileControls {
       if (!this.active) return;
       e.preventDefault();
       cancel();
-      if (!this.chatLongFired) this.toggleChat();
+      if (!this.chatLongFired) this.tapChat();
     });
     button.addEventListener('pointercancel', cancel);
     button.addEventListener('pointerleave', cancel);
@@ -586,21 +602,58 @@ export class MobileControls {
     }
   }
 
+  /** The single top-left Chat button owns a simple two-state toggle (issue
+   * 1577 uiux-overlap: the separate in-log reply pill overlapped the chatbox,
+   * so it was removed; a later round tried a three-state open/read/reply
+   * cycle, since simplified back to two): hidden, or shown, with the log AND
+   * the composer appearing together immediately, composer focused. There is
+   * no separate read-only step to tap through first. */
+  private tapChat(): void {
+    // Two states only: hidden, or shown (log AND composer visible together,
+    // composer focused immediately). No separate read-only step in between.
+    const open = document.body.classList.contains('mobile-chat-open');
+    if (!open) {
+      this.enterChatReply();
+    } else {
+      this.toggleChat();
+    }
+  }
+
   private toggleChat(): void {
     document.body.classList.remove('mobile-chatlog-peek');
     document.body.classList.toggle('mobile-chat-open');
     if (document.body.classList.contains('mobile-chat-open')) {
-      this.callbacks.onChat();
+      // Open the log in a read state, NOT the composer: the keyboard only rises
+      // once the player taps the Chat button again to enter reply mode.
+      // The composer stays hidden until enterChatReply focuses it.
     } else {
-      const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
-      if (input) {
-        input.value = '';
-        input.style.display = 'none';
-        // clear the autosized height so the next open starts at one line
-        input.style.height = '';
-        input.style.overflowY = '';
-        input.blur();
-      }
+      this.exitChatReply();
+    }
+  }
+
+  /** Enter reply mode: raise the keyboard and show the composer via the shared
+   *  onChat path. Reached by tapping the Chat button again while the log is
+   *  already open in its read state. */
+  private enterChatReply(): void {
+    if (!document.body.classList.contains('mobile-chat-open')) {
+      document.body.classList.add('mobile-chat-open');
+    }
+    document.body.classList.remove('mobile-chatlog-peek');
+    document.body.classList.add('mobile-chat-reply');
+    this.callbacks.onChat();
+  }
+
+  /** Leave reply mode and reset the composer back to its collapsed state. */
+  private exitChatReply(): void {
+    document.body.classList.remove('mobile-chat-reply');
+    const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
+    if (input) {
+      input.value = '';
+      input.style.display = 'none';
+      // clear the autosized height so the next open starts at one line
+      input.style.height = '';
+      input.style.overflowY = '';
+      input.blur();
     }
   }
 
@@ -636,16 +689,24 @@ export class MobileControls {
     e.preventDefault();
     this.joyPointer = e.pointerId;
     triggerHaptic(HAPTIC_JOYSTICK, this.hapticsOn);
-    // Spawn the joystick base under the thumb, clamped so the circle stays
-    // on-screen, then pin the stick offset to that floating centre.
-    const radius = Math.max(1, this.moveJoystick.offsetWidth / 2 || 61);
-    const zone = (this.moveZone ?? this.moveJoystick).getBoundingClientRect();
-    const origin = clampJoystickOrigin(e.clientX, e.clientY, radius, zone);
-    this.moveOriginX = origin.x;
-    this.moveOriginY = origin.y;
-    this.moveRadius = radius;
-    this.moveJoystick.style.left = `${(origin.x - radius).toFixed(1)}px`;
-    this.moveJoystick.style.top = `${(origin.y - radius).toFixed(1)}px`;
+    // Spawn the joystick base CENTERED under the thumb (see the origin note
+    // above mapJoystickVector): the input origin IS the touch point, so a
+    // touchdown alone can never produce movement intent. layoutRadius is the
+    // untransformed box (what style.left/top position, with .floating's
+    // transform-origin: center keeping the scaled wheel centered on it);
+    // renderedRadius includes the --joy-scale transform and drives the input
+    // throw, so a resized wheel reaches full deflection exactly at its rim.
+    const layoutRadius = Math.max(1, this.moveJoystick.offsetWidth / 2 || 61);
+    const renderedRadius = Math.max(
+      1,
+      this.moveJoystick.getBoundingClientRect().width / 2 || layoutRadius,
+    );
+    this.moveOriginX = e.clientX;
+    this.moveOriginY = e.clientY;
+    this.moveRadius = renderedRadius;
+    this.moveStickRadius = layoutRadius;
+    this.moveJoystick.style.left = `${(e.clientX - layoutRadius).toFixed(1)}px`;
+    this.moveJoystick.style.top = `${(e.clientY - layoutRadius).toFixed(1)}px`;
     this.moveJoystick.classList.add('floating', 'active');
     try {
       (this.moveZone ?? this.moveJoystick).setPointerCapture(e.pointerId);
@@ -657,14 +718,23 @@ export class MobileControls {
 
   private onMoveMove(e: PointerEvent): void {
     if (!this.active || e.pointerId !== this.joyPointer || !this.moveStick) return;
+    // A window opening mid-drag ends the drag immediately (the same rule
+    // swipe-look has): the joystick is hidden under the full-screen backdrop,
+    // so a held thumb must not keep walking the character behind the modal.
+    if (document.body.classList.contains('mobile-window-open')) {
+      this.releaseMove();
+      return;
+    }
     e.preventDefault();
-    const radius = this.moveRadius;
-    const rawX = (e.clientX - this.moveOriginX) / radius;
-    const rawY = (e.clientY - this.moveOriginY) / radius;
+    const rawX = (e.clientX - this.moveOriginX) / this.moveRadius;
+    const rawY = (e.clientY - this.moveOriginY) / this.moveRadius;
     const mag = Math.max(1, Math.hypot(rawX, rawY));
     const x = rawX / mag;
     const y = rawY / mag;
-    this.moveStick.style.transform = `translate(${(x * radius * 0.46).toFixed(1)}px, ${(y * radius * 0.46).toFixed(1)}px)`;
+    // The stick translates in the wheel's PRE-transform units (the container's
+    // --joy-scale transform scales the offset visually), so it uses the layout
+    // radius while the input throw above used the rendered one.
+    this.moveStick.style.transform = `translate(${(x * this.moveStickRadius * 0.46).toFixed(1)}px, ${(y * this.moveStickRadius * 0.46).toFixed(1)}px)`;
     const move = mapJoystickVector(x, y, this.moveDeadzone);
     this.input.setTouchMove(move);
     // setTouchMove cancels autorun on forward/back input — keep the button glow honest.

@@ -125,6 +125,79 @@ export function arenaQueueJoin(
     return;
   }
 
+  // Protect Yumi (3v3/5v5): premade units of ANY size 1..teamSize pool in
+  // join order; only the leader queues a party, and a party larger than the
+  // team size cannot queue. Same member guards as the 2v2/Fiesta path.
+  if (fmt === 'yumi3' || fmt === 'yumi5') {
+    const teamSize = fmt === 'yumi3' ? 3 : 5;
+    const party = ctx.partyOf(id);
+    let unitPids: number[];
+    if (!party || party.members.length === 1) {
+      unitPids = [id];
+    } else if (party.members.length <= teamSize) {
+      if (party.leader !== id) {
+        ctx.error(id, 'Only the party leader may queue your team for Protect Yumi.');
+        return;
+      }
+      unitPids = [...party.members];
+    } else {
+      ctx.error(
+        id,
+        fmt === 'yumi3'
+          ? 'Protect Yumi 3v3 allows a party of up to three.'
+          : 'Protect Yumi 5v5 allows a party of up to five.',
+      );
+      return;
+    }
+    for (const mPid of unitPids) {
+      if (mPid === id) continue;
+      const e = ctx.entities.get(mPid);
+      const mMeta = ctx.players.get(mPid);
+      if (!e || !mMeta) {
+        ctx.error(id, 'A party member is unavailable.');
+        return;
+      }
+      if (e.dead) {
+        ctx.error(id, `${mMeta.name} cannot queue while dead.`);
+        return;
+      }
+      if (ctx.arenaMatches.has(mPid)) {
+        ctx.error(id, `${mMeta.name} is already in an arena match.`);
+        return;
+      }
+      if (isArenaQueued(ctx, mPid)) {
+        ctx.error(id, `${mMeta.name} is already in the arena queue.`);
+        return;
+      }
+      if (ctx.duels.has(mPid)) {
+        ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
+        return;
+      }
+      if (ctx.trades.has(mPid)) {
+        ctx.error(id, `${mMeta.name} must finish trading before queueing.`);
+        return;
+      }
+      if (e.pos.x > DUNGEON_X_THRESHOLD) {
+        ctx.error(id, `${mMeta.name} cannot queue from inside an instance.`);
+        return;
+      }
+    }
+    const queue = fmt === 'yumi3' ? ctx.arenaQueueYumi3 : ctx.arenaQueueYumi5;
+    const unit: ArenaQueueUnit = { pids: unitPids, rating: arenaTeamRating(ctx, unitPids, '2v2') };
+    queue.push(unit);
+    const position = queue.reduce((n, u) => n + u.pids.length, 0);
+    for (const mPid of unitPids) {
+      ctx.emit({ type: 'arenaQueued', position, format: fmt, pid: mPid });
+      ctx.emit({
+        type: 'log',
+        text: 'You join the Protect Yumi queue. Guard your familiar…',
+        color: '#7fd7ff',
+        pid: mPid,
+      });
+    }
+    return;
+  }
+
   // 2v2 and Fiesta share the same team-formation + queueing path; only the
   // destination queue and the flavour text differ.
   const isFiesta = fmt === 'fiesta';
@@ -200,22 +273,34 @@ export function arenaQueueLeave(ctx: SimContext, pid?: number): void {
   const id = r.meta.entityId;
   const fmt = arenaQueuedFormat(ctx, id);
   const teamQueue =
-    fmt === '2v2' ? ctx.arenaQueue2v2 : fmt === 'fiesta' ? ctx.arenaQueueFiesta : null;
+    fmt === '2v2'
+      ? ctx.arenaQueue2v2
+      : fmt === 'fiesta'
+        ? ctx.arenaQueueFiesta
+        : fmt === 'yumi3'
+          ? ctx.arenaQueueYumi3
+          : fmt === 'yumi5'
+            ? ctx.arenaQueueYumi5
+            : null;
   const unit = teamQueue ? teamQueue.find((u) => u.pids.includes(id)) : null;
   if (arenaDequeue(ctx, id)) {
     ctx.emit({ type: 'arenaUnqueued', pid: id });
     const leaveText =
       fmt === 'fiesta'
         ? 'You leave the 2v2 Fiesta queue.'
-        : fmt === '2v2'
-          ? 'You leave the Ashen Coliseum 2v2 queue.'
-          : 'You leave the Ashen Coliseum queue.';
+        : fmt === 'yumi3' || fmt === 'yumi5'
+          ? 'You leave the Protect Yumi queue.'
+          : fmt === '2v2'
+            ? 'You leave the Ashen Coliseum 2v2 queue.'
+            : 'You leave the Ashen Coliseum queue.';
     ctx.emit({ type: 'log', text: leaveText, color: '#ffa040', pid: id });
     if (unit) {
       const teamLeaveText =
         fmt === 'fiesta'
           ? 'Your team leaves the 2v2 Fiesta queue.'
-          : 'Your team leaves the Ashen Coliseum 2v2 queue.';
+          : fmt === 'yumi3' || fmt === 'yumi5'
+            ? 'Your team leaves the Protect Yumi queue.'
+            : 'Your team leaves the Ashen Coliseum 2v2 queue.';
       for (const mPid of unit.pids) {
         if (mPid === id) continue;
         ctx.emit({ type: 'arenaUnqueued', pid: mPid });
@@ -229,7 +314,9 @@ export function isArenaQueued(ctx: SimContext, pid: number): boolean {
   return (
     ctx.arenaQueue1v1.includes(pid) ||
     ctx.arenaQueue2v2.some((u) => u.pids.includes(pid)) ||
-    ctx.arenaQueueFiesta.some((u) => u.pids.includes(pid))
+    ctx.arenaQueueFiesta.some((u) => u.pids.includes(pid)) ||
+    ctx.arenaQueueYumi3.some((u) => u.pids.includes(pid)) ||
+    ctx.arenaQueueYumi5.some((u) => u.pids.includes(pid))
   );
 }
 
@@ -237,12 +324,21 @@ export function arenaQueuedFormat(ctx: SimContext, pid: number): ArenaFormat | n
   if (ctx.arenaQueue1v1.includes(pid)) return '1v1';
   if (ctx.arenaQueue2v2.some((u) => u.pids.includes(pid))) return '2v2';
   if (ctx.arenaQueueFiesta.some((u) => u.pids.includes(pid))) return 'fiesta';
+  if (ctx.arenaQueueYumi3.some((u) => u.pids.includes(pid))) return 'yumi3';
+  if (ctx.arenaQueueYumi5.some((u) => u.pids.includes(pid))) return 'yumi5';
   return null;
 }
 
 export function arenaQueuePosition(ctx: SimContext, pid: number, format: ArenaFormat): number {
   if (format === '1v1') return ctx.arenaQueue1v1.indexOf(pid) + 1;
-  const queue = format === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
+  const queue =
+    format === 'fiesta'
+      ? ctx.arenaQueueFiesta
+      : format === 'yumi3'
+        ? ctx.arenaQueueYumi3
+        : format === 'yumi5'
+          ? ctx.arenaQueueYumi5
+          : ctx.arenaQueue2v2;
   let pos = 0;
   for (const unit of queue) {
     if (unit.pids.includes(pid)) return pos + 1;
@@ -265,6 +361,16 @@ export function arenaDequeue(ctx: SimContext, pid: number): boolean {
   const fi = ctx.arenaQueueFiesta.findIndex((u) => u.pids.includes(pid));
   if (fi >= 0) {
     ctx.arenaQueueFiesta.splice(fi, 1);
+    return true;
+  }
+  const y3 = ctx.arenaQueueYumi3.findIndex((u) => u.pids.includes(pid));
+  if (y3 >= 0) {
+    ctx.arenaQueueYumi3.splice(y3, 1);
+    return true;
+  }
+  const y5 = ctx.arenaQueueYumi5.findIndex((u) => u.pids.includes(pid));
+  if (y5 >= 0) {
+    ctx.arenaQueueYumi5.splice(y5, 1);
     return true;
   }
   return false;
@@ -339,9 +445,11 @@ export function isArenaCrossTeam(
 }
 
 // "Down" = out of the fight right now. Ranked bouts eliminate permanently
-// (`defeated`); Fiesta only benches you until your respawn timer elapses.
+// (`defeated`); Fiesta and Protect Yumi only bench you until your respawn
+// timer elapses.
 export function arenaIsDown(match: ArenaMatch, pid: number): boolean {
   if (match.fiesta) return match.fiesta.respawn.has(pid);
+  if (match.yumi) return match.yumi.respawn.has(pid);
   return match.defeated.has(pid);
 }
 
@@ -377,12 +485,20 @@ export function arenaCombatants(ctx: SimContext, pids: number[]): ArenaCombatant
 export function updateArena(ctx: SimContext): void {
   matchmakeArena1v1(ctx);
   matchmakeArena2v2(ctx);
+  ctx.matchmakeYumi();
   const seen = new Set<ArenaMatch>();
   for (const match of ctx.arenaMatches.values()) {
     if (seen.has(match)) continue;
     seen.add(match);
-    const missingA = match.teamA.some((pid) => !ctx.entities.get(pid));
-    const missingB = match.teamB.some((pid) => !ctx.entities.get(pid));
+    // Protect Yumi is lenient about disconnects: one missing member of a
+    // 3v3/5v5 benches (updateYumiActive), and the match forfeits only when an
+    // ENTIRE team is gone. Ranked/fiesta keep the strict any-member rule.
+    const missingA = match.yumi
+      ? match.teamA.every((pid) => !ctx.entities.get(pid))
+      : match.teamA.some((pid) => !ctx.entities.get(pid));
+    const missingB = match.yumi
+      ? match.teamB.every((pid) => !ctx.entities.get(pid))
+      : match.teamB.some((pid) => !ctx.entities.get(pid));
     if (missingA || missingB) {
       if (match.state === 'over') returnFromArena(ctx, match);
       else {
@@ -440,6 +556,12 @@ export function updateArena(ctx: SimContext): void {
     match.timer += DT;
     if (match.fiesta) {
       ctx.updateFiestaActive(match);
+      continue;
+    }
+    // Protect Yumi never hits the ranked stall-timeout below: sudden death in
+    // updateYumiActive guarantees its own ending.
+    if (match.yumi) {
+      ctx.updateYumiActive(match);
       continue;
     }
     if (match.timer >= ARENA_MAX_DURATION) {
@@ -761,8 +883,8 @@ export function endArenaMatch(
 ): void {
   const ratingA0 = match.ratingA;
   const ratingB0 = match.ratingB;
-  // Fiesta is unranked party play — it never moves the Elo ladder.
-  const ranked = !match.fiesta;
+  // Fiesta and Protect Yumi are unranked play: they never move the Elo ladder.
+  const ranked = !match.fiesta && !match.yumi;
   let deltaA: number;
   if (!ranked) {
     deltaA = 0;
@@ -852,7 +974,14 @@ export function endArenaMatch(
 // release the instance slot.
 export function returnFromArena(ctx: SimContext, match: ArenaMatch): void {
   for (const pid of arenaAllPids(match)) ctx.arenaMatches.delete(pid);
-  ctx.arenaBusySlots.delete(match.slot);
+  // Slot numbers collide across pools (pit slot 2 vs maze slot 2), so a yumi
+  // match MUST free the maze pool, never the pit's; it also drops its cats.
+  if (match.yumi) {
+    ctx.cleanupYumiMatch(match);
+    ctx.yumiBusySlots.delete(match.slot);
+  } else {
+    ctx.arenaBusySlots.delete(match.slot);
+  }
   for (const pid of arenaAllPids(match)) {
     const e = ctx.entities.get(pid);
     const ret = match.returns.get(pid);

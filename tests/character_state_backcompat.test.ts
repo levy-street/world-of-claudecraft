@@ -25,21 +25,32 @@ describe('character state JSONB back-compat', () => {
     // them; stripping them below then models a row saved before they existed.
     const meta = (
       sim as unknown as {
-        players: Map<number, { vendorBuyback: unknown; delveClears: unknown }>;
+        players: Map<number, { vendorBuyback: unknown; delveClears: unknown; bank: unknown }>;
       }
     ).players.get(pid)!;
     meta.vendorBuyback = [{ itemId: 'roasted_boar', count: 2 }];
     meta.delveClears = { d_reservoir: 3 };
+    meta.bank = {
+      inventory: [{ itemId: 'wolf_fang', count: 3 }],
+      purchasedSlots: 6,
+      bonusSlots: 0,
+    };
 
     const state = sim.serializeCharacter(pid)!;
     expect(state.vendorBuyback).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
     expect(state.delveClears).toEqual({ d_reservoir: 3 });
+    expect(state.bank).toEqual({
+      inventory: [{ itemId: 'wolf_fang', count: 3 }],
+      purchasedSlots: 6,
+      bonusSlots: 0,
+    });
 
     // Round-trip through JSON, then drop the fields a pre-migration row lacks.
     const stripped = JSON.parse(JSON.stringify(state)) as Record<string, unknown>;
     delete stripped.vendorBuyback;
     delete stripped.delveClears;
     delete stripped.companionUpgrades;
+    delete stripped.bank;
 
     // Loading the stripped row must not throw, and the `??` defaults apply.
     const sim2 = new Sim({ seed: 1, playerClass: 'warrior' });
@@ -54,18 +65,25 @@ describe('character state JSONB back-compat', () => {
       sim2 as unknown as {
         players: Map<
           number,
-          { vendorBuyback: unknown; delveClears: unknown; companionUpgrades: unknown }
+          {
+            vendorBuyback: unknown;
+            delveClears: unknown;
+            companionUpgrades: unknown;
+            bank: unknown;
+          }
         >;
       }
     ).players.get(reloadedPid)!;
     expect(reloadedMeta.vendorBuyback).toEqual([]);
     expect(reloadedMeta.delveClears).toEqual({});
     expect(reloadedMeta.companionUpgrades).toEqual({});
+    expect(reloadedMeta.bank).toEqual({ inventory: [], purchasedSlots: 0, bonusSlots: 0 });
 
     // And it re-serializes cleanly with the defaults in place.
     const reserialized = sim2.serializeCharacter(reloadedPid)!;
     expect(reserialized.vendorBuyback).toEqual([]);
     expect(reserialized.delveClears).toEqual({});
     expect(reserialized.companionUpgrades).toEqual({});
+    expect(reserialized.bank).toEqual({ inventory: [], purchasedSlots: 0, bonusSlots: 0 });
   });
 });

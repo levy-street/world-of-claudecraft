@@ -1,18 +1,55 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildPerfOverlayView, DEFAULT_PERF_BG, DEFAULT_PERF_BG_RGB, DEFAULT_PERF_FG, DEFAULT_PERF_FG_RGB,
-  defaultMetricsMap, FrameMeter, hexToRgb, METRIC_REGISTRY, metricsPreset,
-  overlayFractionFromPixel, overlayPixelPosition, PERF_COLOR_THEMES, PERF_METRIC_GROUPS, PERF_METRIC_KEYS,
-  perfMetricGroups, rgbaFromHex,
-  type MetricsSample, type PerfMetricKey, type PerfOverlayViewConfig,
+  buildPerfOverlayView,
+  DEFAULT_PERF_BG,
+  DEFAULT_PERF_BG_RGB,
+  DEFAULT_PERF_FG,
+  DEFAULT_PERF_FG_RGB,
+  defaultMetricsMap,
+  FrameMeter,
+  hexToRgb,
+  METRIC_REGISTRY,
+  type MetricsSample,
+  metricsPreset,
+  overlayFractionFromPixel,
+  overlayPixelPosition,
+  PERF_COLOR_THEMES,
+  PERF_METRIC_GROUPS,
+  PERF_METRIC_KEYS,
+  type PerfMetricKey,
+  type PerfOverlayViewConfig,
+  perfMetricGroups,
+  rgbaFromHex,
 } from '../src/ui/perf_overlay_model';
 
 function sample(over: Partial<MetricsSample> = {}): MetricsSample {
   return {
-    fps: 60, frameTimeMs: 16.6, fps1Low: 50, fps01Low: 40, frameSamples: [16, 17, 16, 18, 15],
-    online: true, connected: true, pingMs: 40, jitterMs: 5, snapshotHz: 20, connectionType: '4g',
-    drawCalls: 300, triangles: 1_200_000, geometries: 80, textures: 50, programs: 20, renderScale: 1, gpu: 'Test GPU',
-    memoryUsedMb: 400, memoryLimitMb: 2048, hitches: 0, entities: 12, apm: 30, backgrounded: false,
+    fps: 60,
+    frameTimeMs: 16.6,
+    fps1Low: 50,
+    fps01Low: 40,
+    frameSamples: [16, 17, 16, 18, 15],
+    online: true,
+    connected: true,
+    pingMs: 40,
+    jitterMs: 5,
+    predLeadMs: 90,
+    snapshotHz: 20,
+    serverTickHz: 19.8,
+    connectionType: '4g',
+    drawCalls: 300,
+    triangles: 1_200_000,
+    geometries: 80,
+    textures: 50,
+    programs: 20,
+    renderScale: 1,
+    gpu: 'Test GPU',
+    memoryUsedMb: 400,
+    memoryLimitMb: 2048,
+    hitches: 0,
+    entities: 12,
+    apm: 30,
+    backgrounded: false,
     ...over,
   };
 }
@@ -53,6 +90,20 @@ describe('perf overlay metric registry', () => {
     expect(apm?.group).toBe('input');
     expect(apm?.read(sample({ apm: 42 }))).toEqual({ kind: 'int', v: 42 });
   });
+
+  it('renders the server tick rate (network group) at one decimal, off by default', () => {
+    expect(defaultMetricsMap().serverTick).toBe(false);
+    const def = METRIC_REGISTRY.find((d) => d.key === 'serverTick');
+    expect(def?.group).toBe('network');
+    expect(def?.read(sample({ serverTickHz: 19.4 }))).toEqual({ kind: 'hz', v: 19.4, digits: 1 });
+    // sag severity derives from the 20 Hz nominal: healthy / mild sag / bad sag
+    expect(def?.severity(sample({ serverTickHz: 19.8 }))).toBe('good');
+    expect(def?.severity(sample({ serverTickHz: 17 }))).toBe('warn');
+    expect(def?.severity(sample({ serverTickHz: 12 }))).toBe('bad');
+    expect(def?.severity(sample({ serverTickHz: null }))).toBe('none');
+    // hidden until the server's meter reports (old server or warm-up)
+    expect(def?.read(sample({ serverTickHz: null }))).toBeNull();
+  });
 });
 
 describe('perf metric grouping', () => {
@@ -69,8 +120,23 @@ describe('perf metric grouping', () => {
     expect(grouped.map((g) => g.group.id)).toEqual(PERF_METRIC_GROUPS.map((g) => g.id));
     const byId = Object.fromEntries(grouped.map((g) => [g.group.id, g.chips.map((c) => c.key)]));
     expect(byId.frame).toEqual(['fps', 'frameTime', 'fps1Low', 'fps01Low', 'hitches']);
-    expect(byId.network).toEqual(['ping', 'jitter', 'snapshot', 'connection']);
-    expect(byId.renderer).toEqual(['drawCalls', 'triangles', 'geometries', 'textures', 'programs', 'renderScale', 'gpu']);
+    expect(byId.network).toEqual([
+      'ping',
+      'jitter',
+      'predLead',
+      'snapshot',
+      'serverTick',
+      'connection',
+    ]);
+    expect(byId.renderer).toEqual([
+      'drawCalls',
+      'triangles',
+      'geometries',
+      'textures',
+      'programs',
+      'renderScale',
+      'gpu',
+    ]);
     expect(byId.system).toEqual(['memory', 'entities']);
   });
 
@@ -88,11 +154,15 @@ describe('buildPerfOverlayView', () => {
   });
 
   it('hides network rows when offline even if enabled', () => {
-    const view = buildPerfOverlayView(sample({ online: false }), viewCfg({ metrics: allMetrics() }));
+    const view = buildPerfOverlayView(
+      sample({ online: false }),
+      viewCfg({ metrics: allMetrics() }),
+    );
     const keys = view.rows.map((r) => r.key);
     expect(keys).not.toContain('ping');
     expect(keys).not.toContain('jitter');
     expect(keys).not.toContain('snapshot');
+    expect(keys).not.toContain('serverTick');
     // local metrics still present
     expect(keys).toContain('fps');
     expect(keys).toContain('entities');
@@ -110,7 +180,9 @@ describe('buildPerfOverlayView', () => {
 
   it('color-codes FPS by threshold and respects the thresholds switch', () => {
     const sev = (fps: number, thresholds = true) =>
-      buildPerfOverlayView(sample({ fps }), viewCfg({ thresholds })).rows.find((r) => r.key === 'fps')!.severity;
+      buildPerfOverlayView(sample({ fps }), viewCfg({ thresholds })).rows.find(
+        (r) => r.key === 'fps',
+      )!.severity;
     expect(sev(72)).toBe('good');
     expect(sev(40)).toBe('warn');
     expect(sev(20)).toBe('bad');
@@ -119,7 +191,9 @@ describe('buildPerfOverlayView', () => {
 
   it('color-codes frame time the opposite direction (lower is better)', () => {
     const sev = (frameTimeMs: number) =>
-      buildPerfOverlayView(sample({ frameTimeMs }), viewCfg()).rows.find((r) => r.key === 'frameTime')!.severity;
+      buildPerfOverlayView(sample({ frameTimeMs }), viewCfg()).rows.find(
+        (r) => r.key === 'frameTime',
+      )!.severity;
     expect(sev(10)).toBe('good');
     expect(sev(25)).toBe('warn');
     expect(sev(40)).toBe('bad');
@@ -132,13 +206,19 @@ describe('buildPerfOverlayView', () => {
   });
 
   it('surfaces backgrounded + offline badges', () => {
-    expect(buildPerfOverlayView(sample({ backgrounded: true }), viewCfg()).badges).toContain('backgrounded');
-    expect(buildPerfOverlayView(sample({ online: true, connected: false }), viewCfg()).badges).toContain('offline');
+    expect(buildPerfOverlayView(sample({ backgrounded: true }), viewCfg()).badges).toContain(
+      'backgrounded',
+    );
+    expect(
+      buildPerfOverlayView(sample({ online: true, connected: false }), viewCfg()).badges,
+    ).toContain('offline');
     expect(buildPerfOverlayView(sample(), viewCfg()).badges).toEqual([]);
   });
 
   it('formats memory as a used/limit pair value descriptor', () => {
-    const row = buildPerfOverlayView(sample(), viewCfg({ metrics: allMetrics() })).rows.find((r) => r.key === 'memory')!;
+    const row = buildPerfOverlayView(sample(), viewCfg({ metrics: allMetrics() })).rows.find(
+      (r) => r.key === 'memory',
+    )!;
     expect(row.value).toEqual({ kind: 'memPair', usedMb: 400, limitMb: 2048 });
   });
 });
@@ -146,10 +226,10 @@ describe('buildPerfOverlayView', () => {
 describe('FrameMeter', () => {
   it('throttles repaints to roughly the configured interval', () => {
     const m = new FrameMeter();
-    expect(m.step(1 / 60, 0)).toBe(false);      // first tick inside the gate
-    expect(m.step(1 / 60, 100)).toBe(false);    // still < 250ms
-    expect(m.step(1 / 60, 300)).toBe(true);     // gate elapsed
-    expect(m.step(1 / 60, 400)).toBe(false);    // gate again
+    expect(m.step(1 / 60, 0)).toBe(false); // first tick inside the gate
+    expect(m.step(1 / 60, 100)).toBe(false); // still < 250ms
+    expect(m.step(1 / 60, 300)).toBe(true); // gate elapsed
+    expect(m.step(1 / 60, 400)).toBe(false); // gate again
     expect(m.step(1 / 60, 600)).toBe(true);
   });
 
@@ -231,8 +311,17 @@ describe('free positioning math', () => {
   // fraction, persisted, then re-projected to a pixel by reposition(). The two must
   // agree within rounding so the overlay never visibly snaps on drop.
   it('drag-settle does not visibly jump: fraction->pixel re-projects to the drop', () => {
-    const vw = 1280, vh = 720, ow = 140, oh = 72;
-    for (const [left, top] of [[8, 8], [600, 300], [1132, 640], [400, 8], [8, 640]] as const) {
+    const vw = 1280,
+      vh = 720,
+      ow = 140,
+      oh = 72;
+    for (const [left, top] of [
+      [8, 8],
+      [600, 300],
+      [1132, 640],
+      [400, 8],
+      [8, 640],
+    ] as const) {
       const frac = overlayFractionFromPixel(left, top, vw, vh, ow, oh);
       const px = overlayPixelPosition(frac.x, frac.y, vw, vh, ow, oh);
       expect(Math.abs(px.left - left)).toBeLessThanOrEqual(1);

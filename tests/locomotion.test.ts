@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
-  MOVE_HOLD_TIME, newLocoTrack, updateLocomotion,
-} from '../src/render/locomotion';
-import { desiredBaseState, locomotionTimeScale, type AnimState } from '../src/render/characters/anim_state';
+  type AnimState,
+  desiredBaseState,
+  locomotionTimeScale,
+  pickProxyHeight,
+} from '../src/render/characters/anim_state';
+import { MOVE_HOLD_TIME, newLocoTrack, updateLocomotion } from '../src/render/locomotion';
 
 const FPS = 1 / 60;
 const BASE_ANIM_STATE: AnimState = {
   speed: 0,
   moving: false,
+  running: false,
   airborne: false,
   backwards: false,
   dead: false,
@@ -90,6 +94,56 @@ describe('locomotion hysteresis', () => {
   });
 });
 
+describe('gait hysteresis (run vs walk)', () => {
+  const run = (t: ReturnType<typeof newLocoTrack>, dt = FPS, speed = 7) =>
+    updateLocomotion(t, 0, speed * dt, 0, dt);
+
+  it('a steady run settles into the run gait quickly', () => {
+    const t = newLocoTrack();
+    let s = run(t);
+    for (let i = 0; i < 20; i++) s = run(t);
+    expect(s.running).toBe(true);
+  });
+
+  it('noisy per-frame speed around the old threshold NEVER flips the gait', () => {
+    // the world-entry glitch: load-hitch frames make the sampled speed swing
+    // wildly around 4.5 u/s; the run/walk pick used a bare compare and
+    // crossfaded Running<->Walking on nearly every frame
+    const t = newLocoTrack();
+    for (let i = 0; i < 30; i++) run(t); // settle into run
+    let flips = 0;
+    let last = true;
+    for (let i = 0; i < 120; i++) {
+      // alternate starved and burst frames: 3 u/s then 8 u/s samples
+      const s = run(t, i % 2 === 0 ? 0.017 : 0.25, i % 2 === 0 ? 3 : 8);
+      if (s.running !== last) flips++;
+      last = s.running;
+    }
+    expect(flips).toBe(0);
+  });
+
+  it('a snared runner keeps the run gait until well below the exit threshold', () => {
+    const t = newLocoTrack();
+    for (let i = 0; i < 30; i++) run(t);
+    let s = run(t, FPS, 4.2); // 40% snare: between exit (3.6) and enter (5.2)
+    for (let i = 0; i < 30; i++) s = run(t, FPS, 4.2);
+    expect(s.running).toBe(true); // no gait pop mid-snare
+    for (let i = 0; i < 60; i++) s = run(t, FPS, 2.0); // hard snare: drop to walk
+    expect(s.running).toBe(false);
+  });
+
+  it('a one-frame backwards read cannot flash the walkBack direction', () => {
+    const t = newLocoTrack();
+    for (let i = 0; i < 30; i++) run(t); // forward run, direction latched
+    // a correction nudge reads one frame of backward displacement
+    let s = updateLocomotion(t, 0, -7 * FPS, 0, FPS);
+    expect(s.backwards).toBe(false); // dwell holds the direction
+    // a REAL sustained backpedal still switches once the dwell elapses
+    for (let i = 0; i < 30; i++) s = updateLocomotion(t, 0, -4.5 * FPS, 0, FPS);
+    expect(s.backwards).toBe(true);
+  });
+});
+
 describe('locomotion animation state', () => {
   it('uses authored walkBack for normal humanoid backpedal', () => {
     const state = { ...BASE_ANIM_STATE, moving: true, backwards: true, speed: 3 };
@@ -98,8 +152,42 @@ describe('locomotion animation state', () => {
   });
 
   it('reverses forward locomotion for Ghost Wolf-style backpedal', () => {
-    const state = { ...BASE_ANIM_STATE, moving: true, backwards: true, reverseBackpedal: true, speed: 7 };
+    const state = {
+      ...BASE_ANIM_STATE,
+      moving: true,
+      running: true,
+      backwards: true,
+      reverseBackpedal: true,
+      speed: 7,
+    };
     expect(desiredBaseState(state, true)).toBe('run');
     expect(locomotionTimeScale('run', state)).toBeLessThan(0);
+  });
+});
+
+describe('pickProxyHeight (corpse pick-capsule flatten, issue 1486)', () => {
+  it('uses the full standing height while alive', () => {
+    expect(pickProxyHeight(1.8, 0.4, false)).toBe(1.8);
+    expect(pickProxyHeight(3.0, 1.2, false)).toBe(3.0);
+  });
+
+  it('collapses a dead entity to a low, ground-hugging profile well under standing height', () => {
+    // A humanoid: standing 1.8, radius 0.4 -> flat ~0.8, far below the upright column
+    // that caused the phantom hitbox.
+    const flat = pickProxyHeight(1.8, 0.4, true);
+    expect(flat).toBeLessThan(1.8);
+    expect(flat).toBe(0.8);
+  });
+
+  it('never exceeds the standing height for a wide, short creature', () => {
+    // radius*2 would be 2.4 but standing height is only 1.0: clamp to the height so
+    // the dead proxy is never TALLER than the living one.
+    expect(pickProxyHeight(1.0, 1.2, true)).toBe(1.0);
+  });
+
+  it('scales the flat profile with body radius (long/wide creatures stay clickable)', () => {
+    // A larger creature keeps a proportionally larger (but still sub-standing) flat
+    // footprint so its corpse is not an unclickable sliver.
+    expect(pickProxyHeight(3.0, 1.0, true)).toBe(2.0);
   });
 });

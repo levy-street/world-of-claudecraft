@@ -6,12 +6,14 @@
   import {
     type Built,
     banAccount,
+    resetPassword,
     suspendCustom,
     suspendHours,
     unbanAccount,
     unsuspendAccount,
     type PendingAction,
   } from '../moderation_actions';
+  import { auth } from '../state/auth.svelte';
   import ModerationActionPrompt from './ModerationActionPrompt.svelte';
 
   type Target = Pick<
@@ -23,7 +25,8 @@
     | { kind: 'suspend-custom'; label: string }
     | { kind: 'unsuspend'; label: string }
     | { kind: 'ban'; label: string }
-    | { kind: 'unban'; label: string };
+    | { kind: 'unban'; label: string }
+    | { kind: 'reset-password'; label: string };
 
   let {
     target,
@@ -61,10 +64,15 @@
     if (action.kind === 'unban') return t('dialog.confirmUnban');
     if (action.kind === 'unsuspend') return t('dialog.confirmUnsuspension');
     if (action.kind === 'suspend-custom') return t('dialog.confirmCustomSuspension');
+    if (action.kind === 'reset-password') return t('dialog.confirmResetPassword');
     return t('dialog.confirmSuspension');
   }
 
-  async function confirm(values: { reason: string; expiry: string }): Promise<void> {
+  async function confirm(values: {
+    reason: string;
+    expiry: string;
+    password: string;
+  }): Promise<void> {
     const action = selected;
     if (!action) return;
     let built: Built;
@@ -72,6 +80,9 @@
     else if (action.kind === 'unban') built = unbanAccount(target.id, values.reason);
     else if (action.kind === 'unsuspend') {
       built = unsuspendAccount(target.id, values.reason);
+    }
+    else if (action.kind === 'reset-password') {
+      built = resetPassword(target.id, values.password, values.reason);
     }
     else if (action.kind === 'suspend-custom') {
       built = suspendCustom(target.id, values.expiry, values.reason);
@@ -147,6 +158,18 @@
         {t('detail.ban')}
       </button>
     {/if}
+    {#if auth.can('accounts.password')}
+      <button
+        class="danger"
+        onclick={() =>
+          (selected = {
+            kind: 'reset-password',
+            label: t('detail.resetPassword'),
+          })}
+      >
+        {t('detail.resetPassword')}
+      </button>
+    {/if}
   </section>
 
   {#if selected}
@@ -156,7 +179,8 @@
         title={titleFor(action)}
         rows={rowsFor(action)}
         showExpiry={action.kind === 'suspend-custom'}
-        danger={action.kind === 'ban'}
+        showPassword={action.kind === 'reset-password'}
+        danger={action.kind === 'ban' || action.kind === 'reset-password'}
         onConfirm={confirm}
         onCancel={() => (selected = null)}
       />

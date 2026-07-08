@@ -36,11 +36,17 @@ function plain(trace: Trace): unknown {
 describe('parity gate', () => {
   for (const scenario of SCENARIOS) {
     describe(scenario.name, () => {
+      // Explicit timeouts: the heaviest scenario (nythraxis_full_pull) records a
+      // full raid pull TWICE in the determinism test and brushes vitest's 5000ms
+      // default on slow shared CI runners (observed timing out twice in a row on
+      // the PR gate while green locally). The assertions are unchanged; the
+      // recording just gets room to finish. This does not soften the gate: a
+      // trace mismatch still fails identically.
       it('records deterministically (same scenario -> identical trace)', () => {
         const a = plain(recordTrace(scenario));
         const b = plain(recordTrace(scenario));
         expect(a).toEqual(b);
-      });
+      }, 30000);
 
       it(UPDATE ? 'mints the golden' : 'matches the committed golden', () => {
         const trace = plain(recordTrace(scenario));
@@ -55,7 +61,7 @@ describe('parity gate', () => {
         );
         const golden = JSON.parse(readFileSync(path, 'utf8'));
         expect(trace).toEqual(golden);
-      });
+      }, 30000);
     });
   }
 });

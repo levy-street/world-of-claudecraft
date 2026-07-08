@@ -33,6 +33,7 @@ import type { AbilityDef, Entity } from '../types';
 import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
 import { isRooted } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
+import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
@@ -112,6 +113,11 @@ export function runEffects(
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
         }
+        // Legendary on-spell-damage weapon procs (e.g. Deathless Heartwood's
+        // Deathbloom). Only a landed damaging SPELL triggers it; a physical special
+        // routed through this same case does not. No-op (no rng draw) unless the
+        // caster wields a proc weapon with a spellDamage proc.
+        if (isSpell) runWeaponProcs(ctx, p, target, 'spellDamage');
         break;
       }
       case 'finisherDamage': {
@@ -316,17 +322,54 @@ export function runEffects(
       case 'drainTick':
         break; // handled per channel tick
       case 'buffTarget': {
-        const buffTarget = target ?? p;
-        ctx.applyAura(buffTarget, {
+        const applyBuff = (e: Entity) =>
+          ctx.applyAura(e, {
+            id: ability.id,
+            name: ability.name,
+            kind: eff.kind,
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.value,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        if (eff.party) {
+          // Raid buff: land on the explicit target (self, ally, or a controlled pet),
+          // the caster, and every living member of the caster's party/raid, regardless
+          // of range. One cast buffs the whole group.
+          const party = ctx.partyOf(p.id);
+          const seen = new Set<number>();
+          const give = (e: Entity | null | undefined) => {
+            if (e && !e.dead && !seen.has(e.id)) {
+              seen.add(e.id);
+              applyBuff(e);
+            }
+          };
+          give(target ?? p);
+          give(p);
+          if (party) {
+            for (const pid of party.members) give(ctx.entities.get(pid));
+          }
+        } else {
+          applyBuff(target ?? p);
+        }
+        break;
+      }
+      case 'faerieFire': {
+        // Fixed-percent armor-reduction debuff (see effectiveArmor); does not stack
+        // with Sunder Armor. The percent is a constant, so the aura value is unused.
+        if (!target || target.dead) break;
+        ctx.applyAura(target, {
           id: ability.id,
           name: ability.name,
-          kind: eff.kind,
+          kind: 'faerie_fire',
           remaining: eff.duration,
           duration: eff.duration,
-          value: eff.value,
+          value: 0,
           sourceId: p.id,
           school: ability.school,
         });
+        ctx.enterCombat(p, target);
         break;
       }
       case 'dot': {
@@ -708,6 +751,30 @@ export function runEffects(
         ctx.enterCombat(p, target);
         break;
       }
+      // The Vale Cup sport moves (docs/prd/vale-cup.md). All three route to the
+      // vale_cup module through the seam and silently no-op unless the caster
+      // is seated in the live Sowfield match's play phase.
+      case 'ballKick': {
+        ctx.vcupBallKick(p, eff.power, eff.loft, ability.range);
+        break;
+      }
+      case 'ballPass': {
+        ctx.vcupBallPass(p, eff.power, eff.loft, ability.range);
+        break;
+      }
+      case 'ballShoot': {
+        ctx.vcupShoot(p, eff.power, eff.loft, ability.range);
+        break;
+      }
+      case 'sportDash': {
+        ctx.vcupSportDash(p, eff.distance, eff.catchBall === true);
+        break;
+      }
+      case 'sportShove': {
+        if (!target || target.dead) break;
+        ctx.vcupSportShove(p, target, eff.distance);
+        break;
+      }
       case 'sunder': {
         if (!target || target.dead) break;
         // a sunder can miss like any melee attack — a miss causes no threat
@@ -725,9 +792,12 @@ export function runEffects(
           ctx.enterCombat(p, target);
           break;
         }
+        // Expose Armor (`full`) lands all stacks at once; warrior Sunder adds one.
         const existing = target.auras.find((a) => a.kind === 'sunder');
         if (existing) {
-          existing.stacks = Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1);
+          existing.stacks = eff.full
+            ? eff.maxStacks
+            : Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1);
           existing.value = eff.armor;
           existing.remaining = existing.duration;
           ctx.emit({ type: 'aura', targetId: target.id, name: ability.name, gained: true });
@@ -739,7 +809,7 @@ export function runEffects(
             remaining: 30,
             duration: 30,
             value: eff.armor,
-            stacks: 1,
+            stacks: eff.full ? eff.maxStacks : 1,
             sourceId: p.id,
             school: 'physical',
           });

@@ -332,7 +332,7 @@ describe('precomputed modifiers', () => {
       20,
       computeTalentModifiers('priest', alloc({ ranks: { pri_imp_fortitude: 2 } })),
     ).find((k) => k.def.id === 'power_word_fortitude')!;
-    expect(effOf(fort).value).toBe(17); // 12 stamina * 1.40
+    expect(effOf(fort).value).toBe(7); // 5% stamina * 1.40 (percent-points survive the round)
 
     const demonSkin = abilitiesKnownAt(
       'warlock',

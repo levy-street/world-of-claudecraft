@@ -2319,6 +2319,17 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   concussive_shot: r('storm', 'sky', ['arrow'], ['arcs']),
   mongoose_bite: r('earth', 'steel', ['fang', { p: 'claw_slash', ...BR }], ['motion']),
   wing_clip: r('earth', 'blood', ['wing', { p: 'claw_slash', ...BR }]),
+  // the Vale Cup sport kit (boarball): the 'coin' disc reads as the ball
+  sport_kick: r('earth', 'leather', ['coin', { p: 'boot', ...BR }]),
+  sport_shoot: r('fury', 'ember', ['coin', { p: 'boot', ...BR }], ['motion']),
+  sport_pass: r('nature', 'gold', ['coin', { p: 'boot', ...TL }], ['motion']),
+  sport_boot: r('fury', 'gold', ['coin', { p: 'boot', ...BR }], ['motion']),
+  sport_hoof: r('fury', 'steel', ['boot', { p: 'coin', ...TR }], ['arcs']),
+  sport_punt: r('nature', 'leafGreen', ['coin', { p: 'sunburst', ...TL }], ['motion']),
+  sport_feint: r('shadow', 'steel', ['boot'], ['arcs']),
+  sport_dive: r('earth', 'leather', ['gauntlet', { p: 'coin', ...TR }], ['motion']),
+  sport_shoulder: r('fury', 'steel', ['pauldron', { p: 'claw_slash', ...BR }]),
+  sport_second_wind: r('nature', 'leafGreen', ['boot', { p: 'leaf', ...TR }], ['glow']),
   // priest
   smite: r('holy', 'holyGold', ['bolt', { p: 'sunburst', ...TL }], ['glow']),
   lesser_heal: r('holy', 'silverWhite', ['cross'], ['glow']),
@@ -2627,6 +2638,20 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['glow', 'sparkle'],
   ),
+  // Heroic-dungeon participation token (final-boss personal drop).
+  heroic_mark: r('holy', 'holyGold', ['sigil_rune'], ['glow']),
+  // Heroic Quartermaster jewelry (marks-vendor rings and pendants); a coin
+  // base reads as the band, the overlay carries the stat identity.
+  seal_of_the_nine_oaths: r('fury', 'blood', ['coin', 'gem'], ['glow']),
+  nielas_coldlight_band: r('arcane', 'arcanePink', ['coin', 'gem'], ['glow']),
+  sutils_gambit: r('nature', 'leafGreen', ['coin', 'gem'], ['sparkle']),
+  oath_of_the_round_table: r('earth', 'earthBrown', ['coin', 'gem'], ['glow']),
+  zyzzs_deathless_signet: r('holy', 'holyGold', ['coin', 'sigil_rune'], ['glow']),
+  architects_cornerstone: r('arcane', 'sky', ['coin', 'scroll'], ['glow']),
+  swiftfang_talisman: r('storm', 'silverWhite', ['wing', 'gem'], ['motion']),
+  yumis_keepsake_locket: r('storm', 'sky', ['gem'], ['sparkle', 'glow']),
+  zense_meridian: r('arcane', 'arcanePink', ['moon', 'gem'], ['glow']),
+  medallion_of_endless_profit: r('treasure', 'gold', ['coin', 'sunburst'], ['sparkle']),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),

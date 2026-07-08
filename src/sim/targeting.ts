@@ -21,6 +21,7 @@
 
 import { deadTargetSelectable } from './dead_target';
 import type { SimContext } from './sim_context';
+import { isVcupCrossTeam } from './social/vale_cup';
 import { orderTabTargets, TAB_QUERY_RADIUS } from './tab_target';
 import type { Entity } from './types';
 
@@ -126,10 +127,22 @@ export class Targeting {
     const attackerPlayer = this.ctx.pvpController(attacker);
     if (!attackerPlayer || attackerPlayer.dead) return false;
     const match = this.ctx.arenaMatches.get(attackerPlayer.id);
-    return (
-      !!match &&
+    if (
+      match &&
       match.state === 'countdown' &&
       this.ctx.isArenaCrossTeam(match, attackerPlayer.id, target.id)
+    ) {
+      return true;
+    }
+    // The Vale Cup: opposing fighters are keyboard-targetable from the whistle
+    // (countdown) through play, so the Shoulder has a target to land on.
+    // isHostileTo only opens during active/golden play, mirroring the arena's
+    // countdown-targeting asymmetry.
+    const cupMatch = this.ctx.vcup.match;
+    return (
+      !!cupMatch &&
+      cupMatch.phase !== 'over' &&
+      isVcupCrossTeam(cupMatch, attackerPlayer.id, target.id)
     );
   }
 

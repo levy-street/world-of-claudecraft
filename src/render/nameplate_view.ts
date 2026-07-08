@@ -45,6 +45,11 @@ export const NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT = 0.2;
 // not a portal billboard).
 const UNLABELED_DOOR_DUNGEON_ID = 'nythraxis_boss_arena';
 
+// The Vale Cup boarball is an inert mob entity (bell pattern) with a bespoke
+// ball visual; a floating "Ball" name + hp bar over it would break the toy
+// (the dungeon-door carve-out pattern, kept template-scoped and pure).
+const UNLABELED_MOB_TEMPLATE_ID = 'vale_cup_ball';
+
 /** Per-entity nameplate decisions the painter consumes. Mutated in place by
  *  nameplatePlanInto so the painter can reuse one instance across all entities. */
 export interface NameplatePlan {
@@ -125,6 +130,7 @@ export function nameplatePlanInto(
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
+    e.templateId === UNLABELED_MOB_TEMPLATE_ID ||
     (!showNameplates && e.kind === 'mob' && !e.dead);
   out.anchorYOffset =
     viewHeight * e.scale +

@@ -12,10 +12,18 @@ import { formatNumber, t } from './i18n';
 import type { PerfOverlayConfig, PerfOverlayPatch } from './perf_overlay_config';
 import { FONT_SCALE_MAX, FONT_SCALE_MIN } from './perf_overlay_config';
 import {
-  metricsPreset, perfMetricGroups, PERF_COLOR_THEMES, type PerfMetricKey,
+  metricsPreset,
+  PERF_COLOR_THEMES,
+  type PerfMetricKey,
+  perfMetricGroups,
 } from './perf_overlay_model';
 import {
-  colorControl, settingsCard, settingRow, sliderControl, subhead, toggleControl,
+  colorControl,
+  settingRow,
+  settingsCard,
+  sliderControl,
+  subhead,
+  toggleControl,
 } from './settings_controls';
 
 /** Drives the customizable performance overlay from the Options > Performance
@@ -41,13 +49,16 @@ export interface PerfSettingsHost {
   click(): void;
   /** Title "X": return to the game. */
   onClose(): void;
-  /** Footer "Back": return to the main options list. */
+  /** Title-bar and footer "Back": return to the main options list. */
   onBack(): void;
   /** svgIcon('close') markup for the title button (trusted, not user text). */
   closeIconHtml: string;
+  /** svgIcon('prev') markup for the title back button (trusted, not user text). */
+  backIconHtml: string;
 }
 
-const PERCENT = (v: number): string => formatNumber(v, { style: 'percent', maximumFractionDigits: 0 });
+const PERCENT = (v: number): string =>
+  formatNumber(v, { style: 'percent', maximumFractionDigits: 0 });
 
 export class PerfOverlaySettingsPanel {
   private container: HTMLElement | null = null;
@@ -106,6 +117,18 @@ export class PerfOverlaySettingsPanel {
 
   private buildTitle(): HTMLElement {
     const title = div('panel-title');
+    // Top-left back to the Game Menu root, matching the panelTitle() sub-views.
+    // Wired locally (NOT via the options window's [data-back] sweep): this panel
+    // rerender()s itself on control changes, which would drop a centrally-wired
+    // listener; carrying the data-back attribute too would double-wire the first
+    // render, so it is deliberately absent here.
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'x-btn back-btn';
+    back.setAttribute('aria-label', t('hud.options.back'));
+    back.setAttribute('title', t('hud.options.back'));
+    back.innerHTML = this.host.backIconHtml; // trusted svg markup
+    back.addEventListener('click', () => this.host.onBack());
     const label = document.createElement('span');
     label.textContent = t('hudChrome.perf.title');
     const close = document.createElement('button');
@@ -114,7 +137,7 @@ export class PerfOverlaySettingsPanel {
     close.setAttribute('aria-label', t('hud.options.returnToGame'));
     close.innerHTML = this.host.closeIconHtml; // trusted svg markup
     close.addEventListener('click', () => this.host.onClose());
-    title.append(label, close);
+    title.append(back, label, close);
     return title;
   }
 
@@ -124,7 +147,10 @@ export class PerfOverlaySettingsPanel {
       parent: wrap,
       label: t('hudChrome.perf.enable'),
       get: () => this.host.getShowFps(),
-      set: (v) => { this.host.setShowFps(v); this.rerender(); },
+      set: (v) => {
+        this.host.setShowFps(v);
+        this.rerender();
+      },
       onLabel: t('hud.options.on'),
       offLabel: t('hud.options.off'),
       onActivate: () => this.host.click(),
@@ -189,7 +215,11 @@ export class PerfOverlaySettingsPanel {
           btn.setAttribute('aria-label', label);
         };
         sync();
-        btn.addEventListener('click', () => { this.host.click(); perf.setMetric(chip.key, !isOn()); sync(); });
+        btn.addEventListener('click', () => {
+          this.host.click();
+          perf.setMetric(chip.key, !isOn());
+          sync();
+        });
         wrap.appendChild(btn);
       }
       card.appendChild(wrap);
@@ -217,19 +247,66 @@ export class PerfOverlaySettingsPanel {
       const selected = cur.textColor === theme.fg && cur.bgColor === theme.bg;
       btn.classList.toggle('sel', selected);
       btn.setAttribute('aria-pressed', String(selected));
-      btn.addEventListener('click', () => { this.host.click(); perf.patch({ textColor: theme.fg, bgColor: theme.bg }); this.rerender(); });
+      btn.addEventListener('click', () => {
+        this.host.click();
+        perf.patch({ textColor: theme.fg, bgColor: theme.bg });
+        this.rerender();
+      });
       swatches.appendChild(btn);
     }
     row.appendChild(swatches);
     card.appendChild(row);
 
-    colorControl({ parent: card, label: t('hudChrome.perf.textColor'), get: () => this.cfg().textColor, set: (v) => perf.patch({ textColor: v }) });
-    colorControl({ parent: card, label: t('hudChrome.perf.bgColor'), get: () => this.cfg().bgColor, set: (v) => perf.patch({ bgColor: v }) });
-    sliderControl({ parent: card, label: t('hudChrome.perf.opacity'), get: () => this.cfg().opacity, set: (v) => perf.patch({ opacity: v }), min: 0, max: 1, step: 0.05, format: PERCENT });
-    this.toggle(card, t('hudChrome.perf.solidBg'), () => this.cfg().solidBg, (v) => perf.patch({ solidBg: v }));
-    sliderControl({ parent: card, label: t('hudChrome.perf.fontScale'), get: () => this.cfg().fontScale, set: (v) => perf.patch({ fontScale: v }), min: FONT_SCALE_MIN, max: FONT_SCALE_MAX, step: 0.05, format: PERCENT });
-    this.toggle(card, t('hudChrome.perf.graph'), () => this.cfg().graph, (v) => perf.patch({ graph: v }));
-    this.toggle(card, t('hudChrome.perf.thresholds'), () => this.cfg().thresholds, (v) => perf.patch({ thresholds: v }));
+    colorControl({
+      parent: card,
+      label: t('hudChrome.perf.textColor'),
+      get: () => this.cfg().textColor,
+      set: (v) => perf.patch({ textColor: v }),
+    });
+    colorControl({
+      parent: card,
+      label: t('hudChrome.perf.bgColor'),
+      get: () => this.cfg().bgColor,
+      set: (v) => perf.patch({ bgColor: v }),
+    });
+    sliderControl({
+      parent: card,
+      label: t('hudChrome.perf.opacity'),
+      get: () => this.cfg().opacity,
+      set: (v) => perf.patch({ opacity: v }),
+      min: 0,
+      max: 1,
+      step: 0.05,
+      format: PERCENT,
+    });
+    this.toggle(
+      card,
+      t('hudChrome.perf.solidBg'),
+      () => this.cfg().solidBg,
+      (v) => perf.patch({ solidBg: v }),
+    );
+    sliderControl({
+      parent: card,
+      label: t('hudChrome.perf.fontScale'),
+      get: () => this.cfg().fontScale,
+      set: (v) => perf.patch({ fontScale: v }),
+      min: FONT_SCALE_MIN,
+      max: FONT_SCALE_MAX,
+      step: 0.05,
+      format: PERCENT,
+    });
+    this.toggle(
+      card,
+      t('hudChrome.perf.graph'),
+      () => this.cfg().graph,
+      (v) => perf.patch({ graph: v }),
+    );
+    this.toggle(
+      card,
+      t('hudChrome.perf.thresholds'),
+      () => this.cfg().thresholds,
+      (v) => perf.patch({ thresholds: v }),
+    );
   }
 
   private buildPositionCard(parent: HTMLElement): void {
@@ -240,14 +317,36 @@ export class PerfOverlaySettingsPanel {
     hint.textContent = t('hudChrome.perf.dragHint');
     card.appendChild(hint);
 
-    this.posX = sliderControl({ parent: card, label: t('hudChrome.perf.positionX'), get: () => this.cfg().posX, set: (v) => perf.patch({ posX: v }), min: 0, max: 1, step: 0.01, format: PERCENT });
-    this.posY = sliderControl({ parent: card, label: t('hudChrome.perf.positionY'), get: () => this.cfg().posY, set: (v) => perf.patch({ posY: v }), min: 0, max: 1, step: 0.01, format: PERCENT });
+    this.posX = sliderControl({
+      parent: card,
+      label: t('hudChrome.perf.positionX'),
+      get: () => this.cfg().posX,
+      set: (v) => perf.patch({ posX: v }),
+      min: 0,
+      max: 1,
+      step: 0.01,
+      format: PERCENT,
+    });
+    this.posY = sliderControl({
+      parent: card,
+      label: t('hudChrome.perf.positionY'),
+      get: () => this.cfg().posY,
+      set: (v) => perf.patch({ posY: v }),
+      min: 0,
+      max: 1,
+      step: 0.01,
+      format: PERCENT,
+    });
 
     const resetPos = document.createElement('button');
     resetPos.type = 'button';
     resetPos.className = 'btn';
     resetPos.textContent = t('hudChrome.perf.resetPosition');
-    resetPos.addEventListener('click', () => { this.host.click(); perf.resetPosition(); this.rerender(); });
+    resetPos.addEventListener('click', () => {
+      this.host.click();
+      perf.resetPosition();
+      this.rerender();
+    });
     card.appendChild(resetPos);
   }
 
@@ -257,21 +356,33 @@ export class PerfOverlaySettingsPanel {
     reset.type = 'button';
     reset.className = 'btn';
     reset.textContent = t('hud.options.resetToDefaults');
-    reset.addEventListener('click', () => { this.host.click(); this.host.perf.reset(); this.rerender(); });
+    reset.addEventListener('click', () => {
+      this.host.click();
+      this.host.perf.reset();
+      this.rerender();
+    });
     const back = document.createElement('button');
     back.type = 'button';
     back.className = 'btn';
     back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => { this.host.click(); this.host.onBack(); });
+    back.addEventListener('click', () => this.host.onBack());
     footer.append(reset, back);
     return footer;
   }
 
   // ---- small helpers -----------------------------------------------------
 
-  private toggle(parent: HTMLElement, label: string, get: () => boolean, set: (v: boolean) => void): void {
+  private toggle(
+    parent: HTMLElement,
+    label: string,
+    get: () => boolean,
+    set: (v: boolean) => void,
+  ): void {
     toggleControl({
-      parent, label, get, set,
+      parent,
+      label,
+      get,
+      set,
       onLabel: t('hud.options.on'),
       offLabel: t('hud.options.off'),
       onActivate: () => this.host.click(),

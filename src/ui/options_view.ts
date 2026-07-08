@@ -40,6 +40,11 @@ export interface SliderControl {
   /** Current value at build time; the painter re-reads the live value on input. */
   value: number;
   fmt: SliderFmt;
+  /** Commit the setting on release ('change') instead of live on every 'input'
+   *  tick. Set for uiScale, whose live rescale moves the slider under the cursor
+   *  mid-drag (issue 1558); dragging updates only the readout, not the setting.
+   *  Other sliders keep their intended live preview (volume, fov, frame scale). */
+  commitOnChange?: boolean;
 }
 
 export interface ToggleControl {
@@ -357,7 +362,10 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
 
 export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
-    slider(s, 'uiScale', 'hudChrome.options.uiScale'),
+    // uiScale commits on release: applying it live rescales the whole UI (the
+    // options window included), which shoves the slider under the cursor and makes
+    // the value hard to land (issue 1558).
+    { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
     slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
     slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),

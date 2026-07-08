@@ -51,6 +51,19 @@ export interface ProfessionRecipeRecord {
   // quality roll and gate access. A common-tier recipe always has skillReq 0
   // per the free-floor rule.
   itemLevelBudget: number;
+  // Dual-craft requirement (issue #1132): a combo recipe exclusive to one
+  // specific adjacent pair on the CRAFT_RING (src/sim/content/professions.ts
+  // adjacentCrafts). When present, the crafting player must hold BOTH
+  // craftA and craftB at or above minTier's flat-skill threshold (see
+  // wheel.ts tierForSkill/TIER_SKILL_STEP), independent of professionId
+  // above (which only names the recipe's "home" craft for listing purposes).
+  // A player's skill in any craft other than these two, no matter how high,
+  // never substitutes for either requirement: only craftA and craftB count.
+  comboRequirement?: {
+    craftA: string;
+    craftB: string;
+    minTier: number;
+  };
 }
 
 // One performed craft (a runtime instance of a RecipeRecord being worked),
