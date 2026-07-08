@@ -152,9 +152,10 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(logs.some((t) => t.startsWith('You abandon'))).toBe(true);
     // Demon Heal channel ticked: applyDemonHealTick emits a heal2 with ability 'Demon Heal'.
     expect(ev.some((e) => e.type === 'heal2' && e.ability === 'Demon Heal')).toBe(true);
-    // Demon swap exercised BOTH branches: a new demon answered, then the same demon faded.
-    expect(logs.some((t) => t.includes('answers your summons'))).toBe(true);
-    expect(logs.some((t) => t.includes('fades back into the void'))).toBe(true);
+    // All 4 summonPet calls answer fresh: initial summon, swap to a different demon,
+    // resummon the SAME living demon (replaced, not dismissed), and the despawnPet resummon.
+    expect(logs.filter((t) => t.includes('answers your summons')).length).toBe(4);
+    expect(logs.some((t) => t.includes('fades back into the void'))).toBe(false);
     // despawnPet scrubbed the hunter's targetId (set to the demon, nulled on its hard despawn).
     expect((rec.sim as any).player.targetId).toBeNull();
     // abandon's despawnPersistentPet scrub pulled the biter off the (now-gone) pet.

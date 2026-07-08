@@ -153,7 +153,7 @@ describe('pet_commands module (P1b)', () => {
     expect(pet.autoAttack).toBe(false);
   });
 
-  it('warlock demon swap: answers vs fades-into-the-void + Demon Heal tick', () => {
+  it('warlock demon swap and same-demon resummon both answer fresh + Demon Heal tick', () => {
     const sim = new Sim({ seed: 13, playerClass: 'warlock', noPlayer: true }) as AnySim;
     const wpid = sim.addPlayer('warlock', 'Demonist') as number;
     sim.setPlayerLevel(12, wpid);
@@ -181,9 +181,16 @@ describe('pet_commands module (P1b)', () => {
     expect(vw.id).not.toBe(imp.id);
     expect(sim.entities.has(imp.id)).toBe(false); // old demon hard-gone
 
-    // Swap to the SAME demon while alive: it fades into the void, leaving NO pet.
+    // Resummon the SAME demon while alive: it is replaced with a fresh, full-health pet.
+    vw.hp = Math.floor(vw.maxHp * 0.3);
+    const staleVwId = vw.id;
     summonPet(sim.ctx, warlock, 'gloomshade');
-    expect(petOf(sim.ctx, wpid, true)).toBeNull();
+    const freshVw = petOf(sim.ctx, wpid) as AnyEntity;
+    expect(freshVw).toBeTruthy();
+    expect(freshVw.templateId).toBe('gloomshade');
+    expect(freshVw.id).not.toBe(staleVwId);
+    expect(freshVw.hp).toBe(freshVw.maxHp);
+    expect(sim.entities.has(staleVwId)).toBe(false); // stale demon hard-gone
   });
 
   it('is deterministic on seeded replay (same seed + same drive => identical state)', () => {

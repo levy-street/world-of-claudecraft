@@ -558,8 +558,9 @@ function petAi(): Scenario {
 // on the pet so despawnPersistentPet's threat-scrub + retargetMob draws; then re-tames,
 // revives a dead pet, and a stow/restore round-trip (serializePet -> despawnPersistentPet
 // -> restorePet). A warlock summons a demon, channels Demon Heal (applyDemonHealTick:
-// heal2 + healingThreat), swaps demons (despawnPersistentPet + the "answers your summons"
-// vs "fades back into the void" branches), then stows a demon so despawnPet runs its
+// heal2 + healingThreat), swaps demons (despawnPersistentPet + "answers your summons"),
+// then resummons the SAME living demon (despawnPersistentPet + a fresh full-health
+// "answers your summons" pet, not a dismiss), then stows a demon so despawnPet runs its
 // player-target + threat scrub (retargetMob draw). The despawn scrubs are the slice's
 // only rng draws, so the draw-order log pins them; the snapshots pin every state change.
 function petCommands(): Scenario {
@@ -665,8 +666,11 @@ function petCommands(): Scenario {
       const vw = sim.petOf(wpid) as AnyEntity;
       rec.notes.voidId = vw.id;
       rec.track(vw.id);
-      (sim as any).summonPet(warlock, 'gloomshade'); // same template, alive: "fades back into the void" (no new pet)
-      rec.snapshot('demon-faded');
+      (sim as any).summonPet(warlock, 'gloomshade'); // same template, alive: fresh full-health pet, not a dismiss
+      const vw2 = sim.petOf(wpid) as AnyEntity;
+      rec.notes.voidId2 = vw2.id;
+      rec.track(vw2.id);
+      rec.snapshot('demon-refreshed');
 
       // despawnPet (demon hard despawn): re-summon, point a player target + mob threat at it, stow the demon.
       (sim as any).summonPet(warlock, 'emberkin');
