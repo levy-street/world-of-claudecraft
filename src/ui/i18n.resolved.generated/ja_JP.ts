@@ -182,6 +182,35 @@ export const ja_JP: EnTranslations = {
       "title": "エモート",
       "done": "完了"
     },
+    "dexSwap": {
+      "title": "$WOCを購入",
+      "close": "$WOC購入を閉じる",
+      "launcher": "購入",
+      "launcherAria": "SOLまたはUSDCで$WOCを購入",
+      "nonCustodial": "スワップはJupiter DEXアグリゲーターを経由し、あなた自身のウォレットが署名して送信します。ゲームがあなたの鍵や資金を預かることはありません。",
+      "amountLabel": "支払い額",
+      "tokenAria": "支払いトークン",
+      "quoteButton": "見積もりを取得",
+      "quoting": "最適なルートを検索中...",
+      "amountInvalid": "有効な数量を入力してください。",
+      "slippage": "最大スリッページ：{percent}%",
+      "receiveLine": "約{amount} $WOCを受け取ります",
+      "payLine": "{amount} {symbol}を支払います",
+      "priceImpact": "価格インパクト：{percent}%",
+      "minReceived": "最低受取額：{amount} $WOC",
+      "buyButton": "$WOCを購入",
+      "quoteStale": "見積もりの有効期限が切れました。購入前に新しい見積もりを取得してください。",
+      "requoted": "見積もりの有効期限が切れたため、新しい見積もりを取得しました。内容を確認して、もう一度購入を押してください。",
+      "signing": "ウォレットでトランザクションを承認してください...",
+      "sentTitle": "スワップを送信しました",
+      "sentBody": "ウォレットがスワップに署名して送信しました。ネットワークが確認すると$WOC残高が更新されます。",
+      "signatureLabel": "トランザクション署名：{signature}",
+      "viewOnExplorer": "Solana Explorerで表示",
+      "buyMore": "さらに$WOCを購入",
+      "errWalletFeature": "接続中のウォレットはゲームからトランザクションを送信できません。別のSolanaウォレットをお試しください。",
+      "errSignFailed": "トランザクションは送信されませんでした。ウォレットで拒否された可能性があります。",
+      "errNoWallet": "まずSolanaウォレットを接続してください。"
+    },
     "dailyRewards": {
       "title": "デイリー報酬",
       "close": "デイリー報酬を閉じる",
@@ -1534,6 +1563,16 @@ export const ja_JP: EnTranslations = {
       "swag_claimed": "この報酬は既に受け取っています。",
       "swag_tier": "これを受け取るにはより高いランクが必要です。",
       "swag_points": "ポイントが足りません。"
+    },
+    "dex_swap": {
+      "disabled": "ゲーム内での$WOC購入は現在利用できません。",
+      "input_not_allowed": "その支払いトークンには対応していません。",
+      "invalid_amount": "有効な数量を入力してください。",
+      "invalid_slippage": "そのスリッページ設定は許可されていません。",
+      "invalid_public_key": "まずSolanaウォレットを接続してください。",
+      "quote_tampered": "その見積もりはこのスワップと一致しません。新しい見積もりを取得してください。",
+      "no_route": "現在その数量で利用できる取引ルートがありません。",
+      "upstream_error": "スワップサービスは利用できません。後でもう一度お試しください。"
     }
   },
   "guide": {

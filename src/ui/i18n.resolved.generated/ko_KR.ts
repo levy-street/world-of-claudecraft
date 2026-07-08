@@ -182,6 +182,35 @@ export const ko_KR: EnTranslations = {
       "title": "감정 표현",
       "done": "완료"
     },
+    "dexSwap": {
+      "title": "$WOC 구매",
+      "close": "$WOC 구매 닫기",
+      "launcher": "구매",
+      "launcherAria": "SOL 또는 USDC로 $WOC 구매",
+      "nonCustodial": "스왑은 Jupiter DEX 애그리게이터를 통해 라우팅되며, 본인 지갑이 직접 서명하고 전송합니다. 게임은 결코 당신의 키나 자금을 보관하지 않습니다.",
+      "amountLabel": "지불 금액",
+      "tokenAria": "결제 토큰",
+      "quoteButton": "견적 받기",
+      "quoting": "최적 경로를 찾는 중...",
+      "amountInvalid": "유효한 수량을 입력하세요.",
+      "slippage": "최대 슬리피지: {percent}%",
+      "receiveLine": "약 {amount} $WOC을 받습니다",
+      "payLine": "{amount} {symbol}을 지불합니다",
+      "priceImpact": "가격 영향: {percent}%",
+      "minReceived": "최소 수령량: {amount} $WOC",
+      "buyButton": "$WOC 구매",
+      "quoteStale": "견적이 만료되었습니다. 구매 전에 새 견적을 받으세요.",
+      "requoted": "견적이 만료되어 새 견적을 가져왔습니다. 내용을 확인한 뒤 다시 구매를 누르세요.",
+      "signing": "지갑에서 트랜잭션을 승인하세요...",
+      "sentTitle": "스왑 전송됨",
+      "sentBody": "지갑이 스왑에 서명하여 전송했습니다. 네트워크가 확인하면 $WOC 잔액이 갱신됩니다.",
+      "signatureLabel": "트랜잭션 서명: {signature}",
+      "viewOnExplorer": "Solana Explorer에서 보기",
+      "buyMore": "$WOC 더 구매",
+      "errWalletFeature": "연결된 지갑은 게임에서 트랜잭션을 보낼 수 없습니다. 다른 Solana 지갑을 사용해 보세요.",
+      "errSignFailed": "트랜잭션이 전송되지 않았습니다. 지갑에서 거절되었을 수 있습니다.",
+      "errNoWallet": "먼저 Solana 지갑을 연결하세요."
+    },
     "dailyRewards": {
       "title": "일일 보상",
       "close": "일일 보상 닫기",
@@ -1534,6 +1563,16 @@ export const ko_KR: EnTranslations = {
       "swag_claimed": "이미 이 보상을 받았습니다.",
       "swag_tier": "이 보상을 받으려면 더 높은 등급에 도달하세요.",
       "swag_points": "포인트가 부족합니다."
+    },
+    "dex_swap": {
+      "disabled": "현재 게임 내 $WOC 구매를 이용할 수 없습니다.",
+      "input_not_allowed": "지원하지 않는 결제 토큰입니다.",
+      "invalid_amount": "유효한 수량을 입력하세요.",
+      "invalid_slippage": "허용되지 않는 슬리피지 설정입니다.",
+      "invalid_public_key": "먼저 Solana 지갑을 연결하세요.",
+      "quote_tampered": "해당 견적이 이 스왑과 일치하지 않습니다. 새 견적을 요청하세요.",
+      "no_route": "현재 해당 수량에 사용할 수 있는 거래 경로가 없습니다.",
+      "upstream_error": "스왑 서비스를 이용할 수 없습니다. 나중에 다시 시도하세요."
     }
   },
   "guide": {

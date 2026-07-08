@@ -182,6 +182,35 @@ export const zh_TW: EnTranslations = {
       "title": "表情",
       "done": "完成"
     },
+    "dexSwap": {
+      "title": "購買 $WOC",
+      "close": "關閉購買 $WOC",
+      "launcher": "購買",
+      "launcherAria": "用 SOL 或 USDC 購買 $WOC",
+      "nonCustodial": "兌換透過 Jupiter DEX 聚合器路由，由你自己的錢包簽署並送出。遊戲絕不保管你的金鑰或資金。",
+      "amountLabel": "你支付",
+      "tokenAria": "支付代幣",
+      "quoteButton": "取得報價",
+      "quoting": "正在尋找最佳路徑...",
+      "amountInvalid": "請輸入有效的數量。",
+      "slippage": "最大滑價：{percent}%",
+      "receiveLine": "你將獲得約 {amount} $WOC",
+      "payLine": "你支付 {amount} {symbol}",
+      "priceImpact": "價格影響：{percent}%",
+      "minReceived": "最少獲得：{amount} $WOC",
+      "buyButton": "購買 $WOC",
+      "quoteStale": "報價已過期。購買前請重新取得報價。",
+      "requoted": "該報價已過期，已為你取得新報價。請確認後再次點擊購買。",
+      "signing": "請在錢包中核准該交易...",
+      "sentTitle": "兌換已送出",
+      "sentBody": "你的錢包已簽署並送出兌換。網路確認後你的 $WOC 餘額將更新。",
+      "signatureLabel": "交易簽章：{signature}",
+      "viewOnExplorer": "在 Solana Explorer 上檢視",
+      "buyMore": "再購買 $WOC",
+      "errWalletFeature": "你連接的錢包無法從遊戲內送出交易。請嘗試其他 Solana 錢包。",
+      "errSignFailed": "交易未送出。可能已在你的錢包中被拒絕。",
+      "errNoWallet": "請先連接 Solana 錢包。"
+    },
     "dailyRewards": {
       "title": "每日獎勵",
       "close": "關閉每日獎勵",
@@ -1534,6 +1563,16 @@ export const zh_TW: EnTranslations = {
       "swag_claimed": "你已經領取過此獎勵。",
       "swag_tier": "達到更高階級才能領取此項目。",
       "swag_points": "點數不足。"
+    },
+    "dex_swap": {
+      "disabled": "目前無法在遊戲內購買 $WOC。",
+      "input_not_allowed": "不支援該支付代幣。",
+      "invalid_amount": "請輸入有效的數量。",
+      "invalid_slippage": "不允許該滑價設定。",
+      "invalid_public_key": "請先連接 Solana 錢包。",
+      "quote_tampered": "該報價與本次兌換不符，請重新取得報價。",
+      "no_route": "目前沒有適用於該數量的交易路徑。",
+      "upstream_error": "兌換服務暫時無法使用，請稍後再試。"
     }
   },
   "guide": {

@@ -182,6 +182,35 @@ export const tr_TR: EnTranslations = {
       "title": "İfadeler",
       "done": "Tamam"
     },
+    "dexSwap": {
+      "title": "Buy $WOC",
+      "close": "Close buy $WOC",
+      "launcher": "Buy",
+      "launcherAria": "Buy $WOC with SOL or USDC",
+      "nonCustodial": "Swaps route through the Jupiter DEX aggregator and are signed and sent by your own wallet. The game never holds your keys or funds.",
+      "amountLabel": "You pay",
+      "tokenAria": "Payment token",
+      "quoteButton": "Get quote",
+      "quoting": "Finding the best route...",
+      "amountInvalid": "Enter a valid amount.",
+      "slippage": "Max slippage: {percent}%",
+      "receiveLine": "You receive about {amount} $WOC",
+      "payLine": "You pay {amount} {symbol}",
+      "priceImpact": "Price impact: {percent}%",
+      "minReceived": "Minimum received: {amount} $WOC",
+      "buyButton": "Buy $WOC",
+      "quoteStale": "The quote expired. Get a fresh quote before buying.",
+      "requoted": "That quote expired, so a fresh one was fetched. Review it and press Buy again.",
+      "signing": "Approve the transaction in your wallet...",
+      "sentTitle": "Swap sent",
+      "sentBody": "Your wallet signed and sent the swap. Your $WOC balance updates once the network confirms it.",
+      "signatureLabel": "Transaction signature: {signature}",
+      "viewOnExplorer": "View on Solana Explorer",
+      "buyMore": "Buy more $WOC",
+      "errWalletFeature": "Your connected wallet cannot send transactions from the game. Try a different Solana wallet.",
+      "errSignFailed": "The transaction was not sent. It may have been declined in your wallet.",
+      "errNoWallet": "Connect a Solana wallet first."
+    },
     "dailyRewards": {
       "title": "Günlük Ödüller",
       "close": "Günlük ödülleri kapat",
@@ -1534,6 +1563,16 @@ export const tr_TR: EnTranslations = {
       "swag_claimed": "Bu ödülü zaten aldınız.",
       "swag_tier": "Bunu almak için daha yüksek bir rütbeye ulaşın.",
       "swag_points": "Yeterli puan yok."
+    },
+    "dex_swap": {
+      "disabled": "Buying $WOC in game is not available right now.",
+      "input_not_allowed": "That payment token is not supported.",
+      "invalid_amount": "Enter a valid amount.",
+      "invalid_slippage": "That slippage setting is not allowed.",
+      "invalid_public_key": "Connect a Solana wallet first.",
+      "quote_tampered": "That quote does not match this swap. Request a new quote.",
+      "no_route": "No trading route is available for that amount right now.",
+      "upstream_error": "The swap service is unavailable. Please try again."
     }
   },
   "guide": {

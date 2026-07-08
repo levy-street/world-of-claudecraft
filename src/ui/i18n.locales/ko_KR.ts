@@ -6020,6 +6020,50 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_claimed': '이미 이 보상을 받았습니다.',
   'apiError.discord.swag_tier': '이 보상을 받으려면 더 높은 등급에 도달하세요.',
   'apiError.discord.swag_points': '포인트가 부족합니다.',
+  // The in-game buy-$WOC DEX swap proxy (M16 non-Latin fill)
+  'apiError.dex_swap.disabled': '현재 게임 내 $WOC 구매를 이용할 수 없습니다.',
+  'apiError.dex_swap.input_not_allowed': '지원하지 않는 결제 토큰입니다.',
+  'apiError.dex_swap.invalid_amount': '유효한 수량을 입력하세요.',
+  'apiError.dex_swap.invalid_slippage': '허용되지 않는 슬리피지 설정입니다.',
+  'apiError.dex_swap.invalid_public_key': '먼저 Solana 지갑을 연결하세요.',
+  'apiError.dex_swap.quote_tampered':
+    '해당 견적이 이 스왑과 일치하지 않습니다. 새 견적을 요청하세요.',
+  'apiError.dex_swap.no_route': '현재 해당 수량에 사용할 수 있는 거래 경로가 없습니다.',
+  'apiError.dex_swap.upstream_error': '스왑 서비스를 이용할 수 없습니다. 나중에 다시 시도하세요.',
+  // The in-game Buy $WOC window (M16 non-Latin fill)
+  'hudChrome.dexSwap.title': '$WOC 구매',
+  'hudChrome.dexSwap.close': '$WOC 구매 닫기',
+  'hudChrome.dexSwap.launcher': '구매',
+  'hudChrome.dexSwap.launcherAria': 'SOL 또는 USDC로 $WOC 구매',
+  'hudChrome.dexSwap.nonCustodial':
+    '스왑은 Jupiter DEX 애그리게이터를 통해 라우팅되며, 본인 지갑이 직접 서명하고 전송합니다. 게임은 결코 당신의 키나 자금을 보관하지 않습니다.',
+  'hudChrome.dexSwap.amountLabel': '지불 금액',
+  'hudChrome.dexSwap.tokenAria': '결제 토큰',
+  'hudChrome.dexSwap.quoteButton': '견적 받기',
+  'hudChrome.dexSwap.quoting': '최적 경로를 찾는 중...',
+  'hudChrome.dexSwap.amountInvalid': '유효한 수량을 입력하세요.',
+  'hudChrome.dexSwap.slippage': '최대 슬리피지: {percent}%',
+  'hudChrome.dexSwap.receiveLine': '약 {amount} $WOC을 받습니다',
+  'hudChrome.dexSwap.payLine': '{amount} {symbol}을 지불합니다',
+  'hudChrome.dexSwap.priceImpact': '가격 영향: {percent}%',
+  'hudChrome.dexSwap.minReceived': '최소 수령량: {amount} $WOC',
+  'hudChrome.dexSwap.buyButton': '$WOC 구매',
+  'hudChrome.dexSwap.quoteStale': '견적이 만료되었습니다. 구매 전에 새 견적을 받으세요.',
+  'hudChrome.dexSwap.requoted':
+    '견적이 만료되어 새 견적을 가져왔습니다. 내용을 확인한 뒤 다시 구매를 누르세요.',
+  'hudChrome.dexSwap.signing': '지갑에서 트랜잭션을 승인하세요...',
+  'hudChrome.dexSwap.sentTitle': '스왑 전송됨',
+  'hudChrome.dexSwap.sentBody':
+    '지갑이 스왑에 서명하여 전송했습니다. 네트워크가 확인하면 $WOC 잔액이 갱신됩니다.',
+  'hudChrome.dexSwap.signatureLabel': '트랜잭션 서명: {signature}',
+  'hudChrome.dexSwap.viewOnExplorer': 'Solana Explorer에서 보기',
+  'hudChrome.dexSwap.buyMore': '$WOC 더 구매',
+  'hudChrome.dexSwap.errWalletFeature':
+    '연결된 지갑은 게임에서 트랜잭션을 보낼 수 없습니다. 다른 Solana 지갑을 사용해 보세요.',
+  'hudChrome.dexSwap.errSignFailed':
+    '트랜잭션이 전송되지 않았습니다. 지갑에서 거절되었을 수 있습니다.',
+  'hudChrome.dexSwap.errNoWallet': '먼저 Solana 지갑을 연결하세요.',
+  // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': '우편함',
   'hudChrome.mailbox.subtitle': '레이븐포스트',
   'hudChrome.mailbox.close': '우편함 닫기',
