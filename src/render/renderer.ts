@@ -4420,6 +4420,7 @@ export class Renderer {
           e.scale,
           this.camera.position.y,
           !visuallyDead,
+          this.fogState === 'outdoor',
         );
       }
 

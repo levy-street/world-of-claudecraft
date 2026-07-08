@@ -110,13 +110,11 @@ void main() {
   }
   lighting += pointLight;
 
-  // 6. Rim light (sun-colored, view-dependent, very subtle)
+  // 6. Rim light (sun-colored, Fresnel-like at sprite edges)
   vec3 viewDir = normalize(uCameraPos - vWorldPos);
-  // Tangential component: perpendicular to sun direction in the view plane
-  float sunDotView = dot(uSunDirection, viewDir);
-  vec3 rimDir = normalize(uSunDirection - viewDir * sunDotView);
-  float rim = pow(1.0 - max(dot(viewDir, vec3(0.0, 1.0, 0.0)), 0.0), 3.0);
-  vec3 rimColor = uSunColor * rim * uRimIntensity;
+  // Fresnel: strong at glancing angles (edges of sprite), zero head-on
+  float fresnel = pow(1.0 - max(dot(viewDir, vec3(0.0, 1.0, 0.0)), 0.0), 3.0);
+  vec3 rimColor = uSunColor * fresnel * uRimIntensity;
   lighting += rimColor;
 
   // 7. Apply biome tint (very subtle color shift)
@@ -126,8 +124,6 @@ void main() {
   vec3 finalColor = texColor.rgb * lighting;
 
   // 9. Fog (Three.js-compatible linear fog)
-  float fogDepth = length(gl_FragCoord.xyz / gl_FragCoord.w);
-  // Approximate fog depth from camera distance
   float fogFactor = smoothstep(fogNear, fogFar, length(vWorldPos - uCameraPos));
   finalColor = mix(finalColor, fogColor, fogFactor);
 
@@ -138,31 +134,6 @@ void main() {
 // ---------------------------------------------------------------------------
 // Material factory
 // ---------------------------------------------------------------------------
-
-let sharedShaderMat: THREE.ShaderMaterial | null = null;
-
-/**
- * Get or create the shared sprite ShaderMaterial.
- * All sprites share this material instance — per-entity tint/color is handled
- * via the material.color property (Three.js multiplies it with the shader output).
- */
-export function getSpriteShaderMaterial(): THREE.ShaderMaterial {
-  if (!sharedShaderMat) {
-    sharedShaderMat = new THREE.ShaderMaterial({
-      vertexShader,
-      fragmentShader,
-      uniforms: {
-        map: { value: null },
-        ...spriteLightingUniforms,
-      },
-      transparent: true,
-      alphaTest: 0.1,
-      side: THREE.DoubleSide,
-      depthWrite: true,
-    });
-  }
-  return sharedShaderMat;
-}
 
 /**
  * Create a per-entity sprite material.

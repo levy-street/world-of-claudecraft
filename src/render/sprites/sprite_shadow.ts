@@ -94,6 +94,7 @@ export function createSpriteShadow(parent: THREE.Object3D): SpriteShadow {
  * @param scale    — `e.scale`
  * @param camY     — camera world Y (for top-down angle fade)
  * @param alive    — false when entity is dead/hidden
+ * @param isOutdoor — false when entity is indoors (shadow hidden)
  */
 export function updateSpriteShadow(
   shadow: SpriteShadow,
@@ -102,8 +103,9 @@ export function updateSpriteShadow(
   scale: number,
   camY: number,
   alive: boolean,
+  isOutdoor: boolean,
 ): void {
-  if (!alive) {
+  if (!alive || !isOutdoor) {
     if (shadow.visible) {
       shadow.mesh.visible = false;
       shadow.visible = false;
