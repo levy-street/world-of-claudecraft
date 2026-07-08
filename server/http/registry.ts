@@ -90,9 +90,10 @@ export interface ApiRegistry {
  *  - both daily-rewards families (server/daily_rewards.ts: the bearer-gated
  *    player routes plus the fail-closed secret-gated /internal/daily-rewards
  *    ops routes);
- *  - the $WOC DEX swap proxy (server/dex_swap.ts: the fail-closed Jupiter
- *    config/quote/swap trio behind WOC_DEX_SWAP_ENABLED; registry-only, born on
- *    the new pipeline with no legacy ladder arm);
+ *  - the $WOC DEX swap proxy (server/dex_swap.ts: the fail-closed
+ *    config/quote/swap trio behind WOC_DEX_SWAP_ENABLED, a thin forwarder to
+ *    the economy service's Jupiter engine; registry-only, born on the new
+ *    pipeline with no legacy ladder arm);
  *  - the custom-map family (server/maps_routes.ts: the owner list/create pair,
  *    the public browse list, the public-or-owner :id read, and the owner-gated
  *    save/delete/fork/publish/unpublish :id routes behind requireOwnedMap);

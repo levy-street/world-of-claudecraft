@@ -6385,7 +6385,7 @@ function wireWallet(): void {
   void loadDexSwapConfig();
 }
 
-// ── In-game Buy $WOC (DEX swap through the server's Jupiter proxy) ──────────
+// ── In-game Buy $WOC (DEX swap via the server's economy-service proxy) ──────
 // main.ts is the net<->ui wiring layer: it fetches /api/dexswap/config once at
 // boot (only when the wallet UI is enabled), and attaches the quote/swap/sign
 // glue to the HUD only when the server reports the feature enabled, so the

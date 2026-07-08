@@ -412,3 +412,27 @@ describe('dex swap view: re-quote debouncer (fake timers)', () => {
     expect(fired).toBe(1);
   });
 });
+
+describe('dex swap view: two quotes racing', () => {
+  it('keeps only the LATEST quote when an older in-flight response lands second', () => {
+    // Quote A starts, then the player re-quotes (B) while A is in flight.
+    let s = beginQuote(createDexSwapState());
+    const seqA = s.seq;
+    s = beginQuote(s);
+    const seqB = s.seq;
+    expect(seqB).toBe(seqA + 1);
+    // B's response lands first and wins.
+    const quoteB: DexSwapQuote = { ...QUOTE_FIXTURE, outAmount: '222' };
+    s = quoteReceived(s, seqB, quoteB, 2_000, 25);
+    expect(s.phase).toBe('quoted');
+    expect(s.quote?.outAmount).toBe('222');
+    // A's slow response lands second: a no-op, B's numbers stay on screen.
+    const quoteA: DexSwapQuote = { ...QUOTE_FIXTURE, outAmount: '111' };
+    const after = quoteReceived(s, seqA, quoteA, 3_000, 25);
+    expect(after).toBe(s);
+    expect(after.quote?.outAmount).toBe('222');
+    // Same for a late failure from A: it cannot clobber B's quote.
+    expect(quoteFailed(s, seqA, 'api')).toBe(s);
+    expect(rateLimited(s, seqA, 1_000, 3_000)).toBe(s);
+  });
+});

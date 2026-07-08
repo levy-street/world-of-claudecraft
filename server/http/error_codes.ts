@@ -173,8 +173,9 @@ export const ERROR_CODES = deepFreeze({
   // identity: "points" (not enough reward points to claim this swag reward)
   'discord.swag_points': { params: [] },
 
-  // --- dex_swap family codes (server/dex_swap.ts, the in-game buy-$WOC Jupiter
-  // proxy). New contracts, no legacy English identity: the family was born on
+  // --- dex_swap family codes (server/dex_swap.ts, the in-game buy-$WOC proxy
+  // to the economy service's Jupiter engine). New contracts, no legacy English
+  // identity: the family was born on
   // the new pipeline (registry-only, no ladder arm), so every code is emitted
   // as an RFC 9457 problem+json body from day one. ---
 
