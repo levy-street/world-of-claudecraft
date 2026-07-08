@@ -95,12 +95,20 @@ function isCovered(
 
 // The swag-claim orphan is an unreachable handler with no dispatch arm today (see
 // the swagClaimOrphanUnreachable known deviation), so it is intentionally NOT
-// served and is excluded from the must-serve set. Referencing the deviation keeps
-// the exclusion documented, not silent.
+// served and is excluded from the must-serve set. The dexswap family (see the
+// dexSwapRegistryOnly deviation) is REGISTRY-ONLY: born on the RouteDef pipeline
+// with no legacy arm to retain, so it is excluded the same way. Referencing the
+// deviations keeps the exclusions documented, not silent.
 const ORPHAN_DEVIATION = KNOWN_DEVIATIONS.find(
   (d) => d.id === DEVIATION_ID.swagClaimOrphanUnreachable,
 );
-const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
+const REGISTRY_ONLY_DEVIATION = KNOWN_DEVIATIONS.find(
+  (d) => d.id === DEVIATION_ID.dexSwapRegistryOnly,
+);
+const EXCLUDED_PATHS = new Set<string>([
+  ...(ORPHAN_DEVIATION?.routes ?? []),
+  ...(REGISTRY_ONLY_DEVIATION?.routes ?? []),
+]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
 // documented unreachable orphan.
@@ -293,6 +301,13 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/assets/mine' },
     { method: 'GET', path: '/api/assets/:file' },
     { method: 'DELETE', path: '/api/assets/:id' },
+    // v0.23.0: the $WOC DEX swap proxy family (server/dex_swap.ts). REGISTRY-ONLY
+    // like the swag claim: born on the RouteDef pipeline, no legacy arm ever
+    // existed (the dexSwapRegistryOnly deviation), so the EXCLUDED_PATHS branch
+    // below asserts router-owned + NOT legacy-served for each.
+    { method: 'GET', path: '/api/dexswap/config' },
+    { method: 'GET', path: '/api/dexswap/quote' },
+    { method: 'POST', path: '/api/dexswap/swap' },
   ];
   const MIGRATED_PATHS = MIGRATED_ROUTES.map((r) => r.path);
 

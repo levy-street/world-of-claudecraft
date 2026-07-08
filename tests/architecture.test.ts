@@ -163,6 +163,7 @@ const UI_PURE_CORES = [
   'src/ui/guild_leaderboard_view.ts',
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
+  'src/ui/dex_swap_view.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/questlog_view.ts',
   'src/ui/swing_timer.ts',

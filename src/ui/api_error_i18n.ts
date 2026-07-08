@@ -107,6 +107,17 @@ export const API_ERROR_KEYS = {
   'discord.swag_claimed': 'apiError.discord.swag_claimed',
   'discord.swag_tier': 'apiError.discord.swag_tier',
   'discord.swag_points': 'apiError.discord.swag_points',
+
+  // dex_swap: the in-game buy-$WOC Jupiter proxy (server/dex_swap.ts).
+  'dex_swap.disabled': 'apiError.dex_swap.disabled',
+  'dex_swap.input_not_allowed': 'apiError.dex_swap.input_not_allowed',
+  'dex_swap.invalid_amount': 'apiError.dex_swap.invalid_amount',
+  'dex_swap.invalid_slippage': 'apiError.dex_swap.invalid_slippage',
+  'dex_swap.invalid_public_key': 'apiError.dex_swap.invalid_public_key',
+  'dex_swap.quote_tampered': 'apiError.dex_swap.quote_tampered',
+  'dex_swap.no_route': 'apiError.dex_swap.no_route',
+  'dex_swap.rate_limited': 'apiError.dex_swap.rate_limited',
+  'dex_swap.upstream_error': 'apiError.dex_swap.upstream_error',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

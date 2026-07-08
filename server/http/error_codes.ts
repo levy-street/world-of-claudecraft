@@ -172,6 +172,34 @@ export const ERROR_CODES = deepFreeze({
   'discord.swag_tier': { params: [] },
   // identity: "points" (not enough reward points to claim this swag reward)
   'discord.swag_points': { params: [] },
+
+  // --- dex_swap family codes (server/dex_swap.ts, the in-game buy-$WOC proxy
+  // to the economy service's Jupiter engine). New contracts, no legacy English
+  // identity: the family was born on
+  // the new pipeline (registry-only, no ladder arm), so every code is emitted
+  // as an RFC 9457 problem+json body from day one. ---
+
+  // The WOC_DEX_SWAP_ENABLED flag is off: every endpoint fails closed with 404.
+  'dex_swap.disabled': { params: [] },
+  // The requested/posted input mint is not in the SOL/USDC allowlist.
+  'dex_swap.input_not_allowed': { params: [] },
+  // The amount is not a positive integer base-unit string within bounds.
+  'dex_swap.invalid_amount': { params: [] },
+  // The slippage is not an integer within 1..DEX_SWAP_MAX_SLIPPAGE_BPS.
+  'dex_swap.invalid_slippage': { params: [] },
+  // The userPublicKey is not a base58-encoded 32-byte Solana address.
+  'dex_swap.invalid_public_key': { params: [] },
+  // The posted quoteResponse was tampered with (outputMint != WOC_MINT, or it
+  // is not a quote object at all).
+  'dex_swap.quote_tampered': { params: [] },
+  // Jupiter found no route to $WOC for that amount (no/thin pool liquidity).
+  'dex_swap.no_route': { params: [] },
+  // The economy service's per-player (or global) rate limit refused the call;
+  // retryAfterMs says exactly when the bucket has a token again (UI cooldown).
+  'dex_swap.rate_limited': { params: ['retryAfterMs'] },
+  // The economy service, Jupiter, or the Solana RPC answered non-200; the
+  // bounded upstream status + error string ride the params, never swallowed.
+  'dex_swap.upstream_error': { params: ['upstreamStatus', 'upstreamError'] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

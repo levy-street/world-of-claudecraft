@@ -6032,6 +6032,55 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_claimed': 'この報酬は既に受け取っています。',
   'apiError.discord.swag_tier': 'これを受け取るにはより高いランクが必要です。',
   'apiError.discord.swag_points': 'ポイントが足りません。',
+  // The in-game buy-$WOC DEX swap proxy (M16 non-Latin fill)
+  'apiError.dex_swap.disabled': 'ゲーム内での$WOC購入は現在利用できません。',
+  'apiError.dex_swap.input_not_allowed': 'その支払いトークンには対応していません。',
+  'apiError.dex_swap.invalid_amount': '有効な数量を入力してください。',
+  'apiError.dex_swap.invalid_slippage': 'そのスリッページ設定は許可されていません。',
+  'apiError.dex_swap.invalid_public_key': 'まずSolanaウォレットを接続してください。',
+  'apiError.dex_swap.quote_tampered':
+    'その見積もりはこのスワップと一致しません。新しい見積もりを取得してください。',
+  'apiError.dex_swap.no_route': '現在その数量で利用できる取引ルートがありません。',
+  'apiError.dex_swap.rate_limited': 'リクエストが多すぎます。しばらく待ってからもう一度お試しください。',
+  'apiError.dex_swap.upstream_error':
+    'スワップサービスは利用できません。後でもう一度お試しください。',
+  // The in-game Buy $WOC window (M16 non-Latin fill)
+  'hudChrome.dexSwap.title': '$WOCを購入',
+  'hudChrome.dexSwap.close': '$WOC購入を閉じる',
+  'hudChrome.dexSwap.launcher': '購入',
+  'hudChrome.dexSwap.launcherAria': 'SOLまたはUSDCで$WOCを購入',
+  'hudChrome.dexSwap.nonCustodial':
+    'スワップはJupiter DEXアグリゲーターを経由し、あなた自身のウォレットが署名して送信します。ゲームがあなたの鍵や資金を預かることはありません。',
+  'hudChrome.dexSwap.amountLabel': '支払い額',
+  'hudChrome.dexSwap.tokenAria': '支払いトークン',
+  'hudChrome.dexSwap.quoteButton': '見積もりを取得',
+  'hudChrome.dexSwap.quoting': '最適なルートを検索中...',
+  'hudChrome.dexSwap.amountInvalid': '有効な数量を入力してください。',
+  'hudChrome.dexSwap.slippage': '最大スリッページ：{percent}%',
+  'hudChrome.dexSwap.receiveLine': '約{amount} $WOCを受け取ります',
+  'hudChrome.dexSwap.payLine': '{amount} {symbol}を支払います',
+  'hudChrome.dexSwap.priceImpact': '価格インパクト：{percent}%',
+  'hudChrome.dexSwap.minReceived': '最低受取額：{amount} $WOC',
+  'hudChrome.dexSwap.buyButton': '$WOCを購入',
+  'hudChrome.dexSwap.quoteStale':
+    '見積もりの有効期限が切れました。購入前に新しい見積もりを取得してください。',
+  'hudChrome.dexSwap.feeLine': '{percent}%のプラットフォーム手数料を含みます',
+  'hudChrome.dexSwap.cooldown': 'リクエストが多すぎます。あと{seconds}秒で再試行できます。',
+  'hudChrome.dexSwap.requoted':
+    '見積もりの有効期限が切れたため、新しい見積もりを取得しました。内容を確認して、もう一度購入を押してください。',
+  'hudChrome.dexSwap.signing': 'ウォレットでトランザクションを承認してください...',
+  'hudChrome.dexSwap.sentTitle': 'スワップを送信しました',
+  'hudChrome.dexSwap.sentBody':
+    'ウォレットがスワップに署名して送信しました。ネットワークが確認すると$WOC残高が更新されます。',
+  'hudChrome.dexSwap.signatureLabel': 'トランザクション署名：{signature}',
+  'hudChrome.dexSwap.viewOnExplorer': 'Solana Explorerで表示',
+  'hudChrome.dexSwap.buyMore': 'さらに$WOCを購入',
+  'hudChrome.dexSwap.errWalletFeature':
+    '接続中のウォレットはゲームからトランザクションを送信できません。別のSolanaウォレットをお試しください。',
+  'hudChrome.dexSwap.errSignFailed':
+    'トランザクションは送信されませんでした。ウォレットで拒否された可能性があります。',
+  'hudChrome.dexSwap.errNoWallet': 'まずSolanaウォレットを接続してください。',
+  // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': 'メールボックス',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',
   'hudChrome.mailbox.close': 'メールボックスを閉じる',

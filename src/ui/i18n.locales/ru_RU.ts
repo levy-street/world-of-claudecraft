@@ -6146,6 +6146,54 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_claimed': 'Вы уже получили эту награду.',
   'apiError.discord.swag_tier': 'Достигните более высокого ранга, чтобы получить это.',
   'apiError.discord.swag_points': 'Недостаточно очков.',
+  // The in-game buy-$WOC DEX swap proxy (M16 non-Latin fill)
+  'apiError.dex_swap.disabled': 'Покупка $WOC в игре сейчас недоступна.',
+  'apiError.dex_swap.input_not_allowed': 'Этот платежный токен не поддерживается.',
+  'apiError.dex_swap.invalid_amount': 'Введите корректное количество.',
+  'apiError.dex_swap.invalid_slippage': 'Такое значение проскальзывания не допускается.',
+  'apiError.dex_swap.invalid_public_key': 'Сначала подключите кошелек Solana.',
+  'apiError.dex_swap.quote_tampered':
+    'Эта котировка не соответствует данному обмену. Запросите новую котировку.',
+  'apiError.dex_swap.no_route': 'Для этого количества сейчас нет доступного торгового маршрута.',
+  'apiError.dex_swap.rate_limited': 'Слишком много запросов. Подождите немного и попробуйте снова.',
+  'apiError.dex_swap.upstream_error': 'Сервис обмена недоступен. Повторите попытку позже.',
+  // The in-game Buy $WOC window (M16 non-Latin fill)
+  'hudChrome.dexSwap.title': 'Купить $WOC',
+  'hudChrome.dexSwap.close': 'Закрыть покупку $WOC',
+  'hudChrome.dexSwap.launcher': 'Купить',
+  'hudChrome.dexSwap.launcherAria': 'Купить $WOC за SOL или USDC',
+  'hudChrome.dexSwap.nonCustodial':
+    'Обмены проходят через DEX-агрегатор Jupiter, а подписывает и отправляет их ваш собственный кошелек. Игра никогда не хранит ваши ключи или средства.',
+  'hudChrome.dexSwap.amountLabel': 'Вы платите',
+  'hudChrome.dexSwap.tokenAria': 'Платежный токен',
+  'hudChrome.dexSwap.quoteButton': 'Получить котировку',
+  'hudChrome.dexSwap.quoting': 'Поиск лучшего маршрута...',
+  'hudChrome.dexSwap.amountInvalid': 'Введите корректное количество.',
+  'hudChrome.dexSwap.slippage': 'Максимальное проскальзывание: {percent}%',
+  'hudChrome.dexSwap.receiveLine': 'Вы получите около {amount} $WOC',
+  'hudChrome.dexSwap.payLine': 'Вы платите {amount} {symbol}',
+  'hudChrome.dexSwap.priceImpact': 'Влияние на цену: {percent}%',
+  'hudChrome.dexSwap.minReceived': 'Минимум к получению: {amount} $WOC',
+  'hudChrome.dexSwap.buyButton': 'Купить $WOC',
+  'hudChrome.dexSwap.quoteStale':
+    'Срок действия котировки истек. Получите новую котировку перед покупкой.',
+  'hudChrome.dexSwap.feeLine': 'Включает платформенную комиссию {percent}%',
+  'hudChrome.dexSwap.cooldown': 'Слишком много запросов. Повторите попытку через {seconds} с.',
+  'hudChrome.dexSwap.requoted':
+    'Срок действия котировки истек, поэтому получена новая. Проверьте ее и нажмите «Купить» еще раз.',
+  'hudChrome.dexSwap.signing': 'Подтвердите транзакцию в кошельке...',
+  'hudChrome.dexSwap.sentTitle': 'Обмен отправлен',
+  'hudChrome.dexSwap.sentBody':
+    'Ваш кошелек подписал и отправил обмен. Баланс $WOC обновится после подтверждения сетью.',
+  'hudChrome.dexSwap.signatureLabel': 'Подпись транзакции: {signature}',
+  'hudChrome.dexSwap.viewOnExplorer': 'Открыть в Solana Explorer',
+  'hudChrome.dexSwap.buyMore': 'Купить еще $WOC',
+  'hudChrome.dexSwap.errWalletFeature':
+    'Подключенный кошелек не может отправлять транзакции из игры. Попробуйте другой кошелек Solana.',
+  'hudChrome.dexSwap.errSignFailed':
+    'Транзакция не была отправлена. Возможно, она была отклонена в вашем кошельке.',
+  'hudChrome.dexSwap.errNoWallet': 'Сначала подключите кошелек Solana.',
+  // The Ravenpost mailbox (M16 non-Latin fill)
   'hudChrome.mailbox.title': 'Почтовый ящик',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',
   'hudChrome.mailbox.close': 'Закрыть почтовый ящик',

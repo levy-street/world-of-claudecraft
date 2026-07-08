@@ -107,6 +107,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   world(): IWorld;
   /** Localized $WOC on-chain balance markup for the money footer. */
   wocBalanceHtml(): string;
+  /** Buy $WOC launcher markup next to the balance ('' when the feature is off). */
+  dexSwapLauncherHtml(): string;
+  /** Open the Buy $WOC window (the launcher's click action). */
+  openDexSwap(): void;
   hideTooltip(): void;
   /** True when this click is the release of a long-press tooltip peek, so the
    *  stack's action (use / sell / deposit / feed) must be SUPPRESSED. Wired to the
@@ -225,7 +229,10 @@ export class BagsWindow {
     grid.scrollTop = prevScrollTop;
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
-    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.moneyHtml(world.copper)}`;
+    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.dexSwapLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
+    moneyRow
+      .querySelector('[data-dexswap-open]')
+      ?.addEventListener('click', () => this.deps.openDexSwap());
     el.appendChild(moneyRow);
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so

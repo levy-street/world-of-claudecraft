@@ -142,6 +142,7 @@ import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
+import type { DexSwapConfig, DexSwapQuote } from './ui/dex_swap_view';
 import {
   type DiscordAccountStatus,
   type DiscordPresenceState,
@@ -1693,6 +1694,9 @@ async function startGame(
         }),
     });
   }
+  // Buy $WOC off the DEX: attach the quote/swap/sign glue (no-op when the
+  // server-side flag is off or the wallet UI is disabled in this build).
+  wireDexSwap(hud);
   function interactKey(): void {
     const p = world.player;
     let bestCorpse: number | null = null,
@@ -6376,6 +6380,123 @@ function wireWallet(): void {
     })
     .catch((e) => console.error('[wallet] load failed', e));
   updateWalletButton();
+  // Boot-time DEX swap config read (flag-off answers 404 and the feature stays
+  // invisible); wireDexSwap re-awaits the same promise when the HUD exists.
+  void loadDexSwapConfig();
+}
+
+// ── In-game Buy $WOC (DEX swap via the server's economy-service proxy) ──────
+// main.ts is the net<->ui wiring layer: it fetches /api/dexswap/config once at
+// boot (only when the wallet UI is enabled), and attaches the quote/swap/sign
+// glue to the HUD only when the server reports the feature enabled, so the
+// launcher and window are invisible while the flag is off.
+let dexSwapConfig: DexSwapConfig | null = null;
+let dexSwapConfigLoad: Promise<void> | null = null;
+
+// A coded /api/dexswap failure: carries the stable problem+json `code` (and the
+// body as `params`) so userFacingApiError localizes it code-first in the window.
+class DexSwapApiError extends Error {
+  constructor(
+    readonly code: string,
+    readonly params: Record<string, unknown>,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'DexSwapApiError';
+  }
+}
+
+async function dexSwapRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  // Quote and swap are authenticated (the server forwards the account id to
+  // the economy service as its per-player rate-limit key).
+  const res = await fetch(path, {
+    ...init,
+    headers: {
+      ...(init?.headers as Record<string, string> | undefined),
+      ...(api.token ? { Authorization: `Bearer ${api.token}` } : {}),
+    },
+  });
+  const body = (await res.json().catch(() => null)) as Record<string, unknown> | null;
+  if (!res.ok) {
+    const code = body && typeof body.code === 'string' ? body.code : '';
+    // The message is a diagnostic fallback (stays English by design); the
+    // window renders the localized text for `code`.
+    throw new DexSwapApiError(code, body ?? {}, `request failed (${res.status})`);
+  }
+  return body as T;
+}
+
+function loadDexSwapConfig(): Promise<void> {
+  if (!WALLET_ENABLED) return Promise.resolve();
+  dexSwapConfigLoad ??= (async () => {
+    try {
+      const res = await fetch('/api/dexswap/config');
+      // 404 IS the flag-off answer (dex_swap.disabled): the feature stays
+      // invisible, deliberately with no error surfaced to the player.
+      if (!res.ok) return;
+      const cfg = (await res.json()) as DexSwapConfig;
+      if (cfg && cfg.enabled === true && Array.isArray(cfg.inputs) && cfg.inputs.length > 0) {
+        dexSwapConfig = cfg;
+      }
+    } catch (err) {
+      // Transport failure at boot: feature hidden this session, diagnostics kept.
+      console.error('[dexswap] config load failed', err);
+    }
+  })();
+  return dexSwapConfigLoad;
+}
+
+function wireDexSwap(hud: Hud): void {
+  if (!WALLET_ENABLED) return;
+  void loadDexSwapConfig().then(() => {
+    if (!dexSwapConfig) return;
+    hud.attachDexSwap({
+      // Launcher gate: the feature is enabled AND this account has a linked wallet.
+      available: () => dexSwapConfig !== null && linkedWalletPubkey !== null,
+      config: () => dexSwapConfig,
+      // The swap binds to the CONNECTED wallet (it is the one that signs); a
+      // linked-but-disconnected wallet surfaces the localized connect-first state.
+      walletAddress: () => walletMod?.currentWallet().address ?? null,
+      fetchQuote: async (inputMint, amount, slippageBps) => {
+        // The proxy relays the service's { quoteResponse, feeBps, feeApplied }
+        // shape; the window renders the fee line from feeBps before signing.
+        const body = await dexSwapRequest<{ quoteResponse: DexSwapQuote; feeBps?: number }>(
+          `/api/dexswap/quote?${new URLSearchParams({
+            inputMint,
+            amount,
+            slippageBps: String(slippageBps),
+          }).toString()}`,
+        );
+        return { quote: body.quoteResponse, feeBps: body.feeBps ?? 0 };
+      },
+      buildSwap: async (quote, userPublicKey) => {
+        const { swapTransaction } = await dexSwapRequest<{ swapTransaction: string }>(
+          '/api/dexswap/swap',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quoteResponse: quote, userPublicKey }),
+          },
+        );
+        return swapTransaction;
+      },
+      signAndSend: async (txBase64) => (await loadWallet()).signAndSendTransactionBase64(txBase64),
+      isWalletFeatureUnsupported: (err) => walletMod?.isWalletFeatureUnsupported(err) ?? false,
+      onSwapSent: () => {
+        // Fresh (cache-bypassing) balance read now, plus one after a typical
+        // confirmation delay, so the bag balance + holder flair pick up the
+        // new tokens (the same fetchWocBalance(owner, fresh=true) path the bag
+        // open uses).
+        refreshWocBalanceOnDemand();
+        const address = linkedWalletPubkey ?? walletMod?.currentWallet().address ?? null;
+        if (address) {
+          window.setTimeout(() => {
+            void refreshWocBalance(address, true);
+          }, 12_000);
+        }
+      },
+    });
+  });
 }
 
 window.addEventListener('woc:wallet-verify', () => {

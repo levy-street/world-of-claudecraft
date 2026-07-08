@@ -167,4 +167,18 @@ export const apiErrorStrings = {
     // reuses hudChrome.discord.swag.needPoints
     swag_points: 'Not enough points.',
   },
+  // dex_swap: the in-game buy-$WOC Jupiter proxy (server/dex_swap.ts). A new
+  // family born on the RouteDef pipeline: coded problem+json from day one, no
+  // legacy prose identity to mirror.
+  dex_swap: {
+    disabled: 'Buying $WOC in game is not available right now.',
+    input_not_allowed: 'That payment token is not supported.',
+    invalid_amount: 'Enter a valid amount.',
+    invalid_slippage: 'That slippage setting is not allowed.',
+    invalid_public_key: 'Connect a Solana wallet first.',
+    quote_tampered: 'That quote does not match this swap. Request a new quote.',
+    no_route: 'No trading route is available for that amount right now.',
+    rate_limited: 'Too many requests. Please wait a moment and try again.',
+    upstream_error: 'The swap service is unavailable. Please try again.',
+  },
 };

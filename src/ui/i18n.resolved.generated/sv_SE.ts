@@ -182,6 +182,37 @@ export const sv_SE: EnTranslations = {
       "title": "Gester",
       "done": "Klar"
     },
+    "dexSwap": {
+      "title": "Buy $WOC",
+      "close": "Close buy $WOC",
+      "launcher": "Buy",
+      "launcherAria": "Buy $WOC with SOL or USDC",
+      "nonCustodial": "Swaps route through the Jupiter DEX aggregator and are signed and sent by your own wallet. The game never holds your keys or funds.",
+      "amountLabel": "You pay",
+      "tokenAria": "Payment token",
+      "quoteButton": "Get quote",
+      "quoting": "Finding the best route...",
+      "amountInvalid": "Enter a valid amount.",
+      "slippage": "Max slippage: {percent}%",
+      "receiveLine": "You receive about {amount} $WOC",
+      "payLine": "You pay {amount} {symbol}",
+      "priceImpact": "Price impact: {percent}%",
+      "minReceived": "Minimum received: {amount} $WOC",
+      "buyButton": "Buy $WOC",
+      "quoteStale": "The quote expired. Get a fresh quote before buying.",
+      "feeLine": "Includes a {percent}% platform fee",
+      "cooldown": "Too many requests. You can try again in {seconds}s.",
+      "requoted": "That quote expired, so a fresh one was fetched. Review it and press Buy again.",
+      "signing": "Approve the transaction in your wallet...",
+      "sentTitle": "Swap sent",
+      "sentBody": "Your wallet signed and sent the swap. Your $WOC balance updates once the network confirms it.",
+      "signatureLabel": "Transaction signature: {signature}",
+      "viewOnExplorer": "View on Solana Explorer",
+      "buyMore": "Buy more $WOC",
+      "errWalletFeature": "Your connected wallet cannot send transactions from the game. Try a different Solana wallet.",
+      "errSignFailed": "The transaction was not sent. It may have been declined in your wallet.",
+      "errNoWallet": "Connect a Solana wallet first."
+    },
     "dailyRewards": {
       "title": "Dagliga belöningar",
       "close": "Stäng dagliga belöningar",
@@ -1534,6 +1565,17 @@ export const sv_SE: EnTranslations = {
       "swag_claimed": "Du har redan hämtat den här belöningen.",
       "swag_tier": "Nå en högre rang för att hämta den här.",
       "swag_points": "Inte tillräckligt med poäng."
+    },
+    "dex_swap": {
+      "disabled": "Buying $WOC in game is not available right now.",
+      "input_not_allowed": "That payment token is not supported.",
+      "invalid_amount": "Enter a valid amount.",
+      "invalid_slippage": "That slippage setting is not allowed.",
+      "invalid_public_key": "Connect a Solana wallet first.",
+      "quote_tampered": "That quote does not match this swap. Request a new quote.",
+      "no_route": "No trading route is available for that amount right now.",
+      "rate_limited": "Too many requests. Please wait a moment and try again.",
+      "upstream_error": "The swap service is unavailable. Please try again."
     }
   },
   "guide": {
