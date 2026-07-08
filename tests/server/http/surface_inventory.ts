@@ -107,7 +107,10 @@ export interface SurfaceRoute {
   readonly requireOwnedExpected: RequireOwnedExpected | null;
   // Distinguishes the query-param forks of /api/leaderboard (same path).
   readonly variant?: string;
-  // True for the swag-claim handler that exists but has no dispatch arm.
+  // True for a route with NO legacy dispatch arm: the swag-claim orphan (a
+  // handler no dispatcher routes to) and the registry-only routes born on the
+  // RouteDef pipeline (the dexswap family), which the legacy-source freshness
+  // scan must not expect to find in main.ts.
   readonly unreachable?: true;
   // The exact regex literal for a `:param` route. Its `.source` equals the
   // regex body in the dispatcher source, which the freshness gate compares.
@@ -776,6 +779,47 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     authScope: AUTH_SCOPE.public,
     limiter: 'wocBalanceRateLimited',
     requireOwnedExpected: null,
+  },
+  // The $WOC DEX swap proxy family (v0.23.0, server/dex_swap.ts): buy $WOC in
+  // game via the Jupiter Swap API, fail-closed behind WOC_DEX_SWAP_ENABLED
+  // (every endpoint answers 404 dex_swap.disabled when off). REGISTRY-ONLY:
+  // born on the RouteDef pipeline with no legacy handleApi arm, so the rows are
+  // flagged `unreachable` (the legacy-source scan must not expect them; see the
+  // dexSwapRegistryOnly known deviation). Public like /api/woc/balance: quotes
+  // read public market data, and the swap build returns an unsigned transaction
+  // only the caller's own wallet can execute.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/dexswap/config',
+    handler: 'dex_swap.ts RouteDef: configHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/dexswap/quote',
+    handler: 'dex_swap.ts RouteDef: quoteHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/dexswap/swap',
+    handler: 'dex_swap.ts RouteDef: swapHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
   },
   // Daily-rewards player family (v0.19.0, server/daily_rewards.ts): served by
   // the handleDailyRewardApi sub-dispatcher behind the main.ts PREFIX arm

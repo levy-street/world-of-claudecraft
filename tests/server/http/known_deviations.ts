@@ -45,6 +45,7 @@ export const DEVIATION_ID = {
   newLimiterDiscord: 'new-limiter-discord',
   discordCallbackHtmlNotRedirect: 'discord-callback-html-not-redirect',
   swagClaimOrphanUnreachable: 'swag-claim-orphan-unreachable',
+  dexSwapRegistryOnly: 'dex-swap-registry-only',
   discordBodyValidationRemap: 'discord-body-validation-remap',
   adminEnumInvalid422: 'admin-enum-invalid-422',
   adminIdParamDecode: 'admin-id-param-decode-422',
@@ -746,6 +747,27 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       'is removed. Not ' +
       'exercised by the parity corpus (no swag fixture, since it 404d), so documented ' +
       'here rather than harness-caught.',
+  },
+  {
+    id: DEVIATION_ID.dexSwapRegistryOnly,
+    routes: ['/api/dexswap/config', '/api/dexswap/quote', '/api/dexswap/swap'],
+    currentBehavior:
+      'The $WOC DEX swap proxy family (server/dex_swap.ts) is REGISTRY-ONLY: it was ' +
+      'born on the RouteDef pipeline and no legacy handleApi arm ever existed, so under ' +
+      'API_DISPATCH=legacy the three paths answer the legacy 404 unknown-endpoint arm. ' +
+      'Every endpoint is additionally fail-closed behind WOC_DEX_SWAP_ENABLED (off = ' +
+      '404 dex_swap.disabled even on the new path).',
+    intendedBehavior:
+      'Preserved: a brand-new feature family needs no legacy rollback arm (there is no ' +
+      'prior behavior to roll back TO; the WOC_DEX_SWAP_ENABLED flag is its own ' +
+      'kill switch). The inventory rows carry `unreachable` so the legacy-source ' +
+      'freshness scan does not expect main.ts arms, and the completeness gate excludes ' +
+      'the family from the must-retain-rollback-arm invariant.',
+    introducedInPhase: null,
+    reason:
+      'New routes land on the RouteDef pipeline only (root CLAUDE.md: never an inline ' +
+      'route in main.ts). The dual-edit rule covers MIGRATED routes; a family with no ' +
+      'legacy twin has nothing to dual-edit.',
   },
   {
     id: DEVIATION_ID.discordBodyValidationRemap,

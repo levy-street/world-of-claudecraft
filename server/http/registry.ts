@@ -27,6 +27,7 @@ import { routes as authRoutes } from '../auth_routes';
 import { routes as characterRoutes } from '../characters';
 import { routes as dailyRewardRoutes } from '../daily_rewards';
 import { routes as desktopLoginRoutes } from '../desktop_login_routes';
+import { routes as dexSwapRoutes } from '../dex_swap';
 import { routes as discordRoutes } from '../discord';
 import { routes as githubRoutes } from '../github';
 import { routes as internalRoutes } from '../internal';
@@ -89,6 +90,9 @@ export interface ApiRegistry {
  *  - both daily-rewards families (server/daily_rewards.ts: the bearer-gated
  *    player routes plus the fail-closed secret-gated /internal/daily-rewards
  *    ops routes);
+ *  - the $WOC DEX swap proxy (server/dex_swap.ts: the fail-closed Jupiter
+ *    config/quote/swap trio behind WOC_DEX_SWAP_ENABLED; registry-only, born on
+ *    the new pipeline with no legacy ladder arm);
  *  - the custom-map family (server/maps_routes.ts: the owner list/create pair,
  *    the public browse list, the public-or-owner :id read, and the owner-gated
  *    save/delete/fork/publish/unpublish :id routes behind requireOwnedMap);
@@ -119,6 +123,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...githubRoutes,
   ...desktopLoginRoutes,
   ...dailyRewardRoutes,
+  ...dexSwapRoutes,
   ...mapsRoutes,
   ...userAssetsRoutes,
   ...adminRoutes,
