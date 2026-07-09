@@ -2924,6 +2924,18 @@
     font-size: 11px;
     color: #ddd;
   }
+  .vendor-item .vi-sub {
+    display: block;
+    font-size: 10px;
+    color: #887c5c;
+  }
+  .vendor-item:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .vendor-item:disabled:hover {
+    background: transparent;
+  }
   .vendor-sell-junk {
     display: flex;
     align-items: center;
