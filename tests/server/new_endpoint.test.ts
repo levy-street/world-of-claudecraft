@@ -57,6 +57,9 @@ const REPO = fileURLToPath(new URL('../../', import.meta.url));
 const SCRIPT = join(REPO, 'scripts', 'new_endpoint.mjs');
 const TSC = join(REPO, 'node_modules', '.bin', 'tsc');
 const VITEST = join(REPO, 'node_modules', '.bin', 'vitest');
+// The .bin shims are .cmd files on Windows, which spawnSync only launches via a
+// shell (the same workaround scripts/gate.mjs uses for npm/npx).
+const SHELL = process.platform === 'win32';
 
 // Every file the generator appends to, seeded as a copy into each temp root.
 const APPEND_TARGETS = [
@@ -105,13 +108,17 @@ function gitPorcelain(): string {
  */
 function runChildVitest(root: string, testPaths: string[]): { status: number; out: string } {
   const config = join(root, 'vitest.golden.config.mjs');
+  // include entries are globs: keep them forward-slashed so a Windows path's
+  // backslashes are not eaten as glob escapes.
+  const include = testPaths.map((p) => p.replaceAll('\\', '/'));
   writeFileSync(
     config,
-    `export default { test: { include: ${JSON.stringify(testPaths)}, exclude: [] } };\n`,
+    `export default { test: { include: ${JSON.stringify(include)}, exclude: [] } };\n`,
   );
   const result = spawnSync(VITEST, ['run', '--config', config], {
     cwd: REPO,
     encoding: 'utf8',
+    shell: SHELL,
     // CI runners color the piped child output (ANSI then sits between "Tests" and the
     // count in the summary line, defeating the plain-text assertions below), so ask the
     // child for no color and strip whatever arrives anyway.
@@ -468,7 +475,11 @@ describe('golden: all three rungs emit, type-check, and pass (one temp root)', (
         files,
       }),
     );
-    const tsc = spawnSync(TSC, ['-p', tsconfig, '--noEmit'], { cwd: REPO, encoding: 'utf8' });
+    const tsc = spawnSync(TSC, ['-p', tsconfig, '--noEmit'], {
+      cwd: REPO,
+      encoding: 'utf8',
+      shell: SHELL,
+    });
     expect(tsc.status, `tsc failed:\n${tsc.stdout}\n${tsc.stderr}`).toBe(0);
 
     // All three emitted tests PASS, plus the code-catalog snapshot stays green against the
