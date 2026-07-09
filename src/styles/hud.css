@@ -67,14 +67,31 @@
     margin-right: 3px;
     filter: drop-shadow(0 1px 1px #000);
   }
-  /* significant-contributor name outline: a steady glow layered over whatever
+  /* significant-contributor name outline: a steady halo layered over whatever
      name color applies (Discord staff or default). The colour is supplied by the
      painter via --dev-outline (per-tier), so no hardcoded hue lives here. No
-     animation, so it is reduced-motion safe. */
+     animation, so it is reduced-motion safe.
+     A crisp 1px ring (eight zero-blur offsets, listed first so they paint nearest
+     the glyph) keeps the letterform edges sharp, with a single small faint blur
+     BEHIND it for the halo flair. The old all-blurred stack (0 0 4px / 0 0 2px,
+     a third of the 12px cap height) smeared the strokes and read as out-of-focus
+     text rather than a halo (issue 1639). */
   .np-name.np-sig-dev {
+    /* The ring is drawn in a SOFTENED tier color: color-mix keeps the per-tier
+       --dev-outline hue but lowers the alpha, so the outline reads as a subtle badge
+       rather than a heavy bold stroke (review of issue 1639). Still a zero-blur ring,
+       so the glyph edges stay sharp; no hardcoded hue (the mix reads --dev-outline). */
+    --dev-ring: color-mix(in srgb, var(--dev-outline) 60%, transparent);
     text-shadow:
-      0 0 4px var(--dev-outline),
-      0 0 2px var(--dev-outline),
+      1px 0 0 var(--dev-ring),
+      -1px 0 0 var(--dev-ring),
+      0 1px 0 var(--dev-ring),
+      0 -1px 0 var(--dev-ring),
+      1px 1px 0 var(--dev-ring),
+      -1px 1px 0 var(--dev-ring),
+      1px -1px 0 var(--dev-ring),
+      -1px -1px 0 var(--dev-ring),
+      0 0 3px var(--dev-ring),
       0 1px 1px #000;
   }
   .np-hpbar {

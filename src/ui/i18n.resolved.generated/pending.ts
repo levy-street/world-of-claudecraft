@@ -10,27 +10,57 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "es_ES": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "fr_FR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "fr_CA": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "de_DE": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
@@ -39,39 +69,84 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "nl_NL": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "pl_PL": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "id_ID": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "tr_TR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "sv_SE": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "vi_VN": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ],
   "da_DK": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.combatText.auraFaded",
     "hudChrome.options.verboseCombatText"
   ]

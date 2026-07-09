@@ -15,11 +15,20 @@ import {
 } from '../src/sim/combat/casting_lifecycle';
 import { handleDeath } from '../src/sim/combat/damage';
 import { MOBS } from '../src/sim/data';
+import { clearNythraxisWardChannelCast } from '../src/sim/encounters/nythraxis';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
+import { readyArenaFighter } from '../src/sim/social/arena';
+import { fiestaDownEntity } from '../src/sim/social/fiesta';
+import { releasePlayerSpirit, resurrectAtSpiritHealer } from '../src/sim/spirit';
 import type { Entity, PlayerClass } from '../src/sim/types';
-import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
+import {
+  CAST_PUSHBACK_SEC,
+  CAST_QUEUE_WINDOW_SEC,
+  CHANNEL_PUSHBACK_FRACTION,
+  FISHING_CAST_ID,
+} from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -265,6 +274,223 @@ describe('casting_lifecycle: pushbackCast', () => {
     pushbackCast(p);
     expect(p.channeling).toBe(true);
     expect(p.castRemaining).toBeCloseTo(Math.max(0, rem0 - tot0 * CHANNEL_PUSHBACK_FRACTION), 9);
+  });
+});
+
+describe('casting_lifecycle: spell queue (#1360)', () => {
+  it('errors on a press outside the queue window (unchanged behavior)', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castRemaining).toBeGreaterThan(CAST_QUEUE_WINDOW_SEC);
+    const errors: Array<Record<string, any>> = [];
+    const orig = (sim as any).emit.bind(sim);
+    (sim as any).emit = (e: Record<string, any>) => {
+      errors.push(e);
+      orig(e);
+    };
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(errors.some((e) => e.type === 'error' && e.text === 'You are busy.')).toBe(true);
+    void meta;
+  });
+
+  it('queues a press within the tail of the cast and fires it on completion', () => {
+    const { sim, p } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    expect(p.castingAbility).toBe('fireball'); // still finishing the first cast
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.queuedCastAbility).toBe('fireball');
+    expect(p.castingAbility).toBe('fireball'); // the in-flight cast is untouched
+
+    // finish draining the first cast; the tick that completes it fires the queued one
+    while (p.queuedCastAbility) sim.tick();
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.castingAbility).toBe('fireball'); // the queued cast just started
+    expect(p.castRemaining).toBeGreaterThan(CAST_QUEUE_WINDOW_SEC);
+  });
+
+  it('keeps only a single queued slot: a later press overwrites the earlier one', () => {
+    const { sim, p } = makeSim('priest', 12);
+    spawnTarget(sim, p); // smite (the second queued press) requires a hostile target
+    p.hp = Math.max(1, p.maxHp - 500);
+    castAbility(sim.ctx, 'lesser_heal', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+
+    castAbility(sim.ctx, 'lesser_heal', p.id);
+    expect(p.queuedCastAbility).toBe('lesser_heal');
+    castAbility(sim.ctx, 'smite', p.id); // a distinct second press replaces the queued slot
+    expect(p.queuedCastAbility).toBe('smite'); // not 'lesser_heal': proves overwrite, not keep-first
+  });
+
+  it('drops a press queued in the tail of a fishing cast instead of stranding it', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    p.castingAbility = FISHING_CAST_ID;
+    p.castTotal = 10;
+    p.castRemaining = CAST_QUEUE_WINDOW_SEC; // inside the queue window
+    p.channeling = false;
+
+    castAbility(sim.ctx, 'fireball', p.id); // pressed during the fishing tail
+    expect(p.queuedCastAbility).toBeNull(); // never queued against fishing
+
+    p.castRemaining = 0;
+    updateCasting(sim.ctx, p, meta); // fishing completes via ctx.completeFishing
+    expect(p.castingAbility).toBeNull();
+    expect(p.queuedCastAbility).toBeNull(); // still nothing lingering to misfire later
+  });
+
+  it('drops the queued cast when the current cast is interrupted, not completed', () => {
+    const { sim, p } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.queuedCastAbility).toBe('fireball');
+
+    cancelCast(sim.ctx, p);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.castingAbility).toBeNull();
+  });
+
+  it('carries the queued aim point through to the fired ground-targeted cast', () => {
+    const { sim, p } = makeSim('mage', 20);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+
+    const aim = { x: p.pos.x + 5, z: p.pos.z + 5 };
+    castAbility(sim.ctx, 'flamestrike', p.id, aim);
+    expect(p.queuedCastAbility).toBe('flamestrike');
+    expect(p.queuedCastAim).toEqual(aim);
+
+    // finish draining the fireball; the completing tick fires the queued, aimed cast
+    while (p.queuedCastAbility) sim.tick();
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+    // flamestrike is instant (castTime 0): it resolves and clears castAim same-tick,
+    // so castingAbility being null (not left on fireball) plus the ability going on
+    // cooldown is the observable proof the fired cast actually ran with the aim.
+    expect(p.castingAbility).toBeNull();
+    expect(p.cooldowns.has('flamestrike')).toBe(true);
+  });
+
+  it('holds a queued cast that would complete before the arming GCD clears, and fires it once the GCD does', () => {
+    const { sim, p } = makeSim('priest', 40);
+    spawnTarget(sim, p);
+    p.spellHaste = 1; // halves cast time: a short cast completes well inside the 1.5s GCD
+    castAbility(sim.ctx, 'flash_heal', p.id); // starts a cast; GCD armed at flat 1.5s
+    expect(p.gcdRemaining).toBeCloseTo(1.5, 5);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+
+    castAbility(sim.ctx, 'flash_heal', p.id);
+    expect(p.queuedCastAbility).toBe('flash_heal');
+
+    while (p.castingAbility === 'flash_heal') sim.tick(); // drains to completion
+    // the cast finished but the GCD from its own start is still running: the queued
+    // press must be held, not dropped
+    expect(p.queuedCastAbility).toBe('flash_heal');
+    expect(p.castingAbility).toBeNull();
+    expect(p.gcdRemaining).toBeGreaterThan(0);
+
+    while (p.queuedCastAbility) sim.tick(); // retried every tick until the GCD clears
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.castingAbility).toBe('flash_heal'); // the held press finally fired
+  });
+});
+
+describe('casting_lifecycle: force-stop clears drop the queued slot', () => {
+  it('death (handleDeath) clears a queued press', () => {
+    const { sim, p } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.queuedCastAbility).toBe('fireball');
+
+    handleDeath(sim.ctx, p, null);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+  });
+
+  it('readyArenaFighter (arena ready/reset) clears a queued press', () => {
+    const { sim, p } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.queuedCastAbility).toBe('fireball');
+
+    readyArenaFighter(sim.ctx, p, { clearPrep: true });
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+  });
+
+  it('fiestaDownEntity clears a queued press', () => {
+    const { sim, p } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.queuedCastAbility).toBe('fireball');
+
+    fiestaDownEntity(sim.ctx, p, null);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+  });
+
+  it('releasePlayerSpirit clears a queued press', () => {
+    const { sim, p } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.queuedCastAbility).toBe('fireball');
+
+    p.hp = 0;
+    handleDeath(sim.ctx, p, null); // release requires the player to already be dead
+    // handleDeath already clears the queue; re-arm it here so this test actually
+    // exercises releasePlayerSpirit's own clear instead of passing on death's.
+    p.queuedCastAbility = 'fireball';
+    p.queuedCastAim = null;
+    releasePlayerSpirit(sim.ctx, p.id);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+  });
+
+  it('resurrectAtSpiritHealer (revive) clears a queued press', () => {
+    const { sim, p } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.queuedCastAbility).toBe('fireball');
+
+    handleDeath(sim.ctx, p, null);
+    releasePlayerSpirit(sim.ctx, p.id);
+    // both handleDeath and releasePlayerSpirit already clear the queue; re-arm it
+    // here so this test actually exercises resurrectAtSpiritHealer's own clear.
+    p.queuedCastAbility = 'fireball';
+    p.queuedCastAim = null;
+    resurrectAtSpiritHealer(sim.ctx, p.id);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+  });
+
+  it('clearNythraxisWardChannelCast clears a queued press behind the ward channel', () => {
+    const { sim, p } = makeSim('mage', 12);
+    p.castingAbility = 'nythraxis_ward_channel';
+    p.channeling = true;
+    p.castTotal = 10;
+    p.castRemaining = CAST_QUEUE_WINDOW_SEC;
+    castAbility(sim.ctx, 'fireball', p.id); // pressed during the ward-channel's tail
+    expect(p.queuedCastAbility).toBe('fireball');
+
+    clearNythraxisWardChannelCast(p);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
   });
 });
 
