@@ -283,6 +283,9 @@ export const nl_NL: EnTranslations = {
     "rest": {
       "resting": "Aan het rusten"
     },
+    "combatText": {
+      "auraFaded": "{name} faded"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -566,6 +569,7 @@ export const nl_NL: EnTranslations = {
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
       "walkByAutoloot": "Buit oprapen in het voorbijgaan",
       "groundReticle": "Grondrichtkruis",
+      "verboseCombatText": "Verbose Combat Text",
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",

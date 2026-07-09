@@ -283,6 +283,9 @@ export const ja_JP: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "combatText": {
+      "auraFaded": "{name}が消えた"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -566,6 +569,7 @@ export const ja_JP: EnTranslations = {
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
+      "verboseCombatText": "詳細な戦闘テキスト",
       "showItemLevel": "アイテムレベルを表示",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",

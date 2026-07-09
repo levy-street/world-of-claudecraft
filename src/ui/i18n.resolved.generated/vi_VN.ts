@@ -283,6 +283,9 @@ export const vi_VN: EnTranslations = {
     "rest": {
       "resting": "Đang Nghỉ Ngơi"
     },
+    "combatText": {
+      "auraFaded": "{name} faded"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -566,6 +569,7 @@ export const vi_VN: EnTranslations = {
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
       "walkByAutoloot": "Tự Nhặt Đồ Khi Đi Ngang",
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
+      "verboseCombatText": "Verbose Combat Text",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",

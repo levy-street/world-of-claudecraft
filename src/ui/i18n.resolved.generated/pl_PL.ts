@@ -283,6 +283,9 @@ export const pl_PL: EnTranslations = {
     "rest": {
       "resting": "Odpoczynek"
     },
+    "combatText": {
+      "auraFaded": "{name} faded"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -566,6 +569,7 @@ export const pl_PL: EnTranslations = {
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
       "walkByAutoloot": "Automatyczny łup w przelocie",
       "groundReticle": "Celownik naziemny",
+      "verboseCombatText": "Verbose Combat Text",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",

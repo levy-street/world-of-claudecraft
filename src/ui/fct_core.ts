@@ -35,7 +35,11 @@ export type FctKind =
   | 'heal'
   | 'xp'
   | 'rested-xp'
-  | 'self-note';
+  | 'self-note'
+  // A relevant-status floater (verbose combat text): e.g. a DoT/HoT/buff fading off a
+  // unit. Carries a caller-supplied localized string like the self-note kind; never a
+  // damage number, never crits, and isSelf does not change its colour.
+  | 'status';
 
 /**
  * The combat-DAMAGE FCT kinds: the high-volume floaters (one per hit, the AoE / boss
@@ -73,7 +77,8 @@ export type FctColorToken =
   | 'heal'
   | 'xp'
   | 'rested-xp'
-  | 'self-note';
+  | 'self-note'
+  | 'status';
 
 /**
  * The minimal entity shape the anchor is read from. Structural on purpose so the core

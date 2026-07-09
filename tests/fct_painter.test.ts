@@ -595,6 +595,9 @@ describe('FCT colour tokens: the .fct-<token> hex stays byte-faithful to the old
     'fct-xp': '#b974ff',
     'fct-rested-xp': '#4a9eff',
     'fct-self-note': '#ff8c66',
+    // Verbose combat text: the relevant-status fade floater (muted lavender, matching the
+    // aura gain/fade combat-log colour).
+    'fct-status': '#d8a0d8',
   };
 
   it('declares every descriptor colour token with its pinned hex', () => {

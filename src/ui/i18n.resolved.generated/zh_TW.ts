@@ -283,6 +283,9 @@ export const zh_TW: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "combatText": {
+      "auraFaded": "{name}已消失"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -566,6 +569,7 @@ export const zh_TW: EnTranslations = {
       "startAttackOnAbility": "使用技能時自動攻擊",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
+      "verboseCombatText": "詳細戰鬥文字",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",

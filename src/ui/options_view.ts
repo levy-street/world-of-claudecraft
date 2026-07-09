@@ -373,6 +373,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     slider(s, 'fctScale', 'hud.options.fctScale'),
     slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
     slider(s, 'chatOpacity', 'hud.options.chatOpacity'),
+    boolToggle(s, 'verboseCombatText', 'hudChrome.options.verboseCombatText'),
     boolToggle(s, 'compactChat', 'hud.options.compactChat'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
     boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),

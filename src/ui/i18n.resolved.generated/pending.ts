@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "es_ES": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "fr_FR": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "fr_CA": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "de_DE": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "nl_NL": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "pl_PL": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "id_ID": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "tr_TR": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "sv_SE": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "vi_VN": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ],
+  "da_DK": [
+    "hudChrome.combatText.auraFaded",
+    "hudChrome.options.verboseCombatText"
+  ]
 };

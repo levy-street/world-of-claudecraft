@@ -268,6 +268,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'fctScale',
       'chatFontScale',
       'chatOpacity',
+      'verboseCombatText',
       'compactChat',
       'frostedPanels',
       'highContrastText',

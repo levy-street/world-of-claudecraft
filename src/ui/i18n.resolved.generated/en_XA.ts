@@ -283,6 +283,9 @@ export const en_XA: EnTranslations = {
     "rest": {
       "resting": "[Ŕéšţíñĝ]"
     },
+    "combatText": {
+      "auraFaded": "[{name} ƒáðéð]"
+    },
     "abilityScaling": {
       "bonus": "[(+{value})]"
     },
@@ -566,6 +569,7 @@ export const en_XA: EnTranslations = {
       "startAttackOnAbility": "[Áúţó-Áţţáçķ óñ Áƀíļíţý Úšé]",
       "walkByAutoloot": "[Ŵáļķ-ƀý Áúţóļóóţ]",
       "groundReticle": "[Ĝŕóúñð-Ţáŕĝéţíñĝ Ŕéţíçļé]",
+      "verboseCombatText": "[Ʋéŕƀóšé Çóɱƀáţ Ţéẋţ]",
       "showItemLevel": "[Šĥóŵ Íţéɱ Ļéʋéļ]",
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",

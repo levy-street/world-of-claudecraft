@@ -283,6 +283,9 @@ export const ko_KR: EnTranslations = {
     "rest": {
       "resting": "휴식 중"
     },
+    "combatText": {
+      "auraFaded": "{name} 효과 사라짐"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -566,6 +569,7 @@ export const ko_KR: EnTranslations = {
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
+      "verboseCombatText": "상세 전투 텍스트",
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",

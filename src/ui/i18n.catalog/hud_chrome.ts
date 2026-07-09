@@ -152,6 +152,12 @@ export const hudChromeStrings = {
   rest: {
     resting: 'Resting',
   },
+  // Verbose combat text (opt-in): the floating status text shown over a unit when one of
+  // your auras fades off it. Target-neutral (it floats over the enemy, the ally, or you),
+  // unlike hud.combat.auraFade which is phrased "from you" for the self combat log.
+  combatText: {
+    auraFaded: '{name} faded',
+  },
   // The Spell Power / Attack Power contribution appended to an ability tooltip's
   // base damage, e.g. "66 to 74 (+29)". Punctuation + a formatted number only (no
   // words), so it is locale-neutral and an English-only add.
@@ -635,6 +641,9 @@ export const hudChromeStrings = {
     // Interface panel toggle: loot corpses by walking past them (off by default).
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',
+    // Interface panel toggle (off by default): float a status floater when one of your
+    // auras (DoT/HoT/buff) fades off you, your target, or a party member.
+    verboseCombatText: 'Verbose Combat Text',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
     itemLevelLine: 'Item Level {level}',

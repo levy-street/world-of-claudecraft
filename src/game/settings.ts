@@ -237,6 +237,12 @@ export const BOOL_SETTINGS = {
   // to just its "Quests (N)" header. Toggled by clicking the tracker header; kept
   // here so the choice persists across sessions like the other HUD preferences.
   questTrackerCollapsed: { def: false },
+  // off by default: verbose combat text. When on, the HUD floats a relevant-status
+  // floater ("Faded: <name>") when one of YOUR auras falls off a unit you care about
+  // (your own buffs/debuffs, a DoT/debuff on your current target, or a HoT/buff on a
+  // party member), so DoTs/HoTs dropping are visible without watching the aura frames.
+  // Purely a client-side display choice read live by the HUD; it never touches the sim.
+  verboseCombatText: { def: false },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.

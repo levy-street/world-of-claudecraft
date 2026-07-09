@@ -2777,6 +2777,12 @@
   .fct-self-note {
     color: #ff8c66;
   }
+  /* Verbose combat text: a relevant-status floater (a DoT/HoT/buff fading off a unit).
+     A muted lavender, matching the aura gain/fade combat-log colour so the fade text
+     reads as status, distinct from the damage/heal/xp floaters. */
+  .fct-status {
+    color: #d8a0d8;
+  }
 
   /* ---------- Interface & Comfort settings ----------
      Each rule is driven by a CSS custom property set on :root from main.ts, or by

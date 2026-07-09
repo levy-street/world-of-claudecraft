@@ -383,6 +383,7 @@ import { buildVcupIndicatorView } from './vale_cup_indicator_view';
 import { ValeCupWindow, vcupNationName } from './vale_cup_window';
 import { buildVendorView } from './vendor_view';
 import { renderVendorWindow } from './vendor_window';
+import { shouldFloatAuraFade } from './verbose_combat_text';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
@@ -9476,6 +9477,33 @@ export class Hud {
             this.combatLog(
               t('hud.combat.auraAfflicted', { target: entityDisplayName(tgt), name: auraName }),
               '#d8a0d8',
+            );
+          }
+          // Verbose combat text (opt-in): float a status floater when one of your auras
+          // (DoT/HoT/buff) FADES off a unit you care about, so you see it drop without
+          // watching the aura frames. Scoped to the player, your current target, and party
+          // members by the pure relevance test; the aura number/heal floaters over the
+          // enemy/ally are unchanged (they already ride the damage/heal2 events).
+          if (
+            tgt &&
+            shouldFloatAuraFade({
+              verbose: this.optionsHooks?.settings.get('verboseCombatText') ?? false,
+              gained: ev.gained,
+              targetId: ev.targetId,
+              playerId: sim.playerId,
+              currentTargetId: sim.player.targetId,
+              partyMemberIds: sim.partyInfo?.members.map((m) => m.pid) ?? [],
+            })
+          ) {
+            this.fctPainter.spawn(
+              {
+                kind: 'status',
+                text: t('hudChrome.combatText.auraFaded', { name: auraName }),
+                target: tgt,
+                crit: false,
+                isSelf: ev.targetId === sim.playerId,
+              },
+              now,
             );
           }
           break;
