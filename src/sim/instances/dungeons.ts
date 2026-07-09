@@ -37,7 +37,14 @@ import {
 } from './difficulty';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
-const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
+const RAID_ALLOWED_DUNGEON_IDS = new Set([
+  'nythraxis_crypt',
+  'nythraxis_boss_arena',
+  'undermount_wing1',
+  'undermount_wing2',
+  'undermount_wing3',
+  'undermount_wing4',
+]);
 const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
@@ -420,8 +427,7 @@ export function instanceInfoAt(
   return null;
 }
 
-// Authoritative: is `pos` physically inside one of the two Nythraxis raid
-// instances (the crypt approach or the boss arena), regardless of raid-GROUP
+// Authoritative: is `pos` physically inside a raid instance, regardless of raid-GROUP
 // membership. Used to silently gate walk-by autoloot (interaction.ts): a rogue
 // looter leaving the raid, or a raid party staging pre-pull in the open world,
 // must not trigger it.
