@@ -988,6 +988,17 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE3_NPCS: Record<string, NpcDef> = {
+  runeseeker_maerin: {
+    id: 'runeseeker_maerin',
+    name: 'Runeseeker Maerin',
+    title: 'Wandering Archaeologist',
+    pos: { x: -170, z: 606 },
+    facing: 0.3,
+    color: 0xc8a24a,
+    questIds: ['q_undermount_heat', 'q_undermount_ledger', 'q_undermount_descent'],
+    greeting:
+      "They told me this was a dead cult's forge, $C. Dead things do not run this hot. Something down there is worth all this smoke.",
+  },
   captain_thessaly: {
     id: 'captain_thessaly',
     name: 'Captain Thessaly',
@@ -1156,6 +1167,66 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE3_QUESTS: Record<string, QuestDef> = {
+  q_undermount_heat: {
+    id: 'q_undermount_heat',
+    name: 'The Heat That Should Not Be',
+    giverNpcId: 'runeseeker_maerin',
+    turnInNpcId: 'runeseeker_maerin',
+    minLevel: 20,
+    text: 'I cannot read the dig-stones with zealots swarming them, $N. The Wyrmcult works this fissure day and night, and the rock is warm a hundred paces from any fire. Thin them out and buy me a quiet hour.',
+    completionText:
+      "Good. Now I can work. These are not a smith's workmarks, $N. They are wards, and something has been cutting them.",
+    objectives: [
+      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 6, label: 'Wyrmcult Zealots slain' },
+    ],
+    xpReward: 600,
+    copperReward: 800,
+    itemRewards: {},
+  },
+  q_undermount_ledger: {
+    id: 'q_undermount_ledger',
+    name: 'What the Cult Buried',
+    giverNpcId: 'runeseeker_maerin',
+    turnInNpcId: 'runeseeker_maerin',
+    requiresQuest: 'q_undermount_heat',
+    minLevel: 20,
+    text: 'The necromancers keep the count of what the forge produces. Break enough of them and I will piece it together. I want to know where all this heat is going.',
+    completionText:
+      'Downward. Every ingot, every ember, all of it spent below us, $N. They are not making anything up here. The forge is a lid.',
+    objectives: [
+      {
+        type: 'kill',
+        targetMobId: 'wyrmcult_necromancer',
+        count: 3,
+        label: 'Wyrmcult Necromancers slain',
+      },
+    ],
+    xpReward: 800,
+    copperReward: 1000,
+    itemRewards: {},
+  },
+  q_undermount_descent: {
+    id: 'q_undermount_descent',
+    name: 'Into the Undermount',
+    giverNpcId: 'runeseeker_maerin',
+    turnInNpcId: 'runeseeker_maerin',
+    requiresQuest: 'q_undermount_ledger',
+    minLevel: 20,
+    text: 'One ritual-leader still holds the inner circle. Put him down, and the cult cannot finish what they started before you reach the bottom.',
+    completionText:
+      'There was never a factory, $N. There was only ever him, and a very good disguise. I am going down with you. Whatever they kept asleep, we are about to wake it early.',
+    objectives: [
+      {
+        type: 'kill',
+        targetMobId: 'wyrmcult_necromancer',
+        count: 1,
+        label: 'Wyrmcult ritual-leader slain',
+      },
+    ],
+    xpReward: 1000,
+    copperReward: 1500,
+    itemRewards: {},
+  },
   q_highwatch_summons: {
     id: 'q_highwatch_summons',
     name: 'The Watch on the Peaks',
@@ -1807,6 +1878,9 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
 };
 
 export const ZONE3_QUEST_ORDER = [
+  'q_undermount_heat',
+  'q_undermount_ledger',
+  'q_undermount_descent',
   'q_highwatch_summons',
   'q_stalkers',
   'q_stalker_pelts',

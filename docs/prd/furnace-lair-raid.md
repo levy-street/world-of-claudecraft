@@ -1020,3 +1020,10 @@ tracked but deliberately out of the skeleton's scope:
    not personally clear the prior wing cannot rejoin the group's already-open
    next wing. Resolve the live claim first and scope the gate to it once
    party/account-wide unseal is specced.
+4. Non-Latin locale fills: the raid's ~17 player-facing English strings (wing
+   dungeon names + enter/leave text, the five boss names, Runeseeker Maerin,
+   and the three pre-quest strings) still need their zh_CN/zh_TW/ja_JP/ko_KR/
+   ru_RU fills for the M16 `i18n_completeness` gate (the maintainer normally
+   supplies these at merge; the content ships English-authored and wired in
+   the meantime). A single focused translation pass, best batched onto a codex
+   reset. Until then `i18n_completeness` is red on the draft, expected.

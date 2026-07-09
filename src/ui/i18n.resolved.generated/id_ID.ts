@@ -7417,6 +7417,11 @@ export const id_ID: EnTranslations = {
         "title": "Pengintai Marsekal",
         "greeting": "Langkah senyap dan pedang pendek membuatmu tetap bernapas di sini. Bicara cepat - aku harus segera kembali ke rerumputan rawa."
       },
+      "runeseeker_maerin": {
+        "name": "Runeseeker Maerin",
+        "title": "Wandering Archaeologist",
+        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
+      },
       "captain_thessaly": {
         "name": "Kapten Thessaly",
         "title": "Kapten Highwatch",
@@ -7906,6 +7911,36 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vael sang Fogbinder dibunuh"
+          }
+        }
+      },
+      "q_undermount_heat": {
+        "title": "The Heat That Should Not Be",
+        "text": "I cannot read the dig-stones with zealots swarming them, {playerName}. The Wyrmcult works this fissure day and night, and the rock is warm a hundred paces from any fire. Thin them out and buy me a quiet hour.",
+        "completion": "Good. Now I can work. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult Zealots slain"
+          }
+        }
+      },
+      "q_undermount_ledger": {
+        "title": "What the Cult Buried",
+        "text": "The necromancers keep the count of what the forge produces. Break enough of them and I will piece it together. I want to know where all this heat is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. They are not making anything up here. The forge is a lid.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult Necromancers slain"
+          }
+        }
+      },
+      "q_undermount_descent": {
+        "title": "Into the Undermount",
+        "text": "One ritual-leader still holds the inner circle. Put him down, and the cult cannot finish what they started before you reach the bottom.",
+        "completion": "There was never a factory, {playerName}. There was only ever him, and a very good disguise. I am going down with you. Whatever they kept asleep, we are about to wake it early.",
+        "objectives": {
+          "0": {
+            "label": "Wyrmcult ritual-leader slain"
           }
         }
       },
