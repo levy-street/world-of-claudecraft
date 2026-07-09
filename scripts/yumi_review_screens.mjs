@@ -140,10 +140,12 @@ if (SHOTS === 'all') {
     const orb = m.yumi.powerups[0];
     orb.state = 'ready';
     orb.timer = 20;
-    // Clear the stage: shove the other fighters out of frame, then park the
-    // orb ahead and OFF-CENTER of the player and look at it (offline sim
-    // state is local and mutable, so this is a legitimate staging trick;
-    // dead-ahead hides the box behind the player model).
+    // Clear the stage: shove the other fighters out of frame, and move the
+    // scene into the maze's open 3x3 CENTER PLAZA so the shot has air around
+    // it instead of a shell wall looming behind (real spawns always sit on
+    // corridor cell centers, ~3yd clear of every wall; the plaza just frames
+    // that honestly). Offline sim state is local and mutable, so this is a
+    // legitimate staging trick.
     for (const pid of [...m.teamA, ...m.teamB]) {
       if (pid === sim.playerId) continue;
       const f = sim.entities.get(pid);
@@ -152,8 +154,14 @@ if (SHOTS === 'all') {
         f.prevPos = { ...f.pos };
       }
     }
-    orb.x = p.pos.x + 1.4;
-    orb.z = p.pos.z - 3.5;
+    const ox = 8400; // maze band x (mirror of yumiMazeOrigin)
+    const oz = -1250 + m.slot * 200;
+    p.pos.x = ox + 1.2;
+    p.pos.z = oz + 4;
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    orb.x = ox - 0.4;
+    orb.z = oz;
     // Aim NEAR the box, not AT it: a dead-on bearing centers the box exactly
     // behind the player model, so offset the yaw to split the silhouettes.
     p.facing = Math.atan2(orb.x - p.pos.x, orb.z - p.pos.z);
