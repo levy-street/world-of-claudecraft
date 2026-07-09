@@ -530,6 +530,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       name: 'Cinder-Toad',
       school: 'fire',
     },
+    // Vitrifying Touch: each melee hit has a chance to stack Glazing on the tank,
+    // a brittle-glass debuff that raises the physical damage they take. It stacks
+    // and refreshes, so an un-swapped tank hardens toward statue-hood and must
+    // hand off (the second tank-swap pressure alongside Cinder-Toad).
+    expose: { chance: 0.4, dmgIncrease: 0.08, duration: 12, name: 'Glazing' },
     loot: [],
     scale: 1.8,
     color: 0x86c6d8,
@@ -815,7 +820,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: 'undermount_wing1',
     name: 'Undermount: The Descent',
     index: 10,
-    overworldDoor: false,
+    // Wing 1 has the raid's only overworld entrance: the Undermount fissure in
+    // the Wyrmcult territory of Thornpeak. Wings 2 to 4 stay internal (reached
+    // through each wing's sealed door), so this is the single walk-in point.
     doorPos: { x: -174, z: 610 },
     entry: { x: 0, z: 4 },
     exitOffset: { x: 0, z: -6 },

@@ -4,6 +4,7 @@
 // until saan_the_stoker and the wing-1 duo spawn list are authored.
 
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../src/sim/data';
 import { enterDungeon, instanceKeyFor } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -36,6 +37,14 @@ function bossIn(sim: AnySim, inst: any, templateId: string): AnyEntity {
 }
 
 describe('Kiln-Keepers duo (wing 1)', () => {
+  it('gives the keepers their signature kit', () => {
+    // Vosh: the two tank-swap pressures (Glazing stack + the Cinder-Toad).
+    expect(MOBS.vosh_the_glazier.expose?.name, 'Glazing').toBe('Glazing');
+    expect(MOBS.vosh_the_glazier.polymorphHex?.name, 'Cinder-Toad').toBe('Cinder-Toad');
+    // Saan: the interruptible Anneal that keeps Vosh up while she lives.
+    expect(MOBS.saan_the_stoker.mendAlly, 'Anneal').toBeDefined();
+  });
+
   it('spawns both keepers in the wing-1 instance', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Solo');
