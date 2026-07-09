@@ -7165,19 +7165,19 @@ export const ko_KR: EnTranslations = {
         "name": "나이트락시스, 손피크의 재앙"
       },
       "vosh_the_glazier": {
-        "name": "Vosh the Glazier"
+        "name": "유리장이 보쉬"
       },
       "saan_the_stoker": {
-        "name": "Saan the Stoker"
+        "name": "화부 사안"
       },
       "the_forge_heart": {
-        "name": "The Forge-Heart"
+        "name": "대장간 심장"
       },
       "odrenn_the_temperer": {
-        "name": "Odrenn the Temperer"
+        "name": "뜨임장이 오드렌"
       },
       "volzharr_buried_furnace": {
-        "name": "Volzharr, the Buried Furnace"
+        "name": "묻힌 용광로 볼자르"
       },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
@@ -7418,9 +7418,9 @@ export const ko_KR: EnTranslations = {
         "greeting": "조용한 발걸음과 짧은 칼날이 목숨을 지킵니다. 빨리 말하십시오. 갈대밭으로 돌아가야 합니다."
       },
       "runeseeker_maerin": {
-        "name": "Runeseeker Maerin",
-        "title": "Wandering Archaeologist",
-        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
+        "name": "룬추적자 매린",
+        "title": "떠도는 고고학자",
+        "greeting": "그들은 이곳이 죽은 교단의 대장간이라고 했습니다, {className}. 죽은 것은 이렇게 뜨겁게 달아오르지 않죠. 저 아래에는 이 모든 연기를 감수할 만한 무언가가 있습니다."
       },
       "captain_thessaly": {
         "name": "대장 테살리",
@@ -7915,32 +7915,32 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_undermount_heat": {
-        "title": "The Heat That Should Not Be",
-        "text": "I cannot read the dig-stones with zealots swarming them, {playerName}. The Wyrmcult works this fissure day and night, and the rock is warm a hundred paces from any fire. Thin them out and buy me a quiet hour.",
-        "completion": "Good. Now I can work. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them.",
+        "title": "있어서는 안 될 열기",
+        "text": "광신도들이 발굴석에 몰려 있으면 그 돌을 읽을 수 없습니다, {playerName}. Wyrmcult 는 밤낮으로 이 균열에서 일하고 있고, 어떤 불에서도 백 걸음 떨어진 바위가 따뜻합니다. 그들을 줄여서 내게 조용한 한 시간을 벌어 주십시오.",
+        "completion": "좋습니다. 이제 일할 수 있겠군요. 이것들은 대장장이의 작업 표식이 아닙니다, {playerName}. 결계입니다. 그리고 무언가가 그것들을 계속 베어 내고 있었죠.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealots slain"
+            "label": "Wyrmcult 광신도 처치"
           }
         }
       },
       "q_undermount_ledger": {
-        "title": "What the Cult Buried",
-        "text": "The necromancers keep the count of what the forge produces. Break enough of them and I will piece it together. I want to know where all this heat is going.",
-        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. They are not making anything up here. The forge is a lid.",
+        "title": "교단이 묻은 것",
+        "text": "강령술사들은 대장간이 만들어 내는 것을 기록합니다. 충분히 부숴 놓으면 제가 조각을 맞춰 보겠습니다. 이 모든 열기가 어디로 가는지 알고 싶습니다.",
+        "completion": "아래입니다. 모든 주괴, 모든 잿불, 전부 우리 발밑에서 쓰이고 있습니다, {playerName}. 그들은 여기 위에서 아무것도 만들고 있지 않습니다. 대장간은 뚜껑입니다.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancers slain"
+            "label": "Wyrmcult 강령술사 처치"
           }
         }
       },
       "q_undermount_descent": {
-        "title": "Into the Undermount",
-        "text": "One ritual-leader still holds the inner circle. Put him down, and the cult cannot finish what they started before you reach the bottom.",
-        "completion": "There was never a factory, {playerName}. There was only ever him, and a very good disguise. I am going down with you. Whatever they kept asleep, we are about to wake it early.",
+        "title": "언더마운트로",
+        "text": "의식 지도자 하나가 아직 내부 원을 장악하고 있습니다. 그를 쓰러뜨리면, 당신이 바닥에 닿기 전에 교단은 시작한 일을 끝낼 수 없습니다.",
+        "completion": "공장은 처음부터 없었습니다, {playerName}. 있었던 것은 오직 그와 아주 훌륭한 위장뿐이었습니다. 저도 함께 내려가겠습니다. 그들이 잠재워 둔 것이 무엇이든, 우리는 그것을 일찍 깨우게 될 겁니다.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult ritual-leader slain"
+            "label": "Wyrmcult 의식 지도자 처치"
           }
         }
       },
@@ -8539,24 +8539,24 @@ export const ko_KR: EnTranslations = {
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
       },
       "undermount_wing1": {
-        "name": "Undermount: The Descent",
-        "enterText": "You descend beneath Thornpeak into glassy dark.",
-        "leaveText": "You climb back from the Undermount descent."
+        "name": "언더마운트: 하강",
+        "enterText": "당신은 쏜피크 아래로 내려가 유리 같은 어둠 속으로 들어갑니다.",
+        "leaveText": "당신은 언더마운트의 하강로에서 기어올라옵니다."
       },
       "undermount_wing2": {
-        "name": "Undermount: The Quenching",
-        "enterText": "Steam curls from the flooded forges ahead.",
-        "leaveText": "You leave the quenching halls behind."
+        "name": "언더마운트: 담금질",
+        "enterText": "앞쪽의 물에 잠긴 용광로에서 증기가 피어오릅니다.",
+        "leaveText": "당신은 담금질 전당을 뒤로합니다."
       },
       "undermount_wing3": {
-        "name": "Undermount: The Tempering",
-        "enterText": "Hammerfalls echo through the tempering vault.",
-        "leaveText": "You retreat from the ringing forgeways."
+        "name": "언더마운트: 뜨임",
+        "enterText": "망치질 소리가 뜨임 금고에 울려 퍼집니다.",
+        "leaveText": "당신은 울리는 화로길에서 물러납니다."
       },
       "undermount_wing4": {
-        "name": "Undermount: The Waking",
-        "enterText": "The buried furnace stirs in the deep.",
-        "leaveText": "You withdraw from the waking heat."
+        "name": "언더마운트: 깨어남",
+        "enterText": "묻힌 용광로가 깊은 곳에서 꿈틀거립니다.",
+        "leaveText": "당신은 깨어나는 열기에서 물러납니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

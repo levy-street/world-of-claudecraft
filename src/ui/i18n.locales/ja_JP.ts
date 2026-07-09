@@ -23,6 +23,46 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveRiteUi.easy': '簡単',
   'delveRiteUi.hard': '難しい',
   'delveUi.object.bell_rope': '鐘の縄',
+  'entities.dungeons.undermount_wing1.name': 'アンダーマウント: 降下',
+  'entities.dungeons.undermount_wing1.enterText':
+    'あなたはソーンピークの下へ降り、硝子のような闇へ入る。',
+  'entities.dungeons.undermount_wing1.leaveText': 'あなたはアンダーマウントの降下路から登り戻る。',
+  'entities.dungeons.undermount_wing2.name': 'アンダーマウント: 焼き入れ',
+  'entities.dungeons.undermount_wing2.enterText': '前方の水没した炉から蒸気が渦を巻く。',
+  'entities.dungeons.undermount_wing2.leaveText': 'あなたは焼き入れの広間を後にする。',
+  'entities.dungeons.undermount_wing3.name': 'アンダーマウント: 焼き戻し',
+  'entities.dungeons.undermount_wing3.enterText': '槌音が焼き戻しの宝物庫に響き渡る。',
+  'entities.dungeons.undermount_wing3.leaveText': 'あなたは鳴り響く炉道から退く。',
+  'entities.dungeons.undermount_wing4.name': 'アンダーマウント: 目覚め',
+  'entities.dungeons.undermount_wing4.enterText': '埋もれた炉が深みで身じろぎする。',
+  'entities.dungeons.undermount_wing4.leaveText': 'あなたは目覚めつつある熱から退く。',
+  'entities.mobs.vosh_the_glazier.name': '玻璃職人ヴォシュ',
+  'entities.mobs.saan_the_stoker.name': '火焚きサーン',
+  'entities.mobs.the_forge_heart.name': '鍛炉の心臓',
+  'entities.mobs.odrenn_the_temperer.name': '焼き戻し師オドレン',
+  'entities.mobs.volzharr_buried_furnace.name': '埋もれた炉ヴォルザール',
+  'entities.npcs.runeseeker_maerin.name': 'ルーン探しのメイリン',
+  'entities.npcs.runeseeker_maerin.title': '放浪の考古学者',
+  'entities.npcs.runeseeker_maerin.greeting':
+    'ここは死んだ教団の鍛炉だと聞かされたよ、{className}。死んだものがここまで熱を出すはずがない。下にはこの煙すべてに見合う何かがある。',
+  'entities.quests.q_undermount_heat.title': 'あるはずのない熱',
+  'entities.quests.q_undermount_heat.text':
+    '狂信者どもが発掘石に群がっていて、読めやしない、{playerName}。Wyrmcult は昼夜この裂け目で働き、どんな火からも百歩離れた岩まで温かい。奴らを間引いて、私に静かな一時間を買ってくれ。',
+  'entities.quests.q_undermount_heat.completion':
+    'よし。これで作業できる。これは鍛冶師の作業印ではない、{playerName}。結界だ。そして何かがそれを切り裂いている。',
+  'entities.quests.q_undermount_heat.objectives.0.label': 'Wyrmcult の狂信者を討伐',
+  'entities.quests.q_undermount_ledger.title': '教団が埋めたもの',
+  'entities.quests.q_undermount_ledger.text':
+    '死霊術師たちは鍛炉が産み出すものの数を記録している。十分に叩き潰せば、私がつなぎ合わせる。この熱がどこへ行くのか知りたい。',
+  'entities.quests.q_undermount_ledger.completion':
+    '下だ。地金ひとつ、残り火ひとつ、すべてが私たちの下で費やされている、{playerName}。ここで何かを作っているのではない。鍛炉は蓋なのだ。',
+  'entities.quests.q_undermount_ledger.objectives.0.label': 'Wyrmcult の死霊術師を討伐',
+  'entities.quests.q_undermount_descent.title': 'アンダーマウントへ',
+  'entities.quests.q_undermount_descent.text':
+    'まだ一人の儀式指導者が内陣を押さえている。そいつを倒せ。底に着く前に、教団は始めたことを終えられなくなる。',
+  'entities.quests.q_undermount_descent.completion':
+    '工場など最初からなかった、{playerName}。いたのは彼だけ、そして実に見事な偽装だけだった。私も一緒に下りる。彼らが眠らせていたものが何であれ、私たちは早めに目覚めさせることになる。',
+  'entities.quests.q_undermount_descent.objectives.0.label': 'Wyrmcult の儀式指導者を討伐',
   'editor.topbar.redo': 'やり直す',
   'editor.topbar.undo': '元に戻す',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',

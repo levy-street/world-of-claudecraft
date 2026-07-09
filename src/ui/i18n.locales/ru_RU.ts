@@ -23,6 +23,46 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveRiteUi.easy': 'Лёгкий',
   'delveRiteUi.hard': 'Сложный',
   'delveUi.object.bell_rope': 'Колокольная Верёвка',
+  'entities.dungeons.undermount_wing1.name': 'Подгорье: Спуск',
+  'entities.dungeons.undermount_wing1.enterText':
+    'Вы спускаетесь под Терновый пик, в стеклянную тьму.',
+  'entities.dungeons.undermount_wing1.leaveText': 'Вы выбираетесь назад со спуска в Подгорье.',
+  'entities.dungeons.undermount_wing2.name': 'Подгорье: Закалка',
+  'entities.dungeons.undermount_wing2.enterText': 'Пар клубится из затопленных горнов впереди.',
+  'entities.dungeons.undermount_wing2.leaveText': 'Вы оставляете залы закалки позади.',
+  'entities.dungeons.undermount_wing3.name': 'Подгорье: Отпуск',
+  'entities.dungeons.undermount_wing3.enterText': 'Удары молотов гремят в хранилище отпуска.',
+  'entities.dungeons.undermount_wing3.leaveText': 'Вы отступаете из звенящих горновых путей.',
+  'entities.dungeons.undermount_wing4.name': 'Подгорье: Пробуждение',
+  'entities.dungeons.undermount_wing4.enterText': 'Погребенная печь шевелится в глубине.',
+  'entities.dungeons.undermount_wing4.leaveText': 'Вы отходите от пробуждающегося жара.',
+  'entities.mobs.vosh_the_glazier.name': 'Вош Стекольщик',
+  'entities.mobs.saan_the_stoker.name': 'Саан Кочегар',
+  'entities.mobs.the_forge_heart.name': 'Сердце Горна',
+  'entities.mobs.odrenn_the_temperer.name': 'Одренн Закальщик',
+  'entities.mobs.volzharr_buried_furnace.name': 'Волзхарр, Погребенная Печь',
+  'entities.npcs.runeseeker_maerin.name': 'Руноискательница Мейрин',
+  'entities.npcs.runeseeker_maerin.title': 'Странствующий археолог',
+  'entities.npcs.runeseeker_maerin.greeting':
+    'Мне сказали, что это горн мертвого культа, {className}. Мертвые вещи не бывают такими горячими. Внизу есть нечто, ради чего стоит весь этот дым.',
+  'entities.quests.q_undermount_heat.title': 'Жар, которого не должно быть',
+  'entities.quests.q_undermount_heat.text':
+    'Я не могу прочесть камни раскопа, пока вокруг них кишат фанатики, {playerName}. Wyrmcult работает у этой расселины день и ночь, а камень теплый в сотне шагов от любого огня. Проредите их и купите мне тихий час.',
+  'entities.quests.q_undermount_heat.completion':
+    'Хорошо. Теперь я могу работать. Это не метки кузнеца, {playerName}. Это обереги, и что-то их разрезает.',
+  'entities.quests.q_undermount_heat.objectives.0.label': 'Фанатики Wyrmcult убиты',
+  'entities.quests.q_undermount_ledger.title': 'Что культ похоронил',
+  'entities.quests.q_undermount_ledger.text':
+    'Некроманты ведут счет тому, что производит горн. Сломайте достаточно из них, и я соберу картину. Я хочу знать, куда уходит весь этот жар.',
+  'entities.quests.q_undermount_ledger.completion':
+    'Вниз. Каждый слиток, каждая искра, все потрачено под нами, {playerName}. Они ничего не делают здесь наверху. Горн это крышка.',
+  'entities.quests.q_undermount_ledger.objectives.0.label': 'Некроманты Wyrmcult убиты',
+  'entities.quests.q_undermount_descent.title': 'В Подгорье',
+  'entities.quests.q_undermount_descent.text':
+    'Один предводитель ритуала все еще держит внутренний круг. Убейте его, и культ не сможет закончить начатое до того, как вы достигнете дна.',
+  'entities.quests.q_undermount_descent.completion':
+    'Никакой фабрики никогда не было, {playerName}. Был только он и очень хорошая маскировка. Я спускаюсь с вами. Что бы они ни держали во сне, мы вот-вот разбудим это раньше срока.',
+  'entities.quests.q_undermount_descent.objectives.0.label': 'Предводитель ритуала Wyrmcult убит',
   'editor.topbar.redo': 'Повторить',
   'editor.topbar.undo': 'Отменить',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',

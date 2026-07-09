@@ -35,8 +35,8 @@
   "counts": {
     "keys": 6549,
     "rows": 137529,
-    "translated": 136696,
-    "pending": 640,
+    "translated": 136856,
+    "pending": 480,
     "blocked": 193,
     "blockedSource": 93
   },
@@ -128312,22 +128312,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "de06a1fc7c1da714",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "de06a1fc7c1da714",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "de06a1fc7c1da714",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "de06a1fc7c1da714",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "de06a1fc7c1da714",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128384,22 +128394,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "abd6d43fcc0f4636",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "abd6d43fcc0f4636",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "abd6d43fcc0f4636",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "abd6d43fcc0f4636",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "abd6d43fcc0f4636",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128456,22 +128476,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "047f489fa73a7604",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "047f489fa73a7604",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "047f489fa73a7604",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "047f489fa73a7604",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "047f489fa73a7604",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128528,22 +128558,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "59fe191dbfc0d76a",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "59fe191dbfc0d76a",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "59fe191dbfc0d76a",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "59fe191dbfc0d76a",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "59fe191dbfc0d76a",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128600,22 +128640,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8e6d8d9223cd919a",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8e6d8d9223cd919a",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8e6d8d9223cd919a",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8e6d8d9223cd919a",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8e6d8d9223cd919a",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128672,22 +128722,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "51a05f5a724ee6cb",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "51a05f5a724ee6cb",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "51a05f5a724ee6cb",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "51a05f5a724ee6cb",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "51a05f5a724ee6cb",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128744,22 +128804,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9ce050e1abb1f413",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9ce050e1abb1f413",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9ce050e1abb1f413",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9ce050e1abb1f413",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9ce050e1abb1f413",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128816,22 +128886,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8263be8874e54d22",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8263be8874e54d22",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8263be8874e54d22",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8263be8874e54d22",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "8263be8874e54d22",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128888,22 +128968,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "338951226409b531",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "338951226409b531",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "338951226409b531",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "338951226409b531",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "338951226409b531",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -128960,22 +129050,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "a383fa0b00db61fb",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "a383fa0b00db61fb",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "a383fa0b00db61fb",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "a383fa0b00db61fb",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "a383fa0b00db61fb",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -129032,22 +129132,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "56d38d03b0f0caf5",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "56d38d03b0f0caf5",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "56d38d03b0f0caf5",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "56d38d03b0f0caf5",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "56d38d03b0f0caf5",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -129104,22 +129214,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "972d166294887eb5",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "972d166294887eb5",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "972d166294887eb5",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "972d166294887eb5",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "972d166294887eb5",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -189880,22 +190000,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f26a37980e98d784",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f26a37980e98d784",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f26a37980e98d784",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f26a37980e98d784",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f26a37980e98d784",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -191632,22 +191762,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "4cf79f0c4a0ea904",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "4cf79f0c4a0ea904",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "4cf79f0c4a0ea904",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "4cf79f0c4a0ea904",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "4cf79f0c4a0ea904",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -193048,22 +193188,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9d2842ba8afe41c7",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9d2842ba8afe41c7",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9d2842ba8afe41c7",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9d2842ba8afe41c7",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "9d2842ba8afe41c7",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -194688,22 +194838,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "7c8b5855b4bf1fc2",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "7c8b5855b4bf1fc2",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "7c8b5855b4bf1fc2",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "7c8b5855b4bf1fc2",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "7c8b5855b4bf1fc2",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -194760,22 +194920,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "5284ac9250091edf",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "5284ac9250091edf",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "5284ac9250091edf",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "5284ac9250091edf",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "5284ac9250091edf",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -203694,22 +203864,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "628f4fced877f3a4",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "628f4fced877f3a4",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "628f4fced877f3a4",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "628f4fced877f3a4",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "628f4fced877f3a4",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -203766,22 +203946,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41a7d093db6edd33",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41a7d093db6edd33",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41a7d093db6edd33",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41a7d093db6edd33",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41a7d093db6edd33",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -203838,22 +204028,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "814811c31b5fc570",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "814811c31b5fc570",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "814811c31b5fc570",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "814811c31b5fc570",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "814811c31b5fc570",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -241824,22 +242024,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4579b5e7b592918",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4579b5e7b592918",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4579b5e7b592918",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4579b5e7b592918",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4579b5e7b592918",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -241896,22 +242106,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "172f5ea39c50a2dd",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "172f5ea39c50a2dd",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "172f5ea39c50a2dd",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "172f5ea39c50a2dd",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "172f5ea39c50a2dd",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -241968,22 +242188,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41d42380026d880f",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41d42380026d880f",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41d42380026d880f",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41d42380026d880f",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "41d42380026d880f",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242040,22 +242270,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4e50d5ecb7e9f6e",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4e50d5ecb7e9f6e",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4e50d5ecb7e9f6e",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4e50d5ecb7e9f6e",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "f4e50d5ecb7e9f6e",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242114,22 +242354,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "17c41aed466f69dd",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "17c41aed466f69dd",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "17c41aed466f69dd",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "17c41aed466f69dd",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "17c41aed466f69dd",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242186,22 +242436,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "cef2c236f700f345",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "cef2c236f700f345",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "cef2c236f700f345",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "cef2c236f700f345",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "cef2c236f700f345",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242260,22 +242520,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "2a15c9d91ceec7fe",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "2a15c9d91ceec7fe",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "2a15c9d91ceec7fe",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "2a15c9d91ceec7fe",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "2a15c9d91ceec7fe",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242332,22 +242602,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "330dee123f5d41dd",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "330dee123f5d41dd",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "330dee123f5d41dd",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "330dee123f5d41dd",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "330dee123f5d41dd",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242406,22 +242686,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "c6b58fdfc05ec58a",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "c6b58fdfc05ec58a",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "c6b58fdfc05ec58a",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "c6b58fdfc05ec58a",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "c6b58fdfc05ec58a",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242478,22 +242768,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "d08e309b76ef0490",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "d08e309b76ef0490",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "d08e309b76ef0490",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "d08e309b76ef0490",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "d08e309b76ef0490",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242550,22 +242850,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "1cf04fa3888048cb",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "1cf04fa3888048cb",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "1cf04fa3888048cb",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "1cf04fa3888048cb",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "1cf04fa3888048cb",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"
@@ -242622,22 +242932,32 @@
           "state": "pending"
         },
         "zh_CN": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "928ff5d0e7149045",
+          "by": "human"
         },
         "zh_TW": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "928ff5d0e7149045",
+          "by": "human"
         },
         "ko_KR": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "928ff5d0e7149045",
+          "by": "human"
         },
         "ja_JP": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "928ff5d0e7149045",
+          "by": "human"
         },
         "pt_BR": {
           "state": "pending"
         },
         "ru_RU": {
-          "state": "pending"
+          "state": "translated",
+          "srcHash": "928ff5d0e7149045",
+          "by": "human"
         },
         "cs_CZ": {
           "state": "pending"

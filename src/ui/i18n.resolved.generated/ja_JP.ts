@@ -7165,19 +7165,19 @@ export const ja_JP: EnTranslations = {
         "name": "ナイスラクシス、ソーンピークの災厄"
       },
       "vosh_the_glazier": {
-        "name": "Vosh the Glazier"
+        "name": "玻璃職人ヴォシュ"
       },
       "saan_the_stoker": {
-        "name": "Saan the Stoker"
+        "name": "火焚きサーン"
       },
       "the_forge_heart": {
-        "name": "The Forge-Heart"
+        "name": "鍛炉の心臓"
       },
       "odrenn_the_temperer": {
-        "name": "Odrenn the Temperer"
+        "name": "焼き戻し師オドレン"
       },
       "volzharr_buried_furnace": {
-        "name": "Volzharr, the Buried Furnace"
+        "name": "埋もれた炉ヴォルザール"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
@@ -7418,9 +7418,9 @@ export const ja_JP: EnTranslations = {
         "greeting": "静かな足取りと短い刃が命を守ります。手短に。葦原へ戻らねばなりません。"
       },
       "runeseeker_maerin": {
-        "name": "Runeseeker Maerin",
-        "title": "Wandering Archaeologist",
-        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
+        "name": "ルーン探しのメイリン",
+        "title": "放浪の考古学者",
+        "greeting": "ここは死んだ教団の鍛炉だと聞かされたよ、{className}。死んだものがここまで熱を出すはずがない。下にはこの煙すべてに見合う何かがある。"
       },
       "captain_thessaly": {
         "name": "隊長テサリー",
@@ -7915,32 +7915,32 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_undermount_heat": {
-        "title": "The Heat That Should Not Be",
-        "text": "I cannot read the dig-stones with zealots swarming them, {playerName}. The Wyrmcult works this fissure day and night, and the rock is warm a hundred paces from any fire. Thin them out and buy me a quiet hour.",
-        "completion": "Good. Now I can work. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them.",
+        "title": "あるはずのない熱",
+        "text": "狂信者どもが発掘石に群がっていて、読めやしない、{playerName}。Wyrmcult は昼夜この裂け目で働き、どんな火からも百歩離れた岩まで温かい。奴らを間引いて、私に静かな一時間を買ってくれ。",
+        "completion": "よし。これで作業できる。これは鍛冶師の作業印ではない、{playerName}。結界だ。そして何かがそれを切り裂いている。",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealots slain"
+            "label": "Wyrmcult の狂信者を討伐"
           }
         }
       },
       "q_undermount_ledger": {
-        "title": "What the Cult Buried",
-        "text": "The necromancers keep the count of what the forge produces. Break enough of them and I will piece it together. I want to know where all this heat is going.",
-        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. They are not making anything up here. The forge is a lid.",
+        "title": "教団が埋めたもの",
+        "text": "死霊術師たちは鍛炉が産み出すものの数を記録している。十分に叩き潰せば、私がつなぎ合わせる。この熱がどこへ行くのか知りたい。",
+        "completion": "下だ。地金ひとつ、残り火ひとつ、すべてが私たちの下で費やされている、{playerName}。ここで何かを作っているのではない。鍛炉は蓋なのだ。",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancers slain"
+            "label": "Wyrmcult の死霊術師を討伐"
           }
         }
       },
       "q_undermount_descent": {
-        "title": "Into the Undermount",
-        "text": "One ritual-leader still holds the inner circle. Put him down, and the cult cannot finish what they started before you reach the bottom.",
-        "completion": "There was never a factory, {playerName}. There was only ever him, and a very good disguise. I am going down with you. Whatever they kept asleep, we are about to wake it early.",
+        "title": "アンダーマウントへ",
+        "text": "まだ一人の儀式指導者が内陣を押さえている。そいつを倒せ。底に着く前に、教団は始めたことを終えられなくなる。",
+        "completion": "工場など最初からなかった、{playerName}。いたのは彼だけ、そして実に見事な偽装だけだった。私も一緒に下りる。彼らが眠らせていたものが何であれ、私たちは早めに目覚めさせることになる。",
         "objectives": {
           "0": {
-            "label": "Wyrmcult ritual-leader slain"
+            "label": "Wyrmcult の儀式指導者を討伐"
           }
         }
       },
@@ -8539,24 +8539,24 @@ export const ja_JP: EnTranslations = {
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
       "undermount_wing1": {
-        "name": "Undermount: The Descent",
-        "enterText": "You descend beneath Thornpeak into glassy dark.",
-        "leaveText": "You climb back from the Undermount descent."
+        "name": "アンダーマウント: 降下",
+        "enterText": "あなたはソーンピークの下へ降り、硝子のような闇へ入る。",
+        "leaveText": "あなたはアンダーマウントの降下路から登り戻る。"
       },
       "undermount_wing2": {
-        "name": "Undermount: The Quenching",
-        "enterText": "Steam curls from the flooded forges ahead.",
-        "leaveText": "You leave the quenching halls behind."
+        "name": "アンダーマウント: 焼き入れ",
+        "enterText": "前方の水没した炉から蒸気が渦を巻く。",
+        "leaveText": "あなたは焼き入れの広間を後にする。"
       },
       "undermount_wing3": {
-        "name": "Undermount: The Tempering",
-        "enterText": "Hammerfalls echo through the tempering vault.",
-        "leaveText": "You retreat from the ringing forgeways."
+        "name": "アンダーマウント: 焼き戻し",
+        "enterText": "槌音が焼き戻しの宝物庫に響き渡る。",
+        "leaveText": "あなたは鳴り響く炉道から退く。"
       },
       "undermount_wing4": {
-        "name": "Undermount: The Waking",
-        "enterText": "The buried furnace stirs in the deep.",
-        "leaveText": "You withdraw from the waking heat."
+        "name": "アンダーマウント: 目覚め",
+        "enterText": "埋もれた炉が深みで身じろぎする。",
+        "leaveText": "あなたは目覚めつつある熱から退く。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

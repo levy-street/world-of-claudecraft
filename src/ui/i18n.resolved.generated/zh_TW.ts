@@ -7165,19 +7165,19 @@ export const zh_TW: EnTranslations = {
         "name": "尼思拉克西斯，荊峰之災"
       },
       "vosh_the_glazier": {
-        "name": "Vosh the Glazier"
+        "name": "玻匠沃什"
       },
       "saan_the_stoker": {
-        "name": "Saan the Stoker"
+        "name": "司爐薩安"
       },
       "the_forge_heart": {
-        "name": "The Forge-Heart"
+        "name": "鍛爐之心"
       },
       "odrenn_the_temperer": {
-        "name": "Odrenn the Temperer"
+        "name": "回火者奧德倫"
       },
       "volzharr_buried_furnace": {
-        "name": "Volzharr, the Buried Furnace"
+        "name": "沃爾札爾，埋藏熔爐"
       },
       "reliquary_ledger_wraith": {
         "name": "名冊幽靈"
@@ -7418,9 +7418,9 @@ export const zh_TW: EnTranslations = {
         "greeting": "安靜的腳步和短刃能保命。快說，我得回蘆葦地去。"
       },
       "runeseeker_maerin": {
-        "name": "Runeseeker Maerin",
-        "title": "Wandering Archaeologist",
-        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
+        "name": "尋符者梅林",
+        "title": "流浪考古學家",
+        "greeting": "他們告訴我這是一個死去邪教的鍛爐，{className}。死物不會燒得這麼熱。下面一定有什麼值得吞下這些煙塵。"
       },
       "captain_thessaly": {
         "name": "瑟薩莉隊長",
@@ -7915,32 +7915,32 @@ export const zh_TW: EnTranslations = {
         }
       },
       "q_undermount_heat": {
-        "title": "The Heat That Should Not Be",
-        "text": "I cannot read the dig-stones with zealots swarming them, {playerName}. The Wyrmcult works this fissure day and night, and the rock is warm a hundred paces from any fire. Thin them out and buy me a quiet hour.",
-        "completion": "Good. Now I can work. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them.",
+        "title": "不該存在的熱量",
+        "text": "狂信徒在掘石旁蜂擁，我就讀不懂那些石頭，{playerName}。Wyrmcult 日夜經營這道裂隙，岩石在離任何火焰百步外都還發熱。削弱他們，給我買來一小時清靜。",
+        "completion": "很好。現在我能幹活了。這些不是鐵匠的工印，{playerName}。它們是結界，而且有什麼東西一直在切開它們。",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealots slain"
+            "label": "已擊殺 Wyrmcult 狂信徒"
           }
         }
       },
       "q_undermount_ledger": {
-        "title": "What the Cult Buried",
-        "text": "The necromancers keep the count of what the forge produces. Break enough of them and I will piece it together. I want to know where all this heat is going.",
-        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. They are not making anything up here. The forge is a lid.",
+        "title": "邪教埋藏之物",
+        "text": "死靈法師記錄著鍛爐產出了什麼。打垮足夠多的他們，我就能拼出真相。我想知道這些熱量究竟流向何處。",
+        "completion": "向下。每一塊錠，每一點餘燼，全都耗在我們腳下，{playerName}。他們不是在這裡製造東西。鍛爐是一只蓋子。",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancers slain"
+            "label": "已擊殺 Wyrmcult 死靈法師"
           }
         }
       },
       "q_undermount_descent": {
-        "title": "Into the Undermount",
-        "text": "One ritual-leader still holds the inner circle. Put him down, and the cult cannot finish what they started before you reach the bottom.",
-        "completion": "There was never a factory, {playerName}. There was only ever him, and a very good disguise. I am going down with you. Whatever they kept asleep, we are about to wake it early.",
+        "title": "進入地底山",
+        "text": "還有一個儀式首領掌控著內圈。放倒他，在你抵達底部之前，邪教就無法完成他們開頭的事。",
+        "completion": "從來沒有什麼工廠，{playerName}。從來只有他，以及一層非常高明的偽裝。我要和你一起下去。無論他們讓什麼東西沉睡，我們都要提前喚醒它。",
         "objectives": {
           "0": {
-            "label": "Wyrmcult ritual-leader slain"
+            "label": "已擊殺 Wyrmcult 儀式首領"
           }
         }
       },
@@ -8539,24 +8539,24 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你回到荊峰的寒冷空氣中。"
       },
       "undermount_wing1": {
-        "name": "Undermount: The Descent",
-        "enterText": "You descend beneath Thornpeak into glassy dark.",
-        "leaveText": "You climb back from the Undermount descent."
+        "name": "地底山: 下行",
+        "enterText": "你下到荊峰之下，進入玻璃般的黑暗。",
+        "leaveText": "你從地底山的下行路爬回。"
       },
       "undermount_wing2": {
-        "name": "Undermount: The Quenching",
-        "enterText": "Steam curls from the flooded forges ahead.",
-        "leaveText": "You leave the quenching halls behind."
+        "name": "地底山: 淬火",
+        "enterText": "蒸汽從前方被水淹沒的鍛爐中捲起。",
+        "leaveText": "你把淬火大廳拋在身後。"
       },
       "undermount_wing3": {
-        "name": "Undermount: The Tempering",
-        "enterText": "Hammerfalls echo through the tempering vault.",
-        "leaveText": "You retreat from the ringing forgeways."
+        "name": "地底山: 回火",
+        "enterText": "錘擊聲在回火寶庫中迴盪。",
+        "leaveText": "你從鳴響的爐道撤退。"
       },
       "undermount_wing4": {
-        "name": "Undermount: The Waking",
-        "enterText": "The buried furnace stirs in the deep.",
-        "leaveText": "You withdraw from the waking heat."
+        "name": "地底山: 甦醒",
+        "enterText": "被埋的熔爐在深處躁動。",
+        "leaveText": "你從甦醒的熱浪中撤離。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

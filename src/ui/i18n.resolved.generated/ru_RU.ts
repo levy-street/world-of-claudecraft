@@ -7165,19 +7165,19 @@ export const ru_RU: EnTranslations = {
         "name": "Нитраксис, Бич Торнпика"
       },
       "vosh_the_glazier": {
-        "name": "Vosh the Glazier"
+        "name": "Вош Стекольщик"
       },
       "saan_the_stoker": {
-        "name": "Saan the Stoker"
+        "name": "Саан Кочегар"
       },
       "the_forge_heart": {
-        "name": "The Forge-Heart"
+        "name": "Сердце Горна"
       },
       "odrenn_the_temperer": {
-        "name": "Odrenn the Temperer"
+        "name": "Одренн Закальщик"
       },
       "volzharr_buried_furnace": {
-        "name": "Volzharr, the Buried Furnace"
+        "name": "Волзхарр, Погребенная Печь"
       },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"
@@ -7418,9 +7418,9 @@ export const ru_RU: EnTranslations = {
         "greeting": "Тихие шаги и короткий клинок сохраняют жизнь. Говорите быстро, мне пора в камыши."
       },
       "runeseeker_maerin": {
-        "name": "Runeseeker Maerin",
-        "title": "Wandering Archaeologist",
-        "greeting": "They told me this was a dead cult's forge, {className}. Dead things do not run this hot. Something down there is worth all this smoke."
+        "name": "Руноискательница Мейрин",
+        "title": "Странствующий археолог",
+        "greeting": "Мне сказали, что это горн мертвого культа, {className}. Мертвые вещи не бывают такими горячими. Внизу есть нечто, ради чего стоит весь этот дым."
       },
       "captain_thessaly": {
         "name": "Капитан Тессали",
@@ -7915,32 +7915,32 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_undermount_heat": {
-        "title": "The Heat That Should Not Be",
-        "text": "I cannot read the dig-stones with zealots swarming them, {playerName}. The Wyrmcult works this fissure day and night, and the rock is warm a hundred paces from any fire. Thin them out and buy me a quiet hour.",
-        "completion": "Good. Now I can work. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them.",
+        "title": "Жар, которого не должно быть",
+        "text": "Я не могу прочесть камни раскопа, пока вокруг них кишат фанатики, {playerName}. Wyrmcult работает у этой расселины день и ночь, а камень теплый в сотне шагов от любого огня. Проредите их и купите мне тихий час.",
+        "completion": "Хорошо. Теперь я могу работать. Это не метки кузнеца, {playerName}. Это обереги, и что-то их разрезает.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealots slain"
+            "label": "Фанатики Wyrmcult убиты"
           }
         }
       },
       "q_undermount_ledger": {
-        "title": "What the Cult Buried",
-        "text": "The necromancers keep the count of what the forge produces. Break enough of them and I will piece it together. I want to know where all this heat is going.",
-        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. They are not making anything up here. The forge is a lid.",
+        "title": "Что культ похоронил",
+        "text": "Некроманты ведут счет тому, что производит горн. Сломайте достаточно из них, и я соберу картину. Я хочу знать, куда уходит весь этот жар.",
+        "completion": "Вниз. Каждый слиток, каждая искра, все потрачено под нами, {playerName}. Они ничего не делают здесь наверху. Горн это крышка.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancers slain"
+            "label": "Некроманты Wyrmcult убиты"
           }
         }
       },
       "q_undermount_descent": {
-        "title": "Into the Undermount",
-        "text": "One ritual-leader still holds the inner circle. Put him down, and the cult cannot finish what they started before you reach the bottom.",
-        "completion": "There was never a factory, {playerName}. There was only ever him, and a very good disguise. I am going down with you. Whatever they kept asleep, we are about to wake it early.",
+        "title": "В Подгорье",
+        "text": "Один предводитель ритуала все еще держит внутренний круг. Убейте его, и культ не сможет закончить начатое до того, как вы достигнете дна.",
+        "completion": "Никакой фабрики никогда не было, {playerName}. Был только он и очень хорошая маскировка. Я спускаюсь с вами. Что бы они ни держали во сне, мы вот-вот разбудим это раньше срока.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult ritual-leader slain"
+            "label": "Предводитель ритуала Wyrmcult убит"
           }
         }
       },
@@ -8539,24 +8539,24 @@ export const ru_RU: EnTranslations = {
         "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
       },
       "undermount_wing1": {
-        "name": "Undermount: The Descent",
-        "enterText": "You descend beneath Thornpeak into glassy dark.",
-        "leaveText": "You climb back from the Undermount descent."
+        "name": "Подгорье: Спуск",
+        "enterText": "Вы спускаетесь под Терновый пик, в стеклянную тьму.",
+        "leaveText": "Вы выбираетесь назад со спуска в Подгорье."
       },
       "undermount_wing2": {
-        "name": "Undermount: The Quenching",
-        "enterText": "Steam curls from the flooded forges ahead.",
-        "leaveText": "You leave the quenching halls behind."
+        "name": "Подгорье: Закалка",
+        "enterText": "Пар клубится из затопленных горнов впереди.",
+        "leaveText": "Вы оставляете залы закалки позади."
       },
       "undermount_wing3": {
-        "name": "Undermount: The Tempering",
-        "enterText": "Hammerfalls echo through the tempering vault.",
-        "leaveText": "You retreat from the ringing forgeways."
+        "name": "Подгорье: Отпуск",
+        "enterText": "Удары молотов гремят в хранилище отпуска.",
+        "leaveText": "Вы отступаете из звенящих горновых путей."
       },
       "undermount_wing4": {
-        "name": "Undermount: The Waking",
-        "enterText": "The buried furnace stirs in the deep.",
-        "leaveText": "You withdraw from the waking heat."
+        "name": "Подгорье: Пробуждение",
+        "enterText": "Погребенная печь шевелится в глубине.",
+        "leaveText": "Вы отходите от пробуждающегося жара."
       },
       "drowned_temple": {
         "name": "Утонувший храм",
