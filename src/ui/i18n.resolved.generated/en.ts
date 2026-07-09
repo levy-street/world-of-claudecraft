@@ -397,7 +397,13 @@ export const en: EnTranslations = {
       "targetFriendly": "Target Nearest Friendly",
       "targetFriendlyNext": "Cycle Friendly Target",
       "discord": "Discord",
-      "valecup": "Vale Cup"
+      "valecup": "Vale Cup",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "The Vale Cup",

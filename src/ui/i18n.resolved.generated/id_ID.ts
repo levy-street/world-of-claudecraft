@@ -397,7 +397,13 @@ export const id_ID: EnTranslations = {
       "targetFriendly": "Bidik Sekutu Terdekat",
       "targetFriendlyNext": "Putar Bidikan Sekutu",
       "discord": "Discord",
-      "valecup": "Piala Lembah"
+      "valecup": "Piala Lembah",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Piala Lembah",

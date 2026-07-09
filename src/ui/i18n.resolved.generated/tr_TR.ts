@@ -397,7 +397,13 @@ export const tr_TR: EnTranslations = {
       "targetFriendly": "En Yakın Dostu Hedefle",
       "targetFriendlyNext": "Dost Hedefler Arasında Geç",
       "discord": "Discord",
-      "valecup": "Vadi Kupası"
+      "valecup": "Vadi Kupası",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "Vadi Kupası",

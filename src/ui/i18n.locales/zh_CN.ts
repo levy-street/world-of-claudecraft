@@ -5882,6 +5882,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.chatPlaceholder': '说点什么...',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷杯',
+  'hudChrome.keybinds.categoryPet': '宠物',
+  'hudChrome.keybinds.petAttack': '宠物：攻击',
+  'hudChrome.keybinds.petStop': '宠物：停止',
+  'hudChrome.keybinds.petTaunt': '宠物：嘲讽',
+  'hudChrome.keybinds.petDefensive': '宠物：防御',
+  'hudChrome.keybinds.petAggressive': '宠物：攻击性',
   'hudChrome.vcup.title': '溪谷杯',
   'hudChrome.vcup.close': '关闭溪谷杯窗口',
   'hudChrome.vcup.offlineNote': '赛程簿已合上。溪谷杯目前不可用。',

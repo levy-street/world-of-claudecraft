@@ -397,7 +397,13 @@ export const zh_TW: EnTranslations = {
       "targetFriendly": "選取最近友方",
       "targetFriendlyNext": "切換友方目標",
       "discord": "Discord",
-      "valecup": "溪谷盃"
+      "valecup": "溪谷盃",
+      "categoryPet": "寵物",
+      "petAttack": "寵物：攻擊",
+      "petStop": "寵物：停止",
+      "petTaunt": "寵物：嘲諷",
+      "petDefensive": "寵物：防禦",
+      "petAggressive": "寵物：攻擊性"
     },
     "vcup": {
       "title": "溪谷盃",

@@ -9,25 +9,130 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "es_ES": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "fr_FR": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "fr_CA": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "de_DE": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "nl_NL": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "pl_PL": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "id_ID": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "tr_TR": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "sv_SE": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "vi_VN": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ],
+  "da_DK": [
+    "hudChrome.keybinds.categoryPet",
+    "hudChrome.keybinds.petAggressive",
+    "hudChrome.keybinds.petAttack",
+    "hudChrome.keybinds.petDefensive",
+    "hudChrome.keybinds.petStop",
+    "hudChrome.keybinds.petTaunt"
+  ]
 };

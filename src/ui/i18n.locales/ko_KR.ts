@@ -6193,6 +6193,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.chatPlaceholder': '메시지 입력...',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '베일 컵',
+  'hudChrome.keybinds.categoryPet': '펫',
+  'hudChrome.keybinds.petAttack': '펫: 공격',
+  'hudChrome.keybinds.petStop': '펫: 정지',
+  'hudChrome.keybinds.petTaunt': '펫: 도발',
+  'hudChrome.keybinds.petDefensive': '펫: 방어',
+  'hudChrome.keybinds.petAggressive': '펫: 공격적',
   'hudChrome.vcup.title': '베일 컵',
   'hudChrome.vcup.close': '베일 컵 창 닫기',
   'hudChrome.vcup.offlineNote': '대진표가 닫혀 있습니다. 지금은 베일 컵을 이용할 수 없습니다.',

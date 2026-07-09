@@ -397,7 +397,13 @@ export const ko_KR: EnTranslations = {
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "targetFriendlyNext": "아군 대상 순환",
       "discord": "Discord",
-      "valecup": "베일 컵"
+      "valecup": "베일 컵",
+      "categoryPet": "펫",
+      "petAttack": "펫: 공격",
+      "petStop": "펫: 정지",
+      "petTaunt": "펫: 도발",
+      "petDefensive": "펫: 방어",
+      "petAggressive": "펫: 공격적"
     },
     "vcup": {
       "title": "베일 컵",

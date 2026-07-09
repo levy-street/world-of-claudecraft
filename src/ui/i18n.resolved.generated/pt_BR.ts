@@ -397,7 +397,13 @@ export const pt_BR: EnTranslations = {
       "targetFriendly": "Selecionar aliado mais próximo",
       "targetFriendlyNext": "Alternar alvo aliado",
       "discord": "Discord",
-      "valecup": "Copa do Vale"
+      "valecup": "Copa do Vale",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "A Copa do Vale",
