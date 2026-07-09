@@ -17,6 +17,7 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
+import { undermountWing, undermountWingSealed } from '../encounters/undermount';
 import { createGroundObject, createMob } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -101,6 +102,10 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   }
   if (!party?.raid && raidRequired) {
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
+    return;
+  }
+  if (undermountWing(dungeonId) && undermountWingSealed(r.meta.undermountCleared, dungeonId)) {
+    ctx.error(r.meta.entityId, 'The way down is sealed. The wing above must fall first.');
     return;
   }
   if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta)) {

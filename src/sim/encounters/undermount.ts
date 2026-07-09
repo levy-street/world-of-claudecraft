@@ -6,9 +6,18 @@
 // land here later, following the encounters/nythraxis.ts pattern; for now this
 // is the walking-skeleton backbone that the instance layer consults.
 //
-// Pure and host-agnostic: no rng, no Sim state, no DOM. The instance layer
-// (src/sim/instances/dungeons.ts) is the only consumer and passes in the set of
-// cleared wing dungeonIds it tracks.
+// The wing chain + seal predicate are pure (no rng, no Sim state, no DOM); the
+// instance layer (src/sim/instances/dungeons.ts) consumes them. grantUndermountClear
+// is the one ctx-dependent function (boss-death credit), mirroring
+// encounters/nythraxis.ts grantNythraxisLockout.
+
+import type { SimContext } from '../sim_context';
+import { dist2d, type Entity } from '../types';
+
+// Players within this many yards of the dead boss's spawn get the wing cleared.
+// Matches NYTHRAXIS_ROOM_RADIUS: large enough to cover the interior, small enough
+// not to bleed into an adjacent instance's origin.
+const UNDERMOUNT_ROOM_RADIUS = 260;
 
 export interface UndermountWing {
   /** The DUNGEON_DEFS id for this wing's instance. */
@@ -63,4 +72,29 @@ export function undermountWingSealed(cleared: ReadonlySet<string>, dungeonId: st
   const wing = WING_BY_DUNGEON.get(dungeonId);
   if (!wing || wing.requires === null) return false;
   return !cleared.has(wing.requires);
+}
+
+const WING_BY_BOSS = new Map(UNDERMOUNT_WINGS.map((w) => [w.bossMobId, w] as const));
+
+/** The wing whose boss is `bossMobId`, or undefined if it is not an Undermount boss. */
+export function undermountWingByBoss(bossMobId: string): UndermountWing | undefined {
+  return WING_BY_BOSS.get(bossMobId);
+}
+
+/**
+ * Boss-death credit: when an Undermount wing boss dies, record its wing as
+ * cleared (permanent progress) on every player in the room, so the sealed door
+ * to the next wing opens for the raid. Credits by proximity to the boss's spawn
+ * (like grantNythraxisLockout), which scopes it to the boss's instance. No-ops
+ * for any non-wing-boss death.
+ */
+export function grantUndermountClear(ctx: SimContext, boss: Entity): void {
+  const wing = WING_BY_BOSS.get(boss.templateId);
+  if (!wing) return;
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
+    if (p && dist2d(p.pos, boss.spawnPos) <= UNDERMOUNT_ROOM_RADIUS) {
+      meta.undermountCleared.add(wing.dungeonId);
+    }
+  }
 }

@@ -118,6 +118,7 @@ import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
 import * as nythraxis from './encounters/nythraxis';
+import * as undermount from './encounters/undermount';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
 // delves/runs.ts + render/dungeon.ts; W11 dropped the stranded sim.ts import. I2a's delve
@@ -901,6 +902,11 @@ export interface PlayerMeta {
   // parity samples and character persistence do not churn on a default.
   dungeonDifficulty?: DungeonDifficulty;
   raidLockouts: Map<string, number>; // dungeon id -> epoch ms expiry
+  // Permanent Undermount raid progress: the set of wing dungeonIds whose boss
+  // this character has cleared. Gates the sealed door to the next wing (unlike
+  // raidLockouts, this never resets). Session-only for now; persistence is a
+  // follow-up (see docs/prd/furnace-lair-raid.md).
+  undermountCleared: Set<string>;
   // Transient presence status. Set by /afk and /dnd, cleared when the player
   // chats again. Session-only — never persisted, so it resets on login.
   away: AwayStatus | null;
@@ -1725,6 +1731,7 @@ export class Sim {
       loadouts: [],
       activeLoadout: -1,
       raidLockouts: new Map(),
+      undermountCleared: new Set(),
       away: null,
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
@@ -2837,6 +2844,7 @@ export class Sim {
       // N1: grantNythraxisLockout now lives in encounters/nythraxis.ts; late-bound arrow
       // (handleDeath in combat/damage.ts reaches it via ctx on the boss-death path).
       grantNythraxisLockout: (boss) => nythraxis.grantNythraxisLockout(sim.ctx, boss),
+      grantUndermountClear: (boss) => undermount.grantUndermountClear(sim.ctx, boss),
       // frenzyPackmates / armDeathThroes flipped points-at to mob/lifecycle (M4); their
       // late-bound lifecycle arrows live in the death-lifecycle block below.
       refreshKnownAbilities: sim.refreshKnownAbilities.bind(sim),

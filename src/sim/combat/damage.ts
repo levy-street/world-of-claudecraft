@@ -23,6 +23,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
+import { undermountWingByBoss } from '../encounters/undermount';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -622,6 +623,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       });
     }
     if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
+    if (undermountWingByBoss(e.templateId)) ctx.grantUndermountClear(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer =
