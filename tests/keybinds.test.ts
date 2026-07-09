@@ -100,7 +100,8 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
     expect(kb.actionForCode('KeyU')).toBe('discord');
-    expect(kb.actionForCode('KeyT')).toBe('crafting');
+    expect(kb.actionForCode('KeyT')).toBe('assist');
+    expect(kb.actionForCode('KeyZ')).toBe('crafting');
     expect(kb.actionForCode('KeyY')).toBe('valecup');
     expect(kb.actionForCode('Backquote')).toBe(null);
   });

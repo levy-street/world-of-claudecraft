@@ -145,7 +145,7 @@ export const BIND_ACTIONS: BindAction[] = [
     label: 'Assist Target',
     category: 'Targeting',
     kind: 'edge',
-    defaults: ['KeyZ'],
+    defaults: ['KeyT'],
   },
   // Only acts while the Attack Move setting is on; shares its default key with
   // Turn Left intentionally, and only that key is reserved while active.
@@ -163,7 +163,7 @@ export const BIND_ACTIONS: BindAction[] = [
   { id: 'questlog', label: 'Quest Log', category: 'Interface', kind: 'edge', defaults: ['KeyL'] },
   { id: 'map', label: 'World Map', category: 'Interface', kind: 'edge', defaults: ['KeyM'] },
   { id: 'bags', label: 'Bags', category: 'Interface', kind: 'edge', defaults: ['KeyB'] },
-  { id: 'crafting', label: 'Crafting', category: 'Interface', kind: 'edge', defaults: ['KeyT'] },
+  { id: 'crafting', label: 'Crafting', category: 'Interface', kind: 'edge', defaults: ['KeyZ'] },
   {
     id: 'nameplates',
     label: 'Toggle Nameplates',
