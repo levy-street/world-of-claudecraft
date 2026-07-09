@@ -5309,6 +5309,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Poslední obřad",
         "description": "Mohutná vlna léčení: obnoví {damage} zdraví. Cooldown 10 min."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Zhojení světlem",
         "description": "Rychlý a úsporný záblesk Světla, který vyléčí spojenecký cíl za {damage}."

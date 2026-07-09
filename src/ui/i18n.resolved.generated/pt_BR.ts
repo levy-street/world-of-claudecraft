@@ -5309,6 +5309,10 @@ export const pt_BR: EnTranslations = {
         "name": "Extrema-Unção",
         "description": "Uma onda massiva de cura: restaura {damage} de vida. Recarga de 10 min."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Cura Luminosa",
         "description": "Uma explosão de Luz rápida e eficiente que cura um alvo aliado em {damage}."

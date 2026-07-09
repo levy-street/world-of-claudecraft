@@ -5309,6 +5309,10 @@ export const nl_NL: EnTranslations = {
         "name": "Laatste Rite",
         "description": "Een enorme golf van genezing: herstelt {damage} levenskracht. 10 min hersteltijd."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Lichtheling",
         "description": "Een snelle, doeltreffende uitbarsting van Licht die een bevriend doelwit voor {damage} geneest."

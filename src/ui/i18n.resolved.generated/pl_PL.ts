@@ -5309,6 +5309,10 @@ export const pl_PL: EnTranslations = {
         "name": "Ostatnie namaszczenie",
         "description": "Potężny przypływ uzdrowienia: przywraca {damage} zdrowia. 10 min czasu odnowienia."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Świetliste ukojenie",
         "description": "Szybki, oszczędny rozbłysk światła, który leczy sprzymierzony cel o {damage}."

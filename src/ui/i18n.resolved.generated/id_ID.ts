@@ -5309,6 +5309,10 @@ export const id_ID: EnTranslations = {
         "name": "Ritus Terakhir",
         "description": "Lonjakan penyembuhan masif: memulihkan {damage} kesehatan. Jeda 10 menit."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Lightmend",
         "description": "Semburan Cahaya yang cepat dan efisien yang menyembuhkan target sekutu sebesar {damage}."

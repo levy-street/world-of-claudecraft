@@ -5309,6 +5309,10 @@ export const zh_TW: EnTranslations = {
         "name": "臨終聖禮",
         "description": "巨大的治療湧流：恢復 {damage} 點生命值。10 分鐘冷卻時間。"
       },
+      "holy_taunt": {
+        "name": "神聖挑釁",
+        "description": "嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。"
+      },
       "flash_of_light": {
         "name": "光癒術",
         "description": "快速而高效的聖光迸發，為一個友方目標恢復 {damage} 點生命值。"

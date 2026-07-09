@@ -5309,6 +5309,10 @@ export const ja_JP: EnTranslations = {
         "name": "最後の秘跡",
         "description": "大きな癒やしの波で体力を{damage}回復します。クールダウン10分。"
       },
+      "holy_taunt": {
+        "name": "聖なる挑発",
+        "description": "対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。"
+      },
       "flash_of_light": {
         "name": "光の癒し",
         "description": "素早く効率的な光の迸りで味方対象の体力を {damage} 回復します。"

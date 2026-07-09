@@ -5309,6 +5309,10 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 의식",
         "description": "막대한 치유의 힘으로 생명력을 {damage}만큼 회복시킵니다. 재사용 대기시간 10분."
       },
+      "holy_taunt": {
+        "name": "신성한 부추김",
+        "description": "대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다."
+      },
       "flash_of_light": {
         "name": "빛의 치유",
         "description": "빠르고 효율적인 빛줄기로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."

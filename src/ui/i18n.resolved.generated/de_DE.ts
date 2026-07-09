@@ -5309,6 +5309,10 @@ export const de_DE: EnTranslations = {
         "name": "Letzte Ölung",
         "description": "Ein gewaltiger Heilungsstoß: Stellt {damage} Gesundheit wieder her. 10 Min. Abklingzeit."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Lightmend",
         "description": "Ein schneller, effizienter Lichtstoß, der ein freundliches Ziel um {damage} heilt."

@@ -5309,6 +5309,10 @@ export const en: EnTranslations = {
         "name": "Last Rite",
         "description": "A massive surge of healing: restores {damage} health. 10 min cooldown."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Lightmend",
         "description": "A quick, efficient burst of Light that heals a friendly target for {damage}."

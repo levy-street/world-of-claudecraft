@@ -5309,6 +5309,10 @@ export const it_IT: EnTranslations = {
         "name": "Ultimo Rito",
         "description": "Una grande ondata di guarigione: ripristina {damage} salute. Tempo di recupero di 10 min."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Rammendo di Luce",
         "description": "Un rapido ed efficiente sprazzo di Luce che cura un bersaglio alleato di {damage}."

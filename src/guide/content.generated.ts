@@ -293,6 +293,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Last Rite"
       },
       {
+        "id": "holy_taunt",
+        "name": "Sacred Goad"
+      },
+      {
         "id": "flash_of_light",
         "name": "Lightmend"
       },

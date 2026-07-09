@@ -5309,6 +5309,10 @@ export const fr_CA: EnTranslations = {
         "name": "Dernier sacrement",
         "description": "Une vague de soins massive: rend {damage} points de vie. Temps de recharge de 10 min."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Lightmend",
         "description": "Un éclat de Lumière rapide et efficace qui rend {damage} points de vie à une cible alliée."

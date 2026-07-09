@@ -1980,6 +1980,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': 'Последний обряд',
   'entities.abilities.lay_on_hands.description':
     'Мощный поток исцеления: восстанавливает {damage} здоровья. Время восстановления 10 мин.',
+  'entities.abilities.holy_taunt.name': 'Священное подстрекательство',
+  'entities.abilities.holy_taunt.description':
+    'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
   'entities.abilities.flash_of_light.name': 'Заживление Светом',
   'entities.abilities.flash_of_light.description':
     'Быстрая и действенная вспышка Света, исцеляющая дружественную цель на {damage}.',

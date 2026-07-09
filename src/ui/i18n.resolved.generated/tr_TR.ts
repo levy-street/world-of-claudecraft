@@ -5309,6 +5309,10 @@ export const tr_TR: EnTranslations = {
         "name": "Son Ayin",
         "description": "Devasa bir iyileştirme dalgası: {damage} can geri kazandırır. 10 dakika bekleme süresi."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Işık Şifası",
         "description": "Dost bir hedefi {damage} iyileştiren hızlı ve verimli bir Işık patlaması."

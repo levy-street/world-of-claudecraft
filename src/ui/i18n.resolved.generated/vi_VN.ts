@@ -5309,6 +5309,10 @@ export const vi_VN: EnTranslations = {
         "name": "Nghi Thức Cuối Cùng",
         "description": "Một luồng trị liệu khổng lồ: hồi phục {damage} máu. Hồi chiêu 10 phút."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Ánh Quang Hàn Gắn",
         "description": "Một luồng Thánh Quang nhanh và hiệu quả trị liệu cho đồng minh {damage} máu."

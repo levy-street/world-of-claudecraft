@@ -1878,6 +1878,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': '臨終聖禮',
   'entities.abilities.lay_on_hands.description':
     '巨大的治療湧流：恢復 {damage} 點生命值。10 分鐘冷卻時間。',
+  'entities.abilities.holy_taunt.name': '神聖挑釁',
+  'entities.abilities.holy_taunt.description':
+    '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
   'entities.abilities.flash_of_light.name': '光癒術',
   'entities.abilities.flash_of_light.description':
     '快速而高效的聖光迸發，為一個友方目標恢復 {damage} 點生命值。',

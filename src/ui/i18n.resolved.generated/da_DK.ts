@@ -5309,6 +5309,10 @@ export const da_DK: EnTranslations = {
         "name": "Sidste Rite",
         "description": "En massiv bølge af helbredelse: genopretter {damage} helbred. 10 min afkøling."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Lyslægning",
         "description": "Et hurtigt, effektivt udbrud af Lys, der helbreder et venligt mål for {damage}."

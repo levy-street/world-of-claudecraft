@@ -5309,6 +5309,10 @@ export const sv_SE: EnTranslations = {
         "name": "Sista smörjelsen",
         "description": "En massiv våg av läkning: återställer {damage} hälsa. 10 min nedkylning."
       },
+      "holy_taunt": {
+        "name": "Sacred Goad",
+        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+      },
       "flash_of_light": {
         "name": "Ljuslagning",
         "description": "En snabb, effektiv ljusskur som läker ett vänligt mål för {damage}."

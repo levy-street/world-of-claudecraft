@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "es_ES": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "fr_FR": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "fr_CA": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "de_DE": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "nl_NL": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "pl_PL": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "id_ID": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "tr_TR": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "sv_SE": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "vi_VN": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ],
+  "da_DK": [
+    "entities.abilities.holy_taunt.description",
+    "entities.abilities.holy_taunt.name"
+  ]
 };
