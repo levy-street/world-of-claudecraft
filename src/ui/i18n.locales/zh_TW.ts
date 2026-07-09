@@ -2190,6 +2190,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': '玄網絲腺',
   'entities.items.supply_crate.name': '被盜補給箱',
   'entities.items.greyjaw_fang.name': '老灰顎的尖牙',
+  'entities.items.chunk_of_ore.name': '礦石塊',
   'entities.items.weathered_ledger_page.name': '風化帳頁',
   'entities.items.morthen_grimoire.name': '莫森的魔典',
   'entities.items.wolf_fang.name': '裂開的狼牙',
@@ -2557,6 +2558,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '守潮者',
   'entities.npcs.tidewatcher_ondrel.greeting':
     '湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。',
+  'entities.quests.q_prof_intro.title': '人人都有一技之長',
+  'entities.quests.q_prof_intro.text':
+    '伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。',
+  'entities.quests.q_prof_intro.completion':
+    '看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，這裡面都有正經買賣等著你。',
+  'entities.quests.q_prof_intro.objectives.0.label': '礦石塊',
   'entities.quests.q_wolves.title': '門前群狼',
   'entities.quests.q_wolves.text':
     '森林狼已敢撲咬北路旅人，{playerName}。擊敗8隻森林狼，讓東溪能鬆一口氣。',

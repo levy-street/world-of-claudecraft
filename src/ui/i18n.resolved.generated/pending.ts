@@ -10,6 +10,11 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -18,6 +23,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "es_ES": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -26,6 +36,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "fr_FR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -34,6 +49,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "fr_CA": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -43,6 +63,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -51,6 +76,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "de_DE": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -63,6 +93,11 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -72,6 +107,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -80,6 +120,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "nl_NL": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -88,6 +133,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "pl_PL": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -96,6 +146,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "id_ID": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -104,6 +159,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "tr_TR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -112,6 +172,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "sv_SE": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -120,6 +185,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "vi_VN": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
@@ -128,6 +198,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.petTaunt"
   ],
   "da_DK": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.keybinds.categoryPet",
     "hudChrome.keybinds.petAggressive",
     "hudChrome.keybinds.petAttack",
