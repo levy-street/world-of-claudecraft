@@ -199,6 +199,15 @@ async function conceptStage(job, { kind, description, family, image, rigType }) 
   // A --redo concept clears this step first, correctly forcing a fresh prompt.
   const doneConcept = job.state.steps.concept;
   if (doneConcept?.status === 'done') return doneConcept.result;
+  // An imported model (--model-file) has a completed generate step but never ran
+  // concept; a later `--redo texture` repaint (or finish) re-enters the lane with
+  // no prompt. Since generate is already done, concept's output is unused
+  // downstream; skip it rather than abort demanding a --prompt/--image the import
+  // never had. A --redo generate cascade clears generate first, so this won't mask
+  // a genuine from-scratch re-roll.
+  if (job.state.steps.generate?.status === 'done') {
+    return { input: null, conceptPath: null, source: 'skipped-generate-done' };
+  }
   if (image) {
     return job.step('concept', async () => {
       if (/^https?:\/\//.test(image) || /^(task_|file_)/.test(image)) {
@@ -406,14 +415,19 @@ async function cmdWeapon() {
     // --apply time, after the credits were already spent.
     throw new Error(`weapon --name must be snake_case ([a-z0-9_]): ${name}`);
   }
-  const family = weaponFamilyFor(opt('family') ?? name);
+  const job = Job.open({ job: opt('job'), kind: 'weapon', name, create: flag('new-job') });
+  // Resolve family from --family, else the family the job recorded at generation,
+  // else infer from the name. finish/apply resume the lane WITHOUT re-passing
+  // --family, so without the recorded fallback a weapon whose name carries no
+  // family keyword (e.g. "skyrender_heaven_s_fracture") would fail every step
+  // after generate, even though it generated fine with the family picked in the UI.
+  const family = weaponFamilyFor(opt('family') ?? job.state.family ?? name);
   if (!family) {
     throw new Error(
       `cannot infer weapon family from "${opt('family') ?? name}"; the key must contain one of: ` +
-        'sword, dagger, staff, hammer, axe, halberd, spear, scythe, wand (test contract), or pass --family',
+        'sword, dagger, knife, axe, hammer, mace, staff, wand, halberd, spear, scythe, book, tome, crossbow, bow (test contract), or pass --family',
     );
   }
-  const job = Job.open({ job: opt('job'), kind: 'weapon', name, create: flag('new-job') });
   applyRedo(job, 'weapon');
   job.set('kind', 'weapon');
   job.set('name', name);
@@ -1296,12 +1310,13 @@ async function cmdLibrary() {
     './lib/library.mjs'
   );
   console.log('collecting inventory...');
-  let assets = collectInventory();
   const only = opt('category');
-  if (only) {
+  const filterByCategory = (list) => {
+    if (!only) return list;
     const cats = only.split(',').map((s) => s.trim().toLowerCase());
-    assets = assets.filter((a) => cats.some((c) => a.category.toLowerCase().includes(c)));
-  }
+    return list.filter((a) => cats.some((c) => a.category.toLowerCase().includes(c)));
+  };
+  const assets = filterByCategory(collectInventory());
   const byCat = {};
   for (const a of assets) byCat[a.category] = (byCat[a.category] ?? 0) + 1;
   console.log(
@@ -1321,7 +1336,15 @@ async function cmdLibrary() {
 
   if (flag('serve')) {
     const port = Number(opt('port', 5180));
-    const { url } = await serveLibrary({ port });
+    // Re-inventory + re-emit on each page load so newly generated/applied assets
+    // appear on reload without restarting the command (mirrors the initial
+    // collect/enrich/emit; both are hash-cached).
+    const refresh = async () => {
+      const fresh = filterByCategory(collectInventory());
+      await enrichAssets(fresh, { log: () => {} });
+      emitViewer(fresh);
+    };
+    const { url } = await serveLibrary({ port, refresh });
     console.log(`\nLIVE viewer serving at ${url}`);
     console.log(
       '  drag to rotate, scroll to zoom, pick animations, toggle "vs player". Ctrl-C to stop.',

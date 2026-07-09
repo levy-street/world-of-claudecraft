@@ -41,10 +41,14 @@ describe('weapon families', () => {
   it('resolves kinds and variant-key tokens to families', () => {
     expect(families.weaponFamilyFor('sword').name).toBe('sword');
     expect(families.weaponFamilyFor('emberfang_sword').name).toBe('sword');
-    expect(families.weaponFamilyFor('war_hammer').name).toBe('axe');
+    expect(families.weaponFamilyFor('war_hammer').name).toBe('hammer');
+    expect(families.weaponFamilyFor('spiked_mace').name).toBe('mace');
     expect(families.weaponFamilyFor('moon_staff').name).toBe('staff');
     expect(families.weaponFamilyFor('bone_wand').name).toBe('wand');
     expect(families.weaponFamilyFor('reaver_scythe').name).toBe('polearm');
+    expect(families.weaponFamilyFor('oak_longbow').name).toBe('bow');
+    // "bow" is a substring of "crossbow"; a crossbow key must still resolve to crossbow.
+    expect(families.weaponFamilyFor('skeleton_crossbow').name).toBe('crossbow');
     expect(families.weaponFamilyFor('mystery_orb')).toBeNull();
   });
 
@@ -294,12 +298,94 @@ describe('per-weapon grip overrides', () => {
 });
 
 // ---------------------------------------------------------------------------
+// 2c. removeWeaponFromSources (viewer "Delete asset" -- inverse of registerWeapon)
+// ---------------------------------------------------------------------------
+
+describe('removeWeaponFromSources', () => {
+  const ACCESSORY = [
+    OBJ_ANCHOR,
+    "  sword_a: 'VAR_SWORD',",
+    "  notched_woodaxe: 'VAR_AXE',",
+    "  redskull_hammer: 'VAR_AXE',",
+    '};',
+    '',
+  ].join('\n');
+  const VARIANTS = [
+    'export const ITEM_WEAPON_VARIANTS: Record<string, string> = {',
+    "  worn_sword: 'sword_a',",
+    "  hand_axe: 'notched_woodaxe',",
+    "  woodsmans_axe: 'notched_woodaxe',",
+    '};',
+    '',
+  ].join('\n');
+  const bal = (s: string) => s.split('{').length - s.split('}').length;
+
+  it('strips the accessory entry + every variant row mapping to the key', () => {
+    const out = integrate.removeWeaponFromSources(
+      { accessory: ACCESSORY, grip: GRIP_FIXTURE, variants: VARIANTS },
+      'notched_woodaxe',
+    );
+    expect(out.accessory).not.toContain('notched_woodaxe');
+    // Neighbours are untouched.
+    expect(out.accessory).toContain("sword_a: 'VAR_SWORD'");
+    expect(out.accessory).toContain("redskull_hammer: 'VAR_AXE'");
+    // BOTH items that mapped to the deleted model are gone; the sword item stays.
+    expect(out.variants).not.toContain('notched_woodaxe');
+    expect(out.variants).toContain("worn_sword: 'sword_a'");
+    expect(out.actions.some((a: string) => a.includes('KAYKIT_WEAPON_ACCESSORY'))).toBe(true);
+    expect(out.actions.some((a: string) => a.includes('ITEM_WEAPON_VARIANTS'))).toBe(true);
+    // Brace balance holds on both edited sources.
+    expect(bal(out.accessory)).toBe(bal(ACCESSORY));
+    expect(bal(out.variants)).toBe(bal(VARIANTS));
+  });
+
+  it('removes a saved grip override for the key', () => {
+    const out = integrate.removeWeaponFromSources(
+      { accessory: ACCESSORY, grip: GRIP_FIXTURE, variants: VARIANTS },
+      'worn_axe', // present in GRIP_FIXTURE
+    );
+    expect(out.grip).not.toContain('worn_axe');
+    expect(out.actions.some((a: string) => a.includes('worn_axe'))).toBe(true);
+  });
+
+  it('round-trips register -> remove back to the original accessory source', () => {
+    const added = integrate.insertIntoBlock(ACCESSORY, OBJ_ANCHOR, "  ember_maul: 'VAR_HAMMER',\n");
+    expect(added).toContain('ember_maul');
+    const out = integrate.removeWeaponFromSources(
+      { accessory: added, grip: GRIP_FIXTURE, variants: VARIANTS },
+      'ember_maul',
+    );
+    expect(out.accessory).toBe(ACCESSORY);
+  });
+
+  it('is a no-op for an absent key (sources unchanged, no actions)', () => {
+    const out = integrate.removeWeaponFromSources(
+      { accessory: ACCESSORY, grip: GRIP_FIXTURE, variants: VARIANTS },
+      'does_not_exist',
+    );
+    expect(out.accessory).toBe(ACCESSORY);
+    expect(out.grip).toBe(GRIP_FIXTURE);
+    expect(out.variants).toBe(VARIANTS);
+    expect(out.actions).toEqual([]);
+  });
+
+  it('rejects a non-snake_case key (no injection surface)', () => {
+    expect(() =>
+      integrate.removeWeaponFromSources(
+        { accessory: ACCESSORY, grip: GRIP_FIXTURE, variants: VARIANTS },
+        'Bad-Key',
+      ),
+    ).toThrow('snake_case');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // 3. Prompt builders
 // ---------------------------------------------------------------------------
 
 describe('prompt builders', () => {
   const sword = families.weaponFamilyFor('sword');
-  const axe = families.weaponFamilyFor('war_hammer');
+  const hammer = families.weaponFamilyFor('war_hammer');
 
   it('weapon concept prompts isolate the object on a plain background with no text', () => {
     const p = prompts.conceptPrompt({
@@ -312,7 +398,11 @@ describe('prompt builders', () => {
   });
 
   it('heavy-headed families are described head at the top', () => {
-    const p = prompts.conceptPrompt({ kind: 'weapon', description: 'a war hammer', family: axe });
+    const p = prompts.conceptPrompt({
+      kind: 'weapon',
+      description: 'a war hammer',
+      family: hammer,
+    });
     expect(p).toContain('head at the top');
   });
 
@@ -336,7 +426,7 @@ describe('prompt builders', () => {
     const banned = /[\u2013\u2014\u{1F300}-\u{1FAFF}]/u;
     const built = [
       prompts.conceptPrompt({ kind: 'weapon', description: 'a fiery sword', family: sword }),
-      prompts.conceptPrompt({ kind: 'weapon', description: 'a war hammer', family: axe }),
+      prompts.conceptPrompt({ kind: 'weapon', description: 'a war hammer', family: hammer }),
       prompts.conceptPrompt({ kind: 'prop', description: 'an oak barrel' }),
       prompts.conceptPrompt({ kind: 'creature', description: 'a swamp troll' }),
       prompts.modelPrompt({ kind: 'weapon', description: 'a fiery sword', family: sword }),

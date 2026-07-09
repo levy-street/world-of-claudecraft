@@ -58,6 +58,38 @@ async function api(path, body) {
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Stream a dropped File to the server, which writes it to a temp path and returns
+// it, so import + ref-image can point the pipeline at a file on this machine.
+async function uploadToServer(file, ext) {
+  const q = new URLSearchParams({
+    name: String(file.name || 'upload').replace(/\.[^.]+$/, ''),
+    ext,
+  });
+  const res = await fetch(`/api/wizard/upload?${q}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/octet-stream' },
+    body: file,
+  });
+  return res.json();
+}
+
+// Make an element a drop target; calls onFile(File) with the first dropped file.
+function attachDrop(zone, onFile) {
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.style.borderColor = '#ffcf4a';
+  });
+  zone.addEventListener('dragleave', () => {
+    zone.style.borderColor = '#4a5568';
+  });
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.style.borderColor = '#4a5568';
+    const f = e.dataTransfer?.files?.[0];
+    if (f) onFile(f);
+  });
+}
+
 // --- styles ------------------------------------------------------------------
 const STYLE = `
 .wz-fab { position: fixed; right: 22px; bottom: 22px; z-index: 40; background: var(--gold);
@@ -264,15 +296,70 @@ class Wizard {
       laneSel.disabled = true;
       nameIn.disabled = true;
     }
+    const importToggle = el('input', { type: 'checkbox' });
+    importToggle.checked = !!s.importMode;
+    importToggle.onchange = () => {
+      s.importMode = importToggle.checked;
+      this.renderPrompt();
+    };
+    const fileIn = el('input', {
+      type: 'text',
+      placeholder: '/absolute/path/to/model.glb',
+      value: s.modelFile || '',
+    });
+    fileIn.oninput = () => {
+      s.modelFile = fileIn.value;
+    };
+    const modelStatus = el(
+      'div',
+      { style: 'font-size:12px;color:#9aa;min-height:1em' },
+      s.modelFile ? `ready: ${s.modelFile.split('/').pop()}` : '',
+    );
+    const modelDrop = el(
+      'div',
+      {
+        class: 'wz-field',
+        style:
+          'gap:6px;border:1px dashed #4a5568;border-radius:8px;padding:10px;transition:border-color .15s',
+      },
+      el('label', {}, 'Model file: drop a .glb here, or paste a path'),
+      fileIn,
+      modelStatus,
+    );
+    attachDrop(modelDrop, async (f) => {
+      if (!/\.glb$/i.test(f.name)) {
+        modelStatus.textContent = 'please drop a .glb file';
+        return;
+      }
+      modelStatus.textContent = `uploading ${f.name}...`;
+      const r = await uploadToServer(f, 'glb');
+      if (r.error) {
+        modelStatus.textContent = `upload failed: ${r.error}`;
+        return;
+      }
+      s.modelFile = r.path;
+      fileIn.value = r.path;
+      modelStatus.textContent = `ready: ${f.name}`;
+    });
     this.modal.append(
       el('div', { class: 'wz-field' }, el('label', {}, 'Type'), laneSel),
       el('div', { class: 'wz-field' }, el('label', {}, 'Name'), nameIn),
-      el('div', { class: 'wz-field' }, el('label', {}, 'Description (text prompt)'), promptIn),
+      el(
+        'div',
+        { class: 'wz-field', style: 'flex-direction:row;align-items:center;gap:8px' },
+        importToggle,
+        el('label', {}, 'Import an existing .glb instead of generating'),
+      ),
+      s.importMode
+        ? modelDrop
+        : el('div', { class: 'wz-field' }, el('label', {}, 'Description (text prompt)'), promptIn),
       ...this.optionFields(s),
       el(
         'div',
         { class: 'wz-note' },
-        'Kaykit chibi style is added automatically. Generating a model spends about 45 to 65 Tripo credits ($0.45 to $0.65).',
+        s.importMode
+          ? 'Imports your .glb (normalize + icon + previews, no Tripo credits), then you review it and save it into the game like any generated asset.'
+          : 'Kaykit chibi style is added automatically. Generating a model spends about 45 to 65 Tripo credits ($0.45 to $0.65).',
       ),
       el(
         'div',
@@ -285,11 +372,20 @@ class Wizard {
             onclick: () => {
               s.lane = laneSel.value;
               s.name = nameIn.value.trim();
-              s.prompt = promptIn.value.trim();
               if (!s.name) {
                 alert('Name is required.');
                 return;
               }
+              if (s.importMode) {
+                s.modelFile = fileIn.value.trim();
+                if (!s.modelFile) {
+                  alert('Enter the path to a .glb file to import.');
+                  return;
+                }
+                this.startImport();
+                return;
+              }
+              s.prompt = promptIn.value.trim();
               if (!s.prompt && !s.options.image) {
                 alert('A description or a reference image is required.');
                 return;
@@ -301,10 +397,29 @@ class Wizard {
               this.submitPrompt();
             },
           },
-          'Generate model',
+          s.importMode ? 'Import model' : 'Generate model',
         ),
       ),
     );
+  }
+
+  // Import an existing .glb instead of generating: the server runs the lane with
+  // --model-file (no Tripo spend), then we review the finished asset and save it.
+  async startImport() {
+    const s = this.state;
+    s.phase = 'model';
+    this.renderWorking('model', 'Importing your .glb (normalize, icon, previews)...');
+    const r = await api('/api/wizard/import', {
+      lane: s.lane,
+      name: s.name,
+      family: s.options.family,
+      modelFile: s.modelFile,
+    });
+    if (r.error) return this.renderError(r.error, () => this.renderPrompt());
+    s.jobId = r.jobId;
+    // Land on the model-review screen so the imported mesh can be re-textured with
+    // the pipeline (Repaint texture) before finishing + saving into the game.
+    this.pollUntilIdle(() => this.renderModelReview());
   }
 
   // Decide whether the prompt-screen "Generate model" starts fresh or resumes.
@@ -686,6 +801,41 @@ class Wizard {
         ]),
       ),
     ];
+    // Optional reference image (drag one in): the pipeline uploads it to Tripo and
+    // uses image-to-model. Hidden when importing an existing .glb (no generation).
+    if (!s.importMode) {
+      const imgStatus = el(
+        'div',
+        { style: 'font-size:12px;color:#9aa;min-height:1em' },
+        o.image ? `ref image: ${String(o.image).split('/').pop()}` : '',
+      );
+      const imgDrop = el(
+        'div',
+        {
+          class: 'wz-field',
+          style:
+            'gap:6px;border:1px dashed #4a5568;border-radius:8px;padding:10px;transition:border-color .15s',
+        },
+        el('label', {}, 'Reference image (optional): drop a PNG/JPG to guide the shape'),
+        imgStatus,
+      );
+      attachDrop(imgDrop, async (f) => {
+        const m = f.name.match(/\.(png|jpe?g|webp)$/i);
+        if (!m) {
+          imgStatus.textContent = 'drop a PNG, JPG or WebP image';
+          return;
+        }
+        imgStatus.textContent = `uploading ${f.name}...`;
+        const r = await uploadToServer(f, m[1].toLowerCase());
+        if (r.error) {
+          imgStatus.textContent = `upload failed: ${r.error}`;
+          return;
+        }
+        o.image = r.path;
+        imgStatus.textContent = `ref image: ${f.name} (drop another to replace)`;
+      });
+      fields.push(imgDrop);
+    }
     if (s.lane === 'creature') {
       fields.push(
         field(
@@ -710,10 +860,15 @@ class Wizard {
             ['', 'Auto (from name)'],
             ['sword', 'Sword'],
             ['dagger', 'Dagger'],
-            ['axe', 'Axe / hammer'],
+            ['axe', 'Axe'],
+            ['hammer', 'Hammer / maul'],
+            ['mace', 'Mace / flail'],
             ['staff', 'Staff'],
             ['wand', 'Wand'],
             ['polearm', 'Polearm (spear / halberd / scythe)'],
+            ['book', 'Book / tome'],
+            ['crossbow', 'Crossbow'],
+            ['bow', 'Bow / longbow'],
           ]),
         ),
       );
@@ -760,35 +915,88 @@ class Wizard {
     if (this.polling) cb();
   }
 
-  // Per-asset Regenerate button, injected into the open detail inspector.
+  // Per-asset actions injected into the open detail inspector: save a finished
+  // generated job into the game (idempotent --apply, no credits) and regenerate.
   onDetail(asset) {
     const lane = laneOf(asset);
     const inspector = document.getElementById('inspector');
     if (!inspector || !lane) return;
     if (inspector.querySelector('.wz-detail-regen')) return;
     const priorPrompt = asset.job?.prompt || asset.prompt || '';
-    inspector.prepend(
-      el(
-        'div',
-        { class: 'wz-detail-regen' },
-        el(
-          'button',
-          {
-            class: 'wz-btn',
-            onclick: () => {
-              document.getElementById('overlay')?.classList.remove('open');
-              this.openNew({
-                lane,
-                name: asset.name,
-                prompt: priorPrompt,
-                jobId: asset.job?.id || asset.name,
-              });
-            },
-          },
-          'Regenerate this asset',
-        ),
-      ),
+    const jobId = asset.job?.id || asset.name;
+
+    const regenBtn = el(
+      'button',
+      {
+        class: 'wz-btn',
+        onclick: () => {
+          document.getElementById('overlay')?.classList.remove('open');
+          // Job assets display as "weapon: <key>"; strip that prefix so safeName
+          // doesn't fold it into the name and produce a "weapon_weapon_…" job id.
+          const cleanName = asset.name.replace(/^[a-z]+:\s+/, '');
+          this.openNew({ lane, name: cleanName, prompt: priorPrompt, jobId });
+        },
+      },
+      'Regenerate this asset',
     );
+
+    const row = el('div', {
+      class: 'wz-detail-regen',
+      style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap',
+    });
+    // A finished generated job (its built GLB is present) can be saved straight
+    // into the game via an idempotent --apply, no re-running the wizard. A weapon
+    // already registered as a VAR_* variant (asset.weaponKey) is shown as in-game.
+    const built = asset.kind === 'job' && !!asset.repoGlb;
+    const applied = asset.kind === 'job' && !!asset.weaponKey;
+    if (applied) {
+      row.append(el('span', { class: 'wz-sub' }, 'In game'), regenBtn);
+    } else if (built) {
+      const statusEl = el('span', { class: 'wz-sub' });
+      const saveBtn = el('button', { class: 'wz-btn primary' }, 'Save into game');
+      saveBtn.addEventListener('click', () =>
+        this.applyFromDetail({ lane, jobId, name: asset.name }, [saveBtn, regenBtn], statusEl),
+      );
+      row.append(saveBtn, regenBtn, statusEl);
+    } else {
+      row.append(regenBtn);
+    }
+    inspector.prepend(row);
+  }
+
+  // Copy a finished generated asset into the game (public/ + registries) via an
+  // idempotent --apply, no regeneration, no Tripo credits. Polls the apply step,
+  // then reloads the library so the asset shows as applied (and, for weapons, its
+  // grip Save unlocks).
+  async applyFromDetail(info, buttons, statusEl) {
+    if (
+      !confirm(
+        `Save "${info.name}" into the game? Copies the model into public/ and registers it (no Tripo credits).`,
+      )
+    )
+      return;
+    for (const b of buttons) b.disabled = true;
+    statusEl.textContent = ' Saving into the game...';
+    const r = await api('/api/wizard/apply', { lane: info.lane, jobId: info.jobId });
+    if (r.error) {
+      statusEl.textContent = ` Save failed: ${r.error}`;
+      for (const b of buttons) b.disabled = false;
+      return;
+    }
+    for (;;) {
+      const st = await api(`/api/wizard/status?job=${encodeURIComponent(info.jobId)}`);
+      if (!st.running) {
+        if (Object.values(st.steps || {}).includes('error')) {
+          statusEl.textContent = ' Save failed: check the terminal log.';
+          for (const b of buttons) b.disabled = false;
+          return;
+        }
+        break;
+      }
+      await sleep(1500);
+    }
+    statusEl.textContent = ' Saved. Reloading...';
+    location.reload();
   }
 }
 

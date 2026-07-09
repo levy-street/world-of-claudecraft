@@ -7,7 +7,15 @@
 // The registry parsers work on SOURCE TEXT (read-only, regex over the pure
 // data registries), never by importing TS, per the scripts/ rules.
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import {
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { join, relative } from 'node:path';
 import { REPO_ROOT } from './env.mjs';
 import { weaponFamilyFor } from './families.mjs';
@@ -308,8 +316,24 @@ export function collectInventory() {
             .filter((f) => f.endsWith('.png'))
             .map((f) => `../${id}/preview/${f}`)
         : [];
+      // Let a generated weapon be grip-tuned + saved from the viewer. Resolve its
+      // VAR_* grip in priority order: the live grip of an already --applied weapon
+      // (KAYKIT_WEAPON_ACCESSORY), else the family the job was GENERATED with
+      // (job.json `family`, authoritative no matter how the weapon is named, e.g.
+      // "..._stave"/"..._knife"), else a last-resort guess from the name. The
+      // override is keyed by name and honored once the weapon is --applied as that
+      // variant. Anything that resolves to no VAR_* grip stays unsaveable.
+      const appliedGrip = state.kind === 'weapon' ? (registries.accessory.get(name) ?? null) : null;
+      const gripFamily =
+        state.kind === 'weapon'
+          ? (appliedGrip ??
+            weaponFamilyFor(state.family)?.grip ??
+            weaponFamilyFor(name)?.grip ??
+            null)
+          : null;
       assets.push({
         id: `job:${id}`,
+        weaponKey: gripFamily ? name : null,
         kind: 'job',
         category: 'generated',
         name: `${state.kind ?? 'job'}: ${name}`,
@@ -335,8 +359,30 @@ export function collectInventory() {
             : null,
         },
         previews,
-        registration: { referenced: false, generated: true },
+        registration: {
+          referenced: false,
+          generated: true,
+          gripFamily,
+          gripOverride: registries.grip.get(name) ?? null,
+        },
       });
+    }
+  }
+
+  // Mark which assets the viewer may delete: ONLY those backed by a generation
+  // job (every shipped/base weapon has none, so it can never be deleted). Attach
+  // the job id so the delete call can target it directly.
+  const genJobByName = new Map();
+  for (const a of assets) {
+    if (a.kind === 'job' && a.job?.id) {
+      genJobByName.set(a.weaponKey ?? a.name.replace(/^[^:]+:\s*/, ''), a.job.id);
+    }
+  }
+  for (const a of assets) {
+    if (a.kind === 'job') {
+      a.registration = { ...(a.registration ?? {}), deletable: true };
+    } else if (a.category === 'weapons' && genJobByName.has(a.name)) {
+      a.registration = { ...a.registration, deletable: true, jobId: genJobByName.get(a.name) };
     }
   }
 
@@ -523,15 +569,19 @@ async function buildThreeBundle() {
   return result.outputFiles[0].text;
 }
 
-/** Start the live viewer http server. Returns { server, url }. */
-export async function serveLibrary({ port = 5180 } = {}) {
+/** Start the live viewer http server. Returns { server, url }.
+ *  `refresh` (optional): an async fn that re-inventories and re-emits index.html;
+ *  when provided it runs on each page load so newly generated/applied assets
+ *  appear on reload without restarting the command. */
+export async function serveLibrary({ port = 5180, refresh = null } = {}) {
   const http = await import('node:http');
   const { readFileSync: rf, existsSync: ex, statSync: st } = await import('node:fs');
   const { extname, join: pjoin, normalize: pnorm } = await import('node:path');
   const wiz = await import('./wizard.mjs');
   const threeBundle = await buildThreeBundle();
-  const liveModule = rf(join(REPO_ROOT, 'scripts/asset_pipeline/viewer_live.js'), 'utf8');
-  const wizardModule = rf(join(REPO_ROOT, 'scripts/asset_pipeline/wizard_ui.js'), 'utf8');
+  // Viewer page modules are read per request (not cached) so edits to the live
+  // viewer / wizard / VFX layer show up on a plain page reload.
+  const pageModule = (name) => rf(join(REPO_ROOT, `scripts/asset_pipeline/${name}`), 'utf8');
 
   // Only these repo subtrees are reachable via /repo/* (never .env, src, etc.).
   const ALLOWED = ['public/', 'tmp/asset_pipeline/'];
@@ -574,30 +624,101 @@ export async function serveLibrary({ port = 5180 } = {}) {
       if (url === '/api/wizard/model') return sendJson(res, 200, wiz.startModel(body));
       if (url === '/api/wizard/texture') return sendJson(res, 200, wiz.textureAsset(body));
       if (url === '/api/wizard/finish') return sendJson(res, 200, wiz.finishAsset(body));
+      if (url === '/api/wizard/import') return sendJson(res, 200, wiz.importModel(body));
       if (url === '/api/wizard/apply') return sendJson(res, 200, wiz.applyAsset(body));
+      if (url === '/api/asset/delete') return sendJson(res, 200, wiz.deleteAsset(body));
+      if (url === '/api/asset/reveal') return sendJson(res, 200, await wiz.revealAsset(body));
+      if (url === '/api/model/update') return sendJson(res, 200, await wiz.updateModel(body));
+      if (url === '/api/model/export') return sendJson(res, 200, await wiz.compressExport(body));
       return sendJson(res, 404, { error: 'unknown action' });
     } catch (err) {
       return sendJson(res, 400, { error: String(err.message ?? err) });
     }
   }
 
+  // Rebuild the baked asset snapshot on each page load so newly generated jobs
+  // and freshly applied assets show up without restarting `library --serve`.
+  // The rebuild (collectInventory -> enrichAssets -> emitViewer) is content-hash
+  // cached, so a warm reload only re-renders assets that actually changed.
+  // Overlapping loads share one in-flight rebuild; a failed rebuild falls back
+  // to the last good index.html rather than 500ing.
+  let refreshing = null;
+  const doRefresh = () => {
+    if (!refresh) return Promise.resolve();
+    if (!refreshing) {
+      refreshing = Promise.resolve()
+        .then(refresh)
+        .finally(() => {
+          refreshing = null;
+        });
+    }
+    return refreshing;
+  };
+  const serveIndex = async (res) => {
+    try {
+      await doRefresh();
+    } catch {
+      // keep serving the previous snapshot if a rebuild fails
+    }
+    let html = rf(join(LIBRARY_DIR, 'index.html'), 'utf8');
+    html = html.replace('window.__LIVE__ = false;', 'window.__LIVE__ = true;');
+    html = html.replace(
+      '</body>',
+      '<script type="module" src="/viewer_live.js"></script>\n' +
+        '<script type="module" src="/wizard_ui.js"></script>\n</body>',
+    );
+    send(res, 200, MIME['.html'], html);
+  };
+
+  // Stream a dropped file to a server-side temp path (browsers can't hand us the
+  // real filesystem path) and return it, so import + ref-image can point the
+  // pipeline at a file that lives on this machine. Runs before readBody so it
+  // isn't size-capped; the pipeline reads the returned path directly.
+  const UPLOAD_DIR = pjoin(REPO_ROOT, 'tmp/asset_pipeline/_uploads');
+  const UPLOAD_EXTS = new Set(['glb', 'png', 'jpg', 'jpeg', 'webp']);
+  const handleUpload = (req, res) => {
+    const q = new URL(req.url, 'http://x').searchParams;
+    const ext = (q.get('ext') || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!UPLOAD_EXTS.has(ext))
+      return sendJson(res, 400, { error: `unsupported file type: .${ext}` });
+    const base =
+      (q.get('name') || 'upload')
+        .toLowerCase()
+        .replace(/[^a-z0-9_]+/g, '_')
+        .slice(0, 40) || 'upload';
+    mkdirSync(UPLOAD_DIR, { recursive: true });
+    const abs = pjoin(UPLOAD_DIR, `${base}_${Date.now()}.${ext}`);
+    const out = createWriteStream(abs);
+    let bytes = 0;
+    let tooBig = false;
+    req.on('data', (c) => {
+      bytes += c.length;
+      if (bytes > 200 * 1024 * 1024) {
+        tooBig = true;
+        req.destroy();
+        out.destroy();
+      }
+    });
+    req.pipe(out);
+    out.on('finish', () =>
+      tooBig
+        ? sendJson(res, 413, { error: 'file too large (200 MB max)' })
+        : sendJson(res, 200, { path: abs }),
+    );
+    out.on('error', (e) => sendJson(res, 500, { error: String(e.message ?? e) }));
+  };
+
   const server = http.createServer((req, res) => {
     try {
       const url = decodeURIComponent((req.url || '/').split('?')[0]);
+      if (url === '/api/wizard/upload' && req.method === 'POST') return void handleUpload(req, res);
       if (url.startsWith('/api/')) return void handleApi(req, res, url);
-      if (url === '/wizard_ui.js') return send(res, 200, MIME['.js'], wizardModule);
-      if (url === '/' || url === '/index.html') {
-        let html = rf(join(LIBRARY_DIR, 'index.html'), 'utf8');
-        html = html.replace('window.__LIVE__ = false;', 'window.__LIVE__ = true;');
-        html = html.replace(
-          '</body>',
-          '<script type="module" src="/viewer_live.js"></script>\n' +
-            '<script type="module" src="/wizard_ui.js"></script>\n</body>',
-        );
-        return send(res, 200, MIME['.html'], html);
-      }
+      if (url === '/wizard_ui.js') return send(res, 200, MIME['.js'], pageModule('wizard_ui.js'));
+      if (url === '/' || url === '/index.html') return void serveIndex(res);
       if (url === '/three.bundle.js') return send(res, 200, MIME['.js'], threeBundle);
-      if (url === '/viewer_live.js') return send(res, 200, MIME['.js'], liveModule);
+      if (url === '/viewer_live.js')
+        return send(res, 200, MIME['.js'], pageModule('viewer_live.js'));
+      if (url === '/weapon_vfx.js') return send(res, 200, MIME['.js'], pageModule('weapon_vfx.js'));
       if (url.startsWith('/thumbs/')) {
         const p = pjoin(LIBRARY_DIR, url.slice(1));
         if (ex(p) && st(p).isFile())

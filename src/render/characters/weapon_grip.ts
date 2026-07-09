@@ -34,6 +34,90 @@ export interface WeaponGripOverride {
  *  and scale (a multiplier on the family clamp); omitted fields stay identity. */
 export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   // Populated by hand or by the inspector Save button. An absent key is identity.
+  notched_woodaxe: { pos: [0.1249, 0.0794, 0.0321], rot: [180, -8.7527, 180], scale: 0.85 },
+  whittler_s_knife: { pos: [0, 0.0184, 0], rot: [0, 0, -19.9726], scale: 0.6 },
+  peeled_birch_wand: { pos: [0.01, 0.02, 0.02] },
+  knotted_oak_stave: { pos: [-0.1, 0.57, 0.02], rot: [-180, 0, 0], scale: 0.85 },
+  redskull_sword: { scale: 1.3 },
+  simple_farmhand_crossbow: { pos: [0.155, 0.0684, 0.2319], rot: [95.2624, 0, 0], scale: 0.65 },
+  guildmark_arming_sword: { pos: [0, 0.01, 0], rot: [15, 5, 0], scale: 0.95 },
+  brasscap_hatchet: {
+    pos: [0.0585, 0.0588, 0.0529],
+    rot: [-162.524, 1.1883, -177.4091],
+    scale: 0.9,
+  },
+  solheim_last_light_of_the_dawn: {
+    pos: [-0.1787, -0.0279, -0.273],
+    rot: [-2.9988, 0, 0],
+    scale: 1.4,
+  },
+  skyrender_the_firmament_s_wound: {
+    pos: [0.0662, 0.0855, -0.0044],
+    rot: [4.898, 0.5818, -34.2432],
+    scale: 1.3,
+  },
+  skyrender_heaven_s_fracture: {
+    pos: [0.0974, 0.2418, 0.0362],
+    rot: [180, -5.4502, -160.0379],
+    scale: 1.3,
+  },
+  cosmarch_spire_of_the_endless_void: {
+    pos: [-0.0725, 0.7123, 0.0769],
+    rot: [-149.1828, -80.6499, -141.918],
+    scale: 1.5,
+  },
+  emberwish_mote_of_the_dying_sun: {
+    pos: [-0.2681, 0.2224, 0.0872],
+    rot: [135.4907, -79.3213, 111.7394],
+    scale: 1.3,
+  },
+  meteorlatch_the_sky_s_last_judgment: {
+    pos: [-0.2705, 0.0871, -0.0149],
+    rot: [90.1927, -3.4743, 93.1768],
+  },
+  wrought_iron_longsword: { scale: 0.85 },
+  iron_field_hammer: { scale: 0.75 },
+  astravyr_fang_of_the_fallen_star: { scale: 1.2 },
+  starfall_judgment_of_the_heavens: {
+    pos: [-0.0598, 0.1954, -0.0137],
+    rot: [53.2074, 68.0435, -51.3048],
+    scale: 1.65,
+  },
+  ice_fang: { scale: 1.25 },
+  glaciersplit: { pos: [0.0713, 0.0779, -0.0096], rot: [180, -7.6717, -165.7991], scale: 1.35 },
+  rimecrusher: { rot: [-50.9571, -60.9258, -57.8216], scale: 1.8 },
+  frostbite: { pos: [0, -0.3643, 0], scale: 1.55 },
+  // Full Set drop (July 2026). The two bows also ship an ATTACK grip in their
+  // handoff position files (gripOverride + gripAttackOverride, blended during
+  // the draw animation); only the idle grip is registered until the engine
+  // grows a second-pose slot.
+  winterbite: {
+    pos: [-0.0439, -0.0034, 0.0066],
+    rot: [-164.6994, -29.0522, -148.7048],
+    scale: 1.05,
+  },
+  cinderlatch: {
+    pos: [0.1565, 0.1562, -0.0917],
+    rot: [94.6767, -12.6224, 138.9958],
+    scale: 0.65,
+  },
+  emberbite: { pos: [-0.0061, 0.1097, 0] },
+  smoulderfall: { rot: [0, 0, -12.429], scale: 0.9 },
+  ashspark_shiv: { pos: [0, -0.0745, 0.0717], rot: [14.7156, 0, 0] },
+  forgeheart_stave: { pos: [0, 0.1168, 0], scale: 1.1 },
+  emberwrought_wand: {
+    pos: [-0.1158, 0.7129, 0],
+    rot: [101.5834, 80.5884, 78.5684],
+    scale: 1.2,
+  },
+  tempered_flanged_mace: { pos: [0, 0.12, 0], rot: [5, 0, 0] },
+  guildmark_dirk: {
+    pos: [-0.0006, -0.0285, 0.0472],
+    rot: [-180, -89.2652, -180],
+    scale: 1.1,
+  },
+  lacquered_rod: { pos: [0.0606, 0.1259, -0.0094], rot: [0, 0, -46.2693] },
+  fletcher_s_guild_bow: { pos: [-0.2237, 0, 0.0851] },
 };
 
 export interface GripTransform {
