@@ -587,6 +587,35 @@ describe('yumi power-up heartbeat cadence', () => {
     expect(beat.groundPowerups.length).toBe(0);
   });
 
+  it('match end retires the orb and any in-flight grab with one final beat', () => {
+    // updateYumiActive stops running the moment the match leaves 'active', so
+    // without the killYumiCat funnel doing this the ONLINE mirror kept the
+    // last beat's orb (inert, but visible) for the whole 5s aftermath, and a
+    // mid-channel grab bar froze until teardown.
+    const res = startYumi('yumi3');
+    const { sim, match, ctx, pids } = res;
+    const y = (match as any).yumi;
+    const winnerPid = match.teamA[0];
+    const { orb, e } = readyOrbUnder(res, winnerPid);
+    startYumiGrab(ctx, match, e, orb.id);
+    updateYumiPowerups(ctx, match);
+    expect(e.yumiGrabRemaining).toBeGreaterThan(0);
+    pastSecondEdge(sim, match);
+    // Kill the enemy cat through the real damage hub, mid-second; the funnel's
+    // emits are queued and drain on the next tick.
+    const enemyCat = sim.entities.get(y.yumiB)!;
+    (sim as any).dealDamage(e, enemyCat, 999999, false, 'physical', null, 'hit');
+    const evs: SimEvent[] = sim.tick();
+    expect(match.state).toBe('over');
+    expect(y.powerups.length).toBe(0);
+    expect(y.grab.size).toBe(0);
+    expect(e.yumiGrabRemaining).toBe(0);
+    const beat = evs.find((ev) => ev.type === 'yumiStatus' && (ev as any).pid === winnerPid) as any;
+    expect(beat).toBeTruthy();
+    expect(beat.groundPowerups.length).toBe(0);
+    expect(beat.enemyHp).toBe(0); // the final scoreboard: the fallen cat reads 0
+  });
+
   it('an orb timing out mid-second fires an immediate beat with the orb gone', () => {
     const { sim, match, ctx, pids } = startYumi('yumi3');
     const y = (match as any).yumi;

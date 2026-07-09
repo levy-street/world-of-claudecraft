@@ -33,6 +33,7 @@ import { teleportPoints, YUMI_TELEPORT_MIN_SEP, yumiMazeLayout } from '../yumi_m
 import * as arenaMod from './arena';
 import { fiestaDownEntity } from './fiesta';
 import {
+  stopYumiGrab,
   updateYumiPowerups,
   YUMI_POWERUP_FIRST,
   yumiNextPowerupIn,
@@ -447,6 +448,23 @@ function killYumiCat(ctx: SimContext, match: ArenaMatch, cat: Entity, killer: En
   ctx.emit({ type: 'death', entityId: cat.id, killerId: killer?.id ?? -1 });
   const catTeam = match.yumi!.yumiA === cat.id ? 'A' : 'B';
   ctx.endArenaMatch(match, catTeam === 'A' ? 'B' : 'A', 'defeat');
+  // The bout is decided: retire any live orb and in-flight grab NOW and send
+  // one final heartbeat, so the ONLINE mirror drops the orb for the 5s
+  // aftermath too (offline arenaInfoFor reports [] the instant the match
+  // leaves 'active', but updateYumiActive no longer runs, so without this
+  // beat the last mirrored orb lingered, inert, until teardown). The beat
+  // doubles as the final scoreboard: the fallen cat reads 0. This is the one
+  // funnel for every aftermath-visible ending (defeat and the sudden-death
+  // bleed); a forfeit returns everyone immediately with no aftermath.
+  const y = match.yumi!;
+  for (const pid of [...y.grab.keys()]) {
+    const e = ctx.entities.get(pid);
+    if (e) stopYumiGrab(match, e);
+    else y.grab.delete(pid);
+  }
+  y.powerups = [];
+  y.statusDirty = false;
+  emitYumiStatus(ctx, match);
 }
 
 function bleedCat(ctx: SimContext, match: ArenaMatch, cat: Entity, dmg: number): void {
