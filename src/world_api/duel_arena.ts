@@ -76,6 +76,17 @@ export interface YumiView {
   alive: boolean;
 }
 
+// A mystery power-up orb on the maze as the renderer/HUD sees it. It carries NO
+// type (the mystery is the point): every orb renders as the same `(?)` icon
+// until a fighter grabs it (social/yumi_powerups.ts).
+export interface YumiGroundPowerupView {
+  id: number;
+  x: number;
+  z: number;
+  state: 'spawning' | 'ready';
+  frac: number; // spawning: telegraph progress 0..1; ready: lifetime remaining 0..1
+}
+
 // One combatant's line on the Protect Yumi scoreboard.
 export interface YumiScoreboardPlayer {
   pid: number;
@@ -101,6 +112,10 @@ export interface YumiMatchInfo {
   damageTakenMult: number; // current cat damage-taken multiplier (1 before sudden death)
   down: boolean; // am I currently benched
   respawnIn: number; // whole seconds until I revive (0 if alive)
+  // Mystery power-ups: whole seconds until the next spawn (0 while an orb is on
+  // the maze) and the live orbs, type-free (every one is a `(?)`).
+  nextPowerupIn: number;
+  groundPowerups: YumiGroundPowerupView[];
   yumiA: YumiView;
   yumiB: YumiView;
   teamA: YumiScoreboardPlayer[];

@@ -1004,6 +1004,8 @@ function blankEntity(id: number): Entity {
     targetId: null,
     autoAttack: false,
     swingTimer: 0,
+    yumiGrabRemaining: 0,
+    yumiGrabTotal: 0,
     inCombat: false,
     combatTimer: 99,
     auras: [],
@@ -2091,6 +2093,8 @@ export class ClientWorld implements IWorld {
       e.targetId = s.target ?? null;
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
+      e.yumiGrabRemaining = s.ygr ?? 0;
+      e.yumiGrabTotal = s.ygt ?? 0;
       e.queuedOnSwing = s.queued ?? null;
       // A rolling deploy can pair this client with an older server whose stats
       // object predates WARFARE. Preserve numeric PvP fields instead of letting
@@ -2422,6 +2426,14 @@ export class ClientWorld implements IWorld {
   }
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });
+  }
+  // Protect Yumi hold-to-grab intent (the server runs the 1.8s channel; progress
+  // rides player.yumiGrabRemaining on the self snapshot).
+  yumiGrabStart(orbId: number): void {
+    this.cmd({ cmd: 'yumi_grab_start', id: orbId });
+  }
+  yumiGrabStop(): void {
+    this.cmd({ cmd: 'yumi_grab_stop' });
   }
   acceptQuest(questId: string): void {
     if (!this.canSendCommand()) return;

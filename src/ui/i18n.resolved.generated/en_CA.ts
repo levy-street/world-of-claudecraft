@@ -4573,7 +4573,10 @@ export const en_CA: EnTranslations = {
       "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Protect Yumi! Defend your familiar and hunt theirs.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "PROTECT YUMI",
@@ -4584,14 +4587,36 @@ export const en_CA: EnTranslations = {
       "enemyYumi": "Enemy Yumi",
       "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
       "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "expand": "Expand the Protect Yumi bars",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!"
     },
     "respawn": {
       "title": "DOWNED!"
     },
     "banner": {
       "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "teleport": "The Yumis teleport!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Stealth"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Berserker"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "VICTORY! Yumi is safe!",

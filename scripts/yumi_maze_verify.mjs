@@ -100,7 +100,7 @@ const start = await page.evaluate(() => {
 });
 check('yumi3 match active', start.format === 'yumi3', JSON.stringify(start));
 check('player teleported into the maze band', start.px >= 8000, `px=${start.px}`);
-check('both cats at 5000 hp', start.catA.hp === 5000 && start.catB.hp === 5000);
+check('both cats at 7500 hp', start.catA.hp === 7500 && start.catB.hp === 7500);
 check('seated ' + JSON.stringify(seated.pids ? seated.pids.length : 0) + ' fighters', true);
 
 // Let the renderer build the maze interior + the HUD strip paint.

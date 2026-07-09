@@ -10,10 +10,15 @@ function consumeAuraKind(ctx: SimContext, e: Entity, kind: AuraKind): boolean {
 }
 
 export function hasNextCastFree(e: Entity): boolean {
-  return e.auras.some((a) => a.kind === 'next_cast_free');
+  // The Endless Mana mystery power-up (social/yumi_powerups.ts) makes casts free
+  // for its whole 15s, so it reads as a next-cast-free that is never consumed.
+  return e.auras.some((a) => a.kind === 'next_cast_free' || a.kind === 'pu_endless_mana');
 }
 
 export function consumeNextCastFree(ctx: SimContext, e: Entity): boolean {
+  // Endless Mana grants free casts WITHOUT being spent: treat it as free but
+  // leave the aura in place so every cast is free until it expires.
+  if (e.auras.some((a) => a.kind === 'pu_endless_mana')) return true;
   return consumeAuraKind(ctx, e, 'next_cast_free');
 }
 

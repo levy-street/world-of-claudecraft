@@ -4573,7 +4573,10 @@ export const ru_RU: EnTranslations = {
       "partyTooBig5": "В Protect Yumi 5 на 5 группа может быть не больше пяти игроков."
     },
     "log": {
-      "start": "Protect Yumi! Защищайте своего фамильяра и охотьтесь на чужого."
+      "start": "Protect Yumi! Защищайте своего фамильяра и охотьтесь на чужого.",
+      "teamBlue": "Вы в синей команде!",
+      "teamRed": "Вы в красной команде!",
+      "powerupGrabbed": "{player} подобрал усиление {name}!"
     },
     "hud": {
       "title": "PROTECT YUMI",
@@ -4584,14 +4587,36 @@ export const ru_RU: EnTranslations = {
       "enemyYumi": "Вражеская Yumi",
       "aria": "Ваша Yumi: {mine} из {max} здоровья, вражеская Yumi: {theirs}.",
       "collapse": "Свернуть полосы Protect Yumi",
-      "expand": "Развернуть полосы Protect Yumi"
+      "expand": "Развернуть полосы Protect Yumi",
+      "powerupIn": "Усиление через {s}с",
+      "powerupReady": "Усиление готово!"
     },
     "respawn": {
       "title": "ВЫ ПАЛИ!"
     },
     "banner": {
       "sudden": "ВНЕЗАПНАЯ СМЕРТЬ! Yumi больше не перемещаются!",
-      "teleport": "Yumi переместились!"
+      "teleport": "Yumi переместились!",
+      "powerupSpawn": "Появилось таинственное усиление!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Неуязвимость"
+      },
+      "stealth": {
+        "name": "Маскировка"
+      },
+      "endless_mana": {
+        "name": "Бесконечная мана"
+      },
+      "berserk": {
+        "name": "Берсерк"
+      }
+    },
+    "grab": {
+      "channeling": "Подбор… {s}с",
+      "aria": "Подбор таинственного усиления"
     },
     "end": {
       "win": "ПОБЕДА! Yumi в безопасности!",

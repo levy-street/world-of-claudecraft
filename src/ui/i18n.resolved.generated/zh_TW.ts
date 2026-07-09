@@ -4573,7 +4573,10 @@ export const zh_TW: EnTranslations = {
       "partyTooBig5": "Protect Yumi 5v5最多允許五人隊伍。"
     },
     "log": {
-      "start": "Protect Yumi！保衛你的使魔，獵殺敵方的使魔。"
+      "start": "Protect Yumi！保衛你的使魔，獵殺敵方的使魔。",
+      "teamBlue": "你在藍隊！",
+      "teamRed": "你在紅隊！",
+      "powerupGrabbed": "{player} 獲得了 {name} 強化！"
     },
     "hud": {
       "title": "守護YUMI",
@@ -4584,14 +4587,36 @@ export const zh_TW: EnTranslations = {
       "enemyYumi": "敵方Yumi",
       "aria": "我方Yumi生命值{mine}/{max}，敵方Yumi生命值{theirs}。",
       "collapse": "摺疊Protect Yumi血條",
-      "expand": "展開Protect Yumi血條"
+      "expand": "展開Protect Yumi血條",
+      "powerupIn": "強化 {s}秒後出現",
+      "powerupReady": "強化已就緒！"
     },
     "respawn": {
       "title": "倒下了！"
     },
     "banner": {
       "sudden": "驟死戰！Yumi不再傳送！",
-      "teleport": "Yumi傳送了！"
+      "teleport": "Yumi傳送了！",
+      "powerupSpawn": "神祕強化出現了！",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "無敵"
+      },
+      "stealth": {
+        "name": "潛行"
+      },
+      "endless_mana": {
+        "name": "無盡法力"
+      },
+      "berserk": {
+        "name": "狂暴"
+      }
+    },
+    "grab": {
+      "channeling": "拾取中… {s}秒",
+      "aria": "正在拾取神祕強化"
     },
     "end": {
       "win": "勝利！Yumi安全了！",

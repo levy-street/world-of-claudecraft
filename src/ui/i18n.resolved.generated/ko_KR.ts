@@ -4573,7 +4573,10 @@ export const ko_KR: EnTranslations = {
       "partyTooBig5": "Protect Yumi 5대5는 최대 5인 파티까지 참가할 수 있습니다."
     },
     "log": {
-      "start": "Protect Yumi! 아군 소환수를 지키고 적의 소환수를 사냥하세요."
+      "start": "Protect Yumi! 아군 소환수를 지키고 적의 소환수를 사냥하세요.",
+      "teamBlue": "당신은 청팀입니다!",
+      "teamRed": "당신은 홍팀입니다!",
+      "powerupGrabbed": "{player}님이 {name} 파워업을 획득했습니다!"
     },
     "hud": {
       "title": "PROTECT YUMI",
@@ -4584,14 +4587,36 @@ export const ko_KR: EnTranslations = {
       "enemyYumi": "적군 Yumi",
       "aria": "아군 Yumi 생명력 {mine}/{max}, 적군 Yumi {theirs}.",
       "collapse": "Protect Yumi 게이지 접기",
-      "expand": "Protect Yumi 게이지 펼치기"
+      "expand": "Protect Yumi 게이지 펼치기",
+      "powerupIn": "파워업까지 {s}초",
+      "powerupReady": "파워업 준비 완료!"
     },
     "respawn": {
       "title": "쓰러졌습니다!"
     },
     "banner": {
       "sudden": "서든 데스! Yumi가 더는 이동하지 않습니다!",
-      "teleport": "Yumi가 순간이동했습니다!"
+      "teleport": "Yumi가 순간이동했습니다!",
+      "powerupSpawn": "미스터리 파워업이 나타났습니다!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "무적"
+      },
+      "stealth": {
+        "name": "은신"
+      },
+      "endless_mana": {
+        "name": "무한 마나"
+      },
+      "berserk": {
+        "name": "광폭화"
+      }
+    },
+    "grab": {
+      "channeling": "획득 중… {s}초",
+      "aria": "미스터리 파워업 획득 중"
     },
     "end": {
       "win": "승리! Yumi를 지켜냈습니다!",

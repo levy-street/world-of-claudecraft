@@ -216,12 +216,19 @@ const HOT_PAINTERS: ReadonlyArray<{
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
-  // yumi builds its whole strip + respawn overlay once in ensureEls (14 class
-  // assignments + the two role attributes + the toggle's type); every
-  // per-frame write is facet-routed.
+  // yumi builds its whole strip + respawn overlay once in ensureEls (15 class
+  // assignments incl. the mystery power-up line + the two role attributes + the
+  // toggle's type); every per-frame write is facet-routed.
   {
     file: 'yumi_match_painter.ts',
-    allow: { '.className': 14, '.setAttribute': 3 },
+    allow: { '.className': 15, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
+  // yumi grab bar builds its bar once in ensureEls (4 class assignments + the
+  // one role attribute); every per-frame write is facet-routed.
+  {
+    file: 'yumi_grab_bar_painter.ts',
+    allow: { '.className': 4, '.setAttribute': 1 },
     reflowAllow: {},
   },
   { file: 'auras_painter.ts', allow: { '.className': 3 }, reflowAllow: {} },

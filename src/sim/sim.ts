@@ -771,6 +771,7 @@ export interface FiestaPowerup {
 // per-match `rng` (fiesta's two-stream rule), never the shared sim stream.
 export interface YumiMatchState {
   teamSize: 3 | 5;
+  maxHp: number; // per-format objective pool (yumi3 7500, yumi5 12500); see yumiHpFor
   yumiA: number; // entity id of team A's cat
   yumiB: number;
   nextTeleportAt: number; // active-timer (s) of the next simultaneous teleport
@@ -781,7 +782,29 @@ export interface YumiMatchState {
   dmgToYumiA: number; // cumulative player damage dealt TO cat A (tiebreak)
   dmgToYumiB: number;
   lastStatusSecond: number; // last whole active-second a yumiStatus heartbeat went out
+  // Mystery power-ups (social/yumi_powerups.ts): the live orbs on the maze, a
+  // spawn-attempt countdown, and an id counter. Draws come from `rng` (the
+  // per-match stream), never the shared sim stream.
+  powerups: YumiGroundPowerup[];
+  nextPowerupId: number;
+  powerupTimer: number; // s until the next power-up spawn attempt
+  // In-progress hold-to-grab channels: pid -> the orb id being grabbed. The
+  // channel progress rides entity.yumiGrabRemaining (self-wire) for the bar.
+  grab: Map<number, number>;
   rng: Rng;
+}
+
+// A mystery power-up on the maze floor. `defId` is chosen at spawn but NEVER
+// leaves the sim (the client view omits it): every orb shows the same `(?)`
+// icon until it is grabbed. Telegraphs for YUMI_POWERUP_TELEGRAPH seconds
+// ('spawning'), then is grabbable ('ready') until it times out.
+export interface YumiGroundPowerup {
+  id: number;
+  defId: string;
+  x: number;
+  z: number;
+  state: 'spawning' | 'ready';
+  timer: number; // spawning: countdown to ready; ready: countdown to despawn
 }
 
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts; re-exported from the
@@ -4666,7 +4689,9 @@ export class Sim {
     if (idx < 0) return;
     const name = e.auras[idx].name;
     e.auras.splice(idx, 1);
-    e.stealthed = false; // keep the cache live without waiting for updateAuras
+    // The Yumi Stealth mystery power-up (pu_stealth) keeps the carrier hidden
+    // through actions and hits, so only clear the cache if none remains.
+    e.stealthed = e.auras.some((a) => a.kind === 'pu_stealth');
     this.emit({ type: 'aura', targetId: e.id, name, gained: false });
   }
 
@@ -6338,6 +6363,16 @@ export class Sim {
 
   interact(pid?: number): void {
     interaction.interact(this.ctx, pid);
+  }
+
+  // Protect Yumi hold-to-grab intent (social/yumi_powerups.ts). Thin delegates so
+  // the IWorld surface + server dispatch resolve on the Sim facade unchanged.
+  yumiGrabStart(orbId: number, pid?: number): void {
+    interaction.yumiGrabStart(this.ctx, orbId, pid);
+  }
+
+  yumiGrabStop(pid?: number): void {
+    interaction.yumiGrabStop(this.ctx, pid);
   }
 
   private isQuestInteractionEntity(e: Entity): boolean {

@@ -295,7 +295,18 @@ export type AuraKind =
   | 'buff_int_pct'
   | 'buff_sta_pct'
   | 'buff_armor_pct'
-  | 'buff_ap_pct';
+  | 'buff_ap_pct'
+  // Protect Yumi mystery power-ups (social/yumi_powerups.ts), each a flat 15s
+  // temporary advantage. `pu_invuln`: dealDamage no-ops on the carrier.
+  // `pu_stealth`: drives the `stealthed` cache but survives breakStealth (stays
+  // hidden through actions, unlike rogue stealth). `pu_endless_mana`: free casts
+  // for the duration (reuses the next_cast_free plumbing, never consumed).
+  // `pu_berserk`: value = outgoing damage multiplier; dealDamage also amplifies
+  // incoming damage on the carrier (YUMI_BERSERK_TAKEN_MULT).
+  | 'pu_invuln'
+  | 'pu_stealth'
+  | 'pu_endless_mana'
+  | 'pu_berserk';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -1943,6 +1954,12 @@ export interface Entity {
   targetId: number | null;
   autoAttack: boolean;
   swingTimer: number;
+  // Protect Yumi hold-to-grab channel (social/yumi_powerups.ts): seconds left in
+  // the 1.8s pickup channel (0 = not grabbing) and the full duration for the bar
+  // fraction. Transient combat state like swingTimer; wired on the self snapshot
+  // so the grab bar reads it, never persisted.
+  yumiGrabRemaining: number;
+  yumiGrabTotal: number;
   /** petSpell windup in flight: sim tick the committed release fires on
    *  (transient combat state like swingTimer; never persisted or wired). */
   rangedWindupReleaseTick?: number | null;
@@ -2469,6 +2486,25 @@ export type SimEvent = { pid?: number } & (
       suddenDeath: boolean;
       mult: number;
       team: 'A' | 'B';
+      // Whole seconds until the next mystery power-up spawn attempt (0 once one
+      // is on the field). Rides the 1/s heartbeat so the online HUD timer stays
+      // fresh even though the arena wire (which carries the ground orbs) is
+      // rate-limited. See social/yumi_powerups.ts.
+      nextPowerupIn: number;
+    }
+  // A mystery power-up appeared on the maze (personal per fighter): drives the
+  // "available" banner + audio cue. The persistent (?) orb itself renders from
+  // arenaInfo.match.yumi.groundPowerups; this is the instant announcement.
+  | { type: 'yumiPowerupSpawn'; x: number; z: number }
+  // A fighter grabbed a mystery power-up (world event so everyone sees the pop +
+  // aura). `auraColor` is the hue of the carrier aura (null for Stealth, which
+  // must show none). "Mine" is decided client-side (entityId === local player).
+  | {
+      type: 'yumiPowerup';
+      entityId: number;
+      defId: string;
+      auraColor: number | null;
+      duration: number;
     }
   | { type: 'augmentOffer'; tier: 'silver' | 'gold' | 'prismatic'; wave: number; choices: string[] }
   | { type: 'augmentChosen'; augmentId: string; byPid: number; byName: string; mine: boolean }

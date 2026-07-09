@@ -76,6 +76,7 @@ import {
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { YumiGrabDriver } from './game/yumi_grab';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -139,6 +140,7 @@ import { GATHER_NODES, ITEMS, isDelvePos, setActiveWorldContent } from './sim/da
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
+import { YUMI_POWERUP_RADIUS } from './sim/social/yumi_powerups';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
   DT,
@@ -1334,6 +1336,7 @@ async function startGame(
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
     onInteract: () => interactKey(),
+    onInteractHold: (held: boolean) => input.setMobileInteractHeld(held),
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
     onChatClose: () => closeChat(),
@@ -2755,6 +2758,9 @@ async function startGame(
     getApm: () => inputMeter.apm(performance.now()),
   });
 
+  // Protect Yumi hold-to-grab: sends the local player's grab intent each frame.
+  const yumiGrabDriver = new YumiGrabDriver();
+
   function frame(now: number): void {
     requestAnimationFrame(frame);
     let frameDt = (now - last) / 1000;
@@ -2781,6 +2787,10 @@ async function startGame(
     perf.trace('input.gamepad', () => gamepad.poll(frameDt), { frameDtMs: frameDt * 1000 });
     perf.trace('input.hoverCursor', () => updateHoverCursor(), { active: input.hoverActive });
     perf.markInputFrame(performance.now());
+
+    // Protect Yumi hold-to-grab: express the local player's grab intent (Interact
+    // held + a nearby ready orb) each frame; the server runs the 1.8s channel.
+    yumiGrabDriver.update(world, input.isInteractHeld(), YUMI_POWERUP_RADIUS);
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
     const controllerFacing = input.controllerFacingOverride();

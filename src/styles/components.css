@@ -9688,6 +9688,60 @@
     font-size: 11px;
     color: #cfc9bb;
   }
+  /* Mystery power-up availability line: subtle by default, a brighter gold once
+     an orb is on the maze ('ready'). Readable but never shouty. */
+  .yh-powerup {
+    font-size: 11px;
+    font-weight: 700;
+    color: #d9c48a;
+    font-variant-numeric: tabular-nums;
+  }
+  .yh-powerup.ready {
+    color: #ffe27a;
+  }
+  /* Hold-to-grab bar (yumi_grab_bar_painter.ts): a cast-style timer centred in
+     the mid-lower screen, clear of the bottom control cluster + action bar on
+     desktop and mobile. Painter toggles display:flex; hidden by default. */
+  .yumi-grab-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 34%;
+    transform: translateX(-50%);
+    width: min(300px, 70vw);
+    max-width: 92vw;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    background: rgba(20, 16, 10, 0.74);
+    border: 1px solid #5a4a2a;
+    border-radius: 9px;
+    pointer-events: none;
+    z-index: 40;
+  }
+  .ygb-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #ffe27a;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  .ygb-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .ygb-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ffcf4a, #ffe9a0);
+    border-radius: 5px;
+    transition: width 60ms linear;
+  }
   /* Collapse toggle: the one interactive element on the strip (the root is
      pointer-events none). CSS chevron, no glyph text; 40px touch floor on
      coarse pointers; steady token-colored focus ring. */
@@ -9728,7 +9782,8 @@
   }
   .yumi-hud.collapsed .yh-side,
   .yumi-hud.collapsed .yh-timer,
-  .yumi-hud.collapsed .yh-sub {
+  .yumi-hud.collapsed .yh-sub,
+  .yumi-hud.collapsed .yh-powerup {
     display: none;
   }
   .yumi-respawn {

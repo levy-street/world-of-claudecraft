@@ -963,6 +963,9 @@ export const en = {
     },
     log: {
       start: 'Protect Yumi! Defend your familiar and hunt theirs.',
+      teamBlue: 'You are in the blue team!',
+      teamRed: 'You are in the red team!',
+      powerupGrabbed: '{player} grabbed a {name} power-up!',
     },
     hud: {
       title: 'PROTECT YUMI',
@@ -974,6 +977,8 @@ export const en = {
       aria: 'Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.',
       collapse: 'Collapse the Protect Yumi bars',
       expand: 'Expand the Protect Yumi bars',
+      powerupIn: 'Power-up in {s}s',
+      powerupReady: 'Power-up ready!',
     },
     respawn: {
       title: 'DOWNED!',
@@ -981,6 +986,20 @@ export const en = {
     banner: {
       sudden: 'SUDDEN DEATH! The Yumis hold their ground!',
       teleport: 'The Yumis teleport!',
+      powerupSpawn: 'A mystery power-up appeared!',
+      powerupMine: '{name}!',
+    },
+    // Mystery power-up names, revealed only on pickup (social/yumi_powerups.ts).
+    powerup: {
+      invuln: { name: 'Invulnerable' },
+      stealth: { name: 'Stealth' },
+      endless_mana: { name: 'Endless Mana' },
+      berserk: { name: 'Berserker' },
+    },
+    // The hold-to-grab channel bar (yumi_grab_bar_painter.ts).
+    grab: {
+      channeling: 'Grabbing… {s}s',
+      aria: 'Grabbing the mystery power-up',
     },
     end: {
       win: 'VICTORY! Yumi is safe!',

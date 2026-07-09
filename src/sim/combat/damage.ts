@@ -33,6 +33,7 @@ import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { vcupBothSeated } from '../social/vale_cup';
+import { YUMI_BERSERK_DMG_MULT, YUMI_BERSERK_TAKEN_MULT } from '../social/yumi_powerups';
 import { addThreat, clearThreat } from '../threat';
 import type { Entity } from '../types';
 import {
@@ -87,6 +88,9 @@ export function dealDamage(
 ): void {
   if (target.dead) return;
   if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
+  // Mystery power-up: Invulnerable makes the carrier take no damage for 15s.
+  // Funnels through here like the GM guard (every damage path reaches dealDamage).
+  if (target.auras.some((a) => a.kind === 'pu_invuln')) return;
   // A wild mob that broke leash is in 'evade': it has dropped its hate table
   // and walks home without fighting back, healing to full only on arrival.
   // Classic mechanics make it immune while it retreats, so it can't be chipped
@@ -155,6 +159,21 @@ export function dealDamage(
     let vuln = 0;
     for (const a of target.auras) if (a.kind === 'vulnerability') vuln += a.value;
     if (vuln > 0) amount = Math.round(amount * (1 + vuln));
+  }
+
+  // Mystery power-up: Berserker deals MORE but also TAKES more. The outgoing
+  // boost rides the source (self-damage untouched); the incoming amplification
+  // rides the target (the built-in, non-dispellable downside of the buff).
+  if (
+    amount > 0 &&
+    source &&
+    source.id !== target.id &&
+    source.auras.some((a) => a.kind === 'pu_berserk')
+  ) {
+    amount = Math.round(amount * YUMI_BERSERK_DMG_MULT);
+  }
+  if (amount > 0 && target.auras.some((a) => a.kind === 'pu_berserk')) {
+    amount = Math.round(amount * YUMI_BERSERK_TAKEN_MULT);
   }
 
   // Weakening Hex: a hexed source deals less damage (mirrors the healing cut in

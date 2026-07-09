@@ -29,6 +29,8 @@ export interface YumiLiveState {
   teleportIn: number;
   suddenDeathIn: number;
   suddenDeath: boolean;
+  /** Whole seconds until the next mystery power-up spawn; 0 while one is out. */
+  nextPowerupIn: number;
 }
 
 export interface YumiHudModel {
@@ -51,6 +53,8 @@ export interface YumiHudModel {
   down: boolean;
   /** Whole seconds until my revive (0 when alive). */
   respawnIn: number;
+  /** Whole seconds until the next mystery power-up spawns; 0 while one is out. */
+  nextPowerupIn: number;
 }
 
 const model: YumiHudModel = {
@@ -69,6 +73,7 @@ const model: YumiHudModel = {
   suddenDeath: false,
   down: false,
   respawnIn: 0,
+  nextPowerupIn: 0,
 };
 
 /**
@@ -87,6 +92,7 @@ export function yumiMatchView(
     model.phase = 'over';
     model.down = false;
     model.respawnIn = 0;
+    model.nextPowerupIn = 0;
     return model;
   }
   const useLive = live !== null && live.seen && y.phase !== 'countdown';
@@ -107,5 +113,8 @@ export function yumiMatchView(
   model.suddenDeathIn = model.suddenDeath ? 0 : useLive ? live.suddenDeathIn : y.suddenDeathIn;
   model.respawnIn = localRespawn > 0 ? Math.ceil(localRespawn) : y.down ? y.respawnIn : 0;
   model.down = model.respawnIn > 0 && y.phase !== 'countdown';
+  // The event heartbeat is the fresh source online (the snapshot is rate-limited);
+  // fall back to the snapshot offline / before the first heartbeat.
+  model.nextPowerupIn = useLive ? live.nextPowerupIn : y.nextPowerupIn;
   return model;
 }

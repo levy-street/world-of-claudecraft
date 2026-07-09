@@ -4573,7 +4573,10 @@ export const ja_JP: EnTranslations = {
       "partyTooBig5": "Protect Yumi 5v5のパーティは最大5人までです。"
     },
     "log": {
-      "start": "Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。"
+      "start": "Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。",
+      "teamBlue": "あなたは青チームです！",
+      "teamRed": "あなたは赤チームです！",
+      "powerupGrabbed": "{player} が {name} パワーアップを獲得！"
     },
     "hud": {
       "title": "PROTECT YUMI",
@@ -4584,14 +4587,36 @@ export const ja_JP: EnTranslations = {
       "enemyYumi": "敵軍のYumi",
       "aria": "自軍のYumiは体力{mine}/{max}、敵軍のYumiは{theirs}。",
       "collapse": "Protect Yumiのバーを折りたたむ",
-      "expand": "Protect Yumiのバーを展開する"
+      "expand": "Protect Yumiのバーを展開する",
+      "powerupIn": "パワーアップまで {s}秒",
+      "powerupReady": "パワーアップ出現！"
     },
     "respawn": {
       "title": "ダウン！"
     },
     "banner": {
       "sudden": "サドンデス！Yumiはもう転移しない！",
-      "teleport": "Yumiが転移した！"
+      "teleport": "Yumiが転移した！",
+      "powerupSpawn": "ミステリーパワーアップが出現！",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "無敵"
+      },
+      "stealth": {
+        "name": "ステルス"
+      },
+      "endless_mana": {
+        "name": "無限マナ"
+      },
+      "berserk": {
+        "name": "バーサーカー"
+      }
+    },
+    "grab": {
+      "channeling": "取得中… {s}秒",
+      "aria": "ミステリーパワーアップを取得中"
     },
     "end": {
       "win": "勝利！Yumiは無事だ！",

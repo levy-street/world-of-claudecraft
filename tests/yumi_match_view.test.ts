@@ -19,6 +19,8 @@ function stubInfo(over: Partial<NonNullable<ArenaInfo['match']>['yumi']> = {}): 
     damageTakenMult: 1,
     down: false,
     respawnIn: 0,
+    nextPowerupIn: 30,
+    groundPowerups: [],
     yumiA: { entityId: 900, hp: 4200, maxHp: 5000, x: 8400, z: -1250, alive: true },
     yumiB: { entityId: 901, hp: 3100, maxHp: 5000, x: 8420, z: -1240, alive: true },
     teamA: [],
@@ -58,6 +60,7 @@ const live: YumiLiveState = {
   teleportIn: 7,
   suddenDeathIn: 431,
   suddenDeath: false,
+  nextPowerupIn: 12,
 };
 
 describe('yumi match view', () => {
@@ -94,6 +97,15 @@ describe('yumi match view', () => {
     const c = yumiMatchView(stubInfo({ phase: 'countdown' }), live, 0);
     expect(c.myHp).toBe(4200);
     expect(c.phase).toBe('countdown');
+  });
+
+  it('surfaces the next-power-up countdown, preferring the live heartbeat', () => {
+    // snapshot only (offline / pre-heartbeat)
+    expect(yumiMatchView(stubInfo(), null, 0).nextPowerupIn).toBe(30);
+    // live heartbeat wins once seen (fresh online source)
+    expect(yumiMatchView(stubInfo(), live, 0).nextPowerupIn).toBe(12);
+    // 0 = an orb is already on the maze
+    expect(yumiMatchView(stubInfo(), { ...live, nextPowerupIn: 0 }, 0).nextPowerupIn).toBe(0);
   });
 
   it('sudden death zeroes the teleport countdown from either source', () => {

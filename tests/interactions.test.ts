@@ -217,6 +217,8 @@ describe('activePvpOpponentIds', () => {
       damageTakenMult: 1,
       down: false,
       respawnIn: 0,
+      nextPowerupIn: 0,
+      groundPowerups: [],
       yumiA: yumiView(900),
       yumiB: yumiView(901),
       teamA: [],

@@ -538,6 +538,7 @@ function mobileCallbacks() {
     onCycleTarget: noop,
     onJump: noop,
     onInteract: noop,
+    onInteractHold: noop,
     onChat: noop,
     onChatOpen: noop,
     onChatClose: noop,

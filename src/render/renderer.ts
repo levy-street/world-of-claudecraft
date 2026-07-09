@@ -972,8 +972,13 @@ export class Renderer {
   private shakeElapsed = 0;
   private fiestaRing: THREE.Mesh | null = null;
   private fiestaPowerupMeshes = new Map<number, THREE.Mesh>();
-  // Per-entity power-up glow: emits a coloured swirl around the carrier until it expires.
+  // Per-entity power-up glow: emits a coloured swirl around the carrier until it
+  // expires. Shared by the Fiesta ring power-ups and the Yumi mystery power-ups.
   private fiestaGlows = new Map<number, { color: number; until: number; nextSwirl: number }>();
+  // Protect Yumi mystery power-ups: pooled `(?)` orbs (orb mesh + billboard glyph)
+  // by power-up id, and the shared `?` sprite material built once on first use.
+  private yumiPowerupMeshes = new Map<number, THREE.Group>();
+  private mysterySpriteMat: THREE.SpriteMaterial | null = null;
 
   // Vale Cup: the Sowfield set piece, the staggered goal-firework volley queue,
   // and the boarball's dust pool (created lazily the first time the ball rolls).
@@ -3087,6 +3092,30 @@ export class Renderer {
         });
         if (ev.entityId === this.sim.playerId) this.addShake(0.5);
         break;
+      case 'yumiPowerup':
+        // Grabbed a mystery power-up: a big celebratory pop, then a lingering
+        // hue aura for the duration UNLESS it is Stealth (auraColor null: a glow
+        // would reveal the hidden player, so it shows none).
+        this.vfx.levelUpPillar(ev.entityId);
+        if (ev.auraColor !== null) {
+          this.vfx.nova(ev.entityId, 'arcane');
+          this.fiestaGlows.set(ev.entityId, {
+            color: ev.auraColor,
+            until: this.time + ev.duration,
+            nextSwirl: 0,
+          });
+        } else {
+          this.fiestaGlows.delete(ev.entityId); // stealth: drop any prior aura at once
+        }
+        if (ev.entityId === this.sim.playerId) this.addShake(0.5);
+        break;
+      case 'yumiPowerupSpawn': {
+        // A mystery power-up appeared: a sparkle burst where it dropped (the
+        // telegraphing `(?)` orb itself is the persistent cue; the HUD arms audio).
+        const sy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
+        this.vfx.burst(new THREE.Vector3(ev.x, sy + 1, ev.z), 'arcane', 22, 1.2);
+        break;
+      }
       case 'vcupGoal': {
         // Team-colored firework volley above the goal the ball went into (the
         // event's world anchor). Away palette when both sides fly one banner.
@@ -3296,6 +3325,91 @@ export class Renderer {
       (m.material as THREE.Material).dispose();
       m.geometry.dispose();
       this.fiestaPowerupMeshes.delete(id);
+    }
+  }
+
+  // The shared billboard material for the mystery `(?)` glyph, built once. A
+  // static canvas glyph (not procedural-random), so no seeded rnd() here.
+  private getMysterySpriteMat(): THREE.SpriteMaterial {
+    if (this.mysterySpriteMat) return this.mysterySpriteMat;
+    const c = document.createElement('canvas');
+    c.width = 128;
+    c.height = 128;
+    const cx = c.getContext('2d');
+    if (cx) {
+      cx.font = 'bold 92px sans-serif';
+      cx.fillStyle = '#ffffff';
+      cx.textAlign = 'center';
+      cx.textBaseline = 'middle';
+      cx.shadowColor = '#000000';
+      cx.shadowBlur = 10;
+      cx.fillText('?', 64, 70);
+    }
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    this.mysterySpriteMat = new THREE.SpriteMaterial({
+      map: tex,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false, // the glyph floats readably over the orb
+    });
+    return this.mysterySpriteMat;
+  }
+
+  private buildMysteryOrb(): THREE.Group {
+    const group = new THREE.Group();
+    const geo = new THREE.OctahedronGeometry(0.85, 0);
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0xffe066, // uniform mystery gold; the TYPE is never revealed here
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    group.add(new THREE.Mesh(geo, mat));
+    const spr = new THREE.Sprite(this.getMysterySpriteMat());
+    spr.scale.setScalar(1.1);
+    spr.position.y = 0.05;
+    group.add(spr);
+    return group;
+  }
+
+  // The mystery `(?)` orbs on the Yumi maze: a growing/pulsing telegraph while
+  // 'spawning', then a bright bobbing orb once 'ready'. Every orb is identical
+  // (?) gold: the type stays hidden until grabbed. Pooled by power-up id.
+  private updateYumiPowerups(dt: number): void {
+    const match = this.sim.arenaInfo?.match;
+    const list = match?.yumi && match.state === 'active' ? match.yumi.groundPowerups : [];
+    const seen = new Set<number>();
+    for (const p of list) {
+      seen.add(p.id);
+      let g = this.yumiPowerupMeshes.get(p.id);
+      if (!g) {
+        g = this.buildMysteryOrb();
+        this.yumiPowerupMeshes.set(p.id, g);
+        this.scene.add(g);
+      }
+      const gy = groundHeight(p.x, p.z, this.sim.cfg.seed);
+      const orb = g.children[0] as THREE.Mesh;
+      const mat = orb.material as THREE.MeshBasicMaterial;
+      if (p.state === 'spawning') {
+        g.scale.setScalar(0.3 + p.frac * 0.85);
+        g.position.set(p.x, gy + 0.95, p.z);
+        mat.opacity = 0.3 + Math.abs(Math.sin(this.time * 9)) * 0.45; // urgent pulse
+      } else {
+        g.scale.setScalar(1);
+        g.position.set(p.x, gy + 1.25 + Math.sin(this.time * 2 + p.id) * 0.25, p.z);
+        mat.opacity = 0.7 + Math.abs(Math.sin(this.time * 3)) * 0.25; // steady shimmer
+      }
+      orb.rotation.y += dt * 1.6;
+    }
+    for (const [id, g] of this.yumiPowerupMeshes) {
+      if (seen.has(id)) continue;
+      this.scene.remove(g);
+      const orb = g.children[0] as THREE.Mesh;
+      (orb.material as THREE.Material).dispose();
+      orb.geometry.dispose(); // the `?` sprite material is shared, never disposed here
+      this.yumiPowerupMeshes.delete(id);
     }
   }
 
@@ -4955,6 +5069,7 @@ export class Renderer {
     this.vfx.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
+    this.updateYumiPowerups(dt);
     this.tickFiestaGlows(dt);
     for (const view of this.yumiMazeViews.values()) view.update(this.sim);
     this.yumiTeamMarkers.update(this.sim, this.views);
