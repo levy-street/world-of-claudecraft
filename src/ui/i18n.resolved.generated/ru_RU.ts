@@ -6325,7 +6325,7 @@ export const ru_RU: EnTranslations = {
         "name": "Грубая шкура"
       },
       "thick_hide": {
-        "name": "Прочная шкура"
+        "name": "Плотная шкура"
       },
       "silk_gland": {
         "name": "Шёлковая железа"

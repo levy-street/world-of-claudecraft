@@ -2238,7 +2238,7 @@ const itemNamesEn = {
       'Silverleaf Herb',
       'Briarthorn Herb',
       'Rough Hide',
-      'Sturdy Hide',
+      'Dense Hide',
       'Silk Gland',
       'Venom Sac',
       'Beast Fang',

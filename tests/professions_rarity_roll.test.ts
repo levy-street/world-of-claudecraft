@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
-  materialRarityQuantity,
   MATERIAL_RARITY_MAX_PROFICIENCY,
   type MaterialRarity,
+  materialRarityQuantity,
   resolveHarvest,
   rollMaterialRarity,
 } from '../src/sim/professions/gathering';

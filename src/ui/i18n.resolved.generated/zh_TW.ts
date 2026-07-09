@@ -6325,7 +6325,7 @@ export const zh_TW: EnTranslations = {
         "name": "粗糙獸皮"
       },
       "thick_hide": {
-        "name": "堅韌獸皮"
+        "name": "密實獸皮"
       },
       "silk_gland": {
         "name": "絲腺"

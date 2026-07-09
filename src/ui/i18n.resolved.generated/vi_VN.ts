@@ -6325,7 +6325,7 @@ export const vi_VN: EnTranslations = {
         "name": "Rough Hide"
       },
       "thick_hide": {
-        "name": "Sturdy Hide"
+        "name": "Dense Hide"
       },
       "silk_gland": {
         "name": "Silk Gland"

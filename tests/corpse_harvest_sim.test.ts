@@ -21,6 +21,7 @@ type SimInternals = {
 };
 
 const HIDE_MATERIAL_ITEM = 'rough_hide';
+const THICK_HIDE_MATERIAL_ITEM = 'thick_hide';
 
 function setup(seed = 11) {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
@@ -215,9 +216,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     expect(mob.harvestClaimedBy).toBeNull();
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
-    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBe(
-      stackSizeOf(ITEMS[HIDE_MATERIAL_ITEM]) - 1,
-    );
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBe(stackSizeOf(ITEMS[HIDE_MATERIAL_ITEM]) - 1);
     // The unconsumed claim is still winnable by a player with room.
     sim.harvestCorpse(mob.id, ['hide'], b);
     expect(mob.harvestClaimedBy).toBe(b);
@@ -238,12 +237,31 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     sim.drainEvents();
     sim.harvestCorpse(componentMob.id, undefined, a);
     expect(componentMob.harvestClaimedBy).toBe(a);
-    expect(sim.countItem('beast_claw', a) + sim.countItem('boar_tusk', a)).toBeGreaterThanOrEqual(
-      1,
-    );
+    expect(sim.countItem('beast_claw', a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('boar_tusk', a)).toBeGreaterThanOrEqual(1);
     // The profession-material claim is still single-use for everyone else.
     sim.harvestCorpse(componentMob.id, undefined, b);
     expect(componentMob.harvestClaimedBy).toBe(a);
+  });
+
+  it('a thick-hide tagged live beast grants thick hide, not rough hide', () => {
+    const { sim, internals, a } = setup();
+    const template = MOBS.ridge_stalker;
+    expect(template.componentTags).toEqual(['thickHide', 'claw']);
+    expect(HARVEST_COMPONENT_ITEMS.thickHide).toBe(THICK_HIDE_MATERIAL_ITEM);
+
+    const componentMob = createMob(6666, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    componentMob.dead = true;
+    componentMob.corpseTimer = 9999;
+    componentMob.respawnTimer = 9999;
+    internals.entities.set(componentMob.id, componentMob);
+
+    sim.drainEvents();
+    sim.harvestCorpse(componentMob.id, undefined, a);
+
+    expect(componentMob.harvestClaimedBy).toBe(a);
+    expect(sim.countItem(THICK_HIDE_MATERIAL_ITEM, a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem(HIDE_MATERIAL_ITEM, a)).toBe(0);
   });
 
   it('clears the claim on respawn, so the next corpse is harvestable again', () => {

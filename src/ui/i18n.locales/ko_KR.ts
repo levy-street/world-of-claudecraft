@@ -3417,7 +3417,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.silverleaf_herb.name': '은잎 약초',
   'entities.items.briarthorn_herb.name': '가시덩굴 약초',
   'entities.items.rough_hide.name': '거친 가죽',
-  'entities.items.thick_hide.name': '질긴 가죽',
+  'entities.items.thick_hide.name': '촘촘한 가죽',
   'entities.items.silk_gland.name': '비단샘',
   'entities.items.venom_sac.name': '독주머니',
   'entities.items.beast_fang.name': '야수 송곳니',

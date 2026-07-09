@@ -3429,7 +3429,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.silverleaf_herb.name': '銀葉草',
   'entities.items.briarthorn_herb.name': '茨棘草',
   'entities.items.rough_hide.name': '粗い獣皮',
-  'entities.items.thick_hide.name': '丈夫な獣皮',
+  'entities.items.thick_hide.name': '緻密な獣皮',
   'entities.items.silk_gland.name': '絹糸腺',
   'entities.items.venom_sac.name': '毒袋',
   'entities.items.beast_fang.name': '獣の牙',

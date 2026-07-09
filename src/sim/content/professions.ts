@@ -60,6 +60,7 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'log
 // here remain zero-yield profession harvests until the material catalog grows.
 export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
   hide: 'rough_hide',
+  thickHide: 'thick_hide',
   fang: 'beast_fang',
   claw: 'beast_claw',
   silk: 'silk_gland',

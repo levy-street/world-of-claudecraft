@@ -614,6 +614,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
+  // tin_ore and beast_claw are source-first materials in this PR. Their recipe
+  // sinks are deferred to the trainer and skill-gate follow-up.
   tin_ore: {
     id: 'tin_ore',
     name: 'Tin Ore',
@@ -714,7 +716,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   thick_hide: {
     id: 'thick_hide',
-    name: 'Sturdy Hide',
+    name: 'Dense Hide',
     kind: 'junk',
     quality: 'uncommon',
     sellValue: 12,

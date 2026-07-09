@@ -3290,7 +3290,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.silverleaf_herb.name': '银叶草',
   'entities.items.briarthorn_herb.name': '刺藤草',
   'entities.items.rough_hide.name': '粗糙兽皮',
-  'entities.items.thick_hide.name': '坚韧兽皮',
+  'entities.items.thick_hide.name': '密实兽皮',
   'entities.items.silk_gland.name': '丝腺',
   'entities.items.venom_sac.name': '毒囊',
   'entities.items.beast_fang.name': '野兽尖牙',

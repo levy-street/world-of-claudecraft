@@ -3291,7 +3291,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.silverleaf_herb.name': '銀葉草',
   'entities.items.briarthorn_herb.name': '刺藤草',
   'entities.items.rough_hide.name': '粗糙獸皮',
-  'entities.items.thick_hide.name': '堅韌獸皮',
+  'entities.items.thick_hide.name': '密實獸皮',
   'entities.items.silk_gland.name': '絲腺',
   'entities.items.venom_sac.name': '毒囊',
   'entities.items.beast_fang.name': '野獸尖牙',

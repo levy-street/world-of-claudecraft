@@ -6325,7 +6325,7 @@ export const ko_KR: EnTranslations = {
         "name": "거친 가죽"
       },
       "thick_hide": {
-        "name": "질긴 가죽"
+        "name": "촘촘한 가죽"
       },
       "silk_gland": {
         "name": "비단샘"

@@ -238,6 +238,10 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
     return;
   }
   const entry = nodeHarvestEntryFor(node);
+  // Reserve the maximum possible node yield before rolling rarity. This can
+  // reject a common harvest that would fit exactly one unit, but it preserves
+  // deterministic RNG draw order, prevents post-roll capacity overflow, and
+  // ensures denied harvest attempts draw no RNG.
   if (!ctx.canAddItem(entry.itemId, materialRarityQuantity('legendary'), meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;

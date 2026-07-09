@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { GATHER_NODES, ITEMS } from '../src/sim/data';
 import {
+  MATERIAL_RARITY_MAX_PROFICIENCY,
   materialRarityQuantity,
   nodeHarvestEntryFor,
 } from '../src/sim/professions/gathering';
@@ -73,6 +74,24 @@ describe('gather node harvest (#1121)', () => {
     sim.harvestNode(NODE_ID, pid);
     sim.tick();
     expect(sim.countItem(entry.itemId, pid)).toBe(before + 1);
+  });
+
+  it('a max-proficiency single harvest grants the rolled rarity quantity', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Adept');
+    teleportOntoNode(sim, pid, NODE_ID);
+
+    const node = mustNode(NODE_ID);
+    const entry = nodeHarvestEntryFor(node);
+    mustMeta(sim, pid).gatheringProficiency[entry.professionId] = MATERIAL_RARITY_MAX_PROFICIENCY;
+
+    const before = sim.countItem(entry.itemId, pid);
+    sim.harvestNode(node.id, pid);
+    sim.tick();
+
+    const delta = sim.countItem(entry.itemId, pid) - before;
+    expect(delta).toBeGreaterThan(1);
+    expect(delta).toBeLessThanOrEqual(materialRarityQuantity('legendary'));
   });
 
   it('denies harvest when the player is too far from the node', () => {

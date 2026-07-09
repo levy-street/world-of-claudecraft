@@ -102,7 +102,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // Miring Pounce: the prowler drags its prey into the sucking mire, slowing
     // the victim's swings (+30% swing interval) for 8s.
     slowStrike: { chance: 0.3, mult: 1.3, duration: 8, name: 'Miring Pounce', school: 'physical' },
-    componentTags: ['hide', 'claw'],
+    componentTags: ['thickHide', 'claw'],
   },
   deepfen_murloc: {
     id: 'deepfen_murloc',

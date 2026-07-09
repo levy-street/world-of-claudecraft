@@ -6325,7 +6325,7 @@ export const en_XA: EnTranslations = {
         "name": "[Ŕóúĝĥ Ĥíðé]"
       },
       "thick_hide": {
-        "name": "[Šţúŕðý Ĥíðé]"
+        "name": "[Ðéñšé Ĥíðé]"
       },
       "silk_gland": {
         "name": "[Šíļķ Ĝļáñð]"

@@ -6325,7 +6325,7 @@ export const tr_TR: EnTranslations = {
         "name": "Rough Hide"
       },
       "thick_hide": {
-        "name": "Sturdy Hide"
+        "name": "Dense Hide"
       },
       "silk_gland": {
         "name": "Silk Gland"

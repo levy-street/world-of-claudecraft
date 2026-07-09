@@ -125,7 +125,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.95,
     color: 0x8c8270,
-    componentTags: ['hide', 'claw'],
+    componentTags: ['thickHide', 'claw'],
   },
   // The apex of the southern ridge: a grizzled, scar-pelted old cat that has
   // outlived three generations of its pack. A rare elite counterpart to the
@@ -160,7 +160,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.3,
     color: 0x6e6453,
-    componentTags: ['hide', 'fang', 'claw'],
+    componentTags: ['thickHide', 'fang', 'claw'],
   },
   deeprock_kobold: {
     id: 'deeprock_kobold',

@@ -1,10 +1,52 @@
 import { describe, expect, it } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
-import { COMBO_RECIPES, COMMON_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
-import { GATHER_NODES, ITEMS } from '../src/sim/data';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { GATHER_NODES, GROUND_OBJECTS, ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { NODE_HARVEST_TABLE, nodeHarvestEntryFor } from '../src/sim/professions/gathering';
 
 const QUEST_ONLY_COLLECTIBLES = new Set(['boar_hide', 'webwood_silk', 'widow_venom_sac']);
+const PRE_EXISTING_UNOBTAINABLE_REAGENTS = new Set([
+  // Already unobtainable on release/v0.23.0; intentionally not fixed in PR #1664.
+  'arcanite_bar',
+]);
+
+function obtainableItemIds(): Set<string> {
+  const itemIds = new Set<string>();
+
+  for (const node of GATHER_NODES) {
+    itemIds.add(nodeHarvestEntryFor(node).itemId);
+  }
+
+  for (const fallback of Object.values(NODE_HARVEST_TABLE)) {
+    itemIds.add(fallback.itemId);
+  }
+
+  for (const itemId of Object.values(HARVEST_COMPONENT_ITEMS)) {
+    itemIds.add(itemId);
+  }
+
+  for (const recipe of ALL_RECIPES) {
+    itemIds.add(recipe.resultItemId);
+  }
+
+  for (const mob of Object.values(MOBS)) {
+    for (const loot of mob.loot) {
+      if (loot.itemId) itemIds.add(loot.itemId);
+    }
+  }
+
+  for (const npc of Object.values(NPCS)) {
+    for (const itemId of npc.vendorItems ?? []) {
+      itemIds.add(itemId);
+    }
+  }
+
+  for (const object of GROUND_OBJECTS) {
+    itemIds.add(object.itemId);
+  }
+
+  return itemIds;
+}
 
 describe('profession material content', () => {
   it('every node output and fallback harvest-table output exists in ITEMS', () => {
@@ -19,10 +61,21 @@ describe('profession material content', () => {
   });
 
   it('every recipe reagent and result exists in ITEMS', () => {
-    for (const recipe of [...COMMON_RECIPES, ...TOOL_RECIPES, ...COMBO_RECIPES]) {
+    for (const recipe of ALL_RECIPES) {
       expect(ITEMS[recipe.resultItemId]).toBeDefined();
       for (const reagent of recipe.reagents) {
         expect(ITEMS[reagent.itemId]).toBeDefined();
+      }
+    }
+  });
+
+  it('every recipe reagent is obtainable from a live item source', () => {
+    const obtainable = obtainableItemIds();
+
+    for (const recipe of ALL_RECIPES) {
+      for (const reagent of recipe.reagents) {
+        if (PRE_EXISTING_UNOBTAINABLE_REAGENTS.has(reagent.itemId)) continue;
+        expect(obtainable.has(reagent.itemId), `${recipe.id} reagent ${reagent.itemId}`).toBe(true);
       }
     }
   });

@@ -6325,7 +6325,7 @@ export const sv_SE: EnTranslations = {
         "name": "Rough Hide"
       },
       "thick_hide": {
-        "name": "Sturdy Hide"
+        "name": "Dense Hide"
       },
       "silk_gland": {
         "name": "Silk Gland"

@@ -6325,7 +6325,7 @@ export const ja_JP: EnTranslations = {
         "name": "粗い獣皮"
       },
       "thick_hide": {
-        "name": "丈夫な獣皮"
+        "name": "緻密な獣皮"
       },
       "silk_gland": {
         "name": "絹糸腺"

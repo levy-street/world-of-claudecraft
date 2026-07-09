@@ -3460,7 +3460,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.silverleaf_herb.name': 'Трава серебролист',
   'entities.items.briarthorn_herb.name': 'Трава колючелист',
   'entities.items.rough_hide.name': 'Грубая шкура',
-  'entities.items.thick_hide.name': 'Прочная шкура',
+  'entities.items.thick_hide.name': 'Плотная шкура',
   'entities.items.silk_gland.name': 'Шёлковая железа',
   'entities.items.venom_sac.name': 'Ядовитый мешочек',
   'entities.items.beast_fang.name': 'Клык зверя',
