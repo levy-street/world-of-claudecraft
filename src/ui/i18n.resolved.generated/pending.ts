@@ -23,6 +23,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -41,6 +42,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -59,6 +61,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -77,6 +80,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -96,6 +100,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -114,6 +119,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -132,6 +138,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -150,6 +157,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -168,6 +176,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -186,6 +195,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -204,6 +214,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -222,6 +233,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -240,6 +252,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -258,6 +271,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -276,6 +290,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -294,6 +309,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -312,6 +328,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -330,6 +347,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -348,6 +366,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"
@@ -366,6 +385,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.dungeons.undermount_wing4.leaveText",
     "entities.dungeons.undermount_wing4.name",
     "entities.mobs.odrenn_the_temperer.name",
+    "entities.mobs.saan_the_stoker.name",
     "entities.mobs.the_forge_heart.name",
     "entities.mobs.volzharr_buried_furnace.name",
     "entities.mobs.vosh_the_glazier.name"

@@ -55,10 +55,12 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
     const wing1 = claimFor(sim, 'undermount_wing1', pid);
     expect(wing1, 'wing 1 is open').toBeDefined();
 
-    // Killing the wing-1 boss clears the wing for the raid in the room.
-    const boss = bossIn(sim, wing1, 'vosh_the_glazier');
-    sim.dealDamage(player, boss, boss.hp, false, 'physical', null, 'hit', true);
-    expect(boss.dead, 'boss died').toBe(true);
+    // The Kiln-Keepers duo clears the wing only when BOTH keepers fall.
+    for (const id of ['vosh_the_glazier', 'saan_the_stoker']) {
+      const keeper = bossIn(sim, wing1, id);
+      sim.dealDamage(player, keeper, keeper.hp, false, 'physical', null, 'hit', true);
+      expect(keeper.dead, `${id} died`).toBe(true);
+    }
     expect(meta.undermountCleared.has('undermount_wing1'), 'wing 1 recorded').toBe(true);
 
     // With wing 1 cleared, wing 2 now opens.

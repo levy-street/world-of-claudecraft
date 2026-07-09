@@ -417,7 +417,7 @@ export interface SimContextCallbacks {
   delveRunForMob(mobId: number): DelveRun | null;
   onDelveBossDefeated(run: DelveRun): void;
   grantNythraxisLockout(boss: Entity): void;
-  grantUndermountClear(boss: Entity): void;
+  onUndermountBossDeath(boss: Entity): void;
   frenzyPackmates(dead: Entity): void;
   armDeathThroes(dead: Entity): void;
   // C1's grantXp level-up path AND G1a's talent application (progression/talents.ts)
@@ -929,7 +929,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     delveRunForMob: host.delveRunForMob,
     onDelveBossDefeated: host.onDelveBossDefeated,
     grantNythraxisLockout: host.grantNythraxisLockout,
-    grantUndermountClear: host.grantUndermountClear,
+    onUndermountBossDeath: host.onUndermountBossDeath,
     frenzyPackmates: host.frenzyPackmates,
     armDeathThroes: host.armDeathThroes,
     refreshKnownAbilities: host.refreshKnownAbilities,

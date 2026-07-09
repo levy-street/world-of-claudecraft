@@ -203,18 +203,24 @@ parts):
   and the duo link: she channels ANNEAL on Vosh (`mendAlly`), a big
   interruptible heal, so while she lives Vosh effectively does not die.
   Kick discipline (`silence`-school counterplay) is the casters' job.
-- **The duo rule, data-only:** both carry `packFrenzy`. Stagger the kills
-  and the survivor frenzies: tuned so a ~20 s kill gap is a wipe for a
-  wing-1-geared raid and ~10 s is survivable (tuning). Tank them apart
-  (Anneal has a range, tuning), balance the damage, kill in step.
+- **The duo rule (Kiln Fury):** stagger the kills and the survivor
+  frenzies, tuned so a big kill gap is a wipe and a tight one is
+  survivable (tuning). IMPLEMENTATION NOTE (corrected during build): the
+  engine's `packFrenzy` only buffs SAME-`templateId` packmates (a wolf
+  pack), so it is inert across a two-DIFFERENT-boss duo. The cross-keeper
+  frenzy is therefore bespoke encounter logic: `onUndermountBossDeath`
+  (encounters/undermount.ts) applies a `buff_haste` "Kiln Fury" aura to
+  the surviving keeper. Tank them apart (Anneal has a range, tuning),
+  balance the damage, kill in step.
 - **Optional module twist (cuttable, the one scripted hook):** if the
   frenzied survivor lives 25 s past their partner's death, they drag the
   corpse into the kiln and RE-FIRE it at 40% HP (`delayedEvents` + the
   respawn machinery). A resurrection mechanic told as a joke: they
   literally put the boss back in the oven.
-- Machinery: the CORE is fully data-only (`packFrenzy`, `mendAlly`,
-  `polymorphHex`, `terrify` on Saan as texture, `aoePulse`, `cleave`);
-  wing 1 still carries zero required scripting, and the raid's onboarding
+- Machinery: the kits are data-only (`mendAlly`, `polymorphHex`,
+  `aoePulse`, `cleave`); the only script is the small `onUndermountBossDeath`
+  hook (duo frenzy + clear-when-both-dead), which the wing needs anyway. The
+  raid's onboarding
   fight stays the codebase's onboarding fight.
 - Wing 1 lessons that wing 4 grades later: watching debuff state, kill
   discipline across two targets, and taunt reflexes.
@@ -863,9 +869,9 @@ land.
 Wing 1, the Kiln-Keepers:
 - A 10-player raid can enter `undermount_wing1`, and the raid gate refuses
   fewer than `RAID_MIN_PLAYERS`.
-- Killing one keeper frenzies the survivor (`packFrenzy`); a staggered
-  kill ~20 s apart wipes a wing-1-geared raid, ~10 s apart is survivable
-  (open question 9's tuning).
+- Killing one keeper frenzies the survivor (Kiln Fury, via
+  `onUndermountBossDeath`), and the wing clears only when BOTH keepers are
+  down; a staggered kill wipes a wing-1-geared raid (open question 9's tuning).
 - Saan's Anneal heals Vosh, is interruptible, and stops at its tether
   range when they are tanked apart; Vosh's Glazing stacks and Cinder-Toad
   (`polymorphHex`) both force observable taunt swaps.
@@ -969,8 +975,9 @@ worktree, screenshots for anything visual, `npm run gate` green.
    overheal rules apply? Needs a decision before healer-balance tuning, and
    it should reuse the effective-healing accounting `healingThreat` already
    does rather than inventing a second definition.
-9. Kiln-Keepers duo tuning: the packFrenzy numbers that make a ~20 s kill
-   gap a wipe and ~10 s survivable; Anneal's tether range and heal size
+9. Kiln-Keepers duo tuning: the Kiln Fury numbers (haste + how long) that
+   make a big kill gap a wipe and a tight one survivable; Anneal's tether
+   range and heal size
    (large enough that ignoring Saan is a loss, kickable enough that a
    coordinated raid fully denies it); and whether Glazing's statue endpoint
    is organic (the stacking slow makes swaps obvious) or a hard scripted

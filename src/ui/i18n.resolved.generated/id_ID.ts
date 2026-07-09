@@ -7167,6 +7167,9 @@ export const id_ID: EnTranslations = {
       "vosh_the_glazier": {
         "name": "Vosh the Glazier"
       },
+      "saan_the_stoker": {
+        "name": "Saan the Stoker"
+      },
       "the_forge_heart": {
         "name": "The Forge-Heart"
       },

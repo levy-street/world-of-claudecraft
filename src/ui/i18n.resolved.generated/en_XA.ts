@@ -7167,6 +7167,9 @@ export const en_XA: EnTranslations = {
       "vosh_the_glazier": {
         "name": "[Ʋóšĥ ţĥé Ĝļážíéŕ]"
       },
+      "saan_the_stoker": {
+        "name": "[Šááñ ţĥé Šţóķéŕ]"
+      },
       "the_forge_heart": {
         "name": "[Ţĥé Ƒóŕĝé-Ĥéáŕţ]"
       },

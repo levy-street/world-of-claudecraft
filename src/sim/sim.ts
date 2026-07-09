@@ -2844,7 +2844,7 @@ export class Sim {
       // N1: grantNythraxisLockout now lives in encounters/nythraxis.ts; late-bound arrow
       // (handleDeath in combat/damage.ts reaches it via ctx on the boss-death path).
       grantNythraxisLockout: (boss) => nythraxis.grantNythraxisLockout(sim.ctx, boss),
-      grantUndermountClear: (boss) => undermount.grantUndermountClear(sim.ctx, boss),
+      onUndermountBossDeath: (boss) => undermount.onUndermountBossDeath(sim.ctx, boss),
       // frenzyPackmates / armDeathThroes flipped points-at to mob/lifecycle (M4); their
       // late-bound lifecycle arrows live in the death-lifecycle block below.
       refreshKnownAbilities: sim.refreshKnownAbilities.bind(sim),

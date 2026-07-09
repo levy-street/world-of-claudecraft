@@ -78,11 +78,13 @@ describe('Undermount wing content (skeleton)', () => {
     }
   });
 
-  it('defines each wing boss as a boss MobTemplate', () => {
+  it('defines every wing boss as a boss MobTemplate', () => {
     for (const wing of UNDERMOUNT_WINGS) {
-      const boss = MOBS[wing.bossMobId];
-      expect(boss, wing.bossMobId).toBeDefined();
-      expect(boss.boss, wing.bossMobId).toBe(true);
+      for (const id of wing.bossMobIds) {
+        const boss = MOBS[id];
+        expect(boss, id).toBeDefined();
+        expect(boss.boss, id).toBe(true);
+      }
     }
   });
 

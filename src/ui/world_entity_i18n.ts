@@ -77,6 +77,7 @@ const MOB_IDS = [
   'nythraxis_skeleton_warrior',
   'nythraxis_scourge_of_thornpeak',
   'vosh_the_glazier',
+  'saan_the_stoker',
   'the_forge_heart',
   'odrenn_the_temperer',
   'volzharr_buried_furnace',

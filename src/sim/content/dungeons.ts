@@ -523,9 +523,52 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 7,
     aggroRadius: 18,
+    cleave: { radius: 8, mult: 0.65, name: 'Glasscut Arc' },
+    polymorphHex: {
+      chance: 0.16,
+      duration: 4,
+      name: 'Cinder-Toad',
+      school: 'fire',
+    },
     loot: [],
     scale: 1.8,
     color: 0x86c6d8,
+  },
+  saan_the_stoker: {
+    id: 'saan_the_stoker',
+    name: 'Saan the Stoker',
+    minLevel: 24,
+    maxLevel: 24,
+    family: 'humanoid',
+    elite: true,
+    boss: true,
+    hpBase: 360,
+    hpPerLevel: 42,
+    dmgBase: 13,
+    dmgPerLevel: 2.8,
+    attackSpeed: 2.0,
+    armorPerLevel: 22,
+    moveSpeed: 7,
+    aggroRadius: 18,
+    aoePulse: {
+      min: 28,
+      max: 40,
+      radius: 14,
+      every: 8,
+      name: 'Kilnflare Pulse',
+      school: 'fire',
+    },
+    mendAlly: {
+      healMin: 90,
+      healMax: 130,
+      radius: 20,
+      every: 12,
+      name: 'Stoke the Coals',
+      school: 'fire',
+    },
+    loot: [],
+    scale: 1.65,
+    color: 0xd86d32,
   },
   the_forge_heart: {
     id: 'the_forge_heart',
@@ -656,7 +699,10 @@ const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 },
 ];
 
-const UNDERMOUNT_WING1_SPAWN_LIST: DungeonSpawn[] = [{ mobId: 'vosh_the_glazier', x: 0, z: 40 }];
+const UNDERMOUNT_WING1_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: 'vosh_the_glazier', x: -6, z: 40 },
+  { mobId: 'saan_the_stoker', x: 6, z: 40 },
+];
 
 const UNDERMOUNT_WING2_SPAWN_LIST: DungeonSpawn[] = [{ mobId: 'the_forge_heart', x: 0, z: 40 }];
 

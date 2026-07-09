@@ -225,7 +225,7 @@ function makeCtx() {
     delveRunForMob: vi.fn(() => null),
     onDelveBossDefeated: vi.fn(),
     grantNythraxisLockout: vi.fn(),
-    grantUndermountClear: vi.fn(),
+    onUndermountBossDeath: vi.fn(),
     frenzyPackmates: vi.fn(),
     armDeathThroes: vi.fn(),
     refreshKnownAbilities: vi.fn(),

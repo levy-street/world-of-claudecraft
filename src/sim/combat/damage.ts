@@ -623,7 +623,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       });
     }
     if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
-    if (undermountWingByBoss(e.templateId)) ctx.grantUndermountClear(e);
+    if (undermountWingByBoss(e.templateId)) ctx.onUndermountBossDeath(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer =

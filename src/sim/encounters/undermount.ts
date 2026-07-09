@@ -7,50 +7,63 @@
 // is the walking-skeleton backbone that the instance layer consults.
 //
 // The wing chain + seal predicate are pure (no rng, no Sim state, no DOM); the
-// instance layer (src/sim/instances/dungeons.ts) consumes them. grantUndermountClear
-// is the one ctx-dependent function (boss-death credit), mirroring
+// instance layer (src/sim/instances/dungeons.ts) consumes them. onUndermountBossDeath
+// is the one ctx-dependent function (duo frenzy + wing-clear credit), mirroring
 // encounters/nythraxis.ts grantNythraxisLockout.
 
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity } from '../types';
+import { type Aura, dist2d, type Entity } from '../types';
 
 // Players within this many yards of the dead boss's spawn get the wing cleared.
 // Matches NYTHRAXIS_ROOM_RADIUS: large enough to cover the interior, small enough
 // not to bleed into an adjacent instance's origin.
 const UNDERMOUNT_ROOM_RADIUS = 260;
 
+// Kiln Fury: the surviving keeper of a duo frenzies when its partner falls (the
+// kill-together tension). The engine's packFrenzy only buffs SAME-templateId
+// packmates, so this cross-keeper frenzy is bespoke to the encounter.
+const KEEPER_FRENZY_AURA_ID = 'undermount_keeper_frenzy';
+const KEEPER_FRENZY_HASTE = 0.5; // +50% attack speed while enraged (tuning)
+const KEEPER_FRENZY_DURATION = 90; // effectively the rest of the fight (tuning)
+
 export interface UndermountWing {
   /** The DUNGEON_DEFS id for this wing's instance. */
   dungeonId: string;
   /** 1-based wing number, in descent order. */
   order: number;
-  /** The boss whose death clears the wing (the last boss to die in a duo). */
-  bossMobId: string;
+  /** The bosses of this wing. The wing clears only when ALL of them are dead,
+   *  so a duo (wing 1: Vosh + Saan) clears on the last keeper to die. */
+  bossMobIds: readonly string[];
   /** The wing that must be cleared before this one's door opens; null for wing 1. */
   requires: string | null;
 }
 
 // Descent order. dungeonIds and bossMobIds are the stable content contract the
-// DUNGEON_DEFS + MobTemplate records must match (the skeleton uses one stub boss
-// per wing; the wing-1 duo and the real kits refine these in place later).
+// DUNGEON_DEFS + MobTemplate records must match. Wing 1 is the Kiln-Keepers duo
+// (Vosh + Saan); wings 2 to 4 are still single stub bosses pending their kits.
 export const UNDERMOUNT_WINGS: readonly UndermountWing[] = [
-  { dungeonId: 'undermount_wing1', order: 1, bossMobId: 'vosh_the_glazier', requires: null },
+  {
+    dungeonId: 'undermount_wing1',
+    order: 1,
+    bossMobIds: ['vosh_the_glazier', 'saan_the_stoker'],
+    requires: null,
+  },
   {
     dungeonId: 'undermount_wing2',
     order: 2,
-    bossMobId: 'the_forge_heart',
+    bossMobIds: ['the_forge_heart'],
     requires: 'undermount_wing1',
   },
   {
     dungeonId: 'undermount_wing3',
     order: 3,
-    bossMobId: 'odrenn_the_temperer',
+    bossMobIds: ['odrenn_the_temperer'],
     requires: 'undermount_wing2',
   },
   {
     dungeonId: 'undermount_wing4',
     order: 4,
-    bossMobId: 'volzharr_buried_furnace',
+    bossMobIds: ['volzharr_buried_furnace'],
     requires: 'undermount_wing3',
   },
 ] as const;
@@ -74,23 +87,73 @@ export function undermountWingSealed(cleared: ReadonlySet<string>, dungeonId: st
   return !cleared.has(wing.requires);
 }
 
-const WING_BY_BOSS = new Map(UNDERMOUNT_WINGS.map((w) => [w.bossMobId, w] as const));
+const WING_BY_BOSS = new Map(
+  UNDERMOUNT_WINGS.flatMap((w) => w.bossMobIds.map((id) => [id, w] as const)),
+);
 
 /** The wing whose boss is `bossMobId`, or undefined if it is not an Undermount boss. */
 export function undermountWingByBoss(bossMobId: string): UndermountWing | undefined {
   return WING_BY_BOSS.get(bossMobId);
 }
 
+// Whether every OTHER boss of `wing` is already down (dead or despawned) in the
+// room around the just-slain `dying` boss. A live partner nearby means the
+// encounter is not finished, so a duo does not clear on the first keeper's death.
+function wingBossesAllDown(ctx: SimContext, wing: UndermountWing, dying: Entity): boolean {
+  for (const id of wing.bossMobIds) {
+    if (id === dying.templateId) continue;
+    for (const ent of ctx.entities.values()) {
+      if (
+        ent.templateId === id &&
+        !ent.dead &&
+        dist2d(ent.pos, dying.spawnPos) <= UNDERMOUNT_ROOM_RADIUS
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// Frenzy the surviving keeper(s) of a duo when one of them dies: a stacking-free
+// haste buff so killing the keepers far apart is a wipe. No-op for a single-boss
+// wing or when no partner is still up in the room.
+function frenzyUndermountPartners(ctx: SimContext, wing: UndermountWing, dying: Entity): void {
+  if (wing.bossMobIds.length < 2) return;
+  for (const ent of ctx.entities.values()) {
+    if (ent.kind !== 'mob' || ent.dead || ent.id === dying.id) continue;
+    if (!wing.bossMobIds.includes(ent.templateId)) continue;
+    if (dist2d(ent.pos, dying.spawnPos) > UNDERMOUNT_ROOM_RADIUS) continue;
+    if (ent.auras.some((a) => a.id === KEEPER_FRENZY_AURA_ID)) continue;
+    const aura: Aura = {
+      id: KEEPER_FRENZY_AURA_ID,
+      name: 'Kiln Fury',
+      kind: 'buff_haste',
+      remaining: KEEPER_FRENZY_DURATION,
+      duration: KEEPER_FRENZY_DURATION,
+      value: KEEPER_FRENZY_HASTE,
+      sourceId: ent.id,
+      school: 'physical',
+    };
+    ent.auras.push(aura);
+    ctx.emit({ type: 'aura', targetId: ent.id, name: 'Kiln Fury', gained: true });
+  }
+}
+
 /**
- * Boss-death credit: when an Undermount wing boss dies, record its wing as
- * cleared (permanent progress) on every player in the room, so the sealed door
- * to the next wing opens for the raid. Credits by proximity to the boss's spawn
- * (like grantNythraxisLockout), which scopes it to the boss's instance. No-ops
- * for any non-wing-boss death.
+ * Undermount wing boss-death hook, fired for every wing-boss death:
+ * 1. Frenzy any surviving duo partner (Kiln Fury), the kill-together tension.
+ * 2. When the LAST boss of the wing is down, record the wing as cleared
+ *    (permanent progress) on every player in the room, opening the sealed door
+ *    to the next wing. Crediting is scoped by proximity to the boss's spawn,
+ *    like grantNythraxisLockout.
+ * No-ops for a non-wing-boss death; for a duo the clear waits for the last keeper.
  */
-export function grantUndermountClear(ctx: SimContext, boss: Entity): void {
+export function onUndermountBossDeath(ctx: SimContext, boss: Entity): void {
   const wing = WING_BY_BOSS.get(boss.templateId);
   if (!wing) return;
+  frenzyUndermountPartners(ctx, wing, boss);
+  if (!wingBossesAllDown(ctx, wing, boss)) return;
   for (const meta of ctx.players.values()) {
     const p = ctx.entities.get(meta.entityId);
     if (p && dist2d(p.pos, boss.spawnPos) <= UNDERMOUNT_ROOM_RADIUS) {
