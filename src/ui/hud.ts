@@ -8972,6 +8972,16 @@ export class Hud {
             () => this.sim.partyDecline(),
           );
           break;
+        case 'readyCheckStart':
+          audio.readyCheck();
+          this.showPrompt(
+            t('hudChrome.readyCheck.prompt', { name: `<b>${esc(ev.fromName)}</b>` }),
+            t('hudChrome.readyCheck.ready'),
+            () => this.sim.readyCheckRespond(true),
+            () => this.sim.readyCheckRespond(false),
+            t('hudChrome.readyCheck.notReady'),
+          );
+          break;
         case 'guildInvite':
           audio.questAccept();
           this.showPrompt(
@@ -13873,6 +13883,7 @@ export class Hud {
     acceptLabel: string,
     onAccept: () => void,
     onDecline: () => void,
+    declineLabel: string = t('hud.prompts.decline'),
   ): void {
     const stack = $('#prompt-stack');
     const prompt = document.createElement('div');
@@ -13883,7 +13894,7 @@ export class Hud {
     accept.textContent = acceptLabel;
     const decline = document.createElement('button');
     decline.className = 'btn';
-    decline.textContent = t('hud.prompts.decline');
+    decline.textContent = declineLabel;
     accept.addEventListener('click', () => {
       prompt.remove();
       onAccept();

@@ -154,6 +154,12 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} 發起了準備確認。你準備好了嗎？",
+      "ready": "準備就緒",
+      "notReady": "未準備",
+      "result": "準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。"
+    },
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",

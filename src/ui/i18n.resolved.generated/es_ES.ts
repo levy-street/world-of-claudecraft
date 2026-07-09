@@ -154,6 +154,12 @@ export const es_ES: EnTranslations = {
     "spectate": {
       "banner": "Observando a {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Resucitar en el cadáver",
       "resurrectAtHealer": "El Guardián Pálido (Tañido del Guardián)",

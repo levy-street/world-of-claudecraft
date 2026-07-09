@@ -317,6 +317,14 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  // "/ready" (alias "/readycheck"): the party/raid leader starts a ready check. Every
+  // other member's client plays a sound and shows a yes/no prompt; validation (in a
+  // party, leader-only, none already running) is delegated to readyCheckStart.
+  if (/^\/ready(?:check)?\s*$/i.test(raw)) {
+    ctx.readyCheckStart(r.meta.entityId);
+    return null;
+  }
+
   // "/unfollow" stops an active follow
   if (/^\/unfollow(?:\s|$)/i.test(raw)) {
     if (r.e.followTargetId === null) ctx.error(r.meta.entityId, 'You are not following anyone.');

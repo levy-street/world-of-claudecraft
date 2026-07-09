@@ -11,6 +11,14 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
+  // yes/no prompt; the outcome is announced in chat by the sim.
+  readyCheck: {
+    prompt: '{name} has started a ready check. Are you ready?',
+    ready: 'Ready',
+    notReady: 'Not Ready',
+    result: 'Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.',
+  },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
   // button and "You have died." title reuse the hud.core.* keys; these are the
   // ghost-state additions shown once the spirit has been released.

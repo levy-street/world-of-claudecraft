@@ -154,6 +154,12 @@ export const da_DK: EnTranslations = {
     "spectate": {
       "banner": "Tilskuer til {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",

@@ -154,6 +154,12 @@ export const cs_CZ: EnTranslations = {
     "spectate": {
       "banner": "Sleduješ {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",

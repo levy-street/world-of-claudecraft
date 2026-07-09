@@ -251,6 +251,7 @@ export const COMMAND_NAMES = [
   'masterAssign',
   'setMarker',
   'clearMarker',
+  'readyrespond',
   'pet_abandon',
   'pet_rename',
   'pet_revive',

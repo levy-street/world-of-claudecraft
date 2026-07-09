@@ -154,6 +154,12 @@ export const en_XA: EnTranslations = {
     "spectate": {
       "banner": "[Šþéçţáţíñĝ {name}]"
     },
+    "readyCheck": {
+      "prompt": "[{name} ĥáš šţáŕţéð á ŕéáðý çĥéçķ. Áŕé ýóú ŕéáðý?]",
+      "ready": "[Ŕéáðý]",
+      "notReady": "[Ñóţ Ŕéáðý]",
+      "result": "[Ŕéáðý çĥéçķ: {ready} ŕéáðý, {notReady} ñóţ ŕéáðý, {noResponse} ñó ŕéšþóñšé.]"
+    },
     "death": {
       "resurrectAtCorpse": "[Ŕéšúŕŕéçţ áţ Çóŕþšé]",
       "resurrectAtHealer": "[Ţĥé Þáļé Ķééþéŕ (Ķééþéŕ'š Ţóļļ)]",

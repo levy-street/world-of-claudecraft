@@ -2016,6 +2016,17 @@ export type CalendarResultCode =
   | 'calendarFull'
   | 'eventGone';
 
+// An in-flight party/raid ready check (social/ready_check.ts). Keyed on Sim by party
+// id. Each member is 'pending' until they answer; a timeout flips the stragglers to
+// 'afk'. Sim-internal state, never wired to the client (the outcome is announced as
+// chat/log lines and the yes/no prompt rides the readyCheckStart event).
+export interface ReadyCheck {
+  partyId: number;
+  initiator: number; // pid who ran /ready
+  endsAt: number; // sim-clock seconds (ctx.time) when the check auto-finalizes
+  responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
+}
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -2114,6 +2125,9 @@ export type SimEvent = { pid?: number } & (
       to?: string;
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
+  // The party/raid leader started a ready check: the recipient's client plays a
+  // sound and shows a yes/no prompt (social/ready_check.ts). Personal (pid set).
+  | { type: 'readyCheckStart'; fromName: string }
   // a guild invitation from an online guild officer/leader; resolved by name
   // server-side so it carries no pid
   | { type: 'guildInvite'; fromName: string; guildName: string }

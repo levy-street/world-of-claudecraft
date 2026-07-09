@@ -178,6 +178,7 @@ export const IWORLD_MEMBERS = [
   { name: 'markerFor', kind: 'method' }, // read-returning (3/6)
   { name: 'setMarker', kind: 'method' },
   { name: 'clearMarker', kind: 'method' },
+  { name: 'readyCheckRespond', kind: 'method' },
   { name: 'tradeRequest', kind: 'method' },
   { name: 'tradeAccept', kind: 'method' },
   { name: 'tradeSetOffer', kind: 'method' },
@@ -396,9 +397,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(204);
+    expect(IWORLD_MEMBERS.length).toBe(205);
     expect(DATA_MEMBERS.length).toBe(54);
-    expect(METHOD_MEMBERS.length).toBe(150);
+    expect(METHOD_MEMBERS.length).toBe(151);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -407,7 +408,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 204', () => {
+  it('the full sorted member set is exactly the pinned 205', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -557,6 +558,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'questsDone',
       'raidLockouts',
+      'readyCheckRespond',
       'realm',
       'recipeList',
       'releaseSpirit',
@@ -675,7 +677,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 150', () => {
+  it('the sorted method-kind set is exactly the pinned 151', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -783,6 +785,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'prestige',
       'questState',
       'raidLockouts',
+      'readyCheckRespond',
       'releaseSpirit',
       'renamePet',
       'reportTelemetry',
@@ -1045,6 +1048,7 @@ const FACET_PARTY = [
   'markerFor',
   'setMarker',
   'clearMarker',
+  'readyCheckRespond',
 ] as const satisfies readonly (keyof IWorldParty)[];
 type _ExhaustParty = AssertNever<Exclude<keyof IWorldParty, (typeof FACET_PARTY)[number]>>;
 
@@ -1262,10 +1266,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 25 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 25 facets equals the pinned 204-member IWORLD_MEMBERS set', () => {
+  it('the union of the 25 facets equals the pinned 205-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(204);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(204);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(205);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(205);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
