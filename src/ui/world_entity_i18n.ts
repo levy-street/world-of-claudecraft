@@ -135,6 +135,7 @@ const NPC_IDS = [
 ] as const;
 
 const QUEST_IDS = [
+  'q_prof_intro',
   'q_wolves',
   'q_greyjaw',
   'q_boars',

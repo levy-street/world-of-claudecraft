@@ -10,22 +10,52 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "es_ES": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "fr_FR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "fr_CA": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "de_DE": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "zh_CN": [
@@ -41,33 +71,78 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.totLabel"
   ],
   "pt_BR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "ru_RU": [
     "hudChrome.unitFrame.totLabel"
   ],
   "cs_CZ": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "nl_NL": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "pl_PL": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "id_ID": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "tr_TR": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "sv_SE": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "vi_VN": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ],
   "da_DK": [
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title",
     "hudChrome.unitFrame.totLabel"
   ]
 };

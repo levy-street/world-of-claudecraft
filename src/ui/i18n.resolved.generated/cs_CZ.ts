@@ -5819,6 +5819,9 @@ export const cs_CZ: EnTranslations = {
       "greyjaw_fang": {
         "name": "Tesák starého Šedočelista"
       },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
+      },
       "weathered_ledger_page": {
         "name": "Ošlehaná stránka účetní knihy"
       },
@@ -7490,6 +7493,16 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Vlci u dveří",
         "text": "Lesní vlci jsou čím dál drzejší a chňapají po cestovatelích na severní cestě. Prořeď jejich počty, {playerName}. Zabij 8 lesních vlků a Eastbrook si oddechne.",
