@@ -2467,11 +2467,12 @@ export type SimEvent = { pid?: number } & (
   | { type: 'fiestaDown'; seconds: number }
   // Protect Yumi maze objective mode (social/yumi.ts). `yumiTeleport` is a
   // world-visible relocation cue (renderer snap + VFX at both ends);
-  // `yumiDown` is your personal 10s bench countdown; `yumiSuddenDeath` fires
-  // once when teleports freeze and the bleed ramp starts; `yumiStatus` is the
-  // once-per-second personal scoreboard heartbeat (the arena wire field is
-  // rate-limited and the enemy cat can sit outside interest range, so the
-  // live bars ride the event queue like fiesta's dynamics do).
+  // `yumiDown` is your personal bench countdown (YUMI_RESPAWN_SECONDS);
+  // `yumiSuddenDeath` fires once when teleports freeze and the bleed ramp
+  // starts; `yumiStatus` is the once-per-second personal scoreboard heartbeat
+  // (the arena wire field is rate-limited and the enemy cat can sit outside
+  // interest range, so the live bars ride the event queue like fiesta's
+  // dynamics do).
   | { type: 'yumiTeleport'; catId: number; fromX: number; fromZ: number; toX: number; toZ: number }
   | { type: 'yumiDown'; seconds: number }
   | { type: 'yumiSuddenDeath' }
@@ -2491,6 +2492,19 @@ export type SimEvent = { pid?: number } & (
       // fresh even though the arena wire (which carries the ground orbs) is
       // rate-limited. See social/yumi_powerups.ts.
       nextPowerupIn: number;
+      // The live `(?)` orbs (type-free), riding the same heartbeat for the same
+      // reason: the arena wire's ~10s cadence is far coarser than the 4s
+      // telegraph and the grab interaction, so online ClientWorld folds THESE
+      // into its mirrored arenaInfo. A heartbeat also fires IMMEDIATELY on any
+      // orb transition (spawn, ready, grab, timeout), on every host, so the
+      // orbs pop in and vanish without waiting for the next whole second.
+      groundPowerups: {
+        id: number;
+        x: number;
+        z: number;
+        state: 'spawning' | 'ready';
+        frac: number;
+      }[];
     }
   // A mystery power-up appeared on the maze (personal per fighter): drives the
   // "available" banner + audio cue. The persistent (?) orb itself renders from

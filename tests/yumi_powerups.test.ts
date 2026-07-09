@@ -4,11 +4,11 @@
 // one-at-a-time replace rule, and the mode-based objective HP (7500 vs 12500).
 
 import { describe, expect, it } from 'vitest';
-import { hasNextCastFree } from '../src/sim/combat/empower_next';
+import { consumeNextCastFree, hasNextCastFree } from '../src/sim/combat/empower_next';
 import { MOBS, yumiMazeOrigin } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { yumiHpFor } from '../src/sim/social/yumi';
+import { cleanupYumiMatch, yumiHpFor } from '../src/sim/social/yumi';
 import {
   applyMysteryPowerup,
   isMysteryPowerupAura,
@@ -24,7 +24,7 @@ import {
   yumiNextPowerupIn,
   yumiPowerupViews,
 } from '../src/sim/social/yumi_powerups';
-import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { type Aura, DT, type Entity, type SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { teleportPoints, yumiMazeLayout } from '../src/sim/yumi_maze_layout';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
@@ -306,6 +306,55 @@ describe('yumi power-up hold-to-grab', () => {
     expect(e.yumiGrabRemaining).toBe(0);
     expect(y.grab.has(e.id)).toBe(false);
   });
+
+  it('the orb despawning mid-channel cancels the grab on the same tick', () => {
+    const res = startYumi('yumi3');
+    const { match, ctx } = res;
+    const { orb, e, y } = readyOrbUnder(res, match.teamA[0]);
+    startYumiGrab(ctx, match, e, orb.id);
+    updateYumiPowerups(ctx, match);
+    expect(e.yumiGrabRemaining).toBeGreaterThan(0);
+    orb.timer = 0.01; // times out on the next tick
+    updateYumiPowerups(ctx, match);
+    expect(y.powerups.length).toBe(0);
+    expect(e.yumiGrabRemaining).toBe(0);
+    expect(y.grab.has(e.id)).toBe(false);
+    expect(e.auras.some((au) => isMysteryPowerupAura(au.kind))).toBe(false);
+  });
+
+  it('two channels completing on the same tick: exactly one fighter gets the orb', () => {
+    // The tie-break documented in updateYumiGrabs: `y.grab` iterates in Map
+    // insertion order, so the fighter who STARTED first wins the same-tick
+    // claim and the loser's channel cancels at once (the orb is gone).
+    const res = startYumi('yumi3');
+    const { sim, match, ctx } = res;
+    const { orb, e: first, y } = readyOrbUnder(res, match.teamA[0]);
+    const second = sim.entities.get(match.teamB[0])!;
+    second.pos.x = orb.x;
+    second.pos.z = orb.z;
+    startYumiGrab(ctx, match, first, orb.id); // first to start...
+    startYumiGrab(ctx, match, second, orb.id);
+    for (let i = 0; i < 40; i++) updateYumiPowerups(ctx, match);
+    // ...is first to finish (every channel is the same fixed 1.8s).
+    expect(first.auras.some((au) => isMysteryPowerupAura(au.kind))).toBe(true);
+    expect(second.auras.some((au) => isMysteryPowerupAura(au.kind))).toBe(false);
+    expect(y.powerups.length).toBe(0); // the one orb was consumed exactly once
+    expect(y.grab.size).toBe(0); // the loser's channel cancelled, not dangling
+    expect(second.yumiGrabRemaining).toBe(0);
+  });
+
+  it('cleanupYumiMatch zeroes every fighter grab bar and the channel map', () => {
+    const res = startYumi('yumi3');
+    const { match, ctx } = res;
+    const { orb, e, y } = readyOrbUnder(res, match.teamA[0]);
+    startYumiGrab(ctx, match, e, orb.id);
+    updateYumiPowerups(ctx, match);
+    expect(e.yumiGrabRemaining).toBeGreaterThan(0);
+    cleanupYumiMatch(ctx, match);
+    expect(e.yumiGrabRemaining).toBe(0);
+    expect(e.yumiGrabTotal).toBe(0);
+    expect(y.grab.size).toBe(0);
+  });
 });
 
 describe('yumi power-up effects', () => {
@@ -317,20 +366,39 @@ describe('yumi power-up effects', () => {
   });
 
   it('Berserker: deals more (source) and takes more (target)', () => {
+    // The tuning contract, pinned as literals so a drive-by constant change
+    // fails here (asserting against the same constant damage.ts imports would
+    // be a self-comparison that can never fail).
+    expect(YUMI_BERSERK_DMG_MULT).toBe(1.4);
+    expect(YUMI_BERSERK_TAKEN_MULT).toBe(1.35);
     // baseline: a plain 100 hit lands verbatim on a mob
     const w0 = mobWorld();
     hit(w0.sim, w0.p, w0.mob, 100);
     expect(5000 - w0.mob.hp).toBe(100);
-    // outgoing boost: a berserk attacker
+    // outgoing boost: a berserk attacker (100 x 1.4)
     const w1 = mobWorld();
     applyMysteryPowerup(w1.ctx, w1.p, 'berserk');
     hit(w1.sim, w1.p, w1.mob, 100);
-    expect(5000 - w1.mob.hp).toBe(Math.round(100 * YUMI_BERSERK_DMG_MULT));
-    // incoming amplification: a berserk victim, plain attacker
+    expect(5000 - w1.mob.hp).toBe(140);
+    // incoming amplification: a berserk victim, plain attacker (100 x 1.35)
     const w2 = mobWorld();
     applyMysteryPowerup(w2.ctx, w2.mob, 'berserk');
     hit(w2.sim, w2.p, w2.mob, 100);
-    expect(5000 - w2.mob.hp).toBe(Math.round(100 * YUMI_BERSERK_TAKEN_MULT));
+    expect(5000 - w2.mob.hp).toBe(135);
+  });
+
+  it('Berserker never amplifies self-damage or source-less damage', () => {
+    // Both berserk arms guard on a real enemy source (matching the Weakening
+    // Hex arm): the built-in downside amplifies what ENEMIES do to you, never
+    // your own self-damage or environmental hits (falls, neutral bleeds).
+    const w1 = mobWorld();
+    applyMysteryPowerup(w1.ctx, w1.mob, 'berserk');
+    hit(w1.sim, w1.mob, w1.mob, 100); // self-damage: untouched
+    expect(5000 - w1.mob.hp).toBe(100);
+    const w2 = mobWorld();
+    applyMysteryPowerup(w2.ctx, w2.mob, 'berserk');
+    hit(w2.sim, null, w2.mob, 100); // source-less (fall-style): untouched
+    expect(5000 - w2.mob.hp).toBe(100);
   });
 
   it('Endless Mana: reads as a free cast that is never consumed', () => {
@@ -340,6 +408,13 @@ describe('yumi power-up effects', () => {
     expect(hasNextCastFree(a)).toBe(true);
     // the aura stays put (free casts for the whole duration, never consumed)
     expect(a.auras.some((au) => au.kind === 'pu_endless_mana')).toBe(true);
+    // ...and the CONSUME path agrees: every consume answers free and leaves the
+    // aura in place (a single-shot next_cast_free would vanish after the first).
+    expect(consumeNextCastFree(ctx, a)).toBe(true);
+    expect(consumeNextCastFree(ctx, a)).toBe(true);
+    expect(consumeNextCastFree(ctx, a)).toBe(true);
+    expect(a.auras.some((au) => au.kind === 'pu_endless_mana')).toBe(true);
+    expect(hasNextCastFree(a)).toBe(true);
   });
 
   it('Stealth: hides the carrier and survives taking a hit (unlike rogue stealth)', () => {
@@ -406,5 +481,87 @@ describe('yumi power-up rules', () => {
     expect(ev.entityId).toBe(a0.id);
     expect(ev.auraColor).toBeNull();
     expect(ev.duration).toBe(YUMI_POWERUP_DURATION);
+  });
+});
+
+describe('yumi sudden-death bleed pool', () => {
+  it('scales off the MODE pool: a 5v5 step-1 pulse bleeds 125, not the 3v3 75', () => {
+    // Pinned literals: ceil(12500 x 0.01 x 1) = 125. A regression that reads
+    // the YUMI_HP constant instead of y.maxHp would bleed ceil(7500 x 0.01) =
+    // 75 here and only ever be right at 3v3, where the two coincide.
+    const { sim, match } = startYumi('yumi5');
+    const y = (match as any).yumi;
+    match.timer = 600 - 0.5; // just before YUMI_SUDDEN_AT latches
+    const catA = sim.entities.get(y.yumiA)!;
+    const hp0 = catA.hp;
+    expect(hp0).toBe(12500);
+    for (let i = 0; i < 20 * 4 && catA.hp === hp0; i++) sim.tick();
+    expect(hp0 - catA.hp).toBe(125);
+  });
+});
+
+// The online freshness contract: the orbs ride the 1/s yumiStatus heartbeat
+// (the arena wire that also carries them is rate-limited to ~10s, coarser than
+// the 4s telegraph), and any orb TRANSITION forces an immediate out-of-band
+// beat, so spawn/ready/grab/timeout are never up to a second (let alone 10s)
+// stale on any host.
+describe('yumi power-up heartbeat cadence', () => {
+  // Advance to just past a whole-second heartbeat edge, so anything the next
+  // few ticks emit can only come from the statusDirty transition path.
+  function pastSecondEdge(sim: Sim, match: any) {
+    let last = Math.floor(match.timer);
+    for (let i = 0; i < 40; i++) {
+      sim.tick();
+      const s = Math.floor(match.timer);
+      if (s !== last) return;
+      last = s;
+    }
+    throw new Error('no second edge within 40 ticks');
+  }
+
+  it('every heartbeat carries the live orb views', () => {
+    const { sim, match, ctx, pids } = startYumi('yumi3');
+    spawnYumiPowerup(ctx, match);
+    let beat: any = null;
+    for (let i = 0; i < 40 && !beat; i++) {
+      beat = sim.tick().find((e) => e.type === 'yumiStatus' && (e as any).pid === pids[0]);
+    }
+    expect(beat).toBeTruthy();
+    expect(beat.groundPowerups.length).toBe(1);
+    expect(beat.groundPowerups[0].state).toMatch(/spawning|ready/);
+    expect((beat.groundPowerups[0] as any).defId).toBeUndefined(); // type never leaks
+  });
+
+  it('a spawn mid-second fires an immediate beat with the new orb on it', () => {
+    const { sim, match, pids } = startYumi('yumi3');
+    const y = (match as any).yumi;
+    pastSecondEdge(sim, match);
+    y.powerupTimer = 2 * DT; // the spawn lands two ticks from now, mid-second
+    sim.tick();
+    expect(y.powerups.length).toBe(0);
+    const evs = sim.tick(); // the spawn tick
+    expect(y.powerups.length).toBe(1);
+    const beat = evs.find((e) => e.type === 'yumiStatus' && (e as any).pid === pids[0]) as any;
+    expect(beat).toBeTruthy();
+    expect(beat.groundPowerups.length).toBe(1);
+    expect(beat.groundPowerups[0].id).toBe(y.powerups[0].id);
+    expect(beat.groundPowerups[0].state).toBe('spawning');
+  });
+
+  it('an orb timing out mid-second fires an immediate beat with the orb gone', () => {
+    const { sim, match, ctx, pids } = startYumi('yumi3');
+    const y = (match as any).yumi;
+    spawnYumiPowerup(ctx, match);
+    const orb = y.powerups[0];
+    orb.state = 'ready';
+    pastSecondEdge(sim, match);
+    orb.timer = 2 * DT; // despawns two ticks from now, mid-second
+    sim.tick();
+    expect(y.powerups.length).toBe(1);
+    const evs = sim.tick(); // the timeout tick
+    expect(y.powerups.length).toBe(0);
+    const beat = evs.find((e) => e.type === 'yumiStatus' && (e as any).pid === pids[0]) as any;
+    expect(beat).toBeTruthy();
+    expect(beat.groundPowerups.length).toBe(0);
   });
 });

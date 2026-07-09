@@ -17,6 +17,7 @@
 // skipping the DOM rebuild when the content signature is unchanged.
 
 import { audio } from '../game/audio';
+import { YUMI_RESPAWN_SECONDS, YUMI_SUDDEN_AT } from '../sim/social/yumi';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
 import {
@@ -229,7 +230,14 @@ export class ArenaWindow {
       arenaTabs,
       '',
     );
-    const rules = `<div class="arena-rules">${esc(t('hudChrome.arena.yumiRules'))}</div>`;
+    // The rules prose interpolates the LIVE sim tuning constants so the copy
+    // can never drift from the numbers the mode actually runs.
+    const rules = `<div class="arena-rules">${esc(
+      t('hudChrome.arena.yumiRules', {
+        respawn: formatNumber(YUMI_RESPAWN_SECONDS, { maximumFractionDigits: 0 }),
+        sudden: formatNumber(YUMI_SUDDEN_AT / 60, { maximumFractionDigits: 0 }),
+      }),
+    )}</div>`;
     const yumiGroup = this.groupHtml(
       'yumi',
       t('hudChrome.arena.yumiHeading'),

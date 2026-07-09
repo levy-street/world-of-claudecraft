@@ -6831,7 +6831,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.arena.descYumi3': '3대3. 아군 Yumi 고양이를 지키고 적팀의 고양이를 사냥하세요.',
   'hudChrome.arena.descYumi5': '5대5, 더 큰 미로에서 진행되며 고양이의 체력이 훨씬 많습니다.',
   'hudChrome.arena.yumiRules':
-    '각 팀은 수동적인 Yumi 고양이를 지키고 적팀의 고양이를 사냥합니다. 두 고양이는 1분마다 미로의 새로운 구석으로 순간이동합니다. 쓰러진 전사는 15초 후 복귀합니다. 미스터리 파워업이 바닥에 나타나며, 상호작용을 잠시 누르고 있으면 획득합니다. 적 고양이를 먼저 파괴한 팀이 승리하고, 10분에 서든데스로 교착을 끝냅니다.',
+    '각 팀은 수동적인 Yumi 고양이를 지키고 적팀의 고양이를 사냥합니다. 두 고양이는 1분마다 미로의 새로운 구석으로 순간이동합니다. 쓰러진 전사는 {respawn}초 후 복귀합니다. 미스터리 파워업이 바닥에 나타나며, 상호작용을 잠시 누르고 있으면 획득합니다. 적 고양이를 먼저 파괴한 팀이 승리하고, {sudden}분에 서든데스로 교착을 끝냅니다.',
   'hudChrome.arena.queueCount': '대기열 {n}명',
   'yumi.bracket3': 'Yumi 3대3',
   'yumi.bracket5': 'Yumi 5대5',

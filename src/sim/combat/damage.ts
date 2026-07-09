@@ -162,8 +162,10 @@ export function dealDamage(
   }
 
   // Mystery power-up: Berserker deals MORE but also TAKES more. The outgoing
-  // boost rides the source (self-damage untouched); the incoming amplification
-  // rides the target (the built-in, non-dispellable downside of the buff).
+  // boost rides the source; the incoming amplification rides the target (the
+  // built-in, non-dispellable downside of the buff). Both arms guard on a real
+  // ENEMY source: self-damage and source-less damage (falls, neutral bleeds)
+  // are never amplified, matching the Weakening Hex arm below.
   if (
     amount > 0 &&
     source &&
@@ -172,7 +174,12 @@ export function dealDamage(
   ) {
     amount = Math.round(amount * YUMI_BERSERK_DMG_MULT);
   }
-  if (amount > 0 && target.auras.some((a) => a.kind === 'pu_berserk')) {
+  if (
+    amount > 0 &&
+    source &&
+    source.id !== target.id &&
+    target.auras.some((a) => a.kind === 'pu_berserk')
+  ) {
     amount = Math.round(amount * YUMI_BERSERK_TAKEN_MULT);
   }
 

@@ -782,6 +782,11 @@ export interface YumiMatchState {
   dmgToYumiA: number; // cumulative player damage dealt TO cat A (tiebreak)
   dmgToYumiB: number;
   lastStatusSecond: number; // last whole active-second a yumiStatus heartbeat went out
+  // Set by yumi_powerups.ts on any orb transition (spawn, ready, grab, timeout)
+  // to force an immediate out-of-band yumiStatus heartbeat: online the orbs ride
+  // the heartbeat (the arena wire is rate-limited far coarser than the 4s
+  // telegraph), so transitions must not wait for the next whole second.
+  statusDirty: boolean;
   // Mystery power-ups (social/yumi_powerups.ts): the live orbs on the maze, a
   // spawn-attempt countdown, and an id counter. Draws come from `rng` (the
   // per-match stream), never the shared sim stream.

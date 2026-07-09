@@ -112,6 +112,10 @@ export function updateYumiPowerups(ctx: SimContext, match: ArenaMatch): void {
       } else {
         y.powerups.splice(i, 1);
       }
+      // Any transition forces an immediate yumiStatus heartbeat: the orbs ride
+      // that heartbeat online (the arena wire is rate-limited ~10s, coarser
+      // than the 4s telegraph), so ready/timeout must not wait a whole second.
+      y.statusDirty = true;
     }
   }
   // Advance every in-progress hold-to-grab channel (grant on completion).
@@ -158,6 +162,7 @@ export function spawnYumiPowerup(ctx: SimContext, match: ArenaMatch): void {
     state: 'spawning',
     timer: YUMI_POWERUP_TELEGRAPH,
   });
+  y.statusDirty = true; // spawn transition: force an immediate heartbeat (orbs ride it online)
   // Personal per fighter (an anchor-less world event would broadcast realm-wide,
   // and only the maze fighters can see it anyway).
   for (const pid of ctx.arenaAllPids(match)) {
@@ -241,6 +246,7 @@ export function updateYumiGrabs(ctx: SimContext, match: ArenaMatch): void {
     applyMysteryPowerup(ctx, e, orb!.defId);
     const idx = y.powerups.indexOf(orb!);
     if (idx >= 0) y.powerups.splice(idx, 1);
+    y.statusDirty = true; // grab transition: force an immediate heartbeat (orbs ride it online)
   }
 }
 

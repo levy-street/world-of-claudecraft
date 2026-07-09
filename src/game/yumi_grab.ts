@@ -48,12 +48,25 @@ export function carriesMysteryPowerup(auras: readonly { kind: string }[]): boole
   return auras.some((a) => a.kind.startsWith('pu_'));
 }
 
+// Frames between re-sent yumi_grab_start intents while an orb is desired but no
+// channel is live (player.yumiGrabRemaining is 0). This is the recovery path for
+// a SERVER-side cancel the client does not model, stun above all: the server
+// drops the channel, the player keeps Interact held, and without a re-send the
+// bar would never come back until they released and re-pressed. ~0.25s at 60fps;
+// re-sending is safe because the sim treats a start for the orb ALREADY being
+// channeled as a no-op (it cannot reset live progress), and a start that is
+// still disallowed (stunned) stays a no-op until it finally sticks.
+export const YUMI_GRAB_RESEND_FRAMES = 15;
+
 export class YumiGrabDriver {
   private intentOrb: number | null = null;
+  private resendIn = 0;
 
   /** Poll once per frame; sends start when the chosen orb appears/changes and
-   *  stop when it goes away. Idempotent server-side, so an unchanged choice
-   *  sends nothing. `radius` is the sim's YUMI_POWERUP_RADIUS. */
+   *  stop when it goes away. An unchanged choice sends nothing while the
+   *  authoritative channel is live, and re-sends start on a short cooldown
+   *  while it is NOT (the server cancelled: stun, or a start it rejected).
+   *  `radius` is the sim's YUMI_POWERUP_RADIUS. */
   update(world: IWorld, interactHeld: boolean, radius: number): void {
     const match = world.arenaInfo?.match;
     const yumi = match?.yumi;
@@ -72,15 +85,34 @@ export class YumiGrabDriver {
             radius,
           )
         : null;
-    if (desired === this.intentOrb) return;
-    if (desired != null) world.yumiGrabStart(desired);
-    else world.yumiGrabStop();
-    this.intentOrb = desired;
+    if (desired !== this.intentOrb) {
+      if (desired != null) world.yumiGrabStart(desired);
+      else world.yumiGrabStop();
+      this.intentOrb = desired;
+      this.resendIn = YUMI_GRAB_RESEND_FRAMES;
+      return;
+    }
+    if (desired == null) return;
+    // Same orb still desired. The authoritative channel signal is
+    // player.yumiGrabRemaining: positive means the server is running the
+    // channel, so there is nothing to send (and a re-send would be a no-op
+    // anyway). Zero while we still want the orb means the server cancelled
+    // (stun) or never accepted (started while stunned), so re-express the
+    // intent on a cooldown until it sticks or the orb stops being desired.
+    if (p.yumiGrabRemaining > 0) {
+      this.resendIn = YUMI_GRAB_RESEND_FRAMES;
+      return;
+    }
+    if (--this.resendIn <= 0) {
+      world.yumiGrabStart(desired);
+      this.resendIn = YUMI_GRAB_RESEND_FRAMES;
+    }
   }
 
   /** Forget the last intent (e.g. on match end / world swap) so the next update
    *  re-sends cleanly. */
   reset(): void {
     this.intentOrb = null;
+    this.resendIn = 0;
   }
 }

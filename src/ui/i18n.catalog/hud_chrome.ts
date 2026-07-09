@@ -39,8 +39,11 @@ export const hudChromeStrings = {
     descFiesta: 'A rowdy two-versus-two free-for-all with augments and power-ups.',
     descYumi3: "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
     descYumi5: 'Five versus five in a larger maze, and your cat holds far more health.',
+    // {respawn}/{sudden} are filled from the sim tuning constants
+    // (YUMI_RESPAWN_SECONDS / YUMI_SUDDEN_AT) so this prose can never drift
+    // from the numbers the mode actually runs.
     yumiRules:
-      "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after fifteen seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at ten minutes sudden death breaks any stalemate.",
+      "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
     queueCount: '{n} in queue',
   },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release

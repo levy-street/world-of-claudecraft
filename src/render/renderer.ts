@@ -139,6 +139,7 @@ import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
+import { YumiPowerupOrbs } from './yumi_powerup_orbs';
 import { YumiTeamMarkers } from './yumi_team_markers';
 
 // Festival gold/white celebration palette, shared by the Vale Cup full-time
@@ -975,10 +976,9 @@ export class Renderer {
   // Per-entity power-up glow: emits a coloured swirl around the carrier until it
   // expires. Shared by the Fiesta ring power-ups and the Yumi mystery power-ups.
   private fiestaGlows = new Map<number, { color: number; until: number; nextSwirl: number }>();
-  // Protect Yumi mystery power-ups: pooled `(?)` orbs (orb mesh + billboard glyph)
-  // by power-up id, and the shared `?` sprite material built once on first use.
-  private yumiPowerupMeshes = new Map<number, THREE.Group>();
-  private mysterySpriteMat: THREE.SpriteMaterial | null = null;
+  // Protect Yumi mystery power-ups: the `(?)` orb pool + the shared glyph
+  // material live in their own visual module (yumi_powerup_orbs.ts).
+  private yumiOrbs = new YumiPowerupOrbs(this.scene);
 
   // Vale Cup: the Sowfield set piece, the staggered goal-firework volley queue,
   // and the boarball's dust pool (created lazily the first time the ball rolls).
@@ -3328,91 +3328,6 @@ export class Renderer {
     }
   }
 
-  // The shared billboard material for the mystery `(?)` glyph, built once. A
-  // static canvas glyph (not procedural-random), so no seeded rnd() here.
-  private getMysterySpriteMat(): THREE.SpriteMaterial {
-    if (this.mysterySpriteMat) return this.mysterySpriteMat;
-    const c = document.createElement('canvas');
-    c.width = 128;
-    c.height = 128;
-    const cx = c.getContext('2d');
-    if (cx) {
-      cx.font = 'bold 92px sans-serif';
-      cx.fillStyle = '#ffffff';
-      cx.textAlign = 'center';
-      cx.textBaseline = 'middle';
-      cx.shadowColor = '#000000';
-      cx.shadowBlur = 10;
-      cx.fillText('?', 64, 70);
-    }
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    this.mysterySpriteMat = new THREE.SpriteMaterial({
-      map: tex,
-      transparent: true,
-      depthWrite: false,
-      depthTest: false, // the glyph floats readably over the orb
-    });
-    return this.mysterySpriteMat;
-  }
-
-  private buildMysteryOrb(): THREE.Group {
-    const group = new THREE.Group();
-    const geo = new THREE.OctahedronGeometry(0.85, 0);
-    const mat = new THREE.MeshBasicMaterial({
-      color: 0xffe066, // uniform mystery gold; the TYPE is never revealed here
-      transparent: true,
-      opacity: 0.9,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-    group.add(new THREE.Mesh(geo, mat));
-    const spr = new THREE.Sprite(this.getMysterySpriteMat());
-    spr.scale.setScalar(1.1);
-    spr.position.y = 0.05;
-    group.add(spr);
-    return group;
-  }
-
-  // The mystery `(?)` orbs on the Yumi maze: a growing/pulsing telegraph while
-  // 'spawning', then a bright bobbing orb once 'ready'. Every orb is identical
-  // (?) gold: the type stays hidden until grabbed. Pooled by power-up id.
-  private updateYumiPowerups(dt: number): void {
-    const match = this.sim.arenaInfo?.match;
-    const list = match?.yumi && match.state === 'active' ? match.yumi.groundPowerups : [];
-    const seen = new Set<number>();
-    for (const p of list) {
-      seen.add(p.id);
-      let g = this.yumiPowerupMeshes.get(p.id);
-      if (!g) {
-        g = this.buildMysteryOrb();
-        this.yumiPowerupMeshes.set(p.id, g);
-        this.scene.add(g);
-      }
-      const gy = groundHeight(p.x, p.z, this.sim.cfg.seed);
-      const orb = g.children[0] as THREE.Mesh;
-      const mat = orb.material as THREE.MeshBasicMaterial;
-      if (p.state === 'spawning') {
-        g.scale.setScalar(0.3 + p.frac * 0.85);
-        g.position.set(p.x, gy + 0.95, p.z);
-        mat.opacity = 0.3 + Math.abs(Math.sin(this.time * 9)) * 0.45; // urgent pulse
-      } else {
-        g.scale.setScalar(1);
-        g.position.set(p.x, gy + 1.25 + Math.sin(this.time * 2 + p.id) * 0.25, p.z);
-        mat.opacity = 0.7 + Math.abs(Math.sin(this.time * 3)) * 0.25; // steady shimmer
-      }
-      orb.rotation.y += dt * 1.6;
-    }
-    for (const [id, g] of this.yumiPowerupMeshes) {
-      if (seen.has(id)) continue;
-      this.scene.remove(g);
-      const orb = g.children[0] as THREE.Mesh;
-      (orb.material as THREE.Material).dispose();
-      orb.geometry.dispose(); // the `?` sprite material is shared, never disposed here
-      this.yumiPowerupMeshes.delete(id);
-    }
-  }
-
   private tickFiestaGlows(dt: number): void {
     if (this.fiestaGlows.size === 0) return;
     for (const [id, g] of this.fiestaGlows) {
@@ -5069,7 +4984,17 @@ export class Renderer {
     this.vfx.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
-    this.updateYumiPowerups(dt);
+    {
+      // The mystery `(?)` orbs (yumi_powerup_orbs.ts): live views only during
+      // an active bout, an empty list otherwise so the pool drains + frees.
+      const ym = this.sim.arenaInfo?.match;
+      this.yumiOrbs.update(
+        ym?.yumi && ym.state === 'active' ? ym.yumi.groundPowerups : [],
+        this.time,
+        dt,
+        this.sim.cfg.seed,
+      );
+    }
     this.tickFiestaGlows(dt);
     for (const view of this.yumiMazeViews.values()) view.update(this.sim);
     this.yumiTeamMarkers.update(this.sim, this.views);

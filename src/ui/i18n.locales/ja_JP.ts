@@ -6852,7 +6852,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.arena.descYumi3': '3対3。自分のYumi猫を守り、敵チームの猫を狙え。',
   'hudChrome.arena.descYumi5': '5対5。より大きな迷宮で、猫の体力も大幅に増える。',
   'hudChrome.arena.yumiRules':
-    '各チームは受け身のYumi猫を守り、敵チームの猫を狙う。両方の猫は1分ごとに迷宮の新しい隅へ瞬間移動する。倒れた戦士は15秒後に復帰する。ミステリーパワーアップが床に出現し、インタラクトを少し長押しで入手できる。先に敵の猫を倒したチームが勝利し、10分でサドンデスとなり膠着を打破する。',
+    '各チームは受け身のYumi猫を守り、敵チームの猫を狙う。両方の猫は1分ごとに迷宮の新しい隅へ瞬間移動する。倒れた戦士は{respawn}秒後に復帰する。ミステリーパワーアップが床に出現し、インタラクトを少し長押しで入手できる。先に敵の猫を倒したチームが勝利し、{sudden}分でサドンデスとなり膠着を打破する。',
   'hudChrome.arena.queueCount': '待機中 {n} 人',
   'yumi.bracket3': 'Yumi 3v3',
   'yumi.bracket5': 'Yumi 5v5',

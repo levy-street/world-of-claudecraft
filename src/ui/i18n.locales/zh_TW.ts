@@ -6510,7 +6510,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.arena.descYumi3': '三對三。守護你的Yumi貓，獵殺敵隊的。',
   'hudChrome.arena.descYumi5': '五對五，迷宮更大，你的貓擁有更多生命值。',
   'hudChrome.arena.yumiRules':
-    '每隊守護一隻被動的Yumi貓，並獵殺敵隊的。兩隻貓每分鐘都會閃現到迷宮的新角落。陣亡的戰士十五秒後重生。神祕強化會出現在地面上：按住互動鍵片刻即可拾取。率先摧毀敵方貓的隊伍獲勝；十分鐘時進入突然死亡，打破僵局。',
+    '每隊守護一隻被動的Yumi貓，並獵殺敵隊的。兩隻貓每分鐘都會閃現到迷宮的新角落。陣亡的戰士{respawn}秒後重生。神祕強化會出現在地面上：按住互動鍵片刻即可拾取。率先摧毀敵方貓的隊伍獲勝；{sudden}分鐘時進入突然死亡，打破僵局。',
   'hudChrome.arena.queueCount': '排隊中 {n} 人',
   'yumi.bracket3': 'Yumi 3v3',
   'yumi.bracket5': 'Yumi 5v5',

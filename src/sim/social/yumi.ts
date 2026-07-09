@@ -278,6 +278,7 @@ export function startYumiMatch(
       dmgToYumiA: 0,
       dmgToYumiB: 0,
       lastStatusSecond: -1,
+      statusDirty: false,
       // Mystery power-ups: first attempt YUMI_POWERUP_FIRST seconds into the
       // bout, then on the interval (social/yumi_powerups.ts).
       powerups: [],
@@ -414,8 +415,9 @@ export function updateYumiActive(ctx: SimContext, match: ArenaMatch): void {
   }
   // Mystery power-ups: spawn/telegraph/pickup on the maze (social/yumi_powerups.ts).
   updateYumiPowerups(ctx, match);
-  // Flat 10s respawn countdowns (fiesta's loop shape). A missing entity keeps
-  // its bench entry; a reconnected one restarts at the normal timer.
+  // Flat YUMI_RESPAWN_SECONDS respawn countdowns (fiesta's loop shape). A
+  // missing entity keeps its bench entry; a reconnected one restarts at the
+  // normal timer.
   for (const [pid, t] of [...y.respawn]) {
     const e = ctx.entities.get(pid);
     if (!e) continue;
@@ -427,10 +429,14 @@ export function updateYumiActive(ctx: SimContext, match: ArenaMatch): void {
     if (nt <= 0) yumiRevive(ctx, match, e);
     else y.respawn.set(pid, nt);
   }
-  // Once-per-second scoreboard heartbeat on whole-second edges (never per tick).
+  // Once-per-second scoreboard heartbeat on whole-second edges (never per
+  // tick), plus an immediate out-of-band beat whenever an orb transitioned
+  // this tick (statusDirty): the heartbeat is what carries the orbs online,
+  // and a 4s telegraph cannot wait for the next whole second.
   const sec = Math.floor(match.timer);
-  if (sec !== y.lastStatusSecond) {
+  if (sec !== y.lastStatusSecond || y.statusDirty) {
     y.lastStatusSecond = sec;
+    y.statusDirty = false;
     emitYumiStatus(ctx, match);
   }
 }
@@ -589,6 +595,10 @@ function emitYumiStatus(ctx: SimContext, match: ArenaMatch): void {
   const suddenDeathIn = y.suddenDeath ? 0 : Math.max(0, Math.ceil(YUMI_SUDDEN_AT - match.timer));
   const mult = yumiTakenMult(match.timer);
   const nextPowerupIn = yumiNextPowerupIn(match);
+  // One shared view array per beat (nobody mutates event payloads); this is
+  // what keeps the `(?)` orbs fresh online, where the arena wire that also
+  // carries them is rate-limited far coarser than the telegraph.
+  const groundPowerups = yumiPowerupViews(match);
   for (const mPid of ctx.arenaAllPids(match)) {
     const team = ctx.arenaTeamOf(match, mPid);
     if (!team) continue;
@@ -604,6 +614,7 @@ function emitYumiStatus(ctx: SimContext, match: ArenaMatch): void {
       mult,
       team,
       nextPowerupIn,
+      groundPowerups,
       pid: mPid,
     });
   }
