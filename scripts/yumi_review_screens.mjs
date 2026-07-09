@@ -140,12 +140,24 @@ if (SHOTS === 'all') {
     const orb = m.yumi.powerups[0];
     orb.state = 'ready';
     orb.timer = 20;
-    // Park the orb 4yd ahead of the player and look at it (offline sim state
-    // is local and mutable, so this is a legitimate staging trick).
-    orb.x = p.pos.x;
-    orb.z = p.pos.z - 4;
+    // Clear the stage: shove the other fighters out of frame, then park the
+    // orb ahead and OFF-CENTER of the player and look at it (offline sim
+    // state is local and mutable, so this is a legitimate staging trick;
+    // dead-ahead hides the box behind the player model).
+    for (const pid of [...m.teamA, ...m.teamB]) {
+      if (pid === sim.playerId) continue;
+      const f = sim.entities.get(pid);
+      if (f) {
+        f.pos.x += 18;
+        f.prevPos = { ...f.pos };
+      }
+    }
+    orb.x = p.pos.x + 1.4;
+    orb.z = p.pos.z - 3.5;
+    // Aim NEAR the box, not AT it: a dead-on bearing centers the box exactly
+    // behind the player model, so offset the yaw to split the silhouettes.
     p.facing = Math.atan2(orb.x - p.pos.x, orb.z - p.pos.z);
-    if (g.input) g.input.camYaw = p.facing;
+    if (g.input) g.input.camYaw = p.facing - 0.55;
     // A stable mid-channel grab bar: the bar paints off the entity fields, and
     // nothing decrements them unless a real channel is in the grab map.
     p.yumiGrabRemaining = 0.9;
