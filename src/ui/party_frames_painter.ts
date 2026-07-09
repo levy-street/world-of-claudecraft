@@ -46,6 +46,9 @@ const CLASS_COLOR_PROP = '--cls';
 // The combat highlight class. dead / out-of-range are owned by the family's state
 // classes; combat is the party-only extra (dead wins, so combat is off when dead).
 const COMBAT_CLASS = 'combat';
+// The current target highlight. It is a paint-only cue; CSS uses outline/shadow
+// so selecting a member never changes row geometry.
+const SELECTED_CLASS = 'selected';
 // The container class that drops the frames below the target frame.
 const BELOW_TARGET_CLASS = 'below-target';
 // The mobile collapse classes on #party-frames: the chip's presence (so CSS can
@@ -341,6 +344,7 @@ export class PartyFramesPainter {
     this.writers.setStyleProp(row.el, CLASS_COLOR_PROP, this.deps.classCss(m.cls));
     const inCombat = !!m.inCombat && !m.dead;
     this.writers.toggleClass(row.el, COMBAT_CLASS, inCombat);
+    this.writers.toggleClass(row.el, SELECTED_CLASS, !!m.selected);
     // The shared frame (name / level / hp + resource fills / dead + out-of-range
     // classes) through the family instance, byte-faithful to the inline markup. The
     // family writes ONLY the level number into .lead-num now; the leader star is the

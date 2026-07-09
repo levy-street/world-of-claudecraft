@@ -74,6 +74,7 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
     inCombat: 0,
     group: 1,
     oor: false,
+    selected: false,
   });
 
   it('a row recycled to a new member targets the NEW pid + name (not the stale one)', () => {
@@ -262,6 +263,7 @@ const member = (over: Partial<PartyFrameMember> & { pid: number }): PartyFrameMe
   inCombat: 0,
   group: 1,
   oor: false,
+  selected: false,
   ...over,
 });
 
@@ -491,7 +493,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     painter.sync(
       [
         member({ pid: 2, name: 'Alice', dead: 0, inCombat: 1, hp: 50, mhp: 100, oor: false }),
-        member({ pid: 3, name: 'Bob', dead: 1, oor: false }),
+        member({ pid: 3, name: 'Bob', dead: 1, oor: false, selected: true }),
         member({ pid: 4, name: 'Cora', dead: 0, inCombat: 0, oor: true }),
       ],
       2, // leader = pid 2 (Alice)
@@ -508,6 +510,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     );
     // combat (party-only), dead + oor (family state classes) all via toggleClass.
     expect(has('toggleClass', (c) => c.args[0] === 'combat' && c.args[1] === true)).toBe(true);
+    expect(has('toggleClass', (c) => c.args[0] === 'selected' && c.args[1] === true)).toBe(true);
     expect(has('toggleClass', (c) => c.args[0] === 'dead' && c.args[1] === true)).toBe(true);
     expect(has('toggleClass', (c) => c.args[0] === 'oor' && c.args[1] === true)).toBe(true);
     // A combat member is NOT also dead (dead wins), so its combat is on but dead off.

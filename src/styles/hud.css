@@ -4082,7 +4082,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    z-index: 5;
+    z-index: 7;
   }
   /* The painter nests the member rows one level down in a .party-rows wrapper (so the
      mobile collapse chip can sit alone on its own line). On desktop the wrapper is
@@ -4235,6 +4235,12 @@
   .party-frame:hover {
     outline: 1px solid var(--gold-dim);
     opacity: 1;
+  }
+  .party-frame.selected {
+    position: relative;
+    z-index: 1;
+    outline: 1px solid var(--gold);
+    box-shadow: 0 0 calc(8px * var(--fx-shadow, 1)) var(--gold-dim);
   }
   /* Reset opacity on a keyboard-focused dimmed (dead 0.7 / out-of-range 0.45) row so the
      global [tabindex="0"]:focus-visible outline (shell.css) is drawn at full strength, not

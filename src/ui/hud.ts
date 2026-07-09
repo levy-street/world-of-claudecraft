@@ -13973,16 +13973,26 @@ export class Hud {
     // Hoist the cheap signature (a single string pass, no intermediate arrays) AHEAD
     // of the selector so an unchanged party short-circuits before selectPartyFrameMembers
     // allocates its sorted / filtered / mapped arrays.
-    const sig = partyFrameSignature(info, this.sim.playerId, this.sim.player.pos);
+    const sig = partyFrameSignature(
+      info,
+      this.sim.playerId,
+      this.sim.player.pos,
+      this.sim.player.targetId,
+    );
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
-    const others = selectPartyFrameMembers(info, this.sim.playerId, this.sim.player.pos);
-    this.partyFramesPainter.sync(others, info.leader, info.raid);
+    const members = selectPartyFrameMembers(
+      info,
+      this.sim.playerId,
+      this.sim.player.pos,
+      this.sim.player.targetId,
+    );
+    this.partyFramesPainter.sync(members, info.leader, info.raid);
     // Re-dock the Loot Settings panel below the (just re-synced) party frames when their
     // size changes (row count / raid grouping). Gated so the layout measure runs on a real
     // geometry change, not every combat tick; positionLootSettingsPanel honors a manual drag.
     if (this.lootSettingsOpen) {
-      const geomSig = `${others.length}/${info.raid ? 1 : 0}`;
+      const geomSig = `${members.length}/${info.raid ? 1 : 0}`;
       if (geomSig !== this.lastLootGeomSig) {
         this.lastLootGeomSig = geomSig;
         this.positionLootSettingsPanel();
