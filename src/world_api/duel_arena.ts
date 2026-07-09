@@ -131,6 +131,10 @@ export interface ArenaInfo {
   format: ArenaFormat | null;
   queued: boolean;
   queueSize: number;
+  // Live player-count waiting in EACH bracket's queue right now, so the window can
+  // show a per-bracket "N in queue" badge before you commit. queueSize above stays
+  // the resolved-bracket count used by the "searching" line.
+  queueCounts: Record<ArenaFormat, number>;
   // present only while in a match
   match: {
     format: ArenaFormat;

@@ -24,6 +24,13 @@ import type { ArenaFormat, ArenaInfo, ArenaStanding, PartyInfo } from '../world_
 /** The five brackets, in display order. */
 const ARENA_BRACKETS: readonly ArenaFormat[] = ['1v1', '2v2', 'fiesta', 'yumi3', 'yumi5'];
 
+/** Which titled group a bracket belongs to. Protect Yumi is NOT part of the
+ *  ranked coliseum, so it renders under its own heading. */
+export type ArenaGroup = 'arena' | 'yumi';
+export function bracketGroupOf(fmt: ArenaFormat): ArenaGroup {
+  return fmt === 'yumi3' || fmt === 'yumi5' ? 'yumi' : 'arena';
+}
+
 /** Premade-party cap per team bracket (1v1 is partyless). */
 function bracketTeamCap(fmt: ArenaFormat): number {
   return fmt === 'yumi5' ? 5 : fmt === 'yumi3' ? 3 : fmt === '2v2' || fmt === 'fiesta' ? 2 : 1;
@@ -62,6 +69,9 @@ export interface ArenaBracketTab {
   fmt: ArenaFormat;
   active: boolean;
   locked: boolean;
+  group: ArenaGroup;
+  /** Live player-count waiting in this bracket's queue right now. */
+  queueCount: number;
 }
 
 /** A 2v2/Fiesta party member row on the pre-queue party panel. */
@@ -98,6 +108,8 @@ export type ArenaView =
       canSwitchBracket: boolean;
       standing: ArenaStanding;
       brackets: ArenaBracketTab[];
+      /** The titled group the resolved bracket sits in (arena vs Protect Yumi). */
+      bracketGroup: ArenaGroup;
       isTeamBracket: boolean;
       party: ArenaPartySection;
       action: ArenaAction;
@@ -161,6 +173,8 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     fmt,
     active: bracket === fmt,
     locked: !canSwitchBracket && bracket !== fmt,
+    group: bracketGroupOf(fmt),
+    queueCount: a.queueCounts[fmt] ?? 0,
   }));
 
   let partySection: ArenaPartySection = { kind: 'none' };
@@ -218,6 +232,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     standing,
     a.queued,
     a.queueSize,
+    a.queueCounts,
     inMatch,
     ladderRows,
     allTimeRows,
@@ -233,6 +248,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     canSwitchBracket,
     standing,
     brackets,
+    bracketGroup: bracketGroupOf(bracket),
     isTeamBracket,
     party: partySection,
     action,

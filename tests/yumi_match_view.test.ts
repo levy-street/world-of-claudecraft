@@ -35,6 +35,7 @@ function stubInfo(over: Partial<NonNullable<ArenaInfo['match']>['yumi']> = {}): 
     format: 'yumi3',
     queued: false,
     queueSize: 0,
+    queueCounts: { '1v1': 0, '2v2': 0, fiesta: 0, yumi3: 0, yumi5: 0 },
     match: {
       format: 'yumi3',
       state: yumi.phase === 'sudden' ? 'active' : (yumi.phase as 'countdown' | 'active' | 'over'),

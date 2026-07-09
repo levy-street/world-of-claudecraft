@@ -23,6 +23,8 @@ const STANDINGS = {
   '1v1': { rating: 1500, wins: 10, losses: 5 },
   '2v2': { rating: 1400, wins: 6, losses: 6 },
   fiesta: { rating: 1300, wins: 3, losses: 2 },
+  yumi3: { rating: 1500, wins: 0, losses: 0 },
+  yumi5: { rating: 1500, wins: 0, losses: 0 },
 } as const;
 
 const LADDERS = {
@@ -32,7 +34,11 @@ const LADDERS = {
   ],
   '2v2': [],
   fiesta: [],
+  yumi3: [],
+  yumi5: [],
 } as const;
+
+const QUEUE_COUNTS = { '1v1': 4, '2v2': 2, fiesta: 0, yumi3: 6, yumi5: 0 } as const;
 
 /** A live ArenaInfo. `shape: 'sim'` carries extra fields the core must ignore. */
 function makeArenaInfo(shape: 'sim' | 'client', over: Partial<ArenaInfo> = {}): ArenaInfo {
@@ -45,6 +51,7 @@ function makeArenaInfo(shape: 'sim' | 'client', over: Partial<ArenaInfo> = {}): 
     format: null,
     queued: false,
     queueSize: 0,
+    queueCounts: structuredClone(QUEUE_COUNTS),
     match: null,
     ladder: structuredClone(LADDERS['1v1']),
     ladders: structuredClone(LADDERS),
@@ -218,6 +225,41 @@ describe('buildArenaView: ladder + all-time rows', () => {
     expect(
       live(buildArenaView(input({ selectedBracket: '1v1', practiceAvailable: true }))).practice,
     ).toBe(false);
+  });
+});
+
+describe('buildArenaView: two groups + per-bracket queue counts', () => {
+  it('tags each bracket with its group and live queue count', () => {
+    const v = live(buildArenaView(input()));
+    const byFmt = Object.fromEntries(v.brackets.map((b) => [b.fmt, b]));
+    expect(byFmt['1v1'].group).toBe('arena');
+    expect(byFmt['2v2'].group).toBe('arena');
+    expect(byFmt.fiesta.group).toBe('arena');
+    expect(byFmt.yumi3.group).toBe('yumi');
+    expect(byFmt.yumi5.group).toBe('yumi');
+    expect(byFmt['1v1'].queueCount).toBe(4);
+    expect(byFmt.yumi3.queueCount).toBe(6);
+    expect(byFmt.fiesta.queueCount).toBe(0);
+  });
+
+  it('reports the resolved bracket group (arena vs Protect Yumi)', () => {
+    expect(live(buildArenaView(input({ selectedBracket: '2v2' }))).bracketGroup).toBe('arena');
+    expect(live(buildArenaView(input({ selectedBracket: 'yumi3' }))).bracketGroup).toBe('yumi');
+    expect(live(buildArenaView(input({ selectedBracket: 'yumi5' }))).bracketGroup).toBe('yumi');
+  });
+
+  it('folds the per-bracket queue counts into the render-skip signature', () => {
+    const base = live(buildArenaView(input())).sig;
+    const bumped = live(
+      buildArenaView(
+        input({
+          info: makeArenaInfo('sim', {
+            queueCounts: { ...structuredClone(QUEUE_COUNTS), yumi3: 7 },
+          }),
+        }),
+      ),
+    ).sig;
+    expect(bumped).not.toBe(base);
   });
 });
 

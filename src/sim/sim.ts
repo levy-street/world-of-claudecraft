@@ -7350,18 +7350,16 @@ export class Sim {
     const readoutFormat = format ?? '1v1';
     const standing = standings[readoutFormat];
     const playerCount = (q: ArenaQueueUnit[]) => q.reduce((n, u) => n + u.pids.length, 0);
-    const queueSize =
-      format === 'fiesta'
-        ? playerCount(this.arenaQueueFiesta)
-        : format === 'yumi3'
-          ? playerCount(this.arenaQueueYumi3)
-          : format === 'yumi5'
-            ? playerCount(this.arenaQueueYumi5)
-            : format === '2v2'
-              ? playerCount(this.arenaQueue2v2)
-              : format === '1v1'
-                ? this.arenaQueue1v1.length
-                : 0;
+    // Live player-count in every bracket's queue, so the window shows a per-bracket
+    // badge before you commit (1v1 is a flat pid list; the rest are premade units).
+    const queueCounts: Record<ArenaFormat, number> = {
+      '1v1': this.arenaQueue1v1.length,
+      '2v2': playerCount(this.arenaQueue2v2),
+      fiesta: playerCount(this.arenaQueueFiesta),
+      yumi3: playerCount(this.arenaQueueYumi3),
+      yumi5: playerCount(this.arenaQueueYumi5),
+    };
+    const queueSize = format ? queueCounts[format] : 0;
     return {
       rating: standing.rating,
       wins: standing.wins,
@@ -7370,6 +7368,7 @@ export class Sim {
       format,
       queued: queuedFmt !== null,
       queueSize,
+      queueCounts,
       match: matchInfo,
       ladder: ladders[readoutFormat],
       ladders,

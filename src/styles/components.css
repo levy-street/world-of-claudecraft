@@ -6416,6 +6416,78 @@
     font-size: 11px;
     margin-left: 4px;
   }
+  /* Two titled sections: the ranked coliseum, then Protect Yumi (a separate mode,
+     tinted cool to read as NOT a coliseum bracket). */
+  .arena-group {
+    margin: 8px 0 4px;
+    padding: 8px 10px;
+    border: 1px solid #4a3c18;
+    border-radius: 7px;
+    background: linear-gradient(#1a140880, #0d0a0480);
+  }
+  .arena-group-yumi {
+    border-color: #3a4a66;
+    background: linear-gradient(#0f142280, #0a0d1480);
+  }
+  .arena-group-head {
+    font-family: var(--title-font);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-primary);
+  }
+  .arena-group-yumi .arena-group-head {
+    color: #7fb0ff;
+  }
+  .arena-group-intro {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 2px 0 4px;
+    line-height: 1.35;
+  }
+  .arena-group .arena-brackets {
+    margin: 4px 0 0;
+  }
+  /* Live "N in queue" pill on each bracket tab. */
+  .arena-qcount {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 0 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #0d0a04;
+    background: #ffb24a;
+    border-radius: 8px;
+    vertical-align: middle;
+  }
+  .arena-group-yumi .arena-qcount {
+    background: #7fb0ff;
+  }
+  .arena-rules {
+    margin: 8px 0 2px;
+    padding: 7px 9px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #cdd6e6;
+    background: rgba(20, 28, 48, 0.5);
+    border-left: 3px solid #3a4a66;
+    border-radius: 4px;
+  }
+  .arena-selected {
+    margin-top: 8px;
+  }
+  .arena-selected-name {
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffb24a;
+  }
+  .arena-bracket-desc {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 2px 0 6px;
+    line-height: 1.35;
+  }
   .arena-party {
     margin: 6px 0 4px;
     padding: 8px 10px;
