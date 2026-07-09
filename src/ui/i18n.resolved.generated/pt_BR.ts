@@ -289,6 +289,7 @@ export const pt_BR: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Seu personagem",
       "targetLabel": "Seu alvo",
+      "totLabel": "Mark's Mark",
       "targetAnnounce": "Alvo: {name}",
       "partyLabel": "Seu grupo",
       "partyChip": "Grupo",

@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "es_ES": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "fr_FR": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "fr_CA": [
+    "hudChrome.unitFrame.totLabel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "de_DE": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "zh_CN": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "zh_TW": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "ko_KR": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "ja_JP": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "pt_BR": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "ru_RU": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "cs_CZ": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "nl_NL": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "pl_PL": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "id_ID": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "tr_TR": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "sv_SE": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "vi_VN": [
+    "hudChrome.unitFrame.totLabel"
+  ],
+  "da_DK": [
+    "hudChrome.unitFrame.totLabel"
+  ]
 };

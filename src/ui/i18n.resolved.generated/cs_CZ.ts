@@ -289,6 +289,7 @@ export const cs_CZ: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Tvůj hrdina",
       "targetLabel": "Tvoje značka",
+      "totLabel": "Mark's Mark",
       "targetAnnounce": "Označit {name}",
       "partyLabel": "Tvoje družina",
       "partyChip": "Skupina",

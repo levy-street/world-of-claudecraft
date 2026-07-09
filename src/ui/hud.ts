@@ -358,6 +358,7 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
+import { targetOfTargetId } from './target_of_target';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
@@ -1017,6 +1018,16 @@ export class Hud {
   // from its enclosing scope; the gate now lives in the painter, so the redraw
   // closure reads it from here).
   private targetPortraitSubject: Entity | null = null;
+  // Target-of-target frame: a compact FOURTH unit_frame family instance showing the
+  // entity the current target is targeting (a tank on a boss, a healer's focus, an
+  // enemy's mark). Portrait + name + hp only; the assist key (Z) selects it.
+  private totFrameEl = $('#tot-frame');
+  private totNameEl = $('#totf-name');
+  private totLevelEl = $('#totf-level');
+  private totHpEl = $('#totf-hp');
+  private totHpTextEl = $('#totf-hp-text');
+  private totPortraitEl = $('#totf-portrait') as unknown as HTMLCanvasElement;
+  private totPortraitSubject: Entity | null = null;
   private comboRowEl = $('#combo-row');
   private castbarEl = $('#castbar');
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
@@ -3312,6 +3323,21 @@ export class Hud {
       repaintPortrait: () => this.drawTargetPortrait(),
     },
   );
+  // Target-of-target: another unit_frame family instance (portrait + name + hp).
+  private readonly totFramePainter = new UnitFramePainter(
+    this.writerFacet,
+    {
+      frame: this.totFrameEl,
+      name: this.totNameEl,
+      level: this.totLevelEl,
+      hpFill: this.totHpEl,
+      hpText: this.totHpTextEl,
+    },
+    {
+      shownDisplay: 'flex',
+      repaintPortrait: () => this.drawTotPortrait(),
+    },
+  );
   // Deferred "Auto-Attack on Ability Use" for TIMED casts: set by castSlot when
   // the QoL would engage but the ability has a cast time, consumed by the
   // castStop event (engage on success, drop on interrupt), so starting a Smite
@@ -3894,6 +3920,28 @@ export class Hud {
         crestIdForEntity(target.kind, MOBS[target.templateId]?.family),
       );
     }
+  }
+
+  private drawTotPortrait(): void {
+    const tot = this.totPortraitSubject;
+    if (!tot) return;
+    if (tot.kind === 'player') {
+      this.portraits.drawClass(this.totPortraitEl, tot.templateId as PlayerClass, tot.skin ?? 0);
+    } else {
+      this.portraits.drawCrest(
+        this.totPortraitEl,
+        crestIdForEntity(tot.kind, MOBS[tot.templateId]?.family),
+      );
+    }
+  }
+
+  // Assist: select the current target's target (a mob's aggro target, a player's
+  // target). Bound to the assist key (Z by default) and mirrors the tot frame.
+  assistTarget(): void {
+    const p = this.sim.player;
+    const target = p?.targetId != null ? (this.sim.entities.get(p.targetId) ?? null) : null;
+    const totId = targetOfTargetId(target);
+    if (totId != null && this.sim.entities.get(totId)) this.sim.targetEntity(totId);
   }
 
   private itemIcon(item: ItemDef): string {
@@ -6687,6 +6735,41 @@ export class Hud {
         this.lastAnnouncedTargetId = null;
       }
       this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+    }
+
+    // target-of-target frame: whoever the current target is targeting (aggro target
+    // for a mob, target for a player). Hidden when there is no target or the target
+    // has no target. A compact portrait + name + hp; the assist key selects it.
+    const curTarget = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
+    const totId = targetOfTargetId(curTarget);
+    const tot = totId != null ? (this.sim.entities.get(totId) ?? null) : null;
+    // The ToT may be the player themselves (a mob is on YOU): show it, that is the
+    // primary tank/solo signal ("this mob is targeting me").
+    if (tot && tot.kind !== 'object') {
+      this.totPortraitSubject = tot;
+      this.totFramePainter.paint(
+        unitFrameView({
+          present: true,
+          hpFrac: tot.hp / Math.max(1, tot.maxHp),
+          hpText: tot.dead ? t('hud.core.dead') : `${tot.hp} / ${tot.maxHp}`,
+          resourceKind: 'none',
+          resFrac: 0,
+          resText: '',
+          levelText: MOBS[tot.templateId]?.boss ? BOSS_SKULL_GLYPH : String(tot.level),
+          name: entityDisplayName(tot),
+          portraitKey: String(tot.id),
+          absorb: null,
+          dead: false,
+          outOfRange: false,
+        }),
+      );
+      this.setStyleProp(
+        this.totNameEl,
+        'color',
+        tot.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)',
+      );
+    } else {
+      this.totFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
     }
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers

@@ -289,6 +289,7 @@ export const ja_JP: EnTranslations = {
     "unitFrame": {
       "playerLabel": "あなたのキャラクター",
       "targetLabel": "あなたのターゲット",
+      "totLabel": "Mark's Mark",
       "targetAnnounce": "ターゲット：{name}",
       "partyLabel": "あなたのパーティ",
       "partyChip": "パーティ",

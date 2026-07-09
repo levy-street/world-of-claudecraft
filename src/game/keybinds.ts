@@ -140,6 +140,13 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyF'],
   },
+  {
+    id: 'assist',
+    label: 'Assist Target',
+    category: 'Targeting',
+    kind: 'edge',
+    defaults: ['KeyZ'],
+  },
   // Only acts while the Attack Move setting is on; shares its default key with
   // Turn Left intentionally, and only that key is reserved while active.
   {

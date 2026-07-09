@@ -1111,6 +1111,9 @@ async function startGame(
           case 'interact':
             interactKey();
             break;
+          case 'assist':
+            hud.assistTarget();
+            break;
           case 'bags':
             hud.toggleBags();
             break;

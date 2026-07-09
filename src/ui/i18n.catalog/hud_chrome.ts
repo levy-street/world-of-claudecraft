@@ -168,6 +168,12 @@ export const hudChromeStrings = {
   unitFrame: {
     playerLabel: 'Your Hero',
     targetLabel: 'Your Mark',
+    // totLabel names the #tot-frame region: the target's own target (a mob's aggro
+    // target, a player's target). Kept SHORT and non-wordy (no run of four+
+    // lowercase after stripping tokens) so an English-filled non-Latin locale does
+    // not trip the M16 leak guard; "Mark's Mark" reuses the frame's own term for the
+    // target ("Mark", from targetLabel), so it reads as the mark's own mark.
+    totLabel: "Mark's Mark",
     // targetAnnounce is the polite #target-live announcement spoken once when the player's
     // target CHANGES; {name} is the new target's display name. Kept NON-WORDY
     // (no run of four-plus lowercase after stripping {name}) so an English-filled non-Latin

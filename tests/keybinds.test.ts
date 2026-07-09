@@ -102,7 +102,7 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyU')).toBe('discord');
     expect(kb.actionForCode('KeyT')).toBe('crafting');
     expect(kb.actionForCode('KeyY')).toBe('valecup');
-    expect(kb.actionForCode('KeyZ')).toBe(null);
+    expect(kb.actionForCode('Backquote')).toBe(null);
   });
 
   it('exposes primary/secondary codes and labels', () => {
@@ -140,10 +140,10 @@ describe('binding', () => {
 
   it('binds a secondary key without disturbing the primary', () => {
     const kb = new Keybinds();
-    expect(kb.bind('slot1', 1, 'KeyZ')).toBe(true);
+    expect(kb.bind('slot1', 1, 'Backquote')).toBe(true);
     expect(kb.codeAt('slot1', 0)).toBe('Digit2');
-    expect(kb.codeAt('slot1', 1)).toBe('KeyZ');
-    expect(kb.actionForCode('KeyZ')).toBe('slot1');
+    expect(kb.codeAt('slot1', 1)).toBe('Backquote');
+    expect(kb.actionForCode('Backquote')).toBe('slot1');
   });
 
   it('rejects the reserved Escape key', () => {
@@ -241,7 +241,7 @@ describe('persistence', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('Enter')).toBe('chat');
     expect(kb.actionForCode('Equal')).toBe('slot11');
-    expect(kb.actionForCode('KeyZ')).toBe(null);
+    expect(kb.actionForCode('Backquote')).toBe(null);
   });
 
   it('drops a retained default that a stored binding already claimed', () => {
@@ -289,16 +289,16 @@ describe('persistence', () => {
 describe('per-character scope', () => {
   it('keeps two character scopes independent', () => {
     const alice = new Keybinds('char:alice');
-    alice.bind('jump', 0, 'KeyZ'); // KeyZ is unbound by default
+    alice.bind('jump', 0, 'Backquote'); // Backquote is unbound by default
     const bob = new Keybinds('char:bob');
     // Bob never inherits Alice's change; he starts from defaults.
-    expect(bob.actionForCode('KeyZ')).toBe(null);
+    expect(bob.actionForCode('Backquote')).toBe(null);
     expect(bob.codeAt('jump', 0)).toBe('Space');
     bob.bind('jump', 0, 'KeyY'); // also unbound by default
     // Reloading each scope reads back only its own profile.
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:alice').actionForCode('Backquote')).toBe('jump');
     expect(new Keybinds('char:bob').actionForCode('KeyY')).toBe('jump');
-    expect(new Keybinds('char:bob').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('char:bob').actionForCode('Backquote')).toBe(null);
   });
 
   it('writes to a namespaced key, not the legacy global key', () => {
@@ -351,59 +351,59 @@ describe('per-character scope', () => {
   it('uses the production char:<numeric id> scope shape', () => {
     // Online scope is `char:${c.id}` where c.id is the numeric DB character id.
     const kb = new Keybinds('char:1729');
-    kb.bind('jump', 0, 'KeyZ');
+    kb.bind('jump', 0, 'Backquote');
     expect(localStorage.getItem('woc_keybinds:char:1729')).not.toBeNull();
-    expect(new Keybinds('char:1729').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:1729').actionForCode('Backquote')).toBe('jump');
   });
 
   it('namespaces the offline scope (offline:<class>:<name>) per character', () => {
     // Offline scope is `offline:${playerClass}:${name}` (the only stable handle).
     const aldric = new Keybinds('offline:warrior:Aldric');
-    aldric.bind('jump', 0, 'KeyZ');
+    aldric.bind('jump', 0, 'Backquote');
     expect(localStorage.getItem('woc_keybinds:offline:warrior:Aldric')).not.toBeNull();
     expect(localStorage.getItem('woc_keybinds')).toBeNull();
     // A different offline character starts from defaults, not Aldric's binding.
-    expect(new Keybinds('offline:mage:Brenna').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('offline:mage:Brenna').actionForCode('Backquote')).toBe(null);
     expect(new Keybinds('offline:mage:Brenna').codeAt('jump', 0)).toBe('Space');
     // The same scope reads back its own profile.
-    expect(new Keybinds('offline:warrior:Aldric').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('offline:warrior:Aldric').actionForCode('Backquote')).toBe('jump');
   });
 
   it('shares one store across same-class same-name offline characters', () => {
     // Offline characters are not persisted, so class+name is the only handle:
     // two offline sessions with the same class and name intentionally share one
     // profile. A different name does not.
-    new Keybinds('offline:warrior:Aldric').bind('jump', 0, 'KeyZ');
-    expect(new Keybinds('offline:warrior:Aldric').actionForCode('KeyZ')).toBe('jump');
-    expect(new Keybinds('offline:warrior:Borin').actionForCode('KeyZ')).toBe(null);
+    new Keybinds('offline:warrior:Aldric').bind('jump', 0, 'Backquote');
+    expect(new Keybinds('offline:warrior:Aldric').actionForCode('Backquote')).toBe('jump');
+    expect(new Keybinds('offline:warrior:Borin').actionForCode('Backquote')).toBe(null);
   });
 
   it('seeds from the legacy blob when the scoped value is corrupt JSON', () => {
-    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyZ', null] }));
+    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['Backquote', null] }));
     localStorage.setItem('woc_keybinds:char:alice', '{not valid json');
     // A corrupt scoped value behaves like an absent one: still seed from legacy,
     // do not drop to bare defaults.
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:alice').actionForCode('Backquote')).toBe('jump');
   });
 
   it('seeds from the legacy blob when the scoped value is not a plain object', () => {
-    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyZ', null] }));
+    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['Backquote', null] }));
     // A JSON array is typeof 'object' but is not a valid profile; it must seed.
     localStorage.setItem('woc_keybinds:char:alice', JSON.stringify(['garbage']));
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:alice').actionForCode('Backquote')).toBe('jump');
     // A JSON scalar likewise.
     localStorage.setItem('woc_keybinds:char:bob', JSON.stringify(42));
-    expect(new Keybinds('char:bob').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:bob').actionForCode('Backquote')).toBe('jump');
   });
 
   it('reset() persists to the scoped key and leaves the legacy blob untouched', () => {
     localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyJ', null] }));
     const alice = new Keybinds('char:alice');
-    alice.bind('jump', 0, 'KeyZ'); // KeyZ is unbound by default
+    alice.bind('jump', 0, 'Backquote'); // Backquote is unbound by default
     alice.reset();
     // Alice's scoped profile is back to defaults...
     expect(new Keybinds('char:alice').codeAt('jump', 0)).toBe('Space');
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('char:alice').actionForCode('Backquote')).toBe(null);
     // ...and reset never wrote the legacy key.
     expect(JSON.parse(localStorage.getItem('woc_keybinds')!).jump).toEqual(['KeyJ', null]);
   });

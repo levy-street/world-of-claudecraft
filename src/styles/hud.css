@@ -456,6 +456,31 @@
     display: none;
     z-index: 6;
   }
+  /* Target-of-target: a compact frame anchored below the target frame (clearing
+     its debuff strip). Its portrait + bars are smaller than the target frame so it
+     reads as a secondary, at-a-glance readout of who the target is on. */
+  #tot-frame {
+    left: 12px;
+    top: 100px;
+    display: none;
+    z-index: 6;
+  }
+  #tot-frame > :not(.tf-move-btn) {
+    zoom: var(--target-frame-scale, 1);
+  }
+  #tot-frame .portrait canvas {
+    width: 40px;
+    height: 40px;
+  }
+  #tot-frame .uf-bars {
+    width: 132px;
+  }
+  #tot-frame .uf-name {
+    font-size: 12px;
+  }
+  #tot-frame .bar.hp {
+    height: 12px;
+  }
   /* Target Frame Scale (--target-frame-scale, targetFrameScale setting): the
      player frame's twin. Children only, never the drag-positioned frame itself
      (zoom there would multiply its used left/top and break the MovableFrame

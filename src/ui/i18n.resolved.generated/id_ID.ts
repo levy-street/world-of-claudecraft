@@ -289,6 +289,7 @@ export const id_ID: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Pahlawan Anda",
       "targetLabel": "Sasaran Anda",
+      "totLabel": "Mark's Mark",
       "targetAnnounce": "Tandai {name}",
       "partyLabel": "Kelompok Anda",
       "partyChip": "Kelompok",

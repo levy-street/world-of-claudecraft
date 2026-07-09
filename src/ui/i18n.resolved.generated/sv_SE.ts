@@ -289,6 +289,7 @@ export const sv_SE: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Din hjälte",
       "targetLabel": "Ditt mål",
+      "totLabel": "Mark's Mark",
       "targetAnnounce": "Markera {name}",
       "partyLabel": "Ditt följe",
       "partyChip": "Grupp",

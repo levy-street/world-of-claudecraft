@@ -1645,6 +1645,7 @@ export class ClientWorld implements IWorld {
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
       e.aggroTargetId = w.aggro ?? null;
+      e.targetId = w.tgt ?? null; // a targeted PLAYER's target, for the target-of-target frame
       e.tappedById = w.tap ?? null;
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';

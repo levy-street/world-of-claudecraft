@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6517,
-    "rows": 136857,
-    "translated": 136664,
-    "pending": 0,
+    "keys": 6518,
+    "rows": 136878,
+    "translated": 136665,
+    "pending": 20,
     "blocked": 193,
     "blockedSource": 93
   },
@@ -528370,6 +528370,78 @@
           "state": "translated",
           "srcHash": "53c0e8a85540491a",
           "by": "human"
+        }
+      }
+    },
+    "main:hudChrome.unitFrame.totLabel": {
+      "scope": "main",
+      "enHash": "fb711ce9f74f18c4",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "fb711ce9f74f18c4",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
         }
       }
     },

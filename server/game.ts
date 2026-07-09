@@ -720,6 +720,10 @@ function dynamicFields(e: Entity): Record<string, unknown> {
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
+  // A player's current target, mirrored so the client can show a target-of-target
+  // frame + assist for a targeted PLAYER (mobs use `aggro` above). Interest-scoped,
+  // sent only when set. Applied to `targetId` in online.ts applyWire.
+  if (e.targetId !== null) out.tgt = e.targetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {

@@ -289,6 +289,7 @@ export const en_XA: EnTranslations = {
     "unitFrame": {
       "playerLabel": "[Ýóúŕ Ĥéŕó]",
       "targetLabel": "[Ýóúŕ Ɱáŕķ]",
+      "totLabel": "[Ɱáŕķ'š Ɱáŕķ]",
       "targetAnnounce": "[Ɱáŕķ {name}]",
       "partyLabel": "[Ýóúŕ Ɓáñð]",
       "partyChip": "[Þáŕţý]",

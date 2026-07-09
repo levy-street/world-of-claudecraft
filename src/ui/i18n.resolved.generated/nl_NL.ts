@@ -289,6 +289,7 @@ export const nl_NL: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Je Held",
       "targetLabel": "Je Doelwit",
+      "totLabel": "Mark's Mark",
       "targetAnnounce": "Markeer {name}",
       "partyLabel": "Je Bende",
       "partyChip": "Groep",

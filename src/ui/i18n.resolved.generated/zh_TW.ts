@@ -289,6 +289,7 @@ export const zh_TW: EnTranslations = {
     "unitFrame": {
       "playerLabel": "你的角色",
       "targetLabel": "你的目標",
+      "totLabel": "Mark's Mark",
       "targetAnnounce": "目標：{name}",
       "partyLabel": "你的隊伍",
       "partyChip": "隊伍",
