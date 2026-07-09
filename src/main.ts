@@ -13,6 +13,7 @@ import {
 } from './game/browser_env';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
 import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveShouldWalk,
   clickMoveStep,
@@ -993,13 +994,34 @@ async function startGame(
     hud.clearPendingChatLinks();
     recoverFromMobileKeyboard();
   };
+  // On the touch HUD the composer is a desktop-style bar at the TOP of the chat panel
+  // (above the tabs + log), so on mobile it lives INSIDE #chatlog-wrap as its first child
+  // rather than as an absolutely-positioned sibling. Move it there once, lazily, the first
+  // time chat opens (idempotent; a no-op on desktop and after the first move).
+  const ensureMobileComposerInPanel = (): void => {
+    if (!document.body.classList.contains('mobile-touch')) return;
+    const wrap = document.getElementById('chatlog-wrap');
+    if (!wrap || chatInput.parentElement === wrap) return;
+    wrap.insertBefore(chatInput, wrap.firstChild);
+  };
   function openChat(): void {
     // reflect the active chat-channel tab in the placeholder (e.g. "Message World")
+    ensureMobileComposerInPanel();
     chatInput.placeholder = hud.activeChatPlaceholder();
     chatInput.style.display = 'block';
     anchorChatInput();
     autosizeChatInput();
     chatInput.focus();
+  }
+  // Mobile read view: tapping the Chat button opens the centered panel with the composer
+  // bar VISIBLE but NOT focused (no keyboard). Tapping the composer focuses it and raises
+  // the keyboard (native + the focus handler). Same as openChat minus the focus.
+  function openChatRead(): void {
+    ensureMobileComposerInPanel();
+    chatInput.placeholder = hud.activeChatPlaceholder();
+    chatInput.style.display = 'block';
+    document.body.classList.remove('mobile-chat-reply');
+    autosizeChatInput();
   }
   // Fired for every open path (keybind, whisper context menu, mobile toggle)
   // since they all call focus().
@@ -1058,8 +1080,18 @@ async function startGame(
     }
   });
   chatInput.addEventListener('blur', () => {
-    if (chatInput.style.display === 'none') recoverFromMobileKeyboard();
+    // Recover the mobile-chat viewport ONLY when the composer is already hidden (the
+    // close path: closeChat hides then blurs). A keyboard dismiss (the OS hide-keyboard
+    // key) blurs while the composer is still shown, so this is false and chat stays open
+    // in its centered READ view, reflowed by the keyboard_viewport applier off the
+    // visualViewport resize. Only the Chat button closes chat.
+    if (shouldRecoverOnComposerBlur(chatInput.style.display)) recoverFromMobileKeyboard();
   });
+  // The mobile keyboard-dismiss chevron (hidden on mobile in the current model; kept wired
+  // for parity): blur the composer to drop the keyboard and return to the read view,
+  // WITHOUT closing chat.
+  const chatDismiss = document.getElementById('chat-dismiss');
+  chatDismiss?.addEventListener('click', () => chatInput.blur());
 
   const input = new Input(
     canvas,
@@ -1163,6 +1195,8 @@ async function startGame(
     onInteract: () => interactKey(),
     onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),
+    onChatOpen: () => openChatRead(),
+    onChatClose: () => closeChat(),
     onMenu: () => hud.toggleOptionsMenu(),
     onSocial: () => hud.toggleSocial(),
     onDiscord: () => openDiscordEntry(),

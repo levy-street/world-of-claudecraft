@@ -291,6 +291,7 @@ export const vi_VN: EnTranslations = {
       "targetLabel": "Mục Tiêu Của Bạn",
       "targetAnnounce": "Đánh Dấu {name}",
       "partyLabel": "Đội Của Bạn",
+      "partyChip": "Tổ Đội",
       "partyGroup": "Nhóm {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "ph",
@@ -320,7 +321,9 @@ export const vi_VN: EnTranslations = {
       "actionPageIndicator": "Trang {page}",
       "targetCycle": "Hoán đổi mục tiêu",
       "targetCycleShort": "Mục tiêu",
-      "spellbookPageLabel": "Trang {page}"
+      "spellbookPageLabel": "Trang {page}",
+      "hideKeyboard": "Ẩn bàn phím",
+      "chatPlaceholder": "Nói gì đó..."
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -1014,18 +1017,18 @@ export const vi_VN: EnTranslations = {
       },
       "allStatsPctReduce": "Giảm tất cả thuộc tính đi {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Tăng sức mạnh tấn công thêm {pct}%",
+        "armor": "Tăng giáp thêm {pct}%",
+        "int": "Tăng Trí Tuệ thêm {pct}%",
+        "sta": "Tăng Thể Lực thêm {pct}%",
+        "allStats": "Tăng tất cả thuộc tính thêm {pct}%"
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Giảm giáp đi {pct}%",
+      "armorPctStacks": "Giảm giáp đi {pct}% ({stacks} tích trữ)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -1431,6 +1434,7 @@ export const vi_VN: EnTranslations = {
     "archetypeTitle": {
       "label": "Danh hiệu",
       "none": "Không có",
+      "hobbyLabel": "Sở Thích",
       "armorcrafting": "Thợ Giáp",
       "weaponcrafting": "Thợ Rèn Vũ Khí",
       "jewelcrafting": "Thợ Kim Hoàn",
@@ -1453,7 +1457,10 @@ export const vi_VN: EnTranslations = {
       "craftedToast": "Đã chế tác: {name}",
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
       "unknownRecipe": "Công thức đó không tồn tại.",
-      "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó."
+      "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
+      "notAtHub": "Bạn phải ở trung tâm chế tác, đạt cấp yêu cầu, mới chế tạo được thứ đó.",
+      "throttled": "Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.",
+      "recipeNotLearned": "Bạn chưa học công thức đó."
     }
   },
   "apiError": {
@@ -2226,8 +2233,8 @@ export const vi_VN: EnTranslations = {
       "waveGoldBody": "Đợt giữa: những tổ hợp hai mặt nơi lối xây dựng của bạn bắt đầu thành hình và phát huy.",
       "wavePrismaticTitle": "Lăng Kính",
       "wavePrismaticBody": "Đợt cuối cùng: những đòn bùng phát định hình lối chơi, làm tan chảy màn hình, được tạo ra để cảm thấy lố bịch theo cách tuyệt vời nhất.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Bảo Vệ Yumi",
+      "yumiBody": "Bảo Vệ Yumi là chế độ tranh mục tiêu theo đội chơi trong một mê cung: mỗi bên canh giữ linh thú mèo của mình trong khi săn lùng con của đối phương. Thỉnh thoảng cả hai chú mèo lại chớp dịch tới những góc mới của mê cung, nên trận đấu xoay vần giữa việc phòng thủ, săn lùng và chạy đua đi tìm lại chúng. Xếp hàng chờ theo dạng ba đấu ba hoặc năm đấu năm; gục ngã trong trận chỉ khiến bạn phải ngồi ngoài trong chốc lát.",
       "powerupsTitle": "Tăng lực trong vòng đấu",
       "powerupsBody": "Những quả cầu phát sáng cũng rơi vào đấu trường giữa trận, miễn phí cho ai chạm tới đầu tiên. Chúng được thiết kế phóng đại có chủ đích và chỉ kéo dài trong chốc lát: Quỷ Tốc cho một thoáng vận tốc chói lóa, Khổng Lồ để phình to thành gã khổng lồ nặng nề, Giày Mặt Trăng cho một cú nhảy nảy bật trọng lực thấp, và Cuồng Bạo cho một đợt phẫn nộ dâng trào đột ngột.",
       "ladderHeading": "Leo Bảng Xếp Hạng",
@@ -3658,42 +3665,42 @@ export const vi_VN: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 đấu 3",
+    "bracket5": "Yumi 5 đấu 5",
+    "enterQueue": "Tham Gia Bảo Vệ Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Bạn vào hàng chờ Bảo Vệ Yumi. Hãy canh giữ linh thú của bạn…",
+      "leave": "Bạn rời hàng chờ Bảo Vệ Yumi.",
+      "teamLeave": "Đội của bạn rời hàng chờ Bảo Vệ Yumi."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Bảo Vệ Yumi 3 đấu 3 chỉ cho phép tổ đội tối đa ba người.",
+      "partyTooBig5": "Bảo Vệ Yumi 5 đấu 5 chỉ cho phép tổ đội tối đa năm người."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Bảo Vệ Yumi! Bảo vệ linh thú của bạn và săn lùng linh thú của đối phương."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "BẢO VỆ YUMI",
+      "getReady": "Sẵn sàng…",
+      "teleportIn": "Các Yumi dịch chuyển sau {s}",
+      "suddenDeath": "ĐỘT TỬ",
+      "yourYumi": "Yumi Của Bạn",
+      "enemyYumi": "Yumi Địch",
+      "aria": "Yumi của bạn còn {mine} trên {max} máu, Yumi địch còn {theirs}.",
+      "collapse": "Thu gọn thanh Bảo Vệ Yumi",
+      "expand": "Mở rộng thanh Bảo Vệ Yumi"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "GỤC NGÃ!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "ĐỘT TỬ! Các Yumi vẫn trụ vững!",
+      "teleport": "Các Yumi dịch chuyển tức thời!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "CHIẾN THẮNG! Yumi đã an toàn!",
+      "loss": "THẤT BẠI! Yumi của bạn đã gục ngã."
     }
   },
   "fiesta": {
@@ -4142,6 +4149,7 @@ export const vi_VN: EnTranslations = {
       "mobileSocial": "Xã Hội",
       "mobileArena": "Đấu Trường",
       "mobileMenu": "Menu",
+      "mobileSettings": "Cài Đặt",
       "mobileUse": "Dùng",
       "mobileMeters": "Đồng Hồ",
       "mobileMap": "Bản Đồ",
@@ -4690,6 +4698,7 @@ export const vi_VN: EnTranslations = {
       "offGlobalCooldown": "Không tính vào hồi chiêu toàn cục",
       "friendlyTarget": "Mục tiêu đồng minh",
       "enemyTarget": "Mục tiêu địch",
+      "selfOnly": "Chỉ bản thân",
       "damageRange": "{min} đến {max}",
       "finisherDamage": "{base} cộng {perCombo} mỗi điểm combo"
     },
@@ -4999,7 +5008,7 @@ export const vi_VN: EnTranslations = {
       "greedAria": "Tham Lam giành {item}",
       "passAria": "Bỏ qua {item}",
       "everyonePassed": "Mọi người đều bỏ qua {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "Đã tung {answered}/{total}"
     }
   },
   "entities": {
@@ -5122,7 +5131,7 @@ export const vi_VN: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Xẻ Giáp",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Xẻ toạc giáp của mục tiêu, giảm {damage}% mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo ra lượng đe dọa lớn."
       },
       "taunt": {
         "name": "Chọc Tức",
@@ -5578,7 +5587,7 @@ export const vi_VN: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Ánh Ma Trơi",
-        "description": "Giảm giáp của mục tiêu đi 35 trong 30 giây."
+        "description": "Giảm giáp của mục tiêu đi {damage}% trong 40 giây. Không cộng dồn với Xẻ Giáp."
       },
       "hibernate": {
         "name": "Giấc Ngủ Sâu",
@@ -5808,6 +5817,9 @@ export const vi_VN: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "Nanh Của Greyjaw Già"
+      },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Trang Sổ Cái Phong Sương"
@@ -7045,7 +7057,7 @@ export const vi_VN: EnTranslations = {
         "name": "Chấp Sự Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Hình Nộm Tập Luyện"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"
@@ -7480,6 +7492,16 @@ export const vi_VN: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Sói Trước Cửa",
         "text": "Lũ sói rừng ngày càng hung hăng, chực vồ lữ khách trên con đường phía bắc. Hãy thưa bớt số lượng chúng, {playerName}. Hạ 8 con Sói Rừng và Đông Khê sẽ dễ thở hơn.",

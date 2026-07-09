@@ -329,7 +329,10 @@ const BOT_CAST_PERIOD = 44; // ticks (~2.2s) between a field bot's ability decis
 const BOT_KEEPER_CAST_PERIOD = 8; // ticks between a keeper's dive/clear checks (stays sharp)
 const BOT_KEEPER_SHADE = 5.2; // yd the keeper shades off center (tracks the wider goal mouth)
 const VC_KEEPER_GUARD_DEPTH = 1; // yd the keeper stands off its own goal line
-const BOT_KICK_REACH = 3.5; // yd from the ball a bot will swing a kick
+// yd from the ball a bot will swing a kick. MUST stay <= VC_POSSESSION_RADIUS
+// (vale_cup.ts): the strike handlers reject a kick/shoot/pass beyond that, so a
+// bot committing to a swing from farther would connect with nothing.
+const BOT_KICK_REACH = 3.5;
 const BOT_SPRINT_BALL_DIST = 13; // yd from a loose ball a chaser pops Fresh Legs to reach it
 const BOT_SHOOT_RANGE = 14; // yd from the goal mouth a bot will shoot; farther: build up
 const BOT_PASS_MIN_LEAD = 6; // a teammate this much nearer the enemy goal is "ahead"

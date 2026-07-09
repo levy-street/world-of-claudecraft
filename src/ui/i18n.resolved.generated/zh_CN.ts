@@ -291,6 +291,7 @@ export const zh_CN: EnTranslations = {
       "targetLabel": "你的目标",
       "targetAnnounce": "目标：{name}",
       "partyLabel": "你的队伍",
+      "partyChip": "小队",
       "partyGroup": "小队 {n}",
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
@@ -320,7 +321,9 @@ export const zh_CN: EnTranslations = {
       "actionPageIndicator": "第{page}页",
       "targetCycle": "切换目标",
       "targetCycleShort": "目标",
-      "spellbookPageLabel": "页{page}"
+      "spellbookPageLabel": "页{page}",
+      "hideKeyboard": "隐藏键盘",
+      "chatPlaceholder": "说点什么..."
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -1431,6 +1434,7 @@ export const zh_CN: EnTranslations = {
     "archetypeTitle": {
       "label": "称号",
       "none": "无",
+      "hobbyLabel": "爱好",
       "armorcrafting": "锻甲师",
       "weaponcrafting": "武器匠",
       "jewelcrafting": "珠宝匠",
@@ -1453,7 +1457,10 @@ export const zh_CN: EnTranslations = {
       "craftedToast": "已制作:{name}",
       "insufficientMaterials": "你没有足够的材料。",
       "unknownRecipe": "该配方不存在。",
-      "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。"
+      "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。",
+      "notAtHub": "必须达到所需等级并位于制作站，才能制作该物品。",
+      "throttled": "你制作得太快了，请稍等片刻后再试。",
+      "recipeNotLearned": "你还没有学会这个配方。"
     }
   },
   "apiError": {
@@ -4142,6 +4149,7 @@ export const zh_CN: EnTranslations = {
       "mobileSocial": "社交",
       "mobileArena": "竞技场",
       "mobileMenu": "菜单",
+      "mobileSettings": "设置",
       "mobileUse": "使用",
       "mobileMeters": "统计",
       "mobileMap": "地图",
@@ -4690,6 +4698,7 @@ export const zh_CN: EnTranslations = {
       "offGlobalCooldown": "不触发公共冷却",
       "friendlyTarget": "友方目标",
       "enemyTarget": "敌方目标",
+      "selfOnly": "仅对自己",
       "damageRange": "{min} 到 {max}",
       "finisherDamage": "{base} 加每个连击点 {perCombo}"
     },
@@ -5122,7 +5131,7 @@ export const zh_CN: EnTranslations = {
       },
       "sunder_armor": {
         "name": "削甲",
-        "description": "撕裂目标的护甲，每次使其降低 2%。最多叠加 5 次（叠满时降低 10%）。产生大量威胁值。"
+        "description": "撕裂目标的护甲，每次使其降低 {damage}%。最多叠加 5 次。产生大量威胁值。"
       },
       "taunt": {
         "name": "挑衅",
@@ -5578,7 +5587,7 @@ export const zh_CN: EnTranslations = {
       },
       "faerie_fire": {
         "name": "巫光",
-        "description": "使目标的护甲降低 35，持续 30 秒。"
+        "description": "使目标的护甲降低 {damage}%，持续 40 秒。无法与削甲叠加。"
       },
       "hibernate": {
         "name": "沉眠",
@@ -5808,6 +5817,9 @@ export const zh_CN: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "老灰颚的尖牙"
+      },
+      "chunk_of_ore": {
+        "name": "矿石块"
       },
       "weathered_ledger_page": {
         "name": "风化账页"
@@ -6982,7 +6994,7 @@ export const zh_CN: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "由美"
       },
       "forest_wolf": {
         "name": "森林狼"
@@ -7480,6 +7492,16 @@ export const zh_CN: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "人人都有一技之长",
+        "text": "伊斯特布鲁克的每个人都有除了剑术之外的手艺，{playerName}。镇子周围散落着矿脉，去挥镐采上5块矿石带给我。要亲自采，别耍花招，我看得出来。",
+        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，这里面都有正经买卖等着你。",
+        "objectives": {
+          "0": {
+            "label": "矿石块"
+          }
+        }
+      },
       "q_wolves": {
         "title": "门前群狼",
         "text": "森林狼已经敢扑咬北路旅人，{playerName}。击败8只森林狼，让东溪能松一口气。",

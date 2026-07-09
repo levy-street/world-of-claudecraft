@@ -7,8 +7,15 @@
 // assertion here compares exact inventories; the kit round-trip compares the
 // ABILITY list, not bags.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { SPORT_KITS, VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
+
+// The full-match bot sims here run thousands of deterministic ticks; the 5s
+// vitest default is too tight for them under CI's parallel load (they complete
+// in well under a second locally). Give the file the headroom the other heavy
+// sim suites use (climb_slope, sim, dungeons).
+vi.setConfig({ testTimeout: 30000 });
+
 import { DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import {
@@ -81,6 +88,63 @@ function tickUntil(sim: Sim, pred: () => boolean, maxTicks: number): SimEvent[] 
   for (let i = 0; i < maxTicks && !pred(); i++) out.push(...sim.tick());
   return out;
 }
+
+describe('Vale Cup: possession gate (must be on the ball to play it)', () => {
+  // Stage a resting ball near the east goal, park the opponent in a far corner
+  // so it cannot trap, and return the live match + ball for a strike attempt.
+  function stageRestingBall(sim: Sim, a: number, b: number) {
+    const match = startBout(sim, a, b);
+    teleport(sim, b, PITCH.xMin + 1, PITCH.zMin + 1);
+    const ball = match.ball!;
+    ball.x = GOAL_LINE_EAST_X - 6;
+    ball.z = PITCH_CENTER.z;
+    ball.y = groundHeight(ball.x, ball.z, sim.cfg.seed);
+    ball.vx = 0;
+    ball.vy = 0;
+    ball.vz = 0;
+    ball.holderPid = null;
+    return { match, ball };
+  }
+  const ballSpeed = (ball: { vx: number; vz: number }) => Math.hypot(ball.vx, ball.vz);
+  const aimAtGoal = { x: GOAL_LINE_EAST_X + 12, z: PITCH_CENTER.z };
+
+  it('rejects a shot from off the ball (the reported anywhere-on-the-map bug)', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Aleph');
+    const b = addAt(sim, 'mage', 'Bet', 2, -40);
+    const { ball } = stageRestingBall(sim, a, b);
+    // Stand ~24yd off the ball: inside the old sport_shoot.range (34) that let a
+    // shot fire from anywhere, but well outside actual possession.
+    teleport(sim, a, ball.x - 24, ball.z);
+    sim.entities.get(a)!.facing = Math.PI / 2;
+    sim.castAbility('sport_shoot', a, aimAtGoal);
+    expect(ballSpeed(ball)).toBe(0); // no possession, no launch
+  });
+
+  it('rejects a kick and a pass from off the ball', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Aleph');
+    const b = addAt(sim, 'mage', 'Bet', 2, -40);
+    const { ball } = stageRestingBall(sim, a, b);
+    teleport(sim, a, ball.x - 16, ball.z); // inside sport_kick(18)/sport_pass(42) range
+    sim.entities.get(a)!.facing = Math.PI / 2;
+    sim.castAbility('sport_kick', a, aimAtGoal);
+    expect(ballSpeed(ball)).toBe(0);
+    sim.castAbility('sport_pass', a, aimAtGoal);
+    expect(ballSpeed(ball)).toBe(0);
+  });
+
+  it('lets you strike the ball once it is at your feet', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Aleph');
+    const b = addAt(sim, 'mage', 'Bet', 2, -40);
+    const { ball } = stageRestingBall(sim, a, b);
+    teleport(sim, a, ball.x - 2, ball.z); // on the ball (within VC_POSSESSION_RADIUS)
+    sim.entities.get(a)!.facing = Math.PI / 2;
+    sim.castAbility('sport_shoot', a, aimAtGoal);
+    expect(ballSpeed(ball)).toBeGreaterThan(0); // struck: the shot launches
+  });
+});
 
 describe('Vale Cup: queue guards', () => {
   it('rejects a dead, instanced, dueling-free litany with the arena literals', () => {

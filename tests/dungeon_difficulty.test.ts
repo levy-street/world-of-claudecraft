@@ -55,7 +55,7 @@ describe('heroic tuning data contract', () => {
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
     });
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
-      expect(tuning.level).toBe(20);
+      expect(tuning.level).toBe(22);
       expect(MOBS[tuning.finalBossId], `${tuning.id} finalBossId is a real mob`).toBeTruthy();
     }
     expect(ITEMS[HEROIC_MARK_ITEM_ID]).toBeTruthy();
@@ -74,11 +74,13 @@ describe('heroic tuning data contract', () => {
   });
 
   it('pins the classic-era heroic multipliers per dungeon', () => {
-    // Calibrated against measured TBC pairs (see the tuning table's comment):
-    // overall raw ratios ~2.7-3.2x damage / ~2-3x health once the level-20
-    // pin is included, clamped to TBC's EFFECTIVE severity for the local
-    // armor math. Exact literals so an accidental retune (or a revert to the
-    // old ~1.1x elite bump) reddens deliberately.
+    // The four five-mans are damage-EQUALIZED at the level-22 pin: the raw
+    // damageMultiplier per dungeon is set so an average elite-trash swing lands
+    // ~300 post-mitigation on the reference geared shaman (see the tuning
+    // table's comment), which inverts the multiplier ladder because the harder
+    // dungeons already carry bigger base weapon damage. Exact literals so an
+    // accidental retune (or a revert to the old un-equalized ladder) reddens
+    // deliberately.
     expect(
       Object.fromEntries(
         Object.values(HEROIC_DUNGEON_TUNING).map((t) => [
@@ -87,10 +89,10 @@ describe('heroic tuning data contract', () => {
         ]),
       ),
     ).toEqual({
-      hollow_crypt: [1.9, 3.4, 1.3],
-      sunken_bastion: [2.0, 3.8, 1.3],
-      drowned_temple: [2.6, 4.2, 1.25],
-      gravewyrm_sanctum: [2.0, 4.6, 1.2],
+      hollow_crypt: [1.9, 6.8, 1.3],
+      sunken_bastion: [2.0, 6.2, 1.3],
+      drowned_temple: [2.6, 5.7, 1.25],
+      gravewyrm_sanctum: [2.0, 5.4, 1.2],
       // The raid multiplier is smaller in RELATIVE terms because normal
       // Nythraxis already lands the game's hardest hits (see the tuning
       // table's comment); its percentage mechanics scale separately in
@@ -121,14 +123,14 @@ describe('mobTemplateForDungeonDifficulty', () => {
   it('produces an exact heroic transform without mutating the base template', () => {
     const before = JSON.stringify(SYNTHETIC);
     const heroic = mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'heroic');
-    // hollow_crypt tuning: health x1.9, damage x3.4, armor x1.3, level 20.
+    // hollow_crypt tuning: health x1.9, damage x6.8, armor x1.3, level 22.
     expect(heroic).not.toBe(SYNTHETIC);
-    expect(heroic.minLevel).toBe(20);
-    expect(heroic.maxLevel).toBe(20);
+    expect(heroic.minLevel).toBe(22);
+    expect(heroic.maxLevel).toBe(22);
     expect(heroic.hpBase).toBeCloseTo(190, 10);
     expect(heroic.hpPerLevel).toBeCloseTo(19, 10);
-    expect(heroic.dmgBase).toBeCloseTo(68, 10);
-    expect(heroic.dmgPerLevel).toBeCloseTo(6.8, 10);
+    expect(heroic.dmgBase).toBeCloseTo(136, 10);
+    expect(heroic.dmgPerLevel).toBeCloseTo(13.6, 10);
     expect(heroic.armorPerLevel).toBeCloseTo(5.2, 10);
     // Every heroic mob is floored to the anti-kite speed (player RUN_SPEED is
     // 7); a template already at or above the floor keeps its own speed.
@@ -145,7 +147,7 @@ describe('mobTemplateForDungeonDifficulty', () => {
 
 describe('mobLevelForDungeonDifficulty', () => {
   it('pins heroic spawns to the tuning level and passes rolled levels through otherwise', () => {
-    expect(mobLevelForDungeonDifficulty('hollow_crypt', 'heroic', 11)).toBe(20);
+    expect(mobLevelForDungeonDifficulty('hollow_crypt', 'heroic', 11)).toBe(22);
     expect(mobLevelForDungeonDifficulty('hollow_crypt', 'normal', 11)).toBe(11);
     expect(mobLevelForDungeonDifficulty('no_such_dungeon', 'heroic', 11)).toBe(11);
   });

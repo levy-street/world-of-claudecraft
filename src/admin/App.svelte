@@ -24,6 +24,7 @@
   import Usage from './pages/Usage.svelte';
   import TickPerf from './pages/TickPerf.svelte';
   import Moderation from './pages/Moderation.svelte';
+  import ModerationHistoryPage from './pages/ModerationHistoryPage.svelte';
   import SuspiciousPlayers from './pages/SuspiciousPlayers.svelte';
   import DetectionCalibration from './pages/DetectionCalibration.svelte';
   import AntibotConfig from './pages/AntibotConfig.svelte';
@@ -47,6 +48,7 @@
     usage: Usage,
     'tick-perf': TickPerf,
     moderation: Moderation,
+    'moderation-history': ModerationHistoryPage,
     'suspicious-players': SuspiciousPlayers,
     'detection-calibration': DetectionCalibration,
     'antibot-config': AntibotConfig,

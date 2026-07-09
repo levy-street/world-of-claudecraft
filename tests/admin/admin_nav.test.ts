@@ -24,6 +24,10 @@ describe('AdminNav', () => {
       'href',
       expect.stringContaining('page=moderation'),
     );
+    expect(screen.getByRole('link', { name: t('nav.history') })).toHaveAttribute(
+      'href',
+      expect.stringContaining('page=moderation-history'),
+    );
     expect(screen.getByRole('link', { name: t('nav.blockedIps') })).toHaveAttribute(
       'aria-current',
       'page',
@@ -92,6 +96,7 @@ describe('AdminNav', () => {
 
     // Moderation section: reports/shared-ips/blocked-ips/chat-filter all visible.
     expect(screen.getByRole('link', { name: t('nav.reports') })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: t('nav.history') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.blockedIps') })).toBeInTheDocument();
     // Accounts and characters both require accounts.read, so both are visible.
     expect(screen.getByRole('link', { name: t('nav.accounts') })).toBeInTheDocument();

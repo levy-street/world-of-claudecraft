@@ -349,6 +349,9 @@ CREATE TABLE IF NOT EXISTS account_moderation_actions (
   expires_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS account_moderation_actions_account ON account_moderation_actions(account_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS account_moderation_actions_created ON account_moderation_actions(created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS account_moderation_actions_admin_created ON account_moderation_actions(admin_account_id, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS account_moderation_actions_admin_action_created ON account_moderation_actions(admin_account_id, action, created_at DESC, id DESC);
 CREATE TABLE IF NOT EXISTS blocked_ips (
   id SERIAL PRIMARY KEY,
   ip TEXT NOT NULL UNIQUE,
@@ -366,6 +369,8 @@ CREATE TABLE IF NOT EXISTS blocked_ip_actions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS blocked_ip_actions_ip ON blocked_ip_actions(ip, created_at DESC);
+CREATE INDEX IF NOT EXISTS blocked_ip_actions_created ON blocked_ip_actions(created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS blocked_ip_actions_admin_created ON blocked_ip_actions(admin_account_id, created_at DESC, id DESC);
 -- Audit trail for staff role changes (dashboard staff page; the grant script
 -- writes here too, with admin_account_id NULL).
 CREATE TABLE IF NOT EXISTS admin_role_changes (

@@ -181,6 +181,15 @@ export const hudChromeStrings = {
     // does not trip the untranslated-leak guard; "Band" reads as your group of
     // companions, parallel to playerLabel / targetLabel.
     partyLabel: 'Your Band',
+    // partyChip is the caption on the mobile-only collapse chip that stands in for the
+    // expanded party stack (the member frames + Leave button) on the touch HUD: tap it
+    // to reveal the stack, tap again to collapse. A distinct key from the chat channel
+    // "Party" (a different render sink: a disclosure header, not a channel tab), so a
+    // locale can name the two independently. WORDY by M16 ("Party" to "arty", a four-
+    // plus consecutive-lowercase run survives), so the five non-Latin overlays
+    // (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) carry real fills and the Latin overlays stay
+    // pending, exactly like partyGroup below.
+    partyChip: 'Party',
     // partyGroup is the visually-hidden raid-group cue appended to a raid party row's
     // accessible name (e.g. "Group 1"), so a screen reader conveys which raid group a
     // member sits in. {n} is the group number (formatNumber). UNLIKE the labels above
@@ -222,7 +231,7 @@ export const hudChromeStrings = {
   // On-screen / mobile control labels and their accessible names. char/bags/music
   // reuse existing keys (hud.keybinds.actions.*, hud.options.music) at the call site.
   mobile: {
-    autorun: 'Autorun',
+    autorun: 'Auto',
     jump: 'Jump',
     leaderboard: 'Ranks',
     dailyRewards: 'Rewards',
@@ -264,6 +273,20 @@ export const hudChromeStrings = {
     // falls on. "Page {page}" is not wordy (one word plus a token), so it is
     // exempt from the M16 non-Latin-fill requirement.
     spellbookPageLabel: 'Page {page}',
+    // The mobile chat composer's keyboard-dismiss chevron (#chat-dismiss): a
+    // down-chevron button that blurs the chat input so the on-screen keyboard drops
+    // WITHOUT closing chat (the log + composer stay at their resting seat). Its
+    // accessible name; WORDY by M16 ("Hide" plus "keyboard", each a four-plus
+    // consecutive-lowercase run), so the five non-Latin overlays carry real fills and
+    // the Latin overlays stay pending, exactly like the other wordy chrome labels.
+    hideKeyboard: 'Hide keyboard',
+    // The mobile chat composer's placeholder. The desktop hud.core.chatPlaceholder
+    // packs the full slash-command legend (/s, /w, /r, ...), which overflows the
+    // compact touch composer strip, so the touch HUD shows this short prompt instead
+    // (activeChatPlaceholder branches on the mobile layout). WORDY by M16
+    // ("something" is a four-plus consecutive-lowercase run), so the five non-Latin
+    // overlays carry real fills and the Latin overlays stay pending.
+    chatPlaceholder: 'Say something...',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -1678,6 +1701,10 @@ export const hudChromeStrings = {
   archetypeTitle: {
     label: 'Title',
     none: 'None',
+    // The hobby craft (#1294): one opposite craft empowered up to rare
+    // alongside the active archetype's majors. Reuses the same per-craft
+    // name table below (a hobby id IS a craft id on the ring).
+    hobbyLabel: 'Hobby',
     armorcrafting: 'Armorer',
     weaponcrafting: 'Weaponsmith',
     jewelcrafting: 'Jeweler',
@@ -1704,5 +1731,13 @@ export const hudChromeStrings = {
     unknownRecipe: 'That recipe does not exist.',
     comboRequirementUnmet:
       'You do not have both required crafts at the required tier for that recipe.',
+    // #1297: denied because the recipe is station-bound (the level-20
+    // crafting hub) and the player is either not there or not high enough
+    // level.
+    notAtHub: 'You must be at the crafting hub, at the required level, to craft that.',
+    // #1301: denied because the rolling craft-output window is full.
+    throttled: 'You are crafting too quickly. Wait a moment and try again.',
+    // #1299: the recipe exists but this player has not learned it yet.
+    recipeNotLearned: 'You have not learned that recipe yet.',
   },
 };

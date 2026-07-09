@@ -26,6 +26,11 @@ import {
 export const PHONE_TOUCH_QUERY =
   '(pointer: coarse) and (hover: none), (pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)';
 const DEADZONE = 0.22;
+// How far the move wheel's DRAWN position may lean from its resting spot
+// toward the thumb (px), so a touch anywhere in the (much larger) move zone
+// leans the visible wheel toward it without teleporting it clear across the
+// screen. Cosmetic only: never fed into the input math (see onMoveDown).
+const MOVE_JOYSTICK_FLOAT_RADIUS = 48;
 const CAMERA_SENSITIVITY = 0.8;
 // TODO: a dedicated deadzone/smoothing setting for swipe-look is deferred (plan
 // decision 7); touchLookSpeed already covers sensitivity for both the camera
@@ -110,7 +115,12 @@ export interface MobileControlCallbacks {
   onJump(): void;
   onInteract(): void;
   onAutorun(): boolean;
+  /** Open the composer focused (raise the keyboard): the keybind / whisper path. */
   onChat(): void;
+  /** Open the centered read view: composer bar visible but NOT focused (no keyboard). */
+  onChatOpen(): void;
+  /** Close chat entirely (hide the composer, drop the keyboard, recover the viewport). */
+  onChatClose(): void;
   onMenu(): void;
   onSocial(): void;
   /** Open the Discord entry (account panel when available, else the community invite). */
@@ -319,8 +329,12 @@ export class MobileControls {
     // Idle-fade: dims the action row + minimap quick-access rail after a stretch
     // of no touch, brightens instantly on the next one. Body-scoped (CSS decides
     // which chrome selectors respond) so it works regardless of which control the
-    // player actually touches.
-    this.chromeFade = startChromeFade(document.body);
+    // player actually touches. The handle's lifecycle is owned by setActive (the
+    // above setActive call already armed it when in touch mode), so a flip to the
+    // desktop interface disposes it and un-dims the body instead of stranding the
+    // idle class. This document-level forwarder is bound once and reads
+    // this.chromeFade dynamically, guarding on this.active, so it is a no-op while
+    // the handle is null (desktop mode).
     document.addEventListener('pointerdown', () => {
       if (this.active) this.chromeFade?.touch();
     });
@@ -469,6 +483,11 @@ export class MobileControls {
   }
 
   private setActive(active: boolean): void {
+    // Was the touch interface already active BEFORE this call? A redundant
+    // re-activation (active was already true, e.g. a PHONE_TOUCH_QUERY threshold
+    // crossing on a foldable resize while staying in touch) must NOT wipe an
+    // in-progress composer draft; only a genuine desktop->touch transition resets it.
+    const wasActive = this.active;
     this.active = active;
     document.body.classList.toggle('mobile-touch', active);
     if (!active) {
@@ -484,8 +503,28 @@ export class MobileControls {
       this.releaseCamera();
       this.releasePinch();
       this.touchOwners.releaseAll();
+      // Dispose the idle-fade so the chrome un-dims and the timer stops: without
+      // this a fade left in its dimmed state leaks past the flip to the desktop
+      // interface (dispose() clears the mobile-chrome-idle class).
+      this.chromeFade?.dispose();
+      this.chromeFade = null;
     } else {
-      document.body.classList.remove('mobile-chat-open', 'mobile-chat-reply');
+      // Reset any composer left open ONLY on a real transition INTO touch (not on a
+      // redundant re-activation while already active, which would clear a draft the
+      // player is typing). This clears input.value, so gate it on !wasActive.
+      if (!wasActive) {
+        document.body.classList.remove('mobile-chat-open', 'mobile-chat-reply');
+        const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
+        if (input) {
+          input.value = '';
+          input.style.display = 'none';
+          input.style.height = '';
+          input.style.overflowY = '';
+          input.blur();
+        }
+      }
+      // Arm the idle-fade once for this activation (idempotent via ??=).
+      this.chromeFade ??= startChromeFade(document.body);
     }
   }
 
@@ -593,67 +632,26 @@ export class MobileControls {
     button.addEventListener('pointerleave', cancel);
   }
 
-  /** Toggle the read-only chat-log peek. Opening it makes sure the composer (and
-   * keyboard) is dismissed; opening the composer elsewhere clears the peek. */
+  /** Toggle the read-only chat-log peek. Opening a peek closes the full chat first (so a
+   *  peek and the open panel are never both up); opening the panel elsewhere clears it. */
   private toggleLogPeek(): void {
     const peeking = document.body.classList.toggle('mobile-chatlog-peek');
     if (peeking && document.body.classList.contains('mobile-chat-open')) {
-      this.toggleChat();
+      this.callbacks.onChatClose();
     }
   }
 
-  /** The single top-left Chat button owns a simple two-state toggle (issue
-   * 1577 uiux-overlap: the separate in-log reply pill overlapped the chatbox,
-   * so it was removed; a later round tried a three-state open/read/reply
-   * cycle, since simplified back to two): hidden, or shown, with the log AND
-   * the composer appearing together immediately, composer focused. There is
-   * no separate read-only step to tap through first. */
+  /** The single top-left Chat button toggles the chat panel. Tapping it OPEN shows the
+   *  centered read view: the log plus the composer bar above it, keyboard DOWN (tapping
+   *  the composer bar raises the keyboard to type). Tapping it again CLOSES the panel;
+   *  if the keyboard is up, closing drops it too (closeChat blurs the composer). */
   private tapChat(): void {
-    // Two states only: hidden, or shown (log AND composer visible together,
-    // composer focused immediately). No separate read-only step in between.
-    const open = document.body.classList.contains('mobile-chat-open');
-    if (!open) {
-      this.enterChatReply();
-    } else {
-      this.toggleChat();
-    }
-  }
-
-  private toggleChat(): void {
-    document.body.classList.remove('mobile-chatlog-peek');
-    document.body.classList.toggle('mobile-chat-open');
     if (document.body.classList.contains('mobile-chat-open')) {
-      // Open the log in a read state, NOT the composer: the keyboard only rises
-      // once the player taps the Chat button again to enter reply mode.
-      // The composer stays hidden until enterChatReply focuses it.
+      this.callbacks.onChatClose();
     } else {
-      this.exitChatReply();
-    }
-  }
-
-  /** Enter reply mode: raise the keyboard and show the composer via the shared
-   *  onChat path. Reached by tapping the Chat button again while the log is
-   *  already open in its read state. */
-  private enterChatReply(): void {
-    if (!document.body.classList.contains('mobile-chat-open')) {
+      document.body.classList.remove('mobile-chatlog-peek');
       document.body.classList.add('mobile-chat-open');
-    }
-    document.body.classList.remove('mobile-chatlog-peek');
-    document.body.classList.add('mobile-chat-reply');
-    this.callbacks.onChat();
-  }
-
-  /** Leave reply mode and reset the composer back to its collapsed state. */
-  private exitChatReply(): void {
-    document.body.classList.remove('mobile-chat-reply');
-    const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
-    if (input) {
-      input.value = '';
-      input.style.display = 'none';
-      // clear the autosized height so the next open starts at one line
-      input.style.height = '';
-      input.style.overflowY = '';
-      input.blur();
+      this.callbacks.onChatOpen();
     }
   }
 
@@ -687,12 +685,19 @@ export class MobileControls {
     if (!this.active || this.joyPointer !== null || !this.moveJoystick) return;
     if (this.classifyTouch(e) !== 'movement') return;
     e.preventDefault();
+    // The wheel's RESTING center, read before any style.left/top override this
+    // touch may apply (releaseMove clears both back to the CSS-authored rest
+    // spot, so a fresh touchdown always reads it here). Used only to clamp
+    // where the wheel is DRAWN below; never fed into the input math.
+    const restRect = this.moveJoystick.getBoundingClientRect();
+    const restCenterX = restRect.left + restRect.width / 2;
+    const restCenterY = restRect.top + restRect.height / 2;
     this.joyPointer = e.pointerId;
     triggerHaptic(HAPTIC_JOYSTICK, this.hapticsOn);
-    // Spawn the joystick base CENTERED under the thumb (see the origin note
-    // above mapJoystickVector): the input origin IS the touch point, so a
-    // touchdown alone can never produce movement intent. layoutRadius is the
-    // untransformed box (what style.left/top position, with .floating's
+    // The input origin IS the raw touch point, unclamped (see the origin note
+    // above mapJoystickVector): a touchdown alone can never produce movement
+    // intent, or it re-creates the v0.22.0 #1229 drift regression. layoutRadius
+    // is the untransformed box (what style.left/top position, with .floating's
     // transform-origin: center keeping the scaled wheel centered on it);
     // renderedRadius includes the --joy-scale transform and drives the input
     // throw, so a resized wheel reaches full deflection exactly at its rim.
@@ -705,8 +710,20 @@ export class MobileControls {
     this.moveOriginY = e.clientY;
     this.moveRadius = renderedRadius;
     this.moveStickRadius = layoutRadius;
-    this.moveJoystick.style.left = `${(e.clientX - layoutRadius).toFixed(1)}px`;
-    this.moveJoystick.style.top = `${(e.clientY - layoutRadius).toFixed(1)}px`;
+    // The wheel's DRAWN position floats toward the thumb but is clamped to stay
+    // within MOVE_JOYSTICK_FLOAT_RADIUS of its resting spot, so a touch anywhere
+    // in the (much larger) move zone no longer teleports the visible wheel clear
+    // across the screen; it just leans toward the thumb within a small radius.
+    // Purely cosmetic: moveOriginX/Y above (the input math) is untouched.
+    const floatDx = e.clientX - restCenterX;
+    const floatDy = e.clientY - restCenterY;
+    const floatDist = Math.hypot(floatDx, floatDy);
+    const floatScale =
+      floatDist > MOVE_JOYSTICK_FLOAT_RADIUS ? MOVE_JOYSTICK_FLOAT_RADIUS / floatDist : 1;
+    const drawnCenterX = restCenterX + floatDx * floatScale;
+    const drawnCenterY = restCenterY + floatDy * floatScale;
+    this.moveJoystick.style.left = `${(drawnCenterX - layoutRadius).toFixed(1)}px`;
+    this.moveJoystick.style.top = `${(drawnCenterY - layoutRadius).toFixed(1)}px`;
     this.moveJoystick.classList.add('floating', 'active');
     try {
       (this.moveZone ?? this.moveJoystick).setPointerCapture(e.pointerId);

@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 407,
-      "state": "b960744a",
+      "state": "d52adc86",
       "events": "10366efa",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 407,
-      "state": "8e49e376",
+      "state": "76415d02",
       "events": "084c2ae4",
       "rng": {
         "draws": 34,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 407,
-      "state": "810c0eee",
+      "state": "e0ddd67a",
       "events": "0166c11c",
       "rng": {
         "draws": 134,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "c32e6a9a",
+      "state": "fb041156",
       "events": "d8f42c8c",
       "rng": {
         "draws": 254,
@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 407,
-      "state": "36cbd34d",
+      "state": "c5b1eadd",
       "events": "57e1d7bf",
       "rng": {
         "draws": 384,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 407,
-      "state": "47345bad",
+      "state": "62e1f7bd",
       "events": "741638a5",
       "rng": {
         "draws": 482,
@@ -109,6 +109,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -151,6 +152,7 @@
             "deaths": 1
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,

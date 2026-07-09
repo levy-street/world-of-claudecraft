@@ -291,6 +291,7 @@ export const en_XA: EnTranslations = {
       "targetLabel": "[Ýóúŕ Ɱáŕķ]",
       "targetAnnounce": "[Ɱáŕķ {name}]",
       "partyLabel": "[Ýóúŕ Ɓáñð]",
+      "partyChip": "[Þáŕţý]",
       "partyGroup": "[Ĝŕóúþ {n}]",
       "durationUnitSeconds": "[š]",
       "durationUnitMinutes": "[ɱ]",
@@ -305,7 +306,7 @@ export const en_XA: EnTranslations = {
       "chat": "[Šķíþ ţó Çĥáţ]"
     },
     "mobile": {
-      "autorun": "[Áúţóŕúñ]",
+      "autorun": "[Áúţó]",
       "jump": "[Ĵúɱþ]",
       "leaderboard": "[Ŕáñķš]",
       "dailyRewards": "[Ŕéŵáŕðš]",
@@ -320,7 +321,9 @@ export const en_XA: EnTranslations = {
       "actionPageIndicator": "[{page}]",
       "targetCycle": "[Šŵáþ ţáŕĝéţ]",
       "targetCycleShort": "[Ţáŕĝéţ]",
-      "spellbookPageLabel": "[Þáĝé {page}]"
+      "spellbookPageLabel": "[Þáĝé {page}]",
+      "hideKeyboard": "[Ĥíðé ķéýƀóáŕð]",
+      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ...]"
     },
     "tutorial": {
       "moveBodyTouch": "[Úšé ţĥé ɱóʋéɱéñţ šţíçķ ţó ɱóʋé áñð ðŕáĝ ţĥé šçŕééñ ţó ļóóķ áŕóúñð. Ţáķé á ƒéŵ šţéþš ţó ƀéĝíñ.]",
@@ -1431,6 +1434,7 @@ export const en_XA: EnTranslations = {
     "archetypeTitle": {
       "label": "[Ţíţļé]",
       "none": "[Ñóñé]",
+      "hobbyLabel": "[Ĥóƀƀý]",
       "armorcrafting": "[Áŕɱóŕéŕ]",
       "weaponcrafting": "[Ŵéáþóñšɱíţĥ]",
       "jewelcrafting": "[Ĵéŵéļéŕ]",
@@ -1453,7 +1457,10 @@ export const en_XA: EnTranslations = {
       "craftedToast": "[Çŕáƒţéð: {name}]",
       "insufficientMaterials": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ.]",
       "unknownRecipe": "[Ţĥáţ ŕéçíþé ðóéš ñóţ éẋíšţ.]",
-      "comboRequirementUnmet": "[Ýóú ðó ñóţ ĥáʋé ƀóţĥ ŕéɋúíŕéð çŕáƒţš áţ ţĥé ŕéɋúíŕéð ţíéŕ ƒóŕ ţĥáţ ŕéçíþé.]"
+      "comboRequirementUnmet": "[Ýóú ðó ñóţ ĥáʋé ƀóţĥ ŕéɋúíŕéð çŕáƒţš áţ ţĥé ŕéɋúíŕéð ţíéŕ ƒóŕ ţĥáţ ŕéçíþé.]",
+      "notAtHub": "[Ýóú ɱúšţ ƀé áţ ţĥé çŕáƒţíñĝ ĥúƀ, áţ ţĥé ŕéɋúíŕéð ļéʋéļ, ţó çŕáƒţ ţĥáţ.]",
+      "throttled": "[Ýóú áŕé çŕáƒţíñĝ ţóó ɋúíçķļý. Ŵáíţ á ɱóɱéñţ áñð ţŕý áĝáíñ.]",
+      "recipeNotLearned": "[Ýóú ĥáʋé ñóţ ļéáŕñéð ţĥáţ ŕéçíþé ýéţ.]"
     }
   },
   "apiError": {
@@ -4142,6 +4149,7 @@ export const en_XA: EnTranslations = {
       "mobileSocial": "[Šóçíáļ]",
       "mobileArena": "[Áŕéñá]",
       "mobileMenu": "[Ɱéñú]",
+      "mobileSettings": "[Šéţţíñĝš]",
       "mobileUse": "[Íñţéŕáçţ]",
       "mobileMeters": "[Ɱéţéŕš]",
       "mobileMap": "[Ɱáþ]",
@@ -4690,6 +4698,7 @@ export const en_XA: EnTranslations = {
       "offGlobalCooldown": "[Óƒƒ ţĥé ĝļóƀáļ çóóļðóŵñ]",
       "friendlyTarget": "[Ƒŕíéñðļý ţáŕĝéţ]",
       "enemyTarget": "[Éñéɱý ţáŕĝéţ]",
+      "selfOnly": "[Šéļƒ óñļý]",
       "damageRange": "[{min} ţó {max}]",
       "finisherDamage": "[{base} þļúš {perCombo} þéŕ çóɱƀó þóíñţ]"
     },
@@ -5074,7 +5083,7 @@ export const en_XA: EnTranslations = {
       },
       "commanding_shout": {
         "name": "[Ɓóļšţéŕíñĝ Çŕý]",
-        "description": "[Íñçŕéášéš ýóúŕ Šţáɱíñá ƀý 6 ƒóŕ 2 ɱíñ.]"
+        "description": "[Íñçŕéášéš ýóúŕ Šţáɱíñá ƀý {buff} ƒóŕ 2 ɱíñ.]"
       },
       "demoralizing_shout": {
         "name": "[Ðíŕéĥóŵļ]",
@@ -5578,7 +5587,7 @@ export const en_XA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "[Ŵíţçĥļíĝĥţ]",
-        "description": "[Ðéçŕéášéš ţĥé ţáŕĝéţ'š áŕɱóŕ ƀý {damage}% ƒóŕ 40 šéç. Ðóéš ñóţ šţáçķ ŵíţĥ Šúñðéŕ Áŕɱóŕ.]"
+        "description": "[Ðéçŕéášéš ţĥé ţáŕĝéţ'š áŕɱóŕ ƀý {damage}% ƒóŕ 40 šéç. Ðóéš ñóţ šţáçķ ŵíţĥ Áŕɱóŕ Šĥéáŕ.]"
       },
       "hibernate": {
         "name": "[Šļúɱƀéŕ]",
@@ -5808,6 +5817,9 @@ export const en_XA: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "[Óļð Ĝŕéýĵáŵ'š Ƒáñĝ]"
+      },
+      "chunk_of_ore": {
+        "name": "[Çĥúñķ óƒ Óŕé]"
       },
       "weathered_ledger_page": {
         "name": "[Ŵéáţĥéŕéð Ļéðĝéŕ Þáĝé]"
@@ -7480,6 +7492,16 @@ export const en_XA: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "[Á Ţŕáðé ƒóŕ Éʋéŕý Ĥáñð]",
+        "text": "[Éʋéŕý šóúļ íñ Éášţƀŕóóķ ŵóŕķš á ţŕáðé ƀéšíðéš ţĥé šŵóŕð, {playerName}. Ţĥéŕé'š óŕé ʋéíñš šçáţţéŕéð ŕóúñð ţóŵñ, šó ĝó šŵíñĝ á þíçķ áñð ƀŕíñĝ ɱé 5 çĥúñķš. Ɱíñé ţĥéɱ ýóúŕšéļƒ, ɱíñð; Í'ļļ ķñóŵ ţĥé ðíƒƒéŕéñçé.]",
+        "completion": "[Šéé? Óŕé íñ ýóúŕ þáçķ áñð çáļļúš óñ ýóúŕ ĥáñðš. Ķééþ áţ ţĥé ɱíñíñĝ, ļóĝĝíñĝ, áñð ĥéŕƀ-þíçķíñĝ áš ýóú ţŕáʋéļ ţĥé ŕóáðš, áñð ŵĥéñ ýóú'ŕé ƀáçķ íñ ţóŵñ, ɱíñð ţĥé Ţóŵñ Ƒóçúš ƀóáŕð ƀý ţĥé ɱáŕķéţ áñð ţĥé çŕáƒţíñĝ ƀéñçĥ ñéáŕƀý. Ţĥéŕé'š á ƒáíŕ ţŕáðé ŵáíţíñĝ íñ áļļ óƒ íţ, íƒ ýóú ŵáñţ íţ.]",
+        "objectives": {
+          "0": {
+            "label": "[Çĥúñķ óƒ Óŕé]"
+          }
+        }
+      },
       "q_wolves": {
         "title": "[Ŵóļʋéš áţ ţĥé Ðóóŕ]",
         "text": "[Ţĥé ƒóŕéšţ ŵóļʋéš ĝŕóŵ ƀóļð, šñáþþíñĝ áţ ţŕáʋéļéŕš óñ ţĥé ñóŕţĥ ŕóáð. Ţĥíñ ţĥéíŕ ñúɱƀéŕš, {playerName}. Šļáý 8 Ƒóŕéšţ Ŵóļʋéš áñð Éášţƀŕóóķ ŵíļļ ƀŕéáţĥé éášíéŕ.]",

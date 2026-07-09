@@ -21,7 +21,8 @@ export interface ChromeFadeTimers {
 export interface ChromeFadeHandle {
   /** Call on any touch activity: clears the idle dim and restarts the timer. */
   touch(): void;
-  /** Stop the timer (e.g. when touch controls deactivate). */
+  /** Un-dim the target and stop the timer (e.g. when touch controls
+   *  deactivate), so a mid-fade dim never leaks past the interface-mode flip. */
   dispose(): void;
 }
 
@@ -54,6 +55,10 @@ export function startChromeFade(
   return {
     touch: arm,
     dispose: () => {
+      // Clear the dim first: disposing mid-fade (e.g. flipping to the desktop
+      // interface while the chrome is idle-dimmed) must leave the target un-dimmed,
+      // not stranded with the idle class still applied.
+      target.classList.remove(CHROME_FADE_IDLE_CLASS);
       if (timer !== null) timers.clearTimeout(timer);
       timer = null;
     },

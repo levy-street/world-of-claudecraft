@@ -5,7 +5,9 @@ import { fileURLToPath } from 'node:url';
 import { planVersionSync } from './version_sync.mjs';
 
 const VERSION_RE = /^\d+\.\d+\.\d+$/;
-const RELEASE_REF_RE = /(?:^|refs\/heads\/)release\/v?(\d+\.\d+\.\d+)$/;
+// A release integration branch (release/vX.Y.Z-<slug>) carries the base
+// version's surfaces, so a trailing -<slug> is tolerated when inferring.
+const RELEASE_REF_RE = /(?:^|refs\/heads\/)release\/v?(\d+\.\d+\.\d+)(?:-[a-z0-9][a-z0-9-]*)?$/;
 const MAC_DMG_RE = /world-of-claudecraft-\d+\.\d+\.\d+-mac-universal\.dmg/g;
 const LINUX_APPIMAGE_RE = /world-of-claudecraft-\d+\.\d+\.\d+-linux-x86_64\.AppImage/g;
 const DESKTOP_VERSION_RE = /export const DESKTOP_VERSION = '(\d+\.\d+\.\d+)';/;

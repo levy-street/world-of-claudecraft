@@ -117,6 +117,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': '時',
   'hudChrome.unitFrame.durationUnitDays': '日',
   'hudChrome.unitFrame.partyLabel': 'あなたのパーティ',
+  'hudChrome.unitFrame.partyChip': 'パーティ',
   'hudChrome.unitFrame.playerLabel': 'あなたのキャラクター',
   'hudChrome.unitFrame.targetAnnounce': 'ターゲット：{name}',
   'hudChrome.unitFrame.targetLabel': 'あなたのターゲット',
@@ -1036,6 +1037,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'ソーシャル',
   'hud.core.mobileArena': 'アリーナ',
   'hud.core.mobileMenu': 'メニュー',
+  'hud.core.mobileSettings': '設定',
   'hud.core.mobileUse': '使用',
   'hud.core.mobileMeters': 'メーター',
   'hud.core.mobileMap': 'マップ',
@@ -1510,6 +1512,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'グローバルクールダウン外',
   'abilityUi.tooltip.friendlyTarget': '味方対象',
   'abilityUi.tooltip.enemyTarget': '敵対象',
+  'abilityUi.tooltip.selfOnly': '自分のみ',
   'abilityUi.tooltip.damageRange': '{min}から{max}',
   'abilityUi.tooltip.finisherDamage': '{base}にコンボポイントごと{perCombo}',
   'abilityUi.resources.mana': 'マナ',
@@ -1817,7 +1820,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '防御用の戦闘スタンスです。脅威生成が30%増加しますが、与えるダメージと受けるダメージが10%低下します。再度使用するとスタンスを解除します。',
   'entities.abilities.sunder_armor.name': '装甲切断',
   'entities.abilities.sunder_armor.description':
-    '対象のアーマーを破壊し、1回ごとに 2% 低下させます。最大5回まで重なります（最大で10%）。大量の脅威を生成します。',
+    '対象のアーマーを破壊し、1回ごとに{damage}%低下させます。最大5回まで重なります。大量の脅威を生成します。',
   'entities.abilities.taunt.name': '挑発',
   'entities.abilities.taunt.description':
     '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
@@ -2152,7 +2155,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '脳震盪',
   'entities.abilities.bash.description': '対象を2秒間スタンさせます。ブルーインフォーム専用。',
   'entities.abilities.faerie_fire.name': '魔女火',
-  'entities.abilities.faerie_fire.description': '対象のアーマーを30秒間35低下させます。',
+  'entities.abilities.faerie_fire.description':
+    '対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。',
   'entities.abilities.hibernate.name': '微睡み',
   'entities.abilities.hibernate.description':
     '対象を最大8秒間深い眠りに落とします。ダメージを受けると目を覚まします。',
@@ -2289,6 +2293,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': 'セイブルウェブの絹腺',
   'entities.items.supply_crate.name': '盗まれた補給箱',
   'entities.items.greyjaw_fang.name': '老グレイジョーの牙',
+  'entities.items.chunk_of_ore.name': '鉱石のかけら',
   'entities.items.weathered_ledger_page.name': '風化した帳簿のページ',
   'entities.items.morthen_grimoire.name': 'モーセンの魔導書',
   'entities.items.wolf_fang.name': '割れた狼の牙',
@@ -2664,6 +2669,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '潮見の番人',
   'entities.npcs.tidewatcher_ondrel.greeting':
     'この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。',
+  'entities.quests.q_prof_intro.title': '剣以外にも稼ぎはある',
+  'entities.quests.q_prof_intro.text':
+    'イーストブルックの誰もが剣以外の生業を持っているものだ、{playerName}。町の周りに鉱脈が散らばっている。つるはしを振るって鉱石を5個持ってきてくれ。自分で採掘するんだぞ、見ればわかる。',
+  'entities.quests.q_prof_intro.completion':
+    'どうだ？鞄には鉱石、手にはマメだ。旅の道中も採掘、伐採、薬草採取を続けるといい。町に戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も気にかけてくれ。その気があれば、どれも実入りのいい仕事になる。',
+  'entities.quests.q_prof_intro.objectives.0.label': '鉱石のかけら',
   'entities.quests.q_wolves.title': '戸口の狼',
   'entities.quests.q_wolves.text':
     '森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。',
@@ -6155,6 +6166,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': '薬草学',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': 'なし',
+  'hudChrome.archetypeTitle.hobbyLabel': '趣味',
   'hudChrome.archetypeTitle.armorcrafting': '防具鍛冶師',
   'hudChrome.archetypeTitle.weaponcrafting': '武器鍛冶師',
   'hudChrome.archetypeTitle.jewelcrafting': '宝石職人',
@@ -6195,8 +6207,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '敗北！Yumiが倒れてしまった。',
   'hudChrome.crafting.comboRequirementUnmet':
     'その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。',
+  'hudChrome.crafting.notAtHub': 'それを製作するには、必要なレベルで製作拠点にいる必要があります。',
+  'hudChrome.crafting.throttled': '製作が速すぎます。少し待ってからもう一度お試しください。',
+  'hudChrome.crafting.recipeNotLearned': 'そのレシピはまだ習得していません。',
   'hudChrome.mobile.actionPageIndicator': '{page}ページ',
   'hudChrome.mobile.spellbookPageLabel': 'ページ{page}',
+  'hudChrome.mobile.hideKeyboard': 'キーボードを隠す',
+  'hudChrome.mobile.chatPlaceholder': '発言する...',
+  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'ヴェイルカップ',
   'hudChrome.vcup.title': 'ヴェイルカップ',
   'hudChrome.vcup.close': 'ヴェイルカップウィンドウを閉じる',
@@ -6441,4 +6459,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '友達を招待しましょう：友達がレベル10に達すると、お互いに2スロット獲得できます。友達は最大5人までです。',
   'hudChrome.bank.bonusSectionAria': 'ボーナス銀行スロットと獲得方法',
+  'entities.mobs.yumi_cat.name': 'ユミ',
 };

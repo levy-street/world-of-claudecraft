@@ -486,7 +486,7 @@ describe('daily rewards', () => {
     expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(1);
   });
 
-  it('awards Vale Cup task points for ranked wins only', async () => {
+  it('awards Vale Cup task points for ranked wins and reduced bot-match wins', async () => {
     const db = new FakeDailyRewardDb();
     const service = new DailyRewardService(db);
     resetDailyRewardPriceCacheForTests();
@@ -495,15 +495,16 @@ describe('daily rewards', () => {
         {
           id: 'vale_cup_ranked_wins',
           type: 'vale_cup_result',
-          title: 'Win ranked Vale Cup matches',
-          description: 'Win ranked football matches today.',
+          title: 'Win Vale Cup matches',
+          description:
+            'Win Vale Cup football matches today. Bot-filled and practice wins award fewer points.',
           points: 25,
           basePoints: 25,
           sortOrder: 1,
           active: true,
           config: {
             winBasePoints: 25,
-            lossBasePoints: 10,
+            botWinBasePoints: 5,
             minMultiplier: 1,
             maxMultiplier: 3,
             minutesPerMultiplier: 30,
@@ -530,6 +531,17 @@ describe('daily rewards', () => {
     await service.recordValeCupResult(1, {
       won: true,
       bracket: 1,
+      matchId: 41,
+      rated: false,
+      hasBots: false,
+      completedAt: new Date('2026-06-30T13:00:30.000Z'),
+    });
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+    expect(db.score).toBe(0);
+
+    await service.recordValeCupResult(1, {
+      won: true,
+      bracket: 1,
       matchId: 42,
       completedAt: new Date('2026-06-30T13:01:00.000Z'),
     });
@@ -545,12 +557,76 @@ describe('daily rewards', () => {
         bracket: 1,
         matchId: 42,
         won: true,
+        matchType: 'ranked',
+        rated: true,
+        hasBots: false,
         onlineMinutes: 60,
         multiplier: 3,
         basePoints: 25,
       },
     });
     expect(db.score).toBe(75);
+
+    await service.recordValeCupResult(1, {
+      won: true,
+      bracket: 1,
+      matchId: 43,
+      rated: false,
+      hasBots: true,
+      completedAt: new Date('2026-06-30T13:02:00.000Z'),
+    });
+
+    const botEvent = db.events.filter((event) => event.kind === 'task')[1];
+    expect(botEvent).toMatchObject({
+      points: 15,
+      key: 'task:vale_cup_ranked_wins:vale_cup:43:bot_win',
+      meta: {
+        taskId: 'vale_cup_ranked_wins',
+        taskType: 'vale_cup_result',
+        bracket: 1,
+        matchId: 43,
+        won: true,
+        matchType: 'bot',
+        rated: false,
+        hasBots: true,
+        practice: false,
+        onlineMinutes: 60,
+        multiplier: 3,
+        basePoints: 5,
+      },
+    });
+    expect(db.score).toBe(90);
+
+    await service.recordValeCupResult(1, {
+      won: true,
+      bracket: 1,
+      matchId: 44,
+      rated: false,
+      hasBots: true,
+      practice: true,
+      completedAt: new Date('2026-06-30T13:03:00.000Z'),
+    });
+
+    const practiceEvent = db.events.filter((event) => event.kind === 'task')[2];
+    expect(practiceEvent).toMatchObject({
+      points: 15,
+      key: 'task:vale_cup_ranked_wins:vale_cup:44:practice_win',
+      meta: {
+        taskId: 'vale_cup_ranked_wins',
+        taskType: 'vale_cup_result',
+        bracket: 1,
+        matchId: 44,
+        won: true,
+        matchType: 'practice',
+        rated: false,
+        hasBots: true,
+        practice: true,
+        onlineMinutes: 60,
+        multiplier: 3,
+        basePoints: 5,
+      },
+    });
+    expect(db.score).toBe(105);
   });
 
   it('awards delve clear task points with level, tier, and online-time scaling', async () => {

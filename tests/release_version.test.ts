@@ -88,6 +88,15 @@ describe('inferExpectedReleaseVersion', () => {
     ).toBe('1.2.3');
   });
 
+  it('derives the base version from a suffixed release integration branch', () => {
+    expect(
+      inferExpectedReleaseVersion({
+        argv: [],
+        env: { GITHUB_REF: 'refs/heads/release/v0.23.0-mobile-fixes' },
+      }),
+    ).toBe('0.23.0');
+  });
+
   it('fails loudly when no release version can be inferred', () => {
     expect(() =>
       inferExpectedReleaseVersion({

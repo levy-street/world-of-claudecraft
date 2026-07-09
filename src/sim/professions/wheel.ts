@@ -82,6 +82,16 @@ export function craftSkillsFor(ctx: SimContext, pid: number): CraftSkills {
 // - recipe exactly one tier below capability: reduced amount (diminishing
 //   returns for crafting something already mastered).
 // - recipe two or more tiers below capability: zero (no progress at all).
+//
+// #1148 tuning pass: this diminishing-returns shape (full at/above capability,
+// reduced one tier below, zero two-plus tiers below) matches the design doc's
+// own decided text ("crafting below your current capability gives diminishing
+// returns, and a craft two tiers under your capability gives nothing"), so it
+// is CONFIRMED, not re-tuned. The doc's own Open Questions section leaves the
+// "crafts-per-tier" step size itself open ("the example uses about 20");
+// TIER_SKILL_STEP of 25 is kept as the working value (a round number close to
+// that example, over the 1-300 classic skill scale used elsewhere in this
+// module) rather than re-guessed, pending a real number from that open item.
 export const TIER_SKILL_STEP = 25;
 
 /** Bucket a flat skill value into a tier index. Skill 0-24 -> tier 0 (common),

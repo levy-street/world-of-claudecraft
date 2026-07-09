@@ -83,12 +83,12 @@ function makeMatch(
 
 describe('vale_cup_indicator_view', () => {
   it('hides with no snapshot and when nothing is happening', () => {
-    expect(buildVcupIndicatorView(null).kind).toBe('hidden');
-    expect(buildVcupIndicatorView(makeCupInfo('sim')).kind).toBe('hidden');
+    expect(buildVcupIndicatorView(null, true).kind).toBe('hidden');
+    expect(buildVcupIndicatorView(makeCupInfo('sim'), true).kind).toBe('hidden');
   });
 
   it('hides inside my own match (the match strip owns the screen)', () => {
-    const v = buildVcupIndicatorView(makeCupInfo('sim', { match: makeMatch() }));
+    const v = buildVcupIndicatorView(makeCupInfo('sim', { match: makeMatch() }), true);
     expect(v.kind).toBe('hidden');
   });
 
@@ -101,6 +101,7 @@ describe('vale_cup_indicator_view', () => {
         position: 2,
         queueSizes: { 1: 0, 2: 0, 3: 4, 4: 0, 5: 0 },
       }),
+      true,
     );
     expect(v).toEqual({
       kind: 'queued',
@@ -126,6 +127,7 @@ describe('vale_cup_indicator_view', () => {
             nationB: 'vale',
           },
         }),
+        true,
       );
     const a = at(65);
     expect(a).toMatchObject({
@@ -143,6 +145,22 @@ describe('vale_cup_indicator_view', () => {
     expect(at(66)).toMatchObject({ minutes: 1, seconds: 6 });
   });
 
+  it('hides the live score when the player is not near the Sowfield', () => {
+    const live: NonNullable<CupInfo['live']> = {
+      id: 8,
+      bracket: 2,
+      clock: 65,
+      scoreA: 1,
+      scoreB: 1,
+      nationA: 'vale',
+      nationB: 'vale',
+    };
+    const far = buildVcupIndicatorView(makeCupInfo('sim', { live }), false);
+    expect(far.kind).toBe('hidden');
+    const near = buildVcupIndicatorView(makeCupInfo('sim', { live }), true);
+    expect(near.kind).toBe('live');
+  });
+
   it('renders identically from Sim-shaped and mirror-shaped stubs', () => {
     const over: Partial<CupInfo> = {
       live: {
@@ -155,8 +173,8 @@ describe('vale_cup_indicator_view', () => {
         nationB: 'moon',
       },
     };
-    expect(buildVcupIndicatorView(makeCupInfo('sim', over))).toEqual(
-      buildVcupIndicatorView(makeCupInfo('client', over)),
+    expect(buildVcupIndicatorView(makeCupInfo('sim', over), true)).toEqual(
+      buildVcupIndicatorView(makeCupInfo('client', over), true),
     );
   });
 });

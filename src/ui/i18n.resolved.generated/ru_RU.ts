@@ -291,6 +291,7 @@ export const ru_RU: EnTranslations = {
       "targetLabel": "Ваша цель",
       "targetAnnounce": "Цель: {name}",
       "partyLabel": "Ваша группа",
+      "partyChip": "Группа",
       "partyGroup": "Группа {n}",
       "durationUnitSeconds": "с",
       "durationUnitMinutes": "м",
@@ -320,7 +321,9 @@ export const ru_RU: EnTranslations = {
       "actionPageIndicator": "Стр. {page}",
       "targetCycle": "Сменить цель",
       "targetCycleShort": "Цель",
-      "spellbookPageLabel": "Страница {page}"
+      "spellbookPageLabel": "Страница {page}",
+      "hideKeyboard": "Скрыть клавиатуру",
+      "chatPlaceholder": "Напишите сообщение..."
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -1431,6 +1434,7 @@ export const ru_RU: EnTranslations = {
     "archetypeTitle": {
       "label": "Титул",
       "none": "Нет",
+      "hobbyLabel": "Хобби",
       "armorcrafting": "Бронник",
       "weaponcrafting": "Оружейник",
       "jewelcrafting": "Ювелир",
@@ -1453,7 +1457,10 @@ export const ru_RU: EnTranslations = {
       "craftedToast": "Создано: {name}",
       "insufficientMaterials": "У вас недостаточно материалов.",
       "unknownRecipe": "Такого рецепта не существует.",
-      "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта."
+      "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.",
+      "notAtHub": "Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.",
+      "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.",
+      "recipeNotLearned": "Вы еще не изучили этот рецепт."
     }
   },
   "apiError": {
@@ -4142,6 +4149,7 @@ export const ru_RU: EnTranslations = {
       "mobileSocial": "Общение",
       "mobileArena": "Арена",
       "mobileMenu": "Меню",
+      "mobileSettings": "Настройки",
       "mobileUse": "Использовать",
       "mobileMeters": "Счетчики",
       "mobileMap": "Карта",
@@ -4690,6 +4698,7 @@ export const ru_RU: EnTranslations = {
       "offGlobalCooldown": "Вне глобального восстановления",
       "friendlyTarget": "Дружественная цель",
       "enemyTarget": "Вражеская цель",
+      "selfOnly": "Только на себя",
       "damageRange": "от {min} до {max}",
       "finisherDamage": "{base} плюс {perCombo} за прием серии"
     },
@@ -5122,7 +5131,7 @@ export const ru_RU: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Срез брони",
-        "description": "Раскалывает броню цели, снижая ее на 2% за применение. Суммируется до 5 раз (10% при полном стаке). Создает большое количество угрозы."
+        "description": "Раскалывает броню цели, снижая ее на {damage}% за применение. Суммируется до 5 раз. Создает большое количество угрозы."
       },
       "taunt": {
         "name": "Подстрекательство",
@@ -5578,7 +5587,7 @@ export const ru_RU: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Ведьмин огонь",
-        "description": "Снижает броню цели на 35 на 30 сек."
+        "description": "Снижает броню цели на {damage}% на 40 сек. Не суммируется со Срезом брони."
       },
       "hibernate": {
         "name": "Дремота",
@@ -5808,6 +5817,9 @@ export const ru_RU: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "Клык старого Серочелюста"
+      },
+      "chunk_of_ore": {
+        "name": "Кусок руды"
       },
       "weathered_ledger_page": {
         "name": "Выветренная страница книги учета"
@@ -6982,7 +6994,7 @@ export const ru_RU: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "Юми"
       },
       "forest_wolf": {
         "name": "Лесной волк"
@@ -7480,6 +7492,16 @@ export const ru_RU: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Ремесло для каждой руки",
+        "text": "Каждая душа в Иствруке владеет ремеслом помимо меча, {playerName}. Вокруг города разбросаны рудные жилы - возьми кирку и принеси мне 5 кусков руды. Добудь их сам, учти: я отличу.",
+        "completion": "Видишь? Руда в котомке, мозоли на руках. Продолжай добывать руду, валить лес и собирать травы в пути - а вернувшись в город, загляни на доску городского фокуса у рынка и на ближайший верстак. Честное ремесло ждёт тебя во всём этом, если пожелаешь.",
+        "objectives": {
+          "0": {
+            "label": "Кусок руды"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Волки у дверей",
         "text": "Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.",

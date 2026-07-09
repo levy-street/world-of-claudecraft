@@ -85,6 +85,7 @@ import { formatDuration } from './duration';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
+import { gameMetricsCounters } from './http/game_signals';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
@@ -1956,6 +1957,7 @@ export class GameServer {
     }
     session.userAgent = meta.userAgent ?? '';
     session.clientSeed = meta.clientSeed ?? '';
+    this.botDetector.setTrackingConnection(session.botTrackingContext, true, meta);
     // per-login account state, freshly loaded by the auth path like any join
     session.chatMutedUntil = meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null;
     session.chatMuteReason = meta.reason ?? '';
@@ -2001,6 +2003,7 @@ export class GameServer {
     if (session.spectating) this.exitSpectate(session, false);
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
+    this.botDetector.setTrackingConnection(session.botTrackingContext, false);
     // Stop any held movement now; the sim keeps ticking this entity (it can
     // still be attacked, healed, or die while linkdead, like any player).
     const meta = this.sim.meta(session.pid);
@@ -2301,6 +2304,24 @@ export class GameServer {
       tickHz: this.tickHz == null ? null : round2(this.tickHz),
       ...this.tickProfiler.profile(),
     };
+  }
+
+  // Achieved sim Hz for the /metrics exporter (server/http/game_metrics.ts), or
+  // null while the rate meter is still warming up (its first second of uptime).
+  simTickHz(): number | null {
+    return this.tickHz == null ? null : round2(this.tickHz);
+  }
+
+  // Per-phase loop timing (p95 + max, in MILLISECONDS) for the /metrics exporter,
+  // keyed by phase name. The exporter converts to seconds and surfaces only its
+  // fixed WOC_TICK_PHASES subset, so the exported label set stays bounded.
+  tickPhaseMillis(): Record<string, { p95: number; max: number }> {
+    const { phases } = this.tickProfiler.profile();
+    const out: Record<string, { p95: number; max: number }> = {};
+    for (const [name, stats] of Object.entries(phases)) {
+      out[name] = { p95: stats.p95, max: stats.max };
+    }
+    return out;
   }
 
   // Start an on-demand detailed capture (admin-triggered). Clears the profiler so the
@@ -2697,6 +2718,7 @@ export class GameServer {
   // -------------------------------------------------------------------------
 
   handleMessage(session: ClientSession, raw: string): void {
+    gameMetricsCounters().wsMessage('in');
     const receivedAtMs = Date.now();
     const verdict = consumeMsgToken(session.msgRate, receivedAtMs / 1000);
     if (verdict === 'kick') {
@@ -3075,6 +3097,7 @@ export class GameServer {
           void route
             .then((sent) => {
               if (sent) {
+                gameMetricsCounters().chatMessage();
                 this.chatLog.log({
                   accountId: session.accountId,
                   characterId: session.characterId,
@@ -4325,24 +4348,32 @@ export class GameServer {
           .catch((err) => console.error('daily reward delve chest task failed:', err));
       } else if (ev.type === 'vcupResult' && !ev.draw && ev.pid !== undefined) {
         // A decided Vale Cup bout. The match record survives through the
-        // 'over' aftermath, so the rated gate reads from it: bot-backfilled
-        // and practice matches are unrated in the sim and earn no credit.
-        // Bots have no session, so this.clients.get filters them naturally.
+        // 'over' aftermath. Rated wins earn the full task value; bot-filled
+        // and practice wins earn the reduced bot-match value. Bots have no
+        // session, so this.clients.get filters bot result events naturally.
         const s = this.clients.get(ev.pid);
         if (!s) continue;
         const match = this.sim.vcupMatchOf(ev.pid);
-        if (!match || !match.rated) continue;
+        if (!match) continue;
+        const practice = Boolean(match.practice);
+        const matchHasBots =
+          practice || [...match.rosterA, ...match.rosterB].some((player) => player.bot);
+        if (!match.rated && !matchHasBots) continue;
         if (!ev.won) continue;
         void dailyRewardService
           .recordValeCupResult(s.accountId, {
             won: true,
             bracket: match.bracket,
             matchId: match.id,
+            rated: match.rated,
+            hasBots: matchHasBots,
+            practice,
           })
           .then((points) => {
             if (points > 0) this.sendDailyRewardPointsGained(s, points);
           })
           .catch((err) => console.error('daily reward vale cup task failed:', err));
+        if (!match.rated) continue;
         // One card per decided match: every winner's vcupResult lands on the
         // same tick and the match-id dedupe key collapses them, so the first
         // one enumerates the whole winning side (linked teammates get tagged
@@ -4565,6 +4596,7 @@ export class GameServer {
           void route
             .then((sent) => {
               if (sent) {
+                gameMetricsCounters().chatMessage();
                 this.chatLog.log({
                   accountId: session.accountId,
                   characterId: session.characterId,
@@ -4607,6 +4639,7 @@ export class GameServer {
 
   private logChat(session: ClientSession, sent: import('../src/sim/sim').SentChat | null): void {
     if (!sent) return;
+    gameMetricsCounters().chatMessage();
     this.chatLog.log({
       accountId: session.accountId,
       characterId: session.characterId,
@@ -4899,6 +4932,7 @@ export class GameServer {
       }
       return;
     }
+    gameMetricsCounters().wsMessage('out');
     session.ws.send(payload);
   }
 }

@@ -67,6 +67,15 @@ export function archetypeTitleText(craftId: string | null): string {
   return t(key ?? 'hudChrome.archetypeTitle.none');
 }
 
+/** Localized text for the hobby craft (issue 1294): the same per-craft name
+ *  table as the archetype title (a hobby id IS a craft id on the ring), or
+ *  the "no hobby yet" copy before an archetype has ever been chosen.
+ *  Exported for the view-model test. */
+export function hobbyCraftText(craftId: string | null): string {
+  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
+  return t(key ?? 'hudChrome.archetypeTitle.none');
+}
+
 // The ten character-sheet stat cells, primaries down the left column and derived
 // stats down the right (the CSS grid wraps two per row). The HUD builds each cell
 // from the unit-tested stat_tooltip_view model, so the order is the only stat
@@ -176,7 +185,12 @@ export class CharWindow {
     // WCAG 2.2 AA: name the focus-trapped root via the character title span.
     markDialogRoot(el, { labelledBy: 'char-title' });
     const archetypeTitle = archetypeTitleText(world.archetypeTitle);
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    const hobbyCraft = hobbyCraftText(world.hobbyCraft);
+    const hobbyRow =
+      world.hobbyCraft !== null
+        ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
+        : '';
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">

@@ -568,6 +568,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.autoAttack = false;
     e.queuedOnSwing = null;
     delete e.queuedOnSwingFree;
+    e.queuedCastAbility = null;
+    e.queuedCastAim = null;
     e.comboPoints = 0;
     e.eating = null;
     e.drinking = null;

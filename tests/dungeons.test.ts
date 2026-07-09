@@ -66,7 +66,7 @@ function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
 // Recompute the heroic spawn stats from the RAW base template and the tuning
 // record, independently of mobTemplateForDungeonDifficulty, mirroring createMob's
 // formulas. Dropping any multiplier from the transform reddens these pins even
-// though forcing level 20 alone would already raise the per-level stats.
+// though forcing level 22 alone would already raise the per-level stats.
 function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   const levelUps = tuning.level - 1;
@@ -148,7 +148,7 @@ describe('dungeons: door-trigger entry/exit', () => {
 });
 
 describe('dungeons: heroic difficulty', () => {
-  it('claims heroic Hollow Crypt as a fixed heroic instance with level-20 transformed mobs', () => {
+  it('claims heroic Hollow Crypt as a fixed heroic instance with level-22 transformed mobs', () => {
     const heroic = makeSim(123);
     const heroicPid = heroic.addPlayer('warrior', 'Hero');
     heroic.setDungeonDifficulty('heroic', heroicPid);
@@ -159,10 +159,10 @@ describe('dungeons: heroic difficulty', () => {
     expect(heroicInst).toBeTruthy();
     expect(heroicInst.difficulty).toBe('heroic');
     const heroicMorthen = mobInInstance(heroic, heroicInst, 'morthen');
-    expect(heroicMorthen.level).toBe(20);
+    expect(heroicMorthen.level).toBe(22);
 
     // The health/damage/armor multipliers must survive independently of the
-    // level-20 bump: pin the exact recomputed values, not just a > compare.
+    // level-22 bump: pin the exact recomputed values, not just a > compare.
     const pins = expectedHeroicStats(MOBS.morthen, 'hollow_crypt');
     expect(heroicMorthen.maxHp).toBe(pins.maxHp);
     expect(heroicMorthen.weapon.min).toBe(pins.weaponMin);
@@ -242,7 +242,7 @@ describe('dungeons: heroic difficulty', () => {
 
       const inst = claimedDungeon(sim, dungeonId, 'heroic');
       expect(inst, `${dungeonId} did not claim a heroic instance`).toBeTruthy();
-      expect(mobInInstance(sim, inst, bossId).level).toBe(20);
+      expect(mobInInstance(sim, inst, bossId).level).toBe(22);
     }
   });
 
@@ -290,7 +290,7 @@ describe('dungeons: heroic difficulty', () => {
     enterDungeon(sim.ctx, 'hollow_crypt', pid);
     const heroicInst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
     expect(heroicInst).toBeTruthy();
-    expect(mobInInstance(sim, heroicInst, 'morthen').level).toBe(20);
+    expect(mobInInstance(sim, heroicInst, 'morthen').level).toBe(22);
     // 6000+ ticks of empty-instance countdown: comfortably under a second alone,
     // but borderline at the 5s default under full-suite core contention.
   }, 20000);
@@ -330,7 +330,7 @@ describe('dungeons: heroic difficulty', () => {
     expect(sim.dungeonDifficulty(member)).toBe('heroic');
   });
 
-  it('boss adds summoned in a heroic instance spawn as level-20 transforms', () => {
+  it('boss adds summoned in a heroic instance spawn as level-22 transforms', () => {
     const sim = makeSim(31);
     const pid = sim.addPlayer('warrior', 'Adds');
     sim.setDungeonDifficulty('heroic', pid);
@@ -349,7 +349,7 @@ describe('dungeons: heroic difficulty', () => {
     const pins = expectedHeroicStats(MOBS.drowned_thrall, 'sunken_bastion');
     for (const add of adds) {
       expect(add.templateId).toBe('drowned_thrall');
-      expect(add.level).toBe(20);
+      expect(add.level).toBe(22);
       expect(add.maxHp).toBe(pins.maxHp);
       expect(add.mechanicDamageMult).toBe(HEROIC_DUNGEON_TUNING.sunken_bastion.damageMultiplier);
     }
@@ -757,7 +757,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
 
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
     const pins = expectedHeroicStats(MOBS[NYTHRAXIS_BOSS_ID], 'nythraxis_boss_arena');
-    expect(boss.level).toBe(20);
+    expect(boss.level).toBe(22);
     expect(boss.maxHp).toBe(pins.maxHp);
     expect(boss.weapon.min).toBe(pins.weaponMin);
     expect(boss.weapon.max).toBe(pins.weaponMax);
@@ -774,6 +774,7 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     const addPins = expectedHeroicStats(MOBS[NYTHRAXIS_ADD_ID], 'nythraxis_boss_arena');
     for (const add of adds) {
       expect(add.templateId).toBe(NYTHRAXIS_ADD_ID);
+      expect(add.level).toBe(22);
       expect(add.maxHp).toBe(addPins.maxHp);
       expect(add.mechanicDamageMult).toBe(
         HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplier,
