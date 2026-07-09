@@ -35,4 +35,21 @@ describe('chat tab strip layout (issue #1365)', () => {
   it('mobile keeps the strip horizontally swipeable so overflowed tabs stay reachable', () => {
     expect(block(mobile, 'body.mobile-touch #chatlog-tabs')).toMatch(/touch-action:\s*pan-x/);
   });
+
+  it('mobile drops the desktop down-scale so the tabs are not shrunk below the floor', () => {
+    // The desktop scale(0.92) put the 22px tabs at ~20px, far under the 40px floor.
+    expect(block(mobile, 'body.mobile-touch #chatlog-tabs')).toMatch(/transform:\s*none/);
+  });
+
+  it('mobile chat tabs meet the 40px touch floor with larger text', () => {
+    const tab = block(mobile, 'body.mobile-touch .chat-tab');
+    expect(tab).toMatch(/min-height:\s*40px/);
+    expect(tab).toMatch(/font-size:\s*16px/);
+  });
+
+  it('the mobile add-channel button meets the 40x40 touch floor', () => {
+    // width from the .chat-tab-add rule, height inherited from the .chat-tab rule above.
+    expect(block(mobile, 'body.mobile-touch .chat-tab-add')).toMatch(/min-width:\s*40px/);
+    expect(block(mobile, 'body.mobile-touch .chat-tab')).toMatch(/min-height:\s*40px/);
+  });
 });

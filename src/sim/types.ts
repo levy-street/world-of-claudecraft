@@ -36,6 +36,15 @@ export const DUNGEON_LEASH_DISTANCE = 70;
 // updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
 export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
 export const GCD = 1.5; // seconds
+// Combat ratings are gear-facing stats converted to fractions in recalcPlayerStats.
+export const HASTE_RATING_PER_PCT = 10; // 10 haste rating = 1% faster
+export const CRIT_RATING_PER_PCT = 10; // 10 crit rating = +1% crit chance
+export function hasteFractionFromRating(rating: number): number {
+  return rating / (HASTE_RATING_PER_PCT * 100);
+}
+export function critFractionFromRating(rating: number): number {
+  return rating / (CRIT_RATING_PER_PCT * 100);
+}
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
 // potion locks every other potion for this long (#103). 2 minutes, the classic-era value.
 export const POTION_COOLDOWN = 120; // seconds
@@ -86,8 +95,29 @@ export function isPetClass(cls: PlayerClass): boolean {
 }
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
-// ring) — see docs/design and the Fiesta region of sim.ts.
-export type ArenaFormat = '1v1' | '2v2' | 'fiesta';
+// ring); see docs/design and the Fiesta region of sim.ts. yumi3/yumi5 are the
+// Protect Yumi maze objective brackets (3v3 / 5v5, unranked; social/yumi.ts).
+export type ArenaFormat = '1v1' | '2v2' | 'fiesta' | 'yumi3' | 'yumi5';
+
+export type DungeonDifficulty = 'normal' | 'heroic';
+
+export function isDungeonDifficulty(value: unknown): value is DungeonDifficulty {
+  return value === 'normal' || value === 'heroic';
+}
+
+// The Vale Cup boarball minigame (docs/prd/vale-cup.md): transient match
+// sides pick a banner nation and each fighter picks a sport role.
+export type VcNationId =
+  | 'vale'
+  | 'mirefen'
+  | 'thornpeak'
+  | 'coliseum'
+  | 'choir'
+  | 'ogre'
+  | 'moon'
+  | 'copperdig';
+export type SportRole = 'allrounder' | 'striker' | 'sweeper' | 'keeper';
+export type VcBracket = 1 | 2 | 3 | 4 | 5;
 
 export interface ArenaStanding {
   rating: number;
@@ -100,6 +130,23 @@ export interface ArenaCombatant {
   name: string;
   cls: PlayerClass;
   level: number;
+}
+
+// Hodric's Castle Gauntlet event payload shapes. The obstacle that launched a
+// racer (for the HUD cue), the roster reveal row, and the final placement row.
+export type HcKnockKind = 'flail' | 'axe' | 'log' | 'boulder' | 'piston';
+
+export interface HcFieldEntry {
+  name: string;
+  cls: PlayerClass;
+  bot: boolean;
+}
+
+export interface HcResultRow {
+  name: string;
+  place: number;
+  bot: boolean;
+  timeS: number | null;
 }
 export const ALL_CLASSES: PlayerClass[] = [
   'warrior',
@@ -173,7 +220,18 @@ export type AuraKind =
   | 'stealth'
   | 'defensive_stance'
   | 'righteous_fury'
+  // Warrior/rogue armor debuff. Now a PERCENTAGE reduction (2% per stack via
+  // effectiveArmor), not a flat armor subtraction. Does not stack with faerie_fire
+  // (effectiveArmor max-combines the two percents).
   | 'sunder'
+  // Mob corrosion (Acid Spit / Ledger Rot): a FLAT, stacking armor shred that
+  // subtracts value*stacks. Distinct from the now-percent `sunder` so the two never
+  // collide (effectiveArmor subtracts corrode flat, before the percent debuffs).
+  | 'corrode'
+  // Druid Faerie Fire: a fixed-percent armor reduction that does NOT stack with
+  // Sunder Armor (effectiveArmor takes the larger of the two percents). Own kind so
+  // it is never summed flat with sunder.
+  | 'faerie_fire'
   | 'mortal_wound'
   | 'silence'
   | 'blind'
@@ -194,7 +252,22 @@ export type AuraKind =
   // 2v2 Fiesta power-up buffs: `buff_scale` value = body-size multiplier (also
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
   | 'buff_scale'
-  | 'buff_jump';
+  | 'buff_jump'
+  // Percent raid buffs (vanilla group-buff style). Value is stored as integer percent
+  // POINTS (5 = +5%, 10 = +10%) so it survives the integer-rounding talent value
+  // multiplier; divided by 100 when folded in recalcPlayerStats. Distinct from
+  // `buff_allstats_pct`, which is a SIGNED FRACTION whole-block scale used only by
+  // Resurrection Sickness (see the aura loop in entity.ts):
+  //   buff_stats_pct  -> Mark of the Wild (+% to every primary attribute)
+  //   buff_int_pct    -> Arcane Intellect (+% Intellect)
+  //   buff_sta_pct    -> Power Word: Fortitude (+% Stamina)
+  //   buff_armor_pct  -> Devotion Aura (+% armor)
+  //   buff_ap_pct     -> Battle Shout / Blessing of Might (+% attack power)
+  | 'buff_stats_pct'
+  | 'buff_int_pct'
+  | 'buff_sta_pct'
+  | 'buff_armor_pct'
+  | 'buff_ap_pct';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -249,25 +322,37 @@ export interface WeaponInfo {
 export type EquipSlot =
   | 'mainhand'
   | 'helmet'
+  | 'neck'
   | 'shoulder'
   | 'chest'
   | 'waist'
   | 'legs'
   | 'gloves'
-  | 'feet';
+  | 'feet'
+  | 'ring1'
+  | 'ring2';
 
-// The eight equip slots, in the canonical paperdoll order. Single source for
+// The eleven equip slots, in the canonical paperdoll order. Single source for
 // the entity loop and the server's unequip-command validation.
 export const EQUIP_SLOTS: readonly EquipSlot[] = [
   'mainhand',
   'helmet',
+  'neck',
   'shoulder',
   'chest',
   'waist',
   'legs',
   'gloves',
   'feet',
+  'ring1',
+  'ring2',
 ];
+
+// What an ITEM declares as its slot. Rings declare the slot KIND ('ring'); the
+// equip path resolves the concrete ring1/ring2 equipment key at equip time
+// (resolveEquipSlot in equipment_rules.ts). Every other item names its
+// equipment slot directly. Items never carry 'ring1'/'ring2'.
+export type ItemSlot = EquipSlot | 'ring';
 
 export type SkinCatalog = 'class' | 'mech';
 
@@ -304,13 +389,16 @@ type ItemKind =
 interface BaseItemDef {
   id: string;
   name: string;
-  slot?: EquipSlot;
+  slot?: ItemSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
   // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
   spellPower?: number;
+  // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
+  critRating?: number;
+  hasteRating?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
@@ -354,6 +442,27 @@ interface BaseItemDef {
 // damage-driven cast pushback in combat/casting_lifecycle.ts. `knockbackResistance` (0..1)
 // scales on-hit knockback distance. Balance values are authored in
 // content/item_sets.ts, never inline in engine code.
+export interface SetProc {
+  id: string; // unique aura/proc id, e.g. 'set_clearcasting'
+  name: string; // buff display name, e.g. 'Clearcasting'
+  // weaponCrit fires on any critical white swing or weapon strike, melee AND
+  // ranged (Auto Shot / wand), so the leather sets work for hunters too.
+  trigger: 'spellCast' | 'weaponCrit' | 'spellCrit' | 'kill';
+  chance: number; // 0..1 proc chance
+  aura: AuraKind; // the buff to grant, e.g. 'next_cast_free'
+  duration: number; // seconds the granted aura lasts
+  value?: number; // optional aura value (per stack when maxStacks is set)
+  icd?: number; // internal cooldown seconds, min gap between procs
+  // Target-applied procs (the stacking bleeds): 'target' lands the aura on the
+  // struck enemy instead of the wearer. Defaults to the wearer.
+  applyTo?: 'self' | 'target';
+  tickInterval?: number; // dot/hot tick cadence, seconds
+  // Stacking cap: reapplication adds a stack (magnitude scales linearly with
+  // the count) and refreshes the duration.
+  maxStacks?: number;
+  school?: Aura['school']; // granted aura's school (bleeds are physical); default arcane
+}
+
 export interface SetBonusEffect {
   str?: number;
   agi?: number;
@@ -361,13 +470,17 @@ export interface SetBonusEffect {
   int?: number;
   spi?: number;
   ap?: number; // flat attack power
+  sp?: number; // flat spell power (mirrors `ap` for the caster archetype)
   crit?: number; // flat crit chance, 0..1
+  critRating?: number; // crit rating (converted to % in recalcPlayerStats)
   // Haste fraction (0.15 = 15% faster). ONE stat: it speeds melee and ranged
   // auto-attack swings AND shortens spell cast/channel time, all together
   // (folded into Entity.meleeHaste/rangedHaste/spellHaste in recalcPlayerStats).
   haste?: number;
+  hasteRating?: number; // haste rating (converted to % in recalcPlayerStats)
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
   knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
+  proc?: SetProc;
 }
 
 export interface SetBonusTier {
@@ -384,8 +497,19 @@ export interface ItemSet {
 
 export interface ArmorItemDef extends BaseItemDef {
   kind: 'armor';
-  slot: Exclude<EquipSlot, 'mainhand'>;
+  slot: Exclude<EquipSlot, 'mainhand' | 'neck' | 'ring1' | 'ring2'>;
   armorType: ArmorType;
+  weapon?: never;
+}
+
+// Jewelry: neck and ring pieces. kind 'armor' so the equip/budget/tooltip paths
+// treat it as gear, but it carries NO armor class: equipment_rules falls through
+// the armorType gate, so any class can wear jewelry (requiredClass still applies
+// when set). Rings declare slot 'ring'; see resolveEquipSlot.
+export interface JewelryItemDef extends BaseItemDef {
+  kind: 'armor';
+  slot: 'neck' | 'ring';
+  armorType?: never;
   weapon?: never;
 }
 
@@ -394,6 +518,52 @@ export interface WeaponItemDef extends BaseItemDef {
   slot: 'mainhand';
   weapon: WeaponInfo;
   armorType?: never;
+  // Legendary "chance on action" procs; see WeaponProc below.
+  weaponProcs?: WeaponProc[];
+}
+
+// A legendary weapon proc: a "chance on action" effect that rolls when the wielder
+// performs the trigger action (lands a weapon strike, lands a damaging spell, or lands
+// a heal) and, on success, fires its effects. Handled by
+// src/sim/combat/equip_procs.ts. The proc's rng roll is gated on the wielder actually
+// carrying a proc weapon, so ordinary gear draws no extra rng and the deterministic
+// draw order (and every parity golden that equips no legendary) is unchanged.
+// `weaponHit` covers ANY weapon strike with the equipped mainhand: a melee swing OR a
+// hunter's Auto Shot (which fires with that same weapon). Caster wand bolts, which do
+// not swing the mainhand, never roll it.
+export type WeaponProcTrigger = 'weaponHit' | 'spellDamage' | 'heal';
+
+export type WeaponProcEffect =
+  // Thunderfury-style arc: a bolt that strikes the primary target and then jumps to
+  // up to `jumps` nearby enemies for `falloff`-decaying damage.
+  | {
+      kind: 'chainArc';
+      school: Aura['school'];
+      damage: number;
+      jumps: number;
+      falloff: number;
+      radius: number;
+    }
+  // Slows the primary target's attack speed (an `attackspeed` aura, mult > 1).
+  | { kind: 'attackSlow'; name: string; mult: number; duration: number }
+  // A damage-over-time on the target (e.g. Deathbloom).
+  | {
+      kind: 'dot';
+      name: string;
+      school: Aura['school'];
+      perTick: number;
+      interval: number;
+      duration: number;
+    }
+  // A heal-over-time on the trigger's target (e.g. Lifebloom).
+  | { kind: 'hot'; name: string; perTick: number; interval: number; duration: number };
+
+export interface WeaponProc {
+  id: string; // unique per item; used for the applied aura ids
+  name: string; // player-visible proc name (also the chain arc's damage label)
+  trigger: WeaponProcTrigger;
+  chance: number; // 0..1 per trigger action
+  effects: WeaponProcEffect[];
 }
 
 export interface OtherItemDef extends BaseItemDef {
@@ -401,7 +571,7 @@ export interface OtherItemDef extends BaseItemDef {
   armorType?: never;
 }
 
-export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
+export type ItemDef = ArmorItemDef | WeaponItemDef | JewelryItemDef | OtherItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
@@ -470,6 +640,28 @@ export interface LootRollPrompt {
   itemName: string;
   quality: ItemDef['quality'];
   expiresAt: number;
+}
+
+// One candidate's live vote on an open need-greed roll, as the whole group sees
+// it: the choice only. The 1-100 roll number stays server-side until resolution,
+// when every roll is broadcast as loot chat lines.
+export interface LootRollStatusEntry {
+  pid: number;
+  name: string;
+  choice: LootRollChoice | null;
+}
+
+// Group-visible mirror of an open need-greed roll: every party member (candidate
+// or not) sees who has answered and how while the window runs, so the HUD can
+// keep the roll frame up with a per-player choice strip until the server
+// resolves the roll.
+export interface LootRollGroupStatus {
+  rollId: number;
+  itemId: string;
+  itemName: string;
+  quality: ItemDef['quality'];
+  expiresAt: number;
+  entries: LootRollStatusEntry[];
 }
 
 // Master loot intercepts roll-worthy drops at/above a quality threshold and hands
@@ -556,12 +748,25 @@ export interface MobTemplate {
   xpMult?: number;
   // Rare/miniboss controls.
   canSwim?: boolean;
+  // Every movement step (chase, flee, wander, leash return) uses Sim.moveToward's
+  // phasing mode: a straight line that ignores prop colliders, the waterline, and
+  // the steep-wall gate. For mountain-sized movers (world bosses) that must never
+  // wedge on camp furniture while closing on a target.
+  phasesThroughObstacles?: boolean;
   ccImmune?: boolean;
   // Immune to movement-speed slow auras (kind 'slow'). Distinct from ccImmune, which
   // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
   // leaves snares landing so most elites can still be kited; a raid boss sets both.
   slowImmune?: boolean;
   respawnMult?: number;
+  // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
+  // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
+  respawnSeconds?: number;
+  // Training dummy: a stationary practice target — attackable (so it counts for
+  // damage and the combat meters) but never moves, aggros, or retaliates; drops
+  // combat and heals to full a few seconds after the last hit. Guarded in
+  // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
+  dummy?: boolean;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
     min: number;
@@ -1139,7 +1344,17 @@ export type AbilityEffect =
   | { type: 'judgement' } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
-  | { type: 'buffTarget'; kind: AuraKind; value: number; duration: number } // fortitude/might/mark on a friendly target
+  | {
+      type: 'buffTarget';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      // When true, the buff is a raid buff: it lands on the caster, the explicit
+      // target (a friendly or a controlled pet), and every living member of the
+      // caster's party/raid, regardless of range. Used by Mark of the Wild, Arcane
+      // Intellect, Power Word: Fortitude, Blessing of Might, Battle Shout, Devotion Aura.
+      party?: boolean;
+    } // fortitude/might/mark on a friendly target
   | { type: 'finisherDamage'; base: number; perCombo: number; variance: number } // eviscerate
   | { type: 'dot'; total: number; duration: number; interval: number }
   | { type: 'slow'; mult: number; duration: number }
@@ -1159,6 +1374,20 @@ export type AbilityEffect =
   | { type: 'aoeAttackSpeed'; mult: number; duration: number; radius: number } // thunder clap rider
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
+  // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
+  // match ball toward the caster's castAim (power = ground speed yd/s, loft =
+  // initial vertical speed); sportDash is a targetless directional lunge along
+  // the aim direction (catchBall lets a keeper's Dive catch a crossing ball);
+  // sportShove bumps the target back via the knockback walker. ballPass rolls a
+  // firm auto-paced ground pass to the caster's targeted teammate (else the best
+  // teammate toward the aim), leading their run. All no-damage.
+  | { type: 'ballKick'; power: number; loft: number }
+  | { type: 'ballPass'; power: number; loft: number }
+  // ballShoot fires the ball at the enemy goal; power (ground speed) and loft
+  // both scale with the caster's charge, so a max-power shot sails OVER the bar.
+  | { type: 'ballShoot'; power: number; loft: number }
+  | { type: 'sportDash'; distance: number; catchBall?: boolean }
+  | { type: 'sportShove'; distance: number }
   | {
       type: 'selfBuff';
       kind: AuraKind;
@@ -1174,7 +1403,12 @@ export type AbilityEffect =
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'charge' }
-  | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
+  // Sunder Armor: stacking PERCENT armor debuff (2% per stack via effectiveArmor) +
+  // flat threat. `full` lands all `maxStacks` at once (Expose Armor, a finisher that
+  // applies the cap in one cast) instead of building one stack per hit (warrior Sunder).
+  // `armor` is retained for the threat value; the reduction percent is a fixed constant.
+  | { type: 'sunder'; armor: number; maxStacks: number; full?: boolean }
+  | { type: 'faerieFire'; duration: number } // fixed-percent armor reduction (AuraKind 'faerie_fire')
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
@@ -1269,6 +1503,12 @@ export interface NpcDef {
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
+  // A banker: talking to this NPC opens the player's bank (deposit box). The bank
+  // deposit/withdraw/buy-slots commands gate on standing near one of these.
+  banker?: true;
+  // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
+  // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
+  heroicVendor?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -1509,7 +1749,11 @@ export interface Entity {
   meleeHaste: number;
   rangedHaste: number;
   spellHaste: number;
+  setProcs: SetProc[];
+  procReadyAt: Record<string, number>;
   critChance: number; // 0..1
+  critRating: number; // accumulated crit rating from gear + set bonuses
+  hasteRating: number; // accumulated haste rating from gear + set bonuses
   dodgeChance: number;
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
@@ -1575,6 +1819,12 @@ export interface Entity {
    *  Wiped on evade/respawn/death; drives target selection with the 110%
    *  melee / 130% ranged pull-over rules. */
   threat: Map<number, number>;
+  /** World-boss loot roster: every player id (pet threat credited to the owner) that
+   *  has damaged this world boss since it was pulled. Unlike `threat`, it is NEVER
+   *  pruned when a contributor dies, releases their spirit, leaves range, or drops off
+   *  the hate table, so a raider who died to the boss keeps their personal loot rights.
+   *  Only ever written for `worldBoss` templates; empty on every other entity. */
+  bossDamagers: Set<number>;
   forcedTargetId: number | null; // taunt/growl: attack this target while the timer runs
   forcedTargetTimer: number; // seconds left on the forced-attack window
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
@@ -1601,6 +1851,19 @@ export interface Entity {
   firedSummons: number; // summonAdds thresholds already triggered
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
   enraged: boolean; // enrage mechanic active
+  // Heroic-instance mechanic scaling (instances/difficulty.ts applyHeroicMobTuning).
+  // Mechanic numbers (aoePulse/bigCast/stomp damage; mendAlly/wardAllies/stoneskin
+  // amounts) are read from the base MOBS table at fire time, so the fire sites
+  // multiply by these AFTER the rng draw. undefined = 1 (normal difficulty).
+  mechanicDamageMult?: number;
+  mechanicHealMult?: number;
+  // Entity-level CC/snare immunity, the per-spawn twin of the MobTemplate
+  // ccImmune/slowImmune flags (which are read from the base MOBS table, so a
+  // spawn-time template transform cannot grant them). Heroic instances set
+  // both on boss-flagged mobs (applyHeroicMobTuning); the applyAura gates and
+  // the polymorph cast gate check template OR entity.
+  ccImmune?: boolean;
+  slowImmune?: boolean;
   healedThisPull: boolean; // desperation self-heal already used this pull
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
   spawnPos: Vec3;
@@ -1652,6 +1915,11 @@ export interface Entity {
   // every non-player entity. Owned by src/sim/spirit.ts.
   ghost: boolean;
   corpsePos: Vec3 | null;
+  // A free-roaming Gauntlet spectator (gauntlet/modes.ts): renders at 20% opacity
+  // to OTHER players so the watchers read as faint ghosts among the contestants.
+  // Runtime-only (never persisted); false for the living, the dead, and every
+  // non-player entity. Wired per-entity as the `spec` snapshot flag.
+  spectator: boolean;
   scale: number;
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
@@ -1825,6 +2093,10 @@ export type SimEvent = { pid?: number } & (
   // `collected` the coin taken, `tooManyParcels` the attachment cap). All
   // always carry pid.
   | { type: 'mailbox' }
+  // Asks the client to open the bank window (the interact path at a banker NPC).
+  // Structured data only (pid supplied by the union intersection); the client
+  // builds every visible string, the mailbox precedent.
+  | { type: 'bank' }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
   // Guild calendar outcome. Emitted only by the server's SocialService (the
@@ -1890,6 +2162,26 @@ export type SimEvent = { pid?: number } & (
       allies: ArenaCombatant[];
       enemies: ArenaCombatant[];
     }
+  // Hodric's Castle Gauntlet: queue state, race lifecycle, and the placement
+  // result. All carry pid (personal, delivered to each racer).
+  // `hodricsWindow`: the Herald was talked to, open the race window (mailbox shape).
+  | { type: 'hodricsWindow' }
+  | { type: 'hcQueued'; position: number }
+  | { type: 'hcUnqueued' }
+  | { type: 'hcFound'; field: HcFieldEntry[] }
+  | { type: 'hcCountdown'; seconds: number }
+  | { type: 'hcStart' }
+  // `hcRoundStart`: a round is being plated (1..3); Hodric rebuilds between.
+  | { type: 'hcRoundStart'; round: number }
+  // `hcQualified`: banked a spot in the next round.
+  | { type: 'hcQualified'; round: number }
+  // `hcEliminated`: cut this round; final placement is already assigned.
+  | { type: 'hcEliminated'; place: number; round: number }
+  | { type: 'hcKnocked'; kind: HcKnockKind }
+  | { type: 'hcFall' }
+  | { type: 'hcCheckpoint'; index: number }
+  | { type: 'hcFinish'; place: number; timeS: number }
+  | { type: 'hcEnd'; place: number; won: boolean; field: HcResultRow[] }
   // 2v2 Fiesta party mode. All carry pid (personal — delivered to each combatant).
   // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment
   // wave just opened. `fiestaWord`: an exaggerated word-pop cue (the client maps
@@ -1904,11 +2196,85 @@ export type SimEvent = { pid?: number } & (
       n?: number;
     }
   | { type: 'fiestaDown'; seconds: number }
+  // Protect Yumi maze objective mode (social/yumi.ts). `yumiTeleport` is a
+  // world-visible relocation cue (renderer snap + VFX at both ends);
+  // `yumiDown` is your personal 10s bench countdown; `yumiSuddenDeath` fires
+  // once when teleports freeze and the bleed ramp starts; `yumiStatus` is the
+  // once-per-second personal scoreboard heartbeat (the arena wire field is
+  // rate-limited and the enemy cat can sit outside interest range, so the
+  // live bars ride the event queue like fiesta's dynamics do).
+  | { type: 'yumiTeleport'; catId: number; fromX: number; fromZ: number; toX: number; toZ: number }
+  | { type: 'yumiDown'; seconds: number }
+  | { type: 'yumiSuddenDeath' }
+  | {
+      type: 'yumiStatus';
+      myHp: number;
+      myMax: number;
+      enemyHp: number;
+      enemyMax: number;
+      teleportIn: number;
+      suddenDeathIn: number;
+      suddenDeath: boolean;
+      mult: number;
+      team: 'A' | 'B';
+    }
   | { type: 'augmentOffer'; tier: 'silver' | 'gold' | 'prismatic'; wave: number; choices: string[] }
   | { type: 'augmentChosen'; augmentId: string; byPid: number; byName: string; mine: boolean }
   // A fighter grabbed a ring power-up (world event so everyone sees the glow).
   // Whether it's "mine" is decided client-side (entityId === local player).
   | { type: 'fiestaPowerup'; entityId: number; defId: string; glow: number; duration: number }
+  // The Vale Cup (docs/prd/vale-cup.md). Queue lifecycle events carry pid
+  // (personal). Match-theatre events (kickoff/goal/save/golden/end) carry a
+  // WORLD x/z anchor at the pitch instead, so walk-up spectators in the
+  // Sowfield stands see the banners and fireworks too (routeEvents delivers
+  // anchored pid-less events to everyone within 90yd).
+  | { type: 'vcupQueued'; bracket: VcBracket; position: number }
+  | { type: 'vcupUnqueued' }
+  | {
+      type: 'vcupFound';
+      bracket: VcBracket;
+      nationA: VcNationId;
+      nationB: VcNationId;
+      team: 'A' | 'B';
+      allies: ArenaCombatant[];
+      enemies: ArenaCombatant[];
+    }
+  | { type: 'vcupCountdown'; seconds: number; x: number; z: number }
+  | { type: 'vcupKickoff'; x: number; z: number }
+  | {
+      type: 'vcupGoal';
+      scorerName: string;
+      team: 'A' | 'B';
+      scoreA: number;
+      scoreB: number;
+      nationA: VcNationId;
+      nationB: VcNationId;
+      x: number;
+      z: number;
+    }
+  | { type: 'vcupSave'; keeperName: string; x: number; z: number }
+  // A spectator's parimutuel wager settled: pid-scoped so it refreshes their purse
+  // and toasts the outcome. payout is the total copper credited (0 on a loss).
+  | {
+      type: 'vcupBetSettled';
+      pid: number;
+      outcome: 'won' | 'lost' | 'refunded';
+      stake: number;
+      payout: number;
+    }
+  | { type: 'vcupGolden'; x: number; z: number }
+  | {
+      type: 'vcupEnd';
+      scoreA: number;
+      scoreB: number;
+      nationA: VcNationId;
+      nationB: VcNationId;
+      winner: 'A' | 'B' | null;
+      x: number;
+      z: number;
+    }
+  // personal outcome line for each fighter (rides beside the anchored vcupEnd)
+  | { type: 'vcupResult'; won: boolean; draw: boolean }
   | {
       type: 'heal2';
       sourceId: number;
@@ -2029,9 +2395,363 @@ export type SimEvent = { pid?: number } & (
       itemId?: string;
       count?: number;
       quality?: ItemDef['quality'];
-      reason?: 'unknown_recipe' | 'insufficient_materials';
+      reason?:
+        | 'unknown_recipe'
+        | 'insufficient_materials'
+        | 'combo_requirement_unmet'
+        | 'recipe_not_learned'
+        | 'throttled'
+        | 'not_at_hub';
     }
+  // The Gauntlet survival event. All personal (pid-scoped: each event is emitted
+  // once per run participant) and text-free on purpose (see skinEvent above): the
+  // client renders its own localized copy off the structured fields, so no
+  // sim/server i18n matcher rules are needed.
+  // `gauntletPhase`: the run advanced to a new phase (lobby fill, staging, a
+  // trial opening, interlude, podium), or the lobby roster changed. `remainingS`
+  // is the seconds left in the phase AT EMIT TIME: a point-in-time sample the
+  // client clock estimator calibrates against (a late lobby joiner would
+  // otherwise count down from the full window; see ui/gauntlet_clock.ts).
+  // `gauntletLight`: the watcher flipped
+  // (trial 1); `until` is the absolute sim-time the current light holds.
+  // `gauntletDamage`: your own vitality took a hit (`vitality` = your new value).
+  // `gauntletPoof`: a contestant was knocked out at (x, z) (drives the knockout
+  // VFX/SFX and the survivor counter). `gauntletEliminated`: YOU were knocked
+  // out (the client shows the eliminated overlay + spectator chrome).
+  // `gauntletEchoJudge`: the sim graded YOUR echo stone tap (trial 4); the
+  // client flashes the clicked stone green (`ok`) or red so every click has
+  // visible success/failure feedback.
+  // `gauntletFinished`: YOU cleared the current trial's goal (crossed the
+  // sentinel finish line), a one-shot cue the client turns into a "you passed"
+  // banner. `gauntletPodium`: the run resolved; `won` is whether you took first.
+  | {
+      type: 'gauntletPhase';
+      phase: GauntletPhase;
+      trialIndex: number;
+      survivors: number;
+      remainingS: number;
+    }
+  | { type: 'gauntletLight'; light: 'green' | 'red'; until: number }
+  | {
+      type: 'gauntletDamage';
+      amount: number;
+      cause: GauntletDamageCause;
+      vitality: number;
+    }
+  | { type: 'gauntletEchoJudge'; stone: number; ok: boolean }
+  | {
+      type: 'gauntletPoof';
+      entityId: number;
+      name: string;
+      x: number;
+      z: number;
+      survivors: number;
+    }
+  | { type: 'gauntletEliminated'; trialIndex: number }
+  | { type: 'gauntletFinished'; trialIndex: number }
+  | { type: 'gauntletPodium'; first: string; second: string; third: string; won: boolean }
 );
+
+// ---------------------------------------------------------------------------
+// The Gauntlet, a time-limited survival event: a lobby of players plus an NPC
+// contestant field runs a fixed sequence of trials inside an instanced slot in
+// the gauntlet band (see data.ts gauntletOrigin). Trials deal vitality damage
+// scaled by performance; zero vitality knocks a contestant out. Run state lives
+// in src/sim/gauntlet/state.ts; EVERY numeric knob lives in the tuning blocks
+// below, authored in content/gauntlet.ts (data-as-code, no magic numbers in
+// module logic).
+// ---------------------------------------------------------------------------
+
+export type GauntletPhase = 'lobby' | 'staging' | 'trial' | 'interlude' | 'podium' | 'done';
+
+// What dealt a vitality hit. 'caught' = a trial hard fail (moved on red light);
+// 'trial' = the end-of-trial performance score; 'timeout' = the trial clock ran
+// out before the contestant resolved; 'struck' = a blow in the Final Court melee.
+export type GauntletDamageCause = 'caught' | 'trial' | 'timeout' | 'struck';
+
+export type GauntletTrialKind = 'sentinel' | 'sigils' | 'pull' | 'echo' | 'span' | 'court';
+
+// Trial 1, Sentinel's Crossing (red light / green light). Distances are yards in
+// instance-local coordinates (origin at the staging area), times are seconds.
+export interface GauntletSentinelTuning {
+  durationS: number; // trial time limit
+  fieldLength: number; // start line (z=0) to finish line (z=fieldLength)
+  fieldHalfWidth: number; // |x| beyond this is out of bounds (treated as caught-still)
+  greenMinS: number; // green-light window drawn from [greenMinS, greenMaxS]
+  greenMaxS: number;
+  redMinS: number; // red-light window drawn from [redMinS, redMaxS]
+  redMaxS: number;
+  accelPerCycle: number; // green window multiplier per completed cycle (< 1 accelerates)
+  greenFloorS: number; // green window never shrinks below this
+  telegraphS: number; // watcher turn animation lead time before red starts
+  graceS: number; // motion forgiveness after red starts (reaction budget)
+  redMoveEps: number; // per-tick displacement (yards) beyond this while red = caught
+  hardFailDamage: number; // vitality chunk when caught moving
+  stunS: number; // root applied on a catch
+  pushbackYards: number; // set back toward the start line on a catch
+  momentumDecay: number; // residual per-tick velocity multiplier after input release
+  momentumStopEps: number; // residual speed (yards/tick) below this snaps to a stop
+  damageMax: number; // end-of-trial vitality damage at score 0 (= full pool: score 0 is fatal); scales to ~0 at 1
+  npcTithe: number; // scripted-survivor NPC attrition tithe (invisible; NOT derived from damageMax)
+  finishBonusMax: number; // score bonus for finishing with the full clock remaining
+  // NPC contestant improv: green-light pace is skill-lerped between the speed
+  // bounds (yards/s; compare RUN_SPEED), then each light window rolls fresh
+  // hesitation, stop lag, a speed multiplier, and sometimes a mid-run stutter,
+  // so the field reads as a crowd of people rather than a conveyor belt.
+  npcSpeedMin: number; // green-light pace at skill 0
+  npcSpeedMax: number; // green-light pace at skill 1
+  npcSpeedJitter: number; // per-green speed multiplier drawn from [1-j, 1+j]
+  npcReactMinS: number; // seconds after a green flip before a bot starts moving
+  npcReactMaxS: number;
+  npcStopLagMaxS: number; // seconds a bot keeps sliding after a red flip (cosmetic)
+  npcHesitateChance: number; // chance per green window of a mid-run stutter
+  npcHesitateMinS: number; // stutter length bounds
+  npcHesitateMaxS: number;
+  // Human-feel locomotion on top of the pace above (all cosmetic, deterministic
+  // from a per-NPC seeded phase drawn once in planSentinelScripts, so no extra
+  // per-tick rng and no reordering of the shared stream). While running on
+  // green a bot weaves a little instead of tracking a straight line; on
+  // crossing it overshoots the finish line and mills in the end zone rather
+  // than freezing on the mark.
+  npcWeaveAmp: number; // lateral weave speed while running (yards/s peak)
+  npcWeaveFreq: number; // weave angular frequency (rad/s)
+  npcOvershootMin: number; // yards past the finish line a bot coasts before milling
+  npcOvershootMax: number;
+  npcMillAmp: number; // idle lateral sway speed while milling past the line (yards/s)
+}
+
+// Trial 2, Sugarglass Sigils: freedraw the seeded etched outline without
+// cracking it. The sim owns scoring: the client streams quantized trace points;
+// each on-band point carves the outline vertices near its arc position (any
+// order, any direction), and off-band points accrue crack.
+export interface GauntletSigilsTuning {
+  durationS: number;
+  outlinePoints: number; // polyline resolution a shape is sampled at
+  tolerance: number; // max shape-local distance from the outline before crack accrues
+  // The arc-coverage window a single on-band point carves, as a fraction of the
+  // whole loop (decoupled from `tolerance`).
+  carveArcFrac: number;
+  // The largest arc gap (fraction of the loop) a point may sit from the covered
+  // frontier and still CONTINUE the trace (the gap is filled). A hit further out
+  // is a jump across the shape and carves nothing, so coverage grows as one
+  // contiguous arc and scattered dabs never stitch the loop together.
+  contiguityArcFrac: number;
+  // Max NEW outline vertices carved per second (an anti-teleport rate cap; sits
+  // above an honest continuous drag, so it only stops a single fat batch from
+  // carving the whole outline at once).
+  coverageCapPerS: number;
+  crackMax: number; // the crack meter
+  crackOffPath: number; // crack per second while tracing outside the tolerance
+  thinSectionMult: number; // crack multiplier on a shape's marked thin segments
+  shatterDamage: number; // vitality chunk on a shatter (a fresh shape follows)
+  damageMax: number; // end-of-trial damage at zero progress (= full pool: zero coverage is fatal)
+}
+
+// Trial 3, The Great Pull: team tug of war played on shrinking circles. Each
+// player faces one circle at a time: it spawns after a rolled gap, shrinks at
+// a rolled speed, and a click is graded sim-side by how close the size is to
+// the target when it arrives; a circle that shrinks to nothing unclicked is a
+// miss. Sizes are ABSTRACT UNITS the client renders as CSS px 1:1.
+export interface GauntletPullTuning {
+  durationS: number; // soft cap; the marker usually decides earlier
+  leadInS: number; // pause after the trial opens before the first circle and NPC heave
+  circleSpawnMinS: number; // gap bounds between a circle resolving and the next spawn
+  circleSpawnMaxS: number;
+  circleShrinkMinS: number; // full-shrink duration bounds (the per-circle "random speed")
+  circleShrinkMaxS: number;
+  // The difficulty ramp: as the trial elapses (0..1), the spawn gap AND the
+  // shrink duration are both scaled from 1x down toward this factor, so circles
+  // come faster and shrink faster the longer the pull runs. 1 = no ramp.
+  circleRampMin: number;
+  circleStartSize: number; // spawn size (abstract units, rendered as px 1:1)
+  circleTargetSize: number; // click as close to this size as possible
+  pullForceMax: number; // marker yards for a click at exactly the target size
+  gradePower: number; // exponent sharpening the force falloff with size error
+  npcHeavePeriodS: number; // cadence of the per-team NPC field heave
+  npcForceMin: number; // per-heave per-team NPC force draw bounds
+  npcForceMax: number;
+  winThreshold: number; // |marker| that decides the pull
+  lossDamage: number; // end-of-pull toll at ZERO contribution (= full pool: an idle contestant is knocked out); scaled down by how hard a player pulled (contribution vs winThreshold)
+}
+
+// Trial 4, the Keeper's Echo: a memory duel against the Keeper's rune stones.
+// Each round the stones flash a seeded sequence; the player clicks them back
+// in the same order. Rounds grow one step at a time; a wrong stone or a
+// timeout costs vitality and deals a FRESH sequence for the same round;
+// clearing every round finishes the trial.
+export interface GauntletEchoTuning {
+  durationS: number;
+  stones: number; // rune stones on the table (sequence values are 0..stones-1)
+  rounds: number; // rounds to clear the trial
+  baseLen: number; // round r's sequence length = baseLen + r
+  stepS: number; // seconds per flash during the watch phase
+  inputS: number; // answer window once the flashes end
+  missDamage: number; // vitality per wrong stone or timed-out round
+  damageMax: number; // end-of-trial damage at zero rounds cleared (= full pool: zero rounds is fatal)
+}
+
+// Trial 5, The Brittle Span: paired floor panels over the pit; one of each
+// pair is brittle. Steps are position-detected; reveals are shared knowledge.
+export interface GauntletSpanTuning {
+  durationS: number;
+  steps: number; // panel pairs
+  panelLength: number; // yards along the crossing axis
+  panelWidth: number; // per-panel width
+  panelGap: number; // lateral gap between the pair
+  fallDamage: number; // brittle-panel chunk; respawn at the span start
+  npcAheadCount: number; // seeded crossers that go first and reveal early panels
+  npcHopS: number; // seconds a crosser takes to run-and-hop one panel forward
+  npcJumpHeight: number; // peak height of a crosser's hop (yards)
+  npcPlungeS: number; // seconds a mis-stepped crosser takes to drop into the pit
+  npcPlungeDrop: number; // how far below the deck a plunging crosser falls (yards)
+  npcStumbleChance: number; // chance a scout guesses one panel wrong (then climbs back)
+  damageMax: number; // end-of-trial damage at zero progress (= full pool: never stepping on is fatal)
+}
+
+// Trial 6, The Final Court: a standard-combat free-for-all in a circular arena.
+// Every survivor (players and NPCs alike) is normalized to the SAME hp pool and
+// trades plain auto-attack swings on REAL hp (real `damage` events, real death
+// routed to elimination), so class, level, and gear can never touch the outcome.
+// Last fighter standing is champion; if the clock expires, the highest remaining
+// hp wins.
+export interface GauntletCourtTuning {
+  durationS: number;
+  arenaRadius: number; // the ring every fighter is clamped inside (yards)
+  maxHp: number; // the shared hp pool every fighter is normalized to at start
+  npcMoveSpeed: number; // NPC chase speed (yards/sec), matched to player RUN_SPEED
+  strikeDamage: number; // authored auto-attack hit (bypasses armor, equal for all)
+  strikeIntervalS: number; // auto-attack cadence (seconds between swings)
+  strikeRange: number; // melee reach for the auto-attack
+  // NPC melee AI, all rolled from the per-run stream (skill-scaled 0..1):
+  npcReactMinS: number; // target-decision latency at skill 1
+  npcReactMaxS: number; // decision latency at skill 0
+  npcRetargetS: number; // how often an NPC re-picks its foe
+}
+
+// The viewer-scoped wire projection of a run (the `grun` self-wire key and the
+// IWorldGauntlet.gauntletRun member; the facet re-exports it). Deadlines are
+// ABSOLUTE sim-time (`endsAt`, `until`): the client derives countdowns from
+// world.time, so the serialized view only changes on real state changes and
+// the wire delta-elides it on quiet ticks.
+export interface GauntletRunView {
+  phase: GauntletPhase;
+  trialIndex: number;
+  trialCount: number;
+  endsAt: number; // current phase deadline (absolute sim time)
+  survivors: number;
+  total: number;
+  prizePool: number; // theater in v1 (copper)
+  vitality: number; // the viewer's own vitality
+  vitalityMax: number;
+  spectating: boolean;
+  // A solo Practice run (vs bots only): the podium hides the "rejoin queue" action
+  // and a practice run never records ladder stats. False for a live queue game.
+  practice: boolean;
+  finished: boolean; // the viewer resolved the current trial (crossed the line)
+  originX: number; // instance origin, so presentation can derive field-local coords
+  originZ: number;
+  // The whole contestant field for the top-left standings board: one row per
+  // contestant (players first, then the NPC backfill), each with their event
+  // vitality, whether they have been knocked out, and whether the row is the
+  // viewer. Names are proper nouns (esc'd, never translated). This changes only
+  // on a vitality hit or a knockout, so the wire delta still elides quiet ticks.
+  board: { name: string; vitality: number; out: boolean; you: boolean }[];
+  sentinel: { light: 'green' | 'red'; until: number; fieldLength: number } | null;
+  // The viewer's own per-trial substate, one member per trial kind (only the
+  // active trial's member is non-null). Values are quantized at the wire
+  // projection so quiet ticks still delta-elide.
+  sigils: {
+    shapeSeed: number;
+    shapeId: number;
+    crack: number;
+    crackMax: number;
+    progress: number; // 0..1 covered fraction of the outline
+    // 24-bit coverage mask: bit k is set when any vertex in the k-th 24th of
+    // the arc is covered (the venue tints its outline segments from this).
+    coveredMask: number;
+  } | null;
+  pull: {
+    // ABSOLUTE marker, + = team 0 winning. Both teams stand ON the rope
+    // (team 0 grips the -x half); the meter is the physical rope, not a
+    // viewer-relative bar.
+    marker: number;
+    winThreshold: number;
+    // The sim's eased rope translation (instance-local yards, + toward team
+    // 0's side), the SAME value the players' grips and pins are dragged by,
+    // so the venue rope and the pulling lines move as one body. Quantized to
+    // 0.05 so quiet ticks delta-elide.
+    kx: number;
+    // The viewer's live shrinking circle (the trial's input), or null for
+    // spectators. spawnAt is absolute; spawnAt + shrinkS fully determine the
+    // size curve client-side (startSize at spawnAt, 0 at spawnAt + shrinkS).
+    // Sizes are abstract units the client renders as CSS px 1:1; the screen
+    // POSITION is client-chosen (cosmetic, never scored). The member only
+    // changes when a circle resolves, so quiet ticks delta-elide.
+    circle: {
+      id: number;
+      spawnAt: number;
+      shrinkS: number;
+      startSize: number;
+      targetSize: number;
+    } | null;
+  } | null;
+  echo: {
+    stones: number;
+    round: number; // 0-based current round
+    rounds: number; // total rounds to clear
+    // This round's flash sequence (stone indices); the client renders the
+    // flashes from the absolute schedule below, so quiet ticks delta-elide.
+    seq: number[];
+    showStartAt: number; // absolute; flashes run seq.length * stepS from here
+    stepS: number;
+    inputEndsAt: number; // absolute answer deadline
+    progress: number; // matched steps this round
+    done: boolean;
+  } | null;
+  span: {
+    steps: number;
+    // Per step: -1 unknown, else the KNOWN SAFE side (0 = left, 1 = right).
+    // Reveals are shared: every crosser's fate teaches the whole field.
+    revealed: number[];
+  } | null;
+  // The Final Court free-for-all needs no viewer substate: the sim mirrors the
+  // fighter's foe onto the player's real target, so the standard target frame +
+  // world selection ring show it (exactly like a duel). The fight is plain
+  // auto-attack (no ability buttons); the standings board + health frame carry
+  // the rest.
+  podium: { first: string; second: string; third: string } | null;
+}
+
+// The whole event, one record: run pacing, the contestant field, and one tuning
+// block per trial. `trials` is the ordered sequence a run plays; later phases
+// append kinds to GauntletTrialKind and blocks here.
+export interface GauntletDef {
+  fieldSize: number; // total contestants per run, players + NPC backfill
+  vitalityMax: number; // the normalized event vitality pool (same for everyone)
+  lobbyFillS: number; // how long a lobby waits for more players before starting
+  queueCountdownS: number; // the shorter fill window for a queue-formed lobby (rolling games)
+  maxRealPlayers: number; // lobby starts early when this many have joined
+  joinRadius: number; // yards from the recruiter within which gauntletJoin works
+  emptyTimeoutS: number; // a run with no player attached disposes after this
+  stagingS: number; // seconds contestants stand on the staging area before trial 1
+  interludeS: number; // between-trials beat (survivor count / next-trial teaser)
+  podiumS: number; // podium ceremony length before the run disposes
+  prizeBase: number; // theater only in v1: the advertised pool baseline (copper)
+  prizePerElimination: number; // theater: pool growth per knockout
+  // NPC attrition targets: after trials[i] resolves, the field is culled toward
+  // targetSurvivorsPerTrial[i] survivors (players are never culled by targets;
+  // they live and die by their own vitality).
+  targetSurvivorsPerTrial: number[];
+  npcSkillMin: number; // seeded per-contestant skill range (0..1)
+  npcSkillMax: number;
+  trials: GauntletTrialKind[];
+  sentinel: GauntletSentinelTuning;
+  sigils: GauntletSigilsTuning;
+  pull: GauntletPullTuning;
+  echo: GauntletEchoTuning;
+  span: GauntletSpanTuning;
+  court: GauntletCourtTuning;
+}
 
 export interface MoveInput {
   forward: boolean;
@@ -2146,11 +2866,33 @@ export interface SimConfig {
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
   raidResetMs?: (nowMs: number) => number;
+  // The Gauntlet event window's initial state. The offline client sets true (the
+  // event is always joinable offline); the server leaves the default false and
+  // feeds sim.gauntletEventOpen each loop pass from its world_state/env window
+  // (the utcDay idiom). Headless/parity worlds keep the default: closed, so the
+  // recruiter never spawns and existing golden traces are untouched.
+  gauntletAlwaysOpen?: boolean;
+  // Skip the gauntlet lobby fill window: joining starts the run immediately with
+  // full NPC backfill. The offline client sets true (no other player can ever
+  // join a single-player world, so waiting is pure dead time); the server keeps
+  // the default false so online lobbies gather real players.
+  gauntletInstantLobby?: boolean;
   // Offline play-test: a custom world to run instead of the built-in one. The Sim
   // ctor reads spawns from here; render/terrain read it via the data.ts registry,
   // so callers that set this MUST also call setActiveWorldContent() with content
   // whose terrain-relevant fields are identical (see the sim.ts ctor invariant).
   world?: WorldContent;
+  // Optional per-phase timing hook: tick() calls this after each internal phase and
+  // the HOST owns the clock, attributing the elapsed time since its previous mark to
+  // `phase` (keeps wall-clock reads out of the sim, per the determinism guard). The
+  // server injects it to feed its tick profiler during an on-demand capture; undefined
+  // offline/headless, so the sim draws no wall clock in a deterministic scenario.
+  perfLap?: (phase: string) => void;
+  // When true, the Sowfield auto-runs a bot-vs-bot showcase match after a stretch
+  // of no queue activity, so a walk-up spectator always has a game to watch (and
+  // bet on). Server + offline game enable it; tests/goldens leave it off so the
+  // idle timer never perturbs a deterministic scenario.
+  valeCupShowcase?: boolean;
 }
 
 export function emptyMoveInput(): MoveInput {
@@ -2173,6 +2915,16 @@ export function dist2d(a: Vec3, b: Vec3): number {
 
 export function angleTo(from: Vec3, to: Vec3): number {
   return Math.atan2(to.x - from.x, to.z - from.z);
+}
+
+// Below this separation two positions no longer define a bearing: atan2 turns
+// position noise (collision nudges, online rounding) into full-circle swings,
+// so an entity re-aimed at a target standing on top of it strobes its
+// orientation every tick. steadyAngleTo holds the previous facing instead.
+export const FACING_HOLD_DIST = 0.1;
+
+export function steadyAngleTo(from: Vec3, to: Vec3, current: number): number {
+  return dist2d(from, to) < FACING_HOLD_DIST ? current : angleTo(from, to);
 }
 
 export function normAngle(a: number): number {
@@ -2442,6 +3194,12 @@ export const RANGED_SPELL_AP_SCALE = 0.15;
 // weapon-swing and finisher portions already carry AP through their own paths;
 // this only lifts the flat directDamage / DoT / AoE riders.
 export const MELEE_SPELL_AP_SCALE = 0.15;
+// Armor-reduction debuffs as PERCENTAGES (multiplicative on the target's armor).
+// Sunder Armor reduces 2% per stack (5 stacks = 10%); Faerie Fire reduces a flat
+// 10%. They do NOT stack with each other: effectiveArmor takes the larger percent.
+// Mob corrosion (kind 'corrode') is a separate FLAT shred, subtracted before these.
+export const SUNDER_ARMOR_PCT_PER_STACK = 0.02;
+export const FAERIE_FIRE_ARMOR_PCT = 0.1;
 
 // ---------------------------------------------------------------------------
 // Delves, replayable modular instances (see docs/prd/delves.md)

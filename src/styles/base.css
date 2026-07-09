@@ -540,6 +540,8 @@
   .vendor-item:focus-visible,
   .vendor-sell-junk:focus-visible,
   .bag-item:focus-visible,
+  .bank-item:focus-visible,
+  .bank-buy-btn:focus-visible,
   .mkt-tab:focus-visible,
   .mkt-btn:focus-visible,
   .mkt-list-btn:focus-visible {

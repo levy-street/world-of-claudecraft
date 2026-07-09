@@ -17,6 +17,8 @@
 // ui_tier_knobs.nameplateIntervalSec), which the renderer reads, not the painter.
 
 import * as THREE from 'three';
+import { GAUNTLET_CONTESTANT_NPC_ID, GAUNTLET_RECRUITER_NPC_ID } from '../sim/content/gauntlet';
+import { HC_HERALD_NPC_ID } from '../sim/content/hodrics';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
@@ -26,28 +28,16 @@ import {
   devTierDisplayName,
   devTierNameOutlineColor,
 } from '../ui/dev_tier';
+import { discordRoleTagLabel } from '../ui/discord_role_tag';
 import { tEntity } from '../ui/entity_i18n';
 import {
   holderTierBadgeDataUrl,
   holderTierByIndex,
   holderTierDisplayName,
 } from '../ui/holder_tier';
-import { formatNumber, type TranslationKey, t } from '../ui/i18n';
+import { formatNumber, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
-
-// Staff/special Discord role -> localized nameplate tag label key.
-const DISCORD_ROLE_TAG_KEYS: Record<string, TranslationKey> = {
-  levyst: 'hudChrome.discord.roleTag.levyst',
-  admin: 'hudChrome.discord.roleTag.admin',
-  devs: 'hudChrome.discord.roleTag.devs',
-  mods: 'hudChrome.discord.roleTag.mods',
-  artists: 'hudChrome.discord.roleTag.artists',
-};
-function discordRoleTag(key: string | undefined): string {
-  const tk = key ? DISCORD_ROLE_TAG_KEYS[key] : undefined;
-  return tk ? t(tk) : '';
-}
 
 import { castBarState } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
@@ -203,14 +193,17 @@ export class NameplatePainter {
         // Nameplate" option on it renders exactly like another player's, so you can
         // see your name / level / hp / guild and all your flair the way others do.
         const suppressSelf = isSelf && !showOwnNameplate;
-        const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
+        // Dim the plate for a stealthed unit, and for a free-roaming Gauntlet
+        // spectator seen by others (their body already renders faint).
+        const faint = e.auras.some((a) => a.kind === 'stealth') || (!isSelf && e.spectator);
+        const opacity = faint ? '0.55' : '1';
         const nameDisplay = suppressSelf ? 'none' : '';
         const hpDisplay = e.dead || suppressSelf ? 'none' : '';
         const guild = suppressSelf ? '' : e.guild;
         // Staff/special Discord role: tint the name + prefix a tag.
         const roleKey = suppressSelf ? undefined : e.discordRole;
         const roleColor = specialRoleColor(roleKey);
-        const roleTag = discordRoleTag(roleKey);
+        const roleTag = discordRoleTagLabel(roleKey);
         const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
         // Significant-contributor outline: a glowing outline drawn on top of the
         // existing name color (Discord staff or default) for a high dev tier, so
@@ -240,10 +233,23 @@ export class NameplatePainter {
         this.setNameplateDiscord(v, suppressSelf ? undefined : e.discordAvatar, e.discordName);
         this.setNameplateHp(v, e);
       } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
+        // Gauntlet contestants carry rolled proper-noun names (like player
+        // names, never translated); every other NPC shows its localized
+        // template name.
         const npcName =
           e.kind === 'npc'
-            ? npcDisplayName(e.templateId)
+            ? e.templateId.startsWith(GAUNTLET_CONTESTANT_NPC_ID)
+              ? e.name
+              : npcDisplayName(e.templateId)
             : tEntity({ kind: 'mob', id: e.templateId, field: 'name' });
+        // Classic <Title> sub-line under the name, shown ONLY for the two
+        // Proving Grounds heralds (their subtitle is the minigame they run):
+        // Maro the Gauntlet recruiter and Osric the Hodric's Castle herald.
+        const npcTitle =
+          e.kind === 'npc' &&
+          (e.templateId === GAUNTLET_RECRUITER_NPC_ID || e.templateId === HC_HERALD_NPC_ID)
+            ? tEntity({ kind: 'npc', id: e.templateId, field: 'title' })
+            : '';
         let marker = '';
         let cls = '';
         // role-aware: '!' only at the quest's giver, '?' only at its turn-in
@@ -268,13 +274,15 @@ export class NameplatePainter {
         const markerClass = cls ? `np-marker ${cls}` : 'np-marker';
         this.setNameplateStatic(
           v,
-          `npc|${npcName}|${marker}|${markerClass}`,
+          `npc|${npcName}|${npcTitle}|${marker}|${markerClass}`,
           npcName,
           FRIENDLY,
           'none',
           marker,
           markerClass,
           '1',
+          '',
+          npcTitle,
         );
       } else {
         const diff = e.level - p.level;

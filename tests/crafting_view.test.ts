@@ -88,3 +88,51 @@ describe('buildCraftingView', () => {
     expect(JSON.stringify(recipes)).toBe(recipesSnapshot);
   });
 });
+
+describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
+  function comboRecipe(id: string): RecipeDefLike {
+    return {
+      ...recipe(id, []),
+      comboRequirement: { craftA: 'armorcrafting', craftB: 'weaponcrafting', minTier: 1 },
+    };
+  }
+
+  it('marks a combo recipe not craftable when the player lacks tier capability in either named craft', () => {
+    const items = table(item('recipe_combo_result'));
+    const view = buildCraftingView([comboRecipe('recipe_combo')], [], items, {
+      armorcrafting: 25,
+      weaponcrafting: 0,
+    });
+    expect(view.recipes[0].craftable).toBe(false);
+  });
+
+  it('marks a combo recipe craftable once the player meets tier capability in both named crafts', () => {
+    const items = table(item('recipe_combo_result'));
+    const view = buildCraftingView([comboRecipe('recipe_combo')], [], items, {
+      armorcrafting: 25,
+      weaponcrafting: 25,
+    });
+    expect(view.recipes[0].craftable).toBe(true);
+  });
+
+  it('an unrelated craft, however high, never substitutes for a required craft', () => {
+    const items = table(item('recipe_combo_result'));
+    const view = buildCraftingView([comboRecipe('recipe_combo')], [], items, {
+      armorcrafting: 25,
+      cooking: 500,
+    });
+    expect(view.recipes[0].craftable).toBe(false);
+  });
+
+  it('a recipe with no comboRequirement ignores craftSkills entirely', () => {
+    const items = table(item('bone_fragments'), item('recipe_plain_result'));
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 2 }];
+    const view = buildCraftingView(
+      [recipe('recipe_plain', [{ itemId: 'bone_fragments', count: 2 }])],
+      inventory,
+      items,
+      {},
+    );
+    expect(view.recipes[0].craftable).toBe(true);
+  });
+});

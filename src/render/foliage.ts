@@ -10,6 +10,7 @@ import {
   ZONES,
 } from '../sim/data';
 import type { BiomeId } from '../sim/types';
+import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import type { Decoration } from '../sim/world';
 import {
   biomeAt,
@@ -1175,6 +1176,7 @@ function generateDressing(seed: number): DressingSpot[] {
       if (roadDistance(x, z) < 4) continue;
       if (terrainHeight(x, z, seed) < waterLevelAt(x, z) + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
+      if (isInSowfieldShell(x, z)) continue; // keep bushes/plants off the football ground
       const kind = dressKindFor(biome, hashAt(gx, gz, 44));
       const [sMin, sRange] = DRESS_SCALE[kind];
       out.push({ x, z, kind, scale: (sMin + hashAt(gx, gz, 45) * sRange) * scaleBoost });
@@ -1509,6 +1511,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         }
         if (nearHub) continue;
         if (roadDistance(x, z) < 3.2) continue;
+        if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
         const s = (lush ? 0.55 : 0.45) + r * (lush ? 1.1 : 1);
         q.setFromAxisAngle(up, r * 12.4);
         m.compose(v.set(x, h, z), q, sv.set(s, s, s));

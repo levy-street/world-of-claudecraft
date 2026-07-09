@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { petFollow, petPickTarget, petRangedAttack, updatePet } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 // Direct unit tests for the extracted pet-AI module (P1a). They drive the moved
 // functions through the real Sim.ctx seam (so the still-on-Sim helpers they reach
@@ -53,6 +54,47 @@ function isolate(sim: AnySim, keep: number[]): void {
   }
 }
 
+// petPickTarget scans the spatial grid (a bounded radius query), whose cell membership
+// only updates on rebucket/refresh, NOT when a test mutates `pos` via place(). Rebuild
+// the grid from the live positions before a pick, exactly as a real tick's end-of-tick
+// grid.refresh does (server/sim.ts). Banished entities land in a far cell and the query's
+// live-distance filter drops them; the placed entities land in their real cells.
+function syncGrid(sim: AnySim): void {
+  sim.grid.refresh(sim.entities.values());
+}
+
+// A second wild hostile mob, distinct from the first (grows the exclude set).
+function wildHostile2(sim: AnySim, exclude: number[]): [AnyEntity, AnyEntity] {
+  const first = wildHostile(sim, exclude);
+  const second = wildHostile(sim, [...exclude, first.id]);
+  return [first, second];
+}
+
+// Start an active hunter-vs-mage duel (mirrors tests/duel.test.ts) so the hunter's pet
+// inherits its owner's PvP hostility toward the opponent player. Used to prove a hostile
+// PLAYER is a valid petPickTarget candidate (the grid holds every kind, and the admit
+// predicates carry no kind === 'mob' restriction on ownerOffense).
+function startedDuelHunter(): { sim: AnySim; a: number; b: number } {
+  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true }) as AnySim;
+  const a = sim.addPlayer('hunter', 'Aleph', { autoEquip: true });
+  const b = sim.addPlayer('mage', 'Bet', { autoEquip: true });
+  const move = (pid: number, x: number, z: number): void => {
+    const e = sim.entities.get(pid) as AnyEntity;
+    e.pos = { x, y: groundHeight(x, z, sim.cfg.seed), z };
+    e.prevPos = { ...e.pos };
+    sim.rebucket(e);
+  };
+  move(a, 0, -40);
+  move(b, 4, -40); // adjacent: within duel-request range
+  sim.duelRequest(b, a);
+  sim.duelAccept(b);
+  for (let i = 0; i < 20 * 4; i++) {
+    sim.tick(); // run the countdown out so the bout flips to 'active'
+    if (sim.duels.get(a)?.state === 'active') break;
+  }
+  return { sim, a, b };
+}
+
 describe('pet_ai module (P1a) — direct unit tests', () => {
   it('updatePet despawns a pet whose owner is no longer a tracked player', () => {
     const { sim, pid } = world();
@@ -99,6 +141,7 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     owner.autoAttack = false;
     const meta = sim.meta(pid)!;
     meta.lastActiveTick = sim.tickCount; // active: the aggressive auto-pull gate is open
+    syncGrid(sim); // the grid, not the entity map, is now the scan source
     expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(target.id);
     meta.lastActiveTick = sim.tickCount - 100000; // idle: a non-engaging hostile is left alone
     expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
@@ -161,5 +204,163 @@ describe('pet proximity pull: a pet drags idle wild mobs like its owner', () => 
     updatePet(sim.ctx, pet);
     expect(mob.aggroTargetId).toBe(pet.id);
     expect(mob.aiState).not.toBe('idle');
+  });
+});
+
+// petPickTarget now iterates the spatial grid within PET_ASSIST_RANGE instead of the
+// whole entity roster (a CPU hot path at scale). These pin that the grid path preserves
+// the exact selection contract (nearest valid hostile, strict-`<` boundary, mode ranges,
+// all entity kinds) and that the one observable difference, iteration order on an exact
+// distance tie, is deterministic.
+describe('petPickTarget: grid scan preserves the selection contract', () => {
+  const PET_ASSIST_RANGE = 50; // mirrors the module constant (how far the pet scans)
+  const PET_AGGRESSIVE_RANGE = 18; // aggressive pets pull idle enemies within this
+
+  it('selects the nearest valid hostile inside range (grid path == old full scan)', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'defensive';
+    const [near, far] = wildHostile2(sim, [pet.id]);
+    isolate(sim, [pid, pet.id, near.id, far.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(near, 10, 0); // 10yd
+    place(far, 30, 0); // 30yd: also a valid candidate, but farther
+    near.aggroTargetId = owner.id; // both engage the owner (defensive admit path)
+    far.aggroTargetId = owner.id;
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(near.id);
+  });
+
+  it('resolves an exact-distance tie deterministically to the lower-cell (west) candidate', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'defensive';
+    const [west, east] = wildHostile2(sim, [pet.id]);
+    isolate(sim, [pid, pet.id, west.id, east.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(west, -10, 0); // d = 10, grid cell cx = -1 (scanned first)
+    place(east, 10, 0); // d = 10, grid cell cx = 0 (scanned after west)
+    west.aggroTargetId = owner.id;
+    east.aggroTargetId = owner.id;
+    expect(dist2d(pet.pos, west.pos)).toBe(dist2d(pet.pos, east.pos)); // a genuine tie
+    syncGrid(sim);
+    // strict `d < bestD` keeps the FIRST candidate seen at the tie distance; the grid
+    // scans cells in ascending cx, so the lower-x (west) candidate wins. Pinned because
+    // a change to iteration order here reorders downstream combat rng draws (parity).
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(west.id);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(west.id); // stable across calls
+  });
+
+  it('does NOT select a hostile at exactly PET_ASSIST_RANGE (strict `<` excludes the boundary)', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'defensive';
+    const edge = wildHostile(sim, [pet.id]);
+    isolate(sim, [pid, pet.id, edge.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(edge, PET_ASSIST_RANGE, 0); // exactly 50yd: d < 50 is false
+    edge.aggroTargetId = owner.id;
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+    // control: one yard inside the boundary IS selected (proves it is the boundary,
+    // not a blanket miss of the whole query)
+    place(edge, PET_ASSIST_RANGE - 1, 0);
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(edge.id);
+  });
+
+  it('aggressive mode leaves a non-engaging hostile beyond PET_AGGRESSIVE_RANGE alone', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'aggressive';
+    const mob = wildHostile(sim, [pet.id]);
+    isolate(sim, [pid, pet.id, mob.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(mob, 30, 0); // inside the 50yd grid query, but beyond PET_AGGRESSIVE_RANGE (18)
+    mob.aggroTargetId = null; // not engaging owner or pet
+    owner.targetId = null;
+    owner.autoAttack = false;
+    const meta = sim.meta(pid)!;
+    meta.lastActiveTick = sim.tickCount; // active: the aggressive gate is open
+    syncGrid(sim);
+    // the wider superset radius (50) surfaces this mob, but the `aggressive` predicate
+    // (d <= 18) re-rejects it, exactly as the old bestD-clamped scan did.
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+    // control: inside PET_AGGRESSIVE_RANGE it IS auto-pulled
+    place(mob, PET_AGGRESSIVE_RANGE - 3, 0);
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(mob.id);
+  });
+
+  it('selects a hostile PLAYER in PvP (the grid holds every kind; no mob-only restriction)', () => {
+    const { sim, a, b } = startedDuelHunter();
+    expect(sim.duels.get(a)?.state).toBe('active');
+    const owner = sim.entities.get(a) as AnyEntity;
+    const enemy = sim.entities.get(b) as AnyEntity;
+    const pet = adopt(sim, a); // the hunter's pet
+    pet.petMode = 'defensive';
+    expect(sim.isHostileTo(pet, enemy)).toBe(true); // pet inherits owner PvP hostility
+    isolate(sim, [a, b, pet.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(enemy, 10, 0);
+    owner.targetId = enemy.id;
+    owner.autoAttack = true; // ownerOffense admits the enemy player (kind is not 'mob')
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(b);
+  });
+
+  it('centers the radius query on the PET, not the owner', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'defensive';
+    const mob = wildHostile(sim, [pet.id]);
+    isolate(sim, [pid, pet.id, mob.id]);
+    place(owner, 0, 0);
+    place(pet, 100, 0); // pet far from the owner (petPickTarget itself has no leash gate)
+    place(mob, 103, 0); // 3yd from the PET, but 103yd from the owner
+    mob.aggroTargetId = owner.id; // engagingUs admit
+    syncGrid(sim);
+    // The mob is well outside a 50yd query centered on the owner; it is selected only
+    // because the scan is centered on pet.pos. Guards against a pet.pos -> owner.pos slip.
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(mob.id);
+  });
+
+  it('skips a dead hostile (corpse) even when it is the nearest candidate', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'defensive';
+    const [corpse, live] = wildHostile2(sim, [pet.id]);
+    isolate(sim, [pid, pet.id, corpse.id, live.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(corpse, 5, 0); // nearest, but dead: the `m.dead` guard must skip it
+    place(live, 10, 0); // farther, alive: the real pick
+    corpse.aggroTargetId = owner.id;
+    corpse.dead = true;
+    live.aggroTargetId = owner.id;
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(live.id);
+  });
+
+  it('admits via ownerOffense on the owner-threat disjunct (owner not auto-attacking)', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    pet.petMode = 'defensive';
+    const mob = wildHostile(sim, [pet.id]);
+    isolate(sim, [pid, pet.id, mob.id]);
+    place(owner, 0, 0);
+    place(pet, 0, 0);
+    place(mob, 12, 0);
+    mob.aggroTargetId = null; // engagingUs is false
+    owner.targetId = mob.id;
+    owner.autoAttack = false; // the autoAttack disjunct is closed...
+    mob.threat.set(owner.id, 1); // ...so admission must ride the owner-threat disjunct
+    syncGrid(sim);
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(mob.id);
   });
 });

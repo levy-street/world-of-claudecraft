@@ -42,6 +42,7 @@ import {
   DEMON_HEAL_CAST_ID,
   DT,
   dist2d,
+  FACING_HOLD_DIST,
   FISHING_CAST_ID,
   MELEE_ARC,
   MELEE_RANGE,
@@ -201,6 +202,30 @@ export function castAbility(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  // Hodric's Gauntlet is legs-only: no ability may fire during a race, so
+  // speed buffs, travel forms, and mounts can never decide it (fairness by
+  // construction; run speed is identical for every racer). Gated here, the
+  // single choke point every cast entry point (castSlot, /cast, ground-target)
+  // funnels through, rather than on one wrapper a sibling entry could bypass.
+  const hcMatch = ctx.hcMatches.get(p.id);
+  if (hcMatch && hcMatch.state !== 'over') {
+    ctx.error(p.id, 'Legs only in the Gauntlet: abilities are barred.');
+    return;
+  }
+  // The Gauntlet event runs under the same law (and the same registered
+  // string): a live contestant may not cast from staging through the podium,
+  // so movement abilities can never cheat a red light or the staging hold.
+  // Knocked-out spectators are free again.
+  const gauntletRun = ctx.gauntletRuns.find((run) => run.playerStates.has(p.id));
+  if (
+    gauntletRun &&
+    gauntletRun.phase !== 'lobby' &&
+    gauntletRun.phase !== 'done' &&
+    !gauntletRun.playerStates.get(p.id)?.spectating
+  ) {
+    ctx.error(p.id, 'Legs only in the Gauntlet: abilities are barred.');
+    return;
+  }
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res || p.dead) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
@@ -335,8 +360,12 @@ export function castAbility(
           ctx.error(p.id, 'You must wield a dagger.');
           return;
         }
+        // Inside FACING_HOLD_DIST the target's facing is held steady (see
+        // steadyAngleTo) and "behind" is undefined anyway, so overlapping the
+        // target always reads as in front: no point-blank Backstab through a
+        // frozen facing.
         const behindDiff = Math.abs(normAngle(angleTo(target.pos, p.pos) - target.facing));
-        if (behindDiff < Math.PI / 2) {
+        if (behindDiff < Math.PI / 2 || dist2d(target.pos, p.pos) < FACING_HOLD_DIST) {
           ctx.error(p.id, 'You must be behind your target.');
           return;
         }
@@ -349,7 +378,8 @@ export function castAbility(
           if (
             fam === 'undead' ||
             target.templateId === 'gorrak' ||
-            MOBS[target.templateId]?.ccImmune
+            MOBS[target.templateId]?.ccImmune ||
+            target.ccImmune
           ) {
             ctx.error(p.id, 'This creature cannot be polymorphed.');
             return;
@@ -459,6 +489,11 @@ export function castAbility(
       ability: ability.id,
       time: channelDuration,
     });
+    // A channel never reaches applyAbility (its ticks resolve in updateCasting),
+    // so 'spellCast' set procs (Clearcasting) roll HERE, once per channel start.
+    // Gated on setProcs inside applySetProcs, so proc-less players draw no rng.
+    if (p.kind === 'player' && ability.school !== 'physical')
+      ctx.applySetProcs(p, target ?? null, 'spellCast');
     return;
   }
 
@@ -705,6 +740,9 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     spendAbilityCost(p, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.runEffects(p, meta, target, res);
+    // 'spellCast' means SPELLS: a physical friendly ability never rolls.
+    if (p.kind === 'player' && ability.school !== 'physical')
+      ctx.applySetProcs(p, target, 'spellCast');
     return;
   }
 
@@ -751,10 +789,19 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       }
       ctx.runEffects(src, meta, tgt, res);
     });
+    // 'spellCast' set procs (Clearcasting) roll at CAST COMPLETION, matching the
+    // trigger name: the cast is done even though the bolt is still in flight (a
+    // resisted or fizzled bolt was still a cast). Physical projectile shots
+    // (hunter Aimed / Concussive) are not spells and never roll.
+    if (p.kind === 'player' && isSpell) ctx.applySetProcs(p, target, 'spellCast');
     return;
   }
 
   spendAbilityCost(p, res);
   armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
   ctx.runEffects(p, meta, target, res);
+  // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
+  // cloth-capable druid) and toggle-offs fall through here and must not roll.
+  if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)
+    ctx.applySetProcs(p, target, 'spellCast');
 }

@@ -6,6 +6,7 @@ import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i1
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES } from '../src/sim/data';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -63,6 +64,7 @@ const locales: Record<string, any> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,
@@ -871,7 +873,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/lifecycle.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/heroic_vendor.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
+    // The Gauntlet join guards + "full" error emit (return-literals + ctx.error);
+    // the light/phase/poof events are text-free SimEvents. modes.ts adds the three
+    // join modes' queue/spectate status notices + guards (ctx.notice / ctx.error).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/gauntlet/runs.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/gauntlet/modes.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
     // DL1: Drowned Litany boss/rite/rooms emit surfaces.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_boss.ts'), 'utf8'),
@@ -904,6 +912,12 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // #1121: per-player node harvest command denials (dead gate, unknown node,
     // range, respawn timer, bag-full pre-check).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/gathering.ts'), 'utf8'),
+    // The Proving Grounds hub: the two portal teleport log lines (enter/leave),
+    // recognized by hud.ts localizeSystemText (hudChrome.hub.enter/leave).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/minigame_hub.ts'), 'utf8'),
+    // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
+    // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
     socialSrc,
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The

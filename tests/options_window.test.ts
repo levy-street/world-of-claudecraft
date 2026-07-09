@@ -181,3 +181,130 @@ describe('options_window: stays a cold window', () => {
     expect(update.slice(0, nextMethodEnd)).not.toContain('optionsWindow');
   });
 });
+
+// The title-bar back control: every sub-view offers a one-tap return to the Game
+// Menu root (before this, mobile players had to close the window and re-open it
+// via More then Menu to get back). panelTitle() prepends it on every non-main
+// view, render() wires it centrally, and the self-rendering Performance panel
+// carries its own copy wired locally.
+describe('options_window: title-bar back control', () => {
+  const perfPanel = readFileSync(
+    new URL('../src/ui/perf_overlay_settings.ts', import.meta.url),
+    'utf8',
+  );
+  const layoutCss = readFileSync(new URL('../src/styles/layout.css', import.meta.url), 'utf8');
+
+  it('renders [data-back] on every panelTitle sub-view but not on the main menu', () => {
+    const title = painter.slice(painter.indexOf('private panelTitle(title: string): string {'));
+    const body = title.slice(0, title.indexOf('\n  }\n'));
+    // the control exists only when the open view is not the root menu
+    expect(body).toContain("this.view === 'main'");
+    expect(body).toContain('data-back');
+    // square x-btn chrome, kept in flow at the inline start via .back-btn
+    expect(body).toContain('class="x-btn back-btn"');
+    // accessible name from the existing footer-Back key (no new i18n key)
+    expect(body).toContain("t('hud.options.back')");
+  });
+
+  it('wires [data-back] centrally in render() and routes every back path to goBack()', () => {
+    expect(painter).toContain(
+      "el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());",
+    );
+    // the four footer Back buttons (settings shell, interface, bug report,
+    // keybinds) reuse the same path (no inline copies left)
+    expect(
+      painter.match(/back\.addEventListener\('click', \(\) => this\.goBack\(\)\);/g),
+    ).toHaveLength(4);
+    // the click-then-flip-to-main sequence lives ONLY in goBack itself; a stray
+    // inline copy in some handler would push this count past 1
+    expect(painter.match(/audio\.click\(\);\s*this\.view = 'main';/g) ?? []).toHaveLength(1);
+  });
+
+  it('goBack returns to the root without closing, drops key capture, and moves focus', () => {
+    const goBack = painter.slice(painter.indexOf('private goBack(): void {'));
+    const body = goBack.slice(0, goBack.indexOf('\n  }\n'));
+    expect(body).toContain('audio.click();');
+    expect(body).toContain("this.view = 'main';");
+    expect(body).toContain('this.capturingKey = null;');
+    expect(body).toContain("this.keybindNote = '';");
+    expect(body).toContain('this.render();');
+    // WCAG: the tapped control is destroyed by the re-render, so focus must land
+    // in the re-rendered menu rather than falling to <body>.
+    expect(body).toContain('this.deps.focusFirstInteractive(this.deps.root());');
+    expect(body).not.toContain('this.close()');
+  });
+
+  it('the Performance panel carries the same control, wired locally (it rerenders itself)', () => {
+    // host plumbing: icon in, navigation out (routed to the shared goBack)
+    expect(painter).toContain("backIconHtml: svgIcon('prev'),");
+    expect(painter).toContain('onBack: () => this.goBack(),');
+    const title = perfPanel.slice(perfPanel.indexOf('private buildTitle(): HTMLElement {'));
+    const body = title.slice(0, title.indexOf('\n  }\n'));
+    expect(body).toContain("back.className = 'x-btn back-btn';");
+    expect(body).toContain("back.addEventListener('click', () => this.host.onBack());");
+    // NO data-back attribute: the central sweep would double-wire the first render
+    expect(body).not.toContain("setAttribute('data-back'");
+    // back sits before the title text, close after it
+    expect(body).toContain('title.append(back, label, close);');
+  });
+
+  it('keeps the back control in flow at the inline start (not the x-btn absolute pin)', () => {
+    const rule =
+      layoutCss.match(/\.window > \.panel-title > \.x-btn\.back-btn \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toContain('position: static;');
+    expect(rule).toContain('transform: none;');
+  });
+});
+
+describe('options_window: uiScale slider commits on release (#1558)', () => {
+  it('the shared commit closure applies the setting from the raw slider value', () => {
+    const commit = painter.slice(painter.indexOf('const commit = () => {'));
+    const body = commit.slice(0, commit.indexOf('};'));
+    expect(body).toContain('hooks.onSettingChange(key, sliderDispatchValue(slider.value))');
+    expect(body).toContain('syncReadout();');
+  });
+
+  it('a commit-on-change slider commits only on change, previewing readout on input', () => {
+    // Isolate the settingSlider commit-on-change branch.
+    const fn = painter.slice(painter.indexOf('if (c.commitOnChange) {'));
+    const branch = fn.slice(0, fn.indexOf('} else {'));
+    // input previews only (readout + fill), and must NOT commit the setting.
+    const inputHandler = branch.slice(
+      branch.indexOf("addEventListener('input'"),
+      branch.indexOf("addEventListener('change'"),
+    );
+    expect(inputHandler).toContain('readoutFromSlider();');
+    expect(inputHandler).not.toContain('onSettingChange');
+    expect(inputHandler).not.toContain('commit');
+    // change (release / keyboard step) commits, via the shared closure.
+    const changeHandler = branch.slice(branch.indexOf("addEventListener('change'"));
+    expect(changeHandler).toContain("addEventListener('change', commit)");
+  });
+
+  it('a normal slider still commits live on input, via the shared closure', () => {
+    const elseArm = painter.slice(
+      painter.indexOf('} else {', painter.indexOf('if (c.commitOnChange) {')),
+    );
+    expect(elseArm.slice(0, elseArm.indexOf('\n    }'))).toContain(
+      "addEventListener('input', commit)",
+    );
+  });
+});
+
+describe('options_window: settings shows the running version (#1541)', () => {
+  it('renders the version + build id from the shared app_version source', () => {
+    // Reuse the single build source, not a re-declared __APP_* global.
+    expect(painter).toContain("import { appVersionInfo } from './app_version'");
+    expect(painter).toContain('appVersionInfo()');
+  });
+
+  it('paints the version as a t() label in the main menu (renderMain)', () => {
+    const renderMain = painter.slice(painter.indexOf('private renderMain(): void {'));
+    const body = renderMain.slice(0, renderMain.indexOf('\n  }\n'));
+    // The label is an i18n key with version+build passed as values (no concat).
+    expect(body).toContain("t('hudChrome.options.version', { version, build })");
+    // Rendered as the .opt-version secondary line appended after the button list.
+    expect(body).toContain("'opt-version'");
+    expect(body.indexOf("'opt-version'")).toBeGreaterThan(body.indexOf('el.appendChild(list)'));
+  });
+});

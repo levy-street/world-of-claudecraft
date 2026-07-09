@@ -8,6 +8,7 @@ function buildView(): void {
       <div class="desktop-download-actions">
         <a class="desktop-download-link" data-platform="mac" href="#">mac</a>
         <a class="desktop-download-link" data-platform="linux" href="#">linux</a>
+        <a class="desktop-download-link" data-platform="win" href="#">win</a>
       </div>
       <p class="desktop-download-hint" data-platform-hint="linux" hidden>hint</p>
     </section>`;
@@ -20,27 +21,30 @@ function setUserAgent(ua: string): void {
 describe('initDesktopDownload', () => {
   beforeEach(buildView);
 
-  it('syncs published buttons and disables unavailable buttons', () => {
+  it('syncs each button href to the versioned artifact URL', () => {
     setUserAgent('Mozilla/5.0 (X11; Linux x86_64)');
     initDesktopDownload(document);
     const mac = document.querySelector('[data-platform="mac"]') as HTMLAnchorElement;
     const linux = document.querySelector('[data-platform="linux"]') as HTMLAnchorElement;
     expect(mac.href).toBe(desktopDownloadUrl('mac'));
-    expect(linux.hasAttribute('href')).toBe(false);
-    expect(linux.getAttribute('aria-disabled')).toBe('true');
-    expect(linux.classList.contains('is-unavailable')).toBe(true);
+    expect(linux.href).toBe(desktopDownloadUrl('linux'));
+    expect(linux.getAttribute('aria-disabled')).toBe('false');
+    expect(linux.classList.contains('is-unavailable')).toBe(false);
+    const win = document.querySelector('[data-platform="win"]') as HTMLAnchorElement;
+    expect(win.hasAttribute('href')).toBe(false);
+    expect(win.getAttribute('aria-disabled')).toBe('true');
+    expect(win.classList.contains('is-unavailable')).toBe(true);
   });
 
-  it('does not highlight or float Linux while its download is unavailable', () => {
+  it('highlights and floats the visitor OS button first, and reveals its hint', () => {
     setUserAgent('Mozilla/5.0 (X11; Linux x86_64) Chrome/125');
     initDesktopDownload(document);
     const actions = document.querySelector('.desktop-download-actions') as HTMLElement;
     const first = actions.firstElementChild as HTMLElement;
-    expect(first.dataset.platform).toBe('mac');
-    const linux = document.querySelector('[data-platform="linux"]') as HTMLElement;
-    expect(linux.classList.contains('is-detected')).toBe(false);
+    expect(first.dataset.platform).toBe('linux');
+    expect(first.classList.contains('is-detected')).toBe(true);
     const hint = document.querySelector('.desktop-download-hint') as HTMLElement;
-    expect(hint.hidden).toBe(true);
+    expect(hint.hidden).toBe(false);
   });
 
   it('keeps the Linux hint hidden for non-Linux visitors and highlights their OS', () => {

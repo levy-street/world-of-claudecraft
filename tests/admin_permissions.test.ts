@@ -11,6 +11,7 @@ import {
   SUPERADMIN_ROLE,
   sanitizeRoles,
 } from '../server/admin_permissions';
+import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from '../server/auth';
 import { en } from '../src/admin/i18n.en';
 import { ADMIN_PERMISSIONS as CLIENT_ADMIN_PERMISSIONS } from '../src/admin/permissions';
 
@@ -140,6 +141,8 @@ describe('new admin error strings reverse-map', () => {
     'error.staffSuperadmin': 'superadmin roles are managed via the grant script',
     'error.staffSelfEdit': 'you cannot change your own roles',
     'error.methodNotAllowed': 'method not allowed',
+    'error.resetPasswordStaff': 'only a superadmin can reset a staff password',
+    'error.resetPasswordFailed': 'password reset failed',
   };
 
   it('matches the en catalog and the server emit sites byte for byte', () => {
@@ -148,5 +151,18 @@ describe('new admin error strings reverse-map', () => {
       expect(en[key as keyof typeof en], key).toBe(literal);
       expect(adminSource.includes(`'${literal}'`), `server/admin.ts emits "${literal}"`).toBe(true);
     }
+  });
+
+  // The password-length errors are template literals server-side, so pin the
+  // baked-number catalog values (and their reverse-map keys) to the auth bounds:
+  // changing MIN/MAX_PASSWORD_LENGTH without updating these would silently drop
+  // the localization back to raw English.
+  it('keeps the password-length reverse-map literals in sync with the auth bounds', () => {
+    expect(en['error.passwordTooShort']).toBe(
+      `password must be at least ${MIN_PASSWORD_LENGTH} chars`,
+    );
+    expect(en['error.passwordTooLong']).toBe(
+      `password must be at most ${MAX_PASSWORD_LENGTH} chars`,
+    );
   });
 });

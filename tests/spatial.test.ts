@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { SpatialGrid } from '../src/sim/spatial';
-import { Entity, dist2d } from '../src/sim/types';
+import { dist2d, Entity } from '../src/sim/types';
 
 function bruteForceInRadius(sim: Sim, x: number, z: number, radius: number): Set<number> {
   const out = new Set<number>();
@@ -58,14 +58,35 @@ describe('spatial grid', () => {
   it('player combat flag matches per-player scan semantics', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
     const p = sim.entities.get(sim.primaryId)!;
-    // walk the player into a camp until something aggroes
+    // Park the player right next to the nearest hostile camp mob and let it
+    // aggro, rather than wandering forward from spawn (which can walk straight
+    // into the minigame-hub portal and teleport away before finding a camp).
+    // The invariant under test is that p.inCombat tracks a real aggro from the
+    // end-of-tick engagedPids scan, not the spawn-area navigation path.
+    let target: Entity | undefined;
+    let best = Number.POSITIVE_INFINITY;
+    for (const e of sim.entities.values()) {
+      if (e.kind === 'mob' && !e.dead && e.hostile) {
+        const d = dist2d(p.pos, e.pos);
+        if (d < best) {
+          best = d;
+          target = e;
+        }
+      }
+    }
+    expect(target, 'expected at least one hostile camp mob in the world').toBeTruthy();
+    p.pos = { x: target!.pos.x + 1, y: target!.pos.y, z: target!.pos.z + 1 };
+    p.prevPos = { ...p.pos };
     let aggroed = false;
-    for (let i = 0; i < 4000 && !aggroed; i++) {
-      const meta = sim.players.get(sim.primaryId)!;
-      meta.moveInput.forward = true;
+    for (let i = 0; i < 400 && !aggroed; i++) {
       sim.tick();
       for (const e of sim.entities.values()) {
-        if (e.kind === 'mob' && !e.dead && (e.aiState === 'chase' || e.aiState === 'attack') && e.aggroTargetId === p.id) {
+        if (
+          e.kind === 'mob' &&
+          !e.dead &&
+          (e.aiState === 'chase' || e.aiState === 'attack') &&
+          e.aggroTargetId === p.id
+        ) {
           aggroed = true;
         }
       }

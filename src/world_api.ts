@@ -39,6 +39,11 @@
 //   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (#1164; node
 //                                            harvest read + action landed in #1121; recipe
 //                                            content + basic crafting action landed in #1127)
+//   gauntlet.ts         IWorldGauntlet       The Gauntlet survival event (join/leave + run view)
+//   hodrics.ts          IWorldHodrics        Hodric's Castle Gauntlet race queue + live view
+//   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
+//                                            deposit/withdraw/buy-slots)
+//   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -51,6 +56,7 @@
 //                                          union of the facets.
 // ---------------------------------------------------------------------------
 
+import type { IWorldBank } from './world_api/bank';
 import type { IWorldChat } from './world_api/chat';
 import type { IWorldCombat } from './world_api/combat';
 import type { IWorldCosmetics } from './world_api/cosmetics';
@@ -59,6 +65,8 @@ import type { IWorldDelves } from './world_api/delves';
 import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
+import type { IWorldGauntlet } from './world_api/gauntlet';
+import type { IWorldHodrics } from './world_api/hodrics';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
@@ -74,6 +82,7 @@ import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
+import type { IWorldValeCup } from './world_api/vale_cup';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 export type {
@@ -84,6 +93,7 @@ export type {
 export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from './sim/types';
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
+export type { BankBonusSource, BankInfo } from './world_api/bank';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
@@ -114,6 +124,13 @@ export type {
   FiestaScoreboardPlayer,
 } from './world_api/duel_arena';
 export type { RaidLockout } from './world_api/dungeons';
+export type { GauntletRunView } from './world_api/gauntlet';
+export type {
+  HcInfo,
+  HcMatchInfo,
+  HcRacerView,
+  HcStandingView,
+} from './world_api/hodrics';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
@@ -134,6 +151,17 @@ export type {
   SocialInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type {
+  CupInfo,
+  VcBetInfo,
+  VcBetRecord,
+  VcBoardEntry,
+  VcLiveMatch,
+  VcMatchInfo,
+  VcPhase,
+  VcRosterPlayer,
+  VcStanding,
+} from './world_api/vale_cup';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the
@@ -161,7 +189,11 @@ export interface IWorld
     IWorldDelves,
     IWorldDailyRewards,
     IWorldTelemetry,
-    IWorldProfessions {}
+    IWorldProfessions,
+    IWorldGauntlet,
+    IWorldHodrics,
+    IWorldBank,
+    IWorldValeCup {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -310,6 +342,29 @@ export const COMMAND_NAMES = [
   'autoloot',
   'resurrect_corpse',
   'resurrect_healer',
+  'gauntlet_join',
+  'gauntlet_queue_join',
+  'gauntlet_spectate',
+  'gauntlet_practice',
+  'gauntlet_rejoin',
+  'gauntlet_leave',
+  'hc_queue',
+  'hc_leave',
+  'gauntlet_trace',
+  'gauntlet_pull_circle',
+  'gauntlet_echo',
+  'bank_deposit',
+  'bank_withdraw',
+  'bank_buy_slots',
+  'set_town_focus',
+  'set_dungeon_difficulty',
+  'heroic_buy',
+  'vcup_queue',
+  'vcup_leave',
+  'vcup_role',
+  'vcup_ready',
+  'vcup_bet',
+  'vcup_practice',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -373,7 +428,11 @@ export type WorldFacet =
   | 'IWorldDungeons'
   | 'IWorldDelves'
   | 'IWorldDailyRewards'
-  | 'IWorldTelemetry';
+  | 'IWorldTelemetry'
+  | 'IWorldGauntlet'
+  | 'IWorldHodrics'
+  | 'IWorldBank'
+  | 'IWorldValeCup';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -456,6 +515,10 @@ export const COMMAND_FACETS = {
   arena_queue: 'IWorldDuelArena',
   arena_leave: 'IWorldDuelArena',
   arena_augment: 'IWorldDuelArena',
+  // IWorldHodrics: the Gauntlet race queue. hcInfo is a snapshot read (no send,
+  // untagged); hcPracticeStart is offline-only (never a wire command).
+  hc_queue: 'IWorldHodrics',
+  hc_leave: 'IWorldHodrics',
   // IWorldSocialGraph: friends/blocks/guild commands (online only; resolved
   // server-side by character name, handled by the #4 SocialService). socialInfo
   // arrives via the social/socialpos frames (no command); searchCharacters is a REST
@@ -494,6 +557,8 @@ export const COMMAND_FACETS = {
   // (untagged; on the DISPATCH_ONLY_COMMANDS allowlist), NOT IWorldDungeons.
   enter_dungeon: 'IWorldDungeons',
   leave_dungeon: 'IWorldDungeons',
+  set_dungeon_difficulty: 'IWorldDungeons',
+  heroic_buy: 'IWorldDungeons',
   // IWorldDelves: delve enter/leave + interact + companion upgrade + Marks-vendor buy
   // + lockpick lifecycle + chest collect. Note the wire-name skew: delveBuyShopItem
   // sends `delve_buy`, so the tag is keyed on the WIRE string `delve_buy`. The reads
@@ -510,4 +575,28 @@ export const COMMAND_FACETS = {
   lockpick_abort: 'IWorldDelves',
   collect_delve_chest_loot: 'IWorldDelves',
   delve_rite_choose: 'IWorldDelves',
+  // IWorldGauntlet: The Gauntlet survival event (join the lobby / leave the
+  // run, plus the per-trial inputs: trace, circle pull, echo tap, court shove).
+  gauntlet_join: 'IWorldGauntlet',
+  gauntlet_queue_join: 'IWorldGauntlet',
+  gauntlet_spectate: 'IWorldGauntlet',
+  gauntlet_practice: 'IWorldGauntlet',
+  gauntlet_rejoin: 'IWorldGauntlet',
+  gauntlet_leave: 'IWorldGauntlet',
+  gauntlet_trace: 'IWorldGauntlet',
+  gauntlet_pull_circle: 'IWorldGauntlet',
+  gauntlet_echo: 'IWorldGauntlet',
+  // IWorldBank: the per-character deposit box (snake_case wire strings, by design).
+  // bankInfo is a proximity-gated snapshot read (no send, untagged).
+  bank_deposit: 'IWorldBank',
+  bank_withdraw: 'IWorldBank',
+  bank_buy_slots: 'IWorldBank',
+  // IWorldValeCup: the Vale Cup boarball queue. cupInfo is a snapshot read (no
+  // send); vcup_practice starts a private instanced practice bout (online + off).
+  vcup_queue: 'IWorldValeCup',
+  vcup_leave: 'IWorldValeCup',
+  vcup_role: 'IWorldValeCup',
+  vcup_ready: 'IWorldValeCup',
+  vcup_bet: 'IWorldValeCup',
+  vcup_practice: 'IWorldValeCup',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

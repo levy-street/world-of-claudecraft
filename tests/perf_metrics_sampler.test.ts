@@ -6,15 +6,24 @@ import { createMetricsSampler, type SamplerDeps } from '../src/ui/perf_metrics_s
 function fakeRenderer(over: Partial<ReturnType<SamplerDeps['renderer']['perfStats']>> = {}) {
   return {
     perfStats: () => ({
-      calls: 120, triangles: 80_000, geometries: 40, textures: 22, programs: 9,
-      effectiveRenderScale: 0.9, glRenderer: 'FakeGPU 9000', ...over,
+      calls: 120,
+      triangles: 80_000,
+      geometries: 40,
+      textures: 22,
+      programs: 9,
+      effectiveRenderScale: 0.9,
+      glRenderer: 'FakeGPU 9000',
+      ...over,
     }),
   };
 }
 
 const fakeMeter = {
-  fps: () => 58, frameTimeMs: () => 17.2, lowFps: (pct: number) => (pct === 1 ? 48 : 41),
-  graphSamples: () => [16, 17, 18, 16], hitches: () => 2,
+  fps: () => 58,
+  frameTimeMs: () => 17.2,
+  lowFps: (pct: number) => (pct === 1 ? 48 : 41),
+  graphSamples: () => [16, 17, 18, 16],
+  hitches: () => 2,
 };
 
 function makeDeps(over: Partial<SamplerDeps> = {}): SamplerDeps {
@@ -54,32 +63,59 @@ describe('createMetricsSampler', () => {
   });
 
   it('nulls every network row when offline', () => {
-    const sample = createMetricsSampler(makeDeps({ getOnline: () => null }))();
+    const sample = createMetricsSampler(
+      makeDeps({
+        getOnline: () => null,
+        // even with an active predictor source, offline must not surface it
+        getPredLeadMs: () => 87,
+      }),
+    )();
     expect(sample.online).toBe(false);
     expect(sample.connected).toBe(true); // offline world is "connected" to itself
     expect(sample.pingMs).toBeNull();
     expect(sample.jitterMs).toBeNull();
+    expect(sample.predLeadMs).toBeNull();
     expect(sample.snapshotHz).toBeNull();
+    expect(sample.serverTickHz).toBeNull();
   });
 
   it('surfaces network rows when online with a measured echo', () => {
-    const sample = createMetricsSampler(makeDeps({
-      getOnline: () => ({ connected: true, snapInterval: 50 }),
-      getEchoMs: () => 42,
-      getJitterMs: () => 6,
-    }))();
+    const sample = createMetricsSampler(
+      makeDeps({
+        getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: 19.5 }),
+        getEchoMs: () => 42,
+        getJitterMs: () => 6,
+        getPredLeadMs: () => 87,
+      }),
+    )();
     expect(sample.online).toBe(true);
     expect(sample.connected).toBe(true);
     expect(sample.pingMs).toBe(42);
     expect(sample.jitterMs).toBe(6);
+    expect(sample.predLeadMs).toBe(87); // the sampler wires the predictor source
     expect(sample.snapshotHz).toBe(20); // 1000 / 50ms
+    expect(sample.serverTickHz).toBe(19.5);
+  });
+
+  it('nulls predLead when the predictor is inactive or the dep is absent', () => {
+    const online = {
+      getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: null }),
+    };
+    // predictor inactive (lead-smoothing fallback, ?nopredict, delve, CC)
+    const inactive = createMetricsSampler(makeDeps({ ...online, getPredLeadMs: () => null }))();
+    expect(inactive.predLeadMs).toBeNull();
+    // hosts without the predictor omit the optional dep entirely
+    const absent = createMetricsSampler(makeDeps(online))();
+    expect(absent.predLeadMs).toBeNull();
   });
 
   it('hides ping/jitter until an echo is measured (echo <= 0) but keeps snapshot', () => {
-    const sample = createMetricsSampler(makeDeps({
-      getOnline: () => ({ connected: false, snapInterval: 100 }),
-      getEchoMs: () => 0,
-    }))();
+    const sample = createMetricsSampler(
+      makeDeps({
+        getOnline: () => ({ connected: false, snapInterval: 100, serverTickHz: null }),
+        getEchoMs: () => 0,
+      }),
+    )();
     expect(sample.online).toBe(true);
     expect(sample.connected).toBe(false);
     expect(sample.pingMs).toBeNull();
@@ -87,28 +123,49 @@ describe('createMetricsSampler', () => {
     expect(sample.snapshotHz).toBe(10);
   });
 
+  it('nulls the server tick rate until the server reports one', () => {
+    const unreported = createMetricsSampler(
+      makeDeps({
+        getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: null }),
+      }),
+    )();
+    expect(unreported.serverTickHz).toBeNull();
+    const zeroed = createMetricsSampler(
+      makeDeps({
+        getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: 0 }),
+      }),
+    )();
+    expect(zeroed.serverTickHz).toBeNull();
+  });
+
   it('reports memory only when the probe returns a reading', () => {
     expect(createMetricsSampler(makeDeps({ readMemory: () => null }))().memoryUsedMb).toBeNull();
-    const withMem = createMetricsSampler(makeDeps({
-      readMemory: () => ({ usedMb: 256, limitMb: 4096 }),
-    }))();
+    const withMem = createMetricsSampler(
+      makeDeps({
+        readMemory: () => ({ usedMb: 256, limitMb: 4096 }),
+      }),
+    )();
     expect(withMem.memoryUsedMb).toBe(256);
     expect(withMem.memoryLimitMb).toBe(4096);
   });
 
   it('passes through connection type + backgrounded probes', () => {
-    const sample = createMetricsSampler(makeDeps({
-      readConnectionType: () => '4g',
-      isBackgrounded: () => true,
-    }))();
+    const sample = createMetricsSampler(
+      makeDeps({
+        readConnectionType: () => '4g',
+        isBackgrounded: () => true,
+      }),
+    )();
     expect(sample.connectionType).toBe('4g');
     expect(sample.backgrounded).toBe(true);
   });
 
   it('nulls renderScale + gpu when the renderer omits them', () => {
-    const sample = createMetricsSampler(makeDeps({
-      renderer: fakeRenderer({ effectiveRenderScale: null, glRenderer: null }),
-    }))();
+    const sample = createMetricsSampler(
+      makeDeps({
+        renderer: fakeRenderer({ effectiveRenderScale: null, glRenderer: null }),
+      }),
+    )();
     expect(sample.renderScale).toBeNull();
     expect(sample.gpu).toBeNull();
   });

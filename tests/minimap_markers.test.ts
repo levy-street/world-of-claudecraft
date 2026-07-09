@@ -10,9 +10,14 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { QUESTS } from '../src/sim/data';
+import { MINIGAME_HUB, QUESTS } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
-import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
+import {
+  createMinimapMarkers,
+  MINIGAME_HUB_ZONE_ID,
+  type MinimapMarker,
+  minimapMode,
+} from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
 import { assertAllocationStable } from './util/alloc_probe';
 
@@ -127,9 +132,20 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
       player: { pos: { x: number } };
       delveRun: unknown;
     };
-    w.player.pos.x = 100000; // a delve-band x
-    w.delveRun = { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 100000, z: 0 } };
+    // A real delve-band x: the band is no longer open-ended east. It sits west
+    // of both the Protect Yumi maze band (YUMI_BAND_X_MIN = 8000) and The
+    // Gauntlet band (GAUNTLET_BAND_X_MIN = 8800), so the old open-ended 100000
+    // probe now classifies as a neighbouring band. 5000 is comfortably inside
+    // the delve band regardless of which band caps its east edge.
+    w.player.pos.x = 5000;
+    w.delveRun = { delveId: 'd', modules: ['m'], moduleIndex: 0, origin: { x: 5000, z: 0 } };
     expect(minimapMode(w as unknown as IWorld)).toBe('delve');
+  });
+
+  it('returns yumiMaze anywhere in the Protect Yumi band, run or not', () => {
+    const w = makeWorld('client') as unknown as { player: { pos: { x: number } } };
+    w.player.pos.x = 8400;
+    expect(minimapMode(w as unknown as IWorld)).toBe('yumiMaze');
   });
 });
 
@@ -224,6 +240,19 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     const model = createMinimapMarkers().build(makeWorld('sim'), S, PPY);
     expect(typeof model.zoneId).toBe('string');
     expect(model.zoneId.length).toBeGreaterThan(0);
+  });
+
+  it('emits the Proving Grounds sentinel zone id inside the hub band', () => {
+    const w = makeWorld('sim') as unknown as { player: { pos: { x: number } } };
+    // an overworld position uses the real z-band zone; inside the hub band the
+    // label switches to the venue sentinel (painter maps it to the venue name).
+    expect(createMinimapMarkers().build(w as unknown as IWorld, S, PPY).zoneId).not.toBe(
+      MINIGAME_HUB_ZONE_ID,
+    );
+    w.player.pos.x = MINIGAME_HUB.x;
+    expect(createMinimapMarkers().build(w as unknown as IWorld, S, PPY).zoneId).toBe(
+      MINIGAME_HUB_ZONE_ID,
+    );
   });
 });
 

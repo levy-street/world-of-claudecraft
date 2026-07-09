@@ -34,7 +34,13 @@ export class GameAudio {
     }
   }
 
-  private noise(duration: number, filterFreq: number, gain: number, decay = 0.9, filterType: BiquadFilterType = 'lowpass'): void {
+  private noise(
+    duration: number,
+    filterFreq: number,
+    gain: number,
+    decay = 0.9,
+    filterType: BiquadFilterType = 'lowpass',
+  ): void {
     if (!this.ctx || !this.master || !this.noiseBuf) return;
     const t = this.ctx.currentTime;
     const src = this.ctx.createBufferSource();
@@ -50,7 +56,14 @@ export class GameAudio {
     src.start(t, Math.random() * 0.5, duration);
   }
 
-  private tone(freq: number, duration: number, gain: number, type: OscillatorType = 'sine', delay = 0, slideTo?: number): void {
+  private tone(
+    freq: number,
+    duration: number,
+    gain: number,
+    type: OscillatorType = 'sine',
+    delay = 0,
+    slideTo?: number,
+  ): void {
     if (!this.ctx || !this.master) return;
     const t = this.ctx.currentTime + delay;
     const osc = this.ctx.createOscillator();
@@ -103,7 +116,9 @@ export class GameAudio {
 
   levelUp(): void {
     const notes = [392, 523, 659, 784, 1046];
-    notes.forEach((f, i) => this.tone(f, 0.5, 0.18, 'triangle', i * 0.09));
+    notes.forEach((f, i) => {
+      this.tone(f, 0.5, 0.18, 'triangle', i * 0.09);
+    });
     this.noise(0.8, 5000, 0.06, 0.95, 'highpass');
   }
 
@@ -113,7 +128,9 @@ export class GameAudio {
   }
 
   questDone(): void {
-    [523, 659, 784].forEach((f, i) => this.tone(f, 0.35, 0.16, 'triangle', i * 0.12));
+    [523, 659, 784].forEach((f, i) => {
+      this.tone(f, 0.35, 0.16, 'triangle', i * 0.12);
+    });
   }
 
   coin(): void {
@@ -136,11 +153,15 @@ export class GameAudio {
   }
 
   drink(): void {
-    [0, 0.25, 0.5].forEach((d) => this.tone(420 + Math.random() * 80, 0.12, 0.08, 'sine', d, 280));
+    [0, 0.25, 0.5].forEach((d) => {
+      this.tone(420 + Math.random() * 80, 0.12, 0.08, 'sine', d, 280);
+    });
   }
 
   eat(): void {
-    [0, 0.3].forEach((d) => this.noise(0.1, 800, 0.1, 0.8, 'bandpass'));
+    [0, 0.3].forEach(() => {
+      this.noise(0.1, 800, 0.1, 0.8, 'bandpass');
+    });
   }
 
   click(): void {
@@ -200,7 +221,10 @@ export class GameAudio {
     const base = [523, 587, 659, 784][Math.min(3, tier)];
     this.tone(base, 0.16, 0.2, 'square');
     this.tone(base * 1.5, 0.22, 0.16, 'triangle', 0.05);
-    if (tier >= 2) { this.tone(base * 2, 0.3, 0.14, 'triangle', 0.1); this.noise(0.35, 5200, 0.1, 0.7, 'highpass'); }
+    if (tier >= 2) {
+      this.tone(base * 2, 0.3, 0.14, 'triangle', 0.1);
+      this.noise(0.35, 5200, 0.1, 0.7, 'highpass');
+    }
   }
 
   // Your team scored a point — quick, satisfying blip (higher when it's yours).
@@ -211,7 +235,9 @@ export class GameAudio {
 
   // A new augment wave drops: triumphant rising fanfare — the party escalates.
   fiestaWave(): void {
-    [523, 659, 784, 1046].forEach((f, i) => this.tone(f, 0.4, 0.18, 'triangle', i * 0.08));
+    [523, 659, 784, 1046].forEach((f, i) => {
+      this.tone(f, 0.4, 0.18, 'triangle', i * 0.08);
+    });
     this.noise(0.6, 5000, 0.08, 0.9, 'highpass');
   }
 
@@ -231,6 +257,75 @@ export class GameAudio {
   fiestaRevive(): void {
     this.tone(523, 0.12, 0.14, 'triangle', 0, 784);
     this.tone(784, 0.18, 0.12, 'triangle', 0.08);
+  }
+
+  // ---- The Gauntlet: survival-event cues ----------------------------------
+
+  // A playful marching counting-song jingle that fills exactly `seconds` (clamped
+  // to a sane 0.5..8s): a short major-pentatonic motif repeated across the window
+  // with the gaps shrinking toward the end, so it accelerates into the classic
+  // red-light-green-light tension. Notes are scheduled by delay across the window.
+  gauntletChant(seconds: number): void {
+    const total = Math.min(8, Math.max(0.5, seconds));
+    const motif = [523, 587, 659, 587, 523, 659, 784, 659]; // C D E D C E G E
+    const count = Math.max(6, Math.round(total * 4));
+    // shrinking gaps (1.0 down to 0.45), then normalised so they sum to `total`
+    let sum = 0;
+    const gaps: number[] = [];
+    for (let i = 0; i < count; i++) {
+      const g = 1 - 0.55 * (i / (count - 1));
+      gaps.push(g);
+      sum += g;
+    }
+    const scale = total / sum;
+    let t = 0;
+    for (let i = 0; i < count; i++) {
+      const bright = i / count > 0.7; // the accelerating tail turns brighter
+      this.tone(
+        motif[i % motif.length],
+        Math.min(0.22, scale * gaps[i] * 0.9),
+        bright ? 0.16 : 0.13,
+        bright ? 'square' : 'triangle',
+        t,
+      );
+      t += scale * gaps[i];
+    }
+  }
+
+  // Sharp two-note "STOP" stop cue: a dissonant tritone clash + a short bite,
+  // under 0.5s.
+  gauntletRedStinger(): void {
+    this.tone(440, 0.18, 0.2, 'square'); // A4
+    this.tone(622, 0.22, 0.18, 'sawtooth', 0.04); // ~D#5, a tritone above
+    this.noise(0.12, 1600, 0.1, 0.7, 'bandpass');
+  }
+
+  // A soft comedic knockout puff: an airy filtered noise burst + a quick downward
+  // blip, clearly non-violent (no impact thud).
+  gauntletPoof(): void {
+    this.noise(0.22, 1200, 0.14, 0.7, 'bandpass');
+    this.tone(520, 0.18, 0.1, 'sine', 0, 240); // gentle downward slide
+  }
+
+  // A small metronome tick for a later trial; the downbeat is accented.
+  gauntletBeat(strong: boolean): void {
+    this.tone(strong ? 1200 : 900, 0.05, strong ? 0.14 : 0.09, 'square');
+  }
+
+  // A glassy shatter cue for a later trial: a bright noise crack + descending
+  // shards.
+  gauntletShatter(): void {
+    this.noise(0.3, 6000, 0.16, 0.6, 'highpass');
+    this.tone(2100, 0.18, 0.1, 'triangle', 0, 900);
+    this.tone(1500, 0.22, 0.08, 'triangle', 0.06, 600);
+  }
+
+  // A short triumphant rising fanfare for the podium win.
+  gauntletFanfare(): void {
+    [523, 659, 784, 1046].forEach((f, i) => {
+      this.tone(f, 0.4, 0.18, 'triangle', i * 0.12);
+    });
+    this.noise(0.5, 5000, 0.06, 0.9, 'highpass');
   }
 }
 

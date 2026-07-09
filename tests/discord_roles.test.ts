@@ -6,6 +6,7 @@ import {
   specialRoleColor,
   topSpecialRole,
 } from '../src/sim/discord_roles';
+import { discordRoleTagKey } from '../src/ui/discord_role_tag';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 describe('discord special roles - guild role name matching', () => {
@@ -36,6 +37,15 @@ describe('discord special roles - guild role name matching', () => {
     expect(specialRoleByName('artist')?.key).toBe('artists');
   });
 
+  it('resolves the Core Dev guild role to its own key, distinct from Devs', () => {
+    expect(specialRoleByName('Core Dev')?.key).toBe('coredevs');
+    expect(specialRoleByName('core dev')?.key).toBe('coredevs');
+    expect(specialRoleByName('Core Devs')?.key).toBe('coredevs');
+    expect(specialRoleByName('Core Developer')?.key).toBe('coredevs');
+    // Core Dev is a separate Discord role, not an alias that collapses into Devs.
+    expect(specialRoleByName('Core Dev')?.key).not.toBe('devs');
+  });
+
   it('resolves common aliases for the other staff roles', () => {
     expect(specialRoleByName('Levy Street')?.key).toBe('levyst');
     expect(specialRoleByName('Dev')?.key).toBe('devs');
@@ -61,11 +71,28 @@ describe('discord special roles - priority', () => {
     expect(admin!.priority).toBeGreaterThan(devs!.priority);
   });
 
+  it('ranks core dev above devs and below admin', () => {
+    const admin = specialRoleByKey('admin');
+    const coredevs = specialRoleByKey('coredevs');
+    const devs = specialRoleByKey('devs');
+    expect(coredevs).toBeDefined();
+    expect(admin!.priority).toBeGreaterThan(coredevs!.priority);
+    expect(coredevs!.priority).toBeGreaterThan(devs!.priority);
+  });
+
   it('picks the top role across mixed guild role names, aliases included', () => {
     expect(topSpecialRole(['Artist', 'Admin'])?.key).toBe('admin');
     expect(topSpecialRole(['Admin', 'Levy St'])?.key).toBe('levyst');
     expect(topSpecialRole(['Member', 'Artist'])?.key).toBe('artists');
     expect(topSpecialRole(['Member', 'WoC Champion'])).toBeUndefined();
+  });
+
+  it('surfaces Core Dev over Devs, but Admin still outranks Core Dev', () => {
+    // A member who holds both Devs and Core Dev (like the founder) surfaces the
+    // higher Core Dev tag.
+    expect(topSpecialRole(['Devs', 'Core Dev'])?.key).toBe('coredevs');
+    expect(topSpecialRole(['Mods', 'Core Dev'])?.key).toBe('coredevs');
+    expect(topSpecialRole(['Core Dev', 'Admin'])?.key).toBe('admin');
   });
 
   it('keeps priorities unique so the top pick is deterministic', () => {
@@ -99,5 +126,18 @@ describe('discord special roles - catalog integrity', () => {
         names.add(lower);
       }
     }
+  });
+});
+
+describe('discord role tag labels - single source', () => {
+  it('maps every special role key to a tag label key, and only those', () => {
+    // The nameplate painter and both HUD discord cards resolve the tag through
+    // discordRoleTagKey; a role added here without a tag entry would silently
+    // show no tag in game (the Admin/Artist drop-out bug class).
+    for (const role of DISCORD_SPECIAL_ROLES) {
+      expect(discordRoleTagKey(role.key), `no tag label key for '${role.key}'`).toBeTruthy();
+    }
+    expect(discordRoleTagKey('not-a-role')).toBeUndefined();
+    expect(discordRoleTagKey(undefined)).toBeUndefined();
   });
 });

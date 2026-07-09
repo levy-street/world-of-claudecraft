@@ -339,7 +339,9 @@ export function resolveCorpseHarvest(currentClaimedBy: number | null, pid: numbe
  * but reuses the same classic six-tier naming so it reads consistently. */
 export type HarvestTier = 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
-const HARVEST_TIERS: readonly HarvestTier[] = [
+// Exported so professions/focus.ts (#1143) can shift a rolled tier upward by a
+// persistent town-focus bonus without redefining the tier order.
+export const HARVEST_TIERS: readonly HarvestTier[] = [
   'poor',
   'common',
   'uncommon',
@@ -425,4 +427,49 @@ function rollFocusTier(rng: Rng, bonus: number): HarvestTier {
   }
   const shifted = Math.min(HARVEST_TIERS.length - 1, index + bonus);
   return HARVEST_TIERS[shifted];
+}
+
+// Signed materials (#1145): a corpse-harvested monster material rolls the same
+// MaterialRarity ladder a gathering node does (rollMaterialRarity, above), but a
+// corpse yield has no per-player proficiency counter to scale off (there is no
+// "skinning" gathering profession yet, unlike mining/logging/herbalism): it uses
+// a fixed baseline "power" input instead, tuned so a corpse harvest has a real
+// but modest chance (about 16%) of coming back rare-or-better. One rng.next()
+// draw per harvest that actually yields an item, same one-draw convention as
+// rollMaterialRarity itself.
+export const CORPSE_HARVEST_RARITY_BASELINE = 40;
+
+export function rollCorpseMaterialRarity(rng: Rng): MaterialRarity {
+  return rollMaterialRarity(CORPSE_HARVEST_RARITY_BASELINE, rng);
+}
+
+// The rarity floor at which a monster material is stamped with its gatherer's
+// name (#1145 acceptance criteria: "rare-or-better"). Below this tier the yield
+// stays a plain fungible stack, same as before this issue.
+export function isSignableMaterialRarity(rarity: MaterialRarity): boolean {
+  return rarity === 'rare' || rarity === 'epic' || rarity === 'legendary';
+}
+
+// Fixed rarity ladder, low to high, matching the tier-index scale professions/
+// archetype.ts's empowerment ceiling already uses (common=0, uncommon=1,
+// rare=2, epic=3, legendary=4).
+const MATERIAL_RARITY_ORDER: readonly MaterialRarity[] = [
+  'common',
+  'uncommon',
+  'rare',
+  'epic',
+  'legendary',
+];
+
+/** Clamp a rolled rarity down to at most `maxTier` (a tier index on the same
+ *  ladder, e.g. from archetype.ts `archetypeCeilingFor`; `Infinity` is a no-op).
+ *  Used to cap crafted-output quality at the #1129 empowerment ceiling: a
+ *  dormant or hobby craft can still ROLL a high rarity off raw skill, but the
+ *  actual result granted never exceeds what that craft is empowered to
+ *  produce. Never raises a roll, only lowers it. */
+export function clampMaterialRarity(rarity: MaterialRarity, maxTier: number): MaterialRarity {
+  if (!Number.isFinite(maxTier)) return rarity;
+  const cap = Math.max(0, Math.min(MATERIAL_RARITY_ORDER.length - 1, Math.floor(maxTier)));
+  const rolled = MATERIAL_RARITY_ORDER.indexOf(rarity);
+  return MATERIAL_RARITY_ORDER[Math.min(rolled, cap)];
 }

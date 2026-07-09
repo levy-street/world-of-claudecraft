@@ -18,12 +18,15 @@
     if (action === 'chat_unmute') return t('moderationHistory.actionChatUnmute');
     if (action === 'force_rename') return t('moderationHistory.actionForceRename');
     if (action === 'note') return t('moderationHistory.actionNote');
+    if (action === 'reset_password') return t('moderationHistory.actionResetPassword');
     return t('moderationHistory.actionUnknown');
   }
 
   function actionVariant(action: string): BadgeVariant {
     if (action === 'ban') return 'bad';
-    if (action === 'suspend' || action === 'chat_mute') return 'warn';
+    if (action === 'suspend' || action === 'chat_mute' || action === 'reset_password') {
+      return 'warn';
+    }
     if (action === 'unban' || action === 'unsuspend' || action === 'chat_unmute') {
       return 'success';
     }

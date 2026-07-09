@@ -5,11 +5,19 @@ import {
   delveAt,
   delveModuleLocal,
   dungeonAt,
+  gauntletOriginAt,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isGauntletPos,
+  isHodricsPos,
+  isMinigameHubPos,
+  isYumiMazePos,
+  MINIGAME_HUB,
+  MINIGAME_HUB_RADIUS,
+  yumiMazeOriginAt,
 } from './data';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
@@ -21,8 +29,13 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { gauntletVenueColliders } from './gauntlet/venue_physics';
+import { hodricsCollidersAt } from './hodrics_course';
+import { minigameHubColliders } from './minigame_hub_layout';
 import type { WorldContent } from './types';
+import { valeCupColliders } from './vale_cup_layout';
 import { generateDecorations, groundHeight } from './world';
+import { yumiMazeColliders } from './yumi_maze_layout';
 
 // Static world collision. Prop placement comes from the per-zone content
 // modules (merged into PROPS by sim/data.ts): the renderer builds its meshes
@@ -250,6 +263,14 @@ function staticWorldColliders(seed: number): Collider[] {
       camGhost: true,
     });
   }
+
+  // The Sowfield boards, goal posts, net pockets, stand fronts, and plinth
+  // (Vale Cup). ONE layout module (vale_cup_layout.ts) drives this movement
+  // set, the ball's analytic wall reflection, the terrain flatten, and the
+  // render dressing, so they can never drift. Deliberately NOT fences: boards
+  // must not be jump-through mid-match (the north gate is the way in). Applies
+  // for any active content, matching the flatten arm (crater-precedent leak).
+  out.push(...valeCupColliders());
   return out;
 }
 
@@ -419,6 +440,11 @@ export function resolvePosition(
   ignoreFences = false,
   delveModules?: readonly string[],
 ): { x: number; z: number } {
+  if (isYumiMazePos(x)) {
+    const o = yumiMazeOriginAt(z);
+    const local = resolveAgainst(yumiMazeColliders(), x - o.x, z - o.z, r);
+    return { x: local.x + o.x, z: local.z + o.z };
+  }
   if (isDelvePos(x)) {
     const delve = delveAt(x);
     const mods = delveModules?.length ? delveModules : delve ? defaultDelveModules(delve.id) : [];
@@ -431,6 +457,40 @@ export function resolvePosition(
     const o = arenaOriginAt(z);
     const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
     return { x: local.x + o.x, z: local.z + o.z };
+  }
+  if (isHodricsPos(x)) {
+    // Lord Hodric rebuilds his course every round: walls come from the
+    // slot's ACTIVE generated course, not a static layout.
+    const hc = hodricsCollidersAt(z);
+    const local = resolveAgainst(hc.colliders, x - hc.ox, z - hc.oz, r, ignoreFences);
+    return { x: local.x + hc.ox, z: local.z + hc.oz };
+  }
+  if (isGauntletPos(x)) {
+    // The Gauntlet venue's solids (stands, warden, lecterns, walls, props),
+    // derived from the same anchors the renderer builds from.
+    const o = gauntletOriginAt(z);
+    const local = resolveAgainst(gauntletVenueColliders(), x - o.x, z - o.z, r, ignoreFences);
+    return { x: local.x + o.x, z: local.z + o.z };
+  }
+  if (isMinigameHubPos(x)) {
+    // The Proving Grounds (the Athenaeum of Trials): one circular room furnished
+    // with bookcases, reading tables, and chairs. Resolve against those static
+    // set pieces first (the same anchors the renderer places them from), then a
+    // radial clamp holds the mover inside the wall shell.
+    const local = resolveAgainst(
+      minigameHubColliders(),
+      x - MINIGAME_HUB.x,
+      z - MINIGAME_HUB.z,
+      r,
+      ignoreFences,
+    );
+    const dist = Math.hypot(local.x, local.z);
+    const max = MINIGAME_HUB_RADIUS - r;
+    if (dist > max && dist > 1e-6) {
+      const s = max / dist;
+      return { x: MINIGAME_HUB.x + local.x * s, z: MINIGAME_HUB.z + local.z * s };
+    }
+    return { x: MINIGAME_HUB.x + local.x, z: MINIGAME_HUB.z + local.z };
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);
@@ -663,6 +723,20 @@ export function cameraOcclusion(
   pad = 0.35,
   delveModules?: readonly string[],
 ): number {
+  if (isYumiMazePos(ax)) {
+    const o = yumiMazeOriginAt(az);
+    return sweepColliders(
+      yumiMazeColliders(),
+      ax - o.x,
+      ay,
+      az - o.z,
+      bx - o.x,
+      by,
+      bz - o.z,
+      pad,
+      true,
+    );
+  }
   if (isDelvePos(ax)) {
     const delve = delveAt(ax);
     const mods = delveModules?.length ? delveModules : delve ? defaultDelveModules(delve.id) : [];
@@ -690,6 +764,20 @@ export function cameraOcclusion(
       bx - o.x,
       by,
       bz - o.z,
+      pad,
+      true,
+    );
+  }
+  if (isHodricsPos(ax)) {
+    const hc = hodricsCollidersAt(az);
+    return sweepColliders(
+      hc.colliders,
+      ax - hc.ox,
+      ay,
+      az - hc.oz,
+      bx - hc.ox,
+      by,
+      bz - hc.oz,
       pad,
       true,
     );
@@ -735,6 +823,10 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
     }
     return false;
   };
+  if (isYumiMazePos(x)) {
+    const o = yumiMazeOriginAt(z);
+    return overlapsAny(yumiMazeColliders(), x - o.x, z - o.z, false);
+  }
   if (isDelvePos(x)) {
     const delve = delveAt(x);
     const mods = delve ? defaultDelveModules(delve.id) : [];
@@ -749,6 +841,10 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
     return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
+  }
+  if (isHodricsPos(x)) {
+    const hc = hodricsCollidersAt(z);
+    return overlapsAny(hc.colliders, x - hc.ox, z - hc.oz, false);
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);

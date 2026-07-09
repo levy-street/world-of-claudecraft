@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../src/sim/data';
+import { respawnMob } from '../src/sim/mob/lifecycle';
+import { resetEvadingMob } from '../src/sim/mob/locomotion';
 import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import {
   isWorldBossLootEligible,
   markWorldBossLooted,
+  WORLD_BOSS_CORPSE_SECONDS,
   WORLD_BOSS_INTERVAL_SECONDS,
   WORLD_BOSSES,
   worldBossLockoutId,
@@ -206,8 +210,8 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
     let sawCastBar = false;
     let castYell = false;
     let unleashed = false;
-    // 25s cadence + 3.5s cast, with slack for chase/knockback interruptions.
-    for (let t = 0; t < 20 * 45 && !unleashed; t++) {
+    // 40s cadence + 3.5s cast, with slack for chase/knockback interruptions.
+    for (let t = 0; t < 20 * 60 && !unleashed; t++) {
       // Step back into melee after every Tectonic Heave shove, and keep chipping
       // so the threat table never empties.
       p.pos.x = boss.pos.x + 2;
@@ -427,6 +431,124 @@ describe('world boss personal loot', () => {
   });
 });
 
+describe('world boss loot roster survives contributor death and grouping', () => {
+  it('keeps a contributor who DIED to the boss on the loot roster (not just the hate table)', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const p2 = sim.addPlayer('mage', 'Bru');
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    const e2 = (sim as any).entities.get(p2) as Entity;
+    // Both land a hit: both go on the hate table AND the permanent damager roster.
+    (sim as any).dealDamage(e1, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    (sim as any).dealDamage(e2, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    expect(boss.threat.has(p2)).toBe(true);
+
+    // p2 dies to the boss: handleDeath drops them from EVERY hate table (the classic
+    // "the dead fall off threat" prune) so the boss re-targets. This is exactly what
+    // used to strip a fallen raider's loot rights.
+    (sim as any).dealDamage(boss, e2, 999_999, false, 'physical', 'Boss', 'hit', true);
+    expect(e2.dead).toBe(true);
+    expect(boss.threat.has(p2)).toBe(false); // pruned off the live hate table...
+    expect(boss.bossDamagers.has(p2)).toBe(true); // ...but kept on the permanent roster
+
+    // p1 lands the killing blow.
+    (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+
+    // Both contributors get their own personal drop, including the one who died.
+    const owners = (boss.loot?.items ?? []).flatMap((s) => s.personalFor ?? []);
+    expect(owners).toContain(p1);
+    expect(owners).toContain(p2);
+  });
+
+  it('clears the damager roster on a full evade-home reset: a wiped pull ends loot rights', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'WipedRaiderA');
+    const p2 = sim.addPlayer('mage', 'FreshRaiderB');
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    const e2 = (sim as any).entities.get(p2) as Entity;
+
+    // Pull A: p1 lands a hit and goes on the roster, then the raid wipes and the
+    // boss evades home to full (the same entity survives: only the scheduler
+    // makes a new one, and only after a real kill).
+    (sim as any).dealDamage(e1, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    expect(boss.bossDamagers.has(p1)).toBe(true);
+    resetEvadingMob((sim as any).ctx, boss);
+    expect(boss.hp).toBe(boss.maxHp);
+    expect(boss.bossDamagers.size).toBe(0);
+
+    // Pull B: only p2 fights. The pull-A raider must NOT land on the kill roster.
+    (sim as any).dealDamage(e2, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    (sim as any).dealDamage(e2, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+    const owners = (boss.loot?.items ?? []).flatMap((s) => s.personalFor ?? []);
+    expect(owners).toContain(p2);
+    expect(owners).not.toContain(p1);
+  });
+
+  it('clears the damager roster on respawn: loot rights never carry across lives', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+    expect(boss.bossDamagers.has(p1)).toBe(true); // the kill snapshot already rolled loot
+    respawnMob((sim as any).ctx, boss);
+    expect(boss.bossDamagers.size).toBe(0);
+  });
+
+  it('the lootable corpse window always fits inside the spawn cadence (never overlaps)', () => {
+    expect(WORLD_BOSS_CORPSE_SECONDS).toBeLessThan(WORLD_BOSS_INTERVAL_SECONDS);
+  });
+
+  it('lets a slain world boss corpse linger far longer than a normal corpse', () => {
+    const sim = makeSim();
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+    expect(boss.corpseTimer).toBe(WORLD_BOSS_CORPSE_SECONDS);
+    // Generous enough that a corpse-runner can resurrect and walk back before it drops.
+    expect(WORLD_BOSS_CORPSE_SECONDS).toBeGreaterThanOrEqual(900);
+  });
+
+  it('never routes a world-boss epic through a party need/greed roll (personal loot only)', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const p2 = sim.addPlayer('mage', 'Bru');
+    // Party them up: the default party loot strategy rolls premium (epic) items as
+    // need/greed. If a boss epic ever reached the shared path, this is where it would.
+    sim.partyInvite(p1, p2);
+    sim.partyAccept(p2);
+    const { boss } = spawnBossNow(sim);
+    const e1 = (sim as any).entities.get(p1) as Entity;
+    const e2 = (sim as any).entities.get(p2) as Entity;
+    (sim as any).dealDamage(e1, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    (sim as any).dealDamage(e2, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+
+    // Every slot is a single-owner personal drop even for a grouped raid: an epic can
+    // never enter a shared (need/greed) roll the party would have to fight over.
+    for (const slot of boss.loot?.items ?? []) {
+      expect(slot.personalFor && slot.personalFor.length === 1).toBe(true);
+      expect(slot.openToAll).toBeFalsy();
+    }
+    // Looting the personal drops opens NO group roll: they go straight to the bags.
+    e1.pos = { ...boss.pos };
+    sim.lootCorpse(boss.id, p1);
+    expect((sim as any).pendingLootRolls.size).toBe(0);
+  });
+});
+
 describe('world boss anti-kite snare (Howling Gale)', () => {
   // Place a park-able player at a fixed offset from the boss.
   function place(sim: Sim, boss: Entity, pid: number, offset: number): Entity {
@@ -452,6 +574,14 @@ describe('world boss anti-kite snare (Howling Gale)', () => {
     sim.tick();
   }
 
+  it('outruns a player on foot: boss move speed exceeds base run speed', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('hunter', 'Runner');
+    const { boss } = spawnBossNow(sim);
+    const p = (sim as any).entities.get(pid) as Entity;
+    expect(boss.moveSpeed).toBeGreaterThan(p.moveSpeed);
+  });
+
   it('snares a ranged kiter it is chasing, cutting move speed to 70% (not kiteable)', () => {
     const sim = makeSim();
     const kiter = sim.addPlayer('hunter', 'Kiter');
@@ -464,8 +594,8 @@ describe('world boss anti-kite snare (Howling Gale)', () => {
     const slow = p.auras.find((a) => a.kind === 'slow' && a.name === 'Howling Gale');
     expect(slow).toBeTruthy();
     expect(slow?.value).toBe(0.7);
-    // Run speed (7) beats the boss's 5.8, but a 30% snare (4.9yd/s) still lets the boss,
-    // at 5.8, slowly close the gap: the gentler snare denies a perma-kite without rooting.
+    // The boss (11.6) already outruns base run speed (7); the 30% snare (4.9yd/s) is
+    // the second layer that keeps a speed-buffed runner from opening a gap.
     expect((sim as any).moveSpeedMult(p)).toBeCloseTo(0.7, 5);
   });
 
@@ -592,7 +722,8 @@ describe('world boss is imposing and loud', () => {
     // A large, imposing world boss, but no longer mountain-sized.
     expect(boss.scale).toBe(8);
     // His melee reach is PINNED to a ~17yd (scale-5) body, not the wider reach a scale-8
-    // body would give: the Howling Gale snare, not a giant swing, is what makes him unkitable.
+    // body would give: his move speed and the Howling Gale snare, not a giant swing,
+    // are what make him unkitable.
     const reach = combatProfileForMob(boss.templateId, boss.scale).meleeRange;
     expect(reach).toBe(scaledDefaultMobMeleeRange(5));
     expect(reach).toBeLessThan(scaledDefaultMobMeleeRange(boss.scale));
@@ -646,6 +777,42 @@ describe('world boss is imposing and loud', () => {
     expect(yellTextTo(far).some((t) => /THUNDER ANSWERS/.test(t))).toBe(true);
     // ...but nothing reaches a player 400yd away, past the loud range.
     expect(yellTextTo(tooFar)).toHaveLength(0);
+  });
+});
+
+describe('world boss pathing (phases through obstacles)', () => {
+  it('walks a dead-straight chase line through a building collider', () => {
+    const sim = makeSim();
+    const { boss } = spawnBossNow(sim);
+    // The zone1 house at (10, 12) is a 7x6 OBB collider. Park the boss south of
+    // it and march him due north straight through: with phasesThroughObstacles
+    // his x never deviates and he arrives on the straight-line tick budget. A
+    // sliding mover would have to fan around the OBB (x deviates) or stall.
+    boss.pos = { x: 10, z: 2, y: 0 };
+    const dest = { x: 10, z: 22, y: 0 };
+    let arrived = false;
+    const straightTicks = Math.ceil(20 / (boss.moveSpeed * (1 / 20))) + 2;
+    for (let t = 0; t < straightTicks && !arrived; t++) {
+      arrived = (sim as any).moveToward(boss, dest, boss.moveSpeed);
+      expect(Math.abs(boss.pos.x - 10)).toBeLessThan(1e-6);
+    }
+    expect(arrived).toBe(true);
+  });
+
+  it('an ordinary mob still collides: the same straight line is deflected', () => {
+    const sim = makeSim();
+    const { boss } = spawnBossNow(sim);
+    // Reuse the boss entity but masquerade as an unflagged template: the gate
+    // reads MOBS[templateId], so a plain wolf template must NOT phase.
+    boss.templateId = 'forest_wolf';
+    boss.pos = { x: 10, z: 8, y: 0 };
+    (sim as any).moveToward(boss, { x: 10, z: 22, y: 0 }, 7);
+    const deflected = Math.abs(boss.pos.x - 10) > 1e-6 || Math.abs(boss.pos.z - 8) < 0.3;
+    expect(deflected).toBe(true);
+  });
+
+  it('the template opts in via phasesThroughObstacles', () => {
+    expect(MOBS[BOSS_ID]?.phasesThroughObstacles).toBe(true);
   });
 });
 

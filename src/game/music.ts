@@ -19,6 +19,7 @@ export type MusicZone =
   | 'vale_legacy'
   | 'marsh'
   | 'peaks'
+  | 'vale_cup'
   | 'dungeon_hollow_crypt'
   | 'dungeon_sunken_bastion'
   | 'dungeon_gravewyrm_sanctum';
@@ -1192,6 +1193,102 @@ function composePeaks(): Theme {
   return { bpm: 100, bars: 24, events: ev };
 }
 
+/** The Sowfield: "Boots and Banners". D major, 108 bpm, 16 bars. The Vale Cup
+ *  match-day tune (docs/prd/vale-cup.md): a jaunty harvest-festival stomp that
+ *  stays kin to Eastbrook's D major so the walk-up crossfade from the vale
+ *  never clashes. Oom-pah lute-and-bass under a whistling pipe tune, frame
+ *  drum on the boots, wood block and shaker for the clapping stands, and a
+ *  dulcimer answer in the back eight where the crowd starts singing along. */
+function composeValeCup(): Theme {
+  const ev: NoteEvent[] = [];
+  const D = { root: 62 },
+    G = { root: 55 },
+    A = { root: 57 },
+    Bm = { root: 59, minor: true };
+  const chords: ChordDef[] = [D, G, D, A, D, G, A, D, Bm, G, D, A, G, D, A, D];
+
+  chords.forEach((c, bar) => {
+    const b0 = bar * 4;
+    const t = triad(c);
+    // oom-pah: bass root on 1 and 3, lute chord stabs on 2, 2.5, 4, 4.5
+    pushNote(ev, b0, c.root - 24, 0.9, 0.55, 'bass');
+    pushNote(ev, b0 + 2, c.root - 17, 0.9, 0.46, 'bass');
+    for (const off of [1, 1.5, 3, 3.5]) {
+      for (const n of t) pushNote(ev, b0 + off, n, 0.4, 0.2, 'lute');
+    }
+    // boots on the boards: frame drum 1 and 3, wood block offbeats, shaker run
+    pushDrumHits(ev, b0, [0, 2], 'frameDrum', 0.5, 40);
+    pushDrumHits(ev, b0, [1, 3], 'woodBlock', 0.3, 60);
+    pushDrumHits(ev, b0, [0.5, 1.5, 2.5, 3.5], 'shaker', 0.16, 70);
+    // the stands hum along in the back eight
+    if (bar >= 8) {
+      for (const n of t) pushNote(ev, b0, n - 12, 4.05, 0.16, 'strings');
+      pushNote(ev, b0 + 2, t[2] - 5, 2, 0.12, 'horn');
+    }
+  });
+
+  // pipe tune: an eight-bar kick-about phrase, then answered up the octave
+  const phraseA: Phrase = [
+    [0, 74, 0.5],
+    [0.5, 76, 0.5],
+    [1, 78, 1],
+    [2, 74, 1],
+    [3, 69, 1],
+    [4, 71, 0.5],
+    [4.5, 74, 0.5],
+    [5, 79, 1.5],
+    [6.5, 78, 0.5],
+    [7, 74, 1],
+    [8, 74, 0.5],
+    [8.5, 76, 0.5],
+    [9, 78, 1],
+    [10, 81, 1],
+    [11, 78, 1],
+    [12, 76, 0.5],
+    [12.5, 74, 0.5],
+    [13, 76, 1.5],
+    [14.5, 73, 0.5],
+    [15, 74, 1],
+    [16, 78, 0.5],
+    [16.5, 79, 0.5],
+    [17, 81, 1],
+    [18, 78, 1],
+    [19, 74, 1],
+    [20, 76, 0.5],
+    [20.5, 78, 0.5],
+    [21, 79, 1.5],
+    [22.5, 78, 0.5],
+    [23, 76, 1],
+    [24, 74, 0.5],
+    [24.5, 73, 0.5],
+    [25, 74, 1],
+    [26, 76, 1],
+    [27, 78, 1],
+    [28, 74, 2.5],
+    [31, 69, 1],
+  ];
+  pushPhrase(ev, 0, phraseA, 0.4, 'pipe');
+  // the dulcimer picks the tune up an octave over the humming stands
+  pushPhrase(
+    ev,
+    32,
+    phraseA.map(([b, m, d]) => [b, m + 12, d] as [number, number, number]),
+    0.3,
+    'dulcimer',
+  );
+  // and the pipe rides along in harmony a third below
+  pushPhrase(
+    ev,
+    32,
+    phraseA.map(([b, m, d]) => [b, m - 3, d] as [number, number, number]),
+    0.22,
+    'pipe',
+  );
+
+  ev.sort((a, b) => a.beat - b.beat);
+  return { bpm: 108, bars: 16, events: ev };
+}
+
 /** Hollow Crypt: "Sleep, Neighbors". D minor over a phrygian creep, 100 bpm.
  *  A violated village graveyard: a funeral bell tolls over an unmoving D
  *  pedal, the chapel hymn starts and breaks off, bones skitter in the wood
@@ -1737,6 +1834,7 @@ const STORAGE_KEY = 'ev_music_on';
 //   vale_legacy  7 -> A (original vale is A dorian)
 //   marsh  2 -> E (marsh is E aeolian)
 //   peaks  0 -> D (peaks anthem is D major)
+//   vale_cup  0 -> D (the Sowfield match tune is D major)
 //   dungeon_hollow_crypt      0 -> D
 //   dungeon_sunken_bastion    2 -> E
 //   dungeon_gravewyrm_sanctum 9 -> B
@@ -1748,6 +1846,7 @@ const COMBAT_TRANSPOSE: Record<MusicZone, number> = {
   vale_legacy: 7,
   marsh: 2,
   peaks: 0,
+  vale_cup: 0,
   dungeon_hollow_crypt: 0,
   dungeon_sunken_bastion: 2,
   dungeon_gravewyrm_sanctum: 9,
@@ -1762,6 +1861,7 @@ export function buildMusicThemes(withOverrides = true): Record<string, Theme> {
     vale_legacy: composeLegacyVale(),
     marsh: composeMarsh(),
     peaks: composePeaks(),
+    vale_cup: composeValeCup(),
     dungeon_hollow_crypt: composeDungeonHollowCrypt(),
     dungeon_sunken_bastion: composeDungeonSunkenBastion(),
     dungeon_gravewyrm_sanctum: composeDungeonGravewyrmSanctum(),
@@ -1788,6 +1888,11 @@ export const THEME_TRIM: Record<string, number> = {
   vale_legacy: 1.35,
   marsh: 1.85,
   peaks: 2.05,
+  // ESTIMATED (not yet measured): the Sowfield tune is voiced close to the
+  // Eastbrook town density (lute strum + oom-pah bass + drums + pipe lead), so
+  // it starts near the town reference. Recompute with scripts/render_music.mjs
+  // + the gated-RMS pass alongside the next soundtrack measurement batch.
+  vale_cup: 1.4,
   dungeon_hollow_crypt: 2.95,
   dungeon_sunken_bastion: 2.95,
   dungeon_gravewyrm_sanctum: 1.8,
@@ -2557,6 +2662,15 @@ export class MusicDirector {
   // Boss-fight override: a looped file track routed through the same AudioContext
   // that user gestures already unlock for the procedural soundtrack.
   private bossActive = false;
+  // Sowfield area music: two looped mp3s ('waiting' before a game, 'match' once
+  // one has kicked off) that crossfade against each other and duck the procedural
+  // score while you stand at the stadium. Same file-track pattern as the boss loop.
+  private sowfieldWaitingEl: HTMLAudioElement | null = null;
+  private sowfieldMatchEl: HTMLAudioElement | null = null;
+  private sowfieldWaitingGain: GainNode | null = null;
+  private sowfieldMatchGain: GainNode | null = null;
+  private sowfieldSrcMade = false;
+  private sowfieldTrack: 'waiting' | 'match' | null = null;
 
   get enabled(): boolean {
     return this._enabled;
@@ -2565,7 +2679,8 @@ export class MusicDirector {
   // master gain target given the enabled flag and volume (base level 0.15).
   // The dedicated Nythraxis track owns the mix while active.
   private masterTarget(): number {
-    if (!this._enabled || this._menuPaused || this.bossActive) return 0;
+    if (!this._enabled || this._menuPaused || this.bossActive || this.sowfieldTrack !== null)
+      return 0;
     return 0.15 * this._vol;
   }
 
@@ -2676,6 +2791,74 @@ export class MusicDirector {
     this.bossSource = null;
   }
 
+  /** Drive the Sowfield area music: 'waiting' before a game, 'match' once one has
+   *  kicked off, null when you are away from the stadium. Idempotent; the HUD calls
+   *  it every frame. Crossfades the two tracks and ducks the procedural score while
+   *  active. */
+  setSowfieldTrack(track: 'waiting' | 'match' | null): void {
+    if (track === this.sowfieldTrack) {
+      this.applySowfield();
+      return;
+    }
+    const enteringOrLeaving = (this.sowfieldTrack === null) !== (track === null);
+    this.sowfieldTrack = track;
+    this.applySowfield();
+    if (this.ctx && this.master && enteringOrLeaving) {
+      this.master.gain.setTargetAtTime(
+        this.masterTarget(),
+        this.ctx.currentTime,
+        track ? 0.4 : 0.7,
+      );
+    }
+  }
+
+  private ensureSowfieldElements(): void {
+    if (this.sowfieldSrcMade || !this.ctx || typeof Audio !== 'function') return;
+    this.sowfieldSrcMade = true;
+    const mk = (url: string, gain: GainNode | null): HTMLAudioElement => {
+      const el = new Audio(url);
+      el.loop = true;
+      el.preload = 'auto';
+      try {
+        const src = this.ctx?.createMediaElementSource(el);
+        if (src && gain) src.connect(gain);
+      } catch {
+        /* element already wired or unsupported */
+      }
+      return el;
+    };
+    this.sowfieldWaitingEl = mk('/audio/sowfield-waiting.mp3', this.sowfieldWaitingGain);
+    this.sowfieldMatchEl = mk('/audio/sowfield-match.mp3', this.sowfieldMatchGain);
+  }
+
+  private applySowfield(): void {
+    if (!this.ctx) return;
+    const active = this.sowfieldTrack !== null && this._enabled && !this._menuPaused;
+    const level = 0.5 * this._vol;
+    if (active) {
+      void this.ctx.resume?.();
+      this.ensureSowfieldElements();
+      void this.sowfieldWaitingEl?.play().catch(() => {});
+      void this.sowfieldMatchEl?.play().catch(() => {});
+    }
+    const wTarget = active && this.sowfieldTrack === 'waiting' ? level : 0;
+    const mTarget = active && this.sowfieldTrack === 'match' ? level : 0;
+    if (this.sowfieldWaitingGain)
+      this.sowfieldWaitingGain.gain.setTargetAtTime(wTarget, this.ctx.currentTime, 0.5);
+    if (this.sowfieldMatchGain)
+      this.sowfieldMatchGain.gain.setTargetAtTime(mTarget, this.ctx.currentTime, 0.5);
+    if (!active && this.sowfieldSrcMade) {
+      // Fade to silence, then pause once we are truly away (guard against a quick
+      // re-entry flipping the track back on before the timeout fires).
+      window.setTimeout(() => {
+        if (this.sowfieldTrack === null) {
+          this.sowfieldWaitingEl?.pause();
+          this.sowfieldMatchEl?.pause();
+        }
+      }, 700);
+    }
+  }
+
   /** Set music volume (0..1). Safe before init(); applied to the master gain. */
   setVolume(v: number): void {
     this._vol = Math.min(1, Math.max(0, v));
@@ -2683,6 +2866,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.2);
     }
     this.applyBossPlayback();
+    this.applySowfield();
   }
 
   get volume(): number {
@@ -2711,6 +2895,12 @@ export class MusicDirector {
     this.bossGain = ctx.createGain();
     this.bossGain.gain.value = 0;
     this.bossGain.connect(compressor);
+    this.sowfieldWaitingGain = ctx.createGain();
+    this.sowfieldWaitingGain.gain.value = 0;
+    this.sowfieldWaitingGain.connect(compressor);
+    this.sowfieldMatchGain = ctx.createGain();
+    this.sowfieldMatchGain.gain.value = 0;
+    this.sowfieldMatchGain.connect(compressor);
 
     // generated hall impulse response
     const seconds = 2.6;
@@ -2760,6 +2950,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.3);
     }
     this.applyBossPlayback();
+    this.applySowfield();
   }
 
   /** Fade out while the game menu is open; does not change the music toggle. */
@@ -2772,6 +2963,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
     }
     this.applyBossPlayback();
+    this.applySowfield();
   }
 
   /** Restore playback after closing the game menu. */
@@ -2784,6 +2976,7 @@ export class MusicDirector {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.35);
     }
     this.applyBossPlayback();
+    this.applySowfield();
   }
 
   // called every frame by the HUD; cheap unless the state changed

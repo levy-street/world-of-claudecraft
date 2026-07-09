@@ -375,6 +375,9 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
     "url": "/audio/sfx/proj_shadow.mp3",
     "loop": false
   },
+  "quest_accept":   { "url": "/audio/sfx/quest_accept.mp3",   "loop": false },
+  "quest_complete": { "url": "/audio/sfx/quest_complete.mp3", "loop": false },
+  "quest_ready":    { "url": "/audio/sfx/quest_ready.mp3",    "loop": false },
   "spell_nova": {
     "url": "/audio/sfx/spell_nova.mp3",
     "loop": false

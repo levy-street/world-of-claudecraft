@@ -45,6 +45,7 @@ const abilityStringsEn = {
       offGlobalCooldown: 'Off the global cooldown',
       friendlyTarget: 'Friendly target',
       enemyTarget: 'Enemy target',
+      selfOnly: 'Self only',
       damageRange: '{min} to {max}',
       finisherDamage: '{base} plus {perCombo} per combo point',
     },
@@ -577,6 +578,25 @@ function abilityTranslations(
 const classAbilityNamesEn = {
   entities: {
     abilities: abilityTranslations([
+      // The Vale Cup sport kit (docs/prd/vale-cup.md).
+      ['sport_kick', 'Kick', 'Knock the ball along the ground toward the aim point.'],
+      [
+        'sport_shoot',
+        'Shoot',
+        'Hold to build power, release to shoot at goal. Too much power sails over.',
+      ],
+      ['sport_pass', 'Pass', 'Roll a firm pass to your targeted teammate, leading their run.'],
+      ['sport_boot', 'Big Boot', 'A long lofted boot toward the aim point. The crowd loves it.'],
+      ['sport_hoof', 'Hoof It', 'Hammer the ball low and hard up the field.'],
+      ['sport_punt', 'Long Punt', "A keeper's punt, high and far."],
+      ['sport_feint', 'Feint', 'A quick sidestep burst toward the aim point.'],
+      ['sport_dive', 'Dive', 'Fling yourself toward the aim point. A crossing ball sticks to you.'],
+      [
+        'sport_shoulder',
+        'Shoulder',
+        'A fair harvest-truce shoulder. Sends them tumbling off the ball.',
+      ],
+      ['sport_second_wind', 'Fresh Legs', 'Find your legs: move 50% faster for 4 sec.'],
       [
         'flamestrike',
         'Flamestrike',
@@ -585,34 +605,38 @@ const classAbilityNamesEn = {
       [
         'rain_of_fire',
         'Rain of Fire',
-        'Calls a rain of fire onto the target area, burning enemies for {damage} Fire damage.',
+        'Calls a rain of fire onto the target area for 4 sec, burning enemies for {damage} Fire damage each second.',
       ],
       [
         'volley',
         'Volley',
-        'Rains arrows on the target area, dealing {damage} damage to enemies caught in it.',
+        'Rains arrows on the target area for 3 sec, dealing {damage} damage every 0.5 sec to enemies caught in it.',
       ],
       [
         'hurricane',
         'Hurricane',
-        'Calls a hurricane onto the target area, battering enemies for {damage} Nature damage.',
+        'Calls a hurricane onto the target area for 6 sec, battering enemies for {damage} Nature damage each second.',
       ],
       [
         'earthquake',
         'Earthquake',
-        'Shakes the target area, battering enemies for {damage} Nature damage.',
+        'Shakes the target area for 6 sec, battering enemies for {damage} Nature damage every 1.5 sec.',
       ],
       [
         'heroic_strike',
         'Reaver Strike',
         'A strong attack that increases melee damage by {damage}. Activates on your next swing.',
       ],
-      ['battle_shout', 'Iron Bellow', 'Increases your attack power by 20 for 2 min.'],
-      ['commanding_shout', 'Bolstering Cry', 'Increases your Stamina by 6 for 2 min.'],
+      [
+        'battle_shout',
+        'Iron Bellow',
+        'A shout that increases the attack power of all party members by {buff}% for 2 min.',
+      ],
+      ['commanding_shout', 'Bolstering Cry', 'Increases your Stamina by {buff} for 2 min.'],
       [
         'demoralizing_shout',
         'Direhowl',
-        'Lets out a fearsome shout, reducing the attack power of all nearby enemies by 30 for 30 sec.',
+        'Lets out a fearsome shout, reducing the attack power of all nearby enemies by {buff} for 30 sec.',
       ],
       [
         'charge',
@@ -622,7 +646,7 @@ const classAbilityNamesEn = {
       [
         'rend',
         'Deep Gash',
-        'Wounds the target, causing them to bleed for {damage} damage over 9 sec.',
+        'Wounds the target, causing them to bleed for {damage} damage over {duration} sec.',
       ],
       [
         'thunder_clap',
@@ -632,13 +656,13 @@ const classAbilityNamesEn = {
       [
         'hamstring',
         'Hobbling Cut',
-        'Maims the enemy for 5 damage, slowing its movement by 50% for 15 sec.',
+        'Maims the enemy for {damage} damage, slowing its movement by 50% for 15 sec.',
       ],
       ['bloodrage', 'Blood Toll', 'Generates 10 rage at the cost of health.'],
       [
         'overpower',
         'Redhand',
-        'Instant attack for weapon damage +5. Only usable after the target dodges. Cannot be dodged.',
+        'Instant attack for weapon damage plus {damage}. Only usable after the target dodges. Cannot be dodged.',
       ],
       [
         'execute',
@@ -659,7 +683,7 @@ const classAbilityNamesEn = {
       [
         'sunder_armor',
         'Armor Shear',
-        "Sunders the target's armor, reducing it by {damage} per application. Stacks up to 5 times. Generates a high amount of threat.",
+        "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat.",
       ],
       [
         'taunt',
@@ -674,9 +698,13 @@ const classAbilityNamesEn = {
       [
         'frost_armor',
         'Hoarfrost Mantle',
-        'Encases you in frost, increasing armor by 30 for 30 min.',
+        'Encases you in frost, increasing armor by {buff} for 30 min.',
       ],
-      ['arcane_intellect', 'Aether Insight', 'Increases Intellect by 2 for 30 min.'],
+      [
+        'arcane_intellect',
+        'Aether Insight',
+        'Increases the Intellect of all party members by {buff}% for 30 min.',
+      ],
       [
         'frostbolt',
         'Rimelance',
@@ -701,7 +729,7 @@ const classAbilityNamesEn = {
       [
         'polymorph',
         'Bewitch',
-        'Transforms the enemy into a toad for up to 15 sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
+        'Transforms the enemy into a toad for up to {duration} sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
       ],
       [
         'frost_nova',
@@ -719,13 +747,13 @@ const classAbilityNamesEn = {
         'Pyrelance',
         'Hurls an immense fiery boulder that causes {damage} Fire damage plus additional damage over time.',
       ],
-      ['ice_barrier', 'Frostveil', 'Shields you in ice, absorbing 130 damage for 60 sec.'],
+      ['ice_barrier', 'Frostveil', 'Shields you in ice, absorbing {damage} damage for 60 sec.'],
       [
         'sinister_strike',
         'Wicked Slash',
         'An instant strike for weapon damage plus {damage}. Awards 1 combo point.',
       ],
-      ['eviscerate', 'Dirt Nap', 'Finishing move that causes damage per combo point.'],
+      ['eviscerate', 'Dirt Nap', 'Finishing move that causes {damage}.'],
       [
         'backstab',
         'Craven Thrust',
@@ -734,7 +762,7 @@ const classAbilityNamesEn = {
       [
         'gouge',
         'Eye Jab',
-        'Strikes the target, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point.',
+        'Strikes the target for {damage} damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point.',
       ],
       ['evasion', 'Ghostfoot', 'Increases your dodge chance by 50% for 15 sec.'],
       [
@@ -762,12 +790,12 @@ const classAbilityNamesEn = {
       [
         'garrote',
         'Throat Wire',
-        'Garrote the enemy, causing damage now and bleeding it for {damage} over 18 sec. Must be stealthed. Awards 1 combo point.',
+        'Garrote the enemy, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.',
       ],
       [
         'cheap_shot',
         'Gut Punch',
-        'Strike the target, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.',
+        'Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.',
       ],
       [
         'sap',
@@ -782,7 +810,7 @@ const classAbilityNamesEn = {
       [
         'expose_armor',
         'Armor Breach',
-        'Finishing move that exposes the target, reducing its armor. More combo points spent build into a deeper cut.',
+        'Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec.',
       ],
       [
         'rupture',
@@ -812,10 +840,14 @@ const classAbilityNamesEn = {
       [
         'seal_of_righteousness',
         'Oathbrand',
-        'Fills you with Holy power for 30 sec, causing each of your melee swings to deal 4 additional Holy damage. Unleash with Verdict.',
+        'Fills you with Holy power for 30 sec, causing each of your melee swings to deal {damage} additional Holy damage. Unleash with Verdict.',
       ],
       ['holy_light', 'Mending Light', 'Heals a friendly target for {damage}.'],
-      ['devotion_aura', 'Steadfast Aura', 'Increases your armor by 40 for 30 min.'],
+      [
+        'devotion_aura',
+        'Steadfast Aura',
+        'Increases the armor of all party members by {buff}% for 30 min.',
+      ],
       [
         'judgement',
         'Verdict',
@@ -824,14 +856,18 @@ const classAbilityNamesEn = {
       [
         'blessing_of_might',
         'Oath of Iron',
-        'Places a Blessing on a friendly target, increasing attack power by 15 for 5 min.',
+        'Blesses the party, increasing the attack power of all party members by {buff}% for 30 min.',
       ],
-      ['divine_protection', 'Ward of Faith', 'A protective ward absorbs 50 damage for 10 sec.'],
-      ['hammer_of_justice', 'Sundering Gavel', 'Stuns the target for 3 sec.'],
+      [
+        'divine_protection',
+        'Ward of Faith',
+        'A protective ward absorbs {damage} damage for 10 sec.',
+      ],
+      ['hammer_of_justice', 'Sundering Gavel', 'Stuns the target for {duration} sec.'],
       [
         'lay_on_hands',
         'Last Rite',
-        'A massive surge of healing: restores 250 health. 10 min cooldown.',
+        'A massive surge of healing: restores {damage} health. 10 min cooldown.',
       ],
       [
         'flash_of_light',
@@ -846,7 +882,7 @@ const classAbilityNamesEn = {
       [
         'consecration',
         'Holy Ground',
-        'Consecrates the ground beneath you, searing nearby enemies for {damage} Holy damage.',
+        'Consecrates the ground beneath you, searing nearby enemies for {damage} Holy damage every 2 sec for 10 sec.',
       ],
       [
         'righteous_fury',
@@ -867,12 +903,12 @@ const classAbilityNamesEn = {
       [
         'raptor_strike',
         'Gutting Strike',
-        'A strong melee attack that increases damage by 5. Activates on your next swing.',
+        'A strong melee attack that increases damage by {damage}. Activates on your next swing.',
       ],
       [
         'aspect_of_the_hawk',
         "Harrier's Guise",
-        "Take on the harrier's guise, increasing attack power by 20 for 30 min.",
+        "Take on the harrier's guise, increasing attack power by {buff} for 30 min.",
       ],
       [
         'serpent_sting',
@@ -880,13 +916,21 @@ const classAbilityNamesEn = {
         'Stings the target, dealing {damage} Nature damage over 15 sec.',
       ],
       ['arcane_shot', 'Fell Shot', 'An instant shot that deals {damage} Arcane damage.'],
-      ['concussive_shot', 'Rattling Shot', 'Dazes the target, slowing movement by 50% for 4 sec.'],
+      [
+        'concussive_shot',
+        'Rattling Shot',
+        'Dazes the target for {damage} damage, slowing movement by 50% for 4 sec.',
+      ],
       [
         'mongoose_bite',
         'Counterfang',
-        'Counterattack after the target dodges for weapon damage plus 12. Cannot be dodged.',
+        'Counterattack after the target dodges for weapon damage plus {damage}. Cannot be dodged.',
       ],
-      ['wing_clip', 'Fettering Slash', 'Inflicts a wound that slows the enemy by 40% for 10 sec.'],
+      [
+        'wing_clip',
+        'Fettering Slash',
+        'Inflicts a wound for {damage} damage, slowing the enemy by 40% for 10 sec.',
+      ],
       [
         'aspect_of_the_monkey',
         "Marten's Guise",
@@ -904,7 +948,7 @@ const classAbilityNamesEn = {
       [
         'power_word_fortitude',
         'Litany of Resolve',
-        "Increases the target's Stamina by 3 for 30 min.",
+        'Increases the Stamina of all party members by {buff}% for 30 min.',
       ],
       [
         'shadow_word_pain',
@@ -914,7 +958,7 @@ const classAbilityNamesEn = {
       [
         'power_word_shield',
         'Psalm of Warding',
-        'Shields the target, absorbing 48 damage for 30 sec.',
+        'Shields the target, absorbing {damage} damage for 30 sec.',
       ],
       ['renew', 'Lingering Grace', 'Heals the target for {damage} over 15 sec.'],
       ['mind_blast', 'Mindfracture', "Blasts the target's mind for {damage} Shadow damage."],
@@ -933,7 +977,7 @@ const classAbilityNamesEn = {
       [
         'rockbiter_weapon',
         'Stonebound Weapon',
-        'Imbues your weapon with the fury of stone: each swing deals 5 additional damage for 5 min.',
+        'Imbues your weapon with the fury of stone: each swing deals {damage} additional damage for 5 min.',
       ],
       ['healing_wave', 'Mending Waters', 'Heals a friendly target for {damage}.'],
       [
@@ -944,17 +988,17 @@ const classAbilityNamesEn = {
       [
         'lightning_shield',
         'Thunder Ward',
-        'Surrounds you with crackling lightning: melee attackers take 13 Nature damage, up to 3 charges and at most once every 5 seconds.',
+        'Surrounds you with crackling lightning: melee attackers take {buff} Nature damage, up to 3 charges and at most once every 5 seconds.',
       ],
       [
         'flame_shock',
         'Cinder Jolt',
-        'Sears the target with fire for 25 damage plus {damage} over 12 sec.',
+        'Sears the target with fire for {damage} damage plus {overTime} over 12 sec.',
       ],
       [
         'flametongue_weapon',
         'Pyrebrand Weapon',
-        'Imbues your weapon with elemental fire: each swing deals 8 additional Fire damage for 5 min.',
+        'Imbues your weapon with elemental fire: each swing deals {damage} additional Fire damage for 5 min.',
       ],
       [
         'frost_shock',
@@ -964,7 +1008,7 @@ const classAbilityNamesEn = {
       [
         'frostbrand_weapon',
         'Rimebound Weapon',
-        'Imbues your weapon with biting frost: each swing deals 8 additional damage for 5 min.',
+        'Imbues your weapon with biting frost: each swing deals {damage} additional damage for 5 min.',
       ],
       [
         'ghost_wolf',
@@ -981,18 +1025,18 @@ const classAbilityNamesEn = {
         'Gloom Bolt',
         'Sends a shadowy bolt at the enemy for {damage} Shadow damage.',
       ],
-      ['demon_skin', 'Fiendhide', 'Demonic skin increases your armor by 30 for 30 min.'],
+      ['demon_skin', 'Fiendhide', 'Demonic skin increases your armor by {buff} for 30 min.'],
       [
         'immolate',
         'Burning Pact',
-        'Burns the enemy for 11 Fire damage and an additional {damage} over 15 sec.',
+        'Burns the enemy for {damage} Fire damage and an additional {overTime} over 15 sec.',
       ],
       [
         'corruption',
         'Blackrot',
         'Corrupts the target, causing {damage} Shadow damage over 18 sec.',
       ],
-      ['life_tap', 'Hard Bargain', 'Converts 30 health into 30 mana.'],
+      ['life_tap', 'Hard Bargain', 'Converts {damage} health into {damage} mana.'],
       [
         'curse_of_agony',
         'Hex of Anguish',
@@ -1023,7 +1067,7 @@ const classAbilityNamesEn = {
       [
         'mark_of_the_wild',
         'Wildward',
-        'Places the Wildward on a friendly target, increasing armor by 25 for 30 min.',
+        'Places the Wildward on the party, increasing all attributes of all party members by {buff}% for 30 min.',
       ],
       [
         'moonfire',
@@ -1034,13 +1078,13 @@ const classAbilityNamesEn = {
       [
         'thorns',
         'Briarguard',
-        'Thorns sprout from the target: melee attackers take 3 Nature damage.',
+        'Thorns sprout from the target: melee attackers take {buff} Nature damage.',
       ],
       ['entangling_roots', 'Gripping Roots', 'Roots the target in place for up to 12 sec.'],
       [
         'bear_form',
         'Bruin Form',
-        'Shapeshift into a bear: armor +65%, attack power +15, your attacks build rage and generate 30% more threat. Cast again to return to caster form.',
+        'Shapeshift into a bear: armor +90%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form.',
       ],
       [
         'maul',
@@ -1062,11 +1106,7 @@ const classAbilityNamesEn = {
         'Claw',
         'Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.',
       ],
-      [
-        'ferocious_bite',
-        'Gorebite',
-        'Finishing move that causes damage per combo point. Wolf Form only.',
-      ],
+      ['ferocious_bite', 'Gorebite', 'Finishing move that causes {damage}. Wolf Form only.'],
       [
         'swipe',
         'Sweeping Claws',
@@ -1086,7 +1126,11 @@ const classAbilityNamesEn = {
       ],
       ['enrage', 'Stoke', 'Generates 20 rage instantly. Bruin Form only.'],
       ['bash', 'Concuss', 'Stuns the target for 2 sec. Bruin Form only.'],
-      ['faerie_fire', 'Witchlight', "Decreases the target's armor by 35 for 40 sec."],
+      [
+        'faerie_fire',
+        'Witchlight',
+        "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Armor Shear.",
+      ],
       [
         'hibernate',
         'Slumber',
@@ -1111,7 +1155,7 @@ const classAbilityNamesEn = {
       [
         'rip',
         'Rip',
-        'Finishing move that causes Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
+        'Finishing move that causes {damage} Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
       ],
       [
         'mortal_strike',
@@ -1121,12 +1165,12 @@ const classAbilityNamesEn = {
       [
         'bloodthirst',
         'Bloodletting',
-        'Instantly attack in a blood frenzy for {damage}. (Fury signature)',
+        'Instantly attack in a blood frenzy for 60% weapon damage plus {damage}. (Fury signature)',
       ],
       [
         'shield_slam',
         'Shieldcrack',
-        'Slam the target with your shield for {damage} and massive threat. (Protection signature)',
+        'Slam the target with your shield for 50% weapon damage plus {damage} and massive threat. (Protection signature)',
       ],
       [
         'whirlwind',

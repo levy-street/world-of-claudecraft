@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { QUEST_LETTERS } from '../src/sim/content/letters';
 import {
   ABILITIES,
@@ -14,6 +15,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
+import { abilityBuffValue } from '../src/ui/ability_damage';
 import {
   assertEntityTranslationsReady,
   entityTranslationFallbackLog,
@@ -23,6 +25,7 @@ import {
   tEntity,
 } from '../src/ui/entity_i18n';
 import {
+  cs_CZ,
   da_DK,
   de_DE,
   en,
@@ -75,6 +78,7 @@ const locales: Record<string, typeof en> = {
   ja_JP,
   pt_BR,
   ru_RU,
+  cs_CZ,
   nl_NL,
   pl_PL,
   id_ID,
@@ -331,6 +335,7 @@ describe('i18n Localization Key Coverage', () => {
     ability: 'Fireball',
     action: 'Open Chat',
     amount: 42,
+    answered: 6,
     base: 14,
     rested: 18,
     buyer: 'Mira',
@@ -474,7 +479,7 @@ describe('i18n Localization Key Coverage', () => {
         kind: 'ability',
         id: entry.id,
         field: entry.field as 'name' | 'description',
-        values: { damage: '11-14' },
+        values: { damage: '11-14', overTime: '57', buff: '35', duration: '12' },
       };
     }
     throw new Error(`Unexpected entity kind: ${entry.kind}`);
@@ -639,6 +644,7 @@ describe('i18n Localization Key Coverage', () => {
       'ja_JP',
       'pt_BR',
       'ru_RU',
+      'cs_CZ',
       'nl_NL',
       'pl_PL',
       'id_ID',
@@ -824,6 +830,10 @@ describe('i18n Localization Key Coverage', () => {
         expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.key);
         expect(rendered, `${lang}.${entry.key}`).not.toContain('$d');
         expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\{damage\}/);
+        // The other tooltip placeholders ($o over-time, $b buff value, $t
+        // duration) must interpolate in every locale exactly like $d.
+        expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\$[obt]\b/);
+        expect(rendered, `${lang}.${entry.key}`).not.toMatch(/\{(overTime|buff|duration)\}/);
         if (
           lang !== 'en' &&
           lang !== 'en_CA' &&
@@ -835,18 +845,48 @@ describe('i18n Localization Key Coverage', () => {
             `${lang}.${entry.key} should not use English yard abbreviation`,
           ).not.toMatch(/\byd\b/i);
         }
-        if (
-          entry.kind === 'ability' &&
-          entry.field === 'description' &&
-          entry.source.includes('$d')
-        ) {
-          expect(rendered, `${lang}.${entry.key}`).toContain('11-14');
+        // Placeholder-substitution parity. The fixture feeds SENTINEL values
+        // (damage '11-14', overTime '57', buff '35', duration '12'); an ability
+        // whose sim SOURCE carries a macro must echo that sentinel back in every
+        // locale, proving the localized string kept the interpolation token and
+        // did not hardcode a number or drop it (the pre-tokenization staleness
+        // this suite now guards). The check is deliberately value-agnostic: the
+        // sentinel is the injected input, not the ability's real value, so a
+        // second ability that legitimately shares a macro (many carry $b now)
+        // never trips it. A companion hard data pin below covers the real values.
+        if (entry.kind === 'ability' && entry.field === 'description') {
+          const src = entry.source;
+          if (src.includes('$d')) expect(rendered, `${lang}.${entry.key} $d`).toContain('11-14');
+          if (src.includes('$o')) expect(rendered, `${lang}.${entry.key} $o`).toContain('57');
+          if (src.includes('$b')) expect(rendered, `${lang}.${entry.key} $b`).toContain('35');
+          if (src.includes('$t')) expect(rendered, `${lang}.${entry.key} $t`).toContain('12');
         }
       }
       expect(entityTranslationFallbackLog(), `${lang} fallback log`).toHaveLength(0);
     }
 
+    // Hard data-regression pin. The sentinel check above proves the {buff} token
+    // survives interpolation everywhere but is value-agnostic, so it cannot catch
+    // a silent balance change. commanding_shout is the ability the old blanket $b
+    // pin actually meant: its $b resolves to its rank-1 Stamina buff via the same
+    // picker hud.ts feeds the token. Pinning the literal fails if the datum (or
+    // the picker) changes, and rendering with it confirms the EN description
+    // interpolates the real number instead of a stale hardcoded one.
+    const commandingShout = abilitiesKnownAt('warrior', ABILITIES.commanding_shout.learnLevel).find(
+      (known) => known.def.id === 'commanding_shout' && known.rank === 1,
+    );
+    expect(commandingShout, 'commanding_shout rank 1 resolves').toBeTruthy();
+    const commandingShoutBuff = abilityBuffValue(commandingShout!);
+    expect(commandingShoutBuff, 'commanding_shout rank-1 Stamina buff').toBe(6);
     setLanguage('en');
+    const commandingShoutDesc = tEntity({
+      kind: 'ability',
+      id: 'commanding_shout',
+      field: 'description',
+      values: { buff: String(commandingShoutBuff) },
+    });
+    expect(commandingShoutDesc).toContain('6');
+    expect(commandingShoutDesc).not.toContain('{buff}');
   });
 
   it('should provide every item translation in every locale without canonical fallbacks', () => {
@@ -889,9 +929,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    // 7 raid/dungeon families with name+bonus2+bonus3, plus 3 leveling haste
-    // kits carrying a single 3-piece tier (name+bonus3 only)
-    expect(itemSetEntries).toHaveLength(7 * 3 + 3 * 2);
+    // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
+    // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
+    // single 3-piece tier (name+bonus3 only).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1516,23 +1557,7 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should expose all supported hreflang alternates in index.html', () => {
     const html = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf8');
-    const expectedHreflang = [
-      'en',
-      'es',
-      'es-ES',
-      'fr-FR',
-      'fr-CA',
-      'en-CA',
-      'it-IT',
-      'de-DE',
-      'zh-CN',
-      'zh-TW',
-      'ko-KR',
-      'ja-JP',
-      'pt-BR',
-      'ru-RU',
-      'x-default',
-    ];
+    const expectedHreflang = [...supportedLanguages.map((lang) => languageTag(lang)), 'x-default'];
     for (const hreflang of expectedHreflang) {
       expect(html, `missing hreflang ${hreflang}`).toContain(`hreflang="${hreflang}"`);
     }
@@ -1547,8 +1572,16 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n-aria="hud.core.mobileControls"');
     expect(html).toContain('data-i18n="hud.core.mobileMove"');
     expect(html).toContain('data-i18n="hud.core.mobileCamera"');
-    expect(html).toContain('data-i18n="hud.core.mobileAttack"');
-    expect(html).toContain('data-i18n="hud.core.mobileTarget"');
+    // #mobile-target-cycle is the ring's Target swap helper (it replaced the
+    // Target Closest button when acquire-nearest moved onto the ring's own
+    // #mobile-action-attack toggle), so its copy lives at
+    // hudChrome.mobile.targetCycleShort.
+    expect(html).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
+    // The old bottom-centre Target button stays removed (the ring's Target
+    // swap is the one target-cycling helper); hud.core.mobileTarget stays in
+    // the catalog (the hudKeys existence list above) but no longer appears in
+    // the markup.
+    expect(html).not.toContain('data-i18n="hud.core.mobileTarget"');
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');

@@ -266,6 +266,34 @@ describe('dead-gate: Spirit Healer exceptions for a ghost', () => {
     const letter = sim.postOffice.mail.find((m: any) => m.id === 4242)!;
     expect(letter.copper).toBe(50); // still attached
   });
+
+  it('bank commands are silently refused while dead (the market/mail idiom)', () => {
+    const sim = makeSim();
+    const p = sim.player as AnyEntity;
+    const meta = sim.players.get(sim.playerId)!;
+    const banker = [...sim.entities.values()].find(
+      (e: AnyEntity) => e.kind === 'npc' && e.templateId === 'bursar_fernando',
+    ) as AnyEntity;
+    expect(banker).toBeTruthy();
+    sim.addItem('wolf_fang', 5);
+    meta.copper = 500; // exactly the first slot-expansion price
+    meta.bank.inventory = [{ itemId: 'wolf_fang', count: 7 }];
+    teleport(sim, p, banker.pos.x + 1, banker.pos.z);
+    makeDead(sim, 'ghost');
+    sim.drainEvents();
+
+    const slotIdx = meta.inventory.findIndex((s: any) => s.itemId === 'wolf_fang');
+    sim.bankDeposit(slotIdx, undefined);
+    sim.bankWithdraw(0, undefined);
+    sim.bankBuySlots();
+
+    const events = sim.drainEvents();
+    expect(events.filter((ev) => ev.type === 'error' || ev.type === 'log')).toEqual([]);
+    expect(sim.countItem('wolf_fang')).toBe(5); // deposit and withdraw moved nothing
+    expect(meta.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 7 }]);
+    expect(meta.copper).toBe(500); // buy-slots charged nothing
+    expect(meta.bank.purchasedSlots).toBe(0);
+  });
 });
 
 describe('auto-release-on-logout: save/load of a dead-unreleased character', () => {

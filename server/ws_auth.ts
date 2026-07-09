@@ -11,9 +11,11 @@
 // (src/main.ts), so any value here is part of the wire contract: changing one is a
 // wire change that must land in the client matcher in the same commit.
 
+import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
+import type { BankBonusSource } from '../src/world_api';
 import type {
   AccountChatMuteStatus,
   AccountCosmetics,
@@ -29,6 +31,12 @@ const WS_AUTH_ERROR = {
   authRequired: 'authentication required',
   notAuthenticated: 'not authenticated',
   noSuchCharacter: 'no such character',
+  // The per-character load lease refused: another process (or a live session in
+  // this one) already holds this character in-world. This EXACT string is the
+  // planJoin refusal literal (server/linkdead.ts) the client already maps
+  // (src/ui/api_error_i18n.ts, errors.api.alreadyInWorld), so reusing it verbatim
+  // needs no new i18n key.
+  alreadyInWorld: 'character already in world',
   forceRename: 'This character must be renamed before entering the world.',
   authTimedOut: 'authentication timed out',
 } as const;
@@ -85,6 +93,19 @@ export interface WsAuthDeps {
   bufferHandshakeMessages: (ws: EventEmitter, maxFrames?: number) => () => void;
   requestMetadata: (req: http.IncomingMessage) => { ip: string; userAgent: string };
   maxWsPerIpHard: number;
+  // Per-character DB load lease (server/db.ts character_leases), injected like
+  // every other DB dependency here so the handshake stays unit-testable without a
+  // live database. acquire fences the row with a per-join nonce; release matches
+  // that nonce so a stale release cannot delete a re-acquired lease.
+  acquireCharacterLease: (characterId: number, nonce: string) => Promise<boolean>;
+  releaseCharacterLease: (characterId: number, nonce?: string) => Promise<void>;
+  // Recomputes the account's bank bonus slots from live facts (email/Discord/wallet/
+  // referrals) so a fresh join stamps the current entitlement into the character state.
+  // Called on the FRESH-JOIN arm only, never on a resume (no mid-session recompute); a
+  // rejection fails the handshake exactly like a getCharacter failure.
+  bankBonusForAccount: (
+    accountId: number,
+  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
 }
 
 export interface WsAuthHandlers {
@@ -109,7 +130,18 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     bufferHandshakeMessages,
     requestMetadata,
     maxWsPerIpHard: MAX_WS_PER_IP_HARD,
+    acquireCharacterLease,
+    releaseCharacterLease,
+    bankBonusForAccount,
   } = deps;
+
+  // Character ids whose lease-acquire-through-join section is in flight in THIS
+  // process. Two genuinely concurrent handshakes for one character would race to
+  // stamp the lease nonce (the second's acquire re-stamping the first's row),
+  // re-opening the leaseless-live-session window; admit only the first and refuse
+  // the rest. The id is added before the lease section and removed in a finally,
+  // so the check-acquire-join sequence is atomic per character within the process.
+  const pendingLeaseJoins = new Set<number>();
 
   async function authenticateWebSocket(
     ws: WebSocket,
@@ -172,56 +204,122 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       return;
     }
     const accountCosmetics = await loadAccountCosmetics(accountId);
-    const result = game.join(
-      ws,
-      accountId,
-      character.id,
-      character.name,
-      character.class,
-      character.state,
-      character.is_gm,
-      {
-        ...meta,
-        ...metaRequestUserData(req, meta),
-        sourceUrl: metaEventSourceUrl(req),
-        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
-        reason: chatMute.reason,
-        chatStrikes: status.chatStrikes,
-        accountCosmetics,
-        isAdmin,
-        adminPermissions,
-        clientSeed,
-      },
-    );
-    if ('error' in result) {
-      rejectHandshake(ws, result.error);
+    const joinMeta = {
+      ...meta,
+      ...metaRequestUserData(req, meta),
+      sourceUrl: metaEventSourceUrl(req),
+      mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
+      reason: chatMute.reason,
+      chatStrikes: status.chatStrikes,
+      accountCosmetics,
+      isAdmin,
+      adminPermissions,
+      clientSeed,
+    };
+    // Two genuinely concurrent handshakes for one character would race to stamp
+    // the lease nonce; admit only the first and refuse the rest (never queue).
+    if (pendingLeaseJoins.has(character.id)) {
+      rejectHandshake(ws, WS_AUTH_ERROR.alreadyInWorld);
       return;
     }
-    const session = result;
-    console.log(`+ ${character.name} (${character.class}) joined, ${game.clients.size} online`);
-    ws.on('message', (data) => {
-      game.handleMessage(session, String(data));
-    });
-    // A dropped socket starts the linkdead grace instead of logging the
-    // character out: the session is held in-world so the client's
-    // auto-reconnect (or a fresh login on the same character) resumes it.
-    // socketClosed no-ops for kicked sessions and for stale events from a
-    // socket that a resume has already replaced; the grace-expiry sweep in
-    // game.ts runs the eventual leave().
-    ws.on('close', () => {
-      if (game.socketClosed(session, ws)) {
-        console.log(`~ ${character.name} linkdead, ${game.clients.size} online`);
+    pendingLeaseJoins.add(character.id);
+    try {
+      let leaseNonce: string | undefined;
+      let result: ReturnType<GameServer['join']>;
+      if (game.hasSessionForCharacter(character.id)) {
+        // A live or linkdead session in THIS process already owns the lease row;
+        // let planJoin adjudicate (a linkdead session resumes and keeps the row's
+        // nonce; a live duplicate is rejected) and never re-stamp the row with a
+        // fresh acquire that a doomed handshake could leave mismatched.
+        result = game.join(
+          ws,
+          accountId,
+          character.id,
+          character.name,
+          character.class,
+          character.state,
+          character.is_gm,
+          joinMeta,
+        );
+      } else {
+        // Fresh load: claim the lease immediately before creating the session, and
+        // only after every cheap refusal above (auth, moderation, ownership,
+        // force-rename, the per-IP hard limit), so no refusable handshake pays for
+        // the DB write and no session is ever created without a lease. Acquiring on
+        // a raw client-supplied id before the getCharacter ownership check would let
+        // any authenticated user lock arbitrary characters (a login DoS). The
+        // per-join nonce fences the row so a later stale release cannot delete it. A
+        // live foreign lease fails closed with the exact 'character already in world'
+        // string planJoin already uses.
+        //
+        // Recompute the bank bonus slots from live account facts and stamp them into
+        // the character state at load (server authority). Fresh-join arm ONLY: a resume
+        // above keeps its stamped value (no mid-session recompute, locked policy).
+        // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
+        // await means a DB error fails the handshake exactly like a getCharacter failure.
+        const bankBonus = await bankBonusForAccount(accountId);
+        leaseNonce = randomUUID();
+        const leased = await acquireCharacterLease(character.id, leaseNonce);
+        if (!leased) {
+          rejectHandshake(ws, WS_AUTH_ERROR.alreadyInWorld);
+          return;
+        }
+        result = game.join(
+          ws,
+          accountId,
+          character.id,
+          character.name,
+          character.class,
+          character.state,
+          character.is_gm,
+          { ...joinMeta, leaseNonce, bankBonus },
+        );
       }
-    });
-    ws.on('error', () => {
-      game.socketClosed(session, ws);
-    });
-    // Clears the keepalive liveness flag (game.ts pingLiveSessions). Guarded
-    // on socket identity so a late pong from a pre-resume socket cannot mask
-    // a black-holed replacement.
-    ws.on('pong', () => {
-      if (session.ws === ws) session.awaitingPong = false;
-    });
+      if ('error' in result) {
+        // join refused after we took the lease. Release it, AWAITED and nonce-fenced
+        // so a stale delete never eats a re-acquired row, UNLESS this process already
+        // has a live session for the character (that session owns the lease and
+        // dropping it would strand the live player). leaseNonce is undefined only on
+        // the hasSession path above, where we took no lease to release.
+        if (leaseNonce !== undefined && !game.hasSessionForCharacter(character.id)) {
+          await releaseCharacterLease(character.id, leaseNonce).catch((err) =>
+            console.error('lease release failed:', err),
+          );
+        }
+        rejectHandshake(ws, result.error);
+        return;
+      }
+      const session = result;
+      console.log(`+ ${character.name} (${character.class}) joined, ${game.clients.size} online`);
+      ws.on('message', (data) => {
+        game.handleMessage(session, String(data));
+      });
+      // A dropped socket starts the linkdead grace instead of logging the
+      // character out: the session is held in-world so the client's
+      // auto-reconnect (or a fresh login on the same character) resumes it.
+      // socketClosed no-ops for kicked sessions and for stale events from a
+      // socket that a resume has already replaced; the grace-expiry sweep in
+      // game.ts runs the eventual leave().
+      ws.on('close', () => {
+        if (game.socketClosed(session, ws)) {
+          console.log(`~ ${character.name} linkdead, ${game.clients.size} online`);
+        }
+      });
+      ws.on('error', () => {
+        game.socketClosed(session, ws);
+      });
+      // Clears the keepalive liveness flag (game.ts pingLiveSessions). Guarded
+      // on socket identity so a late pong from a pre-resume socket cannot mask
+      // a black-holed replacement.
+      ws.on('pong', () => {
+        if (session.ws === ws) session.awaitingPong = false;
+      });
+    } finally {
+      // The join is decided (a session now lives in sessionsByCharacterId, or the
+      // handshake was rejected), so a later handshake sees hasSessionForCharacter
+      // and no longer needs this guard.
+      pendingLeaseJoins.delete(character.id);
+    }
   }
 
   async function onConnection(ws: WebSocket, req: http.IncomingMessage): Promise<void> {

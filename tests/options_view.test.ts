@@ -177,8 +177,40 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(keys).toContain('actionButtonScale');
     expect(keys).toContain('joystickDeadzone');
     expect(keys).toContain('touchInvertLook');
+    expect(keys).toContain('mobileCameraJoystick');
+    expect(keys).toContain('leftHandedTouch');
     // touchLookSpeed sits right after cameraSpeed
     expect(keys[keys.indexOf('cameraSpeed') + 1]).toBe('touchLookSpeed');
+    // mobileCameraJoystick and leftHandedTouch are the last two touch-only rows,
+    // right after touchInvertLook, in that order.
+    const touchInvertIdx = keys.indexOf('touchInvertLook');
+    expect(keys[touchInvertIdx + 1]).toBe('mobileCameraJoystick');
+    expect(keys[touchInvertIdx + 2]).toBe('leftHandedTouch');
+  });
+
+  it('hides mobileCameraJoystick and leftHandedTouch on a desktop interface', () => {
+    const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
+      touch: false,
+      nativeShell: false,
+    });
+    const keys = keysOf(controls);
+    expect(keys).not.toContain('mobileCameraJoystick');
+    expect(keys).not.toContain('leftHandedTouch');
+  });
+
+  it('gives mobileCameraJoystick and leftHandedTouch their correct i18n keys', () => {
+    const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
+      touch: true,
+      nativeShell: false,
+    });
+    expect(find(controls, 'mobileCameraJoystick')).toMatchObject({
+      control: 'boolToggle',
+      labelKey: 'hudChrome.options.mobileCameraJoystick',
+    });
+    expect(find(controls, 'leftHandedTouch')).toMatchObject({
+      control: 'boolToggle',
+      labelKey: 'hudChrome.options.mobileLeftHanded',
+    });
   });
 });
 
@@ -255,6 +287,16 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'showDailyRewardsChest',
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
+  });
+
+  it('marks only uiScale as commit-on-release; the other comfort sliders stay live (#1558)', () => {
+    const controls = buildInterfaceControls(makeSource());
+    // uiScale rescales the whole UI (window included), so it must apply on release.
+    expect(find(controls, 'uiScale')).toMatchObject({ control: 'slider', commitOnChange: true });
+    // Sibling sliders keep their live preview (no commitOnChange flag).
+    expect(find(controls, 'playerFrameScale')).not.toHaveProperty('commitOnChange');
+    expect(find(controls, 'tooltipScale')).not.toHaveProperty('commitOnChange');
+    expect(find(controls, 'fctScale')).not.toHaveProperty('commitOnChange');
   });
 });
 

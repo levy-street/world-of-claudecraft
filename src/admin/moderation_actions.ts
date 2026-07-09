@@ -155,6 +155,31 @@ export function addNote(accountId: number, note: string): Built {
   };
 }
 
+// Admin-initiated password reset. Length bounds mirror server/auth.ts
+// (MIN/MAX_PASSWORD_LENGTH); the password itself never renders in a confirm row.
+export const PASSWORD_MIN_LENGTH = 6;
+export const PASSWORD_MAX_LENGTH = 128;
+
+export function resetPassword(accountId: number, password: string, note: string): Built {
+  if (!note) return { errorKey: 'alert.noteRequired' };
+  if (password.length < PASSWORD_MIN_LENGTH || password.length > PASSWORD_MAX_LENGTH) {
+    return { errorKey: 'alert.passwordLength' };
+  }
+  return {
+    pending: {
+      title: t('dialog.confirmResetPassword'),
+      rows: [
+        accountRow(accountId),
+        { label: t('dialog.action'), value: t('dialog.actionResetPassword') },
+        reasonRow(note),
+      ],
+      endpoint: `/admin/api/accounts/${accountId}/reset-password`,
+      body: { password, reason: note },
+      danger: true,
+    },
+  };
+}
+
 export function banAccount(accountId: number, note: string): Built {
   if (!note) return { errorKey: 'alert.noteRequired' };
   return {

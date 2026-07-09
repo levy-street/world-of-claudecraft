@@ -33,8 +33,9 @@ mobile portrait *and* landscape before calling UI work done.
   - Every visible `input`/`select`/`textarea` is **>=16px** font, or iOS Safari auto-zooms the
     page on focus (it ignores the viewport `user-scalable=no`/`maximum-scale`, so font-size is
     the only reliable fix). Enforced centrally by a `@media (pointer: coarse) { input, textarea,
-    select { font-size: 16px !important } }` floor in `index.html` (mirrored in `admin.html`);
-    the `!important` is what wins. Don't set a per-control mobile font below 16px. Regression
+    select { font-size: 16px !important } }` floor in `src/styles/base.css` (both game entries;
+    the admin bundle carries its own mirror in `src/admin/styles/`); the `!important` is what
+    wins. Don't set a per-control mobile font below 16px. Regression
     check: `node scripts/mobile_input_zoom_check.mjs` (needs `npm run dev`).
   - Every tappable target stays **>=40x40px** on mobile touch (the preferred floor); 24x24px
     (WCAG 2.2 SC 2.5.8) is the absolute minimum, used only where 40x40 is genuinely infeasible.
@@ -200,7 +201,7 @@ The locale data is split; touch the right file (full model + locked-terms glossa
   `shell`/`hud`/`hud_chrome`/`abilities`/`quests`/`items`/`game`/`merge` + an `index.ts`
   barrel) that drives `TranslationKey = Leaves<typeof en, 6>`, the dotted-path type every
   `t()` uses. Add a new English string in the matching domain module.
-- **`i18n.locales/<lang>.ts`** are the 20 non-English flat sparse overlays
+- **`i18n.locales/<lang>.ts`** are the 21 non-English flat sparse overlays
   (`Partial<Record<TranslationKey,string>>`), the ONLY files a translator edits. An omitted
   key is English-filled by the build and marked `pending`.
 - **`i18n.resolved.generated/`** is the generated dense table the runtime imports (committed,
@@ -208,8 +209,8 @@ The locale data is split; touch the right file (full model + locked-terms glossa
   counts-only `i18n.status.summary.json` is committed).
 - **`i18n.ts`** is the thin runtime: `t()`/`tOptional`/`tPlural`, `hasTranslation`, the
   formatters, language get/set. The locale set derives from `SUPPORTED_LANGUAGES` in the
-  generated `loaders.ts` (21 = en + 20). **Lazy locale flip:** only `en`/`en_XA`/`pending`/
-  `loaders` are eager; the 20 non-en slices load on demand via `await ensureLocaleLoaded(lang)`.
+  generated `loaders.ts` (22 = en + 21). **Lazy locale flip:** only `en`/`en_XA`/`pending`/
+  `loaders` are eager; the 21 non-en slices load on demand via `await ensureLocaleLoaded(lang)`.
   `setLanguage` is synchronous and does NOT load; `main.ts` awaits `ensureLocaleLoaded` before
   localized paint and each picker switch.
 
@@ -226,7 +227,7 @@ feature branch is expected and fine at the PR-tier gate.
 
 **Contributor workflow (add a player-visible string): add ENGLISH ONLY.**
 1. Add the key to `en` (the matching `i18n.catalog/<domain>.ts` module) and render it through
-   `t()`. **Never edit the 20 `i18n.locales/<lang>.ts` overlays, and never put English / a
+   `t()`. **Never edit the 21 `i18n.locales/<lang>.ts` overlays, and never put English / a
    `// TODO` / a placeholder into one.** Leave the key omitted; the build English-fills it and
    marks it `pending` (the maintainer batch-fills every locale at release).
 2. If the string originates in `src/sim/` or `server/` (which stay language-agnostic), register
@@ -310,6 +311,14 @@ directly, with a thin DOM/canvas consumer. Follow this shape for reusable/testab
 - **vendor_view.ts** / **vendor_window.ts**: the merchant window, the first migrated out of
   `hud.ts` by the recipe above (pure view decides sellable + buyback rows with prices; thin
   consumer paints `#vendor-window` from injected `deps`).
+- **bank_view.ts** / **bank_window.ts** (+ **bank_filter.ts**): the Gilded Strongbox bank
+  window. The DOM-free core builds the cell model, buy-slots pricing, and the
+  deposit-all-materials plan (`planDepositAllMaterials` simulates whole-stack sends without
+  mutating the world; summary via `depositAllSummaryKey`); the painter is a thin non-modal
+  companion of the bags cluster (the Hud docks them side by side via `body.bank-open`,
+  mobile-paired 50/50) with non-trapping focus capture/return. `bank_filter.ts` is the
+  locale-aware search/category/sort that preserves live `slotIndex` values verbatim, so a
+  filtered row still names the exact wire argument for deposit/withdraw.
 - **player_context_menu.ts**: pure `chatPlayerContextActions()` (whisper/invite/friend/ignore/
   report) for the right-click-player menu.
 - **auth_utils.ts**: login/char-select form helpers (password toggle, ARIA validity sync,

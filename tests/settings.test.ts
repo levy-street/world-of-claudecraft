@@ -158,6 +158,14 @@ describe('Settings', () => {
     expect(b.get('leftHandedTouch')).toBe(true);
   });
 
+  it('defaults the mobile camera joystick off and persists enabling it across instances', () => {
+    const a = new Settings();
+    expect(a.get('mobileCameraJoystick')).toBe(false);
+    a.set('mobileCameraJoystick', true);
+    const b = new Settings();
+    expect(b.get('mobileCameraJoystick')).toBe(true);
+  });
+
   it('defaults footstep sounds off and persists re-enabling across instances', () => {
     const a = new Settings();
     expect(a.get('footstepSfx')).toBe(false);
@@ -195,6 +203,7 @@ describe('Settings', () => {
     s.set('shadowQuality', 0);
     s.set('fullscreen', 0);
     s.set('mouseCamera', true);
+    s.set('mobileCameraJoystick', true);
     s.reset();
     expect(s.get('cameraSpeed')).toBe(SETTING_RANGES.cameraSpeed.def);
     expect(s.get('renderScale')).toBe(SETTING_RANGES.renderScale.def);
@@ -206,6 +215,7 @@ describe('Settings', () => {
     expect(s.get('fullscreen')).toBe(SETTING_RANGES.fullscreen.def);
     expect(s.get('clickToMoveButton')).toBe(SETTING_RANGES.clickToMoveButton.def);
     expect(s.get('mouseCamera')).toBe(false);
+    expect(s.get('mobileCameraJoystick')).toBe(false);
   });
 
   it('action button scale defaults to 1.0 and clamps to its slider bounds', () => {

@@ -36,6 +36,7 @@ import {
   ITEMS,
   isArenaPos,
   isDelvePos,
+  isGauntletPos,
   MOBS,
   resolveDelveShopOffers,
 } from '../data';
@@ -331,6 +332,10 @@ export function canEnterDelve(ctx: SimContext, pid: number): string | null {
   if (dungeonAt(r.e.pos.x)) return 'Leave the dungeon first.';
   if (isArenaPos(r.e.pos.x)) return 'Leave the arena first.';
   if (isDelvePos(r.e.pos.x)) return 'You are already in a delve.';
+  // Mid-gauntlet delve entry is refused with the generic gate string (already
+  // matched client-side) rather than a new literal; the position check covers
+  // both a run participant and a spectator in the band.
+  if (isGauntletPos(r.e.pos.x)) return 'You cannot enter a delve right now.';
   if (ctx.tradeFor(pid)) return 'You cannot enter a delve while trading.';
   if (ctx.duelFor(pid)) return 'You cannot enter a delve during a duel.';
   if (ctx.arenaMatches.has(pid)) return 'You cannot enter a delve during an arena match.';

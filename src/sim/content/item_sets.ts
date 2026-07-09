@@ -3,9 +3,11 @@
 // The sets are the epic armor families that drop from the Gravewyrm Sanctum
 // (tier 1) and the Nythraxis raid (tier 2), plus three leveling "haste kit"
 // families assembled from existing world-drop items. Wearing enough pieces of
-// a family grants stacking 2- and 3-piece bonuses, resolved in
+// a family grants stacking 2-, 3-, and 4-piece bonuses, resolved in
 // `recalcPlayerStats` (primary stats, attack power, crit, haste, knockback
-// resistance).
+// resistance). Every epic family's 4-piece tier is a proc (see SetProc):
+// weapon-crit-triggered for the plate and leather archetypes, spell-cast-
+// triggered for the caster archetypes, resolved by combat/set_procs.ts.
 //
 // Bonuses are keyed by archetype: the plate (Strength) families get attack
 // power then Strength/Stamina; the leather (Agility) families get attack power
@@ -17,11 +19,13 @@
 // data-as-code: balance numbers live here, never inline in the engine.
 // `aggregateSetBonuses` is the pure resolver imported by `entity.ts`.
 
-import type { ItemSet, SetBonusEffect, SetBonusTier } from '../types';
+import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
 
 // Haste granted by a 3-piece bonus (fraction). The one knob for every haste
 // source: 0.15 makes swings 15% faster and casts/channels 15% shorter.
 export const SET_HASTE_3PC = 0.15;
+export const SET_HASTE_3PC_RATING = 150; // -> 15% haste at 10 rating = 1%
+export const SET_CRIT_3PC_RATING = 20; // -> +2% crit at 10 rating = 1%
 
 // Set ids. Tier-1 families drop from the Gravewyrm Sanctum; tier-2 from the
 // Nythraxis raid. The string is also the `set` tag on each member item.
@@ -47,25 +51,73 @@ export const SET_GREYJAW_STALKER = 'greyjaw_stalker'; // leather, marksman
 const STRENGTH_T1_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
   { pieces: 3, effect: { str: 15, sta: 15 }, text: 'Increases Strength by 15 and Stamina by 15.' },
+  {
+    pieces: 4,
+    effect: {
+      proc: {
+        id: 'set_gravemight',
+        name: 'Gravemight',
+        trigger: 'weaponCrit',
+        chance: 0.5,
+        aura: 'buff_ap',
+        value: 60,
+        duration: 10,
+        icd: 15,
+      },
+    },
+    text: 'Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 60 for 10 sec.',
+  },
 ];
 const AGILITY_T1_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
   {
     pieces: 3,
-    effect: { agi: 15, crit: 0.02 },
+    effect: { agi: 15, critRating: SET_CRIT_3PC_RATING },
     text: 'Increases Agility by 15 and critical strike chance by 2%.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      proc: {
+        id: 'set_fangrush',
+        name: 'Fangrush',
+        trigger: 'weaponCrit',
+        chance: 0.5,
+        // buff_haste value is a swing-interval divisor (1.25 = 25% faster swings)
+        aura: 'buff_haste',
+        value: 1.25,
+        duration: 8,
+        icd: 15,
+      },
+    },
+    text: 'Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec.',
   },
 ];
 const CASTER_T1_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { knockbackResistance: 1 },
-    text: 'You cannot be knocked back (100% knockback resistance).',
+    effect: { knockbackResistance: 1, sp: 20 },
+    text: 'Increases spell power by 20. You cannot be knocked back (100% knockback resistance).',
   },
   {
     pieces: 3,
     effect: { int: 10, sta: 10 },
     text: 'Increases Intellect by 10 and Stamina by 10.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      proc: {
+        id: 'set_clearcasting',
+        name: 'Clearcasting',
+        trigger: 'spellCast',
+        chance: 0.1,
+        aura: 'next_cast_free',
+        duration: 12,
+        icd: 4,
+      },
+    },
+    text: 'Your spells have a 10% chance to grant Clearcasting, making your next spell free.',
   },
 ];
 // Tier-2 3-piece tiers carry the tier-1 stats PLUS haste.
@@ -73,28 +125,89 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
   {
     pieces: 3,
-    effect: { str: 15, sta: 15, haste: SET_HASTE_3PC },
+    effect: { str: 15, sta: 15, hasteRating: SET_HASTE_3PC_RATING },
     text: 'Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      // Every weapon crit applies/stacks the bleed (no roll, no icd): with a
+      // sustained crit every 8 to 12s the bleed sits at 1 to 2 stacks, peaking
+      // at 3 (24 damage per 2s), roughly the 2-piece's flat 40 AP in
+      // sustained damage while rewarding crit stacking.
+      proc: {
+        id: 'set_bonesplinter',
+        name: 'Bonesplinter',
+        trigger: 'weaponCrit',
+        chance: 1,
+        applyTo: 'target',
+        aura: 'dot',
+        value: 8, // per tick, per stack
+        tickInterval: 2,
+        duration: 12,
+        maxStacks: 3,
+        school: 'physical',
+      },
+    },
+    text: 'Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const AGILITY_T2_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
   {
     pieces: 3,
-    effect: { agi: 15, crit: 0.02, haste: SET_HASTE_3PC },
+    effect: { agi: 15, critRating: SET_CRIT_3PC_RATING, hasteRating: SET_HASTE_3PC_RATING },
     text: 'Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      // Leather crits land more often (the 3-piece adds crit AND haste), so
+      // its bleed ticks lighter than the plate one: more applications, same
+      // sustained value, peaking at 18 damage per 2s at 3 stacks.
+      proc: {
+        id: 'set_ragged_gash',
+        name: 'Ragged Gash',
+        trigger: 'weaponCrit',
+        chance: 1,
+        applyTo: 'target',
+        aura: 'dot',
+        value: 6, // per tick, per stack
+        tickInterval: 2,
+        duration: 12,
+        maxStacks: 3,
+        school: 'physical',
+      },
+    },
+    text: 'Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
 const CASTER_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { knockbackResistance: 1 },
-    text: 'You cannot be knocked back (100% knockback resistance).',
+    effect: { knockbackResistance: 1, sp: 20 },
+    text: 'Increases spell power by 20. You cannot be knocked back (100% knockback resistance).',
   },
   {
     pieces: 3,
-    effect: { int: 15, spi: 15, haste: SET_HASTE_3PC },
+    effect: { int: 15, spi: 15, hasteRating: SET_HASTE_3PC_RATING },
     text: 'Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.',
+  },
+  {
+    pieces: 4,
+    effect: {
+      proc: {
+        id: 'set_soulblaze',
+        name: 'Soulblaze',
+        trigger: 'spellCast',
+        chance: 0.1,
+        aura: 'buff_spellpower',
+        value: 40,
+        duration: 10,
+        icd: 20,
+      },
+    },
+    text: 'Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.',
   },
 ];
 // The leveling haste kits grant haste alone, and only at 3 pieces:
@@ -102,7 +215,7 @@ const CASTER_T2_BONUSES: SetBonusTier[] = [
 const HASTE_KIT_BONUSES: SetBonusTier[] = [
   {
     pieces: 3,
-    effect: { haste: SET_HASTE_3PC },
+    effect: { hasteRating: SET_HASTE_3PC_RATING },
     text: 'Increases attack and casting speed by 15%.',
   },
 ];
@@ -161,10 +274,14 @@ export interface AggregatedSetEffect {
   int: number;
   spi: number;
   ap: number;
+  sp: number;
   crit: number;
+  critRating: number;
   haste: number;
+  hasteRating: number;
   castPushbackReduction: number;
   knockbackResistance: number;
+  procs: SetProc[];
 }
 
 function zeroEffect(): AggregatedSetEffect {
@@ -175,10 +292,14 @@ function zeroEffect(): AggregatedSetEffect {
     int: 0,
     spi: 0,
     ap: 0,
+    sp: 0,
     crit: 0,
+    critRating: 0,
     haste: 0,
+    hasteRating: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
+    procs: [],
   };
 }
 
@@ -200,14 +321,18 @@ export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetE
       out.int += e.int ?? 0;
       out.spi += e.spi ?? 0;
       out.ap += e.ap ?? 0;
+      out.sp += e.sp ?? 0;
       out.crit += e.crit ?? 0;
+      out.critRating += e.critRating ?? 0;
       out.haste += e.haste ?? 0;
+      out.hasteRating += e.hasteRating ?? 0;
       if (e.castPushbackReduction != null) {
         out.castPushbackReduction = Math.max(out.castPushbackReduction, e.castPushbackReduction);
       }
       if (e.knockbackResistance != null) {
         out.knockbackResistance = Math.max(out.knockbackResistance, e.knockbackResistance);
       }
+      if (e.proc) out.procs.push(e.proc);
     }
   }
   out.castPushbackReduction = Math.min(1, Math.max(0, out.castPushbackReduction));

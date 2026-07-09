@@ -113,6 +113,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.gear.intro',
   },
   {
+    id: 'professions',
+    sub: 'professions',
+    navKey: 'guide.nav.professions',
+    group: 'compendium',
+    descKey: 'guide.professions.intro',
+  },
+  {
     id: 'economy',
     sub: 'economy',
     navKey: 'guide.nav.economy',
@@ -146,6 +153,20 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     navKey: 'guide.nav.arena',
     group: 'compendium',
     descKey: 'guide.arenaPage.intro',
+  },
+  {
+    id: 'hodrics-castle',
+    sub: 'hodrics-castle',
+    navKey: 'guide.nav.hodricsCastle',
+    group: 'compendium',
+    descKey: 'guide.hodricsCastlePage.intro',
+  },
+  {
+    id: 'vale-cup',
+    sub: 'vale-cup',
+    navKey: 'guide.nav.valeCup',
+    group: 'compendium',
+    descKey: 'guide.valeCupPage.intro',
   },
   {
     id: 'controls',

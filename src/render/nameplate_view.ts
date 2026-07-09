@@ -18,6 +18,7 @@
 // garbage on the hot path), mirroring the speedStreaksInto / cameraSpace out-param
 // idiom elsewhere in src/render.
 
+import { HUB_PORTAL_TEMPLATE } from '../sim/data';
 import type { Entity } from '../sim/types';
 import { INTERACT_RANGE } from '../sim/types';
 import { comboPipsFor } from './nameplate_combo';
@@ -44,6 +45,11 @@ export const NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT = 0.2;
 // The crypt's sealed royal door carries no floating label (it reads as back wall,
 // not a portal billboard).
 const UNLABELED_DOOR_DUNGEON_ID = 'nythraxis_boss_arena';
+
+// The Vale Cup boarball is an inert mob entity (bell pattern) with a bespoke
+// ball visual; a floating "Ball" name + hp bar over it would break the toy
+// (the dungeon-door carve-out pattern, kept template-scoped and pure).
+const UNLABELED_MOB_TEMPLATE_ID = 'vale_cup_ball';
 
 /** Per-entity nameplate decisions the painter consumes. Mutated in place by
  *  nameplatePlanInto so the painter can reuse one instance across all entities. */
@@ -98,7 +104,14 @@ export function nameplatePlanInto(
   const d2 = dx * dx + dz * dz;
   const isSelf = e.id === player.id;
   const hasOverheadEmote = !!(e.kind === 'player' && e.overheadEmoteId && !e.dead);
-  const isDoor = e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit';
+  // Door-like objects that announce themselves with a standing header: the
+  // dungeon doorways and the Proving Grounds overworld entrance portal (its
+  // header names the venue it leads to). The room's exit portal is not in the
+  // set: it carries no label.
+  const isDoor =
+    e.templateId === 'dungeon_door' ||
+    e.templateId === 'dungeon_exit' ||
+    e.templateId === HUB_PORTAL_TEMPLATE;
   const isDelveInteract =
     e.templateId === 'delve_locked_chest' ||
     e.templateId === 'delve_reward_chest' ||
@@ -125,6 +138,7 @@ export function nameplatePlanInto(
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
+    e.templateId === UNLABELED_MOB_TEMPLATE_ID ||
     (!showNameplates && e.kind === 'mob' && !e.dead);
   out.anchorYOffset =
     viewHeight * e.scale +

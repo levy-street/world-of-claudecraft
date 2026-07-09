@@ -68,6 +68,9 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.fleeReturnTimer = 0;
   mob.hasFled = false;
   clearThreat(mob);
+  // A respawn is a brand-new pull: the world-boss damager roster clears with
+  // the hate table so loot rights never carry across lives.
+  mob.bossDamagers.clear();
   despawnSummonedAdds(ctx, mob);
   mob.firedSummons = 0;
   mob.enraged = false;

@@ -13,6 +13,13 @@ export const LINKDEAD_GRACE_MS = 5 * 60 * 1000;
 export interface LinkdeadSessionView {
   accountId: number;
   linkdead: boolean;
+  // True once GameServer.leave() has begun tearing the session down. leave()
+  // sets it synchronously, then awaits the character save before removing the
+  // sim entity and releasing the character load lease; a session in that
+  // window must never be resumed (the reconnect would get a zombie whose
+  // lease release the nonce fence cannot see, since the resume arm never
+  // re-acquires).
+  left: boolean;
 }
 
 export type JoinPlan =
@@ -37,9 +44,16 @@ export function planJoin(opts: {
   maxPerAccount: number;
 }): JoinPlan {
   if (opts.sameCharacter) {
-    if (opts.sameCharacter.linkdead && opts.sameCharacter.accountId === opts.accountId) {
+    if (
+      opts.sameCharacter.linkdead &&
+      !opts.sameCharacter.left &&
+      opts.sameCharacter.accountId === opts.accountId
+    ) {
       return { action: 'resume' };
     }
+    // Mid-teardown (left) and live-socket sessions both reject with the
+    // transient conflict error; the client's reconnect policy retries it, and
+    // the retry lands on a clean fresh join once the teardown finishes.
     return { action: 'reject', error: 'character already in world' };
   }
   if (!opts.isGm && opts.liveOtherSessions >= opts.maxPerAccount) {

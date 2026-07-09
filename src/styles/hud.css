@@ -971,6 +971,19 @@
   .buff.debuff[data-school="holy"] {
     border-color: var(--color-debuff-holy);
   }
+  /* The LOCAL player's own auras on the target strip (auras_view ownFirst):
+     larger and gold-glowed so the dots/hots YOU are maintaining read at a
+     glance among other casters'. A debuff keeps its school border tint (the
+     size and glow carry the prominence). Extra information only, never less,
+     so no graphics tier sheds it (gameplay-neutral-graphics invariant). */
+  .buff.own {
+    width: 34px;
+    height: 34px;
+    box-shadow: 0 0 5px var(--color-primary-dim);
+  }
+  .buff.own:not(.debuff) {
+    border-color: var(--color-primary);
+  }
   /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
   .buff.cancelable {
     cursor: context-menu;
@@ -1916,6 +1929,9 @@
     font-size: 11px;
     font-family: var(--ui-font);
     vertical-align: text-bottom;
+    /* dark digit on a gold fill: the tracker's inherited black text-shadow
+       only blurs it, so drop it inside the badge */
+    text-shadow: none;
   }
   #quest-tracker .qt-obj {
     color: var(--color-text-overlay);
@@ -2496,6 +2512,7 @@
   body.native-app .donate-cta,
   body.native-app .community-link.donate,
   body.native-app .social-link.donate,
+  body.native-app #mobile-donate,
   body.native-app #token-ca,
   body.native-app #nav-btn-download,
   body.native-app .cs-wallet,
@@ -3752,6 +3769,13 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  /* The mobile keyboard-dismiss chevron is hidden by default (desktop AND mobile-when-
+     chat-closed); only body.mobile-touch.mobile-chat-open reveals it (hud.mobile.css,
+     a later @layer, so it wins there). Without this base hide the button would render
+     as a stray control on desktop, which has no mobile-touch-scoped rule to hide it. */
+  #chat-dismiss {
+    display: none;
+  }
 
   /* ---------- party frames ---------- */
   #party-frames {
@@ -3762,6 +3786,15 @@
     flex-direction: column;
     gap: 6px;
     z-index: 5;
+  }
+  /* The painter nests the member rows one level down in a .party-rows wrapper (so the
+     mobile collapse chip can sit alone on its own line). On desktop the wrapper is
+     transparent (display: contents), so the rows lay out as direct flex items of
+     #party-frames exactly as before the wrapper existed: the flex column gap and every
+     .party-frame rule apply unchanged. Mobile re-declares the wrapper as its own
+     2-column grid (hud.mobile.css). */
+  #party-frames .party-rows {
+    display: contents;
   }
   #party-frames.below-target {
     top: 96px;
@@ -4185,5 +4218,467 @@
   .mail-indicator-count {
     font: 700 11px var(--title-font);
     letter-spacing: 0.4px;
+  }
+
+  /* ---------- gauntlet HUD cluster ---------- */
+  /* The survival-event status cluster: shown only while a run is live (the painter
+     toggles display). Non-interactive chrome, so it never eats clicks. */
+  #gauntlet-hud {
+    position: absolute;
+    left: 50%;
+    top: 74px;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 280px;
+    pointer-events: none;
+    z-index: 6;
+  }
+  #gauntlet-phase {
+    font-family: var(--title-font);
+    font-size: 15px;
+    color: var(--color-primary);
+    text-shadow: 1px 1px 3px #000;
+    letter-spacing: 0.5px;
+  }
+  #gauntlet-countdown {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    border: 2px solid var(--border);
+    outline: 1px solid #000;
+    border-radius: 4px;
+    background: #100c08;
+    overflow: hidden;
+  }
+  #gauntlet-countdown .fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(#ffe48a, #c9941a 60%, #9a6f12);
+  }
+  #gauntlet-countdown .timer {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    line-height: 9px;
+    font-size: 9px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    font-variant-numeric: tabular-nums;
+  }
+  .gh-chip {
+    font: 700 11px / 16px var(--body-font);
+    color: var(--color-text-light);
+    background: rgba(8, 8, 12, 0.82);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 1px 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  /* The pre-trial tutorial banner: the upcoming trial's teaching line, big
+     and centered above mid-screen while the staging/interlude countdown runs
+     out (the painter shows it for the last TUTORIAL_LEAD_S seconds). */
+  #gauntlet-tutorial {
+    position: fixed;
+    left: 50%;
+    top: 30%;
+    transform: translate(-50%, -50%);
+    display: none;
+    width: max-content;
+    max-width: 86%;
+    padding: 10px 24px;
+    font: 700 20px / 28px var(--title-font);
+    letter-spacing: 0.5px;
+    color: var(--color-primary);
+    text-align: center;
+    text-shadow: 1px 1px 3px #000;
+    background: rgba(8, 8, 12, 0.78);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 6;
+  }
+
+  /* The Gauntlet standings board: a compact top-left list of every contestant's
+     vitality bar, the viewer's own row highlighted, knocked-out rows dimmed with
+     an OUT tag. Read-only chrome (built by gauntlet_board.ts), never eats clicks.
+     The top-center player frame is margin-auto centered, so the top-left corner
+     is free for it. */
+  #gauntlet-board {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    display: none;
+    flex-direction: column;
+    width: 190px;
+    max-height: calc(100vh - 200px);
+    overflow: hidden;
+    padding: 6px 8px;
+    background: rgba(8, 8, 12, 0.72);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    pointer-events: none;
+    z-index: 6;
+  }
+  #gauntlet-board .gb-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 3px;
+    margin-bottom: 3px;
+  }
+  #gauntlet-board .gb-title {
+    font-family: var(--title-font);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    color: var(--color-primary);
+    text-shadow: 1px 1px 2px #000;
+  }
+  #gauntlet-board .gb-count {
+    font: 700 11px / 1 var(--body-font);
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
+  }
+  #gauntlet-board .gb-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #gauntlet-board .gb-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 6px;
+    height: 15px;
+    padding: 0 3px;
+    border-radius: 4px;
+  }
+  #gauntlet-board .gb-row.me {
+    background: rgba(201, 148, 26, 0.22);
+    outline: 1px solid var(--color-primary);
+  }
+  #gauntlet-board .gb-name {
+    font: 600 11px / 15px var(--body-font);
+    color: var(--color-text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #gauntlet-board .gb-row.me .gb-name {
+    color: var(--color-primary);
+  }
+  #gauntlet-board .gb-bar {
+    position: relative;
+    width: 62px;
+    height: 7px;
+    border: 1px solid #000;
+    border-radius: 3px;
+    background: #241a12;
+    overflow: hidden;
+  }
+  #gauntlet-board .gb-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(#5fe08a, #2c9a4c);
+  }
+  #gauntlet-board .gb-fill.low {
+    background: linear-gradient(#ff8a6a, #b6402c);
+  }
+  #gauntlet-board .gb-row.out {
+    opacity: 0.5;
+  }
+  #gauntlet-board .gb-row.out .gb-name {
+    text-decoration: line-through;
+  }
+  #gauntlet-board .gb-out {
+    font: 700 9px / 1 var(--body-font);
+    letter-spacing: 1px;
+    color: #ff8a7a;
+  }
+
+  /* ---------- gauntlet circles overlay ---------- */
+  /* The Great Pull's input: one pooled circle, positioned per spawn via
+     --gc-x/--gc-y and shrunk per frame via --gc-size (the painter drives the
+     custom properties; sizes come from the wire, rendered px 1:1). The layer
+     never eats clicks; the shrinking ring is the one pointer target (the tap
+     target IS the circle, well over 44px until late in the shrink). */
+  #gauntlet-circles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 6;
+  }
+  #gauntlet-circle {
+    position: absolute;
+    left: var(--gc-x, 50%);
+    top: var(--gc-y, 50%);
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  #gauntlet-circle .gc-ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--gc-size, 200px);
+    height: var(--gc-size, 200px);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 3px solid #ffe48a;
+    background: rgba(8, 8, 12, 0.16);
+    box-shadow:
+      0 0 12px #000c,
+      inset 0 0 10px #0009;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  /* Inside the near-target band the ring turns go-green (the same family as
+     the sentinel's green light): this is the "click now" cue. */
+  #gauntlet-circle .gc-ring.near {
+    border-color: #3fd268;
+    box-shadow:
+      0 0 14px #35d06a99,
+      inset 0 0 10px #35d06a55;
+  }
+  /* The fixed target-size indicator ring inside every circle. */
+  #gauntlet-circle .gc-target {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--gc-target-size, 75px);
+    height: var(--gc-target-size, 75px);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px dashed #ffffffaa;
+    pointer-events: none;
+  }
+
+  /* ---------- gauntlet recruiter window ---------- */
+  #gauntlet-recruit {
+    width: 320px;
+    max-width: 92%;
+    padding-bottom: 12px;
+  }
+  #gauntlet-recruit .gr-pitch {
+    padding: 10px 14px 4px;
+    font-family: var(--font-serif);
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-text-light);
+  }
+  #gauntlet-recruit .gr-status {
+    padding: 4px 14px 0;
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+  #gauntlet-recruit .gr-countdown {
+    padding: 0 14px 2px;
+    font-size: 15px;
+    color: var(--color-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  #gauntlet-recruit .gr-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 14px 0;
+  }
+  #gauntlet-recruit .gr-action,
+  #gauntlet-recruit .gr-spectate,
+  #gauntlet-recruit .gr-practice {
+    min-width: 160px;
+    min-height: 40px;
+  }
+  #gauntlet-recruit .gr-action[disabled],
+  #gauntlet-recruit .gr-spectate[disabled] {
+    opacity: 0.5;
+    cursor: default;
+  }
+  #gauntlet-recruit .gr-note {
+    padding: 6px 14px 2px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  /* ---------- gauntlet overlay ---------- */
+  /* Knockout splash -> spectator bar, and the podium ceremony. Sub-panels toggle by
+     the root's data-state; the root itself never eats clicks (each live panel opts
+     back into pointer events). */
+  #gauntlet-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 31;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  #gauntlet-overlay[hidden] {
+    display: none;
+  }
+  #gauntlet-overlay[data-state="eliminated"],
+  #gauntlet-overlay[data-state="podium"] {
+    background: radial-gradient(ellipse at center, #00000066 0%, #000000cc 100%);
+  }
+  #gauntlet-overlay .go-eliminated,
+  #gauntlet-overlay .go-spectate,
+  #gauntlet-overlay .go-podium {
+    display: none;
+  }
+  #gauntlet-overlay[data-state="eliminated"] .go-eliminated {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  #gauntlet-overlay[data-state="spectating"] .go-spectate {
+    display: flex;
+  }
+  #gauntlet-overlay[data-state="podium"] .go-podium {
+    display: flex;
+  }
+  .go-title {
+    font-family: var(--title-font);
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--color-hostile);
+    text-shadow:
+      0 0 18px #ff2a1a55,
+      2px 2px 6px #000;
+    animation: go-pop 0.5s ease-out;
+  }
+  .go-sub {
+    font-size: 18px;
+    color: var(--color-text-light);
+    text-shadow: 1px 1px 3px #000;
+    font-variant-numeric: tabular-nums;
+  }
+  .go-spectate {
+    position: absolute;
+    /* clears the bottom player cluster (xp bar + action rows rise ~110px) */
+    bottom: 170px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    background: rgba(8, 8, 12, 0.9);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    pointer-events: auto;
+  }
+  .go-spectate-label {
+    font-family: var(--title-font);
+    font-size: 15px;
+    color: var(--color-primary);
+    letter-spacing: 0.5px;
+  }
+  .go-spectate-count {
+    font-size: 13px;
+    color: var(--color-text-light);
+    font-variant-numeric: tabular-nums;
+  }
+  .go-podium {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 32px;
+    background: rgba(10, 10, 15, 0.95);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    pointer-events: auto;
+  }
+  .go-podium-title {
+    font-family: var(--title-font);
+    font-size: 30px;
+    letter-spacing: 2px;
+    color: var(--color-text-light);
+    text-shadow: 1px 1px 4px #000;
+  }
+  #gauntlet-overlay.victory .go-podium-title {
+    color: var(--color-primary);
+    text-shadow:
+      0 0 16px var(--color-primary-glow-heavy),
+      1px 1px 4px #000;
+  }
+  .go-places {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 240px;
+  }
+  .go-places li {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .go-place {
+    font-family: var(--title-font);
+    font-size: 20px;
+    color: var(--color-primary);
+    width: 44px;
+    text-align: right;
+  }
+  .go-name {
+    font-size: 18px;
+    color: var(--color-text-light);
+  }
+  .go-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .go-leave,
+  .go-rejoin {
+    min-width: 120px;
+    min-height: 40px;
+  }
+  @keyframes go-pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .go-title {
+      animation: none;
+    }
+  }
+
+  /* ---------- gauntlet court chip (trial 6) ---------- */
+  /* The Final Court is plain auto-attack and has no HUD controls: you target a
+     foe with a normal click and the standings board + health frame carry the
+     fight, so this section carries no rules (kept for the corpus manifest). */
+
+  /* ---------- gauntlet echo strip (trial 4) ---------- */
+  /* The round counter + answer clock row inside the gauntlet cluster; the
+     duel itself plays out on the table (the flashing rune stones). */
+  .gh-echo {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 }

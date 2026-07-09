@@ -10,13 +10,18 @@ export type MobCombatProfile = {
   movingRangeBonus: number;
 };
 
+// Every melee mob fights hit-and-run: it swings from effective reach while
+// continuing to close to desiredRange (80% of reach), so it tracks a moving
+// target fluidly instead of stopping at max reach to trade blows. The chase
+// speed stays 1 (pursuit is about swinging mid-step, not a speed buff) and the
+// stationary walk-past fix is preserved via movingRangeBonus.
 export const DEFAULT_MOB_COMBAT_PROFILE: MobCombatProfile = {
   meleeRange: MELEE_RANGE,
   desiredRange: MELEE_RANGE * 0.8,
   chaseSpeedMult: 1,
   canLeash: true,
-  swingWhilePursuing: false,
-  immediateSwingOnEnterRange: false,
+  swingWhilePursuing: true,
+  immediateSwingOnEnterRange: true,
   movingRangeBonus: 1,
 };
 
@@ -57,10 +62,12 @@ export function combatProfileForMob(templateId: string, scale: number): MobComba
     return {
       ...DEFAULT_MOB_COMBAT_PROFILE,
       meleeRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE),
+      desiredRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE) * 0.8,
     };
   return {
     ...DEFAULT_MOB_COMBAT_PROFILE,
     meleeRange: scaledDefaultMobMeleeRange(scale),
+    desiredRange: scaledDefaultMobMeleeRange(scale) * 0.8,
   };
 }
 

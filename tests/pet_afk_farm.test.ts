@@ -40,6 +40,14 @@ function place(e: Entity, x: number, z: number): void {
   e.prevPos = { ...e.pos };
 }
 
+// petPickTarget scans the spatial grid (a bounded radius query), whose cells only update
+// on rebucket/refresh, not when place() mutates `pos`. Rebuild the grid from the live
+// positions before a pick, exactly as a real tick's end-of-tick grid.refresh does.
+function pickTarget(sim: Sim, pet: Entity, owner: Entity): Entity | null {
+  (sim as any).grid.refresh(sim.entities.values());
+  return petPickTarget((sim as any).ctx, pet, owner);
+}
+
 // Set up: aggressive pet next to the owner, a hostile mob 5yd from the pet that
 // is NOT engaging anyone (so only the `aggressive` auto-pull branch can grab it).
 function setup() {
@@ -56,7 +64,7 @@ function setup() {
   owner.targetId = null;
   owner.autoAttack = false;
   const meta = sim.meta(pid)!;
-  const pick = (): Entity | null => petPickTarget((sim as any).ctx, pet, owner);
+  const pick = (): Entity | null => pickTarget(sim, pet, owner);
   return { sim, pid, owner, pet, target, meta, pick };
 }
 
@@ -109,7 +117,7 @@ describe('aggressive pet AFK-farm gate: activity stamping (end-to-end)', () => {
 
   it('a real movement tick stamps activity and re-opens the gate', () => {
     const { sim, owner, pet, target, meta } = setupE2E();
-    expect(petPickTarget((sim as any).ctx, pet, owner)).toBeNull(); // idle: no pull
+    expect(pickTarget(sim, pet, owner)).toBeNull(); // idle: no pull
     meta.moveInput.forward = true; // hold a movement key
     sim.tick(); // updatePlayerMovement runs for real and stamps
     meta.moveInput.forward = false;
@@ -117,7 +125,7 @@ describe('aggressive pet AFK-farm gate: activity stamping (end-to-end)', () => {
     place(owner, 0, 0);
     place(pet, 28, 0);
     place(target, 33, 0); // undo a tick of drift
-    expect(petPickTarget((sim as any).ctx, pet, owner)?.id).toBe(target.id);
+    expect(pickTarget(sim, pet, owner)?.id).toBe(target.id);
   });
 
   it('a real ability cast stamps activity', () => {

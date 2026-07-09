@@ -4,6 +4,7 @@
 // both the renderer and the NameplatePainter can share objectDisplayName without
 // a renderer <-> painter import cycle.
 
+import { HUB_PORTAL_TEMPLATE } from '../sim/data';
 import type { Entity } from '../sim/types';
 import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
 import { t } from '../ui/i18n';
@@ -19,6 +20,13 @@ export function npcDisplayName(npcId: string): string {
 export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'mailbox') {
     return t('worldContent.mailboxName');
+  }
+  // The overworld entrance portal announces the venue it leads to: a floating
+  // header above the arch (the sim leaves its entity name empty on purpose, so
+  // the localized display name is resolved here by templateId, like the dungeon
+  // doors below). The exit portal stays unlabeled: it reads as "back the way in".
+  if (entity.templateId === HUB_PORTAL_TEMPLATE) {
+    return t('hudChrome.hub.zoneName');
   }
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');

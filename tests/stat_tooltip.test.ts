@@ -38,6 +38,8 @@ function inputFor(cls: PlayerClass, p: ReturnType<typeof freshPlayer>): StatTool
     spellPower: p.spellPower,
     critChance: p.critChance,
     dodgeChance: p.dodgeChance,
+    critRating: p.critRating,
+    hasteRating: p.hasteRating,
     dps: 0,
   };
 }
@@ -298,6 +300,8 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       spellPower: p.spellPower,
       critChance: p.critChance,
       dodgeChance: p.dodgeChance,
+      critRating: p.critRating,
+      hasteRating: p.hasteRating,
       dps: 0,
       gear,
       buffs,
@@ -401,5 +405,21 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
     const fromAgi = armor.sources.find((s) => s.kind === 'attributes');
     expect(fromAgi?.value).toBe((p.stats.agi - catBonus) * 2);
     expect(armor.sources.reduce((acc, s) => acc + s.value, 0)).toBe(armor.statValue);
+  });
+});
+
+describe('rating stat cells', () => {
+  it('critRating and hasteRating display the accumulated gear/set rating', () => {
+    const p = freshPlayer('mage', 20);
+    p.critRating = 20;
+    p.hasteRating = 150;
+    const crit = buildStatTooltip('critRating', inputFor('mage', p));
+    const haste = buildStatTooltip('hasteRating', inputFor('mage', p));
+    expect(crit.statValue).toBe(20);
+    expect(haste.statValue).toBe(150);
+    expect(crit.isPrimary).toBe(false);
+    // rating cells show the value + description, no per-source breakdown line
+    expect(crit.sources).toEqual([]);
+    expect(haste.sources).toEqual([]);
   });
 });

@@ -45,7 +45,10 @@ export { questStrings } from './quests';
 // Re-export the catalog public surface (every name the old i18n.en.ts exported).
 export { shellStrings } from './shell';
 
-type ItemSetEntityText = Record<string, { name: string; bonus2?: string; bonus3?: string }>;
+type ItemSetEntityText = Record<
+  string,
+  { name: string; bonus2?: string; bonus3?: string; bonus4?: string }
+>;
 
 const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
   Object.values(ITEM_SETS)
@@ -55,9 +58,15 @@ const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
       // 3-piece tier, so emitting a bonus2 row would bake in an id-fallback string.
       const bonus2 = set.bonuses.find((bonus) => bonus.pieces === 2)?.text;
       const bonus3 = set.bonuses.find((bonus) => bonus.pieces === 3)?.text;
+      const bonus4 = set.bonuses.find((bonus) => bonus.pieces === 4)?.text;
       return [
         set.id,
-        { name: set.name, ...(bonus2 ? { bonus2 } : {}), ...(bonus3 ? { bonus3 } : {}) },
+        {
+          name: set.name,
+          ...(bonus2 ? { bonus2 } : {}),
+          ...(bonus3 ? { bonus3 } : {}),
+          ...(bonus4 ? { bonus4 } : {}),
+        },
       ];
     }),
 );
@@ -612,6 +621,12 @@ export const en = {
   // Delve UI chrome + companion/boss/lore flavor (board, run tracker, completion
   // summary, affixes, module/objective labels). Rendered through t() from hud.ts.
   // {playerName} / {className} interpolate at render time.
+  heroicShop: {
+    // The Heroic Quartermaster window: title/price/buy reuse the vendor and
+    // delve-shop keys; only the marks-specific strings live here.
+    balance: 'Heroic Marks: {count}',
+    buyAria: 'Buy {item} for {marks} Heroic Marks',
+  },
   delveUi: {
     board: {
       title: 'Delve Board',
@@ -820,6 +835,45 @@ export const en = {
       flavor: 'The dead have surrendered what they can spare.',
     },
   },
+  yumi: {
+    bracket3: 'Yumi 3v3',
+    bracket5: 'Yumi 5v5',
+    enterQueue: 'Join Protect Yumi!',
+    queue: {
+      join: 'You join the Protect Yumi queue. Guard your familiar…',
+      leave: 'You leave the Protect Yumi queue.',
+      teamLeave: 'Your team leaves the Protect Yumi queue.',
+    },
+    error: {
+      partyTooBig3: 'Protect Yumi 3v3 allows a party of up to three.',
+      partyTooBig5: 'Protect Yumi 5v5 allows a party of up to five.',
+    },
+    log: {
+      start: 'Protect Yumi! Defend your familiar and hunt theirs.',
+    },
+    hud: {
+      title: 'PROTECT YUMI',
+      getReady: 'Get ready…',
+      teleportIn: 'Yumis move in {s}',
+      suddenDeath: 'SUDDEN DEATH',
+      yourYumi: 'Your Yumi',
+      enemyYumi: 'Enemy Yumi',
+      aria: 'Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.',
+      collapse: 'Collapse the Protect Yumi bars',
+      expand: 'Expand the Protect Yumi bars',
+    },
+    respawn: {
+      title: 'DOWNED!',
+    },
+    banner: {
+      sudden: 'SUDDEN DEATH! The Yumis hold their ground!',
+      teleport: 'The Yumis teleport!',
+    },
+    end: {
+      win: 'VICTORY! Yumi is safe!',
+      loss: 'DEFEAT! Your Yumi has fallen.',
+    },
+  },
   fiesta: {
     bracket: 'Fiesta',
     enterQueue: 'Join the Fiesta!',
@@ -1020,6 +1074,48 @@ export const en = {
       crypt_ritual_circle: { name: 'Ritual Circle' },
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
+      heroic_mark: { name: 'Heroic Mark' },
+      morthens_cryptforged_hauberk: { name: "Morthen's Cryptforged Hauberk" },
+      shadowpulse_handwraps: { name: 'Shadowpulse Handwraps' },
+      bonechill_striders: { name: 'Bonechill Striders' },
+      mistcallers_fang: { name: "Mistcaller's Fang" },
+      tidebound_spaulders: { name: 'Tidebound Spaulders' },
+      sash_of_the_sunken_court: { name: 'Sash of the Sunken Court' },
+      lunar_tide_greatstaff: { name: 'Lunar Tide Greatstaff' },
+      tidewoven_trousers: { name: 'Tidewoven Trousers' },
+      choirmothers_casque: { name: "Choirmother's Casque" },
+      gravewyrm_cleaver: { name: 'Gravewyrm Cleaver' },
+      shroud_of_the_gravewyrm: { name: 'Shroud of the Gravewyrm' },
+      sanctum_prowlers_grips: { name: "Sanctum Prowler's Grips" },
+      scepter_of_the_deathless_court: { name: 'Scepter of the Deathless Court' },
+      deathless_warguard_legmail: { name: 'Deathless Warguard Legmail' },
+      soulrend_diadem: { name: 'Soulrend Diadem' },
+      scourgehide_carapace: { name: 'Scourgehide Carapace' },
+      cryptplate_helm: { name: 'Cryptplate Helm' },
+      shadowpulse_slippers: { name: 'Shadowpulse Slippers' },
+      bonechill_cord: { name: 'Bonechill Cord' },
+      mistforged_pauldrons: { name: 'Mistforged Pauldrons' },
+      tideguard_faceguard: { name: 'Tideguard Faceguard' },
+      sunken_court_mantle: { name: 'Sunken Court Mantle' },
+      lunar_choir_leggings: { name: 'Lunar Choir Leggings' },
+      choir_blessed_spaulders: { name: 'Choir-Blessed Spaulders' },
+      tideworn_warboots: { name: 'Tideworn Warboots' },
+      gravewyrm_claws: { name: 'Gravewyrm Claws' },
+      gravescale_girdle: { name: 'Gravescale Girdle' },
+      wyrmchoir_handwraps: { name: 'Wyrmchoir Handwraps' },
+      deathless_greatblade: { name: 'Deathless Greatblade' },
+      soulforged_warplate: { name: 'Soulforged Warplate' },
+      stormcallers_focus: { name: "Stormcaller's Focus" },
+      seal_of_the_nine_oaths: { name: 'Seal of the Nine Oaths' },
+      nielas_coldlight_band: { name: "Niela's Coldlight Band" },
+      sutils_gambit: { name: "Sutil's Gambit" },
+      oath_of_the_round_table: { name: 'Oath of the Round Table' },
+      zyzzs_deathless_signet: { name: "Zyzz's Deathless Signet" },
+      architects_cornerstone: { name: "The Architect's Cornerstone" },
+      swiftfang_talisman: { name: 'Swiftfang Talisman' },
+      yumis_keepsake_locket: { name: "Yumi's Keepsake Locket" },
+      zense_meridian: { name: 'Zense Meridian' },
+      medallion_of_endless_profit: { name: 'Medallion of Endless Profit' },
       deathless_heartwood: { name: 'Heartwood of the Deathless Crown' },
       kingsbane_last_oath: { name: 'Thronebane, Last Oath of Thornpeak' },
       crownforged_dreadhelm: { name: 'Bonewrought Dreadhelm' },
@@ -1048,14 +1144,14 @@ export const en = {
       vanguard_azure_armor_plate: { name: 'Vanguard Azure' },
       vanguard_chrome_armor_plate: { name: 'Vanguard Chrome' },
       // Thunzharr, the Waking Peak (world boss): epic Tier-2 set gloves and belts
-      crownforged_gauntlets: { name: 'Crownforged Gauntlets' },
-      nighttalon_grips: { name: 'Nighttalon Grips' },
-      soulflame_gloves: { name: 'Soulflame Gloves' },
-      stormcallers_handguards: { name: "Stormcaller's Handguards" },
-      crownforged_girdle: { name: 'Crownforged Girdle' },
-      nighttalon_waistband: { name: 'Nighttalon Waistband' },
-      soulflame_cord: { name: 'Soulflame Cord' },
-      stormcallers_waistguard: { name: "Stormcaller's Waistguard" },
+      crownforged_gauntlets: { name: 'Bonewrought Gauntlets' },
+      nighttalon_grips: { name: 'Direfang Grips' },
+      soulflame_gloves: { name: 'Wraithfire Gloves' },
+      stormcallers_handguards: { name: 'Galecall Handguards' },
+      crownforged_girdle: { name: 'Bonewrought Girdle' },
+      nighttalon_waistband: { name: 'Direfang Waistband' },
+      soulflame_cord: { name: 'Wraithfire Cord' },
+      stormcallers_waistguard: { name: 'Galecall Waistguard' },
     },
     itemSets: itemSetEntityText,
     mobs: { ...worldNames.en.entities.mobs, ...mergeEntities.en.mobs, ...mergeExtra.en.mobs },

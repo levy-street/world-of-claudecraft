@@ -344,6 +344,8 @@ describe('client interaction classification', () => {
         opened = id;
       },
       openDelveBoard: () => {},
+      openGauntletRecruit: () => {},
+      toggleHodricsWindow: () => {},
       openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},

@@ -1,0 +1,1078 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import { isBlocked } from '../src/sim/colliders';
+import {
+  ECHO_STATIONS,
+  echoStation,
+  GAUNTLET,
+  GAUNTLET_LAYOUT,
+  GAUNTLET_VENUE,
+} from '../src/sim/content/gauntlet';
+import { SKIN_COUNTS } from '../src/sim/content/skins';
+import { gauntletOrigin, isGauntletPos } from '../src/sim/data';
+import { nextGreenWindowS } from '../src/sim/gauntlet/trial_sentinel';
+import {
+  aliveContestants,
+  clamp01,
+  sentinelScore,
+  trialDamageFromScore,
+} from '../src/sim/gauntlet/vitality';
+import { Sim } from '../src/sim/sim';
+import { DT, type GauntletPhase, type SimEvent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
+
+// --- local helpers (not shared; copied idioms from arena.test.ts / sim.test.ts) ---
+
+const makeSim = (seed = 42, open = true) =>
+  new Sim({ seed, playerClass: 'warrior', noPlayer: true, gauntletAlwaysOpen: open });
+
+function recruiter(sim: Sim) {
+  return [...sim.entities.values()].find((e) => e.templateId === 'gauntlet_recruiter');
+}
+
+// Teleport idiom: set pos.{x,z}, then pos.y from the shared terrain fn, then prevPos.
+function teleport(sim: Sim, pid: number, x: number, z: number) {
+  const e = sim.entities.get(pid)!;
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = groundHeight(x, z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
+  (sim as any).rebucket(e);
+}
+
+// The recruiter now stands permanently in the Proving Grounds hub (spawned at
+// world init), so stand each player beside it and join. The lobby run is
+// created by the first joiner. (The leading tick is kept for parity with the
+// rest of the suite; the recruiter is already present before it.)
+function openAndJoin(sim: Sim, ...pids: number[]) {
+  sim.tick();
+  const r = recruiter(sim)!;
+  for (const pid of pids) {
+    teleport(sim, pid, r.pos.x, r.pos.z);
+    sim.gauntletJoin(pid);
+  }
+}
+
+// Advance until the run reaches a phase, collecting every event seen on the way.
+function advanceTo(sim: Sim, phase: GauntletPhase, maxTicks = 20 * 80): SimEvent[] {
+  const evs: SimEvent[] = [];
+  for (let i = 0; i < maxTicks && sim.gauntletRuns[0]?.phase !== phase; i++)
+    evs.push(...sim.tick());
+  return evs;
+}
+
+// Tick until phase 'podium' (or the run disposes), collecting events.
+function runToPodium(sim: Sim, maxTicks = 20 * 300): SimEvent[] {
+  const evs: SimEvent[] = [];
+  for (let i = 0; i < maxTicks && sim.gauntletRuns[0]?.phase !== 'podium'; i++) {
+    if (sim.gauntletRuns.length === 0) break;
+    evs.push(...sim.tick());
+  }
+  return evs;
+}
+
+// Drive the player forward only on ticks that land safely mid-red (past the
+// grace window, comfortably before the next flip), so each convicting step is a
+// deliberate red-light violation. Stops when `stop` observes its event.
+function catchLoop(
+  sim: Sim,
+  pid: number,
+  stop: (evs: SimEvent[]) => boolean,
+  maxTicks: number,
+): SimEvent[] {
+  const collected: SimEvent[] = [];
+  for (let i = 0; i < maxTicks; i++) {
+    const trial = sim.gauntletRuns[0]?.trial;
+    const mid =
+      !!trial &&
+      trial.kind === 'sentinel' &&
+      trial.light === 'red' &&
+      sim.time + DT >= trial.graceUntil &&
+      sim.time + 2 * DT < trial.flipAt;
+    sim.meta(pid)!.moveInput.forward = mid;
+    const evs = sim.tick();
+    collected.push(...evs);
+    sim.meta(pid)!.moveInput.forward = false;
+    if (stop(evs)) break;
+  }
+  return collected;
+}
+
+// Filter to one SimEvent variant with narrowing (assertions read fields directly).
+function pick<T extends SimEvent['type']>(
+  evs: SimEvent[],
+  type: T,
+): Extract<SimEvent, { type: T }>[] {
+  return evs.filter((e): e is Extract<SimEvent, { type: T }> => e.type === type);
+}
+
+function errorTexts(evs: SimEvent[]): string[] {
+  return pick(evs, 'error').map((e) => e.text);
+}
+
+// -----------------------------------------------------------------------------
+
+describe('gauntlet sentinel scoring (pure)', () => {
+  const t = GAUNTLET.sentinel;
+
+  it('trialDamageFromScore: score 1 takes nothing, score 0 takes damageMax, monotonic', () => {
+    expect(trialDamageFromScore(1, t.damageMax)).toBe(0);
+    expect(trialDamageFromScore(0, t.damageMax)).toBe(t.damageMax);
+    expect(trialDamageFromScore(0.5, t.damageMax)).toBe(Math.round(t.damageMax * 0.5));
+    // a finish bonus (score > 1) still clamps to zero damage, never negative
+    expect(trialDamageFromScore(1.25, t.damageMax)).toBe(0);
+    // higher score, strictly less damage
+    expect(trialDamageFromScore(0.3, t.damageMax)).toBeGreaterThan(
+      trialDamageFromScore(0.7, t.damageMax),
+    );
+  });
+
+  it('sentinelScore: a finisher always clears >= 1; an unfinished score is bestZ/fieldLength', () => {
+    // finishing always scores >= 1, so a finisher takes no end-of-trial damage
+    expect(sentinelScore(0, true, 0, t.fieldLength, t.finishBonusMax)).toBe(1);
+    expect(sentinelScore(0, true, 1, t.fieldLength, t.finishBonusMax)).toBe(1 + t.finishBonusMax);
+    expect(
+      trialDamageFromScore(
+        sentinelScore(5, true, 0.5, t.fieldLength, t.finishBonusMax),
+        t.damageMax,
+      ),
+    ).toBe(0);
+    // unfinished: linear field progress, clamped to 0..1
+    expect(sentinelScore(t.fieldLength / 2, false, 0, t.fieldLength, t.finishBonusMax)).toBeCloseTo(
+      0.5,
+      6,
+    );
+    expect(sentinelScore(0, false, 0, t.fieldLength, t.finishBonusMax)).toBe(0);
+    expect(sentinelScore(t.fieldLength * 2, false, 0, t.fieldLength, t.finishBonusMax)).toBe(1);
+  });
+
+  it('nextGreenWindowS shrinks by accelPerCycle each cycle and floors at greenFloorS', () => {
+    const draw = t.greenMaxS;
+    expect(nextGreenWindowS(draw, 0, t)).toBeCloseTo(draw, 6);
+    expect(nextGreenWindowS(draw, 1, t)).toBeCloseTo(draw * t.accelPerCycle, 6);
+    expect(nextGreenWindowS(draw, 2, t)).toBeCloseTo(draw * t.accelPerCycle ** 2, 6);
+    // strictly smaller each cycle while above the floor
+    expect(nextGreenWindowS(draw, 2, t)).toBeLessThan(nextGreenWindowS(draw, 1, t));
+    // a large cycle count never dips below the floor
+    expect(nextGreenWindowS(draw, 100, t)).toBe(t.greenFloorS);
+  });
+
+  it('clamp01 pins to the unit interval', () => {
+    expect(clamp01(-1)).toBe(0);
+    expect(clamp01(2)).toBe(1);
+    expect(clamp01(0.4)).toBe(0.4);
+  });
+});
+
+describe('gauntlet event window', () => {
+  it('stays closed by default: the recruiter stands ready but joining is refused', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Hopeful');
+    for (let i = 0; i < 10; i++) sim.tick();
+    expect(sim.gauntletOpen).toBe(false);
+    // Maro stands permanently in the hub; the host-fed event window, not his
+    // presence, gates the join.
+    expect(recruiter(sim)).toBeTruthy();
+    sim.gauntletJoin(pid);
+    expect(errorTexts(sim.tick())).toContain('The Gauntlet is not open right now.');
+    expect(sim.gauntletRuns.length).toBe(0);
+  });
+
+  it('opens the recruiter and admits a player standing beside it', () => {
+    const sim = makeSim(1, true);
+    const pid = sim.addPlayer('warrior', 'Ready');
+    sim.tick();
+    const r = recruiter(sim);
+    expect(r).toBeTruthy();
+    teleport(sim, pid, r!.pos.x, r!.pos.z);
+    sim.gauntletJoin(pid);
+    expect(sim.gauntletRuns.length).toBe(1);
+    expect(sim.gauntletRuns[0]!.playerStates.has(pid)).toBe(true);
+  });
+
+  it('refuses a player standing away from the Herald', () => {
+    const sim = makeSim(1, true);
+    const pid = sim.addPlayer('warrior', 'Distant');
+    sim.tick();
+    expect(recruiter(sim)).toBeTruthy();
+    teleport(sim, pid, 200, 200); // far beyond joinRadius (12)
+    sim.gauntletJoin(pid);
+    expect(errorTexts(sim.tick())).toContain('You must speak to the Herald to enter the Gauntlet.');
+    expect(sim.gauntletRuns.length).toBe(0);
+  });
+});
+
+describe('gauntlet lobby and run setup', () => {
+  it('fills a lobby, spawns the field and watcher, and opens the trial', () => {
+    const sim = makeSim(3);
+    const a = sim.addPlayer('warrior', 'Aay');
+    const b = sim.addPlayer('warrior', 'Bee');
+    openAndJoin(sim, a, b);
+    const run = sim.gauntletRuns[0]!;
+    expect(sim.gauntletRuns.length).toBe(1);
+    expect(run.phase).toBe('lobby');
+    // both joiners landed in the SAME lobby
+    expect(run.playerStates.size).toBe(2);
+    expect(run.contestants.filter((c) => c.player).length).toBe(2);
+
+    // lobbyFillS elapses -> staging: NPC backfill to the full field. No watcher
+    // ENTITY spawns: the venue's Stone Warden effigy is the watcher visual.
+    advanceTo(sim, 'staging');
+    expect(sim.gauntletRuns[0]!.phase).toBe('staging');
+    expect(run.contestants.length).toBe(GAUNTLET.fieldSize);
+    expect(run.watcherId).toBeNull();
+    // both players teleported into the gauntlet band
+    expect(isGauntletPos(sim.entities.get(a)!.pos.x)).toBe(true);
+    expect(isGauntletPos(sim.entities.get(b)!.pos.x)).toBe(true);
+
+    // staging -> trial (the sentinel light machine)
+    advanceTo(sim, 'trial');
+    expect(sim.gauntletRuns[0]!.phase).toBe('trial');
+    expect(run.trial?.kind).toBe('sentinel');
+  }, 20000);
+});
+
+describe('gauntlet sentinel trial', () => {
+  it('a red-light violation deals a caught hit and drops vitality', () => {
+    const sim = makeSim(5);
+    const pid = sim.addPlayer('warrior', 'Runner');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    teleport(sim, pid, run.origin.x, run.origin.z + 20); // mid-field, on the far side of the start line
+
+    const damage: SimEvent[] = [];
+    catchLoop(
+      sim,
+      pid,
+      (evs) => {
+        for (const e of pick(evs, 'gauntletDamage')) if (e.cause === 'caught') damage.push(e);
+        return damage.length > 0;
+      },
+      20 * 60,
+    );
+
+    expect(damage.length).toBe(1);
+    const hit = damage[0] as Extract<SimEvent, { type: 'gauntletDamage' }>;
+    expect(hit.cause).toBe('caught');
+    expect(hit.amount).toBe(GAUNTLET.sentinel.hardFailDamage);
+    expect(hit.vitality).toBe(GAUNTLET.vitalityMax - GAUNTLET.sentinel.hardFailDamage);
+    // the wire view reflects the same vitality
+    expect(sim.gauntletRunWire(pid)!.vitality).toBe(
+      GAUNTLET.vitalityMax - GAUNTLET.sentinel.hardFailDamage,
+    );
+  }, 20000);
+
+  it('five caught hits knock the player out to the spectator platform; the run resolves without them', () => {
+    const sim = makeSim(5);
+    const pid = sim.addPlayer('warrior', 'Fallible');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    teleport(sim, pid, run.origin.x, run.origin.z + 20);
+
+    let eliminated = false;
+    let caughtHits = 0;
+    const evs = catchLoop(
+      sim,
+      pid,
+      (batch) => {
+        for (const e of pick(batch, 'gauntletDamage')) if (e.cause === 'caught') caughtHits++;
+        if (pick(batch, 'gauntletEliminated').length > 0) eliminated = true;
+        return eliminated;
+      },
+      20 * 120,
+    );
+
+    expect(eliminated).toBe(true);
+    // vitalityMax 100 / hardFailDamage 22 => 5 catches to reach zero
+    expect(caughtHits).toBe(Math.ceil(GAUNTLET.vitalityMax / GAUNTLET.sentinel.hardFailDamage));
+    expect(pick(evs, 'gauntletEliminated')[0]!.trialIndex).toBe(0);
+    expect(sim.gauntletRunWire(pid)!.spectating).toBe(true);
+    // parked beside the field on the spectator platform
+    const e = sim.entities.get(pid)!;
+    expect(e.pos.x - run.origin.x).toBeCloseTo(GAUNTLET_LAYOUT.spectatorX, 5);
+    expect(e.pos.z - run.origin.z).toBeCloseTo(GAUNTLET_LAYOUT.spectatorZ, 5);
+
+    // the run continues for the NPC field and resolves to a podium the spectator loses
+    const tail = runToPodium(sim);
+    const podium = pick(tail, 'gauntletPodium')[0]!;
+    expect(podium).toBeTruthy();
+    expect(podium.won).toBe(false);
+    // the fallen player no longer counts toward the survivor target (12 - 1)
+    // With the fallen player spectating, the NPC field thins trial by trial
+    // down to the final target: one champion.
+    expect(aliveContestants(sim.gauntletRuns[0]!).length).toBe(
+      GAUNTLET.targetSurvivorsPerTrial[GAUNTLET.trials.length - 1],
+    );
+  }, 40000);
+
+  it('an idle player who never leaves the start line is knocked out when the crossing times out', () => {
+    const sim = makeSim(41);
+    const pid = sim.addPlayer('warrior', 'Statue');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const c = run.contestants.find((k) => k.entityId === pid)!;
+    expect(run.trial?.kind).toBe('sentinel');
+    // Never move: the sentinel clock expires with zero field progress, and the
+    // full-pool end-of-trial toll (damageMax === vitalityMax) is lethal from
+    // full vitality, so waiting out the timer is fatal, not a free advance.
+    for (
+      let i = 0;
+      i < 20 * (GAUNTLET.sentinel.durationS + 5) && run.trial?.kind === 'sentinel';
+      i++
+    )
+      sim.tick();
+    expect(GAUNTLET.sentinel.damageMax).toBe(GAUNTLET.vitalityMax);
+    expect(c.vitality).toBe(0);
+    expect(c.eliminatedAtTrial).toBe(0);
+    expect(run.playerStates.get(pid)!.spectating).toBe(true);
+  }, 20000);
+
+  it('a full six-trial run crowns one champion; an idle player falls along the way', () => {
+    const sim = makeSim(5);
+    const pid = sim.addPlayer('warrior', 'Champ');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+
+    // cross during a green light (a direct pos set re-syncs prevPos, so no red-light displacement)
+    for (
+      let i = 0;
+      i < 400 && !(run.trial?.kind === 'sentinel' && run.trial.light === 'green');
+      i++
+    )
+      sim.tick();
+    teleport(sim, pid, run.origin.x, run.origin.z + GAUNTLET.sentinel.fieldLength + 1);
+    sim.tick();
+    expect(sim.gauntletRunWire(pid)!.finished).toBe(true);
+
+    // From here the player never plays again. Every later game punishes
+    // idleness on purpose (timeout damage, missed echo rounds), so
+    // the player is knocked out somewhere down the line and watches the NPC
+    // field thin to a single champion.
+    const tail = runToPodium(sim, 20 * 700);
+    expect(sim.gauntletRuns[0]!.phase).toBe('podium');
+    expect(aliveContestants(sim.gauntletRuns[0]!).length).toBe(
+      GAUNTLET.targetSurvivorsPerTrial[GAUNTLET.trials.length - 1],
+    );
+    expect(pick(tail, 'gauntletPoof').length).toBeGreaterThan(0);
+
+    // The idle player was eliminated mid-run and stayed as a spectator.
+    expect(run.playerStates.get(pid)?.spectating).toBe(true);
+    const podium = pick(tail, 'gauntletPodium')[0]!;
+    expect(podium.won).toBe(false);
+    expect(podium.first).not.toBe('Champ');
+    expect(podium.first.length).toBeGreaterThan(0);
+    const stats = sim.meta(pid)!.gauntletStats;
+    expect(stats.runs).toBe(1);
+    expect(stats.wins).toBe(0);
+    // Cleared at least the Crossing, fell before the Final Court resolved.
+    expect(stats.bestTrial).toBeGreaterThanOrEqual(1);
+    expect(stats.bestTrial).toBeLessThan(GAUNTLET.trials.length);
+  }, 60000);
+});
+
+describe('gauntlet leave, disconnect, and forfeit', () => {
+  it('leaving an empty lobby disposes the run and frees the slot', () => {
+    const sim = makeSim(3);
+    const pid = sim.addPlayer('warrior', 'Solo');
+    openAndJoin(sim, pid);
+    expect(sim.gauntletRuns.length).toBe(1);
+    expect(sim.gauntletRuns[0]!.phase).toBe('lobby');
+    sim.gauntletLeave(pid);
+    expect(sim.gauntletRuns.length).toBe(0);
+  });
+
+  it('leaving mid-trial restores the pre-join position and poofs to the remaining field', () => {
+    const sim = makeSim(3);
+    const a = sim.addPlayer('warrior', 'Stay');
+    const b = sim.addPlayer('warrior', 'Quit');
+    openAndJoin(sim, a, b);
+    const savedB = { ...sim.entities.get(b)!.pos }; // captured at join, before staging teleports b
+    advanceTo(sim, 'trial');
+    expect(isGauntletPos(sim.entities.get(b)!.pos.x)).toBe(true); // b is in the band mid-trial
+
+    sim.gauntletLeave(b);
+    const drained = sim.tick(); // the poof/eliminated were queued during gauntletLeave
+
+    // b restored to the pre-join spot (never left in the band)
+    const eb = sim.entities.get(b)!;
+    expect(eb.pos.x).toBeCloseTo(savedB.x, 5);
+    expect(eb.pos.z).toBeCloseTo(savedB.z, 5);
+    expect(isGauntletPos(eb.pos.x)).toBe(false);
+    // the field saw the forfeit as a knockout poof
+    expect(pick(drained, 'gauntletPoof').some((e) => e.entityId === b)).toBe(true);
+    // the run continues for the other player
+    expect(sim.gauntletRuns.length).toBe(1);
+    expect(sim.gauntletRuns[0]!.playerStates.has(a)).toBe(true);
+    expect(sim.gauntletRuns[0]!.playerStates.has(b)).toBe(false);
+  }, 20000);
+
+  it('removePlayer mid-run detaches without restoring and the run continues', () => {
+    const sim = makeSim(3);
+    const a = sim.addPlayer('warrior', 'Keep');
+    const b = sim.addPlayer('warrior', 'Gone');
+    openAndJoin(sim, a, b);
+    advanceTo(sim, 'trial');
+    sim.removePlayer(b);
+    // the character left the world entirely (no teleport home): the entity is gone
+    expect(sim.entities.has(b)).toBe(false);
+    expect(sim.gauntletRuns.length).toBe(1);
+    expect(sim.gauntletRuns[0]!.playerStates.has(b)).toBe(false);
+    expect(sim.gauntletRuns[0]!.playerStates.has(a)).toBe(true);
+  }, 20000);
+});
+
+describe('gauntlet determinism and rng isolation', () => {
+  it('a scripted run is byte-identical across two fresh sims', () => {
+    const scenario = () => {
+      const sim = makeSim(21);
+      const pid = sim.addPlayer('warrior', 'Det');
+      openAndJoin(sim, pid);
+      const evs: SimEvent[] = [];
+      for (let i = 0; i < 20 * 160; i++) {
+        // drive forward only during the trial (idling the lobby avoids a town-wander death)
+        sim.meta(pid)!.moveInput.forward = sim.gauntletRuns[0]?.phase === 'trial';
+        for (const e of sim.tick()) if (e.type.startsWith('gauntlet')) evs.push(e);
+      }
+      return evs;
+    };
+
+    const a = scenario();
+    const b = scenario();
+    // a rich mid-trial stream (light flips + NPC fumbles): any shared or per-run rng
+    // draw-order change forks it within seconds of the trial opening
+    expect(pick(a, 'gauntletLight').length).toBeGreaterThan(5);
+    expect(pick(a, 'gauntletPoof').length).toBeGreaterThan(0);
+    expect(JSON.stringify(b)).toBe(JSON.stringify(a));
+  }, 40000);
+
+  it('an active gauntlet draws nothing from the shared rng stream', () => {
+    const busy = makeSim(7);
+    const bp = busy.addPlayer('warrior', 'Busy');
+    openAndJoin(busy, bp); // ticks once, then joins and runs a full gauntlet
+
+    const idle = makeSim(7);
+    const ip = idle.addPlayer('warrior', 'Idle');
+    idle.tick(); // mirror openAndJoin's recruiter-spawn tick, but never join
+    teleport(idle, ip, recruiter(idle)!.pos.x, recruiter(idle)!.pos.z);
+
+    for (let i = 0; i < 2000; i++) {
+      busy.tick();
+      idle.tick();
+    }
+    expect((busy as any).tickCount).toBe((idle as any).tickCount);
+
+    // If any gauntlet path drew from the shared stream, the two streams would fork.
+    for (let i = 0; i < 3; i++) {
+      expect((busy as any).rng.next()).toBe((idle as any).rng.next());
+    }
+  }, 30000);
+});
+
+describe('gauntlet persistence', () => {
+  it('gauntlet stats survive a serialize/addPlayer round-trip', () => {
+    const sim = makeSim(3, false);
+    const pid = sim.addPlayer('warrior', 'Vet');
+    sim.meta(pid)!.gauntletStats = { runs: 2, wins: 1, bestTrial: 1 };
+    const state = sim.serializeCharacter(pid)!;
+    expect(state.gauntletStats).toEqual({ runs: 2, wins: 1, bestTrial: 1 });
+
+    const fresh = makeSim(3, false);
+    const rid = fresh.addPlayer('warrior', 'Vet', { state });
+    expect(fresh.meta(rid)!.gauntletStats).toEqual({ runs: 2, wins: 1, bestTrial: 1 });
+  });
+});
+
+describe('instant lobby (offline single-player)', () => {
+  it('gauntletInstantLobby skips the fill window: a join starts the run on the spot', () => {
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      noPlayer: true,
+      gauntletAlwaysOpen: true,
+      gauntletInstantLobby: true,
+    });
+    const pid = sim.addPlayer('warrior', 'Solo');
+    openAndJoin(sim, pid);
+    const run = sim.gauntletRuns[0];
+    expect(run.phase).toBe('staging');
+    expect(run.contestants.length).toBe(GAUNTLET.fieldSize);
+    expect(sim.gauntletRunWire(pid)?.phase).toBe('staging');
+  });
+
+  it('without the flag a lone joiner still waits in the lobby', () => {
+    const sim = makeSim(7);
+    const pid = sim.addPlayer('warrior', 'Waits');
+    openAndJoin(sim, pid);
+    expect(sim.gauntletRuns[0].phase).toBe('lobby');
+  });
+});
+
+describe('lobby countdown calibration sample', () => {
+  it('gauntletPhase events carry the true seconds remaining in the phase', () => {
+    const sim = makeSim();
+    const a = sim.addPlayer('warrior', 'First');
+    const b = sim.addPlayer('warrior', 'Late');
+    openAndJoin(sim, a);
+    let evs = sim.tick();
+    const atOpen = pick(evs, 'gauntletPhase');
+    expect(atOpen.length).toBeGreaterThan(0);
+    for (const ev of atOpen) expect(ev.remainingS).toBeCloseTo(GAUNTLET.lobbyFillS, 1);
+    // Ten seconds later a second player joins: their sample reflects the
+    // already-elapsed fill window, not the full one.
+    for (let i = 0; i < 20 * 10; i++) sim.tick();
+    const r = recruiter(sim)!;
+    teleport(sim, b, r.pos.x, r.pos.z);
+    sim.gauntletJoin(b);
+    evs = sim.tick();
+    const lateSamples = pick(evs, 'gauntletPhase');
+    expect(lateSamples.length).toBeGreaterThan(0);
+    for (const ev of lateSamples) {
+      expect(ev.remainingS).toBeLessThan(GAUNTLET.lobbyFillS - 9);
+      expect(ev.remainingS).toBeGreaterThan(GAUNTLET.lobbyFillS - 12);
+    }
+  });
+});
+
+describe('venue layout envelope', () => {
+  it('keeps every venue anchor inside the ground apron and the slot envelope', () => {
+    const V = GAUNTLET_VENUE;
+    // The apron must stay inside the gauntlet band (no bleed into the
+    // battleground reserve at x 13800) and inside one slot's z pitch (400,
+    // data.ts GAUNTLET_SLOT_SPACING) so neighboring runs never see it.
+    expect(isGauntletPos(13200 - V.groundHalfWidth)).toBe(true);
+    expect(isGauntletPos(13200 + V.groundHalfWidth)).toBe(true);
+    expect(V.groundZMax - V.groundZMin).toBeLessThan(400);
+    const inApron = (x: number, z: number, pad: number) => {
+      expect(Math.abs(x) + pad).toBeLessThanOrEqual(V.groundHalfWidth);
+      expect(z - pad).toBeGreaterThanOrEqual(V.groundZMin);
+      expect(z + pad).toBeLessThanOrEqual(V.groundZMax);
+    };
+    inApron(V.sigils.x, V.sigils.z, V.sigils.radius + 4);
+    inApron(V.pull.x, V.pull.z, Math.max(V.pull.length, V.pull.width) / 2 + 4);
+    inApron(V.echo.x, V.echo.z, V.echo.size / 2 + 4);
+    inApron(V.span.x, V.span.z, V.span.length / 2 + 6);
+    inApron(V.court.x, V.court.z, V.court.radius + 4);
+    // The sentinel field itself (z 0..fieldLength plus the warden past the
+    // finish) and the shared stages all sit on the apron too.
+    inApron(0, GAUNTLET.sentinel.fieldLength + GAUNTLET_LAYOUT.watcherMargin + 4, 6);
+    inApron(0, GAUNTLET_LAYOUT.podium.z - 4, 6);
+    inApron(GAUNTLET_LAYOUT.spectatorX + 4, GAUNTLET_LAYOUT.spectatorZ, 12);
+    // The grandstands flank the field without covering the spectator park spot.
+    expect(V.standX).toBeGreaterThan(GAUNTLET.sentinel.fieldHalfWidth + 4);
+    expect(GAUNTLET_LAYOUT.spectatorZ - 12).toBeGreaterThan(V.standZMin);
+    expect(GAUNTLET_LAYOUT.spectatorZ + 12).toBeLessThan(V.standZMax);
+    // The colosseum shell ring fits inside the apron and encloses every arena
+    // anchor (so no trial pokes through the stadium wall).
+    const K = V.colosseum;
+    expect(Math.abs(K.x) + K.rx + K.wallDepth).toBeLessThanOrEqual(V.groundHalfWidth);
+    expect(K.z - K.rz - K.wallDepth).toBeGreaterThanOrEqual(V.groundZMin);
+    expect(K.z + K.rz + K.wallDepth).toBeLessThanOrEqual(V.groundZMax);
+    const insideRing = (x: number, z: number, pad: number) => {
+      const d = ((x - K.x) / (K.rx - pad)) ** 2 + ((z - K.z) / (K.rz - pad)) ** 2;
+      expect(d).toBeLessThan(1);
+    };
+    insideRing(V.sigils.x, V.sigils.z, V.sigils.radius + 2);
+    insideRing(V.pull.x, V.pull.z, Math.max(V.pull.length, V.pull.width) / 2 + 2);
+    insideRing(V.echo.x, V.echo.z, V.echo.size / 2 + 2);
+    insideRing(V.span.x, V.span.z, 8);
+    insideRing(V.span.x, V.span.z - V.span.length / 2, 4);
+    insideRing(V.span.x, V.span.z + V.span.length / 2, 4);
+    insideRing(V.court.x, V.court.z, V.court.radius + 2);
+    insideRing(0, GAUNTLET.sentinel.fieldLength + GAUNTLET_LAYOUT.watcherMargin + 4, 4);
+    insideRing(0, GAUNTLET_LAYOUT.podium.z - 4, 4);
+  });
+});
+
+describe('run fairness guards', () => {
+  it('pins players on their staging mark: no head start onto the field', () => {
+    const sim = makeSim(11);
+    const pid = sim.addPlayer('warrior', 'Eager');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    const run = sim.gauntletRuns[0]!;
+    const mark = { ...sim.entities.get(pid)!.pos };
+    // Hold forward through the whole staging window.
+    while (run.phase === 'staging') {
+      sim.meta(pid)!.moveInput.forward = true;
+      sim.tick();
+    }
+    sim.meta(pid)!.moveInput.forward = false;
+    expect(run.phase).toBe('trial');
+    const e = sim.entities.get(pid)!;
+    expect(Math.abs(e.pos.z - mark.z)).toBeLessThan(1);
+    expect(run.playerStates.get(pid)!.bestZ).toBeLessThan(1);
+  });
+
+  it('bars ability casts from staging through the run (legs only)', () => {
+    const sim = makeSim(12);
+    const pid = sim.addPlayer('warrior', 'Caster');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    sim.castAbility('heroic_strike', pid);
+    expect(errorTexts(sim.tick())).toContain('Legs only in the Gauntlet: abilities are barred.');
+  });
+
+  it('mirrors event vitality onto entity hp during the run and restores it on leave', () => {
+    const sim = makeSim(13);
+    const pid = sim.addPlayer('warrior', 'Mirror');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    const realHp = run.playerStates.get(pid)!.savedHp;
+    const c = run.contestants.find((k) => k.entityId === pid)!;
+    c.vitality = 40;
+    sim.tick();
+    expect(e.hp).toBe(Math.max(1, Math.round((e.maxHp * 40) / GAUNTLET.vitalityMax)));
+    sim.gauntletLeave(pid);
+    expect(e.hp).toBe(Math.max(1, Math.min(realHp, e.maxHp)));
+  });
+});
+
+describe('NPC field pacing', () => {
+  it('bots cross at footrace pace with real spread between runners', () => {
+    const sim = makeSim(14);
+    const pid = sim.addPlayer('warrior', 'Watcher');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const snapshot = () =>
+      run.contestants
+        .filter((c) => !c.player && c.eliminatedAtTrial === null)
+        .map((c) => {
+          const e = sim.entities.get(c.entityId);
+          return e ? e.pos.z - run.origin.z : GAUNTLET.sentinel.fieldLength;
+        });
+    // Ten seconds in the pack is mid-flight: real footrace progress with a
+    // visible spread between the quick and the hesitant.
+    for (let i = 0; i < 20 * 10; i++) sim.tick();
+    const mid = snapshot();
+    expect(mid.length).toBeGreaterThan(0);
+    expect(Math.max(...mid)).toBeGreaterThan(15);
+    expect(Math.max(...mid) - Math.min(...mid)).toBeGreaterThan(6);
+    // By 45 seconds the leaders have effectively crossed the 90yd course
+    // (the old scripts took most of the 300s clock to shuffle over).
+    for (let i = 0; i < 20 * 35; i++) sim.tick();
+    if (run.phase === 'trial') {
+      expect(Math.max(...snapshot())).toBeGreaterThan(GAUNTLET.sentinel.fieldLength * 0.6);
+    } else {
+      // Even better: everyone resolved and the run moved on early.
+      expect(['interlude', 'podium']).toContain(run.phase);
+    }
+  });
+
+  it('a bot that crosses coasts past the line and then mills, never freezing on it', () => {
+    const sim = makeSim(21);
+    const pid = sim.addPlayer('warrior', 'Idle'); // idle player keeps the clock running
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const t = GAUNTLET.sentinel;
+    // A scripted survivor (never fumbles), placed dead centre just past the
+    // finish line so its lateral sway is never clamped by the field walls.
+    const bot = run.contestants.find(
+      (c) => !c.player && c.eliminatedAtTrial === null && c.script.fumbleOnFlip === null,
+    )!;
+    const e = sim.entities.get(bot.entityId)!;
+    e.pos.x = run.origin.x;
+    e.pos.z = run.origin.z + t.fieldLength + 0.1;
+    e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    // Coast: over the next few seconds it eases PAST the line to its overshoot
+    // (>= npcOvershootMin), regardless of the light (a crosser is safe).
+    for (let i = 0; i < 20 * 3 && run.phase === 'trial'; i++) sim.tick();
+    expect(run.phase).toBe('trial');
+    expect(e.pos.z - run.origin.z).toBeGreaterThan(t.fieldLength + t.npcOvershootMin - 0.5);
+    // Mill: it keeps swaying laterally over the next second rather than standing
+    // frozen on the spot.
+    let minX = e.pos.x;
+    let maxX = e.pos.x;
+    for (let i = 0; i < 20 && run.phase === 'trial'; i++) {
+      sim.tick();
+      minX = Math.min(minX, e.pos.x);
+      maxX = Math.max(maxX, e.pos.x);
+    }
+    expect(maxX - minX).toBeGreaterThan(0.02);
+  });
+});
+
+describe('sentinel finish cue + standings board', () => {
+  it('emits gauntletFinished once to the player who crosses the line', () => {
+    const sim = makeSim(22);
+    const pid = sim.addPlayer('warrior', 'Runner');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    // Reach a green light, then teleport across (a direct pos set re-syncs
+    // prevPos, so the crossing is not read as red-light movement).
+    for (
+      let i = 0;
+      i < 400 && !(run.trial?.kind === 'sentinel' && run.trial.light === 'green');
+      i++
+    )
+      sim.tick();
+    teleport(sim, pid, run.origin.x, run.origin.z + GAUNTLET.sentinel.fieldLength + 1);
+    const fin = pick(sim.tick(), 'gauntletFinished');
+    expect(fin.length).toBe(1);
+    expect(fin[0]!.pid).toBe(pid);
+    expect(fin[0]!.trialIndex).toBe(0);
+    // One-shot: already finished, so no repeat on the next tick.
+    expect(pick(sim.tick(), 'gauntletFinished').length).toBe(0);
+  });
+
+  it('projects the whole field onto the standings board, marking the viewer and knockouts', () => {
+    const sim = makeSim(23);
+    const pid = sim.addPlayer('warrior', 'Me');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    const run = sim.gauntletRuns[0]!;
+    const board = sim.gauntletRunWire(pid)!.board;
+    // One row per contestant, players first: the viewer's row is flagged `you`,
+    // full vitality, not out.
+    expect(board.length).toBe(run.contestants.length);
+    const me = board.find((b) => b.you);
+    expect(me).toBeTruthy();
+    expect(me!.name).toBe('Me');
+    expect(me!.vitality).toBe(GAUNTLET.vitalityMax);
+    expect(me!.out).toBe(false);
+    expect(board.filter((b) => b.you).length).toBe(1);
+    // Knock a bot out: its board row flips to out with zero vitality, and the
+    // count of standing rows drops by one.
+    const bot = aliveContestants(run).find((c) => !c.player)!;
+    const before = sim.gauntletRunWire(pid)!.board.filter((b) => !b.out).length;
+    bot.eliminatedAtTrial = run.trialIndex;
+    bot.vitality = 0;
+    const after = sim.gauntletRunWire(pid)!.board;
+    expect(after.filter((b) => !b.out).length).toBe(before - 1);
+    const outRow = after.find((b) => b.name === bot.name && b.out)!;
+    expect(outRow).toBeTruthy();
+    expect(outRow.vitality).toBe(0);
+  });
+});
+
+describe('interlude transport', () => {
+  it('moves the field to the next arena as the interlude opens, and pins it there', () => {
+    const sim = makeSim(31);
+    const pid = sim.addPlayer('warrior', 'Traveler');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    // Cross the sentinel on a green light so the player SURVIVES to the
+    // interlude (a failed crossing is now fatal). A direct pos set re-syncs
+    // prevPos, so the teleport is not read as red-light movement.
+    for (
+      let i = 0;
+      i < 400 && !(run.trial?.kind === 'sentinel' && run.trial.light === 'green');
+      i++
+    )
+      sim.tick();
+    teleport(sim, pid, run.origin.x, run.origin.z + GAUNTLET.sentinel.fieldLength + 1);
+    sim.tick();
+    expect(sim.gauntletRunWire(pid)!.finished).toBe(true);
+    // Sentinel resolves, then the interlude to trial 1 (sigils) opens.
+    advanceTo(sim, 'interlude', 20 * 120);
+    expect(run.phase).toBe('interlude');
+    const e = sim.entities.get(pid)!;
+    const lx = e.pos.x - run.origin.x;
+    // The sigil pavilion is the far -x column (instance-local x=-62); on the
+    // sentinel field the player finished near x=0, so a big negative x proves
+    // the early transport happened at the interlude's start, not its end.
+    expect(lx).toBeLessThan(-40);
+    // Pinned for the countdown: the position holds across the interlude ticks.
+    const ps = run.playerStates.get(pid)!;
+    expect(ps.heldAt).not.toBeNull();
+    const held = { x: e.pos.x, z: e.pos.z };
+    for (let i = 0; i < 20 && run.phase === 'interlude'; i++) sim.tick();
+    if (run.phase === 'interlude') {
+      expect(e.pos.x).toBeCloseTo(held.x, 4);
+      expect(e.pos.z).toBeCloseTo(held.z, 4);
+    }
+  }, 20000);
+});
+
+describe('cross-activity exclusion and reconnect recovery', () => {
+  it('a gauntlet member cannot queue for the arena or the castle race, and vice versa', () => {
+    const sim = makeSim(15);
+    const pid = sim.addPlayer('warrior', 'Busy');
+    openAndJoin(sim, pid);
+    expect(sim.gauntletRuns[0]?.playerStates.has(pid)).toBe(true);
+    (sim as any).arenaQueueJoin(pid);
+    expect(errorTexts(sim.tick())).toContain('You are already in the Gauntlet.');
+    expect((sim as any).arenaQueue1v1).not.toContain(pid);
+    (sim as any).hcQueueJoin(pid);
+    expect(errorTexts(sim.tick())).toContain('You are already in the Gauntlet.');
+    // The reverse: a queued player is turned away at the recruiter.
+    const sim2 = makeSim(16);
+    const p2 = sim2.addPlayer('warrior', 'Queued');
+    sim2.tick();
+    (sim2 as any).arenaQueueJoin(p2);
+    sim2.tick();
+    const r = recruiter(sim2)!;
+    teleport(sim2, p2, r.pos.x, r.pos.z);
+    sim2.gauntletJoin(p2);
+    expect(errorTexts(sim2.tick())).toContain('You cannot enter the Gauntlet right now.');
+    expect(sim2.gauntletRuns.length).toBe(0);
+  });
+
+  it('a character saved mid-run in the band rejoins at the world start, not a dungeon door', () => {
+    // The normal log-out-during-the-event flow: the autosave persists a
+    // position inside the gauntlet band, then the character rejoins a world
+    // where that run no longer exists.
+    const sim = makeSim(17);
+    const pid = sim.addPlayer('warrior', 'Sleeper');
+    teleport(sim, pid, 13200, -1250);
+    const state = sim.serializeCharacter(pid)!;
+    const sim2 = makeSim(18);
+    const p2 = sim2.addPlayer('warrior', 'Sleeper', { state });
+    const e = sim2.entities.get(p2)!;
+    expect(isGauntletPos(e.pos.x)).toBe(false);
+    // Specifically NOT the generic instance fallback (the first dungeon door).
+    expect(e.pos.x).toBeLessThan(4000);
+  });
+});
+
+describe('desk-trial station lock', () => {
+  // Splice the trial list per test (the per-trial suite pattern) and restore
+  // even on failure, so the shipped list is never left modified.
+  const savedTrials = [...GAUNTLET.trials];
+  const savedTargets = [...GAUNTLET.targetSurvivorsPerTrial];
+  afterEach(() => {
+    GAUNTLET.trials.splice(0, GAUNTLET.trials.length, ...savedTrials);
+    GAUNTLET.targetSurvivorsPerTrial.splice(
+      0,
+      GAUNTLET.targetSurvivorsPerTrial.length,
+      ...savedTargets,
+    );
+  });
+  function spliceTrial(kind: (typeof GAUNTLET.trials)[number]) {
+    GAUNTLET.trials.splice(0, GAUNTLET.trials.length, kind);
+    GAUNTLET.targetSurvivorsPerTrial.splice(0, GAUNTLET.targetSurvivorsPerTrial.length, 12);
+  }
+  // Hold a movement key for a second of ticks and report the total drift.
+  function driftUnderForward(sim: Sim, pid: number, back = false): number {
+    const e = sim.entities.get(pid)!;
+    const from = { x: e.pos.x, z: e.pos.z };
+    for (let i = 0; i < 20; i++) {
+      const mi = sim.meta(pid)!.moveInput;
+      if (back) mi.back = true;
+      else mi.forward = true;
+      sim.tick();
+      mi.forward = false;
+      mi.back = false;
+    }
+    return Math.hypot(e.pos.x - from.x, e.pos.z - from.z);
+  }
+
+  it('sigils seats the player at the lectern, facing the slab, and holds them there', () => {
+    spliceTrial('sigils');
+    const sim = makeSim(21);
+    const pid = sim.addPlayer('warrior', 'Etcher');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    const V = GAUNTLET_VENUE.sigils;
+    expect(e.pos.x).toBeCloseTo(run.origin.x + V.x + 1.8, 4);
+    expect(e.pos.z).toBeCloseTo(run.origin.z + V.z, 4);
+    expect(e.facing).toBeCloseTo(-Math.PI / 2, 4);
+    expect(driftUnderForward(sim, pid)).toBeLessThan(0.05);
+    expect(run.phase).toBe('trial'); // still mid-trial: the hold did the work
+  });
+
+  it('pull puts the player ON the rope and drags the line with the marker', () => {
+    spliceTrial('pull');
+    const sim = makeSim(22);
+    const pid = sim.addPlayer('warrior', 'Puller');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    const V = GAUNTLET_VENUE.pull;
+    // A lone player is team 0: the first grip on the -x half of the rope,
+    // facing the pit and the enemy team.
+    expect(e.pos.x).toBeCloseTo(run.origin.x + V.x - V.gripStart, 4);
+    expect(e.pos.z).toBeCloseTo(run.origin.z + V.z - 0.35, 4);
+    expect(e.facing).toBeCloseTo(Math.PI / 2, 4);
+    // Held at the grip (the first NPC heave lands 2s in, after this window).
+    expect(driftUnderForward(sim, pid)).toBeLessThan(0.05);
+    // The whole line slides with the rope: push the marker near the win
+    // threshold and the player's pinned grip is hauled toward -x with it.
+    const trial = run.trial;
+    if (trial?.kind !== 'pull') throw new Error('expected pull live');
+    trial.marker = GAUNTLET.pull.winThreshold - 1;
+    for (let i = 0; i < 15; i++) sim.tick();
+    expect(e.pos.x).toBeLessThan(run.origin.x + V.x - V.gripStart - 5);
+  });
+
+  it('seats the player at their own desk station and holds them there', () => {
+    spliceTrial('echo');
+    const sim = makeSim(23);
+    const pid = sim.addPlayer('warrior', 'Listener');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const e = sim.entities.get(pid)!;
+    // The lone joined player is contestant 0, seated a mat-gap west of desk 0.
+    const s0 = echoStation(0);
+    expect(e.pos.x).toBeCloseTo(run.origin.x + s0.matX, 4);
+    expect(e.pos.z).toBeCloseTo(run.origin.z + s0.matZ, 4);
+    expect(e.facing).toBeCloseTo(s0.facing, 4);
+    expect(driftUnderForward(sim, pid)).toBeLessThan(0.05);
+  });
+
+  it('gives every contestant their own distinct desk station', () => {
+    spliceTrial('echo');
+    const sim = makeSim(23);
+    const pid = sim.addPlayer('warrior', 'Listener');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    // The whole alive field (players AND bots) is seated, each at its station's
+    // mat, and no two contestants share a spot: the memory game is everyone's.
+    const alive = run.contestants.filter((c) => c.eliminatedAtTrial === null);
+    expect(alive.length).toBeGreaterThan(1);
+    const seen = new Set<string>();
+    for (let i = 0; i < alive.length; i++) {
+      const e = sim.entities.get(alive[i].entityId)!;
+      const s = echoStation(i);
+      expect(e.pos.x).toBeCloseTo(run.origin.x + s.matX, 4);
+      expect(e.pos.z).toBeCloseTo(run.origin.z + s.matZ, 4);
+      seen.add(`${e.pos.x.toFixed(2)},${e.pos.z.toFixed(2)}`);
+    }
+    // Distinct spots for at least the whole grid (indices past it wrap by design).
+    expect(seen.size).toBeGreaterThanOrEqual(Math.min(alive.length, ECHO_STATIONS));
+  });
+
+  it('movement trials stay free: the span never pins', () => {
+    spliceTrial('span');
+    const sim = makeSim(24);
+    const pid = sim.addPlayer('warrior', 'Walker');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    // Walk AWAY from the panels (no fall in play): real displacement expected.
+    expect(driftUnderForward(sim, pid, true)).toBeGreaterThan(1);
+  });
+
+  it('a knocked-out player spectates unpinned', () => {
+    spliceTrial('sigils');
+    const sim = makeSim(25);
+    const pid = sim.addPlayer('warrior', 'Doomed');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    const c = run.contestants.find((k) => k.entityId === pid)!;
+    c.vitality = GAUNTLET.sigils.shatterDamage; // the next shatter eliminates
+    for (let i = 0; i < 20 * 20 && c.eliminatedAtTrial === null; i++) {
+      sim.gauntletTrace([0.5, 0.5, 0.5, 0.5], pid); // far off the etched line
+      sim.tick();
+    }
+    const ps = run.playerStates.get(pid)!;
+    expect(ps.spectating).toBe(true);
+    expect(ps.heldAt).toBeNull();
+    // Parked on the terrace and free to walk it.
+    expect(driftUnderForward(sim, pid)).toBeGreaterThan(1);
+  });
+
+  it('the station pin releases when the trial resolves (the winner is posed on the podium)', () => {
+    spliceTrial('sigils');
+    const sim = makeSim(26);
+    const pid = sim.addPlayer('warrior', 'Freed');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'trial');
+    const run = sim.gauntletRuns[0]!;
+    if (run.trial?.kind !== 'sigils') throw new Error('expected sigils live');
+    const station = { ...sim.entities.get(pid)!.pos }; // the etcher's mark
+    run.trial.players.get(pid)!.done = true; // finish instantly
+    sim.tick(); // the trial resolves; a single-trial run goes to the podium
+    expect(run.phase).toBe('podium');
+    // No longer locked to the sigils lectern: the champion has been lifted off
+    // the station and posed on the winners' stand behind the plaza.
+    const e = sim.entities.get(pid)!;
+    expect(Math.hypot(e.pos.x - station.x, e.pos.z - station.z)).toBeGreaterThan(1);
+    expect(run.podiumSeats?.[0]?.entityId).toBe(pid);
+  });
+});
+
+describe('contestant variety', () => {
+  it('the NPC field wears rolled adventurer kits with proper-noun names', () => {
+    const sim = makeSim(31);
+    const pid = sim.addPlayer('warrior', 'Watcher');
+    openAndJoin(sim, pid);
+    advanceTo(sim, 'staging');
+    const run = sim.gauntletRuns[0]!;
+    const kits = new Set<string>();
+    for (const c of run.contestants) {
+      if (c.player) continue;
+      const e = sim.entities.get(c.entityId)!;
+      expect(e.templateId).toBe(`gauntlet_contestant_${c.cls}`);
+      expect(e.name).toBe(c.name); // the rolled proper noun rides the entity
+      expect(e.skin).toBe(c.skin);
+      expect(c.skin).toBeGreaterThanOrEqual(0);
+      expect(c.skin).toBeLessThan(SKIN_COUNTS[c.cls]);
+      kits.add(e.templateId);
+    }
+    // a 29-strong field over nine classes is never a monoculture
+    expect(kits.size).toBeGreaterThan(3);
+  });
+});
+
+describe('venue physics: walk ON the platforms, never INSIDE the solids', () => {
+  const SEED = 42;
+  const o = gauntletOrigin(0);
+
+  it('the etching dais and the span deck carry real ground height', () => {
+    const S = GAUNTLET_VENUE.sigils;
+    expect(groundHeight(o.x + S.x, o.z + S.z, SEED)).toBeCloseTo(0.5, 6);
+    // the rim is a walkable bevel, not a sheer step
+    expect(groundHeight(o.x + S.x + S.radius + 0.3, o.z + S.z, SEED)).toBeCloseTo(0.25, 6);
+    expect(groundHeight(o.x + S.x + S.radius + 1, o.z + S.z, SEED)).toBe(0);
+    const V = GAUNTLET_VENUE.span;
+    expect(groundHeight(o.x + V.x, o.z + V.z, SEED)).toBeCloseTo(0.58, 6);
+    // the crossing ends ramp down to the sand over the same run the venue
+    // draws its ramp meshes
+    const halfLen = (GAUNTLET.span.steps * GAUNTLET.span.panelLength) / 2;
+    const onRamp = groundHeight(o.x + V.x, o.z + V.z + halfLen + 0.45, SEED);
+    expect(onRamp).toBeGreaterThan(0.2);
+    expect(onRamp).toBeLessThan(0.58);
+    expect(groundHeight(o.x + V.x, o.z + V.z + halfLen + 2, SEED)).toBe(0);
+  });
+
+  it('venue solids block movement; the open field stays clear', () => {
+    const wz = GAUNTLET.sentinel.fieldLength + GAUNTLET_LAYOUT.watcherMargin + 4;
+    expect(isBlocked(SEED, o.x, o.z + wz, 0.5)).toBe(true); // the Stone Warden
+    const W = GAUNTLET_VENUE.echo;
+    expect(isBlocked(SEED, o.x + W.x, o.z + W.z + W.size / 2, 0.5)).toBe(true); // courtyard wall
+    const P = GAUNTLET_VENUE.pull;
+    // The pull lane is walk-on now (the drum/banner dressing became a walk-through
+    // scatter); only the two threshold stakes stay solid, and the rope lane is clear.
+    expect(isBlocked(SEED, o.x + P.x - P.knotTravel, o.z + P.z + P.pitHalfZ + 1.4, 0.5)).toBe(true); // a threshold stake
+    expect(isBlocked(SEED, o.x + P.x, o.z + P.z, 0.5)).toBe(false); // the rope lane, walk-on
+    const S = GAUNTLET_VENUE.sigils;
+    expect(isBlocked(SEED, o.x + S.x, o.z + S.z, 0.5)).toBe(true); // the lectern itself
+    expect(isBlocked(SEED, o.x, o.z + 30, 0.5)).toBe(false); // mid-field, clear
+    expect(isBlocked(SEED, o.x + S.x + 1.8, o.z + S.z, 0.5)).toBe(false); // the etcher's mark
+    // The colosseum shell is solid: its wall blocks at a segment seam point
+    // (the north pole of the ring ellipse), and the sand just inside is clear.
+    const K = GAUNTLET_VENUE.colosseum;
+    expect(isBlocked(SEED, o.x + K.x, o.z + K.z + K.rz, 0.5)).toBe(true);
+    expect(isBlocked(SEED, o.x + K.x, o.z + K.z + K.rz - 6, 0.5)).toBe(false);
+  });
+
+  it('a seated etcher stands ON the dais, not inside it', () => {
+    GAUNTLET.trials.splice(0, GAUNTLET.trials.length, 'sigils');
+    GAUNTLET.targetSurvivorsPerTrial.splice(0, GAUNTLET.targetSurvivorsPerTrial.length, 12);
+    try {
+      const sim = makeSim(27);
+      const pid = sim.addPlayer('warrior', 'Grounded');
+      openAndJoin(sim, pid);
+      advanceTo(sim, 'trial');
+      expect(sim.entities.get(pid)!.pos.y).toBeCloseTo(0.5, 6);
+    } finally {
+      GAUNTLET.trials.splice(0, GAUNTLET.trials.length, 'sentinel');
+      GAUNTLET.targetSurvivorsPerTrial.splice(0, GAUNTLET.targetSurvivorsPerTrial.length, 14);
+    }
+  });
+});

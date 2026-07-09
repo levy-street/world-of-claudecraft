@@ -113,6 +113,28 @@ const de: Messages = {
     'Der lokale Chat ist während der Beobachtung nicht verfügbar.',
 };
 
+const cs: Messages = {
+  'moderation.quotedNameRequired': 'Uzavři jméno postavy do dvojitých uvozovek.',
+  'moderation.invalidTarget': 'Tohoto hráče nemůžeš moderovat.',
+  'moderation.noPermission': 'K tomu nemáš oprávnění.',
+  'moderation.kicked': '{name} byl(a) vyhozen(a).',
+  'moderation.killConfirm': '{name} byl(a) zabit(a).',
+  'moderation.renameConfirm': '{name} musí změnit jméno.',
+  'moderation.muteConfirm': '{name} byl(a) umlčen(a) na {duration}.',
+  'moderation.banConfirm': '{name} byl(a) zabanován(a).',
+  'moderation.suspendConfirm': '{name} byl(a) pozastaven(a) na {duration}.',
+  'moderation.banned': 'Tento účet byl zabanován.',
+  'moderation.muteUsage': 'Použití: /mute "<jméno>" <minuty> [důvod]',
+  'moderation.suspendUsage': 'Použití: /suspend "<jméno>" <minuty> [důvod]',
+  'moderation.spectateUsage': 'Použití: /spectate <jméno>',
+  'moderation.spectateNotOnline': "Žádný online hráč jménem '{name}'.",
+  'moderation.notSpectating': 'Nikoho nesleduješ.',
+  'moderation.spectateStart': 'Nyní sleduješ {name}.',
+  'moderation.spectateStop': 'Sledování zastaveno.',
+  'moderation.spectateEnded': '{name} už není online; sledování skončilo.',
+  'moderation.spectateLocalChatUnavailable': 'Místní chat není při sledování dostupný.',
+};
+
 const zhCN: Messages = {
   'moderation.quotedNameRequired': '请用双引号括住角色名称。',
   'moderation.invalidTarget': '你不能管理该玩家。',
@@ -416,6 +438,7 @@ export const IN_GAME_MODERATION_MESSAGES: Record<string, Messages> = {
   ja_JP: ja,
   pt_BR: pt,
   ru_RU: ru,
+  cs_CZ: cs,
   da_DK: da,
   id_ID: id,
   nl_NL: nl,

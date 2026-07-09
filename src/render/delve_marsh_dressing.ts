@@ -430,16 +430,18 @@ export function placeMarshBlackwaterPools(
     const sxr = (h.rx ?? h.r) / h.r;
     const szr = (h.rz ?? h.r) / h.r;
     if (isShallow) {
-      // Shallow: lighter teal, more translucent - reads as wading depth.
+      // Shallow: teal, but opaque enough to read as a damaging pool, not clear
+      // floor. Shallow Blackwater still hurts, so the fill and the warning rim
+      // carry real contrast (a faint teal wash was read as safe wading water).
       const pool = new THREE.Mesh(
         new THREE.CircleGeometry(r, 36)
           .scale(sxr, szr, 1)
           .rotateX(-Math.PI / 2)
           .translate(h.x, 0.1, h.z),
         new THREE.MeshBasicMaterial({
-          color: 0x1a5a6a,
+          color: 0x123f4c,
           transparent: true,
-          opacity: 0.52,
+          opacity: 0.72,
           depthWrite: false,
         }),
       );
@@ -453,7 +455,7 @@ export function placeMarshBlackwaterPools(
         new THREE.MeshBasicMaterial({
           color: 0x4adaaa,
           transparent: true,
-          opacity: 0.38,
+          opacity: 0.6,
           side: THREE.DoubleSide,
           depthWrite: false,
           blending: THREE.AdditiveBlending,
@@ -461,6 +463,24 @@ export function placeMarshBlackwaterPools(
       );
       rim.renderOrder = 2;
       group.add(rim);
+      // A defined outer boundary ring so the pool edge (where the damage starts)
+      // reads at a glance, the same telegraph the deep pool gets.
+      const edge = new THREE.Mesh(
+        new THREE.RingGeometry(r * 0.98, r * 1.06, 40)
+          .scale(sxr, szr, 1)
+          .rotateX(-Math.PI / 2)
+          .translate(h.x, 0.15, h.z),
+        new THREE.MeshBasicMaterial({
+          color: 0x6fe8c4,
+          transparent: true,
+          opacity: 0.5,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        }),
+      );
+      edge.renderOrder = 3;
+      group.add(edge);
       addGlow(h.x, h.z, 0x3abcaa, 0.06, r * 0.8);
     } else {
       // Deep (default): dark near-opaque navy/black - reads as drowning danger.

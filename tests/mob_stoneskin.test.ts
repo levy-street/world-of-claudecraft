@@ -4,9 +4,9 @@
 // interval after the fight begins — resets on evade/respawn, and reuses the
 // existing `absorb` aura, which dealDamage already soaks before any HP is lost.
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 function makeSim() {
@@ -89,6 +89,18 @@ describe('Stoneskin boss mechanic', () => {
     mob.stoneskinTimer = 0;
     (sim as any).resetEvadingMob(mob);
     expect(mob.stoneskinTimer).toBe(MOBS.marrowlord_varkas.stoneskin!.every);
+  });
+
+  it('mechanicHealMult scales the barrier at the fire site (heroic-instance plumbing)', () => {
+    // Heroic spawns carry mechanicHealMult (instances/difficulty.ts). Stoneskin
+    // draws no rng, so the scaled absorb pins exactly: 2x the template amount.
+    const sim = makeSim();
+    const mob = engagedWard(sim);
+    mob.mechanicHealMult = 2;
+    mob.stoneskinTimer = 0.001;
+    (sim as any).updateMob(mob);
+
+    expect(wardAura(mob)?.value).toBe(MOBS.marrowlord_varkas.stoneskin!.amount * 2);
   });
 
   it('a normal mob without a stoneskin template never gains the barrier', () => {

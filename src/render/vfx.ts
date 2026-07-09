@@ -200,6 +200,11 @@ export class Vfx {
   private head = 0;
   private projectiles: Projectile[] = [];
   private tmpColor = new THREE.Color();
+  // fireworkBurst palette scratch, reused across shells (spawn() copies
+  // components, never retaining the reference): a goal volley allocates
+  // no Color objects.
+  private fwCols: THREE.Color[] = [];
+  private fwFlash = new THREE.Color();
   private quality = 1;
 
   constructor(
@@ -502,6 +507,54 @@ export class Vfx {
     }
   }
 
+  // A soft, non-graphic knockout "poof": a pale puff of smoke plus a quick
+  // sparkle pop with a gentle upward drift, tone-appropriate for the stylized
+  // Gauntlet survival event (no gore). HDR-tinted so it blooms softly on the
+  // composer tiers. Cheap and pooled like burst; `at` is any {x,y,z}.
+  poof(at: { x: number; y: number; z: number }): void {
+    const smoke = new THREE.Color(0xf2ecff).multiplyScalar(hdr(1.3));
+    const spark = new THREE.Color(0xfff2c8).multiplyScalar(hdr(1.8));
+    // pale smoke ring drifting up and gently outward (negative gravity keeps it
+    // rising softly as it fades)
+    const puffs = this.scaledCount(12);
+    for (let i = 0; i < puffs; i++) {
+      const a = (i / puffs) * Math.PI * 2 + Math.random() * 0.5;
+      const r = 0.15 + Math.random() * 0.35;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + 0.3 + Math.random() * 0.3,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.8,
+        1.2 + Math.random() * 0.9,
+        Math.cos(a) * 0.8,
+        smoke,
+        0.5 + Math.random() * 0.4,
+        0.5 + Math.random() * 0.3,
+        -0.4,
+        SPR.smoke,
+      );
+    }
+    // a quick sparkle pop that sells the "here one moment, gone the next" beat
+    const sparks = this.scaledCount(9);
+    for (let i = 0; i < sparks; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 1.5 + Math.random() * 2.5;
+      this.spawn(
+        at.x,
+        at.y + 0.35,
+        at.z,
+        Math.sin(a) * sp,
+        1.4 + Math.random() * 1.6,
+        Math.cos(a) * sp,
+        spark,
+        0.28 + Math.random() * 0.2,
+        0.4 + Math.random() * 0.3,
+        2.5,
+        i % 2 === 0 ? SPR.sparkle : SPR.star,
+      );
+    }
+  }
+
   healGlow(targetId: number): void {
     const at = this.anchor(targetId, 0.1);
     if (!at) return;
@@ -578,6 +631,73 @@ export class Vfx {
         1.1 + Math.random() * 0.4,
         -1,
         i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+  }
+
+  // Vale Cup celebration: one team-colored firework shell (per-particle colors,
+  // the levelUpPillar/burst pattern). The renderer staggers several calls per
+  // goal to read as a volley; colors alternate through the scoring nation's
+  // flag palette. A slow confetti sprinkle rides along under lighter gravity.
+  fireworkBurst(at: THREE.Vector3, colors: readonly number[], count = 46, power = 1): void {
+    const colCount = Math.max(1, colors.length);
+    while (this.fwCols.length < colCount) this.fwCols.push(new THREE.Color());
+    for (let i = 0; i < colCount; i++) {
+      this.fwCols[i].setHex(colors.length > 0 ? colors[i] : 0xffd14d).multiplyScalar(hdr(1.8));
+    }
+    const cols = this.fwCols;
+    // the report flash
+    this.spawn(
+      at.x,
+      at.y,
+      at.z,
+      0,
+      0.3,
+      0,
+      this.fwFlash.setHex(0xfff6e0).multiplyScalar(hdr(2.2)),
+      1.5 * power,
+      0.2,
+      0,
+      SPR.flash,
+    );
+    const n = this.scaledCount(count);
+    for (let i = 0; i < n; i++) {
+      // even-ish spherical shell
+      const u = Math.random() * 2 - 1;
+      const a = Math.random() * Math.PI * 2;
+      const s = Math.sqrt(Math.max(0, 1 - u * u));
+      const sp = (6 + Math.random() * 2.6) * power;
+      this.spawn(
+        at.x,
+        at.y,
+        at.z,
+        Math.cos(a) * s * sp,
+        u * sp * 0.85 + 1.2,
+        Math.sin(a) * s * sp,
+        cols[i % colCount],
+        0.4 + Math.random() * 0.2,
+        0.95 + Math.random() * 0.5,
+        4.5,
+        i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    // confetti flecks: slower, tumbling, longer-lived
+    const confetti = this.scaledCount(Math.round(count * 0.4));
+    for (let i = 0; i < confetti; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = (1.5 + Math.random() * 2) * power;
+      this.spawn(
+        at.x,
+        at.y,
+        at.z,
+        Math.sin(a) * sp,
+        Math.random() * 1.5,
+        Math.cos(a) * sp,
+        cols[(i + 1) % colCount],
+        0.22,
+        1.4 + Math.random() * 0.6,
+        1.6,
+        SPR.debris,
       );
     }
   }

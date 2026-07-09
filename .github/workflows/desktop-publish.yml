@@ -1,0 +1,333 @@
+name: Desktop publish
+
+# Builds and publishes the website-channel desktop artifacts to the update
+# host (Cloudflare R2 behind https://updates.worldofclaudecraft.com/desktop/):
+#   - Linux: AppImage + deb (x64 + arm64), SHA256SUMS-linux, and the two
+#     per-arch electron-updater feed files. No signing required.
+#   - macOS: signed + notarized universal dmg + zip + blockmap, SHA256SUMS-mac,
+#     and latest-mac.yml. Requires the Apple signing secrets; the job refuses
+#     to publish an ad-hoc build.
+# Windows stays on the manual runbook until Azure Artifact Signing is
+# provisioned. The full runbook, including the one-time R2 and Apple
+# provisioning these jobs depend on, is docs/desktop-release.md
+# ("Publishing from CI").
+#
+# Triggers:
+#   - a release tag (v<version>) pushed to a commit that is on main; the tag
+#     must match package.json "version" and DESKTOP_VERSION, so the download
+#     page, the feed, and the artifacts stay in lockstep.
+#   - manual dispatch, which is a DRY RUN by default: it builds, signs,
+#     verifies, and checksums exactly like a release, then attaches the
+#     artifacts to the workflow run for inspection instead of uploading.
+#     Tick "publish" to really upload (the backfill path). The same version
+#     lockstep guard runs; only the tag and main-ancestry checks are skipped.
+#
+# The platform jobs are independent: a mac signing failure never blocks the
+# Linux publish and vice versa. Within each job, versioned artifacts upload
+# before the feed files, so an installed app is never offered an update whose
+# file is not yet downloadable.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Upload to the live update host (leave unchecked for a build-only dry run)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-publish
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify release guards
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          # Full history so the main-ancestry guard below can walk it.
+          fetch-depth: 0
+
+      # A tag alone must not be able to publish code that never landed on main
+      # (the contract is: merge to main, then tag the merge).
+      - name: Verify the tagged commit is on main (tag pushes only)
+        if: github.event_name == 'push'
+        run: |
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "Tag ${GITHUB_REF_NAME} points at ${GITHUB_SHA}, which is not on main. Refusing to publish." >&2
+            exit 1
+          fi
+
+      # Artifact names, the updater feed, and the download-page links all key
+      # off package.json "version"; DESKTOP_VERSION (the download page) must
+      # match it (docs/desktop-release.md, "Publishing a website update"
+      # step 1). Fail fast before the long builds if anything is out of step.
+      - name: Verify version lockstep
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "package.json version: ${VERSION}"
+          if [ "${GITHUB_EVENT_NAME}" = "push" ] && [ "${GITHUB_REF_NAME}" != "v${VERSION}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json version v${VERSION}." >&2
+            exit 1
+          fi
+          if ! grep -q "DESKTOP_VERSION = '${VERSION}'" src/game/desktop_download.ts; then
+            echo "DESKTOP_VERSION in src/game/desktop_download.ts does not match package.json version ${VERSION}." >&2
+            exit 1
+          fi
+
+  linux:
+    name: Build and publish Linux artifacts
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Full website-channel build: vite client bundle baked for production,
+      # then electron-builder producing the Linux arch matrix from
+      # package.json "build" (AppImage + deb, x64 + arm64) plus the per-arch
+      # feed files latest-linux.yml (x64) and latest-linux-arm64.yml (arm64).
+      # The script itself passes --publish never; uploading is the explicit,
+      # ordered step below.
+      - name: Build Linux desktop artifacts
+        run: npm run electron:build
+
+      # Checksums so Linux users can validate their download
+      # (docs/desktop-release.md, "Linux"). Bare filenames, so the file
+      # verifies with "sha256sum -c" from the download directory. Named
+      # per-platform because the mac job publishes its own checksum file to
+      # the same prefix.
+      - name: Generate SHA256SUMS-linux
+        run: |
+          cd release
+          sha256sum *.AppImage *.deb > SHA256SUMS-linux
+          cat SHA256SUMS-linux
+
+      # Pin the exact expected artifact names instead of globbing: the x64
+      # AppImage arch token is "x86_64" while the x64 deb is "amd64" (both
+      # electron-builder conventions), and a silent rename here would strand
+      # the download page and the update feed. Runs on dry runs too, so a
+      # rehearsal proves the same contract a release relies on.
+      - name: Verify expected artifacts
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          FILES=(
+            "world-of-claudecraft-${VERSION}-linux-x86_64.AppImage"
+            "world-of-claudecraft-${VERSION}-linux-arm64.AppImage"
+            "world-of-claudecraft-${VERSION}-linux-amd64.deb"
+            "world-of-claudecraft-${VERSION}-linux-arm64.deb"
+            "SHA256SUMS-linux"
+            "latest-linux.yml"
+            "latest-linux-arm64.yml"
+          )
+          for file in "${FILES[@]}"; do
+            if [ ! -f "release/${file}" ]; then
+              echo "Expected artifact release/${file} was not produced; refusing to publish a partial release." >&2
+              ls release >&2
+              exit 1
+            fi
+          done
+
+      - name: Attach artifacts to the run (dry run only)
+        if: github.event_name == 'workflow_dispatch' && !inputs.publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-linux
+          retention-days: 7
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/SHA256SUMS-linux
+            release/latest-linux*.yml
+
+      # Versioned artifacts are immutable (cache for a year); the checksum and
+      # feed files live at stable keys that change each release, so they stay
+      # near-uncached. Feed files upload LAST.
+      - name: Upload to the update host (R2)
+        if: github.event_name == 'push' || inputs.publish
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_EC2_METADATA_DISABLED: 'true'
+          # R2 does not implement the newer S3 default integrity checksums;
+          # these are Cloudflare's documented settings for aws-cli >= 2.23.
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          if [ -z "$R2_ACCOUNT_ID" ] || [ -z "$R2_BUCKET" ] || [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "R2 secrets are not configured (R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY). See docs/desktop-release.md." >&2
+            exit 1
+          fi
+          VERSION="$(node -p "require('./package.json').version")"
+          ENDPOINT="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          put() {
+            aws s3 cp "release/$1" "s3://${R2_BUCKET}/desktop/$1" \
+              --endpoint-url "$ENDPOINT" --content-type "$2" --cache-control "$3"
+          }
+          put "world-of-claudecraft-${VERSION}-linux-x86_64.AppImage" application/octet-stream "public,max-age=31536000,immutable"
+          put "world-of-claudecraft-${VERSION}-linux-arm64.AppImage" application/octet-stream "public,max-age=31536000,immutable"
+          put "world-of-claudecraft-${VERSION}-linux-amd64.deb" application/vnd.debian.binary-package "public,max-age=31536000,immutable"
+          put "world-of-claudecraft-${VERSION}-linux-arm64.deb" application/vnd.debian.binary-package "public,max-age=31536000,immutable"
+          put "SHA256SUMS-linux" text/plain "no-cache,max-age=60"
+          put "latest-linux.yml" text/yaml "no-cache,max-age=60"
+          put "latest-linux-arm64.yml" text/yaml "no-cache,max-age=60"
+          echo "Published Linux ${VERSION} to https://updates.worldofclaudecraft.com/desktop/"
+
+  mac:
+    name: Build and publish macOS artifacts
+    needs: verify
+    runs-on: macos-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      # HARD DEPENDENCY (docs/desktop-release.md, "macOS"): auto-update only
+      # applies to a Developer-ID-signed AND notarized build, so this job
+      # refuses to run unsigned rather than publish an ad-hoc build. Checked
+      # before the long install/build.
+      - name: Verify signing secrets are configured
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          missing=""
+          for name in CSC_LINK CSC_KEY_PASSWORD APPLE_API_KEY_P8 APPLE_API_KEY_ID APPLE_API_ISSUER; do
+            if [ -z "${!name}" ]; then missing="${missing} ${name}"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "Apple signing secrets are not configured:${missing}. See docs/desktop-release.md (Publishing from CI)." >&2
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # CSC_LINK is the base64 .p12 (electron-builder consumes it directly);
+      # the App Store Connect API key must be a file on disk, so the .p8
+      # secret content is written to the runner temp dir and APPLE_API_KEY
+      # points at it. Signing and notarization then activate automatically in
+      # scripts/electron-build.mjs / electron-builder.
+      - name: Build signed and notarized macOS desktop artifacts
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          printf '%s' "$APPLE_API_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
+          export APPLE_API_KEY="$RUNNER_TEMP/AuthKey.p8"
+          npm run electron:build
+
+      # Mirrors the manual runbook verification: a bad signature or a build
+      # that skipped notarization must fail here, never publish.
+      - name: Verify code signature and notarization
+        run: |
+          codesign --verify --deep --strict "release/mac-universal/World of ClaudeCraft.app"
+          spctl -a -t exec -vv "release/mac-universal/World of ClaudeCraft.app"
+
+      - name: Generate SHA256SUMS-mac
+        run: |
+          cd release
+          shasum -a 256 *.dmg *.zip > SHA256SUMS-mac
+          cat SHA256SUMS-mac
+
+      # Pinned filenames, same contract as the Linux job; runs on dry runs too.
+      - name: Verify expected artifacts
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          FILES=(
+            "world-of-claudecraft-${VERSION}-mac-universal.dmg"
+            "world-of-claudecraft-${VERSION}-mac-universal.zip"
+            "world-of-claudecraft-${VERSION}-mac-universal.zip.blockmap"
+            "SHA256SUMS-mac"
+            "latest-mac.yml"
+          )
+          for file in "${FILES[@]}"; do
+            if [ ! -f "release/${file}" ]; then
+              echo "Expected artifact release/${file} was not produced; refusing to publish a partial release." >&2
+              ls release >&2
+              exit 1
+            fi
+          done
+
+      - name: Attach artifacts to the run (dry run only)
+        if: github.event_name == 'workflow_dispatch' && !inputs.publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-mac
+          retention-days: 7
+          path: |
+            release/*.dmg
+            release/*.zip
+            release/*.zip.blockmap
+            release/SHA256SUMS-mac
+            release/latest-mac.yml
+
+      # Same rules as the Linux upload: immutable caching for the versioned
+      # artifacts, near-uncached checksum + feed, and the feed file
+      # (latest-mac.yml) uploads LAST.
+      - name: Upload to the update host (R2)
+        if: github.event_name == 'push' || inputs.publish
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_EC2_METADATA_DISABLED: 'true'
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          if [ -z "$R2_ACCOUNT_ID" ] || [ -z "$R2_BUCKET" ] || [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "R2 secrets are not configured (R2_ACCOUNT_ID, R2_BUCKET, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY). See docs/desktop-release.md." >&2
+            exit 1
+          fi
+          VERSION="$(node -p "require('./package.json').version")"
+          ENDPOINT="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          put() {
+            aws s3 cp "release/$1" "s3://${R2_BUCKET}/desktop/$1" \
+              --endpoint-url "$ENDPOINT" --content-type "$2" --cache-control "$3"
+          }
+          put "world-of-claudecraft-${VERSION}-mac-universal.dmg" application/x-apple-diskimage "public,max-age=31536000,immutable"
+          put "world-of-claudecraft-${VERSION}-mac-universal.zip" application/zip "public,max-age=31536000,immutable"
+          put "world-of-claudecraft-${VERSION}-mac-universal.zip.blockmap" application/octet-stream "public,max-age=31536000,immutable"
+          put "SHA256SUMS-mac" text/plain "no-cache,max-age=60"
+          put "latest-mac.yml" text/yaml "no-cache,max-age=60"
+          echo "Published macOS ${VERSION} to https://updates.worldofclaudecraft.com/desktop/"

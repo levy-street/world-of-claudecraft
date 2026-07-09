@@ -3,6 +3,16 @@ services:
     image: postgres:16-alpine
     container_name: eastbrook-db
     restart: unless-stopped
+    # Preload pg_stat_statements so monitoring can track per-query stats
+    # (slowest/most-frequent queries) via postgres_exporter. Takes effect on the
+    # next DB restart. One-time `CREATE EXTENSION pg_stat_statements;` is needed
+    # afterwards, handled idempotently by the monitoring deploy (woc-deploy).
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_preload_libraries=pg_stat_statements"
+      - "-c"
+      - "pg_stat_statements.track=all"
     environment:
       POSTGRES_USER: eastbrook
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env. See .env.example.}
@@ -60,6 +70,10 @@ services:
       APPLE_DEVICECHECK_KEY_ID: ${APPLE_DEVICECHECK_KEY_ID:-}
       APPLE_DEVICECHECK_SIGNING_PEM: ${APPLE_DEVICECHECK_SIGNING_PEM:-}
       APPLE_DEVICECHECK_ENV: ${APPLE_DEVICECHECK_ENV:-production}
+      # Runtime: opt-in world-loop perf diagnostics (PERF_TICK_LOG=1): the 20 Hz
+      # heartbeat log line (tickHz, per-phase p95/max) plus over-budget stutter
+      # traces. Off by default so production logs stay quiet.
+      PERF_TICK_LOG: ${PERF_TICK_LOG:-}
       # Runtime: protects the loopback-only deploy countdown endpoint.
       RESTART_COUNTDOWN_SECRET: ${RESTART_COUNTDOWN_SECRET:-}
       # Runtime: Discord OAuth + the secret-gated game <-> Discord bot channel.

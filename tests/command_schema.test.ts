@@ -23,8 +23,11 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; never trust stale prose).
-const EXPECTED_SEND_COUNT = 119;
-const EXPECTED_DISPATCH_COUNT = 128;
+// Union of both merged feature sets: base 119 + The Gauntlet / Hodric's Castle
+// (11: gauntlet_* + hc_*) + release bank/Vale Cup/town focus (12: bank_*, heroic_buy,
+// set_dungeon_difficulty, set_town_focus, vcup_*). The two additions are disjoint.
+const EXPECTED_SEND_COUNT = 142;
+const EXPECTED_DISPATCH_COUNT = 151;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

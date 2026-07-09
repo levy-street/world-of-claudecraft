@@ -105,7 +105,61 @@ class Sfx {
         }
       }),
     );
+    // Procedurally synthesized beds/one-shots (no clip files; the Vale Cup
+    // crowd is generated, not recorded, keeping the shipped audio set as-is).
+    try {
+      this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6, false));
+      this.buffers.set('vcup_crowd_roar', this.makeCrowdBuffer(ctx, 2.6, true));
+    } catch {
+      /* stub AudioContext in tests: the keys just stay silent */
+    }
     this.ready = this.buffers.size > 0;
+  }
+
+  /** Procedural crowd noise. Bed mode is a seamless 6s murmur loop (filtered
+   *  noise under slow integer-cycle swells, so the wrap point is silent-clean);
+   *  roar mode bakes a crescendo-decay envelope for a goal-roar one-shot. */
+  private makeCrowdBuffer(ctx: AudioContext, seconds: number, roar: boolean): AudioBuffer {
+    const sr = ctx.sampleRate;
+    const len = Math.floor(seconds * sr);
+    const buf = ctx.createBuffer(2, len, sr);
+    for (let ch = 0; ch < 2; ch++) {
+      const data = buf.getChannelData(ch);
+      let lpDeep = 0; // ~200Hz body: the massed-voices rumble
+      let lpMid = 0; // ~900Hz band: chatter/consonants
+      const phase = ch * 1.9;
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        lpDeep += 0.026 * (w - lpDeep);
+        lpMid += 0.11 * (w - lpMid);
+        const t = i / len;
+        // integer cycle counts so the loop wraps without a click
+        const swell =
+          0.62 +
+          0.22 * Math.sin(2 * Math.PI * 3 * t + phase) +
+          0.16 * Math.sin(2 * Math.PI * 7 * t + phase * 1.31);
+        const voiceBand = (lpMid - lpDeep) * 0.9;
+        let s = (lpDeep * 2.2 + voiceBand) * swell;
+        if (roar) {
+          // crescendo fast, hold, tail off; brighter than the bed
+          const env = t < 0.18 ? t / 0.18 : t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45;
+          s = (lpDeep * 1.6 + voiceBand * 2.4 + w * 0.06) * env * 1.5;
+        }
+        data[i] = Math.max(-1, Math.min(1, s));
+      }
+      if (!roar) {
+        // equal-power crossfade of the tail into the head: noise itself is not
+        // periodic, so the loop seam still needs blending
+        const fade = Math.floor(0.25 * sr);
+        for (let i = 0; i < fade; i++) {
+          const f = i / fade;
+          const a = Math.sqrt(1 - f);
+          const b = Math.sqrt(f);
+          data[len - fade + i] = data[len - fade + i] * a + data[i] * b;
+        }
+      }
+    }
+    return buf;
   }
 
   /** Position + forward vector of the listener (camera), once per frame. */
@@ -386,8 +440,12 @@ class Sfx {
     inDungeon: boolean,
     precip: 'snow' | 'rain' | null,
     nearWater: boolean,
+    crowd: number,
   ): void {
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
+    // Sowfield crowd murmur (procedural bed): quiet chatter on the grounds,
+    // swelling while a match is live (the renderer passes 0 / ~0.4 / 1).
+    this.ambient('amb_crowd', crowd > 0 ? 0.08 + 0.18 * Math.min(1, crowd) : 0);
     this.ambient('amb_wind_vale', !inDungeon && (biome === 'vale' || biome === 'beach') ? 0.12 : 0);
     this.ambient('amb_birds', !inDungeon && biome === 'vale' ? 0.1 : 0);
     this.ambient(
@@ -401,6 +459,44 @@ class Sfx {
     this.ambient('amb_rain', precip === 'rain' ? 0.11 : 0); // sharp clip — kept very low
     this.ambient('amb_snow', precip === 'snow' ? 0.13 : 0);
     this.ambient('amb_water', nearWater ? 0.18 : 0);
+  }
+
+  // --- Vale Cup one-shots (HUD-armed on vcupGoal/vcupEnd events) -----------
+
+  /** GOAL! Two rising open fifths on stacked saws, the festival air horn.
+   *  Fully synthesized (no clip file); non-positional so the whole stadium
+   *  moment lands regardless of camera direction. */
+  goalHorn(): void {
+    const ctx = this.ctx,
+      master = this.master;
+    if (!ctx || !master) return;
+    const t0 = ctx.currentTime;
+    const blast = (freq: number, at: number, dur: number): void => {
+      for (const [mult, level] of [
+        [1, 0.16],
+        [1.5, 0.12],
+        [2.02, 0.05],
+      ] as const) {
+        const osc = ctx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq * mult, t0 + at);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t0 + at);
+        g.gain.linearRampToValueAtTime(level, t0 + at + 0.05);
+        g.gain.setValueAtTime(level, t0 + at + dur * 0.7);
+        g.gain.exponentialRampToValueAtTime(0.001, t0 + at + dur);
+        osc.connect(g).connect(master);
+        osc.start(t0 + at);
+        osc.stop(t0 + at + dur + 0.05);
+      }
+    };
+    blast(196, 0, 0.5);
+    blast(261.6, 0.42, 0.9);
+  }
+
+  /** The stands erupt: the baked crescendo-decay crowd roar (procedural). */
+  crowdRoar(gain = 0.9): void {
+    this.playUi('vcup_crowd_roar', { gain, cooldown: 0.4 });
   }
 }
 

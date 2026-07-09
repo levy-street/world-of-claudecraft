@@ -1,5 +1,6 @@
 import type {
   AccountCosmetics,
+  BankBonusSource,
   DailyRewardHistory,
   DailyRewardLeaderboardPage,
   DailyRewardSpinResult,
@@ -11,6 +12,8 @@ import type {
 } from '../world_api';
 import * as bagsMod from './bags';
 import { addStacked, BAG_SOCKETS, bagCapacity, canAddItem, migrationBagsFor } from './bags';
+import * as bankMod from './bank';
+import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import {
@@ -51,6 +54,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
+import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { isSpellResisted } from './combat/spell_resist';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
@@ -84,10 +88,10 @@ import {
 import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
+  ALL_RECIPES,
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
-  COMMON_RECIPES,
   DEEPFEN_SHALLOWS_LAKE,
   DELVE_COMPANIONS,
   DELVE_LIST,
@@ -100,11 +104,15 @@ import {
   FISHING_RARE_ID,
   FISHING_TABLES,
   getActiveWorldContent,
+  hodricsOrigin,
   INSTANCE_SLOT_COUNT,
   ITEMS,
   isArenaPos,
   isDelvePos,
+  isGauntletPos,
+  isHodricsPos,
   MOBS,
+  NPCS,
   QUESTS,
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
@@ -136,9 +144,12 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
-import { canEquipItem } from './equipment_rules';
+import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import * as gauntletModesMod from './gauntlet/modes';
+import * as gauntletMod from './gauntlet/runs';
+import type { GauntletQueueUnit, GauntletRun, GauntletSpectatorState } from './gauntlet/state';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -158,6 +169,7 @@ import type { Ante, PickAction } from './lockpick';
 import {
   activeLootRolls as activeLootRollsImpl,
   assignMasterLoot as assignMasterLootImpl,
+  lootRollGroupStatus as lootRollGroupStatusImpl,
   type PendingLootRoll,
   partyLootCandidatesForMob as partyLootCandidatesForMobImpl,
   resolveLootRoll as resolveLootRollImpl,
@@ -168,6 +180,12 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import * as hubMod from './minigame_hub';
+import {
+  mobCombatProfile as mobCombatProfileFn,
+  mobEffectiveMeleeRange as mobEffectiveMeleeRangeFn,
+  tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeFn,
+} from './mob/combat_profile';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -176,7 +194,7 @@ import {
   updateMobTarget as updateMobTargetFn,
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
-import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from './mob_combat';
+import type { MobCombatProfile } from './mob_combat';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -186,16 +204,32 @@ import {
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import {
+  isSwimming as isSwimmingImpl,
+  moveSpeedMult as moveSpeedMultImpl,
+  type PlayerMotionDeps,
+  SWIM_SPEED_MULT,
+  stepPlayerMotion,
+  swimSurfaceY,
+} from './player_motion';
+import {
   type ArchetypeState,
   acceptArchetypeQuest as acceptArchetypeQuestImpl,
   advanceAmendsProgress as advanceAmendsProgressImpl,
   archetypeStateFor,
+  archetypeTitleFor,
   emptyArchetypeState,
+  hobbyCraftFor,
   normalizeArchetypeState,
   requiredAmendsProgress,
   switchArchetype as switchArchetypeImpl,
 } from './professions/archetype';
-import { type CraftResult, craftItem as craftItemImpl } from './professions/crafting';
+import {
+  type AcquireRecipeResult,
+  acquireRecipe as acquireRecipeImpl,
+  type CraftResult,
+  craftItem as craftItemImpl,
+} from './professions/crafting';
+import * as professionsFocus from './professions/focus';
 import {
   drainGatheringGrants,
   emptyGatheringProficiency,
@@ -205,6 +239,7 @@ import {
   isNodeHarvestableBy,
   normalizeGatheringProficiency,
 } from './professions/gathering';
+import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
 import type { ProfessionRecipeRecord as RecipeDef } from './professions/types';
 import {
   craftSkillsFor,
@@ -232,7 +267,6 @@ import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
 import {
   applyResurrectionSickness,
-  GHOST_RUN_MULT,
   RESURRECTION_SICKNESS_ID,
   releasePlayerSpirit,
   resurrectAtCorpse,
@@ -254,6 +288,12 @@ export type { MailSave } from './mail/post_office';
 export type { MarketSave } from './market';
 
 import {
+  applyHeroicMobTuning,
+  mobLevelForDungeonDifficulty,
+  mobTemplateForDungeonDifficulty,
+} from './instances/difficulty';
+import {
+  awardHeroicMarks as awardHeroicMarksImpl,
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
   instanceInfoAt as instanceInfoAtImpl,
@@ -265,6 +305,7 @@ import {
   updateDoorTriggers as updateDoorTriggersImpl,
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
+import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -277,9 +318,16 @@ import {
 // (online.ts) stays byte-identical.
 export { computeQuestState } from './quests/quest_commands';
 
+import { hcProgressFrac, hcSectionAt } from './hodrics_course';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import * as duelMod from './social/duel';
+import type { HcMatch, HcQueueUnit } from './social/hodrics';
+import * as hodricsMod from './social/hodrics';
+import * as hcBotsMod from './social/hodrics_bots';
+// A4: Protect Yumi (formats yumi3/yumi5); match logic in social/yumi.ts, reached
+// via ctx callbacks + the two hostility arms in isHostileTo/isFriendlyTo.
+import * as yumiMod from './social/yumi';
 
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts. Re-exported so the
 // public path `import { Sim, eloDelta } from './sim'` (tests/arena.test.ts) holds.
@@ -297,12 +345,14 @@ import {
 } from './social/fiesta';
 import * as fiestaBotsMod from './social/fiesta_bots';
 import { PartyMachine } from './social/party';
+import * as valeCupMod from './social/vale_cup';
+import { createVcState, type VcState } from './social/vale_cup';
+import * as valeCupBotsMod from './social/vale_cup_bots';
 import { SpatialGrid } from './spatial';
 import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
-  clearThreat,
   TAUNT_FORCE_SECONDS,
   threatEntries,
   threatModifier,
@@ -325,22 +375,26 @@ import {
   type DelveModuleDef,
   type DelveRun,
   DT,
-  DUNGEON_LEASH_DISTANCE,
+  type DungeonDifficulty,
   dist2d,
   type Entity,
   type EquipSlot,
   type ErrorReason,
   emptyMoveInput,
+  FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
   FISHING_CAST_TIME,
+  type GauntletRunView,
   GCD,
   type InvSlot,
   type ItemInstancePayload,
   isConsuming,
+  isDungeonDifficulty,
   isPetClass,
   isQuestTurnInNpc,
   LEASH_DISTANCE,
   type LootRollChoice,
+  type LootRollGroupStatus,
   type LootRollPrompt,
   type LootStrategies,
   MAX_LEVEL,
@@ -348,7 +402,6 @@ import {
   MELEE_RANGE,
   type MobFamily,
   type MoveInput,
-  normAngle,
   type OverheadEmoteId,
   PARTY_MEMBER_AURA_CAP,
   type PetMode,
@@ -357,12 +410,17 @@ import {
   type QuestState,
   type RiteIntensity,
   RUN_SPEED,
+  type SetProc,
   type SimConfig,
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
+  type SportRole,
+  SUNDER_ARMOR_PCT_PER_STACK,
+  steadyAngleTo,
   swingMissChance,
-  TURN_SPEED,
+  type VcBracket,
+  type VcNationId,
   type Vec3,
   virtualLevel,
   xpToReachLevel,
@@ -370,7 +428,6 @@ import {
 import {
   groundHeight,
   nearSteepWalls,
-  terrainDownhill,
   terrainSteepnessAt,
   waterLevel,
   waterLevelAt,
@@ -384,7 +441,7 @@ import {
 // can slide around a prop instead of pinning on it. Desired heading (0) first;
 // only evaluated past the first entry when that straight step is obstructed.
 const MOVE_SLIDE_FAN = [0, 0.5, -0.5, 1.0, -1.0, 1.6, -1.6];
-const BACKPEDAL_MULT = 0.65;
+// BACKPEDAL_MULT moved to player_motion.ts (MV1; read only by the movement kernel).
 // Low-HP flee ("fear"): a cowardly mob at or below this HP fraction panics, turns
 // and runs from its attacker for FLEE_DURATION seconds at FLEE_SPEED_MULT speed,
 // rallying same-family allies it runs past (mob/social_aggro.ts). It flees only once
@@ -405,11 +462,12 @@ const FLEEING_FAMILIES: ReadonlySet<MobFamily> = new Set([
   'mudfin',
   'troll',
 ]);
-const GRAVITY = 16;
-const JUMP_VELOCITY = 6; // apex = v^2/2g ≈ 1.125 yd
-// Exported for social/chat_readouts.ts (the /falling readout shares the landing-damage
-// threshold with the in-sim fall-damage model below).
-export const FALL_SAFE_DISTANCE = 12; // yards of free fall before damage
+
+// GRAVITY / JUMP_VELOCITY moved to player_motion.ts (MV1; movement-kernel-only).
+// FALL_SAFE_DISTANCE moved there too; re-exported for social/chat_readouts.ts (the
+// /falling readout shares the landing-damage threshold with the fall-damage model).
+export { FALL_SAFE_DISTANCE } from './player_motion';
+
 // Host-agnostic raid-lockout fallback: when no host injects a reset boundary (offline
 // browser, headless RL env, tests), a kill locks for a flat 24h day. The authoritative
 // server overrides this with its realm-local 3 AM daily reset via SimConfig.raidResetMs.
@@ -492,7 +550,7 @@ export { DELVE_IMPLEMENTED_AFFIXES, DELVE_MODULE_NAMES } from './delves/runs';
 // this slides downhill (STEEP_SLIDE_SPEED) and cannot jump until footing is
 // walkable again.
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
-const STEEP_SLIDE_SPEED = RUN_SPEED; // yd/s a player skids downhill off unwalkable ground
+// STEEP_SLIDE_SPEED moved to player_motion.ts (MV1; movement-kernel-only).
 
 // How far a mob pulls same-family neighbours into a fight ("social aggro").
 // Murlocs (the clustered water mobs players call "frogs") used to pull too much,
@@ -505,14 +563,10 @@ const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
 };
 // PACK_FRENZY_AURA_ID moved to mob/lifecycle.ts (M4; used only by frenzyPackmates).
 // BLOOD_FRENZY_AURA_ID moved to combat/damage.ts (C1; used only by maybeFrenzyOnHit).
-// Body bobs just below the water line at this location (terrain/feature-aware:
-// -Infinity outside a declared lake, so this is never called off a waterline
-// that doesn't exist there).
-function swimSurfaceY(x: number, z: number): number {
-  return waterLevelAt(x, z) - 0.75;
-}
+// swimSurfaceY / SWIM_SPEED_MULT moved to player_motion.ts (MV1) and imported back
+// (follow trailing + the mob/pet water paths still read them here). swimSurfaceY
+// carries v0.22.0's location-aware form (waterLevelAt) in its new home.
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
-const SWIM_SPEED_MULT = 0.65;
 const FISHING_SAMPLE_DISTANCES = [4, 8, 12, 16, 20, 24];
 const DEEPFEN_FISHING_SHORE_MARGIN = 10;
 const THE_CODFATHER_ITEM_ID = 'the_codfather';
@@ -551,6 +605,7 @@ export interface Party {
   raidGroups: Map<number, 1 | 2>; // pid -> raid subgroup
   lootStrategies: LootStrategies;
   lootTurn: number; // round-robin common-item cursor; advances once per awarded item
+  dungeonDifficulty?: DungeonDifficulty;
 }
 
 export interface TradeSession {
@@ -595,6 +650,7 @@ export interface ArenaMatch {
   ratingB: number;
   defeated: Set<number>;
   fiesta?: FiestaState; // present only for format === 'fiesta'
+  yumi?: YumiMatchState; // present only for format 'yumi3' | 'yumi5'
 }
 
 // Everything that makes a Fiesta bout a fiesta. Lives on the ArenaMatch so it is
@@ -637,11 +693,31 @@ export interface FiestaPowerup {
   timer: number; // spawning: countdown to ready; ready: countdown to despawn
 }
 
+// Everything that makes a Protect Yumi bout (formats 'yumi3'/'yumi5'; the
+// system lives in social/yumi.ts). Lives on the ArenaMatch so it is torn down
+// with the match. Teleport picks + the last-resort tiebreak draw from the
+// per-match `rng` (fiesta's two-stream rule), never the shared sim stream.
+export interface YumiMatchState {
+  teamSize: 3 | 5;
+  yumiA: number; // entity id of team A's cat
+  yumiB: number;
+  nextTeleportAt: number; // active-timer (s) of the next simultaneous teleport
+  suddenDeath: boolean; // latched at YUMI_SUDDEN_AT: teleports freeze, the bleed ramps
+  respawn: Map<number, number>; // pid -> seconds until revive (absent = alive)
+  deaths: Map<number, number>; // pid -> times downed (scoreboard)
+  kills: Map<number, number>; // pid -> takedowns (scoreboard)
+  dmgToYumiA: number; // cumulative player damage dealt TO cat A (tiebreak)
+  dmgToYumiB: number;
+  lastStatusSecond: number; // last whole active-second a yumiStatus heartbeat went out
+  rng: Rng;
+}
+
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts; re-exported from the
 // import block above so `import { Sim, eloDelta } from './sim'` is preserved.
 
 export interface InstanceSlot {
   dungeonId: string;
+  difficulty: DungeonDifficulty;
   slot: number;
   partyKey: string | null; // party id or 'solo:<pid>'
   mobIds: number[];
@@ -727,6 +803,15 @@ export interface PlayerMeta {
   // The 4 equippable bag sockets (itemId of a kind:'bag' item, or null). The
   // 16-slot backpack is implicit; capacity math lives in bags.ts. Persisted.
   bags: (string | null)[];
+  // The per-character bank: a second pooled item store with its own copper-bought
+  // slot budget. Capacity/move math lives in bank.ts. Persisted (inside the
+  // character save, exactly like inventory/bags).
+  bank: BankState;
+  // The per-source breakdown behind bank.bonusSlots, stamped by the host at join
+  // alongside the total (addPlayer's bankBonus opt). Display-only session state:
+  // never persisted, never sim-mutated, always [] offline; capacity itself rides
+  // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
+  bankBonusSources: BankBonusSource[];
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
@@ -759,6 +844,13 @@ export interface PlayerMeta {
   // toast/log line off, without deciding the outcome itself. Null until the
   // player's first craft attempt.
   lastCraftResult: CraftResult | null;
+  // Outcome of this player's most recent salvageItem command (#1300), same
+  // session-only shape as lastCraftResult above. Null until the player's
+  // first salvage attempt. Not yet wired onto the IWorld/wire surface (same
+  // documented not-yet-wired status archetype identity carried before its
+  // wire-up): a future issue extends IWorldProfessions + ClientWorld +
+  // server/game.ts the way craft_item/harvest_node already are.
+  lastSalvageResult: SalvageResult | null;
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -780,6 +872,31 @@ export interface PlayerMeta {
   arena2v2Rating: number;
   arena2v2Wins: number;
   arena2v2Losses: number;
+  // Hodric's Castle Gauntlet standings. OPTIONAL (absent until the first race
+  // touches them) so pre-feature saves and parity samples stay byte-identical.
+  hcRaces?: number;
+  hcWins?: number;
+  hcBest?: number; // fastest personal finish, seconds
+  // Gauntlet practice/backfill bot marker. Runtime-only, never serialized.
+  isHcBot?: boolean;
+  // The Vale Cup (docs/prd/vale-cup.md). `sportRole` is the temporary sport-kit
+  // role while seated in a Sowfield match: SESSION-ONLY, never serialized
+  // (known is derived on load, so persistence is naturally safe with no restore
+  // snapshot). The W/L/D standing persists in CharacterState, absent until the
+  // first result so pre-cup saves and the parity samples are untouched.
+  sportRole: SportRole | null;
+  vcupWins: number;
+  vcupLosses: number;
+  vcupDraws: number;
+  // Cup W/L earned while entering under a guild banner (persisted; feeds the
+  // guild leaderboard). Only moves on a rated result while still in that guild.
+  vcupGuildWins: number;
+  vcupGuildLosses: number;
+  // Parimutuel spectator betting record (persisted; absent until the first bet
+  // settles). vcupBetNet is net copper across all settled bets (may be negative).
+  vcupBetWins: number;
+  vcupBetLosses: number;
+  vcupBetNet: number;
   // Talents & Specializations. `talents` is the active allocation; `talentMods`
   // is its precomputed flat struct — resolved only on allocation/respec/loadout
   // change (recomputeTalents), never walked on the combat or stat hot path.
@@ -799,6 +916,9 @@ export interface PlayerMeta {
   fiestaRestore: { level: number; xp: number; talents: TalentAllocation } | null;
   loadouts: SavedLoadout[];
   activeLoadout: number; // index into loadouts, or -1 for none
+  // Session-only dungeon preference. Omitted when normal so deterministic
+  // parity samples and character persistence do not churn on a default.
+  dungeonDifficulty?: DungeonDifficulty;
   raidLockouts: Map<string, number>; // dungeon id -> epoch ms expiry
   // Transient presence status. Set by /afk and /dnd, cleared when the player
   // chats again. Session-only — never persisted, so it resets on login.
@@ -806,32 +926,54 @@ export interface PlayerMeta {
   // Session-only: name of the last player who whispered us, for "/r" replies.
   // Never persisted — a fresh login starts with no reply target.
   lastWhisperFrom?: string;
+  // Session-only World Market browse filter. The market is capped at
+  // MARKET_WIRE_LIMIT listings per snapshot to bound wire cost, so this
+  // server-side substring filter (matched against item names) is how a player
+  // reaches goods past the cap. Never persisted: resets on login.
+  marketFilter: string;
   // Session-only World Market browse query: the search string, the type / subtype /
   // rarity filters, and the page index. The server filters + paginates against this,
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
-  // Session-only World Market browse filter. The market is capped at
-  // MARKET_WIRE_LIMIT listings per snapshot to bound wire cost, so this
-  // server-side substring filter (matched against item names) is how a player
-  // reaches goods past the cap. Never persisted, resets on login.
-  marketFilter: string;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
   craftSkills: Record<string, number>;
-  // One-time Ravenpost welcome letter sent (persisted in CharacterState, so
-  // existing characters get the service announcement exactly once).
-  mailWelcomed: boolean;
+  // Recipe acquisition (#1299): the set of recipe ids this player has learned
+  // via trainer/drop/quest. A recipe with no `acquisition` list is
+  // grandfathered (see professions/crafting.ts isRecipeKnown) and never needs
+  // to appear here. Persisted in CharacterState as a plain string array.
+  knownRecipes: Set<string>;
+  // Craft output throttle (#1301): a rolling window of successful crafts,
+  // any recipe. Session-only (like nodeHarvestReadyAt above), never
+  // persisted: a fresh login gets a fresh window rather than carrying a
+  // logout-time cooldown across sessions.
+  craftThrottle: { windowStart: number; count: number };
   // Active-archetype state and quest-gated switching (#1129, superseded scope: see
   // professions/archetype.ts). Never touches craftSkills. Persisted in CharacterState.
   archetype: ArchetypeState;
+  // One-time Ravenpost welcome letter sent (persisted in CharacterState, so
+  // existing characters get the service announcement exactly once).
+  mailWelcomed: boolean;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;
   delveClears: Record<string, number>;
   companionUpgrades: Record<string, number>;
   delveLoreUnlocked: Set<string>;
   delveDaily: { date: string; firstClearXp: Set<string>; markClears: number };
+  // The Gauntlet event stats (persisted in CharacterState). `runs` counts runs
+  // actually started (lobby withdrawals do not count), `wins` podium firsts,
+  // `bestTrial` the most trials ever cleared in one run (trials.length = won).
+  gauntletStats: { runs: number; wins: number; bestTrial: number };
+  // Persistent town focus allocation (#1143): component type -> points spent.
+  // Set only while standing in a town hub; adds a bonus to that component's
+  // #1142 harvest yield, on top of the universal baseline, never below it.
+  townFocus: Record<string, number>;
+  // Heroic-mark daily income gate (persisted): dungeon ids whose heroic final
+  // boss already paid this player a Heroic Mark on `date` (host UTC day).
+  // See awardHeroicMarks in instances/dungeons.ts; at most 4 marks per day.
+  heroicDaily: { date: string; marked: Set<string> };
   // World-boss loot lockouts live in `raidLockouts` (keyed worldboss:<mobId>), so the
   // eligibility gate and the rendered raid-lockout countdown are one value. See
   // world_boss.ts (markWorldBossLooted / isWorldBossLootEligible).
@@ -845,8 +987,8 @@ export interface AwayStatus {
 }
 
 // ---------------------------------------------------------------------------
-// The World Market — a single shared, server-authoritative auction house run by
-// the Merchant NPC — moved to market.ts (L2). Its types (MarketListing,
+// The World Market (a single shared, server-authoritative auction house run by
+// the Merchant NPC) moved to market.ts (L2). Its types (MarketListing,
 // MarketCollection, MarketSave) and the MARKET_* consts live there now; MarketSave
 // is re-exported from this module (above) for server/db.ts.
 // ---------------------------------------------------------------------------
@@ -868,7 +1010,12 @@ export interface CharacterState {
   // load cleanly, defaulting every profession to 0). `professions` is the legacy
   // pre-rename key, kept for back-compat with old saves; `gatheringProficiency`
   // is the current key both read (preferred) and written going forward.
+  // load cleanly, defaulting every profession to 0). Key is `professions`
+  // (not `gatheringProficiency`), reserved by the settled professions
+  // contract (src/sim/professions/CLAUDE.md, #1164) parallel to the existing
+  // `delveDaily`/`companionUpgrades` persisted fields.
   professions?: Partial<Record<string, number>>;
+  // load cleanly, defaulting every profession to 0).
   gatheringProficiency?: Partial<Record<string, number>>;
   copper: number;
   hp: number;
@@ -880,6 +1027,10 @@ export interface CharacterState {
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
   bags?: (string | null)[];
+  // Per-character bank (JSONB; optional so pre-bank saves load cleanly, defaulting
+  // to an empty bank with no purchased/bonus slots). sanitizeBankState is the one
+  // load path (never destroys items; tolerates an over-capacity inventory).
+  bank?: BankState;
   vendorBuyback?: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
   questsDone: string[];
@@ -894,6 +1045,27 @@ export interface CharacterState {
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
+  // Hodric's Castle Gauntlet standings (JSONB; all optional so pre-Gauntlet
+  // saves load cleanly). `hcReturnPos` is where a mid-race save goes home to:
+  // the race band position itself is never persisted.
+  hcRaces?: number;
+  hcWins?: number;
+  hcBest?: number;
+  hcReturnPos?: { x: number; z: number; facing: number } | null;
+  // The Vale Cup standing (JSONB; optional and written only once a result
+  // exists, so pre-cup saves load cleanly and unchanged saves stay byte-equal).
+  vcupWins?: number;
+  vcupLosses?: number;
+  vcupDraws?: number;
+  // Guild-banner cup record (JSONB; written only once a guild result exists, so
+  // pre-guild-entry saves stay byte-equal).
+  vcupGuildWins?: number;
+  vcupGuildLosses?: number;
+  // The Vale Cup spectator betting record (JSONB; written only once a bet has
+  // settled, so pre-betting saves stay byte-equal).
+  vcupBetWins?: number;
+  vcupBetLosses?: number;
+  vcupBetNet?: number;
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
@@ -929,6 +1101,9 @@ export interface CharacterState {
   companionUpgrades?: Record<string, number>;
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
+  // The Gauntlet event stats (JSONB; optional so older saves load as zeroes).
+  gauntletStats?: { runs: number; wins: number; bestTrial: number };
+  heroicDaily?: { date: string; marked: string[] };
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
@@ -943,6 +1118,10 @@ export interface CharacterState {
   // Flat per-craft skill tracking (#1126; JSONB, additive back-compat: absent or
   // partial on older saves loads the missing crafts as 0, see normalizeCraftSkills).
   craftSkills?: Record<string, number>;
+  // Recipe acquisition (#1299; JSONB, additive back-compat: absent on older
+  // saves loads as an empty set, i.e. no learned non-grandfathered recipes).
+  knownRecipes?: string[];
+  townFocus?: Record<string, number>;
   // Active-archetype state (#1129, superseded scope; JSONB, back-compat: absent on
   // older saves loads as emptyArchetypeState, see normalizeArchetypeState).
   archetype?: Partial<ArchetypeState>;
@@ -996,7 +1175,8 @@ function freshCounters(): RewardCounters {
 export class Sim {
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world'>> & Pick<SimConfig, 'world'>;
+  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
+    Pick<SimConfig, 'world' | 'perfLap'>;
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -1006,6 +1186,10 @@ export class Sim {
   // through instead of reaching into Sim. Built once in the ctor (buildSimContext);
   // it moves no behavior. See src/sim/sim_context.ts.
   readonly ctx: SimContext;
+  // Movement-kernel callbacks (MV1): binds stepPlayerMotion's deps to the live Sim
+  // (fiesta-aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/
+  // dealDamage). Built once in the ctor; draws no rng and mutates nothing.
+  private playerMotionDeps!: PlayerMotionDeps;
   // Party/raid state machine (A1): owns parties/partyByPid/partyInvites/nextPartyId
   // and the invite/accept/convert/move/leave/kick/disband logic, moved off Sim
   // behind SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates
@@ -1048,9 +1232,28 @@ export class Sim {
   arenaQueue1v1: number[] = [];
   arenaQueue2v2: ArenaQueueUnit[] = [];
   arenaQueueFiesta: ArenaQueueUnit[] = []; // 2v2 Fiesta (party mode) queue
+  arenaQueueYumi3: ArenaQueueUnit[] = []; // Protect Yumi 3v3 queue
+  arenaQueueYumi5: ArenaQueueUnit[] = []; // Protect Yumi 5v5 queue
   arenaMatches = new Map<number, ArenaMatch>(); // pid -> shared match (both pids)
   private arenaBusySlots = new Set<number>();
+  // Protect Yumi maze slots are their own pool (the maze band, not the pit);
+  // yumiCatMatches indexes cat entity id -> live match for the damage hub +
+  // hostility reads (both O(1) per attack).
+  private yumiBusySlots = new Set<number>();
+  private yumiCatMatches = new Map<number, ArenaMatch>();
   private nextArenaMatchId = 1;
+  // Hodric's Castle Gauntlet: the race queue, live races keyed by every racer
+  // pid, busy course slots, and the practice/backfill bot rosters.
+  hcQueue: HcQueueUnit[] = [];
+  hcMatches = new Map<number, HcMatch>(); // pid -> shared race (all racers)
+  private hcBusySlots = new Set<number>();
+  private nextHcMatchId = 1;
+  hcPracticeBotPids: number[] = [];
+  hcFillBotPids: number[] = [];
+  // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
+  // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
+  // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
+  vcup: VcState = createVcState();
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -1060,6 +1263,19 @@ export class Sim {
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
+  // The Gauntlet event (gauntlet/runs.ts): the live run pool (a run is pushed
+  // when a lobby opens and spliced on dispose), the recruiter's live entity id,
+  // and the run-id counter. `gauntletEventOpen` is the host-fed window flag:
+  // the server sets it each loop pass from its event window (the utcDay idiom);
+  // offline inits it from cfg.gauntletAlwaysOpen; headless keeps it closed.
+  gauntletRuns: GauntletRun[] = [];
+  gauntletRecruiterId: number | null = null;
+  nextGauntletRunId = 1;
+  gauntletEventOpen: boolean;
+  // The three join modes (gauntlet/modes.ts): the fair FIFO queue that rolls one
+  // game into the next, and the free-roaming spectators (pid -> pre-spectate spot).
+  gauntletQueue: GauntletQueueUnit[] = [];
+  gauntletSpectators = new Map<number, GauntletSpectatorState>();
   // Real-world UTC day ('YYYY-MM-DD') for the delve daily reset (FR-5.1). The sim
   // core must stay deterministic, so it never reads the wall clock itself: the host
   // (server/offline client) sets this each tick from `new Date()`. Empty string =
@@ -1076,6 +1292,12 @@ export class Sim {
   // book, the id counter, and the mailbox entity ids; Sim keeps thin delegates
   // (the market shape). Constructed in the ctor after the SimContext.
   postOffice!: PostOffice;
+  // Entity ids of every NPC with `banker: true`, assigned by the ctor NPC loop.
+  // The bank is per-character self-storage (state on PlayerMeta.bank), so unlike
+  // the shared World Market there is no bank instance: this anchor list is all the
+  // sim needs, and any banker is a valid place to stand and use the bank. Exposed
+  // as a live SimContext view so bank.ts gates deposit/withdraw/buy on proximity.
+  bankerIds: number[] = [];
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
   private pendingMobRespawns: PendingMobRespawn[] = [];
@@ -1100,10 +1322,15 @@ export class Sim {
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
+      gauntletAlwaysOpen: cfg.gauntletAlwaysOpen ?? false,
+      gauntletInstantLobby: cfg.gauntletInstantLobby ?? false,
+      valeCupShowcase: cfg.valeCupShowcase ?? false,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
+      perfLap: cfg.perfLap,
     };
+    this.gauntletEventOpen = this.cfg.gauntletAlwaysOpen;
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -1114,6 +1341,18 @@ export class Sim {
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
     this.ctx = this.buildSimContext();
+    // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
+    this.playerMotionDeps = {
+      seed: this.cfg.seed,
+      moveSpeedMult: (e) => this.moveSpeedMult(e),
+      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
+        this.resolveMove(fromX, fromZ, nx, nz, r, e, ignoreFences),
+      resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
+      cancelCast: (p) => this.cancelCast(p),
+      standUp: (p) => this.standUp(p),
+      dealDamage: (source, target, amount, crit, school, ability, kind, noRage) =>
+        this.dealDamage(source, target, amount, crit, school, ability, kind, noRage),
+    };
     // Party/raid machine (A1): constructed after ctx (it consumes the seam). The
     // ctx party callbacks are lazy arrows, so this assignment before any tick/command
     // is what they resolve against; nothing below this point draws on the machine
@@ -1147,6 +1386,7 @@ export class Sim {
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
       this.addEntity(npc);
       if (npcDef.market) this.market.merchantIds.push(npc.id); // every auctioneer anchors the shared World Market
+      if (npcDef.banker) this.bankerIds.push(npc.id); // every bursar is a place to use the bank
     }
     this.market.seed();
 
@@ -1157,6 +1397,22 @@ export class Sim {
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
       for (let i = 0; i < camp.count; i++) {
+        if (template.dummy) {
+          // A practice dummy is a fixed, deterministic prop (no scatter, fixed level,
+          // never wanders): spawn it WITHOUT drawing any RNG so adding one never
+          // perturbs the world's seed-stable spawns and rolls.
+          const safe = this.findSafePos(camp.center.x, camp.center.z, minHeight);
+          const mob = createMob(
+            this.nextId++,
+            template,
+            template.maxLevel,
+            this.groundPos(safe.x, safe.z),
+          );
+          mob.facing = 0;
+          mob.prevFacing = 0;
+          this.addEntity(mob);
+          continue;
+        }
         const ang = this.rng.range(0, Math.PI * 2);
         const r = Math.sqrt(this.rng.next()) * camp.radius;
         const safe = this.findSafePos(
@@ -1205,6 +1461,7 @@ export class Sim {
         for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
           this.instances.push({
             dungeonId: dungeon.id,
+            difficulty: 'normal',
             slot: i,
             partyKey: null,
             mobIds: [],
@@ -1230,6 +1487,7 @@ export class Sim {
       for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
         this.instances.push({
           dungeonId: dungeon.id,
+          difficulty: 'normal',
           slot: i,
           partyKey: null,
           mobIds: [],
@@ -1244,6 +1502,25 @@ export class Sim {
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx);
+    // The Proving Grounds hub: both event heralds (Osric for Hodric's Castle,
+    // Maro for The Gauntlet) plus the two portal fixtures. All guarded,
+    // reserved-id, zero rng, so the parity goldens never see them.
+    hodricsMod.spawnHcHerald(this.ctx);
+    gauntletMod.spawnGauntletRecruiter(this.ctx);
+    hubMod.spawnMinigameHub(this.ctx);
+
+    // Groundskeeper Bram at the Sowfield gate (Vale Cup). Placed through the
+    // SAME findSafePos path as the generic NPC loop above, but under a RESERVED
+    // entity id outside the nextId sequence (and after the rng-drawing camp
+    // loop), so world-gen determinism AND the parity goldens' pinned id
+    // sequence are both preserved. See social/vale_cup.ts VALE_CUP_BRAM_ID.
+    {
+      const bramDef = NPCS.groundskeeper_bram;
+      if (bramDef) {
+        const safe = this.findSafePos(bramDef.pos.x, bramDef.pos.z, waterLevel() + 0.6);
+        valeCupMod.spawnGroundskeeper(this.ctx, safe);
+      }
+    }
 
     for (const delve of DELVE_LIST) {
       for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
@@ -1404,7 +1681,18 @@ export class Sim {
   addPlayer(
     cls: PlayerClass,
     name: string,
-    opts?: { autoEquip?: boolean; state?: CharacterState; characterId?: number },
+    opts?: {
+      autoEquip?: boolean;
+      state?: CharacterState;
+      characterId?: number;
+      // Server-stamped bank bonus slots, recomputed from account facts at every
+      // join (email/Discord/wallet/referrals). Overrides the persisted value so
+      // unlinking lowers capacity at the next login; a shrink below the used slot
+      // count leaves the bank over-capacity in the tolerated bags.ts sense (new
+      // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
+      // stays the sanitized save value, [] breakdown).
+      bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+    },
   ): number {
     const savedState = opts?.state ? sanitizeRemovedZone1Content(opts.state).state : undefined;
     // Characters saved inside a dungeon instance rejoin at its entrance —
@@ -1418,6 +1706,18 @@ export class Sim {
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
+    } else if (savedPos && isHodricsPos(savedPos.x)) {
+      // Saved mid-race at Hodric's Castle: rejoin where they queued from (the
+      // race instance is long gone); no return recorded falls back to the
+      // world start below.
+      const ret = savedState?.hcReturnPos;
+      savedPos = ret ? { x: ret.x, z: ret.z } : null;
+    } else if (savedPos && isGauntletPos(savedPos.x)) {
+      // Saved mid-run in the Gauntlet band: their run is long gone, and
+      // without this branch the generic dungeon fallback below would eject
+      // them to an unrelated dungeon door. Rejoin at the world start (the
+      // recruiter stands in town when the event is open).
+      savedPos = null;
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
@@ -1453,6 +1753,8 @@ export class Sim {
       wireRev: 0,
       inventory: [],
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
+      bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
+      bankBonusSources: [],
       vendorBuyback: [],
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
@@ -1465,6 +1767,7 @@ export class Sim {
       pendingGatherGrants: [],
       nodeHarvestReadyAt: {},
       lastCraftResult: null,
+      lastSalvageResult: null,
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
@@ -1478,6 +1781,15 @@ export class Sim {
       arena2v2Rating: savedArena2v2.rating,
       arena2v2Wins: savedArena2v2.wins,
       arena2v2Losses: savedArena2v2.losses,
+      sportRole: null,
+      vcupWins: savedState?.vcupWins ?? 0,
+      vcupLosses: savedState?.vcupLosses ?? 0,
+      vcupDraws: savedState?.vcupDraws ?? 0,
+      vcupGuildWins: savedState?.vcupGuildWins ?? 0,
+      vcupGuildLosses: savedState?.vcupGuildLosses ?? 0,
+      vcupBetWins: savedState?.vcupBetWins ?? 0,
+      vcupBetLosses: savedState?.vcupBetLosses ?? 0,
+      vcupBetNet: savedState?.vcupBetNet ?? 0,
       talents: emptyAllocation(),
       talentMods: emptyModifiers(),
       fiestaAugments: [],
@@ -1488,16 +1800,21 @@ export class Sim {
       activeLoadout: -1,
       raidLockouts: new Map(),
       away: null,
-      marketQuery: defaultMarketQuery(),
-      craftSkills: emptyCraftSkills(),
-      mailWelcomed: false,
       marketFilter: '',
+      craftSkills: emptyCraftSkills(),
+      knownRecipes: new Set(),
+      craftThrottle: { windowStart: 0, count: 0 },
+      marketQuery: defaultMarketQuery(),
+      mailWelcomed: false,
       archetype: emptyArchetypeState(),
       delveMarks: 0,
       delveClears: {},
       companionUpgrades: {},
       delveLoreUnlocked: new Set(),
       delveDaily: { date: '', firstClearXp: new Set(), markClears: 0 },
+      gauntletStats: { runs: 0, wins: 0, bestTrial: 0 },
+      townFocus: {},
+      heroicDaily: { date: '', marked: new Set() },
     };
     // A fresh character sets out provisioned (class-defined starter rations);
     // a saved character loads its own bags from savedState below.
@@ -1506,6 +1823,11 @@ export class Sim {
         meta.inventory.push({ itemId: it.itemId, count: it.count });
       }
     }
+    // Gauntlet standings: optional, only present once a race has touched them,
+    // so pre-feature saves and parity samples stay byte-identical.
+    if (savedState?.hcRaces !== undefined) meta.hcRaces = savedState.hcRaces;
+    if (savedState?.hcWins !== undefined) meta.hcWins = savedState.hcWins;
+    if (savedState?.hcBest !== undefined) meta.hcBest = savedState.hcBest;
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
@@ -1552,6 +1874,9 @@ export class Sim {
         }
       }
       meta.vendorBuyback = (s.vendorBuyback ?? []).map(cloneInvSlot);
+      // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
+      // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
+      meta.bank = sanitizeBankState(s.bank);
       for (const q of s.questLog) {
         if (q.state !== 'done')
           meta.questLog.set(q.questId, {
@@ -1590,12 +1915,21 @@ export class Sim {
         }
       }
       meta.craftSkills = normalizeCraftSkills(s.craftSkills);
-      meta.mailWelcomed = s.mailWelcomed === true;
+      if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
       meta.archetype = normalizeArchetypeState(s.archetype);
+      meta.mailWelcomed = s.mailWelcomed === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
+      meta.townFocus = { ...(s.townFocus ?? {}) };
       if (s.delveLoreUnlocked) for (const id of s.delveLoreUnlocked) meta.delveLoreUnlocked.add(id);
+      if (s.gauntletStats) {
+        meta.gauntletStats = {
+          runs: s.gauntletStats.runs ?? 0,
+          wins: s.gauntletStats.wins ?? 0,
+          bestTrial: s.gauntletStats.bestTrial ?? 0,
+        };
+      }
       if (s.delveDaily) {
         meta.delveDaily = {
           date: s.delveDaily.date,
@@ -1603,6 +1937,18 @@ export class Sim {
           markClears: s.delveDaily.markClears,
         };
       }
+      if (s.heroicDaily) {
+        meta.heroicDaily = { date: s.heroicDaily.date, marked: new Set(s.heroicDaily.marked) };
+      }
+    }
+
+    // Host-stamped bank bonus slots (see the opt doc above). Applied on BOTH the
+    // saved-state and brand-new-character arms: a first-ever join can already have
+    // earned account bonuses. Values are host-trusted but clamped to the registry
+    // ceiling anyway; the breakdown rows are cloned at this write boundary.
+    if (opts?.bankBonus) {
+      meta.bank.bonusSlots = clampBonusSlots(opts.bankBonus.bonusSlots);
+      meta.bankBonusSources = opts.bankBonus.sources.map((s) => ({ ...s }));
     }
 
     // Resolve the flat talent struct once, before the stat pass + ability
@@ -1714,6 +2060,11 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
+    // A gauntlet participant leaving the world detaches from the run (a
+    // mid-run departure forfeits; no teleport, the character is leaving).
+    // Must run while the leaver is still in players/entities.
+    gauntletModesMod.gauntletModesOnPlayerRemoved(this.ctx, pid);
+    gauntletMod.gauntletOnPlayerRemoved(this.ctx, pid);
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
@@ -1729,6 +2080,28 @@ export class Sim {
       const team = this.arenaTeamOf(match, pid);
       this.endArenaMatch(match, team === 'A' ? 'B' : team === 'B' ? 'A' : null, 'forfeit');
     }
+    // Gauntlet: leaving the queue is free; a mid-race leaver becomes a DNF
+    // (the match module's desertion sweep scores them by progress).
+    hodricsMod.hcQueueLeave(this.ctx, pid);
+    const hcMatch = this.hcMatches.get(pid);
+    if (hcMatch) {
+      const racer = hcMatch.racers.get(pid);
+      if (racer) racer.left = true;
+      this.hcMatches.delete(pid);
+      // If that emptied the match (a full all-human lobby whose racers all
+      // disconnect), fold it now: with no pid still mapping to it the match
+      // is unreachable from updateHodrics, so its slot + pinned course would
+      // leak forever (only HODRICS_SLOT_COUNT slots exist). returnFromHcMatch
+      // frees the slot, resets the registry, and teleports any survivors home.
+      const anyLive = [...hcMatch.racers.values()].some((r) => !r.left && this.entities.has(r.pid));
+      if (!anyLive) hodricsMod.returnFromHcMatch(this.ctx, hcMatch);
+    }
+    // Vale Cup: leaving the queue is free; deserting a counted match benches
+    // the fighter (the team plays short), takes the loss, and arms the
+    // Groundskeeper's lockout. Idempotent: the server already resolved it
+    // before the leave save (vcupResolveDesertion is a public delegate).
+    valeCupMod.vcupDequeue(this.ctx, pid);
+    valeCupMod.vcupResolveDesertion(this.ctx, pid);
     this.party.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -1778,6 +2151,11 @@ export class Sim {
     // forces a fresh re-summon instead of laundering the summon cooldown for free.
     // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
     const petSnapshot = this.serializePet(pid);
+    // Seated in a Vale Cup match: persist the pre-match RETURN spot, never a
+    // mid-pitch position (a mid-match save or desertion must not strand the
+    // character on the Sowfield). The stowed pet persists via serializePet's
+    // delvePetStash fallback; known/sportRole are session-derived, not saved.
+    const cupReturn = valeCupMod.vcupReturnFor(this.ctx, pid);
     const state: CharacterState = {
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
@@ -1798,8 +2176,8 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: { x: e.pos.x, z: e.pos.z },
-      facing: e.facing,
+      pos: cupReturn ? { x: cupReturn.x, z: cupReturn.z } : { x: e.pos.x, z: e.pos.z },
+      facing: cupReturn ? cupReturn.facing : e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
       dead: e.dead,
@@ -1810,6 +2188,11 @@ export class Sim {
       equipment: { ...meta.equipment },
       inventory: meta.inventory.map(cloneInvSlot),
       bags: [...meta.bags],
+      bank: {
+        inventory: meta.bank.inventory.map(cloneInvSlot),
+        purchasedSlots: meta.bank.purchasedSlots,
+        bonusSlots: meta.bank.bonusSlots,
+      },
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -1826,6 +2209,30 @@ export class Sim {
       arena2v2Rating: meta.arena2v2Rating,
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
+      // Gauntlet standings ride only once touched (undefined keys are dropped
+      // by JSON, so pre-Gauntlet saves stay byte-identical). A mid-race save
+      // also records where to go home to; the load ladder never resumes a
+      // character inside the race band.
+      hcRaces: meta.hcRaces,
+      hcWins: meta.hcWins,
+      hcBest: meta.hcBest,
+      hcReturnPos: this.hcMatches.get(pid)?.returns.get(pid) ?? undefined,
+      // Absent until the first cup result (back-compat + parity-stable saves).
+      ...(meta.vcupWins || meta.vcupLosses || meta.vcupDraws
+        ? { vcupWins: meta.vcupWins, vcupLosses: meta.vcupLosses, vcupDraws: meta.vcupDraws }
+        : {}),
+      // Absent until the first guild-banner result (back-compat + parity-stable).
+      ...(meta.vcupGuildWins || meta.vcupGuildLosses
+        ? { vcupGuildWins: meta.vcupGuildWins, vcupGuildLosses: meta.vcupGuildLosses }
+        : {}),
+      // Absent until the first settled bet (back-compat + parity-stable saves).
+      ...(meta.vcupBetWins || meta.vcupBetLosses || meta.vcupBetNet
+        ? {
+            vcupBetWins: meta.vcupBetWins,
+            vcupBetLosses: meta.vcupBetLosses,
+            vcupBetNet: meta.vcupBetNet,
+          }
+        : {}),
       talents: cloneAllocation(restore ? restore.talents : meta.talents),
       loadouts: meta.loadouts.map((l) => ({
         name: l.name,
@@ -1844,6 +2251,7 @@ export class Sim {
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
       craftSkills: { ...meta.craftSkills },
+      knownRecipes: [...meta.knownRecipes],
       archetype: { ...meta.archetype },
       delveMarks: meta.delveMarks,
       delveClears: { ...meta.delveClears },
@@ -1854,7 +2262,10 @@ export class Sim {
         firstClearXp: [...meta.delveDaily.firstClearXp],
         markClears: meta.delveDaily.markClears,
       },
+      gauntletStats: { ...meta.gauntletStats },
+      heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
       mailWelcomed: meta.mailWelcomed,
+      townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
     };
     return sanitizeRemovedZone1Content(state).state;
@@ -2326,17 +2737,89 @@ export class Sim {
       get arenaBusySlots() {
         return sim.arenaBusySlots;
       },
+      // A4 Protect Yumi live views: the two format queues (reassigned by the
+      // matchmaker's prune filter), the maze slot pool, and the cat -> match index.
+      get arenaQueueYumi3() {
+        return sim.arenaQueueYumi3;
+      },
+      set arenaQueueYumi3(v) {
+        sim.arenaQueueYumi3 = v;
+      },
+      get arenaQueueYumi5() {
+        return sim.arenaQueueYumi5;
+      },
+      set arenaQueueYumi5(v) {
+        sim.arenaQueueYumi5 = v;
+      },
+      get yumiBusySlots() {
+        return sim.yumiBusySlots;
+      },
+      get yumiCatMatches() {
+        return sim.yumiCatMatches;
+      },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
       },
       set nextArenaMatchId(v) {
         sim.nextArenaMatchId = v;
       },
+      // Hodric's Castle Gauntlet state, same live-view shape as the arena's:
+      // the queue is reassigned by prune filters, the rest mutate in place.
+      get hcQueue() {
+        return sim.hcQueue;
+      },
+      set hcQueue(v) {
+        sim.hcQueue = v;
+      },
+      get hcMatches() {
+        return sim.hcMatches;
+      },
+      get hcBusySlots() {
+        return sim.hcBusySlots;
+      },
+      get nextHcMatchId() {
+        return sim.nextHcMatchId;
+      },
+      set nextHcMatchId(v) {
+        sim.nextHcMatchId = v;
+      },
       get delveRuns() {
         return sim.delveRuns;
       },
       get delvePetStash() {
         return sim.delvePetStash;
+      },
+      // The Gauntlet event live views (gauntlet/runs.ts): the run pool array
+      // identity stays Sim-owned (mutated in place); the recruiter id and the
+      // run-id counter are read-write primitives the module assigns.
+      get gauntletRuns() {
+        return sim.gauntletRuns;
+      },
+      get gauntletEventOpen() {
+        return sim.gauntletEventOpen;
+      },
+      get gauntletRecruiterId() {
+        return sim.gauntletRecruiterId;
+      },
+      set gauntletRecruiterId(v) {
+        sim.gauntletRecruiterId = v;
+      },
+      get nextGauntletRunId() {
+        return sim.nextGauntletRunId;
+      },
+      set nextGauntletRunId(v) {
+        sim.nextGauntletRunId = v;
+      },
+      // The Gauntlet queue is reassigned by prune filters (hcQueue idiom); the
+      // spectator Map is mutated in place (read-only ref).
+      get gauntletQueue() {
+        return sim.gauntletQueue;
+      },
+      set gauntletQueue(v) {
+        sim.gauntletQueue = v;
+      },
+      get gauntletSpectators() {
+        return sim.gauntletSpectators;
       },
       get utcDay() {
         return sim.utcDay;
@@ -2376,6 +2859,16 @@ export class Sim {
       get marketListings() {
         return sim.marketListings;
       },
+      // Banker anchor list (bank system): the live array of every banker
+      // NPC id, read by bank.ts's proximity gate. Sim-owned, never reassigned.
+      get bankerIds() {
+        return sim.bankerIds;
+      },
+      // The Vale Cup holder (queues/deserters/botPids mutated in place; the
+      // match slot reassigned inside the holder, so no setter is needed).
+      get vcup() {
+        return sim.vcup;
+      },
       // LATE-bound (not .bind(sim)): a moved emit site (C5 meleeSwing/rangedSwing)
       // now emits via ctx.emit, and tests swap (sim as any).emit post-construction to
       // observe events (mob_blind/mob_cleave). An early .bind(sim) would capture the
@@ -2399,6 +2892,19 @@ export class Sim {
       endDuel: sim.endDuel.bind(sim),
       fiestaTakedown: sim.fiestaTakedown.bind(sim),
       fiestaDown: sim.fiestaDown.bind(sim),
+      gauntletCourtContestant: sim.gauntletCourtContestant.bind(sim),
+      gauntletCourtTakedown: sim.gauntletCourtTakedown.bind(sim),
+      // A4 Protect Yumi hooks: late-bound arrows into social/yumi.ts (the
+      // nythraxis style; no Sim facade methods needed, no foreign name resolves
+      // on Sim). updateArena drives matchmake/update/cleanup; the damage hub
+      // drives the cat + player-down arms.
+      matchmakeYumi: () => yumiMod.matchmakeYumi(sim.ctx),
+      updateYumiActive: (match) => yumiMod.updateYumiActive(sim.ctx, match),
+      yumiPlayerDown: (match, victim, killerPid) =>
+        yumiMod.yumiPlayerDown(sim.ctx, match, victim, killerPid),
+      yumiCatDamaged: (match, source, cat, amount, crit, school, ability, kind) =>
+        yumiMod.yumiCatDamaged(sim.ctx, match, source, cat, amount, crit, school, ability, kind),
+      cleanupYumiMatch: (match) => yumiMod.cleanupYumiMatch(sim.ctx, match),
       // A2: isArenaCrossTeam/arenaTeamOf/endArenaMatch/endDuel (above) now forward to
       // social/arena.ts + social/duel.ts via Sim's thin delegates. The block below is
       // what the moved code CONSUMES that stays on Sim (clearAurasFromSource has
@@ -2474,6 +2980,9 @@ export class Sim {
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       enterDungeon: sim.enterDungeon.bind(sim),
       leaveDungeon: sim.leaveDungeon.bind(sim),
+      dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
+      setDungeonDifficulty: sim.setDungeonDifficulty.bind(sim),
+      awardHeroicMarks: sim.awardHeroicMarks.bind(sim),
       addEntity: sim.addEntity.bind(sim),
       dropEntity: sim.dropEntity.bind(sim),
       rebucket: sim.rebucket.bind(sim),
@@ -2508,9 +3017,6 @@ export class Sim {
       mobSwing: sim.mobSwing.bind(sim),
       updateRangedPetAttack: sim.updateRangedPetAttack.bind(sim),
       fleeMoveSpeed: sim.fleeMoveSpeed.bind(sim),
-      usesProfiledMobCombat: sim.usesProfiledMobCombat.bind(sim),
-      updateProfiledMobCombat: sim.updateProfiledMobCombat.bind(sim),
-      tryMobMeleeSwingInRange: sim.tryMobMeleeSwingInRange.bind(sim),
       maybeFlee: sim.maybeFlee.bind(sim),
       aggroMob: sim.aggroMob.bind(sim),
       // C3 moved the CC predicates to combat/cc.ts; ctx.isStunned/isRooted (consumed by
@@ -2519,7 +3025,6 @@ export class Sim {
       isRooted: isRooted,
       moveSpeedMult: sim.moveSpeedMult.bind(sim),
       swingIntervalMult: sim.swingIntervalMult.bind(sim),
-      mobEffectiveMeleeRange: sim.mobEffectiveMeleeRange.bind(sim),
       mobCanSwim: sim.mobCanSwim.bind(sim),
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
       // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
@@ -2576,6 +3081,7 @@ export class Sim {
       partyMembersForKey: (key) => sim.partyMembersForKey(key),
       grantXp: (amount, meta, opts) => sim.grantXp(amount, meta, opts),
       addItem: (itemId, count, pid) => sim.addItem(itemId, count, pid),
+      addItemInstance: (itemId, instance, pid) => sim.addItemInstance(itemId, instance, pid),
       // L2's World Market escrow (marketList) also consumes removeItem; it is bound once
       // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
       spawnBossAdds: (boss, mobId, count) => sim.spawnBossAdds(boss, mobId, count),
@@ -2632,6 +3138,7 @@ export class Sim {
       hasLineOfSight: sim.hasLineOfSight.bind(sim),
       findChargePath: sim.findChargePath.bind(sim),
       runEffects: (p, meta, target, res) => runEffectsImpl(sim.ctx, p, meta, target, res),
+      applySetProcs: sim.applySetProcs.bind(sim),
       // P1a pet-AI seam: the helper the moved updatePet/petRangedAttack/petPickTarget
       // reach back for. syncPetAspect STAYS on Sim (pet-management, P1b owns it eventually);
       // effectiveAttackPower (C4b binding above) + isHostileTo (C4a binding above) are
@@ -2671,6 +3178,18 @@ export class Sim {
       partyCapacity: (party) => sim.party.partyCapacity(party),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
+      // The Vale Cup sport-move arms (owned by social/vale_cup.ts). Late-bound
+      // arrows so sim.ctx resolves at call time (the Q1 pattern).
+      vcupBallKick: (caster, power, loft, range) =>
+        valeCupMod.vcupBallKick(sim.ctx, caster, power, loft, range),
+      vcupBallPass: (caster, power, loft, range) =>
+        valeCupMod.vcupBallPass(sim.ctx, caster, power, loft, range),
+      vcupShoot: (caster, power, loft, range) =>
+        valeCupMod.vcupShoot(sim.ctx, caster, power, loft, range),
+      vcupSportDash: (caster, distance, catchBall) =>
+        valeCupMod.vcupSportDash(sim.ctx, caster, distance, catchBall),
+      vcupSportShove: (caster, target, distance) =>
+        valeCupMod.vcupSportShove(sim.ctx, caster, target, distance),
     };
     return createSimContext(host);
   }
@@ -2832,26 +3351,42 @@ export class Sim {
     // behavior, so every phase here is byte-identical (the parity gate proves it).
     this.time += DT;
     this.tickCount++;
+    // Optional per-phase timing hook (cfg.perfLap): the host attributes the elapsed
+    // time since its previous mark to the named phase. Undefined offline/headless, so
+    // this is a no-op there; it draws no rng and mutates nothing either way, keeping
+    // the tick deterministic. The server injects it for its on-demand tick profiler.
+    const lap = this.cfg.perfLap;
     this.updatePendingMobRespawns();
+    lap?.('respawns');
     this.updateWorldBosses();
+    lap?.('worldBosses');
     tickGroundAoEs(this.ctx);
+    lap?.('groundAoEs');
 
     runDespawnDecay(this.ctx);
+    lap?.('despawnDecay');
     // Step in-flight projectiles toward their live targets before this tick's casts and
     // swings, so a homing bolt resolves on a fixed, deterministic phase boundary.
     advancePendingProjectiles(this.ctx);
+    lap?.('projectiles');
 
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
       if (!p.dead) {
         this.updatePlayerMovement(p, meta);
+        lap?.('p.move');
         this.updateDoorTriggers(p);
+        hubMod.updateHubPortalTriggers(this.ctx, p);
+        lap?.('p.doors');
         this.updateCasting(p, meta);
+        lap?.('p.casting');
         this.updatePlayerAutoAttack(p, meta);
+        lap?.('p.autoAtk');
         updateRegen(this.ctx, p, meta);
         updateRested(p, meta);
         drainGatheringGrants(meta);
+        lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not
         // fight, cast, or regen. It CAN walk into a dungeon/raid door to re-enter its
@@ -2859,16 +3394,20 @@ export class Sim {
         // death model), or resurrect at its corpse / an overworld Spirit Healer.
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
+        lap?.('p.move');
       }
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
+      lap?.('p.auras');
     }
 
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
         this.updateMob(e);
+        lap?.('mob.update');
         updateAuras(this.ctx, e);
+        lap?.('mob.auras');
       } else if (e.kind === 'npc') {
         cleanseFriendlyNpcAuras(this.ctx, e);
       } else if (e.kind === 'object') {
@@ -2878,6 +3417,7 @@ export class Sim {
         }
       }
     }
+    lap?.('ent.misc');
 
     // one pass over the entities collects every player a mob is engaged
     // with, instead of one full scan per player
@@ -2907,21 +3447,45 @@ export class Sim {
       const p = this.entities.get(meta.entityId);
       if (p) p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
     }
+    lap?.('engaged');
 
     this.updateDuels();
+    lap?.('duels');
     this.updateArena();
+    lap?.('arena');
+    this.updateHodrics();
+    lap?.('hodrics');
     this.updateTradesAndInvites();
+    lap?.('trades');
     this.updateLootRolls();
+    lap?.('lootRolls');
     this.updateInstances();
+    lap?.('instances');
     this.updateDelveRuns();
+    lap?.('delves');
+    // The rolling queue matchmaker runs BEFORE the run driver each tick: it forms
+    // the next game from the front of the queue the moment the previous one is
+    // gone. A no-op (no draws, no writes) when the queue is empty, so idle worlds
+    // and the parity goldens are untouched.
+    this.updateGauntletQueue();
+    this.updateGauntletRuns();
+    lap?.('gauntlet');
+    // The Vale Cup phase draws ZERO shared rng (pure ball physics + timers +
+    // tick-staggered bots), so appending it here cannot fork the draw order.
+    this.updateValeCup();
+    lap?.('valecup');
     this.market.update();
+    lap?.('market');
     this.postOffice.update();
+    lap?.('postOffice');
     drainDelayedEvents(this.ctx);
+    lap?.('delayedEv');
 
     // movement re-bucketing: queries during the next tick and the server's
     // snapshot broadcast right after this one see fresh cells
     this.grid.refresh(this.entities.values());
     this.playerGrid.refresh(this.playerEntities());
+    lap?.('gridRefresh');
 
     const out = this.events;
     this.events = [];
@@ -2986,23 +3550,12 @@ export class Sim {
   private partyLootCandidatesForMob(mob: Entity): PlayerMeta[] {
     return partyLootCandidatesForMobImpl(this.ctx, mob);
   }
+  // Body moved to player_motion.ts (MV1). The ghost/aura math is host-agnostic
+  // there; only the Fiesta augment needs PlayerMeta, so this delegate feeds it in.
   moveSpeedMult(e: Entity): number {
-    // A released spirit runs at a fixed boosted speed and is immune to snares (a ghost
-    // cannot be slowed): short-circuit the aura scan with the ghost-run multiplier.
-    if (e.ghost) return GHOST_RUN_MULT;
-    let slow = 1,
-      speed = 1;
-    for (const a of e.auras) {
-      if (a.kind === 'slow' || a.kind === 'stealth') slow = Math.min(slow, a.value);
-      // buff_speed and form_travel both carry a 1+fraction multiplier (1.4 = +40%).
-      if (a.kind === 'buff_speed' || a.kind === 'form_travel') speed = Math.max(speed, a.value);
-    }
-    // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
-    if (e.kind === 'player') {
-      const ms = this.players.get(e.id)?.fiestaSpecial.moveSpeedPct;
-      if (ms) speed += ms;
-    }
-    return slow * speed;
+    const extra =
+      e.kind === 'player' ? (this.players.get(e.id)?.fiestaSpecial.moveSpeedPct ?? 0) : 0;
+    return moveSpeedMultImpl(e, extra);
   }
 
   private fleeMoveSpeed(e: Entity): number {
@@ -3011,29 +3564,44 @@ export class Sim {
 
   // recoverFromFlee moved to mob/locomotion.ts (M2; called only by the flee arm).
 
-  // Fiesta "Moon Boots" power-up: a buff_jump aura multiplies jump height.
-  private jumpMult(e: Entity): number {
-    let m = 1;
-    for (const a of e.auras) if (a.kind === 'buff_jump') m = Math.max(m, a.value);
-    return m;
-  }
+  // jumpMult moved to player_motion.ts (MV1; read only by the movement kernel).
 
   // Sunder Armor stacks shave flat armor off the defender for physical hits.
   private effectiveArmor(e: Entity): number {
     let armor = e.stats.armor;
+    // Player/rogue armor debuffs are PERCENTAGES that do NOT stack with each other:
+    // Sunder Armor (2% per stack, up to 10% at 5 stacks) and Faerie Fire (a flat 10%)
+    // max-combine, so a fully-stacked Sunder and a Faerie Fire are redundant rather
+    // than additive. Mob corrosion (kind 'corrode') is a separate FLAT shred that
+    // subtracts value*stacks before the percent debuffs apply.
+    let reductionPct = 0;
+    const baseArmor = e.stats.armor;
     for (const a of e.auras) {
       if (e.kind !== 'player' && a.kind === 'buff_armor') armor += a.value;
-      if (a.kind === 'sunder') armor -= a.value * (a.stacks ?? 1);
+      // Percent armor raid buff (Devotion Aura) on a controlled pet; players fold it
+      // in recalcPlayerStats.
+      else if (e.kind !== 'player' && a.kind === 'buff_armor_pct')
+        armor += (baseArmor * a.value) / 100;
+      // Mob corrosion: flat, stacking armor shred (value per stack).
+      if (a.kind === 'corrode') armor -= a.value * (a.stacks ?? 1);
+      else if (a.kind === 'sunder')
+        reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
+      else if (a.kind === 'faerie_fire')
+        reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
     }
-    return Math.max(0, armor);
+    return Math.max(0, armor * (1 - reductionPct));
   }
 
   private effectiveAttackPower(e: Entity): number {
     let attackPower = e.attackPower;
     if (e.kind !== 'player') {
+      const base = e.attackPower;
       for (const a of e.auras) {
         if (a.kind === 'buff_ap') attackPower += a.value;
         else if (a.kind === 'debuff_ap') attackPower -= a.value;
+        // Percent attack-power raid buffs (Blessing of Might / Battle Shout) on a
+        // controlled pet: percent of the pet's base AP. Players fold this in recalc.
+        else if (a.kind === 'buff_ap_pct') attackPower += (base * a.value) / 100;
       }
     }
     return Math.max(0, attackPower);
@@ -3091,11 +3659,11 @@ export class Sim {
     return m;
   }
 
+  // Body moved to player_motion.ts (MV1); thin delegate (also bound on the seam).
   isSwimming(e: Entity): boolean {
-    return (
-      groundHeight(e.pos.x, e.pos.z, this.cfg.seed) < waterLevelAt(e.pos.x, e.pos.z) - SWIM_DEPTH &&
-      e.pos.y <= swimSurfaceY(e.pos.x, e.pos.z) + 0.15
-    );
+    // The Hodric's Castle dry-chasm guard lives in the kernel's isSwimming (the
+    // canonical impl), so both this delegate and stepPlayerMotion agree.
+    return isSwimmingImpl(e, this.cfg.seed);
   }
 
   private findChargePath(p: Entity, target: Entity): Vec3[] {
@@ -3115,7 +3683,7 @@ export class Sim {
     const done = (arrived: boolean): boolean => {
       p.chargeTargetId = null;
       p.chargePath = [];
-      if (target) p.facing = angleTo(p.pos, target.pos);
+      if (target) p.facing = steadyAngleTo(p.pos, target.pos, p.facing);
       if (arrived) this.startAutoAttack(p.id);
       return true;
     };
@@ -3194,7 +3762,7 @@ export class Sim {
       return false;
     }
     // always turn to face the leader, even while held in place
-    p.facing = angleTo(p.pos, t.pos);
+    p.facing = steadyAngleTo(p.pos, t.pos, p.facing);
     if (isStunned(p) || isRooted(p) || d <= FOLLOW_STOP_DIST) return true;
     let speed = RUN_SPEED * this.moveSpeedMult(p);
     if (this.isSwimming(p)) speed *= SWIM_SPEED_MULT;
@@ -3239,201 +3807,13 @@ export class Sim {
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
     if (this.updateFearMovement(p)) return;
-    const inp = meta.moveInput;
-    // Convention: facing f points along (sin f, cos f); the camera sits behind
-    // the player, so screen-right is the world vector (-cos f, sin f).
-    // Turning right therefore DECREASES facing.
-    if (!isStunned(p)) {
-      if (inp.turnLeft) p.facing = normAngle(p.facing + TURN_SPEED * DT);
-      if (inp.turnRight) p.facing = normAngle(p.facing - TURN_SPEED * DT);
-    }
-
-    let mx = 0,
-      mz = 0; // local: z forward, x strafe-right
-    if (inp.forward) mz += 1;
-    if (inp.back) mz -= 1;
-    if (inp.strafeLeft) mx -= 1;
-    if (inp.strafeRight) mx += 1;
-
-    const wantsMove = mx !== 0 || mz !== 0 || inp.jump;
-    if (wantsMove && p.sitting) this.standUp(p);
-
-    const hasMoveInput = mx !== 0 || mz !== 0;
-    const swimming = this.isSwimming(p);
-    // Standing on unwalkably steep ground: no control, no jump, slide downhill.
-    const steepGround =
-      p.onGround &&
-      !swimming &&
-      terrainSteepnessAt(p.pos.x, p.pos.z, this.cfg.seed) > MAX_CLIMB_SLOPE;
-    const moving = hasMoveInput && !isRooted(p) && !steepGround;
-    let wishX = 0,
-      wishZ = 0,
-      wishSpeed = 0;
-    if (moving) {
-      if (p.castingAbility) {
-        // A mobile cast (def flag, or talent-granted via the resolved ability)
-        // survives its caster's movement; everything else breaks, fishing included.
-        const casting = this.resolvedAbility(p.castingAbility, p.id);
-        const mobile = casting != null && (casting.def.castWhileMoving || casting.castWhileMoving);
-        if (!mobile) this.cancelCast(p);
-      }
-      const len = Math.hypot(mx, mz);
-      mx /= len;
-      mz /= len;
-      let speed = RUN_SPEED * this.moveSpeedMult(p);
-      if (mz < 0) speed *= BACKPEDAL_MULT;
-      if (swimming) speed *= SWIM_SPEED_MULT;
-      // world = forward * mz + right * mx, with right = (-cos f, sin f)
-      const sin = Math.sin(p.facing),
-        cos = Math.cos(p.facing);
-      const wx = mz * sin - mx * cos;
-      const wz = mz * cos + mx * sin;
-      wishX = wx;
-      wishZ = wz;
-      wishSpeed = speed;
-    }
-
-    const movingOnGround = moving && (p.onGround || swimming);
-    const slide = steepGround ? terrainDownhill(p.pos.x, p.pos.z, this.cfg.seed) : null;
-    if (slide || movingOnGround || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
-      if (slide && p.castingAbility) this.cancelCast(p);
-      const stepX = slide ? slide.x * STEEP_SLIDE_SPEED : movingOnGround ? wishX * wishSpeed : p.vx;
-      const stepZ = slide ? slide.z * STEEP_SLIDE_SPEED : movingOnGround ? wishZ * wishSpeed : p.vz;
-      let nx = p.pos.x + stepX * DT;
-      let nz = p.pos.z + stepZ * DT;
-      // cliffs, steep mountainsides, and the world rim are walls, not ramps:
-      // an uphill step is blocked when the step itself is too steep OR when it
-      // lands on ground whose true gradient is unwalkable (so approaching at an
-      // angle cannot cheat the limit)
-      if (p.onGround && !swimming) {
-        const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
-        const h1 = groundHeight(nx, nz, this.cfg.seed);
-        const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
-        if (
-          h1 > h0 &&
-          run > 1e-5 &&
-          ((h1 - h0) / run > MAX_CLIMB_SLOPE ||
-            terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)
-        ) {
-          nx = p.pos.x;
-          nz = p.pos.z;
-        }
-      } else if (!p.onGround) {
-        // Airborne, the same wall rule applies: terrain rising above the body
-        // that could not be walked up cannot be jumped into either. The player
-        // drops at the base of the face instead of beaching partway up it.
-        const h1 = groundHeight(nx, nz, this.cfg.seed);
-        if (h1 > p.pos.y) {
-          const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
-          const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
-          if (
-            h1 > h0 &&
-            run > 1e-5 &&
-            ((h1 - h0) / run > MAX_CLIMB_SLOPE ||
-              terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)
-          ) {
-            nx = p.pos.x;
-            nz = p.pos.z;
-            p.vx = 0;
-            p.vz = 0;
-          }
-        }
-      }
-      // Slide along buildings, trees, crypt walls — but while airborne from a
-      // jump, pass through fences for the whole arc. Keying off the jump itself
-      // (not a height threshold) makes this independent of slope: an uphill
-      // approach no longer flickers the clearance off right at the rail.
-      const clearFences = !p.onGround && p.jumping;
-      const resolved = this.resolveMove(p.pos.x, p.pos.z, nx, nz, BODY_RADIUS, p, clearFences);
-      p.pos.x = resolved.x;
-      p.pos.z = resolved.z;
-      if (!p.onGround && (resolved.x !== nx || resolved.z !== nz)) {
-        p.vx = (resolved.x - p.prevPos.x) / DT;
-        p.vz = (resolved.z - p.prevPos.z) / DT;
-      }
-    }
-
-    // Vertical: jumping, gravity, swimming, fall damage
-    const ground = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
-    const deepWater = ground < waterLevelAt(p.pos.x, p.pos.z) - SWIM_DEPTH;
-    if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z) + 0.05) {
-      // treading water at the surface
-      p.pos.y = swimSurfaceY(p.pos.x, p.pos.z);
-      p.vy = 0;
-      p.vx = 0;
-      p.vz = 0;
-      p.onGround = true;
-      p.jumping = false;
-      p.fallStartY = p.pos.y;
-      if (inp.jump && !isRooted(p)) {
-        // small hop to climb onto shores and docks
-        p.vy = JUMP_VELOCITY * 0.7 * this.jumpMult(p);
-        p.vx = wishX * wishSpeed;
-        p.vz = wishZ * wishSpeed;
-        p.onGround = false;
-        p.jumping = true;
-      }
-      return;
-    }
-    if (inp.jump && p.onGround && !isRooted(p) && !steepGround) {
-      p.vy = JUMP_VELOCITY * this.jumpMult(p);
-      p.vx = wishX * wishSpeed;
-      p.vz = wishZ * wishSpeed;
-      p.onGround = false;
-      p.jumping = true;
-      p.fallStartY = p.pos.y;
-    }
-    if (!p.onGround) {
-      p.vy -= GRAVITY * DT;
-      p.pos.y += p.vy * DT;
-      p.fallStartY = Math.max(p.fallStartY, p.pos.y);
-      if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z)) {
-        // splashing into deep water breaks the fall
-        p.pos.y = swimSurfaceY(p.pos.x, p.pos.z);
-        p.vy = 0;
-        p.vx = 0;
-        p.vz = 0;
-        p.onGround = true;
-        p.jumping = false;
-        p.fallStartY = p.pos.y;
-        return;
-      }
-      if (p.pos.y <= ground) {
-        p.pos.y = ground;
-        p.vy = 0;
-        p.vx = 0;
-        p.vz = 0;
-        p.onGround = true;
-        p.jumping = false;
-        const drop = p.fallStartY - ground;
-        if (drop > FALL_SAFE_DISTANCE) {
-          const dmg = Math.round(p.maxHp * (drop - FALL_SAFE_DISTANCE) * 0.07);
-          if (dmg > 0) this.dealDamage(null, p, dmg, false, 'physical', 'Falling', 'hit', true);
-        }
-        p.fallStartY = ground;
-      }
-    } else {
-      // Distinguish a walkable downhill slope from a genuine cliff/ledge. The
-      // drop the ground can take in one tick scales with how far we moved: a
-      // slope no steeper than MAX_CLIMB_SLOPE (the same gate that blocks uphill
-      // climbs) is walkable, so we snap down to follow it instead of falling.
-      // Only a steeper-than-walkable drop counts as walking off a ledge. The
-      // 0.4 base keeps a near-stationary player snapped over tiny terrain noise.
-      const run = Math.hypot(p.pos.x - p.prevPos.x, p.pos.z - p.prevPos.z);
-      const maxStepDown = 0.4 + run * MAX_CLIMB_SLOPE;
-      if (ground < p.pos.y - maxStepDown) {
-        // walked off a ledge — not a jump, so fences still block
-        p.onGround = false;
-        p.jumping = false;
-        p.vx = 0;
-        p.vz = 0;
-        p.vy = 0;
-        p.fallStartY = p.pos.y;
-      } else {
-        p.pos.y = ground;
-        p.fallStartY = ground;
-      }
-    }
+    // The rest of the step (turn integration, wish vector, slope gates, swept
+    // static collision, the vertical pass with fall damage) moved VERBATIM to
+    // player_motion.ts (MV1), which also eases the body off terrain walls at the
+    // end (the standoff); playerMotionDeps binds the live Sim callbacks (fiesta-
+    // aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/dealDamage)
+    // so behavior and the rng draw order are unchanged.
+    stepPlayerMotion(this.playerMotionDeps, p, meta.moveInput);
   }
 
   private standUp(p: Entity): void {
@@ -3606,6 +3986,10 @@ export class Sim {
     healingThreatImpl(this.ctx, source, target, healed);
   }
 
+  private applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void {
+    applySetProcsImpl(this.ctx, source, target, trigger);
+  }
+
   // Combo points are character-bound (retail-style): building on any target adds
   // to the one pool, and the pool persists across target swaps until spent, the
   // player dies, or COMBO_POINT_DURATION passes without a new point.
@@ -3626,7 +4010,7 @@ export class Sim {
       return;
     if (
       target.kind === 'mob' &&
-      MOBS[target.templateId]?.ccImmune &&
+      (MOBS[target.templateId]?.ccImmune || target.ccImmune) &&
       this.isControlAura(aura.kind) &&
       aura.sourceId !== target.id &&
       !this.isNythraxisScriptedControl(target, aura)
@@ -3635,9 +4019,10 @@ export class Sim {
     // Slow immunity is separate from ccImmune: snares (kind 'slow') are not control auras,
     // so a slowImmune raid boss shrugs off Frostbolt/Hamstring-style movement snares while
     // still taking a self-applied slow (e.g. a scripted mechanic) through sourceId === self.
+    // The entity-level flags are the heroic-spawn twins (see Entity.ccImmune).
     if (
       target.kind === 'mob' &&
-      MOBS[target.templateId]?.slowImmune &&
+      (MOBS[target.templateId]?.slowImmune || target.slowImmune) &&
       aura.kind === 'slow' &&
       aura.sourceId !== target.id
     )
@@ -3692,6 +4077,11 @@ export class Sim {
   // it tunnel through in one coarse hop. Returns the yards actually moved (0 if
   // blocked immediately).
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
+    // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
+    // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
+    // and never displaces the victim, so a caster keeps casting through it.
+    distance *= 1 - (target.knockbackResistance ?? 0);
+    if (distance <= 0) return 0;
     let dx = target.pos.x - source.pos.x;
     let dz = target.pos.z - source.pos.z;
     let len = Math.hypot(dx, dz);
@@ -4008,7 +4398,14 @@ export class Sim {
     b.inCombat = true;
     // players and their pets pull wild mobs; pets never run wild-mob AI
     const aAttacker = a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null);
-    if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade') {
+    if (
+      b.kind === 'mob' &&
+      b.ownerId === null &&
+      !b.dead &&
+      aAttacker &&
+      b.aiState !== 'evade' &&
+      !MOBS[b.templateId]?.dummy // a training dummy never retaliates
+    ) {
       if (b.aiState === 'idle') this.aggroMob(b, a, true);
       else if (b.aggroTargetId === null) b.aggroTargetId = a.id;
     }
@@ -4017,7 +4414,8 @@ export class Sim {
       a.ownerId === null &&
       !a.dead &&
       b.kind === 'player' &&
-      a.aiState === 'idle'
+      a.aiState === 'idle' &&
+      !MOBS[a.templateId]?.dummy // a training dummy never aggros
     ) {
       this.aggroMob(a, b, false);
     }
@@ -4063,6 +4461,10 @@ export class Sim {
 
   activeLootRolls(pid = this.playerId): LootRollPrompt[] {
     return activeLootRollsImpl(this.ctx, pid);
+  }
+
+  lootRollGroupStatus(pid = this.playerId): LootRollGroupStatus[] {
+    return lootRollGroupStatusImpl(this.ctx, pid);
   }
 
   submitLootRoll(rollId: number, choice: LootRollChoice, pid?: number): void {
@@ -4131,84 +4533,15 @@ export class Sim {
   }
 
   private mobCombatProfile(mob: Entity): MobCombatProfile {
-    return combatProfileForMob(mob.templateId, mob.scale);
+    return mobCombatProfileFn(mob);
   }
 
   private mobEffectiveMeleeRange(mob: Entity): number {
-    const profile = this.mobCombatProfile(mob);
-    const mobMoved = dist2d(mob.pos, mob.prevPos) > 0.05;
-    return effectiveMobMeleeRange(profile, mobMoved);
+    return mobEffectiveMeleeRangeFn(mob);
   }
 
   private tryMobMeleeSwingInRange(mob: Entity, target: Entity): boolean {
-    if (dist2d(mob.pos, target.pos) > this.mobEffectiveMeleeRange(mob)) return false;
-    mob.aiState = 'attack';
-    mob.facing = angleTo(mob.pos, target.pos);
-    if (mob.swingTimer <= 0) {
-      this.mobSwing(mob, target);
-      mob.swingTimer = mob.weapon.speed * this.swingIntervalMult(mob);
-    }
-    return true;
-  }
-
-  private usesProfiledMobCombat(mob: Entity): boolean {
-    const profile = this.mobCombatProfile(mob);
-    return profile.swingWhilePursuing || profile.immediateSwingOnEnterRange || !profile.canLeash;
-  }
-
-  private updateProfiledMobCombat(mob: Entity): void {
-    const profile = this.mobCombatProfile(mob);
-    this.updateMobTarget(mob);
-    const target = mob.aggroTargetId !== null ? this.entities.get(mob.aggroTargetId) : null;
-    if (!target || target.dead) {
-      this.retargetMob(mob);
-      return;
-    }
-    if (this.maybeFlee(mob, target)) return;
-
-    if (profile.canLeash) {
-      const leash = mob.spawnPos.x > DUNGEON_X_THRESHOLD ? DUNGEON_LEASH_DISTANCE : LEASH_DISTANCE;
-      const leashAnchor = mob.leashAnchor ?? mob.spawnPos;
-      if (mob.fleeReturnTimer > 0) {
-        mob.fleeReturnTimer = Math.max(0, mob.fleeReturnTimer - DT);
-        if (dist2d(mob.pos, leashAnchor) <= leash - 1) mob.fleeReturnTimer = 0;
-      }
-      if (dist2d(mob.pos, leashAnchor) > leash && mob.fleeReturnTimer <= 0) {
-        mob.aiState = 'evade';
-        mob.aggroTargetId = null;
-        clearThreat(mob);
-        mob.leashAnchor = null;
-        return;
-      }
-    }
-
-    mob.swingTimer = Math.max(0, mob.swingTimer - DT);
-    if (profile.swingWhilePursuing || mob.aiState === 'attack') {
-      this.tryMobMeleeSwingInRange(mob, target);
-    }
-
-    if (dist2d(mob.pos, target.pos) > profile.desiredRange) {
-      if (!isRooted(mob)) {
-        this.moveToward(
-          mob,
-          target.pos,
-          mob.moveSpeed * profile.chaseSpeedMult * this.moveSpeedMult(mob),
-        );
-      } else {
-        mob.facing = angleTo(mob.pos, target.pos);
-      }
-    } else {
-      mob.facing = angleTo(mob.pos, target.pos);
-    }
-
-    if (
-      profile.immediateSwingOnEnterRange ||
-      profile.swingWhilePursuing ||
-      mob.aiState === 'attack'
-    ) {
-      this.tryMobMeleeSwingInRange(mob, target);
-    }
-    mob.aiState = dist2d(mob.pos, target.pos) <= profile.meleeRange ? 'attack' : 'chase';
+    return tryMobMeleeSwingInRangeFn(this.ctx, mob, target);
   }
 
   aggroMob(mob: Entity, target: Entity, social: boolean): void {
@@ -4379,7 +4712,7 @@ export class Sim {
       pet.swingTimer = Math.max(0, pet.swingTimer - DT);
       return;
     }
-    pet.facing = angleTo(pet.pos, target.pos);
+    pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
     pet.swingTimer -= DT;
     // Emit the projectile + resolve the hit (resisted, not missed: the same
     // semantics as player casts). Shared by the instant path and the windup
@@ -4442,9 +4775,11 @@ export class Sim {
   }
 
   // Step `e` one tick toward `dest`. With `ignoreObstacles`, the mover phases
-  // straight through props — used to free a stuck evader, never for normal
-  // locomotion. Returns true on arrival.
+  // straight through props — used to free a stuck evader, and forced on for
+  // templates flagged `phasesThroughObstacles` (mountain-sized world bosses
+  // that must never wedge on a collider mid-chase). Returns true on arrival.
   private moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles = false): boolean {
+    if (!ignoreObstacles && MOBS[e.templateId]?.phasesThroughObstacles) ignoreObstacles = true;
     const d = dist2d(e.pos, dest);
     if (d < 0.3) return true;
     const desired = angleTo(e.pos, dest);
@@ -4626,7 +4961,10 @@ export class Sim {
             entityId: mob.id,
           });
           for (const ally of wounded) {
-            const amount = Math.round(this.rng.range(tmpl.mendAlly.healMin, tmpl.mendAlly.healMax));
+            const amount = Math.round(
+              this.rng.range(tmpl.mendAlly.healMin, tmpl.mendAlly.healMax) *
+                (mob.mechanicHealMult ?? 1),
+            );
             this.applyHeal(mob, ally, amount, tmpl.mendAlly.name);
           }
         }
@@ -4663,7 +5001,7 @@ export class Sim {
               kind: 'absorb',
               remaining: tmpl.wardAllies.duration,
               duration: tmpl.wardAllies.duration,
-              value: tmpl.wardAllies.amount,
+              value: Math.round(tmpl.wardAllies.amount * (mob.mechanicHealMult ?? 1)),
               sourceId: mob.id,
               school,
             });
@@ -4820,8 +5158,16 @@ export class Sim {
         boss.pos.x + Math.sin(ang) * spawnRadius,
         boss.pos.z + Math.cos(ang) * spawnRadius,
       );
-      const level = this.rng.int(template.minLevel, template.maxLevel);
-      const add = createMob(this.nextId++, template, level, pos);
+      const rolledLevel = this.rng.int(template.minLevel, template.maxLevel);
+      const difficulty = inst?.difficulty ?? 'normal';
+      const addTemplate = mobTemplateForDungeonDifficulty(
+        template,
+        inst?.dungeonId ?? '',
+        difficulty,
+      );
+      const level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
+      const add = createMob(this.nextId++, addTemplate, level, pos);
+      applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty);
       // Leash to the boss's ORIGINAL spawn (not his current, possibly-kited position):
       // pulled too far from it, the add's chase-case leash check evades it home.
       add.spawnPos = { ...boss.spawnPos };
@@ -4931,19 +5277,27 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
-  removeItem(itemId: string, count: number, pid?: number): void {
+  // Returns the `instance` payload of every instanced slot actually consumed
+  // (highest-index/most-recently-added slot first, matching the removal
+  // order below), so a caller that needs to attribute an effect to the
+  // SPECIFIC copy removed (e.g. #1149 Battlefield Experience) never guesses
+  // at a different slot than the one this call actually took from.
+  removeItem(itemId: string, count: number, pid?: number): ItemInstancePayload[] {
+    const consumedInstances: ItemInstancePayload[] = [];
     const r = this.resolve(pid);
-    if (!r) return;
+    if (!r) return consumedInstances;
     const { meta } = r;
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId) continue;
+      if (s.instance) consumedInstances.push(s.instance);
       const take = Math.min(s.count, count);
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
     this.ctx.onInventoryChangedForQuests(meta);
+    return consumedInstances;
   }
 
   // Fungible-only removal (#1165): skips instanced slots entirely, so a market
@@ -5139,11 +5493,12 @@ export class Sim {
     return this.nodeHarvestableByMeFor(nodeId, this.primaryId);
   }
 
-  // IWorld read surface (IWorldProfessions, #1127): the static common-tier
-  // recipe list, a plain content read (no per-player state), same shape both
-  // worlds can serve without a wire round-trip.
+  // IWorld read surface (IWorldProfessions, #1127): the full recipe list
+  // (common tier plus combo recipes, #1132), a plain content read (no
+  // per-player state), same shape both worlds can serve without a wire
+  // round-trip.
   get recipeList(): readonly RecipeDef[] {
-    return COMMON_RECIPES;
+    return ALL_RECIPES;
   }
 
   // Common-tier crafting command (#1127): a thin delegate onto
@@ -5173,6 +5528,38 @@ export class Sim {
     return this.players.get(this.primaryId)?.lastCraftResult ?? null;
   }
 
+  // Recipe acquisition command (#1299): a thin delegate onto
+  // src/sim/professions/crafting.ts acquireRecipe, resolved on the
+  // deterministic tick the command arrives on. Not yet wired onto the
+  // IWorld/wire surface (see the AcquireRecipeResult return: callers today
+  // are tests and future trainer/loot/quest-reward integrations), same
+  // documented not-yet-wired status the active-archetype identity carried
+  // before its own wire-up.
+  acquireRecipe(
+    recipeId: string,
+    source: 'trainer' | 'drop' | 'quest',
+    pid?: number,
+  ): AcquireRecipeResult {
+    return acquireRecipeImpl(this.ctx, pid ?? this.primaryId, recipeId, source);
+  }
+
+  // Salvage/disenchant command (#1300): a thin delegate onto
+  // src/sim/professions/salvage.ts, resolved on the deterministic tick the
+  // command arrives on, same shape as craftItem above. Stashes the outcome
+  // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
+  salvageItem(itemId: string, pid?: number): void {
+    const result = salvageItemImpl(this.ctx, itemId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    if (meta) meta.lastSalvageResult = result;
+  }
+
+  // The local viewer's most recent salvage-result, or null before their
+  // first salvage attempt this session. Same not-yet-wired-onto-IWorld
+  // status as the salvageItem command above.
+  get lastSalvageResult(): SalvageResult | null {
+    return this.players.get(this.primaryId)?.lastSalvageResult ?? null;
+  }
+
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
     const def = ITEMS[itemId];
     if (!def?.slot) return;
@@ -5188,7 +5575,11 @@ export class Sim {
       if (next && (!cur || next.min + next.max > cur.min + cur.max))
         this.equipItem(itemId, meta.entityId);
     } else {
-      const cur = meta.equipment[def.slot] ? ITEMS[meta.equipment[def.slot]!] : null;
+      // resolveEquipSlot maps a ring item to its concrete ring1/ring2 key
+      // (empty-first), so auto-equip fills an open jewelry slot too.
+      const slot = resolveEquipSlot(def, meta.equipment);
+      const curId = slot ? meta.equipment[slot] : undefined;
+      const cur = curId ? ITEMS[curId] : null;
       if (!cur || (def.stats?.armor ?? 0) > (cur.stats?.armor ?? 0))
         this.equipItem(itemId, meta.entityId);
     }
@@ -5222,6 +5613,39 @@ export class Sim {
 
   pickUpObject(objId: number, pid?: number): void {
     interaction.pickUpObject(this.ctx, objId, pid);
+  }
+
+  townFocusFor(pid: number): Record<string, number> {
+    return this.players.get(pid)?.townFocus ?? {};
+  }
+
+  get townFocus(): Record<string, number> {
+    return this.townFocusFor(this.primaryId);
+  }
+
+  // #1143: sets the caller's persistent town focus allocation. Gated on the
+  // player standing in their current zone's town hub (professions/focus.ts
+  // isInTownZone); rejected requests (out of town, malformed, over budget)
+  // leave the previous allocation untouched and surface a toast.
+  setTownFocus(allocation: Record<string, number>, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e: p } = r;
+    const zone = zoneAt(p.pos.z);
+    const inTown = professionsFocus.isInTownZone(p.pos, zone);
+    const result = professionsFocus.setTownFocus(meta.townFocus, allocation, inTown);
+    if (!result.ok) {
+      this.error(
+        meta.entityId,
+        result.reason === 'not_in_town'
+          ? 'You must be in town to set your focus.'
+          : result.reason === 'over_budget'
+            ? 'That allocation exceeds your focus point budget.'
+            : 'Invalid focus allocation.',
+      );
+      return;
+    }
+    meta.townFocus = result.allocation as Record<string, number>;
   }
 
   interact(pid?: number): void {
@@ -5395,8 +5819,16 @@ export class Sim {
   }
 
   isHostileTo(attacker: Entity, target: Entity): boolean {
+    // The Gauntlet's Final Court is a standard-combat free-for-all: two live
+    // fellow contestants are mutually hostile, so vanilla targeting, the reticle,
+    // tab-cycling, auto-attack, and abilities all engage exactly as in the open
+    // world. Pure (draws no rng), so the world's draw order is untouched.
+    if (gauntletMod.gauntletCourtFoes(this.gauntletRuns, attacker, target)) return true;
     if (target.kind === 'mob') {
       if (target.templateId.startsWith('vision_')) return false;
+      // A Protect Yumi cat is attackable only by the opposing team of its
+      // live match (social/yumi.ts owns the rule).
+      if (yumiMod.isYumiCat(target)) return yumiMod.yumiCatHostileTo(this.ctx, attacker, target);
       if (target.ownerId !== null) {
         const owner = this.entities.get(target.ownerId);
         return !!owner && owner.kind === 'player' && this.isHostileTo(attacker, owner);
@@ -5417,11 +5849,23 @@ export class Sim {
       )
         return true;
       const match = this.arenaMatches.get(attackerPlayer.id);
-      return (
-        !!match &&
+      if (
+        match &&
         match.state === 'active' &&
         !match.defeated.has(attackerPlayer.id) &&
         this.isArenaCrossTeam(match, attackerPlayer.id, target.id)
+      ) {
+        return true;
+      }
+      // The Vale Cup: opposing fighters are hostile only while play is live so
+      // the harvest-truce Shoulder can land on them (targeting also opens during
+      // the countdown via targeting.ts; damage between seated fighters is
+      // floored to 0 in combat/damage.ts, boots and shoulders only).
+      const cupMatch = this.vcup.match;
+      return (
+        !!cupMatch &&
+        (cupMatch.phase === 'active' || cupMatch.phase === 'golden') &&
+        valeCupMod.isVcupCrossTeam(cupMatch, attackerPlayer.id, target.id)
       );
     }
     return false;
@@ -5429,6 +5873,9 @@ export class Sim {
 
   private isFriendlyTo(caster: Entity, target: Entity): boolean {
     if (target.kind === 'player') return !this.isHostileTo(caster, target);
+    // A Protect Yumi cat is heal/shield-targetable only by its own team.
+    if (target.kind === 'mob' && yumiMod.isYumiCat(target))
+      return yumiMod.yumiCatFriendlyTo(this.ctx, caster, target);
     if (target.kind === 'mob' && target.ownerId !== null) {
       const owner = this.entities.get(target.ownerId);
       return !!owner && owner.kind === 'player' && !this.isHostileTo(caster, owner);
@@ -5645,6 +6092,104 @@ export class Sim {
     arenaMod.updateArena(this.ctx);
   }
 
+  // Hodric's Castle Gauntlet, directly after the arena in the end-of-tick
+  // system block (never reorder: parity pins the phase order). The match
+  // module runs FIRST (matchmake + race physics, which re-pins platform
+  // riders the base movement marked as ledge walk-offs), THEN the bots steer:
+  // a bot must decide on the post-physics truth of this tick (the state that
+  // gets snapshotted), or a rider looks permanently airborne to its own
+  // brain. Idle cost is one length check and ZERO rng draws.
+  private updateHodrics(): void {
+    hodricsMod.updateHodrics(this.ctx);
+    hcBotsMod.updateHcBots(this);
+  }
+
+  hcQueueJoin(pid?: number): void {
+    hodricsMod.hcQueueJoin(this.ctx, pid);
+  }
+
+  hcQueueLeave(pid?: number): void {
+    hodricsMod.hcQueueLeave(this.ctx, pid);
+  }
+
+  hcPracticeStart(): boolean {
+    return hcBotsMod.startHcPractice(this);
+  }
+
+  hcMatchFor(pid: number): HcMatch | null {
+    return hodricsMod.hcMatchFor(this.ctx, pid);
+  }
+
+  hcInfoFor(pid: number): import('../world_api').HcInfo | null {
+    const meta = this.players.get(pid);
+    if (!meta) return null;
+    const match = this.hcMatches.get(pid) ?? null;
+    const queuedAt = hodricsMod.hcQueuePosition(this.ctx, pid);
+    const standing = hodricsMod.hcStanding(meta);
+    let matchInfo: import('../world_api').HcMatchInfo | null = null;
+    if (match) {
+      const origin = hodricsOrigin(match.slot);
+      const course = match.course;
+      const me = match.racers.get(pid) ?? null;
+      const e = this.entities.get(pid);
+      const myZ = e ? e.pos.z - origin.z : course.checkpoints[0].z;
+      const racers = [...match.racers.values()]
+        .map((r) => {
+          const re = this.entities.get(r.pid);
+          const eliminated = r.eliminatedRound > 0;
+          const liveZ =
+            re && !r.left && !eliminated ? Math.max(r.furthestZ, re.pos.z - origin.z) : r.furthestZ;
+          return {
+            name: r.name,
+            cls: r.cls,
+            bot: r.bot,
+            you: r.pid === pid,
+            progress: r.finished ? 1 : hcProgressFrac(course, liveZ),
+            finished: r.finished,
+            place: r.place > 0 ? r.place : null,
+            eliminated,
+            left: r.left,
+          };
+        })
+        .sort((a, b) => {
+          // Board order: the live round first (finishers, then by progress),
+          // the gallery below it (best final placement first).
+          if (a.eliminated !== b.eliminated) return a.eliminated ? 1 : -1;
+          if (a.eliminated && b.eliminated) return (a.place ?? 99) - (b.place ?? 99);
+          if (a.finished !== b.finished) return a.finished ? -1 : 1;
+          if (a.place !== null && b.place !== null) return a.place - b.place;
+          return b.progress - a.progress;
+        });
+      const roundTime = hodricsMod.HC_ROUND_TIME[match.round - 1] ?? 120;
+      matchInfo = {
+        state: match.state,
+        round: match.round,
+        rounds: hodricsMod.HC_ROUNDS,
+        qualify: hodricsMod.hcQualifyTarget(match),
+        courseSeed: match.courseSeed,
+        countdown: match.state === 'countdown' ? Math.max(0, Math.ceil(match.timer)) : 0,
+        clock: match.clock,
+        timeLeft: Math.max(0, roundTime - match.clock),
+        section: hcSectionAt(course, myZ).id,
+        checkpoint: me?.checkpoint ?? 0,
+        finished: me?.finished ?? false,
+        place: me && me.place > 0 ? me.place : null,
+        eliminated: me ? me.eliminatedRound > 0 : false,
+        falls: me?.falls ?? 0,
+        racers,
+      };
+    }
+    return {
+      queued: queuedAt > 0 ? { position: queuedAt } : null,
+      standing: standing.races > 0 ? standing : null,
+      match: matchInfo,
+    };
+  }
+
+  get hcInfo(): import('../world_api').HcInfo | null {
+    return this.primaryId === -1 ? null : this.hcInfoFor(this.primaryId);
+  }
+
   // A3: createFiestaState (FiestaState factory + per-match sub-Rng seed) moved to
   // social/fiesta.ts. Thin delegate keeps the ctx.createFiestaState seam binding
   // (consumed by the moved arena startArenaMatch) resolving into the module.
@@ -5777,6 +6322,70 @@ export class Sim {
     fiestaBotsMod.updateFiestaBots(this);
   }
 
+  // -------------------------------------------------------------------------
+  // The Vale Cup: boarball at the Sowfield (social/vale_cup.ts +
+  // social/vale_cup_bots.ts). State stays on Sim (`this.vcup`); Sim keeps thin
+  // same-named delegates for the IWorld facet, the server, and tests. The bots
+  // are driven inside the same tick phase (they need Sim-only affordances), so
+  // the server's queue backfill and the offline Practice run identical code.
+  // -------------------------------------------------------------------------
+
+  private updateValeCup(): void {
+    valeCupMod.updateValeCup(this.ctx);
+    valeCupBotsMod.updateValeCupBots(this);
+  }
+
+  vcupQueueJoin(
+    bracket: VcBracket,
+    nation: VcNationId,
+    role: SportRole,
+    enterAsGuild = false,
+    pid?: number,
+  ): void {
+    valeCupMod.vcupQueueJoin(this.ctx, bracket, nation, role, enterAsGuild, pid);
+  }
+
+  vcupQueueLeave(pid?: number): void {
+    valeCupMod.vcupQueueLeave(this.ctx, pid);
+  }
+
+  vcupSetRole(role: SportRole, pid?: number): void {
+    valeCupMod.vcupSetRole(this.ctx, role, pid);
+  }
+
+  vcupReady(pid?: number): void {
+    valeCupMod.vcupReady(this.ctx, pid);
+  }
+
+  vcupBet(side: 'A' | 'B', amount: number, pid?: number): void {
+    valeCupMod.vcupPlaceBet(this.ctx, pid ?? this.primaryId, side, amount);
+  }
+
+  // Private practice bout vs bots on an instanced pitch copy (parallel to the
+  // real match). Runs identically offline and on the server (via vcup_practice).
+  vcupPracticeStart(bracket: VcBracket, pid?: number): void {
+    valeCupBotsMod.startValeCupPractice(this, bracket, pid);
+  }
+
+  /** The live cup match this pid is seated in, if any (server helpers). */
+  vcupMatchOf(pid: number): valeCupMod.VcMatch | null {
+    return valeCupMod.vcupMatchOf(this.ctx, pid);
+  }
+
+  /** Idempotent desertion resolution; the server calls it BEFORE the leave
+   *  save so the counted loss reaches the persisted standing. */
+  vcupResolveDesertion(pid: number): void {
+    valeCupMod.vcupResolveDesertion(this.ctx, pid);
+  }
+
+  cupInfoFor(pid: number): import('../world_api/vale_cup').CupInfo | null {
+    return valeCupMod.cupInfoFor(this.ctx, pid);
+  }
+
+  get cupInfo(): import('../world_api/vale_cup').CupInfo | null {
+    return this.primaryId === -1 ? null : this.cupInfoFor(this.primaryId);
+  }
+
   private fiestaMatchInfo(
     match: ArenaMatch,
     pid: number,
@@ -5879,6 +6488,7 @@ export class Sim {
             enemies,
             returnIn: match.state === 'over' ? Math.max(0, Math.ceil(match.timer)) : undefined,
             fiesta: match.fiesta ? this.fiestaMatchInfo(match, pid, myTeam) : undefined,
+            yumi: match.yumi ? yumiMod.yumiMatchInfo(this.ctx, match, pid, myTeam) : undefined,
           };
         }
       }
@@ -5889,11 +6499,16 @@ export class Sim {
       // Fiesta is unranked party play — it keeps no standing of its own; mirror
       // 2v2 just to satisfy the bracket record (the Fiesta UI never reads it).
       fiesta: this.arenaStanding(meta, '2v2'),
+      // Protect Yumi is unranked too (same mirror-the-record trick).
+      yumi3: this.arenaStanding(meta, '2v2'),
+      yumi5: this.arenaStanding(meta, '2v2'),
     };
     const ladders: Record<ArenaFormat, import('../world_api').ArenaLadderEntry[]> = {
       '1v1': this.arenaLadder('1v1'),
       '2v2': this.arenaLadder('2v2'),
       fiesta: [],
+      yumi3: [],
+      yumi5: [],
     };
     const format = match?.format ?? queuedFmt;
     const readoutFormat = format ?? '1v1';
@@ -5902,11 +6517,15 @@ export class Sim {
     const queueSize =
       format === 'fiesta'
         ? playerCount(this.arenaQueueFiesta)
-        : format === '2v2'
-          ? playerCount(this.arenaQueue2v2)
-          : format === '1v1'
-            ? this.arenaQueue1v1.length
-            : 0;
+        : format === 'yumi3'
+          ? playerCount(this.arenaQueueYumi3)
+          : format === 'yumi5'
+            ? playerCount(this.arenaQueueYumi5)
+            : format === '2v2'
+              ? playerCount(this.arenaQueue2v2)
+              : format === '1v1'
+                ? this.arenaQueue1v1.length
+                : 0;
     return {
       rating: standing.rating,
       wins: standing.wins,
@@ -5961,6 +6580,31 @@ export class Sim {
   // verbatim to social/trade.ts; partyInvites/duelInvites route through ctx.
   private updateTradesAndInvites(): void {
     tradeMod.updateTradesAndInvites(this.ctx);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Bank: the per-character deposit box
+  // -------------------------------------------------------------------------
+
+  // Thin delegates to the bank free functions (bank.ts). The bank state lives on
+  // PlayerMeta.bank and serializes inside the character save; server/game.ts and
+  // the IWorld surface call these unchanged, reaching the inventory hub through
+  // the SimContext. Each op has one entry point, gated on banker proximity (nearBanker).
+
+  bankDeposit(slotIndex: number, count?: number, pid?: number): void {
+    bankMod.bankDeposit(this.ctx, slotIndex, count, pid);
+  }
+
+  bankWithdraw(slotIndex: number, count?: number, pid?: number): void {
+    bankMod.bankWithdraw(this.ctx, slotIndex, count, pid);
+  }
+
+  bankBuySlots(pid?: number): void {
+    bankMod.bankBuySlots(this.ctx, pid);
+  }
+
+  bankInfoFor(pid: number): import('../world_api').BankInfo | null {
+    return bankMod.bankInfoFor(this.ctx, pid);
   }
 
   // -------------------------------------------------------------------------
@@ -6114,6 +6758,59 @@ export class Sim {
     leaveDungeonImpl(this.ctx, pid);
   }
 
+  dungeonDifficulty(pid?: number): DungeonDifficulty {
+    const r = this.resolve(pid);
+    if (!r) return 'normal';
+    return this.dungeonDifficultyForPid(r.meta.entityId);
+  }
+
+  setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void {
+    if (!isDungeonDifficulty(difficulty)) return;
+    const r = this.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (party && party.leader !== r.meta.entityId) {
+      this.error(r.meta.entityId, 'You are not the party leader.');
+      return;
+    }
+    // Only the SETTER's own preference is stamped: members mirror the party via
+    // dungeonDifficultyForPid while grouped and keep their own prior preference
+    // after leaving, so a stale stamp can never leak into another group.
+    if (difficulty === 'normal') delete r.meta.dungeonDifficulty;
+    else r.meta.dungeonDifficulty = difficulty;
+    if (party) {
+      if (difficulty === 'normal') delete party.dungeonDifficulty;
+      else party.dungeonDifficulty = difficulty;
+    }
+    this.error(
+      r.meta.entityId,
+      difficulty === 'heroic'
+        ? 'Dungeon difficulty set to Heroic.'
+        : 'Dungeon difficulty set to Normal.',
+    );
+  }
+
+  // Owned by instances/dungeons (heroic final-boss participation marks); the
+  // C1 death hub reaches it through the seam, this delegate keeps the facade.
+  awardHeroicMarks(mob: Entity, recipients: PlayerMeta[]): void {
+    awardHeroicMarksImpl(this.ctx, mob, recipients);
+  }
+
+  // Heroic Quartermaster purchase (owned by instances/heroic_vendor.ts): the
+  // heroic_buy command dispatch and the offline HUD resolve it on the facade.
+  buyHeroicVendorItem(itemId: string, pid?: number): void {
+    buyHeroicVendorItemImpl(this.ctx, itemId, pid);
+  }
+
+  private dungeonDifficultyForPid(pid: number): DungeonDifficulty {
+    // In a party the PARTY state is the only authority (leader-set): falling
+    // through to a member's personal stamp would let a stale solo preference
+    // bypass the leader-only rule at the dungeon door.
+    const party = this.partyOf(pid);
+    if (party) return party.dungeonDifficulty ?? 'normal';
+    return this.players.get(pid)?.dungeonDifficulty ?? 'normal';
+  }
+
   // Legacy single-dungeon entry points (tests + scripts use these).
   enterCrypt(pid?: number): void {
     enterCryptImpl(this.ctx, pid);
@@ -6195,6 +6892,10 @@ export class Sim {
 
   get mailUnread(): number {
     return this.primaryId === -1 ? 0 : this.mailUnreadFor(this.primaryId);
+  }
+
+  get bankInfo(): import('../world_api').BankInfo | null {
+    return this.primaryId === -1 ? null : this.bankInfoFor(this.primaryId);
   }
 
   instanceSlotAt(pos: Vec3): number | null {
@@ -6361,6 +7062,101 @@ export class Sim {
 
   private updateDelveRuns(): void {
     runsMod.updateDelveRuns(this.ctx);
+  }
+
+  // --- The Gauntlet event (gauntlet/runs.ts): thin delegates + the IWorld
+  // --- surface. Run state lives on `this.gauntletRuns`; the module reaches it
+  // --- through the seam.
+  private updateGauntletRuns(): void {
+    gauntletMod.updateGauntletRuns(this.ctx);
+  }
+
+  // The rolling-queue matchmaker (gauntlet/modes.ts): forms the next game from the
+  // front of the queue whenever no live queue game is running.
+  private updateGauntletQueue(): void {
+    gauntletModesMod.updateGauntletQueue(this.ctx);
+  }
+
+  // The instant single-player join (offline + tests): open/join a lobby directly,
+  // starting on the spot when cfg.gauntletInstantLobby is set.
+  gauntletJoin(pid?: number): void {
+    gauntletMod.gauntletJoin(this.ctx, pid);
+  }
+
+  // The three player-facing join modes (gauntlet/modes.ts).
+  gauntletQueueJoin(pid?: number): void {
+    gauntletModesMod.gauntletQueueJoin(this.ctx, pid);
+  }
+
+  gauntletSpectate(pid?: number): void {
+    gauntletModesMod.gauntletSpectate(this.ctx, pid);
+  }
+
+  gauntletPractice(pid?: number): void {
+    gauntletModesMod.gauntletPractice(this.ctx, pid);
+  }
+
+  gauntletRejoin(pid?: number): void {
+    gauntletModesMod.gauntletRejoin(this.ctx, pid);
+  }
+
+  // Leave dispatches across all states: dequeue, stop spectating, or leave a run.
+  gauntletLeave(pid?: number): void {
+    gauntletModesMod.gauntletLeave(this.ctx, pid);
+  }
+  gauntletTrace(pts: number[], pid?: number): void {
+    gauntletMod.gauntletTrace(this.ctx, pid, pts);
+  }
+  gauntletPullCircle(id: number, pid?: number): void {
+    gauntletMod.gauntletPullCircle(this.ctx, pid, id);
+  }
+  gauntletEcho(stone: number, pid?: number): void {
+    gauntletMod.gauntletEcho(this.ctx, pid, stone);
+  }
+
+  // The Final Court's combat-core seam (gauntlet/trial_court.ts): dealDamage
+  // consults these through ctx to run a lethal blow as an event elimination (no
+  // death screen) instead of the normal death flow. Thin delegates.
+  private gauntletCourtContestant(target: Entity): boolean {
+    return gauntletMod.gauntletCourtContestant(this.ctx, target);
+  }
+
+  private gauntletCourtTakedown(target: Entity): void {
+    gauntletMod.gauntletCourtTakedown(this.ctx, target);
+  }
+
+  gauntletRunWire(pid: number): GauntletRunView | null {
+    return gauntletMod.gauntletRunWire(this.ctx, pid);
+  }
+
+  // IWorldGauntlet data members (offline Sim side; ClientWorld mirrors the
+  // `grun` self-wire key and the recruiter's presence online).
+  get gauntletRun(): GauntletRunView | null {
+    return this.gauntletRunWire(this.primaryId);
+  }
+
+  get gauntletOpen(): boolean {
+    return this.gauntletEventOpen;
+  }
+
+  // Per-viewer queue place / spectator flag (the server encodes these per session
+  // pid into the `gq`/`gsp` self-wire keys, like gauntletRunWire).
+  gauntletQueuePositionOf(pid: number): number {
+    return gauntletModesMod.gauntletQueuePosition(this.ctx, pid);
+  }
+
+  gauntletSpectatingOf(pid: number): boolean {
+    return this.gauntletSpectators.has(pid);
+  }
+
+  // The IWorldGauntlet data members (offline Sim side, the primary player; online
+  // mirrors the `gq`/`gsp` self-wire keys).
+  get gauntletQueuePosition(): number {
+    return this.gauntletQueuePositionOf(this.primaryId);
+  }
+
+  get gauntletSpectating(): boolean {
+    return this.gauntletSpectatingOf(this.primaryId);
   }
 
   private ejectToDelveDoor(pid: number, delve: DelveDef): void {
@@ -6687,6 +7483,29 @@ export class Sim {
 
   get archetypeAmendsRequired(): number {
     return this.archetypeAmendsRequiredFor(this.primaryId);
+  }
+
+  /** The title granted by the CURRENTLY-ACTIVE archetype (#1130): the craft id
+   *  whose named title is earned, or null before an archetype is ever chosen. See
+   *  professions/archetype.ts getArchetypeTitle for the "no title" rule. */
+  archetypeTitleFor(pid: number): string | null {
+    return archetypeTitleFor(this.ctx, pid);
+  }
+
+  get archetypeTitle(): string | null {
+    return this.archetypeTitleFor(this.primaryId);
+  }
+
+  /** The hobby craft granted by the CURRENTLY-ACTIVE archetype (#1294): the
+   *  opposite craft on CRAFT_RING, empowered up to rare. See
+   *  professions/archetype.ts getHobbyCraft for the "no hobby before an
+   *  archetype is chosen" rule. */
+  hobbyCraftFor(pid: number): string | null {
+    return hobbyCraftFor(this.ctx, pid);
+  }
+
+  get hobbyCraft(): string | null {
+    return this.hobbyCraftFor(this.primaryId);
   }
 
   /** Stub entry point for the zone-1 acceptance quest's completion (see
