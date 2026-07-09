@@ -215,6 +215,14 @@ export function stopYumiGrab(match: ArenaMatch, e: Entity): void {
 // Per-tick: advance each in-progress channel, cancel any that became invalid
 // (stun, out of range, orb taken/despawned, already holding), and grant the
 // power-up the instant the 1.8s completes.
+//
+// Same-tick tie-break: two fighters can finish channeling the SAME orb on one
+// tick. We iterate `y.grab` in Map insertion order, so the one who called
+// startYumiGrab first wins and the other's grab cancels next tick (its orb is
+// gone -> canGrab false). This is deterministic (Map insertion order is stable
+// and replays identically) but it is NOT proximity- or channel-start-time-based;
+// since every channel is the same fixed 1.8s, "first to start" is also the first
+// to finish, so the ordering is intuitive in practice.
 export function updateYumiGrabs(ctx: SimContext, match: ArenaMatch): void {
   const y = match.yumi!;
   for (const [pid, orbId] of [...y.grab]) {

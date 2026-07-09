@@ -41,12 +41,24 @@ import {
 
 // Mode-based objective pool: 3v3 keeps 7500, 5v5 is 12500. Resolve it with
 // yumiHpFor(format) and store it on match.yumi.maxHp, never hardcode it inline.
+//
+// TUNING (a bespoke minigame, so these are pacing targets, not classic-era
+// formulas): the cat HP was raised from the original 5000 so a coordinated team
+// cannot burst the objective before the defenders can rotate back and heal it
+// (own-team healing of the cat is allowed), which keeps a bout in the 3-to-8
+// minute band we want before the 10:00 sudden-death floor. 5v5 scales the pool
+// up by the team-size ratio (7500 * 5/3 ~= 12500) so a larger team's extra DPS
+// does not shorten the fight. These are feel targets from playtesting the mode,
+// not derived numbers; adjust them here (they thread everywhere via yumiHpFor).
 export const YUMI_HP_3V3 = 7500;
 export const YUMI_HP_5V5 = 12500;
 // Back-compat alias (the 3v3 value); prefer yumiHpFor / match.yumi.maxHp.
 export const YUMI_HP = YUMI_HP_3V3;
 export const YUMI_COUNTDOWN = 5; // pre-fight gate, like the ranked arena
 export const YUMI_TELEPORT_EVERY = 60; // s between simultaneous relocations
+// Bench timer raised from 10s to 15s so a takedown buys real objective pressure
+// (long enough for the attackers to commit to the enemy cat) without benching a
+// fighter so long the 3v3 side feels permanently a player down. A pacing target.
 export const YUMI_RESPAWN_SECONDS = 15; // flat player bench timer
 export const YUMI_SUDDEN_AT = 600; // s of active play before sudden death
 export const YUMI_SUDDEN_STEP = 15; // s per escalation step
