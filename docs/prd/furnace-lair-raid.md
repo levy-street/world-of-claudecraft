@@ -992,3 +992,24 @@ worktree, screenshots for anything visual, `npm run gate` green.
     10 rating = 1%), so secondaries are data-only. Remaining tuning: the
     primary->rating trade ratio (~1 primary : ~12 rating placeholder) and
     whether to add the optional `item_level` budget guard.
+
+## Implementation follow-ups (from the slice-2 codex review)
+
+The walking skeleton (PR #1704) enforces the seal per-character, in-memory,
+proximity-credited, mirroring `grantNythraxisLockout`. These refinements are
+tracked but deliberately out of the skeleton's scope:
+
+1. Persistence: `PlayerMeta.undermountCleared` is session-only. Give it its own
+   slice: add to `CharacterState`, load in `addPlayer`, write in
+   `serializeCharacter`, with a save/load round-trip test and a migration-safety
+   review (it is new persisted JSONB).
+2. Credit by instance membership, not a 260 yd radius: find the `InstanceSlot`
+   whose `mobIds` contains the boss and credit that slot's party. Removes the
+   theoretical adjacent-slot overlap (disks of r260 centered 500 apart touch)
+   and correctly credits members outside the radius (ghosts, rejoiners). Applies
+   to `grantNythraxisLockout` too.
+3. Party-shared unseal: the seal check gates on the entering player's own
+   progress before resolving an existing party claim, so a raid member who did
+   not personally clear the prior wing cannot rejoin the group's already-open
+   next wing. Resolve the live claim first and scope the gate to it once
+   party/account-wide unseal is specced.
