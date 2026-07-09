@@ -73,43 +73,30 @@ try {
   const jump = await rect('#mobile-jump');
   const autorun = await rect('#mobile-autorun');
   const joy = await rect('#mobile-move-joystick');
-  const use = await rect('#mobile-interact');
-  check('jump/autorun/joystick/use visible', !!jump && !!autorun && !!joy && !!use);
-  if (jump && autorun && joy && use) {
+  const attack = await rect('#mobile-action-attack');
+  check('jump/autorun/joystick/attack visible', !!jump && !!autorun && !!joy && !!attack);
+  if (jump && autorun && joy && attack) {
     const jc = { x: (joy.l + joy.r) / 2, y: (joy.t + joy.b) / 2 };
     const jumpC = { x: (jump.l + jump.r) / 2, y: (jump.t + jump.b) / 2 };
     const autoC = { x: (autorun.l + autorun.r) / 2, y: (autorun.t + autorun.b) / 2 };
-    const useC = { x: (use.l + use.r) / 2, y: (use.t + use.b) / 2 };
+    const attackC = { x: (attack.l + attack.r) / 2, y: (attack.t + attack.b) / 2 };
     check(
       'autorun due right of joystick centre',
       Math.abs(autoC.y - jc.y) < 3 && autoC.x > jc.x,
       `dy=${(autoC.y - jc.y).toFixed(1)}`,
     );
     check(
-      'jump on the ring bottom row (right thumb, same row as Use)',
-      Math.abs(jumpC.y - useC.y) < 3 && jumpC.x > vw / 2 && jumpC.x < useC.x,
-      `jump=(${jumpC.x.toFixed(0)},${jumpC.y.toFixed(0)}) use=(${useC.x.toFixed(0)},${useC.y.toFixed(0)})`,
+      'jump in the ring hollow (right thumb, due left of Attack)',
+      Math.abs(jumpC.y - attackC.y) < 3 && jumpC.x > vw / 2 && jumpC.x < attackC.x,
+      `jump=(${jumpC.x.toFixed(0)},${jumpC.y.toFixed(0)}) attack=(${attackC.x.toFixed(0)},${attackC.y.toFixed(0)})`,
     );
-    // Even spacing on the bottom row: Jump's circle-edge gap to the 180deg
-    // slot must equal Use's gap on the other side.
-    const slot0 = await rect('.mobile-action-slot[data-mobile-index="0"]');
-    if (slot0) {
-      const slotC = { x: (slot0.l + slot0.r) / 2, y: (slot0.t + slot0.b) / 2 };
-      const gapUse = Math.abs(slotC.x - useC.x) - slot0.w / 2 - use.w / 2;
-      const gapJump = Math.abs(slotC.x - jumpC.x) - slot0.w / 2 - jump.w / 2;
-      check(
-        'jump and Use sit at equal gaps from the 180deg slot',
-        Math.abs(gapUse - gapJump) < 1.5,
-        `gapUse=${gapUse.toFixed(1)} gapJump=${gapJump.toFixed(1)}`,
-      );
-    }
-    // Size parity with the ring's Target/Use secondaries.
+    // Size parity with the ring's Target secondary.
     const target = await rect('#mobile-target-cycle');
     if (target) {
       check(
-        'jump/autorun same size as Target/Use',
-        Math.abs(jump.w - target.w) < 1 && Math.abs(autorun.w - use.w) < 1,
-        `jump=${jump.w.toFixed(1)} autorun=${autorun.w.toFixed(1)} target=${target.w.toFixed(1)} use=${use.w.toFixed(1)}`,
+        'jump/autorun same size as Target',
+        Math.abs(jump.w - target.w) < 1 && Math.abs(autorun.w - target.w) < 1,
+        `jump=${jump.w.toFixed(1)} autorun=${autorun.w.toFixed(1)} target=${target.w.toFixed(1)}`,
       );
     }
     // Jump must clear the (compact-nudged) player frame and the castbar.
@@ -134,8 +121,7 @@ try {
   const frame = await rect('#player-frame');
   check('castbar measurable', !!castbar);
   if (castbar && frame) {
-    // Centre-aligned with the player frame (both nudge 40px left together on
-    // the compact tier so Jump's ring-row seat keeps a clear circle).
+    // Centre-aligned with the player frame.
     const off = Math.abs((castbar.l + castbar.r) / 2 - (frame.l + frame.r) / 2);
     check('castbar centred over the player frame', off < 8, `offset ${off.toFixed(1)}px`);
     check(

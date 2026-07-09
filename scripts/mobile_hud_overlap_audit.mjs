@@ -56,7 +56,6 @@ const CONTROL_IDS = [
   'mobile-target-cycle',
   'mobile-action-page-toggle',
   'mobile-autorun',
-  'mobile-interact',
   'mobile-jump',
   'mobile-chat',
   'mobile-social',
@@ -96,7 +95,6 @@ const OVERLAY_CHROME_IDS = new Set(['meters-window']);
 const CIRCLE_IDS = new Set([
   'mobile-action-attack',
   'mobile-target-cycle',
-  'mobile-interact',
   'mobile-action-page-toggle',
   'mobile-autorun',
   'mobile-jump',

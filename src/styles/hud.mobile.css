@@ -348,9 +348,10 @@
   }
   /* Left-side utility satellite: Autorun nests against the move joystick's
      home seat exactly like the combat ring's crescent hollow, mirrored for
-     the left thumb: it takes Use's mirrored seat (due RIGHT of the joystick
-     centre, the 0deg resting-thumb tap). Jump moved to the RING's bottom row
-     (right thumb) so a player can steer and jump at the same time. The seat
+     the left thumb: it takes the old Use mirrored seat (due RIGHT of the
+     joystick centre, the 0deg resting-thumb tap). Jump now lives in the
+     action ring hollow (right thumb) so a player can steer and jump at the
+     same time. The seat
      rides the --mobile-joy-hollow circle around the joystick centre; the
      hollow tracks the Joystick Size setting (--joy-scale) and the button size
      setting (--btn-scale), FLOORED at its scale-1 value so minimum settings
@@ -377,7 +378,7 @@
     z-index: 30;
   }
   /* The satellites wear the ring secondaries' exact face (size hooks above
-     already mirror Target/Use per tier): same 2px amber border, dark radial
+     already mirror Target/Jump per tier): same 2px amber border, dark radial
      fill, and gold text, so the left pair reads as the mirror of the right
      pair rather than as generic glass chrome. */
   body.mobile-touch #mobile-utility-cluster .mobile-btn {
@@ -494,7 +495,7 @@
      22.5deg steps, so every adjacent pair has the same centre distance
      (chord = 2 * R * sin(11.25deg), tuned per tier to action-size + ~10px so
      buttons never crowd or overlap and nothing pokes past the screen edge; the
-     numeric factors below are cos/sin of 157.5/135/112.5deg). Use (180deg, due
+     numeric factors below are cos/sin of 157.5/135/112.5deg). Jump (180deg, due
      left), Target swap (135deg, the up-left diagonal) and the page toggle
      (90deg, due up over the attack button, to Target's upper right) nest in
      the crescent hollow at --mobile-ring-hollow from the attack centre; every
@@ -648,11 +649,11 @@
     );
   }
   /* The crescent-hollow trio between the attack button and the arc, all on
-     the --mobile-ring-hollow circle in 45deg steps: Use (interact/loot) due
-     left at 180deg, Target swap (Tab-cycle) on the up-left 45deg diagonal at
-     135deg, and the page-swap badge due up at 90deg over the attack button
-     (the seat to Target's upper right). The numeric factors are cos/sin of
-     those angles (0 and 1 terms folded away). Chord between neighbours:
+     the --mobile-ring-hollow circle in 45deg steps: Jump due left at 180deg,
+     Target swap (Tab-cycle) on the up-left 45deg diagonal at 135deg, and the
+     page-swap badge due up at 90deg over the attack button (the seat to
+     Target's upper right). The numeric factors are cos/sin of those angles
+     (0 and 1 terms folded away). Chord between neighbours:
      2 * hollow * sin(22.5deg) = 79.6px at the standard 104px hollow,
      comfortably past the 52-56px circles at every tier. */
   body.mobile-touch #mobile-target-cycle {
@@ -673,29 +674,10 @@
       2
     );
   }
-  body.mobile-touch #mobile-action-ring #mobile-interact {
-    right: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-hollow) -
-      var(--mobile-ring-secondary-size) /
-      2
-    );
-    bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-secondary-size) / 2);
-  }
-  /* Jump: a right-thumb seat on the ring's bottom row, one arc-seat past the
-     180deg action slot on Use's row, so a player can hold the move joystick
-     with the left thumb and jump with the right. Its circle-edge gap to that
-     slot EQUALS Use's gap on the other side (Use gap = radius - hollow -
-     secondary/2 - action/2, so Jump's centre lands at 2 * radius - hollow
-     from the attack centre), keeping the bottom row visually even-spaced at
-     every tier. */
   body.mobile-touch #mobile-action-ring #mobile-jump {
     right: calc(
       var(--mobile-ring-attack-size) /
       2 +
-      var(--mobile-ring-radius) *
-      2 -
       var(--mobile-ring-hollow) -
       var(--mobile-ring-secondary-size) /
       2
@@ -703,7 +685,6 @@
     bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-secondary-size) / 2);
   }
   body.mobile-touch #mobile-target-cycle,
-  body.mobile-touch #mobile-action-ring #mobile-interact,
   body.mobile-touch #mobile-action-ring #mobile-jump {
     width: var(--mobile-ring-secondary-size);
     height: var(--mobile-ring-secondary-size);
@@ -711,19 +692,16 @@
     border-color: #8b4e2c;
   }
   body.mobile-touch #mobile-target-cycle:active,
-  body.mobile-touch #mobile-action-ring #mobile-interact:active,
   body.mobile-touch #mobile-action-ring #mobile-jump:active {
     border-color: var(--gold);
     color: #fff;
   }
   body.mobile-touch #mobile-target-cycle .ui-icon,
-  body.mobile-touch #mobile-action-ring #mobile-interact .ui-icon,
   body.mobile-touch #mobile-action-ring #mobile-jump .ui-icon {
     width: 22px;
     height: 22px;
   }
   body.mobile-touch #mobile-target-cycle .mobile-label,
-  body.mobile-touch #mobile-action-ring #mobile-interact .mobile-label,
   body.mobile-touch #mobile-action-ring #mobile-jump .mobile-label {
     display: block;
     margin-top: 1px;
@@ -792,6 +770,17 @@
     height: 44%;
     color: #ffdf9c;
   }
+  body.mobile-touch #mobile-action-attack .mobile-action-context-icon {
+    display: none;
+  }
+  body.mobile-touch
+    #mobile-action-attack.context-interact
+    > .ui-icon:not(.mobile-action-context-icon) {
+    display: none;
+  }
+  body.mobile-touch #mobile-action-attack.context-interact > .mobile-action-context-icon {
+    display: block;
+  }
   body.mobile-touch #mobile-action-ring button .cd-overlay {
     position: absolute;
     left: 0;
@@ -810,7 +799,7 @@
     overflow: hidden;
   }
   /* Press feedback on the attack toggle and the 5 paged slots, matching the
-     Target/Use/page-toggle trio (which already had :active rules): a tap
+     Target/Jump/page-toggle trio (which already had :active rules): a tap
      must visibly acknowledge even before the used-flash lands. */
   body.mobile-touch #mobile-action-attack:active,
   body.mobile-touch .mobile-action-slot:active {
@@ -2034,9 +2023,9 @@
     left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
     right: auto;
   }
-  /* Target swap and Use keep their crescent-hollow seats, mirrored with the
+  /* Target swap and Jump keep their crescent-hollow seats, mirrored with the
      ring (same cos factors as their right-handed rules: 0.7071 for Target at
-     135deg, due left for Use at 180deg). */
+     135deg, due left for Jump at 180deg). */
   body.mobile-touch.mobile-left-handed #mobile-target-cycle {
     left: calc(
       var(--mobile-ring-attack-size) /
@@ -2048,22 +2037,10 @@
     );
     right: auto;
   }
-  body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-interact {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-hollow) -
-      var(--mobile-ring-secondary-size) /
-      2
-    );
-    right: auto;
-  }
   body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-jump {
     left: calc(
       var(--mobile-ring-attack-size) /
       2 +
-      var(--mobile-ring-radius) *
-      2 -
       var(--mobile-ring-hollow) -
       var(--mobile-ring-secondary-size) /
       2
@@ -3935,14 +3912,14 @@
   }
   /* The Autorun satellite mirrors the ring's per-tier secondary sizing
      (compact 50 / standard 56 / tablet 60), so it always matches the
-     Target/Use/Jump buttons it is the left-thumb mirror of. */
+     Target/Jump buttons it is the left-thumb mirror of. */
   body.mobile-touch.hud-mobile-compact #mobile-utility-cluster {
     --mobile-utility-size: calc(50px * var(--mobile-chrome-scale, 1));
   }
   body.mobile-touch.hud-mobile-tablet #mobile-utility-cluster {
     --mobile-utility-size: calc(60px * var(--mobile-chrome-scale, 1));
   }
-  /* Compact phones: Jump's ring-row seat reaches to ~437px from the left on a
+  /* Compact phones: Jump's ring-hollow seat reaches to ~437px from the left on a
      740px viewport, into the centred player frame's right tail (280..460).
      Nudge the frame and BOTH its bars 40px left, together, so the pair stays
      visually centred-ish while Jump keeps a clear circle on every profile.

@@ -113,7 +113,6 @@ export interface MobileControlCallbacks {
   /** Cycle the hostile target (the Tab-target path) from the ring's Target button. */
   onCycleTarget(): void;
   onJump(): void;
-  onInteract(): void;
   onAutorun(): boolean;
   /** Open the composer focused (raise the keyboard): the keybind / whisper path. */
   onChat(): void;
@@ -434,7 +433,6 @@ export class MobileControls {
 
     this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());
     this.bindButton('mobile-jump', () => this.callbacks.onJump(), { pressFirst: true });
-    this.bindButton('mobile-interact', () => this.callbacks.onInteract());
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());

@@ -16,6 +16,8 @@ import type { InterpolationValues, TranslationKey } from './i18n';
 import type { PainterHostWriters } from './painter_host';
 
 const ARIA_LABEL_ATTR = 'aria-label';
+const CLASS_CONTEXT_INTERACT = 'context-interact';
+const INTERACT_ARIA_KEY: TranslationKey = 'hud.keybinds.actions.interact';
 const PAGE_INDICATOR_KEY: TranslationKey = 'hudChrome.mobile.actionPageIndicator';
 const PAGE_TOGGLE_ARIA_KEY: TranslationKey = 'hudChrome.mobile.actionPageToggle';
 
@@ -49,8 +51,14 @@ export class MobileActionRingPainter {
    *  rebuild + write entirely on an unchanged page). The toggle's aria-label is
    *  the static "Switch action page" action name (its purpose never changes);
    *  the indicator span shows the dynamic "Page X of Y" text. */
-  paint(state: ActionBarState, page: number, pageCount: number): void {
+  paint(state: ActionBarState, page: number, pageCount: number, contextInteract = false): void {
+    if (contextInteract) state.slots[0].ariaLabel = this.t(INTERACT_ARIA_KEY);
     this.barPainter.paint(state);
+    this.writers.toggleClass(
+      this.descriptor.bar.slots[0].btn,
+      CLASS_CONTEXT_INTERACT,
+      contextInteract,
+    );
 
     if (this.lastPage !== page || this.lastPageCount !== pageCount) {
       this.lastPage = page;

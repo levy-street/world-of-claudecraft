@@ -33,8 +33,10 @@ import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import {
   activePvpOpponentIds,
+  findNearbyInteraction,
   HoverPickGate,
   handlePickedEntity,
+  hasNearbyInteraction,
   hoverCursorKind,
   isAttackableEntity,
 } from './game/interactions';
@@ -115,7 +117,6 @@ import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_targ
 import {
   DT,
   dist2d,
-  INTERACT_RANGE,
   MELEE_RANGE,
   type PlayerClass,
   RUN_SPEED,
@@ -1188,11 +1189,12 @@ async function startGame(
   // with no live hostile target (the HUD falls back to plain castSlot(0) until
   // this is wired); the Target button cycles targets via the Tab path below.
   hud.onMobileAttackNearest = () => attackNearest();
+  hud.onMobileCanContextInteract = () => hasNearbyInteraction(world);
+  hud.onMobileContextInteract = () => tryInteractNearby(false);
 
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
-    onInteract: () => interactKey(),
     onAutorun: () => input.toggleAutorun(),
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
@@ -1727,73 +1729,52 @@ async function startGame(
         }),
     });
   }
-  function interactKey(): void {
-    const p = world.player;
-    let bestCorpse: number | null = null,
-      bestCorpseD = INTERACT_RANGE;
-    let bestObj: number | null = null,
-      bestObjD = INTERACT_RANGE;
-    let bestNpc: number | null = null,
-      bestNpcD = INTERACT_RANGE + 1;
-    // Delve interactables (warded chest, cracked grave, sealed/tombstone passage,
-    // surface stairs) are driven through delveInteract, not the generic pickup
-    // path, the sim owns their per-object proximity + state gating and the
-    // lockpick offer. Selected a touch wider than INTERACT_RANGE so the sim can
-    // emit its precise "move closer to the chest/passage" hint.
-    let bestDelve: number | null = null,
-      bestDelveD = INTERACT_RANGE + 1;
-    for (const e of world.entities.values()) {
-      const d = dist2d(p.pos, e.pos);
-      if (e.kind === 'mob' && e.lootable && d < bestCorpseD) {
-        bestCorpse = e.id;
-        bestCorpseD = d;
-      }
-      if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
-        if (d < bestDelveD) {
-          bestDelve = e.id;
-          bestDelveD = d;
+  function tryInteractNearby(showError: boolean): boolean {
+    const action = findNearbyInteraction(world);
+    if (!action) {
+      if (showError) hud.showError(t('errors.nothingInteract'));
+      return false;
+    }
+    switch (action.kind) {
+      case 'corpse':
+        world.lootCorpse(action.id);
+        return true;
+      case 'delve':
+        world.delveInteract(action.id);
+        return true;
+      case 'object': {
+        const obj = world.entities.get(action.id);
+        if (!obj) return false;
+        if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
+          world.enterDungeon(obj.dungeonId);
+          return true;
         }
-      } else if (e.kind === 'object' && e.lootable && d < bestObjD) {
-        bestObj = e.id;
-        bestObjD = d;
+        if (obj.templateId === 'dungeon_exit') {
+          world.leaveDungeon();
+          return true;
+        }
+        if (obj.templateId === 'mailbox') {
+          hud.openMailbox();
+          return true;
+        }
+        world.pickUpObject(action.id);
+        return true;
       }
-      if (e.kind === 'npc' && d < bestNpcD) {
-        bestNpc = e.id;
-        bestNpcD = d;
+      case 'npc': {
+        const npc = world.entities.get(action.id);
+        if (npc?.kind !== 'npc') return false;
+        world.targetEntity(action.id);
+        if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh')
+          hud.openDelveBoard(action.id);
+        else hud.openQuestDialog(action.id);
+        return true;
       }
     }
-    if (bestCorpse !== null) {
-      world.lootCorpse(bestCorpse);
-      return;
-    }
-    if (bestDelve !== null) {
-      world.delveInteract(bestDelve);
-      return;
-    }
-    if (bestObj !== null) {
-      const obj = world.entities.get(bestObj)!;
-      if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
-        world.enterDungeon(obj.dungeonId);
-        return;
-      }
-      if (obj.templateId === 'dungeon_exit') {
-        world.leaveDungeon();
-        return;
-      }
-      if (obj.templateId === 'mailbox') {
-        hud.openMailbox();
-        return;
-      }
-      world.pickUpObject(bestObj);
-      return;
-    }
-    if (bestNpc !== null) {
-      const npc = world.entities.get(bestNpc);
-      if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
-      else hud.openQuestDialog(bestNpc);
-      return;
-    }
-    hud.showError(t('errors.nothingInteract'));
+    return false;
+  }
+
+  function interactKey(): void {
+    tryInteractNearby(true);
   }
 
   function attackNearest(): void {

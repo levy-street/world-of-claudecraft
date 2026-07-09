@@ -488,7 +488,6 @@ function mobileCallbacks() {
   return {
     onCycleTarget: noop,
     onJump: noop,
-    onInteract: noop,
     onAutorun: () => false,
     onChat: noop,
     onChatOpen: noop,

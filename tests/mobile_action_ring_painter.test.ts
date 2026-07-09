@@ -304,6 +304,35 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     painter.paint(view.tick(idleWorld()), 1, 2);
     expect(counts.writes).toBeGreaterThan(writesAfterFirst);
   });
+
+  it('can replace the primary attack aria and state with context interact', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const toggle = { tag: 'toggle' } as unknown as HTMLElement;
+    const indicator = { tag: 'indicator' } as unknown as HTMLElement;
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        pageToggle: toggle,
+        pageIndicator: indicator,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const view = createActionBarView({ slots: ringDescriptor({ page: 0 }, new Map()) }, fakeDeps());
+
+    painter.paint(view.tick(idleWorld()), 0, 2, true);
+
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [els[0].btn, 'aria-label', 'hud.keybinds.actions.interact'],
+    });
+    expect(calls).toContainEqual({
+      m: 'toggleClass',
+      args: [els[0].btn, 'context-interact', true],
+    });
+  });
 });
 
 describe('mobile action ring: alloc stability', () => {
