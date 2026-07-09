@@ -4753,7 +4753,9 @@ export const cs_CZ: EnTranslations = {
     "cast": {
       "fishing": "Rybaření",
       "demonHeal": "Léčení démona",
-      "thunzharrStormcall": "Volání bouře"
+      "thunzharrStormcall": "Volání bouře",
+      "nythraxisDeathlessRage": "Deathless Rage",
+      "nythraxisWardChannel": "Ward Channel"
     }
   },
   "questUi": {

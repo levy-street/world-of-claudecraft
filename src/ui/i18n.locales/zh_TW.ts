@@ -1488,6 +1488,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.fishing': '釣魚',
   'abilityUi.cast.thunzharrStormcall': '風暴召喚',
   'abilityUi.cast.demonHeal': '惡魔治療',
+  'abilityUi.cast.nythraxisDeathlessRage': '不死之怒',
+  'abilityUi.cast.nythraxisWardChannel': '守衛引導',
   'questUi.tracker.title': '任務',
   'questUi.tracker.complete': '完成',
   'questUi.tracker.showOnMap': '在地圖上顯示{name}',

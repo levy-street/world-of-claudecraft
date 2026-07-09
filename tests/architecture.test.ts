@@ -179,6 +179,7 @@ const UI_PURE_CORES = [
   'src/ui/gathering_view.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
+  'src/ui/cast_outcome_core.ts',
   'src/ui/window_resize_core.ts',
   'src/ui/focus_order.ts',
   'src/ui/roving_index.ts',

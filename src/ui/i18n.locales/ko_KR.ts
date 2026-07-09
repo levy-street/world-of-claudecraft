@@ -1545,6 +1545,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.fishing': '낚시',
   'abilityUi.cast.thunzharrStormcall': '폭풍의 부름',
   'abilityUi.cast.demonHeal': '악마 치유',
+  'abilityUi.cast.nythraxisDeathlessRage': '불멸의 격노',
+  'abilityUi.cast.nythraxisWardChannel': '수호석 정신 집중',
   'questUi.tracker.title': '퀘스트',
   'questUi.tracker.complete': '완료',
   'questUi.tracker.showOnMap': '{name} 지도에 표시',

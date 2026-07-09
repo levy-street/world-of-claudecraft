@@ -5,6 +5,7 @@ type NumberFormatter = typeof import('./i18n').formatNumber;
 
 const PET_COOLDOWN_FRACTION_DIGITS = 1;
 const PET_COOLDOWN_MIN_VISIBLE = 0.1;
+const PET_COOLDOWN_WHOLE_SECOND_THRESHOLD = 0.95;
 const PERCENT_SCALE = 100;
 
 export interface PetActionButtonLabelInput {
@@ -26,11 +27,11 @@ export function formatPetCooldownShort(
   secondsUnit: string,
 ): string | undefined {
   if (remaining <= 0) return undefined;
-  const value =
-    remaining >= 1 ? Math.ceil(remaining) : Math.max(PET_COOLDOWN_MIN_VISIBLE, remaining);
+  const useWholeSeconds = remaining >= PET_COOLDOWN_WHOLE_SECOND_THRESHOLD;
+  const value = useWholeSeconds ? Math.ceil(remaining) : Math.max(PET_COOLDOWN_MIN_VISIBLE, remaining);
   const seconds = formatNumber(value, {
-    minimumFractionDigits: remaining >= 1 ? 0 : PET_COOLDOWN_FRACTION_DIGITS,
-    maximumFractionDigits: remaining >= 1 ? 0 : PET_COOLDOWN_FRACTION_DIGITS,
+    minimumFractionDigits: useWholeSeconds ? 0 : PET_COOLDOWN_FRACTION_DIGITS,
+    maximumFractionDigits: useWholeSeconds ? 0 : PET_COOLDOWN_FRACTION_DIGITS,
     useGrouping: false,
   });
   return `${seconds}${secondsUnit}`;

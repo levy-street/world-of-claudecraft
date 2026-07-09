@@ -1558,6 +1558,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.fishing': '釣り',
   'abilityUi.cast.thunzharrStormcall': '嵐の呼び声',
   'abilityUi.cast.demonHeal': '悪魔の治癒',
+  'abilityUi.cast.nythraxisDeathlessRage': '不死の怒り',
+  'abilityUi.cast.nythraxisWardChannel': '護石チャネル',
   'questUi.tracker.title': 'クエスト',
   'questUi.tracker.complete': '完了',
   'questUi.tracker.showOnMap': '{name}をマップに表示',

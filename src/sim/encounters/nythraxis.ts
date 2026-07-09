@@ -56,6 +56,8 @@ const NYTHRAXIS_RELIC_SUMMONS: Record<string, string> = {
   priests_sigil: 'corrupted_priest_malric',
   royal_seal: 'deathstalker_voss',
 };
+const NYTHRAXIS_DEATHLESS_CAST_ID = 'nythraxis_deathless_rage';
+const NYTHRAXIS_WARD_CHANNEL_CAST_ID = 'nythraxis_ward_channel';
 const _NYTHRAXIS_CRYPT_QUESTS = new Set(['q_nythraxis_sealed_crypt', 'q_nythraxis_bound_guardian']);
 // NYTHRAXIS_BOSS_ID / NYTHRAXIS_ADD_ID live in types.ts (shared with mob/locomotion.ts;
 // the dungeon raid-door seal in instances/dungeons.ts also reads NYTHRAXIS_BOSS_ID).
@@ -100,6 +102,26 @@ function isHeroicNythraxis(ctx: SimContext, boss: Entity): boolean {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   return inst?.difficulty === 'heroic';
 }
+
+function stopNythraxisDeathlessRage(ctx: SimContext, boss: Entity, success: boolean): void {
+  const wasCasting =
+    boss.castingAbility === NYTHRAXIS_DEATHLESS_CAST_ID ||
+    (boss.nythraxis?.deathlessCastRemaining ?? 0) > 0;
+  boss.castingAbility = null;
+  boss.castRemaining = 0;
+  boss.castTotal = 0;
+  boss.castTargetId = null;
+  boss.channeling = false;
+  if (boss.nythraxis) boss.nythraxis.deathlessCastRemaining = 0;
+  if (wasCasting) ctx.emit({ type: 'castStop', entityId: boss.id, success });
+}
+
+function stopNythraxisWardChannel(ctx: SimContext, p: Entity, success: boolean): void {
+  const wasCasting = p.castingAbility === NYTHRAXIS_WARD_CHANNEL_CAST_ID;
+  clearNythraxisWardChannelCast(p);
+  if (wasCasting) ctx.emit({ type: 'castStop', entityId: p.id, success });
+}
+
 const NYTHRAXIS_DEATHLESS_EVERY = 45;
 const NYTHRAXIS_DEATHLESS_CAST = 10;
 const NYTHRAXIS_DEATHLESS_CHANNEL = 5;
@@ -221,7 +243,7 @@ export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
     p.auras = p.auras.filter(
       (a) => a.id !== 'nythraxis_soul_rend' && a.id !== 'nythraxis_transition_stun',
     );
-    clearNythraxisWardChannelCast(p);
+    stopNythraxisWardChannel(ctx, p, false);
   }
   for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
     if (e.kind !== 'player') e.auras = e.auras.filter((a) => a.id !== 'nythraxis_transition_stun');
@@ -231,12 +253,8 @@ export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   for (const ward of nythraxisDeathlessChannelObjects(ctx, boss)) {
     ward.auras = ward.auras.filter((a) => a.id !== 'nythraxis_wardstone_lit');
   }
+  stopNythraxisDeathlessRage(ctx, boss, false);
   boss.nythraxis = undefined;
-  boss.castingAbility = null;
-  boss.castRemaining = 0;
-  boss.castTotal = 0;
-  boss.castTargetId = null;
-  boss.channeling = false;
 }
 
 // Full wipe: every player in the arena is dead. Send Nythraxis home at full
@@ -621,11 +639,7 @@ export function startNythraxisTransition(
   st.transitionTimer = NYTHRAXIS_TRANSITION_DURATION + queuedDialogueDelay;
   st.transitionReleased = false;
   st.soulRendMarks = [];
-  st.deathlessCastRemaining = 0;
-  boss.castingAbility = null;
-  boss.castRemaining = 0;
-  boss.castTotal = 0;
-  boss.castTargetId = null;
+  stopNythraxisDeathlessRage(ctx, boss, false);
   const transitionLines = [
     { speaker: 'nythraxis' as const, text: 'Another priest...', delay: 0 },
     { speaker: 'aldric' as const, text: 'Your kingdom is gone, Nythraxis', delay: 3.0 },
@@ -843,11 +857,17 @@ export function startNythraxisDeathlessRage(
     remaining: NYTHRAXIS_DEATHLESS_CHANNEL,
     complete: false,
   }));
-  boss.castingAbility = 'nythraxis_deathless_rage';
+  boss.castingAbility = NYTHRAXIS_DEATHLESS_CAST_ID;
   boss.castTotal = NYTHRAXIS_DEATHLESS_CAST;
   boss.castRemaining = NYTHRAXIS_DEATHLESS_CAST;
   boss.castTargetId = null;
   boss.channeling = false;
+  ctx.emit({
+    type: 'castStart',
+    entityId: boss.id,
+    ability: NYTHRAXIS_DEATHLESS_CAST_ID,
+    time: NYTHRAXIS_DEATHLESS_CAST,
+  });
   nythraxisSay(ctx, boss, 'nythraxis', 'Witness true eternity!', true);
   ctx.emit({
     type: 'spellfx',
@@ -864,17 +884,13 @@ export function updateNythraxisDeathlessRage(
   st: NonNullable<Entity['nythraxis']>,
 ): void {
   st.deathlessCastRemaining = Math.max(0, st.deathlessCastRemaining - DT);
-  boss.castingAbility = 'nythraxis_deathless_rage';
+  boss.castingAbility = NYTHRAXIS_DEATHLESS_CAST_ID;
   boss.castTotal = NYTHRAXIS_DEATHLESS_CAST;
   boss.castRemaining = st.deathlessCastRemaining;
   boss.castTargetId = null;
   updateNythraxisWardChannels(ctx, boss, st);
   if (nythraxisWardstoneInterruptReady(st)) {
-    st.deathlessCastRemaining = 0;
-    boss.castingAbility = null;
-    boss.castRemaining = 0;
-    boss.castTotal = 0;
-    boss.castTargetId = null;
+    stopNythraxisDeathlessRage(ctx, boss, false);
     st.deathlessStunRemaining = NYTHRAXIS_DEATHLESS_STUN;
     ctx.applyAura(boss, {
       id: 'nythraxis_deathless_stun',
@@ -896,10 +912,7 @@ export function updateNythraxisDeathlessRage(
     return;
   }
   if (st.deathlessCastRemaining > 0) return;
-  boss.castingAbility = null;
-  boss.castRemaining = 0;
-  boss.castTotal = 0;
-  boss.castTargetId = null;
+  stopNythraxisDeathlessRage(ctx, boss, true);
   nythraxisSay(ctx, boss, 'nythraxis', 'You cannot stop what was promised..', true);
   ctx.emit({
     type: 'spellfx',
@@ -944,13 +957,13 @@ export function updateNythraxisWardChannels(
     const ward = ctx.entities.get(channel.objectId);
     const p = ctx.entities.get(channel.playerId);
     if (!ward || !p || p.dead || isStunned(p) || dist2d(p.pos, ward.pos) > INTERACT_RANGE + 1) {
-      if (p) clearNythraxisWardChannelCast(p);
+      if (p) stopNythraxisWardChannel(ctx, p, false);
       channel.playerId = null;
       channel.remaining = NYTHRAXIS_DEATHLESS_CHANNEL;
       continue;
     }
     channel.remaining = Math.max(0, channel.remaining - DT);
-    p.castingAbility = 'nythraxis_ward_channel';
+    p.castingAbility = NYTHRAXIS_WARD_CHANNEL_CAST_ID;
     p.channeling = true;
     p.castTotal = NYTHRAXIS_DEATHLESS_CHANNEL;
     p.castRemaining = channel.remaining;
@@ -964,7 +977,7 @@ export function updateNythraxisWardChannels(
     });
     if (channel.remaining <= 0) {
       channel.complete = true;
-      clearNythraxisWardChannelCast(p);
+      stopNythraxisWardChannel(ctx, p, true);
       ctx.emit({
         type: 'spellfx',
         sourceId: ward.id,
@@ -977,7 +990,7 @@ export function updateNythraxisWardChannels(
 }
 
 export function clearNythraxisWardChannelCast(p: Entity): void {
-  if (p.castingAbility !== 'nythraxis_ward_channel') return;
+  if (p.castingAbility !== NYTHRAXIS_WARD_CHANNEL_CAST_ID) return;
   p.castingAbility = null;
   p.channeling = false;
   p.castRemaining = 0;
@@ -1028,11 +1041,17 @@ export function tryStartNythraxisWardChannel(
   if (channel.playerId !== null && channel.playerId !== player.id) return true;
   channel.playerId = player.id;
   channel.remaining = NYTHRAXIS_DEATHLESS_CHANNEL;
-  player.castingAbility = 'nythraxis_ward_channel';
+  player.castingAbility = NYTHRAXIS_WARD_CHANNEL_CAST_ID;
   player.channeling = true;
   player.castTotal = NYTHRAXIS_DEATHLESS_CHANNEL;
   player.castRemaining = NYTHRAXIS_DEATHLESS_CHANNEL;
   player.castTargetId = null;
+  ctx.emit({
+    type: 'castStart',
+    entityId: player.id,
+    ability: NYTHRAXIS_WARD_CHANNEL_CAST_ID,
+    time: NYTHRAXIS_DEATHLESS_CHANNEL,
+  });
   ctx.emit({
     type: 'spellfx',
     sourceId: ward.id,

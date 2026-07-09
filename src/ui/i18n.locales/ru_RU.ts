@@ -1580,6 +1580,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.fishing': 'Рыбная ловля',
   'abilityUi.cast.thunzharrStormcall': 'Зов бури',
   'abilityUi.cast.demonHeal': 'Исцеление демона',
+  'abilityUi.cast.nythraxisDeathlessRage': 'Бессмертная ярость',
+  'abilityUi.cast.nythraxisWardChannel': 'Канал оберега',
   'questUi.tracker.title': 'Задания',
   'questUi.tracker.complete': 'Готово',
   'questUi.tracker.showOnMap': 'Показать {name} на карте',

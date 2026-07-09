@@ -208,6 +208,8 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
     // dummy mid-tick and evade-reset the boss (which reseeds the cadence).
     p.gm = true;
     let sawCastBar = false;
+    let sawCastStart = false;
+    let sawCastStopSuccess = false;
     let castYell = false;
     let unleashed = false;
     let wasCasting = false;
@@ -226,6 +228,24 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
         sawCastBar = true;
         expect(boss.castTotal).toBeCloseTo(3.5, 5);
       }
+      if (
+        events.some(
+          (e) =>
+            e.type === 'castStart' &&
+            (e as any).entityId === boss.id &&
+            (e as any).ability === 'thunzharr_stormcall',
+        )
+      ) {
+        sawCastStart = true;
+      }
+      if (
+        events.some(
+          (e) =>
+            e.type === 'castStop' && (e as any).entityId === boss.id && (e as any).success === true,
+        )
+      ) {
+        sawCastStopSuccess = true;
+      }
       if (chatYells(events).some((e) => /The storm answers my call!/.test((e as any).text)))
         castYell = true;
       // The quiet world boss no longer barks "unleashes Stormcall!", so the spell
@@ -234,9 +254,31 @@ describe('world boss raid-tier combat (melee, Stormcall hardcast, yells)', () =>
       wasCasting = castingNow;
     }
     expect(sawCastBar).toBe(true);
+    expect(sawCastStart).toBe(true);
+    expect(sawCastStopSuccess).toBe(true);
     expect(castYell).toBe(true);
     expect(unleashed).toBe(true);
     expect(boss.castingAbility).toBeNull(); // the bar cleared when the spell landed
+  });
+
+  it('emits castStop failure when a mid-flight Stormcall is reset', () => {
+    const sim = makeSim();
+    const { boss } = spawnBossNow(sim);
+    boss.castingAbility = 'thunzharr_stormcall';
+    boss.castTotal = 3.5;
+    boss.castRemaining = 1.25;
+    boss.castTargetId = null;
+    sim.drainEvents();
+
+    resetEvadingMob((sim as any).ctx, boss);
+
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'castStop',
+        entityId: boss.id,
+        success: false,
+      }),
+    );
   });
 
   it('barks the enrage yell when the last-fifth enrage turns on', () => {
@@ -503,8 +545,19 @@ describe('world boss loot roster survives contributor death and grouping', () =>
     (sim as any).dealDamage(e1, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
     expect(boss.dead).toBe(true);
     expect(boss.bossDamagers.has(p1)).toBe(true); // the kill snapshot already rolled loot
+    boss.castingAbility = 'thunzharr_stormcall';
+    boss.castTotal = 3.5;
+    boss.castRemaining = 1;
+    sim.drainEvents();
     respawnMob((sim as any).ctx, boss);
     expect(boss.bossDamagers.size).toBe(0);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'castStop',
+        entityId: boss.id,
+        success: false,
+      }),
+    );
   });
 
   it('the lootable corpse window always fits inside the spawn cadence (never overlaps)', () => {

@@ -4753,7 +4753,9 @@ export const vi_VN: EnTranslations = {
     "cast": {
       "fishing": "Câu Cá",
       "demonHeal": "Quỷ Trị Liệu",
-      "thunzharrStormcall": "Tiếng Gọi Bão"
+      "thunzharrStormcall": "Tiếng Gọi Bão",
+      "nythraxisDeathlessRage": "Deathless Rage",
+      "nythraxisWardChannel": "Ward Channel"
     }
   },
   "questUi": {

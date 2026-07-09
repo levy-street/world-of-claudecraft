@@ -4753,7 +4753,9 @@ export const ja_JP: EnTranslations = {
     "cast": {
       "fishing": "釣り",
       "demonHeal": "悪魔の治癒",
-      "thunzharrStormcall": "嵐の呼び声"
+      "thunzharrStormcall": "嵐の呼び声",
+      "nythraxisDeathlessRage": "不死の怒り",
+      "nythraxisWardChannel": "護石チャネル"
     }
   },
   "questUi": {

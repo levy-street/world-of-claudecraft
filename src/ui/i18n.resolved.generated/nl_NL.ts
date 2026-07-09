@@ -4753,7 +4753,9 @@ export const nl_NL: EnTranslations = {
     "cast": {
       "fishing": "Vissen",
       "demonHeal": "Demonengenezing",
-      "thunzharrStormcall": "Stormroep"
+      "thunzharrStormcall": "Stormroep",
+      "nythraxisDeathlessRage": "Deathless Rage",
+      "nythraxisWardChannel": "Ward Channel"
     }
   },
   "questUi": {

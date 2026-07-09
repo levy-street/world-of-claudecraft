@@ -4753,7 +4753,9 @@ export const sv_SE: EnTranslations = {
     "cast": {
       "fishing": "Fiske",
       "demonHeal": "Demonläkning",
-      "thunzharrStormcall": "Stormrop"
+      "thunzharrStormcall": "Stormrop",
+      "nythraxisDeathlessRage": "Deathless Rage",
+      "nythraxisWardChannel": "Ward Channel"
     }
   },
   "questUi": {

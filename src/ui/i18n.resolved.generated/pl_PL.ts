@@ -4753,7 +4753,9 @@ export const pl_PL: EnTranslations = {
     "cast": {
       "fishing": "Wędkarstwo",
       "demonHeal": "Demoniczne leczenie",
-      "thunzharrStormcall": "Zew burzy"
+      "thunzharrStormcall": "Zew burzy",
+      "nythraxisDeathlessRage": "Deathless Rage",
+      "nythraxisWardChannel": "Ward Channel"
     }
   },
   "questUi": {

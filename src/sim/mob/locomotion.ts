@@ -461,6 +461,7 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.castTotal = 0;
         mob.castRemaining = 0;
         mob.castTargetId = null;
+        ctx.emit({ type: 'castStop', entityId: mob.id, success: true });
         const school = (bigCast.school ?? 'nature') as Aura['school'];
         ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
         if (!MOBS[mob.templateId]?.quietMechanics)
@@ -489,6 +490,12 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.castRemaining = bigCast.castTime;
         mob.castTargetId = null;
         mob.channeling = false;
+        ctx.emit({
+          type: 'castStart',
+          entityId: mob.id,
+          ability: bigCast.castId,
+          time: bigCast.castTime,
+        });
         if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
       }
     }
@@ -651,6 +658,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
     mob.castTotal = 0;
     mob.castRemaining = 0;
     mob.castTargetId = null;
+    ctx.emit({ type: 'castStop', entityId: mob.id, success: false });
   }
   mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);

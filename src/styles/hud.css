@@ -152,12 +152,17 @@
   .np-castlabel {
     position: absolute;
     inset: 0;
+    box-sizing: border-box;
+    padding: 0 2px;
     font-size: 9px;
     line-height: 9px;
     font-weight: bold;
     color: #fff;
     text-shadow: 1px 1px 1px #000;
-    letter-spacing: 0.2px;
+    letter-spacing: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   /* threat plate: this mob is aggroed on me, red bar + soft glow */
   .nameplate.np-threat .np-hpbar {
@@ -1437,6 +1442,10 @@
   }
   .pet-btn.cooldown.autocast .icon-label {
     filter: grayscale(0.45) brightness(0.78);
+  }
+  .pet-btn:not(.cooldown) .action-label,
+  .pet-btn:not(.cooldown) .cdtext {
+    display: none;
   }
   .pet-btn .auto-badge {
     position: absolute;

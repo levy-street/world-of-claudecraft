@@ -4753,7 +4753,9 @@ export const ko_KR: EnTranslations = {
     "cast": {
       "fishing": "낚시",
       "demonHeal": "악마 치유",
-      "thunzharrStormcall": "폭풍의 부름"
+      "thunzharrStormcall": "폭풍의 부름",
+      "nythraxisDeathlessRage": "불멸의 격노",
+      "nythraxisWardChannel": "수호석 정신 집중"
     }
   },
   "questUi": {

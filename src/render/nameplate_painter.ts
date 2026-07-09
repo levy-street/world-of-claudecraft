@@ -17,9 +17,9 @@
 // ui_tier_knobs.nameplateIntervalSec), which the renderer reads, not the painter.
 
 import * as THREE from 'three';
-import { ABILITIES, MOBS, QUESTS } from '../sim/data';
+import { MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { DEMON_HEAL_CAST_ID, type Entity, FISHING_CAST_ID, isQuestTurnInNpc } from '../sim/types';
+import { type Entity, isQuestTurnInNpc } from '../sim/types';
 import {
   devTierBadgeDataUrl,
   devTierByIndex,
@@ -35,6 +35,7 @@ import {
 } from '../ui/holder_tier';
 import { formatNumber, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
+import { castCueText, castDisplayName, castLabelWithCue } from '../ui/cast_presentation';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
 import { castBarState } from './cast_bar';
@@ -50,23 +51,6 @@ import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
 const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
-
-const nameplateCastDisplayName = (id: string): string => {
-  if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
-  if (id === DEMON_HEAL_CAST_ID) return t('abilityUi.cast.demonHeal');
-  if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
-  return ABILITIES[id] ? tEntity({ kind: 'ability', id, field: 'name' }) : id;
-};
-
-function castCueText(st: ReturnType<typeof castBarState>): string {
-  const cues: string[] = [];
-  if (st.source === 'pet') cues.push(t('hudChrome.castBar.pet'));
-  if (st.kind === 'channel') cues.push(t('hudChrome.castBar.channeling'));
-  if (st.important) cues.push(t('hudChrome.castBar.danger'));
-  if (st.interrupt === 'uninterruptible') cues.push(t('hudChrome.castBar.cannotInterrupt'));
-  else if (st.interrupt === 'interruptible') cues.push(t('hudChrome.castBar.interruptible'));
-  return cues.join(', ');
-}
 
 export interface NameplatePainterDeps {
   /** the per-entity view pool the renderer owns (keyed by entity id) */
@@ -482,8 +466,8 @@ export class NameplatePainter {
     v.castBar.classList.toggle('important', st.important);
     v.castFill.style.width = `${(st.fill * 100).toFixed(1)}%`;
     // cast_bar.ts keeps st.label as a stable id (DOM/i18n-free); localize here.
-    const label = nameplateCastDisplayName(st.label);
-    const cue = castCueText(st);
-    v.castLabel.textContent = cue ? t('hudChrome.castBar.labelWithCue', { cue, label }) : label;
+    const label = castDisplayName(st.label);
+    const cue = castCueText(st, { showInterruptCues: true });
+    v.castLabel.textContent = castLabelWithCue(label, cue);
   }
 }

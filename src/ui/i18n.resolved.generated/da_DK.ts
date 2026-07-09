@@ -4753,7 +4753,9 @@ export const da_DK: EnTranslations = {
     "cast": {
       "fishing": "Fiskeri",
       "demonHeal": "Dæmonhelbredelse",
-      "thunzharrStormcall": "Stormkald"
+      "thunzharrStormcall": "Stormkald",
+      "nythraxisDeathlessRage": "Deathless Rage",
+      "nythraxisWardChannel": "Ward Channel"
     }
   },
   "questUi": {

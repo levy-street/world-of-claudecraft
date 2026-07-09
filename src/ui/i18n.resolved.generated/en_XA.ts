@@ -4753,7 +4753,9 @@ export const en_XA: EnTranslations = {
     "cast": {
       "fishing": "[Ƒíšĥíñĝ]",
       "demonHeal": "[Ðéɱóñ Ĥéáļ]",
-      "thunzharrStormcall": "[Šţóŕɱçáļļ]"
+      "thunzharrStormcall": "[Šţóŕɱçáļļ]",
+      "nythraxisDeathlessRage": "[Ðéáţĥļéšš Ŕáĝé]",
+      "nythraxisWardChannel": "[Ŵáŕð Çĥáññéļ]"
     }
   },
   "questUi": {

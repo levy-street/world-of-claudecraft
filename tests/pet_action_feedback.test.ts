@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { formatNumber, t } from '../src/ui/i18n';
 import {
@@ -10,6 +11,9 @@ describe('pet action feedback', () => {
   it('formats cooldowns with units instead of a bare number', () => {
     const unit = t('hudChrome.unitFrame.durationUnitSeconds');
     expect(formatPetCooldownShort(6.1, formatNumber, unit)).toBe('7s');
+    expect(formatPetCooldownShort(1, formatNumber, unit)).toBe('1s');
+    expect(formatPetCooldownShort(0.95, formatNumber, unit)).toBe('1s');
+    expect(formatPetCooldownShort(0.94, formatNumber, unit)).toBe('0.9s');
     expect(formatPetCooldownShort(0.7, formatNumber, unit)).toBe('0.7s');
     expect(formatPetCooldownShort(0.01, formatNumber, unit)).toBe('0.1s');
   });
@@ -41,5 +45,14 @@ describe('pet action feedback', () => {
     expect(ready.title).toBe(t('hud.pet.taunt'));
     expect(ready.ariaLabel).toBe(t('hud.pet.taunt'));
     expect(ready.autoBadge).toBeUndefined();
+  });
+
+  it('keeps pet cooldown text out of the full pet bar rebuild signature', () => {
+    const src = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const sigLine = src.match(/const sig = `\$\{pet\.id\}:[^`]+`;/)?.[0] ?? '';
+
+    expect(src).toContain('updatePetTauntCooldown(');
+    expect(sigLine).not.toContain('tauntCooldownText');
+    expect(sigLine).not.toContain('tauntCooldownProgress');
   });
 });

@@ -11,8 +11,8 @@
 // PLAYER bar (#castbar) and the TARGET bar (#tf-castbar) from their own element
 // sets. The two differ only in their options, never in a branch on "which bar":
 //   - `resolveCastLabel` localizes the cast id. The player resolves it through
-//     castDisplayName (the ability's localized name); the target shows the raw cast
-//     id, byte-faithful to its inline block, by passing the identity resolver.
+//     castDisplayName (the ability's localized name); the target can pass the same
+//     resolver so boss/scripted ids do not leak through as raw tokens.
 //   - the eat/drink overlay is PLAYER-ONLY: the target never eats/drinks, so its
 //     paint input simply omits `consume` and the consume branch is unreachable for
 //     it (the generic-Entity cast path stays the target's whole story).
@@ -32,6 +32,8 @@ import type {
   ConsumeBarState,
   ConsumeMode,
 } from '../render/cast_bar';
+import type { CastOutcomeKind, CastOutcomeState } from './cast_outcome_core';
+import { castCueText, castLabelWithCue } from './cast_presentation';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
 
@@ -48,7 +50,7 @@ const PET_SOURCE_CLASS = 'cast-source-pet';
 const INTERRUPTIBLE_CLASS = 'interruptible';
 const UNINTERRUPTIBLE_CLASS = 'uninterruptible';
 const IMPORTANT_CLASS = 'important';
-const OUTCOME_CLASSES: Record<CastBarOutcomeKind, string> = {
+const OUTCOME_CLASSES: Record<CastOutcomeKind, string> = {
   success: 'outcome-success',
   interrupted: 'outcome-interrupted',
   failed: 'outcome-failed',
@@ -69,13 +71,6 @@ const CONSUME_LABEL_KEYS: Record<ConsumeMode, TranslationKey> = {
   drink: 'hud.core.drinking',
   eatdrink: 'hud.core.eatingDrinking',
 };
-
-export type CastBarOutcomeKind = 'success' | 'interrupted' | 'failed';
-
-export interface CastBarOutcomeState {
-  kind: CastBarOutcomeKind;
-  label: string;
-}
 
 /** The four DOM nodes one cast-bar instance paints into. */
 export interface CastBarElements {
@@ -114,7 +109,7 @@ export interface CastBarPaintInput {
    *  the target instance can never render eat/drink. */
   consume?: ConsumeBarState;
   /** Short success/interrupted/failed presentation pulse after the live cast ends. */
-  outcome?: CastBarOutcomeState;
+  outcome?: CastOutcomeState;
 }
 
 export class CastBarPainter {
@@ -129,12 +124,7 @@ export class CastBarPainter {
   paint(input: CastBarPaintInput): void {
     if (input.cast.visible) {
       const label = this.opts.resolveCastLabel(input.cast);
-      const cue = this.cueText(
-        input.cast.kind,
-        input.cast.source,
-        input.cast.interrupt,
-        input.cast.important,
-      );
+      const cue = castCueText(input.cast, { showInterruptCues: this.opts.showInterruptCues });
       const status =
         input.cast.kind === 'channel'
           ? t('hudChrome.castBar.channeling')
@@ -148,7 +138,7 @@ export class CastBarPainter {
         important: input.cast.important,
         fill: input.cast.fill,
         label,
-        visibleLabel: this.withCue(label, cue),
+        visibleLabel: castLabelWithCue(label, cue),
         timer,
         status,
         ariaLabel: this.statusAria(status, label, timer),
@@ -217,7 +207,7 @@ export class CastBarPainter {
     this.writers.setAttr(this.el.bar, 'aria-label', model.ariaLabel);
   }
 
-  private paintOutcome(outcome: CastBarOutcomeState): void {
+  private paintOutcome(outcome: CastOutcomeState): void {
     const status = this.outcomeStatus(outcome.kind);
     this.writers.setDisplay(this.el.bar, SHOWN_DISPLAY);
     this.applyClasses({
@@ -229,7 +219,7 @@ export class CastBarPainter {
       outcome: outcome.kind,
     });
     this.writers.setWidth(this.el.fill, `${(100).toFixed(PERCENT_FRACTION_DIGITS)}%`);
-    this.writers.setText(this.el.label, this.withCue(outcome.label, status));
+    this.writers.setText(this.el.label, castLabelWithCue(outcome.label, status));
     this.writers.setText(this.el.timer, '');
     this.writers.setAttr(this.el.bar, 'aria-valuenow', '100');
     this.writers.setAttr(
@@ -260,29 +250,7 @@ export class CastBarPainter {
     });
   }
 
-  private cueText(
-    kind: CastBarKind,
-    source: CastBarSource,
-    interrupt: CastBarInterrupt,
-    important: boolean,
-  ): string {
-    const cues: string[] = [];
-    if (source === 'pet') cues.push(t('hudChrome.castBar.pet'));
-    if (kind === 'channel') cues.push(t('hudChrome.castBar.channeling'));
-    if (important) cues.push(t('hudChrome.castBar.danger'));
-    if (this.opts.showInterruptCues !== false && source !== 'pet') {
-      if (interrupt === 'uninterruptible') cues.push(t('hudChrome.castBar.cannotInterrupt'));
-      else if (interrupt === 'interruptible') cues.push(t('hudChrome.castBar.interruptible'));
-    }
-    return cues.join(', ');
-  }
-
-  private withCue(label: string, cue: string): string {
-    if (!cue) return label;
-    return t('hudChrome.castBar.labelWithCue', { cue, label });
-  }
-
-  private outcomeStatus(kind: CastBarOutcomeKind): string {
+  private outcomeStatus(kind: CastOutcomeKind): string {
     switch (kind) {
       case 'success':
         return t('hudChrome.castBar.complete');
@@ -299,7 +267,7 @@ export class CastBarPainter {
     source: CastBarSource;
     interrupt: CastBarInterrupt;
     important: boolean;
-    outcome?: CastBarOutcomeKind;
+    outcome?: CastOutcomeKind;
   }): void {
     const sig = [
       model.channel ? '1' : '0',
@@ -324,7 +292,7 @@ export class CastBarPainter {
     );
     this.writers.toggleClass(this.el.bar, IMPORTANT_CLASS, model.important);
     for (const [kind, className] of Object.entries(OUTCOME_CLASSES) as [
-      CastBarOutcomeKind,
+      CastOutcomeKind,
       string,
     ][]) {
       this.writers.toggleClass(this.el.bar, className, model.outcome === kind);

@@ -91,6 +91,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
     mob.castTotal = 0;
     mob.castRemaining = 0;
     mob.castTargetId = null;
+    ctx.emit({ type: 'castStop', entityId: mob.id, success: false });
   }
   mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);

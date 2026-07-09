@@ -4753,7 +4753,9 @@ export const zh_TW: EnTranslations = {
     "cast": {
       "fishing": "釣魚",
       "demonHeal": "惡魔治療",
-      "thunzharrStormcall": "風暴召喚"
+      "thunzharrStormcall": "風暴召喚",
+      "nythraxisDeathlessRage": "不死之怒",
+      "nythraxisWardChannel": "守衛引導"
     }
   },
   "questUi": {

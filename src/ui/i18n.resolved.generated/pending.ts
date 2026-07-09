@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -38,6 +40,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "es_ES": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -66,6 +70,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "fr_FR": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -94,6 +100,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "fr_CA": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -123,6 +131,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -151,6 +161,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "de_DE": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -191,6 +203,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag"
   ],
   "pt_BR": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -222,6 +236,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemHeroicTag"
   ],
   "cs_CZ": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -250,6 +266,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "nl_NL": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -278,6 +296,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "pl_PL": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -306,6 +326,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "id_ID": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -334,6 +356,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "tr_TR": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -362,6 +386,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "sv_SE": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -390,6 +416,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "vi_VN": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
@@ -418,6 +446,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.petAction.cooldownTitle"
   ],
   "da_DK": [
+    "abilityUi.cast.nythraxisDeathlessRage",
+    "abilityUi.cast.nythraxisWardChannel",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",

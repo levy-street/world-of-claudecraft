@@ -4753,7 +4753,9 @@ export const id_ID: EnTranslations = {
     "cast": {
       "fishing": "Memancing",
       "demonHeal": "Penyembuhan Iblis",
-      "thunzharrStormcall": "Panggilan Badai"
+      "thunzharrStormcall": "Panggilan Badai",
+      "nythraxisDeathlessRage": "Deathless Rage",
+      "nythraxisWardChannel": "Ward Channel"
     }
   },
   "questUi": {

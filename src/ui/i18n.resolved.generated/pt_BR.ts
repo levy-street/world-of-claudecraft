@@ -4753,7 +4753,9 @@ export const pt_BR: EnTranslations = {
     "cast": {
       "fishing": "Pesca",
       "demonHeal": "Cura demoníaca",
-      "thunzharrStormcall": "Chamado da Tempestade"
+      "thunzharrStormcall": "Chamado da Tempestade",
+      "nythraxisDeathlessRage": "Deathless Rage",
+      "nythraxisWardChannel": "Ward Channel"
     }
   },
   "questUi": {

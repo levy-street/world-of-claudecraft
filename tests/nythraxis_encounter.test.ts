@@ -181,6 +181,54 @@ describe('Nythraxis encounter module (N1)', () => {
     }
   });
 
+  it('Deathless Rage emits authoritative cast events on start and completion', () => {
+    const { sim, ctx, boss, tank, dps } = setup();
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    for (const p of [tank, ...dps]) {
+      p.maxHp = 1000;
+      p.hp = 1000;
+    }
+    sim.drainEvents();
+
+    nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'castStart',
+        entityId: boss.id,
+        ability: 'nythraxis_deathless_rage',
+      }),
+    );
+
+    st.deathlessCastRemaining = 0.01;
+    nythraxis.updateNythraxisDeathlessRage(ctx, boss, st);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'castStop',
+        entityId: boss.id,
+        success: true,
+      }),
+    );
+  });
+
+  it('Deathless Rage emits castStop failure on reset cleanup', () => {
+    const { sim, ctx, boss } = setup();
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
+    sim.drainEvents();
+
+    nythraxis.resetNythraxisEncounter(ctx, boss);
+
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'castStop',
+        entityId: boss.id,
+        success: false,
+      }),
+    );
+  });
+
   it('Soul Rend marks up to three distinct non-tank players (the rng.int pick)', () => {
     const { ctx, boss, tank, dps } = setup();
     const st = nythraxis.initNythraxisEncounter(boss);
@@ -203,6 +251,7 @@ describe('Nythraxis encounter module (N1)', () => {
     const st = nythraxis.initNythraxisEncounter(boss);
     st.phase = 2;
     nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
+    sim.drainEvents();
     expect(st.deathlessCastRemaining).toBeGreaterThan(0);
     expect(st.wardChannels.length).toBe(3);
     const wards = [...ctx.entities.values()]
@@ -227,6 +276,13 @@ describe('Nythraxis encounter module (N1)', () => {
     expect(st.deathlessStunRemaining).toBeGreaterThan(0);
     expect(st.deathlessCastRemaining).toBe(0);
     expect(boss.auras.some((a) => a.id === 'nythraxis_deathless_stun')).toBe(true);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'castStop',
+        entityId: boss.id,
+        success: false,
+      }),
+    );
   });
 
   it('a wardstone with no boss in range falls through (overworld Sunken Bastion stone)', () => {
