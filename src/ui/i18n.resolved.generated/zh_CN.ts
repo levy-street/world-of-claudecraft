@@ -4605,13 +4605,13 @@ export const zh_CN: EnTranslations = {
         "name": "无敌"
       },
       "stealth": {
-        "name": "潜行"
+        "name": "帷影步"
       },
       "endless_mana": {
         "name": "无尽法力"
       },
       "berserk": {
-        "name": "狂暴"
+        "name": "战争狂热"
       }
     },
     "grab": {

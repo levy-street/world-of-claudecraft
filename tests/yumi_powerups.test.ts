@@ -80,7 +80,7 @@ function duelWorld() {
   };
 }
 
-const hit = (sim: Sim, src: Entity, tgt: Entity, amount: number) =>
+const hit = (sim: Sim, src: Entity | null, tgt: Entity, amount: number) =>
   (sim as any).dealDamage(src, tgt, amount, false, 'physical', null, 'hit');
 
 // A player attacker + a fresh 5000 hp hostile mob target: dealDamage applies the
@@ -546,6 +546,45 @@ describe('yumi power-up heartbeat cadence', () => {
     expect(beat.groundPowerups.length).toBe(1);
     expect(beat.groundPowerups[0].id).toBe(y.powerups[0].id);
     expect(beat.groundPowerups[0].state).toBe('spawning');
+  });
+
+  it('the telegraph turning ready mid-second fires an immediate beat', () => {
+    // The 4s telegraph ends mid-second more often than not; without the
+    // transition beat, other clients keep drawing a not-yet-grabbable orb.
+    const { sim, match, ctx, pids } = startYumi('yumi3');
+    const y = (match as any).yumi;
+    spawnYumiPowerup(ctx, match);
+    const orb = y.powerups[0];
+    pastSecondEdge(sim, match);
+    orb.state = 'spawning';
+    orb.timer = 2 * DT; // turns ready two ticks from now, mid-second
+    sim.tick();
+    expect(y.powerups[0].state).toBe('spawning');
+    const evs = sim.tick(); // the ready tick
+    expect(y.powerups[0].state).toBe('ready');
+    const beat = evs.find((ev) => ev.type === 'yumiStatus' && (ev as any).pid === pids[0]) as any;
+    expect(beat).toBeTruthy();
+    expect(beat.groundPowerups[0].state).toBe('ready');
+  });
+
+  it('a grab completing mid-second fires an immediate beat with the orb consumed', () => {
+    // Without this beat the grabbed orb lingers as a phantom on OTHER clients
+    // until the next whole-second heartbeat (the grabber gets the instant
+    // yumiPowerup event, everyone else only has the orb list).
+    const res = startYumi('yumi3');
+    const { sim, match, ctx, pids } = res;
+    const y = (match as any).yumi;
+    const { orb, e } = readyOrbUnder(res, match.teamA[0]);
+    pastSecondEdge(sim, match);
+    startYumiGrab(ctx, match, e, orb.id);
+    e.yumiGrabRemaining = 2 * DT; // the channel completes two ticks from now, mid-second
+    sim.tick();
+    expect(y.powerups.length).toBe(1);
+    const evs = sim.tick(); // the completion tick
+    expect(y.powerups.length).toBe(0);
+    const beat = evs.find((ev) => ev.type === 'yumiStatus' && (ev as any).pid === pids[0]) as any;
+    expect(beat).toBeTruthy();
+    expect(beat.groundPowerups.length).toBe(0);
   });
 
   it('an orb timing out mid-second fires an immediate beat with the orb gone', () => {

@@ -4605,13 +4605,13 @@ export const ko_KR: EnTranslations = {
         "name": "무적"
       },
       "stealth": {
-        "name": "은신"
+        "name": "베일스텝"
       },
       "endless_mana": {
         "name": "무한 마나"
       },
       "berserk": {
-        "name": "광폭화"
+        "name": "워피버"
       }
     },
     "grab": {

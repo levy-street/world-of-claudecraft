@@ -30,7 +30,7 @@ import { isStunned } from '../combat/cc';
 import { yumiMazeOrigin } from '../data';
 import type { ArenaMatch, YumiGroundPowerup } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type AuraKind, DT, type Entity } from '../types';
+import { type AuraKind, DT, type Entity, type YumiGroundPowerupView } from '../types';
 import { teleportPoints, yumiMazeLayout } from '../yumi_maze_layout';
 
 // ---- Tuning (all configurable in one place) --------------------------------
@@ -63,9 +63,9 @@ export interface MysteryPowerupDef {
 
 export const MYSTERY_POWERUPS: MysteryPowerupDef[] = [
   { id: 'invuln', auraKind: 'pu_invuln', auraName: 'Invulnerable', auraColor: 0xffd700, value: 1 },
-  // Stealth deliberately has NO carrier aura (auraColor null): a glow would give
-  // the hidden player away.
-  { id: 'stealth', auraKind: 'pu_stealth', auraName: 'Stealth', auraColor: null, value: 1 },
+  // Veilstep (the hide-me power-up) deliberately has NO carrier aura
+  // (auraColor null): a glow would give the hidden player away.
+  { id: 'stealth', auraKind: 'pu_stealth', auraName: 'Veilstep', auraColor: null, value: 1 },
   {
     id: 'endless_mana',
     auraKind: 'pu_endless_mana',
@@ -76,7 +76,7 @@ export const MYSTERY_POWERUPS: MysteryPowerupDef[] = [
   {
     id: 'berserk',
     auraKind: 'pu_berserk',
-    auraName: 'Berserker',
+    auraName: 'Warfever',
     auraColor: 0xff3b30,
     value: YUMI_BERSERK_DMG_MULT,
   },
@@ -282,14 +282,9 @@ export function applyMysteryPowerup(ctx: SimContext, e: Entity, defId: string): 
 }
 
 // ---- Presentation reads (consumed by yumiMatchInfo / the HUD timer) ---------
-
-export interface YumiGroundPowerupView {
-  id: number;
-  x: number;
-  z: number;
-  state: 'spawning' | 'ready';
-  frac: number; // spawning: telegraph progress 0..1; ready: lifetime remaining 0..1
-}
+// The view shape itself (YumiGroundPowerupView) lives in types.ts so the
+// yumiStatus event and this builder share ONE named type and the wire shape
+// cannot silently narrow.
 
 // The orbs as the renderer/HUD sees them: position + state + progress, but NEVER
 // the type (the mystery is the whole point; every orb is a `(?)`).

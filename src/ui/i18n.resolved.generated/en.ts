@@ -4605,13 +4605,13 @@ export const en: EnTranslations = {
         "name": "Invulnerable"
       },
       "stealth": {
-        "name": "Stealth"
+        "name": "Veilstep"
       },
       "endless_mana": {
         "name": "Endless Mana"
       },
       "berserk": {
-        "name": "Berserker"
+        "name": "Warfever"
       }
     },
     "grab": {

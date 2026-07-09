@@ -4605,13 +4605,13 @@ export const en_XA: EnTranslations = {
         "name": "[Íñʋúļñéŕáƀļé]"
       },
       "stealth": {
-        "name": "[Šţéáļţĥ]"
+        "name": "[Ʋéíļšţéþ]"
       },
       "endless_mana": {
         "name": "[Éñðļéšš Ɱáñá]"
       },
       "berserk": {
-        "name": "[Ɓéŕšéŕķéŕ]"
+        "name": "[Ŵáŕƒéʋéŕ]"
       }
     },
     "grab": {

@@ -4605,13 +4605,13 @@ export const ru_RU: EnTranslations = {
         "name": "Неуязвимость"
       },
       "stealth": {
-        "name": "Маскировка"
+        "name": "Вуальный шаг"
       },
       "endless_mana": {
         "name": "Бесконечная мана"
       },
       "berserk": {
-        "name": "Берсерк"
+        "name": "Боевая лихорадка"
       }
     },
     "grab": {

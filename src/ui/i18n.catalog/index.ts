@@ -990,11 +990,13 @@ export const en = {
       powerupMine: '{name}!',
     },
     // Mystery power-up names, revealed only on pickup (social/yumi_powerups.ts).
+    // Veilstep/Warfever are original coinages (the G0 de-IP gate denylists the
+    // verbatim classic names); keep them in sync with the sim auraName values.
     powerup: {
       invuln: { name: 'Invulnerable' },
-      stealth: { name: 'Stealth' },
+      stealth: { name: 'Veilstep' },
       endless_mana: { name: 'Endless Mana' },
-      berserk: { name: 'Berserker' },
+      berserk: { name: 'Warfever' },
     },
     // The hold-to-grab channel bar (yumi_grab_bar_painter.ts).
     grab: {

@@ -2287,6 +2287,18 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
+// A ground mystery power-up as presentation sees it, TYPE-FREE (every orb is a
+// `(?)`; the defId never leaves the sim). Built by yumiPowerupViews in
+// social/yumi_powerups.ts and carried on BOTH the yumiStatus heartbeat and
+// arenaInfo; src/world_api/duel_arena.ts mirrors this shape at the IWorld seam.
+export interface YumiGroundPowerupView {
+  id: number;
+  x: number;
+  z: number;
+  state: 'spawning' | 'ready';
+  frac: number; // spawning: telegraph progress 0..1; ready: lifetime remaining 0..1
+}
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -2472,7 +2484,8 @@ export type SimEvent = { pid?: number } & (
   // starts; `yumiStatus` is the once-per-second personal scoreboard heartbeat
   // (the arena wire field is rate-limited and the enemy cat can sit outside
   // interest range, so the live bars ride the event queue like fiesta's
-  // dynamics do).
+  // dynamics do). The heartbeat's orb list is the named YumiGroundPowerupView
+  // (declared above the union) so the wire shape cannot silently narrow.
   | { type: 'yumiTeleport'; catId: number; fromX: number; fromZ: number; toX: number; toZ: number }
   | { type: 'yumiDown'; seconds: number }
   | { type: 'yumiSuddenDeath' }
@@ -2498,13 +2511,7 @@ export type SimEvent = { pid?: number } & (
       // into its mirrored arenaInfo. A heartbeat also fires IMMEDIATELY on any
       // orb transition (spawn, ready, grab, timeout), on every host, so the
       // orbs pop in and vanish without waiting for the next whole second.
-      groundPowerups: {
-        id: number;
-        x: number;
-        z: number;
-        state: 'spawning' | 'ready';
-        frac: number;
-      }[];
+      groundPowerups: YumiGroundPowerupView[];
     }
   // A mystery power-up appeared on the maze (personal per fighter): drives the
   // "available" banner + audio cue. The persistent (?) orb itself renders from

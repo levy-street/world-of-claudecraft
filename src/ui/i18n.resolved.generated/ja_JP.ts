@@ -4605,13 +4605,13 @@ export const ja_JP: EnTranslations = {
         "name": "無敵"
       },
       "stealth": {
-        "name": "ステルス"
+        "name": "ヴェイルステップ"
       },
       "endless_mana": {
         "name": "無限マナ"
       },
       "berserk": {
-        "name": "バーサーカー"
+        "name": "ウォーフィーバー"
       }
     },
     "grab": {
