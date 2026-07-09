@@ -609,37 +609,32 @@ str/agi/sta/int/spi. Haste and crit are SECONDARY and off this budget
 | waist / gloves | 16 | 17 |
 | feet | 15 | 16 |
 
-### Secondary stats: haste and crit RATING debut in this raid
+### Secondary stats: haste and crit RATING (already engine-supported)
 
-New itemization axis, and this raid is where it starts. Two hard facts
-from the code, because they turn this from a data edit into a small
-feature:
+CORRECTION (verified against release/v0.24.0; an earlier draft of this
+section was written against an older branch and was WRONG): per-item
+haste/crit rating is ALREADY wired. This is DATA-ONLY, not an engine
+change.
 
-- ENGINE GAP: per-item haste/crit is NOT wired today.
-  `recalcPlayerStats` sources haste only from set bonuses
-  (`e.meleeHaste = setEff.haste`, "the only haste-gear source") and crit
-  from agility + talents + set bonuses (`setEff.crit`, `mods.stats.crit`).
-  Individual `item.stats.haste` / `item.stats.crit` are never summed off
-  equipped gear. Shipping secondaries on loot REQUIRES a focused
-  `recalcPlayerStats` change: aggregate equipped-item haste/crit alongside
-  the existing set/talent sources. That change lands in PR A (wing 1 is
-  the first gear that carries them) and is the load-bearing engine work of
-  the whole raid.
-- BUDGET GAP: `tests/item_level` only sums PRIMARY_STATS, so haste/crit
-  are invisible to it, i.e. "free power" unless we self-govern. Convention,
-  locked here: an item carries EITHER a full primary budget OR trades a
-  fixed slice of it for a secondary (roughly 1 primary point buys ~1.2
-  secondary points, tuning), never both at full. A new guard test
-  (`item_level` extension) should enforce "primary + secondary/1.2 == the
-  slot budget" so secondaries stay on-budget. Without it, authoring drift
-  silently inflates the raid.
-
-Stat model recommendation: keep the game's existing FLAT-PERCENT model
-(crit is `0..1`, haste is a fraction), and treat "rating" as flavor text,
-not a new conversion curve. A true WoW-style rating-with-diminishing-
-returns system is a much larger change and does not match the codebase; I
-do not recommend it unless you specifically want DR. (Flagged as an open
-question either way.)
+- ENGINE (shipped): `ItemDef` already has `critRating` / `hasteRating`
+  fields, and `recalcPlayerStats` already aggregates them off equipped gear
+  (`bonusCritRating += item.critRating`, `bonusHasteRating += item.hasteRating`),
+  adds set-bonus rating, and converts to a fraction via
+  `critFractionFromRating` / `hasteFractionFromRating`. The rating model is
+  `HASTE_RATING_PER_PCT = 10` and `CRIT_RATING_PER_PCT = 10` (10 rating =
+  1%), so the game already uses RATINGS, not flat percents, and
+  `item_sets.ts` already grants them. Authoring secondaries on this raid's
+  loot is just setting `critRating`/`hasteRating` on the item records. PR A
+  needs NO `recalcPlayerStats` change (this supersedes the old claim that
+  it did).
+- BUDGET GAP (still real): `tests/item_level` only sums PRIMARY_STATS
+  (str/agi/sta/int/spi), so `critRating`/`hasteRating` are invisible to it,
+  i.e. "free power" with no guard. Existing gear authors rating by hand with
+  no test. Self-imposed convention for this raid: an item carries EITHER a
+  full primary budget OR trades a fixed slice for rating (roughly 1 primary
+  point buys ~12 rating, i.e. ~1.2%, tuning), never both at full. A small
+  `item_level` guard extension would enforce it; recommended but not
+  strictly required (the rest of the game ships without it).
 
 Who carries secondaries (the raid's identity, not every piece): weapons
 and the off-piece rings/waists lead with them (the "texture" notes below
@@ -852,11 +847,10 @@ land.
 - New set-bonus text rows: overlay translations per the established process.
 - Guide: `npm run wiki:content` regen + `wiki:stills` for the boss model
   (spoiler-safe surface only: the guide must not describe mechanics or loot).
-- ENGINE: per-item haste/crit support in `recalcPlayerStats` (aggregate
-  equipped-item `stats.haste`/`stats.crit` alongside the existing set/talent
-  sources), plus a `tests/item_level` extension enforcing the
-  primary+secondary on-budget convention. This is the one non-content code
-  change the raid REQUIRES; it lands in PR A and everything above assumes it.
+- ENGINE: none required for secondaries. Per-item `critRating`/`hasteRating`
+  are already aggregated in `recalcPlayerStats` on release/v0.24.0 (see the
+  Secondary stats section). Optional nicety: a `tests/item_level` guard
+  extension for the primary+rating on-budget convention, not a blocker.
 - Tests: `tests/parity` scenario covering vent + nest + Vent Surge rng draw
   order AND a geyser-launch replay (fall damage is sim state); item budget
   rows land free in `tests/item_level`; encounter unit tests for vent
@@ -928,11 +922,10 @@ Cross-cutting:
   baseline surface camp if the full world event PR F is not yet live),
   i18n for all of it, tests. Data-heavy, no required encounter module:
   deliberately the cheapest PR first, and it proves the wing/unseal
-  skeleton every later PR reuses. PR A ALSO carries the one required
-  engine change: per-item haste/crit in `recalcPlayerStats` + the
-  secondary-budget guard test, since wing 1 is the first gear to itemize
-  secondaries. (The optional re-kiln hook, if kept, rides PR A as its one
-  small scripted piece or slips to a follow-up.)
+  skeleton every later PR reuses. No engine change needed for secondaries
+  (per-item `critRating`/`hasteRating` already ship on v0.24.0); wing 1
+  gear just sets those fields. (The optional re-kiln hook, if kept, rides
+  PR A as its one small scripted piece or slips to a follow-up.)
 - PR B (wing 2): the Forge-Heart module (quench meter, ritualist waves),
   its arena, rings + loot, i18n, meter unit tests + a parity scenario.
 - PR C (wing 3): the Odrenn module (marks + flips, the proximity pass,
@@ -995,8 +988,7 @@ worktree, screenshots for anything visual, `npm run gate` green.
 12. RESOLVED (normal mode): first three bosses ilvl 33, Volzharr ilvl 35
     (boss levels 24 and 26). Heroic/higher-mode ilvls, if the raid gains
     difficulty modes, are deferred to the mythic+/forged PRD.
-13. Secondary stat model: keep flat-percent (recommended, matches the
-    codebase) or introduce a true rating-with-diminishing-returns system
-    (much larger, not recommended)? And the exact primary->secondary trade
-    ratio (~1 : 1.2 placeholder) plus whether the guard test is required
-    (recommended yes) before authoring any secondary.
+13. RESOLVED: the game already uses a rating model (`critRating`/`hasteRating`,
+    10 rating = 1%), so secondaries are data-only. Remaining tuning: the
+    primary->rating trade ratio (~1 primary : ~12 rating placeholder) and
+    whether to add the optional `item_level` budget guard.

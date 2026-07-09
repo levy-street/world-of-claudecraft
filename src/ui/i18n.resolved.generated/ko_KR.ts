@@ -7164,6 +7164,18 @@ export const ko_KR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "the_forge_heart": {
+        "name": "The Forge-Heart"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },
@@ -8487,6 +8499,26 @@ export const ko_KR: EnTranslations = {
         "name": "니트락시스 공격대 투기장",
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
+      },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Quenching",
+        "enterText": "Steam curls from the flooded forges ahead.",
+        "leaveText": "You leave the quenching halls behind."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing4": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
       },
       "drowned_temple": {
         "name": "익사한 신전",

@@ -7164,6 +7164,18 @@ export const id_ID: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Bencana Thornpeak"
       },
+      "vosh_the_glazier": {
+        "name": "Vosh the Glazier"
+      },
+      "the_forge_heart": {
+        "name": "The Forge-Heart"
+      },
+      "odrenn_the_temperer": {
+        "name": "Odrenn the Temperer"
+      },
+      "volzharr_buried_furnace": {
+        "name": "Volzharr, the Buried Furnace"
+      },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"
       },
@@ -8487,6 +8499,26 @@ export const id_ID: EnTranslations = {
         "name": "Arena Raid Nythraxis",
         "enterText": "Kau melewati pintu kerajaan yang tersegel.",
         "leaveText": "Kau kembali ke udara dingin Thornpeak."
+      },
+      "undermount_wing1": {
+        "name": "Undermount: The Descent",
+        "enterText": "You descend beneath Thornpeak into glassy dark.",
+        "leaveText": "You climb back from the Undermount descent."
+      },
+      "undermount_wing2": {
+        "name": "Undermount: The Quenching",
+        "enterText": "Steam curls from the flooded forges ahead.",
+        "leaveText": "You leave the quenching halls behind."
+      },
+      "undermount_wing3": {
+        "name": "Undermount: The Tempering",
+        "enterText": "Hammerfalls echo through the tempering vault.",
+        "leaveText": "You retreat from the ringing forgeways."
+      },
+      "undermount_wing4": {
+        "name": "Undermount: The Waking",
+        "enterText": "The buried furnace stirs in the deep.",
+        "leaveText": "You withdraw from the waking heat."
       },
       "drowned_temple": {
         "name": "Kuil Tenggelam",
