@@ -187,9 +187,9 @@ describe('yumi: team announcement', () => {
     const evs = sim.tick(); // matchmake seats the teams and emits the intro logs
     const match = sim.arenaMatchFor(pids[0])!;
     const line = (pid: number, text: string) =>
-      evs.find(
-        (e) => e.type === 'log' && e.pid === pid && (e as any).text === text,
-      ) as (SimEvent & { color?: string }) | undefined;
+      evs.find((e) => e.type === 'log' && e.pid === pid && (e as any).text === text) as
+        | (SimEvent & { color?: string })
+        | undefined;
     for (const pid of match.teamA) {
       const ev = line(pid, 'You are in the blue team!');
       expect(ev).toBeTruthy();
@@ -203,8 +203,7 @@ describe('yumi: team announcement', () => {
     // no fighter ever receives the other team's line (per-dimension negatives)
     const wrong = (text: string, roster: number[]) =>
       evs.some(
-        (e) =>
-          e.type === 'log' && (e as any).text === text && roster.includes(e.pid as number),
+        (e) => e.type === 'log' && (e as any).text === text && roster.includes(e.pid as number),
       );
     expect(wrong('You are in the red team!', match.teamA)).toBe(false);
     expect(wrong('You are in the blue team!', match.teamB)).toBe(false);

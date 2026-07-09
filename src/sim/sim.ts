@@ -5307,7 +5307,7 @@ export class Sim {
   }
 
   // Step `e` one tick toward `dest`. With `ignoreObstacles`, the mover phases
-  // straight through props — used to free a stuck evader, and forced on for
+  // straight through props, used to free a stuck evader, and forced on for
   // templates flagged `phasesThroughObstacles` (mountain-sized world bosses
   // that must never wedge on a collider mid-chase). Returns true on arrival.
   private moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles = false): boolean {

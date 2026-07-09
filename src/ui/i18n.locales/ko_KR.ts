@@ -6820,9 +6820,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'yumi.grab.channeling': '획득 중… {s}초',
   'yumi.grab.aria': '미스터리 파워업 획득 중',
   'hudChrome.arena.windowTitle': '전장',
-  'hudChrome.arena.arenaIntro': '랭킹 콜로세움: 1대1이나 팀으로 겨루고, 승리해 순위를 오르며 레이팅을 올리세요.',
+  'hudChrome.arena.arenaIntro':
+    '랭킹 콜로세움: 1대1이나 팀으로 겨루고, 승리해 순위를 오르며 레이팅을 올리세요.',
   'hudChrome.arena.yumiHeading': 'Yumi 지키기',
-  'hudChrome.arena.yumiIntro': '미로에서 벌어지는 팀 목표 모드로, 콜로세움 밖에 있습니다. 순위가 없으니 레이팅이 아닌 영광을 위해 즐기세요.',
+  'hudChrome.arena.yumiIntro':
+    '미로에서 벌어지는 팀 목표 모드로, 콜로세움 밖에 있습니다. 순위가 없으니 레이팅이 아닌 영광을 위해 즐기세요.',
   'hudChrome.arena.desc1v1': '1대1. 순수한 실력 승부, 의지할 동료가 없습니다.',
   'hudChrome.arena.desc2v2': '2대2. 파트너와 함께하거나 혼자 대기해 듀오로 매칭됩니다.',
   'hudChrome.arena.descFiesta': '증강과 파워업이 난무하는 시끌벅적한 2대2 난투.',

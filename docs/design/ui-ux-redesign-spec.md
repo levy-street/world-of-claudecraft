@@ -457,4 +457,323 @@ variants). All states below are mandatory for every instance.
 - **Empty, loading, disabled, error states:** as defined in 6.1, one shared
   visual per state across all windows.
 
-<!-- CONTINUED -->
+## 9. Visual design tokens
+
+All new tokens land in `src/styles/tokens.css` (`@layer tokens`); theme-varying
+knobs additionally join `themeCssVars` in `src/ui/theme.ts`, where **all four
+presets (classic, midnight, parchment, highContrast) must define every knob**
+(`tests/theme.test.ts` enforces definition + WCAG contrast). No raw hex appears
+in implementation guidance below; new values derive from existing tokens or are
+chosen at implementation time inside the theme system.
+
+### 9.1 Layering scale
+`--z-hud: 10; --z-window: 100; --z-dock: 150; --z-drawer: 200; --z-modal: 300;
+--z-toast: 400; --z-tooltip: 500;` One scale, no ad-hoc z-index anywhere.
+
+### 9.2 Panel depth
+- `--color-panel-l0-bg`: translucent dark derived from `--panel-base` (approx 86
+  percent alpha); `--color-panel-l0-border`: hairline from `--color-border-default`.
+- `--color-panel-l1-bg`: aliases the existing `--panel-bg` gradient.
+- `--color-panel-l2-bg`: `--panel-bg` over a solid `--color-bg-dark` base (no
+  translucency: modals must not composite the world through them).
+- `--color-panel-edge` (exists as `--panel-edge`), reused across depths.
+
+### 9.3 Window chrome
+`--window-titlebar-h: 40px; --window-titlebar-h-touch: 48px;
+--window-title-color: var(--color-gold); --window-border:
+var(--color-border-default); --window-ornament-size: 12px` (ornament renders
+only at fx medium+).
+
+### 9.4 Modal overlay and scrim
+`--color-scrim`: black-derived at approx 55 percent alpha; `--scrim-blur`: a
+backdrop blur radius consumed only where the existing glass rules apply (the
+low tier already force-drops all backdrop-filter, so the scrim falls back to
+the solid translucent color automatically).
+
+### 9.5 Mobile drawer and bottom sheet
+`--drawer-w: min(84%, 360px); --drawer-bg: var(--color-panel-l1-bg);
+--sheet-bg: var(--color-panel-l1-bg); --sheet-radius: 12px 12px 0 0;
+--sheet-handle-color: var(--color-border-default);
+--sheet-snap-peek: 33; --sheet-snap-half: 60; --sheet-snap-full: 92`
+(snap values are percentages of `--app-vh`, consumed by the sheet module).
+
+### 9.6 Combat urgency
+`--color-urgency-warn`: amber family (aligns with the existing aggro orange
+role); `--color-urgency-danger`: derived from `--color-hostile`;
+`--urgency-pulse-dur: calc(1200ms * var(--motion-scale))`. Urgency colors are
+emphasis over baseline cues, never the only cue.
+
+### 9.7 Rarity
+`--color-quality-poor/common/uncommon/rare/epic/legendary`, seeded from the
+established `QUALITY_COLOR` table in `src/ui/icons.ts`. **Tokens become the
+single source:** the JS table is refactored to resolve from the tokens via one
+cached `getComputedStyle` read at startup (same pattern as the map painters),
+so CSS borders and canvas icon frames can never drift apart.
+`--color-quality-default` already exists and is kept.
+
+### 9.8 Focus ring
+`--focus-ring-color: var(--color-border-focus); --focus-ring-width: 2px;
+--focus-ring-offset: 2px`. Consumed by one shared `:focus-visible` rule;
+`forced-colors: active` swaps to system `Highlight` (existing base.css section).
+
+### 9.9 Tooltip layer
+`--tooltip-bg: var(--color-panel-l2-bg); --tooltip-border:
+var(--color-border-default); --tooltip-max-w: 320px`; tooltips render at
+`--z-tooltip` above everything including modals.
+
+### 9.10 Notification priority
+`--color-notify-info` (border-default family), `--color-notify-success`
+(from `--color-text-success`), `--color-notify-warning` (urgency-warn),
+`--color-notify-critical` (from `--color-text-error`);
+`--notify-dur-short: 3000ms; --notify-dur-long: 6000ms` (critical persists).
+
+### 9.11 Motion and reduced motion
+`--dur-fast: 120ms; --dur-base: 200ms; --dur-slow: 300ms`. Every new animated
+duration is authored as `calc(var(--dur-*) * var(--motion-scale))`, inheriting
+the existing reduced-motion behavior (near-zero scale, `animationend` still
+fires). `--fx-shadow` continues to scale decorative glow blur; parchment grain
+ships as `--texture-parchment` (inline SVG data-URI) applied only under
+`[data-fx-level="high"], [data-fx-level="ultra"]`.
+
+### 9.12 Density and type scale
+`--control-h-compact: 28px; --control-h: 36px; --control-h-touch: 44px;
+--touch-min: 40px; --text-xs: 12px; --text-sm: 13px; --text-md: 15px;
+--text-lg: 18px; --text-title: 22px`. The 16px touch input floor stays in
+`base.css` and is not re-tokenized (its `!important` floor is the guard).
+
+### 9.13 Theme inheritance
+Theme-varying knobs (panel colors, scrim, urgency, rarity title colors, focus
+ring, notification colors) join `themeCssVars`; structural knobs (z-scale,
+sizes, durations, snap points) stay `:root`-only. `parchment` lightens panel
+depths and strengthens the grain; `highContrast` maximizes border and focus
+deltas and zeroes decorative glow; both keep AA text contrast (test-enforced).
+
+## 10. Motion and effects
+
+### 10.1 Allowed transitions
+- Window open/close: 200ms cross-fade + 8px translateY, transform/opacity only.
+- Sheet/drawer: 250ms transform slide; gesture-driven position is direct (no
+  easing fight against the finger).
+- Hover/focus: border and background color fades at 120ms. **No transform:
+  scale() on hover or focus of list, rail, or chip items** (repo invariant).
+- Bar fills: HP/resource/progress width moves with value through elided
+  writers; an optional cosmetic damage-ghost (a second fill that drains 300ms
+  behind the true value, fx medium+) may trail, the true fill is instant.
+
+### 10.2 Reduced motion
+All durations multiply by `--motion-scale`; under `prefers-reduced-motion`
+cross-fades and translations collapse to near-instant, ambient loops pause
+(`--fx-ambient-anim`), auto-peek chat becomes manual, the camera never
+auto-rotates. No information is ever motion-only: every animated cue has a
+static equivalent (color, border, text).
+
+### 10.3 FX tier behavior (data-fx-level)
+- **low:** no backdrop blur (force-dropped), no glow, no ornaments, no grain,
+  no ghosting, no vignette, no ambient animation. Full information.
+- **medium:** ornaments, cooldown GCD sweep, damage ghost.
+- **high:** + glow accents, parchment grain, urgency vignette.
+- **ultra:** + ambient breathing on decorative frame edges.
+Tier resolution reads the static preset (`ui_effects_profile.ts`), never the
+FPS governor.
+
+### 10.4 Combat urgency effects
+- Low-health baseline cue (all tiers): the existing `low_health` treatment.
+- Additive at fx high+: a single fixed-position vignette element whose opacity
+  is written per frame through an elided writer, pulsing at
+  `--urgency-pulse-dur`.
+- Target cast bar interrupt-window emphasis: border shifts to
+  `--color-urgency-warn` (color change is baseline; any pulse is fx medium+).
+
+### 10.5 Notification timing
+Info/success auto-dismiss at `--notify-dur-short`; warnings at
+`--notify-dur-long`; critical persists until dismissed and mirrors to the
+status live region. Max 3 toasts visible, FIFO, fixed slots (no shift).
+
+### 10.6 Never animate
+Focus rings (steady, token-drawn). Cast bar timing (linear real-time). HP
+values and granularity. Aura durations. Layout position of any combat element.
+Anything under `forced-colors: active`.
+
+## 11. Accessibility specification
+
+- **Keyboard:** every interactive element Tab-reachable; windows trap Tab and
+  Shift+Tab via the shared `FocusManager` only when focus is already inside
+  (Tab remains the target-nearest game key outside); Esc closes topmost; focus
+  returns to the opener on close. Roving tabindex for tab rails, action bar
+  config mode, and grids (existing `roving_index`).
+- **Focus order:** skip links ("Skip to Main HUD", "Skip to Chat") remain the
+  first focusable elements; within a window: header controls, search, tab rail,
+  body, footer actions.
+- **Live regions:** `#chatlog` role=log; `#combat-live` role=status throttled
+  per type; notifications mirror to status; error banners announce assertively.
+  The new mobile drawer and sheets do not introduce new live regions; they
+  reuse the toast/status channels.
+- **Labels:** all accessible names via `t()` keys (aria-label included); icon
+  buttons always labeled; item cells expose name + rarity + count in the
+  accessible name.
+- **Forced colors:** borders and focus ring survive via system colors (existing
+  base.css section extends to all new components); no information conveyed by
+  background color alone.
+- **Contrast:** AA minimum across all four themes, test-enforced; muted text
+  never used for values a player acts on.
+- **Touch targets:** 40x40px minimum, 44px standard; 24px absolute floor only
+  where genuinely infeasible (dense bag grids keep 40px).
+- **Reduced motion:** per 10.2; verified by the existing reduced-motion suite.
+
+## 12. Implementation architecture
+
+### 12.1 Work-item map
+
+| Work item | Type | Files | Notes |
+|---|---|---|---|
+| Token additions (section 9) | CSS tokens | `src/styles/tokens.css` | plus `themeCssVars` knobs in `src/ui/theme.ts`, all 4 presets |
+| Component grammar | component CSS | `src/styles/components.css`, `hud.mobile.css` | extend existing modules, no new @import (keeps `styles_extraction` stable) |
+| Window chrome restyle (24 windows) | CSS + minor markup | `components.css`, both HTML entries | shared `.window-frame` classes; markup parity in `index.html` + `play.html` |
+| Desktop zone polish | CSS + hud wiring | `hud.css`, `src/ui/hud.ts` (composition only) | anchors, insets, reserved slots |
+| Bottom sheet host | new module | `src/ui/bottom_sheet.ts` + `bottom_sheet_view.ts` | view-core in `UI_PURE_CORES`; instance-parameterized descriptor; side-panel mode for landscape |
+| Mobile bottom menu bar | new module | `src/ui/mobile_menu_bar.ts` + `_view.ts` | badge model in the view-core (free slots, unread, completable) |
+| Mobile nav drawer | new module | `src/ui/mobile_drawer.ts` + `_view.ts` | grouped nav model pure; focus trap via FocusManager |
+| Notification stack | new module | `src/ui/notification_stack.ts` + `_view.ts` | pooled toasts, priority queue, fixed slots |
+| Combat vignette | new module | `src/ui/combat_vignette.ts` | hot path: one element, one elided opacity write, fx high+ only |
+| Window frame builder | new module | `src/ui/window_frame.ts` | cold path helper building titlebar/tabs from a descriptor (t() + esc()) |
+| Rarity token unification | painter update | `src/ui/icons.ts` + `bags/bank/market` cells | QUALITY_COLOR resolves from tokens via cached getComputedStyle |
+| Frame/bar visual pass | painter updates | `unit_frame_painter`, `action_bar_painter`, `auras_painter`, `cast_bar_painter`, `party_frames_painter` | token consumption + ghost/sweep hooks; write patterns unchanged |
+| Filter standardization | view-core updates | `mailbox_view`, `social_view`, `spellbook_view`, `questlog_view`, `leaderboard_view` | pure filters modeled on `bag_filter`/`bank_filter` |
+| New copy | i18n | `src/ui/i18n.catalog/hud_chrome.ts` | `hudChrome.mobileNav.*`, `hudChrome.sheet.*`, `hudChrome.notify.*`; English only; M16 rule for wordy strings |
+
+### 12.2 IWorld additions
+None required for the redesign as specified: every surface renders data already
+exposed (frames, auras, quests, bags, market, meters, threat, connection state
+via the existing reconnect/perf modules). If a future iteration adds new
+on-screen information (for example a server latency number in the perf chip
+sourced from the world), it follows the seam rule: extend `src/world_api.ts`,
+implement in both `Sim` and `ClientWorld`, then consume. Name the seam in the
+PR before building the UI.
+
+### 12.3 Entry parity
+Every markup or CSS-hook change lands in **both** `index.html` and `play.html`,
+and `index.extra.css` is checked for affected selectors (known drift hazard).
+New containers required in both entries: sheet host root, drawer root, bottom
+menu bar root, notification stack root, vignette element.
+
+### 12.4 Suggested phase order (for implementation agents)
+1. **Phase 0:** tokens + theme knobs + z-scale (pure CSS, zero behavior risk).
+2. **Phase 1:** component grammar CSS + window frame builder + one pilot window
+   (vendor: it is the recipe reference) restyled end to end, both entries.
+3. **Phase 2:** remaining 23 windows in family batches (grids, master-detail,
+   forms, tables, canvas).
+4. **Phase 3:** mobile shell (sheet host, menu bar, drawer, chat states).
+5. **Phase 4:** HUD chrome polish (frames, bars, auras, tracker, toasts).
+6. **Phase 5:** motion/fx layer (ghosting, vignette, ornaments, grain) with
+   tier gating and reduced-motion verification.
+Each phase ends green on `npm run gate` and lands before/after screenshots.
+
+## 13. Performance plan
+
+- **Hot-path protections:** all new per-frame writes go through PainterHost
+  elided writers; the only new per-frame surfaces are the vignette (1 elided
+  opacity write) and the damage-ghost fill (1 elided width write per visible
+  bar, fx medium+). Menu bar badges, toasts, sheet position, and drawer state
+  are event-driven, not per-frame.
+- **No layout reads in hot paths:** sheet gestures cache container heights on
+  open; drawer uses fixed token widths; no `offsetWidth`/`getBoundingClientRect`
+  from any per-frame path (budget test scans for this).
+- **Pooling and keyed reconciliation:** toasts, loot rolls, leaderboard and
+  market rows, and party/raid chips use keyed pools with FIFO caps (patterns:
+  `auras_painter`, `fct_painter`).
+- **Canvas token caching:** every canvas painter reads new tokens via cached
+  `getComputedStyle` (session cache, invalidation hook on theme change, as the
+  minimap does today).
+- **Cold-path freedom:** window open/build may use `innerHTML` (through `esc()`)
+  and `createElement`; only `Hud.update()`-reachable code is budgeted.
+- **Budget:** `tests/hud_perf_budget.test.ts` stays green; if the vignette and
+  ghost writes push `hudHotDomWrites` past 153, re-baseline via the documented
+  process in the same PR with the perf tour green (`scripts/perf_tour.mjs`
+  against the recorded baseline, `frameP95 <= baseline`).
+- **Tests that must pass:** `hud_perf_budget`, `architecture` (purity + the
+  `*_view` completeness sweep for the four new view-cores), `painter_host`,
+  per-painter no-magic scans, `alloc_probe`-backed core tests.
+
+## 14. Mobile QA plan
+
+- Portrait and landscape passes on a real or emulated phone for: bottom bar,
+  drawer, every sheet-presented window, chat states, combat guard behavior.
+- Mobile Safari/WebKit first-class: run the browserslist floor build, verify
+  backdrop-filter fallbacks, safe-area padding on a notched viewport.
+- Tap targets: rendered-size audit >= 40x40 on every interactive element
+  (browser suite target-size checks).
+- Input zoom: `node scripts/mobile_input_zoom_check.mjs` against `npm run dev`
+  (16px floor holds in every sheet and drawer form).
+- Drawer: open/close via button, scrim, swipe; focus trap and return; badge
+  correctness.
+- Sheets: snap points, gesture drag, combat clamp (half max + ring quadrant
+  clear), edge safety margins, push/back navigation, sticky footers.
+- Safe areas: no interactive element under `env(safe-area-inset-*)` regions.
+- Combat readability: with a sheet open in combat, verify visible and tappable:
+  action ring, own debuffs strip, target cast bar, party chips, low-health cue.
+
+## 15. Desktop QA plan
+
+- Big-3 desktop browsers (pinned floor in `.browserslistrc`): visual pass over
+  all 24 windows and all HUD zones in each.
+- Fullscreen and windowed at 1280x720, 1920x1080, 3440x1440; ui_scale extremes
+  (0.8 and 1.15); zone collapse behavior under 1280px.
+- Keyboard: full Tab walk of every window (order per 11); trap and return on
+  every open/close; Esc stack order; rebound-key smoke test.
+- Focus: `:focus-visible` ring visible on every interactive element in all four
+  themes; never animated away.
+- High contrast: `forced-colors: active` pass (borders + ring survive) and the
+  `highContrast` theme preset pass.
+- Reduced motion: `prefers-reduced-motion` collapses transitions, pauses
+  ambient loops, keeps all information static-readable.
+- Window overlap: combat-lane discipline (3.6), dock pairs, drag persistence,
+  reset-layout action.
+- Both entries: repeat the window pass on `index.html` and `play.html`.
+
+## 16. Acceptance criteria
+
+- [ ] No concrete world imports from UI (`tests/architecture.test.ts` green).
+- [ ] No raw string copy outside i18n; new keys English-only in the correct
+      catalog domain; M16 fills where wordy.
+- [ ] No raw interpolated user/server text (all through `esc()`).
+- [ ] No token bypasses: no literal hex/px/color in painter TS; per-painter
+      no-magic scans green.
+- [ ] No gameplay advantage or information loss from FX tiers
+      (`ui_effects_profile` + `ui_tier_knobs` tests green; manual fairness pass
+      against the section 10.3 tier table).
+- [ ] No hot-path layout reads; no per-frame node churn (pooled + keyed).
+- [ ] No layout shift during combat, chat, loot, quest, aura, or tooltip
+      updates (reserved-slot audit).
+- [ ] WCAG 2.2 AA for HUD chrome: focus suites + axe browser suite green.
+- [ ] Mobile tap targets >= 40x40px; inputs >= 16px
+      (`mobile_input_zoom_check.mjs` green).
+- [ ] Desktop and mobile before/after screenshots committed under
+      `docs/screenshots/` and referenced from the PR body.
+- [ ] `npm run gate` passes (note the known Windows-local `new_endpoint` golden
+      failure is pre-existing and excluded).
+- [ ] `index.html`, `play.html`, and `index.extra.css` parity verified
+      (`per_entry_css_wiring` test green plus manual selector check).
+- [ ] `tests/theme.test.ts` green with every new knob defined in all four
+      presets at AA contrast.
+- [ ] New `*_view` cores registered in `UI_PURE_CORES` and tested against both
+      Sim-shaped and ClientWorld-shaped stubs.
+
+## 17. Deliverables
+
+This specification delivers, in one document:
+
+1. **Redesign narrative:** sections 1 and 2 (vision + principles).
+2. **Desktop full-screen layout spec:** section 3 (zones, sizing, density,
+   combat behavior, placement discipline).
+3. **Mobile menu and responsive behavior spec:** sections 4 and 5 (portrait,
+   landscape, drawer, sheets, chat states, navigation model).
+4. **Component and token spec:** sections 6 to 10 (window system, HUD chrome,
+   component grammar, tokens, motion).
+5. **Implementation map:** section 12 (work items, new modules, seam policy,
+   entry parity, phase order) plus section 13 (performance plan).
+6. **QA and acceptance checklist:** sections 14 to 16.
+
+Companion input: `docs/design/ui-ux-current-state.md`. Repo contracts of
+record: root `CLAUDE.md`, `src/ui/CLAUDE.md`, `src/styles/CLAUDE.md`,
+`docs/design/graphics-settings-fairness.md`.
+

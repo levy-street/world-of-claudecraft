@@ -6841,9 +6841,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'yumi.grab.channeling': '取得中… {s}秒',
   'yumi.grab.aria': 'ミステリーパワーアップを取得中',
   'hudChrome.arena.windowTitle': 'バトルグラウンド',
-  'hudChrome.arena.arenaIntro': 'ランク制コロシアム。1対1やチームで対戦し、勝ってランキングを駆け上がりレートを上げよう。',
+  'hudChrome.arena.arenaIntro':
+    'ランク制コロシアム。1対1やチームで対戦し、勝ってランキングを駆け上がりレートを上げよう。',
   'hudChrome.arena.yumiHeading': 'Yumiを守れ',
-  'hudChrome.arena.yumiIntro': '迷宮で戦うチーム目標モード。コロシアムの外にあり、レート無し。名誉のために戦おう。',
+  'hudChrome.arena.yumiIntro':
+    '迷宮で戦うチーム目標モード。コロシアムの外にあり、レート無し。名誉のために戦おう。',
   'hudChrome.arena.desc1v1': '1対1。純粋な実力勝負、頼れる仲間はいない。',
   'hudChrome.arena.desc2v2': '2対2。相棒を連れてくるか、ソロで並んでペアを組もう。',
   'hudChrome.arena.descFiesta': 'オーグメントとパワーアップが飛び交う賑やかな2対2の乱戦。',

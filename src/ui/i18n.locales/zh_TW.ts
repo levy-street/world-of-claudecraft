@@ -6502,7 +6502,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.arena.windowTitle': '戰場',
   'hudChrome.arena.arenaIntro': '排名競技場：單挑或組隊對決，獲勝可攀升排行榜並提升評分。',
   'hudChrome.arena.yumiHeading': '保護Yumi',
-  'hudChrome.arena.yumiIntro': '在迷宮中進行的團隊目標模式，不屬於競技場。無排名，為榮耀而戰而非評分。',
+  'hudChrome.arena.yumiIntro':
+    '在迷宮中進行的團隊目標模式，不屬於競技場。無排名，為榮耀而戰而非評分。',
   'hudChrome.arena.desc1v1': '一對一。純粹技巧，沒有隊友可依靠。',
   'hudChrome.arena.desc2v2': '二對二。帶上搭檔，或單人排隊被配成一對。',
   'hudChrome.arena.descFiesta': '喧鬧的二對二混戰，帶有強化和道具。',
