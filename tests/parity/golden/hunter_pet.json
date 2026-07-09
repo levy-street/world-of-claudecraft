@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "9843961e",
+      "state": "e31e290e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,6 +40,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -126,7 +127,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 409,
-      "state": "b105f333",
+      "state": "4e0cfa23",
       "events": "43ab1dd4",
       "rng": {
         "draws": 9,
@@ -137,7 +138,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 409,
-      "state": "26fd9600",
+      "state": "2b8deeaa",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -148,7 +149,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 409,
-      "state": "8a7b0ebb",
+      "state": "9af5856b",
       "events": "d6d42245",
       "rng": {
         "draws": 100,
@@ -159,7 +160,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 409,
-      "state": "3b7ec288",
+      "state": "8b05ee12",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -170,7 +171,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 409,
-      "state": "55fa087c",
+      "state": "5a86faae",
       "events": "1b963611",
       "rng": {
         "draws": 298,
@@ -181,7 +182,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "1b98bcbf",
+      "state": "c51d89a7",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -192,7 +193,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 409,
-      "state": "1b98bcbf",
+      "state": "c51d89a7",
       "events": "741638a5",
       "rng": {
         "draws": 405,
@@ -219,6 +220,7 @@
             "damageDealt": 48
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,

@@ -313,15 +313,6 @@ export function summonPet(ctx: SimContext, owner: Entity, templateId: string): v
   const existing = petOf(ctx, owner.id, true);
   if (existing) {
     despawnPersistentPet(ctx, existing);
-    if (existing.templateId === templateId && !existing.dead) {
-      ctx.emit({
-        type: 'log',
-        text: `${existing.name} fades back into the void.`,
-        color: '#b894ff',
-        pid: owner.id,
-      });
-      return;
-    }
   }
 
   const pet = createDemonPet(ctx, owner, templateId);

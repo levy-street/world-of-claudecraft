@@ -291,6 +291,7 @@ export const tr_TR: EnTranslations = {
       "targetLabel": "Hedefin",
       "targetAnnounce": "{name} hedefini işaretle",
       "partyLabel": "Takımın",
+      "partyChip": "Grup",
       "partyGroup": "Grup {n}",
       "durationUnitSeconds": "sn",
       "durationUnitMinutes": "dk",
@@ -320,7 +321,9 @@ export const tr_TR: EnTranslations = {
       "actionPageIndicator": "Sayfa {page}",
       "targetCycle": "Hedefi değiştir",
       "targetCycleShort": "Hedef",
-      "spellbookPageLabel": "Sayfa {page}"
+      "spellbookPageLabel": "Sayfa {page}",
+      "hideKeyboard": "Klavyeyi gizle",
+      "chatPlaceholder": "Bir şey söyle..."
     },
     "tutorial": {
       "moveBodyTouch": "Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.",
@@ -1015,18 +1018,18 @@ export const tr_TR: EnTranslations = {
       },
       "allStatsPctReduce": "Tüm nitelikleri %{pct} azaltır",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Saldırı gücünü %{pct} artırır",
+        "armor": "Zırhı %{pct} artırır",
+        "int": "Zekayı %{pct} artırır",
+        "sta": "Dayanıklılığı %{pct} artırır",
+        "allStats": "Tüm nitelikleri %{pct} artırır"
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Zırhı %{pct} azaltır",
+      "armorPctStacks": "Zırhı %{pct} azaltır ({stacks} istif)",
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
@@ -1432,6 +1435,7 @@ export const tr_TR: EnTranslations = {
     "archetypeTitle": {
       "label": "Unvan",
       "none": "Yok",
+      "hobbyLabel": "Hobi",
       "armorcrafting": "Zırhçı",
       "weaponcrafting": "Silah Ustası",
       "jewelcrafting": "Kuyumcu",
@@ -1454,7 +1458,10 @@ export const tr_TR: EnTranslations = {
       "craftedToast": "Hazırlanma Tarihi: {name}",
       "insufficientMaterials": "Bunun için malzemeleriniz yok.",
       "unknownRecipe": "O tarif mevcut değil.",
-      "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin."
+      "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin.",
+      "notAtHub": "Bunu üretmek için zanaat merkezinde ve gereken kademede olmalısın.",
+      "throttled": "Çok hızlı üretiyorsun. Bir an bekle ve tekrar dene.",
+      "recipeNotLearned": "Bu tarifi henüz öğrenmedin."
     }
   },
   "apiError": {
@@ -2240,8 +2247,8 @@ export const tr_TR: EnTranslations = {
       "waveGoldBody": "Orta dalga: kurgunun şekillenmeye ve uyum tutturmaya başladığı iki yönlü kombolar.",
       "wavePrismaticTitle": "Prizmatik",
       "wavePrismaticBody": "Son dalga: kurguyu belirleyen, ekran eriten, en güzel anlamda saçma hissettirmesi amaçlanan sıçramalar.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Yumi'yi Koru",
+      "yumiBody": "Yumi'yi Koru, bir labirentte oynanan bir takım hedef modudur: her taraf kendi kedi yoldaşını korurken diğerininkini avlar. Ara sıra her iki kedi de labirentin yeni köşelerine ışınlanır, bu yüzden dövüş savunma, avlanma ve onları yeniden bulmak için yarışma arasında gidip gelir. Üçe üç ya da beşe beş olarak kuyruğa gir; dövüşte düşmek seni yalnızca kısa bir süre kenara çeker.",
       "powerupsTitle": "Ringdeki takviyeler",
       "powerupsBody": "Parlayan küreler de dövüşün ortasında arenaya düşer, kim önce ulaşırsa onun olur. Bilerek abartılıdırlar ve yalnızca kısa bir süre dayanırlar: bir göz kırpımlık göz kamaştırıcı hız için Hız İblisi, hantal bir deve dönüşmek için Devasa, zıplayan, düşük yerçekimli bir sıçrama için Ay Botları, ve ani bir öfke dalgası için Cinnet.",
       "ladderHeading": "Merdiveni tırmanmak",
@@ -3674,42 +3681,42 @@ export const tr_TR: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi'yi Koru 3v3",
+    "bracket5": "Yumi'yi Koru 5v5",
+    "enterQueue": "Yumi'yi Koru'ya Katıl!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Yumi'yi Koru kuyruğuna katılıyorsun. Yoldaşını koru…",
+      "leave": "Yumi'yi Koru kuyruğundan ayrılıyorsun.",
+      "teamLeave": "Takımın Yumi'yi Koru kuyruğundan ayrılıyor."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Yumi'yi Koru 3v3 en fazla üç kişilik bir gruba izin verir.",
+      "partyTooBig5": "Yumi'yi Koru 5v5 en fazla beş kişilik bir gruba izin verir."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Yumi'yi Koru! Kendi yoldaşını savun ve onlarınkini avla."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "YUMİ'Yİ KORU",
+      "getReady": "Hazır ol…",
+      "teleportIn": "Yumi'ler {s} içinde hareket eder",
+      "suddenDeath": "ANİ ÖLÜM",
+      "yourYumi": "Senin Yumi'n",
+      "enemyYumi": "Düşman Yumi'si",
+      "aria": "Senin Yumi'n {max} candan {mine} canda, düşman Yumi'si {theirs} canda.",
+      "collapse": "Yumi'yi Koru çubuklarını daralt",
+      "expand": "Yumi'yi Koru çubuklarını genişlet"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "DÜŞTÜN!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "ANİ ÖLÜM! Yumi'ler yerlerini koruyor!",
+      "teleport": "Yumi'ler ışınlanıyor!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "ZAFER! Yumi güvende!",
+      "loss": "YENİLGİ! Yumi'n düştü."
     }
   },
   "fiesta": {
@@ -4161,6 +4168,7 @@ export const tr_TR: EnTranslations = {
       "mobileSocial": "Sosyal",
       "mobileArena": "Arena",
       "mobileMenu": "Menü",
+      "mobileSettings": "Ayarlar",
       "mobileUse": "Kullan",
       "mobileMeters": "Ölçerler",
       "mobileMap": "Harita",
@@ -4710,6 +4718,7 @@ export const tr_TR: EnTranslations = {
       "offGlobalCooldown": "Genel bekleme süresinden bağımsız",
       "friendlyTarget": "Dost hedef",
       "enemyTarget": "Düşman hedef",
+      "selfOnly": "Yalnızca kendine",
       "damageRange": "{min} ila {max}",
       "finisherDamage": "{base} artı her kombo puanı için {perCombo}"
     },
@@ -5020,7 +5029,7 @@ export const tr_TR: EnTranslations = {
       "greedAria": "{item} için açgözlülük",
       "passAria": "{item} için pas geç",
       "everyonePassed": "Herkes {item} için pas geçti.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} zar attı"
     }
   },
   "entities": {
@@ -5143,7 +5152,7 @@ export const tr_TR: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Zırh Kesme",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Hedefin zırhını parçalar, her uygulamada %{damage} azaltır. 5 kez istiflenir. Yüksek miktarda tehdit üretir."
       },
       "taunt": {
         "name": "Tahrik",
@@ -5599,7 +5608,7 @@ export const tr_TR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cadı Işığı",
-        "description": "Hedefin zırhını 30 saniye boyunca 35 azaltır."
+        "description": "Hedefin zırhını 40 saniye boyunca %{damage} azaltır. Zırh Kesme ile birlikte istiflenmez."
       },
       "hibernate": {
         "name": "Derin Uyku",
@@ -5877,6 +5886,9 @@ export const tr_TR: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "Yaşlı Greyjaw'un Dişi"
+      },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Yıpranmış Defter Sayfası"
@@ -7114,7 +7126,7 @@ export const tr_TR: EnTranslations = {
         "name": "Diyakoz Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Antrenman Kuklası"
       },
       "ridge_stalker": {
         "name": "Sırt Sinsisi"
@@ -7549,6 +7561,16 @@ export const tr_TR: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Kapıdaki Kurtlar",
         "text": "Orman kurtları cüretkârlaşıyor, kuzey yolundaki yolculara saldırıyorlar. Sayılarını azalt, {playerName}. 8 Orman Kurdu öldür ki Doğudere rahat bir nefes alsın.",

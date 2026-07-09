@@ -1205,6 +1205,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     questId: 'q_greyjaw',
   },
+  chunk_of_ore: {
+    id: 'chunk_of_ore',
+    name: 'Chunk of Ore',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_prof_intro',
+  },
   weathered_ledger_page: {
     id: 'weathered_ledger_page',
     name: 'Weathered Ledger Page',

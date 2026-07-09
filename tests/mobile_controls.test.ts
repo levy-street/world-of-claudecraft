@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Input, TouchMoveInput } from '../src/game/input';
+import { CHROME_FADE_IDLE_CLASS, CHROME_FADE_IDLE_MS } from '../src/game/mobile_chrome_fade';
 import {
   CHAT_LONG_PRESS_MS,
   HAPTICS_STORE_KEY,
@@ -320,8 +321,26 @@ class FakeClassList {
 
 class FakeElement extends EventTarget {
   classList = new FakeClassList();
-  style = { transform: '', left: '', top: '' };
+  style: {
+    transform: string;
+    left: string;
+    top: string;
+    display: string;
+    overflowY: string;
+    height: string;
+  } = {
+    transform: '',
+    left: '',
+    top: '',
+    display: '',
+    overflowY: '',
+    height: '',
+  };
   offsetWidth = 122;
+  // Textarea-ish props so #chat-input can back exitChatReply (value clear + blur) in
+  // the fake DOM; harmless no-op defaults for every other element.
+  value = '';
+  blur(): void {}
   private captured = new Set<number>();
   /** Selectors this element (or a simulated ancestor) matches, for closest();
    *  drives touch_router.ts's isInteractiveHudElement checks in tests. */
@@ -414,6 +433,9 @@ function installMobileControlDom(): {
     ['mobile-emote', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
+    // The chat composer, so exitChatReply (value clear + blur) is exercised in the
+    // fake DOM: the setActive draft-survival test reads its .value.
+    ['chat-input', new FakeElement()],
   ]);
   const body = new FakeElement();
   const documentTarget = new EventTarget();
@@ -469,6 +491,8 @@ function mobileCallbacks() {
     onInteract: noop,
     onAutorun: () => false,
     onChat: noop,
+    onChatOpen: noop,
+    onChatClose: noop,
     onMenu: noop,
     onSocial: noop,
     onDiscord: noop,
@@ -489,6 +513,48 @@ function mobileCallbacks() {
     onRecenterCamera: noop,
   };
 }
+
+describe('MobileControls setActive draft survival', () => {
+  const noopInputForActive = () =>
+    ({
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    }) as unknown as Input;
+
+  it('keeps an in-progress composer draft on a redundant re-activation (only a real desktop->touch transition resets it)', () => {
+    installMobileControlDom();
+    // Force touch active for a real desktop->touch transition on start().
+    setInterfaceMode('touch');
+    const controls = new MobileControls(noopInputForActive(), mobileCallbacks());
+    controls.start();
+    // The initial activation (a genuine transition) reset the composer to empty.
+    const chatInput = document.getElementById('chat-input') as unknown as { value: string };
+    expect(chatInput).toBeTruthy();
+    // The player starts typing a draft in the composer.
+    chatInput.value = 'hello raid, on my way';
+    // A redundant re-activation while ALREADY active (e.g. a foldable resize crossing
+    // the PHONE_TOUCH_QUERY threshold but staying in touch): the draft must SURVIVE.
+    controls.refreshInterfaceMode();
+    expect(chatInput.value).toBe('hello raid, on my way');
+  });
+
+  it('resets the composer on a genuine desktop->touch transition (draft from a prior desktop session cleared)', () => {
+    installMobileControlDom();
+    // Start in desktop mode (not active), so the first refresh into touch is a real
+    // transition that must clear a stray composer value.
+    setInterfaceMode('desktop');
+    const controls = new MobileControls(noopInputForActive(), mobileCallbacks());
+    controls.start();
+    const chatInput = document.getElementById('chat-input') as unknown as { value: string };
+    chatInput.value = 'stale desktop draft';
+    // Flip to touch: a genuine desktop->touch transition resets the composer.
+    setInterfaceMode('touch');
+    controls.refreshInterfaceMode();
+    expect(chatInput.value).toBe('');
+  });
+});
 
 describe('MobileControls pointer lifecycle', () => {
   it('clears movement when the active pointer ends outside the joystick element', () => {
@@ -640,6 +706,46 @@ describe('MobileControls pointer lifecycle', () => {
     );
 
     expect(lastMove).toEqual({ forward: false, back: false, strafeLeft: false, strafeRight: true });
+  });
+
+  it('clamps the drawn wheel near its resting spot on a far touchdown, without drifting input', () => {
+    const { moveZone, moveJoystick } = installMobileControlDom();
+    let lastMove: TouchMoveInput | null = null;
+    const input = {
+      setTouchMove: (move: TouchMoveInput) => {
+        lastMove = move;
+      },
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    // The wheel's resting rect (installMobileControlDom's FakeElement default)
+    // is {left:0,top:0,width:100,height:100}, centered at (50,50). A touchdown
+    // far from that center (deep in the zone's bottom-left corner) must still
+    // read zero deflection at touchdown (the input origin is the raw touch
+    // point, unclamped: the #1229 drift contract above), even though the wheel
+    // is only DRAWN a small distance toward the thumb.
+    moveZone.dispatchEvent(pointerEvent('pointerdown', { pointerId: 9, clientX: 8, clientY: 232 }));
+    expect(lastMove).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+    // The drawn wheel leans toward the thumb but stays within
+    // MOVE_JOYSTICK_FLOAT_RADIUS of its resting center (50,50), nowhere near
+    // the far-off touch point (8,232): it must not have teleported there.
+    const left = Number.parseFloat(moveJoystick.style.left);
+    const top = Number.parseFloat(moveJoystick.style.top);
+    const layoutRadius = moveJoystick.offsetWidth / 2;
+    const drawnCenterX = left + layoutRadius;
+    const drawnCenterY = top + layoutRadius;
+    const distFromRest = Math.hypot(drawnCenterX - 50, drawnCenterY - 50);
+    expect(distFromRest).toBeLessThanOrEqual(48 + 0.5);
+    expect(Math.hypot(drawnCenterX - 8, drawnCenterY - 232)).toBeGreaterThan(distFromRest);
   });
 
   it('a window opening mid-drag releases the joystick instead of walking blind', () => {
@@ -1385,5 +1491,52 @@ describe('MobileControls pointer lifecycle', () => {
       }),
     );
     expect(lookActive).toEqual([true, false, false]);
+  });
+});
+
+describe('MobileControls chrome idle-fade lifecycle', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    setInterfaceMode('auto');
+  });
+
+  const noopInput = () =>
+    ({
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    }) as unknown as Input;
+
+  it('dims chrome after idle in touch mode, un-dims on the flip to desktop, and re-arms un-dimmed back in touch', () => {
+    // startChromeFade reads the global setTimeout at call time, so install fake
+    // timers before start() arms the fade.
+    vi.useFakeTimers();
+    installMobileControlDom();
+
+    const controls = new MobileControls(noopInput(), mobileCallbacks());
+    // The fake matchMedia reports matches:true, so auto resolves to touch: start()
+    // arms the idle-fade against document.body.
+    controls.start();
+
+    // Idle long enough for the fade to dim the body chrome.
+    vi.advanceTimersByTime(CHROME_FADE_IDLE_MS);
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(true);
+
+    // Flip to the desktop interface: the dim must be cleared, not stranded.
+    setInterfaceMode('desktop');
+    controls.refreshInterfaceMode();
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(false);
+
+    // And it must not creep back: no timer survives to re-dim in desktop mode.
+    vi.advanceTimersByTime(CHROME_FADE_IDLE_MS * 2);
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(false);
+
+    // Flip back to touch: the fade re-arms un-dimmed, then dims again after idle.
+    setInterfaceMode('touch');
+    controls.refreshInterfaceMode();
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(false);
+    vi.advanceTimersByTime(CHROME_FADE_IDLE_MS);
+    expect(document.body.classList.contains(CHROME_FADE_IDLE_CLASS)).toBe(true);
   });
 });

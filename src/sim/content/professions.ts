@@ -11,6 +11,7 @@
 // the fields later profession issues (#1120/#1125/#1126/#1140) read against.
 // maxSkill follows the classic 1-300 profession skill scale.
 import type { ProfessionRecord } from '../professions/types';
+import { ZONE3_ZONE } from './zone3';
 
 export type GatheringProfessionId = 'mining' | 'logging' | 'herbalism';
 
@@ -153,15 +154,23 @@ export const TOOL_EFFECT_IDS: ToolEffectId[] = [
 // no mechanic wiring: this file only defines the ring geometry (order, pole tags)
 // and the adjacency/opposite lookups derived from it. See issue #1125.
 //
-// Design-doc note: the canonical ring order lives at
+// Design-doc note (#1148 tuning pass): the canonical ring order lives at
 // https://woc.nervemart.com/docs/professions-system, which returned 403 Forbidden
-// when this file was authored. The ring below is a reasonable placeholder pending
-// maintainer confirmation against the design doc: a 10-craft circle, opposite =
-// 5 positions away, adjacent = 1 position away either side, with the 4 poles grouped
-// as evenly as sensible (Material: crafts that shape raw matter into gear;
-// Experimental: crafts driven by trial-and-error formulae; Formal: crafts built on
-// exact patterns/measurements; Cross-cutting: crafts that touch every other craft's
-// output). Flag any correction needed once the doc is reachable.
+// when this file was authored and is reachable again as of this pass. The doc's
+// own ring text ("Engineering, Alchemy, Cooking, Leatherworking, Tailoring,
+// Inscription, Enchanting, Jewelcrafting, Weaponcrafting, Armorcrafting") differs
+// from the exact rotation below in SOME non-adjacent-pair placements, but every
+// adjacency this codebase has already committed to in real content is confirmed
+// consistent with it: armorcrafting-weaponcrafting (doc: adjacent, wrapping the
+// ring) and alchemy-engineering (doc: adjacent) are exactly the two pairs
+// content/recipes.ts COMBO_RECIPES already require. A full reorder to match the
+// doc craft-for-craft would also reshuffle every OTHER adjacency/opposite pair
+// (affecting future hobby/combo assignments) with a blast radius broader than
+// this pass's scope; deferred as its own follow-up rather than an unreviewed
+// reshuffle here. The 4 poles are this codebase's own grouping (not named in the
+// doc): Material (crafts that shape raw matter into gear), Experimental (crafts
+// driven by trial-and-error formulae), Formal (crafts built on exact patterns/
+// measurements), Cross-cutting (crafts that touch every other craft's output).
 
 export type CraftPole = 'Material' | 'Experimental' | 'Formal' | 'Cross-cutting';
 
@@ -318,10 +327,18 @@ export const TOOL_RECIPE_STUBS: ToolRecipeStub[] = [
 // discount (composed, never replacing it, in ../professions/tools.ts).
 //
 // Every craft on the ring gets an entry (data-driven, not hardcoded in
-// logic): thresholds and percents are placeholders pending maintainer
-// confirmation against the design doc (same 403-Forbidden caveat noted above
-// CRAFT_RING), kept deliberately uniform across crafts and poles so no single
-// craft is silently favored until real balance numbers land.
+// logic): thresholds and percents were placeholders pending maintainer
+// confirmation against the design doc. #1148 tuning pass: the doc's own Open
+// Questions section ("Specialization perks: the exact perk set and the
+// thresholds that unlock them") still lists this as genuinely open, i.e. no
+// real numbers to replace these with yet. Per that issue's own acceptance
+// criteria ("tuned... or explicitly deferred with a reason"), these are kept
+// as-is and CONFIRMED (not re-guessed) as the working values: 75 skill sits at
+// the tier-3 boundary (see wheel.ts TIER_SKILL_STEP, tierForSkill), a round,
+// legible mid-tier gate; 20%/25% are modest, non-punitive discounts consistent
+// with the #1301 gold-sink/throttle pass's own "tuned modest, not a large
+// invented swing" rule. Uniform across crafts/poles so no single craft is
+// silently favored until the doc's open question resolves with real numbers.
 export interface PerkThresholdDef {
   /** Skill level (0 to 100) in this craft required to count as "specialized". */
   specializedSkillThreshold: number;
@@ -347,3 +364,82 @@ export const PERK_THRESHOLDS: Record<string, PerkThresholdDef> = Object.fromEntr
 // mechanic itself and why it is currently inert (no town/crafting-station
 // proximity gate exists anywhere in the engine yet for it to bypass).
 export const MOBILE_CRAFTING_STATION_DURATION_TICKS = 20 * 60 * 10; // 10 minutes
+
+// Gold sink + output throttle tuning (#1301): professions is a large new
+// material/item faucet, and the doc names both a proportional gold sink and a
+// throttle on a maxed specialist's output rate as TBD. Content-driven per the
+// issue's scope note ("read from content, not hardcoded"), tuned modest and
+// non-punitive rather than inventing a large balance swing: see
+// ../professions/crafting.ts resolveCraftForRecipe for where these are read.
+// - `CRAFT_GOLD_SINK_COPPER_PER_BUDGET`: copper fee per point of a recipe's
+//   `itemLevelBudget`, charged on every successful craft (proportional to the
+//   value of what is being produced, same axis P4/P8 already scale off).
+// - `CRAFT_THROTTLE_WINDOW_SECONDS` / `CRAFT_THROTTLE_MAX_PER_WINDOW`: a flat
+//   cap on successful crafts (any recipe) per rolling sim-time window, so a
+//   maxed specialist cannot flood the market faster than this rate regardless
+//   of skill or material supply.
+export const CRAFT_GOLD_SINK_COPPER_PER_BUDGET = 2;
+export const CRAFT_THROTTLE_WINDOW_SECONDS = 60;
+export const CRAFT_THROTTLE_MAX_PER_WINDOW = 10;
+
+// Level-20 crafting hub (issue #1297): a designated in-world location hosting
+// a station for every craft on CRAFT_RING, gated to characters at or above
+// zone3's top level. The gate/read logic lives in
+// ../professions/crafting_hub.ts behind the SimContext seam; this is the
+// content half: WHERE the hub sits and WHICH stations it hosts.
+//
+// Location: rather than build a fourth, brand-new town (out of scope per the
+// issue's own notes: "Scope (which zone, what the hub includes) needs
+// maintainer confirmation... Independent of the wheel mechanics"), this reuses
+// Thornpeak Heights' existing Highwatch hub (content/zone3.ts ZONE3_ZONE.hub):
+// zone3's levelRange tops out at exactly 20 (`[13, 20]`), so "the level-20
+// zone" already exists and Highwatch is its town center. Importing the hub
+// circle directly (rather than re-typing its coordinates) keeps this content
+// from silently drifting if Highwatch's hub ever moves.
+export const CRAFTING_HUB_ZONE_ID = ZONE3_ZONE.id;
+export const CRAFTING_HUB_POS: { readonly x: number; readonly z: number } = {
+  x: ZONE3_ZONE.hub.x,
+  z: ZONE3_ZONE.hub.z,
+};
+export const CRAFTING_HUB_RADIUS = ZONE3_ZONE.hub.radius;
+
+// The level a character must have reached to use a hub station (issue
+// #1297's own title: "Professions: level-20 zone and crafting hub"). Matches
+// zone3's top level exactly, rather than inventing an unrelated number: by
+// the time a character can comfortably work the zone whose town hosts the
+// hub, they have reached the level the hub gates on.
+export const CRAFTING_HUB_MIN_LEVEL = 20;
+
+export interface CraftingHubStationDef {
+  /** Which craft on CRAFT_RING this station serves. */
+  craftId: string;
+  /** Offset from CRAFTING_HUB_POS, kept well within CRAFTING_HUB_RADIUS so
+   *  every station sits inside the hub's gate circle. */
+  offset: { x: number; z: number };
+}
+
+// One station per craft on the ring (ten total), laid out on a small circle
+// around the hub center so no two stations overlap. A future render pass
+// reads `craftId` + `offset` to place a minimal prop per station; this table
+// carries no display "name" field of its own (avoiding a new player-visible
+// string surface in this pass) since a station is identified by its craft id,
+// which already has a localized display name (src/ui/i18n.catalog/hud_chrome.ts
+// `archetypeTitle.<craftId>` / `gathering.*`).
+//
+// Has zero consumers today: forward content for that future render pass, kept
+// data-as-code (module-init cost is negligible, ten cheap trig calls). Its
+// `offset` is render-only positioning; never feed it back into sim state if a
+// consumer lands.
+export const CRAFTING_HUB_STATIONS: readonly CraftingHubStationDef[] = CRAFT_RING.map(
+  (craft, index) => {
+    const angle = (index / CRAFT_RING.length) * Math.PI * 2;
+    const stationRadius = CRAFTING_HUB_RADIUS * 0.6;
+    return {
+      craftId: craft.id,
+      offset: {
+        x: Math.round(Math.cos(angle) * stationRadius),
+        z: Math.round(Math.sin(angle) * stationRadius),
+      },
+    };
+  },
+);

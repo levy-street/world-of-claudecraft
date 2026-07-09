@@ -119,6 +119,15 @@ export const VC_KICKOFF_CIRCLE = 5; // yd
 // would be impossible; everyone else (either team) traps it immediately.
 export const VC_TRAP_KICK_GRACE = 0.4; // s the kicker is exempt from their own kick
 const VC_PLAYER_BODY_RADIUS = 0.5; // mirrors pathfind PLAYER_BODY_RADIUS
+// You may only STRIKE the loose ball (kick / pass / shoot) when it is genuinely
+// at your feet, never merely within the ability's aim range (18 to 42 yd), which
+// let a player launch the ball from anywhere on the pitch. This covers the
+// dribble/trap contact (VC_DRIBBLE_RADIUS + body), a dribbled ball riding a
+// stride ahead (its carry runs ~1.15x the dribbler's speed), and the bots'
+// swing reach (BOT_KICK_REACH in vale_cup_bots.ts, which MUST stay <= this so a
+// bot that commits to a kick actually connects). A keeper HOLDING the ball is
+// always exempt.
+export const VC_POSSESSION_RADIUS = 4; // yd from the ball you can play it
 const VC_DRIBBLE_MAX_BALL_HEIGHT = 1.2; // a ball overhead cannot be dribbled
 const VC_TRAP_MAX_BALL_HEIGHT = 1.8; // higher flight (the punt's arc) clears heads
 // Passing (sport_pass): auto-paced so it arrives at a controllable weight. Power
@@ -1306,7 +1315,11 @@ export function vcupBallKick(
   if (!ball) return;
   if (ball.holderPid !== null && ball.holderPid !== caster.id) return; // held: unkickable by others
   const maxRange = range > 0 ? range : MELEE_RANGE;
-  if (dist2d(caster.pos, ballVec(ball)) > maxRange) return;
+  // Possession gate: strike only a ball you actually have (holding it as keeper,
+  // or the loose ball at your feet). maxRange below stays the aim/touch reach.
+  if (ball.holderPid === null && dist2d(caster.pos, ballVec(ball)) > VC_POSSESSION_RADIUS) {
+    return;
+  }
   if (ball.holderPid === caster.id) {
     ball.holderPid = null; // launch from the hold
     ball.holdUntil = 0;
@@ -1434,6 +1447,7 @@ function pickPassReceiver(
   match: VcMatch,
   caster: Entity,
   team: 'A' | 'B',
+  maxSeek: number = VC_PASS_MAX_RANGE,
 ): Entity | null {
   const mates = team === 'A' ? match.teamA : match.teamB;
   const selfPid = caster.id;
@@ -1469,7 +1483,7 @@ function pickPassReceiver(
     let mx = mate.pos.x - caster.pos.x;
     let mz = mate.pos.z - caster.pos.z;
     const ml = Math.hypot(mx, mz);
-    if (ml < 1e-6 || ml > VC_PASS_MAX_RANGE) continue;
+    if (ml < 1e-6 || ml > maxSeek) continue;
     mx /= ml;
     mz /= ml;
     const dot = dirX * mx + dirZ * mz;
@@ -1496,8 +1510,12 @@ export function vcupBallPass(
   if (!ball) return;
   if (ball.holderPid !== null && ball.holderPid !== caster.id) return; // held by someone else
   const maxRange = range > 0 ? range : MELEE_RANGE;
-  if (dist2d(caster.pos, ballVec(ball)) > maxRange) return; // must be near the ball to play it
-  const receiver = pickPassReceiver(ctx, match, caster, team);
+  // Possession gate: you must have the ball (holding it, or loose at your feet),
+  // not merely be within the pass's reach.
+  if (ball.holderPid === null && dist2d(caster.pos, ballVec(ball)) > VC_POSSESSION_RADIUS) {
+    return;
+  }
+  const receiver = pickPassReceiver(ctx, match, caster, team, maxRange);
   if (!receiver) return; // nobody to pass to: the whistle stays quiet, no wild boot
   if (ball.holderPid === caster.id) {
     ball.holderPid = null;
@@ -1553,7 +1571,11 @@ export function vcupShoot(
   if (!ball) return;
   if (ball.holderPid !== null && ball.holderPid !== caster.id) return; // held by someone else
   const maxRange = range > 0 ? range : MELEE_RANGE;
-  if (dist2d(caster.pos, ballVec(ball)) > maxRange) return; // must be on the ball
+  // Possession gate: only shoot a ball at your feet (or one you hold as keeper).
+  // maxRange below is the charge/aim reach, not the possession radius.
+  if (ball.holderPid === null && dist2d(caster.pos, ballVec(ball)) > VC_POSSESSION_RADIUS) {
+    return;
+  }
   if (ball.holderPid === caster.id) {
     ball.holderPid = null;
     ball.holdUntil = 0;

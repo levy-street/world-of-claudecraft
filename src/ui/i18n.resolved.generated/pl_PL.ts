@@ -291,6 +291,7 @@ export const pl_PL: EnTranslations = {
       "targetLabel": "Twój cel",
       "targetAnnounce": "Oznacz {name}",
       "partyLabel": "Twoja drużyna",
+      "partyChip": "Drużyna",
       "partyGroup": "Grupa {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -320,7 +321,9 @@ export const pl_PL: EnTranslations = {
       "actionPageIndicator": "Str. {page}",
       "targetCycle": "Zmień cel",
       "targetCycleShort": "Cel",
-      "spellbookPageLabel": "Strona {page}"
+      "spellbookPageLabel": "Strona {page}",
+      "hideKeyboard": "Ukryj klawiaturę",
+      "chatPlaceholder": "Powiedz coś..."
     },
     "tutorial": {
       "moveBodyTouch": "Użyj gałki ruchu, aby się poruszać, i przeciągaj ekran, aby się rozglądać. Zrób kilka kroków, by zacząć.",
@@ -1015,18 +1018,18 @@ export const pl_PL: EnTranslations = {
       },
       "allStatsPctReduce": "Zmniejsza wszystkie atrybuty o {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Zwiększa moc ataku o {pct}%",
+        "armor": "Zwiększa pancerz o {pct}%",
+        "int": "Zwiększa Intelekt o {pct}%",
+        "sta": "Zwiększa Wytrzymałość o {pct}%",
+        "allStats": "Zwiększa wszystkie atrybuty o {pct}%"
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Zmniejsza pancerz o {pct}%",
+      "armorPctStacks": "Zmniejsza pancerz o {pct}% ({stacks} nałożeń)",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -1432,6 +1435,7 @@ export const pl_PL: EnTranslations = {
     "archetypeTitle": {
       "label": "Tytuł",
       "none": "Brak",
+      "hobbyLabel": "Pasja",
       "armorcrafting": "Płatnerz",
       "weaponcrafting": "Zbrojmistrz",
       "jewelcrafting": "Jubiler",
@@ -1454,7 +1458,10 @@ export const pl_PL: EnTranslations = {
       "craftedToast": "Wykonane: {name}",
       "insufficientMaterials": "Nie masz na to materiałów.",
       "unknownRecipe": "Ten przepis nie istnieje.",
-      "comboRequirementUnmet": "Nie masz obu wymaganych rzemiosł na wymaganym poziomie dla tego przepisu."
+      "comboRequirementUnmet": "Nie masz obu wymaganych rzemiosł na wymaganym poziomie dla tego przepisu.",
+      "notAtHub": "Musisz być w warsztacie rzemieślniczym i mieć wymagany poziom, aby to wytworzyć.",
+      "throttled": "Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.",
+      "recipeNotLearned": "Nie nauczyłeś się jeszcze tego przepisu."
     }
   },
   "apiError": {
@@ -2240,8 +2247,8 @@ export const pl_PL: EnTranslations = {
       "waveGoldBody": "Środkowa fala: obosieczne kombinacje, w których twój build zaczyna nabierać kształtu i rozbrzmiewać.",
       "wavePrismaticTitle": "Pryzmatyczny",
       "wavePrismaticBody": "Ostatnia fala: definiujące build, rozsadzające ekran skoki mocy, które mają wydawać się absurdalne w najlepszym tego słowa znaczeniu.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Ochrona Yumi",
+      "yumiBody": "Ochrona Yumi to drużynowy tryb z zadaniem, rozgrywany w labiryncie: każda strona strzeże własnego kociego chowańca, jednocześnie polując na cudzego. Co jakiś czas oba koty przeskakują w nowe zakątki labiryntu, więc walka waha się między obroną, polowaniem i wyścigiem, by znaleźć je na nowo. Zapisuj się w trybie trzech na trzech lub pięciu na pięciu; upadek w boju odstawia cię jedynie na chwilę.",
       "powerupsTitle": "Wzmocnienia na ringu",
       "powerupsBody": "Na arenę w trakcie walki spadają też świecące kule, dostępne dla tego, kto pierwszy do nich dotrze. Są celowo przesadne i działają tylko przez chwilę: Demon Prędkości dla mgnienia oślepiającego tempa, Kolos, by rozrosnąć się w ociężałego giganta, Księżycowe Buty dla skocznego susu w niskiej grawitacji oraz Berserker dla nagłego przypływu furii.",
       "ladderHeading": "Wspinaczka po drabinie rankingowej",
@@ -3674,42 +3681,42 @@ export const pl_PL: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 na 3",
+    "bracket5": "Yumi 5 na 5",
+    "enterQueue": "Dołącz do Ochrony Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Dołączasz do kolejki Ochrony Yumi. Strzeż swojego chowańca…",
+      "leave": "Opuszczasz kolejkę Ochrony Yumi.",
+      "teamLeave": "Twoja drużyna opuszcza kolejkę Ochrony Yumi."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Ochrona Yumi 3 na 3 pozwala na drużynę liczącą do trzech osób.",
+      "partyTooBig5": "Ochrona Yumi 5 na 5 pozwala na drużynę liczącą do pięciu osób."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Ochrona Yumi! Broń swojego chowańca i poluj na cudzego."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "OCHRONA YUMI",
+      "getReady": "Przygotuj się…",
+      "teleportIn": "Yumi ruszają za {s}",
+      "suddenDeath": "NAGŁA ŚMIERĆ",
+      "yourYumi": "Twoja Yumi",
+      "enemyYumi": "Wroga Yumi",
+      "aria": "Twoja Yumi ma {mine} z {max} zdrowia, wroga Yumi ma {theirs}.",
+      "collapse": "Zwiń paski Ochrony Yumi",
+      "expand": "Rozwiń paski Ochrony Yumi"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "POWALONY!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "NAGŁA ŚMIERĆ! Yumi trzymają pozycje!",
+      "teleport": "Yumi się teleportują!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "ZWYCIĘSTWO! Yumi jest bezpieczna!",
+      "loss": "PORAŻKA! Twoja Yumi padła."
     }
   },
   "fiesta": {
@@ -4161,6 +4168,7 @@ export const pl_PL: EnTranslations = {
       "mobileSocial": "Społeczność",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Ustawienia",
       "mobileUse": "Użyj",
       "mobileMeters": "Liczniki",
       "mobileMap": "Mapa",
@@ -4710,6 +4718,7 @@ export const pl_PL: EnTranslations = {
       "offGlobalCooldown": "Poza globalnym czasem odnowienia",
       "friendlyTarget": "Cel przyjazny",
       "enemyTarget": "Cel wrogi",
+      "selfOnly": "Tylko na siebie",
       "damageRange": "{min} do {max}",
       "finisherDamage": "{base} plus {perCombo} za punkt kombinacji"
     },
@@ -5020,7 +5029,7 @@ export const pl_PL: EnTranslations = {
       "greedAria": "Chciwość na {item}",
       "passAria": "Pasuj na {item}",
       "everyonePassed": "Wszyscy spasowali na {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} rzuciło"
     }
   },
   "entities": {
@@ -5143,7 +5152,7 @@ export const pl_PL: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rozdarcie pancerza",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie. Kumuluje się do 5 razy. Generuje dużą ilość zagrożenia."
       },
       "taunt": {
         "name": "Podjudzenie",
@@ -5599,7 +5608,7 @@ export const pl_PL: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Wiedźmie światło",
-        "description": "Zmniejsza pancerz celu o 35 na 30 sek."
+        "description": "Zmniejsza pancerz celu o {damage}% na 40 sek. Nie kumuluje się z Rozdarciem pancerza."
       },
       "hibernate": {
         "name": "Uśpienie",
@@ -5877,6 +5886,9 @@ export const pl_PL: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "Kieł Starego Szaroszczękiego"
+      },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Zniszczona strona księgi"
@@ -7114,7 +7126,7 @@ export const pl_PL: EnTranslations = {
         "name": "Diakon Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Manekin treningowy"
       },
       "ridge_stalker": {
         "name": "Grzbietowy Tropiciel"
@@ -7549,6 +7561,16 @@ export const pl_PL: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Wilki u progu",
         "text": "Leśne wilki robią się zuchwałe, kąsają podróżnych na północnej drodze. Przerzedź ich szeregi, {playerName}. Zabij 8 Leśnych wilków, a Eastbrook odetchnie z ulgą.",

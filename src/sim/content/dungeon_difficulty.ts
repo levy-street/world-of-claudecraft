@@ -20,29 +20,30 @@ export interface HeroicDungeonTuning {
   marksPerParticipant: number;
 }
 
-// Tuning model follows classic-era (TBC) heroics: measured database pairs put
-// the heroic raw-damage jump at ~3.0-3.5x flat across leveling and endgame
-// dungeons (Gargolmar 3.00x, Nazan 3.28x, Omor 3.42x, cap-level Kargath
-// Bladefist 3.50x), with health following the cap-band level jump. The
-// damage multipliers below are calibrated against a GEARED level-20 roster
-// (endgame blues: tank ~1150 hp at 33% armor DR, cloth ~640 hp at 18%),
-// reproducing the TBC-heroic EXPERIENCE: a final boss chews a tank for
-// ~18-28% of max hp per swing (healers must actively pump), trash melee
-// takes ~30-55% of a clothie per hit, and boss melee on cloth is close to a
-// two-shot. That lands the raw heroic-vs-normal ratios above TBC's 3.5x
-// because this game's mitigation and hp pools are proportionally larger at
-// the cap; the EFFECTIVE severity is the calibration target. Recompute the
-// bands with the level-20 pin included (Hollow Crypt L10 mobs already gain
-// ~1.6x health and ~1.8x damage from the level bump alone). Mechanic damage
-// and support heals scale with the same multipliers
-// (mechanicDamageMult/mechanicHealMult in ../instances/difficulty.ts).
+// Tuning model: every heroic mob is pinned to LEVEL 22 (two above the level-20
+// player cap) and the four five-mans are damage-EQUALIZED, so a heroic feels
+// the same whichever one you run. The calibration target is an average elite
+// TRASH swing landing ~300 post-mitigation on the reference GEARED shaman
+// (full heroic mail: 2142 armor, 1493 hp, 48.55% DR vs a level-22 attacker),
+// i.e. ~20% of max hp per hit, with final bosses ~22-24%. Solving each dungeon
+// for that target INVERTS the multiplier ladder, because the harder dungeons
+// already carry bigger base weapon damage: hollow_crypt needs the largest
+// multiplier, gravewyrm_sanctum the smallest. Gear-band reference points at
+// these constants: full-heroic mail lands ~300 trash / ~330-350 boss per hit;
+// endgame blues tank (~1150 hp, ~31% DR at L22) ~35% trash / ~40% boss; blues
+// cloth (~640 hp, ~17% DR) ~76% per trash hit and a trash CRIT one-shots, so
+// heroics are gear-gated by design. Mechanic damage lands RAW (no armor step;
+// see aoePulse/stomp in ../mob/locomotion.ts) and scales with the same
+// per-dungeon multiplier via mechanicDamageMult; support heals scale with
+// mechanicHealMult (= healthMultiplier); both wired in
+// ../instances/difficulty.ts.
 export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   hollow_crypt: {
     id: 'hollow_crypt',
     difficulty: 'heroic',
-    level: 20,
+    level: 22,
     healthMultiplier: 1.9,
-    damageMultiplier: 3.4,
+    damageMultiplier: 6.8,
     armorMultiplier: 1.3,
     finalBossId: 'morthen',
     marksPerParticipant: 1,
@@ -50,9 +51,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   sunken_bastion: {
     id: 'sunken_bastion',
     difficulty: 'heroic',
-    level: 20,
+    level: 22,
     healthMultiplier: 2.0,
-    damageMultiplier: 3.8,
+    damageMultiplier: 6.2,
     armorMultiplier: 1.3,
     finalBossId: 'vael_the_mistcaller',
     marksPerParticipant: 1,
@@ -60,9 +61,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   drowned_temple: {
     id: 'drowned_temple',
     difficulty: 'heroic',
-    level: 20,
+    level: 22,
     healthMultiplier: 2.6,
-    damageMultiplier: 4.2,
+    damageMultiplier: 5.7,
     armorMultiplier: 1.25,
     finalBossId: 'ysolei',
     marksPerParticipant: 1,
@@ -70,18 +71,19 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   gravewyrm_sanctum: {
     id: 'gravewyrm_sanctum',
     difficulty: 'heroic',
-    level: 20,
+    level: 22,
     healthMultiplier: 2.0,
-    damageMultiplier: 4.6,
+    damageMultiplier: 5.4,
     armorMultiplier: 1.2,
     finalBossId: 'korzul_the_gravewyrm',
     marksPerParticipant: 1,
   },
   // The 10-player raid arena. Normal Nythraxis already swings ~3.7x harder
   // than Korzul, so the raid's heroic multiplier is small in RELATIVE terms
-  // while landing the hardest absolute hits in the game: the boss chews a
-  // geared tank for ~47% of max hp per 2.6s swing (a raid brings two or
-  // three healers), and add waves hit cloth for ~50%. The percentage
+  // while landing the hardest absolute hits in the game: at the level-22
+  // heroic pin (matching the 5-mans) the boss chews a geared tank for ~54%
+  // of max hp per 2.6s swing (a raid brings two or three healers), and add
+  // waves hit cloth for ~57%. The percentage
   // mechanics scale on heroic in the encounter script (Soul Rend 1.5x,
   // Deathless Rage lethal on a failed wardstone channel; see
   // encounters/nythraxis.ts). The attunement dungeon nythraxis_crypt is
@@ -91,7 +93,7 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   nythraxis_boss_arena: {
     id: 'nythraxis_boss_arena',
     difficulty: 'heroic',
-    level: 20,
+    level: 22,
     healthMultiplier: 1.6,
     damageMultiplier: 2.0,
     armorMultiplier: 1.2,

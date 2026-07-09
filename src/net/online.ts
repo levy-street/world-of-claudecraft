@@ -27,7 +27,7 @@ import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
-import { getArchetypeTitle } from '../sim/professions/archetype';
+import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
@@ -836,6 +836,8 @@ function blankEntity(id: number): Entity {
     gcdRemaining: 0,
     cooldowns: new Map(),
     queuedOnSwing: null,
+    queuedCastAbility: null,
+    queuedCastAim: null,
     fiveSecondRule: 99,
     comboPoints: 0,
     comboUntil: -1,
@@ -1058,6 +1060,14 @@ export class ClientWorld implements IWorld {
   // above, i.e. always null). See src/sim/professions/archetype.ts.
   get archetypeTitle(): string | null {
     return getArchetypeTitle(this.activeArchetype);
+  }
+  // Hobby craft granted by the active archetype (#1294): derived the same way
+  // as archetypeTitle above, not a stored mirror field, so it stays correct
+  // once a future wire-up starts pushing `activeArchetype` snapshot updates
+  // (until then it tracks the stub default above, i.e. always null). See
+  // src/sim/professions/archetype.ts getHobbyCraft.
+  get hobbyCraft(): string | null {
+    return getHobbyCraft(this.activeArchetype);
   }
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---

@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "5ba4f051",
+      "state": "fcc709e3",
       "events": "a6bdb9f3",
       "rng": {
         "draws": 3,
@@ -56,6 +56,7 @@
             "damageDealt": 30
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -97,6 +98,7 @@
             "damageDealt": 30
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -142,6 +144,7 @@
             "damageDealt": 30
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -397,7 +400,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "d2c2f456",
+      "state": "81c8acb8",
       "events": "ea631a91",
       "rng": {
         "draws": 6,
@@ -423,6 +426,7 @@
             "damageDealt": 60
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -464,6 +468,7 @@
             "damageDealt": 60
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -509,6 +514,7 @@
             "damageDealt": 60
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -764,7 +770,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "7907ef9e",
+      "state": "46f3cd2e",
       "events": "ea631a91",
       "rng": {
         "draws": 9,
@@ -790,6 +796,7 @@
             "damageDealt": 90
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -831,6 +838,7 @@
             "damageDealt": 90
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -876,6 +884,7 @@
             "damageDealt": 90
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -1131,7 +1140,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "d8964619",
+      "state": "66b66d17",
       "events": "ea631a91",
       "rng": {
         "draws": 12,
@@ -1157,6 +1166,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1198,6 +1208,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -1243,6 +1254,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,
@@ -1498,7 +1510,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 409,
-      "state": "a1265267",
+      "state": "c1de0d3d",
       "events": "0085b1fd",
       "rng": {
         "draws": 15,
@@ -1509,7 +1521,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "339bffd0",
+      "state": "b3717938",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1520,7 +1532,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 409,
-      "state": "339bffd0",
+      "state": "b3717938",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1547,6 +1559,7 @@
             "damageTaken": 13
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -1588,6 +1601,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 406,
@@ -1633,6 +1647,7 @@
             "damageDealt": 120
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 407,

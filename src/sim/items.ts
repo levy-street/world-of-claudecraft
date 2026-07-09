@@ -203,6 +203,8 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
         itemId,
         instance: drunkInstance,
         observerName: meta.name,
+        observerActiveArchetype: meta.archetype.activeArchetype,
+        observerPairedMajor: meta.archetype.pairedMajor,
       });
     }
     p.potionCooldownUntil = ctx.time + POTION_COOLDOWN;

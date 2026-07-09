@@ -121,6 +121,8 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   p.autoAttack = false;
   p.queuedOnSwing = null;
   delete p.queuedOnSwingFree;
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
   p.combatTimer = 99;
   p.inCombat = false;
   // No event: the client transitions to the ghost UI from the snapshot's ghost flag.
@@ -203,6 +205,8 @@ function reviveAt(
   p.targetId = null;
   p.autoAttack = false;
   p.queuedOnSwing = null;
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
   p.combatTimer = 99;
   p.inCombat = false;
   // Apply sickness last: applyAura -> recalcPlayerStats preserves the hp/resource

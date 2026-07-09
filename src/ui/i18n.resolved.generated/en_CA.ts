@@ -291,6 +291,7 @@ export const en_CA: EnTranslations = {
       "targetLabel": "Your Mark",
       "targetAnnounce": "Mark {name}",
       "partyLabel": "Your Band",
+      "partyChip": "Party",
       "partyGroup": "Group {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -305,7 +306,7 @@ export const en_CA: EnTranslations = {
       "chat": "Skip to Chat"
     },
     "mobile": {
-      "autorun": "Autorun",
+      "autorun": "Auto",
       "jump": "Jump",
       "leaderboard": "Ranks",
       "dailyRewards": "Rewards",
@@ -320,7 +321,9 @@ export const en_CA: EnTranslations = {
       "actionPageIndicator": "{page}",
       "targetCycle": "Swap target",
       "targetCycleShort": "Target",
-      "spellbookPageLabel": "Page {page}"
+      "spellbookPageLabel": "Page {page}",
+      "hideKeyboard": "Hide keyboard",
+      "chatPlaceholder": "Say something..."
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -1432,6 +1435,7 @@ export const en_CA: EnTranslations = {
     "archetypeTitle": {
       "label": "Title",
       "none": "None",
+      "hobbyLabel": "Hobby",
       "armorcrafting": "Armorer",
       "weaponcrafting": "Weaponsmith",
       "jewelcrafting": "Jeweler",
@@ -1454,7 +1458,10 @@ export const en_CA: EnTranslations = {
       "craftedToast": "Crafted: {name}",
       "insufficientMaterials": "You do not have the materials for that.",
       "unknownRecipe": "That recipe does not exist.",
-      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe."
+      "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
+      "notAtHub": "You must be at the crafting hub, at the required level, to craft that.",
+      "throttled": "You are crafting too quickly. Wait a moment and try again.",
+      "recipeNotLearned": "You have not learned that recipe yet."
     }
   },
   "apiError": {
@@ -4161,6 +4168,7 @@ export const en_CA: EnTranslations = {
       "mobileSocial": "Social",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Settings",
       "mobileUse": "Interact",
       "mobileMeters": "Meters",
       "mobileMap": "Map",
@@ -4710,6 +4718,7 @@ export const en_CA: EnTranslations = {
       "offGlobalCooldown": "Off the global cooldown",
       "friendlyTarget": "Friendly target",
       "enemyTarget": "Enemy target",
+      "selfOnly": "Self only",
       "damageRange": "{min} to {max}",
       "finisherDamage": "{base} plus {perCombo} per combo point"
     },
@@ -5095,7 +5104,7 @@ export const en_CA: EnTranslations = {
       },
       "commanding_shout": {
         "name": "Bolstering Cry",
-        "description": "Increases your Stamina by 6 for 2 min."
+        "description": "Increases your Stamina by {buff} for 2 min."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
@@ -5599,7 +5608,7 @@ export const en_CA: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Sunder Armor."
+        "description": "Decreases the target's armor by {damage}% for 40 sec. Does not stack with Armor Shear."
       },
       "hibernate": {
         "name": "Slumber",
@@ -5877,6 +5886,9 @@ export const en_CA: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "Old Greyjaw's Fang"
+      },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Weathered Ledger Page"
@@ -7549,6 +7561,16 @@ export const en_CA: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Wolves at the Door",
         "text": "The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, {playerName}. Slay 8 Forest Wolves and Eastbrook will breathe easier.",

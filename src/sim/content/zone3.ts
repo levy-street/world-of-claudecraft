@@ -1084,6 +1084,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'stalkerhide_jerkin',
       'cragwalker_boots',
       'windguard_leggings',
+      'simple_fishing_pole',
     ],
     greeting:
       'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',

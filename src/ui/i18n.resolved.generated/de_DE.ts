@@ -291,6 +291,7 @@ export const de_DE: EnTranslations = {
       "targetLabel": "Euer Ziel",
       "targetAnnounce": "Ziel: {name}",
       "partyLabel": "Eure Gruppe",
+      "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "Min",
@@ -320,7 +321,9 @@ export const de_DE: EnTranslations = {
       "actionPageIndicator": "Seite {page}",
       "targetCycle": "Ziel tauschen",
       "targetCycleShort": "Ziel",
-      "spellbookPageLabel": "Seite {page}"
+      "spellbookPageLabel": "Seite {page}",
+      "hideKeyboard": "Tastatur ausblenden",
+      "chatPlaceholder": "Sag etwas..."
     },
     "tutorial": {
       "moveBodyTouch": "Nutze den Bewegungsstick zum Bewegen und zieh über den Bildschirm, um dich umzusehen. Mach ein paar Schritte, um zu beginnen.",
@@ -1015,18 +1018,18 @@ export const de_DE: EnTranslations = {
       },
       "allStatsPctReduce": "Verringert alle Attribute um {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Erhöht Angriffskraft um {pct}%",
+        "armor": "Erhöht Rüstung um {pct}%",
+        "int": "Erhöht Intelligenz um {pct}%",
+        "sta": "Erhöht Ausdauer um {pct}%",
+        "allStats": "Erhöht alle Attribute um {pct}%"
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Verringert Rüstung um {pct}%",
+      "armorPctStacks": "Verringert Rüstung um {pct}% ({stacks} Stapel)",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -1432,6 +1435,7 @@ export const de_DE: EnTranslations = {
     "archetypeTitle": {
       "label": "Titel",
       "none": "Keiner",
+      "hobbyLabel": "Freizeit",
       "armorcrafting": "Rüstungsschmied",
       "weaponcrafting": "Waffenschmied",
       "jewelcrafting": "Juwelier",
@@ -1454,7 +1458,10 @@ export const de_DE: EnTranslations = {
       "craftedToast": "Hergestellt: {name}",
       "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
       "unknownRecipe": "Dieses Rezept existiert nicht.",
-      "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept."
+      "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.",
+      "notAtHub": "Ihr müsst Euch am Handwerksplatz und auf der erforderlichen Stufe befinden, um das herzustellen.",
+      "throttled": "Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.",
+      "recipeNotLearned": "Ihr habt dieses Rezept noch nicht erlernt."
     }
   },
   "apiError": {
@@ -2240,8 +2247,8 @@ export const de_DE: EnTranslations = {
       "waveGoldBody": "Die mittlere Welle: zweischneidige Kombinationen, in denen dein Build allmählich Gestalt annimmt und zu glänzen beginnt.",
       "wavePrismaticTitle": "Prismatisch",
       "wavePrismaticBody": "Die letzte Welle: build-prägende, bildschirmschmelzende Ausschläge, die sich auf die beste Art lächerlich anfühlen sollen.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Yumi beschützen",
+      "yumiBody": "Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.",
       "powerupsTitle": "Powerups im Ring",
       "powerupsBody": "Mitten im Kampf fallen außerdem leuchtende Kugeln in die Arena, frei für den, der sie zuerst erreicht. Sie sind absichtlich völlig übertrieben und halten nur kurz an: Geschwindigkeitsdämon für einen Wimpernschlag blendenden Tempos, Koloss, um dich zu einem schwerfälligen Riesen anschwellen zu lassen, Mondstiefel für einen federnden Sprung bei niedriger Schwerkraft und Berserker für einen plötzlichen Schub an Raserei.",
       "ladderHeading": "Die Rangleiter erklimmen",
@@ -3674,42 +3681,42 @@ export const de_DE: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Yumi 3 gegen 3",
+    "bracket5": "Yumi 5 gegen 5",
+    "enterQueue": "Yumi beschützen beitreten!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Ihr tretet der Warteschlange für Yumi beschützen bei. Bewacht Euren Begleiter…",
+      "leave": "Ihr verlasst die Warteschlange für Yumi beschützen.",
+      "teamLeave": "Euer Team verlässt die Warteschlange für Yumi beschützen."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Bei Yumi beschützen 3 gegen 3 ist eine Gruppe von bis zu drei Spielern erlaubt.",
+      "partyTooBig5": "Bei Yumi beschützen 5 gegen 5 ist eine Gruppe von bis zu fünf Spielern erlaubt."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Yumi beschützen! Verteidigt Euren Begleiter und jagt ihren."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "YUMI BESCHÜTZEN",
+      "getReady": "Macht Euch bereit…",
+      "teleportIn": "Yumis teleportieren in {s}",
+      "suddenDeath": "PLÖTZLICHER TOD",
+      "yourYumi": "Eure Yumi",
+      "enemyYumi": "Gegnerische Yumi",
+      "aria": "Eure Yumi bei {mine} von {max} Gesundheit, gegnerische Yumi bei {theirs}.",
+      "collapse": "Die Yumi-beschützen-Leisten einklappen",
+      "expand": "Die Yumi-beschützen-Leisten ausklappen"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "AM BODEN!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "PLÖTZLICHER TOD! Die Yumis halten die Stellung!",
+      "teleport": "Die Yumis teleportieren!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "SIEG! Yumi ist in Sicherheit!",
+      "loss": "NIEDERLAGE! Eure Yumi ist gefallen."
     }
   },
   "fiesta": {
@@ -4161,6 +4168,7 @@ export const de_DE: EnTranslations = {
       "mobileSocial": "Soziales",
       "mobileArena": "Arena",
       "mobileMenu": "Menü",
+      "mobileSettings": "Einstellungen",
       "mobileUse": "Benutzen",
       "mobileMeters": "Anzeigen",
       "mobileMap": "Karte",
@@ -4710,6 +4718,7 @@ export const de_DE: EnTranslations = {
       "offGlobalCooldown": "Außerhalb der globalen Abklingzeit",
       "friendlyTarget": "Freundliches Ziel",
       "enemyTarget": "Feindliches Ziel",
+      "selfOnly": "Nur auf Euch selbst",
       "damageRange": "{min} bis {max}",
       "finisherDamage": "{base} plus {perCombo} pro Combopunkt"
     },
@@ -5020,7 +5029,7 @@ export const de_DE: EnTranslations = {
       "greedAria": "Gier für {item}",
       "passAria": "Bei {item} passen",
       "everyonePassed": "Alle passen bei {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} gewürfelt"
     }
   },
   "entities": {
@@ -5143,7 +5152,7 @@ export const de_DE: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Rüstungsspalter",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Spaltet die Rüstung des Ziels und verringert sie pro Anwendung um {damage}%. Stapelt sich bis zu 5-mal. Erzeugt sehr viel Bedrohung."
       },
       "taunt": {
         "name": "Anstacheln",
@@ -5599,7 +5608,7 @@ export const de_DE: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Verringert die Rüstung des Ziels 30 Sek. lang um 35."
+        "description": "Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%. Nicht mit Rüstungsspalter kumulierbar."
       },
       "hibernate": {
         "name": "Schlummer",
@@ -5877,6 +5886,9 @@ export const de_DE: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "Zahn des alten Greyjaw"
+      },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Verwitterte Buchseite"
@@ -7114,7 +7126,7 @@ export const de_DE: EnTranslations = {
         "name": "Diakon Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Trainingspuppe"
       },
       "ridge_stalker": {
         "name": "Gratpirscher"
@@ -7549,6 +7561,16 @@ export const de_DE: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Wölfe vor der Tür",
         "text": "Die Waldwölfe fallen Reisende auf der Nordstraße an, {playerName}. Töte 8 von ihnen, damit Eastbrook wieder freier atmen kann.",

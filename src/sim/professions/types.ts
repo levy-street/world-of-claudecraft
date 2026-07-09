@@ -64,6 +64,23 @@ export interface ProfessionRecipeRecord {
     craftB: string;
     minTier: number;
   };
+  // Acquisition source(s) a recipe can be learned from (issue #1299). A recipe
+  // with no `acquisition` field (or an empty list) is GRANDFATHERED: known
+  // automatically to every player with no learn step required, matching the
+  // behavior every recipe in content/recipes.ts had before this issue (no
+  // back-compat regression for existing common-tier/combo/tool recipes). A
+  // recipe that DOES list one or more sources must be acquired (see
+  // professions/crafting.ts acquireRecipe) via one of the listed sources
+  // before it can be crafted, independent of the player's tier/skill: knowing
+  // a recipe and being able to craft it at tier are orthogonal gates.
+  acquisition?: readonly ('trainer' | 'drop' | 'quest')[];
+  // Station-bound crafting (issue #1297): true only for the tier-4/5 recipes
+  // that require the player to be present at the level-20 crafting hub (see
+  // ../professions/crafting_hub.ts + content/professions.ts CRAFTING_HUB_*).
+  // Absent (the default) for every common-tier and combo recipe today: the
+  // free floor stays field-craftable, matching the existing "common tier
+  // never costs anything beyond materials" rule.
+  requiresHubStation?: boolean;
 }
 
 // One performed craft (a runtime instance of a RecipeRecord being worked),

@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "260ee7a7",
+      "state": "a4dc4df1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,6 +40,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -125,7 +126,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 407,
-      "state": "7fdc1ee0",
+      "state": "26739cb0",
       "events": "6f4af3da",
       "rng": {
         "draws": 3,
@@ -136,7 +137,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 407,
-      "state": "44e59742",
+      "state": "a0f9d7c2",
       "events": "32aafa0f",
       "rng": {
         "draws": 3,
@@ -147,7 +148,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 407,
-      "state": "032f7682",
+      "state": "70bbf102",
       "events": "c880e87c",
       "rng": {
         "draws": 73,
@@ -158,7 +159,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 407,
-      "state": "501ab3c6",
+      "state": "79efde0e",
       "events": "c880e87c",
       "rng": {
         "draws": 162,
@@ -169,7 +170,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 407,
-      "state": "8ae1a07e",
+      "state": "714b5da6",
       "events": "894957f3",
       "rng": {
         "draws": 254,
@@ -180,7 +181,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 407,
-      "state": "b16b723b",
+      "state": "9a5fe4a5",
       "events": "c880e87c",
       "rng": {
         "draws": 367,
@@ -191,7 +192,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 407,
-      "state": "a6ea7dcb",
+      "state": "a9ab1db5",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -216,6 +217,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,

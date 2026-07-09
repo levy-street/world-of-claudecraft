@@ -105,8 +105,6 @@ export interface MapPaintOptions {
   canvasSize: number;
   zoom: number;
   center: { x: number; z: number } | null;
-  /** Quest ids untracked from the map side list (their areas are not plotted). */
-  untrackedQuestIds?: ReadonlySet<string>;
 }
 
 /** What the painter reports back so Hud can update its drag state + cursor,
@@ -155,7 +153,6 @@ export class MapWindowPainter {
       center: opts.center,
       canvasSize: opts.canvasSize,
       decorations: this.decorations,
-      untrackedQuestIds: opts.untrackedQuestIds,
     });
     const colors = this.resolveColors();
     this.draw(ctx, model, opts.bg, opts.canvasSize, colors);

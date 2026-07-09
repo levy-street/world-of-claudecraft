@@ -291,6 +291,7 @@ export const nl_NL: EnTranslations = {
       "targetLabel": "Je Doelwit",
       "targetAnnounce": "Markeer {name}",
       "partyLabel": "Je Bende",
+      "partyChip": "Groep",
       "partyGroup": "Groep {n}",
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
@@ -320,7 +321,9 @@ export const nl_NL: EnTranslations = {
       "actionPageIndicator": "Pag. {page}",
       "targetCycle": "Wissel van doel",
       "targetCycleShort": "Doel",
-      "spellbookPageLabel": "Pagina {page}"
+      "spellbookPageLabel": "Pagina {page}",
+      "hideKeyboard": "Toetsenbord verbergen",
+      "chatPlaceholder": "Zeg iets..."
     },
     "tutorial": {
       "moveBodyTouch": "Gebruik de bewegingsstick om te bewegen en sleep over het scherm om rond te kijken. Zet een paar stappen om te beginnen.",
@@ -1015,18 +1018,18 @@ export const nl_NL: EnTranslations = {
       },
       "allStatsPctReduce": "Vermindert alle statistieken met {pct}%",
       "increasePct": {
-        "ap": "Increases attack power by {pct}%",
-        "armor": "Increases armor by {pct}%",
-        "int": "Increases Intellect by {pct}%",
-        "sta": "Increases Stamina by {pct}%",
-        "allStats": "Increases all attributes by {pct}%"
+        "ap": "Verhoogt aanvalskracht met {pct}%",
+        "armor": "Verhoogt pantser met {pct}%",
+        "int": "Verhoogt Intellect met {pct}%",
+        "sta": "Verhoogt Uithoudingsvermogen met {pct}%",
+        "allStats": "Verhoogt alle statistieken met {pct}%"
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
-      "armorPct": "Reduces armor by {pct}%",
-      "armorPctStacks": "Reduces armor by {pct}% ({stacks} stacks)",
+      "armorPct": "Vermindert pantser met {pct}%",
+      "armorPctStacks": "Vermindert pantser met {pct}% ({stacks} stapels)",
       "mortalWound": "Verringert erhaltene Heilung um {pct}%",
       "vulnerability": "Erhöht erlittenen Schaden um {pct}%",
       "physVuln": "Erhöht erlittenen physischen Schaden um {pct}%",
@@ -1432,6 +1435,7 @@ export const nl_NL: EnTranslations = {
     "archetypeTitle": {
       "label": "Titel",
       "none": "Geen",
+      "hobbyLabel": "Liefhebberij",
       "armorcrafting": "Harnasmaker",
       "weaponcrafting": "Wapensmid",
       "jewelcrafting": "Juwelier",
@@ -1454,7 +1458,10 @@ export const nl_NL: EnTranslations = {
       "craftedToast": "Gemaakt: {name}",
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
       "unknownRecipe": "Dat recept bestaat niet.",
-      "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept."
+      "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
+      "notAtHub": "Je moet bij de werkbank zijn, op het vereiste niveau, om dat te maken.",
+      "throttled": "Je maakt te snel. Wacht even en probeer het opnieuw.",
+      "recipeNotLearned": "Je hebt dat recept nog niet geleerd."
     }
   },
   "apiError": {
@@ -2240,8 +2247,8 @@ export const nl_NL: EnTranslations = {
       "waveGoldBody": "De middelste golf: tweesnijdende combo's waar je build vorm begint te krijgen en gaat zingen.",
       "wavePrismaticTitle": "Prismatisch",
       "wavePrismaticBody": "De laatste golf: build-bepalende, schermversmeltende pieken bedoeld om belachelijk aan te voelen op de beste manier.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
+      "yumiHeading": "Bescherm Yumi",
+      "yumiBody": "Bescherm Yumi is een teamdoelspel dat in een doolhof wordt gespeeld: elke kant bewaakt zijn eigen kattenmetgezel terwijl hij die van de ander bejaagt. Zo nu en dan flitsen beide katten naar nieuwe hoeken van het doolhof, zodat het gevecht heen en weer gaat tussen verdedigen, jagen en de race om ze opnieuw te vinden. Sluit aan als drie tegen drie of vijf tegen vijf; sneuvelen in de strijd zet je maar even op de bank.",
       "powerupsTitle": "Power-ups in de ring",
       "powerupsBody": "Gloeiende bollen vallen ook middenin het gevecht in de arena, gratis voor wie ze als eerste bereikt. Ze zijn opzettelijk over de top en duren maar even: Speed Demon voor een flits van verblindend tempo, Colossus om uit te dijen tot een logge reus, Moon Boots voor een stuiterende sprong met lage zwaartekracht, en Berserker voor een plotselinge golf van razernij.",
       "ladderHeading": "De ladder beklimmen",
@@ -3674,42 +3681,42 @@ export const nl_NL: EnTranslations = {
     }
   },
   "yumi": {
-    "bracket3": "Yumi 3v3",
-    "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
+    "bracket3": "Bescherm Yumi 3v3",
+    "bracket5": "Bescherm Yumi 5v5",
+    "enterQueue": "Doe mee met Bescherm Yumi!",
     "queue": {
-      "join": "You join the Protect Yumi queue. Guard your familiar…",
-      "leave": "You leave the Protect Yumi queue.",
-      "teamLeave": "Your team leaves the Protect Yumi queue."
+      "join": "Je sluit je aan bij de Bescherm Yumi-wachtrij. Bewaak je metgezel…",
+      "leave": "Je verlaat de Bescherm Yumi-wachtrij.",
+      "teamLeave": "Je team verlaat de Bescherm Yumi-wachtrij."
     },
     "error": {
-      "partyTooBig3": "Protect Yumi 3v3 allows a party of up to three.",
-      "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
+      "partyTooBig3": "Bescherm Yumi 3v3 staat een groep van maximaal drie toe.",
+      "partyTooBig5": "Bescherm Yumi 5v5 staat een groep van maximaal vijf toe."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Bescherm Yumi! Verdedig je metgezel en bejaag die van hen."
     },
     "hud": {
-      "title": "PROTECT YUMI",
-      "getReady": "Get ready…",
-      "teleportIn": "Yumis move in {s}",
-      "suddenDeath": "SUDDEN DEATH",
-      "yourYumi": "Your Yumi",
-      "enemyYumi": "Enemy Yumi",
-      "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
-      "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "title": "BESCHERM YUMI",
+      "getReady": "Maak je klaar…",
+      "teleportIn": "Yumi's verplaatsen zich over {s}",
+      "suddenDeath": "PLOTSELINGE DOOD",
+      "yourYumi": "Jouw Yumi",
+      "enemyYumi": "Vijandige Yumi",
+      "aria": "Jouw Yumi op {mine} van {max} gezondheid, vijandige Yumi op {theirs}.",
+      "collapse": "De Bescherm Yumi-balken inklappen",
+      "expand": "De Bescherm Yumi-balken uitklappen"
     },
     "respawn": {
-      "title": "DOWNED!"
+      "title": "NEERGEHAALD!"
     },
     "banner": {
-      "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "sudden": "PLOTSELINGE DOOD! De Yumi's houden stand!",
+      "teleport": "De Yumi's teleporteren!"
     },
     "end": {
-      "win": "VICTORY! Yumi is safe!",
-      "loss": "DEFEAT! Your Yumi has fallen."
+      "win": "OVERWINNING! Yumi is veilig!",
+      "loss": "NEDERLAAG! Jouw Yumi is gevallen."
     }
   },
   "fiesta": {
@@ -4161,6 +4168,7 @@ export const nl_NL: EnTranslations = {
       "mobileSocial": "Sociaal",
       "mobileArena": "Arena",
       "mobileMenu": "Menu",
+      "mobileSettings": "Instellingen",
       "mobileUse": "Gebruiken",
       "mobileMeters": "Meters",
       "mobileMap": "Kaart",
@@ -4710,6 +4718,7 @@ export const nl_NL: EnTranslations = {
       "offGlobalCooldown": "Buiten de globale afkoeltijd",
       "friendlyTarget": "Vriendelijk doelwit",
       "enemyTarget": "Vijandig doelwit",
+      "selfOnly": "Alleen jezelf",
       "damageRange": "{min} tot {max}",
       "finisherDamage": "{base} plus {perCombo} per combopunt"
     },
@@ -5020,7 +5029,7 @@ export const nl_NL: EnTranslations = {
       "greedAria": "Hebzucht voor {item}",
       "passAria": "{item} passeren",
       "everyonePassed": "Iedereen passeerde {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} geworpen"
     }
   },
   "entities": {
@@ -5143,7 +5152,7 @@ export const nl_NL: EnTranslations = {
       },
       "sunder_armor": {
         "name": "Pantserscheur",
-        "description": "Sunders the target's armor, reducing it by {damage}% per application. Stacks up to 5 times. Generates a high amount of threat."
+        "description": "Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging."
       },
       "taunt": {
         "name": "Provoceren",
@@ -5599,7 +5608,7 @@ export const nl_NL: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Heksenlicht",
-        "description": "Verlaagt het pantser van het doelwit met 35 gedurende 30 sec."
+        "description": "Verlaagt het pantser van het doelwit met {damage}% gedurende 40 sec. Stapelt niet met Pantserscheur."
       },
       "hibernate": {
         "name": "Sluimer",
@@ -5877,6 +5886,9 @@ export const nl_NL: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "Tand van Oude Grijskaak"
+      },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
       },
       "weathered_ledger_page": {
         "name": "Verweerd Grootboekblad"
@@ -7114,7 +7126,7 @@ export const nl_NL: EnTranslations = {
         "name": "Diaken Voss"
       },
       "training_dummy": {
-        "name": "Training Dummy"
+        "name": "Oefenpop"
       },
       "ridge_stalker": {
         "name": "Bergkam-Sluiper"
@@ -7549,6 +7561,16 @@ export const nl_NL: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Wolven voor de Deur",
         "text": "De boswolven worden brutaal en happen naar reizigers op de noordweg. Dun hun aantal uit, {playerName}. Dood 8 Boswolven en Oostbeek zal vrijer ademen.",

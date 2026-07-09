@@ -39,7 +39,7 @@ export type VcupIndicatorView =
       sig: string;
     };
 
-export function buildVcupIndicatorView(info: CupInfo | null): VcupIndicatorView {
+export function buildVcupIndicatorView(info: CupInfo | null, nearby: boolean): VcupIndicatorView {
   if (!info) return { kind: 'hidden', sig: 'hidden' };
   // My own match: the match strip (vale_cup_hud.ts) takes over.
   if (info.match !== null) return { kind: 'hidden', sig: 'hidden' };
@@ -54,7 +54,11 @@ export function buildVcupIndicatorView(info: CupInfo | null): VcupIndicatorView 
       sig: `q|${info.bracket}|${info.position}|${waiting}`,
     };
   }
-  if (info.live) {
+  // The live score only matters as chrome once you are near the Sowfield to
+  // watch it: world-wide it just sits over the zone's NPC nameplates for
+  // every player, everywhere, for the whole match. Gated on the same
+  // walk-up radius the theatre banners and spectator betting use.
+  if (info.live && nearby) {
     const s = Math.max(0, Math.floor(info.live.clock));
     return {
       kind: 'live',

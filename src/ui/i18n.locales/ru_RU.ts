@@ -114,6 +114,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': 'ч',
   'hudChrome.unitFrame.durationUnitDays': 'д',
   'hudChrome.unitFrame.partyLabel': 'Ваша группа',
+  'hudChrome.unitFrame.partyChip': 'Группа',
   'hudChrome.unitFrame.playerLabel': 'Ваш персонаж',
   'hudChrome.unitFrame.targetAnnounce': 'Цель: {name}',
   'hudChrome.unitFrame.targetLabel': 'Ваша цель',
@@ -1055,6 +1056,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'Общение',
   'hud.core.mobileArena': 'Арена',
   'hud.core.mobileMenu': 'Меню',
+  'hud.core.mobileSettings': 'Настройки',
   'hud.core.mobileUse': 'Использовать',
   'hud.core.mobileMeters': 'Счетчики',
   'hud.core.mobileMap': 'Карта',
@@ -1532,6 +1534,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': 'Вне глобального восстановления',
   'abilityUi.tooltip.friendlyTarget': 'Дружественная цель',
   'abilityUi.tooltip.enemyTarget': 'Вражеская цель',
+  'abilityUi.tooltip.selfOnly': 'Только на себя',
   'abilityUi.tooltip.damageRange': 'от {min} до {max}',
   'abilityUi.tooltip.finisherDamage': '{base} плюс {perCombo} за прием серии',
   'abilityUi.resources.mana': 'маны',
@@ -1836,7 +1839,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Оборонительная боевая стойка: вы создаете на 30% больше угрозы, но наносите и получаете на 10% меньше урона. Примените снова, чтобы выйти из стойки.',
   'entities.abilities.sunder_armor.name': 'Срез брони',
   'entities.abilities.sunder_armor.description':
-    'Раскалывает броню цели, снижая ее на 2% за применение. Суммируется до 5 раз (10% при полном стаке). Создает большое количество угрозы.',
+    'Раскалывает броню цели, снижая ее на {damage}% за применение. Суммируется до 5 раз. Создает большое количество угрозы.',
   'entities.abilities.taunt.name': 'Подстрекательство',
   'entities.abilities.taunt.description':
     'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
@@ -2176,7 +2179,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Контузия',
   'entities.abilities.bash.description': 'Оглушает цель на 2 сек. Только в облике бурого.',
   'entities.abilities.faerie_fire.name': 'Ведьмин огонь',
-  'entities.abilities.faerie_fire.description': 'Снижает броню цели на 35 на 30 сек.',
+  'entities.abilities.faerie_fire.description':
+    'Снижает броню цели на {damage}% на 40 сек. Не суммируется со Срезом брони.',
   'entities.abilities.hibernate.name': 'Дремота',
   'entities.abilities.hibernate.description':
     'Погружает цель в глубокий сон на срок до 8 сек. Любой урон пробуждает ее.',
@@ -2315,6 +2319,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': 'Шёлковая железа Сейблвеба',
   'entities.items.supply_crate.name': 'Украденный ящик припасов',
   'entities.items.greyjaw_fang.name': 'Клык старого Серочелюста',
+  'entities.items.chunk_of_ore.name': 'Кусок руды',
   'entities.items.weathered_ledger_page.name': 'Выветренная страница книги учета',
   'entities.items.morthen_grimoire.name': 'Гримуар Мортена',
   'entities.items.wolf_fang.name': 'Треснувший волчий клык',
@@ -2690,6 +2695,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': 'Страж приливов',
   'entities.npcs.tidewatcher_ondrel.greeting':
     'Омут пьёт лунный свет, {className}, и возвращает утопленников. Тридцать ночей я наблюдаю за теми вратами — и нынче ночью они открыты.',
+  'entities.quests.q_prof_intro.title': 'Ремесло для каждой руки',
+  'entities.quests.q_prof_intro.text':
+    'Каждая душа в Иствруке владеет ремеслом помимо меча, {playerName}. Вокруг города разбросаны рудные жилы - возьми кирку и принеси мне 5 кусков руды. Добудь их сам, учти: я отличу.',
+  'entities.quests.q_prof_intro.completion':
+    'Видишь? Руда в котомке, мозоли на руках. Продолжай добывать руду, валить лес и собирать травы в пути - а вернувшись в город, загляни на доску городского фокуса у рынка и на ближайший верстак. Честное ремесло ждёт тебя во всём этом, если пожелаешь.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Кусок руды',
   'entities.quests.q_wolves.title': 'Волки у дверей',
   'entities.quests.q_wolves.text':
     'Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.',
@@ -6306,6 +6317,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.metamorphosis': 'Охотник на демонов.',
 'hudChrome.archetypeTitle.label': 'Титул',
   'hudChrome.archetypeTitle.none': 'Нет',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Хобби',
   'hudChrome.archetypeTitle.armorcrafting': 'Бронник',
   'hudChrome.archetypeTitle.weaponcrafting': 'Оружейник',
   'hudChrome.archetypeTitle.jewelcrafting': 'Ювелир',
@@ -6346,8 +6358,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': 'ПОРАЖЕНИЕ! Ваша Yumi пала.',
   'hudChrome.crafting.comboRequirementUnmet':
     'У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.',
+  'hudChrome.crafting.notAtHub':
+    'Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.',
+  'hudChrome.crafting.throttled':
+    'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
+  'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
   'hudChrome.mobile.actionPageIndicator': 'Стр. {page}',
   'hudChrome.mobile.spellbookPageLabel': 'Страница {page}',
+  'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
+  'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение...',
+  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.vcup.title': 'Кубок Долины',
   'hudChrome.vcup.close': 'Закрыть окно Кубка Долины',
@@ -6605,4 +6625,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     'Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.',
   'hudChrome.bank.bonusSectionAria': 'Бонусные ячейки банка и способы их получить',
+  'entities.mobs.yumi_cat.name': 'Юми',
 };

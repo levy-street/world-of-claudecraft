@@ -38,6 +38,7 @@ import {
   armorReduction,
   CAST_COMPLETE_EPS,
   CAST_PUSHBACK_SEC,
+  CAST_QUEUE_WINDOW_SEC,
   CHANNEL_PUSHBACK_FRACTION,
   DEMON_HEAL_CAST_ID,
   DT,
@@ -92,7 +93,13 @@ function isShamanShock(abilityId: string): boolean {
 }
 
 export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
-  if (!p.castingAbility) return;
+  if (!p.castingAbility) {
+    // a queued press held back by a still-running GCD (see fireQueuedCast) retries
+    // here every tick until the GCD clears, instead of being dropped once at the
+    // moment the cast that queued it completed.
+    if (p.queuedCastAbility) fireQueuedCast(ctx, p);
+    return;
+  }
   if (isStunned(p)) {
     cancelCast(ctx, p);
     return;
@@ -135,6 +142,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       p.castAim = null;
       p.castTargetId = null;
       ctx.emit({ type: 'castStop', entityId: p.id, success: true });
+      fireQueuedCast(ctx, p);
     }
     return;
   }
@@ -154,7 +162,24 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // non-aimed cast can't inherit a stale target point.
     p.castAim = null;
     p.castTargetId = null;
+    fireQueuedCast(ctx, p);
   }
+}
+
+// Consumes the single-slot spell queue (see CAST_QUEUE_WINDOW_SEC), firing the
+// queued ability exactly as a fresh castAbility press. A cast shorter than the
+// flat GCD (the common hasted case) can complete before the GCD armed at its
+// start clears: hold the slot in that case and let updateCasting retry every
+// tick until the GCD is gone, instead of dropping the press.
+function fireQueuedCast(ctx: SimContext, p: Entity): void {
+  const queued = p.queuedCastAbility;
+  if (!queued) return;
+  const res = ctx.resolvedAbility(queued, p.id);
+  if (res && !res.def.offGcd && p.gcdRemaining > 0) return;
+  const aim = p.queuedCastAim;
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
+  castAbility(ctx, queued, p.id, aim ?? undefined);
 }
 
 export function cancelCast(ctx: SimContext, p: Entity): void {
@@ -163,6 +188,9 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.channeling = false;
   p.castAim = null;
   p.castTargetId = null;
+  // an interrupted cast never completed, so its queued follow-up is dropped too
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
   ctx.emit({ type: 'castStop', entityId: p.id, success: false });
 }
 
@@ -219,9 +247,23 @@ export function castAbility(
     return;
   }
   if (p.castingAbility) {
+    // classic-era spell queue: a press during the tail of the current cast
+    // queues instead of erroring, and updateCasting fires it on cast completion.
+    // Fishing is exempt (like the silence/lockout guards above): completeFishing
+    // never calls fireQueuedCast, so a press queued against it would strand and
+    // misfire on a later, unrelated cast.
+    if (p.castRemaining <= CAST_QUEUE_WINDOW_SEC && p.castingAbility !== FISHING_CAST_ID) {
+      p.queuedCastAbility = abilityId;
+      p.queuedCastAim = aim ?? null;
+      return;
+    }
     ctx.error(p.id, 'You are busy.');
     return;
   }
+  // note: a queued press fires here, re-running the full castAbility gate set
+  // (including this GCD check). fireQueuedCast holds the slot instead of calling
+  // in when the GCD is still running, so this early return only fires for a
+  // same-tick player press racing the GCD, not for a queued follow-up.
   if (!ability.offGcd && p.gcdRemaining > 0) return; // silent, classic spams this
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   const sharedCooldown = isShamanShock(ability.id)

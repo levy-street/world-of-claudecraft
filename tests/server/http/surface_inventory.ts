@@ -1482,6 +1482,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'GET',
+    path: '/admin/api/moderation/history',
+    handler: 'handleAdminApi arm: /admin/api/moderation/history',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
     path: '/admin/api/bug-reports',
     handler: 'handleAdminApi arm: /admin/api/bug-reports',
     contentType: PROBLEM_JSON,

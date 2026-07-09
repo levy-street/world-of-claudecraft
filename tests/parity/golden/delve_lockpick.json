@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "e9e0f0d9",
+      "state": "bf8f6ae7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,6 +41,7 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
           "entityId": 405,
@@ -123,7 +124,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 419,
-      "state": "41965dfc",
+      "state": "fdf6393a",
       "events": "d9e43221",
       "rng": {
         "draws": 4,
@@ -134,7 +135,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 419,
-      "state": "e9e00a5d",
+      "state": "0067222d",
       "events": "9cfda0e2",
       "rng": {
         "draws": 4,
@@ -145,7 +146,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 419,
-      "state": "c2591642",
+      "state": "efc869f0",
       "events": "356a26ae",
       "rng": {
         "draws": 5,
@@ -156,7 +157,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 421,
-      "state": "7d6620ae",
+      "state": "25eccec6",
       "events": "13255c68",
       "rng": {
         "draws": 8,
@@ -186,6 +187,7 @@
             "xpGained": 898
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {
             "collapsed_reliquary:normal": 1
           },
@@ -419,7 +421,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 421,
-      "state": "e185b903",
+      "state": "efcefe69",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -430,7 +432,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 421,
-      "state": "e185b903",
+      "state": "efcefe69",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -460,6 +462,7 @@
             "xpGained": 898
           },
           "craftSkills": {},
+          "craftThrottle": {},
           "delveClears": {
             "collapsed_reliquary:normal": 1
           },

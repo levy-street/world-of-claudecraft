@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { QUEST_LETTERS } from '../src/sim/content/letters';
 import {
   ABILITIES,
@@ -14,6 +15,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
+import { abilityBuffValue } from '../src/ui/ability_damage';
 import {
   assertEntityTranslationsReady,
   entityTranslationFallbackLog,
@@ -843,32 +845,48 @@ describe('i18n Localization Key Coverage', () => {
             `${lang}.${entry.key} should not use English yard abbreviation`,
           ).not.toMatch(/\byd\b/i);
         }
-        if (
-          entry.kind === 'ability' &&
-          entry.field === 'description' &&
-          entry.source.includes('$d')
-        ) {
-          expect(rendered, `${lang}.${entry.key}`).toContain('11-14');
-        }
-        if (
-          entry.kind === 'ability' &&
-          entry.field === 'description' &&
-          entry.source.includes('$o')
-        ) {
-          expect(rendered, `${lang}.${entry.key}`).toContain('57');
-        }
-        if (
-          entry.kind === 'ability' &&
-          entry.field === 'description' &&
-          entry.source.includes('$b')
-        ) {
-          expect(rendered, `${lang}.${entry.key}`).toContain('35');
+        // Placeholder-substitution parity. The fixture feeds SENTINEL values
+        // (damage '11-14', overTime '57', buff '35', duration '12'); an ability
+        // whose sim SOURCE carries a macro must echo that sentinel back in every
+        // locale, proving the localized string kept the interpolation token and
+        // did not hardcode a number or drop it (the pre-tokenization staleness
+        // this suite now guards). The check is deliberately value-agnostic: the
+        // sentinel is the injected input, not the ability's real value, so a
+        // second ability that legitimately shares a macro (many carry $b now)
+        // never trips it. A companion hard data pin below covers the real values.
+        if (entry.kind === 'ability' && entry.field === 'description') {
+          const src = entry.source;
+          if (src.includes('$d')) expect(rendered, `${lang}.${entry.key} $d`).toContain('11-14');
+          if (src.includes('$o')) expect(rendered, `${lang}.${entry.key} $o`).toContain('57');
+          if (src.includes('$b')) expect(rendered, `${lang}.${entry.key} $b`).toContain('35');
+          if (src.includes('$t')) expect(rendered, `${lang}.${entry.key} $t`).toContain('12');
         }
       }
       expect(entityTranslationFallbackLog(), `${lang} fallback log`).toHaveLength(0);
     }
 
+    // Hard data-regression pin. The sentinel check above proves the {buff} token
+    // survives interpolation everywhere but is value-agnostic, so it cannot catch
+    // a silent balance change. commanding_shout is the ability the old blanket $b
+    // pin actually meant: its $b resolves to its rank-1 Stamina buff via the same
+    // picker hud.ts feeds the token. Pinning the literal fails if the datum (or
+    // the picker) changes, and rendering with it confirms the EN description
+    // interpolates the real number instead of a stale hardcoded one.
+    const commandingShout = abilitiesKnownAt('warrior', ABILITIES.commanding_shout.learnLevel).find(
+      (known) => known.def.id === 'commanding_shout' && known.rank === 1,
+    );
+    expect(commandingShout, 'commanding_shout rank 1 resolves').toBeTruthy();
+    const commandingShoutBuff = abilityBuffValue(commandingShout!);
+    expect(commandingShoutBuff, 'commanding_shout rank-1 Stamina buff').toBe(6);
     setLanguage('en');
+    const commandingShoutDesc = tEntity({
+      kind: 'ability',
+      id: 'commanding_shout',
+      field: 'description',
+      values: { buff: String(commandingShoutBuff) },
+    });
+    expect(commandingShoutDesc).toContain('6');
+    expect(commandingShoutDesc).not.toContain('{buff}');
   });
 
   it('should provide every item translation in every locale without canonical fallbacks', () => {
@@ -1568,7 +1586,14 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');
     expect(html).toContain('data-i18n="hud.core.mobileArena"');
-    expect(html).toContain('data-i18n="hud.core.mobileMenu"');
+    // The Settings button (promoted to the bar between Social and More) uses
+    // mobileSettings ("Settings"); the old mobileMenu ("Menu") key stays in the
+    // catalog but, like mobileTarget, no longer appears in the markup.
+    expect(html).toContain('data-i18n="hud.core.mobileSettings"');
+    expect(html).not.toContain('data-i18n="hud.core.mobileMenu"');
+    // The Quests button reuses the tracker's "Quests" label rather than the
+    // longer "Quest Log" title.
+    expect(html).toContain('data-i18n="questUi.tracker.title"');
     expect(html).toContain('data-i18n="hud.core.mobileUse"');
     // Note: the v0.7 layout moved damage meters from a mobile tray button to a
     // dedicated #meters-window, so there is no longer a mobile-meters button to

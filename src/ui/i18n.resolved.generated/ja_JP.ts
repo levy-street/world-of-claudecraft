@@ -291,6 +291,7 @@ export const ja_JP: EnTranslations = {
       "targetLabel": "あなたのターゲット",
       "targetAnnounce": "ターゲット：{name}",
       "partyLabel": "あなたのパーティ",
+      "partyChip": "パーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
@@ -320,7 +321,9 @@ export const ja_JP: EnTranslations = {
       "actionPageIndicator": "{page}ページ",
       "targetCycle": "ターゲット切替",
       "targetCycleShort": "標的",
-      "spellbookPageLabel": "ページ{page}"
+      "spellbookPageLabel": "ページ{page}",
+      "hideKeyboard": "キーボードを隠す",
+      "chatPlaceholder": "発言する..."
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -1432,6 +1435,7 @@ export const ja_JP: EnTranslations = {
     "archetypeTitle": {
       "label": "称号",
       "none": "なし",
+      "hobbyLabel": "趣味",
       "armorcrafting": "防具鍛冶師",
       "weaponcrafting": "武器鍛冶師",
       "jewelcrafting": "宝石職人",
@@ -1454,7 +1458,10 @@ export const ja_JP: EnTranslations = {
       "craftedToast": "製作しました:{name}",
       "insufficientMaterials": "材料が不足しています。",
       "unknownRecipe": "そのレシピは存在しません。",
-      "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。"
+      "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
+      "notAtHub": "それを製作するには、必要なレベルで製作拠点にいる必要があります。",
+      "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
+      "recipeNotLearned": "そのレシピはまだ習得していません。"
     }
   },
   "apiError": {
@@ -4161,6 +4168,7 @@ export const ja_JP: EnTranslations = {
       "mobileSocial": "ソーシャル",
       "mobileArena": "アリーナ",
       "mobileMenu": "メニュー",
+      "mobileSettings": "設定",
       "mobileUse": "使用",
       "mobileMeters": "メーター",
       "mobileMap": "マップ",
@@ -4710,6 +4718,7 @@ export const ja_JP: EnTranslations = {
       "offGlobalCooldown": "グローバルクールダウン外",
       "friendlyTarget": "味方対象",
       "enemyTarget": "敵対象",
+      "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
     },
@@ -5143,7 +5152,7 @@ export const ja_JP: EnTranslations = {
       },
       "sunder_armor": {
         "name": "装甲切断",
-        "description": "対象のアーマーを破壊し、1回ごとに 2% 低下させます。最大5回まで重なります（最大で10%）。大量の脅威を生成します。"
+        "description": "対象のアーマーを破壊し、1回ごとに{damage}%低下させます。最大5回まで重なります。大量の脅威を生成します。"
       },
       "taunt": {
         "name": "挑発",
@@ -5599,7 +5608,7 @@ export const ja_JP: EnTranslations = {
       },
       "faerie_fire": {
         "name": "魔女火",
-        "description": "対象のアーマーを30秒間35低下させます。"
+        "description": "対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。"
       },
       "hibernate": {
         "name": "微睡み",
@@ -5877,6 +5886,9 @@ export const ja_JP: EnTranslations = {
       },
       "greyjaw_fang": {
         "name": "老グレイジョーの牙"
+      },
+      "chunk_of_ore": {
+        "name": "鉱石のかけら"
       },
       "weathered_ledger_page": {
         "name": "風化した帳簿のページ"
@@ -7051,7 +7063,7 @@ export const ja_JP: EnTranslations = {
     },
     "mobs": {
       "yumi_cat": {
-        "name": "Yumi"
+        "name": "ユミ"
       },
       "forest_wolf": {
         "name": "森の狼"
@@ -7549,6 +7561,16 @@ export const ja_JP: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "剣以外にも稼ぎはある",
+        "text": "イーストブルックの誰もが剣以外の生業を持っているものだ、{playerName}。町の周りに鉱脈が散らばっている。つるはしを振るって鉱石を5個持ってきてくれ。自分で採掘するんだぞ、見ればわかる。",
+        "completion": "どうだ？鞄には鉱石、手にはマメだ。旅の道中も採掘、伐採、薬草採取を続けるといい。町に戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も気にかけてくれ。その気があれば、どれも実入りのいい仕事になる。",
+        "objectives": {
+          "0": {
+            "label": "鉱石のかけら"
+          }
+        }
+      },
       "q_wolves": {
         "title": "戸口の狼",
         "text": "森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。",

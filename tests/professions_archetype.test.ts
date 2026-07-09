@@ -1,8 +1,9 @@
 // Active-archetype state and quest-gated switching (issue #1129, superseded scope).
 // Per the maintainer comment on #1129 (referencing decision #107), the original
 // conserved-mass budget / opposite-craft-drain model is dropped: knowledge across
-// all ten crafts stays purely additive, and archetype identity is a single active
-// craft the player swaps via quest. See src/sim/professions/archetype.ts.
+// all ten crafts stays purely additive, and archetype identity is an ADJACENT
+// PAIR (activeArchetype, the title craft the player swaps via quest, plus
+// pairedMajor, its ring-adjacent second major). See src/sim/professions/archetype.ts.
 //
 // STUB NOTE (read before extending these tests): the two quests behind this feature
 // (the zone-1 acceptance lore quest and the repeatable "make amends" quest) are
@@ -15,6 +16,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
+import { normalizeArchetypeState } from '../src/sim/professions/archetype';
 import { Sim } from '../src/sim/sim';
 
 function makeSim(seed = 42) {
@@ -110,5 +112,110 @@ describe('professions active-archetype state machine (#1129)', () => {
       expect(after[craft.id]).toBe(before[craft.id]);
     }
     expect(after).toEqual(before);
+  });
+});
+
+function archetypeOf(sim: Sim) {
+  return (
+    sim as unknown as {
+      players: Map<
+        number,
+        { archetype: { activeArchetype: string | null; pairedMajor: string | null } }
+      >;
+    }
+  ).players.get(sim.playerId)!.archetype;
+}
+
+// All pair ids below are pinned as LITERALS (never recomputed via
+// adjacentCrafts/defaultPairedMajor) so a change to the default-pair rule
+// reddens here deliberately, per the anti-self-comparison pin convention.
+describe('the stubbed default paired major (#1129 pair model, #1638 review round 2)', () => {
+  it('prefers the content-combo partner for every craft named in a combo recipe', () => {
+    const expected: Array<[string, string]> = [
+      ['armorcrafting', 'weaponcrafting'],
+      ['weaponcrafting', 'armorcrafting'],
+      ['alchemy', 'engineering'],
+      ['engineering', 'alchemy'],
+    ];
+    for (const [attuned, pair] of expected) {
+      const sim = makeSim();
+      sim.acceptArchetypeQuest(attuned);
+      expect(archetypeOf(sim).pairedMajor, `${attuned} pairs with ${pair}`).toBe(pair);
+    }
+  });
+
+  it('falls back to the first ring-adjacent neighbor for a craft with no content combo', () => {
+    const sim = makeSim();
+    sim.acceptArchetypeQuest('cooking');
+    expect(archetypeOf(sim).pairedMajor).toBe('engineering'); // cooking's ring-prev neighbor
+  });
+
+  it('switchArchetype re-derives the pair for the new title craft', () => {
+    const sim = makeSim();
+    sim.acceptArchetypeQuest('cooking');
+    const required = sim.archetypeAmendsRequired;
+    for (let i = 0; i < required; i++) sim.advanceAmendsProgress();
+    expect(sim.switchArchetype('alchemy')).toBe(true);
+    expect(archetypeOf(sim).pairedMajor).toBe('engineering'); // alchemy's combo partner
+  });
+});
+
+describe('archetype persistence: pairedMajor round trip and pre-pair save backfill', () => {
+  it('pairedMajor survives a serialize/reload round trip', () => {
+    const sim = makeSim();
+    sim.acceptArchetypeQuest('armorcrafting');
+    const saved = sim.serializeCharacter(sim.playerId);
+    const sim2 = makeSim();
+    const pid2 = sim2.addPlayer('warrior', 'Reloaded', { state: saved ?? undefined });
+    const archetype = (
+      sim2 as unknown as {
+        players: Map<
+          number,
+          { archetype: { activeArchetype: string | null; pairedMajor: string | null } }
+        >;
+      }
+    ).players.get(pid2)!.archetype;
+    expect(archetype.activeArchetype).toBe('armorcrafting');
+    expect(archetype.pairedMajor).toBe('weaponcrafting');
+  });
+
+  it('a pre-pair save (activeArchetype set, no pairedMajor field) loads with the default pair', () => {
+    const state = normalizeArchetypeState({
+      activeArchetype: 'cooking',
+      switchCount: 1,
+      amendsProgress: 2,
+    });
+    expect(state.pairedMajor).toBe('engineering'); // backfilled, not left null
+    expect(state.activeArchetype).toBe('cooking');
+    expect(state.switchCount).toBe(1);
+    expect(state.amendsProgress).toBe(2);
+  });
+
+  it('a saved pairedMajor that is not ring-adjacent to the title craft is replaced by the default', () => {
+    const state = normalizeArchetypeState({
+      activeArchetype: 'armorcrafting',
+      pairedMajor: 'cooking', // opposite, not adjacent: malformed
+      switchCount: 0,
+      amendsProgress: 0,
+    });
+    expect(state.pairedMajor).toBe('weaponcrafting');
+  });
+
+  it('a saved NON-DEFAULT but ring-adjacent pairedMajor is preserved (a future quest-chosen pair)', () => {
+    const state = normalizeArchetypeState({
+      activeArchetype: 'armorcrafting',
+      pairedMajor: 'leatherworking', // the OTHER neighbor, valid
+      switchCount: 0,
+      amendsProgress: 0,
+    });
+    expect(state.pairedMajor).toBe('leatherworking');
+  });
+
+  it('no archetype means no pair, for missing, null, and malformed saves alike', () => {
+    expect(normalizeArchetypeState(undefined).pairedMajor).toBeNull();
+    expect(normalizeArchetypeState(null).activeArchetype).toBeNull();
+    const malformed = normalizeArchetypeState({ activeArchetype: 'not_a_craft' });
+    expect(malformed.activeArchetype).toBeNull();
+    expect(malformed.pairedMajor).toBeNull();
   });
 });

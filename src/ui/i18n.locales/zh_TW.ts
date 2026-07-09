@@ -111,6 +111,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitHours': '時',
   'hudChrome.unitFrame.durationUnitDays': '天',
   'hudChrome.unitFrame.partyLabel': '你的隊伍',
+  'hudChrome.unitFrame.partyChip': '隊伍',
   'hudChrome.unitFrame.playerLabel': '你的角色',
   'hudChrome.unitFrame.targetAnnounce': '目標：{name}',
   'hudChrome.unitFrame.targetLabel': '你的目標',
@@ -980,6 +981,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': '社交',
   'hud.core.mobileArena': '競技場',
   'hud.core.mobileMenu': '選單',
+  'hud.core.mobileSettings': '設定',
   'hud.core.mobileUse': '使用',
   'hud.core.mobileMeters': '統計',
   'hud.core.mobileMap': '地圖',
@@ -1442,6 +1444,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.offGlobalCooldown': '不觸發公共冷卻',
   'abilityUi.tooltip.friendlyTarget': '友方目標',
   'abilityUi.tooltip.enemyTarget': '敵方目標',
+  'abilityUi.tooltip.selfOnly': '僅對自己',
   'abilityUi.tooltip.damageRange': '{min} 到 {max}',
   'abilityUi.tooltip.finisherDamage': '{base} 加每個連擊點 {perCombo}',
   'abilityUi.resources.mana': '法力',
@@ -1738,7 +1741,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '防禦戰鬥姿態：你產生的威脅值提高 30%，但造成和受到的傷害降低 10%。再次施放可離開該姿態。',
   'entities.abilities.sunder_armor.name': '削甲',
   'entities.abilities.sunder_armor.description':
-    '撕裂目標的護甲，每次使其降低 2%。最多疊加 5 次（疊滿時降低 10%）。產生大量威脅值。',
+    '撕裂目標的護甲，每次使其降低 {damage}%。最多疊加 5 次。產生大量威脅值。',
   'entities.abilities.taunt.name': '挑釁',
   'entities.abilities.taunt.description':
     '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。',
@@ -2051,7 +2054,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '震腦擊',
   'entities.abilities.bash.description': '昏迷目標 2 秒。僅限巨熊形態。',
   'entities.abilities.faerie_fire.name': '巫光',
-  'entities.abilities.faerie_fire.description': '使目標的護甲降低 35，持續 30 秒。',
+  'entities.abilities.faerie_fire.description':
+    '使目標的護甲降低 {damage}%，持續 40 秒。無法與削甲疊加。',
   'entities.abilities.hibernate.name': '沉眠',
   'entities.abilities.hibernate.description':
     '迫使目標陷入深度睡眠，最多持續 8 秒。任何傷害都會將其喚醒。',
@@ -2186,6 +2190,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': '玄網絲腺',
   'entities.items.supply_crate.name': '被盜補給箱',
   'entities.items.greyjaw_fang.name': '老灰顎的尖牙',
+  'entities.items.chunk_of_ore.name': '礦石塊',
   'entities.items.weathered_ledger_page.name': '風化帳頁',
   'entities.items.morthen_grimoire.name': '莫森的魔典',
   'entities.items.wolf_fang.name': '裂開的狼牙',
@@ -2553,6 +2558,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': '守潮者',
   'entities.npcs.tidewatcher_ondrel.greeting':
     '湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。',
+  'entities.quests.q_prof_intro.title': '人人都有一技之長',
+  'entities.quests.q_prof_intro.text':
+    '伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。',
+  'entities.quests.q_prof_intro.completion':
+    '看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，這裡面都有正經買賣等著你。',
+  'entities.quests.q_prof_intro.objectives.0.label': '礦石塊',
   'entities.quests.q_wolves.title': '門前群狼',
   'entities.quests.q_wolves.text':
     '森林狼已敢撲咬北路旅人，{playerName}。擊敗8隻森林狼，讓東溪能鬆一口氣。',
@@ -5869,6 +5880,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.metamorphosis': '惡魔獵人技巧。',
 'hudChrome.archetypeTitle.label': '稱號',
   'hudChrome.archetypeTitle.none': '無',
+  'hudChrome.archetypeTitle.hobbyLabel': '愛好',
   'hudChrome.archetypeTitle.armorcrafting': '鍛甲師',
   'hudChrome.archetypeTitle.weaponcrafting': '武器匠',
   'hudChrome.archetypeTitle.jewelcrafting': '珠寶匠',
@@ -5908,8 +5920,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'yumi.end.win': '勝利！Yumi安全了！',
   'yumi.end.loss': '戰敗！你的Yumi倒下了。',
   'hudChrome.crafting.comboRequirementUnmet': '你尚未達到該配方所需組合的兩項製造技能等級。',
+  'hudChrome.crafting.notAtHub': '必須達到所需等級並位於製作站，才能製作該物品。',
+  'hudChrome.crafting.throttled': '你製作得太快了，請稍等片刻後再試。',
+  'hudChrome.crafting.recipeNotLearned': '你還沒有學會這個配方。',
   'hudChrome.mobile.actionPageIndicator': '第{page}頁',
   'hudChrome.mobile.spellbookPageLabel': '頁{page}',
+  'hudChrome.mobile.hideKeyboard': '隱藏鍵盤',
+  'hudChrome.mobile.chatPlaceholder': '說點什麼...',
+  // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷盃',
   'hudChrome.vcup.title': '溪谷盃',
   'hudChrome.vcup.close': '關閉溪谷盃視窗',
@@ -6147,4 +6165,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '邀請好友：當好友升到 10 級，你們各獲得 2 個格子，最多 5 位好友。',
   'hudChrome.bank.bonusSectionAria': '獎勵銀行格子及獲取方式',
+  'entities.mobs.yumi_cat.name': '由美',
 };

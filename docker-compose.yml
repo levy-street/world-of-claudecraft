@@ -64,6 +64,11 @@ services:
       # heartbeat log line (tickHz, per-phase p95/max) plus over-budget stutter
       # traces. Off by default so production logs stay quiet.
       PERF_TICK_LOG: ${PERF_TICK_LOG:-}
+      # Runtime: bearer token that gates GET /metrics (server/http/health.ts).
+      # Empty (unset) leaves the endpoint feature-off (404); a non-empty value
+      # turns it on behind Authorization: Bearer <token>. Set on the host .env by
+      # the monitoring deploy so Prometheus can scrape the RED + process metrics.
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
       # Runtime: protects the loopback-only deploy countdown endpoint.
       RESTART_COUNTDOWN_SECRET: ${RESTART_COUNTDOWN_SECRET:-}
       # Runtime: Discord OAuth + the secret-gated game <-> Discord bot channel.
