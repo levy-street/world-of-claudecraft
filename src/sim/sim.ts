@@ -995,6 +995,8 @@ export interface PlayerMeta {
   // parity samples and character persistence do not churn on a default.
   dungeonDifficulty?: DungeonDifficulty;
   raidLockouts: Map<string, number>; // dungeon id -> epoch ms expiry
+  // Session only countdown armed when a kicked raider is still inside a raid instance.
+  raidKickEjectRemaining: number;
   // Transient presence status. Set by /afk and /dnd, cleared when the player
   // chats again. Session-only — never persisted, so it resets on login.
   away: AwayStatus | null;
@@ -1910,6 +1912,7 @@ export class Sim {
       loadouts: [],
       activeLoadout: -1,
       raidLockouts: new Map(),
+      raidKickEjectRemaining: 0,
       away: null,
       marketFilter: '',
       craftSkills: emptyCraftSkills(),

@@ -158,6 +158,7 @@ const baseEnTable = {
   'log.partyLeaves': '{name} leaves the party.',
   'log.partyLeft': '{name} has left the party.',
   'log.partyRemoved': '{name} has been removed from the party.',
+  'log.raidKickEject': 'You have been removed from the raid and will be teleported out shortly.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
   'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
@@ -5648,6 +5649,10 @@ const RULES: Rule[] = [
   {
     re: /^The royal door is sealed — Nythraxis must fall first\.$/,
     build: () => tRaidExtra('mustFall'),
+  },
+  {
+    re: /^You have been removed from the raid and will be teleported out shortly\.$/,
+    build: () => tSim('log.raidKickEject'),
   },
   {
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,

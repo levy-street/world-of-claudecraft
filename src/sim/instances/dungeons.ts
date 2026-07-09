@@ -39,6 +39,7 @@ import {
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
+const RAID_KICK_EJECT_SECONDS = 60;
 const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
 const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
 
@@ -359,12 +360,57 @@ export function leaveDungeon(ctx: SimContext, pid?: number): void {
       return;
     }
   }
+  relocateOutsideDungeon(ctx, r.meta, p, dungeon.id, true);
+}
+
+function relocateOutsideDungeon(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  p: Entity,
+  dungeonId: string,
+  emitLeaveText: boolean,
+): void {
+  const dungeon = DUNGEONS[dungeonId];
+  if (!dungeon) return;
   p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.targetId = null;
   p.autoAttack = false;
-  ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
+  if (emitLeaveText)
+    ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: meta.entityId });
+}
+
+export function scheduleRaidKickEject(ctx: SimContext, pid: number): void {
+  const r = ctx.resolve(pid);
+  if (!r || !isInRaidInstance(ctx, r.e.pos)) return;
+  r.meta.raidKickEjectRemaining = RAID_KICK_EJECT_SECONDS;
+  ctx.emit({
+    type: 'log',
+    text: 'You have been removed from the raid and will be teleported out shortly.',
+    color: '#aaf',
+    pid: r.meta.entityId,
+  });
+}
+
+function updateRaidKickEjects(ctx: SimContext): void {
+  for (const meta of ctx.players.values()) {
+    if (meta.raidKickEjectRemaining <= 0) continue;
+    const p = ctx.entities.get(meta.entityId);
+    if (!p || !isInRaidInstance(ctx, p.pos)) {
+      meta.raidKickEjectRemaining = 0;
+      continue;
+    }
+    meta.raidKickEjectRemaining -= 1;
+    if (meta.raidKickEjectRemaining > 0) continue;
+    const info = instanceInfoAt(ctx, p.pos);
+    if (!info || !RAID_ALLOWED_DUNGEON_IDS.has(info.dungeonId)) {
+      meta.raidKickEjectRemaining = 0;
+      continue;
+    }
+    relocateOutsideDungeon(ctx, meta, p, info.dungeonId, true);
+    meta.raidKickEjectRemaining = 0;
+  }
 }
 
 // Legacy single-dungeon entry points (tests + scripts use these).
@@ -547,6 +593,7 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
 
 export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
+  updateRaidKickEjects(ctx);
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
     const origin = instanceOriginOf(inst);

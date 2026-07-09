@@ -1514,6 +1514,35 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     expect(sim.players.get(fallen)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, fallen)).toBe(0);
   });
+
+  it('kicks a raider inside the raid arena out after the grace timer', () => {
+    const { sim, tank, raiders } = raidSetup('normal');
+    const kicked = raiders[1];
+    sim.players.get(kicked)!.questsDone.add('q_nythraxis_bound_guardian');
+    sim.enterDungeon('nythraxis_boss_arena', kicked);
+    const p = sim.entities.get(kicked) as AnyEntity;
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull();
+
+    sim.partyKick(kicked, tank);
+    const events = sim.drainEvents();
+    const meta = sim.players.get(kicked)!;
+    expect(meta.raidKickEjectRemaining).toBe(60);
+    expect(sim.partyOf(kicked)).toBeNull();
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'log',
+        text: 'You have been removed from the raid and will be teleported out shortly.',
+        pid: kicked,
+      }),
+    );
+
+    for (let i = 0; i < 20 * 60; i++) sim.tick();
+
+    expect(meta.raidKickEjectRemaining).toBe(0);
+    expect(sim.instanceSlotAt(p.pos)).toBeNull();
+    expect(p.pos.x).toBe(DUNGEONS.nythraxis_boss_arena.doorPos.x);
+    expect(p.pos.z).toBe(DUNGEONS.nythraxis_boss_arena.doorPos.z - 4);
+  });
 });
 
 describe('dungeons: ghost corpse-run re-entry', () => {

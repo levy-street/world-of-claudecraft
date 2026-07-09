@@ -12,10 +12,11 @@
 // `this.partyOf` call sites), and `removeFromParty` stays reachable by Sim's
 // `removePlayer` teardown through the SimContext seam.
 //
-// src/sim-pure: imports only sibling sim types + a content constant (no DOM/Three/
+// src/sim-pure: imports only sibling sim modules and types (no DOM/Three/
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { scheduleRaidKickEject } from '../instances/dungeons';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -231,7 +232,9 @@ export class PartyMachine {
       return;
     }
     if (!party.members.includes(targetPid) || targetPid === r.meta.entityId) return;
+    const wasRaid = party.raid;
     this.removeFromParty(targetPid, 'has been removed from the party');
+    if (wasRaid) scheduleRaidKickEject(this.ctx, targetPid);
   }
 
   // Leader-only handoff: pass leadership to another member without changing the
