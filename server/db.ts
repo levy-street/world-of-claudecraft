@@ -23,6 +23,7 @@ import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SOCIAL_SCHEMA } from './social_db';
+import { SOCIAL_LOGIN_SCHEMA } from './social_login_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
 
 // The realm-market key helpers and the backfill marker key live in
@@ -671,6 +672,9 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id), so it runs after SCHEMA. Applied unconditionally
     // (idempotent), like the Discord tables.
     await client.query(GITHUB_SCHEMA);
+    // Google/Twitch/Kick login tables (links + OAuth states). FK-references
+    // accounts(id), so it runs after SCHEMA and before requests can enable it.
+    await client.query(SOCIAL_LOGIN_SCHEMA);
     // Tier-2 global rate-limit backstop table (pg-backed fixed-window counters,
     // one row per (policy, key)) for the multi-realm deployment. Applied
     // unconditionally (idempotent), like the Discord/GitHub tables. See

@@ -611,6 +611,10 @@ export class Api {
     return this.post(`/api/auth/discord/start?mode=${mode}`, {});
   }
 
+  async socialLoginStart(provider: 'google' | 'twitch' | 'kick'): Promise<{ url: string }> {
+    return this.post(`/api/auth/${provider}/start`, {});
+  }
+
   // First-time Discord login chooser: create a brand-new account for the verified
   // Discord identity (parked under `linkToken`) and start a session.
   async discordLoginNew(linkToken: string): Promise<void> {

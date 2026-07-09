@@ -1684,6 +1684,9 @@ export const hudChromeStrings = {
   social: {
     lastSeen: 'Last seen: {when}',
     lastSeenNever: 'never',
+    googleLoginCta: 'Continue with Google',
+    twitchLoginCta: 'Continue with Twitch',
+    kickLoginCta: 'Continue with Kick',
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).

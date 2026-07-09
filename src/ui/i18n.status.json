@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6517,
-    "rows": 136857,
-    "translated": 136664,
-    "pending": 0,
+    "keys": 6520,
+    "rows": 136920,
+    "translated": 136667,
+    "pending": 60,
     "blocked": 193,
     "blockedSource": 93
   },
@@ -518562,6 +518562,150 @@
         }
       }
     },
+    "main:hudChrome.social.googleLoginCta": {
+      "scope": "main",
+      "enHash": "a19c86e027939f71",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "a19c86e027939f71",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
+    "main:hudChrome.social.kickLoginCta": {
+      "scope": "main",
+      "enHash": "68a2690d52db0d4b",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "68a2690d52db0d4b",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
+        }
+      }
+    },
     "main:hudChrome.social.lastSeen": {
       "scope": "main",
       "enHash": "555f7af799dc0041",
@@ -518785,6 +518929,78 @@
           "state": "translated",
           "srcHash": "66e97c472bc8e303",
           "by": "human"
+        }
+      }
+    },
+    "main:hudChrome.social.twitchLoginCta": {
+      "scope": "main",
+      "enHash": "c0c7c678dd85ac64",
+      "placeholders": [],
+      "locales": {
+        "es": {
+          "state": "pending"
+        },
+        "es_ES": {
+          "state": "pending"
+        },
+        "fr_FR": {
+          "state": "pending"
+        },
+        "fr_CA": {
+          "state": "pending"
+        },
+        "en_CA": {
+          "state": "translated",
+          "srcHash": "c0c7c678dd85ac64",
+          "by": "human"
+        },
+        "it_IT": {
+          "state": "pending"
+        },
+        "de_DE": {
+          "state": "pending"
+        },
+        "zh_CN": {
+          "state": "pending"
+        },
+        "zh_TW": {
+          "state": "pending"
+        },
+        "ko_KR": {
+          "state": "pending"
+        },
+        "ja_JP": {
+          "state": "pending"
+        },
+        "pt_BR": {
+          "state": "pending"
+        },
+        "ru_RU": {
+          "state": "pending"
+        },
+        "cs_CZ": {
+          "state": "pending"
+        },
+        "nl_NL": {
+          "state": "pending"
+        },
+        "pl_PL": {
+          "state": "pending"
+        },
+        "id_ID": {
+          "state": "pending"
+        },
+        "tr_TR": {
+          "state": "pending"
+        },
+        "sv_SE": {
+          "state": "pending"
+        },
+        "vi_VN": {
+          "state": "pending"
+        },
+        "da_DK": {
+          "state": "pending"
         }
       }
     },

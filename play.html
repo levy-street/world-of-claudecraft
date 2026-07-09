@@ -585,6 +585,21 @@
 
         <form id="login-panel" class="panel auth-panel auth-panel-premium" data-auth-mode="login" hidden novalidate>
           <h2 class="auth-title" id="auth-title" data-i18n="auth.enterRealm">Enter the Realm</h2>
+          <div id="social-login-buttons" hidden>
+            <button type="button" class="btn" id="btn-login-google" style="width:100%;margin:4px 0;background:linear-gradient(180deg,#ffffff,#e8edf4);border-color:#aab3c2;color:#202124;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;min-height:42px;">
+              <span aria-hidden="true" style="font-weight:800;color:#4285f4;">G</span>
+              <span data-i18n="hudChrome.social.googleLoginCta">Continue with Google</span>
+            </button>
+            <button type="button" class="btn" id="btn-login-twitch" style="width:100%;margin:4px 0;background:linear-gradient(180deg,#9146ff,#5d2db5);border-color:#3f1c83;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;min-height:42px;">
+              <span aria-hidden="true" style="font-weight:800;">T</span>
+              <span data-i18n="hudChrome.social.twitchLoginCta">Continue with Twitch</span>
+            </button>
+            <button type="button" class="btn" id="btn-login-kick" style="width:100%;margin:4px 0 12px;background:linear-gradient(180deg,#53fc18,#2aa900);border-color:#1f7600;color:#061a02;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;min-height:42px;">
+              <span aria-hidden="true" style="font-weight:800;">K</span>
+              <span data-i18n="hudChrome.social.kickLoginCta">Continue with Kick</span>
+            </button>
+          </div>
+          <div id="auth-or-divider" class="auth-or" hidden><span data-i18n="hudChrome.discord.orEmail">or use email</span></div>
           
           <div class="auth-field">
             <label for="login-user" class="auth-label" data-i18n="auth.username">Username</label>
