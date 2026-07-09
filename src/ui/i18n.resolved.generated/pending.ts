@@ -11,28 +11,58 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "es_ES": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "fr_FR": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "fr_CA": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "de_DE": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +70,84 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "nl_NL": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "pl_PL": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "id_ID": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "tr_TR": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "sv_SE": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "vi_VN": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ],
   "da_DK": [
     "entities.abilities.holy_taunt.description",
-    "entities.abilities.holy_taunt.name"
+    "entities.abilities.holy_taunt.name",
+    "entities.items.chunk_of_ore.name",
+    "entities.quests.q_prof_intro.completion",
+    "entities.quests.q_prof_intro.objectives.0.label",
+    "entities.quests.q_prof_intro.text",
+    "entities.quests.q_prof_intro.title"
   ]
 };
