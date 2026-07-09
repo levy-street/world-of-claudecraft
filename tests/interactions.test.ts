@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   activePvpOpponentIds,
+  findNearbyInteraction,
   HOVER_REPICK_MS,
   HoverPickGate,
   handlePickedEntity,
+  hasNearbyInteraction,
   hoverCursorKind,
   isAttackableEntity,
   isAttackHoverTarget,
+  isLiveAttackTarget,
 } from '../src/game/interactions';
 import type { Entity } from '../src/sim/types';
 
@@ -79,6 +82,86 @@ function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Ent
     ...partial,
   } as Entity;
 }
+
+describe('findNearbyInteraction', () => {
+  it('prefers a lootable corpse over objects and npcs in range', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const corpse = stubEntity({
+      id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      pos: { x: 2, y: 0, z: 0 },
+    });
+    const obj = stubEntity({
+      id: 3,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const npc = stubEntity({ id: 4, kind: 'npc', pos: { x: 1, y: 0, z: 1 } });
+
+    expect(
+      findNearbyInteraction({
+        player,
+        entities: new Map([
+          [corpse.id, corpse],
+          [obj.id, obj],
+          [npc.id, npc],
+        ]),
+      }),
+    ).toEqual({ kind: 'corpse', id: 2 });
+  });
+
+  it('falls through to delve, lootable object, then npc using the interact bands', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const delve = stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'delve_warded_chest',
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const obj = stubEntity({
+      id: 3,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const npc = stubEntity({ id: 4, kind: 'npc', pos: { x: 1, y: 0, z: 1 } });
+
+    const entities = new Map<number, Entity>([
+      [delve.id, delve],
+      [obj.id, obj],
+      [npc.id, npc],
+    ]);
+    expect(findNearbyInteraction({ player, entities })).toEqual({ kind: 'delve', id: 2 });
+    entities.delete(delve.id);
+    expect(findNearbyInteraction({ player, entities })).toEqual({ kind: 'object', id: 3 });
+    entities.delete(obj.id);
+    expect(findNearbyInteraction({ player, entities })).toEqual({ kind: 'npc', id: 4 });
+  });
+
+  it('returns null when nothing usable is in range', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const farNpc = stubEntity({ id: 2, kind: 'npc', pos: { x: 99, y: 0, z: 0 } });
+
+    expect(findNearbyInteraction({ player, entities: new Map([[farNpc.id, farNpc]]) })).toBeNull();
+  });
+
+  it('exposes a boolean check for hot mobile context paint', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const npc = stubEntity({ id: 2, kind: 'npc', pos: { x: 1, y: 0, z: 0 } });
+    const farObj = stubEntity({
+      id: 3,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 99, y: 0, z: 0 },
+    });
+
+    expect(hasNearbyInteraction({ player, entities: new Map([[farObj.id, farObj]]) })).toBe(false);
+    expect(hasNearbyInteraction({ player, entities: new Map([[npc.id, npc]]) })).toBe(true);
+  });
+});
 
 describe('hoverCursorKind', () => {
   it('returns attack for living hostile mobs', () => {
@@ -274,6 +357,80 @@ describe('activePvpOpponentIds', () => {
     });
 
     expect(ids.size).toBe(0);
+  });
+});
+
+describe('isLiveAttackTarget', () => {
+  it('treats active pvp players and enemy Yumi objectives as live attack targets', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const opponent = stubEntity({ id: 2, kind: 'player', hostile: false });
+    const enemyCat = stubEntity({ id: 900, kind: 'mob', hostile: false });
+    const ownCat = stubEntity({ id: 901, kind: 'mob', hostile: false });
+    const world = {
+      playerId: 1,
+      player,
+      duelInfo: { otherPid: 2, otherName: 'Duelist', state: 'active' as const },
+      arenaInfo: {
+        queued: false,
+        queueSize: 0,
+        rating: 1500,
+        wins: 0,
+        losses: 0,
+        format: 'yumi3' as const,
+        standings: {
+          '1v1': { rating: 1500, wins: 0, losses: 0 },
+          '2v2': { rating: 1500, wins: 0, losses: 0 },
+          fiesta: { rating: 1500, wins: 0, losses: 0 },
+          yumi3: { rating: 1500, wins: 0, losses: 0 },
+          yumi5: { rating: 1500, wins: 0, losses: 0 },
+        },
+        ladder: [],
+        ladders: { '1v1': [], '2v2': [], fiesta: [], yumi3: [], yumi5: [] },
+        match: {
+          state: 'active' as const,
+          oppPid: 2,
+          oppName: 'Duelist',
+          oppClass: 'warrior' as const,
+          oppLevel: 1,
+          format: 'yumi3' as const,
+          allies: [],
+          enemies: [],
+          yumi: {
+            team: 'A' as const,
+            size: 3 as const,
+            phase: 'active' as const,
+            matchElapsed: 10,
+            teleportIn: 50,
+            suddenDeathIn: 590,
+            damageTakenMult: 1,
+            down: false,
+            respawnIn: 0,
+            yumiA: {
+              entityId: 901,
+              hp: 5000,
+              maxHp: 5000,
+              x: 8400,
+              z: -1250,
+              alive: true,
+            },
+            yumiB: {
+              entityId: 900,
+              hp: 5000,
+              maxHp: 5000,
+              x: -8400,
+              z: -1250,
+              alive: true,
+            },
+            teamA: [],
+            teamB: [],
+          },
+        },
+      },
+    };
+
+    expect(isLiveAttackTarget(world, opponent)).toBe(true);
+    expect(isLiveAttackTarget(world, enemyCat)).toBe(true);
+    expect(isLiveAttackTarget(world, ownCat)).toBe(false);
   });
 });
 

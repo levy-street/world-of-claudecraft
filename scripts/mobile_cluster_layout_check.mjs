@@ -1,5 +1,5 @@
 // Geometric regression gate for the mobile HUD thumb clusters (the combat arc,
-// the Target swap / Use hollow seats, the page-toggle satellite, the left
+// the Target swap / Jump hollow seats, the page-toggle satellite, the left
 // utility cluster, and the bottom-centre Chat/More pair).
 //
 // Per device profile it measures REAL rendered getBoundingClientRect geometry
@@ -41,7 +41,6 @@ const CONTROL_IDS = [
   'mobile-target-cycle',
   'mobile-action-page-toggle',
   'mobile-autorun',
-  'mobile-interact',
   'mobile-jump',
   'mobile-chat',
   'mobile-social',
@@ -105,10 +104,9 @@ function collectRects(page) {
 const CIRCLE_IDS = new Set([
   'mobile-action-attack',
   'mobile-target-cycle',
-  'mobile-interact',
   'mobile-action-page-toggle',
   // Jump/Autorun are true circles too, nested around the joystick's hollow
-  // the same way Target/Use nest in the ring's (mirrored for the left thumb).
+  // the same way Target/Jump nest in the ring's (mirrored for the left thumb).
   'mobile-autorun',
   'mobile-jump',
   'slot-0',

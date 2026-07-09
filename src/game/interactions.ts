@@ -27,6 +27,71 @@ export interface PickInteractionHud {
   closeContextMenu(): void;
 }
 
+export interface NearbyInteractionWorld {
+  player: PickInteractionWorld['player'];
+  entities: PickInteractionWorld['entities'];
+}
+
+export type NearbyInteraction =
+  | { kind: 'corpse'; id: number }
+  | { kind: 'delve'; id: number }
+  | { kind: 'object'; id: number }
+  | { kind: 'npc'; id: number };
+
+export function findNearbyInteraction(world: NearbyInteractionWorld): NearbyInteraction | null {
+  const p = world.player;
+  let bestCorpse: number | null = null;
+  let bestCorpseD = INTERACT_RANGE;
+  let bestObj: number | null = null;
+  let bestObjD = INTERACT_RANGE;
+  let bestNpc: number | null = null;
+  let bestNpcD = INTERACT_RANGE + 1;
+  // Delve interactables use the same slightly wider pick band as keyboard
+  // interact, so the sim can emit its precise "move closer" hint.
+  let bestDelve: number | null = null;
+  let bestDelveD = INTERACT_RANGE + 1;
+
+  for (const e of world.entities.values()) {
+    const d = dist2d(p.pos, e.pos);
+    if (e.kind === 'mob' && e.lootable && d < bestCorpseD) {
+      bestCorpse = e.id;
+      bestCorpseD = d;
+    }
+    if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
+      if (d < bestDelveD) {
+        bestDelve = e.id;
+        bestDelveD = d;
+      }
+    } else if (e.kind === 'object' && e.lootable && d < bestObjD) {
+      bestObj = e.id;
+      bestObjD = d;
+    }
+    if (e.kind === 'npc' && d < bestNpcD) {
+      bestNpc = e.id;
+      bestNpcD = d;
+    }
+  }
+
+  if (bestCorpse !== null) return { kind: 'corpse', id: bestCorpse };
+  if (bestDelve !== null) return { kind: 'delve', id: bestDelve };
+  if (bestObj !== null) return { kind: 'object', id: bestObj };
+  if (bestNpc !== null) return { kind: 'npc', id: bestNpc };
+  return null;
+}
+
+export function hasNearbyInteraction(world: NearbyInteractionWorld): boolean {
+  const p = world.player;
+  for (const e of world.entities.values()) {
+    const d = dist2d(p.pos, e.pos);
+    if (e.kind === 'mob' && e.lootable && d < INTERACT_RANGE) return true;
+    if (e.kind === 'object' && e.templateId?.startsWith('delve_') && d < INTERACT_RANGE + 1)
+      return true;
+    if (e.kind === 'object' && e.lootable && d < INTERACT_RANGE) return true;
+    if (e.kind === 'npc' && d < INTERACT_RANGE + 1) return true;
+  }
+  return false;
+}
+
 export function isAttackHoverTarget(e: Entity | undefined): boolean {
   return hoverCursorKind(e, -1, new Set()) === 'attack';
 }
@@ -87,6 +152,17 @@ export function isAttackableEntity(
   // here so every attack affordance agrees with the sim).
   if (e.kind === 'mob') return e.hostile || activePvpOpponentSet.has(e.id);
   return e.kind === 'player' && activePvpOpponentSet.has(e.id);
+}
+
+export function isLiveAttackTarget(
+  world: Pick<PickInteractionWorld, 'player' | 'playerId' | 'duelInfo' | 'arenaInfo'>,
+  target: Entity | null | undefined,
+): boolean {
+  return isAttackableEntity(
+    target ?? undefined,
+    world.playerId ?? world.player.id,
+    activePvpOpponentIds(world),
+  );
 }
 
 /** Which game cursor to show when hovering an entity. */

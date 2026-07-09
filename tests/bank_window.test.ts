@@ -202,11 +202,11 @@ describe('bank_window: hud.ts wiring', () => {
   });
 
   it('a banker interact routes to the sim from every input path (gossip never renders for bankers)', () => {
-    // interactKey (keyboard, gamepad, the mobile button) and the mouse click-pick
-    // all funnel NPCs into openQuestDialog; the banker arm must divert to the sim
-    // interact (whose banker intercept emits the bank event both hosts open on)
-    // BEFORE any gossip renders, or the bank is unreachable in normal play. Found
-    // by a cross-platform audit: every earlier smoke drove
+    // interactKey (keyboard/gamepad), contextual mobile interact, and mouse
+    // click-pick all funnel NPCs into openQuestDialog; the banker arm must
+    // divert to the sim interact (whose banker intercept emits the bank event
+    // both hosts open on) BEFORE any gossip renders, or the bank is unreachable
+    // in normal play. Found by a cross-platform audit: every earlier smoke drove
     // __game.sim.interact() directly, which masked the missing client trigger.
     expect(hud).toMatch(
       /openQuestDialog\(npcId: number\): void \{[\s\S]{0,700}?if \(NPCS\[npc\.templateId\]\?\.banker\) \{[\s\S]{0,160}?this\.sim\.targetEntity\(npc\.id\);[\s\S]{0,80}?this\.sim\.interact\(\);[\s\S]{0,40}?return;/,

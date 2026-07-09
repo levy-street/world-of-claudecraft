@@ -1,5 +1,6 @@
 import { audio } from '../game/audio';
 import type { GamepadKind } from '../game/gamepad_map';
+import { isLiveAttackTarget } from '../game/interactions';
 import type { Keybinds } from '../game/keybinds';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
@@ -246,7 +247,6 @@ import {
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
-  getLanguage,
   moneyParts,
   type SupportedLanguage,
   type TranslationKey,
@@ -364,7 +364,7 @@ import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from
 import { buildTownFocusView, stepTownFocus } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
 import { TutorialOverlay } from './tutorial';
-import { svgIcon } from './ui_icons';
+import { hydrateIcons, svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
@@ -867,11 +867,14 @@ export class Hud {
   private mobileRingAttackBtn: HTMLButtonElement | null = null;
   private mobileRingSlotBtns: HTMLButtonElement[] = [];
   // Acquire-nearest fallback for the ring's attack toggle when the player has
-  // no live hostile target: wired by main.ts to the same nearest-attackable
-  // pick the touch layer uses (the HUD cannot resolve attackability itself,
-  // that helper lives behind the game-layer seam). Null until wired; the
-  // attack handler then falls back to the plain castSlot(0) toggle.
+  // no live attackable target: wired by main.ts to the same nearest-attackable
+  // pick the touch layer uses. Null until wired; the attack handler then falls
+  // back to the plain castSlot(0) toggle.
   onMobileAttackNearest: (() => void) | null = null;
+  // Context replacement for the primary mobile Attack button: main.ts owns the
+  // world scan/action, while HUD only decides when combat state permits using it.
+  onMobileCanContextInteract: (() => boolean) | null = null;
+  onMobileContextInteract: (() => boolean) | null = null;
   private hotbarActions: HotbarAction[] = []; // index = barSlot-1
   private loadedSlotMapFromStorage = false;
   private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
@@ -5516,6 +5519,10 @@ export class Hud {
   // (#mobile-action-ring); on a build that omits them (neither game entry does,
   // but this stays defensive like the #actionbar2-less template case above) the
   // ring silently stays unbuilt and update() skips painting it.
+  private hasLiveMobileAttackTarget(target: Entity | null): boolean {
+    return isLiveAttackTarget(this.sim, target);
+  }
+
   private buildMobileActionRing(): void {
     const attackBtn = document.getElementById('mobile-action-attack') as HTMLButtonElement | null;
     const slotBtns = Array.from(
@@ -5526,6 +5533,13 @@ export class Hud {
     if (!attackBtn || slotBtns.length !== 5 || !pageToggle || !pageIndicator) return;
     this.mobileRingAttackBtn = attackBtn;
     this.mobileRingSlotBtns = slotBtns;
+    hydrateIcons(attackBtn.parentElement ?? document);
+    if (!attackBtn.querySelector(':scope > .mobile-action-context-icon')) {
+      attackBtn.insertAdjacentHTML(
+        'afterbegin',
+        svgIcon('interact', { cls: 'mobile-action-context-icon' }),
+      );
+    }
 
     const ringButtons = [attackBtn, ...slotBtns];
     const ringEls: ActionBarSlotElements[] = ringButtons.map((btn) => {
@@ -5543,18 +5557,18 @@ export class Hud {
       return { btn, label, countEl, keybindEl, cdOverlay, cdText };
     });
 
-    // Wire clicks: attack -> the classic toggle via castSlot(0) while the
-    // player is auto-attacking or holds a live hostile target, and the
-    // acquire-nearest fallback (the old Closest behavior, injected by main.ts
-    // as onMobileAttackNearest) otherwise, so a bare tap with nothing targeted
-    // picks the closest enemy and starts swinging instead of erroring. Slot
-    // buttons -> castSlot(the resolved source slot for the CURRENT page at
-    // click time, not a captured page). Mirrors the desktop action-btn click
-    // pattern (audio.click, blur), EXCEPT the peek guard: the ring has no
-    // tooltip of its own (see the no-tooltip note below), so a set peek flag
-    // here is always STALE cross-talk from some other control's long-press.
-    // Each handler clears it and dismisses any lingering tooltip box but never
-    // early-returns on it (an early return here ate the player's next cast).
+    // Wire clicks: attack -> context interact first when combat state permits
+    // it, otherwise the classic toggle via castSlot(0) while auto-attacking or
+    // holding a live hostile target, and the acquire-nearest fallback (the old
+    // Closest behavior, injected by main.ts as onMobileAttackNearest) with
+    // nothing usable nearby. Slot buttons -> castSlot(the resolved source slot
+    // for the CURRENT page at click time, not a captured page). Mirrors the
+    // desktop action-btn click pattern (audio.click, blur), EXCEPT the peek
+    // guard: the ring has no tooltip of its own (see the no-tooltip note below),
+    // so a set peek flag here is always STALE cross-talk from some other
+    // control's long-press. Each handler clears it and dismisses any lingering
+    // tooltip box but never early-returns on it (an early return here ate the
+    // player's next cast).
     // bindTouchTap, not 'click': the browser only synthesizes click for the
     // PRIMARY pointer, so click-bound ring buttons went dead the moment the
     // other thumb held the joystick, which is how combat is actually played.
@@ -5564,11 +5578,15 @@ export class Hud {
       audio.click();
       const p = this.sim.player;
       const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
-      const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
-      if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {
-        this.castSlot(0);
-      } else {
-        this.onMobileAttackNearest();
+      const hasLiveAttackTarget = this.hasLiveMobileAttackTarget(target ?? null);
+      const contextInteracted =
+        !p.autoAttack && !hasLiveAttackTarget && !!this.onMobileContextInteract?.();
+      if (!contextInteracted) {
+        if (p.autoAttack || hasLiveAttackTarget || !this.onMobileAttackNearest) {
+          this.castSlot(0);
+        } else {
+          this.onMobileAttackNearest();
+        }
       }
       attackBtn.blur();
     });
@@ -6737,6 +6755,9 @@ export class Hud {
     // stay undefined when the ring DOM never got built, e.g. an older cached
     // template). Reuses the exact same world snapshot as the desktop bar.
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
+      const hasLiveAttackTarget = this.hasLiveMobileAttackTarget(target ?? null);
+      const contextInteract =
+        !p.autoAttack && !hasLiveAttackTarget && !!this.onMobileCanContextInteract?.();
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick({
           player: p,
@@ -6745,6 +6766,7 @@ export class Hud {
         }),
         this.mobileActionPage,
         mobilePageCount(),
+        contextInteract,
       );
     }
 

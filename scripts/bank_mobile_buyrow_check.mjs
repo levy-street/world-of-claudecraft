@@ -14,7 +14,7 @@ import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 
-const BASE = (process.env.GAME_URL ?? 'http://localhost:5173') + '/';
+const BASE = `${process.env.GAME_URL ?? 'http://localhost:5173'}/`;
 const CHAR_NAME = 'Proberton';
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -56,7 +56,7 @@ for (const profile of PROFILES) {
   });
   const page = await browser.newPage();
   const errors = [];
-  page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+  page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
   const cdp = await page.target().createCDPSession();
   // Satisfy PHONE_TOUCH_QUERY: (pointer: coarse) / no hover.
   await cdp.send('Emulation.setEmulatedMedia', {
@@ -94,9 +94,10 @@ for (const profile of PROFILES) {
   });
   await wait(1000);
 
-  // Act: the REAL touch interact opens the bank; deposit-all mounts the status
-  // line and fills the vault (which mounts the full toolbar).
-  await page.evaluate(() => document.querySelector('#mobile-interact')?.click());
+  // Act: the REAL contextual mobile interact opens the bank through the primary
+  // action button; deposit-all mounts the status line and fills the vault (which
+  // mounts the full toolbar).
+  await page.evaluate(() => document.querySelector('#mobile-action-attack')?.click());
   await page.waitForSelector('#bank-window', { visible: true, timeout: 5000 });
   await wait(400);
   await page.evaluate(() => document.querySelector('#bank-window .bank-deposit-all')?.click());

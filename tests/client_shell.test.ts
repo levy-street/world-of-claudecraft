@@ -1668,11 +1668,20 @@ describe('client HTML shell', () => {
     expect(mobileControlsTs).toContain(
       "this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());",
     );
-    // The attack toggle's fallback fires ONLY with no live hostile target (and
-    // never while auto-attacking), so a tap on a live target still toggles the
-    // classic castSlot(0) attack.
+    expect(mobileControlsTs).not.toContain("bindButton('mobile-interact'");
+    expect(mobileControlsTs).not.toContain('onInteract');
+    // The attack toggle's fallback fires ONLY with no live attackable target
+    // (including active PvP/Yumi targets, not just hostile mobs) and never while
+    // auto-attacking, so a tap on a live target still toggles the classic
+    // castSlot(0) attack.
+    expect(hudTs).toContain("import { isLiveAttackTarget } from '../game/interactions';");
+    expect(hudTs).toContain('private hasLiveMobileAttackTarget(target: Entity | null): boolean {');
+    expect(hudTs).toContain('return isLiveAttackTarget(this.sim, target);');
     expect(hudTs).toContain(
-      'if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {',
+      'if (p.autoAttack || hasLiveAttackTarget || !this.onMobileAttackNearest) {',
+    );
+    expect(mainTs).toContain(
+      "case 'npc': {\n        const npc = world.entities.get(action.id);\n        if (npc?.kind !== 'npc') return false;\n        world.targetEntity(action.id);",
     );
   });
 
@@ -1709,7 +1718,7 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // The cast bar sits at the classic centre seat above the bottom-centre
     // player frame, in both the base and landscape rules; on the compact tier
-    // both nudge 40px left so Jump's ring-row seat keeps a clear circle on
+    // both nudge 40px left so Jump's hollow seat keeps a clear circle on
     // 740px-wide phones.
     expect(hudMobileCss).toContain('bottom: calc(68px + env(safe-area-inset-bottom));');
     expect(hudMobileCss).toContain('bottom: calc(62px + env(safe-area-inset-bottom));');
@@ -1730,7 +1739,7 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('keeps the Target swap, Use, Jump and page toggle inside the action ring', () => {
+  it('keeps the Target swap, Jump and page toggle inside the action ring', () => {
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
@@ -1740,21 +1749,19 @@ describe('client HTML shell', () => {
         entry.indexOf('<div id="mobile-extra-controls"'),
       );
       expect(ring, name).toContain('id="mobile-target-cycle"');
-      expect(ring, name).toContain('id="mobile-interact"');
+      expect(ring, name).not.toContain('id="mobile-interact"');
       expect(ring, name).toContain('id="mobile-jump"');
       expect(ring, name).toContain('id="mobile-action-page-toggle"');
       expect(ring, name).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
-      expect(ring, name).toContain('data-i18n="hud.core.mobileUse"');
+      expect(ring, name).not.toContain('data-i18n="hud.core.mobileUse"');
       expect(ring, name).toContain('data-i18n="hudChrome.mobile.jump"');
       // The page toggle is the gold swap badge: number over the swap glyph.
       expect(ring, name).toContain('data-icon="swap"');
     }
-    // Jump's seat: one arc-seat past the 180deg action slot on Use's row,
-    // with its circle-edge gap to that slot EQUAL to Use's gap on the other
-    // side (centre at 2 * radius - hollow from the attack centre), so the
-    // bottom row reads even-spaced at every tier. Plus its left-handed mirror.
+    // Jump's seat: due left on the crescent hollow, replacing the old explicit
+    // Use button now that Attack becomes contextual Interact near usable things.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-action-ring #mobile-jump {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-radius) *\n      2 -\n      var(--mobile-ring-hollow) -\n      var(--mobile-ring-secondary-size) /\n      2\n    );',
+      'body.mobile-touch #mobile-action-ring #mobile-jump {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-hollow) -',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-jump {\n    left: calc(',
@@ -1787,7 +1794,7 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       '.mobile-action-slot[data-mobile-index="4"] {\n    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);\n    right: auto;\n  }',
     );
-    // Use (180deg, due left), Target swap (135deg, the up-left diagonal) and
+    // Jump (180deg, due left), Target swap (135deg, the up-left diagonal) and
     // the page toggle (90deg, due up over the attack button, to Target's
     // upper right) nest in the crescent hollow in 45deg steps. All three keep
     // their seats in the left-handed mirror. Pin the literal cos/sin factors:
@@ -1803,7 +1810,7 @@ describe('client HTML shell', () => {
       'body.mobile-touch #mobile-target-cycle {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-hollow) *\n      0.7071 -',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-action-ring #mobile-interact {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-hollow) -',
+      'body.mobile-touch #mobile-action-ring #mobile-jump {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-hollow) -',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-action-page-toggle {\n    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);',
@@ -1812,7 +1819,7 @@ describe('client HTML shell', () => {
       'body.mobile-touch.mobile-left-handed #mobile-target-cycle {\n    left: calc(',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-interact {\n    left: calc(',
+      'body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-jump {\n    left: calc(',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-action-page-toggle {\n    left: calc(',
