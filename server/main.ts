@@ -206,6 +206,13 @@ import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } fro
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { handleSitePresenceHeartbeat } from './site_presence';
+import {
+  configureSocialLoginRuntime,
+  handleSocialLoginCallback,
+  handleSocialLoginStart,
+} from './social_login';
+import { pruneSocialLoginOAuthStates } from './social_login_db';
+import { isSocialLoginProvider } from './social_login_oauth';
 import { adminRolesForAccount } from './staff_db';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { passesTurnstile } from './turnstile';
@@ -1669,6 +1676,18 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         return json(res, 429, { error: 'rate limited' });
       return handleGitHubUnlink(req, res, accountId);
     }
+    const socialStartMatch = /^\/api\/auth\/([^/]+)\/start$/.exec(url);
+    if (req.method === 'POST' && socialStartMatch) {
+      const provider = socialStartMatch[1];
+      if (!isSocialLoginProvider(provider)) return json(res, 404, { error: 'not found' });
+      return handleSocialLoginStart(req, res, provider);
+    }
+    const socialCallbackMatch = /^\/api\/auth\/([^/]+)\/callback$/.exec(url);
+    if (req.method === 'GET' && socialCallbackMatch) {
+      const provider = socialCallbackMatch[1];
+      if (!isSocialLoginProvider(provider)) return json(res, 404, { error: 'not found' });
+      return handleSocialLoginCallback(req, res, provider);
+    }
     // $WOC balance proxy, keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain
     // balances are public) but narrow + IP rate-limited + per-wallet cached.
@@ -1937,6 +1956,11 @@ configureReportsRuntime({
 configureDiscordRuntime({
   isIpBlocked: (ip) => liveGame().isIpBlocked(ip),
   grantCosmetic: (accountId, chromaId) => liveGame().grantMechChromaToAccount(accountId, chromaId),
+});
+
+configureSocialLoginRuntime({
+  isIpBlocked: (ip) => liveGame().isIpBlocked(ip),
+  requestMetadata,
 });
 
 // configureAdminRuntime(game) and configureInternalRuntime(game) pass the live
@@ -2265,6 +2289,9 @@ export async function startServer(): Promise<http.Server> {
     );
     void pruneGitHubOAuthStates(pool).catch((err) =>
       console.error('github oauth state prune failed:', err),
+    );
+    void pruneSocialLoginOAuthStates(pool).catch((err) =>
+      console.error('social login oauth state prune failed:', err),
     );
   }, DAILY_PRUNE_INTERVAL_MS).unref();
   setInterval(() => {

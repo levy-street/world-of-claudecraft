@@ -5611,13 +5611,18 @@ function flashWalletError(message: string): void {
 // Discord UI is on unless the native app build disables it.
 const DISCORD_BUILD_ENABLED =
   !NATIVE_APP && String(import.meta.env.VITE_DISCORD_DISABLED ?? '').trim() !== '1';
+type SocialLoginProvider = 'google' | 'twitch' | 'kick';
+const SOCIAL_LOGIN_BUILD_ENABLED =
+  !NATIVE_APP && String(import.meta.env.VITE_SOCIAL_LOGIN_DISABLED ?? '').trim() !== '1';
 // Community links for the mobile More tray. The invite mirrors the hardcoded
 // invite on the shells' community links and is the fallback when the server-fed
 // discordInviteUrl() is not known yet (logged out, offline).
 const DISCORD_INVITE_URL = 'https://discord.gg/GjhnUsBtw';
 const DONATE_URL = 'https://github.com/sponsors/levy-street';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
+const SOCIAL_ONBOARD_KEY = 'woc_social_onboard';
 let discordPopup: Window | null = null;
+let socialLoginPopup: Window | null = null;
 
 function flashDiscordError(): void {
   const el = document.getElementById('login-error');
@@ -5676,6 +5681,33 @@ window.addEventListener('message', (e: MessageEvent) => {
   }
   if (d.mode === 'login') window.location.reload();
   else void refreshDiscordStatus(); // link succeeded: refresh the in-game panel
+});
+
+function startSocialLoginOAuth(provider: SocialLoginProvider): void {
+  try {
+    localStorage.setItem(SOCIAL_ONBOARD_KEY, '1');
+  } catch {
+    /* storage disabled */
+  }
+  void api
+    .socialLoginStart(provider)
+    .then(({ url }) => {
+      window.location.href = url;
+    })
+    .catch((err) => {
+      console.error('[social-login] could not start oauth', err);
+      loginError(userFacingApiError(err));
+    });
+}
+
+window.addEventListener('message', (e: MessageEvent) => {
+  if (e.origin !== location.origin) return;
+  const d = e.data as { source?: string; ok?: boolean; error?: string | null } | null;
+  if (d?.source !== 'woc-social-login') return;
+  socialLoginPopup?.close();
+  socialLoginPopup = null;
+  if (d.ok) window.location.reload();
+  else loginError(userFacingApiError(new Error(d.error || 'provider_error')));
 });
 
 // ── GitHub link (developer badge) on the character-select screen ───────────────
@@ -7437,6 +7469,20 @@ function wireStartScreens(): void {
   // "Continue with Discord": first-class login at the top of the auth form.
   const discordLoginBtn = $('#btn-login-discord');
   const discordOrDivider = document.getElementById('auth-or-divider');
+  const socialButtons = document.getElementById('social-login-buttons');
+  if (socialButtons && SOCIAL_LOGIN_BUILD_ENABLED) {
+    socialButtons.hidden = false;
+    if (discordOrDivider) discordOrDivider.hidden = false;
+    const wireSocialButton = (id: string, provider: SocialLoginProvider) => {
+      document.getElementById(id)?.addEventListener('click', (e) => {
+        e.preventDefault();
+        startSocialLoginOAuth(provider);
+      });
+    };
+    wireSocialButton('btn-login-google', 'google');
+    wireSocialButton('btn-login-twitch', 'twitch');
+    wireSocialButton('btn-login-kick', 'kick');
+  }
   if (discordLoginBtn && DISCORD_BUILD_ENABLED) {
     discordLoginBtn.hidden = false;
     if (discordOrDivider) discordOrDivider.hidden = false;
@@ -7591,9 +7637,12 @@ function wireStartScreens(): void {
 
   // A just-completed Discord login should land straight in online play, not home.
   let discordOnboarding = false;
+  let socialOnboarding = false;
   try {
     discordOnboarding = localStorage.getItem(DISCORD_ONBOARD_KEY) === '1';
+    socialOnboarding = localStorage.getItem(SOCIAL_ONBOARD_KEY) === '1';
     localStorage.removeItem(DISCORD_ONBOARD_KEY);
+    localStorage.removeItem(SOCIAL_ONBOARD_KEY);
   } catch {
     /* storage disabled */
   }
@@ -7622,7 +7671,9 @@ function wireStartScreens(): void {
     // (Discord status is refreshed by enterLoggedInChrome above.)
     // A just-completed Discord login lands straight in play; capture a recovery
     // email first if the Discord grant did not provide one.
-    if (discordOnboarding) void maybePromptRecoveryEmail().then(() => enterOnlinePlayFlow());
+    if (discordOnboarding || socialOnboarding) {
+      void maybePromptRecoveryEmail().then(() => enterOnlinePlayFlow());
+    }
     if (isDesktopLoginPage()) void completeDesktopBrowserLogin();
   } else {
     enterLoggedOutChrome();
