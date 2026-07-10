@@ -465,4 +465,59 @@ describe('ClientWorld wire path', () => {
     expect(c.known.some((k: any) => k.def.id === 'reckless_vow')).toBe(true);
     expect(c.talentPoints()).toEqual({ total: 6, spent: pickedRows(snapshotAlloc.rows) });
   });
+
+  it('rebuilds known ability cost/effects when the talent snapshot changes (online tooltip refresh)', () => {
+    // Regression: the online client derives its known-ability list (and thus every
+    // ability tooltip's cost / cooldown / effect text) from the `tal` snapshot field.
+    // A talent that lowers an ability's cost (Crippling Strikes: Hamstring costs 66%
+    // less) must be reflected in the client's known list once the new allocation
+    // arrives, or the tooltip shows a stale cost.
+    const c = bareClient(1);
+    // First snapshot: no talents. Hamstring reads its base cost.
+    c.applySnapshot({
+      t: 'snap',
+      tick: 1,
+      time: 0,
+      ents: [],
+      self: selfWire({ tal: { alloc: emptyAllocation(), spec: null, role: null, loadouts: [] } }),
+    });
+    const baseCost = c.known.find((k: any) => k.def.id === 'hamstring')?.cost;
+    expect(baseCost).toBeGreaterThan(0);
+    // Second snapshot: Crippling Strikes picked. The derived cost must drop.
+    c.applySnapshot({
+      t: 'snap',
+      tick: 2,
+      time: 0,
+      ents: [],
+      self: selfWire({
+        tal: {
+          alloc: alloc({ rows: { 8: 'war_r8_crippling_strikes' } }),
+          spec: null,
+          role: null,
+          loadouts: [],
+        },
+      }),
+    });
+    const moddedCost = c.known.find((k: any) => k.def.id === 'hamstring')?.cost;
+    expect(moddedCost).toBe(Math.round(baseCost * (1 - 0.66)));
+    expect(moddedCost).toBeLessThan(baseCost);
+  });
+});
+
+describe('talent change wire refresh', () => {
+  it('bumps the player wireRev on every live allocation change so online clients re-pull tal', () => {
+    // The server only re-sends the heavy `tal` snapshot field (which the online client
+    // rebuilds its known-ability list + tooltips from) when the player's wireRev advances
+    // or the periodic backstop fires. recomputeTalents is the single choke point every live
+    // talent change flows through, so it must bump wireRev, mirroring the Vale Cup / fiesta
+    // kit swaps. Guards against a talent-mutating path leaving stale online tooltips.
+    const sim = warriorAtCap();
+    const meta = sim.players.get(sim.playerId)!;
+    const before = meta.wireRev;
+    expect(sim.applyTalents(alloc({ rows: { 8: 'war_r8_crippling_strikes' } }))).toBe(true);
+    expect(meta.wireRev).toBeGreaterThan(before);
+    const afterApply = meta.wireRev;
+    expect(sim.saveLoadout('Build', ['mortal_strike'], alloc({ spec: 'arms' }))).toBe(0);
+    expect(meta.wireRev).toBeGreaterThan(afterApply);
+  });
 });
