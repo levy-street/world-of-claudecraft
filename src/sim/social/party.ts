@@ -16,11 +16,11 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import type { PartyRole } from '../../world_api';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
-import type { PartyRole } from '../../world_api';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
 // from sim.ts with the only code that reads them; do NOT inline new numbers.

@@ -23,8 +23,8 @@ import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import {
-  angleTo,
   type Aura,
+  angleTo,
   armorReduction,
   dist2d,
   type Entity,

@@ -4,9 +4,9 @@
 // the party-shared instance, the claim -> free empty-reset, and the raid-lockout gate.
 
 import { describe, expect, it } from 'vitest';
+import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
-import { runEffects } from '../src/sim/combat/effect_dispatch';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import {
@@ -17,7 +17,7 @@ import {
   updateDoorTriggers,
   updateInstances,
 } from '../src/sim/instances/dungeons';
-import { Sim, type ResolvedAbility } from '../src/sim/sim';
+import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import {
   type AbilityDef,
   type Entity,
@@ -98,7 +98,12 @@ function interruptRes(lockout = 4): ResolvedAbility {
   };
 }
 
-function morthenHarness(seed = 777): { sim: AnySim; pid: number; player: AnyEntity; boss: AnyEntity } {
+function morthenHarness(seed = 777): {
+  sim: AnySim;
+  pid: number;
+  player: AnyEntity;
+  boss: AnyEntity;
+} {
   const sim = makeSim(seed);
   const pid = sim.addPlayer('warrior', 'Tank');
   enterDungeon(sim.ctx, 'hollow_crypt', pid);

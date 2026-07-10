@@ -278,7 +278,8 @@ export function runEffects(
           ctx.resolvedAbility(target.castingAbility, target.id)?.def ??
           ABILITIES[target.castingAbility];
         const scriptedBigCast =
-          target.kind === 'mob' && MOBS[target.templateId]?.bigCast?.castId === target.castingAbility
+          target.kind === 'mob' &&
+          MOBS[target.templateId]?.bigCast?.castId === target.castingAbility
             ? MOBS[target.templateId]?.bigCast
             : undefined;
         const school = interruptedDef?.school ?? scriptedBigCast?.school ?? 'nature';
