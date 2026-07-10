@@ -196,6 +196,13 @@ export const SFX = [
     prompt:
       'Earthy nature magic growing: rustling leaves and a low primal hum building. Seamless loop, no music.',
   },
+  {
+    key: 'cast_lightning_bolt',
+    custom: true,
+    filename: 'cast_lightning_bolt.wav',
+    duration: 1.5,
+    loop: true,
+  },
 
   // --- Spell projectiles ----------------------------------------------------
   {

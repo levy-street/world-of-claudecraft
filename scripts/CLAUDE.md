@@ -55,7 +55,8 @@ npm (see `package.json`); many more run directly.
 - Character names are letters-only (classic rule), scripts derive an `alpha` suffix
   from a base-36 timestamp so reruns don't collide.
 - Generated SFX must go through `gen_sfx.mjs` or `gen_sfx.mjs --conform-existing` and
-  pass `npm run sfx:check`; do not hand-edit MP3s around the checker.
+  pass `npm run sfx:check`; do not hand-edit assets around the checker. Retained custom
+  containers need an explicit catalog filename and remain subject to the generic audio checks.
 
 ## How to add one
 - **Browser E2E / tour:** copy `smoke_browser.mjs` / `visual_tour.mjs`; import

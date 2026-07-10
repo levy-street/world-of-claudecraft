@@ -39,12 +39,12 @@ contract stay aligned.
 
 | Rule | Standard | Reason |
 |---|---|---|
-| Container / codec | MP3 only, one audio stream | The runtime uses WebAudio `decodeAudioData`; MP3 is the broadest baseline for WebKit/iOS and Safari. Ogg Vorbis is intentionally out of scope. AAC in `.m4a` is a possible future efficiency pass, not this standard. |
+| Container / codec | Generated and default catalog assets use MP3 with one audio stream. An existing hand-authored asset may retain a different container only through an explicit `custom: true` catalog filename. | The runtime uses WebAudio `decodeAudioData`; MP3 is the broadest baseline for WebKit/iOS and Safari. Explicit custom assets remain subject to sample-rate, channel, and peak checks. |
 | Sample rate | 44.1kHz | Matches the ElevenLabs output profile and keeps all SFX uniform. |
 | Bitrate | Generator writes 128kbps CBR MP3; hand-authored clips must be <=192kbps | Short SFX do not benefit enough from 320kbps to justify the decoded-memory and download drift. |
 | Loudness | Peak-normalize to -6dBFS after channel conversion | Keeps generated and hand-authored clips at predictable relative levels with headroom for runtime gain/jitter. |
 | Channels | Mono by default; `stereo: true` in the catalog means stereo | Positional and one-shot sounds are panned/spatialized at runtime, so pre-rendered stereo width is wasted. Ambient beds may keep stereo width. |
-| Naming | `snake_case` key, filename exactly `<key>.mp3` | The filename, manifest key, and `scripts/sfx/sfx_prompts.mjs` key are the same identifier. |
+| Naming | `snake_case` key, filename exactly `<key>.mp3` by default. A custom filename must be flat, match the key stem, and be declared in the catalog. | The filename, manifest key, and `scripts/sfx/sfx_prompts.mjs` key stay tied to the same identifier. |
 
 ### Channel policy by playback path
 
@@ -192,6 +192,7 @@ Keys map to `public/audio/sfx/<key>.mp3`; the manifest
 | `cast_shadow` | 2.0 | ✓ | dark shadow magic whispering, an ominous low void hum |
 | `cast_holy` | 2.0 | ✓ | a holy golden light building, soft angelic choir shimmer |
 | `cast_nature` | 2.0 | ✓ | earthy nature magic growing, rustling leaves and a low primal hum |
+| `cast_lightning_bolt` | 1.5 | ✓ | explicitly cataloged hand-authored cast loop retained from the release branch |
 
 ### Spell projectiles (spatial one-shots)
 | key | dur | prompt summary |
@@ -272,10 +273,15 @@ and strips metadata. Existing files are skipped unless `--force`; use
 `node scripts/gen_sfx.mjs --conform-existing` to reprocess already-committed files
 without calling ElevenLabs.
 
+Catalog entries with `custom: true` and an explicit `filename` are committed
+source assets. The generator preserves their filename in the manifest and does
+not rewrite their container during `--conform-existing`; the checker still probes
+their sample rate, channel count, and peak level.
+
 `npm run sfx:check` scans `public/audio/sfx` with `ffprobe` and `ffmpeg
 volumedetect`. It exits non-zero and reports each file/rule violation for:
 
-- wrong container/codec or non-`.mp3` filename,
+- wrong container/codec or non-`.mp3` filename without an explicit custom catalog entry,
 - wrong sample rate,
 - stereo where mono is required or mono where `stereo: true` is required,
 - peak above -6dBFS (small codec tolerance allowed),

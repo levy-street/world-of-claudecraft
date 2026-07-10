@@ -4,15 +4,16 @@
 
 import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { SFX } from './sfx/sfx_prompts.mjs';
 import {
   buildSfxCatalogMap,
   channelLabel,
+  filenameForKey,
   keyFromFilename,
   SFX_STANDARD,
   validateSfxCatalog,
 } from './sfx/sfx_asset_standard.mjs';
 import { measurePeakDbfs, probeAudio } from './sfx/sfx_ffmpeg.mjs';
+import { SFX } from './sfx/sfx_prompts.mjs';
 
 const root = process.cwd();
 const sfxDir = path.join(root, 'public/audio/sfx');
@@ -50,6 +51,7 @@ try {
   add(violations, '[catalog]', err.message);
   catalog = new Map();
 }
+const catalogByFilename = new Map([...catalog.values()].map((entry) => [entry.filename, entry]));
 
 if (!existsSync(sfxDir)) {
   console.error(`SFX directory missing: ${path.relative(root, sfxDir)}`);
@@ -62,29 +64,47 @@ let checked = 0;
 for (const file of files) {
   const rel = path.relative(sfxDir, file).split(path.sep).join('/');
   const filename = path.basename(file);
-  const key = keyFromFilename(filename);
+  const entry = catalogByFilename.get(filename);
+  const customContainer = entry?.custom === true && entry.filename !== filenameForKey(entry.key);
+  const key = entry?.key ?? keyFromFilename(filename);
 
-  if (rel !== filename) add(violations, rel, 'audio clips must live directly under public/audio/sfx, not nested directories');
-  if (!SFX_STANDARD.filenamePattern.test(filename)) {
+  if (rel !== filename)
+    add(
+      violations,
+      rel,
+      'audio clips must live directly under public/audio/sfx, not nested directories',
+    );
+  if (!customContainer && !SFX_STANDARD.filenamePattern.test(filename)) {
     add(violations, rel, 'filename must be lowercase snake_case and end in .mp3');
   }
   if (!key) {
     add(violations, rel, 'wrong container: only .mp3 files are allowed');
     continue;
   }
-  const entry = catalog.get(key);
   if (!entry) {
     add(violations, rel, `filename key "${key}" is not present in scripts/sfx/sfx_prompts.mjs`);
+    continue;
   }
 
   try {
     const probe = await probeAudio(file);
     checked++;
-    if (probe.codec !== SFX_STANDARD.codec || !probe.formatName.split(',').includes(SFX_STANDARD.codec)) {
-      add(violations, rel, `wrong container/codec: expected MP3, got codec=${probe.codec || 'unknown'} format=${probe.formatName || 'unknown'}`);
+    if (
+      (!customContainer && probe.codec !== SFX_STANDARD.codec) ||
+      (!customContainer && !probe.formatName.split(',').includes(SFX_STANDARD.codec))
+    ) {
+      add(
+        violations,
+        rel,
+        `wrong container/codec: expected MP3, got codec=${probe.codec || 'unknown'} format=${probe.formatName || 'unknown'}`,
+      );
     }
     if (probe.sampleRateHz !== SFX_STANDARD.sampleRateHz) {
-      add(violations, rel, `wrong sample rate: expected ${SFX_STANDARD.sampleRateHz}Hz, got ${probe.sampleRateHz || 'unknown'}Hz`);
+      add(
+        violations,
+        rel,
+        `wrong sample rate: expected ${SFX_STANDARD.sampleRateHz}Hz, got ${probe.sampleRateHz || 'unknown'}Hz`,
+      );
     }
     const expectedChannels = entry?.channels ?? SFX_STANDARD.monoChannels;
     if (probe.channels !== expectedChannels) {
@@ -94,14 +114,16 @@ for (const file of files) {
         `wrong channel count: expected ${channelLabel(expectedChannels)}, got ${channelLabel(probe.channels || 0)}`,
       );
     }
-    if (!probe.bitRateBps) {
-      add(violations, rel, 'could not determine bitrate');
-    } else if (kbps(probe.bitRateBps) > SFX_STANDARD.bitrateCeilingKbps) {
-      add(
-        violations,
-        rel,
-        `bitrate above ceiling: expected <= ${SFX_STANDARD.bitrateCeilingKbps}kbps, got ${Math.round(kbps(probe.bitRateBps))}kbps`,
-      );
+    if (!customContainer) {
+      if (!probe.bitRateBps) {
+        add(violations, rel, 'could not determine bitrate');
+      } else if (kbps(probe.bitRateBps) > SFX_STANDARD.bitrateCeilingKbps) {
+        add(
+          violations,
+          rel,
+          `bitrate above ceiling: expected <= ${SFX_STANDARD.bitrateCeilingKbps}kbps, got ${Math.round(kbps(probe.bitRateBps))}kbps`,
+        );
+      }
     }
 
     const peak = await measurePeakDbfs(file);
@@ -118,9 +140,13 @@ for (const file of files) {
 }
 
 if (violations.length) {
-  console.error(`SFX conformance failed (${violations.length} violation${violations.length === 1 ? '' : 's'}):`);
+  console.error(
+    `SFX conformance failed (${violations.length} violation${violations.length === 1 ? '' : 's'}):`,
+  );
   for (const v of violations) console.error(`- ${v.file}: ${v.reason}`);
   process.exit(1);
 }
 
-console.log(`SFX conformance passed: ${checked} MP3 file${checked === 1 ? '' : 's'} in ${path.relative(root, sfxDir)}.`);
+console.log(
+  `SFX conformance passed: ${checked} audio file${checked === 1 ? '' : 's'} in ${path.relative(root, sfxDir)}.`,
+);

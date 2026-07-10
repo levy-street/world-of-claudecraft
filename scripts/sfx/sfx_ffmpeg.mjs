@@ -1,6 +1,6 @@
+import { execFile } from 'node:child_process';
 import { mkdir, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
-import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { SFX_STANDARD } from './sfx_asset_standard.mjs';
 
@@ -12,7 +12,9 @@ async function run(command, args) {
     return await execFileAsync(command, args, { maxBuffer: MAX_BUFFER });
   } catch (err) {
     if (err?.code === 'ENOENT') {
-      throw new Error(`${command} was not found on PATH. Install ffmpeg/ffprobe before running the SFX asset tools.`);
+      throw new Error(
+        `${command} was not found on PATH. Install ffmpeg/ffprobe before running the SFX asset tools.`,
+      );
     }
     const stderr = typeof err?.stderr === 'string' ? err.stderr.trim() : '';
     const detail = stderr ? `\n${stderr}` : '';
@@ -61,7 +63,8 @@ export async function measurePeakDbfs(filePath) {
     '-',
   ]);
   const match = /max_volume:\s*(-?(?:\d+(?:\.\d+)?|inf)) dB/i.exec(stderr);
-  if (!match) throw new Error(`Could not read max_volume from ffmpeg volumedetect for ${filePath}.`);
+  if (!match)
+    throw new Error(`Could not read max_volume from ffmpeg volumedetect for ${filePath}.`);
   return match[1].toLowerCase() === '-inf' ? Number.NEGATIVE_INFINITY : Number(match[1]);
 }
 

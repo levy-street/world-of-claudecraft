@@ -35,8 +35,9 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
   effects + NPC voice) keyed off their `*_manifest.generated.ts`; a missing clip is
   a silent no-op (the dialogue/combat text stays the source of truth).
 - **Sampled SFX asset standards live in `docs/design/sound_effects.md`.** Runtime
-  code assumes `public/audio/sfx` already passed `npm run sfx:check`: MP3, 44.1kHz,
-  -6dBFS peak, mono by default, stereo only for catalog entries marked `stereo:true`.
+  code assumes `public/audio/sfx` already passed `npm run sfx:check`: MP3 by default,
+  explicit catalog filenames for retained custom assets, 44.1kHz, -6dBFS peak, mono
+  by default, and stereo only for catalog entries marked `stereo:true`.
   Fix malformed clips in `scripts/gen_sfx.mjs` / `scripts/check_sfx.mjs`, not with
   runtime compensation in `sfx.ts`.
 - **`AudioContext` needs a user gesture**: `audio.init()`/`music.init()`/`sfx.init()`

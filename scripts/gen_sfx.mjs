@@ -16,9 +16,14 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { rm } from 'node:fs/promises';
 import path from 'node:path';
-import { SFX } from './sfx/sfx_prompts.mjs';
-import { channelLabel, channelsForEntry, SFX_STANDARD } from './sfx/sfx_asset_standard.mjs';
+import {
+  channelLabel,
+  channelsForEntry,
+  filenameForEntry,
+  SFX_STANDARD,
+} from './sfx/sfx_asset_standard.mjs';
 import { postProcessSfxFile } from './sfx/sfx_ffmpeg.mjs';
+import { SFX } from './sfx/sfx_prompts.mjs';
 
 const API = 'https://api.elevenlabs.io';
 const OUTPUT_FORMAT = 'mp3_44100_128';
@@ -33,17 +38,19 @@ const conformExisting = args.has('--conform-existing');
 const help = args.has('--help') || args.has('-h');
 
 if (help) {
-  console.log([
-    'Usage:',
-    '  ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]',
-    '  node scripts/gen_sfx.mjs --conform-existing',
-    '',
-    'Options:',
-    '  --force             Regenerate clips that already exist.',
-    '  --conform-existing  Reprocess existing public/audio/sfx clips through ffmpeg',
-    '                      without calling ElevenLabs. Missing clips are generated',
-    '                      only when ELEVENLABS_API_KEY is available.',
-  ].join('\n'));
+  console.log(
+    [
+      'Usage:',
+      '  ELEVENLABS_API_KEY=… node scripts/gen_sfx.mjs [--force]',
+      '  node scripts/gen_sfx.mjs --conform-existing',
+      '',
+      'Options:',
+      '  --force             Regenerate clips that already exist.',
+      '  --conform-existing  Reprocess existing public/audio/sfx clips through ffmpeg',
+      '                      without calling ElevenLabs. Missing clips are generated',
+      '                      only when ELEVENLABS_API_KEY is available.',
+    ].join('\n'),
+  );
   process.exit(0);
 }
 
@@ -105,9 +112,17 @@ let seconds = 0;
 const failed = [];
 
 for (const entry of SFX) {
-  const dest = path.join(sfxDir, `${entry.key}.mp3`);
+  const filename = filenameForEntry(entry);
+  const dest = path.join(sfxDir, filename);
   const channels = channelsForEntry(entry);
   const detail = `${entry.duration}s${entry.loop ? ', loop' : ''}, ${channelLabel(channels)}`;
+
+  // Explicit custom filenames are committed source assets. Keep them in the
+  // manifest, but never rewrite their container during bulk conformance.
+  if (entry.custom && entry.filename) {
+    skipped++;
+    continue;
+  }
 
   if (existsSync(dest) && conformExisting && !force) {
     process.stdout.write(`sfx  ${entry.key} (${detail}) conform… `);
@@ -124,9 +139,18 @@ for (const entry of SFX) {
     continue;
   }
 
-  if (entry.custom) { skipped++; continue; }
-  if (existsSync(dest) && !force) { skipped++; continue; }
-  if (!KEY) { skipped++; continue; }
+  if (entry.custom) {
+    skipped++;
+    continue;
+  }
+  if (existsSync(dest) && !force) {
+    skipped++;
+    continue;
+  }
+  if (!KEY) {
+    skipped++;
+    continue;
+  }
 
   process.stdout.write(`sfx  ${entry.key} (${detail})… `);
   const rawPath = path.join(sfxDir, `.${entry.key}.${process.pid}.${Date.now()}.raw.mp3`);
@@ -154,8 +178,9 @@ for (const entry of SFX) {
 // which clips are seamless loops.
 const entries = {};
 for (const entry of SFX) {
-  if (existsSync(path.join(sfxDir, `${entry.key}.mp3`))) {
-    entries[entry.key] = { url: `/audio/sfx/${entry.key}.mp3`, loop: !!entry.loop };
+  const filename = filenameForEntry(entry);
+  if (existsSync(path.join(sfxDir, filename))) {
+    entries[entry.key] = { url: `/audio/sfx/${filename}`, loop: !!entry.loop };
   }
 }
 const sorted = Object.fromEntries(
@@ -179,5 +204,7 @@ writeFileSync(
 console.log(
   `\nDone: ${made} generated, ${conformed} conformed, ${skipped} skipped, ${Object.keys(sorted).length}/${SFX.length} clips on disk.`,
 );
-console.log(`Billed ~${seconds.toFixed(1)} seconds of audio this run. Manifest: ${path.relative(root, manifestPath)}`);
+console.log(
+  `Billed ~${seconds.toFixed(1)} seconds of audio this run. Manifest: ${path.relative(root, manifestPath)}`,
+);
 if (failed.length) console.log(`Failed (${failed.length}): ${failed.join(', ')}`);
