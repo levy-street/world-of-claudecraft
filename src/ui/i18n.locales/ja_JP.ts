@@ -115,7 +115,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
   'hudChrome.readyCheck.ready': '準備完了',
   'hudChrome.readyCheck.notReady': '準備未完了',
-  'hudChrome.readyCheck.result': '準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。',
+  'hudChrome.readyCheck.result':
+    '準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',

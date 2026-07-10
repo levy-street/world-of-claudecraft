@@ -8,7 +8,8 @@
 import type { SimContext } from '../sim_context';
 import type { ReadyCheck } from '../types';
 
-// Classic-era ready checks give stragglers 30 seconds before marking them AFK.
+// Classic-era ready checks give stragglers 30 seconds; anyone still pending then is
+// tallied as "no response".
 export const READY_CHECK_SECONDS = 30;
 
 export function readyCheckStart(ctx: SimContext, pid?: number): void {
@@ -63,7 +64,11 @@ export function readyCheckRespond(ctx: SimContext, ready: boolean, pid?: number)
 // fixed end-of-tick system block, next to updateTradesAndInvites.
 export function updateReadyChecks(ctx: SimContext): void {
   for (const check of [...ctx.readyChecks.values()]) {
-    if (ctx.time >= check.endsAt) finalizeReadyCheck(ctx, check);
+    // Finalize on timeout, or as soon as nobody is still pending. The pending
+    // sweep also catches a check emptied by a leaver whose slot was dropped
+    // (social/party.ts) so the rest do not eat the full timeout.
+    const pending = [...check.responses.values()].some((s) => s === 'pending');
+    if (ctx.time >= check.endsAt || !pending) finalizeReadyCheck(ctx, check);
   }
 }
 

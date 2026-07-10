@@ -2059,8 +2059,9 @@ export type CalendarResultCode =
   | 'eventGone';
 
 // An in-flight party/raid ready check (social/ready_check.ts). Keyed on Sim by party
-// id. Each member is 'pending' until they answer; a timeout flips the stragglers to
-// 'afk'. Sim-internal state, never wired to the client (the outcome is announced as
+// id. Each member is 'pending' until they answer; anyone still 'pending' when the
+// timeout fires is counted as "no response" (there is no separate afk state).
+// Sim-internal state, never wired to the client (the outcome is announced as
 // chat/log lines and the yes/no prompt rides the readyCheckStart event).
 export interface ReadyCheck {
   partyId: number;

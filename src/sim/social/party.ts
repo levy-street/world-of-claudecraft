@@ -398,6 +398,10 @@ export class PartyMachine {
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
     this.partyByPid.delete(pid);
+    // Drop the leaver from any in-flight ready check so the remaining members can
+    // still early-finalize once everyone left has answered (their pending slot
+    // would otherwise block it for the full timeout).
+    this.ctx.readyChecks.get(party.id)?.responses.delete(pid);
     for (const mPid of [...party.members, pid]) {
       this.ctx.emit({
         type: 'log',
@@ -413,6 +417,9 @@ export class PartyMachine {
       }
       this.parties.delete(party.id);
       this.ctx.dropPartyMarkers(party.id);
+      // A disband mid-check would otherwise fire the counts-only summary to every
+      // ex-member 30s later about a party that no longer exists.
+      this.ctx.readyChecks.delete(party.id);
     } else if (party.leader === pid) {
       party.leader = party.members[0];
       const newLeader = this.ctx.players.get(party.leader);
