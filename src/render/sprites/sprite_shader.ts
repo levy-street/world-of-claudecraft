@@ -53,10 +53,10 @@ uniform vec3 uPointLightPos3;
 uniform vec3 uPointLightColor3;
 uniform int uPointLightCount;
 
-// Fog (Three.js standard)
-uniform vec3 fogColor;
-uniform float fogNear;
-uniform float fogFar;
+// Fog (shared with sprite_lighting uniforms)
+uniform vec3 uFogColor;
+uniform float uFogNear;
+uniform float uFogFar;
 
 varying vec2 vUv;
 varying vec3 vWorldPos;
@@ -123,9 +123,9 @@ void main() {
   // 8. Final color: texture × lighting (multiplicative modulation)
   vec3 finalColor = texColor.rgb * lighting;
 
-  // 9. Fog (Three.js-compatible linear fog)
-  float fogFactor = smoothstep(fogNear, fogFar, length(vWorldPos - uCameraPos));
-  finalColor = mix(finalColor, fogColor, fogFactor);
+  // 9. Fog (linear, matches Three.js Fog)
+  float fogFactor = smoothstep(uFogNear, uFogFar, length(vWorldPos - uCameraPos));
+  finalColor = mix(finalColor, uFogColor, fogFactor);
 
   gl_FragColor = vec4(finalColor, texColor.a * opacity);
 }
