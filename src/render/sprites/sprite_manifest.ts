@@ -9,11 +9,38 @@ import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 // Types
 // ---------------------------------------------------------------------------
 
+/** 8 cardinal+intercardinal viewing directions for Ragnarok-style sprites. */
+export type SpriteDir =
+  | 'front'
+  | 'frontRight'
+  | 'right'
+  | 'backRight'
+  | 'back'
+  | 'backLeft'
+  | 'left'
+  | 'frontLeft';
+
+/** All 8 directions in order (index matches the angle-bin quantization). */
+export const SPRITE_DIR_ORDER: readonly SpriteDir[] = [
+  'front',
+  'frontRight',
+  'right',
+  'backRight',
+  'back',
+  'backLeft',
+  'left',
+  'frontLeft',
+];
+
 export interface SpriteDef {
-  /** Base filename (without extension) under public/sprites/bodies/ */
+  /** Base filename (without extension) under public/sprites/bodies/ — front view (default) */
   bodyPng: string;
-  /** Optional weapon overlay filename under public/sprites/weapons/ */
+  /** Optional directional body variants (keys missing fall back to bodyPng) */
+  bodyDir?: Partial<Record<SpriteDir, string>>;
+  /** Optional weapon overlay filename under public/sprites/weapons/ — front view */
   weaponPng?: string;
+  /** Optional directional weapon variants (keys missing fall back to weaponPng) */
+  weaponDir?: Partial<Record<SpriteDir, string>>;
   /** World-unit height (pivot→crown) at e.scale = 1 — mirrors VisualDef.height */
   height: number;
   /** Floating offset above pivot (for elementals, ghosts) — mirrors VisualDef.hover */
@@ -22,6 +49,12 @@ export interface SpriteDef {
   tint?: number | 'entity';
   /** Tint strength (0..1) — mirrors VisualDef.tintStrength */
   tintStrength?: number;
+  /**
+   * When true, the sprite renders in world-space (faces its movement direction)
+   * and switches between 8 directional atlases based on camera angle.
+   * When false/undefined, the sprite is billboard-flat (always faces camera).
+   */
+  directional?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -207,6 +240,21 @@ export function spriteBodyMetaUrl(def: SpriteDef): string {
   return `${BODIES_DIR}/${def.bodyPng}.json`;
 }
 
+/** Resolve a directional body PNG name, falling back to the base bodyPng. */
+export function spriteBodyDirPng(def: SpriteDef, dir: SpriteDir): string {
+  return def.bodyDir?.[dir] ?? def.bodyPng;
+}
+
+/** Resolve a directional body PNG url. */
+export function spriteBodyDirUrl(def: SpriteDef, dir: SpriteDir): string {
+  return `${BODIES_DIR}/${spriteBodyDirPng(def, dir)}.png`;
+}
+
+/** Resolve a directional body JSON url. */
+export function spriteBodyDirMetaUrl(def: SpriteDef, dir: SpriteDir): string {
+  return `${BODIES_DIR}/${spriteBodyDirPng(def, dir)}.json`;
+}
+
 /** Resolve a weapon sprite's PNG url. */
 export function spriteWeaponUrl(weaponPng: string): string {
   return `${WEAPONS_DIR}/${weaponPng}.png`;
@@ -215,6 +263,33 @@ export function spriteWeaponUrl(weaponPng: string): string {
 /** Resolve a weapon sprite's JSON url. */
 export function spriteWeaponMetaUrl(weaponPng: string): string {
   return `${WEAPONS_DIR}/${weaponPng}.json`;
+}
+
+/** Resolve a directional weapon PNG name, falling back to the base weaponPng. */
+export function spriteWeaponDirPng(
+  def: SpriteDef,
+  dir: SpriteDir,
+): string | null {
+  if (!def.weaponPng) return null;
+  return def.weaponDir?.[dir] ?? def.weaponPng;
+}
+
+/** Resolve a directional weapon PNG url. Returns null if entity has no weapon. */
+export function spriteWeaponDirUrl(
+  def: SpriteDef,
+  dir: SpriteDir,
+): string | null {
+  const png = spriteWeaponDirPng(def, dir);
+  return png ? `${WEAPONS_DIR}/${png}.png` : null;
+}
+
+/** Resolve a directional weapon JSON url. Returns null if entity has no weapon. */
+export function spriteWeaponDirMetaUrl(
+  def: SpriteDef,
+  dir: SpriteDir,
+): string | null {
+  const png = spriteWeaponDirPng(def, dir);
+  return png ? `${WEAPONS_DIR}/${png}.json` : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -226,15 +301,41 @@ const _weaponPreloaded = new Set<string>();
 
 export function registerSpritePreloads(): void {
   for (const [, def] of Object.entries(SPRITE_DEFS)) {
-    // body
+    // body (front — always preload)
     if (!_preloaded.has(def.bodyPng)) {
       _preloaded.add(def.bodyPng);
       preloadSpriteAtlas(spriteBodyUrl(def), spriteBodyMetaUrl(def));
     }
-    // weapon (entity default)
+    // directional body variants
+    if (def.bodyDir) {
+      for (const dir of SPRITE_DIR_ORDER) {
+        const png = def.bodyDir[dir];
+        if (png && !_preloaded.has(png)) {
+          _preloaded.add(png);
+          preloadSpriteAtlas(
+            `${BODIES_DIR}/${png}.png`,
+            `${BODIES_DIR}/${png}.json`,
+          );
+        }
+      }
+    }
+    // weapon (entity default — front)
     if (def.weaponPng && !_weaponPreloaded.has(def.weaponPng)) {
       _weaponPreloaded.add(def.weaponPng);
       preloadWeaponAtlas(spriteWeaponUrl(def.weaponPng), spriteWeaponMetaUrl(def.weaponPng));
+    }
+    // directional weapon variants
+    if (def.weaponDir) {
+      for (const dir of SPRITE_DIR_ORDER) {
+        const png = def.weaponDir[dir];
+        if (png && !_weaponPreloaded.has(png)) {
+          _weaponPreloaded.add(png);
+          preloadWeaponAtlas(
+            `${WEAPONS_DIR}/${png}.png`,
+            `${WEAPONS_DIR}/${png}.json`,
+          );
+        }
+      }
     }
   }
   // Also preload ALL weapon sprite sheets from WEAPON_SPRITE_MAP so runtime

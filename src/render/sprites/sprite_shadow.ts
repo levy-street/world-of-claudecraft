@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { terrainHeight } from '../../sim/world';
-import { spriteLightingUniforms } from './sprite_lighting';
 
 // ---------------------------------------------------------------------------
 // Sprite shadow blob — small dark ellipse on the ground beneath each sprite
@@ -52,7 +51,6 @@ function getMatTemplate(): THREE.MeshBasicMaterial {
     colorWrite: true,
     side: THREE.DoubleSide,
     fog: true,
-    color: new THREE.Color(spriteLightingUniforms.uFogColor.value),
   });
   return _matTemplate;
 }
@@ -97,6 +95,8 @@ export function createSpriteShadow(parent: THREE.Object3D): SpriteShadow {
  * @param camY     — camera world Y (for top-down angle fade)
  * @param alive    — false when entity is dead/hidden
  * @param isOutdoor — false when entity is indoors (shadow hidden)
+ * @param seed     — terrain seed for height sampling
+ * @param fogColor — current fog color (for shadow tinting)
  */
 export function updateSpriteShadow(
   shadow: SpriteShadow,
@@ -106,6 +106,8 @@ export function updateSpriteShadow(
   camY: number,
   alive: boolean,
   isOutdoor: boolean,
+  seed: number,
+  fogColor: THREE.Color,
 ): void {
   if (!alive || !isOutdoor) {
     if (shadow.visible) {
@@ -121,10 +123,10 @@ export function updateSpriteShadow(
   const wz = _worldPos.z;
 
   // Terrain normal approximation via finite-difference height sampling
-  const hL = terrainHeight(wx - 0.3, wz);
-  const hR = terrainHeight(wx + 0.3, wz);
-  const hD = terrainHeight(wx, wz - 0.3);
-  const hU = terrainHeight(wx, wz + 0.3);
+  const hL = terrainHeight(wx - 0.3, wz, seed);
+  const hR = terrainHeight(wx + 0.3, wz, seed);
+  const hD = terrainHeight(wx, wz - 0.3, seed);
+  const hU = terrainHeight(wx, wz + 0.3, seed);
   _normal.set(hL - hR, 0.6, hD - hU).normalize();
   const slopeDot = _normal.dot(UP);
 
@@ -142,7 +144,7 @@ export function updateSpriteShadow(
   shadow.mesh.scale.set(s * 1.1, s * 0.7, 1);
 
   // Position at terrain height
-  const groundY = terrainHeight(wx, wz);
+  const groundY = terrainHeight(wx, wz, seed);
   shadow.mesh.position.y = 0.02 + groundY - _worldPos.y;
 
   // Opacity: fade with camera distance (top-down cameras → smaller shadow)
@@ -151,7 +153,7 @@ export function updateSpriteShadow(
   shadow.material.opacity = slopeFade * camFactor;
 
   // Tint shadow with fog color for environment blending
-  shadow.material.color.copy(spriteLightingUniforms.uFogColor.value);
+  shadow.material.color.copy(fogColor);
 
   shadow.mesh.visible = true;
   shadow.visible = true;

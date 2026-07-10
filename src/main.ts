@@ -1457,6 +1457,11 @@ async function startGame(
           renderer.setCameraFov(20);
           input.camDist = 40;
           input.classicZoomIdx = 4;
+          // Auto-enable click-to-move (Ragnarok-style point-and-click navigation)
+          if (!settings.get('clickToMove')) {
+            settings.set('clickToMove', 1);
+            syncClickMoveInput();
+          }
         } else {
           renderer.setCameraFov(settings.get('cameraFov'));
         }

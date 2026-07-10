@@ -73,7 +73,6 @@ export const spriteLightingUniforms = {
 // ---------------------------------------------------------------------------
 
 export class SpriteLightingSystem {
-  private currentBiome: string | null = null;
   private biomeTintScratch = new THREE.Vector3();
 
   /** Call once per frame from the renderer, after updateCamera(). */
@@ -107,9 +106,6 @@ export class SpriteLightingSystem {
 
     // Biome tint — lerp smoothly on biome change
     const targetTint = BIOME_TINTS[biome ?? 'vale'] ?? BIOME_TINTS.vale;
-    if (biome !== this.currentBiome) {
-      this.currentBiome = biome;
-    }
     const k = 1 - Math.exp(-dt * 2);
     this.biomeTintScratch.copy(targetTint);
     u.uBiomeTint.value.lerp(this.biomeTintScratch, k);
@@ -157,11 +153,11 @@ export class SpriteLightingSystem {
       const colKey = `uPointLightColor${i}` as keyof typeof u;
       if (i < count) {
         const l = candidates[i].light;
-        u[posKey].value.copy(l.position);
-        u[colKey].value.copy(l.color).multiplyScalar(l.intensity * 0.04);
+        (u[posKey].value as THREE.Vector3).copy(l.position);
+        (u[colKey].value as THREE.Color).copy(l.color).multiplyScalar(l.intensity * 0.04);
       } else {
-        u[posKey].value.set(0, -9999, 0);
-        u[colKey].value.set(0, 0, 0);
+        (u[posKey].value as THREE.Vector3).set(0, -9999, 0);
+        (u[colKey].value as THREE.Color).set(0, 0, 0);
       }
     }
   }

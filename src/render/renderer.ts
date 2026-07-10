@@ -49,7 +49,7 @@ import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
-import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
+import { releaseSelfFacing, stepSelfFacing, wrapAngle } from './facing_smooth';
 import { buildFish, type FishView } from './fish';
 import {
   buildFoliage,
@@ -91,7 +91,7 @@ import { drapeRingLocalY } from './selection_ring';
 import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { spriteLighting } from './sprites/sprite_lighting';
-import { SPRITE_DEFS } from './sprites/sprite_manifest';
+import { SPRITE_DEFS, SPRITE_DIR_ORDER } from './sprites/sprite_manifest';
 import { updateSpriteShadow } from './sprites/sprite_shadow';
 import { SpriteVisual } from './sprites/sprite_visual';
 import { freezeStaticMatrices } from './static_matrix';
@@ -4316,15 +4316,27 @@ export class Renderer {
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual);
 
-      // True billboard for sprites: rotate the active visual's root so the flat
-      // quad faces the camera.  root.rotation.y = camYaw − facing means the
-      // root's world rotation = camYaw.  The sprite's bodyMesh stays at
-      // rotation.y = 0 (no counter-rotation) so its world rotation = camYaw —
-      // always front-on to the viewer regardless of entity heading.
+      // Billboard / directional sprite switching
       if (active instanceof SpriteVisual) {
-        const dx = this.camera.position.x - x;
-        const dz = this.camera.position.z - z;
-        active.root.rotation.y = Math.atan2(dx, dz) - facing;
+        if (active.hasDirectional()) {
+          // World-space directional sprite (Ragnarok Online style):
+          // Compute angle from entity to camera, quantize to 8 directions,
+          // swap the active atlas to match, and rotate root to entity facing.
+          const dx = this.camera.position.x - x;
+          const dz = this.camera.position.z - z;
+          const relAngle = wrapAngle(Math.atan2(dx, dz) - facing);
+          // Quantize to 8 bins: each bin = PI/4 (45°)
+          const BIN = Math.PI / 4;
+          const bin = Math.round(relAngle / BIN) & 7;
+          active.setDirection(SPRITE_DIR_ORDER[bin]);
+          // Root follows entity facing (world-space, not billboarded)
+          active.root.rotation.y = facing;
+        } else {
+          // Billboard flat (legacy): quad always faces camera
+          const dx = this.camera.position.x - x;
+          const dz = this.camera.position.z - z;
+          active.root.rotation.y = Math.atan2(dx, dz) - facing;
+        }
       }
 
       // animation state machine inputs, derived from render-space motion with
@@ -4426,6 +4438,8 @@ export class Renderer {
           this.camera.position.y,
           !visuallyDead,
           this.fogState === 'outdoor',
+          this.sim.cfg.seed,
+          this.scene.fog!.color,
         );
       }
 

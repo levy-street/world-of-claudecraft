@@ -12,8 +12,12 @@ import { getCachedAtlas, getCachedMeta } from './atlas';
 import { newSpriteLocoState, spriteAnimSpeedScale, updateSpriteLoco } from './sprite_locomotion';
 import {
   SPRITE_DEFS,
+  SPRITE_DIR_ORDER,
   type SpriteDef,
+  type SpriteDir,
   WEAPON_OFFSETS,
+  spriteBodyDirMetaUrl,
+  spriteWeaponDirPng,
   weaponSpriteForItem,
 } from './sprite_manifest';
 import { createSpriteMaterial } from './sprite_shader';
@@ -26,6 +30,7 @@ import { createSpriteShadow, disposeSpriteShadow, type SpriteShadow } from './sp
 const GHOST_OPACITY = 0.34;
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
+const WHITE = new THREE.Color(0xffffff);
 
 // Shared geometry — a unit quad (1×1) centred at origin, used by every sprite.
 let quadGeoSingleton: THREE.PlaneGeometry | null = null;
@@ -110,6 +115,14 @@ export class SpriteVisual {
   private weaponAtlas: SpriteAtlas | null = null;
   private weaponMeta: WeaponSlotMeta | null = null;
 
+  // Directional atlas storage (8 directions, null = not loaded / fallback to front)
+  private dirBodyAtlases: Map<SpriteDir, SpriteAtlas> | null = null;
+  private dirBodyMetas: Map<SpriteDir, SpriteMeta> | null = null;
+  private dirWeaponAtlases: Map<SpriteDir, SpriteAtlas> | null = null;
+  private dirWeaponMetas: Map<SpriteDir, WeaponSlotMeta | null> | null = null;
+  private currentDir: SpriteDir = 'front';
+  private readonly isDirectional: boolean;
+
   // SpriteDef fields
   private readonly spriteDef: SpriteDef;
   private readonly entityColor: number;
@@ -163,6 +176,7 @@ export class SpriteVisual {
     this.spriteDef = def;
     this.entityColor = entityColor;
     this.height = def.height;
+    this.isDirectional = def.directional === true;
 
     const bodyAtlas = getCachedAtlas(`sprites/bodies/${def.bodyPng}`);
     const bodyMeta = getCachedMeta(`sprites/bodies/${def.bodyPng}`);
@@ -170,6 +184,23 @@ export class SpriteVisual {
 
     this.bodyAtlas = bodyAtlas;
     this.bodyMeta = bodyMeta;
+
+    // Load directional body atlases if defined
+    if (this.isDirectional && def.bodyDir) {
+      this.dirBodyAtlases = new Map();
+      this.dirBodyMetas = new Map();
+      for (const dir of SPRITE_DIR_ORDER) {
+        const png = def.bodyDir[dir];
+        if (png) {
+          const atlas = getCachedAtlas(`sprites/bodies/${png}`);
+          const meta = getCachedMeta(`sprites/bodies/${png}`);
+          if (atlas && meta) {
+            this.dirBodyAtlases.set(dir, atlas);
+            this.dirBodyMetas.set(dir, meta);
+          }
+        }
+      }
+    }
 
     // Body mesh — unit quad, scaled to height
     this.bodyMaterial = createSpriteMaterial(bodyAtlas.texture);
@@ -196,16 +227,25 @@ export class SpriteVisual {
         this.weaponMeta = wMeta.weaponSlot ?? WEAPON_OFFSETS[def.weaponPng] ?? null;
         this.weaponMaterial = createSpriteMaterial(wAtlas.texture);
         this.weaponMesh = new THREE.Mesh(quadGeo(), this.weaponMaterial);
-        const off = this.weaponMeta;
-        if (off) {
-          this.weaponMesh.scale.set(def.height * off.scale, def.height * off.scale, 1);
-          this.weaponMesh.position.set(
-            off.offsetX,
-            def.height * off.offsetY + def.height / 2 + (def.hover ?? 0),
-            0.01,
-          );
-        }
+        this.applyWeaponOffset(this.weaponMeta);
         this.root.add(this.weaponMesh);
+      }
+
+      // Load directional weapon atlases if defined
+      if (this.isDirectional && def.weaponDir) {
+        this.dirWeaponAtlases = new Map();
+        this.dirWeaponMetas = new Map();
+        for (const dir of SPRITE_DIR_ORDER) {
+          const png = def.weaponDir[dir];
+          if (png) {
+            const atlas = getCachedAtlas(`sprites/weapons/${png}`);
+            const meta = getCachedMeta(`sprites/weapons/${png}`);
+            if (atlas && meta) {
+              this.dirWeaponAtlases.set(dir, atlas);
+              this.dirWeaponMetas.set(dir, meta.weaponSlot ?? WEAPON_OFFSETS[png] ?? null);
+            }
+          }
+        }
       }
     }
 
@@ -379,6 +419,74 @@ export class SpriteVisual {
   }
 
   // -------------------------------------------------------------------------
+  // Directional sprite switching (8-direction, world-space)
+  // -------------------------------------------------------------------------
+
+  /** Returns true if this sprite has directional variants (world-space rendering). */
+  hasDirectional(): boolean {
+    return this.isDirectional;
+  }
+
+  /** Get the current directional variant. */
+  getDirection(): SpriteDir {
+    return this.currentDir;
+  }
+
+  /**
+   * Switch the active body+weapon atlas to the given direction.
+   * No-op if the sprite is not directional or the direction is already active.
+   */
+  setDirection(dir: SpriteDir): void {
+    if (!this.isDirectional || dir === this.currentDir) return;
+    this.currentDir = dir;
+
+    // Swap body atlas to directional variant (fallback to front)
+    const dirAtlas = this.dirBodyAtlases?.get(dir);
+    const dirMeta = this.dirBodyMetas?.get(dir);
+    if (dirAtlas && dirMeta) {
+      this.bodyAtlas = dirAtlas;
+      this.bodyMeta = dirMeta;
+    } else {
+      // Fallback to front (base) atlas
+      const frontAtlas = getCachedAtlas(`sprites/bodies/${this.spriteDef.bodyPng}`);
+      const frontMeta = getCachedMeta(`sprites/bodies/${this.spriteDef.bodyPng}`);
+      if (frontAtlas && frontMeta) {
+        this.bodyAtlas = frontAtlas;
+        this.bodyMeta = frontMeta;
+      }
+    }
+    // Re-apply current frame on new atlas
+    this.setFrame(this.currentAnim, this.currentFrame);
+
+    // Swap weapon atlas to directional variant
+    if (this.weaponMesh && this.weaponMaterial) {
+      const wDirAtlas = this.dirWeaponAtlases?.get(dir);
+      const wDirMeta = this.dirWeaponMetas?.get(dir);
+      if (wDirAtlas && wDirMeta) {
+        this.weaponAtlas = wDirAtlas;
+        this.weaponMeta = wDirMeta;
+        (this.weaponMaterial.uniforms.map.value as THREE.Texture) = wDirAtlas.texture;
+        this.applyWeaponOffset(wDirMeta);
+      } else {
+        // Fallback to front weapon atlas
+        const wPng = this.spriteDef.weaponPng;
+        if (wPng) {
+          const frontWAtlas = getCachedAtlas(`sprites/weapons/${wPng}`);
+          const frontWMeta = getCachedMeta(`sprites/weapons/${wPng}`);
+          if (frontWAtlas && frontWMeta) {
+            this.weaponAtlas = frontWAtlas;
+            this.weaponMeta = frontWMeta.weaponSlot ?? WEAPON_OFFSETS[wPng] ?? null;
+            (this.weaponMaterial.uniforms.map.value as THREE.Texture) = frontWAtlas.texture;
+            this.applyWeaponOffset(this.weaponMeta);
+          }
+        }
+      }
+      // Re-apply current frame on new weapon atlas
+      this.setFrame(this.currentAnim, this.currentFrame);
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Skin / weapon swap
   // -------------------------------------------------------------------------
 
@@ -414,21 +522,18 @@ export class SpriteVisual {
         }
         // Update weapon offset from new metadata
         const newOffset = newMeta.weaponSlot ?? WEAPON_OFFSETS[spriteName] ?? null;
-        if (newOffset && this.weaponMesh && this.spriteDef) {
-          this.weaponMesh.scale.set(
-            this.spriteDef.height * newOffset.scale,
-            this.spriteDef.height * newOffset.scale,
-            1,
-          );
-          this.weaponMesh.position.set(
-            newOffset.offsetX,
-            this.spriteDef.height * newOffset.offsetY +
-              this.spriteDef.height / 2 +
-              (this.spriteDef.hover ?? 0),
-            0.01,
-          );
-        }
         this.weaponMeta = newOffset;
+        this.weaponAtlas = newAtlas;
+        this.applyWeaponOffset(newOffset);
+
+        // If directional, rebuild directional weapon atlases for the new weapon
+        if (this.isDirectional && this.dirWeaponAtlases) {
+          this.dirWeaponAtlases.clear();
+          this.dirWeaponMetas?.clear();
+          // The new weapon's directional variants would need to be defined
+          // per-entity or follow a naming convention (e.g. sword_1handed_back).
+          // For now, runtime-swapped weapons use front-facing only.
+        }
       }
     }
 
@@ -436,6 +541,8 @@ export class SpriteVisual {
     if (this.weaponMesh) {
       this.weaponMesh.visible = hasWeapon && !this.far;
     }
+    // Re-apply current frame
+    this.setFrame(this.currentAnim, this.currentFrame);
   }
 
   // -------------------------------------------------------------------------
@@ -462,6 +569,23 @@ export class SpriteVisual {
   // -------------------------------------------------------------------------
   // Internals
   // -------------------------------------------------------------------------
+
+  /** Apply weapon overlay position/scale from offset metadata. */
+  private applyWeaponOffset(off: WeaponSlotMeta | null): void {
+    if (!off || !this.weaponMesh || !this.spriteDef) return;
+    this.weaponMesh.scale.set(
+      this.spriteDef.height * off.scale,
+      this.spriteDef.height * off.scale,
+      1,
+    );
+    this.weaponMesh.position.set(
+      off.offsetX,
+      this.spriteDef.height * off.offsetY +
+        this.spriteDef.height / 2 +
+        (this.spriteDef.hover ?? 0),
+      0.01,
+    );
+  }
 
   private setAnimation(name: string, loop: boolean): void {
     if (name === this.currentAnim && this.loop === loop) return;
@@ -579,11 +703,10 @@ export class SpriteVisual {
   private applyTint(): void {
     const colorUniform = this.bodyMaterial.uniforms.color.value as THREE.Color;
     if (!this.tintColor) {
-      colorUniform.set(0xffffff);
+      colorUniform.copy(WHITE);
       return;
     }
     // Blend tint toward white: tintStrength=0 → white (no tint), 1 → full tint
-    const white = new THREE.Color(0xffffff);
-    colorUniform.copy(white).lerp(this.tintColor, this.tintStrength);
+    colorUniform.copy(WHITE).lerp(this.tintColor, this.tintStrength);
   }
 }
