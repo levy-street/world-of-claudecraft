@@ -1450,6 +1450,17 @@ async function startGame(
       case 'cameraFov':
         renderer.setCameraFov(v);
         break;
+      case 'cameraStyle':
+        input.classicMode = v >= 0.5;
+        if (input.classicMode) {
+          // Apply classic defaults: narrow FOV, mid-range zoom
+          renderer.setCameraFov(20);
+          input.camDist = 40;
+          input.classicZoomIdx = 4;
+        } else {
+          renderer.setCameraFov(settings.get('cameraFov'));
+        }
+        break;
       case 'renderScale':
         renderer.setRenderScale(v);
         break;
@@ -2026,6 +2037,8 @@ async function startGame(
       orbiting: input.leftDown && input.isCameraDragActive(),
     });
     input.camYaw = next.camYaw;
+    // Clamp auto-follow yaw to classic mode rotation limits
+    if (input.classicMode) input.clampClassicAngles();
     lastInterpFacing = next.lastInterpFacing; // track through mouselook too, no snap on release
   }
 
@@ -2330,6 +2343,13 @@ async function startGame(
           alpha: acc / DT,
         }),
       );
+      // Sync indoor lock for classic camera — freeze rotation in dungeons/temples
+      if (input.classicMode) {
+        const fog = renderer.getFogState();
+        input.indoorLock = fog !== 'outdoor' && fog !== 'underwater';
+      } else {
+        input.indoorLock = false;
+      }
       perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
       perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
@@ -2436,6 +2456,13 @@ async function startGame(
         },
       ),
     );
+    // Sync indoor lock for classic camera — freeze rotation in dungeons/temples
+    if (input.classicMode) {
+      const fog = renderer.getFogState();
+      input.indoorLock = fog !== 'outdoor' && fog !== 'underwater';
+    } else {
+      input.indoorLock = false;
+    }
     perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
     maybeShowImmobileNote(now);
     perf.markInputVisible(performance.now());

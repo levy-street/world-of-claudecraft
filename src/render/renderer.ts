@@ -1534,6 +1534,11 @@ export class Renderer {
     this.camera.updateProjectionMatrix();
   }
 
+  /** Current fog/interior state — read by main.ts to set input.indoorLock. */
+  getFogState(): 'outdoor' | 'dungeon' | 'temple' | 'nythraxis' | 'delve' | 'underwater' {
+    return this.fogState;
+  }
+
   /** Resolution multiplier on top of the device pixel ratio (0.5..1). */
   setRenderScale(scale: number): void {
     this.renderScale = Math.min(1, Math.max(0.5, scale));

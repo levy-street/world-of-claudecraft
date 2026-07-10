@@ -38,6 +38,9 @@ export const SETTING_RANGES = {
   // a wider FOV shows more of the world (good for situational awareness) while
   // a narrower one zooms in. Purely a comfort/visibility preference.
   cameraFov: { min: 55, max: 100, def: 60 },
+  // Camera style: 0 = modern (default, 360° rotation, continuous zoom),
+  // 1 = classic Ragnarok (restricted rotation, discrete zoom levels, narrow FOV).
+  cameraStyle: { min: 0, max: 1, def: 0 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn

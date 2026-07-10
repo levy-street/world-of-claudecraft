@@ -15,14 +15,19 @@ const BASE_LOOK_SENS = 0.0045;
 const TOUCH_LOOK_YAW_RATE = 3.2;
 const TOUCH_LOOK_PITCH_RATE = 2.2;
 const TOUCH_JUMP_LATCH_MS = 220;
-// A keyboard jump press is latched the same way a touch tap is: a fast spacebar
-// tap can be pressed and released entirely between two 20Hz input samples (or
-// sim-tick gaps), so reading the raw key-held state silently drops it. Holding
-// the value above one full input/tick window (50ms) guarantees a grounded tick
-// observes the jump. Held jumps are unaffected (the key stays physically down).
 const KEY_JUMP_LATCH_MS = 150;
 const CAMERA_DRAG_START_DISTANCE = 18;
 const CAMERA_DRAG_START_MS = 140;
+
+// --- Classic (Ragnarok-style) camera constants ---
+// Discrete zoom levels matching RO's 8-step zoom (distance in world units)
+const CLASSIC_ZOOM_LEVELS = [10, 16, 22, 30, 40, 55, 70, 85] as const;
+const CLASSIC_DEFAULT_ZOOM_IDX = 4; // ~40 units (mid-range, RO default feel)
+// Pitch limits in classic mode (narrower, RO-like viewing angle)
+const CLASSIC_PITCH_MIN = -0.15; // ~-9° (barely above horizon)
+const CLASSIC_PITCH_MAX = 0.8; // ~+46° (moderate top-down tilt)
+// Horizontal rotation restriction in classic mode (±90° from default facing)
+const CLASSIC_YAW_RANGE = Math.PI / 2; // 90° each side = 180° total sweep
 
 type FullscreenDocument = Document & {
   webkitFullscreenElement?: Element | null;
@@ -105,6 +110,11 @@ export class Input {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // Classic camera state
+  classicZoomIdx = CLASSIC_DEFAULT_ZOOM_IDX;
+  classicYawBase = Math.PI; // base facing for rotation clamp
+  indoorLock = false; // when true, rotation is locked (dungeon/temple/nythraxis)
+  classicMode = false; // true = Ragnarok-style camera (set from settings)
   autorun = false;
   suspendMovement = false;
   // click-to-move (#95): a world destination the player clicked; the frame loop
@@ -266,7 +276,17 @@ export class Input {
 
   /** Move the camera in/out, clamped to the zoom limits. Shared by wheel + touch pinch. */
   zoomBy(delta: number): void {
-    this.camDist = Math.min(22, Math.max(3, this.camDist + delta));
+    if (this.classicMode) {
+      // Discrete zoom levels like Ragnarok Online
+      if (delta > 0) {
+        this.classicZoomIdx = Math.min(CLASSIC_ZOOM_LEVELS.length - 1, this.classicZoomIdx + 1);
+      } else if (delta < 0) {
+        this.classicZoomIdx = Math.max(0, this.classicZoomIdx - 1);
+      }
+      this.camDist = CLASSIC_ZOOM_LEVELS[this.classicZoomIdx];
+    } else {
+      this.camDist = Math.min(22, Math.max(3, this.camDist + delta));
+    }
   }
 
   /** True while a mouse button is held for camera drag. */
@@ -447,10 +467,13 @@ export class Input {
 
   applyTouchLookDelta(dx: number, dy: number): void {
     this.camYaw -= dx * this.lookSensitivity;
+    const pitchMin = this.classicMode ? CLASSIC_PITCH_MIN : -0.4;
+    const pitchMax = this.classicMode ? CLASSIC_PITCH_MAX : 1.35;
     this.camPitch = Math.min(
-      1.35,
-      Math.max(-0.4, this.camPitch + this.touchPitchSign * dy * this.lookSensitivity),
+      pitchMax,
+      Math.max(pitchMin, this.camPitch + this.touchPitchSign * dy * this.lookSensitivity),
     );
+    this.clampClassicAngles();
     if (dx !== 0 || dy !== 0) this.noteIntent('look');
   }
 
@@ -489,17 +512,22 @@ export class Input {
   applyGamepadLook(yawDelta: number, pitchDelta: number): void {
     if (yawDelta === 0 && pitchDelta === 0) return;
     this.camYaw += yawDelta;
-    this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + pitchDelta));
+    const pitchMin = this.classicMode ? CLASSIC_PITCH_MIN : -0.4;
+    const pitchMax = this.classicMode ? CLASSIC_PITCH_MAX : 1.35;
+    this.camPitch = Math.min(pitchMax, Math.max(pitchMin, this.camPitch + pitchDelta));
+    this.clampClassicAngles();
     this.noteIntent('look');
   }
 
   updateTouchLook(dt: number): void {
     if (!this.touchLookActive) return;
     this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * this.touchLookSpeed * dt;
+    const pitchMin = this.classicMode ? CLASSIC_PITCH_MIN : -0.4;
+    const pitchMax = this.classicMode ? CLASSIC_PITCH_MAX : 1.35;
     this.camPitch = Math.min(
-      1.35,
+      pitchMax,
       Math.max(
-        -0.4,
+        pitchMin,
         this.camPitch +
           this.touchPitchSign *
             this.touchLookVector.y *
@@ -508,12 +536,16 @@ export class Input {
             dt,
       ),
     );
+    this.clampClassicAngles();
   }
 
   /** Snap the orbit camera back behind the character (mobile recenter gesture). */
   recenterCameraBehind(facing: number): void {
-    if (Number.isFinite(facing)) this.camYaw = facing;
-    this.camPitch = 0.32;
+    if (Number.isFinite(facing)) {
+      this.camYaw = facing;
+      if (this.classicMode) this.classicYawBase = facing;
+    }
+    this.camPitch = this.classicMode ? CLASSIC_PITCH_MAX * 0.4 : 0.32;
   }
 
   isMouselookActive(): boolean {
@@ -874,16 +906,34 @@ export class Input {
       this.updateCursor();
       return;
     }
+    // Indoor lock: freeze rotation in classic mode inside dungeons/temples
+    if (this.classicMode && this.indoorLock) return;
+
     this.camYaw -= mx * this.lookSensitivity;
+    const pitchMin = this.classicMode ? CLASSIC_PITCH_MIN : -0.4;
+    const pitchMax = this.classicMode ? CLASSIC_PITCH_MAX : 1.35;
     this.camPitch = Math.min(
-      1.35,
-      Math.max(-0.4, this.camPitch + my * this.lookSensitivity * this.lookPitchSign),
+      pitchMax,
+      Math.max(pitchMin, this.camPitch + my * this.lookSensitivity * this.lookPitchSign),
     );
+    this.clampClassicAngles();
     if (mx !== 0 || my !== 0) this.noteIntent('look');
   }
 
   private noteIntent(kind: 'move' | 'look' | 'zoom'): void {
     this.cb.onInputIntent?.(kind);
+  }
+
+  /** Clamp yaw/pitch to classic-mode limits. No-op in modern mode. */
+  clampClassicAngles(): void {
+    if (!this.classicMode) return;
+    // Clamp yaw to ±90° from base facing
+    let dyaw = this.camYaw - this.classicYawBase;
+    dyaw = ((((dyaw + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
+    this.camYaw =
+      this.classicYawBase + Math.max(-CLASSIC_YAW_RANGE, Math.min(CLASSIC_YAW_RANGE, dyaw));
+    // Clamp pitch to narrower range
+    this.camPitch = Math.max(CLASSIC_PITCH_MIN, Math.min(CLASSIC_PITCH_MAX, this.camPitch));
   }
 
   private isAttackMoveReservedCode(code: string): boolean {
