@@ -16,11 +16,11 @@ The implementation must not change combat, targeting, ability paging, interactio
 
 ## Progress
 
-- [x] T0: Create a recoverable pre-rebase checkpoint — pre-rebase SHA `fb473dc74`, 2026-07-10
-- [x] T1: Rebase on integrated joystick Autorun — release merge `083856d8c`, 2026-07-10
-- [x] T2-T23: Layout implementation and focused geometry checks prepared — 2026-07-10
-- [x] T24-T27: Populated/stress interaction rerun and landscape evidence review — 2026-07-10
-- [x] T28: Run the contribution gate and report exact evidence — all nine canonical gate steps passed, 2026-07-10
+- [x] T0: Create a recoverable pre-rebase checkpoint - pre-rebase SHA `fb473dc74`, 2026-07-10
+- [x] T1: Rebase on integrated joystick Autorun - release merge `083856d8c`, 2026-07-10
+- [x] T2-T23: Layout implementation and focused geometry checks prepared - 2026-07-10
+- [x] T24-T27: Populated/stress interaction rerun and landscape evidence review - 2026-07-10
+- [x] T28: Run the contribution gate and report exact evidence - all nine canonical gate steps passed, 2026-07-10
 - [x] T29: Redock landscape Party beside the map, safe-center Target, and enlarge player chrome, 2026-07-10
 - [x] T30: Compact Party to an icon-only disclosure and dock pet commands above the action pad, 2026-07-10
 - [x] T31: Remove mobile pet tiles, move the optional view joystick to the view side, and reduce Target
