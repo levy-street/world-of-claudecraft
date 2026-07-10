@@ -29,9 +29,16 @@ expansion: story arc, zones, dungeons, XP math, ids); `design/spell-ranks.md` is
 classic-era ability-rank reference for sim ability content. **TRAP:**
 `design/icon-system.md` proposes a multi-file `src/ui/icons/` module, but the shipped
 code is the flat `src/ui/icons.ts`, so re-verify against code.
-`prd/frontier-pvp-honor.md` (Frostreach Frontier PvP zone, honor, $WOC stakes layer)
-pairs with `prd/FRONTIER_PHASE1_HANDOFF.md`, a slice-by-slice implementation handoff
-whose slices are specced but NOT yet implemented; read the handoff before starting one.
+The PvP suite is split into a foundation + a zone. `prd/pvp-honor-and-quartermaster.md`
+is the **Phase 1 foundation** (the soulbound Honor currency earned from arena wins +
+Fiesta kills, the Honor Quartermaster vendor, and the PvP Offense/Defense "PvP Power"
+stats): it ships first and stands alone. `prd/frontier-pvp.md` (was `frontier-pvp-honor.md`)
+is the **factionless / free-for-all open-world PvP zone** (RuneScape-Wilderness-style: no
+teams, everyone-hostile-in-band, a depth danger gradient, resource cargo extraction, 2x
+honor on open-world kills) plus the $WOC stakes layer; it depends on the honor doc.
+`prd/FRONTIER_PHASE1_HANDOFF.md` is the slice-by-slice handoff for the zone's factionless
+F1 skeleton; read it (and the honor doc's section 9 slices) before starting one. All
+specced, none implemented.
 
 ## screenshots/
 JPG/PNG assets embedded by the repo-root `README.md` (title screen, zones, dungeons, UI).
