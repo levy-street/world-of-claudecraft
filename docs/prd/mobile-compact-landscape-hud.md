@@ -26,9 +26,14 @@ contextual action is available. Attack remains explicitly available, but as a vi
 tertiary control.
 
 The design is compact-landscape-first, but defines one stable topology for all touch tiers.
-Standard, tablet, portrait, safe-area, and left-handed layouts may change dimensions and
-orientation-specific offsets, but they must preserve the same control relationships and input
-semantics.
+Standard and tablet landscape, safe-area, and left-handed layouts may change dimensions and
+offsets, but they must preserve the same control relationships and input semantics.
+
+### 1.1 Landscape-only scope amendment
+
+On 2026-07-10 the user removed portrait gameplay from this contribution because a separate PR
+will disable it. Existing portrait CSS may remain for compatibility until that PR lands, but
+portrait geometry, screenshots, and browser matrices are not acceptance gates here.
 
 ## 2. Problem statement
 
@@ -117,6 +122,7 @@ auto-attack semantics make that pattern inappropriate here.
 - No mobile access to desktop source slot 11 or secondary slots 12 through 22 in this scope.
 - No player-authored freeform HUD editor.
 - No desktop HUD layout changes.
+- No portrait gameplay layout work or portrait QA; a separate PR owns disabling that orientation.
 - No reimplementation or fallback standalone Autorun button. PR #1724 owns Autorun inside the
   joystick and must land first.
 - No redesign of minimap contents, party data, target data, or Consumables ordering.
@@ -129,24 +135,26 @@ The closed resting layout is:
 
 ```text
 +-----------------------------------------------------------------------+
-| [MAP] [TARGET / PARTY]                         [CHAT][QUEST][MORE]     |
+| [MAP] [>][P1][P2][P3][P4][x]                   [CHAT][QUEST][MORE]     |
+|                         [TARGET]                                      |
 |                                                                       |
 |                                      +------------------------------+ |
 |                                      |      CAMERA START ZONE       | |
 |                                      |         swipe-look           | |
 |                                      +------------------------------+ |
-|                                                                       |
+|                                      [PET ATK][TAUNT][HEAL][STANCE]  |
 | [MOVE + AUTORUN] [CONS]       [PLAYER]       [A1][A2][ATK][TARGET]  |
 |                                           [1/2][A3][A4][A5][JUMP/USE]|
 +-----------------------------------------------------------------------+
 ```
 
-When Consumables is open, its six automatic slots expand upward and inward from the toggle:
+When Consumables is open on compact landscape, the toggle stays low beside movement. Items fill
+toward the player frame first and only then wrap upward:
 
 ```text
-                    [C1][C2][C3]
-                    [C4][C5][C6]
- [MOVE + AUTORUN] [CONS]
+                         [C5][C6]
+                         [C3][C4]
+ [MOVE + AUTORUN] [CONS][C1][C2]   [PLAYER]
 ```
 
 The open grid is transient. It must not move the joystick, player frame, action pad, map,
@@ -187,7 +195,7 @@ For compact landscape at default interface scale:
 | Target | Standard secondary face | 48 x 48px |
 | Page 1/2 | Visually compact, subdued page indicator | 48 x 48px |
 | Jump/Use | Largest and highest-emphasis action | 56 x 56px |
-| Consumables toggle and slots | Standard utility face | 48 x 48px |
+| Consumables toggle and slots | Compact 40px utility face | 48 x 48px |
 | Compact top menu buttons | Standard menu face | 48 x 48px |
 
 The user Button Size setting may scale glyphs, borders, and visible faces, but it must not
@@ -241,39 +249,57 @@ relative order or semantics.
 
 ### 6.5 Camera start zone
 
-- **FR-5.1** Every touch tier and orientation reserves a contiguous non-interactive canvas
-  rectangle on the action side between the top HUD and action pad.
+- **FR-5.1** Every supported landscape touch tier reserves a contiguous non-interactive canvas
+  rectangle on the action side between the top HUD and the pet/action cluster.
 - **FR-5.2** On every canonical landscape profile, the rectangle is at least
-  `min(30vw, 220px)` wide and `min(40vh, 140px)` tall. On every canonical portrait profile,
-  it is at least `min(42vw, 160px)` wide and `min(24vh, 200px)` tall.
+  `min(30vw, 220px)` wide and `min(24vh, 100px)` tall. Swipe-look is not restricted to this
+  rectangle; it is the guaranteed unobstructed start surface within the wider free canvas.
 - **FR-5.3** A pointerdown anywhere in the measured rectangle must pass
   `isCameraDragAllowedAt` when no modal is open. The browser gate samples a 3 x 3 point grid,
   including all four corners, edge midpoints, and center.
-- **FR-5.4** The action pad, menu, minimap, target/party frames, Consumables, and any transparent
-  wrapper must not occupy or intercept the rectangle.
+- **FR-5.4** The action pad, pet commands, menu, minimap, target/party frames, Consumables, and
+  any transparent wrapper must not occupy or intercept the rectangle.
 - **FR-5.5** Once a camera drag begins, existing pointer ownership, pointer capture, 6px
   deadzone, double-tap recenter, and pinch behavior remain unchanged.
+- **FR-5.6** When the optional view joystick is enabled in the default layout, it sits on the
+  right view side with the full guaranteed swipe-look rectangle immediately inward of it. The
+  joystick and rectangle mirror together in left-handed mode and neither may collide with the
+  target, pet commands, or action pad. Its outer edge remains at least 30px from the viewport edge
+  or 12px inward of the corresponding safe-area inset, whichever is greater.
 
 ### 6.6 Minimap, target, party, and menus
 
 - **FR-6.1** In right-handed touch mode, the minimap sits at the top-left above the movement
   joystick. Compact landscape targets an approximately 80 to 85px rendered map width.
-- **FR-6.2** The target frame sits immediately to the right of the map, never between the map
-  and movement joystick.
-- **FR-6.3** Party is collapsed by default to its existing Party chip below the target frame.
-  Expanded party rows grow toward the center and downward only where geometry remains clear.
-- **FR-6.4** Expanded party rows must not overlap the map, movement capture zone, Consumables,
-  player frame, action pad, or camera start zone.
-- **FR-6.5** Compact touch layouts show Chat, Quests, and More in the top corner opposite the
+- **FR-6.2** The target frame is centered within the safe viewport width in a separate row 48px
+  below the safe top edge. Its rendered width remains smaller than the centered player frame on
+  every landscape tier. It uses 80 percent of the responsive player-frame tier scale before the
+  shared mobile chrome scale is applied.
+- **FR-6.3** Party is collapsed by default to an icon-only chevron immediately inward of the
+  minimap. Its transparent button retains a 40 x 40px hit target while the visible glass face is
+  approximately 28px; the localized Party caption remains visually hidden as its accessible
+  name. When expanded, the disclosure, all compact members, and Leave control occupy one top row.
+  The entire row follows the map when handedness mirrors.
+- **FR-6.4** Expanded party rows must not overlap the map, target, top menu, movement capture
+  zone, Consumables, player frame, action pad, or camera start zone.
+- **FR-6.5** The mobile Leave Party control uses a 40 x 40px touch target with a visually
+  smaller close icon and retains the localized Leave Party accessible name.
+- **FR-6.6** Whenever a live pet is active in landscape, its command bar sits directly above the
+  two-row action pad with an 8px gap and shares the pad's action-side edge. It mirrors to the left
+  with the pad in left-handed mode and must clear both the pad and guaranteed camera start zone.
+  Each command keeps a 40 x 40px hit target, exposes approximately 32px circular art, and removes
+  the desktop group panel and dark button tile from the mobile presentation.
+- **FR-6.7** Compact touch layouts show Chat, Quests, and More in the top corner opposite the
   minimap.
-- **FR-6.6** Social and Settings remain reachable through More on compact layouts. Their actions
+- **FR-6.8** Social and Settings remain reachable through More on compact layouts. Their actions
   must have one logical owner and no duplicate active element IDs.
-- **FR-6.7** Standard and tablet touch layouts may show all five current direct menu actions if
+- **FR-6.9** Standard and tablet touch layouts may show all five current direct menu actions if
   they pass the same geometry and camera-zone constraints.
 
 ### 6.7 Joystick and Autorun dependency
 
-- **FR-7.1** The movement joystick remains in its current thumb corner.
+- **FR-7.1** The movement joystick remains in its current thumb corner. Its landscape wheel is
+  116px before user and shared chrome scaling, while its floating capture zone remains unchanged.
 - **FR-7.2** Autorun is provided only by the joystick interaction from PR #1724.
 - **FR-7.3** The layout contains no standalone Autorun seat, markup, label, or collision rule.
 - **FR-7.4** Layout work may proceed before PR #1724 merges, but the old standalone button must
@@ -284,10 +310,16 @@ relative order or semantics.
 ### 6.8 Consumables
 
 - **FR-8.1** The closed Consumables toggle sits immediately inward of the movement joystick,
-  outside its fixed capture zone.
+  outside its fixed capture zone. The toggle and every populated slot retain a 48 x 48px hitbox
+  while exposing a 40 x 40px visible face. Button Size may reduce the visible slot content only to
+  36px and may not enlarge it beyond 40px. The cooldown overlay remains clipped to the same visible
+  face at every Button Size value.
 - **FR-8.2** Opening the toggle snapshots up to six distinct carried items using the existing
   order: potion, elixir, food, drink. Duplicate stacks remain one visible slot.
-- **FR-8.3** The open items use a 3 x 2 grid that grows upward and inward.
+- **FR-8.3** On compact landscape phones, the toggle remains low immediately inward of the
+  movement capture zone. Open items fill rightward toward the player frame in a two-column row,
+  then wrap upward for up to three rows. Standard and tablet landscape retain the 3 x 2 grid
+  growing upward and inward.
 - **FR-8.4** Empty slots collapse. Counts, usability, and potion cooldown continue updating
   live while item positions remain stable until the drawer is reopened.
 - **FR-8.5** Long press continues to inspect an item instead of consuming it.
@@ -297,11 +329,12 @@ relative order or semantics.
 
 ### 6.9 Player frame
 
-- **FR-9.1** The player frame remains bottom-center.
-- **FR-9.2** The new pad should remove the need for the current ring-specific 15px and 44px
-  compact left nudges. If a safe-area profile requires a residual adjustment, it must be the
-  smallest measured offset and keep the frame visually centered.
-- **FR-9.3** Cast and swing bars remain aligned with the player frame.
+- **FR-9.1** The player frame remains at the bottom and is centered within the safe viewport
+  width rather than the full physical width.
+- **FR-9.2** The complete player frame scales by responsive tier: 0.62 on compact phones, 0.9 on
+  standard touch screens, and 1.0 on tablets, before the shared mobile chrome scale is applied.
+- **FR-9.3** Cast and swing bars use the same responsive scale and safe center as the player
+  frame.
 
 ## 7. Responsive and handedness behavior
 
@@ -310,7 +343,8 @@ relative order or semantics.
 - Reference profiles: 740x360, 844x390, 915x412, and 932x430.
 - Uses the exact two-row action order in section 5.2.
 - Uses the three-action compact menu.
-- Uses the 3 x 2 Consumables drawer.
+- Keeps the Consumables toggle low beside movement and fills its 2 x 3 drawer toward the player
+  frame before wrapping upward.
 - Enforces the camera rectangle in FR-5.2.
 
 ### Standard and tablet landscape
@@ -323,10 +357,8 @@ relative order or semantics.
 
 ### Portrait touch
 
-- Preserve the action order and context-action column.
-- Reflow or lift the pad above the bottom-center player frame without changing button order.
-- Use the compact three-action menu unless a measured profile proves all five controls fit.
-- Enforce the portrait camera rectangle in FR-5.2.
+Out of scope. A separate contribution disables portrait gameplay; this PR neither redesigns nor
+validates that orientation.
 
 ### Left-handed touch
 
@@ -334,11 +366,14 @@ Mirror the topology as one system:
 
 - Movement joystick and integrated Autorun move to bottom-right.
 - Minimap moves above the movement joystick at top-right.
-- Consumables moves inward to the left of the joystick and opens upward and inward.
+- Consumables moves inward to the left of the joystick and fills leftward toward the player frame
+  before wrapping upward.
 - Action pad moves to bottom-left.
-- Camera start zone moves to middle-left above the pad.
+- Optional view joystick moves to the left view side and the camera start zone sits immediately
+  inward of it above the pad.
 - Compact menu moves to top-left.
-- Target/party frames sit inward of the mirrored minimap.
+- Party stays immediately inward-left of the mirrored minimap. Target and player chrome remain
+  centered within the safe viewport width.
 - The page control remains farthest from the action thumb after mirroring.
 
 No mirrored mode may change action semantics, source-slot mapping, or touch target size.
@@ -416,7 +451,7 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
   `tests/interactions.test.ts` for multi-touch ownership and contextual actions.
 - Preserve `tests/consumable_bar_view.test.ts` ordering, cap, and stable snapshot behavior.
 - Update `tests/browser/target_size.browser.test.ts` to exercise minimum user scale and assert
-  the 48px rendered gameplay-control floor.
+  the 48px rendered primary gameplay-control floor and the explicit 40px pet-command floor.
 
 ### Geometry and browser checks
 
@@ -424,8 +459,9 @@ No mirrored mode may change action semantics, source-slot mapping, or touch targ
   `scripts/mobile_hud_overlap_audit.mjs` for the new inventory and geometry.
 - Add a measured camera-start rectangle assertion using the same real browser geometry.
 - Replace the implicit profile set with the canonical matrix below.
-- Assert every control remains on-screen, at least 48 x 48px, and at least 4px from adjacent
-  controls.
+- Assert every control remains on-screen and at least 4px from adjacent controls. Primary
+  gameplay controls remain at least 48 x 48px; compact pet commands retain their explicit
+  40 x 40px hit target from FR-6.6.
 - Assert no interactive element or wrapper intercepts the camera-start rectangle.
 
 Canonical viewports:
@@ -439,9 +475,6 @@ Canonical viewports:
 | Touch laptop landscape | 1280x720 | standard |
 | Tablet 4:3 landscape | 1024x768 | tablet |
 | FHD touch landscape | 1920x1080 | tablet |
-| iPhone 13 portrait | 390x844 | compact |
-| Tablet 4:3 portrait | 768x1024 | standard |
-| Large tablet portrait | 1024x1366 | tablet |
 
 Synthetic safe-area vectors use `{ top, right, bottom, left }` CSS pixels:
 
@@ -450,7 +483,6 @@ Synthetic safe-area vectors use `{ top, right, bottom, left }` CSS pixels:
 | None | `{ 0, 0, 0, 0 }` |
 | Landscape notch right | `{ 0, 44, 21, 0 }` |
 | Landscape notch left | `{ 0, 0, 21, 44 }` |
-| Portrait notch | `{ 47, 0, 34, 0 }` |
 
 Required state runs are bounded rather than a full Cartesian product:
 
@@ -461,9 +493,7 @@ Required state runs are bounded rather than a full Cartesian product:
 3. The 740x360 profile runs right-handed maximum button and joystick scales with camera joystick
    on, Consumables open, party expanded, pet active, and the landscape notch-right vector.
 4. The same maximum 740x360 stress state runs left-handed with the landscape notch-left vector.
-5. The 390x844 profile runs both handedness modes with the portrait-notch vector, once at
-   default scale and once at minimum scale.
-6. Consumables open and closed, party collapsed and expanded, and pet absent and active are
+5. Consumables open and closed, party collapsed and expanded, and pet absent and active are
    therefore each covered in both handedness directions on the strictest phone profile.
 
 ### Visual QA
@@ -471,10 +501,9 @@ Required state runs are bounded rather than a full Cartesian product:
 Commit before and after screenshots under `docs/screenshots/` for at least:
 
 - 740x360 compact landscape, resting state.
-- 740x360 compact landscape, Consumables open.
+- 740x360 compact landscape, Consumables open with an active pet and optional view joystick.
 - 844x390 compact landscape with a target and party.
-- Left-handed compact landscape.
-- Portrait phone.
+- Left-handed compact landscape with an active pet.
 - 1024x768 tablet landscape.
 
 ### Contribution gate
@@ -494,17 +523,21 @@ The feature is complete when all of the following are true:
 4. Target remains directly available and behaviorally unchanged.
 5. Page 1 maps source slots 1 through 5 and page 2 maps 6 through 10.
 6. The page button sits left of A3 and does not create a camera gesture.
-7. Every canonical landscape and portrait camera-start rectangle meets FR-5.2 and is
+7. Every canonical landscape camera-start rectangle meets FR-5.2 and is
    camera-draggable at every point in the required 3 x 3 sample grid.
 8. Minimap, target, party, menu, player frame, pad, joystick, and Consumables pass all overlap
-   checks in every canonical profile and state.
+   checks in every canonical profile and state; target remains narrower than the player frame.
 9. Compact menu exposes Chat, Quests, and More directly; Social and Settings remain reachable
    through More.
 10. The implementation base contains the integrated joystick Autorun behavior from PR #1724
     and contains no standalone Autorun markup, handler, or layout seat.
-11. Consumables remains automatic and opens as a stable 3 x 2 grid beside the joystick.
-12. Right-handed and left-handed layouts are complete mirrors with identical semantics.
-13. Every gameplay touch target remains at least 48 x 48px at minimum user scale.
+11. Consumables remains automatic and opens as a stable responsive drawer beside the joystick:
+    compact keeps the toggle low and fills a 2 x 3 drawer toward the player frame before wrapping
+    upward; larger landscape tiers retain 3 x 2.
+12. Side-owned controls mirror completely with identical semantics; Party follows the map while
+    Target and the player frame remain centered within the safe width.
+13. Every primary gameplay touch target remains at least 48 x 48px at minimum user scale; pet
+    commands retain the explicit 40 x 40px accessible exception in FR-6.6.
 14. All controls remain reachable with safe-area insets and optional camera joystick enabled.
 15. `index.html` and `play.html` remain structurally equivalent for touch controls.
 16. Desktop layout and behavior remain unchanged.
@@ -518,8 +551,9 @@ The feature is complete when all of the following are true:
    against the joystick-owned Autorun contract from PR #1724.
 3. Replace the radial action ring with the two-row action pad and page seat.
 4. Reflow the minimap, target/party frames, compact menu, and player frame.
-5. Move Consumables and implement its 3 x 2 responsive drawer.
-6. Add tier, portrait, left-handed, scale, safe-area, camera-zone, and overlap validation.
+5. Move Consumables and implement its responsive compact drawer toward the player frame, with the
+   3 x 2 larger-tier drawer retained.
+6. Add tier, left-handed, scale, safe-area, camera-zone, and overlap validation for landscape.
 7. Integrate PR #1724 before final readiness and resolve only its remaining joystick behavior.
 8. Capture visual evidence and run the full contribution gate.
 
@@ -528,12 +562,12 @@ The feature is complete when all of the following are true:
 | Risk | Mitigation |
 |---|---|
 | Two-row pad grows into the player frame on 740x360 | Use compact 48px targets, 4px gaps, a 56px Jump/Use face, and real-browser geometry gates. |
-| Moving the map creates target or party overlap | Treat map, target, party, and Consumables-open states as one audited top-left geometry system. |
+| Map-adjacent Party collides with target or menu on a short phone | Keep disclosure, members, and Leave in one narrow row; seat Target below at safe center; audit both rows against every landscape profile. |
 | Compact menu relocation duplicates actions or IDs | Reuse one logical action owner and one active DOM element per ID. |
 | Minimum Button Size silently shrinks hitboxes | Scale visual faces independently and assert rendered targets at minimum settings. |
 | Page gestures steal camera input | Keep paging tap-only on its explicit control and leave wrappers non-interactive. |
 | Consumables beside movement is hard to use while steering | Preserve multi-touch operation and keep it a transient utility drawer; do not move it into the camera zone. |
-| Left-handed mode receives partial mirroring | Mirror map, menu, target/party, camera zone, Consumables, pad, and joystick in one audited state. |
+| Left-handed mode receives partial mirroring | Mirror map, Party, menu, camera zone, Consumables, pad, and joystick while keeping Target and player chrome safe-centered. |
 | Dependency PR changes while this work is in progress | Re-verify PR #1724 after rebase and keep standalone Autorun explicitly out of scope. |
 
 ## 15. Rejected alternatives
@@ -563,8 +597,9 @@ existing drag behavior.
 
 ### Keep the six-slot Consumables row in the top band
 
-Rejected because it competes with the pet bar, menu, minimap, and camera zone. A 3 x 2 drawer
-uses less horizontal space and remains transient.
+Rejected because it competes with the pet bar, menu, minimap, and camera zone. A low compact
+drawer that fills from movement toward the player frame (and a 3 x 2 drawer on larger tiers) stays
+beside the movement control and remains transient.
 
 ### Add a full freeform HUD editor now
 

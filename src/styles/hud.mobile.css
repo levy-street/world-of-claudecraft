@@ -284,9 +284,8 @@
     display: none;
   }
   body.mobile-touch #mobile-camera-joystick {
-    /* Base fallback stacks above movement on the movement side. The compact
-       landscape topology later redocks this optional control between the map
-       and movement so it clears the two-row action pad and camera start zone. */
+    /* Base fallback for portrait and pre-layout states. The final landscape
+       topology later redocks this optional control on the opposite view side. */
     left: max(18px, env(safe-area-inset-left));
     right: auto;
     bottom: calc(176px + env(safe-area-inset-bottom));
@@ -766,6 +765,7 @@
     z-index: 30;
   }
   body.mobile-touch #mobile-consumables-toggle {
+    position: relative;
     width: 48px;
     height: 48px;
     padding: 0;
@@ -774,23 +774,37 @@
     align-items: center;
     justify-content: center;
     pointer-events: auto;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border: 0;
     border-radius: 12px;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
-    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    background: transparent;
     color: #d8b98a;
     cursor: var(--cursor-point);
     opacity: 0.85;
+    box-shadow: none;
+  }
+  body.mobile-touch #mobile-consumables-toggle::before {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    inset: 4px;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 10px;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
     box-shadow:
       inset 0 1px 0 #ffffff14,
       0 2px 8px #0009;
+    pointer-events: none;
   }
   body.mobile-touch #mobile-consumables-toggle .ui-icon {
     width: 14px;
     height: 14px;
     transform: scale(var(--btn-scale, 1));
     transform-origin: center;
+    position: relative;
+    z-index: 1;
   }
   @media (prefers-reduced-motion: no-preference) {
     body.mobile-touch #mobile-consumables-toggle .ui-icon {
@@ -799,8 +813,10 @@
   }
   body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle {
     opacity: 1;
-    border-color: var(--gold-dim);
     color: #ffdf9c;
+  }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle::before {
+    border-color: var(--gold-dim);
   }
   body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle .ui-icon {
     transform: rotate(90deg) scale(var(--btn-scale, 1));
@@ -826,41 +842,43 @@
     padding: 0;
     flex: none;
     pointer-events: auto;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border: 0;
     border-radius: 50%;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
-    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    background: transparent;
     color: #eee8ff;
     cursor: var(--cursor-point);
     overflow: hidden;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    box-shadow: none;
   }
-  body.mobile-touch .mobile-consumable-slot:active {
+  body.mobile-touch .mobile-consumable-slot:active .icon-label {
     border-color: var(--gold);
   }
   /* Same cd-overlay/count/state structure as the ring buttons (shared painter). */
   body.mobile-touch .mobile-consumable-slot .icon-label {
     position: absolute;
-    inset: 3px;
+    inset: 4px;
     border-radius: 50%;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
     background-size: cover;
     background-position: center;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
   }
   body.mobile-touch .mobile-consumable-slot .icon-label,
   body.mobile-touch .mobile-consumable-slot .cdtext,
   body.mobile-touch .mobile-consumable-slot .item-count {
-    transform: scale(var(--btn-scale, 1));
+    transform: scale(clamp(0.9, var(--btn-scale, 1), 1));
     transform-origin: center;
   }
   body.mobile-touch .mobile-consumable-slot .cd-overlay {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
     height: 0;
+    transform: scale(clamp(0.9, var(--btn-scale, 1), 1)) scaleY(0.833333);
+    transform-origin: center bottom;
     border-radius: 0 0 50% 50%;
     background: #000a;
     pointer-events: none;
@@ -891,7 +909,7 @@
     filter: grayscale(0.6);
     opacity: 0.6;
   }
-  body.mobile-touch .mobile-consumable-slot.used {
+  body.mobile-touch .mobile-consumable-slot.used .icon-label {
     border-color: var(--gold);
   }
   body.mobile-touch #mobile-extra-controls {
@@ -1079,19 +1097,19 @@
     display: none;
   }
   /* Issue 1577 (6): both bars are anchored directly above the player frame and
-     match its rendered width exactly (300px times the #player-frame scale
-     below, 0.82 here) instead of their own independent min()-clamped width, so
+     match its rendered width exactly through --mobile-player-frame-scale instead
+     of their own independent min()-clamped width, so
      the bar ends line up with the frame instead of floating narrower/wider. */
   body.mobile-touch #castbar {
     position: fixed;
-    left: 50%;
+    left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
     /* Centred just above the bottom-centre #player-frame (14px inset + its
        scaled ~48px height + a gap), the classic seat: with Chat/More moved to
        the top-left trio the band over the player frame is free again, and the old
        left strip now belongs to movement-side touch controls
        (a cast bar rendered behind a button, z 19 vs 30, was unreadable). */
     bottom: calc(68px + env(safe-area-inset-bottom));
-    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    width: calc(300px * var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1));
     min-width: 0;
     height: 6px;
     transform: translateX(-50%);
@@ -1111,9 +1129,9 @@
      overlap each other either. */
   body.mobile-touch #swingbar {
     position: fixed;
-    left: 50%;
+    left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
     bottom: calc(76px + env(safe-area-inset-bottom));
-    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    width: calc(300px * var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1));
     min-width: 0;
     height: 5px;
     transform: translateX(-50%);
@@ -1476,7 +1494,7 @@
      to that origin, not to the portrait element. */
   body.mobile-touch #player-frame {
     position: fixed;
-    left: 50%;
+    left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
     top: auto;
     bottom: calc(14px + env(safe-area-inset-bottom));
     z-index: 21;
@@ -1484,7 +1502,8 @@
     margin: 0;
     display: flex;
     justify-content: flex-start;
-    transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform: translateX(-50%)
+      scale(calc(var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1)));
     transform-origin: center bottom;
   }
   body.mobile-touch #player-frame .portrait-wrap {
@@ -1621,47 +1640,48 @@
     border-radius: 5px;
     font-size: 10px;
   }
-  /* The mobile-only collapse chip (a "Party" disclosure header) the party painter
+  /* The mobile-only collapse chip the party painter
      seats first in #party-frames while in a party on the touch HUD. Collapsed by
      default (a persisted USER choice, never a graphics-tier signal): only the chip
      shows; the member frames + Leave button reveal when the container gains
-     .party-expanded. The chip reuses the glass look + chevron rotate of the
-     consumables toggle. Never rendered on desktop (the painter builds it only under
-     body.mobile-touch), so the desktop stack is unchanged. */
+     .party-expanded. Its 40px transparent button preserves the touch floor while a
+     compact 28px glass-backed chevron is the only visible face; the localized Party
+     caption remains visually hidden for the accessible name. Never rendered on desktop
+     (the painter builds it only under body.mobile-touch), so desktop is unchanged. */
   body.mobile-touch #party-chip {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
     min-width: 40px;
     min-height: 40px;
     /* margin-bottom 5px (>= the 4px interactive touch gap the audit now enforces between
        the chip and each member frame): the chip is a flex-column sibling ABOVE the rows
        wrapper, so this bottom margin is the clearance between the chip and the topmost
-       member frame in the expanded stack. */
+    member frame in the expanded stack. */
     margin: 0 0 5px;
-    padding: 6px 12px;
-    border: 1px solid var(--mobile-glass-border, #cba43d8c);
-    border-radius: 8px;
-    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
-    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
-    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: #d8b98a;
     cursor: var(--cursor-point);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    box-shadow: none;
   }
-  body.mobile-touch #party-chip:active {
+  body.mobile-touch #party-chip:active .ui-icon {
     border-color: var(--gold);
     color: #fff;
   }
   body.mobile-touch #party-chip .ui-icon {
-    width: 11px;
-    height: 11px;
+    box-sizing: content-box;
+    width: 12px;
+    height: 12px;
+    padding: 7px;
     flex: none;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 6px;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
   }
   @media (prefers-reduced-motion: no-preference) {
     body.mobile-touch #party-chip .ui-icon {
@@ -1675,10 +1695,10 @@
      party UI. On desktop this rule never applies (no body.mobile-touch), so the desktop
      stack is unchanged. */
   body.mobile-touch #party-frames.party-expanded #party-chip {
-    border-color: var(--gold-dim);
     color: #ffdf9c;
   }
   body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {
+    border-color: var(--gold-dim);
     transform: rotate(90deg);
   }
   body.mobile-touch #party-frames:not(.party-expanded) .party-frame,
@@ -3350,19 +3370,31 @@
       mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
     }
     body.mobile-touch #castbar {
-      /* Centred above the bottom-centre player frame like the base rule, one
-         notch lower to match the shorter landscape frame band. Width matches
-         the landscape #player-frame's rendered width (300px * 0.6 below). */
-      bottom: calc(62px + env(safe-area-inset-bottom));
-      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      /* Centred above the safe-centred player frame like the base rule, one
+         notch lower to match the shorter landscape frame band. Its vertical seat
+         grows with the same tier scale as the complete frame. */
+      bottom: calc(
+        14px +
+        env(safe-area-inset-bottom) +
+        var(--mobile-player-frame-source-height) *
+        var(--mobile-player-frame-scale, 0.9) *
+        var(--mobile-chrome-scale, 1)
+      );
+      width: calc(300px * var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1));
       min-width: 0;
       height: 5px;
     }
     body.mobile-touch #swingbar {
       /* Same landscape notch as #castbar above, stacked one bar-height higher
          so the two never overlap when both are active. */
-      bottom: calc(70px + env(safe-area-inset-bottom));
-      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      bottom: calc(
+        22px +
+        env(safe-area-inset-bottom) +
+        var(--mobile-player-frame-source-height) *
+        var(--mobile-player-frame-scale, 0.9) *
+        var(--mobile-chrome-scale, 1)
+      );
+      width: calc(300px * var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1));
       min-width: 0;
       height: 4px;
     }
@@ -3402,11 +3434,12 @@
     /* The dismiss chevron tracks the shared --mobile-chat-w in every orientation, so
        the portrait-level rule already seats it correctly here (no landscape override). */
     body.mobile-touch #player-frame {
-      left: 50%;
+      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
       top: auto;
       bottom: calc(10px + env(safe-area-inset-bottom));
       width: 300px;
-      transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+      transform: translateX(-50%)
+        scale(calc(var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1)));
     }
     body.mobile-touch #player-frame .uf-bars {
       width: 224px;
@@ -3679,13 +3712,25 @@
   body.mobile-touch {
     --mobile-map-size: 85px;
     --mobile-direct-menu-width: 256px;
+    --mobile-player-frame-scale: 0.9;
+    --mobile-target-frame-ratio: 0.8;
+    --mobile-player-frame-source-height: 68px;
+    --mobile-camera-joystick-size: 96px;
   }
   body.mobile-touch.hud-mobile-compact {
     --mobile-direct-menu-width: 152px;
+    --mobile-player-frame-scale: 0.62;
+    --mobile-camera-joystick-size: 82px;
+  }
+  body.mobile-touch.hud-mobile-tablet {
+    --mobile-player-frame-scale: 1;
   }
   body.mobile-touch.game-active #mobile-controls {
     --mobile-camera-zone-width: min(30vw, 220px);
-    --mobile-camera-zone-height: min(40vh, 140px);
+    /* A guaranteed empty upper action-side patch between the direct menu and pet bar.
+       Swipe-look still works on every unobstructed canvas pixel; this rectangle is the
+       audit contract that stays clear even with pet + expanded party + max UI scales. */
+    --mobile-camera-zone-height: min(24vh, 100px);
     --mobile-camera-zone-left: calc(
       var(--app-vw) -
       max(18px, env(safe-area-inset-right)) -
@@ -3814,9 +3859,30 @@
   body.mobile-touch.mobile-left-handed.game-active #mobile-controls {
     --mobile-camera-zone-left: max(18px, env(safe-area-inset-left));
   }
+  /* When the optional view joystick is visible, it owns the outer action-side edge.
+     Keep the full swipe-look rectangle immediately inward of it instead of letting the
+     joystick cover that canvas contract. The lower seat also clears the target row. */
+  body.mobile-touch.mobile-camera-joystick-on.game-active #mobile-controls {
+    --mobile-camera-zone-left: calc(
+      var(--app-vw) -
+      max(30px, calc(env(safe-area-inset-right) + 12px)) -
+      var(--mobile-camera-joystick-size) -
+      12px -
+      var(--mobile-camera-zone-width)
+    );
+    --mobile-camera-zone-top: max(84px, calc(env(safe-area-inset-top) + 80px));
+  }
+  body.mobile-touch.mobile-left-handed.mobile-camera-joystick-on.game-active #mobile-controls {
+    --mobile-camera-zone-left: calc(
+      max(30px, calc(env(safe-area-inset-left) + 12px)) +
+      var(--mobile-camera-joystick-size) +
+      12px
+    );
+  }
   @media (orientation: portrait) {
     body.mobile-touch {
       --mobile-direct-menu-width: 152px;
+      --mobile-player-frame-scale: 0.55;
     }
     body.mobile-touch.game-active #mobile-controls {
       --mobile-camera-zone-width: min(42vw, 160px);
@@ -3836,13 +3902,6 @@
     }
     body.mobile-touch #target-frame {
       transform: scale(calc(0.45 * var(--mobile-chrome-scale, 1)));
-    }
-    body.mobile-touch #player-frame {
-      transform: translateX(-50%) scale(calc(0.55 * var(--mobile-chrome-scale, 1)));
-    }
-    body.mobile-touch #castbar,
-    body.mobile-touch #swingbar {
-      width: calc(300px * 0.55 * var(--mobile-chrome-scale, 1));
     }
     body.mobile-touch:is(.hud-mobile-compact, .hud-mobile-standard, .hud-mobile-tablet)
       #right-tracker-stack {
@@ -3880,58 +3939,235 @@
     }
   }
   @media (orientation: landscape) {
+    body.mobile-touch #mobile-move-joystick {
+      width: 116px;
+      height: 116px;
+    }
+    body.mobile-touch #mobile-move-joystick::before {
+      inset: 27px;
+    }
+    body.mobile-touch #mobile-move-joystick .mobile-stick {
+      width: 52px;
+      height: 52px;
+      margin: -26px 0 0 -26px;
+    }
     body.mobile-touch.hud-mobile-compact #mobile-move-joystick {
       transform: scale(calc(min(var(--joy-scale, 1), 1) * var(--mobile-chrome-scale, 1)));
     }
-    body.mobile-touch.hud-mobile-compact #mobile-camera-joystick {
-      width: 82px;
-      height: 82px;
-      left: max(6px, env(safe-area-inset-left));
-      right: auto;
-      top: max(140px, calc(env(safe-area-inset-top) + 140px));
+    /* Movement stays under the left thumb in the default layout, so the optional
+       view joystick belongs on the right inside the view-control region. Handedness
+       mirrors the pair as a system. Clamp its visual scale so an optional stick does
+       not crowd the pet and action rows at the maximum joystick setting. */
+    body.mobile-touch #mobile-camera-joystick {
+      width: var(--mobile-camera-joystick-size);
+      height: var(--mobile-camera-joystick-size);
+      left: auto;
+      right: max(30px, calc(env(safe-area-inset-right) + 12px));
+      top: var(--mobile-camera-zone-top);
       bottom: auto;
       transform: scale(calc(min(var(--joy-scale, 1), 1) * var(--mobile-chrome-scale, 1)));
-      transform-origin: left top;
-    }
-    body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-camera-joystick {
-      left: auto;
-      right: max(6px, env(safe-area-inset-right));
       transform-origin: right top;
     }
-    body.mobile-touch.hud-mobile-compact #party-frames {
+    body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
+      left: max(30px, calc(env(safe-area-inset-left) + 12px));
+      right: auto;
+      transform-origin: left top;
+    }
+    /* Landscape keeps the entire party strip in the top row immediately inward of the
+       minimap. Party follows the map when handedness mirrors, while Target owns a stable
+       safe-centered seat one row lower. */
+    body.mobile-touch #party-frames {
+      left: calc(max(6px, env(safe-area-inset-left)) + var(--mobile-map-size) + 10px);
+      right: auto;
+      top: max(6px, env(safe-area-inset-top));
+      transform: none;
+      transform-origin: left top;
       display: grid;
-      grid-template-columns: auto auto;
-      grid-template-areas:
-        "chip leave"
-        "rows rows";
+      grid-template-columns: auto auto auto;
+      grid-template-areas: "chip rows leave";
       column-gap: 4px;
-      align-items: start;
+      align-items: center;
       justify-items: start;
     }
-    body.mobile-touch.hud-mobile-compact #party-frames.below-target {
-      top: calc(max(6px, env(safe-area-inset-top)) + 50px);
+    body.mobile-touch #party-frames.below-target {
+      top: max(6px, env(safe-area-inset-top));
     }
-    body.mobile-touch.hud-mobile-compact #party-chip {
+    body.mobile-touch.mobile-left-handed #party-frames {
+      left: auto;
+      right: calc(max(6px, env(safe-area-inset-right)) + var(--mobile-map-size) + 10px);
+      top: max(6px, env(safe-area-inset-top));
+      transform: none;
+      transform-origin: right top;
+    }
+    body.mobile-touch #target-frame,
+    body.mobile-touch.mobile-left-handed #target-frame {
+      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);
+      right: auto;
+      top: calc(max(6px, env(safe-area-inset-top)) + 48px);
+      transform: translateX(-50%)
+        scale(
+          calc(
+            var(--mobile-player-frame-scale, 0.9) *
+            var(--mobile-target-frame-ratio, 0.8) *
+            var(--mobile-chrome-scale, 1)
+          )
+        );
+      transform-origin: center top;
+    }
+    body.mobile-touch #party-chip {
       grid-area: chip;
+      min-width: 40px;
+      min-height: 40px;
+      margin: 0 0 4px;
+      padding: 0;
     }
-    body.mobile-touch.hud-mobile-compact #party-frames .party-rows {
+    body.mobile-touch #party-frames .party-rows {
       grid-area: rows;
       grid-template-rows: auto;
       grid-auto-flow: column;
     }
-    body.mobile-touch.hud-mobile-compact #party-frames #party-leave {
+    body.mobile-touch #party-frames .party-frame {
+      width: calc(68px * var(--mobile-chrome-scale, 1));
+      min-height: 40px;
+      padding: 2px 4px;
+      border-radius: 5px;
+    }
+    body.mobile-touch #party-frames .party-frame:not(:first-of-type) {
+      margin-top: 0;
+    }
+    body.mobile-touch #party-frames #party-leave {
       grid-area: leave;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
       margin: 0;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      box-shadow: none;
+    }
+    body.mobile-touch #party-frames #party-leave .party-leave-label {
+      display: none;
+    }
+    body.mobile-touch #party-frames #party-leave .ui-icon {
+      box-sizing: content-box;
+      width: 12px;
+      height: 12px;
+      padding: 7px;
+      border: 1px solid var(--mobile-glass-border, #cba43d8c);
+      border-radius: 6px;
+      background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+      box-shadow:
+        inset 0 1px 0 #ffffff14,
+        0 2px 8px #0009;
+    }
+    body.mobile-touch #party-frames #party-leave:active .ui-icon {
+      border-color: var(--gold);
+      color: #fff;
+    }
+    /* Pet commands keep a 40px hitbox, but shed the desktop panel and dark button
+       tiles. Only the 32px art is visible, leaving more world around the command row. */
+    body.mobile-touch #petbar {
+      gap: 4px;
+    }
+    body.mobile-touch #petbar .petbar-group {
+      gap: 0;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    body.mobile-touch #petbar .pet-btn {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    body.mobile-touch #petbar .pet-btn .icon-label {
+      inset: 4px;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px #000b;
+    }
+    body.mobile-touch #petbar .pet-btn.active,
+    body.mobile-touch #petbar .pet-btn.autocast {
+      box-shadow: none;
+    }
+    body.mobile-touch #petbar .pet-btn.active .icon-label {
+      outline: 2px solid var(--gold);
+      outline-offset: 0;
+    }
+    body.mobile-touch #petbar .pet-btn.autocast .icon-label {
+      outline: 2px solid #ffe77a;
+      outline-offset: 0;
+      box-shadow: 0 0 10px #ffe77a66;
+    }
+    /* Pet commands belong to the action thumb: dock the two-group bar directly above
+       the two-row skill pad. The base pad is 108px tall and sits 20px from the bottom,
+       so 136px leaves an 8px gap. Handedness mirrors the whole action-side cluster. */
+    body.mobile-touch #petbar {
+      left: auto;
+      right: max(18px, env(safe-area-inset-right));
+      top: auto;
+      bottom: calc(136px + env(safe-area-inset-bottom));
+      transform: none;
+      transform-origin: right bottom;
+    }
+    body.mobile-touch.mobile-left-handed #petbar {
+      left: max(18px, env(safe-area-inset-left));
+      right: auto;
+      transform-origin: left bottom;
+    }
+    /* Compact's pad hugs the edge 10px lower; keep the same 8px inter-cluster gap. */
+    body.mobile-touch.hud-mobile-compact #petbar {
+      right: max(14px, env(safe-area-inset-right));
+      bottom: calc(126px + env(safe-area-inset-bottom));
+    }
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #petbar {
+      left: max(14px, env(safe-area-inset-left));
+      right: auto;
+    }
+    /* Tablet's larger hitboxes make its pad 126px tall. */
+    body.mobile-touch.hud-mobile-tablet #petbar {
+      bottom: calc(154px + env(safe-area-inset-bottom));
+    }
+    /* Compact keeps the disclosure low, immediately beyond the fixed movement
+       capture zone. Carried items fill rightward toward the centered player
+       frame, then wrap upward in two-column rows. The action-side safe inset
+       lifts only the drawer when the centered player frame shifts toward it. */
+    body.mobile-touch.hud-mobile-compact #mobile-consumables {
+      left: max(136px, calc(env(safe-area-inset-left) + 136px));
     }
     body.mobile-touch.hud-mobile-compact #mobile-consumables-row {
-      bottom: 34px;
+      left: calc(48px + 6px);
+      right: auto;
+      bottom: calc(
+        max(env(safe-area-inset-left), env(safe-area-inset-right)) +
+        min(8px, max(env(safe-area-inset-left), env(safe-area-inset-right)))
+      );
+      width: 100px;
     }
-    body.mobile-touch.hud-mobile-compact #player-frame {
-      transform: translateX(-50%) scale(calc(0.45 * var(--mobile-chrome-scale, 1)));
+    body.mobile-touch.hud-mobile-compact.mobile-consumables-open #mobile-consumables-row {
+      display: flex;
+      flex-flow: row wrap-reverse;
     }
-    body.mobile-touch.hud-mobile-compact #castbar,
-    body.mobile-touch.hud-mobile-compact #swingbar {
-      width: calc(300px * 0.45 * var(--mobile-chrome-scale, 1));
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-consumables {
+      left: auto;
+      right: max(136px, calc(env(safe-area-inset-right) + 136px));
+    }
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-consumables-row {
+      left: auto;
+      right: calc(48px + 6px);
+    }
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed.mobile-consumables-open
+      #mobile-consumables-row {
+      flex-direction: row-reverse;
     }
   }
 

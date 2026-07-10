@@ -20,6 +20,7 @@ const URL = process.env.URL || 'http://localhost:5173/';
 const GATE = process.argv.includes('--gate');
 const MATRIX_ALL = process.env.MATRIX_ALL === '1';
 const QUICK = process.env.QUICK === '1';
+const STRESS_ONLY = process.env.STRESS_ONLY === '1';
 const SHOT_DIR = 'tmp/mobile-hud-audit';
 const MIN_GAP = 4;
 const EPSILON = 0.6;
@@ -186,6 +187,10 @@ async function buildPopulatedState(page) {
   const party = await page.evaluate(() => {
     const sim = window.__game.sim;
     const player = sim.player;
+    // Keep the long-running viewport sweep from killing the fixture player and
+    // clearing the populated aura/pet state halfway through the matrix.
+    player.maxHp = Math.max(player.maxHp, 1_000_000);
+    player.hp = player.maxHp;
     const roster = [
       ['Brightoak', 'druid'],
       ['Stormcaller', 'shaman'],
@@ -223,10 +228,19 @@ async function buildPopulatedState(page) {
     const questLog = window.__game.world?.questLog;
     questLog?.set?.('q_wolves', { questId: 'q_wolves', counts: [0], state: 'active' });
 
-    if (!sim.inventory.some((slot) => slot.itemId === 'minor_healing_potion')) {
-      sim.inventory.push({ itemId: 'minor_healing_potion', count: 3 });
+    for (const itemId of [
+      'minor_healing_potion',
+      'minor_mana_potion',
+      'lesser_healing_potion',
+      'lesser_mana_potion',
+      'healing_potion',
+      'mana_potion',
+    ]) {
+      if (!sim.inventory.some((slot) => slot.itemId === itemId)) {
+        sim.inventory.push({ itemId, count: 3 });
+      }
     }
-    player.hp = Math.max(1, player.maxHp - 50);
+    player.hp = player.maxHp - 50;
     window.__game.hud?.update?.(0.05);
     return sim.partyInfo?.members?.length ?? 0;
   });
@@ -241,9 +255,10 @@ async function ensureAuditPet(page) {
       (entity) => entity.kind === 'mob' && entity.ownerId === sim.playerId && !entity.dead,
     );
     if (!owned) {
-      player.resource = player.maxResource;
-      sim.castAbility('summon_imp');
-      for (let tick = 0; tick < 20 * 8 && player.castingAbility; tick++) sim.tick();
+      // This is the same real summon path used by the completed ability, called
+      // directly so the geometry fixture does not spend eight simulated seconds
+      // advancing every combat timer and aura in the populated state.
+      sim.summonPet(player, 'emberkin');
       owned = [...sim.entities.values()].find(
         (entity) => entity.kind === 'mob' && entity.ownerId === sim.playerId && !entity.dead,
       );
@@ -259,6 +274,29 @@ async function forceTarget(page, showCast = false) {
   const target = await page.evaluate(() => {
     const sim = window.__game.sim;
     const player = sim.player;
+    player.maxHp = Math.max(player.maxHp, 1_000_000);
+    player.hp = player.maxHp;
+    player.dead = false;
+    const addAura = (id, name, kind, value) => {
+      const aura = player.auras.find((candidate) => candidate.id === id);
+      if (aura) {
+        aura.remaining = 9999;
+        aura.duration = 9999;
+        return;
+      }
+      player.auras.push({
+        id,
+        name,
+        kind,
+        remaining: 9999,
+        duration: 9999,
+        value,
+        sourceId: sim.primaryId,
+        school: 'physical',
+      });
+    };
+    addAura('layout-audit-buff', 'Audit Vigor', 'buff_ap', 15);
+    addAura('layout-audit-debuff', 'Audit Sunder', 'sunder', 10);
     let best = null;
     let bestDistance = Number.POSITIVE_INFINITY;
     for (const [id, entity] of sim.entities.entries()) {
@@ -287,10 +325,17 @@ async function forceTarget(page, showCast = false) {
   if (showCast) {
     const casting = await page.evaluate(() => {
       const sim = window.__game.sim;
-      sim.player.resource = sim.player.maxResource;
-      sim.castAbility('summon_imp');
+      const player = sim.player;
+      player.resource = player.maxResource;
+      player.gcdRemaining = 0;
+      player.cooldowns.delete('shadow_bolt');
+      player.castingAbility = null;
+      player.castRemaining = 0;
+      player.castTotal = 0;
+      player.channeling = false;
+      sim.castAbility('shadow_bolt');
       window.__game.hud?.update?.(0.05);
-      return sim.player.castingAbility === 'summon_imp';
+      return player.castingAbility === 'shadow_bolt';
     });
     if (!casting) fail('populated state: failed to start the audit cast');
   }
@@ -350,9 +395,8 @@ async function collectGeometry(page) {
       document.querySelectorAll('.mobile-action-slot').forEach((element) => {
         controls[`slot-${element.dataset.mobileIndex}`] = grab(element);
       });
-      controls['mobile-consumables-toggle'] = grab(
-        document.getElementById('mobile-consumables-toggle'),
-      );
+      const consumablesToggle = document.getElementById('mobile-consumables-toggle');
+      controls['mobile-consumables-toggle'] = grab(consumablesToggle);
       document.querySelectorAll('.mobile-consumable-slot').forEach((element) => {
         controls[`consumable-${element.dataset.consumableIndex}`] = grab(element);
       });
@@ -392,9 +436,59 @@ async function collectGeometry(page) {
             }
           : null;
 
+      const controlChrome = (element) => {
+        const style = getComputedStyle(element);
+        return {
+          borders: [
+            style.borderTopWidth,
+            style.borderRightWidth,
+            style.borderBottomWidth,
+            style.borderLeftWidth,
+          ].map(Number.parseFloat),
+          paddings: [
+            style.paddingTop,
+            style.paddingRight,
+            style.paddingBottom,
+            style.paddingLeft,
+          ].map(Number.parseFloat),
+          outline: Number.parseFloat(style.outlineWidth),
+          backgroundImage: style.backgroundImage,
+          backgroundColor: style.backgroundColor,
+          boxShadow: style.boxShadow,
+        };
+      };
+      const petButtonElements = Array.from(document.querySelectorAll('#petbar .pet-btn'));
+      const petButtons = petButtonElements.map(grab);
+      const petButtonChrome = petButtonElements.map(controlChrome);
+      const petFaces = Array.from(document.querySelectorAll('#petbar .pet-btn .icon-label')).map(
+        grab,
+      );
+      const petGroups = Array.from(document.querySelectorAll('#petbar .petbar-group')).map(
+        controlChrome,
+      );
+      const consumablesToggleFaceStyle = consumablesToggle
+        ? getComputedStyle(consumablesToggle, '::before')
+        : null;
+      const consumablesToggleFace = consumablesToggleFaceStyle
+        ? {
+            w: Number.parseFloat(consumablesToggleFaceStyle.width),
+            h: Number.parseFloat(consumablesToggleFaceStyle.height),
+          }
+        : null;
+      const consumableFaces = Array.from(
+        document.querySelectorAll('.mobile-consumable-slot .icon-label'),
+      ).map(grab);
+
       return {
         controls,
         chrome,
+        actionPad: grab(document.getElementById('mobile-action-ring')),
+        petButtons,
+        petButtonChrome,
+        petFaces,
+        petGroups,
+        consumablesToggleFace,
+        consumableFaces,
         camera,
         viewport: { w: window.innerWidth, h: window.innerHeight },
         tier: ['hud-mobile-compact', 'hud-mobile-standard', 'hud-mobile-tablet'].find((name) =>
@@ -475,6 +569,20 @@ function checkPersistentGeometry(tag, geometry, profile, state) {
       fail(`${tag}: #${id} enters the emulated safe-area inset`);
     }
   }
+  if (state.cameraJoystick) {
+    const joystick = geometry.controls['mobile-camera-joystick'];
+    const safeInset = state.leftHanded ? safeArea.left : safeArea.right;
+    const expectedInset = Math.max(30, safeInset + 12);
+    const actualInset = state.leftHanded
+      ? joystick?.left
+      : geometry.viewport.w - (joystick?.right ?? geometry.viewport.w);
+    if (actualInset === undefined || Math.abs(actualInset - expectedInset) > 1) {
+      fail(
+        `${tag}: view joystick outer inset ${actualInset?.toFixed(1) ?? 'missing'}px, ` +
+          `expected ${expectedInset}px on the ${state.leftHanded ? 'left' : 'right'} view side`,
+      );
+    }
+  }
   for (let left = 0; left < controlEntries.length; left++) {
     for (let right = left + 1; right < controlEntries.length; right++) {
       const gap = edgeGap(controlEntries[left][1], controlEntries[right][1]);
@@ -507,6 +615,28 @@ function checkPersistentGeometry(tag, geometry, profile, state) {
     }
   }
 
+  if (
+    !geometry.consumablesToggleFace ||
+    Math.abs(geometry.consumablesToggleFace.w - 40) > 1 ||
+    Math.abs(geometry.consumablesToggleFace.h - 40) > 1
+  ) {
+    fail(`${tag}: Consumables toggle face is not 40x40px inside its 48px hitbox`);
+  }
+  if (state.consumablesOpen) {
+    const expectedFace = 40 * Math.min(1, Math.max(0.9, state.buttonScale));
+    const visibleFaces = geometry.consumableFaces.filter(Boolean);
+    if (
+      visibleFaces.length !== 6 ||
+      visibleFaces.some(
+        (rect) => Math.abs(rect.w - expectedFace) > 1 || Math.abs(rect.h - expectedFace) > 1,
+      )
+    ) {
+      fail(
+        `${tag}: an open Consumables slot face is not ${expectedFace.toFixed(0)}x${expectedFace.toFixed(0)}px inside its 48px hitbox`,
+      );
+    }
+  }
+
   const chromeEntries = Object.entries(geometry.chrome).filter(([, rect]) => rect);
   for (let left = 0; left < chromeEntries.length; left++) {
     for (let right = left + 1; right < chromeEntries.length; right++) {
@@ -516,7 +646,10 @@ function checkPersistentGeometry(tag, geometry, profile, state) {
         INTERACTIVE_CHROME.has(leftId) || INTERACTIVE_CHROME.has(rightId) ? MIN_GAP : 0;
       const gap = edgeGap(leftRect, rightRect);
       if (gap < requiredGap - EPSILON) {
-        fail(`${tag}: #${leftId} vs #${rightId} gap ${gap.toFixed(1)}px`);
+        fail(
+          `${tag}: #${leftId} vs #${rightId} gap ${gap.toFixed(1)}px ` +
+            `${JSON.stringify(leftRect)} ${JSON.stringify(rightRect)}`,
+        );
       }
     }
   }
@@ -525,7 +658,10 @@ function checkPersistentGeometry(tag, geometry, profile, state) {
     for (const [chromeId, chromeRect] of chromeEntries) {
       const gap = edgeGap(controlRect, chromeRect);
       if (gap < MIN_GAP - EPSILON) {
-        fail(`${tag}: #${controlId} vs #${chromeId} gap ${gap.toFixed(1)}px`);
+        fail(
+          `${tag}: #${controlId} vs #${chromeId} gap ${gap.toFixed(1)}px ` +
+            `${JSON.stringify(controlRect)} ${JSON.stringify(chromeRect)}`,
+        );
       }
     }
   }
@@ -543,12 +679,72 @@ function checkPersistentGeometry(tag, geometry, profile, state) {
     }
     for (const [chromeId, chromeRect] of chromeEntries) {
       if (CAMERA_BLOCKER_IDS.has(chromeId) && edgeGap(chromeRect, geometry.camera) < -EPSILON) {
-        fail(`${tag}: #${chromeId} overlaps the camera zone`);
+        fail(
+          `${tag}: #${chromeId} overlaps the camera zone ` +
+            `${JSON.stringify(chromeRect)} ${JSON.stringify(geometry.camera)}`,
+        );
       }
     }
   }
 
   if (state.petActive) {
+    const petbar = geometry.chrome.petbar;
+    const actionPad = geometry.actionPad;
+    if (!petbar || !actionPad) {
+      fail(`${tag}: pet bar or action pad is unavailable for dock measurement`);
+    } else {
+      const edgeOffset = state.leftHanded
+        ? Math.abs(petbar.left - actionPad.left)
+        : Math.abs(petbar.right - actionPad.right);
+      if (edgeOffset > 1.5) {
+        fail(`${tag}: pet bar action-side edge is offset ${edgeOffset.toFixed(1)}px from the pad`);
+      }
+      const dockGap = actionPad.top - petbar.bottom;
+      if (Math.abs(dockGap - 8) > 1.5) {
+        fail(`${tag}: pet bar/pad gap is ${dockGap.toFixed(1)}px instead of 8px`);
+      }
+    }
+    if (geometry.petButtons.length === 0 || geometry.petButtons.some((rect) => !rect)) {
+      fail(`${tag}: pet command hitboxes are unavailable`);
+    } else if (
+      geometry.petButtons.some((rect) => Math.abs(rect.w - 40) > 1 || Math.abs(rect.h - 40) > 1)
+    ) {
+      fail(`${tag}: a compact pet command hitbox is not exactly 40x40px`);
+    }
+    if (
+      geometry.petFaces.length !== geometry.petButtons.length ||
+      geometry.petFaces.some(
+        (rect) => !rect || Math.abs(rect.w - 32) > 1 || Math.abs(rect.h - 32) > 1,
+      )
+    ) {
+      fail(`${tag}: compact pet command art is not 32x32px inside its hitbox`);
+    }
+    if (
+      geometry.petButtonChrome.length !== geometry.petButtons.length ||
+      geometry.petButtonChrome.some(
+        (style) =>
+          style.borders.some((value) => value !== 0) ||
+          style.backgroundImage !== 'none' ||
+          style.backgroundColor !== 'rgba(0, 0, 0, 0)' ||
+          style.boxShadow !== 'none',
+      )
+    ) {
+      fail(`${tag}: a pet command retained desktop button chrome`);
+    }
+    if (
+      geometry.petGroups.length !== 2 ||
+      geometry.petGroups.some(
+        (style) =>
+          style.borders.some((value) => value !== 0) ||
+          style.outline !== 0 ||
+          style.paddings.some((value) => value !== 0) ||
+          style.backgroundImage !== 'none' ||
+          style.backgroundColor !== 'rgba(0, 0, 0, 0)' ||
+          style.boxShadow !== 'none',
+      )
+    ) {
+      fail(`${tag}: pet command groups retained desktop panel chrome`);
+    }
     const frame = geometry.chrome['player-frame'];
     for (const id of ['castbar', 'swingbar']) {
       const bar = geometry.chrome[id];
@@ -664,7 +860,7 @@ try {
   await sleep(1000);
   await enterOfflineGame(page, { charClass: 'warlock', charName: 'HudAudit', settleMs: 1500 });
   await page.waitForFunction(() => window.__game?.sim && window.__game?.hud, {
-    timeout: 15000,
+    timeout: 30000,
   });
   await page.evaluate(() => document.querySelector('.tut-skip')?.click());
   await sleep(200);
@@ -691,7 +887,7 @@ try {
   };
 
   console.log('\n=== PASS A: populated persistent HUD ===');
-  const profiles = QUICK ? PROFILES.slice(0, 1) : PROFILES;
+  const profiles = STRESS_ONLY ? [] : QUICK ? PROFILES.slice(0, 1) : PROFILES;
   for (const profile of profiles) {
     await flipViewport(page, cdp, profile);
     await applySafeArea(page, cdp, SAFE_AREA_VECTORS.none, `${profile.name}/reset`);
@@ -709,8 +905,28 @@ try {
   if (!QUICK) {
     const compact = PROFILES.find((profile) => profile.w === 740 && profile.h === 360);
     if (!compact) throw new Error('740x360 stress profile is missing');
-    await flipViewport(page, cdp, compact);
     await ensureAuditPet(page);
+    const petDockProfiles = [
+      PROFILES.find((profile) => profile.tier === 'hud-mobile-standard'),
+      PROFILES.find((profile) => profile.name === 'tablet-4-3'),
+    ];
+    if (petDockProfiles.some((profile) => !profile)) {
+      throw new Error('standard/tablet pet-dock profiles are missing');
+    }
+    for (const profile of petDockProfiles) {
+      await flipViewport(page, cdp, profile);
+      await applySafeArea(page, cdp, SAFE_AREA_VECTORS.none, `${profile.name}/pet/reset`);
+      for (const leftHanded of [false, true]) {
+        const state = { ...baseline, leftHanded, cameraJoystick: true, petActive: true };
+        await forceTarget(page, true);
+        await applyHudState(page, state);
+        const tag = `${profile.name}/pet/${leftHanded ? 'left' : 'right'}`;
+        checkPersistentGeometry(tag, await collectGeometry(page), profile, state);
+        console.log(`checked ${tag}`);
+      }
+    }
+
+    await flipViewport(page, cdp, compact);
     for (const leftHanded of [false, true]) {
       const state = {
         ...baseline,
@@ -725,37 +941,29 @@ try {
           ? SAFE_AREA_VECTORS.landscapeNotchLeft
           : SAFE_AREA_VECTORS.landscapeNotchRight,
       };
-      await applySafeArea(
-        page,
-        cdp,
-        state.safeArea,
-        `galaxy-s8-stress/${leftHanded ? 'left' : 'right'}`,
-      );
+      const tag = `galaxy-s8-stress/${leftHanded ? 'left' : 'right'}`;
+      await applySafeArea(page, cdp, state.safeArea, tag);
       await forceTarget(page, true);
       await applyHudState(page, state);
-      const tag = `galaxy-s8-stress/${leftHanded ? 'left' : 'right'}`;
       checkPersistentGeometry(tag, await collectGeometry(page), compact, state);
       await page.screenshot({ path: `${SHOT_DIR}/${tag.replace('/', '-')}.png` });
       console.log(`checked ${tag}`);
     }
 
-    console.log('\n=== PASS B: mobile window matrix ===');
-    const windowProfiles = MATRIX_ALL
-      ? PROFILES
-      : PROFILES.filter((profile) =>
-          [
-            'galaxy-s8-landscape',
-            'iphone-13-landscape',
-            'tablet-4-3',
-            'iphone-13-portrait',
-          ].includes(profile.name),
-        );
-    for (const profile of windowProfiles) {
-      await flipViewport(page, cdp, profile);
-      await applySafeArea(page, cdp, SAFE_AREA_VECTORS.none, `${profile.name}/windows-reset`);
-      await applyHudState(page, baseline);
-      for (const entry of WINDOW_MATRIX) await checkWindow(page, profile, entry);
-      console.log(`checked windows at ${profile.name}`);
+    if (!STRESS_ONLY) {
+      console.log('\n=== PASS B: mobile window matrix ===');
+      const windowProfiles = MATRIX_ALL
+        ? PROFILES
+        : PROFILES.filter((profile) =>
+            ['galaxy-s8-landscape', 'iphone-13-landscape', 'tablet-4-3'].includes(profile.name),
+          );
+      for (const profile of windowProfiles) {
+        await flipViewport(page, cdp, profile);
+        await applySafeArea(page, cdp, SAFE_AREA_VECTORS.none, `${profile.name}/windows-reset`);
+        await applyHudState(page, baseline);
+        for (const entry of WINDOW_MATRIX) await checkWindow(page, profile, entry);
+        console.log(`checked windows at ${profile.name}`);
+      }
     }
   }
 

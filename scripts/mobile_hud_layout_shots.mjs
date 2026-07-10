@@ -4,10 +4,11 @@
 //   SHOT_PHASE=before URL=http://127.0.0.1:5174/ node scripts/mobile_hud_layout_shots.mjs
 //   SHOT_PHASE=after  URL=http://127.0.0.1:5173/ node scripts/mobile_hud_layout_shots.mjs
 //
-// Six PNGs are written under docs/screenshots/mobile-hud-layout/.
+// Five landscape PNGs are written under docs/screenshots/mobile-hud-layout/.
 
 import { mkdirSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
+import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 
@@ -33,15 +34,6 @@ const SHOTS = [
     partyExpanded: false,
   },
   {
-    name: 'compact-consumables',
-    width: 740,
-    height: 360,
-    dsf: 3,
-    leftHanded: false,
-    consumablesOpen: true,
-    partyExpanded: false,
-  },
-  {
     name: 'iphone-target-party',
     width: 844,
     height: 390,
@@ -51,24 +43,6 @@ const SHOTS = [
     partyExpanded: true,
   },
   {
-    name: 'compact-left-handed',
-    width: 740,
-    height: 360,
-    dsf: 3,
-    leftHanded: true,
-    consumablesOpen: false,
-    partyExpanded: false,
-  },
-  {
-    name: 'iphone-portrait',
-    width: 390,
-    height: 844,
-    dsf: 3,
-    leftHanded: false,
-    consumablesOpen: false,
-    partyExpanded: false,
-  },
-  {
     name: 'tablet-landscape',
     width: 1024,
     height: 768,
@@ -76,6 +50,27 @@ const SHOTS = [
     leftHanded: false,
     consumablesOpen: false,
     partyExpanded: false,
+  },
+  {
+    name: 'compact-consumables',
+    width: 740,
+    height: 360,
+    dsf: 3,
+    leftHanded: false,
+    consumablesOpen: true,
+    partyExpanded: false,
+    petActive: true,
+    cameraJoystick: true,
+  },
+  {
+    name: 'compact-left-handed',
+    width: 740,
+    height: 360,
+    dsf: 3,
+    leftHanded: true,
+    consumablesOpen: false,
+    partyExpanded: false,
+    petActive: true,
   },
 ];
 
@@ -151,16 +146,32 @@ async function buildState(page) {
   await sleep(400);
 }
 
+async function ensureShotPet(page) {
+  const pet = await page.evaluate(() => {
+    const sim = window.__game.sim;
+    const player = sim.player;
+    let owned = [...sim.entities.values()].find(
+      (entity) => entity.kind === 'mob' && entity.ownerId === sim.playerId && !entity.dead,
+    );
+    if (!owned) {
+      sim.summonPet(player, 'emberkin');
+      owned = [...sim.entities.values()].find(
+        (entity) => entity.kind === 'mob' && entity.ownerId === sim.playerId && !entity.dead,
+      );
+    }
+    window.__game.hud?.update?.(0.05);
+    return owned?.id ?? null;
+  });
+  if (pet === null) failures.push('failed to summon the screenshot pet');
+  await sleep(200);
+}
+
 async function applyShotState(page, shot) {
   await page.evaluate((next) => {
     window.__game.hud.closeAll?.();
     document.body.classList.toggle('mobile-left-handed', next.leftHanded);
-    document.body.classList.remove(
-      'mobile-window-open',
-      'mobile-more-open',
-      'mobile-chat-open',
-      'mobile-camera-joystick-on',
-    );
+    document.body.classList.toggle('mobile-camera-joystick-on', !!next.cameraJoystick);
+    document.body.classList.remove('mobile-window-open', 'mobile-more-open', 'mobile-chat-open');
     window.dispatchEvent(new Event('resize'));
   }, shot);
   await sleep(350);
@@ -198,7 +209,7 @@ try {
   await sleep(1000);
   await enterOfflineGame(page, { charClass: 'warrior', charName: 'LayoutShots', settleMs: 1500 });
   await page.waitForFunction(() => window.__game?.sim && window.__game?.hud, {
-    timeout: 15000,
+    timeout: 30000,
   });
   await page.evaluate(() => document.querySelector('.tut-skip')?.click());
   await sleep(200);
@@ -214,10 +225,14 @@ try {
   await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 
   for (const shot of SHOTS) {
+    if (shot.petActive) await ensureShotPet(page);
     await flipViewport(page, cdp, shot);
     await applyShotState(page, shot);
     const path = `${OUT_DIR}/${PHASE}-${shot.name}.png`;
-    await page.screenshot({ path });
+    const screenshot = await page.screenshot();
+    await sharp(screenshot)
+      .extract({ left: 0, top: 0, width: shot.width, height: shot.height })
+      .toFile(path);
     console.log(`captured ${path}`);
   }
 

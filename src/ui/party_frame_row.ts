@@ -284,29 +284,39 @@ export function createPartyRow(
 }
 
 /** The member-rows wrapper class. The wrapper nests every pooled member row one level
- *  under #party-frames so the mobile collapse chip, the rows, the master-loot control,
- *  and the Leave button stack as a simple column (chip alone on its own line), while the
- *  rows themselves keep the 2-column auto-flow double-stack on the wrapper. */
+ *  under #party-frames so CSS can lay out member rows independently from the collapse,
+ *  master-loot, and Leave controls. */
 export const PARTY_ROWS_CLASS = 'party-rows';
 
-/** Build the persistent member-rows wrapper (created once, reused across rebuilds). On
- *  mobile hud.mobile.css gives it the 2-column auto-flow grid #party-frames used to carry
- *  (so 3-4 members double-stack); on desktop it is display:contents (transparent), so the
- *  rows participate directly in the #party-frames flex column exactly as before the
- *  wrapper existed. The pool re-parents the pooled rows into it without churning nodes. */
+/** Build the persistent member-rows wrapper (created once, reused across rebuilds). Mobile
+ *  CSS chooses the orientation-specific row grid; desktop keeps it display:contents so the
+ *  rows participate directly in the original #party-frames stack. */
 export function createPartyRowsWrapper(doc: Document): HTMLElement {
   const el = doc.createElement('div');
   el.className = PARTY_ROWS_CLASS;
   return el;
 }
 
+/** The persistent leave control keeps its icon static while the painter updates the
+ *  localized label span and accessible name through elided writers. Desktop shows the
+ *  text label; mobile landscape keeps the same 40px hitbox but shows only the close icon. */
+export interface PartyLeaveButton {
+  el: HTMLButtonElement;
+  label: HTMLElement;
+}
+
 /** Build the persistent "Leave Party" button (created once, its click listener
  *  attached once). The pool keeps it last in the container and re-localizes its label
  *  through the elided setText each rebuild. */
-export function createLeaveButton(doc: Document, onLeave: () => void): HTMLButtonElement {
+export function createLeaveButton(doc: Document, onLeave: () => void): PartyLeaveButton {
   const btn = doc.createElement('button');
   btn.className = 'btn';
   btn.id = 'party-leave';
+  btn.type = 'button';
+  btn.insertAdjacentHTML('afterbegin', svgIcon('close'));
+  const label = doc.createElement('span');
+  label.className = 'party-leave-label';
+  btn.appendChild(label);
   btn.addEventListener('click', onLeave);
-  return btn;
+  return { el: btn, label };
 }

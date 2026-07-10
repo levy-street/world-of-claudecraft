@@ -1,5 +1,5 @@
-// Visual verification for the relocated mobile HUD clusters: top trio,
-// joystick satellites, centred More dialog, and the castbar's new seat.
+// Visual verification for the compact mobile HUD: top menu, joystick-owned
+// Autorun, two-row action pad, centred More dialog, and player-frame bars.
 // Needs `npm run dev`. Writes PNGs to tmp/.
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
@@ -53,53 +53,51 @@ try {
 
   const vw = 844;
   const chat = await rect('#mobile-chat');
-  const social = await rect('#mobile-social');
+  const quest = await rect('#mobile-quest');
   const more = await rect('#mobile-more');
-  check('trio visible', !!chat && !!social && !!more);
-  if (chat && social && more) {
+  check('compact Chat/Quests/More visible', !!chat && !!quest && !!more);
+  if (chat && quest && more) {
     check(
-      'trio anchored top-left',
-      chat.l < 20 && chat.t < 20,
-      `l=${chat.l.toFixed(1)} t=${chat.t.toFixed(1)}`,
+      'compact menu anchored top-right',
+      more.r > vw - 20 && chat.t < 20,
+      `right=${more.r.toFixed(1)} top=${chat.t.toFixed(1)}`,
     );
-    check(
-      'trio clears the target-frame seat (top+72)',
-      more.b <= 72,
-      `bottom=${more.b.toFixed(1)}`,
-    );
-    check('order chat < social < more', chat.l < social.l && social.l < more.l);
+    check('order Chat < Quests < More', chat.l < quest.l && quest.l < more.l);
   }
+  check('Social moved into closed More', !(await rect('#mobile-social')));
+  check('Settings moved into closed More', !(await rect('#mobile-menu')));
   check('community rail hidden on mobile', !(await rect('#community-hud')));
   const jump = await rect('#mobile-jump');
-  const autorun = await rect('#mobile-autorun');
+  const autorun = await rect('#mobile-autorun-target');
   const joy = await rect('#mobile-move-joystick');
   const attack = await rect('#mobile-action-attack');
-  check('jump/autorun/joystick/attack visible', !!jump && !!autorun && !!joy && !!attack);
+  check('jump/autorun target/joystick/attack measurable', !!jump && !!autorun && !!joy && !!attack);
   if (jump && autorun && joy && attack) {
     const jc = { x: (joy.l + joy.r) / 2, y: (joy.t + joy.b) / 2 };
     const jumpC = { x: (jump.l + jump.r) / 2, y: (jump.t + jump.b) / 2 };
     const autoC = { x: (autorun.l + autorun.r) / 2, y: (autorun.t + autorun.b) / 2 };
     const attackC = { x: (attack.l + attack.r) / 2, y: (attack.t + attack.b) / 2 };
     check(
-      'autorun due right of joystick centre',
-      Math.abs(autoC.y - jc.y) < 3 && autoC.x > jc.x,
-      `dy=${(autoC.y - jc.y).toFixed(1)}`,
+      'Autorun target centred above movement',
+      Math.abs(autoC.x - jc.x) < 3 && autoC.y < jc.y,
+      `dx=${(autoC.x - jc.x).toFixed(1)} dy=${(autoC.y - jc.y).toFixed(1)}`,
     );
     check(
-      'jump in the ring hollow (right thumb, due left of Attack)',
-      Math.abs(jumpC.y - attackC.y) < 3 && jumpC.x > vw / 2 && jumpC.x < attackC.x,
+      'Jump is the action pad primary nearest the right thumb',
+      jumpC.x > attackC.x && jumpC.y > attackC.y && jumpC.x > vw / 2,
       `jump=(${jumpC.x.toFixed(0)},${jumpC.y.toFixed(0)}) attack=(${attackC.x.toFixed(0)},${attackC.y.toFixed(0)})`,
     );
-    // Size parity with the ring's Target secondary.
+    // Jump is primary; the non-interactive Autorun target matches secondary
+    // face scale without becoming another gameplay button.
     const target = await rect('#mobile-target-cycle');
     if (target) {
       check(
-        'jump/autorun same size as Target',
-        Math.abs(jump.w - target.w) < 1 && Math.abs(autorun.w - target.w) < 1,
+        'Jump is largest and hidden Autorun target is visually recessed',
+        jump.w > target.w && autorun.w < target.w,
         `jump=${jump.w.toFixed(1)} autorun=${autorun.w.toFixed(1)} target=${target.w.toFixed(1)}`,
       );
     }
-    // Jump must clear the (compact-nudged) player frame and the castbar.
+    // Jump must clear the centred player frame.
     const frame = await rect('#player-frame');
     if (frame) {
       check(
@@ -132,15 +130,20 @@ try {
   }
   await page.screenshot({ path: 'tmp/layout_top_trio.png' });
 
-  // Open the More dialog: it must be centred on screen.
+  // Open the More dialog: landscape centres it horizontally and top-anchors it
+  // above the bottom action row so a tall utility inventory cannot cover play.
   await page.evaluate(() => document.getElementById('mobile-more')?.click());
   await sleep(400);
   const modal = await rect('#mobile-extra-controls');
   check('More dialog opens', !!modal);
   if (modal) {
     const cx = Math.abs((modal.l + modal.r) / 2 - vw / 2);
-    const cy = Math.abs((modal.t + modal.b) / 2 - 390 / 2);
-    check('More dialog centred', cx < 2 && cy < 8, `off by (${cx.toFixed(1)}, ${cy.toFixed(1)})`);
+    const actionPad = await rect('#mobile-action-ring');
+    check(
+      'More dialog centred horizontally and clear of the action pad',
+      cx < 2 && modal.t < 20 && (!actionPad || modal.b <= actionPad.t),
+      `x offset ${cx.toFixed(1)}px, top=${modal.t.toFixed(1)} bottom=${modal.b.toFixed(1)}`,
+    );
   }
   await page.screenshot({ path: 'tmp/layout_more_dialog.png' });
   await page.evaluate(() => document.getElementById('mobile-more-close')?.click());

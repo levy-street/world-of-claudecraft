@@ -522,8 +522,11 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(has('setText', (c) => c.args[0] === 'Alice')).toBe(true);
     // Outside raid, no group label is emitted (the group span stays empty).
     expect(has('setText', (c) => c.args[0] === 'Group 1')).toBe(false);
-    // The leave label is set (and re-localizable) through setText.
+    // The leave label and icon-only mobile accessible name are both writer-routed.
     expect(has('setText', (c) => c.args[0] === 'Leave Party')).toBe(true);
+    expect(has('setAttr', (c) => c.args[0] === 'aria-label' && c.args[1] === 'Leave Party')).toBe(
+      true,
+    );
     // Badges toggle via setDisplay (the forced-colors-safe icon cue): dead/combat/oor
     // each show at least once across the three members.
     expect(has('setDisplay', (c) => c.args[0] === '')).toBe(true);
@@ -558,6 +561,11 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     calls.length = 0;
     painter.relocalize();
     expect(calls.some((c) => c.m === 'setText' && c.args[0] === 'Leave Party')).toBe(true);
+    expect(
+      calls.some(
+        (c) => c.m === 'setAttr' && c.args[0] === 'aria-label' && c.args[1] === 'Leave Party',
+      ),
+    ).toBe(true);
   });
 
   it('the leave button click leaves the party', () => {

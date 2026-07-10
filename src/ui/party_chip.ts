@@ -17,7 +17,7 @@ import { svgIcon } from './ui_icons';
 
 /** The chip's id, so hud.mobile.css can target it and the E2E audit can measure it. */
 export const PARTY_CHIP_ID = 'party-chip';
-/** The label text span's class (the visible "Party" caption, written via t()). */
+/** The label text span's class (the accessible "Party" caption, written via t()). */
 export const PARTY_CHIP_LABEL_CLASS = 'party-chip-label';
 
 /** A built chip: the button element and its label span (the painter writes the
@@ -28,11 +28,11 @@ export interface PartyChip {
 }
 
 /**
- * Build the collapse chip once: a button carrying the chevron icon + a label span.
+ * Build the collapse chip once: a button carrying the chevron icon + an accessible label.
  * The caller (the painter) writes the localized caption and drives aria-expanded
  * through the elided writers; the click handler is attached here (once) and calls
- * onToggle. The accessible name comes from the visible label text, so it stays
- * localized without a per-frame aria write.
+ * onToggle. The accessible name comes from the visually-hidden label text, so it stays
+ * localized without a per-frame aria write while the visible control remains icon-only.
  */
 export function createPartyChip(doc: Document, onToggle: () => void): PartyChip {
   const btn = doc.createElement('button');
@@ -47,7 +47,7 @@ export function createPartyChip(doc: Document, onToggle: () => void): PartyChip 
   // the party frames expand. No unicode arrow (the repo pattern is CSS/SVG).
   btn.insertAdjacentHTML('afterbegin', svgIcon('next'));
   const label = doc.createElement('span');
-  label.className = PARTY_CHIP_LABEL_CLASS;
+  label.className = `${PARTY_CHIP_LABEL_CLASS} visually-hidden`;
   btn.appendChild(label);
   btn.addEventListener('click', onToggle);
   return { el: btn, label };

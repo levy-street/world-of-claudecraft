@@ -15,13 +15,11 @@
 // kept pids update in place, new pids take a free row or build one. The rows are
 // re-parented in member order into a persistent .party-rows WRAPPER (their own element,
 // one level under #party-frames), and the container's own direct children are ordered
-// chip (mobile only), wrapper, master-loot control, leave button. The wrapper is what
-// lets the mobile chip sit alone on its own line: with the rows nested inside it, no
-// member frame can auto-flow beside the chip (the container's mobile column stacks chip,
-// wrapper, and Leave; the 2-column double-stack lives on the wrapper). The mobile
-// row-styling rules key on .party-frame:first-of-type / :not(:first-of-type), which now
-// resolve within the wrapper (only member rows live there); appendChild/insertBefore
-// move a node without dropping its keyboard focus or its listeners.
+// chip (mobile only), wrapper, master-loot control, leave button. The wrapper lets CSS
+// choose a horizontal landscape row without mixing member nodes with the header controls.
+// The row-styling rules key on .party-frame:first-of-type / :not(:first-of-type), which
+// resolve within the wrapper (only member rows live there); appendChild/insertBefore moves
+// a node without dropping its keyboard focus or its listeners.
 
 import { formatNumber, t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
@@ -33,6 +31,7 @@ import {
   createPartyRowsWrapper,
   PARTY_CREST_KEY_PREFIX,
   PARTY_LEADER_GLYPH,
+  type PartyLeaveButton,
   type PartyRow,
   type PartyRowAuraDeps,
   type PartyRowDeps,
@@ -56,6 +55,7 @@ const CHIP_PRESENT_CLASS = 'has-party-chip';
 const EXPANDED_CLASS = 'party-expanded';
 // The chip's aria-expanded attribute name/values (a disclosure control).
 const ARIA_EXPANDED = 'aria-expanded';
+const ARIA_LABEL = 'aria-label';
 const ARIA_TRUE = 'true';
 const ARIA_FALSE = 'false';
 // Badge visibility: '' reverts to the stylesheet display (shown), 'none' hides. The
@@ -71,7 +71,7 @@ export interface PartyFramesPainterDeps {
   onContextMenu: (pid: number, name: string, x: number, y: number) => void;
   onLeave: () => void;
   /** The localized "Leave Party" label, re-read each rebuild so an in-game language
-   *  switch re-localizes it (through the elided setText). */
+   *  switch re-localizes its text span and accessible name through elided writers. */
   leaveLabel: () => string;
   /** The localized "Party" chip caption, re-read each update so an in-game language
    *  switch re-localizes it (through the elided setText). Mobile only. */
@@ -93,14 +93,13 @@ export class PartyFramesPainter {
   // listeners stay attached and read the live slot, so a recycled row is safe.
   private readonly free: PartyRow[] = [];
   // The member-rows wrapper: every pooled row nests one level under #party-frames inside
-  // this element, so the chip, the rows, the master-loot control, and Leave stack as a
-  // simple column (the chip alone on its own line). On mobile the wrapper carries the
-  // 2-column auto-flow grid the container used to; on desktop it is display:contents
-  // (transparent), so the rows lay out in the #party-frames flex column exactly as before.
+  // this element, so CSS can orient members independently from the chip, master-loot
+  // control, and Leave. On desktop it is display:contents (transparent), so the rows lay
+  // out in the #party-frames flex column exactly as before.
   // Built lazily on the first sync, then kept in the DOM (detached only by clear(), where
   // it is retained for reuse); reconcileOrder re-parents rows into it without node churn.
   private rowsWrapper: HTMLElement | null = null;
-  private leaveBtn: HTMLButtonElement | null = null;
+  private leaveBtn: PartyLeaveButton | null = null;
   // The mobile collapse chip, built lazily on the first mobile update and then kept
   // in the DOM (first child of the container) while in a party on mobile. Off mobile
   // it is never built (desktop party frames are unchanged). Its click toggles the
@@ -193,7 +192,7 @@ export class PartyFramesPainter {
     if (this.masterControl) this.masterControl.remove();
     this.masterControl = el;
     if (el) {
-      const leave = this.leaveBtn;
+      const leave = this.leaveBtn?.el;
       if (leave && leave.parentNode === this.container) this.container.insertBefore(el, leave);
       else this.container.appendChild(el);
     }
@@ -239,8 +238,10 @@ export class PartyFramesPainter {
     // the quest tracker re-focuses manually after a rebuild; re-appending every row
     // each frame would yank focus off a party row on every combat tick.)
     const leave = this.ensureLeaveButton();
-    this.reconcileOrder(ordered, leave);
-    this.writers.setText(leave, this.deps.leaveLabel());
+    this.reconcileOrder(ordered, leave.el);
+    const leaveLabel = this.deps.leaveLabel();
+    this.writers.setText(leave.label, leaveLabel);
+    this.writers.setAttr(leave.el, ARIA_LABEL, leaveLabel);
   }
 
   private ensureRowsWrapper(): HTMLElement {
@@ -302,7 +303,11 @@ export class PartyFramesPainter {
       this.writers.setText(row.group, this.groupLabel(row.slot.member, this.lastRaid));
     }
     for (const row of this.free) row.relocalize();
-    if (this.leaveBtn) this.writers.setText(this.leaveBtn, this.deps.leaveLabel());
+    if (this.leaveBtn) {
+      const leaveLabel = this.deps.leaveLabel();
+      this.writers.setText(this.leaveBtn.label, leaveLabel);
+      this.writers.setAttr(this.leaveBtn.el, ARIA_LABEL, leaveLabel);
+    }
     // Re-emit the chip caption in the new language while it is shown (a language
     // switch does not flip the collapse state, so the Hud never re-drives
     // setCollapse for it, exactly like the pooled group labels above).
@@ -319,7 +324,7 @@ export class PartyFramesPainter {
       this.free.push(row);
       this.pool.delete(pid);
     }
-    this.leaveBtn?.remove();
+    this.leaveBtn?.el.remove();
     this.masterControl?.remove();
     this.masterControl = null;
     // Detach the (now empty) rows wrapper too, so a no-party container is truly empty and
@@ -387,7 +392,7 @@ export class PartyFramesPainter {
       : '';
   }
 
-  private ensureLeaveButton(): HTMLButtonElement {
+  private ensureLeaveButton(): PartyLeaveButton {
     if (!this.leaveBtn) this.leaveBtn = createLeaveButton(this.doc, this.deps.onLeave);
     return this.leaveBtn;
   }

@@ -16,6 +16,7 @@ import { edgeGap, PROFILES, SAFE_AREA_VECTORS } from './lib/overlap_geometry.mjs
 
 const URL = process.env.URL || 'http://localhost:5173/';
 const QUICK = process.env.QUICK === '1';
+const PROFILE_SHOTS = process.env.PROFILE_SHOTS !== '0';
 const SHOT_DIR = 'tmp/mobile-cluster-layout';
 const TOUCH_FLOOR = 48;
 const MIN_GAP = 4;
@@ -190,7 +191,6 @@ async function applyHudState(page, descriptor) {
     window.__game?.hud?.closeAll?.();
     body.classList.toggle('mobile-left-handed', state.leftHanded);
     body.classList.toggle('mobile-camera-joystick-on', state.cameraJoystick);
-    body.classList.toggle('mobile-consumables-open', state.consumablesOpen);
     body.classList.toggle('mobile-pet-active', state.petActive);
     body.classList.remove(
       'mobile-window-open',
@@ -207,7 +207,8 @@ async function applyHudState(page, descriptor) {
     party?.classList.toggle('party-expanded', state.partyExpanded);
 
     const toggle = document.getElementById('mobile-consumables-toggle');
-    toggle?.setAttribute('aria-expanded', state.consumablesOpen ? 'true' : 'false');
+    const consumablesAreOpen = toggle?.getAttribute('aria-expanded') === 'true';
+    if (toggle && consumablesAreOpen !== state.consumablesOpen) toggle.click();
     if (state.consumablesOpen) {
       for (const slot of document.querySelectorAll('.mobile-consumable-slot')) {
         slot.classList.remove('empty');
@@ -246,7 +247,17 @@ async function collectLayout(page) {
           bottom: rect.bottom,
           w: rect.width,
           h: rect.height,
+          layoutW: element.offsetWidth,
+          layoutH: element.offsetHeight,
         };
+      };
+      const grabForced = (element) => {
+        if (!element) return null;
+        const inlineDisplay = element.style.display;
+        element.style.display = 'block';
+        const rect = grab(element);
+        element.style.display = inlineDisplay;
+        return rect;
       };
 
       const controls = {};
@@ -255,12 +266,33 @@ async function collectLayout(page) {
         controls[`slot-${element.dataset.mobileIndex}`] = grab(element);
       });
       for (const id of allMenuIds) controls[id] = grab(document.getElementById(id));
-      controls['mobile-consumables-toggle'] = grab(
-        document.getElementById('mobile-consumables-toggle'),
-      );
-      document.querySelectorAll('.mobile-consumable-slot').forEach((element) => {
+      const consumablesToggle = document.getElementById('mobile-consumables-toggle');
+      const consumableElements = Array.from(document.querySelectorAll('.mobile-consumable-slot'));
+      controls['mobile-consumables-toggle'] = grab(consumablesToggle);
+      consumableElements.forEach((element) => {
         controls[`consumable-${element.dataset.consumableIndex}`] = grab(element);
       });
+
+      const consumablesToggleStyle = consumablesToggle
+        ? getComputedStyle(consumablesToggle, '::before')
+        : null;
+      const consumablesToggleFace = consumablesToggleStyle
+        ? {
+            w: Number.parseFloat(consumablesToggleStyle.width),
+            h: Number.parseFloat(consumablesToggleStyle.height),
+          }
+        : null;
+      const consumableFaces = consumableElements.map((element) =>
+        grab(element.querySelector('.icon-label')),
+      );
+      const cooldownOverlay = consumableElements[0]?.querySelector('.cd-overlay') ?? null;
+      let consumableCooldownFace = null;
+      if (cooldownOverlay) {
+        const inlineHeight = cooldownOverlay.style.height;
+        cooldownOverlay.style.height = '100%';
+        consumableCooldownFace = grab(cooldownOverlay);
+        cooldownOverlay.style.height = inlineHeight;
+      }
 
       const mobileControls = document.getElementById('mobile-controls');
       const mobileControlsRect = mobileControls?.getBoundingClientRect() ?? null;
@@ -339,6 +371,9 @@ async function collectLayout(page) {
 
       return {
         controls,
+        consumablesToggleFace,
+        consumableFaces,
+        consumableCooldownFace,
         viewport: { w: window.innerWidth, h: window.innerHeight },
         tier: ['hud-mobile-compact', 'hud-mobile-standard', 'hud-mobile-tablet'].find((name) =>
           document.body.classList.contains(name),
@@ -363,10 +398,19 @@ async function collectLayout(page) {
         menu: grab(document.getElementById('mobile-combat-controls')),
         target: grab(document.getElementById('target-frame')),
         party: grab(document.getElementById('party-frames')),
+        partyChip: grab(document.getElementById('party-chip')),
+        partyChipFace: grab(document.querySelector('#party-chip .ui-icon')),
         moveZone: grab(document.getElementById('mobile-move-zone')),
         moveJoystick: grab(document.getElementById('mobile-move-joystick')),
         cameraJoystick: grab(document.getElementById('mobile-camera-joystick')),
         playerFrame: grab(document.getElementById('player-frame')),
+        castbar: grabForced(document.getElementById('castbar')),
+        swingbar: grabForced(document.getElementById('swingbar')),
+        scales: {
+          playerFrame: Number.parseFloat(
+            getComputedStyle(document.body).getPropertyValue('--mobile-player-frame-scale'),
+          ),
+        },
         partyRows: Array.from(document.querySelectorAll('#party-frames .party-frame'))
           .map(grab)
           .filter(Boolean),
@@ -451,6 +495,73 @@ function checkLayout(tag, geometry, profile, state) {
     if (rect.w < TOUCH_FLOOR - EPSILON || rect.h < TOUCH_FLOOR - EPSILON) {
       fail(`${tag}: #${id} is ${rect.w.toFixed(1)}x${rect.h.toFixed(1)}, below ${TOUCH_FLOOR}px`);
     }
+  }
+  const consumablesToggle = geometry.controls['mobile-consumables-toggle'];
+  if (
+    !consumablesToggle ||
+    Math.abs(consumablesToggle.layoutW - 48) > EPSILON ||
+    Math.abs(consumablesToggle.layoutH - 48) > EPSILON ||
+    !geometry.consumablesToggleFace ||
+    Math.abs(geometry.consumablesToggleFace.w - 40) > EPSILON ||
+    Math.abs(geometry.consumablesToggleFace.h - 40) > EPSILON
+  ) {
+    fail(`${tag}: Consumables toggle is not a 40px face inside an exact 48px hitbox`);
+  }
+  if (state.consumablesOpen) {
+    const expectedFace = 40 * Math.min(1, Math.max(0.9, state.buttonScale));
+    const slotRects = Array.from(
+      { length: 6 },
+      (_, index) => geometry.controls[`consumable-${index}`],
+    );
+    if (
+      slotRects.some(
+        (rect) =>
+          !rect || Math.abs(rect.layoutW - 48) > EPSILON || Math.abs(rect.layoutH - 48) > EPSILON,
+      )
+    ) {
+      fail(`${tag}: an open Consumables slot lost its exact 48px hitbox`);
+    }
+    if (
+      geometry.consumableFaces.some(
+        (rect) =>
+          !rect || Math.abs(rect.w - expectedFace) > 1 || Math.abs(rect.h - expectedFace) > 1,
+      )
+    ) {
+      fail(
+        `${tag}: a Consumables face is not ${expectedFace.toFixed(0)}px at Button Size ${state.buttonScale}`,
+      );
+    }
+    if (
+      !geometry.consumableCooldownFace ||
+      Math.abs(geometry.consumableCooldownFace.w - expectedFace) > 1 ||
+      Math.abs(geometry.consumableCooldownFace.h - expectedFace) > 1
+    ) {
+      fail(
+        `${tag}: Consumables cooldown overlay does not match the ${expectedFace.toFixed(0)}px face`,
+      );
+    }
+  }
+
+  if (
+    !geometry.moveJoystick ||
+    Math.abs(geometry.moveJoystick.layoutW - 116) > EPSILON ||
+    Math.abs(geometry.moveJoystick.layoutH - 116) > EPSILON
+  ) {
+    fail(`${tag}: landscape movement wheel does not retain its 116px base box`);
+  }
+  const expectedMoveZoneWidth = Math.max(112, Math.min(geometry.viewport.w * 0.3, 132));
+  const expectedMoveZoneHeight = Math.min(geometry.viewport.h * 0.36, 172);
+  if (
+    !geometry.moveZone ||
+    Math.abs(geometry.moveZone.w - expectedMoveZoneWidth) > 1 ||
+    Math.abs(geometry.moveZone.h - expectedMoveZoneHeight) > 1 ||
+    (state.leftHanded
+      ? Math.abs(geometry.viewport.w - geometry.moveZone.right) > EPSILON
+      : Math.abs(geometry.moveZone.left) > EPSILON)
+  ) {
+    fail(
+      `${tag}: movement capture zone changed from ${expectedMoveZoneWidth.toFixed(1)}x${expectedMoveZoneHeight.toFixed(1)}px or left its thumb side`,
+    );
   }
 
   for (let left = 0; left < entries.length; left++) {
@@ -573,35 +684,143 @@ function checkLayout(tag, geometry, profile, state) {
   if (geometry.map && geometry.moveJoystick && geometry.map.bottom > geometry.moveJoystick.top) {
     fail(`${tag}: minimap is not above the movement joystick`);
   }
-  if (geometry.map && geometry.target && geometry.party) {
-    if (state.leftHanded) {
-      if (geometry.target.right > geometry.map.left + EPSILON) {
-        fail(`${tag}: target is not inward-left of the mirrored minimap`);
-      }
-      if (geometry.party.right > geometry.map.left + EPSILON) {
-        fail(`${tag}: party is not inward-left of the mirrored minimap`);
+  if (geometry.map && geometry.party) {
+    const mapPartyGap = state.leftHanded
+      ? geometry.map.left - geometry.party.right
+      : geometry.party.left - geometry.map.right;
+    if (mapPartyGap < 4 - EPSILON || mapPartyGap > 24 + EPSILON) {
+      fail(`${tag}: Party gap beside the minimap is ${mapPartyGap.toFixed(1)}px`);
+    }
+    const expectedTop = Math.max(6, safeArea.top);
+    if (Math.abs(geometry.party.top - expectedTop) > 1.5) {
+      fail(
+        `${tag}: party dock top ${geometry.party.top.toFixed(1)}px, expected ${expectedTop.toFixed(1)}px`,
+      );
+    }
+  }
+  if (!geometry.partyChip || !geometry.partyChipFace) {
+    fail(`${tag}: Party disclosure hitbox or icon face is not measurable`);
+  } else {
+    if (Math.abs(geometry.partyChip.w - 40) > 1 || Math.abs(geometry.partyChip.h - 40) > 1) {
+      fail(
+        `${tag}: Party disclosure hitbox is ${geometry.partyChip.w.toFixed(1)}x${geometry.partyChip.h.toFixed(1)}px instead of 40x40px`,
+      );
+    }
+    if (
+      Math.abs(geometry.partyChipFace.w - 28) > 1 ||
+      Math.abs(geometry.partyChipFace.h - 28) > 1
+    ) {
+      fail(
+        `${tag}: Party disclosure face is ${geometry.partyChipFace.w.toFixed(1)}x${geometry.partyChipFace.h.toFixed(1)}px instead of 28x28px`,
+      );
+    }
+  }
+  if (geometry.target) {
+    const expectedCenter = geometry.viewport.w / 2 + (safeArea.left - safeArea.right) / 2;
+    const targetOffset = Math.abs(center(geometry.target).x - expectedCenter);
+    if (targetOffset > 1.5) {
+      fail(`${tag}: target frame is ${targetOffset.toFixed(1)}px off safe center`);
+    }
+    const expectedTop = Math.max(6, safeArea.top) + 48;
+    if (Math.abs(geometry.target.top - expectedTop) > 1.5) {
+      fail(
+        `${tag}: target frame top ${geometry.target.top.toFixed(1)}px, expected ${expectedTop.toFixed(1)}px`,
+      );
+    }
+    if (geometry.party && geometry.target.top < geometry.party.bottom + 4 - EPSILON) {
+      fail(`${tag}: target frame does not clear the Party row`);
+    }
+  }
+  if (geometry.target && geometry.playerFrame) {
+    if (geometry.target.w >= geometry.playerFrame.w) {
+      fail(
+        `${tag}: target frame width ${geometry.target.w.toFixed(1)}px is not smaller than player frame ${geometry.playerFrame.w.toFixed(1)}px`,
+      );
+    }
+    const targetScale = geometry.target.w / geometry.target.layoutW;
+    const playerScale = geometry.playerFrame.w / geometry.playerFrame.layoutW;
+    const renderedTierRatio = targetScale / playerScale;
+    if (Math.abs(renderedTierRatio - 0.8) > 0.015) {
+      fail(`${tag}: rendered Target tier ratio ${renderedTierRatio.toFixed(3)}, expected 0.800`);
+    }
+  }
+  if (state.cameraJoystick) {
+    if (!geometry.cameraJoystick) {
+      fail(`${tag}: enabled view joystick is not measurable`);
+    } else if (state.leftHanded) {
+      const expectedInset = Math.max(30, safeArea.left + 12);
+      if (center(geometry.cameraJoystick).x >= geometry.viewport.w / 2) {
+        fail(`${tag}: view joystick did not mirror to the left view side`);
+      } else if (Math.abs(geometry.cameraJoystick.left - expectedInset) > 1) {
+        fail(`${tag}: left view joystick inset is not ${expectedInset}px`);
       }
     } else {
-      if (geometry.target.left < geometry.map.right - EPSILON) {
-        fail(`${tag}: target is not inward-right of the minimap`);
-      }
-      if (geometry.party.left < geometry.map.right - EPSILON) {
-        fail(`${tag}: party is not inward-right of the minimap`);
+      const expectedInset = Math.max(30, safeArea.right + 12);
+      if (center(geometry.cameraJoystick).x <= geometry.viewport.w / 2) {
+        fail(`${tag}: view joystick is not on the right view side`);
+      } else if (
+        Math.abs(geometry.viewport.w - geometry.cameraJoystick.right - expectedInset) > 1
+      ) {
+        fail(`${tag}: right view joystick inset is not ${expectedInset}px`);
       }
     }
   }
   if (geometry.playerFrame) {
-    const offset = Math.abs(center(geometry.playerFrame).x - geometry.viewport.w / 2);
-    if (offset > 1.5) fail(`${tag}: player frame is ${offset.toFixed(1)}px off center`);
+    const expectedCenter = geometry.viewport.w / 2 + (safeArea.left - safeArea.right) / 2;
+    const offset = Math.abs(center(geometry.playerFrame).x - expectedCenter);
+    if (offset > 1.5) fail(`${tag}: player frame is ${offset.toFixed(1)}px off safe center`);
+    const expectedScale = {
+      'hud-mobile-compact': 0.62,
+      'hud-mobile-standard': 0.9,
+      'hud-mobile-tablet': 1,
+    }[profile.tier];
+    if (Math.abs(geometry.scales.playerFrame - expectedScale) > 0.01) {
+      fail(`${tag}: player-frame scale ${geometry.scales.playerFrame}, expected ${expectedScale}`);
+    }
+    const minimumWidth = {
+      'hud-mobile-compact': 150,
+      'hud-mobile-standard': 220,
+      'hud-mobile-tablet': 245,
+    }[profile.tier];
+    if (geometry.playerFrame.w < minimumWidth - EPSILON) {
+      fail(
+        `${tag}: player frame width ${geometry.playerFrame.w.toFixed(1)}px is below the ${minimumWidth}px ${profile.tier} floor`,
+      );
+    }
+    for (const [id, bar] of [
+      ['castbar', geometry.castbar],
+      ['swingbar', geometry.swingbar],
+    ]) {
+      if (!bar) {
+        fail(`${tag}: forced #${id} geometry is unavailable`);
+        continue;
+      }
+      const barOffset = Math.abs(center(bar).x - expectedCenter);
+      if (barOffset > 1.5) fail(`${tag}: #${id} is ${barOffset.toFixed(1)}px off safe center`);
+      if (Math.abs(bar.w - geometry.playerFrame.w) > 1.5) {
+        fail(
+          `${tag}: #${id} width ${bar.w.toFixed(1)}px does not match player frame ${geometry.playerFrame.w.toFixed(1)}px`,
+        );
+      }
+    }
+    if (geometry.castbar) {
+      const castGap = geometry.playerFrame.top - geometry.castbar.bottom;
+      if (Math.abs(castGap - 4) > 1.5) {
+        fail(`${tag}: castbar/player gap is ${castGap.toFixed(1)}px instead of 4px`);
+      }
+    }
+    if (geometry.castbar && geometry.swingbar) {
+      const swingGap = geometry.castbar.top - geometry.swingbar.bottom;
+      if (Math.abs(swingGap - 3) > 1.5) {
+        fail(`${tag}: swingbar/castbar gap is ${swingGap.toFixed(1)}px instead of 3px`);
+      }
+    }
   }
   if (state.partyExpanded) {
-    if (geometry.partyRows.length < 4) {
+    if (geometry.partyRows.length !== 4) {
       fail(`${tag}: expanded party exposes ${geometry.partyRows.length} member row(s), expected 4`);
-    } else if (
-      geometry.party &&
-      Math.min(...geometry.partyRows.map((row) => row.top)) <= geometry.party.top
-    ) {
-      fail(`${tag}: expanded party rows do not grow downward below the party chip`);
+    } else if (coordinateBucketCount(geometry.partyRows.map((row) => center(row).y)) !== 1) {
+      fail(`${tag}: expanded party members are not in one horizontal row`);
     }
   }
   if (state.consumablesOpen) {
@@ -609,19 +828,84 @@ function checkLayout(tag, geometry, profile, state) {
     if (slots.every(Boolean)) {
       const xs = slots.map((rect) => center(rect).x);
       const ys = slots.map((rect) => center(rect).y);
-      if (coordinateBucketCount(xs) !== 3 || coordinateBucketCount(ys) !== 2) {
-        fail(`${tag}: Consumables do not render as a 3 x 2 grid`);
-      }
       const toggle = geometry.controls['mobile-consumables-toggle'];
-      if (Math.max(...ys) >= center(toggle).y - EPSILON) {
-        fail(`${tag}: Consumables do not expand upward from the toggle`);
-      }
-      if (state.leftHanded) {
-        if (Math.max(...xs) >= center(toggle).x - EPSILON) {
-          fail(`${tag}: mirrored Consumables do not expand inward-left`);
+      if (profile.tier === 'hud-mobile-compact') {
+        if (coordinateBucketCount(xs) !== 2 || coordinateBucketCount(ys) !== 3) {
+          fail(`${tag}: compact Consumables do not render as a 2 x 3 grid`);
         }
-      } else if (Math.min(...xs) <= center(toggle).x + EPSILON) {
-        fail(`${tag}: Consumables do not expand inward-right`);
+        const expectedToggleBottom = geometry.viewport.h - safeArea.bottom - 16;
+        if (Math.abs(toggle.bottom - expectedToggleBottom) > EPSILON) {
+          fail(`${tag}: compact Consumables toggle left its low thumb-side seat`);
+        }
+        if (Math.max(...slots.map((rect) => rect.bottom)) > toggle.bottom + EPSILON) {
+          fail(`${tag}: compact Consumables extend below their low disclosure`);
+        }
+        const movementGap = state.leftHanded
+          ? geometry.moveZone.left - toggle.right
+          : toggle.left - geometry.moveZone.right;
+        const expectedMovementGap = MIN_GAP + (state.leftHanded ? safeArea.right : safeArea.left);
+        if (Math.abs(movementGap - expectedMovementGap) > EPSILON) {
+          fail(
+            `${tag}: compact Consumables toggle gap is ${movementGap.toFixed(1)}px, expected ${expectedMovementGap.toFixed(1)}px`,
+          );
+        }
+        if (state.leftHanded) {
+          if (toggle.left - Math.max(...slots.map((rect) => rect.right)) < MIN_GAP - EPSILON) {
+            fail(`${tag}: mirrored compact Consumables do not expand left toward the hero frame`);
+          }
+          if (
+            Math.abs(center(slots[0]).y - center(slots[1]).y) > EPSILON ||
+            center(slots[0]).x <= center(slots[1]).x
+          ) {
+            fail(`${tag}: mirrored compact Consumables do not fill leftward before wrapping up`);
+          }
+        } else {
+          if (Math.min(...slots.map((rect) => rect.left)) - toggle.right < MIN_GAP - EPSILON) {
+            fail(`${tag}: compact Consumables do not expand right toward the hero frame`);
+          }
+          if (
+            Math.abs(center(slots[0]).y - center(slots[1]).y) > EPSILON ||
+            center(slots[0]).x >= center(slots[1]).x
+          ) {
+            fail(`${tag}: compact Consumables do not fill rightward before wrapping up`);
+          }
+        }
+        const wrapRows = [slots[0], slots[2], slots[4]].map((rect) => center(rect).y);
+        if (wrapRows[1] >= wrapRows[0] - EPSILON || wrapRows[2] >= wrapRows[1] - EPSILON) {
+          fail(`${tag}: later compact Consumables rows do not wrap upward in item order`);
+        }
+        for (const [chromeId, chrome] of [
+          ['player-frame', geometry.playerFrame],
+          ['castbar', geometry.castbar],
+          ['swingbar', geometry.swingbar],
+        ]) {
+          if (!chrome) continue;
+          for (const [index, slot] of slots.entries()) {
+            const gap = edgeGap(slot, chrome);
+            if (gap < -EPSILON) {
+              fail(
+                `${tag}: compact Consumables slot ${index} overlaps #${chromeId} by ${Math.abs(gap).toFixed(1)}px`,
+              );
+            }
+          }
+        }
+      } else {
+        if (coordinateBucketCount(xs) !== 3 || coordinateBucketCount(ys) !== 2) {
+          fail(`${tag}: Consumables do not render as a 3 x 2 grid`);
+        }
+        if (
+          Math.max(...slots.map((rect) => rect.bottom)) > toggle.bottom + EPSILON ||
+          Math.min(...ys) >= center(toggle).y - EPSILON
+        ) {
+          fail(`${tag}: Consumables do not keep one row above the toggle baseline`);
+        }
+        if (state.leftHanded) {
+          if (Math.max(...xs) >= center(toggle).x - EPSILON) {
+            fail(`${tag}: mirrored Consumables do not expand inward-left`);
+          }
+        } else if (Math.min(...xs) <= center(toggle).x + EPSILON) {
+          fail(`${tag}: Consumables do not expand inward-right`);
+        }
       }
     }
   }
@@ -658,7 +942,7 @@ function checkLayout(tag, geometry, profile, state) {
       : Math.min(profile.w * 0.3, 220);
     const expectedHeight = portrait
       ? Math.min(profile.h * 0.24, 200)
-      : Math.min(profile.h * 0.4, 140);
+      : Math.min(profile.h * 0.24, 100);
     if (geometry.camera.w < expectedWidth - EPSILON) {
       fail(
         `${tag}: camera width ${geometry.camera.w.toFixed(1)}px < ${expectedWidth.toFixed(1)}px`,
@@ -743,13 +1027,130 @@ async function verifyCompactMoreFlow(page, tag) {
   await page.evaluate(() => window.__game.hud.closeAll?.());
 }
 
-async function verifyTwoFingerConsumableFlow(page, tag) {
+async function verifyJoystickAutorunFlow(page, tag, pointerBase) {
+  const result = await page.evaluate((pointerId) => {
+    const moveZone = document.getElementById('mobile-move-zone');
+    const joystick = document.getElementById('mobile-move-joystick');
+    const target = document.getElementById('mobile-autorun-target');
+    if (!moveZone || !joystick || !target) return { error: 'missing Autorun geometry' };
+
+    const joystickRect = joystick.getBoundingClientRect();
+    const startX = joystickRect.left + joystickRect.width / 2;
+    const startY = joystickRect.top + joystickRect.height / 2;
+    const lockY = startY - joystickRect.height * 1.2;
+    const fire = (element, type, clientY, buttons) =>
+      element.dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          pointerId,
+          pointerType: 'touch',
+          clientX: startX,
+          clientY,
+          isPrimary: true,
+          buttons,
+        }),
+      );
+
+    window.__game.input.setAutorun(false);
+    fire(moveZone, 'pointerdown', startY, 1);
+    fire(moveZone, 'pointermove', lockY, 1);
+    fire(moveZone, 'pointerup', lockY, 0);
+
+    const grab = (element) => {
+      if (!element || getComputedStyle(element).display === 'none') return null;
+      const rect = element.getBoundingClientRect();
+      return {
+        left: rect.left,
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+      };
+    };
+    const overlaps = (a, b) =>
+      !!a &&
+      !!b &&
+      Math.min(a.right, b.right) > Math.max(a.left, b.left) &&
+      Math.min(a.bottom, b.bottom) > Math.max(a.top, b.top);
+    const targetRect = grab(target);
+    const collision = ['minimap-wrap', 'mobile-consumables', 'mobile-action-ring'].find((id) =>
+      overlaps(targetRect, grab(document.getElementById(id))),
+    );
+
+    return {
+      autorun: window.__game.input.autorun,
+      near: target.classList.contains('near'),
+      locked: target.classList.contains('locked'),
+      parent: target.parentElement?.id ?? null,
+      standalone: !!document.getElementById('mobile-autorun'),
+      joystickActive: joystick.classList.contains('active'),
+      targetRect,
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      collision: collision ?? null,
+      start: { x: startX, y: startY },
+    };
+  }, pointerBase);
+
+  if (result.error) {
+    fail(`${tag}: ${result.error}`);
+    return;
+  }
+  if (!result.autorun || !result.near || !result.locked) {
+    fail(`${tag}: joystick push did not leave Autorun locked`);
+  }
+  if (result.parent !== 'mobile-move-joystick' || result.standalone) {
+    fail(`${tag}: Autorun is not owned exclusively by the move joystick`);
+  }
+  if (result.joystickActive) fail(`${tag}: joystick stayed visually active after release`);
+  if (
+    !result.targetRect ||
+    result.targetRect.left < -EPSILON ||
+    result.targetRect.top < -EPSILON ||
+    result.targetRect.right > result.viewport.width + EPSILON ||
+    result.targetRect.bottom > result.viewport.height + EPSILON
+  ) {
+    fail(`${tag}: locked Autorun target leaves the viewport`);
+  }
+  if (result.collision) fail(`${tag}: locked Autorun target overlaps #${result.collision}`);
+
+  const reset = await page.evaluate(
+    ({ pointerId, start }) => {
+      const moveZone = document.getElementById('mobile-move-zone');
+      if (!moveZone) return false;
+      const fire = (type, buttons) =>
+        moveZone.dispatchEvent(
+          new PointerEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            pointerId,
+            pointerType: 'touch',
+            clientX: start.x,
+            clientY: start.y,
+            isPrimary: true,
+            buttons,
+          }),
+        );
+      fire('pointerdown', 1);
+      fire('pointerup', 0);
+      return (
+        !window.__game.input.autorun &&
+        !document.getElementById('mobile-autorun-target')?.classList.contains('locked')
+      );
+    },
+    { pointerId: pointerBase + 1, start: result.start },
+  );
+  if (!reset) fail(`${tag}: fresh joystick press did not cancel locked Autorun`);
+}
+
+async function verifyTwoFingerConsumableFlow(page, tag, pointerBase) {
   await page.evaluate(() => {
     const sim = window.__game.sim;
     const existing = sim.inventory.find((slot) => slot.itemId === 'minor_healing_potion');
     if (existing) existing.count = Math.max(existing.count, 3);
     else sim.inventory.push({ itemId: 'minor_healing_potion', count: 3 });
     sim.player.hp = Math.max(1, sim.player.maxHp - 60);
+    sim.player.potionCooldownUntil = sim.time - 1;
+    sim.player.potionCdRemaining = 0;
     if (document.body.classList.contains('mobile-consumables-open')) {
       document.getElementById('mobile-consumables-toggle')?.click();
     }
@@ -757,7 +1158,7 @@ async function verifyTwoFingerConsumableFlow(page, tag) {
   });
   await sleep(150);
 
-  const movementStarted = await page.evaluate(() => {
+  const movementStarted = await page.evaluate((pointerId) => {
     const moveZone = document.getElementById('mobile-move-zone');
     const joystick = document.getElementById('mobile-move-joystick');
     if (!moveZone || !joystick) return false;
@@ -769,7 +1170,7 @@ async function verifyTwoFingerConsumableFlow(page, tag) {
         new PointerEvent(type, {
           bubbles: true,
           cancelable: true,
-          pointerId: 901,
+          pointerId,
           pointerType: 'touch',
           clientX,
           clientY,
@@ -783,20 +1184,20 @@ async function verifyTwoFingerConsumableFlow(page, tag) {
       active: joystick.classList.contains('active'),
       intent: move.forward || move.back || move.strafeLeft || move.strafeRight,
     };
-  });
+  }, pointerBase);
   if (!movementStarted.active || !movementStarted.intent) {
     fail(`${tag}: movement pointer did not produce both joystick state and movement intent`);
     return;
   }
 
-  await page.evaluate(() => {
+  await page.evaluate((pointerId) => {
     const toggle = document.getElementById('mobile-consumables-toggle');
     if (!toggle) return;
     const rect = toggle.getBoundingClientRect();
     const options = {
       bubbles: true,
       cancelable: true,
-      pointerId: 902,
+      pointerId,
       pointerType: 'touch',
       clientX: rect.left + rect.width / 2,
       clientY: rect.top + rect.height / 2,
@@ -804,7 +1205,7 @@ async function verifyTwoFingerConsumableFlow(page, tag) {
     };
     toggle.dispatchEvent(new PointerEvent('pointerdown', options));
     toggle.dispatchEvent(new PointerEvent('pointerup', options));
-  });
+  }, pointerBase + 1);
   await sleep(250);
   const opened = await page.evaluate(() =>
     document.body.classList.contains('mobile-consumables-open'),
@@ -816,14 +1217,14 @@ async function verifyTwoFingerConsumableFlow(page, tag) {
       window.__game.sim.inventory.find((slot) => slot.itemId === 'minor_healing_potion')?.count ??
       0,
   );
-  await page.evaluate(() => {
+  await page.evaluate((pointerId) => {
     const slot = document.querySelector('.mobile-consumable-slot:not(.empty)');
     if (!(slot instanceof HTMLElement)) return;
     const rect = slot.getBoundingClientRect();
     const options = {
       bubbles: true,
       cancelable: true,
-      pointerId: 903,
+      pointerId,
       pointerType: 'touch',
       clientX: rect.left + rect.width / 2,
       clientY: rect.top + rect.height / 2,
@@ -831,7 +1232,7 @@ async function verifyTwoFingerConsumableFlow(page, tag) {
     };
     slot.dispatchEvent(new PointerEvent('pointerdown', options));
     slot.dispatchEvent(new PointerEvent('pointerup', options));
-  });
+  }, pointerBase + 2);
   await sleep(250);
   const result = await page.evaluate(() => ({
     count:
@@ -854,16 +1255,18 @@ async function verifyTwoFingerConsumableFlow(page, tag) {
     fail(`${tag}: using a Consumable cleared the held movement intent`);
   }
 
-  await page.evaluate(() => {
-    window.dispatchEvent(
+  await page.evaluate((pointerId) => {
+    const moveZone = document.getElementById('mobile-move-zone');
+    moveZone?.dispatchEvent(
       new PointerEvent('pointerup', {
         bubbles: true,
-        pointerId: 901,
+        pointerId,
         pointerType: 'touch',
         isPrimary: true,
+        buttons: 0,
       }),
     );
-  });
+  }, pointerBase);
 }
 
 const browser = await puppeteer.launch({
@@ -888,7 +1291,7 @@ try {
   await sleep(1000);
   await enterOfflineGame(page, { charClass: 'warrior', charName: 'LayoutAudit', settleMs: 1500 });
   await page.waitForFunction(() => window.__game?.sim && window.__game?.hud, {
-    timeout: 15000,
+    timeout: 30000,
   });
   await page.evaluate(() => document.querySelector('.tut-skip')?.click());
   await sleep(200);
@@ -924,7 +1327,7 @@ try {
       const geometry = await collectLayout(page);
       const tag = `${profile.name}/${leftHanded ? 'left' : 'right'}`;
       checkLayout(tag, geometry, profile, state);
-      if (!leftHanded) {
+      if (!leftHanded && PROFILE_SHOTS) {
         await page.screenshot({ path: `${SHOT_DIR}/${profile.name}.png` });
       }
       console.log(`checked ${tag}`);
@@ -933,8 +1336,7 @@ try {
 
   if (!QUICK) {
     const compact = PROFILES.find((profile) => profile.w === 740 && profile.h === 360);
-    const portrait = PROFILES.find((profile) => profile.w === 390 && profile.h === 844);
-    if (!compact || !portrait) throw new Error('canonical stress profiles are missing');
+    if (!compact) throw new Error('canonical compact stress profile is missing');
 
     await flipViewport(page, cdp, compact);
     for (const leftHanded of [false, true]) {
@@ -957,6 +1359,19 @@ try {
         compact,
         state,
       );
+    }
+
+    await applySafeArea(page, cdp, SAFE_AREA_VECTORS.none, 'galaxy-s8/consumables-scale/reset');
+    for (const buttonScale of [0.8, 1, 1.3]) {
+      const state = {
+        ...defaultState,
+        buttonScale,
+        consumablesOpen: true,
+      };
+      await applyHudState(page, state);
+      const tag = `galaxy-s8/consumables-scale-${buttonScale}`;
+      checkLayout(tag, await collectLayout(page), compact, state);
+      console.log(`checked ${tag}`);
     }
 
     for (const leftHanded of [false, true]) {
@@ -988,29 +1403,42 @@ try {
       );
     }
 
-    await flipViewport(page, cdp, portrait);
-    for (const buttonScale of [1, 0.8]) {
+    for (const leftHanded of [false, true]) {
+      const state = {
+        ...defaultState,
+        leftHanded,
+        buttonScale: 1.3,
+        consumablesOpen: true,
+        safeArea: leftHanded
+          ? SAFE_AREA_VECTORS.landscapeNotchRight
+          : SAFE_AREA_VECTORS.landscapeNotchLeft,
+      };
+      const tag = `galaxy-s8/movement-inset/${leftHanded ? 'left' : 'right'}`;
+      await applySafeArea(page, cdp, state.safeArea, tag);
+      await applyHudState(page, state);
+      checkLayout(tag, await collectLayout(page), compact, state);
+    }
+
+    const expandedProfiles = [
+      PROFILES.find((profile) => profile.tier === 'hud-mobile-standard'),
+      PROFILES.find((profile) => profile.tier === 'hud-mobile-tablet'),
+    ];
+    if (expandedProfiles.some((profile) => !profile)) {
+      throw new Error('expanded Party standard/tablet profiles are missing');
+    }
+    for (const profile of expandedProfiles) {
+      await flipViewport(page, cdp, profile);
+      await applySafeArea(page, cdp, SAFE_AREA_VECTORS.none, `${profile.name}/party/reset`);
       for (const leftHanded of [false, true]) {
         const state = {
           ...defaultState,
           leftHanded,
-          buttonScale,
-          joystickScale: buttonScale === 1 ? 1 : 0.7,
-          safeArea: SAFE_AREA_VECTORS.portraitNotch,
+          consumablesOpen: true,
+          partyExpanded: true,
         };
-        await applySafeArea(
-          page,
-          cdp,
-          state.safeArea,
-          `iphone-portrait/${buttonScale}/${leftHanded ? 'left' : 'right'}`,
-        );
         await applyHudState(page, state);
-        checkLayout(
-          `iphone-portrait/${buttonScale}/${leftHanded ? 'left' : 'right'}`,
-          await collectLayout(page),
-          portrait,
-          state,
-        );
+        const tag = `${profile.name}/party-consumables-open/${leftHanded ? 'left' : 'right'}`;
+        checkLayout(tag, await collectLayout(page), profile, state);
       }
     }
 
@@ -1018,11 +1446,13 @@ try {
     for (const leftHanded of [false, true]) {
       const state = { ...defaultState, leftHanded };
       const tag = `compact-actions/${leftHanded ? 'left' : 'right'}`;
+      const pointerBase = leftHanded ? 1200 : 900;
       await applySafeArea(page, cdp, state.safeArea, `${tag}/reset`);
       await applyHudState(page, state);
+      await verifyJoystickAutorunFlow(page, tag, pointerBase);
       await verifyCompactMoreFlow(page, tag);
       await applyHudState(page, state);
-      await verifyTwoFingerConsumableFlow(page, tag);
+      await verifyTwoFingerConsumableFlow(page, tag, pointerBase + 10);
     }
 
     const resetState = { ...defaultState };

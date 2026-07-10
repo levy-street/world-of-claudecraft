@@ -497,15 +497,23 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('ships the mobile party-chip CSS with a 40px touch floor, scoped to body.mobile-touch', () => {
-    // The chip meets the mobile touch floor and reveals the frames only under the
-    // painter-driven .party-expanded class (collapsed by default hides the rows + Leave).
+  it('ships an icon-only mobile party disclosure with a compact face and 40px hit floor', () => {
+    // The visible caption is clipped accessibly, leaving only the chevron on screen.
+    expect(partyChipTs).toContain('label.className = `${PARTY_CHIP_LABEL_CLASS} visually-hidden`;');
+    // Keep the ergonomic hit target while the button shell itself is visually transparent;
+    // the smaller glass face lives on the icon.
     const chipRule = hudMobileCss.match(/body\.mobile-touch #party-chip \{([^}]*)\}/)?.[1] ?? '';
     expect(chipRule).toMatch(/min-width:\s*40px/);
     expect(chipRule).toMatch(/min-height:\s*40px/);
-    // The chevron rotates on expand (the repo's SVG chevron pattern, not a unicode arrow).
+    expect(chipRule).toMatch(/padding:\s*0/);
+    expect(chipRule).toMatch(/border:\s*0/);
+    expect(chipRule).toMatch(/background:\s*transparent/);
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {\n    transform: rotate(90deg);',
+      'body.mobile-touch #party-chip .ui-icon {\n    box-sizing: content-box;\n    width: 12px;\n    height: 12px;\n    padding: 7px;',
+    );
+    // The chevron rotates on expand (the repo's SVG chevron pattern, not a unicode arrow).
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch #party-frames\.party-expanded #party-chip \.ui-icon \{[^}]*transform:\s*rotate\(90deg\)/,
     );
     // Collapsed OR chat-yielded (no .party-expanded on mobile) hides the member rows +
     // Leave button, so both states leave only the chip (if present) as the party UI.
@@ -514,6 +522,118 @@ describe('client HTML shell', () => {
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames:not(.party-expanded) #party-leave {\n    display: none;',
+    );
+  });
+
+  it('docks landscape Party beside the map in one row and seats Target below at safe center', () => {
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames {\n      left: calc(max(6px, env(safe-area-inset-left)) + var(--mobile-map-size) + 10px);\n      right: auto;\n      top: max(6px, env(safe-area-inset-top));\n      transform: none;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #party-frames {\n      left: auto;\n      right: calc(max(6px, env(safe-area-inset-right)) + var(--mobile-map-size) + 10px);\n      top: max(6px, env(safe-area-inset-top));\n      transform: none;',
+    );
+    expect(hudMobileCss).toContain(
+      'grid-template-columns: auto auto auto;\n      grid-template-areas: "chip rows leave";',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames .party-rows {\n      grid-area: rows;\n      grid-template-rows: auto;\n      grid-auto-flow: column;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames .party-frame {\n      width: calc(68px * var(--mobile-chrome-scale, 1));\n      min-height: 40px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames #party-leave {\n      grid-area: leave;\n      width: 40px;\n      height: 40px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames #party-leave .party-leave-label {\n      display: none;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames #party-leave .ui-icon {\n      box-sizing: content-box;\n      width: 12px;\n      height: 12px;\n      padding: 7px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #target-frame,\n    body.mobile-touch.mobile-left-handed #target-frame {\n      left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);\n      right: auto;\n      top: calc(max(6px, env(safe-area-inset-top)) + 48px);\n      transform: translateX(-50%)',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #petbar {\n      left: auto;\n      right: max(18px, env(safe-area-inset-right));\n      top: auto;\n      bottom: calc(136px + env(safe-area-inset-bottom));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #petbar {\n      left: max(18px, env(safe-area-inset-left));\n      right: auto;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact #petbar {\n      right: max(14px, env(safe-area-inset-right));\n      bottom: calc(126px + env(safe-area-inset-bottom));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-tablet #petbar {\n      bottom: calc(154px + env(safe-area-inset-bottom));',
+    );
+    expect(partyFrameRowTs).toContain("btn.insertAdjacentHTML('afterbegin', svgIcon('close'));");
+    expect(partyFrameRowTs).toContain("label.className = 'party-leave-label';");
+    expect(partyFramesPainterTs).toContain('this.writers.setText(leave.label, leaveLabel);');
+    expect(partyFramesPainterTs).toContain(
+      'this.writers.setAttr(leave.el, ARIA_LABEL, leaveLabel);',
+    );
+  });
+
+  it('keeps the landscape target subordinate and compacts pet and view controls', () => {
+    expect(hudMobileCss).toContain('--mobile-target-frame-ratio: 0.8;');
+    expect(hudMobileCss).toContain(
+      'translateX(-50%)\n        scale(\n          calc(\n            var(--mobile-player-frame-scale, 0.9) *\n            var(--mobile-target-frame-ratio, 0.8) *\n            var(--mobile-chrome-scale, 1)\n          )\n        );',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #petbar .petbar-group {\n      gap: 0;\n      padding: 0;\n      border: 0;\n      outline: 0;\n      background: transparent;\n      box-shadow: none;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #petbar .pet-btn {\n      width: 40px;\n      height: 40px;\n      border: 0;\n      background: transparent;\n      box-shadow: none;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #petbar .pet-btn .icon-label {\n      inset: 4px;\n      border-radius: 50%;',
+    );
+    expect(hudMobileCss).toContain('--mobile-camera-joystick-size: 96px;');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-camera-joystick {\n      width: var(--mobile-camera-joystick-size);\n      height: var(--mobile-camera-joystick-size);\n      left: auto;\n      right: max(30px, calc(env(safe-area-inset-right) + 12px));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-camera-joystick {\n      left: max(30px, calc(env(safe-area-inset-left) + 12px));\n      right: auto;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-camera-joystick-on.game-active #mobile-controls {\n    --mobile-camera-zone-left: calc(',
+    );
+    expect(hudMobileCss).toContain(
+      '--mobile-camera-zone-top: max(84px, calc(env(safe-area-inset-top) + 80px));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-move-joystick {\n      width: 116px;\n      height: 116px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-move-joystick .mobile-stick {\n      width: 52px;\n      height: 52px;\n      margin: -26px 0 0 -26px;',
+    );
+  });
+
+  it('scales the complete landscape player frame responsively with its cast bars', () => {
+    expect(hudMobileCss).toContain('--mobile-player-frame-scale: 0.9;');
+    expect(hudMobileCss).toContain('--mobile-player-frame-source-height: 68px;');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact {\n    --mobile-direct-menu-width: 152px;\n    --mobile-player-frame-scale: 0.62;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-tablet {\n    --mobile-player-frame-scale: 1;',
+    );
+    expect(hudMobileCss).toContain(
+      'scale(calc(var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1)));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);',
+    );
+    expect(hudMobileCss).toContain(
+      '300px * var(--mobile-player-frame-scale, 0.9) * var(--mobile-chrome-scale, 1)',
+    );
+    expect(hudMobileCss).toMatch(
+      /bottom:\s*calc\(\s*14px\s*\+\s*env\(safe-area-inset-bottom\)\s*\+\s*var\(--mobile-player-frame-source-height\)/,
+    );
+    expect(hudMobileCss).toMatch(
+      /bottom:\s*calc\(\s*22px\s*\+\s*env\(safe-area-inset-bottom\)\s*\+\s*var\(--mobile-player-frame-source-height\)/,
+    );
+    expect(hudMobileCss).toContain(
+      '@media (orientation: portrait) {\n    body.mobile-touch {\n      --mobile-direct-menu-width: 152px;\n      --mobile-player-frame-scale: 0.55;',
     );
   });
 
@@ -939,7 +1059,19 @@ describe('client HTML shell', () => {
       'body.mobile-touch #mobile-consumables-toggle .ui-icon {\n    width: 14px;\n    height: 14px;\n    transform: scale(var(--btn-scale, 1));',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch .mobile-consumable-slot .icon-label,\n  body.mobile-touch .mobile-consumable-slot .cdtext,\n  body.mobile-touch .mobile-consumable-slot .item-count {\n    transform: scale(var(--btn-scale, 1));',
+      'body.mobile-touch #mobile-consumables-toggle::before {\n    content: "";\n    position: absolute;\n    width: 40px;\n    height: 40px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mobile-consumable-slot {\n    position: relative;\n    width: 48px;\n    height: 48px;\n    padding: 0;\n    flex: none;\n    pointer-events: auto;\n    border: 0;\n    border-radius: 50%;\n    background: transparent;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mobile-consumable-slot .icon-label {\n    position: absolute;\n    inset: 4px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mobile-consumable-slot .cd-overlay {\n    position: absolute;\n    left: 4px;\n    right: 4px;\n    bottom: 4px;\n    height: 0;\n    transform: scale(clamp(0.9, var(--btn-scale, 1), 1)) scaleY(0.833333);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mobile-consumable-slot .icon-label,\n  body.mobile-touch .mobile-consumable-slot .cdtext,\n  body.mobile-touch .mobile-consumable-slot .item-count {\n    transform: scale(clamp(0.9, var(--btn-scale, 1), 1));',
     );
     // A touch starting on the bar must never double as a camera drag.
     expect(readFileSync(new URL('../src/game/touch_router.ts', import.meta.url), 'utf8')).toContain(
@@ -1151,10 +1283,10 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('conic-gradient(\n      from var(--xp-ring-start),');
     expect(hudMobileCss).toContain('calc(var(--xp-fill, 0) * 360deg)');
     expect(hudMobileCss).toContain('transparent var(--xp-ring-arc) 360deg');
-    // Own HP/mana lives bottom-center (the one part of the screen every
+    // Own HP/mana lives bottom safe-center (the one part of the screen every
     // other mobile element deliberately leaves empty), not top-left.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: 50%;\n    top: auto;\n    bottom: calc(14px + env(safe-area-inset-bottom));\n    z-index: 21;',
+      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: calc(50% + env(safe-area-inset-left) / 2 - env(safe-area-inset-right) / 2);\n    top: auto;\n    bottom: calc(14px + env(safe-area-inset-bottom));\n    z-index: 21;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #player-frame .portrait-wrap {\n    z-index: 3;\n  }',
@@ -1177,9 +1309,8 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames {\n    position: fixed;\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 74px);',
     );
-    // The base below-target offset was nudged +5px (130 -> 135) so the new first-child
-    // collapse chip clears the target frame's bottom edge; a comment now sits between the
-    // selector and the top, so assert the selector and the pinned value independently.
+    // Base/portrait compatibility keeps the older below-target offset. The final landscape
+    // override replaces it with the map-adjacent one-row Party contract tested above.
     expect(hudMobileCss).toContain('body.mobile-touch #party-frames.below-target {');
     expect(hudMobileCss).toContain('top: calc(max(8px, env(safe-area-inset-top)) + 135px);');
     expect(hudMobileCss).toContain(
@@ -1190,9 +1321,8 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame:not(:first-of-type) {\n    margin-top: -1px;',
     );
-    // F1: the container is a simple flex column now (chip, rows wrapper, master-loot,
-    // leave), so the leave button carries no grid placement and no member frame can
-    // auto-flow beside the chip.
+    // The base/portrait fallback remains a flex column (chip, rows wrapper, master-loot,
+    // leave). Landscape later overrides it with the approved single-row grid.
     expect(hudMobileCss).toMatch(
       /body\.mobile-touch #party-frames \{[^}]*display: flex;[^}]*flex-direction: column;/,
     );
@@ -1687,7 +1817,7 @@ describe('client HTML shell', () => {
       'left: calc(max(6px, env(safe-area-inset-left)) + var(--mobile-map-size) + 10px);',
     );
     expect(hudMobileCss).toContain('--mobile-camera-zone-width: min(30vw, 220px);');
-    expect(hudMobileCss).toContain('--mobile-camera-zone-height: min(40vh, 140px);');
+    expect(hudMobileCss).toContain('--mobile-camera-zone-height: min(24vh, 100px);');
     expect(hudMobileCss).toContain(
       'body.mobile-touch.game-active #mobile-controls::before {\n    content: "";\n    position: absolute;',
     );
@@ -1705,11 +1835,9 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-consumables-row {\n      bottom: 102px;',
     );
+    expect(hudMobileCss).toContain('--mobile-player-frame-scale: 0.55;');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #player-frame {\n      transform: translateX(-50%) scale(calc(0.55 * var(--mobile-chrome-scale, 1)));',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #mobile-camera-joystick {\n      width: 82px;\n      height: 82px;',
+      'body.mobile-touch.hud-mobile-compact {\n    --mobile-direct-menu-width: 152px;\n    --mobile-player-frame-scale: 0.62;\n    --mobile-camera-joystick-size: 82px;',
     );
     expect(hudMobileCss).toContain(
       'transform: scale(calc(min(var(--joy-scale, 1), 1) * var(--mobile-chrome-scale, 1)));',
@@ -1721,14 +1849,33 @@ describe('client HTML shell', () => {
       'body.mobile-touch.hud-mobile-compact #mobile-move-joystick:not(.floating)',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #party-frames .party-rows {\n      grid-area: rows;\n      grid-template-rows: auto;',
+      'body.mobile-touch #party-frames .party-rows {\n      grid-area: rows;\n      grid-template-rows: auto;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #mobile-consumables-row {\n      bottom: 34px;',
+      'body.mobile-touch #party-frames.below-target {\n      top: max(6px, env(safe-area-inset-top));',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #player-frame {\n      transform: translateX(-50%) scale(calc(0.45 * var(--mobile-chrome-scale, 1)));',
+      'body.mobile-touch.hud-mobile-compact #mobile-consumables {\n      left: max(136px, calc(env(safe-area-inset-left) + 136px));',
     );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact #mobile-consumables-row {\n      left: calc(48px + 6px);\n      right: auto;\n      bottom: calc(\n        max(env(safe-area-inset-left), env(safe-area-inset-right)) +\n        min(8px, max(env(safe-area-inset-left), env(safe-area-inset-right)))\n      );\n      width: 100px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact.mobile-consumables-open #mobile-consumables-row {\n      display: flex;\n      flex-flow: row wrap-reverse;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-consumables {\n      left: auto;\n      right: max(136px, calc(env(safe-area-inset-right) + 136px));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-consumables-row {\n      left: auto;\n      right: calc(48px + 6px);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact.mobile-left-handed.mobile-consumables-open\n      #mobile-consumables-row {\n      flex-direction: row-reverse;',
+    );
+    expect(hudMobileCss).not.toContain(
+      'body.mobile-touch.hud-mobile-compact.mobile-consumables-open #mobile-consumables-toggle {',
+    );
+    expect(hudMobileCss).toContain('--mobile-player-frame-scale: 0.62;');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
     expect(hudMobileCss).not.toContain('left: calc(50% - 15px);');
     expect(hudMobileCss).not.toContain('left: calc(50% - 44px);');

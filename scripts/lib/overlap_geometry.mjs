@@ -24,16 +24,12 @@ export const PROFILES = [
   { name: 'touch-laptop-landscape', w: 1280, h: 720, dsf: 1, tier: 'hud-mobile-standard' },
   { name: 'tablet-4-3', w: 1024, h: 768, dsf: 2, tier: 'hud-mobile-tablet' },
   { name: 'fhd-touch-landscape', w: 1920, h: 1080, dsf: 1, tier: 'hud-mobile-tablet' },
-  { name: 'iphone-13-portrait', w: 390, h: 844, dsf: 3, tier: 'hud-mobile-compact' },
-  { name: 'tablet-4-3-portrait', w: 768, h: 1024, dsf: 2, tier: 'hud-mobile-standard' },
-  { name: 'large-tablet-portrait', w: 1024, h: 1366, dsf: 2, tier: 'hud-mobile-tablet' },
 ];
 
 export const SAFE_AREA_VECTORS = {
   none: { top: 0, right: 0, bottom: 0, left: 0 },
   landscapeNotchRight: { top: 0, right: 44, bottom: 21, left: 0 },
   landscapeNotchLeft: { top: 0, right: 0, bottom: 21, left: 44 },
-  portraitNotch: { top: 47, right: 0, bottom: 34, left: 0 },
 };
 
 // Edge distance between two rects: positive = separated, negative = overlap depth.
