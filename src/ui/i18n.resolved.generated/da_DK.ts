@@ -3809,6 +3809,7 @@ export const da_DK: EnTranslations = {
       "on": "Til",
       "off": "Fra",
       "cameraSpeed": "Kamerahastighed",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "Lysstyrke",
       "renderQuality": "Renderkvalitet",
       "graphicsQuality": "Grafikkvalitet",

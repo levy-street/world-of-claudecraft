@@ -3809,6 +3809,7 @@ export const pt_BR: EnTranslations = {
       "on": "Ligado",
       "off": "Desligado",
       "cameraSpeed": "Velocidade da câmera",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "Brilho",
       "renderQuality": "Qualidade de renderização",
       "graphicsQuality": "Qualidade gráfica",

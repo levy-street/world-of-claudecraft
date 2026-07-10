@@ -3809,6 +3809,7 @@ export const sv_SE: EnTranslations = {
       "on": "På",
       "off": "Av",
       "cameraSpeed": "Kamerahastighet",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "Ljusstyrka",
       "renderQuality": "Renderingskvalitet",
       "graphicsQuality": "Grafikkvalitet",

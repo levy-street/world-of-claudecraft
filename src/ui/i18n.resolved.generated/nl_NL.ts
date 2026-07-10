@@ -3809,6 +3809,7 @@ export const nl_NL: EnTranslations = {
       "on": "Aan",
       "off": "Uit",
       "cameraSpeed": "Camerasnelheid",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "Helderheid",
       "renderQuality": "Renderkwaliteit",
       "graphicsQuality": "Beeldkwaliteit",

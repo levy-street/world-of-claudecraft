@@ -11,22 +11,56 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [],
   "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "fr_FR": [
+    "hud.options.cameraStyle"
+  ],
+  "fr_CA": [
+    "hud.options.cameraStyle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hud.options.cameraStyle"
+  ],
+  "de_DE": [
+    "hud.options.cameraStyle"
+  ],
+  "zh_CN": [
+    "hud.options.cameraStyle"
+  ],
+  "zh_TW": [
+    "hud.options.cameraStyle"
+  ],
+  "ko_KR": [
+    "hud.options.cameraStyle"
+  ],
+  "ja_JP": [
+    "hud.options.cameraStyle"
+  ],
+  "pt_BR": [
+    "hud.options.cameraStyle"
+  ],
+  "ru_RU": [
+    "hud.options.cameraStyle"
+  ],
+  "nl_NL": [
+    "hud.options.cameraStyle"
+  ],
+  "pl_PL": [
+    "hud.options.cameraStyle"
+  ],
+  "id_ID": [
+    "hud.options.cameraStyle"
+  ],
+  "tr_TR": [
+    "hud.options.cameraStyle"
+  ],
+  "sv_SE": [
+    "hud.options.cameraStyle"
+  ],
+  "vi_VN": [
+    "hud.options.cameraStyle"
+  ],
+  "da_DK": [
+    "hud.options.cameraStyle"
+  ]
 };

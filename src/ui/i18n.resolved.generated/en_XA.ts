@@ -3809,6 +3809,7 @@ export const en_XA: EnTranslations = {
       "on": "[Óñ]",
       "off": "[Óƒƒ]",
       "cameraSpeed": "[Çáɱéŕá Šþééð]",
+      "cameraStyle": "[Çļáššíç Çáɱéŕá (Ŕáĝñáŕóķ)]",
       "brightness": "[Ɓŕíĝĥţñéšš]",
       "renderQuality": "[Ŕéñðéŕ Ɋúáļíţý]",
       "graphicsQuality": "[Ĝŕáþĥíçš Ɋúáļíţý]",

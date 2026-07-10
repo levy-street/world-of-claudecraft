@@ -3809,6 +3809,7 @@ export const ru_RU: EnTranslations = {
       "on": "Вкл.",
       "off": "Выкл.",
       "cameraSpeed": "Скорость камеры",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "Яркость",
       "renderQuality": "Качество рендера",
       "graphicsQuality": "Качество графики",

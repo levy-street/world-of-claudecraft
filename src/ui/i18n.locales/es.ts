@@ -1663,6 +1663,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.options.on': 'Activado',
   'hud.options.off': 'Desactivado',
   'hud.options.cameraSpeed': 'Velocidad de cámara',
+  'hud.options.cameraStyle': 'Cámara clásica (Ragnarok)',
   'hud.options.brightness': 'Brillo',
   'hud.options.renderQuality': 'Calidad de renderizado',
   'hud.options.graphicsQuality': 'Calidad gráfica',

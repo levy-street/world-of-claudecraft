@@ -3809,6 +3809,7 @@ export const vi_VN: EnTranslations = {
       "on": "Bật",
       "off": "Tắt",
       "cameraSpeed": "Tốc độ máy quay",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "Độ sáng",
       "renderQuality": "Chất Lượng Kết Xuất",
       "graphicsQuality": "Chất Lượng Đồ Họa",

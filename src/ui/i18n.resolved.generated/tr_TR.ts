@@ -3809,6 +3809,7 @@ export const tr_TR: EnTranslations = {
       "on": "Açık",
       "off": "Kapalı",
       "cameraSpeed": "Kamera Hızı",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "Parlaklık",
       "renderQuality": "Görüntü Kalitesi",
       "graphicsQuality": "Grafik Kalitesi",

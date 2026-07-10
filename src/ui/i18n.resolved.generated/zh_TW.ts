@@ -3809,6 +3809,7 @@ export const zh_TW: EnTranslations = {
       "on": "開啟",
       "off": "關閉",
       "cameraSpeed": "鏡頭速度",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "亮度",
       "renderQuality": "渲染品質",
       "graphicsQuality": "圖形品質",

@@ -3809,6 +3809,7 @@ export const id_ID: EnTranslations = {
       "on": "Aktif",
       "off": "Nonaktif",
       "cameraSpeed": "Kecepatan Kamera",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "Kecerahan",
       "renderQuality": "Kualitas Render",
       "graphicsQuality": "Kualitas Grafik",

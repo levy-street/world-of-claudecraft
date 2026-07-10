@@ -3809,6 +3809,7 @@ export const ko_KR: EnTranslations = {
       "on": "켜짐",
       "off": "꺼짐",
       "cameraSpeed": "카메라 속도",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "밝기",
       "renderQuality": "렌더 품질",
       "graphicsQuality": "그래픽 품질",

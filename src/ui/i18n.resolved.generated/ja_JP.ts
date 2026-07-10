@@ -3809,6 +3809,7 @@ export const ja_JP: EnTranslations = {
       "on": "オン",
       "off": "オフ",
       "cameraSpeed": "カメラ速度",
+      "cameraStyle": "Classic Camera (Ragnarok)",
       "brightness": "明るさ",
       "renderQuality": "描画品質",
       "graphicsQuality": "グラフィック品質",
