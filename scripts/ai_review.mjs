@@ -7,11 +7,16 @@
 // installed by the workflow, and the GitHub side is plain REST via global fetch.
 //
 // Two ways to trigger it (both wired in .github/workflows/pr-ai.yml):
-//   - automatically on every push to the PR: DIFF_FILE points at a precomputed diff.
-//   - on demand: an OWNER/MEMBER/COLLABORATOR comments `/review` or `/suggest <focus>`
-//     on the PR. The workflow gates on the commenter's author_association, checks out
-//     the PR head the same way, and posts a fresh reply comment keyed to the triggering
-//     comment, separate from the sticky automatic review.
+//   - automatically on every push to the PR (ai-review job): DIFF_FILE points at a
+//     precomputed diff and the agent VERIFIES against a full PR-HEAD checkout (executing
+//     mode). Runs only on the pull_request trigger, so a fork PR gets no secret and this
+//     script no-ops instead of running fork code under the token.
+//   - on demand, open to ANY commenter (`/review` or `/suggest <focus>`): split across
+//     two jobs so no fork code runs under the secret. A secret-less -verify job runs the
+//     PR's tsc/vitest and writes the results to VERIFY_FILE; this script then runs in the
+//     secret-bearing -post job with REVIEW_NO_EXECUTE=1, which FORBIDS running anything
+//     and reviews only the inlined diff plus that VERIFY_FILE text. It posts a fresh
+//     reply comment keyed to the triggering comment, separate from the sticky review.
 //
 // AUTH (ChatGPT OAuth): run `codex login` once locally, which stores OAuth tokens in
 // ~/.codex/auth.json. In CI, put that file's contents in the CODEX_AUTH_JSON repo
@@ -33,6 +38,12 @@
 //   PR_NUMBER           the pull request number
 //   DIFF_FILE           path to a precomputed unified diff (automatic run); when absent,
 //                       the diff is fetched from the GitHub API instead (comment run)
+//   REVIEW_NO_EXECUTE   when '1', static mode: no code tree, no commands, review the diff
+//                       plus VERIFY_FILE only. Set by the /review comment's -post job so
+//                       the PR's code never runs in the secret-bearing job.
+//   VERIFY_FILE         path to the pre-computed check output (tsc + covering vitest) that
+//                       the secret-less -verify job produced; embedded in the prompt in
+//                       no-execute mode
 //   COMMENT_BODY        the triggering comment's body (comment run only)
 //   COMMENT_ID          the triggering comment's id; keys its reply comment
 //   COMMENT_AUTHOR      the triggering comment's author; credited in the reply
@@ -82,6 +93,13 @@ const GITHUB_API = process.env.GITHUB_API_URL ?? 'https://api.github.com';
 const BASE_SHA = process.env.BASE_SHA || '';
 const HEAD_SHA = process.env.HEAD_SHA || '';
 const REVIEW_CWD = process.env.REVIEW_CWD || process.cwd();
+// No-execute (static) mode: the comment-command flow runs the PR's checks in a separate,
+// secret-less job and hands this step ONLY the resulting text (the diff plus VERIFY_FILE).
+// Here the agent has no code tree and must not run anything; it reasons over that text.
+// This is what lets the /review command be open to any commenter without a fork's code
+// ever executing in the job that holds CODEX_AUTH_JSON.
+const NO_EXECUTE = process.env.REVIEW_NO_EXECUTE === '1';
+const VERIFY_FILE = process.env.VERIFY_FILE || '';
 
 const prNumber = process.env.PR_NUMBER;
 const diffFile = process.env.DIFF_FILE;
@@ -173,13 +191,24 @@ if (!diff.trim()) {
   process.exit(0);
 }
 
-// Codex runs as a verifying agent over a full checkout of the PR HEAD with dependencies
-// installed (the workflow runs npm ci + i18n:gen first), so the prompt demands evidence:
-// read the tree, run the typecheck, run the tests that cover the change, and only then
-// write the review. The inlined diff below is filtered (no generated/binary churn) and
-// capped; the agent reads the full diff itself via git when it needs more.
-const gitDiffHint =
-  BASE_SHA && HEAD_SHA
+// The reviewer runs in one of two modes. Executing mode (default: the automatic ai-review
+// job and local runs) gets a full PR-HEAD checkout and is told to VERIFY by reading the
+// tree and running tsc/vitest. No-execute mode (the /review comment command) has no tree:
+// a separate secret-less job already ran those checks, so the agent is FORBIDDEN to run
+// anything and reasons only over the inlined diff and the provided check output.
+let verifyText = '';
+if (NO_EXECUTE && VERIFY_FILE) {
+  try {
+    verifyText = fs.readFileSync(VERIFY_FILE, 'utf8').trim();
+  } catch {
+    console.log(`[ai_review] could not read VERIFY_FILE=${VERIFY_FILE}; proceeding without it.`);
+  }
+}
+
+const gitDiffHint = NO_EXECUTE
+  ? `You do NOT have a code tree and cannot run git; the inlined diff below (filtered of
+generated/binary files, possibly capped) plus the pre-computed check output are your only sources.`
+  : BASE_SHA && HEAD_SHA
     ? `The checkout is the PR HEAD (${HEAD_SHA.slice(0, 10)}). The full, unfiltered diff is available
 locally: \`git diff --no-color ${BASE_SHA} ${HEAD_SHA}\` (also \`git log ${BASE_SHA}..${HEAD_SHA}\`
 for the commits). The inlined diff below omits generated/binary files and may be capped; consult
@@ -187,7 +216,21 @@ git whenever you need the complete picture.`
     : `The checkout may be the PR's BASE branch, so a file the diff itself adds may exist only in the
 diff text; that is expected, never a finding.`;
 
-const prompt = `You are a thorough, constructive senior code reviewer for World of ClaudeCraft, a TypeScript
+// In no-execute mode there is no tree and no commands: the "verify" step is replaced by
+// the pre-computed check output, and the agent is told not to run anything.
+const preamble = NO_EXECUTE
+  ? `You are reviewing a pull request from its diff and the output of the project's own checks that
+were ALREADY RUN for you (in a separate, isolated job). ${gitDiffHint}
+
+DO NOT RUN ANYTHING. You have no repository checkout, no network, and no shell to trust: do not run
+commands, do not read files, do not fetch anything. Ground the review ONLY in the inlined diff and
+the check output provided below. If the diff plus that output is not enough to be sure of a finding,
+downgrade it to a one-line question rather than guessing.
+
+Pre-computed check output (tsc, and the vitest files covering the change; a separate job ran these
+against the PR's own code):
+${verifyText ? `\n\`\`\`\n${verifyText}\n\`\`\`\n` : '\n(no check output was provided this run)\n'}`
+  : `You are a thorough, constructive senior code reviewer for World of ClaudeCraft, a TypeScript
 micro-MMO and reinforcement-learning environment built on one deterministic 20 Hz simulation core
 (see CLAUDE.md at the repo root for the architecture and the invariants; read it first).
 
@@ -210,7 +253,15 @@ plainly cannot affect it:
 Budget your time: about 10 minutes of commands. Do not install packages, do not run npm ci, do not
 run browser/E2E scripts (scripts/*.mjs need a live dev server), do not push, and do not modify any
 tracked file; scratch output under /tmp is fine. If a command fails for environmental reasons,
-say so in the verification section rather than guessing.
+say so in the verification section rather than guessing.`;
+
+const prompt = `${
+  NO_EXECUTE
+    ? `You are a thorough, constructive senior code reviewer for World of ClaudeCraft, a TypeScript
+micro-MMO and reinforcement-learning environment built on one deterministic 20 Hz simulation core.
+`
+    : ''
+}${preamble}
 
 Invariant scope, apply LITERALLY and do not generalize beyond it: these rules constrain application
 code under src/ ONLY.
@@ -242,9 +293,11 @@ Output rules: your FINAL message is posted verbatim as the PR review comment, so
 ONLY the review in GitHub-flavored Markdown, no preamble or meta commentary. Do NOT add your own
 title or top-level heading (no "# ..." or "## AI review"). Structure it as:
 1. A one-or-two-line overall assessment (what the change does and whether it is sound).
-2. "**Verified:**" followed by a short list of the commands you ran and their outcomes (for
-   example: tsc clean; vitest tests/spirit.test.ts 34 passed). If something could not run,
-   say so here honestly.
+2. "**Verified:**" followed by a short list of ${
+  NO_EXECUTE
+    ? 'the pre-computed check results you were given and what they show (for example: tsc clean; vitest tests/spirit.test.ts 34 passed). Do not claim to have run anything yourself; if no check output was provided, say the review is diff-only'
+    : 'the commands you ran and their outcomes (for example: tsc clean; vitest tests/spirit.test.ts 34 passed). If something could not run, say so'
+} here honestly.
 3. Findings grouped under Correctness, Invariants, Tests, Nits, each tagged with its severity.
    Omit an empty group. If there are no findings, say the change looks correct in one line and
    name the strongest piece of evidence.

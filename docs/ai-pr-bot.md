@@ -44,13 +44,15 @@ them is a required check.
    `scripts/gh_sticky_comment.mjs`. No new npm dependencies in the repo: the workflow
    installs `@openai/codex` globally on the runner, and the GitHub side is Node's
    built-in `fetch` against the REST API.
-3. **AI review on demand** (`ai-review-comment` job). An OWNER, MEMBER, or COLLABORATOR
-   of this repo can comment `/review` or `/suggest <focus>` on a PR (for example
-   `/suggest check the null handling around the new cache`) to re-run the same reviewer
-   whenever they want, optionally pointed at a specific concern. It runs the same
-   `scripts/ai_review.mjs` with the same PR-head checkout and verification setup, and
-   posts its answer as a fresh reply comment rather than editing the standing sticky
-   review, so a one-off question does not overwrite it.
+3. **AI review on demand** (`ai-review-comment-verify` + `ai-review-comment-post` jobs).
+   Anyone can comment `/review` or `/suggest <focus>` on a PR (for example
+   `/suggest check the null handling around the new cache`) to re-run the reviewer
+   whenever they want, optionally pointed at a specific concern. It is split into two
+   jobs so it can be open to every commenter without ever running a fork's code under the
+   secret (see "Requesting a review on demand" below): a secret-less verify job runs the
+   PR's checks and emits only sanitized text, and a post job feeds that text to
+   `scripts/ai_review.mjs` in no-execute mode and posts a fresh reply comment rather than
+   editing the standing sticky review, so a one-off question does not overwrite it.
 
 ## Enabling the AI review
 
@@ -84,21 +86,35 @@ opt-in and authenticates with a ChatGPT account through OAuth, not an API key:
 Comment `/review` on a PR to re-run the reviewer over the current state of the PR, or
 `/suggest <focus>` to ask it to prioritize something specific (the rest of the comment
 after the command is passed to the model as the thing to focus on; it still mentions
-other high-confidence findings). Only comments from an OWNER, MEMBER, or COLLABORATOR of
-this repo trigger it, checked against this repo regardless of whose PR it is, so a first-
-time contributor cannot self-trigger it on their own fork PR by commenting on it.
+other high-confidence findings). There is no author_association gate: any commenter can
+trigger it, including a first-time contributor on their own fork PR. This is a deliberate
+choice so every contributor can self-serve a review without waiting on a maintainer.
 
-Know what you are opting into on a FORK PR: unlike the old diff-only reviewer, this job
-checks out the fork's code and exercises it (the i18n generation step, and whatever tests
-the agent runs), in a job that holds the `CODEX_AUTH_JSON` secret. The mitigations are
-real but not absolute: the reviewer scripts themselves run from a TRUSTED default-branch
-checkout while the PR head sits in a separate `pr/` tree (so a fork cannot replace
-`ai_review.mjs` and read the secret from inside the secret-holding step),
-`npm ci --ignore-scripts` keeps third-party install hooks from running, the raw secret is
-scrubbed from the agent's child environment (only the materialized `CODEX_HOME/auth.json`
-exists, in a throwaway temp dir), and the `GITHUB_TOKEN` carries only `contents: read`
-plus `pull-requests: write`. Skim a fork PR's diff for anything that reads credentials or
-phones home before typing `/review` on it; for same-repo PRs there is no new exposure.
+That is safe to leave open to everyone because the command is split into two jobs so a
+fork's code never runs in the job that holds the secret:
+
+- **`ai-review-comment-verify`** has NO secret. It checks out the PR head, installs deps
+  with `npm ci --ignore-scripts`, generates i18n artifacts, computes the diff, and runs
+  the project's own checks (`tsc --noEmit`, plus the vitest files the diff touches and the
+  sim guard when `src/sim/` changed). This is the only place the PR's code executes, and
+  because the job holds no token there is nothing for that code to steal (secrets are
+  injected only into steps that reference them, and the check steps reference none). It
+  uploads only sanitized TEXT (the diff and the check output) as a workflow artifact.
+- **`ai-review-comment-post`** holds `CODEX_AUTH_JSON` but never checks out or runs the
+  PR's code. It checks out only the trusted base-repo tooling, downloads the text
+  artifact, and runs `scripts/ai_review.mjs` in no-execute mode (`REVIEW_NO_EXECUTE=1`)
+  from an empty working directory under a `read-only` sandbox, with a prompt that forbids
+  running commands or reading files. Codex reviews the diff and the pre-computed check
+  output as text-as-data and posts the reply.
+
+The only attacker-controlled input reaching the secret-bearing job is that text, so the
+remaining surface is prompt injection (a diff that tries to talk the model into leaking
+the token), contained by the read-only sandbox, the minimal child environment that never
+exposes `GITHUB_TOKEN` or the raw `CODEX_AUTH_JSON` (`codexChildEnv`), and the output
+secret-redaction (`redactSecrets`) before anything is posted. Defense in depth worth
+adding: point `CODEX_AUTH_JSON` at a dedicated throwaway ChatGPT account rather than a
+personal one, so a leak is contained. If the token is ever suspected leaked, refresh it
+(see the setup note).
 
 ## Privacy: read before enabling on private code
 
@@ -119,11 +135,12 @@ neither host the images nor post a comment at all, so on a fork PR the screensho
 is skipped entirely (the frames exist only in the job log's capture output).
 
 The on-demand `/review` and `/suggest` comment trigger is different: `issue_comment`
-always runs with full repo secrets, regardless of whether the PR is from a fork, and it
-checks out and exercises the PR's own code so the agent can verify it. That combination
-is gated on the commenter's `author_association` with this repo, not the PR's origin,
-and is a deliberate maintainer opt-in with documented mitigations (see "Requesting a
-review on demand" above).
+always runs with full repo secrets, regardless of whether the PR is from a fork. It is
+intentionally ungated (any commenter, any PR, including a fork PR's own author), and it is
+split so the secret never meets the fork's code: the `-verify` job runs that code with no
+secret, and the `-post` job that holds the secret only reviews the resulting text and
+never runs the PR's code. See "Requesting a review on demand" above for the full split and
+its remaining prompt-injection surface.
 
 ## Running the screenshot capture locally
 
