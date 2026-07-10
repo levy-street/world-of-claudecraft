@@ -9001,6 +9001,19 @@ export class Hud {
             () => this.sim.partyDecline(),
           );
           break;
+        case 'readyCheckStart':
+          audio.readyCheck();
+          this.showPrompt(
+            t('hudChrome.readyCheck.prompt', { name: `<b>${esc(ev.fromName)}</b>` }),
+            t('hudChrome.readyCheck.ready'),
+            () => this.sim.readyCheckRespond(true),
+            () => this.sim.readyCheckRespond(false),
+            t('hudChrome.readyCheck.notReady'),
+            // Ignoring the prompt must read as "no response", not "not ready":
+            // let the sim's own 30s timeout bucket the straggler.
+            () => {},
+          );
+          break;
         case 'guildInvite':
           audio.questAccept();
           this.showPrompt(
@@ -13902,6 +13915,12 @@ export class Hud {
     acceptLabel: string,
     onAccept: () => void,
     onDecline: () => void,
+    declineLabel: string = t('hud.prompts.decline'),
+    // Fired only when the prompt auto-dismisses after the wall-clock timeout.
+    // Defaults to onDecline so existing callers stay byte-identical; callers that
+    // want an ignored prompt to mean "no response" (ready check) pass a no-op and
+    // let their own server-side timeout own the outcome.
+    onTimeout: () => void = onDecline,
   ): void {
     const stack = $('#prompt-stack');
     const prompt = document.createElement('div');
@@ -13912,7 +13931,7 @@ export class Hud {
     accept.textContent = acceptLabel;
     const decline = document.createElement('button');
     decline.className = 'btn';
-    decline.textContent = t('hud.prompts.decline');
+    decline.textContent = declineLabel;
     accept.addEventListener('click', () => {
       prompt.remove();
       onAccept();
@@ -13926,7 +13945,7 @@ export class Hud {
     window.setTimeout(() => {
       if (prompt.isConnected) {
         prompt.remove();
-        onDecline();
+        onTimeout();
       }
     }, 28000);
   }

@@ -154,6 +154,12 @@ export const en: EnTranslations = {
     "spectate": {
       "banner": "Spectating {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Resurrect at Corpse",
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",

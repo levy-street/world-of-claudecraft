@@ -154,6 +154,12 @@ export const it_IT: EnTranslations = {
     "spectate": {
       "banner": "Stai osservando {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",

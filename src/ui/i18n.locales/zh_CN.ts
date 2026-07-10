@@ -102,6 +102,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.price_unavailable': 'WOC 价格不可用，奖励暂时锁定。',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '正在观察 {name}',
+  'hudChrome.readyCheck.prompt': '{name} 发起了准备确认。你准备好了吗？',
+  'hudChrome.readyCheck.ready': '准备就绪',
+  'hudChrome.readyCheck.notReady': '未准备',
+  'hudChrome.readyCheck.result':
+    '准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.itemTooltip.requiresLevel': '需要等级 {level}',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',

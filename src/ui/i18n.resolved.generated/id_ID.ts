@@ -154,6 +154,12 @@ export const id_ID: EnTranslations = {
     "spectate": {
       "banner": "Menonton {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",

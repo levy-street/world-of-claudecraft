@@ -154,6 +154,12 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "readyCheck": {
+      "prompt": "{name} が準備確認を開始しました。準備はいいですか？",
+      "ready": "準備完了",
+      "notReady": "準備未完了",
+      "result": "準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。"
+    },
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",

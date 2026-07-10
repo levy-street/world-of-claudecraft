@@ -108,6 +108,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name} 관전 중',
+  'hudChrome.readyCheck.prompt': '{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?',
+  'hudChrome.readyCheck.ready': '준비 완료',
+  'hudChrome.readyCheck.notReady': '준비 안 됨',
+  'hudChrome.readyCheck.result':
+    '준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답.',
   'hudChrome.loot.chestTitle': '상자',
   'hudChrome.itemTooltip.requiresLevel': '필요 레벨 {level}',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',

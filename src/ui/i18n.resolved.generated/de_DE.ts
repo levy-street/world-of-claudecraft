@@ -154,6 +154,12 @@ export const de_DE: EnTranslations = {
     "spectate": {
       "banner": "{name} wird beobachtet"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response."
+    },
     "death": {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",

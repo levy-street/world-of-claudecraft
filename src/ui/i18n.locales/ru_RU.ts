@@ -108,6 +108,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Цена WOC недоступна, награды временно заблокированы.',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
+  'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
+  'hudChrome.readyCheck.ready': 'Готов',
+  'hudChrome.readyCheck.notReady': 'Не готов',
+  'hudChrome.readyCheck.result':
+    'Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.',
   'hudChrome.loot.chestTitle': 'Сундук',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
