@@ -15,6 +15,8 @@
 // in the headless RL env unchanged.
 
 import { ITEMS } from '../data';
+import { requiredLevelFor } from '../item_level_req';
+import { removePreferFungible } from '../items';
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import type { ItemDef } from '../types';
@@ -57,14 +59,15 @@ export function isSalvageable(def: ItemDef | undefined): boolean {
 
 /**
  * The material yield for one salvage of `def`: scales with rarity (the
- * `QUALITY_ORDER` index) and tier (`requiredLevel`, bucketed one point per 10
- * levels), plus one rng-rolled bonus unit (issue #1300 acceptance: "the roll
+ * `QUALITY_ORDER` index) and tier (`requiredLevelFor`, the derived level for
+ * items whose gate isn't explicit, bucketed one point per 10 levels), plus
+ * one rng-rolled bonus unit (issue #1300 acceptance: "the roll
  * uses Rng"), so identical salvages of the same item are not perfectly
  * deterministic. Pure aside from the rng draw.
  */
 export function salvageYield(def: ItemDef, rng: Rng): number {
   const qualityIdx = Math.max(0, QUALITY_ORDER.indexOf(def.quality ?? 'common'));
-  const tierBonus = Math.floor((def.requiredLevel ?? 0) / 10);
+  const tierBonus = Math.floor(requiredLevelFor(def) / 10);
   const bonus = rng.next() < 0.5 ? 0 : 1;
   return qualityIdx + tierBonus + 1 + bonus;
 }
@@ -87,7 +90,7 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
-  ctx.removeItem(itemId, 1, pid);
+  removePreferFungible(ctx, itemId, 1, pid);
   const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
   const count = salvageYield(def, ctx.rng);
   ctx.addItem(materialItemId, count, pid);

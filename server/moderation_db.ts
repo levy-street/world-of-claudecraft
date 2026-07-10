@@ -18,6 +18,8 @@ export type ModerationAction = 'ignore' | 'kick' | 'kill' | 'suspend' | 'ban' | 
 export const MODERATION_ACTIONS = [
   'kick',
   'kill',
+  'jail',
+  'unjail',
   'suspend',
   'unsuspend',
   'ban',
@@ -557,7 +559,7 @@ export async function addAccountNote(input: {
 // Audit-only record for an in-game action whose live effect is owned by the
 // GameServer. Unlike account sanctions, this changes no persistent account state.
 export async function recordInGameAction(input: {
-  action: 'kick' | 'kill';
+  action: 'kick' | 'kill' | 'jail' | 'unjail';
   accountId: number;
   adminAccountId: number;
   reason: unknown;

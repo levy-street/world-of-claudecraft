@@ -232,7 +232,7 @@ export const shellStrings = {
       title: 'Play in Landscape Fullscreen',
       continue: 'Continue to Game',
       rotateTitle: 'Rotate to Landscape',
-      rotateSub: 'Play in landscape fullscreen for the best mobile experience.',
+      rotateSub: 'Portrait mode is not supported. Rotate your device to landscape to continue.',
       baseLandscape: 'Rotate your device to landscape before entering the world.',
       basePerformance:
         'Mobile performance may be degraded. Close extra tabs and lower Render Quality if the game feels slow.',
@@ -1259,7 +1259,7 @@ export const shellStrings = {
       title: 'Play in Landscape Fullscreen',
       continue: 'Continue to Game',
       rotateTitle: 'Rotate to Landscape',
-      rotateSub: 'Play in landscape fullscreen for the best mobile experience.',
+      rotateSub: 'Portrait mode is not supported. Rotate your device to landscape to continue.',
       baseLandscape: 'Rotate your device to landscape before entering the world.',
       basePerformance:
         'Mobile performance may be degraded. Close extra tabs and lower Render Quality if the game feels slow.',

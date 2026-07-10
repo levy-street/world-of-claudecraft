@@ -1086,6 +1086,22 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     });
   });
 
+  it('moderation/history scopes tab reads to the current admin account', async () => {
+    const listModerationActions = vi.fn(async () => ({ rows: [], total: 0, page: 2, limit: 100 }));
+    authedAdminDb({ listModerationActions });
+    installAdminRuntime();
+    const r = await runRoute('GET', '/admin/api/moderation/history', {
+      headers: { authorization: BEARER },
+      url: '/admin/api/moderation/history?tab=notes&page=2&limit=100',
+    });
+    expect(listModerationActions).toHaveBeenCalledWith('notes', ADMIN_ACCOUNT_ID, 2, 100);
+    expect(r.body).toEqual({
+      success: true,
+      data: { rows: [], total: 0, page: 2, limit: 100 },
+      error: null,
+    });
+  });
+
   it('moderation/accounts/:id composes the account/reports/chat/blockedIps detail', async () => {
     const detail = {
       id: 5,

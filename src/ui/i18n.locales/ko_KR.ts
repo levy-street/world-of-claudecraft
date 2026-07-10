@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.auth.appleLoginCta': 'Apple로 계속하기',
+  'hudChrome.auth.appleError': 'Apple로 로그인할 수 없습니다. 다시 시도해 주세요.',
+  'hudChrome.auth.appleChoiceIntro': '새 계정을 만들거나 Apple을 기존 계정에 연결하세요.',
+  'hudChrome.auth.appleChoiceExpired':
+    'Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.',
   'hudChrome.vcup.guildBoardWl': '{wins}승 {losses}패',
   'hudChrome.vcup.shootPower': '파워',
   'hudChrome.discord.roleTag.coredevs': '핵심 개발자',
@@ -32,6 +37,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '받는 사람',
   'itemUi.kind.bag': '가방',
   'itemUi.tooltip.bagSlots': '{slots}칸 가방',
+  'hudChrome.auth.forgotPrompt': '비밀번호를 잊으셨나요?',
+  'hudChrome.auth.forgotTitle': '비밀번호 재설정',
+  'hudChrome.auth.forgotHint': '사용자 이름을 입력하면 등록된 이메일로 재설정 링크를 보내드립니다.',
+  'hudChrome.auth.forgotUsername': '사용자 이름',
+  'hudChrome.auth.forgotSubmit': '재설정 링크 보내기',
+  'hudChrome.auth.forgotSent':
+    '해당 사용자 이름의 계정에 등록된 이메일이 있으면 재설정 링크를 보냈습니다. 받은 편지함을 확인하세요.',
+  'hudChrome.auth.forgotBack': '로그인으로 돌아가기',
+  'hudChrome.auth.resetTitle': '새 비밀번호 설정',
+  'hudChrome.auth.resetNewPassword': '새 비밀번호',
+  'hudChrome.auth.resetConfirm': '새 비밀번호 확인',
+  'hudChrome.auth.resetSubmit': '비밀번호 업데이트',
+  'hudChrome.auth.resetDone': '비밀번호가 업데이트되었습니다. 이제 로그인할 수 있습니다.',
+  'hudChrome.auth.resetMismatch': '비밀번호가 일치하지 않습니다.',
+  'hudChrome.auth.resetErrInvalid':
+    '이 재설정 링크가 유효하지 않거나 만료되었습니다. 새 링크를 요청하세요.',
+  // Guild roster last-seen (M16 non-Latin fill)
   'hudChrome.social.lastSeen': '마지막 접속: {when}',
   'hudChrome.social.lastSeenNever': '없음',
   'hudChrome.dailyRewards.title': '일일 보상',
@@ -2294,6 +2316,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': '기름진 수지 덩어리',
   'entities.items.spider_leg.name': '꿈틀대는 거미 다리',
   'entities.items.bone_fragments.name': '뼈 조각',
+  'entities.items.arcane_dust.name': '비전 가루',
+  'entities.items.arcane_essence.name': '비전 정수',
+  'entities.items.arcane_shard.name': '비전 파편',
   'entities.items.linen_scrap.name': '아마포 조각',
   'entities.items.fen_muster_order.name': '펜브리지 소집 명령서',
   'entities.items.mire_prowler_pelt.name': '수렁 배회자 가죽',
@@ -3585,7 +3610,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}초',
   'hudChrome.mobile.actionPageToggle': '행동 페이지 전환',
   'hudChrome.mobile.actionRing': '전투 행동',
-  'hudChrome.mobile.autorun': '자동 달리기',
   'hudChrome.mobile.haptics': '진동',
   'hudChrome.mobile.hapticsOff': '진동 꺼짐',
   'hudChrome.mobile.hotbarPage': '스킬',
@@ -5257,6 +5281,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus4':
     '무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다.',
+  'hudChrome.itemSoulbound': '귀속',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
@@ -6061,6 +6086,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': '소포',
   'hudChrome.mailbox.parcelsHint': '가방의 아이템을 클릭하면 첨부됩니다.',
   'hudChrome.mailbox.removeParcelAria': '편지에서 {item} 제거',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': '{item} 하나 적게 보내기',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': '{item} 하나 더 보내기',
   'hudChrome.mailbox.sendButton': '편지 보내기',
   'hudChrome.mailbox.postageNote': '우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.',
   'hudChrome.mailbox.arrivedBanner': '까마귀가 도착했습니다: {name}의 우편.',

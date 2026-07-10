@@ -353,6 +353,57 @@ export class Api {
     return {};
   }
 
+  async appleLogin(
+    identityToken: string,
+    displayName: string,
+    nativeAttestation: unknown,
+  ): Promise<{ choose: boolean; linkToken: string; username: string }> {
+    const data = await this.post('/api/auth/apple', {
+      identityToken,
+      displayName,
+      nativeAttestation,
+    });
+    if (data.choose === true) {
+      return {
+        choose: true,
+        linkToken: typeof data.linkToken === 'string' ? data.linkToken : '',
+        username: typeof data.username === 'string' ? data.username : '',
+      };
+    }
+    this.token = data.token;
+    this.username = data.username;
+    this.emailMissing = data.emailMissing === true;
+    return { choose: false, linkToken: '', username: this.username ?? '' };
+  }
+
+  async appleLoginNew(linkToken: string): Promise<void> {
+    const data = await this.post('/api/auth/apple/login/new', { linkToken });
+    this.token = data.token;
+    this.username = data.username;
+    this.emailMissing = data.emailMissing === true;
+  }
+
+  async appleLoginLink(
+    linkToken: string,
+    username: string,
+    password: string,
+    code = '',
+    recoveryCode = '',
+  ): Promise<{ twoFactorRequired?: boolean }> {
+    const data = await this.post('/api/auth/apple/login/link', {
+      linkToken,
+      username,
+      password,
+      code,
+      recoveryCode,
+    });
+    if (data.twoFactorRequired && !data.token) return { twoFactorRequired: true };
+    this.token = data.token;
+    this.username = data.username;
+    this.emailMissing = data.emailMissing === true;
+    return {};
+  }
+
   async createDesktopLoginCode(): Promise<{ code: string; expiresInMs: number }> {
     const data = await this.post('/api/desktop-login/create', {});
     return {
@@ -425,6 +476,18 @@ export class Api {
 
   async changePassword(current: string, next: string): Promise<void> {
     await this.post('/api/account/password', { current, next });
+  }
+
+  // Request a password-reset email (for a locked-out user). Always resolves: the
+  // server returns 200 whether or not the username exists, so the UI cannot be
+  // used to enumerate accounts.
+  async requestPasswordReset(username: string): Promise<void> {
+    await this.post('/api/account/password/forgot', { username });
+  }
+
+  // Complete a password reset with the emailed token and a new password.
+  async resetPassword(token: string, next: string): Promise<void> {
+    await this.post('/api/account/password/reset', { token, next });
   }
 
   async logout(): Promise<void> {
@@ -607,8 +670,31 @@ export class Api {
   // ── Discord link/login + status ────────────────────────────────────────────
   // Returns the discord.com authorize URL the browser navigates to (login = new
   // session, link = attach to the current account).
-  async discordStart(mode: 'login' | 'link'): Promise<{ url: string }> {
-    return this.post(`/api/auth/discord/start?mode=${mode}`, {});
+  async discordStart(
+    mode: 'login' | 'link',
+    native = false,
+    challenge = '',
+    nativeAttestation: unknown = undefined,
+  ): Promise<{ url: string }> {
+    const nativeQuery = native ? `&native=1&challenge=${encodeURIComponent(challenge)}` : '';
+    return this.post(`/api/auth/discord/start?mode=${mode}${nativeQuery}`, { nativeAttestation });
+  }
+
+  async exchangeNativeDiscordCode(
+    code: string,
+    verifier: string,
+  ): Promise<{ choose: boolean; linkToken: string; username: string }> {
+    const data = await this.post('/api/auth/discord/native/exchange', { code, verifier });
+    if (data.choose === true) {
+      return {
+        choose: true,
+        linkToken: typeof data.linkToken === 'string' ? data.linkToken : '',
+        username: typeof data.username === 'string' ? data.username : '',
+      };
+    }
+    this.token = data.token;
+    this.username = data.username;
+    return { choose: false, linkToken: '', username: this.username ?? '' };
   }
 
   // First-time Discord login chooser: create a brand-new account for the verified
@@ -906,6 +992,7 @@ function blankEntity(id: number): Entity {
     skin: 0,
     mainhandItemId: null,
     equippedItems: {},
+    equippedInstances: {},
     guild: '',
   };
 }

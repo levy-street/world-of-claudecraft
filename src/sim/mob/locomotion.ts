@@ -418,12 +418,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       mob.stompTimer = stomp.every;
       const school = stomp.school ?? 'physical';
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      ctx.emit({
-        type: 'log',
-        text: `${mob.name} unleashes ${stomp.name}!`,
-        color: '#ff9933',
-        entityId: mob.id,
-      });
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${stomp.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
       for (const meta of ctx.players.values()) {
         const pe = ctx.entities.get(meta.entityId);
         if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > stomp.radius) continue;
@@ -462,12 +463,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         mob.castTargetId = null;
         const school = (bigCast.school ?? 'nature') as Aura['school'];
         ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-        ctx.emit({
-          type: 'log',
-          text: `${mob.name} unleashes ${bigCast.name}!`,
-          color: '#ff9933',
-          entityId: mob.id,
-        });
+        if (!MOBS[mob.templateId]?.quietMechanics)
+          ctx.emit({
+            type: 'log',
+            text: `${mob.name} unleashes ${bigCast.name}!`,
+            color: '#ff9933',
+            entityId: mob.id,
+          });
         for (const meta of ctx.players.values()) {
           const pe = ctx.entities.get(meta.entityId);
           if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= bigCast.radius) {
@@ -501,12 +503,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       mob.stoneskinTimer = stoneskin.every;
       const school = (stoneskin.school ?? 'physical') as Aura['school'];
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      ctx.emit({
-        type: 'log',
-        text: `${mob.name} unleashes ${stoneskin.name}!`,
-        color: '#c9c2b5',
-        entityId: mob.id,
-      });
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${stoneskin.name}!`,
+          color: '#c9c2b5',
+          entityId: mob.id,
+        });
       ctx.applyAura(mob, {
         id: `stoneskin_${mob.templateId}`,
         name: stoneskin.name,
@@ -528,12 +531,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
       mob.terrifyTimer = terrify.every;
       const school = terrify.school ?? 'shadow';
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
-      ctx.emit({
-        type: 'log',
-        text: `${mob.name} unleashes ${terrify.name}!`,
-        color: '#ff9933',
-        entityId: mob.id,
-      });
+      if (!MOBS[mob.templateId]?.quietMechanics)
+        ctx.emit({
+          type: 'log',
+          text: `${mob.name} unleashes ${terrify.name}!`,
+          color: '#ff9933',
+          entityId: mob.id,
+        });
       for (const meta of ctx.players.values()) {
         const pe = ctx.entities.get(meta.entityId);
         if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > terrify.radius) continue;

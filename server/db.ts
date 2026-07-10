@@ -4,6 +4,7 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
@@ -185,6 +186,20 @@ CREATE TABLE IF NOT EXISTS email_change_requests (
 );
 CREATE INDEX IF NOT EXISTS email_change_requests_token ON email_change_requests(token_hash);
 CREATE INDEX IF NOT EXISTS email_change_requests_account ON email_change_requests(account_id);
+-- Pending self-service password resets. Same posture as email_change_requests:
+-- only the SHA-256 of the token is stored (a DB leak cannot be replayed into a
+-- takeover), each row is single-use (consumed_at) and time-boxed (expires_at).
+-- No payload column; account_id is the reset target.
+CREATE TABLE IF NOT EXISTS password_reset_requests (
+  id SERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ NOT NULL,
+  consumed_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS password_reset_requests_token ON password_reset_requests(token_hash);
+CREATE INDEX IF NOT EXISTS password_reset_requests_account ON password_reset_requests(account_id);
 -- Audit trail for every outbound email attempt (success or failure). Doubles as
 -- the source for any future per-account send rate limiting.
 CREATE TABLE IF NOT EXISTS email_log (
@@ -349,6 +364,9 @@ CREATE TABLE IF NOT EXISTS account_moderation_actions (
   expires_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS account_moderation_actions_account ON account_moderation_actions(account_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS account_moderation_actions_created ON account_moderation_actions(created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS account_moderation_actions_admin_created ON account_moderation_actions(admin_account_id, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS account_moderation_actions_admin_action_created ON account_moderation_actions(admin_account_id, action, created_at DESC, id DESC);
 CREATE TABLE IF NOT EXISTS blocked_ips (
   id SERIAL PRIMARY KEY,
   ip TEXT NOT NULL UNIQUE,
@@ -366,6 +384,8 @@ CREATE TABLE IF NOT EXISTS blocked_ip_actions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS blocked_ip_actions_ip ON blocked_ip_actions(ip, created_at DESC);
+CREATE INDEX IF NOT EXISTS blocked_ip_actions_created ON blocked_ip_actions(created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS blocked_ip_actions_admin_created ON blocked_ip_actions(admin_account_id, created_at DESC, id DESC);
 -- Audit trail for staff role changes (dashboard staff page; the grant script
 -- writes here too, with admin_account_id NULL).
 CREATE TABLE IF NOT EXISTS admin_role_changes (
@@ -667,6 +687,7 @@ export async function ensureSchema(): Promise<void> {
     // unconditionally (idempotent) so the tables exist before the feature is
     // enabled, like the other schema modules.
     await client.query(DISCORD_SCHEMA);
+    await client.query(APPLE_AUTH_SCHEMA);
     // GitHub link tables (links + oauth states) for the developer badge.
     // FK-references accounts(id), so it runs after SCHEMA. Applied unconditionally
     // (idempotent), like the Discord tables.
@@ -1225,6 +1246,68 @@ export async function consumeEmailChangeRequest(
     ]);
     await client.query('COMMIT');
     return { accountId: row.account_id, newEmail: row.new_email };
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+export async function createPasswordResetRequest(
+  accountId: number,
+  tokenHash: string,
+  ttlHours: number,
+): Promise<void> {
+  // Invalidate any still-pending reset for this account first: only the most
+  // recent link stays live, and this keeps the table from accumulating dead rows.
+  await pool.query(
+    'DELETE FROM password_reset_requests WHERE account_id = $1 AND consumed_at IS NULL',
+    [accountId],
+  );
+  await pool.query(
+    `INSERT INTO password_reset_requests (account_id, token_hash, expires_at)
+     VALUES ($1, $2, now() + ($3 || ' hours')::interval)`,
+    [accountId, tokenHash, String(ttlHours)],
+  );
+}
+
+// Atomically consume a pending password-reset token, set the new password, and
+// revoke every session, all in one transaction. The claiming UPDATE ... WHERE
+// consumed_at IS NULL AND expires_at > now() is the race + replay guard: a
+// replayed or expired link matches zero rows and returns null, and two concurrent
+// clicks can never both win. Deleting all auth_tokens signs out every device,
+// which is the right posture for a reset (the account may be recovering from a
+// compromise), unlike the change-password path that keeps the current device.
+export async function consumePasswordResetRequest(
+  tokenHash: string,
+  newPasswordHash: string,
+): Promise<{ accountId: number } | null> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const claim = await client.query(
+      `UPDATE password_reset_requests
+       SET consumed_at = now()
+       WHERE token_hash = $1 AND consumed_at IS NULL AND expires_at > now()
+       RETURNING account_id`,
+      [tokenHash],
+    );
+    const row = claim.rows[0];
+    if (!row) {
+      await client.query('ROLLBACK');
+      return null;
+    }
+    // Mirror updatePasswordHash: setting a password always marks the account
+    // usable (this is also how a Discord-provisioned account that added an email
+    // could gain a password).
+    await client.query(
+      'UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1',
+      [row.account_id, newPasswordHash],
+    );
+    await client.query('DELETE FROM auth_tokens WHERE account_id = $1', [row.account_id]);
+    await client.query('COMMIT');
+    return { accountId: row.account_id };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;

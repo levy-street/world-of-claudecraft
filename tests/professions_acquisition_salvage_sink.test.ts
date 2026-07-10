@@ -178,10 +178,16 @@ describe('#1300 salvage/disenchant', () => {
       { id: 'b', name: 'b', sellValue: 0, quality: 'legendary', kind: 'weapon' } as never,
       makeSim().ctx.rng,
     );
-    // With the bonus draws identical, the yields differ by exactly the quality
-    // term: legendary (index 4) minus common (index 0). A strict delta, not
-    // >=, so dropping or neutering the rarity term cannot pass.
-    expect(high - low).toBe(4);
+    // With the bonus draws identical, the yields differ by the quality term
+    // (legendary index 4 minus common index 0 = 4) PLUS the derived-tier term
+    // (#1712 round-3 review point 11: salvageYield's tier axis now reads
+    // requiredLevelFor, not raw requiredLevel, so it engages for every item,
+    // not just the ones with an explicit level pinned). Neither fake item has
+    // an explicit requiredLevel or a derivable itemSourceLevel, so
+    // requiredLevelFor falls back per-quality: common -> 1 (tierBonus 0),
+    // legendary -> MAX_LEVEL 20 (tierBonus 2). Total delta = 4 + 2 = 6. A
+    // strict delta, not >=, so dropping or neutering either term cannot pass.
+    expect(high - low).toBe(6);
   });
 });
 

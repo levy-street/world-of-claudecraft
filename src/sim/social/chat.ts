@@ -423,6 +423,26 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  // "/playtime": report this character's LIFETIME played time, accumulated
+  // across every session and persisted server-side (see PlayerMeta.
+  // totalPlayedSeconds + serializeCharacter). Unlike /played (session-only,
+  // resets on relog), this figure only ever grows while the character is
+  // actually in the world.
+  if (/^\/playtime(?:\s|$)/i.test(raw)) {
+    const secs = Math.max(0, Math.floor(r.meta.totalPlayedSeconds + (ctx.time - r.meta.joinedAt)));
+    const d = Math.floor(secs / 86400);
+    const h = Math.floor((secs % 86400) / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    const parts: string[] = [];
+    if (d) parts.push(`${d}d`);
+    if (d || h) parts.push(`${h}h`);
+    if (d || h || m) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+    ctx.error(r.meta.entityId, `Total time played: ${parts.join(' ')}.`);
+    return null;
+  }
+
   // Self-only readouts: emit a private system line and never become chat.
   if (/^\/(?:where|loc|zone)(?:\s|$)/i.test(raw)) {
     const zone = zoneAt(r.e.pos.z);
@@ -1066,7 +1086,7 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
-    'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
+    'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',
     'State readouts: /pet, /pettaunt, /speed, /consumable, /potion, /form, /manaregen, /falling, /queued, /savedmana.',

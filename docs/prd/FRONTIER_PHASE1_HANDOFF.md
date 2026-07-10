@@ -5,12 +5,12 @@
 | **Status** | Ready to implement (do not start slices without operator go-ahead) |
 | **Source PRD** | `docs/prd/frontier-pvp-honor.md`, section 11 Phase 1 |
 | **Scope** | Free loop skeleton ONLY: band, enter/leave via the G window, team assignment, auto-flagging, base graveyards, honor counter, honor on kills with DR, back banner, nameplate tint. NO cargo/nodes (Phase 2), NO events (Phase 3), NO $WOC (section 12, later). |
-| **Verified against** | `main` on 2026-07-03. Line numbers WILL drift: re-find every anchor before editing; trust the symbol, not the line. |
-| **Executor routing** | Slices S1 to S6: codex (`codex exec` via the codex-implementation skill), one self-contained prompt per slice, reviewed by Claude before merge. Slices S7 to S9: Claude (taste surfaces: UI, copy, render). |
+| **Verified against** | Repository snapshot on 2026-07-03. Revalidate every anchor against the active release branch before implementation; trust symbols, not line numbers. |
+| **Executor routing** | Route by slice complexity and the active session model. Use `$woc-extract-and-test` for implementation and `$woc-qa` for each completed slice. UI and render work also receives `woc_frontend` review. No slice depends on a named model. |
 
 ---
 
-## 0. Ground rules (paste into every codex prompt)
+## 0. Ground rules for every implementation prompt
 
 1. `src/sim/` never imports from `render/`, `ui/`, `game/`, `net/`, or any DOM/Three
    API. Guarded by `tests/architecture.test.ts`.
@@ -20,7 +20,9 @@
 3. Every player-visible string is i18n: sim/server emit stable event data or
    English literals that MUST have a matcher entry (`src/ui/sim_i18n.ts` /
    `src/ui/server_i18n.ts`); UI strings are `t()` keys added to
-   `src/ui/i18n.catalog/` (English only, never edit `i18n.locales/` overlays).
+   `src/ui/i18n.catalog/` (English first). Do not edit `i18n.locales/` overlays except
+   for M16: a new wordy English value also needs its five non-Latin fills in the same
+   change; see `src/ui/CLAUDE.md`.
    The S3 guard is `tests/localization_fixes.test.ts`.
 4. TypeScript strict, ESM, 2-space indent, match surrounding style. No em dashes,
    en dashes, or emojis anywhere, including comments and commit messages.
@@ -84,7 +86,7 @@ contributor tracking cargo needs anyway).
 Dependency order: S1 -> S2 -> S3 -> (S4, S5, S6 in any order) -> S7, S8 -> S9.
 S4, S5, S6 are independent of each other once S1-S3 are merged.
 
-### S1. Band, content module, and persisted state (codex)
+### S1. Band, content module, and persisted state
 - `src/sim/data.ts`: add the constants from section 1. **Bound the delve band**
   (gotcha G1): `isDelvePos(x)` becomes `x >= DELVE_BAND_X_MIN && x < FRONTIER_X_MIN`.
 - `src/sim/content/frontier.ts`: new content module exporting `FrontierTeam`,
@@ -106,7 +108,7 @@ S4, S5, S6 are independent of each other once S1-S3 are merged.
   and `npx vitest run tests/parity` (must be untouched: no draws added outside
   the band).
 
-### S2. Enter, leave, team assignment (codex)
+### S2. Enter, leave, team assignment
 - New `src/sim/frontier/` directory: `index.ts` barrel + `frontier.ts` + a local
   `CLAUDE.md` (one paragraph: what lives here, the invariants). Module functions
   take `ctx: SimContext` first, arena-module style.
@@ -139,7 +141,7 @@ S4, S5, S6 are independent of each other once S1-S3 are merged.
   with the same seed and drive produce identical assignments.
 - Acceptance: `npx vitest run tests/frontier_enter.test.ts tests/architecture.test.ts && npx vitest run tests/parity`.
 
-### S3. Hostility clause + seam (IWorld, wire, server dispatch) (codex)
+### S3. Hostility clause + seam (IWorld, wire, server dispatch)
 - `isHostileTo` (`sim.ts:5861`): in the `target.kind === 'player'` block, after
   the duel clause and before the arena clause, add: both `attackerPlayer` and
   `target` positions satisfy `isFrontierPos`, both have `frontierTeam` set, and
@@ -169,7 +171,7 @@ S4, S5, S6 are independent of each other once S1-S3 are merged.
   assignment, fight to a kill, leave) recorded with `UPDATE_PARITY=1`.
 - Acceptance: `npx vitest run tests/frontier_hostility.test.ts tests/snapshots.test.ts && npx vitest run tests/parity`.
 
-### S4. Death and respawn at team base (codex)
+### S4. Death and respawn at team base
 - `releasePlayerSpirit` (`entity_roster.ts:157`): after the delve branch, add
   `if (isFrontierPos(r.e.pos.x)) { releaseSpiritInFrontier(ctx, ...); return; }`
   modeled on `releaseSpiritInDelve` but: respawn at `FRONTIER_BASES[team]`
@@ -181,7 +183,7 @@ S4, S5, S6 are independent of each other once S1-S3 are merged.
   untouched.
 - Acceptance: `npx vitest run tests/frontier_respawn.test.ts tests/entity_roster.test.ts && npx vitest run tests/parity`.
 
-### S5. Honor on kills with DR (codex)
+### S5. Honor on kills with DR
 - New `src/sim/frontier/honor.ts`: `grantKillHonor(ctx, killer, victim)` applying
   section 1 tuning; DR state lives on `PlayerMeta` as
   `honorDr?: Map<victimPid, { kills: number; windowStart: number }>` (sim-time
@@ -198,13 +200,13 @@ S4, S5, S6 are independent of each other once S1-S3 are merged.
   honor survives serialize/load round-trip.
 - Acceptance: `npx vitest run tests/frontier_honor.test.ts && npx vitest run tests/parity`.
 
-### S6. Guide/wiki content + docs sync (codex)
+### S6. Guide/wiki content + docs sync
 - Run `npm run wiki:content`; add any new `guide.*` prose keys the generator
   demands for the frontier zone entry (English only, per `src/guide/CLAUDE.md`),
   spoiler-safe.
 - Acceptance: `npx vitest run tests/guide.test.ts`.
 
-### S7. PvP window: Frontier section in the G window (Claude, taste)
+### S7. PvP window: Frontier section in the G window
 - Follow the modular recipe (`src/ui/CLAUDE.md`, vendor template): new
   `src/ui/frontier_panel_view.ts` (pure view: derives labels/state from
   `FrontierInfo` + level; unit-tested) + `src/ui/frontier_panel.ts` (thin DOM
@@ -223,7 +225,7 @@ S4, S5, S6 are independent of each other once S1-S3 are merged.
   template at `hud.ts:6165`), `frontierEntered`/`frontierLeft` as system lines.
 - Acceptance: `npx vitest run tests/frontier_panel_view.test.ts tests/i18n_completeness.test.ts tests/localization_fixes.test.ts`; manual: `npm run dev`, press G, enter, kill, see honor float (screenshot per the headless screenshot workflow).
 
-### S8. Back banner + nameplate team tint (Claude, taste)
+### S8. Back banner + nameplate team tint
 - Banner: extend the attach path so player visuals in-band get a team banner.
   No tabard precedent exists; pattern-match the weapon attach
   (`manifest.ts` `AttachDef`, swap machinery `visual.ts:439`). If no suitable
@@ -238,14 +240,13 @@ S4, S5, S6 are independent of each other once S1-S3 are merged.
   (banners visible at distance, enemy nameplate tinted); screenshot committed
   under `docs/screenshots/` if it is README-worthy, else attached to the PR.
 
-### S9. Integration pass (Claude)
-- Full gates: `npx vitest run tests/architecture.test.ts tests/localization_fixes.test.ts tests/i18n_completeness.test.ts && npx vitest run tests/parity && npm test`
-  (mind the known full-suite flake pattern: diff FAIL sets against a stashed
-  baseline before believing a red).
-- Spawn the repo reviewers on the combined diff: `cross-platform-sync` (IWorld /
-  wire / event parity), `privacy-security-review` (server authority on the new
-  commands), `qa-checklist` (feature checklist).
-- Run the codex-review skill as the independent second opinion.
+### S9. Integration pass
+- Run `npm run gate` once from the coordinator. Diagnose any full-suite load flake
+  against a clean baseline before changing production behavior.
+- Run `$woc-qa` on the combined diff with `woc_sim_architecture`,
+  `woc_cross_platform`, `woc_persistence`, `woc_security`, `woc_test_coverage`, and
+  `woc_frontend` in scope. Reviewers inspect shared command output rather than rerunning
+  the full gate.
 
 ## 4. New player-facing strings (complete list; the S3 i18n guard will check)
 
@@ -284,20 +285,20 @@ locales plus exact level-20 stat budgets; that lands with Phase 2 economy).
   `tests/i18n_completeness` when the generated files were not rebuilt and
   committed (`npm run i18n:scan && npm run i18n:build`, commit
   `i18n.resolved.generated/` + `i18n.status.summary.json`). Run the test
-  locally before pushing. Never hand-edit locale overlays.
+  locally before pushing. Do not hand-edit locale overlays except for the M16 five
+  non-Latin fills required alongside new wordy English values.
 - **G5, `hostile` flag vs `isHostileTo`.** Mob hostility is a template flag;
   player hostility is ONLY the `isHostileTo` clauses. Do not set any
   `hostile`-like flag on players; the frontier clause is positional.
-- **G6, worktree discipline.** The operator's main working tree carries
-  uncommitted WIP. Build each slice in a fresh worktree under
-  `.claude/worktrees/` off `origin/main` (repo convention), branch
-  `feature/frontier-p1-s<N>`.
+- **G6, worktree discipline.** Other sessions may carry uncommitted work. Build each
+  slice in a fresh worktree outside the shared checkout, based on the active release
+  branch, with branch `feature/frontier-p1-s<N>`.
 
-## 6. Codex dispatch template (for later; do not dispatch yet)
+## 6. Agent dispatch template (for later; do not dispatch yet)
 
-Per slice: one thin wrapper agent (`model: sonnet`, low effort) whose prompt is:
-the slice spec verbatim, section 0 ground rules, section 1 constants, the
-relevant hook-map rows, the relevant gotchas, and the acceptance commands, with
-the instruction to run acceptance before returning and to return the diff
-summary + test output verbatim. Claude reviews every diff against this doc
-before merge; S9 gates the whole phase.
+Give one implementation owner the slice outcome, acceptance criteria, relevant files,
+section 0 ground rules, section 1 constants, applicable hook-map rows and gotchas, the
+authorized actions, and validation commands. Use the active model and reasoning setting;
+do not bake a model name into the packet. Require a diff summary, exact command results,
+remaining manual verification, and a clean handoff. Run `$woc-qa` before merging each
+slice, then use S9 for the combined gate.

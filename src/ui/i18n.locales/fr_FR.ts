@@ -4536,7 +4536,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} s',
-  'hudChrome.mobile.autorun': 'Course automatique',
   'hudChrome.mobile.haptics': 'Vibrations',
   'hudChrome.mobile.hapticsOff': 'Vibrations désactivées',
   'hudChrome.mobile.hotbarPage': 'Techniques',
@@ -6723,4 +6722,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Vous quittez la file de Protégez Yumi.',
   'yumi.queue.teamLeave': 'Votre équipe quitte la file de Protégez Yumi.',
   'yumi.respawn.title': 'À TERRE !',
+  'hudChrome.auth.forgotPrompt': 'Mot de passe oublié ?',
+  'hudChrome.auth.forgotTitle': 'Réinitialiser votre mot de passe',
+  'hudChrome.auth.forgotHint':
+    'Saisissez votre nom d’utilisateur et nous enverrons un lien de réinitialisation à l’adresse e-mail enregistrée.',
+  'hudChrome.auth.forgotUsername': 'Nom d’utilisateur',
+  'hudChrome.auth.forgotSubmit': 'Envoyer le lien de réinitialisation',
+  'hudChrome.auth.forgotSent':
+    'Si un compte avec ce nom d’utilisateur possède une adresse e-mail enregistrée, nous avons envoyé un lien de réinitialisation. Consultez votre boîte de réception.',
+  'hudChrome.auth.forgotBack': 'Retour à la connexion',
+  'hudChrome.auth.resetTitle': 'Choisissez un nouveau mot de passe',
+  'hudChrome.auth.resetNewPassword': 'Nouveau mot de passe',
+  'hudChrome.auth.resetConfirm': 'Confirmez le nouveau mot de passe',
+  'hudChrome.auth.resetSubmit': 'Mettre à jour le mot de passe',
+  'hudChrome.auth.resetDone':
+    'Votre mot de passe a été mis à jour. Vous pouvez maintenant vous connecter.',
+  'hudChrome.auth.resetMismatch': 'Les mots de passe ne correspondent pas.',
+  'hudChrome.auth.resetErrInvalid':
+    'Ce lien de réinitialisation est invalide ou a expiré. Demandez-en un nouveau.',
 };

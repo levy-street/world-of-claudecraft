@@ -847,6 +847,11 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     // the straight line through fences, buildings, and the waterline, so he can
     // always go directly at his target and never wedges on a collider.
     phasesThroughObstacles: true,
+    // His only periodic voice is the battle cry below (every ~45s, zone-wide). The
+    // per-mechanic log barks ("unleashes Seismic Stomp/Tectonic Heave/Mountainhide!"
+    // and "becomes enraged!") are silenced so an overworld pull does not spam the
+    // combat log; the mechanics still fire with their spellfx and damage.
+    quietMechanics: true,
     ccImmune: true,
     // A raid boss cannot be perma-snared by a wall of Frostbolts / Hamstrings: slows do
     // not stick to him (ccImmune already blocks stun/root/etc; slow is separate).
@@ -926,12 +931,13 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       summon: 'Rise, stormlings! Tear them loose from my slopes!',
       enrage: 'The peak breaks, and the sky falls with it!',
     },
-    // Loud: a mountain-sized voice. Every yell (engage/summon/enrage + these battle
-    // cries) carries 350yd, far past the 100yd default, and he bellows one of these
-    // lines once a minute in combat: the whole of Thornpeak still knows he is awake,
-    // but the barks never drown out the raid's chat.
+    // Loud: a mountain-sized voice, and (with quietMechanics) his ONLY periodic
+    // voice. Every yell (engage/summon/enrage + these battle cries) carries 350yd,
+    // far past the 100yd default; he bellows one of these lines about every 45s in
+    // combat, so the whole of Thornpeak knows he is awake without the log ever
+    // filling with per-mechanic barks.
     battleYells: {
-      every: 60,
+      every: 45,
       range: 350,
       lines: [
         'THUNDER ANSWERS! The peak has teeth again!',

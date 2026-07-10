@@ -361,6 +361,16 @@ export interface SimContextCallbacks {
   // Fungible-only count (excludes per-instance slots, #1165); market.ts uses this
   // instead of countItem so an instanced copy is never listed as a plain stack member.
   countFungibleItem(itemId: string, pid?: number): number;
+  // Enchanting-eligible count/removal (#1712 review): counts/removes a plain
+  // fungible stack OR an instanced copy with no rolled.stats (crafted rare+
+  // gear), excluding only an already-enchanted (rolled.stats) copy. Used by
+  // professions/enchanting.ts instead of countFungibleItem/removeFungibleItem
+  // so crafted single-copy rares remain disenchantable/enchantable.
+  countEnchantableItem(itemId: string, pid?: number): number;
+  // Returns the consumed slots' `instance` payloads (removeItem's contract),
+  // so applyEnchant can merge a crafted copy's signer/rolled.quality into the
+  // freshly-enchanted instance instead of dropping them.
+  removeEnchantableItem(itemId: string, count: number, pid?: number): ItemInstancePayload[];
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
 
@@ -893,6 +903,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     spendResource: host.spendResource,
     removeItem: host.removeItem,
     removeFungibleItem: host.removeFungibleItem,
+    countEnchantableItem: host.countEnchantableItem,
+    removeEnchantableItem: host.removeEnchantableItem,
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
     partyInvite: host.partyInvite,

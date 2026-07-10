@@ -32,8 +32,22 @@ describe('server-sent message localization', () => {
     'Stopped spectating.',
     'Zephyr is no longer online; spectate ended.',
     'Local chat is unavailable while spectating.',
+    'Usage: /jail ["<name>" <minutes> [reason]]',
+    'Usage: /unjail ["<name>"]',
+    'A moderator has moved you to jail for 10 minutes.',
+    'Your jail sentence has ended.',
+    'A moderator has released you from jail.',
+    'Moved to jail visitor area.',
+    'Returned from jail visitor area.',
+    'You are not visiting jail.',
     'Kicked Bob.',
     'Killed Bob.',
+    'Jailed Bob.',
+    'Jailed Bob for 10 minutes.',
+    'Released Bob from jail.',
+    'Bob is already jailed.',
+    'Bob is not jailed.',
+    'You cannot do that while jailed.',
     'Required Bob to rename.',
     'Muted Bob for 5 minutes.',
     'Suspended Bob for 30 minutes.',
@@ -162,6 +176,12 @@ describe('in-game moderation strings round-trip through localizeServerText', () 
     },
     { input: 'Kicked Bob.', es: 'Has expulsado a Bob.', de: 'Bob wurde entfernt.' },
     { input: 'Killed Bob.', es: 'Has matado a Bob.', de: 'Bob wurde getötet.' },
+    { input: 'Jailed Bob.', es: 'Has encarcelado a Bob.', de: 'Bob wurde eingesperrt.' },
+    {
+      input: 'Released Bob from jail.',
+      es: 'Has liberado a Bob de la cárcel.',
+      de: 'Bob wurde aus dem Gefängnis entlassen.',
+    },
     {
       input: 'Muted Bob for 5 minutes.',
       es: 'Has silenciado a Bob durante 5 minutos.',
@@ -183,6 +203,8 @@ describe('in-game moderation strings round-trip through localizeServerText', () 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
       expect(localizeServerText('Kicked Zephyr.')).toContain('Zephyr');
+      expect(localizeServerText('Jailed Zephyr.')).toContain('Zephyr');
+      expect(localizeServerText('Released Zephyr from jail.')).toContain('Zephyr');
       expect(localizeServerText('Now spectating Zephyr.')).toContain('Zephyr');
       expect(localizeServerText('Zephyr is no longer online; spectate ended.')).toContain('Zephyr');
     }

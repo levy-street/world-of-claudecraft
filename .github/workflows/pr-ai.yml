@@ -1,33 +1,24 @@
 name: PR AI assist
 
-# Two INFORMATIONAL, NON-BLOCKING jobs that help review a pull request, plus an on-demand
-# comment trigger for the second one. None of this is a required check; it assists
-# review, it does not gate merge. Lives in its own workflow so it never interferes with
-# the CI gate in ci.yml.
+# Informational, non-blocking jobs that help review a pull request. None is a required
+# check, and this workflow never replaces the deterministic CI gate in ci.yml.
 #
 #   screenshots        boots the Vite dev client headless and, ONLY when the diff has a
 #                       visual change, renders the sections it touches (a mapped window, or
 #                       the in-world HUD for a generic visual change), then embeds the PNGs
 #                       inline in a sticky PR comment. A non-visual diff captures nothing.
-#   ai-review           reviews the PR with the OpenAI Codex CLI, authenticated via
-#                       ChatGPT OAuth (the CODEX_AUTH_JSON secret holds a `codex login`
-#                       auth.json), and posts the review as a sticky PR comment. The
-#                       agent gets the PR HEAD checked out with dependencies installed
-#                       and is required to VERIFY before writing: read the tree, run
-#                       npx tsc --noEmit, run the vitest files covering the change.
-#                       No-ops without the secret (for example on a fork PR), so it
-#                       never blocks.
-#   ai-review-comment   on demand: an OWNER/MEMBER/COLLABORATOR comments `/review` or
-#                       `/suggest <focus>` on the PR. Same verifying setup as ai-review
-#                       (PR-head checkout + deps), posting a fresh reply comment keyed
-#                       to the triggering comment rather than the sticky review above.
-#                       Running a fork PR's code here is a deliberate maintainer opt-in;
-#                       see the security note on the job.
+#   codex-review        performs a static review through openai/codex-action. The trusted
+#                       base checkout supplies policy, while the nested PR checkout is
+#                       untrusted data and is never executed. Automatic review is limited
+#                       to same-repository PRs.
+#   post-codex-review   runs on a fresh host with GitHub write permission but no OpenAI
+#                       credential. It validates, redacts, and posts structured output.
+#                       Authorized maintainers can request a fork review with `/review`
+#                       or `/suggest <focus>` without executing fork code.
 #
-# Setup (one time): run `codex login` locally and store ~/.codex/auth.json in the
-# CODEX_AUTH_JSON repo secret to enable ai-review. Optionally set a CODEX_MODEL repo
-# variable to override the Codex CLI's default model. See docs/ai-pr-bot.md, including
-# the data-handling note and how to refresh an expired OAuth session.
+# Setup: store an OpenAI API key as the OPENAI_API_KEY repository secret. Optional
+# CODEX_REVIEW_MODEL, CODEX_REVIEW_EFFORT, and CODEX_CLI_VERSION repository variables
+# override action defaults. Never store a ChatGPT auth.json in CI. See docs/ai-pr-bot.md.
 
 on:
   pull_request:
@@ -35,14 +26,8 @@ on:
     types: [created]
   workflow_dispatch:
 
-# Needed to post the sticky review/screenshot comments and read the PR diff via the API.
-# Fork PRs get a read-only token on the pull_request trigger, so the comment steps
-# degrade to a no-op there (handled in the scripts). issue_comment always runs with the
-# base repo's token and secrets regardless of whose PR it is, which is why
-# ai-review-comment additionally gates on the commenter's author_association.
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
   group: pr-ai-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
@@ -133,145 +118,147 @@ jobs:
           SHOTS_DIR: pr-shots
         run: node scripts/pr_comment_shots.mjs
 
-  ai-review:
+  codex-review:
     name: AI review (Codex)
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    timeout-minutes: 35
-    steps:
-      # The PR HEAD itself (not the merge ref): the agent reviews and runs exactly what
-      # the contributor wrote, and BASE_SHA/HEAD_SHA below match this tree.
-      - name: Check out the PR head
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install the Codex CLI
-        run: npm install -g @openai/codex
-
-      # Mount the project for real verification: the agent runs tsc and targeted vitest
-      # against the PR's own tree. --ignore-scripts skips third-party install hooks (the
-      # only dep with one, esbuild, works via its optionalDependencies binary), so no
-      # lifecycle script from a dependency bump ever runs in this job.
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
-
-      # The client and several tests import committed-but-derived i18n tables.
-      - name: Generate i18n artifacts
-        run: npm run i18n:gen
-
-      - name: Compute PR diff
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          git diff --no-color "$BASE_SHA" "$HEAD_SHA" > pr.diff || true
-          echo "diff bytes: $(wc -c < pr.diff)"
-
-      - name: Review with Codex
-        env:
-          CODEX_AUTH_JSON: ${{ secrets.CODEX_AUTH_JSON }}
-          CODEX_MODEL: ${{ vars.CODEX_MODEL }}
-          # The GitHub-hosted runner VM is the isolation boundary; the kernel sandbox
-          # (Landlock) is not reliably available there and used to abort every
-          # inspection command before it ran.
-          CODEX_SANDBOX: danger-full-access
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          DIFF_FILE: pr.diff
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: node scripts/ai_review.mjs
-
-  ai-review-comment:
-    name: AI review (comment command)
-    runs-on: ubuntu-latest
-    # Only a PR conversation comment (not a plain issue), starting with /review or
-    # /suggest, from someone with write access to THIS repo. author_association is
-    # evaluated against the base repo regardless of whether the PR itself is from a
-    # fork, so a fork PR's own author cannot self-trigger this on their own comment.
-    #
-    # SECURITY TRADEOFF, deliberate: this job checks out and exercises the PR's own code
-    # (i18n:gen, and the tests the agent runs) in a job that holds CODEX_AUTH_JSON, so a
-    # maintainer typing /review on a fork PR is explicitly opting in to running that
-    # fork's code. Mitigations: the REVIEWER SCRIPTS run from a trusted default-branch
-    # checkout while the PR head sits in a separate pr/ tree (so a fork cannot swap
-    # ai_review.mjs itself and read the secret), npm ci --ignore-scripts (no third-party
-    # install hooks), the raw secret is scrubbed from the agent's child environment
-    # (ai_review.mjs), and GITHUB_TOKEN carries only contents:read + pull-requests:write.
-    # Residual risk: code the agent chooses to execute (the PR's tests) runs inside the
-    # job; skim a fork PR's diff before requesting a review on it.
+    timeout-minutes: 30
     if: >
-      github.event_name == 'issue_comment' &&
-      github.event.issue.pull_request != null &&
-      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
-      (startsWith(github.event.comment.body, '/review') || startsWith(github.event.comment.body, '/suggest'))
-    timeout-minutes: 35
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request != null &&
+       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
+       (github.event.comment.body == '/review' || startsWith(github.event.comment.body, '/suggest ')))
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    outputs:
+      pr_number: ${{ steps.context.outputs.pr_number }}
+      base_sha: ${{ steps.context.outputs.base_sha }}
+      head_sha: ${{ steps.context.outputs.head_sha }}
+      review_mode: ${{ steps.context.outputs.review_mode }}
+      request_comment_id: ${{ steps.context.outputs.request_comment_id }}
+      request_actor: ${{ steps.context.outputs.request_actor }}
+      codex_outcome: ${{ steps.codex.outcome }}
+      review_json: ${{ steps.codex.outputs.final-message }}
     steps:
-      # Trusted copy of the reviewer tooling: the default branch of the base repo. The
-      # secret-holding step below runs scripts from HERE, never from the PR's tree.
       - name: Check out trusted reviewer code
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.repository.default_branch }}
+          path: trusted
+          fetch-depth: 1
+          persist-credentials: false
 
-      # The PR head, in its own subdirectory: the tree the agent verifies (and whose
-      # tests it may run), kept apart from the code that handles the secret.
-      - name: Check out the PR head
+      # The rollout PR cannot trust scripts that exist only in its own head. It skips
+      # cleanly; after merge, every later PR uses the trusted base copy.
+      - name: Check trusted reviewer availability
+        id: harness
+        run: |
+          if [ -f trusted/scripts/prepare_ai_review.mjs ] && \
+             [ -f trusted/.github/codex/prompts/pr-review.md ] && \
+             [ -f trusted/.github/codex/review-output.schema.json ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Trusted base does not contain the reviewer yet; skipping this rollout run."
+          fi
+
+      - name: Resolve and validate review context
+        id: context
+        if: steps.harness.outputs.enabled == 'true'
+        env:
+          AI_REVIEW_EVENT_PATH: ${{ github.event_path }}
+          AI_REVIEW_CONTEXT_FILE: ${{ runner.temp }}/ai-review-context.json
+          AI_REVIEW_API_URL: ${{ github.api_url }}
+          AI_REVIEW_REPOSITORY: ${{ github.repository }}
+          AI_REVIEW_TOKEN: ${{ github.token }}
+        run: node trusted/scripts/prepare_ai_review.mjs resolve
+
+      - name: Check out trusted base policy
+        if: steps.harness.outputs.enabled == 'true'
         uses: actions/checkout@v6
         with:
-          ref: refs/pull/${{ github.event.issue.number }}/head
-          fetch-depth: 0
-          path: pr
+          ref: ${{ steps.context.outputs.base_sha }}
+          path: policy
+          fetch-depth: 1
+          persist-credentials: false
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      # This checkout is attacker-controlled data. No file in it is executed.
+      - name: Check out PR head as nested untrusted data
+        if: steps.harness.outputs.enabled == 'true'
+        uses: actions/checkout@v6
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: pr/package-lock.json
+          repository: ${{ github.repository }}
+          ref: refs/pull/${{ steps.context.outputs.pr_number }}/head
+          path: review/untrusted/pr
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+          lfs: false
 
-      - name: Install the Codex CLI
-        run: npm install -g @openai/codex
-
-      - name: Install PR dependencies
-        working-directory: pr
-        run: npm ci --ignore-scripts
-
-      - name: Generate i18n artifacts
-        working-directory: pr
-        run: npm run i18n:gen
-
-      # The issue_comment payload has no base/head SHAs; resolve them so the agent can
-      # read the full diff via git.
-      - name: Resolve the PR base and head
-        working-directory: pr
+      - name: Build trusted static-review harness
+        if: steps.harness.outputs.enabled == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          BASE_REF="$(gh pr view "${{ github.event.issue.number }}" --json baseRefName --jq .baseRefName)"
-          git fetch origin "$BASE_REF"
-          echo "BASE_SHA=$(git merge-base "origin/$BASE_REF" HEAD)" >> "$GITHUB_ENV"
-          echo "HEAD_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          AI_REVIEW_CONTEXT_FILE: ${{ runner.temp }}/ai-review-context.json
+          AI_REVIEW_PR_DIR: ${{ github.workspace }}/review/untrusted/pr
+          AI_REVIEW_HARNESS_DIR: ${{ github.workspace }}/review
+          AI_REVIEW_TRUSTED_DIR: ${{ github.workspace }}/trusted
+          AI_REVIEW_POLICY_DIR: ${{ github.workspace }}/policy
+          AI_REVIEW_CODEX_HOME: ${{ runner.temp }}/codex-review-home
+        run: node trusted/scripts/prepare_ai_review.mjs build
 
-      - name: Review with Codex
+      # Keep this as the final step. The next job receives output on a fresh runner.
+      - name: Run read-only Codex review
+        id: codex
+        if: steps.harness.outputs.enabled == 'true'
+        continue-on-error: true
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          codex-home: ${{ runner.temp }}/codex-review-home
+          codex-version: ${{ vars.CODEX_CLI_VERSION }}
+          model: ${{ vars.CODEX_REVIEW_MODEL }}
+          effort: ${{ vars.CODEX_REVIEW_EFFORT }}
+          working-directory: review
+          prompt-file: review/review-prompt.md
+          output-schema-file: trusted/.github/codex/review-output.schema.json
+          permission-profile: ":read-only"
+          safety-strategy: "drop-sudo"
+          codex-args: '["--ephemeral", "--skip-git-repo-check", "--ignore-rules", "--disable", "hooks"]'
+
+  post-codex-review:
+    name: Post AI review
+    runs-on: ubuntu-latest
+    needs: codex-review
+    if: >
+      always() &&
+      needs.codex-review.result != 'skipped' &&
+      needs.codex-review.result != 'cancelled' &&
+      needs.codex-review.outputs.pr_number != ''
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Check out trusted posting code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.codex-review.outputs.base_sha }}
+          path: trusted
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate, redact, and post review
+        continue-on-error: true
         env:
-          CODEX_AUTH_JSON: ${{ secrets.CODEX_AUTH_JSON }}
-          CODEX_MODEL: ${{ vars.CODEX_MODEL }}
-          # Same rationale as the automatic job: the runner VM is the isolation boundary.
-          CODEX_SANDBOX: danger-full-access
-          # The agent works inside the PR tree; the script itself is the trusted copy.
-          REVIEW_CWD: ${{ github.workspace }}/pr
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-          COMMENT_ID: ${{ github.event.comment.id }}
-          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
-          COMMENT_BODY: ${{ github.event.comment.body }}
-        run: node scripts/ai_review.mjs
+          AI_REVIEW_PR_NUMBER: ${{ needs.codex-review.outputs.pr_number }}
+          AI_REVIEW_MODE: ${{ needs.codex-review.outputs.review_mode }}
+          AI_REVIEW_REQUEST_COMMENT_ID: ${{ needs.codex-review.outputs.request_comment_id }}
+          AI_REVIEW_REQUEST_ACTOR: ${{ needs.codex-review.outputs.request_actor }}
+          AI_REVIEW_CODEX_OUTCOME: ${{ needs.codex-review.outputs.codex_outcome }}
+          AI_REVIEW_FINAL_JSON: ${{ needs.codex-review.outputs.review_json }}
+        run: node trusted/scripts/post_ai_review.mjs

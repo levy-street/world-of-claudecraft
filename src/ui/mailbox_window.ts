@@ -22,6 +22,7 @@ import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
   buildMailboxView,
+  clampParcelQty,
   type MailInboxBody,
   type MailInboxRow,
   type MailSendBody,
@@ -130,14 +131,35 @@ export class MailboxWindow {
       return;
     }
     if (this.attachments.some((s) => s.itemId === itemId)) return;
-    const count = this.deps
-      .world()
-      .inventory.filter((s) => s.itemId === itemId)
-      .reduce((n, s) => n + s.count, 0);
+    const count = this.ownedCountFor(itemId);
     if (count < 1) return;
     this.attachments.push({ itemId, count });
     audio.click();
     this.render();
+  }
+
+  /**
+   * Total owned across all bag slots of one item id (the stepper's ceiling).
+   * Mirrors the sim's fungible-only stock check (countFungibleItem in
+   * sim.ts skips instanced slots), so the ceiling never exceeds what the
+   * send path can actually deduct.
+   */
+  private ownedCountFor(itemId: string): number {
+    return this.deps
+      .world()
+      .inventory.filter((s) => s.itemId === itemId && !s.instance)
+      .reduce((n, s) => n + s.count, 0);
+  }
+
+  /** Nudge a staged parcel's quantity from the +/- stepper (#1444). */
+  private adjustParcelQty(itemId: string, delta: number): void {
+    const slot = this.attachments.find((s) => s.itemId === itemId);
+    if (!slot) return;
+    const next = clampParcelQty(slot.count, delta, this.ownedCountFor(itemId));
+    if (next === slot.count) return;
+    slot.count = next;
+    audio.click();
+    this.renderParcels();
   }
 
   /** Mail command outcome relayed by the HUD (handleEvents). */
@@ -581,6 +603,12 @@ export class MailboxWindow {
   private renderParcels(): void {
     const parcels = this.deps.root().querySelector<HTMLElement>('#mail-parcels');
     if (!parcels) return;
+    // A +/- click rebuilds this whole container, which would otherwise drop
+    // keyboard focus to <body>; remember which control (by item + role) had
+    // it so the rebuilt equivalent can reclaim it below.
+    const focusedEl = document.activeElement as HTMLElement | null;
+    const focusKey =
+      focusedEl && parcels.contains(focusedEl) ? (focusedEl.dataset.focusKey ?? null) : null;
     parcels.innerHTML = '';
     if (this.attachments.length === 0) {
       const hint = document.createElement('span');
@@ -589,27 +617,104 @@ export class MailboxWindow {
       parcels.appendChild(hint);
       return;
     }
+    const itemControls = new Map<
+      string,
+      { minus?: HTMLButtonElement; plus?: HTMLButtonElement; remove?: HTMLButtonElement }
+    >();
     for (const slot of this.attachments) {
       const item = ITEMS[slot.itemId];
       if (!item) continue;
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
-      const chip = document.createElement('button');
-      chip.type = 'button';
+      const chip = document.createElement('span');
       chip.className = 'mail-parcel-chip';
-      const stack =
-        slot.count > 1 ? ` x${formatNumber(slot.count, { maximumFractionDigits: 0 })}` : '';
-      chip.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>${svgIcon('close', { cls: 'mail-parcel-remove' })}`;
-      chip.setAttribute(
+      const name = document.createElement('span');
+      name.className = 'mail-parcel-name';
+      // Keyboard-focusable so Tab can reach it: attachTooltip's keyboard path
+      // is a focusin listener on this exact element.
+      name.tabIndex = 0;
+      name.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
+      this.deps.attachTooltip(name, () => this.deps.itemTooltip(item));
+      chip.appendChild(name);
+      const owned = this.ownedCountFor(slot.itemId);
+      const controls: {
+        minus?: HTMLButtonElement;
+        plus?: HTMLButtonElement;
+        remove?: HTMLButtonElement;
+      } = {};
+      if (owned > 1) {
+        const step = document.createElement('span');
+        step.className = 'mail-parcel-qty';
+        const minus = document.createElement('button');
+        minus.type = 'button';
+        minus.className = 'mail-parcel-step';
+        minus.textContent = '−';
+        minus.disabled = slot.count <= 1;
+        minus.dataset.focusKey = `${slot.itemId}:minus`;
+        minus.setAttribute(
+          'aria-label',
+          t('hudChrome.mailbox.parcelQtyDecreaseAria', { item: itemDisplayName(item) }),
+        );
+        minus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, -1));
+        const qty = document.createElement('span');
+        qty.className = 'mail-parcel-qty-value';
+        qty.setAttribute('aria-live', 'polite');
+        qty.textContent = t('itemUi.bags.stackCount', {
+          count: formatNumber(slot.count, { maximumFractionDigits: 0 }),
+        });
+        const plus = document.createElement('button');
+        plus.type = 'button';
+        plus.className = 'mail-parcel-step';
+        plus.textContent = '+';
+        plus.disabled = slot.count >= owned;
+        plus.dataset.focusKey = `${slot.itemId}:plus`;
+        plus.setAttribute(
+          'aria-label',
+          t('hudChrome.mailbox.parcelQtyIncreaseAria', { item: itemDisplayName(item) }),
+        );
+        plus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, 1));
+        step.append(minus, qty, plus);
+        chip.appendChild(step);
+        controls.minus = minus;
+        controls.plus = plus;
+      }
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'mail-parcel-remove-btn';
+      remove.innerHTML = svgIcon('close', { cls: 'mail-parcel-remove' });
+      remove.dataset.focusKey = `${slot.itemId}:remove`;
+      remove.setAttribute(
         'aria-label',
         t('hudChrome.mailbox.removeParcelAria', { item: itemDisplayName(item) }),
       );
-      chip.addEventListener('click', () => {
+      remove.addEventListener('click', () => {
         this.attachments = this.attachments.filter((s) => s.itemId !== slot.itemId);
         audio.click();
         this.renderParcels();
       });
-      this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item));
+      chip.appendChild(remove);
+      controls.remove = remove;
+      itemControls.set(slot.itemId, controls);
       parcels.appendChild(chip);
+    }
+    if (focusKey) {
+      const [itemId, role] = focusKey.split(':');
+      const controls = itemControls.get(itemId);
+      const preferred = controls
+        ? role === 'minus'
+          ? controls.minus
+          : role === 'plus'
+            ? controls.plus
+            : controls.remove
+        : undefined;
+      // The just-activated control (or its whole item) can vanish on rebuild
+      // (disabled at a bound, or the stepper dropped once owned <= 1): fall
+      // back to the nearest still-focusable control for the same item.
+      let target: HTMLButtonElement | undefined;
+      if (preferred && !preferred.disabled) target = preferred;
+      else if (controls?.minus && !controls.minus.disabled) target = controls.minus;
+      else if (controls?.plus && !controls.plus.disabled) target = controls.plus;
+      else target = controls?.remove;
+      target?.focus();
     }
   }
 }

@@ -6,9 +6,13 @@ import {
   HAPTICS_STORE_KEY,
   interfaceModeFromSetting,
   isChatLongPress,
+  isMoveAutorunNear,
+  isMoveAutorunPush,
   isPhoneTouchDevice,
   isRecenterDoubleTap,
   loadHapticsEnabled,
+  MOVE_AUTORUN_REVEAL_THRESHOLD,
+  MOVE_AUTORUN_THRESHOLD,
   MobileControls,
   mapJoystickVector,
   mapLookVector,
@@ -88,6 +92,20 @@ describe('mapJoystickVector', () => {
     // a tiny push that's neutral by default registers with a narrow deadzone
     const narrow = mapJoystickVector(0, -0.15, 0.1);
     expect(narrow.forward).toBe(true);
+  });
+});
+
+describe('isMoveAutorunPush', () => {
+  it('requires a strong upward push into the top joystick band', () => {
+    expect(isMoveAutorunPush(-MOVE_AUTORUN_THRESHOLD)).toBe(true);
+    expect(isMoveAutorunPush(-MOVE_AUTORUN_THRESHOLD + 0.01)).toBe(false);
+    expect(isMoveAutorunPush(0)).toBe(false);
+  });
+
+  it('reveals the round target before the lock threshold', () => {
+    expect(isMoveAutorunNear(-MOVE_AUTORUN_REVEAL_THRESHOLD)).toBe(true);
+    expect(isMoveAutorunNear(-MOVE_AUTORUN_REVEAL_THRESHOLD + 0.01)).toBe(false);
+    expect(isMoveAutorunPush(-MOVE_AUTORUN_REVEAL_THRESHOLD)).toBe(false);
   });
 });
 
@@ -219,30 +237,23 @@ describe('mapLookVector', () => {
   });
 });
 
+describe('pinchZoomDelta', () => {
+  it('ignores small two-finger distance jitter', () => {
+    expect(pinchZoomDelta(120, 130)).toBe(0);
+    expect(pinchZoomDelta(120, 109)).toBe(0);
+  });
+
+  it('zooms in when fingers spread apart and out when they pinch together', () => {
+    expect(pinchZoomDelta(100, 150)).toBeCloseTo(-1.33);
+    expect(pinchZoomDelta(150, 100)).toBeCloseTo(1.33);
+  });
+});
+
 // (clampJoystickOrigin was removed: clamping the floating origin into the
 // 132px capture zone, which cannot contain the 140/128px wheel, pinned the
 // origin away from the thumb and made every off-center touchdown instantly
 // walk the character: the issue #1229 drift. The origin is now the raw touch
 // point; the integration tests below pin the new contract.)
-
-describe('pinchZoomDelta', () => {
-  it('returns zero when the pinch distance is unchanged', () => {
-    expect(pinchZoomDelta(120, 120)).toBe(0);
-  });
-
-  it('zooms in (negative delta) when the fingers spread apart', () => {
-    expect(pinchZoomDelta(100, 150, 0.04)).toBeCloseTo(-2);
-  });
-
-  it('zooms out (positive delta) when the fingers pinch together', () => {
-    expect(pinchZoomDelta(150, 100, 0.04)).toBeCloseTo(2);
-  });
-
-  it('scales the delta by the magnitude of the spread', () => {
-    expect(pinchZoomDelta(100, 110, 0.04)).toBeCloseTo(-0.4);
-    expect(pinchZoomDelta(100, 200, 0.04)).toBeCloseTo(-4);
-  });
-});
 
 describe('haptics', () => {
   const makeStore = (initial: Record<string, string> = {}) => {
@@ -321,10 +332,13 @@ class FakeClassList {
 
 class FakeElement extends EventTarget {
   classList = new FakeClassList();
+  dataset: Record<string, string> = {};
   style: {
     transform: string;
     left: string;
     top: string;
+    right: string;
+    bottom: string;
     display: string;
     overflowY: string;
     height: string;
@@ -332,6 +346,8 @@ class FakeElement extends EventTarget {
     transform: '',
     left: '',
     top: '',
+    right: '',
+    bottom: '',
     display: '',
     overflowY: '',
     height: '',
@@ -408,13 +424,17 @@ function installMobileControlDom(): {
   canvas: FakeElement;
   moveZone: FakeElement;
   moveJoystick: FakeElement;
+  autorunTarget: FakeElement;
   cameraJoystick: FakeElement;
   jumpButton: FakeElement;
+  moreButton: FakeElement;
+  moreModal: FakeElement;
   emoteButton: FakeElement;
   discordButton: FakeElement;
   donateButton: FakeElement;
   windowTarget: EventTarget;
 } {
+  const autorunTarget = new FakeElement();
   const elements = new Map<string, FakeElement>([
     [
       'game-canvas',
@@ -427,9 +447,12 @@ function installMobileControlDom(): {
     ],
     ['mobile-move-joystick', new FakeElement()],
     ['mobile-move-stick', new FakeElement()],
+    ['mobile-autorun-target', autorunTarget],
     ['mobile-camera-joystick', new FakeElement()],
     ['mobile-camera-stick', new FakeElement()],
     ['mobile-jump', new FakeElement()],
+    ['mobile-more', new FakeElement()],
+    ['mobile-extra-controls', new FakeElement()],
     ['mobile-emote', new FakeElement()],
     ['mobile-discord', new FakeElement()],
     ['mobile-donate', new FakeElement()],
@@ -443,7 +466,10 @@ function installMobileControlDom(): {
     matchMedia(query: string): FakeMediaQueryList;
   };
   windowTarget.matchMedia = () => new FakeMediaQueryList();
-
+  Object.defineProperties(windowTarget, {
+    innerWidth: { value: 390, configurable: true },
+    innerHeight: { value: 844, configurable: true },
+  });
   const documentFake = documentTarget as EventTarget & {
     body: FakeElement;
     visibilityState: DocumentVisibilityState;
@@ -460,8 +486,11 @@ function installMobileControlDom(): {
     canvas: elements.get('game-canvas')!,
     moveZone: elements.get('mobile-move-zone')!,
     moveJoystick: elements.get('mobile-move-joystick')!,
+    autorunTarget,
     cameraJoystick: elements.get('mobile-camera-joystick')!,
     jumpButton: elements.get('mobile-jump')!,
+    moreButton: elements.get('mobile-more')!,
+    moreModal: elements.get('mobile-extra-controls')!,
     emoteButton: elements.get('mobile-emote')!,
     discordButton: elements.get('mobile-discord')!,
     donateButton: elements.get('mobile-donate')!,
@@ -489,7 +518,6 @@ function mobileCallbacks() {
     onCycleTarget: noop,
     onJump: noop,
     onInteract: noop,
-    onAutorun: () => false,
     onChat: noop,
     onChatOpen: noop,
     onChatClose: noop,
@@ -557,6 +585,128 @@ describe('MobileControls setActive draft survival', () => {
 });
 
 describe('MobileControls pointer lifecycle', () => {
+  it('engages autorun when the move joystick is pushed into the high round target', () => {
+    const { autorunTarget, moveZone, windowTarget } = installMobileControlDom();
+    let autorunOn = false;
+    let clearCount = 0;
+    const input = {
+      get autorun() {
+        return autorunOn;
+      },
+      setTouchMove: (move: TouchMoveInput) => {
+        if (move.forward || move.back || move.strafeLeft || move.strafeRight) autorunOn = false;
+      },
+      clearTouchMove: () => {
+        clearCount += 1;
+      },
+      setAutorun: (on: boolean) => {
+        autorunOn = on;
+        return autorunOn;
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 14, clientX: 100, clientY: 100 }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 14, clientX: 100, clientY: 25 }),
+    );
+
+    expect(autorunOn).toBe(false);
+    expect(autorunTarget.classList.contains('near')).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 14, clientX: 100, clientY: -5 }),
+    );
+
+    expect(autorunOn).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(true);
+    expect(clearCount).toBeGreaterThan(0);
+
+    windowTarget.dispatchEvent(pointerEvent('pointerup', { pointerId: 14 }));
+
+    expect(autorunOn).toBe(true);
+    expect(autorunTarget.classList.contains('near')).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(true);
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 15, clientX: 100, clientY: 100 }),
+    );
+
+    expect(autorunOn).toBe(false);
+    expect(autorunTarget.classList.contains('near')).toBe(false);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+  });
+
+  it('cancels a locked autorun when the same joystick drag leaves the target', () => {
+    const { autorunTarget, moveZone } = installMobileControlDom();
+    let autorunOn = false;
+    const input = {
+      get autorun() {
+        return autorunOn;
+      },
+      setTouchMove: (move: TouchMoveInput) => {
+        if (move.forward || move.back || move.strafeLeft || move.strafeRight) autorunOn = false;
+      },
+      clearTouchMove: () => {},
+      setAutorun: (on: boolean) => {
+        autorunOn = on;
+        return autorunOn;
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 16, clientX: 100, clientY: 100 }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 16, clientX: 100, clientY: -5 }),
+    );
+    expect(autorunOn).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(true);
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 16, clientX: 102, clientY: 84 }),
+    );
+
+    expect(autorunOn).toBe(false);
+    expect(autorunTarget.classList.contains('near')).toBe(false);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+  });
+
+  it('syncs an external autorun reset into the round target UI', () => {
+    const { autorunTarget } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    const controls = new MobileControls(input, mobileCallbacks());
+    controls.start();
+
+    controls.syncAutorun(true);
+
+    expect(autorunTarget.classList.contains('near')).toBe(true);
+    expect(autorunTarget.classList.contains('locked')).toBe(true);
+
+    autorunTarget.classList.add('near', 'locked');
+
+    controls.syncAutorun(false);
+
+    expect(autorunTarget.classList.contains('near')).toBe(false);
+    expect(autorunTarget.classList.contains('locked')).toBe(false);
+  });
+
   it('clears movement when the active pointer ends outside the joystick element', () => {
     const { moveZone, windowTarget } = installMobileControlDom();
     let lastMove: TouchMoveInput | null = null;
@@ -974,6 +1124,25 @@ describe('MobileControls pointer lifecycle', () => {
     expect(document.body.classList.contains('mobile-more-open')).toBe(false);
   });
 
+  it('keeps the More drawer centered when opened', () => {
+    const { moreButton, moreModal } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+    new MobileControls(input, mobileCallbacks()).start();
+
+    moreButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(moreModal.style.left).toBe('50%');
+    expect(moreModal.style.top).toBe('50%');
+    expect(moreModal.style.right).toBe('auto');
+    expect(moreModal.style.bottom).toBe('auto');
+    expect(moreModal.style.transform).toBe('translate(-50%, -50%)');
+  });
+
   it('fires the Jump callback immediately on pointerdown without double-firing the generated click', () => {
     const { jumpButton } = installMobileControlDom();
     const input = {
@@ -1073,7 +1242,7 @@ describe('MobileControls pointer lifecycle', () => {
     ]);
   });
 
-  it('cancels canvas swipe rotation when a second finger starts pinch zoom', () => {
+  it('cancels canvas swipe rotation when a second finger starts guarded pinch zoom', () => {
     const { canvas } = installMobileControlDom();
     const deltas: Array<{ dx: number; dy: number }> = [];
     const zooms: number[] = [];
@@ -1138,7 +1307,61 @@ describe('MobileControls pointer lifecycle', () => {
 
     expect(deltas).toEqual([{ dx: 16, dy: 0 }]);
     expect(lookActive).toEqual([true, false]);
-    expect(zooms.length).toBeGreaterThan(0);
+    expect(zooms).toHaveLength(2);
+    expect(zooms[0]).toBeGreaterThan(0);
+    expect(zooms[1]).toBeLessThan(0);
+  });
+
+  it('does not zoom for small two-finger jitter', () => {
+    const { canvas } = installMobileControlDom();
+    const zooms: number[] = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: (delta: number) => {
+        zooms.push(delta);
+      },
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 23,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 24,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 23,
+        pointerType: 'touch',
+        clientX: 105,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 24,
+        pointerType: 'touch',
+        clientX: 196,
+        clientY: 100,
+      }),
+    );
+
+    expect(zooms).toEqual([]);
   });
 
   it('blocks swipe-look from starting over interactive HUD chrome (a button/window)', () => {
@@ -1289,7 +1512,7 @@ describe('MobileControls pointer lifecycle', () => {
     expect(lookActive).toEqual([true, false]);
   });
 
-  it('ends an active pinch-zoom gesture when a window opens mid-gesture', () => {
+  it('ends an active pinch gesture when a window opens mid-gesture', () => {
     const { canvas } = installMobileControlDom();
     const zooms: number[] = [];
     const input = {
@@ -1325,13 +1548,13 @@ describe('MobileControls pointer lifecycle', () => {
       pointerEvent('pointermove', {
         pointerId: 50,
         pointerType: 'touch',
-        clientX: 90,
+        clientX: 80,
         clientY: 100,
       }),
     );
-    expect(zooms.length).toBe(1);
+    expect(zooms).toHaveLength(1);
 
-    // A window opens mid-gesture: the next move must stop zooming.
+    // A window opens mid-gesture: the next move must stop tracking zoom.
     document.body.classList.add('mobile-window-open');
     canvas.dispatchEvent(
       pointerEvent('pointermove', {
@@ -1342,10 +1565,10 @@ describe('MobileControls pointer lifecycle', () => {
       }),
     );
 
-    expect(zooms.length).toBe(1);
+    expect(zooms).toHaveLength(1);
 
     // The pinch state was released, so even a further move from the surviving
-    // pointer (post window-close) must not resume zooming on its own.
+    // pointer (post window-close) must not resume the gesture on its own.
     document.body.classList.remove('mobile-window-open');
     canvas.dispatchEvent(
       pointerEvent('pointermove', {
@@ -1355,7 +1578,7 @@ describe('MobileControls pointer lifecycle', () => {
         clientY: 100,
       }),
     );
-    expect(zooms.length).toBe(1);
+    expect(zooms).toHaveLength(1);
   });
 
   it('never starts tracking a fresh pinch while a mobile window/menu is open', () => {

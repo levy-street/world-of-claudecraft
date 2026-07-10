@@ -1,24 +1,66 @@
-# AGENTS.md
+# Codex entry point
 
-Any non-Claude coding agent (Codex and similar) treats this file as the entry point for World
-of ClaudeCraft. **The root `CLAUDE.md` and the per-directory `CLAUDE.md` files are the canonical
-source of truth.** Read the root `CLAUDE.md` in full, and the local `CLAUDE.md` when you open
-files in a directory (`src/sim/`, `src/render/`, `src/ui/`, `server/`, ...). They own the
-architecture, the hard invariants (sim purity and determinism, graphics fairness, i18n,
-secrets), the module-first doctrine, the conventions, the commands, and the QA gate. If anything
-here disagrees with `CLAUDE.md`, `CLAUDE.md` wins. This file holds ONLY the agent-runtime notes
-that are not themselves repo facts.
+This file owns Codex runtime behavior for World of ClaudeCraft. The root and
+directory-local `CLAUDE.md` files remain canonical for repository facts, architecture,
+hard invariants, conventions, commands, and the QA contract. Claude-specific model,
+memory, Workflow, slash-command, and agent-runtime instructions do not apply to Codex.
+Do not edit or replace the Claude setup unless the user explicitly asks for that work.
 
-## Startup checklist
-1. Run `git status --short` before edits.
-2. Preserve unrelated user work: do not revert, discard, stage, or commit changes unless asked.
-3. Read the root `CLAUDE.md`, then `GEMINI.md` for any supplemental local context.
-4. Use `rg` and targeted reads for discovery; read existing code and follow local patterns.
+## Start safely
 
-## Tool notes
-- Plain Node `http` + `ws` server, no Express. Vanilla DOM UI, no Tailwind or new UI framework.
-- For external library or API usage, fetch current docs via Context7 or the official docs
-  rather than writing from memory.
-- Keep `AGENTS.md` and `GEMINI.md` tracked: do not add either to `.gitignore`.
-- Do not commit unless asked; if committing, stage only the files for your change and use
-  Conventional Commits with a scope (`<type>(scope): ...`), matching `CLAUDE.md`.
+1. Run `git status --short` before edits and preserve unrelated user work.
+2. Confirm the requested base branch. Use an isolated worktree when another session may
+   share the checkout, and keep work off the shared branch.
+3. Read the root `CLAUDE.md` in full. Before reading or changing files in a directory,
+   read that directory's `CLAUDE.md` if it exists. Codex builds its instruction chain at
+   session start, so opening a nested file does not load local guidance automatically.
+4. Use `rg` and targeted reads to discover the current shape. Follow existing code and
+   tests instead of relying on remembered inventories or line numbers.
+
+Never revert, discard, stage, commit, push, file an issue, post a review, or mutate a
+remote system unless the user authorized that action. If a commit is requested, stage
+only this task's files and follow the scoped Conventional Commit rule in `CLAUDE.md`.
+
+## Work effectively
+
+- Keep the main thread responsible for integration and final verification.
+- Parallelize bounded exploration, log analysis, and read-only reviews when useful.
+  Give overlapping files one implementation owner and wait for every delegated task
+  before reporting completion.
+- Treat subagent results as evidence to verify, not verdicts to relay unchanged.
+- Use the active session model and reasoning setting. Do not weaken acceptance criteria,
+  tests, or review depth for a faster model. Route by task shape, not a hardcoded model:
+  clear mechanical work can run fast, while ambiguous architecture and security work
+  needs deeper reasoning.
+- Fetch current official documentation for external APIs and libraries. Do not write
+  unstable interfaces from memory.
+- Prefer small modules, decisive tests, and existing seams. Do not add frameworks or
+  abstractions without a concrete repository need.
+
+## Codex workflows
+
+Repository skills live in `.agents/skills/` and are invoked as `$skill-name`:
+
+- `$woc-qa`: scope and run the contribution gate, then dispatch relevant reviewers.
+- `$woc-extract-and-test`: extract a module behind behavior-pinning tests.
+- `$woc-feature-plan`: produce an implementation-ready plan for cross-cutting work.
+- `$woc-review-pr`: verify a pull request without posting unless explicitly requested.
+- `$woc-file-issue`: draft an issue, and file it only with explicit authorization.
+- `$woc-release-merge-audit`: find semantic damage after release integration.
+- `$woc-release-malware-audit`: scan and judge malicious-code risk.
+- `$woc-codex-audit`: compare the checked-in Codex architecture with current official
+  guidance.
+
+Read-only specialist agents live in `.codex/agents/`. Use only the roles matching the
+changed surface: sim architecture, cross-platform parity, persistence, security, test
+coverage, frontend, release malware, and official documentation research. The parent
+runs deterministic commands once; reviewers inspect evidence instead of duplicating the
+full gate.
+
+## Completion contract
+
+Run checks proportional to the change while iterating. Before calling an implementation
+complete, use `$woc-qa` or follow `docs/qa-gate.md`, including `npm run gate` when the
+canonical gate requires it. Report the exact commands and outcomes, remaining risks, and
+any checks you could not run. A hook or subagent report never substitutes for the shared
+test, typecheck, build, i18n, and security gates.

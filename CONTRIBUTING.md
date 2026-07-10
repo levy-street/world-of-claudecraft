@@ -66,7 +66,9 @@ The [README](README.md) has the full host, develop, and play guide, and the
 
 ## Making your change
 
-1. **Create a branch** off `main`: `feature/<short-slug>` or `fix/<short-slug>`.
+1. **Create a branch** from the current `release/vX.Y.Z` branch: `feature/<short-slug>`
+   or `fix/<short-slug>`. Check the repository's active release branch instead of
+   assuming `main`.
 2. **Make focused commits.** Smaller, self-contained changes are easier to review
    and merge than large ones.
 3. **Add or update tests** for any behavior you change in `src/sim/` or `server/`.
@@ -93,17 +95,15 @@ root [`CLAUDE.md`](CLAUDE.md), but the short version:
 
 ## Before you open a pull request
 
-Please run these locally. They're the same checks CI runs:
+Run the repository gate locally. It is the same contract CI enforces:
 
 ```bash
-npm test                    # Vitest suite
-npx tsc --noEmit            # TypeScript typecheck (the project is strict)
-npm run security:gate       # malicious-code release gate (high-severity signatures; also asserted by npm test)
-npm run build               # production client build
+npm run gate
 ```
 
-If you changed server or headless code, also run `npm run build:server` and
-`npm run build:env`.
+Use targeted tests and `npm run ci:changed` while iterating. `npm run gate` covers the
+generated-artifact freshness check, malware scan, formatting, full tests, strict
+typecheck, and client, server, and headless builds.
 
 Then test your change on both desktop and mobile, including a phone-sized viewport
 in portrait and landscape, if it touches anything players see. Touch targets
@@ -112,39 +112,39 @@ are documented in [`src/ui/CLAUDE.md`](src/ui/CLAUDE.md).
 
 ## Opening the pull request
 
-Push your branch and open a PR against `main`. The
+Push your branch and open a PR against the active release branch. The
 [pull request template](.github/PULL_REQUEST_TEMPLATE.md) will guide you through a
 short checklist. Please fill it in:
 
 - Describe **what** changed and **why**.
 - Link any related issue (for example, "Closes #123").
 - Add **screenshots or a clip for UI changes**, on desktop and mobile.
-- Confirm tests, typecheck, and the build pass, and that new strings are
-  translated.
+- Confirm `npm run gate` passes and new player-facing strings follow the English-first
+  contributor policy below.
 
 A green CI run and a complete checklist are what we look for before merging. A
 maintainer may suggest changes. That's a normal, collaborative part of the
 process, not a rejection. We aim to be kind and constructive in review, and we ask
 the same of you.
 
-> Commit messages and PR titles follow [Conventional Commits](https://www.conventionalcommits.org/)
-> with a scope where it fits (`feat(talents): ...`, `fix(net): ...`). It's a
-> convention we like rather than a strict requirement. Clear, descriptive messages
-> matter more than perfect formatting.
+> Commit messages and PR titles must follow [Conventional Commits](https://www.conventionalcommits.org/)
+> with a scope (`feat(talents): ...`, `fix(net): ...`).
 
 <a id="localization"></a>
 
 ## Localization
 
-World of ClaudeCraft ships in many languages, and we keep it that way as the game
-grows. Every player-visible string is translated into every supported locale.
+World of ClaudeCraft ships in many languages. Every player-visible string must be a
+translation key, while feature contributors normally add only the English source.
 
 - All user-facing text is a `t()` key. Add new English copy to the matching
   per-domain module under [`src/ui/i18n.catalog/`](src/ui/i18n.catalog/) (new HUD
   chrome goes in `hud_chrome.ts`), then render it with `t('dotted.key', values)`.
   English-only is exactly right for a feature PR: the maintainer fills the other
   locales at release, so you do not edit the `src/ui/i18n.locales/` overlays and you
-  never leave an English placeholder or a `// TODO` in one.
+  never leave an English placeholder or a `// TODO` in one. The M16 exception is a new
+  wordy English value, which also needs the five non-Latin fills described in
+  [`src/ui/CLAUDE.md`](src/ui/CLAUDE.md).
 - Numbers, money, dates, units, and percentages go through the formatters
   (`formatNumber`, `formatMoney`, `formatDateTime`, `Intl`) rather than manual
   string building.

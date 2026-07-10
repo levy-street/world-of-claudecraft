@@ -51,7 +51,9 @@
     pointer-events: none !important;
   }
   body.mobile-touch.game-active:not(.mobile-more-open) #mobile-extra-controls {
-    display: none !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
   body.mobile-touch #game-canvas {
     touch-action: none;
@@ -232,6 +234,50 @@
       inset 0 0 26px #0008,
       0 0 16px 3px #e3c66a55;
   }
+  body.mobile-touch #mobile-autorun-target {
+    position: absolute;
+    left: 50%;
+    top: -104px;
+    width: 48px;
+    height: 48px;
+    border: 2px solid #b7a35a00;
+    border-radius: 50%;
+    color: #f6e7ad;
+    background: radial-gradient(circle at 35% 30%, #57451ccf, #161108e8 72%);
+    box-shadow:
+      0 0 0 1px #0009,
+      inset 0 1px 0 #ffffff20,
+      0 0 16px #0008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 14px) scale(0.72);
+    transition:
+      opacity 0.12s ease,
+      transform 0.12s ease,
+      border-color 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  body.mobile-touch #mobile-autorun-target .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+  body.mobile-touch #mobile-autorun-target.near,
+  body.mobile-touch #mobile-autorun-target.locked {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    border-color: #d8c46bb8;
+  }
+  body.mobile-touch #mobile-autorun-target.locked {
+    color: #fff7c7;
+    border-color: var(--gold);
+    box-shadow:
+      0 0 0 1px #0009,
+      inset 0 1px 0 #ffffff24,
+      0 0 18px #e3c66a99;
+  }
   /* Hidden by default (settings.mobileCameraJoystick, def false): swipe-look on
      open gameplay space is the primary camera path (plan decision 2). Hidden
      means no reserved layout space and mobile_controls.ts's onCameraDown no-ops
@@ -240,12 +286,10 @@
     display: none;
   }
   body.mobile-touch #mobile-camera-joystick {
-    /* Stacked above the move joystick (26px bottom + 140px tall = 166px to its
-       top edge, plus a 10px gap) on the LEFT side, not the ring's bottom-right
-       corner, so an opted-in joystick never overlaps the paged action ring
-       cluster (#mobile-action-ring, bottom-right, up to ~290px tall). While it
-       is enabled, Autorun's 45deg satellite seat (which reaches this band)
-       slides beside Jump instead; see the .mobile-camera-joystick-on rule. */
+    /* Stacked above the move joystick on the LEFT side, not the ring's
+       bottom-right corner, so an opted-in joystick never overlaps the paged
+       action ring cluster (#mobile-action-ring, bottom-right, up to ~290px
+       tall). */
     left: max(18px, env(safe-area-inset-left));
     right: auto;
     bottom: calc(176px + env(safe-area-inset-bottom));
@@ -346,97 +390,20 @@
     width: 22px;
     height: 22px;
   }
-  /* Left-side utility satellite: Autorun nests against the move joystick's
-     home seat exactly like the combat ring's crescent hollow, mirrored for
-     the left thumb: it takes Use's mirrored seat (due RIGHT of the joystick
-     centre, the 0deg resting-thumb tap). Jump moved to the RING's bottom row
-     (right thumb) so a player can steer and jump at the same time. The seat
-     rides the --mobile-joy-hollow circle around the joystick centre; the
-     hollow tracks the Joystick Size setting (--joy-scale) and the button size
-     setting (--btn-scale), FLOORED at its scale-1 value so minimum settings
-     never collapse the seat into the pad. The seat's screen-side edge is
-     additionally floored at 134px: the floating-joystick capture zone
-     (#mobile-move-zone) stays a FIXED min(30vw, 132px) at every joystick
-     scale, so without the floor a small joystick would park the button over
-     the zone's right column and steal movement touches. The 0deg seat also
-     stays clear of the opt-in camera joystick stacked above the pad at every
-     size-setting combination (its top edge peaks at ~154px, under the 176px
-     camera-pad bottom). */
-  body.mobile-touch #mobile-utility-cluster {
-    --mobile-joy-anchor-x: max(18px, env(safe-area-inset-left));
-    --mobile-joy-anchor-y: calc(26px + env(safe-area-inset-bottom));
-    --mobile-joy-radius: 70px;
-    --mobile-joy-hollow: max(
-      calc(var(--mobile-joy-radius) + 46px),
-      calc(var(--mobile-joy-radius) * var(--joy-scale, 1) + 46px * var(--btn-scale, 1))
-    );
-    --mobile-utility-size: calc(56px * var(--mobile-chrome-scale, 1));
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 30;
-  }
-  /* The satellites wear the ring secondaries' exact face (size hooks above
-     already mirror Target/Use per tier): same 2px amber border, dark radial
-     fill, and gold text, so the left pair reads as the mirror of the right
-     pair rather than as generic glass chrome. */
-  body.mobile-touch #mobile-utility-cluster .mobile-btn {
-    position: absolute;
-    pointer-events: auto;
-    width: calc(var(--mobile-utility-size) * var(--btn-scale, 1));
-    height: calc(var(--mobile-utility-size) * var(--btn-scale, 1));
-    border: 2px solid #8b4e2c;
-    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);
-    color: #ffdf9c;
-  }
-  body.mobile-touch #mobile-utility-cluster .mobile-btn:active {
-    border-color: var(--gold);
-    color: #fff;
-  }
-  body.mobile-touch #mobile-utility-cluster .mobile-btn .mobile-label {
-    color: #d8b98a;
-  }
-  body.mobile-touch #mobile-autorun {
-    left: max(
-      134px,
-      calc(
-        var(--mobile-joy-anchor-x) +
-        var(--mobile-joy-radius) *
-        var(--joy-scale, 1) +
-        var(--mobile-joy-hollow) -
-        var(--mobile-utility-size) *
-        var(--btn-scale, 1) /
-        2
-      )
-    );
-    bottom: calc(
-      var(--mobile-joy-anchor-y) +
-      var(--mobile-joy-radius) *
-      var(--joy-scale, 1) -
-      var(--mobile-utility-size) *
-      var(--btn-scale, 1) /
-      2
-    );
-  }
   body.mobile-touch #mobile-more {
     position: static;
     z-index: 19;
+  }
+  body.mobile-touch #mobile-more .ui-icon {
+    transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  body.mobile-touch.mobile-more-open #mobile-more .ui-icon {
+    transform: rotate(38deg);
   }
   body.mobile-touch .mobile-btn:active {
     transform: translateY(1px);
     border-color: var(--gold);
     color: #fff;
-  }
-  body.mobile-touch #mobile-autorun.active {
-    border-color: var(--gold);
-    color: #fff;
-    background: radial-gradient(circle at 35% 30%, #5a4a1ed8, #2a230fd8 72%);
-    box-shadow:
-      inset 0 1px 0 #ffffff20,
-      0 0 12px #e3c46a80;
-  }
-  body.mobile-touch.mobile-window-open #mobile-autorun {
-    display: none;
   }
   body.mobile-touch .mobile-btn.is-on {
     border-color: var(--gold);
@@ -1054,11 +1021,16 @@
     left: 50%;
     top: 50%;
     bottom: auto;
-    transform: translate(-50%, -50%);
-    display: none;
+    --mobile-more-open-transform: translate(-50%, -50%);
+    --mobile-more-closed-transform: translate(-50%, -46%) scale(0.96);
+    transform: var(--mobile-more-closed-transform);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
     width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
     --window-pad: 10px;
-    pointer-events: auto;
+    pointer-events: none;
     z-index: 100;
     border: 1px solid var(--mobile-glass-border);
     border-radius: 10px;
@@ -1079,10 +1051,27 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+    will-change: transform, opacity;
+    transition:
+      opacity 150ms ease,
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s linear 180ms;
   }
   body.mobile-touch.mobile-more-open #mobile-extra-controls {
-    display: flex;
-    flex-direction: column;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: var(--mobile-more-open-transform);
+    transition:
+      opacity 150ms ease,
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-extra-controls,
+    body.mobile-touch #mobile-more .ui-icon {
+      transition: none;
+    }
   }
   body.mobile-touch #mobile-extra-controls .panel-title {
     /* 48px, not the old 32px: the close button is a 40x40 absolute-pinned touch
@@ -1312,13 +1301,12 @@
   }
   /* Idle-fade (mobile_chrome_fade.ts arms .mobile-chrome-idle on body after a
      stretch of no touch): recedes the low-frequency chrome (the top-left
-     Chat/Social/More trio, the Autorun/Jump joystick satellites, and the
-     daily-chest rail), instantly restored on the next touch. Deliberately
+     Chat/Social/More trio and the daily-chest rail), instantly restored on
+     the next touch. Deliberately
      excludes the action ring and both joysticks -- cosmetic declutter only,
      never the actionable info the graphics fairness rule protects (HP/target/
      cast bars aren't in this selector list). */
   body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn,
-  body.mobile-touch.mobile-chrome-idle #mobile-utility-cluster .mobile-btn,
   body.mobile-touch.mobile-chrome-idle #mobile-consumables-toggle {
     opacity: 0.5;
   }
@@ -1345,8 +1333,7 @@
     opacity: 1;
   }
   @media (prefers-reduced-motion: reduce) {
-    body.mobile-touch #mobile-combat-controls .mobile-btn,
-    body.mobile-touch #mobile-utility-cluster .mobile-btn {
+    body.mobile-touch #mobile-combat-controls .mobile-btn {
       transition: none;
     }
   }
@@ -2070,27 +2057,6 @@
     );
     right: auto;
   }
-  /* The Autorun satellite mirrors with the (now right-side) move joystick:
-     the anchor swaps to the right safe inset and the seat's floored offset
-     re-applies from the right edge (same hollow math, mirrored). */
-  body.mobile-touch.mobile-left-handed #mobile-utility-cluster {
-    --mobile-joy-anchor-x: max(18px, env(safe-area-inset-right));
-  }
-  body.mobile-touch.mobile-left-handed #mobile-autorun {
-    left: auto;
-    right: max(
-      134px,
-      calc(
-        var(--mobile-joy-anchor-x) +
-        var(--mobile-joy-radius) *
-        var(--joy-scale, 1) +
-        var(--mobile-joy-hollow) -
-        var(--mobile-utility-size) *
-        var(--btn-scale, 1) /
-        2
-      )
-    );
-  }
   body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
     /* Left-handed mirrors the move joystick to the right (above) AND the ring
        (this section, above) to the left, so the camera joystick's non-left-
@@ -2193,11 +2159,13 @@
     top: calc(env(safe-area-inset-top) + 122px);
   }
   body.mobile-touch .window {
-    max-width: calc(100vw - 20px);
+    max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
     /* --window-scale, never --ui-scale: this generic rule also governs the
        body-level windows OUTSIDE the zoomed #ui (the confirm/input dialog),
        which pin --window-scale to 1 (see the shell note in layout.css). */
     max-height: calc(var(--app-vh) / var(--window-scale, 1) - 40px);
+    padding-bottom: max(var(--window-pad), calc(18px + env(safe-area-inset-bottom)));
+    box-sizing: border-box;
   }
   /* Mobile border restyle: every mobile window (.window.panel covers bags,
      character, talents, quest log, spellbook, loot, and every other modal window)
@@ -2404,6 +2372,32 @@
   }
   body.mobile-touch #bags .bag-grid {
     min-height: 150px;
+  }
+  body.mobile-touch :is(.bag-grid, .bank-scroll, .soc-body, .ql-detail-body) {
+    padding-bottom: max(18px, calc(12px + env(safe-area-inset-bottom)));
+    scroll-padding-bottom: max(18px, calc(12px + env(safe-area-inset-bottom)));
+    box-sizing: border-box;
+  }
+  body.mobile-touch .bag-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch .bag-chip {
+    flex: 0 0 auto;
+  }
+  body.mobile-touch #social-window .soc-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch #social-window .soc-tab {
+    flex: 0 0 auto;
+    min-width: max-content;
+    padding-inline: 10px;
+    white-space: nowrap;
   }
   body.mobile-touch .vendor-item,
   body.mobile-touch .bag-item,
@@ -2632,7 +2626,7 @@
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
   body.mobile-touch #options-menu.perf-wide {
-    width: min(560px, calc(100vw - 170px));
+    width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
   }
   body.mobile-touch.vendor-open #vendor-window,
@@ -3064,12 +3058,13 @@
     min-height: 40px;
     box-sizing: border-box;
   }
-  /* Mailbox: the folder tab strip, the "back to inbox" link, and the Send-tab
-     remove-staged-parcel chip (a real <button>, base min-height 32px in
-     components.css, below the touch floor). */
+  /* Mailbox: the folder tab strip and the "back to inbox" link. The Send-tab
+     parcel chip is now a non-interactive span (the +/- stepper and remove
+     button are the real controls); their own pointer: coarse 40x40 floor
+     lives in components.css next to .mail-parcel-step / .mail-parcel-remove-btn,
+     the same convention as .yh-toggle. */
   body.mobile-touch #mailbox-window .mail-tab,
-  body.mobile-touch #mailbox-window .mail-back,
-  body.mobile-touch #mailbox-window .mail-parcel-chip {
+  body.mobile-touch #mailbox-window .mail-back {
     min-height: 40px;
     box-sizing: border-box;
   }
@@ -3101,7 +3096,7 @@
     right: auto;
     top: 44%;
     bottom: auto;
-    width: min(360px, calc(100vw - 170px));
+    width: min(430px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
     height: min(380px, calc(var(--app-vh) / var(--ui-scale, 1) - 116px));
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     transform: translate(-50%, -50%);
@@ -3110,13 +3105,45 @@
   body.mobile-touch #map-window {
     left: 50%;
     top: calc(46% - env(safe-area-inset-bottom));
-    width: min(46vw, 330px);
-    max-width: calc(100vw - 220px);
+    width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);
     /* The variable, not raw padding, like every other window (the map has no
        sticky header today, but keeping it in the --window-pad system means
        adding one later cannot silently misalign; see layout.css). */
     --window-pad: 8px;
     transform: translate(-50%, -50%);
+  }
+  body.mobile-touch.mobile-map-quest-open {
+    --mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));
+    --mobile-map-quest-log-max-height: clamp(
+      88px,
+      calc(var(--app-vh) / var(--ui-scale, 1) - 150px),
+      118px
+    );
+    --mobile-map-quest-stack-gap: 8px;
+  }
+  body.mobile-touch.mobile-map-quest-open #quest-log-window {
+    top: var(--mobile-map-quest-stack-top);
+    max-height: var(--mobile-map-quest-log-max-height);
+    overflow: auto;
+  }
+  body.mobile-touch.mobile-map-quest-open #map-window {
+    top: calc(
+      var(--mobile-map-quest-stack-top) +
+      var(--mobile-map-quest-log-max-height) +
+      var(--mobile-map-quest-stack-gap)
+    );
+    transform: translateX(-50%);
+    width: min(
+      46vw,
+      300px,
+      calc(
+        var(--app-vh) -
+        var(--mobile-map-quest-log-max-height) -
+        var(--mobile-map-quest-stack-gap) -
+        22px
+      )
+    );
   }
   body.mobile-touch #map-canvas {
     width: 100%;
@@ -3340,33 +3367,6 @@
     line-height: 1.45;
   }
 
-  @media (orientation: portrait) {
-    body.mobile-touch #mobile-combat-controls {
-      /* Portrait resets JUST this trio back to btn-scale only (no chrome-scale): its
-         42x44 buttons already sit on the 40px floor, so the 0.85 shrink would drop
-         them under it. The rest of the chrome still scales via the token in portrait;
-         web in-game is landscape-locked regardless, so the trio never actually renders
-         portrait in play. */
-      transform: scale(var(--btn-scale, 1));
-      grid-template-columns: repeat(5, 42px);
-      gap: 6px;
-    }
-    body.mobile-touch .mobile-btn {
-      width: 42px;
-      height: 44px;
-      font-size: 16px;
-    }
-    /* Portrait bar is 5x42px + 4x6px gaps = 234px wide (native app: web
-       gameplay is landscape-locked); shrink the chip to the 44px button
-       height and re-dock it past the narrower bar. */
-    body.mobile-touch #mobile-consumables {
-      left: calc(max(12px, env(safe-area-inset-left)) + 234px * var(--btn-scale, 1) + 8px);
-    }
-    body.mobile-touch #mobile-consumables-toggle {
-      height: 44px;
-    }
-  }
-
   @media (orientation: landscape) {
     body.mobile-touch[data-start-panel="mode-select"] #homepage-views-container {
       align-items: center;
@@ -3521,17 +3521,6 @@
       );
       top: max(6px, env(safe-area-inset-top));
     }
-    /* Landscape joystick is 128px and re-anchored (above), so the satellite
-       seats follow via the cluster's anchor/radius hooks; the hollow math and
-       the 134px move-zone floors are the base rules, unchanged. */
-    body.mobile-touch #mobile-utility-cluster {
-      --mobile-joy-anchor-x: max(24px, calc(env(safe-area-inset-left) + 12px));
-      --mobile-joy-anchor-y: calc(15px + env(safe-area-inset-bottom));
-      --mobile-joy-radius: 64px;
-    }
-    body.mobile-touch.mobile-left-handed #mobile-utility-cluster {
-      --mobile-joy-anchor-x: max(24px, calc(env(safe-area-inset-right) + 12px));
-    }
     body.mobile-touch .mobile-btn {
       width: 54px;
       height: 48px;
@@ -3540,6 +3529,8 @@
     }
     body.mobile-touch #mobile-extra-controls {
       left: 50%;
+      --mobile-more-open-transform: translateX(-50%);
+      --mobile-more-closed-transform: translate(-50%, 10px) scale(0.96);
       /* True vertical centering (the base rule's top:50%/translate(-50%,-50%))
          let this 4-row, 16-pill grid grow tall enough on a short landscape
          viewport to overlap the fixed bottom control row (Autorun/Jump/combat
@@ -3556,7 +3547,7 @@
          landscape position here is correct regardless. */
       top: max(8px, env(safe-area-inset-top)) !important;
       bottom: auto !important;
-      transform: translateX(-50%) !important;
+      transform: var(--mobile-more-closed-transform) !important;
       --window-pad: 8px;
       /* No --ui-scale division: body-level window outside the zoomed #ui.
          120px clears the bottom control row (Autorun/Jump/combat cluster +
@@ -3569,6 +3560,9 @@
         env(safe-area-inset-bottom)
       );
     }
+    body.mobile-touch.mobile-more-open #mobile-extra-controls {
+      transform: var(--mobile-more-open-transform) !important;
+    }
     body.mobile-touch #mobile-extra-grid {
       /* 4 columns in landscape too (issue 1577 round 2 (4)), matching the base
          tier so each More-tray pill stays narrow on a wide landscape phone.
@@ -3578,16 +3572,47 @@
       grid-auto-rows: 34px;
       gap: 5px;
     }
-    /* The base rule's min(46vw, 330px) square map, vertically centered at 46%,
-       is tall enough on a short landscape phone (the map-canvas keeps a 1:1
-       aspect ratio via width:100%/height:auto) to dip its bottom edge into the
-       fixed Jump/Interact/combat-cluster row, which reserves no layout space
-       of its own. Shrink it to fit the room actually free above that row
-       instead of a fraction of the whole (short) viewport height. */
+    /* The base square map can dip into the fixed Jump/Interact/combat row on a
+       short landscape phone. Top-anchor it and reserve a right rail so the
+       close and zoom buttons do not sit on top of the drawn map. */
     body.mobile-touch #map-window {
+      --mobile-map-size: min(60vw, 420px, calc(var(--app-vh) - 104px));
+      --mobile-map-rail: 58px;
       top: max(10px, env(safe-area-inset-top));
       transform: translateX(-50%);
-      width: min(46vw, 300px, calc(var(--app-vh) - 140px));
+      width: min(
+        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
+      );
+    }
+    body.mobile-touch #map-window #map-canvas {
+      width: var(--mobile-map-size);
+      max-width: calc(100% - var(--mobile-map-rail));
+    }
+    body.mobile-touch #map-window #map-zoom {
+      right: 8px;
+      bottom: 8px;
+    }
+    body.mobile-touch.mobile-map-quest-open #map-window {
+      --mobile-map-size: min(
+        52vw,
+        320px,
+        calc(
+          var(--app-vh) -
+          var(--mobile-map-quest-log-max-height) -
+          var(--mobile-map-quest-stack-gap) -
+          22px
+        )
+      );
+      top: calc(
+        var(--mobile-map-quest-stack-top) +
+        var(--mobile-map-quest-log-max-height) +
+        var(--mobile-map-quest-stack-gap)
+      );
+      width: min(
+        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
+      );
     }
     body.mobile-touch.mobile-left-handed #mobile-extra-controls {
       left: 50%;
@@ -3932,15 +3957,6 @@
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-action-ring {
     left: max(14px, env(safe-area-inset-left));
     right: auto;
-  }
-  /* The Autorun satellite mirrors the ring's per-tier secondary sizing
-     (compact 50 / standard 56 / tablet 60), so it always matches the
-     Target/Use/Jump buttons it is the left-thumb mirror of. */
-  body.mobile-touch.hud-mobile-compact #mobile-utility-cluster {
-    --mobile-utility-size: calc(50px * var(--mobile-chrome-scale, 1));
-  }
-  body.mobile-touch.hud-mobile-tablet #mobile-utility-cluster {
-    --mobile-utility-size: calc(60px * var(--mobile-chrome-scale, 1));
   }
   /* Compact phones: Jump's ring-row seat reaches to ~437px from the left on a
      740px viewport, into the centred player frame's right tail (280..460).

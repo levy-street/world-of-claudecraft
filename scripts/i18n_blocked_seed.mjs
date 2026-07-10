@@ -288,6 +288,7 @@ export const V07_SLASH = [
   'Threat is only tracked on enemies; Aki is not one.',
   'Threat on Aki (5): Aki.',
   'Time played this session: Aki.',
+  'Total time played: Aki.',
   'Unknown command: Aki. Type /help for a list.',
   'Vendor buyback (5): Aki. Repurchase at any merchant.',
   'You are Aki.',

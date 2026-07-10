@@ -459,6 +459,9 @@ export class BagsWindow {
         }
         const action = bagItemAction(item, this.bagMode());
         switch (action) {
+          case 'transferBlockedSoulbound':
+            this.deps.showError(t('hudChrome.itemSoulbound'));
+            return;
           case 'trade':
             this.deps.addItemToTrade(s.itemId);
             break;

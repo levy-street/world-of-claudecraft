@@ -23,8 +23,11 @@ ACTIONABLE (must be identical across every tier; never tiered):
 - Enemy / aggro positions a player acts on.
 
 COSMETIC (may be tiered down on lower presets):
-- Floating combat text volume, lifetime, and non-crit damage numbers. The numbers are
-  redundant with the HP bars and the combat log, and the damage itself is server-resolved.
+- Floating combat text volume and lifetime (the live-floater cap and how long each number
+  lingers). The damage itself is server-resolved and the HP bars and combat log carry the
+  numbers too. NOTE: the numbers themselves are NOT dropped. Refusing non-crit damage numbers
+  on low used to hide the player's own hits on their target, their primary combat feedback, so
+  low still spawns every floater and sheds cost only through the bounded pool.
 - Minimap redraw smoothness. It is a coarse overview; the 3D world and nameplates carry the
   same signal at full rate.
 - Buff-icon overflow when the bar is full. A buff is active whether or not its icon is on
@@ -43,11 +46,13 @@ byte-equivalent to pre-tiering.
 
 What each knob does, and why it is gameplay-neutral:
 
-- FCT (floating combat text), `src/ui/fct_painter.ts`: on low, caps live floaters, shortens
-  their lifetime, and drops non-crit DAMAGE NUMBERS only (scoped via
-  `fct_core.isDamageFctKind`, so crits, xp, the cannot-move self-note, heals, and miss / dodge
-  words are all kept). Cosmetic: server-authoritative damage is unchanged and the HP bars and
-  combat log carry the numbers at full rate.
+- FCT (floating combat text), `src/ui/fct_painter.ts`: on low, caps live floaters
+  (`fctMaxConcurrent`) and shortens their lifetime (`fctTtlScale`), so a burst sheds sooner.
+  Every floater is still spawned on every tier, including the player's own non-crit hits, so no
+  damage number is ever hidden. The only crit knob left is the CSS crit-emphasis gate
+  (`[data-fx-level="low"] .fct.crit`), which keeps the number and drops only the scale/pop.
+  Cosmetic: server-authoritative damage is unchanged and the HP bars and combat log also carry
+  the numbers.
 - Minimap, `src/ui/minimap_painter.ts` + the hud cadence gate: on low, redraws at about 4 Hz
   instead of 10 Hz. Cosmetic: the minimap never draws enemy players (only PvE aggro mobs and
   allies), and the same aggro signal is full-rate in the 3D world and on nameplates.

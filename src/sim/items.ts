@@ -33,11 +33,34 @@ import {
   type EquipSlot,
   FISHING_CAST_ID,
   INTERACT_RANGE,
+  type ItemInstancePayload,
   POTION_COOLDOWN,
 } from './types';
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+// Fungible-preferring removal: consumes plain (non-instanced) copies first and
+// only reaches for an instanced copy (an enchanted or otherwise signed/rolled
+// piece) once no fungible copy remains. removeItem's own ordering (sim.ts) scans
+// highest-index-first, which is exactly where applyEnchant's addItemInstance
+// pushes a freshly-enchanted copy (professions/enchanting.ts), so a plain
+// ctx.removeItem there would eat the enchanted copy first when both exist.
+// sellItem/discardItem below and trade.ts's drop arm route through this instead
+// so "sell/discard/trade one" prefers the plain copy a player almost always means.
+export function removePreferFungible(
+  ctx: SimContext,
+  itemId: string,
+  count: number,
+  pid?: number,
+): ItemInstancePayload[] {
+  const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
+  const fungibleTake = Math.min(fungibleAvailable, count);
+  if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
+  const remaining = count - fungibleTake;
+  if (remaining <= 0) return [];
+  return ctx.removeItem(itemId, remaining, pid);
+}
 
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -49,10 +72,10 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
-  if (def.noDiscard) return;
+  if (def.noDiscard || def.soulbound) return;
   const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
   if (discardCount <= 0) return;
-  ctx.removeItem(itemId, discardCount, meta.entityId);
+  removePreferFungible(ctx, itemId, discardCount, meta.entityId);
   ctx.emit({
     type: 'log',
     // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -81,10 +104,31 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   const slot = resolveEquipSlot(def, meta.equipment);
   if (!slot) return;
   const old = meta.equipment[slot];
-  ctx.removeItem(itemId, 1, meta.entityId);
-  if (old) addItemSilent(old, 1, meta);
+  const oldInstance = meta.equipmentInstance?.[slot];
+  // removeItem scans from the highest inventory index down (sim.ts), so a
+  // freshly-enchanted copy (pushed onto the end by addItemInstance,
+  // src/sim/professions/enchanting.ts applyEnchant) is what this picks up first
+  // when both a plain and an enchanted copy of the same item exist and nothing
+  // else has been looted since. That only holds while the enchanted copy stays
+  // the highest-index match: loot another plain copy afterward and the plain
+  // one gets equipped instead. Deterministic, acceptable for v1, but a future
+  // picker UI should not assume the enchanted copy is always favored.
+  const consumed = ctx.removeItem(itemId, 1, meta.entityId);
+  if (old) {
+    // Return the piece that was worn: if it carried an enchant, give it back
+    // its own instanced slot (never merge it into a plain stack, which would
+    // silently drop the enchant), same non-merge rule addItemInstance follows.
+    if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
+    else addItemSilent(old, 1, meta);
+  }
   meta.equipment[slot] = itemId;
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  if (consumed[0]) {
+    meta.equipmentInstance ??= {};
+    meta.equipmentInstance[slot] = consumed[0];
+  } else if (meta.equipmentInstance) {
+    delete meta.equipmentInstance[slot];
+  }
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
 
@@ -102,12 +146,16 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
     bagsFullError(ctx, meta.entityId);
     return false;
   }
+  const instance = meta.equipmentInstance?.[slot];
   delete meta.equipment[slot];
+  if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
   // addItemSilent (not addItem): returning a piece you already owned to bags is
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
-  // today keys on an unequip, so there is nothing to award here regardless.
-  addItemSilent(itemId, 1, meta);
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+  // today keys on an unequip, so there is nothing to award here regardless. An
+  // enchanted piece gets its own instanced slot instead, so its enchant survives.
+  if (instance) meta.inventory.push({ itemId, count: 1, instance });
+  else addItemSilent(itemId, 1, meta);
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   const def = ITEMS[itemId];
   ctx.emit({
     type: 'log',
@@ -327,7 +375,7 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     ctx.error(meta.entityId, 'There is no merchant nearby.');
     return;
   }
-  if (def.noVendorSell) {
+  if (def.noVendorSell || def.soulbound) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -335,7 +383,7 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     ctx.error(meta.entityId, 'You cannot sell quest items.');
     return;
   }
-  ctx.removeItem(itemId, sellCount, meta.entityId);
+  removePreferFungible(ctx, itemId, sellCount, meta.entityId);
   recordVendorBuyback(meta, itemId, sellCount);
   const payout = def.sellValue * sellCount;
   meta.copper += payout;
@@ -368,7 +416,12 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     .filter((s) => {
       const def = ITEMS[s.itemId];
       return (
-        !!def && def.quality === 'poor' && def.kind !== 'quest' && !def.noVendorSell && s.count > 0
+        !!def &&
+        def.quality === 'poor' &&
+        def.kind !== 'quest' &&
+        !def.noVendorSell &&
+        !def.soulbound &&
+        s.count > 0
       );
     })
     .map((s) => ({ itemId: s.itemId, count: s.count }));

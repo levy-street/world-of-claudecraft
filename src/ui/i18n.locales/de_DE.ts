@@ -4515,7 +4515,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} Sek.',
-  'hudChrome.mobile.autorun': 'Auto-Laufen',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik aus',
   'hudChrome.mobile.hotbarPage': 'Fähigkeiten',
@@ -6695,4 +6694,21 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Ihr verlasst die Warteschlange für Yumi beschützen.',
   'yumi.queue.teamLeave': 'Euer Team verlässt die Warteschlange für Yumi beschützen.',
   'yumi.respawn.title': 'AM BODEN!',
+  'hudChrome.auth.forgotPrompt': 'Passwort vergessen?',
+  'hudChrome.auth.forgotTitle': 'Passwort zurücksetzen',
+  'hudChrome.auth.forgotHint':
+    'Gib deinen Benutzernamen ein und wir senden einen Link zum Zurücksetzen an die hinterlegte E-Mail-Adresse.',
+  'hudChrome.auth.forgotUsername': 'Benutzername',
+  'hudChrome.auth.forgotSubmit': 'Link zum Zurücksetzen senden',
+  'hudChrome.auth.forgotSent':
+    'Falls ein Konto mit diesem Benutzernamen eine E-Mail-Adresse hinterlegt hat, haben wir einen Link zum Zurücksetzen gesendet. Prüfe deinen Posteingang.',
+  'hudChrome.auth.forgotBack': 'Zurück zur Anmeldung',
+  'hudChrome.auth.resetTitle': 'Neues Passwort wählen',
+  'hudChrome.auth.resetNewPassword': 'Neues Passwort',
+  'hudChrome.auth.resetConfirm': 'Neues Passwort bestätigen',
+  'hudChrome.auth.resetSubmit': 'Passwort aktualisieren',
+  'hudChrome.auth.resetDone': 'Dein Passwort wurde aktualisiert. Du kannst dich jetzt anmelden.',
+  'hudChrome.auth.resetMismatch': 'Die Passwörter stimmen nicht überein.',
+  'hudChrome.auth.resetErrInvalid':
+    'Dieser Link zum Zurücksetzen ist ungültig oder abgelaufen. Fordere einen neuen an.',
 };

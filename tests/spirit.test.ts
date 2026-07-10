@@ -350,6 +350,54 @@ describe('spirit: delve respawn (unchanged bounded rules)', () => {
     const events = sim.tick();
     expect(events.some((ev: any) => ev.type === 'delveFailed')).toBe(true);
   });
+
+  it('a delve respawn also clears a held movement key (#1651)', () => {
+    const sim = makeSim('rogue', 99);
+    const reliquary = DELVES.collapsed_reliquary;
+    sim.setPlayerLevel(reliquary.minLevel);
+    const p = sim.player as AnyEntity;
+    p.pos = { x: reliquary.doorPos.x, y: 0, z: reliquary.doorPos.z };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId) as any;
+    run.modules = ['reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+
+    sim.moveInput.strafeLeft = true;
+    p.dead = true;
+    sim.releaseSpirit();
+    expect(p.dead).toBe(false);
+    expect(sim.moveInput.strafeLeft).toBe(false);
+  });
+
+  it('a second delve death (run-failing eject to the door) also clears a held movement key', () => {
+    const sim = makeSim('rogue', 99);
+    const reliquary = DELVES.collapsed_reliquary;
+    sim.setPlayerLevel(reliquary.minLevel);
+    const p = sim.player as AnyEntity;
+    p.pos = { x: reliquary.doorPos.x, y: 0, z: reliquary.doorPos.z };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId) as any;
+    run.modules = ['reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+
+    p.dead = true;
+    sim.releaseSpirit();
+    expect(p.dead).toBe(false);
+
+    const e2 = sim.entities.get(sim.playerId) as AnyEntity;
+    sim.moveInput.back = true;
+    e2.dead = true;
+    sim.releaseSpirit();
+    const events = sim.tick();
+    expect(events.some((ev: any) => ev.type === 'delveFailed')).toBe(true);
+    expect(sim.moveInput.back).toBe(false);
+  });
 });
 
 describe('spirit: ghost movement (tick loop)', () => {
@@ -375,6 +423,63 @@ describe('spirit: ghost movement (tick loop)', () => {
     expect(p.dead).toBe(true);
     expect(p.ghost).toBe(true);
     expect(p.hp).toBe(p.maxHp);
+  });
+});
+
+describe('spirit: stale movement intent does not survive death (#1651)', () => {
+  it('releasing the spirit clears a held movement key, so the ghost does not walk on its own', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    // the player was holding "back" the instant they died
+    sim.moveInput.back = true;
+    p.dead = true;
+    sim.releaseSpirit();
+    expect(sim.moveInput).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+    });
+    // ticking with the stale input gone, the ghost stays put
+    const posAfterRelease = { ...p.pos };
+    sim.tick();
+    expect(dist2d(p.pos, posAfterRelease)).toBeLessThan(0.01);
+  });
+
+  it('resurrecting at the corpse clears a held movement key, so the revived body does not walk on its own', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.dead = true;
+    sim.releaseSpirit();
+    const corpse = { ...(p.corpsePos as { x: number; y: number; z: number }) };
+    p.pos = { x: corpse.x, y: corpse.y, z: corpse.z };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    // a key held while running the ghost back must not survive into the revived body
+    sim.moveInput.back = true;
+    sim.resurrectAtCorpse();
+    expect(p.dead).toBe(false);
+    expect(sim.moveInput.back).toBe(false);
+    const posAfterRevive = { ...p.pos };
+    sim.tick();
+    expect(dist2d(p.pos, posAfterRevive)).toBeLessThan(0.01);
+  });
+
+  it('resurrecting at the Spirit Healer also clears a held movement key', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.dead = true;
+    sim.releaseSpirit();
+    sim.moveInput.forward = true;
+    sim.resurrectAtSpiritHealer();
+    expect(p.dead).toBe(false);
+    expect(sim.moveInput.forward).toBe(false);
   });
 });
 
