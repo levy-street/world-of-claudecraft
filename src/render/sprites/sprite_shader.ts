@@ -69,7 +69,7 @@ void main() {
   // 2. Apply material color tint (entity-specific tint, ghost, soulRend)
   texColor.rgb *= color;
 
-  // 2. Ambient lighting (hemisphere blend)
+  // 3. Ambient lighting (hemisphere blend)
   //    Upper hemisphere = sky color, lower = ground color
   float hemiBlend = 0.5; // fixed blend for sprites (no normal)
   vec3 hemiColor = mix(uHemiGroundColor, uHemiSkyColor, hemiBlend);

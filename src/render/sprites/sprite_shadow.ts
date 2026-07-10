@@ -41,20 +41,20 @@ function getTex(): THREE.CanvasTexture {
   return _tex;
 }
 
-// Shared material — transparent, no depth write, reads fog from sprite lighting uniforms
-let _mat: THREE.MeshBasicMaterial | null = null;
-function getMat(): THREE.MeshBasicMaterial {
-  _mat ??= new THREE.MeshBasicMaterial({
+// Template material — each shadow gets its own clone so per-entity
+// opacity/color writes don't overwrite other shadows.
+let _matTemplate: THREE.MeshBasicMaterial | null = null;
+function getMatTemplate(): THREE.MeshBasicMaterial {
+  _matTemplate ??= new THREE.MeshBasicMaterial({
     map: getTex(),
     transparent: true,
     depthWrite: false,
     colorWrite: true,
     side: THREE.DoubleSide,
     fog: true,
-    // Tint the shadow with the fog color so it blends in indoor/foggy areas
     color: new THREE.Color(spriteLightingUniforms.uFogColor.value),
   });
-  return _mat;
+  return _matTemplate;
 }
 
 // Up vector for slope detection
@@ -67,6 +67,7 @@ const _normal = new THREE.Vector3();
 
 export interface SpriteShadow {
   mesh: THREE.Mesh;
+  material: THREE.MeshBasicMaterial;
   visible: boolean;
 }
 
@@ -77,12 +78,13 @@ const _worldPos = new THREE.Vector3();
  * sprite root) and sits at y ≈ 0 (ground level).
  */
 export function createSpriteShadow(parent: THREE.Object3D): SpriteShadow {
-  const mesh = new THREE.Mesh(getGeo(), getMat());
+  const material = getMatTemplate().clone();
+  const mesh = new THREE.Mesh(getGeo(), material);
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = 0.02; // tiny lift to avoid z-fight with terrain
   mesh.renderOrder = -1; // draw before sprite
   parent.add(mesh);
-  return { mesh, visible: false };
+  return { mesh, material, visible: false };
 }
 
 /**
@@ -146,10 +148,10 @@ export function updateSpriteShadow(
   // Opacity: fade with camera distance (top-down cameras → smaller shadow)
   const slopeFade = (slopeDot - SLOPE_FADE_THRESHOLD) / (1 - SLOPE_FADE_THRESHOLD);
   const camFactor = THREE.MathUtils.clamp(1 - Math.abs(camY - groundY) * 0.05, 0.4, 1);
-  shadow.mesh.material.opacity = slopeFade * camFactor;
+  shadow.material.opacity = slopeFade * camFactor;
 
   // Tint shadow with fog color for environment blending
-  shadow.mesh.material.color.copy(spriteLightingUniforms.uFogColor.value);
+  shadow.material.color.copy(spriteLightingUniforms.uFogColor.value);
 
   shadow.mesh.visible = true;
   shadow.visible = true;
@@ -160,6 +162,5 @@ export function updateSpriteShadow(
  */
 export function disposeSpriteShadow(shadow: SpriteShadow, parent: THREE.Object3D): void {
   parent.remove(shadow.mesh);
-  shadow.mesh.geometry = getGeo(); // shared, don't dispose
-  // material is shared — don't dispose
+  shadow.material.dispose();
 }
