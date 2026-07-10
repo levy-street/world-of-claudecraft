@@ -125,11 +125,7 @@ describe('content referential integrity', () => {
   });
 
   it('stocks simple fishing poles at a general vendor in every zone', () => {
-    const generalPoleVendors = [
-      'trader_wilkes',
-      'provisioner_hale',
-      'quartermaster_bree',
-    ] as const;
+    const generalPoleVendors = ['trader_wilkes', 'provisioner_hale', 'quartermaster_bree'] as const;
 
     for (const vendorId of generalPoleVendors) {
       expect(NPCS[vendorId]?.vendorItems ?? [], vendorId).toContain('simple_fishing_pole');
