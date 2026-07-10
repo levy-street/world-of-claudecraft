@@ -911,13 +911,13 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r17_master_tamer',
           name: 'Master Tamer',
           description:
-            'When Patch Up runs its full 15 sec duration, the target gains a shield absorbing 60 damage for 8 sec.',
+            'Your bond with your pet steels you: taking a hit above 30% of your maximum health grants a shield absorbing 60 damage for 8 sec. 20 sec cooldown.',
           icon: 'tame_beast',
           effect: {
             proc: {
               id: 'hun_master_tamer',
               name: 'Master Tamer',
-              trigger: { on: 'hotExpired', ability: 'mend_pet' },
+              trigger: { on: 'bigHitTaken', hpFrac: 0.3, icd: 20 },
               responses: [{ kind: 'absorb', amount: 60, duration: 8, name: 'Master Tamer' }],
             },
           },
@@ -1772,13 +1772,13 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_tidal_waves',
           name: 'Tidal Waves',
           description:
-            'Each Chain Heal you cast makes your next Mending Waters within 10 sec instant.',
+            'Every 3rd Mending Waters you cast makes your next Mending Waters within 10 sec instant.',
           icon: 'healing_wave',
           effect: {
             proc: {
               id: 'sha_tidal_waves',
               name: 'Tidal Waves',
-              trigger: { on: 'castNth', n: 1, abilities: ['chain_heal'] },
+              trigger: { on: 'castNth', n: 3, abilities: ['healing_wave'] },
               responses: [
                 {
                   kind: 'empowerNext',
@@ -2119,14 +2119,22 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r5_natures_bounty',
           name: "Nature's Bounty",
-          description: 'When Rejuvenation runs its full duration, Swiftmend cooldown is reset.',
+          description:
+            'When Rejuvenation runs its full duration, your next Regrowth within 8 sec is instant.',
           icon: 'rejuvenation',
           effect: {
             proc: {
               id: 'dru_natures_bounty',
               name: "Nature's Bounty",
               trigger: { on: 'hotExpired', ability: 'rejuvenation' },
-              responses: [{ kind: 'cooldownRefund', ability: 'swiftmend', seconds: 'reset' }],
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['regrowth'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },
@@ -2153,7 +2161,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r8_brutal_bash',
           name: 'Brutal Bash',
-          description: 'Concuss restores 15 rage and resets Feral Charge cooldown.',
+          description: 'Concuss restores 15 rage and makes your next Maul within 8 sec free.',
           icon: 'bash',
           effect: {
             proc: {
@@ -2162,7 +2170,12 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
               trigger: { on: 'castNth', n: 1, abilities: ['bash'] },
               responses: [
                 { kind: 'resource', amount: 15 },
-                { kind: 'cooldownRefund', ability: 'feral_charge', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['maul'],
+                  duration: 8,
+                },
               ],
             },
           },
@@ -2326,7 +2339,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r17_survival_of_the_fittest',
           name: 'Survival of the Fittest',
           description:
-            'Taking a hit above 20% of your maximum health restores 20 rage and refunds 30 sec of Savage Mending cooldown. 20 sec internal cooldown.',
+            'Taking a hit above 20% of your maximum health restores 20 rage and shields you, absorbing 80 damage for 6 sec. 20 sec internal cooldown.',
           icon: 'bear_form',
           effect: {
             proc: {
@@ -2335,7 +2348,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
               trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
               responses: [
                 { kind: 'resource', amount: 20 },
-                { kind: 'cooldownRefund', ability: 'frenzied_regeneration', seconds: 30 },
+                { kind: 'absorb', amount: 80, duration: 6, name: 'Survival of the Fittest' },
               ],
             },
           },

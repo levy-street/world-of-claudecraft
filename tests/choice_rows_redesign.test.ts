@@ -207,12 +207,13 @@ describe('shaman redesign', () => {
     expect(before! - after).toBeGreaterThan(0.5);
   });
 
-  it('Tidal Waves: Chain Heal makes the next Mending Waters instant', () => {
+  it('Tidal Waves: every 3rd Mending Waters makes the next one instant', () => {
+    // Self-contained: triggers off baseline Healing Wave (Mending Waters), not
+    // the unobtainable Chain Heal.
     const { sim, p } = rig('shaman', 20, { 20: 'sha_r20_tidal_waves' });
-    sim.setSpec('restoration');
     p.hp = Math.round(p.maxHp * 0.5);
     sim.targetEntity(sim.playerId);
-    castAndSettle(sim, 'chain_heal', 5);
+    for (let i = 0; i < 3; i++) castAndSettle(sim, 'healing_wave', 5);
     expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(true);
     p.resource = p.maxResource;
     sim.castAbility('healing_wave');

@@ -123,8 +123,10 @@ describe('hunter wave 2 choice rows', () => {
       17: 'hun_r17_master_tamer',
       20: 'hun_r20_improved_volley',
     });
-    p.hp = Math.round(p.maxHp * 0.6);
-    expireHot(sim, 'mend_pet', p);
+    // Master Tamer is now a self-contained defensive proc (big hit -> shield),
+    // no longer contingent on the Patch Up (mend_pet) talent.
+    p.hp = p.maxHp;
+    dealDamage(sim, p, Math.ceil(p.maxHp * 0.35));
     expect(p.auras.some((a) => a.id === 'hun_master_tamer')).toBe(true);
     completeCast(sim, 'volley');
     expect(p.auras.some((a) => a.id === 'hun_improved_volley')).toBe(true);
@@ -169,11 +171,12 @@ describe('druid wave 2 choice rows', () => {
     castAndSettle(sim, 'cat_form', 1);
     expect(p.auras.some((a) => a.id === 'dru_redmaw')).toBe(true);
 
-    const healer = rig('druid', 20, { 5: 'dru_r5_natures_bounty' }, 'restoration');
-    healer.p.cooldowns.set('swiftmend', 30);
+    // Nature's Bounty is now self-contained: a full-duration Rejuvenation
+    // empowers the next Regrowth (baseline) instead of resetting Swiftmend.
+    const healer = rig('druid', 20, { 5: 'dru_r5_natures_bounty' });
     healer.p.hp = Math.round(healer.p.maxHp * 0.5);
     expireHot(healer.sim, 'rejuvenation', healer.p);
-    expect(healer.p.cooldowns.has('swiftmend')).toBe(false);
+    expect(healer.p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(true);
   });
 
   it('Empowered Touch echo and Survival of the Fittest big-hit loop resolve', () => {
@@ -190,11 +193,12 @@ describe('druid wave 2 choice rows', () => {
       17: 'dru_r17_survival_of_the_fittest',
       20: 'dru_r20_improved_hurricane',
     });
+    // Survival of the Fittest is now self-contained: a big hit restores rage
+    // and grants a shield, instead of refunding the same-row Savage Mending.
     bear.p.resource = 0;
-    bear.p.cooldowns.set('frenzied_regeneration', 100);
     dealDamage(bear.sim, bear.p, Math.ceil(bear.p.maxHp * 0.25));
     expect(bear.p.resource).toBe(20);
-    expect(bear.p.cooldowns.get('frenzied_regeneration')).toBe(70);
+    expect(bear.p.auras.some((a) => a.id === 'dru_survival_of_the_fittest')).toBe(true);
     bear.p.cooldowns.set('hurricane', 10);
     completeCast(bear.sim, 'hurricane');
     expect(bear.p.cooldowns.get('hurricane')).toBe(6);
