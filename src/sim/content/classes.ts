@@ -4574,7 +4574,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: false,
     targetMode: 'position',
-    effects: [{ type: 'aoeDamage', min: 34, max: 42, radius: 8 }],
+    effects: [{ type: 'aoeDamage', min: 24, max: 28, radius: 8 }],
     description:
       'Channels shadow energy at the target area, damaging nearby enemies each second for $d. (Priest talent)',
   },

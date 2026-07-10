@@ -926,18 +926,18 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r17_thick_hide',
           name: 'Calloused Hide',
           description:
-            'Taking a hit above 15% of your maximum health makes your next Rattling Shot within 8 sec free. 20 sec internal cooldown.',
+            'Taking a hit above 15% of your maximum health makes your next Aimed Shot within 8 sec instant. 15 sec internal cooldown.',
           icon: 'aspect_of_the_monkey',
           effect: {
             proc: {
               id: 'hun_calloused_hide',
               name: 'Calloused Hide',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 15 },
               responses: [
                 {
                   kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['concussive_shot'],
+                  aura: 'next_cast_instant',
+                  abilities: ['aimed_shot'],
                   duration: 8,
                 },
               ],
