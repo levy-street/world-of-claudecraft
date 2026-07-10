@@ -3,7 +3,7 @@
 Generated via the Higgsfield MCP connector (Recraft V4.1 for stills, Seedance 2.0
 for motion), then composited and web-optimized locally. Identity is pinned in
 [CLAUDIUM_VISUAL_ID.md](CLAUDIUM_VISUAL_ID.md): a platinum coin with a hexagonal
-bezel and a violet-to-cyan arcane gem core, distinct from the gold $WOC token.
+bezel and a blue-essence-to-cyan arcane gem core, distinct from the gold $WOC token.
 
 Credit spend: 336 Higgsfield credits total (877.16 to 541.16). All assets are the
 project's preferred formats: WebP for transparent art, mp4 + webm + poster for
