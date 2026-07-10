@@ -1,6 +1,6 @@
 import { audio } from '../game/audio';
 import type { GamepadKind } from '../game/gamepad_map';
-import { isLiveAttackTarget } from '../game/interactions';
+import { isLiveAttackTarget, mobileAttackTapAction } from '../game/interactions';
 import type { Keybinds } from '../game/keybinds';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
@@ -871,10 +871,9 @@ export class Hud {
   // pick the touch layer uses. Null until wired; the attack handler then falls
   // back to the plain castSlot(0) toggle.
   onMobileAttackNearest: (() => void) | null = null;
-  // Context replacement for the primary mobile Attack button: main.ts owns the
-  // world scan/action, while HUD only decides when combat state permits using it.
+  // Context replacement state for the mobile Jump button: main.ts owns both
+  // the world scan/action and the fallback jump; HUD only paints the live state.
   onMobileCanContextInteract: (() => boolean) | null = null;
-  onMobileContextInteract: (() => boolean) | null = null;
   private hotbarActions: HotbarAction[] = []; // index = barSlot-1
   private loadedSlotMapFromStorage = false;
   private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
@@ -4538,6 +4537,9 @@ export class Hud {
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
+    // Jump/Interact owns dynamic copy that deliberately has no static data-i18n
+    // attributes; force its cached painter state to rebuild in the new locale.
+    this.mobileActionRingPainter?.relocalize();
     // The unit-frame move/lock buttons' labels are set once at construction + on
     // toggle, so re-localize them in place on a language switch (same reason as
     // the party rows above).
@@ -5525,17 +5527,27 @@ export class Hud {
 
   private buildMobileActionRing(): void {
     const attackBtn = document.getElementById('mobile-action-attack') as HTMLButtonElement | null;
+    const jumpBtn = document.getElementById('mobile-jump') as HTMLButtonElement | null;
+    const jumpLabel = jumpBtn?.querySelector<HTMLElement>('.mobile-label');
     const slotBtns = Array.from(
       document.querySelectorAll<HTMLButtonElement>('.mobile-action-slot'),
     ).sort((a, b) => Number(a.dataset.mobileIndex ?? 0) - Number(b.dataset.mobileIndex ?? 0));
     const pageToggle = document.getElementById('mobile-action-page-toggle');
     const pageIndicator = pageToggle?.querySelector<HTMLElement>('.mobile-action-page-indicator');
-    if (!attackBtn || slotBtns.length !== 5 || !pageToggle || !pageIndicator) return;
+    if (
+      !attackBtn ||
+      !jumpBtn ||
+      !jumpLabel ||
+      slotBtns.length !== 5 ||
+      !pageToggle ||
+      !pageIndicator
+    )
+      return;
     this.mobileRingAttackBtn = attackBtn;
     this.mobileRingSlotBtns = slotBtns;
     hydrateIcons(attackBtn.parentElement ?? document);
-    if (!attackBtn.querySelector(':scope > .mobile-action-context-icon')) {
-      attackBtn.insertAdjacentHTML(
+    if (!jumpBtn.querySelector(':scope > .mobile-action-context-icon')) {
+      jumpBtn.insertAdjacentHTML(
         'afterbegin',
         svgIcon('interact', { cls: 'mobile-action-context-icon' }),
       );
@@ -5557,18 +5569,18 @@ export class Hud {
       return { btn, label, countEl, keybindEl, cdOverlay, cdText };
     });
 
-    // Wire clicks: attack -> context interact first when combat state permits
-    // it, otherwise the classic toggle via castSlot(0) while auto-attacking or
-    // holding a live hostile target, and the acquire-nearest fallback (the old
-    // Closest behavior, injected by main.ts as onMobileAttackNearest) with
-    // nothing usable nearby. Slot buttons -> castSlot(the resolved source slot
-    // for the CURRENT page at click time, not a captured page). Mirrors the
-    // desktop action-btn click pattern (audio.click, blur), EXCEPT the peek
-    // guard: the ring has no tooltip of its own (see the no-tooltip note below),
-    // so a set peek flag here is always STALE cross-talk from some other
-    // control's long-press. Each handler clears it and dismisses any lingering
-    // tooltip box but never early-returns on it (an early return here ate the
-    // player's next cast).
+    // Wire clicks: attack keeps the classic toggle via castSlot(0) while
+    // auto-attacking or holding a live attack target, and the acquire-nearest
+    // fallback (the old Closest behavior, injected by main.ts as
+    // onMobileAttackNearest) otherwise. Jump/Interact stays owned by
+    // MobileControls so its press-first path works with the movement thumb held.
+    // Slot buttons -> castSlot(the resolved source slot for the CURRENT page at
+    // click time, not a captured page). Mirrors the desktop action-btn click
+    // pattern (audio.click, blur), EXCEPT the peek guard: the ring has no tooltip
+    // of its own (see the no-tooltip note below), so a set peek flag here is
+    // always STALE cross-talk from some other control's long-press. Each handler
+    // clears it and dismisses any lingering tooltip box but never early-returns
+    // on it (an early return here ate the player's next cast).
     // bindTouchTap, not 'click': the browser only synthesizes click for the
     // PRIMARY pointer, so click-bound ring buttons went dead the moment the
     // other thumb held the joystick, which is how combat is actually played.
@@ -5579,14 +5591,13 @@ export class Hud {
       const p = this.sim.player;
       const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
       const hasLiveAttackTarget = this.hasLiveMobileAttackTarget(target ?? null);
-      const contextInteracted =
-        !p.autoAttack && !hasLiveAttackTarget && !!this.onMobileContextInteract?.();
-      if (!contextInteracted) {
-        if (p.autoAttack || hasLiveAttackTarget || !this.onMobileAttackNearest) {
-          this.castSlot(0);
-        } else {
-          this.onMobileAttackNearest();
-        }
+      if (
+        mobileAttackTapAction(p.autoAttack, hasLiveAttackTarget, !!this.onMobileAttackNearest) ===
+        'toggle'
+      ) {
+        this.castSlot(0);
+      } else {
+        this.onMobileAttackNearest?.();
       }
       attackBtn.blur();
     });
@@ -5661,6 +5672,7 @@ export class Hud {
           container: document.getElementById('mobile-action-ring') as HTMLElement,
           slots: ringEls,
         },
+        contextAction: { button: jumpBtn, label: jumpLabel },
         pageToggle: pageToggle as HTMLElement,
         pageIndicator,
       },
@@ -6755,9 +6767,7 @@ export class Hud {
     // stay undefined when the ring DOM never got built, e.g. an older cached
     // template). Reuses the exact same world snapshot as the desktop bar.
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
-      const hasLiveAttackTarget = this.hasLiveMobileAttackTarget(target ?? null);
-      const contextInteract =
-        !p.autoAttack && !hasLiveAttackTarget && !!this.onMobileCanContextInteract?.();
+      const contextInteract = !!this.onMobileCanContextInteract?.();
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick({
           player: p,

@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { setInterfaceMode } from '../src/game/mobile_controls';
-import { applyMobileHudLayout } from '../src/game/mobile_hud_layout_applier';
+import {
+  applyMobileHudLayout,
+  syncMobileMenuPlacement,
+} from '../src/game/mobile_hud_layout_applier';
 
 // Hand-rolled fake DOM (the tests/CLAUDE.md idiom: no jsdom). Models only the
 // contract applyMobileHudLayout touches: classList add/remove/contains and
@@ -29,12 +32,68 @@ class FakeBody {
   };
 }
 
+class FakeElement {
+  parentElement: FakeElement | null = null;
+  readonly children: FakeElement[] = [];
+  focused = false;
+
+  constructor(readonly id: string) {}
+
+  get firstChild(): FakeElement | null {
+    return this.children[0] ?? null;
+  }
+
+  insertBefore(node: FakeElement, before: FakeElement | null): FakeElement {
+    if (node.parentElement) {
+      const oldIndex = node.parentElement.children.indexOf(node);
+      if (oldIndex >= 0) node.parentElement.children.splice(oldIndex, 1);
+    }
+    const index = before ? this.children.indexOf(before) : -1;
+    this.children.splice(index >= 0 ? index : this.children.length, 0, node);
+    node.parentElement = this;
+    return node;
+  }
+
+  append(...nodes: FakeElement[]): void {
+    for (const node of nodes) this.insertBefore(node, null);
+  }
+
+  contains(node: unknown): boolean {
+    return node === this || this.children.some((child) => child.contains(node));
+  }
+
+  focus(): void {
+    this.focused = true;
+  }
+}
+
+function menuDocument() {
+  const combat = new FakeElement('mobile-combat-controls');
+  const extra = new FakeElement('mobile-extra-grid');
+  const chat = new FakeElement('mobile-chat');
+  const social = new FakeElement('mobile-social');
+  const quest = new FakeElement('mobile-quest');
+  const menu = new FakeElement('mobile-menu');
+  const more = new FakeElement('mobile-more');
+  const bags = new FakeElement('mobile-bags');
+  combat.append(chat, social, quest, menu, more);
+  extra.append(bags);
+  const elements = new Map(
+    [combat, extra, chat, social, quest, menu, more, bags].map((el) => [el.id, el]),
+  );
+  const document = {
+    activeElement: null,
+    getElementById: (id: string) => elements.get(id) ?? null,
+  } as unknown as Document;
+  return { document, combat, extra, social, menu, more };
+}
+
 function fakeWin(width: number, height: number, body: FakeBody) {
   return {
     innerWidth: width,
     innerHeight: height,
     matchMedia: () => ({ matches: false }),
-    document: { body: body as unknown as HTMLElement },
+    document: { body: body as unknown as HTMLElement, getElementById: () => null },
   } as unknown as Window;
 }
 
@@ -120,5 +179,58 @@ describe('applyMobileHudLayout', () => {
     });
     applyMobileHudLayout(fakeWin(390, 844, body));
     expect(body.classList.contains('hud-mobile-compact')).toBe(true);
+  });
+});
+
+describe('syncMobileMenuPlacement', () => {
+  it('moves the same Social and Settings nodes to the start of More in compact mode', () => {
+    const { document, combat, extra, social, menu } = menuDocument();
+
+    syncMobileMenuPlacement(document, 'compact');
+
+    expect(combat.children.map((el) => el.id)).toEqual([
+      'mobile-chat',
+      'mobile-quest',
+      'mobile-more',
+    ]);
+    expect(extra.children.map((el) => el.id)).toEqual([
+      'mobile-social',
+      'mobile-menu',
+      'mobile-bags',
+    ]);
+    expect(extra.children[0]).toBe(social);
+    expect(extra.children[1]).toBe(menu);
+  });
+
+  it('restores the full direct order and stays idempotent across repeated transitions', () => {
+    const { document, combat, extra } = menuDocument();
+
+    syncMobileMenuPlacement(document, 'compact');
+    syncMobileMenuPlacement(document, 'compact');
+    syncMobileMenuPlacement(document, 'full');
+    syncMobileMenuPlacement(document, 'full');
+
+    expect(combat.children.map((el) => el.id)).toEqual([
+      'mobile-chat',
+      'mobile-social',
+      'mobile-quest',
+      'mobile-menu',
+      'mobile-more',
+    ]);
+    expect(extra.children.map((el) => el.id)).toEqual(['mobile-bags']);
+  });
+
+  it('moves focus to More before compact placement hides a focused direct action', () => {
+    const { document, social, more } = menuDocument();
+    (document as unknown as { activeElement: FakeElement }).activeElement = social;
+
+    syncMobileMenuPlacement(document, 'compact');
+
+    expect(more.focused).toBe(true);
+  });
+
+  it('does nothing when a cached or partial shell omits one of the required nodes', () => {
+    const document = { getElementById: () => null } as unknown as Document;
+    expect(() => syncMobileMenuPlacement(document, 'compact')).not.toThrow();
   });
 });

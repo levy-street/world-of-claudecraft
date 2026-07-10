@@ -17,14 +17,24 @@
 // in one place. Fields: name, w/h CSS viewport, dsf deviceScaleFactor, tier the
 // expected responsive body class.
 export const PROFILES = [
-  { name: 'iphone-13-landscape', w: 844, h: 390, dsf: 3, tier: 'hud-mobile-compact' },
-  { name: 'iphone-pro-max-landscape', w: 932, h: 430, dsf: 3, tier: 'hud-mobile-compact' },
-  { name: 'pixel-7-landscape', w: 915, h: 412, dsf: 2.625, tier: 'hud-mobile-compact' },
   { name: 'galaxy-s8-landscape', w: 740, h: 360, dsf: 3, tier: 'hud-mobile-compact' },
-  { name: 'small-laptop-720p', w: 1280, h: 720, dsf: 1, tier: 'hud-mobile-standard' },
+  { name: 'iphone-13-landscape', w: 844, h: 390, dsf: 3, tier: 'hud-mobile-compact' },
+  { name: 'pixel-7-landscape', w: 915, h: 412, dsf: 2.625, tier: 'hud-mobile-compact' },
+  { name: 'iphone-pro-max-landscape', w: 932, h: 430, dsf: 3, tier: 'hud-mobile-compact' },
+  { name: 'touch-laptop-landscape', w: 1280, h: 720, dsf: 1, tier: 'hud-mobile-standard' },
   { name: 'tablet-4-3', w: 1024, h: 768, dsf: 2, tier: 'hud-mobile-tablet' },
-  { name: 'fhd-1080p', w: 1920, h: 1080, dsf: 1, tier: 'hud-mobile-tablet' },
+  { name: 'fhd-touch-landscape', w: 1920, h: 1080, dsf: 1, tier: 'hud-mobile-tablet' },
+  { name: 'iphone-13-portrait', w: 390, h: 844, dsf: 3, tier: 'hud-mobile-compact' },
+  { name: 'tablet-4-3-portrait', w: 768, h: 1024, dsf: 2, tier: 'hud-mobile-standard' },
+  { name: 'large-tablet-portrait', w: 1024, h: 1366, dsf: 2, tier: 'hud-mobile-tablet' },
 ];
+
+export const SAFE_AREA_VECTORS = {
+  none: { top: 0, right: 0, bottom: 0, left: 0 },
+  landscapeNotchRight: { top: 0, right: 44, bottom: 21, left: 0 },
+  landscapeNotchLeft: { top: 0, right: 0, bottom: 21, left: 44 },
+  portraitNotch: { top: 47, right: 0, bottom: 34, left: 0 },
+};
 
 // Edge distance between two rects: positive = separated, negative = overlap depth.
 export function edgeGap(a, b) {

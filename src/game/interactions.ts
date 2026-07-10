@@ -13,6 +13,8 @@ export interface PickInteractionWorld {
   targetEntity(id: number | null): void;
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
+  lootCorpse(id: number): void;
+  delveInteract(objectId: number): void;
   pickUpObject(id: number): void;
   startAutoAttack(): void;
   resurrectAtSpiritHealer(): void;
@@ -40,6 +42,25 @@ export type NearbyInteraction =
 
 export function findNearbyInteraction(world: NearbyInteractionWorld): NearbyInteraction | null {
   const p = world.player;
+  // The unreleased dead cannot act at all. A released ghost can only use the
+  // Spirit Healer, which is the one interaction that advances the death loop.
+  // Keep that exception here so the painter probe and the action selector stay
+  // byte-for-byte equivalent about when Jump becomes Interact.
+  if (p.dead) {
+    if (!p.ghost) return null;
+    let bestHealer: number | null = null;
+    let bestHealerD = INTERACT_RANGE;
+    for (const e of world.entities.values()) {
+      if (e.kind !== 'npc' || e.templateId !== 'spirit_healer') continue;
+      const d = dist2d(p.pos, e.pos);
+      if (d < bestHealerD) {
+        bestHealer = e.id;
+        bestHealerD = d;
+      }
+    }
+    return bestHealer === null ? null : { kind: 'npc', id: bestHealer };
+  }
+
   let bestCorpse: number | null = null;
   let bestCorpseD = INTERACT_RANGE;
   let bestObj: number | null = null;
@@ -81,6 +102,18 @@ export function findNearbyInteraction(world: NearbyInteractionWorld): NearbyInte
 
 export function hasNearbyInteraction(world: NearbyInteractionWorld): boolean {
   const p = world.player;
+  if (p.dead) {
+    if (!p.ghost) return false;
+    for (const e of world.entities.values()) {
+      if (
+        e.kind === 'npc' &&
+        e.templateId === 'spirit_healer' &&
+        dist2d(p.pos, e.pos) < INTERACT_RANGE
+      )
+        return true;
+    }
+    return false;
+  }
   for (const e of world.entities.values()) {
     const d = dist2d(p.pos, e.pos);
     if (e.kind === 'mob' && e.lootable && d < INTERACT_RANGE) return true;
@@ -90,6 +123,69 @@ export function hasNearbyInteraction(world: NearbyInteractionWorld): boolean {
     if (e.kind === 'npc' && d < INTERACT_RANGE + 1) return true;
   }
   return false;
+}
+
+/** Execute the same nearby action selected for keyboard Interact and the
+ * contextual mobile Jump button. Returns false only when Jump should retain
+ * its movement behavior. */
+export function tryNearbyInteraction(
+  world: PickInteractionWorld,
+  hud: PickInteractionHud,
+  showError: boolean,
+): boolean {
+  const action = findNearbyInteraction(world);
+  if (!action) {
+    if (showError) hud.showError(t('errors.nothingInteract'));
+    return false;
+  }
+
+  switch (action.kind) {
+    case 'corpse':
+      world.lootCorpse(action.id);
+      return true;
+    case 'delve':
+      world.delveInteract(action.id);
+      return true;
+    case 'object': {
+      const obj = world.entities.get(action.id);
+      if (!obj) return false;
+      if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
+        world.enterDungeon(obj.dungeonId);
+      } else if (obj.templateId === 'dungeon_exit') {
+        world.leaveDungeon();
+      } else if (obj.templateId === 'mailbox') {
+        hud.openMailbox();
+      } else {
+        world.pickUpObject(action.id);
+      }
+      return true;
+    }
+    case 'npc': {
+      const npc = world.entities.get(action.id);
+      if (npc?.kind !== 'npc') return false;
+      world.targetEntity(action.id);
+      if (world.player.ghost && npc.templateId === 'spirit_healer') {
+        world.resurrectAtSpiritHealer();
+      } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {
+        hud.openDelveBoard(action.id);
+      } else {
+        hud.openQuestDialog(action.id);
+      }
+      return true;
+    }
+  }
+}
+
+export type MobileAttackTapAction = 'toggle' | 'acquire-nearest';
+
+/** Preserve Attack as a dedicated combat toggle, acquiring the nearest enemy
+ * only when there is no current combat action for the button to toggle. */
+export function mobileAttackTapAction(
+  autoAttack: boolean,
+  hasLiveAttackTarget: boolean,
+  canAcquireNearest: boolean,
+): MobileAttackTapAction {
+  return autoAttack || hasLiveAttackTarget || !canAcquireNearest ? 'toggle' : 'acquire-nearest';
 }
 
 export function isAttackHoverTarget(e: Entity | undefined): boolean {

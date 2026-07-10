@@ -13,7 +13,7 @@
 // getComputedStyle read every call, which is unnecessary work when CSS already
 // applies the same insets natively and unconditionally.
 
-import { resolveMobileHudLayout } from '../ui/mobile_hud_layout';
+import { type MobileMenuPlacement, resolveMobileHudLayout } from '../ui/mobile_hud_layout';
 import { isNativeAppShell, useTouchInterface } from './mobile_controls';
 
 const TIER_CLASSES = ['hud-mobile-compact', 'hud-mobile-standard', 'hud-mobile-tablet'];
@@ -21,6 +21,34 @@ const STATE_CLASSES = ['hud-menu-open', 'hud-chat-open'];
 const ALL_LAYOUT_CLASSES = [...TIER_CLASSES, ...STATE_CLASSES];
 
 let previousClasses: string[] = [];
+
+/** Move the existing Social and Settings nodes between the direct action row
+ *  and More. Reparenting preserves their listeners, state, and unique ids. */
+export function syncMobileMenuPlacement(doc: Document, placement: MobileMenuPlacement): void {
+  const combat = doc.getElementById('mobile-combat-controls');
+  const extra = doc.getElementById('mobile-extra-grid');
+  const social = doc.getElementById('mobile-social');
+  const quest = doc.getElementById('mobile-quest');
+  const menu = doc.getElementById('mobile-menu');
+  const more = doc.getElementById('mobile-more');
+  if (!combat || !extra || !social || !quest || !menu || !more) return;
+
+  if (placement === 'compact') {
+    const active = doc.activeElement;
+    if (
+      active &&
+      (social === active || social.contains(active) || menu === active || menu.contains(active))
+    ) {
+      more.focus();
+    }
+    extra.insertBefore(menu, extra.firstChild);
+    extra.insertBefore(social, menu);
+    return;
+  }
+
+  combat.insertBefore(social, quest);
+  combat.insertBefore(menu, more);
+}
 
 /** Read the current viewport/mode state and apply the resolved mobile HUD
  *  layout classes + CSS vars to document.body. Call once at startup (after
@@ -40,6 +68,7 @@ export function applyMobileHudLayout(win: Window = window): void {
     menuOpen: body.classList.contains('mobile-window-open'),
     chatOpen: body.classList.contains('mobile-chat-open'),
   });
+  syncMobileMenuPlacement(doc, layout.menuPlacement);
 
   for (const cls of previousClasses) {
     if (!layout.classes.includes(cls)) body.classList.remove(cls);

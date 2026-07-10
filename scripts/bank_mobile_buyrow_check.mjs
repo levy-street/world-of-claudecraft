@@ -94,10 +94,10 @@ for (const profile of PROFILES) {
   });
   await wait(1000);
 
-  // Act: the REAL contextual mobile interact opens the bank through the primary
-  // action button; deposit-all mounts the status line and fills the vault (which
-  // mounts the full toolbar).
-  await page.evaluate(() => document.querySelector('#mobile-action-attack')?.click());
+  // Act: the REAL contextual mobile Jump/Interact button opens the bank;
+  // deposit-all mounts the status line and fills the vault (which mounts the
+  // full toolbar).
+  await page.evaluate(() => document.querySelector('#mobile-jump')?.click());
   await page.waitForSelector('#bank-window', { visible: true, timeout: 5000 });
   await wait(400);
   await page.evaluate(() => document.querySelector('#bank-window .bank-deposit-all')?.click());

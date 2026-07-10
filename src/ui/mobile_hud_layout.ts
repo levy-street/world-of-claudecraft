@@ -36,6 +36,7 @@ export const TABLET_MIN_DIMENSION_PX = 768;
 export const TABLET_MIN_WIDTH_PX = 1000;
 
 export type MobileHudTier = 'compact' | 'standard' | 'tablet';
+export type MobileMenuPlacement = 'compact' | 'full';
 
 export interface MobileHudLayoutInput {
   /** CSS viewport width in pixels. */
@@ -61,6 +62,9 @@ export interface MobileHudLayoutInput {
 
 export interface MobileHudLayout {
   tier: MobileHudTier;
+  /** Compact exposes Chat/Quests/More directly and moves Social/Settings into
+   *  More. Full restores all five direct actions. */
+  menuPlacement: MobileMenuPlacement;
   /** Exactly one of hud-mobile-compact / hud-mobile-standard / hud-mobile-tablet,
    *  plus hud-menu-open iff menuOpen and hud-chat-open iff chatOpen. Empty when
    *  touchMode is false (desktop stays untouched). */
@@ -91,9 +95,11 @@ const TIER_CLASS: Record<MobileHudTier, string> = {
  *  list when touchMode is false so desktop is never tier-classed. */
 export function resolveMobileHudLayout(input: MobileHudLayoutInput): MobileHudLayout {
   if (!input.touchMode) {
-    return { tier: 'standard', classes: [], cssVars: {} };
+    return { tier: 'standard', menuPlacement: 'full', classes: [], cssVars: {} };
   }
   const tier = resolveTier(input.width, input.height);
+  const menuPlacement: MobileMenuPlacement =
+    tier === 'compact' || input.height > input.width ? 'compact' : 'full';
   const classes: string[] = [TIER_CLASS[tier]];
   if (input.menuOpen) classes.push('hud-menu-open');
   if (input.chatOpen) classes.push('hud-chat-open');
@@ -103,5 +109,5 @@ export function resolveMobileHudLayout(input: MobileHudLayoutInput): MobileHudLa
     '--mobile-hud-safe-bottom': `${input.safeAreaBottom}px`,
     '--mobile-hud-safe-left': `${input.safeAreaLeft}px`,
   };
-  return { tier, classes, cssVars };
+  return { tier, menuPlacement, classes, cssVars };
 }

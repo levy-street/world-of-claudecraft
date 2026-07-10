@@ -202,8 +202,8 @@ describe('bank_window: hud.ts wiring', () => {
   });
 
   it('a banker interact routes to the sim from every input path (gossip never renders for bankers)', () => {
-    // interactKey (keyboard/gamepad), contextual mobile interact, and mouse
-    // click-pick all funnel NPCs into openQuestDialog; the banker arm must
+    // interactKey (keyboard/gamepad), contextual mobile Jump/Interact, and
+    // mouse click-pick all funnel NPCs into openQuestDialog; the banker arm must
     // divert to the sim interact (whose banker intercept emits the bank event
     // both hosts open on) BEFORE any gossip renders, or the bank is unreachable
     // in normal play. Found by a cross-platform audit: every earlier smoke drove

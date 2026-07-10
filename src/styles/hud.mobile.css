@@ -284,10 +284,9 @@
     display: none;
   }
   body.mobile-touch #mobile-camera-joystick {
-    /* Stacked above the move joystick on the LEFT side, not the ring's
-       bottom-right corner, so an opted-in joystick never overlaps the paged
-       action ring cluster (#mobile-action-ring, bottom-right, up to ~290px
-       tall). */
+    /* Base fallback stacks above movement on the movement side. The compact
+       landscape topology later redocks this optional control between the map
+       and movement so it clears the two-row action pad and camera start zone. */
     left: max(18px, env(safe-area-inset-left));
     right: auto;
     bottom: calc(176px + env(safe-area-inset-bottom));
@@ -438,220 +437,114 @@
     pointer-events: auto;
   }
 
-  /* ---------- mobile action ring (paged combat buttons) ---------- */
-  /* Phase 1 of the mobile combat HUD rework: a bottom-right thumb cluster that
-     makes the existing hotbar castable on touch (desktop drag/drop keybinds are
-     unusable on a phone). One fixed primary Attack toggle (castSlot(0), unpaged),
-     5 paged action buttons (2 pages of 5 covering hotbar source slots 1-10, see
-     mobile_action_page_view.ts), a page-cycle toggle, and the Target swap
-     helper. The ring supersedes the desktop #actionbar/#actionbar2 rows under
-     body.mobile-touch (hidden below); xpbar/player-frame/petbar keep rendering
-     (their own mobile rules are untouched).
-
-     GEOMETRY: the 5 paged buttons sit on one circular arc centred on the attack
-     button's centre, a quarter sweep from due-left (180deg) to due-up (90deg) in
-     22.5deg steps, so every adjacent pair has the same centre distance
-     (chord = 2 * R * sin(11.25deg), tuned per tier to action-size + ~10px so
-     buttons never crowd or overlap and nothing pokes past the screen edge; the
-     numeric factors below are cos/sin of 157.5/135/112.5deg). Jump (180deg, due
-     left), Target swap (135deg, the up-left diagonal) and the page toggle
-     (90deg, due up over the attack button, to Target's upper right) nest in
-     the crescent hollow at --mobile-ring-hollow from the attack centre; every
-     seat stays inside the ring box, so nothing overhangs the screen edge.
-     Sizing hooks: --mobile-ring-* are scoped to #mobile-action-ring and
-     re-tuned per layout tier (see the tiers section); --btn-scale
-     (actionButtonScale) and --touch-opacity (touchOpacity) are reused
-     directly, not forked. */
+  /* ---------- mobile action pad (paged combat buttons) ---------- */
+  /* The stable id remains #mobile-action-ring for handler compatibility, but
+     its geometry is a shallow two-row pad. Hitboxes never scale below the
+     48px gameplay floor; --btn-scale applies only to visual descendants. */
   body.mobile-touch #mobile-action-ring {
-    /* Chrome-scale folded into every ring size var (the arc offsets below are
-       expressed in these vars, so the whole cluster shrinks proportionally and keeps
-       its equal-chord geometry). Standard-tier sizes all stay >= 40px at 0.85x
-       (smallest: toggle 52 * 0.85 = 44.2), so no clamp is needed here. */
-    --mobile-ring-attack-size: calc(100px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-action-size: calc(64px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-radius: calc(190px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-toggle-size: calc(52px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-secondary-size: calc(56px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-hollow: calc(104px * var(--mobile-chrome-scale, 1));
+    --mobile-action-hit: 48px;
+    --mobile-action-face: 40px;
+    --mobile-jump-face: 46px;
+    --mobile-attack-face: 36px;
+    --mobile-page-face: 32px;
+    --mobile-action-gap: 4px;
+    --mobile-jump-hit: 56px;
+    --mobile-pad-edge-inline: max(18px, env(safe-area-inset-right));
+    --mobile-pad-edge-bottom: calc(20px + env(safe-area-inset-bottom));
     position: absolute;
-    right: max(18px, env(safe-area-inset-right));
-    bottom: calc(20px + env(safe-area-inset-bottom));
-    width: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) +
-      var(--mobile-ring-action-size) /
-      2
-    );
-    height: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) +
-      var(--mobile-ring-action-size) /
-      2
-    );
-    transform-origin: right bottom;
-    transform: scale(var(--btn-scale, 1));
+    right: var(--mobile-pad-edge-inline);
+    bottom: var(--mobile-pad-edge-bottom);
+    display: grid;
+    grid-template-columns: repeat(4, var(--mobile-action-hit)) var(--mobile-jump-hit);
+    grid-template-rows: var(--mobile-action-hit) var(--mobile-jump-hit);
+    grid-template-areas:
+      ". a1 a2 attack target"
+      "page a3 a4 a5 jump";
+    gap: var(--mobile-action-gap);
+    align-items: center;
+    justify-items: center;
     opacity: var(--touch-opacity, 1);
     pointer-events: none;
     z-index: 31;
   }
   body.mobile-touch #mobile-action-ring > button {
-    position: absolute;
+    --mobile-control-face: var(--mobile-action-face);
+    --mobile-control-border: #4a3d1d;
+    --mobile-control-shadow: inset 0 1px 0 #ffffff14, 0 2px 8px #0009;
+    position: relative;
+    inset: auto;
     pointer-events: auto;
+    width: var(--mobile-action-hit);
+    height: var(--mobile-action-hit);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 2px solid #4a3d1d;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
     color: #eee8ff;
     cursor: var(--cursor-point);
-    box-shadow:
-      inset 0 1px 0 #ffffff14,
-      0 2px 8px #0009;
+    box-shadow: none;
+    isolation: isolate;
   }
-  /* Primary attack toggle: bottom-right anchor of the cluster, largest button. */
-  body.mobile-touch #mobile-action-attack {
-    right: 0;
-    bottom: 0;
-    width: var(--mobile-ring-attack-size);
-    height: var(--mobile-ring-attack-size);
-    color: #ffdf9c;
-    border-color: #8b4e2c;
+  body.mobile-touch #mobile-action-ring > button::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--mobile-control-face);
+    height: var(--mobile-control-face);
+    transform: translate(-50%, -50%) scale(var(--btn-scale, 1));
+    transform-origin: center;
+    border: 2px solid var(--mobile-control-border);
+    border-radius: 14px;
+    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);
+    box-shadow: var(--mobile-control-shadow);
+    pointer-events: none;
+    z-index: -1;
   }
-  /* The 5 paged action buttons: one clean quarter-circle crescent left-and-up
-     of the attack button (pure CSS positioning, no JS layout). Each button's
-     centre is at angle 180 - 22.5 * i deg on the --mobile-ring-radius circle
-     around the attack centre; right/bottom below are that centre math expanded
-     (right = attack/2 + R * cos - action/2, bottom = attack/2 + R * sin -
-     action/2), so the arc holds at every tier/setting size combination and no
-     button ever leaves the viewport (all offsets stay non-negative). */
-  body.mobile-touch .mobile-action-slot {
-    width: var(--mobile-ring-action-size);
-    height: var(--mobile-ring-action-size);
+  body.mobile-touch #mobile-action-ring > #mobile-action-attack {
+    grid-area: attack;
+    --mobile-control-face: var(--mobile-attack-face);
+    --mobile-control-border: #8b4e2c;
+    color: #cbb98f;
+    opacity: 0.82;
   }
   body.mobile-touch .mobile-action-slot[data-mobile-index="0"] {
-    right: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) -
-      var(--mobile-ring-action-size) /
-      2
-    );
-    bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);
+    grid-area: a1;
   }
   body.mobile-touch .mobile-action-slot[data-mobile-index="1"] {
-    right: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.9239 -
-      var(--mobile-ring-action-size) /
-      2
-    );
-    bottom: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.3827 -
-      var(--mobile-ring-action-size) /
-      2
-    );
+    grid-area: a2;
   }
   body.mobile-touch .mobile-action-slot[data-mobile-index="2"] {
-    right: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.7071 -
-      var(--mobile-ring-action-size) /
-      2
-    );
-    bottom: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.7071 -
-      var(--mobile-ring-action-size) /
-      2
-    );
+    grid-area: a3;
   }
   body.mobile-touch .mobile-action-slot[data-mobile-index="3"] {
-    right: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.3827 -
-      var(--mobile-ring-action-size) /
-      2
-    );
-    bottom: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.9239 -
-      var(--mobile-ring-action-size) /
-      2
-    );
+    grid-area: a4;
   }
   body.mobile-touch .mobile-action-slot[data-mobile-index="4"] {
-    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);
-    bottom: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) -
-      var(--mobile-ring-action-size) /
-      2
-    );
+    grid-area: a5;
   }
-  /* The crescent-hollow trio between the attack button and the arc, all on
-     the --mobile-ring-hollow circle in 45deg steps: Jump due left at 180deg,
-     Target swap (Tab-cycle) on the up-left 45deg diagonal at 135deg, and the
-     page-swap badge due up at 90deg over the attack button (the seat to
-     Target's upper right). The numeric factors are cos/sin of those angles
-     (0 and 1 terms folded away). Chord between neighbours:
-     2 * hollow * sin(22.5deg) = 79.6px at the standard 104px hollow,
-     comfortably past the 52-56px circles at every tier. */
   body.mobile-touch #mobile-target-cycle {
-    right: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-hollow) *
-      0.7071 -
-      var(--mobile-ring-secondary-size) /
-      2
-    );
-    bottom: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-hollow) *
-      0.7071 -
-      var(--mobile-ring-secondary-size) /
-      2
-    );
+    grid-area: target;
   }
   body.mobile-touch #mobile-action-ring #mobile-jump {
-    right: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-hollow) -
-      var(--mobile-ring-secondary-size) /
-      2
-    );
-    bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-secondary-size) / 2);
+    grid-area: jump;
+    --mobile-control-face: var(--mobile-jump-face);
+    --mobile-control-border: var(--gold-dim);
+    --mobile-control-shadow: inset 0 1px 0 #ffffff18, 0 0 10px #e3c46a35;
+    width: var(--mobile-jump-hit);
+    height: var(--mobile-jump-hit);
   }
   body.mobile-touch #mobile-target-cycle,
   body.mobile-touch #mobile-action-ring #mobile-jump {
-    width: var(--mobile-ring-secondary-size);
-    height: var(--mobile-ring-secondary-size);
     color: #ffdf9c;
-    border-color: #8b4e2c;
+    --mobile-control-border: #8b4e2c;
   }
   body.mobile-touch #mobile-target-cycle:active,
   body.mobile-touch #mobile-action-ring #mobile-jump:active {
-    border-color: var(--gold);
+    --mobile-control-border: var(--gold);
     color: #fff;
   }
   body.mobile-touch #mobile-target-cycle .ui-icon,
@@ -667,27 +560,13 @@
     font-family: var(--ui-font);
     color: #d8b98a;
   }
-  /* Page-cycle toggle: the gold swap badge at the hollow trio's 90deg seat
-     (due up over the attack centre on the --mobile-ring-hollow circle, to the
-     Target button's upper right), spaced a full 45deg chord off Target and
-     clear of the arc's top button so a page flip never fat-fingers a cast.
-     The face is the current page number in the same gold as the attack/Target
-     accents, over a small swap-arrows glyph (the ordering is CSS `order`:
-     hydrateIcons prepends the SVG, the number must still read first). */
-  body.mobile-touch #mobile-action-page-toggle {
-    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
-    bottom: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-hollow) -
-      var(--mobile-ring-toggle-size) /
-      2
-    );
-    width: var(--mobile-ring-toggle-size);
-    height: var(--mobile-ring-toggle-size);
+  body.mobile-touch #mobile-action-ring > #mobile-action-page-toggle {
+    grid-area: page;
+    --mobile-control-face: var(--mobile-page-face);
+    --mobile-control-border: #665630;
     font-family: var(--ui-font);
-    color: #ffdf9c;
-    border-color: #8b4e2c;
+    color: #b7a67e;
+    opacity: 0.72;
   }
   body.mobile-touch #mobile-action-page-toggle .mobile-action-page-indicator {
     font-size: 20px;
@@ -703,8 +582,19 @@
     color: #d8b98a;
   }
   body.mobile-touch #mobile-action-page-toggle:active {
-    border-color: var(--gold);
+    --mobile-control-border: var(--gold);
     color: #fff;
+  }
+  body.mobile-touch #mobile-action-ring > button > .ui-icon,
+  body.mobile-touch #mobile-action-ring > button > .icon-label,
+  body.mobile-touch #mobile-action-ring > button > .mobile-label,
+  body.mobile-touch #mobile-action-ring > button > .item-count,
+  body.mobile-touch #mobile-action-ring > button > .cd-overlay,
+  body.mobile-touch #mobile-action-ring > button > .cdtext,
+  body.mobile-touch #mobile-action-ring > button > .keybind,
+  body.mobile-touch #mobile-action-ring > button > .mobile-action-page-indicator {
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: center;
   }
   /* Cooldown sweep + used-flash + state dimming reuse the SAME classes/structure
      as .action-btn (cd-overlay height% sweep, .empty/.unusable/.oor/.queued),
@@ -728,15 +618,21 @@
     height: 44%;
     color: #ffdf9c;
   }
-  body.mobile-touch #mobile-action-attack .mobile-action-context-icon {
+  /* Jump becomes Interact near a usable target. Both glyphs remain mounted so
+     the painter only swaps a class, accessible name, and short label. */
+  body.mobile-touch #mobile-action-ring #mobile-jump .mobile-action-context-icon {
     display: none;
   }
   body.mobile-touch
-    #mobile-action-attack.context-interact
+    #mobile-action-ring
+    #mobile-jump.context-interact
     > .ui-icon:not(.mobile-action-context-icon) {
     display: none;
   }
-  body.mobile-touch #mobile-action-attack.context-interact > .mobile-action-context-icon {
+  body.mobile-touch
+    #mobile-action-ring
+    #mobile-jump.context-interact
+    > .mobile-action-context-icon {
     display: block;
   }
   body.mobile-touch #mobile-action-ring button .cd-overlay {
@@ -761,15 +657,15 @@
      must visibly acknowledge even before the used-flash lands. */
   body.mobile-touch #mobile-action-attack:active,
   body.mobile-touch .mobile-action-slot:active {
-    border-color: var(--gold);
+    --mobile-control-border: var(--gold);
   }
   /* Long-press-to-pick-up state for the ring's touch swap (bindMobileRingDrag):
      a steady border + glow, never a scale transform (motion-sickness rule), on
      both the picked-up source slot and whichever slot the finger is currently
      over. Mirrors the desktop .action-btn.drop-target treatment. */
   body.mobile-touch .mobile-action-slot.drop-target {
-    border-color: #7fd1ff;
-    box-shadow: 0 0 8px #7fd1ff88;
+    --mobile-control-border: #7fd1ff;
+    --mobile-control-shadow: 0 0 8px #7fd1ff88;
   }
   body.mobile-touch #mobile-action-ring button .cdtext {
     position: relative;
@@ -801,16 +697,27 @@
     opacity: 0.6;
   }
   body.mobile-touch #mobile-action-ring button.oor {
-    border-color: #a33;
+    --mobile-control-border: #a33;
   }
   body.mobile-touch #mobile-action-ring button.queued {
-    border-color: var(--gold);
-    box-shadow:
-      0 0 12px #ffd100aa,
-      inset 0 0 0 1px #ffd10077;
+    --mobile-control-border: var(--gold);
+    --mobile-control-shadow: 0 0 12px #ffd100aa, inset 0 0 0 1px #ffd10077;
+  }
+  body.mobile-touch #mobile-action-attack.queued::after {
+    content: "";
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    background: currentColor;
+    box-shadow: 0 0 0 1px #000;
+    pointer-events: none;
   }
   body.mobile-touch #mobile-action-ring button.used {
-    border-color: var(--gold);
+    --mobile-control-border: var(--gold);
   }
   /* Page-switch icon transition: gated behind prefers-reduced-motion so the icon
      swap when cycling pages does not animate for a motion-sensitive player. */
@@ -819,50 +726,48 @@
       transition: opacity 0.12s ease;
     }
   }
-  /* Consumables quick bar: a quiet chevron chip docked right of the top-left
-     trio that expands a row of the carried potions/elixirs/food/drink
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-action-ring > button::before,
+    body.mobile-touch #mobile-action-ring > button > * {
+      transition: none;
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch #mobile-action-ring > button::before {
+      border-color: ButtonText;
+      background: ButtonFace;
+      forced-color-adjust: auto;
+    }
+    body.mobile-touch #mobile-action-attack.queued::before {
+      outline: 2px solid CanvasText;
+      outline-offset: -4px;
+    }
+    body.mobile-touch #mobile-action-attack.queued::after {
+      border-color: CanvasText;
+      background: CanvasText;
+      box-shadow: none;
+    }
+  }
+  /* Consumables drawer: a quiet chip immediately inward of the move joystick
+     that expands the carried potions/elixirs/food/drink upward and inward
      (auto-populated by consumable_bar_view.ts, painted by the shared action
      bar painter, so the cd-overlay/count/state classes below mirror the
      ring's). Collapsed by default and session-only: the row shows only under
      body.mobile-consumables-open, and empty slots collapse away so the open
-     row is exactly as wide as what the player carries. The left anchor adds
-     the bar's SCALED width (5 columns + 4 gaps) to the bar's own safe-area
-     anchor so a grown --btn-scale never slides the bar under the chip. */
+     row is exactly as large as what the player carries. */
   body.mobile-touch #mobile-consumables {
     position: absolute;
-    left: calc(
-      max(12px, env(safe-area-inset-left)) +
-      338px *
-      var(--btn-scale, 1) *
-      var(--mobile-chrome-scale, 1) +
-      10px
-    );
-    top: max(8px, env(safe-area-inset-top));
-    /* Right reservation sized for the WORST-CASE visual overhang: flex-wrap
-       decides on the untransformed layout width, but the container then scales
-       by --btn-scale (max 1.3) from left top, so the painted row extends past
-       its layout edge by (scale - 1) x row width. 260px keeps the scaled row
-       clear of everything in #ui above it (buff column at right 98px+, the
-       daily-chest rail, the minimap corner): on an 844px landscape phone,
-       (844 - 260 - left(1.3)) x 1.3 + left(1.3) = 684 = the buff column edge. */
-    right: calc(260px + env(safe-area-inset-right));
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    /* The container spans the top band; only its BUTTONS take touches, so an
-       empty stretch stays camera-draggable (touch_router matches the target's
-       closest #mobile-consumables, which pointer-events: none prevents). */
+    left: max(150px, calc(env(safe-area-inset-left) + 132px));
+    right: auto;
+    top: auto;
+    bottom: calc(20px + env(safe-area-inset-bottom));
     pointer-events: none;
-    transform: scale(var(--btn-scale, 1));
-    transform-origin: left top;
     z-index: 30;
   }
   body.mobile-touch #mobile-consumables-toggle {
-    /* Width stays a hard 40px (the touch floor is never scaled); only the height
-       folds in chrome-scale (54 * 0.85 = 45.9, still >= 40). The portrait override
-       below keeps its own 44px height. */
-    width: 40px;
-    height: calc(54px * var(--mobile-chrome-scale, 1));
+    width: 48px;
+    height: 48px;
     padding: 0;
     display: inline-flex;
     flex: none;
@@ -884,6 +789,8 @@
   body.mobile-touch #mobile-consumables-toggle .ui-icon {
     width: 14px;
     height: 14px;
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: center;
   }
   @media (prefers-reduced-motion: no-preference) {
     body.mobile-touch #mobile-consumables-toggle .ui-icon {
@@ -896,41 +803,26 @@
     color: #ffdf9c;
   }
   body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle .ui-icon {
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(var(--btn-scale, 1));
   }
-  /* The open row extends RIGHTWARD from the toggle chip along the top band
-     (restored by owner request; v0.23.0 had dropped it BELOW the chip to leave the
-     top-centre band to the pet bar). It is a single nowrap line so it never wraps
-     down over the world. The two pet classes still own the top-centre line while a
-     pet is out (body.mobile-pet-active), so the row then drops one band to clear the
-     pet bar; overlap in every state is gated by the pet-bar top-band probe. */
+  /* A 3 x 2 grid anchored to the toggle's bottom edge grows upward and inward. */
   body.mobile-touch #mobile-consumables-row {
     display: none;
     position: absolute;
-    top: 0;
-    /* Anchor to the RIGHT edge of the 40px toggle (its first child), not the
-       container: #mobile-consumables is a wide stretched band (left..right:260px),
-       so `left: 100%` would fling the row to the far right edge and off a 740px
-       viewport. 40px (toggle width) + 6px gap flows it just past the toggle. */
-    left: calc(40px + 6px);
+    bottom: 0;
+    left: calc(48px + 6px);
     right: auto;
-    gap: 8px;
-  }
-  /* Pet classes: the pet bar sits on the top-centre line, so the row (which flows
-     right across the centre) drops below the toggle while a pet is out. Still
-     sideways + nowrap, just one band lower. */
-  body.mobile-touch.mobile-pet-active #mobile-consumables-row {
-    top: calc(100% + 6px);
+    grid-template-columns: repeat(3, 48px);
+    grid-template-rows: repeat(2, 48px);
+    gap: 4px;
   }
   body.mobile-touch.mobile-consumables-open #mobile-consumables-row {
-    display: flex;
-    flex-wrap: nowrap;
+    display: grid;
   }
   body.mobile-touch .mobile-consumable-slot {
     position: relative;
-    /* 48 * 0.85 = 40.8, still clear of the 40px touch floor. */
-    width: calc(48px * var(--mobile-chrome-scale, 1));
-    height: calc(48px * var(--mobile-chrome-scale, 1));
+    width: 48px;
+    height: 48px;
     padding: 0;
     flex: none;
     pointer-events: auto;
@@ -956,6 +848,12 @@
     border-radius: 50%;
     background-size: cover;
     background-position: center;
+  }
+  body.mobile-touch .mobile-consumable-slot .icon-label,
+  body.mobile-touch .mobile-consumable-slot .cdtext,
+  body.mobile-touch .mobile-consumable-slot .item-count {
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: center;
   }
   body.mobile-touch .mobile-consumable-slot .cd-overlay {
     position: absolute;
@@ -1190,7 +1088,7 @@
     /* Centred just above the bottom-centre #player-frame (14px inset + its
        scaled ~48px height + a gap), the classic seat: with Chat/More moved to
        the top-left trio the band over the player frame is free again, and the old
-       left-strip seat now belongs to Jump's hollow seat around the joystick
+       left strip now belongs to movement-side touch controls
        (a cast bar rendered behind a button, z 19 vs 30, was unreadable). */
     bottom: calc(68px + env(safe-area-inset-bottom));
     width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
@@ -1258,10 +1156,9 @@
     display: none !important;
   }
   /* Idle-fade (mobile_chrome_fade.ts arms .mobile-chrome-idle on body after a
-     stretch of no touch): recedes the low-frequency chrome (the top-left
-     Chat/Social/More trio and the daily-chest rail), instantly restored on
-     the next touch. Deliberately
-     excludes the action ring and both joysticks -- cosmetic declutter only,
+     stretch of no touch): recedes the low-frequency menu and Consumables
+     chrome, instantly restored on the next touch. Deliberately
+     excludes the action pad and both joysticks -- cosmetic declutter only,
      never the actionable info the graphics fairness rule protects (HP/target/
      cast bars aren't in this selector list). */
   body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn,
@@ -1295,12 +1192,12 @@
       transition: none;
     }
   }
-  /* The second action bar is desktop-only (the mobile action ring above owns
+  /* The second action bar is desktop-only (the mobile action pad above owns
      ability casting on touch). */
   body.mobile-touch #actionbar2 {
     display: none;
   }
-  /* The mobile action ring (above) supersedes both desktop bars: it makes the
+  /* The mobile action pad (above) supersedes both desktop bars: it makes the
      hotbar castable on touch, so the scaled desktop rows would only duplicate
      it. #actionbar-stack siblings (xpbar/player-frame/petbar) are untouched and
      keep rendering via their own existing mobile rules elsewhere in this file.
@@ -1898,8 +1795,8 @@
     overflow: hidden;
     z-index: 25;
   }
-  /* Left-handed mirror: swap the move joystick (and the utility cluster and
-     action ring that hug the two corners, see below) so the movement stick
+  /* Left-handed mirror: swap the move joystick and action pad that hug the two
+     corners, see below, so the movement stick
      sits under the right thumb. Opt-in via the "Left-handed Touch" toggle in
      Key Bindings; the centred Chat/More pair stays put. */
   body.mobile-touch.mobile-left-handed .mobile-joystick {
@@ -1908,100 +1805,29 @@
   }
   /* The floating-joystick capture zone follows the joystick's mirrored home so
      a right thumb can land anywhere near the stick (and so the zone never sits
-     under the mirrored action ring on the left). */
+     under the mirrored action pad on the left). */
   body.mobile-touch.mobile-left-handed #mobile-move-zone {
     left: auto;
     right: 0;
   }
-  /* The paged action ring (Phase 1) lives bottom-right, the same corner the
-     move joystick mirrors to above. Pin the ring to the LEFT in left-handed
-     mode instead so it moves under the (now-right) move thumb's opposite hand
-     and stops overlapping it; mirror every absolutely positioned ring child by
-     swapping its right: offset to the identical left: expression so the
-     crescent arcs for a left thumb instead of a right one. */
+  body.mobile-touch.mobile-left-handed #mobile-consumables {
+    left: auto;
+    right: max(150px, calc(env(safe-area-inset-right) + 132px));
+  }
+  body.mobile-touch.mobile-left-handed #mobile-consumables-row {
+    left: auto;
+    right: calc(48px + 6px);
+  }
+  /* Mirror the complete pad so Target and Jump stay nearest the action thumb
+     while Page remains farthest away. */
   body.mobile-touch.mobile-left-handed #mobile-action-ring {
-    left: max(18px, env(safe-area-inset-left));
+    --mobile-pad-edge-inline: max(18px, env(safe-area-inset-left));
+    left: var(--mobile-pad-edge-inline);
     right: auto;
-    transform-origin: left bottom;
-  }
-  body.mobile-touch.mobile-left-handed #mobile-action-attack {
-    left: 0;
-    right: auto;
-  }
-  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="0"] {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) -
-      var(--mobile-ring-action-size) /
-      2
-    );
-    right: auto;
-  }
-  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="1"] {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.9239 -
-      var(--mobile-ring-action-size) /
-      2
-    );
-    right: auto;
-  }
-  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="2"] {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.7071 -
-      var(--mobile-ring-action-size) /
-      2
-    );
-    right: auto;
-  }
-  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="3"] {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-radius) *
-      0.3827 -
-      var(--mobile-ring-action-size) /
-      2
-    );
-    right: auto;
-  }
-  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="4"] {
-    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);
-    right: auto;
-  }
-  body.mobile-touch.mobile-left-handed #mobile-action-page-toggle {
-    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
-    right: auto;
-  }
-  /* Target swap and Jump keep their crescent-hollow seats, mirrored with the
-     ring (same cos factors as their right-handed rules: 0.7071 for Target at
-     135deg, due left for Jump at 180deg). */
-  body.mobile-touch.mobile-left-handed #mobile-target-cycle {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-hollow) *
-      0.7071 -
-      var(--mobile-ring-secondary-size) /
-      2
-    );
-    right: auto;
-  }
-  body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-jump {
-    left: calc(
-      var(--mobile-ring-attack-size) /
-      2 +
-      var(--mobile-ring-hollow) -
-      var(--mobile-ring-secondary-size) /
-      2
-    );
-    right: auto;
+    grid-template-columns: var(--mobile-jump-hit) repeat(4, var(--mobile-action-hit));
+    grid-template-areas:
+      "target attack a2 a1 ."
+      "jump a5 a4 a3 page";
   }
   body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
     /* Left-handed mirrors the move joystick to the right (above) AND the ring
@@ -3258,8 +3084,7 @@
       /* Portrait resets JUST this trio back to btn-scale only (no chrome-scale): its
          42x44 buttons already sit on the 40px floor, so the 0.85 shrink would drop
          them under it. The rest of the chrome still scales via the token in portrait;
-         web in-game is landscape-locked regardless, so the trio never actually renders
-         portrait in play. */
+         play.html is landscape-gated, while index.html can render this portrait layout. */
       transform: scale(var(--btn-scale, 1));
       grid-template-columns: repeat(5, 42px);
       gap: 6px;
@@ -3269,9 +3094,8 @@
       height: 44px;
       font-size: 16px;
     }
-    /* Portrait bar is 5x42px + 4x6px gaps = 234px wide (native app: web
-       gameplay is landscape-locked); shrink the chip to the 44px button
-       height and re-dock it past the narrower bar. */
+    /* Portrait bar is 5x42px + 4x6px gaps = 234px wide; shrink the chip to the
+       44px button height and re-dock it past the narrower bar. */
     body.mobile-touch #mobile-consumables {
       left: calc(max(12px, env(safe-area-inset-left)) + 234px * var(--btn-scale, 1) + 8px);
     }
@@ -3444,8 +3268,8 @@
       left: 50%;
       /* True vertical centering (the base rule's top:50%/translate(-50%,-50%))
          let this 4-row, 16-pill grid grow tall enough on a short landscape
-         viewport to overlap the fixed bottom control row (Autorun/Jump/combat
-         cluster), which reserves no layout space of its own. Anchor from the
+         viewport to overlap the fixed bottom action pad, which reserves no
+         layout space of its own. Anchor from the
          top instead so the drawer's height is measured against the space
          actually free above that row, not the whole viewport.
          !important: the shared window-drag code (hud.ts, pointerdown on any
@@ -3461,7 +3285,7 @@
       transform: translateX(-50%) !important;
       --window-pad: 8px;
       /* No --ui-scale division: body-level window outside the zoomed #ui.
-         120px clears the bottom control row (Autorun/Jump/combat cluster +
+         120px clears the bottom control row (movement/action clusters +
          labels), which sits outside normal layout flow so nothing else
          reserves space for it. */
       max-height: calc(
@@ -3803,7 +3627,7 @@
     transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));
   }
   /* A short landscape phone (the compact tier's primary trigger) has too little
-     vertical room for a full chat log AND the action ring at once; drop the log
+     vertical room for a full chat log AND the action pad at once; drop the log
      out of flow entirely unless the player has it explicitly open. Keys on the
      LIVE mobile-chat-open / mobile-chatlog-peek body classes (toggled
      synchronously by mobile_controls.ts), not the applier-mirrored hud-chat-open
@@ -3813,94 +3637,301 @@
   #chatlog-wrap {
     display: none;
   }
-  /* Compact (short landscape phones): shrink the whole combat cluster and hug
-     the corner tighter so the arc's top button and the page toggle above the
-     attack button clear the top-right minimap/chest strip even on a 360px-tall
-     viewport (the 0.57 minimap above is the other half of that budget). The
-     radius keeps the equal-chord arc rule: 160 * 2 * sin(11.25deg) = 62.4 =
-     action-size 54 + an 8.4px edge gap. Every var also folds in the 0.85
-     mobile-chrome-scale; the toggle (46 * 0.85 = 39.1) is clamped back to the 40px
-     touch floor with max(), and target/use (50 * 0.85 = 42.5) clear it. */
+  /* Compact phones keep the 48px hit floor and hug the action-side corner. */
   body.mobile-touch.hud-mobile-compact #mobile-action-ring {
-    --mobile-ring-attack-size: calc(84px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-action-size: calc(54px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-radius: calc(160px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-toggle-size: max(40px, calc(46px * var(--mobile-chrome-scale, 1)));
-    --mobile-ring-secondary-size: calc(50px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-hollow: calc(88px * var(--mobile-chrome-scale, 1));
-    right: max(14px, env(safe-area-inset-right));
-    bottom: calc(10px + env(safe-area-inset-bottom));
+    --mobile-pad-edge-inline: max(14px, env(safe-area-inset-right));
+    --mobile-pad-edge-bottom: calc(10px + env(safe-area-inset-bottom));
+    right: var(--mobile-pad-edge-inline);
+    bottom: var(--mobile-pad-edge-bottom);
   }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-action-ring {
-    left: max(14px, env(safe-area-inset-left));
+    --mobile-pad-edge-inline: max(14px, env(safe-area-inset-left));
+    left: var(--mobile-pad-edge-inline);
     right: auto;
   }
-  /* Compact phones: Jump's ring-row seat reaches to ~437px from the left on a
-     740px viewport, into the centred player frame's right tail (280..460).
-     Nudge the frame and BOTH its bars 40px left, together, so the pair stays
-     visually centred-ish while Jump keeps a clear circle on every profile.
-     swingbar joined this rule alongside castbar (issue 1577 (6)): it was
-     missing here, so on this tier it drifted 40px off the player frame's left
-     edge even though its width already matched. */
-  /* Nudged further right (was -40px) to clear more of the left-side joystick
-     zone; castbar/swingbar move with it so they stay centred above it. */
-  body.mobile-touch.hud-mobile-compact #player-frame {
-    left: calc(50% - 15px);
-  }
-  body.mobile-touch.hud-mobile-compact #castbar,
-  body.mobile-touch.hud-mobile-compact #swingbar {
-    left: calc(50% - 15px);
-  }
-  /* Narrowest compact phones (galaxy-s8-class 740px and below): at that width the
-     centred frame's right tail (right edge ~445) runs into Jump's ring crescent
-     (its circle centre sits only ~82px right of viewport centre on so narrow a
-     screen), overlapping the button by ~18px. The -15px seat above clears Jump
-     fine from 844px up (34px+), so key the extra left nudge to <=800px only, and
-     shift the frame plus BOTH its bars together to -44px. That drops the frame's
-     right edge to ~416 (an ~11px clear circle to Jump) while its left edge only
-     reaches ~236, still ~104px clear of the fixed 132px-wide move-joystick
-     capture zone: it keeps the round-4 joystick-zone clearance AND clears the
-     jump crescent, the two constraints that pull the frame in opposite directions
-     on a very narrow viewport. 844/915/932 stay on the -15px seat above.
-     Landscape-gated: the crescent geometry that justifies the nudge only exists
-     in landscape; a portrait phone at these widths keeps the tier's base seat
-     instead of an off-centre frame. */
-  @media (max-width: 800px) and (orientation: landscape) {
-    body.mobile-touch.hud-mobile-compact #player-frame,
-    body.mobile-touch.hud-mobile-compact #castbar,
-    body.mobile-touch.hud-mobile-compact #swingbar {
-      left: calc(50% - 44px);
-    }
-  }
-  /* Tablet: a large viewport can afford a bigger, easier-to-hit cluster than
-     the standard baseline; reuses the ring's own sizing hooks (a tier value on
-     top of the settings scale, not a fork of it). Radius keeps the same chord
-     rule: 226 * 2 * sin(11.25deg) = 88 = action-size 76 + a 12px edge gap. */
+  /* Tablet increases hitboxes and gaps without changing topology. */
   body.mobile-touch.hud-mobile-tablet #mobile-action-ring {
-    --mobile-ring-attack-size: calc(116px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-action-size: calc(76px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-radius: calc(226px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-toggle-size: calc(56px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-secondary-size: calc(60px * var(--mobile-chrome-scale, 1));
-    --mobile-ring-hollow: calc(123px * var(--mobile-chrome-scale, 1));
+    --mobile-action-hit: 56px;
+    --mobile-action-face: 46px;
+    --mobile-jump-face: 52px;
+    --mobile-attack-face: 42px;
+    --mobile-page-face: 38px;
+    --mobile-action-gap: 6px;
+    --mobile-jump-hit: 64px;
   }
   body.mobile-touch.hud-mobile-tablet #right-tracker-stack {
     width: calc(220px * var(--mobile-chrome-scale, 1));
   }
-  /* Tablet: unlike compact, the frame has no left nudge here, so on a 4:3 tablet
-     (1024x768) the centred frame's right edge (~602) grazes the tablet-tier Jump
-     crescent (60px circle, left edge ~589), leaving only ~2px, below the 4px
-     interactive floor. A small -10px nudge of the frame plus BOTH its bars (kept
-     in lockstep so the swing/cast bars stay centred over the frame, as in round 4)
-     opens that to ~8px on 1024x768. It is inconsequential on the wider tablet
-     profile (1920x1080), where Jump sits hundreds of px clear regardless.
-     Landscape-gated for the same reason as the compact narrow-width nudge:
-     portrait keeps the centred base seat. */
+  /* Portrait lifts the pad above the centered player frame without changing
+     its two-row order or its side ownership. */
+  @media (orientation: portrait) {
+    body.mobile-touch:is(.hud-mobile-compact, .hud-mobile-standard, .hud-mobile-tablet)
+      #mobile-action-ring {
+      --mobile-pad-edge-bottom: calc(126px + env(safe-area-inset-bottom));
+      bottom: var(--mobile-pad-edge-bottom);
+    }
+  }
+
+  /* ---------- approved mobile HUD topology ----------
+     Keep navigation chrome in the top corners and leave a predictable strip of
+     world view open for swipe-look. These final rules intentionally sit after
+     the legacy orientation blocks so every responsive tier shares one topology. */
+  body.mobile-touch {
+    --mobile-map-size: 85px;
+    --mobile-direct-menu-width: 256px;
+  }
+  body.mobile-touch.hud-mobile-compact {
+    --mobile-direct-menu-width: 152px;
+  }
+  body.mobile-touch.game-active #mobile-controls {
+    --mobile-camera-zone-width: min(30vw, 220px);
+    --mobile-camera-zone-height: min(40vh, 140px);
+    --mobile-camera-zone-left: calc(
+      var(--app-vw) -
+      max(18px, env(safe-area-inset-right)) -
+      var(--mobile-camera-zone-width)
+    );
+    --mobile-camera-zone-top: max(64px, calc(env(safe-area-inset-top) + 60px));
+  }
+  body.mobile-touch.game-active #mobile-controls::before {
+    content: "";
+    position: absolute;
+    left: var(--mobile-camera-zone-left);
+    top: var(--mobile-camera-zone-top);
+    width: var(--mobile-camera-zone-width);
+    height: var(--mobile-camera-zone-height);
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-combat-controls {
+    position: absolute;
+    left: auto;
+    right: max(12px, env(safe-area-inset-right));
+    top: max(8px, env(safe-area-inset-top));
+    transform: none;
+    display: flex;
+    gap: 4px;
+    pointer-events: auto;
+    align-items: flex-start;
+    z-index: 30;
+  }
+  body.mobile-touch #mobile-combat-controls .mobile-btn {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    font-size: 18px;
+  }
+  body.mobile-touch #mobile-combat-controls .mobile-btn .ui-icon,
+  body.mobile-touch #mobile-combat-controls .mobile-btn .mobile-label {
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: center;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-combat-controls {
+    left: max(12px, env(safe-area-inset-left));
+    right: auto;
+  }
+  body.mobile-touch #mobile-consumables {
+    left: max(154px, calc(env(safe-area-inset-left) + 136px));
+    right: auto;
+    top: auto;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    transform: none;
+  }
+  body.mobile-touch #mobile-consumables-toggle {
+    width: 48px;
+    height: 48px;
+  }
+  body.mobile-touch #mobile-consumables-row {
+    left: calc(48px + 6px);
+    right: auto;
+    bottom: 0;
+    grid-template-columns: repeat(3, 48px);
+    grid-template-rows: repeat(2, 48px);
+  }
+  body.mobile-touch.mobile-left-handed #mobile-consumables {
+    left: auto;
+    right: max(154px, calc(env(safe-area-inset-right) + 136px));
+  }
+  body.mobile-touch.mobile-left-handed #mobile-consumables-row {
+    left: auto;
+    right: calc(48px + 6px);
+  }
+  body.mobile-touch.mobile-left-handed #mobile-move-joystick:not(.floating) {
+    transform-origin: right bottom;
+  }
+  body.mobile-touch #minimap-wrap {
+    left: max(6px, env(safe-area-inset-left));
+    right: auto;
+    top: max(6px, env(safe-area-inset-top));
+    transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));
+    transform-origin: left top;
+  }
+  body.mobile-touch #target-frame,
+  body.mobile-touch #party-frames {
+    left: calc(max(6px, env(safe-area-inset-left)) + var(--mobile-map-size) + 10px);
+    right: auto;
+    transform-origin: left top;
+  }
+  body.mobile-touch #target-frame {
+    top: max(6px, env(safe-area-inset-top));
+  }
+  body.mobile-touch #party-frames {
+    top: calc(max(6px, env(safe-area-inset-top)) + 58px);
+  }
+  body.mobile-touch #party-frames.below-target {
+    top: calc(max(6px, env(safe-area-inset-top)) + 105px);
+  }
+  body.mobile-touch.mobile-left-handed #minimap-wrap {
+    left: auto;
+    right: max(6px, env(safe-area-inset-right));
+    transform-origin: right top;
+  }
+  body.mobile-touch.mobile-left-handed #target-frame,
+  body.mobile-touch.mobile-left-handed #party-frames {
+    left: auto;
+    right: calc(max(6px, env(safe-area-inset-right)) + var(--mobile-map-size) + 10px);
+    transform-origin: right top;
+  }
+  body.mobile-touch #buff-bar,
+  body.mobile-touch #debuff-bar {
+    left: auto;
+    right: calc(max(12px, env(safe-area-inset-right)) + var(--mobile-direct-menu-width) + 8px);
+    max-width: 160px;
+    transform: scale(calc(0.75 * var(--mobile-chrome-scale, 1)));
+    transform-origin: right top;
+  }
+  body.mobile-touch #buff-bar {
+    top: max(8px, env(safe-area-inset-top));
+  }
+  body.mobile-touch #debuff-bar {
+    top: calc(max(8px, env(safe-area-inset-top)) + 32px);
+  }
+  body.mobile-touch.mobile-left-handed #buff-bar,
+  body.mobile-touch.mobile-left-handed #debuff-bar {
+    left: calc(max(12px, env(safe-area-inset-left)) + var(--mobile-direct-menu-width) + 8px);
+    right: auto;
+    transform-origin: left top;
+  }
+  body.mobile-touch.mobile-left-handed.game-active #mobile-controls {
+    --mobile-camera-zone-left: max(18px, env(safe-area-inset-left));
+  }
+  @media (orientation: portrait) {
+    body.mobile-touch {
+      --mobile-direct-menu-width: 152px;
+    }
+    body.mobile-touch.game-active #mobile-controls {
+      --mobile-camera-zone-width: min(42vw, 160px);
+      --mobile-camera-zone-height: min(24vh, 200px);
+    }
+    body.mobile-touch #mobile-consumables {
+      left: max(18px, calc(env(safe-area-inset-left) + 12px));
+      right: auto;
+      bottom: calc(136px + env(safe-area-inset-bottom));
+    }
+    body.mobile-touch.mobile-left-handed #mobile-consumables {
+      left: auto;
+      right: max(18px, calc(env(safe-area-inset-right) + 12px));
+    }
+    body.mobile-touch #mobile-consumables-row {
+      bottom: 102px;
+    }
+    body.mobile-touch #target-frame {
+      transform: scale(calc(0.45 * var(--mobile-chrome-scale, 1)));
+    }
+    body.mobile-touch #player-frame {
+      transform: translateX(-50%) scale(calc(0.55 * var(--mobile-chrome-scale, 1)));
+    }
+    body.mobile-touch #castbar,
+    body.mobile-touch #swingbar {
+      width: calc(300px * 0.55 * var(--mobile-chrome-scale, 1));
+    }
+    body.mobile-touch:is(.hud-mobile-compact, .hud-mobile-standard, .hud-mobile-tablet)
+      #right-tracker-stack {
+      left: auto;
+      right: max(10px, env(safe-area-inset-right));
+      top: calc(max(64px, calc(env(safe-area-inset-top) + 60px)) + min(24vh, 200px) + 48px);
+      width: min(calc(148px * var(--mobile-chrome-scale, 1)), 40vw);
+    }
+    body.mobile-touch.mobile-left-handed:is(
+        .hud-mobile-compact,
+        .hud-mobile-standard,
+        .hud-mobile-tablet
+      )
+      #right-tracker-stack {
+      left: max(10px, env(safe-area-inset-left));
+      right: auto;
+    }
+    body.mobile-touch #buff-bar,
+    body.mobile-touch #debuff-bar {
+      left: max(6px, env(safe-area-inset-left));
+      right: auto;
+      transform-origin: left top;
+    }
+    body.mobile-touch #buff-bar {
+      top: calc(max(64px, calc(env(safe-area-inset-top) + 60px)) + min(24vh, 200px) + 64px);
+    }
+    body.mobile-touch #debuff-bar {
+      top: calc(max(64px, calc(env(safe-area-inset-top) + 60px)) + min(24vh, 200px) + 96px);
+    }
+    body.mobile-touch.mobile-left-handed #buff-bar,
+    body.mobile-touch.mobile-left-handed #debuff-bar {
+      left: auto;
+      right: max(6px, env(safe-area-inset-right));
+      transform-origin: right top;
+    }
+  }
   @media (orientation: landscape) {
-    body.mobile-touch.hud-mobile-tablet #player-frame,
-    body.mobile-touch.hud-mobile-tablet #castbar,
-    body.mobile-touch.hud-mobile-tablet #swingbar {
-      left: calc(50% - 10px);
+    body.mobile-touch.hud-mobile-compact #mobile-move-joystick {
+      transform: scale(calc(min(var(--joy-scale, 1), 1) * var(--mobile-chrome-scale, 1)));
+    }
+    body.mobile-touch.hud-mobile-compact #mobile-camera-joystick {
+      width: 82px;
+      height: 82px;
+      left: max(6px, env(safe-area-inset-left));
+      right: auto;
+      top: max(140px, calc(env(safe-area-inset-top) + 140px));
+      bottom: auto;
+      transform: scale(calc(min(var(--joy-scale, 1), 1) * var(--mobile-chrome-scale, 1)));
+      transform-origin: left top;
+    }
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-camera-joystick {
+      left: auto;
+      right: max(6px, env(safe-area-inset-right));
+      transform-origin: right top;
+    }
+    body.mobile-touch.hud-mobile-compact #party-frames {
+      display: grid;
+      grid-template-columns: auto auto;
+      grid-template-areas:
+        "chip leave"
+        "rows rows";
+      column-gap: 4px;
+      align-items: start;
+      justify-items: start;
+    }
+    body.mobile-touch.hud-mobile-compact #party-frames.below-target {
+      top: calc(max(6px, env(safe-area-inset-top)) + 50px);
+    }
+    body.mobile-touch.hud-mobile-compact #party-chip {
+      grid-area: chip;
+    }
+    body.mobile-touch.hud-mobile-compact #party-frames .party-rows {
+      grid-area: rows;
+      grid-template-rows: auto;
+      grid-auto-flow: column;
+    }
+    body.mobile-touch.hud-mobile-compact #party-frames #party-leave {
+      grid-area: leave;
+      margin: 0;
+    }
+    body.mobile-touch.hud-mobile-compact #mobile-consumables-row {
+      bottom: 34px;
+    }
+    body.mobile-touch.hud-mobile-compact #player-frame {
+      transform: translateX(-50%) scale(calc(0.45 * var(--mobile-chrome-scale, 1)));
+    }
+    body.mobile-touch.hud-mobile-compact #castbar,
+    body.mobile-touch.hud-mobile-compact #swingbar {
+      width: calc(300px * 0.45 * var(--mobile-chrome-scale, 1));
     }
   }
 

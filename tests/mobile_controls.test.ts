@@ -408,6 +408,7 @@ const previousGlobals = {
 };
 
 afterEach(() => {
+  vi.useRealTimers();
   Object.defineProperty(globalThis, 'document', {
     value: previousGlobals.document,
     configurable: true,
@@ -510,7 +511,6 @@ function mobileCallbacks() {
   return {
     onCycleTarget: noop,
     onJump: noop,
-    onInteract: noop,
     onChat: noop,
     onChatOpen: noop,
     onChatClose: noop,
@@ -1140,6 +1140,91 @@ describe('MobileControls pointer lifecycle', () => {
 
     jumpButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
     expect(jumps).toBe(1);
+  });
+
+  it('keeps movement owned while a second touch triggers Jump or context Use', () => {
+    const { moveZone, jumpButton, windowTarget } = installMobileControlDom();
+    let lastMove: TouchMoveInput | null = null;
+    let actions = 0;
+    const input = {
+      setTouchMove: (move: TouchMoveInput) => {
+        lastMove = move;
+      },
+      clearTouchMove: () => {
+        lastMove = null;
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onJump: () => {
+        actions += 1;
+      },
+    }).start();
+
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 60,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 50,
+      }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 60,
+        pointerType: 'touch',
+        clientX: 160,
+        clientY: 50,
+      }),
+    );
+    expect(lastMove).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: true,
+    });
+
+    jumpButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 61, pointerType: 'touch' }));
+
+    expect(actions).toBe(1);
+    expect(lastMove).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: true,
+    });
+
+    windowTarget.dispatchEvent(pointerEvent('pointerup', { pointerId: 60, pointerType: 'touch' }));
+    expect(lastMove).toBeNull();
+  });
+
+  it('does not repeat a press-first Jump action after a long hold', () => {
+    vi.useFakeTimers();
+    const { jumpButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let actions = 0;
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onJump: () => {
+        actions += 1;
+      },
+    }).start();
+
+    jumpButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 33, pointerType: 'touch' }));
+    vi.advanceTimersByTime(1000);
+    jumpButton.dispatchEvent(pointerEvent('pointerup', { pointerId: 33, pointerType: 'touch' }));
+    jumpButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(actions).toBe(1);
   });
 
   it('rotates the camera from a single-finger swipe on the game canvas', () => {

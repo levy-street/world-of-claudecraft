@@ -10,6 +10,8 @@ import {
   isAttackableEntity,
   isAttackHoverTarget,
   isLiveAttackTarget,
+  mobileAttackTapAction,
+  tryNearbyInteraction,
 } from '../src/game/interactions';
 import type { Entity } from '../src/sim/types';
 
@@ -99,6 +101,12 @@ describe('findNearbyInteraction', () => {
       lootable: true,
       pos: { x: 1, y: 0, z: 0 },
     });
+    const delve = stubEntity({
+      id: 5,
+      kind: 'object',
+      templateId: 'delve_warded_chest',
+      pos: { x: 0.5, y: 0, z: 0 },
+    });
     const npc = stubEntity({ id: 4, kind: 'npc', pos: { x: 1, y: 0, z: 1 } });
 
     expect(
@@ -106,11 +114,73 @@ describe('findNearbyInteraction', () => {
         player,
         entities: new Map([
           [corpse.id, corpse],
+          [delve.id, delve],
           [obj.id, obj],
           [npc.id, npc],
         ]),
       }),
     ).toEqual({ kind: 'corpse', id: 2 });
+  });
+
+  it('chooses the nearest candidate within every interaction kind regardless of insertion order', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    for (const [kind, farther, nearer] of [
+      [
+        'corpse',
+        stubEntity({
+          id: 2,
+          kind: 'mob',
+          dead: true,
+          lootable: true,
+          pos: { x: 3, y: 0, z: 0 },
+        }),
+        stubEntity({
+          id: 3,
+          kind: 'mob',
+          dead: true,
+          lootable: true,
+          pos: { x: 1, y: 0, z: 0 },
+        }),
+      ],
+      [
+        'delve',
+        stubEntity({
+          id: 2,
+          kind: 'object',
+          templateId: 'delve_far',
+          pos: { x: 3, y: 0, z: 0 },
+        }),
+        stubEntity({
+          id: 3,
+          kind: 'object',
+          templateId: 'delve_near',
+          pos: { x: 1, y: 0, z: 0 },
+        }),
+      ],
+      [
+        'object',
+        stubEntity({ id: 2, kind: 'object', lootable: true, pos: { x: 3, y: 0, z: 0 } }),
+        stubEntity({ id: 3, kind: 'object', lootable: true, pos: { x: 1, y: 0, z: 0 } }),
+      ],
+      [
+        'npc',
+        stubEntity({ id: 2, kind: 'npc', pos: { x: 3, y: 0, z: 0 } }),
+        stubEntity({ id: 3, kind: 'npc', pos: { x: 1, y: 0, z: 0 } }),
+      ],
+    ] as const) {
+      for (const entities of [
+        new Map([
+          [nearer.id, nearer],
+          [farther.id, farther],
+        ]),
+        new Map([
+          [farther.id, farther],
+          [nearer.id, nearer],
+        ]),
+      ]) {
+        expect(findNearbyInteraction({ player, entities })).toEqual({ kind, id: nearer.id });
+      }
+    }
   });
 
   it('falls through to delve, lootable object, then npc using the interact bands', () => {
@@ -160,6 +230,224 @@ describe('findNearbyInteraction', () => {
 
     expect(hasNearbyInteraction({ player, entities: new Map([[farObj.id, farObj]]) })).toBe(false);
     expect(hasNearbyInteraction({ player, entities: new Map([[npc.id, npc]]) })).toBe(true);
+  });
+
+  it('keeps dead players on Jump except for a ghost beside a Spirit Healer', () => {
+    const questNpc = stubEntity({ id: 2, kind: 'npc', pos: { x: 1, y: 0, z: 0 } });
+    const healer = stubEntity({
+      id: 3,
+      kind: 'npc',
+      templateId: 'spirit_healer',
+      pos: { x: 2, y: 0, z: 0 },
+    });
+    const entities = new Map([
+      [questNpc.id, questNpc],
+      [healer.id, healer],
+    ]);
+    const unreleased = stubEntity({ id: 1, kind: 'player', dead: true, ghost: false });
+    const ghost = stubEntity({ id: 1, kind: 'player', dead: true, ghost: true });
+
+    expect(findNearbyInteraction({ player: unreleased, entities })).toBeNull();
+    expect(hasNearbyInteraction({ player: unreleased, entities })).toBe(false);
+    expect(findNearbyInteraction({ player: ghost, entities })).toEqual({ kind: 'npc', id: 3 });
+    expect(hasNearbyInteraction({ player: ghost, entities })).toBe(true);
+  });
+
+  it('keeps the boolean paint probe equivalent to the selected interaction', () => {
+    const alive = stubEntity({ id: 1, kind: 'player' });
+    const ghost = stubEntity({ id: 1, kind: 'player', dead: true, ghost: true });
+    const unreleased = stubEntity({ id: 1, kind: 'player', dead: true, ghost: false });
+    const nearNpc = stubEntity({ id: 2, kind: 'npc', pos: { x: 1, y: 0, z: 0 } });
+    const healer = stubEntity({
+      id: 3,
+      kind: 'npc',
+      templateId: 'spirit_healer',
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const corpse = stubEntity({
+      id: 4,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const delve = stubEntity({
+      id: 5,
+      kind: 'object',
+      templateId: 'delve_cache',
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const nearObj = stubEntity({
+      id: 7,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const farNpc = stubEntity({ id: 6, kind: 'npc', pos: { x: 99, y: 0, z: 0 } });
+
+    for (const [player, entities] of [
+      [alive, new Map<number, Entity>()],
+      [alive, new Map([[nearNpc.id, nearNpc]])],
+      [alive, new Map([[corpse.id, corpse]])],
+      [alive, new Map([[delve.id, delve]])],
+      [alive, new Map([[nearObj.id, nearObj]])],
+      [alive, new Map([[farNpc.id, farNpc]])],
+      [unreleased, new Map([[healer.id, healer]])],
+      [ghost, new Map([[nearNpc.id, nearNpc]])],
+      [ghost, new Map([[healer.id, healer]])],
+    ] as const) {
+      expect(hasNearbyInteraction({ player, entities })).toBe(
+        findNearbyInteraction({ player, entities }) !== null,
+      );
+    }
+  });
+});
+
+describe('tryNearbyInteraction', () => {
+  function rig(player: Entity, target: Entity) {
+    const calls: string[] = [];
+    const world = {
+      player,
+      entities: new Map([[target.id, target]]),
+      targetEntity: (id: number) => calls.push(`target:${id}`),
+      lootCorpse: (id: number) => calls.push(`loot:${id}`),
+      delveInteract: (id: number) => calls.push(`delve:${id}`),
+      enterDungeon: (id: string) => calls.push(`enter:${id}`),
+      leaveDungeon: () => calls.push('leave'),
+      pickUpObject: (id: number) => calls.push(`pick-up:${id}`),
+      resurrectAtSpiritHealer: () => calls.push('resurrect'),
+    } as unknown as Parameters<typeof tryNearbyInteraction>[0];
+    const hud = {
+      openMailbox: () => calls.push('mailbox'),
+      openQuestDialog: (id: number) => calls.push(`quest:${id}`),
+      openDelveBoard: (id: number) => calls.push(`board:${id}`),
+      showError: () => calls.push('error'),
+    } as unknown as Parameters<typeof tryNearbyInteraction>[1];
+    return { world, hud, calls };
+  }
+
+  it.each([
+    [
+      'corpse',
+      stubEntity({ id: 2, kind: 'mob', dead: true, lootable: true, pos: { x: 1, y: 0, z: 0 } }),
+      ['loot:2'],
+    ],
+    [
+      'delve',
+      stubEntity({
+        id: 2,
+        kind: 'object',
+        templateId: 'delve_cache',
+        pos: { x: 1, y: 0, z: 0 },
+      }),
+      ['delve:2'],
+    ],
+    [
+      'dungeon door',
+      stubEntity({
+        id: 2,
+        kind: 'object',
+        templateId: 'dungeon_door',
+        dungeonId: 'crypt',
+        lootable: true,
+        pos: { x: 1, y: 0, z: 0 },
+      }),
+      ['enter:crypt'],
+    ],
+    [
+      'dungeon exit',
+      stubEntity({
+        id: 2,
+        kind: 'object',
+        templateId: 'dungeon_exit',
+        lootable: true,
+        pos: { x: 1, y: 0, z: 0 },
+      }),
+      ['leave'],
+    ],
+    [
+      'mailbox',
+      stubEntity({
+        id: 2,
+        kind: 'object',
+        templateId: 'mailbox',
+        lootable: true,
+        pos: { x: 1, y: 0, z: 0 },
+      }),
+      ['mailbox'],
+    ],
+    [
+      'lootable object',
+      stubEntity({ id: 2, kind: 'object', lootable: true, pos: { x: 1, y: 0, z: 0 } }),
+      ['pick-up:2'],
+    ],
+    [
+      'quest npc',
+      stubEntity({ id: 2, kind: 'npc', pos: { x: 1, y: 0, z: 0 } }),
+      ['target:2', 'quest:2'],
+    ],
+    [
+      'Brother Halven',
+      stubEntity({
+        id: 2,
+        kind: 'npc',
+        templateId: 'brother_halven',
+        pos: { x: 1, y: 0, z: 0 },
+      }),
+      ['target:2', 'board:2'],
+    ],
+    [
+      'Brother Halven in the marsh',
+      stubEntity({
+        id: 2,
+        kind: 'npc',
+        templateId: 'brother_halven_marsh',
+        pos: { x: 1, y: 0, z: 0 },
+      }),
+      ['target:2', 'board:2'],
+    ],
+  ])('dispatches the selected %s interaction', (_name, target, expected) => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const { world, hud, calls } = rig(player, target as Entity);
+
+    expect(tryNearbyInteraction(world, hud, false)).toBe(true);
+    expect(calls).toEqual(expected);
+  });
+
+  it('resurrects a ghost through the Spirit Healer contextual action', () => {
+    const player = stubEntity({ id: 1, kind: 'player', dead: true, ghost: true });
+    const healer = stubEntity({
+      id: 2,
+      kind: 'npc',
+      templateId: 'spirit_healer',
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const { world, hud, calls } = rig(player, healer);
+
+    expect(tryNearbyInteraction(world, hud, false)).toBe(true);
+    expect(calls).toEqual(['target:2', 'resurrect']);
+  });
+
+  it('does not consume Jump when no contextual action is available', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const farNpc = stubEntity({ id: 2, kind: 'npc', pos: { x: 99, y: 0, z: 0 } });
+    const { world, hud, calls } = rig(player, farNpc);
+
+    expect(tryNearbyInteraction(world, hud, false)).toBe(false);
+    expect(calls).toEqual([]);
+    expect(tryNearbyInteraction(world, hud, true)).toBe(false);
+    expect(calls).toEqual(['error']);
+  });
+});
+
+describe('mobileAttackTapAction', () => {
+  it.each([
+    [true, false, true, 'toggle'],
+    [false, true, true, 'toggle'],
+    [false, false, false, 'toggle'],
+    [false, false, true, 'acquire-nearest'],
+  ] as const)('maps autoAttack=%s liveTarget=%s nearestHook=%s to %s', (autoAttack, liveTarget, nearestHook, expected) => {
+    expect(mobileAttackTapAction(autoAttack, liveTarget, nearestHook)).toBe(expected);
   });
 });
 

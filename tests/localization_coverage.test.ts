@@ -145,6 +145,9 @@ describe('i18n Localization Key Coverage', () => {
     'hud.options.unbound',
     'hud.keybinds.categories.movement',
     'hud.keybinds.actions.forward',
+    'hud.keybinds.actions.jump',
+    'hud.keybinds.actions.interact',
+    'hudChrome.mobile.jump',
     'hud.meters.noCombat',
     'hud.chat.templates.guild',
     'hud.chat.context.trade',
@@ -1601,9 +1604,9 @@ describe('i18n Localization Key Coverage', () => {
     // The Quests button reuses the tracker's "Quests" label rather than the
     // longer "Quest Log" title.
     expect(html).toContain('data-i18n="questUi.tracker.title"');
-    // The explicit mobile Use button was removed; contextual Interact now lives
-    // on the Attack button near usable targets, so mobileUse stays cataloged but
-    // no longer appears in static shell markup.
+    // The explicit mobile Use button was removed; Jump becomes contextual
+    // Interact near usable targets, so mobileUse stays cataloged but no longer
+    // appears in static shell markup.
     expect(html).not.toContain('data-i18n="hud.core.mobileUse"');
     // Note: the v0.7 layout moved damage meters from a mobile tray button to a
     // dedicated #meters-window, so there is no longer a mobile-meters button to

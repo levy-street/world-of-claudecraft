@@ -188,6 +188,10 @@ describe('MobileActionRingPainter: cooldown/empty rendering parity with the desk
       writers,
       {
         bar: { container: { tag: 'ring-container' } as unknown as HTMLElement, slots: els },
+        contextAction: {
+          button: { tag: 'jump' } as unknown as HTMLElement,
+          label: { tag: 'jump-label' } as unknown as HTMLElement,
+        },
         pageToggle: toggle,
         pageIndicator: indicator,
       },
@@ -211,6 +215,50 @@ describe('MobileActionRingPainter: cooldown/empty rendering parity with the desk
   });
 });
 
+describe('MobileActionRingPainter: accessible Attack toggle state', () => {
+  it('writes aria-pressed from auto-attack state and elides unchanged writes', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'ring-container' } as unknown as HTMLElement, slots: els },
+        contextAction: {
+          button: { tag: 'jump' } as unknown as HTMLElement,
+          label: { tag: 'jump-label' } as unknown as HTMLElement,
+        },
+        pageToggle: { tag: 'toggle' } as unknown as HTMLElement,
+        pageIndicator: { tag: 'indicator' } as unknown as HTMLElement,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const view = createActionBarView({ slots: ringDescriptor({ page: 0 }, new Map()) }, fakeDeps());
+    const world = idleWorld();
+    world.player.autoAttack = true;
+
+    painter.paint(view.tick(world), 0, 2);
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [els[0].btn, 'aria-pressed', 'true'],
+    });
+
+    calls.length = 0;
+    painter.paint(view.tick(world), 0, 2);
+    expect(calls).not.toContainEqual({
+      m: 'setAttr',
+      args: [els[0].btn, 'aria-pressed', 'true'],
+    });
+
+    world.player.autoAttack = false;
+    painter.paint(view.tick(world), 0, 2);
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [els[0].btn, 'aria-pressed', 'false'],
+    });
+  });
+});
+
 describe('MobileActionRingPainter: page indicator + toggle aria', () => {
   it('writes the page indicator text and the toggle aria-label on first paint', () => {
     const { calls, writers } = recordingFacet();
@@ -221,6 +269,10 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       writers,
       {
         bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        contextAction: {
+          button: { tag: 'jump' } as unknown as HTMLElement,
+          label: { tag: 'jump-label' } as unknown as HTMLElement,
+        },
         pageToggle: toggle,
         pageIndicator: indicator,
       },
@@ -264,6 +316,18 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       classList: { toggle(): void {} },
       setAttribute(): void {},
     } as unknown as HTMLElement;
+    const contextButton = {
+      textContent: '',
+      style: { setProperty(): void {} },
+      classList: { toggle(): void {} },
+      setAttribute(): void {},
+    } as unknown as HTMLElement;
+    const contextLabel = {
+      textContent: '',
+      style: { setProperty(): void {} },
+      classList: { toggle(): void {} },
+      setAttribute(): void {},
+    } as unknown as HTMLElement;
     // Give the bar's own elements a real-ish shape too so ActionBarPainter's
     // writes succeed against the shared facet.
     const realEls = els.map(() => ({
@@ -284,6 +348,7 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       facet,
       {
         bar: { container: realEls[0] as unknown as HTMLElement, slots: bar },
+        contextAction: { button: contextButton, label: contextLabel },
         pageToggle: toggle,
         pageIndicator: indicator,
       },
@@ -305,20 +370,24 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     expect(counts.writes).toBeGreaterThan(writesAfterFirst);
   });
 
-  it('can replace the primary attack aria and state with context interact', () => {
+  it('replaces Jump aria, label, and icon state with context Interact', () => {
     const { calls, writers } = recordingFacet();
     const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const jumpButton = { tag: 'jump' } as unknown as HTMLElement;
+    const jumpLabel = { tag: 'jump-label' } as unknown as HTMLElement;
     const toggle = { tag: 'toggle' } as unknown as HTMLElement;
     const indicator = { tag: 'indicator' } as unknown as HTMLElement;
+    let locale = 'en';
     const painter = new MobileActionRingPainter(
       writers,
       {
         bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        contextAction: { button: jumpButton, label: jumpLabel },
         pageToggle: toggle,
         pageIndicator: indicator,
       },
       (key) => `URL(${key})`,
-      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+      (key, values) => (values ? `${locale}:${key}|${JSON.stringify(values)}` : `${locale}:${key}`),
     );
     const view = createActionBarView({ slots: ringDescriptor({ page: 0 }, new Map()) }, fakeDeps());
 
@@ -326,11 +395,70 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
 
     expect(calls).toContainEqual({
       m: 'setAttr',
-      args: [els[0].btn, 'aria-label', 'hud.keybinds.actions.interact'],
+      args: [jumpButton, 'aria-label', 'en:hud.keybinds.actions.interact'],
+    });
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [jumpButton, 'title', 'en:hud.keybinds.actions.interact'],
     });
     expect(calls).toContainEqual({
       m: 'toggleClass',
+      args: [jumpButton, 'context-interact', true],
+    });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [jumpLabel, 'en:hud.core.mobileUse'],
+    });
+    expect(calls).not.toContainEqual({
+      m: 'toggleClass',
       args: [els[0].btn, 'context-interact', true],
+    });
+
+    // A locale switch must repaint the dynamic copy even though the context
+    // boolean stays true. Static translatePage() must never leave an Interact
+    // icon paired with Jump text/metadata.
+    calls.length = 0;
+    locale = 'cs_CZ';
+    painter.relocalize();
+    painter.paint(view.tick(idleWorld()), 0, 2, true);
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [jumpButton, 'aria-label', 'cs_CZ:hud.keybinds.actions.interact'],
+    });
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [jumpButton, 'title', 'cs_CZ:hud.keybinds.actions.interact'],
+    });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [jumpLabel, 'cs_CZ:hud.core.mobileUse'],
+    });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [indicator, 'cs_CZ:hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}'],
+    });
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [toggle, 'aria-label', 'cs_CZ:hudChrome.mobile.actionPageToggle'],
+    });
+
+    calls.length = 0;
+    painter.paint(view.tick(idleWorld()), 0, 2, false);
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [jumpButton, 'aria-label', 'cs_CZ:hud.keybinds.actions.jump'],
+    });
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [jumpButton, 'title', 'cs_CZ:hud.keybinds.actions.jump'],
+    });
+    expect(calls).toContainEqual({
+      m: 'toggleClass',
+      args: [jumpButton, 'context-interact', false],
+    });
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [jumpLabel, 'cs_CZ:hudChrome.mobile.jump'],
     });
   });
 });

@@ -94,6 +94,34 @@ describe('resolveMobileHudLayout: menu/chat state classes', () => {
   });
 });
 
+describe('resolveMobileHudLayout: direct menu placement', () => {
+  it.each([
+    [740, 360],
+    [844, 390],
+    [915, 412],
+    [932, 430],
+    [390, 844],
+    [768, 1024],
+    [1024, 1366],
+  ])('uses the compact Chat/Quests/More inventory at %sx%s', (width, height) => {
+    expect(resolveMobileHudLayout(input({ width, height })).menuPlacement).toBe('compact');
+  });
+
+  it.each([
+    [1280, 720],
+    [1024, 768],
+    [1920, 1080],
+  ])('keeps all five direct actions in landscape at %sx%s', (width, height) => {
+    expect(resolveMobileHudLayout(input({ width, height })).menuPlacement).toBe('full');
+  });
+
+  it('restores full placement when touch mode turns off', () => {
+    expect(
+      resolveMobileHudLayout(input({ touchMode: false, width: 390, height: 844 })).menuPlacement,
+    ).toBe('full');
+  });
+});
+
 describe('resolveMobileHudLayout: desktop (touchMode false)', () => {
   it('yields an empty classes list regardless of viewport or menu/chat state', () => {
     const layout = resolveMobileHudLayout(

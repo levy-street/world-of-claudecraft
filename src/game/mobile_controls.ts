@@ -115,7 +115,6 @@ export interface MobileControlCallbacks {
   /** Cycle the hostile target (the Tab-target path) from the ring's Target button. */
   onCycleTarget(): void;
   onJump(): void;
-  onInteract(): void;
   /** Open the composer focused (raise the keyboard): the keybind / whisper path. */
   onChat(): void;
   /** Open the centered read view: composer bar visible but NOT focused (no keyboard). */
@@ -538,15 +537,33 @@ export class MobileControls {
     };
     if (opts.pressFirst) {
       let suppressNextClick = false;
+      let suppressResetTimer: ReturnType<typeof globalThis.setTimeout> | null = null;
+      const clearSuppressReset = () => {
+        if (suppressResetTimer !== null) globalThis.clearTimeout(suppressResetTimer);
+        suppressResetTimer = null;
+      };
       button.addEventListener('pointerdown', (e) => {
+        clearSuppressReset();
         suppressNextClick = true;
-        globalThis.setTimeout(() => {
-          suppressNextClick = false;
-        }, 700);
         run(e);
+      });
+      button.addEventListener('pointerup', () => {
+        clearSuppressReset();
+        // The compatibility click is generated after pointerup, even after a
+        // long hold. Keep suppression alive from release (not press) so that
+        // click cannot execute Jump/Interact a second time.
+        suppressResetTimer = globalThis.setTimeout(() => {
+          suppressNextClick = false;
+          suppressResetTimer = null;
+        }, 700);
+      });
+      button.addEventListener('pointercancel', () => {
+        clearSuppressReset();
+        suppressNextClick = false;
       });
       button.addEventListener('click', (e) => {
         if (suppressNextClick) {
+          clearSuppressReset();
           suppressNextClick = false;
           e.preventDefault();
           return;

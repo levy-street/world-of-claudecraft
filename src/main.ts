@@ -34,12 +34,12 @@ import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import {
   activePvpOpponentIds,
-  findNearbyInteraction,
   HoverPickGate,
   handlePickedEntity,
   hasNearbyInteraction,
   hoverCursorKind,
   isAttackableEntity,
+  tryNearbyInteraction,
 } from './game/interactions';
 import { Keybinds } from './game/keybinds';
 import { newKeyboardTurnState, stepKeyboardTurnFacing } from './game/keyboard_turn_facing';
@@ -1197,14 +1197,16 @@ async function startGame(
   // The ring's attack toggle acquires the nearest attackable enemy when tapped
   // with no live hostile target (the HUD falls back to plain castSlot(0) until
   // this is wired); the Target button cycles targets via the Tab path below.
+  // Jump paints as Interact whenever the shared interaction scan finds a nearby
+  // action, and its callback attempts that action before falling back to jump.
   hud.onMobileAttackNearest = () => attackNearest();
   hud.onMobileCanContextInteract = () => hasNearbyInteraction(world);
-  hud.onMobileContextInteract = () => tryInteractNearby(false);
 
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
-    onJump: () => input.triggerTouchJump(),
-    onInteract: () => interactKey(),
+    onJump: () => {
+      if (!tryNearbyInteraction(world, hud, false)) input.triggerTouchJump();
+    },
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
     onChatClose: () => closeChat(),
@@ -1738,52 +1740,8 @@ async function startGame(
         }),
     });
   }
-  function tryInteractNearby(showError: boolean): boolean {
-    const action = findNearbyInteraction(world);
-    if (!action) {
-      if (showError) hud.showError(t('errors.nothingInteract'));
-      return false;
-    }
-    switch (action.kind) {
-      case 'corpse':
-        world.lootCorpse(action.id);
-        return true;
-      case 'delve':
-        world.delveInteract(action.id);
-        return true;
-      case 'object': {
-        const obj = world.entities.get(action.id);
-        if (!obj) return false;
-        if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
-          world.enterDungeon(obj.dungeonId);
-          return true;
-        }
-        if (obj.templateId === 'dungeon_exit') {
-          world.leaveDungeon();
-          return true;
-        }
-        if (obj.templateId === 'mailbox') {
-          hud.openMailbox();
-          return true;
-        }
-        world.pickUpObject(action.id);
-        return true;
-      }
-      case 'npc': {
-        const npc = world.entities.get(action.id);
-        if (npc?.kind !== 'npc') return false;
-        world.targetEntity(action.id);
-        if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh')
-          hud.openDelveBoard(action.id);
-        else hud.openQuestDialog(action.id);
-        return true;
-      }
-    }
-    return false;
-  }
-
   function interactKey(): void {
-    tryInteractNearby(true);
+    tryNearbyInteraction(world, hud, true);
   }
 
   function attackNearest(): void {

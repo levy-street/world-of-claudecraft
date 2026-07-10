@@ -152,7 +152,7 @@ const INDEX_SECTIONS = [
   'Premium Class Details Panel',
   'mobile touch controls (runtime-gated with body.mobile-touch + game-active)',
   'mobile window backdrop',
-  'mobile action ring (paged combat buttons)',
+  'mobile action pad (paged combat buttons)',
   'mobile hud layout tiers',
   'Unified Character Select Layout',
   'Cosmetic skin-select event overlay',
