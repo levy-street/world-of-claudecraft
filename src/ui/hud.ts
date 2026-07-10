@@ -149,8 +149,10 @@ import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { CalendarWindow } from './calendar_window';
+import { CastBarPainter } from './cast_bar_painter';
 import {
   activeCastOutcome,
+  type CastOutcomeState,
   clearCastOutcomeEntity,
   createCastOutcomeTracker,
   noteCastHidden,
@@ -159,12 +161,8 @@ import {
   noteCastVisible,
   pruneExpiredCastOutcomes,
   reconcileCastOutcomeEntities,
-  type CastOutcomeState,
 } from './cast_outcome_core';
 import { castDisplayName } from './cast_presentation';
-import {
-  CastBarPainter,
-} from './cast_bar_painter';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { CharWindow } from './char_window';
 import {
@@ -9600,13 +9598,7 @@ export class Hud {
           noteCastStart(this.castOutcomes, ev.entityId, ev.ability);
           break; // cast-loop SFX is spatial now (see playEventSfx)
         case 'castStop':
-          noteCastStop(
-            this.castOutcomes,
-            ev.entityId,
-            ev.success,
-            now,
-            Hud.CAST_OUTCOME_DURATIONS,
-          );
+          noteCastStop(this.castOutcomes, ev.entityId, ev.success, now, Hud.CAST_OUTCOME_DURATIONS);
           // Deferred "Auto-Attack on Ability Use" (timed casts): engage only when
           // the player's own cast COMPLETES, so the aggro happens as the damage
           // lands, never at cast start (the aggro-before-damage bug). An

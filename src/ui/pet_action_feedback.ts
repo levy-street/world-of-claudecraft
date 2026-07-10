@@ -28,7 +28,9 @@ export function formatPetCooldownShort(
 ): string | undefined {
   if (remaining <= 0) return undefined;
   const useWholeSeconds = remaining >= PET_COOLDOWN_WHOLE_SECOND_THRESHOLD;
-  const value = useWholeSeconds ? Math.ceil(remaining) : Math.max(PET_COOLDOWN_MIN_VISIBLE, remaining);
+  const value = useWholeSeconds
+    ? Math.ceil(remaining)
+    : Math.max(PET_COOLDOWN_MIN_VISIBLE, remaining);
   const seconds = formatNumber(value, {
     minimumFractionDigits: useWholeSeconds ? 0 : PET_COOLDOWN_FRACTION_DIGITS,
     maximumFractionDigits: useWholeSeconds ? 0 : PET_COOLDOWN_FRACTION_DIGITS,

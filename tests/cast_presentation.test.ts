@@ -23,14 +23,15 @@ describe('cast presentation helpers', () => {
     expect(castDisplayName('nythraxis_deathless_rage')).toBe(
       t('abilityUi.cast.nythraxisDeathlessRage'),
     );
-    expect(castDisplayName('nythraxis_ward_channel')).toBe(t('abilityUi.cast.nythraxisWardChannel'));
+    expect(castDisplayName('nythraxis_ward_channel')).toBe(
+      t('abilityUi.cast.nythraxisWardChannel'),
+    );
   });
 
   it('suppresses interrupt cues for pet casts even when interrupt cues are enabled', () => {
-    const cue = castCueText(
-      state({ kind: 'channel', source: 'pet', interrupt: 'interruptible' }),
-      { showInterruptCues: true },
-    );
+    const cue = castCueText(state({ kind: 'channel', source: 'pet', interrupt: 'interruptible' }), {
+      showInterruptCues: true,
+    });
 
     expect(cue).toContain(t('hudChrome.castBar.pet'));
     expect(cue).toContain(t('hudChrome.castBar.channeling'));
@@ -41,9 +42,9 @@ describe('cast presentation helpers', () => {
     expect(castCueText(state({ interrupt: 'interruptible' }), { showInterruptCues: true })).toBe(
       t('hudChrome.castBar.interruptible'),
     );
-    expect(
-      castCueText(state({ interrupt: 'uninterruptible' }), { showInterruptCues: true }),
-    ).toBe(t('hudChrome.castBar.cannotInterrupt'));
+    expect(castCueText(state({ interrupt: 'uninterruptible' }), { showInterruptCues: true })).toBe(
+      t('hudChrome.castBar.cannotInterrupt'),
+    );
     expect(castCueText(state({ interrupt: 'interruptible' }), { showInterruptCues: false })).toBe(
       '',
     );

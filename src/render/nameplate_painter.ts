@@ -20,6 +20,7 @@ import * as THREE from 'three';
 import { MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
+import { castCueText, castDisplayName, castLabelWithCue } from '../ui/cast_presentation';
 import {
   devTierBadgeDataUrl,
   devTierByIndex,
@@ -35,7 +36,6 @@ import {
 } from '../ui/holder_tier';
 import { formatNumber, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
-import { castCueText, castDisplayName, castLabelWithCue } from '../ui/cast_presentation';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
 import { castBarState } from './cast_bar';

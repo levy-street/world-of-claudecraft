@@ -1,4 +1,9 @@
-import type { CastBarInterrupt, CastBarKind, CastBarSource, CastBarState } from '../render/cast_bar';
+import type {
+  CastBarInterrupt,
+  CastBarKind,
+  CastBarSource,
+  CastBarState,
+} from '../render/cast_bar';
 import { ABILITIES } from '../sim/data';
 import { DEMON_HEAL_CAST_ID, FISHING_CAST_ID } from '../sim/types';
 import { tEntity } from './entity_i18n';
