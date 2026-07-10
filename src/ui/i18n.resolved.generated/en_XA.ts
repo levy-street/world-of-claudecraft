@@ -6309,6 +6309,18 @@ export const en_XA: EnTranslations = {
       "copper_bar": {
         "name": "[Çóþþéŕ Ɓáŕ]"
       },
+      "tin_bar": {
+        "name": "[Ţíñ Ɓáŕ]"
+      },
+      "bronze_bar": {
+        "name": "[Ɓŕóñžé Ɓáŕ]"
+      },
+      "bronzeclasp_gauntlets": {
+        "name": "[Ɓŕóñžéçļášþ Ĝáúñţļéţš]"
+      },
+      "clawspur_dirk": {
+        "name": "[Çļáŵšþúŕ Ðíŕķ]"
+      },
       "iron_bar": {
         "name": "[Íŕóñ Ɓáŕ]"
       },

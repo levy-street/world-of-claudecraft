@@ -6309,6 +6309,18 @@ export const zh_TW: EnTranslations = {
       "copper_bar": {
         "name": "銅錠"
       },
+      "tin_bar": {
+        "name": "錫錠"
+      },
+      "bronze_bar": {
+        "name": "青銅錠"
+      },
+      "bronzeclasp_gauntlets": {
+        "name": "青銅扣護手"
+      },
+      "clawspur_dirk": {
+        "name": "爪刺匕首"
+      },
       "iron_bar": {
         "name": "鐵錠"
       },

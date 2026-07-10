@@ -614,8 +614,6 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
-  // tin_ore and beast_claw are source-first materials in this PR. Their recipe
-  // sinks are deferred to the trainer and skill-gate follow-up.
   tin_ore: {
     id: 'tin_ore',
     name: 'Tin Ore',
@@ -643,6 +641,20 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'common',
     sellValue: 8,
+  },
+  tin_bar: {
+    id: 'tin_bar',
+    name: 'Tin Bar',
+    kind: 'junk',
+    quality: 'uncommon',
+    sellValue: 12,
+  },
+  bronze_bar: {
+    id: 'bronze_bar',
+    name: 'Bronze Bar',
+    kind: 'junk',
+    quality: 'uncommon',
+    sellValue: 10,
   },
   iron_bar: {
     id: 'iron_bar',
@@ -983,6 +995,26 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     foodHp: 552,
     sellValue: 0,
+  },
+  // --- early common-tier profession-crafted gear ---
+  bronzeclasp_gauntlets: {
+    id: 'bronzeclasp_gauntlets',
+    name: 'Bronzeclasp Gauntlets',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'gloves',
+    quality: 'common',
+    stats: { armor: 20 },
+    sellValue: 100,
+  },
+  clawspur_dirk: {
+    id: 'clawspur_dirk',
+    name: 'Clawspur Dirk',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'common',
+    weapon: { min: 5, max: 8, speed: 1.8, dagger: true },
+    sellValue: 130,
   },
   // --- Smith Haldren's stock (common/white, levels 3-7) ---
   eastbrook_arming_sword: {

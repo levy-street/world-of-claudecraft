@@ -6309,6 +6309,18 @@ export const ko_KR: EnTranslations = {
       "copper_bar": {
         "name": "구리 주괴"
       },
+      "tin_bar": {
+        "name": "주석 주괴"
+      },
+      "bronze_bar": {
+        "name": "청동 주괴"
+      },
+      "bronzeclasp_gauntlets": {
+        "name": "청동걸쇠 건틀릿"
+      },
+      "clawspur_dirk": {
+        "name": "발톱가시 단검"
+      },
       "iron_bar": {
         "name": "철 주괴"
       },

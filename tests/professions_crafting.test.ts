@@ -234,6 +234,84 @@ describe('resolveCraft (#1127)', () => {
   });
 });
 
+describe('tin, bronze, and beast-claw material sinks', () => {
+  it('smelts tin ore into one tin bar', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    grantItem(sim, 'tin_ore', 2, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, 'recipe_tin_bar');
+
+    expect(result.ok).toBe(true);
+    expect(result.itemId).toBe('tin_bar');
+    expect(result.count).toBe(1);
+    expect(sim.countItem('tin_ore', pid)).toBe(0);
+    expect(sim.countItem('tin_bar', pid)).toBe(1);
+  });
+
+  it('combines copper and tin bars into two bronze bars', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    grantItem(sim, 'copper_bar', 1, pid);
+    grantItem(sim, 'tin_bar', 1, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, 'recipe_bronze_bar');
+
+    expect(result.ok).toBe(true);
+    expect(result.itemId).toBe('bronze_bar');
+    expect(result.count).toBe(2);
+    expect(sim.countItem('copper_bar', pid)).toBe(0);
+    expect(sim.countItem('tin_bar', pid)).toBe(0);
+    expect(sim.countItem('bronze_bar', pid)).toBe(2);
+  });
+
+  it('crafts two distinct bronze sinks, including a weapon that consumes beast claw', () => {
+    const armorSim = makeSim();
+    const armorPid = armorSim.playerId;
+    grantItem(armorSim, 'bronze_bar', 2, armorPid);
+    grantItem(armorSim, 'rough_hide', 1, armorPid);
+
+    const armorResult = resolveCraft(
+      (armorSim as any).ctx,
+      armorPid,
+      'recipe_bronzeclasp_gauntlets',
+    );
+
+    expect(armorResult.ok).toBe(true);
+    expect(armorSim.countItem('bronze_bar', armorPid)).toBe(0);
+    expect(armorSim.countItem('rough_hide', armorPid)).toBe(0);
+    expect(armorSim.countItem('bronzeclasp_gauntlets', armorPid)).toBe(1);
+
+    const weaponSim = makeSim();
+    const weaponPid = weaponSim.playerId;
+    grantItem(weaponSim, 'bronze_bar', 2, weaponPid);
+    grantItem(weaponSim, 'ashwood_log', 1, weaponPid);
+    grantItem(weaponSim, 'beast_claw', 1, weaponPid);
+
+    const weaponResult = resolveCraft((weaponSim as any).ctx, weaponPid, 'recipe_clawspur_dirk');
+
+    expect(weaponResult.ok).toBe(true);
+    expect(weaponSim.countItem('bronze_bar', weaponPid)).toBe(0);
+    expect(weaponSim.countItem('ashwood_log', weaponPid)).toBe(0);
+    expect(weaponSim.countItem('beast_claw', weaponPid)).toBe(0);
+    expect(weaponSim.countItem('clawspur_dirk', weaponPid)).toBe(1);
+  });
+
+  it('denies bronze conversion without consuming either reagent', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    grantItem(sim, 'copper_bar', 1, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, 'recipe_bronze_bar');
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('insufficient_materials');
+    expect(sim.countItem('copper_bar', pid)).toBe(1);
+    expect(sim.countItem('tin_bar', pid)).toBe(0);
+    expect(sim.countItem('bronze_bar', pid)).toBe(0);
+  });
+});
+
 describe('craftItem command (#1127)', () => {
   it('resolves server-side via Sim.craftItem, stashing the result on lastCraftResult', () => {
     const sim = makeSim();

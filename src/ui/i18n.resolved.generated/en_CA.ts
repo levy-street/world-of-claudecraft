@@ -6309,6 +6309,18 @@ export const en_CA: EnTranslations = {
       "copper_bar": {
         "name": "Copper Bar"
       },
+      "tin_bar": {
+        "name": "Tin Bar"
+      },
+      "bronze_bar": {
+        "name": "Bronze Bar"
+      },
+      "bronzeclasp_gauntlets": {
+        "name": "Bronzeclasp Gauntlets"
+      },
+      "clawspur_dirk": {
+        "name": "Clawspur Dirk"
+      },
       "iron_bar": {
         "name": "Iron Bar"
       },

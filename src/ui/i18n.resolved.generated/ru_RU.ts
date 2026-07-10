@@ -6309,6 +6309,18 @@ export const ru_RU: EnTranslations = {
       "copper_bar": {
         "name": "Медный слиток"
       },
+      "tin_bar": {
+        "name": "Оловянный слиток"
+      },
+      "bronze_bar": {
+        "name": "Бронзовый слиток"
+      },
+      "bronzeclasp_gauntlets": {
+        "name": "Латные рукавицы с бронзовыми застёжками"
+      },
+      "clawspur_dirk": {
+        "name": "Кинжал Когтевой шип"
+      },
       "iron_bar": {
         "name": "Железный слиток"
       },

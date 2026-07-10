@@ -3,6 +3,7 @@ import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { GATHER_NODES, GROUND_OBJECTS, ITEMS, MOBS, NPCS } from '../src/sim/data';
 import { NODE_HARVEST_TABLE, nodeHarvestEntryFor } from '../src/sim/professions/gathering';
+import { itemNames } from '../src/ui/i18n.catalog/items';
 
 const QUEST_ONLY_COLLECTIBLES = new Set(['boar_hide', 'webwood_silk', 'widow_venom_sac']);
 const PRE_EXISTING_UNOBTAINABLE_REAGENTS = new Set([
@@ -49,6 +50,29 @@ function obtainableItemIds(): Set<string> {
 }
 
 describe('profession material content', () => {
+  it('registers every new material and crafted output in item content and English i18n', () => {
+    for (const itemId of [
+      'tin_bar',
+      'bronze_bar',
+      'bronzeclasp_gauntlets',
+      'clawspur_dirk',
+    ] as const) {
+      expect(ITEMS[itemId]).toBeDefined();
+      expect(itemNames.en.entities.items[itemId]?.name).toBe(ITEMS[itemId].name);
+    }
+  });
+
+  it('connects tin ore and beast claws to live recipes, with two bronze consumers', () => {
+    const recipesUsing = (itemId: string) =>
+      ALL_RECIPES.filter((recipe) => recipe.reagents.some((reagent) => reagent.itemId === itemId));
+
+    expect(recipesUsing('tin_ore').map((recipe) => recipe.id)).toContain('recipe_tin_bar');
+    expect(recipesUsing('beast_claw').map((recipe) => recipe.id)).toContain('recipe_clawspur_dirk');
+    expect(recipesUsing('bronze_bar').map((recipe) => recipe.id)).toEqual(
+      expect.arrayContaining(['recipe_bronzeclasp_gauntlets', 'recipe_clawspur_dirk']),
+    );
+  });
+
   it('every node output and fallback harvest-table output exists in ITEMS', () => {
     for (const fallback of Object.values(NODE_HARVEST_TABLE)) {
       expect(ITEMS[fallback.itemId]).toBeDefined();

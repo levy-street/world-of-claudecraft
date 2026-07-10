@@ -6309,6 +6309,18 @@ export const ja_JP: EnTranslations = {
       "copper_bar": {
         "name": "銅の延べ棒"
       },
+      "tin_bar": {
+        "name": "錫の延べ棒"
+      },
+      "bronze_bar": {
+        "name": "青銅の延べ棒"
+      },
+      "bronzeclasp_gauntlets": {
+        "name": "青銅留めの篭手"
+      },
+      "clawspur_dirk": {
+        "name": "爪棘の短剣"
+      },
       "iron_bar": {
         "name": "鉄の延べ棒"
       },
