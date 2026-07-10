@@ -605,7 +605,7 @@ describe('client HTML shell', () => {
     expect(hudTs).not.toContain("bags.style.display = 'block'");
     expect(hudTs).not.toContain("bags.style.display !== 'block'");
     expect(hudTs).toContain("$('#bags').style.display = 'flex';");
-    expect(hudTs).toContain('this.isWindowVisible($(\'#bags\'))');
+    expect(hudTs).toContain("this.isWindowVisible($('#bags'))");
     expect(hudTs).toContain('if (this.isWindowVisible(el)) {');
     expect(hudTs).toContain("bags.style.display !== 'flex'");
   });
