@@ -448,7 +448,7 @@ describe('dungeons: heroic marks', () => {
     }
   });
 
-  it('a heroic final boss drops one personal Heroic Mark per participant', () => {
+  it('a heroic final boss drops one shared-personal Heroic Mark slot for the party', () => {
     const sim = makeSim(9);
     const leader = sim.addPlayer('warrior', 'Lead');
     const member = sim.addPlayer('mage', 'Mate');
@@ -470,11 +470,14 @@ describe('dungeons: heroic marks', () => {
     const marks = ((morthen.loot?.items ?? []) as any[]).filter(
       (s) => s.itemId === HEROIC_MARK_ITEM_ID,
     );
-    expect(marks).toHaveLength(2);
-    expect(marks.every((s) => s.count === 1)).toBe(true);
-    // One personal slot per participant: each mark is lootable by exactly one
-    // player, and together they cover both party members.
-    expect(marks.map((s) => s.personalFor)).toEqual(expect.arrayContaining([[leader], [member]]));
+    // One shared-personal slot covers the whole party: any earner looting it hands
+    // every earner their marks. count is the per-participant payout (1 five-man).
+    expect(marks).toHaveLength(1);
+    expect(marks[0].count).toBe(1);
+    expect(marks[0].sharedPersonal).toBe(true);
+    expect([...marks[0].personalFor].sort((a, b) => a - b)).toEqual(
+      [leader, member].sort((a, b) => a - b),
+    );
     expect(morthen.lootable).toBe(true);
   });
 
@@ -500,7 +503,37 @@ describe('dungeons: heroic marks', () => {
       (s) => s.itemId === HEROIC_MARK_ITEM_ID,
     );
     expect(marks).toHaveLength(1);
+    expect(marks[0].count).toBe(1);
+    expect(marks[0].sharedPersonal).toBe(true);
     expect(marks[0].personalFor).toEqual([pid]);
+  });
+
+  it('one party member looting the mark grants it to every earner and consumes the slot', () => {
+    const sim = makeSim(9);
+    const leader = sim.addPlayer('warrior', 'Lead');
+    const member = sim.addPlayer('mage', 'Mate');
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.setDungeonDifficulty('heroic', leader);
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    enterDungeon(sim.ctx, 'hollow_crypt', member);
+    const inst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
+    const morthen = mobInInstance(sim, inst, 'morthen');
+    const le = sim.entities.get(leader) as AnyEntity;
+    const me = sim.entities.get(member) as AnyEntity;
+    teleport(sim, le, morthen.pos.x + 1, morthen.pos.z);
+    teleport(sim, me, morthen.pos.x - 1, morthen.pos.z);
+    (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
+    expect(morthen.dead).toBe(true);
+
+    // Only the member loots. The mark still lands in BOTH bags, and the slot is gone.
+    sim.lootCorpse(morthen.id, member);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, member)).toBe(1);
+    const marksLeft = ((morthen.loot?.items ?? []) as any[]).filter(
+      (s) => s.itemId === HEROIC_MARK_ITEM_ID,
+    );
+    expect(marksLeft).toHaveLength(0);
   });
 
   it('drops no marks from a normal final boss or heroic trash', () => {
@@ -811,11 +844,13 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     const marks = ((boss.loot?.items ?? []) as any[]).filter(
       (s) => s.itemId === HEROIC_MARK_ITEM_ID,
     );
-    // The raid pays THREE marks per participant (marksPerParticipant), one
-    // personal slot each so a single loot click takes all three.
-    expect(marks).toHaveLength(raiders.length * 3);
-    expect(marks.flatMap((s) => s.personalFor).sort((a, b) => a - b)).toEqual(
-      raiders.flatMap((pid) => [pid, pid, pid]).sort((a, b) => a - b),
+    // The raid pays THREE marks per participant (marksPerParticipant) via one
+    // shared-personal slot: count 3, every raider listed, one loot fans out to all.
+    expect(marks).toHaveLength(1);
+    expect(marks[0].count).toBe(3);
+    expect(marks[0].sharedPersonal).toBe(true);
+    expect([...marks[0].personalFor].sort((a, b) => a - b)).toEqual(
+      [...raiders].sort((a, b) => a - b),
     );
   });
 });

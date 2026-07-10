@@ -719,7 +719,7 @@ export function valeCupRestore(ctx: SimContext, meta: PlayerMeta, e: Entity): vo
   meta.sportRole = null;
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   meta.wireRev++;
-  recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+  recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   restorePetFromDelveStash(ctx, meta.entityId);
 }
 

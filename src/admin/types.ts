@@ -313,6 +313,13 @@ export interface ModerationHistoryEntry {
   adminUsername: string | null;
 }
 
+export interface ModerationActionHistoryRow extends ModerationHistoryEntry {
+  source: 'account' | 'ip';
+  accountId: number | null;
+  username: string | null;
+  ip: string | null;
+}
+
 export interface ModerationQueueRow {
   accountId: number;
   username: string;

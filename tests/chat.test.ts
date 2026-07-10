@@ -270,6 +270,65 @@ describe('chat channels', () => {
     );
   });
 
+  it('/playtime reports zero on a freshly joined character', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    sim.tick();
+    sim.chat('/playtime', a);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        pid: a,
+        text: 'Total time played: 0s.',
+      }),
+    );
+  });
+
+  it('/playtime accumulates as the sim advances, unlike /played it survives a relog', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    teleport(sim, a, 0, -40);
+    // 20 ticks per sim-second; advance just over a minute of world time
+    for (let i = 0; i < 20 * 65; i++) sim.tick();
+
+    const state = sim.serializeCharacter(a);
+    expect(state?.totalPlayedSeconds).toBeGreaterThanOrEqual(64.9);
+
+    // Relog: a fresh Sim (server restart resets sim.time to 0) loading the saved state.
+    const sim2 = makeWorld();
+    const b = sim2.addPlayer('warrior', 'Aleph', { state: state! });
+    teleport(sim2, b, 0, -40);
+    sim2.tick();
+    sim2.chat('/playtime', b);
+    const events = sim2.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    const played = events.find(
+      (e): e is Extract<SimEvent, { type: 'error' }> =>
+        e.type === 'error' && e.text.startsWith('Total time played'),
+    );
+    // still reports the prior session's accumulated total, even though the new
+    // sim's clock (and this session's /played) has reset to zero.
+    expect(played?.text).toMatch(/^Total time played: 1m \d+s\.$/);
+
+    // Continuing to play in the new session keeps accumulating on top of that baseline.
+    for (let i = 0; i < 20 * 10; i++) sim2.tick();
+    sim2.chat('/playtime', b);
+    const events2 = sim2.tick();
+    const played2 = events2.find(
+      (e): e is Extract<SimEvent, { type: 'error' }> =>
+        e.type === 'error' && e.text.startsWith('Total time played'),
+    );
+    expect(played2?.text).toMatch(/^Total time played: 1m \d+s\.$/);
+    const secondsOf = (t: string) => {
+      const m = /(\d+)m (\d+)s/.exec(t)!;
+      return Number(m[1]) * 60 + Number(m[2]);
+    };
+    expect(secondsOf(played2!.text)).toBeGreaterThan(secondsOf(played!.text));
+  });
+
   it("/where reports the caller's zone, level range, and coordinates", () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');

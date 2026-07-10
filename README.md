@@ -277,7 +277,10 @@ The sim is a fixed 20 Hz tick (`DT = 1/20`), all randomness flows through one se
 | `scripts/` | Asset build plus browser E2E, screenshot, and integration scripts. |
 | `public/` · `docs/` | Static assets (GLB models, textures, HDRIs) and design docs. |
 
-Most directories carry their own `CLAUDE.md` with local conventions. The full set of project invariants lives in the root [`CLAUDE.md`](CLAUDE.md).
+Most directories carry their own `CLAUDE.md` with local conventions. The full set of
+project invariants lives in the root [`CLAUDE.md`](CLAUDE.md). Codex contributors start
+with [`AGENTS.md`](AGENTS.md) and the [Codex operator guide](docs/codex.md); those files
+route into the same canonical architecture without changing the Claude Code setup.
 
 ## Built like the classics
 
@@ -294,6 +297,7 @@ And almost none of it is a shipped asset. The world is drawn from code:
 
 ```bash
 npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons
+npm run gate                    # complete CI-equivalent contribution gate
 npm run build                   # production web build
 node scripts/smoke_browser.mjs  # warrior end-to-end (needs npm run dev)
 node scripts/smoke_mage.mjs     # mage: casting, polymorph, conjure and drink, death and release

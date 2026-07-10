@@ -87,6 +87,29 @@ beforeEach(() => {
   vi.restoreAllMocks();
 });
 
+describe('Input camera zoom', () => {
+  it('zooms the camera with the mouse wheel on desktop', () => {
+    const { canvasListeners, input } = makeInput();
+    const preventDefault = vi.fn();
+
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalled();
+    expect(input.camDist).toBeCloseTo(13.4);
+  });
+
+  it('ignores canvas wheel zoom while the mobile touch HUD is active', () => {
+    const { canvasListeners, input, setMobileTouch } = makeInput();
+    const preventDefault = vi.fn();
+    setMobileTouch(true);
+
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault });
+
+    expect(preventDefault).toHaveBeenCalled();
+    expect(input.camDist).toBe(12);
+  });
+});
+
 describe('Input autorun', () => {
   it('toggleAutorun flips state and feeds forward into readMoveInput', () => {
     const { input } = makeInput();
@@ -95,6 +118,14 @@ describe('Input autorun', () => {
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.toggleAutorun()).toBe(false);
+    expect(input.readMoveInput().forward).toBe(false);
+  });
+
+  it('setAutorun idempotently syncs external analog latches', () => {
+    const { input } = makeInput();
+    expect(input.setAutorun(true)).toBe(true);
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.setAutorun(false)).toBe(false);
     expect(input.readMoveInput().forward).toBe(false);
   });
 

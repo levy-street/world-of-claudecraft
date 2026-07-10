@@ -32,15 +32,17 @@ const DEADZONE = 0.22;
 // screen. Cosmetic only: never fed into the input math (see onMoveDown).
 const MOVE_JOYSTICK_FLOAT_RADIUS = 48;
 const CAMERA_SENSITIVITY = 0.8;
+export const MOVE_AUTORUN_REVEAL_THRESHOLD = 1.45;
+export const MOVE_AUTORUN_THRESHOLD = 2.05;
 // TODO: a dedicated deadzone/smoothing setting for swipe-look is deferred (plan
 // decision 7); touchLookSpeed already covers sensitivity for both the camera
 // joystick and swipe-look, so this constant stays a fixed tuning value for now.
 const SWIPE_LOOK_DEADZONE_PX = 6;
-// Pinch: each pixel the two fingers spread/close maps to this many yards of
-// camera distance. Tuned so a comfortable thumb-to-finger pinch sweeps roughly
-// the full 3..22yd zoom range in one gesture.
-const PINCH_ZOOM_SCALE = 0.04;
-
+// Ignore small two-finger jitter before treating the gesture as intentional
+// camera zoom. The sensitivity is deliberately lower than the old pinch path so
+// a comfortable spread/pinch changes camera distance gradually.
+const PINCH_ZOOM_DEADZONE_PX = 12;
+const PINCH_ZOOM_SENSITIVITY = 0.035;
 // Haptic feedback: short Vibration-API buzzes so touch actions feel physical.
 // On by default (own localStorage key, like music's ev_music_on); try/catch +
 // feature-detect guarded so it no-ops on desktop and under Vitest/jsdom.
@@ -114,7 +116,6 @@ export interface MobileControlCallbacks {
   onCycleTarget(): void;
   onJump(): void;
   onInteract(): void;
-  onAutorun(): boolean;
   /** Open the composer focused (raise the keyboard): the keybind / whisper path. */
   onChat(): void;
   /** Open the centered read view: composer bar visible but NOT focused (no keyboard). */
@@ -232,6 +233,14 @@ export function mapJoystickVector(x: number, y: number, deadzone = DEADZONE): To
   };
 }
 
+export function isMoveAutorunPush(y: number, threshold = MOVE_AUTORUN_THRESHOLD): boolean {
+  return y <= -threshold;
+}
+
+export function isMoveAutorunNear(y: number, threshold = MOVE_AUTORUN_REVEAL_THRESHOLD): boolean {
+  return y <= -threshold;
+}
+
 export class MobileControls {
   private active = false;
   private hapticsOn = loadHapticsEnabled();
@@ -258,11 +267,14 @@ export class MobileControls {
   private moveOriginY = 0;
   /** Rendered (transform-scaled) wheel radius: the input throw distance. */
   private moveRadius = 1;
+  private moveAutorunLocked = false;
   /** Layout (pre-transform) wheel radius: what style.left/top and the stick's
    *  translate use; the --joy-scale transform scales those visually. */
   private moveStickRadius = 1;
 
-  // two-finger pinch-to-zoom on the game view (phones have no scroll wheel)
+  // Track two-finger canvas gestures for guarded camera zoom and to suppress
+  // swipe-look while both fingers are down. Touches that begin on HUD chrome are
+  // owned by the router and never reach this canvas path.
   private pinchPointers = new Map<number, { x: number; y: number }>();
   private pinchPrevDist: number | null = null;
   private swipeLookPointer: number | null = null;
@@ -285,7 +297,7 @@ export class MobileControls {
   private moveStick = document.getElementById('mobile-move-stick') as HTMLElement | null;
   private cameraJoystick = document.getElementById('mobile-camera-joystick') as HTMLElement | null;
   private cameraStick = document.getElementById('mobile-camera-stick') as HTMLElement | null;
-  private autorunButton = document.getElementById('mobile-autorun') as HTMLElement | null;
+  private autorunTarget = document.getElementById('mobile-autorun-target') as HTMLElement | null;
 
   constructor(
     private input: Input,
@@ -388,18 +400,6 @@ export class MobileControls {
       }
     });
 
-    if (this.autorunButton) {
-      // bindTouchTap, not 'click': a click never fires for a non-primary
-      // touch, and Autorun is tapped mid-steer by definition.
-      bindTouchTap(this.autorunButton, (e) => {
-        if (!this.active) return;
-        e.preventDefault();
-        triggerHaptic(HAPTIC_TAP, this.hapticsOn);
-        const on = this.callbacks.onAutorun();
-        this.autorunButton?.classList.toggle('active', on);
-      });
-    }
-
     this.canvas?.addEventListener('pointerdown', (e) => {
       this.onPinchDown(e);
       this.onSwipeLookDown(e);
@@ -492,7 +492,6 @@ export class MobileControls {
     document.body.classList.toggle('mobile-touch', active);
     if (!active) {
       this.root?.classList.remove('expanded');
-      this.autorunButton?.classList.remove('active');
       document.body.classList.remove(
         'mobile-more-open',
         'mobile-chat-open',
@@ -710,6 +709,11 @@ export class MobileControls {
     this.moveOriginY = e.clientY;
     this.moveRadius = renderedRadius;
     this.moveStickRadius = layoutRadius;
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget('hidden');
+    // Autorun is a latch from the previous joystick drag; a fresh grab is a new
+    // movement intent, so it cancels the latch before steering.
+    if (this.input.autorun) this.input.setAutorun(false);
     // The wheel's DRAWN position floats toward the thumb but is clamped to stay
     // within MOVE_JOYSTICK_FLOAT_RADIUS of its resting spot, so a touch anywhere
     // in the (much larger) move zone no longer teleports the visible wheel clear
@@ -753,9 +757,28 @@ export class MobileControls {
     // radius while the input throw above used the rendered one.
     this.moveStick.style.transform = `translate(${(x * this.moveStickRadius * 0.46).toFixed(1)}px, ${(y * this.moveStickRadius * 0.46).toFixed(1)}px)`;
     const move = mapJoystickVector(x, y, this.moveDeadzone);
+    const inAutorunTarget = isMoveAutorunPush(rawY);
+    if (this.moveAutorunLocked && inAutorunTarget) {
+      this.input.clearTouchMove();
+      this.input.setAutorun(true);
+      this.syncMoveAutorunTarget('locked');
+      return;
+    }
+    if (this.moveAutorunLocked && !inAutorunTarget) {
+      this.moveAutorunLocked = false;
+      this.input.setAutorun(false);
+    }
+    if (inAutorunTarget) {
+      this.moveAutorunLocked = true;
+      this.input.clearTouchMove();
+      this.input.setAutorun(true);
+      this.syncMoveAutorunTarget('locked');
+      return;
+    }
     this.input.setTouchMove(move);
-    // setTouchMove cancels autorun on forward/back input — keep the button glow honest.
-    if (move.forward || move.back) this.autorunButton?.classList.remove('active');
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
+    if (moving && this.input.autorun) this.input.setAutorun(false);
+    this.syncMoveAutorunTarget(isMoveAutorunNear(rawY) ? 'near' : 'hidden');
   }
 
   private onMoveEnd(e: PointerEvent): void {
@@ -777,6 +800,8 @@ export class MobileControls {
       }
     }
     this.joyPointer = null;
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget(this.input.autorun ? 'locked' : 'hidden');
     this.input.clearTouchMove();
     if (this.moveStick) this.moveStick.style.transform = '';
     if (this.moveJoystick) {
@@ -784,6 +809,16 @@ export class MobileControls {
       this.moveJoystick.style.left = '';
       this.moveJoystick.style.top = '';
     }
+  }
+
+  private syncMoveAutorunTarget(state: 'hidden' | 'near' | 'locked'): void {
+    this.autorunTarget?.classList.toggle('near', state === 'near' || state === 'locked');
+    this.autorunTarget?.classList.toggle('locked', state === 'locked');
+  }
+
+  syncAutorun(on: boolean): void {
+    this.moveAutorunLocked = false;
+    this.syncMoveAutorunTarget(on ? 'locked' : 'hidden');
   }
 
   private onCameraDown(e: PointerEvent): void {
@@ -897,7 +932,8 @@ export class MobileControls {
   private onPinchMove(e: PointerEvent): void {
     if (!this.active || !this.pinchPointers.has(e.pointerId)) return;
     // A window opening mid-gesture ends the pinch immediately: menuOpen means
-    // every touch is now the modal's, so the gesture must stop zooming.
+    // every touch is now the modal's, so the gesture must stop suppressing camera
+    // swipes.
     if (document.body.classList.contains('mobile-window-open')) {
       this.releasePinch();
       return;
@@ -906,8 +942,11 @@ export class MobileControls {
     if (this.pinchPointers.size === 2 && this.pinchPrevDist !== null) {
       e.preventDefault();
       const cur = this.currentPinchDist();
-      this.input.zoomBy(pinchZoomDelta(this.pinchPrevDist, cur));
-      this.pinchPrevDist = cur;
+      const zoomDelta = pinchZoomDelta(this.pinchPrevDist, cur);
+      if (zoomDelta !== 0) {
+        this.input.zoomBy(zoomDelta);
+        this.pinchPrevDist = cur;
+      }
     }
   }
 
@@ -1029,15 +1068,15 @@ export function mapLookVector(x: number, y: number, deadzone = DEADZONE): { x: n
   return { x: x * CAMERA_SENSITIVITY, y: y * CAMERA_SENSITIVITY };
 }
 
-/**
- * Camera-distance delta for a pinch frame, in yards. Fingers spreading apart
- * (curDist > prevDist) zooms IN, i.e. returns a negative delta to shrink camDist;
- * pinching together zooms out. Matches the sign convention of the wheel handler.
- */
 export function pinchZoomDelta(
   prevDist: number,
   curDist: number,
-  scale = PINCH_ZOOM_SCALE,
+  sensitivity = PINCH_ZOOM_SENSITIVITY,
+  deadzonePx = PINCH_ZOOM_DEADZONE_PX,
 ): number {
-  return (prevDist - curDist) * scale;
+  const delta = curDist - prevDist;
+  const abs = Math.abs(delta);
+  if (abs <= deadzonePx) return 0;
+  const adjusted = abs - deadzonePx;
+  return -Math.sign(delta) * adjusted * sensitivity;
 }

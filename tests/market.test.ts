@@ -553,3 +553,50 @@ describe('the World Market — the Merchant', () => {
     expect(info.listings.length).toBeLessThanOrEqual(120);
   });
 });
+
+describe('World Market: a now-soulbound listing is returned to the seller', () => {
+  it('moves a soulbound listing off the book and into the seller collection on load', () => {
+    const sim = makeWorld();
+    const sellerKey = 'char:99';
+    // A save from BEFORE heroic_mark became soulbound can still hold a listing of
+    // it (the list-time gate only blocks NEW listings). loadMarket must not keep a
+    // soulbound item on the market; it returns it to the seller's collection.
+    const save = {
+      listings: [
+        {
+          id: 1,
+          sellerKey,
+          sellerName: 'Ada',
+          itemId: 'heroic_mark',
+          count: 3,
+          price: 100,
+          secondsLeft: 1000,
+        },
+        {
+          id: 2,
+          sellerKey,
+          sellerName: 'Ada',
+          itemId: 'wolf_fang',
+          count: 1,
+          price: 50,
+          secondsLeft: 1000,
+        },
+      ],
+      collections: [],
+      nextListingId: 3,
+    };
+    sim.market.loadMarket(save as never);
+
+    const listed = sim.market.marketListings.filter((l) => !l.house).map((l) => l.itemId);
+    expect(listed).not.toContain('heroic_mark'); // the soulbound listing is gone
+    expect(listed).toContain('wolf_fang'); // a tradable listing stays
+
+    const collections = (
+      sim.market as unknown as {
+        marketCollections: Map<string, { items: { itemId: string; count: number }[] }>;
+      }
+    ).marketCollections;
+    const coll = collections.get(sellerKey);
+    expect(coll?.items.some((s) => s.itemId === 'heroic_mark' && s.count === 3)).toBe(true);
+  });
+});

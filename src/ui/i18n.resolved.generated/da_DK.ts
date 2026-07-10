@@ -306,7 +306,6 @@ export const da_DK: EnTranslations = {
       "chat": "Spring til chat"
     },
     "mobile": {
-      "autorun": "Autoløb",
       "jump": "Hop",
       "leaderboard": "Rangliste",
       "dailyRewards": "Belønninger",
@@ -722,6 +721,8 @@ export const da_DK: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1067,6 +1068,26 @@ export const da_DK: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} rejser sig over Tornetop Højder!"
     },
+    "auth": {
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "forgotPrompt": "Glemt adgangskode?",
+      "forgotTitle": "Nulstil din adgangskode",
+      "forgotHint": "Indtast dit brugernavn, så sender vi et nulstillingslink til den registrerede e-mailadresse.",
+      "forgotUsername": "Brugernavn",
+      "forgotSubmit": "Send nulstillingslink",
+      "forgotSent": "Hvis en konto med det brugernavn har en registreret e-mailadresse, har vi sendt et nulstillingslink. Tjek din indbakke.",
+      "forgotBack": "Tilbage til log ind",
+      "resetTitle": "Vælg en ny adgangskode",
+      "resetNewPassword": "Ny adgangskode",
+      "resetConfirm": "Bekræft ny adgangskode",
+      "resetSubmit": "Opdater adgangskode",
+      "resetDone": "Din adgangskode er opdateret. Du kan nu logge ind.",
+      "resetMismatch": "Adgangskoderne stemmer ikke overens.",
+      "resetErrInvalid": "Dette nulstillingslink er ugyldigt eller udløbet. Anmod om et nyt."
+    },
     "loot": {
       "chestTitle": "Kiste"
     },
@@ -1296,6 +1317,8 @@ export const da_DK: EnTranslations = {
       "parcelsLabel": "Pakker",
       "parcelsHint": "Klik på en genstand i dine tasker for at vedhæfte den.",
       "removeParcelAria": "Fjern {item} fra brevet",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Send brev",
       "postageNote": "Porto: {amount}. Ravnen er undervejs i omtrent {seconds}s.",
       "arrivedBanner": "Ravnen er landet: post fra {name}.",
@@ -5854,6 +5877,15 @@ export const da_DK: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Lærredslap"
+      },
+      "arcane_dust": {
+        "name": "Arkanstøv"
+      },
+      "arcane_essence": {
+        "name": "Arkanessens"
+      },
+      "arcane_shard": {
+        "name": "Arkanskår"
       },
       "fen_muster_order": {
         "name": "Kærbro Mønstringsordre"

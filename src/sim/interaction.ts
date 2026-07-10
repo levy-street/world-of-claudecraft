@@ -127,6 +127,17 @@ export function lootCorpse(
       if (s.count > 0) bagsFull = true;
       continue;
     }
+    if (s.personalFor && s.sharedPersonal) {
+      // Shared-personal token (Heroic Marks): one loot action by any earner hands
+      // every earner their marks, then the slot is consumed. Grant best-effort so
+      // a full-bagged earner never strands the token for the rest of the party;
+      // marks stack, so this only misses a truly full inventory.
+      for (const rid of s.personalFor) ctx.addItem(s.itemId, s.count, rid);
+      s.count = 0;
+      s.personalFor = [];
+      tookPersonal = true;
+      continue;
+    }
     if (s.personalFor) {
       if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) {
         bagsFull = true;

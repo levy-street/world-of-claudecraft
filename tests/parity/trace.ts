@@ -173,6 +173,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'potionCdRemaining', // derived display copy of potionCooldownUntil (the pinned authority)
   'mainhandItemId', // render-only; "the sim never reads it for gameplay"
   'equippedItems', // render-only mirror for inspect; sim never reads it for gameplay
+  'equippedInstances', // render-only mirror (Enchanting); the sim reads the SOURCE (meta.equipmentInstance), never this
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',
   'stealthed', // derived cache of auras.some(a => a.kind === 'stealth'); auras is sampled

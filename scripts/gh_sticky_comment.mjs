@@ -1,7 +1,7 @@
 // Shared helper: post or update a single "sticky" comment on a pull request via the
 // GitHub REST API. A sticky comment carries a hidden HTML marker so reruns edit the
-// same comment instead of stacking a new one every push. Used by the PR-assist jobs
-// (ai_review.mjs, pr_comment_shots.mjs). No npm deps: Node 18+ global fetch only.
+// same comment instead of stacking a new one every push. Used by the PR-assist posting
+// and screenshot scripts. No npm deps: Node 18+ global fetch only.
 //
 // Auth + target come from the standard GitHub Actions environment:
 //   GITHUB_TOKEN       token with pull-requests:write (the default Actions token)

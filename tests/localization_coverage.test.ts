@@ -753,7 +753,11 @@ describe('i18n Localization Key Coverage', () => {
     expect(entityCount('class', 'description')).toBe(Object.keys(CLASSES).length);
     expect(entityCount('ability', 'name')).toBe(Object.keys(ABILITIES).length);
     expect(entityCount('ability', 'description')).toBe(Object.keys(ABILITIES).length);
-    expect(entityCount('item', 'name')).toBe(Object.keys(ITEMS).length);
+    // Heroic upgraded variants (heroicOf) have no name key: they share the base
+    // item name, so they are excluded from the entity manifest.
+    expect(entityCount('item', 'name')).toBe(
+      Object.values(ITEMS).filter((i) => !i.heroicOf).length,
+    );
     expect(entityCount('mob', 'name')).toBe(Object.keys(MOBS).length);
     expect(entityCount('npc', 'name')).toBe(Object.keys(NPCS).length);
     expect(entityCount('npc', 'title')).toBe(Object.keys(NPCS).length);
@@ -891,7 +895,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide every item translation in every locale without canonical fallbacks', () => {
     const itemEntries = entityTranslationManifest().filter((entry) => entry.group === 'item');
-    expect(itemEntries).toHaveLength(Object.keys(ITEMS).length);
+    // Heroic upgraded variants (heroicOf) carry no name key: they share the base
+    // item name (see itemDisplayName), so they are not in the manifest.
+    const namedItems = Object.values(ITEMS).filter((i) => !i.heroicOf).length;
+    expect(itemEntries).toHaveLength(namedItems);
     expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
 
     for (const lang of supportedLanguages) {

@@ -23,6 +23,7 @@
 
 import { routes as accountRoutes } from '../account';
 import { routes as adminRoutes } from '../admin';
+import { routes as appleAuthRoutes } from '../apple_auth';
 import { routes as authRoutes } from '../auth_routes';
 import { routes as characterRoutes } from '../characters';
 import { routes as dailyRewardRoutes } from '../daily_rewards';
@@ -111,6 +112,7 @@ export interface ApiRegistry {
 export const apiRoutes: readonly RouteDef[] = [
   ...leaderboardRoutes,
   ...authRoutes,
+  ...appleAuthRoutes,
   ...characterRoutes,
   ...accountRoutes,
   ...walletRoutes,

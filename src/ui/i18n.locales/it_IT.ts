@@ -4488,7 +4488,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}s',
-  'hudChrome.mobile.autorun': 'Corsa automatica',
   'hudChrome.mobile.haptics': 'Vibrazione',
   'hudChrome.mobile.hapticsOff': 'Vibrazione disattivata',
   'hudChrome.mobile.hotbarPage': 'Abilità',
@@ -6659,4 +6658,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Lasci la coda di Proteggi Yumi.',
   'yumi.queue.teamLeave': 'La tua squadra lascia la coda di Proteggi Yumi.',
   'yumi.respawn.title': 'ABBATTUTO!',
+  'hudChrome.auth.forgotPrompt': 'Password dimenticata?',
+  'hudChrome.auth.forgotTitle': 'Reimposta la password',
+  'hudChrome.auth.forgotHint':
+    'Inserisci il tuo nome utente e invieremo un link di reimpostazione all’indirizzo e-mail registrato.',
+  'hudChrome.auth.forgotUsername': 'Nome utente',
+  'hudChrome.auth.forgotSubmit': 'Invia link di reimpostazione',
+  'hudChrome.auth.forgotSent':
+    'Se un account con quel nome utente ha un indirizzo e-mail registrato, abbiamo inviato un link di reimpostazione. Controlla la tua casella di posta.',
+  'hudChrome.auth.forgotBack': 'Torna all’accesso',
+  'hudChrome.auth.resetTitle': 'Scegli una nuova password',
+  'hudChrome.auth.resetNewPassword': 'Nuova password',
+  'hudChrome.auth.resetConfirm': 'Conferma la nuova password',
+  'hudChrome.auth.resetSubmit': 'Aggiorna password',
+  'hudChrome.auth.resetDone': 'La tua password è stata aggiornata. Ora puoi accedere.',
+  'hudChrome.auth.resetMismatch': 'Le password non coincidono.',
+  'hudChrome.auth.resetErrInvalid':
+    'Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo.',
 };

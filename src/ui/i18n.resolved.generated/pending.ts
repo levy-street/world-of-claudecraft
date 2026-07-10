@@ -12,72 +12,159 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.holy_taunt.description",
     "entities.abilities.holy_taunt.name",
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "es_ES": [
     "entities.abilities.holy_taunt.description",
     "entities.abilities.holy_taunt.name",
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "fr_FR": [
     "entities.abilities.holy_taunt.description",
     "entities.abilities.holy_taunt.name",
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "fr_CA": [
     "entities.abilities.holy_taunt.description",
     "entities.abilities.holy_taunt.name",
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.holy_taunt.description",
     "entities.abilities.holy_taunt.name",
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "de_DE": [
     "entities.abilities.holy_taunt.description",
     "entities.abilities.holy_taunt.name",
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.itemHeroicTag"
+  ],
+  "zh_TW": [
+    "hudChrome.itemHeroicTag"
+  ],
+  "ko_KR": [
+    "hudChrome.itemHeroicTag"
+  ],
+  "ja_JP": [
+    "hudChrome.itemHeroicTag"
+  ],
   "pt_BR": [
     "entities.abilities.holy_taunt.description",
     "entities.abilities.holy_taunt.name",
+    "entities.items.arcane_dust.name",
+    "entities.items.arcane_essence.name",
+    "entities.items.arcane_shard.name",
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.itemHeroicTag"
+  ],
   "cs_CZ": [
     "entities.abilities.holy_taunt.description",
     "entities.abilities.holy_taunt.name",
@@ -85,7 +172,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "nl_NL": [
     "entities.abilities.holy_taunt.description",
@@ -94,7 +189,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "pl_PL": [
     "entities.abilities.holy_taunt.description",
@@ -103,7 +206,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "id_ID": [
     "entities.abilities.holy_taunt.description",
@@ -112,7 +223,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "tr_TR": [
     "entities.abilities.holy_taunt.description",
@@ -121,7 +240,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "sv_SE": [
     "entities.abilities.holy_taunt.description",
@@ -130,7 +257,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "vi_VN": [
     "entities.abilities.holy_taunt.description",
@@ -139,7 +274,15 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ],
   "da_DK": [
     "entities.abilities.holy_taunt.description",
@@ -148,6 +291,14 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_prof_intro.completion",
     "entities.quests.q_prof_intro.objectives.0.label",
     "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title"
+    "entities.quests.q_prof_intro.title",
+    "hudChrome.auth.appleChoiceExpired",
+    "hudChrome.auth.appleChoiceIntro",
+    "hudChrome.auth.appleError",
+    "hudChrome.auth.appleLoginCta",
+    "hudChrome.itemHeroicTag",
+    "hudChrome.itemSoulbound",
+    "hudChrome.mailbox.parcelQtyDecreaseAria",
+    "hudChrome.mailbox.parcelQtyIncreaseAria"
   ]
 };
