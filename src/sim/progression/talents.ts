@@ -64,6 +64,14 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   // addPlayer/restore block), so this never spams on login. refreshKnownAbilities only
   // fires for abilities genuinely new since the last known-set.
   ctx.refreshKnownAbilities(meta, true);
+  // Force the online client to re-pull the heavy `tal` snapshot field NOW, so its
+  // derived known-ability list (and every ability tooltip's cost / cooldown / effect
+  // text) reflects the new allocation immediately instead of waiting on the periodic
+  // heavy-refresh backstop. This is the single choke point every LIVE talent change
+  // flows through (apply / spec / respec / loadout-switch), so bumping wireRev here
+  // covers them all without depending on each command being listed in HEAVY_SELF_CMDS
+  // (the same reason the Vale Cup kit swap and fiesta loadout swap bump it).
+  meta.wireRev++;
 }
 
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
