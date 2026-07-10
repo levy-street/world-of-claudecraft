@@ -1833,8 +1833,18 @@ describe('delve self-state mirrors over the wire', () => {
     const meta = server.sim.meta(session.pid)!;
     meta.delveClears['collapsed_reliquary:heroic'] = 1;
     meta.delveDaily.markClears = 2;
-    broadcast(server);
-    const snap = lastSnap(fc.sent);
+    // Delve META (marks/clears/daily) rides the pid-staggered secondary
+    // cadence (SELF_SECONDARY_INTERVAL_TICKS): a sim-driven change reaches
+    // the client within 4 ticks (<=200ms), not necessarily the very next
+    // snapshot. Live delve HUD state (drun/dcompanion) stays per-tick.
+    let snap: any;
+    for (let i = 0; i < 4 && snap === undefined; i++) {
+      server.sim.tick();
+      broadcast(server);
+      const last = lastSnap(fc.sent);
+      if (last?.self?.dmarks !== undefined) snap = last;
+    }
+    expect(snap).toBeDefined();
     expect(snap.self.dmarks).toBe(5);
     expect(snap.self.dclears['collapsed_reliquary:heroic']).toBe(1);
     expect(snap.self.delveDaily.markClears).toBe(2);
@@ -2332,8 +2342,10 @@ describe('delta-key contract pins (anti-drift)', () => {
   it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from server/game.ts (multi-line lockouts incl.)', () => {
     const src = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
     // tolerate whitespace/newline between `(` and the quote so the multi-line
-    // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted
-    const re = /\bmaybe\(\s*['"](\w+)['"]/g;
+    // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted.
+    // maybeJson('key', ...) is the same delta mechanism fed a pre-serialized
+    // string (per-party caches, empty-map fast paths), so it counts equally.
+    const re = /\bmaybe(?:Json)?\(\s*['"](\w+)['"]/g;
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured

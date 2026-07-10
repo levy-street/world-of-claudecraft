@@ -121,6 +121,11 @@ export interface BotTrackingContext {
 }
 
 export interface BotDetector {
+  // When false, the host skips building the per-session SessionRuntimeSnapshot
+  // each tick (an allocation per player per tick) and passes null to handleTick.
+  // Absent means true, so an implementation predating this flag keeps receiving
+  // snapshots unchanged.
+  readonly wantsTickSnapshots?: boolean;
   createTrackingContext(ref: PlayerSessionRef, meta?: unknown): BotTrackingContext;
   // Contexts start connected; linkdead drop marks false, same-session resume marks true with fresh meta.
   setTrackingConnection(ctx: BotTrackingContext, connected: boolean, meta?: unknown): void;

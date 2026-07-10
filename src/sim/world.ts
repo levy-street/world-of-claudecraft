@@ -403,14 +403,105 @@ function shapeAt(x: number, z: number): { hill: number; base: number } {
   return { hill, base };
 }
 
+// ---------------------------------------------------------------------------
+// Per-cell shortlists of the point features the heightfield composes (zone
+// hubs, lakes, camps). baseHeight/terrainHeight used to test EVERY hub, lake,
+// and camp for every sample (a sqrt + compare per feature per sample, on the
+// per-tick movement path of every moving entity). A sample can only be
+// influenced by a feature whose gate radius reaches its 64-yd cell, so each
+// cell caches the features that can possibly pass their gate anywhere inside
+// it (conservative superset: gate radius + the cell's half-diagonal + 1 yd of
+// float margin). Shortlisted features then run the ORIGINAL gate with the
+// ORIGINAL arithmetic, in the ORIGINAL composition order, so results stay
+// bit-identical (the buildTerrainEditIndex contract: extra candidates are
+// harmless because every candidate is re-checked). Keyed by content identity
+// (custom maps get their own cells) and rebuilt only on content swap.
+type ZoneT = WorldContent['zones'][number];
+type CampT = WorldContent['camps'][number];
+type LakeT = ZoneT['lakes'][number];
+
+interface TerrainFeatureShortlists {
+  hubZones: readonly ZoneT[]; // zones whose hub plateau can reach this cell, zone order
+  lakes: readonly LakeT[]; // lakes whose basin can reach this cell, zones-then-lakes order
+  camps: readonly CampT[]; // camps whose flatten can reach this cell, camp order
+}
+
+const FEATURE_CELL = 64; // yards per shortlist cell
+const FEATURE_CELL_SPAN = 16384; // cells per axis in the packed key
+const FEATURE_CELL_REACH = (FEATURE_CELL * Math.SQRT2) / 2 + 1; // half-diagonal + margin
+const FEATURE_CELLS_MAX = 100_000; // bounds memory on absurd custom maps
+
+const featureShortlistCache = new WeakMap<WorldContent, Map<number, TerrainFeatureShortlists>>();
+
+function featureShortlistsAt(x: number, z: number): TerrainFeatureShortlists {
+  const content = world().content;
+  let cells = featureShortlistCache.get(content);
+  if (!cells) {
+    cells = new Map();
+    featureShortlistCache.set(content, cells);
+  }
+  const cx = Math.floor(x / FEATURE_CELL);
+  const cz = Math.floor(z / FEATURE_CELL);
+  const key = (cx + FEATURE_CELL_SPAN / 2) * FEATURE_CELL_SPAN + (cz + FEATURE_CELL_SPAN / 2);
+  let cell = cells.get(key);
+  if (cell === undefined) {
+    if (cells.size >= FEATURE_CELLS_MAX) cells.clear();
+    const ccx = (cx + 0.5) * FEATURE_CELL;
+    const ccz = (cz + 0.5) * FEATURE_CELL;
+    const reaches = (fx: number, fz: number, gateRadius: number): boolean =>
+      Math.hypot(fx - ccx, fz - ccz) < gateRadius + FEATURE_CELL_REACH;
+    const hubZones = content.zones.filter((zone) =>
+      reaches(zone.hub.x, zone.hub.z, zone.hub.radius * 1.6),
+    );
+    const lakes: LakeT[] = [];
+    for (const zone of content.zones) {
+      for (const lake of zone.lakes) {
+        if (reaches(lake.x, lake.z, lake.radius * LAKE_BLEND_RADIUS_MULT)) lakes.push(lake);
+      }
+    }
+    const camps = content.camps.filter((camp) =>
+      reaches(camp.center.x, camp.center.z, camp.radius * 1.8),
+    );
+    cell = { hubZones, lakes, camps };
+    cells.set(key, cell);
+  }
+  return cell;
+}
+
+// The camp-flatten target height (baseHeight at the camp's center) is a pure
+// constant per (camp, seed) FOR FROZEN CONTENT; the map editor mutates camp
+// objects in place, so entries also carry the feature-cache generation and go
+// stale together with the shortlists on invalidateTerrainFeatures().
+let terrainFeatureGen = 0;
+const campCenterHeightCache = new WeakMap<CampT, { seed: number; gen: number; h: number }>();
+
+function campCenterHeight(camp: CampT, seed: number): number {
+  let entry = campCenterHeightCache.get(camp);
+  if (!entry || entry.seed !== seed || entry.gen !== terrainFeatureGen) {
+    entry = { seed, gen: terrainFeatureGen, h: baseHeight(camp.center.x, camp.center.z, seed) };
+    campCenterHeightCache.set(camp, entry);
+  }
+  return entry.h;
+}
+
+// Drops the terrain-feature caches for the ACTIVE content (editor-only: call
+// after mutating hubs/lakes/camps in place, the invalidateTerrainEditIndex /
+// invalidateStaticColliders pattern). Hosts never mutate content in place, so
+// the sim/server never need this. The exact export name is a contract with
+// the editor lane: do not rename.
+export function invalidateTerrainFeatures(): void {
+  featureShortlistCache.delete(world().content);
+  terrainFeatureGen++;
+}
+
 function baseHeight(x: number, z: number, seed: number): number {
-  const zones = world().content.zones;
+  const shortlists = featureShortlistsAt(x, z);
   const shape = shapeAt(x, z);
   let h =
     (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
   // Flatten each zone's hub settlement into a plateau
-  for (const zone of zones) {
+  for (const zone of shortlists.hubZones) {
     const dx = x - zone.hub.x,
       dz = z - zone.hub.z;
     const dHub = Math.sqrt(dx * dx + dz * dz);
@@ -423,17 +514,11 @@ function baseHeight(x: number, z: number, seed: number): number {
   const minLand = waterLevel() + 1.4;
   if (h < minLand) h = minLand - (minLand - h) * 0.12;
   // ...except the carved lake basins
-  for (const zone of zones) {
-    for (const lake of zone.lakes) {
-      const dLake = Math.sqrt((x - lake.x) ** 2 + (z - lake.z) ** 2);
-      if (dLake < lake.radius * LAKE_BLEND_RADIUS_MULT) {
-        const lakeBlend = smoothstep(
-          lake.radius * 0.55,
-          lake.radius * LAKE_BLEND_RADIUS_MULT,
-          dLake,
-        );
-        h = h * lakeBlend + (waterLevel() - 4) * (1 - lakeBlend);
-      }
+  for (const lake of shortlists.lakes) {
+    const dLake = Math.sqrt((x - lake.x) ** 2 + (z - lake.z) ** 2);
+    if (dLake < lake.radius * LAKE_BLEND_RADIUS_MULT) {
+      const lakeBlend = smoothstep(lake.radius * 0.55, lake.radius * LAKE_BLEND_RADIUS_MULT, dLake);
+      h = h * lakeBlend + (waterLevel() - 4) * (1 - lakeBlend);
     }
   }
   return h;
@@ -456,12 +541,12 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   let h = baseHeight(x, z, seed);
 
   // Flatten each camp a little so mobs don't stand on cliffs
-  for (const camp of w.content.camps) {
+  for (const camp of featureShortlistsAt(x, z).camps) {
     const dx = x - camp.center.x,
       dz = z - camp.center.z;
     const d = Math.sqrt(dx * dx + dz * dz);
     if (d < camp.radius * 1.8) {
-      const ch = baseHeight(camp.center.x, camp.center.z, seed);
+      const ch = campCenterHeight(camp, seed);
       const blend = smoothstep(camp.radius * 0.8, camp.radius * 1.8, d);
       h = h * blend + ch * (1 - blend);
     }
@@ -515,12 +600,17 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // read as artificial from a distance. Give it the same two-layer jagged
   // crest as the inter-zone ridges: a coarse peak/saddle layer plus a finer
   // crag layer, same conservative combined variance so the climb-limit
-  // invariant still holds along the whole rim.
-  const rimCrest =
-    1 +
-    (fbm2(x * 0.025, z * 0.025, seed + 29, 3) - 0.5) * 0.35 * mountainDetail +
-    (fbm2(x * 0.09, z * 0.09, seed + 37, 2) - 0.5) * 0.15 * mountainDetail;
-  mountainAdd += rim * 55 * rimCrest;
+  // invariant still holds along the whole rim. Everywhere away from the rim
+  // (rim === 0, the whole playable interior) the term contributes an exact
+  // +0 for any finite crest, so the five crest noise octaves are skipped
+  // without moving a single in-world sample.
+  if (rim !== 0) {
+    const rimCrest =
+      1 +
+      (fbm2(x * 0.025, z * 0.025, seed + 29, 3) - 0.5) * 0.35 * mountainDetail +
+      (fbm2(x * 0.09, z * 0.09, seed + 37, 2) - 0.5) * 0.15 * mountainDetail;
+    mountainAdd += rim * 55 * rimCrest;
+  }
   // Terrace the combined mountain rise into stair-stepped bands (flat treads
   // + steep risers) instead of one smooth ramp, so slopes read as a stacked
   // rocky mountainside rather than a uniform incline. This does not reduce

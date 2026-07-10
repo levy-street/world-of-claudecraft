@@ -55,20 +55,31 @@ export function scaledDefaultMobMeleeRange(scale: number): number {
 // reach to a scale-5 body (~17yd): visual size and combat reach are decoupled.
 const THUNZHARR_REACH_SCALE = 5;
 
+// Profiles are shared, read-only values: the two Nythraxis branches have
+// always returned module constants, so callers already must not mutate a
+// returned profile. The scale-derived defaults are memoized to that same
+// contract; the spread allocation used to run about twice per engaged mob
+// per tick.
+const scaledProfileCache = new Map<number, MobCombatProfile>();
+
+function scaledMobCombatProfile(scale: number): MobCombatProfile {
+  let p = scaledProfileCache.get(scale);
+  if (!p) {
+    p = {
+      ...DEFAULT_MOB_COMBAT_PROFILE,
+      meleeRange: scaledDefaultMobMeleeRange(scale),
+      desiredRange: scaledDefaultMobMeleeRange(scale) * 0.8,
+    };
+    scaledProfileCache.set(scale, p);
+  }
+  return p;
+}
+
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {
   if (templateId === 'nythraxis_scourge_of_thornpeak') return NYTHRAXIS_BOSS_COMBAT_PROFILE;
   if (templateId === 'nythraxis_skeleton_warrior') return NYTHRAXIS_ADD_COMBAT_PROFILE;
-  if (templateId === 'thunzharr_waking_peak')
-    return {
-      ...DEFAULT_MOB_COMBAT_PROFILE,
-      meleeRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE),
-      desiredRange: scaledDefaultMobMeleeRange(THUNZHARR_REACH_SCALE) * 0.8,
-    };
-  return {
-    ...DEFAULT_MOB_COMBAT_PROFILE,
-    meleeRange: scaledDefaultMobMeleeRange(scale),
-    desiredRange: scaledDefaultMobMeleeRange(scale) * 0.8,
-  };
+  if (templateId === 'thunzharr_waking_peak') return scaledMobCombatProfile(THUNZHARR_REACH_SCALE);
+  return scaledMobCombatProfile(scale);
 }
 
 // Closing-distance grace. A 20 Hz tick samples positions discretely, so a mob that

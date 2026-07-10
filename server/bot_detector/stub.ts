@@ -5,6 +5,9 @@ const HANDLE = {} as unknown as BotTrackingContext;
 
 export function createBotDetector(): BotDetector {
   return {
+    // The stub inspects nothing, so the host can skip the per-player-per-tick
+    // runtime-snapshot allocation entirely.
+    wantsTickSnapshots: false,
     createTrackingContext: (_ref, _meta) => HANDLE,
     setTrackingConnection: () => {},
     releaseTrackingContext: () => {},

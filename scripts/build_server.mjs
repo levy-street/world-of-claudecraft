@@ -20,6 +20,16 @@ await esbuild.build({
   alias: { '#bot-detector': usePrivate ? privateImpl : stubImpl },
 });
 
+// The snapshot-fanout worker thread: its own bundle next to server.cjs (the
+// server resolves it as path.join(__dirname, 'snapshot_worker.cjs')).
+await esbuild.build({
+  entryPoints: ['server/snapshot_fanout/worker_main.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  outfile: 'dist-server/snapshot_worker.cjs',
+});
+
 await esbuild.build({
   entryPoints: ['scripts/migrate_old_cragmaw_pelt.ts'],
   bundle: true,

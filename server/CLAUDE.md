@@ -22,6 +22,9 @@ Postgres and serves the built client from `dist/`.
 | `antibot_config_db.ts` | per-realm JSONB state plus append-only audit history for the bot-detector runtime config (the admin Bot Detector > Configuration panel); validation and live apply happen inside the detector (`BotDetector.applyConfig`), replayed in `startServer()` right after the first `liveGame()` touch (next to `configureAdminRuntime`) |
 | `turnstile.ts`, `web_login_guard.ts` | Cloudflare Turnstile siteverify / auth-endpoint Origin guard (anti-bot) |
 | `realm.ts` | `REALM`, `REALM_DIRECTORY`, `REALM_ORIGINS` from `REALM_NAME`/`REALMS` env |
+| `snapshot_fanout/` | multi-core snapshot pipeline: the per-session interest scan + ents/keep assembly on worker_threads over a SharedArrayBuffer mirror; the shared interest ladder both build paths use lives here (`interest_rules.ts`). `SNAPSHOT_WORKERS=auto\|0\|N`. See its `CLAUDE.md` |
+| `event_routing.ts` | per-tick SimEvent pid index + order-preserving candidate merge (routeEvents visits only its own events instead of scanning the batch per session) |
+| `input_frame_fast.ts` | hand parser for the canonical 20 Hz movement frame, JSON.parse fallback for any other byte shape (equivalence-fuzzed) |
 | `ratelimit.ts` | per-IP sliding-window limiter + `X-Forwarded-For` resolution |
 | `internal.ts` | secret-gated `/internal/*` ops endpoints (e.g. restart-countdown trigger) |
 | `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |

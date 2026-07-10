@@ -209,6 +209,23 @@ For off-box safety, sync the directory to S3 occasionally:
   ladder is serving in production, which after this default flip means the warn fires
   exactly when someone has rolled back (`API_DISPATCH=legacy`), a deliberate choice
   worth noticing rather than a routine boot.
+- **Snapshot fanout (multi-core broadcast)**: `SNAPSHOT_WORKERS` controls the
+  worker_threads pool that builds the per-player interest-scoped snapshot
+  blocks off the main thread (server/snapshot_fanout/CLAUDE.md). Unset or
+  `auto` sizes it to `min(6, cores - 2)`, so the pool turns itself OFF on a
+  2-vCPU box (where extra threads would starve the sim) and ON with spare
+  cores. `SNAPSHOT_WORKERS=0` forces the classic in-thread path; a number
+  pins the count. The pool degrades safely on its own: an overloaded worker
+  skips ticks for its sessions (interpolation covers the gap), a dead worker
+  respawns with its sessions built in-thread meanwhile, and repeated failures
+  disable the pool for the process. Capacity note (verified with the bot
+  fleet in docs/design/server-scale-v0.24.md): with the v0.24 hot-path work,
+  one realm process holds 600 players ALL FIGHTING in dense 200-player camps
+  at tick p95 ~46ms on an 8-performance-core box (fanout on); ordinary
+  spread-out populations sit well above that, and a 2-vCPU box (fanout
+  auto-off) handles roughly 3-4x its old comfort point. Past one process,
+  add realms (one process per realm, shared DB), the supported horizontal
+  scale-out.
 - **Env hygiene: no empty numeric placeholders.** A SET-BUT-EMPTY numeric env
   line (`CHAT_LOG_RETENTION_DAYS=`, `PORT=`, `MAX_WS_PER_IP_HARD=`,
   `PERF_REPORT_RETENTION_DAYS=`) now means the DEFAULT, not `0`. Before the

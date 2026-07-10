@@ -241,10 +241,19 @@ describe('bank wire round-trip', () => {
 
     // Move the only nearby banker 1000 yd away: the player is now far from every
     // banker, so the encoder ships an explicit null (the client clears its window).
+    // Bank is a secondary self panel: it re-diffs on the pid-staggered
+    // SELF_SECONDARY_INTERVAL_TICKS cadence, so the null lands within 4 ticks
+    // (<=200ms), not necessarily the very next snapshot.
     banker.pos = { x: p.pos.x + 1000, y: p.pos.y, z: p.pos.z + 1000 };
     fw.sent.length = 0;
-    (server as any).broadcastSnapshots();
-    const snapFar = lastSnap(fw.sent);
+    let snapFar: any;
+    for (let i = 0; i < 4 && snapFar === undefined; i++) {
+      sim.tick();
+      (server as any).broadcastSnapshots();
+      const last = lastSnap(fw.sent);
+      if (last?.self && 'bank' in last.self) snapFar = last;
+    }
+    expect(snapFar).toBeDefined();
     expect(snapFar.self.bank).toBeNull();
 
     // The explicit null must CLEAR the mirror: a truthy decode guard (`if (s.bank)`)

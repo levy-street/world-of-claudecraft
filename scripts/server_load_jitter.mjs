@@ -37,7 +37,10 @@ const WANT_OBSERVER = process.env.OBSERVER !== '0';
 const IDLE = process.env.IDLE === '1';
 const JSON_OUT = process.env.JSON_OUT ?? '';
 
-const uniq = Date.now().toString(36);
+// Several instances launched in the same millisecond (multi-hub fleets) would
+// otherwise mint colliding usernames; give each process its own namespace.
+const PREFIX = (process.env.BOT_PREFIX ?? '').replace(/[^a-z]/gi, '').slice(0, 6);
+const uniq = `${PREFIX}${Date.now().toString(36)}`;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // classic names are letters only; map an index to a short letters-only suffix
 const L = 'abcdefghijklmnopqrstuvwxyz';

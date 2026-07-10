@@ -18,7 +18,7 @@ import { Renderer } from '../../render/renderer';
 import { FENCE_HALF_DEPTH } from '../../sim/colliders';
 import { Sim } from '../../sim/sim';
 import { type BlockerDef, DT } from '../../sim/types';
-import { terrainHeight } from '../../sim/world';
+import { invalidateTerrainFeatures, terrainHeight } from '../../sim/world';
 import { type CustomMap, customMapToWorldContent, placementsToRenderAssets } from '../custom_map';
 import { EditorCamera } from './editor_camera';
 
@@ -294,6 +294,10 @@ export class Editor3DViewport {
       return;
     }
     if (!this.renderer) return;
+    // A full rebuild follows in-place hub/lake/camp mutations (marker drags,
+    // typed coords, undo): drop the feature shortlists + camp-height memos so
+    // the re-mesh samples the moved features, not their cached footprints.
+    invalidateTerrainFeatures();
     this.renderer.rebuildTerrain();
     // A full rebuild can follow a moved/added/removed lake marker (2D edit), so
     // reconcile the water meshes from the current declared-lake list rather

@@ -301,7 +301,15 @@ const BLOCKER_WALL_HEIGHT = 6;
 const FENCE_RAIL_HEIGHT = 2.8;
 
 interface ColliderGrid {
-  cells: Map<string, Collider[]>;
+  cells: Map<number, Collider[]>;
+}
+
+// Packed numeric cell key (the SpatialGrid pattern): the old template-string
+// keys allocated a string per lookup, and resolveMovement looks up once per
+// 0.2-yd sub-step for every moving entity every tick.
+const GRID_KEY_OFFSET = 32768;
+function gridKey(gx: number, gz: number): number {
+  return (gx + GRID_KEY_OFFSET) * 65536 + (gz + GRID_KEY_OFFSET);
 }
 
 // Grids are cached per (active world content, seed). The WeakMap keeps the
@@ -310,9 +318,11 @@ interface ColliderGrid {
 const gridCaches = new WeakMap<WorldContent, Map<number, ColliderGrid>>();
 
 /** Drop the cached collider grid for the ACTIVE world content (editor-only:
- * call after mutating its placements/props in place). */
+ * call after mutating its placements/props in place). Fences are props too,
+ * so the fence shortlist grid drops with it. */
 export function invalidateStaticColliders(): void {
   gridCaches.delete(getActiveWorldContent());
+  invalidateFenceGrid();
 }
 
 function colliderBounds(c: Collider): { minX: number; maxX: number; minZ: number; maxZ: number } {
@@ -341,7 +351,7 @@ function gridFor(seed: number): ColliderGrid {
     const z1 = Math.floor((b.maxZ + MAX_BODY_RADIUS) / GRID_CELL);
     for (let gx = x0; gx <= x1; gx++) {
       for (let gz = z0; gz <= z1; gz++) {
-        const key = `${gx},${gz}`;
+        const key = gridKey(gx, gz);
         const list = grid.cells.get(key);
         if (list) list.push(c);
         else grid.cells.set(key, [c]);
@@ -456,14 +466,88 @@ export function resolvePosition(
     return { x: local.x + ox, z: local.z + oz };
   }
   const grid = gridFor(seed);
-  const key = `${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`;
-  const list = grid.cells.get(key);
+  const list = grid.cells.get(gridKey(Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL)));
   if (!list) return { x, z };
   return resolveAgainst(list, x, z, r, ignoreFences);
 }
 
+// Fence shortlists per 16-yd cell, replacing the every-fence scan that ran per
+// 0.2-yd movement sub-step for every moving entity. A fence can only report a
+// crossing when the intersection point lies on the query segment AND within
+// FENCE_END_PAD + r of the fence span, so any fence able to return true has
+// its (END_PAD + r + margin)-padded bounding box overlapping the segment's
+// bounding box; bucketing each fence into the cells its padded box covers and
+// querying the segment's cells therefore yields a conservative superset, and
+// every candidate re-runs the ORIGINAL crossing math (the
+// buildTerrainEditIndex contract). The pad assumes r <= MAX_BODY_RADIUS, the
+// largest mover movement resolves for; a caller passing a larger r falls back
+// to the exact linear scan.
+type FenceT = WorldContent['props']['fences'][number];
+
+interface FenceGrid {
+  cells: Map<number, FenceT[]>;
+}
+
+const FENCE_BUCKET_PAD = FENCE_END_PAD + MAX_BODY_RADIUS + 1;
+const fenceGridCache = new WeakMap<WorldContent, FenceGrid>();
+
+function fenceGridFor(content: WorldContent): FenceGrid {
+  let grid = fenceGridCache.get(content);
+  if (grid) return grid;
+  grid = { cells: new Map() };
+  for (const f of content.props.fences) {
+    const x0 = Math.floor((Math.min(f.x1, f.x2) - FENCE_BUCKET_PAD) / GRID_CELL);
+    const x1 = Math.floor((Math.max(f.x1, f.x2) + FENCE_BUCKET_PAD) / GRID_CELL);
+    const z0 = Math.floor((Math.min(f.z1, f.z2) - FENCE_BUCKET_PAD) / GRID_CELL);
+    const z1 = Math.floor((Math.max(f.z1, f.z2) + FENCE_BUCKET_PAD) / GRID_CELL);
+    for (let gx = x0; gx <= x1; gx++) {
+      for (let gz = z0; gz <= z1; gz++) {
+        const key = gridKey(gx, gz);
+        const list = grid.cells.get(key);
+        if (list) list.push(f);
+        else grid.cells.set(key, [f]);
+      }
+    }
+  }
+  fenceGridCache.set(content, grid);
+  return grid;
+}
+
+/** Drop the cached fence grid for the ACTIVE world content (editor-only:
+ * call after mutating its fence props in place). */
+export function invalidateFenceGrid(): void {
+  fenceGridCache.delete(getActiveWorldContent());
+}
+
 function crossesFence(fromX: number, fromZ: number, toX: number, toZ: number, r: number): boolean {
-  for (const f of getActiveWorldContent().props.fences) {
+  const content = getActiveWorldContent();
+  if (r <= MAX_BODY_RADIUS) {
+    const grid = fenceGridFor(content);
+    if (grid.cells.size === 0) return false;
+    const gx0 = Math.floor(Math.min(fromX, toX) / GRID_CELL);
+    const gx1 = Math.floor(Math.max(fromX, toX) / GRID_CELL);
+    const gz0 = Math.floor(Math.min(fromZ, toZ) / GRID_CELL);
+    const gz1 = Math.floor(Math.max(fromZ, toZ) / GRID_CELL);
+    for (let gx = gx0; gx <= gx1; gx++) {
+      for (let gz = gz0; gz <= gz1; gz++) {
+        const list = grid.cells.get(gridKey(gx, gz));
+        if (list && crossesAnyFence(list, fromX, fromZ, toX, toZ, r)) return true;
+      }
+    }
+    return false;
+  }
+  return crossesAnyFence(content.props.fences, fromX, fromZ, toX, toZ, r);
+}
+
+function crossesAnyFence(
+  fences: readonly FenceT[],
+  fromX: number,
+  fromZ: number,
+  toX: number,
+  toZ: number,
+  r: number,
+): boolean {
+  for (const f of fences) {
     const dx = f.x2 - f.x1,
       dz = f.z2 - f.z1;
     const len = Math.hypot(dx, dz);
@@ -738,7 +822,7 @@ export function cameraOcclusion(
   let best = 1;
   for (let gx = gx0; gx <= gx1; gx++) {
     for (let gz = gz0; gz <= gz1; gz++) {
-      const list = grid.cells.get(`${gx},${gz}`);
+      const list = grid.cells.get(gridKey(gx, gz));
       if (list) best = Math.min(best, sweepColliders(list, ax, ay, az, bx, by, bz, pad, false));
     }
   }
@@ -790,7 +874,7 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
     return overlapsAny(INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS, x - ox, z - oz, false);
   }
   const grid = gridFor(seed);
-  const list = grid.cells.get(`${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`);
+  const list = grid.cells.get(gridKey(Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL)));
   return list ? overlapsAny(list, x, z, true) : false;
 }
 

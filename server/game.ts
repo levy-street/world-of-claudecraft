@@ -82,10 +82,12 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+import { indexEventsForRouting, mergeCandidates } from './event_routing';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { gameMetricsCounters } from './http/game_signals';
+import { parseInputFrameFast } from './input_frame_fast';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
@@ -106,6 +108,20 @@ import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from '.
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createSerialWriter } from './serial_writer';
+import {
+  decideKnownRecord,
+  F64_PER_SLOT,
+  FLAG_NPC,
+  FLAG_STEALTHED_PLAYER,
+  FLAG_VALE_BALL,
+  I32_PER_SLOT,
+  INTEREST_QUERY_RADIUS,
+  INTEREST_RADIUS,
+  type SentEntityVersions,
+  type SessionJob,
+  SnapshotFanoutPool,
+  withinInterest,
+} from './snapshot_fanout';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
@@ -116,25 +132,9 @@ import { isBackpressureExceeded } from './ws_backpressure';
 
 const WORLD_SEED = 20061;
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
-// Interest management: the client renders entities out to 80yd, so new
-// entities enter interest just past that, and known entities persist a
-// little farther so the boundary doesn't churn create/destroy cycles.
-const INTEREST_RADIUS = 90;
-const INTEREST_DROP_RADIUS = 100;
-// Stationary quest/vendor npcs anchor map markers, so they keep the legacy
-// radius; once known they cost a handful of bytes per snapshot anyway.
-const NPC_INTEREST_RADIUS = 120;
-const NPC_DROP_RADIUS = 130;
-// the widest radius any entity kind can be relevant at
-const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
-// Distance-tiered update rates: full snapshot rate inside nameplate range
-// (55yd, beyond every ability range), half rate out to the 80yd draw range,
-// quarter rate beyond. The viewer's target and anything attacking the
-// viewer always update at full rate regardless of distance.
-const FULL_RATE_RADIUS_SQ = 55 * 55;
-const HALF_RATE_RADIUS_SQ = 80 * 80;
-const HALF_RATE_DIVISOR = 2;
-const QUARTER_RATE_DIVISOR = 4;
+// Interest management radii and distance-tiered update rates live in
+// server/snapshot_fanout/interest_rules.ts, one pure module shared verbatim
+// with the snapshot-fanout worker so the two build paths cannot drift.
 // How often the achieved tick rate rides the snapshot head. The meter's 3s
 // sliding window moves slowly and the client holds the last value across
 // omissions, so ~2 Hz keeps the overlay live without paying the scalar on
@@ -352,6 +352,11 @@ function isVcBracket(value: unknown): value is VcBracket {
 // a steady source of GC pressure, when a crowd gathers. The small/dynamic fields
 // (position, resource, target, party HP, cooldowns, ...) still diff every tick.
 const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so refreshes don't synchronize into a spike
+// Secondary self panels (mail/bank/market/professions/delve meta/lockouts)
+// re-diff on this pid-staggered cadence instead of every tick: <=200ms added
+// change-detection latency on panel UI, in exchange for 4x fewer accessor
+// builds + stringifies per player. A selfHeavyDirty session re-diffs at once.
+const SELF_SECONDARY_INTERVAL_TICKS = 4;
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'unequip_item',
@@ -483,6 +488,14 @@ export interface ClientSession {
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
+  // Object-identity gates for delta self fields whose sim source is REPLACED,
+  // never mutated in place (stats/weapon via entity.ts recalc): while the
+  // reference is unchanged the serialized form cannot have changed, so the
+  // per-tick JSON.stringify diff in maybe() is skipped. Self-healing across
+  // every lastSent reset: the gate also fires whenever the key is absent from
+  // lastSent, so no reset site needs to know these exist.
+  lastStatsRef?: unknown;
+  lastWeaponRef?: unknown;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
   // Vale Cup readout, same idea at its own cadence (VC_WIRE_HZ)
@@ -533,17 +546,8 @@ export interface ClientSession {
   } | null;
 }
 
-interface SentEntityVersions {
-  idVer: number;
-  dynVer: number;
-  // sim tick of the last full/lite record, so distance-tiered rates hold
-  // even when one broadcast covers several catch-up sim ticks
-  sentAtTick: number;
-  // an entity whose state stopped changing gets one final "settle" record
-  // before riding the keep list — without it the client's extrapolation
-  // would leave it rendered slightly past where it actually stopped
-  settled: boolean;
-}
+// SentEntityVersions (idVer/dynVer/sentAtTick/settled) lives with the shared
+// interest rules in server/snapshot_fanout/interest_rules.ts.
 
 export interface AdminServerStats {
   online: number;
@@ -776,41 +780,8 @@ export function wireEntity(e: Entity): Record<string, unknown> {
   return { id: e.id, ...identityFields(e), ...dynamicFields(e) };
 }
 
-// npcs stay visible to the legacy radius (see the constants above);
-// everything else enters at INTEREST_RADIUS and known entities persist to
-// the drop radius — hysteresis against churn at the boundary
-function interestLimitSq(e: Entity, known: boolean): number {
-  if (e.kind === 'npc') {
-    return known ? NPC_DROP_RADIUS * NPC_DROP_RADIUS : NPC_INTEREST_RADIUS * NPC_INTEREST_RADIUS;
-  }
-  return known ? INTEREST_DROP_RADIUS * INTEREST_DROP_RADIUS : INTEREST_RADIUS * INTEREST_RADIUS;
-}
-
 function isStealthed(e: Entity): boolean {
   return e.stealthed; // cached in the sim's updateAuras; see Entity.stealthed
-}
-
-// full rate close up and for anything the viewer is fighting; mid range
-// updates every other tick, far entities every fourth. Measured against
-// the per-session last-sent tick rather than a tick-parity stagger: when
-// the event loop degrades and one broadcast covers several sim ticks, a
-// parity check can stay permanently false and starve entities frozen
-function isUpdateDue(
-  tick: number,
-  e: Entity,
-  d2: number,
-  viewer: Entity,
-  sentAtTick: number,
-): boolean {
-  // The one Vale Cup ball is watched by the whole Sowfield: a far keeper sits
-  // past the 55yd full-rate tier and the stands past 80yd, where a ~25 yd/s
-  // ball turns visibly steppy at half/quarter rate. One entity at full rate
-  // costs one lite record per tick, so it is always due.
-  if (e.templateId === VALE_CUP_BALL_TEMPLATE_ID) return true;
-  if (d2 <= FULL_RATE_RADIUS_SQ) return true;
-  if (viewer.targetId === e.id || e.aggroTargetId === viewer.id) return true;
-  const divisor = d2 <= HALF_RATE_RADIUS_SQ ? HALF_RATE_DIVISOR : QUARTER_RATE_DIVISOR;
-  return tick - sentAtTick >= divisor;
 }
 
 // Per-entity wire fragments, refreshed lazily at most once per tick and
@@ -913,6 +884,8 @@ export class GameServer {
   private readonly startedAt = Date.now();
   private peakOnline = 0;
   private tickMsAvg = 0;
+  // Next wall-clock ms at which the sim's utcDay string is recomputed (1 Hz).
+  private utcDayRefreshAtMs = 0;
   // Achieved sim ticks per wall-clock second. The cost metrics above go blind
   // when the dt clamp discards wall time under saturation; this is the number
   // that actually sags. Rides the snapshot head (throttled) + perfProfile().
@@ -968,7 +941,43 @@ export class GameServer {
   private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
 
-  constructor() {
+  // Snapshot-fanout worker pool (null = in-thread broadcast only). Created
+  // only when the host passes an explicit worker count + worker bundle path
+  // (server/main.ts wires SNAPSHOT_WORKERS); bare `new GameServer()` in tests
+  // never spawns threads.
+  private readonly snapshotFanout: SnapshotFanoutPool | null = null;
+  // Per-session self/head captured at fanout dispatch, paired with the worker
+  // reply of the SAME tick so a frame's pieces never mix sim states.
+  private readonly pendingFanoutFrames = new Map<
+    number,
+    { tick: number; head: string; selfJson: string }
+  >();
+
+  constructor(opts: { snapshotWorkers?: number; snapshotWorkerPath?: string } = {}) {
+    if ((opts.snapshotWorkers ?? 0) > 0 && opts.snapshotWorkerPath) {
+      this.snapshotFanout = new SnapshotFanoutPool(
+        opts.snapshotWorkers ?? 0,
+        opts.snapshotWorkerPath,
+        {
+          deliverFrame: (sid, tick, ents, keep) => this.deliverFanoutFrame(sid, tick, ents, keep),
+          collectFragmentDeltas: (ledger, out) => {
+            for (const [id, cache] of this.wireCache) {
+              const shipped = ledger.get(id);
+              if (shipped && shipped.idVer === cache.idVer && shipped.dynVer === cache.dynVer)
+                continue;
+              if (shipped) {
+                shipped.idVer = cache.idVer;
+                shipped.dynVer = cache.dynVer;
+              } else {
+                ledger.set(id, { idVer: cache.idVer, dynVer: cache.dynVer });
+              }
+              out.push([id, cache.idVer, cache.dynVer, cache.fullJson, cache.liteJson]);
+            }
+          },
+          log: (line) => console.error(line),
+        },
+      );
+    }
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
@@ -1098,6 +1107,7 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
+    this.snapshotFanout?.resetSession(moderator.pid);
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
@@ -1122,6 +1132,7 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
+    this.snapshotFanout?.resetSession(moderator.pid);
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }
@@ -1252,7 +1263,13 @@ export class GameServer {
           acc += dt;
           // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
           // works without the sim reading the wall clock itself (determinism invariant).
-          this.sim.utcDay = new Date().toISOString().slice(0, 10);
+          // Recomputed at most once a second: the Date + ISO-string allocation is
+          // pointless 20x/s, and a day flip still lands within a second.
+          const nowWallMs = Date.now();
+          if (nowWallMs >= this.utcDayRefreshAtMs) {
+            this.utcDayRefreshAtMs = nowWallMs + 1000;
+            this.sim.utcDay = new Date(nowWallMs).toISOString().slice(0, 10);
+          }
           this.bcastGridNs = 0n;
           this.bcastSelfNs = 0n;
           this.bcSerializeNs = 0n;
@@ -1378,6 +1395,7 @@ export class GameServer {
   }
 
   stop(): void {
+    this.snapshotFanout?.shutdown();
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
@@ -1562,6 +1580,10 @@ export class GameServer {
 
   private runAntibotTick(): void {
     const now = Date.now();
+    // A detector that declares it never reads runtime snapshots (the no-op
+    // stub) skips the 20-field snapshot allocation per player per tick; the
+    // flag is absent on older implementations, which keep receiving them.
+    const buildSnapshots = this.botDetector.wantsTickSnapshots !== false;
     for (const session of this.clients.values()) {
       // Enforcement gating lives in the detector's own runtime config (which
       // defaults to the ANTIBOT_ENFORCE env var and is operator-tunable live),
@@ -1570,7 +1592,7 @@ export class GameServer {
         session.botTrackingContext,
         now,
         true,
-        this.captureBotDetectionSnapshot(session, now),
+        buildSnapshots ? this.captureBotDetectionSnapshot(session, now) : null,
       );
       if (action === 'kick') {
         void this.kickSession(session, 'rejected by server', 'disconnected');
@@ -1968,6 +1990,7 @@ export class GameServer {
     session.lastInputAt = this.sim.time;
     session.lastSent = {};
     session.sentEnts = new Map();
+    this.snapshotFanout?.resetSession(session.pid);
     session.selfHeavyDirty = true;
     session.lastWireRev = -1;
     session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
@@ -2077,6 +2100,8 @@ export class GameServer {
     if (session.spectating) this.exitSpectate(session, false);
     session.left = true;
     this.clients.delete(session.pid);
+    this.snapshotFanout?.dropSession(session.pid);
+    this.pendingFanoutFrames.delete(session.pid);
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
     this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
@@ -2726,17 +2751,22 @@ export class GameServer {
       return;
     }
     if (verdict === 'drop') return;
-    let msg: unknown;
-    try {
-      msg = JSON.parse(raw);
-    } catch {
-      this.botDetector.observeProtocolAnomaly(
-        session.botTrackingContext,
-        'invalid_json',
-        raw,
-        receivedAtMs,
-      );
-      return;
+    // Movement frames arrive 20x/s from EVERY client; the hand parser covers
+    // the canonical encoding and null means "shape not covered", never
+    // "invalid", so everything else takes the JSON.parse path unchanged.
+    let msg: unknown = parseInputFrameFast(raw);
+    if (msg === null) {
+      try {
+        msg = JSON.parse(raw);
+      } catch {
+        this.botDetector.observeProtocolAnomaly(
+          session.botTrackingContext,
+          'invalid_json',
+          raw,
+          receivedAtMs,
+        );
+        return;
+      }
     }
     // a malformed payload must never take down the server for everyone
     try {
@@ -3784,6 +3814,9 @@ export class GameServer {
   private broadcastSnapshots(): void {
     if (this.clients.size === 0) return;
     const tick = this.sim.tickCount;
+    // One wall-clock read for the whole broadcast; selfWireJson's lockout
+    // filter was calling Date.now() once per player per tick.
+    const nowMs = Date.now();
     // tickHz rides the head at ~2 Hz, not on every snapshot: it is omitted while
     // the meter warms up (first ~1s, so a fresh server never shows a bogus
     // reading), and between-emissions the client holds the last value. A warmed
@@ -3802,111 +3835,241 @@ export class GameServer {
       }
     }
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
-    // Guard each session: a throw while building one player's snapshot must not
-    // starve every other session of its snapshot this tick (server/CLAUDE.md).
-    forEachGuarded(
-      this.clients.values(),
-      (session) => {
-        // no transport while linkdead; the resume path resets sentEnts/lastSent
-        // so the fresh socket starts from a full snapshot anyway
-        if (session.linkdead) return;
-        const p = this.sim.entities.get(session.pid);
-        const meta = this.sim.meta(session.pid);
-        if (!p || !meta) return;
-        let anchorEntity = p;
-        let anchorMeta = meta;
-        let anchorSession = session;
-        if (session.spectating) {
-          const spectateName = session.spectating.name;
-          const target = this.sessionByCharacterId(session.spectating.characterId);
-          const targetEntity = target ? this.sim.entities.get(target.pid) : null;
-          const targetMeta = target ? this.sim.meta(target.pid) : null;
-          if (!target || target.left || !targetEntity || !targetMeta) {
-            this.exitSpectate(session, false);
-            this.sendChatNotice(session, `${spectateName} is no longer online; spectate ended.`);
-          } else {
-            anchorEntity = targetEntity;
-            anchorMeta = targetMeta;
-            anchorSession = target;
-          }
-        }
-        const ents: string[] = [];
-        const keep: number[] = [];
-        const present = new Set<number>();
-        const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
-        this.sim.grid.forEachInRadius(
-          anchorEntity.pos.x,
-          anchorEntity.pos.z,
-          INTEREST_QUERY_RADIUS,
-          (e, d2) => {
-            if (this.perfDetailActive) this.bcVisits++;
-            if (e.id === anchorEntity.id) return;
-            if (!this.canObserveEntity(anchorEntity, e, d2)) return;
-            const known = session.sentEnts.get(e.id);
-            // the viewer's current target stays in interest to the widest drop
-            // radius so its unit frame doesn't vanish mid-chase
-            const limitSq =
-              anchorEntity.targetId === e.id
-                ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
-                : interestLimitSq(e, known !== undefined);
-            if (d2 > limitSq) return;
-            present.add(e.id);
-            const cache = this.wireCacheFor(e);
-            if (known === undefined) {
-              // first sight carries the at-rest state exactly, so no settle
-              // record is owed until it moves again
-              ents.push(cache.fullJson);
-              session.sentEnts.set(e.id, {
-                idVer: cache.idVer,
-                dynVer: cache.dynVer,
-                sentAtTick: tick,
-                settled: true,
-              });
-              return;
-            }
-            if (known.idVer !== cache.idVer) {
-              ents.push(cache.fullJson);
-              known.idVer = cache.idVer;
-              known.dynVer = cache.dynVer;
-              known.sentAtTick = tick;
-              known.settled = false;
-              return;
-            }
-            if (
-              !isUpdateDue(tick, e, d2, anchorEntity, known.sentAtTick) ||
-              (known.dynVer === cache.dynVer && known.settled)
-            ) {
-              // not due at this distance tier yet, or unchanged and already
-              // settled: a bare id keeps it alive on the client
-              keep.push(e.id);
-              return;
-            }
-            // due, and either changed or owing its one settle record
-            known.settled = known.dynVer === cache.dynVer;
-            known.dynVer = cache.dynVer;
-            known.sentAtTick = tick;
-            ents.push(cache.liteJson);
-          },
-        );
-        // forget entities that left interest, so a re-entry sends identity again
-        for (const id of session.sentEnts.keys()) {
-          if (!present.has(id)) session.sentEnts.delete(id);
-        }
-        const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
-        if (this.perfDetailActive) this.bcastGridNs += selfStart - gridStart;
-        const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
-        if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
-        const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-        this.sendRaw(session, `${head},"self":${selfJson},"ents":[${ents.join(',')}]${keepJson}}`);
-      },
-      (err, session) =>
-        console.error(`[snap] failed to build snapshot for pid ${session.pid}, skipping:`, err),
-    );
+    const fanout = this.snapshotFanout;
+    if (fanout?.isEnabled() && this.sim.entities.size <= fanout.capacity) {
+      this.broadcastViaFanout(fanout, tick, nowMs, head);
+    } else {
+      // Guard each session: a throw while building one player's snapshot must
+      // not starve every other session of its snapshot this tick
+      // (server/CLAUDE.md).
+      forEachGuarded(
+        this.clients.values(),
+        (session) => this.buildSessionSnapshotInThread(session, tick, nowMs, head),
+        (err, session) =>
+          console.error(`[snap] failed to build snapshot for pid ${session.pid}, skipping:`, err),
+      );
+    }
     // >= rather than a modulo check: catch-up broadcasts can skip ticks
     if (tick - this.lastWireSweepTick >= WIRE_CACHE_SWEEP_TICKS) {
       this.lastWireSweepTick = tick;
       this.sweepWireCache();
     }
+  }
+
+  // The spectate-aware snapshot anchor: whose surroundings and self state this
+  // session renders. A vanished spectate target ends the spectate and falls
+  // back to the moderator's own body, exactly as the in-loop block always did.
+  private resolveSnapshotAnchor(
+    session: ClientSession,
+  ): { anchorEntity: Entity; anchorMeta: PlayerMeta; anchorSession: ClientSession } | null {
+    const p = this.sim.entities.get(session.pid);
+    const meta = this.sim.meta(session.pid);
+    if (!p || !meta) return null;
+    let anchorEntity = p;
+    let anchorMeta = meta;
+    let anchorSession = session;
+    if (session.spectating) {
+      const spectateName = session.spectating.name;
+      const target = this.sessionByCharacterId(session.spectating.characterId);
+      const targetEntity = target ? this.sim.entities.get(target.pid) : null;
+      const targetMeta = target ? this.sim.meta(target.pid) : null;
+      if (!target || target.left || !targetEntity || !targetMeta) {
+        this.exitSpectate(session, false);
+        this.sendChatNotice(session, `${spectateName} is no longer online; spectate ended.`);
+      } else {
+        anchorEntity = targetEntity;
+        anchorMeta = targetMeta;
+        anchorSession = target;
+      }
+    }
+    return { anchorEntity, anchorMeta, anchorSession };
+  }
+
+  private buildSessionSnapshotInThread(
+    session: ClientSession,
+    tick: number,
+    nowMs: number,
+    head: string,
+  ): void {
+    // no transport while linkdead; the resume path resets sentEnts/lastSent
+    // so the fresh socket starts from a full snapshot anyway
+    if (session.linkdead) return;
+    const anchor = this.resolveSnapshotAnchor(session);
+    if (!anchor) return;
+    const { anchorEntity, anchorMeta, anchorSession } = anchor;
+    const ents: string[] = [];
+    const keep: number[] = [];
+    const present = new Set<number>();
+    const gridStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
+    this.sim.grid.forEachInRadius(
+      anchorEntity.pos.x,
+      anchorEntity.pos.z,
+      INTEREST_QUERY_RADIUS,
+      (e, d2) => {
+        if (this.perfDetailActive) this.bcVisits++;
+        if (e.id === anchorEntity.id) return;
+        if (!this.canObserveEntity(anchorEntity, e, d2)) return;
+        const known = session.sentEnts.get(e.id);
+        const targeted = anchorEntity.targetId === e.id;
+        if (!withinInterest(d2, e.kind === 'npc', known !== undefined, targeted)) return;
+        present.add(e.id);
+        const cache = this.wireCacheFor(e);
+        if (known === undefined) {
+          // first sight carries the at-rest state exactly, so no settle
+          // record is owed until it moves again
+          ents.push(cache.fullJson);
+          session.sentEnts.set(e.id, {
+            idVer: cache.idVer,
+            dynVer: cache.dynVer,
+            sentAtTick: tick,
+            settled: true,
+          });
+          return;
+        }
+        const action = decideKnownRecord(
+          tick,
+          d2,
+          known,
+          cache.idVer,
+          cache.dynVer,
+          e.templateId === VALE_CUP_BALL_TEMPLATE_ID,
+          targeted,
+          e.aggroTargetId === anchorEntity.id,
+        );
+        if (action === 'keep') keep.push(e.id);
+        else ents.push(action === 'full' ? cache.fullJson : cache.liteJson);
+      },
+    );
+    // forget entities that left interest, so a re-entry sends identity again
+    for (const id of session.sentEnts.keys()) {
+      if (!present.has(id)) session.sentEnts.delete(id);
+    }
+    const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
+    if (this.perfDetailActive) this.bcastGridNs += selfStart - gridStart;
+    const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, nowMs, anchorSession);
+    if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
+    const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
+    this.sendRaw(session, `${head},"self":${selfJson},"ents":[${ents.join(',')}]${keepJson}}`);
+  }
+
+  // Fan the per-session ents/keep builds out to the worker pool: write the
+  // entity mirror + refresh every wire fragment (the workers' inputs), then
+  // dispatch jobs and pair each reply with the self JSON captured now, at
+  // this tick's sim state. Sessions the pool could not take (busy/dead shard)
+  // build in-thread immediately; per-session interleaving of the two paths is
+  // safe because both only ever emit current state (see pool.ts).
+  private broadcastViaFanout(
+    fanout: SnapshotFanoutPool,
+    tick: number,
+    nowMs: number,
+    head: string,
+  ): void {
+    // A free (unpinned) mirror buffer to write this tick's facts into; when
+    // every buffer is still being read by a slow worker, skip the fanout tick
+    // outright, tearing a busy reader's buffer is never an option, and the
+    // per-session skip semantics below already cover a missed tick.
+    const mirror = fanout.acquireMirror();
+    if (mirror === null) return;
+    const f64 = mirror.f64;
+    const i32 = mirror.i32;
+    let slot = 0;
+    let stealthed: Entity[] | null = null;
+    for (const e of this.sim.entities.values()) {
+      const cache = this.wireCacheFor(e);
+      const fBase = slot * F64_PER_SLOT;
+      const iBase = slot * I32_PER_SLOT;
+      f64[fBase] = e.pos.x;
+      f64[fBase + 1] = e.pos.z;
+      i32[iBase] = e.id;
+      let flags = 0;
+      if (e.kind === 'npc') flags |= FLAG_NPC;
+      else if (e.kind === 'player' && isStealthed(e)) {
+        flags |= FLAG_STEALTHED_PLAYER;
+        if (stealthed === null) stealthed = [];
+        stealthed.push(e);
+      }
+      if (e.templateId === VALE_CUP_BALL_TEMPLATE_ID) flags |= FLAG_VALE_BALL;
+      i32[iBase + 1] = flags;
+      i32[iBase + 2] = e.aggroTargetId ?? -1;
+      i32[iBase + 3] = cache.idVer;
+      i32[iBase + 4] = cache.dynVer;
+      slot++;
+    }
+    mirror.headerI32[0] = slot;
+    mirror.headerI32[1] = tick;
+    const jobs: SessionJob[] = [];
+    forEachGuarded(
+      this.clients.values(),
+      (session) => {
+        if (session.linkdead) return;
+        const anchor = this.resolveSnapshotAnchor(session);
+        if (!anchor) return;
+        const { anchorEntity, anchorMeta, anchorSession } = anchor;
+        // Stealth visibility needs live sim social state (hostility, party,
+        // duel, detection radius), so it resolves here and ships as a small
+        // denied-ids list; the worker only consults it for entities flagged
+        // stealthed. Checked against every stealthed entity the worker could
+        // possibly visit (query radius + the grid's 1yd drift pad).
+        let denied: number[] | undefined;
+        if (stealthed !== null) {
+          const checkR = INTEREST_QUERY_RADIUS + 2;
+          for (const s of stealthed) {
+            if (s.id === anchorEntity.id) continue;
+            const dx = s.pos.x - anchorEntity.pos.x;
+            const dz = s.pos.z - anchorEntity.pos.z;
+            const d2 = dx * dx + dz * dz;
+            if (d2 <= checkR * checkR && !this.canObserveEntity(anchorEntity, s, d2)) {
+              if (denied === undefined) denied = [];
+              denied.push(s.id);
+            }
+          }
+        }
+        const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, nowMs, anchorSession);
+        this.pendingFanoutFrames.set(session.pid, { tick, head, selfJson });
+        jobs.push({
+          sid: session.pid,
+          anchorId: anchorEntity.id,
+          anchorX: anchorEntity.pos.x,
+          anchorZ: anchorEntity.pos.z,
+          anchorTargetId: anchorEntity.targetId ?? -1,
+          denied,
+        });
+      },
+      (err, session) =>
+        console.error(`[snap] failed to prepare fanout job for pid ${session.pid}:`, err),
+    );
+    const result = fanout.dispatchTick(tick, mirror.index, jobs);
+    // Dead shard: build in-thread so nobody freezes while the worker
+    // respawns. Busy shard (result.skipped): drop this tick's frame instead,
+    // clients coast on interpolation; see pool.ts on why in-thread fallback
+    // for an OVERLOADED shard would defeat the fanout.
+    for (const job of result.skipped) this.pendingFanoutFrames.delete(job.sid);
+    for (const job of result.fallback) {
+      this.pendingFanoutFrames.delete(job.sid);
+      const session = this.clients.get(job.sid);
+      if (!session) continue;
+      runGuarded(
+        () => this.buildSessionSnapshotInThread(session, tick, nowMs, head),
+        (err) =>
+          console.error(`[snap] failed to build snapshot for pid ${session.pid}, skipping:`, err),
+      );
+    }
+  }
+
+  // Worker reply: splice the stored head/self of the SAME tick around the
+  // worker-built ents/keep blocks and send. A session that left, went
+  // linkdead, or was re-dispatched since simply drops the frame.
+  private deliverFanoutFrame(sid: number, tick: number, ents: string, keep: string): void {
+    const pending = this.pendingFanoutFrames.get(sid);
+    if (!pending || pending.tick !== tick) return;
+    this.pendingFanoutFrames.delete(sid);
+    const session = this.clients.get(sid);
+    if (!session || session.left || session.linkdead) return;
+    const keepJson = keep !== '' ? `,"keep":[${keep}]` : '';
+    this.sendRaw(
+      session,
+      `${pending.head},"self":${pending.selfJson},"ents":[${ents}]${keepJson}}`,
+    );
   }
 
   private canObserveEntity(viewer: Entity, e: Entity, d2: number): boolean {
@@ -3965,15 +4128,23 @@ export class GameServer {
   }
 
   private sweepWireCache(): void {
+    let removed: number[] | null = null;
     for (const id of this.wireCache.keys()) {
-      if (!this.sim.entities.has(id)) this.wireCache.delete(id);
+      if (!this.sim.entities.has(id)) {
+        this.wireCache.delete(id);
+        if (removed === null) removed = [];
+        removed.push(id);
+      }
     }
+    // fanout workers evict the same ids from their fragment caches
+    if (removed !== null) this.snapshotFanout?.noteRemovedEntities(removed);
   }
 
   private selfWireJson(
     session: ClientSession,
     p: Entity,
     meta: PlayerMeta,
+    nowMs: number,
     anchorSession: ClientSession = session,
   ): string {
     const self = wireEntity(p);
@@ -4019,29 +4190,43 @@ export class GameServer {
         extra += `,"${key}":${s}`;
       }
     };
+    // Same diff against a value something else already serialized this tick
+    // (the per-party caches), so N party members cost one stringify, not N.
+    const maybeJson = (key: string, s: string): void => {
+      if (sent[key] !== s) {
+        sent[key] = s;
+        extra += `,"${key}":${s}`;
+      }
+    };
     // Dynamic / latency-sensitive fields: diffed every tick. These change from
     // outside this session's own commands/events, party member HP from another
     // player taking damage, cooldowns counting down, an incoming trade/duel,
-    // so they can't be gated behind this session's dirty flag. They're also
-    // cheap (mostly null, or a small map) so the per-tick diff is negligible.
-    // Raid lockouts as {dungeonId: expiryEpochMs}, future-only. Absolute expiry
-    // (not a countdown) so the serialized form is stable between resets and the
-    // delta guard ships it only on grant / reset / expiry; the client derives the
-    // remaining time from its own clock. Small, and granted from sim events that
-    // don't mark this session dirty, so kept per-tick rather than gated.
-    maybe(
-      'lockouts',
-      Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
-    );
+    // so they can't be gated behind this session's dirty flag.
     // Where the player's corpse lies while their spirit is a ghost (null otherwise).
     // Delta-guarded: ships on death-release and clears on resurrect. The client
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
-    maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
-    maybe('stats', p.stats);
-    maybe('weapon', p.weapon);
-    maybe('party', this.partyWire(anchorSession.pid));
-    maybe('marks', this.markersWire(anchorSession.pid));
+    // Empty cooldown map: skip the per-tick fromEntries+map+round2 allocation.
+    if (p.cooldowns.size === 0) {
+      maybeJson('cds', '{}');
+    } else {
+      maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
+    }
+    // stats/weapon are REPLACED by the sim on recalc, never mutated in place
+    // (entity.ts), so an unchanged reference cannot serialize differently and
+    // the stringify diff is skipped. The `in` check self-heals after any
+    // lastSent reset (fresh socket, spectate flip): an absent key re-runs the
+    // full diff regardless of the reference.
+    if (session.lastStatsRef !== p.stats || sent.stats === undefined) {
+      session.lastStatsRef = p.stats;
+      maybe('stats', p.stats);
+    }
+    if (session.lastWeaponRef !== p.weapon || sent.weapon === undefined) {
+      session.lastWeaponRef = p.weapon;
+      maybe('weapon', p.weapon);
+    }
+    maybeJson('party', this.partyWireJson(anchorSession.pid));
+    maybeJson('marks', this.markersWireJson(anchorSession.pid));
     maybe('trade', this.tradeWire(anchorSession.pid));
     maybe('duel', this.duelWire(anchorSession.pid));
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
@@ -4056,16 +4241,6 @@ export class GameServer {
       session.lastVcupWireTick = this.sim.tickCount;
       maybe('vcup', this.sim.cupInfoFor(anchorSession.pid));
     }
-    // market info is null unless the player is standing at the Merchant, so it
-    // only rides the wire for players actually browsing the World Market
-    maybe('market', this.sim.marketInfoFor(anchorSession.pid));
-    maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
-    maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
-    // bank info is null unless the player is standing at a banker, so it only
-    // rides the wire for players actually browsing their deposit box (the mail
-    // pattern). Not heavy-gated: it appears from proximity, not this session's
-    // own dirty-marking commands.
-    maybe('bank', this.sim.bankInfoFor(anchorSession.pid));
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).
@@ -4074,24 +4249,57 @@ export class GameServer {
     // so every party member's roll frame shows the live vote strip and stays up
     // after they answer. Per-tick for the same reason as lroll.
     maybe('lrollg', this.sim.lootRollGroupStatus(anchorSession.pid));
+    // live delve HUD state (run progress, companion vitals): per-tick, it is
+    // active-gameplay UI
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
-    maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
-    maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
-    maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
-    maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));
-    // per-player read, so kept per-tick like the other small maps above. Wire
-    // key `prof` and IWorld member `professionsState` are the settled names
-    // for the professions facet (#1164, src/sim/professions/CLAUDE.md). `gprof`
-    // mirrors the raw per-craft proficiency map for the `gatheringProficiency`
-    // IWorld data member (#1119), independent of the `professionsState` view.
-    maybe('prof', this.sim.professionsStateFor(anchorSession.pid));
-    maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
-    // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
-    // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
-    // shape used by the `/dev gather` chat cheat and existing consumers. Wire
-    // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
-    maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    // Secondary panels: mail, bank, market, professions, delve meta, raid
+    // lockouts. Each is a delta-guarded accessor whose value changes rarely,
+    // but BUILDING it to discover "unchanged" used to run 20x/s per player,
+    // which is a top per-player cost at high population. They re-diff on a
+    // pid-staggered 4-tick cadence (<=200ms added detection latency on a
+    // change, imperceptible for panel/meta UI: nothing here is state a player
+    // reacts to in combat, the graphics-fairness bar). A heavy-dirty session
+    // re-diffs immediately, so a player's OWN mail/bank/craft action still
+    // reflects on the next snapshot.
+    const secondaryDue =
+      session.selfHeavyDirty ||
+      (this.sim.tickCount + session.pid) % SELF_SECONDARY_INTERVAL_TICKS === 0;
+    if (secondaryDue) {
+      // Raid lockouts as {dungeonId: expiryEpochMs}, future-only; the client
+      // derives remaining time from its own clock.
+      if (meta.raidLockouts.size === 0) {
+        maybeJson('lockouts', '{}');
+      } else {
+        maybe(
+          'lockouts',
+          Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > nowMs)),
+        );
+      }
+      // market info is null unless the player is standing at the Merchant, so
+      // it only rides the wire for players actually browsing the World Market
+      maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+      maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
+      maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
+      // bank info is null unless the player is standing at a banker, so it
+      // only rides the wire for players actually browsing their deposit box
+      // (the mail pattern). Not heavy-gated: it appears from proximity, not
+      // this session's own dirty-marking commands.
+      maybe('bank', this.sim.bankInfoFor(anchorSession.pid));
+      maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
+      maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
+      maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
+      maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));
+      // Wire key `prof` and IWorld member `professionsState` are the settled
+      // names for the professions facet (#1164, src/sim/professions/CLAUDE.md).
+      // `gprof` mirrors the raw per-craft proficiency map for the
+      // `gatheringProficiency` IWorld data member (#1119), independent of the
+      // `professionsState` view; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in
+      // tests/snapshots.test.ts.
+      maybe('prof', this.sim.professionsStateFor(anchorSession.pid));
+      maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
+      maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    }
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety
@@ -4132,9 +4340,49 @@ export class GameServer {
     return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
   }
 
-  private partyWire(pid: number): unknown {
+  // Per-tick caches for party-scoped self fields. The serialized payload is
+  // identical for every member of one party (nothing in it depends on the
+  // viewing pid), so a 40-player raid costs one build+stringify per tick, not
+  // 40. Keyed by party object identity; cleared at the first access of each
+  // new tick so disbanded parties cannot accumulate.
+  private partyJsonTick = -1;
+  private readonly partyJsonByParty = new Map<object, string>();
+  private readonly markersJsonByParty = new Map<object, string>();
+
+  private partyScopedJson(
+    pid: number,
+    cache: Map<object, string>,
+    build: (party: NonNullable<ReturnType<Sim['partyOf']>>) => string,
+  ): string {
     const party = this.sim.partyOf(pid);
-    if (!party) return null;
+    if (!party) return 'null';
+    if (this.partyJsonTick !== this.sim.tickCount) {
+      this.partyJsonTick = this.sim.tickCount;
+      this.partyJsonByParty.clear();
+      this.markersJsonByParty.clear();
+    }
+    let json = cache.get(party);
+    if (json === undefined) {
+      json = build(party);
+      cache.set(party, json);
+    }
+    return json;
+  }
+
+  private partyWireJson(pid: number): string {
+    return this.partyScopedJson(pid, this.partyJsonByParty, (party) =>
+      JSON.stringify(this.partyWire(party)),
+    );
+  }
+
+  private markersWireJson(pid: number): string {
+    return this.partyScopedJson(pid, this.markersJsonByParty, (party) =>
+      // markersFor only reads party.id, identical for every member.
+      JSON.stringify(this.sim.markersFor(party.members[0] ?? -1)),
+    );
+  }
+
+  private partyWire(party: NonNullable<ReturnType<Sim['partyOf']>>): unknown {
     return {
       leader: party.leader,
       raid: party.raid,
@@ -4174,14 +4422,6 @@ export class GameServer {
         })
         .filter(Boolean),
     };
-  }
-
-  // Raid markers the player's party can see, as { entityId: markerId }; null
-  // when the player is in no party. Pure read — the sim owns marker cleanup.
-  private markersWire(pid: number): unknown {
-    const party = this.sim.partyOf(pid);
-    if (!party) return null;
-    return this.sim.markersFor(pid);
   }
 
   private tradeWire(pid: number): unknown {
@@ -4414,6 +4654,14 @@ export class GameServer {
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
     const suppressedInvites = this.suppressBlockedSocialInvites(events);
+    // Index the batch by pid once, so each session visits only its own
+    // candidates (its pid, its spectate anchor's pid, and the rare world
+    // events) instead of scanning the whole batch, in exact batch order
+    // (mergeCandidates); the decision logic per candidate is unchanged.
+    const { byPid, world } = indexEventsForRouting(events);
+    // World events route by distance; resolve each anchor once per batch, not
+    // once per session per event.
+    const worldAnchors = new Map(world.map((w) => [w.ev, this.eventAnchor(w.ev)]));
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(
@@ -4430,9 +4678,12 @@ export class GameServer {
           anchorPid = target.pid;
           anchorPos = targetEntity.pos;
         }
+        const own = byPid.get(session.pid);
+        const anchor = anchorPid === session.pid ? own : byPid.get(anchorPid);
+        if (own === undefined && anchor === undefined && world.length === 0) return;
         const mine: SimEvent[] = [];
-        for (const ev of events) {
-          if (suppressedInvites !== null && suppressedInvites.has(ev)) continue;
+        const visit = (ev: SimEvent): void => {
+          if (suppressedInvites !== null && suppressedInvites.has(ev)) return;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
@@ -4441,7 +4692,7 @@ export class GameServer {
             session.blockedIds.size > 0 &&
             this.isBlockedSender(session, ev.fromPid)
           )
-            continue;
+            return;
           if (ev.pid !== undefined) {
             if (
               session.spectating &&
@@ -4450,13 +4701,13 @@ export class GameServer {
               ev.channel !== 'say' &&
               ev.channel !== 'yell'
             ) {
-              if (this.isBlockedSender(session, ev.fromPid)) continue;
+              if (this.isBlockedSender(session, ev.fromPid)) return;
               mine.push(ev);
               if (ev.channel === 'whisper' && ev.to === undefined && ev.fromPid !== session.pid) {
                 session.lastWhisperFrom = ev.from;
               }
               this.botDetector.observeEvent(session.botTrackingContext, ev, eventTime);
-              continue;
+              return;
             }
             if (ev.pid === anchorPid) {
               if (
@@ -4465,7 +4716,7 @@ export class GameServer {
                 ev.channel !== 'say' &&
                 ev.channel !== 'yell'
               ) {
-                continue;
+                return;
               }
               mine.push(ev);
               // a sim-driven change to a heavy self field (loot, level-up, quest
@@ -4486,14 +4737,15 @@ export class GameServer {
                 this.botDetector.observeEvent(session.botTrackingContext, ev, eventTime);
               }
             }
-            continue;
+            return;
           }
           // world events: only those near this player
-          const anchor = this.eventAnchor(ev);
-          if (anchor === null || dist2d(anchorPos, anchor) <= EVENT_RADIUS) {
+          const evAnchor = worldAnchors.get(ev) ?? null;
+          if (evAnchor === null || dist2d(anchorPos, evAnchor) <= EVENT_RADIUS) {
             mine.push(ev);
           }
-        }
+        };
+        mergeCandidates(own, anchor, world, visit);
         if (mine.length > 0) this.send(session, { t: 'events', list: mine });
       },
       (err, session) =>

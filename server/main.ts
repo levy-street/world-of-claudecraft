@@ -1,5 +1,6 @@
 import * as fs from 'node:fs';
 import * as http from 'node:http';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
 import {
@@ -314,8 +315,25 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
 function liveGame(): GameServer {
-  gameInstance ??= new GameServer();
+  gameInstance ??= new GameServer({
+    snapshotWorkers: snapshotWorkerCount(),
+    snapshotWorkerPath: path.join(__dirname, 'snapshot_worker.cjs'),
+  });
   return gameInstance;
+}
+
+// Snapshot-fanout sizing. SNAPSHOT_WORKERS=0 disables, N pins a count, unset
+// or 'auto' scales with the host: leave two cores for the sim + I/O and
+// Node's own pools, cap at 6 (diminishing returns past the broadcast share
+// of the tick). A 2-vCPU box therefore auto-disables, exactly the hardware
+// where extra threads would only steal time from the sim.
+function snapshotWorkerCount(): number {
+  const raw = (process.env.SNAPSHOT_WORKERS ?? 'auto').trim().toLowerCase();
+  if (raw !== 'auto') {
+    const n = Number(raw);
+    return Number.isInteger(n) && n >= 0 ? Math.min(n, 16) : 0;
+  }
+  return Math.min(6, Math.max(0, os.availableParallelism() - 2));
 }
 
 function initialCharacterState(

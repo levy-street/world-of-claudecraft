@@ -20,7 +20,13 @@ import {
   MIN_COLLIDE_RADIUS,
 } from '../sim/map_doc';
 import type { BlockerDef, CampDef, HeightStamp, WorldContent } from '../sim/types';
-import { invalidateTerrainEditIndex, terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
+import {
+  invalidateTerrainEditIndex,
+  invalidateTerrainFeatures,
+  terrainHeight,
+  WATER_LEVEL,
+  waterLevel,
+} from '../sim/world';
 import { tEntity } from '../ui/entity_i18n';
 import { t } from '../ui/i18n';
 import { Editor3DViewport } from './3d/viewport';
@@ -754,6 +760,7 @@ export class EditorApp {
   private terrainEditsMutated(): void {
     invalidateStaticColliders();
     invalidateTerrainEditIndex();
+    invalidateTerrainFeatures();
   }
 
   private strokeStep(w: Vec2): void {
@@ -1412,6 +1419,11 @@ export class EditorApp {
   }
 
   private afterCampsChanged(): void {
+    // camp add/delete/move/radius mutate the live content in place: the
+    // terrain-feature shortlists + camp-height memos must not keep serving
+    // the old footprint (the 3D re-mesh also invalidates, but inspector
+    // edits can land while already in 3D)
+    invalidateTerrainFeatures();
     this.map.meta.updatedAt = now();
     this.entities = buildEntities(this.content);
     this.base = snapshot(this.entities);
