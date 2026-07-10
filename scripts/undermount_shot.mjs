@@ -29,7 +29,16 @@ await page.evaluate(() =>
   document.querySelector('#offline-select .mini-class[data-class="warrior"]')?.click(),
 );
 await page.click('#btn-start-offline');
-await page.waitForFunction(() => !!window.__game?.sim?.player, { timeout: 30000 });
+// Poll Node-side (NOT page.waitForFunction): software-GL rendering starves the
+// page's requestAnimationFrame, so rAF-based waiting never fires.
+{
+  let booted = false;
+  for (let i = 0; i < 30 && !booted; i++) {
+    booted = await page.evaluate(() => !!window.__game?.sim?.player);
+    if (!booted) await sleep(2000);
+  }
+  if (!booted) throw new Error('world did not boot');
+}
 await sleep(1200);
 await page.keyboard.press('Escape'); // skip the intro cinematic (else #ui is hidden)
 await sleep(600);
@@ -77,7 +86,7 @@ const frameDuo = (targetTid) =>
       const cx = bosses.reduce((s, b) => s + b.pos.x, 0) / bosses.length;
       const cz = bosses.reduce((s, b) => s + b.pos.z, 0) / bosses.length;
       const px = cx;
-      const pz = cz - 15; // close on the pair so nameplates + target frame read
+      const pz = cz - 24; // pull back to show the lava floor
       p.pos = { x: px, y: 1, z: pz };
       p.prevPos = { ...p.pos };
       sim.rebucket(p);

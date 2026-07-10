@@ -54,6 +54,62 @@ const DUNGEON_LIGHT_INTENSITY = 46;
 const DUNGEON_LIGHT_DISTANCE = 34;
 const UNDERMOUNT_FLOOR_EMISSIVE = 0xff5a1e;
 const UNDERMOUNT_FLOOR_EMISSIVE_INTENSITY = 1.2;
+const UNDERMOUNT_LAVA_BASE = 0x260603;
+const UNDERMOUNT_LAVA_EMISSIVE = 0xff5a10;
+const UNDERMOUNT_LAVA_EMISSIVE_INTENSITY = 2.2;
+
+// Fixed normalized paths keep every Undermount wing deterministic while
+// scaling the magma network to the unusually wide authored room bounds.
+const UNDERMOUNT_LAVA_PATHS = [
+  [
+    [-0.9, 0.16],
+    [-0.73, 0.23],
+    [-0.57, 0.19],
+    [-0.4, 0.29],
+    [-0.22, 0.24],
+    [-0.08, 0.34],
+  ],
+  [
+    [0.08, 0.12],
+    [0.24, 0.2],
+    [0.39, 0.16],
+    [0.55, 0.27],
+    [0.72, 0.21],
+    [0.9, 0.31],
+  ],
+  [
+    [-0.84, 0.55],
+    [-0.67, 0.49],
+    [-0.49, 0.58],
+    [-0.31, 0.52],
+    [-0.14, 0.63],
+  ],
+  [
+    [0.12, 0.58],
+    [0.3, 0.64],
+    [0.46, 0.57],
+    [0.62, 0.68],
+    [0.8, 0.61],
+    [0.9, 0.72],
+  ],
+  [
+    [-0.45, 0.58],
+    [-0.48, 0.7],
+    [-0.38, 0.81],
+    [-0.48, 0.9],
+  ],
+  [
+    [0.55, 0.27],
+    [0.61, 0.4],
+    [0.54, 0.5],
+    [0.64, 0.57],
+  ],
+] as const;
+
+const UNDERMOUNT_LAVA_POOLS = [
+  { x: -0.62, z: 0.36, scaleX: 1.25, scaleZ: 0.75, rotation: 0.24 },
+  { x: 0.6, z: 0.78, scaleX: 1.0, scaleZ: 0.9, rotation: -0.31 },
+] as const;
 
 const MODULE_SCALE = 2; // KayKit walls are 4u tall/long -> 8u at our room scale
 const FLOOR_CELL = 4; // kit floor tiles are 4x4 at MODULE_SCALE 1
@@ -584,6 +640,9 @@ export class DungeonInteriors {
   private glowDecalTex: THREE.Texture | null = null;
   private glowDecalMats = new Map<number, THREE.MeshBasicMaterial>();
   private flameGeo: THREE.BufferGeometry | null = null;
+  private undermountLavaVeinGeo: THREE.BufferGeometry | null = null;
+  private undermountLavaPoolGeo: THREE.BufferGeometry | null = null;
+  private undermountLavaMat: THREE.Material | null = null;
   private packMats = new Map<Pack, THREE.Material>();
   private undermountFloorMats = new Map<Pack, THREE.Material>();
   // delve_marsh / delve_marsh_apse wall+pillar and floor tints: clones of
@@ -641,6 +700,11 @@ export class DungeonInteriors {
     );
     water.frustumCulled = false;
     group.add(water);
+    // Undermount lava uses one shared emissive program for veins and pools.
+    this.undermountLavaVeinGeo ??= new THREE.BoxGeometry(1, 0.06, 1);
+    const lava = new THREE.Mesh(this.undermountLavaVeinGeo, this.undermountLavaMaterial());
+    lava.frustumCulled = false;
+    group.add(lava);
     // Torch-glow decal: one MeshBasic program shared by every variant's colour.
     this.addTorchGlow(group, 0, 0, TORCH_COLORS.crypt.light);
     return group;
@@ -696,11 +760,15 @@ export class DungeonInteriors {
     this.placeFloor(p, layout, variant);
     this.placeWalls(p, layout, variant, arenaWalls);
     this.placePillarsAndTorches(group, p, layout, variant);
-    this.placeTombs(p, layout, variant);
+    if (variant !== 'undermount') this.placeTombs(p, layout, variant);
     this.placeStubs(p, layout.stubs, variant);
     this.placeDais(group, p, layout, variant);
-    this.placeAisleClutter(p, layout, variant);
-    this.placeWallDressing(p, layout, variant, arenaWalls);
+    if (variant === 'undermount') {
+      this.placeUndermountLava(group, layout);
+    } else {
+      this.placeAisleClutter(p, layout, variant);
+      this.placeWallDressing(p, layout, variant, arenaWalls);
+    }
     if (variant === 'temple') {
       this.placeFloodwater(group, layout);
       this.placeAquaticDressing(group, layout);
@@ -741,6 +809,83 @@ export class DungeonInteriors {
         m.mat.depthWrite = hide ? false : m.depthWrite;
       }
     }
+  }
+
+  private placeUndermountLava(group: THREE.Group, layout: DungeonLayout): void {
+    const halfX = layout.floorHalfX ?? (layout.wallX ?? DUNGEON_WALL_X) - 1;
+    const zSpan = Math.max(1, layout.zMax - layout.zMin);
+    const transform = new THREE.Object3D();
+    const segmentCount = UNDERMOUNT_LAVA_PATHS.reduce((count, path) => count + path.length - 1, 0);
+
+    this.undermountLavaVeinGeo ??= new THREE.BoxGeometry(1, 0.06, 1);
+    const veins = new THREE.InstancedMesh(
+      this.undermountLavaVeinGeo,
+      this.undermountLavaMaterial(),
+      segmentCount,
+    );
+    let segmentIndex = 0;
+    for (let pathIndex = 0; pathIndex < UNDERMOUNT_LAVA_PATHS.length; pathIndex++) {
+      const path = UNDERMOUNT_LAVA_PATHS[pathIndex];
+      for (let pointIndex = 1; pointIndex < path.length; pointIndex++) {
+        const start = path[pointIndex - 1];
+        const end = path[pointIndex];
+        const ax = start[0] * halfX;
+        const az = layout.zMin + start[1] * zSpan;
+        const bx = end[0] * halfX;
+        const bz = layout.zMin + end[1] * zSpan;
+        const dx = bx - ax;
+        const dz = bz - az;
+        const length = Math.hypot(dx, dz);
+        const width = 1.2 + ((pathIndex + pointIndex) % 3) * 0.35;
+
+        transform.position.set((ax + bx) / 2, 0.065, (az + bz) / 2);
+        transform.rotation.set(0, Math.atan2(-dz, dx), 0);
+        transform.scale.set(length + width * 0.4, 1, width);
+        transform.updateMatrix();
+        veins.setMatrixAt(segmentIndex++, transform.matrix);
+      }
+    }
+    veins.name = 'undermount-lava-veins';
+    veins.instanceMatrix.needsUpdate = true;
+    veins.computeBoundingSphere();
+    veins.renderOrder = 1;
+    group.add(veins);
+
+    this.undermountLavaPoolGeo ??= new THREE.CircleGeometry(1, 32).rotateX(-Math.PI / 2);
+    const pools = new THREE.InstancedMesh(
+      this.undermountLavaPoolGeo,
+      this.undermountLavaMaterial(),
+      UNDERMOUNT_LAVA_POOLS.length,
+    );
+    const poolRadius = Math.max(6, Math.min(11, halfX * 0.05));
+    for (let i = 0; i < UNDERMOUNT_LAVA_POOLS.length; i++) {
+      const spec = UNDERMOUNT_LAVA_POOLS[i];
+      const x = spec.x * halfX;
+      const z = layout.zMin + spec.z * zSpan;
+      transform.position.set(x, 0.08, z);
+      transform.rotation.set(0, spec.rotation, 0);
+      transform.scale.set(poolRadius * spec.scaleX, 1, poolRadius * spec.scaleZ);
+      transform.updateMatrix();
+      pools.setMatrixAt(i, transform.matrix);
+
+      this.addTorchGlow(group, x, z, UNDERMOUNT_LAVA_EMISSIVE, 0.11, poolRadius / 5.5);
+      const baseIntensity = this.lowGfx ? 9 : 18;
+      const light = new THREE.PointLight(
+        UNDERMOUNT_LAVA_EMISSIVE,
+        baseIntensity,
+        this.lowGfx ? 30 : 48,
+        2,
+      );
+      light.userData.baseIntensity = baseIntensity;
+      light.position.set(x, 2.8, z);
+      group.add(light);
+      this.fireLights.push(light);
+    }
+    pools.name = 'undermount-lava-pools';
+    pools.instanceMatrix.needsUpdate = true;
+    pools.computeBoundingSphere();
+    pools.renderOrder = 1;
+    group.add(pools);
   }
 
   // -------------------------------------------------------------------------
@@ -968,6 +1113,19 @@ export class DungeonInteriors {
     });
     this.undermountFloorMats.set(pack, mat);
     return mat;
+  }
+
+  private undermountLavaMaterial(): THREE.Material {
+    if (this.undermountLavaMat) return this.undermountLavaMat;
+    this.undermountLavaMat = surfaceMat({
+      color: UNDERMOUNT_LAVA_BASE,
+      roughness: 0.55,
+      metalness: 0,
+      emissive: UNDERMOUNT_LAVA_EMISSIVE,
+      emissiveIntensity: UNDERMOUNT_LAVA_EMISSIVE_INTENSITY,
+      side: THREE.DoubleSide,
+    });
+    return this.undermountLavaMat;
   }
 
   private emit(group: THREE.Group, p: Placements, variant: Variant): void {
