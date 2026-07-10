@@ -32,8 +32,8 @@ import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
-  type DungeonDifficulty,
   type DelveCompanionRole,
+  type DungeonDifficulty,
   type Entity,
   type EquipSlot,
   emptyMoveInput,

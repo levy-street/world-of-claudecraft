@@ -20,6 +20,7 @@
 // and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { DelveCompanionInfo } from '../../world_api';
+import type { GatheringProfessionId } from '../content/professions';
 import type { DelveShopGate, DelveShopOffer } from '../data';
 import {
   COMPANION_UPGRADE_COSTS,
@@ -45,7 +46,6 @@ import {
   delveModuleEntry as delveLayoutEntry,
 } from '../delve_layout';
 import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
-import type { GatheringProfessionId } from '../content/professions';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';

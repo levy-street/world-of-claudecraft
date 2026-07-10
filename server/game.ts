@@ -22,8 +22,8 @@ import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
-  DT,
   type DelveCompanionRole,
+  DT,
   dist2d,
   type Entity,
   EQUIP_SLOTS,
