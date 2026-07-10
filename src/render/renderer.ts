@@ -271,6 +271,18 @@ const YUMI_MAZE_SUN_INTENSITY = 1.2;
 const YUMI_MAZE_HEMI_INTENSITY = 0.42;
 const YUMI_MAZE_ENV_INTENSITY = 0.28;
 const YUMI_MAZE_RIM_BOOST = 1.7;
+// The Undermount is a molten forge chamber, not a crypt. Warm ambient
+// light keeps its large wings readable while torches retain contrast.
+const UNDERMOUNT_SUN_INTENSITY = 0.9;
+const UNDERMOUNT_HEMI_INTENSITY = 0.6;
+const UNDERMOUNT_ENV_INTENSITY = 0.16;
+const UNDERMOUNT_RIM_BOOST = 1.8;
+const UNDERMOUNT_HEMI_SKY_COLOR = 0xffb060;
+const UNDERMOUNT_HEMI_GROUND_COLOR = 0x3a1206;
+const UNDERMOUNT_INSTANCE_HALF_WIDTH = 250;
+const UNDERMOUNT_INSTANCE_XS = DUNGEON_LIST.filter(
+  (dungeon) => dungeon.interior === 'undermount',
+).map((dungeon) => instanceOrigin(dungeon.index, 0).x);
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -3713,6 +3725,7 @@ export class Renderer {
     | 'dungeon'
     | 'temple'
     | 'nythraxis'
+    | 'undermount'
     | 'delve'
     | 'yumiMaze'
     | 'underwater'
@@ -3826,6 +3839,16 @@ export class Renderer {
     // non-zero pitch origin (the real Sowfield match is {0,0}).
     const po = this.sim.cupInfo?.match?.origin;
     const inPractice = !!po && (po.x !== 0 || po.z !== 0);
+    // Undermount origins sit inside the broad Delve and Yumi x-bands. Resolve
+    // their narrower dungeon bands first so those coarse checks do not claim them.
+    let inUndermountBand = false;
+    if (inside) {
+      for (const ox of UNDERMOUNT_INSTANCE_XS) {
+        if (Math.abs(px - ox) >= UNDERMOUNT_INSTANCE_HALF_WIDTH) continue;
+        inUndermountBand = true;
+        break;
+      }
+    }
     if (inPractice) {
       const idx = this.practiceSkyVariant();
       this.valeCupSky.setVariant(idx);
@@ -3834,9 +3857,9 @@ export class Renderer {
     } else {
       this.valeCupSky.mesh.visible = false;
     }
-    if (isDelvePos(px) && !inPractice) {
+    if (isDelvePos(px) && !inPractice && !inUndermountBand) {
       this.ensureDelveInteriorsNear(px, pz);
-    } else if (inside && isYumiMazePos(px)) {
+    } else if (inside && isYumiMazePos(px) && !inUndermountBand) {
       // build the Protect Yumi maze copy the player was matched into; the
       // update() call each frame lives in sync() (beacon anchors)
       for (let i = 0; i < YUMI_MAZE_SLOT_COUNT; i++) {
@@ -3881,12 +3904,17 @@ export class Renderer {
     }
     // the Drowned Temple reads as submerged: a teal murk instead of the
     // crypt's near-black, so its flooded halls feel underwater, not just dark
-    const inDelve = inside && isDelvePos(px);
-    const inYumiMaze = inside && isYumiMazePos(px);
+    const inDelve = inside && !inUndermountBand && isDelvePos(px);
+    const inYumiMaze = inside && !inUndermountBand && isYumiMazePos(px);
     const interior =
-      inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
+      inside && !inDelve && !inYumiMaze && !isArenaPos(px)
+        ? inUndermountBand
+          ? 'undermount'
+          : dungeonAt(px)?.interior
+        : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
+    const inUndermount = interior === 'undermount';
     const desired = inPractice
       ? 'practice'
       : inDelve
@@ -3897,11 +3925,13 @@ export class Renderer {
             ? 'temple'
             : inNythraxis
               ? 'nythraxis'
-              : inside
-                ? 'dungeon'
-                : camY < waterLevelAt(px, pz) - 0.05
-                  ? 'underwater'
-                  : 'outdoor';
+              : inUndermount
+                ? 'undermount'
+                : inside
+                  ? 'dungeon'
+                  : camY < waterLevelAt(px, pz) - 0.05
+                    ? 'underwater'
+                    : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     if (desired !== this.fogState) {
       this.fogState = desired;
@@ -3919,6 +3949,10 @@ export class Renderer {
         fog.color.setHex(0x020106);
         fog.near = 20;
         fog.far = 80;
+      } else if (desired === 'undermount') {
+        fog.color.setHex(0x1a0a05);
+        fog.near = 22;
+        fog.far = 95;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
@@ -3953,6 +3987,9 @@ export class Renderer {
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead — silhouettes must split from the murk.
+      const moltenForge = desired === 'undermount';
+      this.hemi.color.setHex(moltenForge ? UNDERMOUNT_HEMI_SKY_COLOR : 0xdcefff);
+      this.hemi.groundColor.setHex(moltenForge ? UNDERMOUNT_HEMI_GROUND_COLOR : 0x465f39);
       if (!this.lowGfx) {
         const mazeNight = desired === 'yumiMaze';
         const underground =
@@ -3960,26 +3997,34 @@ export class Renderer {
           desired === 'temple' ||
           desired === 'nythraxis' ||
           desired === 'delve';
-        this.sun.intensity = mazeNight
-          ? YUMI_MAZE_SUN_INTENSITY
-          : underground
-            ? DUNGEON_SUN_INTENSITY
-            : SUN_INTENSITY;
-        this.hemi.intensity = mazeNight
-          ? YUMI_MAZE_HEMI_INTENSITY
-          : underground
-            ? DUNGEON_HEMI_INTENSITY
-            : HEMI_INTENSITY;
-        this.scene.environmentIntensity = mazeNight
-          ? YUMI_MAZE_ENV_INTENSITY
-          : underground
-            ? DUNGEON_ENV_INTENSITY
-            : this.envOutdoorIntensity;
-        sharedUniforms.uRimBoost.value = mazeNight
-          ? YUMI_MAZE_RIM_BOOST
-          : underground
-            ? DUNGEON_RIM_BOOST
-            : 1;
+        this.sun.intensity = moltenForge
+          ? UNDERMOUNT_SUN_INTENSITY
+          : mazeNight
+            ? YUMI_MAZE_SUN_INTENSITY
+            : underground
+              ? DUNGEON_SUN_INTENSITY
+              : SUN_INTENSITY;
+        this.hemi.intensity = moltenForge
+          ? UNDERMOUNT_HEMI_INTENSITY
+          : mazeNight
+            ? YUMI_MAZE_HEMI_INTENSITY
+            : underground
+              ? DUNGEON_HEMI_INTENSITY
+              : HEMI_INTENSITY;
+        this.scene.environmentIntensity = moltenForge
+          ? UNDERMOUNT_ENV_INTENSITY
+          : mazeNight
+            ? YUMI_MAZE_ENV_INTENSITY
+            : underground
+              ? DUNGEON_ENV_INTENSITY
+              : this.envOutdoorIntensity;
+        sharedUniforms.uRimBoost.value = moltenForge
+          ? UNDERMOUNT_RIM_BOOST
+          : mazeNight
+            ? YUMI_MAZE_RIM_BOOST
+            : underground
+              ? DUNGEON_RIM_BOOST
+              : 1;
       }
       return;
     }

@@ -43,7 +43,7 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
-import { sharedUniforms } from './gfx';
+import { sharedUniforms, surfaceMat } from './gfx';
 import { radialGlowTexture } from './textures';
 
 const FLAME_EMISSIVE_HIGH = 2.2;
@@ -52,6 +52,8 @@ const FLAME_EMISSIVE_HIGH = 2.2;
 const DUNGEON_LIGHT_Y = 6.4;
 const DUNGEON_LIGHT_INTENSITY = 46;
 const DUNGEON_LIGHT_DISTANCE = 34;
+const UNDERMOUNT_FLOOR_EMISSIVE = 0xff5a1e;
+const UNDERMOUNT_FLOOR_EMISSIVE_INTENSITY = 1.2;
 
 const MODULE_SCALE = 2; // KayKit walls are 4u tall/long -> 8u at our room scale
 const FLOOR_CELL = 4; // kit floor tiles are 4x4 at MODULE_SCALE 1
@@ -583,6 +585,7 @@ export class DungeonInteriors {
   private glowDecalMats = new Map<number, THREE.MeshBasicMaterial>();
   private flameGeo: THREE.BufferGeometry | null = null;
   private packMats = new Map<Pack, THREE.Material>();
+  private undermountFloorMats = new Map<Pack, THREE.Material>();
   // delve_marsh / delve_marsh_apse wall+pillar and floor tints: clones of
   // packMats keyed by pack, built once and reused for every marsh room this
   // instance draws (see marshMaterial). Never touched by any other variant.
@@ -949,6 +952,24 @@ export class DungeonInteriors {
     return mat;
   }
 
+  private undermountFloorMaterial(pack: Pack): THREE.Material {
+    let mat = this.undermountFloorMats.get(pack);
+    if (mat) return mat;
+    // Keep the KayKit atlas detail while making every floor tile visible
+    // without relying on the underground torch rig.
+    const src = packSourceMaterial.get(pack);
+    mat = surfaceMat({
+      color: src?.color.getHex() ?? 0x777788,
+      map: src?.map ?? undefined,
+      roughness: Math.max(0.9, src?.roughness ?? 0.95),
+      metalness: 0,
+      emissive: UNDERMOUNT_FLOOR_EMISSIVE,
+      emissiveIntensity: UNDERMOUNT_FLOOR_EMISSIVE_INTENSITY,
+    });
+    this.undermountFloorMats.set(pack, mat);
+    return mat;
+  }
+
   private emit(group: THREE.Group, p: Placements, variant: Variant): void {
     const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, mats] of p.byKind) {
@@ -958,12 +979,17 @@ export class DungeonInteriors {
         console.warn(`dungeon: unknown module kind '${kind}'`);
         continue;
       }
-      // Marsh wall/pillar/floor stone gets a wet-mossy / peat tint (see
-      // marshMaterial); every other kind (banners, torches, props) and every
-      // other variant keep the plain shared pack material unchanged.
+      // Undermount floor receivers glow molten. Marsh wall/pillar/floor stone
+      // gets a wet-mossy / peat tint (see marshMaterial). All remaining kinds
+      // and variants keep the plain shared pack material unchanged.
       let mat = this.material(asset.pack);
-      if (isMarsh && WALL_PILLAR_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'wall');
-      else if (isMarsh && RECEIVER_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'floor');
+      if (variant === 'undermount' && RECEIVER_KINDS.has(kind)) {
+        mat = this.undermountFloorMaterial(asset.pack);
+      } else if (isMarsh && WALL_PILLAR_KINDS.has(kind)) {
+        mat = this.marshMaterial(asset.pack, 'wall');
+      } else if (isMarsh && RECEIVER_KINDS.has(kind)) {
+        mat = this.marshMaterial(asset.pack, 'floor');
+      }
       const mesh = new THREE.InstancedMesh(asset.geo, mat, mats.length);
       for (let i = 0; i < mats.length; i++) mesh.setMatrixAt(i, mats[i]);
       mesh.instanceMatrix.needsUpdate = true;

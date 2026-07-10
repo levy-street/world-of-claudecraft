@@ -77,7 +77,7 @@ const frameDuo = (targetTid) =>
       const cx = bosses.reduce((s, b) => s + b.pos.x, 0) / bosses.length;
       const cz = bosses.reduce((s, b) => s + b.pos.z, 0) / bosses.length;
       const px = cx;
-      const pz = cz - 15; // close on the pair so the nameplates + target frame read
+      const pz = cz - 15; // close on the pair so nameplates + target frame read
       p.pos = { x: px, y: 1, z: pz };
       p.prevPos = { ...p.pos };
       sim.rebucket(p);
