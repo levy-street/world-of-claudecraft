@@ -102,17 +102,7 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "hudChrome.itemHeroicTag"
   ],
-  "cs_CZ": [
-    "entities.items.chunk_of_ore.name",
-    "entities.quests.q_prof_intro.completion",
-    "entities.quests.q_prof_intro.objectives.0.label",
-    "entities.quests.q_prof_intro.text",
-    "entities.quests.q_prof_intro.title",
-    "hudChrome.itemHeroicTag",
-    "hudChrome.itemSoulbound",
-    "hudChrome.mailbox.parcelQtyDecreaseAria",
-    "hudChrome.mailbox.parcelQtyIncreaseAria"
-  ],
+  "cs_CZ": [],
   "nl_NL": [
     "entities.items.chunk_of_ore.name",
     "entities.quests.q_prof_intro.completion",

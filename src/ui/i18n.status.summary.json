@@ -34,8 +34,8 @@
   "counts": {
     "keys": 6558,
     "rows": 137718,
-    "translated": 137025,
-    "pending": 500,
+    "translated": 137034,
+    "pending": 491,
     "blocked": 193,
     "blockedSource": 93
   },
@@ -106,8 +106,8 @@
       "blocked": 0
     },
     "cs_CZ": {
-      "translated": 6517,
-      "pending": 27,
+      "translated": 6526,
+      "pending": 18,
       "blocked": 14
     },
     "nl_NL": {
