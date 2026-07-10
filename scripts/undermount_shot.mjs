@@ -50,38 +50,23 @@ const aimAt = (g, px, pz, tx, tz) => {
   g.sim.player.facing = yaw;
 };
 
-// 1) Surface fissure entrance: frame Runeseeker Maerin (and the door beside her).
+// 1) The seal in action: entering wing 2 before wing 1 is cleared is refused
+//    with the "The way down is sealed" banner (proof of the wing-gate mechanic).
 await pose(() => {
   const g = window.__game;
   const sim = g.sim;
   const p = sim.player;
   sim.setPlayerLevel(20);
   p.gm = true;
-  const maerin = [...sim.entities.values()].find(
-    (e) => e.templateId === 'runeseeker_maerin' || e.name === 'Runeseeker Maerin',
-  );
-  if (maerin) {
-    const px = maerin.pos.x;
-    const pz = maerin.pos.z + 9; // stand uphill; the slope camera looks downhill at her
-    p.pos = { x: px, y: maerin.pos.y, z: pz };
-    p.prevPos = { ...p.pos };
-    sim.rebucket(p);
-    const yaw = Math.atan2(maerin.pos.x - px, maerin.pos.z - pz);
-    g.input.camYaw = yaw;
-    g.input.interpFacing = yaw;
-    p.facing = yaw;
-    window.__maerinId = maerin.id;
-    window.__maerinPos = { ...maerin.pos };
-  }
-  for (let i = 0; i < 30; i++) sim.tick();
+  sim.enterDungeon('undermount_wing2', p.id); // sealed -> error banner
 });
-await sleep(700);
-await page.screenshot({ path: `${OUT}/01_fissure_maerin.png` });
-console.log('shot 1: fissure + Maerin');
+await sleep(400);
+await page.screenshot({ path: `${OUT}/01_wing_sealed.png` });
+console.log('shot 1: sealed-wing banner');
 
-// Enter wing 1 and frame the two bosses.
-const frameDuo = () =>
-  page.evaluate(() => {
+// Enter wing 1, frame the duo, and optionally target a boss so its frame shows.
+const frameDuo = (targetTid) =>
+  page.evaluate((tid) => {
     const g = window.__game;
     const sim = g.sim;
     const p = sim.player;
@@ -92,7 +77,7 @@ const frameDuo = () =>
       const cx = bosses.reduce((s, b) => s + b.pos.x, 0) / bosses.length;
       const cz = bosses.reduce((s, b) => s + b.pos.z, 0) / bosses.length;
       const px = cx;
-      const pz = cz - 16;
+      const pz = cz - 15; // close on the pair so the nameplates + target frame read
       p.pos = { x: px, y: 1, z: pz };
       p.prevPos = { ...p.pos };
       sim.rebucket(p);
@@ -101,10 +86,14 @@ const frameDuo = () =>
       g.input.interpFacing = yaw;
       p.facing = yaw;
     }
+    if (tid) {
+      const t = [...sim.entities.values()].find((e) => e.templateId === tid && !e.dead);
+      if (t) p.targetId = t.id;
+    }
     for (let i = 0; i < 20; i++) sim.tick();
-  });
+  }, targetTid);
 
-// 2) Inside wing 1: the Kiln-Keepers duo (both alive).
+// 2) The Kiln-Keepers duo in the warm molten chamber (target Vosh for his frame).
 await pose(() => {
   const g = window.__game;
   const sim = g.sim;
@@ -112,12 +101,12 @@ await pose(() => {
   sim.enterDungeon('undermount_wing1', sim.player.id);
   for (let i = 0; i < 10; i++) sim.tick();
 });
-await frameDuo();
+await frameDuo('vosh_the_glazier');
 await sleep(700);
 await page.screenshot({ path: `${OUT}/02_kiln_keepers_duo.png` });
-console.log('shot 2: kiln-keepers duo');
+console.log('shot 2: kiln-keepers duo (warm interior)');
 
-// 3) Kill Vosh: Saan flies into Kiln Fury (the kill-together mechanic).
+// 3) Kill Vosh -> Saan gains Kiln Fury; target her so the buff shows on her frame.
 await pose(() => {
   const g = window.__game;
   const sim = g.sim;
@@ -126,10 +115,10 @@ await pose(() => {
   if (vosh) sim.dealDamage(p, vosh, vosh.hp, false, 'physical', null, 'hit', true);
   for (let i = 0; i < 6; i++) sim.tick();
 });
-await frameDuo();
+await frameDuo('saan_the_stoker');
 await sleep(700);
-await page.screenshot({ path: `${OUT}/03_kiln_fury_frenzy.png` });
-console.log('shot 3: Kiln Fury frenzy on the survivor');
+await page.screenshot({ path: `${OUT}/03_kiln_fury_buff.png` });
+console.log('shot 3: Kiln Fury buff on the survivor');
 
 const shots = fs.readdirSync(OUT).filter((f) => f.endsWith('.png'));
 console.log('DONE, wrote', shots.length, 'shots to', OUT, shots);

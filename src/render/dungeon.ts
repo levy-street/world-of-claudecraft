@@ -65,6 +65,7 @@ export type DungeonInteriorVariant =
   | 'temple'
   | 'arena'
   | 'nythraxis'
+  | 'undermount'
   // Collapsed Reliquary delve sub-themes (share the ember crypt-stone base, see
   // isDelveVariant; differ only in wall-side props, clutter, and the dais).
   | 'delve_ossuary'
@@ -91,10 +92,11 @@ export function isDelveVariant(variant: DungeonInteriorVariant): boolean {
 type Variant = DungeonInteriorVariant;
 
 export function dungeonDaisHasRaisedPlatform(variant: DungeonInteriorVariant): boolean {
-  // Flat fighting floors: the arena, the Nythraxis raid, and the delve trash
+  // Flat fighting floors: the arena, the Nythraxis and Undermount raids, and the
+  // delve trash
   // rooms (their "dais" marker is only the exit threshold). The delve finale
   // keeps a raised boss stage for Deacon Varric.
-  if (variant === 'arena' || variant === 'nythraxis') return false;
+  if (variant === 'arena' || variant === 'nythraxis' || variant === 'undermount') return false;
   if (variant === 'delve_ossuary' || variant === 'delve_bell' || variant === 'delve_hall')
     return false;
   // marsh trash rooms are flat fighting floors like the other delve trash; the
@@ -118,6 +120,7 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   // the Ashen Coliseum burns warm — amber braziers ringing the fighting sands
   arena: { flame: 0xffb24a, emissive: 0xcc5a14, light: 0xff9a3c },
   nythraxis: { flame: 0x8f5cff, emissive: 0x4b1c9a, light: 0x7b4dff },
+  undermount: { flame: 0xffb24a, emissive: 0xe0521a, light: 0xffc266 },
   // delve reliquaries burn with grave-ember red: warm coals over cold stone
   delve_ossuary: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
   delve_bell: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
@@ -673,9 +676,17 @@ export class DungeonInteriors {
             ? ARENA_LAYOUT
             : interior === 'nythraxis'
               ? NYTHRAXIS_LAYOUT
-              : CRYPT_LAYOUT);
+              : interior === 'undermount'
+                ? NYTHRAXIS_LAYOUT
+                : CRYPT_LAYOUT);
     const variant = opts?.variant ?? this.variantFor(interior, ox);
     const group = new THREE.Group();
+    // Undermount wings read as a warm molten kiln: a hemisphere fill + amber
+    // ambient lift the otherwise torch-only room out of the dark-arena black.
+    if (variant === 'undermount') {
+      group.add(new THREE.HemisphereLight(0xffb060, 0x421205, 1.0));
+      group.add(new THREE.AmbientLight(0xff7a2e, 0.4));
+    }
     const p = new Placements();
     const arenaWalls = variant === 'arena' ? this.pendingArenaWalls(layout, ox, oz) : undefined;
 
@@ -888,6 +899,7 @@ export class DungeonInteriors {
   private variantFor(interior: string, ox: number): Variant {
     if (interior === 'arena') return 'arena';
     if (interior === 'nythraxis') return 'nythraxis';
+    if (interior === 'undermount') return 'undermount';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
     const bastionX = instanceOrigin(1, 0).x;
@@ -1626,8 +1638,8 @@ export class DungeonInteriors {
     variant: Variant,
   ): void {
     const d = layout.dais;
-    // The arena and Nythraxis raid keep flat fighting floors: no raised platform
-    // or rim clutter to visually disagree with the walkable sim collision.
+    // The arena, Nythraxis raid, and Undermount raid keep flat fighting floors:
+    // no raised platform or rim clutter to visually disagree with the walkable sim collision.
     if (!dungeonDaisHasRaisedPlatform(variant)) {
       this.addTorchGlow(group, d.x, d.z, TORCH_COLORS[variant].light, 0.07, 2.4);
       return;

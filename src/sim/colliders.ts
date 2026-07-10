@@ -281,6 +281,7 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   sanctum: SANCTUM_COLLIDERS,
   temple: TEMPLE_COLLIDERS,
   nythraxis: NYTHRAXIS_COLLIDERS,
+  undermount: NYTHRAXIS_COLLIDERS,
 };
 
 // ---------------------------------------------------------------------------
