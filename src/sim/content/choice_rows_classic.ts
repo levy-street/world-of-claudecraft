@@ -584,9 +584,9 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pal_r14_swift_verdicts',
           name: 'Swift Verdicts',
-          description: 'Reduces the cooldown of Verdict by 40% and its mana cost by 20%.',
+          description: 'Verdict costs 20% less mana and deals 25% more damage.',
           icon: 'judgement',
-          effect: { ability: [{ ability: 'judgement', cooldownPct: -0.4, costPct: -0.2 }] },
+          effect: { ability: [{ ability: 'judgement', costPct: -0.2, dmgPct: 0.25 }] },
         },
         {
           id: 'pal_r14_holy_wrath',
@@ -861,23 +861,9 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'hun_r14_sniper_training',
           name: 'Sniper Training',
-          description: 'Rattling Shot makes your next Fell Shot within 8 sec free.',
+          description: "Long Draw's cast time is reduced by 30% and it deals 15% more damage.",
           icon: 'aimed_shot',
-          effect: {
-            proc: {
-              id: 'hun_sniper_training',
-              name: 'Sniper Training',
-              trigger: { on: 'castNth', n: 1, abilities: ['concussive_shot'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['arcane_shot'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
+          effect: { ability: [{ ability: 'aimed_shot', castPct: -0.3, dmgPct: 0.15 }] },
         },
         {
           id: 'hun_r14_serpents_venom',
@@ -1659,9 +1645,24 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r11_elemental_attunement',
           name: 'Elemental Attunement',
-          description: 'Lightning Bolt costs 20% less.',
+          description: 'Arc Bolt critical strikes make your next Arc Bolt within 8 sec instant.',
           icon: 'lightning_bolt',
-          effect: { ability: [{ ability: 'lightning_bolt', costPct: -0.2 }] },
+          effect: {
+            proc: {
+              id: 'sha_elemental_attunement',
+              name: 'Elemental Attunement',
+              school: 'nature',
+              trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['lightning_bolt'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'sha_r11_healing_stream',
@@ -1764,9 +1765,14 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r20_elemental_fury',
           name: 'Earthen Fury',
-          description: 'Critical strike chance increased by 5%.',
+          description: 'Your Arc Bolt and Earthen Jolt deal 20% more damage.',
           icon: 'lightning_bolt',
-          effect: { stats: { crit: 0.05 } },
+          effect: {
+            ability: [
+              { ability: 'lightning_bolt', dmgPct: 0.2 },
+              { ability: 'earth_shock', dmgPct: 0.2 },
+            ],
+          },
         },
         {
           id: 'sha_r20_tidal_waves',
@@ -2013,7 +2019,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r20_grimoire_of_haste',
           name: 'Grimoire of Carnage',
           description:
-            'Every 3rd curse, Fire, or Shadow spell raises a demonic ward absorbing 120 damage for 10 sec.',
+            'Every 3rd curse, Fire, or Shadow spell raises a demonic ward absorbing 90 damage for 10 sec.',
           icon: 'summon_felhound',
           effect: {
             proc: {
@@ -2034,7 +2040,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
                 ],
               },
               responses: [
-                { kind: 'absorb', amount: 120, duration: 10, name: 'Grimoire of Carnage' },
+                { kind: 'absorb', amount: 90, duration: 10, name: 'Grimoire of Carnage' },
               ],
             },
           },

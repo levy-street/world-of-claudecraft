@@ -113,8 +113,14 @@ describe('hunter wave 2 choice rows', () => {
     expect(p.auras.some((a) => a.id === 'hun_improved_venom_barb')).toBe(true);
     expect(p.auras.some((a) => a.id === 'hun_lean_quiver')).toBe(true);
     expect(p.resource).toBe(p.maxResource - 10);
-    completeCast(sim, 'concussive_shot');
-    expect(p.auras.some((a) => a.id === 'hun_sniper_training')).toBe(true);
+    // Sniper Training is now an ability-mod (Long Draw casts faster + hits harder),
+    // not a proc.
+    const base = new Sim({ seed: 17, playerClass: 'hunter', autoEquip: true });
+    base.setPlayerLevel(20);
+    const modded = sim.resolvedAbility('aimed_shot')!;
+    const baseline = base.resolvedAbility('aimed_shot')!;
+    expect(modded.castTime).toBeLessThan(baseline.castTime);
+    expect(modded.castTime).toBeCloseTo(baseline.castTime * 0.7, 5);
   });
 
   it('Master Tamer, Deathless Will, and Volley use HoT, big-hit, and channel hooks', () => {
