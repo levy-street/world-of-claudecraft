@@ -166,3 +166,6 @@ export class SpriteLightingSystem {
     }
   }
 }
+
+/** Singleton — one lighting system shared by all sprites. */
+export const spriteLighting = new SpriteLightingSystem();
