@@ -2755,8 +2755,8 @@
   /* FCT crit: at the low effect tier the floating combat text keeps the damage
      number, colour and bigger size but sheds the scale/pop (the heaviest FCT
      effect) by swapping the crit keyframes for the plain rise. The number is never
-     refused. This is the CSS floor; the per-element JS gate (fctDropNonCrit in
-     src/game/ui_tier_knobs.ts, consumed by the FCT painter). Inert above
+     refused (the painter spawns every floater on every tier; low sheds cost only via
+     the tighter live cap + shorter TTL in src/game/ui_tier_knobs.ts). Inert above
      the low tier. */
   :root[data-fx-level="low"] .fct.crit {
     animation-name: fct-rise;

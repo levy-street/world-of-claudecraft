@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 406,
-      "state": "bf8f6ae7",
+      "state": "7301c7f4",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -48,6 +48,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -123,7 +124,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "23e95df4",
+      "state": "f9e81955",
       "events": "652092ee",
       "rng": {
         "draws": 1,
@@ -156,6 +157,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -231,7 +233,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 416,
-      "state": "3a3a26bd",
+      "state": "e2ed21c6",
       "events": "84c4e002",
       "rng": {
         "draws": 1,
@@ -264,6 +266,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
@@ -340,7 +343,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 416,
-      "state": "3a3a26bd",
+      "state": "e2ed21c6",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -373,6 +376,7 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "equipmentInstance": {},
           "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [

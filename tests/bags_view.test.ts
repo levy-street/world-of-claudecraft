@@ -38,6 +38,7 @@ const ITEMS: Record<string, ItemDef> = {
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
   soulbound: { kind: 'quest', name: 'Soulbound Key', quality: 'epic', noDiscard: true } as ItemDef,
+  mark: { kind: 'tool', name: 'Heroic Mark', quality: 'rare', soulbound: true } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
 
@@ -83,6 +84,10 @@ describe('bagDestroyAction', () => {
     expect(bagDestroyAction(ITEMS.soulbound, NO_MODE)).toBe('discardBlocked');
   });
 
+  it('protects a soulbound item (Heroic Mark) from destruction too', () => {
+    expect(bagDestroyAction(ITEMS.mark, NO_MODE)).toBe('discardBlocked');
+  });
+
   it('is inert in every transactional mode (their own click/contextmenu owns the slot)', () => {
     for (const mode of [
       'tradeOpen',
@@ -118,6 +123,36 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+  });
+});
+
+describe('soulbound transfer affordances', () => {
+  it('blocks trade, mail, market, and vendor clicks instead of staging a Heroic Mark transfer', () => {
+    expect([
+      bagItemAction(ITEMS.mark, { ...NO_MODE, tradeOpen: true }),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, mailAttach: true }),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, marketSell: true }),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, vendorOpen: true }),
+    ]).toEqual([
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+    ]);
+  });
+
+  it('labels every blocked transfer as soulbound instead of advertising the action', () => {
+    expect([
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, tradeOpen: true }),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, mailAttach: true }),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, marketSell: true }),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, vendorOpen: true }),
+    ]).toEqual([
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+    ]);
   });
 });
 

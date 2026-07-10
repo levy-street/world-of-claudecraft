@@ -312,7 +312,6 @@ export const ru_RU: EnTranslations = {
       "chat": "Перейти к чату"
     },
     "mobile": {
-      "autorun": "Автобег",
       "jump": "Прыжок",
       "leaderboard": "Рейтинг",
       "dailyRewards": "Награды",
@@ -728,6 +727,8 @@ export const ru_RU: EnTranslations = {
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Персональный",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1073,6 +1074,26 @@ export const ru_RU: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} поднимается над Терновыми высотами!"
     },
+    "auth": {
+      "appleLoginCta": "Продолжить с Apple",
+      "appleError": "Не удалось войти через Apple. Попробуйте ещё раз.",
+      "appleChoiceIntro": "Создайте новую учётную запись или привяжите Apple к существующей.",
+      "appleChoiceExpired": "Вход через Apple истёк. Войдите через Apple ещё раз.",
+      "forgotPrompt": "Забыли пароль?",
+      "forgotTitle": "Сброс пароля",
+      "forgotHint": "Введите имя пользователя, и мы отправим ссылку для сброса на указанный адрес электронной почты.",
+      "forgotUsername": "Имя пользователя",
+      "forgotSubmit": "Отправить ссылку для сброса",
+      "forgotSent": "Если для этого имени пользователя есть аккаунт с указанной почтой, мы отправили ссылку для сброса. Проверьте свой почтовый ящик.",
+      "forgotBack": "Вернуться ко входу",
+      "resetTitle": "Выберите новый пароль",
+      "resetNewPassword": "Новый пароль",
+      "resetConfirm": "Подтвердите новый пароль",
+      "resetSubmit": "Обновить пароль",
+      "resetDone": "Ваш пароль обновлён. Теперь вы можете войти.",
+      "resetMismatch": "Пароли не совпадают.",
+      "resetErrInvalid": "Эта ссылка для сброса недействительна или истекла. Запросите новую."
+    },
     "loot": {
       "chestTitle": "Сундук"
     },
@@ -1302,6 +1323,8 @@ export const ru_RU: EnTranslations = {
       "parcelsLabel": "Посылки",
       "parcelsHint": "Нажмите на предмет в сумке, чтобы приложить его.",
       "removeParcelAria": "Убрать {item} из письма",
+      "parcelQtyDecreaseAria": "Отправить на один {item} меньше",
+      "parcelQtyIncreaseAria": "Отправить на один {item} больше",
       "sendButton": "Отправить письмо",
       "postageNote": "Почтовый сбор: {amount}. Ворон летит около {seconds} с.",
       "arrivedBanner": "Ворон прилетел: письмо от {name}.",
@@ -5856,6 +5879,15 @@ export const ru_RU: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Лоскут льна"
+      },
+      "arcane_dust": {
+        "name": "Тайная пыль"
+      },
+      "arcane_essence": {
+        "name": "Тайная эссенция"
+      },
+      "arcane_shard": {
+        "name": "Тайный осколок"
       },
       "fen_muster_order": {
         "name": "Приказ о сборе в Фенбридже"

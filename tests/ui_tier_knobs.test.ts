@@ -13,7 +13,6 @@ import {
   FCT_MAX_CONCURRENT_LOW,
   FCT_TTL_SCALE_FULL,
   FCT_TTL_SCALE_LOW,
-  fctDropNonCrit,
   fctMaxConcurrent,
   fctTtlScale,
   MINIMAP_REDRAW_INTERVAL_LOW_MS,
@@ -43,7 +42,6 @@ describe('ui_tier_knobs - determinism (pure: same input, same output)', () => {
     for (const tier of ALL_TIERS) {
       expect(fctMaxConcurrent(tier, FCT_POOL_CAP)).toBe(fctMaxConcurrent(tier, FCT_POOL_CAP));
       expect(fctTtlScale(tier)).toBe(fctTtlScale(tier));
-      expect(fctDropNonCrit(tier)).toBe(fctDropNonCrit(tier));
       expect(minimapRedrawIntervalMs(tier)).toBe(minimapRedrawIntervalMs(tier));
       expect(auraVisibleCap(tier)).toBe(auraVisibleCap(tier));
       expect(auraRefreshIntervalMs(tier)).toBe(auraRefreshIntervalMs(tier));
@@ -53,12 +51,11 @@ describe('ui_tier_knobs - determinism (pure: same input, same output)', () => {
 });
 
 describe('ui_tier_knobs - no-op on full tiers (ultra byte-equivalent to pre-tiering)', () => {
-  it('FCT: full pool cap, TTL scale 1, no drop-non-crit on medium/high/ultra', () => {
+  it('FCT: full pool cap, TTL scale 1 on medium/high/ultra', () => {
     for (const tier of FULL_TIERS) {
       expect(fctMaxConcurrent(tier, FCT_POOL_CAP)).toBe(FCT_POOL_CAP);
       expect(fctTtlScale(tier)).toBe(FCT_TTL_SCALE_FULL);
       expect(fctTtlScale(tier)).toBe(1); // 1250 * 1 = 1250, exactly the descriptor ttl
-      expect(fctDropNonCrit(tier)).toBe(false);
     }
   });
 
@@ -87,12 +84,11 @@ describe('ui_tier_knobs - no-op on full tiers (ultra byte-equivalent to pre-tier
 });
 
 describe('ui_tier_knobs - low sheds cost on every knob', () => {
-  it('FCT: tighter live cap, shorter TTL, drops non-crit', () => {
+  it('FCT: tighter live cap, shorter TTL (but every floater still spawns)', () => {
     expect(fctMaxConcurrent('low', FCT_POOL_CAP)).toBe(FCT_MAX_CONCURRENT_LOW);
     expect(fctMaxConcurrent('low', FCT_POOL_CAP)).toBeLessThan(FCT_POOL_CAP);
     expect(fctTtlScale('low')).toBe(FCT_TTL_SCALE_LOW);
     expect(fctTtlScale('low')).toBeLessThan(1);
-    expect(fctDropNonCrit('low')).toBe(true);
   });
 
   it('FCT live cap never exceeds the pre-allocated pool (small-pool clamp)', () => {
@@ -282,7 +278,6 @@ describe('ui_tier_knobs - behavioral: only the tier moves a knob', () => {
     const snapshot = (tier: UiEffectsTier) => ({
       fctCap: fctMaxConcurrent(tier, FCT_POOL_CAP),
       fctTtl: fctTtlScale(tier),
-      fctDrop: fctDropNonCrit(tier),
       minimap: minimapRedrawIntervalMs(tier),
       auraCap: auraVisibleCap(tier),
       auraRefresh: auraRefreshIntervalMs(tier),

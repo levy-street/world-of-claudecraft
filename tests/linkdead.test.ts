@@ -159,22 +159,39 @@ describe('linkdead grace lifecycle', () => {
 
   it('resumes the held session on a same-character re-join: same pid, fresh socket, full re-sync', () => {
     const server = new GameServer();
+    const setTrackingConnection = vi.spyOn((server as any).botDetector, 'setTrackingConnection');
     const ws = fakeWs();
     const session = expectJoined(server.join(ws, 11, 101, 'Comeback', 'warrior', null));
+    expect(setTrackingConnection).not.toHaveBeenCalled();
     server.handleMessage(
       session,
       JSON.stringify({ t: 'input', seq: 9, mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } }),
     );
     session.sentEnts.set(4242, {} as any);
     dropSocket(server, session, ws);
+    expect(setTrackingConnection).toHaveBeenCalledTimes(1);
+    expect(setTrackingConnection).toHaveBeenCalledWith(session.botTrackingContext, false);
 
     const ws2 = fakeWs();
-    const resumed = expectJoined(server.join(ws2, 11, 101, 'Comeback', 'warrior', null));
+    const resumeMeta = {
+      ip: '203.0.113.45',
+      userAgent: 'Mozilla/5.0 linkdead-test',
+      clientSeed: 'seed-after-resume',
+    };
+    const resumed = expectJoined(
+      server.join(ws2, 11, 101, 'Comeback', 'warrior', null, false, resumeMeta),
+    );
 
     expect(resumed).toBe(session);
     expect(resumed.linkdead).toBe(false);
     expect(resumed.graceUntil).toBe(0);
     expect(resumed.ws).toBe(ws2);
+    expect(setTrackingConnection).toHaveBeenCalledTimes(2);
+    expect(setTrackingConnection).toHaveBeenLastCalledWith(
+      session.botTrackingContext,
+      true,
+      resumeMeta,
+    );
     // per-connection wire/input state restarts so the new client gets a full
     // snapshot and its input sequence (restarting at 1) is acked correctly
     expect(resumed.lastInputSeq).toBe(0);

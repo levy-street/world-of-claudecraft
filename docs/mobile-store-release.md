@@ -73,6 +73,64 @@ VITE_API_ORIGIN=http://192.168.1.247 npm run native:sync
 Replace the IP with the Mac's current Wi-Fi/LAN address. Do not use
 `localhost` for a physical phone; that resolves to the phone itself.
 
+## Native Discord Authentication
+
+Discord login and account linking open the system browser, return through the
+`worldofclaudecraft://discord-auth` app URL, and exchange a short-lived,
+single-use handoff code with the game server. The exchange also requires an
+app-generated verifier that never appears in the callback URL, so another app
+cannot use an intercepted custom-scheme callback. Starting the flow also uses
+the existing Apple DeviceCheck or Play Integrity proof, which prevents another
+app from initiating its own handoff with the shared URL scheme. The native return URL
+never carries a bearer session token or first-login link token. Discord itself
+continues to redirect to the existing
+HTTPS `/api/auth/discord/callback` URL, so no additional Discord Developer Portal
+redirect is required.
+
+Release QA must cover returning-user login, the first-time create-or-link chooser,
+linking from an existing signed-in account, cancellation, and an expired handoff
+on both iOS and Android. Confirm each browser flow returns to the app and that a
+consumed handoff code cannot be reused.
+
+## Native Sign in with Apple
+
+The iOS app shows `Continue with Apple` and uses Apple's native
+`AuthenticationServices` sheet. The server verifies the signed identity token against
+Apple's public keys, including its issuer, bundle-ID audience, expiry, and the
+single-use nonce issued through the native-attestation flow. A first sign-in asks the
+player to create a new passwordless game account or link Apple to an existing account.
+Linking requires the existing username and password, plus its second factor when enabled.
+The short-lived Apple identity token used by this chooser is single-use. Later Apple
+sign-ins return directly to the linked account by Apple's stable subject identifier.
+Apple relay email addresses are accepted and stored only when Apple marks the address as
+verified.
+
+The production server needs no new secret for native iOS sign-in. It defaults the token
+audience to the existing bundle ID, `com.worldofclaudecraft`. Set
+`APPLE_CLIENT_ID=com.worldofclaudecraft` only if an explicit deployment value is
+preferred. A different bundle ID must set `APPLE_CLIENT_ID` to that exact identifier.
+
+Before archiving:
+
+1. In Apple Developer, open Identifiers, select `com.worldofclaudecraft`, enable
+   Sign in with Apple, and configure it as the primary App ID unless it belongs to an
+   existing Sign in with Apple app group.
+2. In Xcode, confirm the App target has the Sign in with Apple capability. The checked-in
+   `App.entitlements` contains the `Default` entitlement, but the Developer Portal App ID
+   must also have the capability enabled.
+3. With automatic signing, let Xcode refresh the provisioning profile after enabling the
+   capability. With manual signing, regenerate and install both development and App Store
+   distribution profiles.
+4. Update App Store Connect privacy answers if necessary to disclose collection of the
+   Apple account identifier and optional relay email for authentication and account
+   management.
+5. Test both `Share My Email` and `Hide My Email`, then revoke the app under the device's
+   Apple Account sign-in settings and test first-time authorization again.
+
+A Services ID, website return URL, Sign in with Apple private key, Team ID, and key ID are
+not required for this native-only implementation. Those become necessary if Sign in with
+Apple is later added to the website or another non-native authorization flow.
+
 ## Over The Air Updates
 
 The native apps include the Ionic Appflow Capacitor Live Updates SDK. It is

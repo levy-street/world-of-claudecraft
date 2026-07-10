@@ -354,7 +354,7 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
   // KILL, independent of the marks daily gate below, and scoped to the
   // :heroic key so the normal difficulty is never consumed.
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
-  let awarded = false;
+  const earners: number[] = [];
   for (const meta of recipients) {
     meta.raidLockouts.set(heroicLockoutId(inst.dungeonId), lockedUntil);
     // `utcDay` comes from the host, never the wall clock (determinism). Both
@@ -366,12 +366,19 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
     }
     if (meta.heroicDaily.marked.has(inst.dungeonId)) continue;
     meta.heroicDaily.marked.add(inst.dungeonId);
-    for (let i = 0; i < tuning.marksPerParticipant; i++) {
-      loot.items.push({ itemId: HEROIC_MARK_ITEM_ID, count: 1, personalFor: [meta.entityId] });
-    }
-    awarded = true;
+    earners.push(meta.entityId);
   }
-  if (!awarded) return;
+  if (earners.length === 0) return;
+  // One shared-personal slot for the whole party: whoever loots the corpse hands
+  // every earner their marks at once, so no one has to reach the body and click
+  // their own copy. `count` is the per-participant payout (1 for a five-man, 3
+  // for the raid); the loot handler grants that many to each id in `personalFor`.
+  loot.items.push({
+    itemId: HEROIC_MARK_ITEM_ID,
+    count: tuning.marksPerParticipant,
+    personalFor: earners,
+    sharedPersonal: true,
+  });
   mob.loot = loot;
   mob.lootable = true;
 }

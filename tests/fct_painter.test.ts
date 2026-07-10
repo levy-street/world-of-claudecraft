@@ -451,11 +451,13 @@ describe('FctPainter: the exported cap', () => {
 });
 
 // ---------------------------------------------------------------------------
-// The pool cap / TTL / drop-non-crit knobs are a pure function of the
-// STATIC ui effects tier (data-fx-level), NEVER the governor. These drive the painter
-// through the injected getFxTier accessor and assert: ultra is byte-equivalent to the
-// untiered painter (no drop, full cap, full TTL) and low sheds (drops non-crit, caps
-// tighter, shortens TTL), identically under a Sim- and a ClientWorld-shaped anchor.
+// The pool cap / TTL knobs are a pure function of the STATIC ui effects tier
+// (data-fx-level), NEVER the governor. These drive the painter through the injected
+// getFxTier accessor and assert: ultra is byte-equivalent to the untiered painter (full
+// cap, full TTL) and low sheds cost ONLY through a tighter live cap + a shorter TTL, never
+// by refusing a floater. Every floater (including a non-crit damage number, the player's
+// primary combat feedback) still spawns on low, identically under a Sim- and a
+// ClientWorld-shaped anchor.
 // ---------------------------------------------------------------------------
 
 describe('FctPainter: static-preset tiering', () => {
@@ -480,46 +482,45 @@ describe('FctPainter: static-preset tiering', () => {
   }
   const liveNodes = () => mount.childNodes;
 
-  it('drop-non-crit: low drops non-crit DAMAGE numbers, keeps crits + informational floaters', () => {
+  it('no-drop: low still spawns every non-crit DAMAGE number (the primary combat feedback)', () => {
     const low = tierPainter('low', 16);
-    // Non-crit damage numbers are the high-volume combat spam: dropped on low.
+    // Non-crit damage numbers are the player's core combat feedback: never refused on low.
+    // (The previous drop-non-crit shed hid the player's own hits on their target; removed.)
     low.spawn(evt({ kind: 'damage-taken', text: '-7', crit: false }), 0);
     low.spawn(evt({ kind: 'damage-done-auto', text: '12', crit: false }), 0);
-    expect(low.liveCount()).toBe(0);
-    // A crit damage number is never refused.
+    expect(low.liveCount()).toBe(2);
+    // A crit damage number is likewise spawned.
     low.spawn(evt({ kind: 'damage-done-ability', text: '99', crit: true }), 0);
-    expect(low.liveCount()).toBe(1);
-    expect(lastText(calls, liveNodes()[0])).toBe('99');
-    // Low-volume floaters that are NOT damage numbers are KEPT on low (no UX regression):
-    // xp progression, the self-note hint, heals, and avoidance words.
+    expect(low.liveCount()).toBe(3);
+    expect(lastText(calls, liveNodes()[2])).toBe('99');
+    // The non-damage floaters spawn on low too: xp, the self-note hint, heals, avoidance words.
     low.spawn(evt({ kind: 'xp', text: '+10 XP', crit: false }), 0);
     low.spawn(evt({ kind: 'self-note', text: 'Cannot move', crit: false }), 0);
     low.spawn(evt({ kind: 'heal', text: '+5', crit: false }), 0);
     low.spawn(evt({ kind: 'miss', text: 'Miss', crit: false }), 0);
-    expect(low.liveCount()).toBe(5); // crit damage + xp + self-note + heal + miss
+    expect(low.liveCount()).toBe(7); // 3 damage + xp + self-note + heal + miss
 
     const ultra = tierPainter('ultra', 8);
     ultra.spawn(evt({ kind: 'damage-taken', text: '-7', crit: false }), 0);
     expect(ultra.liveCount()).toBe(1); // ultra keeps non-crit damage too (byte-equivalent)
   });
 
-  it('drop-non-crit gate is UNIFORM across all three damage kinds (non-crit dropped, crit kept)', () => {
-    // Pin that the low gate (isDamageFctKind(kind) && !crit) is kind-agnostic across the
-    // whole DAMAGE_FCT_KINDS set (iterated, so a future damage kind is auto-covered), not
-    // accidentally specific to the two kinds the case above happens to spawn. Each kind: a
-    // non-crit sheds, a crit is kept.
+  it('no-drop holds UNIFORMLY across all three damage kinds (non-crit AND crit both spawn)', () => {
+    // Iterate the whole DAMAGE_FCT_KINDS set (so a future damage kind is auto-covered) and
+    // pin that low spawns BOTH a non-crit and a crit of every kind: no damage number is ever
+    // shed by the tier.
     for (const kind of DAMAGE_FCT_KINDS) {
       const low = tierPainter('low', 8);
       low.spawn(evt({ kind, text: '1', crit: false }), 0);
-      expect(low.liveCount()).toBe(0); // non-crit damage of EVERY kind sheds on low
+      expect(low.liveCount()).toBe(1); // non-crit damage of EVERY kind spawns on low
       low.spawn(evt({ kind, text: '2', crit: true }), 0);
-      expect(low.liveCount()).toBe(1); // a crit of EVERY kind is kept
+      expect(low.liveCount()).toBe(2); // and a crit of EVERY kind spawns too
     }
   });
 
   it('max-concurrent: low caps the live count tighter than the pre-allocated pool', () => {
     const low = tierPainter('low', FCT_POOL_CAP);
-    // All crits (so drop-non-crit does not interfere), well over the low cap.
+    // Well over the low cap; the cap (not any drop) is what bounds the live count.
     for (let i = 0; i < FCT_MAX_CONCURRENT_LOW + 16; i++) {
       low.spawn(evt({ kind: 'damage-done-ability', text: `${i}`, crit: true }), 0);
     }
@@ -553,10 +554,10 @@ describe('FctPainter: static-preset tiering', () => {
     expect(ultra.liveCount()).toBe(0);
   });
 
-  it('the tier gate behaves identically for a Sim- and a ClientWorld-shaped anchor', () => {
-    // The crit gate reads the event, not the anchor; assert the tiered drop is anchor-shape
+  it('the tier behaves identically for a Sim- and a ClientWorld-shaped anchor', () => {
+    // The painter reads the event, not the anchor; assert the tiered spawn is anchor-shape
     // independent. Sim-shaped anchor carries sim-only junk the descriptor must ignore; the
-    // ClientWorld mirror is lean. Both: a crit spawns, a non-crit is dropped, on low.
+    // ClientWorld mirror is lean. Both: a non-crit and a crit damage number both spawn on low.
     const simAnchor = {
       pos: { x: 1, y: 2, z: 3 },
       scale: 1,
@@ -568,10 +569,10 @@ describe('FctPainter: static-preset tiering', () => {
       mount = fakeEl('div'); // fresh mount + facet per anchor (tierPainter reads both)
       const low = tierPainter('low', 8);
       low.spawn(evt({ kind: 'damage-taken', text: '-7', crit: false, target: anchor }), 0);
-      expect(low.liveCount()).toBe(0);
-      low.spawn(evt({ kind: 'damage-done-ability', text: '42', crit: true, target: anchor }), 0);
       expect(low.liveCount()).toBe(1);
-      expect(lastText(calls, liveNodes()[0])).toBe('42');
+      low.spawn(evt({ kind: 'damage-done-ability', text: '42', crit: true, target: anchor }), 0);
+      expect(low.liveCount()).toBe(2);
+      expect(lastText(calls, liveNodes()[1])).toBe('42');
     }
   });
 });

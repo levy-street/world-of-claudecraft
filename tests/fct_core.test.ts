@@ -199,7 +199,7 @@ describe('describeFct: ClientWorld-vs-Sim parity', () => {
   });
 });
 
-describe('isDamageFctKind: the combat-damage taxonomy (drop-non-crit target)', () => {
+describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)', () => {
   it('classifies exactly the three damage-number kinds as damage', () => {
     expect([...DAMAGE_FCT_KINDS].sort()).toEqual([
       'damage-done-ability',

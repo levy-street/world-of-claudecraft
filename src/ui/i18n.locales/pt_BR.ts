@@ -4476,7 +4476,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}s',
-  'hudChrome.mobile.autorun': 'Corrida automática',
   'hudChrome.mobile.haptics': 'Vibração',
   'hudChrome.mobile.hapticsOff': 'Vibração desligada',
   'hudChrome.mobile.hotbarPage': 'Habilidades',
@@ -6632,4 +6631,21 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Você sai da fila do Proteja a Yumi.',
   'yumi.queue.teamLeave': 'Sua equipe sai da fila do Proteja a Yumi.',
   'yumi.respawn.title': 'ABATIDO!',
+  'hudChrome.auth.forgotPrompt': 'Esqueceu a senha?',
+  'hudChrome.auth.forgotTitle': 'Redefinir sua senha',
+  'hudChrome.auth.forgotHint':
+    'Digite seu nome de usuário e enviaremos um link de redefinição para o e-mail cadastrado.',
+  'hudChrome.auth.forgotUsername': 'Nome de usuário',
+  'hudChrome.auth.forgotSubmit': 'Enviar link de redefinição',
+  'hudChrome.auth.forgotSent':
+    'Se uma conta com esse nome de usuário tiver um e-mail cadastrado, enviamos um link de redefinição. Verifique sua caixa de entrada.',
+  'hudChrome.auth.forgotBack': 'Voltar ao login',
+  'hudChrome.auth.resetTitle': 'Escolha uma nova senha',
+  'hudChrome.auth.resetNewPassword': 'Nova senha',
+  'hudChrome.auth.resetConfirm': 'Confirme a nova senha',
+  'hudChrome.auth.resetSubmit': 'Atualizar senha',
+  'hudChrome.auth.resetDone': 'Sua senha foi atualizada. Agora você pode entrar.',
+  'hudChrome.auth.resetMismatch': 'As senhas não coincidem.',
+  'hudChrome.auth.resetErrInvalid':
+    'Este link de redefinição é inválido ou expirou. Solicite um novo.',
 };

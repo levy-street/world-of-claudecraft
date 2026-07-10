@@ -219,6 +219,7 @@ export class Input {
       'wheel',
       (e) => {
         e.preventDefault();
+        if (document.body.classList.contains('mobile-touch')) return;
         this.zoomBy(Math.sign(e.deltaY) * 1.4);
         this.noteIntent('zoom');
       },
@@ -277,7 +278,7 @@ export class Input {
     return target && typeof target === 'object' ? (target as ContextMenuTarget) : null;
   }
 
-  /** Move the camera in/out, clamped to the zoom limits. Shared by wheel + touch pinch. */
+  /** Move the camera in/out, clamped to the zoom limits. */
   zoomBy(delta: number): void {
     this.camDist = Math.min(22, Math.max(3, this.camDist + delta));
   }
@@ -441,6 +442,13 @@ export class Input {
   // Returns the new state so the on-screen button can reflect it.
   toggleAutorun(): boolean {
     this.autorun = !this.autorun;
+    return this.autorun;
+  }
+
+  // Idempotent autorun latch for analog inputs that have a one-way "engage"
+  // gesture, such as the mobile move joystick's top band.
+  setAutorun(on: boolean): boolean {
+    this.autorun = on;
     return this.autorun;
   }
 

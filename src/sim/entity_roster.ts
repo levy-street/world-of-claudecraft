@@ -26,7 +26,7 @@ import { recalcPlayerStats } from './entity';
 import { aurasSurvivingDeath } from './resurrection';
 import type { SimContext } from './sim_context';
 import type { Entity, SimEvent, Vec3 } from './types';
-import { CAST_COMPLETE_EPS, DT } from './types';
+import { CAST_COMPLETE_EPS, DT, emptyMoveInput } from './types';
 
 // Mobs that despawn after sitting out of combat too long (boss adds that should not
 // litter the world). The idle timer is reset to DAMAGE_IDLE_DESPAWN_SECONDS whenever
@@ -184,11 +184,15 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   // (or insta-killed) by an effect that was already active before they died.
   clearDrownedLitanyBellsAndMarks(ctx, run);
   p.facing = 0;
+  // A held movement key at the moment of death must not carry over into the respawned
+  // body, or it walks off on its own with no input held (same fix as the graveyard
+  // release/revive flow in spirit.ts).
+  Object.assign(r.meta.moveInput, emptyMoveInput());
   // The Keeper's Toll persists through a delve death too (see resurrection.ts); every
   // other aura clears on respawn.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
-  recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods);
+  recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods, r.meta.equipmentInstance);
   p.hp = Math.max(1, Math.round(p.maxHp * 0.5));
   p.resource =
     p.resourceType === 'mana'

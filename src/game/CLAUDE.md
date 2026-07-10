@@ -49,7 +49,7 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
   green. `mobile_controls.ts`/`settings.ts` have tests too.
 - **i18n (root `t()` rules apply), 3 local facts:** the one dynamic control label here,
   the mobile haptics toggle, is keyed (`t('hudChrome.mobile.haptics'/'…hapticsOff')` in
-  `mobile_controls.ts`); the **static** mobile button labels (move/camera/attack/autorun/
+  `mobile_controls.ts`); the **static** mobile button labels (move/camera/attack/
   jump…) live in `index.html` via `data-i18n`, not here; the perf overlay/doctor/reporter
   (`perf.ts`/`perf_doctor.ts`/`perf_reporter.ts`) stays English, a `?perf`/`woc_perf`-gated
   dev diagnostic like `console.*`.

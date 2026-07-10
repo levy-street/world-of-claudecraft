@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.auth.appleLoginCta': 'Appleで続ける',
+  'hudChrome.auth.appleError': 'Appleでサインインできませんでした。もう一度お試しください。',
+  'hudChrome.auth.appleChoiceIntro':
+    '新しいアカウントを作成するか、Appleを既存のアカウントに連携します。',
+  'hudChrome.auth.appleChoiceExpired':
+    'Appleでのサインインの有効期限が切れました。もう一度お試しください。',
   'hudChrome.vcup.guildBoardWl': '{wins} 勝 {losses} 敗',
   'hudChrome.vcup.shootPower': 'パワー',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',
@@ -32,6 +38,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '宛先',
   'itemUi.kind.bag': 'バッグ',
   'itemUi.tooltip.bagSlots': '{slots}スロットのバッグ',
+  'hudChrome.auth.forgotPrompt': 'パスワードをお忘れですか？',
+  'hudChrome.auth.forgotTitle': 'パスワードをリセット',
+  'hudChrome.auth.forgotHint':
+    'ユーザー名を入力してください。登録されているメールアドレスにリセットリンクをお送りします。',
+  'hudChrome.auth.forgotUsername': 'ユーザー名',
+  'hudChrome.auth.forgotSubmit': 'リセットリンクを送信',
+  'hudChrome.auth.forgotSent':
+    'そのユーザー名のアカウントにメールアドレスが登録されている場合、リセットリンクを送信しました。受信トレイをご確認ください。',
+  'hudChrome.auth.forgotBack': 'ログインに戻る',
+  'hudChrome.auth.resetTitle': '新しいパスワードを設定',
+  'hudChrome.auth.resetNewPassword': '新しいパスワード',
+  'hudChrome.auth.resetConfirm': '新しいパスワード（確認）',
+  'hudChrome.auth.resetSubmit': 'パスワードを更新',
+  'hudChrome.auth.resetDone': 'パスワードを更新しました。ログインできます。',
+  'hudChrome.auth.resetMismatch': 'パスワードが一致しません。',
+  'hudChrome.auth.resetErrInvalid':
+    'このリセットリンクは無効か、有効期限が切れています。新しいリンクをリクエストしてください。',
+  // Guild roster last-seen (M16 non-Latin fill)
   'hudChrome.social.lastSeen': '最終ログイン: {when}',
   'hudChrome.social.lastSeenNever': 'なし',
   'hudChrome.dailyRewards.title': 'デイリー報酬',
@@ -2312,6 +2336,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': '脂ぎった獣脂の塊',
   'entities.items.spider_leg.name': 'ぴくつく蜘蛛の脚',
   'entities.items.bone_fragments.name': '骨の破片',
+  'entities.items.arcane_dust.name': '秘術の粉塵',
+  'entities.items.arcane_essence.name': '秘術の精髄',
+  'entities.items.arcane_shard.name': '秘術のかけら',
   'entities.items.linen_scrap.name': 'リネンの切れ端',
   'entities.items.fen_muster_order.name': 'フェンブリッジ召集令',
   'entities.items.mire_prowler_pelt.name': '沼の徘徊者の毛皮',
@@ -3598,7 +3625,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s}秒',
   'hudChrome.mobile.actionPageToggle': '行動ページ切替',
   'hudChrome.mobile.actionRing': '戦闘アクション',
-  'hudChrome.mobile.autorun': 'オートラン',
   'hudChrome.mobile.haptics': '振動',
   'hudChrome.mobile.hapticsOff': '振動オフ',
   'hudChrome.mobile.hotbarPage': 'スキル',
@@ -5259,6 +5285,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus3': '敏捷性が15、クリティカル率が2%上昇します。',
   'entities.itemSets.wyrmshadow.bonus4':
     '武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間25%上昇します。',
+  'hudChrome.itemSoulbound': '魂縛',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',
@@ -6083,6 +6110,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': '小包',
   'hudChrome.mailbox.parcelsHint': 'バッグ内のアイテムをクリックして添付します。',
   'hudChrome.mailbox.removeParcelAria': '手紙から{item}を取り除く',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': '{item}を1つ減らして送る',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': '{item}を1つ増やして送る',
   'hudChrome.mailbox.sendButton': '手紙を送る',
   'hudChrome.mailbox.postageNote': '郵送料：{amount}。ワタリガラスの飛行時間は約{seconds}秒です。',
   'hudChrome.mailbox.arrivedBanner': 'ワタリガラスが到着：{name}からの手紙。',

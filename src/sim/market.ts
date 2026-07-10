@@ -234,7 +234,7 @@ export class Market {
       this.ctx.error(meta.entityId, 'The Merchant will not broker quest items.');
       return;
     }
-    if (def.noMarketList) {
+    if (def.noMarketList || def.soulbound) {
       this.ctx.error(meta.entityId, 'That item cannot be listed on the World Market.');
       return;
     }
@@ -574,5 +574,23 @@ export class Market {
     }
     const maxId = this.marketListings.reduce((m, l) => Math.max(m, l.id + 1), 1);
     this.nextListingId = Math.max(this.nextListingId, save.nextListingId ?? 1, maxId);
+    this.reclaimSoulboundListings();
+  }
+
+  // Migration for a listing whose item became SOULBOUND after it was listed (a
+  // soulbound item can no longer sit on the World Market). Return each such
+  // listing to its seller's collection so the owner reclaims it at the Merchant:
+  // a soulbound item cannot be traded or mailed, but a Merchant pickup hands it
+  // straight back to the player it is bound to, which is allowed. Mirrors the
+  // expired-listing return (updateMarket). Runs once at load and is idempotent
+  // (a returned listing is removed, so the next save has none; new listings of a
+  // soulbound item are already blocked at list time).
+  private reclaimSoulboundListings(): void {
+    for (let i = this.marketListings.length - 1; i >= 0; i--) {
+      const l = this.marketListings[i];
+      if (l.house || !ITEMS[l.itemId]?.soulbound) continue;
+      this.marketListings.splice(i, 1);
+      this.collectionFor(l.sellerKey).items.push({ itemId: l.itemId, count: l.count });
+    }
   }
 }

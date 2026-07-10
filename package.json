@@ -78,6 +78,9 @@
     "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-sesv2": "^3.1084.0",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/browser": "^8.0.3",
     "@capacitor/live-updates": "^0.5.0",
     "@noble/curves": "^1.9.7",
     "@solana/wallet-standard-chains": "^1.1.2",

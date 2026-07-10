@@ -80,6 +80,12 @@ import {
 } from './http/middleware/bearer_active_guard';
 import type { Ctx, Middleware, Next, RouteDef } from './http/types';
 import { isUniqueViolation, json, moderationErrorBody } from './http_util';
+import { verifyNativeAttestation } from './native_attestation';
+import {
+  consumeNativeDiscordHandoff,
+  createNativeDiscordHandoff,
+  validNativeDiscordChallenge,
+} from './native_discord_handoff';
 import {
   authThrottled,
   clearAuthFailures,
@@ -95,6 +101,8 @@ const STATE_TTL_MINUTES = 10;
 // than the OAuth state TTL since a human decision sits in the middle.
 const PENDING_LOGIN_TTL_MINUTES = 15;
 const DEFAULT_INVITE = 'https://discord.gg/GjhnUsBtw';
+const NATIVE_DISCORD_REDIRECT = 'worldofclaudecraft://discord-auth';
+const NATIVE_REDIRECT_STATE_PREFIX = `${NATIVE_DISCORD_REDIRECT}?challenge=`;
 
 // Lightweight local instrumentation hook. Admin-dashboard usage metrics require a
 // registered typed key + per-locale label, which is more coupling than this
@@ -195,7 +203,13 @@ export function discordPresenceCache(): DiscordPresenceSnapshot {
 export async function handleDiscordStart(
   req: http.IncomingMessage,
   res: http.ServerResponse,
-  opts: { mode: DiscordLinkMode; accountId: number | null },
+  opts: {
+    mode: DiscordLinkMode;
+    accountId: number | null;
+    native?: boolean;
+    nativeChallenge?: string;
+    nativeAttestation?: unknown;
+  },
 ): Promise<void> {
   note('discord.start.request');
   const cfg = discordConfig();
@@ -208,6 +222,12 @@ export async function handleDiscordStart(
     note('discord.start.rate_limited');
     return json(res, 429, { error: 'rate limited' });
   }
+  if (opts.native && !validNativeDiscordChallenge(opts.nativeChallenge)) {
+    return json(res, 400, { error: 'invalid native challenge' });
+  }
+  if (opts.native && !(await verifyNativeAttestation(req, opts.nativeAttestation))) {
+    return json(res, 403, { error: 'native verification failed' });
+  }
   const state = newToken();
   const codeVerifier = newToken();
   const codeChallenge = pkceChallengeFromVerifier(codeVerifier);
@@ -216,7 +236,7 @@ export async function handleDiscordStart(
     codeVerifier,
     mode: opts.mode,
     accountId: opts.accountId,
-    redirectTo: null,
+    redirectTo: opts.native ? `${NATIVE_REDIRECT_STATE_PREFIX}${opts.nativeChallenge}` : null,
     ttlMinutes: STATE_TTL_MINUTES,
   });
   const url = buildAuthorizeUrl({
@@ -241,19 +261,26 @@ export async function handleDiscordStart(
 export async function handleDiscordCallback(
   req: http.IncomingMessage,
   res: http.ServerResponse,
+  isIpBlocked: (ip: string) => boolean = () => false,
 ): Promise<void> {
   note('discord.callback.request');
+  const u = new URL(req.url ?? '/', 'http://localhost');
+  const state = u.searchParams.get('state') ?? '';
+  // Preserve the callback's established abuse-control and HTML error contract even
+  // when Discord is not configured. A callback carrying state defers this check
+  // until the state is consumed so a verified native flow can return to the app.
+  if (!state && isIpBlocked(requestIp(req))) {
+    return bouncePage(res, 403, { ok: false, mode: 'login', error: 'server_error' });
+  }
   const cfg = discordConfig();
   if (!cfg) return bouncePage(res, 503, { ok: false, mode: 'login', error: 'not_configured' });
-  const u = new URL(req.url ?? '/', 'http://localhost');
   const code = u.searchParams.get('code') ?? '';
-  const state = u.searchParams.get('state') ?? '';
-  if (u.searchParams.get('error')) {
-    // User clicked "Cancel" on Discord's consent screen.
+  if (u.searchParams.get('error') && !state) {
+    // Preserve the legacy web cancellation response for providers or old links
+    // that omit state. A native flow always has state and takes the app return path.
     return bouncePage(res, 200, { ok: false, mode: 'login', error: 'cancelled' });
   }
-  if (!code || !state)
-    return bouncePage(res, 400, { ok: false, mode: 'login', error: 'bad_request' });
+  if (!state) return bouncePage(res, 400, { ok: false, mode: 'login', error: 'bad_request' });
 
   const stateRow = await consumeDiscordOAuthState(pool, state);
   if (!stateRow) {
@@ -261,6 +288,21 @@ export async function handleDiscordCallback(
     return bouncePage(res, 400, { ok: false, mode: 'login', error: 'expired' });
   }
   const mode: DiscordLinkMode = isDiscordLinkMode(stateRow.mode) ? stateRow.mode : 'login';
+  const nativeChallenge = nativeChallengeFromState(stateRow.redirect_to);
+  const native = nativeChallenge !== null;
+  const respond = (status: number, payload: BouncePayload): void =>
+    discordOAuthResponse(req, res, status, payload, native);
+
+  if (isIpBlocked(requestIp(req))) {
+    return respond(403, { ok: false, mode, error: 'server_error' });
+  }
+
+  if (u.searchParams.get('error')) {
+    // User clicked "Cancel" on Discord's consent screen. Consume the state first so
+    // native callers can be returned to the app without trusting a query flag.
+    return respond(200, { ok: false, mode, error: 'cancelled' });
+  }
+  if (!code) return respond(400, { ok: false, mode, error: 'bad_request' });
 
   const identity = await exchangeCodeForIdentity(
     code,
@@ -270,18 +312,18 @@ export async function handleDiscordCallback(
   );
   if (!identity) {
     note('discord.callback.exchange_failed');
-    return bouncePage(res, 502, { ok: false, mode, error: 'discord_error' });
+    return respond(502, { ok: false, mode, error: 'discord_error' });
   }
   const { user, guildMember } = identity;
 
   try {
     if (mode === 'link') {
-      return await completeLink(res, stateRow.account_id, user, guildMember, mode);
+      return await completeLink(respond, stateRow.account_id, user, guildMember, mode);
     }
-    return await completeLogin(req, res, user, guildMember);
+    return await completeLogin(req, respond, user, guildMember, nativeChallenge);
   } catch (err) {
     logger.error({ err }, 'discord callback error');
-    return bouncePage(res, 500, { ok: false, mode, error: 'server_error' });
+    return respond(500, { ok: false, mode, error: 'server_error' });
   }
 }
 
@@ -299,13 +341,13 @@ async function captureDiscordEmail(
 
 // Link an authenticated session's account to the Discord identity.
 async function completeLink(
-  res: http.ServerResponse,
+  respond: (status: number, payload: BouncePayload) => void,
   accountId: number | null,
   user: DiscordUser,
   guildMember: boolean,
   mode: DiscordLinkMode,
 ): Promise<void> {
-  if (accountId === null) return bouncePage(res, 400, { ok: false, mode, error: 'no_session' });
+  if (accountId === null) return respond(400, { ok: false, mode, error: 'no_session' });
   const linked = await linkDiscordToAccount(pool, accountId, {
     discordUserId: user.id,
     username: discordDisplayName(user),
@@ -315,12 +357,12 @@ async function completeLink(
   });
   if (!linked) {
     note('discord.link.conflict');
-    return bouncePage(res, 409, { ok: false, mode, error: 'already_linked' });
+    return respond(409, { ok: false, mode, error: 'already_linked' });
   }
   await captureDiscordEmail(accountId, user.email, user.emailVerified);
   await grantLinkRewards(accountId, guildMember);
   note('discord.link.success');
-  return bouncePage(res, 200, { ok: true, mode, username: discordDisplayName(user) });
+  return respond(200, { ok: true, mode, username: discordDisplayName(user) });
 }
 
 // Log in the account that owns this Discord identity, OR (first time) hand the
@@ -330,9 +372,10 @@ async function completeLink(
 // be an account-takeover vector).
 async function completeLogin(
   req: http.IncomingMessage,
-  res: http.ServerResponse,
+  respond: (status: number, payload: BouncePayload) => void,
   user: DiscordUser,
   guildMember: boolean,
+  nativeChallenge: string | null,
 ): Promise<void> {
   const meta = { ip: requestIp(req), userAgent: String(req.headers['user-agent'] ?? '') };
   const accountId = await accountForDiscord(pool, user.id);
@@ -353,7 +396,20 @@ async function completeLogin(
       ttlMinutes: PENDING_LOGIN_TTL_MINUTES,
     });
     note('discord.login.choose');
-    return bouncePage(res, 200, {
+    if (nativeChallenge) {
+      const nativeCode = createNativeDiscordHandoff(nativeChallenge, {
+        kind: 'choose',
+        linkToken,
+        username: discordDisplayName(user),
+      });
+      return respond(200, {
+        ok: true,
+        mode: 'login',
+        nativeCode,
+        username: discordDisplayName(user),
+      });
+    }
+    return respond(200, {
       ok: true,
       mode: 'login',
       choose: true,
@@ -371,9 +427,22 @@ async function completeLogin(
   if (guildMember) await grantGuildReward(accountId);
   note('discord.login.returning');
   const status = await moderationStatusForAccount(accountId);
-  if (status.locked) return bouncePage(res, 403, { ok: false, mode: 'login', error: 'locked' });
+  if (status.locked) return respond(403, { ok: false, mode: 'login', error: 'locked' });
+  if (nativeChallenge) {
+    const nativeCode = createNativeDiscordHandoff(nativeChallenge, {
+      kind: 'login',
+      accountId,
+      username: acct?.username ?? 'player',
+    });
+    return respond(200, {
+      ok: true,
+      mode: 'login',
+      nativeCode,
+      username: acct?.username ?? 'player',
+    });
+  }
   const token = await issueDiscordSession(accountId, meta);
-  return bouncePage(res, 200, {
+  return respond(200, {
     ok: true,
     mode: 'login',
     token,
@@ -918,6 +987,65 @@ interface BouncePayload {
   // under `linkToken`; the SPA shows the create-new / link-existing chooser.
   choose?: boolean;
   linkToken?: string;
+  // Native returning login: short-lived single-use code exchanged through the
+  // existing desktop handoff endpoint. A bearer session never appears in a URL.
+  nativeCode?: string;
+}
+
+function nativeChallengeFromState(redirectTo: string | null): string | null {
+  if (!redirectTo?.startsWith(NATIVE_REDIRECT_STATE_PREFIX)) return null;
+  const challenge = redirectTo.slice(NATIVE_REDIRECT_STATE_PREFIX.length);
+  return validNativeDiscordChallenge(challenge) ? challenge : null;
+}
+
+function discordOAuthResponse(
+  _req: http.IncomingMessage,
+  res: http.ServerResponse,
+  status: number,
+  payload: BouncePayload,
+  native: boolean,
+): void {
+  if (!native) {
+    bouncePage(res, status, payload);
+    return;
+  }
+  const url = new URL(NATIVE_DISCORD_REDIRECT);
+  url.searchParams.set('ok', payload.ok ? '1' : '0');
+  url.searchParams.set('mode', payload.mode);
+  if (payload.nativeCode) url.searchParams.set('code', payload.nativeCode);
+  if (payload.choose && payload.linkToken) {
+    url.searchParams.set('choose', '1');
+    url.searchParams.set('linkToken', payload.linkToken);
+  }
+  if (payload.username) url.searchParams.set('username', payload.username);
+  if (payload.error) url.searchParams.set('error', payload.error);
+  res.writeHead(302, {
+    Location: url.toString(),
+    'Cache-Control': 'no-store',
+    Pragma: 'no-cache',
+  });
+  res.end();
+}
+
+export async function handleNativeDiscordExchange(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  if (!discordRateLimited(req, 0).allowed) return json(res, 429, { error: 'rate limited' });
+  const body = await readJsonBody(req);
+  const handoff = consumeNativeDiscordHandoff(body.code, body.verifier);
+  if (!handoff) return json(res, 401, { error: 'invalid or expired native login code' });
+  if (handoff.kind === 'choose') {
+    return json(res, 200, {
+      choose: true,
+      linkToken: handoff.linkToken,
+      username: handoff.username,
+    });
+  }
+  const status = await moderationStatusForAccount(handoff.accountId);
+  if (status.locked) return json(res, 403, moderationErrorBody(status));
+  const token = await issueDiscordSession(handoff.accountId, requestMeta(req));
+  return json(res, 200, { token, username: handoff.username });
 }
 
 // Render the callback result as an HTML page that messages the SPA. Works whether
@@ -1135,18 +1263,25 @@ async function discordStartHandler(ctx: Ctx): Promise<void> {
   // A blocked IP must not open the OAuth flow (login mode can provision an account
   // via the callback). Opaque 429, matching login/new + login/link.
   if (useRuntime().isIpBlocked(ctx.ip)) return json(ctx.res, 429, { error: 'rate limited' });
-  return handleDiscordStart(ctx.req, ctx.res, { mode, accountId });
+  const native = ctx.url.searchParams.get('native') === '1';
+  const nativeChallenge = ctx.url.searchParams.get('challenge') ?? undefined;
+  const body = native ? await readJsonBody(ctx.req) : {};
+  return handleDiscordStart(ctx.req, ctx.res, {
+    mode,
+    accountId,
+    native,
+    nativeChallenge,
+    nativeAttestation: body.nativeAttestation,
+  });
 }
 
 /** GET /api/auth/discord/callback: OAuth callback (HTML bounce; never problem+json). */
 async function discordCallbackHandler(ctx: Ctx): Promise<void> {
-  // A blocked IP must not mint a returning-user session through the callback. Opaque
-  // HTML bounce (the existing 'server_error' the SPA already handles), so the block
-  // is never revealed and the response stays HTML, not problem+json.
-  if (useRuntime().isIpBlocked(ctx.ip)) {
-    return bouncePage(ctx.res, 403, { ok: false, mode: 'login', error: 'server_error' });
-  }
-  return handleDiscordCallback(ctx.req, ctx.res);
+  return handleDiscordCallback(ctx.req, ctx.res, useRuntime().isIpBlocked);
+}
+
+async function nativeDiscordExchangeHandler(ctx: Ctx): Promise<void> {
+  return handleNativeDiscordExchange(ctx.req, ctx.res);
 }
 
 /** POST /api/auth/discord/login/new: first-login "create new account" chooser. */
@@ -1213,6 +1348,12 @@ export const routes: RouteDef[] = [
     path: '/api/auth/discord/login/link',
     surface: 'api',
     handler: discordLoginLinkHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/auth/discord/native/exchange',
+    surface: 'api',
+    handler: nativeDiscordExchangeHandler,
   },
   {
     method: 'GET',

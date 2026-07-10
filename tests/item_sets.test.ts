@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
+  SET_BOUNDSTONE_VANGUARD,
   SET_CRIT_3PC_RATING,
   SET_CROWNFORGED,
   SET_DEATHLORD,
@@ -10,19 +11,19 @@ import {
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
 } from '../src/sim/content/item_sets';
-import { MOBS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
-import { itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
+import { itemSetMemberCounts, itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
 
 const counts = (m: Record<string, number>) => new Map(Object.entries(m));
 
 function statsFor(cls: PlayerClass, level: number, equipment: Record<string, string>): Entity {
   const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
   e.level = level;
-  recalcPlayerStats(e, cls, equipment as any);
+  recalcPlayerStats(e, cls, equipment as any, undefined, {});
   return e;
 }
 
@@ -130,6 +131,32 @@ describe('aggregateSetBonuses (pure resolver)', () => {
 });
 
 describe('item set tooltip model', () => {
+  it('counts base and Heroic alternatives as one logical member of every item set', () => {
+    const logicalMembers = new Map<string, Set<string>>();
+    for (const item of Object.values(ITEMS)) {
+      if (!item.set) continue;
+      const members = logicalMembers.get(item.set) ?? new Set<string>();
+      members.add(item.heroicOf ?? item.id);
+      logicalMembers.set(item.set, members);
+    }
+    const expectedCounts = Object.fromEntries(
+      [...logicalMembers].map(([setId, members]) => [setId, members.size]),
+    );
+
+    expect(itemSetMemberCounts()).toEqual(expectedCounts);
+  });
+
+  it('keeps four-piece families at four and the Boundstone family at three', () => {
+    const memberCounts = itemSetMemberCounts();
+    expect({
+      [SET_DEATHLORD]: memberCounts[SET_DEATHLORD],
+      [SET_BOUNDSTONE_VANGUARD]: memberCounts[SET_BOUNDSTONE_VANGUARD],
+    }).toEqual({
+      [SET_DEATHLORD]: 4,
+      [SET_BOUNDSTONE_VANGUARD]: 3,
+    });
+  });
+
   it('uses the authored member count, not the highest bonus threshold, as the header total', () => {
     const model = itemSetTooltipModel({
       itemSetId: SET_DEATHLORD,
