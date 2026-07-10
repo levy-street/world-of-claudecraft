@@ -5937,11 +5937,7 @@ export class Hud {
       if (wasActive) {
         e.preventDefault();
         this.suppressNextActionClick = true;
-        if (
-          !this.actionBarsLocked() &&
-          targetIndex !== null &&
-          targetIndex !== drag.sourceIndex
-        ) {
+        if (!this.actionBarsLocked() && targetIndex !== null && targetIndex !== drag.sourceIndex) {
           const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
           if (resolvedTarget === null) {
             this.clearMobileHotbarDrag();
@@ -6045,11 +6041,7 @@ export class Hud {
       if (wasActive) {
         e.preventDefault();
         this.suppressNextActionClick = true;
-        if (
-          !this.actionBarsLocked() &&
-          targetIndex !== null &&
-          targetIndex !== drag.sourceIndex
-        ) {
+        if (!this.actionBarsLocked() && targetIndex !== null && targetIndex !== drag.sourceIndex) {
           const resolvedTarget = resolveMobileHotbarDrop(drag.sourceIndex, targetIndex);
           if (resolvedTarget === null) {
             this.clearMobileHotbarDrag();

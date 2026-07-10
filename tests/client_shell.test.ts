@@ -1913,7 +1913,9 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain('setActionBarsLocked(locked: boolean): void');
     expect(hudTs).toContain('btn.draggable = !locked;');
     expect(hudTs).toContain('btn.draggable = !this.actionBarsLocked();');
-    expect(hudTs).toMatch(/const clearSlot = \(\) => \{\s*if \(this\.actionBarsLocked\(\)\) return;/);
+    expect(hudTs).toMatch(
+      /const clearSlot = \(\) => \{\s*if \(this\.actionBarsLocked\(\)\) return;/,
+    );
     expect(hudTs).toMatch(
       /btn\.addEventListener\('dragstart', \(e\) => \{\s*if \(this\.actionBarsLocked\(\)\) \{\s*e\.preventDefault\(\);\s*return;/,
     );
@@ -1932,7 +1934,8 @@ describe('client HTML shell', () => {
     expect(hudTs).toMatch(
       /if \(\s*!this\.actionBarsLocked\(\) &&\s*targetIndex !== null &&\s*targetIndex !== drag\.sourceIndex\s*\)/,
     );
-    const castSlotBody = hudTs.match(/castSlot\(barSlot: number\): void \{([\s\S]*?)\n  \}/)?.[1] ?? '';
+    const castSlotBody =
+      hudTs.match(/castSlot\(barSlot: number\): void \{([\s\S]*?)\n {2}\}/)?.[1] ?? '';
     expect(castSlotBody).not.toContain('lockActionBars');
     expect(castSlotBody).not.toContain('actionBarsLocked');
   });
