@@ -731,6 +731,12 @@ export class Input {
     }
     const edge = combo ? this.keybinds.edgeActionForCombo(combo) : null;
     if (edge !== null) {
+      // A matched chord that carries a modifier (Ctrl/Alt/Cmd) shadows a browser
+      // accelerator, e.g. Ctrl+number tab switching. Cancel the default so the
+      // game keeps the keypress. Some accelerators are not cancelable (Chrome and
+      // Edge reserve Ctrl+1..8 outright), but this reclaims the ones that are
+      // (Firefox) and is a no-op where there is nothing to cancel.
+      if (e.ctrlKey || e.altKey || e.metaKey) e.preventDefault?.();
       if (edge.startsWith('slot')) {
         // Slot keys use DOWN/UP so a slot can hold to charge; the HUD decides
         // whether a slot charges (shoot) or fires immediately (tap = down+up).
