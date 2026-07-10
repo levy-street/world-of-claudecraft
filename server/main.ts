@@ -38,6 +38,13 @@ import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
 import { permissionsForRoles } from './admin_permissions';
 import { loadAntibotConfig } from './antibot_config_db';
 import {
+  configureAppleAuthRuntime,
+  handleAppleLogin,
+  handleAppleLoginLink,
+  handleAppleLoginNew,
+} from './apple_auth';
+import { pruneApplePendingLogins } from './apple_auth_db';
+import {
   hashPassword,
   newToken,
   normalizeCharName,
@@ -1608,6 +1615,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    if (req.method === 'POST' && url === '/api/auth/apple') {
+      return handleAppleLogin(req, res, await readBody(req));
+    }
+    if (req.method === 'POST' && url === '/api/auth/apple/login/new') {
+      return handleAppleLoginNew(req, res, await readBody(req), (ip) => liveGame().isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/apple/login/link') {
+      return handleAppleLoginLink(req, res, await readBody(req));
+    }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the
     // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
@@ -1899,6 +1915,9 @@ configureAuthRuntime({
   // legacy handleApi arm above.
   passesTurnstile: (req, body) => passesTurnstile(req, body, activeConfig().turnstileSecret),
   requestMetadata,
+});
+configureAppleAuthRuntime({
+  isIpBlocked: (ip) => liveGame().isIpBlocked(ip),
 });
 
 // Inject the main.ts runtime the ported character handlers (server/characters.ts) need
@@ -2264,6 +2283,7 @@ export async function startServer(): Promise<http.Server> {
     console.log(
       `pruned ${prunedPerfReports} client perf report row(s) older than ${config.perfReportRetentionDays} days`,
     );
+  await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
   await game.loadChatFilter();
@@ -2287,6 +2307,9 @@ export async function startServer(): Promise<http.Server> {
     );
     void pruneDiscordPendingLogins(pool).catch((err) =>
       console.error('discord pending login prune failed:', err),
+    );
+    void pruneApplePendingLogins(pool).catch((err) =>
+      console.error('apple pending login prune failed:', err),
     );
     void pruneGitHubOAuthStates(pool).catch((err) =>
       console.error('github oauth state prune failed:', err),

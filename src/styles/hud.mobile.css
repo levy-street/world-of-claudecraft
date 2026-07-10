@@ -51,7 +51,9 @@
     pointer-events: none !important;
   }
   body.mobile-touch.game-active:not(.mobile-more-open) #mobile-extra-controls {
-    display: none !important;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
   body.mobile-touch #game-canvas {
     touch-action: none;
@@ -389,6 +391,12 @@
   body.mobile-touch #mobile-more {
     position: static;
     z-index: 19;
+  }
+  body.mobile-touch #mobile-more .ui-icon {
+    transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  body.mobile-touch.mobile-more-open #mobile-more .ui-icon {
+    transform: rotate(38deg);
   }
   body.mobile-touch .mobile-btn:active {
     transform: translateY(1px);
@@ -917,11 +925,16 @@
     left: 50%;
     top: 50%;
     bottom: auto;
-    transform: translate(-50%, -50%);
-    display: none;
+    --mobile-more-open-transform: translate(-50%, -50%);
+    --mobile-more-closed-transform: translate(-50%, -46%) scale(0.96);
+    transform: var(--mobile-more-closed-transform);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
     width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
     --window-pad: 10px;
-    pointer-events: auto;
+    pointer-events: none;
     z-index: 100;
     border: 1px solid var(--mobile-glass-border);
     border-radius: 10px;
@@ -942,10 +955,27 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+    will-change: transform, opacity;
+    transition:
+      opacity 150ms ease,
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s linear 180ms;
   }
   body.mobile-touch.mobile-more-open #mobile-extra-controls {
-    display: flex;
-    flex-direction: column;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: var(--mobile-more-open-transform);
+    transition:
+      opacity 150ms ease,
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-extra-controls,
+    body.mobile-touch #mobile-more .ui-icon {
+      transition: none;
+    }
   }
   body.mobile-touch #mobile-extra-controls .panel-title {
     /* 48px, not the old 32px: the close button is a 40x40 absolute-pinned touch
@@ -1808,7 +1838,7 @@
     left: calc(max(18px, env(safe-area-inset-left)) + 132px);
     right: auto;
     top: auto;
-    bottom: calc(31px + env(safe-area-inset-bottom));
+    bottom: calc(72px + env(safe-area-inset-bottom));
     width: min(220px, calc(50vw - 144px));
     min-width: 142px;
     max-height: min(170px, calc(var(--app-vh) / var(--ui-scale, 1) - 128px));
@@ -1951,11 +1981,13 @@
     top: calc(env(safe-area-inset-top) + 122px);
   }
   body.mobile-touch .window {
-    max-width: calc(100vw - 20px);
+    max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
     /* --window-scale, never --ui-scale: this generic rule also governs the
        body-level windows OUTSIDE the zoomed #ui (the confirm/input dialog),
        which pin --window-scale to 1 (see the shell note in layout.css). */
     max-height: calc(var(--app-vh) / var(--window-scale, 1) - 40px);
+    padding-bottom: max(var(--window-pad), calc(18px + env(safe-area-inset-bottom)));
+    box-sizing: border-box;
   }
   /* Mobile border restyle: every mobile window (.window.panel covers bags,
      character, talents, quest log, spellbook, loot, and every other modal window)
@@ -2162,6 +2194,32 @@
   }
   body.mobile-touch #bags .bag-grid {
     min-height: 150px;
+  }
+  body.mobile-touch :is(.bag-grid, .bank-scroll, .soc-body, .ql-detail-body) {
+    padding-bottom: max(18px, calc(12px + env(safe-area-inset-bottom)));
+    scroll-padding-bottom: max(18px, calc(12px + env(safe-area-inset-bottom)));
+    box-sizing: border-box;
+  }
+  body.mobile-touch .bag-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch .bag-chip {
+    flex: 0 0 auto;
+  }
+  body.mobile-touch #social-window .soc-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch #social-window .soc-tab {
+    flex: 0 0 auto;
+    min-width: max-content;
+    padding-inline: 10px;
+    white-space: nowrap;
   }
   body.mobile-touch .vendor-item,
   body.mobile-touch .bag-item,
@@ -2390,7 +2448,7 @@
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
   body.mobile-touch #options-menu.perf-wide {
-    width: min(560px, calc(100vw - 170px));
+    width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
   }
   body.mobile-touch.vendor-open #vendor-window,
@@ -2860,7 +2918,7 @@
     right: auto;
     top: 44%;
     bottom: auto;
-    width: min(360px, calc(100vw - 170px));
+    width: min(430px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
     height: min(380px, calc(var(--app-vh) / var(--ui-scale, 1) - 116px));
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     transform: translate(-50%, -50%);
@@ -2869,13 +2927,45 @@
   body.mobile-touch #map-window {
     left: 50%;
     top: calc(46% - env(safe-area-inset-bottom));
-    width: min(46vw, 330px);
-    max-width: calc(100vw - 220px);
+    width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);
     /* The variable, not raw padding, like every other window (the map has no
        sticky header today, but keeping it in the --window-pad system means
        adding one later cannot silently misalign; see layout.css). */
     --window-pad: 8px;
     transform: translate(-50%, -50%);
+  }
+  body.mobile-touch.mobile-map-quest-open {
+    --mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));
+    --mobile-map-quest-log-max-height: clamp(
+      88px,
+      calc(var(--app-vh) / var(--ui-scale, 1) - 150px),
+      118px
+    );
+    --mobile-map-quest-stack-gap: 8px;
+  }
+  body.mobile-touch.mobile-map-quest-open #quest-log-window {
+    top: var(--mobile-map-quest-stack-top);
+    max-height: var(--mobile-map-quest-log-max-height);
+    overflow: auto;
+  }
+  body.mobile-touch.mobile-map-quest-open #map-window {
+    top: calc(
+      var(--mobile-map-quest-stack-top) +
+      var(--mobile-map-quest-log-max-height) +
+      var(--mobile-map-quest-stack-gap)
+    );
+    transform: translateX(-50%);
+    width: min(
+      46vw,
+      300px,
+      calc(
+        var(--app-vh) -
+        var(--mobile-map-quest-log-max-height) -
+        var(--mobile-map-quest-stack-gap) -
+        22px
+      )
+    );
   }
   body.mobile-touch #map-canvas {
     width: 100%;
@@ -3099,31 +3189,6 @@
     line-height: 1.45;
   }
 
-  @media (orientation: portrait) {
-    body.mobile-touch #mobile-combat-controls {
-      /* Portrait resets JUST this trio back to btn-scale only (no chrome-scale): its
-         42x44 buttons already sit on the 40px floor, so the 0.85 shrink would drop
-         them under it. The rest of the chrome still scales via the token in portrait;
-         play.html is landscape-gated, while index.html can render this portrait layout. */
-      transform: scale(var(--btn-scale, 1));
-      grid-template-columns: repeat(5, 42px);
-      gap: 6px;
-    }
-    body.mobile-touch .mobile-btn {
-      width: 42px;
-      height: 44px;
-      font-size: 16px;
-    }
-    /* Portrait bar is 5x42px + 4x6px gaps = 234px wide; shrink the chip to the
-       44px button height and re-dock it past the narrower bar. */
-    body.mobile-touch #mobile-consumables {
-      left: calc(max(12px, env(safe-area-inset-left)) + 234px * var(--btn-scale, 1) + 8px);
-    }
-    body.mobile-touch #mobile-consumables-toggle {
-      height: 44px;
-    }
-  }
-
   @media (orientation: landscape) {
     body.mobile-touch[data-start-panel="mode-select"] #homepage-views-container {
       align-items: center;
@@ -3286,6 +3351,8 @@
     }
     body.mobile-touch #mobile-extra-controls {
       left: 50%;
+      --mobile-more-open-transform: translateX(-50%);
+      --mobile-more-closed-transform: translate(-50%, 10px) scale(0.96);
       /* True vertical centering (the base rule's top:50%/translate(-50%,-50%))
          let this 4-row, 16-pill grid grow tall enough on a short landscape
          viewport to overlap the fixed bottom action pad, which reserves no
@@ -3302,7 +3369,7 @@
          landscape position here is correct regardless. */
       top: max(8px, env(safe-area-inset-top)) !important;
       bottom: auto !important;
-      transform: translateX(-50%) !important;
+      transform: var(--mobile-more-closed-transform) !important;
       --window-pad: 8px;
       /* No --ui-scale division: body-level window outside the zoomed #ui.
          120px clears the bottom control row (movement/action clusters +
@@ -3315,6 +3382,9 @@
         env(safe-area-inset-bottom)
       );
     }
+    body.mobile-touch.mobile-more-open #mobile-extra-controls {
+      transform: var(--mobile-more-open-transform) !important;
+    }
     body.mobile-touch #mobile-extra-grid {
       /* 4 columns in landscape too (issue 1577 round 2 (4)), matching the base
          tier so each More-tray pill stays narrow on a wide landscape phone.
@@ -3324,16 +3394,47 @@
       grid-auto-rows: 34px;
       gap: 5px;
     }
-    /* The base rule's min(46vw, 330px) square map, vertically centered at 46%,
-       is tall enough on a short landscape phone (the map-canvas keeps a 1:1
-       aspect ratio via width:100%/height:auto) to dip its bottom edge into the
-       fixed Jump/Interact/combat-cluster row, which reserves no layout space
-       of its own. Shrink it to fit the room actually free above that row
-       instead of a fraction of the whole (short) viewport height. */
+    /* The base square map can dip into the fixed Jump/Interact/combat row on a
+       short landscape phone. Top-anchor it and reserve a right rail so the
+       close and zoom buttons do not sit on top of the drawn map. */
     body.mobile-touch #map-window {
+      --mobile-map-size: min(60vw, 420px, calc(var(--app-vh) - 104px));
+      --mobile-map-rail: 58px;
       top: max(10px, env(safe-area-inset-top));
       transform: translateX(-50%);
-      width: min(46vw, 300px, calc(var(--app-vh) - 140px));
+      width: min(
+        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
+      );
+    }
+    body.mobile-touch #map-window #map-canvas {
+      width: var(--mobile-map-size);
+      max-width: calc(100% - var(--mobile-map-rail));
+    }
+    body.mobile-touch #map-window #map-zoom {
+      right: 8px;
+      bottom: 8px;
+    }
+    body.mobile-touch.mobile-map-quest-open #map-window {
+      --mobile-map-size: min(
+        52vw,
+        320px,
+        calc(
+          var(--app-vh) -
+          var(--mobile-map-quest-log-max-height) -
+          var(--mobile-map-quest-stack-gap) -
+          22px
+        )
+      );
+      top: calc(
+        var(--mobile-map-quest-stack-top) +
+        var(--mobile-map-quest-log-max-height) +
+        var(--mobile-map-quest-stack-gap)
+      );
+      width: min(
+        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
+      );
     }
     body.mobile-touch.mobile-left-handed #mobile-extra-controls {
       left: 50%;
@@ -3516,7 +3617,7 @@
       left: calc(max(20px, env(safe-area-inset-left)) + 112px);
       right: auto;
       top: auto;
-      bottom: calc(26px + env(safe-area-inset-bottom));
+      bottom: calc(72px + env(safe-area-inset-bottom));
       width: min(190px, calc(50vw - 142px));
       min-width: 128px;
       max-height: min(135px, calc(var(--app-vh) / var(--ui-scale, 1) - 112px));

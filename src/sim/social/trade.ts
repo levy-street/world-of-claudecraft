@@ -13,6 +13,7 @@
 import type { TradeInfo } from '../../world_api';
 import { bagCapacity, fitsAll, removeStacked } from '../bags';
 import { ITEMS } from '../data';
+import { removePreferFungible } from '../items';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type InvSlot } from '../types';
@@ -166,11 +167,11 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
   metaB.copper = metaB.copper - session.offerB.copper + session.offerA.copper;
   for (const s of session.offerA.items) {
-    ctx.removeItem(s.itemId, s.count, session.a);
+    removePreferFungible(ctx, s.itemId, s.count, session.a);
     ctx.addItem(s.itemId, s.count, session.b);
   }
   for (const s of session.offerB.items) {
-    ctx.removeItem(s.itemId, s.count, session.b);
+    removePreferFungible(ctx, s.itemId, s.count, session.b);
     ctx.addItem(s.itemId, s.count, session.a);
   }
   for (const tPid of [session.a, session.b]) {

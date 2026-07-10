@@ -353,6 +353,57 @@ export class Api {
     return {};
   }
 
+  async appleLogin(
+    identityToken: string,
+    displayName: string,
+    nativeAttestation: unknown,
+  ): Promise<{ choose: boolean; linkToken: string; username: string }> {
+    const data = await this.post('/api/auth/apple', {
+      identityToken,
+      displayName,
+      nativeAttestation,
+    });
+    if (data.choose === true) {
+      return {
+        choose: true,
+        linkToken: typeof data.linkToken === 'string' ? data.linkToken : '',
+        username: typeof data.username === 'string' ? data.username : '',
+      };
+    }
+    this.token = data.token;
+    this.username = data.username;
+    this.emailMissing = data.emailMissing === true;
+    return { choose: false, linkToken: '', username: this.username ?? '' };
+  }
+
+  async appleLoginNew(linkToken: string): Promise<void> {
+    const data = await this.post('/api/auth/apple/login/new', { linkToken });
+    this.token = data.token;
+    this.username = data.username;
+    this.emailMissing = data.emailMissing === true;
+  }
+
+  async appleLoginLink(
+    linkToken: string,
+    username: string,
+    password: string,
+    code = '',
+    recoveryCode = '',
+  ): Promise<{ twoFactorRequired?: boolean }> {
+    const data = await this.post('/api/auth/apple/login/link', {
+      linkToken,
+      username,
+      password,
+      code,
+      recoveryCode,
+    });
+    if (data.twoFactorRequired && !data.token) return { twoFactorRequired: true };
+    this.token = data.token;
+    this.username = data.username;
+    this.emailMissing = data.emailMissing === true;
+    return {};
+  }
+
   async createDesktopLoginCode(): Promise<{ code: string; expiresInMs: number }> {
     const data = await this.post('/api/desktop-login/create', {});
     return {
@@ -941,6 +992,7 @@ function blankEntity(id: number): Entity {
     skin: 0,
     mainhandItemId: null,
     equippedItems: {},
+    equippedInstances: {},
     guild: '',
   };
 }

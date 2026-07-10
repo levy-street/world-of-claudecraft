@@ -1069,6 +1069,10 @@ export const ko_KR: EnTranslations = {
       "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
     },
     "auth": {
+      "appleLoginCta": "Apple로 계속하기",
+      "appleError": "Apple로 로그인할 수 없습니다. 다시 시도해 주세요.",
+      "appleChoiceIntro": "새 계정을 만들거나 Apple을 기존 계정에 연결하세요.",
+      "appleChoiceExpired": "Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.",
       "forgotPrompt": "비밀번호를 잊으셨나요?",
       "forgotTitle": "비밀번호 재설정",
       "forgotHint": "사용자 이름을 입력하면 등록된 이메일로 재설정 링크를 보내드립니다.",
@@ -5869,6 +5873,15 @@ export const ko_KR: EnTranslations = {
       },
       "linen_scrap": {
         "name": "아마포 조각"
+      },
+      "arcane_dust": {
+        "name": "비전 가루"
+      },
+      "arcane_essence": {
+        "name": "비전 정수"
+      },
+      "arcane_shard": {
+        "name": "비전 파편"
       },
       "fen_muster_order": {
         "name": "펜브리지 소집 명령서"

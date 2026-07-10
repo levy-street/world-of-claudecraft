@@ -14,7 +14,7 @@ const counts = (m: Record<string, number>) => new Map(Object.entries(m));
 function statsFor(cls: PlayerClass, level: number, equipment: Record<string, string>): Entity {
   const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
   e.level = level;
-  recalcPlayerStats(e, cls, equipment as any);
+  recalcPlayerStats(e, cls, equipment as any, undefined, {});
   return e;
 }
 

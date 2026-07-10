@@ -177,6 +177,7 @@ async function buildTopologyState(page) {
       }
     }
     if (nearest !== null) sim.targetEntity(nearest);
+    window.__game.hud?.closeLootSettings?.();
     window.__game.hud?.update?.(0.05);
     return { party: sim.partyInfo?.members?.length ?? 0, target: nearest };
   });
@@ -189,6 +190,7 @@ async function applyHudState(page, descriptor) {
   await page.evaluate((state) => {
     const body = document.body;
     window.__game?.hud?.closeAll?.();
+    window.__game?.hud?.closeLootSettings?.();
     body.classList.toggle('mobile-left-handed', state.leftHanded);
     body.classList.toggle('mobile-camera-joystick-on', state.cameraJoystick);
     body.classList.toggle('mobile-pet-active', state.petActive);
@@ -980,6 +982,7 @@ async function verifyCompactMoreFlow(page, tag) {
     return;
   }
 
+  let trayActionsHit = true;
   for (const id of ['mobile-social', 'mobile-menu']) {
     const hit = await page.$eval(`#${id}`, (button) => {
       const rect = button.getBoundingClientRect();
@@ -987,10 +990,32 @@ async function verifyCompactMoreFlow(page, tag) {
         (rect.left + rect.right) / 2,
         (rect.top + rect.bottom) / 2,
       );
-      return target === button || target?.closest('button') === button;
+      return {
+        ok: target === button || target?.closest('button') === button,
+        rect: {
+          left: rect.left,
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+        },
+        parent: button.parentElement?.id ?? 'none',
+        display: getComputedStyle(button).display,
+        visibility: getComputedStyle(button).visibility,
+        target: target
+          ? `${target.tagName.toLowerCase()}#${target.id}.${target.className}`
+          : 'none',
+      };
     });
-    if (!hit) fail(`${tag}: compact More #${id} center is not hit-testable`);
+    if (!hit.ok) {
+      trayActionsHit = false;
+      fail(
+        `${tag}: compact More #${id} center is not hit-testable ` +
+          `(rect=${JSON.stringify(hit.rect)}, parent=${hit.parent}, display=${hit.display}, ` +
+          `visibility=${hit.visibility}, target=${hit.target})`,
+      );
+    }
   }
+  if (!trayActionsHit) return;
 
   await page.click('#mobile-social');
   const socialOpened = await page

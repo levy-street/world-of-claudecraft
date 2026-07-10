@@ -31,6 +31,7 @@ import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
+  type Aura,
   DT,
   dist2d,
   type Entity,
@@ -720,6 +721,46 @@ function identityFields(e: Entity): Record<string, unknown> {
   return out;
 }
 
+// Builds one aura's wire record via direct assignment rather than chained
+// conditional spreads (`...(cond ? {...} : {})`), which allocated a throwaway
+// object literal per branch regardless of which side taken. This runs for
+// every aura on every entity every tick (dynamicFields below is unconditional
+// per-entity, per-tick, even when wireCacheFor's diff ends up eliding the
+// result), so at raid-sized entity/aura counts and 20 Hz the spread form was a
+// measurable source of short-lived garbage. Output is byte-identical to the
+// prior spread chain; only the allocation shape changed.
+function wireAura(a: Aura): WireAura {
+  const w: WireAura = {
+    id: a.id,
+    name: a.name,
+    kind: a.kind,
+    rem: round2(a.remaining),
+    dur: a.duration,
+  };
+  // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
+  // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
+  // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
+  // stat-sap's isAuraDebuff classification intact (round2 could turn a tiny negative into
+  // -0 -> 0). Omitted only when exactly 0, which decodes back to 0, so value-less auras and
+  // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
+  // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
+  if (a.value !== 0) w.value = a.value;
+  // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
+  // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
+  if (a.value2 !== undefined) w.value2 = a.value2;
+  if (a.value3 !== undefined) w.value3 = a.value3;
+  if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
+  if (a.school !== 'physical') w.school = a.school;
+  if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
+  // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
+  // buff icon can badge the count online exactly as offline; undefined for every other aura.
+  if (a.charges !== undefined) w.charges = a.charges;
+  // The caster's entity id, for the client's own-aura prominence on the target strip
+  // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
+  if (a.sourceId) w.src = a.sourceId;
+  return w;
+}
+
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity): Record<string, unknown> {
@@ -768,36 +809,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (e.auras.length > 0) {
-    out.auras = e.auras.map(
-      (a): WireAura => ({
-        id: a.id,
-        name: a.name,
-        kind: a.kind,
-        rem: round2(a.remaining),
-        dur: a.duration,
-        // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
-        // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
-        // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
-        // stat-sap's isAuraDebuff classification intact (round2 could turn a tiny negative into
-        // -0 -> 0). Omitted only when exactly 0, which decodes back to 0, so value-less auras and
-        // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
-        // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
-        ...(a.value !== 0 ? { value: a.value } : {}),
-        // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
-        // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
-        ...(a.value2 !== undefined ? { value2: a.value2 } : {}),
-        ...(a.value3 !== undefined ? { value3: a.value3 } : {}),
-        ...(a.tickInterval !== undefined ? { tickInterval: a.tickInterval } : {}),
-        ...(a.school !== 'physical' ? { school: a.school } : {}),
-        ...(a.stacks && a.stacks > 1 ? { stacks: a.stacks } : {}),
-        // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
-        // buff icon can badge the count online exactly as offline; undefined for every other aura.
-        ...(a.charges !== undefined ? { charges: a.charges } : {}),
-        // The caster's entity id, for the client's own-aura prominence on the target strip
-        // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
-        ...(a.sourceId ? { src: a.sourceId } : {}),
-      }),
-    );
+    out.auras = e.auras.map(wireAura);
   }
   if (e.kind === 'mob' && e.lootable && e.loot) {
     out.lootList = { copper: e.loot.copper, items: e.loot.items };

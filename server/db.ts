@@ -4,6 +4,7 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
@@ -686,6 +687,7 @@ export async function ensureSchema(): Promise<void> {
     // unconditionally (idempotent) so the tables exist before the feature is
     // enabled, like the other schema modules.
     await client.query(DISCORD_SCHEMA);
+    await client.query(APPLE_AUTH_SCHEMA);
     // GitHub link tables (links + oauth states) for the developer badge.
     // FK-references accounts(id), so it runs after SCHEMA. Applied unconditionally
     // (idempotent), like the Discord tables.

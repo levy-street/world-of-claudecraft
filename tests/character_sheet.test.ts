@@ -107,7 +107,7 @@ describe('characterSheet — owner variant', () => {
     // Independently derive via the engine's one true function.
     const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
     e.level = level;
-    recalcPlayerStats(e, cls, {});
+    recalcPlayerStats(e, cls, {}, undefined, {});
     expect(sheet.stats).toEqual({ ...e.stats });
     expect(sheet.vitals!.maxHp).toBe(e.maxHp);
     expect(sheet.vitals!.resource.max).toBe(e.maxResource);

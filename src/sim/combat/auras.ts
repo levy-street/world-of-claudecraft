@@ -200,7 +200,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   }
   if (statsDirty && e.kind === 'player') {
     const meta = ctx.players.get(e.id);
-    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+    if (meta)
+      recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   }
   e.stealthed = e.auras.some((a) => a.kind === 'stealth');
 }

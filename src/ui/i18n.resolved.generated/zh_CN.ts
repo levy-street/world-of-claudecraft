@@ -1069,6 +1069,10 @@ export const zh_CN: EnTranslations = {
       "spawn": "{name}在荆峰高地崛起！"
     },
     "auth": {
+      "appleLoginCta": "通过 Apple 继续",
+      "appleError": "无法通过 Apple 登录。请重试。",
+      "appleChoiceIntro": "创建新帐户，或将 Apple 关联到现有帐户。",
+      "appleChoiceExpired": "Apple 登录已过期。请再次使用 Apple 登录。",
       "forgotPrompt": "忘记密码？",
       "forgotTitle": "重置密码",
       "forgotHint": "输入您的用户名，我们会将重置链接发送到登记的邮箱。",
@@ -5869,6 +5873,15 @@ export const zh_CN: EnTranslations = {
       },
       "linen_scrap": {
         "name": "亚麻碎布"
+      },
+      "arcane_dust": {
+        "name": "奥术之尘"
+      },
+      "arcane_essence": {
+        "name": "奥术精华"
+      },
+      "arcane_shard": {
+        "name": "奥术碎片"
       },
       "fen_muster_order": {
         "name": "芬桥集结令"
