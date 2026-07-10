@@ -296,6 +296,7 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
   if (env.touch) out.push(slider(s, 'touchLookSpeed', 'hud.options.touchLookSpeed'));
   out.push(slider(s, 'brightness', 'hud.options.brightness'));
   out.push(slider(s, 'cameraFov', 'hud.options.fieldOfView', 'degrees', 1));
+  out.push(toggle(s, 'cameraStyle', 'hud.options.cameraStyle'));
   out.push(slider(s, 'renderScale', 'hud.options.renderQuality'));
   out.push(toggle(s, 'fullscreen', 'hud.options.fullscreen'));
   out.push(toggle(s, 'showOverflowXp', 'game.settings.showOverflowXp'));
