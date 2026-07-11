@@ -27,7 +27,9 @@ const PCT_FIELDS = new Set([
   'spellDmgPct',
   'healPct',
   'threatPct',
-  'critDmgPct',
+  'critDmgSpellPct',
+  'critDmgPhysPct',
+  'critDmgHealPct',
   'dotDmgPct',
   'hotHealPct',
   'absorbPct',
@@ -52,7 +54,9 @@ function expectedTokens(effect: unknown, maxRank: number): string[] {
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         if (value === 0) continue;
-        if (key === 'critDmgPct' && value === 0.5) {
+        // A +50% spell or heal crit-damage mastery lifts the 1.5x base to 2.0x, which the
+        // hand-written descriptions phrase as "double" rather than "50%".
+        if ((key === 'critDmgSpellPct' || key === 'critDmgHealPct') && value === 0.5) {
           toks.push('double');
           continue;
         }

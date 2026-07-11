@@ -21,6 +21,20 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
   });
 });
 
+describe('crit-damage masteries are scoped to their channel (F4)', () => {
+  it("a Holy paladin's heal-crit mastery does not leak into damage crits", () => {
+    const sim = new Sim({ seed: 3, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('holy')).toBe(true);
+    const p = sim.entities.get(sim.playerId) as Entity;
+    // Holy mastery boosts HEAL crits only; the spell and physical crit channels stay 0,
+    // so the paladin's Holy Shock / Crusader Strike crits are not amplified.
+    expect(p.critDmgHealBonus).toBeCloseTo(0.5);
+    expect(p.critDmgSpellBonus).toBe(0);
+    expect(p.critDmgPhysBonus).toBe(0);
+  });
+});
+
 describe('Demonology damage redirect is not double-modified (F7)', () => {
   it("a source's Defensive Stance cut is applied once, not again on the pet's share", () => {
     const sim = new Sim({ seed: 1, playerClass: 'warlock', autoEquip: true });

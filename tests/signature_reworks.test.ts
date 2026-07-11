@@ -171,11 +171,14 @@ describe('spell haste plumbing', () => {
 });
 
 describe('crit-damage masteries', () => {
-  it('a Fire mage mastery doubles spell crit damage via Entity.critDmgBonus', () => {
+  it('a Fire mage mastery doubles SPELL crit damage via Entity.critDmgSpellBonus', () => {
     const sim = makeSim('mage', 'fire');
     const p = sim.entities.get(sim.playerId) as Entity;
-    // Afterflame grants +50% crit damage: spell crits go from 1.5x to 2.0x.
-    expect(p.critDmgBonus).toBeCloseTo(0.5);
+    // Afterflame grants +50% spell crit damage: spell crits go from 1.5x to 2.0x. The
+    // physical/heal crit channels are untouched (the mastery is spell-only).
+    expect(p.critDmgSpellBonus).toBeCloseTo(0.5);
+    expect(p.critDmgPhysBonus).toBe(0);
+    expect(p.critDmgHealBonus).toBe(0);
   });
 
   it('a non-specced caster has no bonus crit damage', () => {
@@ -188,6 +191,6 @@ describe('crit-damage masteries', () => {
       (sim as any).playerMods((sim as any).players.get(p.id)),
       (sim as any).players.get(p.id).equipmentInstance,
     );
-    expect(p.critDmgBonus).toBe(0);
+    expect(p.critDmgSpellBonus).toBe(0);
   });
 });

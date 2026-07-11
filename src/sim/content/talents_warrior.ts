@@ -211,7 +211,7 @@ const SPECS: SpecDef[] = [
     id: 'arms', class: 'warrior', name: 'Battlecraft', role: 'dps', icon: '⚔',
     description: 'A master of two-handed weapons who strikes with deadly, deliberate blows.',
     signature: 'mortal_strike',
-    mastery: { name: 'Sharpened Blades', description: 'Increases your melee ability damage by 15% and the damage of your critical strikes by 25%.', effect: { global: { meleeDmgPct: 0.15, critDmgPct: 0.25 } } },
+    mastery: { name: 'Sharpened Blades', description: 'Increases your melee ability damage by 15% and the damage of your critical strikes by 25%.', effect: { global: { meleeDmgPct: 0.15, critDmgPhysPct: 0.25 } } },
   },
   {
     id: 'fury', class: 'warrior', name: 'Bloodrush', role: 'dps', icon: '🪓',

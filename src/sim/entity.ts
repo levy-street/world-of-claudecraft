@@ -56,7 +56,9 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
-    critDmgBonus: 0,
+    critDmgSpellBonus: 0,
+    critDmgPhysBonus: 0,
+    critDmgHealBonus: 0,
     dodgeChance: 0.05,
     castPushbackReduction: 0,
     knockbackResistance: 0,
@@ -454,8 +456,11 @@ export function recalcPlayerStats(
     (mods?.stats.crit ?? 0) +
     setEff.crit +
     critFractionFromRating(e.critRating);
-  // Extra crit damage from a spec mastery (e.g. Fire mage: spell crits deal double).
-  e.critDmgBonus = mods?.global.critDmgPct ?? 0;
+  // Extra crit damage from a spec mastery, per output channel (e.g. Fire mage: SPELL
+  // crits deal more; Holy paladin: HEAL crits; Subtlety/Arms: PHYSICAL crits).
+  e.critDmgSpellBonus = mods?.global.critDmgSpellPct ?? 0;
+  e.critDmgPhysBonus = mods?.global.critDmgPhysPct ?? 0;
+  e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.

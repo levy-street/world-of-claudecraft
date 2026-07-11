@@ -144,7 +144,7 @@ export function runEffects(
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
-        if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
+        if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
@@ -178,7 +178,7 @@ export function runEffects(
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
-        if (crit) dmg *= 2 + p.critDmgBonus;
+        if (crit) dmg *= 2 + p.critDmgPhysBonus;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
           p,
@@ -389,7 +389,7 @@ export function runEffects(
           ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
           directHitBonus(p.spellPower, ability, res.castTime);
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
-        if (crit) dmg *= 1.5 + p.critDmgBonus;
+        if (crit) dmg *= 1.5 + p.critDmgSpellBonus;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
         noteSpellHit(ctx, p, crit);
         break;
@@ -936,7 +936,8 @@ export function runEffects(
             directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
-          if (crit) dmg *= (isSpell ? 1.5 : 2) + p.critDmgBonus;
+          if (crit)
+            dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
           if (isSpell) noteSpellHit(ctx, p, crit);
           ctx.dealDamage(

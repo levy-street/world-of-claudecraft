@@ -39,7 +39,7 @@ function metaOf(sim: Sim, entity: Entity) {
 describe('spec masteries', () => {
   it('authors the ten PR B mastery effects exactly', () => {
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
-      global: { critDmgPct: 0.5 },
+      global: { critDmgHealPct: 0.5 },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'discipline')?.mastery.effect).toEqual({
       global: { absorbPct: 0.3 },
@@ -58,7 +58,7 @@ describe('spec masteries', () => {
       global: { dotDmgPct: 0.2 },
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'fire')?.mastery.effect).toEqual({
-      global: { critDmgPct: 0.5 },
+      global: { critDmgSpellPct: 0.5 },
       stats: { crit: 0.02 },
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'frost')?.mastery.effect).toEqual({
@@ -107,7 +107,7 @@ describe('spec masteries', () => {
       stats: { crit: 0.03 },
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
-      global: { critDmgPct: 0.4 },
+      global: { critDmgPhysPct: 0.4 },
       stats: { agiPct: 0.1 },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
@@ -126,7 +126,7 @@ describe('spec masteries', () => {
       global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
-      global: { critDmgPct: 0.5 },
+      global: { critDmgSpellPct: 0.5 },
       stats: { crit: 0.02 },
     });
   });
@@ -167,14 +167,15 @@ describe('spec masteries', () => {
     paladin.setPlayerLevel(20);
     paladin.setSpec('holy');
     paladin.player.stats.int = 2000;
-    paladin.player.critDmgBonus = 0;
+    paladin.player.critDmgHealBonus = 0;
     paladin.player.hp = 0;
     (
       paladin as unknown as { applyHeal(s: Entity, t: Entity, a: number, n: string): void }
     ).applyHeal(paladin.player, paladin.player, 100, 'test');
     expect(paladin.player.hp).toBe(150);
     paladin.player.hp = 0;
-    paladin.player.critDmgBonus = metaOf(paladin, paladin.player).talentMods.global.critDmgPct;
+    paladin.player.critDmgHealBonus =
+      metaOf(paladin, paladin.player).talentMods.global.critDmgHealPct;
     (
       paladin as unknown as { applyHeal(s: Entity, t: Entity, a: number, n: string): void }
     ).applyHeal(paladin.player, paladin.player, 100, 'test');
@@ -253,7 +254,7 @@ describe('spec masteries', () => {
         prot: { global: 'threatPct', value: 0.5 },
       },
       paladin: {
-        holy: { global: 'critDmgPct', value: 0.5 },
+        holy: { global: 'critDmgHealPct', value: 0.5 },
         protection: { global: 'threatPct', value: 0.5 },
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
@@ -264,13 +265,13 @@ describe('spec masteries', () => {
       },
       mage: {
         arcane: { global: 'spellDmgPct', value: 0.15 },
-        fire: { global: 'critDmgPct', value: 0.5 },
+        fire: { global: 'critDmgSpellPct', value: 0.5 },
         frost: { abilities: ['frostbolt', 'frost_nova'], dmgPct: 0.25 },
       },
       rogue: {
         assassination: { global: 'dotDmgPct', value: 0.2 },
         combat: { global: 'meleeHastePct', value: 0.1 },
-        subtlety: { global: 'critDmgPct', value: 0.4 },
+        subtlety: { global: 'critDmgPhysPct', value: 0.4 },
       },
       priest: {
         discipline: { global: 'absorbPct', value: 0.3 },
@@ -285,7 +286,7 @@ describe('spec masteries', () => {
       warlock: {
         affliction: { global: 'dotDmgPct', value: 0.2 },
         demonology: { global: 'petDmgSharePct', value: 0.2 },
-        destruction: { global: 'critDmgPct', value: 0.5 },
+        destruction: { global: 'critDmgSpellPct', value: 0.5 },
       },
       druid: {
         balance: { global: 'spellDmgPct', value: 0.15 },

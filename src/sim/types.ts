@@ -1828,9 +1828,13 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
-  // Extra critical-strike damage from a spec mastery (0 = none). Added to the base crit
-  // multiplier at the crit site: spell crits deal 1.5 + this, physical crits 2 + this.
-  critDmgBonus: number;
+  // Extra critical-strike damage from a spec mastery (0 = none), split by OUTPUT CHANNEL
+  // so a mastery only strengthens the crits it is meant to. Added to the matching base
+  // crit multiplier at the crit site: spell crits deal 1.5 + critDmgSpellBonus, physical
+  // crits 2 + critDmgPhysBonus, heal crits 1.5 + critDmgHealBonus.
+  critDmgSpellBonus: number;
+  critDmgPhysBonus: number;
+  critDmgHealBonus: number;
   dodgeChance: number;
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
