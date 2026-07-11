@@ -6558,6 +6558,15 @@ export const en: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Simple Fishing Pole"
       },
+      "mount_forest_stag": {
+        "name": "Forest Stag Bridle"
+      },
+      "mount_swamp_raptor": {
+        "name": "Spearjaw Saddle"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Emerald Wyrm Reins"
+      },
       "tangled_weed": {
         "name": "Tangled Weed"
       },
@@ -7617,6 +7626,11 @@ export const en: EnTranslations = {
         "name": "Brother Halven",
         "title": "Reliquary Keeper",
         "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Stable Master",
+        "greeting": "Every hero needs a steed, {className}. The stag is steady, the raptor is fast, and the wyrm... the wyrm flies."
       },
       "spirit_healer": {
         "name": "The Pale Keeper",

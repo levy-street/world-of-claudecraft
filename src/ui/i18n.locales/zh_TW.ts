@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': '森林雄鹿韁轡',
+  'entities.items.mount_swamp_raptor.name': '槍顎迅猛龍鞍',
+  'entities.items.mount_emerald_wyrm.name': '翡翠巨龍韁繩',
+  'entities.npcs.stable_master_wren.name': '雷恩·鞍值',
+  'entities.npcs.stable_master_wren.title': '馬廄總管',
+  'entities.npcs.stable_master_wren.greeting': '每位英雄都需要坐騎，{className}。雄鹿沉穩，迅猛龍迅捷，而巨龍……巨龍會飛。',
   'itemUi.vendor.sellItemAria': '以 {price} 的價格出售 {item}',
   'hudChrome.itemHeroicTag': '[英雄]',
   'hudChrome.options.done': '完成',

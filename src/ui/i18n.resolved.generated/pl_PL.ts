@@ -6558,6 +6558,15 @@ export const pl_PL: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Prosta wędka"
       },
+      "mount_forest_stag": {
+        "name": "Uzda leśnego jelenia"
+      },
+      "mount_swamp_raptor": {
+        "name": "Siodło błotnego raptora"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Wodze szmaragdowego smoka"
+      },
       "tangled_weed": {
         "name": "Splątane zielsko"
       },
@@ -7617,6 +7626,11 @@ export const pl_PL: EnTranslations = {
         "name": "Brat Halven",
         "title": "Strażnik Relikwiarza",
         "greeting": "Trop powiódł na północ. Kolejny relikwiarz, kolejny obrzęd. Wybierz poziom trudności, a ja potrzymam linę, aż wrócisz."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Stajenna",
+        "greeting": "Każdy bohater potrzebuje wierzchowca, {className}. Jeleń jest pewny, raptor szybki, a smok... smok lata."
       },
       "spirit_healer": {
         "name": "Blady Strażnik",

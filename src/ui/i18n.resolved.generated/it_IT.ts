@@ -6558,6 +6558,15 @@ export const it_IT: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Canna da pesca semplice"
       },
+      "mount_forest_stag": {
+        "name": "Briglia del cervo silvano"
+      },
+      "mount_swamp_raptor": {
+        "name": "Sella del raptor palustre"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Redini del wyrm di smeraldo"
+      },
       "tangled_weed": {
         "name": "Erbaccia aggrovigliata"
       },
@@ -7617,6 +7626,11 @@ export const it_IT: EnTranslations = {
         "name": "Fratello Halven",
         "title": "Custode del Reliquiario",
         "greeting": "La pista portava a nord. Un altro reliquiario, un altro rito. Scegli la difficoltà, e io terrò la corda finché non torni."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Maestra di scuderia",
+        "greeting": "Ogni eroe ha bisogno di una cavalcatura, {className}. Il cervo è costante, il raptor è rapido e il wyrm... il wyrm vola."
       },
       "spirit_healer": {
         "name": "Il Custode Pallido",

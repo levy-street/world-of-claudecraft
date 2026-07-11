@@ -344,6 +344,8 @@ export type SkinCatalog = 'class' | 'mech';
 
 export type ItemUse =
   | { type: 'fishing' }
+  // Mount bridle: toggles the mount_<id> buff_speed aura (src/sim/content/mounts.ts).
+  | { type: 'mount'; mountId: string }
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.

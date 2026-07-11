@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Waldhirsch-Zaumzeug',
+  'entities.items.mount_swamp_raptor.name': 'Speerkiefer-Sattel',
+  'entities.items.mount_emerald_wyrm.name': 'Smaragdwyrm-Zügel',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Stallmeisterin',
+  'entities.npcs.stable_master_wren.greeting': 'Jeder Held braucht ein Reittier, {className}. Der Hirsch ist verlässlich, der Raptor ist schnell, und der Wyrm... der Wyrm fliegt.',
   'entities.abilities.sport_boot.description':
     'Ein hoher, weiter Schlag Richtung Zielpunkt. Die Menge liebt es.',
   'entities.abilities.sport_boot.name': 'Weitschlag',

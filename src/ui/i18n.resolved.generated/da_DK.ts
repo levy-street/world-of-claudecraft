@@ -6558,6 +6558,15 @@ export const da_DK: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Simpel Fiskestang"
       },
+      "mount_forest_stag": {
+        "name": "Skovhjortens hovedtøj"
+      },
+      "mount_swamp_raptor": {
+        "name": "Spydkæbe-sadel"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Smaragdlindorm-tøjler"
+      },
       "tangled_weed": {
         "name": "Sammenfiltret Ukrudt"
       },
@@ -7617,6 +7626,11 @@ export const da_DK: EnTranslations = {
         "name": "Broder Halven",
         "title": "Relikvarievogter",
         "greeting": "Sporet førte mod nord. Endnu et relikvarium, endnu en rite. Vælg din sværhedsgrad, så holder jeg rebet, til du vender tilbage."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Staldmester",
+        "greeting": "Enhver helt har brug for en ganger, {className}. Hjorten er stabil, raptoren er hurtig, og lindormen... lindormen flyver."
       },
       "spirit_healer": {
         "name": "Den Blege Vogter",

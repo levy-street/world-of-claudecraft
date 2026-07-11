@@ -6558,6 +6558,15 @@ export const cs_CZ: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Jednoduchý rybářský prut"
       },
+      "mount_forest_stag": {
+        "name": "Uzda lesního jelena"
+      },
+      "mount_swamp_raptor": {
+        "name": "Sedlo bahenního ještěra"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Otěže smaragdového wyrma"
+      },
       "tangled_weed": {
         "name": "Zamotaná plevelná rostlina"
       },
@@ -7617,6 +7626,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Bratr Halven",
         "title": "Strážce relikviáře",
         "greeting": "Stopa vedla na sever. Další relikviář, další rituál. Vyber si obtížnost a podržím lano, dokud se nevrátíš."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Stájník",
+        "greeting": "Každý hrdina potřebuje oře, {className}. Jelen je stálý, ještěr rychlý a wyrm... wyrm létá."
       },
       "spirit_healer": {
         "name": "Bledá strážkyně",

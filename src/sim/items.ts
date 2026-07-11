@@ -16,6 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
+import { MOUNTS, MOUNT_AURA_PREFIX } from './content/mounts';
 import { addStacked, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
@@ -174,6 +175,43 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
   if (!def) return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) {
     ctx.error(meta.entityId, "You don't have that item.");
+    return;
+  }
+  if (def.use?.type === 'mount') {
+    const mount = MOUNTS[def.use.mountId];
+    if (!mount) return;
+    const auraId = `${MOUNT_AURA_PREFIX}${mount.id}`;
+    const idx = p.auras.findIndex((a) => a.id === auraId);
+    if (idx >= 0) {
+      // toggle off: dismount
+      const name = p.auras[idx].name;
+      p.auras.splice(idx, 1);
+      ctx.emit({ type: 'aura', targetId: p.id, name, gained: false });
+      return;
+    }
+    if (p.inCombat) {
+      ctx.error(meta.entityId, "You can't mount in combat.");
+      return;
+    }
+    // swap: only one mount up at a time
+    for (let i = p.auras.length - 1; i >= 0; i--) {
+      if (p.auras[i].id.startsWith(MOUNT_AURA_PREFIX)) {
+        ctx.emit({ type: 'aura', targetId: p.id, name: p.auras[i].name, gained: false });
+        p.auras.splice(i, 1);
+      }
+    }
+    p.auras.push({
+      id: auraId,
+      name: mount.name,
+      kind: 'buff_speed',
+      remaining: 86400,
+      duration: 86400,
+      value: mount.speedMult,
+      sourceId: p.id,
+      school: 'physical',
+      breaksOnDamage: true, // classic mounts: taking a hit dismounts
+    });
+    ctx.emit({ type: 'aura', targetId: p.id, name: mount.name, gained: true });
     return;
   }
   if (def.use?.type === 'fishing') {

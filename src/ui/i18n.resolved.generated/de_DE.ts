@@ -6558,6 +6558,15 @@ export const de_DE: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Einfache Angel"
       },
+      "mount_forest_stag": {
+        "name": "Waldhirsch-Zaumzeug"
+      },
+      "mount_swamp_raptor": {
+        "name": "Speerkiefer-Sattel"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Smaragdwyrm-Zügel"
+      },
       "tangled_weed": {
         "name": "Verheddertes Kraut"
       },
@@ -7617,6 +7626,11 @@ export const de_DE: EnTranslations = {
         "name": "Bruder Halven",
         "title": "Reliquiarhüter",
         "greeting": "Die Spur führte nach Norden. Ein weiteres Reliquiar, ein weiterer Ritus. Wähle deine Schwierigkeit, und ich halte das Seil, bis du zurückkehrst."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Stallmeisterin",
+        "greeting": "Jeder Held braucht ein Reittier, {className}. Der Hirsch ist verlässlich, der Raptor ist schnell, und der Wyrm... der Wyrm fliegt."
       },
       "spirit_healer": {
         "name": "Der Bleiche Hüter",

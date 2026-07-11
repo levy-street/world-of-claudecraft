@@ -6558,6 +6558,15 @@ export const tr_TR: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Basit Olta"
       },
+      "mount_forest_stag": {
+        "name": "Orman Geyiği Dizgini"
+      },
+      "mount_swamp_raptor": {
+        "name": "Mızrakçene Eyeri"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Zümrüt Ejder Dizginleri"
+      },
       "tangled_weed": {
         "name": "Dolaşık Yabanot"
       },
@@ -7617,6 +7626,11 @@ export const tr_TR: EnTranslations = {
         "name": "Birader Halven",
         "title": "Emanetlik Bekçisi",
         "greeting": "İz kuzeye çıktı. Bir emanetlik daha, bir ayin daha. Kademeni seç, sen dönene dek ipi ben tutarım."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Ahır Ustası",
+        "greeting": "Her kahramanın bir bineğe ihtiyacı var, {className}. Geyik sağlamdır, raptor hızlıdır, ejder ise... ejder uçar."
       },
       "spirit_healer": {
         "name": "Solgun Bekçi",

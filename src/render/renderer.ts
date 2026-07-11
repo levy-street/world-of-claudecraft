@@ -1,3 +1,4 @@
+import { mountForAuraId } from '../sim/content/mounts';
 import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
@@ -525,6 +526,8 @@ export interface EntityView {
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
+  mountVisual: CharacterVisual | null; // rideable mount body (stag/raptor/wyrm), built lazily
+  mountKey: string | null; // which mount rig mountVisual holds (rebuilt on swap)
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
@@ -3552,6 +3555,8 @@ export class Renderer {
       bearVisual: null,
       catVisual: null,
       travelVisual: null,
+      mountVisual: null,
+      mountKey: null,
       height,
       clickTarget,
       nameplate: np,
@@ -4054,6 +4059,7 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
+      v.mountVisual?.dispose();
     } else {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, { group: v.objectMesh, height: v.height });
@@ -4249,7 +4255,12 @@ export class Renderer {
       let hasCatForm = false;
       let hasTravelForm = false;
       let hasStealth = false;
+      let mountVisualKey: string | null = null;
       for (const a of e.auras) {
+        if (mountVisualKey === null) {
+          const mnt = mountForAuraId(a.id);
+          if (mnt) mountVisualKey = mnt.visualKey;
+        }
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
         if (a.id === 'ghost_wolf') hasGhostWolf = true;
@@ -4262,6 +4273,7 @@ export class Renderer {
       const ghostWolf = !polyed && !bear && hasGhostWolf;
       const cat = !polyed && !bear && (ghostWolf || hasCatForm);
       const travel = !polyed && !bear && !cat && hasTravelForm;
+      const mountKey = !polyed && !bear && !cat && !travel ? mountVisualKey : null;
       const _stealthed = hasStealth;
       // distance cull: far rigs are invisible specks but cost real draw calls
       const cdx = e.pos.x - p.pos.x,
@@ -4309,7 +4321,7 @@ export class Renderer {
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
-            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel,
+            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel && !mountKey,
           );
           // sheep/forms keep articulated shadows through the whole proxy band —
           // a frozen humanoid proxy silhouette would be wrong under a form
@@ -4318,6 +4330,7 @@ export class Renderer {
           v.bearVisual?.setShadow(wantFormShadow);
           v.catVisual?.setShadow(wantFormShadow);
           v.travelVisual?.setShadow(wantFormShadow);
+          v.mountVisual?.setShadow(wantFormShadow);
         } else if (wantShadow !== v.shadowOn) {
           v.shadowOn = wantShadow;
           for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
@@ -4476,10 +4489,26 @@ export class Renderer {
         v.travelVisual = createCharacterVisual(e, 'form_travel');
         v.group.add(v.travelVisual.root);
       }
+      if (v.mountVisual && v.mountKey !== mountKey && mountKey !== null) {
+        // swapped mounts: rebuild the rig for the new steed
+        v.group.remove(v.mountVisual.root);
+        v.mountVisual.dispose();
+        v.mountVisual = null;
+        v.mountKey = null;
+      }
+      if (mountKey && !v.mountVisual) {
+        v.mountVisual = createCharacterVisual(
+          e,
+          mountKey as 'mount_stag' | 'mount_raptor' | 'mount_wyrm',
+        );
+        v.mountKey = mountKey;
+        v.group.add(v.mountVisual.root);
+      }
       if (v.sheepVisual) v.sheepVisual.root.visible = polyed;
       if (v.bearVisual) v.bearVisual.root.visible = bear;
       if (v.catVisual) v.catVisual.root.visible = cat;
       if (v.travelVisual) v.travelVisual.root.visible = travel;
+      if (v.mountVisual) v.mountVisual.root.visible = mountKey !== null;
       const active =
         polyed && v.sheepVisual
           ? v.sheepVisual
@@ -4489,7 +4518,9 @@ export class Renderer {
               ? v.catVisual
               : travel && v.travelVisual
                 ? v.travelVisual
-                : v.visual;
+                : mountKey && v.mountVisual
+                  ? v.mountVisual
+                  : v.visual;
       const ghost =
         ghostWolf ||
         shouldRenderStealthGhost(this.sim.playerId, e) ||

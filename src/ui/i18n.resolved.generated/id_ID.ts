@@ -6558,6 +6558,15 @@ export const id_ID: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Joran Pancing Sederhana"
       },
+      "mount_forest_stag": {
+        "name": "Kekang Rusa Hutan"
+      },
+      "mount_swamp_raptor": {
+        "name": "Pelana Raptor Rawa"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Tali Kekang Wyrm Zamrud"
+      },
       "tangled_weed": {
         "name": "Gulma Kusut"
       },
@@ -7617,6 +7626,11 @@ export const id_ID: EnTranslations = {
         "name": "Bruder Halven",
         "title": "Penjaga Relikuari",
         "greeting": "Jejak itu menuntun ke utara. Relikuari lain, ritus lain. Pilih tingkat kesulitanmu, dan aku akan memegangi talinya sampai kau kembali."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Kepala Istal",
+        "greeting": "Setiap pahlawan butuh tunggangan, {className}. Rusa itu tenang, raptor itu cepat, dan wyrm... wyrm bisa terbang."
       },
       "spirit_healer": {
         "name": "Sang Penjaga Pucat",

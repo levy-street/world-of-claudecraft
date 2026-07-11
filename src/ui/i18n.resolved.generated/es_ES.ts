@@ -6558,6 +6558,15 @@ export const es_ES: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Caña de pescar sencilla"
       },
+      "mount_forest_stag": {
+        "name": "Brida de ciervo del bosque"
+      },
+      "mount_swamp_raptor": {
+        "name": "Silla de raptor lancero"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Riendas del vermis esmeralda"
+      },
       "tangled_weed": {
         "name": "Hierba enredada"
       },
@@ -7617,6 +7626,11 @@ export const es_ES: EnTranslations = {
         "name": "Hermano Halven",
         "title": "Guardián del Relicario",
         "greeting": "El rastro llevaba al norte. Otro relicario, otro rito. Elige tu dificultad y yo sujetaré la cuerda hasta que vuelvas."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Maestra de establos",
+        "greeting": "Cada héroe necesita una montura, {className}. El ciervo es firme, el raptor es veloz y el vermis... el vermis vuela."
       },
       "spirit_healer": {
         "name": "El Guardián Pálido",

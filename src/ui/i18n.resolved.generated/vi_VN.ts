@@ -6558,6 +6558,15 @@ export const vi_VN: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Cần Câu Đơn Giản"
       },
+      "mount_forest_stag": {
+        "name": "Dây cương hươu rừng"
+      },
+      "mount_swamp_raptor": {
+        "name": "Yên raptor đầm lầy"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Dây cương wyrm ngọc lục bảo"
+      },
       "tangled_weed": {
         "name": "Cỏ Dại Rối Bời"
       },
@@ -7617,6 +7626,11 @@ export const vi_VN: EnTranslations = {
         "name": "Tu Huynh Halven",
         "title": "Người Giữ Thánh Tích",
         "greeting": "Dấu vết dẫn về phương bắc. Lại một hộp thánh tích nữa, lại một nghi lễ nữa. Chọn độ khó của ngươi đi, và ta sẽ giữ dây thừng cho đến khi ngươi trở về."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Quản mã",
+        "greeting": "Anh hùng nào cũng cần một thú cưỡi, {className}. Hươu thì vững, raptor thì nhanh, còn wyrm... wyrm biết bay."
       },
       "spirit_healer": {
         "name": "Người Canh Giữ Nhợt Nhạt",

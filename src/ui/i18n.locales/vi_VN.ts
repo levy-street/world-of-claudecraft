@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Dây cương hươu rừng',
+  'entities.items.mount_swamp_raptor.name': 'Yên raptor đầm lầy',
+  'entities.items.mount_emerald_wyrm.name': 'Dây cương wyrm ngọc lục bảo',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Quản mã',
+  'entities.npcs.stable_master_wren.greeting': 'Anh hùng nào cũng cần một thú cưỡi, {className}. Hươu thì vững, raptor thì nhanh, còn wyrm... wyrm biết bay.',
   'itemUi.vendor.sellItemAria': 'Bán {item} với giá {price}',
   'itemUi.vendor.sellRolledWarning': 'Không thể khôi phục các chỉ số ngẫu nhiên bằng cách mua lại.',
   'loading.tips.classes':

@@ -538,6 +538,17 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     ],
     greeting: 'Keep your blade close, $C. The Vale is not what it was.',
   },
+  stable_master_wren: {
+    id: 'stable_master_wren',
+    name: 'Wren Saddleworth',
+    title: 'Stable Master',
+    pos: { x: -10, z: 6 },
+    facing: Math.PI / 2,
+    color: 0x8a5a2b,
+    questIds: [],
+    greeting: 'Every hero needs a steed, $C. The stag is steady, the raptor is fast, and the wyrm... the wyrm flies.',
+    vendorItems: ['mount_forest_stag', 'mount_swamp_raptor', 'mount_emerald_wyrm'],
+  },
   trader_wilkes: {
     id: 'trader_wilkes',
     name: 'Trader Wilkes',

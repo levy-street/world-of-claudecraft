@@ -123,6 +123,7 @@ import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { MOUNT_ITEMS } from './content/mounts';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
@@ -164,6 +165,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   TEMPLE_ITEMS,
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
+  MOUNT_ITEMS,
   HEROIC_ITEMS,
 );
 

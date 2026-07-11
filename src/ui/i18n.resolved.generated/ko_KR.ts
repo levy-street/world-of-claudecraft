@@ -6558,6 +6558,15 @@ export const ko_KR: EnTranslations = {
       "simple_fishing_pole": {
         "name": "간단한 낚싯대"
       },
+      "mount_forest_stag": {
+        "name": "숲 수사슴 굴레"
+      },
+      "mount_swamp_raptor": {
+        "name": "창턱 랩터 안장"
+      },
+      "mount_emerald_wyrm": {
+        "name": "에메랄드 윔 고삐"
+      },
       "tangled_weed": {
         "name": "엉킨 물풀"
       },
@@ -7617,6 +7626,11 @@ export const ko_KR: EnTranslations = {
         "name": "브라더 할벤",
         "title": "성물실 관리인",
         "greeting": "오솔길이 북쪽으로 이어졌소. 또 다른 성물실, 또 다른 의식. 난이도를 고르시오, 그대가 돌아올 때까지 밧줄을 잡고 있겠소."
+      },
+      "stable_master_wren": {
+        "name": "렌 새들워스",
+        "title": "마구간지기",
+        "greeting": "영웅에겐 탈것이 필요하지, {className}. 수사슴은 듬직하고, 랩터는 빠르고, 윔은... 윔은 하늘을 난다네."
       },
       "spirit_healer": {
         "name": "영혼 치유사",

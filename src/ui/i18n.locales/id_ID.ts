@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Kekang Rusa Hutan',
+  'entities.items.mount_swamp_raptor.name': 'Pelana Raptor Rawa',
+  'entities.items.mount_emerald_wyrm.name': 'Tali Kekang Wyrm Zamrud',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Kepala Istal',
+  'entities.npcs.stable_master_wren.greeting': 'Setiap pahlawan butuh tunggangan, {className}. Rusa itu tenang, raptor itu cepat, dan wyrm... wyrm bisa terbang.',
   'itemUi.vendor.sellItemAria': 'Jual {item} seharga {price}',
   'itemUi.vendor.sellRolledWarning': 'Atribut acak tidak dapat dipulihkan dengan membeli kembali.',
   'loading.tips.classes':

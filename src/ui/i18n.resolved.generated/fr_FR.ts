@@ -6558,6 +6558,15 @@ export const fr_FR: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Canne à pêche simple"
       },
+      "mount_forest_stag": {
+        "name": "Bride de cerf des bois"
+      },
+      "mount_swamp_raptor": {
+        "name": "Selle de raptor-harpon"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Rênes du ver émeraude"
+      },
       "tangled_weed": {
         "name": "Herbe emmêlée"
       },
@@ -7617,6 +7626,11 @@ export const fr_FR: EnTranslations = {
         "name": "Frère Halven",
         "title": "Gardien du reliquaire",
         "greeting": "La piste menait au nord. Un autre reliquaire, un autre rite. Choisis ton palier, et je tiendrai la corde jusqu'à ton retour."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Maîtresse d'écurie",
+        "greeting": "Tout héros a besoin d'une monture, {className}. Le cerf est sûr, le raptor est rapide, et le ver... le ver vole."
       },
       "spirit_healer": {
         "name": "Le Veilleur pâle",
