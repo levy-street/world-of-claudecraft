@@ -1813,6 +1813,18 @@ export const zh_CN: EnTranslations = {
       "throttled": "你制作得太快了，请稍等片刻后再试。",
       "recipeNotLearned": "你还没有学会这个配方。"
     },
+    "cameraMode": {
+      "title": "选择你的镜头",
+      "body": "你想如何控制镜头？",
+      "classicLabel": "经典",
+      "classicDesc": "按住鼠标右键转动镜头，松开即可释放光标。",
+      "mouseLabel": "鼠标镜头",
+      "mouseDesc": "鼠标始终操控镜头，实现流畅的现代自由视角。",
+      "recommended": "推荐",
+      "note": "稍后可在 Esc 的“按键绑定”中更改。",
+      "confirm": "确认",
+      "dismiss": "关闭"
+    },
     "deeds": {
       "title": "功绩之书",
       "close": "关闭功绩之书",

@@ -1813,6 +1813,18 @@ export const da_DK: EnTranslations = {
       "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
       "recipeNotLearned": "Du har ikke lært den opskrift endnu."
     },
+    "cameraMode": {
+      "title": "Choose Your Camera",
+      "body": "How would you like to control the camera?",
+      "classicLabel": "Classic",
+      "classicDesc": "Hold the right mouse button to turn the camera, then release to free your cursor.",
+      "mouseLabel": "Mouse Camera",
+      "mouseDesc": "The mouse always steers the camera for smooth, modern free-look.",
+      "recommended": "Recommended",
+      "note": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm",
+      "dismiss": "Close"
+    },
     "deeds": {
       "title": "Bedrifternes Bog",
       "close": "Luk Bedrifternes Bog",

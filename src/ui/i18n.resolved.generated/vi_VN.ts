@@ -1813,6 +1813,18 @@ export const vi_VN: EnTranslations = {
       "throttled": "Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.",
       "recipeNotLearned": "Bạn chưa học công thức đó."
     },
+    "cameraMode": {
+      "title": "Choose Your Camera",
+      "body": "How would you like to control the camera?",
+      "classicLabel": "Classic",
+      "classicDesc": "Hold the right mouse button to turn the camera, then release to free your cursor.",
+      "mouseLabel": "Mouse Camera",
+      "mouseDesc": "The mouse always steers the camera for smooth, modern free-look.",
+      "recommended": "Recommended",
+      "note": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm",
+      "dismiss": "Close"
+    },
     "deeds": {
       "title": "Sách Kỳ Công",
       "close": "Đóng Sách Kỳ Công",

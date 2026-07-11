@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import type { GamepadKind } from '../game/gamepad_map';
 import { type Keybinds, keyCapLabel } from '../game/keybinds';
+import { isPhoneTouchDevice } from '../game/mobile_controls';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
@@ -158,6 +159,7 @@ import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { CalendarWindow } from './calendar_window';
+import { CameraModePrompt, cameraModePromptSeen } from './camera_mode_prompt';
 import { CastBarPainter } from './cast_bar_painter';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { CharWindow } from './char_window';
@@ -1024,6 +1026,10 @@ export class Hud {
   // ./focus_manager. Escape is NOT handled here: it stays with the existing unified
   // dispatcher (main.ts game input -> hud.closeAll()), so there is one Escape path.
   private readonly focusManager = new FocusManager();
+  // First-run camera-mode prompt (Classic vs Mouse Camera), created lazily the first
+  // time maybeShowCameraModePrompt() decides to show it. Its own module (see
+  // ./camera_mode_prompt); the Hud only orchestrates when it opens.
+  private cameraModePrompt: CameraModePrompt | null = null;
   // Classic-style chat tabs. `chatTabs` are the player-added tabs (send-capable
   // channels plus the optional filter-only whisper collector; the built-in
   // `all`/`combat` views are implicit); `activeChatTab` is the one currently
@@ -14886,6 +14892,30 @@ export class Hud {
     this.optionsHooks = hooks;
   }
 
+  /**
+   * Show the first-run camera-mode prompt (Classic vs Mouse Camera) once on world
+   * entry. A no-op on a phone touch device (its camera is the joystick, not this
+   * choice), once the localStorage flag is set, if the options hooks are not wired
+   * yet, or if it is already open. Confirming routes through the SAME effect as the
+   * Key Bindings mouseCamera toggle (settings.set + onSettingChange -> applySetting).
+   */
+  maybeShowCameraModePrompt(): void {
+    const hooks = this.optionsHooks;
+    if (!hooks) return;
+    if (isPhoneTouchDevice() || cameraModePromptSeen()) return;
+    if (this.cameraModePrompt?.isOpen()) return;
+    this.cameraModePrompt ??= new CameraModePrompt({
+      focusManager: this.focusManager,
+      // onSettingChange -> applySetting already does settings.set + the
+      // input.setMouseCameraEnabled side effect (main.ts), exactly like the Key
+      // Bindings toggle, so just hand it the chosen value (no redundant set here).
+      applyMouseCamera: (enabled) => {
+        hooks.onSettingChange('mouseCamera', enabled);
+      },
+    });
+    this.cameraModePrompt.open();
+  }
+
   attachReporting(hooks: ReportHooks): void {
     this.reportHooks = hooks;
   }
@@ -14912,7 +14942,8 @@ export class Hud {
       this.optionsOpen ||
       this.emoteWheelOpen ||
       $('#emote-editor').style.display === 'block' ||
-      this.cardModalEl !== null
+      this.cardModalEl !== null ||
+      (this.cameraModePrompt?.isOpen() ?? false)
     );
   }
 
@@ -14966,6 +14997,13 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
+    // The first-run camera-mode prompt is the topmost aria-modal on world entry;
+    // Escape dismisses it (marks it seen, so it will not reappear) via the one
+    // unified close path, rather than falling through to open the options menu.
+    if (this.cameraModePrompt?.isOpen()) {
+      this.cameraModePrompt.dismiss();
+      return true;
+    }
     if (this.openLootChestId !== null) {
       this.closeLoot();
       return true;

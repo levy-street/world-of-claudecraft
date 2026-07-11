@@ -1813,6 +1813,18 @@ export const es: EnTranslations = {
       "throttled": "Estás elaborando demasiado rápido. Espera un momento e inténtalo de nuevo.",
       "recipeNotLearned": "Aún no has aprendido esa receta."
     },
+    "cameraMode": {
+      "title": "Choose Your Camera",
+      "body": "How would you like to control the camera?",
+      "classicLabel": "Classic",
+      "classicDesc": "Hold the right mouse button to turn the camera, then release to free your cursor.",
+      "mouseLabel": "Mouse Camera",
+      "mouseDesc": "The mouse always steers the camera for smooth, modern free-look.",
+      "recommended": "Recommended",
+      "note": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm",
+      "dismiss": "Close"
+    },
     "deeds": {
       "title": "Libro de Gestas",
       "close": "Cerrar el Libro de Gestas",

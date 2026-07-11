@@ -1813,6 +1813,18 @@ export const pl_PL: EnTranslations = {
       "throttled": "Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.",
       "recipeNotLearned": "Nie nauczyłeś się jeszcze tego przepisu."
     },
+    "cameraMode": {
+      "title": "Choose Your Camera",
+      "body": "How would you like to control the camera?",
+      "classicLabel": "Classic",
+      "classicDesc": "Hold the right mouse button to turn the camera, then release to free your cursor.",
+      "mouseLabel": "Mouse Camera",
+      "mouseDesc": "The mouse always steers the camera for smooth, modern free-look.",
+      "recommended": "Recommended",
+      "note": "You can change this later under Esc, Key Bindings.",
+      "confirm": "Confirm",
+      "dismiss": "Close"
+    },
     "deeds": {
       "title": "Księga Czynów",
       "close": "Zamknij Księgę Czynów",

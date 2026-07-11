@@ -1813,6 +1813,18 @@ export const ja_JP: EnTranslations = {
       "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
       "recipeNotLearned": "そのレシピはまだ習得していません。"
     },
+    "cameraMode": {
+      "title": "カメラを選択",
+      "body": "カメラの操作方法を選んでください。",
+      "classicLabel": "クラシック",
+      "classicDesc": "マウス右ボタンを押している間カメラを回転し、離すとカーソルが解放されます。",
+      "mouseLabel": "マウスカメラ",
+      "mouseDesc": "マウスが常にカメラを操作する、滑らかで現代的なフリールックです。",
+      "recommended": "おすすめ",
+      "note": "この設定は後で Esc の「キー割り当て」から変更できます。",
+      "confirm": "決定",
+      "dismiss": "閉じる"
+    },
     "deeds": {
       "title": "功績の書",
       "close": "功績の書を閉じる",

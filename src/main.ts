@@ -2904,6 +2904,10 @@ async function startGame(
     } catch {
       // storage unavailable: worst case the intro replays next session
     }
+    // The cinematic is over, so it is now safe to offer the first-run camera-mode
+    // prompt (deferred from world entry, where the intro's input capture would make
+    // it unusable). A no-op if already seen, on a phone, or already open.
+    hud.maybeShowCameraModePrompt();
   };
   const introTaps: number[] = [];
   const skipIntro = (e: Event): void => {
@@ -2986,6 +2990,12 @@ async function startGame(
         // bags/vendor/loot open never pays the compose burst synchronously
         // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.
         prewarmIconCache(defaultIconPrewarmEntries());
+        // First-run only: offer the Classic vs Mouse Camera choice (skipped on phone
+        // touch devices and after the first answer; see hud.maybeShowCameraModePrompt).
+        // Deferred while the spawn cinematic runs (finishIntro fires it instead): the
+        // intro's capture-phase skipIntro handler eats keydown/pointerdown, so the
+        // modal would be unusable and an Escape would skip the intro, not dismiss it.
+        if (intro === null) hud.maybeShowCameraModePrompt();
         (window as any).__game = {
           sim: world,
           world,

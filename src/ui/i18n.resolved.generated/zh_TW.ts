@@ -1813,6 +1813,18 @@ export const zh_TW: EnTranslations = {
       "throttled": "你製作得太快了，請稍等片刻後再試。",
       "recipeNotLearned": "你還沒有學會這個配方。"
     },
+    "cameraMode": {
+      "title": "選擇你的鏡頭",
+      "body": "你想如何控制鏡頭？",
+      "classicLabel": "經典",
+      "classicDesc": "按住滑鼠右鍵轉動鏡頭，放開即可釋放游標。",
+      "mouseLabel": "滑鼠鏡頭",
+      "mouseDesc": "滑鼠始終操控鏡頭，實現流暢的現代自由視角。",
+      "recommended": "推薦",
+      "note": "稍後可在 Esc 的「按鍵綁定」中更改。",
+      "confirm": "確認",
+      "dismiss": "關閉"
+    },
     "deeds": {
       "title": "功績之書",
       "close": "關閉功績之書",

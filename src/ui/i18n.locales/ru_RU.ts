@@ -6858,6 +6858,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.throttled':
     'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
+  'hudChrome.cameraMode.title': 'Выберите камеру',
+  'hudChrome.cameraMode.body': 'Как вы хотите управлять камерой?',
+  'hudChrome.cameraMode.classicLabel': 'Классическая',
+  'hudChrome.cameraMode.classicDesc':
+    'Удерживайте правую кнопку мыши, чтобы поворачивать камеру, отпустите, чтобы освободить курсор.',
+  'hudChrome.cameraMode.mouseLabel': 'Камера мышью',
+  'hudChrome.cameraMode.mouseDesc':
+    'Мышь всегда управляет камерой для плавного современного свободного обзора.',
+  'hudChrome.cameraMode.recommended': 'Рекомендуется',
+  'hudChrome.cameraMode.note': 'Вы можете изменить это позже в разделе Esc, Привязка клавиш.',
+  'hudChrome.cameraMode.confirm': 'Подтвердить',
+  'hudChrome.cameraMode.dismiss': 'Закрыть',
   'hudChrome.mobile.actionPageIndicator': 'Стр. {page}',
   'hudChrome.mobile.spellbookPageLabel': 'Страница {page}',
   'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',

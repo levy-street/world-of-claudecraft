@@ -2015,6 +2015,19 @@ export const hudChromeStrings = {
   // the unlock moment (banner, log lines, retro catch-up summary). Deed
   // names, descriptions, and title strings are sim content localized through
   // deed_i18n.ts, never through these keys.
+  cameraMode: {
+    title: 'Choose Your Camera',
+    body: 'How would you like to control the camera?',
+    classicLabel: 'Classic',
+    classicDesc:
+      'Hold the right mouse button to turn the camera, then release to free your cursor.',
+    mouseLabel: 'Mouse Camera',
+    mouseDesc: 'The mouse always steers the camera for smooth, modern free-look.',
+    recommended: 'Recommended',
+    note: 'You can change this later under Esc, Key Bindings.',
+    confirm: 'Confirm',
+    dismiss: 'Close',
+  },
   deeds: {
     title: 'Book of Deeds',
     close: 'Close the Book of Deeds',

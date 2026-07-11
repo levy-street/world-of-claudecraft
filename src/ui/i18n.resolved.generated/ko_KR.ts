@@ -1813,6 +1813,18 @@ export const ko_KR: EnTranslations = {
       "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다."
     },
+    "cameraMode": {
+      "title": "카메라 선택",
+      "body": "카메라를 어떻게 조작하시겠습니까?",
+      "classicLabel": "클래식",
+      "classicDesc": "마우스 오른쪽 버튼을 누른 채로 카메라를 돌리고, 놓으면 커서가 자유로워집니다.",
+      "mouseLabel": "마우스 카메라",
+      "mouseDesc": "마우스가 항상 카메라를 조종하는 부드럽고 현대적인 자유 시점입니다.",
+      "recommended": "추천",
+      "note": "이 설정은 나중에 Esc의 키 바인딩에서 변경할 수 있습니다.",
+      "confirm": "확인",
+      "dismiss": "닫기"
+    },
     "deeds": {
       "title": "업적의 서",
       "close": "업적의 서 닫기",
