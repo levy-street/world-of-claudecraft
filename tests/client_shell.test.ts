@@ -965,9 +965,8 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain(
       "window.open(discordInviteUrl() || DISCORD_INVITE_URL, '_blank', 'noopener,noreferrer');",
     );
-    expect(mainTs).toContain(
-      "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
-    );
+    expect(mainTs).toContain('onDonate: () => {');
+    expect(mainTs).toContain("window.open(DONATE_URL, '_blank', 'noopener,noreferrer');");
   });
 
   it('ships the consumables quick bar in BOTH entries, collapsed by default', () => {
@@ -1799,7 +1798,8 @@ describe('client HTML shell', () => {
       'body.mobile-touch #petbar {\n    position: fixed;\n    left: 50%;\n    top: max(8px, env(safe-area-inset-top));',
     );
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
-    expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
+    expect(mainTs).toContain('onMenu: () => {');
+    expect(mainTs).toContain('hud.toggleOptionsMenu();');
     expect(mobileControlsTs).not.toContain("bindButton('mobile-more-chat'");
     expect(mobileControlsTs).not.toContain("bindButton('mobile-more-social'");
     expect(mobileControlsTs).not.toContain("bindButton('mobile-more-quest'");
@@ -1814,7 +1814,8 @@ describe('client HTML shell', () => {
     expect(mainTs).not.toContain('onTarget:');
     expect(mobileControlsTs).not.toContain("bindButton('mobile-target'");
     expect(mainTs).toContain('onCycleTarget: () => world.tabTarget(),');
-    expect(mainTs).toContain('hud.onMobileAttackNearest = () => attackNearest();');
+    expect(mainTs).toContain('hud.onMobileAttackNearest = () => {');
+    expect(mainTs).toContain('attackNearest();');
     expect(mobileControlsTs).toContain(
       "this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());",
     );

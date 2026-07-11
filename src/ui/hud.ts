@@ -4220,7 +4220,7 @@ export class Hud {
   // bottom-right corner, see paintMobTooltipBottomRight) rather than following the cursor.
   showMobHoverTooltip(entity: Entity, pvpOpponents: ReadonlySet<number>): void {
     // Questie-style quest lines: the objectives this mob advances, with live
-    // counts. They ride the rebuild key so a kill mid-hover repaints 3/8 -> 4/8.
+    // counts. They ride the rebuild key so a kill mid-hover repaints 1/3 -> 2/3.
     const mobQuests = questObjectivesForMob(this.sim.questLog, entity.templateId);
     const questKey = mobQuests
       .map((q) => `${q.questId}#${q.objectiveIndex}:${q.current}/${q.total}`)
@@ -8822,7 +8822,7 @@ export class Hud {
         case 'questProgress': {
           const progressText = this.localizeQuestProgressText(ev.questId, ev.text);
           this.log(progressText, '#dcd29f');
-          // The classic yellow top-center flash ("Forest Wolf slain: 3/8"); the
+          // The classic yellow top-center flash ("Forest Wolf slain: 2/3"); the
           // log line above stays the durable, announced copy.
           this.questBanner.show(progressText);
           this.refreshGossip();

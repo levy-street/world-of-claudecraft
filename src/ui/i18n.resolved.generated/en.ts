@@ -7653,7 +7653,7 @@ export const en: EnTranslations = {
       },
       "q_wolves": {
         "title": "Wolves at the Door",
-        "text": "The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, {playerName}. Slay 8 Forest Wolves and Eastbrook will breathe easier.",
+        "text": "The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, {playerName}. Slay 3 Forest Wolves and Eastbrook will breathe easier.",
         "completion": "Fine work. The road feels safer already.",
         "objectives": {
           "0": {

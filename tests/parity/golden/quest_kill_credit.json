@@ -2,15 +2,15 @@
   "scenario": "quest_kill_credit",
   "seed": 1014,
   "sampleEvery": 20,
-  "ticks": 10,
+  "ticks": 5,
   "coverage": [
     "onMobKilledForQuests kill credit via handleDeath party loop (~5925)",
     "checkQuestReady promotion (active -> ready)",
     "acceptQuest -> finalizeQuestAccept -> onInventoryChangedForQuests",
     "turnInQuest (xp + copper reward)"
   ],
-  "draws": 40,
-  "drawDigest": "0e96c13c",
+  "draws": 15,
+  "drawDigest": "fee7fea1",
   "frames": [
     {
       "tick": 0,
@@ -240,14 +240,14 @@
       ]
     },
     {
-      "tick": 8,
-      "time": 0.4,
-      "nextId": 414,
-      "state": "682a8d8d",
-      "events": "babdb250",
+      "tick": 3,
+      "time": 0.15,
+      "nextId": 409,
+      "state": "d382eac5",
+      "events": "ce0a9d42",
       "rng": {
-        "draws": 40,
-        "digest": "0e96c13c"
+        "draws": 15,
+        "digest": "fee7fea1"
       },
       "label": "quest-ready",
       "players": [
@@ -267,9 +267,9 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 8432,
-            "kills": 8,
-            "questProgress": 8
+            "damageDealt": 3162,
+            "kills": 3,
+            "questProgress": 3
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -297,7 +297,7 @@
               "q_wolves",
               {
                 "counts": [
-                  8
+                  3
                 ],
                 "questId": "q_wolves",
                 "state": "ready"
@@ -321,7 +321,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
-          "fiveSecondRule": 99.4,
+          "fiveSecondRule": 99.15,
           "hp": 50000,
           "id": 405,
           "inCombat": true,
@@ -365,14 +365,14 @@
       ]
     },
     {
-      "tick": 8,
-      "time": 0.4,
-      "nextId": 414,
-      "state": "eea48748",
+      "tick": 3,
+      "time": 0.15,
+      "nextId": 409,
+      "state": "5098d73f",
       "events": "3c24f53f",
       "rng": {
-        "draws": 40,
-        "digest": "0e96c13c"
+        "draws": 15,
+        "digest": "fee7fea1"
       },
       "label": "quest-turned-in",
       "players": [
@@ -393,9 +393,9 @@
           "companionUpgrades": {},
           "copper": 75,
           "counters": {
-            "damageDealt": 8432,
-            "kills": 8,
-            "questProgress": 8,
+            "damageDealt": 3162,
+            "kills": 3,
+            "questProgress": 3,
             "questsCompleted": 1,
             "xpGained": 250
           },
@@ -441,7 +441,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
-          "fiveSecondRule": 99.4,
+          "fiveSecondRule": 99.15,
           "hp": 50000,
           "id": 405,
           "inCombat": true,
@@ -485,14 +485,14 @@
       ]
     },
     {
-      "tick": 10,
-      "time": 0.5,
-      "nextId": 414,
-      "state": "4b2b3070",
+      "tick": 5,
+      "time": 0.25,
+      "nextId": 409,
+      "state": "e1d4bc51",
       "events": "741638a5",
       "rng": {
-        "draws": 40,
-        "digest": "0e96c13c"
+        "draws": 15,
+        "digest": "fee7fea1"
       },
       "label": "final",
       "players": [
@@ -513,9 +513,9 @@
           "companionUpgrades": {},
           "copper": 75,
           "counters": {
-            "damageDealt": 8432,
-            "kills": 8,
-            "questProgress": 8,
+            "damageDealt": 3162,
+            "kills": 3,
+            "questProgress": 3,
             "questsCompleted": 1,
             "xpGained": 250
           },
@@ -561,7 +561,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
-          "fiveSecondRule": 99.5,
+          "fiveSecondRule": 99.25,
           "hp": 50000,
           "id": 405,
           "inCombat": true,

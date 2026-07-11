@@ -56,8 +56,8 @@ describe('quest progress survives logout/login (server save -> load)', () => {
     const pid = s1.pid;
     const meta = sim.meta(pid);
 
-    // q_wolves: kill 8 forest_wolf. Seed the log with partial progress directly.
-    meta.questLog.set('q_wolves', { questId: 'q_wolves', counts: [3], state: 'active' });
+    // q_wolves: kill 3 forest_wolf. Seed the log with partial progress directly.
+    meta.questLog.set('q_wolves', { questId: 'q_wolves', counts: [2], state: 'active' });
     expect(sim.questState('q_wolves', pid)).toBe('active');
 
     // Leave => server saves the serialized character state.
@@ -73,7 +73,7 @@ describe('quest progress survives logout/login (server save -> load)', () => {
 
     expect(qp2).toBeTruthy();
     expect(qp2.state).toBe('active');
-    expect(qp2.counts[0]).toBe(3); // progress must NOT reset to 0
+    expect(qp2.counts[0]).toBe(2); // progress must NOT reset to 0
   });
 
   it('restores collect-objective progress (item-derived counts) after a rejoin', async () => {

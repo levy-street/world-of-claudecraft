@@ -1,4 +1,9 @@
 const DEFAULT_DESKTOP_API_ORIGIN = 'https://worldofclaudecraft.com';
+const GLITCH_PLATFORM_ORIGINS = new Set([
+  'https://api.glitch.fun',
+  'https://glitch.fun',
+  'https://www.glitch.fun',
+]);
 
 export function normalizeOrigin(raw: string): string {
   const trimmed = raw.trim().replace(/\/+$/, '');
@@ -8,6 +13,23 @@ export function normalizeOrigin(raw: string): string {
     throw new Error(`unsupported origin protocol: ${url.protocol}`);
   }
   return url.origin;
+}
+
+export function isGlitchPlatformOrigin(raw: string): boolean {
+  try {
+    return GLITCH_PLATFORM_ORIGINS.has(normalizeOrigin(raw));
+  } catch {
+    return false;
+  }
+}
+
+export function normalizeGameApiOrigin(raw: string): string {
+  try {
+    const origin = normalizeOrigin(raw);
+    return isGlitchPlatformOrigin(origin) ? '' : origin;
+  } catch {
+    return '';
+  }
 }
 
 export function isElectronRuntime(userAgent = globalThis.navigator?.userAgent ?? ''): boolean {
@@ -23,8 +45,18 @@ export function desktopApiOrigin(): string {
   return normalizeOrigin(configured || DEFAULT_DESKTOP_API_ORIGIN);
 }
 
-export function runtimeApiOrigin(userAgent = globalThis.navigator?.userAgent ?? ''): string {
+type RuntimeLocation = Pick<Location, 'protocol'> | undefined;
+
+export function isWebServedRuntime(location: RuntimeLocation = globalThis.location): boolean {
+  return location?.protocol === 'http:' || location?.protocol === 'https:';
+}
+
+export function runtimeApiOrigin(
+  userAgent = globalThis.navigator?.userAgent ?? '',
+  location: RuntimeLocation = globalThis.location,
+): string {
   if (String(import.meta.env.VITE_DESKTOP_RELATIVE_API ?? '') === '1') return '';
+  if (isDesktopAppRuntime(userAgent) && isWebServedRuntime(location)) return '';
   return isDesktopAppRuntime(userAgent) ? desktopApiOrigin() : '';
 }
 

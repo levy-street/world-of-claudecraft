@@ -2,6 +2,7 @@
 
 import {
   isDesktopAppRuntime,
+  normalizeGameApiOrigin,
   normalizeOrigin,
   runtimeApiOrigin,
   runtimeWebSocketUrl,
@@ -153,7 +154,9 @@ export function buildWebSocketUrl(protocol: string, host: string): string {
 }
 
 export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
-export const NATIVE_API_ORIGIN = normalizeOrigin(String(import.meta.env.VITE_API_ORIGIN ?? ''));
+export const NATIVE_API_ORIGIN = normalizeGameApiOrigin(
+  String(import.meta.env.VITE_API_ORIGIN ?? ''),
+);
 export const DESKTOP_APP = isDesktopAppRuntime();
 export const DESKTOP_API_ORIGIN = DESKTOP_APP ? runtimeApiOrigin() : '';
 
@@ -1449,7 +1452,8 @@ export class ClientWorld implements IWorld {
   }
 
   private canSendCommand(): boolean {
-    return this.connected && this.ws.readyState === WebSocket.OPEN;
+    const openState = typeof WebSocket === 'undefined' ? 1 : WebSocket.OPEN;
+    return this.connected && this.ws.readyState === openState;
   }
 
   private rawCmd(payload: Record<string, unknown>): void {

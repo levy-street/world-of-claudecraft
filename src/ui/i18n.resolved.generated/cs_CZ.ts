@@ -3193,6 +3193,7 @@ export const cs_CZ: EnTranslations = {
     "haveAccountPrompt": "Už máš účet?",
     "characters": "Postavy:",
     "createCharacter": "Vytvořit postavu",
+    "currentCharacter": "Your Current Character",
     "characterName": "Jméno postavy",
     "characterNamePlaceholder": "Jméno postavy",
     "enterWorld": "Vstoupit do světa",
@@ -4142,6 +4143,11 @@ export const cs_CZ: EnTranslations = {
     "confirmLabel": "Pro potvrzení napiš jméno postavy",
     "cancel": "Zrušit",
     "confirm": "Trvale smazat"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {

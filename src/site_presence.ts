@@ -1,23 +1,14 @@
+import { normalizeGameApiOrigin } from './runtime';
+
 const STORAGE_KEY = 'woc_site_visitor_id';
 const HEARTBEAT_MS = 45_000;
 const GLITCH_STATIC_HOST = 'glitch-game-content.s3.amazonaws.com';
-
-function normalizeHttpOrigin(raw: string): string {
-  const trimmed = raw.trim().replace(/\/+$/, '');
-  if (!trimmed) return '';
-  try {
-    const url = new URL(trimmed);
-    return url.protocol === 'http:' || url.protocol === 'https:' ? url.origin : '';
-  } catch {
-    return '';
-  }
-}
 
 export function sitePresenceEndpoint(
   location: Pick<Location, 'hostname'>,
   configuredApiOrigin = String(import.meta.env.VITE_API_ORIGIN ?? ''),
 ): string | null {
-  const apiOrigin = normalizeHttpOrigin(configuredApiOrigin);
+  const apiOrigin = normalizeGameApiOrigin(configuredApiOrigin);
   if (apiOrigin) return `${apiOrigin}/api/site-presence`;
   if (location.hostname === GLITCH_STATIC_HOST) return null;
   return '/api/site-presence';

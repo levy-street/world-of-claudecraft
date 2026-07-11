@@ -13,7 +13,7 @@ It is off by default. A Glitch-enabled build activates only when
 - Bypasses the normal World of ClaudeCraft login, realm, character, and offline
   selection screens when a valid Glitch launch install is present.
 - Exchanges the Glitch install for a normal World of ClaudeCraft online session
-  through `/api/auth/glitch`.
+  through this game's server route at `/api/auth/glitch`.
 - Enters the authoritative MMO server over the normal WebSocket world path, so
   Glitch players share the same live realm as regular web players.
 - Starts an Aegis install heartbeat every 60 seconds.
@@ -156,9 +156,29 @@ For a static `iframe` or `wasm` client-only deploy, opt in deliberately:
 ```bash
 export GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1
 export GLITCH_DEPLOYMENT_TYPE=iframe
-export GLITCH_GAME_API_ORIGIN="https://worldofclaudecraft.com"
-export VITE_API_ORIGIN="https://worldofclaudecraft.com"
+export GLITCH_GAME_API_ORIGIN="https://woc-server.example.com"
+export VITE_API_ORIGIN="https://woc-server.example.com"
 ```
+
+`GLITCH_GAME_API_ORIGIN` / `VITE_API_ORIGIN` must point at the World of
+ClaudeCraft server that hosts `/api/auth/glitch`, `/api/project-stats`, and
+the WebSocket world. For static clients, this value is game-specific and must
+not be assumed from the Desktop App, the static asset host, or the Glitch
+platform API.
+
+Do not set the game API origin to `https://www.glitch.fun`,
+`https://glitch.fun`, or `https://api.glitch.fun`. Those are Glitch platform
+origins; World of ClaudeCraft routes such as `/api/auth/glitch`,
+`/api/project-stats`, and `/api/site-presence` must be served by the WOC node
+server. Node deployments normally use same-origin `/api/...` calls, so omit
+`VITE_API_ORIGIN` unless the build intentionally talks to a separate WOC server.
+The node deploy script also sets `VITE_DESKTOP_RELATIVE_API=1` for the deployed
+client, so a Desktop App launch from the Azure Container Apps origin keeps API
+and WebSocket traffic on that same game server instead of falling back to the
+standalone World of ClaudeCraft desktop origin.
+Do not pass `GLITCH_DEPLOY_VAR_VITE_API_ORIGIN` for a node deployment unless
+`GLITCH_NODE_EXTERNAL_API_ORIGIN=1` is deliberately set for a separate WOC API
+server that already allows the deployed game origin with CORS.
 
 The external server must include the Glitch iframe origins in `WEB_ORIGINS` if a
 static client calls it cross-origin:
@@ -334,8 +354,8 @@ GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
 GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch  # static iframe/wasm only; node preflight still builds
 GLITCH_BUILD_TYPE=playtest npm run deploy:glitch
 GLITCH_DEPLOY_VERSION=0.22.0 npm run deploy:glitch
-GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=iframe npm run deploy:glitch
-GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=wasm npm run deploy:glitch
+GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=iframe GLITCH_GAME_API_ORIGIN=https://dev.worldofclaudecraft.com npm run deploy:glitch
+GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=wasm GLITCH_GAME_API_ORIGIN=https://dev.worldofclaudecraft.com npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_GAME_API_ORIGIN=https://dev.worldofclaudecraft.com npm run deploy:glitch
 ```
 

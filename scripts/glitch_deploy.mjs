@@ -11,6 +11,11 @@ const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const CLI_DIR = path.join(os.tmpdir(), 'world-of-claudecraft-glitch-cli-deploy');
 const CLI_REPO = 'https://github.com/Glitch-Gaming-Platform/Glitch-Cli-Deploy.git';
 const TITLE_ID = '8254e0f9-6c3a-4c94-8a16-570157b9df3b';
+const GLITCH_PLATFORM_ORIGINS = new Set([
+  'https://api.glitch.fun',
+  'https://glitch.fun',
+  'https://www.glitch.fun',
+]);
 
 loadEnvFile(path.join(ROOT, '.env'));
 loadEnvFile(path.join(ROOT, '.env.local'));
@@ -23,8 +28,8 @@ const deploymentType = env.GLITCH_DEPLOYMENT_TYPE || 'node';
 const nodeDeployment = deploymentType === 'node';
 const staticClientDeployment = deploymentType === 'iframe' || deploymentType === 'wasm';
 const entryPoint = env.GLITCH_ENTRY_POINT || 'index.html';
-const gameApiOrigin =
-  env.VITE_API_ORIGIN || env.GLITCH_GAME_API_ORIGIN || 'https://worldofclaudecraft.com';
+const configuredGameApiOrigin = env.VITE_API_ORIGIN || env.GLITCH_GAME_API_ORIGIN || '';
+const gameApiOrigin = configuredGameApiOrigin || 'https://worldofclaudecraft.com';
 const dryRun = env.GLITCH_DEPLOY_DRY_RUN === '1';
 const skipBuild = env.GLITCH_DEPLOY_SKIP_BUILD === '1';
 const azurePostDeploy = env.GLITCH_AZURE_POST_DEPLOY !== '0';
@@ -62,6 +67,19 @@ if (!clientTitleToken && !skipBuild) {
 if (staticClientDeployment && env.GLITCH_ALLOW_STATIC_CLIENT_DEPLOY !== '1') {
   fail(
     'World of ClaudeCraft is a Node-backed MMO. Use GLITCH_DEPLOYMENT_TYPE=node for shared-world deploys, or set GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 for a static iframe/wasm client build.',
+  );
+}
+
+if (staticClientDeployment && !configuredGameApiOrigin) {
+  fail(
+    'Static Glitch client deployments must set GLITCH_GAME_API_ORIGIN or VITE_API_ORIGIN to the World of ClaudeCraft server origin that serves /api/auth/glitch.',
+  );
+}
+
+if (staticClientDeployment && configuredGameApiOrigin) {
+  assertWorldGameApiOrigin(
+    configuredGameApiOrigin,
+    env.VITE_API_ORIGIN ? 'VITE_API_ORIGIN' : 'GLITCH_GAME_API_ORIGIN',
   );
 }
 
@@ -225,6 +243,7 @@ function nodePublicBuildEnv(sourceEnv) {
     ],
     ['VITE_GLITCH_TITLE_TOKEN', clientTitleToken],
     ['VITE_GLITCH_DEFAULT_CLASS', sourceEnv.VITE_GLITCH_DEFAULT_CLASS || 'warrior'],
+    ['VITE_DESKTOP_RELATIVE_API', '1'],
   ]);
   if (sourceEnv.VITE_GLITCH_API_BASE_URL) {
     vars.set('VITE_GLITCH_API_BASE_URL', sourceEnv.VITE_GLITCH_API_BASE_URL);
@@ -232,8 +251,13 @@ function nodePublicBuildEnv(sourceEnv) {
   if (sourceEnv.VITE_TURNSTILE_SITEKEY) {
     vars.set('VITE_TURNSTILE_SITEKEY', sourceEnv.VITE_TURNSTILE_SITEKEY);
   }
-  if (sourceEnv.GLITCH_NODE_EXTERNAL_API_ORIGIN === '1' && sourceEnv.VITE_API_ORIGIN) {
-    vars.set('VITE_API_ORIGIN', sourceEnv.VITE_API_ORIGIN);
+  const externalApiOrigin = sourceEnv.VITE_API_ORIGIN || sourceEnv.GLITCH_GAME_API_ORIGIN;
+  if (sourceEnv.GLITCH_NODE_EXTERNAL_API_ORIGIN === '1' && externalApiOrigin) {
+    assertWorldGameApiOrigin(
+      externalApiOrigin,
+      sourceEnv.VITE_API_ORIGIN ? 'VITE_API_ORIGIN' : 'GLITCH_GAME_API_ORIGIN',
+    );
+    vars.set('VITE_API_ORIGIN', externalApiOrigin);
   }
   return `${[...vars].map(([key, value]) => `${key}=${JSON.stringify(String(value))}`).join('\n')}\n`;
 }
@@ -242,7 +266,12 @@ function customVariables(sourceEnv) {
   const vars = new Map();
   for (const [key, value] of Object.entries(sourceEnv)) {
     if (key.startsWith('GLITCH_DEPLOY_VAR_') && value !== undefined) {
-      vars.set(key.slice('GLITCH_DEPLOY_VAR_'.length), value);
+      const variableName = key.slice('GLITCH_DEPLOY_VAR_'.length);
+      if (variableName === 'VITE_API_ORIGIN') {
+        assertNodeExternalApiOriginEnabled(key);
+        assertWorldGameApiOrigin(value, key);
+      }
+      vars.set(variableName, value);
     }
   }
   if (!nodeDeployment) return vars;
@@ -252,6 +281,7 @@ function customVariables(sourceEnv) {
   vars.set('GLITCH_TITLE_ID', sourceEnv.GLITCH_TITLE_ID || TITLE_ID);
   vars.set('VITE_GLITCH_ENABLED', '1');
   vars.set('VITE_GLITCH_TITLE_ID', sourceEnv.VITE_GLITCH_TITLE_ID || TITLE_ID);
+  vars.set('VITE_DESKTOP_RELATIVE_API', '1');
   for (const key of [
     'DATABASE_URL',
     'PUBLIC_ORIGIN',
@@ -265,8 +295,13 @@ function customVariables(sourceEnv) {
   ]) {
     if (sourceEnv[key]) vars.set(key, sourceEnv[key]);
   }
-  if (sourceEnv.GLITCH_NODE_EXTERNAL_API_ORIGIN === '1' && sourceEnv.VITE_API_ORIGIN) {
-    vars.set('VITE_API_ORIGIN', sourceEnv.VITE_API_ORIGIN);
+  const externalApiOrigin = sourceEnv.VITE_API_ORIGIN || sourceEnv.GLITCH_GAME_API_ORIGIN;
+  if (sourceEnv.GLITCH_NODE_EXTERNAL_API_ORIGIN === '1' && externalApiOrigin) {
+    assertWorldGameApiOrigin(
+      externalApiOrigin,
+      sourceEnv.VITE_API_ORIGIN ? 'VITE_API_ORIGIN' : 'GLITCH_GAME_API_ORIGIN',
+    );
+    vars.set('VITE_API_ORIGIN', externalApiOrigin);
   }
   return vars;
 }
@@ -1140,6 +1175,34 @@ async function sleepRemaining(deadline, maxSleepMs) {
 function readPositiveMs(key, fallback) {
   const value = Number(env[key]);
   return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
+function normalizeHttpOrigin(raw) {
+  const trimmed = String(raw || '')
+    .trim()
+    .replace(/\/+$/, '');
+  if (!trimmed) return '';
+  try {
+    const url = new URL(trimmed);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.origin : '';
+  } catch {
+    return '';
+  }
+}
+
+function assertWorldGameApiOrigin(value, sourceName) {
+  const origin = normalizeHttpOrigin(value);
+  if (!origin || !GLITCH_PLATFORM_ORIGINS.has(origin)) return;
+  fail(
+    `${sourceName} is set to ${origin}, but World of ClaudeCraft API calls such as /api/auth/glitch, /api/project-stats, and /api/site-presence must point to the WOC server origin, not the Glitch platform origin.`,
+  );
+}
+
+function assertNodeExternalApiOriginEnabled(sourceName) {
+  if (!nodeDeployment || env.GLITCH_NODE_EXTERNAL_API_ORIGIN === '1') return;
+  fail(
+    `${sourceName} must not set VITE_API_ORIGIN for a Glitch node deployment. Node deployments serve the WOC API from the same origin; set GLITCH_NODE_EXTERNAL_API_ORIGIN=1 only when intentionally using a separate WOC API server with CORS configured.`,
+  );
 }
 
 function loadEnvFile(file) {

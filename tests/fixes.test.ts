@@ -86,7 +86,7 @@ describe('quest lifecycle', () => {
     expect(zoneWelcomeText(starterZone, (questId) => sim.questState(questId))).toBeNull();
 
     const qp = sim.questLog.get('q_wolves')!;
-    qp.counts[0] = 8;
+    qp.counts[0] = 3;
     qp.state = 'ready';
 
     teleportTo(sim, redbrook.pos.x + 2, redbrook.pos.z + 2);
@@ -118,7 +118,7 @@ describe('quest lifecycle', () => {
     expect(sim.questState('q_wolves')).toBe('active');
 
     const qp = sim.questLog.get('q_wolves')!;
-    qp.counts[0] = 8;
+    qp.counts[0] = 3;
     qp.state = 'ready';
 
     teleportTo(sim, redbrook.pos.x + 2, redbrook.pos.z + 2);

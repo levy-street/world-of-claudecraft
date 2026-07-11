@@ -24,6 +24,17 @@ describe('Glitch static runtime URLs', () => {
     );
   });
 
+  it('does not send WOC site presence to Glitch platform web origins', () => {
+    expect(
+      sitePresenceEndpoint(
+        {
+          hostname: 'world-of-claudecraft-node.graywater-acc59434.eastus.azurecontainerapps.io',
+        } as Location,
+        'https://www.glitch.fun',
+      ),
+    ).toBe('/api/site-presence');
+  });
+
   it('keeps runtime cursor URLs document-relative for nested Glitch build pages', () => {
     expect(cursorUrlForBase('gauntlet.png', 6, 4, 'pointer', './')).toBe(
       'url("./ui/cursors/gauntlet.png") 6 4, pointer',
