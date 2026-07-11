@@ -40,6 +40,7 @@ const baseEnTable = {
   'error.bankCannotAfford': 'You cannot afford that bank expansion.',
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
+  'error.mountCombat': "You can't mount in combat.",
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
   'error.specLevel': 'You may choose a specialization at level {level}.',
   'error.equipLevel': 'You must be level {level} to equip that.',

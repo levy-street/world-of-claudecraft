@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Briglia del cervo silvano',
+  'entities.items.mount_swamp_raptor.name': 'Sella del raptor palustre',
+  'entities.items.mount_emerald_wyrm.name': 'Redini del wyrm di smeraldo',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Maestra di scuderia',
+  'entities.npcs.stable_master_wren.greeting': 'Ogni eroe ha bisogno di una cavalcatura, {className}. Il cervo è costante, il raptor è rapido e il wyrm... il wyrm vola.',
   'entities.abilities.sport_boot.description':
     'Un calcione alto e lungo verso il punto mirato. La folla lo adora.',
   'entities.abilities.sport_boot.name': 'Calcione',

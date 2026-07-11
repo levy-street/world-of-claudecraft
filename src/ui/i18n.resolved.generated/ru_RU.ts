@@ -6558,6 +6558,15 @@ export const ru_RU: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Простая удочка"
       },
+      "mount_forest_stag": {
+        "name": "Уздечка лесного оленя"
+      },
+      "mount_swamp_raptor": {
+        "name": "Седло болотного раптора"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Поводья изумрудного змея"
+      },
       "tangled_weed": {
         "name": "Спутанные водоросли"
       },
@@ -7617,6 +7626,11 @@ export const ru_RU: EnTranslations = {
         "name": "Брат Хальвен",
         "title": "Хранитель Реликвария",
         "greeting": "Тропа вела на север. Ещё один реликварий, ещё один обряд. Выбирай уровень, и я буду держать верёвку, пока ты не вернёшься."
+      },
+      "stable_master_wren": {
+        "name": "Рен Сэдлворт",
+        "title": "Смотрительница конюшни",
+        "greeting": "Каждому герою нужен скакун, {className}. Олень надёжен, раптор быстр, а змей... змей летает."
       },
       "spirit_healer": {
         "name": "Целитель душ",

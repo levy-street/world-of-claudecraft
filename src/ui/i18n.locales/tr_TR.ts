@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Orman Geyiği Dizgini',
+  'entities.items.mount_swamp_raptor.name': 'Mızrakçene Eyeri',
+  'entities.items.mount_emerald_wyrm.name': 'Zümrüt Ejder Dizginleri',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Ahır Ustası',
+  'entities.npcs.stable_master_wren.greeting': 'Her kahramanın bir bineğe ihtiyacı var, {className}. Geyik sağlamdır, raptor hızlıdır, ejder ise... ejder uçar.',
   'itemUi.vendor.sellItemAria': '{item} öğesini {price} karşılığında sat',
   'itemUi.vendor.sellRolledWarning': 'Rastgele özellikler geri satın almayla kurtarılamaz.',
   'loading.tips.classes':

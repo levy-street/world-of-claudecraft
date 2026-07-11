@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Uzda lesního jelena',
+  'entities.items.mount_swamp_raptor.name': 'Sedlo bahenního ještěra',
+  'entities.items.mount_emerald_wyrm.name': 'Otěže smaragdového wyrma',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Stájník',
+  'entities.npcs.stable_master_wren.greeting': 'Každý hrdina potřebuje oře, {className}. Jelen je stálý, ještěr rychlý a wyrm... wyrm létá.',
   'entities.abilities.sport_boot.description':
     'Dlouhý vysoký odkop směrem k zaměřovanému bodu. Dav to miluje.',
   'entities.abilities.sport_boot.name': 'Velký odkop',

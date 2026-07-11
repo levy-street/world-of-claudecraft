@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "7301c7f4",
+      "nextId": 407,
+      "state": "f9f2bda8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,7 +44,7 @@
           "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 406,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -79,7 +79,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 405,
+          "id": 406,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -124,9 +124,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 417,
-      "state": "389dc174",
-      "events": "2758fde1",
+      "nextId": 418,
+      "state": "2ff349dd",
+      "events": "b291ba36",
       "rng": {
         "draws": 3,
         "digest": "ad960248"
@@ -135,9 +135,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 417,
-      "state": "9af029d4",
-      "events": "9cfda0e2",
+      "nextId": 418,
+      "state": "61f74d3d",
+      "events": "a3b147e3",
       "rng": {
         "draws": 3,
         "digest": "ad960248"
@@ -146,8 +146,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 417,
-      "state": "d966255a",
+      "nextId": 418,
+      "state": "fa22ea4b",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -157,8 +157,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 417,
-      "state": "8a6566e4",
+      "nextId": 418,
+      "state": "e10c804d",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -168,8 +168,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 417,
-      "state": "ef2279e6",
+      "nextId": 418,
+      "state": "1c3a8397",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -179,8 +179,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 417,
-      "state": "537c4848",
+      "nextId": 418,
+      "state": "32ce4cd1",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -190,9 +190,9 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 418,
-      "state": "ac1c4f5a",
-      "events": "b6936edd",
+      "nextId": 419,
+      "state": "ccd9144b",
+      "events": "25f3cd2e",
       "rng": {
         "draws": 3,
         "digest": "ad960248"
@@ -223,7 +223,7 @@
           "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 406,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -259,7 +259,7 @@
           "dodgeChance": 0.0715,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 405,
+          "id": 406,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -309,7 +309,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 416,
+          "id": 417,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -342,8 +342,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 418,
-      "state": "8028038a",
+      "nextId": 419,
+      "state": "83a8edbb",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -353,8 +353,8 @@
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 418,
-      "state": "d54969a6",
+      "nextId": 419,
+      "state": "52120557",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -386,7 +386,7 @@
           "craftThrottle": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 406,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -422,7 +422,7 @@
           "dodgeChance": 0.0715,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 405,
+          "id": 406,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -472,7 +472,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 416,
+          "id": 417,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

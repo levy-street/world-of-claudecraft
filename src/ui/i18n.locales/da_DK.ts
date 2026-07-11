@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Skovhjortens hovedtøj',
+  'entities.items.mount_swamp_raptor.name': 'Spydkæbe-sadel',
+  'entities.items.mount_emerald_wyrm.name': 'Smaragdlindorm-tøjler',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Staldmester',
+  'entities.npcs.stable_master_wren.greeting': 'Enhver helt har brug for en ganger, {className}. Hjorten er stabil, raptoren er hurtig, og lindormen... lindormen flyver.',
   'entities.abilities.sport_boot.description':
     'Et langt, højt spark mod sigtepunktet. Publikum elsker det.',
   'entities.abilities.sport_boot.name': 'Kæmpespark',

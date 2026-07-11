@@ -6558,6 +6558,15 @@ export const zh_CN: EnTranslations = {
       "simple_fishing_pole": {
         "name": "简易鱼竿"
       },
+      "mount_forest_stag": {
+        "name": "森林雄鹿缰辔"
+      },
+      "mount_swamp_raptor": {
+        "name": "枪颚迅猛龙鞍"
+      },
+      "mount_emerald_wyrm": {
+        "name": "翡翠巨龙缰绳"
+      },
       "tangled_weed": {
         "name": "缠结水草"
       },
@@ -7617,6 +7626,11 @@ export const zh_CN: EnTranslations = {
         "name": "哈尔文修士",
         "title": "圣物库守护人",
         "greeting": "小径向北延伸。又一座圣物库，又一场仪式。选择你的难度，我会为你守住绳索，直到你归来。"
+      },
+      "stable_master_wren": {
+        "name": "雷恩·鞍值",
+        "title": "马厩总管",
+        "greeting": "每位英雄都需要坐骑，{className}。雄鹿沉稳，迅猛龙迅捷，而巨龙……巨龙会飞。"
       },
       "spirit_healer": {
         "name": "灵魂医者",

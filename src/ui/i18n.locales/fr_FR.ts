@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Bride de cerf des bois',
+  'entities.items.mount_swamp_raptor.name': 'Selle de raptor-harpon',
+  'entities.items.mount_emerald_wyrm.name': 'Rênes du ver émeraude',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Maîtresse d\'écurie',
+  'entities.npcs.stable_master_wren.greeting': 'Tout héros a besoin d\'une monture, {className}. Le cerf est sûr, le raptor est rapide, et le ver... le ver vole.',
   'entities.abilities.sport_boot.description':
     'Une longue balle bottée en cloche vers le point visé. La foule adore.',
   'entities.abilities.sport_boot.name': 'Grosse botte',

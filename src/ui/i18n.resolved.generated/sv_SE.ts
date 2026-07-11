@@ -6558,6 +6558,15 @@ export const sv_SE: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Enkelt metspö"
       },
+      "mount_forest_stag": {
+        "name": "Skogshjortens betsel"
+      },
+      "mount_swamp_raptor": {
+        "name": "Spjutkäft-sadel"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Smaragdlindorm-tyglar"
+      },
       "tangled_weed": {
         "name": "Tilltrasslat ogräs"
       },
@@ -7617,6 +7626,11 @@ export const sv_SE: EnTranslations = {
         "name": "Broder Halven",
         "title": "Relikvarieväktare",
         "greeting": "Spåret ledde norrut. Ännu ett relikvarium, ännu en rit. Välj din svårighetsgrad, så håller jag repet tills du kommer tillbaka."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Stallmästare",
+        "greeting": "Varje hjälte behöver en riddjur, {className}. Hjorten är stadig, raptorn är snabb, och lindormen... lindormen flyger."
       },
       "spirit_healer": {
         "name": "Den bleka väktaren",

@@ -6558,6 +6558,15 @@ export const nl_NL: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Eenvoudige Hengel"
       },
+      "mount_forest_stag": {
+        "name": "Woudhert-hoofdstel"
+      },
+      "mount_swamp_raptor": {
+        "name": "Speerkaak-zadel"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Smaragdwyrm-teugels"
+      },
       "tangled_weed": {
         "name": "Verstrengeld Onkruid"
       },
@@ -7617,6 +7626,11 @@ export const nl_NL: EnTranslations = {
         "name": "Broeder Halven",
         "title": "Reliekbewaarder",
         "greeting": "Het spoor leidde noordwaarts. Weer een reliekschrijn, weer een ritueel. Kies je moeilijkheid, en ik houd het touw vast tot je terugkeert."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Stalmeester",
+        "greeting": "Elke held heeft een rijdier nodig, {className}. Het hert is betrouwbaar, de raptor is snel, en de wyrm... de wyrm vliegt."
       },
       "spirit_healer": {
         "name": "De Bleke Hoeder",

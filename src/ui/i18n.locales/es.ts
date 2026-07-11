@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Brida de ciervo del bosque',
+  'entities.items.mount_swamp_raptor.name': 'Silla de raptor lancero',
+  'entities.items.mount_emerald_wyrm.name': 'Riendas del vermis esmeralda',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Maestra de establos',
+  'entities.npcs.stable_master_wren.greeting': 'Cada héroe necesita una montura, {className}. El ciervo es firme, el raptor es veloz y el vermis... el vermis vuela.',
   'entities.abilities.sport_boot.description':
     'Un patadón largo y elevado hacia el punto de mira. El público lo adora.',
   'entities.abilities.sport_boot.name': 'Patadón',

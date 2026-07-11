@@ -6558,6 +6558,15 @@ export const pt_BR: EnTranslations = {
       "simple_fishing_pole": {
         "name": "Vara de pesca simples"
       },
+      "mount_forest_stag": {
+        "name": "Rédea do cervo da floresta"
+      },
+      "mount_swamp_raptor": {
+        "name": "Sela do raptor do pântano"
+      },
+      "mount_emerald_wyrm": {
+        "name": "Rédeas do vorme esmeralda"
+      },
       "tangled_weed": {
         "name": "Erva emaranhada"
       },
@@ -7617,6 +7626,11 @@ export const pt_BR: EnTranslations = {
         "name": "Irmão Halven",
         "title": "Guardião do Relicário",
         "greeting": "A trilha levou ao norte. Outro relicário, outro rito. Escolha sua dificuldade, e eu seguro a corda até você voltar."
+      },
+      "stable_master_wren": {
+        "name": "Wren Saddleworth",
+        "title": "Mestra dos estábulos",
+        "greeting": "Cada herói precisa de uma montaria, {className}. O cervo é firme, o raptor é veloz e o vorme... o vorme voa."
       },
       "spirit_healer": {
         "name": "O Guardião Pálido",

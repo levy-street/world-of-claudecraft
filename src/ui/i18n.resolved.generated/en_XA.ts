@@ -6558,6 +6558,15 @@ export const en_XA: EnTranslations = {
       "simple_fishing_pole": {
         "name": "[Šíɱþļé Ƒíšĥíñĝ Þóļé]"
       },
+      "mount_forest_stag": {
+        "name": "[Ƒóŕéšţ Šţáĝ Ɓŕíðļé]"
+      },
+      "mount_swamp_raptor": {
+        "name": "[Šþéáŕĵáŵ Šáððļé]"
+      },
+      "mount_emerald_wyrm": {
+        "name": "[Éɱéŕáļð Ŵýŕɱ Ŕéíñš]"
+      },
       "tangled_weed": {
         "name": "[Ţáñĝļéð Ŵééð]"
       },
@@ -7617,6 +7626,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ɓŕóţĥéŕ Ĥáļʋéñ]",
         "title": "[Ŕéļíɋúáŕý Ķééþéŕ]",
         "greeting": "[Ţĥé ţŕáíļ ļéð ñóŕţĥ. Áñóţĥéŕ ŕéļíɋúáŕý, áñóţĥéŕ ŕíţé. Çĥóóšé ýóúŕ ţíéŕ, áñð Í'ļļ ĥóļð ţĥé ŕóþé úñţíļ ýóú ŕéţúŕñ.]"
+      },
+      "stable_master_wren": {
+        "name": "[Ŵŕéñ Šáððļéŵóŕţĥ]",
+        "title": "[Šţáƀļé Ɱášţéŕ]",
+        "greeting": "[Éʋéŕý ĥéŕó ñééðš á šţééð, {className}. Ţĥé šţáĝ íš šţéáðý, ţĥé ŕáþţóŕ íš ƒášţ, áñð ţĥé ŵýŕɱ... ţĥé ŵýŕɱ ƒļíéš.]"
       },
       "spirit_healer": {
         "name": "[Ţĥé Þáļé Ķééþéŕ]",

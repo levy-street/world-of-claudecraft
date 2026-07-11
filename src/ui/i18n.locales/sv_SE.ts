@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': 'Skogshjortens betsel',
+  'entities.items.mount_swamp_raptor.name': 'Spjutkäft-sadel',
+  'entities.items.mount_emerald_wyrm.name': 'Smaragdlindorm-tyglar',
+  'entities.npcs.stable_master_wren.name': 'Wren Saddleworth',
+  'entities.npcs.stable_master_wren.title': 'Stallmästare',
+  'entities.npcs.stable_master_wren.greeting': 'Varje hjälte behöver en riddjur, {className}. Hjorten är stadig, raptorn är snabb, och lindormen... lindormen flyger.',
   'entities.abilities.sport_boot.description':
     'En lång, hög spark mot siktpunkten. Publiken älskar den.',
   'entities.abilities.sport_boot.name': 'Storspark',

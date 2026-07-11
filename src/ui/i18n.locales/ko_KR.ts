@@ -14,6 +14,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'entities.items.mount_forest_stag.name': '숲 수사슴 굴레',
+  'entities.items.mount_swamp_raptor.name': '창턱 랩터 안장',
+  'entities.items.mount_emerald_wyrm.name': '에메랄드 윔 고삐',
+  'entities.npcs.stable_master_wren.name': '렌 새들워스',
+  'entities.npcs.stable_master_wren.title': '마구간지기',
+  'entities.npcs.stable_master_wren.greeting': '영웅에겐 탈것이 필요하지, {className}. 수사슴은 듬직하고, 랩터는 빠르고, 윔은... 윔은 하늘을 난다네.',
   'itemUi.vendor.sellItemAria': '{item}을(를) {price}에 판매',
   'hudChrome.itemHeroicTag': '[영웅]',
   'hudChrome.options.done': '완료',

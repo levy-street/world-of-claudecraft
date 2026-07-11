@@ -6558,6 +6558,15 @@ export const ja_JP: EnTranslations = {
       "simple_fishing_pole": {
         "name": "簡素な釣り竿"
       },
+      "mount_forest_stag": {
+        "name": "森の牡鹿の手綱"
+      },
+      "mount_swamp_raptor": {
+        "name": "槍顎ラプターの鞍"
+      },
+      "mount_emerald_wyrm": {
+        "name": "エメラルドワームの手綱"
+      },
       "tangled_weed": {
         "name": "絡まった水草"
       },
@@ -7617,6 +7626,11 @@ export const ja_JP: EnTranslations = {
         "name": "ハルヴェン修道士",
         "title": "聖遺物庫の番人",
         "greeting": "道は北へ続いていた。また聖遺物庫、また儀式。難易度を選べ、お前が戻るまで縄を握っていよう。"
+      },
+      "stable_master_wren": {
+        "name": "レン・サドルワース",
+        "title": "厩舎長",
+        "greeting": "英雄には乗騎が要るのだ、{className}。牡鹿は堅実、ラプターは俊足、そしてワームは……ワームは空を飛ぶ。"
       },
       "spirit_healer": {
         "name": "霊魂の癒し手",

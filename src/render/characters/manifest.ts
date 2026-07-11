@@ -610,6 +610,30 @@ export const VISUALS: Record<string, VisualDef> = {
       hit: ['Armature|Block5|baselayer'],
     },
   },
+  // Rideable mount rigs (src/sim/content/mounts.ts): the player renders ON
+  // these bodies while the mount_<id> aura is up (renderer form-swap).
+  mount_stag: {
+    url: `${CREATURES}/stag.glb`,
+    height: 2.1,
+    clips: animal(['Attack_Headbutt', 'Attack']),
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mount_raptor: {
+    url: `${CREATURES}/velociraptor.glb`,
+    height: 2.0,
+    clips: VELOCIRAPTOR,
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mount_wyrm: {
+    url: `${CREATURES}/dragonevolved.glb`,
+    height: 2.6,
+    hover: 0.45,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
   mob_stag: {
     url: `${CREATURES}/stag.glb`,
     height: 1.9,
