@@ -4155,7 +4155,10 @@
     top: 64px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 60;
+    /* Above every in-game surface (windows are z 20, banners/drawers top out
+       at 340): the 30s prompt must never hide behind another panel. Only the
+       app-update backdrop (700) and the system gates (100000) outrank it. */
+    z-index: 500;
     width: 320px;
     max-width: 94%;
     padding: 12px 14px;
