@@ -48,6 +48,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
+    shadowSpellPowerBonus: 0,
     meleeHaste: 0,
     rangedHaste: 0,
     spellHaste: 0,
@@ -213,6 +214,7 @@ export function recalcPlayerStats(
   };
   const setCounts = new Map<string, number>();
   let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
+  let shadowSpBonus = 0; // Shadow-school-ONLY spell power (Gloamveil Form)
   let bonusCritRating = 0;
   let bonusHasteRating = 0;
   for (const slot of EQUIP_SLOTS) {
@@ -319,11 +321,14 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_ap_pct') buffApPct += a.value / 100;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
-    // Caster forms (Shadowform, Moonkin Form) carry their Spell Power bonus in
-    // the form aura's value, so the bonus lives and dies with the one toggle.
-    else if (a.kind === 'form_shadow' || a.kind === 'form_moonkin') {
+    // Caster forms carry their Spell Power bonus in the form aura's value, so it lives
+    // and dies with the one toggle. Gloamveil Form (form_shadow) is SHADOW-SCHOOL ONLY:
+    // its power routes to shadowSpBonus so it never strengthens a non-Shadow spell.
+    // Moonkin Form stays generic (a Balance druid's whole kit is arcane/nature).
+    else if (a.kind === 'form_shadow') shadowSpBonus += a.value;
+    else if (a.kind === 'form_moonkin') {
       bonusSp += a.value;
-      if (a.kind === 'form_moonkin') moonkinForm = true;
+      moonkinForm = true;
     }
   }
   // Talent passive stat modifiers (flat additions + a stamina percent before the
@@ -435,6 +440,8 @@ export function recalcPlayerStats(
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
   e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
+  // Shadow-school-only spell power (Gloamveil Form), kept off the generic spellPower.
+  e.shadowSpellPowerBonus = Math.max(0, Math.round(shadowSpBonus));
   e.critRating = bonusCritRating + setEff.critRating;
   e.hasteRating = bonusHasteRating + setEff.hasteRating;
   const hasteFrac = setEff.haste + hasteFractionFromRating(e.hasteRating);

@@ -50,11 +50,18 @@ export function dotTotalCoeff(durationSec: number): number {
 // melee Attack Power for physical-school specials, otherwise Spell Power. Reads
 // only the three derived combat ratings off the entity.
 export function abilityScalingPower(
-  e: Pick<Entity, 'spellPower' | 'rangedPower' | 'attackPower'>,
+  e: Pick<Entity, 'spellPower' | 'rangedPower' | 'attackPower'> & {
+    shadowSpellPowerBonus?: number;
+  },
   def: AbilityDef,
 ): number {
   if (def.scalesWith === 'ranged') return e.rangedPower;
   if (def.school === 'physical') return e.attackPower;
+  // Gloamveil Form's spell power is Shadow-school ONLY, so it is added here for a shadow
+  // spell instead of being baked into the generic spellPower (where it would leak onto
+  // a priest's occasional non-shadow cast). Callers with a narrower scaling shape (the UI
+  // estimate) omit the field and treat it as 0.
+  if (def.school === 'shadow') return e.spellPower + (e.shadowSpellPowerBonus ?? 0);
   return e.spellPower;
 }
 

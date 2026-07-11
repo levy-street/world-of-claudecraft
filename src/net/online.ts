@@ -892,6 +892,7 @@ function blankEntity(id: number): Entity {
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
+    shadowSpellPowerBonus: 0,
     meleeHaste: 0,
     rangedHaste: 0,
     spellHaste: 0,

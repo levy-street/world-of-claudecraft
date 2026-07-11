@@ -3,9 +3,10 @@
 //  - Demonology's redirected pet damage must not re-apply the source's output mods (F7)
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
+import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import { abilityScalingPower } from '../src/sim/spell_scaling';
+import type { AbilityDef, Aura, Entity } from '../src/sim/types';
 
 describe('mastery does not corrupt utility rate buffs (F1)', () => {
   it("an Elemental shaman's spell-damage mastery leaves Ghost Wolf's 1.4x speed intact", () => {
@@ -18,6 +19,40 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const gw = sim.resolvedAbility('ghost_wolf', sim.playerId);
     const buff = gw?.effects.find((e) => e.type === 'selfBuff');
     expect(buff && 'value' in buff ? buff.value : null).toBe(1.4);
+  });
+});
+
+describe('Gloamveil Form spell power is Shadow-school only (F6)', () => {
+  it('adds its +15 to shadow spells only, not to the generic spell power or other schools', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'priest', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const p = sim.entities.get(sim.playerId) as Entity;
+    const meta = (sim as unknown as { players: Map<number, unknown> }).players.get(sim.playerId);
+    const mods = (sim as unknown as { playerMods(m: unknown): unknown }).playerMods(meta);
+    const eq = (meta as { equipment: unknown }).equipment;
+    const eqi = (meta as { equipmentInstance: unknown }).equipmentInstance;
+
+    const spBefore = p.spellPower;
+    // Enter Gloamveil Form (form_shadow, value 15) and re-derive stats.
+    p.auras.push({
+      kind: 'form_shadow',
+      name: 'Gloamveil Form',
+      value: 15,
+      remaining: 3600,
+      duration: 3600,
+      sourceId: p.id,
+      school: 'shadow',
+    } as Aura);
+    recalcPlayerStats(p, 'priest', eq as never, mods as never, eqi as never);
+
+    // The +15 lives in the shadow-only channel, NOT the generic spell power.
+    expect(p.shadowSpellPowerBonus).toBe(15);
+    expect(p.spellPower).toBe(spBefore);
+
+    const shadowSpell = { school: 'shadow' } as AbilityDef;
+    const holySpell = { school: 'holy' } as AbilityDef;
+    expect(abilityScalingPower(p, shadowSpell)).toBe(p.spellPower + 15);
+    expect(abilityScalingPower(p, holySpell)).toBe(p.spellPower);
   });
 });
 
