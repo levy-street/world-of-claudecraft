@@ -3166,6 +3166,12 @@ export class Sim {
     // from a sane baseline (virtualLevel never falls below the real level). Only
     // ever raises it — lifetimeXp is monotonic.
     r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
+    // Re-bake the flat talent mods at the new level before the stat + ability pass:
+    // spec mastery magnitudes scale with level (min(1, level/20)), so a dev/GM level
+    // jump must strengthen (or weaken) the mastery, exactly like the live ding path
+    // (combat/damage.ts grantXp). Without this a level-jumped character keeps the
+    // mastery baked at the OLD level.
+    r.meta.talentMods = computeTalentModifiers(r.meta.cls, r.meta.talents, r.e.level);
     recalcPlayerStats(
       r.e,
       r.meta.cls,

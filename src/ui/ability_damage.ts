@@ -56,9 +56,11 @@ export function abilityDamageBonus(
         : directHitBonus(power, def, res.castTime, false);
     case 'aoeDamage':
     case 'aoeRoot':
+    case 'chainDamage':
       // A channelled AoE (Rain of Fire, Hurricane, Volley) pulses through the
       // channel-tick path in casting_lifecycle, which adds channelTickBonus to
-      // each pulse, not the single-cast AoE coefficient.
+      // each pulse, not the single-cast AoE coefficient. chainDamage (Hallowed Wall
+      // bounce) is a one-shot AoE hit, so it takes the same AoE coefficient.
       return def.channel
         ? channelTickBonus(power, def)
         : directHitBonus(power, def, res.castTime, true);

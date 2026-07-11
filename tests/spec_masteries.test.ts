@@ -222,6 +222,22 @@ describe('spec masteries', () => {
     expect(at20).toBeGreaterThan(at10);
   });
 
+  it('setPlayerLevel re-bakes level-scaled mastery (dev/GM cap-level path)', () => {
+    // Spec is chosen FIRST (baked at 20), then the level is jumped down: the mastery
+    // must re-bake to the new level, not keep its old-level strength. Before the fix,
+    // setPlayerLevel recalced stats but left talentMods baked at the prior level.
+    const sim = new Sim({ seed: 12, playerClass: 'druid', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('restoration');
+    expect(metaOf(sim, sim.player).talentMods.global.hotHealPct).toBeCloseTo(0.25, 10);
+    // Jump down to level 10: mastery must halve (min(1, 10/20) = 0.5).
+    sim.setPlayerLevel(10);
+    expect(metaOf(sim, sim.player).talentMods.global.hotHealPct).toBeCloseTo(0.25 * 0.5, 10);
+    // And back up to 20: full strength again.
+    sim.setPlayerLevel(20);
+    expect(metaOf(sim, sim.player).talentMods.global.hotHealPct).toBeCloseTo(0.25, 10);
+  });
+
   it('every spec ships its designated mastery-rating axis (PRD: Mastery rating readiness)', () => {
     // The future mastery stat (item rating, unimplemented) scales exactly one axis per
     // spec. This pins that the shipped mastery DATA carries that axis, so the rating PR

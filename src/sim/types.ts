@@ -1398,6 +1398,20 @@ export type AbilityEffect =
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
   | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  // Bounce damage: the caster's directDamage already hit the primary target; this arcs
+  // from that target to the nearest not-yet-hit hostile within `radius`, up to `jumps`
+  // enemies (the primary and the caster are excluded), each jump dealing `falloff`x the
+  // last. The hop pick is DETERMINISTIC (nearest by distance, then lowest id), mirroring
+  // chainHeal, so the only rng is the one base roll plus each hit's crit. Used by
+  // Hallowed Wall (Protection paladin signature).
+  | {
+      type: 'chainDamage';
+      min: number;
+      max: number;
+      jumps: number;
+      falloff: number;
+      radius: number;
+    }
   | { type: 'aoeHeal'; min: number; max: number; radius: number }
   | {
       type: 'groundAoE';

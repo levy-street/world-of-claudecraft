@@ -681,6 +681,71 @@ export function runEffects(
         }
         break;
       }
+      case 'chainDamage': {
+        // Bounce damage (Hallowed Wall): the directDamage above already hit the primary
+        // target; this arcs from THAT target to the nearest hostiles, up to eff.jumps of
+        // them, excluding the primary and the caster. The hop pick is DETERMINISTIC
+        // (nearest by squared distance, then lowest id), mirroring chainHeal, so the only
+        // rng is the one base roll plus each dealDamage crit.
+        const origin = target ?? p;
+        const chainSpBonus = directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          true,
+        );
+        const baseAmount = ctx.rng.range(eff.min, eff.max) + chainSpBonus;
+        const hitList: Entity[] = [];
+        const excluded = new Set<number>([p.id]);
+        if (target) excluded.add(target.id);
+        let from: Entity = origin;
+        while (hitList.length < eff.jumps) {
+          let best: Entity | null = null;
+          let bestD2 = Number.POSITIVE_INFINITY;
+          for (const m of ctx.hostilesInRadius(p, from.pos, eff.radius)) {
+            // LoS is checked from the PREVIOUS hop, not the caster: the bolt arcs
+            // enemy-to-enemy, so a wall between the caster and a bounce target must
+            // not block a hop the arc itself has clear line to.
+            if (excluded.has(m.id) || !ctx.hasLineOfSight(from, m)) continue;
+            const dx = m.pos.x - from.pos.x;
+            const dz = m.pos.z - from.pos.z;
+            const d2 = dx * dx + dz * dz;
+            if (best === null || d2 < bestD2 || (d2 === bestD2 && m.id < best.id)) {
+              best = m;
+              bestD2 = d2;
+            }
+          }
+          if (best === null) break;
+          excluded.add(best.id);
+          hitList.push(best);
+          from = best;
+        }
+        for (let i = 0; i < hitList.length; i++) {
+          const m = hitList[i];
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: i === 0 ? origin.id : hitList[i - 1].id,
+            targetId: m.id,
+            school: ability.school,
+            fx: 'projectile',
+          });
+          let dmg = baseAmount * eff.falloff ** i;
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
+          else dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
+          ctx.dealDamage(
+            p,
+            m,
+            Math.max(1, Math.round(dmg)),
+            false,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+          );
+        }
+        break;
+      }
       case 'aoeHeal': {
         ctx.emit({
           type: 'spellfx',

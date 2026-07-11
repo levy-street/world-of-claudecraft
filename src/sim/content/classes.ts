@@ -3623,7 +3623,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [
       { type: 'directDamage', min: 90, max: 110 },
-      { type: 'aoeDamage', min: 60, max: 75, radius: 10 },
+      { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
     ],
     description:
       'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
@@ -3973,6 +3973,30 @@ function scaleEffect(
         ...eff,
         min: Math.round(eff.min * dmgMult + flat),
         max: Math.round(eff.max * dmgMult + flat),
+      };
+    case 'chainDamage':
+      // Bounce damage (Hallowed Wall): a damage effect, scale by the damage mult like
+      // aoeDamage so the Protection mastery / talent dmg mods reach the bounces too.
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult + flat),
+        max: Math.round(eff.max * dmgMult + flat),
+      };
+    case 'groundAoE':
+      // Ground-persisted AoE damage (Consecration, Earthquake): scale the per-tick
+      // magnitude by the damage mult so the Retribution / Elemental masteries reach it.
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult + flat),
+        max: Math.round(eff.max * dmgMult + flat),
+      };
+    case 'aoeHeal':
+      // AoE heal (Holy Nova, Tranquility): scale by the heal mult so the Holy / heal
+      // masteries reach it, mirroring the single-target heal case below.
+      return {
+        ...eff,
+        min: Math.round(eff.min * healMult + flat),
+        max: Math.round(eff.max * healMult + flat),
       };
     case 'aoeRoot':
       return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
