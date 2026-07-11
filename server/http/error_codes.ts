@@ -200,6 +200,48 @@ export const ERROR_CODES = deepFreeze({
   // The economy service, Jupiter, or the Solana RPC answered non-200; the
   // bounded upstream status + error string ride the params, never swallowed.
   'dex_swap.upstream_error': { params: ['upstreamStatus', 'upstreamError'] },
+
+  // --- trading_bots family codes (server/trading_bots.ts, the rentable
+  // SOL/WOC trading-bot proxy to the economy service's bot engine). Same
+  // construction as the dex_swap family: born on the new pipeline
+  // (registry-only, no ladder arm), every code an RFC 9457 problem+json body
+  // from day one, the service owning all validation. ---
+
+  // The WOC_TRADING_BOTS_ENABLED flag is off: every endpoint fails closed with 404.
+  'trading_bots.disabled': { params: [] },
+  // The posted skuId is not in the service's bot catalog.
+  'trading_bots.unknown_sku': { params: [] },
+  // payWith is neither 'woc' nor 'claudium' (or the currency is unavailable).
+  'trading_bots.invalid_pay_currency': { params: [] },
+  // The account already has an active rental (one subscription per account).
+  'trading_bots.already_subscribed': { params: [] },
+  // The call needs an active rental (fund/control) and the account has none.
+  'trading_bots.subscription_required': { params: [] },
+  // The rental lapsed: the bot is auto-paused; withdraw stays available.
+  'trading_bots.subscription_expired': { params: [] },
+  // The service's Claudium ledger balance cannot cover the monthly price.
+  'trading_bots.insufficient_claudium': { params: [] },
+  // An amount is not a positive integer base-unit digit string within bounds.
+  'trading_bots.invalid_amount': { params: [] },
+  // The SOL/WOC deposit falls outside the SKU's min/max vault bounds.
+  'trading_bots.deposit_out_of_bounds': { params: [] },
+  // The userPublicKey is not a base58-encoded 32-byte Solana address.
+  'trading_bots.invalid_public_key': { params: [] },
+  // A strategy param is unknown or outside the SKU's schema bounds.
+  'trading_bots.invalid_params': { params: [] },
+  // The paymentId/depositId does not name a pending payment for this account.
+  'trading_bots.payment_not_found': { params: [] },
+  // The submitted signature does not verify as funding the expected
+  // destination for the expected amount (or is not finalized yet).
+  'trading_bots.payment_unverified': { params: [] },
+  // A vault operation is already in flight (deposit/withdraw/trade settling).
+  'trading_bots.vault_busy': { params: [] },
+  // The economy service's per-player (or global) rate limit refused the call;
+  // retryAfterMs says exactly when the bucket has a token again (UI cooldown).
+  'trading_bots.rate_limited': { params: ['retryAfterMs'] },
+  // The economy service, Jupiter, or the Solana RPC answered non-200; the
+  // bounded upstream status + error string ride the params, never swallowed.
+  'trading_bots.upstream_error': { params: ['upstreamStatus', 'upstreamError'] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

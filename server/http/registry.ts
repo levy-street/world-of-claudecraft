@@ -35,6 +35,7 @@ import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
 import { routes as oauthRoutes } from '../oauth';
 import { routes as reportsRoutes } from '../reports';
+import { routes as tradingBotRoutes } from '../trading_bots';
 import { routes as userAssetsRoutes } from '../user_assets_routes';
 import { routes as walletRoutes } from '../wallet';
 // new:endpoint imports appear above this line (npm run new:endpoint)
@@ -94,6 +95,11 @@ export interface ApiRegistry {
  *    config/quote/swap trio behind WOC_DEX_SWAP_ENABLED, a thin forwarder to
  *    the economy service's Jupiter engine; registry-only, born on the new
  *    pipeline with no legacy ladder arm);
+ *  - the trading-bot rental proxy (server/trading_bots.ts: the fail-closed
+ *    config/status/subscribe/deposit/withdraw/control family behind
+ *    WOC_TRADING_BOTS_ENABLED, a thin forwarder to the economy service's bot
+ *    engine; registry-only, born on the new pipeline with no legacy ladder
+ *    arm);
  *  - the custom-map family (server/maps_routes.ts: the owner list/create pair,
  *    the public browse list, the public-or-owner :id read, and the owner-gated
  *    save/delete/fork/publish/unpublish :id routes behind requireOwnedMap);
@@ -125,6 +131,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...desktopLoginRoutes,
   ...dailyRewardRoutes,
   ...dexSwapRoutes,
+  ...tradingBotRoutes,
   ...mapsRoutes,
   ...userAssetsRoutes,
   ...adminRoutes,
