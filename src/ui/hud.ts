@@ -353,6 +353,12 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import type { TradingBotsConfig, TradingBotsStatus } from './trading_bots_view';
+import {
+  type TradingBotsSubscribeResult,
+  TradingBotsWindow,
+  type TradingBotsWithdrawResult,
+} from './trading_bots_window';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -459,6 +465,44 @@ export interface DexSwapHooks {
   isWalletFeatureUnsupported(err: unknown): boolean;
   /** Refresh the wallet $WOC balance (fresh read) after a swap is sent. */
   onSwapSent(): void;
+}
+
+/**
+ * main.ts glue for the Trading Bots flow (the net<->ui wiring layer owns the
+ * /api/tradingbots fetches and the wallet module; see
+ * src/net/trading_bots_api.ts). Attached only when the server reports the
+ * feature enabled, so the launcher and window are invisible while the flag is
+ * off.
+ */
+export interface TradingBotsHooks {
+  /** True when the feature is enabled AND a wallet is linked (launcher gate). */
+  available(): boolean;
+  /** The /api/tradingbots/config payload. */
+  config(): TradingBotsConfig | null;
+  /** The connected wallet address money operations bind to, or null. */
+  walletAddress(): string | null;
+  fetchStatus(): Promise<TradingBotsStatus>;
+  subscribe(
+    skuId: string,
+    payWith: 'woc' | 'claudium',
+    userPublicKey: string | null,
+  ): Promise<TradingBotsSubscribeResult>;
+  confirmSubscribe(paymentId: string, signature: string): Promise<unknown>;
+  deposit(
+    solAmount: string,
+    wocAmount: string,
+    userPublicKey: string,
+  ): Promise<{ depositId: string; depositTransaction: string }>;
+  confirmDeposit(depositId: string, signature: string): Promise<unknown>;
+  withdraw(userPublicKey: string): Promise<TradingBotsWithdrawResult>;
+  control(
+    action: 'start' | 'pause' | 'update_params',
+    params?: Record<string, number>,
+  ): Promise<unknown>;
+  signAndSend(txBase64: string): Promise<string>;
+  isWalletFeatureUnsupported(err: unknown): boolean;
+  /** Refresh wallet balances (fresh read) after vault funds moved. */
+  onFundsMoved(): void;
 }
 
 export interface BugReportPayload {
@@ -901,6 +945,8 @@ export class Hud {
   // attaches them (only when the server-side feature flag is on).
   private dexSwapHooks: DexSwapHooks | null = null;
   private dexSwapWindow: DexSwapWindow | null = null;
+  private tradingBotsHooks: TradingBotsHooks | null = null;
+  private tradingBotsWindow: TradingBotsWindow | null = null;
   // Soft swear terms from the server (online only), masked in chat when the
   // player's "Filter Profanity" setting is on. Fed by main.ts from ClientWorld.
   private profanityWords: string[] = [];
@@ -2193,6 +2239,10 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.dexSwapWindow?.close();
         break;
+      case 'tradingbots-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.tradingBotsWindow?.close();
+        break;
       case 'emote-editor':
         this.closeEmoteEditor();
         break;
@@ -3399,6 +3449,8 @@ export class Hud {
     wocBalanceHtml: () => this.wocBalanceHtml(),
     dexSwapLauncherHtml: () => this.dexSwapLauncherHtml(),
     openDexSwap: () => this.toggleDexSwap(),
+    tradingBotsLauncherHtml: () => this.tradingBotsLauncherHtml(),
+    openTradingBots: () => this.toggleTradingBots(),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     cancelPetFeed: () => this.cancelPetFeed(),
@@ -3811,6 +3863,15 @@ export class Hud {
   private dexSwapLauncherHtml(): string {
     if (!walletUiEnabled() || !this.dexSwapHooks?.available()) return '';
     return `<button type="button" class="dexswap-open-btn" data-dexswap-open aria-label="${esc(t('hudChrome.dexSwap.launcherAria'))}">${esc(t('hudChrome.dexSwap.launcher'))}</button>`;
+  }
+
+  // The Trading Bots launcher, rendered next to the Buy $WOC launcher in the
+  // bag footer. Same gating: empty (feature invisible) unless main.ts attached
+  // the hooks (server flag on) AND a wallet is linked; the bags window wires
+  // the click to toggleTradingBots.
+  private tradingBotsLauncherHtml(): string {
+    if (!walletUiEnabled() || !this.tradingBotsHooks?.available()) return '';
+    return `<button type="button" class="tradingbots-open-btn" data-tradingbots-open aria-label="${esc(t('hudChrome.tradingBots.launcherAria'))}">${esc(t('hudChrome.tradingBots.launcher'))}</button>`;
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
@@ -13650,6 +13711,39 @@ export class Hud {
   toggleDexSwap(): void {
     if (!this.dexSwapHooks?.available()) return;
     this.dexSwapWindow?.toggle();
+  }
+
+  /** Wire the Trading Bots flow (called by main.ts only when enabled). */
+  attachTradingBots(hooks: TradingBotsHooks): void {
+    this.tradingBotsHooks = hooks;
+    this.tradingBotsWindow = new TradingBotsWindow({
+      root: () => $('#tradingbots-window'),
+      closeOthers: () => this.closeOtherWindows('#tradingbots-window'),
+      ...this.windowFocus('#tradingbots-window'),
+      onVisibilityChange: () => this.syncAnyWindowOpenState(),
+      config: () => hooks.config(),
+      walletAddress: () => hooks.walletAddress(),
+      fetchStatus: () => hooks.fetchStatus(),
+      subscribe: (skuId, payWith, userPublicKey) => hooks.subscribe(skuId, payWith, userPublicKey),
+      confirmSubscribe: (paymentId, signature) => hooks.confirmSubscribe(paymentId, signature),
+      deposit: (solAmount, wocAmount, userPublicKey) =>
+        hooks.deposit(solAmount, wocAmount, userPublicKey),
+      confirmDeposit: (depositId, signature) => hooks.confirmDeposit(depositId, signature),
+      withdraw: (userPublicKey) => hooks.withdraw(userPublicKey),
+      control: (action, params) => hooks.control(action, params),
+      signAndSend: (txBase64) => hooks.signAndSend(txBase64),
+      isWalletFeatureUnsupported: (err) => hooks.isWalletFeatureUnsupported(err),
+      onFundsMoved: () => hooks.onFundsMoved(),
+      now: () => Date.now(),
+    });
+    // The bag footer may already be painted without the launcher; repaint it.
+    if ($('#bags').style.display !== 'none') this.renderBags();
+  }
+
+  /** Toggle the Trading Bots window (the bag-footer launcher's action). */
+  toggleTradingBots(): void {
+    if (!this.tradingBotsHooks?.available()) return;
+    this.tradingBotsWindow?.toggle();
   }
 
   attachReporting(hooks: ReportHooks): void {

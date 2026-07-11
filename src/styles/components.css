@@ -7590,4 +7590,171 @@
   body.mobile-touch #dexswap-window {
     z-index: 95;
   }
+  /* ---------- tradingbots ---------- */
+  /* The Trading Bots window (trading_bots_window.ts) + the bag-footer launcher.
+     Shares the dexswap brand-purple accent (the .woc-coin chip family); text
+     colors come from tokens. Buttons and both amount inputs keep the 40px
+     mobile touch-target floor (the 16px input font floor is the global
+     pointer-coarse rule). */
+  #tradingbots-window {
+    width: 420px;
+  }
+  .tradingbots-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .tradingbots-note {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .tradingbots-risk {
+    color: var(--color-text-error);
+  }
+  .tradingbots-intro {
+    margin: 0;
+    font-size: 12px;
+  }
+  .tradingbots-screen,
+  .tradingbots-form,
+  .tradingbots-params {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tradingbots-payrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+  .tradingbots-payrow select {
+    min-height: 40px;
+    min-width: 110px;
+  }
+  .tradingbots-claudium {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .tradingbots-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tradingbots-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+  }
+  .tradingbots-card-name {
+    font-weight: 700;
+  }
+  .tradingbots-card-blurb {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .tradingbots-line {
+    font-size: 12px;
+  }
+  .tradingbots-subtitle {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .tradingbots-form input {
+    min-height: 40px;
+  }
+  .tradingbots-form label {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .tradingbots-bounds {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .tradingbots-rent-btn,
+  .tradingbots-deposit-btn,
+  .tradingbots-run-btn,
+  .tradingbots-withdraw-btn {
+    min-height: 40px;
+  }
+  .tradingbots-rental.tradingbots-expired {
+    color: var(--color-text-error);
+  }
+  .tradingbots-vault {
+    font-weight: 600;
+  }
+  .tradingbots-pnl {
+    color: var(--color-text-success);
+  }
+  .tradingbots-param {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .tradingbots-param input {
+    min-height: 40px;
+    width: 110px;
+  }
+  .tradingbots-trades {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tradingbots-trade {
+    font-size: 11px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .tradingbots-trade-side {
+    font-weight: 700;
+  }
+  .tradingbots-trade-time {
+    color: var(--color-text-muted);
+  }
+  .tradingbots-status,
+  .tradingbots-notice {
+    font-size: 12px;
+    color: var(--gold-dim);
+  }
+  .tradingbots-error {
+    font-size: 12px;
+    color: var(--color-text-error);
+  }
+  .tradingbots-open-btn {
+    min-height: 24px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #c9a3ff;
+    background: rgba(107, 63, 160, 0.25);
+    border: 1px solid #6b3fa0;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tradingbots-open-btn:hover {
+    background: rgba(107, 63, 160, 0.45);
+  }
+  body.mobile-touch .tradingbots-open-btn {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  body.mobile-touch #tradingbots-window {
+    z-index: 95;
+  }
 }

@@ -111,6 +111,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   dexSwapLauncherHtml(): string;
   /** Open the Buy $WOC window (the launcher's click action). */
   openDexSwap(): void;
+  /** Trading Bots launcher markup next to it ('' when the feature is off). */
+  tradingBotsLauncherHtml(): string;
+  /** Open the Trading Bots window (the launcher's click action). */
+  openTradingBots(): void;
   hideTooltip(): void;
   /** True when this click is the release of a long-press tooltip peek, so the
    *  stack's action (use / sell / deposit / feed) must be SUPPRESSED. Wired to the
@@ -229,10 +233,13 @@ export class BagsWindow {
     grid.scrollTop = prevScrollTop;
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
-    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.dexSwapLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
+    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.dexSwapLauncherHtml()}${this.deps.tradingBotsLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
     moneyRow
       .querySelector('[data-dexswap-open]')
       ?.addEventListener('click', () => this.deps.openDexSwap());
+    moneyRow
+      .querySelector('[data-tradingbots-open]')
+      ?.addEventListener('click', () => this.deps.openTradingBots());
     el.appendChild(moneyRow);
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so

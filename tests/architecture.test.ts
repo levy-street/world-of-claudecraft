@@ -164,6 +164,7 @@ const UI_PURE_CORES = [
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
   'src/ui/dex_swap_view.ts',
+  'src/ui/trading_bots_view.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/questlog_view.ts',
   'src/ui/swing_timer.ts',
