@@ -92,6 +92,12 @@ export function tradingBotsConfig(): TradingBotsConfig | null {
   return config;
 }
 
+/** Drop the memoized config + in-flight load (test-only). */
+export function resetTradingBotsApiForTests(): void {
+  config = null;
+  configLoad = null;
+}
+
 /**
  * Build the hooks object for Hud.attachTradingBots (shaped structurally like
  * ui/hud's TradingBotsHooks; a drift is a tsc error at the attach call site).
