@@ -230,8 +230,8 @@
       "state": "c96f736b",
       "events": "9508a0b6",
       "rng": {
-        "draws": 943,
-        "digest": "b9ebae32"
+        "draws": 944,
+        "digest": "1771d9a2"
       }
     },
     {
@@ -478,8 +478,8 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 408,
-      "state": "acabe442",
-      "events": "c0de995d",
+      "state": "1782699d",
+      "events": "e253d2ca",
       "rng": {
         "draws": 1050,
         "digest": "a67794aa"
@@ -603,7 +603,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 341,
+          "hp": 339,
           "id": 406,
           "inCombat": true,
           "kind": "mob",
@@ -653,7 +653,7 @@
           "forcedTargetId": 406,
           "forcedTargetTimer": 2.8,
           "hostile": true,
-          "hp": 49943,
+          "hp": 49927,
           "id": 407,
           "inCombat": true,
           "kind": "mob",
@@ -694,7 +694,7 @@
             ],
             [
               406,
-              36
+              52
             ]
           ],
           "weapon": {

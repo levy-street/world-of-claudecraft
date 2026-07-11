@@ -841,6 +841,8 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  dailyRewardsBan?: { reason: string; createdAt: string } | null;
+  dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -985,13 +987,17 @@ export async function listModerationActions(
 }
 
 export async function accountDetail(accountId: number): Promise<AccountDetail | null> {
-  const [account, characters, sessions, moderationHistory] = await Promise.all([
+  const [account, characters, sessions, moderationHistory, dailyRewardsIpBans] = await Promise.all([
     pool.query(
       `SELECT id, username, created_at, last_login, is_admin, banned_at, suspended_until,
               COALESCE(moderation_reason, '') AS moderation_reason,
               chat_muted_until,
               COALESCE(chat_mute_reason, '') AS chat_mute_reason,
               COALESCE(chat_strikes, 0) AS chat_strikes,
+              (SELECT reason FROM daily_reward_bans WHERE account_id = accounts.id)
+                AS daily_rewards_ban_reason,
+              (SELECT created_at FROM daily_reward_bans WHERE account_id = accounts.id)
+                AS daily_rewards_banned_at,
               last_login_ip,
               COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                         FROM play_sessions s WHERE s.account_id = accounts.id), 0)::bigint AS playtime_seconds
@@ -1023,6 +1029,17 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
        LIMIT 50`,
       [accountId],
     ),
+    pool.query(
+      `SELECT ib.ip_address, ib.reason, ib.created_at
+         FROM daily_reward_ip_bans ib
+        WHERE ib.ip_address = (SELECT last_login_ip FROM accounts WHERE id = $1)
+           OR EXISTS (
+             SELECT 1 FROM play_sessions ps
+              WHERE ps.account_id = $1 AND ps.ip_address = ib.ip_address
+           )
+        ORDER BY ib.created_at DESC`,
+      [accountId],
+    ),
   ]);
   const a = account.rows[0];
   if (!a) return null;
@@ -1038,6 +1055,18 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     chatMutedUntil: a.chat_muted_until,
     chatMuteReason: a.chat_mute_reason,
     chatStrikes: Number(a.chat_strikes ?? 0),
+    dailyRewardsBan:
+      a.daily_rewards_ban_reason == null
+        ? null
+        : {
+            reason: String(a.daily_rewards_ban_reason),
+            createdAt: a.daily_rewards_banned_at,
+          },
+    dailyRewardsIpBans: (dailyRewardsIpBans?.rows ?? []).map((row) => ({
+      ip: String(row.ip_address),
+      reason: String(row.reason),
+      createdAt: row.created_at,
+    })),
     lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({

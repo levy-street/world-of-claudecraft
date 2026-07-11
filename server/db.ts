@@ -547,6 +547,31 @@ CREATE TABLE IF NOT EXISTS daily_reward_scores (
 );
 CREATE INDEX IF NOT EXISTS daily_reward_scores_rank
   ON daily_reward_scores(day, realm, points DESC, updated_at ASC);
+CREATE TABLE IF NOT EXISTS daily_reward_bans (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  reason TEXT NOT NULL,
+  admin_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS daily_reward_ip_bans (
+  ip_address TEXT PRIMARY KEY,
+  reason TEXT NOT NULL,
+  admin_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE OR REPLACE VIEW daily_reward_excluded_accounts AS
+SELECT account_id, reason FROM daily_reward_bans
+UNION
+SELECT a.id AS account_id, ib.reason
+  FROM accounts a
+  JOIN daily_reward_ip_bans ib
+    ON ib.ip_address = a.last_login_ip
+    OR EXISTS (
+      SELECT 1 FROM play_sessions ps
+       WHERE ps.account_id = a.id AND ps.ip_address = ib.ip_address
+    );
 CREATE TABLE IF NOT EXISTS daily_reward_events (
   id BIGSERIAL PRIMARY KEY,
   day TEXT NOT NULL,

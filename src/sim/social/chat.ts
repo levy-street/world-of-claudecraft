@@ -317,6 +317,14 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  // "/ready" (alias "/readycheck"): the party/raid leader starts a ready check. Every
+  // other member's client plays a sound and shows a yes/no prompt; validation (in a
+  // party, leader-only, none already running) is delegated to readyCheckStart.
+  if (/^\/ready(?:check)?\s*$/i.test(raw)) {
+    ctx.readyCheckStart(r.meta.entityId);
+    return null;
+  }
+
   // "/unfollow" stops an active follow
   if (/^\/unfollow(?:\s|$)/i.test(raw)) {
     if (r.e.followTargetId === null) ctx.error(r.meta.entityId, 'You are not following anyone.');
@@ -1085,7 +1093,7 @@ export function helpLines(): string[] {
   return [
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
+    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',

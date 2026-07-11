@@ -346,6 +346,17 @@ export default defineConfig({
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
       },
+      output: {
+        // three.js almost never changes between our releases and is the single
+        // heaviest dependency in the game/editor bundles; splitting it into its
+        // own chunk lets the browser fetch it in parallel with app code and
+        // reuse the browser cache across app-only redeploys (its content hash
+        // stays stable unless the three version itself bumps).
+        manualChunks(id: string): string | undefined {
+          if (id.includes('node_modules/three/')) return 'vendor-three';
+          return undefined;
+        },
+      },
     },
   },
   test: {

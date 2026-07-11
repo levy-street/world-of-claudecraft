@@ -2409,6 +2409,67 @@ describe('Nythraxis raid encounter', () => {
     expect(tank.pos.x).toBeGreaterThan(3000); // lockout lifted, re-entry allowed
   });
 
+  it('the kill locks EVERY raid member, even one who never entered the arena', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const reset = nextRaidResetMs(now);
+    const sim = makeWorld(
+      () => now,
+      (nowMs) => nextRaidResetMs(nowMs),
+    );
+    const tankPid = sim.addPlayer('warrior', 'Tank');
+    // enterRaid moves only the tank through the door: the raid fills stay at the
+    // world spawn, outside the arena and the boss room. A member who released
+    // (or camped the door) must still be locked by the kill, or one unlocked
+    // raider re-claims the arena for the whole locked raid.
+    enterRaid(sim, tankPid);
+    const tank = sim.entities.get(tankPid)!;
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    engage(boss, tank);
+    killMob(sim, boss, tank);
+
+    const members = sim.partyOf(tankPid)!.members;
+    expect(members.length).toBeGreaterThanOrEqual(5);
+    for (const pid of members) {
+      // The fills really are outside the arena footprint (never zoned in), so
+      // this exercises the party-membership arm, not the position arm.
+      if (pid !== tankPid) {
+        expect(sim.entities.get(pid)!.pos.x, `fill ${pid} outside`).toBeLessThan(3000);
+      }
+      expect(sim.players.get(pid)!.raidLockouts.get('nythraxis_boss_arena'), `pid ${pid}`).toBe(
+        reset,
+      );
+    }
+  });
+
+  it('a raider who left the raid while parked in a side wing is still locked by the kill', () => {
+    const now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const reset = nextRaidResetMs(now);
+    const sim = makeWorld(
+      () => now,
+      (nowMs) => nextRaidResetMs(nowMs),
+    );
+    const tankPid = sim.addPlayer('warrior', 'Tank');
+    const origin = enterRaid(sim, tankPid);
+    // Bring one raider inside and park them in the east wing: inside the arena
+    // walls (the 260yd boss room) but OUTSIDE the generic 120-wide instance
+    // footprint, then have them leave the raid. Neither the group arm nor the
+    // footprint arm of the sweep sees them, so only the room-radius union does.
+    const wingPid = sim.partyOf(tankPid)!.members.find((pid) => pid !== tankPid)!;
+    sim.enterDungeon('nythraxis_boss_arena', wingPid);
+    teleport(sim, wingPid, origin.x + 200, origin.z + 82);
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    const wing = sim.entities.get(wingPid)!;
+    expect(Math.abs(wing.pos.x - origin.x)).toBeGreaterThan(120); // outside the footprint
+    expect(dist2d(wing.pos, boss.spawnPos)).toBeLessThanOrEqual(260); // inside the room
+    sim.partyLeave(wingPid);
+    expect(sim.partyOf(wingPid)).toBeNull();
+
+    const tank = sim.entities.get(tankPid)!;
+    engage(boss, tank);
+    killMob(sim, boss, tank);
+    expect(sim.players.get(wingPid)!.raidLockouts.get('nythraxis_boss_arena')).toBe(reset);
+  });
+
   it('a heroic kill locks the :heroic key only; the normal raid stays open that day', () => {
     const now = Date.UTC(2025, 5, 29, 16, 0, 0);
     const reset = nextRaidResetMs(now);

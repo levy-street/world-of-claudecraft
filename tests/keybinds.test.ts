@@ -59,9 +59,29 @@ describe('registry', () => {
     expect(BIND_CATEGORIES).toContain('Movement');
     expect(BIND_CATEGORIES).toContain('Action Bar');
     expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(23);
-    // The secondary bar's slots exist and default to the numpad row.
-    expect(BIND_ACTIONS.find((a) => a.id === 'slot12')?.defaults).toEqual(['Numpad1']);
+    // Action Bar 11/12 (slots 10/11) put Q/E on the primary, keeping Minus/Equal
+    // as secondaries so nothing is lost (Q/E freed from the strafe defaults).
+    expect(BIND_ACTIONS.find((a) => a.id === 'slot10')?.defaults).toEqual(['KeyQ', 'Minus']);
+    expect(BIND_ACTIONS.find((a) => a.id === 'slot11')?.defaults).toEqual(['KeyE', 'Equal']);
+    // The secondary bar's slots exist: numpad primaries, with slots 12..21 adding
+    // Shift+<digit> secondaries so the whole page is reachable without a numpad.
+    expect(BIND_ACTIONS.find((a) => a.id === 'slot12')?.defaults).toEqual([
+      'Numpad1',
+      'Shift+Digit1',
+    ]);
+    expect(BIND_ACTIONS.find((a) => a.id === 'slot21')?.defaults).toEqual([
+      'Numpad0',
+      'Shift+Digit0',
+    ]);
+    // slot22 ('Secondary Bar 11') is the eleventh secondary and keeps its single
+    // numpad default (only slots 12..21 gained the ten Shift+digit secondaries).
     expect(BIND_ACTIONS.find((a) => a.id === 'slot22')?.defaults).toEqual(['NumpadDecimal']);
+    // Strafe ships unbound by default (Q/E reserved for the spell bar).
+    expect(BIND_ACTIONS.find((a) => a.id === 'strafeLeft')?.defaults).toEqual([]);
+    expect(BIND_ACTIONS.find((a) => a.id === 'strafeRight')?.defaults).toEqual([]);
+    // Damage Meters moved off KeyH (now KeyZ); Target Nearest Friendly keeps KeyH.
+    expect(BIND_ACTIONS.find((a) => a.id === 'meters')?.defaults).toEqual(['KeyZ']);
+    expect(BIND_ACTIONS.find((a) => a.id === 'targetFriendly')?.defaults).toEqual(['KeyH']);
     // Discord is a rebindable Interface window toggle (default U).
     const discord = BIND_ACTIONS.find((a) => a.id === 'discord');
     expect(discord?.category).toBe('Interface');
@@ -102,7 +122,15 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyU')).toBe('discord');
     expect(kb.actionForCode('KeyT')).toBe('crafting');
     expect(kb.actionForCode('KeyY')).toBe('valecup');
-    expect(kb.actionForCode('KeyZ')).toBe(null);
+    // Modernized defaults: KeyZ now drives Damage Meters; Q/E moved to the spell
+    // action bar (slots 10/11 primaries); strafe ships unbound.
+    expect(kb.actionForCode('KeyZ')).toBe('meters');
+    expect(kb.actionForCode('KeyQ')).toBe('slot10');
+    expect(kb.actionForCode('KeyE')).toBe('slot11');
+    expect(kb.codeAt('strafeLeft', 0)).toBe(null);
+    expect(kb.codeAt('strafeRight', 0)).toBe(null);
+    // F13 is genuinely unbound in the modernized default layout.
+    expect(kb.actionForCode('F13')).toBe(null);
   });
 
   it('exposes primary/secondary codes and labels', () => {
@@ -140,10 +168,11 @@ describe('binding', () => {
 
   it('binds a secondary key without disturbing the primary', () => {
     const kb = new Keybinds();
-    expect(kb.bind('slot1', 1, 'KeyZ')).toBe(true);
+    // F13 is unbound by default, so no eviction clouds the "secondary" assertion.
+    expect(kb.bind('slot1', 1, 'F13')).toBe(true);
     expect(kb.codeAt('slot1', 0)).toBe('Digit2');
-    expect(kb.codeAt('slot1', 1)).toBe('KeyZ');
-    expect(kb.actionForCode('KeyZ')).toBe('slot1');
+    expect(kb.codeAt('slot1', 1)).toBe('F13');
+    expect(kb.actionForCode('F13')).toBe('slot1');
   });
 
   it('rejects the reserved Escape key', () => {
@@ -241,7 +270,9 @@ describe('persistence', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('Enter')).toBe('chat');
     expect(kb.actionForCode('Equal')).toBe('slot11');
-    expect(kb.actionForCode('KeyZ')).toBe(null);
+    // meters keeps its (new) default KeyZ; F13 is genuinely unbound.
+    expect(kb.actionForCode('KeyZ')).toBe('meters');
+    expect(kb.actionForCode('F13')).toBe(null);
   });
 
   it('drops a retained default that a stored binding already claimed', () => {
@@ -289,16 +320,16 @@ describe('persistence', () => {
 describe('per-character scope', () => {
   it('keeps two character scopes independent', () => {
     const alice = new Keybinds('char:alice');
-    alice.bind('jump', 0, 'KeyZ'); // KeyZ is unbound by default
+    alice.bind('jump', 0, 'F13'); // F13 is unbound by default
     const bob = new Keybinds('char:bob');
     // Bob never inherits Alice's change; he starts from defaults.
-    expect(bob.actionForCode('KeyZ')).toBe(null);
+    expect(bob.actionForCode('F13')).toBe(null);
     expect(bob.codeAt('jump', 0)).toBe('Space');
-    bob.bind('jump', 0, 'KeyY'); // also unbound by default
+    bob.bind('jump', 0, 'F14'); // also unbound by default
     // Reloading each scope reads back only its own profile.
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
-    expect(new Keybinds('char:bob').actionForCode('KeyY')).toBe('jump');
-    expect(new Keybinds('char:bob').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('char:alice').actionForCode('F13')).toBe('jump');
+    expect(new Keybinds('char:bob').actionForCode('F14')).toBe('jump');
+    expect(new Keybinds('char:bob').actionForCode('F13')).toBe(null);
   });
 
   it('writes to a namespaced key, not the legacy global key', () => {
@@ -351,59 +382,59 @@ describe('per-character scope', () => {
   it('uses the production char:<numeric id> scope shape', () => {
     // Online scope is `char:${c.id}` where c.id is the numeric DB character id.
     const kb = new Keybinds('char:1729');
-    kb.bind('jump', 0, 'KeyZ');
+    kb.bind('jump', 0, 'F13');
     expect(localStorage.getItem('woc_keybinds:char:1729')).not.toBeNull();
-    expect(new Keybinds('char:1729').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:1729').actionForCode('F13')).toBe('jump');
   });
 
   it('namespaces the offline scope (offline:<class>:<name>) per character', () => {
     // Offline scope is `offline:${playerClass}:${name}` (the only stable handle).
     const aldric = new Keybinds('offline:warrior:Aldric');
-    aldric.bind('jump', 0, 'KeyZ');
+    aldric.bind('jump', 0, 'F13');
     expect(localStorage.getItem('woc_keybinds:offline:warrior:Aldric')).not.toBeNull();
     expect(localStorage.getItem('woc_keybinds')).toBeNull();
     // A different offline character starts from defaults, not Aldric's binding.
-    expect(new Keybinds('offline:mage:Brenna').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('offline:mage:Brenna').actionForCode('F13')).toBe(null);
     expect(new Keybinds('offline:mage:Brenna').codeAt('jump', 0)).toBe('Space');
     // The same scope reads back its own profile.
-    expect(new Keybinds('offline:warrior:Aldric').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('offline:warrior:Aldric').actionForCode('F13')).toBe('jump');
   });
 
   it('shares one store across same-class same-name offline characters', () => {
     // Offline characters are not persisted, so class+name is the only handle:
     // two offline sessions with the same class and name intentionally share one
     // profile. A different name does not.
-    new Keybinds('offline:warrior:Aldric').bind('jump', 0, 'KeyZ');
-    expect(new Keybinds('offline:warrior:Aldric').actionForCode('KeyZ')).toBe('jump');
-    expect(new Keybinds('offline:warrior:Borin').actionForCode('KeyZ')).toBe(null);
+    new Keybinds('offline:warrior:Aldric').bind('jump', 0, 'F13');
+    expect(new Keybinds('offline:warrior:Aldric').actionForCode('F13')).toBe('jump');
+    expect(new Keybinds('offline:warrior:Borin').actionForCode('F13')).toBe(null);
   });
 
   it('seeds from the legacy blob when the scoped value is corrupt JSON', () => {
-    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyZ', null] }));
+    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['F13', null] }));
     localStorage.setItem('woc_keybinds:char:alice', '{not valid json');
     // A corrupt scoped value behaves like an absent one: still seed from legacy,
     // do not drop to bare defaults.
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:alice').actionForCode('F13')).toBe('jump');
   });
 
   it('seeds from the legacy blob when the scoped value is not a plain object', () => {
-    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyZ', null] }));
+    localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['F13', null] }));
     // A JSON array is typeof 'object' but is not a valid profile; it must seed.
     localStorage.setItem('woc_keybinds:char:alice', JSON.stringify(['garbage']));
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:alice').actionForCode('F13')).toBe('jump');
     // A JSON scalar likewise.
     localStorage.setItem('woc_keybinds:char:bob', JSON.stringify(42));
-    expect(new Keybinds('char:bob').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:bob').actionForCode('F13')).toBe('jump');
   });
 
   it('reset() persists to the scoped key and leaves the legacy blob untouched', () => {
     localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyJ', null] }));
     const alice = new Keybinds('char:alice');
-    alice.bind('jump', 0, 'KeyZ'); // KeyZ is unbound by default
+    alice.bind('jump', 0, 'F13'); // F13 is unbound by default
     alice.reset();
     // Alice's scoped profile is back to defaults...
     expect(new Keybinds('char:alice').codeAt('jump', 0)).toBe('Space');
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('char:alice').actionForCode('F13')).toBe(null);
     // ...and reset never wrote the legacy key.
     expect(JSON.parse(localStorage.getItem('woc_keybinds')!).jump).toEqual(['KeyJ', null]);
   });
@@ -528,5 +559,77 @@ describe('modifiers and held (movement) actions', () => {
     expect(kb.heldActionForCode('Space')).toBe('jump');
     // edge keys are not held
     expect(kb.heldActionForCode('Digit1')).toBe(null);
+  });
+});
+
+// The default-bind modernization (task 10, item 5): the four data-only default
+// changes and the boundary that they only affect FRESH profiles, never migrating
+// a stored one.
+describe('default-bind modernization', () => {
+  it('resolves the secondary bar Shift+digit chords as distinct from the bare digits', () => {
+    const kb = new Keybinds();
+    // slots 12..21 carry Numpad primaries + Shift+Digit1..0 secondaries; the full
+    // chord resolves to the secondary slot without evicting the primary number row.
+    expect(kb.edgeActionForCombo('Shift+Digit1')).toBe('slot12');
+    expect(kb.edgeActionForCombo('Shift+Digit0')).toBe('slot21');
+    expect(kb.edgeActionForCombo('Numpad1')).toBe('slot12');
+    // The bare digits still drive the primary bar (slot0..slot9), untouched.
+    expect(kb.edgeActionForCombo('Digit1')).toBe('slot0');
+    expect(kb.edgeActionForCombo('Digit0')).toBe('slot9');
+    // Q/E moved to the primary of Action Bar 11/12; Minus/Equal stay as secondaries.
+    expect(kb.codeAt('slot10', 0)).toBe('KeyQ');
+    expect(kb.codeAt('slot10', 1)).toBe('Minus');
+    expect(kb.codeAt('slot11', 0)).toBe('KeyE');
+    expect(kb.codeAt('slot11', 1)).toBe('Equal');
+  });
+
+  it('ships strafe unbound and has no keyboard duplicate on a fresh profile', () => {
+    const kb = new Keybinds();
+    expect(kb.codesForAction('strafeLeft')).toEqual([]);
+    expect(kb.codesForAction('strafeRight')).toEqual([]);
+    // The KeyH collision (Damage Meters vs Target Nearest Friendly) is gone.
+    expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
+    expect(kb.actionForCode('KeyZ')).toBe('meters');
+    // No two DISTINCT actions share a code in the fresh default layout (Attack Move
+    // deliberately shares KeyA with Turn Left and is exempt).
+    const codeOwners = new Map<string, string[]>();
+    for (const a of BIND_ACTIONS) {
+      if (actionAllowsShared(a.id)) continue;
+      for (const c of kb.codesForAction(a.id)) {
+        codeOwners.set(c, [...(codeOwners.get(c) ?? []), a.id]);
+      }
+    }
+    for (const [code, owners] of codeOwners) {
+      expect(owners, `${code} is on more than one action`).toHaveLength(1);
+    }
+  });
+
+  it('does NOT migrate a legacy stored profile to the new defaults', () => {
+    // A profile saved before the modernization: strafe still on Q/E, meters still
+    // on H, Action Bar 11/12 still on Minus/Equal. Loading MUST preserve these
+    // stored values; the new defaults only fill actions ABSENT from the blob.
+    localStorage.setItem(
+      'woc_keybinds',
+      JSON.stringify({
+        strafeLeft: ['KeyQ', null],
+        strafeRight: ['KeyE', null],
+        meters: ['KeyH', null],
+        slot10: ['Minus', null],
+        slot11: ['Equal', null],
+        targetFriendly: ['KeyJ', null], // moved off H in this legacy profile
+      }),
+    );
+    const kb = new Keybinds();
+    expect(kb.codeAt('strafeLeft', 0)).toBe('KeyQ'); // stored, not unbound
+    expect(kb.codeAt('strafeRight', 0)).toBe('KeyE'); // stored, not unbound
+    expect(kb.codeAt('meters', 0)).toBe('KeyH'); // stored, not KeyZ
+    expect(kb.codeAt('slot10', 0)).toBe('Minus'); // stored, not KeyQ
+    expect(kb.codeAt('slot11', 0)).toBe('Equal'); // stored, not KeyE
+    // The stored slot10 has no secondary, so it stays null (NOT the new Minus
+    // default): the stored row is taken verbatim, not merged with new defaults.
+    expect(kb.codeAt('slot10', 1)).toBe(null);
+    // An action ABSENT from the blob takes the NEW default (unmigrated fill).
+    expect(kb.codeAt('slot12', 1)).toBe('Shift+Digit1');
+    expect(kb.codeAt('strafeLeft', 1)).toBe(null);
   });
 });

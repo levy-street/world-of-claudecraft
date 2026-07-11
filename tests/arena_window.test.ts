@@ -18,9 +18,11 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
     expect(code).toContain('buildArenaView(');
   });
 
-  it('gives the close control a real button with an aria-label', () => {
-    expect(code).toContain('class="x-btn" data-close aria-label=');
-    expect(code).toContain("t('hud.arena.close')");
+  it('gives the close control a real button via the shared frame builder', () => {
+    // The chrome (titlebar + close button) is stamped by the shared window-frame
+    // builder; the window names its own close aria key on the descriptor.
+    expect(code).toContain('renderWindowFrame(');
+    expect(code).toContain("closeLabelKey: 'hud.arena.close'");
   });
 
   it('renders bracket tabs as real buttons with aria-pressed state', () => {
@@ -30,8 +32,9 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
   });
 
   it('routes every close path through close() so focus returns to the opener', () => {
-    // The X button (both offline + live) closes via the painter, not a raw hide.
-    expect(code).toContain("data-close]')?.addEventListener('click', () => this.close())");
+    // The frame builder wires its close control to the injected onClose, pointed
+    // at close() (WCAG 2.4.3 focus-return), not a raw hide.
+    expect(code).toContain('() => this.close()');
     // close() captures + restores the opener focus (WCAG 2.2 AA focus-return).
     expect(code).toContain('this.deps.restoreFocus(this.openerFocus)');
     expect(code).toContain('this.openerFocus = this.deps.captureFocus()');

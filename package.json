@@ -1,9 +1,12 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "private": true,
   "license": "MIT",
-  "author": "levy-street",
+  "author": {
+    "name": "Levy Street",
+    "email": "woc@levystreet.com"
+  },
   "type": "module",
   "main": "electron/main.cjs",
   "description": "World of Claudecraft: a classic-style micro-MMO + headless RL training environment",
@@ -81,7 +84,6 @@
     "@aws-sdk/client-sesv2": "^3.1084.0",
     "@capacitor/app": "^8.1.0",
     "@capacitor/browser": "^8.0.3",
-    "@capacitor/live-updates": "^0.5.0",
     "@noble/curves": "^1.9.7",
     "@solana/wallet-standard-chains": "^1.1.2",
     "@solana/wallet-standard-features": "^1.4.0",

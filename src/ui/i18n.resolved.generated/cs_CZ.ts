@@ -154,6 +154,14 @@ export const cs_CZ: EnTranslations = {
     "spectate": {
       "banner": "Sleduješ {name}"
     },
+    "readyCheck": {
+      "prompt": "Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?",
+      "ready": "Připraven(a)",
+      "notReady": "Nepřipraven(a)",
+      "result": "Kontrola připravenosti: {ready} připraveno, {notReady} nepřipraveno, {noResponse} bez odpovědi.",
+      "notInPartyError": "Abys mohl(a) zahájit kontrolu připravenosti, musíš být ve skupině.",
+      "inProgressError": "Kontrola připravenosti už probíhá."
+    },
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
@@ -232,7 +240,8 @@ export const cs_CZ: EnTranslations = {
         "eligible": "Odměny odemčeny.",
         "no_wallet": "Připoj peněženku s alespoň 20 USD ve WOC.",
         "under_minimum": "Peněženka je pod minimem 20 USD ve WOC.",
-        "price_unavailable": "Cena WOC není dostupná, odměny jsou dočasně uzamčené."
+        "price_unavailable": "Cena WOC není dostupná, odměny jsou dočasně uzamčené.",
+        "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}"
       }
     },
     "theme": {
@@ -313,6 +322,8 @@ export const cs_CZ: EnTranslations = {
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",
       "toggleHaptics": "Přepnout haptiku",
+      "showMenuButtons": "Zobrazit tlačítka nabídky",
+      "hideMenuButtons": "Skrýt tlačítka nabídky",
       "hotbarPage": "Dovednosti",
       "hotbarPageAria": "Zobrazit další sadu dovedností",
       "actionRing": "Bojové akce",
@@ -396,7 +407,13 @@ export const cs_CZ: EnTranslations = {
       "targetFriendly": "Zacílit nejbližšího spojence",
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "discord": "Discord",
-      "valecup": "Pohár údolí"
+      "valecup": "Pohár údolí",
+      "categoryPet": "Mazlíček",
+      "petAttack": "Mazlíček: Útok",
+      "petStop": "Mazlíček: Zastavit",
+      "petTaunt": "Mazlíček: Provokace",
+      "petDefensive": "Mazlíček: Obranný",
+      "petAggressive": "Mazlíček: Agresivní"
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -571,7 +588,84 @@ export const cs_CZ: EnTranslations = {
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
-      "mobileLeftHanded": "Rozvržení pro leváky"
+      "mobileLeftHanded": "Rozvržení pro leváky",
+      "ia": {
+        "railDisplay": "Zobrazení",
+        "railInput": "Vstup",
+        "railSystem": "Systémová nastavení",
+        "catOverviewName": "Přehled",
+        "catOverviewSub": "Připnuté základní volby, rychlé akce a změny.",
+        "catGraphicsSub": "Kvalita, dohled a vzhled světa.",
+        "catInterfaceSub": "Měřítko HUD, panely, chat a rámečky jednotek.",
+        "catAccessibilityName": "Přístupnost",
+        "catAccessibilitySub": "Pohyb, kontrast a pohodlné zobrazení obsahu.",
+        "catControlsName": "Ovládání",
+        "catControlsSub": "Kamera, pohyb, boj a odezva.",
+        "catKeybindsSub": "Nastav klávesy pro každou akci.",
+        "catControllerSub": "Pocit z gamepadu a rozložení tlačítek.",
+        "catTouchName": "Dotykové ovládání",
+        "catTouchSub": "Ovládací páčky na obrazovce, rozhlížení a tlačítka.",
+        "catAudioSub": "Hlasitost a přepínače zvuku.",
+        "catSystemName": "Systémová nastavení",
+        "catSystemSub": "Výkon, podpora a informace."
+      },
+      "done": "Hotovo",
+      "resetAllTitle": "Resetovat všechna nastavení?",
+      "resetAllBody": "Tím se všechna nastavení vrátí na výchozí hodnoty. Tuto akci nelze vrátit zpět.",
+      "searchPlaceholder": "Hledat v nastavení",
+      "searchScopeAll": "Všechna nastavení",
+      "searchScopeThis": "Tato sekce",
+      "searchEmpty": "Tvému hledání neodpovídá žádné nastavení.",
+      "searchGoTo": "Přejít na {category}",
+      "modeOnline": "Síťový režim",
+      "modeOffline": "Režim bez připojení",
+      "changed": "Změněno: {count}",
+      "changedSummary": "Změněno oproti výchozím hodnotám: {count}",
+      "legend": {
+        "category": "Kategorie",
+        "navigate": "Navigace",
+        "select": "Vybrat",
+        "back": "Zpět",
+        "reset": "Resetovat",
+        "clear": "Vymazat",
+        "page": "Stránka"
+      },
+      "keybindCleared": "Vymazána klávesa pro {action}",
+      "keybindRebinding": "Přemapování akce {action}. Stiskni klávesu, nebo zruš akci klávesou Escape.",
+      "keybindEvicted": "Přiřazena klávesa {key} k akci {action}; odebrána z {evicted}",
+      "keybindTaken": "Klávesa odebrána",
+      "keybindUnbound": "{action} nemá přiřazenou klávesu",
+      "keybindModifierHint": "Tip: můžeš přiřadit kombinace modifikačních kláves. Podrž Shift, Ctrl nebo Alt a stiskni klávesu, aby se kombinace zachytila, například Shift+1.",
+      "conflictDot": "Konflikt přiřazení",
+      "overviewConflictAlert": "Některá přiřazení kláves jsou v konfliktu nebo chybí.",
+      "sec": {
+        "quality": "Kvalita",
+        "view": "Výhled",
+        "general": "Obecné",
+        "scaleText": "Měřítko a text",
+        "panels": "Panely",
+        "unitFrames": "Rámečky jednotek",
+        "actionBars": "Lišty akcí",
+        "chat": "Konverzace",
+        "combatTooltips": "Boj a popisky",
+        "hudExtras": "Doplňky HUD",
+        "motionContrast": "Pohyb a kontrast",
+        "content": "Obsah",
+        "camera": "Ovládání kamery",
+        "movement": "Pohyb",
+        "combat": "Boj",
+        "feedback": "Odezva",
+        "inputMode": "Režim vstupu",
+        "feel": "Pocit ze hry",
+        "sticks": "Ovládací páčky",
+        "look": "Rozhlížení",
+        "buttons": "Tlačítka",
+        "volume": "Hlasitost",
+        "toggles": "Přepínače",
+        "performance": "Výkon",
+        "support": "Podpora",
+        "about": "Informace"
+      }
     },
     "controller": {
       "title": "Ovladač",
@@ -583,7 +677,8 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
-      "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce."
+      "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce.",
+      "duplicate": "Také přiřazeno k {buttons}"
     },
     "perf": {
       "title": "Performance overlay",
@@ -716,13 +811,17 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Sestava {n}"
+      "defaultBuildName": "Sestava {n}",
+      "choicesTab": "Volby",
+      "resetChoices": "Resetovat volby",
+      "tierLevel": "Úroveň {n}",
+      "tierLevelLabel": "Úroveň"
     },
     "tips": {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
-    "itemHeroicTag": "[HEROIC]",
-    "itemSoulbound": "Soulbound",
+    "itemHeroicTag": "[HRDINSKÉ]",
+    "itemSoulbound": "Vázáno na duši",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1069,10 +1168,10 @@ export const cs_CZ: EnTranslations = {
       "spawn": "{name} povstává nad Thornpeak Heights!"
     },
     "auth": {
-      "appleLoginCta": "Continue with Apple",
-      "appleError": "Could not sign in with Apple. Please try again.",
-      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
-      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "appleLoginCta": "Pokračovat přes Apple",
+      "appleError": "Přihlášení přes Apple se nezdařilo. Zkus to znovu.",
+      "appleChoiceIntro": "Vytvoř nový účet, nebo propoj Apple s účtem, který už máš.",
+      "appleChoiceExpired": "Platnost tohoto přihlášení přes Apple vypršela. Přihlas se přes Apple znovu.",
       "forgotPrompt": "Zapomenuté heslo?",
       "forgotTitle": "Obnovení hesla",
       "forgotHint": "Zadejte své uživatelské jméno a na uloženou e-mailovou adresu pošleme odkaz pro obnovení.",
@@ -1317,8 +1416,8 @@ export const cs_CZ: EnTranslations = {
       "parcelsLabel": "Balíky",
       "parcelsHint": "Klikni na předmět v batozích a přilož ho.",
       "removeParcelAria": "Odebrat {item} z dopisu",
-      "parcelQtyDecreaseAria": "Send one fewer {item}",
-      "parcelQtyIncreaseAria": "Send one more {item}",
+      "parcelQtyDecreaseAria": "Odeslat o jeden kus {item} méně",
+      "parcelQtyIncreaseAria": "Odeslat o jeden kus {item} více",
       "sendButton": "Odeslat dopis",
       "postageNote": "Poštovné: {amount}. Havran poletí asi {seconds} s.",
       "arrivedBanner": "Havran přistál: pošta od {name}.",
@@ -3923,7 +4022,17 @@ export const cs_CZ: EnTranslations = {
     "enterTimeout": "Nepodařilo se vstoupit do světa. Připojení vypršelo. Běží herní server?",
     "connectionLost": "Připojení k serveru bylo ztraceno.",
     "reconnecting": "Připojení ztraceno. Znovu se připojuje...",
-    "connectionRejected": "Server ukončil připojení."
+    "connectionRejected": "Server ukončil připojení.",
+    "tips": {
+      "classes": "Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.",
+      "talents": "Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.",
+      "dungeons": "Tip: až svou výbavou přerosteš normální obtížnost dungeonu, vyzkoušej hrdinskou obtížnost. Čeká tě těžší boj a lepší odměna.",
+      "market": "Tip: na Světovém trhu můžeš nakupovat a prodávat s hráči z celého světa.",
+      "guilds": "Tip: vstupem do cechu získáš soukromý chatovací kanál a sdílený seznam členů cechu.",
+      "professions": "Tip: sběračská a řemeslná povolání můžeš trénovat souběžně s bojovou třídou.",
+      "loadouts": "Tip: ulož si více než jednu sestavu talentů, abys mohl(a) přepínat mezi sestavami bez dvojího utrácení bodů.",
+      "pvp": "Tip: vyzvi jiného hráče na přátelský souboj, nebo se zařaď do fronty arény Popelavého kolosea a vyzkoušej svou sestavu."
+    }
   },
   "errors": {
     "nothingInteract": "Není s čím interagovat.",
@@ -4918,6 +5027,8 @@ export const cs_CZ: EnTranslations = {
       "buybackTitle": "Zpětný odkup",
       "buybackEmpty": "Žádné předměty",
       "buybackAria": "Odkoupit zpět {item} za {price}",
+      "sellItemAria": "Prodat {item} za {price}",
+      "sellRolledWarning": "Náhodně vytvořené vlastnosti nelze získat zpět odkoupením.",
       "sellQuantityTitle": "Prodat {item}",
       "sellQuantityInput": "Množství k prodeji",
       "sellQuantityConfirm": "Prodat",
@@ -5846,7 +5957,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Tesák starého Šedočelista"
       },
       "chunk_of_ore": {
-        "name": "Chunk of Ore"
+        "name": "Kus rudy"
       },
       "weathered_ledger_page": {
         "name": "Ošlehaná stránka účetní knihy"
@@ -7529,12 +7640,12 @@ export const cs_CZ: EnTranslations = {
     },
     "quests": {
       "q_prof_intro": {
-        "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "title": "Řemeslo pro každou ruku",
+        "text": "Každý v Eastbrooku ovládá vedle meče i nějaké řemeslo, {playerName}. Kolem města jsou roztroušené rudné žíly, tak se rozmáchni krumpáčem a přines mi 5 kusů. Vytěž je vlastníma rukama; rozdíl poznám.",
+        "completion": "Vidíš? Rudu v batohu a mozoly na rukou. Pokračuj v těžbě, kácení dřeva a sběru bylin, když cestuješ po cestách, a až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a řemeslnický ponk poblíž. V tom všem čeká poctivé živobytí, pokud o něj stojíš.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Kus rudy"
           }
         }
       },

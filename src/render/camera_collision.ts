@@ -16,12 +16,28 @@ function expEase(current: number, target: number, rate: number, dt: number): num
   return current + (target - current) * (1 - Math.exp(-rate * dt));
 }
 
+/**
+ * The base vertical field of view (degrees) the chase camera renders with, given
+ * the player's cameraFov comfort setting. Clamped to the supported [55, 100]
+ * range (a non-finite stored value falls back to the shipped 60) so an
+ * out-of-range value can never distort the projection. renderer.ts stores this
+ * and threads it through stepCameraOcclusion as the occlusion base every frame,
+ * so the slider both changes the rendered FOV and survives the per-frame camera
+ * update (the base previously hardcoded 60 there, silently ignoring the setting).
+ * The bounds mirror SETTING_RANGES.cameraFov; kept as literals so this pure render
+ * helper stays free of a src/game import.
+ */
+export function resolveCameraBaseFov(userFov: number): number {
+  if (!Number.isFinite(userFov)) return 60;
+  return Math.min(100, Math.max(55, userFov));
+}
+
 function compensatedFov(baseFov: number, maxFov: number, apparentT: number, pullT: number): number {
   const safePull = Math.max(1e-3, pullT);
   const ratio = Math.max(1, apparentT / safePull);
   if (ratio <= 1.001) return baseFov;
-  const baseRad = baseFov * Math.PI / 180;
-  const fov = 2 * Math.atan(Math.tan(baseRad / 2) * ratio) * 180 / Math.PI;
+  const baseRad = (baseFov * Math.PI) / 180;
+  const fov = (2 * Math.atan(Math.tan(baseRad / 2) * ratio) * 180) / Math.PI;
   return Math.min(maxFov, Math.max(baseFov, fov));
 }
 
@@ -46,9 +62,8 @@ export function stepCameraOcclusion(
 ): CameraOcclusionState {
   const hard = clamp01(hardLimit);
   const soft = clamp01(softLimit);
-  const softTarget = hard >= 1 && soft < 1
-    ? hard + (soft - hard) * Math.min(1, Math.max(0, softWeight))
-    : hard;
+  const softTarget =
+    hard >= 1 && soft < 1 ? hard + (soft - hard) * Math.min(1, Math.max(0, softWeight)) : hard;
   const target = Math.min(hard, softTarget);
   const rate = target < state.pullT ? pullInRate : pullOutRate;
   const easedPull = expEase(clamp01(state.pullT), target, rate, dt);

@@ -95,21 +95,30 @@
     transform: none;
     flex: none;
   }
-  /* Resizable windows (class stamped by src/ui/window_resize.ts): a diagonal grip
-     drawn as an extra background layer on the window itself, so it stays pinned to
-     the visual bottom-right corner while the content scrolls (an element or
-     pseudo-element would scroll away with the content). The second layer restates
-     the shared --panel-bg frame gradient. */
-  .window.window-resizable {
-    background-image:
-      repeating-linear-gradient(135deg, transparent 0 3px, var(--gold-dim) 3px 4px), var(--panel-bg);
-    background-size:
-      12px 12px,
-      auto;
-    background-position:
-      right 3px bottom 3px,
-      0 0;
-    background-repeat: no-repeat, repeat;
+  /* Resizable windows (class stamped by src/ui/window_resize.ts): one diagonal
+     grip at the visual bottom-right corner, drawn as a ::after pseudo on the
+     window ROOT. It sits ABOVE the frame body AND a sticky .window-footer, which
+     a frame-background grip sat behind (an opaque footer hid the grip on every
+     window that has one, while footerless windows showed it: the exact grip
+     inconsistency this replaces). Every resizable window is now the flex model
+     (root overflow:hidden, the body scrolls INSIDE the frame), so the root never
+     scrolls and the pinned pseudo never scrolls away, which is why the old
+     comment's background-layer workaround is no longer needed. Only a resizable
+     host stamps .window-resizable, so non-resizable windows get no grip; hidden
+     on touch (the dock chrome owns the corner and the touch band still resizes). */
+  .window.window-resizable::after {
+    content: "";
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 12px;
+    height: 12px;
+    background-image: repeating-linear-gradient(135deg, transparent 0 3px, var(--gold-dim) 3px 4px);
+    pointer-events: none;
+    z-index: 8;
+  }
+  body.mobile-touch .window.window-resizable::after {
+    display: none;
   }
   .window.window-resize-hot,
   .window.window-resizing {

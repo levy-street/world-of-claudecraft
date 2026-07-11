@@ -64,13 +64,22 @@
     if (action === 'unjail') return t('moderationHistory.actionUnjail');
     if (action === 'note') return t('moderationHistory.actionNote');
     if (action === 'reset_password') return t('moderationHistory.actionResetPassword');
+    if (action === 'daily_rewards_ban') return t('moderationHistory.actionDailyRewardsBan');
+    if (action === 'daily_rewards_unban') return t('moderationHistory.actionDailyRewardsUnban');
+    if (action === 'daily_rewards_ip_ban') return t('moderationHistory.actionDailyRewardsIpBan');
+    if (action === 'daily_rewards_ip_unban') return t('moderationHistory.actionDailyRewardsIpUnban');
     if (action === 'block') return t('moderationHistory.actionIpBlock');
     if (action === 'unblock') return t('moderationHistory.actionIpUnblock');
     return t('moderationHistory.actionUnknown');
   }
 
   function actionVariant(action: string): BadgeVariant {
-    if (action === 'ban' || action === 'block') return 'bad';
+    if (
+      action === 'ban' ||
+      action === 'block' ||
+      action === 'daily_rewards_ban' ||
+      action === 'daily_rewards_ip_ban'
+    ) return 'bad';
     if (
       action === 'suspend' ||
       action === 'chat_mute' ||
@@ -87,6 +96,8 @@
       action === 'chat_unmute' ||
       action === 'unjail' ||
       action === 'unblock'
+      || action === 'daily_rewards_unban'
+      || action === 'daily_rewards_ip_unban'
     ) {
       return 'success';
     }

@@ -11,16 +11,21 @@ const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url)
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
 describe('bags_window: no magic values', () => {
-  it('carries no literal hex color in TS (quality color comes from QUALITY_COLOR + a token)', () => {
+  it('carries no literal hex color in TS (the item-cell grammar resolves rarity in CSS)', () => {
     const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
     expect(hex, `hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
   });
 
-  it('uses the --color-quality-default token for the unranked-quality fallback', () => {
-    expect(painter).toContain('var(--color-quality-default)');
+  it('drives the slot rarity from data-quality (the item-cell grammar), no colour in TS', () => {
+    // The AAA .item-cell grammar resolves the rarity border from the quality tokens
+    // via the data-quality attribute; the painter no longer sets a colour custom
+    // property, so QUALITY_COLOR / --bag-slot-quality leave the painter entirely.
+    expect(painter).toContain("row.setAttribute('data-quality', bagQualityKey(item))");
+    expect(painter).not.toContain('--bag-slot-quality');
+    expect(painter).not.toContain('QUALITY_COLOR');
   });
 
-  it('defines --color-quality-default in the design-token sheet', () => {
+  it('defines --color-quality-default in the design-token sheet (the item-cell default)', () => {
     expect(tokens).toContain('--color-quality-default:');
   });
 

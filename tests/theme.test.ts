@@ -104,6 +104,44 @@ describe('theme pure core', () => {
     }
   });
 
+  it('severity + success tokens clear their floors over BOTH panel and panel edge per preset', () => {
+    for (const id of PRESET_ORDER) {
+      const vars = themeCssVars(resolveTheme({ preset: id, custom: {} }));
+      const panel = vars['--panel-base'];
+      const edge = vars['--panel-edge'];
+      for (const bg of [panel, edge]) {
+        // Warn / danger / success are non-text UI colours (badge borders,
+        // urgency accents): the 3:1 non-text floor. Critical doubles as error
+        // text, so it holds full AA (4.5:1).
+        expect(wcagContrast(vars['--color-urgency-warn'], bg), `${id} warn`).toBeGreaterThanOrEqual(
+          3,
+        );
+        expect(
+          wcagContrast(vars['--color-urgency-danger'], bg),
+          `${id} danger`,
+        ).toBeGreaterThanOrEqual(3);
+        expect(
+          wcagContrast(vars['--color-notify-success'], bg),
+          `${id} success`,
+        ).toBeGreaterThanOrEqual(3);
+        expect(
+          wcagContrast(vars['--color-notify-critical'], bg),
+          `${id} critical`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
+  it('notify-success keeps the shipped green on the dark classic panel, repairs it on parchment', () => {
+    const classic = themeCssVars(resolveTheme({ preset: 'classic', custom: {} }));
+    // Already readable on the dark panel: the base value ships untouched.
+    expect(classic['--color-notify-success']).toBe('#7fdc4f');
+    const parchment = themeCssVars(resolveTheme({ preset: 'parchment', custom: {} }));
+    // The static alias computed ~1.3:1 as a badge-success border on parchment;
+    // the theme must emit a repaired value, not the base.
+    expect(parchment['--color-notify-success']).not.toBe('#7fdc4f');
+  });
+
   it('High-Contrast Text outline flips to the opposite side of the panel lightness', () => {
     for (const id of PRESET_ORDER) {
       const vars = themeCssVars(resolveTheme({ preset: id, custom: {} }));

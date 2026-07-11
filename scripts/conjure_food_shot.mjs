@@ -4,8 +4,9 @@
 // and the bags with a conjured-bread tooltip.
 //
 // Needs `npm run dev` on :5173 (override with GAME_URL). Writes to tmp/.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -20,7 +21,9 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
-page.on('console', (m) => { if (m.type() === 'error') console.log('CONSOLE:', m.text()); });
+page.on('console', (m) => {
+  if (m.type() === 'error') console.log('CONSOLE:', m.text());
+});
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
 await page.evaluate(() => document.querySelector('#btn-offline').click());
@@ -36,7 +39,9 @@ const info = await page.evaluate(() => {
   const sim = g.sim;
   sim.setPlayerLevel(18);
   const p = sim.player;
-  p.maxHp = 99999; p.hp = 99999; p.resource = 99999;
+  p.maxHp = 99999;
+  p.hp = 99999;
+  p.resource = 99999;
   // conjure each rank's bread so all three tiers sit in the bags
   sim.addItem('conjured_bread', 2);
   sim.addItem('conjured_bread2', 2);
@@ -76,11 +81,13 @@ await page.evaluate(() => {
 });
 await sleep(600);
 const hovered = await page.evaluate(() => {
-  const rows = [...document.querySelectorAll('#bags .bag-item')];
-  const el = rows.find((r) => /Conjured (Bread|Pumpernickel|Sweet Roll)/i.test(r.textContent || r.getAttribute('aria-label') || ''));
+  const rows = [...document.querySelectorAll('#bags .item-cell')];
+  const el = rows.find((r) =>
+    /Conjured (Bread|Pumpernickel|Sweet Roll)/i.test(r.getAttribute('aria-label') || ''),
+  );
   if (!el) return false;
   el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-  return el.textContent.trim();
+  return (el.getAttribute('aria-label') || '').trim();
 });
 console.log('hovered conjured bread slot:', hovered);
 await sleep(500);

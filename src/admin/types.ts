@@ -279,6 +279,8 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  dailyRewardsBan?: { reason: string; createdAt: string } | null;
+  dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {

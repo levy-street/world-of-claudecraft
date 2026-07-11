@@ -82,7 +82,8 @@ interface RuntimeConfigCache {
 
 interface Eligibility {
   eligible: boolean;
-  reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable';
+  reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable' | 'banned';
+  banReason: string | null;
   walletPubkey: string | null;
   wocBalance: number | null;
   wocUsdPrice: number | null;
@@ -362,6 +363,7 @@ export async function dailyRewardEligibility(
     return {
       eligible: false,
       reason: 'no_wallet',
+      banReason: null,
       walletPubkey: null,
       wocBalance: null,
       wocUsdPrice: runtimeConfig.wocUsdPrice,
@@ -377,6 +379,7 @@ export async function dailyRewardEligibility(
     return {
       eligible: false,
       reason: 'price_unavailable',
+      banReason: null,
       walletPubkey: wallet.pubkey,
       wocBalance: balance,
       wocUsdPrice: price,
@@ -388,6 +391,7 @@ export async function dailyRewardEligibility(
   return {
     eligible: usdValue >= runtimeConfig.minUsd,
     reason: usdValue >= runtimeConfig.minUsd ? 'eligible' : 'under_minimum',
+    banReason: null,
     walletPubkey: wallet.pubkey,
     wocBalance: balance,
     wocUsdPrice: price,
@@ -564,6 +568,26 @@ function currentTaskMultiplier(
 export class DailyRewardService {
   constructor(private readonly db: DailyRewardDb = new PgDailyRewardDb()) {}
 
+  private async eligibility(
+    accountId: number,
+    config: DailyRewardRuntimeConfig,
+  ): Promise<Eligibility> {
+    const ban = await this.db.banForAccount(accountId);
+    if (ban) {
+      return {
+        eligible: false,
+        reason: 'banned',
+        banReason: ban.reason,
+        walletPubkey: null,
+        wocBalance: null,
+        wocUsdPrice: config.wocUsdPrice,
+        usdValue: null,
+        minUsd: config.minUsd,
+      };
+    }
+    return dailyRewardEligibility(accountId, config);
+  }
+
   async activeSeconds(day?: string): Promise<number> {
     if (day) return (await dailyRewardRuntimeConfig(day)).activeSeconds;
     return (await dailyRewardClock()).config.activeSeconds;
@@ -580,7 +604,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock();
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     const [score, rank, spin, tasks, leaders, leaderboardTotal, onlineMinutes] = await Promise.all([
       this.db.scoreForAccount(day, accountId),
       this.db.rankForAccount(day, accountId),
@@ -645,7 +669,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock();
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible)
       return { error: 'daily rewards are locked for this wallet', status: 403 };
     const existing = await this.db.spinForAccount(day, accountId);
@@ -680,7 +704,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'quest_completion');
     if (tasks.length === 0) return 0;
@@ -737,7 +761,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'arena_result');
     if (tasks.length === 0) return 0;
@@ -784,7 +808,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'delve_clear');
     if (tasks.length === 0) return 0;
@@ -831,7 +855,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock(openedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'delve_clear');
     if (tasks.length === 0) return 0;
@@ -889,7 +913,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'vale_cup_result');
     if (tasks.length === 0) return 0;

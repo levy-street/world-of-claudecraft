@@ -5305,6 +5305,12 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
+  {
+    re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
+    build: (m) =>
+      t('hudChrome.readyCheck.result', { ready: m[1], notReady: m[2], noResponse: m[3] }),
+  },
   { re: /^Your class has no talent tree yet\.$/, build: () => t('game.talents.readout.noTree') },
   {
     re: /^You have not unlocked talents yet — they begin at level (.+)\.$/,

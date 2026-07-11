@@ -65,21 +65,21 @@ const FOCUS_SELECTORS = [
   '#btn-start-offline',
   '#actionbar .action-btn:not(.empty)',
   '#options-menu .btn',
-  '#options-menu .x-btn',
+  '#options-menu .window-close',
   '#spellbook .spell-row',
   '#quest-dialog .qd-list-item',
   '#quest-log-window .ql-item',
-  '#vendor-window .vendor-item',
+  '#vendor-window .vendor-row',
   '#market-window .mkt-tab',
   '#market-window .mkt-btn',
   '#market-window .mkt-list-btn',
-  '#social-window .soc-tab',
+  '#social-window [data-window-tab]',
   '#social-window .soc-x',
   '#social-window .soc-name.soc-link',
   '#trade-window .trade-item.mine',
   '#trade-window .btn',
   '#trade-copper',
-  '#bags .bag-item',
+  '#bags .item-cell',
 ];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -114,9 +114,11 @@ function isProjectStatsUrl(url) {
 }
 
 function isAllowedBrowserError(text) {
-  return /Failed to fetch project stats|project-stats/i.test(text)
-    || (/Failed to load resource/i.test(text) && /502|Bad Gateway/i.test(text))
-    || /fullscreen|screen\.orientation|orientation\.lock/i.test(text);
+  return (
+    /Failed to fetch project stats|project-stats/i.test(text) ||
+    (/Failed to load resource/i.test(text) && /502|Bad Gateway/i.test(text)) ||
+    /fullscreen|screen\.orientation|orientation\.lock/i.test(text)
+  );
 }
 
 function isAllowedNetworkIssue(url) {
@@ -173,14 +175,19 @@ async function newAuditedPage(browser, viewport, label) {
     page,
     assertNoDiagnostics() {
       if (diagnostics.length > 0) {
-        throw new Error(`Browser diagnostics failed for ${label}:\n${diagnostics.slice(0, 8).join('\n')}`);
+        throw new Error(
+          `Browser diagnostics failed for ${label}:\n${diagnostics.slice(0, 8).join('\n')}`,
+        );
       }
     },
   };
 }
 
 async function gotoLocale(page, locale) {
-  await page.goto(localUrlForLocale(locale), { waitUntil: 'domcontentloaded', timeout: WAIT_TIMEOUT });
+  await page.goto(localUrlForLocale(locale), {
+    waitUntil: 'domcontentloaded',
+    timeout: WAIT_TIMEOUT,
+  });
   await page.waitForSelector('#lang-select', { timeout: WAIT_TIMEOUT });
   await sleep(250);
 }
@@ -210,53 +217,91 @@ async function assertHomepageLocale(page, locale) {
     };
   });
   const currentUrl = new URL(page.url());
-  check(result.htmlLang === expectedLang, `${locale}: expected html lang ${expectedLang}, got ${result.htmlLang}`);
+  check(
+    result.htmlLang === expectedLang,
+    `${locale}: expected html lang ${expectedLang}, got ${result.htmlLang}`,
+  );
   check(result.selectedLanguage === locale, `${locale}: language selector did not keep ${locale}`);
-  check(currentUrl.searchParams.get('lang') === locale, `${locale}: URL did not include lang=${locale}`);
+  check(
+    currentUrl.searchParams.get('lang') === locale,
+    `${locale}: URL did not include lang=${locale}`,
+  );
   check(result.title.length > 10, `${locale}: document title is missing`);
-  check(result.canonicalHref === expectedSiteUrl, `${locale}: canonical URL mismatch: ${result.canonicalHref}`);
+  check(
+    result.canonicalHref === expectedSiteUrl,
+    `${locale}: canonical URL mismatch: ${result.canonicalHref}`,
+  );
   check(result.ogUrl === expectedSiteUrl, `${locale}: Open Graph URL mismatch: ${result.ogUrl}`);
-  check(result.jsonLdLanguage === expectedLang, `${locale}: JSON-LD language mismatch: ${result.jsonLdLanguage}`);
-  check(result.jsonLdUrl === expectedSiteUrl, `${locale}: JSON-LD URL mismatch: ${result.jsonLdUrl}`);
+  check(
+    result.jsonLdLanguage === expectedLang,
+    `${locale}: JSON-LD language mismatch: ${result.jsonLdLanguage}`,
+  );
+  check(
+    result.jsonLdUrl === expectedSiteUrl,
+    `${locale}: JSON-LD URL mismatch: ${result.jsonLdUrl}`,
+  );
   check(result.playText.length > 0, `${locale}: play nav text is empty`);
 }
 
 async function switchLanguage(page, locale) {
   await page.select('#lang-select', locale);
-  await page.waitForFunction((expected) => {
-    return document.documentElement.lang === expected
-      && new URL(location.href).searchParams.get('lang') === expected.replace('-', '_');
-  }, { timeout: WAIT_TIMEOUT }, languageTag(locale));
+  await page.waitForFunction(
+    (expected) => {
+      return (
+        document.documentElement.lang === expected &&
+        new URL(location.href).searchParams.get('lang') === expected.replace('-', '_')
+      );
+    },
+    { timeout: WAIT_TIMEOUT },
+    languageTag(locale),
+  );
   await assertHomepageLocale(page, locale);
 }
 
 async function assertNoVisibleMarkers(page, label) {
   const failures = await page.evaluate(() => {
     const markerPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/i;
-    const keyPattern = /\b(?:seo|hud|questUi|itemUi|abilityUi|worldContent|entities|mobilePreflight|auth|errors)\.[A-Za-z0-9_.]+/;
+    const keyPattern =
+      /\b(?:seo|hud|questUi|itemUi|abilityUi|worldContent|entities|mobilePreflight|auth|errors)\.[A-Za-z0-9_.]+/;
     const unresolvedPattern = /\{[A-Za-z][A-Za-z0-9_]*\}|\$[NCd]/;
     const isVisible = (el) => {
       const style = getComputedStyle(el);
       const rect = el.getBoundingClientRect();
-      return style.display !== 'none'
-        && style.visibility !== 'hidden'
-        && rect.width > 0
-        && rect.height > 0;
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        rect.width > 0 &&
+        rect.height > 0
+      );
     };
     return [...document.body.querySelectorAll('*')]
       .filter(isVisible)
-      .map((el) => ({ label: cssPath(el), text: (el.textContent ?? '').replace(/\s+/g, ' ').trim() }))
+      .map((el) => ({
+        label: cssPath(el),
+        text: (el.textContent ?? '').replace(/\s+/g, ' ').trim(),
+      }))
       .filter((entry) => entry.text.length > 0)
-      .filter((entry) => markerPattern.test(entry.text) || keyPattern.test(entry.text) || unresolvedPattern.test(entry.text))
+      .filter(
+        (entry) =>
+          markerPattern.test(entry.text) ||
+          keyPattern.test(entry.text) ||
+          unresolvedPattern.test(entry.text),
+      )
       .slice(0, 12);
 
     function cssPath(el) {
       if (el.id) return `#${el.id}`;
-      const classes = [...el.classList].slice(0, 2).map((name) => `.${name}`).join('');
+      const classes = [...el.classList]
+        .slice(0, 2)
+        .map((name) => `.${name}`)
+        .join('');
       return `${el.tagName.toLowerCase()}${classes}`;
     }
   });
-  check(failures.length === 0, `${label}: visible localization markers found:\n${failures.map((f) => `${f.label}: ${f.text}`).join('\n')}`);
+  check(
+    failures.length === 0,
+    `${label}: visible localization markers found:\n${failures.map((f) => `${f.label}: ${f.text}`).join('\n')}`,
+  );
 }
 
 async function assertNoHorizontalOverflow(page, label) {
@@ -267,11 +312,13 @@ async function assertNoHorizontalOverflow(page, label) {
       .filter((el) => {
         const style = getComputedStyle(el);
         const rect = el.getBoundingClientRect();
-        return style.display !== 'none'
-          && style.visibility !== 'hidden'
-          && style.overflowX !== 'hidden'
-          && rect.width > 0
-          && rect.height > 0;
+        return (
+          style.display !== 'none' &&
+          style.visibility !== 'hidden' &&
+          style.overflowX !== 'hidden' &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
       })
       .filter((el) => el.scrollWidth > el.clientWidth + 2)
       .map((el) => describe(el, `${el.scrollWidth}px > ${el.clientWidth}px`))
@@ -286,12 +333,21 @@ async function assertNoHorizontalOverflow(page, label) {
 
     function describe(el, detail) {
       const id = el.id ? `#${el.id}` : '';
-      const klass = [...el.classList].slice(0, 3).map((name) => `.${name}`).join('');
+      const klass = [...el.classList]
+        .slice(0, 3)
+        .map((name) => `.${name}`)
+        .join('');
       return `${el.tagName.toLowerCase()}${id}${klass} ${detail}`;
     }
   });
-  check(!result.pageOverflow, `${label}: page has horizontal overflow (${result.docWidth}/${result.bodyWidth} > ${result.viewportWidth})`);
-  check(result.openPanels.length === 0, `${label}: open panels have horizontal overflow:\n${result.openPanels.join('\n')}`);
+  check(
+    !result.pageOverflow,
+    `${label}: page has horizontal overflow (${result.docWidth}/${result.bodyWidth} > ${result.viewportWidth})`,
+  );
+  check(
+    result.openPanels.length === 0,
+    `${label}: open panels have horizontal overflow:\n${result.openPanels.join('\n')}`,
+  );
 }
 
 async function assertNoClippedText(page, label) {
@@ -302,13 +358,14 @@ async function assertNoClippedText(page, label) {
       'select',
       'textarea',
       '.panel-title',
+      '.window-title',
       '.qd-text',
       '.qd-obj',
       '.ql-item',
       '.spell-name',
       '.spell-sub',
-      '.vendor-item',
-      '.bag-item',
+      '.vendor-row',
+      '.item-cell',
       '.mkt-row',
       '.mkt-note',
       '#error-msg',
@@ -318,14 +375,25 @@ async function assertNoClippedText(page, label) {
       .filter((el) => {
         const style = getComputedStyle(el);
         const rect = el.getBoundingClientRect();
-        if (style.display === 'none' || style.visibility === 'hidden' || rect.width <= 0 || rect.height <= 0) return false;
+        if (
+          style.display === 'none' ||
+          style.visibility === 'hidden' ||
+          rect.width <= 0 ||
+          rect.height <= 0
+        )
+          return false;
         if (style.overflowX === 'auto' || style.overflowX === 'scroll') return false;
         return el.scrollWidth > el.clientWidth + 2;
       })
       .map((el) => {
         const id = el.id ? `#${el.id}` : '';
-        const klass = [...el.classList].slice(0, 3).map((name) => `.${name}`).join('');
-        const text = (el.textContent || el.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
+        const klass = [...el.classList]
+          .slice(0, 3)
+          .map((name) => `.${name}`)
+          .join('');
+        const text = (el.textContent || el.getAttribute('aria-label') || '')
+          .replace(/\s+/g, ' ')
+          .trim();
         return `${el.tagName.toLowerCase()}${id}${klass}: ${el.scrollWidth}px > ${el.clientWidth}px (${text.slice(0, 80)})`;
       })
       .slice(0, 12);
@@ -356,9 +424,13 @@ async function assertAccessibleNames(page, label) {
         const title = el.getAttribute('title')?.trim() ?? '';
         const placeholder = el.getAttribute('placeholder')?.trim() ?? '';
         const text = (el.textContent ?? '').replace(/\s+/g, ' ').trim();
-        const value = ['button', 'submit', 'reset'].includes(el.getAttribute('type') ?? '') ? el.getAttribute('value') ?? '' : '';
+        const value = ['button', 'submit', 'reset'].includes(el.getAttribute('type') ?? '')
+          ? (el.getAttribute('value') ?? '')
+          : '';
         const name = aria || ariaLabelledBy || label || title || placeholder || text || value;
-        const hasSemanticName = Boolean(aria || ariaLabelledBy || label || title || placeholder || value);
+        const hasSemanticName = Boolean(
+          aria || ariaLabelledBy || label || title || placeholder || value,
+        );
         return {
           label: describe(el),
           name,
@@ -371,14 +443,19 @@ async function assertAccessibleNames(page, label) {
     function isVisible(el) {
       const style = getComputedStyle(el);
       const rect = el.getBoundingClientRect();
-      return style.display !== 'none'
-        && style.visibility !== 'hidden'
-        && rect.width > 0
-        && rect.height > 0;
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        rect.width > 0 &&
+        rect.height > 0
+      );
     }
     function labelledBy(el) {
       const ids = (el.getAttribute('aria-labelledby') ?? '').split(/\s+/).filter(Boolean);
-      return ids.map((id) => document.getElementById(id)?.textContent?.trim() ?? '').join(' ').trim();
+      return ids
+        .map((id) => document.getElementById(id)?.textContent?.trim() ?? '')
+        .join(' ')
+        .trim();
     }
     function nativeLabel(el) {
       if (el.id) {
@@ -390,11 +467,17 @@ async function assertAccessibleNames(page, label) {
     }
     function describe(el) {
       const id = el.id ? `#${el.id}` : '';
-      const klass = [...el.classList].slice(0, 3).map((name) => `.${name}`).join('');
+      const klass = [...el.classList]
+        .slice(0, 3)
+        .map((name) => `.${name}`)
+        .join('');
       return `${el.tagName.toLowerCase()}${id}${klass}`;
     }
   });
-  check(failures.length === 0, `${label}: interactive elements missing accessible names:\n${failures.map((f) => f.label).join('\n')}`);
+  check(
+    failures.length === 0,
+    `${label}: interactive elements missing accessible names:\n${failures.map((f) => f.label).join('\n')}`,
+  );
 }
 
 async function assertMobileFormSizes(page, label) {
@@ -403,7 +486,12 @@ async function assertMobileFormSizes(page, label) {
       .filter((el) => {
         const style = getComputedStyle(el);
         const rect = el.getBoundingClientRect();
-        return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+        return (
+          style.display !== 'none' &&
+          style.visibility !== 'hidden' &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
       })
       .filter((el) => parseFloat(getComputedStyle(el).fontSize) < 16)
       .map((el) => `${describe(el)} font-size ${getComputedStyle(el).fontSize}`)
@@ -411,29 +499,50 @@ async function assertMobileFormSizes(page, label) {
 
     function describe(el) {
       const id = el.id ? `#${el.id}` : '';
-      const klass = [...el.classList].slice(0, 3).map((name) => `.${name}`).join('');
+      const klass = [...el.classList]
+        .slice(0, 3)
+        .map((name) => `.${name}`)
+        .join('');
       return `${el.tagName.toLowerCase()}${id}${klass}`;
     }
   });
-  check(failures.length === 0, `${label}: visible mobile form controls below 16px:\n${failures.join('\n')}`);
+  check(
+    failures.length === 0,
+    `${label}: visible mobile form controls below 16px:\n${failures.join('\n')}`,
+  );
 }
 
 async function assertMobileTouchTargets(page, label, rootSelectors = MOBILE_AUDIT_ROOTS) {
   const failures = await page.evaluate((roots) => {
-    const interactive = 'button, a[href], input:not([type="hidden"]), select, textarea, [role="button"], [role="tab"], [role="option"]';
+    const interactive =
+      'button, a[href], input:not([type="hidden"]), select, textarea, [role="button"], [role="tab"], [role="option"]';
     const results = [];
     for (const rootSelector of roots) {
       const root = document.querySelector(rootSelector);
       if (!root) continue;
       const rootStyle = getComputedStyle(root);
       const rootRect = root.getBoundingClientRect();
-      if (rootStyle.display === 'none' || rootStyle.visibility === 'hidden' || rootRect.width <= 0 || rootRect.height <= 0) continue;
-      const candidates = root.matches(interactive) ? [root, ...root.querySelectorAll(interactive)] : [...root.querySelectorAll(interactive)];
+      if (
+        rootStyle.display === 'none' ||
+        rootStyle.visibility === 'hidden' ||
+        rootRect.width <= 0 ||
+        rootRect.height <= 0
+      )
+        continue;
+      const candidates = root.matches(interactive)
+        ? [root, ...root.querySelectorAll(interactive)]
+        : [...root.querySelectorAll(interactive)];
       for (const el of candidates) {
         if (el.disabled || getComputedStyle(el).pointerEvents === 'none') continue;
         const style = getComputedStyle(el);
         const rect = el.getBoundingClientRect();
-        if (style.display === 'none' || style.visibility === 'hidden' || rect.width <= 0 || rect.height <= 0) continue;
+        if (
+          style.display === 'none' ||
+          style.visibility === 'hidden' ||
+          rect.width <= 0 ||
+          rect.height <= 0
+        )
+          continue;
         if (rect.width < 39.5 || rect.height < 39.5) {
           results.push(`${describe(el)} ${Math.round(rect.width)}x${Math.round(rect.height)}`);
         }
@@ -443,11 +552,17 @@ async function assertMobileTouchTargets(page, label, rootSelectors = MOBILE_AUDI
 
     function describe(el) {
       const id = el.id ? `#${el.id}` : '';
-      const klass = [...el.classList].slice(0, 3).map((name) => `.${name}`).join('');
+      const klass = [...el.classList]
+        .slice(0, 3)
+        .map((name) => `.${name}`)
+        .join('');
       return `${el.tagName.toLowerCase()}${id}${klass}`;
     }
   }, rootSelectors);
-  check(failures.length === 0, `${label}: mobile touch targets below 40px:\n${failures.join('\n')}`);
+  check(
+    failures.length === 0,
+    `${label}: mobile touch targets below 40px:\n${failures.join('\n')}`,
+  );
 }
 
 async function assertFocusVisible(page, label, selectors = FOCUS_SELECTORS) {
@@ -458,7 +573,13 @@ async function assertFocusVisible(page, label, selectors = FOCUS_SELECTORS) {
       const el = [...document.querySelectorAll(selector)].find((candidate) => {
         const style = getComputedStyle(candidate);
         const rect = candidate.getBoundingClientRect();
-        return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0 && !candidate.disabled;
+        return (
+          style.display !== 'none' &&
+          style.visibility !== 'hidden' &&
+          rect.width > 0 &&
+          rect.height > 0 &&
+          !candidate.disabled
+        );
       });
       if (!el || typeof el.focus !== 'function') continue;
       el.focus({ preventScroll: true });
@@ -470,7 +591,10 @@ async function assertFocusVisible(page, label, selectors = FOCUS_SELECTORS) {
     }
     return failed;
   }, selectors);
-  check(failures.length === 0, `${label}: focused controls lack a visible outline or shadow:\n${failures.join('\n')}`);
+  check(
+    failures.length === 0,
+    `${label}: focused controls lack a visible outline or shadow:\n${failures.join('\n')}`,
+  );
 }
 
 async function assertContrast(page, label) {
@@ -483,13 +607,14 @@ async function assertContrast(page, label) {
       'select',
       'textarea',
       '.panel-title',
+      '.window-title',
       '.qd-text',
       '.qd-obj',
       '.ql-item',
       '.spell-name',
       '.spell-sub',
-      '.vendor-item',
-      '.bag-item',
+      '.vendor-row',
+      '.item-cell',
       '.mkt-row',
       '.mkt-note',
       '#chatlog div',
@@ -500,14 +625,21 @@ async function assertContrast(page, label) {
       .filter((el) => {
         const style = getComputedStyle(el);
         const rect = el.getBoundingClientRect();
-        const text = (el.textContent || el.getAttribute('aria-label') || el.getAttribute('placeholder') || '').trim();
-        return text.length > 0
-          && !el.closest('.visually-hidden')
-          && style.display !== 'none'
-          && style.visibility !== 'hidden'
-          && parseFloat(style.opacity) !== 0
-          && rect.width > 0
-          && rect.height > 0;
+        const text = (
+          el.textContent ||
+          el.getAttribute('aria-label') ||
+          el.getAttribute('placeholder') ||
+          ''
+        ).trim();
+        return (
+          text.length > 0 &&
+          !el.closest('.visually-hidden') &&
+          style.display !== 'none' &&
+          style.visibility !== 'hidden' &&
+          parseFloat(style.opacity) !== 0 &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
       })
       .map((el) => {
         const style = getComputedStyle(el);
@@ -521,11 +653,17 @@ async function assertContrast(page, label) {
           label: describe(el),
           ratio,
           minRatio,
-          text: (el.textContent || el.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim().slice(0, 60),
+          text: (el.textContent || el.getAttribute('aria-label') || '')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 60),
         };
       })
       .filter((entry) => entry.ratio + 0.01 < entry.minRatio)
-      .map((entry) => `${entry.label} contrast ${entry.ratio.toFixed(2)} < ${entry.minRatio}: ${entry.text}`)
+      .map(
+        (entry) =>
+          `${entry.label} contrast ${entry.ratio.toFixed(2)} < ${entry.minRatio}: ${entry.text}`,
+      )
       .slice(0, 12);
 
     function parseColor(value) {
@@ -573,7 +711,10 @@ async function assertContrast(page, label) {
     }
     function describe(el) {
       const id = el.id ? `#${el.id}` : '';
-      const klass = [...el.classList].slice(0, 3).map((name) => `.${name}`).join('');
+      const klass = [...el.classList]
+        .slice(0, 3)
+        .map((name) => `.${name}`)
+        .join('');
       return `${el.tagName.toLowerCase()}${id}${klass}`;
     }
   });
@@ -594,8 +735,13 @@ async function assertAuditBasics(page, label, options = {}) {
 
 async function assertNonEnglishNotFallback(page, locale, selector, englishText, label) {
   if (locale === 'en' || locale === 'en_CA') return;
-  const text = await page.$eval(selector, (el) => (el.textContent ?? el.getAttribute('aria-label') ?? '').replace(/\s+/g, ' ').trim());
-  check(!text.includes(englishText), `${label}: non-English surface still includes English fallback "${englishText}" in "${text}"`);
+  const text = await page.$eval(selector, (el) =>
+    (el.textContent ?? el.getAttribute('aria-label') ?? '').replace(/\s+/g, ' ').trim(),
+  );
+  check(
+    !text.includes(englishText),
+    `${label}: non-English surface still includes English fallback "${englishText}" in "${text}"`,
+  );
 }
 
 // Presence zones in the social roster come from the server as canonical English
@@ -606,10 +752,16 @@ async function assertSocialZonesLocalized(page, locale, englishZones, label) {
   if (locale === 'en' || locale === 'en_CA') return;
   const texts = await page.$$eval(
     '#social-window .soc-row .zone, #social-window .soc-row [title]',
-    (els) => els.map((el) => `${el.textContent ?? ''} ${el.getAttribute('title') ?? ''}`.replace(/\s+/g, ' ').trim()),
+    (els) =>
+      els.map((el) =>
+        `${el.textContent ?? ''} ${el.getAttribute('title') ?? ''}`.replace(/\s+/g, ' ').trim(),
+      ),
   );
   for (const english of englishZones) {
-    check(!texts.some((tx) => tx.includes(english)), `${label}: social presence zone still shows English "${english}" in ${JSON.stringify(texts)}`);
+    check(
+      !texts.some((tx) => tx.includes(english)),
+      `${label}: social presence zone still shows English "${english}" in ${JSON.stringify(texts)}`,
+    );
   }
 }
 
@@ -641,10 +793,15 @@ async function runMobileHomepageAudit(page, locale, viewport) {
     '#lang-select',
   ]);
   await page.click('.mobile-menu-toggle');
-  await page.waitForFunction(() => {
-    return document.querySelector('.homepage-header')?.classList.contains('menu-open');
-  }, { timeout: WAIT_TIMEOUT });
-  await assertAuditBasics(page, `mobile homepage menu ${locale} ${viewport.name}`, { mobile: true });
+  await page.waitForFunction(
+    () => {
+      return document.querySelector('.homepage-header')?.classList.contains('menu-open');
+    },
+    { timeout: WAIT_TIMEOUT },
+  );
+  await assertAuditBasics(page, `mobile homepage menu ${locale} ${viewport.name}`, {
+    mobile: true,
+  });
   await assertFocusVisible(page, `mobile homepage menu focus ${locale} ${viewport.name}`, [
     '.mobile-menu-toggle',
     '#header-logo-btn',
@@ -662,12 +819,19 @@ async function enterOfflineGame(page, locale, viewport) {
   await page.evaluate(() => document.querySelector('#btn-offline').click());
   await page.waitForSelector('#offline-select:not([hidden])', { timeout: WAIT_TIMEOUT });
   await page.click('#btn-start-offline');
-  await page.waitForFunction(() => {
-    const error = document.querySelector('#offline-error');
-    const input = document.querySelector('#char-name');
-    return error?.textContent?.trim().length > 0 && input?.getAttribute('aria-invalid') === 'true';
-  }, { timeout: WAIT_TIMEOUT });
-  await assertAuditBasics(page, `offline validation ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await page.waitForFunction(
+    () => {
+      const error = document.querySelector('#offline-error');
+      const input = document.querySelector('#char-name');
+      return (
+        error?.textContent?.trim().length > 0 && input?.getAttribute('aria-invalid') === 'true'
+      );
+    },
+    { timeout: WAIT_TIMEOUT },
+  );
+  await assertAuditBasics(page, `offline validation ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
 
   await page.evaluate(() => {
     const input = document.querySelector('#char-name');
@@ -678,22 +842,32 @@ async function enterOfflineGame(page, locale, viewport) {
   await page.click('#btn-start-offline');
 
   if (viewport.isMobile) {
-    await page.waitForFunction(() => {
-      const prompt = document.querySelector('#mobile-preflight');
-      return prompt
-        && getComputedStyle(prompt).display !== 'none'
-        && prompt.classList.contains('visible')
-        && document.body.classList.contains('mobile-touch');
-    }, { timeout: WAIT_TIMEOUT });
+    await page.waitForFunction(
+      () => {
+        const prompt = document.querySelector('#mobile-preflight');
+        return (
+          prompt &&
+          getComputedStyle(prompt).display !== 'none' &&
+          prompt.classList.contains('visible') &&
+          document.body.classList.contains('mobile-touch')
+        );
+      },
+      { timeout: WAIT_TIMEOUT },
+    );
     await assertAuditBasics(page, `mobile preflight ${locale} ${viewport.name}`, { mobile: true });
     await page.click('#mobile-preflight-continue');
   }
 
-  await page.waitForFunction(() => {
-    return Boolean(window.__game?.sim?.player && document.body.classList.contains('game-active'));
-  }, { timeout: 60000, polling: 250 });
+  await page.waitForFunction(
+    () => {
+      return Boolean(window.__game?.sim?.player && document.body.classList.contains('game-active'));
+    },
+    { timeout: 60000, polling: 250 },
+  );
   await sleep(800);
-  await assertAuditBasics(page, `game entry ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await assertAuditBasics(page, `game entry ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
 }
 
 async function setupGameScene(page) {
@@ -708,11 +882,19 @@ async function setupGameScene(page) {
       sim.addItem(itemId, itemId === 'wolf_fang' ? 3 : 1);
     }
     const entities = [...sim.entities.values()];
-    const questNpc = entities.find((entity) => entity.kind === 'npc' && (entity.questIds?.length ?? 0) > 0);
-    const vendorNpc = entities.find((entity) => entity.kind === 'npc' && (entity.vendorItems?.length ?? 0) > 0);
-    const merchant = entities.find((entity) => entity.kind === 'npc' && entity.templateId === 'the_merchant');
-    const wolf = entities.find((entity) => entity.kind === 'mob' && entity.templateId === 'forest_wolf' && !entity.dead)
-      ?? entities.find((entity) => entity.kind === 'mob' && !entity.dead);
+    const questNpc = entities.find(
+      (entity) => entity.kind === 'npc' && (entity.questIds?.length ?? 0) > 0,
+    );
+    const vendorNpc = entities.find(
+      (entity) => entity.kind === 'npc' && (entity.vendorItems?.length ?? 0) > 0,
+    );
+    const merchant = entities.find(
+      (entity) => entity.kind === 'npc' && entity.templateId === 'the_merchant',
+    );
+    const wolf =
+      entities.find(
+        (entity) => entity.kind === 'mob' && entity.templateId === 'forest_wolf' && !entity.dead,
+      ) ?? entities.find((entity) => entity.kind === 'mob' && !entity.dead);
     if (questNpc) {
       const pos = sim.groundPos(questNpc.pos.x, questNpc.pos.z - 3);
       player.pos = pos;
@@ -744,7 +926,11 @@ async function runChatAndCombat(page, scene, locale, viewport) {
   });
   await page.type('#chat-input', '42');
   await page.keyboard.press('Enter');
-  await page.waitForFunction(() => [...document.querySelectorAll('#chatlog div')].some((row) => row.textContent?.includes('42')), { timeout: WAIT_TIMEOUT });
+  await page.waitForFunction(
+    () =>
+      [...document.querySelectorAll('#chatlog div')].some((row) => row.textContent?.includes('42')),
+    { timeout: WAIT_TIMEOUT },
+  );
 
   await page.evaluate((wolfId) => {
     const g = window.__game;
@@ -764,8 +950,12 @@ async function runChatAndCombat(page, scene, locale, viewport) {
     sim.castAbility('fire_blast');
   }, scene.wolfId);
   await page.evaluate(() => document.querySelector('[data-tab="combat"]')?.click());
-  await page.waitForFunction(() => document.querySelectorAll('#combatlog div').length > 0, { timeout: WAIT_TIMEOUT });
-  await assertAuditBasics(page, `chat and combat ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await page.waitForFunction(() => document.querySelectorAll('#combatlog div').length > 0, {
+    timeout: WAIT_TIMEOUT,
+  });
+  await assertAuditBasics(page, `chat and combat ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
 }
 
 async function runHudOptions(page, locale, viewport) {
@@ -773,9 +963,17 @@ async function runHudOptions(page, locale, viewport) {
     window.__game.hud.closeAll();
     window.__game.hud.toggleOptionsMenu();
   });
-  await page.waitForSelector('#options-menu .opt-btn', { timeout: WAIT_TIMEOUT });
-  await assertNonEnglishNotFallback(page, locale, '#options-menu .panel-title span', 'Game Menu', `options ${locale} ${viewport.name}`);
-  await assertAuditBasics(page, `options ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await page.waitForSelector('#options-menu .window-title', { timeout: WAIT_TIMEOUT });
+  await assertNonEnglishNotFallback(
+    page,
+    locale,
+    '#options-menu .window-title',
+    'Game Menu',
+    `options ${locale} ${viewport.name}`,
+  );
+  await assertAuditBasics(page, `options ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
   await page.evaluate(() => window.__game.hud.closeAll());
 }
 
@@ -785,9 +983,23 @@ async function runSpellbookAndActions(page, locale, viewport) {
     window.__game.hud.toggleSpellbook();
   });
   await page.waitForSelector('#spellbook .spell-row', { timeout: WAIT_TIMEOUT });
-  await assertNonEnglishNotFallback(page, locale, '#spellbook .panel-title span', 'Spellbook', `spellbook ${locale} ${viewport.name}`);
-  await assertNonEnglishNotFallback(page, locale, '#actionbar .action-btn[aria-label]', 'Attack', `action bar ${locale} ${viewport.name}`);
-  await assertAuditBasics(page, `spellbook and action bar ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await assertNonEnglishNotFallback(
+    page,
+    locale,
+    '#spellbook .window-title',
+    'Spellbook',
+    `spellbook ${locale} ${viewport.name}`,
+  );
+  await assertNonEnglishNotFallback(
+    page,
+    locale,
+    '#actionbar .action-btn[aria-label]',
+    'Attack',
+    `action bar ${locale} ${viewport.name}`,
+  );
+  await assertAuditBasics(page, `spellbook and action bar ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
   await page.evaluate(() => window.__game.hud.closeAll());
 }
 
@@ -805,8 +1017,12 @@ async function runQuestSurfaces(page, scene, locale, viewport) {
     window.__game.hud.openQuestDialog(npcId);
   }, scene.questNpcId);
   await page.waitForSelector('#quest-dialog .qd-list-item', { timeout: WAIT_TIMEOUT });
-  await assertAuditBasics(page, `npc dialogue ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
-  await page.evaluate(() => document.querySelector('#quest-dialog .qd-list-item[data-quest]')?.click());
+  await assertAuditBasics(page, `npc dialogue ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
+  await page.evaluate(() =>
+    document.querySelector('#quest-dialog .qd-list-item[data-quest]')?.click(),
+  );
   await sleep(250);
   await page.evaluate(() => document.querySelector('#quest-dialog .btn')?.click());
   await sleep(250);
@@ -822,8 +1038,16 @@ async function runQuestSurfaces(page, scene, locale, viewport) {
     window.__game.hud.toggleQuestLog();
   });
   await page.waitForSelector('#quest-log-window .ql-item', { timeout: WAIT_TIMEOUT });
-  await assertNonEnglishNotFallback(page, locale, '#quest-log-title', 'Quest Log', `quest log ${locale} ${viewport.name}`);
-  await assertAuditBasics(page, `quest log ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await assertNonEnglishNotFallback(
+    page,
+    locale,
+    '#quest-log-window .window-title',
+    'Quest Log',
+    `quest log ${locale} ${viewport.name}`,
+  );
+  await assertAuditBasics(page, `quest log ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
   await page.evaluate(() => window.__game.hud.closeAll());
 }
 
@@ -832,21 +1056,35 @@ async function runItemVendorMarket(page, scene, locale, viewport) {
     window.__game.hud.closeAll();
     window.__game.hud.openVendor(npcId);
   }, scene.vendorNpcId);
-  await page.waitForSelector('#vendor-window .vendor-item', { timeout: WAIT_TIMEOUT });
-  await page.waitForSelector('#bags .bag-item', { timeout: WAIT_TIMEOUT });
-  await assertAuditBasics(page, `inventory and vendor ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await page.waitForSelector('#vendor-window .vendor-row', { timeout: WAIT_TIMEOUT });
+  await page.waitForSelector('#bags .item-cell', { timeout: WAIT_TIMEOUT });
+  await assertAuditBasics(page, `inventory and vendor ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
 
   await page.evaluate(() => {
     window.__game.hud.closeAll();
     window.__game.hud.openMarket();
   });
   await page.waitForSelector('#market-window [data-tab="sell"]', { timeout: WAIT_TIMEOUT });
-  await assertNonEnglishNotFallback(page, locale, '#market-window .panel-title span', 'World Market', `market ${locale} ${viewport.name}`);
+  await assertNonEnglishNotFallback(
+    page,
+    locale,
+    '#market-window .panel-title span',
+    'World Market',
+    `market ${locale} ${viewport.name}`,
+  );
   await page.evaluate(() => document.querySelector('#market-window [data-tab="sell"]')?.click());
-  await page.waitForFunction(() => {
-    return document.querySelector('#market-window [data-tab="sell"]')?.getAttribute('aria-pressed') === 'true';
-  }, { timeout: WAIT_TIMEOUT });
-  await page.evaluate(() => document.querySelector('#bags .bag-item')?.click());
+  await page.waitForFunction(
+    () => {
+      return (
+        document.querySelector('#market-window [data-tab="sell"]')?.getAttribute('aria-pressed') ===
+        'true'
+      );
+    },
+    { timeout: WAIT_TIMEOUT },
+  );
+  await page.evaluate(() => document.querySelector('#bags .item-cell')?.click());
   await page.waitForSelector('#mkt-c', { timeout: WAIT_TIMEOUT });
   await page.evaluate(() => {
     for (const id of ['mkt-g', 'mkt-s', 'mkt-c']) {
@@ -855,11 +1093,16 @@ async function runItemVendorMarket(page, scene, locale, viewport) {
     }
   });
   await page.evaluate(() => document.querySelector('#market-body .mkt-list-btn')?.click());
-  await page.waitForFunction(() => {
-    const text = document.querySelector('#error-msg')?.textContent?.trim() ?? '';
-    return text.length > 0;
-  }, { timeout: WAIT_TIMEOUT });
-  await assertAuditBasics(page, `market and error state ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await page.waitForFunction(
+    () => {
+      const text = document.querySelector('#error-msg')?.textContent?.trim() ?? '';
+      return text.length > 0;
+    },
+    { timeout: WAIT_TIMEOUT },
+  );
+  await assertAuditBasics(page, `market and error state ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
 }
 
 async function runSocialAndTradeSurfaces(page, locale, viewport) {
@@ -869,7 +1112,16 @@ async function runSocialAndTradeSurfaces(page, locale, viewport) {
     g.sim.realm = 'Eastbrook';
     g.sim.socialInfo = {
       friends: [
-        { id: 801, name: 'Boro', cls: 'warrior', level: 12, realm: 'Eastbrook', online: true, zone: 'Eastbrook Vale', status: 'online' },
+        {
+          id: 801,
+          name: 'Boro',
+          cls: 'warrior',
+          level: 12,
+          realm: 'Eastbrook',
+          online: true,
+          zone: 'Eastbrook Vale',
+          status: 'online',
+        },
       ],
       blocks: [{ id: 802, name: 'Rook' }],
       guild: {
@@ -877,23 +1129,65 @@ async function runSocialAndTradeSurfaces(page, locale, viewport) {
         name: 'Dawn Wardens',
         rank: 'leader',
         members: [
-          { id: player.id, name: player.name, cls: 'mage', level: player.level, realm: 'Eastbrook', online: true, zone: 'Eastbrook Vale', status: 'online', rank: 'leader' },
-          { id: 803, name: 'Ilyra', cls: 'priest', level: 14, realm: 'Eastbrook', online: true, zone: 'Mirefen Marsh', status: 'dungeon', rank: 'officer' },
+          {
+            id: player.id,
+            name: player.name,
+            cls: 'mage',
+            level: player.level,
+            realm: 'Eastbrook',
+            online: true,
+            zone: 'Eastbrook Vale',
+            status: 'online',
+            rank: 'leader',
+          },
+          {
+            id: 803,
+            name: 'Ilyra',
+            cls: 'priest',
+            level: 14,
+            realm: 'Eastbrook',
+            online: true,
+            zone: 'Mirefen Marsh',
+            status: 'dungeon',
+            rank: 'officer',
+          },
         ],
       },
     };
     g.hud.closeAll();
     g.hud.toggleSocial();
   });
-  await page.waitForSelector('#social-window.open .soc-tab', { timeout: WAIT_TIMEOUT });
-  await assertNonEnglishNotFallback(page, locale, '#social-window .panel-title span', 'Social', `social ${locale} ${viewport.name}`);
-  await assertAuditBasics(page, `social friends ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
-  await assertSocialZonesLocalized(page, locale, ['Eastbrook Vale'], `social friends ${locale} ${viewport.name}`);
-  await page.click('#social-window .soc-tab[data-tab="guild"]');
-  await assertAuditBasics(page, `social guild ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
-  await assertSocialZonesLocalized(page, locale, ['Eastbrook Vale', 'Mirefen Marsh'], `social guild ${locale} ${viewport.name}`);
-  await page.click('#social-window .soc-tab[data-tab="ignore"]');
-  await assertAuditBasics(page, `social ignore ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
+  await page.waitForSelector('#social-window.open [data-window-tab]', { timeout: WAIT_TIMEOUT });
+  await assertNonEnglishNotFallback(
+    page,
+    locale,
+    '#social-window .window-title',
+    'Social',
+    `social ${locale} ${viewport.name}`,
+  );
+  await assertAuditBasics(page, `social friends ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
+  await assertSocialZonesLocalized(
+    page,
+    locale,
+    ['Eastbrook Vale'],
+    `social friends ${locale} ${viewport.name}`,
+  );
+  await page.click('#social-window [data-window-tab="guild"]');
+  await assertAuditBasics(page, `social guild ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
+  await assertSocialZonesLocalized(
+    page,
+    locale,
+    ['Eastbrook Vale', 'Mirefen Marsh'],
+    `social guild ${locale} ${viewport.name}`,
+  );
+  await page.click('#social-window [data-window-tab="ignore"]');
+  await assertAuditBasics(page, `social ignore ${locale} ${viewport.name}`, {
+    mobile: viewport.isMobile,
+  });
 
   await page.evaluate(() => {
     const g = window.__game;
@@ -913,7 +1207,13 @@ async function runSocialAndTradeSurfaces(page, locale, viewport) {
     g.hud.updateTradeWindow();
   });
   await page.waitForSelector('#trade-window .trade-cols', { timeout: WAIT_TIMEOUT });
-  await assertNonEnglishNotFallback(page, locale, '#trade-window .panel-title span', 'Trade with', `trade ${locale} ${viewport.name}`);
+  await assertNonEnglishNotFallback(
+    page,
+    locale,
+    '#trade-window .panel-title span',
+    'Trade with',
+    `trade ${locale} ${viewport.name}`,
+  );
   await assertAuditBasics(page, `trade ${locale} ${viewport.name}`, { mobile: viewport.isMobile });
   await page.evaluate(() => {
     const g = window.__game;
@@ -967,7 +1267,12 @@ async function main() {
   const browser = await puppeteer.launch({
     executablePath: BROWSER_PATH,
     headless: 'new',
-    args: ['--window-size=1366,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'],
+    args: [
+      '--window-size=1366,900',
+      '--use-angle=swiftshader',
+      '--enable-unsafe-swiftshader',
+      '--no-sandbox',
+    ],
     defaultViewport: { width: 1366, height: 900 },
   });
   try {

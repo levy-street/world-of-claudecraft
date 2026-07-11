@@ -62,6 +62,12 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/ban')).toBe(
       'moderation.act',
     );
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/daily-rewards-ban'),
+    ).toBe('moderation.act');
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/accounts/42/daily-rewards-ip-ban'),
+    ).toBe('moderation.act');
     expect(permissionForAdminRoute('POST', '/admin/api/chat-filter/config')).toBe(
       'chatfilter.manage',
     );

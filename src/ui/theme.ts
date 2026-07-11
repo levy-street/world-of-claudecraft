@@ -183,6 +183,16 @@ export const MIN_TEXT_CONTRAST = 4.5;
 /** Minimum contrast for muted/secondary and accent (large-text tier). */
 export const MIN_LARGE_CONTRAST = 3;
 
+// AAA redesign, phase 0 theme inheritance (docs/design/ui-ux-redesign-spec.md
+// section 9.13): base hex values mirrored from the tokens.css :root defaults
+// (--color-urgency-warn, --color-hostile, --color-text-error), repaired per
+// preset by `ensureReadable` below so they clear AA against every preset's
+// panel, exactly like --color-gold/text/textMuted already are.
+const BASE_URGENCY_WARN = '#ff8800';
+const BASE_URGENCY_DANGER = '#ff6b5e'; // mirrors --color-hostile
+const BASE_NOTIFY_CRITICAL = '#ff8f85'; // mirrors --color-text-error
+const BASE_NOTIFY_SUCCESS = '#7fdc4f'; // mirrors --color-text-success
+
 /**
  * Repair a text colour so it clears `min` contrast against `panel`. We keep the
  * caller's hue when it already passes; otherwise we step it toward whichever of
@@ -248,6 +258,47 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
   // the glyph instead of separating it. The halo needs to sit on the opposite
   // side of the panel's lightness from the text, so flip it light there.
   const textOutline = lightPanel ? '#ffffff' : '#000000';
+  // AAA redesign, phase 0: the theme-inheriting subset of the new token groups
+  // (spec 9.13). These join themeCssVars as computed entries rather than new
+  // THEME_KNOB_ORDER slots: --color-panel-l0-bg and --color-scrim carry alpha,
+  // which the isValidHex custom-colour-picker gate cannot accept, and treating
+  // the other four as picker knobs would need matching entries in
+  // THEME_KNOB_LABEL_KEY *and* new i18n catalog rows for the Options custom-
+  // colour grid (src/ui/options_window.ts) to avoid an untracked-key throw at
+  // render time, which is out of scope for this token-only change. Deriving
+  // them here instead keeps the Options UI byte-for-byte unchanged while still
+  // making every one of them vary correctly per preset through main.ts's
+  // existing generic applyTheme loop.
+  const panelL0Bg = rgba(panel, 0.86);
+  // Like colorGold above, the severity colours are double-guarded against BOTH
+  // the panel and its edge: --panel-edge is the solid base of the L2/modal
+  // surfaces this token group defines, so a critical notification on a modal
+  // must clear its floor there too (on the light Parchment panel the
+  // single-guarded values pass the panel but fail the darker edge band).
+  const urgencyWarn = ensureReadable(
+    ensureReadable(BASE_URGENCY_WARN, panel, MIN_LARGE_CONTRAST),
+    panelEdge,
+    MIN_LARGE_CONTRAST,
+  );
+  const urgencyDanger = ensureReadable(
+    ensureReadable(BASE_URGENCY_DANGER, panel, MIN_LARGE_CONTRAST),
+    panelEdge,
+    MIN_LARGE_CONTRAST,
+  );
+  const notifyCritical = ensureReadable(
+    ensureReadable(BASE_NOTIFY_CRITICAL, panel, MIN_TEXT_CONTRAST),
+    panelEdge,
+    MIN_TEXT_CONTRAST,
+  );
+  // Success mirrors the critical/warn repair: the static #7fdc4f alias computed
+  // ~1.3:1 as a badge-success border on the light Parchment panel. A badge
+  // border is a non-text UI element, so it holds the same large-text/non-text
+  // tier as warn and danger.
+  const notifySuccess = ensureReadable(
+    ensureReadable(BASE_NOTIFY_SUCCESS, panel, MIN_LARGE_CONTRAST),
+    panelEdge,
+    MIN_LARGE_CONTRAST,
+  );
   return {
     '--gold': accent,
     '--gold-dim': accentDim,
@@ -273,6 +324,13 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
     '--color-mana': mana,
     '--color-rage': rage,
     '--color-energy': energy,
+    '--color-panel-l0-bg': panelL0Bg,
+    '--color-scrim': 'rgba(0, 0, 0, 0.55)',
+    '--color-urgency-warn': urgencyWarn,
+    '--color-urgency-danger': urgencyDanger,
+    '--color-notify-critical': notifyCritical,
+    '--color-notify-success': notifySuccess,
+    '--focus-ring-color': accentDim,
   };
 }
 
