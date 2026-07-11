@@ -196,6 +196,7 @@ import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
+import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
 import {
   classDisplayName,
@@ -1220,6 +1221,10 @@ export class Hud {
   private lastZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
+  // Dungeon Finder "Show on Map": a highlighted entrance + the zone band to
+  // display instead of the player's committed zone. Cleared on map open/close.
+  private mapPing: { x: number; z: number } | null = null;
+  private mapZoneOverride: string | null = null;
   private mapDrag: { px: number; py: number; cx: number; cz: number } | null = null;
   private mapView: {
     spanX: number;
@@ -1728,6 +1733,7 @@ export class Hud {
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
+    $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
     $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     const emoteBtn = $('#mm-emote');
@@ -2164,6 +2170,10 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
         // consistent with the toggle / X close path.
         this.arenaWindow.close();
+        break;
+      case 'dungeon-finder-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.dungeonFinderWindow.close();
         break;
       case 'valecup-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -3646,6 +3656,19 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#arena-window'),
     ...this.windowFocus('#arena-window'),
   });
+
+  // Dungeon Finder (cold window; docs/prd/dungeon-finder.md). Composes the
+  // shared presentation bag for loot icons/tooltips and a narrow map hook for
+  // the non-teleporting "Show on Map" action.
+  private readonly dungeonFinderWindow = new DungeonFinderWindow({
+    ...this.presentationBag,
+    root: () => $('#dungeon-finder-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#dungeon-finder-window'),
+    hideTooltip: () => this.hideTooltip(),
+    showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    ...this.windowFocus('#dungeon-finder-window'),
+  });
   // Vale Cup window painter (vale_cup_window_view.ts model + vale_cup_window.ts
   // painter, the ArenaWindow shape). It owns the bracket / nation / role
   // selections, the render-skip signature, and focus-return; Hud forwards the
@@ -4538,6 +4561,7 @@ export class Hud {
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
     // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
+    this.dungeonFinderWindow.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
     // sigs so the next render/update rebuilds with fresh t().
     this.valeCupWindow.relocalize();
@@ -6010,6 +6034,7 @@ export class Hud {
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
       ['#mm-arena', 'arena', 'hud.core.mobileArena'],
+      ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
       ['#mm-valecup', 'valecup', 'hudChrome.keybinds.valecup'],
       ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
       ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
@@ -6947,6 +6972,7 @@ export class Hud {
       this.updateShootCharge();
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
+      if ($('#dungeon-finder-window').style.display === 'block') this.dungeonFinderWindow.render();
       if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
       if (this.openLootMobId !== null) {
         const mob = sim.entities.get(this.openLootMobId);
@@ -8014,6 +8040,10 @@ export class Hud {
     this.arenaWindow.toggle();
   }
 
+  toggleDungeonFinder(): void {
+    this.dungeonFinderWindow.toggle();
+  }
+
   toggleValeCup(): void {
     this.valeCupWindow.toggle();
   }
@@ -8077,12 +8107,29 @@ export class Hud {
     if (el.style.display === 'block') {
       el.style.display = 'none';
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
+      this.mapPing = null;
+      this.mapZoneOverride = null;
       return;
     }
     this.closeOtherWindows('#map-window');
     this.mapZoom = 1; // always open at the full-zone view, following the player
     this.mapCenter = null;
+    this.mapPing = null;
+    this.mapZoneOverride = null;
     el.style.display = 'block';
+    this.updateMapWindow();
+  }
+
+  // Dungeon Finder "Show on Map": open the world map on the entrance's zone
+  // band, pan to the authored door position, and ring it. Never teleports; the
+  // highlight clears when the map closes or is reopened normally.
+  showFinderOnMap(x: number, z: number): void {
+    const el = $('#map-window');
+    if (el.style.display !== 'block') this.toggleMap();
+    this.mapZoneOverride = zoneAt(z).id;
+    this.mapPing = { x, z };
+    this.mapZoom = Math.max(this.mapZoom, 2);
+    this.mapCenter = { x, z };
     this.updateMapWindow();
   }
 
@@ -8127,15 +8174,18 @@ export class Hud {
     // the instance x-band layout); outdoors, follow the committed zone so
     // border-straddling can't thrash the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
-    const zone: ZoneDef = dungeon
-      ? zoneAt(dungeon.doorPos.z)
-      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
+    const zone: ZoneDef = this.mapZoneOverride
+      ? (ZONES.find((z) => z.id === this.mapZoneOverride) ?? zoneAt(p.pos.z))
+      : dungeon
+        ? zoneAt(dungeon.doorPos.z)
+        : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
       bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
       canvasSize: S,
       zoom: this.mapZoom,
       center: this.mapCenter,
+      ping: this.mapPing,
     });
     this.mapView = result.view;
     this.mapQuestAreas = result.questAreas;
@@ -9031,6 +9081,11 @@ export class Hud {
           break;
         case 'arenaUnqueued':
           this.log(t('hud.system.arenaUnqueued'), '#ffa040');
+          break;
+        case 'dfProposal':
+          // A 30s availability window: surface the finder's Quick Match tab so
+          // the accept/decline prompt is in front of the player immediately.
+          this.dungeonFinderWindow.open('queue');
           break;
         case 'arenaFound': {
           const name =

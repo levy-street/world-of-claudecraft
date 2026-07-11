@@ -33,6 +33,7 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
 import type {
@@ -354,6 +355,12 @@ export interface SimContextCallbacks {
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
+  // Dungeon Finder formation seam (owned by social/party.ts): merge solo
+  // players and whole partial parties into ONE party/raid without synthesizing
+  // invite prompts or accept events. Returns the formed party, or null (and
+  // mutates nothing) when a source roster no longer matches live party state.
+  // Consumed by social/dungeon_finder.ts.
+  formDungeonFinderGroup(units: FinderFormationUnit[], opts: { raid: boolean }): Party | null;
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
@@ -898,6 +905,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     partyInvite: host.partyInvite,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
+    formDungeonFinderGroup: host.formDungeonFinderGroup,
     onMobKilledForQuests: host.onMobKilledForQuests,
     onInventoryChangedForQuests: host.onInventoryChangedForQuests,
     checkQuestReady: host.checkQuestReady,

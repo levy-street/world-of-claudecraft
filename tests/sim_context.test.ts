@@ -71,6 +71,7 @@ const CALLBACK_KEYS = [
   'partyOf',
   'removeFromParty',
   'dropPartyMarkers',
+  'formDungeonFinderGroup',
   // Q1 quest-credit trio + the countItem it consumes.
   'onMobKilledForQuests',
   'onInventoryChangedForQuests',
@@ -334,6 +335,7 @@ function makeFakeHost() {
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
     dropPartyMarkers: vi.fn(),
+    formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),

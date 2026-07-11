@@ -2123,6 +2123,9 @@ export type SimEvent = { pid?: number } & (
   | { type: 'duelCountdown'; seconds: number }
   | { type: 'duelStart' }
   | { type: 'duelEnd'; winnerName: string; loserName: string }
+  // Dungeon Finder: a 30s availability proposal opened for this player (the
+  // client pops the finder window; state rides the `df` self snapshot).
+  | { type: 'dfProposal' }
   // Ashen Coliseum arena: queue state, match lifecycle, and rating result
   | { type: 'arenaQueued'; position: number; format: ArenaFormat }
   | { type: 'arenaUnqueued' }

@@ -3892,6 +3892,361 @@
     z-index: 2;
   }
 
+  /* ---------- Dungeon Finder ---------- */
+  #dungeon-finder-window {
+    width: 640px;
+    max-width: 96%;
+    --window-pad: 14px;
+  }
+  .df-tabs {
+    display: flex;
+    gap: 6px;
+    margin: 6px 0 10px;
+  }
+  .df-tab {
+    flex: 1;
+    padding: 6px 0;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .df-tab.active {
+    color: #ffb24a;
+    border-color: #8a6a28;
+    background: linear-gradient(180deg, #3a2c14, #241a0c);
+  }
+  .df-body {
+    display: block;
+  }
+  .df-cols {
+    display: grid;
+    grid-template-columns: 236px 1fr;
+    gap: 10px;
+  }
+  .df-rail,
+  .df-detail {
+    max-height: min(520px, 62vh);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .df-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 7px 8px;
+    margin: 0 0 4px;
+    background: #1c150c;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+  .df-row.active {
+    border-color: #8a6a28;
+    color: #ffd9a0;
+    background: linear-gradient(180deg, #33260f, #221808);
+  }
+  .df-row.ineligible {
+    opacity: 0.55;
+  }
+  .df-row-name {
+    display: block;
+    font-family: var(--title-font);
+    font-size: 13px;
+  }
+  .df-row-meta,
+  .df-lock,
+  .df-blocked {
+    display: block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-lock {
+    color: #d98181;
+  }
+  .df-badge {
+    display: inline-block;
+    padding: 1px 5px;
+    margin-left: 4px;
+    font-size: 10px;
+    border: 1px solid var(--panel-border);
+    border-radius: 3px;
+    color: var(--color-text-muted);
+    vertical-align: 1px;
+  }
+  .df-badge.heroic {
+    color: #d9964d;
+    border-color: #8a5a28;
+  }
+  .df-kind {
+    margin-left: 6px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-detail-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .df-detail-name {
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: var(--gold);
+  }
+  .df-back {
+    display: none;
+  }
+  .df-meta {
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .df-meta-row {
+    font-size: 12px;
+    margin: 2px 0;
+    color: var(--color-text-muted);
+  }
+  .df-entrance .df-map-btn {
+    margin-left: 6px;
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+  .df-sub {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 12px;
+    margin: 8px 0 4px;
+  }
+  .df-encounter {
+    display: flex;
+    gap: 8px;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+  .df-portrait {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    object-fit: cover;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    background: #12100a;
+  }
+  .df-encounter-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .df-encounter-name {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #ffd9a0;
+  }
+  .df-flag {
+    margin-left: 6px;
+    font-size: 10px;
+    color: #d9964d;
+    border: 1px solid #8a5a28;
+    border-radius: 3px;
+    padding: 0 4px;
+  }
+  .df-mechanics {
+    margin: 4px 0;
+  }
+  .df-chip {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 1px 8px;
+    margin: 0 4px 4px 0;
+    background: #171208;
+  }
+  .df-loot-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 6px 0 2px;
+  }
+  .df-loot-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 2px;
+    border-radius: 3px;
+  }
+  .df-loot-row:focus-visible {
+    outline: 2px solid var(--gold);
+  }
+  .df-loot-row img {
+    width: 22px;
+    height: 22px;
+  }
+  .df-loot-name {
+    flex: 1;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .df-loot-chance {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-loot-money {
+    margin-top: 4px;
+    font-size: 12px;
+  }
+  .df-proposal {
+    border: 1px solid #8a6a28;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #35270f, #201607);
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+  .df-proposal-title {
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: #ffd9a0;
+  }
+  .df-proposal-meta {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0 6px;
+  }
+  .df-proposal-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .df-proposal-actions .btn {
+    flex: 1;
+    text-align: center;
+  }
+  .df-roles,
+  .df-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .df-role,
+  .df-opt {
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    background: #1c150c;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .df-role.active,
+  .df-opt.active,
+  .df-tag.active {
+    color: #ffd9a0;
+    border-color: #8a6a28;
+    background: linear-gradient(180deg, #33260f, #221808);
+  }
+  .df-role[disabled],
+  .df-opt[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .df-footer .btn {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    margin: 4px 0;
+  }
+  .df-queue-status {
+    font-size: 12px;
+    color: #ffd9a0;
+    margin: 4px 0;
+  }
+  .df-note {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 6px 0;
+  }
+  .df-warn {
+    color: #d98181;
+  }
+  .df-create,
+  .df-mine,
+  .df-listing {
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+  .df-create-row {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .df-create-row select {
+    margin-left: 6px;
+    max-width: 100%;
+  }
+  .df-create-tags {
+    margin-bottom: 6px;
+  }
+  .df-tag {
+    cursor: var(--cursor-point);
+  }
+  .df-listing-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .df-listing-name {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #ffd9a0;
+  }
+  .df-listing-size,
+  .df-listing-meta,
+  .df-needed {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-member {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-right: 8px;
+  }
+  .df-listing-action {
+    margin-top: 6px;
+  }
+  .df-applicant {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--panel-border);
+    padding: 6px 0;
+  }
+  .df-app-name {
+    font-size: 12px;
+    color: #ffd9a0;
+  }
+  .df-app-meta {
+    flex: 1;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .df-app-actions {
+    display: flex;
+    gap: 6px;
+  }
+
   /* ---------- Ashen Coliseum (arena) ---------- */
   #arena-window {
     width: 360px;

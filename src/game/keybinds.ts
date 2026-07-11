@@ -181,6 +181,14 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyG'],
   },
   {
+    // Shift+KeyI: bare KeyI belongs to Calendar (unchanged).
+    id: 'dungeonFinder',
+    label: 'Dungeon Finder',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyI'],
+  },
+  {
     id: 'valecup',
     label: 'Vale Cup',
     category: 'Interface',

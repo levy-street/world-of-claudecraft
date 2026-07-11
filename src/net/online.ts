@@ -965,6 +965,11 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
+  // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
+  // missing key keeps the prior mirror, an explicit null clears it). ---
+  dungeonFinderInfo: import('../world_api').DungeonFinderInfo | null = null;
+  dungeonFinderBoard: import('../world_api').DungeonFinderBoard | null = null;
   // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
   // self (`s.vcup`, delta-omitted: a missing key keeps the prior mirror, an
   // explicit null clears it, same as `s.arena`). ---
@@ -1873,6 +1878,8 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.df !== undefined) this.dungeonFinderInfo = s.df;
+      if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
       if (s.vcup !== undefined) this.cupInfo = s.vcup;
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
@@ -2312,6 +2319,38 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
+  // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---
+  dungeonFinderSetRoles(roles: import('../sim/content/talents').Role[]): void {
+    this.cmd({ cmd: 'df_roles', roles });
+  }
+  dungeonFinderQueueJoin(activityIds: string[]): void {
+    this.cmd({ cmd: 'df_queue', activities: activityIds });
+  }
+  dungeonFinderQueueLeave(): void {
+    this.cmd({ cmd: 'df_queue_leave' });
+  }
+  dungeonFinderRespond(accept: boolean): void {
+    this.cmd({ cmd: 'df_proposal', accept });
+  }
+  dungeonFinderListingCreate(
+    activityId: string,
+    tags: import('../sim/content/dungeon_finder').FinderListingTag[],
+  ): void {
+    this.cmd({ cmd: 'df_list_create', activity: activityId, tags });
+  }
+  dungeonFinderListingClose(): void {
+    this.cmd({ cmd: 'df_list_close' });
+  }
+  dungeonFinderApply(listingId: number): void {
+    this.cmd({ cmd: 'df_apply', listing: listingId });
+  }
+  dungeonFinderApplyCancel(): void {
+    this.cmd({ cmd: 'df_apply_cancel' });
+  }
+  dungeonFinderApplicationRespond(applicantPid: number, accept: boolean): void {
+    this.cmd({ cmd: 'df_app_respond', applicant: applicantPid, accept });
   }
   // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
   // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---

@@ -180,6 +180,7 @@ function makeCtx() {
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
     dropPartyMarkers: vi.fn(),
+    formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),

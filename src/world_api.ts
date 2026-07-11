@@ -42,6 +42,7 @@
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
+//   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -61,6 +62,7 @@ import type { IWorldCosmetics } from './world_api/cosmetics';
 import type { IWorldDailyRewards } from './world_api/daily_rewards';
 import type { IWorldDelves } from './world_api/delves';
 import type { IWorldDuelArena } from './world_api/duel_arena';
+import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
 import type { IWorldInteraction } from './world_api/interaction';
@@ -119,6 +121,15 @@ export type {
   FiestaPowerupView,
   FiestaScoreboardPlayer,
 } from './world_api/duel_arena';
+export type {
+  DungeonFinderApplicantView,
+  DungeonFinderBoard,
+  DungeonFinderInfo,
+  DungeonFinderListingView,
+  DungeonFinderMyListingView,
+  DungeonFinderProposalView,
+  DungeonFinderQueueView,
+} from './world_api/dungeon_finder';
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
@@ -180,7 +191,8 @@ export interface IWorld
     IWorldTelemetry,
     IWorldProfessions,
     IWorldBank,
-    IWorldValeCup {}
+    IWorldValeCup,
+    IWorldDungeonFinder {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -341,6 +353,15 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'df_roles',
+  'df_queue',
+  'df_queue_leave',
+  'df_proposal',
+  'df_list_create',
+  'df_list_close',
+  'df_apply',
+  'df_apply_cancel',
+  'df_app_respond',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -406,7 +427,8 @@ export type WorldFacet =
   | 'IWorldDailyRewards'
   | 'IWorldTelemetry'
   | 'IWorldBank'
-  | 'IWorldValeCup';
+  | 'IWorldValeCup'
+  | 'IWorldDungeonFinder';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -558,4 +580,15 @@ export const COMMAND_FACETS = {
   vcup_ready: 'IWorldValeCup',
   vcup_bet: 'IWorldValeCup',
   vcup_practice: 'IWorldValeCup',
+  // IWorldDungeonFinder: the group finder (snake_case wire strings, by design).
+  // dungeonFinderInfo / dungeonFinderBoard are snapshot reads (no send, untagged).
+  df_roles: 'IWorldDungeonFinder',
+  df_queue: 'IWorldDungeonFinder',
+  df_queue_leave: 'IWorldDungeonFinder',
+  df_proposal: 'IWorldDungeonFinder',
+  df_list_create: 'IWorldDungeonFinder',
+  df_list_close: 'IWorldDungeonFinder',
+  df_apply: 'IWorldDungeonFinder',
+  df_apply_cancel: 'IWorldDungeonFinder',
+  df_app_respond: 'IWorldDungeonFinder',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

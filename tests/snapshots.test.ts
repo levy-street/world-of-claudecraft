@@ -1978,7 +1978,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 
 // The pinned set of the 36 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 37th unregistered delta key reddens this gate.
+// 39th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'bags',
@@ -1991,6 +1991,8 @@ const ALL_DELTA_KEYS = [
   'dcomp',
   'dcompanion',
   'delveDaily',
+  'df',
+  'dfb',
   'dmarks',
   'drun',
   'duel',
@@ -2035,6 +2037,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
+  df: 'dungeonFinderInfo',
+  dfb: 'dungeonFinderBoard',
   dmarks: 'delveMarks',
   drun: 'delveRun',
   duel: 'duelInfo',
@@ -2323,9 +2327,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 36 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(36);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(36);
+  it('ALL_DELTA_KEYS contains exactly 38 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(38);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(38);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2337,7 +2341,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(36);
+    expect(scraped.size).toBe(38);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

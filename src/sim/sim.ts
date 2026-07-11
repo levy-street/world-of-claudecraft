@@ -322,6 +322,8 @@ import * as yumiMod from './social/yumi';
 // public path `import { Sim, eloDelta } from './sim'` (tests/arena.test.ts) holds.
 export { eloDelta } from './social/arena';
 
+import type { FinderListingTag } from './content/dungeon_finder';
+import { DungeonFinderMachine } from './social/dungeon_finder';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
 // by the fiestaMatchInfo presentation accessor (which STAYS on Sim).
@@ -1163,6 +1165,11 @@ export class Sim {
   // behind SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates
   // (partyOf + the eight command methods) so IWorld + foreign call sites resolve.
   private party!: PartyMachine;
+  // Dungeon Finder (docs/prd/dungeon-finder.md): the queue/proposal/board
+  // machine, its own system module behind SimContext. Built in the ctor after
+  // `party` (it forms groups through the party machine's formation seam). Sim
+  // keeps thin delegates so IWorld + server dispatch resolve.
+  private dungeonFinder!: DungeonFinderMachine;
   // Player target selection + the party-scoped raid-marker store (T1): owns
   // partyMarkers and the tab/nearest/friendly selectors, moved off Sim behind
   // SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates (the nine
@@ -1302,6 +1309,9 @@ export class Sim {
     // is what they resolve against; nothing below this point draws on the machine
     // during construction.
     this.party = new PartyMachine(this.ctx);
+    // Dungeon Finder (consumes the seam plus the party formation seam; draws
+    // no rng, so constructing it here cannot perturb the draws below).
+    this.dungeonFinder = new DungeonFinderMachine(this.ctx);
     // Target selection + raid-marker store (T1): also constructed after ctx (it
     // consumes the seam). The ctx clearEntityMarker/dropPartyMarkers callbacks are
     // lazy arrows resolving against this instance.
@@ -1973,6 +1983,10 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
+    // Dungeon Finder teardown FIRST, while the leaver's party/roster still
+    // resolves (drops their queue unit, fails their proposal, closes their
+    // listing, withdraws their application).
+    this.dungeonFinder.onPlayerRemoved(pid);
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
@@ -2784,6 +2798,9 @@ export class Sim {
       partyOf: sim.partyOf.bind(sim),
       partyInvite: (targetPid: number, pid?: number) => sim.party.partyInvite(targetPid, pid),
       removeFromParty: (pid: number, verb: string) => sim.party.removeFromParty(pid, verb),
+      // Dungeon Finder formation seam (points at the party machine); lazy arrow
+      // since `sim.party` is built after ctx.
+      formDungeonFinderGroup: (units, opts) => sim.party.formDungeonFinderGroup(units, opts),
       // dropPartyMarkers flips to the T1 marker store (targeting); lazy arrow since
       // sim.targeting is built after ctx. The T1 selectors consume isHostileTo/
       // isFriendlyTo/pvpController/stopFollow, which are already bound above (C4a/C1) and
@@ -3293,6 +3310,10 @@ export class Sim {
     // tick-staggered bots), so appending it here cannot fork the draw order.
     this.updateValeCup();
     lap?.('valecup');
+    // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
+    // matching on the sim clock), so appending it here cannot fork the draw order.
+    this.updateDungeonFinder();
+    lap?.('dfinder');
     this.market.update();
     lap?.('market');
     this.postOffice.update();
@@ -5756,6 +5777,59 @@ export class Sim {
   // removePlayer through `this.ctx.removeFromParty` (the SimContext seam).
 
   // -------------------------------------------------------------------------
+  // Dungeon Finder (thin delegates into social/dungeon_finder.ts; the IWorld
+  // facet methods take a trailing optional pid for the server dispatch path)
+  // -------------------------------------------------------------------------
+  private updateDungeonFinder(): void {
+    this.dungeonFinder.update();
+  }
+
+  dungeonFinderSetRoles(roles: Role[], pid?: number): void {
+    this.dungeonFinder.dungeonFinderSetRoles(roles, pid);
+  }
+
+  dungeonFinderQueueJoin(activityIds: string[], pid?: number): void {
+    this.dungeonFinder.dungeonFinderQueueJoin(activityIds, pid);
+  }
+
+  dungeonFinderQueueLeave(pid?: number): void {
+    this.dungeonFinder.dungeonFinderQueueLeave(pid);
+  }
+
+  dungeonFinderRespond(accept: boolean, pid?: number): void {
+    this.dungeonFinder.dungeonFinderRespond(accept, pid);
+  }
+
+  dungeonFinderListingCreate(activityId: string, tags: FinderListingTag[], pid?: number): void {
+    this.dungeonFinder.dungeonFinderListingCreate(activityId, tags, pid);
+  }
+
+  dungeonFinderListingClose(pid?: number): void {
+    this.dungeonFinder.dungeonFinderListingClose(pid);
+  }
+
+  dungeonFinderApply(listingId: number, pid?: number): void {
+    this.dungeonFinder.dungeonFinderApply(listingId, pid);
+  }
+
+  dungeonFinderApplyCancel(pid?: number): void {
+    this.dungeonFinder.dungeonFinderApplyCancel(pid);
+  }
+
+  dungeonFinderApplicationRespond(applicantPid: number, accept: boolean, pid?: number): void {
+    this.dungeonFinder.dungeonFinderApplicationRespond(applicantPid, accept, pid);
+  }
+
+  dungeonFinderInfoFor(pid: number): import('../world_api').DungeonFinderInfo | null {
+    if (!this.players.has(pid)) return null;
+    return this.dungeonFinder.buildInfoFor(pid);
+  }
+
+  dungeonFinderBoardView(): import('../world_api').DungeonFinderBoard {
+    return this.dungeonFinder.buildBoard();
+  }
+
+  // -------------------------------------------------------------------------
   // Raid markers (party-scoped target markers)
   // -------------------------------------------------------------------------
 
@@ -6594,6 +6668,14 @@ export class Sim {
 
   get arenaInfo(): import('../world_api').ArenaInfo | null {
     return this.primaryId === -1 ? null : this.arenaInfoFor(this.primaryId);
+  }
+
+  get dungeonFinderInfo(): import('../world_api').DungeonFinderInfo | null {
+    return this.primaryId === -1 ? null : this.dungeonFinderInfoFor(this.primaryId);
+  }
+
+  get dungeonFinderBoard(): import('../world_api').DungeonFinderBoard | null {
+    return this.primaryId === -1 ? null : this.dungeonFinderBoardView();
   }
 
   get marketInfo(): import('../world_api').MarketInfo | null {
