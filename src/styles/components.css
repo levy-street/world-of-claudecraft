@@ -3273,17 +3273,23 @@
     overflow: hidden;
   }
 
-  /* Slot cells: the fixed 44px .item-cell grammar becomes a fluid square that fills
-     the auto-fill grid track (the classic bag look), the item icon fills the cell,
-     and the free-slot pad is a muted decorative cell. The rarity border + count
-     corner + focus ring come from the shared .item-cell grammar via data-quality. */
+  /* Slot cells: a fixed --slot-cell square (the classic bag look), the item icon
+     fills the cell, and the free-slot pad is a muted decorative cell. Fixed, not a
+     fluid aspect-ratio square that fills the auto-fill track: with an indefinite
+     (auto-fill/1fr) column size, CSS grid's "auto" row-track sizing does not
+     reliably resolve a row's height from a child's aspect-ratio, so it fell back
+     to this rule's min-height (40px) as the row height while each cell still
+     rendered at its full aspect-ratio height (up to ~90px on a wide window) -
+     every row after the first visually overlapped the row above it. A fixed cell
+     size sidesteps the row-sizing bug entirely, matches the fixed spell/action-bar
+     icon grammar, and lets the grid re-track its COLUMN COUNT on resize instead of
+     the cell size (see the fixed-track grid-template-columns below). The rarity
+     border + count corner + focus ring come from the shared .item-cell grammar via
+     data-quality. */
   .window-frame .bag-grid .item-cell,
   .window-frame .bank-grid .item-cell {
-    width: auto;
-    height: auto;
-    aspect-ratio: 1;
-    /* SC 2.5.8: the --slot-cell column floor keeps every cell >= 40x40 on touch too. */
-    min-height: var(--touch-min);
+    width: var(--slot-cell);
+    height: var(--slot-cell);
     padding: 0;
     overflow: hidden;
     font-family: var(--font-ui);
@@ -3348,24 +3354,23 @@
   body.mobile-touch .window-frame .chip {
     min-height: var(--touch-min);
   }
-  /* Touch: the slot grids re-track to the --touch-cell floor and REFLOW to fewer
-     columns (live user feedback: the item icons read too small to tap inside the
-     50/50 bank / market docks). The cells are fluid aspect-ratio squares, so the
-     wider track is what grows them, and the icon inside already fills the cell.
-     Cell size stays fixed at the floor; the COLUMN COUNT is what yields. The
-     desktop base rules now share the same 56px value via --slot-cell, so these
-     re-tracks are value-no-ops, but they stay as the INDEPENDENT touch tap-size
-     guarantee (they keep holding if the desktop floor diverges) and the dock
-     geometry (the 50/50 split rules in hud.mobile.css) is untouched. :is(), not a
-     two-selector list: the bank_window.test.ts scroll-contract slices anchor on
-     this file's first bank-grid rule OPENER, which must stay the base rule in the
-     bank section below (this block must not spell that opener out, even here). */
+  /* Touch: the slot grids re-track to the larger --touch-cell floor and REFLOW to
+     fewer columns (live user feedback: the item icons read too small to tap inside
+     the 50/50 bank / market docks). Cell size is fixed (see .item-cell above); only
+     the COLUMN COUNT yields, both here and on desktop, so these re-tracks are
+     value-no-ops today but stay as the INDEPENDENT touch tap-size guarantee (they
+     keep holding if the desktop floor diverges) and the dock geometry (the 50/50
+     split rules in hud.mobile.css) is untouched. :is(), not a two-selector list:
+     the bank_window.test.ts scroll-contract slices anchor on this file's first
+     bank-grid rule OPENER, which must stay the base rule in the bank section below
+     (this block must not spell that opener out, even here). */
   body.mobile-touch :is(.bag-grid, .bank-grid) {
-    grid-template-columns: repeat(auto-fill, minmax(var(--touch-cell), 1fr));
+    grid-template-columns: repeat(auto-fill, var(--touch-cell));
   }
   body.mobile-touch .window-frame .bag-grid .item-cell,
   body.mobile-touch .window-frame .bank-grid .item-cell {
-    min-height: var(--touch-cell);
+    width: var(--touch-cell);
+    height: var(--touch-cell);
   }
   /* The bag-bar sockets (backpack + 4 equip slots) grow to the same touch floor so
      every icon target in the window reads one size; the bar wraps so the capacity
@@ -3490,7 +3495,7 @@
      badge in the bottom-right corner, and free capacity paints as empty sockets. */
   .bag-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--slot-cell), 1fr));
+    grid-template-columns: repeat(auto-fill, var(--slot-cell));
     gap: 4px;
     padding: 2px;
     align-content: start;
@@ -3816,7 +3821,7 @@
   }
   .bank-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--slot-cell), 1fr));
+    grid-template-columns: repeat(auto-fill, var(--slot-cell));
     gap: 4px;
     padding: 2px;
     align-content: start;

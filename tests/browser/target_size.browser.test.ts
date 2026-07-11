@@ -378,38 +378,74 @@ describe('mobile target-size: bag/bank slot cells stay comfortable in every dock
     expectAtLeast(cell, CELL_FLOOR, 'bank-open #bank-window .item-cell');
   });
 
-  it('desktop keeps the dense 42px slot tracks (no touch re-track leak)', () => {
-    // Without body.mobile-touch the grid must keep the desktop density: a 412px
-    // container (the dock half width) still fits at least 8 columns of 42px tracks,
-    // so a desktop cell stays UNDER the touch floor. This pins the scoping: if the
-    // touch re-track ever leaks to desktop, the cell balloons past 56px and this
-    // fails (and 24px SC 2.5.8 still bounds it from below).
+  // Builds a bare .bag-grid (no mobile-touch) at the given pixel width with enough
+  // cells to wrap across multiple rows, mirroring the real bags_window.ts markup.
+  function buildBareGrid(
+    width: number,
+    cellCount: number,
+  ): { grid: HTMLElement; cells: HTMLElement[] } {
     document.body.className = '';
     const bags = el('div', { id: 'bags', class: 'window panel' });
     bags.style.display = 'flex';
-    bags.style.width = '412px';
+    bags.style.width = `${width}px`;
     const frame = el('div', { class: 'window-frame' });
     const body = el('div', { class: 'window-body' });
     const grid = el('div', { class: 'bag-grid' });
-    const cell = el('button', { class: 'item-cell', 'data-quality': 'common' });
-    grid.appendChild(cell);
-    for (let i = 0; i < 7; i++)
-      grid.appendChild(el('button', { class: 'item-cell', 'data-quality': 'common' }));
+    const cells: HTMLElement[] = [];
+    for (let i = 0; i < cellCount; i++) {
+      const cell = el('button', { class: 'item-cell', 'data-quality': 'common' });
+      grid.appendChild(cell);
+      cells.push(cell);
+    }
     body.appendChild(grid);
     frame.appendChild(body);
     bags.appendChild(frame);
     document.body.appendChild(bags);
-    const { w, h } = measure(cell);
-    expect(w, `desktop .item-cell width ${w} ballooned to the touch floor`).toBeLessThan(
-      CELL_FLOOR,
+    return { grid, cells };
+  }
+
+  it('desktop item cells stay pinned at the fixed --slot-cell size at any container width', () => {
+    // Regression guard: a fluid aspect-ratio cell (grid-template-columns:
+    // repeat(auto-fill, minmax(--slot-cell, 1fr))) grows past --slot-cell to fill
+    // whatever space is left over once the last full column is placed, so the
+    // rendered size drifted with the window's exact pixel width. Cells must now be
+    // a FIXED --slot-cell box: identical at a narrow width (412px, the dock half
+    // width) and a much wider one (700px), with only the column count differing.
+    const narrow = buildBareGrid(412, 8);
+    const narrowSize = measure(narrow.cells[0]);
+    cleanup();
+    const wide = buildBareGrid(700, 8);
+    const wideSize = measure(wide.cells[0]);
+    expect(narrowSize.w, 'desktop .item-cell width at 412px').toBe(CELL_FLOOR);
+    expect(narrowSize.h, 'desktop .item-cell height at 412px').toBe(CELL_FLOOR);
+    expect(wideSize.w, 'desktop .item-cell width must not grow with the window').toBe(narrowSize.w);
+    expect(wideSize.h, 'desktop .item-cell height must not grow with the window').toBe(
+      narrowSize.h,
     );
-    expect(w, `desktop .item-cell width ${w} under the 24px absolute floor`).toBeGreaterThanOrEqual(
-      24 - EPSILON,
-    );
+  });
+
+  it('desktop bag-grid rows never overlap once cells wrap past one row', () => {
+    // The exact bug this guards: a fluid aspect-ratio cell in an "auto"-sized grid
+    // row track does not reliably resolve its height from aspect-ratio during row
+    // sizing, so the row track locked to the cell's min-height (40px) while the
+    // cell itself rendered taller (up to ~90px) - every row after the first visibly
+    // overlapped the row above it. A 412px-wide grid with 8 cells wraps to multiple
+    // rows of 6 columns; every row's top must be at or below the previous row's
+    // bottom edge.
+    const { cells } = buildBareGrid(412, 8);
+    const rects = cells.map((c) => c.getBoundingClientRect());
+    const rowTops = [...new Set(rects.map((r) => Math.round(r.top)))].sort((a, b) => a - b);
     expect(
-      h,
-      `desktop .item-cell height ${h} under the 24px absolute floor`,
-    ).toBeGreaterThanOrEqual(24 - EPSILON);
+      rowTops.length,
+      'grid must wrap to more than one row for this guard to mean anything',
+    ).toBeGreaterThan(1);
+    for (let i = 1; i < rowTops.length; i++) {
+      const prevBottom = rowTops[i - 1] + CELL_FLOOR;
+      expect(
+        rowTops[i],
+        `row ${i} top ${rowTops[i]} overlaps row ${i - 1} bottom ${prevBottom}`,
+      ).toBeGreaterThanOrEqual(prevBottom - EPSILON);
+    }
   });
 });
 
