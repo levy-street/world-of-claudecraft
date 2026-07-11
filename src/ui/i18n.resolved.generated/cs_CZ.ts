@@ -1515,6 +1515,7 @@ export const cs_CZ: EnTranslations = {
       "accept": "Accept",
       "decline": "Decline",
       "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
       "openListings": "Open listings",
       "boardEmpty": "No listings right now. Publish one!",
       "boardLeaderGate": "Only your party leader can publish a listing.",

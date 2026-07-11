@@ -196,6 +196,7 @@ import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
+import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
 import {
@@ -3669,6 +3670,14 @@ export class Hud {
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
     ...this.windowFocus('#dungeon-finder-window'),
   });
+
+  // The WoW-style "group found" prompt: opened by the dfProposal SimEvent,
+  // self-closing when the proposal resolves. Lives OUTSIDE the finder window
+  // so an answer never requires opening it.
+  private readonly dungeonFinderProposalPopup = new DungeonFinderProposalPopup({
+    root: () => $('#dfinder-proposal-popup'),
+    world: () => this.sim,
+  });
   // Vale Cup window painter (vale_cup_window_view.ts model + vale_cup_window.ts
   // painter, the ArenaWindow shape). It owns the bracket / nation / role
   // selections, the render-skip signature, and focus-return; Hud forwards the
@@ -4562,6 +4571,7 @@ export class Hud {
     // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
     this.dungeonFinderWindow.relocalize();
+    this.dungeonFinderProposalPopup.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
     // sigs so the next render/update rebuilds with fresh t().
     this.valeCupWindow.relocalize();
@@ -6973,6 +6983,7 @@ export class Hud {
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
       if ($('#dungeon-finder-window').style.display === 'block') this.dungeonFinderWindow.render();
+      if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
       if (this.openLootMobId !== null) {
         const mob = sim.entities.get(this.openLootMobId);
@@ -9083,9 +9094,9 @@ export class Hud {
           this.log(t('hud.system.arenaUnqueued'), '#ffa040');
           break;
         case 'dfProposal':
-          // A 30s availability window: surface the finder's Quick Match tab so
-          // the accept/decline prompt is in front of the player immediately.
-          this.dungeonFinderWindow.open('queue');
+          // A 30s availability window: the WoW-style prompt pops at the top of
+          // the screen (with its cue) without opening the finder window.
+          this.dungeonFinderProposalPopup.show();
           break;
         case 'arenaFound': {
           const name =

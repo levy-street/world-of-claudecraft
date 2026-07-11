@@ -50,6 +50,9 @@ async function seedFinderState(page) {
       ['Shade', 'rogue', ['dps']],
     ].map(([name, cls, roles]) => {
       const pid = sim.addPlayer(cls, name);
+      // Dev bots auto-accept finder proposals (the /dev lfg behavior), so the
+      // popup meters fill and the group forms off the primary's single accept.
+      sim.players.get(pid).isDevBot = true;
       sim.setPlayerLevel(8, pid);
       sim.dungeonFinderSetRoles(roles, pid);
       return pid;
@@ -132,14 +135,17 @@ await page.waitForFunction(() => window.__game.sim.dungeonFinderInfo?.proposal !
   polling: 200,
 });
 await sleep(800);
+// The bots auto-accept, so the popup meters already show 4/5: capture it both
+// over the open window and standalone over the world.
 await shot(page, 'dungeon-finder-desktop-proposal.jpg');
+await page.evaluate(() => window.__game.hud.toggleDungeonFinder());
+await sleep(400);
+await shot(page, 'dungeon-finder-desktop-proposal-popup.jpg');
 
-// Everyone accepts: the finder forms the party in place (no teleport).
+// Accept through the popup: the finder forms the party in place (no teleport).
 await page.evaluate(() => {
-  const sim = window.__game.sim;
-  for (const pid of window.__dfBots) sim.dungeonFinderRespond(true, pid);
+  document.querySelector('#dfinder-proposal-popup [data-dfp="accept"]').click();
 });
-await clickIn(page, '[data-act="accept"]');
 await sleep(1200);
 const party = await page.evaluate(() => {
   const sim = window.__game.sim;
@@ -153,6 +159,7 @@ await page.evaluate(() => {
   const sim = window.__game.sim;
   sim.setPlayerLevel(20);
   sim.setSpec('prot');
+  window.__game.hud.toggleDungeonFinder(); // reopen after the popup-only shot
 });
 await sleep(400);
 await clickIn(page, '[data-tab="catalogue"]');

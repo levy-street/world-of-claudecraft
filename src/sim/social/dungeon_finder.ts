@@ -999,6 +999,12 @@ export class DungeonFinderMachine {
       this.ctx.notice(memberPid, 'A dungeon group is ready. Confirm your slot now.');
       this.ctx.emit({ type: 'dfProposal', pid: memberPid });
     }
+    // Dev bots ("/dev lfg" seeding, devCommands only) answer instantly, so a
+    // solo tester only has to confirm their own slot. May complete the
+    // proposal right here when every participant is a bot.
+    for (const memberPid of [...roles.keys()]) {
+      if (this.ctx.players.get(memberPid)?.isDevBot) this.dungeonFinderRespond(true, memberPid);
+    }
   }
 
   // ---- IWorld projections --------------------------------------------------------
@@ -1054,12 +1060,17 @@ export class DungeonFinderMachine {
   }
 
   private proposalViewFor(proposal: FinderProposal, pid: number): DungeonFinderProposalView {
+    const acceptedByRole = { tank: 0, healer: 0, dps: 0 };
+    for (const [memberPid, role] of proposal.roles) {
+      if (proposal.accepted.has(memberPid)) acceptedByRole[role]++;
+    }
     return {
       id: proposal.id,
       activityId: proposal.activityId,
       role: proposal.roles.get(pid) ?? 'dps',
       size: proposal.roles.size,
       accepted: proposal.accepted.size,
+      acceptedByRole,
       myResponse: proposal.accepted.has(pid) ? 'accepted' : 'pending',
       remaining: Math.max(0, Math.ceil(proposal.expiresAt - this.ctx.time)),
     };

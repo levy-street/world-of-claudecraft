@@ -1515,6 +1515,7 @@ export const zh_CN: EnTranslations = {
       "accept": "接受",
       "decline": "拒绝",
       "acceptedWait": "正在等待其他人...",
+      "slotState": "{role}：{accepted}/{total} 已就绪",
       "openListings": "公开招募",
       "boardEmpty": "目前没有招募。发布一个吧！",
       "boardLeaderGate": "只有队长才能发布招募。",

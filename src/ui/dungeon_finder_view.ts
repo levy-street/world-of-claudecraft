@@ -489,3 +489,54 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     sig,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Proposal popup (the WoW-style "group found" prompt shown OUTSIDE the finder
+// window, at the top of the screen). Same pure-core rules as the window view:
+// DOM/i18n-free, clock numbers outside the signature.
+// ---------------------------------------------------------------------------
+
+export interface FinderProposalPopupSlot {
+  role: Role;
+  total: number;
+  accepted: number;
+  mine: boolean; // my assigned role slot (highlighted)
+}
+
+export interface FinderProposalPopupView {
+  dungeonId: string;
+  difficulty: DungeonDifficulty;
+  slots: FinderProposalPopupSlot[];
+  myResponse: 'pending' | 'accepted';
+  remaining: number; // whole seconds (clock slot, OUTSIDE sig)
+  sig: string;
+}
+
+// null = no live proposal (the popup closes itself).
+export function buildFinderProposalPopupView(
+  info: DungeonFinderInfo | null,
+): FinderProposalPopupView | null {
+  const p = info?.proposal;
+  if (!p) return null;
+  const activity = finderActivity(p.activityId);
+  if (!activity || activity.composition === null) return null;
+  const comp = activity.composition;
+  const slots: FinderProposalPopupSlot[] = (['tank', 'healer', 'dps'] as const).map((role) => ({
+    role,
+    total: comp[role],
+    accepted: Math.min(comp[role], p.acceptedByRole?.[role] ?? 0),
+    mine: p.role === role,
+  }));
+  return {
+    dungeonId: activity.dungeonId,
+    difficulty: activity.difficulty,
+    slots,
+    myResponse: p.myResponse,
+    remaining: p.remaining,
+    sig: JSON.stringify([
+      p.id,
+      p.myResponse,
+      slots.map((s) => [s.role, s.total, s.accepted, s.mine]),
+    ]),
+  };
+}

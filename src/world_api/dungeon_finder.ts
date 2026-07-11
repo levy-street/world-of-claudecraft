@@ -22,6 +22,8 @@ export interface DungeonFinderProposalView {
   role: Role; // my assigned role
   size: number; // total participants
   accepted: number; // participants who accepted so far
+  // Accepted count per role slot (drives the WoW-style proposal popup meters).
+  acceptedByRole: { tank: number; healer: number; dps: number };
   myResponse: 'pending' | 'accepted';
   remaining: number; // whole seconds until the proposal expires
 }

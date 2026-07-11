@@ -1515,6 +1515,7 @@ export const en_XA: EnTranslations = {
       "accept": "[Áççéþţ]",
       "decline": "[Ðéçļíñé]",
       "acceptedWait": "[Ŵáíţíñĝ ƒóŕ ţĥé óţĥéŕš...]",
+      "slotState": "[{role}: {accepted} óƒ {total} ŕéáðý]",
       "openListings": "[Óþéñ ļíšţíñĝš]",
       "boardEmpty": "[Ñó ļíšţíñĝš ŕíĝĥţ ñóŵ. Þúƀļíšĥ óñé!]",
       "boardLeaderGate": "[Óñļý ýóúŕ þáŕţý ļéáðéŕ çáñ þúƀļíšĥ á ļíšţíñĝ.]",

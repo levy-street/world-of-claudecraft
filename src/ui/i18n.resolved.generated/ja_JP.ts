@@ -1515,6 +1515,7 @@ export const ja_JP: EnTranslations = {
       "accept": "承認",
       "decline": "辞退",
       "acceptedWait": "他のメンバーを待っています...",
+      "slotState": "{role}：{total} 人中 {accepted} 人が準備完了",
       "openListings": "公開中の募集",
       "boardEmpty": "現在募集はありません。作成してみましょう！",
       "boardLeaderGate": "募集を出せるのはパーティリーダーだけです。",

@@ -4,7 +4,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
-import { buildDungeonFinderView, type DungeonFinderViewInput } from '../src/ui/dungeon_finder_view';
+import {
+  buildDungeonFinderView,
+  buildFinderProposalPopupView,
+  type DungeonFinderViewInput,
+} from '../src/ui/dungeon_finder_view';
 import type { DungeonFinderInfo } from '../src/world_api';
 
 function makeInfo(
@@ -219,6 +223,7 @@ describe('dungeon finder view core', () => {
               role: 'tank',
               size: 5,
               accepted: 2,
+              acceptedByRole: { tank: 0, healer: 0, dps: 2 },
               myResponse: 'pending',
               remaining: 21,
             },
@@ -283,6 +288,7 @@ describe('dungeon finder view core', () => {
           role: 'tank',
           size: 5,
           accepted: 1,
+          acceptedByRole: { tank: 0, healer: 0, dps: 1 },
           myResponse: 'accepted',
           remaining: 20,
         },
@@ -301,6 +307,7 @@ describe('dungeon finder view core', () => {
             role: 'tank',
             size: 5,
             accepted: 2,
+            acceptedByRole: { tank: 0, healer: 0, dps: 2 },
             myResponse: 'accepted',
             remaining: 19,
           },
@@ -319,5 +326,49 @@ describe('dungeon finder view core', () => {
     expect(roleFlip.sig).not.toBe(a.sig);
     const tabFlip = live(buildDungeonFinderView({ ...base, tab: 'board' }));
     expect(tabFlip.sig).not.toBe(a.sig);
+  });
+});
+
+describe('proposal popup view', () => {
+  const proposal = {
+    id: 9,
+    activityId: 'hollow_crypt_normal',
+    role: 'healer' as const,
+    size: 5,
+    accepted: 3,
+    acceptedByRole: { tank: 1, healer: 0, dps: 2 },
+    myResponse: 'pending' as const,
+    remaining: 17,
+  };
+
+  it('is null without a live proposal', () => {
+    expect(buildFinderProposalPopupView(null)).toBeNull();
+    expect(buildFinderProposalPopupView(makeInfo('sim'))).toBeNull();
+  });
+
+  it('builds one meter per role slot with my slot flagged', () => {
+    const view = buildFinderProposalPopupView(makeInfo('sim', { proposal }));
+    expect(view?.dungeonId).toBe('hollow_crypt');
+    expect(view?.slots).toEqual([
+      { role: 'tank', total: 1, accepted: 1, mine: false },
+      { role: 'healer', total: 1, accepted: 0, mine: true },
+      { role: 'dps', total: 3, accepted: 2, mine: false },
+    ]);
+    expect(view?.myResponse).toBe('pending');
+    expect(view?.remaining).toBe(17);
+  });
+
+  it('keeps the countdown OUT of the signature but moves it on accepts', () => {
+    const a = buildFinderProposalPopupView(makeInfo('sim', { proposal }));
+    const ticked = buildFinderProposalPopupView(
+      makeInfo('sim', { proposal: { ...proposal, remaining: 16 } }),
+    );
+    expect(ticked?.sig).toBe(a?.sig);
+    const accepted = buildFinderProposalPopupView(
+      makeInfo('sim', {
+        proposal: { ...proposal, accepted: 4, acceptedByRole: { tank: 1, healer: 1, dps: 2 } },
+      }),
+    );
+    expect(accepted?.sig).not.toBe(a?.sig);
   });
 });

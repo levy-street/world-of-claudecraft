@@ -6495,6 +6495,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.accept': '수락',
   'hudChrome.finder.decline': '거절',
   'hudChrome.finder.acceptedWait': '다른 플레이어를 기다리는 중...',
+  'hudChrome.finder.slotState': '{role}: {total}명 중 {accepted}명 준비 완료',
   'hudChrome.finder.openListings': '공개 모집',
   'hudChrome.finder.boardEmpty': '지금은 모집이 없습니다. 직접 올려 보세요!',
   'hudChrome.finder.boardLeaderGate': '파티장만 모집 글을 올릴 수 있습니다.',

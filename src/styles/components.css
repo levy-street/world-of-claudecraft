@@ -4148,6 +4148,94 @@
     margin-top: 4px;
     font-size: 12px;
   }
+  /* The "group found" popup: fixed top-center, outside the finder window. */
+  #dfinder-proposal-popup {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    width: 320px;
+    max-width: 94%;
+    padding: 12px 14px;
+    border: 1px solid #8a6a28;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #2c2110, #1a1207);
+    box-shadow: 0 6px 24px #000c;
+    text-align: center;
+  }
+  .dfp-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: #ffd9a0;
+    margin-bottom: 8px;
+  }
+  .dfp-head .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .dfp-slots {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin: 6px 0 4px;
+  }
+  .dfp-slot {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--color-text-muted);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    background: #171208;
+  }
+  .dfp-slot .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .dfp-slot.mine {
+    border-color: #8a6a28;
+    color: #ffd9a0;
+    background: linear-gradient(180deg, #33260f, #221808);
+  }
+  .dfp-slot.full {
+    color: #9fdc8f;
+  }
+  .dfp-count {
+    font-size: 12px;
+  }
+  .dfp-remaining {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0 8px;
+  }
+  .dfp-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .dfp-actions .btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .dfp-actions .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  .dfp-waiting {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
   .df-proposal {
     border: 1px solid #8a6a28;
     border-radius: 5px;

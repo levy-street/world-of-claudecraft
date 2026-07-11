@@ -4111,7 +4111,8 @@ body.mobile-touch #dungeon-finder-window .df-opt,
 body.mobile-touch #dungeon-finder-window .df-tag,
 body.mobile-touch #dungeon-finder-window .df-map-btn,
 body.mobile-touch #dungeon-finder-window .btn,
-body.mobile-touch #dungeon-finder-window select {
+body.mobile-touch #dungeon-finder-window select,
+body.mobile-touch #dfinder-proposal-popup .btn {
   min-height: 40px;
   box-sizing: border-box;
 }

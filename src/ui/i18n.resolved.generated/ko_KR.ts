@@ -1515,6 +1515,7 @@ export const ko_KR: EnTranslations = {
       "accept": "수락",
       "decline": "거절",
       "acceptedWait": "다른 플레이어를 기다리는 중...",
+      "slotState": "{role}: {total}명 중 {accepted}명 준비 완료",
       "openListings": "공개 모집",
       "boardEmpty": "지금은 모집이 없습니다. 직접 올려 보세요!",
       "boardLeaderGate": "파티장만 모집 글을 올릴 수 있습니다.",

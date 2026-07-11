@@ -6171,6 +6171,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.accept': '接受',
   'hudChrome.finder.decline': '拒绝',
   'hudChrome.finder.acceptedWait': '正在等待其他人...',
+  'hudChrome.finder.slotState': '{role}：{accepted}/{total} 已就绪',
   'hudChrome.finder.openListings': '公开招募',
   'hudChrome.finder.boardEmpty': '目前没有招募。发布一个吧！',
   'hudChrome.finder.boardLeaderGate': '只有队长才能发布招募。',

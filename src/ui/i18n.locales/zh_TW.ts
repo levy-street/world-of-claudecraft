@@ -6172,6 +6172,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.accept': '接受',
   'hudChrome.finder.decline': '拒絕',
   'hudChrome.finder.acceptedWait': '正在等待其他人...',
+  'hudChrome.finder.slotState': '{role}：{accepted}/{total} 已就緒',
   'hudChrome.finder.openListings': '公開招募',
   'hudChrome.finder.boardEmpty': '目前沒有招募。發佈一個吧！',
   'hudChrome.finder.boardLeaderGate': '只有隊長才能發佈招募。',

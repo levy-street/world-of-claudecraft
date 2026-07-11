@@ -868,6 +868,13 @@ describe('/dev lfg seeding', () => {
     tickAll(sim, 1);
     expect(sim.dungeonFinderInfo?.proposal).not.toBeNull();
     expect(sim.dungeonFinderInfo?.proposal?.role).toBe('tank');
+    // The bots auto-accept, so the popup meters already show 4 of 5 and MY
+    // single accept is all that is left to form the group.
+    expect(sim.dungeonFinderInfo?.proposal?.accepted).toBe(4);
+    sim.dungeonFinderRespond(true);
+    tickAll(sim, 1);
+    const party = sim.partyOf(sim.playerId);
+    expect(party?.members).toHaveLength(5);
   });
 
   it('raid mode fills the 2/2/6 composition around my role at the cap', () => {

@@ -6633,6 +6633,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.accept': 'Принять',
   'hudChrome.finder.decline': 'Отклонить',
   'hudChrome.finder.acceptedWait': 'Ожидание остальных...',
+  'hudChrome.finder.slotState': '{role}: готовы {accepted} из {total}',
   'hudChrome.finder.openListings': 'Открытые объявления',
   'hudChrome.finder.boardEmpty': 'Объявлений пока нет. Создайте свое!',
   'hudChrome.finder.boardLeaderGate': 'Публиковать объявление может только лидер группы.',

@@ -6506,6 +6506,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.accept': '承認',
   'hudChrome.finder.decline': '辞退',
   'hudChrome.finder.acceptedWait': '他のメンバーを待っています...',
+  'hudChrome.finder.slotState': '{role}：{total} 人中 {accepted} 人が準備完了',
   'hudChrome.finder.openListings': '公開中の募集',
   'hudChrome.finder.boardEmpty': '現在募集はありません。作成してみましょう！',
   'hudChrome.finder.boardLeaderGate': '募集を出せるのはパーティリーダーだけです。',

@@ -1515,6 +1515,7 @@ export const ru_RU: EnTranslations = {
       "accept": "Принять",
       "decline": "Отклонить",
       "acceptedWait": "Ожидание остальных...",
+      "slotState": "{role}: готовы {accepted} из {total}",
       "openListings": "Открытые объявления",
       "boardEmpty": "Объявлений пока нет. Создайте свое!",
       "boardLeaderGate": "Публиковать объявление может только лидер группы.",
