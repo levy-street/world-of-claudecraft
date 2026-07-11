@@ -88,6 +88,11 @@ import {
   NATIVE_APP,
   type ReleaseEntry,
 } from './net/online';
+import {
+  buildTradingBotsHooks,
+  loadTradingBotsConfig,
+  tradingBotsConfig,
+} from './net/trading_bots_api';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -1697,6 +1702,8 @@ async function startGame(
   // Buy $WOC off the DEX: attach the quote/swap/sign glue (no-op when the
   // server-side flag is off or the wallet UI is disabled in this build).
   wireDexSwap(hud);
+  // Trading Bots: same attach contract, same flag-off invisibility.
+  wireTradingBots(hud);
   function interactKey(): void {
     const p = world.player;
     let bestCorpse: number | null = null,
@@ -6383,6 +6390,8 @@ function wireWallet(): void {
   // Boot-time DEX swap config read (flag-off answers 404 and the feature stays
   // invisible); wireDexSwap re-awaits the same promise when the HUD exists.
   void loadDexSwapConfig();
+  // Boot-time Trading Bots config read, same flag-off invisibility contract.
+  void loadTradingBotsConfig(WALLET_ENABLED);
 }
 
 // ── In-game Buy $WOC (DEX swap via the server's economy-service proxy) ──────
@@ -6496,6 +6505,40 @@ function wireDexSwap(hud: Hud): void {
         }
       },
     });
+  });
+}
+
+// Trading Bots: the REST glue lives in src/net/trading_bots_api.ts (the
+// firewall rule); main.ts contributes only closures over its private wallet
+// state and attaches the built hooks when the server reports the feature on.
+function wireTradingBots(hud: Hud): void {
+  if (!WALLET_ENABLED) return;
+  void loadTradingBotsConfig(WALLET_ENABLED).then(() => {
+    if (!tradingBotsConfig()) return;
+    hud.attachTradingBots(
+      buildTradingBotsHooks({
+        token: () => api.token,
+        linkedWallet: () => linkedWalletPubkey,
+        // Money ops bind to the CONNECTED wallet (it is the one that signs); a
+        // linked-but-disconnected wallet surfaces the localized connect-first state.
+        walletAddress: () => walletMod?.currentWallet().address ?? null,
+        signAndSend: async (txBase64) =>
+          (await loadWallet()).signAndSendTransactionBase64(txBase64),
+        isWalletFeatureUnsupported: (err) => walletMod?.isWalletFeatureUnsupported(err) ?? false,
+        onFundsMoved: () => {
+          // Fresh (cache-bypassing) balance read now, plus one after a typical
+          // confirmation delay, so the bag balance + holder flair pick up the
+          // moved tokens (the same path the dex swap onSwapSent uses).
+          refreshWocBalanceOnDemand();
+          const address = linkedWalletPubkey ?? walletMod?.currentWallet().address ?? null;
+          if (address) {
+            window.setTimeout(() => {
+              void refreshWocBalance(address, true);
+            }, 12_000);
+          }
+        },
+      }),
+    );
   });
 }
 
