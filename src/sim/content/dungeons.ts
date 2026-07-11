@@ -515,10 +515,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
-    hpBase: 420,
-    hpPerLevel: 48,
-    dmgBase: 15,
-    dmgPerLevel: 3.0,
+    // 34k effective on normal (createMob applies the 2.3x elite factor). The
+    // Kiln-Keepers are a 10-player wing-1 duo: two health pools fought together,
+    // combined below the 60k Nythraxis finale but each a real tank-and-spank.
+    // Vosh is the melee anchor and carries the larger pool.
+    hpBase: 34000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 46,
+    dmgPerLevel: 9.6,
     attackSpeed: 2.6,
     armorPerLevel: 34,
     moveSpeed: 7,
@@ -547,25 +551,29 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
-    hpBase: 360,
-    hpPerLevel: 42,
-    dmgBase: 13,
-    dmgPerLevel: 2.8,
+    // 28k effective on normal (the 2.3x elite factor). Saan is the caster half of
+    // the duo: a smaller pool than Vosh, but her cross-heal (Stoke the Coals) tops
+    // off her partner, so the raid must burn the two keepers down together rather
+    // than tunnelling one. Her melee is soft; her damage is the Kilnflare Pulse.
+    hpBase: 28000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 30,
+    dmgPerLevel: 6.2,
     attackSpeed: 2.0,
     armorPerLevel: 22,
     moveSpeed: 7,
     aggroRadius: 18,
     aoePulse: {
-      min: 28,
-      max: 40,
+      min: 170,
+      max: 240,
       radius: 14,
       every: 8,
       name: 'Kilnflare Pulse',
       school: 'fire',
     },
     mendAlly: {
-      healMin: 90,
-      healMax: 130,
+      healMin: 1400,
+      healMax: 2000,
       radius: 20,
       every: 12,
       name: 'Stoke the Coals',
@@ -583,10 +591,13 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'elemental',
     elite: true,
     boss: true,
-    hpBase: 420,
-    hpPerLevel: 48,
-    dmgBase: 15,
-    dmgPerLevel: 3.0,
+    // Wing 2, single boss. 42k effective (2.3x elite factor). Mechanics not yet
+    // authored: this is a raid-scale stat block so the encounter is not trivial
+    // while the wing-2 fight script is still to come.
+    hpBase: 42000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 50,
+    dmgPerLevel: 10.4,
     attackSpeed: 2.6,
     armorPerLevel: 34,
     moveSpeed: 7,
@@ -603,10 +614,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
-    hpBase: 420,
-    hpPerLevel: 48,
-    dmgBase: 15,
-    dmgPerLevel: 3.0,
+    // Wing 3, single boss. 48k effective (2.3x elite factor). Mechanics not yet
+    // authored: raid-scale stat block placeholder ahead of the wing-3 script.
+    hpBase: 48000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 52,
+    dmgPerLevel: 10.8,
     attackSpeed: 2.6,
     armorPerLevel: 34,
     moveSpeed: 7,
@@ -623,10 +636,13 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'elemental',
     elite: true,
     boss: true,
-    hpBase: 420,
-    hpPerLevel: 48,
-    dmgBase: 15,
-    dmgPerLevel: 3.0,
+    // Wing 4, the raid capstone (level 26, drops ilvl 35). 68k effective (2.3x
+    // elite factor), pitched just above the 60k Nythraxis finale since this is a
+    // higher-level tier. Mechanics not yet authored: raid-scale stat placeholder.
+    hpBase: 68000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 58,
+    dmgPerLevel: 12.2,
     attackSpeed: 2.6,
     armorPerLevel: 34,
     moveSpeed: 7,
