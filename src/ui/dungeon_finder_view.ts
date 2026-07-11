@@ -61,6 +61,8 @@ export interface FinderActivityRowView {
   // granularity keeps the render-skip signature from churning every second.
   lockedMinutes: number;
   selected: boolean;
+  // The final boss's prerendered still: the activity's rail/detail icon.
+  portraitUrl: string;
 }
 
 export interface FinderLootItemView {
@@ -333,7 +335,9 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
 
   const rows: FinderActivityRowView[] = FINDER_ACTIVITIES.map((a) => {
     const blocked = blockReasonFor(a, level, specRole);
+    const finalEnc = a.encounters.find((e) => e.final) ?? a.encounters[a.encounters.length - 1];
     return {
+      portraitUrl: `${FINDER_PORTRAIT_DIR}/${finalEnc.mobId}.webp`,
       id: a.id,
       dungeonId: a.dungeonId,
       difficulty: a.difficulty,

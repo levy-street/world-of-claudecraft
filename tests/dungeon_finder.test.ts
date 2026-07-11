@@ -848,3 +848,63 @@ describe('premade board', () => {
     expect(sim.dungeonFinderBoardView()).toHaveLength(0);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Dev seeding: "/dev lfg" (docs/prd/dungeon-finder.md tooling; devCommands only).
+// ---------------------------------------------------------------------------
+
+describe('/dev lfg seeding', () => {
+  const makeDevSim = () => new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+
+  it('queue mode spawns the complementary bots so my join pops a proposal', () => {
+    const sim = makeDevSim();
+    sim.setPlayerLevel(8);
+    sim.dungeonFinderSetRoles(['tank']);
+    sim.chat('/dev lfg');
+    tickAll(sim, 1);
+    const bots = [...sim.players.values()].filter((m) => m.isDevBot);
+    expect(bots).toHaveLength(4);
+    sim.dungeonFinderQueueJoin(['hollow_crypt_normal']);
+    tickAll(sim, 1);
+    expect(sim.dungeonFinderInfo?.proposal).not.toBeNull();
+    expect(sim.dungeonFinderInfo?.proposal?.role).toBe('tank');
+  });
+
+  it('raid mode fills the 2/2/6 composition around my role at the cap', () => {
+    const sim = makeDevSim();
+    sim.setPlayerLevel(20);
+    sim.setSpec(specIdFor('warrior', 'tank'));
+    sim.dungeonFinderSetRoles(['tank']);
+    sim.chat('/dev lfg raid');
+    tickAll(sim, 1);
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(9);
+    sim.dungeonFinderQueueJoin(['nythraxis_boss_arena_normal']);
+    tickAll(sim, 1);
+    expect(sim.dungeonFinderInfo?.proposal?.size).toBe(10);
+  });
+
+  it('board mode publishes bot listings and sends my listing an applicant', () => {
+    const sim = makeDevSim();
+    sim.setPlayerLevel(8);
+    sim.dungeonFinderSetRoles(['tank']);
+    sim.dungeonFinderListingCreate('hollow_crypt_normal', ['first_run']);
+    sim.chat('/dev lfg board');
+    tickAll(sim, 1);
+    expect(sim.dungeonFinderBoardView()).toHaveLength(3);
+    expect(sim.dungeonFinderInfo?.myListing?.applicants).toHaveLength(1);
+  });
+
+  it('asks for a role first and is inert without devCommands', () => {
+    const sim = makeDevSim();
+    sim.setPlayerLevel(8);
+    sim.chat('/dev lfg');
+    tickAll(sim, 1);
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
+    const prod = new Sim({ seed: 42, playerClass: 'warrior' });
+    prod.setPlayerLevel(8);
+    prod.dungeonFinderSetRoles(['tank']);
+    prod.chat('/dev lfg');
+    tickAll(prod, 1);
+    expect([...prod.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
+  });
+});

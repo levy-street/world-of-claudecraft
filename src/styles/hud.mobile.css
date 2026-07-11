@@ -4068,6 +4068,17 @@
 /* One navigable pane: the catalogue rail and the detail never compete for
      width; the painter's df-pane-* class picks which one shows, and the Back
      button (hidden on desktop) returns to the list. */
+body.mobile-touch #dungeon-finder-window {
+  display: block;
+  max-height: calc(100% - 20px);
+}
+body.mobile-touch #dungeon-finder-window .df-body {
+  overflow: visible;
+  min-height: auto;
+}
+body.mobile-touch #dungeon-finder-window .df-body-catalogue {
+  display: block;
+}
 body.mobile-touch #dungeon-finder-window .df-cols {
   display: block;
 }

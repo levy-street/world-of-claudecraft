@@ -290,9 +290,12 @@ export class DungeonFinderWindow {
       audio.click();
     });
     // Premade board.
-    const createSelect = el.querySelector<HTMLSelectElement>('[data-createact]');
-    createSelect?.addEventListener('change', () => {
-      this.stagedListingActivity = createSelect.value || null;
+    el.querySelectorAll('[data-createopt]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.stagedListingActivity = (btn as HTMLElement).dataset.createopt ?? null;
+        audio.click();
+        rerender();
+      });
     });
     el.querySelectorAll('[data-tag]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -354,14 +357,14 @@ export class DungeonFinderWindow {
   private liveHtml(view: Extract<DungeonFinderViewModel, { kind: 'live' }>): string {
     const tabs = `<div class="df-tabs" role="tablist">${(
       [
-        ['catalogue', 'hudChrome.finder.tabCatalogue'],
-        ['queue', 'hudChrome.finder.tabQueue'],
-        ['board', 'hudChrome.finder.tabBoard'],
+        ['catalogue', 'hudChrome.finder.tabCatalogue', 'skull'],
+        ['queue', 'hudChrome.finder.tabQueue', 'social'],
+        ['board', 'hudChrome.finder.tabBoard', 'chest'],
       ] as const
     )
       .map(
-        ([tab, key]) =>
-          `<button type="button" class="df-tab${view.tab === tab ? ' active' : ''}" data-tab="${tab}" aria-pressed="${view.tab === tab ? 'true' : 'false'}">${esc(t(key))}</button>`,
+        ([tab, key, icon]) =>
+          `<button type="button" class="df-tab${view.tab === tab ? ' active' : ''}" data-tab="${tab}" aria-pressed="${view.tab === tab ? 'true' : 'false'}">${svgIcon(icon)}${esc(t(key))}</button>`,
       )
       .join('')}</div>`;
     const proposal = view.queue.proposal ? this.proposalHtml(view.queue) : '';
@@ -371,7 +374,7 @@ export class DungeonFinderWindow {
         : view.tab === 'queue'
           ? this.queueHtml(view.queue)
           : this.boardHtml(view.board);
-    return this.titleHtml() + tabs + proposal + `<div class="df-body">${body}</div>`;
+    return `${this.titleHtml() + tabs + proposal}<div class="df-body${view.tab === 'catalogue' ? ' df-body-catalogue' : ''}">${body}</div>`;
   }
 
   // --- catalogue -----------------------------------------------------------
@@ -395,21 +398,37 @@ export class DungeonFinderWindow {
     const blocked = r.blocked ? `<span class="df-blocked">${esc(this.blockedLabel(r))}</span>` : '';
     return (
       `<button type="button" class="df-row${r.selected ? ' active' : ''}${r.eligible ? '' : ' ineligible'}" data-row="${esc(r.id)}" aria-pressed="${r.selected ? 'true' : 'false'}">` +
-      `<span class="df-row-name">${esc(name)} ${badge}</span>` +
+      `<img class="df-row-icon" src="${esc(r.portraitUrl)}" width="30" height="30" loading="lazy" decoding="async" alt="">` +
+      `<span class="df-row-text"><span class="df-row-name">${esc(name)} ${badge}</span>` +
       `<span class="df-row-meta">${esc(this.levelsLabel(r.minLevel, r.maxLevel))} · ${esc(
         t('hudChrome.finder.partySize', { count: num(r.size) }),
-      )}</span>${lock}${blocked}</button>`
+      )}</span>${lock}${blocked}</span></button>`
     );
   }
 
   private detailHtml(d: FinderActivityDetailView): string {
     const name = dungeonDisplayName(d.dungeonId);
     const back = `<button type="button" class="btn df-back" data-back>${esc(t('hudChrome.finder.back'))}</button>`;
+    const finalEnc = d.encounters.find((e) => e.final) ?? d.encounters[d.encounters.length - 1];
+    const headIcon = finalEnc
+      ? `<img class="df-detail-icon" src="${esc(finalEnc.portraitUrl)}" width="40" height="40" loading="lazy" decoding="async" alt="">`
+      : '';
     const head =
-      `<div class="df-detail-head">${back}<span class="df-detail-name">${esc(name)}</span>` +
+      `<div class="df-detail-head">${back}${headIcon}<span class="df-detail-name">${esc(name)}</span>` +
       `${this.difficultyBadge(d.difficulty)}<span class="df-kind">${esc(this.kindLabel(d.kind))}</span></div>`;
     const comp = d.composition
-      ? `${num(d.composition.tank)} ${esc(t('hudChrome.finder.roleTank'))} / ${num(d.composition.healer)} ${esc(t('hudChrome.finder.roleHealer'))} / ${num(d.composition.dps)} ${esc(t('hudChrome.finder.roleDps'))}`
+      ? (
+          [
+            ['tank', d.composition.tank],
+            ['healer', d.composition.healer],
+            ['dps', d.composition.dps],
+          ] as const
+        )
+          .map(
+            ([role, n]) =>
+              `<span class="df-role-count">${this.roleIcon(role)}${num(n)} ${esc(this.roleLabel(role))}</span>`,
+          )
+          .join(' ')
       : esc(t('hudChrome.finder.freeRoles'));
     const lockLine =
       d.lockedMinutes > 0
@@ -530,7 +549,7 @@ export class DungeonFinderWindow {
     return (
       `<div class="df-proposal" role="alert">` +
       `<div class="df-proposal-title">${esc(t('hudChrome.finder.proposalTitle', { name }))} ${this.difficultyBadge(p.difficulty)}</div>` +
-      `<div class="df-proposal-meta">${esc(t('hudChrome.finder.proposalRole', { role: this.roleLabel(p.role) }))}` +
+      `<div class="df-proposal-meta">${this.roleIcon(p.role)}${esc(t('hudChrome.finder.proposalRole', { role: this.roleLabel(p.role) }))}` +
       ` · <span data-df-clock="accepted"></span> · <span data-df-clock="remaining"></span></div>` +
       answer +
       `</div>`
@@ -546,7 +565,7 @@ export class DungeonFinderWindow {
       q.roles
         .map(
           (r) =>
-            `<button type="button" class="df-role${r.selected ? ' active' : ''}" data-role="${r.role}" aria-pressed="${r.selected ? 'true' : 'false'}"${r.eligible ? '' : ' disabled'}>${esc(this.roleLabel(r.role))}</button>`,
+            `<button type="button" class="df-role${r.selected ? ' active' : ''}" data-role="${r.role}" aria-pressed="${r.selected ? 'true' : 'false'}"${r.eligible ? '' : ' disabled'}>${this.roleIcon(r.role)}${esc(this.roleLabel(r.role))}</button>`,
         )
         .join('') +
       `</div>`;
@@ -601,7 +620,7 @@ export class DungeonFinderWindow {
     const options = b.createOptions
       .map(
         (o) =>
-          `<option value="${esc(o.id)}"${o.id === selected ? ' selected' : ''}>${esc(dungeonDisplayName(o.dungeonId))} (${esc(this.difficultyLabel(o.difficulty))})</option>`,
+          `<button type="button" class="df-opt df-createopt${o.id === selected ? ' active' : ''}" data-createopt="${esc(o.id)}" role="radio" aria-checked="${o.id === selected ? 'true' : 'false'}">${esc(dungeonDisplayName(o.dungeonId))} ${this.difficultyBadge(o.difficulty)}</button>`,
       )
       .join('');
     const tags = b.tags
@@ -612,7 +631,8 @@ export class DungeonFinderWindow {
       .join('');
     return (
       `<div class="df-create"><div class="df-sub">${esc(t('hudChrome.finder.publishListing'))}</div>` +
-      `<label class="df-create-row">${esc(t('hudChrome.finder.activity'))} <select data-createact>${options}</select></label>` +
+      `<div class="df-sub">${esc(t('hudChrome.finder.activity'))}</div>` +
+      `<div class="df-options" role="radiogroup">${options}</div>` +
       `<div class="df-create-tags">${tags}</div>` +
       `<button type="button" class="btn df-create-btn" data-act="create">${esc(t('hudChrome.finder.publish'))}</button></div>`
     );
@@ -634,7 +654,7 @@ export class DungeonFinderWindow {
   }
 
   private applicantHtml(a: DungeonFinderApplicantView): string {
-    const roles = a.roles.map((r) => esc(this.roleLabel(r))).join(' / ');
+    const roles = a.roles.map((r) => `${this.roleIcon(r)}${esc(this.roleLabel(r))}`).join(' / ');
     return (
       `<div class="df-applicant"><span class="df-app-name">${esc(a.name)}</span>` +
       `<span class="df-app-meta">${esc(
@@ -661,8 +681,11 @@ export class DungeonFinderWindow {
           ] as const
         )
           .filter(([, n]) => n > 0)
-          .map(([role, n]) => `${num(n)} ${esc(this.roleLabel(role))}`)
-          .join(', ')}</span>`
+          .map(
+            ([role, n]) =>
+              `<span class="df-role-count">${this.roleIcon(role)}${num(n)} ${esc(this.roleLabel(role))}</span>`,
+          )
+          .join(' ')}</span>`
       : '';
     const members = l.members
       .map(
@@ -672,7 +695,7 @@ export class DungeonFinderWindow {
               level: num(m.level),
               className: classDisplayName(m.cls),
             }),
-          )}">${esc(classDisplayName(m.cls))}${m.role ? ` (${esc(this.roleLabel(m.role))})` : ''}</span>`,
+          )}">${m.role ? this.roleIcon(m.role) : ''}${esc(classDisplayName(m.cls))}</span>`,
       )
       .join('');
     const tags = l.tags
@@ -715,6 +738,12 @@ export class DungeonFinderWindow {
     if (role === 'tank') return t('hudChrome.finder.roleTank');
     if (role === 'healer') return t('hudChrome.finder.roleHealer');
     return t('hudChrome.finder.roleDps');
+  }
+
+  // Decorative role glyph (aria-hidden inside svgIcon); the localized label
+  // always rides beside it, so no accessible name is lost.
+  private roleIcon(role: Role): string {
+    return svgIcon(role === 'tank' ? 'tank' : role === 'healer' ? 'healer' : 'attack');
   }
 
   private tagLabel(tag: FinderListingTag): string {
