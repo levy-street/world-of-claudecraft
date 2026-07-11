@@ -76,6 +76,11 @@ export function dealDamage(
   // ticks). Only direct damage may walk a mob's leash anchor; passive damage must
   // let the mob leash (evade home) so it can't be kited an unlimited distance.
   direct = true,
+  // The amount is ALREADY fully source-modified (e.g. a Fiendlore share of damage the
+  // owner already took): skip the source-output mods (Defensive Stance's own-damage cut,
+  // Weakening Hex) so they are not applied a second time. Target-side amps, absorb, death,
+  // and events still run so the redirected hit lands normally on the pet.
+  alreadyFinal = false,
 ): void {
   if (target.dead) return;
   if (target.gm) return; // GM characters are invulnerable — every damage path funnels here
@@ -89,6 +94,7 @@ export function dealDamage(
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
+    !alreadyFinal &&
     source &&
     source.id !== target.id &&
     source.auras.some((a) => a.kind === 'defensive_stance')
@@ -135,7 +141,7 @@ export function dealDamage(
 
   // Weakening Hex: a hexed source deals less damage (mirrors the healing cut in
   // applyHeal). Self-damage paths (source === target) are left untouched.
-  if (source && source.id !== target.id) {
+  if (!alreadyFinal && source && source.id !== target.id) {
     const hexMult = ctx.hexOutputMult(source);
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
   }
@@ -193,6 +199,9 @@ export function dealDamage(
           noRage,
           threatOpts,
           direct,
+          // The share is already fully source-modified: don't re-apply the source's
+          // Defensive Stance cut / Weakening Hex to the pet's portion.
+          true,
         );
       }
     }

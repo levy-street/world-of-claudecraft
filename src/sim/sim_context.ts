@@ -238,6 +238,8 @@ export interface SimContextCallbacks {
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
     direct?: boolean,
+    // Amount is already fully source-modified (redirect shares); skip source-output mods.
+    alreadyFinal?: boolean,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;

@@ -1,4 +1,4 @@
-import type { AbilityDef, AbilityEffect, PlayerClass, Stats, WeaponInfo } from '../types';
+import type { AbilityDef, AbilityEffect, AuraKind, PlayerClass, Stats, WeaponInfo } from '../types';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
 
@@ -3943,6 +3943,20 @@ export interface KnownAbility {
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
 }
 
+// The buff kinds whose value is a flat MAGNITUDE (armor, attack power, a flat primary
+// stat, spell power) and so scales with an ability/global damage-power mod. Every other
+// selfBuff/buffTarget kind is a rate, multiplier, percent, or a locked caster-form value
+// and passes through scaleEffect untouched (see the selfBuff/buffTarget arm).
+const SCALABLE_BUFF_KINDS = new Set<AuraKind>([
+  'buff_ap',
+  'buff_armor',
+  'buff_int',
+  'buff_agi',
+  'buff_spi',
+  'buff_sta',
+  'buff_spellpower',
+]);
+
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
 // base content arrays are shared module data and must never be mutated. `flat`
 // is added once to the effect's primary magnitude.
@@ -4027,23 +4041,22 @@ function scaleEffect(
       return { ...eff, total: Math.round(eff.total * healMult * hotMult + flat) };
     case 'absorb':
       return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
-    // A buff value below 1 is a RATE (haste/spell-damage/crit fraction, e.g. 0.2), not a
-    // magnitude: scaling it by a global damage mult and rounding would floor it to 0 (this
-    // silently zeroed Arcane Power's haste for an Arcane mage). Only integer magnitudes
-    // (armor, attack power, thorns damage) scale; rates pass through untouched. Intentional
-    // buff scaling still rides the per-ability buffPct in applyTalentMods.
+    // A flat-MAGNITUDE buff (armor, attack power, a flat stat, spell power) DOES scale
+    // with an ability/global damage-power mod, e.g. the Demonic Skin talent hardening
+    // Demon Skin's armor. But a RATE / MULTIPLIER / PERCENT buff (haste, move speed, any
+    // `_pct` buff) and the caster-form SP grants (Gloamveil / Moonkin, locked values)
+    // must NOT: scaling a 1.2 haste or 1.4 speed multiplier and rounding corrupted it
+    // (1.2 -> 1, 1.4 -> 2), and a whole-number percent (buff_ap_pct 20) would be inflated.
+    // The old `value < 1` heuristic mislabeled every rate stored at >= 1; gate on the
+    // KIND instead. Intentional per-ability buff scaling still also rides the separate
+    // buffPct pass in applyTalentMods.
     case 'buffTarget':
-      return Math.abs(eff.value) < 1
-        ? eff
-        : { ...eff, value: Math.round(eff.value * dmgMult + flat) };
     case 'selfBuff':
-      return Math.abs(eff.value) < 1
-        ? eff
-        : { ...eff, value: Math.round(eff.value * dmgMult + flat) };
-    case 'lifeTap':
-      return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
-    case 'gainResource':
-      return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
+      return SCALABLE_BUFF_KINDS.has(eff.kind)
+        ? { ...eff, value: Math.round(eff.value * dmgMult + flat) }
+        : eff;
+    // lifeTap / gainResource fall through: a damage/heal mod must not inflate a mana or
+    // resource gain.
     default:
       return eff;
   }
