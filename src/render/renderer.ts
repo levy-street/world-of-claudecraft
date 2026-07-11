@@ -54,7 +54,7 @@ import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
-import { crowdLodScaleSq, midAnimCadence } from './crowd_lod';
+import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable } from './delve_props';
 import { buildDoorBody } from './door_portal';
@@ -4616,8 +4616,7 @@ export class Renderer {
       // player reacts to, so the local player, the current target, and anything
       // mid-cast always animate every frame no matter how dense the crowd.
       let animate = true;
-      const telegraphing = id === p.id || id === p.targetId || e.castingAbility !== null;
-      if (!telegraphing) {
+      if (!animatesEveryFrame(id, p.id, p.targetId, e.castingAbility)) {
         if (v.isFar) animate = (this.frameIdx + e.id) % 6 === 0;
         else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
       }

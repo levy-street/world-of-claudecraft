@@ -168,6 +168,18 @@ function sameAttributeSet(parts: THREE.SkinnedMesh[]): boolean {
 }
 
 /**
+ * `rebakeGeometry` rebuilds positions/normals/tangents and carries nothing else,
+ * so a part with morph targets would lose them SILENTLY (a blendshape simply
+ * stops working, with no error). No shipped character GLB has any today, but the
+ * contract of this module is that anything it cannot prove safe is left alone,
+ * so refuse the merge rather than drop data.
+ */
+function hasMorphTargets(sm: THREE.SkinnedMesh): boolean {
+  const morphs = sm.geometry.morphAttributes;
+  return !!morphs && Object.keys(morphs).length > 0;
+}
+
+/**
  * Merge every mergeable group of skinned body parts under `root` in place.
  *
  * A part joins the merge only when it shares the canonical part's bone array,
@@ -182,6 +194,7 @@ export function mergeSkinnedParts(root: THREE.Object3D): void {
     const sm = o as THREE.SkinnedMesh;
     if (!sm.isSkinnedMesh || !sm.visible) return;
     if (Array.isArray(sm.material)) return; // never happens via GLTFLoader
+    if (hasMorphTargets(sm)) return; // would be silently dropped by the rebake
     const key = bucketKey(sm);
     const bucket = groups.get(key);
     if (bucket) bucket.push(sm);
@@ -226,7 +239,11 @@ export function mergeSkinnedParts(root: THREE.Object3D): void {
     merged.receiveShadow = canon.receiveShadow;
     // A skinned mesh's bind-pose bounds do not follow the animation, so the rig
     // owner decides culling (visual.ts turns it off); inherit, never re-decide.
+    // Same rule for draw order and layers: the merged part stands in for the
+    // canonical one, so it must present the same way to the renderer.
     merged.frustumCulled = canon.frustumCulled;
+    merged.renderOrder = canon.renderOrder;
+    merged.layers.mask = canon.layers.mask;
     merged.userData = { ...canon.userData };
     merged.bind(canon.skeleton, canon.bindMatrix);
     canon.parent?.add(merged);

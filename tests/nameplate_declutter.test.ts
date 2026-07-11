@@ -252,4 +252,41 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     expect(actual[0].sy).toBeCloseTo(expected[0].sy, 9);
     expect(actual[1].sy).toBeCloseTo(expected[1].sy, 9);
   });
+
+  // The painter hands in a POOLED array whose tail still holds last frame's
+  // anchors, and bounds the live region with `count`. This is the whole reason
+  // the pooling is safe: without the bound, stale anchors from a previous, larger
+  // frame would join this frame's clustering and shove live plates around.
+  it('ignores the stale tail beyond `count`', () => {
+    const anchors: NameplateAnchor[] = [
+      // this frame's two live plates, far apart, so nothing should move
+      { id: 1, sx: 500, sy: 500 },
+      { id: 2, sx: 900, sy: 500 },
+      // last frame's leftovers, parked right on top of plate 1
+      { id: 3, sx: 500, sy: 500 },
+      { id: 4, sx: 502, sy: 501 },
+      { id: 5, sx: 501, sy: 499 },
+      { id: 6, sx: 503, sy: 500 },
+    ];
+
+    declutterNameplatesInPlace(anchors, 2);
+
+    // the live pair is untouched: it never saw the stale anchors
+    expect(anchors[0]).toEqual({ id: 1, sx: 500, sy: 500 });
+    expect(anchors[1]).toEqual({ id: 2, sx: 900, sy: 500 });
+    // and the stale tail is left exactly as it was, not restacked
+    expect(anchors[2]).toEqual({ id: 3, sx: 500, sy: 500 });
+    expect(anchors[3]).toEqual({ id: 4, sx: 502, sy: 501 });
+    expect(anchors[4]).toEqual({ id: 5, sx: 501, sy: 499 });
+    expect(anchors[5]).toEqual({ id: 6, sx: 503, sy: 500 });
+  });
+
+  it('clamps `count` to the array length', () => {
+    const anchors: NameplateAnchor[] = [
+      { id: 1, sx: 100, sy: 100 },
+      { id: 2, sx: 104, sy: 101 },
+    ];
+    expect(() => declutterNameplatesInPlace(anchors, 99)).not.toThrow();
+    expect(Math.abs(anchors[0].sy - anchors[1].sy)).toBeGreaterThanOrEqual(18);
+  });
 });

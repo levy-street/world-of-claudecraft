@@ -4,7 +4,9 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
+  BIND_EPS,
   mergeSkinnedParts,
+  REBIND_EPS,
   rebakeGeometry,
   rebakeMatrix,
   solveRebindTransform,
@@ -112,6 +114,32 @@ describe('solveRebindTransform', () => {
       new THREE.Matrix4().copy(canon[1]).multiply(new THREE.Matrix4().makeTranslation(1, 2, 3)),
     ];
     expect(solveRebindTransform(canon, part)).toBeNull();
+  });
+
+  it('rejects a deviation only just above the tolerance', () => {
+    // The gross counterexample above deviates by ~0.5 to 3.0, so it would still
+    // be rejected by a tolerance loosened by four orders of magnitude. This case
+    // sits just above REBIND_EPS instead, so it is the one that actually pins the
+    // constant: it goes green the moment someone widens REBIND_EPS.
+    const bones = makeBones();
+    const canon = restInverses(bones);
+    const t = new THREE.Matrix4().makeScale(0.46, 0.46, 0.46);
+    const part = canon.map((m) => new THREE.Matrix4().copy(m).multiply(t));
+    // perturb ONE element of ONE bone by 100x the tolerance (still 5 orders of
+    // magnitude tighter than the 1e-2-scale deviation a real re-export causes,
+    // and 5 orders LOOSER than the ~1e-7 float residual the real GLBs carry)
+    part[1].elements[13] += REBIND_EPS * 100;
+
+    expect(solveRebindTransform(canon, part)).toBeNull();
+  });
+
+  it('pins the tolerances themselves, so a loosened guard cannot pass silently', () => {
+    // Every other assertion here compares against these constants, so without a
+    // literal pin the whole suite moves with them: widening REBIND_EPS to 1e-1
+    // would let genuinely different bind poses merge into a corrupted skin with
+    // every test still green.
+    expect(REBIND_EPS).toBe(1e-4);
+    expect(BIND_EPS).toBe(1e-3);
   });
 
   it('rejects mismatched bone counts and empty bind data', () => {
@@ -290,5 +318,58 @@ describe('mergeSkinnedParts', () => {
 
     expect(countSkinned(root)).toBe(2); // one merged body + the hidden part
     expect(parts[2].parent).toBe(root);
+  });
+
+  it('never merges parts bound with a different bind matrix', () => {
+    // The single-T algebra assumes the parts' bind matrices are equal, and
+    // mergeSkinnedParts checks it. Without that guard the rebake would solve for
+    // the wrong pre-transform and skin the part into a broken pose.
+    const { root, parts } = rig((canon) => canon.map((m) => m.clone()));
+    parts[2].bind(parts[2].skeleton, new THREE.Matrix4().makeTranslation(0, 5, 0));
+
+    mergeSkinnedParts(root);
+
+    expect(countSkinned(root)).toBe(2); // the two matching parts merge; the odd one stands alone
+    expect(parts[2].parent).toBe(root);
+  });
+
+  it('never merges a part carrying morph targets', () => {
+    // rebakeGeometry rebuilds only attributes + index, so a merged morph target
+    // would vanish silently. Refuse the merge instead of dropping the data.
+    const { root, parts } = rig((canon) => canon.map((m) => m.clone()));
+    parts[2].geometry.morphAttributes.position = [
+      new THREE.Float32BufferAttribute(new Float32Array(9), 3),
+    ];
+
+    mergeSkinnedParts(root);
+
+    expect(countSkinned(root)).toBe(2);
+    expect(parts[2].parent).toBe(root);
+    expect(parts[2].geometry.morphAttributes.position).toHaveLength(1);
+  });
+
+  it('carries the canonical render flags onto the merged mesh', () => {
+    // visual.ts owns culling/draw order for the rig; the merged part stands in
+    // for the canonical one and must present to the renderer identically.
+    const { root, parts } = rig((canon) => canon.map((m) => m.clone()));
+    parts[0].frustumCulled = false;
+    parts[0].castShadow = true;
+    parts[0].receiveShadow = true;
+    parts[0].renderOrder = 3;
+    parts[0].layers.set(2);
+    parts[0].userData.bodyMesh = true;
+
+    mergeSkinnedParts(root);
+
+    let merged: THREE.SkinnedMesh | null = null;
+    root.traverse((o) => {
+      if ((o as THREE.SkinnedMesh).isSkinnedMesh) merged = o as THREE.SkinnedMesh;
+    });
+    expect(merged!.frustumCulled).toBe(false);
+    expect(merged!.castShadow).toBe(true);
+    expect(merged!.receiveShadow).toBe(true);
+    expect(merged!.renderOrder).toBe(3);
+    expect(merged!.layers.mask).toBe(parts[0].layers.mask);
+    expect(merged!.userData.bodyMesh).toBe(true);
   });
 });

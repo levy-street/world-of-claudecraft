@@ -77,15 +77,25 @@ function inverseBindMatrices(glb: Glb, skinIndex: number): THREE.Matrix4[] {
   return out;
 }
 
-const PLAYER_RIGS = [
-  'barbarian',
-  'druid',
-  'knight',
-  'mage',
-  'paladin',
-  'ranger',
-  'rogue',
-  'rogue_hooded',
+// `optimizedScene` runs the merge per URL, so EVERY multi-skin character asset
+// goes through it, not just the player classes. The skeleton mobs are the ones
+// that actually fill a dungeon crowd, so they are exactly what the saving is for
+// and exactly what a bad re-export would silently switch off.
+const RIGS = [
+  'players/barbarian',
+  'players/druid',
+  'players/knight',
+  'players/mage',
+  'players/paladin',
+  'players/ranger',
+  'players/rogue',
+  'players/rogue_hooded',
+  'enemies/necromancer',
+  'enemies/skeleton_golem',
+  'enemies/skeleton_mage',
+  'enemies/skeleton_minion',
+  'enemies/skeleton_rogue',
+  'enemies/skeleton_warrior',
 ];
 
 describe('shipped character rigs satisfy the single-transform rebind law', () => {
@@ -93,8 +103,8 @@ describe('shipped character rigs satisfy the single-transform rebind law', () =>
     await MeshoptDecoder.ready;
   });
 
-  it.each(PLAYER_RIGS)('%s: every skin rebinds onto the canonical one', (name) => {
-    const glb = readGlb(`public/models/chars/players/${name}.glb`);
+  it.each(RIGS)('%s: every skin rebinds onto the canonical one', (name) => {
+    const glb = readGlb(`public/models/chars/${name}.glb`);
     const skins: any[] = glb.json.skins ?? [];
     expect(skins.length).toBeGreaterThan(1); // otherwise there is nothing to merge
 
@@ -135,5 +145,15 @@ describe('shipped character rigs satisfy the single-transform rebind law', () =>
     // The whole point: the parts DO carry per-primitive bind data (that is why the
     // naive equality check never merged them).
     expect(distinctBindData).toBeGreaterThan(0);
+  });
+
+  // rig_merge refuses to merge a part with morph targets (the rebake would drop
+  // them silently), so a rig that grows one quietly loses the saving. No shipped
+  // rig has any today: this is the canary that tells us the day one does.
+  it.each(RIGS)('%s: carries no morph targets, so nothing blocks the merge', (name) => {
+    const glb = readGlb(`public/models/chars/${name}.glb`);
+    const prims = (glb.json.meshes ?? []).flatMap((m: any) => m.primitives ?? []);
+    expect(prims.length).toBeGreaterThan(0);
+    expect(prims.filter((p: any) => p.targets?.length).length).toBe(0);
   });
 });

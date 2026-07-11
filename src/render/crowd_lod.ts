@@ -36,3 +36,27 @@ export function midAnimCadence(visibleRigs: number): number {
   if (visibleRigs >= CROWD_LOD_HARD_RIGS) return 4;
   return 3;
 }
+
+/**
+ * Whether an entity must advance its mixer EVERY frame regardless of how dense
+ * the crowd is, because its pose carries information the player acts on rather
+ * than mere cosmetic smoothness.
+ *
+ * This is the gameplay-fairness carve-out for the cadence above, and the repo
+ * invariant it serves is: a performance knob may shed cosmetic richness but must
+ * NEVER hide or delay actionable information. A cast windup is a telegraph, so a
+ * caster keeps animating at full rate; so does the local player (whose own
+ * animation is direct feedback) and the current target (whose pose the player is
+ * actively reading).
+ *
+ * Pure so the carve-out is unit-tested rather than asserted in a comment: an
+ * arm silently lost in a refactor is a real fairness regression.
+ */
+export function animatesEveryFrame(
+  entityId: number,
+  localPlayerId: number,
+  targetId: number | null,
+  castingAbility: string | null,
+): boolean {
+  return entityId === localPlayerId || entityId === targetId || castingAbility !== null;
+}
