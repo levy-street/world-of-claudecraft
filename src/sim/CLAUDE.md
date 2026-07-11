@@ -39,6 +39,7 @@ talk only to the **`SimContext` seam** (`sim_context.ts`).
 - **`types.ts`**: ALL shared types AND the global tuning constants + classic-era formulas (`TICK_RATE`, `DT`, `GCD`, ranges, `XP_TABLE`, hit/armor/rage math, post-cap `virtualLevel`/prestige). Plus the `SimEvent` union and the `Entity` shape.
 - `data.ts`: merges `content/*` into the flat tables (`ABILITIES`, `MOBS`, `NPCS`, `QUESTS`, `ITEMS`, `CAMPS`, `DUNGEONS`) and owns world-layout consts (`WORLD_SIZE`, `instanceOrigin`, `arenaOrigin`, `zoneAt`, `dungeonAt`).
 - `entity.ts`: `createPlayer/createMob/createNpc/createGroundObject` + `recalcPlayerStats` (the ONE place derived stats are computed from class/level/gear/auras/talent `mods`).
+- `player_motion.ts`: the pure player-movement kernel (`stepPlayerMotion`: turn integration, wish vector, slope gates, swept static collision, the vertical pass) plus `moveSpeedMult`/`jumpMult`/`isSwimming` and the locomotion-feel constants. `Sim.updatePlayerMovement` wraps it behind `PlayerMotionDeps` (fiesta speed, delve-aware `resolveMove`, cast/damage callbacks); the online display-only self extrapolator (`src/render/self_motion.ts`) binds pure/no-op deps so BOTH hosts run the same math, pinned by `tests/player_motion.test.ts` (client-dep-shape vs live-Sim parity, bit for bit). Changing movement here means keeping that parity test green.
 - `entity_roster.ts`: roster ops the coordinator drives: `addEntity`/`dropEntity`/`rebucket`, despawn decay, the delayed-event drain, the ground-AoE tick, and release-spirit.
 - `rng.ts`: `class Rng` (mulberry32) + stateless `hash2/noise2/fbm2` for terrain.
 - `world.ts`: `groundHeight`/`terrainHeight` (pure fn of x,z,seed), `WATER_LEVEL`, `generateDecorations`. **Renderer samples the same fns**: keep them identical.
@@ -65,6 +66,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `progression/xp.ts` | `prestige`, rested-XP, `isResting` |
 | `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |
 | `mob/targeting.ts` | `updateMobTarget`, `retargetMob`, highest-threat target, trivial-target check |
+| `mob/combat_profile.ts` | mob combat profile selection, effective melee reach, and the general chase/attack profile runner |
 | `mob/locomotion.ts` | `updateMob` dispatcher, `resetEvadingMob`, flee recovery, spawn-block; `onBossDeath` points-at `encounters/nythraxis` |
 | `mob/mob_swing.ts` | the mob on-hit affix cascade (`runMobSwingAffixes`); the base hit-table shell stays on `Sim` |
 | `mob/lifecycle.ts` | `respawnMob`, despawn summoned adds, frenzy packmates, death-throes, corpse detonate |
@@ -82,6 +84,8 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `social/trade.ts` + `social/chat.ts` | player trade + chat helpers (the `chat()` router itself stays on `Sim`) |
 | `targeting.ts` | player target selection + raid markers |
 | `market.ts` | the World Market (`Market` class) |
+| `mail/post_office.ts` | player mail (send/take/read/delete, the mailbox anchor gate) |
+| `bank.ts` | the personal pooled bank (The Gilded Strongbox): capacity math + the container-agnostic `moveBetweenContainers`, `bankDeposit`/`bankWithdraw`/`bankBuySlots`, `bankInfoFor` (boundary-clones), `sanitizeBankState` (the one load path), `nearBanker`; state on `PlayerMeta.bank`, the `bankerIds` anchor list on `Sim`; draws NO rng |
 | `loot/loot_roll.ts` | loot rolls, corpse loot, party-loot strategy, `rollLoot` |
 
 ## The SimContext seam (final shape)

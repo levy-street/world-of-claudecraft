@@ -210,6 +210,10 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'superadmin roles are managed via the grant script': 'error.staffSuperadmin',
   'you cannot change your own roles': 'error.staffSelfEdit',
   'method not allowed': 'error.methodNotAllowed',
+  'only a superadmin can reset a staff password': 'error.resetPasswordStaff',
+  'password reset failed': 'error.resetPasswordFailed',
+  'password must be at least 6 chars': 'error.passwordTooShort',
+  'password must be at most 128 chars': 'error.passwordTooLong',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

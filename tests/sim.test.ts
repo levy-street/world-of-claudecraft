@@ -6,6 +6,7 @@ import {
   GROUND_OBJECTS,
   ITEMS,
   LAKE,
+  NPCS,
 } from '../src/sim/data';
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
 import { Sim } from '../src/sim/sim';
@@ -1083,6 +1084,13 @@ describe('food, drink, vendor', () => {
     sim.buyItem(brandt.id, 'simple_fishing_pole');
     expect(sim.countItem('simple_fishing_pole')).toBe(1);
     expect(sim.copper).toBe(80);
+  });
+
+  it('a general vendor in each of zone 2 and 3 also sells a simple fishing pole', () => {
+    for (const templateId of ['provisioner_hale', 'quartermaster_bree']) {
+      expect(NPCS[templateId].vendorItems).toContain('simple_fishing_pole');
+    }
+    expect(NPCS.trader_wilkes.vendorItems).not.toContain('simple_fishing_pole');
   });
 
   it('rejects fishing away from fishable water', () => {

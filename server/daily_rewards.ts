@@ -82,7 +82,8 @@ interface RuntimeConfigCache {
 
 interface Eligibility {
   eligible: boolean;
-  reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable';
+  reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable' | 'banned';
+  banReason: string | null;
   walletPubkey: string | null;
   wocBalance: number | null;
   wocUsdPrice: number | null;
@@ -362,6 +363,7 @@ export async function dailyRewardEligibility(
     return {
       eligible: false,
       reason: 'no_wallet',
+      banReason: null,
       walletPubkey: null,
       wocBalance: null,
       wocUsdPrice: runtimeConfig.wocUsdPrice,
@@ -377,6 +379,7 @@ export async function dailyRewardEligibility(
     return {
       eligible: false,
       reason: 'price_unavailable',
+      banReason: null,
       walletPubkey: wallet.pubkey,
       wocBalance: balance,
       wocUsdPrice: price,
@@ -388,6 +391,7 @@ export async function dailyRewardEligibility(
   return {
     eligible: usdValue >= runtimeConfig.minUsd,
     reason: usdValue >= runtimeConfig.minUsd ? 'eligible' : 'under_minimum',
+    banReason: null,
     walletPubkey: wallet.pubkey,
     wocBalance: balance,
     wocUsdPrice: price,
@@ -552,7 +556,7 @@ function currentTaskMultiplier(
 ): number | null {
   if (task.type === 'quest_completion')
     return questCompletionPoints(task, onlineMinutes).multiplier;
-  if (task.type === 'arena_result')
+  if (task.type === 'arena_result' || task.type === 'vale_cup_result')
     return onlineMultiplierPoints(task.basePoints ?? task.points, task.config ?? {}, onlineMinutes)
       .multiplier;
   if (task.type === 'delve_clear')
@@ -563,6 +567,26 @@ function currentTaskMultiplier(
 
 export class DailyRewardService {
   constructor(private readonly db: DailyRewardDb = new PgDailyRewardDb()) {}
+
+  private async eligibility(
+    accountId: number,
+    config: DailyRewardRuntimeConfig,
+  ): Promise<Eligibility> {
+    const ban = await this.db.banForAccount(accountId);
+    if (ban) {
+      return {
+        eligible: false,
+        reason: 'banned',
+        banReason: ban.reason,
+        walletPubkey: null,
+        wocBalance: null,
+        wocUsdPrice: config.wocUsdPrice,
+        usdValue: null,
+        minUsd: config.minUsd,
+      };
+    }
+    return dailyRewardEligibility(accountId, config);
+  }
 
   async activeSeconds(day?: string): Promise<number> {
     if (day) return (await dailyRewardRuntimeConfig(day)).activeSeconds;
@@ -580,7 +604,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock();
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     const [score, rank, spin, tasks, leaders, leaderboardTotal, onlineMinutes] = await Promise.all([
       this.db.scoreForAccount(day, accountId),
       this.db.rankForAccount(day, accountId),
@@ -645,7 +669,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock();
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible)
       return { error: 'daily rewards are locked for this wallet', status: 403 };
     const existing = await this.db.spinForAccount(day, accountId);
@@ -680,7 +704,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'quest_completion');
     if (tasks.length === 0) return 0;
@@ -729,11 +753,15 @@ export class DailyRewardService {
       completedAt?: Date;
     },
   ): Promise<number> {
+    // Protect Yumi (yumi3/yumi5) is an unranked objective mode: its bouts do
+    // not count toward the arena daily-reward task (maintainer decision;
+    // fiesta keeps its historical counting behavior).
+    if (result.format === 'yumi3' || result.format === 'yumi5') return 0;
     const completedAt = result.completedAt ?? new Date();
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'arena_result');
     if (tasks.length === 0) return 0;
@@ -780,7 +808,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'delve_clear');
     if (tasks.length === 0) return 0;
@@ -827,7 +855,7 @@ export class DailyRewardService {
     const { day, config } = await dailyRewardClock(openedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
-    const eligibility = await dailyRewardEligibility(accountId, config);
+    const eligibility = await this.eligibility(accountId, config);
     if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'delve_clear');
     if (tasks.length === 0) return 0;
@@ -859,6 +887,76 @@ export class DailyRewardService {
         },
       );
       if (recorded) awardedPoints += chestPoints.points;
+    }
+    return awardedPoints;
+  }
+
+  // Vale Cup daily task: wins only. Rated wins use the full task value; bot-filled
+  // and practice wins use a much smaller base so they can contribute without competing
+  // with real ranked match rewards. The match id keys the dedupe row, so one match
+  // yields at most one grant per account.
+  async recordValeCupResult(
+    accountId: number,
+    result: {
+      won: boolean;
+      bracket: number;
+      matchId: number;
+      rated?: boolean;
+      hasBots?: boolean;
+      practice?: boolean;
+      completedAt?: Date;
+    },
+  ): Promise<number> {
+    if (!result.won) return 0;
+    if (result.rated === false && result.hasBots !== true && result.practice !== true) return 0;
+    const completedAt = result.completedAt ?? new Date();
+    const { day, config } = await dailyRewardClock(completedAt);
+    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+    await this.db.seedTasks(day, config.tasks);
+    const eligibility = await this.eligibility(accountId, config);
+    if (!eligibility.eligible) return 0;
+    const tasks = await this.db.tasksForType(day, 'vale_cup_result');
+    if (tasks.length === 0) return 0;
+    const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
+    for (const task of tasks) {
+      const taskConfig = task.config ?? {};
+      const rankedBasePoints = numberConfig(
+        taskConfig,
+        'winBasePoints',
+        task.basePoints ?? task.points,
+      );
+      const botFallbackPoints = Math.max(1, Math.floor(rankedBasePoints * 0.2));
+      const reducedMatch = result.hasBots === true || result.practice === true;
+      const basePoints = reducedMatch
+        ? numberConfig(taskConfig, 'botWinBasePoints', botFallbackPoints)
+        : rankedBasePoints;
+      const { points, multiplier } = onlineMultiplierPoints(basePoints, taskConfig, onlineMinutes);
+      if (points <= 0) continue;
+      const outcomeKey =
+        result.practice === true ? 'practice_win' : reducedMatch ? 'bot_win' : 'win';
+      const recorded = await this.db.addPoints(
+        day,
+        accountId,
+        'task',
+        points,
+        `task:${task.taskId}:vale_cup:${result.matchId}:${outcomeKey}`,
+        {
+          taskId: task.taskId,
+          taskType: task.type,
+          bracket: result.bracket,
+          matchId: result.matchId,
+          won: true,
+          matchType: result.practice === true ? 'practice' : reducedMatch ? 'bot' : 'ranked',
+          rated: result.rated !== false,
+          hasBots: result.hasBots === true,
+          practice: result.practice === true,
+          onlineMinutes,
+          multiplier,
+          basePoints,
+        },
+      );
+      if (recorded) awardedPoints += points;
     }
     return awardedPoints;
   }

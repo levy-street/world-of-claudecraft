@@ -637,13 +637,17 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
   });
 
-  // The two chooser routes (login/new + login/link) are ALSO masked by
+  // The two chooser routes (login/new + login/link) and native exchange are ALSO masked by
   // newLimiterDiscord but have no corpus fixture (every non-429 branch reads the db:
   // the pending-login token lookup is the first thing after the body). Their one
   // deterministic, db-free branch is the shared handler self-limit (checked BEFORE
   // the body read on both the legacy arm and the RouteDef), so each is re-pinned by
   // draining the discord bucket before each pass and proving the 429 byte-identical.
-  for (const chooserPath of ['/api/auth/discord/login/new', '/api/auth/discord/login/link']) {
+  for (const chooserPath of [
+    '/api/auth/discord/login/new',
+    '/api/auth/discord/login/link',
+    '/api/auth/discord/native/exchange',
+  ]) {
     it(`POST ${chooserPath} with a drained bucket is identical old-vs-new and is a 429 (re-pins masked chooser route)`, async () => {
       const drainedCapture = async (dispatch: Dispatch) => {
         isolate();

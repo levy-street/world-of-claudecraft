@@ -25,14 +25,23 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   { method: 'GET', pattern: '/admin/api/activity', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/perf/summary', permission: 'analytics.read' },
   { method: 'GET', pattern: '/admin/api/perf/raw', permission: 'analytics.read' },
+  // Server tick-loop profiling capture: ops-sensitive, admin/superadmin only.
+  { method: 'GET', pattern: '/admin/api/perf/tick', permission: 'ops.perf' },
+  { method: 'POST', pattern: '/admin/api/perf/tick/capture', permission: 'ops.perf' },
   { method: 'GET', pattern: '/admin/api/characters', permission: 'accounts.read' },
 
   { method: 'GET', pattern: '/admin/api/accounts', permission: 'accounts.read' },
   { method: 'GET', pattern: /^\/admin\/api\/accounts\/(\d+)$/, permission: 'accounts.read' },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/accounts\/(\d+)\/reset-password$/,
+    permission: 'accounts.password',
+  },
   { method: 'GET', pattern: '/admin/api/shared-ips', permission: 'moderation.read' },
   { method: 'GET', pattern: '/admin/api/ip-associations', permission: 'accounts.read' },
 
   { method: 'GET', pattern: '/admin/api/moderation/queue', permission: 'moderation.read' },
+  { method: 'GET', pattern: '/admin/api/moderation/history', permission: 'moderation.read' },
   {
     method: 'GET',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)$/,
@@ -78,6 +87,16 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   {
     method: 'POST',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/chat-mute$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-(ban|unban)$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-ip-(ban|unban)$/,
     permission: 'moderation.act',
   },
   {

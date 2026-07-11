@@ -56,6 +56,7 @@ const LOCALES = [
   'ja_JP',
   'pt_BR',
   'ru_RU',
+  'cs_CZ',
   'nl_NL',
   'pl_PL',
   'id_ID',

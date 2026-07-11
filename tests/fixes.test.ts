@@ -23,9 +23,18 @@ import {
 } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { ACTIONS, encodeObs } from '../src/sim/obs';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type SimEvent } from '../src/sim/types';
-import { generateDecorations, groundHeight, WATER_LEVEL } from '../src/sim/world';
+import {
+  DECORATION_MAX_SLOPE,
+  generateDecorations,
+  groundHeight,
+  terrainSteepness,
+  terrainSteepnessAt,
+  terrainWallStandoff,
+  WATER_LEVEL,
+} from '../src/sim/world';
 
 const SEED = 20061;
 
@@ -231,6 +240,122 @@ describe('collision & terrain', () => {
 
     const blocked = resolvePosition(SEED, tree.x, tree.z, 0.5);
     expect(Math.abs(blocked.x - tree.x) + Math.abs(blocked.z - tree.z)).toBeGreaterThan(0.5);
+  });
+
+  it('does not scatter trees or rocks onto cliff faces', () => {
+    // A prop on a wall steeper than the climb limit floats off the face and
+    // (for large rocks / trunks) plants an invisible collider there.
+    expect(DECORATION_MAX_SLOPE).toBe(1.5);
+    const onCliffs = generateDecorations(SEED)
+      .filter((d) => terrainSteepness(d.x, d.z, SEED) > DECORATION_MAX_SLOPE)
+      .map((d) => `${d.kind}@${d.x.toFixed(0)},${d.z.toFixed(0)}`);
+    expect(onCliffs).toEqual([]);
+  });
+});
+
+describe('terrain wall standoff', () => {
+  const R = PLAYER_BODY_RADIUS;
+  const SLOPE = PLAYER_MAX_CLIMB_SLOPE;
+
+  it('leaves open ground untouched', () => {
+    // the Eastbrook hub plateau: flat, no wall within a body radius
+    const s = terrainWallStandoff(0, 0, SEED, R, SLOPE);
+    expect(s).toEqual({ x: 0, z: 0 });
+  });
+
+  it('eases a body off the rim wall, bounded by one body radius', () => {
+    let pushed = 0;
+    let maxMove = 0;
+    for (let x = -175; x <= -148; x += 0.5) {
+      for (let z = 555; z <= 645; z += 0.5) {
+        // only positions a player could actually stand on
+        if (terrainSteepness(x, z, SEED) > SLOPE) continue;
+        const s = terrainWallStandoff(x, z, SEED, R, SLOPE);
+        const moved = Math.hypot(s.x - x, s.z - z);
+        if (moved === 0) continue;
+        pushed++;
+        maxMove = Math.max(maxMove, moved);
+      }
+    }
+    expect(pushed).toBeGreaterThan(0); // the standoff actually engages along the wall
+    expect(maxMove).toBeLessThanOrEqual(R + 1e-9); // never more than a body radius
+  });
+
+  it('keeps the Abandoned Crypt door reachable (door trigger 2.0yd)', () => {
+    // the crypt door sits in the west rim at (-152, 610); the standoff must not
+    // fence the player out of its 2.0yd trigger.
+    const door = { x: -152, z: 610 };
+    let closest = Infinity;
+    for (let x = -156; x <= -148; x += 0.5) {
+      for (let z = 606; z <= 614; z += 0.5) {
+        if (terrainSteepness(x, z, SEED) > SLOPE) continue;
+        const s = terrainWallStandoff(x, z, SEED, R, SLOPE);
+        if (terrainSteepness(s.x, s.z, SEED) > SLOPE) continue;
+        closest = Math.min(closest, Math.hypot(s.x - door.x, s.z - door.z));
+      }
+    }
+    expect(closest).toBeLessThan(2.0);
+  });
+
+  it('eases a player parked at a rim wall foot off it, end to end through the Sim', () => {
+    // A cell the Sim itself treats as FLAT footing (terrainSteepnessAt well under
+    // the limit, so no downhill slide and no move gate fires) that still has a
+    // wall within a body radius. A no-input grounded tick therefore moves the
+    // player ONLY via the standoff in the shared movement kernel, isolating it
+    // from the slide: without the standoff the player would not move at all.
+    const cell = { x: -150, z: 546.75 };
+    expect(terrainSteepnessAt(cell.x, cell.z, SEED)).toBeLessThan(1.0); // flat footing: no slide
+    const sim = makeSim();
+    teleportTo(sim, cell.x, cell.z);
+    sim.player.onGround = true;
+    sim.player.vx = 0;
+    sim.player.vz = 0;
+    sim.player.vy = 0;
+    sim.tick();
+    const moved = Math.hypot(sim.player.pos.x - cell.x, sim.player.pos.z - cell.z);
+    expect(moved).toBeGreaterThan(0.1); // the standoff engaged in the live Sim
+    expect(moved).toBeLessThanOrEqual(R + 1e-6); // and never more than a body radius
+    // and it did not shove the player onto a wall to slide back off
+    expect(terrainSteepnessAt(sim.player.pos.x, sim.player.pos.z, SEED)).toBeLessThanOrEqual(
+      SLOPE + 1e-6,
+    );
+  });
+
+  it('does not sawtooth when holding forward into the western wall', () => {
+    const sim = makeSim();
+    teleportTo(sim, -90, -154);
+    sim.player.facing = Math.PI;
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('missing player meta');
+    meta.moveInput.forward = true;
+
+    sim.tick(); // allow the body-width standoff to clear the initial wall overlap
+    let totalJitter = 0;
+    let largestStep = 0;
+    for (let i = 0; i < 60; i++) {
+      const beforeZ = sim.player.pos.z;
+      sim.tick();
+      const dz = Math.abs(sim.player.pos.z - beforeZ);
+      totalJitter += dz;
+      largestStep = Math.max(largestStep, dz);
+    }
+
+    expect(largestStep).toBeLessThan(0.02);
+    expect(totalJitter).toBeLessThan(0.05);
+  });
+
+  it('still preserves tangential wall slide when pushing into the western wall at an angle', () => {
+    const sim = makeSim();
+    teleportTo(sim, -90, -154);
+    sim.player.facing = Math.PI - 0.2;
+    const meta = sim.players.get(sim.playerId);
+    if (!meta) throw new Error('missing player meta');
+    meta.moveInput.forward = true;
+
+    for (let i = 0; i < 20; i++) sim.tick();
+
+    expect(sim.player.pos.x).toBeGreaterThan(-88.5);
+    expect(Math.abs(sim.player.pos.z + 153.65)).toBeLessThan(0.25);
   });
 });
 
@@ -1893,8 +2018,7 @@ describe('mob auto attacks against moving targets', () => {
     );
   }
 
-  it('continues landing melee swings after the target moves around melee range', () => {
-    const sim = makeSim();
+  function orbitScenario(sim: ReturnType<typeof makeSim>, angularSpeed: number) {
     const p = sim.player;
     p.maxHp = 1_000_000;
     p.hp = p.maxHp;
@@ -1915,7 +2039,7 @@ describe('mob auto attacks against moving targets', () => {
       const t = i / 20;
       if (t > 2) {
         const oldPos = { ...p.pos };
-        const angle = (t - 2) * 1.6;
+        const angle = (t - 2) * angularSpeed;
         p.pos.x = wolf.spawnPos.x + Math.sin(angle) * 8;
         p.pos.z = wolf.spawnPos.z + Math.cos(angle) * 8;
         p.pos.y = groundHeight(p.pos.x, p.pos.z, sim.cfg.seed);
@@ -1924,9 +2048,37 @@ describe('mob auto attacks against moving targets', () => {
       const events = sim.tick();
       if (damageTimesFrom(events, wolf.id, p.id)) hitTimes.push(i / 20);
     }
+    return { p, wolf, hitTimes };
+  }
 
-    expect(hitTimes.length).toBeGreaterThanOrEqual(6);
+  it('continues landing melee swings after the target moves around melee range', () => {
+    // The target circles at 7 yd/s (0.875 rad/s at r=8), a legitimately attainable
+    // player run speed. Pursuit combat must keep the wolf (8 yd/s) glued at its
+    // desired range, landing a swing on every full weapon cadence, all the way to
+    // the end of the window. This is STRONGER than the legacy stop-go behavior,
+    // which hovered at the reach boundary and only connected every ~3.5s.
+    const sim = makeSim();
+    const { hitTimes } = orbitScenario(sim, 0.875);
+
+    expect(hitTimes.length).toBeGreaterThanOrEqual(9);
     expect(hitTimes.at(-1)).toBeGreaterThan(15);
+  });
+
+  it('stays locked onto a super-speed circler it cannot catch (kited, never resets)', () => {
+    // At 12.8 yd/s (1.6 rad/s at r=8) the orbiter outruns the wolf outright: a
+    // sustained speed no player reaches without stacked cooldowns. Fluid pursuit
+    // settles into a tail-chase just outside reach, so the circler CAN kite the
+    // wolf hit-free after the opening contact: that is the deliberate trade for
+    // hit-and-run combat (the mobs that must not be kiteable carry anti-kite
+    // pulses instead, see aoeSlow). What the wolf must never do is give up:
+    // it stays engaged and on the target the whole window.
+    const sim = makeSim();
+    const { p, wolf, hitTimes } = orbitScenario(sim, 1.6);
+
+    expect(hitTimes.length).toBeGreaterThanOrEqual(3); // the opening contact still lands
+    expect(wolf.aggroTargetId).toBe(p.id);
+    expect(wolf.inCombat).toBe(true);
+    expect(['chase', 'attack']).toContain(wolf.aiState);
   });
 });
 

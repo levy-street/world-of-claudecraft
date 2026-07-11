@@ -1,18 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
 import { DUNGEON_LIST, zoneAt } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
+import type { SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 }
 
-function lastError(events: SimEvent[]): string | undefined {
-  for (let i = events.length - 1; i >= 0; i--) {
-    const e = events[i];
-    if (e.type === 'error') return e.text;
-  }
-  return undefined;
+function errorTexts(events: SimEvent[]): string[] {
+  return events.flatMap((e) => (e.type === 'error' ? [e.text] : []));
 }
 
 describe('/dungeons command', () => {
@@ -27,7 +23,12 @@ describe('/dungeons command', () => {
     const expected = `Dungeons (${parts.length}): ${parts.join(', ')}.`;
 
     sim.chat('/dungeons', a);
-    expect(lastError(sim.tick())).toBe(expected);
+    // The readout comes first, then the difficulty status line (heroic feature).
+    const texts = errorTexts(sim.tick());
+    expect(texts[texts.length - 2]).toBe(expected);
+    expect(texts[texts.length - 1]).toBe(
+      'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
+    );
   });
 
   it('responds to the /dungeon and /instances aliases', () => {
@@ -36,9 +37,9 @@ describe('/dungeons command', () => {
     sim.tick();
 
     sim.chat('/dungeon', a);
-    const first = lastError(sim.tick());
+    const first = errorTexts(sim.tick()).find((t) => t.startsWith('Dungeons ('));
     sim.chat('/instances', a);
-    const second = lastError(sim.tick());
+    const second = errorTexts(sim.tick()).find((t) => t.startsWith('Dungeons ('));
 
     expect(first).toMatch(/^Dungeons \(/);
     expect(second).toBe(first);

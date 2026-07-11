@@ -57,6 +57,12 @@ export const pending: Record<string, readonly string[]> = {
     "glitchReroll.title"
   ],
   "ru_RU": [],
+  "cs_CZ": [
+    "auth.currentCharacter",
+    "glitchReroll.cancel",
+    "glitchReroll.confirm",
+    "glitchReroll.title"
+  ],
   "nl_NL": [
     "auth.currentCharacter",
     "glitchReroll.cancel",

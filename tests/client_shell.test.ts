@@ -47,6 +47,10 @@ const hudMobileCss = readFileSync(
   new URL('../src/styles/hud.mobile.css', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const tokensCss = readFileSync(
+  new URL('../src/styles/tokens.css', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const indexExtraCss = readFileSync(
   new URL('../src/styles/index.extra.css', import.meta.url),
   'utf8',
@@ -134,6 +138,18 @@ const characterPreviewTs = readFileSync(
 // the painter that owns the pool now, not a static id in hud.ts (moved-id sweep).
 const partyFrameRowTs = readFileSync(
   new URL('../src/ui/party_frame_row.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+// The mobile collapse chip is painter-created (built by party_chip.ts, driven by the
+// party painter), so it is entry-agnostic: there is no static chip markup to keep in
+// sync across index.html / play.html. These guards read the painter + chip builder +
+// the mobile CSS instead of a static id.
+const partyChipTs = readFileSync(
+  new URL('../src/ui/party_chip.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+const partyFramesPainterTs = readFileSync(
+  new URL('../src/ui/party_frames_painter.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
 const aurasPainterTs = readFileSync(
@@ -369,6 +385,142 @@ describe('client HTML shell', () => {
     ).toBe(true);
   });
 
+  it('keeps the mobile party-collapse chip painter-created (entry-agnostic, no static markup)', () => {
+    // The chip is built by party_chip.ts and placed by the party painter, so it is NOT
+    // static markup that must ship in both index.html / play.html. Pin that: the chip id
+    // appears in the builder, and NEITHER entry carries a static #party-chip.
+    expect(partyChipTs).toContain("export const PARTY_CHIP_ID = 'party-chip';");
+    expect(partyChipTs).toContain('doc.createElement');
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).not.toContain('id="party-chip"');
+    }
+    // The Hud drives the chip only in a party AND on the touch HUD: setCollapse takes the
+    // isMobileLayout() flag, so it never renders on desktop (party frames unchanged there),
+    // plus the isMobileChatOpen() flag so the party UI yields while mobile chat is up.
+    expect(hudTs).toContain('this.partyFramesPainter.setCollapse(');
+    expect(hudTs).toContain('this.isMobileLayout(),');
+    expect(hudTs).toContain('this.partyCollapsed,');
+    expect(hudTs).toContain('this.isMobileChatOpen(),');
+    // The chat-yield read is a transient body-class check, never persisted.
+    expect(hudTs).toContain("return document.body.classList.contains('mobile-chat-open');");
+    // The collapse is a pure USER toggle: the chip caption reuses a t() key (never a raw
+    // string), and the tap persists the flag through the party_collapse core.
+    expect(hudTs).toContain("chipLabel: () => t('hudChrome.unitFrame.partyChip'),");
+    expect(hudTs).toContain('savePartyCollapsed(this.partyCollapsed);');
+    // The painter routes every chip DOM effect through the elided writers (no raw write
+    // on the party painter's per-frame path): the class + attr + text writers, never a
+    // raw classList / setAttribute / textContent.
+    expect(partyFramesPainterTs).toContain(
+      'this.writers.toggleClass(this.container, CHIP_PRESENT_CLASS',
+    );
+    expect(partyFramesPainterTs).toContain('this.writers.setAttr(chip.el, ARIA_EXPANDED');
+    expect(partyFramesPainterTs).not.toMatch(/chip\.el\.setAttribute/);
+  });
+
+  it('ships the mobile chat keyboard-dismiss chevron in BOTH entries, hidden until chat opens', () => {
+    // The dismiss chevron blurs the composer so the on-screen keyboard drops WITHOUT
+    // closing chat. It is STATIC markup (a fixed button seated at the composer's corner),
+    // so it must ship in both index.html / play.html or one entry loses the affordance.
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).toContain('id="chat-dismiss"');
+      // Carries the chevron icon hook (hydrateIcons swaps [data-icon] for inline SVG).
+      expect(entry, name).toMatch(/id="chat-dismiss"[^>]*data-icon="next"/);
+      // Accessible name via the hud_chrome mobile namespace (English-only domain + M16
+      // non-Latin fills), never a raw aria string.
+      expect(entry, name).toMatch(
+        /id="chat-dismiss"[^>]*data-i18n-aria="hudChrome\.mobile\.hideKeyboard"/,
+      );
+    }
+    // Hidden by default (desktop) AND hidden on mobile in the current model: the OS
+    // keyboard's own hide key returns to the read view and the Chat icon closes the panel,
+    // so there is no in-app chevron shown (no mobile show rule reveals it).
+    expect(hudCss).toContain('#chat-dismiss {\n    display: none;\n  }');
+    expect(hudMobileCss).toContain('body.mobile-touch #chat-dismiss {\n    display: none;');
+    expect(hudMobileCss).not.toMatch(/#chat-dismiss \{[^}]*display:\s*inline-flex/);
+    // Dismissing the keyboard KEEPS chat open in the read view: the composer's blur handler
+    // recovers the viewport ONLY on the close path (composer already hidden), never on a
+    // still-shown-composer blur. Only the Chat button closes chat.
+    expect(mainTs).toContain(
+      'if (shouldRecoverOnComposerBlur(chatInput.style.display)) recoverFromMobileKeyboard();',
+    );
+    // The chevron (kept wired for parity) blurs the composer to drop the keyboard, not close.
+    expect(mainTs).toContain("document.getElementById('chat-dismiss')");
+    expect(mainTs).toContain("chatDismiss?.addEventListener('click', () => chatInput.blur());");
+    // Chat surfaces stay full-contrast while open (the idle fade never dims the log/composer).
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-chat-open #chatlog-wrap,\n  body.mobile-touch.mobile-chat-open #chatlog-tabs,\n  body.mobile-touch.mobile-chat-open #chat-input,\n  body.mobile-touch.mobile-chat-open #mobile-chat {\n    opacity: 1;',
+    );
+    // The Chat button is itself #mobile-combat-controls .mobile-btn, so its full-contrast
+    // pin must OUT-SPECIFY the idle fade. The fade carries ONE id (#mobile-combat-controls);
+    // the pin carries TWO (#mobile-combat-controls #mobile-chat), so opacity 1 wins while
+    // chat is open even though .mobile-chrome-idle stays armed during a keyboard reply.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn,',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-chat-open #mobile-combat-controls #mobile-chat {\n    opacity: 1;',
+    );
+  });
+
+  it('fills the keyboard-open chat as a flex column above the keyboard (composer is a flow item)', () => {
+    // While the keyboard is up the whole panel (composer bar + tabs + log) re-lays as a flex
+    // column filling the space ABOVE the keyboard: the log frame flexes to fill, and the
+    // composer is a FLOW item at the top of the panel (from the open rule), not a separately
+    // docked bar, so no composer reservation is needed.
+    const wrapRule =
+      hudMobileCss.match(
+        /body\.mobile-touch\.mobile-keyboard-open\.mobile-chat-open #chatlog-wrap \{([^}]*)\}/,
+      )?.[1] ?? '';
+    // Definite height: the visible-above-keyboard band minus the top inset minus an 8px gap.
+    expect(wrapRule).toMatch(/top:\s*max\(6px, env\(safe-area-inset-top\)\)/);
+    expect(wrapRule).toMatch(/var\(--mobile-keyboard-visible-vh, 100vh\)/);
+    expect(wrapRule).toMatch(/-\s+8px/);
+    // No composer reservation any more (the composer is a flow item, not a docked bar).
+    expect(wrapRule).not.toMatch(/--mobile-composer-h/);
+    // The composer is a flow item in the panel (from the open rule), not absolutely docked.
+    const openInputRule =
+      hudMobileCss.match(/body\.mobile-touch\.mobile-chat-open #chat-input \{([^}]*)\}/)?.[1] ?? '';
+    expect(openInputRule).toMatch(/position:\s*static/);
+    expect(openInputRule).toMatch(/order:\s*-1/);
+    // The log frame fills the rest of the panel (from the open rule); not height:100%.
+    const frameRule =
+      hudMobileCss.match(/body\.mobile-touch\.mobile-chat-open #chatlog-frame \{([^}]*)\}/)?.[1] ??
+      '';
+    expect(frameRule).toMatch(/flex:\s*1 1 auto/);
+    expect(frameRule).not.toMatch(/height:\s*100%/);
+    // The low-priority Chat/Social/More trio yields while the keyboard is up (fairness-neutral
+    // menu chrome, restored on keyboard dismiss).
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch\.mobile-keyboard-open\.mobile-chat-open #mobile-combat-controls \{\s*display:\s*none;/,
+    );
+  });
+
+  it('ships the mobile party-chip CSS with a 40px touch floor, scoped to body.mobile-touch', () => {
+    // The chip meets the mobile touch floor and reveals the frames only under the
+    // painter-driven .party-expanded class (collapsed by default hides the rows + Leave).
+    const chipRule = hudMobileCss.match(/body\.mobile-touch #party-chip \{([^}]*)\}/)?.[1] ?? '';
+    expect(chipRule).toMatch(/min-width:\s*40px/);
+    expect(chipRule).toMatch(/min-height:\s*40px/);
+    // The chevron rotates on expand (the repo's SVG chevron pattern, not a unicode arrow).
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {\n    transform: rotate(90deg);',
+    );
+    // Collapsed OR chat-yielded (no .party-expanded on mobile) hides the member rows +
+    // Leave button, so both states leave only the chip (if present) as the party UI.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames:not(.party-expanded) .party-frame,',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames:not(.party-expanded) #party-leave {\n    display: none;',
+    );
+  });
+
   it('drives the arena window relocalize from refreshLocalizedDynamicUi (live language switch)', () => {
     // The arena window's render-skip signature is text-independent (the offline sentinel,
     // or a JSON of ids/numbers), so a language switch never moves it on its own; the
@@ -377,6 +529,51 @@ describe('client HTML shell', () => {
     expect(
       refresh.slice(0, refresh.indexOf('\n  }')).includes('this.arenaWindow.relocalize();'),
     ).toBe(true);
+  });
+
+  it('re-renders the open vendor on a language switch regardless of its display value', () => {
+    // The open vendor root carries NO inline display (stylesheet-owned: flex on
+    // desktop, the touch dock's block on mobile), so the language-switch re-render
+    // must gate on visibility (display !== 'none'), never a literal === 'block',
+    // or a live switch leaves the open copper/heroic vendor text stale until
+    // reopen (the regression this pins).
+    const refresh = hudTs.slice(hudTs.indexOf('private refreshLocalizedDynamicUi(): void {'));
+    const body = refresh.slice(0, refresh.indexOf('\n  }'));
+    expect(body).toContain(
+      "this.openVendorNpcId !== null && $('#vendor-window').style.display !== 'none'",
+    );
+    expect(body).toContain(
+      "this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display !== 'none'",
+    );
+    expect(body).not.toContain("$('#vendor-window').style.display === 'block'");
+  });
+
+  it('drives the open vendor display from CSS state, tracking mobile-touch flips live', () => {
+    // body.mobile-touch can flip while the vendor is open (Interface Mode opens
+    // Options WITHOUT closing the vendor; foldable rotation crosses the touch
+    // media query). An inline display baked at render time goes stale on that
+    // flip, so the value is stylesheet-owned: the open state (body.vendor-open +
+    // the mounted frame) shows the desktop flex column in components.css, and the
+    // touch dock (hud-mobile layer, which outranks components) overrides it to
+    // display:block. Pin both rules plus the painter's no-inline-display and the
+    // explicit open-state sync the Hud must run because a first open no longer
+    // produces a style mutation for the window observer.
+    expect(componentsCss).toContain(
+      'body.vendor-open #vendor-window:has(> .window-frame) {\n    display: flex;\n  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.vendor-open #vendor-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);\n    display: block;',
+    );
+    const vendorWindowTs = readFileSync(
+      new URL('../src/ui/vendor_window.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(vendorWindowTs).toContain("el.style.removeProperty('display');");
+    expect(vendorWindowTs).not.toMatch(/el\.style\.display\s*=/);
+    const openVendor = hudTs.slice(hudTs.indexOf('openVendor(npcId: number): void {'));
+    expect(openVendor.slice(0, openVendor.indexOf('\n  }'))).toContain(
+      "this.syncWindowOpenState($('#vendor-window'));",
+    );
   });
 
   it('routes the cold-window closeManagedWindow cases through their painter close() for focus-return', () => {
@@ -479,24 +676,29 @@ describe('client HTML shell', () => {
   it('keeps the Discord unlink panel clickable over the pre-game shell', () => {
     const startZ = Number(shellCss.match(/#start-screen \{[\s\S]*?z-index: (\d+);/)?.[1]);
     const modalZ = Number(shellCss.match(/\.modal-backdrop \{[\s\S]*?z-index: (\d+);/)?.[1]);
-    const discordZ = Number(indexExtraCss.match(/#discord-window \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const discordZ = Number(componentsCss.match(/#discord-window \{[\s\S]*?z-index: (\d+);/)?.[1]);
     expect(discordZ).toBeGreaterThan(startZ);
     expect(discordZ).toBeLessThan(modalZ);
   });
 
-  it('keeps the Discord unlink modal at top level so it shows in-game', () => {
+  it('keeps the Discord unlink modal at top level so it shows in-game, in BOTH entries', () => {
     // #start-screen is display:none once the game starts (main.ts hides it) and is a
     // lower z-index:100 stacking context, so a keep-modal nested inside it would be
     // invisible in-game and trapped below the top-level #discord-window. It must be a
     // top-level sibling declared above #start-screen, exactly like #discord-window.
-    const modalAt = html.indexOf('id="discord-keep-modal"');
-    const windowAt = html.indexOf('id="discord-window"');
-    const startAt = html.indexOf('id="start-screen"');
-    expect(modalAt).toBeGreaterThan(-1);
-    expect(windowAt).toBeGreaterThan(-1);
-    // Declared before #start-screen opens, hence a top-level sibling, never a descendant.
-    expect(modalAt).toBeLessThan(startAt);
-    expect(windowAt).toBeLessThan(startAt);
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const modalAt = entry.indexOf('id="discord-keep-modal"');
+      const windowAt = entry.indexOf('id="discord-window"');
+      const startAt = entry.indexOf('id="start-screen"');
+      expect(modalAt, name).toBeGreaterThan(-1);
+      expect(windowAt, name).toBeGreaterThan(-1);
+      // Declared before #start-screen opens, hence a top-level sibling, never a descendant.
+      expect(modalAt, name).toBeLessThan(startAt);
+      expect(windowAt, name).toBeLessThan(startAt);
+    }
   });
 
   it('shows a logged-in Logout nav item next to Account', () => {
@@ -649,16 +851,20 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("document.querySelector('.account-wallet-card')?.remove();");
   });
 
-  it('skips the web mobile preflight in native builds and shows an in-game rotate prompt', () => {
+  it('skips the web mobile preflight in native builds and hard-gates portrait gameplay', () => {
     expect(mainTs).toContain('if (NATIVE_APP) return Promise.resolve();');
     expect(hudMobileCss).toContain(
       'body.mobile-touch.game-active #mobile-preflight {\n    display: none !important;',
     );
     expect(indexExtraCss).toContain(
-      'body.mobile-touch.game-active:not(.native-app) #rotate-device',
+      '@media (orientation: portrait) {\n    body.mobile-touch.game-active #rotate-device {\n      display: flex;',
     );
-    expect(indexExtraCss).toContain(
-      '@media (orientation: portrait) {\n    body.native-app.mobile-touch.game-active #rotate-device {\n      display: flex;',
+    expect(indexExtraCss).not.toContain('body.mobile-touch.game-active:not(.native-app)');
+    expect(html).toContain(
+      'Portrait mode is not supported. Rotate your device to landscape to continue.',
+    );
+    expect(playHtml).toContain(
+      'Portrait mode is not supported. Rotate your device to landscape to continue.',
     );
   });
 
@@ -682,6 +888,16 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain('--cs-details-width: var(--cs-roster-width);');
     expect(shellCss).toContain(
       '@media (min-width: 861px) {\n    #offline-select.cs-wow,\n    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {',
+    );
+    // The offline panel is the one cs-wow panel that is ALSO .auth-panel-premium
+    // (which sets backdrop-filter: blur(12px)); the full-screen takeover must drop
+    // that blur, or the offline character screen frosts the live 3D scene behind it
+    // while the online screens show it sharp. Regression guard for that leak.
+    expect(shellCss).toContain(
+      'background: linear-gradient(180deg, #0008 0%, #0002 18%, #0002 78%, #000c 100%);\n      box-shadow: none;\n      /* The offline panel is the one cs-wow panel that is ALSO .auth-panel-premium,',
+    );
+    expect(shellCss).toContain(
+      '      -webkit-backdrop-filter: none;\n      backdrop-filter: none;\n      overflow: hidden;\n    }',
     );
     expect(shellCss).toContain(
       'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-row {\n      display: grid;\n      grid-template-columns: auto minmax(0, 1fr) auto;',
@@ -718,20 +934,122 @@ describe('client HTML shell', () => {
     expect(html).toContain('aria-label="Quest Log"');
   });
 
-  it('offers a Discord entry in the mobile drawer, hidden until Discord is available', () => {
+  it('offers Discord and Donate entries in the mobile drawer of BOTH entries', () => {
     // Mobile has no keyboard, so the U-key Discord panel toggle is unreachable;
-    // this drawer button is the touch path into #discord-window (link / unlink).
-    expect(html).toContain('id="mobile-discord"');
-    // Carries the icon hook (hydrateIcons swaps [data-icon] for the inline SVG).
-    expect(html).toMatch(/id="mobile-discord"[^>]*data-icon="discord"/);
-    // Starts hidden; main.ts reveals it only when Discord is enabled and logged in.
-    expect(html).toMatch(/id="mobile-discord"\s+hidden/);
+    // this drawer button is the touch path to Discord (the account panel when
+    // available, else the community invite). Donate mirrors the desktop shell's
+    // sponsors community link.
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).toContain('id="mobile-discord"');
+      // Carries the icon hook (hydrateIcons swaps [data-icon] for the inline SVG).
+      expect(entry, name).toMatch(/id="mobile-discord"[^>]*data-icon="discord"/);
+      // Starts hidden; main.ts reveals it at boot on any build with Discord UI
+      // enabled (it stays hidden in the native-app build).
+      expect(entry, name).toMatch(/id="mobile-discord"\s+hidden/);
+      expect(entry, name).toContain('id="mobile-donate"');
+      expect(entry, name).toMatch(/id="mobile-donate"[^>]*data-icon="donate"/);
+      // Donate is never gated on the web: no hidden attribute on it.
+      expect(entry, name).not.toMatch(/id="mobile-donate"\s+hidden/);
+    }
+    // The native-app build strips every donation link (store payment-steering
+    // policy); the tray entry joins the same suppression block as the desktop
+    // .donate links in hud.css.
+    expect(hudCss).toContain('body.native-app #mobile-donate,');
+    // The tap targets: the account panel with the invite as the logged-out /
+    // offline fallback, and the sponsors page, pinned to the shells' URLs.
+    expect(mainTs).toContain("const DISCORD_INVITE_URL = 'https://discord.gg/GjhnUsBtw';");
+    expect(mainTs).toContain("const DONATE_URL = 'https://github.com/sponsors/levy-street';");
+    expect(mainTs).toContain(
+      "window.open(discordInviteUrl() || DISCORD_INVITE_URL, '_blank', 'noopener,noreferrer');",
+    );
+    expect(mainTs).toContain(
+      "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
+    );
+  });
+
+  it('ships the consumables quick bar in BOTH entries, collapsed by default', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).toContain('id="mobile-consumables"');
+      // aria-label on a role-less div is prohibited ARIA (ignored by screen
+      // readers); the container carries role="group" so the name is exposed.
+      expect(entry, name).toMatch(/id="mobile-consumables" role="group"/);
+      // The chevron chip starts collapsed (aria-expanded false; hud.ts flips it)
+      // and reuses the existing bags-filter key, so the bar adds no i18n keys.
+      expect(entry, name).toMatch(/id="mobile-consumables-toggle"[^>]*aria-expanded="false"/);
+      expect(entry, name).toMatch(/id="mobile-consumables-toggle"[^>]*data-icon="next"/);
+      expect(entry, name).toMatch(
+        /id="mobile-consumables-toggle"[^>]*data-i18n-aria="hudChrome\.bags\.filterConsumable"/,
+      );
+      const slots = [
+        ...entry.matchAll(/class="mobile-consumable-slot"[^>]*data-consumable-index="(\d+)"/g),
+      ];
+      expect(slots, name).toHaveLength(6);
+      expect(slots.map((m) => m[1]).sort(), name).toEqual(['0', '1', '2', '3', '4', '5']);
+    }
+    // The row shows only via the session-only body toggle, and empty slots
+    // collapse away so the open row is as wide as what the player carries.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-consumables-open #mobile-consumables-row {',
+    );
+    expect(hudMobileCss).toContain('body.mobile-touch .mobile-consumable-slot.empty {');
+    // A touch starting on the bar must never double as a camera drag.
+    expect(readFileSync(new URL('../src/game/touch_router.ts', import.meta.url), 'utf8')).toContain(
+      "'#mobile-consumables',",
+    );
+    // The open row extends RIGHTWARD from the toggle along the top band (restored
+    // by owner request; v0.23.0 had dropped it below the chip). top:0 + a left offset
+    // past the 40px toggle flow it sideways; the pet classes drop it a band so it
+    // clears the pet bar (mobile-pet-active). Overlap is gated by the mobile HUD audit.
+    const consumRowStart = hudMobileCss.indexOf('body.mobile-touch #mobile-consumables-row {');
+    const consumRow = hudMobileCss.slice(consumRowStart, hudMobileCss.indexOf('}', consumRowStart));
+    expect(consumRow).toMatch(/top: 0;/);
+    expect(consumRow).toMatch(/left: calc\(40px \+ 6px\);/);
+    expect(consumRow).toMatch(/right: auto;/);
+    // Pet classes drop the sideways row one band so it never overlaps the pet bar.
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch\.mobile-pet-active #mobile-consumables-row \{\n {4}top: calc\(100% \+ 6px\);/,
+    );
+    // The id list is snapshotted at OPEN time and stays frozen while open, so
+    // slots never shift under the thumb the frame a stack depletes: exactly one
+    // consumableBarItems CALL (the toggle handler's snapshot), none per-frame.
+    expect(hudTs.match(/consumableBarItems\(/g) ?? []).toHaveLength(1);
+    expect(hudTs).toContain(
+      'consumableBarItems(this.sim.inventory, (id) => ITEMS[id], this.consumableBarIds);',
+    );
+  });
+
+  it('carries identical mobile-action-ring markup in BOTH entries', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="mobile-action-ring"');
+      expect(entry).toContain('id="mobile-action-attack"');
+      expect(entry).toContain('id="mobile-action-page-toggle"');
+      const slotMatches = [
+        ...entry.matchAll(/class="mobile-action-slot"[^>]*data-mobile-index="(\d+)"/g),
+      ];
+      expect(slotMatches).toHaveLength(5);
+      const indices = slotMatches.map((m) => m[1]).sort();
+      expect(indices).toEqual(['0', '1', '2', '3', '4']);
+    }
   });
 
   it('keeps the game menu free of duplicate and dev-only entries', () => {
-    const interfaceEntries = optionsViewTs.match(/labelKey: 'hud\.options\.interface'/g) ?? [];
+    // The legacy main-menu model (buildOptionsMenu) is gone from options_view.ts;
+    // the one Interface entry now lives in the options_ia category tree.
+    const optionsIaTs = readFileSync(
+      new URL('../src/ui/options_ia.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const interfaceEntries = optionsIaTs.match(/nameKey: 'hud\.options\.interface'/g) ?? [];
     expect(interfaceEntries).toHaveLength(1);
+    expect(optionsViewTs.match(/'hud\.options\.interface'/g) ?? []).toHaveLength(0);
     expect(optionsViewTs).not.toContain('Skin Select (dev)');
+    expect(optionsIaTs).not.toContain('Skin Select (dev)');
     expect(hudTs).not.toContain('Skin Select (dev)');
   });
 
@@ -805,7 +1123,11 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('collapses in-game mobile community links behind one Community control', () => {
+  it('hides the community-links rail on mobile touch (its icon read as a Friends button)', () => {
+    // The rail markup stays for desktop (narrow-desktop rules and the
+    // homepage still use it); only the in-game touch HUD hides it, because
+    // its two-person toggle icon under the minimap masqueraded as a Friends
+    // button next to the real Social button in the top-left trio.
     expect(html).toContain('<a class="donate-cta"');
     expect(html).toContain('<details id="community-menu">');
     expect(html).toContain('<summary class="community-toggle"');
@@ -814,32 +1136,13 @@ describe('client HTML shell', () => {
     expect(html).toContain('<a class="community-link github"');
     expect(html).toContain('<a class="community-link donate"');
     expect(hudMobileCss).toContain('body.mobile-touch.game-active #ui {\n    z-index: 80;\n  }');
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #community-hud {\n    right: max(8px, env(safe-area-inset-right));\n    top: calc(max(8px, env(safe-area-inset-top)) + 158px);',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch .community-toggle {\n    width: 44px;\n    height: 44px;',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch .community-toggle svg {\n    width: 20px;\n    height: 20px;',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #community-hud {\n      top: calc(max(6px, env(safe-area-inset-top)) + 132px);',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch .community-toggle {\n      width: 40px;\n      height: 40px;\n    }',
-    );
-    expect(hudMobileCss).toContain('body.mobile-touch .community-tray {\n    position: absolute;');
-    expect(hudMobileCss).toContain('z-index: 90;');
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #community-menu[open] .community-tray {\n    display: flex;\n  }',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch .community-link.donate {\n    display: inline-flex;',
-    );
-    expect(hudMobileCss).not.toContain(
-      'body.mobile-touch .community-link.donate {\n    display: none;',
-    );
+    expect(hudMobileCss).toContain('body.mobile-touch #community-hud {\n    display: none;\n  }');
+    // No stray mobile-touch styling survives for the hidden rail (the old
+    // positioning/tray rules are gone, not just overridden).
+    expect(hudMobileCss).not.toContain('body.mobile-touch .community-toggle');
+    expect(hudMobileCss).not.toContain('body.mobile-touch .community-tray');
+    expect(hudMobileCss).not.toContain('body.mobile-touch .community-link');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #community-menu');
     expect(hudMobileCss).not.toContain('body.mobile-touch .donate-cta {\n    display: none;');
   });
 
@@ -859,9 +1162,10 @@ describe('client HTML shell', () => {
       "document.getElementById('mobile-controls')?.classList.remove('expanded');",
     );
     expect(hudTs).toContain("more?.classList.remove('active');");
-    expect(hudTs).toContain(
-      "document.getElementById('mobile-more-close')?.addEventListener('click', () => {",
-    );
+    // The close X is touch-tap bound (never bare 'click', which the browser
+    // only synthesizes for the primary pointer), so it works mid-steer.
+    expect(hudTs).toContain("const moreClose = document.getElementById('mobile-more-close');");
+    expect(hudTs).toContain('bindTouchTap(moreClose, () => {');
   });
 
   it('keeps desktop community links open after HUD clicks', () => {
@@ -882,8 +1186,10 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('conic-gradient(\n      from var(--xp-ring-start),');
     expect(hudMobileCss).toContain('calc(var(--xp-fill, 0) * 360deg)');
     expect(hudMobileCss).toContain('transparent var(--xp-ring-arc) 360deg');
+    // Own HP/mana lives bottom-center (the one part of the screen every
+    // other mobile element deliberately leaves empty), not top-left.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: max(8px, env(safe-area-inset-left));\n    top: max(8px, env(safe-area-inset-top));\n    z-index: 21;',
+      'body.mobile-touch #player-frame {\n    position: fixed;\n    left: 50%;\n    top: auto;\n    bottom: calc(14px + env(safe-area-inset-bottom));\n    z-index: 21;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #player-frame .portrait-wrap {\n    z-index: 3;\n  }',
@@ -901,32 +1207,49 @@ describe('client HTML shell', () => {
       'body.mobile-touch #player-frame::before {\n      left: -5px;\n      top: -5px;\n      width: 73px;\n      height: 73px;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #target-frame {\n    left: max(8px, env(safe-area-inset-left));\n    top: calc(max(8px, env(safe-area-inset-top)) + 72px);',
+      'body.mobile-touch #target-frame {\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 72px);',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames {\n    position: fixed;\n    left: max(8px, env(safe-area-inset-left));\n    top: calc(max(8px, env(safe-area-inset-top)) + 74px);',
+      'body.mobile-touch #party-frames {\n    position: fixed;\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 74px);',
+    );
+    // The base below-target offset was nudged +5px (130 -> 135) so the new first-child
+    // collapse chip clears the target frame's bottom edge; a comment now sits between the
+    // selector and the top, so assert the selector and the pinned value independently.
+    expect(hudMobileCss).toContain('body.mobile-touch #party-frames.below-target {');
+    expect(hudMobileCss).toContain('top: calc(max(8px, env(safe-area-inset-top)) + 135px);');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames .party-frame {\n    width: calc(112px * var(--mobile-chrome-scale, 1));\n    min-height: 40px;',
+    );
+    // Keyed on :first-of-type (not :first-child): the collapse chip is now the
+    // container's first child, so the top member row is selected by :first-of-type.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #party-frames .party-frame:not(:first-of-type) {\n    margin-top: -1px;',
+    );
+    // F1: the container is a simple flex column now (chip, rows wrapper, master-loot,
+    // leave), so the leave button carries no grid placement and no member frame can
+    // auto-flow beside the chip.
+    expect(hudMobileCss).toMatch(
+      /body\.mobile-touch #party-frames \{[^}]*display: flex;[^}]*flex-direction: column;/,
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames.below-target {\n    top: calc(max(8px, env(safe-area-inset-top)) + 130px);',
+      'body.mobile-touch #party-frames #party-leave {\n    width: auto;\n    min-width: 0;\n    min-height: 40px;',
     );
+    expect(hudMobileCss).not.toMatch(/#party-leave \{\n {4}grid-column/);
+    // The double-stack grid the container used to carry moved to the .party-rows WRAPPER;
+    // on desktop the wrapper is transparent (display: contents), so the desktop stack is
+    // unchanged. Both pins guard the two-arm structure.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames .party-frame {\n    width: 132px;\n    min-height: 40px;',
+      'body.mobile-touch #party-frames .party-rows {\n    display: grid;\n    grid-auto-flow: column;\n    grid-template-rows: repeat(2, auto);',
     );
+    expect(hudCss).toContain('#party-frames .party-rows {\n    display: contents;\n  }');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames .party-frame:not(:first-child) {\n    margin-top: -1px;',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames #party-leave {\n    width: 132px;\n    min-height: 40px;',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames .party-frame {\n      width: 118px;\n      min-height: 40px;',
+      'body.mobile-touch #party-frames .party-frame {\n      width: calc(100px * var(--mobile-chrome-scale, 1));\n      min-height: 40px;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #target-frame {\n      left: max(6px, env(safe-area-inset-left));\n      top: calc(max(6px, env(safe-area-inset-top)) + 56px);',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames.below-target {\n      top: calc(max(6px, env(safe-area-inset-top)) + 100px);',
-    );
+    // Landscape below-target offset likewise nudged +5px (100 -> 105) for the chip.
+    expect(hudMobileCss).toContain('top: calc(max(6px, env(safe-area-inset-top)) + 105px);');
     expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-left-handed #xpbar,');
     // The XP fill fraction is mirrored into --xp-fill on BOTH the #xpbar and the
     // #player-frame (the mobile ring around the class circle reads it). The painter
@@ -1009,15 +1332,23 @@ describe('client HTML shell', () => {
       '@media (orientation: landscape) {\n    body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,\n    body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view {\n      justify-content: flex-start;\n      min-height: calc(var(--app-vh) - 86px);',
+      'body.mobile-touch[data-start-panel="login-panel"] #hero-view,\n    body.mobile-touch[data-start-panel="discord-choice-panel"] #hero-view,\n    body.mobile-touch[data-start-panel="realm-panel"] #hero-view,\n    body.mobile-touch[data-start-panel="offline-select"] #hero-view {\n      justify-content: flex-start;\n      min-height: calc(var(--app-vh) - 86px);',
+    );
+    // charselect/charcreate float their header out of flow entirely (a floating
+    // hamburger, not a shrunk-but-present header bar), so they get the FULL
+    // viewport height here instead of height-minus-header.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,\n    body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view {\n      justify-content: flex-start;\n      min-height: var(--app-vh);',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch[data-start-panel="mode-select"] #title-logo {\n      width: min(176px, 24vw);\n      margin: 0;',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch[data-start-panel="charselect-panel"] #title-logo,\n    body.mobile-touch[data-start-panel="charcreate-panel"] #title-logo {\n      display: none;',
+      'body.mobile-touch[data-start-panel="charselect-panel"] #title-logo,\n    body.mobile-touch[data-start-panel="charcreate-panel"] #title-logo,\n    body.mobile-touch[data-start-panel="login-panel"] #title-logo,\n    body.mobile-touch[data-start-panel="discord-choice-panel"] #title-logo,\n    body.mobile-touch[data-start-panel="realm-panel"] #title-logo,\n    body.mobile-touch[data-start-panel="offline-select"] #title-logo {\n      display: none;',
     );
-    expect(shellCss).toContain('height: min(560px, calc(var(--app-vh) - 96px));');
+    // No header flow-height to subtract anymore: the floating hamburger reserves
+    // zero layout height, so only the panel's own top/bottom padding is left.
+    expect(shellCss).toContain('height: min(560px, calc(var(--app-vh) - 20px));');
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel .cs-detail-col {\n      display: grid;\n      grid-template-columns: minmax(120px, 0.54fr) minmax(0, 1.46fr);',
     );
@@ -1037,9 +1368,28 @@ describe('client HTML shell', () => {
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel #charselect-class-details .details-spells-list {\n      display: grid;\n      grid-template-columns: minmax(0, 1fr);',
     );
+    // charselect's columns stay overflow:hidden (their #char-list and
+    // #charselect-class-details CHILDREN scroll); charcreate's columns hold a
+    // single tall flow with no inner scroll container, so THEY scroll instead
+    // (overflow-y: auto), or the Create button clips off with no way to reach it.
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel .cs-list-col,\n    body.mobile-touch #charselect-panel .cs-detail-col,\n    body.mobile-touch #charcreate-panel .cs-create-col,\n    body.mobile-touch #charcreate-panel .cs-detail-col {\n      min-height: 0;\n      height: 100%;\n      overflow: hidden;',
+      'body.mobile-touch #charselect-panel .cs-list-col,\n    body.mobile-touch #charselect-panel .cs-detail-col {\n      min-height: 0;\n      height: 100%;\n      overflow: hidden;',
     );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charcreate-panel .cs-create-col,\n    body.mobile-touch #charcreate-panel .cs-detail-col {\n      min-height: 0;\n      height: 100%;\n      overflow-y: auto;',
+    );
+    // No body.mobile-touch charcreate column rule may declare overflow:hidden
+    // (that was the clip bug). Guard both column selectors against a hidden
+    // regression, tolerating either selector order.
+    for (const col of ['.cs-create-col', '.cs-detail-col']) {
+      const rule = shellCss.match(
+        new RegExp(`body\\.mobile-touch #charcreate-panel \\${col}[^{]*\\{([^}]*)\\}`),
+      );
+      expect(rule, `charcreate ${col} mobile column rule should exist`).not.toBeNull();
+      const ruleBody = rule?.[1] ?? '';
+      expect(ruleBody).toMatch(/overflow-y:\s*auto/);
+      expect(ruleBody).not.toMatch(/overflow:\s*hidden/);
+    }
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel .cs-list-actions {\n      position: absolute;\n      top: 28px;\n      right: 0;',
     );
@@ -1131,65 +1481,118 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('lays out mobile More tray buttons horizontally', () => {
-    expect(html).toContain(
+  it('builds the mobile More drawer on the AAA window-frame grammar with a roomy 3-column tile grid', () => {
+    // The drawer region is BYTE-IDENTICAL across both entries (play.html had
+    // drifted: 12 buttons without type="button" and no Daily Rewards tile).
+    // The region regex ends at the drawer's own 6-space-indented close, before
+    // the entries' differing container close (</section> vs </div>).
+    const drawerRe = /<div id="mobile-extra-controls"[\s\S]*?\n {6}<\/div>/;
+    const drawer = html.match(drawerRe)?.[0] ?? '';
+    expect(drawer).not.toBe('');
+    expect(playHtml.match(drawerRe)?.[0]).toBe(drawer);
+    // The static markup carries the SAME window-frame anatomy the grammar
+    // windows (Social, Quest Log, Bags, ...) mount from window_frame.ts:
+    // titlebar (display-font title + 44px close) over a scrolling .window-body.
+    expect(drawer).toContain(
       '<div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title">',
     );
-    expect(html).toContain('<div class="panel-title">');
-    expect(html).toContain('id="mobile-more-close"');
-    expect(html).toContain('<div id="mobile-extra-grid">');
+    expect(drawer).toContain('<div class="window-frame">');
+    expect(drawer).toContain('<div class="window-titlebar">');
+    expect(drawer).toContain(
+      '<span class="window-title" id="mobile-more-title" data-i18n="hud.core.mobileMore">More</span>',
+    );
+    expect(drawer).toContain('class="window-close" id="mobile-more-close"');
+    expect(drawer).toContain('<div class="window-body">');
+    expect(drawer).toContain('<div id="mobile-extra-grid">');
+    expect(drawer).not.toContain('panel-title');
+    expect(drawer).not.toContain('x-btn');
+    // All 15 actions ride the grid as tiles, Daily Rewards included in BOTH entries.
+    expect([...drawer.matchAll(/class="mobile-btn(?: active)?" id="mobile-/g)]).toHaveLength(15);
+    expect(drawer).toContain('id="mobile-daily-rewards"');
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-controls {\n    z-index: 140;\n  }',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-extra-controls {\n    position: fixed;\n    left: 50%;\n    top: max(14px, env(safe-area-inset-top));\n    bottom: auto;\n    transform: translateX(-50%);',
+    // The root is a transparent shell around the frame, with the modal scrim
+    // (a huge-spread box-shadow, the cheap ::backdrop stand-in) dimming the
+    // chrome behind it: NO glass gradient, NO backdrop blur on the drawer.
+    const drawerRuleStart = hudMobileCss.indexOf('body.mobile-touch #mobile-extra-controls {');
+    expect(drawerRuleStart).toBeGreaterThan(-1);
+    const drawerRule = hudMobileCss.slice(
+      drawerRuleStart,
+      hudMobileCss.indexOf('\n  }', drawerRuleStart),
     );
-    expect(hudMobileCss).toContain('z-index: 100;');
-    expect(hudMobileCss).toContain('border-radius: 10px;');
-    expect(hudMobileCss).toContain(
-      'max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));',
-    );
-    expect(hudMobileCss).toContain(
-      'max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-more-open #mobile-extra-controls {\n    display: flex;\n    flex-direction: column;\n  }',
-    );
-    // Anchored to the drawer-header rule itself (not just the declarations,
-    // which any rule could carry): the 48px floor must stay on THIS selector.
-    const drawerTitleStart = hudMobileCss.indexOf(
-      'body.mobile-touch #mobile-extra-controls .panel-title {',
-    );
-    expect(drawerTitleStart).toBeGreaterThan(-1);
-    const drawerTitleBody = hudMobileCss.slice(
-      drawerTitleStart,
-      hudMobileCss.indexOf('}', drawerTitleStart),
-    );
-    expect(drawerTitleBody).toContain('min-height: 48px;');
-    expect(drawerTitleBody).toContain('margin-bottom: 8px;');
-    expect(drawerTitleBody).toContain('padding-bottom: 6px;');
-    expect(drawerTitleBody).toContain('cursor: move;');
-    expect(hudMobileCss).toContain(
+    expect(drawerRule).toContain('position: fixed;');
+    expect(drawerRule).toContain('transform: translate(-50%, -50%);');
+    expect(drawerRule).toContain('z-index: 100;');
+    expect(drawerRule).toContain('background: transparent;');
+    expect(drawerRule).toContain('box-shadow: 0 0 0 100vmax var(--color-scrim);');
+    expect(drawerRule).not.toContain('backdrop-filter');
+    expect(drawerRule).not.toContain('--mobile-glass-bg');
+    // A roomier sheet than the old 440px pill tray, capped to 80 percent of the
+    // safe app viewport; overflowing tiles scroll INSIDE the frame's body.
+    expect(drawerRule).toContain(
       'width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));',
     );
+    expect(drawerRule).toContain('max-height: min(\n      calc(var(--app-vh) * 0.8),');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-more-open #mobile-extra-controls {\n    opacity: 1;\n    visibility: visible;\n    pointer-events: auto;\n    transform: translate(-50%, -50%);',
+    );
+    expect(hudMobileCss).toContain(
+      'transition:\n      opacity 150ms ease,\n      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-more .ui-icon {\n    transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-more-open #mobile-more .ui-icon {\n    transform: rotate(38deg);',
+    );
+    expect(hudMobileCss).toContain(
+      '@media (prefers-reduced-motion: reduce) {\n    body.mobile-touch #mobile-extra-controls,\n    body.mobile-touch #mobile-more .ui-icon {\n      transition: none;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-extra-controls .window-body {\n    overscroll-behavior: contain;',
+    );
+    // 3 columns of icon-over-label tiles at a 64px row floor (was 4 columns of
+    // 36px pills): decisively ABOVE the 40px touch floor. Parse the numbers so
+    // shrinking either below 56px fails here, not just a changed literal.
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-extra-grid {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));',
     );
-    expect(hudMobileCss).toContain('body.mobile-touch #mobile-extra-controls .mobile-btn');
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-extra-controls .mobile-btn {\n    width: 100%;',
+    const rowFloor = hudMobileCss.match(
+      /#mobile-extra-grid \{[^}]*grid-auto-rows: minmax\((\d+)px/,
     );
-    expect(hudMobileCss).toContain('flex-direction: row;');
-    expect(hudMobileCss).toContain('body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon');
+    expect(Number(rowFloor?.[1] ?? 0)).toBeGreaterThanOrEqual(56);
+    const tileRule = hudMobileCss.match(
+      /body\.mobile-touch #mobile-extra-controls \.mobile-btn \{[^}]*\}/,
+    )?.[0];
+    expect(tileRule).toBeTruthy();
+    expect(tileRule).toContain('flex-direction: column;');
+    const tileFloor = tileRule?.match(/min-height: (\d+)px/);
+    expect(Number(tileFloor?.[1] ?? 0)).toBeGreaterThanOrEqual(56);
+    // Tokenized tile chrome over the frame's solid base; a visibly larger icon.
+    expect(tileRule).toContain('background: var(--color-panel-l0-bg);');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {\n    flex: none;\n    width: 24px;\n    height: 24px;\n  }',
+    );
+    const labelRule = hudMobileCss.match(
+      /body\.mobile-touch #mobile-extra-controls \.mobile-label \{[^}]*\}/,
+    )?.[0];
+    expect(labelRule).toContain('font-size: var(--text-xs);');
+    // While the drawer is open the floating top-right chrome hides exactly like
+    // it does for mobile-window-open windows (the drawer never sets that class).
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-more-open #minimap-wrap,\n  body.mobile-touch.mobile-more-open #mail-indicator {',
+    );
     expect(mobileControlsTs).toContain(
       "const open = !document.body.classList.contains('mobile-more-open');",
     );
     expect(mobileControlsTs).toContain("this.root?.classList.toggle('expanded', open);");
     expect(mobileControlsTs).toContain("document.body.classList.toggle('mobile-more-open', open);");
-    expect(mobileControlsTs).toContain("modal.style.left = '50%';");
-    expect(mobileControlsTs).toContain("modal.style.top = 'max(14px, env(safe-area-inset-top))';");
-    expect(mobileControlsTs).toContain("modal.style.transform = 'translateX(-50%)';");
-    expect(mobileControlsTs).toContain('delete modal.dataset.windowMoved;');
+    // The opener writes NO inline geometry: centering belongs to the stylesheet
+    // alone (the old inline left/top/transform write raced the Hud observer's
+    // show-time mobile clear and broke the FIRST open of every session).
+    expect(mobileControlsTs).not.toContain("modal.style.left = '50%';");
+    expect(mobileControlsTs).not.toContain("modal.style.transform = 'translate(-50%, -50%)';");
     expect(mobileControlsTs).toContain('private closeMoreModal(): void {');
     expect(mobileControlsTs).toContain(
       "document.getElementById('mobile-controls')?.classList.remove('expanded');",
@@ -1309,59 +1712,381 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
   });
 
-  it('keeps the mobile More and Autorun buttons in the combat row', () => {
-    const combatControls = html.slice(
-      html.indexOf('<div id="mobile-combat-controls">'),
-      html.indexOf('<div id="mobile-extra-controls"'),
-    );
-    const primaryButtons = [...combatControls.matchAll(/<button class="mobile-btn"/g)];
-    const attack = combatControls.indexOf('id="mobile-attack-nearest"');
-    const autorun = combatControls.indexOf('id="mobile-autorun"');
-    const jump = combatControls.indexOf('id="mobile-jump"');
-
-    expect(primaryButtons).toHaveLength(7);
-    expect(attack).toBeGreaterThanOrEqual(0);
-    expect(autorun).toBeGreaterThan(attack);
-    expect(jump).toBeGreaterThan(autorun);
-    expect(hudMobileCss).toContain('grid-template-columns: 124px repeat(6, 58px);');
-    expect(hudMobileCss).toContain('grid-template-columns: 115px repeat(6, 54px);');
-    expect(hudMobileCss).toContain('grid-template-columns: 96px repeat(6, 42px);');
+  it('keeps the mobile bar at top-left and leaves low-frequency actions in the More tray', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const combatControls = entry.slice(
+        entry.indexOf('<div id="mobile-combat-controls">'),
+        entry.indexOf('<div id="mobile-action-ring"'),
+      );
+      const primaryButtons = [...combatControls.matchAll(/<button class="mobile-btn"/g)];
+      const chat = combatControls.indexOf('id="mobile-chat"');
+      const social = combatControls.indexOf('id="mobile-social"');
+      const quest = combatControls.indexOf('id="mobile-quest"');
+      const settings = combatControls.indexOf('id="mobile-menu"');
+      const more = combatControls.indexOf('id="mobile-more"');
+      const moreButton = combatControls.slice(more, combatControls.indexOf('</button>', more));
+      // The source order stays the touch row: Chat, Social, Quests, Settings,
+      // More. Portrait gameplay is blocked by the rotate gate, so this row does
+      // not need a second portrait-specific copy in the tray.
+      expect(primaryButtons, name).toHaveLength(5);
+      expect(chat, name).toBeGreaterThanOrEqual(0);
+      expect(social, name).toBeGreaterThan(chat);
+      expect(quest, name).toBeGreaterThan(social);
+      expect(settings, name).toBeGreaterThan(quest);
+      expect(more, name).toBeGreaterThan(settings);
+      // The five buttons are wrapped in #mobile-combat-buttons behind an always-
+      // visible collapse handle that ships DEFAULT COLLAPSED (aria-expanded="false"),
+      // so the round icons no longer crowd the play field (live PR #1736 feedback).
+      expect(combatControls, name).toContain('id="mobile-combat-buttons"');
+      expect(combatControls, name).toContain('id="mobile-menu-collapse-toggle"');
+      expect(combatControls, name).toContain('aria-expanded="false"');
+      expect(combatControls, name).toContain('aria-controls="mobile-combat-buttons"');
+      // Social (Friends & Guild), Quests and Settings live in the bar, promoted
+      // OUT of the More tray; none may reappear in the tray grid.
+      const tray = entry.slice(
+        entry.indexOf('<div id="mobile-extra-grid">'),
+        entry.indexOf('<div id="mobile-window-backdrop"'),
+      );
+      expect(tray, name).not.toContain('mobile-portrait-primary');
+      expect(tray, name).not.toContain('id="mobile-more-chat"');
+      expect(tray, name).not.toContain('id="mobile-more-social"');
+      expect(tray, name).not.toContain('id="mobile-more-quest"');
+      expect(tray, name).not.toContain('id="mobile-more-menu"');
+      expect(tray, name).not.toContain('id="mobile-social"');
+      expect(tray, name).not.toContain('id="mobile-quest"');
+      expect(tray, name).not.toContain('id="mobile-menu"');
+      // No bottom-centre Target button: the one targeting helper on touch is
+      // the Target swap button inside the action ring (#mobile-target-cycle),
+      // never a third centre button (the old #mobile-target design).
+      expect(entry, name).not.toContain('id="mobile-target"');
+      expect(entry, name).not.toContain('data-i18n="hud.core.mobileTarget"');
+    }
+    // The five buttons live in a fitted #mobile-combat-buttons grid the collapse
+    // toggle reveals; it keeps the band's established width (40px handle + 8px gap +
+    // the fitted five-button row) in each orientation, so the consumables dock offsets
+    // below are unchanged whether the cluster is collapsed or open.
+    expect(hudMobileCss).toContain('grid-template-columns: repeat(5, 1fr);');
+    expect(hudMobileCss).toContain('--mobile-menu-row-w: calc(338px - 40px - 8px);'); // base row
+    expect(hudMobileCss).toContain('--mobile-menu-row-w: calc(310px - 40px - 8px);'); // landscape row
+    expect(hudMobileCss).toContain('--mobile-menu-row-w: calc(234px - 40px - 8px);'); // portrait row
+    // The #mobile-consumables chip docks just PAST the band's PAINTED width: the
+    // unscaled 48px handle + gap, then the grid row scaled by the size settings
+    // (base 290, landscape 262, portrait 186 = each row-w above). Pinned so a
+    // future band-width change updates both and the chip never slides back under
+    // the buttons.
+    expect(hudMobileCss).toContain('48px +\n      290px *'); // base consumables dock offset
+    expect(hudMobileCss).toContain('+ 48px + 186px * var(--btn-scale, 1) + 8px)'); // portrait dock
+    expect(hudMobileCss).toContain('48px +\n        262px *'); // landscape consumables dock offset
+    // Top-LEFT anchor: the band clears the target-frame seat below it (top + 72px)
+    // and leaves the top-centre band to the pet bar.
     expect(hudMobileCss).toContain(
-      'position: absolute;\n    left: 50%;\n    bottom: calc(3px + env(safe-area-inset-bottom));',
+      'position: absolute;\n    left: max(12px, env(safe-area-inset-left));\n    top: max(8px, env(safe-area-inset-top));',
+    );
+    expect(hudMobileCss).toContain('top: max(6px, env(safe-area-inset-top));'); // landscape band top
+    expect(hudMobileCss).toContain(
+      'pointer-events: auto;\n    align-items: start;\n    z-index: 30;',
+    );
+    // Default COLLAPSED: the reveal keys off .mobile-menu-open, and the collapsed band
+    // drops its pointer-events so it leaves no dead tap zone over the world.
+    expect(hudMobileCss).toContain('body.mobile-touch.mobile-menu-open #mobile-combat-buttons {');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch:not(.mobile-menu-open) #mobile-combat-controls {\n    pointer-events: none;',
     );
     expect(hudMobileCss).toContain(
-      'bottom: calc(2px + env(safe-area-inset-bottom));\n      grid-template-columns: 115px repeat(6, 54px);',
-    );
-    expect(hudMobileCss).toContain(
-      'pointer-events: auto;\n    align-items: end;\n    z-index: 30;',
+      'body.mobile-touch #petbar {\n    position: fixed;\n    left: 50%;\n    top: max(8px, env(safe-area-inset-top));',
     );
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
     expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
+    expect(mobileControlsTs).not.toContain("bindButton('mobile-more-chat'");
+    expect(mobileControlsTs).not.toContain("bindButton('mobile-more-social'");
+    expect(mobileControlsTs).not.toContain("bindButton('mobile-more-quest'");
+    expect(mobileControlsTs).not.toContain("bindButton('mobile-more-menu'");
+    expect(mobileControlsTs).not.toContain('isPortraitViewport');
+    // The touch targeting split: the ring's Target swap button cycles hostiles
+    // via the Tab path (onCycleTarget), and the attack toggle owns the
+    // acquire-nearest fallback through the hud hook. Pin every arm positively
+    // (bindButton silently no-ops on a missing element, so only a positive
+    // source pin catches a lost binding) plus the old bottom-centre Target
+    // button's removal.
+    expect(mainTs).not.toContain('onTarget:');
+    expect(mobileControlsTs).not.toContain("bindButton('mobile-target'");
+    expect(mainTs).toContain('onCycleTarget: () => world.tabTarget(),');
+    expect(mainTs).toContain('hud.onMobileAttackNearest = () => attackNearest();');
+    expect(mobileControlsTs).toContain(
+      "this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());",
+    );
+    // The attack toggle's fallback fires ONLY with no live hostile target (and
+    // never while auto-attacking), so a tap on a live target still toggles the
+    // classic castSlot(0) attack.
+    expect(hudTs).toContain(
+      'if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {',
+    );
+  });
+
+  it('sizes the two top-left disclosure chips from ONE shared block, outside every scale transform', () => {
+    // Live user feedback: the menu collapse handle and the consumables chevron rendered
+    // as two different-sized, different-looking arrows because one inherited the band's
+    // --btn-scale transform and the other its own container's. The pair now shares a
+    // single selector list for face + size, and BOTH containers stay transform-free:
+    // the Button Size factor lives on the grid / slot row INSIDE them, so the chips
+    // hold their fixed rendered size (>= the 40px touch floor) at every size setting.
+    // The shared sizing block, in every orientation tier (base, landscape, portrait).
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-menu-collapse-toggle,\n  body.mobile-touch #mobile-consumables-toggle {\n    width: 40px;\n    height: max(40px, calc(54px * var(--mobile-chrome-scale, 1)));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-menu-collapse-toggle,\n    body.mobile-touch #mobile-consumables-toggle {\n      height: max(40px, calc(48px * var(--mobile-chrome-scale, 1)));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-menu-collapse-toggle,\n    body.mobile-touch #mobile-consumables-toggle {\n      height: 44px;',
+    );
+    // Anti-drift teeth: any rule that names ONE of the two chips (not both) may never
+    // declare width/height again; reintroducing a solo sizing block fails here.
+    // (Comments are stripped first: prose mentioning ids or "transform:" inside a
+    // block body must not trip the declaration scans below.)
+    const strippedCss = hudMobileCss.replace(/\/\*[\s\S]*?\*\//g, '');
+    const blocks = [...strippedCss.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+    for (const [, selector, body] of blocks) {
+      const namesHandle = selector.includes('#mobile-menu-collapse-toggle');
+      const namesChevron = selector.includes('#mobile-consumables-toggle');
+      if (namesHandle === namesChevron) continue; // shared list (or neither): fine
+      expect(
+        body,
+        `solo chip rule may not size the chip (shared block only): ${selector.trim()}`,
+      ).not.toMatch(/(?:^|[\s;])(?:width|height)\s*:/);
+    }
+    // The chip containers carry NO transform (a scale here is exactly the bug the
+    // shared block fixed); the Button Size factor lands on the content inside.
+    for (const [, selector, body] of blocks) {
+      if (!/#mobile-combat-controls(?![\w-])|#mobile-consumables(?![\w-])/.test(selector)) continue;
+      expect(body, `chip container must stay transform-free: ${selector.trim()}`).not.toContain(
+        'transform:',
+      );
+    }
+    expect(hudMobileCss).toContain(
+      'transform: scale(var(--mobile-menu-scale)) translateX(-6px);\n    transform-origin: left top;',
+    ); // the five-button grid scales...
+    expect(hudMobileCss).toContain('--mobile-menu-scale: var(--btn-scale, 1);'); // ...portrait re-points it
+    expect(hudMobileCss).toContain(
+      'transform: scale(var(--btn-scale, 1));\n    transform-origin: left top;',
+    ); // ...and the consumable slot row scales
+  });
+
+  it('keeps joystick autorun on the move pad and Jump on the ring bottom row', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const moveJoystick = entry.slice(
+        entry.indexOf('<div id="mobile-move-joystick"'),
+        entry.indexOf('<div id="mobile-camera-joystick"'),
+      );
+      const ring = entry.slice(
+        entry.indexOf('<div id="mobile-action-ring"'),
+        entry.indexOf('<div id="mobile-extra-controls"'),
+      );
+      expect(moveJoystick, name).toContain('id="mobile-autorun-target"');
+      expect(moveJoystick.indexOf('id="mobile-autorun-target"')).toBeLessThan(
+        moveJoystick.indexOf('id="mobile-move-stick"'),
+      );
+      expect(entry, name).not.toContain('id="mobile-utility-cluster"');
+      expect(entry, name).not.toContain('id="mobile-autorun"');
+      // Jump moved to the RING's bottom row (right thumb: steer with the left
+      // thumb, jump with the right); Use stays in the ring hollow. Neither
+      // may reappear as a left-side utility satellite.
+      expect(ring, name).toContain('id="mobile-jump"');
+      expect(ring, name).toContain('id="mobile-interact"');
+    }
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target {');
+    expect(hudMobileCss).toContain('top: -104px;');
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.near,');
+    expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.locked {');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
+    // The cast bar sits at the classic centre seat above the bottom-centre
+    // player frame, in both the base and landscape rules; on the compact tier
+    // both nudge 40px left so Jump's ring-row seat keeps a clear circle on
+    // 740px-wide phones.
+    expect(hudMobileCss).toContain('bottom: calc(68px + env(safe-area-inset-bottom));');
+    expect(hudMobileCss).toContain('bottom: calc(62px + env(safe-area-inset-bottom));');
+    expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-left-handed #castbar');
+    // Nudged further right from the original -40px to clear more of the
+    // joystick zone; castbar/swingbar still move together with it.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact #player-frame {\n    left: calc(50% - 15px);\n  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar {\n    left: calc(50% - 15px);\n  }',
+    );
+    // Left-handed mode mirrors the floating capture zone; the autorun target is
+    // a child of the move joystick, so it follows that mirror without its own
+    // satellite placement rules.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: 0;\n  }',
+    );
+  });
+
+  it('keeps the Target swap, Use, Jump and page toggle in the action ring markup', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      const ring = entry.slice(
+        entry.indexOf('<div id="mobile-action-ring"'),
+        entry.indexOf('<div id="mobile-extra-controls"'),
+      );
+      expect(ring, name).toContain('id="mobile-target-cycle"');
+      expect(ring, name).toContain('id="mobile-interact"');
+      expect(ring, name).toContain('id="mobile-jump"');
+      expect(ring, name).toContain('id="mobile-action-page-toggle"');
+      expect(ring, name).toContain('data-i18n="hudChrome.mobile.targetCycleShort"');
+      expect(ring, name).toContain('data-i18n="hud.core.mobileUse"');
+      expect(ring, name).toContain('data-i18n="hudChrome.mobile.jump"');
+      // The page toggle is the gold swap badge: number over the swap glyph.
+      expect(ring, name).toContain('data-icon="swap"');
+    }
+    // Jump's seat: one arc-seat past the 180deg action slot on Use's row,
+    // with its circle-edge gap to that slot EQUAL to Use's gap on the other
+    // side (centre at 2 * radius - hollow from the attack centre), so the
+    // bottom row reads even-spaced at every tier. Plus its left-handed mirror.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-ring #mobile-jump {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-radius) *\n      2 -\n      var(--mobile-ring-hollow) -\n      var(--mobile-ring-secondary-size) /\n      2\n    );',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-jump {\n    left: calc(',
+    );
+    // The arc is a single quarter-circle: every slot offset is derived from the
+    // shared radius var and stays non-negative (nothing can leave the screen,
+    // the regression the redesign fixed).
+    expect(hudMobileCss).toContain(
+      '--mobile-ring-radius: calc(190px * var(--mobile-chrome-scale, 1));',
+    );
+    // The token VALUE is the whole chrome-scale feature: every consumer falls
+    // back to 1 (`var(--mobile-chrome-scale, 1)`), so deleting or resetting the
+    // one declaration silently reverts the entire 0.85 shrink with every usage
+    // pin above still green. Only a literal value pin catches it.
+    expect(hudMobileCss).toContain('--mobile-chrome-scale: 0.85;');
+    expect(hudMobileCss).not.toContain('calc(0px -');
+    // The equal-chord arc factors (cos/sin of 157.5 and 112.5 deg) on the two
+    // asymmetric slots, right-handed and mirrored: corrupting one angle breaks
+    // the even spacing without moving anything off-screen, so only a literal
+    // factor pin catches it.
+    expect(hudMobileCss).toContain(
+      '.mobile-action-slot[data-mobile-index="1"] {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-radius) *\n      0.9239 -',
+    );
+    expect(hudMobileCss).toContain(
+      '.mobile-action-slot[data-mobile-index="3"] {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-radius) *\n      0.3827 -',
+    );
+    expect(hudMobileCss).toContain(
+      '.mobile-action-slot[data-mobile-index="1"] {\n    left: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-radius) *\n      0.9239 -',
+    );
+    expect(hudMobileCss).toContain(
+      '.mobile-action-slot[data-mobile-index="4"] {\n    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);\n    right: auto;\n  }',
+    );
+    // Use (180deg, due left), Target swap (135deg, the up-left diagonal) and
+    // the page toggle (90deg, due up over the attack button, to Target's
+    // upper right) nest in the crescent hollow in 45deg steps. All three keep
+    // their seats in the left-handed mirror. Pin the literal cos/sin factors:
+    // corrupting one breaks the even spacing without moving anything
+    // off-screen, so only a literal pin catches it.
+    expect(hudMobileCss).toContain(
+      '--mobile-ring-hollow: calc(104px * var(--mobile-chrome-scale, 1));',
+    );
+    expect(hudMobileCss).toContain(
+      '--mobile-ring-toggle-size: calc(52px * var(--mobile-chrome-scale, 1));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-target-cycle {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-hollow) *\n      0.7071 -',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-ring #mobile-interact {\n    right: calc(\n      var(--mobile-ring-attack-size) /\n      2 +\n      var(--mobile-ring-hollow) -',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-action-page-toggle {\n    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-target-cycle {\n    left: calc(',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-interact {\n    left: calc(',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.mobile-left-handed #mobile-action-page-toggle {\n    left: calc(',
+    );
+    // The tier var packs are pinned as WHOLE blocks (selector + every value):
+    // a bare-literal pin would still pass if the compact and tablet packs were
+    // swapped between selectors.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact #mobile-action-ring {\n' +
+        '    --mobile-ring-attack-size: calc(84px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-action-size: calc(54px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-radius: calc(160px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-toggle-size: max(40px, calc(46px * var(--mobile-chrome-scale, 1)));\n' +
+        '    --mobile-ring-secondary-size: calc(50px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-hollow: calc(88px * var(--mobile-chrome-scale, 1));\n' +
+        '    right: max(14px, env(safe-area-inset-right));\n' +
+        '    bottom: calc(10px + env(safe-area-inset-bottom));\n' +
+        '  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-tablet #mobile-action-ring {\n' +
+        '    --mobile-ring-attack-size: calc(116px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-action-size: calc(76px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-radius: calc(226px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-toggle-size: calc(56px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-secondary-size: calc(60px * var(--mobile-chrome-scale, 1));\n' +
+        '    --mobile-ring-hollow: calc(123px * var(--mobile-chrome-scale, 1));\n' +
+        '  }',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-action-ring {',
+    );
+    // The compact minimap shrink keeps the arc's vertical budget on a
+    // 360px-tall phone holding (the daily-chest rail was folded into the
+    // mobile More tray, issue #1577, so it no longer needs a coupled offset).
+    // PR #1674 relaxed the shrink from 0.44 to 0.57 for minimap legibility.
+    expect(hudMobileCss).toContain('transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));');
+  });
+
+  it('gates the camera joystick behind its opt-in setting (swipe-look is the primary camera)', () => {
+    // The base's declutter removed the camera joystick outright; this branch
+    // keeps it as an OPT-IN (settings.mobileCameraJoystick stamps
+    // body.mobile-camera-joystick-on), hidden by default with no reserved
+    // layout space. The double-tap recenter gesture therefore also lives on
+    // the swipe-look path, which is the default camera on touch.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch:not(.mobile-camera-joystick-on) #mobile-camera-joystick {\n    display: none;\n  }',
+    );
+    expect(mobileControlsTs).toContain('private swipeLookDownAt = 0;');
+    expect(mobileControlsTs).toContain('private lastSwipeTapAt = 0;');
+    expect(mobileControlsTs).toContain('this.callbacks.onRecenterCamera();');
   });
 
   it('keeps the mobile spell bar in a scrollable row between the joysticks', () => {
     expect(hudMobileCss).toContain('width: min(30vw, 132px);');
     expect(hudMobileCss).toContain('min-width: 112px;');
     expect(hudMobileCss).toContain('height: min(36vh, 172px);');
-    expect(hudMobileCss).toContain('left: calc(max(18px, env(safe-area-inset-left)) + 154px);');
-    expect(hudMobileCss).toContain('right: calc(max(18px, env(safe-area-inset-right)) + 154px);');
+    expect(hudMobileCss).toContain('left: calc(max(18px, env(safe-area-inset-left)) + 172px);');
+    expect(hudMobileCss).toContain('right: calc(max(18px, env(safe-area-inset-right)) + 172px);');
     expect(hudMobileCss).toContain('bottom: calc(64px + env(safe-area-inset-bottom));');
-    expect(hudMobileCss).toContain('left: calc(max(20px, env(safe-area-inset-left)) + 136px);');
-    expect(hudMobileCss).toContain('right: calc(max(20px, env(safe-area-inset-right)) + 136px);');
+    expect(hudMobileCss).toContain('left: calc(max(20px, env(safe-area-inset-left)) + 164px);');
+    expect(hudMobileCss).toContain('right: calc(max(20px, env(safe-area-inset-right)) + 164px);');
     expect(hudMobileCss).toContain('bottom: calc(57px + env(safe-area-inset-bottom));');
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #actionbar {\n    display: flex;\n    flex-wrap: nowrap;',
-    );
-    expect(hudMobileCss).toContain('overflow-x: auto;\n    overflow-y: hidden;');
-    expect(hudMobileCss).toContain('touch-action: pan-x;');
-    expect(hudMobileCss).toContain('min-height: 50px;');
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch .action-btn {\n    width: 42px;\n    height: 42px;\n    flex: 0 0 42px;',
-    );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-hotbar-dragging #actionbar {\n    touch-action: none;\n  }',
-    );
-    expect(hudMobileCss).toContain('body.mobile-touch .action-btn.mobile-drag-source');
+  });
+
+  it('hides the desktop action bars on touch: the mobile action ring supersedes them', () => {
+    // The paged mobile action ring (bcc5fa53) replaced the scrollable desktop
+    // #actionbar row on touch, so both desktop bars (and their .action-btn
+    // sizing/drag/hover rules, only ever reachable while a bar is visible) stay
+    // display:none rather than also being scaled/laid out for touch.
+    expect(hudMobileCss).toContain('body.mobile-touch #actionbar2 {\n    display: none;\n  }');
+    expect(hudMobileCss).toContain('body.mobile-touch #actionbar {\n    display: none;\n  }');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #actionbar {\n    display: flex;');
+    expect(hudMobileCss).not.toContain('body.mobile-touch .action-btn {');
+    expect(hudMobileCss).not.toContain('body.mobile-touch #actionbar.many-spells');
   });
 
   it('seeds druid form bars with the form kit, and only clones normal for rogue stealth', () => {
@@ -1404,7 +2129,9 @@ describe('client HTML shell', () => {
     // Hud still owns resetActiveFormBarToDefault + the form-bar predicate it wires.
     expect(spellbookWindowTs).toContain('data-reset-bar');
     expect(spellbookWindowTs).toContain("t('abilityUi.spellbook.resetBar')");
-    expect(spellbookWindowTs).toContain('const resetBtnHtml = view.hasFormBars');
+    // The reset button now lives in the shared window-frame footer, gated on the
+    // form-bars flag (was an inline resetBtnHtml const in the pre-frame chrome).
+    expect(spellbookWindowTs).toContain('if (view.hasFormBars)');
     expect(hudTs).toContain('resetFormBar: () => this.resetActiveFormBarToDefault()');
     expect(componentsCss).toContain('.spellbook-reset {');
     expect(hudMobileCss).toContain('body.mobile-touch #spellbook .spellbook-reset {');
@@ -1425,7 +2152,7 @@ describe('client HTML shell', () => {
 
   it('sizes the mobile Bags window as a usable modal', () => {
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #bags {\n    position: fixed;\n    left: max(10px, env(safe-area-inset-left));\n    right: max(10px, env(safe-area-inset-right));\n    top: max(10px, env(safe-area-inset-top));\n    bottom: calc(72px + env(safe-area-inset-bottom));\n    width: auto;\n    transform: none;',
+      'body.mobile-touch #bags {\n    position: fixed;\n    left: max(10px, env(safe-area-inset-left));\n    right: max(10px, env(safe-area-inset-right));\n    top: max(10px, env(safe-area-inset-top));\n    bottom: max(10px, env(safe-area-inset-bottom));\n    width: auto;\n    transform: none;',
     );
     expect(hudMobileCss).toContain('body.mobile-touch #bags .bag-grid {\n    min-height: 150px;');
     expect(hudMobileCss).not.toContain(
@@ -1434,15 +2161,59 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).not.toContain('max-height: calc(38vh - 20px);');
   });
 
+  it('re-tracks the touch slot grids to the comfortable --touch-cell floor', () => {
+    // Live user feedback on the bank-open 50/50 dock: the bag/bank item icons were
+    // too small to tap on a phone. On touch the slot grids re-track from the 42px
+    // desktop density to the --touch-cell floor and REFLOW to fewer columns (cell
+    // size fixed, column count yields), and the bag-bar sockets grow to the same
+    // floor with the bar wrapping so the capacity counter never overflows the
+    // narrowest dock halves. All scoped under body.mobile-touch so desktop keeps
+    // its density. The rendered-geometry twin (every dock state, real cascade)
+    // lives in tests/browser/target_size.browser.test.ts.
+    expect(tokensCss).toContain('--touch-cell: 56px;');
+    // :is(), not a two-selector list: the bank_window.test.ts scroll-contract
+    // slices anchor on the FIRST '.bank-grid {' occurrence in components.css,
+    // which must stay the base rule in the bank section.
+    expect(componentsCss).toContain(
+      'body.mobile-touch :is(.bag-grid, .bank-grid) {\n    grid-template-columns: repeat(auto-fill, minmax(var(--touch-cell), 1fr));',
+    );
+    expect(componentsCss).toContain(
+      'body.mobile-touch .window-frame .bag-grid .item-cell,\n  body.mobile-touch .window-frame .bank-grid .item-cell {\n    min-height: var(--touch-cell);',
+    );
+    expect(componentsCss).toContain(
+      'body.mobile-touch .bag-socket {\n    width: var(--touch-cell);\n    height: var(--touch-cell);',
+    );
+    expect(componentsCss).toContain('body.mobile-touch .bag-bar {\n    flex-wrap: wrap;');
+    // The desktop grids share the 56px comfort floor via --slot-cell (the old
+    // dense 42px tracks kept the icons ~42px however large the resizable window
+    // grew: auto-fill minted new columns instead of growing the cells), while the
+    // touch re-tracks above stay pinned to --touch-cell as their own guarantee.
+    expect(tokensCss).toContain('--slot-cell: 56px;');
+    expect(componentsCss).toContain(
+      '.bag-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fill, minmax(var(--slot-cell), 1fr));',
+    );
+    expect(componentsCss).toContain(
+      '.bank-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fill, minmax(var(--slot-cell), 1fr));',
+    );
+    // The desktop bag-bar sockets grow with the grid cells (one icon size per
+    // window); the touch rule re-states the same box via --touch-cell.
+    expect(componentsCss).toContain(
+      'width: var(--slot-cell);\n    height: var(--slot-cell);\n    flex: none;',
+    );
+  });
+
   it('combines Trader and Bags into a mobile split-pane modal', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.vendor-open #vendor-window,\n  body.mobile-touch.vendor-open #bags {\n    position: fixed;\n    top: max(10px, env(safe-area-inset-top));\n    bottom: calc(72px + env(safe-area-inset-bottom));',
     );
+    // The split point divides the shared --app-vw box by the live uiScale: #ui's
+    // zoom multiplies author lengths, so a raw 50vw only tiles at scale 1 (the
+    // halves gap above 1 and overlap below 1; the 2026-07-07 bank QA finding).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.vendor-open #vendor-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: 50vw;',
+      'body.mobile-touch.vendor-open #vendor-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);',
     );
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.vendor-open #bags {\n    left: 50vw;\n    right: max(10px, env(safe-area-inset-right));',
+      'body.mobile-touch.vendor-open #bags {\n    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);\n    right: max(10px, env(safe-area-inset-right));',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.vendor-open #vendor-window .panel-title,\n  body.mobile-touch.vendor-open #bags .panel-title {\n    height: 47px;\n    min-height: 47px;',
@@ -1458,13 +2229,50 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('keeps the expanded mobile More tray inside the viewport', () => {
+  it('keeps the expanded mobile More drawer inside the viewport', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-left-handed #mobile-extra-controls {\n    left: 50%;\n    right: auto;',
     );
+    // 80 percent of the safe app viewport, everywhere (the drawer is a centered
+    // modal with an internal .window-body scroller; the old landscape-only
+    // top-anchor + 120px bottom clearance predates the scrim and is gone).
     expect(hudMobileCss).toContain(
-      'max-height: calc(\n        var(--app-vh) -\n        28px -\n        env(safe-area-inset-top) -\n        env(safe-area-inset-bottom)\n      );',
+      'max-height: min(\n      calc(var(--app-vh) * 0.8),\n      calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))\n    );',
     );
+    expect(hudMobileCss).not.toContain(
+      'top: max(8px, env(safe-area-inset-top)) !important;\n      bottom: auto !important;\n      transform: translateX(-50%) !important;',
+    );
+  });
+
+  it('seats the landscape map above controls with a side rail for zoom buttons', () => {
+    // Same overlap class as the More tray: the base square map, vertically
+    // centered, can dip into Jump/Interact on a short landscape phone. The
+    // landscape rule top-anchors it, caps the drawn map against free height, and
+    // adds a right-side rail so the zoom buttons do not cover the map canvas.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #map-window {\n      --mobile-map-size: min(60vw, 420px, calc(var(--app-vh) - 104px));\n      --mobile-map-rail: 58px;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #map-window #map-canvas {\n      width: var(--mobile-map-size);\n      max-width: calc(100% - var(--mobile-map-rail));',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #map-window #map-zoom {\n      right: 8px;\n      bottom: 8px;',
+    );
+  });
+
+  it('stacks the mobile map below the quest log when both are open', () => {
+    expect(hudTs).toContain("'mobile-map-quest-open'");
+    expect(hudTs).toContain('this.isWindowVisible(mapWindow)');
+    expect(hudTs).toContain('this.isWindowVisible(questLogWindow)');
+    expect(hudMobileCss).toContain(
+      '--mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));',
+    );
+    expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #quest-log-window');
+    expect(hudMobileCss).toContain('top: var(--mobile-map-quest-stack-top);');
+    expect(hudMobileCss).toContain('max-height: var(--mobile-map-quest-log-max-height);');
+    expect(hudMobileCss).toContain('body.mobile-touch.mobile-map-quest-open #map-window');
+    expect(hudMobileCss).toContain('var(--mobile-map-quest-stack-gap)');
+    expect(hudMobileCss).toContain('22px');
   });
 
   it('caps mobile quest and NPC panels instead of stretching them edge to edge', () => {
@@ -1482,5 +2290,18 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('top: 50%;');
     expect(hudMobileCss).toContain('transform: translate(-50%, -50%);');
     expect(hudMobileCss).toContain('z-index: 95 !important;');
+  });
+
+  it('character-preview init considers ALL THREE play panels (create included)', () => {
+    // On a slow connection (a phone with a cold cache) assets finish loading
+    // AFTER the player has registered and landed on the CREATE panel; the old
+    // two-panel candidate list resolved to the hidden charselect container and
+    // the create preview rendered nothing (show()'s updatePreviewContainer
+    // no-ops until this init has run). The init must consider the create panel
+    // and route through the full panel wiring.
+    expect(mainTs).toContain("['#charselect-panel', '#charcreate-panel', '#offline-select'].find(");
+    const init = mainTs.slice(mainTs.indexOf('assetsReady()'));
+    const body = init.slice(0, init.indexOf('decorateClassChips();'));
+    expect(body).toContain('updatePreviewContainer(activePanelId);');
   });
 });

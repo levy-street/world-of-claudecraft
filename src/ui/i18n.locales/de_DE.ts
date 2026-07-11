@@ -14,6 +14,372 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.sport_boot.description':
+    'Ein hoher, weiter Schlag Richtung Zielpunkt. Die Menge liebt es.',
+  'entities.abilities.sport_boot.name': 'Weitschlag',
+  'entities.abilities.sport_dive.description':
+    'Wirf dich zum Zielpunkt. Ein hereinfliegender Ball bleibt an dir haften.',
+  'entities.abilities.sport_dive.name': 'Hechtsprung',
+  'entities.abilities.sport_feint.description':
+    'Ein schneller Antritt mit Seitwärtshaken zum Zielpunkt.',
+  'entities.abilities.sport_feint.name': 'Finte',
+  'entities.abilities.sport_hoof.description':
+    'Drisch den Ball flach und hart nach vorn übers Feld.',
+  'entities.abilities.sport_hoof.name': 'Bolzen',
+  'entities.abilities.sport_kick.description': 'Stoß den Ball flach über den Boden zum Zielpunkt.',
+  'entities.abilities.sport_kick.name': 'Kick',
+  'entities.abilities.sport_pass.description':
+    'Spiel einen scharfen Pass auf deinen anvisierten Mitspieler, genau in seinen Lauf.',
+  'entities.abilities.sport_pass.name': 'Pass',
+  'entities.abilities.sport_punt.description': 'Ein Abschlag des Torhüters, hoch und weit.',
+  'entities.abilities.sport_punt.name': 'Weiter Abschlag',
+  'entities.abilities.sport_second_wind.description':
+    'Finde deine Beine: Bewege dich 4 Sek. lang 50% schneller.',
+  'entities.abilities.sport_second_wind.name': 'Frische Beine',
+  'entities.abilities.sport_shoot.description':
+    'Halten, um Kraft aufzubauen, loslassen, um aufs Tor zu schießen. Zu viel Kraft und der Ball segelt drüber.',
+  'entities.abilities.sport_shoot.name': 'Torschuss',
+  'entities.abilities.sport_shoulder.description':
+    'Ein fairer Rempler nach den Regeln des Erntefriedens. Wirft den Gegner purzelnd vom Ball.',
+  'entities.abilities.sport_shoulder.name': 'Rempler',
+  'entities.npcs.groundskeeper_bram.greeting':
+    'Auf dem Saufeld gilt der Erntefrieden, {className}: nur Kicks und Rempler. Lust auf ein Spiel um den Kupfereimer?',
+  'entities.npcs.groundskeeper_bram.name': 'Platzwart Bram',
+  'entities.npcs.groundskeeper_bram.title': 'Hüter des Saufelds',
+  'entities.zones.eastbrook_vale.pois.10.label': 'Das Saufeld',
+  'guide.nav.professions': 'Berufe',
+  'guide.nav.valeCup': 'Talpokal',
+  'guide.professions.archetypeChooseBody':
+    'Deinen ersten Archetyp erklärst du über eine frühe Story-Quest im ersten Gebiet, die dich förmlich in diese Identität aufnimmt. Bis du diese Quest abgeschlossen hast, hast du noch gar keinen Archetyp gewählt.',
+  'guide.professions.archetypeChooseTitle': 'Deinen Archetyp wählen',
+  'guide.professions.archetypeIdentityBody':
+    'Dein aktiver Archetyp ist eine Aussage darüber, wer dein Charakter in der Welt ist, und spiegelt sich darin, wie andere und die Welt dich ansprechen. Die genauen Belohnungen und die Anerkennung, die damit einhergehen, werden noch ausgearbeitet; schau wieder vorbei, während das System Gestalt annimmt.',
+  'guide.professions.archetypeIdentityTitle': 'Was dein Archetyp bedeutet',
+  'guide.professions.archetypeIntro':
+    'Jedes der zehn Handwerke steht zugleich für einen Archetyp, eine umfassendere Identität, die du über das bloße Ausüben des Gewerbes hinaus annehmen kannst. Dein aktiver Archetyp ist eine einzelne Wahl, keine Checkliste: Du trägst einen und kannst später wechseln, wenn du möchtest.',
+  'guide.professions.archetypeSwitchBody':
+    'Einmal einen Archetyp erklärt zu haben, bindet dich nicht für immer. Wer zu einem anderen Archetyp wechseln will, muss zuerst eine wiederholbare Quest der Wiedergutmachung für den alten abschließen, und mit jedem Wechsel fällt die nächste erwartete Wiedergutmachung ein wenig strenger aus, damit der Wechsel bedeutsam bleibt statt kostenlos.',
+  'guide.professions.archetypeSwitchTitle': 'Es dir anders überlegen',
+  'guide.professions.archetypeTitle': 'Die zehn Archetypen',
+  'guide.professions.craftComboBody':
+    'Über die eigene Rezeptliste eines einzelnen Handwerks hinaus unterstützt das Rad auch Kombinationsrezepte, die zwei benachbarte Handwerke zugleich fordern, und belohnt damit einen Charakter (oder ein Paar von Handelspartnern), der in benachbarte Gewerbe auf dem Ring investiert hat statt in eines allein.',
+  'guide.professions.craftComboTitle': 'Kombinationsrezepte',
+  'guide.professions.craftIntro':
+    'Zehn Handwerksgewerbe verwandeln gesammelte Materialien in fertige Ausrüstung und Waren: Rüstungsschmieden, Waffenschmieden und Juwelierskunst formen rohen Stoff zu tragbarer Ausrüstung; Alchemie und Ingenieurskunst leben von Versuch und Irrtum; Kochkunst, Inschriftenkunde und Verzauberungskunst greifen jeweils auf die Erzeugnisse anderer Handwerke zurück; Schneiderei und Gerberei arbeiten nach exakten Schnittmustern. Zusammen bilden sie ein Rad, auf dem jedes Handwerk neben zwei Nachbarn und einem anderen genau gegenüber sitzt.',
+  'guide.professions.craftMasteryBody':
+    'Erfolgreiches Herstellen steigert deine Fertigkeit in diesem Gewerbe, und reichhaltigere Rezepte sind hinter höherer Fertigkeit verschlossen: Die Grundrezepte stehen allen offen, während zunehmend fortgeschrittene Rezepte für den Versuch zunehmend mehr Meisterschaft verlangen. Deine Fertigkeit in einem Handwerk auszubauen ist der Weg von einfachen Anfängerwaren zu seinen ehrgeizigeren Rezepten.',
+  'guide.professions.craftMasteryTitle': 'Fertigkeit und Meisterschaft',
+  'guide.professions.craftRecipesBody':
+    'Jedes Handwerk hat eigene Rezepte, und jedes verlangt bestimmte Reagenzien, die du sammelst oder kaufst. Die einfachsten Rezepte jedes Handwerks brauchen nichts als gewöhnliche Materialien und lassen sich von Anfang an herstellen, sodass du ein Gewerbe in dem Moment aufnehmen kannst, in dem du es erlernst, statt erst auf eine Freischaltung zu warten.',
+  'guide.professions.craftRecipesTitle': 'Rezepte und Reagenzien',
+  'guide.professions.craftRingBody':
+    'Die zehn Handwerke sind in einem festen Ring angeordnet, und wo ein Handwerk auf diesem Ring sitzt, spielt eine Rolle: Nebeneinanderliegende Handwerke haben mehr miteinander gemein als solche auf gegenüberliegenden Seiten. Sich einem Handwerk zu verschreiben soll sich anfühlen, als träte man einer Familie verwandter Gewerbe bei, nicht wie das Wählen einer isolierten Fertigkeit.',
+  'guide.professions.craftRingTitle': 'Ein Rad der Spezialitäten',
+  'guide.professions.craftTitle': 'Die zehn Handwerke',
+  'guide.professions.gatherIntro':
+    'Drei Sammelgewerbe lassen dich Rohstoffe direkt aus der Welt ziehen: Bergbau schlägt Erz und Stein aus Adern, Holzfällen fällt Nutzholz aus Baumbeständen, und Kräuterkunde sammelt wild wachsende Kräuter und Pflanzen. Jedes wird getrennt gezählt, sodass die Arbeit an einem nie deinen Fortschritt in einem anderen bremst.',
+  'guide.professions.gatherProficiencyBody':
+    'Jede erfolgreiche Ernte steigert deine Fertigkeit in diesem Sammelgewerbe. Höhere Fertigkeit verschiebt, was du aus einem Vorkommen holst, hin zu selteneren Materialgüten, von gewöhnlich aufwärts, wobei die seltensten Güten auch bei hoher Fertigkeit selten bleiben. Mehr Übung schadet deinen Chancen nie, sie verbessert sie immer nur.',
+  'guide.professions.gatherProficiencyTitle': 'Fertigkeit und Materialqualität',
+  'guide.professions.gatherTitle': 'Sammeln: Bergbau, Holzfällen und Kräuterkunde',
+  'guide.professions.gatherToolsBody':
+    'Händler verkaufen einfache Werkzeuge für jedes Sammelgewerbe, und bessere lassen sich herstellen; die Arbeit an einem Rohstoffvorkommen soll sich also fähiger anfühlen, je besser du dafür ausgerüstet bist, statt immer gleich zu bleiben. Werkzeuge höherer Stufe sind der vorgesehene Weg, um Zugang zu reicheren Vorkommen zu erhalten und sie über eine lange Sitzung hinweg effizienter zu bearbeiten.',
+  'guide.professions.gatherToolsTitle': 'Das Werkzeug des Handwerks',
+  'guide.professions.gatherWhatBody':
+    'Erzadern, Baumbestände und Kräuterflecken stehen sichtbar und herrenlos draußen in den Gebieten. Geh auf eines zu und interagiere damit, um zu ernten, was es enthält. Hast du ein Vorkommen abgeerntet, braucht es Zeit, um sich zu erholen, bevor du persönlich es erneut ernten kannst; andere blockiert es aber nie: Ein anderer Spieler kann dasselbe Vorkommen in der Zwischenzeit ernten.',
+  'guide.professions.gatherWhatTitle': 'Rohstoffvorkommen',
+  'guide.professions.intro':
+    'Jenseits von Kampf und Quests belohnt dich die Welt für die Arbeit an Land und Esse: Rohstoffe sammeln, sie an den Werkstationen von zehn verschiedenen Gewerben zu Ausrüstung verarbeiten und in eine Identität als einer der zehn Archetypen hineinwachsen, für die diese Gewerbe stehen.',
+  'guide.valeCupPage.heading': 'Der Talpokal',
+  'guide.valeCupPage.howHeading': 'So wird gespielt',
+  'guide.valeCupPage.howMatch':
+    'Beim Anstoß werden deine Klassenfähigkeiten gegen eine Sportausrüstung getauscht und danach exakt wiederhergestellt. Kicks zielen auf das Fadenkreuz am Boden, der Ball prallt von der Bande ab, und Dribbeln heißt einfach, mit dem Ball zu laufen. Erziele bis zum Abpfiff mehr Tore als die Gegenseite; ein Unentschieden geht ins Golden Goal.',
+  'guide.valeCupPage.howQueue':
+    'Stell dich von überall über das Talpokal-Fenster an, oder sprich mit Platzwart Bram am Tor des Saufelds. Wähle eine Staffel von eins gegen eins bis fünf gegen fünf, eine Bannernation und eine Sportrolle; stell dich allein an oder bring deine Gruppe mit.',
+  'guide.valeCupPage.howTruce':
+    'Auf dem Saufeld blutet niemand: Tacklings lassen dich nur purzeln, nichts tut weh, und Begleiter setzen das Spiel aus.',
+  'guide.valeCupPage.intro':
+    'Keilerball auf dem Saufeld: Wähle ein Banner, wähle eine Rolle und schieß eine ausgestopfte Eberhaut an einem Torhüter vorbei, um den Kupfereimer zu holen. Kein Blut, keine Beute, nur das Tosen der Ränge.',
+  'guide.valeCupPage.loreHeading': 'Keilerball und der Erntefrieden',
+  'guide.valeCupPage.loreOldSow':
+    'Lange bevor die Toten erwachten, spielten Eastbrooks Feldarbeiter nach der Ernte Keilerball auf den Stoppelfeldern: zwei Haufen Leute, eine mit Stroh ausgestopfte Eberhaut und zwei Wagentore, an beide Enden des Angers gezerrt. Der erste Ball, die Alte Sau, hängt in Bronze über dem Kamin der Taverne.',
+  'guide.valeCupPage.loreTruce':
+    'Als das Aschene Kolosseum begann, Kriegsspiele auszurichten, antwortete Marschall Redbrook mit etwas Sanfterem: einem ständigen Erntefrieden auf dem alten Anger. Die Wagentore wurden zu Torpfosten, der Anger bekam Wände, Ränge und einen Namen, das Saufeld, und der Preis war immer derselbe verbeulte Milcheimer, aus dem die Sieger tranken: der Kupfereimer.',
+  'guide.valeCupPage.nationChoir':
+    'Fahlblau und Silber unter der Glocke: unheimlich, präzise und sehr still.',
+  'guide.valeCupPage.nationColiseum':
+    'Rot und Schwarz mit gekreuzten Schwertern: Sie spielen, als wäre es noch immer ein Kriegsspiel.',
+  'guide.valeCupPage.nationCopperdig':
+    'Kupfer und Braun mit der Spitzhacke: Schaufler, die nie aufhören zu rennen.',
+  'guide.valeCupPage.nationMirefen':
+    'Blaugrün und Grau unter dem Reiher: geduldig, langbeinig, nie in Eile.',
+  'guide.valeCupPage.nationMoon':
+    'Violett und Silber unter der Mondsichel: Nachtspieler, leicht auf den Beinen.',
+  'guide.valeCupPage.nationOgre':
+    'Orange und Umbra hinter der Faust: Schulter voran und stolz darauf.',
+  'guide.valeCupPage.nationThornpeak':
+    'Eisblau und Weiß unter dem Berggipfel: trittsicher und stur.',
+  'guide.valeCupPage.nationVale':
+    'Grün und Gold unter der Weizengarbe: die Heimmannschaft, Feldarbeiter bis ins Mark.',
+  'guide.valeCupPage.nationsBody':
+    'Jedes Team spielt unter einem Banner. Der Kapitän wählt die Nation, und fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.',
+  'guide.valeCupPage.nationsHeading': 'Die acht Bannernationen',
+  'guide.valeCupPage.rewardsBody':
+    'Friedensregeln bedeuten keine Erfahrung und keine Beute: Ein entschiedenes Spiel zählt für deine Bilanz und die Siegertafel, und Punkte für die täglichen Belohnungen gibt es obendrauf. Wer ein Spiel im Stich lässt, kassiert eine Sperre, und der Platzwart vergisst nicht.',
+  'guide.valeCupPage.rewardsHeading': 'Friedensregeln',
+  'guide.valeCupPage.rolesBody':
+    'Deine Rolle bestimmt die Ausrüstung, die du auf den Platz trägst. Kicken kann jeder; der Rest ist Temperament.',
+  'guide.valeCupPage.rolesHeading': 'Sportrollen',
+  'guide.valeCupPage.spectateBody':
+    'Im Stadion läuft immer nur ein Spiel, und jeder kann einfach vorbeikommen und von den Rängen aus zusehen.',
+  'hudChrome.keybinds.valecup': 'Talpokal',
+  'hudChrome.mobile.dailyRewards': 'Belohnungen',
+  'hudChrome.perf.labels.predLead': 'Prädiktionsvorlauf',
+  'hudChrome.townFocus.budgetLabel': 'Verbleibende Punkte: {remaining} / {budget}',
+  'hudChrome.townFocus.decreaseAria': 'Fokus auf {component} verringern',
+  'hudChrome.townFocus.hint':
+    'Fokuspunkte gewähren einen Bonus auf den Grundertrag jeder Einrichtung. Einrichtungen ohne Fokus bleiben beim Grundertrag.',
+  'hudChrome.townFocus.increaseAria': 'Fokus auf {component} erhöhen',
+  'hudChrome.townFocus.notInTownHint': 'Du musst in der Stadt sein, um deinen Fokus festzulegen.',
+  'hudChrome.townFocus.saveButton': 'Fokus speichern',
+  'hudChrome.townFocus.title': 'Stadtfokus',
+  'hudChrome.vcup.awayNote':
+    'Fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.',
+  'hudChrome.vcup.bannerCountdown': 'Anstoß in {seconds}...',
+  'hudChrome.vcup.bannerDraw': 'Unentschieden auf dem Saufeld.',
+  'hudChrome.vcup.bannerEnd': 'Abpfiff: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.bannerFound': 'Der Talpokal ruft: {nationA} gegen {nationB}!',
+  'hudChrome.vcup.bannerGoal': 'TOR! {nation} trifft!',
+  'hudChrome.vcup.bannerGolden': 'GOLDEN GOAL: Der nächste Treffer gewinnt!',
+  'hudChrome.vcup.bannerKickoff': 'ANSTOSS!',
+  'hudChrome.vcup.bannerLoss': 'Niederlage auf dem Saufeld.',
+  'hudChrome.vcup.bannerSave': '{name} HÄLT!',
+  'hudChrome.vcup.bannerWin': 'Sieg auf dem Saufeld!',
+  'hudChrome.vcup.bet.aria': 'Talpokal-Spielwetten',
+  'hudChrome.vcup.bet.back': 'Auf {team} setzen',
+  'hudChrome.vcup.bet.closed': 'Wetten geschlossen',
+  'hudChrome.vcup.bet.closesIn': 'Wettschluss in {seconds}s',
+  'hudChrome.vcup.bet.collapse': 'Wetten ausblenden',
+  'hudChrome.vcup.bet.expand': 'Wetten ansehen und setzen',
+  'hudChrome.vcup.bet.form': '{wins}S-{losses}N',
+  'hudChrome.vcup.bet.lostLog': 'Deine Talpokal-Wette ist verloren: {amount}.',
+  'hudChrome.vcup.bet.mine': 'Deine Wette: {amount} auf {team}',
+  'hudChrome.vcup.bet.none': 'Du hast auf dieses Spiel noch keine Wette platziert.',
+  'hudChrome.vcup.bet.oddsLabel': 'Quote',
+  'hudChrome.vcup.bet.prize': 'Topf {amount}',
+  'hudChrome.vcup.bet.record': 'Wettbilanz: {wins}S-{losses}N, {sign}{net}',
+  'hudChrome.vcup.bet.refundLog':
+    'Wetten annulliert, dein Einsatz von {amount} wurde zurückgezahlt.',
+  'hudChrome.vcup.bet.splitAria': 'Anteil des Wett-Topfs je Team',
+  'hudChrome.vcup.bet.title': 'Spielwetten',
+  'hudChrome.vcup.bet.wonBanner': 'Deine Wette hat gewonnen!',
+  'hudChrome.vcup.bet.wonLog': 'Deine Talpokal-Wette hat gewonnen: {amount} ausgezahlt.',
+  'hudChrome.vcup.blockNation': 'Wähle zuerst eine Bannernation.',
+  'hudChrome.vcup.blockNotLeader':
+    'Nur der Gruppenanführer kann das Team in die Warteschlange stellen.',
+  'hudChrome.vcup.blockPartySize': 'Diese Staffel braucht eine kleinere Gruppe.',
+  'hudChrome.vcup.boardEmpty': 'Noch keine Sieger verzeichnet. Der Kupfereimer wartet.',
+  'hudChrome.vcup.boardHeading': 'Siegertafel',
+  'hudChrome.vcup.boardWins': '{count} Siege',
+  'hudChrome.vcup.bracketLabel': '{n}v{n}',
+  'hudChrome.vcup.bracketsAria': 'Spielstaffel',
+  'hudChrome.vcup.briefing.bot': 'Bot',
+  'hudChrome.vcup.briefing.kitHeading': 'Deine Ausrüstung',
+  'hudChrome.vcup.briefing.kitNote':
+    'Diese Manöver ersetzen für das Spiel deine Klassenfähigkeiten.',
+  'hudChrome.vcup.briefing.ready': 'Ich bin bereit',
+  'hudChrome.vcup.briefing.readyAria': 'Bereit machen für den Anstoß',
+  'hudChrome.vcup.briefing.readyCount': '{ready} von {total} bereit',
+  'hudChrome.vcup.briefing.readyDone': 'Bereit',
+  'hudChrome.vcup.briefing.rosterHeading': 'Die Aufstellung',
+  'hudChrome.vcup.briefing.rule1':
+    'Schieße oder passe den Ball ins gegnerische Tor, um zu punkten.',
+  'hudChrome.vcup.briefing.rule2':
+    'Wer zuerst 5 Tore erzielt, gewinnt, oder wer beim Abpfiff die meisten Tore hat.',
+  'hudChrome.vcup.briefing.rule3':
+    'Steht es beim Abpfiff unentschieden, geht es ins Golden Goal: Der nächste Treffer gewinnt.',
+  'hudChrome.vcup.briefing.rule4':
+    'Tacklings werfen dich nur um. Unter dem Erntefrieden wird niemand verletzt.',
+  'hudChrome.vcup.briefing.rule5': 'Jeder kann vorbeikommen und dich von den Rängen aus anfeuern.',
+  'hudChrome.vcup.briefing.rulesHeading': 'So wird gespielt',
+  'hudChrome.vcup.briefing.subtitle': 'Besprechung vor dem Spiel',
+  'hudChrome.vcup.briefing.vs': 'gegen',
+  'hudChrome.vcup.briefing.waiting': 'Warte, bis die andere Seite bereit ist...',
+  'hudChrome.vcup.briefing.whistle': 'Der Anpfiff ertönt in {seconds}s.',
+  'hudChrome.vcup.briefing.you': 'Du',
+  'hudChrome.vcup.clock': '{minutes}:{seconds}',
+  'hudChrome.vcup.close': 'Das Talpokal-Fenster schließen',
+  'hudChrome.vcup.deserterNote':
+    'Der Platzwart vergisst nicht. Du kannst dich in {seconds} Sek. wieder anstellen.',
+  'hudChrome.vcup.enterAsGuild': 'Unter dem Banner von {guild} antreten',
+  'hudChrome.vcup.gossipOpen': 'Das Spielplanbuch',
+  'hudChrome.vcup.gossipOpenAria': 'Das Talpokal-Fenster öffnen',
+  'hudChrome.vcup.guildBoardEmpty': 'Noch keine Gilde hat den Platz betreten. Zeig dein Banner!',
+  'hudChrome.vcup.guildBoardHeading': 'Gildenbanner',
+  'hudChrome.vcup.guildBoardWl': '{wins} S, {losses} N',
+  'hudChrome.vcup.guildRecordLine': 'Deine Gildenbilanz: {wins} Siege, {losses} Niederlagen.',
+  'hudChrome.vcup.inMatchNote': 'Dein Team steht auf dem Platz. Weiterspielen!',
+  'hudChrome.vcup.indicatorLive': 'Talpokal',
+  'hudChrome.vcup.indicatorOpen': 'Das Talpokal-Fenster öffnen',
+  'hudChrome.vcup.indicatorQueued':
+    'Talpokal-Warteschlange: {bracket}, Position {position} von {count}',
+  'hudChrome.vcup.leaveQueue': 'Warteschlange verlassen',
+  'hudChrome.vcup.liveAria': 'Talpokal: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.liveHeading': 'Jetzt auf dem Saufeld',
+  'hudChrome.vcup.logDraw': 'Die Partie auf dem Saufeld endet unentschieden.',
+  'hudChrome.vcup.logFound': 'Dein Talpokal-Spiel ist bereit: {nationA} gegen {nationB}.',
+  'hudChrome.vcup.logGoal': '{name} trifft für {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
+  'hudChrome.vcup.logLoss': 'Du verlierst die Partie auf dem Saufeld.',
+  'hudChrome.vcup.logQueued':
+    'Du reihst dich in die Talpokal-Warteschlange für {bracket} ein (Position {position}).',
+  'hudChrome.vcup.logRoster': 'Deine Seite: {allies}. Die Gegenseite: {enemies}.',
+  'hudChrome.vcup.logSave': '{name} hält den Ball!',
+  'hudChrome.vcup.logUnqueued': 'Du verlässt die Talpokal-Warteschlange.',
+  'hudChrome.vcup.logWin': 'Du gewinnst die Partie auf dem Saufeld.',
+  'hudChrome.vcup.mobileLabel': 'Pokal',
+  'hudChrome.vcup.nation.choir': 'Der Bleiche Chor',
+  'hudChrome.vcup.nation.coliseum': 'Das Aschene Kolosseum',
+  'hudChrome.vcup.nation.copperdig': 'Die Kupfergrube',
+  'hudChrome.vcup.nation.mirefen': 'Das Mirefen',
+  'hudChrome.vcup.nation.moon': 'Der Bleiche Mond',
+  'hudChrome.vcup.nation.ogre': 'Die Oger-Clans',
+  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
+  'hudChrome.vcup.nation.vale': 'Eastbrook-Tal',
+  'hudChrome.vcup.nationsHeading': 'Bannernation',
+  'hudChrome.vcup.noLive': 'Der Platz ruht. Es wird gerade kein Spiel gespielt.',
+  'hudChrome.vcup.offlineNote':
+    'Das Spielplanbuch ist geschlossen. Der Talpokal ist gerade nicht verfügbar.',
+  'hudChrome.vcup.phaseCountdown': 'Anstoß in {seconds}',
+  'hudChrome.vcup.phaseGoal': 'TOR!',
+  'hudChrome.vcup.phaseGolden': 'GOLDEN GOAL',
+  'hudChrome.vcup.phaseOver': 'ABPFIFF',
+  'hudChrome.vcup.practice': 'Training gegen Bots',
+  'hudChrome.vcup.practiceNote':
+    'Startet sofort ein privates Bot-Spiel auf deinem eigenen Trainingsplatz.',
+  'hudChrome.vcup.practicingNow': 'Gerade im Training ({count}):',
+  'hudChrome.vcup.queue': 'In die Warteschlange',
+  'hudChrome.vcup.queueNote': 'Stell dich von überall an; der Anpfiff ruft dich zum Saufeld.',
+  'hudChrome.vcup.queuedStatus':
+    'In der Warteschlange für {bracket}: Position {position} von {count}.',
+  'hudChrome.vcup.recordLine':
+    'Deine Bilanz: {wins} Siege, {losses} Niederlagen, {draws} Unentschieden.',
+  'hudChrome.vcup.role.allrounder.desc':
+    'Von allem etwas: Kick, Weitschlag und ein fairer Rempler.',
+  'hudChrome.vcup.role.allrounder.name': 'Allrounder',
+  'hudChrome.vcup.role.keeper.desc': 'Hütet den Torraum mit Griff, Hechtsprung und Abschlag.',
+  'hudChrome.vcup.role.keeper.name': 'Torhüter',
+  'hudChrome.vcup.role.striker.desc': 'Lebt für den weiten Schlag und den schnellen Haken.',
+  'hudChrome.vcup.role.striker.name': 'Stürmer',
+  'hudChrome.vcup.role.sweeper.desc': 'Rempelt Läufer vom Ball und schlägt ihn weit nach vorn.',
+  'hudChrome.vcup.role.sweeper.name': 'Ausputzer',
+  'hudChrome.vcup.rolesHeading': 'Sportrolle',
+  'hudChrome.vcup.shootPower': 'KRAFT',
+  'hudChrome.vcup.title': 'Der Talpokal',
+  'hudChrome.vcup.waitingCount': 'Wartende: {count}',
+  'hudChrome.vcup.walkUp': 'Komm zum Saufeld, um von den Rängen aus zuzusehen.',
+  'hudChrome.archetypeTitle.label': 'Titel',
+  'hudChrome.archetypeTitle.none': 'Keiner',
+  'hudChrome.archetypeTitle.armorcrafting': 'Rüstungsschmied',
+  'hudChrome.archetypeTitle.weaponcrafting': 'Waffenschmied',
+  'hudChrome.archetypeTitle.jewelcrafting': 'Juwelier',
+  'hudChrome.archetypeTitle.alchemy': 'Alchemist',
+  'hudChrome.archetypeTitle.engineering': 'Ingenieur',
+  'hudChrome.archetypeTitle.cooking': 'Koch',
+  'hudChrome.archetypeTitle.inscription': 'Schreiber',
+  'hudChrome.archetypeTitle.enchanting': 'Verzauberer',
+  'hudChrome.archetypeTitle.tailoring': 'Schneider',
+  'hudChrome.archetypeTitle.leatherworking': 'Gerber',
+  'entities.itemSets.crownforged.bonus4':
+    'Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal.',
+  'entities.itemSets.deathlord.bonus4':
+    'Eure kritischen Waffentreffer haben eine Chance von 50%, Grabesmacht zu gewähren, was die Angriffskraft 10 Sek. lang um 60 erhöht.',
+  'entities.itemSets.necromancers.bonus4':
+    'Eure Zauber haben eine Chance von 10%, Klarsicht zu gewähren, wodurch euer nächster Zauber kostenlos wird.',
+  'entities.itemSets.nighttalon.bonus4':
+    'Eure kritischen Waffentreffer reißen eine Zerfetzte Wunde und lassen das Ziel 12 Sek. lang alle 2 Sek. 6 Schaden bluten. Stapelt sich bis zu 3-mal.',
+  'entities.itemSets.soulflame.bonus4':
+    'Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht.',
+  'entities.itemSets.stormcallers.bonus4':
+    'Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht.',
+  'entities.itemSets.wyrmshadow.bonus4':
+    'Eure kritischen Waffentreffer haben eine Chance von 50%, Fangrausch zu gewähren, was das Angriffstempo 8 Sek. lang um 25% erhöht.',
+  'entities.items.architects_cornerstone.name': 'Der Grundstein des Architekten',
+  'entities.items.bonechill_cord.name': 'Knochenfrost-Kordel',
+  'entities.items.bonechill_striders.name': 'Knochenfrost-Schreiter',
+  'entities.items.choir_blessed_spaulders.name': 'Chorgesegnete Schulterstücke',
+  'entities.items.choirmothers_casque.name': 'Helm der Chormutter',
+  'entities.items.cryptplate_helm.name': 'Gruftplatten-Helm',
+  'entities.items.deathless_greatblade.name': 'Todlose Großklinge',
+  'entities.items.deathless_warguard_legmail.name': 'Todlose Beinkette der Kriegswache',
+  'entities.items.gravescale_girdle.name': 'Grabschuppen-Gürtel',
+  'entities.items.gravewyrm_claws.name': 'Grabwyrm-Klauen',
+  'entities.items.gravewyrm_cleaver.name': 'Grabwyrm-Spalter',
+  'entities.items.heroic_mark.name': 'Heroische Marke',
+  'entities.items.lunar_choir_leggings.name': 'Mondchor-Beinschienen',
+  'entities.items.lunar_tide_greatstaff.name': 'Großstab der Mondflut',
+  'entities.items.medallion_of_endless_profit.name': 'Medaillon des endlosen Profits',
+  'entities.items.mistcallers_fang.name': 'Fangzahn des Nebelrufers',
+  'entities.items.mistforged_pauldrons.name': 'Nebelgeschmiedete Schulterstücke',
+  'entities.items.morthens_cryptforged_hauberk.name': 'Morthens gruftgeschmiedetes Kettenhemd',
+  'entities.items.nielas_coldlight_band.name': 'Nielas Kaltlicht-Reif',
+  'entities.items.oath_of_the_round_table.name': 'Eid der Tafelrunde',
+  'entities.items.sanctum_prowlers_grips.name': 'Griffe des Sanktum-Pirschers',
+  'entities.items.sash_of_the_sunken_court.name': 'Schärpe des Versunkenen Hofes',
+  'entities.items.scepter_of_the_deathless_court.name': 'Zepter des Todlosen Hofes',
+  'entities.items.scourgehide_carapace.name': 'Geißelhaut-Panzer',
+  'entities.items.seal_of_the_nine_oaths.name': 'Siegel der Neun Eide',
+  'entities.items.shadowpulse_handwraps.name': 'Schattenpuls-Handwickel',
+  'entities.items.shadowpulse_slippers.name': 'Schattenpuls-Schuhe',
+  'entities.items.shroud_of_the_gravewyrm.name': 'Leichentuch des Grabwyrms',
+  'entities.items.soulforged_warplate.name': 'Seelengeschmiedete Kriegsplatte',
+  'entities.items.soulrend_diadem.name': 'Seelenriss-Diadem',
+  'entities.items.stormcallers_focus.name': 'Fokus des Sturmrufers',
+  'entities.items.sunken_court_mantle.name': 'Umhang des Versunkenen Hofes',
+  'entities.items.sutils_gambit.name': 'Sutils Gambit',
+  'entities.items.swiftfang_talisman.name': 'Schnellzahn-Talisman',
+  'entities.items.tidebound_spaulders.name': 'Flutgebundene Schulterstücke',
+  'entities.items.tideguard_faceguard.name': 'Gesichtsschutz der Flutwache',
+  'entities.items.tideworn_warboots.name': 'Flutzerschlissene Kriegsstiefel',
+  'entities.items.tidewoven_trousers.name': 'Flutgewebte Beinkleider',
+  'entities.items.wyrmchoir_handwraps.name': 'Wyrmchor-Handwickel',
+  'entities.items.yumis_keepsake_locket.name': 'Yumis Andenken-Medaillon',
+  'entities.items.zense_meridian.name': 'Zense-Meridian',
+  'entities.items.zyzzs_deathless_signet.name': "Zyzz' Todloser Siegelring",
+  'entities.npcs.heroic_quartermaster.greeting':
+    'Ein Beweis aus den heroischen Tiefen kauft die feinsten Ringe und Anhänger in Highwatch. Zeig mir deine Marken.',
+  'entities.npcs.heroic_quartermaster.name': 'Quartiermeister Vex',
+  'entities.npcs.heroic_quartermaster.title': 'Heroischer Quartiermeister',
+  'heroicShop.balance': 'Heroische Marken: {count}',
+  'heroicShop.buyAria': '{item} für {marks} Heroische Marken kaufen',
+  'hudChrome.bags.cannotDestroy': 'Dieser Gegenstand kann nicht zerstört werden.',
+  'hudChrome.bags.rightClickDestroy': 'Rechtsklick zum Zerstören',
+  'hudChrome.crafting.comboRequirementUnmet':
+    'Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.',
+  'hudChrome.discord.roleTag.coredevs': 'Kernentwickler',
+  'hudChrome.dungeonDifficulty.setHeroic': 'Dungeon-Schwierigkeit festlegen: Heroisch',
+  'hudChrome.dungeonDifficulty.setNormal': 'Dungeon-Schwierigkeit festlegen: Normal',
+  'hudChrome.itemProc.attackSlow':
+    'und verlangsamt das Angriffstempo des Ziels {duration} Sek. lang um {pct}%',
+  'hudChrome.itemProc.chainArc':
+    'trifft das Ziel mit einem {school} {name} ({damage}), der auf {jumps} nahe Gegner mit abnehmendem Schaden überspringt',
+  'hudChrome.itemProc.dot':
+    'lässt {name} schwären, einen {school} Schaden über Zeit, der {total} über {duration} Sek. verursacht',
+  'hudChrome.itemProc.hot':
+    'entfaltet {name}, eine Heilung über Zeit, die {total} über {duration} Sek. wiederherstellt',
+  'hudChrome.itemProc.onHeal': 'Chance bei euren Heilungen ({chance}%): {effect}',
+  'hudChrome.itemProc.onMeleeHit': 'Chance bei Treffer ({chance}%): {effect}',
+  'hudChrome.itemProc.onSpellDamage': 'Chance bei euren schädigenden Zaubern ({chance}%): {effect}',
+  'hudChrome.options.version': 'v{version} ({build})',
+  'hudChrome.raidLockout.heroicLocked': 'Du bist für Heroisch {name} gesperrt.',
+  'hudChrome.raidLockout.heroicName': 'Heroisch {name}',
+  'hudChrome.statInfo.desc.critRating':
+    'Kritische Trefferwertung aus deiner Ausrüstung und deinen Setboni, die deine kritische Trefferchance erhöht. Etwa 10 Wertung gewähren 1% kritische Trefferchance.',
+  'hudChrome.statInfo.desc.hasteRating':
+    'Tempowertung aus deiner Ausrüstung und deinen Setboni, die deine Angriffe und dein Zaubern beschleunigt. Etwa 10 Wertung gewähren 1% Tempo.',
+  'hudChrome.statInfo.names.critRating': 'Kritische Trefferwertung',
+  'hudChrome.statInfo.names.hasteRating': 'Tempowertung',
+  'itemUi.slots.neck': 'Hals',
+  'itemUi.slots.ring': 'Finger',
   'auth.email': 'E-Mail',
   'auth.emailError': 'Bitte gib eine gültige E-Mail-Adresse ein.',
   'auth.emailPlaceholder': 'du@example.com',
@@ -550,6 +916,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Spinnen-Eikokon',
   'entities.mobs.sump_troll_devourer.name': 'Sumpftroll-Verschlinger',
   'entities.mobs.tolling_bell.name': 'Läutende Glocke',
+  'entities.mobs.vale_cup_ball.name': 'Keilerball',
   'entities.npcs.brother_halven_marsh.greeting':
     'Die Spur führte nach Norden. Ein weiteres Reliquiar, ein weiterer Ritus. Wähle deine Schwierigkeit, und ich halte das Seil, bis du zurückkehrst.',
   'entities.npcs.brother_halven_marsh.name': 'Bruder Halven',
@@ -932,7 +1299,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.returnTitle': 'Hol dir deine Belohnung',
   'hud.tutorial.returnBody':
     'Deine Aufgabe ist erledigt. Kehre zu Marschall Redbrook zurück und drücke {interactKey}, um sie abzugeben.',
-  // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': 'Von deinen {value} Punkten {stat}:',
   'hudChrome.statInfo.desc.str':
     'Erhöht deine Angriffskraft, sodass deine Waffenschläge härter treffen.',
@@ -1007,6 +1373,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.labels.ping': 'Ping',
   'hudChrome.perf.labels.jitter': 'Jitter',
   'hudChrome.perf.labels.snapshot': 'Snapshot-Rate',
+  'hudChrome.perf.labels.serverTick': 'Server-Tickrate',
   'hudChrome.perf.labels.connection': 'Verbindung',
   'hudChrome.perf.labels.drawCalls': 'Draw Calls',
   'hudChrome.perf.labels.triangles': 'Dreiecke',
@@ -1654,6 +2021,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'Soziales',
   'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menü',
+  'hud.core.mobileSettings': 'Einstellungen',
   'hud.core.mobileUse': 'Benutzen',
   'hud.core.mobileMeters': 'Anzeigen',
   'hud.core.mobileMap': 'Karte',
@@ -2143,9 +2511,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.demonHeal': 'Dämonenheilung',
   'questUi.tracker.title': 'Quests',
   'questUi.tracker.complete': 'Abgeschlossen',
-
   'questUi.tracker.showOnMap': '{name} auf der Karte anzeigen',
-
   'questUi.tracker.hideFromMap': '{name} auf der Karte ausblenden',
   'questUi.log.title': 'Questlog',
   'questUi.log.close': 'Questlog schließen',
@@ -2404,29 +2770,29 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     'Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
   'entities.abilities.battle_shout.name': 'Eisernes Gebrüll',
-  'entities.abilities.battle_shout.description': 'Erhöht eure Angriffskraft 2 Min. lang um 20.',
+  'entities.abilities.battle_shout.description': 'Erhöht eure Angriffskraft 2 Min. lang um {buff}.',
   'entities.abilities.commanding_shout.name': 'Stärkender Ruf',
-  'entities.abilities.commanding_shout.description': 'Erhöht eure Ausdauer 2 Min. lang um 6.',
+  'entities.abilities.commanding_shout.description': 'Erhöht eure Ausdauer 2 Min. lang um {buff}.',
   'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.demoralizing_shout.description':
-    'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um 30.',
+    'Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um {buff}.',
   'entities.abilities.charge.name': 'Vorpreschen',
   'entities.abilities.charge.description':
     'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m.',
   'entities.abilities.rend.name': 'Tiefe Wunde',
   'entities.abilities.rend.description':
-    'Verwundet das Ziel und lässt es über 9 Sek. für {damage} Schaden bluten.',
+    'Verwundet das Ziel und lässt es über {duration} Sek. für {damage} Schaden bluten.',
   'entities.abilities.thunder_clap.name': 'Bebender Schlag',
   'entities.abilities.thunder_clap.description':
     'Trifft nahe Gegner für {damage} Schaden und verlangsamt ihre Angriffe 10 Sek. lang um 10%.',
   'entities.abilities.hamstring.name': 'Lähmender Schnitt',
   'entities.abilities.hamstring.description':
-    'Verkrüppelt den Gegner für 5 Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
+    'Verkrüppelt den Gegner für {damage} Schaden und verringert sein Bewegungstempo 15 Sek. lang um 50%.',
   'entities.abilities.bloodrage.name': 'Blutzoll',
   'entities.abilities.bloodrage.description': 'Erzeugt 10 Wut auf Kosten von Gesundheit.',
   'entities.abilities.overpower.name': 'Redhand',
   'entities.abilities.overpower.description':
-    'Sofortiger Angriff mit Waffenschaden +5. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
+    'Sofortiger Angriff mit Waffenschaden plus {damage}. Nur einsetzbar, nachdem das Ziel ausgewichen ist. Kann nicht ausgewichen werden.',
   'entities.abilities.execute.name': 'Frühes Grab',
   'entities.abilities.execute.description':
     'Versucht, einen verwundeten Gegner zu erledigen, und verursacht {damage} Schaden. Nur bei Gegnern unter 20% Gesundheit einsetzbar.',
@@ -2440,24 +2806,22 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.defensive_stance.description':
     'Defensive Kampfhaltung: Ihr erzeugt 30% mehr Bedrohung, verursacht und erleidet aber 10% weniger Schaden. Erneut wirken, um die Haltung zu verlassen.',
   'entities.abilities.sunder_armor.name': 'Rüstungsspalter',
-  'entities.abilities.sunder_armor.description':
-    'Zerreißt die Rüstung des Ziels und verringert sie pro Anwendung um {damage}. Bis zu 5-mal stapelbar. Erzeugt viel Bedrohung.',
   'entities.abilities.taunt.name': 'Anstacheln',
   'entities.abilities.taunt.description':
     'Verspottet das Ziel: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen.',
   'entities.abilities.fireball.name': 'Feuerball',
   'entities.abilities.rain_of_fire.name': 'Feuerregen',
   'entities.abilities.rain_of_fire.description':
-    'Lässt einen Feuerregen auf den Zielbereich niedergehen, der Gegner verbrennt und {damage} Feuerschaden verursacht.',
+    'Lässt 4 Sek. lang einen Feuerregen auf den Zielbereich niedergehen, der Gegner jede Sekunde für {damage} Feuerschaden verbrennt.',
   'entities.abilities.volley.name': 'Pfeilhagel',
   'entities.abilities.volley.description':
-    'Lässt einen Pfeilhagel auf den Zielbereich niedergehen und verursacht {damage} Schaden an den Gegnern darin.',
+    'Lässt 3 Sek. lang Pfeile auf den Zielbereich niedergehen und verursacht alle 0.5 Sek. {damage} Schaden an Gegnern darin.',
   'entities.abilities.hurricane.name': 'Wirbelsturm',
   'entities.abilities.hurricane.description':
-    'Entfesselt einen Wirbelsturm über dem Zielbereich, der Gegner trifft und {damage} Naturschaden verursacht.',
+    'Entfesselt 6 Sek. lang einen Wirbelsturm über dem Zielbereich, der Gegner jede Sekunde für {damage} Naturschaden trifft.',
   'entities.abilities.earthquake.name': 'Erdbeben',
   'entities.abilities.earthquake.description':
-    'Lässt den Zielbereich erbeben, trifft Gegner und verursacht {damage} Naturschaden.',
+    'Lässt den Zielbereich 6 Sek. lang erbeben und trifft Gegner alle 1.5 Sek. für {damage} Naturschaden.',
   'entities.abilities.flamestrike.name': 'Flammenschlag',
   'entities.abilities.flamestrike.description':
     'Lässt am Zielort eine Feuerexplosion niedergehen, die allen Gegnern im Wirkungsbereich {damage} Feuerschaden zufügt.',
@@ -2465,9 +2829,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
   'entities.abilities.frost_armor.name': 'Raureifmantel',
   'entities.abilities.frost_armor.description':
-    'Hüllt euch in Frost und erhöht die Rüstung 30 Min. lang um 30.',
+    'Hüllt euch in Frost und erhöht die Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.arcane_intellect.name': 'Aether-Einsicht',
-  'entities.abilities.arcane_intellect.description': 'Erhöht die Intelligenz 30 Min. lang um 2.',
+  'entities.abilities.arcane_intellect.description':
+    'Erhöht die Intelligenz 30 Min. lang um {buff}.',
   'entities.abilities.frostbolt.name': 'Rimelance',
   'entities.abilities.frostbolt.description':
     'Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%.',
@@ -2485,7 +2850,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert Aether-Pfeile auf den Gegner und verursacht 3 Sek. lang jede Sekunde {damage} Arkanschaden.',
   'entities.abilities.polymorph.name': 'Behexen',
   'entities.abilities.polymorph.description':
-    'Verwandelt den Gegner bis zu 15 Sek. lang in eine Kröte. Die Kröte wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
+    'Verwandelt den Gegner bis zu {duration} Sek. lang in eine Kröte. Die Kröte wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
   'entities.abilities.frost_nova.name': 'Icebind',
   'entities.abilities.frost_nova.description':
     'Friert alle nahen Gegner bis zu 8 Sek. lang fest und verursacht {damage} Frostschaden.',
@@ -2500,19 +2865,18 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
   'entities.abilities.ice_barrier.name': 'Frostschleier',
   'entities.abilities.ice_barrier.description':
-    'Schützt euch mit Eis und absorbiert 60 Sek. lang 130 Schaden.',
+    'Schützt euch mit Eis und absorbiert 60 Sek. lang {damage} Schaden.',
   'entities.abilities.sinister_strike.name': 'Boshafter Hieb',
   'entities.abilities.sinister_strike.description':
     'Sofortiger Hieb für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
   'entities.abilities.eviscerate.name': 'Grabesschlaf',
-  'entities.abilities.eviscerate.description':
-    'Finishing-Move, der Schaden pro Combopunkt verursacht.',
+  'entities.abilities.eviscerate.description': 'Finishing-Move, der {damage} verursacht.',
   'entities.abilities.backstab.name': 'Feiger Stoß',
   'entities.abilities.backstab.description':
     'Meuchelt das Ziel für 150% Waffenschaden plus {damage}. Ihr müsst hinter dem Ziel stehen. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.gouge.name': 'Augenstich',
   'entities.abilities.gouge.description':
-    'Trifft das Ziel und macht es 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. Gewährt 1 Combopunkt.',
+    'Trifft das Ziel für {damage} Schaden und macht es 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. Gewährt 1 Combopunkt.',
   'entities.abilities.evasion.name': 'Ghostfoot',
   'entities.abilities.evasion.description': 'Erhöht eure Ausweichchance 15 Sek. lang um 50%.',
   'entities.abilities.slice_and_dice.name': 'Mörderisches Tempo',
@@ -2534,19 +2898,19 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Euer Blut kocht und stellt sofort 60 Energie wieder her.',
   'entities.abilities.garrote.name': 'Kehldraht',
   'entities.abilities.garrote.description':
-    'Erwürgt den Gegner, verursacht sofort Schaden und lässt ihn 18 Sek. lang um {damage} bluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt.',
+    'Erwürgt den Gegner, verursacht sofort {damage} Schaden und lässt ihn über 18 Sek. für {overTime} bluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt.',
   'entities.abilities.cheap_shot.name': 'Magenhieb',
   'entities.abilities.cheap_shot.description':
-    'Trifft das Ziel und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.',
+    'Trifft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.',
   'entities.abilities.sap.name': 'Kopfnuss',
   'entities.abilities.sap.description':
     'Macht das Ziel 8 Sek. lang handlungsunfähig. Erfordert Verstohlenheit und außerhalb des Kampfes zu sein. Jeder Schaden bricht den Effekt.',
   'entities.abilities.crippling_poison.name': 'Bleiernes Gift',
   'entities.abilities.crippling_poison.description':
-    'Trifft das Ziel mit einem bleiernen Gift, verursacht {damage} Naturschaden und verringert sein Bewegungstempo 12 Sek. lang um 50%.',
+    'Trifft das Ziel mit einem bleiernen Gift, verursacht {damage} Naturschaden und verlangsamt sein Bewegungstempo 12 Sek. lang um 50%.',
   'entities.abilities.expose_armor.name': 'Rüstungsbruch',
   'entities.abilities.expose_armor.description':
-    'Finishing-Move, der das Ziel entblößt und seine Rüstung verringert. Mehr eingesetzte Combopunkte führen zu einem tieferen Schnitt.',
+    'Finishing-Move, der das Ziel entblößt und seine Rüstung 30 Sek. lang um {damage} verringert.',
   'entities.abilities.rupture.name': 'Ausbluten',
   'entities.abilities.rupture.description':
     'Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt.',
@@ -2564,25 +2928,25 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Blendet das Ziel, sodass es 8 Sek. lang desorientiert umherirrt. Jeder Schaden bricht den Effekt.',
   'entities.abilities.seal_of_righteousness.name': 'Oathbrand',
   'entities.abilities.seal_of_righteousness.description':
-    'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung 4 zusätzlichen Heiligschaden verursacht. Mit Verdict entfesseln.',
+    'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung {damage} zusätzlichen Heiligschaden verursacht. Mit Verdict entfesseln.',
   'entities.abilities.holy_light.name': 'Mending Light',
   'entities.abilities.holy_light.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.devotion_aura.name': 'Standhafte Aura',
-  'entities.abilities.devotion_aura.description': 'Erhöht eure Rüstung 30 Min. lang um 40.',
+  'entities.abilities.devotion_aura.description': 'Erhöht eure Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.judgement.name': 'Verdict',
   'entities.abilities.judgement.description':
     'Entfesselt euer aktives Siegel auf den Gegner, verbraucht es und verursacht seinen gespeicherten Heiligschaden.',
   'entities.abilities.blessing_of_might.name': 'Eid des Eisens',
   'entities.abilities.blessing_of_might.description':
-    'Belegt ein freundliches Ziel mit einem Segen und erhöht seine Angriffskraft 5 Min. lang um 15.',
+    'Belegt ein freundliches Ziel mit einem Segen und erhöht seine Angriffskraft 5 Min. lang um {buff}.',
   'entities.abilities.divine_protection.name': 'Bannschild des Glaubens',
   'entities.abilities.divine_protection.description':
-    'Ein schützender Bannschild absorbiert 10 Sek. lang 50 Schaden.',
+    'Ein schützender Bannschild absorbiert 10 Sek. lang {damage} Schaden.',
   'entities.abilities.hammer_of_justice.name': 'Spaltender Richthammer',
-  'entities.abilities.hammer_of_justice.description': 'Betäubt das Ziel 3 Sek. lang.',
+  'entities.abilities.hammer_of_justice.description': 'Betäubt das Ziel {duration} Sek. lang.',
   'entities.abilities.lay_on_hands.name': 'Letzte Ölung',
   'entities.abilities.lay_on_hands.description':
-    'Ein gewaltiger Heilungsstoß: Stellt 250 Gesundheit wieder her. 10 Min. Abklingzeit.',
+    'Ein gewaltiger Heilungsstoß: Stellt {damage} Gesundheit wieder her. 10 Min. Abklingzeit.',
   'entities.abilities.flash_of_light.name': 'Lightmend',
   'entities.abilities.flash_of_light.description':
     'Ein schneller, effizienter Lichtstoß, der ein freundliches Ziel um {damage} heilt.',
@@ -2591,7 +2955,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Bannt das Böse mit Heiligem Zorn und verursacht {damage} Heiligschaden.',
   'entities.abilities.consecration.name': 'Heiliger Boden',
   'entities.abilities.consecration.description':
-    'Weiht den Boden unter euch und versengt nahe Gegner für {damage} Heiligschaden.',
+    'Weiht den Boden unter euch und versengt nahe Gegner 10 Sek. lang alle 2 Sek. für {damage} Heiligschaden.',
   'entities.abilities.righteous_fury.name': 'Brennender Eid',
   'entities.abilities.righteous_fury.description':
     'Erhöht die durch euren Heiligschaden erzeugte Bedrohung 30 Min. lang um 60%. Der Grundpfeiler des Tank-Paladins.',
@@ -2605,10 +2969,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Entlässt euren Begleiter zurück in die Wildnis.',
   'entities.abilities.raptor_strike.name': 'Ausweidender Hieb',
   'entities.abilities.raptor_strike.description':
-    'Starker Nahkampfangriff, der den Schaden um 5 erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
+    'Starker Nahkampfangriff, der den Schaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
   'entities.abilities.aspect_of_the_hawk.name': 'Gestalt der Weihe',
   'entities.abilities.aspect_of_the_hawk.description':
-    'Nehmt die Gestalt der Weihe an und erhöht die Angriffskraft 30 Min. lang um 20.',
+    'Nehmt die Gestalt der Weihe an und erhöht die Angriffskraft 30 Min. lang um {buff}.',
   'entities.abilities.serpent_sting.name': 'Giftstachel',
   'entities.abilities.serpent_sting.description':
     'Sticht das Ziel und verursacht über 15 Sek. {damage} Naturschaden.',
@@ -2617,13 +2981,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Sofortiger Schuss, der {damage} Arkanschaden verursacht.',
   'entities.abilities.concussive_shot.name': 'Rasselnder Schuss',
   'entities.abilities.concussive_shot.description':
-    'Macht das Ziel benommen und verringert sein Bewegungstempo 4 Sek. lang um 50%.',
+    'Macht das Ziel für {damage} Schaden benommen und verringert sein Bewegungstempo 4 Sek. lang um 50%.',
   'entities.abilities.mongoose_bite.name': 'Counterfang',
   'entities.abilities.mongoose_bite.description':
-    'Kontert, nachdem das Ziel ausgewichen ist, für Waffenschaden plus 12. Kann nicht ausgewichen werden.',
+    'Kontert, nachdem das Ziel ausgewichen ist, für Waffenschaden plus {damage}. Kann nicht ausgewichen werden.',
   'entities.abilities.wing_clip.name': 'Fesselnder Hieb',
   'entities.abilities.wing_clip.description':
-    'Verursacht eine Wunde, die den Gegner 10 Sek. lang um 40% verlangsamt.',
+    'Verursacht eine Wunde für {damage} Schaden, die den Gegner 10 Sek. lang um 40% verlangsamt.',
   'entities.abilities.aspect_of_the_monkey.name': 'Gestalt des Marders',
   'entities.abilities.aspect_of_the_monkey.description':
     'Nehmt die Gestalt des Marders an und erhöht eure Ausweichchance 30 Min. lang um 8%.',
@@ -2641,13 +3005,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.power_word_fortitude.name': 'Litanei der Entschlossenheit',
   'entities.abilities.power_word_fortitude.description':
-    'Erhöht die Ausdauer des Ziels 30 Min. lang um 3.',
+    'Erhöht die Ausdauer des Ziels 30 Min. lang um {buff}.',
   'entities.abilities.shadow_word_pain.name': 'Klagelied des Verfalls',
   'entities.abilities.shadow_word_pain.description':
     'Ein Wort der Dunkelheit verursacht über 18 Sek. {damage} Schattenschaden.',
   'entities.abilities.power_word_shield.name': 'Psalm der Abschirmung',
   'entities.abilities.power_word_shield.description':
-    'Schützt das Ziel und absorbiert 30 Sek. lang 48 Schaden.',
+    'Schützt das Ziel und absorbiert 30 Sek. lang {damage} Schaden.',
   'entities.abilities.renew.name': 'Anhaltende Gnade',
   'entities.abilities.renew.description': 'Heilt das Ziel über 15 Sek. um {damage}.',
   'entities.abilities.mind_blast.name': 'Mindfracture',
@@ -2667,7 +3031,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen Blitz für {damage} Naturschaden.',
   'entities.abilities.rockbiter_weapon.name': 'Stonebound-Waffe',
   'entities.abilities.rockbiter_weapon.description':
-    'Erfüllt eure Waffe mit der Wut des Steins: Jeder Schlag verursacht 5 zusätzlichen Schaden für 5 Min.',
+    'Erfüllt eure Waffe mit der Wut des Steins: Jeder Schlag verursacht 5 Min. lang {damage} zusätzlichen Schaden.',
   'entities.abilities.healing_wave.name': 'Heilende Wasser',
   'entities.abilities.healing_wave.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.earth_shock.name': 'Erdstoß',
@@ -2675,19 +3039,19 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schockt das Ziel sofort mit erschütternder Kraft für {damage} Naturschaden.',
   'entities.abilities.lightning_shield.name': 'Donnerschild',
   'entities.abilities.lightning_shield.description':
-    'Umhüllt euch mit knisternden Blitzen: Nahkampfangreifer erleiden 13 Naturschaden.',
+    'Umhüllt euch mit knisternden Blitzen: Nahkampfangreifer erleiden {buff} Naturschaden, bis zu 3 Aufladungen und höchstens einmal alle 5 Sekunden.',
   'entities.abilities.flame_shock.name': 'Cinder-Stoß',
   'entities.abilities.flame_shock.description':
-    'Versengt das Ziel mit Feuer für 25 Schaden plus {damage} über 12 Sek.',
+    'Versengt das Ziel mit Feuer für {damage} Schaden plus {overTime} über 12 Sek.',
   'entities.abilities.flametongue_weapon.name': 'Pyrebrand-Waffe',
   'entities.abilities.flametongue_weapon.description':
-    'Erfüllt eure Waffe mit elementarem Feuer: Jeder Schlag verursacht 8 zusätzlichen Feuerschaden für 5 Min.',
+    'Erfüllt eure Waffe mit elementarem Feuer: Jeder Schlag verursacht 5 Min. lang {damage} zusätzlichen Feuerschaden.',
   'entities.abilities.frost_shock.name': 'Rime-Stoß',
   'entities.abilities.frost_shock.description':
     'Schockt das Ziel sofort mit Frost für {damage} Frostschaden und verlangsamt seine Bewegung 8 Sek. lang um 50%.',
   'entities.abilities.frostbrand_weapon.name': 'Rimebound-Waffe',
   'entities.abilities.frostbrand_weapon.description':
-    'Verzaubert Eure Waffe mit beißendem Frost: Jeder Schlag verursacht 8 zusätzlichen Schaden für 5 Min.',
+    'Verzaubert Eure Waffe mit beißendem Frost: Jeder Schlag verursacht 5 Min. lang {damage} zusätzlichen Schaden.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.ghost_wolf.description':
     'Verwandelt euch in einen Shadewolf und erhöht euer Bewegungstempo 10 Min. lang um 40%.',
@@ -2699,15 +3063,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Sendet einen schattenhaften Blitz auf den Gegner und verursacht {damage} Schattenschaden.',
   'entities.abilities.demon_skin.name': 'Fiendhide',
   'entities.abilities.demon_skin.description':
-    'Dämonische Haut erhöht eure Rüstung 30 Min. lang um 30.',
+    'Dämonische Haut erhöht eure Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.immolate.name': 'Brennender Pakt',
   'entities.abilities.immolate.description':
-    'Verbrennt den Gegner für 11 Feuerschaden und zusätzlich {damage} über 15 Sek.',
+    'Verbrennt den Gegner für {damage} Feuerschaden und zusätzlich {overTime} über 15 Sek.',
   'entities.abilities.corruption.name': 'Blackrot',
   'entities.abilities.corruption.description':
     'Verderbt das Ziel und verursacht über 18 Sek. {damage} Schattenschaden.',
   'entities.abilities.life_tap.name': 'Harter Handel',
-  'entities.abilities.life_tap.description': 'Wandelt 30 Gesundheit in 30 Mana um.',
+  'entities.abilities.life_tap.description': 'Wandelt {damage} Gesundheit in {damage} Mana um.',
   'entities.abilities.curse_of_agony.name': 'Fluch der Qual',
   'entities.abilities.curse_of_agony.description':
     'Verflucht das Ziel mit Pein: {damage} Schattenschaden über 24 Sek.',
@@ -2730,7 +3094,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.mark_of_the_wild.description':
-    'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um 25.',
+    'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.moonfire.name': 'Mondsturm',
   'entities.abilities.moonfire.description':
     'Verbrennt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
@@ -2738,13 +3102,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description': 'Heilt das Ziel über 12 Sek. um {damage}.',
   'entities.abilities.thorns.name': 'Briarguard',
   'entities.abilities.thorns.description':
-    'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden 3 Naturschaden.',
+    'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden {buff} Naturschaden.',
   'entities.abilities.entangling_roots.name': 'Greifende Wurzeln',
   'entities.abilities.entangling_roots.description':
     'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.',
   'entities.abilities.bear_form.name': 'Bruin Form',
   'entities.abilities.bear_form.description':
-    'Verwandelt euch in einen Bären: Rüstung +65%, Angriffskraft +15, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
+    'Verwandelt euch in einen Bären: Rüstung +90%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.maul.name': 'Bonecrush',
   'entities.abilities.maul.description':
     'Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bruin Form.',
@@ -2759,7 +3123,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Kratzt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.ferocious_bite.name': 'Gorebite',
   'entities.abilities.ferocious_bite.description':
-    'Finishing-Move, der Schaden pro Combopunkt verursacht. Nur in Wolfsgestalt.',
+    'Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt.',
   'entities.abilities.swipe.name': 'Fegende Klauen',
   'entities.abilities.swipe.description':
     'Fegt nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin Form.',
@@ -2781,7 +3145,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description': 'Betäubt das Ziel 2 Sek. lang. Nur in Bruin Form.',
   'entities.abilities.faerie_fire.name': 'Witchlight',
   'entities.abilities.faerie_fire.description':
-    'Verringert die Rüstung des Ziels 40 Sek. lang um 35.',
+    'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%. Nicht mit Rüstungsspalter kumulierbar.',
   'entities.abilities.hibernate.name': 'Schlummer',
   'entities.abilities.hibernate.description':
     'Versetzt das Ziel bis zu 8 Sek. in tiefen Schlaf. Jeglicher Schaden weckt es auf.',
@@ -2799,16 +3163,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht die Angriffskraft 6 Sek. lang um 40. Nur in Wolfsgestalt.',
   'entities.abilities.rip.name': 'Zerfetzen',
   'entities.abilities.rip.description':
-    'Finishing-Move, der über 12 Sek. Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
+    'Finishing-Move, der über 12 Sek. {damage} Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
   'entities.abilities.mortal_strike.name': 'Verstümmelnder Hieb',
   'entities.abilities.mortal_strike.description':
     'Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)',
   'entities.abilities.bloodthirst.name': 'Aderlass',
   'entities.abilities.bloodthirst.description':
-    'Greift sofort in blutiger Raserei an und verursacht {damage}. (Furor-Signatur)',
+    'Greift sofort in blutiger Raserei an und verursacht 60% Waffenschaden plus {damage}. (Furor-Signatur)',
   'entities.abilities.shield_slam.name': 'Shieldcrack',
   'entities.abilities.shield_slam.description':
-    'Schlägt das Ziel mit eurem Schild für {damage} und erzeugt enorme Bedrohung. (Schutz-Signatur)',
+    'Schlägt das Ziel mit eurem Schild für 50% Waffenschaden plus {damage} und erzeugt enorme Bedrohung. (Schutz-Signatur)',
   'entities.abilities.whirlwind.name': 'Klingenwirbel',
   'entities.abilities.whirlwind.description':
     'Dreht euch in einem tödlichen Bogen und trefft alle nahen Gegner für {damage}. (Furor-Talent)',
@@ -3867,7 +4231,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'news.prerelease': 'Vorabversion',
   'news.viewOnGithub': 'Auf GitHub ansehen',
   'wiki.cta': 'Wiki durchstöbern',
-  // --- qol-changes: character profile, attack-move, login/create labels ---
   'character.portraitAlt': 'Porträt von {name}',
   'character.viewProfile': 'Profil ansehen',
   'character.profile': 'Profil',
@@ -3882,7 +4245,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'auth.chromaOption': 'Chroma {n}',
   'auth.noAccountPrompt': 'Neu in der Welt?',
   'auth.haveAccountPrompt': 'Schon ein Konto?',
-
   'entities.items.conjured_bread.name': 'Herbeigezauberter Haferkuchen',
   'entities.items.conjured_bread2.name': 'Herbeigezaubertes Schwarzbrot',
   'entities.items.conjured_bread3.name': 'Herbeigezauberter Honigkuchen',
@@ -3943,7 +4305,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_axe.name': 'Altholzaxt',
   'entities.items.goldleaf_sickle.name': 'Goldblatt-Sichel',
   'entities.items.sunpetal_sickle.name': 'Sonnenblütensichel',
-  // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
+  'entities.items.thorium_ore.name': 'Thoriumerz',
+  'entities.items.arcanite_bar.name': 'Arkanitbarren',
+  'entities.items.ashwood_log.name': 'Aschenholzscheit',
+  'entities.items.elderwood_log.name': 'Altholunderscheit',
+  'entities.items.goldleaf_herb.name': 'Goldblattkraut',
+  'entities.items.sunpetal_herb.name': 'Sonnenblütenkraut',
   'hud.core.chatChannels.add': 'Chatkanal hinzufügen',
   'hud.core.chatChannels.addTitle': 'Kanal hinzufügen',
   'hud.core.chatChannels.close': 'Reiter {channel} schließen',
@@ -4148,9 +4515,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} Sek.',
-  'hudChrome.mobile.autorun': 'Auto-Laufen',
   'hudChrome.mobile.haptics': 'Haptik',
   'hudChrome.mobile.hapticsOff': 'Haptik aus',
+  'hudChrome.mobile.hotbarPage': 'Fähigkeiten',
+  'hudChrome.mobile.hotbarPageAria': 'Nächste Fähigkeitengruppe anzeigen',
   'hudChrome.mobile.jump': 'Springen',
   'hudChrome.mobile.leaderboard': 'Rangliste',
   'hudChrome.mobile.nameplates': 'Namen',
@@ -4287,11 +4655,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.title': 'Konto',
   'hudChrome.account.walletSummary':
     'Verifiziert ein Solana-Wallet, um Inhaber-Flair auf Eurer Spielerkarte anzuzeigen.',
-  // On-screen quest tracker (hudChrome.questTracker.*): collapsed count badge + header toggle hover hint.
   'hudChrome.questTracker.count': '({count})',
   'hudChrome.questTracker.collapseHint': 'Quests einklappen',
   'hudChrome.questTracker.expandHint': 'Quests ausklappen',
-  // Modular bag filtering controls (hudChrome.bags.*).
   'hudChrome.bags.filterGroupAria': 'Taschen nach Kategorie filtern',
   'hudChrome.bags.filterAll': 'Alle',
   'hudChrome.bags.filterWeapon': 'Waffen',
@@ -4306,7 +4672,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.searchPlaceholder': 'Gegenstände durchsuchen',
   'hudChrome.bags.searchAria': 'Taschengegenstände nach Namen durchsuchen',
   'hudChrome.bags.noMatch': 'Keine Gegenstände entsprechen Euren Filtern.',
-  // v0.13.0 release i18n fill: bug report, chat window, character takeover, admin bug reports
   'character.inWorldHint':
     'Bereits in der Welt. Melde dich anderswo ab oder übernimm den Charakter.',
   'character.takeOver': 'Übernehmen',
@@ -4343,7 +4708,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': 'Zurücksetzen',
   'hudChrome.chatWindow.resize': 'Ziehen, um die Größe des Chatfensters zu ändern',
   'hudChrome.options.clickFeedback': 'Klickmarkierung',
-  // v0.13.0 adaptive browser-effects perf tier (PR #759)
   'hudChrome.options.browserEffects': 'Browser-Effekte',
   'hudChrome.options.browserEffectsAuto': 'Auto',
   'hudChrome.options.browserEffectsFull': 'Voll',
@@ -4351,7 +4715,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': 'Minimal',
   'hudChrome.options.browserEffectsNote':
     'Der Automatikmodus reduziert aufwendige CSS-Effekte (Unschärfe, Leuchten, Hintergrundbewegung) je nach Browser und Gerät. Senke ihn manuell, wenn sich die Oberfläche träge anfühlt.',
-  // Guide (/guide) localization.
   'guide.bestiary.heading': 'Bestiarium',
   'guide.bestiary.intro':
     'Die Kreaturen der Welt, nach Familien gruppiert. Dies sind die Gegner, denen ihr im Freien begegnet. Die tödlichsten Wesen warten ungelistet hinter den Toren der Dungeons.',
@@ -5025,7 +5388,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Drei Gebiete, von Süden nach Norden, jedes eine Stufe höher im Level. Folge der Questspur, und das Land trägt dich vom Tal bis zu den Gipfeln.',
   'guide.worldPage.places': 'Bemerkenswerte Orte',
   'guide.worldPage.residents': 'Wem du begegnen wirst',
-  // guide.* enrichment fill (lore, gear, social, stats, economy, progression)
   'guide.arenaPage.powerupsBody':
     'Mitten im Kampf fallen außerdem leuchtende Kugeln in die Arena, frei für den, der sie zuerst erreicht. Sie sind absichtlich völlig übertrieben und halten nur kurz an: Geschwindigkeitsdämon für einen Wimpernschlag blendenden Tempos, Koloss, um dich zu einem schwerfälligen Riesen anschwellen zu lassen, Mondstiefel für einen federnden Sprung bei niedriger Schwerkraft und Berserker für einen plötzlichen Schub an Raserei.',
   'guide.arenaPage.powerupsTitle': 'Powerups im Ring',
@@ -5382,9 +5744,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gladeTitle': 'Eine stille Ecke: Brightwood Glade',
   'guide.worldPage.gladeBody':
     'Nicht jede Geschichte im Tal handelt von den Toten. Im Norden bewahrt ein sonnenheller Hain namens Brightwood Glade seinen eigenen, sanfteren Rhythmus, ganz aus stillen Pfaden und geflecktem Licht unter den Zweigen. Er ist ein sanfter Gegenklang zu der Spur, der du folgst, und einen Blick wert, wenn die Straße dir Raum zum Umherstreifen lässt.',
-  // APM telemetry label from release/v0.14.0
   'hudChrome.perf.labels.apm': 'APM',
-  // Account-security portal (2FA, verified email change, GDPR export) from PR #833.
   'auth.twoFactorLabel': 'Authentifizierungscode',
   'auth.twoFactorPlaceholder': '6-stelliger Code oder Wiederherstellungscode',
   'auth.twoFactorHint':
@@ -5640,7 +6000,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.tierMedium': 'Mittel',
   'sim.lockpick.tierPremium': 'Erlesen',
   'sim.lockpick.toolSlips': 'Dieses Werkzeug rutscht von diesem Schloss ab.',
-  // Guide (/guide) localization.,
   'lockpickUi.pickTitle': 'Knacke das Schloss',
   'lockpickUi.cofferTitle': 'Reich gefüllte Truhe',
   'lockpickUi.cache': '{tier} Hort',
@@ -5688,8 +6047,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Drücke F, um hinaufzuklettern',
   'sim.delve.objectiveClearRoom': 'Den Raum räumen.',
   'sim.delve.objectiveDefeatBoss': 'Den Boss erschlagen.',
-  // Account-security portal (2FA, verified email change, GDPR export) from PR #833.,
-  // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Verursacht alle {interval} s {value} {school}schaden',
   'hudChrome.auraEffect.hot': 'Stellt alle {interval} s {value} Gesundheit wieder her',
   'hudChrome.auraEffect.absorb': 'Absorbiert {value} Schaden',
@@ -6011,7 +6368,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jetzt nicht',
   'hudChrome.nativeUpdate.title': 'Update verfügbar',
   'hudChrome.nativeUpdate.update': 'Aktualisieren',
-  // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'Die Rabenpost',
   'entities.letters.ravenpost_welcome.subject': 'Die Raben fliegen nun für Euch',
   'entities.letters.ravenpost_welcome.body':
@@ -6106,7 +6462,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Starte zuerst die Zwei-Faktor-Einrichtung.',
   'apiError.validation.failed':
     'Einige Felder sind ungültig. Prüfe das Formular und versuche es erneut.',
-  // Release v0.22.0 locale fill.
   'download.linuxCta': 'Für Linux herunterladen',
   'download.linuxHint':
     'AppImage: Machen Sie es ausführbar und führen Sie es dann aus. Keine Installation erforderlich.',
@@ -6207,7 +6562,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': 'Basteln {name}',
   'hudChrome.crafting.title': 'Basteln',
   'hudChrome.crafting.unknownRecipe': 'Dieses Rezept existiert nicht.',
-  // Release v0.22.0 professions quest locale fill.
+  'hudChrome.mobile.actionPageIndicator': 'Seite {page}',
+  'hudChrome.mobile.actionPageToggle': 'Aktionsseite wechseln',
+  'hudChrome.mobile.actionRing': 'Kampfhandlungen',
+  'hudChrome.mobile.spellbookPageLabel': 'Seite {page}',
+  'hudChrome.mobile.targetCycle': 'Ziel tauschen',
+  'hudChrome.mobile.targetCycleShort': 'Ziel',
+  'hudChrome.options.mobileCameraJoystick': 'Kamera-Joystick',
+  'hudChrome.options.mobileLeftHanded': 'Linkshänder-Layout',
   'entities.quests.q_archetype_acceptance.title': 'Ein Handwerk, das Sie Ihr Eigen nennen können',
   'entities.quests.q_archetype_acceptance.text':
     'Jeder Kunsthandwerker aus Eastbrook entscheidet sich schließlich für ein Handwerk, das er sein Eigen nennen kann. Beweisen Sie sich mit einer einzigen Tat, {playerName}, und erklären Sie Ihren Weg.',
@@ -6219,4 +6581,274 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_make_amends.completion':
     'Änderungen vorgenommen; ein neuer Weg steht dir offen.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Waldwolf getötet',
+  'entities.npcs.bursar_aldous_crane.greeting':
+    'Jede Kiste, jede Truhe und jedes Kleinod ist bei der Vergoldeten Schatulle sicher.',
+  'entities.npcs.bursar_aldous_crane.name': 'Kämmerer Aldous Crane',
+  'entities.npcs.bursar_aldous_crane.title': 'Die Vergoldete Schatulle',
+  'entities.npcs.bursar_fernando.greeting':
+    'Willkommen bei der Vergoldeten Schatulle. Deine Waren ruhen sicher hinter unseren Schlössern.',
+  'entities.npcs.bursar_fernando.name': 'Kämmerer Fernando',
+  'entities.npcs.bursar_fernando.title': 'Die Vergoldete Schatulle',
+  'entities.npcs.bursar_petra_vell.greeting':
+    'Die Vergoldete Schatulle führt saubere Bücher und noch sauberere Tresore. Was dürfen wir für dich verwahren?',
+  'entities.npcs.bursar_petra_vell.name': 'Kämmerin Petra Vell',
+  'entities.npcs.bursar_petra_vell.title': 'Die Vergoldete Schatulle',
+  'guide.economy.bankBody':
+    'Jede größere Stadt beherbergt eine Filiale der Vergoldeten Schatulle, des Bankhauses des Reichs. Sprich dort mit dem Kämmerer, um deinen Tresor zu eröffnen: einen privaten Stauraum jenseits deiner Taschen, der deinem Charakter ein Leben lang erhalten bleibt. Was du dort zurücklässt, wartet sicher auf dich, welche Filiale du auch als Nächstes besuchst.',
+  'guide.economy.bankHow':
+    'Ist der Tresor geöffnet, klicke einen Gegenstand in deinen Taschen an, um ihn einzulagern, und klicke ihn im Tresor an, um ihn zurückzuholen. Der Tresor fasst nur Waren, niemals Münzen, und Questgegenstände bleiben bei dir. Wenn deine Taschen unterwegs überquellen, fegt ein einziger Knopf alle deine Handwerksmaterialien auf einmal hinein.',
+  'guide.economy.bankSlots':
+    'Ein frischer Tresor beginnt klein und wächst mit dir. Der Kämmerer verkauft weitere Fächer für Münzen zu immer steileren Preisen, und Online-Spielen bringt obendrein Bonusfächer ein, etwa für eine bestätigte E-Mail-Adresse, verknüpfte Konten und Freunde, die du ins Spiel holst.',
+  'guide.economy.bankTitle': 'Die Bank',
+  'hudChrome.bank.bonusAdvertDiscord': 'Verknüpfe dein Discord-Konto und erhalte 2 Fächer.',
+  'hudChrome.bank.bonusAdvertEmail': 'Bestätige deine E-Mail-Adresse und erhalte 2 Fächer.',
+  'hudChrome.bank.bonusAdvertWallet': 'Verknüpfe eine Wallet und erhalte 2 Fächer.',
+  'hudChrome.bank.bonusEarned': '+{count}',
+  'hudChrome.bank.bonusReferralExplainer':
+    'Lade einen Freund ein: Erreicht er Stufe 10, erhaltet ihr beide 2 Fächer, bis zu 5 Freunde.',
+  'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
+  'hudChrome.bank.bonusSectionAria': 'Bonus-Bankfächer und wie du mehr davon verdienst',
+  'hudChrome.bank.bonusSourceDiscord': 'Discord verknüpft',
+  'hudChrome.bank.bonusSourceEmail': 'E-Mail-Adresse bestätigt',
+  'hudChrome.bank.bonusSourceReferral': 'Geworbene Freunde',
+  'hudChrome.bank.bonusSourceWallet': 'Wallet verknüpft',
+  'hudChrome.bank.bonusStatusEarned': '+{count}',
+  'hudChrome.bank.bonusTitle': 'Bonusfächer',
+  'hudChrome.bank.buyConfirm': '{count} zusätzliche Bankfächer für {price} kaufen?',
+  'hudChrome.bank.buyConfirmAccept': 'Kaufen',
+  'hudChrome.bank.buySlots': '{count} Fächer kaufen',
+  'hudChrome.bank.buySlotsMaxed': 'Vollständig erweitert',
+  'hudChrome.bank.cannotDeposit': 'Kann nicht eingelagert werden',
+  'hudChrome.bank.capacity': '{used}/{total}',
+  'hudChrome.bank.capacityAria': 'Belegte Bankfächer: {used} von {total}',
+  'hudChrome.bank.close': 'Bank schließen',
+  'hudChrome.bank.depositAll': 'Alle Materialien einlagern',
+  'hudChrome.bank.depositAllDone': 'Eingelagerte Materialien: {count}.',
+  'hudChrome.bank.depositAllFull': 'Eingelagerte Materialien: {count}. Die Bank ist jetzt voll.',
+  'hudChrome.bank.depositAllNone': 'Bank voll: nichts eingelagert.',
+  'hudChrome.bank.depositHint': 'Klicke, um einzulagern',
+  'hudChrome.bank.depositPartialHint': 'Umschalt-Klick, um eine Teilmenge einzulagern',
+  'hudChrome.bank.depositQuantityConfirm': 'Einlagern',
+  'hudChrome.bank.depositQuantityInput': 'Einzulagernde Menge',
+  'hudChrome.bank.depositQuantityTitle': '{item} einlagern',
+  'hudChrome.bank.empty': 'Deine Bank ist leer.',
+  'hudChrome.bank.filterGroupAria': 'Bank nach Kategorie filtern',
+  'hudChrome.bank.searchAria': 'Bankgegenstände nach Namen durchsuchen',
+  'hudChrome.bank.sortAria': 'Bankgegenstände sortieren',
+  'hudChrome.bank.subtitle': 'Die Vergoldete Schatulle',
+  'hudChrome.bank.title': 'Bank',
+  'hudChrome.bank.tooFar': 'Du musst bei einem Bankier stehen, um deine Bank einzusehen.',
+  'hudChrome.bank.withdrawHint': 'Klicke, um zu entnehmen',
+  'hudChrome.bank.withdrawPartialHint': 'Umschalt-Klick, um eine Teilmenge zu entnehmen',
+  'hudChrome.bank.withdrawQuantityConfirm': 'Entnehmen',
+  'hudChrome.bank.withdrawQuantityInput': 'Zu entnehmende Menge',
+  'hudChrome.bank.withdrawQuantityTitle': '{item} entnehmen',
+  'abilityUi.tooltip.selfOnly': 'Nur auf Euch selbst',
+  'itemUi.lootRoll.rolled': '{answered}/{total} gewürfelt',
+  'entities.abilities.sunder_armor.description':
+    'Spaltet die Rüstung des Ziels und verringert sie pro Anwendung um {damage}%. Stapelt sich bis zu 5-mal. Erzeugt sehr viel Bedrohung.',
+  'entities.mobs.training_dummy.name': 'Trainingspuppe',
+  'entities.mobs.yumi_cat.name': 'Yumi',
+  'guide.arenaPage.yumiBody':
+    'Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.',
+  'guide.arenaPage.yumiHeading': 'Yumi beschützen',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Freizeit',
+  'hudChrome.auraEffect.armorPct': 'Verringert Rüstung um {pct}%',
+  'hudChrome.auraEffect.armorPctStacks': 'Verringert Rüstung um {pct}% ({stacks} Stapel)',
+  'hudChrome.auraEffect.increasePct.allStats': 'Erhöht alle Attribute um {pct}%',
+  'hudChrome.auraEffect.increasePct.ap': 'Erhöht Angriffskraft um {pct}%',
+  'hudChrome.auraEffect.increasePct.armor': 'Erhöht Rüstung um {pct}%',
+  'hudChrome.auraEffect.increasePct.int': 'Erhöht Intelligenz um {pct}%',
+  'hudChrome.auraEffect.increasePct.sta': 'Erhöht Ausdauer um {pct}%',
+  'hudChrome.crafting.notAtHub':
+    'Ihr müsst Euch am Handwerksplatz und auf der erforderlichen Stufe befinden, um das herzustellen.',
+  'hudChrome.crafting.recipeNotLearned': 'Ihr habt dieses Rezept noch nicht erlernt.',
+  'hudChrome.crafting.throttled':
+    'Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.',
+  'hudChrome.mobile.chatPlaceholder': 'Sag etwas...',
+  'hudChrome.mobile.hideKeyboard': 'Tastatur ausblenden',
+  'hudChrome.unitFrame.partyChip': 'Gruppe',
+  'yumi.banner.sudden': 'PLÖTZLICHER TOD! Die Yumis halten die Stellung!',
+  'yumi.banner.teleport': 'Die Yumis teleportieren!',
+  'yumi.bracket3': 'Yumi 3 gegen 3',
+  'yumi.bracket5': 'Yumi 5 gegen 5',
+  'yumi.end.loss': 'NIEDERLAGE! Eure Yumi ist gefallen.',
+  'yumi.end.win': 'SIEG! Yumi ist in Sicherheit!',
+  'yumi.enterQueue': 'Yumi beschützen beitreten!',
+  'yumi.error.partyTooBig3':
+    'Bei Yumi beschützen 3 gegen 3 ist eine Gruppe von bis zu drei Spielern erlaubt.',
+  'yumi.error.partyTooBig5':
+    'Bei Yumi beschützen 5 gegen 5 ist eine Gruppe von bis zu fünf Spielern erlaubt.',
+  'yumi.hud.aria': 'Eure Yumi bei {mine} von {max} Gesundheit, gegnerische Yumi bei {theirs}.',
+  'yumi.hud.collapse': 'Die Yumi-beschützen-Leisten einklappen',
+  'yumi.hud.enemyYumi': 'Gegnerische Yumi',
+  'yumi.hud.expand': 'Die Yumi-beschützen-Leisten ausklappen',
+  'yumi.hud.getReady': 'Macht Euch bereit…',
+  'yumi.hud.suddenDeath': 'PLÖTZLICHER TOD',
+  'yumi.hud.teleportIn': 'Yumis teleportieren in {s}',
+  'yumi.hud.title': 'YUMI BESCHÜTZEN',
+  'yumi.hud.yourYumi': 'Eure Yumi',
+  'yumi.log.start': 'Yumi beschützen! Verteidigt Euren Begleiter und jagt ihren.',
+  'yumi.queue.join':
+    'Ihr tretet der Warteschlange für Yumi beschützen bei. Bewacht Euren Begleiter…',
+  'yumi.queue.leave': 'Ihr verlasst die Warteschlange für Yumi beschützen.',
+  'yumi.queue.teamLeave': 'Euer Team verlässt die Warteschlange für Yumi beschützen.',
+  'yumi.respawn.title': 'AM BODEN!',
+  'hudChrome.auth.forgotPrompt': 'Passwort vergessen?',
+  'hudChrome.auth.forgotTitle': 'Passwort zurücksetzen',
+  'hudChrome.auth.forgotHint':
+    'Gib deinen Benutzernamen ein und wir senden einen Link zum Zurücksetzen an die hinterlegte E-Mail-Adresse.',
+  'hudChrome.auth.forgotUsername': 'Benutzername',
+  'hudChrome.auth.forgotSubmit': 'Link zum Zurücksetzen senden',
+  'hudChrome.auth.forgotSent':
+    'Falls ein Konto mit diesem Benutzernamen eine E-Mail-Adresse hinterlegt hat, haben wir einen Link zum Zurücksetzen gesendet. Prüfe deinen Posteingang.',
+  'hudChrome.auth.forgotBack': 'Zurück zur Anmeldung',
+  'hudChrome.auth.resetTitle': 'Neues Passwort wählen',
+  'hudChrome.auth.resetNewPassword': 'Neues Passwort',
+  'hudChrome.auth.resetConfirm': 'Neues Passwort bestätigen',
+  'hudChrome.auth.resetSubmit': 'Passwort aktualisieren',
+  'hudChrome.auth.resetDone': 'Dein Passwort wurde aktualisiert. Du kannst dich jetzt anmelden.',
+  'hudChrome.auth.resetMismatch': 'Die Passwörter stimmen nicht überein.',
+  'hudChrome.auth.resetErrInvalid':
+    'Dieser Link zum Zurücksetzen ist ungültig oder abgelaufen. Fordere einen neuen an.',
+  'entities.items.arcane_dust.name': 'Arkanstaub',
+  'entities.items.arcane_essence.name': 'Arkanessenz',
+  'entities.items.arcane_shard.name': 'Arkansplitter',
+  'entities.items.chunk_of_ore.name': 'Erzbrocken',
+  'entities.quests.q_prof_intro.completion':
+    'Siehst du? Erz in deinem Rucksack und Schwielen an deinen Händen. Bleib beim Bergbau, Holzfällen und Kräutersammeln, während du die Straßen bereist. Wenn du wieder in der Stadt bist, wirf einen Blick auf die Stadtfokus-Tafel am Markt und die Werkbank in der Nähe. In all dem wartet ein ehrlicher Verdienst, wenn du ihn willst.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Erzbrocken',
+  'entities.quests.q_prof_intro.text':
+    'Jeder in Eastbrook übt neben dem Schwert ein Handwerk aus, {playerName}. Rund um die Stadt gibt es Erzadern, also schwing die Spitzhacke und bring mir 5 Brocken. Bau sie selbst ab, wohlgemerkt; ich werde den Unterschied erkennen.',
+  'entities.quests.q_prof_intro.title': 'Ein Handwerk für jede Hand',
+  'hudChrome.auth.appleChoiceExpired':
+    'Diese Apple-Anmeldung ist abgelaufen. Melde dich bitte erneut mit Apple an.',
+  'hudChrome.auth.appleChoiceIntro':
+    'Erstelle ein neues Konto oder verknüpfe Apple mit einem bestehenden Konto.',
+  'hudChrome.auth.appleError':
+    'Die Anmeldung mit Apple ist fehlgeschlagen. Bitte versuche es erneut.',
+  'hudChrome.auth.appleLoginCta': 'Mit Apple fortfahren',
+  'hudChrome.controller.duplicate': 'Auch an {buttons} gebunden',
+  'hudChrome.dailyRewards.reason.banned':
+    'Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}',
+  'hudChrome.itemHeroicTag': '[HEROISCH]',
+  'hudChrome.itemSoulbound': 'Seelengebunden',
+  'hudChrome.keybinds.categoryPet': 'Begleiter',
+  'hudChrome.keybinds.petAggressive': 'Begleiter: Aggressiv',
+  'hudChrome.keybinds.petAttack': 'Begleiter: Angreifen',
+  'hudChrome.keybinds.petDefensive': 'Begleiter: Defensiv',
+  'hudChrome.keybinds.petStop': 'Begleiter: Stopp',
+  'hudChrome.keybinds.petTaunt': 'Begleiter: Verspotten',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Ein Stück weniger von {item} senden',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Ein Stück mehr von {item} senden',
+  'hudChrome.mobile.hideMenuButtons': 'Menütasten ausblenden',
+  'hudChrome.mobile.showMenuButtons': 'Menütasten anzeigen',
+  'hudChrome.options.changed': '{count} geändert',
+  'hudChrome.options.changedSummary': '{count} gegenüber den Standardwerten geändert',
+  'hudChrome.options.conflictDot': 'Belegungskonflikt',
+  'hudChrome.options.done': 'Fertig',
+  'hudChrome.options.ia.catAccessibilityName': 'Barrierefreiheit',
+  'hudChrome.options.ia.catAccessibilitySub':
+    'Bewegung, Kontrast und angenehme Inhaltsdarstellung.',
+  'hudChrome.options.ia.catAudioSub': 'Lautstärke und Soundoptionen.',
+  'hudChrome.options.ia.catControllerSub': 'Gamepad-Gefühl und Tastenbelegung.',
+  'hudChrome.options.ia.catControlsName': 'Steuerung',
+  'hudChrome.options.ia.catControlsSub': 'Kamera, Bewegung, Kampf und Rückmeldungen.',
+  'hudChrome.options.ia.catGraphicsSub': 'Qualität, Sichtweite und Weltdarstellung.',
+  'hudChrome.options.ia.catInterfaceSub': 'HUD-Skalierung, Fenster, Chat und Einheitenrahmen.',
+  'hudChrome.options.ia.catKeybindsSub': 'Tasten für jede Aktion belegen.',
+  'hudChrome.options.ia.catOverviewName': 'Übersicht',
+  'hudChrome.options.ia.catOverviewSub': 'Angeheftete Grundlagen, Schnellaktionen und Änderungen.',
+  'hudChrome.options.ia.catSystemName': 'Systemeinstellungen',
+  'hudChrome.options.ia.catSystemSub': 'Leistung, Support und Info.',
+  'hudChrome.options.ia.catTouchName': 'Touch-Steuerung',
+  'hudChrome.options.ia.catTouchSub': 'Bildschirmsticks, Blicksteuerung und Tasten.',
+  'hudChrome.options.ia.railDisplay': 'Anzeige',
+  'hudChrome.options.ia.railInput': 'Eingabe',
+  'hudChrome.options.ia.railSystem': 'Systemeinstellungen',
+  'hudChrome.options.keybindCleared': 'Belegung für {action} gelöscht',
+  'hudChrome.options.keybindEvicted':
+    '{key} an {action} gebunden und Belegung von {evicted} entfernt',
+  'hudChrome.options.keybindModifierHint':
+    'Tipp: Du kannst Tastenkombinationen mit Modifikatoren belegen. Halte Umschalt, Strg oder Alt gedrückt, während du eine Taste drückst, um die Kombination zu erfassen, zum Beispiel Umschalt+1.',
+  'hudChrome.options.keybindRebinding':
+    '{action} neu belegen. Drücke eine Taste oder Escape zum Abbrechen.',
+  'hudChrome.options.keybindTaken': 'Taste entfernt',
+  'hudChrome.options.keybindUnbound': '{action} hat keine Taste',
+  'hudChrome.options.legend.back': 'Zurück',
+  'hudChrome.options.legend.category': 'Kategorie',
+  'hudChrome.options.legend.clear': 'Löschen',
+  'hudChrome.options.legend.navigate': 'Navigieren',
+  'hudChrome.options.legend.page': 'Seite',
+  'hudChrome.options.legend.reset': 'Zurücksetzen',
+  'hudChrome.options.legend.select': 'Auswählen',
+  'hudChrome.options.modeOffline': 'Ohne Verbindung',
+  'hudChrome.options.modeOnline': 'Mit Verbindung',
+  'hudChrome.options.overviewConflictAlert':
+    'Einige Tastenbelegungen stehen im Konflikt oder sind nicht belegt.',
+  'hudChrome.options.resetAllBody':
+    'Dadurch werden alle Einstellungen auf ihre Standardwerte zurückgesetzt. Dies kann nicht rückgängig gemacht werden.',
+  'hudChrome.options.resetAllTitle': 'Alle Einstellungen zurücksetzen?',
+  'hudChrome.options.searchEmpty': 'Keine Einstellungen entsprechen deiner Suche.',
+  'hudChrome.options.searchGoTo': 'Zu {category} wechseln',
+  'hudChrome.options.searchPlaceholder': 'Einstellungen durchsuchen',
+  'hudChrome.options.searchScopeAll': 'Alle Einstellungen',
+  'hudChrome.options.searchScopeThis': 'Dieser Abschnitt',
+  'hudChrome.options.sec.about': 'Info',
+  'hudChrome.options.sec.actionBars': 'Aktionsleisten',
+  'hudChrome.options.sec.buttons': 'Tasten',
+  'hudChrome.options.sec.camera': 'Kamera',
+  'hudChrome.options.sec.chat': 'Unterhaltung',
+  'hudChrome.options.sec.combat': 'Kampf',
+  'hudChrome.options.sec.combatTooltips': 'Kampf und Tooltips',
+  'hudChrome.options.sec.content': 'Inhalte',
+  'hudChrome.options.sec.feedback': 'Rückmeldungen',
+  'hudChrome.options.sec.feel': 'Spielgefühl',
+  'hudChrome.options.sec.general': 'Allgemein',
+  'hudChrome.options.sec.hudExtras': 'HUD-Extras',
+  'hudChrome.options.sec.inputMode': 'Eingabemodus',
+  'hudChrome.options.sec.look': 'Blicksteuerung',
+  'hudChrome.options.sec.motionContrast': 'Bewegung und Kontrast',
+  'hudChrome.options.sec.movement': 'Bewegung',
+  'hudChrome.options.sec.panels': 'Fenster',
+  'hudChrome.options.sec.performance': 'Leistung',
+  'hudChrome.options.sec.quality': 'Qualität',
+  'hudChrome.options.sec.scaleText': 'Skalierung und Text',
+  'hudChrome.options.sec.sticks': 'Steuerknüppel',
+  'hudChrome.options.sec.support': 'Hilfe',
+  'hudChrome.options.sec.toggles': 'Schalter',
+  'hudChrome.options.sec.unitFrames': 'Einheitenrahmen',
+  'hudChrome.options.sec.view': 'Sicht',
+  'hudChrome.options.sec.volume': 'Lautstärke',
+  'hudChrome.readyCheck.notReady': 'Nicht bereit',
+  'hudChrome.readyCheck.prompt': '{name} hat einen Bereitschaftscheck gestartet. Bist du bereit?',
+  'hudChrome.readyCheck.ready': 'Bereit',
+  'hudChrome.readyCheck.result':
+    'Bereitschaftscheck: {ready} bereit, {notReady} nicht bereit, {noResponse} ohne Antwort.',
+  'hudChrome.readyCheck.notInPartyError':
+    'Du musst einer Gruppe angehören, um einen Bereitschaftscheck zu starten.',
+  'hudChrome.readyCheck.inProgressError': 'Ein Bereitschaftscheck läuft bereits.',
+  'hudChrome.talents.choicesTab': 'Auswahlmöglichkeiten',
+  'hudChrome.talents.resetChoices': 'Auswahl zurücksetzen',
+  'hudChrome.talents.tierLevel': 'Stufe {n}',
+  'hudChrome.talents.tierLevelLabel': 'Stufe',
+  'itemUi.vendor.sellItemAria': '{item} für {price} verkaufen',
+  'itemUi.vendor.sellRolledWarning':
+    'Zufällig erzeugte Werte können durch Rückkauf nicht wiederhergestellt werden.',
+  'loading.tips.classes':
+    'Tipp: Jede der 9 Klassen spielt sich anders. Probiere einige aus, bevor du dich für eine entscheidest.',
+  'loading.tips.dungeons':
+    'Tipp: Versuche einen Dungeon auf heroischer Schwierigkeit, sobald du für den normalen Schwierigkeitsgrad zu gut ausgerüstet bist. Dich erwartet ein härterer und lohnenderer Kampf.',
+  'loading.tips.guilds':
+    'Tipp: Der Beitritt zu einer Gilde gibt dir einen privaten Chatkanal und eine gemeinsame Liste deiner Gildenmitglieder.',
+  'loading.tips.loadouts':
+    'Tipp: Speichere mehr als eine Talentausrüstung, um zwischen Builds zu wechseln, ohne Punkte doppelt auszugeben.',
+  'loading.tips.market':
+    'Tipp: Auf dem Weltmarkt kannst du mit Spielern aus dem gesamten Reich kaufen und verkaufen.',
+  'loading.tips.professions':
+    'Tipp: Sammel- und Handwerksberufe können parallel zu deiner Kampfklasse erlernt werden.',
+  'loading.tips.pvp':
+    'Tipp: Fordere einen anderen Spieler zu einem freundschaftlichen Duell heraus oder reihe dich für die Arena des Aschenen Kolosseums ein, um deinen Build zu testen.',
+  'loading.tips.talents':
+    'Tipp: Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle.',
 };

@@ -20,12 +20,13 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { dungeonAt, zoneAt } from './data';
+import { DELVES, dungeonAt, zoneAt } from './data';
+import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
 import { aurasSurvivingDeath } from './resurrection';
 import type { SimContext } from './sim_context';
 import type { Entity, SimEvent, Vec3 } from './types';
-import { CAST_COMPLETE_EPS, DT } from './types';
+import { CAST_COMPLETE_EPS, DT, emptyMoveInput } from './types';
 
 // Mobs that despawn after sitting out of combat too long (boss adds that should not
 // litter the world). The idle timer is reset to DAMAGE_IDLE_DESPAWN_SECONDS whenever
@@ -178,12 +179,20 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   p.pos = entry;
   p.prevPos = { ...entry };
   rebucketEntity(ctx, p);
+  // The Drowned Litany finale: in-flight Tolling Bells and Blackwater Mark
+  // puddles must not outlive the death, or the respawned player can be hit
+  // (or insta-killed) by an effect that was already active before they died.
+  clearDrownedLitanyBellsAndMarks(ctx, run);
   p.facing = 0;
+  // A held movement key at the moment of death must not carry over into the respawned
+  // body, or it walks off on its own with no input held (same fix as the graveyard
+  // release/revive flow in spirit.ts).
+  Object.assign(r.meta.moveInput, emptyMoveInput());
   // The Keeper's Toll persists through a delve death too (see resurrection.ts); every
   // other aura clears on respawn.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
-  recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods);
+  recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods, r.meta.equipmentInstance);
   p.hp = Math.max(1, Math.round(p.maxHp * 0.5));
   p.resource =
     p.resourceType === 'mana'
@@ -194,6 +203,19 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   p.targetId = null;
   p.combatTimer = 99;
   p.inCombat = false;
+  // The owner-dead arm of updateDelveCompanion despawns the auto-companion (and
+  // clears run.companion) while the player is dead. Re-spawn her here so she is
+  // back at the player's side promptly on release, same as a fresh delve entry.
+  // Despawn any stale reference first (belt and suspenders: a caller that
+  // releases without an intervening tick, e.g. a direct test/parity drive,
+  // still has a live run.companion at this point) so the guard on
+  // spawnDelveCompanion never no-ops. This draws no rng and does not touch
+  // run.companionReviveUsed, so the once-per-run revive boon is unaffected.
+  const delve = DELVES[run.delveId];
+  if (run.partyKey?.startsWith('solo:') && delve?.autoCompanionId) {
+    if (run.companion) ctx.despawnDelveCompanion(run);
+    ctx.spawnDelveCompanion(run, pid, delve.autoCompanionId);
+  }
   ctx.emit({ type: 'respawn', pid });
 }
 

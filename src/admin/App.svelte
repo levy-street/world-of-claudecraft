@@ -22,7 +22,9 @@
   import Accounts from './pages/Accounts.svelte';
   import Characters from './pages/Characters.svelte';
   import Usage from './pages/Usage.svelte';
+  import TickPerf from './pages/TickPerf.svelte';
   import Moderation from './pages/Moderation.svelte';
+  import ModerationHistoryPage from './pages/ModerationHistoryPage.svelte';
   import SuspiciousPlayers from './pages/SuspiciousPlayers.svelte';
   import DetectionCalibration from './pages/DetectionCalibration.svelte';
   import AntibotConfig from './pages/AntibotConfig.svelte';
@@ -44,7 +46,9 @@
     accounts: Accounts,
     characters: Characters,
     usage: Usage,
+    'tick-perf': TickPerf,
     moderation: Moderation,
+    'moderation-history': ModerationHistoryPage,
     'suspicious-players': SuspiciousPlayers,
     'detection-calibration': DetectionCalibration,
     'antibot-config': AntibotConfig,

@@ -39,6 +39,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: 80, z: 80, label: 'Fallen Chapel' },
     { x: -5, z: -52, label: 'Reliquary Hill' },
     { x: 40, z: 140, label: 'Brightwood Glade' },
+    { x: -11, z: -112, label: 'The Sowfield' },
   ],
   welcome: 'Find Marshal Redbrook in town — he has work for you.',
   welcomeQuestId: 'q_wolves',
@@ -640,8 +641,36 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: -4, z: -14 },
     facing: -2.14,
     color: 0xa04000,
-    questIds: ['q_mine'],
+    questIds: ['q_prof_intro', 'q_mine'],
     greeting: "Whole dig's crawling with those dirt-caked vermin!",
+  },
+  bursar_fernando: {
+    id: 'bursar_fernando',
+    name: 'Bursar Fernando',
+    title: 'The Gilded Strongbox',
+    // east side of the square, facing the approach toward the well and Merchant
+    pos: { x: 13, z: 8 },
+    facing: -Math.PI / 2,
+    color: 0xc9a227,
+    questIds: [],
+    banker: true,
+    greeting: 'Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.',
+  },
+  groundskeeper_bram: {
+    id: 'groundskeeper_bram',
+    name: 'Groundskeeper Bram',
+    title: 'Keeper of the Sowfield',
+    // At the Sowfield's north gate with the book of fixtures (vale_cup_layout
+    // BRAM_POS). dynamic: the generic surface-placement loop skips him; the
+    // Vale Cup module spawns him at world init under a RESERVED entity id so
+    // adding him never shifts the ctor id sequence (parity goldens pin nextId).
+    pos: { x: -6, z: -82 },
+    facing: Math.PI,
+    color: 0x3f7d34,
+    questIds: [],
+    dynamic: true,
+    greeting:
+      'The truce holds at the Sowfield, $C: boots and shoulders only. Care to play for the Copper Pail?',
   },
 };
 
@@ -650,6 +679,37 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
 // ---------------------------------------------------------------------------
 
 export const ZONE1_QUESTS: Record<string, QuestDef> = {
+  // Professions onboarding (issue #1701 follow-up): the very first quest a
+  // new adventurer can take, no prerequisite and no minLevel gate (defaults
+  // to available at level 1, same as q_wolves). Gathering/crafting/town focus
+  // are otherwise entirely undiscoverable: nothing in the starting flow ever
+  // points a new player at them (see the professions.ts GATHERING_PROFESSIONS
+  // comment: no level/quest/tool gate exists at the mechanic level either, so
+  // there was no natural "unlock" moment to hang a quest off before this).
+  // A `collect` objective on the dedicated chunk_of_ore quest item (kind
+  // 'quest', src/sim/content/items.ts), not the mining node's shared
+  // bone_fragments yield: that material also drops from mobs, salvage, and
+  // the market (see #1708 review), so a collect objective targeting it could
+  // be completed without ever mining. chunk_of_ore is only ever granted by an
+  // ore-node harvest while this quest is active (the NODE_QUEST_GRANT gate in
+  // professions/gathering.ts, mirroring the mob-loot questId gate other
+  // collect quests use), and being kind 'quest' it can't be sold or lost to
+  // the vendor's Sell Junk button either. foreman_odell is the existing
+  // mine-themed NPC (already gives q_mine) so this reuses him rather than
+  // inventing a new trainer NPC.
+  q_prof_intro: {
+    id: 'q_prof_intro',
+    name: 'A Trade for Every Hand',
+    giverNpcId: 'foreman_odell',
+    turnInNpcId: 'foreman_odell',
+    text: "Every soul in Eastbrook works a trade besides the sword, $N. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+    completionText:
+      "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+    objectives: [{ type: 'collect', itemId: 'chunk_of_ore', count: 5, label: 'Chunk of Ore' }],
+    xpReward: 150,
+    copperReward: 50,
+    itemRewards: {},
+  },
   q_wolves: {
     id: 'q_wolves',
     name: 'Wolves at the Door',
@@ -1004,6 +1064,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
 };
 
 export const ZONE1_QUEST_ORDER = [
+  'q_prof_intro',
   'q_wolves',
   'q_boars',
   'q_spiders',

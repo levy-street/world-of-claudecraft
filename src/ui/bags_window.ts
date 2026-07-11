@@ -13,9 +13,11 @@
 // painter owns no cross-window state of its own. The HUD keeps toggleBags() +
 // onInventoryChanged() as the coordinator and calls render() to repaint.
 //
-// No raw hex: the item-quality color comes from the shared
-// QUALITY_COLOR map, and the unranked fallback is the --color-quality-default token
-// (not a literal white hex).
+// Chrome is the shared AAA window frame (window_frame.ts) mounted on an inner
+// container so the #bags root stays pristine for the docking CSS; the slot grid uses
+// the .item-cell grammar (rarity via data-quality from the quality tokens, no raw
+// hex in the painter), the filter is a .filter-row / .chip / .search-field header,
+// and empty states use .empty-state.
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
@@ -34,41 +36,59 @@ import {
 } from './bag_filter';
 import {
   type BagMode,
+  bagDestroyAction,
   bagItemAction,
   bagQualityKey,
   bagShiftLinks,
+  bagStackIndex,
   bagTooltipHintKey,
+  bankDepositOpensPrompt,
   buildBagBar,
   buildBagGrid,
+  resolveDepositSubmit,
 } from './bags_view';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
-import { iconDataUrl, QUALITY_COLOR } from './icons';
+import { iconDataUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
-import { svgIcon } from './ui_icons';
+import { tSim } from './sim_i18n';
+import { renderWindowFrame } from './window_frame';
+import type { WindowFrameDescriptor } from './window_frame_view';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
+
+// A closable frame WITH the sticky footer: the bag bar, filter header, and slot
+// grid render into the scrollable body, and the player's money lives in the
+// pinned .window-footer (the classic bags anatomy). It used to sit as the last
+// child of the scrollable body, where the touch sheet pushed it below the fold
+// and the coin readout was effectively invisible on mobile (live maintainer
+// feedback). Reuses the existing bag title + close keys. Instance-parameterized
+// on the '#bags' id (title id 'bags-title').
+const BAGS_FRAME: WindowFrameDescriptor = {
+  id: 'bags',
+  titleKey: 'itemUi.bags.title',
+  closeLabelKey: 'itemUi.bags.close',
+  footer: true,
+};
 
 // Monotonic id source for the ad-hoc prompt dialogs' aria-labelledby target, so the
 // id never couples to class ordering (was prompt.classList[last]).
 let promptDialogSeq = 0;
 
-// The ad-hoc discard / sell quantity prompts mount into #prompt-stack (outside #bags).
-// A window-level close() removes any that are open so it never leaves an orphaned
-// aria-modal dialog floating over the closed window (the show* paths already clear a
-// prior same-type prompt with these classes).
-const BAG_PROMPT_SELECTOR = '.discard-item-prompt, .sell-quantity-prompt';
-function dismissBagPrompts(): void {
+// The ad-hoc discard / sell / bank-deposit quantity prompts mount into #prompt-stack
+// (outside #bags). A window-level close() removes any that are open so it never leaves
+// an orphaned aria-modal dialog floating over the closed window (the show* paths
+// already clear a prior same-type prompt with these classes).
+const BAG_PROMPT_SELECTOR = '.discard-item-prompt, .sell-quantity-prompt, .bank-deposit-prompt';
+// Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
+// which hide #bags without running close(): they must not strand a still-visible
+// prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
+export function dismissBagPrompts(): void {
   for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) p.remove();
 }
-
-// The unranked quality fallback as a CSS custom property. The shared
-// QUALITY_COLOR map carries the real per-quality hex; this token covers the rare
-// item with no quality field, so no raw hex lives in the painter.
-const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
@@ -100,6 +120,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   /** Localized $WOC on-chain balance markup for the money footer. */
   wocBalanceHtml(): string;
   hideTooltip(): void;
+  /** True when this click is the release of a long-press tooltip peek, so the
+   *  stack's action (use / sell / deposit / feed) must be SUPPRESSED. Wired to the
+   *  shared Hud TouchPeekGuard; a plain tap and every desktop click return false. */
+  consumePeek(): boolean;
   cancelPetFeed(): void;
   // Non-modal focus capture/return (WCAG 2.4.3). Bags rides alongside vendor / trade /
   // market, so it does NOT trap focus; it only records its opener on open and returns
@@ -115,9 +139,20 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   isMarketSell(): boolean;
   /** The Ravenpost mailbox is open on its Send tab (clicks attach parcels). */
   isMailAttach(): boolean;
+  /** The bank window is open (docked beside the bags): a click deposits the stack. */
+  isBankOpen(): boolean;
   pendingPetFeed(): boolean;
   // Cross-window commands the bag click fans out to.
   closeVendor(): void;
+  /** Close the bank cluster (bank + this bags companion). On touch the bank hides
+   *  its own x-btn under the pairing, so the bags x-btn is the cluster's single
+   *  close control, mirroring closeVendor. */
+  closeBank(): void;
+  /** Fired after close() finished its teardown. The HUD uses it to undock a still
+   *  open bank companion on touch (the tray/minimap bags toggle hides bags without
+   *  closing the bank; dropping the docking class lets the mobile standalone
+   *  full-screen rule take over instead of leaving a half-width orphan). */
+  onClosed(): void;
   addItemToTrade(itemId: string): void;
   /** Stage a bag item for a Market listing (selects it + repaints the market). */
   stageMarketSell(itemId: string): void;
@@ -180,6 +215,26 @@ export class BagsWindow {
     this.deps.cancelPetFeed();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
+    this.deps.onClosed();
+  }
+
+  // The window close control (wired to the shared frame's onClose). On touch the
+  // vendor / bank clusters hide their LEFT panel's own close, so this bags close is
+  // the whole cluster's single close control: it closes the companion window too
+  // (mirroring closeVendor's / onBankClosed's teardown), never leaving a half-screen
+  // orphan. Desktop and standalone touch fall through to the plain close().
+  private handleClose(): void {
+    if (document.body.classList.contains('mobile-touch')) {
+      if (this.deps.vendorOpen()) {
+        this.deps.closeVendor();
+        return;
+      }
+      if (this.deps.isBankOpen()) {
+        this.deps.closeBank();
+        return;
+      }
+    }
+    this.close();
   }
 
   render(): void {
@@ -189,27 +244,30 @@ export class BagsWindow {
     // rebuild, so capture its scroll offset and reapply it to the fresh grid:
     // otherwise using an item (e.g. a potion) snaps the list back to the top.
     const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
-    el.appendChild(this.buildBagBar());
+    // Stamp the shared AAA window frame onto an INNER mount, leaving the #bags root
+    // pristine (never a builder class / role / aria): the root stays the docking
+    // anchor the cluster CSS targets by id, and .window:has(> .window-frame) makes it
+    // the clipping flex column the frame fills. The bag bar, filter header, and slot
+    // grid render into the scrollable body; the money readout is pinned in the
+    // frame's sticky footer so it stays visible however far the grid scrolls.
+    const mount = document.createElement('div');
+    const { body, footer } = renderWindowFrame(mount, BAGS_FRAME, {
+      onClose: () => this.handleClose(),
+    });
+    body.appendChild(this.buildBagBar());
     // Skip the chip/search row entirely when the bag is empty: a full filter bar
     // above a grid of empty squares is just noise.
-    if (world.inventory.length > 0) el.appendChild(this.buildFilterBar());
+    if (world.inventory.length > 0) body.appendChild(this.buildFilterBar());
     const grid = document.createElement('div');
     grid.className = 'bag-grid';
     this.fillGrid(grid);
-    el.appendChild(grid);
-    grid.scrollTop = prevScrollTop;
+    body.appendChild(grid);
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
     moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.moneyHtml(world.copper)}`;
-    el.appendChild(moneyRow);
-    el.querySelector('[data-close]')?.addEventListener('click', () => {
-      if (this.deps.vendorOpen() && document.body.classList.contains('mobile-touch')) {
-        this.deps.closeVendor();
-        return;
-      }
-      this.close();
-    });
+    (footer ?? body).appendChild(moneyRow);
+    el.replaceChildren(mount);
+    grid.scrollTop = prevScrollTop;
   }
 
   // The classic bag bar: the implicit backpack, the 4 equip sockets, and the
@@ -321,13 +379,13 @@ export class BagsWindow {
     bar.className = 'bag-filter-bar';
 
     const chips = document.createElement('div');
-    chips.className = 'bag-chips';
+    chips.className = 'filter-row';
     chips.setAttribute('role', 'group');
     chips.setAttribute('aria-label', t('hudChrome.bags.filterGroupAria'));
     for (const category of BAG_CATEGORIES) {
       const chip = document.createElement('button');
       chip.type = 'button';
-      chip.className = `bag-chip${this.filter.category === category ? ' active' : ''}`;
+      chip.className = 'chip';
       chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
       chip.setAttribute('aria-pressed', this.filter.category === category ? 'true' : 'false');
       chip.addEventListener('click', () => {
@@ -344,6 +402,8 @@ export class BagsWindow {
     const tools = document.createElement('div');
     tools.className = 'bag-tools';
 
+    const searchField = document.createElement('div');
+    searchField.className = 'search-field';
     const search = document.createElement('input');
     search.type = 'search';
     search.className = 'bag-search';
@@ -355,7 +415,8 @@ export class BagsWindow {
       this.persistFilter();
       this.refreshGrid();
     });
-    tools.appendChild(search);
+    searchField.appendChild(search);
+    tools.appendChild(searchField);
 
     const sort = document.createElement('select');
     sort.className = 'bag-sort';
@@ -386,11 +447,11 @@ export class BagsWindow {
     const world = this.deps.world();
     const model = buildBagGrid(world.inventory, (id) => ITEMS[id], this.filter, world.bagCapacity);
     if (model.state === 'empty') {
-      grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
+      grid.innerHTML = `<div class="empty-state">${esc(t('itemUi.bags.empty'))}</div>`;
       return;
     }
     if (model.state === 'noMatch') {
-      grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
+      grid.innerHTML = `<div class="empty-state">${esc(t('hudChrome.bags.noMatch'))}</div>`;
       return;
     }
     for (const s of model.visible) {
@@ -398,10 +459,12 @@ export class BagsWindow {
       if (!item) continue;
       const row = document.createElement('button');
       row.type = 'button';
-      row.className = `bag-item q-${bagQualityKey(item)}`;
-      const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
+      // AAA item-cell grammar: rarity border from the quality tokens via
+      // data-quality (no painter-set colour prop), the stack count in the corner,
+      // and the shared focus ring (components.css .window-frame .item-cell).
+      row.className = 'item-cell';
+      row.setAttribute('data-quality', bagQualityKey(item));
       const itemName = itemDisplayName(item);
-      row.style.setProperty('--bag-slot-quality', qColor);
       row.setAttribute(
         'aria-label',
         t('itemUi.bags.itemAria', {
@@ -409,14 +472,25 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      row.innerHTML = `${this.deps.itemIcon(item)}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      row.innerHTML = `${this.deps.itemIcon(item)}${s.count > 1 ? `<span class="item-cell-count">${esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) }))}</span>` : ''}`;
       row.addEventListener('click', (ev) => {
+        // On touch, the click that ends a long-press peek inspects the stack (its
+        // tooltip is already shown) instead of running its action (use / sell /
+        // deposit / feed): the release dismisses the tooltip and fires nothing. A
+        // plain tap / desktop click falls through.
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
         if (ev.shiftKey && bagShiftLinks(this.bagMode())) {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
         const action = bagItemAction(item, this.bagMode());
         switch (action) {
+          case 'transferBlockedSoulbound':
+            this.deps.showError(t('hudChrome.itemSoulbound'));
+            return;
           case 'trade':
             this.deps.addItemToTrade(s.itemId);
             break;
@@ -438,6 +512,31 @@ export class BagsWindow {
           case 'vendorSell':
             this.sellBagItem(s, ev);
             break;
+          case 'bankDeposit': {
+            // The command is inventory-index-based, so resolve the exact clicked stack
+            // by reference (duplicate stacks / distinct instanced copies share an
+            // itemId); a stale click whose stack already left the bags is a no-op.
+            const index = bagStackIndex(this.deps.world().inventory, s);
+            if (index < 0) break;
+            if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+              this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)));
+            } else {
+              // Whole-stack deposit (omitted count); an instanced slot always moves whole.
+              this.deps.world().bankDeposit(index);
+              this.deps.hideTooltip();
+              // Bank ops emit no client repaint event and the bags grid has no per-frame
+              // refresh (only the bank grid does), so repaint here like the use / equip
+              // local-action cases, not a bespoke path.
+              this.render();
+            }
+            break;
+          }
+          case 'bankDepositBlockedQuest':
+            // The sim would refuse this ('You cannot store quest items in the bank.');
+            // pre-empt with the same deny wording via its established sim key (rendered
+            // through the shared showError pipe), and send nothing.
+            this.deps.showError(tSim('error.bankQuestItem'));
+            return;
           case 'petFeedBlocked':
             this.deps.showError(t('hud.pet.petEatsFoodOnly'));
             return;
@@ -463,9 +562,38 @@ export class BagsWindow {
         }
       });
       row.addEventListener('contextmenu', (ev) => {
-        if (!this.deps.vendorOpen() || (!ev.ctrlKey && !ev.metaKey)) return;
+        // A touch long-press belongs to the tooltip peek (the TouchPeekGuard
+        // family): Chromium synthesizes contextmenu at ~500ms on a touch hold,
+        // beating the 950ms peek timer, so a touch-sourced right-click inspects
+        // and never sells or destroys. Desktop mouse right-click keeps both
+        // affordances; an undefined pointerType on a mobile-touch device fails
+        // safe to inspect (Firefox Android fires contextmenu as a MouseEvent).
+        const pointerType = (ev as PointerEvent).pointerType;
+        if (
+          pointerType === 'touch' ||
+          pointerType === 'pen' ||
+          (document.body.classList.contains('mobile-touch') && pointerType !== 'mouse')
+        ) {
+          ev.preventDefault();
+          return;
+        }
+        // At a vendor, Ctrl/Meta right-click owns the split-stack sell prompt.
+        if (this.deps.vendorOpen()) {
+          if (!ev.ctrlKey && !ev.metaKey) return;
+          ev.preventDefault();
+          this.sellBagItem(s, ev);
+          return;
+        }
+        // Otherwise right-click destroys the item, reusing the quest-item destroy
+        // prompt (confirm + quantity). noDiscard items stay protected (issue 1501).
+        const destroy = bagDestroyAction(item, this.bagMode());
+        if (destroy === 'none') return;
         ev.preventDefault();
-        this.sellBagItem(s, ev);
+        if (destroy === 'discardBlocked') {
+          this.deps.showError(t('hudChrome.bags.cannotDestroy'));
+          return;
+        }
+        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
       });
       if (!this.deps.tradeOpen() && !this.deps.vendorOpen() && this.deps.isHotbarItemId(s.itemId)) {
         row.draggable = true;
@@ -482,20 +610,35 @@ export class BagsWindow {
         });
       }
       this.deps.attachTooltip(row, () => {
-        const key = bagTooltipHintKey(item, this.bagMode());
+        const mode = this.bagMode();
+        const key = bagTooltipHintKey(item, mode);
         const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
-        const link = bagShiftLinks(this.bagMode())
+        // Advertise the shift-click partial deposit on a splittable stack, the bank
+        // window's withdrawPartialHint twin (tied to the deposit hint arm so a
+        // blocked quest item never shows it).
+        const partial =
+          key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)
+            ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
+            : '';
+        // Advertise the right-click destroy affordance (issue 1501) only when the item is
+        // actually destroyable here, so junk items are discoverable without a menu.
+        const destroy =
+          bagDestroyAction(item, mode) === 'discard'
+            ? `<div class="tt-sub">${esc(t('hudChrome.bags.rightClickDestroy'))}</div>`
+            : '';
+        const link = bagShiftLinks(mode)
           ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
           : '';
-        return this.deps.itemTooltip(item) + extra + link;
+        return this.deps.itemTooltip(item) + extra + partial + destroy + link;
       });
       grid.appendChild(row);
     }
     // Free-slot squares (unfiltered view only): the classic empty sockets that
-    // make the remaining capacity visible at a glance. Decorative, not focusable.
+    // make the remaining capacity visible at a glance. Decorative, not focusable
+    // (an .is-empty item-cell with no data-quality and no tab stop).
     for (let i = 0; i < model.emptyCells; i++) {
       const cell = document.createElement('div');
-      cell.className = 'bag-item empty';
+      cell.className = 'item-cell is-empty';
       cell.setAttribute('aria-hidden', 'true');
       grid.appendChild(cell);
     }
@@ -521,6 +664,7 @@ export class BagsWindow {
       mailAttach: this.deps.isMailAttach(),
       marketSell: this.deps.isMarketSell(),
       vendorOpen: this.deps.vendorOpen(),
+      bankDeposit: this.deps.isBankOpen(),
       petFeed: this.deps.pendingPetFeed(),
     };
   }
@@ -586,9 +730,29 @@ export class BagsWindow {
     };
     prompt.addEventListener('keydown', (e) => {
       const ke = e as KeyboardEvent;
+      // Escape: stopPropagation, not just preventDefault. The input layer's
+      // window-level keydown runs the global escape action (closeAll) regardless of
+      // defaultPrevented, and prompt BUTTONS are not tag-exempt like inputs, so
+      // without it one keypress dismisses the prompt AND closes the whole window.
       if (ke.key === 'Escape') {
         ke.preventDefault();
+        ke.stopPropagation();
         dismissAndReturn();
+        return;
+      }
+      // Enter / Space: stopPropagation for the same reason, keeping the default so
+      // native activation (Enter/Space on the confirm and cancel buttons) survives.
+      // A submit handler on the quantity input runs at the target phase and removes
+      // the prompt DURING this keydown, so a window-level gate keyed on the prompt's
+      // presence runs too late: without the stop, the same press hits the global
+      // chat/jump bind and steals the WCAG 2.4.3 focus return. The event path is
+      // fixed at dispatch, so this listener still runs after the detach; only THEN
+      // cancel the default too, or the browser runs the key's activation against
+      // the freshly re-landed focus (Enter ghost-clicking [data-window-close] and closing
+      // the whole window).
+      if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') {
+        ke.stopPropagation();
+        if (!prompt.isConnected) ke.preventDefault();
         return;
       }
       if (ke.key !== 'Tab') return;
@@ -654,7 +818,7 @@ export class BagsWindow {
       // detaching the opener slot, so land on the always-present window close button
       // rather than letting focus fall to <body>. dismiss() cleared inert first, so this
       // focus is not dropped into a still-inert subtree.
-      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+      (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
     };
     confirm.addEventListener('click', submit);
     cancel.addEventListener('click', dismissAndReturn);
@@ -713,6 +877,72 @@ export class BagsWindow {
       // 2.4.3): it survives the sell, so unlike discard there is no rebuild to dodge
       // (cancel and Escape return via dismissAndReturn). dismiss() cleared inert first.
       opener?.focus();
+    };
+    confirm.addEventListener('click', submit);
+    cancel.addEventListener('click', dismissAndReturn);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submit();
+    });
+    stack.appendChild(prompt);
+    window.setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 0);
+  }
+
+  // The partial-deposit prompt (shift-click a splittable stack while the bank is
+  // open), cloned from the QA-hardened bank withdraw prompt: index-based, and AT
+  // SUBMIT it re-resolves the live slot and refuses on an itemId mismatch (the bags
+  // can repaint under the open prompt) while clamping the count to the live stack.
+  // Reuses this window's installPromptDialog (role/aria-modal/aria-labelledby, the
+  // Tab cycle, Escape preventDefault+stopPropagation, the #bags inert set/clear, and
+  // focus return) and the shared prompt cancel label.
+  private showDepositQuantityPrompt(index: number, captured: InvSlot, maxCount: number): void {
+    dismissBagPrompts();
+    const opener = document.activeElement as HTMLElement | null;
+    const item = ITEMS[captured.itemId];
+    const stack = document.getElementById('prompt-stack');
+    if (!stack) return;
+    const prompt = document.createElement('div');
+    prompt.className = 'prompt panel bank-deposit-prompt';
+    const itemName = item ? itemDisplayName(item) : captured.itemId;
+    prompt.innerHTML = `<div class="prompt-text">${esc(t('hudChrome.bank.depositQuantityTitle', { item: itemName }))}</div>`;
+    const input = document.createElement('input');
+    input.className = 'prompt-number';
+    input.type = 'number';
+    input.setAttribute('aria-label', t('hudChrome.bank.depositQuantityInput'));
+    input.min = '1';
+    input.max = String(maxCount);
+    input.step = '1';
+    input.value = '1';
+    const confirm = document.createElement('button');
+    confirm.className = 'btn';
+    confirm.textContent = t('hudChrome.bank.depositQuantityConfirm');
+    const cancel = document.createElement('button');
+    cancel.className = 'btn';
+    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
+    const close = () => prompt.remove();
+    prompt.append(input, confirm, cancel);
+    const { dismiss, dismissAndReturn } = this.installPromptDialog(prompt, opener, close);
+    const submit = () => {
+      // Re-resolve the live slot at the captured index: depositing the WRONG item
+      // (the bags repainted under the prompt) is worse than dismissing. resolveDepositSubmit
+      // returns null to refuse on a mismatch, else the count clamped to the live stack.
+      const live = this.deps.world().inventory[index];
+      const count = resolveDepositSubmit(live, captured, Number(input.value) || 0, maxCount);
+      if (count === null) {
+        dismiss();
+        (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+        return;
+      }
+      this.deps.world().bankDeposit(index, count);
+      dismiss();
+      this.deps.hideTooltip();
+      // render() rebuilds the grid, detaching the opener slot, so land focus on the
+      // always-present close button rather than dropping it to <body>. dismiss()
+      // cleared inert first, so this focus is not lost into a still-inert subtree.
+      this.render();
+      (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
     };
     confirm.addEventListener('click', submit);
     cancel.addEventListener('click', dismissAndReturn);

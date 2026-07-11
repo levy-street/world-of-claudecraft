@@ -10,11 +10,20 @@
 // UX contract: this side only LOGS and forwards whitelisted payloads
 // (electron/update_events.cjs) to the renderer over 'desktop-update-event';
 // the renderer renders the t()-localized toast and calls
-// 'desktop-update-install' when the player picks "restart now". Downloads are
-// automatic; if the player ignores the toast the update installs on quit
-// (autoInstallOnAppQuit).
+// 'desktop-update-install' when the player picks "restart now". Downloads
+// start as soon as an offered update passes the cross-track origin guard
+// (electron/update_guard.cjs); if the player ignores the toast the update
+// installs on quit (autoInstallOnAppQuit).
+//
+// Track safety: this install reads ONLY the update channel derived from its
+// own baked API origin (production origin: 'latest'; anything else: 'dev'),
+// and it refuses to download an update whose feed-file wocApiOrigin stamp
+// differs from that origin. Both are defense in depth behind the build-time
+// split in scripts/electron-builder-config.mjs; see the issue this closes:
+// a dev-origin artifact on the production feed must never install.
 
 const { shouldNotifyProgress, updateEventPayload } = require('./update_events.cjs');
+const { evaluateUpdateOffer } = require('./update_guard.cjs');
 
 const FIRST_CHECK_DELAY_MS = 15_000;
 const RECHECK_INTERVAL_MS = 4 * 60 * 60 * 1000;
@@ -44,15 +53,38 @@ function loadAutoUpdater({ isPackaged } = {}) {
   return null;
 }
 
-function initUpdater({ ipcMain, log, getWindow, isTrusted, isPackaged }) {
-  const autoUpdater = loadAutoUpdater({ isPackaged });
+function initUpdater({
+  ipcMain,
+  log,
+  getWindow,
+  isTrusted,
+  isPackaged,
+  apiOrigin,
+  updateChannel,
+  autoUpdater: injectedAutoUpdater,
+}) {
+  // injectedAutoUpdater is a test seam only (tests/electron_updater_track.test.ts);
+  // electron/main.cjs never passes it, so a real app always loads the vendor bundle.
+  const autoUpdater = injectedAutoUpdater ?? loadAutoUpdater({ isPackaged });
   if (!autoUpdater) {
     log.warn('[updater] electron-updater bundle missing; auto-update disabled this session');
     return null;
   }
 
   autoUpdater.logger = log;
-  autoUpdater.autoDownload = true;
+  // Read the channel derived from this build's own baked API origin, never the
+  // one in the shipped app-update.yml: even an artifact packaged with a wrong
+  // publish config stays on its origin's track. electron-updater's channel
+  // setter silently flips allowDowngrade to true, so reset it right after (a
+  // production install must never "update" onto an older feed entry).
+  if (typeof updateChannel === 'string' && updateChannel !== '') {
+    autoUpdater.channel = updateChannel;
+    autoUpdater.allowDowngrade = false;
+  }
+  // Downloads are gated on the cross-track origin guard in 'update-available'
+  // below; only a guard-approved download exists for autoInstallOnAppQuit to
+  // install.
+  autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
   const send = (payload) => {
@@ -64,9 +96,26 @@ function initUpdater({ ipcMain, log, getWindow, isTrusted, isPackaged }) {
 
   let lastProgressSent = -1;
   autoUpdater.on('update-available', (info) => {
-    log.info('[updater] update available', { version: info?.version });
+    const verdict = evaluateUpdateOffer({ apiOrigin, info });
+    if (!verdict.ok) {
+      // Never user-facing: the player keeps playing on the build they have.
+      // Loud in the log so the operator finds the wrong-track artifact.
+      log.error('[updater] REFUSED update: baked for another API origin; not downloading', {
+        version: info?.version,
+        offeredOrigin: verdict.offeredOrigin,
+        expectedOrigin: verdict.expectedOrigin,
+      });
+      return;
+    }
+    log.info('[updater] update available', {
+      version: info?.version,
+      originStamp: verdict.stamped ? 'match' : 'absent (pre-split feed file)',
+    });
     lastProgressSent = -1;
     send(updateEventPayload('available', info));
+    autoUpdater
+      .downloadUpdate()
+      .catch((err) => log.warn('[updater] download failed', err?.message ?? String(err)));
   });
   autoUpdater.on('update-not-available', (info) => {
     log.info('[updater] up to date', { version: info?.version });

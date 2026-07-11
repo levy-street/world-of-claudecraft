@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { CAMPS, NPCS, ROADS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../src/sim/data';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
-import { terrainSteepness } from '../src/sim/world';
+import {
+  PITCH,
+  PITCH_CENTER,
+  SOWFIELD_FLAT,
+  STAND_NORTH,
+  STAND_SOUTH,
+  VC_STAND_TIER_DEPTH,
+  VC_STAND_TIER_HEIGHTS,
+} from '../src/sim/vale_cup_layout';
+import { groundHeight, terrainSteepness } from '../src/sim/world';
 
 // The mountain walls of the world (the inter-zone ridges and the outer rim) are
 // meant to be impassable: every crossing outside the road pass must somewhere be
@@ -182,6 +191,38 @@ describe('impassable terrain walls', () => {
           terrainSteepness(p.x, p.z, WORLD_SEED),
           `road vertex (${p.x},${p.z})`,
         ).toBeLessThanOrEqual(CLIMB_LIMIT);
+      }
+    }
+  });
+
+  it('the Vale Cup grandstands are raised but walkable, and the pitch stays flat', () => {
+    // The pitch surface (where the ball rolls) must stay dead flat at the flatten
+    // height, or the ball physics and kickoffs drift.
+    for (const p of [PITCH_CENTER, { x: PITCH.xMin + 2, z: PITCH.zMin + 2 }]) {
+      expect(groundHeight(p.x, p.z, WORLD_SEED), `pitch (${p.x},${p.z})`).toBeCloseTo(
+        SOWFIELD_FLAT.height,
+        3,
+      );
+    }
+    for (const stand of [STAND_NORTH, STAND_SOUTH]) {
+      const front = stand === STAND_NORTH ? stand.zMin : stand.zMax;
+      const away = stand === STAND_NORTH ? 1 : -1;
+      const total = VC_STAND_TIER_DEPTH * VC_STAND_TIER_HEIGHTS.length;
+      // The top tier's walkable ground is raised to its landing height above the pitch.
+      const topZ = front + away * (total - 0.5);
+      expect(groundHeight(0, topZ, WORLD_SEED) - SOWFIELD_FLAT.height).toBeCloseTo(
+        VC_STAND_TIER_HEIGHTS[VC_STAND_TIER_HEIGHTS.length - 1],
+        1,
+      );
+      // ...and every step across the reachable tiers (up to the solid back rail
+      // that caps the stand) stays walkable, so a player can climb the bleachers
+      // without skidding. The terrain drops off behind the back rail, which the
+      // rail collider keeps players from ever reaching.
+      for (let rel = 0; rel <= total - 0.8; rel += 0.5) {
+        const z = front + away * rel;
+        expect(terrainSteepness(0, z, WORLD_SEED), `stand ramp at rel=${rel}`).toBeLessThanOrEqual(
+          CLIMB_LIMIT,
+        );
       }
     }
   });

@@ -15,20 +15,39 @@
 // extracted stylesheet, no literal hex/px in TS). refreshHotbarControls
 // is the one not-cold touch: hud.update() calls it while the window is open so the
 // +/- toggles track action-bar changes without a full rebuild.
+//
+// Chrome comes from the shared window-frame builder (window_frame.ts): a titlebar
+// with a close control, a scrollable body holding the spell list, and a sticky
+// footer that hosts the per-form reset-bar action. Like the vendor / options
+// windows the frame mounts on an INNER container (ensureFrame), so the shared
+// #spellbook root stays a pristine .window.panel (drag/resize/position live on the
+// root). Drag-to-actionbar is unchanged: the row grammar, the dragstart/dragend
+// payload, and the +/- toggle wiring are byte-identical to the pre-frame code.
 
 import { audio } from '../game/audio';
 import { ABILITIES, CLASSES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef } from '../sim/types';
 import type { IWorld } from '../world_api';
-import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
 import { formatNumber, t } from './i18n';
 import { iconDataUrl } from './icons';
 import { buildSpellbookView, type SpellbookRow } from './spellbook_view';
-import { svgIcon } from './ui_icons';
+import { renderWindowFrame, type WindowFrameParts } from './window_frame';
+import type { WindowFrameDescriptor } from './window_frame_view';
+
+// A closable, footer-bearing frame with no tab rail: the class kit renders as one
+// scrollable list (the pre-redesign window had no tabs; the ability schools are
+// not modelled in the view core, so a school-tab split would need a core change,
+// out of this painters-only scope). Every key is reused from the ability catalog.
+const SPELLBOOK_FRAME: WindowFrameDescriptor = {
+  id: 'spellbook',
+  titleKey: 'abilityUi.spellbook.title',
+  closeLabelKey: 'abilityUi.spellbook.close',
+  footer: true,
+};
 
 /**
  * Hud-supplied glue. The spellbook renders from IWorld + these callbacks; it never
@@ -50,6 +69,9 @@ export interface SpellbookWindowDeps {
   abilityTooltip(known: ResolvedAbility): string;
   /** Ability ids currently on the action bar. */
   barAbilityIds(): string[];
+  /** The hotbar's ability id per bar slot (index 0 = barSlot 1), used to derive
+   *  each row's mobile action-ring page (Phase 4, touch-only presentation). */
+  abilityIdByBarSlot(): (string | null)[];
   /** The action bar has at least one empty slot. */
   hasFreeSlot(): boolean;
   /** Place an ability on the first free slot; returns whether it changed. */
@@ -66,11 +88,25 @@ export interface SpellbookWindowDeps {
 
 export class SpellbookWindow {
   private openerFocus: HTMLElement | null = null;
+  // Signature of the resolved abilities the last render painted (id/rank/cost/
+  // cast/cooldown). Talent allocation while the window is open reassigns
+  // world.known with new numbers; comparing this per frame lets tickOpen rebuild
+  // the row summaries so their cost/cast/cooldown never go stale (tooltip parity).
+  private lastKnownSig = '';
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
 
+  // Cheap content signature of the fields a row summary displays. Reference
+  // equality on world.known will not do: the online mirror rebuilds that array
+  // every snapshot, so only the VALUES tell us a talent actually changed a number.
+  private static knownSig(known: readonly ResolvedAbility[]): string {
+    let sig = '';
+    for (const k of known) sig += `${k.def.id}:${k.rank}:${k.cost}:${k.castTime}:${k.cooldown}|`;
+    return sig;
+  }
+
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.deps.root().style.display === 'flex';
   }
 
   toggle(): void {
@@ -83,13 +119,13 @@ export class SpellbookWindow {
     this.openerFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.render();
-    this.deps.root().style.display = 'block';
-    (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+    this.deps.root().style.display = 'flex';
+    (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
   }
 
   close(): void {
     const el = this.deps.root();
-    if (el.style.display !== 'block') {
+    if (el.style.display !== 'flex') {
       this.openerFocus = null;
       return;
     }
@@ -99,9 +135,71 @@ export class SpellbookWindow {
     this.openerFocus = null;
   }
 
-  render(): void {
+  // Stamp the shared window frame cold at first open, then reuse it. The frame
+  // mounts on an inner container so the #spellbook root stays a pristine
+  // .window.panel; an intact mounted frame (its body present) is the reuse marker.
+  private ensureFrame(): WindowFrameParts {
     const el = this.deps.root();
+    const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
+    const body = mounted?.querySelector<HTMLElement>('.window-body');
+    if (mounted && body) {
+      return {
+        root: mounted,
+        body,
+        footer: mounted.querySelector<HTMLElement>('.window-footer'),
+        tabButtons: [],
+      };
+    }
+    const mount = document.createElement('div');
+    const parts = renderWindowFrame(mount, SPELLBOOK_FRAME, { onClose: () => this.close() });
+    el.replaceChildren(mount);
+    return parts;
+  }
+
+  // Per-frame entry while the window is open. Rebuilds the whole list only when a
+  // resolved ability's numbers changed (a talent allocation reassigns world.known),
+  // so row summaries reflect current cost/cast/cooldown; otherwise it just does the
+  // cheap in-place +/- toggle refresh. Hover tooltips resolve live regardless (see
+  // appendRow), so this covers the always-visible row text, not the tooltip.
+  tickOpen(): void {
+    if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {
+      this.rerenderPreservingView();
+      return;
+    }
+    this.refreshHotbarControls();
+  }
+
+  // render() rebuilds the list via innerHTML, and the window root is the scroll
+  // container, so a mid-session rebuild would jump the scroll to top and drop the
+  // keyboard user's focus. Preserve both across the talent-driven rebuild: capture
+  // scrollTop and the focused element's identity (a row or its +/- toggle, keyed by
+  // ability id; or the close/reset control), then restore after the render.
+  private rerenderPreservingView(): void {
+    const root = this.deps.root();
+    // The .window-body is the scroll container now (the frame bounds it as a flex
+    // column); capture its scrollTop, not the root's.
+    const scroller = root.querySelector<HTMLElement>('.window-body');
+    const scrollTop = scroller?.scrollTop ?? 0;
+    const active = document.activeElement as HTMLElement | null;
+    let refocus: string | null = null;
+    if (active && root.contains(active)) {
+      const id = active.dataset.abilityId;
+      if (id && active.classList.contains('spell-hotbar-toggle'))
+        refocus = `.spell-hotbar-toggle[data-ability-id="${id}"]`;
+      else if (id && active.classList.contains('spell-row'))
+        refocus = `.spell-row[data-ability-id="${id}"]`;
+      else if (active.hasAttribute('data-reset-bar')) refocus = '[data-reset-bar]';
+      else if (active.hasAttribute('data-window-close')) refocus = '[data-window-close]';
+    }
+    this.render();
+    const scrollerAfter = root.querySelector<HTMLElement>('.window-body');
+    if (scrollerAfter) scrollerAfter.scrollTop = scrollTop;
+    if (refocus) (root.querySelector(refocus) as HTMLElement | null)?.focus();
+  }
+
+  render(): void {
     const world = this.deps.world();
+    this.lastKnownSig = SpellbookWindow.knownSig(world.known);
     const classId = world.cfg.playerClass;
     const cls = CLASSES[classId];
     const view = buildSpellbookView({
@@ -109,21 +207,25 @@ export class SpellbookWindow {
       abilities: cls.abilities,
       known: world.known,
       barAbilityIds: this.deps.barAbilityIds(),
+      abilityIdByBarSlot: this.deps.abilityIdByBarSlot(),
       hasFreeSlot: this.deps.hasFreeSlot(),
       hasFormBars: this.deps.hasFormBars(),
     });
     const className = classDisplayName(view.classId);
-    markDialogRoot(el, { label: t('abilityUi.spellbook.title') });
-    // "Reset bar" only applies to classes with per-form bars (druid); other classes
-    // have a single bar, so the button is omitted for them.
-    const resetBtnHtml = view.hasFormBars
-      ? `<button type="button" class="x-btn spellbook-reset" data-reset-bar aria-label="${esc(t('abilityUi.spellbook.resetBarAria'))}">${esc(t('abilityUi.spellbook.resetBar'))}</button>`
-      : '';
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('abilityUi.spellbook.title'))} <span class="spellbook-class">${esc(t('abilityUi.spellbook.classSubtitle', { className }))}</span></span><div class="panel-title-actions">${resetBtnHtml}<button type="button" class="x-btn" data-close aria-label="${esc(t('abilityUi.spellbook.close'))}">${svgIcon('close')}</button></div></div>`;
+    const { root: frame, body, footer } = this.ensureFrame();
+    // The frame builder resolves the title key WITHOUT interpolation; the spellbook
+    // title carries the class subtitle, so paint it here onto the frame's title.
+    const titleEl = frame.querySelector<HTMLElement>('.window-title');
+    if (titleEl) {
+      titleEl.innerHTML = `${esc(t('abilityUi.spellbook.title'))} <span class="spellbook-class">${esc(
+        t('abilityUi.spellbook.classSubtitle', { className }),
+      )}</span>`;
+    }
+    body.innerHTML = '';
     const list = document.createElement('div');
     list.className = 'spell-list';
     list.setAttribute('role', 'list');
-    el.appendChild(list);
+    body.appendChild(list);
     for (const row of view.rows) this.appendRow(list, row);
     if (view.empty) {
       const empty = document.createElement('div');
@@ -131,15 +233,27 @@ export class SpellbookWindow {
       empty.textContent = t('abilityUi.spellbook.empty');
       list.appendChild(empty);
     }
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    const resetBtn = el.querySelector('[data-reset-bar]');
-    resetBtn?.addEventListener('pointerdown', (ev) => ev.stopPropagation());
-    resetBtn?.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      this.deps.resetFormBar();
-      audio.click();
-    });
+    // "Reset bar" only applies to classes with per-form bars (druid); other classes
+    // have a single bar, so the footer stays empty for them (collapsed by CSS).
+    if (footer) {
+      footer.innerHTML = '';
+      if (view.hasFormBars) {
+        const resetBtn = document.createElement('button');
+        resetBtn.type = 'button';
+        resetBtn.className = 'btn spellbook-reset';
+        resetBtn.dataset.resetBar = '1';
+        resetBtn.setAttribute('aria-label', t('abilityUi.spellbook.resetBarAria'));
+        resetBtn.textContent = t('abilityUi.spellbook.resetBar');
+        resetBtn.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+        resetBtn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          this.deps.resetFormBar();
+          audio.click();
+        });
+        footer.appendChild(resetBtn);
+      }
+    }
   }
 
   // In-place refresh of the per-row hotbar toggles, called from hud.update() while
@@ -195,6 +309,9 @@ export class SpellbookWindow {
     el.className = `spell-row${known ? '' : ' locked'}`;
     el.tabIndex = 0;
     el.setAttribute('role', 'listitem');
+    // Ability id on the row so a talent-driven rerenderPreservingView() can restore
+    // scroll focus to the same row after it rebuilds the list.
+    el.dataset.abilityId = row.abilityId;
     const locked = !known;
     const summary = known ? this.deps.abilitySummary(known) : '';
     const name = this.abilityName(def);
@@ -229,6 +346,19 @@ export class SpellbookWindow {
       );
       toggle.setAttribute('aria-pressed', row.onBar ? 'true' : 'false');
       toggle.disabled = row.toggleDisabled;
+      // Touch-only page label (Phase 4): names which mobile action-ring page
+      // (Phase 1) this bar-assigned row's slot falls on, so a touch player who
+      // added it from the spellbook knows where to find it on the ring. Desktop
+      // rendering is untouched (row.mobilePage is still computed either way, but
+      // the label never appends without the touch gate).
+      if (row.mobilePage !== null && document.body.classList.contains('mobile-touch')) {
+        const pageLabel = document.createElement('span');
+        pageLabel.className = 'spell-mobile-page';
+        pageLabel.textContent = t('hudChrome.mobile.spellbookPageLabel', {
+          page: this.formatAbilityNumber(row.mobilePage + 1),
+        });
+        el.appendChild(pageLabel);
+      }
       toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
       toggle.addEventListener('click', (ev) => {
         ev.preventDefault();
@@ -254,7 +384,14 @@ export class SpellbookWindow {
         this.deps.setDragAction(null);
         this.deps.clearActionDropTargets();
       });
-      this.deps.attachTooltip(el, () => this.deps.abilityTooltip(known));
+      // Resolve the ability LIVE at hover time, not the object captured at render:
+      // a talent allocated while the spellbook is open reassigns world.known with a
+      // new cost/damage, and this row's tooltip must reflect it even before the next
+      // tickOpen rebuild lands.
+      this.deps.attachTooltip(el, () => {
+        const live = this.deps.world().known.find((k) => k.def.id === known.def.id) ?? known;
+        return this.deps.abilityTooltip(live);
+      });
     } else {
       this.deps.attachTooltip(
         el,

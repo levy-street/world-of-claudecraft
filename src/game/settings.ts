@@ -69,10 +69,14 @@ export const SETTING_RANGES = {
   // touch-only: scales both on-screen joysticks from their anchored corner so
   // players can size the thumb pads to their hands (0.7x–1.3x). 1.0 = stock.
   joystickScale: { min: 0.7, max: 1.3, def: 1 },
-  // touch only: scale the on-screen action button cluster so players with
-  // larger or smaller thumbs can size the controls to taste (default 1.0x).
-  // Surfaced in the Esc menu only on phone-touch devices.
-  actionButtonScale: { min: 0.8, max: 1.3, def: 1 },
+  // touch only: scale the on-screen action button cluster (spell/ability ring +
+  // touch buttons) so players with larger or smaller thumbs can size the controls
+  // to taste. Widened from the old 0.8-1.3 band to 25-200% on live feedback: the
+  // 0.25 floor keeps the buttons on screen (a 0 scale collapsed the whole cluster
+  // to nothing, soft-locking the player), 100% is stock, 200% is the large end.
+  // def stays 1.0x so no stored value migrates (the load clamp only widens the
+  // interval). Surfaced in the Esc menu only on phone-touch devices.
+  actionButtonScale: { min: 0.25, max: 2, def: 1 },
   // touch-only: how far the move thumbstick must travel before it registers
   // movement. Higher values resist accidental drift on a jittery thumb; lower
   // values make the stick more responsive. Default matches the old fixed 0.22.
@@ -135,6 +139,11 @@ export const BOOL_SETTINGS = {
   // the right and the camera joystick on the left, for left-thumb-dominant
   // players. CSS-only swap gated on body.mobile-left-handed; ignored on desktop.
   leftHandedTouch: { def: false },
+  // off by default: shows the fixed camera joystick on touch (hidden otherwise,
+  // reserving no layout space and consuming no touches). Swipe-look on open
+  // gameplay space is the primary camera path; this is an opt-in alternative for
+  // players who prefer a dedicated stick. Gated on body.mobile-camera-joystick-on.
+  mobileCameraJoystick: { def: false },
   // on by default: mask configured swear words in chat with ****. Purely a
   // local display choice; the server sends raw text and each client decides.
   // (Slurs are blocked server-side regardless and never reach here.)

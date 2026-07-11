@@ -2,13 +2,17 @@ import { describe, expect, it } from 'vitest';
 import {
   addNote,
   banAccount,
+  banDailyRewards,
   chatMuteCustom,
   chatMuteHours,
   forceRename,
   liftChatMute,
+  moderateDailyRewardsIp,
+  resetPassword,
   suspendCustom,
   suspendHours,
   unbanAccount,
+  unbanDailyRewards,
   unsuspendAccount,
 } from '../../src/admin/moderation_actions';
 
@@ -41,6 +45,30 @@ describe('moderation_actions', () => {
     const built = banAccount(42, 'cheating');
     if (!('pending' in built)) throw new Error('expected pending');
     expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/ban');
+    expect(built.pending.danger).toBe(true);
+  });
+
+  it('builds reason-required Daily Rewards ban and unban requests', () => {
+    expect(banDailyRewards(42, '')).toEqual({ errorKey: 'alert.noteRequired' });
+    expect(unbanDailyRewards(42, '')).toEqual({ errorKey: 'alert.noteRequired' });
+    const ban = banDailyRewards(42, 'automated play');
+    const unban = unbanDailyRewards(42, 'appeal accepted');
+    if (!('pending' in ban) || !('pending' in unban)) throw new Error('expected pending');
+    expect(ban.pending.endpoint).toBe('/admin/api/moderation/accounts/42/daily-rewards-ban');
+    expect(ban.pending.body).toEqual({ reason: 'automated play' });
+    expect(ban.pending.danger).toBe(true);
+    expect(unban.pending.endpoint).toBe('/admin/api/moderation/accounts/42/daily-rewards-unban');
+    expect(unban.pending.body).toEqual({ reason: 'appeal accepted' });
+  });
+
+  it('builds reason-required Daily Rewards IP ban requests', () => {
+    expect(moderateDailyRewardsIp(42, '203.0.113.4', true, '')).toEqual({
+      errorKey: 'alert.noteRequired',
+    });
+    const built = moderateDailyRewardsIp(42, '203.0.113.4', true, 'multi-account abuse');
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/daily-rewards-ip-ban');
+    expect(built.pending.body).toEqual({ ip: '203.0.113.4', reason: 'multi-account abuse' });
     expect(built.pending.danger).toBe(true);
   });
 
@@ -87,6 +115,30 @@ describe('moderation_actions', () => {
       reason: 'spoke to player, watching for repeat behavior',
     });
     expect(built.pending.danger).toBeUndefined();
+  });
+
+  it('requires a note and an in-bounds password for a password reset', () => {
+    expect(resetPassword(42, 'newpass123', '')).toEqual({ errorKey: 'alert.noteRequired' });
+    expect(resetPassword(42, 'abc', 'lost account')).toEqual({
+      errorKey: 'alert.passwordLength',
+    });
+    expect(resetPassword(42, 'x'.repeat(129), 'lost account')).toEqual({
+      errorKey: 'alert.passwordLength',
+    });
+  });
+
+  it('marks password reset as danger and never renders the password in a row', () => {
+    const built = resetPassword(42, 'newpass123', 'owner verified over email');
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.endpoint).toBe('/admin/api/accounts/42/reset-password');
+    expect(built.pending.body).toEqual({
+      password: 'newpass123',
+      reason: 'owner verified over email',
+    });
+    expect(built.pending.danger).toBe(true);
+    for (const row of built.pending.rows) {
+      expect(row.value).not.toContain('newpass123');
+    }
   });
 
   it('force-rename posts to the character endpoint', () => {

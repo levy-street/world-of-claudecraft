@@ -14,6 +14,374 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.sport_boot.description':
+    'Un calcione alto e lungo verso il punto mirato. La folla lo adora.',
+  'entities.abilities.sport_boot.name': 'Calcione',
+  'entities.abilities.sport_dive.description':
+    'Ti lanci verso il punto mirato. Una palla in traiettoria ti resta incollata.',
+  'entities.abilities.sport_dive.name': 'Tuffo',
+  'entities.abilities.sport_feint.description': 'Uno scatto laterale rapido verso il punto mirato.',
+  'entities.abilities.sport_feint.name': 'Finta',
+  'entities.abilities.sport_hoof.description':
+    "Martella la palla bassa e forte verso l'altra metà campo.",
+  'entities.abilities.sport_hoof.name': 'Spazzata',
+  'entities.abilities.sport_kick.description': 'Spingi la palla rasoterra verso il punto mirato.',
+  'entities.abilities.sport_kick.name': 'Calcio',
+  'entities.abilities.sport_pass.description':
+    'Un passaggio rasoterra deciso al compagno selezionato, anticipando la sua corsa.',
+  'entities.abilities.sport_pass.name': 'Passaggio',
+  'entities.abilities.sport_punt.description': 'Il rinvio del portiere, alto e lontano.',
+  'entities.abilities.sport_punt.name': 'Rinvio Lungo',
+  'entities.abilities.sport_second_wind.description':
+    'Ritrovi le gambe: ti muovi il 50% più veloce per 4 sec.',
+  'entities.abilities.sport_second_wind.name': 'Gambe Fresche',
+  'entities.abilities.sport_shoot.description':
+    'Tieni premuto per caricare la potenza, rilascia per tirare in porta. Con troppa potenza la palla vola alta.',
+  'entities.abilities.sport_shoot.name': 'Tiro',
+  'entities.abilities.sport_shoulder.description':
+    "Una spallata leale da tregua del raccolto. Manda l'avversario a ruzzolare lontano dalla palla.",
+  'entities.abilities.sport_shoulder.name': 'Spallata',
+  'entities.npcs.groundskeeper_bram.greeting':
+    'La tregua regge al Campo della Scrofa, {className}: solo calci e spallate. Ti va di giocare per il Secchio di Rame?',
+  'entities.npcs.groundskeeper_bram.name': 'Guardacampo Bram',
+  'entities.npcs.groundskeeper_bram.title': 'Custode del Campo della Scrofa',
+  'entities.zones.eastbrook_vale.pois.10.label': 'Il Campo della Scrofa',
+  'guide.nav.professions': 'Professioni',
+  'guide.nav.valeCup': 'Coppa della Valle',
+  'guide.professions.archetypeChooseBody':
+    "Dichiari il tuo primo archetipo tramite una missione di trama iniziale della prima zona, che ti accoglie formalmente in quell'identità. Finché non completi quella missione, non hai ancora scelto alcun archetipo.",
+  'guide.professions.archetypeChooseTitle': 'Scegliere il tuo archetipo',
+  'guide.professions.archetypeIdentityBody':
+    "L'archetipo attivo è una dichiarazione su chi è il tuo personaggio nel mondo, riconosciuta nel modo in cui gli altri e il mondo si rivolgono a te. Le ricompense e i riconoscimenti esatti che lo accompagnano sono ancora in via di definizione; torna a controllare man mano che il sistema prende forma.",
+  'guide.professions.archetypeIdentityTitle': 'Cosa significa il tuo archetipo',
+  'guide.professions.archetypeIntro':
+    "Ognuno dei dieci mestieri artigiani rappresenta anche un archetipo, un'identità più ampia che puoi adottare oltre al semplice esercizio del mestiere. L'archetipo attivo è una scelta singola alla volta, non una lista da spuntare: ne porti uno solo, e in seguito puoi cambiarlo se lo desideri.",
+  'guide.professions.archetypeSwitchBody':
+    'Aver dichiarato un archetipo una volta non ti ci vincola per sempre. Passare a un archetipo diverso richiede prima di completare una missione ripetibile per "fare ammenda" verso quello vecchio, e a ogni cambio l\'ammenda attesa la volta successiva diventa un po\' più esigente, così che cambiare resti significativo anziché gratuito.',
+  'guide.professions.archetypeSwitchTitle': 'Cambiare idea',
+  'guide.professions.archetypeTitle': 'I dieci archetipi',
+  'guide.professions.craftComboBody':
+    "Oltre alla lista di ricette di un singolo mestiere, la ruota supporta anche ricette combinate che richiedono due mestieri vicini allo stesso tempo, premiando un personaggio (o una coppia di partner commerciali) che ha investito in mestieri adiacenti sull'anello anziché in uno solo isolato.",
+  'guide.professions.craftComboTitle': 'Ricette combinate',
+  'guide.professions.craftIntro':
+    'Dieci mestieri artigiani trasformano i materiali raccolti in equipaggiamento e beni finiti: Fabbricazione di armature, Fabbricazione di armi e Gioielleria danno forma alla materia grezza in equipaggiamento indossabile; Alchimia e Ingegneria procedono per tentativi ed errori; Cucina, Inscrizione e Incantamento toccano ciascuno il prodotto di altri mestieri; Sartoria e Conciatura lavorano da modelli esatti. Insieme formano una ruota, con ogni mestiere accanto a due vicini e opposto a un altro.',
+  'guide.professions.craftMasteryBody':
+    "Creare con successo accresce l'abilità in quel mestiere, e le ricette più ricche sono riservate a un'abilità più alta: quelle di base sono aperte a chiunque, mentre quelle via via più avanzate richiedono via via più maestria per essere tentate. Far crescere la tua abilità in un mestiere è il percorso dai semplici beni iniziali alle sue ricette più ambiziose.",
+  'guide.professions.craftMasteryTitle': 'Abilità e maestria',
+  'guide.professions.craftRecipesBody':
+    "Ogni mestiere ha le proprie ricette, ognuna delle quali richiede reagenti specifici da raccogliere o comprare. Le ricette più basilari di ogni mestiere non chiedono altro che materiali comuni e si possono creare fin dall'inizio, così puoi cominciare a esercitare un mestiere nel momento in cui lo scegli, senza dover aspettare di sbloccarlo.",
+  'guide.professions.craftRecipesTitle': 'Ricette e reagenti',
+  'guide.professions.craftRingBody':
+    "I dieci mestieri sono disposti in un anello fisso, e la posizione di un mestiere su quell'anello conta: i mestieri vicini tra loro sulla ruota hanno più cose in comune di quelli sui lati opposti. Impegnarsi in un mestiere deve dare la sensazione di entrare in una famiglia di mestieri affini, non di scegliere un'abilità isolata.",
+  'guide.professions.craftRingTitle': 'Una ruota di specialità',
+  'guide.professions.craftTitle': 'I dieci mestieri artigiani',
+  'guide.professions.gatherIntro':
+    "Tre mestieri di raccolta ti permettono di estrarre materie prime direttamente dal mondo: l'Estrazione mineraria cava minerale e pietra dalle vene, il Taglio del legname abbatte tronchi dai gruppi di alberi e l'Erbalismo raccoglie erbe e piante selvatiche. Ognuno è tracciato separatamente, quindi esercitarne uno non rallenta mai i tuoi progressi in un altro.",
+  'guide.professions.gatherProficiencyBody':
+    'Ogni raccolto riuscito accresce la tua competenza in quel mestiere di raccolta. Una competenza più alta sposta ciò che estrai da un nodo verso gradi di materiale più rari, dal comune in su, anche se i gradi più rari restano rari perfino ad alta competenza. Più pratica non peggiora mai le tue probabilità, le migliora soltanto.',
+  'guide.professions.gatherProficiencyTitle': 'Competenza e qualità dei materiali',
+  'guide.professions.gatherTitle':
+    'Raccolta: Estrazione mineraria, Taglio del legname ed Erbalismo',
+  'guide.professions.gatherToolsBody':
+    'I venditori offrono attrezzi di base per ogni mestiere di raccolta, e se ne possono creare di migliori, così lavorare un nodo di risorse deve risultare sempre più efficace man mano che ti equipaggi, invece di restare statico. Gli attrezzi di livello superiore sono la via prevista per accedere ai nodi più ricchi e lavorarli con più efficienza in una lunga sessione.',
+  'guide.professions.gatherToolsTitle': 'Gli attrezzi del mestiere',
+  'guide.professions.gatherWhatBody':
+    'Vene di minerale, gruppi di alberi e macchie di erbe sono collocati nelle zone come elementi visibili e senza padrone. Avvicinati a uno e interagisci per raccogliere ciò che contiene. Una volta raccolto un nodo, serve tempo perché si riprenda prima che tu, personalmente, possa raccoglierlo di nuovo, ma non blocca mai nessun altro: un altro giocatore può raccogliere lo stesso identico nodo nel frattempo.',
+  'guide.professions.gatherWhatTitle': 'Nodi di risorse',
+  'guide.professions.intro':
+    "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento alle postazioni artigiane di dieci mestieri diversi e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
+  'guide.valeCupPage.heading': 'La Coppa della Valle',
+  'guide.valeCupPage.howHeading': 'Come si gioca',
+  'guide.valeCupPage.howMatch':
+    "Al calcio d'inizio il tuo kit di classe viene sostituito da un kit sportivo e ripristinato esattamente alla fine. I calci mirano al reticolo a terra, la palla rimbalza sulle sponde e dribblare significa semplicemente correre con la palla. Segna più gol dell'altra squadra prima del fischio finale; un pareggio va al gol d'oro.",
+  'guide.valeCupPage.howQueue':
+    "Mettiti in coda da qualsiasi luogo tramite la finestra della Coppa della Valle, oppure parla con il Guardacampo Bram al cancello del Campo della Scrofa. Scegli un formato dall'uno contro uno fino al cinque contro cinque, una nazione del vessillo e un ruolo sportivo; entra in coda da solo o porta il tuo gruppo.",
+  'guide.valeCupPage.howTruce':
+    'Nessuno sanguina al Campo della Scrofa: i contrasti fanno solo ruzzolare, niente fa male e i famigli restano fuori dalla partita.',
+  'guide.valeCupPage.intro':
+    'Palla di cinghiale al Campo della Scrofa: scegli un vessillo, scegli un ruolo e calcia una pelle di cinghiale imbottita oltre un portiere per il Secchio di Rame. Niente sangue, niente bottino, solo il boato degli spalti.',
+  'guide.valeCupPage.loreHeading': 'La palla di cinghiale e la tregua del raccolto',
+  'guide.valeCupPage.loreOldSow':
+    'Molto prima che i morti si destassero, i braccianti di Eastbrook giocavano a palla di cinghiale sui campi di stoppie dopo il raccolto: due torme, una pelle di cinghiale imbottita di paglia e due cancelli da carro trascinati ai due capi del prato. La prima palla, la Vecchia Scrofa, pende bronzata sopra il focolare della taverna.',
+  'guide.valeCupPage.loreTruce':
+    'Quando il Colosseo Cinereo cominciò a patrocinare giochi di guerra, il Maresciallo Redbrook rispose con qualcosa di più gentile: una tregua del raccolto permanente sul vecchio prato. I cancelli da carro divennero pali delle porte, il prato ebbe muri, spalti e un nome, il Campo della Scrofa, e il premio fu sempre lo stesso secchio del latte ammaccato da cui bevevano i vincitori: il Secchio di Rame.',
+  'guide.valeCupPage.nationChoir':
+    'Azzurro pallido e argento sotto la campana: inquietanti, precisi e molto silenziosi.',
+  'guide.valeCupPage.nationColiseum':
+    'Rosso e nero con le spade incrociate: giocano come se fosse ancora un gioco di guerra.',
+  'guide.valeCupPage.nationCopperdig':
+    'Rame e marrone con il piccone: scavatori che non smettono mai di correre.',
+  'guide.valeCupPage.nationMirefen':
+    "Verde acqua e grigio sotto l'airone: pazienti, dalle gambe lunghe, mai frettolosi.",
+  'guide.valeCupPage.nationMoon':
+    'Viola e argento sotto la falce di luna: giocatori notturni, leggeri sui piedi.',
+  'guide.valeCupPage.nationOgre':
+    "Arancio e terra d'ombra dietro il pugno: prima la spallata, e ne vanno fieri.",
+  'guide.valeCupPage.nationThornpeak':
+    'Blu ghiaccio e bianco sotto la vetta: dal passo sicuro e testardi.',
+  'guide.valeCupPage.nationVale':
+    'Verde e oro, con il covone di grano al vento: la squadra di casa, braccianti fino al midollo.',
+  'guide.valeCupPage.nationsBody':
+    'Ogni squadra gioca sotto un vessillo. Il capitano sceglie la nazione e, se entrambe le squadre battono lo stesso vessillo, quella in trasferta gioca con i colori invertiti.',
+  'guide.valeCupPage.nationsHeading': 'Le otto nazioni del vessillo',
+  'guide.valeCupPage.rewardsBody':
+    'Le regole della tregua significano niente esperienza e niente bottino: una partita decisa conta per il tuo bilancio e per il tabellone dei vincitori, e con essa arrivano i punti delle ricompense giornaliere. Disertare una partita mette in panchina il tuo posto, e il Guardacampo non dimentica.',
+  'guide.valeCupPage.rewardsHeading': 'Le regole della tregua',
+  'guide.valeCupPage.rolesBody':
+    'Il tuo ruolo decide il kit che porti in campo. Tutti calciano; il resto è temperamento.',
+  'guide.valeCupPage.rolesHeading': 'Ruoli sportivi',
+  'guide.valeCupPage.spectateBody':
+    'Allo stadio si gioca una partita alla volta, e chiunque può avvicinarsi e guardare dagli spalti.',
+  'hudChrome.keybinds.valecup': 'Coppa della Valle',
+  'hudChrome.mobile.dailyRewards': 'Ricompense',
+  'hudChrome.perf.labels.predLead': 'Anticipo di predizione',
+  'hudChrome.townFocus.budgetLabel': 'Punti rimanenti: {remaining} / {budget}',
+  'hudChrome.townFocus.decreaseAria': 'Riduci la priorità di {component}',
+  'hudChrome.townFocus.hint':
+    'I punti priorità aggiungono un bonus sopra la resa base di ogni componente. I componenti senza priorità restano alla resa base.',
+  'hudChrome.townFocus.increaseAria': 'Aumenta la priorità di {component}',
+  'hudChrome.townFocus.notInTownHint': 'Devi essere in città per impostare la priorità.',
+  'hudChrome.townFocus.saveButton': 'Salva priorità',
+  'hudChrome.townFocus.title': 'Priorità della città',
+  'hudChrome.vcup.awayNote':
+    'Se entrambe le squadre battono lo stesso vessillo, quella in trasferta gioca con i colori invertiti.',
+  'hudChrome.vcup.bannerCountdown': "Calcio d'inizio tra {seconds}...",
+  'hudChrome.vcup.bannerDraw': 'Pareggio al Campo della Scrofa.',
+  'hudChrome.vcup.bannerEnd': 'Fischio finale: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.bannerFound': 'La Coppa della Valle chiama: {nationA} contro {nationB}!',
+  'hudChrome.vcup.bannerGoal': 'GOL! Segna {nation}!',
+  'hudChrome.vcup.bannerGolden': "GOL D'ORO: il prossimo gol vince!",
+  'hudChrome.vcup.bannerKickoff': "CALCIO D'INIZIO!",
+  'hudChrome.vcup.bannerLoss': 'Sconfitta al Campo della Scrofa.',
+  'hudChrome.vcup.bannerSave': '{name} PARA!',
+  'hudChrome.vcup.bannerWin': 'Vittoria al Campo della Scrofa!',
+  'hudChrome.vcup.bet.aria': 'Scommesse sulla partita della Coppa della Valle',
+  'hudChrome.vcup.bet.back': 'Punta su {team}',
+  'hudChrome.vcup.bet.closed': 'Scommesse chiuse',
+  'hudChrome.vcup.bet.closesIn': 'Le scommesse chiudono tra {seconds}s',
+  'hudChrome.vcup.bet.collapse': 'Nascondi le scommesse',
+  'hudChrome.vcup.bet.expand': 'Vedi le scommesse e punta',
+  'hudChrome.vcup.bet.form': '{wins}V-{losses}S',
+  'hudChrome.vcup.bet.lostLog': 'Hai perso la tua scommessa sulla Coppa della Valle: {amount}.',
+  'hudChrome.vcup.bet.mine': 'La tua scommessa: {amount} su {team}',
+  'hudChrome.vcup.bet.none': 'Non hai ancora scommesso su questa partita.',
+  'hudChrome.vcup.bet.oddsLabel': 'Paga',
+  'hudChrome.vcup.bet.prize': 'Montepremi {amount}',
+  'hudChrome.vcup.bet.record': 'Bilancio scommesse: {wins}V-{losses}S, {sign}{net}',
+  'hudChrome.vcup.bet.refundLog':
+    'Scommesse annullate, la tua puntata di {amount} è stata restituita.',
+  'hudChrome.vcup.bet.splitAria': 'Quota del montepremi puntata su ciascuna squadra',
+  'hudChrome.vcup.bet.title': 'Scommesse sulla partita',
+  'hudChrome.vcup.bet.wonBanner': 'La tua scommessa ha vinto!',
+  'hudChrome.vcup.bet.wonLog':
+    'La tua scommessa sulla Coppa della Valle ha vinto: {amount} restituiti.',
+  'hudChrome.vcup.blockNation': 'Scegli prima una nazione del vessillo.',
+  'hudChrome.vcup.blockNotLeader': 'Solo il capogruppo può mettere in coda la squadra.',
+  'hudChrome.vcup.blockPartySize': 'Quel formato richiede un gruppo più piccolo.',
+  'hudChrome.vcup.boardEmpty': 'Nessun vincitore registrato finora. Il Secchio di Rame attende.',
+  'hudChrome.vcup.boardHeading': 'Tabellone dei vincitori',
+  'hudChrome.vcup.boardWins': '{count} vittorie',
+  'hudChrome.vcup.bracketLabel': '{n}c{n}',
+  'hudChrome.vcup.bracketsAria': 'Formato della partita',
+  'hudChrome.vcup.briefing.bot': 'Bot',
+  'hudChrome.vcup.briefing.kitHeading': 'Il tuo kit',
+  'hudChrome.vcup.briefing.kitNote':
+    'Queste mosse sostituiscono le tue abilità di classe per la partita.',
+  'hudChrome.vcup.briefing.ready': 'Sono pronto',
+  'hudChrome.vcup.briefing.readyAria': "Dichiarati pronto per il calcio d'inizio",
+  'hudChrome.vcup.briefing.readyCount': '{ready} pronti su {total}',
+  'hudChrome.vcup.briefing.readyDone': 'Pronto',
+  'hudChrome.vcup.briefing.rosterHeading': 'La distinta',
+  'hudChrome.vcup.briefing.rule1': 'Calcia o passa la palla nella porta avversaria per segnare.',
+  'hudChrome.vcup.briefing.rule2':
+    'Vince chi per primo arriva a 5 gol, o chi ne ha di più al fischio finale.',
+  'hudChrome.vcup.briefing.rule3':
+    "Una partita in parità al fischio finale va al gol d'oro: il prossimo gol vince.",
+  'hudChrome.vcup.briefing.rule4':
+    'I contrasti ti fanno solo ruzzolare. Nessuno si fa male sotto la tregua del raccolto.',
+  'hudChrome.vcup.briefing.rule5': 'Chiunque può avvicinarsi e fare il tifo dagli spalti.',
+  'hudChrome.vcup.briefing.rulesHeading': 'Come si gioca',
+  'hudChrome.vcup.briefing.subtitle': 'Riunione pre-partita',
+  'hudChrome.vcup.briefing.vs': 'vs',
+  'hudChrome.vcup.briefing.waiting': "In attesa che l'altra squadra si dichiari pronta...",
+  'hudChrome.vcup.briefing.whistle': 'Il fischio arriva tra {seconds}s.',
+  'hudChrome.vcup.briefing.you': 'Tu',
+  'hudChrome.vcup.clock': '{minutes}:{seconds}',
+  'hudChrome.vcup.close': 'Chiudi la finestra della Coppa della Valle',
+  'hudChrome.vcup.deserterNote':
+    'Il Guardacampo non dimentica. Potrai rimetterti in coda tra {seconds} sec.',
+  'hudChrome.vcup.enterAsGuild': 'Entra sotto il vessillo di {guild}',
+  'hudChrome.vcup.gossipOpen': 'Il libro degli incontri',
+  'hudChrome.vcup.gossipOpenAria': 'Apri la finestra della Coppa della Valle',
+  'hudChrome.vcup.guildBoardEmpty': 'Nessuna gilda è ancora scesa in campo. Batti il tuo vessillo!',
+  'hudChrome.vcup.guildBoardHeading': 'Vessilli di gilda',
+  'hudChrome.vcup.guildBoardWl': '{wins} V, {losses} S',
+  'hudChrome.vcup.guildRecordLine':
+    'Bilancio della tua gilda: {wins} vittorie, {losses} sconfitte.',
+  'hudChrome.vcup.inMatchNote': 'La tua squadra è in campo. Gioca!',
+  'hudChrome.vcup.indicatorLive': 'Coppa della Valle',
+  'hudChrome.vcup.indicatorOpen': 'Apri la finestra della Coppa della Valle',
+  'hudChrome.vcup.indicatorQueued':
+    'Coda della Coppa della Valle: {bracket}, posizione {position} di {count}',
+  'hudChrome.vcup.leaveQueue': 'Lascia la coda',
+  'hudChrome.vcup.liveAria': 'Coppa della Valle: {nationA} {scoreA}, {nationB} {scoreB}',
+  'hudChrome.vcup.liveHeading': 'Ora al Campo della Scrofa',
+  'hudChrome.vcup.logDraw': "L'incontro al Campo della Scrofa finisce in pareggio.",
+  'hudChrome.vcup.logFound':
+    'La tua partita della Coppa della Valle è pronta: {nationA} contro {nationB}.',
+  'hudChrome.vcup.logGoal': '{name} segna per {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
+  'hudChrome.vcup.logLoss': "Perdi l'incontro al Campo della Scrofa.",
+  'hudChrome.vcup.logQueued':
+    'Entri nella coda della Coppa della Valle per {bracket} (posizione {position}).',
+  'hudChrome.vcup.logRoster': 'La tua squadra: {allies}. La loro: {enemies}.',
+  'hudChrome.vcup.logSave': '{name} compie la parata!',
+  'hudChrome.vcup.logUnqueued': 'Lasci la coda della Coppa della Valle.',
+  'hudChrome.vcup.logWin': "Vinci l'incontro al Campo della Scrofa.",
+  'hudChrome.vcup.mobileLabel': 'Coppa',
+  'hudChrome.vcup.nation.choir': 'Il Coro Pallido',
+  'hudChrome.vcup.nation.coliseum': 'Il Colosseo Cinereo',
+  'hudChrome.vcup.nation.copperdig': 'Lo Scavo di Rame',
+  'hudChrome.vcup.nation.mirefen': 'Il Mirefen',
+  'hudChrome.vcup.nation.moon': 'La Luna Pallida',
+  'hudChrome.vcup.nation.ogre': 'I Clan degli Ogre',
+  'hudChrome.vcup.nation.thornpeak': 'Thornpeak',
+  'hudChrome.vcup.nation.vale': 'Valle di Eastbrook',
+  'hudChrome.vcup.nationsHeading': 'Nazione del vessillo',
+  'hudChrome.vcup.noLive': 'Il campo è tranquillo. Nessuna partita in corso.',
+  'hudChrome.vcup.offlineNote':
+    'Il libro degli incontri è chiuso. La Coppa della Valle non è disponibile al momento.',
+  'hudChrome.vcup.phaseCountdown': "Calcio d'inizio tra {seconds}",
+  'hudChrome.vcup.phaseGoal': 'GOL!',
+  'hudChrome.vcup.phaseGolden': "GOL D'ORO",
+  'hudChrome.vcup.phaseOver': 'FISCHIO FINALE',
+  'hudChrome.vcup.practice': 'Allenamento contro i bot',
+  'hudChrome.vcup.practiceNote':
+    'Avvia subito una partita privata contro i bot sul tuo campo di allenamento.',
+  'hudChrome.vcup.practicingNow': 'In allenamento ora ({count}):',
+  'hudChrome.vcup.queue': 'Entra in coda',
+  'hudChrome.vcup.queueNote':
+    'Mettiti in coda da qualsiasi luogo; il fischio ti chiamerà al Campo della Scrofa.',
+  'hudChrome.vcup.queuedStatus': 'In coda per {bracket}: posizione {position} di {count}.',
+  'hudChrome.vcup.recordLine':
+    'Il tuo bilancio: {wins} vittorie, {losses} sconfitte, {draws} pareggi.',
+  'hudChrome.vcup.role.allrounder.desc': "Un po' di tutto: calcio, calcione e una spallata leale.",
+  'hudChrome.vcup.role.allrounder.name': 'Tuttocampista',
+  'hudChrome.vcup.role.keeper.desc': "Difende l'area di porta con presa, tuffo e rinvio.",
+  'hudChrome.vcup.role.keeper.name': 'Portiere',
+  'hudChrome.vcup.role.striker.desc': 'Vive per il calcione lungo e lo scatto laterale.',
+  'hudChrome.vcup.role.striker.name': 'Attaccante',
+  'hudChrome.vcup.role.sweeper.desc': 'Sbalza gli avversari lontano dalla palla e la spazza via.',
+  'hudChrome.vcup.role.sweeper.name': 'Libero',
+  'hudChrome.vcup.rolesHeading': 'Ruolo sportivo',
+  'hudChrome.vcup.shootPower': 'POTENZA',
+  'hudChrome.vcup.title': 'La Coppa della Valle',
+  'hudChrome.vcup.waitingCount': '{count} in attesa',
+  'hudChrome.vcup.walkUp': 'Avvicinati al Campo della Scrofa per guardare dagli spalti.',
+  'hudChrome.archetypeTitle.label': 'Titolo',
+  'hudChrome.archetypeTitle.none': 'Nessuno',
+  'hudChrome.archetypeTitle.armorcrafting': 'Armaiolo',
+  'hudChrome.archetypeTitle.weaponcrafting': "Fabbro d'armi",
+  'hudChrome.archetypeTitle.jewelcrafting': 'Gioielliere',
+  'hudChrome.archetypeTitle.alchemy': 'Alchimista',
+  'hudChrome.archetypeTitle.engineering': 'Ingegnere',
+  'hudChrome.archetypeTitle.cooking': 'Cuoco',
+  'hudChrome.archetypeTitle.inscription': 'Scriba',
+  'hudChrome.archetypeTitle.enchanting': 'Incantatore',
+  'hudChrome.archetypeTitle.tailoring': 'Sarto',
+  'hudChrome.archetypeTitle.leatherworking': 'Conciatore',
+  'entities.itemSets.crownforged.bonus4':
+    'I colpi critici della tua arma scheggiano il bersaglio con Scheggiaossa, facendolo sanguinare per 8 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte.',
+  'entities.itemSets.deathlord.bonus4':
+    "I colpi critici della tua arma hanno una probabilità del 50% di conferire Possanza Tombale, aumentando la potenza d'attacco di 60 per 10 sec.",
+  'entities.itemSets.necromancers.bonus4':
+    'I tuoi incantesimi hanno una probabilità del 10% di conferire Lancio Limpido, rendendo gratuito il tuo prossimo incantesimo.',
+  'entities.itemSets.nighttalon.bonus4':
+    'I colpi critici della tua arma aprono uno Squarcio Frastagliato, facendo sanguinare il bersaglio per 6 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte.',
+  'entities.itemSets.soulflame.bonus4':
+    'I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec.',
+  'entities.itemSets.stormcallers.bonus4':
+    'I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec.',
+  'entities.itemSets.wyrmshadow.bonus4':
+    "I colpi critici della tua arma hanno una probabilità del 50% di conferire Zannimpeto, aumentando la velocità d'attacco del 25% per 8 sec.",
+  'entities.items.architects_cornerstone.name': "La Pietra Angolare dell'Architetto",
+  'entities.items.bonechill_cord.name': 'Cordone del gelo osseo',
+  'entities.items.bonechill_striders.name': 'Falcate del gelo osseo',
+  'entities.items.choir_blessed_spaulders.name': 'Spallacci benedetti dal coro',
+  'entities.items.choirmothers_casque.name': 'Elmetto della madre del coro',
+  'entities.items.cryptplate_helm.name': 'Elmo della corazza della cripta',
+  'entities.items.deathless_greatblade.name': 'Spadone senza morte',
+  'entities.items.deathless_warguard_legmail.name':
+    'Cosciali di maglia del guardiaguerra senza morte',
+  'entities.items.gravescale_girdle.name': 'Cintura scagliatomba',
+  'entities.items.gravewyrm_claws.name': 'Artigli del wyrm tombale',
+  'entities.items.gravewyrm_cleaver.name': 'Mannaia del wyrm tombale',
+  'entities.items.heroic_mark.name': 'Marchio Eroico',
+  'entities.items.lunar_choir_leggings.name': 'Gambali del coro lunare',
+  'entities.items.lunar_tide_greatstaff.name': 'Grande bastone della marea lunare',
+  'entities.items.medallion_of_endless_profit.name': 'Medaglione del profitto infinito',
+  'entities.items.mistcallers_fang.name': "Zanna dell'evocanebbia",
+  'entities.items.mistforged_pauldrons.name': 'Spallacci forgiati nella nebbia',
+  'entities.items.morthens_cryptforged_hauberk.name': 'Usbergo forgiacripta di Morthen',
+  'entities.items.nielas_coldlight_band.name': 'Anello lucegelida di Niela',
+  'entities.items.oath_of_the_round_table.name': 'Giuramento della Tavola Rotonda',
+  'entities.items.sanctum_prowlers_grips.name': 'Prese del predatore del santuario',
+  'entities.items.sash_of_the_sunken_court.name': 'Fascia della corte sommersa',
+  'entities.items.scepter_of_the_deathless_court.name': 'Scettro della corte senza morte',
+  'entities.items.scourgehide_carapace.name': 'Carapace di pelle del flagello',
+  'entities.items.seal_of_the_nine_oaths.name': 'Sigillo dei nove giuramenti',
+  'entities.items.shadowpulse_handwraps.name': 'Bende ombrapulsante',
+  'entities.items.shadowpulse_slippers.name': 'Calzari ombrapulsante',
+  'entities.items.shroud_of_the_gravewyrm.name': 'Sudario del wyrm tombale',
+  'entities.items.soulforged_warplate.name': 'Corazza da guerra forgianima',
+  'entities.items.soulrend_diadem.name': 'Diadema straccianima',
+  'entities.items.stormcallers_focus.name': "Focus dell'evocatempesta",
+  'entities.items.sunken_court_mantle.name': 'Mantello della corte sommersa',
+  'entities.items.sutils_gambit.name': 'Gambetto di Sutil',
+  'entities.items.swiftfang_talisman.name': 'Talismano zannarapida',
+  'entities.items.tidebound_spaulders.name': 'Spallacci vincolati alla marea',
+  'entities.items.tideguard_faceguard.name': 'Visiera della guardia della marea',
+  'entities.items.tideworn_warboots.name': 'Stivali da guerra logori di marea',
+  'entities.items.tidewoven_trousers.name': 'Calzoni tessuti dalla marea',
+  'entities.items.wyrmchoir_handwraps.name': 'Bende del coro dei wyrm',
+  'entities.items.yumis_keepsake_locket.name': 'Medaglione ricordo di Yumi',
+  'entities.items.zense_meridian.name': 'Meridiano di Zense',
+  'entities.items.zyzzs_deathless_signet.name': 'Sigillo senza morte di Zyzz',
+  'entities.npcs.heroic_quartermaster.greeting':
+    'La prova degli abissi eroici compra gli anelli e i pendenti più pregiati di Highwatch. Mostrami i tuoi marchi.',
+  'entities.npcs.heroic_quartermaster.name': 'Quartiermastro Vex',
+  'entities.npcs.heroic_quartermaster.title': 'Quartiermastro Eroico',
+  'heroicShop.balance': 'Marchi Eroici: {count}',
+  'heroicShop.buyAria': 'Compra {item} per {marks} Marchi Eroici',
+  'hudChrome.bags.cannotDestroy': 'Questo oggetto non può essere distrutto.',
+  'hudChrome.bags.rightClickDestroy': 'Clic destro per distruggere',
+  'hudChrome.crafting.comboRequirementUnmet':
+    'Non possiedi entrambe le professioni richieste al livello necessario per quella ricetta.',
+  'hudChrome.discord.roleTag.coredevs': 'Sviluppatore Principale',
+  'hudChrome.dungeonDifficulty.setHeroic': 'Imposta difficoltà del dungeon: Eroica',
+  'hudChrome.dungeonDifficulty.setNormal': 'Imposta difficoltà del dungeon: Normale',
+  'hudChrome.itemProc.attackSlow':
+    "e rallenta la velocità d'attacco del bersaglio del {pct}% per {duration} sec",
+  'hudChrome.itemProc.chainArc':
+    'colpisce il bersaglio con {name} ({school}, {damage}) che rimbalza su {jumps} nemici vicini infliggendo danno decrescente',
+  'hudChrome.itemProc.dot':
+    'provoca {name}, un danno nel tempo di tipo {school} che infligge {total} in {duration} sec',
+  'hudChrome.itemProc.hot':
+    'fa sbocciare {name}, una cura nel tempo che ripristina {total} in {duration} sec',
+  'hudChrome.itemProc.onHeal': 'Probabilità sulle tue cure ({chance}%): {effect}',
+  'hudChrome.itemProc.onMeleeHit': 'Probabilità al colpo ({chance}%): {effect}',
+  'hudChrome.itemProc.onSpellDamage':
+    'Probabilità sui tuoi incantesimi dannosi ({chance}%): {effect}',
+  'hudChrome.options.version': 'v{version} ({build})',
+  'hudChrome.raidLockout.heroicLocked': 'Sei bloccato sulla versione Eroica di {name}.',
+  'hudChrome.raidLockout.heroicName': '{name} Eroico',
+  'hudChrome.statInfo.desc.critRating':
+    "Indice di critico dal tuo equipaggiamento e dai bonus di set, che aumenta la tua probabilità di colpo critico. Circa 10 punti conferiscono l'1% di critico.",
+  'hudChrome.statInfo.desc.hasteRating':
+    "Indice di celerità dal tuo equipaggiamento e dai bonus di set, che accelera i tuoi attacchi e i tuoi lanci. Circa 10 punti conferiscono l'1% di celerità.",
+  'hudChrome.statInfo.names.critRating': 'Indice di critico',
+  'hudChrome.statInfo.names.hasteRating': 'Indice di celerità',
+  'itemUi.slots.neck': 'Collo',
+  'itemUi.slots.ring': 'Dito',
   'auth.email': 'Email',
   'auth.emailError': 'Inserisci un indirizzo email valido.',
   'auth.emailPlaceholder': 'tu@esempio.com',
@@ -543,6 +911,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spider_egg_sac.name': 'Sacca di Uova di Ragno',
   'entities.mobs.sump_troll_devourer.name': 'Troll Divoratore del Pantano',
   'entities.mobs.tolling_bell.name': 'Campana Rintoccante',
+  'entities.mobs.vale_cup_ball.name': 'Palla di cinghiale',
   'entities.npcs.brother_halven_marsh.greeting':
     'La pista portava a nord. Un altro reliquiario, un altro rito. Scegli la difficoltà, e io terrò la corda finché non torni.',
   'entities.npcs.brother_halven_marsh.name': 'Fratello Halven',
@@ -919,7 +1288,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.returnTitle': 'Reclama la ricompensa',
   'hud.tutorial.returnBody':
     'Il tuo incarico è compiuto. Torna dal maresciallo Redbrook e premi {interactKey} per consegnarlo.',
-  // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': 'Dai tuoi {value} punti {stat}:',
   'hudChrome.statInfo.desc.str':
     "Aumenta la tua potenza d'attacco, così i colpi della tua arma sono più potenti.",
@@ -994,6 +1362,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.labels.ping': 'Ping',
   'hudChrome.perf.labels.jitter': 'Jitter',
   'hudChrome.perf.labels.snapshot': 'Frequenza snapshot',
+  'hudChrome.perf.labels.serverTick': 'Frequenza tick del server',
   'hudChrome.perf.labels.connection': 'Connessione',
   'hudChrome.perf.labels.drawCalls': 'Chiamate di disegno',
   'hudChrome.perf.labels.triangles': 'Triangoli',
@@ -1643,6 +2012,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileSocial': 'Sociale',
   'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menu',
+  'hud.core.mobileSettings': 'Impostazioni',
   'hud.core.mobileUse': 'Usa',
   'hud.core.mobileMeters': 'Misuratori',
   'hud.core.mobileMap': 'Mappa',
@@ -2127,9 +2497,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.demonHeal': 'Cura demoniaca',
   'questUi.tracker.title': 'Missioni',
   'questUi.tracker.complete': 'Completata',
-
   'questUi.tracker.showOnMap': 'Mostra {name} sulla mappa',
-
   'questUi.tracker.hideFromMap': 'Nascondi {name} dalla mappa',
   'questUi.log.title': 'Registro missioni',
   'questUi.log.close': 'Chiudi registro missioni',
@@ -2385,29 +2753,29 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un attacco potente che aumenta i danni in mischia di {damage}. Si attiva al tuo prossimo colpo.',
   'entities.abilities.battle_shout.name': 'Urlo di Ferro',
   'entities.abilities.battle_shout.description':
-    "Aumenta la tua potenza d'attacco di 20 per 2 min.",
+    "Aumenta la tua potenza d'attacco di {buff} per 2 min.",
   'entities.abilities.commanding_shout.name': 'Grido Rincuorante',
-  'entities.abilities.commanding_shout.description': 'Aumenta la tua Tempra di 6 per 2 min.',
+  'entities.abilities.commanding_shout.description': 'Aumenta la tua Tempra di {buff} per 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Ululato Sinistro',
   'entities.abilities.demoralizing_shout.description':
-    "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di 30 per 30 sec.",
+    "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di {buff} per 30 sec.",
   'entities.abilities.charge.name': 'Irruzione',
   'entities.abilities.charge.description':
     'Carica un nemico, genera 9 rabbia e lo stordisce per 1 s. Portata 8-25 m.',
   'entities.abilities.rend.name': 'Squarcio Profondo',
   'entities.abilities.rend.description':
-    'Ferisce il bersaglio e lo fa sanguinare per {damage} danni in 9 s.',
+    'Ferisce il bersaglio e lo fa sanguinare per {damage} danni in {duration} sec.',
   'entities.abilities.thunder_clap.name': 'Colpo Sismico',
   'entities.abilities.thunder_clap.description':
     'Colpisce i nemici vicini per {damage} danni e rallenta i loro attacchi del 10% per 10 s.',
   'entities.abilities.hamstring.name': 'Taglio Azzoppante',
   'entities.abilities.hamstring.description':
-    'Menoma il nemico per 5 danni, riducendo la sua velocità di movimento del 50% per 15 s.',
+    'Menoma il nemico per {damage} danni, riducendo la sua velocità di movimento del 50% per 15 sec.',
   'entities.abilities.bloodrage.name': 'Tributo di Sangue',
   'entities.abilities.bloodrage.description': 'Genera 10 rabbia al costo di salute.',
   'entities.abilities.overpower.name': 'Mano Rossa',
   'entities.abilities.overpower.description':
-    "Attacco istantaneo per danni dell'arma +5. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato.",
+    "Attacco istantaneo per danni dell'arma più {damage}. Utilizzabile solo dopo che il bersaglio schiva. Non può essere schivato.",
   'entities.abilities.execute.name': 'Tomba Prematura',
   'entities.abilities.execute.description':
     'Tenta di finire un nemico ferito, infliggendo {damage} danni. Utilizzabile solo sui nemici sotto il 20% di salute.',
@@ -2420,24 +2788,22 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.defensive_stance.description':
     'Posizione di combattimento difensiva: generi il 30% di minaccia in più, ma infliggi e subisci il 10% di danni in meno. Lanciala di nuovo per uscire dalla posizione.',
   'entities.abilities.sunder_armor.name': 'Trancia Armatura',
-  'entities.abilities.sunder_armor.description':
-    "Lacera l'armatura del bersaglio, riducendola di {damage} per applicazione. Si accumula fino a 5 volte. Genera molta minaccia.",
   'entities.abilities.taunt.name': 'Aizzare',
   'entities.abilities.taunt.description':
     'Provoca il bersaglio: la tua minaccia sale fino a eguagliare quella del suo nemico più odiato e lo costringe ad attaccarti per 3 s.',
   'entities.abilities.fireball.name': 'Dardo di Braci',
   'entities.abilities.rain_of_fire.name': 'Pioggia di Fuoco',
   'entities.abilities.rain_of_fire.description':
-    'Fa piovere fuoco sulla zona bersaglio, bruciando i nemici per {damage} danni da Fuoco.',
+    'Fa piovere fuoco sulla zona bersaglio per 4 sec, bruciando i nemici per {damage} danni da Fuoco ogni secondo.',
   'entities.abilities.volley.name': 'Scarica di Frecce',
   'entities.abilities.volley.description':
-    'Fa piovere frecce sulla zona bersaglio, infliggendo {damage} danni ai nemici colpiti.',
+    'Fa piovere frecce sulla zona bersaglio per 3 sec, infliggendo {damage} danni ogni 0.5 sec ai nemici colpiti.',
   'entities.abilities.hurricane.name': 'Uragano',
   'entities.abilities.hurricane.description':
-    'Scatena un uragano sulla zona bersaglio, colpendo i nemici per {damage} danni della Natura.',
+    'Scatena un uragano sulla zona bersaglio per 6 sec, colpendo i nemici per {damage} danni della Natura ogni secondo.',
   'entities.abilities.earthquake.name': 'Terremoto',
   'entities.abilities.earthquake.description':
-    'Scuote la zona bersaglio, colpendo i nemici per {damage} danni della Natura.',
+    'Scuote la zona bersaglio per 6 sec, colpendo i nemici per {damage} danni della Natura ogni 1.5 sec.',
   'entities.abilities.flamestrike.name': 'Ondata di Fiamme',
   'entities.abilities.flamestrike.description':
     "Evoca un'esplosione di fiamme sulla zona bersaglio, infliggendo {damage} danni da Fuoco ai nemici investiti dalla deflagrazione.",
@@ -2445,9 +2811,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia una palla infuocata che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo.',
   'entities.abilities.frost_armor.name': 'Manto di Brina',
   'entities.abilities.frost_armor.description':
-    "Ti avvolge nel gelo, aumentando l'armatura di 30 per 30 min.",
+    "Ti avvolge nel gelo, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.arcane_intellect.name': "Intuito d'Etere",
-  'entities.abilities.arcane_intellect.description': "Aumenta l'Intelletto di 2 per 30 min.",
+  'entities.abilities.arcane_intellect.description': "Aumenta l'Intelletto di {buff} per 30 min.",
   'entities.abilities.frostbolt.name': 'Lancia di Brina',
   'entities.abilities.frostbolt.description':
     'Lancia un dardo di gelo, infliggendo {damage} danni da Gelo e rallentando il movimento del 40%.',
@@ -2465,7 +2831,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Lancia Dardi d'Etere contro il nemico, infliggendo {damage} danni Arcani ogni secondo per 3 s.",
   'entities.abilities.polymorph.name': 'Ammaliare',
   'entities.abilities.polymorph.description':
-    "Trasforma il nemico in un rospo per un massimo di 15 s. Il rospo vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
+    "Trasforma il nemico in un rospo per un massimo di {duration} sec. Il rospo vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
   'entities.abilities.frost_nova.name': 'Vincolo di Ghiaccio',
   'entities.abilities.frost_nova.description':
     'Congela sul posto tutti i nemici vicini per un massimo di 8 s e infligge {damage} danni da Gelo.',
@@ -2480,18 +2846,18 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia un immenso masso infuocato che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo.',
   'entities.abilities.ice_barrier.name': 'Velo di Gelo',
   'entities.abilities.ice_barrier.description':
-    'Ti protegge nel ghiaccio, assorbendo 130 danni per 60 s.',
+    'Ti protegge nel ghiaccio, assorbendo {damage} danni per 60 sec.',
   'entities.abilities.sinister_strike.name': 'Fendente Malvagio',
   'entities.abilities.sinister_strike.description':
     "Colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
   'entities.abilities.eviscerate.name': 'Sonno Eterno',
-  'entities.abilities.eviscerate.description': 'Mossa finale che infligge danni per punto combo.',
+  'entities.abilities.eviscerate.description': 'Mossa finale che infligge {damage}.',
   'entities.abilities.backstab.name': 'Affondo Codardo',
   'entities.abilities.backstab.description':
     "Pugnala il bersaglio per il 150% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
   'entities.abilities.gouge.name': "Colpo all'Occhio",
   'entities.abilities.gouge.description':
-    "Colpisce il bersaglio e lo incapacita per 4 s. Qualsiasi danno interrompe l'effetto. Conferisce 1 punto combo.",
+    "Colpisce il bersaglio per {damage} danni e lo incapacita per 4 sec. Qualsiasi danno interrompe l'effetto. Conferisce 1 punto combo.",
   'entities.abilities.evasion.name': 'Passo Spettrale',
   'entities.abilities.evasion.description':
     'Aumenta la tua probabilità di schivata del 50% per 15 s.',
@@ -2514,10 +2880,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il sangue ti ribolle e ripristina istantaneamente 60 energia.',
   'entities.abilities.garrote.name': 'Filo alla Gola',
   'entities.abilities.garrote.description':
-    'Garrota il nemico, infliggendo danni immediati e provocando sanguinamento per {damage} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.',
+    'Garrota il nemico, infliggendo {damage} danni immediati e provocando sanguinamento per {overTime} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.',
   'entities.abilities.cheap_shot.name': 'Pugno allo Stomaco',
   'entities.abilities.cheap_shot.description':
-    'Colpisce il bersaglio, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.',
+    'Colpisce il bersaglio per {damage} danni, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.',
   'entities.abilities.sap.name': 'Tramortimento',
   'entities.abilities.sap.description':
     "Incapacita il bersaglio per 8 sec. Devi essere furtivo e fuori dal combattimento. Qualsiasi danno interrompe l'effetto.",
@@ -2526,7 +2892,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpisce il bersaglio con un veleno plumbeo, infliggendo {damage} danni della Natura e rallentando la sua velocità di movimento del 50% per 12 sec.',
   'entities.abilities.expose_armor.name': "Breccia nell'Armatura",
   'entities.abilities.expose_armor.description':
-    'Mossa finale che espone il bersaglio, riducendone la corazza. Più punti combo spesi approfondiscono il taglio.',
+    'Mossa finale che espone il bersaglio, riducendone la corazza di {damage} per 30 sec.',
   'entities.abilities.rupture.name': 'Dissanguamento',
   'entities.abilities.rupture.description':
     'Mossa finale che ferisce il bersaglio, provocando sanguinamento per {damage} in 16 sec.',
@@ -2544,25 +2910,25 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Acceca il bersaglio, facendolo vagare disorientato per 8 sec. Qualsiasi danno interrompe l'effetto.",
   'entities.abilities.seal_of_righteousness.name': 'Marchio del Giuramento',
   'entities.abilities.seal_of_righteousness.description':
-    'Ti riempie di potere Sacro per 30 s, facendo infliggere 4 danni Sacri aggiuntivi a ogni tuo colpo in mischia. Scatenalo con Verdict.',
+    'Ti riempie di potere Sacro per 30 sec, facendo infliggere {damage} danni Sacri aggiuntivi a ogni tuo colpo in mischia. Scatenalo con Verdict.',
   'entities.abilities.holy_light.name': 'Luce Risanatrice',
   'entities.abilities.holy_light.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.devotion_aura.name': 'Aura Incrollabile',
-  'entities.abilities.devotion_aura.description': 'Aumenta la tua armatura di 40 per 30 min.',
+  'entities.abilities.devotion_aura.description': 'Aumenta la tua armatura di {buff} per 30 min.',
   'entities.abilities.judgement.name': 'Verdict',
   'entities.abilities.judgement.description':
     'Scatena il tuo Sigillo attivo sul nemico, consumandolo per infliggere i suoi danni Sacri accumulati.',
   'entities.abilities.blessing_of_might.name': 'Giuramento di Ferro',
   'entities.abilities.blessing_of_might.description':
-    "Pone una Benedizione su un bersaglio alleato, aumentando la potenza d'attacco di 15 per 5 min.",
+    "Pone una Benedizione su un bersaglio alleato, aumentando la potenza d'attacco di {buff} per 5 min.",
   'entities.abilities.divine_protection.name': 'Barriera della Fede',
   'entities.abilities.divine_protection.description':
-    'Una barriera protettiva assorbe 50 danni per 10 s.',
+    'Una barriera protettiva assorbe {damage} danni per 10 sec.',
   'entities.abilities.hammer_of_justice.name': 'Maglio Frantumante',
-  'entities.abilities.hammer_of_justice.description': 'Stordisce il bersaglio per 3 s.',
+  'entities.abilities.hammer_of_justice.description': 'Stordisce il bersaglio per {duration} sec.',
   'entities.abilities.lay_on_hands.name': 'Ultimo Rito',
   'entities.abilities.lay_on_hands.description':
-    'Una grande ondata di guarigione: ripristina 250 salute. Tempo di recupero di 10 min.',
+    'Una grande ondata di guarigione: ripristina {damage} salute. Tempo di recupero di 10 min.',
   'entities.abilities.flash_of_light.name': 'Rammendo di Luce',
   'entities.abilities.flash_of_light.description':
     'Un rapido ed efficiente sprazzo di Luce che cura un bersaglio alleato di {damage}.',
@@ -2571,7 +2937,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaccia i malvagi con ira Sacra, infliggendo {damage} danni Sacri.',
   'entities.abilities.consecration.name': 'Terra Consacrata',
   'entities.abilities.consecration.description':
-    'Consacra il terreno sotto di te, bruciando i nemici vicini per {damage} danni Sacri.',
+    'Consacra il terreno sotto di te, bruciando i nemici vicini per {damage} danni Sacri ogni 2 sec per 10 sec.',
   'entities.abilities.righteous_fury.name': 'Giuramento Ardente',
   'entities.abilities.righteous_fury.description':
     'Aumenta del 60% la minaccia generata dai tuoi danni Sacri per 30 min. Il cardine del paladino difensore.',
@@ -2586,10 +2952,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Libera il tuo famiglio e lo rimanda nelle terre selvagge.',
   'entities.abilities.raptor_strike.name': 'Colpo Sventratore',
   'entities.abilities.raptor_strike.description':
-    'Forte attacco in mischia che aumenta i danni di 5. Si attiva al tuo prossimo colpo.',
+    'Forte attacco in mischia che aumenta i danni di {damage}. Si attiva al tuo prossimo colpo.',
   'entities.abilities.aspect_of_the_hawk.name': "Sembianze dell'Albanella",
   'entities.abilities.aspect_of_the_hawk.description':
-    "Assumi le sembianze dell'albanella, aumentando la potenza d'attacco di 20 per 30 min.",
+    "Assumi le sembianze dell'albanella, aumentando la potenza d'attacco di {buff} per 30 min.",
   'entities.abilities.serpent_sting.name': 'Aculeo Velenoso',
   'entities.abilities.serpent_sting.description':
     'Punzecchia il bersaglio, infliggendo {damage} danni da Natura in 15 s.',
@@ -2598,13 +2964,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Tiro istantaneo che infligge {damage} danni Arcani.',
   'entities.abilities.concussive_shot.name': 'Tiro Scuotente',
   'entities.abilities.concussive_shot.description':
-    'Stordisce leggermente il bersaglio, rallentandone il movimento del 50% per 4 s.',
+    'Stordisce leggermente il bersaglio per {damage} danni, rallentandone il movimento del 50% per 4 sec.',
   'entities.abilities.mongoose_bite.name': 'Controzanna',
   'entities.abilities.mongoose_bite.description':
-    "Contrattacca dopo che il bersaglio schiva, infliggendo danni dell'arma più 12. Non può essere schivato.",
+    "Contrattacca dopo che il bersaglio schiva, infliggendo danni dell'arma più {damage}. Non può essere schivato.",
   'entities.abilities.wing_clip.name': 'Fendente Immobilizzante',
   'entities.abilities.wing_clip.description':
-    'Infligge una ferita che rallenta il nemico del 40% per 10 s.',
+    'Infligge una ferita per {damage} danni, rallentando il nemico del 40% per 10 sec.',
   'entities.abilities.aspect_of_the_monkey.name': 'Sembianze della Martora',
   'entities.abilities.aspect_of_the_monkey.description':
     "Assumi le sembianze della martora, aumentando la tua probabilità di schivata dell'8% per 30 min.",
@@ -2623,13 +2989,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lesser_heal.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.power_word_fortitude.name': 'Litania della Fermezza',
   'entities.abilities.power_word_fortitude.description':
-    'Aumenta la Tempra del bersaglio di 3 per 30 min.',
+    'Aumenta la Tempra del bersaglio di {buff} per 30 min.',
   'entities.abilities.shadow_word_pain.name': 'Canto Funebre della Putrefazione',
   'entities.abilities.shadow_word_pain.description':
     "Una parola d'oscurità infligge {damage} danni da Ombra in 18 s.",
   'entities.abilities.power_word_shield.name': 'Salmo di Protezione',
   'entities.abilities.power_word_shield.description':
-    'Protegge il bersaglio, assorbendo 48 danni per 30 s.',
+    'Protegge il bersaglio, assorbendo {damage} danni per 30 sec.',
   'entities.abilities.renew.name': 'Grazia Persistente',
   'entities.abilities.renew.description': 'Cura il bersaglio di {damage} in 15 s.',
   'entities.abilities.mind_blast.name': 'Frattura Mentale',
@@ -2649,7 +3015,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia un fulmine per {damage} danni da Natura.',
   'entities.abilities.rockbiter_weapon.name': 'Arma Legapietra',
   'entities.abilities.rockbiter_weapon.description':
-    'Imbeve la tua arma con la furia della pietra: ogni colpo infligge 5 danni aggiuntivi per 5 min.',
+    'Imbeve la tua arma con la furia della pietra: ogni colpo infligge {damage} danni aggiuntivi per 5 min.',
   'entities.abilities.healing_wave.name': 'Acque Risananti',
   'entities.abilities.healing_wave.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.earth_shock.name': 'Scossa Tellurica',
@@ -2657,19 +3023,19 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scuote istantaneamente il bersaglio con forza dirompente per {damage} danni da Natura.',
   'entities.abilities.lightning_shield.name': 'Barriera di Tuono',
   'entities.abilities.lightning_shield.description':
-    'Ti circonda di fulmini crepitanti: gli assalitori in mischia subiscono 13 danni da Natura.',
+    'Ti circonda di fulmini crepitanti: gli assalitori in mischia subiscono {buff} danni da Natura, fino a 3 cariche e al massimo una volta ogni 5 secondi.',
   'entities.abilities.flame_shock.name': 'Scossa di Braci',
   'entities.abilities.flame_shock.description':
-    'Brucia il bersaglio con il fuoco per 25 danni più {damage} in 12 s.',
+    'Brucia il bersaglio con il fuoco per {damage} danni più {overTime} in 12 sec.',
   'entities.abilities.flametongue_weapon.name': 'Arma Marchiofuoco',
   'entities.abilities.flametongue_weapon.description':
-    'Imbeve la tua arma con fuoco elementale: ogni colpo infligge 8 danni da Fuoco aggiuntivi per 5 min.',
+    'Imbeve la tua arma con fuoco elementale: ogni colpo infligge {damage} danni da Fuoco aggiuntivi per 5 min.',
   'entities.abilities.frost_shock.name': 'Scossa di Brina',
   'entities.abilities.frost_shock.description':
     'Scuote istantaneamente il bersaglio col gelo per {damage} danni da Gelo e rallenta il movimento del 50% per 8 s.',
   'entities.abilities.frostbrand_weapon.name': 'Arma Legabrina',
   'entities.abilities.frostbrand_weapon.description':
-    'Imbeve la tua arma con gelo pungente: ogni colpo infligge 8 danni aggiuntivi per 5 min.',
+    'Imbeve la tua arma con gelo pungente: ogni colpo infligge {damage} danni aggiuntivi per 5 min.',
   'entities.abilities.ghost_wolf.name': 'Shadewolf',
   'entities.abilities.ghost_wolf.description':
     'Ti trasforma in un Shadewolf, aumentando la velocità di movimento del 40% per 10 min.',
@@ -2681,15 +3047,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Invia un dardo oscuro contro il nemico per {damage} danni da Ombra.',
   'entities.abilities.demon_skin.name': 'Pelle di Demone',
   'entities.abilities.demon_skin.description':
-    'La pelle demoniaca aumenta la tua armatura di 30 per 30 min.',
+    'La pelle demoniaca aumenta la tua armatura di {buff} per 30 min.',
   'entities.abilities.immolate.name': 'Patto Ardente',
   'entities.abilities.immolate.description':
-    'Brucia il nemico per 11 danni da Fuoco e altri {damage} in 15 s.',
+    'Brucia il nemico per {damage} danni da Fuoco e altri {overTime} in 15 sec.',
   'entities.abilities.corruption.name': 'Marciume Nero',
   'entities.abilities.corruption.description':
     'Corrompe il bersaglio, infliggendo {damage} danni da Ombra in 18 s.',
   'entities.abilities.life_tap.name': 'Patto Amaro',
-  'entities.abilities.life_tap.description': 'Converte 30 salute in 30 mana.',
+  'entities.abilities.life_tap.description': 'Converte {damage} salute in {damage} mana.',
   'entities.abilities.curse_of_agony.name': "Maleficio dell'Angoscia",
   'entities.abilities.curse_of_agony.description':
     'Maledice il bersaglio con agonia: {damage} danni da Ombra in 24 s.',
@@ -2712,7 +3078,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_touch.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Wildward',
   'entities.abilities.mark_of_the_wild.description':
-    "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di 25 per 30 min.",
+    "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.moonfire.name': 'Tempesta Lunare',
   'entities.abilities.moonfire.description':
     'Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.',
@@ -2720,13 +3086,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description': 'Cura il bersaglio di {damage} in 12 s.',
   'entities.abilities.thorns.name': 'Guardia di Rovi',
   'entities.abilities.thorns.description':
-    'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono 3 danni da Natura.',
+    'Dal bersaglio spuntano spine: gli assalitori in mischia subiscono {buff} danni da Natura.',
   'entities.abilities.entangling_roots.name': 'Radici Avvinghianti',
   'entities.abilities.entangling_roots.description':
     'Radica il bersaglio sul posto per un massimo di 12 s.',
   'entities.abilities.bear_form.name': 'Forma di Bruin',
   'entities.abilities.bear_form.description':
-    "Mutamenti in orso: armatura +65%, potenza d'attacco +15, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
+    "Mutamenti in orso: armatura +90%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore.",
   'entities.abilities.maul.name': 'Frantumaossa',
   'entities.abilities.maul.description':
     'Attacco brutale che aumenta i danni in mischia di {damage} e causa molta minaccia. Si attiva al tuo prossimo colpo. Solo in Forma di Bruin.',
@@ -2741,7 +3107,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo.",
   'entities.abilities.ferocious_bite.name': 'Morso Cruento',
   'entities.abilities.ferocious_bite.description':
-    'Mossa finale che infligge danni per punto combo. Solo Forma del Lupo.',
+    'Mossa finale che infligge {damage}. Solo Forma del Lupo.',
   'entities.abilities.swipe.name': 'Artigli Falcianti',
   'entities.abilities.swipe.description':
     'Falcia i nemici vicini per {damage} danni. Genera minaccia extra. Solo in Forma di Bruin.',
@@ -2764,7 +3130,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.description':
     'Stordisce il bersaglio per 2 sec. Solo in Forma di Bruin.',
   'entities.abilities.faerie_fire.name': 'Luce Stregata',
-  'entities.abilities.faerie_fire.description': "Riduce l'armatura del bersaglio di 35 per 40 sec.",
+  'entities.abilities.faerie_fire.description':
+    "Riduce l'armatura del bersaglio del {damage}% per 40 sec. Non si somma con Trancia Armatura.",
   'entities.abilities.hibernate.name': 'Sopore',
   'entities.abilities.hibernate.description':
     'Costringe il bersaglio in un sonno profondo per un massimo di 8 sec. Qualsiasi danno lo risveglia.',
@@ -2782,16 +3149,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Aumenta la potenza d'attacco di 40 per 6 sec. Solo Forma del Lupo.",
   'entities.abilities.rip.name': 'Squartare',
   'entities.abilities.rip.description':
-    'Mossa finale che infligge danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo.',
+    'Mossa finale che infligge {damage} danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo.',
   'entities.abilities.mortal_strike.name': 'Colpo Mutilante',
   'entities.abilities.mortal_strike.description':
     "Un colpo feroce che infligge danni dell'arma più {damage}. (firma Armi)",
   'entities.abilities.bloodthirst.name': 'Salasso',
   'entities.abilities.bloodthirst.description':
-    'Attacca istantaneamente in una frenesia sanguigna per {damage}. (firma Furia)',
+    "Attacca istantaneamente in una frenesia sanguigna per il 60% dei danni dell'arma più {damage}. (firma Furia)",
   'entities.abilities.shield_slam.name': 'Frantumascudo',
   'entities.abilities.shield_slam.description':
-    'Colpisce il bersaglio con lo scudo per {damage} e genera una minaccia enorme. (firma Protezione)',
+    "Colpisce il bersaglio con lo scudo per il 50% dei danni dell'arma più {damage} e genera una minaccia enorme. (firma Protezione)",
   'entities.abilities.whirlwind.name': 'Vortice di Lame',
   'entities.abilities.whirlwind.description':
     'Ruoti in un arco letale, colpendo tutti i nemici vicini per {damage}. (talento Furia)',
@@ -3842,7 +4209,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'news.prerelease': 'Anteprima',
   'news.viewOnGithub': 'Vedi su GitHub',
   'wiki.cta': 'Sfoglia la Wiki',
-  // --- qol-changes: character profile, attack-move, login/create labels ---
   'character.portraitAlt': 'Ritratto di {name}',
   'character.viewProfile': 'Vedi profilo',
   'character.profile': 'Profilo',
@@ -3857,7 +4223,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'auth.chromaOption': 'Croma {n}',
   'auth.noAccountPrompt': 'Nuovo nel mondo?',
   'auth.haveAccountPrompt': 'Hai già un account?',
-
   'entities.items.conjured_bread.name': "Focaccia d'avena evocata",
   'entities.items.conjured_bread2.name': 'Pagnotta nera evocata',
   'entities.items.conjured_bread3.name': 'Dolce al miele evocato',
@@ -3918,7 +4283,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_axe.name': 'Ascia di Legno Antico',
   'entities.items.goldleaf_sickle.name': 'Falcetto Fogliadoro',
   'entities.items.sunpetal_sickle.name': 'Falcetto Petalo di Sole',
-  // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
+  'entities.items.thorium_ore.name': 'Minerale di Torio',
+  'entities.items.arcanite_bar.name': 'Barra di Arcanite',
+  'entities.items.ashwood_log.name': 'Tronco di Frassino Cinereo',
+  'entities.items.elderwood_log.name': 'Tronco di Sambuco Antico',
+  'entities.items.goldleaf_herb.name': 'Erba Fogliadoro',
+  'entities.items.sunpetal_herb.name': 'Erba Petalosole',
   'hud.core.chatChannels.add': 'Aggiungi canale di chat',
   'hud.core.chatChannels.addTitle': 'Aggiungi canale',
   'hud.core.chatChannels.close': 'Chiudi la scheda {channel}',
@@ -4118,9 +4488,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}s',
-  'hudChrome.mobile.autorun': 'Corsa automatica',
   'hudChrome.mobile.haptics': 'Vibrazione',
   'hudChrome.mobile.hapticsOff': 'Vibrazione disattivata',
+  'hudChrome.mobile.hotbarPage': 'Abilità',
+  'hudChrome.mobile.hotbarPageAria': 'Mostra la serie successiva di abilità',
   'hudChrome.mobile.jump': 'Salta',
   'hudChrome.mobile.leaderboard': 'Classifica',
   'hudChrome.mobile.nameplates': 'Nomi',
@@ -4256,11 +4627,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.title': 'Account',
   'hudChrome.account.walletSummary':
     'Verifica un portafoglio Solana per mostrare il distintivo da titolare sulla tua scheda giocatore.',
-  // On-screen quest tracker (hudChrome.questTracker.*): collapsed count badge + header toggle hover hint.
   'hudChrome.questTracker.count': '({count})',
   'hudChrome.questTracker.collapseHint': 'Comprimi il riquadro Missioni',
   'hudChrome.questTracker.expandHint': 'Espandi il riquadro Missioni',
-  // Modular bag filtering controls (hudChrome.bags.*).
   'hudChrome.bags.filterGroupAria': 'Filtra le borse per categoria',
   'hudChrome.bags.filterAll': 'Tutti',
   'hudChrome.bags.filterWeapon': 'Armi',
@@ -4275,7 +4644,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.searchPlaceholder': 'Cerca oggetti',
   'hudChrome.bags.searchAria': 'Cerca gli oggetti della borsa per nome',
   'hudChrome.bags.noMatch': 'Nessun oggetto corrisponde ai tuoi filtri.',
-  // v0.13.0 release i18n fill: bug report, chat window, character takeover, admin bug reports
   'character.inWorldHint': 'Già nel mondo. Esci altrove, oppure prendine il controllo.',
   'character.takeOver': 'Prendi il controllo',
   'character.takeOverConfirm':
@@ -4310,7 +4678,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatWindow.resetAction': 'Ripristina',
   'hudChrome.chatWindow.resize': 'Trascina per ridimensionare la finestra della chat',
   'hudChrome.options.clickFeedback': 'Indicatore di clic',
-  // v0.13.0 adaptive browser-effects perf tier (PR #759)
   'hudChrome.options.browserEffects': 'Effetti del browser',
   'hudChrome.options.browserEffectsAuto': 'Auto',
   'hudChrome.options.browserEffectsFull': 'Completi',
@@ -4318,7 +4685,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsMinimal': 'Minimi',
   'hudChrome.options.browserEffectsNote':
     "La modalità automatica attenua gli effetti CSS pesanti (sfocatura, bagliore, movimento dello sfondo) in base al tuo browser e dispositivo. Riducila manualmente se l'interfaccia sembra lenta.",
-  // Guide (/guide) localization.
   'guide.bestiary.heading': 'Bestiario',
   'guide.bestiary.intro':
     "Le creature del mondo, raggruppate per famiglia. Sono i nemici che incontri all'aperto. Le cose più letali attendono, non elencate, dietro le porte dei dungeon.",
@@ -4994,7 +5360,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Tre zone, da sud a nord, ognuna un gradino più in alto di livello. Segui la scia delle missioni e la terra ti porta dalla valle alle vette.',
   'guide.worldPage.places': 'Luoghi notevoli',
   'guide.worldPage.residents': 'Chi incontrerai',
-  // guide.* enrichment fill (lore, gear, social, stats, economy, progression)
   'guide.arenaPage.powerupsBody':
     "Durante lo scontro nell'arena cadono anche sfere luminose, libere per chiunque le raggiunga per primo. Sono volutamente sopra le righe e durano solo un istante: Demone della Velocità per un lampo di ritmo accecante, Colosso per gonfiarti in un gigante ingombrante, Stivali Lunari per un balzo rimbalzante a bassa gravità, e Berserker per un'improvvisa ondata di furia.",
   'guide.arenaPage.powerupsTitle': "Potenziamenti nell'arena",
@@ -5349,9 +5714,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.gladeTitle': 'Un angolo quieto: la Radura di Brightwood',
   'guide.worldPage.gladeBody':
     'Non ogni storia della Valle parla dei morti. A nord, una radura assolata chiamata Brightwood Glade mantiene un ritmo più gentile tutto suo, fatto di sentieri silenziosi e luce screziata sotto i rami. È un contrappunto lieve alla pista che stai seguendo e vale la pena vederla quando la strada ti lascia spazio per vagare.',
-  // APM telemetry label from release/v0.14.0
   'hudChrome.perf.labels.apm': 'APM',
-  // Account-security portal (2FA, verified email change, GDPR export) from PR #833.
   'auth.twoFactorLabel': 'Codice di autenticazione',
   'auth.twoFactorPlaceholder': 'Codice a 6 cifre o codice di recupero',
   'auth.twoFactorHint':
@@ -5604,7 +5967,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.tierMedium': 'Medio',
   'sim.lockpick.tierPremium': 'Pregiato',
   'sim.lockpick.toolSlips': 'Quello strumento scivola via da questa serratura.',
-  // Guide (/guide) localization.,
   'lockpickUi.pickTitle': 'Scassina la Serratura',
   'lockpickUi.cofferTitle': 'Forziere Ricolmo',
   'lockpickUi.cache': 'Scrigno {tier}',
@@ -5652,8 +6014,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Premi F per risalire',
   'sim.delve.objectiveClearRoom': 'Ripulisci la stanza.',
   'sim.delve.objectiveDefeatBoss': 'Sconfiggi il boss.',
-  // Account-security portal (2FA, verified email change, GDPR export) from PR #833.,
-  // Aura effect tooltip summaries.
   'hudChrome.auraEffect.dot': 'Infligge {value} danni da {school} ogni {interval} s',
   'hudChrome.auraEffect.hot': 'Ripristina {value} salute ogni {interval} s',
   'hudChrome.auraEffect.absorb': 'Assorbe {value} danni',
@@ -5973,7 +6333,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Non ora',
   'hudChrome.nativeUpdate.title': 'Aggiornamento disponibile',
   'hudChrome.nativeUpdate.update': 'Aggiorna',
-  // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'La Posta dei Corvi',
   'entities.letters.ravenpost_welcome.subject': 'Ora i corvi volano per te',
   'entities.letters.ravenpost_welcome.body':
@@ -6068,7 +6427,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required':
     "Avvia prima la configurazione dell'autenticazione a due fattori.",
   'apiError.validation.failed': 'Alcuni campi non sono validi. Controlla il modulo e riprova.',
-  // Release v0.22.0 locale fill.
   'download.linuxCta': 'Scarica per Linux',
   'download.linuxHint':
     'AppImage: rendilo eseguibile, quindi eseguilo. Nessuna installazione necessaria.',
@@ -6171,7 +6529,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.resultAria': 'Crea {name}',
   'hudChrome.crafting.title': 'Creazione',
   'hudChrome.crafting.unknownRecipe': 'Quella ricetta non esiste.',
-  // Release v0.22.0 professions quest locale fill.
+  'hudChrome.mobile.actionPageIndicator': 'Pag. {page}',
+  'hudChrome.mobile.actionPageToggle': 'Cambia pagina di azione',
+  'hudChrome.mobile.actionRing': 'Azioni di combattimento',
+  'hudChrome.mobile.spellbookPageLabel': 'Pagina {page}',
+  'hudChrome.mobile.targetCycle': 'Scambia bersaglio',
+  'hudChrome.mobile.targetCycleShort': 'Bersaglio',
+  'hudChrome.options.mobileCameraJoystick': 'Joystick della fotocamera',
+  'hudChrome.options.mobileLeftHanded': 'Disposizione per mancini',
   'entities.quests.q_archetype_acceptance.title': 'Un mestiere da chiamare tuo',
   'entities.quests.q_archetype_acceptance.text':
     'Ogni artigiano di Eastbrook alla fine sceglie un mestiere da considerare proprio. Mettiti alla prova con una sola azione, {playerName}, e dichiara il tuo percorso.',
@@ -6183,4 +6548,269 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_make_amends.completion':
     'Modifiche apportate; una nuova strada è aperta per te.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Lupo della Foresta ucciso',
+  'entities.npcs.bursar_aldous_crane.name': 'Economo Aldous Crane',
+  'entities.npcs.bursar_aldous_crane.title': 'Il Forziere Dorato',
+  'entities.npcs.bursar_aldous_crane.greeting':
+    'Ogni cassa, scrigno e ninnolo è al sicuro presso il Forziere Dorato.',
+  'entities.npcs.bursar_fernando.name': 'Economo Fernando',
+  'entities.npcs.bursar_fernando.title': 'Il Forziere Dorato',
+  'entities.npcs.bursar_fernando.greeting':
+    'Ti diamo il benvenuto al Forziere Dorato. I tuoi beni riposano al sicuro dietro le nostre serrature.',
+  'entities.npcs.bursar_petra_vell.name': 'Economa Petra Vell',
+  'entities.npcs.bursar_petra_vell.title': 'Il Forziere Dorato',
+  'entities.npcs.bursar_petra_vell.greeting':
+    'Il Forziere Dorato tiene registri puliti e caveau ancora più puliti. Cosa possiamo custodire per te?',
+  'guide.economy.bankTitle': 'La banca',
+  'guide.economy.bankBody':
+    "Ogni città principale ospita una filiale del Forziere Dorato, la casa bancaria del reame. Parla con l'economo del posto per aprire il tuo caveau, una riserva privata di spazio oltre le tue borse che il tuo personaggio conserva per tutta la vita. Qualunque cosa lasci in custodia ti aspetta al sicuro, quale che sia la filiale che visiterai la prossima volta.",
+  'guide.economy.bankHow':
+    'Con il caveau aperto, clicca un oggetto nelle borse per depositarlo e cliccalo nel caveau per riprenderlo. Il caveau custodisce solo beni, mai monete, e gli oggetti missione restano con te. Quando le borse si riempiono a metà viaggio, un solo pulsante vi riversa in una volta sola tutti i tuoi materiali da artigianato.',
+  'guide.economy.bankSlots':
+    "Un caveau nuovo parte piccolo e cresce con te. L'economo vende altri spazi in cambio di monete a prezzi sempre più ripidi, e giocare online frutta spazio bonus in aggiunta, per cose come un'email verificata, gli account collegati e gli amici che porti nel gioco.",
+  'hudChrome.bank.title': 'Banca',
+  'hudChrome.bank.subtitle': 'Il Forziere Dorato',
+  'hudChrome.bank.close': 'Chiudi la banca',
+  'hudChrome.bank.empty': 'La tua banca è vuota.',
+  'hudChrome.bank.tooFar': 'Devi essere da un banchiere per consultare la tua banca.',
+  'hudChrome.bank.capacity': '{used}/{total}',
+  'hudChrome.bank.capacityAria': 'Spazi della banca usati: {used} di {total}',
+  'hudChrome.bank.filterGroupAria': 'Filtra la banca per categoria',
+  'hudChrome.bank.searchAria': 'Cerca gli oggetti della banca per nome',
+  'hudChrome.bank.sortAria': 'Ordina gli oggetti della banca',
+  'hudChrome.bank.cannotDeposit': 'Non depositabile in banca',
+  'hudChrome.bank.depositHint': 'Clicca per depositare',
+  'hudChrome.bank.depositPartialHint': 'Maiusc + clic per depositare una quantità parziale',
+  'hudChrome.bank.depositQuantityTitle': 'Deposita {item}',
+  'hudChrome.bank.depositQuantityInput': 'Quantità da depositare',
+  'hudChrome.bank.depositQuantityConfirm': 'Deposita',
+  'hudChrome.bank.withdrawHint': 'Clicca per ritirare',
+  'hudChrome.bank.withdrawPartialHint': 'Maiusc + clic per ritirare una quantità parziale',
+  'hudChrome.bank.withdrawQuantityTitle': 'Ritira {item}',
+  'hudChrome.bank.withdrawQuantityInput': 'Quantità da ritirare',
+  'hudChrome.bank.withdrawQuantityConfirm': 'Ritira',
+  'hudChrome.bank.depositAll': 'Deposita tutti i materiali',
+  'hudChrome.bank.depositAllDone': 'Materiali depositati: {count}.',
+  'hudChrome.bank.depositAllFull': 'Materiali depositati: {count}. Ora la banca è piena.',
+  'hudChrome.bank.depositAllNone': 'Banca piena: non è stato depositato nulla.',
+  'hudChrome.bank.buySlots': 'Compra {count} spazi',
+  'hudChrome.bank.buySlotsMaxed': 'Ampliata al massimo',
+  'hudChrome.bank.buyConfirm': 'Acquistare {count} spazi aggiuntivi della banca per {price}?',
+  'hudChrome.bank.buyConfirmAccept': 'Acquista',
+  'hudChrome.bank.bonusTitle': 'Spazi bonus',
+  'hudChrome.bank.bonusSectionAria': 'Spazi bonus della banca e come guadagnarne altri',
+  'hudChrome.bank.bonusEarned': '+{count}',
+  'hudChrome.bank.bonusStatusEarned': '+{count}',
+  'hudChrome.bank.bonusSourceEmail': 'Email verificata',
+  'hudChrome.bank.bonusSourceDiscord': 'Discord collegato',
+  'hudChrome.bank.bonusSourceWallet': 'Portafoglio collegato',
+  'hudChrome.bank.bonusSourceReferral': 'Amici invitati',
+  'hudChrome.bank.bonusAdvertEmail': 'Verifica la tua email per guadagnare 2 spazi.',
+  'hudChrome.bank.bonusAdvertDiscord': 'Collega il tuo Discord per guadagnare 2 spazi.',
+  'hudChrome.bank.bonusAdvertWallet': 'Collega un portafoglio per guadagnare 2 spazi.',
+  'hudChrome.bank.bonusReferralExplainer':
+    'Invita un amico: quando raggiunge il livello 10 guadagnate 2 spazi ciascuno, fino a 5 amici.',
+  'hudChrome.bank.bonusReferralProgress': '{count}/{cap}',
+  'abilityUi.tooltip.selfOnly': 'Solo su di sé',
+  'itemUi.lootRoll.rolled': '{answered}/{total} hanno tirato',
+  'entities.abilities.sunder_armor.description':
+    "Lacera l'armatura del bersaglio, riducendola del {damage}% per applicazione. Si accumula fino a 5 volte. Genera una grande quantità di minaccia.",
+  'entities.mobs.training_dummy.name': "Manichino d'allenamento",
+  'entities.mobs.yumi_cat.name': 'Yumi',
+  'guide.arenaPage.yumiBody':
+    'Proteggi Yumi è una modalità a obiettivi di squadra che si gioca in un labirinto: ogni fazione protegge il proprio famiglio felino mentre dà la caccia a quello avversario. Di tanto in tanto entrambi i gatti si teletrasportano in nuovi angoli del labirinto, così lo scontro oscilla tra difesa, caccia e corsa per ritrovarli. Mettiti in coda in tre contro tre o cinque contro cinque; cadere in battaglia ti tiene in panchina solo per un momento.',
+  'guide.arenaPage.yumiHeading': 'Proteggi Yumi',
+  'hudChrome.archetypeTitle.hobbyLabel': 'Passatempo',
+  'hudChrome.auraEffect.armorPct': "Riduce l'armatura del {pct}%",
+  'hudChrome.auraEffect.armorPctStacks': "Riduce l'armatura del {pct}% ({stacks} accumuli)",
+  'hudChrome.auraEffect.increasePct.allStats': 'Aumenta tutti gli attributi del {pct}%',
+  'hudChrome.auraEffect.increasePct.ap': 'Aumenta la potenza di attacco del {pct}%',
+  'hudChrome.auraEffect.increasePct.armor': "Aumenta l'armatura del {pct}%",
+  'hudChrome.auraEffect.increasePct.int': "Aumenta l'intelletto del {pct}%",
+  'hudChrome.auraEffect.increasePct.sta': 'Aumenta la tempra del {pct}%',
+  'hudChrome.crafting.notAtHub':
+    'Devi trovarti alla postazione artigiana, al livello richiesto, per fabbricarlo.',
+  'hudChrome.crafting.recipeNotLearned': 'Non hai ancora imparato quella ricetta.',
+  'hudChrome.crafting.throttled':
+    'Stai fabbricando troppo in fretta. Aspetta un momento e riprova.',
+  'hudChrome.mobile.chatPlaceholder': 'Scrivi qualcosa...',
+  'hudChrome.mobile.hideKeyboard': 'Nascondi tastiera',
+  'hudChrome.unitFrame.partyChip': 'Gruppo',
+  'yumi.banner.sudden': 'MORTE IMPROVVISA! Gli Yumi tengono la posizione!',
+  'yumi.banner.teleport': 'Gli Yumi si teletrasportano!',
+  'yumi.bracket3': 'Yumi 3c3',
+  'yumi.bracket5': 'Yumi 5c5',
+  'yumi.end.loss': 'SCONFITTA! Il tuo Yumi è caduto.',
+  'yumi.end.win': 'VITTORIA! Yumi è al sicuro!',
+  'yumi.enterQueue': 'Unisciti a Proteggi Yumi!',
+  'yumi.error.partyTooBig3': 'Proteggi Yumi 3c3 ammette un gruppo di massimo tre giocatori.',
+  'yumi.error.partyTooBig5': 'Proteggi Yumi 5c5 ammette un gruppo di massimo cinque giocatori.',
+  'yumi.hud.aria': 'Il tuo Yumi a {mine} di {max} salute, Yumi nemico a {theirs}.',
+  'yumi.hud.collapse': 'Comprimi le barre di Proteggi Yumi',
+  'yumi.hud.enemyYumi': 'Yumi nemico',
+  'yumi.hud.expand': 'Espandi le barre di Proteggi Yumi',
+  'yumi.hud.getReady': 'Preparati…',
+  'yumi.hud.suddenDeath': 'MORTE IMPROVVISA',
+  'yumi.hud.teleportIn': 'Gli Yumi si spostano tra {s}',
+  'yumi.hud.title': 'PROTEGGI YUMI',
+  'yumi.hud.yourYumi': 'Il tuo Yumi',
+  'yumi.log.start': 'Proteggi Yumi! Difendi il tuo famiglio e dai la caccia a quello nemico.',
+  'yumi.queue.join': 'Ti unisci alla coda di Proteggi Yumi. Proteggi il tuo famiglio…',
+  'yumi.queue.leave': 'Lasci la coda di Proteggi Yumi.',
+  'yumi.queue.teamLeave': 'La tua squadra lascia la coda di Proteggi Yumi.',
+  'yumi.respawn.title': 'ABBATTUTO!',
+  'hudChrome.auth.forgotPrompt': 'Password dimenticata?',
+  'hudChrome.auth.forgotTitle': 'Reimposta la password',
+  'hudChrome.auth.forgotHint':
+    'Inserisci il tuo nome utente e invieremo un link di reimpostazione all’indirizzo e-mail registrato.',
+  'hudChrome.auth.forgotUsername': 'Nome utente',
+  'hudChrome.auth.forgotSubmit': 'Invia link di reimpostazione',
+  'hudChrome.auth.forgotSent':
+    'Se un account con quel nome utente ha un indirizzo e-mail registrato, abbiamo inviato un link di reimpostazione. Controlla la tua casella di posta.',
+  'hudChrome.auth.forgotBack': 'Torna all’accesso',
+  'hudChrome.auth.resetTitle': 'Scegli una nuova password',
+  'hudChrome.auth.resetNewPassword': 'Nuova password',
+  'hudChrome.auth.resetConfirm': 'Conferma la nuova password',
+  'hudChrome.auth.resetSubmit': 'Aggiorna password',
+  'hudChrome.auth.resetDone': 'La tua password è stata aggiornata. Ora puoi accedere.',
+  'hudChrome.auth.resetMismatch': 'Le password non coincidono.',
+  'hudChrome.auth.resetErrInvalid':
+    'Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo.',
+  'itemUi.vendor.sellItemAria': 'Vendi {item} per {price}',
+  'itemUi.vendor.sellRolledWarning':
+    'Le statistiche generate casualmente non possono essere recuperate con il riacquisto.',
+  'loading.tips.classes':
+    'Suggerimento: ciascuna delle 9 classi si gioca in modo diverso. Provane alcune prima di sceglierne una.',
+  'loading.tips.dungeons':
+    'Suggerimento: prova un sotterraneo in difficoltà eroica quando la modalità normale non rappresenta più una sfida per il tuo equipaggiamento, per uno scontro più duro e gratificante.',
+  'loading.tips.guilds':
+    'Suggerimento: unirti a una gilda ti offre un canale di chat privato e un elenco condiviso dei compagni di gilda.',
+  'loading.tips.loadouts':
+    'Suggerimento: salva più configurazioni dei talenti per passare da una build all’altra senza spendere i punti due volte.',
+  'loading.tips.market':
+    'Suggerimento: il Mercato Mondiale ti permette di comprare e vendere con giocatori di tutto il reame.',
+  'loading.tips.professions':
+    'Suggerimento: puoi apprendere le professioni di raccolta e creazione insieme alla tua classe di combattimento.',
+  'loading.tips.pvp':
+    'Suggerimento: sfida un altro giocatore a un duello amichevole oppure mettiti in coda per l’arena del Colosseo Cinereo per mettere alla prova la tua build.',
+  'loading.tips.talents':
+    'Suggerimento: puoi azzerare i talenti ogni volta che sei fuori combattimento, quindi una scelta iniziale non è mai definitiva.',
+  'entities.items.arcane_dust.name': 'Polvere Arcana',
+  'entities.items.arcane_essence.name': 'Essenza Arcana',
+  'entities.items.arcane_shard.name': 'Frammento Arcano',
+  'entities.items.chunk_of_ore.name': 'Pezzo di Minerale',
+  'entities.quests.q_prof_intro.completion':
+    'Vedi? Minerale nello zaino e calli sulle mani. Continua a estrarre minerali, tagliare legna e raccogliere erbe mentre percorri le strade. Quando torni in città, tieni d’occhio il tabellone delle Priorità della città vicino al mercato e il banco da lavoro lì accanto. C’è un mestiere onesto in tutto questo, se ti interessa.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Pezzo di Minerale',
+  'entities.quests.q_prof_intro.text':
+    'A Eastbrook ogni anima pratica un mestiere oltre all’arte della spada, {playerName}. Ci sono vene di minerale sparse intorno alla città, quindi impugna un piccone e portami 5 pezzi. Estraili tu, bada bene, saprò riconoscere la differenza.',
+  'entities.quests.q_prof_intro.title': 'Un mestiere per ogni mano',
+  'hudChrome.auth.appleChoiceExpired':
+    'Questo accesso con Apple è scaduto. Accedi di nuovo con Apple.',
+  'hudChrome.auth.appleChoiceIntro':
+    'Crea un nuovo account oppure collega Apple a un account esistente.',
+  'hudChrome.auth.appleError': 'Impossibile accedere con Apple. Riprova.',
+  'hudChrome.auth.appleLoginCta': 'Continua con Apple',
+  'hudChrome.controller.duplicate': 'Associato anche a {buttons}',
+  'hudChrome.dailyRewards.reason.banned':
+    'Sei escluso dalle Ricompense giornaliere. Motivo: {reason}',
+  'hudChrome.itemHeroicTag': '[EROICO]',
+  'hudChrome.itemSoulbound': 'Vincolato all’anima',
+  'hudChrome.keybinds.categoryPet': 'Famiglio',
+  'hudChrome.keybinds.petAggressive': 'Famiglio: aggressivo',
+  'hudChrome.keybinds.petAttack': 'Famiglio: attacca',
+  'hudChrome.keybinds.petDefensive': 'Famiglio: difensivo',
+  'hudChrome.keybinds.petStop': 'Famiglio: fermo',
+  'hudChrome.keybinds.petTaunt': 'Famiglio: provoca',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Invia un {item} in meno',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Invia un {item} in più',
+  'hudChrome.mobile.hideMenuButtons': 'Nascondi i pulsanti del menu',
+  'hudChrome.mobile.showMenuButtons': 'Mostra i pulsanti del menu',
+  'hudChrome.options.changed': 'Modifiche: {count}',
+  'hudChrome.options.changedSummary': '{count} diversi dai valori predefiniti',
+  'hudChrome.options.conflictDot': 'Conflitto di associazione',
+  'hudChrome.options.done': 'Fatto',
+  'hudChrome.options.ia.catAccessibilityName': 'Accessibilità',
+  'hudChrome.options.ia.catAccessibilitySub': 'Movimento, contrasto e comfort dei contenuti.',
+  'hudChrome.options.ia.catAudioSub': 'Volume e opzioni audio.',
+  'hudChrome.options.ia.catControllerSub': 'Risposta del controller e disposizione dei pulsanti.',
+  'hudChrome.options.ia.catControlsName': 'Comandi',
+  'hudChrome.options.ia.catControlsSub': 'Visuale, movimento, combattimento e risposta.',
+  'hudChrome.options.ia.catGraphicsSub': 'Qualità, visuale e aspetto del mondo.',
+  'hudChrome.options.ia.catInterfaceSub':
+    'Scala dell’interfaccia, pannelli, chat e riquadri delle unità.',
+  'hudChrome.options.ia.catKeybindsSub': 'Associa un tasto a ogni azione.',
+  'hudChrome.options.ia.catOverviewName': 'Panoramica',
+  'hudChrome.options.ia.catOverviewSub': 'Elementi fissati, azioni rapide e modifiche effettuate.',
+  'hudChrome.options.ia.catSystemName': 'Sistema',
+  'hudChrome.options.ia.catSystemSub': 'Prestazioni, assistenza e informazioni.',
+  'hudChrome.options.ia.catTouchName': 'Tocco',
+  'hudChrome.options.ia.catTouchSub': 'Levette su schermo, visuale e pulsanti.',
+  'hudChrome.options.ia.railDisplay': 'Schermo',
+  'hudChrome.options.ia.railInput': 'Inserimento',
+  'hudChrome.options.ia.railSystem': 'Sistema',
+  'hudChrome.options.keybindCleared': 'Associazione di {action} cancellata',
+  'hudChrome.options.keybindEvicted': '{key} associato a {action} e rimosso da {evicted}',
+  'hudChrome.options.keybindModifierHint':
+    'Suggerimento: puoi associare combinazioni con tasti modificatori. Tieni premuto Maiusc, Ctrl o Alt mentre premi un tasto per registrare la combinazione, per esempio Maiusc+1.',
+  'hudChrome.options.keybindRebinding':
+    'Nuova associazione per {action}. Premi un tasto oppure Esc per annullare.',
+  'hudChrome.options.keybindTaken': 'Tasto rimosso',
+  'hudChrome.options.keybindUnbound': 'Nessun tasto associato a {action}',
+  'hudChrome.options.legend.back': 'Indietro',
+  'hudChrome.options.legend.category': 'Categoria',
+  'hudChrome.options.legend.clear': 'Cancella',
+  'hudChrome.options.legend.navigate': 'Naviga',
+  'hudChrome.options.legend.page': 'Pagina',
+  'hudChrome.options.legend.reset': 'Ripristina',
+  'hudChrome.options.legend.select': 'Seleziona',
+  'hudChrome.options.modeOffline': 'Non in linea',
+  'hudChrome.options.modeOnline': 'In linea',
+  'hudChrome.options.overviewConflictAlert':
+    'Alcune associazioni di tasti sono in conflitto o non hanno un tasto.',
+  'hudChrome.options.resetAllBody':
+    'Questa azione ripristina ogni impostazione al valore predefinito e non può essere annullata.',
+  'hudChrome.options.resetAllTitle': 'Ripristinare tutte le impostazioni?',
+  'hudChrome.options.searchEmpty': 'Nessuna impostazione corrisponde alla ricerca.',
+  'hudChrome.options.searchGoTo': 'Vai a {category}',
+  'hudChrome.options.searchPlaceholder': 'Cerca impostazioni',
+  'hudChrome.options.searchScopeAll': 'Tutte le impostazioni',
+  'hudChrome.options.searchScopeThis': 'Questa sezione',
+  'hudChrome.options.sec.about': 'Informazioni',
+  'hudChrome.options.sec.actionBars': 'Barre delle azioni',
+  'hudChrome.options.sec.buttons': 'Pulsanti',
+  'hudChrome.options.sec.camera': 'Visuale',
+  'hudChrome.options.sec.chat': 'Conversazione',
+  'hudChrome.options.sec.combat': 'Combattimento',
+  'hudChrome.options.sec.combatTooltips': 'Combattimento e descrizioni',
+  'hudChrome.options.sec.content': 'Contenuti',
+  'hudChrome.options.sec.feedback': 'Risposta',
+  'hudChrome.options.sec.feel': 'Sensibilità',
+  'hudChrome.options.sec.general': 'Generale',
+  'hudChrome.options.sec.hudExtras': 'Extra dell’interfaccia',
+  'hudChrome.options.sec.inputMode': 'Modalità di input',
+  'hudChrome.options.sec.look': 'Visuale',
+  'hudChrome.options.sec.motionContrast': 'Movimento e contrasto',
+  'hudChrome.options.sec.movement': 'Movimento',
+  'hudChrome.options.sec.panels': 'Pannelli',
+  'hudChrome.options.sec.performance': 'Prestazioni',
+  'hudChrome.options.sec.quality': 'Qualità',
+  'hudChrome.options.sec.scaleText': 'Scala e testo',
+  'hudChrome.options.sec.sticks': 'Levette',
+  'hudChrome.options.sec.support': 'Assistenza',
+  'hudChrome.options.sec.toggles': 'Interruttori',
+  'hudChrome.options.sec.unitFrames': 'Riquadri delle unità',
+  'hudChrome.options.sec.view': 'Visuale',
+  'hudChrome.options.sec.volume': 'Audio',
+  'hudChrome.readyCheck.notReady': 'Non pronto',
+  'hudChrome.readyCheck.prompt': '{name} ha avviato un controllo di prontezza. Sei pronto?',
+  'hudChrome.readyCheck.ready': 'Pronto',
+  'hudChrome.readyCheck.result':
+    'Controllo di prontezza: {ready} pronti, {notReady} non pronti, {noResponse} senza risposta.',
+  'hudChrome.readyCheck.notInPartyError':
+    'Devi essere in un gruppo per avviare un controllo di prontezza.',
+  'hudChrome.readyCheck.inProgressError': 'È già in corso un controllo di prontezza.',
+  'hudChrome.talents.choicesTab': 'Scelte',
+  'hudChrome.talents.resetChoices': 'Ripristina scelte',
+  'hudChrome.talents.tierLevel': 'Livello {n}',
+  'hudChrome.talents.tierLevelLabel': 'Livello',
 };

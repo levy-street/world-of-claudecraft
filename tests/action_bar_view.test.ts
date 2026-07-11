@@ -200,6 +200,27 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(near.outOfRange).toBe(false);
   });
 
+  it('respects both range boundaries for an ability with a minimum range', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('charge', { requiresTarget: true, range: 25, minRange: 8 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    // Snapshot each primitive: the core reuses the slot object across ticks.
+    const tooClose = view.tick(world({ targetPos: { x: 5, y: 0, z: 0 } })).slots[0].outOfRange;
+    const atMinimum = view.tick(world({ targetPos: { x: 8, y: 0, z: 0 } })).slots[0].outOfRange;
+    const atMaximum = view.tick(world({ targetPos: { x: 25, y: 0, z: 0 } })).slots[0].outOfRange;
+    const tooFar = view.tick(world({ targetPos: { x: 26, y: 0, z: 0 } })).slots[0].outOfRange;
+
+    expect(tooClose).toBe(true);
+    expect(atMinimum).toBe(false);
+    expect(atMaximum).toBe(false);
+    expect(tooFar).toBe(true);
+  });
+
   it('a range-0 targeted ability falls back to MELEE_RANGE for the range check', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('rend', { requiresTarget: true, range: 0 }) })),

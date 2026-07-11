@@ -130,7 +130,12 @@ describe('buildArenaView: bracket resolution + commit', () => {
     expect(v.canSwitchBracket).toBe(false);
     expect(v.action).toEqual({ kind: 'queued', queueSize: 3 });
     // Locked brackets are the inactive ones while queued.
-    expect(v.brackets.filter((b) => b.locked).map((b) => b.fmt)).toEqual(['1v1', 'fiesta']);
+    expect(v.brackets.filter((b) => b.locked).map((b) => b.fmt)).toEqual([
+      '1v1',
+      'fiesta',
+      'yumi3',
+      'yumi5',
+    ]);
   });
 });
 

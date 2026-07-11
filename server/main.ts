@@ -25,6 +25,8 @@ import {
   handleAccountExport,
   handleAccountLogout,
   handleAccountMarketing,
+  handleAccountPasswordForgot,
+  handleAccountPasswordReset,
   handleAccountSetEmail,
   handleAccountSetInitialEmail,
   handleAccountWhoami,
@@ -36,6 +38,13 @@ import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
 import { permissionsForRoles } from './admin_permissions';
 import { loadAntibotConfig } from './antibot_config_db';
 import {
+  configureAppleAuthRuntime,
+  handleAppleLogin,
+  handleAppleLoginLink,
+  handleAppleLoginNew,
+} from './apple_auth';
+import { pruneApplePendingLogins } from './apple_auth_db';
+import {
   hashPassword,
   newToken,
   normalizeCharName,
@@ -46,6 +55,8 @@ import {
   verifyPassword,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
+import { computeBankBonus } from './bank_entitlements';
+import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { characterSheet, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
@@ -54,6 +65,8 @@ import {
   accountAndScopeForToken,
   accountById,
   accountForToken,
+  acquireCharacterLease,
+  bankBonusFactsForAccount,
   type CharacterRow,
   characterCountsByRealm,
   chatMuteStatusForAccount,
@@ -85,6 +98,8 @@ import {
   pruneClientPerfReports,
   reclaimDeactivatedName,
   referralCountForAccount,
+  releaseAllCharacterLeases,
+  releaseCharacterLease,
   renameCharacter,
   rerollCharacter,
   revokeCompanionToken,
@@ -111,6 +126,7 @@ import {
   handleDiscordStart,
   handleDiscordStatus,
   handleDiscordUnlink,
+  handleNativeDiscordExchange,
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
@@ -126,7 +142,9 @@ import { pruneGitHubOAuthStates } from './github_db';
 import { handleGlitchLogin, readGlitchServerConfig } from './glitch_auth';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
+import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
+import { registerClientPerfMetrics } from './http/client_perf_metrics';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
 import {
   type ApiDelegate,
@@ -134,6 +152,8 @@ import {
   createApiDispatcher,
   selectApiEntry,
 } from './http/dispatch';
+import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
+import { setGameMetricsCounters } from './http/game_signals';
 import { handleLivez, handleMetricsGate, handleReadyz, markDraining } from './http/health';
 import { type Logger, logger } from './http/logger';
 import { createHttpMetrics } from './http/metrics';
@@ -766,7 +786,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (
       activeConfig().requireWebLogin &&
       req.method === 'POST' &&
-      (url === '/api/register' || url === '/api/login') &&
+      (url === '/api/register' ||
+        url === '/api/login' ||
+        url === '/api/account/password/forgot' ||
+        url === '/api/account/password/reset') &&
       !isWebClientRequest(req)
     ) {
       return json(res, 403, {
@@ -1545,6 +1568,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
       return handleAccountChangePassword(req, res, accountId, callerToken);
     }
+    // Password reset is for users who are locked out, so both routes are
+    // unauthenticated (rate-limited + web-login guarded above, and each handler is
+    // written to never reveal whether an account exists).
+    if (req.method === 'POST' && url === '/api/account/password/forgot') {
+      return handleAccountPasswordForgot(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/account/password/reset') {
+      return handleAccountPasswordReset(req, res);
+    }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
       if (!callerToken || (await accountForToken(callerToken)) === null)
@@ -1664,16 +1696,25 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    if (req.method === 'POST' && url === '/api/auth/apple') {
+      return handleAppleLogin(req, res, await readBody(req));
+    }
+    if (req.method === 'POST' && url === '/api/auth/apple/login/new') {
+      return handleAppleLoginNew(req, res, await readBody(req), (ip) => liveGame().isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/apple/login/link') {
+      return handleAppleLoginLink(req, res, await readBody(req));
+    }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the
     // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
     // web-login guard, which is login/register-only). Mutations go through
     // bearerActiveAccount; the dedicated Discord rate-limit bucket guards them.
     if (req.method === 'POST' && url === '/api/auth/discord/start') {
-      const mode =
-        new URL(req.url ?? '/', 'http://localhost').searchParams.get('mode') === 'link'
-          ? 'link'
-          : 'login';
+      const discordStartUrl = new URL(req.url ?? '/', 'http://localhost');
+      const mode = discordStartUrl.searchParams.get('mode') === 'link' ? 'link' : 'login';
+      const native = discordStartUrl.searchParams.get('native') === '1';
+      const nativeChallenge = discordStartUrl.searchParams.get('challenge') ?? undefined;
       let accountId: number | null = null;
       if (mode === 'link') {
         accountId = await bearerActiveAccount(req, res);
@@ -1681,10 +1722,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }
       if (!discordRateLimited(req, accountId ?? 0).allowed)
         return json(res, 429, { error: 'rate limited' });
-      return handleDiscordStart(req, res, { mode, accountId });
+      const body = native ? await readBody(req) : {};
+      return handleDiscordStart(req, res, {
+        mode,
+        accountId,
+        native,
+        nativeChallenge,
+        nativeAttestation: body.nativeAttestation,
+      });
     }
     if (req.method === 'GET' && url === '/api/auth/discord/callback') {
-      return handleDiscordCallback(req, res);
+      return handleDiscordCallback(req, res, (ip) => liveGame().isIpBlocked(ip));
     }
     // First-time-login chooser endpoints. Unauthenticated like /callback: the
     // authorization is the single-use pending-login token (minted only after a
@@ -1695,6 +1743,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/auth/discord/login/link') {
       return handleDiscordLoginLink(req, res, (ip) => liveGame().isIpBlocked(ip));
+    }
+    if (req.method === 'POST' && url === '/api/auth/discord/native/exchange') {
+      return handleNativeDiscordExchange(req, res);
     }
     if (req.method === 'GET' && url === '/api/discord') {
       const accountId = await bearerActiveAccount(req, res);
@@ -1945,6 +1996,9 @@ configureAuthRuntime({
   // legacy handleApi arm above.
   passesTurnstile: (req, body) => passesTurnstile(req, body, activeConfig().turnstileSecret),
   requestMetadata,
+});
+configureAppleAuthRuntime({
+  isIpBlocked: (ip) => liveGame().isIpBlocked(ip),
 });
 
 // Inject the main.ts runtime the ported character handlers (server/characters.ts) need
@@ -2312,6 +2366,7 @@ export async function startServer(): Promise<http.Server> {
     console.log(
       `pruned ${prunedPerfReports} client perf report row(s) older than ${config.perfReportRetentionDays} days`,
     );
+  await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
   await game.loadChatFilter();
@@ -2335,6 +2390,9 @@ export async function startServer(): Promise<http.Server> {
     );
     void pruneDiscordPendingLogins(pool).catch((err) =>
       console.error('discord pending login prune failed:', err),
+    );
+    void pruneApplePendingLogins(pool).catch((err) =>
+      console.error('apple pending login prune failed:', err),
     );
     void pruneGitHubOAuthStates(pool).catch((err) =>
       console.error('github oauth state prune failed:', err),
@@ -2407,8 +2465,36 @@ export async function startServer(): Promise<http.Server> {
     bufferHandshakeMessages,
     requestMetadata,
     maxWsPerIpHard: config.maxWsPerIpHard,
+    acquireCharacterLease,
+    releaseCharacterLease,
+    bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
   });
   wsAuth.attachUpgrade(server, wss);
+
+  // Register the game-state gauges + throughput counters on the SAME registry the
+  // RED exporter built at module scope, then install the counter sink process-wide
+  // (mirrors setAttackSignalSink). Wired here, after `game` and `wss` exist, so the
+  // gauges read live state at scrape time; ws_connections is the raw open-socket
+  // count (joined or not), distinct from players_online (joined sessions).
+  const gameStateSource: GameStateSource = {
+    playersOnline: () => game.clients.size,
+    accountsOnline: () => game.liveAccountIds().size,
+    wsConnections: () => wss.clients.size,
+    simEntities: () => game.sim.entities.size,
+    simTickHz: () => game.simTickHz(),
+    tickPhaseMillis: () => game.tickPhaseMillis(),
+  };
+  setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+
+  // The app-aggregate /metrics collectors (Phase 3 business, Phase 4 client-perf):
+  // each registers bounded gauges on the SAME exporter registry and runs ONE cached
+  // Postgres aggregate on a fixed interval, so a scrape publishes the cached snapshot
+  // and never queries the DB. start() kicks off an immediate refresh plus the
+  // interval (both unref()'d); shutdown stops them below.
+  const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
+  const clientPerfMetrics = registerClientPerfMetrics(httpMetrics.registry);
+  businessMetrics.start();
+  clientPerfMetrics.start();
 
   game.start();
   server.listen(config.port, () => {
@@ -2423,11 +2509,32 @@ export async function startServer(): Promise<http.Server> {
     // /livez keep working through the drain).
     markDraining();
     console.log('shutting down: saving characters...');
+    // Stop the app-aggregate metric collectors so no refresh query races the pool
+    // close below (their intervals are unref()'d, but an in-flight tick could still
+    // fire before pool.end()).
+    businessMetrics.stop();
+    clientPerfMetrics.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();
     await game.endAllPlaySessions();
+    // Drain any bank_ledger writes still queued on the FIFO tail BEFORE the lease
+    // sweep: once the leases drop, a replacement process can load the same character
+    // and write new ledger rows, and rows still queued here would flush after them
+    // with higher insertion ids, inverting the id order the offline audit replays by
+    // (false negative_net / purchased_regression alarms). A clean restart loses no
+    // audit rows this way (a crash still can; the audit tolerates that as a
+    // transient mismatch). Rejections log inside the writer, so the drain never
+    // throws.
+    await bankLedgerIdle();
+    // Drop every character load lease this process holds so a clean restart can
+    // reload its characters immediately instead of waiting out the lease TTL.
+    // Runs before pool.end(); a failure here must not abort the shutdown, so log
+    // and continue to close the pool.
+    await releaseAllCharacterLeases().catch((err) =>
+      console.error('lease release-all failed:', err),
+    );
     await game.chatLog.stop();
     await realmLock?.release();
     await pool.end();

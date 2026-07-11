@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.14.1-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.24.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
 
@@ -47,7 +47,7 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 - **The Ashen Coliseum**, a ranked PvP arena with 1v1 and 2v2 ladders plus a 2v2 Fiesta mode (augment pickups, a shrinking ring, first to fifteen takedowns).
 - **Real multiplayer**: parties, trading, duels, tap rights, party-split XP, whispers, away status, and a server that owns every combat roll.
 - **Procedural everything**: timber-framed towns, rigged creature families, painted spell icons drawn on canvas, WebAudio sound, biome weather, and real-time shadows. No 3D model files for the world.
-- **Localized into 21 locales** through a deterministic, sim-emits-keys pipeline.
+- **Localized into 22 locales** through a deterministic, sim-emits-keys pipeline.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
 - **Web3-native**: link a Solana wallet to show your $WOC balance and a cosmetic holder badge, fully optional and non-custodial.
 
@@ -131,7 +131,7 @@ Open http://localhost:5173, choose **Play Online**, create an account, create a 
 What persists and how the server stays in charge:
 
 - **Accounts**: scrypt-hashed passwords and 7-day bearer tokens (`auth_tokens`).
-- **Characters**: up to 10 per account; level, gear, bags, quests, talents, position, and money persist as JSONB in Postgres, saved every 30 seconds, on logout, and on server shutdown. Names are globally unique, letters only, classic style.
+- **Characters**: up to 10 per account; level, gear, bags, bank vault, quests, talents, position, and money persist as JSONB in Postgres, saved every 30 seconds, on logout, and on server shutdown. Names are globally unique, letters only, classic style.
 - **The server is authoritative**: clients stream movement intent and commands at 20 Hz; the server runs the one shared `Sim` and returns interest-scoped snapshots (~120 yd) plus per-player events. Every combat roll, loot drop, quest credit, and vendor transaction resolves server-side. The client is a renderer.
 
 ## Train an agent (headless RL)
@@ -229,6 +229,7 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 - **Eating and drinking**: sit to restore over 18 seconds, broken by damage or standing, and yes, you can eat and drink at once.
 - **Vendors** that buy food and water and sell honest white gear, with coin shown in gold, silver, and copper.
+- **A personal bank** (the Gilded Strongbox): bursars in each hub town keep a vault per character, from 24 slots up to 96 with coin-bought expansions, plus bonus slots earned online for a verified email, linked accounts, and referrals.
 - **Mob AI**: wander, proximity aggro by level difference, social pulls, chase, leash and reset, corpse loot, and respawns, with a rare spawn (Old Greyjaw) on a long timer.
 - **Fishing** spots with their own loot tables and rare catches.
 - **Cosmetic skins** rolled at uncommon, rare, and epic rarity, purely for looks.
@@ -239,13 +240,13 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 | Input | Action |
 |---|---|
-| `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held), `Q`/`E` strafe |
+| `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held); dedicated strafe keys are unbound by default and rebindable |
 | right-drag / left-drag | mouselook / orbit camera. Wheel zooms, `Space` jumps |
 | `Tab` | cycle nearest enemies. left-click to target, right-click to attack, loot, or talk |
-| `1`-`9`, `0`, `-`, `=` | action bar |
+| `1`-`9`, `0`, `Q`, `E` | action bar (`-`/`=` as alternates; the secondary bar sits on the numpad or `Shift+1` to `Shift+0`) |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `G` | character, spellbook, quest log, world map, bags, arena |
-| `V` / `R` / `Esc` | nameplates, autorun, close windows or clear target |
+| `V` / `Z` / `R` / `Esc` | nameplates, damage meters, autorun, close windows or clear target |
 
 Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
 
@@ -276,7 +277,10 @@ The sim is a fixed 20 Hz tick (`DT = 1/20`), all randomness flows through one se
 | `scripts/` | Asset build plus browser E2E, screenshot, and integration scripts. |
 | `public/` · `docs/` | Static assets (GLB models, textures, HDRIs) and design docs. |
 
-Most directories carry their own `CLAUDE.md` with local conventions. The full set of project invariants lives in the root [`CLAUDE.md`](CLAUDE.md).
+Most directories carry their own `CLAUDE.md` with local conventions. The full set of
+project invariants lives in the root [`CLAUDE.md`](CLAUDE.md). Codex contributors start
+with [`AGENTS.md`](AGENTS.md) and the [Codex operator guide](docs/codex.md); those files
+route into the same canonical architecture without changing the Claude Code setup.
 
 ## Built like the classics
 
@@ -293,6 +297,7 @@ And almost none of it is a shipped asset. The world is drawn from code:
 
 ```bash
 npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons
+npm run gate                    # complete CI-equivalent contribution gate
 npm run build                   # production web build
 node scripts/smoke_browser.mjs  # warrior end-to-end (needs npm run dev)
 node scripts/smoke_mage.mjs     # mage: casting, polymorph, conjure and drink, death and release
@@ -310,7 +315,7 @@ For the server commands see [Develop online](#develop-online-with-hot-reload) ab
 
 ## Localization
 
-Every player-visible string resolves through `t()`, and the game ships in **21 locales** (English, two Spanish, two French, English Canada, Italian, German, Simplified and Traditional Chinese, Korean, Japanese, Brazilian Portuguese, Russian, Dutch, Polish, Indonesian, Turkish, Swedish, Vietnamese, and Danish). The sim and server stay language-agnostic: they emit stable keys or English that the client re-localizes at the boundary, which keeps determinism intact. Contributors add English only; the maintainer batch-fills the other locales before each release. The workflow is documented in `docs/i18n-scaling/translation-workflow.md`.
+Every player-visible string resolves through `t()`, and the game ships in **22 locales** (English, two Spanish, two French, English Canada, Italian, German, Simplified and Traditional Chinese, Korean, Japanese, Brazilian Portuguese, Russian, Czech, Dutch, Polish, Indonesian, Turkish, Swedish, Vietnamese, and Danish). The sim and server stay language-agnostic: they emit stable keys or English that the client re-localizes at the boundary, which keeps determinism intact. Contributors add English only; the maintainer batch-fills the other locales before each release. The workflow is documented in `docs/i18n-scaling/translation-workflow.md`.
 
 ## Contributing
 

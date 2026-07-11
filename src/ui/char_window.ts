@@ -23,16 +23,16 @@ import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
-import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { buildGatheringProficiencyRows } from './gathering_view';
-import { formatNumber, t } from './i18n';
+import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import type { StatId } from './stat_tooltip';
-import { svgIcon } from './ui_icons';
+import { renderWindowFrame, type WindowFrameParts } from './window_frame';
+import type { WindowFrameDescriptor } from './window_frame_view';
 
 // Quality / empty-slot colors as CSS custom properties: the shared
 // QUALITY_COLOR map carries the per-quality hex, and these tokens cover the
@@ -41,6 +41,40 @@ import { svgIcon } from './ui_icons';
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
+
+// The ten craft-archetype title keys (issue 1130), one per craft id on the ring (see
+// src/sim/content/professions.ts CRAFT_RING and src/sim/professions/archetype.ts
+// getArchetypeTitle: the title identifier IS the craft id). Every player-visible
+// string is a t() key, so this is a literal id-to-key table, never a built string.
+const ARCHETYPE_TITLE_KEYS: Record<string, TranslationKey> = {
+  armorcrafting: 'hudChrome.archetypeTitle.armorcrafting',
+  weaponcrafting: 'hudChrome.archetypeTitle.weaponcrafting',
+  jewelcrafting: 'hudChrome.archetypeTitle.jewelcrafting',
+  alchemy: 'hudChrome.archetypeTitle.alchemy',
+  engineering: 'hudChrome.archetypeTitle.engineering',
+  cooking: 'hudChrome.archetypeTitle.cooking',
+  inscription: 'hudChrome.archetypeTitle.inscription',
+  enchanting: 'hudChrome.archetypeTitle.enchanting',
+  tailoring: 'hudChrome.archetypeTitle.tailoring',
+  leatherworking: 'hudChrome.archetypeTitle.leatherworking',
+};
+
+/** Localized text for the granted archetype title, or the "no title yet" copy
+ *  when the player has not completed the zone-1 acceptance quest (or the id is
+ *  somehow unrecognized). Exported for the view-model test. */
+export function archetypeTitleText(craftId: string | null): string {
+  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
+  return t(key ?? 'hudChrome.archetypeTitle.none');
+}
+
+/** Localized text for the hobby craft (issue 1294): the same per-craft name
+ *  table as the archetype title (a hobby id IS a craft id on the ring), or
+ *  the "no hobby yet" copy before an archetype has ever been chosen.
+ *  Exported for the view-model test. */
+export function hobbyCraftText(craftId: string | null): string {
+  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
+  return t(key ?? 'hudChrome.archetypeTitle.none');
+}
 
 // The ten character-sheet stat cells, primaries down the left column and derived
 // stats down the right (the CSS grid wraps two per row). The HUD builds each cell
@@ -58,6 +92,8 @@ const STAT_GRID: readonly StatId[] = [
   'spi',
   'dodge',
   'spellPower',
+  'critRating',
+  'hasteRating',
 ];
 
 /**
@@ -107,10 +143,40 @@ const GATHERING_PROFESSION_LABEL_KEY: Record<
 const SHARE_GLYPH =
   '<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>';
 
+// The character sheet is a closable, footer-less frame: the paperdoll + stats
+// two-pane, the class identity strip, and the share row all render as sections of
+// one scrollable body. The title reuses the existing "Character" action label and
+// the close reuses the returnToGame key (no new i18n keys). The frame IS the dialog
+// (role + aria-labelledby on the inner mount), so the module no longer marks the
+// shared #char-window root as a dialog.
+const CHAR_FRAME: WindowFrameDescriptor = {
+  id: 'char-window',
+  titleKey: 'hud.keybinds.actions.char',
+  closeLabelKey: 'hud.options.returnToGame',
+};
+
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
 
   constructor(private readonly deps: CharWindowDeps) {}
+
+  /**
+   * Stamp the shared window frame cold at first open, then reuse it. The frame
+   * mounts on an INNER container (never on the shared #char-window root), so the
+   * root stays a pristine `.window.panel`: the id-scoped viewport clamp, the
+   * resize grip (window_resize.ts targets the root), and the mobile inset rules
+   * keep matching it. An intact mounted frame (its body present) is the reuse
+   * marker; only the body repaints per render.
+   */
+  private ensureFrame(el: HTMLElement): WindowFrameParts {
+    const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
+    const body = mounted?.querySelector<HTMLElement>('.window-body');
+    if (mounted && body) return { root: mounted, body, footer: null, tabButtons: [] };
+    const mount = document.createElement('div');
+    const parts = renderWindowFrame(mount, CHAR_FRAME, { onClose: () => this.close() });
+    el.replaceChildren(mount);
+    return parts;
+  }
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
@@ -146,9 +212,20 @@ export class CharWindow {
     const p = world.player;
     const className = classDisplayName(world.cfg.playerClass);
     const level = formatNumber(p.level, { maximumFractionDigits: 0 });
-    // WCAG 2.2 AA: name the focus-trapped root via the character title span.
-    markDialogRoot(el, { labelledBy: 'char-title' });
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    // The shared frame carries the dialog role + aria-labelledby (its "Character"
+    // title); the body repaints below. The close routes to this.close() via the
+    // frame's onClose, wired once when the frame is stamped cold.
+    const { body } = this.ensureFrame(el);
+    const archetypeTitle = archetypeTitleText(world.archetypeTitle);
+    const hobbyCraft = hobbyCraftText(world.hobbyCraft);
+    const hobbyRow =
+      world.hobbyCraft !== null
+        ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
+        : '';
+    // The class identity strip (portrait + name + level/class/archetype/hobby): the
+    // former sticky .panel-title header content, now the first body row under the
+    // frame titlebar (the close moved to the frame).
+    let html = `<div class="char-identity">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}</span></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -162,23 +239,23 @@ export class CharWindow {
     html += this.deps.progressionHtml(p.level);
     html += this.gatheringHtml(world);
     html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
-    el.innerHTML = html;
-    hydratePortraits(el);
-    el.querySelector('[data-act="prestige"]')?.addEventListener('click', () =>
-      this.deps.openPrestige(),
-    );
-    el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
+    body.innerHTML = html;
+    hydratePortraits(body);
+    body
+      .querySelector('[data-act="prestige"]')
+      ?.addEventListener('click', () => this.deps.openPrestige());
+    body.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
       audio.click();
       this.deps.openPlayerCard();
     });
 
     const view = buildPaperdollView(world.equipment, ITEMS);
-    const leftCol = el.querySelector('#equip-col-left');
-    const rightCol = el.querySelector('#equip-col-right');
+    const leftCol = body.querySelector('#equip-col-left');
+    const rightCol = body.querySelector('#equip-col-right');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
 
-    for (const cell of el.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
+    for (const cell of body.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
       const stat = cell.dataset.stat as StatId;
       // Resolve the tooltip lazily, on show, so the breakdown reflects the
       // player's current stats at the moment they hover, not at render time.
@@ -187,7 +264,6 @@ export class CharWindow {
 
     this.deps.renderPreview();
     this.deps.renderSkinPicker();
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
   }
 
   // The "Gathering" section (issue 1124): one row per gathering profession, showing

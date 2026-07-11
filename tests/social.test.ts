@@ -1226,3 +1226,66 @@ describe('the new dungeons', () => {
     expect(korgath.enraged).toBe(true);
   });
 });
+
+describe('dungeon difficulty slash command', () => {
+  it('lets a leader switch normal and heroic without using dev commands', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Lead');
+    const member = sim.addPlayer('mage', 'Mage');
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+
+    sim.drainEvents();
+    sim.chat('/dungeon heroic', member);
+    expect(sim.dungeonDifficulty(leader)).toBe('normal');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (e) => e.type === 'error' && e.pid === member && e.text === 'You are not the party leader.',
+      ),
+    ).toBe(true);
+
+    sim.chat('/dungeon heroic', leader);
+    expect(sim.dungeonDifficulty(member)).toBe('heroic');
+    expect(
+      (sim.drainEvents() as any[]).some(
+        (e) =>
+          e.type === 'error' && e.pid === leader && e.text === 'Dungeon difficulty set to Heroic.',
+      ),
+    ).toBe(true);
+
+    sim.chat('/dungeon normal', leader);
+    expect(sim.dungeonDifficulty(member)).toBe('normal');
+  });
+
+  it('routes the /instances and /dungeons aliases, case-insensitively', () => {
+    const sim = makeWorld();
+    const p = sim.addPlayer('warrior', 'Solo');
+
+    sim.chat('/instances heroic', p);
+    expect(sim.dungeonDifficulty(p)).toBe('heroic');
+    sim.chat('/dungeons normal', p);
+    expect(sim.dungeonDifficulty(p)).toBe('normal');
+    sim.chat('/DUNGEON HEROIC', p);
+    expect(sim.dungeonDifficulty(p)).toBe('heroic');
+  });
+
+  it('the /dungeon readout reports the current selection and how to change it', () => {
+    const sim = makeWorld();
+    const p = sim.addPlayer('warrior', 'Solo');
+
+    sim.drainEvents();
+    sim.chat('/dungeon', p);
+    let texts = (sim.drainEvents() as any[])
+      .filter((e) => e.type === 'error' && e.pid === p)
+      .map((e) => e.text);
+    expect(texts).toContain('Dungeon difficulty: Normal. Use /dungeon heroic to change it.');
+
+    sim.chat('/dungeon heroic', p);
+    sim.drainEvents();
+    sim.chat('/dungeon', p);
+    texts = (sim.drainEvents() as any[])
+      .filter((e) => e.type === 'error' && e.pid === p)
+      .map((e) => e.text);
+    expect(texts).toContain('Dungeon difficulty: Heroic. Use /dungeon normal to change it.');
+  });
+});

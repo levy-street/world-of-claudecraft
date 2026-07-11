@@ -18,6 +18,8 @@ const HARMFUL_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'attackspeed',
   'debuff_ap',
   'sunder',
+  'corrode',
+  'faerie_fire',
   'mortal_wound',
   'silence',
   'disarm',

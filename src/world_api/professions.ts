@@ -27,10 +27,18 @@ export interface CraftResultView {
   itemId?: string;
   count?: number;
   quality?: MaterialRarity;
-  reason?: 'unknown_recipe' | 'insufficient_materials';
+  reason?:
+    | 'unknown_recipe'
+    | 'insufficient_materials'
+    | 'combo_requirement_unmet'
+    | 'recipe_not_learned'
+    | 'throttled'
+    // #1297: denied because the recipe is station-bound and the player is not
+    // currently at the level-20 crafting hub (or not yet the required level).
+    | 'not_at_hub';
 }
 
-// The professions read-surface facet (#1164, extended by #1127, #1129). `Sim`
+// The professions read-surface facet (#1164, extended by #1121/#1127/#1129). `Sim`
 // (src/sim/sim.ts `professionsState`/`professionsStateFor`) and `ClientWorld`
 // (src/net/online.ts, mirrored from the `prof` wire delta) both implement
 // this; see src/sim/professions/CLAUDE.md for the settled wire/persistence
@@ -47,8 +55,12 @@ export interface CraftResultView {
 // `archetypeAmendsRequired` plus `acceptArchetypeQuest`/`advanceAmendsProgress`/
 // `switchArchetype` (#1129, superseded scope) are the active-archetype identity
 // surface: per the #107 decision, all ten craft skills (above) stay purely
-// additive, and archetype identity is a single active craft the player swaps via
-// quest, not a conserved-mass drain. See src/sim/professions/archetype.ts for the
+// additive, and archetype identity is a pair of ring-adjacent crafts (the two
+// majors) the player swaps via quest, not a conserved-mass drain. `activeArchetype`
+// here is the title-quest major only; its ring-adjacent partner (also
+// empowered past rare) is internal sim state (archetype.ts `pairedMajor`), not
+// yet its own read surface since no UI reads it independently of the
+// composed empowerment ceiling. See src/sim/professions/archetype.ts for the
 // full state machine and what is stubbed (quest content, not the gating logic).
 export interface IWorldProfessions {
   professionsState: PlayerProfessionsView;
@@ -65,6 +77,23 @@ export interface IWorldProfessions {
   // requirement itself (scales with archetypeSwitchCount; see archetype.ts).
   archetypeAmendsProgress: number;
   archetypeAmendsRequired: number;
+  // The title granted by the CURRENTLY-ACTIVE archetype (#1130, re-scoped per the
+  // comment on the live issue): the craft id whose named title the player has
+  // earned, or null before the acceptance quest has ever been completed (no
+  // "Jack of All Trades" fallback under the #1129 active-archetype model, since a
+  // character has at most one active archetype at a time). An identifier, not
+  // localized text, per the string-free IWorld seam: the ten title names live in
+  // src/ui/i18n.catalog/hud_chrome.ts (`archetypeTitle.<craftId>`).
+  archetypeTitle: string | null;
+  // The hobby craft (#1294): the opposite craft on CRAFT_RING from the active
+  // archetype, empowered up to rare rather than common (see archetype.ts
+  // `archetypeCeilingFor`/`getHobbyCraft`). `null` before the acceptance quest
+  // has ever been completed (no active archetype means no opposite craft to
+  // be a hobby of). An identifier, same string-free-seam rule as
+  // `archetypeTitle`: localized text lives in
+  // src/ui/i18n.catalog/hud_chrome.ts (`archetypeTitle.<craftId>`, reused as
+  // the hobby's display name too since a hobby id IS a craft id).
+  hobbyCraft: string | null;
   // Stub entry point for the zone-1 acceptance quest's completion: sets the
   // chosen craft as the active archetype (first time only). See archetype.ts.
   acceptArchetypeQuest(craftId: string): void;

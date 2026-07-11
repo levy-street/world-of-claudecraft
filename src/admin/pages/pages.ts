@@ -8,9 +8,11 @@ import type { AdminPermission } from '../permissions';
 export type AdminPage =
   | 'overview'
   | 'usage'
+  | 'tick-perf'
   | 'accounts'
   | 'characters'
   | 'moderation'
+  | 'moderation-history'
   | 'suspicious-players'
   | 'detection-calibration'
   | 'antibot-config'
@@ -43,7 +45,10 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     id: 'operations',
     labelKey: 'nav.operations',
     defaultPage: 'usage',
-    items: [{ id: 'usage', labelKey: 'nav.usage', permission: 'ops_usage.read' }],
+    items: [
+      { id: 'usage', labelKey: 'nav.usage', permission: 'ops_usage.read' },
+      { id: 'tick-perf', labelKey: 'nav.tickPerf', permission: 'ops.perf' },
+    ],
   },
   {
     id: 'players',
@@ -60,6 +65,7 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     defaultPage: 'moderation',
     items: [
       { id: 'moderation', labelKey: 'nav.reports', permission: 'moderation.read' },
+      { id: 'moderation-history', labelKey: 'nav.history', permission: 'moderation.read' },
       { id: 'shared-ips', labelKey: 'nav.sharedIps', permission: 'moderation.read' },
       { id: 'blocked-ips', labelKey: 'nav.blockedIps', permission: 'moderation.read' },
       { id: 'chat-filter', labelKey: 'nav.chatFilter', permission: 'moderation.read' },

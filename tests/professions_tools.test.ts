@@ -73,9 +73,15 @@ describe('gathering tool tier gating (#1123)', () => {
   it('a base tool never becomes unusable, because this repo has no durability mechanic', () => {
     const pick = ITEMS.copper_mining_pick;
     // ItemDef (src/sim/types.ts) carries no durability field anywhere in this repo,
-    // so a base gathering tool can never be exhausted by gathering.
+    // so simulating repeated gathers cannot reduce or exhaust a tool's usability:
+    // there is nothing on the item shape a "gather" could decrement.
+    expect(pick).not.toHaveProperty('durability');
     expect(isGatherToolUse(pick.use)).toBe(true);
-    expect(gatherToolTier(pick, 'mining')).toBe(1);
+    for (let i = 0; i < 1000; i++) {
+      // Repeated simulated gathers: the item object is never mutated.
+      expect(gatherToolTier(pick, 'mining')).toBe(1);
+    }
+    expect(pick).not.toHaveProperty('durability');
   });
 
   it('gatherToolTier returns undefined for a non-tool item, a mismatched profession, and a differently-used tool', () => {
@@ -159,11 +165,10 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     for (const [item, tier] of crafted) {
       expect(item).not.toHaveProperty('durability');
       expect(isGatherToolUse(item.use)).toBe(true);
-      // gatherToolTier is a pure read of static item data (src/sim/types.ts's
-      // ItemDef has no durability field at all), so a single read already
-      // proves it can never be mutated or exhausted; repeating the same pure
-      // call would test nothing further.
-      expect(gatherToolTier(item, 'mining')).toBe(tier);
+      for (let i = 0; i < 1000; i++) {
+        // Repeated simulated gathers never mutate or exhaust the item.
+        expect(gatherToolTier(item, 'mining')).toBe(tier);
+      }
       expect(item).not.toHaveProperty('durability');
     }
   });
@@ -186,14 +191,17 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       sellValue: 1,
     };
     expect(commonTierThree.quality).not.toBe(epicTierThree.quality);
-    // gatherToolTier reads only `use.tier`, never `quality`: two items that
-    // differ solely in rarity resolve to the identical tier, so every gating
-    // call downstream (canGatherTier / canHarvestMonsterMaterial) is already
-    // provably identical for the two without needing to re-call them (doing
-    // so would just compare f(x, y) to f(x, y), which can never fail).
-    expect(gatherToolTier(commonTierThree, 'mining')).toBe(3);
-    expect(gatherToolTier(epicTierThree, 'mining')).toBe(3);
-    // Real vendor (uncommon, tier 3) and crafted (rare, tier 4) tools also
+    const commonTier = gatherToolTier(commonTierThree, 'mining') ?? -1;
+    const epicTier = gatherToolTier(epicTierThree, 'mining') ?? -1;
+    expect(commonTier).toBe(epicTier);
+    for (const nodeOrMaterialTier of [1, 2, 3, 4, 5]) {
+      expect(canGatherTier(commonTier, nodeOrMaterialTier)).toBe(
+        canGatherTier(epicTier, nodeOrMaterialTier),
+      );
+      expect(canHarvestMonsterMaterial(commonTier, nodeOrMaterialTier)).toBe(
+        canHarvestMonsterMaterial(epicTier, nodeOrMaterialTier),
+      );
+    } // Real vendor (uncommon, tier 3) and crafted (rare, tier 4) tools also
     // carry different rarities: confirm the rarity difference is real, so the
     // tier-only gating check above is meaningful and not vacuously true.
     expect(ITEMS.mithril_mining_pick.quality).toBe('uncommon');

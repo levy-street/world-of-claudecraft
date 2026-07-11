@@ -4,11 +4,11 @@
   import AccountLink from '../components/AccountLink.svelte';
   import IpLink from '../components/IpLink.svelte';
   import Panel from '../components/Panel.svelte';
-  import { fmtDate } from '../format';
+  import { fmtDate, fmtRelative } from '../format';
   import { adminLanguageTag, t } from '../i18n';
   import { auth } from '../state/auth.svelte';
   import { buildSuspiciousSessionsExport } from '../suspicious_sessions_export';
-  import type { SuspiciousPlayer, SuspiciousPlayersData } from '../types';
+  import type { SuspiciousEvidence, SuspiciousPlayer, SuspiciousPlayersData } from '../types';
 
   type SortColumn = 'observed' | 'score' | 'evidence';
   type SortDirection = 'asc' | 'desc';
@@ -83,6 +83,32 @@
 
   function formatTimestamp(value: number): string {
     return fmtDate(new Date(value).toISOString());
+  }
+
+  // Only kinds where re-triggering carries information ship the history fields;
+  // the rest (persistent-property kinds) render nothing here.
+  function recurrenceLabel(evidence: SuspiciousEvidence): string {
+    if (evidence.occurrences === undefined) return '';
+    const parts = [
+      t('suspiciousPlayers.evidenceOccurrences', {
+        count: new Intl.NumberFormat(adminLanguageTag()).format(evidence.occurrences),
+      }),
+    ];
+    if (evidence.occurrences > 1 && evidence.firstAt !== undefined) {
+      parts.push(
+        t('suspiciousPlayers.evidenceFirstSeen', {
+          when: fmtRelative(new Date(evidence.firstAt).toISOString()),
+        }),
+      );
+    }
+    if (evidence.lastAt !== undefined) {
+      parts.push(
+        t('suspiciousPlayers.evidenceLastSeen', {
+          when: fmtRelative(new Date(evidence.lastAt).toISOString()),
+        }),
+      );
+    }
+    return parts.join(' | ');
   }
 
   async function refresh(): Promise<void> {
@@ -260,9 +286,15 @@
                   </div>
                   <ul>
                     {#each player.evidence as evidence}
+                      {@const recurrence = recurrenceLabel(evidence)}
                       <li>
                         <code>{evidence.kind}</code>
-                        <div class="evidence-detail">{evidence.detail}</div>
+                        <div class="evidence-detail">
+                          {evidence.detail}
+                          {#if recurrence}
+                            <div class="evidence-recurrence">{recurrence}</div>
+                          {/if}
+                        </div>
                         <span class="evidence-weight">
                           {t('suspiciousPlayers.evidenceWeight', {
                             value: formatScore(evidence.weight),
@@ -513,6 +545,12 @@
     color: var(--text);
     line-height: 1.4;
     overflow-wrap: anywhere;
+  }
+
+  .evidence-recurrence {
+    margin-top: 3px;
+    color: var(--text-dim);
+    font-size: var(--font-size-small);
   }
 
   @media (max-width: 900px) {

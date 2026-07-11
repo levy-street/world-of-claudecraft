@@ -16,6 +16,7 @@ export type { PreviewAppearance } from './preview_appearance';
 const PREVIEW_ANIM_STATE = {
   speed: 0,
   moving: false,
+  running: false,
   airborne: false,
   backwards: false,
   dead: false,

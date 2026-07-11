@@ -47,6 +47,8 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'polymorph',
   'attackspeed',
   'sunder',
+  'corrode',
+  'faerie_fire',
   'spellvuln',
   'vulnerability',
   'tongues',
@@ -198,7 +200,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   }
   if (statsDirty && e.kind === 'player') {
     const meta = ctx.players.get(e.id);
-    if (meta) recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta));
+    if (meta)
+      recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   }
   e.stealthed = e.auras.some((a) => a.kind === 'stealth');
 }

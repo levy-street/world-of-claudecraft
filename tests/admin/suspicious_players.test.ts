@@ -43,6 +43,9 @@ const data = {
           weight: 0.3,
           detail: 'Public-safe synthetic evidence B.',
           expiresAt: 2,
+          occurrences: 1,
+          firstAt: Date.now() - 12_000,
+          lastAt: Date.now() - 12_000,
         },
       ],
     },
@@ -56,6 +59,9 @@ const data = {
           weight: 1.5,
           detail: 'Public-safe synthetic evidence C.',
           expiresAt: 3,
+          occurrences: 4,
+          firstAt: Date.now() - 40 * 60_000,
+          lastAt: Date.now() - 12_000,
         },
       ],
     },
@@ -91,6 +97,22 @@ describe('Suspicious players', () => {
     expect(observedSort.closest('th')).toHaveAttribute('aria-sort', 'descending');
     expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveTextContent('2 results');
     expect(screen.getByRole('status')).toHaveTextContent('2 results');
+  });
+
+  it('shows the recurrence history only on evidence that carries it', async () => {
+    render(SuspiciousPlayers);
+    await screen.findByText('HighScore');
+
+    // review_signal_c: a repeating episode shows the count plus both endpoints.
+    const repeating = screen.getByText(/seen x4/);
+    expect(repeating).toHaveTextContent('first');
+    expect(repeating).toHaveTextContent('latest');
+    // review_signal_b: a single occurrence shows the count and the latest, no "first".
+    const single = screen.getByText(/seen x1/);
+    expect(single).toHaveTextContent('latest');
+    expect(single).not.toHaveTextContent('first');
+    // review_signal_a and review_signal_c's siblings without history render nothing.
+    expect(screen.getAllByText(/seen x/)).toHaveLength(2);
   });
 
   it('sorts by evidence count when its header is selected', async () => {

@@ -95,6 +95,25 @@ export function resetDrownedLitanyBossEncounter(ctx: SimContext, boss: Entity): 
   initDrownedLitanyBossState(run);
 }
 
+// Player death: the Tolling Bells volley and Blackwater Mark puddles must not
+// outlive the death, or an in-delve respawn at the module entry can be hit (or
+// insta-killed) by an effect that was already in flight before they died. Drop
+// every in-flight bell entity and empty both collections. Unlike the evade/leash
+// reset above, this does NOT re-init the encounter: firedCantorPhases,
+// finalBellFired, cantorShieldAdds, and bellVolleyTimer stay untouched so the
+// fight keeps progressing for any party members still alive.
+export function clearDrownedLitanyBellsAndMarks(ctx: SimContext, run: DelveRun): void {
+  if (run.delveId !== 'drowned_litany') return;
+  const st = run.nhaliaBoss;
+  if (!st) return;
+  for (const bell of st.bells) {
+    const be = ctx.entities.get(bell.entityId);
+    if (be && !be.dead) ctx.dropEntity(bell.entityId);
+  }
+  st.bells = [];
+  st.marks = [];
+}
+
 function findNhaliaBoss(ctx: SimContext, run: DelveRun): Entity | null {
   for (const id of run.mobIds) {
     const e = ctx.entities.get(id);

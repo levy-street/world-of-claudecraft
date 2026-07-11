@@ -1,7 +1,8 @@
 // Hand-written declarations for electron/updater.cjs so the Vitest suite
-// (tests/electron_update_cadence.test.ts) type-checks its imports. Keep in sync
-// with the .cjs exports (same convention as shell_guards.d.cts). Only the pure,
-// electron-free surface is declared; initUpdater's runtime deps are injected.
+// (tests/electron_update_cadence.test.ts, tests/electron_updater_track.test.ts)
+// type-checks its imports. Keep in sync with the .cjs exports (same convention
+// as shell_guards.d.cts). Only the pure, electron-free surface is declared;
+// initUpdater's runtime deps are injected.
 
 export const FIRST_CHECK_DELAY_MS: number;
 export const RECHECK_INTERVAL_MS: number;
@@ -16,4 +17,7 @@ export function initUpdater(deps: {
   getWindow: () => unknown;
   isTrusted: (event: unknown) => boolean;
   isPackaged?: boolean;
+  apiOrigin?: string;
+  updateChannel?: string;
+  autoUpdater?: unknown;
 }): unknown;

@@ -13,15 +13,24 @@
 //
 // Reconcile: departed pids detach to a free list (their listeners intact for reuse),
 // kept pids update in place, new pids take a free row or build one. The rows are
-// re-appended in member order with the leave button last, so the mobile
-// :first-child / :not(:first-child) rules still match; appendChild moves a node
-// without dropping its keyboard focus or its listeners.
+// re-parented in member order into a persistent .party-rows WRAPPER (their own element,
+// one level under #party-frames), and the container's own direct children are ordered
+// chip (mobile only), wrapper, master-loot control, leave button. The wrapper is what
+// lets the mobile chip sit alone on its own line: with the rows nested inside it, no
+// member frame can auto-flow beside the chip (the container's mobile column stacks chip,
+// wrapper, and Leave; the 2-column double-stack lives on the wrapper). The mobile
+// row-styling rules key on .party-frame:first-of-type / :not(:first-of-type), which now
+// resolve within the wrapper (only member rows live there); appendChild/insertBefore
+// move a node without dropping its keyboard focus or its listeners.
 
 import { formatNumber, t } from './i18n';
 import type { PainterHostWriters } from './painter_host';
+import { createPartyChip, type PartyChip } from './party_chip';
+import { partyChipState } from './party_collapse';
 import {
   createLeaveButton,
   createPartyRow,
+  createPartyRowsWrapper,
   PARTY_CREST_KEY_PREFIX,
   PARTY_LEADER_GLYPH,
   type PartyRow,
@@ -39,6 +48,16 @@ const CLASS_COLOR_PROP = '--cls';
 const COMBAT_CLASS = 'combat';
 // The container class that drops the frames below the target frame.
 const BELOW_TARGET_CLASS = 'below-target';
+// The mobile collapse classes on #party-frames: the chip's presence (so CSS can
+// style the container as a chip host) and the expanded state (so CSS reveals the
+// member rows + Leave button; collapsed hides them, leaving only the chip). Both are
+// toggled through the elided writer only when the state changes (never per frame).
+const CHIP_PRESENT_CLASS = 'has-party-chip';
+const EXPANDED_CLASS = 'party-expanded';
+// The chip's aria-expanded attribute name/values (a disclosure control).
+const ARIA_EXPANDED = 'aria-expanded';
+const ARIA_TRUE = 'true';
+const ARIA_FALSE = 'false';
 // Badge visibility: '' reverts to the stylesheet display (shown), 'none' hides. The
 // badges persist in the DOM and only their display toggles, so the icon cue survives
 // forced-colors (where the combat box-shadow is dropped).
@@ -54,6 +73,13 @@ export interface PartyFramesPainterDeps {
   /** The localized "Leave Party" label, re-read each rebuild so an in-game language
    *  switch re-localizes it (through the elided setText). */
   leaveLabel: () => string;
+  /** The localized "Party" chip caption, re-read each update so an in-game language
+   *  switch re-localizes it (through the elided setText). Mobile only. */
+  chipLabel: () => string;
+  /** Toggle the persisted mobile collapse choice (the chip's tap). The Hud flips +
+   *  persists its collapsed flag and re-drives setCollapse; a pure USER action, never
+   *  gated on data-fx-level / reduce-motion / the governor (party HP is actionable). */
+  onToggleCollapse: () => void;
   /** The shared aura view/painter deps every row's mini aura strip builds over
    *  (each row owns its own view + painter instance; the deps are the Hud's). */
   partyAuras: PartyRowAuraDeps;
@@ -66,7 +92,24 @@ export class PartyFramesPainter {
   // Detached rows kept for reuse (recycling a departed row to a new pid). The row's
   // listeners stay attached and read the live slot, so a recycled row is safe.
   private readonly free: PartyRow[] = [];
+  // The member-rows wrapper: every pooled row nests one level under #party-frames inside
+  // this element, so the chip, the rows, the master-loot control, and Leave stack as a
+  // simple column (the chip alone on its own line). On mobile the wrapper carries the
+  // 2-column auto-flow grid the container used to; on desktop it is display:contents
+  // (transparent), so the rows lay out in the #party-frames flex column exactly as before.
+  // Built lazily on the first sync, then kept in the DOM (detached only by clear(), where
+  // it is retained for reuse); reconcileOrder re-parents rows into it without node churn.
+  private rowsWrapper: HTMLElement | null = null;
   private leaveBtn: HTMLButtonElement | null = null;
+  // The mobile collapse chip, built lazily on the first mobile update and then kept
+  // in the DOM (first child of the container) while in a party on mobile. Off mobile
+  // it is never built (desktop party frames are unchanged). Its click toggles the
+  // persisted collapse state through deps.onToggleCollapse.
+  private chip: PartyChip | null = null;
+  // The last-synced expanded flag, so relocalize() can re-emit the chip caption in
+  // the new language after an in-game switch (a switch does not flip the collapse
+  // state, so the Hud never re-drives setCollapse for it, like the group labels).
+  private chipShown = false;
   // The leader-only master-loot control, owned by the Hud (built on its own
   // low-frequency footer signature) and handed to the pool for placement. It sits
   // between the member rows and the leave button, and persists across member-frame
@@ -94,6 +137,50 @@ export class PartyFramesPainter {
    *  matching the inline `el.classList.toggle('below-target', ...)`. */
   setBelowTarget(on: boolean): void {
     this.writers.toggleClass(this.container, BELOW_TARGET_CLASS, on);
+  }
+
+  /**
+   * Drive the mobile collapse chip from the current (in-party, mobile, collapsed,
+   * chat-open) inputs, every frame (cheap and fully elided). On mobile in a party it
+   * lazily builds the chip, keeps it as the container's first child, and toggles the
+   * container's chip-present + expanded classes so CSS shows the chip and reveals or
+   * hides the member rows + Leave button; on desktop (or out of a party) the chip is
+   * removed and the container carries neither class, so the desktop stack is exactly
+   * as before. While the mobile chat overlay is open the party UI yields entirely (the
+   * chip and frames hide), so the chat log / composer own the top-left; the persisted
+   * collapse choice is untouched, so closing chat restores it. Every DOM effect routes
+   * through the elided writers (class + attr + text), so a steady state (unchanged
+   * inputs, the dominant case) writes nothing.
+   */
+  setCollapse(inParty: boolean, mobile: boolean, collapsed: boolean, chatOpen: boolean): void {
+    const state = partyChipState({ inParty, mobile, collapsed, chatOpen });
+    if (state.chipVisible) {
+      const chip = this.ensureChip();
+      this.chipShown = true;
+      // The chip is placed first by reconcileOrder on the next sync; ensure it is in
+      // the DOM now (a fresh chip on the first mobile update) so the class-driven
+      // reveal has something to sit above even before a member rebuild.
+      if (chip.el.parentNode !== this.container) {
+        this.container.insertBefore(chip.el, this.container.firstChild);
+      }
+      this.writers.setText(chip.label, this.deps.chipLabel());
+      this.writers.setAttr(chip.el, ARIA_EXPANDED, state.framesExpanded ? ARIA_TRUE : ARIA_FALSE);
+    } else if (this.chip) {
+      // Left the party or switched to desktop: drop the chip entirely.
+      this.chip.el.remove();
+      this.chipShown = false;
+    }
+    this.writers.toggleClass(this.container, CHIP_PRESENT_CLASS, state.chipVisible);
+    // party-expanded is a MOBILE-only affordance class (it gates the mobile hide rule):
+    // gate it on `mobile` so the desktop container stays pristine (no mobile classes),
+    // even though the resolver reports framesExpanded=true on desktop (frames always
+    // show there). On mobile it reflects the expanded state exactly.
+    this.writers.toggleClass(this.container, EXPANDED_CLASS, state.framesExpanded && mobile);
+  }
+
+  private ensureChip(): PartyChip {
+    if (!this.chip) this.chip = createPartyChip(this.doc, this.deps.onToggleCollapse);
+    return this.chip;
   }
 
   /** Set (or clear with null) the leader-only master-loot control. The Hud rebuilds
@@ -156,15 +243,38 @@ export class PartyFramesPainter {
     this.writers.setText(leave, this.deps.leaveLabel());
   }
 
-  // Walk the desired child sequence (the member rows in order, then the leave
-  // button) against the container's current children, moving a node into place ONLY
-  // when it is not already there. The standard keyed-list reconcile: O(N) compares
-  // and exactly as many insertBefore moves as nodes that actually changed position
-  // (zero when nothing moved). Departed rows were already detached in sync() and
-  // new / recycled rows are detached, so every move here is a deliberate (re)insert
-  // that restores member order; an unchanged order touches the DOM not at all. This
-  // is the pooled-node ordering discipline the auras and FCT pools reuse.
+  private ensureRowsWrapper(): HTMLElement {
+    if (!this.rowsWrapper) this.rowsWrapper = createPartyRowsWrapper(this.doc);
+    return this.rowsWrapper;
+  }
+
+  // Walk the desired child sequence against the current children, moving a node into
+  // place ONLY when it is not already there. The standard keyed-list reconcile: O(N)
+  // compares and exactly as many insertBefore moves as nodes that actually changed
+  // position (zero when nothing moved). Departed rows were already detached in sync()
+  // and new / recycled rows are detached, so every move here is a deliberate (re)insert
+  // that restores member order; an unchanged order touches the DOM not at all. This is
+  // the pooled-node ordering discipline the auras and FCT pools reuse.
+  //
+  // Two passes: (1) order the member rows INSIDE the rows wrapper (their own element,
+  // so no member frame ever flows beside the container-level chip), then (2) order the
+  // container's own direct children: the mobile chip first (when present, the collapse
+  // header above the stack), the rows wrapper, the leader-only master-loot control, and
+  // the leave button last. On desktop the chip is null and the wrapper is
+  // display:contents, so the sequence renders as wrapper's rows, [master], leave, exactly
+  // the pre-wrapper order. A steady-state rebuild moves nothing in EITHER pass.
   private reconcileOrder(rows: PartyRow[], leave: HTMLButtonElement): void {
+    const wrapper = this.ensureRowsWrapper();
+    let rowRef: ChildNode | null = wrapper.firstChild;
+    const placeRow = (node: ChildNode): void => {
+      if (node === rowRef) {
+        rowRef = rowRef.nextSibling;
+      } else {
+        wrapper.insertBefore(node, rowRef);
+      }
+    };
+    for (const row of rows) placeRow(row.el);
+
     let ref: ChildNode | null = this.container.firstChild;
     const place = (node: ChildNode): void => {
       if (node === ref) {
@@ -173,7 +283,8 @@ export class PartyFramesPainter {
         this.container.insertBefore(node, ref);
       }
     };
-    for (const row of rows) place(row.el);
+    if (this.chip && this.chip.el.parentNode === this.container) place(this.chip.el);
+    place(wrapper);
     if (this.masterControl) place(this.masterControl);
     place(leave);
   }
@@ -192,10 +303,16 @@ export class PartyFramesPainter {
     }
     for (const row of this.free) row.relocalize();
     if (this.leaveBtn) this.writers.setText(this.leaveBtn, this.deps.leaveLabel());
+    // Re-emit the chip caption in the new language while it is shown (a language
+    // switch does not flip the collapse state, so the Hud never re-drives
+    // setCollapse for it, exactly like the pooled group labels above).
+    if (this.chip && this.chipShown) {
+      this.writers.setText(this.chip.label, this.deps.chipLabel());
+    }
   }
 
-  /** Empty the frames (no party): detach every row + the leave button. Keeps the
-   *  detached rows in the free list so a re-formed party reuses them. */
+  /** Empty the frames (no party): detach every row + the leave button + the chip.
+   *  Keeps the detached rows in the free list so a re-formed party reuses them. */
   clear(): void {
     for (const [pid, row] of this.pool) {
       row.el.remove();
@@ -205,6 +322,17 @@ export class PartyFramesPainter {
     this.leaveBtn?.remove();
     this.masterControl?.remove();
     this.masterControl = null;
+    // Detach the (now empty) rows wrapper too, so a no-party container is truly empty and
+    // not a lone wrapper box; the detached wrapper node is kept for reuse when a party
+    // re-forms (the pooled rows are re-parented back into it by reconcileOrder).
+    this.rowsWrapper?.remove();
+    // Drop the chip and its container state classes: leaving a party must not leave a
+    // stray chip or a lingering .party-expanded that would style a future desktop
+    // stack. The chip node is kept for reuse if a party re-forms on mobile.
+    this.chip?.el.remove();
+    this.chipShown = false;
+    this.writers.toggleClass(this.container, CHIP_PRESENT_CLASS, false);
+    this.writers.toggleClass(this.container, EXPANDED_CLASS, false);
   }
 
   private paintRow(row: PartyRow, m: PartyFrameMember, leader: number, raid: boolean): void {

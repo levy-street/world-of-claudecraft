@@ -25,6 +25,7 @@ const {
   ALLOWED_PERMISSIONS,
 } = require('./shell_guards.cjs');
 const { resolveDesktopConfig } = require('./desktop_config.cjs');
+const { PRODUCTION_API_ORIGIN } = require('./update_guard.cjs');
 const {
   MAX_FORWARDED_ERRORS,
   MAX_MIRRORED_CONSOLE_LINES,
@@ -77,7 +78,7 @@ const desktopConfig = resolveDesktopConfig({
 // what the Vite client bundle was baked with; loginOrigin is main-process-only);
 // the VITE_DESKTOP_* env pair is honored on unpackaged checkouts only,
 // mirroring the WOC_DISTRIBUTION hatch closure.
-const apiOrigin = deriveOrigin(desktopConfig.apiOrigin) || 'https://worldofclaudecraft.com';
+const apiOrigin = deriveOrigin(desktopConfig.apiOrigin) || PRODUCTION_API_ORIGIN;
 const desktopLoginOrigin = desktopConfig.loginOrigin.replace(/\/+$/, '');
 
 // Crashpad must start before any window exists so native crashes in EVERY
@@ -464,6 +465,7 @@ app.whenReady().then(() => {
     packaged: app.isPackaged,
     distribution: desktopConfig.distribution,
     updaterEnabled: desktopConfig.updaterEnabled,
+    updateChannel: desktopConfig.updateChannel,
     crashUpload: desktopConfig.crashSubmitUrl !== '',
     crashDumpDir: app.getPath('crashDumps'),
     logFile: logFilePath,
@@ -501,6 +503,11 @@ app.whenReady().then(() => {
         getWindow: () => mainWindow,
         isTrusted: trustedSender,
         isPackaged: app.isPackaged,
+        // The normalized origin this install talks to and the update channel
+        // derived from it (electron/update_guard.cjs): the updater reads only
+        // its own track's feed and refuses cross-origin artifacts.
+        apiOrigin,
+        updateChannel: desktopConfig.updateChannel,
       });
     } catch (err) {
       log.error('[updater] init failed', err);

@@ -1,7 +1,4 @@
-export type HotbarAction =
-  | { type: 'ability'; id: string }
-  | { type: 'item'; id: string }
-  | null;
+export type HotbarAction = { type: 'ability'; id: string } | { type: 'item'; id: string } | null;
 
 export const HOTBAR_ACTION_MIME = 'application/x-woc-hotbar-action';
 
@@ -17,7 +14,8 @@ export function parseHotbarAction(
   if (!value || typeof value !== 'object') return null;
   const action = value as { type?: unknown; id?: unknown };
   if (typeof action.id !== 'string') return null;
-  if (action.type === 'ability' && abilityExists(action.id)) return { type: 'ability', id: action.id };
+  if (action.type === 'ability' && abilityExists(action.id))
+    return { type: 'ability', id: action.id };
   if (action.type === 'item' && itemExists(action.id)) return { type: 'item', id: action.id };
   return null;
 }
@@ -31,9 +29,12 @@ export function parseHotbarActions(
   const seenAbilities = new Set<string>();
   return Array.from({ length: slots }, (_, i) => {
     const raw = Array.isArray(value) ? value[i] : null;
-    const action = typeof raw === 'string'
-      ? (abilityExists(raw) ? { type: 'ability' as const, id: raw } : null)
-      : parseHotbarAction(raw, abilityExists, itemExists);
+    const action =
+      typeof raw === 'string'
+        ? abilityExists(raw)
+          ? { type: 'ability' as const, id: raw }
+          : null
+        : parseHotbarAction(raw, abilityExists, itemExists);
     if (action?.type === 'ability') {
       if (seenAbilities.has(action.id)) return null;
       seenAbilities.add(action.id);
@@ -49,7 +50,9 @@ export function placeAbilityOnSlot(
 ): HotbarAction[] {
   const next = actions.slice();
   if (targetIndex < 0 || targetIndex >= next.length) return next;
-  const sourceIndex = next.findIndex((action) => action?.type === 'ability' && action.id === abilityId);
+  const sourceIndex = next.findIndex(
+    (action) => action?.type === 'ability' && action.id === abilityId,
+  );
   if (sourceIndex === targetIndex) return next;
   if (sourceIndex !== -1) {
     [next[sourceIndex], next[targetIndex]] = [next[targetIndex], next[sourceIndex]];
@@ -64,7 +67,7 @@ export function clearHotbarSlot(
   targetIndex: number,
 ): HotbarAction[] {
   if (targetIndex < 0 || targetIndex >= actions.length) return [...actions];
-  return actions.map((action, index) => index === targetIndex ? null : action);
+  return actions.map((action, index) => (index === targetIndex ? null : action));
 }
 
 export function placeItemOnSlot(
@@ -78,6 +81,19 @@ export function placeItemOnSlot(
   return next;
 }
 
+// Given a completed touch drag (mobile long-press pick-up + drag-to-slot), decide
+// whether it resolves to a swap. `targetIndex` is null when the pointer released
+// outside any slot (cancel); releasing back on the source slot is also a no-op
+// cancel, not a swap-with-itself. Pure so hud.ts's pointer-event finish handler
+// stays a thin call site instead of inlining this branch.
+export function resolveMobileHotbarDrop(
+  sourceIndex: number,
+  targetIndex: number | null,
+): number | null {
+  if (targetIndex === null || targetIndex === sourceIndex) return null;
+  return targetIndex;
+}
+
 export function swapHotbarSlots(
   actions: readonly HotbarAction[],
   sourceIndex: number,
@@ -85,10 +101,13 @@ export function swapHotbarSlots(
 ): HotbarAction[] {
   const next = actions.slice();
   if (
-    sourceIndex < 0 || sourceIndex >= next.length ||
-    targetIndex < 0 || targetIndex >= next.length ||
+    sourceIndex < 0 ||
+    sourceIndex >= next.length ||
+    targetIndex < 0 ||
+    targetIndex >= next.length ||
     sourceIndex === targetIndex
-  ) return next;
+  )
+    return next;
   [next[sourceIndex], next[targetIndex]] = [next[targetIndex], next[sourceIndex]];
   return next;
 }
@@ -153,9 +172,9 @@ export function syncHotbarActions(
   autoPlaceAbilityIds: ReadonlySet<string>,
 ): { actions: HotbarAction[]; changed: boolean } {
   const known = new Set(knownAbilityIds);
-  const next = actions.map((action) => (
-    action?.type === 'ability' && !known.has(action.id) ? null : action
-  ));
+  const next = actions.map((action) =>
+    action?.type === 'ability' && !known.has(action.id) ? null : action,
+  );
   let changed = next.some((action, i) => action !== actions[i]);
   for (const id of knownAbilityIds) {
     if (next.some((action) => action?.type === 'ability' && action.id === id)) continue;

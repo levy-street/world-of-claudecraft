@@ -1,0 +1,6 @@
+interface:
+  display_name: "Release Merge Audit"
+  short_description: "Find semantic damage after release integration"
+  default_prompt: "Use $woc-release-merge-audit to inspect this World of ClaudeCraft release merge for semantic regressions and stale assumptions."
+policy:
+  allow_implicit_invocation: true

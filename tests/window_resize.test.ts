@@ -57,10 +57,12 @@ describe('isInResizeCorner', () => {
 });
 
 describe('resizedWindowSize', () => {
-  const start = { left: 100, top: 80, width: 400, height: 300 };
+  // Height sits comfortably above the min-height floor so an unclamped shrink
+  // delta still lands above it (the floor is exercised by the clamp tests below).
+  const start = { left: 100, top: 80, width: 400, height: 400 };
 
   it('applies the drag delta directly when unclamped', () => {
-    expect(resizedWindowSize(start, 60, -40, LIMITS)).toEqual({ width: 460, height: 260 });
+    expect(resizedWindowSize(start, 60, -40, LIMITS)).toEqual({ width: 460, height: 360 });
   });
 
   it('clamps down to the minimum size', () => {
@@ -86,7 +88,27 @@ describe('resizedWindowSize', () => {
   });
 
   it('rounds fractional author-space sizes to whole pixels', () => {
-    expect(resizedWindowSize(start, 10.4, 10.6, LIMITS)).toEqual({ width: 410, height: 311 });
+    expect(resizedWindowSize(start, 10.4, 10.6, LIMITS)).toEqual({ width: 410, height: 411 });
+  });
+});
+
+describe('resize floor keeps every window usable at its minimum', () => {
+  // Live user feedback (PR #1736): a framed window could be dragged so small its
+  // actions vanished. The floor must leave a resizable window's whole chrome
+  // reachable at the minimum: titlebar + any tab rail + at least one content row
+  // + its primary action. The delve board carries the tallest fixed chrome
+  // (delve name, marks, two requirement lines, and the DELVE/SHOP tab rail, about
+  // 200 author px) before its scrolling body, so the height floor leaves that
+  // plus a shop row and its Buy button; the width floor keeps an item row (icon +
+  // truncated name + Buy) legible. Both stay below the narrowest default window
+  // width (the social panel, 348px), so the floor only bounds shrinking and never
+  // makes a window open or first-resize oddly.
+  it('the height floor clears the chrome plus a content row and action', () => {
+    expect(WINDOW_MIN_HEIGHT).toBe(300);
+  });
+
+  it('the width floor keeps an item row legible', () => {
+    expect(WINDOW_MIN_WIDTH).toBe(260);
   });
 });
 
@@ -106,8 +128,17 @@ describe('isResizableWindow', () => {
     }
   });
 
-  it('allows the content windows', () => {
-    for (const id of ['char-window', 'quest-log-window', 'market-window', 'bags', 'spellbook']) {
+  it('allows the content windows AND the Esc options menu (maintainer drag/resize direction)', () => {
+    // The Warden's Codex now resizes by the corner band like every grammar window,
+    // superseding the P2 fixed-window ruling (esc-menu-redesign spec section 2).
+    for (const id of [
+      'char-window',
+      'quest-log-window',
+      'market-window',
+      'bags',
+      'spellbook',
+      'options-menu',
+    ]) {
       expect(isResizableWindow(el(id))).toBe(true);
     }
   });

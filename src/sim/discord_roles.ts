@@ -1,5 +1,5 @@
 // Shared, host-agnostic catalog of the staff/special Discord roles that get a
-// colored name + a tag in game. Only these five are surfaced (everyone else has
+// colored name + a tag in game. Only these six are surfaced (everyone else has
 // the default name color and no tag). Pure data so the server, the renderer, and
 // the bot all agree on the key set without crossing host boundaries.
 //
@@ -26,12 +26,19 @@ export interface DiscordSpecialRole {
 // stays on the staff green because the guild's Admin role is the renamed Mods
 // role and a Discord rename keeps the role's color.
 export const DISCORD_SPECIAL_ROLES: readonly DiscordSpecialRole[] = [
-  { key: 'levyst', name: 'Levy St', aliases: ['Levy Street'], color: '#ff6b6b', priority: 5 },
+  { key: 'levyst', name: 'Levy St', aliases: ['Levy Street'], color: '#ff6b6b', priority: 6 },
   {
     key: 'admin',
     name: 'Admin',
     aliases: ['Admins', 'Administrator', 'Administrators'],
     color: '#57d98a',
+    priority: 5,
+  },
+  {
+    key: 'coredevs',
+    name: 'Core Dev',
+    aliases: ['Core Devs', 'Core Developer', 'Core Developers', 'CoreDev'],
+    color: '#bc00ff',
     priority: 4,
   },
   {

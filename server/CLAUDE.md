@@ -27,6 +27,8 @@ Postgres and serves the built client from `dist/`.
 | `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
 | `woc_balance.ts` | the sole Solana RPC reader: holder-tier flair and connected-wallet balance, cached |
 | `player_card.ts` | shareable player-card PNGs, Open Graph unfurl, referral capture |
+| `bank_ledger.ts` | append-only `bank_ledger` observer: diffs `Sim.bankInfoFor` around each bank dispatch and writes the moved delta via a fire-and-forget FIFO (audited offline by `scripts/bank_audit.mjs`) |
+| `bank_entitlements.ts` | pure bonus-slot source registry + `computeBankBonus` (email verified / Discord / wallet / qualified referrals); stamped at the fresh-join handshake via the injected `WsAuthDeps.bankBonusForAccount`, never client-supplied |
 | `perf_report.ts` / `provider_usage.ts` | rate-limited client perf-report ingestion / process-local provider and usage telemetry for the admin dashboard |
 
 ## Invariants, YOU MUST keep these
@@ -46,8 +48,14 @@ Postgres and serves the built client from `dist/`.
 - **`ALLOW_DEV_COMMANDS=1` gates `dev_level`/`dev_teleport`/`dev_give`** (dev/E2E only, **never prod**).
 
 ## Persistence model
-- Character level + full state (gear/bags/quests/position/money/talents/arena/lifetimeXp)
+- Character level + full state (gear/bags/bank/quests/position/money/talents/arena/lifetimeXp)
   stored as **JSONB** in `characters.state`; `serializeCharacter` converts to and from the `Sim`.
+  Same-blob atomicity is the bank's anti-dupe cornerstone: the personal bank NEVER gets its own
+  `world_state` row. Treat the bank rollout as forward-only (a pre-bank binary's save drops the field).
+- **Per-character load lease** (`character_leases`): acquired at the WS handshake between
+  `getCharacter` and `game.join` (90 s TTL, heartbeats on the autosave loop, nonce-fenced release),
+  so two processes can never double-load one character. `bank_ledger` is the append-only per-op
+  audit trail (`scripts/bank_audit.mjs` replays it offline).
 - Save cadence: autosave every **30 s** (`AUTOSAVE_SECONDS`), on `leave`, and on
   `SIGINT`/`SIGTERM` shutdown (`saveAll`). World Market is a per-realm JSONB row (`world_state` key `market:<realm>`), realm-scoped like everything else; a pre-scoping bare `'market'` row is migrated by a one-shot per-seller-realm partitioned backfill (`server/market_backfill.ts`) that `ensureSchema` runs under the advisory lock, recording completion in the `'market_backfill_done'` marker row and RETAINING the legacy `'market'` row for rollback (see `docs/api-pipeline/phase-20-rollback-runbook.md`). Market writes are gated at boot until that marker is confirmed.
 - **Character names are globally `UNIQUE`** (catch `23505`, return 409 "name taken").
@@ -78,7 +86,7 @@ Postgres and serves the built client from `dist/`.
    `tests/command_schema.test.ts` (W0b).
 
 - **Delta-key registry.** The heavy self fields `selfWireJson` may omit are written
-  with `maybe(...)`; the 31 such keys plus their terse-key to IWorld-name mapping are
+  with `maybe(...)`; the 35 such keys plus their terse-key to IWorld-name mapping are
   pinned by `ALL_DELTA_KEYS` + `TERSE_TO_IWORLD` in `tests/snapshots.test.ts` (W0a),
   which guards the `selfWireJson` (encode) to `applySnapshot` (decode) round-trip. A
   new heavy self field lands in `selfWireJson` (here) and `applySnapshot` (`online.ts`)

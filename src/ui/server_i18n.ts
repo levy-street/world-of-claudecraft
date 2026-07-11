@@ -1531,6 +1531,11 @@ const dungeonNameToId = new Map<string, string>();
 for (const [id, d] of Object.entries(DUNGEONS)) dungeonNameToId.set(d.name, id);
 export function localizeZone(name: string): string {
   if (name === 'Unknown') return tServer('who.zoneUnknown');
+  // The Sowfield: a presence zone name with no ZoneDef/DungeonDef record
+  // (server presenceOf reports the stadium footprint); localized via the
+  // zone 1 poi label it shares (index pinned by tests/vale_cup_layout.test.ts).
+  if (name === 'The Sowfield')
+    return tEntity({ kind: 'zonePoi', zoneId: 'eastbrook_vale', poiIndex: 10, field: 'label' });
   const zid = zoneNameToId.get(name);
   if (zid) return tEntity({ kind: 'zone', id: zid, field: 'name' });
   const did = dungeonNameToId.get(name);
@@ -1567,6 +1572,7 @@ export const RESTART_MESSAGES: Record<string, Record<string, string>> = {
     ja_JP: 'サーバーは10分後に再起動します。',
     pt_BR: 'Reinício do servidor em 10 minutos.',
     ru_RU: 'Перезапуск сервера через 10 минут.',
+    cs_CZ: 'Server se restartuje za 10 minut.',
     nl_NL: 'Serverherstart over 10 minuten.',
     pl_PL: 'Restart serwera za 10 minut.',
     id_ID: 'Server akan dimulai ulang dalam 10 menit.',
@@ -1590,6 +1596,7 @@ export const RESTART_MESSAGES: Record<string, Record<string, string>> = {
     ja_JP: 'サーバーは5分後に再起動します。',
     pt_BR: 'Reinício do servidor em 5 minutos.',
     ru_RU: 'Перезапуск сервера через 5 минут.',
+    cs_CZ: 'Server se restartuje za 5 minut.',
     nl_NL: 'Serverherstart over 5 minuten.',
     pl_PL: 'Restart serwera za 5 minut.',
     id_ID: 'Server akan dimulai ulang dalam 5 menit.',
@@ -1613,6 +1620,7 @@ export const RESTART_MESSAGES: Record<string, Record<string, string>> = {
     ja_JP: 'サーバーは2分後に再起動します。',
     pt_BR: 'Reinício do servidor em 2 minutos.',
     ru_RU: 'Перезапуск сервера через 2 минуты.',
+    cs_CZ: 'Server se restartuje za 2 minuty.',
     nl_NL: 'Serverherstart over 2 minuten.',
     pl_PL: 'Restart serwera za 2 minuty.',
     id_ID: 'Server akan dimulai ulang dalam 2 menit.',
@@ -1636,6 +1644,7 @@ export const RESTART_MESSAGES: Record<string, Record<string, string>> = {
     ja_JP: 'サーバーは1分後に再起動します。',
     pt_BR: 'Reinício do servidor em 1 minuto.',
     ru_RU: 'Перезапуск сервера через 1 минуту.',
+    cs_CZ: 'Server se restartuje za 1 minutu.',
     nl_NL: 'Serverherstart over 1 minuut.',
     pl_PL: 'Restart serwera za 1 minutę.',
     id_ID: 'Server akan dimulai ulang dalam 1 menit.',
@@ -1659,6 +1668,7 @@ export const RESTART_MESSAGES: Record<string, Record<string, string>> = {
     ja_JP: 'サーバーは30秒後に再起動します。',
     pt_BR: 'Reinício do servidor em 30 segundos.',
     ru_RU: 'Перезапуск сервера через 30 секунд.',
+    cs_CZ: 'Server se restartuje za 30 sekund.',
     nl_NL: 'Serverherstart over 30 seconden.',
     pl_PL: 'Restart serwera za 30 sekund.',
     id_ID: 'Server akan dimulai ulang dalam 30 detik.',
@@ -1682,6 +1692,7 @@ export const RESTART_MESSAGES: Record<string, Record<string, string>> = {
     ja_JP: 'サーバーは10秒後に再起動します。',
     pt_BR: 'Reinício do servidor em 10 segundos.',
     ru_RU: 'Перезапуск сервера через 10 секунд.',
+    cs_CZ: 'Server se restartuje za 10 sekund.',
     nl_NL: 'Serverherstart over 10 seconden.',
     pl_PL: 'Restart serwera za 10 sekund.',
     id_ID: 'Server akan dimulai ulang dalam 10 detik.',
@@ -1705,6 +1716,7 @@ export const RESTART_MESSAGES: Record<string, Record<string, string>> = {
     ja_JP: 'サーバーを今すぐ再起動します。',
     pt_BR: 'O servidor está reiniciando agora.',
     ru_RU: 'Сервер перезапускается сейчас.',
+    cs_CZ: 'Server se nyní restartuje.',
     nl_NL: 'Server wordt nu herstart.',
     pl_PL: 'Restart serwera w toku.',
     id_ID: 'Server sedang dimulai ulang sekarang.',
@@ -1848,6 +1860,28 @@ const RULES: Rule[] = [
   },
   { re: /^Kicked (.+)\.$/, build: (m) => tServer('moderation.kicked', { name: m[1] }) },
   { re: /^Killed (.+)\.$/, build: (m) => tServer('moderation.killConfirm', { name: m[1] }) },
+  // Timed variant first: the broad /^Jailed (.+)\.$/ would swallow it.
+  {
+    re: /^Jailed (.+) for (.+)\.$/,
+    build: (m) =>
+      tServer('moderation.jailedFor', {
+        name: m[1],
+        duration: localizeServerDuration(m[2]),
+      }),
+  },
+  { re: /^Jailed (.+)\.$/, build: (m) => tServer('moderation.jailed', { name: m[1] }) },
+  {
+    re: /^Released (.+) from jail\.$/,
+    build: (m) => tServer('moderation.unjailed', { name: m[1] }),
+  },
+  {
+    re: /^(.+) is already jailed\.$/,
+    build: (m) => tServer('moderation.alreadyJailed', { name: m[1] }),
+  },
+  {
+    re: /^(.+) is not jailed\.$/,
+    build: (m) => tServer('moderation.notJailed', { name: m[1] }),
+  },
   {
     re: /^Required (.+) to rename\.$/,
     build: (m) => tServer('moderation.renameConfirm', { name: m[1] }),
@@ -1892,6 +1926,34 @@ const RULES: Rule[] = [
   {
     re: /^Usage: \/spectate <name>$/,
     build: () => tServer('moderation.spectateUsage'),
+  },
+  {
+    re: /^Usage: \/jail \["<name>" <minutes> \[reason\]\]$/,
+    build: () => tServer('moderation.jailUsage'),
+  },
+  {
+    re: /^Usage: \/unjail \["<name>"\]$/,
+    build: () => tServer('moderation.unjailUsage'),
+  },
+  {
+    re: /^A moderator has moved you to jail for (.+)\.$/,
+    build: (m) => tServer('moderation.jailMovedFor', { duration: localizeServerDuration(m[1]) }),
+  },
+  {
+    re: /^A moderator has released you from jail\.$/,
+    build: () => tServer('moderation.jailReleased'),
+  },
+  {
+    re: /^Moved to jail visitor area\.$/,
+    build: () => tServer('moderation.jailVisitStart'),
+  },
+  {
+    re: /^Returned from jail visitor area\.$/,
+    build: () => tServer('moderation.jailVisitStop'),
+  },
+  {
+    re: /^You are not visiting jail\.$/,
+    build: () => tServer('moderation.jailVisitNotActive'),
   },
   // Chat-filter mute notices. The {duration} comes from formatDuration; re-localize it.
   {

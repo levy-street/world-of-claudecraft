@@ -6,6 +6,7 @@ import { biomeAt, roadDistance, terrainHeight, waterLevelAt, zoneBiomeAt } from 
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { runIdleQueue } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import { chunkIntersectsRegion, normalTexelBounds } from './terrain_region_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
@@ -16,7 +17,14 @@ import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textu
 //   works (the old single-plane-per-zone terrain was always fully submitted).
 // - LOD by distance from the nearest hub at build time: settlements (where
 //   the camera lingers) get dense vertices, the wilderness gets coarse ones.
-// - 0.3u skirts hang from every chunk edge to hide LOD cracks.
+//   Chunks carrying the impassable mountain walls (inter-zone ridges, world
+//   rim) are promoted to the densest band regardless: the terraced walls hold
+//   the heightfield's highest frequencies and the far band smears them into
+//   ragged shards.
+// - Skirts hang from every chunk edge to hide LOD cracks: a 0.3u base drop
+//   plus the vertex slope times the coarsest band spacing, since a T-junction
+//   hole grows with both the neighbor's chord span and the local gradient
+//   (terraced cliffs open multi-yard holes that a flat drop cannot cover).
 // - High tier: MeshStandardMaterial + splat shading (grass/dirt/rock/sand
 //   weights precomputed per vertex from slope/height/roadDistance into a vec4
 //   attribute) over the biome vertex-color tint, plus a world-space macro
@@ -100,6 +108,13 @@ const LOD_BANDS = {
     { maxHubDist: Infinity, spacing: 6.5 },
   ],
 } as const;
+
+// Mountain-wall chunks are promoted to the densest LOD band. Half-widths
+// mirror sim/world.ts: the ridge contribution lives within RIDGE_SIGMA*3
+// (30yd) of each inter-zone ridge line, and the rim rise starts 30yd inside
+// the world edge (plus crest-noise margin).
+const WALL_LOD_RIDGE_HALF = 30;
+const WALL_LOD_RIM_MARGIN = 40;
 
 // terrain normal map resolution (~0.56u per texel over 360x1080)
 const NORMAL_TEX_W = 640;
@@ -391,12 +406,16 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
     lerpSplat(w, 2, t);
   }
-  // high ground (ridges, peaks) goes rocky then snowy
+  // high ground (ridges, peaks) goes rocky then snowy. The snow ramp is wide
+  // (26u, over four terrace bands) with a strong patch-noise term: the terraced
+  // heightfield steps 6u at a time, and a ramp comparable to the step paints
+  // alternate treads fully white / fully bare, which reads as a repetitive
+  // checkerboard from a distance.
   let snow = 0;
   if (h > 22) {
     const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
     cTmp.lerp(rockC, rockT);
-    snow = clamp01((h - 34 + (snowPatch - 0.5) * 8) / 14) * 0.85;
+    snow = clamp01((h - 28 + (snowPatch - 0.5) * 14) / 26) * 0.85;
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
   }
@@ -418,7 +437,10 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   const rim = clamp01(edge / 64);
   if (rim > 0) {
     cTmp.lerp(hazyPeakC, rim * 0.95);
-    const rimSnow = clamp01((h - 26) / 16) * rim * 0.8;
+    // same wide, noise-broken ramp as the interior snow above: a pure
+    // height threshold snowed every terrace tread above the line uniformly,
+    // turning the rim's 2D terrace lattice into a white/grey checkerboard
+    const rimSnow = clamp01((h - 21 + (snowPatch - 0.5) * 12) / 26) * rim * 0.8;
     cTmp.lerp(snowCapC, rimSnow);
     snow = Math.max(snow, rimSnow);
     lerpSplat(w, 2, rim * 0.85);
@@ -457,6 +479,7 @@ function buildChunkGeometry(
   spacing: number,
   seed: number,
   withSplat: boolean,
+  skirtSpan: number,
 ): THREE.BufferGeometry {
   const nx = Math.max(4, Math.round(size / spacing));
   const nz = nx;
@@ -493,7 +516,11 @@ function buildChunkGeometry(
       }
       const vi = gj * gw + gi;
       positions[vi * 3] = x;
-      positions[vi * 3 + 1] = s.height - (isSkirt ? SKIRT_DROP : 0);
+      // Slope-aware drop: a T-junction hole under a coarse neighbor's chord is
+      // bounded by the local gradient times that neighbor's vertex spacing, so
+      // a flat cliff-side skirt must deepen with the slope or the hole shows
+      // sky (skirtSpan is the coarsest spacing any neighbor can have).
+      positions[vi * 3 + 1] = s.height - (isSkirt ? SKIRT_DROP + s.slope * skirtSpan : 0);
       positions[vi * 3 + 2] = z;
       normals[vi * 3] = s.normal[0];
       normals[vi * 3 + 1] = s.normal[1];
@@ -528,12 +555,29 @@ function buildChunkGeometry(
       const b = a + 1;
       const c = a + gw;
       const d = c + 1;
-      indices[k++] = a;
-      indices[k++] = c;
-      indices[k++] = b;
-      indices[k++] = b;
-      indices[k++] = c;
-      indices[k++] = d;
+      // Split each quad along the diagonal whose endpoints are closest in
+      // height, so the fold line follows a ridge/terrace edge instead of
+      // cutting across it (a fixed diagonal saws terraced cliffs into
+      // alternating shards). Both windings keep the +y face up.
+      const ha = positions[a * 3 + 1];
+      const hb = positions[b * 3 + 1];
+      const hc = positions[c * 3 + 1];
+      const hd = positions[d * 3 + 1];
+      if (Math.abs(hb - hc) <= Math.abs(ha - hd)) {
+        indices[k++] = a;
+        indices[k++] = c;
+        indices[k++] = b;
+        indices[k++] = b;
+        indices[k++] = c;
+        indices[k++] = d;
+      } else {
+        indices[k++] = a;
+        indices[k++] = c;
+        indices[k++] = d;
+        indices[k++] = a;
+        indices[k++] = d;
+        indices[k++] = b;
+      }
     }
   }
 
@@ -620,7 +664,15 @@ function terrainNormalTexture(seed: number): THREE.DataTexture {
   tex.colorSpace = THREE.NoColorSpace;
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
   tex.magFilter = THREE.LinearFilter;
-  tex.minFilter = THREE.LinearFilter;
+  // Mipmapped minification (DataTexture defaults it off): the bake packs the
+  // terraces' near-vertical risers next to flat treads at 0.56u/texel, and
+  // sampling that unfiltered from a distant camera aliases the lighting into
+  // shimmering checker patterns. Mips average the relief away smoothly with
+  // distance instead. WebGL2 handles the NPOT mip chain; the editor's
+  // rebakeNormalRegion re-upload regenerates it automatically.
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.generateMipmaps = true;
+  tex.anisotropy = NORMAL_ANISOTROPY;
   tex.needsUpdate = true;
   return tex;
 }
@@ -888,9 +940,27 @@ export interface TerrainView {
   setBrush(x: number, z: number, radius: number, color?: THREE.ColorRepresentation): void;
   /** Editor-only: hide the brush ring. */
   clearBrush(): void;
+  /**
+   * Resolves once every streamed-in far chunk (see buildTerrain) has been
+   * added to `group`. Only the near ring around the world's zone hubs is
+   * built synchronously; everything else streams in across idle slots so
+   * first paint isn't gated on the whole map's geometry. Most callers don't
+   * need this - `chunks` is a live array shared with update()/rebuildRegion(),
+   * so those already see streamed chunks as they arrive. Use this only when a
+   * caller needs the FULL map built before doing something else (e.g. a
+   * screenshot tour), and call cancelStreaming() before discarding this view.
+   */
+  streamingDone: Promise<void>;
+  /** Stops any in-flight far-chunk streaming. Call before discarding this view (see rebuildTerrain). */
+  cancelStreaming(): void;
 }
 
-export function buildTerrain(seed: number): TerrainView {
+// Chunks farther than the near ring stream in this many at a time per idle
+// slot, forced forward even under sustained load by the timeout.
+const STREAM_BATCH_SIZE = 4;
+const STREAM_TIMEOUT_MS = 200;
+
+export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
   const brush = makeBrushUniforms();
   const normalTex = lowGfx ? null : terrainNormalTexture(seed);
@@ -914,9 +984,32 @@ export function buildTerrain(seed: number): TerrainView {
     spacing: number;
   }[] = [];
 
+  // True when the chunk cell overlaps a mountain-wall band: an inter-zone
+  // ridge line (ZONES[i].zMax) or the world rim. Those chunks always take the
+  // densest band; the walls sit far from every hub, so hub-distance LOD alone
+  // hands the steepest, most looked-at cliffs the coarsest grid.
+  const wallChunkAt = (x0: number, z0: number, size: number): boolean => {
+    if (x0 < -WORLD_MAX_X + WALL_LOD_RIM_MARGIN || x0 + size > WORLD_MAX_X - WALL_LOD_RIM_MARGIN) {
+      return true;
+    }
+    if (z0 < WORLD_MIN_Z + WALL_LOD_RIM_MARGIN || z0 + size > WORLD_MAX_Z - WALL_LOD_RIM_MARGIN) {
+      return true;
+    }
+    for (let i = 0; i + 1 < ZONES.length; i++) {
+      const ridgeZ = ZONES[i].zMax;
+      if (z0 - WALL_LOD_RIDGE_HALF < ridgeZ && z0 + size + WALL_LOD_RIDGE_HALF > ridgeZ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const bandIndexAt = (cx: number, cz: number): number => {
-    const centerX = -WORLD_MAX_X + cx * CHUNK_SIZE + CHUNK_SIZE / 2;
-    const centerZ = WORLD_MIN_Z + cz * CHUNK_SIZE + CHUNK_SIZE / 2;
+    const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+    const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+    if (wallChunkAt(x0, z0, CHUNK_SIZE)) return 0;
+    const centerX = x0 + CHUNK_SIZE / 2;
+    const centerZ = z0 + CHUNK_SIZE / 2;
     let hubDist = Infinity;
     for (const zn of ZONES) {
       hubDist = Math.min(hubDist, Math.hypot(centerX - zn.hub.x, centerZ - zn.hub.z));
@@ -925,11 +1018,25 @@ export function buildTerrain(seed: number): TerrainView {
     return idx === -1 ? bands.length - 1 : idx;
   };
 
+  // the coarsest spacing any neighbor chunk can have; sizes the slope-aware
+  // skirt drop so a fine chunk's skirt always reaches past the coarsest
+  // neighbor's chord (and vice versa)
+  const skirtSpan = bands[bands.length - 1].spacing;
+
   const addChunk = (x0: number, z0: number, size: number, spacing: number): void => {
-    const geo = buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx);
+    const geo = buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan);
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
     group.add(mesh);
+    // A chunk's transform never changes after this point (its shape lives in
+    // the geometry, not the mesh matrix), so it can freeze immediately rather
+    // than waiting for the caller's group-wide freezeStaticMatrices pass.
+    // That pass only runs once, right after the synchronous near ring returns,
+    // so every chunk streamed in afterward (the majority, on the far bands)
+    // would otherwise keep matrixAutoUpdate = true and recompose every frame
+    // for the rest of the session.
+    mesh.updateMatrixWorld(true);
+    mesh.matrixAutoUpdate = false;
     chunks.push({
       mesh,
       x: x0 + size / 2,
@@ -941,6 +1048,20 @@ export function buildTerrain(seed: number): TerrainView {
       spacing,
     });
   };
+
+  // Collect every chunk to build as a job first, instead of building inline,
+  // so the near ring (around the zone hubs, i.e. where a fresh character
+  // actually stands) can build synchronously while the rest streams in
+  // across idle slots below. bandIndexAt returns 0 only for the densest,
+  // closest-to-a-hub band, which is what we treat as "near".
+  interface ChunkJob {
+    x0: number;
+    z0: number;
+    size: number;
+    spacing: number;
+    near: boolean;
+  }
+  const jobs: ChunkJob[] = [];
 
   // far-LOD cells merge 2x2 into super-chunks: the far field is where draw
   // count hurts and culling granularity matters least
@@ -967,26 +1088,67 @@ export function buildTerrain(seed: number): TerrainView {
         ]) {
           built.add((cz + dz) * chunksX + (cx + dx));
         }
-        addChunk(
-          -WORLD_MAX_X + cx * CHUNK_SIZE,
-          WORLD_MIN_Z + cz * CHUNK_SIZE,
-          CHUNK_SIZE * 2,
-          bands[farBand].spacing,
-        );
+        // a merged super-chunk only forms from four far-band cells, so it's
+        // never near
+        jobs.push({
+          x0: -WORLD_MAX_X + cx * CHUNK_SIZE,
+          z0: WORLD_MIN_Z + cz * CHUNK_SIZE,
+          size: CHUNK_SIZE * 2,
+          spacing: bands[farBand].spacing,
+          near: false,
+        });
       } else {
         built.add(cz * chunksX + cx);
-        const band = bands[bandIndexAt(cx, cz)];
-        addChunk(
-          -WORLD_MAX_X + cx * CHUNK_SIZE,
-          WORLD_MIN_Z + cz * CHUNK_SIZE,
-          CHUNK_SIZE,
-          band.spacing,
-        );
+        const bandIdx = bandIndexAt(cx, cz);
+        jobs.push({
+          x0: -WORLD_MAX_X + cx * CHUNK_SIZE,
+          z0: WORLD_MIN_Z + cz * CHUNK_SIZE,
+          size: CHUNK_SIZE,
+          spacing: bands[bandIdx].spacing,
+          near: bandIdx === 0,
+        });
       }
     }
   }
+
+  for (const job of jobs) {
+    if (job.near) addChunk(job.x0, job.z0, job.size, job.spacing);
+  }
+  const farJobs = jobs.filter((job) => !job.near);
+  // A returning character can log out anywhere, not just at a zone hub, so
+  // the near ring alone can leave them standing on not-yet-streamed terrain.
+  // Ordering the far queue by distance to the actual entry point (falling
+  // back to world center when none is given) guarantees the chunk directly
+  // underfoot streams in first rather than landing wherever row-major order
+  // happens to reach it.
+  if (priorityPoint) {
+    const centerX = (job: (typeof farJobs)[number]): number => job.x0 + job.size / 2;
+    const centerZ = (job: (typeof farJobs)[number]): number => job.z0 + job.size / 2;
+    farJobs.sort(
+      (a, b) =>
+        Math.hypot(centerX(a) - priorityPoint.x, centerZ(a) - priorityPoint.z) -
+        Math.hypot(centerX(b) - priorityPoint.x, centerZ(b) - priorityPoint.z),
+    );
+  }
+  let cancelled = false;
+  const streamingDone = runIdleQueue(
+    farJobs,
+    (job) => {
+      addChunk(job.x0, job.z0, job.size, job.spacing);
+    },
+    {
+      batchSize: STREAM_BATCH_SIZE,
+      timeoutMs: STREAM_TIMEOUT_MS,
+      cancelled: () => cancelled,
+    },
+  );
+
   return {
     group,
+    streamingDone,
+    cancelStreaming(): void {
+      cancelled = true;
+    },
     update(camX: number, camZ: number, fogFar: number): void {
       // fully-fogged chunks are pure overdraw; drop them before the frustum
       for (const chunk of chunks) {
@@ -1009,6 +1171,7 @@ export function buildTerrain(seed: number): TerrainView {
           chunk.spacing,
           seed,
           !lowGfx,
+          skirtSpan,
         );
         chunk.mesh.geometry.dispose();
         chunk.mesh.geometry = geo; // bounding box/sphere already computed by the build

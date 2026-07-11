@@ -642,6 +642,43 @@ describe('game.* side effects preserved', () => {
     expect(rt.muteAccountChat).toHaveBeenCalledWith(5, '2030-01-01', 'spam');
   });
 
+  it('bans an account from Daily Rewards with the moderator reason', async () => {
+    const setDailyRewardsBan = vi.fn(async () => {});
+    authedAdminDb({ setDailyRewardsBan });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/daily-rewards-ban', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { reason: 'automated play' },
+    });
+    expect(r.status).toBe(200);
+    expect(setDailyRewardsBan).toHaveBeenCalledWith({
+      accountId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      banned: true,
+      reason: 'automated play',
+    });
+  });
+
+  it('bans an account IP from Daily Rewards with the moderator reason', async () => {
+    const setDailyRewardsIpBan = vi.fn(async () => {});
+    authedAdminDb({ setDailyRewardsIpBan });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/daily-rewards-ip-ban', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { ip: '203.0.113.4', reason: 'multi-account abuse' },
+    });
+    expect(r.status).toBe(200);
+    expect(setDailyRewardsIpBan).toHaveBeenCalledWith({
+      accountId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      ip: '203.0.113.4',
+      banned: true,
+      reason: 'multi-account abuse',
+    });
+  });
+
   it('force-rename disconnects the character owner', async () => {
     authedAdminDb({ forceCharacterRename: async () => ({ accountId: 88 }) });
     const rt = installAdminRuntime();
@@ -1082,6 +1119,22 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     expect(r.body).toEqual({
       success: true,
       data: { rows: [{ accountId: 1, openReports: 2 }] },
+      error: null,
+    });
+  });
+
+  it('moderation/history scopes tab reads to the current admin account', async () => {
+    const listModerationActions = vi.fn(async () => ({ rows: [], total: 0, page: 2, limit: 100 }));
+    authedAdminDb({ listModerationActions });
+    installAdminRuntime();
+    const r = await runRoute('GET', '/admin/api/moderation/history', {
+      headers: { authorization: BEARER },
+      url: '/admin/api/moderation/history?tab=notes&page=2&limit=100',
+    });
+    expect(listModerationActions).toHaveBeenCalledWith('notes', ADMIN_ACCOUNT_ID, 2, 100);
+    expect(r.body).toEqual({
+      success: true,
+      data: { rows: [], total: 0, page: 2, limit: 100 },
       error: null,
     });
   });
@@ -1898,5 +1951,136 @@ describe('remaining legacy guard negatives (re-verification audit)', () => {
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'a valid IP address is required' });
     expect(removeBlockedIp).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Reset password (accounts.password): the RouteDef twin of the legacy branch.
+// ---------------------------------------------------------------------------
+
+describe('reset-password RouteDef handler (accounts.password)', () => {
+  const resetDeps = () => ({
+    accountById: vi.fn(async () => ({ id: 5 })),
+    recordPasswordReset: vi.fn(async () => {}),
+    hashPassword: vi.fn(async () => 'salt:hashed'),
+    updatePasswordHash: vi.fn(async () => {}),
+    revokeTokensExcept: vi.fn(async () => {}),
+  });
+
+  it('audits first, rehashes, revokes every token, and kicks live sessions', async () => {
+    const deps = resetDeps();
+    authedAdminDb(deps);
+    const rt = installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/accounts/:id/reset-password', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { password: 'newpass123', reason: 'account recovery' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(deps.recordPasswordReset).toHaveBeenCalledWith({
+      accountId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      reason: 'account recovery',
+    });
+    expect(deps.hashPassword).toHaveBeenCalledWith('newpass123');
+    expect(deps.updatePasswordHash).toHaveBeenCalledWith(5, 'salt:hashed');
+    expect(deps.revokeTokensExcept).toHaveBeenCalledWith(5, null);
+    expect(rt.disconnectAccount).toHaveBeenCalledWith(5, 'Connection to the server was lost.');
+    // The audit row lands before the credential write (no unaudited action).
+    expect(deps.recordPasswordReset.mock.invocationCallOrder[0]).toBeLessThan(
+      deps.updatePasswordHash.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('rejects out-of-bounds passwords and unknown accounts without any write', async () => {
+    const deps = resetDeps();
+    authedAdminDb(deps);
+    installAdminRuntime();
+    const short = await runRoute('POST', '/admin/api/accounts/:id/reset-password', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { password: 'abc', reason: 'r' },
+    });
+    expect(short.status).toBe(400);
+    expect(short.body).toEqual({
+      success: false,
+      data: null,
+      error: 'password must be at least 6 chars',
+    });
+    const long = await runRoute('POST', '/admin/api/accounts/:id/reset-password', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { password: 'x'.repeat(129), reason: 'r' },
+    });
+    expect(long.status).toBe(400);
+    expect(long.body).toEqual({
+      success: false,
+      data: null,
+      error: 'password must be at most 128 chars',
+    });
+
+    authedAdminDb({ ...deps, accountById: vi.fn(async () => null) });
+    installAdminRuntime();
+    const missing = await runRoute('POST', '/admin/api/accounts/:id/reset-password', {
+      headers: { authorization: BEARER },
+      params: { id: '12345' },
+      body: { password: 'newpass123', reason: 'r' },
+    });
+    expect(missing.status).toBe(404);
+    expect(missing.body).toEqual({ success: false, data: null, error: 'account not found' });
+
+    expect(deps.recordPasswordReset).not.toHaveBeenCalled();
+    expect(deps.updatePasswordHash).not.toHaveBeenCalled();
+    expect(deps.revokeTokensExcept).not.toHaveBeenCalled();
+  });
+
+  it('refuses a staff target unless the actor is a superadmin', async () => {
+    const deps = resetDeps();
+    // The actor holds accounts.password via the plain admin role, but the target
+    // reads as staff (isAdminAccount true), so the reset is refused.
+    setDb({
+      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      adminRolesForAccount: async (id: number) =>
+        id === ADMIN_ACCOUNT_ID ? { username: 'op', roles: ['admin'] } : null,
+      isAdminAccount: async () => true,
+      ...deps,
+    });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/accounts/:id/reset-password', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { password: 'newpass123', reason: 'r' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'only a superadmin can reset a staff password',
+    });
+    expect(deps.updatePasswordHash).not.toHaveBeenCalled();
+    expect(deps.revokeTokensExcept).not.toHaveBeenCalled();
+  });
+
+  it('is denied 403 by the central gate for a moderator (accounts.password not held)', async () => {
+    const deps = resetDeps();
+    setDb({
+      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
+      ...deps,
+    });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/accounts/:id/reset-password', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { password: 'newpass123', reason: 'r' },
+    });
+    expect(r.status).toBe(403);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'you do not have permission to do this',
+    });
+    expect(deps.updatePasswordHash).not.toHaveBeenCalled();
   });
 });

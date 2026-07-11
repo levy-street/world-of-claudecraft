@@ -52,6 +52,33 @@ Most directories above have their own `CLAUDE.md` with local conventions; read i
 
 See `README.md` for the full host/develop/play guide and the classic-fidelity checklist; `DEPLOY.md` for production.
 
+## Default task workflow
+Unless the request says otherwise, the default for any task is to accomplish the stated
+objective, and to deliver it this way. This is the baseline for every contribution.
+
+Before making changes:
+- **Base your work off the latest release branch** (and its tracking issue), not `main`. The
+  release branch is the active integration base; `main` trails it.
+- **Create and use a separate git worktree for the task**, so unrelated working-tree WIP never
+  contaminates the branch and parallel tasks stay isolated.
+- **Review the existing implementation before modifying anything.** Read the code paths, tests,
+  and the local `CLAUDE.md` for the area you are touching first.
+- **Preserve existing behavior unless the goal explicitly requires changing it.**
+
+Implementation requirements:
+- Make **all** the changes the objective needs: code, data, validation, UI, and tests.
+- **Avoid unrelated refactors.** Keep the diff scoped to the task.
+- **Add or update automated tests** covering the new behavior (`sim/` and `server/` changes
+  always get a test).
+- Keep the solution maintainable and extensible: follow the module-first seams above, do not grow
+  a monolith.
+- **If the change is visual, add before/after screenshots to the PR** (desktop and mobile where
+  relevant), committed under `docs/screenshots` and referenced from the PR body.
+
+Deliverable: a PR based off the latest release branch, following
+`.github/PULL_REQUEST_TEMPLATE.md`, that is **fully mergeable and passes CI**. Gate it locally
+with `npm run gate` (above) before calling it done.
+
 ## Architecture (the load-bearing ideas)
 - **One sim, three hosts.** The exact same `src/sim/` code runs the offline
   browser world, the online server, and the RL env. Behavior must be identical

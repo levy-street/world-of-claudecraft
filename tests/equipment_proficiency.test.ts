@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { CLASSES, ITEMS } from '../src/sim/data';
+import { canEquipItem } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
+import type { PlayerClass } from '../src/sim/types';
+
+const ALL_CLASSES = Object.keys(CLASSES) as PlayerClass[];
 
 function equip(cls: Parameters<Sim['addPlayer']>[0], itemId: string) {
   const sim = new Sim({ seed: 42, playerClass: cls, noPlayer: true, autoEquip: false });
@@ -62,5 +67,22 @@ describe('armor proficiencies', () => {
     expect(equip('warrior', 'staff_of_the_gravewyrm').equipment.mainhand).not.toBe(
       'staff_of_the_gravewyrm',
     );
+  });
+});
+
+describe('weapon requiredClass is representative of who can equip', () => {
+  // The whole point of the field: a weapon's requiredClass must list exactly the
+  // classes that can actually equip it, not an archetype-signature subset. Guards
+  // every weapon at once, so a future archetype weapon authored with the short
+  // form (e.g. ['warrior','paladin']) fails here until it lists the full group.
+  it('lists exactly the classes canEquipItem allows, for every weapon with a class list', () => {
+    for (const item of Object.values(ITEMS)) {
+      if (item.kind !== 'weapon' || !item.requiredClass) continue;
+      const equippable = ALL_CLASSES.filter((c) => canEquipItem(c, item)).sort();
+      const listed = [...item.requiredClass].sort();
+      expect(listed, `${item.id}: requiredClass must match its equippable classes`).toEqual(
+        equippable,
+      );
+    }
   });
 });

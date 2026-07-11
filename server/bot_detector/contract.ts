@@ -93,6 +93,15 @@ export interface SuspiciousEvidence {
   weight: number;
   detail: string;
   expiresAt: number;
+  // Recurrence history, present only on kinds where re-triggering carries
+  // information (decided entirely by the implementation): distinct episodes
+  // observed this session, when the first and latest happened (epoch ms), and
+  // the opening timestamps of the most recent episodes (bounded ring; the count
+  // and firstAt keep the totals the ring loses when it overflows).
+  occurrences?: number;
+  firstAt?: number;
+  lastAt?: number;
+  episodesAt?: number[];
 }
 
 export type SuspiciousPlayerState = 'SUSPICIOUS' | 'CONFIRMED';
@@ -113,6 +122,8 @@ export interface BotTrackingContext {
 
 export interface BotDetector {
   createTrackingContext(ref: PlayerSessionRef, meta?: unknown): BotTrackingContext;
+  // Contexts start connected; linkdead drop marks false, same-session resume marks true with fresh meta.
+  setTrackingConnection(ctx: BotTrackingContext, connected: boolean, meta?: unknown): void;
   releaseTrackingContext(ctx: BotTrackingContext): void;
   observeCommand(ctx: BotTrackingContext, cmd: string, now: number, message?: unknown): void;
   observeEvent(ctx: BotTrackingContext, ev: SimEvent, now: number): void;

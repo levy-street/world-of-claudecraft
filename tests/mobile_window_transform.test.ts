@@ -32,6 +32,7 @@ const STYLE_MODULES = [
   '../src/styles/layout.css',
   '../src/styles/hud.css',
   '../src/styles/components.css',
+  '../src/styles/hud.mobile.css',
 ];
 
 // Strip CSS/HTML comments so they can't bleed into a rule's selector text (the flat
@@ -137,5 +138,123 @@ describe.each(HTML_ENTRIES)('mobile window positioning (%s)', (entry) => {
       'these left-pinned mobile-touch windows do not reset the centering transform, ' +
         `so translateX(-50%) shifts them off the left edge:\n${offenders.join('\n')}`,
     ).toEqual([]);
+  });
+});
+
+// Phase 4: the modal backdrop (#mobile-window-backdrop). A static element in
+// both HTML entries, hidden by default / on desktop, shown as a full-screen dim
+// layer only under body.mobile-touch.mobile-window-open.
+describe.each(HTML_ENTRIES)('mobile window backdrop (%s)', (entry) => {
+  const html = readFileSync(fileURLToPath(new URL(entry, import.meta.url)), 'utf8');
+  const source = loadHtml(entry);
+  const rules = cssRules(source);
+
+  it('ships a static #mobile-window-backdrop element with aria-hidden', () => {
+    expect(html).toMatch(/<div id="mobile-window-backdrop" aria-hidden="true"><\/div>/);
+  });
+
+  it('is hidden by default (no body.mobile-touch requirement)', () => {
+    const hidden = rules.find((r) => r.selector === '#mobile-window-backdrop');
+    expect(
+      hidden,
+      'a bare #mobile-window-backdrop { display: none } rule should exist',
+    ).toBeDefined();
+    expect(value(hidden!.body, 'display')).toBe('none');
+  });
+
+  it('shows as a full-screen layer only under body.mobile-touch.mobile-window-open', () => {
+    const shown = rules.find(
+      (r) => r.selector === 'body.mobile-touch.mobile-window-open #mobile-window-backdrop',
+    );
+    expect(shown, 'the mobile-window-open show rule should exist').toBeDefined();
+    expect(value(shown!.body, 'display')).toBe('block');
+    expect(value(shown!.body, 'pointer-events')).toBe('auto');
+    // Never gated on a bare body.mobile-window-open (desktop can also carry that
+    // class); the selector must require body.mobile-touch too.
+    const desktopOnly = rules.find(
+      (r) => r.selector === 'body.mobile-window-open #mobile-window-backdrop',
+    );
+    expect(desktopOnly, 'the backdrop must not show without body.mobile-touch').toBeUndefined();
+  });
+
+  it('sits above the base HUD chrome but below an open .window (z-index 85 < 90)', () => {
+    const shown = rules.find(
+      (r) => r.selector === 'body.mobile-touch.mobile-window-open #mobile-window-backdrop',
+    );
+    const z = Number(value(shown!.body, 'z-index'));
+    const uiOpenRule = rules.find((r) => r.selector === 'body.mobile-touch.mobile-window-open #ui');
+    const uiOpenZ = Number(value(uiOpenRule!.body, 'z-index'));
+    expect(z).toBeLessThan(uiOpenZ);
+  });
+});
+
+describe('tier player-frame nudges are landscape-gated (hud.mobile.css)', () => {
+  // The compact narrow-width (-44px) and tablet (-10px) player-frame seats exist
+  // to clear the bottom-right Jump crescent, a landscape-only geometry. The tier
+  // classes themselves carry no orientation gate (a 390x844 portrait phone still
+  // resolves compact), so without an orientation media the nudges would off-centre
+  // the frame in browser portrait. Pin both rules inside an
+  // `@media (orientation: landscape)` block. Raw-text scan on purpose: the flat
+  // rule scan above unwraps only the outer @layer, not nested @media blocks.
+  // Strip CSS comments first (like the coverage test next door) so a stray `{`/`}` or a
+  // `@media` word inside a comment cannot throw off the brace-depth scan below.
+  const css = readFileSync(
+    fileURLToPath(new URL('../src/styles/hud.mobile.css', import.meta.url)),
+    'utf8',
+  ).replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // Enumerate every @media block with its prelude text and body brace range, matched
+  // by a brace-depth scan from each @media's opening brace to its balanced close.
+  function mediaBlocks(): Array<{ prelude: string; bodyStart: number; bodyEnd: number }> {
+    const blocks: Array<{ prelude: string; bodyStart: number; bodyEnd: number }> = [];
+    const re = /@media\b/g;
+    let m: RegExpExecArray | null = re.exec(css);
+    while (m !== null) {
+      const preludeStart = m.index;
+      const open = css.indexOf('{', preludeStart);
+      if (open >= 0) {
+        // Walk from the opening brace to its balanced close via a brace-depth scan.
+        let depth = 0;
+        let close = -1;
+        for (let i = open; i < css.length; i++) {
+          const ch = css[i];
+          if (ch === '{') depth++;
+          else if (ch === '}') {
+            depth--;
+            if (depth === 0) {
+              close = i;
+              break;
+            }
+          }
+        }
+        if (close >= 0) {
+          blocks.push({ prelude: css.slice(preludeStart, open), bodyStart: open, bodyEnd: close });
+        }
+      }
+      m = re.exec(css);
+    }
+    return blocks;
+  }
+
+  function mediaPrelude(needle: string): string {
+    const at = css.indexOf(needle);
+    expect(at, `${needle} rule should exist`).toBeGreaterThanOrEqual(0);
+    // The INNERMOST @media block whose body contains the rule (smallest enclosing body
+    // range): nesting-proof. An inner nested @media sitting between the outer block's
+    // open brace and the rule no longer mis-grabs, because we pick the smallest-body
+    // block that still encloses the rule index, not the nearest '@media' token above it.
+    const enclosing = mediaBlocks()
+      .filter((b) => at > b.bodyStart && at < b.bodyEnd)
+      .sort((a, b) => a.bodyEnd - a.bodyStart - (b.bodyEnd - b.bodyStart))[0];
+    expect(enclosing, `${needle} should sit inside a media block`).toBeTruthy();
+    return enclosing.prelude;
+  }
+
+  it('keys the compact -44px seat to landscape', () => {
+    expect(mediaPrelude('left: calc(50% - 44px)')).toContain('(orientation: landscape)');
+  });
+
+  it('keys the tablet -10px seat to landscape', () => {
+    expect(mediaPrelude('left: calc(50% - 10px)')).toContain('(orientation: landscape)');
   });
 });

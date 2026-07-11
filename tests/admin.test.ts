@@ -12,6 +12,9 @@ vi.mock('../server/db', () => ({
   accountForToken: vi.fn(),
   isAdminAccount: vi.fn(),
   accountMailTarget: vi.fn(async () => null),
+  accountById: vi.fn(),
+  updatePasswordHash: vi.fn(),
+  revokeTokensExcept: vi.fn(),
 }));
 vi.mock('../server/admin_db', async () => {
   const actual = await vi.importActual<typeof import('../server/admin_db')>('../server/admin_db');
@@ -35,6 +38,9 @@ vi.mock('../server/admin_db', async () => {
 vi.mock('../server/auth', () => ({
   verifyPassword: vi.fn(async () => false),
   newToken: vi.fn(() => 'b'.repeat(64)),
+  hashPassword: vi.fn(async () => 'salt:hashed'),
+  MIN_PASSWORD_LENGTH: 6,
+  MAX_PASSWORD_LENGTH: 128,
 }));
 vi.mock('../server/moderation_db', () => ({
   forceCharacterRename: vi.fn(),
@@ -44,6 +50,7 @@ vi.mock('../server/moderation_db', () => ({
   liftAccountChatMute: vi.fn(),
   moderateAccount: vi.fn(),
   muteAccountChat: vi.fn(),
+  recordPasswordReset: vi.fn(),
 }));
 vi.mock('../server/chat_filter_db', () => ({
   addFilterWord: vi.fn(),
@@ -91,7 +98,7 @@ import {
   overviewCounts,
   type PerfRawRow,
 } from '../server/admin_db';
-import { verifyPassword } from '../server/auth';
+import { hashPassword, verifyPassword } from '../server/auth';
 import type { CalibrationHistogram, SuspiciousPlayer } from '../server/bot_detector/contract';
 import {
   addFilterWord,
@@ -102,7 +109,15 @@ import {
   resetChatStrikes,
   updateFilterConfig,
 } from '../server/chat_filter_db';
-import { accountForToken, accountMailTarget, findAccount, isAdminAccount } from '../server/db';
+import {
+  accountById,
+  accountForToken,
+  accountMailTarget,
+  findAccount,
+  isAdminAccount,
+  revokeTokensExcept,
+  updatePasswordHash,
+} from '../server/db';
 import { addBlockedIp, removeBlockedIp } from '../server/ip_block_db';
 import type { LiveSharedIp } from '../server/live_shared_ips';
 import {
@@ -113,6 +128,7 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  recordPasswordReset,
 } from '../server/moderation_db';
 import {
   adminRolesForAccount,
@@ -1309,6 +1325,141 @@ describe('blocked-ips admin route', () => {
     );
     expect(res.statusCode).toBe(400);
     expect(removeBlockedIp).not.toHaveBeenCalled();
+  });
+});
+
+describe('admin api password reset', () => {
+  const actAs = (roles: string[], accountId = 7) => {
+    vi.mocked(accountForToken).mockResolvedValue(accountId);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'operator', roles });
+  };
+  const targetExists = () =>
+    vi
+      .mocked(accountById)
+      .mockResolvedValue({ id: 9 } as NonNullable<Awaited<ReturnType<typeof accountById>>>);
+  const post = (body: unknown, id = 9) =>
+    fakeReq({
+      method: 'POST',
+      token: VALID_TOKEN,
+      url: `/admin/api/accounts/${id}/reset-password`,
+      body,
+    });
+
+  it('audits, rehashes, revokes every token, and disconnects live sessions', async () => {
+    actAs(['admin']);
+    vi.mocked(isAdminAccount).mockResolvedValue(false); // target is not staff
+    targetExists();
+    const res = fakeRes();
+
+    await handleAdminApi(
+      post({ password: 'newpass123', reason: 'account recovery' }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(recordPasswordReset).toHaveBeenCalledWith({
+      accountId: 9,
+      adminAccountId: 7,
+      reason: 'account recovery',
+    });
+    expect(hashPassword).toHaveBeenCalledWith('newpass123');
+    expect(updatePasswordHash).toHaveBeenCalledWith(9, 'salt:hashed');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
+    expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(
+      9,
+      'Connection to the server was lost.',
+    );
+    // The audit row lands before the credential write (no unaudited action).
+    expect(vi.mocked(recordPasswordReset).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(updatePasswordHash).mock.invocationCallOrder[0],
+    );
+  });
+
+  it('rejects out-of-bounds passwords without touching the account', async () => {
+    actAs(['admin']);
+    vi.mocked(isAdminAccount).mockResolvedValue(false);
+    targetExists();
+
+    const tooShort = fakeRes();
+    await handleAdminApi(post({ password: 'abc', reason: 'r' }), tooShort, fakeGame);
+    expect(tooShort.statusCode).toBe(400);
+    expect(tooShort.body.error).toBe('password must be at least 6 chars');
+
+    const tooLong = fakeRes();
+    await handleAdminApi(post({ password: 'x'.repeat(129), reason: 'r' }), tooLong, fakeGame);
+    expect(tooLong.statusCode).toBe(400);
+    expect(tooLong.body.error).toBe('password must be at most 128 chars');
+
+    const missing = fakeRes();
+    await handleAdminApi(post({ reason: 'r' }), missing, fakeGame);
+    expect(missing.statusCode).toBe(400);
+
+    expect(recordPasswordReset).not.toHaveBeenCalled();
+    expect(updatePasswordHash).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 for an unknown account without touching anything', async () => {
+    actAs(['admin']);
+    vi.mocked(isAdminAccount).mockResolvedValue(false);
+    vi.mocked(accountById).mockResolvedValue(null);
+    const res = fakeRes();
+
+    await handleAdminApi(post({ password: 'newpass123', reason: 'r' }, 12345), res, fakeGame);
+
+    expect(res.statusCode).toBe(404);
+    expect(recordPasswordReset).not.toHaveBeenCalled();
+    expect(updatePasswordHash).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
+  });
+
+  it('refuses a staff target unless the actor is a superadmin', async () => {
+    actAs(['admin']);
+    vi.mocked(isAdminAccount).mockResolvedValue(true); // target is staff
+    targetExists();
+    const denied = fakeRes();
+
+    await handleAdminApi(post({ password: 'newpass123', reason: 'r' }), denied, fakeGame);
+
+    expect(denied.statusCode).toBe(400);
+    expect(denied.body.error).toBe('only a superadmin can reset a staff password');
+    expect(updatePasswordHash).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
+
+    actAs(['superadmin']);
+    const allowed = fakeRes();
+    await handleAdminApi(post({ password: 'newpass123', reason: 'r' }), allowed, fakeGame);
+    expect(allowed.statusCode).toBe(200);
+    expect(updatePasswordHash).toHaveBeenCalledWith(9, 'salt:hashed');
+  });
+
+  it('refuses the route entirely without the accounts.password permission', async () => {
+    actAs(['moderator']);
+    const res = fakeRes();
+
+    await handleAdminApi(post({ password: 'newpass123', reason: 'r' }), res, fakeGame);
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body.error).toBe('you do not have permission to do this');
+    expect(updatePasswordHash).not.toHaveBeenCalled();
+  });
+
+  it('requires a moderation reason, surfacing the audit failure as 400', async () => {
+    actAs(['admin']);
+    vi.mocked(isAdminAccount).mockResolvedValue(false);
+    targetExists();
+    vi.mocked(recordPasswordReset).mockRejectedValueOnce(
+      new Error('moderation reason is required'),
+    );
+    const res = fakeRes();
+
+    await handleAdminApi(post({ password: 'newpass123' }), res, fakeGame);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe('moderation reason is required');
+    expect(updatePasswordHash).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 });
 

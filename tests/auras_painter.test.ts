@@ -149,6 +149,7 @@ function slot(over: Partial<AuraSlotState> & { key: string }): AuraSlotState {
     iconKey: over.key,
     isDebuff: false,
     school: '',
+    own: false,
     durationText: '',
     stacksText: '',
     name: over.key,
@@ -502,6 +503,7 @@ describe('AurasPainter: a wire-faithful buff_* stat-sap survives the low cap (vi
       iconId: (a) => a.id,
       auraName: (a) => a.name,
       formatStacks: (n) => String(n),
+      isOwn: () => false,
       durationUnits: () => ({ s: 's', m: 'm', h: 'h', d: 'd' }),
       auraEffectHtml: () => '',
     };

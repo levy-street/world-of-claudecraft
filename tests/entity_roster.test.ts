@@ -18,6 +18,7 @@ import {
 } from '../src/sim/entity_roster';
 import { Rng } from '../src/sim/rng';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
+import { createVcState } from '../src/sim/social/vale_cup';
 import { SpatialGrid } from '../src/sim/spatial';
 import type { Entity } from '../src/sim/types';
 
@@ -107,12 +108,22 @@ function makeCtx() {
     arenaQueue2v2: [],
     arenaQueueFiesta: [],
     arenaBusySlots: new Set(),
+    arenaQueueYumi3: [],
+    arenaQueueYumi5: [],
+    yumiBusySlots: new Set(),
+    yumiCatMatches: new Map(),
+    matchmakeYumi: vi.fn(),
+    updateYumiActive: vi.fn(),
+    yumiPlayerDown: vi.fn(),
+    yumiCatDamaged: vi.fn(),
+    cleanupYumiMatch: vi.fn(),
     nextArenaMatchId: 1,
     delveRuns: [],
     delvePetStash: new Map(),
     utcDay: '',
     pendingMobRespawns: [],
     partyInvites: new Map(),
+    readyChecks: new Map(),
     chatTokens: new Map(),
     channelSubs: new Map(),
     emit,
@@ -175,6 +186,8 @@ function makeCtx() {
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),
     countFungibleItem: vi.fn(() => 0),
+    countEnchantableItem: vi.fn(() => 0),
+    removeEnchantableItem: vi.fn(),
     completeQuestForDev: vi.fn(() => false),
     completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),
@@ -183,6 +196,10 @@ function makeCtx() {
     instanceOriginOf: vi.fn(() => ({ x: 0, z: 0 })),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
+    dungeonDifficulty: vi.fn(() => 'normal' as const),
+    setDungeonDifficulty: vi.fn(),
+    awardHeroicMarks: vi.fn(),
+    grantHeroicKillLockout: vi.fn(),
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),
@@ -197,6 +214,8 @@ function makeCtx() {
     nextLootRollId: 1,
     devCommands: false,
     marketListings: [],
+    bankerIds: [],
+    vcup: createVcState(),
     grantXp: vi.fn(),
     enterCombat: vi.fn(),
     hexOutputMult: vi.fn(() => 1),
@@ -218,16 +237,12 @@ function makeCtx() {
     mobSwing: vi.fn(),
     updateRangedPetAttack: vi.fn(),
     fleeMoveSpeed: vi.fn(() => 0),
-    usesProfiledMobCombat: vi.fn(() => false),
-    updateProfiledMobCombat: vi.fn(),
-    tryMobMeleeSwingInRange: vi.fn(() => false),
     maybeFlee: vi.fn(() => false),
     aggroMob: vi.fn(),
     isStunned: vi.fn(() => false),
     isRooted: vi.fn(() => false),
     moveSpeedMult: vi.fn(() => 1),
     swingIntervalMult: vi.fn(() => 1),
-    mobEffectiveMeleeRange: vi.fn(() => 0),
     mobCanSwim: vi.fn(() => false),
     resolveMovePoint: vi.fn(() => ({ x: 0, z: 0 })),
     updatePet: vi.fn(),
@@ -250,6 +265,7 @@ function makeCtx() {
     // delveDetectMult stubbed above (C1/M2/C3) - deduped here.
     partyMembersForKey: vi.fn(() => []),
     addItem: vi.fn(),
+    addItemInstance: vi.fn(),
     // removeItem stubbed above (P1b inventory-hub helper) - deduped.
     spawnBossAdds: vi.fn(),
     tradeFor: vi.fn(() => null),
@@ -271,6 +287,7 @@ function makeCtx() {
     lineOfSightBlocked: vi.fn(() => false),
     stopFollow: vi.fn(),
     partyInvite: vi.fn(),
+    readyCheckStart: vi.fn(),
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
     breakGhostWolf: vi.fn(),
@@ -305,6 +322,13 @@ function makeCtx() {
     marketListingBelongsTo: vi.fn(() => false),
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
+    applySetProcs: vi.fn(),
+    // The Vale Cup sport-move arms.
+    vcupBallKick: vi.fn(),
+    vcupBallPass: vi.fn(),
+    vcupShoot: vi.fn(),
+    vcupSportDash: vi.fn(),
+    vcupSportShove: vi.fn(),
   };
   const ctx = createSimContext(host);
   return {

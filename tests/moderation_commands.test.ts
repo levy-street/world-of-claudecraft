@@ -132,12 +132,70 @@ describe('moderation chat commands', () => {
     expect(parseModerationChatCommand('/unspectate')).toEqual({ kind: 'unspectate' });
   });
 
+  it('parses jail visits and requires a sentence length on jail targets', () => {
+    const invalid = { kind: 'jail', name: null, minutes: null, reason: null, malformed: true };
+    expect(parseModerationChatCommand('/jail')).toEqual({
+      kind: 'jail',
+      name: null,
+      minutes: null,
+      reason: null,
+      malformed: false,
+    });
+    expect(parseModerationChatCommand('/jail "Mira Sun" 10')).toEqual({
+      kind: 'jail',
+      name: 'Mira Sun',
+      minutes: 10,
+      reason: null,
+      malformed: false,
+    });
+    // The reason rides after the minutes, bare or quoted.
+    expect(parseModerationChatCommand('/jail "Mira Sun" 10 spamming chat')).toEqual({
+      kind: 'jail',
+      name: 'Mira Sun',
+      minutes: 10,
+      reason: 'spamming chat',
+      malformed: false,
+    });
+    expect(parseModerationChatCommand('/jail "Mira Sun" 10 "the reason"')).toEqual({
+      kind: 'jail',
+      name: 'Mira Sun',
+      minutes: 10,
+      reason: 'the reason',
+      malformed: false,
+    });
+    // No indefinite form: a name without minutes is malformed usage.
+    expect(parseModerationChatCommand('/jail "Mira Sun"')).toEqual(invalid);
+    expect(parseModerationChatCommand('/jail Mira Sun')).toEqual(invalid);
+    // A zero, non-numeric, or absurd sentence is malformed usage too.
+    expect(parseModerationChatCommand('/jail "Mira Sun" 0')).toEqual(invalid);
+    expect(parseModerationChatCommand('/jail "Mira Sun" soon')).toEqual(invalid);
+    expect(parseModerationChatCommand('/jail "Mira Sun" 99999999999')).toEqual(invalid);
+    // A reason without minutes is malformed as well.
+    expect(parseModerationChatCommand('/jail "Mira Sun" "the reason"')).toEqual(invalid);
+    expect(parseModerationChatCommand('/unjail')).toEqual({
+      kind: 'unjail',
+      name: null,
+      malformed: false,
+    });
+    expect(parseModerationChatCommand('/unjail "Mira Sun"')).toEqual({
+      kind: 'unjail',
+      name: 'Mira Sun',
+      malformed: false,
+    });
+    expect(parseModerationChatCommand('/unjail "Mira Sun" trailing')).toEqual({
+      kind: 'unjail',
+      name: null,
+      malformed: true,
+    });
+  });
+
   it('ignores unrelated commands and near misses', () => {
     expect(parseModerationChatCommand('/guild hello')).toBeNull();
     expect(parseModerationChatCommand('/kicker someone')).toBeNull();
     expect(parseModerationChatCommand('/suspender someone')).toBeNull();
     expect(parseModerationChatCommand('/spectator someone')).toBeNull();
     expect(parseModerationChatCommand('/unspectate now')).toBeNull();
+    expect(parseModerationChatCommand('/jailer "Mira"')).toBeNull();
     expect(parseModerationChatCommand('hello /kick')).toBeNull();
   });
 });

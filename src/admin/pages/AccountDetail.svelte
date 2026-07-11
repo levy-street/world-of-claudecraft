@@ -12,6 +12,7 @@
   import AccountModerationActions from '../components/AccountModerationActions.svelte';
   import AccountNote from '../components/AccountNote.svelte';
   import ChatModerationControls from '../components/ChatModerationControls.svelte';
+  import DailyRewardsModerationControls from '../components/DailyRewardsModerationControls.svelte';
   import ModerationActionPrompt from '../components/ModerationActionPrompt.svelte';
   import ModerationHistory from '../components/ModerationHistory.svelte';
 
@@ -84,6 +85,7 @@
       onSubmit={submitPending}
       onReset={() => direct(`/admin/api/moderation/accounts/${detail.id}/reset-strikes`)}
     />
+    <DailyRewardsModerationControls target={detail} onSubmit={submitPending} />
   {/if}
 
   <div class="detail-grid">

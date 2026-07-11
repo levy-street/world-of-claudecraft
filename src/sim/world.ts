@@ -1,6 +1,7 @@
 import { DUNGEON_FLOOR_Y, DUNGEON_X_THRESHOLD, getActiveWorldContent, WORLD_MAX_X } from './data';
 import { fbm2, hash2 } from './rng';
 import type { BiomeId, HeightStamp, WorldContent } from './types';
+import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 
 // Terrain is a pure function of (x, z, seed) for a given active world content:
 // both the sim (ground clamping) and the renderer (mesh) sample the same
@@ -312,6 +313,25 @@ function applyEditLayer(x: number, z: number, h0: number): number {
   return h;
 }
 
+// The Sowfield boarball ground (docs/prd/vale-cup.md): the southern Eastbrook
+// basin leveled into a crisp rectangular plateau with a smoothstep apron ring.
+// Blend weight of the flatten at (x, z): 1 inside the rectangle, easing to 0
+// over SOWFIELD_FLAT.falloff yards outside it. Height stamps are circles-only,
+// so like MIREFEN_IMPACT_CRATER this is a bespoke hand-authored arm; it applies
+// for ANY active content (the crater's accepted custom-map leak). The apron's
+// influence ends at z = SOWFIELD_FLAT.zMin - falloff (-149), north of the world
+// rim's z = -150 onset, so the rim wall is untouched by construction
+// (tests/terrain_walls.test.ts sweeps that band).
+export function sowfieldFlattenWeight(x: number, z: number): number {
+  const f = SOWFIELD_FLAT;
+  const dx = Math.max(0, f.xMin - x, x - f.xMax);
+  const dz = Math.max(0, f.zMin - z, z - f.zMax);
+  if (dx === 0 && dz === 0) return 1;
+  const d = Math.sqrt(dx * dx + dz * dz);
+  if (d >= f.falloff) return 0;
+  return 1 - smoothstep(0, 1, d / f.falloff);
+}
+
 export function mirefenImpactCraterOffset(x: number, z: number): number {
   const dx = x - MIREFEN_IMPACT_CRATER.x;
   const dz = z - MIREFEN_IMPACT_CRATER.z;
@@ -422,7 +442,13 @@ function baseHeight(x: number, z: number, seed: number): number {
 // Ground height including instanced dungeon floors (flat, far off-world).
 export function groundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
-  return terrainHeight(x, z, seed);
+  // The Vale Cup grandstands are walkable: the ground steps up in seated tiers so
+  // players can climb the bleachers (the boss-dais pattern, raised WALKABLE ground
+  // is the heightfield). This lives in groundHeight, NOT terrainHeight, so the
+  // render's flat terrain baseline (and the wooden deck/post geometry it seats on
+  // that baseline) is unchanged; the ramp just raises where the player stands, up
+  // onto the decks. Zero outside the stand footprints, so the pitch stays flat.
+  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
@@ -446,6 +472,13 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // + terracing); see OUTSIDE_FADE_START above.
   const beyond = Math.max(0, w.minZ - z, z - w.maxZ, Math.abs(x) - WORLD_MAX_X);
   const mountainDetail = 1 - smoothstep(OUTSIDE_FADE_START, OUTSIDE_FADE_END, beyond);
+
+  // The Sowfield plateau (Vale Cup). Runs between the camp flatten and the
+  // ridge/rim walls: a LEVEL pull toward the pitch height, so it must land
+  // before the additive walls; its influence never reaches the rim band (see
+  // sowfieldFlattenWeight), so the rim still wins everywhere it exists.
+  const sow = sowfieldFlattenWeight(x, z);
+  if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
 
   // Mountain ridge walls between zones, pierced by the road pass
   let mountainAdd = 0;
@@ -582,6 +615,52 @@ export function terrainDownhill(
   return { x: -hx / mag, z: -hz / mag };
 }
 
+// Ring samples for the wall standoff below. 8 covers the body circle evenly
+// without being a hot-loop cost (the caller only runs it for grounded overworld
+// players).
+const WALL_STANDOFF_SAMPLES = 8;
+
+// Push a body of `radius` out of terrain steeper than `maxSlope` so the
+// character model does not sink into a cliff face. Movement collision samples
+// only the center point (the climb gate blocks the center from CLIMBING a wall,
+// but nothing keeps the body's WIDTH clear of one), so standing at or strafing
+// along the foot of a near-vertical wall buries the model's near side. This
+// samples the heightfield on a ring at the body radius; any direction rising
+// faster than a climbable slope is a wall within reach, and the center is nudged
+// directly away from it, toward the lower walkable side. Pure and deterministic;
+// returns the input unchanged on open or merely-sloped ground (no ring sample
+// exceeds a climbable rise there), so it is a near-no-op away from the walls.
+export function terrainWallStandoff(
+  x: number,
+  z: number,
+  seed: number,
+  radius: number,
+  maxSlope: number,
+): { x: number; z: number } {
+  const h0 = groundHeight(x, z, seed);
+  const wallRise = radius * maxSlope; // the most a climbable slope rises over `radius`
+  let pushX = 0;
+  let pushZ = 0;
+  for (let k = 0; k < WALL_STANDOFF_SAMPLES; k++) {
+    const a = (k / WALL_STANDOFF_SAMPLES) * Math.PI * 2;
+    const sx = Math.sin(a);
+    const sz = Math.cos(a);
+    const rise = groundHeight(x + sx * radius, z + sz * radius, seed) - h0;
+    if (rise > wallRise) {
+      // horizontal setback that would make this direction merely climbable,
+      // capped at the body radius (a face closer than `radius` reads as a huge
+      // rise; one exactly at `radius` contributes nothing)
+      const setback = Math.min((rise - wallRise) / maxSlope, radius);
+      pushX -= sx * setback;
+      pushZ -= sz * setback;
+    }
+  }
+  if (pushX === 0 && pushZ === 0) return { x, z };
+  const mag = Math.hypot(pushX, pushZ);
+  const scale = Math.min(mag, radius) / mag; // total nudge never exceeds one body radius
+  return { x: x + pushX * scale, z: z + pushZ * scale };
+}
+
 // Distance from (x,z) to the nearest road polyline segment.
 export function roadDistance(x: number, z: number): number {
   let best = Infinity;
@@ -634,6 +713,17 @@ export function zoneBiomeAt(z: number): BiomeId {
   return zones[zones.length - 1].biome;
 }
 
+// Scatter props (trees, boulders) are anchored to terrainHeight at their exact
+// (x, z). On a near-vertical rim/ridge wall a prop juts out of the face and
+// reads as floating, and (via colliders.ts) a large rock or trunk there is also
+// an invisible collider on the cliff. Reject any candidate whose local terrain
+// is steeper than this: it matches PLAYER_MAX_CLIMB_SLOPE (the impassable-wall
+// gate), so only genuine walls are cleared and rolling interior hills keep
+// their props. Grass and ground dressing already refuse cliffs the same way
+// (foliage.ts tooSteep / GRASS_MAX_SLOPE); this brings the big props in line.
+// Pinned as a literal by tests/fixes.test.ts.
+export const DECORATION_MAX_SLOPE = 1.5;
+
 export function generateDecorations(seed: number): Decoration[] {
   const w = world();
   const out: Decoration[] = [];
@@ -674,6 +764,9 @@ export function generateDecorations(seed: number): Decoration[] {
       const x = gx + ox,
         z = gz + oz;
       if (isExcludedDecoration(x, z)) continue;
+      // The Sowfield stadium footprint grows no trees or rocks (hash-based
+      // placement, so skipping here shifts no other decoration or rng draw).
+      if (isInSowfieldShell(x, z)) continue;
       let inHub = false;
       for (const zone of w.content.zones) {
         const dx = x - zone.hub.x,
@@ -696,6 +789,11 @@ export function generateDecorations(seed: number): Decoration[] {
         }
       }
       if (inCamp) continue;
+      // no scatter on cliff faces: a prop anchored to the surface here floats
+      // off the wall (and large ones would be phantom colliders). Checked last,
+      // after the cheaper gates, so the four-sample steepness only runs for
+      // candidates that survive everything else.
+      if (terrainSteepness(x, z, seed) > DECORATION_MAX_SLOPE) continue;
       out.push({
         kind,
         x,

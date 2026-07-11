@@ -4,7 +4,7 @@ import { syncAppViewport } from '../src/game/app_viewport';
 interface FakeWin {
   innerWidth: number;
   innerHeight: number;
-  visualViewport: { width: number; height: number } | undefined;
+  visualViewport: { width: number; height: number; scale?: number } | undefined;
   matchMedia: (query: string) => { matches: boolean };
   document: {
     body: { classList: { contains: (c: string) => boolean } };
@@ -15,7 +15,7 @@ interface FakeWin {
 function fakeWin(opts: {
   innerWidth: number;
   innerHeight: number;
-  visualViewport?: { width: number; height: number };
+  visualViewport?: { width: number; height: number; scale?: number };
   gameActive?: boolean;
   touch?: boolean;
 }): { win: FakeWin; props: Record<string, string> } {
@@ -60,7 +60,7 @@ describe('syncAppViewport', () => {
     expect(props['--app-vh']).toBe('700px');
   });
 
-  it('uses window inner dimensions on the stable (touch, game-active) viewport, ignoring visualViewport', () => {
+  it('uses window inner dimensions on the stable landscape (touch, game-active) viewport', () => {
     const { win, props } = fakeWin({
       innerWidth: 1194,
       innerHeight: 905,
@@ -71,6 +71,44 @@ describe('syncAppViewport', () => {
     syncAppViewport(win as unknown as Window);
     expect(props['--app-vw']).toBe('1194px');
     expect(props['--app-vh']).toBe('905px');
+  });
+
+  it('uses the visible viewport for the portrait rotate prompt so Safari chrome does not cover it', () => {
+    const { win, props } = fakeWin({
+      innerWidth: 390,
+      innerHeight: 844,
+      visualViewport: { width: 390, height: 724 },
+      gameActive: true,
+      touch: true,
+    });
+    syncAppViewport(win as unknown as Window);
+    expect(props['--app-vw']).toBe('390px');
+    expect(props['--app-vh']).toBe('724px');
+  });
+
+  it('keeps the stable portrait game viewport while the keyboard owns the visual viewport', () => {
+    const { win, props } = fakeWin({
+      innerWidth: 390,
+      innerHeight: 844,
+      visualViewport: { width: 390, height: 420 },
+      gameActive: true,
+      touch: true,
+    });
+    syncAppViewport(win as unknown as Window);
+    expect(props['--app-vw']).toBe('390px');
+    expect(props['--app-vh']).toBe('844px');
+  });
+
+  it('normalizes a stale scaled visual viewport after a landscape-to-portrait rotation', () => {
+    const { win, props } = fakeWin({
+      innerWidth: 844,
+      innerHeight: 1827,
+      visualViewport: { width: 844, height: 1827, scale: 390 / 844 },
+      touch: true,
+    });
+    syncAppViewport(win as unknown as Window);
+    expect(props['--app-vw']).toBe('390px');
+    expect(props['--app-vh']).toBe('844px');
   });
 
   it('rounds fractional visualViewport dimensions and floors at 1px', () => {

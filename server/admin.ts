@@ -8,6 +8,7 @@ import {
   levelDistribution,
   listAccounts,
   listCharacters,
+  listModerationActions,
   listSharedIps,
   onlineHistory,
   overviewCounts,
@@ -27,7 +28,13 @@ import {
   loadAntibotConfig,
   saveAntibotConfigChange,
 } from './antibot_config_db';
-import { newToken, verifyPassword } from './auth';
+import {
+  hashPassword,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  newToken,
+  verifyPassword,
+} from './auth';
 import { getBugReportScreenshot, listBugReports } from './bug_report_db';
 import {
   addFilterWord,
@@ -41,14 +48,17 @@ import {
   type WordTier,
 } from './chat_filter_db';
 import {
+  accountById,
   accountForToken,
   accountMailTarget,
   findAccount,
   isAdminAccount,
   pool,
+  revokeTokensExcept,
   saveToken,
   setAccountDeactivated,
   touchLogin,
+  updatePasswordHash,
 } from './db';
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
@@ -77,6 +87,9 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  recordPasswordReset,
+  setDailyRewardsBan,
+  setDailyRewardsIpBan,
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
@@ -163,6 +176,7 @@ function cleanTier(value: unknown): WordTier | null {
 
 type SharedIpSort = 'accounts' | 'last_seen';
 type SharedIpSortDirection = 'asc' | 'desc';
+type ModerationHistoryTab = 'all' | 'mine' | 'notes';
 
 function sharedIpSortParams(params: URLSearchParams): {
   sort: SharedIpSort;
@@ -191,6 +205,11 @@ function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeen
         : b.lastSeenAt.localeCompare(a.lastSeenAt);
     return primary * multiplier || secondary || a.ip.localeCompare(b.ip);
   });
+}
+
+function moderationHistoryTab(params: URLSearchParams): ModerationHistoryTab {
+  const tab = params.get('tab');
+  return tab === 'mine' || tab === 'notes' ? tab : 'all';
 }
 
 function getBlockedIpsForAccount(
@@ -475,6 +494,47 @@ export async function handleAdminApi(
         return fail(res, 400, err instanceof Error ? err.message : 'chat mute failed');
       }
     }
+    const dailyRewardsBanMatch =
+      /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-(ban|unban)$/.exec(path);
+    if (req.method === 'POST' && dailyRewardsBanMatch) {
+      const body = await readBody(req);
+      try {
+        await setDailyRewardsBan({
+          accountId: Number(dailyRewardsBanMatch[1]),
+          adminAccountId: accountId,
+          banned: dailyRewardsBanMatch[2] === 'ban',
+          reason: body.reason,
+        });
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(
+          res,
+          400,
+          err instanceof Error ? err.message : 'daily rewards moderation failed',
+        );
+      }
+    }
+    const dailyRewardsIpBanMatch =
+      /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-ip-(ban|unban)$/.exec(path);
+    if (req.method === 'POST' && dailyRewardsIpBanMatch) {
+      const body = await readBody(req);
+      try {
+        await setDailyRewardsIpBan({
+          accountId: Number(dailyRewardsIpBanMatch[1]),
+          adminAccountId: accountId,
+          ip: body.ip,
+          banned: dailyRewardsIpBanMatch[2] === 'ban',
+          reason: body.reason,
+        });
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(
+          res,
+          400,
+          err instanceof Error ? err.message : 'daily rewards IP moderation failed',
+        );
+      }
+    }
     const ignoreMatch = /^\/admin\/api\/moderation\/reports\/(\d+)\/ignore$/.exec(path);
     if (req.method === 'POST' && ignoreMatch) {
       const body = await readBody(req);
@@ -540,6 +600,42 @@ export async function handleAdminApi(
       const reset = await resetChatStrikes(id);
       if (reset) game.resetChatStrikesLive(id);
       return reset ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
+    }
+
+    // Set a new password on any account (admin-initiated credential reset). The
+    // audit row is written first (no live effect without its record), then every
+    // device is signed out: all tokens revoked plus a live WS disconnect, since
+    // token revocation alone leaves an already-open socket connected.
+    const resetPasswordMatch = /^\/admin\/api\/accounts\/(\d+)\/reset-password$/.exec(path);
+    if (req.method === 'POST' && resetPasswordMatch) {
+      const targetAccountId = Number(resetPasswordMatch[1]);
+      if ((await isAdminAccount(targetAccountId)) && !identity.roles.includes(SUPERADMIN_ROLE)) {
+        return fail(res, 400, 'only a superadmin can reset a staff password');
+      }
+      const body = await readBody(req);
+      const password = body.password;
+      if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
+        return fail(res, 400, `password must be at least ${MIN_PASSWORD_LENGTH} chars`);
+      }
+      if (password.length > MAX_PASSWORD_LENGTH) {
+        return fail(res, 400, `password must be at most ${MAX_PASSWORD_LENGTH} chars`);
+      }
+      if (!(await accountById(targetAccountId))) {
+        return fail(res, 404, 'account not found');
+      }
+      try {
+        await recordPasswordReset({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
+        await updatePasswordHash(targetAccountId, await hashPassword(password));
+        await revokeTokensExcept(targetAccountId, null);
+        game.disconnectAccount(targetAccountId, IP_BLOCK_KICK_MESSAGE);
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'password reset failed');
+      }
     }
 
     // Chat filter: word list + escalation config management. Every edit reloads
@@ -613,7 +709,22 @@ export async function handleAdminApi(
       return await handleAntibotConfigSave(req, res, game, accountId);
     }
 
+    // Trigger an on-demand server tick-loop profiling capture. The detailed
+    // sub-phase timing runs only for the requested window, then freezes a result
+    // read back via GET /admin/api/perf/tick.
+    if (req.method === 'POST' && path === '/admin/api/perf/tick/capture') {
+      const body = await readBody(req);
+      const raw = body.durationMs;
+      const durationMs = typeof raw === 'number' && Number.isFinite(raw) ? raw : undefined;
+      return ok(res, game.startPerfCapture(durationMs));
+    }
+
     if (req.method !== 'GET') return fail(res, 405, 'method not allowed');
+
+    // Current capture status + the last frozen result.
+    if (path === '/admin/api/perf/tick') {
+      return ok(res, game.perfCaptureStatus());
+    }
 
     if (path === '/admin/api/blocked-ips') {
       return ok(res, { rows: await listBlockedIps() });
@@ -746,6 +857,13 @@ export async function handleAdminApi(
     }
     if (path === '/admin/api/moderation/queue') {
       return ok(res, { rows: await moderationQueue(game.liveAccountIds()) });
+    }
+    if (path === '/admin/api/moderation/history') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      return ok(
+        res,
+        await listModerationActions(moderationHistoryTab(url.searchParams), accountId, page, limit),
+      );
     }
     if (path === '/admin/api/bug-reports') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -904,6 +1022,8 @@ export type AdminRuntime = Pick<
   | 'disconnectByIp'
   | 'antibotConfigFields'
   | 'applyAntibotConfig'
+  | 'startPerfCapture'
+  | 'perfCaptureStatus'
 >;
 
 let runtime: AdminRuntime | null = null;
@@ -946,6 +1066,7 @@ function makeRealAdminDb() {
     levelDistribution,
     listAccounts,
     listCharacters,
+    listModerationActions,
     listSharedIps,
     onlineHistory,
     overviewCounts,
@@ -984,6 +1105,15 @@ function makeRealAdminDb() {
     touchLogin,
     newToken,
     verifyPassword,
+    // Admin-initiated password reset: existence check, credential write, sign out
+    // every device, and its moderation-history audit row.
+    accountById,
+    hashPassword,
+    updatePasswordHash,
+    revokeTokensExcept,
+    recordPasswordReset,
+    setDailyRewardsBan,
+    setDailyRewardsIpBan,
     emailSecurityIncident,
     providerUsageSnapshot,
     rateLimited,
@@ -1258,6 +1388,23 @@ async function perfRawHandler(ctx: Ctx): Promise<void> {
   });
 }
 
+/** GET /admin/api/perf/tick: server tick-loop capture status + last frozen result. */
+async function perfTickHandler(ctx: Ctx): Promise<void> {
+  ok(ctx.res, useAdminRuntime().perfCaptureStatus());
+}
+
+/**
+ * POST /admin/api/perf/tick/capture: start an on-demand tick-loop profiling capture.
+ * Mirrors the legacy handleAdminApi arm: a non-numeric/NaN durationMs falls back to
+ * the default; the window is clamped server-side in startPerfCapture.
+ */
+async function perfTickCaptureHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const raw = body.durationMs;
+  const durationMs = typeof raw === 'number' && Number.isFinite(raw) ? raw : undefined;
+  ok(ctx.res, useAdminRuntime().startPerfCapture(durationMs));
+}
+
 /** GET /admin/api/accounts: paged account search (search clamped to 64 chars). */
 async function accountsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
@@ -1432,6 +1579,48 @@ async function chatMuteHandler(ctx: Ctx): Promise<void> {
   }
 }
 
+/** POST daily-rewards-ban/unban: change reward eligibility with an audited reason. */
+async function dailyRewardsBanHandler(ctx: Ctx): Promise<void> {
+  const banned = ctx.path.endsWith('/daily-rewards-ban');
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().setDailyRewardsBan({
+      accountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      banned,
+      reason: body.reason,
+    });
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(
+      ctx.res,
+      400,
+      err instanceof Error ? err.message : 'daily rewards moderation failed',
+    );
+  }
+}
+
+async function dailyRewardsIpBanHandler(ctx: Ctx): Promise<void> {
+  const banned = ctx.path.endsWith('/daily-rewards-ip-ban');
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().setDailyRewardsIpBan({
+      accountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      ip: body.ip,
+      banned,
+      reason: body.reason,
+    });
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(
+      ctx.res,
+      400,
+      err instanceof Error ? err.message : 'daily rewards IP moderation failed',
+    );
+  }
+}
+
 /** POST /admin/api/moderation/reports/:id/ignore: resolve one open report. */
 async function ignoreReportHandler(ctx: Ctx): Promise<void> {
   const body = await readBody(ctx.req);
@@ -1507,6 +1696,20 @@ async function moderationQueueHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { rows: await adminDb().moderationQueue(useAdminRuntime().liveAccountIds()) });
 }
 
+/** GET /admin/api/moderation/history: latest audit actions, optionally scoped to caller. */
+async function moderationHistoryHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  ok(
+    ctx.res,
+    await adminDb().listModerationActions(
+      moderationHistoryTab(ctx.url.searchParams),
+      ctxAccountId(ctx),
+      page,
+      limit,
+    ),
+  );
+}
+
 /** GET /admin/api/moderation/accounts/:id: full moderation detail for one account. */
 async function moderationAccountDetailHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
@@ -1532,6 +1735,49 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
   const detail = await adminDb().accountDetail(id);
   if (!detail) return fail(ctx.res, 404, 'account not found');
   ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
+}
+
+/**
+ * POST /admin/api/accounts/:id/reset-password: set a new password on any account.
+ * Audit row first (no live effect without its record), then the credential write,
+ * then every device is signed out: all tokens revoked plus a live WS disconnect
+ * (token revocation alone leaves an already-open socket connected). A staff
+ * target is refused unless the actor is a superadmin, mirroring the
+ * isAdminAccount guard on suspend/ban/chat-mute.
+ */
+async function resetPasswordHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  if (
+    (await adminDb().isAdminAccount(targetAccountId)) &&
+    !adminIdentityOf(ctx).roles.includes(SUPERADMIN_ROLE)
+  ) {
+    return fail(ctx.res, 400, 'only a superadmin can reset a staff password');
+  }
+  const body = await readBody(ctx.req);
+  const password = body.password;
+  if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
+    return fail(ctx.res, 400, `password must be at least ${MIN_PASSWORD_LENGTH} chars`);
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    return fail(ctx.res, 400, `password must be at most ${MAX_PASSWORD_LENGTH} chars`);
+  }
+  if (!(await adminDb().accountById(targetAccountId))) {
+    return fail(ctx.res, 404, 'account not found');
+  }
+  try {
+    await adminDb().recordPasswordReset({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    await adminDb().updatePasswordHash(targetAccountId, await adminDb().hashPassword(password));
+    await adminDb().revokeTokensExcept(targetAccountId, null);
+    rt.disconnectAccount(targetAccountId, IP_BLOCK_KICK_MESSAGE);
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'password reset failed');
+  }
 }
 
 /** GET /admin/api/chat-filter: word lists + escalation config + moderated accounts. */
@@ -1730,6 +1976,22 @@ export const routes: RouteDef[] = [
   },
   {
     method: 'GET',
+    path: '/admin/api/perf/tick',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: perfTickHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/perf/tick/capture',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: perfTickCaptureHandler,
+  },
+  {
+    method: 'GET',
     path: '/admin/api/accounts',
     surface: 'admin',
     middleware: [requireAdmin],
@@ -1767,6 +2029,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: accountDetailHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/accounts/:id/reset-password',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: resetPasswordHandler,
   },
 
   // Staff-role management (release v0.22.0 fine-grained permissions).
@@ -1859,6 +2129,38 @@ export const routes: RouteDef[] = [
   },
   {
     method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-unban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ip-ban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsIpBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ip-unban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsIpBanHandler,
+  },
+  {
+    method: 'POST',
     path: '/admin/api/moderation/accounts/:id/lift-mute',
     surface: 'admin',
     middleware: [requireAdmin, requireAdminTarget('account')],
@@ -1912,6 +2214,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: moderationQueueHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/moderation/history',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: moderationHistoryHandler,
   },
   {
     method: 'GET',

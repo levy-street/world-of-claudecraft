@@ -29,6 +29,11 @@
     text-shadow: 1px 1px 2px #000;
     white-space: nowrap;
     will-change: transform;
+    /* The painter's transform is translate3d(sx,sy) scale(distance)
+       translate(-50%,-100%); origin 0 0 keeps the plate's bottom-center anchor
+       exactly at (sx,sy) while the distance scale shrinks it toward that point
+       (the default 50% 50% origin would drift a scaled plate off its anchor). */
+    transform-origin: 0 0;
   }
   .nameplate.has-emote {
     z-index: 30;
@@ -67,14 +72,31 @@
     margin-right: 3px;
     filter: drop-shadow(0 1px 1px #000);
   }
-  /* significant-contributor name outline: a steady glow layered over whatever
+  /* significant-contributor name outline: a steady halo layered over whatever
      name color applies (Discord staff or default). The colour is supplied by the
      painter via --dev-outline (per-tier), so no hardcoded hue lives here. No
-     animation, so it is reduced-motion safe. */
+     animation, so it is reduced-motion safe.
+     A crisp 1px ring (eight zero-blur offsets, listed first so they paint nearest
+     the glyph) keeps the letterform edges sharp, with a single small faint blur
+     BEHIND it for the halo flair. The old all-blurred stack (0 0 4px / 0 0 2px,
+     a third of the 12px cap height) smeared the strokes and read as out-of-focus
+     text rather than a halo (issue 1639). */
   .np-name.np-sig-dev {
+    /* The ring is drawn in a SOFTENED tier color: color-mix keeps the per-tier
+       --dev-outline hue but lowers the alpha, so the outline reads as a subtle badge
+       rather than a heavy bold stroke (review of issue 1639). Still a zero-blur ring,
+       so the glyph edges stay sharp; no hardcoded hue (the mix reads --dev-outline). */
+    --dev-ring: color-mix(in srgb, var(--dev-outline) 60%, transparent);
     text-shadow:
-      0 0 4px var(--dev-outline),
-      0 0 2px var(--dev-outline),
+      1px 0 0 var(--dev-ring),
+      -1px 0 0 var(--dev-ring),
+      0 1px 0 var(--dev-ring),
+      0 -1px 0 var(--dev-ring),
+      1px 1px 0 var(--dev-ring),
+      -1px 1px 0 var(--dev-ring),
+      1px -1px 0 var(--dev-ring),
+      -1px -1px 0 var(--dev-ring),
+      0 0 3px var(--dev-ring),
       0 1px 1px #000;
   }
   .np-hpbar {
@@ -970,6 +992,19 @@
   }
   .buff.debuff[data-school="holy"] {
     border-color: var(--color-debuff-holy);
+  }
+  /* The LOCAL player's own auras on the target strip (auras_view ownFirst):
+     larger and gold-glowed so the dots/hots YOU are maintaining read at a
+     glance among other casters'. A debuff keeps its school border tint (the
+     size and glow carry the prominence). Extra information only, never less,
+     so no graphics tier sheds it (gameplay-neutral-graphics invariant). */
+  .buff.own {
+    width: 34px;
+    height: 34px;
+    box-shadow: 0 0 5px var(--color-primary-dim);
+  }
+  .buff.own:not(.debuff) {
+    border-color: var(--color-primary);
   }
   /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
   .buff.cancelable {
@@ -1916,6 +1951,9 @@
     font-size: 11px;
     font-family: var(--ui-font);
     vertical-align: text-bottom;
+    /* dark digit on a gold fill: the tracker's inherited black text-shadow
+       only blurs it, so drop it inside the badge */
+    text-shadow: none;
   }
   #quest-tracker .qt-obj {
     color: var(--color-text-overlay);
@@ -2496,6 +2534,7 @@
   body.native-app .donate-cta,
   body.native-app .community-link.donate,
   body.native-app .social-link.donate,
+  body.native-app #mobile-donate,
   body.native-app #token-ca,
   body.native-app #nav-btn-download,
   body.native-app .cs-wallet,
@@ -2721,8 +2760,8 @@
   /* FCT crit: at the low effect tier the floating combat text keeps the damage
      number, colour and bigger size but sheds the scale/pop (the heaviest FCT
      effect) by swapping the crit keyframes for the plain rise. The number is never
-     refused. This is the CSS floor; the per-element JS gate (fctDropNonCrit in
-     src/game/ui_tier_knobs.ts, consumed by the FCT painter). Inert above
+     refused (the painter spawns every floater on every tier; low sheds cost only via
+     the tighter live cap + shorter TTL in src/game/ui_tier_knobs.ts). Inert above
      the low tier. */
   :root[data-fx-level="low"] .fct.crit {
     animation-name: fct-rise;
@@ -3752,6 +3791,13 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  /* The mobile keyboard-dismiss chevron is hidden by default (desktop AND mobile-when-
+     chat-closed); only body.mobile-touch.mobile-chat-open reveals it (hud.mobile.css,
+     a later @layer, so it wins there). Without this base hide the button would render
+     as a stray control on desktop, which has no mobile-touch-scoped rule to hide it. */
+  #chat-dismiss {
+    display: none;
+  }
 
   /* ---------- party frames ---------- */
   #party-frames {
@@ -3762,6 +3808,15 @@
     flex-direction: column;
     gap: 6px;
     z-index: 5;
+  }
+  /* The painter nests the member rows one level down in a .party-rows wrapper (so the
+     mobile collapse chip can sit alone on its own line). On desktop the wrapper is
+     transparent (display: contents), so the rows lay out as direct flex items of
+     #party-frames exactly as before the wrapper existed: the flex column gap and every
+     .party-frame rule apply unchanged. Mobile re-declares the wrapper as its own
+     2-column grid (hud.mobile.css). */
+  #party-frames .party-rows {
+    display: contents;
   }
   #party-frames.below-target {
     top: 96px;
@@ -4107,6 +4162,14 @@
     color: #887c5c;
     margin-top: 8px;
   }
+  /* Primary action row (Accept / Cancel): one wrapper so the pair lays out as a
+     row on desktop (matching the old inline-button flow) and can ride sticky at
+     the window bottom on touch (hud.mobile.css). */
+  .trade-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
 
   /* ---------- elite target frame ---------- */
   #target-frame.elite .portrait {
@@ -4173,6 +4236,9 @@
     border: 1px solid #cc9a3c88;
     border-radius: 12px;
     color: var(--gold);
+    appearance: none;
+    cursor: pointer;
+    font: inherit;
     pointer-events: auto;
   }
   #mail-indicator[hidden] {

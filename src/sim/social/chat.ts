@@ -317,6 +317,14 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  // "/ready" (alias "/readycheck"): the party/raid leader starts a ready check. Every
+  // other member's client plays a sound and shows a yes/no prompt; validation (in a
+  // party, leader-only, none already running) is delegated to readyCheckStart.
+  if (/^\/ready(?:check)?\s*$/i.test(raw)) {
+    ctx.readyCheckStart(r.meta.entityId);
+    return null;
+  }
+
   // "/unfollow" stops an active follow
   if (/^\/unfollow(?:\s|$)/i.test(raw)) {
     if (r.e.followTargetId === null) ctx.error(r.meta.entityId, 'You are not following anyone.');
@@ -423,6 +431,26 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  // "/playtime": report this character's LIFETIME played time, accumulated
+  // across every session and persisted server-side (see PlayerMeta.
+  // totalPlayedSeconds + serializeCharacter). Unlike /played (session-only,
+  // resets on relog), this figure only ever grows while the character is
+  // actually in the world.
+  if (/^\/playtime(?:\s|$)/i.test(raw)) {
+    const secs = Math.max(0, Math.floor(r.meta.totalPlayedSeconds + (ctx.time - r.meta.joinedAt)));
+    const d = Math.floor(secs / 86400);
+    const h = Math.floor((secs % 86400) / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    const parts: string[] = [];
+    if (d) parts.push(`${d}d`);
+    if (d || h) parts.push(`${h}h`);
+    if (d || h || m) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+    ctx.error(r.meta.entityId, `Total time played: ${parts.join(' ')}.`);
+    return null;
+  }
+
   // Self-only readouts: emit a private system line and never become chat.
   if (/^\/(?:where|loc|zone)(?:\s|$)/i.test(raw)) {
     const zone = zoneAt(r.e.pos.z);
@@ -520,8 +548,22 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     ctx.error(r.meta.entityId, graveyardReadout(r.e));
     return null;
   }
+  const dungeonDifficulty = /^\/(?:dungeons|dungeon|instances)\s+(normal|heroic)$/i.exec(raw);
+  if (dungeonDifficulty) {
+    ctx.setDungeonDifficulty(
+      dungeonDifficulty[1].toLowerCase() as 'normal' | 'heroic',
+      r.meta.entityId,
+    );
+    return null;
+  }
   if (/^\/(?:dungeons|dungeon|instances)(?:\s|$)/i.test(raw)) {
     ctx.error(r.meta.entityId, readouts.dungeonsReadout());
+    ctx.error(
+      r.meta.entityId,
+      ctx.dungeonDifficulty(r.meta.entityId) === 'heroic'
+        ? 'Dungeon difficulty: Heroic. Use /dungeon normal to change it.'
+        : 'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
+    );
     return null;
   }
   if (/^\/(?:consider|con|difficulty)(?:\s|$)/i.test(raw)) {
@@ -761,6 +803,21 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   if (meMatch) {
     const action = meMatch[1].trim();
     if (action) broadcastEmote(ctx, r.meta, r.e, action);
+    return null;
+  }
+
+  // "/sit", "/stand": a real seated POSE (rest on a bench, or up in the Vale
+  // Cup grandstands, which are walkable tiers). Sitting clears the moment you
+  // move, cast, or take a hit (those paths call standUp), so /stand is only for
+  // standing back up in place. Rides the existing `sitting` wire bit, so it works
+  // the same online and offline; no chat text, so nothing to localize.
+  const poseMatch = /^\/(sit|stand)\s*$/i.exec(raw);
+  if (poseMatch) {
+    if (poseMatch[1].toLowerCase() === 'sit') {
+      if (!r.e.dead) r.e.sitting = true;
+    } else {
+      ctx.standUp(r.e);
+    }
     return null;
   }
 
@@ -1036,8 +1093,8 @@ export function helpLines(): string[] {
   return [
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
-    'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
+    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
+    'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',
     'State readouts: /pet, /pettaunt, /speed, /consumable, /potion, /form, /manaregen, /falling, /queued, /savedmana.',

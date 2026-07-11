@@ -2,27 +2,28 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
+  SET_BOUNDSTONE_VANGUARD,
+  SET_CRIT_3PC_RATING,
   SET_CROWNFORGED,
   SET_DEATHLORD,
   SET_NECROMANCERS,
-  SET_NIGHTTALON,
   SET_SOULFLAME,
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
 } from '../src/sim/content/item_sets';
-import { MOBS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
-import { itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
+import { itemSetMemberCounts, itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
 
 const counts = (m: Record<string, number>) => new Map(Object.entries(m));
 
 function statsFor(cls: PlayerClass, level: number, equipment: Record<string, string>): Entity {
   const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
   e.level = level;
-  recalcPlayerStats(e, cls, equipment as any);
+  recalcPlayerStats(e, cls, equipment as any, undefined, {});
   return e;
 }
 
@@ -39,10 +40,14 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       int: 0,
       spi: 0,
       ap: 0,
+      sp: 0,
       crit: 0,
+      critRating: 0,
       haste: 0,
+      hasteRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
+      procs: [],
     });
   });
 
@@ -62,7 +67,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     const three = aggregateSetBonuses(counts({ [SET_WYRMSHADOW]: 3 }));
     expect(three.ap).toBe(40);
     expect(three.agi).toBe(15);
-    expect(three.crit).toBeCloseTo(0.02);
+    expect(three.critRating).toBe(SET_CRIT_3PC_RATING);
   });
 
   it('caster sets: 2pc grants knockback resistance, 3pc grants tier stats', () => {
@@ -113,17 +118,45 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     }
   });
 
-  it('every set definition lists ascending tiers ending at 3 pieces', () => {
+  it('every set definition lists ascending tiers ending at its authored cap', () => {
     for (const set of Object.values(ITEM_SETS)) {
       const pieces = set.bonuses.map((b) => b.pieces);
-      // raid/dungeon families carry 2- and 3-piece tiers; the leveling haste
-      // kits deliberately carry the single 3-piece tier
-      expect([pieces.join(','), set.id]).toEqual([pieces.length === 1 ? '3' : '2,3', set.id]);
+      // every epic (raid/dungeon) family carries 2-, 3-, and 4-piece tiers (the
+      // 4-piece is a proc); the leveling haste kits deliberately carry the
+      // single 3-piece tier.
+      const expected = pieces.length === 1 ? '3' : '2,3,4';
+      expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });
 });
 
 describe('item set tooltip model', () => {
+  it('counts base and Heroic alternatives as one logical member of every item set', () => {
+    const logicalMembers = new Map<string, Set<string>>();
+    for (const item of Object.values(ITEMS)) {
+      if (!item.set) continue;
+      const members = logicalMembers.get(item.set) ?? new Set<string>();
+      members.add(item.heroicOf ?? item.id);
+      logicalMembers.set(item.set, members);
+    }
+    const expectedCounts = Object.fromEntries(
+      [...logicalMembers].map(([setId, members]) => [setId, members.size]),
+    );
+
+    expect(itemSetMemberCounts()).toEqual(expectedCounts);
+  });
+
+  it('keeps four-piece families at four and the Boundstone family at three', () => {
+    const memberCounts = itemSetMemberCounts();
+    expect({
+      [SET_DEATHLORD]: memberCounts[SET_DEATHLORD],
+      [SET_BOUNDSTONE_VANGUARD]: memberCounts[SET_BOUNDSTONE_VANGUARD],
+    }).toEqual({
+      [SET_DEATHLORD]: 4,
+      [SET_BOUNDSTONE_VANGUARD]: 3,
+    });
+  });
+
   it('uses the authored member count, not the highest bonus threshold, as the header total', () => {
     const model = itemSetTooltipModel({
       itemSetId: SET_DEATHLORD,
@@ -133,7 +166,7 @@ describe('item set tooltip model', () => {
       },
     });
     expect(model?.totalPieces).toBe(4);
-    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 3]);
+    expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2, 3, 4]);
   });
 
   it('hides bonus tiers that cannot be reached by the currently authored set pieces', () => {

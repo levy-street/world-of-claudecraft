@@ -13,12 +13,14 @@ export interface ItemSetTooltipModel {
 }
 
 export function itemSetMemberCounts(): Record<string, number> {
-  const counts: Record<string, number> = {};
+  const membersBySet = new Map<string, Set<string>>();
   for (const item of Object.values(ITEMS)) {
     if (!item.set) continue;
-    counts[item.set] = (counts[item.set] ?? 0) + 1;
+    const members = membersBySet.get(item.set) ?? new Set<string>();
+    members.add(item.heroicOf ?? item.id);
+    membersBySet.set(item.set, members);
   }
-  return counts;
+  return Object.fromEntries([...membersBySet].map(([setId, members]) => [setId, members.size]));
 }
 
 export function itemSetTooltipModel(args: {

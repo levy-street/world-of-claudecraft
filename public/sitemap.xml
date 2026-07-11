@@ -121,6 +121,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://worldofclaudecraft.com/wiki/professions</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://worldofclaudecraft.com/wiki/economy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -142,6 +147,11 @@
   </url>
   <url>
     <loc>https://worldofclaudecraft.com/wiki/arena</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://worldofclaudecraft.com/wiki/vale-cup</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

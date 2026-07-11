@@ -654,6 +654,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'reedwoven_jerkin',
       'fenwalker_boots',
       'reedwoven_trousers',
+      'simple_fishing_pole',
     ],
     greeting:
       'Dry boots, dry bread, dry powder — at Fenbridge you get two of the three on a good day.',
@@ -678,6 +679,20 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     questIds: ['q_troll_fetishes', 'q_cult_camp', 'q_olen'],
     greeting:
       'Quiet feet and a short blade keep you breathing out here. Speak quick — I am due back in the reeds.',
+  },
+  bursar_petra_vell: {
+    id: 'bursar_petra_vell',
+    name: 'Bursar Petra Vell',
+    title: 'The Gilded Strongbox',
+    // east side of the square, on open ground: {12,303} sits inside the inn's
+    // collider margin and findSafePos would silently relocate her at spawn
+    pos: { x: 9, z: 303 },
+    facing: -Math.PI / 2,
+    color: 0xc9a227,
+    questIds: [],
+    banker: true,
+    greeting:
+      'The Gilded Strongbox keeps clean ledgers and cleaner vaults. What shall we stow for you?',
   },
 };
 

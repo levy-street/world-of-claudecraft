@@ -125,6 +125,34 @@ export async function verifyNativeAttestation(
   return false;
 }
 
+export async function verifyNativeAttestationChallenge(
+  req: IncomingMessage,
+  proof: unknown,
+  expectedAction: string,
+): Promise<{ nonce: string } | null> {
+  if (!isNativeAppRequest(req) || !proof || typeof proof !== 'object') return null;
+  const src = proof as NativeAttestationProof;
+  if (
+    typeof src.platform !== 'string' ||
+    typeof src.challengeId !== 'string' ||
+    typeof src.token !== 'string'
+  ) {
+    return null;
+  }
+  const challenge = consumeChallenge(src.challengeId, req);
+  if (!challenge || challenge.action !== expectedAction) return null;
+  if (nativeAttestationRequired()) {
+    const valid =
+      src.platform === 'android'
+        ? await verifyAndroidIntegrity(src.token, challenge)
+        : src.platform === 'ios'
+          ? await verifyAppleDeviceCheck(src.token, src.challengeId)
+          : false;
+    if (!valid) return null;
+  }
+  return { nonce: challenge.nonce };
+}
+
 async function googleAccessToken(): Promise<string | null> {
   if (googleTokenCache && googleTokenCache.expiresAt - nowMs() > 60_000)
     return googleTokenCache.accessToken;
