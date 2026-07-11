@@ -823,6 +823,105 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: null,
     unreachable: true,
   },
+  // The trading-bot rental proxy family (server/trading_bots.ts): rent a
+  // SOL/WOC trading bot via the ECONOMY SERVICE's bot engine (the game server
+  // is a thin forwarder carrying the internal secret + the authenticated
+  // player id), fail-closed behind WOC_TRADING_BOTS_ENABLED (every endpoint
+  // answers 404 trading_bots.disabled when off or when the service connection
+  // is unset). REGISTRY-ONLY: born on the RouteDef pipeline with no legacy
+  // handleApi arm, so the rows are flagged `unreachable` (the legacy-source
+  // scan must not expect them; see the tradingBotsRegistryOnly known
+  // deviation). Config is a public read (boot-time launcher visibility); the
+  // seven player routes require a bearer session whose account id is the
+  // service's subscription/vault identity key.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/tradingbots/config',
+    handler: 'trading_bots.ts RouteDef: configHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/tradingbots/status',
+    handler: 'trading_bots.ts RouteDef: statusHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/tradingbots/subscribe',
+    handler: 'trading_bots.ts RouteDef: subscribeHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/tradingbots/subscribe/confirm',
+    handler: 'trading_bots.ts RouteDef: subscribeConfirmHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/tradingbots/deposit',
+    handler: 'trading_bots.ts RouteDef: depositHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/tradingbots/deposit/confirm',
+    handler: 'trading_bots.ts RouteDef: depositConfirmHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/tradingbots/withdraw',
+    handler: 'trading_bots.ts RouteDef: withdrawHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/tradingbots/control',
+    handler: 'trading_bots.ts RouteDef: controlHandler',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+    unreachable: true,
+  },
   // Daily-rewards player family (v0.19.0, server/daily_rewards.ts): served by
   // the handleDailyRewardApi sub-dispatcher behind the main.ts PREFIX arm
   // `url.startsWith('/api/daily-rewards')`, which runs bearerActiveAccount

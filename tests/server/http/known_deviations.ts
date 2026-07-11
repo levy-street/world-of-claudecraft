@@ -46,6 +46,7 @@ export const DEVIATION_ID = {
   discordCallbackHtmlNotRedirect: 'discord-callback-html-not-redirect',
   swagClaimOrphanUnreachable: 'swag-claim-orphan-unreachable',
   dexSwapRegistryOnly: 'dex-swap-registry-only',
+  tradingBotsRegistryOnly: 'trading-bots-registry-only',
   discordBodyValidationRemap: 'discord-body-validation-remap',
   adminEnumInvalid422: 'admin-enum-invalid-422',
   adminIdParamDecode: 'admin-id-param-decode-422',
@@ -768,6 +769,36 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       'New routes land on the RouteDef pipeline only (root CLAUDE.md: never an inline ' +
       'route in main.ts). The dual-edit rule covers MIGRATED routes; a family with no ' +
       'legacy twin has nothing to dual-edit.',
+  },
+  {
+    id: DEVIATION_ID.tradingBotsRegistryOnly,
+    routes: [
+      '/api/tradingbots/config',
+      '/api/tradingbots/status',
+      '/api/tradingbots/subscribe',
+      '/api/tradingbots/subscribe/confirm',
+      '/api/tradingbots/deposit',
+      '/api/tradingbots/deposit/confirm',
+      '/api/tradingbots/withdraw',
+      '/api/tradingbots/control',
+    ],
+    currentBehavior:
+      'The trading-bot rental proxy family (server/trading_bots.ts) is REGISTRY-ONLY: ' +
+      'it was born on the RouteDef pipeline and no legacy handleApi arm ever existed, ' +
+      'so under API_DISPATCH=legacy the eight paths answer the legacy 404 ' +
+      'unknown-endpoint arm. Every endpoint is additionally fail-closed behind ' +
+      'WOC_TRADING_BOTS_ENABLED (off = 404 trading_bots.disabled even on the new path).',
+    intendedBehavior:
+      'Preserved: a brand-new feature family needs no legacy rollback arm (there is no ' +
+      'prior behavior to roll back TO; the WOC_TRADING_BOTS_ENABLED flag is its own ' +
+      'kill switch). The inventory rows carry `unreachable` so the legacy-source ' +
+      'freshness scan does not expect main.ts arms, and the completeness gate excludes ' +
+      'the family from the must-retain-rollback-arm invariant.',
+    introducedInPhase: null,
+    reason:
+      'Same construction as the dexSwapRegistryOnly deviation: new routes land on the ' +
+      'RouteDef pipeline only, and a family with no legacy twin has nothing to ' +
+      'dual-edit.',
   },
   {
     id: DEVIATION_ID.discordBodyValidationRemap,

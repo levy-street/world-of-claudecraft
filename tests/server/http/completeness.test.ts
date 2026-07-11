@@ -105,9 +105,13 @@ const ORPHAN_DEVIATION = KNOWN_DEVIATIONS.find(
 const REGISTRY_ONLY_DEVIATION = KNOWN_DEVIATIONS.find(
   (d) => d.id === DEVIATION_ID.dexSwapRegistryOnly,
 );
+const TRADING_BOTS_REGISTRY_ONLY_DEVIATION = KNOWN_DEVIATIONS.find(
+  (d) => d.id === DEVIATION_ID.tradingBotsRegistryOnly,
+);
 const EXCLUDED_PATHS = new Set<string>([
   ...(ORPHAN_DEVIATION?.routes ?? []),
   ...(REGISTRY_ONLY_DEVIATION?.routes ?? []),
+  ...(TRADING_BOTS_REGISTRY_ONLY_DEVIATION?.routes ?? []),
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -308,6 +312,18 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/dexswap/config' },
     { method: 'GET', path: '/api/dexswap/quote' },
     { method: 'POST', path: '/api/dexswap/swap' },
+    // The trading-bot rental proxy family (server/trading_bots.ts).
+    // REGISTRY-ONLY like the dexswap family: born on the RouteDef pipeline, no
+    // legacy arm ever existed (the tradingBotsRegistryOnly deviation), so the
+    // EXCLUDED_PATHS branch below asserts router-owned + NOT legacy-served.
+    { method: 'GET', path: '/api/tradingbots/config' },
+    { method: 'GET', path: '/api/tradingbots/status' },
+    { method: 'POST', path: '/api/tradingbots/subscribe' },
+    { method: 'POST', path: '/api/tradingbots/subscribe/confirm' },
+    { method: 'POST', path: '/api/tradingbots/deposit' },
+    { method: 'POST', path: '/api/tradingbots/deposit/confirm' },
+    { method: 'POST', path: '/api/tradingbots/withdraw' },
+    { method: 'POST', path: '/api/tradingbots/control' },
   ];
   const MIGRATED_PATHS = MIGRATED_ROUTES.map((r) => r.path);
 
