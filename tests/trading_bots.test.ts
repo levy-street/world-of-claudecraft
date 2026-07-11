@@ -26,8 +26,10 @@ import { type FakeRes, fakeCtx } from './server/helpers';
 const SERVICE_URL = 'http://economy.internal:8798';
 const SECRET = 'internal-secret';
 const TOKEN = 'a'.repeat(64);
+const READ_TOKEN = 'c'.repeat(64);
 const ACCOUNT_ID = 42;
 const AUTH_HEADERS = { authorization: `Bearer ${TOKEN}` };
+const READ_AUTH_HEADERS = { authorization: `Bearer ${READ_TOKEN}` };
 const SOL_MINT = 'So11111111111111111111111111111111111111112';
 const WOC_MINT = '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth';
 const VALID_PUBKEY = '11111111111111111111111111111111';
@@ -174,10 +176,16 @@ beforeEach(() => {
   process.env.ECONOMY_SERVICE_URL = SERVICE_URL;
   process.env.WOC_ECONOMY_INTERNAL_SECRET = SECRET;
   // Real bearer parsing, fake token resolution: no Postgres in these tests.
+  // TOKEN is a full session; READ_TOKEN is a read-scoped (companion/OAuth)
+  // token, accepted on reads and rejected on every mutating route.
   configureTradingBotsRuntime({
     authDeps: {
       lookupToken: async (raw) =>
-        raw === TOKEN ? { accountId: ACCOUNT_ID, scope: 'full' as const } : null,
+        raw === TOKEN
+          ? { accountId: ACCOUNT_ID, scope: 'full' as const }
+          : raw === READ_TOKEN
+            ? { accountId: ACCOUNT_ID, scope: 'read' as const }
+            : null,
       moderationStatus: async () => ({
         locked: false,
         banned: false,
@@ -270,6 +278,36 @@ describe('trading bots proxy: auth on every player route', () => {
     await run(configRoute, ctx);
     expect((ctx.res as unknown as FakeRes).statusCode).toBe(200);
   });
+
+  it('a read-scoped token is accepted on the status read', async () => {
+    installFakeService(() => jsonResponse(200, SERVICE_STATUS));
+    const ctx = fakeCtx({ headers: READ_AUTH_HEADERS });
+    await run(statusRoute, ctx);
+    expect((ctx.res as unknown as FakeRes).statusCode).toBe(200);
+  });
+
+  it('a read-scoped token is 403 on every MUTATING route, zero service calls', async () => {
+    // The scope invariant: read tokens (companion apps, OAuth character:read)
+    // are rejected on every mutating route. A Claudium subscribe debits the
+    // account ledger and control starts trading the funded vault, so none of
+    // the six may run on a read token.
+    const calls = installFakeService(() => jsonResponse(200, {}));
+    for (const postRoute of [
+      subscribeRoute,
+      subscribeConfirmRoute,
+      depositRoute,
+      depositConfirmRoute,
+      withdrawRoute,
+      controlRoute,
+    ]) {
+      await expectHttpError(
+        run(postRoute, fakeCtx({ method: 'POST', headers: READ_AUTH_HEADERS, body: {} })),
+        403,
+        'auth.forbidden',
+      );
+    }
+    expect(calls.length).toBe(0);
+  });
 });
 
 describe('trading bots proxy: forwarding', () => {
@@ -322,11 +360,14 @@ describe('trading bots proxy: forwarding', () => {
   });
 
   it('a claudium subscribe passes through the single-call subscription answer', async () => {
-    installFakeService(() =>
+    const calls = installFakeService(() =>
       jsonResponse(200, { subscription: { skuId: 'dca', activeUntilMs: 1_800_000_000_000 } }),
     );
     const ctx = authedPost({ skuId: 'dca', payWith: 'claudium' });
     await run(subscribeRoute, ctx);
+    // JSON.stringify drops the undefined userPublicKey: the forwarded body
+    // carries exactly the two present fields.
+    expect(Object.keys(forwardedBody(calls[0])).sort()).toEqual(['payWith', 'skuId']);
     expect(jsonBody(ctx.res as unknown as FakeRes)).toEqual({
       subscription: { skuId: 'dca', activeUntilMs: 1_800_000_000_000 },
     });
@@ -368,7 +409,7 @@ describe('trading bots proxy: forwarding', () => {
     const calls = installFakeService(() =>
       jsonResponse(200, { vault: { sol: '1100000000', woc: '57000000000' } }),
     );
-    const ctx = authedPost({ depositId: 'dep_1', signature: 'sig' });
+    const ctx = authedPost({ depositId: 'dep_1', signature: 'sig', extra: 'dropped' });
     await run(depositConfirmRoute, ctx);
     expect(calls[0].url).toBe(`${SERVICE_URL}/v1/tradingbots/deposit/confirm`);
     expect(Object.keys(forwardedBody(calls[0])).sort()).toEqual(['depositId', 'signature']);
@@ -407,6 +448,19 @@ describe('trading bots proxy: forwarding', () => {
     expect(jsonBody(ctx.res as unknown as FakeRes)).toEqual({
       bot: { state: 'paused', params: { gridSpacingBps: 75 } },
     });
+  });
+
+  it('a paramless control forwards only the action (undefined params dropped)', async () => {
+    const calls = installFakeService(() => jsonResponse(200, { bot: { state: 'running' } }));
+    await run(controlRoute, authedPost({ action: 'start' }));
+    expect(Object.keys(forwardedBody(calls[0]))).toEqual(['action']);
+  });
+
+  it('trims a trailing slash off ECONOMY_SERVICE_URL (no double-slash upstream)', async () => {
+    process.env.ECONOMY_SERVICE_URL = `${SERVICE_URL}/`;
+    const calls = installFakeService(() => jsonResponse(200, SERVICE_CONFIG));
+    await run(configRoute, fakeCtx());
+    expect(calls[0].url).toBe(`${SERVICE_URL}/v1/tradingbots/config`);
   });
 
   it('contains no Jupiter knowledge: the only upstream is the economy service', async () => {
@@ -465,6 +519,39 @@ describe('trading bots proxy: service error mapping', () => {
       'trading_bots.rate_limited',
     );
     expect(err.params?.retryAfterMs).toBe(60_000);
+  });
+
+  it('rate_limited with a zero or negative retryAfterMs also falls back to 60s', async () => {
+    for (const bad of [0, -500]) {
+      installFakeService(() => jsonResponse(429, { error: 'rate_limited', retryAfterMs: bad }));
+      const err = await expectHttpError(
+        run(statusRoute, authedGet()),
+        429,
+        'trading_bots.rate_limited',
+      );
+      expect(err.params?.retryAfterMs).toBe(60_000);
+    }
+  });
+
+  it('a fractional retryAfterMs is ceiled to whole milliseconds', async () => {
+    installFakeService(() => jsonResponse(429, { error: 'rate_limited', retryAfterMs: 1200.4 }));
+    const err = await expectHttpError(
+      run(statusRoute, authedGet()),
+      429,
+      'trading_bots.rate_limited',
+    );
+    expect(err.params?.retryAfterMs).toBe(1201);
+  });
+
+  it('upstream_error without an upstreamStatus falls back to the HTTP status', async () => {
+    installFakeService(() => jsonResponse(503, { error: 'upstream_error', upstreamError: 'down' }));
+    const err = await expectHttpError(
+      run(statusRoute, authedGet()),
+      502,
+      'trading_bots.upstream_error',
+    );
+    expect(err.params?.upstreamStatus).toBe(503);
+    expect(err.params?.upstreamError).toBe('down');
   });
 
   it('propagates upstream_error with the service-reported status + text', async () => {

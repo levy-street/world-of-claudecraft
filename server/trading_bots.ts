@@ -118,9 +118,24 @@ const tradingBotsGate: Middleware = async (_ctx, next) => {
   await next();
 };
 
-/** Bearer auth for everything but config; auth deps injectable for tests. */
-const tradingBotsAuth: Middleware = async (ctx, next) => {
+/** Bearer auth for the status read; auth deps injectable for tests. */
+const tradingBotsReadAuth: Middleware = async (ctx, next) => {
   await requireAccount({ scope: 'read', ...runtime.authDeps })(ctx, next);
+};
+
+/**
+ * Full-session bearer auth for the six MUTATING routes. Unlike the dexswap
+ * family (whose one authenticated route only returns an unsigned transaction
+ * and mutates nothing server-side), subscribe/confirm/deposit/withdraw/control
+ * change real service-side state: a Claudium rental debits the account's
+ * ledger and control starts trading the funded vault, with no wallet
+ * signature in the loop. The repo scope invariant applies: read-scoped tokens
+ * (companion apps, OAuth character:read) are rejected on every mutating
+ * route, so these require a mutation-capable session ('active' enforces
+ * scopeAllowsMutation).
+ */
+const tradingBotsActiveAuth: Middleware = async (ctx, next) => {
+  await requireAccount({ scope: 'active', ...runtime.authDeps })(ctx, next);
 };
 
 // ---------------------------------------------------------------------------
@@ -386,49 +401,49 @@ export const routes: RouteDef[] = [
     method: 'GET',
     path: '/api/tradingbots/status',
     surface: 'api',
-    middleware: [tradingBotsGate, tradingBotsAuth],
+    middleware: [tradingBotsGate, tradingBotsReadAuth],
     handler: statusHandler,
   },
   {
     method: 'POST',
     path: '/api/tradingbots/subscribe',
     surface: 'api',
-    middleware: [tradingBotsGate, tradingBotsAuth],
+    middleware: [tradingBotsGate, tradingBotsActiveAuth],
     handler: subscribeHandler,
   },
   {
     method: 'POST',
     path: '/api/tradingbots/subscribe/confirm',
     surface: 'api',
-    middleware: [tradingBotsGate, tradingBotsAuth],
+    middleware: [tradingBotsGate, tradingBotsActiveAuth],
     handler: subscribeConfirmHandler,
   },
   {
     method: 'POST',
     path: '/api/tradingbots/deposit',
     surface: 'api',
-    middleware: [tradingBotsGate, tradingBotsAuth],
+    middleware: [tradingBotsGate, tradingBotsActiveAuth],
     handler: depositHandler,
   },
   {
     method: 'POST',
     path: '/api/tradingbots/deposit/confirm',
     surface: 'api',
-    middleware: [tradingBotsGate, tradingBotsAuth],
+    middleware: [tradingBotsGate, tradingBotsActiveAuth],
     handler: depositConfirmHandler,
   },
   {
     method: 'POST',
     path: '/api/tradingbots/withdraw',
     surface: 'api',
-    middleware: [tradingBotsGate, tradingBotsAuth],
+    middleware: [tradingBotsGate, tradingBotsActiveAuth],
     handler: withdrawHandler,
   },
   {
     method: 'POST',
     path: '/api/tradingbots/control',
     surface: 'api',
-    middleware: [tradingBotsGate, tradingBotsAuth],
+    middleware: [tradingBotsGate, tradingBotsActiveAuth],
     handler: controlHandler,
   },
 ];

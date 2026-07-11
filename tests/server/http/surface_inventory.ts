@@ -831,8 +831,12 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   // is unset). REGISTRY-ONLY: born on the RouteDef pipeline with no legacy
   // handleApi arm, so the rows are flagged `unreachable` (the legacy-source
   // scan must not expect them; see the tradingBotsRegistryOnly known
-  // deviation). Config is a public read (boot-time launcher visibility); the
-  // seven player routes require a bearer session whose account id is the
+  // deviation). Config is a public read (boot-time launcher visibility);
+  // status is an authenticated read (read tokens accepted); the six MUTATING
+  // routes (subscribe/confirm/deposit/confirm/withdraw/control) require a
+  // FULL session (read-scoped companion/OAuth tokens rejected), since a
+  // Claudium rental debits the account ledger and control starts trading the
+  // funded vault with no wallet signature in the loop. The account id is the
   // service's subscription/vault identity key.
   {
     dispatcher: DISPATCH.mainApi,
@@ -862,7 +866,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     path: '/api/tradingbots/subscribe',
     handler: 'trading_bots.ts RouteDef: subscribeHandler',
     contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.bearer,
+    authScope: AUTH_SCOPE.full,
     limiter: null,
     requireOwnedExpected: null,
     unreachable: true,
@@ -873,7 +877,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     path: '/api/tradingbots/subscribe/confirm',
     handler: 'trading_bots.ts RouteDef: subscribeConfirmHandler',
     contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.bearer,
+    authScope: AUTH_SCOPE.full,
     limiter: null,
     requireOwnedExpected: null,
     unreachable: true,
@@ -884,7 +888,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     path: '/api/tradingbots/deposit',
     handler: 'trading_bots.ts RouteDef: depositHandler',
     contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.bearer,
+    authScope: AUTH_SCOPE.full,
     limiter: null,
     requireOwnedExpected: null,
     unreachable: true,
@@ -895,7 +899,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     path: '/api/tradingbots/deposit/confirm',
     handler: 'trading_bots.ts RouteDef: depositConfirmHandler',
     contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.bearer,
+    authScope: AUTH_SCOPE.full,
     limiter: null,
     requireOwnedExpected: null,
     unreachable: true,
@@ -906,7 +910,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     path: '/api/tradingbots/withdraw',
     handler: 'trading_bots.ts RouteDef: withdrawHandler',
     contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.bearer,
+    authScope: AUTH_SCOPE.full,
     limiter: null,
     requireOwnedExpected: null,
     unreachable: true,
@@ -917,7 +921,7 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     path: '/api/tradingbots/control',
     handler: 'trading_bots.ts RouteDef: controlHandler',
     contentType: PROBLEM_JSON,
-    authScope: AUTH_SCOPE.bearer,
+    authScope: AUTH_SCOPE.full,
     limiter: null,
     requireOwnedExpected: null,
     unreachable: true,
