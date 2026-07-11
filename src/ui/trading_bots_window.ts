@@ -1,12 +1,15 @@
 // Thin DOM window for the Trading Bots flow (rent -> fund -> run -> withdraw).
 //
-// The consumer half of the pure-core + thin-consumer split: trading_bots_view
-// owns the screen derivation, the seq-guarded op state machine, the exact
-// deposit-bounds math, and the cooldown; this module paints
-// #tradingbots-window, wires the proxied endpoints + the wallet signAndSend
-// through injected deps, and localizes every state through t(). It owns no
-// policy: the service owns the catalog, pricing, custody, and validation; the
-// wallet signs and sends; SKUs without client strings are hidden.
+// The consumer half of the pure-core + thin-consumer split, now with TWO pure
+// cores: trading_bots_view owns the screen derivation, the seq-guarded op
+// state machine, the exact deposit-bounds math, and the cooldown;
+// trading_bots_flows_core owns the async flow orchestration (rent WOC or
+// Claudium, fund, withdraw, control), driven through the TradingBotsFlowHost
+// this window implements. This module only paints #tradingbots-window, reads
+// its form fields, wires clicks, and localizes every state through t(). It
+// owns no policy: the service owns the catalog, pricing, custody, and
+// validation; the wallet signs and sends; SKUs without client strings are
+// hidden.
 //
 // All HTML interpolation goes through esc(); focus is captured/restored via
 // the Hud windowFocus pair (the shared FocusManager trap); Esc stays with the
@@ -18,7 +21,19 @@ import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, type TranslationKey, t } from './i18n';
 import {
-  beginOp,
+  ERR_API,
+  ERR_NO_WALLET,
+  ERR_WALLET_FEATURE,
+  controlFlow as runControlFlow,
+  depositFlow as runDepositFlow,
+  rentFlow as runRentFlow,
+  withdrawFlow as runWithdrawFlow,
+  type TradingBotsFlowHost,
+  type TradingBotsNoticeTag,
+  type TradingBotsSubscribeResult,
+  type TradingBotsWithdrawResult,
+} from './trading_bots_flows_core';
+import {
   clearElapsedCooldown,
   cooldownRemainingSeconds,
   createTradingBotsOpState,
@@ -26,13 +41,7 @@ import {
   ERR_RATE_LIMITED,
   effectiveParams,
   isCoolingDown,
-  isOpInFlight,
   isRentalExpired,
-  opConfirming,
-  opDone,
-  opFailed,
-  opRateLimited,
-  opSigning,
   rentalDaysLeft,
   resetOp,
   screenForStatus,
@@ -43,30 +52,19 @@ import {
   type TradingBotsConfig,
   type TradingBotsOpState,
   type TradingBotsStatus,
-  validateDeposit,
   visibleSkus,
 } from './trading_bots_view';
 import { svgIcon } from './ui_icons';
 
-// Coarse error tags the pure op state carries; the paint maps each to a
-// localized message (the original thrown value is kept painter-side for the
-// code-first API localizer).
-const ERR_API = 'api';
-const ERR_WALLET_FEATURE = 'wallet_feature';
-const ERR_SIGN_FAILED = 'sign_failed';
-const ERR_NO_WALLET = 'no_wallet';
+// The wire result shapes live in the flows core; re-exported so the hud and
+// the net glue keep one import site.
+export type { TradingBotsSubscribeResult, TradingBotsWithdrawResult };
 
-/** The subscribe answer: a WOC payment leg, or a one-call Claudium rental. */
-export interface TradingBotsSubscribeResult {
-  paymentId?: string;
-  paymentTransaction?: string;
-  subscription?: unknown;
-}
-
-/** The withdraw answer: an owner transaction to sign, or a pending payout. */
-export interface TradingBotsWithdrawResult {
-  withdrawTransaction?: string;
-}
+/** Success-notice tag -> the localized line the panel shows. */
+const NOTICE_KEYS: Record<TradingBotsNoticeTag, TranslationKey> = {
+  subscribed: 'hudChrome.tradingBots.subscribedBody',
+  withdrawPending: 'hudChrome.tradingBots.withdrawPending',
+};
 
 export interface TradingBotsWindowDeps {
   root(): HTMLElement;
@@ -138,6 +136,29 @@ export class TradingBotsWindow {
   private lastApiError: unknown = null;
   private notice: string | null = null;
   private cooldownTimer: number | null = null;
+
+  // The window-side surface the pure flow core drives (trading_bots_flows_core):
+  // op state get/set, localized notices by tag, paint signals, and the status
+  // re-read. The core owns the orchestration; this window only paints.
+  private readonly flowHost: TradingBotsFlowHost = {
+    getOp: () => this.op,
+    setOp: (op) => {
+      this.op = op;
+    },
+    setNotice: (tag) => {
+      this.notice = tag === null ? null : t(NOTICE_KEYS[tag]);
+    },
+    setLastApiError: (err) => {
+      this.lastApiError = err;
+    },
+    paintPanel: () => this.paintPanel(),
+    onFieldInvalid: () => this.paintFieldError(t('hudChrome.tradingBots.amountInvalid')),
+    refreshStatus: () => this.refreshStatus(),
+    walletAddress: () => this.deps.walletAddress(),
+    isWalletFeatureUnsupported: (err) => this.deps.isWalletFeatureUnsupported(err),
+    onFundsMoved: () => this.deps.onFundsMoved(),
+    now: () => this.deps.now(),
+  };
 
   constructor(private readonly deps: TradingBotsWindowDeps) {}
 
@@ -468,161 +489,34 @@ export class TradingBotsWindow {
     return select?.value === 'claudium' ? 'claudium' : 'woc';
   }
 
+  // Each flow: read the form fields this window owns, then hand the pure core
+  // the orchestration (trading_bots_flows_core owns the seq guards, the
+  // wallet-sign legs, and the error mapping; this.deps satisfies its ops
+  // surface structurally).
+
   private async rent(skuId: string): Promise<void> {
-    if (isOpInFlight(this.op) || isCoolingDown(this.op, this.deps.now())) return;
-    const payWith = this.selectedPayWith();
-    const owner = this.deps.walletAddress();
-    if (payWith === 'woc' && !owner) {
-      this.op = { ...beginOp(this.op, 'subscribe'), phase: 'error', errorCode: ERR_NO_WALLET };
-      this.paintPanel();
-      return;
-    }
-    this.notice = null;
-    this.op = beginOp(this.op, 'subscribe');
-    const seq = this.op.seq;
-    this.paintPanel();
-    try {
-      const result = await this.deps.subscribe(skuId, payWith, owner);
-      if (payWith === 'woc') {
-        if (typeof result.paymentId !== 'string' || typeof result.paymentTransaction !== 'string') {
-          throw new Error('malformed subscribe answer');
-        }
-        this.op = opSigning(this.op, seq);
-        this.paintPanel();
-        const signature = await this.deps.signAndSend(result.paymentTransaction);
-        this.op = opConfirming(this.op, seq);
-        this.paintPanel();
-        await this.deps.confirmSubscribe(result.paymentId, signature);
-      }
-      this.op = opDone(this.op, seq);
-      this.notice = t('hudChrome.tradingBots.subscribedBody');
-      await this.refreshStatus();
-    } catch (err) {
-      this.applyOpFailure(seq, err);
-    }
+    await runRentFlow(this.flowHost, this.deps, skuId, this.selectedPayWith());
   }
 
   private async depositFlow(): Promise<void> {
     const config = this.deps.config();
     const sku = config ? this.rentedSku(config) : null;
-    if (!config || !sku || isOpInFlight(this.op) || isCoolingDown(this.op, this.deps.now())) return;
+    if (!config || !sku) return;
     const root = this.deps.root();
     const solText = root.querySelector<HTMLInputElement>('[data-tb-sol]')?.value ?? '';
     const wocText = root.querySelector<HTMLInputElement>('[data-tb-woc]')?.value ?? '';
-    const validated = validateDeposit(sku, config, solText, wocText);
-    if (!validated.ok) {
-      this.paintFieldError(t('hudChrome.tradingBots.amountInvalid'));
-      return;
-    }
-    const owner = this.deps.walletAddress();
-    if (!owner) {
-      this.op = { ...beginOp(this.op, 'deposit'), phase: 'error', errorCode: ERR_NO_WALLET };
-      this.paintPanel();
-      return;
-    }
-    this.notice = null;
-    this.op = beginOp(this.op, 'deposit');
-    const seq = this.op.seq;
-    this.paintPanel();
-    try {
-      const { depositId, depositTransaction } = await this.deps.deposit(
-        validated.solBaseUnits,
-        validated.wocBaseUnits,
-        owner,
-      );
-      this.op = opSigning(this.op, seq);
-      this.paintPanel();
-      const signature = await this.deps.signAndSend(depositTransaction);
-      this.op = opConfirming(this.op, seq);
-      this.paintPanel();
-      await this.deps.confirmDeposit(depositId, signature);
-      this.op = opDone(this.op, seq);
-      this.deps.onFundsMoved();
-      await this.refreshStatus();
-    } catch (err) {
-      this.applyOpFailure(seq, err);
-    }
+    await runDepositFlow(this.flowHost, this.deps, sku, config, solText, wocText);
   }
 
   private async withdrawFlow(): Promise<void> {
-    if (isOpInFlight(this.op) || isCoolingDown(this.op, this.deps.now())) return;
-    const owner = this.deps.walletAddress();
-    if (!owner) {
-      this.op = { ...beginOp(this.op, 'withdraw'), phase: 'error', errorCode: ERR_NO_WALLET };
-      this.paintPanel();
-      return;
-    }
-    this.notice = null;
-    this.op = beginOp(this.op, 'withdraw');
-    const seq = this.op.seq;
-    this.paintPanel();
-    try {
-      const result = await this.deps.withdraw(owner);
-      // Both custody shapes: an owner tx to sign, or a service-side payout.
-      if (typeof result.withdrawTransaction === 'string') {
-        this.op = opSigning(this.op, seq);
-        this.paintPanel();
-        await this.deps.signAndSend(result.withdrawTransaction);
-      }
-      this.op = opDone(this.op, seq);
-      this.notice = t('hudChrome.tradingBots.withdrawPending');
-      this.deps.onFundsMoved();
-      await this.refreshStatus();
-    } catch (err) {
-      this.applyOpFailure(seq, err);
-    }
+    await runWithdrawFlow(this.flowHost, this.deps);
   }
 
   private async controlFlow(
     action: 'start' | 'pause' | 'update_params',
     params?: Record<string, number>,
   ): Promise<void> {
-    if (isOpInFlight(this.op) || isCoolingDown(this.op, this.deps.now())) return;
-    this.notice = null;
-    this.op = beginOp(this.op, 'control');
-    const seq = this.op.seq;
-    this.paintPanel();
-    try {
-      await this.deps.control(action, params);
-      this.op = opDone(this.op, seq);
-      await this.refreshStatus();
-    } catch (err) {
-      this.applyOpFailure(seq, err);
-    }
-  }
-
-  private applyOpFailure(seq: number, err: unknown): void {
-    this.lastApiError = err;
-    const retryAfterMs = this.rateLimitRetryMs(err);
-    if (retryAfterMs !== null) {
-      this.op = opRateLimited(this.op, seq, retryAfterMs, this.deps.now());
-    } else {
-      const tag = this.deps.isWalletFeatureUnsupported(err)
-        ? ERR_WALLET_FEATURE
-        : this.isCodedError(err)
-          ? ERR_API
-          : ERR_SIGN_FAILED;
-      this.op = opFailed(this.op, seq, tag);
-    }
-    this.paintPanel();
-  }
-
-  private isCodedError(err: unknown): boolean {
-    return (
-      !!err &&
-      typeof err === 'object' &&
-      typeof (err as { code?: unknown }).code === 'string' &&
-      (err as { code: string }).code.length > 0
-    );
-  }
-
-  /** retryAfterMs for a coded trading_bots.rate_limited failure, else null. */
-  private rateLimitRetryMs(err: unknown): number | null {
-    if (!err || typeof err !== 'object') return null;
-    const coded = err as { code?: unknown; params?: { retryAfterMs?: unknown } };
-    if (coded.code !== 'trading_bots.rate_limited') return null;
-    const ms = coded.params?.retryAfterMs;
-    return typeof ms === 'number' && ms > 0 ? ms : 60_000;
+    await runControlFlow(this.flowHost, this.deps, action, params);
   }
 
   // -------------------------------------------------------------------------
