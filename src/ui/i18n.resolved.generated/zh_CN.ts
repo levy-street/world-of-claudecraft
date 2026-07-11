@@ -154,6 +154,14 @@ export const zh_CN: EnTranslations = {
     "spectate": {
       "banner": "正在观察 {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} 发起了准备确认。你准备好了吗？",
+      "ready": "准备就绪",
+      "notReady": "未准备",
+      "result": "准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。",
+      "notInPartyError": "你必须加入队伍才能发起就绪确认。",
+      "inProgressError": "就绪确认已在进行中。"
+    },
     "death": {
       "resurrectAtCorpse": "在尸体旁复活",
       "resurrectAtHealer": "灵魂医者（复活后遗症）",
@@ -232,7 +240,8 @@ export const zh_CN: EnTranslations = {
         "eligible": "奖励已解锁。",
         "no_wallet": "请连接一个持有至少价值 $20 USD 的 WOC 的钱包。",
         "under_minimum": "钱包低于 $20 USD WOC 的最低要求。",
-        "price_unavailable": "WOC 价格不可用，奖励暂时锁定。"
+        "price_unavailable": "WOC 价格不可用，奖励暂时锁定。",
+        "banned": "您已被禁止参加每日奖励。原因：{reason}"
       }
     },
     "theme": {
@@ -306,7 +315,6 @@ export const zh_CN: EnTranslations = {
       "chat": "跳转到聊天"
     },
     "mobile": {
-      "autorun": "自动奔跑",
       "jump": "跳跃",
       "leaderboard": "排行榜",
       "dailyRewards": "奖励",
@@ -314,6 +322,8 @@ export const zh_CN: EnTranslations = {
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
       "toggleHaptics": "切换震动反馈",
+      "showMenuButtons": "显示菜单按钮",
+      "hideMenuButtons": "隐藏菜单按钮",
       "hotbarPage": "技能",
       "hotbarPageAria": "显示下一组技能",
       "actionRing": "战斗动作",
@@ -397,7 +407,13 @@ export const zh_CN: EnTranslations = {
       "targetFriendly": "选中最近友方",
       "targetFriendlyNext": "切换友方目标",
       "discord": "Discord",
-      "valecup": "溪谷杯"
+      "valecup": "溪谷杯",
+      "categoryPet": "宠物",
+      "petAttack": "宠物：攻击",
+      "petStop": "宠物：停止",
+      "petTaunt": "宠物：嘲讽",
+      "petDefensive": "宠物：防御",
+      "petAggressive": "宠物：攻击性"
     },
     "vcup": {
       "title": "溪谷杯",
@@ -572,7 +588,84 @@ export const zh_CN: EnTranslations = {
       "showSecondaryActionBar": "显示副动作条",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
-      "mobileLeftHanded": "左手布局"
+      "mobileLeftHanded": "左手布局",
+      "ia": {
+        "railDisplay": "显示",
+        "railInput": "输入",
+        "railSystem": "系统",
+        "catOverviewName": "概览",
+        "catOverviewSub": "固定的常用项、快捷操作，以及已更改的内容。",
+        "catGraphicsSub": "画质、视野与世界画面。",
+        "catInterfaceSub": "界面缩放、面板、聊天与单位框体。",
+        "catAccessibilityName": "无障碍",
+        "catAccessibilitySub": "动态效果、对比度与内容舒适度。",
+        "catControlsName": "控制",
+        "catControlsSub": "镜头、移动、战斗与反馈。",
+        "catKeybindsSub": "为每个操作绑定按键。",
+        "catControllerSub": "手柄手感与按键布局。",
+        "catTouchName": "触控",
+        "catTouchSub": "屏幕摇杆、视角与按钮。",
+        "catAudioSub": "音量与声音开关。",
+        "catSystemName": "系统",
+        "catSystemSub": "性能、支持与关于。"
+      },
+      "done": "完成",
+      "resetAllTitle": "重置所有设置？",
+      "resetAllBody": "这会将每项设置恢复为默认值。此操作无法撤销。",
+      "searchPlaceholder": "搜索设置",
+      "searchScopeAll": "所有设置",
+      "searchScopeThis": "当前分区",
+      "searchEmpty": "没有符合搜索的设置。",
+      "searchGoTo": "前往{category}",
+      "modeOnline": "在线",
+      "modeOffline": "离线",
+      "changed": "已更改 {count} 项",
+      "changedSummary": "已更改 {count} 项（相对默认）",
+      "legend": {
+        "category": "分类",
+        "navigate": "导航",
+        "select": "选择",
+        "back": "返回",
+        "reset": "重置",
+        "clear": "清除",
+        "page": "页面"
+      },
+      "keybindCleared": "已清除 {action}",
+      "keybindRebinding": "正在重绑定 {action}。请按一个键，或按 Esc 取消。",
+      "keybindEvicted": "已将 {key} 绑定到 {action}；已从 {evicted} 移除。",
+      "keybindTaken": "按键已移除",
+      "keybindUnbound": "{action} 尚未绑定按键",
+      "keybindModifierHint": "提示：你可以绑定组合键。按住 Shift、Ctrl 或 Alt 的同时按下某个键即可录制组合键（例如 Shift+1）。",
+      "conflictDot": "按键冲突",
+      "overviewConflictAlert": "部分按键绑定存在冲突或未绑定。",
+      "sec": {
+        "quality": "画质",
+        "view": "视野",
+        "general": "通用",
+        "scaleText": "缩放与文字",
+        "panels": "面板",
+        "unitFrames": "单位框体",
+        "actionBars": "动作条",
+        "chat": "聊天",
+        "combatTooltips": "战斗与提示",
+        "hudExtras": "HUD 附加项",
+        "motionContrast": "动态与对比度",
+        "content": "内容",
+        "camera": "镜头",
+        "movement": "移动",
+        "combat": "战斗",
+        "feedback": "反馈",
+        "inputMode": "输入模式",
+        "feel": "操作感",
+        "sticks": "摇杆",
+        "look": "视角",
+        "buttons": "按钮",
+        "volume": "音量",
+        "toggles": "开关",
+        "performance": "性能",
+        "support": "支持",
+        "about": "关于"
+      }
     },
     "controller": {
       "title": "手柄",
@@ -584,7 +677,8 @@ export const zh_CN: EnTranslations = {
       "buttons": "按键布局",
       "resetButtons": "重置按键布局",
       "menuAction": "游戏菜单",
-      "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。"
+      "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。",
+      "duplicate": "也绑定到 {buttons}"
     },
     "perf": {
       "title": "性能监视器",
@@ -717,11 +811,17 @@ export const zh_CN: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "配置 {n}"
+      "defaultBuildName": "配置 {n}",
+      "choicesTab": "天赋选择",
+      "resetChoices": "重置选择",
+      "tierLevel": "等级 {n}",
+      "tierLevelLabel": "等级"
     },
     "tips": {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
     },
+    "itemHeroicTag": "[英雄]",
+    "itemSoulbound": "灵魂绑定",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1067,6 +1167,26 @@ export const zh_CN: EnTranslations = {
     "worldBoss": {
       "spawn": "{name}在荆峰高地崛起！"
     },
+    "auth": {
+      "appleLoginCta": "通过 Apple 继续",
+      "appleError": "无法通过 Apple 登录。请重试。",
+      "appleChoiceIntro": "创建新帐户，或将 Apple 关联到现有帐户。",
+      "appleChoiceExpired": "Apple 登录已过期。请再次使用 Apple 登录。",
+      "forgotPrompt": "忘记密码？",
+      "forgotTitle": "重置密码",
+      "forgotHint": "输入您的用户名，我们会将重置链接发送到登记的邮箱。",
+      "forgotUsername": "用户名",
+      "forgotSubmit": "发送重置链接",
+      "forgotSent": "如果该用户名对应的账户已登记邮箱，我们已发送重置链接。请查收您的收件箱。",
+      "forgotBack": "返回登录",
+      "resetTitle": "设置新密码",
+      "resetNewPassword": "新密码",
+      "resetConfirm": "确认新密码",
+      "resetSubmit": "更新密码",
+      "resetDone": "您的密码已更新。现在可以登录了。",
+      "resetMismatch": "两次输入的密码不一致。",
+      "resetErrInvalid": "此重置链接无效或已过期。请重新申请一个。"
+    },
     "loot": {
       "chestTitle": "宝箱"
     },
@@ -1296,6 +1416,8 @@ export const zh_CN: EnTranslations = {
       "parcelsLabel": "包裹",
       "parcelsHint": "点击背包中的物品即可附上。",
       "removeParcelAria": "从信件中移除 {item}",
+      "parcelQtyDecreaseAria": "少寄一个{item}",
+      "parcelQtyIncreaseAria": "多寄一个{item}",
       "sendButton": "寄出信件",
       "postageNote": "邮资：{amount}。渡鸦飞行约 {seconds} 秒。",
       "arrivedBanner": "渡鸦已降落：来自 {name} 的邮件。",
@@ -3900,7 +4022,17 @@ export const zh_CN: EnTranslations = {
     "enterTimeout": "无法进入世界。连接已超时。游戏服务器是否正在运行？",
     "connectionLost": "与服务器的连接已断开。",
     "reconnecting": "连接已断开。正在重新连接...",
-    "connectionRejected": "服务器关闭了连接。"
+    "connectionRejected": "服务器关闭了连接。",
+    "tips": {
+      "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
+      "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
+      "dungeons": "提示：装备超出普通难度要求后，试试地下城的英雄难度，享受更艰难也更有回报的战斗。",
+      "market": "提示：世界市场可以让你与全服玩家进行买卖交易。",
+      "guilds": "提示：加入公会可获得专属聊天频道和公会成员名单。",
+      "professions": "提示：采集与制造类生活技能可以与你的战斗职业同时培养。",
+      "loadouts": "提示：保存多套天赋配置，即可在不同 build 间切换而无需重新分配天赋点。",
+      "pvp": "提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。"
+    }
   },
   "errors": {
     "nothingInteract": "附近没有可互动目标。",
@@ -4895,6 +5027,8 @@ export const zh_CN: EnTranslations = {
       "buybackTitle": "回购",
       "buybackEmpty": "没有物品",
       "buybackAria": "以 {price} 回购 {item}",
+      "sellItemAria": "以 {price} 的价格出售 {item}",
+      "sellRolledWarning": "随机属性无法通过回购找回。",
       "sellQuantityTitle": "出售 {item}",
       "sellQuantityInput": "要出售的数量",
       "sellQuantityConfirm": "出售",
@@ -5818,6 +5952,9 @@ export const zh_CN: EnTranslations = {
       "greyjaw_fang": {
         "name": "老灰颚的尖牙"
       },
+      "chunk_of_ore": {
+        "name": "矿石块"
+      },
       "weathered_ledger_page": {
         "name": "风化账页"
       },
@@ -5847,6 +5984,15 @@ export const zh_CN: EnTranslations = {
       },
       "linen_scrap": {
         "name": "亚麻碎布"
+      },
+      "arcane_dust": {
+        "name": "奥术之尘"
+      },
+      "arcane_essence": {
+        "name": "奥术精华"
+      },
+      "arcane_shard": {
+        "name": "奥术碎片"
       },
       "fen_muster_order": {
         "name": "芬桥集结令"
@@ -7489,6 +7635,16 @@ export const zh_CN: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "人人都有一技之长",
+        "text": "伊斯特布鲁克的每个人都有除了剑术之外的手艺，{playerName}。镇子周围散落着矿脉，去挥镐采上5块矿石带给我。要亲自采，别耍花招，我看得出来。",
+        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，靠这些都能正经谋生。",
+        "objectives": {
+          "0": {
+            "label": "矿石块"
+          }
+        }
+      },
       "q_wolves": {
         "title": "门前群狼",
         "text": "森林狼已经敢扑咬北路旅人，{playerName}。击败8只森林狼，让东溪能松一口气。",

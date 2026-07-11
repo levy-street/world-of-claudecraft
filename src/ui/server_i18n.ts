@@ -1860,6 +1860,28 @@ const RULES: Rule[] = [
   },
   { re: /^Kicked (.+)\.$/, build: (m) => tServer('moderation.kicked', { name: m[1] }) },
   { re: /^Killed (.+)\.$/, build: (m) => tServer('moderation.killConfirm', { name: m[1] }) },
+  // Timed variant first: the broad /^Jailed (.+)\.$/ would swallow it.
+  {
+    re: /^Jailed (.+) for (.+)\.$/,
+    build: (m) =>
+      tServer('moderation.jailedFor', {
+        name: m[1],
+        duration: localizeServerDuration(m[2]),
+      }),
+  },
+  { re: /^Jailed (.+)\.$/, build: (m) => tServer('moderation.jailed', { name: m[1] }) },
+  {
+    re: /^Released (.+) from jail\.$/,
+    build: (m) => tServer('moderation.unjailed', { name: m[1] }),
+  },
+  {
+    re: /^(.+) is already jailed\.$/,
+    build: (m) => tServer('moderation.alreadyJailed', { name: m[1] }),
+  },
+  {
+    re: /^(.+) is not jailed\.$/,
+    build: (m) => tServer('moderation.notJailed', { name: m[1] }),
+  },
   {
     re: /^Required (.+) to rename\.$/,
     build: (m) => tServer('moderation.renameConfirm', { name: m[1] }),
@@ -1904,6 +1926,34 @@ const RULES: Rule[] = [
   {
     re: /^Usage: \/spectate <name>$/,
     build: () => tServer('moderation.spectateUsage'),
+  },
+  {
+    re: /^Usage: \/jail \["<name>" <minutes> \[reason\]\]$/,
+    build: () => tServer('moderation.jailUsage'),
+  },
+  {
+    re: /^Usage: \/unjail \["<name>"\]$/,
+    build: () => tServer('moderation.unjailUsage'),
+  },
+  {
+    re: /^A moderator has moved you to jail for (.+)\.$/,
+    build: (m) => tServer('moderation.jailMovedFor', { duration: localizeServerDuration(m[1]) }),
+  },
+  {
+    re: /^A moderator has released you from jail\.$/,
+    build: () => tServer('moderation.jailReleased'),
+  },
+  {
+    re: /^Moved to jail visitor area\.$/,
+    build: () => tServer('moderation.jailVisitStart'),
+  },
+  {
+    re: /^Returned from jail visitor area\.$/,
+    build: () => tServer('moderation.jailVisitStop'),
+  },
+  {
+    re: /^You are not visiting jail\.$/,
+    build: () => tServer('moderation.jailVisitNotActive'),
   },
   // Chat-filter mute notices. The {duration} comes from formatDuration; re-localize it.
   {

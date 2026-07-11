@@ -127,6 +127,14 @@ export class GameAudio {
     this.tone(880, 0.25, 0.14, 'triangle', 0.1);
   }
 
+  // A distinct rising three-note attention chime for a raid ready check, so it stands
+  // apart from the party-invite / quest chimes.
+  readyCheck(): void {
+    this.tone(784, 0.16, 0.16, 'triangle');
+    this.tone(988, 0.16, 0.16, 'triangle', 0.12);
+    this.tone(1319, 0.28, 0.16, 'triangle', 0.24);
+  }
+
   questDone(): void {
     [523, 659, 784].forEach((f, i) => {
       this.tone(f, 0.35, 0.16, 'triangle', i * 0.12);

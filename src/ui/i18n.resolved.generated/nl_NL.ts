@@ -154,6 +154,14 @@ export const nl_NL: EnTranslations = {
     "spectate": {
       "banner": "Toeschouwer bij {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} heeft een gereedheidscontrole gestart. Ben je gereed?",
+      "ready": "Gereed",
+      "notReady": "Niet gereed",
+      "result": "Gereedheidscontrole: {ready} gereed, {notReady} niet gereed, {noResponse} geen antwoord.",
+      "notInPartyError": "Je moet in een groep zitten om een gereedheidscontrole te starten.",
+      "inProgressError": "Er is al een gereedheidscontrole bezig."
+    },
     "death": {
       "resurrectAtCorpse": "Herrijs bij je lijk",
       "resurrectAtHealer": "De Bleke Hoeder (Tol van de Hoeder)",
@@ -232,7 +240,8 @@ export const nl_NL: EnTranslations = {
         "eligible": "Beloningen ontgrendeld.",
         "no_wallet": "Verbind een portemonnee met minstens $20 USD aan WOC.",
         "under_minimum": "Portemonnee ligt onder het WOC-minimum van $20 USD.",
-        "price_unavailable": "WOC-prijs is niet beschikbaar, beloningen zijn tijdelijk vergrendeld."
+        "price_unavailable": "WOC-prijs is niet beschikbaar, beloningen zijn tijdelijk vergrendeld.",
+        "banned": "Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}"
       }
     },
     "theme": {
@@ -306,7 +315,6 @@ export const nl_NL: EnTranslations = {
       "chat": "Ga naar chat"
     },
     "mobile": {
-      "autorun": "Autoloop",
       "jump": "Springen",
       "leaderboard": "Ranglijst",
       "dailyRewards": "Beloningen",
@@ -314,6 +322,8 @@ export const nl_NL: EnTranslations = {
       "haptics": "Haptiek",
       "hapticsOff": "Haptiek uit",
       "toggleHaptics": "Haptiek aan/uit",
+      "showMenuButtons": "Menuknoppen tonen",
+      "hideMenuButtons": "Menuknoppen verbergen",
       "hotbarPage": "Vaardigheden",
       "hotbarPageAria": "Toon de volgende set vaardigheden",
       "actionRing": "Gevechtsacties",
@@ -397,7 +407,13 @@ export const nl_NL: EnTranslations = {
       "targetFriendly": "Dichtstbijzijnde Bondgenoot Aanwijzen",
       "targetFriendlyNext": "Door Bondgenoten Bladeren",
       "discord": "Discord",
-      "valecup": "Dalbeker"
+      "valecup": "Dalbeker",
+      "categoryPet": "Huisdier",
+      "petAttack": "Huisdier: Aanvallen",
+      "petStop": "Huisdier: Stoppen",
+      "petTaunt": "Huisdier: Uitdagen",
+      "petDefensive": "Huisdier: Verdedigend",
+      "petAggressive": "Huisdier: Agressief"
     },
     "vcup": {
       "title": "De Dalbeker",
@@ -572,7 +588,84 @@ export const nl_NL: EnTranslations = {
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
-      "mobileLeftHanded": "Linkshandige indeling"
+      "mobileLeftHanded": "Linkshandige indeling",
+      "ia": {
+        "railDisplay": "Weergave",
+        "railInput": "Invoer",
+        "railSystem": "Systeeminstellingen",
+        "catOverviewName": "Overzicht",
+        "catOverviewSub": "Vastgezette basisinstellingen, snelle acties en wijzigingen.",
+        "catGraphicsSub": "Kwaliteit, zicht en wereldweergave.",
+        "catInterfaceSub": "HUD-schaal, panelen, chat en eenheidsframes.",
+        "catAccessibilityName": "Toegankelijkheid",
+        "catAccessibilitySub": "Beweging, contrast en prettige inhoud.",
+        "catControlsName": "Besturing",
+        "catControlsSub": "Camera, beweging, gevechten en feedback.",
+        "catKeybindsSub": "Stel toetsen in voor elke actie.",
+        "catControllerSub": "Gamepadgevoel en knopindeling.",
+        "catTouchName": "Aanraakbediening",
+        "catTouchSub": "Schermsticks, kijkbediening en knoppen.",
+        "catAudioSub": "Volume en geluidsopties.",
+        "catSystemName": "Systeeminstellingen",
+        "catSystemSub": "Prestaties, hulp en informatie."
+      },
+      "done": "Klaar",
+      "resetAllTitle": "Alle instellingen herstellen?",
+      "resetAllBody": "Hiermee worden alle instellingen naar hun standaardwaarden hersteld. Dit kan niet ongedaan worden gemaakt.",
+      "searchPlaceholder": "Instellingen zoeken",
+      "searchScopeAll": "Alle instellingen",
+      "searchScopeThis": "Dit onderdeel",
+      "searchEmpty": "Geen instellingen komen overeen met je zoekopdracht.",
+      "searchGoTo": "Ga naar {category}",
+      "modeOnline": "Met verbinding",
+      "modeOffline": "Zonder verbinding",
+      "changed": "{count} gewijzigd",
+      "changedSummary": "{count} gewijzigd ten opzichte van de standaardwaarden",
+      "legend": {
+        "category": "Categorie",
+        "navigate": "Navigeren",
+        "select": "Selecteren",
+        "back": "Terug",
+        "reset": "Herstellen",
+        "clear": "Wissen",
+        "page": "Pagina"
+      },
+      "keybindCleared": "Toewijzing voor {action} gewist",
+      "keybindRebinding": "{action} opnieuw toewijzen. Druk op een toets of op Escape om te annuleren.",
+      "keybindEvicted": "{key} toegewezen aan {action}; verwijderd van {evicted}",
+      "keybindTaken": "Toets verwijderd",
+      "keybindUnbound": "{action} heeft geen toets",
+      "keybindModifierHint": "Tip: je kunt combinaties met modificatietoetsen toewijzen. Houd Shift, Ctrl of Alt ingedrukt terwijl je op een toets drukt om de combinatie vast te leggen, bijvoorbeeld Shift+1.",
+      "conflictDot": "Toewijzingsconflict",
+      "overviewConflictAlert": "Sommige toetstoewijzingen conflicteren of zijn niet ingesteld.",
+      "sec": {
+        "quality": "Kwaliteit",
+        "view": "Zicht",
+        "general": "Algemeen",
+        "scaleText": "Schaal en tekst",
+        "panels": "Panelen",
+        "unitFrames": "Eenheidsframes",
+        "actionBars": "Actiebalken",
+        "chat": "Gesprekken",
+        "combatTooltips": "Gevecht en hulpteksten",
+        "hudExtras": "HUD-extra’s",
+        "motionContrast": "Beweging en contrast",
+        "content": "Inhoud",
+        "camera": "Camerabediening",
+        "movement": "Beweging",
+        "combat": "Gevecht",
+        "feedback": "Terugkoppeling",
+        "inputMode": "Invoermodus",
+        "feel": "Gevoel",
+        "sticks": "Stuurknuppels",
+        "look": "Kijkbediening",
+        "buttons": "Knoppen",
+        "volume": "Geluidssterkte",
+        "toggles": "Schakelaars",
+        "performance": "Prestaties",
+        "support": "Hulp",
+        "about": "Informatie"
+      }
     },
     "controller": {
       "title": "Controller",
@@ -584,7 +677,8 @@ export const nl_NL: EnTranslations = {
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",
       "menuAction": "Spelmenu",
-      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken."
+      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken.",
+      "duplicate": "Ook toegewezen aan {buttons}"
     },
     "perf": {
       "title": "Prestatie-overlay",
@@ -717,11 +811,17 @@ export const nl_NL: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "Build {n}",
+      "choicesTab": "Keuzes",
+      "resetChoices": "Keuzes herstellen",
+      "tierLevel": "Niveau {n}",
+      "tierLevelLabel": "Niveau"
     },
     "tips": {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
+    "itemHeroicTag": "[HELDHAFTIG]",
+    "itemSoulbound": "Zielsgebonden",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1067,6 +1167,26 @@ export const nl_NL: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} verrijst boven Doorntop-Hoogten!"
     },
+    "auth": {
+      "appleLoginCta": "Ga verder met Apple",
+      "appleError": "Aanmelden met Apple is mislukt. Probeer het opnieuw.",
+      "appleChoiceIntro": "Maak een nieuw account of koppel Apple aan een bestaand account.",
+      "appleChoiceExpired": "Deze aanmelding bij Apple is verlopen. Meld je opnieuw aan met Apple.",
+      "forgotPrompt": "Wachtwoord vergeten?",
+      "forgotTitle": "Wachtwoord opnieuw instellen",
+      "forgotHint": "Voer je gebruikersnaam in en we sturen een herstellink naar het geregistreerde e-mailadres.",
+      "forgotUsername": "Gebruikersnaam",
+      "forgotSubmit": "Herstellink versturen",
+      "forgotSent": "Als een account met die gebruikersnaam een e-mailadres heeft, hebben we een herstellink gestuurd. Controleer je inbox.",
+      "forgotBack": "Terug naar inloggen",
+      "resetTitle": "Kies een nieuw wachtwoord",
+      "resetNewPassword": "Nieuw wachtwoord",
+      "resetConfirm": "Bevestig nieuw wachtwoord",
+      "resetSubmit": "Wachtwoord bijwerken",
+      "resetDone": "Je wachtwoord is bijgewerkt. Je kunt nu inloggen.",
+      "resetMismatch": "De wachtwoorden komen niet overeen.",
+      "resetErrInvalid": "Deze herstellink is ongeldig of verlopen. Vraag een nieuwe aan."
+    },
     "loot": {
       "chestTitle": "Kist"
     },
@@ -1296,6 +1416,8 @@ export const nl_NL: EnTranslations = {
       "parcelsLabel": "Pakketten",
       "parcelsHint": "Klik op een voorwerp in je tassen om het bij te voegen.",
       "removeParcelAria": "Verwijder {item} uit de brief",
+      "parcelQtyDecreaseAria": "Eén {item} minder versturen",
+      "parcelQtyIncreaseAria": "Eén {item} meer versturen",
       "sendButton": "Brief versturen",
       "postageNote": "Porto: {amount}. De raaf vliegt ongeveer {seconds}s.",
       "arrivedBanner": "De raaf is geland: post van {name}.",
@@ -3900,7 +4022,17 @@ export const nl_NL: EnTranslations = {
     "enterTimeout": "Kon de wereld niet betreden. De verbinding is verlopen. Draait de gameserver?",
     "connectionLost": "De verbinding met de server is verbroken.",
     "reconnecting": "Verbinding verbroken. Opnieuw verbinding maken...",
-    "connectionRejected": "De server heeft de verbinding gesloten."
+    "connectionRejected": "De server heeft de verbinding gesloten.",
+    "tips": {
+      "classes": "Tip: elk van de 9 klassen speelt anders. Probeer er een paar voordat je er een kiest.",
+      "talents": "Tip: je kunt je talenten buiten gevechten altijd herstellen, dus een vroege keuze is nooit een valstrik.",
+      "dungeons": "Tip: probeer een kerker op heldhaftige moeilijkheid wanneer je uitrusting te goed is geworden voor normaal, voor een zwaarder en lonender gevecht.",
+      "market": "Tip: op de Wereldmarkt kun je kopen en verkopen met spelers uit het hele rijk.",
+      "guilds": "Tip: als je lid wordt van een gilde, krijg je een eigen chatkanaal en een gedeelde lijst met je gildeleden.",
+      "professions": "Tip: verzamel- en ambachtsberoepen kunnen naast je gevechtsklasse worden geleerd.",
+      "loadouts": "Tip: sla meer dan één talentuitrusting op om tussen builds te wisselen zonder punten dubbel uit te geven.",
+      "pvp": "Tip: daag een andere speler uit voor een vriendschappelijk duel, of sluit je aan bij de wachtrij voor de arena van het Asgrauwe Colosseum om je build te testen."
+    }
   },
   "errors": {
     "nothingInteract": "Niets om mee te interacteren.",
@@ -4895,6 +5027,8 @@ export const nl_NL: EnTranslations = {
       "buybackTitle": "Terugkopen",
       "buybackEmpty": "Geen voorwerpen",
       "buybackAria": "Koop {item} terug voor {price}",
+      "sellItemAria": "{item} verkopen voor {price}",
+      "sellRolledWarning": "Willekeurig bepaalde eigenschappen kunnen niet worden hersteld door het voorwerp terug te kopen.",
       "sellQuantityTitle": "{item} verkopen",
       "sellQuantityInput": "Aantal te verkopen",
       "sellQuantityConfirm": "Verkopen",
@@ -5818,6 +5952,9 @@ export const nl_NL: EnTranslations = {
       "greyjaw_fang": {
         "name": "Tand van Oude Grijskaak"
       },
+      "chunk_of_ore": {
+        "name": "Brok erts"
+      },
       "weathered_ledger_page": {
         "name": "Verweerd Grootboekblad"
       },
@@ -5847,6 +5984,15 @@ export const nl_NL: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Linnen Lap"
+      },
+      "arcane_dust": {
+        "name": "Arcaan stof"
+      },
+      "arcane_essence": {
+        "name": "Arcane essentie"
+      },
+      "arcane_shard": {
+        "name": "Arcane scherf"
       },
       "fen_muster_order": {
         "name": "Veenbrug-Mobilisatiebevel"
@@ -7489,6 +7635,16 @@ export const nl_NL: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Een ambacht voor iedere hand",
+        "text": "Iedereen in Oostbeek beoefent naast het zwaard een ambacht, {playerName}. Er liggen ertsaders rond de stad, dus zwaai met een pikhouweel en breng me 5 brokken. Delf ze zelf, hoor; ik merk het verschil.",
+        "completion": "Zie je? Erts in je tas en eelt op je handen. Blijf mijnen, houthakken en kruiden plukken terwijl je over de wegen reist. Wanneer je terug in de stad bent, kijk dan naar het bord met de Stadsfocus bij de markt en de werkbank ernaast. Er valt met alles een eerlijke boterham te verdienen, als je dat wilt.",
+        "objectives": {
+          "0": {
+            "label": "Brok erts"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Wolven voor de Deur",
         "text": "De boswolven worden brutaal en happen naar reizigers op de noordweg. Dun hun aantal uit, {playerName}. Dood 8 Boswolven en Oostbeek zal vrijer ademen.",

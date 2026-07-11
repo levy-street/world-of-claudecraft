@@ -1932,6 +1932,16 @@
     font-size: 13px;
     text-shadow: 1px 1px 2px #000;
   }
+  #ls-tip {
+    max-width: min(480px, 80vw);
+    margin-top: 4px;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+    min-height: 1.2em;
+  }
 
   /* ---------- play console (realm selector + Play CTA) ---------- */
   .play-console {
@@ -2601,6 +2611,15 @@
       border-radius: 0;
       background: linear-gradient(180deg, #0008 0%, #0002 18%, #0002 78%, #000c 100%);
       box-shadow: none;
+      /* The offline panel is the one cs-wow panel that is ALSO .auth-panel-premium,
+         which sets backdrop-filter: blur(12px); the online create/roster panels
+         (.charselect-screen, no premium chrome) never had it. This full-screen
+         takeover neutralizes the premium background/border/shadow but must also
+         drop the blur, or the offline character screen frosts the live 3D scene
+         behind it while the online screens show it sharp (the whole point of the
+         cs-wow full-bleed showcase). */
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
       overflow: hidden;
     }
     /* The online panels' card layout is a grid, and grid-placement on an
@@ -3207,6 +3226,83 @@
       width: 38px;
       height: 38px;
     }
+    #offline-select.cs-wow .class-details-panel {
+      bottom: 190px;
+    }
+    #offline-select.cs-wow .mini-class-row {
+      bottom: 82px;
+    }
+
+    @media (max-width: 1040px), (max-height: 520px) {
+      #offline-select.cs-wow .auth-title {
+        top: 12px;
+        font-size: 20px;
+      }
+      #offline-select.cs-wow .auth-label {
+        top: 48px;
+      }
+      #offline-select.cs-wow .char-input-group {
+        top: 70px;
+        width: 220px;
+        max-width: 220px;
+      }
+      #offline-select.cs-wow .skin-row {
+        left: 18px;
+        gap: 8px;
+      }
+      #offline-select.cs-wow .skin-swatch {
+        width: 50px;
+        height: 50px;
+      }
+      #offline-select.cs-wow .class-details-panel {
+        top: 108px;
+        right: 26px;
+        bottom: 154px;
+        width: min(310px, calc(100vw - 622px));
+        min-width: 280px;
+        padding: 12px;
+        font-size: 12px;
+      }
+      #offline-select.cs-wow .class-details-name {
+        font-size: 20px;
+      }
+      #offline-select.cs-wow .class-details-role,
+      #offline-select.cs-wow .details-stat-bar-row,
+      #offline-select.cs-wow .details-gear-row,
+      #offline-select.cs-wow .details-spell-item,
+      #offline-select.cs-wow .details-spell-text strong {
+        font-size: 12px;
+      }
+      #offline-select.cs-wow .class-details-lore {
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      #offline-select.cs-wow .mini-class-row {
+        bottom: 64px;
+        gap: 8px;
+      }
+      #offline-select.cs-wow .mini-class {
+        width: 70px;
+        gap: 4px;
+      }
+      #offline-select.cs-wow .mini-class .mini-class-portrait {
+        width: 48px;
+        height: 48px;
+      }
+      #offline-select.cs-wow .mini-class .mini-class-label {
+        font-size: 11px;
+      }
+      #offline-select.cs-wow #btn-start-offline {
+        right: 26px;
+        bottom: 22px;
+        min-width: 160px;
+      }
+      #offline-select.cs-wow #btn-offline-back {
+        left: 26px;
+        bottom: 22px;
+        min-width: 130px;
+      }
+    }
   }
 
   /* ---------- Skin picker (alternate body textures) ---------- */
@@ -3426,6 +3522,7 @@
     align-items: end;
   }
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-apple,
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-discord,
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #auth-or-divider,
   body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel #cf-turnstile-container,
@@ -3472,6 +3569,7 @@
     align-items: end;
   }
   body.mobile-touch[data-start-panel="login-panel"] #login-panel .auth-title,
+  body.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-apple,
   body.mobile-touch[data-start-panel="login-panel"] #login-panel #btn-login-discord,
   body.mobile-touch[data-start-panel="login-panel"] #login-panel #auth-or-divider,
   body.mobile-touch[data-start-panel="login-panel"] #login-panel #cf-turnstile-container,

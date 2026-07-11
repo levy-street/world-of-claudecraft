@@ -57,8 +57,8 @@ async function hoverBagItem(label) {
   });
   await sleep(400);
   const handle = await page.evaluateHandle((label) => {
-    const rows = [...document.querySelectorAll('#bags .bag-item')];
-    return rows.find((r) => (r.textContent || '').includes(label)) ?? null;
+    const rows = [...document.querySelectorAll('#bags .item-cell')];
+    return rows.find((r) => (r.getAttribute('aria-label') || '').includes(label)) ?? null;
   }, label);
   const el = handle.asElement();
   if (!el) throw new Error(`bag row not found: ${label}`);

@@ -2,16 +2,56 @@
 // editable form for the leader and read-only labels for members from the pure
 // LootSettingsModel. Owns no state; the Hud rebuilds it from authoritative party
 // state whenever the settings signature changes. Interpolated names go through esc.
+//
+// Chrome comes from the shared window-frame builder (window_frame.ts): a titlebar
+// with a close control and a scrollable body (a form, so no footer). The frame
+// mounts on an inner container and is reused across repaints; only the .ls-body
+// form refills per render. The root is the DIALOG: #loot-settings-window carries a
+// static role="dialog" + aria-labelledby="loot-settings-title" in index.html and
+// Hud focus-traps it, so the descriptor id is chosen so the frame's title id
+// matches that target, and the frame's own redundant role/aria are stripped,
+// leaving exactly one dialog (the root). The root keeps display:block, so Hud's
+// open/close, focus trap, and auto-docking are unchanged.
 
 import type { MasterLootThreshold } from '../sim/types';
 import { esc } from './esc';
 import { type TranslationKey, t } from './i18n';
 import type { LootSettingsModel } from './loot_settings_view';
-import { svgIcon } from './ui_icons';
+import { renderWindowFrame, type WindowFrameParts } from './window_frame';
+import type { WindowFrameDescriptor } from './window_frame_view';
 
 export interface LootSettingsWindowDeps {
   onChange: (enabled: boolean, looter: number, threshold: MasterLootThreshold) => void;
   onClose: () => void;
+}
+
+// Descriptor id 'loot-settings' derives the title id 'loot-settings-title', which
+// is exactly the id the static root aria-labelledby points at; the frame's own
+// role/aria are stripped below so the root stays the sole dialog.
+const LOOT_SETTINGS_FRAME: WindowFrameDescriptor = {
+  id: 'loot-settings',
+  titleKey: 'hudChrome.lootSettings.title',
+  closeLabelKey: 'hudChrome.lootSettings.close',
+};
+
+/**
+ * Stamp the shared window frame cold on an inner mount, then reuse it. The frame
+ * is visual chrome only: its role/aria-labelledby/aria-modal are stripped so the
+ * static dialog identity on the #loot-settings-window root is preserved intact.
+ */
+function ensureFrame(el: HTMLElement, onClose: () => void): WindowFrameParts {
+  const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
+  const body = mounted?.querySelector<HTMLElement>('.window-body');
+  if (mounted && body) {
+    return { root: mounted, body, footer: null, tabButtons: [] };
+  }
+  const mount = document.createElement('div');
+  const parts = renderWindowFrame(mount, LOOT_SETTINGS_FRAME, { onClose });
+  mount.removeAttribute('role');
+  mount.removeAttribute('aria-labelledby');
+  mount.removeAttribute('aria-modal');
+  el.replaceChildren(mount);
+  return parts;
 }
 
 const THRESHOLDS: MasterLootThreshold[] = ['uncommon', 'rare', 'epic'];
@@ -77,14 +117,11 @@ export function renderLootSettingsWindow(
   model: LootSettingsModel,
   deps: LootSettingsWindowDeps,
 ): void {
-  root.innerHTML =
-    `<div class="panel-title"><span id="loot-settings-title">${esc(t('hudChrome.lootSettings.title'))}</span>` +
-    `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.lootSettings.close'))}">${svgIcon('close')}</button></div>` +
-    `<div class="ls-body">${model.isLeader ? leaderBody(model) : memberBody(model)}</div>`;
-  root.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
+  const { body } = ensureFrame(root, () => deps.onClose());
+  body.innerHTML = `<div class="ls-body">${model.isLeader ? leaderBody(model) : memberBody(model)}</div>`;
   if (!model.isLeader) return;
-  const method = root.querySelector<HTMLSelectElement>('#ls-method');
-  const threshold = root.querySelector<HTMLSelectElement>('#ls-threshold');
+  const method = body.querySelector<HTMLSelectElement>('#ls-method');
+  const threshold = body.querySelector<HTMLSelectElement>('#ls-threshold');
   if (!method || !threshold) return;
   const apply = (): void => {
     const val = method.value;

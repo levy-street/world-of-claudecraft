@@ -12,6 +12,7 @@ export type AdminPage =
   | 'accounts'
   | 'characters'
   | 'moderation'
+  | 'moderation-history'
   | 'suspicious-players'
   | 'detection-calibration'
   | 'antibot-config'
@@ -64,6 +65,7 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     defaultPage: 'moderation',
     items: [
       { id: 'moderation', labelKey: 'nav.reports', permission: 'moderation.read' },
+      { id: 'moderation-history', labelKey: 'nav.history', permission: 'moderation.read' },
       { id: 'shared-ips', labelKey: 'nav.sharedIps', permission: 'moderation.read' },
       { id: 'blocked-ips', labelKey: 'nav.blockedIps', permission: 'moderation.read' },
       { id: 'chat-filter', labelKey: 'nav.chatFilter', permission: 'moderation.read' },

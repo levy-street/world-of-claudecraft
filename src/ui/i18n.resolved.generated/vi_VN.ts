@@ -154,6 +154,14 @@ export const vi_VN: EnTranslations = {
     "spectate": {
       "banner": "Đang xem {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?",
+      "ready": "Sẵn Sàng",
+      "notReady": "Chưa Sẵn Sàng",
+      "result": "Kiểm tra sẵn sàng: {ready} sẵn sàng, {notReady} chưa sẵn sàng, {noResponse} không phản hồi.",
+      "notInPartyError": "Bạn phải ở trong tổ đội để bắt đầu kiểm tra sẵn sàng.",
+      "inProgressError": "Một lượt kiểm tra sẵn sàng đang diễn ra."
+    },
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
@@ -232,7 +240,8 @@ export const vi_VN: EnTranslations = {
         "eligible": "Đã mở khóa phần thưởng.",
         "no_wallet": "Kết nối một ví có ít nhất 20 USD WOC.",
         "under_minimum": "Ví thấp hơn mức tối thiểu 20 USD WOC.",
-        "price_unavailable": "Giá WOC hiện không có sẵn, phần thưởng tạm thời bị khóa."
+        "price_unavailable": "Giá WOC hiện không có sẵn, phần thưởng tạm thời bị khóa.",
+        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}"
       }
     },
     "theme": {
@@ -306,7 +315,6 @@ export const vi_VN: EnTranslations = {
       "chat": "Chuyển tới Trò Chuyện"
     },
     "mobile": {
-      "autorun": "Tự Chạy",
       "jump": "Nhảy",
       "leaderboard": "Xếp Hạng",
       "dailyRewards": "Thưởng",
@@ -314,6 +322,8 @@ export const vi_VN: EnTranslations = {
       "haptics": "Phản Hồi Rung",
       "hapticsOff": "Tắt Phản Hồi Rung",
       "toggleHaptics": "Bật/tắt phản hồi rung",
+      "showMenuButtons": "Hiện các nút trình đơn",
+      "hideMenuButtons": "Ẩn các nút trình đơn",
       "hotbarPage": "Kỹ Năng",
       "hotbarPageAria": "Hiện bộ kỹ năng tiếp theo",
       "actionRing": "Hành động chiến đấu",
@@ -397,7 +407,13 @@ export const vi_VN: EnTranslations = {
       "targetFriendly": "Chọn Đồng Minh Gần Nhất",
       "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
       "discord": "Discord",
-      "valecup": "Cúp Thung Lũng"
+      "valecup": "Cúp Thung Lũng",
+      "categoryPet": "Thú Cưng",
+      "petAttack": "Thú Cưng: Tấn Công",
+      "petStop": "Thú Cưng: Dừng",
+      "petTaunt": "Thú Cưng: Khiêu Khích",
+      "petDefensive": "Thú Cưng: Phòng Thủ",
+      "petAggressive": "Thú Cưng: Hung Hăng"
     },
     "vcup": {
       "title": "Cúp Thung Lũng",
@@ -572,7 +588,84 @@ export const vi_VN: EnTranslations = {
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
-      "mobileLeftHanded": "Bố cục thuận tay trái"
+      "mobileLeftHanded": "Bố cục thuận tay trái",
+      "ia": {
+        "railDisplay": "Hiển Thị",
+        "railInput": "Đầu Vào",
+        "railSystem": "Hệ Thống",
+        "catOverviewName": "Tổng Quan",
+        "catOverviewSub": "Các mục thiết yếu đã ghim, thao tác nhanh và những gì đã đổi.",
+        "catGraphicsSub": "Chất lượng, tầm nhìn và hình ảnh thế giới.",
+        "catInterfaceSub": "Tỷ lệ HUD, bảng, trò chuyện và khung đơn vị.",
+        "catAccessibilityName": "Khả Năng Tiếp Cận",
+        "catAccessibilitySub": "Chuyển động, độ tương phản và sự thoải mái về nội dung.",
+        "catControlsName": "Điều Khiển",
+        "catControlsSub": "Máy quay, di chuyển, chiến đấu và phản hồi.",
+        "catKeybindsSub": "Gán phím cho mọi hành động.",
+        "catControllerSub": "Cảm giác tay cầm và bố cục nút.",
+        "catTouchName": "Cảm Ứng",
+        "catTouchSub": "Cần điều khiển trên màn hình, tầm nhìn và nút.",
+        "catAudioSub": "Âm lượng và các tùy chọn bật tắt âm thanh.",
+        "catSystemName": "Hệ Thống",
+        "catSystemSub": "Hiệu năng, hỗ trợ và thông tin."
+      },
+      "done": "Xong",
+      "resetAllTitle": "Đặt lại mọi cài đặt?",
+      "resetAllBody": "Thao tác này khôi phục mọi cài đặt về mặc định và không thể hoàn tác.",
+      "searchPlaceholder": "Tìm kiếm cài đặt",
+      "searchScopeAll": "Mọi cài đặt",
+      "searchScopeThis": "Mục này",
+      "searchEmpty": "Không có cài đặt nào khớp với tìm kiếm.",
+      "searchGoTo": "Đi tới {category}",
+      "modeOnline": "Trực Tuyến",
+      "modeOffline": "Ngoại Tuyến",
+      "changed": "{count} mục đã đổi",
+      "changedSummary": "{count} mục khác mặc định",
+      "legend": {
+        "category": "Danh Mục",
+        "navigate": "Di Chuyển",
+        "select": "Chọn",
+        "back": "Quay Lại",
+        "reset": "Đặt Lại",
+        "clear": "Xóa",
+        "page": "Trang"
+      },
+      "keybindCleared": "Đã xóa {action}",
+      "keybindRebinding": "Đang gán lại {action}. Nhấn một phím, hoặc nhấn Escape để hủy.",
+      "keybindEvicted": "Đã gán {key} cho {action}; gỡ khỏi {evicted}",
+      "keybindTaken": "Đã gỡ phím",
+      "keybindUnbound": "{action} chưa có phím",
+      "keybindModifierHint": "Mẹo: bạn có thể gán tổ hợp phím bổ trợ. Giữ Shift, Ctrl hoặc Alt trong khi nhấn một phím để ghi nhận tổ hợp (ví dụ Shift+1).",
+      "conflictDot": "Xung đột phím gán",
+      "overviewConflictAlert": "Một số phím gán bị xung đột hoặc chưa được gán.",
+      "sec": {
+        "quality": "Chất Lượng",
+        "view": "Tầm Nhìn",
+        "general": "Chung",
+        "scaleText": "Tỷ Lệ và Văn Bản",
+        "panels": "Bảng",
+        "unitFrames": "Khung Đơn Vị",
+        "actionBars": "Thanh Hành Động",
+        "chat": "Trò Chuyện",
+        "combatTooltips": "Chiến Đấu và Chú Thích",
+        "hudExtras": "Tính Năng HUD Bổ Sung",
+        "motionContrast": "Chuyển Động và Tương Phản",
+        "content": "Nội Dung",
+        "camera": "Máy Quay",
+        "movement": "Di Chuyển",
+        "combat": "Chiến Đấu",
+        "feedback": "Phản Hồi",
+        "inputMode": "Chế Độ Đầu Vào",
+        "feel": "Cảm Giác",
+        "sticks": "Cần Điều Khiển",
+        "look": "Hướng Nhìn",
+        "buttons": "Nút",
+        "volume": "Âm Lượng",
+        "toggles": "Bật Tắt",
+        "performance": "Hiệu Năng",
+        "support": "Hỗ Trợ",
+        "about": "Thông Tin"
+      }
     },
     "controller": {
       "title": "Tay Cầm",
@@ -584,7 +677,8 @@ export const vi_VN: EnTranslations = {
       "buttons": "Bố Cục Nút",
       "resetButtons": "Đặt Lại Bố Cục Nút",
       "menuAction": "Menu Trò Chơi",
-      "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình."
+      "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình.",
+      "duplicate": "Cũng được gán cho {buttons}"
     },
     "perf": {
       "title": "Lớp Phủ Hiệu Năng",
@@ -717,11 +811,17 @@ export const vi_VN: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Cấu Hình {n}"
+      "defaultBuildName": "Cấu Hình {n}",
+      "choicesTab": "Lựa Chọn",
+      "resetChoices": "Đặt Lại Lựa Chọn",
+      "tierLevel": "Cấp {n}",
+      "tierLevelLabel": "Cấp"
     },
     "tips": {
       "joinChannels": "Mẹo: gõ /join world hoặc /join lfg để trò chuyện với người chơi khắp thế giới."
     },
+    "itemHeroicTag": "[ANH HÙNG]",
+    "itemSoulbound": "Ràng Buộc Linh Hồn",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1067,6 +1167,26 @@ export const vi_VN: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!"
     },
+    "auth": {
+      "appleLoginCta": "Tiếp Tục với Apple",
+      "appleError": "Không thể đăng nhập bằng Apple. Vui lòng thử lại.",
+      "appleChoiceIntro": "Tạo tài khoản mới, hoặc liên kết Apple với tài khoản bạn đã có.",
+      "appleChoiceExpired": "Lần đăng nhập bằng Apple đó đã hết hạn. Vui lòng đăng nhập lại bằng Apple.",
+      "forgotPrompt": "Quên mật khẩu?",
+      "forgotTitle": "Đặt lại mật khẩu",
+      "forgotHint": "Nhập tên người dùng của bạn và chúng tôi sẽ gửi liên kết đặt lại tới địa chỉ email đã đăng ký.",
+      "forgotUsername": "Tên người dùng",
+      "forgotSubmit": "Gửi liên kết đặt lại",
+      "forgotSent": "Nếu tài khoản với tên người dùng đó có địa chỉ email đã đăng ký, chúng tôi đã gửi liên kết đặt lại. Hãy kiểm tra hộp thư của bạn.",
+      "forgotBack": "Quay lại đăng nhập",
+      "resetTitle": "Chọn mật khẩu mới",
+      "resetNewPassword": "Mật khẩu mới",
+      "resetConfirm": "Xác nhận mật khẩu mới",
+      "resetSubmit": "Cập nhật mật khẩu",
+      "resetDone": "Mật khẩu của bạn đã được cập nhật. Bây giờ bạn có thể đăng nhập.",
+      "resetMismatch": "Mật khẩu không khớp.",
+      "resetErrInvalid": "Liên kết đặt lại này không hợp lệ hoặc đã hết hạn. Hãy yêu cầu liên kết mới."
+    },
     "loot": {
       "chestTitle": "Rương"
     },
@@ -1296,6 +1416,8 @@ export const vi_VN: EnTranslations = {
       "parcelsLabel": "Bưu Kiện",
       "parcelsHint": "Nhấp một vật phẩm trong túi để đính kèm.",
       "removeParcelAria": "Gỡ {item} khỏi lá thư",
+      "parcelQtyDecreaseAria": "Gửi bớt một {item}",
+      "parcelQtyIncreaseAria": "Gửi thêm một {item}",
       "sendButton": "Gửi thư",
       "postageNote": "Bưu phí: {amount}. Quạ thư bay mất khoảng {seconds} giây.",
       "arrivedBanner": "Quạ thư đã đáp xuống: thư từ {name}.",
@@ -3900,7 +4022,17 @@ export const vi_VN: EnTranslations = {
     "enterTimeout": "Không thể vào thế giới. Kết nối đã quá thời gian. Máy chủ trò chơi có đang chạy không?",
     "connectionLost": "Đã mất kết nối tới máy chủ.",
     "reconnecting": "Mất kết nối. Đang kết nối lại...",
-    "connectionRejected": "Máy chủ đã đóng kết nối."
+    "connectionRejected": "Máy chủ đã đóng kết nối.",
+    "tips": {
+      "classes": "Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.",
+      "talents": "Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.",
+      "dungeons": "Mẹo: khi trang bị đã vượt mức thường, hãy thử hầm ngục ở độ khó anh hùng để có trận chiến khó hơn và phần thưởng hậu hĩnh hơn.",
+      "market": "Mẹo: Chợ Thế Giới cho phép bạn mua bán với người chơi trên toàn thế giới.",
+      "guilds": "Mẹo: gia nhập bang hội cho bạn một kênh trò chuyện riêng và danh sách chung các thành viên trong bang.",
+      "professions": "Mẹo: có thể rèn luyện nghề thu thập và chế tác song song với lớp chiến đấu của bạn.",
+      "loadouts": "Mẹo: lưu nhiều hơn một bộ tài năng để chuyển đổi giữa các lối xây dựng mà không phải dùng điểm hai lần.",
+      "pvp": "Mẹo: thách đấu người chơi khác trong một trận giao hữu, hoặc xếp hàng vào Đấu Trường Tro Tàn, để thử sức lối xây dựng của bạn."
+    }
   },
   "errors": {
     "nothingInteract": "Không có gì để tương tác.",
@@ -4895,6 +5027,8 @@ export const vi_VN: EnTranslations = {
       "buybackTitle": "Mua Lại",
       "buybackEmpty": "Không có vật phẩm",
       "buybackAria": "Mua lại {item} với giá {price}",
+      "sellItemAria": "Bán {item} với giá {price}",
+      "sellRolledWarning": "Không thể khôi phục các chỉ số ngẫu nhiên bằng cách mua lại.",
       "sellQuantityTitle": "Bán {item}",
       "sellQuantityInput": "Số lượng cần bán",
       "sellQuantityConfirm": "Bán",
@@ -5818,6 +5952,9 @@ export const vi_VN: EnTranslations = {
       "greyjaw_fang": {
         "name": "Nanh Của Greyjaw Già"
       },
+      "chunk_of_ore": {
+        "name": "Khối Quặng"
+      },
       "weathered_ledger_page": {
         "name": "Trang Sổ Cái Phong Sương"
       },
@@ -5847,6 +5984,15 @@ export const vi_VN: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Mảnh Vải Lanh"
+      },
+      "arcane_dust": {
+        "name": "Bụi Bí Thuật"
+      },
+      "arcane_essence": {
+        "name": "Tinh Chất Bí Thuật"
+      },
+      "arcane_shard": {
+        "name": "Mảnh Bí Thuật"
       },
       "fen_muster_order": {
         "name": "Lệnh Tập Hợp Fenbridge"
@@ -7489,6 +7635,16 @@ export const vi_VN: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Nghề Cho Mọi Đôi Tay",
+        "text": "Mọi người ở Đông Khê đều làm một nghề bên cạnh việc cầm kiếm, {playerName}. Các mạch quặng nằm rải rác quanh thị trấn, nên hãy vung cuốc và mang về cho ta 5 khối. Tự tay khai thác nhé, ta sẽ biết nếu không phải vậy.",
+        "completion": "Thấy chưa? Quặng trong túi, chai sạn trên tay. Cứ tiếp tục khai khoáng, đốn gỗ và hái thảo dược dọc đường. Khi về thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn cạnh chợ và bàn chế tác gần đó. Nếu muốn, mọi việc ấy đều có thể thành một nghề kiếm sống đàng hoàng.",
+        "objectives": {
+          "0": {
+            "label": "Khối Quặng"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Sói Trước Cửa",
         "text": "Lũ sói rừng ngày càng hung hăng, chực vồ lữ khách trên con đường phía bắc. Hãy thưa bớt số lượng chúng, {playerName}. Hạ 8 con Sói Rừng và Đông Khê sẽ dễ thở hơn.",

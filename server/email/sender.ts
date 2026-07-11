@@ -3,6 +3,8 @@
 // none in dev, is a one-file concern. No new dependency: HttpSender uses the
 // same raw `fetch` the codebase already uses for Turnstile and the Solana RPC.
 
+import { SesSender } from './ses_sender';
+
 export interface OutboundEmail {
   to: string;
   subject: string;
@@ -72,13 +74,21 @@ export class HttpSender implements EmailSender {
   }
 }
 
-// Pick a transport from the environment. Real delivery requires BOTH a provider
-// URL and key plus a from-address; anything missing falls back to console so a
+// Pick a transport from the environment. An explicit EMAIL_PROVIDER=ses wins;
+// otherwise the generic http transport requires BOTH a provider URL and key
+// plus a from-address. Anything missing falls back to console so a
 // half-configured env can never silently drop mail on the floor without a log.
 export function selectSender(env: NodeJS.ProcessEnv = process.env): EmailSender {
+  const from = env.EMAIL_FROM?.trim();
+  if (env.EMAIL_PROVIDER?.trim() === 'ses') {
+    const region = env.EMAIL_SES_REGION?.trim() || env.AWS_REGION?.trim();
+    if (region && from) {
+      return new SesSender({ region, from });
+    }
+    return new ConsoleSender();
+  }
   const apiUrl = env.EMAIL_API_URL?.trim();
   const apiKey = env.EMAIL_API_KEY?.trim();
-  const from = env.EMAIL_FROM?.trim();
   if (apiUrl && apiKey && from) {
     return new HttpSender({ apiUrl, apiKey, from });
   }

@@ -279,6 +279,8 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  dailyRewardsBan?: { reason: string; createdAt: string } | null;
+  dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -311,6 +313,13 @@ export interface ModerationHistoryEntry {
   expiresAt: string | null;
   adminAccountId: number | null;
   adminUsername: string | null;
+}
+
+export interface ModerationActionHistoryRow extends ModerationHistoryEntry {
+  source: 'account' | 'ip';
+  accountId: number | null;
+  username: string | null;
+  ip: string | null;
 }
 
 export interface ModerationQueueRow {

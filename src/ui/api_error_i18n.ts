@@ -234,6 +234,8 @@ export function userFacingApiError(err: unknown): string {
     return t('hudChrome.account.errPasswordLong');
   if (normalized === 'that is already your email address')
     return t('hudChrome.account.errEmailUnchanged');
+  // Password-reset ("forgot password") link is invalid or expired (server/account.ts).
+  if (normalized === 'invalid or expired link') return t('hudChrome.auth.resetErrInvalid');
   if (
     normalized === 'that code is not valid, try again' ||
     normalized === 'invalid authentication code'

@@ -116,10 +116,10 @@ describe('set-bonus haste derivation (recalcPlayerStats)', () => {
   it('3 caster kit pieces set all three haste channels from the one stat', () => {
     const { p } = player('mage');
     const [a, b, c] = setMembers(SET_VALE_ARCANIST);
-    recalcPlayerStats(p, 'mage', equipmentOf([a, b]));
+    recalcPlayerStats(p, 'mage', equipmentOf([a, b]), undefined, {});
     expect(p.spellHaste).toBe(0);
     expect(p.meleeHaste).toBe(0);
-    recalcPlayerStats(p, 'mage', equipmentOf([a, b, c]));
+    recalcPlayerStats(p, 'mage', equipmentOf([a, b, c]), undefined, {});
     expect(p.spellHaste).toBe(SET_HASTE_3PC);
     expect(p.meleeHaste).toBe(SET_HASTE_3PC);
     expect(p.rangedHaste).toBe(SET_HASTE_3PC);
@@ -127,7 +127,13 @@ describe('set-bonus haste derivation (recalcPlayerStats)', () => {
 
   it('the tier-2 Nighttalon 3-piece adds haste on top of its agi/crit bonus', () => {
     const { p } = player('rogue');
-    recalcPlayerStats(p, 'rogue', equipmentOf(setMembers(SET_NIGHTTALON).slice(0, 3)));
+    recalcPlayerStats(
+      p,
+      'rogue',
+      equipmentOf(setMembers(SET_NIGHTTALON).slice(0, 3)),
+      undefined,
+      {},
+    );
     expect(p.meleeHaste).toBe(SET_HASTE_3PC);
     expect(p.spellHaste).toBe(SET_HASTE_3PC);
     // the pre-existing 3pc payload still applies alongside the haste
@@ -136,7 +142,13 @@ describe('set-bonus haste derivation (recalcPlayerStats)', () => {
 
   it('the tier-1 Deathlord 3-piece grants no haste', () => {
     const { p } = player('warrior');
-    recalcPlayerStats(p, 'warrior', equipmentOf(setMembers(SET_DEATHLORD).slice(0, 3)));
+    recalcPlayerStats(
+      p,
+      'warrior',
+      equipmentOf(setMembers(SET_DEATHLORD).slice(0, 3)),
+      undefined,
+      {},
+    );
     expect(p.meleeHaste).toBe(0);
     expect(p.spellHaste).toBe(0);
   });

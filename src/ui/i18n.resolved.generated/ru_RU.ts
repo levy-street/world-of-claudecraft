@@ -154,6 +154,14 @@ export const ru_RU: EnTranslations = {
     "spectate": {
       "banner": "Наблюдение за {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} начал проверку готовности. Вы готовы?",
+      "ready": "Готов",
+      "notReady": "Не готов",
+      "result": "Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.",
+      "notInPartyError": "Чтобы начать проверку готовности, вы должны состоять в группе.",
+      "inProgressError": "Проверка готовности уже идёт."
+    },
     "death": {
       "resurrectAtCorpse": "Воскреснуть у тела",
       "resurrectAtHealer": "Целитель душ (болезнь воскрешения)",
@@ -232,7 +240,8 @@ export const ru_RU: EnTranslations = {
         "eligible": "Награды открыты.",
         "no_wallet": "Подключите кошелек с не менее чем $20 USD в WOC.",
         "under_minimum": "Кошелек ниже минимума в $20 USD WOC.",
-        "price_unavailable": "Цена WOC недоступна, награды временно заблокированы."
+        "price_unavailable": "Цена WOC недоступна, награды временно заблокированы.",
+        "banned": "Вам запрещено участвовать в ежедневных наградах. Причина: {reason}"
       }
     },
     "theme": {
@@ -306,7 +315,6 @@ export const ru_RU: EnTranslations = {
       "chat": "Перейти к чату"
     },
     "mobile": {
-      "autorun": "Автобег",
       "jump": "Прыжок",
       "leaderboard": "Рейтинг",
       "dailyRewards": "Награды",
@@ -314,6 +322,8 @@ export const ru_RU: EnTranslations = {
       "haptics": "Вибрация",
       "hapticsOff": "Вибрация выкл.",
       "toggleHaptics": "Вкл/выкл вибрацию",
+      "showMenuButtons": "Показать кнопки меню",
+      "hideMenuButtons": "Скрыть кнопки меню",
       "hotbarPage": "Навыки",
       "hotbarPageAria": "Показать следующий набор навыков",
       "actionRing": "Боевые действия",
@@ -397,7 +407,13 @@ export const ru_RU: EnTranslations = {
       "targetFriendly": "Ближайший союзник",
       "targetFriendlyNext": "Следующий союзник",
       "discord": "Discord",
-      "valecup": "Кубок Долины"
+      "valecup": "Кубок Долины",
+      "categoryPet": "Питомец",
+      "petAttack": "Питомец: атака",
+      "petStop": "Питомец: стоп",
+      "petTaunt": "Питомец: провокация",
+      "petDefensive": "Питомец: защита",
+      "petAggressive": "Питомец: агрессия"
     },
     "vcup": {
       "title": "Кубок Долины",
@@ -572,7 +588,84 @@ export const ru_RU: EnTranslations = {
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
-      "mobileLeftHanded": "Раскладка для левшей"
+      "mobileLeftHanded": "Раскладка для левшей",
+      "ia": {
+        "railDisplay": "Экран",
+        "railInput": "Ввод",
+        "railSystem": "Система",
+        "catOverviewName": "Обзор",
+        "catOverviewSub": "Закрепленные настройки, быстрые действия и что изменилось.",
+        "catGraphicsSub": "Качество, обзор и вид мира.",
+        "catInterfaceSub": "Масштаб интерфейса, панели, чат и рамки юнитов.",
+        "catAccessibilityName": "Доступность",
+        "catAccessibilitySub": "Анимация, контраст и комфорт контента.",
+        "catControlsName": "Управление",
+        "catControlsSub": "Камера, движение, бой и отклик.",
+        "catKeybindsSub": "Назначьте клавиши для всех действий.",
+        "catControllerSub": "Отклик геймпада и раскладка кнопок.",
+        "catTouchName": "Сенсор",
+        "catTouchSub": "Экранные стики, обзор и кнопки.",
+        "catAudioSub": "Громкость и переключатели звука.",
+        "catSystemName": "Система",
+        "catSystemSub": "Производительность, поддержка и о программе."
+      },
+      "done": "Готово",
+      "resetAllTitle": "Сбросить все настройки?",
+      "resetAllBody": "Все настройки вернутся к значениям по умолчанию. Это действие нельзя отменить.",
+      "searchPlaceholder": "Поиск настроек",
+      "searchScopeAll": "Все настройки",
+      "searchScopeThis": "Этот раздел",
+      "searchEmpty": "Нет настроек, соответствующих запросу.",
+      "searchGoTo": "Перейти к разделу «{category}»",
+      "modeOnline": "В сети",
+      "modeOffline": "Не в сети",
+      "changed": "Изменено: {count}",
+      "changedSummary": "Изменено относительно стандартных: {count}",
+      "legend": {
+        "category": "Категория",
+        "navigate": "Навигация",
+        "select": "Выбрать",
+        "back": "Назад",
+        "reset": "Сброс",
+        "clear": "Очистить",
+        "page": "Страница"
+      },
+      "keybindCleared": "Очищено: {action}",
+      "keybindRebinding": "Переназначение «{action}». Нажмите клавишу или Escape для отмены.",
+      "keybindEvicted": "{key} назначена на «{action}»; снята с «{evicted}».",
+      "keybindTaken": "Клавиша снята",
+      "keybindUnbound": "Для действия «{action}» не назначена клавиша",
+      "keybindModifierHint": "Совет: можно назначать сочетания с модификатором. Удерживайте Shift, Ctrl или Alt и нажмите клавишу, чтобы записать сочетание (например, Shift+1).",
+      "conflictDot": "Конфликт клавиш",
+      "overviewConflictAlert": "Некоторые привязки клавиш конфликтуют или не назначены.",
+      "sec": {
+        "quality": "Качество",
+        "view": "Обзор",
+        "general": "Основные",
+        "scaleText": "Масштаб и текст",
+        "panels": "Панели",
+        "unitFrames": "Рамки существ",
+        "actionBars": "Панели действий",
+        "chat": "Чат",
+        "combatTooltips": "Бой и подсказки",
+        "hudExtras": "Дополнения интерфейса",
+        "motionContrast": "Анимация и контраст",
+        "content": "Содержимое",
+        "camera": "Камера",
+        "movement": "Движение",
+        "combat": "Бой",
+        "feedback": "Отклик",
+        "inputMode": "Режим ввода",
+        "feel": "Ощущения",
+        "sticks": "Стики",
+        "look": "Обзор",
+        "buttons": "Кнопки",
+        "volume": "Громкость",
+        "toggles": "Переключатели",
+        "performance": "Производительность",
+        "support": "Поддержка",
+        "about": "О программе"
+      }
     },
     "controller": {
       "title": "Геймпад",
@@ -584,7 +677,8 @@ export const ru_RU: EnTranslations = {
       "buttons": "Раскладка кнопок",
       "resetButtons": "Сбросить раскладку кнопок",
       "menuAction": "Игровое меню",
-      "help": "Левый стик — движение, правый — камера. Откройте окно, чтобы использовать экранный указатель."
+      "help": "Левый стик отвечает за движение, правый наводит камеру. Откройте окно, чтобы использовать экранный указатель.",
+      "duplicate": "Также назначено на {buttons}"
     },
     "perf": {
       "title": "Оверлей производительности",
@@ -717,11 +811,17 @@ export const ru_RU: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Билд {n}"
+      "defaultBuildName": "Билд {n}",
+      "choicesTab": "Выбор талантов",
+      "resetChoices": "Сбросить выбор",
+      "tierLevel": "Уровень {n}",
+      "tierLevelLabel": "Уровень"
     },
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
+    "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
+    "itemSoulbound": "Персональный",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1067,6 +1167,26 @@ export const ru_RU: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} поднимается над Терновыми высотами!"
     },
+    "auth": {
+      "appleLoginCta": "Продолжить с Apple",
+      "appleError": "Не удалось войти через Apple. Попробуйте ещё раз.",
+      "appleChoiceIntro": "Создайте новую учётную запись или привяжите Apple к существующей.",
+      "appleChoiceExpired": "Вход через Apple истёк. Войдите через Apple ещё раз.",
+      "forgotPrompt": "Забыли пароль?",
+      "forgotTitle": "Сброс пароля",
+      "forgotHint": "Введите имя пользователя, и мы отправим ссылку для сброса на указанный адрес электронной почты.",
+      "forgotUsername": "Имя пользователя",
+      "forgotSubmit": "Отправить ссылку для сброса",
+      "forgotSent": "Если для этого имени пользователя есть аккаунт с указанной почтой, мы отправили ссылку для сброса. Проверьте свой почтовый ящик.",
+      "forgotBack": "Вернуться ко входу",
+      "resetTitle": "Выберите новый пароль",
+      "resetNewPassword": "Новый пароль",
+      "resetConfirm": "Подтвердите новый пароль",
+      "resetSubmit": "Обновить пароль",
+      "resetDone": "Ваш пароль обновлён. Теперь вы можете войти.",
+      "resetMismatch": "Пароли не совпадают.",
+      "resetErrInvalid": "Эта ссылка для сброса недействительна или истекла. Запросите новую."
+    },
     "loot": {
       "chestTitle": "Сундук"
     },
@@ -1296,6 +1416,8 @@ export const ru_RU: EnTranslations = {
       "parcelsLabel": "Посылки",
       "parcelsHint": "Нажмите на предмет в сумке, чтобы приложить его.",
       "removeParcelAria": "Убрать {item} из письма",
+      "parcelQtyDecreaseAria": "Отправить на один {item} меньше",
+      "parcelQtyIncreaseAria": "Отправить на один {item} больше",
       "sendButton": "Отправить письмо",
       "postageNote": "Почтовый сбор: {amount}. Ворон летит около {seconds} с.",
       "arrivedBanner": "Ворон прилетел: письмо от {name}.",
@@ -3900,7 +4022,17 @@ export const ru_RU: EnTranslations = {
     "enterTimeout": "Не удалось войти в мир. Время подключения истекло. Запущен ли игровой сервер?",
     "connectionLost": "Соединение с сервером потеряно.",
     "reconnecting": "Соединение потеряно. Повторное подключение...",
-    "connectionRejected": "Сервер закрыл соединение."
+    "connectionRejected": "Сервер закрыл соединение.",
+    "tips": {
+      "classes": "Совет: все 9 классов играются по-разному. Попробуйте несколько, прежде чем выбрать один.",
+      "talents": "Совет: вы можете сбросить таланты в любое время вне боя, так что ранний выбор никогда не станет ловушкой.",
+      "dungeons": "Совет: попробуйте героическую сложность подземелья, когда переросли обычную, ради более сложного и выгодного боя.",
+      "market": "Совет: на Мировом рынке можно покупать и продавать вещи игрокам всего мира.",
+      "guilds": "Совет: вступление в гильдию даёт личный чат-канал и общий список соратников по гильдии.",
+      "professions": "Совет: сбор и крафтовые профессии можно развивать параллельно с боевым классом.",
+      "loadouts": "Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.",
+      "pvp": "Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд."
+    }
   },
   "errors": {
     "nothingInteract": "Нет объекта для взаимодействия.",
@@ -4895,6 +5027,8 @@ export const ru_RU: EnTranslations = {
       "buybackTitle": "Выкуп",
       "buybackEmpty": "Нет предметов",
       "buybackAria": "Выкупить {item} за {price}",
+      "sellItemAria": "Продать {item} за {price}",
+      "sellRolledWarning": "Случайные характеристики нельзя вернуть выкупом.",
       "sellQuantityTitle": "Продать {item}",
       "sellQuantityInput": "Количество для продажи",
       "sellQuantityConfirm": "Продать",
@@ -5818,6 +5952,9 @@ export const ru_RU: EnTranslations = {
       "greyjaw_fang": {
         "name": "Клык старого Серочелюста"
       },
+      "chunk_of_ore": {
+        "name": "Кусок руды"
+      },
       "weathered_ledger_page": {
         "name": "Выветренная страница книги учета"
       },
@@ -5847,6 +5984,15 @@ export const ru_RU: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Лоскут льна"
+      },
+      "arcane_dust": {
+        "name": "Тайная пыль"
+      },
+      "arcane_essence": {
+        "name": "Тайная эссенция"
+      },
+      "arcane_shard": {
+        "name": "Тайный осколок"
       },
       "fen_muster_order": {
         "name": "Приказ о сборе в Фенбридже"
@@ -7489,6 +7635,16 @@ export const ru_RU: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "Ремесло для каждой руки",
+        "text": "Каждая душа в Иствруке владеет ремеслом помимо меча, {playerName}. Вокруг города разбросаны рудные жилы - возьми кирку и принеси мне 5 кусков руды. Добудь их сам, учти: я отличу.",
+        "completion": "Видишь? Руда в котомке, мозоли на руках. Продолжай добывать руду, валить лес и собирать травы в пути - а вернувшись в город, загляни на доску городского фокуса у рынка и на ближайший верстак. Честное ремесло ждёт тебя во всём этом, если пожелаешь.",
+        "objectives": {
+          "0": {
+            "label": "Кусок руды"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Волки у дверей",
         "text": "Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.",

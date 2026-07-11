@@ -154,6 +154,14 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "readyCheck": {
+      "prompt": "{name} が準備確認を開始しました。準備はいいですか？",
+      "ready": "準備完了",
+      "notReady": "準備未完了",
+      "result": "準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。",
+      "notInPartyError": "準備確認を開始するにはパーティーに参加している必要があります。",
+      "inProgressError": "準備確認はすでに進行中です。"
+    },
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
@@ -232,7 +240,8 @@ export const ja_JP: EnTranslations = {
         "eligible": "報酬が解放されました。",
         "no_wallet": "$20 USD 相当以上のWOCを保有するウォレットを接続してください。",
         "under_minimum": "ウォレットが最低額の $20 USD 相当のWOCを下回っています。",
-        "price_unavailable": "WOCの価格を取得できないため、報酬は一時的にロックされています。"
+        "price_unavailable": "WOCの価格を取得できないため、報酬は一時的にロックされています。",
+        "banned": "デイリー報酬への参加が禁止されています。理由: {reason}"
       }
     },
     "theme": {
@@ -306,7 +315,6 @@ export const ja_JP: EnTranslations = {
       "chat": "チャットへスキップ"
     },
     "mobile": {
-      "autorun": "オートラン",
       "jump": "ジャンプ",
       "leaderboard": "ランキング",
       "dailyRewards": "報酬",
@@ -314,6 +322,8 @@ export const ja_JP: EnTranslations = {
       "haptics": "振動",
       "hapticsOff": "振動オフ",
       "toggleHaptics": "振動を切り替え",
+      "showMenuButtons": "メニューボタンを表示",
+      "hideMenuButtons": "メニューボタンを非表示",
       "hotbarPage": "スキル",
       "hotbarPageAria": "次のスキルセットを表示",
       "actionRing": "戦闘アクション",
@@ -397,7 +407,13 @@ export const ja_JP: EnTranslations = {
       "targetFriendly": "最も近い味方をターゲット",
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
       "discord": "Discord",
-      "valecup": "ヴェイルカップ"
+      "valecup": "ヴェイルカップ",
+      "categoryPet": "ペット",
+      "petAttack": "ペット：攻撃",
+      "petStop": "ペット：停止",
+      "petTaunt": "ペット：挑発",
+      "petDefensive": "ペット：防御",
+      "petAggressive": "ペット：攻撃的"
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -572,7 +588,84 @@ export const ja_JP: EnTranslations = {
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト"
+      "mobileLeftHanded": "左利き用レイアウト",
+      "ia": {
+        "railDisplay": "表示",
+        "railInput": "入力",
+        "railSystem": "システム",
+        "catOverviewName": "概要",
+        "catOverviewSub": "よく使う項目、クイック操作、変更点をまとめて表示します。",
+        "catGraphicsSub": "画質、視界、世界の見た目。",
+        "catInterfaceSub": "HUDの拡大率、パネル、チャット、ユニットフレーム。",
+        "catAccessibilityName": "アクセシビリティ",
+        "catAccessibilitySub": "モーション、コントラスト、コンテンツの快適さ。",
+        "catControlsName": "操作",
+        "catControlsSub": "カメラ、移動、戦闘、フィードバック。",
+        "catKeybindsSub": "すべての操作にキーを割り当てます。",
+        "catControllerSub": "ゲームパッドの操作感とボタン配置。",
+        "catTouchName": "タッチ",
+        "catTouchSub": "画面上のスティック、視点、ボタン。",
+        "catAudioSub": "音量とサウンドの切り替え。",
+        "catSystemName": "システム",
+        "catSystemSub": "パフォーマンス、サポート、バージョン情報。"
+      },
+      "done": "完了",
+      "resetAllTitle": "すべての設定をリセットしますか？",
+      "resetAllBody": "すべての設定を初期値に戻します。この操作は元に戻せません。",
+      "searchPlaceholder": "設定を検索",
+      "searchScopeAll": "すべての設定",
+      "searchScopeThis": "このセクション",
+      "searchEmpty": "検索に一致する設定はありません。",
+      "searchGoTo": "{category}へ移動",
+      "modeOnline": "オンライン",
+      "modeOffline": "オフライン",
+      "changed": "{count} 件変更",
+      "changedSummary": "初期値から {count} 件変更",
+      "legend": {
+        "category": "カテゴリ",
+        "navigate": "移動",
+        "select": "決定",
+        "back": "戻る",
+        "reset": "リセット",
+        "clear": "クリア",
+        "page": "ページ"
+      },
+      "keybindCleared": "{action} をクリアしました",
+      "keybindRebinding": "{action} を再割り当て中です。キーを押すか、Esc でキャンセルしてください。",
+      "keybindEvicted": "{key} を {action} に割り当てました。{evicted} からは解除されました。",
+      "keybindTaken": "キー解除",
+      "keybindUnbound": "{action}にキーが割り当てられていません",
+      "keybindModifierHint": "ヒント：修飾キーの組み合わせを割り当てられます。Shift、Ctrl、Alt のいずれかを押しながらキーを押すと、その組み合わせが登録されます（例：Shift+1）。",
+      "conflictDot": "キー競合",
+      "overviewConflictAlert": "一部のキー割り当てが競合しているか未設定です。",
+      "sec": {
+        "quality": "品質",
+        "view": "視野",
+        "general": "一般",
+        "scaleText": "拡大と文字",
+        "panels": "パネル",
+        "unitFrames": "ユニットフレーム",
+        "actionBars": "アクションバー",
+        "chat": "チャット",
+        "combatTooltips": "戦闘とツールチップ",
+        "hudExtras": "HUD の追加項目",
+        "motionContrast": "モーションとコントラスト",
+        "content": "コンテンツ",
+        "camera": "カメラ",
+        "movement": "移動",
+        "combat": "戦闘",
+        "feedback": "フィードバック",
+        "inputMode": "入力モード",
+        "feel": "操作感",
+        "sticks": "スティック",
+        "look": "視点",
+        "buttons": "ボタン",
+        "volume": "音量",
+        "toggles": "切り替え",
+        "performance": "パフォーマンス",
+        "support": "サポート",
+        "about": "情報"
+      }
     },
     "controller": {
       "title": "コントローラー",
@@ -584,7 +677,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
-      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
+      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。",
+      "duplicate": "{buttons} にも割り当て済み"
     },
     "perf": {
       "title": "パフォーマンスオーバーレイ",
@@ -717,11 +811,17 @@ export const ja_JP: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "ビルド {n}"
+      "defaultBuildName": "ビルド {n}",
+      "choicesTab": "選択",
+      "resetChoices": "選択をリセット",
+      "tierLevel": "レベル {n}",
+      "tierLevelLabel": "レベル"
     },
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
+    "itemHeroicTag": "[ヒロイック]",
+    "itemSoulbound": "魂縛",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1067,6 +1167,26 @@ export const ja_JP: EnTranslations = {
     "worldBoss": {
       "spawn": "{name}がソーンピーク高地に立ち上がった！"
     },
+    "auth": {
+      "appleLoginCta": "Appleで続ける",
+      "appleError": "Appleでサインインできませんでした。もう一度お試しください。",
+      "appleChoiceIntro": "新しいアカウントを作成するか、Appleを既存のアカウントに連携します。",
+      "appleChoiceExpired": "Appleでのサインインの有効期限が切れました。もう一度お試しください。",
+      "forgotPrompt": "パスワードをお忘れですか？",
+      "forgotTitle": "パスワードをリセット",
+      "forgotHint": "ユーザー名を入力してください。登録されているメールアドレスにリセットリンクをお送りします。",
+      "forgotUsername": "ユーザー名",
+      "forgotSubmit": "リセットリンクを送信",
+      "forgotSent": "そのユーザー名のアカウントにメールアドレスが登録されている場合、リセットリンクを送信しました。受信トレイをご確認ください。",
+      "forgotBack": "ログインに戻る",
+      "resetTitle": "新しいパスワードを設定",
+      "resetNewPassword": "新しいパスワード",
+      "resetConfirm": "新しいパスワード（確認）",
+      "resetSubmit": "パスワードを更新",
+      "resetDone": "パスワードを更新しました。ログインできます。",
+      "resetMismatch": "パスワードが一致しません。",
+      "resetErrInvalid": "このリセットリンクは無効か、有効期限が切れています。新しいリンクをリクエストしてください。"
+    },
     "loot": {
       "chestTitle": "宝箱"
     },
@@ -1296,6 +1416,8 @@ export const ja_JP: EnTranslations = {
       "parcelsLabel": "小包",
       "parcelsHint": "バッグ内のアイテムをクリックして添付します。",
       "removeParcelAria": "手紙から{item}を取り除く",
+      "parcelQtyDecreaseAria": "{item}を1つ減らして送る",
+      "parcelQtyIncreaseAria": "{item}を1つ増やして送る",
       "sendButton": "手紙を送る",
       "postageNote": "郵送料：{amount}。ワタリガラスの飛行時間は約{seconds}秒です。",
       "arrivedBanner": "ワタリガラスが到着：{name}からの手紙。",
@@ -3900,7 +4022,17 @@ export const ja_JP: EnTranslations = {
     "enterTimeout": "世界に入れませんでした。接続がタイムアウトしました。ゲームサーバーは動作していますか？",
     "connectionLost": "サーバーとの接続が切断されました。",
     "reconnecting": "サーバーとの接続が切断されました。再接続しています...",
-    "connectionRejected": "サーバーが接続を閉じました。"
+    "connectionRejected": "サーバーが接続を閉じました。",
+    "tips": {
+      "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
+      "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",
+      "dungeons": "ヒント：通常難易度の装備が整ったら、より歯応えのあるヒロイック難易度のダンジョンに挑戦してみましょう。",
+      "market": "ヒント：ワールドマーケットではサーバー中のプレイヤーと売買ができます。",
+      "guilds": "ヒント：ギルドに加入すると専用のチャットチャンネルとギルドメンバーの名簿が使えるようになります。",
+      "professions": "ヒント：採集や製作の生産系スキルは、戦闘クラスと並行して育てられます。",
+      "loadouts": "ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。",
+      "pvp": "ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。"
+    }
   },
   "errors": {
     "nothingInteract": "操作できるものがありません。",
@@ -4895,6 +5027,8 @@ export const ja_JP: EnTranslations = {
       "buybackTitle": "買い戻し",
       "buybackEmpty": "アイテムなし",
       "buybackAria": "{item}を{price}で買い戻す",
+      "sellItemAria": "{item}を{price}で売却",
+      "sellRolledWarning": "ランダムな性能は買い戻しでは戻せません。",
       "sellQuantityTitle": "{item}を売却",
       "sellQuantityInput": "売却する数量",
       "sellQuantityConfirm": "売却",
@@ -5818,6 +5952,9 @@ export const ja_JP: EnTranslations = {
       "greyjaw_fang": {
         "name": "老グレイジョーの牙"
       },
+      "chunk_of_ore": {
+        "name": "鉱石のかけら"
+      },
       "weathered_ledger_page": {
         "name": "風化した帳簿のページ"
       },
@@ -5847,6 +5984,15 @@ export const ja_JP: EnTranslations = {
       },
       "linen_scrap": {
         "name": "リネンの切れ端"
+      },
+      "arcane_dust": {
+        "name": "秘術の粉塵"
+      },
+      "arcane_essence": {
+        "name": "秘術の精髄"
+      },
+      "arcane_shard": {
+        "name": "秘術のかけら"
       },
       "fen_muster_order": {
         "name": "フェンブリッジ召集令"
@@ -7489,6 +7635,16 @@ export const ja_JP: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "剣以外にも稼ぎはある",
+        "text": "イーストブルックの誰もが剣以外の生業を持っているものだ、{playerName}。町の周りに鉱脈が散らばっている。つるはしを振るって鉱石を5個持ってきてくれ。自分で採掘するんだぞ、見ればわかる。",
+        "completion": "どうだ？鞄には鉱石、手にはマメだ。旅の道中も採掘、伐採、薬草採取を続けるといい。町に戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も気にかけてくれ。その気があれば、どれも実入りのいい仕事になる。",
+        "objectives": {
+          "0": {
+            "label": "鉱石のかけら"
+          }
+        }
+      },
       "q_wolves": {
         "title": "戸口の狼",
         "text": "森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。",

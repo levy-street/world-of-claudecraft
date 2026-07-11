@@ -14,6 +14,94 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'itemUi.vendor.sellItemAria': 'Продать {item} за {price}',
+  'hudChrome.itemHeroicTag': '[ГЕРОИЧЕСКИЙ]',
+  'hudChrome.options.done': 'Готово',
+  'hudChrome.options.keybindUnbound': 'Для действия «{action}» не назначена клавиша',
+  'hudChrome.options.legend.back': 'Назад',
+  'hudChrome.options.legend.page': 'Страница',
+  'hudChrome.options.searchGoTo': 'Перейти к разделу «{category}»',
+  'hudChrome.options.sec.chat': 'Чат',
+  'hudChrome.options.sec.feel': 'Ощущения',
+  'hudChrome.options.sec.look': 'Обзор',
+  'hudChrome.options.sec.view': 'Обзор',
+  'hudChrome.readyCheck.notInPartyError':
+    'Чтобы начать проверку готовности, вы должны состоять в группе.',
+  'hudChrome.readyCheck.inProgressError': 'Проверка готовности уже идёт.',
+  // Esc menu redesign (The Warden's Codex): category-rail IA (options_ia.ts).
+  'hudChrome.options.ia.railDisplay': 'Экран',
+  'hudChrome.options.ia.railInput': 'Ввод',
+  'hudChrome.options.ia.railSystem': 'Система',
+  'hudChrome.options.ia.catOverviewName': 'Обзор',
+  'hudChrome.options.ia.catOverviewSub':
+    'Закрепленные настройки, быстрые действия и что изменилось.',
+  'hudChrome.options.ia.catGraphicsSub': 'Качество, обзор и вид мира.',
+  'hudChrome.options.ia.catInterfaceSub': 'Масштаб интерфейса, панели, чат и рамки юнитов.',
+  'hudChrome.options.ia.catAccessibilityName': 'Доступность',
+  'hudChrome.options.ia.catAccessibilitySub': 'Анимация, контраст и комфорт контента.',
+  'hudChrome.options.ia.catControlsName': 'Управление',
+  'hudChrome.options.ia.catControlsSub': 'Камера, движение, бой и отклик.',
+  'hudChrome.options.ia.catKeybindsSub': 'Назначьте клавиши для всех действий.',
+  'hudChrome.options.ia.catControllerSub': 'Отклик геймпада и раскладка кнопок.',
+  'hudChrome.options.ia.catTouchName': 'Сенсор',
+  'hudChrome.options.ia.catTouchSub': 'Экранные стики, обзор и кнопки.',
+  'hudChrome.options.ia.catAudioSub': 'Громкость и переключатели звука.',
+  'hudChrome.options.ia.catSystemName': 'Система',
+  'hudChrome.options.ia.catSystemSub': 'Производительность, поддержка и о программе.',
+  // Esc menu redesign P2 (desktop chrome): search strip, reset-all confirm,
+  // status block, and the section heads. M16 fills.
+  'hudChrome.options.resetAllTitle': 'Сбросить все настройки?',
+  'hudChrome.options.resetAllBody':
+    'Все настройки вернутся к значениям по умолчанию. Это действие нельзя отменить.',
+  'hudChrome.options.searchPlaceholder': 'Поиск настроек',
+  'hudChrome.options.searchScopeAll': 'Все настройки',
+  'hudChrome.options.searchScopeThis': 'Этот раздел',
+  'hudChrome.options.searchEmpty': 'Нет настроек, соответствующих запросу.',
+  'hudChrome.options.modeOnline': 'В сети',
+  'hudChrome.options.modeOffline': 'Не в сети',
+  'hudChrome.options.changed': 'Изменено: {count}',
+  'hudChrome.options.changedSummary': 'Изменено относительно стандартных: {count}',
+  'hudChrome.options.legend.category': 'Категория',
+  'hudChrome.options.legend.navigate': 'Навигация',
+  'hudChrome.options.legend.select': 'Выбрать',
+  'hudChrome.options.legend.reset': 'Сброс',
+  'hudChrome.options.legend.clear': 'Очистить',
+  'hudChrome.options.keybindCleared': 'Очищено: {action}',
+  'hudChrome.options.keybindRebinding':
+    'Переназначение «{action}». Нажмите клавишу или Escape для отмены.',
+  'hudChrome.options.keybindEvicted': '{key} назначена на «{action}»; снята с «{evicted}».',
+  'hudChrome.options.keybindTaken': 'Клавиша снята',
+  'hudChrome.options.conflictDot': 'Конфликт клавиш',
+  'hudChrome.options.overviewConflictAlert':
+    'Некоторые привязки клавиш конфликтуют или не назначены.',
+  'hudChrome.controller.duplicate': 'Также назначено на {buttons}',
+  'hudChrome.options.sec.quality': 'Качество',
+  'hudChrome.options.sec.general': 'Основные',
+  'hudChrome.options.sec.scaleText': 'Масштаб и текст',
+  'hudChrome.options.sec.panels': 'Панели',
+  'hudChrome.options.sec.unitFrames': 'Рамки существ',
+  'hudChrome.options.sec.actionBars': 'Панели действий',
+  'hudChrome.options.sec.combatTooltips': 'Бой и подсказки',
+  'hudChrome.options.sec.hudExtras': 'Дополнения интерфейса',
+  'hudChrome.options.sec.motionContrast': 'Анимация и контраст',
+  'hudChrome.options.sec.content': 'Содержимое',
+  'hudChrome.options.sec.camera': 'Камера',
+  'hudChrome.options.sec.movement': 'Движение',
+  'hudChrome.options.sec.combat': 'Бой',
+  'hudChrome.options.sec.feedback': 'Отклик',
+  'hudChrome.options.sec.inputMode': 'Режим ввода',
+  'hudChrome.options.sec.sticks': 'Стики',
+  'hudChrome.options.sec.buttons': 'Кнопки',
+  'hudChrome.options.sec.volume': 'Громкость',
+  'hudChrome.options.sec.toggles': 'Переключатели',
+  'hudChrome.options.sec.performance': 'Производительность',
+  'hudChrome.options.sec.support': 'Поддержка',
+  'hudChrome.options.sec.about': 'О программе',
+  'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',
+  'hudChrome.auth.appleError': 'Не удалось войти через Apple. Попробуйте ещё раз.',
+  'hudChrome.auth.appleChoiceIntro':
+    'Создайте новую учётную запись или привяжите Apple к существующей.',
+  'hudChrome.auth.appleChoiceExpired': 'Вход через Apple истёк. Войдите через Apple ещё раз.',
   'hudChrome.vcup.guildBoardWl': '{wins} побед, {losses} поражений',
   'hudChrome.vcup.shootPower': 'СИЛА',
   'hudChrome.discord.roleTag.coredevs': 'Ведущий разработчик',
@@ -32,6 +120,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': 'Кому',
   'itemUi.kind.bag': 'Сумка',
   'itemUi.tooltip.bagSlots': 'Сумка на {slots} ячеек',
+  'hudChrome.auth.forgotPrompt': 'Забыли пароль?',
+  'hudChrome.auth.forgotTitle': 'Сброс пароля',
+  'hudChrome.auth.forgotHint':
+    'Введите имя пользователя, и мы отправим ссылку для сброса на указанный адрес электронной почты.',
+  'hudChrome.auth.forgotUsername': 'Имя пользователя',
+  'hudChrome.auth.forgotSubmit': 'Отправить ссылку для сброса',
+  'hudChrome.auth.forgotSent':
+    'Если для этого имени пользователя есть аккаунт с указанной почтой, мы отправили ссылку для сброса. Проверьте свой почтовый ящик.',
+  'hudChrome.auth.forgotBack': 'Вернуться ко входу',
+  'hudChrome.auth.resetTitle': 'Выберите новый пароль',
+  'hudChrome.auth.resetNewPassword': 'Новый пароль',
+  'hudChrome.auth.resetConfirm': 'Подтвердите новый пароль',
+  'hudChrome.auth.resetSubmit': 'Обновить пароль',
+  'hudChrome.auth.resetDone': 'Ваш пароль обновлён. Теперь вы можете войти.',
+  'hudChrome.auth.resetMismatch': 'Пароли не совпадают.',
+  'hudChrome.auth.resetErrInvalid':
+    'Эта ссылка для сброса недействительна или истекла. Запросите новую.',
+  // Guild roster last-seen (M16 non-Latin fill)
   'hudChrome.social.lastSeen': 'Последний вход: {when}',
   'hudChrome.social.lastSeenNever': 'никогда',
   'hudChrome.dailyRewards.title': 'Ежедневные награды',
@@ -83,8 +189,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.under_minimum': 'Кошелек ниже минимума в $20 USD WOC.',
   'hudChrome.dailyRewards.reason.price_unavailable':
     'Цена WOC недоступна, награды временно заблокированы.',
+  'hudChrome.dailyRewards.reason.banned':
+    'Вам запрещено участвовать в ежедневных наградах. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
+  'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
+  'hudChrome.readyCheck.ready': 'Готов',
+  'hudChrome.readyCheck.notReady': 'Не готов',
+  'hudChrome.readyCheck.result':
+    'Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.',
   'hudChrome.loot.chestTitle': 'Сундук',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
@@ -398,6 +511,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.lockCursorOnRotate': 'Блокировать курсор при вращении',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.',
+  'hudChrome.options.keybindModifierHint':
+    'Совет: можно назначать сочетания с модификатором. Удерживайте Shift, Ctrl или Alt и нажмите клавишу, чтобы записать сочетание (например, Shift+1).',
   'hudChrome.options.showWalletOnCharacterScreen': 'Показывать кошелек на экране персонажей',
   'hudChrome.options.showWalletOnPlayerCard': 'Показывать кошелек на карточке игрока',
   'hudChrome.options.showDevBadges': 'Показывать значки разработчика',
@@ -416,6 +531,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrastAria':
     'Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым',
   'hudChrome.talents.defaultBuildName': 'Билд {n}',
+  'hudChrome.talents.choicesTab': 'Выбор талантов',
+  'hudChrome.talents.resetChoices': 'Сбросить выбор',
+  'hudChrome.talents.tierLevel': 'Уровень {n}',
+  'hudChrome.talents.tierLevelLabel': 'Уровень',
   'hudChrome.tips.joinChannels':
     'Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру.',
   'meta.builtOn': 'Сборка от {date}',
@@ -1691,6 +1810,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.buybackTitle': 'Выкуп',
   'itemUi.vendor.buybackEmpty': 'Нет предметов',
   'itemUi.vendor.buybackAria': 'Выкупить {item} за {price}',
+  'itemUi.vendor.sellRolledWarning': 'Случайные характеристики нельзя вернуть выкупом.',
   'itemUi.vendor.sellQuantityTitle': 'Продать {item}',
   'itemUi.vendor.sellQuantityInput': 'Количество для продажи',
   'itemUi.vendor.sellQuantityConfirm': 'Продать',
@@ -2319,6 +2439,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.webwood_silk.name': 'Шёлковая железа Сейблвеба',
   'entities.items.supply_crate.name': 'Украденный ящик припасов',
   'entities.items.greyjaw_fang.name': 'Клык старого Серочелюста',
+  'entities.items.chunk_of_ore.name': 'Кусок руды',
   'entities.items.weathered_ledger_page.name': 'Выветренная страница книги учета',
   'entities.items.morthen_grimoire.name': 'Гримуар Мортена',
   'entities.items.wolf_fang.name': 'Треснувший волчий клык',
@@ -2333,6 +2454,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': 'Жирный кусок сала',
   'entities.items.spider_leg.name': 'Дергающаяся нога паука',
   'entities.items.bone_fragments.name': 'Фрагменты костей',
+  'entities.items.arcane_dust.name': 'Тайная пыль',
+  'entities.items.arcane_essence.name': 'Тайная эссенция',
+  'entities.items.arcane_shard.name': 'Тайный осколок',
   'entities.items.linen_scrap.name': 'Лоскут льна',
   'entities.items.fen_muster_order.name': 'Приказ о сборе в Фенбридже',
   'entities.items.mire_prowler_pelt.name': 'Шкура болотного хищника',
@@ -2694,6 +2818,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewatcher_ondrel.title': 'Страж приливов',
   'entities.npcs.tidewatcher_ondrel.greeting':
     'Омут пьёт лунный свет, {className}, и возвращает утопленников. Тридцать ночей я наблюдаю за теми вратами — и нынче ночью они открыты.',
+  'entities.quests.q_prof_intro.title': 'Ремесло для каждой руки',
+  'entities.quests.q_prof_intro.text':
+    'Каждая душа в Иствруке владеет ремеслом помимо меча, {playerName}. Вокруг города разбросаны рудные жилы - возьми кирку и принеси мне 5 кусков руды. Добудь их сам, учти: я отличу.',
+  'entities.quests.q_prof_intro.completion':
+    'Видишь? Руда в котомке, мозоли на руках. Продолжай добывать руду, валить лес и собирать травы в пути - а вернувшись в город, загляни на доску городского фокуса у рынка и на ближайший верстак. Честное ремесло ждёт тебя во всём этом, если пожелаешь.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Кусок руды',
   'entities.quests.q_wolves.title': 'Волки у дверей',
   'entities.quests.q_wolves.text':
     'Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.',
@@ -3627,7 +3757,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.seconds': '{s} сек.',
   'hudChrome.mobile.actionPageToggle': 'Переключить страницу действий',
   'hudChrome.mobile.actionRing': 'Боевые действия',
-  'hudChrome.mobile.autorun': 'Автобег',
   'hudChrome.mobile.haptics': 'Вибрация',
   'hudChrome.mobile.hapticsOff': 'Вибрация выкл.',
   'hudChrome.mobile.hotbarPage': 'Навыки',
@@ -3639,6 +3768,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycle': 'Сменить цель',
   'hudChrome.mobile.targetCycleShort': 'Цель',
   'hudChrome.mobile.toggleHaptics': 'Вкл/выкл вибрацию',
+  'hudChrome.mobile.showMenuButtons': 'Показать кнопки меню',
+  'hudChrome.mobile.hideMenuButtons': 'Скрыть кнопки меню',
   'hudChrome.rest.resting': 'Отдых',
   'hudChrome.swing.ready': 'Замах',
   'hudChrome.swing.seconds': '{seconds} сек.',
@@ -3695,7 +3826,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Сбросить раскладку кнопок',
   'hudChrome.controller.menuAction': 'Игровое меню',
   'hudChrome.controller.help':
-    'Левый стик — движение, правый — камера. Откройте окно, чтобы использовать экранный указатель.',
+    'Левый стик отвечает за движение, правый наводит камеру. Откройте окно, чтобы использовать экранный указатель.',
   'hud.tutorial.title': 'Новый искатель приключений',
   'hud.tutorial.stepLabel': 'Шаг {current} из {total}',
   'hud.tutorial.skip': 'Пропустить обучение',
@@ -5353,6 +5484,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ловкость повышается на 15, вероятность критического удара на 2%.',
   'entities.itemSets.wyrmshadow.bonus4':
     'Критические удары оружием с вероятностью 50% даруют «Клыкастый порыв», увеличивая скорость атаки на 25% на 8 сек.',
+  'hudChrome.itemSoulbound': 'Персональный',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Шанс от уронных заклинаний ({chance}%): {effect}',
@@ -6181,6 +6313,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.parcelsLabel': 'Посылки',
   'hudChrome.mailbox.parcelsHint': 'Нажмите на предмет в сумке, чтобы приложить его.',
   'hudChrome.mailbox.removeParcelAria': 'Убрать {item} из письма',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Отправить на один {item} меньше',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Отправить на один {item} больше',
   'hudChrome.mailbox.sendButton': 'Отправить письмо',
   'hudChrome.mailbox.postageNote': 'Почтовый сбор: {amount}. Ворон летит около {seconds} с.',
   'hudChrome.mailbox.arrivedBanner': 'Ворон прилетел: письмо от {name}.',
@@ -6323,6 +6457,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение...',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
+  'hudChrome.keybinds.categoryPet': 'Питомец',
+  'hudChrome.keybinds.petAttack': 'Питомец: атака',
+  'hudChrome.keybinds.petStop': 'Питомец: стоп',
+  'hudChrome.keybinds.petTaunt': 'Питомец: провокация',
+  'hudChrome.keybinds.petDefensive': 'Питомец: защита',
+  'hudChrome.keybinds.petAggressive': 'Питомец: агрессия',
   'hudChrome.vcup.title': 'Кубок Долины',
   'hudChrome.vcup.close': 'Закрыть окно Кубка Долины',
   'hudChrome.vcup.offlineNote': 'Книга матчей закрыта. Кубок Долины сейчас недоступен.',
@@ -6580,4 +6720,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.',
   'hudChrome.bank.bonusSectionAria': 'Бонусные ячейки банка и способы их получить',
   'entities.mobs.yumi_cat.name': 'Юми',
+  'loading.tips.classes':
+    'Совет: все 9 классов играются по-разному. Попробуйте несколько, прежде чем выбрать один.',
+  'loading.tips.talents':
+    'Совет: вы можете сбросить таланты в любое время вне боя, так что ранний выбор никогда не станет ловушкой.',
+  'loading.tips.dungeons':
+    'Совет: попробуйте героическую сложность подземелья, когда переросли обычную, ради более сложного и выгодного боя.',
+  'loading.tips.market':
+    'Совет: на Мировом рынке можно покупать и продавать вещи игрокам всего мира.',
+  'loading.tips.guilds':
+    'Совет: вступление в гильдию даёт личный чат-канал и общий список соратников по гильдии.',
+  'loading.tips.professions':
+    'Совет: сбор и крафтовые профессии можно развивать параллельно с боевым классом.',
+  'loading.tips.loadouts':
+    'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
+  'loading.tips.pvp':
+    'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
 };

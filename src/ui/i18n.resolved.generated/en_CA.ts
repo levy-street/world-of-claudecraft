@@ -154,6 +154,14 @@ export const en_CA: EnTranslations = {
     "spectate": {
       "banner": "Spectating {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} has started a ready check. Are you ready?",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.",
+      "notInPartyError": "You must be in a party to start a ready check.",
+      "inProgressError": "A ready check is already in progress."
+    },
     "death": {
       "resurrectAtCorpse": "Resurrect at Corpse",
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
@@ -232,7 +240,8 @@ export const en_CA: EnTranslations = {
         "eligible": "Rewards unlocked.",
         "no_wallet": "Connect a wallet with at least $20 USD in WOC.",
         "under_minimum": "Wallet is below the $20 USD WOC minimum.",
-        "price_unavailable": "WOC price is unavailable, rewards are temporarily locked."
+        "price_unavailable": "WOC price is unavailable, rewards are temporarily locked.",
+        "banned": "You are banned from Daily Rewards. Reason: {reason}"
       }
     },
     "theme": {
@@ -306,7 +315,6 @@ export const en_CA: EnTranslations = {
       "chat": "Skip to Chat"
     },
     "mobile": {
-      "autorun": "Auto",
       "jump": "Jump",
       "leaderboard": "Ranks",
       "dailyRewards": "Rewards",
@@ -314,6 +322,8 @@ export const en_CA: EnTranslations = {
       "haptics": "Haptics",
       "hapticsOff": "Haptics Off",
       "toggleHaptics": "Toggle haptics",
+      "showMenuButtons": "Show menu buttons",
+      "hideMenuButtons": "Hide menu buttons",
       "hotbarPage": "Skills",
       "hotbarPageAria": "Show next set of skills",
       "actionRing": "Combat actions",
@@ -397,7 +407,13 @@ export const en_CA: EnTranslations = {
       "targetFriendly": "Target Nearest Friendly",
       "targetFriendlyNext": "Cycle Friendly Target",
       "discord": "Discord",
-      "valecup": "Vale Cup"
+      "valecup": "Vale Cup",
+      "categoryPet": "Pet",
+      "petAttack": "Pet: Attack",
+      "petStop": "Pet: Stop",
+      "petTaunt": "Pet: Taunt",
+      "petDefensive": "Pet: Defensive",
+      "petAggressive": "Pet: Aggressive"
     },
     "vcup": {
       "title": "The Vale Cup",
@@ -572,7 +588,84 @@ export const en_CA: EnTranslations = {
       "showSecondaryActionBar": "Show Secondary Action Bar",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
-      "mobileLeftHanded": "Left-handed layout"
+      "mobileLeftHanded": "Left-handed layout",
+      "ia": {
+        "railDisplay": "Display",
+        "railInput": "Input",
+        "railSystem": "System",
+        "catOverviewName": "Overview",
+        "catOverviewSub": "Pinned essentials, quick actions, and what changed.",
+        "catGraphicsSub": "Quality, view, and world visuals.",
+        "catInterfaceSub": "HUD scale, panels, chat, and unit frames.",
+        "catAccessibilityName": "Accessibility",
+        "catAccessibilitySub": "Motion, contrast, and content comfort.",
+        "catControlsName": "Controls",
+        "catControlsSub": "Camera, movement, combat, and feedback.",
+        "catKeybindsSub": "Bind keys for every action.",
+        "catControllerSub": "Gamepad feel and button layout.",
+        "catTouchName": "Touch",
+        "catTouchSub": "On-screen sticks, look, and buttons.",
+        "catAudioSub": "Volume and sound toggles.",
+        "catSystemName": "System",
+        "catSystemSub": "Performance, support, and about."
+      },
+      "done": "Done",
+      "resetAllTitle": "Reset all settings?",
+      "resetAllBody": "This restores every setting to its default. This cannot be undone.",
+      "searchPlaceholder": "Search settings",
+      "searchScopeAll": "All settings",
+      "searchScopeThis": "This section",
+      "searchEmpty": "No settings match your search.",
+      "searchGoTo": "Go to {category}",
+      "modeOnline": "Online",
+      "modeOffline": "Offline",
+      "changed": "{count} changed",
+      "changedSummary": "{count} changed from defaults",
+      "legend": {
+        "category": "Category",
+        "navigate": "Navigate",
+        "select": "Select",
+        "back": "Back",
+        "reset": "Reset",
+        "clear": "Clear",
+        "page": "Page"
+      },
+      "keybindCleared": "Cleared {action}",
+      "keybindRebinding": "Rebinding {action}. Press a key, or Escape to cancel.",
+      "keybindEvicted": "Bound {key} to {action}; removed from {evicted}",
+      "keybindTaken": "Key removed",
+      "keybindUnbound": "{action} has no key",
+      "keybindModifierHint": "Tip: you can bind modifier combinations. Hold Shift, Ctrl, or Alt while pressing a key to capture the combo (for example Shift+1).",
+      "conflictDot": "Binding conflict",
+      "overviewConflictAlert": "Some key bindings conflict or are unbound.",
+      "sec": {
+        "quality": "Quality",
+        "view": "View",
+        "general": "General",
+        "scaleText": "Scale and Text",
+        "panels": "Panels",
+        "unitFrames": "Unit Frames",
+        "actionBars": "Action Bars",
+        "chat": "Chat",
+        "combatTooltips": "Combat and Tooltips",
+        "hudExtras": "HUD Extras",
+        "motionContrast": "Motion and Contrast",
+        "content": "Content",
+        "camera": "Camera",
+        "movement": "Movement",
+        "combat": "Combat",
+        "feedback": "Feedback",
+        "inputMode": "Input Mode",
+        "feel": "Feel",
+        "sticks": "Sticks",
+        "look": "Look",
+        "buttons": "Buttons",
+        "volume": "Volume",
+        "toggles": "Toggles",
+        "performance": "Performance",
+        "support": "Support",
+        "about": "About"
+      }
     },
     "controller": {
       "title": "Controller",
@@ -584,7 +677,8 @@ export const en_CA: EnTranslations = {
       "buttons": "Button Layout",
       "resetButtons": "Reset Button Layout",
       "menuAction": "Game Menu",
-      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
+      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer.",
+      "duplicate": "Also bound to {buttons}"
     },
     "perf": {
       "title": "Performance Overlay",
@@ -717,11 +811,17 @@ export const en_CA: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Build {n}"
+      "defaultBuildName": "Build {n}",
+      "choicesTab": "Choices",
+      "resetChoices": "Reset choices",
+      "tierLevel": "Level {n}",
+      "tierLevelLabel": "Level"
     },
     "tips": {
       "joinChannels": "Tip: type /join world or /join lfg to chat with players across the world."
     },
+    "itemHeroicTag": "[HEROIC]",
+    "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1067,6 +1167,26 @@ export const en_CA: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} rises over Thornpeak Heights!"
     },
+    "auth": {
+      "appleLoginCta": "Continue with Apple",
+      "appleError": "Could not sign in with Apple. Please try again.",
+      "appleChoiceIntro": "Create a new account, or link Apple to one you already have.",
+      "appleChoiceExpired": "That Apple sign-in expired. Please sign in with Apple again.",
+      "forgotPrompt": "Forgot password?",
+      "forgotTitle": "Reset your password",
+      "forgotHint": "Enter your username and we will email a reset link to the address on file.",
+      "forgotUsername": "Username",
+      "forgotSubmit": "Send reset link",
+      "forgotSent": "If an account with that username has an email on file, we have sent a reset link. Check your inbox.",
+      "forgotBack": "Back to log in",
+      "resetTitle": "Choose a new password",
+      "resetNewPassword": "New password",
+      "resetConfirm": "Confirm new password",
+      "resetSubmit": "Update password",
+      "resetDone": "Your password has been updated. You can now log in.",
+      "resetMismatch": "The passwords do not match.",
+      "resetErrInvalid": "This reset link is invalid or has expired. Request a new one."
+    },
     "loot": {
       "chestTitle": "Chest"
     },
@@ -1296,6 +1416,8 @@ export const en_CA: EnTranslations = {
       "parcelsLabel": "Parcels",
       "parcelsHint": "Click an item in your bags to attach it.",
       "removeParcelAria": "Remove {item} from the letter",
+      "parcelQtyDecreaseAria": "Send one fewer {item}",
+      "parcelQtyIncreaseAria": "Send one more {item}",
       "sendButton": "Send letter",
       "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
       "arrivedBanner": "The raven has landed: mail from {name}.",
@@ -1739,7 +1861,7 @@ export const en_CA: EnTranslations = {
       "talents": "Talents",
       "arena": "Arena",
       "leaderboard": "Leaderboard",
-      "abilities": "Use action bar abilities (the number row; a second bar sits on the numpad)",
+      "abilities": "Use action bar abilities (the number row plus Q and E; the secondary bar sits on the numpad or Shift+1 to Shift+0)",
       "targetFriendly": "Target nearest friendly",
       "cycleFriendly": "Cycle friendly target",
       "gameMenu": "Open game menu and options",
@@ -3900,7 +4022,17 @@ export const en_CA: EnTranslations = {
     "enterTimeout": "Could not enter world. The connection timed out. Is the game server running?",
     "connectionLost": "Connection to the server was lost.",
     "reconnecting": "Connection lost. Reconnecting...",
-    "connectionRejected": "The server closed the connection."
+    "connectionRejected": "The server closed the connection.",
+    "tips": {
+      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
+      "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
+      "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
+      "guilds": "Tip: joining a guild gives you a private chat channel and a shared roster of your guildmates.",
+      "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
+      "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
+      "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build."
+    }
   },
   "errors": {
     "nothingInteract": "Nothing to interact with.",
@@ -4074,7 +4206,7 @@ export const en_CA: EnTranslations = {
     "title": "Play in Landscape Fullscreen",
     "continue": "Continue to Game",
     "rotateTitle": "Rotate to Landscape",
-    "rotateSub": "Play in landscape fullscreen for the best mobile experience.",
+    "rotateSub": "Portrait mode is not supported. Rotate your device to landscape to continue.",
     "baseLandscape": "Rotate your device to landscape before entering the world.",
     "basePerformance": "Mobile performance may be degraded. Close extra tabs and lower Render Quality if the game feels slow.",
     "iosStandaloneDetail": "You are in home-screen fullscreen mode. Keep the device in landscape.",
@@ -4895,6 +5027,8 @@ export const en_CA: EnTranslations = {
       "buybackTitle": "Buyback",
       "buybackEmpty": "No items",
       "buybackAria": "Buy back {item} for {price}",
+      "sellItemAria": "Sell {item} for {price}",
+      "sellRolledWarning": "Rolled stats cannot be recovered by buyback.",
       "sellQuantityTitle": "Sell {item}",
       "sellQuantityInput": "Quantity to sell",
       "sellQuantityConfirm": "Sell",
@@ -5818,6 +5952,9 @@ export const en_CA: EnTranslations = {
       "greyjaw_fang": {
         "name": "Old Greyjaw's Fang"
       },
+      "chunk_of_ore": {
+        "name": "Chunk of Ore"
+      },
       "weathered_ledger_page": {
         "name": "Weathered Ledger Page"
       },
@@ -5847,6 +5984,15 @@ export const en_CA: EnTranslations = {
       },
       "linen_scrap": {
         "name": "Linen Scrap"
+      },
+      "arcane_dust": {
+        "name": "Arcane Dust"
+      },
+      "arcane_essence": {
+        "name": "Arcane Essence"
+      },
+      "arcane_shard": {
+        "name": "Arcane Shard"
       },
       "fen_muster_order": {
         "name": "Fenbridge Muster Order"
@@ -7489,6 +7635,16 @@ export const en_CA: EnTranslations = {
       }
     },
     "quests": {
+      "q_prof_intro": {
+        "title": "A Trade for Every Hand",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins scattered round town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "objectives": {
+          "0": {
+            "label": "Chunk of Ore"
+          }
+        }
+      },
       "q_wolves": {
         "title": "Wolves at the Door",
         "text": "The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, {playerName}. Slay 8 Forest Wolves and Eastbrook will breathe easier.",

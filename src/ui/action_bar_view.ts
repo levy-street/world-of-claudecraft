@@ -339,7 +339,8 @@ export function createActionBarView(
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
-          tgtDist > (def.range > 0 ? def.range : MELEE_RANGE);
+          (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
+            (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,

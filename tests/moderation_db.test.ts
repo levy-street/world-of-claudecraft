@@ -28,6 +28,8 @@ import {
   moderationReportsForAccount,
   muteAccountChat,
   recordInGameAction,
+  setDailyRewardsBan,
+  setDailyRewardsIpBan,
 } from '../server/moderation_db';
 
 const { query, connect } = db;
@@ -456,6 +458,80 @@ describe('moderation report helpers', () => {
     expect(sql).not.toMatch(/UPDATE accounts/);
     expect(sql).not.toMatch(/player_reports/);
     expect(params).toEqual([2, 1, 'note', 'watching for repeat behavior', null]);
+  });
+
+  it('persists and audits a Daily Rewards ban atomically', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: true,
+      reason: 'automated play',
+    });
+
+    expect(client.query.mock.calls.map((call) => call[0])).toEqual([
+      'BEGIN',
+      expect.stringContaining('INSERT INTO daily_reward_bans'),
+      expect.stringContaining('INSERT INTO account_moderation_actions'),
+      'COMMIT',
+    ]);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'daily_rewards_ban',
+      'automated play',
+      null,
+    ]);
+  });
+
+  it('removes and audits a Daily Rewards ban atomically', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([]))
+      .mockResolvedValueOnce(queryResult([], 1))
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: false,
+      reason: 'appeal accepted',
+    });
+
+    expect(client.query.mock.calls[1][0]).toContain('DELETE FROM daily_reward_bans');
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'daily_rewards_unban',
+      'appeal accepted',
+      null,
+    ]);
+  });
+
+  it('persists and audits a Daily Rewards IP ban atomically', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await setDailyRewardsIpBan({
+      accountId: 2,
+      adminAccountId: 1,
+      ip: '203.0.113.4',
+      banned: true,
+      reason: 'multi-account abuse',
+    });
+
+    expect(client.query.mock.calls[1][0]).toContain('INSERT INTO daily_reward_ip_bans');
+    expect(client.query.mock.calls[1][1]).toEqual(['203.0.113.4', 'multi-account abuse', 1]);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'daily_rewards_ip_ban',
+      'multi-account abuse (IP: 203.0.113.4)',
+      null,
+    ]);
   });
 
   it('records in-game kick and kill actions without changing account state', async () => {

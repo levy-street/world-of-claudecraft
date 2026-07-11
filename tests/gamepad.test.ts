@@ -155,6 +155,136 @@ function padWithId(id: string): Gamepad {
   return { ...gamepadWithPressed(), id } as unknown as Gamepad;
 }
 
+describe('GamepadManager menu mode', () => {
+  afterEach(() => {
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: originalNavigator,
+    });
+  });
+
+  function menuSetup(menuActive = true) {
+    let pad = gamepadWithPressed();
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const onAction = vi.fn();
+    const onMenuIntent = vi.fn();
+    const clearGamepadMove = vi.fn();
+    const applyGamepadLook = vi.fn();
+    const input = {
+      applyGamepadLook,
+      setGamepadMove: vi.fn(),
+      triggerGamepadJump: vi.fn(),
+      clearGamepadMove,
+    } as unknown as Input;
+    let menu = menuActive;
+    const manager = new GamepadManager(input, new GamepadBindings(), {
+      onAction,
+      onInputEdge: vi.fn(),
+      isPointerMode: () => false,
+      isMenuMode: () => menu,
+      onMenuIntent,
+    });
+    (manager as unknown as { index: number | null }).index = 0;
+    return {
+      manager,
+      onAction,
+      onMenuIntent,
+      clearGamepadMove,
+      applyGamepadLook,
+      setPad: (p: Gamepad) => {
+        pad = p;
+      },
+      setMenu: (m: boolean) => {
+        menu = m;
+      },
+    };
+  }
+
+  it('drives a scripted intent sequence and never reaches world input while trapped', () => {
+    const { manager, onAction, onMenuIntent, clearGamepadMove, applyGamepadLook, setPad } =
+      menuSetup();
+    const tap = (btn: number) => {
+      setPad(gamepadWithPressed(btn));
+      manager.poll(1 / 60); // rising edge -> the verb
+      setPad(gamepadWithPressed());
+      manager.poll(1 / 60); // release so the next press is a fresh edge
+    };
+    tap(GP.RB); // categoryNext
+    tap(GP.DPAD_DOWN); // rowNext
+    tap(GP.DPAD_RIGHT); // adjustInc
+    tap(GP.A); // activate
+    tap(GP.B); // back
+    expect(onMenuIntent.mock.calls.map((c) => c[0])).toEqual([
+      'categoryNext',
+      'rowNext',
+      'adjustInc',
+      'activate',
+      'back',
+    ]);
+    // World input (edge dispatch + camera) is fully suppressed under the trap.
+    expect(onAction).not.toHaveBeenCalled();
+    expect(applyGamepadLook).not.toHaveBeenCalled();
+    expect(clearGamepadMove).toHaveBeenCalled();
+  });
+
+  it('resolves a left-stick deflection as a single value-adjust step (no repeat while held)', () => {
+    const { manager, onMenuIntent, setPad } = menuSetup();
+    const padAxes = (x: number) =>
+      ({ ...gamepadWithPressed(), axes: [x, 0, 0, 0] }) as unknown as Gamepad;
+    setPad(padAxes(0)); // sync prevStickX at rest
+    manager.poll(1 / 60);
+    setPad(padAxes(0.9)); // cross +threshold -> one step
+    manager.poll(1 / 60);
+    setPad(padAxes(0.9)); // held -> no repeat (keyboard single-step semantics)
+    manager.poll(1 / 60);
+    expect(onMenuIntent.mock.calls.map((c) => c[0])).toEqual(['adjustInc']);
+  });
+
+  it('resets the stick tracking on disconnect so a reconnect behaves like a fresh start', () => {
+    const { manager, onMenuIntent, setPad } = menuSetup();
+    const padAxes = (x: number) =>
+      ({ ...gamepadWithPressed(), axes: [x, 0, 0, 0] }) as unknown as Gamepad;
+    const mgr = manager as unknown as {
+      onConnect(e: { gamepad: Gamepad }): void;
+      onDisconnect(e: { gamepad: Gamepad }): void;
+    };
+    setPad(padAxes(0));
+    manager.poll(1 / 60);
+    setPad(padAxes(0.9)); // cross +threshold -> one step
+    manager.poll(1 / 60);
+    expect(onMenuIntent.mock.calls.map((c) => c[0])).toEqual(['adjustInc']);
+    // Disconnect while deflected: the tracking must reset (mirror stop()), so the
+    // reconnect never resolves its first frame against the pre-disconnect
+    // deflection. With the stale 0.9 kept, a pad re-acquired while held right
+    // would silently swallow the crossing a fresh start() would deliver.
+    mgr.onDisconnect({ gamepad: padAxes(0.9) });
+    mgr.onConnect({ gamepad: padAxes(0.9) });
+    manager.poll(1 / 60);
+    expect(onMenuIntent.mock.calls.map((c) => c[0])).toEqual(['adjustInc', 'adjustInc']);
+  });
+
+  it('consumes edges ONLY while trapped: outside the trap they flow to world input', () => {
+    const { manager, onAction, onMenuIntent, setPad, setMenu } = menuSetup(false);
+    // GP.B default-binds to 'interact', so out of a trap it fires the world action.
+    setPad(gamepadWithPressed(GP.B));
+    manager.poll(1 / 60);
+    expect(onMenuIntent).not.toHaveBeenCalled();
+    expect(onAction).toHaveBeenCalledWith('interact');
+    // Enter the trap: the same button is now a consumed menu verb, not a world action.
+    setPad(gamepadWithPressed());
+    manager.poll(1 / 60);
+    setMenu(true);
+    onAction.mockClear();
+    setPad(gamepadWithPressed(GP.B));
+    manager.poll(1 / 60);
+    expect(onMenuIntent).toHaveBeenCalledWith('back');
+    expect(onAction).not.toHaveBeenCalled();
+  });
+});
+
 function stubInput(): Input {
   return {
     applyGamepadLook: vi.fn(),

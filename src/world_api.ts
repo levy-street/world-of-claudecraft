@@ -251,6 +251,7 @@ export const COMMAND_NAMES = [
   'masterAssign',
   'setMarker',
   'clearMarker',
+  'readyrespond',
   'pet_abandon',
   'pet_rename',
   'pet_revive',
@@ -472,6 +473,7 @@ export const COMMAND_FACETS = {
   masterAssign: 'IWorldParty',
   setMarker: 'IWorldParty',
   clearMarker: 'IWorldParty',
+  readyrespond: 'IWorldParty',
   // IWorldTrade: peer-to-peer trade-window commands (tradeInfo is a snapshot read,
   // no send).
   trade_req: 'IWorldTrade',

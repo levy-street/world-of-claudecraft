@@ -1,8 +1,9 @@
 // Capture the new weapon icons across the HUD: bags, vendor, character/equipment
 // panel, and an item tooltip. Boots the offline game, stages weapons, equips one,
 // opens each panel, and writes PNGs to tmp/weapon_snapshots/. Needs `npm run dev`.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -27,24 +28,61 @@ await page.click('#btn-start-offline');
 await new Promise((r) => setTimeout(r, 2500));
 
 const setup = await page.evaluate(() => {
-  const g = window.__game, sim = g.sim, pid = sim.player.id;
-  const give = ['wyrmfang_greatblade', 'drogmars_skullcleaver', 'valeborn_spellblade', 'fang_of_korzul',
-    'gravecaller_staff', 'moggers_copper_cudgel', 'fen_reaver_glaive', 'redbrook_blade', 'keen_dirk', 'worn_sword'];
+  const g = window.__game,
+    sim = g.sim,
+    pid = sim.player.id;
+  const give = [
+    'wyrmfang_greatblade',
+    'drogmars_skullcleaver',
+    'valeborn_spellblade',
+    'fang_of_korzul',
+    'gravecaller_staff',
+    'moggers_copper_cudgel',
+    'fen_reaver_glaive',
+    'redbrook_blade',
+    'keen_dirk',
+    'worn_sword',
+  ];
   for (const id of give) sim.addItem(id, 1, pid);
   // equip the best warrior-usable weapon for the character panel
   let equipped = null;
-  for (const id of ['wyrmfang_greatblade', 'drogmars_skullcleaver', 'redbrook_blade', 'worn_sword']) {
-    try { g.world.equipItem(id); } catch (e) { /* class-locked */ }
-    if (g.world.equipment?.mainhand === id) { equipped = id; break; }
+  for (const id of [
+    'wyrmfang_greatblade',
+    'drogmars_skullcleaver',
+    'redbrook_blade',
+    'worn_sword',
+  ]) {
+    try {
+      g.world.equipItem(id);
+    } catch (e) {
+      /* class-locked */
+    }
+    if (g.world.equipment?.mainhand === id) {
+      equipped = id;
+      break;
+    }
   }
   // find a weapon-selling vendor NPC
-  const knownVendorWeapons = ['eastbrook_arming_sword', 'bronzework_mace', 'vale_carving_knife',
-    'hickory_shortstaff', 'highwatch_warblade', 'bogiron_mace', 'fenreed_staff', 'mirefen_skinner',
-    'craghorn_staff', 'icevein_dirk'];
+  const knownVendorWeapons = [
+    'eastbrook_arming_sword',
+    'bronzework_mace',
+    'vale_carving_knife',
+    'hickory_shortstaff',
+    'highwatch_warblade',
+    'bogiron_mace',
+    'fenreed_staff',
+    'mirefen_skinner',
+    'craghorn_staff',
+    'icevein_dirk',
+  ];
   let vendorId = null;
   for (const e of sim.entities.values()) {
-    if (Array.isArray(e.vendorItems) && e.vendorItems.some((it) => knownVendorWeapons.includes(it))) {
-      vendorId = e.id; break;
+    if (
+      Array.isArray(e.vendorItems) &&
+      e.vendorItems.some((it) => knownVendorWeapons.includes(it))
+    ) {
+      vendorId = e.id;
+      break;
     }
   }
   return { equipped, mainhand: g.world.equipment?.mainhand ?? null, vendorId };
@@ -73,8 +111,12 @@ if (setup.vendorId !== null) {
     // stand next to the vendor so the world's update loop keeps the shop open
     const sim = window.__game.sim;
     const npc = sim.entities.get(id);
-    sim.player.pos.x = npc.pos.x + 1.5; sim.player.pos.z = npc.pos.z;
-    for (const sel of ['#char-window', '#bags']) { const e = document.querySelector(sel); if (e) e.style.display = 'none'; }
+    sim.player.pos.x = npc.pos.x + 1.5;
+    sim.player.pos.z = npc.pos.z;
+    for (const sel of ['#char-window', '#bags']) {
+      const e = document.querySelector(sel);
+      if (e) e.style.display = 'none';
+    }
     window.__game.hud.openVendor(id);
     document.querySelector('#bags').style.display = 'none'; // openVendor re-shows bags
     return { name: npc?.name, kids: document.querySelector('#vendor-window').childElementCount };
@@ -83,18 +125,26 @@ if (setup.vendorId !== null) {
   await new Promise((r) => setTimeout(r, 400));
   const vclip = await page.evaluate(() => {
     const el = document.querySelector('#vendor-window');
-    el.style.display = 'block'; el.style.left = '600px'; el.style.top = '80px';
+    el.style.display = 'block';
+    el.style.left = '600px';
+    el.style.top = '80px';
     const r = el.getBoundingClientRect();
-    return { x: Math.max(0, r.x - 6), y: Math.max(0, r.y - 6), width: r.width + 12, height: r.height + 12 };
+    return {
+      x: Math.max(0, r.x - 6),
+      y: Math.max(0, r.y - 6),
+      width: r.width + 12,
+      height: r.height + 12,
+    };
   });
   await page.screenshot({ path: `${OUT}/03_vendor.png`, clip: vclip });
 
   // 4) TOOLTIP — synthesize a hover on the first vendor weapon row (attachTooltip
   // listens for mouseenter/mousemove and positions #tooltip at the cursor).
   await page.evaluate(() => {
-    const row = document.querySelector('#vendor-window .vendor-item');
+    const row = document.querySelector('#vendor-window .vendor-row');
     const r = row.getBoundingClientRect();
-    const cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+    const cx = r.x + r.width / 2,
+      cy = r.y + r.height / 2;
     for (const type of ['mouseenter', 'mouseover', 'mousemove']) {
       row.dispatchEvent(new MouseEvent(type, { bubbles: true, clientX: cx, clientY: cy }));
     }
@@ -105,8 +155,10 @@ if (setup.vendorId !== null) {
     const v = document.querySelector('#vendor-window').getBoundingClientRect();
     const tt = document.querySelector('#tooltip');
     const t = tt && tt.style.display !== 'none' ? tt.getBoundingClientRect() : v;
-    const x0 = Math.max(0, Math.min(v.x, t.x) - 10), y0 = Math.max(0, Math.min(v.y, t.y) - 10);
-    const x1 = Math.max(v.x + v.width, t.x + t.width) + 10, y1 = Math.max(v.y + v.height, t.y + t.height) + 10;
+    const x0 = Math.max(0, Math.min(v.x, t.x) - 10),
+      y0 = Math.max(0, Math.min(v.y, t.y) - 10);
+    const x1 = Math.max(v.x + v.width, t.x + t.width) + 10,
+      y1 = Math.max(v.y + v.height, t.y + t.height) + 10;
     return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
   });
   await page.screenshot({ path: `${OUT}/04_tooltip.png`, clip: ttclip });
