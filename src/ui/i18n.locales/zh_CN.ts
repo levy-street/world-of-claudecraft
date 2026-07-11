@@ -100,8 +100,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.no_wallet': '请连接一个持有至少价值 $20 USD 的 WOC 的钱包。',
   'hudChrome.dailyRewards.reason.under_minimum': '钱包低于 $20 USD WOC 的最低要求。',
   'hudChrome.dailyRewards.reason.price_unavailable': 'WOC 价格不可用，奖励暂时锁定。',
+  'hudChrome.dailyRewards.reason.banned': '您已被禁止参加每日奖励。原因：{reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '正在观察 {name}',
+  'hudChrome.readyCheck.prompt': '{name} 发起了准备确认。你准备好了吗？',
+  'hudChrome.readyCheck.ready': '准备就绪',
+  'hudChrome.readyCheck.notReady': '未准备',
+  'hudChrome.readyCheck.result':
+    '准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.itemTooltip.requiresLevel': '需要等级 {level}',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',
@@ -5914,6 +5920,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.chatPlaceholder': '说点什么...',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷杯',
+  'hudChrome.keybinds.categoryPet': '宠物',
+  'hudChrome.keybinds.petAttack': '宠物：攻击',
+  'hudChrome.keybinds.petStop': '宠物：停止',
+  'hudChrome.keybinds.petTaunt': '宠物：嘲讽',
+  'hudChrome.keybinds.petDefensive': '宠物：防御',
+  'hudChrome.keybinds.petAggressive': '宠物：攻击性',
   'hudChrome.vcup.title': '溪谷杯',
   'hudChrome.vcup.close': '关闭溪谷杯窗口',
   'hudChrome.vcup.offlineNote': '赛程簿已合上。溪谷杯目前不可用。',
@@ -6151,4 +6163,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '邀请好友：当好友升到 10 级，你们各获得 2 个格子，最多 5 位好友。',
   'hudChrome.bank.bonusSectionAria': '奖励银行格子及获取方式',
   'entities.mobs.yumi_cat.name': '由美',
+  'loading.tips.classes': '提示：9 个职业玩法各不相同，投入之前不妨都试一试。',
+  'loading.tips.talents':
+    '提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。',
+  'loading.tips.dungeons':
+    '提示：装备超出普通难度要求后，试试地下城的英雄难度，享受更艰难也更有回报的战斗。',
+  'loading.tips.market': '提示：世界市场可以让你与全服玩家进行买卖交易。',
+  'loading.tips.guilds': '提示：加入公会可获得专属聊天频道和公会成员名单。',
+  'loading.tips.professions': '提示：采集与制造类生活技能可以与你的战斗职业同时培养。',
+  'loading.tips.loadouts': '提示：保存多套天赋配置，即可在不同 build 间切换而无需重新分配天赋点。',
+  'loading.tips.pvp': '提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。',
 };

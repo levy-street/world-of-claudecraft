@@ -88,8 +88,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   // Deathless Rage lethal on a failed wardstone channel; see
   // encounters/nythraxis.ts). The attunement dungeon nythraxis_crypt is
   // story content and deliberately has NO heroic record. The daily raid
-  // lockout is keyed by dungeon id, so it is SHARED across difficulties:
-  // one Nythraxis kill per day, normal or heroic.
+  // lockout is difficulty-scoped (the :heroic key beside the plain dungeon
+  // id): one normal AND one heroic Nythraxis kill per day.
   nythraxis_boss_arena: {
     id: 'nythraxis_boss_arena',
     difficulty: 'heroic',

@@ -57,6 +57,7 @@ function makeInput() {
     onTab: vi.fn(),
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
+    onPet: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),
@@ -208,6 +209,35 @@ describe('Input autorun', () => {
   });
 });
 
+describe('Input pet bar chords', () => {
+  it('dispatches onPet for the default Ctrl+Digit pet chords and cancels the browser default', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    const cases: Array<[string, string]> = [
+      ['Digit1', 'attack'],
+      ['Digit2', 'stop'],
+      ['Digit3', 'taunt'],
+      ['Digit4', 'defensive'],
+      ['Digit5', 'aggressive'],
+    ];
+    for (const [code, action] of cases) {
+      const preventDefault = vi.fn();
+      windowListeners.get('keydown')!({ code, ctrlKey: true, repeat: false, preventDefault });
+      expect(cb.onPet).toHaveBeenCalledWith(action);
+      // The chord carries Ctrl, so the browser accelerator default is cancelled.
+      expect(preventDefault).toHaveBeenCalled();
+    }
+  });
+
+  it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onPet).not.toHaveBeenCalled();
+    expect(cb.onAbilityDown).toHaveBeenCalledWith(0); // Digit1 -> action bar slot 0
+  });
+});
+
 describe('Input click-to-move marker pulses', () => {
   it('increments the pulse id for every accepted click-move target', () => {
     const { input } = makeInput();
@@ -344,7 +374,7 @@ describe('Input pointer lock', () => {
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
   });
 
-  it('uses normal mouse dragging instead of pointer lock while browser fullscreen is active', () => {
+  it('requests pointer lock while browser fullscreen is active', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
     (globalThis as any).document.fullscreenElement =
       (globalThis as any).document.documentElement ?? canvas;
@@ -353,7 +383,7 @@ describe('Input pointer lock', () => {
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
 
-    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
   });
 
   it('does not rotate the camera before the drag threshold, so short sloppy clicks stay stable', () => {

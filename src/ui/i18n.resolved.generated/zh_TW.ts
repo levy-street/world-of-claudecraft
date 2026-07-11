@@ -154,6 +154,12 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "readyCheck": {
+      "prompt": "{name} 發起了準備確認。你準備好了嗎？",
+      "ready": "準備就緒",
+      "notReady": "未準備",
+      "result": "準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。"
+    },
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
@@ -232,7 +238,8 @@ export const zh_TW: EnTranslations = {
         "eligible": "獎勵已解鎖。",
         "no_wallet": "請連接持有至少 $20 USD WOC 的錢包。",
         "under_minimum": "錢包低於 $20 USD 的 WOC 最低要求。",
-        "price_unavailable": "無法取得 WOC 價格，獎勵暫時鎖定。"
+        "price_unavailable": "無法取得 WOC 價格，獎勵暫時鎖定。",
+        "banned": "您已被禁止參加每日獎勵。原因：{reason}"
       }
     },
     "theme": {
@@ -396,7 +403,13 @@ export const zh_TW: EnTranslations = {
       "targetFriendly": "選取最近友方",
       "targetFriendlyNext": "切換友方目標",
       "discord": "Discord",
-      "valecup": "溪谷盃"
+      "valecup": "溪谷盃",
+      "categoryPet": "寵物",
+      "petAttack": "寵物：攻擊",
+      "petStop": "寵物：停止",
+      "petTaunt": "寵物：嘲諷",
+      "petDefensive": "寵物：防禦",
+      "petAggressive": "寵物：攻擊性"
     },
     "vcup": {
       "title": "溪谷盃",
@@ -3923,7 +3936,17 @@ export const zh_TW: EnTranslations = {
     "enterTimeout": "無法進入世界。連線已逾時。遊戲伺服器是否正在執行？",
     "connectionLost": "與伺服器的連線已中斷。",
     "reconnecting": "連線已中斷。正在重新連線...",
-    "connectionRejected": "伺服器已關閉連線。"
+    "connectionRejected": "伺服器已關閉連線。",
+    "tips": {
+      "classes": "提示：9 個職業玩法各不相同，投入之前不妨都試一試。",
+      "talents": "提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。",
+      "dungeons": "提示：裝備超出普通難度要求後，試試地下城的英雄難度，享受更艱難也更有成就感的戰鬥。",
+      "market": "提示：世界市場可以讓你與全服玩家進行買賣交易。",
+      "guilds": "提示：加入公會可獲得專屬聊天頻道與公會成員名單。",
+      "professions": "提示：採集與製造類生活技能可以與你的戰鬥職業同時培養。",
+      "loadouts": "提示：保存多套天賦配置，即可在不同組合間切換而無需重新分配天賦點。",
+      "pvp": "提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。"
+    }
   },
   "errors": {
     "nothingInteract": "附近沒有可互動目標。",

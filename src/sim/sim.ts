@@ -299,6 +299,7 @@ import {
   awardHeroicMarks as awardHeroicMarksImpl,
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
+  grantHeroicKillLockout as grantHeroicKillLockoutImpl,
   instanceInfoAt as instanceInfoAtImpl,
   instanceKeyFor as instanceKeyForImpl,
   instanceOriginOf as instanceOriginOfImpl,
@@ -344,6 +345,7 @@ import {
 } from './social/fiesta';
 import * as fiestaBotsMod from './social/fiesta_bots';
 import { PartyMachine } from './social/party';
+import * as readyCheckMod from './social/ready_check';
 import * as valeCupMod from './social/vale_cup';
 import { createVcState, type VcState } from './social/vale_cup';
 import * as valeCupBotsMod from './social/vale_cup_bots';
@@ -407,6 +409,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type ReadyCheck,
   type RiteIntensity,
   RUN_SPEED,
   type SetProc,
@@ -723,6 +726,11 @@ export interface InstanceSlot {
   objectIds: number[];
   exitId: number | null;
   emptyFor: number;
+  // Players whose heroic daily lockout FIRST landed with THIS claim's final-boss
+  // kill (instances/dungeons lockToHeroicClaim). The heroic door's cleared-run
+  // exception admits only these: a player locked by an earlier run can never
+  // treat someone else's cleared claim as their own loot run.
+  clearedBy: Set<number>;
 }
 
 export interface ResolvedAbility {
@@ -1199,6 +1207,9 @@ export class Sim {
   // behind SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates
   // (partyOf + the eight command methods) so IWorld + foreign call sites resolve.
   private party!: PartyMachine;
+  // Active party/raid ready checks, keyed by party id (social/ready_check.ts). Swept
+  // in the end-of-tick block by updateReadyChecks. Exposed to the seam as ctx.readyChecks.
+  readyChecks = new Map<number, ReadyCheck>();
   // Player target selection + the party-scoped raid-marker store (T1): owns
   // partyMarkers and the tab/nearest/friendly selectors, moved off Sim behind
   // SimContext. Built in the ctor after `ctx`. Sim keeps thin delegates (the nine
@@ -1458,6 +1469,7 @@ export class Sim {
             objectIds: [],
             exitId: null,
             emptyFor: 0,
+            clearedBy: new Set(),
           });
         }
         continue;
@@ -1484,6 +1496,7 @@ export class Sim {
           objectIds: [],
           exitId: null,
           emptyFor: 0,
+          clearedBy: new Set(),
         });
       }
     }
@@ -2452,6 +2465,7 @@ export class Sim {
       eligibility: {
         eligible: false,
         reason: 'no_wallet',
+        banReason: null,
         walletPubkey: null,
         wocBalance: null,
         wocUsdPrice: null,
@@ -2730,6 +2744,9 @@ export class Sim {
       get partyInvites() {
         return sim.party.partyInvites;
       },
+      get readyChecks() {
+        return sim.readyChecks;
+      },
       get chatTokens() {
         return sim.chatTokens;
       },
@@ -2851,6 +2868,7 @@ export class Sim {
       removeEnchantableItem: sim.removeEnchantableItem.bind(sim),
       partyOf: sim.partyOf.bind(sim),
       partyInvite: (targetPid: number, pid?: number) => sim.party.partyInvite(targetPid, pid),
+      readyCheckStart: (pid?: number) => sim.readyCheckStart(pid),
       removeFromParty: (pid: number, verb: string) => sim.party.removeFromParty(pid, verb),
       // dropPartyMarkers flips to the T1 marker store (targeting); lazy arrow since
       // sim.targeting is built after ctx. The T1 selectors consume isHostileTo/
@@ -2880,6 +2898,9 @@ export class Sim {
       dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
       setDungeonDifficulty: sim.setDungeonDifficulty.bind(sim),
       awardHeroicMarks: sim.awardHeroicMarks.bind(sim),
+      // Kill-site heroic daily lockout (instances/dungeons): C1's death hub calls it
+      // for every mob death, credit or no credit; late-bound arrow, no Sim facade.
+      grantHeroicKillLockout: (mob) => grantHeroicKillLockoutImpl(sim.ctx, mob),
       addEntity: sim.addEntity.bind(sim),
       dropEntity: sim.dropEntity.bind(sim),
       rebucket: sim.rebucket.bind(sim),
@@ -3364,6 +3385,7 @@ export class Sim {
     this.updateArena();
     lap?.('arena');
     this.updateTradesAndInvites();
+    this.updateReadyChecks();
     lap?.('trades');
     this.updateLootRolls();
     lap?.('lootRolls');
@@ -5901,6 +5923,21 @@ export class Sim {
 
   partyInvite(targetPid: number, pid?: number): void {
     this.party.partyInvite(targetPid, pid);
+  }
+
+  // Ready check (social/ready_check.ts). readyCheckStart is leader-gated and reached
+  // by the chat "/ready" command through ctx; readyCheckRespond is the yes/no answer
+  // (IWorld surface + server dispatch), defaulting to the primary player.
+  readyCheckStart(pid?: number): void {
+    readyCheckMod.readyCheckStart(this.ctx, pid);
+  }
+
+  readyCheckRespond(ready: boolean, pid?: number): void {
+    readyCheckMod.readyCheckRespond(this.ctx, ready, pid);
+  }
+
+  updateReadyChecks(): void {
+    readyCheckMod.updateReadyChecks(this.ctx);
   }
 
   partyAccept(pid?: number): void {

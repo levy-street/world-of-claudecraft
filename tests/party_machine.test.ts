@@ -14,12 +14,13 @@ import type { Entity, SimEvent } from '../src/sim/types';
 type Invite = { fromPid: number; expires: number };
 
 // A minimal SimContext that supplies only what PartyMachine reads: resolve/players/
-// error/emit/time + the trade/duel invite maps + dropPartyMarkers. The rest of the
-// seam is irrelevant to the party machine and left unimplemented.
+// error/emit/time + the trade/duel invite maps + readyChecks + dropPartyMarkers. The
+// rest of the seam is irrelevant to the party machine and left unimplemented.
 function makeCtx() {
   const players = new Map<number, PlayerMeta>();
   const tradeInvites = new Map<number, Invite>();
   const duelInvites = new Map<number, Invite>();
+  const readyChecks = new Map();
   const events: SimEvent[] = [];
   const errors: { pid: number; text: string }[] = [];
   const droppedMarkers: number[] = [];
@@ -37,6 +38,9 @@ function makeCtx() {
     },
     get duelInvites() {
       return duelInvites;
+    },
+    get readyChecks() {
+      return readyChecks;
     },
     resolve(pid?: number) {
       if (pid === undefined) return null;

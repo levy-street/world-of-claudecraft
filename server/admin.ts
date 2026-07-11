@@ -88,6 +88,8 @@ import {
   moderationReportsForAccount,
   muteAccountChat,
   recordPasswordReset,
+  setDailyRewardsBan,
+  setDailyRewardsIpBan,
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
@@ -490,6 +492,47 @@ export async function handleAdminApi(
         return ok(res, { ok: true });
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : 'chat mute failed');
+      }
+    }
+    const dailyRewardsBanMatch =
+      /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-(ban|unban)$/.exec(path);
+    if (req.method === 'POST' && dailyRewardsBanMatch) {
+      const body = await readBody(req);
+      try {
+        await setDailyRewardsBan({
+          accountId: Number(dailyRewardsBanMatch[1]),
+          adminAccountId: accountId,
+          banned: dailyRewardsBanMatch[2] === 'ban',
+          reason: body.reason,
+        });
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(
+          res,
+          400,
+          err instanceof Error ? err.message : 'daily rewards moderation failed',
+        );
+      }
+    }
+    const dailyRewardsIpBanMatch =
+      /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-ip-(ban|unban)$/.exec(path);
+    if (req.method === 'POST' && dailyRewardsIpBanMatch) {
+      const body = await readBody(req);
+      try {
+        await setDailyRewardsIpBan({
+          accountId: Number(dailyRewardsIpBanMatch[1]),
+          adminAccountId: accountId,
+          ip: body.ip,
+          banned: dailyRewardsIpBanMatch[2] === 'ban',
+          reason: body.reason,
+        });
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(
+          res,
+          400,
+          err instanceof Error ? err.message : 'daily rewards IP moderation failed',
+        );
       }
     }
     const ignoreMatch = /^\/admin\/api\/moderation\/reports\/(\d+)\/ignore$/.exec(path);
@@ -1069,6 +1112,8 @@ function makeRealAdminDb() {
     updatePasswordHash,
     revokeTokensExcept,
     recordPasswordReset,
+    setDailyRewardsBan,
+    setDailyRewardsIpBan,
     emailSecurityIncident,
     providerUsageSnapshot,
     rateLimited,
@@ -1531,6 +1576,48 @@ async function chatMuteHandler(ctx: Ctx): Promise<void> {
     return ok(ctx.res, { ok: true });
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'chat mute failed');
+  }
+}
+
+/** POST daily-rewards-ban/unban: change reward eligibility with an audited reason. */
+async function dailyRewardsBanHandler(ctx: Ctx): Promise<void> {
+  const banned = ctx.path.endsWith('/daily-rewards-ban');
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().setDailyRewardsBan({
+      accountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      banned,
+      reason: body.reason,
+    });
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(
+      ctx.res,
+      400,
+      err instanceof Error ? err.message : 'daily rewards moderation failed',
+    );
+  }
+}
+
+async function dailyRewardsIpBanHandler(ctx: Ctx): Promise<void> {
+  const banned = ctx.path.endsWith('/daily-rewards-ip-ban');
+  const body = await readBody(ctx.req);
+  try {
+    await adminDb().setDailyRewardsIpBan({
+      accountId: adminTargetId(ctx),
+      adminAccountId: ctxAccountId(ctx),
+      ip: body.ip,
+      banned,
+      reason: body.reason,
+    });
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(
+      ctx.res,
+      400,
+      err instanceof Error ? err.message : 'daily rewards IP moderation failed',
+    );
   }
 }
 
@@ -2039,6 +2126,38 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: chatMuteHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-unban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ip-ban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsIpBanHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/daily-rewards-ip-unban',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardsIpBanHandler,
   },
   {
     method: 'POST',

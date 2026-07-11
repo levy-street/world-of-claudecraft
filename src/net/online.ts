@@ -2327,6 +2327,9 @@ export class ClientWorld implements IWorld {
   partyAccept(): void {
     this.cmd({ cmd: 'paccept' });
   }
+  readyCheckRespond(ready: boolean): void {
+    this.cmd({ cmd: 'readyrespond', ready });
+  }
   partyDecline(): void {
     this.cmd({ cmd: 'pdecline' });
   }

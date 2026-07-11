@@ -622,6 +622,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       });
     }
     if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
+    // Heroic daily lockout lands HERE, on the kill itself (credit or no credit),
+    // for the whole group that owns the claim: the marks award further down is
+    // credit- and participation-gated, so it must not carry the lockout.
+    ctx.grantHeroicKillLockout(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer =

@@ -561,6 +561,7 @@ export function setHeldWeapon(
 // ---------------------------------------------------------------------------
 
 const matCache = new Map<string, THREE.Material>();
+const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[]>();
 const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
 const weaponHighlight = new THREE.Color(0xfff0c2);
@@ -662,17 +663,20 @@ export function applyMaterials(
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
+    // Always derive a skin/material variant from the assembled model's source
+    // material. Reusing the last applied variant would retain its alternate map
+    // when skin 0 asks to restore the embedded default texture.
+    const source = sourceMaterials.get(mesh) ?? mesh.material;
+    sourceMaterials.set(mesh, source);
     const role: MaterialRole = mesh.userData.weaponMesh ? 'weapon' : 'body';
     const materialTint = role === 'weapon' ? null : tint;
     // skin/emissive override only touches the character's own atlas meshes, not weapons
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
-    if (Array.isArray(mesh.material)) {
-      mesh.material = mesh.material.map((m) =>
-        tintedMaterial(m, materialTint, strength, sk, em, role),
-      );
+    if (Array.isArray(source)) {
+      mesh.material = source.map((m) => tintedMaterial(m, materialTint, strength, sk, em, role));
     } else {
-      mesh.material = tintedMaterial(mesh.material, materialTint, strength, sk, em, role);
+      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role);
     }
   });
 }

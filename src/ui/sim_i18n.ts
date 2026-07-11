@@ -64,6 +64,8 @@ const baseEnTable = {
   'error.alreadyInParty': 'You are already in a party.',
   'error.notPartyLeader': 'You are not the party leader.',
   'error.raidMarkersParty': 'You must be in a party to use raid markers.',
+  'error.readyCheckNotInParty': 'You must be in a party to start a ready check.',
+  'error.readyCheckInProgress': 'A ready check is already in progress.',
   'error.nameSellQty': 'Name how many you wish to sell.',
   'error.talentsInCombat': 'You cannot change talents in combat.',
   'error.talentsArena': 'You cannot change talents during an arena match.',
@@ -5305,6 +5307,12 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
+  {
+    re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
+    build: (m) =>
+      t('hudChrome.readyCheck.result', { ready: m[1], notReady: m[2], noResponse: m[3] }),
+  },
   { re: /^Your class has no talent tree yet\.$/, build: () => t('game.talents.readout.noTree') },
   {
     re: /^You have not unlocked talents yet — they begin at level (.+)\.$/,

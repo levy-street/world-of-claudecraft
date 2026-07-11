@@ -106,8 +106,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.under_minimum': 'Кошелек ниже минимума в $20 USD WOC.',
   'hudChrome.dailyRewards.reason.price_unavailable':
     'Цена WOC недоступна, награды временно заблокированы.',
+  'hudChrome.dailyRewards.reason.banned':
+    'Вам запрещено участвовать в ежедневных наградах. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
+  'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
+  'hudChrome.readyCheck.ready': 'Готов',
+  'hudChrome.readyCheck.notReady': 'Не готов',
+  'hudChrome.readyCheck.result':
+    'Проверка готовности: {ready} готовы, {notReady} не готовы, {noResponse} без ответа.',
   'hudChrome.loot.chestTitle': 'Сундук',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
@@ -6358,6 +6365,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение...',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
+  'hudChrome.keybinds.categoryPet': 'Питомец',
+  'hudChrome.keybinds.petAttack': 'Питомец: атака',
+  'hudChrome.keybinds.petStop': 'Питомец: стоп',
+  'hudChrome.keybinds.petTaunt': 'Питомец: провокация',
+  'hudChrome.keybinds.petDefensive': 'Питомец: защита',
+  'hudChrome.keybinds.petAggressive': 'Питомец: агрессия',
   'hudChrome.vcup.title': 'Кубок Долины',
   'hudChrome.vcup.close': 'Закрыть окно Кубка Долины',
   'hudChrome.vcup.offlineNote': 'Книга матчей закрыта. Кубок Долины сейчас недоступен.',
@@ -6615,4 +6628,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.',
   'hudChrome.bank.bonusSectionAria': 'Бонусные ячейки банка и способы их получить',
   'entities.mobs.yumi_cat.name': 'Юми',
+  'loading.tips.classes':
+    'Совет: все 9 классов играются по-разному. Попробуйте несколько, прежде чем выбрать один.',
+  'loading.tips.talents':
+    'Совет: вы можете сбросить таланты в любое время вне боя, так что ранний выбор никогда не станет ловушкой.',
+  'loading.tips.dungeons':
+    'Совет: попробуйте героическую сложность подземелья, когда переросли обычную, ради более сложного и выгодного боя.',
+  'loading.tips.market':
+    'Совет: на Мировом рынке можно покупать и продавать вещи игрокам всего мира.',
+  'loading.tips.guilds':
+    'Совет: вступление в гильдию даёт личный чат-канал и общий список соратников по гильдии.',
+  'loading.tips.professions':
+    'Совет: сбор и крафтовые профессии можно развивать параллельно с боевым классом.',
+  'loading.tips.loadouts':
+    'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
+  'loading.tips.pvp':
+    'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
 };

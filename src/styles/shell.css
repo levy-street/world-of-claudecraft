@@ -1932,6 +1932,16 @@
     font-size: 13px;
     text-shadow: 1px 1px 2px #000;
   }
+  #ls-tip {
+    max-width: min(480px, 80vw);
+    margin-top: 4px;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+    min-height: 1.2em;
+  }
 
   /* ---------- play console (realm selector + Play CTA) ---------- */
   .play-console {

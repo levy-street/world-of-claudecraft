@@ -91,6 +91,16 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
   },
   {
     method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-(ban|unban)$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/daily-rewards-ip-(ban|unban)$/,
+    permission: 'moderation.act',
+  },
+  {
+    method: 'POST',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/lift-mute$/,
     permission: 'moderation.act',
   },
